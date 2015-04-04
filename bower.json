@@ -1,0 +1,22 @@
+{
+  "name": "ngFormio",
+  "version": "0.0.1",
+  "authors": [
+    "Travis Tidwell <travis@form.io>"
+  ],
+  "description": "The Form.IO form renderer.",
+  "main": "formio.js",
+  "keywords": [
+    "angularjs",
+    "ionic",
+    "form"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
