@@ -1,7 +1,4 @@
-'use strict';
-
-var app = angular.module('formio.components');
-app.config(function(formioComponentsProvider) {
+components.config(function(formioComponentsProvider) {
   formioComponentsProvider.register('hidden', {
     title: 'Hidden',
     template: 'formio/components/hidden.html',

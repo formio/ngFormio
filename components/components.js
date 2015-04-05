@@ -1,7 +1,5 @@
-'use strict';
-
-var app = angular.module('formio.components', []);
-app.provider('formioComponents', function() {
+var components = angular.module('formio.components', []);
+components.provider('formioComponents', function() {
   var components = {};
   var groups = {
     __component: {

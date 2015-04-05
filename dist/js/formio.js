@@ -1,5 +1,5 @@
+(function () {
 'use strict';
-
 var app = angular.module('formio', [
   'formio.components'
 ]);
@@ -612,10 +612,8 @@ app.run([
   }
 ]);
 
-'use strict';
-
-var app = angular.module('formio.components', []);
-app.provider('formioComponents', function() {
+var components = angular.module('formio.components', []);
+components.provider('formioComponents', function() {
   var components = {};
   var groups = {
     __component: {
@@ -652,10 +650,7 @@ app.provider('formioComponents', function() {
   };
 });
 
-'use strict';
-
-var app = angular.module('formio.components');
-app.config(function(formioComponentsProvider) {
+components.config(function(formioComponentsProvider) {
   formioComponentsProvider.register('textfield', {
     title: 'Text Field',
     template: 'formio/components/textfield.html',
@@ -680,7 +675,7 @@ app.config(function(formioComponentsProvider) {
     }
   });
 });
-app.run([
+components.run([
   '$templateCache',
   'FormioUtils',
   function(
@@ -702,12 +697,7 @@ app.run([
   }
 ]);
 
-'use strict';
-
-var app = angular.module('formio.components');
-
-// Configure the Select component.
-app.config(function(formioComponentsProvider) {
+components.config(function(formioComponentsProvider) {
   formioComponentsProvider.register('address', {
     title: 'Address',
     template: function($scope) {
@@ -735,7 +725,7 @@ app.config(function(formioComponentsProvider) {
     }
   });
 });
-app.run([
+components.run([
   '$templateCache',
   function($templateCache) {
     $templateCache.put('formio/components/address.html',
@@ -755,10 +745,7 @@ app.run([
   }
 ]);
 
-'use strict';
-
-var app = angular.module('formio.components');
-app.config(function(formioComponentsProvider) {
+components.config(function(formioComponentsProvider) {
   formioComponentsProvider.register('container', {
     title: 'Container',
     template: 'formio/components/container.html',
@@ -769,7 +756,7 @@ app.config(function(formioComponentsProvider) {
     }
   });
 });
-app.run([
+components.run([
   '$templateCache',
   function($templateCache) {
     $templateCache.put('formio/components/container.html',
@@ -782,10 +769,7 @@ app.run([
   }
 ]);
 
-'use strict';
-
-var app = angular.module('formio.components');
-app.directive('dateTimePicker', function() {
+components.directive('dateTimePicker', function() {
   return {
     restrict: 'AE',
     scope: false,
@@ -794,7 +778,7 @@ app.directive('dateTimePicker', function() {
     }
   };
 });
-app.config(function(formioComponentsProvider) {
+components.config(function(formioComponentsProvider) {
   formioComponentsProvider.register('datetime', {
     title: 'Date / Time',
     template: 'formio/components/datetime.html',
@@ -813,7 +797,7 @@ app.config(function(formioComponentsProvider) {
     }
   });
 });
-app.run([
+components.run([
   '$templateCache',
   function($templateCache) {
     $templateCache.put('formio/components/datetime.html',
@@ -822,10 +806,7 @@ app.run([
   }
 ]);
 
-'use strict';
-
-var app = angular.module('formio.components');
-app.config(function(formioComponentsProvider) {
+components.config(function(formioComponentsProvider) {
   formioComponentsProvider.register('email', {
     title: 'Email',
     template: 'formio/components/textfield.html',
@@ -841,10 +822,7 @@ app.config(function(formioComponentsProvider) {
   });
 });
 
-'use strict';
-
-var app = angular.module('formio.components');
-app.config(function(formioComponentsProvider) {
+components.config(function(formioComponentsProvider) {
   formioComponentsProvider.register('fieldset', {
     title: 'Field Set',
     template: 'formio/components/fieldset.html',
@@ -855,7 +833,7 @@ app.config(function(formioComponentsProvider) {
     }
   });
 });
-app.run([
+components.run([
   '$templateCache',
   function($templateCache) {
     $templateCache.put('formio/components/fieldset.html',
@@ -867,10 +845,7 @@ app.run([
   }
 ]);
 
-'use strict';
-
-var app = angular.module('formio.components');
-app.config(function(formioComponentsProvider) {
+components.config(function(formioComponentsProvider) {
   formioComponentsProvider.register('hidden', {
     title: 'Hidden',
     template: 'formio/components/hidden.html',
@@ -889,10 +864,7 @@ app.run([
   }
 ]);
 
-'use strict';
-
-var app = angular.module('formio.components');
-app.config(function(formioComponentsProvider) {
+components.config(function(formioComponentsProvider) {
   formioComponentsProvider.register('number', {
     title: 'Number',
     template: 'formio/components/number.html',
@@ -919,7 +891,7 @@ app.config(function(formioComponentsProvider) {
     }
   });
 });
-app.run([
+components.run([
   '$templateCache',
   'FormioUtils',
   function(
@@ -943,10 +915,7 @@ app.run([
 ]);
 
 
-'use strict';
-
-var app = angular.module('formio.components');
-app.config(function(formioComponentsProvider) {
+components.config(function(formioComponentsProvider) {
   formioComponentsProvider.register('panel', {
     title: 'Panel',
     template: 'formio/components/panel.html',
@@ -959,7 +928,7 @@ app.config(function(formioComponentsProvider) {
     }
   });
 });
-app.run([
+components.run([
   '$templateCache',
   function($templateCache) {
     $templateCache.put('formio/components/panel.html',
@@ -973,10 +942,7 @@ app.run([
   }
 ]);
 
-'use strict';
-
-var app = angular.module('formio.components');
-app.config(function(formioComponentsProvider) {
+components.config(function(formioComponentsProvider) {
   formioComponentsProvider.register('password', {
     title: 'Password',
     template: 'formio/components/textfield.html',
@@ -992,10 +958,7 @@ app.config(function(formioComponentsProvider) {
   });
 });
 
-'use strict';
-
-var app = angular.module('formio.components');
-app.config(function(formioComponentsProvider) {
+components.config(function(formioComponentsProvider) {
   formioComponentsProvider.register('phoneNumber', {
     title: 'Phone Number',
     template: 'formio/components/phoneNumber.html',
@@ -1010,7 +973,7 @@ app.config(function(formioComponentsProvider) {
     }
   });
 });
-app.run([
+components.run([
   '$templateCache',
   function($templateCache) {
     $templateCache.put('formio/components/phoneNumber.html',
@@ -1025,11 +988,7 @@ app.run([
   }
 ]);
 
-'use strict';
-
 var app = angular.module('formio.components');
-
-// Configure the Select component.
 app.config(function(formioComponentsProvider) {
   formioComponentsProvider.register('resource', {
     title: 'Resource',
@@ -1114,11 +1073,7 @@ app.run([
   }
 ]);
 
-'use strict';
-
-var app = angular.module('formio.components');
-
-app.directive('formioSelectItem', [
+components.directive('formioSelectItem', [
   '$compile',
   function(
     $compile
@@ -1140,7 +1095,7 @@ app.directive('formioSelectItem', [
 ]);
 
 // Configure the Select component.
-app.config(function(formioComponentsProvider) {
+components.config(function(formioComponentsProvider) {
   formioComponentsProvider.register('select', {
     title: 'Select',
     template: function($scope) {
@@ -1179,7 +1134,7 @@ app.config(function(formioComponentsProvider) {
     }
   });
 });
-app.run([
+components.run([
   '$templateCache',
   function($templateCache) {
     $templateCache.put('formio/components/select.html',
@@ -1201,10 +1156,7 @@ app.run([
   }
 ]);
 
-'use strict';
-
-var app = angular.module('formio.components');
-app.config(function(formioComponentsProvider) {
+components.config(function(formioComponentsProvider) {
   formioComponentsProvider.register('textarea', {
     title: 'Text Area',
     template: 'formio/components/textarea.html',
@@ -1228,7 +1180,7 @@ app.config(function(formioComponentsProvider) {
     }
   });
 });
-app.run([
+components.run([
   '$templateCache',
   'FormioUtils',
   function(
@@ -1246,10 +1198,7 @@ app.run([
   }
 ]);
 
-'use strict';
-
-var app = angular.module('formio.components');
-app.config(function(formioComponentsProvider) {
+components.config(function(formioComponentsProvider) {
   formioComponentsProvider.register('well', {
     title: 'Well',
     template: 'formio/components/well.html',
@@ -1260,7 +1209,7 @@ app.config(function(formioComponentsProvider) {
     }
   });
 });
-app.run([
+components.run([
   '$templateCache',
   function($templateCache) {
     $templateCache.put('formio/components/well.html',
@@ -1270,3 +1219,4 @@ app.run([
     );
   }
 ]);
+})();

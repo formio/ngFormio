@@ -1,7 +1,4 @@
-'use strict';
-
-var app = angular.module('formio.components');
-app.config(function(formioComponentsProvider) {
+components.config(function(formioComponentsProvider) {
   formioComponentsProvider.register('fieldset', {
     title: 'Field Set',
     template: 'formio/components/fieldset.html',
@@ -12,7 +9,7 @@ app.config(function(formioComponentsProvider) {
     }
   });
 });
-app.run([
+components.run([
   '$templateCache',
   function($templateCache) {
     $templateCache.put('formio/components/fieldset.html',

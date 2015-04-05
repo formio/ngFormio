@@ -1,9 +1,4 @@
-'use strict';
-
-var app = angular.module('formio.components');
-
-// Configure the Select component.
-app.config(function(formioComponentsProvider) {
+components.config(function(formioComponentsProvider) {
   formioComponentsProvider.register('address', {
     title: 'Address',
     template: function($scope) {
@@ -31,7 +26,7 @@ app.config(function(formioComponentsProvider) {
     }
   });
 });
-app.run([
+components.run([
   '$templateCache',
   function($templateCache) {
     $templateCache.put('formio/components/address.html',

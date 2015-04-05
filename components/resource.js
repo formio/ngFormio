@@ -1,8 +1,4 @@
-'use strict';
-
 var app = angular.module('formio.components');
-
-// Configure the Select component.
 app.config(function(formioComponentsProvider) {
   formioComponentsProvider.register('resource', {
     title: 'Resource',

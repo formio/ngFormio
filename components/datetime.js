@@ -1,7 +1,4 @@
-'use strict';
-
-var app = angular.module('formio.components');
-app.directive('dateTimePicker', function() {
+components.directive('dateTimePicker', function() {
   return {
     restrict: 'AE',
     scope: false,
@@ -10,7 +7,7 @@ app.directive('dateTimePicker', function() {
     }
   };
 });
-app.config(function(formioComponentsProvider) {
+components.config(function(formioComponentsProvider) {
   formioComponentsProvider.register('datetime', {
     title: 'Date / Time',
     template: 'formio/components/datetime.html',
@@ -29,7 +26,7 @@ app.config(function(formioComponentsProvider) {
     }
   });
 });
-app.run([
+components.run([
   '$templateCache',
   function($templateCache) {
     $templateCache.put('formio/components/datetime.html',

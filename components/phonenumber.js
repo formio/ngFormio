@@ -1,7 +1,4 @@
-'use strict';
-
-var app = angular.module('formio.components');
-app.config(function(formioComponentsProvider) {
+components.config(function(formioComponentsProvider) {
   formioComponentsProvider.register('phoneNumber', {
     title: 'Phone Number',
     template: 'formio/components/phoneNumber.html',
@@ -16,7 +13,7 @@ app.config(function(formioComponentsProvider) {
     }
   });
 });
-app.run([
+components.run([
   '$templateCache',
   function($templateCache) {
     $templateCache.put('formio/components/phoneNumber.html',

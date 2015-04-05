@@ -4,6 +4,10 @@
   "authors": [
     "Travis Tidwell <travis@form.io>"
   ],
+  "main": [
+    "dist/css/formio.min.css",
+    "dist/js/formio.min.js"
+  ],
   "description": "The Form.IO form renderer.",
   "main": "formio.js",
   "keywords": [
@@ -18,5 +22,10 @@
     "bower_components",
     "test",
     "tests"
-  ]
+  ],
+  "dependencies": {
+    "eonasdan-bootstrap-datetimepicker": "~4.7.14",
+    "jquery.maskedinput": "~1.4.1",
+    "angular-ui-select": "~0.11.2"
+  }
 }

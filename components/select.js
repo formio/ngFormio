@@ -1,8 +1,4 @@
-'use strict';
-
-var app = angular.module('formio.components');
-
-app.directive('formioSelectItem', [
+components.directive('formioSelectItem', [
   '$compile',
   function(
     $compile
@@ -24,7 +20,7 @@ app.directive('formioSelectItem', [
 ]);
 
 // Configure the Select component.
-app.config(function(formioComponentsProvider) {
+components.config(function(formioComponentsProvider) {
   formioComponentsProvider.register('select', {
     title: 'Select',
     template: function($scope) {
@@ -63,7 +59,7 @@ app.config(function(formioComponentsProvider) {
     }
   });
 });
-app.run([
+components.run([
   '$templateCache',
   function($templateCache) {
     $templateCache.put('formio/components/select.html',
