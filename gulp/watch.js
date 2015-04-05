@@ -21,7 +21,5 @@ module.exports = function(gulp, plugins) {
     gulp.watch('app/styles/**/*.scss', ['styles']);
     gulp.watch('app/fonts/**/*', ['fonts']);
     gulp.watch('bower.json', ['wiredep', 'fonts']);
-    gulp.watch('bower_components/formio/**/*.js', ['build-formio']);
-    gulp.watch('bower_components/ngFormBuilder/**/*.js', ['build-formbuilder']);
   };
 };

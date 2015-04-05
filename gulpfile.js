@@ -13,8 +13,6 @@ gulp.task('clean', require('del').bind(null, ['.tmp', 'dist']));
 gulp.task('wiredep', require('./gulp/wiredep')(gulp, plugins));
 gulp.task('watch', require('./gulp/watch')(gulp, plugins));
 gulp.task('serve', ['wiredep', 'styles', 'fonts', 'watch']);
-gulp.task('build-formbuilder', require('./bower_components/ngFormBuilder/gulp/scripts')(gulp, plugins));
-gulp.task('build-formio', require('./bower_components/formio/gulp/scripts')(gulp, plugins));
 gulp.task('build', ['jshint', 'wiredep', 'html', 'images', 'fonts', 'extras'], function () {
   return gulp.src('dist/**/*').pipe(plugins.size({title: 'build', gzip: true}));
 });
