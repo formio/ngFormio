@@ -1,4 +1,4 @@
-components.config(function(formioComponentsProvider) {
+app.config(function(formioComponentsProvider) {
   formioComponentsProvider.register('hidden', {
     title: 'Hidden',
     template: 'formio/components/hidden.html',
@@ -8,7 +8,7 @@ components.config(function(formioComponentsProvider) {
     }
   });
 });
-components.run([
+app.run([
   '$templateCache',
   function($templateCache) {
     $templateCache.put('formio/components/hidden.html',

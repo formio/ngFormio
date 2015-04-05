@@ -1,5 +1,4 @@
-var components = angular.module('formio.components', []);
-components.provider('formioComponents', function() {
+app.provider('formioComponents', function() {
   var components = {};
   var groups = {
     __component: {

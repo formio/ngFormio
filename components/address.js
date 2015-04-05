@@ -1,4 +1,4 @@
-components.config(function(formioComponentsProvider) {
+app.config(function(formioComponentsProvider) {
   formioComponentsProvider.register('address', {
     title: 'Address',
     template: function($scope) {
@@ -26,7 +26,7 @@ components.config(function(formioComponentsProvider) {
     }
   });
 });
-components.run([
+app.run([
   '$templateCache',
   function($templateCache) {
     $templateCache.put('formio/components/address.html',

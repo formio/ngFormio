@@ -1,4 +1,4 @@
-components.config(function(formioComponentsProvider) {
+app.config(function(formioComponentsProvider) {
   formioComponentsProvider.register('phoneNumber', {
     title: 'Phone Number',
     template: 'formio/components/phoneNumber.html',
@@ -13,7 +13,7 @@ components.config(function(formioComponentsProvider) {
     }
   });
 });
-components.run([
+app.run([
   '$templateCache',
   function($templateCache) {
     $templateCache.put('formio/components/phoneNumber.html',

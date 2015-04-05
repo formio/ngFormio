@@ -6,9 +6,9 @@ module.exports = function(gulp, plugins) {
         header: "(function () {\n'use strict';\n",
         footer: '})();'
       }))
-      .pipe(gulp.dest('dist/js/'))
+      .pipe(gulp.dest('dist/'))
       .pipe(plugins.rename('formio.min.js'))
       .pipe(plugins.uglify())
-      .pipe(gulp.dest('dist/js/'));
+      .pipe(gulp.dest('dist/'));
   };
 };

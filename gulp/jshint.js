@@ -1,6 +1,6 @@
 module.exports = function(gulp, plugins) {
   return function () {
-    return gulp.src('dist/js/formio.js')
+    return gulp.src('dist/formio.js')
       .pipe(plugins.jshint({
         predef: ['angular']
       }))

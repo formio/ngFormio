@@ -1,4 +1,4 @@
-components.config(function(formioComponentsProvider) {
+app.config(function(formioComponentsProvider) {
   formioComponentsProvider.register('email', {
     title: 'Email',
     template: 'formio/components/textfield.html',

@@ -1,4 +1,4 @@
-components.directive('dateTimePicker', function() {
+app.directive('dateTimePicker', function() {
   return {
     restrict: 'AE',
     scope: false,
@@ -7,7 +7,7 @@ components.directive('dateTimePicker', function() {
     }
   };
 });
-components.config(function(formioComponentsProvider) {
+app.config(function(formioComponentsProvider) {
   formioComponentsProvider.register('datetime', {
     title: 'Date / Time',
     template: 'formio/components/datetime.html',
@@ -26,7 +26,7 @@ components.config(function(formioComponentsProvider) {
     }
   });
 });
-components.run([
+app.run([
   '$templateCache',
   function($templateCache) {
     $templateCache.put('formio/components/datetime.html',

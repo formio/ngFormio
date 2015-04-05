@@ -1,4 +1,4 @@
-components.config(function(formioComponentsProvider) {
+app.config(function(formioComponentsProvider) {
   formioComponentsProvider.register('password', {
     title: 'Password',
     template: 'formio/components/textfield.html',

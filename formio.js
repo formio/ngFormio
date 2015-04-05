@@ -1,6 +1,4 @@
-var app = angular.module('formio', [
-  'formio.components'
-]);
+var app = angular.module('formio', []);
 
 /**
  * Create the formio provider.

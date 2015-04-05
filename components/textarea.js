@@ -1,4 +1,4 @@
-components.config(function(formioComponentsProvider) {
+app.config(function(formioComponentsProvider) {
   formioComponentsProvider.register('textarea', {
     title: 'Text Area',
     template: 'formio/components/textarea.html',
@@ -22,7 +22,7 @@ components.config(function(formioComponentsProvider) {
     }
   });
 });
-components.run([
+app.run([
   '$templateCache',
   'FormioUtils',
   function(

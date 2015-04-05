@@ -1,4 +1,4 @@
-components.directive('formioSelectItem', [
+app.directive('formioSelectItem', [
   '$compile',
   function(
     $compile
@@ -20,7 +20,7 @@ components.directive('formioSelectItem', [
 ]);
 
 // Configure the Select component.
-components.config(function(formioComponentsProvider) {
+app.config(function(formioComponentsProvider) {
   formioComponentsProvider.register('select', {
     title: 'Select',
     template: function($scope) {
@@ -59,7 +59,7 @@ components.config(function(formioComponentsProvider) {
     }
   });
 });
-components.run([
+app.run([
   '$templateCache',
   function($templateCache) {
     $templateCache.put('formio/components/select.html',
