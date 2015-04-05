@@ -1,0 +1,5 @@
+<ul class="nav nav-tabs submission-nav">
+  <li role="presentation" ng-class="{active:isActive(nav, 'resource', 'submission', 'view')}"><a ui-sref="view{{ resourceInfo.title }}Submission({id: resource._id, subId: submission._id})">View</a></li>
+  <li role="presentation" ng-class="{active:isActive(nav, 'resource', 'submission', 'edit')}"><a ui-sref="edit{{ resourceInfo.title }}Submission({id: resource._id, subId: submission._id})">Edit</a></li>
+  <li role="presentation" ng-class="{active:isActive(nav, 'resource', 'submission', 'delete')}"><a ui-sref="delete{{ resourceInfo.title }}Submission({id: resource._id, subId: submission._id})">Delete</a></li>
+</ul>

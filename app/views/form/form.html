@@ -1,0 +1,10 @@
+<div id="form-group-title" class="form-group">
+  <label for="title" class="control-label">Title</label>
+  <input type="text" ng-model="resource.title" class="form-control" id="title" placeholder="Enter the {{ resourceName }} title"/>
+</div>
+<form-builder components="resource.components"></form-builder>
+<div class="form-group">
+  <input type="submit" class="btn btn-primary" ng-click="saveResource()" value="Save" />
+  <a class="btn btn-danger" ng-if="resource._id" ui-sref="delete{{ resourceInfo.title }}({id: resource._id})">Delete</a>
+  <button type="button" class="btn btn-default" ng-click="back()">Cancel</button>
+</div>
