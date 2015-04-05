@@ -1,6 +1,5 @@
 var gulp = require('gulp');
 var concat = require('gulp-concat');
-var stripDebug = require('gulp-strip-debug');
 var uglify = require('gulp-uglify');
 var notify = require('gulp-notify');
 var jshint = require('gulp-jshint');
@@ -9,10 +8,10 @@ var rename = require('gulp-rename');
 
 // The javascript sources.
 var sources = [
-  'formio.js',
   'components/components.js',
   'components/textfield.js',
-  'components/*.js'
+  'components/*.js',
+  'formio.js'
 ];
 
 gulp.task('clean', require('del').bind(null, ['dist']));

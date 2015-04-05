@@ -1,5 +1,613 @@
 (function () {
 'use strict';
+var components = angular.module('formio.components', []);
+components.provider('formioComponents', function() {
+  var components = {};
+  var groups = {
+    __component: {
+      title: 'Form Components'
+    },
+    layout: {
+      title: 'Layout Components'
+    }
+  };
+  return {
+    addGroup: function(name, group) {
+      groups[name] = group;
+    },
+    register: function(type, component, group) {
+      if (!components[type]) {
+        components[type] = component;
+      }
+      else {
+        angular.extend(components[type], component);
+      }
+
+      // Set the type for this component.
+      if (!components[type].group) {
+        components[type].group = group || '__component';
+      }
+      components[type].settings.type = type;
+    },
+    $get: function() {
+      return {
+        components: components,
+        groups: groups
+      };
+    }
+  };
+});
+
+components.config(function(formioComponentsProvider) {
+  formioComponentsProvider.register('textfield', {
+    title: 'Text Field',
+    template: 'formio/components/textfield.html',
+    settings: {
+      input: true,
+      inputType: 'text',
+      inputMask: '',
+      label: '',
+      key: '',
+      placeholder: '',
+      prefix: '',
+      suffix: '',
+      multiple: false,
+      defaultValue: '',
+      validate: {
+        required: false,
+        minLength: '',
+        maxLength: '',
+        pattern: '',
+        custom: ''
+      }
+    }
+  });
+});
+components.run([
+  '$templateCache',
+  'FormioUtils',
+  function(
+    $templateCache,
+    FormioUtils
+  ) {
+    $templateCache.put('formio/components/textfield.html', FormioUtils.fieldWrap(
+      '<input type="{{ component.inputType }}" ' +
+        'class="form-control" ' +
+        'id="{{ component.key }}" ' +
+        'name="{{ component.key }}" ' +
+        'ng-model="data[component.key]" ' +
+        'ng-required="component.validate.required" ' +
+        'ng-minlength="component.validate.minLength" ' +
+        'ng-maxlength="component.validate.maxLength" ' +
+        'placeholder="{{ component.placeholder }}" ' +
+        'formio-input-mask="{{ component.inputMask }}">'
+    ));
+  }
+]);
+
+components.config(function(formioComponentsProvider) {
+  formioComponentsProvider.register('address', {
+    title: 'Address',
+    template: function($scope) {
+      return $scope.component.multiple ? 'formio/components/address-multiple.html' : 'formio/components/address.html';
+    },
+    controller: function(settings, $scope, $http) {
+      $scope.address = {};
+      $scope.addresses = [];
+      $scope.refreshAddress = function(address) {
+        var params = {address: address, sensor: false};
+        return $http.get(
+          'http://maps.googleapis.com/maps/api/geocode/json',
+          {params: params}
+        ).then(function(response) {
+          $scope.addresses = response.data.results;
+        });
+      };
+    },
+    settings: {
+      input: true,
+      label: '',
+      key: '',
+      placeholder: '',
+      multiple: false
+    }
+  });
+});
+components.run([
+  '$templateCache',
+  function($templateCache) {
+    $templateCache.put('formio/components/address.html',
+      '<label ng-if="component.label" for="{{ component.key }}">{{ component.label }}</label>' +
+      '<ui-select ng-model="data[component.key]" id="{{ component.key }}" theme="bootstrap">' +
+        '<ui-select-match placeholder="{{ component.placeholder }}">{{$item.formatted_address || $select.selected.formatted_address}}</ui-select-match>' +
+        '<ui-select-choices repeat="address in addresses track by $index" refresh="refreshAddress($select.search)" refresh-delay="1000">' +
+          '<div ng-bind-html="address.formatted_address | highlight: $select.search"></div>' +
+        '</ui-select-choices>' +
+      '</ui-select>'
+    );
+
+    // Change the ui-select to ui-select multiple.
+    $templateCache.put('formio/components/address-multiple.html',
+      $templateCache.get('formio/components/address.html').replace('<ui-select', '<ui-select multiple')
+    );
+  }
+]);
+
+components.config(function(formioComponentsProvider) {
+  formioComponentsProvider.register('container', {
+    title: 'Container',
+    template: 'formio/components/container.html',
+    group: 'layout',
+    settings: {
+      input: false,
+      columns: [[],[]]
+    }
+  });
+});
+components.run([
+  '$templateCache',
+  function($templateCache) {
+    $templateCache.put('formio/components/container.html',
+      '<div class="row">' +
+        '<div class="col-xs-6" ng-repeat="components in component.columns">' +
+          '<formio-component ng-repeat="component in components" component="component" data="data"></formio-component>' +
+        '</div>' +
+      '</div>'
+    );
+  }
+]);
+
+components.directive('dateTimePicker', function() {
+  return {
+    restrict: 'AE',
+    scope: false,
+    link: function(scope, element) {
+      element.datetimepicker();
+    }
+  };
+});
+components.config(function(formioComponentsProvider) {
+  formioComponentsProvider.register('datetime', {
+    title: 'Date / Time',
+    template: 'formio/components/datetime.html',
+    settings: {
+      input: true,
+      label: '',
+      key: '',
+      placeholder: '',
+      prefix: '',
+      suffix: '',
+      multiple: false,
+      validate: {
+        required: false,
+        custom: ''
+      }
+    }
+  });
+});
+components.run([
+  '$templateCache',
+  function($templateCache) {
+    $templateCache.put('formio/components/datetime.html',
+      ''
+    );
+  }
+]);
+
+components.config(function(formioComponentsProvider) {
+  formioComponentsProvider.register('email', {
+    title: 'Email',
+    template: 'formio/components/textfield.html',
+    settings: {
+      input: true,
+      inputType: 'email',
+      label: '',
+      key: '',
+      placeholder: '',
+      prefix: '',
+      suffix: ''
+    }
+  });
+});
+
+components.config(function(formioComponentsProvider) {
+  formioComponentsProvider.register('fieldset', {
+    title: 'Field Set',
+    template: 'formio/components/fieldset.html',
+    settings: {
+      input: false,
+      legend: '',
+      components: []
+    }
+  });
+});
+components.run([
+  '$templateCache',
+  function($templateCache) {
+    $templateCache.put('formio/components/fieldset.html',
+      '<fieldset>' +
+        '<legend ng-if="component.legend">{{ component.legend }}</legend>' +
+        '<formio-component ng-repeat="component in component.components" component="component" data="data"></formio-component>' +
+      '</fieldset>'
+    );
+  }
+]);
+
+components.config(function(formioComponentsProvider) {
+  formioComponentsProvider.register('hidden', {
+    title: 'Hidden',
+    template: 'formio/components/hidden.html',
+    settings: {
+      input: true,
+      key: ''
+    }
+  });
+});
+app.run([
+  '$templateCache',
+  function($templateCache) {
+    $templateCache.put('formio/components/hidden.html',
+      '<input type="hidden" id="{{ component.key }}" name="{{ component.key }} ng-model="data[component.key]">'
+    );
+  }
+]);
+
+components.config(function(formioComponentsProvider) {
+  formioComponentsProvider.register('number', {
+    title: 'Number',
+    template: 'formio/components/number.html',
+    settings: {
+      input: true,
+      inputType: 'number',
+      label: '',
+      key: '',
+      placeholder: '',
+      prefix: '',
+      suffix: '',
+      defaultValue: '',
+      validate: {
+        required: false,
+        min: '',
+        max: '',
+        greater: '',
+        less: '',
+        step: 'any',
+        integer: '',
+        multiple: '',
+        custom: ''
+      }
+    }
+  });
+});
+components.run([
+  '$templateCache',
+  'FormioUtils',
+  function(
+    $templateCache,
+    FormioUtils
+  ) {
+    $templateCache.put('formio/components/number.html', FormioUtils.fieldWrap(
+      '<input type="{{ component.inputType }}" ' +
+        'class="form-control" ' +
+        'id="{{ component.key }}" ' +
+        'name="{{ component.key }}" ' +
+        'ng-model="data[component.key]" ' +
+        'ng-required="component.validate.required" ' +
+        'min="{{ component.validate.min }}" ' +
+        'max="{{ component.validate.max }}" ' +
+        'step="{{ component.validate.step }}" ' +
+        'placeholder="{{ component.placeholder }}" ' +
+        'formio-input-mask="{{ component.inputMask }}">'
+    ));
+  }
+]);
+
+
+components.config(function(formioComponentsProvider) {
+  formioComponentsProvider.register('panel', {
+    title: 'Panel',
+    template: 'formio/components/panel.html',
+    group: 'layout',
+    settings: {
+      input: false,
+      title: '',
+      theme: 'default',
+      components: []
+    }
+  });
+});
+components.run([
+  '$templateCache',
+  function($templateCache) {
+    $templateCache.put('formio/components/panel.html',
+      '<div class="panel panel-{{ component.theme }}">' +
+        '<div ng-if="component.title" class="panel-heading"><h3 class="panel-title">{{ component.title }}</h3></div>' +
+        '<div class="panel-body">' +
+          '<formio-component ng-repeat="component in component.components" component="component" data="data"></formio-component>' +
+        '</div>' +
+      '</div>'
+    );
+  }
+]);
+
+components.config(function(formioComponentsProvider) {
+  formioComponentsProvider.register('password', {
+    title: 'Password',
+    template: 'formio/components/textfield.html',
+    settings: {
+      input: true,
+      inputType: 'password',
+      label: '',
+      key: '',
+      placeholder: '',
+      prefix: '',
+      suffix: ''
+    }
+  });
+});
+
+components.config(function(formioComponentsProvider) {
+  formioComponentsProvider.register('phoneNumber', {
+    title: 'Phone Number',
+    template: 'formio/components/phoneNumber.html',
+    settings: {
+      input: true,
+      inputMask: '(999) 999-9999',
+      label: '',
+      key: '',
+      placeholder: '',
+      prefix: '',
+      suffix: ''
+    }
+  });
+});
+components.run([
+  '$templateCache',
+  function($templateCache) {
+    $templateCache.put('formio/components/phoneNumber.html',
+      '<label ng-if="component.label" for="{{ component.key }}">{{ component.label }}</label>' +
+      '<div class="input-group" ng-if="component.prefix || component.suffix">' +
+        '<div class="input-group-addon" ng-if="!!component.prefix">{{ component.prefix }}</div>' +
+        '<input type="text" class="form-control" ng-model="data[component.key]" id="{{ component.key }}" placeholder="{{ component.placeholder }}" formio-input-mask="{{ component.inputMask }}">' +
+        '<div class="input-group-addon" ng-if="!!component.suffix">{{ component.suffix }}</div>' +
+      '</div>' +
+      '<input ng-if="!component.prefix && !component.suffix" type="text" class="form-control" ng-model="data[component.key]" id="{{ component.key }}" placeholder="{{ component.placeholder }}" formio-input-mask="{{ component.inputMask }}">'
+    );
+  }
+]);
+
+var app = angular.module('formio.components');
+app.config(function(formioComponentsProvider) {
+  formioComponentsProvider.register('resource', {
+    title: 'Resource',
+    template: function($scope) {
+      return $scope.component.multiple ? 'formio/components/resource-multiple.html' : 'formio/components/resource.html';
+    },
+    controller: function(settings, $scope, $http, Formio) {
+      $scope.selectItems = [];
+      if (settings.resource) {
+        var formio = new Formio('/resource/' + settings.resource);
+        if (settings.searchExpression && settings.searchFields) {
+          var search = new RegExp(settings.searchExpression);
+          $scope.refreshSubmissions = function(input) {
+            if (!input) { return; }
+            var matches = input.match(search);
+            var params = {};
+            var shouldRequest = false;
+            if (matches && matches.length > 1) {
+              angular.forEach(settings.searchFields, function(field, index) {
+                if ((matches.length > (index + 1)) && matches[index + 1]) {
+                  params[field] = matches[index + 1];
+                  shouldRequest = true;
+                }
+              });
+            }
+
+            // Do not request unless we have parameters.
+            if (!shouldRequest) { return; }
+
+            // Load the submissions.
+            formio.loadSubmissions({
+              params: params
+            }).then(function(submissions) {
+              $scope.selectItems = submissions;
+            });
+          };
+        }
+        else {
+
+          // Load all submissions.
+          $scope.refreshSubmissions = function() {};
+          formio.loadSubmissions().then(function(submissions) {
+            $scope.selectItems = submissions;
+          });
+        }
+      }
+    },
+    settings: {
+      input: true,
+      label: '',
+      key: '',
+      placeholder: '',
+      resource: '',
+      template: '<span>{{ item.data }}</span>',
+      searchExpression: '',
+      searchFields: '',
+      multiple: false,
+      refresh: false,
+      refreshDelay: 0
+    }
+  });
+});
+app.run([
+  '$templateCache',
+  function($templateCache) {
+    $templateCache.put('formio/components/resource.html',
+      '<label ng-if="component.label" for="{{ component.key }}">{{ component.label }}</label>' +
+      '<ui-select ng-model="data[component.key]" id="{{ component.key }}" theme="bootstrap">' +
+        '<ui-select-match placeholder="{{ component.placeholder }}">' +
+          '<formio-select-item template="component.template" item="$item || $select.selected" select="$select"></formio-select-item>' +
+        '</ui-select-match>' +
+        '<ui-select-choices repeat="item in selectItems | filter: $select.search" refresh="refreshSubmissions($select.search)" refresh-delay="1000">' +
+          '<formio-select-item template="component.template" item="item" select="$select"></formio-select-item>' +
+        '</ui-select-choices>' +
+      '</ui-select>'
+    );
+
+    // Change the ui-select to ui-select multiple.
+    $templateCache.put('formio/components/resource-multiple.html',
+      $templateCache.get('formio/components/resource.html').replace('<ui-select', '<ui-select multiple')
+    );
+  }
+]);
+
+components.directive('formioSelectItem', [
+  '$compile',
+  function(
+    $compile
+  ) {
+    return {
+      restrict: 'E',
+      scope: {
+        template: '=',
+        item: '=',
+        select: '='
+      },
+      link: function(scope, element) {
+        if (scope.template) {
+          element.html($compile(angular.element(scope.template))(scope));
+        }
+      }
+    };
+  }
+]);
+
+// Configure the Select component.
+components.config(function(formioComponentsProvider) {
+  formioComponentsProvider.register('select', {
+    title: 'Select',
+    template: function($scope) {
+      return $scope.component.multiple ? 'formio/components/select-multiple.html' : 'formio/components/select.html';
+    },
+    controller: function(settings, $scope, $http) {
+      $scope.nowrap = true;
+      $scope.selectItems = [];
+
+      // If this is a url, then load the file.
+      if (settings.dataSrc.substr(0, 4) === 'http') {
+        $http.get(settings.dataSrc)
+          .success(function(data) {
+            $scope.selectItems = data;
+          });
+      }
+      else if (settings.dataSrc) {
+        try {
+          $scope.selectItems = angular.fromJson(settings.dataSrc);
+        }
+        catch (error) {
+          $scope.selectItems = [];
+        }
+      }
+    },
+    settings: {
+      input: true,
+      label: '',
+      key: '',
+      placeholder: '',
+      dataSrc: '',
+      template: '',
+      multiple: false,
+      refresh: false,
+      refreshDelay: 0
+    }
+  });
+});
+components.run([
+  '$templateCache',
+  function($templateCache) {
+    $templateCache.put('formio/components/select.html',
+      '<label ng-if="component.label" for="{{ component.key }}">{{ component.label }}</label>' +
+      '<ui-select ng-model="data[component.key]" id="{{ component.key }}" theme="bootstrap">' +
+        '<ui-select-match placeholder="{{ component.placeholder }}">' +
+          '<formio-select-item template="component.template" item="$item || $select.selected" select="$select"></formio-select-item>' +
+        '</ui-select-match>' +
+        '<ui-select-choices repeat="item in selectItems | filter: $select.search">' +
+          '<formio-select-item template="component.template" item="item" select="$select"></formio-select-item>' +
+        '</ui-select-choices>' +
+      '</ui-select>'
+    );
+
+    // Change the ui-select to ui-select multiple.
+    $templateCache.put('formio/components/select-multiple.html',
+      $templateCache.get('formio/components/select.html').replace('<ui-select', '<ui-select multiple')
+    );
+  }
+]);
+
+components.config(function(formioComponentsProvider) {
+  formioComponentsProvider.register('textarea', {
+    title: 'Text Area',
+    template: 'formio/components/textarea.html',
+    settings: {
+      input: true,
+      label: '',
+      key: '',
+      placeholder: '',
+      prefix: '',
+      suffix: '',
+      rows: 3,
+      multiple: false,
+      defaultValue: '',
+      validate: {
+        required: false,
+        minLength: '',
+        maxLength: '',
+        pattern: '',
+        custom: ''
+      }
+    }
+  });
+});
+components.run([
+  '$templateCache',
+  'FormioUtils',
+  function(
+    $templateCache,
+    FormioUtils
+  ) {
+    $templateCache.put('formio/components/textarea.html', FormioUtils.fieldWrap(
+      '<textarea ' +
+        'class="form-control" ' +
+        'ng-model="data[component.key]" ' +
+        'id="{{ component.key }}" ' +
+        'placeholder="{{ component.placeholder }}" ' +
+        'rows="{{ component.rows }}"></textarea>'
+    ));
+  }
+]);
+
+components.config(function(formioComponentsProvider) {
+  formioComponentsProvider.register('well', {
+    title: 'Well',
+    template: 'formio/components/well.html',
+    group: 'layout',
+    settings: {
+      input: false,
+      components: []
+    }
+  });
+});
+components.run([
+  '$templateCache',
+  function($templateCache) {
+    $templateCache.put('formio/components/well.html',
+      '<div class="well">' +
+        '<formio-component ng-repeat="component in component.components" component="component" data="data"></formio-component>' +
+      '</div>'
+    );
+  }
+]);
+
 var app = angular.module('formio', [
   'formio.components'
 ]);
@@ -607,614 +1215,6 @@ app.run([
         '<p class="help-block" ng-show="formioFieldForm[component.key].$error.minlength">{{ component.label }} must be longer than {{ component.validate.minLength - 1 }} characters.</p>' +
         '<p class="help-block" ng-show="formioFieldForm[component.key].$error.min">{{ component.label }} must be higher than {{ component.validate.min - 1 }}.</p>' +
         '<p class="help-block" ng-show="formioFieldForm[component.key].$error.max">{{ component.label }} must be lower than {{ component.validate.max + 1 }}.</p>' +
-      '</div>'
-    );
-  }
-]);
-
-var components = angular.module('formio.components', []);
-components.provider('formioComponents', function() {
-  var components = {};
-  var groups = {
-    __component: {
-      title: 'Form Components'
-    },
-    layout: {
-      title: 'Layout Components'
-    }
-  };
-  return {
-    addGroup: function(name, group) {
-      groups[name] = group;
-    },
-    register: function(type, component, group) {
-      if (!components[type]) {
-        components[type] = component;
-      }
-      else {
-        angular.extend(components[type], component);
-      }
-
-      // Set the type for this component.
-      if (!components[type].group) {
-        components[type].group = group || '__component';
-      }
-      components[type].settings.type = type;
-    },
-    $get: function() {
-      return {
-        components: components,
-        groups: groups
-      };
-    }
-  };
-});
-
-components.config(function(formioComponentsProvider) {
-  formioComponentsProvider.register('textfield', {
-    title: 'Text Field',
-    template: 'formio/components/textfield.html',
-    settings: {
-      input: true,
-      inputType: 'text',
-      inputMask: '',
-      label: '',
-      key: '',
-      placeholder: '',
-      prefix: '',
-      suffix: '',
-      multiple: false,
-      defaultValue: '',
-      validate: {
-        required: false,
-        minLength: '',
-        maxLength: '',
-        pattern: '',
-        custom: ''
-      }
-    }
-  });
-});
-components.run([
-  '$templateCache',
-  'FormioUtils',
-  function(
-    $templateCache,
-    FormioUtils
-  ) {
-    $templateCache.put('formio/components/textfield.html', FormioUtils.fieldWrap(
-      '<input type="{{ component.inputType }}" ' +
-        'class="form-control" ' +
-        'id="{{ component.key }}" ' +
-        'name="{{ component.key }}" ' +
-        'ng-model="data[component.key]" ' +
-        'ng-required="component.validate.required" ' +
-        'ng-minlength="component.validate.minLength" ' +
-        'ng-maxlength="component.validate.maxLength" ' +
-        'placeholder="{{ component.placeholder }}" ' +
-        'formio-input-mask="{{ component.inputMask }}">'
-    ));
-  }
-]);
-
-components.config(function(formioComponentsProvider) {
-  formioComponentsProvider.register('address', {
-    title: 'Address',
-    template: function($scope) {
-      return $scope.component.multiple ? 'formio/components/address-multiple.html' : 'formio/components/address.html';
-    },
-    controller: function(settings, $scope, $http) {
-      $scope.address = {};
-      $scope.addresses = [];
-      $scope.refreshAddress = function(address) {
-        var params = {address: address, sensor: false};
-        return $http.get(
-          'http://maps.googleapis.com/maps/api/geocode/json',
-          {params: params}
-        ).then(function(response) {
-          $scope.addresses = response.data.results;
-        });
-      };
-    },
-    settings: {
-      input: true,
-      label: '',
-      key: '',
-      placeholder: '',
-      multiple: false
-    }
-  });
-});
-components.run([
-  '$templateCache',
-  function($templateCache) {
-    $templateCache.put('formio/components/address.html',
-      '<label ng-if="component.label" for="{{ component.key }}">{{ component.label }}</label>' +
-      '<ui-select ng-model="data[component.key]" id="{{ component.key }}" theme="bootstrap">' +
-        '<ui-select-match placeholder="{{ component.placeholder }}">{{$item.formatted_address || $select.selected.formatted_address}}</ui-select-match>' +
-        '<ui-select-choices repeat="address in addresses track by $index" refresh="refreshAddress($select.search)" refresh-delay="1000">' +
-          '<div ng-bind-html="address.formatted_address | highlight: $select.search"></div>' +
-        '</ui-select-choices>' +
-      '</ui-select>'
-    );
-
-    // Change the ui-select to ui-select multiple.
-    $templateCache.put('formio/components/address-multiple.html',
-      $templateCache.get('formio/components/address.html').replace('<ui-select', '<ui-select multiple')
-    );
-  }
-]);
-
-components.config(function(formioComponentsProvider) {
-  formioComponentsProvider.register('container', {
-    title: 'Container',
-    template: 'formio/components/container.html',
-    group: 'layout',
-    settings: {
-      input: false,
-      columns: [[],[]]
-    }
-  });
-});
-components.run([
-  '$templateCache',
-  function($templateCache) {
-    $templateCache.put('formio/components/container.html',
-      '<div class="row">' +
-        '<div class="col-xs-6" ng-repeat="components in component.columns">' +
-          '<formio-component ng-repeat="component in components" component="component" data="data"></formio-component>' +
-        '</div>' +
-      '</div>'
-    );
-  }
-]);
-
-components.directive('dateTimePicker', function() {
-  return {
-    restrict: 'AE',
-    scope: false,
-    link: function(scope, element) {
-      element.datetimepicker();
-    }
-  };
-});
-components.config(function(formioComponentsProvider) {
-  formioComponentsProvider.register('datetime', {
-    title: 'Date / Time',
-    template: 'formio/components/datetime.html',
-    settings: {
-      input: true,
-      label: '',
-      key: '',
-      placeholder: '',
-      prefix: '',
-      suffix: '',
-      multiple: false,
-      validate: {
-        required: false,
-        custom: ''
-      }
-    }
-  });
-});
-components.run([
-  '$templateCache',
-  function($templateCache) {
-    $templateCache.put('formio/components/datetime.html',
-      ''
-    );
-  }
-]);
-
-components.config(function(formioComponentsProvider) {
-  formioComponentsProvider.register('email', {
-    title: 'Email',
-    template: 'formio/components/textfield.html',
-    settings: {
-      input: true,
-      inputType: 'email',
-      label: '',
-      key: '',
-      placeholder: '',
-      prefix: '',
-      suffix: ''
-    }
-  });
-});
-
-components.config(function(formioComponentsProvider) {
-  formioComponentsProvider.register('fieldset', {
-    title: 'Field Set',
-    template: 'formio/components/fieldset.html',
-    settings: {
-      input: false,
-      legend: '',
-      components: []
-    }
-  });
-});
-components.run([
-  '$templateCache',
-  function($templateCache) {
-    $templateCache.put('formio/components/fieldset.html',
-      '<fieldset>' +
-        '<legend ng-if="component.legend">{{ component.legend }}</legend>' +
-        '<formio-component ng-repeat="component in component.components" component="component" data="data"></formio-component>' +
-      '</fieldset>'
-    );
-  }
-]);
-
-components.config(function(formioComponentsProvider) {
-  formioComponentsProvider.register('hidden', {
-    title: 'Hidden',
-    template: 'formio/components/hidden.html',
-    settings: {
-      input: true,
-      key: ''
-    }
-  });
-});
-app.run([
-  '$templateCache',
-  function($templateCache) {
-    $templateCache.put('formio/components/hidden.html',
-      '<input type="hidden" id="{{ component.key }}" name="{{ component.key }} ng-model="data[component.key]">'
-    );
-  }
-]);
-
-components.config(function(formioComponentsProvider) {
-  formioComponentsProvider.register('number', {
-    title: 'Number',
-    template: 'formio/components/number.html',
-    settings: {
-      input: true,
-      inputType: 'number',
-      label: '',
-      key: '',
-      placeholder: '',
-      prefix: '',
-      suffix: '',
-      defaultValue: '',
-      validate: {
-        required: false,
-        min: '',
-        max: '',
-        greater: '',
-        less: '',
-        step: 'any',
-        integer: '',
-        multiple: '',
-        custom: ''
-      }
-    }
-  });
-});
-components.run([
-  '$templateCache',
-  'FormioUtils',
-  function(
-    $templateCache,
-    FormioUtils
-  ) {
-    $templateCache.put('formio/components/number.html', FormioUtils.fieldWrap(
-      '<input type="{{ component.inputType }}" ' +
-        'class="form-control" ' +
-        'id="{{ component.key }}" ' +
-        'name="{{ component.key }}" ' +
-        'ng-model="data[component.key]" ' +
-        'ng-required="component.validate.required" ' +
-        'min="{{ component.validate.min }}" ' +
-        'max="{{ component.validate.max }}" ' +
-        'step="{{ component.validate.step }}" ' +
-        'placeholder="{{ component.placeholder }}" ' +
-        'formio-input-mask="{{ component.inputMask }}">'
-    ));
-  }
-]);
-
-
-components.config(function(formioComponentsProvider) {
-  formioComponentsProvider.register('panel', {
-    title: 'Panel',
-    template: 'formio/components/panel.html',
-    group: 'layout',
-    settings: {
-      input: false,
-      title: '',
-      theme: 'default',
-      components: []
-    }
-  });
-});
-components.run([
-  '$templateCache',
-  function($templateCache) {
-    $templateCache.put('formio/components/panel.html',
-      '<div class="panel panel-{{ component.theme }}">' +
-        '<div ng-if="component.title" class="panel-heading"><h3 class="panel-title">{{ component.title }}</h3></div>' +
-        '<div class="panel-body">' +
-          '<formio-component ng-repeat="component in component.components" component="component" data="data"></formio-component>' +
-        '</div>' +
-      '</div>'
-    );
-  }
-]);
-
-components.config(function(formioComponentsProvider) {
-  formioComponentsProvider.register('password', {
-    title: 'Password',
-    template: 'formio/components/textfield.html',
-    settings: {
-      input: true,
-      inputType: 'password',
-      label: '',
-      key: '',
-      placeholder: '',
-      prefix: '',
-      suffix: ''
-    }
-  });
-});
-
-components.config(function(formioComponentsProvider) {
-  formioComponentsProvider.register('phoneNumber', {
-    title: 'Phone Number',
-    template: 'formio/components/phoneNumber.html',
-    settings: {
-      input: true,
-      inputMask: '(999) 999-9999',
-      label: '',
-      key: '',
-      placeholder: '',
-      prefix: '',
-      suffix: ''
-    }
-  });
-});
-components.run([
-  '$templateCache',
-  function($templateCache) {
-    $templateCache.put('formio/components/phoneNumber.html',
-      '<label ng-if="component.label" for="{{ component.key }}">{{ component.label }}</label>' +
-      '<div class="input-group" ng-if="component.prefix || component.suffix">' +
-        '<div class="input-group-addon" ng-if="!!component.prefix">{{ component.prefix }}</div>' +
-        '<input type="text" class="form-control" ng-model="data[component.key]" id="{{ component.key }}" placeholder="{{ component.placeholder }}" formio-input-mask="{{ component.inputMask }}">' +
-        '<div class="input-group-addon" ng-if="!!component.suffix">{{ component.suffix }}</div>' +
-      '</div>' +
-      '<input ng-if="!component.prefix && !component.suffix" type="text" class="form-control" ng-model="data[component.key]" id="{{ component.key }}" placeholder="{{ component.placeholder }}" formio-input-mask="{{ component.inputMask }}">'
-    );
-  }
-]);
-
-var app = angular.module('formio.components');
-app.config(function(formioComponentsProvider) {
-  formioComponentsProvider.register('resource', {
-    title: 'Resource',
-    template: function($scope) {
-      return $scope.component.multiple ? 'formio/components/resource-multiple.html' : 'formio/components/resource.html';
-    },
-    controller: function(settings, $scope, $http, Formio) {
-      $scope.selectItems = [];
-      if (settings.resource) {
-        var formio = new Formio('/resource/' + settings.resource);
-        if (settings.searchExpression && settings.searchFields) {
-          var search = new RegExp(settings.searchExpression);
-          $scope.refreshSubmissions = function(input) {
-            if (!input) { return; }
-            var matches = input.match(search);
-            var params = {};
-            var shouldRequest = false;
-            if (matches && matches.length > 1) {
-              angular.forEach(settings.searchFields, function(field, index) {
-                if ((matches.length > (index + 1)) && matches[index + 1]) {
-                  params[field] = matches[index + 1];
-                  shouldRequest = true;
-                }
-              });
-            }
-
-            // Do not request unless we have parameters.
-            if (!shouldRequest) { return; }
-
-            // Load the submissions.
-            formio.loadSubmissions({
-              params: params
-            }).then(function(submissions) {
-              $scope.selectItems = submissions;
-            });
-          };
-        }
-        else {
-
-          // Load all submissions.
-          $scope.refreshSubmissions = function() {};
-          formio.loadSubmissions().then(function(submissions) {
-            $scope.selectItems = submissions;
-          });
-        }
-      }
-    },
-    settings: {
-      input: true,
-      label: '',
-      key: '',
-      placeholder: '',
-      resource: '',
-      template: '<span>{{ item.data }}</span>',
-      searchExpression: '',
-      searchFields: '',
-      multiple: false,
-      refresh: false,
-      refreshDelay: 0
-    }
-  });
-});
-app.run([
-  '$templateCache',
-  function($templateCache) {
-    $templateCache.put('formio/components/resource.html',
-      '<label ng-if="component.label" for="{{ component.key }}">{{ component.label }}</label>' +
-      '<ui-select ng-model="data[component.key]" id="{{ component.key }}" theme="bootstrap">' +
-        '<ui-select-match placeholder="{{ component.placeholder }}">' +
-          '<formio-select-item template="component.template" item="$item || $select.selected" select="$select"></formio-select-item>' +
-        '</ui-select-match>' +
-        '<ui-select-choices repeat="item in selectItems | filter: $select.search" refresh="refreshSubmissions($select.search)" refresh-delay="1000">' +
-          '<formio-select-item template="component.template" item="item" select="$select"></formio-select-item>' +
-        '</ui-select-choices>' +
-      '</ui-select>'
-    );
-
-    // Change the ui-select to ui-select multiple.
-    $templateCache.put('formio/components/resource-multiple.html',
-      $templateCache.get('formio/components/resource.html').replace('<ui-select', '<ui-select multiple')
-    );
-  }
-]);
-
-components.directive('formioSelectItem', [
-  '$compile',
-  function(
-    $compile
-  ) {
-    return {
-      restrict: 'E',
-      scope: {
-        template: '=',
-        item: '=',
-        select: '='
-      },
-      link: function(scope, element) {
-        if (scope.template) {
-          element.html($compile(angular.element(scope.template))(scope));
-        }
-      }
-    };
-  }
-]);
-
-// Configure the Select component.
-components.config(function(formioComponentsProvider) {
-  formioComponentsProvider.register('select', {
-    title: 'Select',
-    template: function($scope) {
-      return $scope.component.multiple ? 'formio/components/select-multiple.html' : 'formio/components/select.html';
-    },
-    controller: function(settings, $scope, $http) {
-      $scope.nowrap = true;
-      $scope.selectItems = [];
-
-      // If this is a url, then load the file.
-      if (settings.dataSrc.substr(0, 4) === 'http') {
-        $http.get(settings.dataSrc)
-          .success(function(data) {
-            $scope.selectItems = data;
-          });
-      }
-      else if (settings.dataSrc) {
-        try {
-          $scope.selectItems = angular.fromJson(settings.dataSrc);
-        }
-        catch (error) {
-          $scope.selectItems = [];
-        }
-      }
-    },
-    settings: {
-      input: true,
-      label: '',
-      key: '',
-      placeholder: '',
-      dataSrc: '',
-      template: '',
-      multiple: false,
-      refresh: false,
-      refreshDelay: 0
-    }
-  });
-});
-components.run([
-  '$templateCache',
-  function($templateCache) {
-    $templateCache.put('formio/components/select.html',
-      '<label ng-if="component.label" for="{{ component.key }}">{{ component.label }}</label>' +
-      '<ui-select ng-model="data[component.key]" id="{{ component.key }}" theme="bootstrap">' +
-        '<ui-select-match placeholder="{{ component.placeholder }}">' +
-          '<formio-select-item template="component.template" item="$item || $select.selected" select="$select"></formio-select-item>' +
-        '</ui-select-match>' +
-        '<ui-select-choices repeat="item in selectItems | filter: $select.search">' +
-          '<formio-select-item template="component.template" item="item" select="$select"></formio-select-item>' +
-        '</ui-select-choices>' +
-      '</ui-select>'
-    );
-
-    // Change the ui-select to ui-select multiple.
-    $templateCache.put('formio/components/select-multiple.html',
-      $templateCache.get('formio/components/select.html').replace('<ui-select', '<ui-select multiple')
-    );
-  }
-]);
-
-components.config(function(formioComponentsProvider) {
-  formioComponentsProvider.register('textarea', {
-    title: 'Text Area',
-    template: 'formio/components/textarea.html',
-    settings: {
-      input: true,
-      label: '',
-      key: '',
-      placeholder: '',
-      prefix: '',
-      suffix: '',
-      rows: 3,
-      multiple: false,
-      defaultValue: '',
-      validate: {
-        required: false,
-        minLength: '',
-        maxLength: '',
-        pattern: '',
-        custom: ''
-      }
-    }
-  });
-});
-components.run([
-  '$templateCache',
-  'FormioUtils',
-  function(
-    $templateCache,
-    FormioUtils
-  ) {
-    $templateCache.put('formio/components/textarea.html', FormioUtils.fieldWrap(
-      '<textarea ' +
-        'class="form-control" ' +
-        'ng-model="data[component.key]" ' +
-        'id="{{ component.key }}" ' +
-        'placeholder="{{ component.placeholder }}" ' +
-        'rows="{{ component.rows }}"></textarea>'
-    ));
-  }
-]);
-
-components.config(function(formioComponentsProvider) {
-  formioComponentsProvider.register('well', {
-    title: 'Well',
-    template: 'formio/components/well.html',
-    group: 'layout',
-    settings: {
-      input: false,
-      components: []
-    }
-  });
-});
-components.run([
-  '$templateCache',
-  function($templateCache) {
-    $templateCache.put('formio/components/well.html',
-      '<div class="well">' +
-        '<formio-component ng-repeat="component in component.components" component="component" data="data"></formio-component>' +
       '</div>'
     );
   }
