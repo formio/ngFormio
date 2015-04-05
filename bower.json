@@ -22,6 +22,7 @@
   "dependencies": {
     "eonasdan-bootstrap-datetimepicker": "~4.7.14",
     "jquery.maskedinput": "~1.4.1",
-    "angular-ui-select": "~0.11.2"
+    "angular-ui-select": "~0.11.2",
+    "angular-paginate-anything": "~4.1.1"
   }
 }
