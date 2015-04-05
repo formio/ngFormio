@@ -15,6 +15,8 @@ var sources = [
   'components/*.js'
 ];
 
+gulp.task('clean', require('del').bind(null, ['dist']));
+
 gulp.task('watch', function () {
   gulp.watch(sources, ['jshint', 'scripts']);
 });
@@ -40,4 +42,5 @@ gulp.task('scripts', function () {
     .pipe(gulp.dest('dist/js/'));
 });
 
-gulp.task('default', ['jshint', 'scripts', 'watch']);
+gulp.task('build', ['clean', 'scripts']);
+gulp.task('default', ['jshint', 'build', 'watch']);
