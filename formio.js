@@ -102,7 +102,7 @@ app.provider('Formio', function() {
 
         // Static methods.
         Formio.submissionData = function(data, component, onId) {
-          if (!data) return '';
+          if (!data) { return ''; }
           if (component.key.indexOf('.') !== -1) {
             var value = data;
             var parts = component.key.split('.');
