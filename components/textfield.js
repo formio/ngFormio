@@ -1,28 +1,31 @@
-app.config(function(formioComponentsProvider) {
-  formioComponentsProvider.register('textfield', {
-    title: 'Text Field',
-    template: 'formio/components/textfield.html',
-    settings: {
-      input: true,
-      inputType: 'text',
-      inputMask: '',
-      label: '',
-      key: '',
-      placeholder: '',
-      prefix: '',
-      suffix: '',
-      multiple: false,
-      defaultValue: '',
-      validate: {
-        required: false,
-        minLength: '',
-        maxLength: '',
-        pattern: '',
-        custom: ''
+app.config([
+  'formioComponentsProvider',
+  function(formioComponentsProvider) {
+    formioComponentsProvider.register('textfield', {
+      title: 'Text Field',
+      template: 'formio/components/textfield.html',
+      settings: {
+        input: true,
+        inputType: 'text',
+        inputMask: '',
+        label: '',
+        key: '',
+        placeholder: '',
+        prefix: '',
+        suffix: '',
+        multiple: false,
+        defaultValue: '',
+        validate: {
+          required: false,
+          minLength: '',
+          maxLength: '',
+          pattern: '',
+          custom: ''
+        }
       }
-    }
-  });
-});
+    });
+  }
+]);
 app.run([
   '$templateCache',
   'FormioUtils',

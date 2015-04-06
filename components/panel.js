@@ -1,16 +1,19 @@
-app.config(function(formioComponentsProvider) {
-  formioComponentsProvider.register('panel', {
-    title: 'Panel',
-    template: 'formio/components/panel.html',
-    group: 'layout',
-    settings: {
-      input: false,
-      title: '',
-      theme: 'default',
-      components: []
-    }
-  });
-});
+app.config([
+  'formioComponentsProvider',
+  function(formioComponentsProvider) {
+    formioComponentsProvider.register('panel', {
+      title: 'Panel',
+      template: 'formio/components/panel.html',
+      group: 'layout',
+      settings: {
+        input: false,
+        title: '',
+        theme: 'default',
+        components: []
+      }
+    });
+  }
+]);
 app.run([
   '$templateCache',
   function($templateCache) {

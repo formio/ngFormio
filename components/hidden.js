@@ -1,13 +1,16 @@
-app.config(function(formioComponentsProvider) {
-  formioComponentsProvider.register('hidden', {
-    title: 'Hidden',
-    template: 'formio/components/hidden.html',
-    settings: {
-      input: true,
-      key: ''
-    }
-  });
-});
+app.config([
+  'formioComponentsProvider',
+  function(formioComponentsProvider) {
+    formioComponentsProvider.register('hidden', {
+      title: 'Hidden',
+      template: 'formio/components/hidden.html',
+      settings: {
+        input: true,
+        key: ''
+      }
+    });
+  }
+]);
 app.run([
   '$templateCache',
   function($templateCache) {

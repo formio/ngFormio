@@ -20,45 +20,48 @@ app.directive('formioSelectItem', [
 ]);
 
 // Configure the Select component.
-app.config(function(formioComponentsProvider) {
-  formioComponentsProvider.register('select', {
-    title: 'Select',
-    template: function($scope) {
-      return $scope.component.multiple ? 'formio/components/select-multiple.html' : 'formio/components/select.html';
-    },
-    controller: function(settings, $scope, $http) {
-      $scope.nowrap = true;
-      $scope.selectItems = [];
+app.config([
+  'formioComponentsProvider',
+  function(formioComponentsProvider) {
+    formioComponentsProvider.register('select', {
+      title: 'Select',
+      template: function($scope) {
+        return $scope.component.multiple ? 'formio/components/select-multiple.html' : 'formio/components/select.html';
+      },
+      controller: function(settings, $scope, $http) {
+        $scope.nowrap = true;
+        $scope.selectItems = [];
 
-      // If this is a url, then load the file.
-      if (settings.dataSrc.substr(0, 4) === 'http') {
-        $http.get(settings.dataSrc)
-          .success(function(data) {
-            $scope.selectItems = data;
-          });
-      }
-      else if (settings.dataSrc) {
-        try {
-          $scope.selectItems = angular.fromJson(settings.dataSrc);
+        // If this is a url, then load the file.
+        if (settings.dataSrc.substr(0, 4) === 'http') {
+          $http.get(settings.dataSrc)
+            .success(function(data) {
+              $scope.selectItems = data;
+            });
         }
-        catch (error) {
-          $scope.selectItems = [];
+        else if (settings.dataSrc) {
+          try {
+            $scope.selectItems = angular.fromJson(settings.dataSrc);
+          }
+          catch (error) {
+            $scope.selectItems = [];
+          }
         }
+      },
+      settings: {
+        input: true,
+        label: '',
+        key: '',
+        placeholder: '',
+        dataSrc: '',
+        template: '',
+        multiple: false,
+        refresh: false,
+        refreshDelay: 0
       }
-    },
-    settings: {
-      input: true,
-      label: '',
-      key: '',
-      placeholder: '',
-      dataSrc: '',
-      template: '',
-      multiple: false,
-      refresh: false,
-      refreshDelay: 0
-    }
-  });
-});
+    });
+  }
+]);
 app.run([
   '$templateCache',
   function($templateCache) {

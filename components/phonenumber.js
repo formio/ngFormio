@@ -1,18 +1,21 @@
-app.config(function(formioComponentsProvider) {
-  formioComponentsProvider.register('phoneNumber', {
-    title: 'Phone Number',
-    template: 'formio/components/phoneNumber.html',
-    settings: {
-      input: true,
-      inputMask: '(999) 999-9999',
-      label: '',
-      key: '',
-      placeholder: '',
-      prefix: '',
-      suffix: ''
-    }
-  });
-});
+app.config([
+  'formioComponentsProvider',
+  function(formioComponentsProvider) {
+    formioComponentsProvider.register('phoneNumber', {
+      title: 'Phone Number',
+      template: 'formio/components/phoneNumber.html',
+      settings: {
+        input: true,
+        inputMask: '(999) 999-9999',
+        label: '',
+        key: '',
+        placeholder: '',
+        prefix: '',
+        suffix: ''
+      }
+    });
+  }
+]);
 app.run([
   '$templateCache',
   function($templateCache) {

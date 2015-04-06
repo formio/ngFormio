@@ -1,14 +1,17 @@
-app.config(function(formioComponentsProvider) {
-  formioComponentsProvider.register('well', {
-    title: 'Well',
-    template: 'formio/components/well.html',
-    group: 'layout',
-    settings: {
-      input: false,
-      components: []
-    }
-  });
-});
+app.config([
+  'formioComponentsProvider',
+  function(formioComponentsProvider) {
+    formioComponentsProvider.register('well', {
+      title: 'Well',
+      template: 'formio/components/well.html',
+      group: 'layout',
+      settings: {
+        input: false,
+        components: []
+      }
+    });
+  }
+]);
 app.run([
   '$templateCache',
   function($templateCache) {

@@ -1,27 +1,30 @@
-app.config(function(formioComponentsProvider) {
-  formioComponentsProvider.register('textarea', {
-    title: 'Text Area',
-    template: 'formio/components/textarea.html',
-    settings: {
-      input: true,
-      label: '',
-      key: '',
-      placeholder: '',
-      prefix: '',
-      suffix: '',
-      rows: 3,
-      multiple: false,
-      defaultValue: '',
-      validate: {
-        required: false,
-        minLength: '',
-        maxLength: '',
-        pattern: '',
-        custom: ''
+app.config([
+  'formioComponentsProvider',
+  function(formioComponentsProvider) {
+    formioComponentsProvider.register('textarea', {
+      title: 'Text Area',
+      template: 'formio/components/textarea.html',
+      settings: {
+        input: true,
+        label: '',
+        key: '',
+        placeholder: '',
+        prefix: '',
+        suffix: '',
+        rows: 3,
+        multiple: false,
+        defaultValue: '',
+        validate: {
+          required: false,
+          minLength: '',
+          maxLength: '',
+          pattern: '',
+          custom: ''
+        }
       }
-    }
-  });
-});
+    });
+  }
+]);
 app.run([
   '$templateCache',
   'FormioUtils',

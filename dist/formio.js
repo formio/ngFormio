@@ -647,31 +647,34 @@ app.provider('formioComponents', function() {
   };
 });
 
-app.config(function(formioComponentsProvider) {
-  formioComponentsProvider.register('textfield', {
-    title: 'Text Field',
-    template: 'formio/components/textfield.html',
-    settings: {
-      input: true,
-      inputType: 'text',
-      inputMask: '',
-      label: '',
-      key: '',
-      placeholder: '',
-      prefix: '',
-      suffix: '',
-      multiple: false,
-      defaultValue: '',
-      validate: {
-        required: false,
-        minLength: '',
-        maxLength: '',
-        pattern: '',
-        custom: ''
+app.config([
+  'formioComponentsProvider',
+  function(formioComponentsProvider) {
+    formioComponentsProvider.register('textfield', {
+      title: 'Text Field',
+      template: 'formio/components/textfield.html',
+      settings: {
+        input: true,
+        inputType: 'text',
+        inputMask: '',
+        label: '',
+        key: '',
+        placeholder: '',
+        prefix: '',
+        suffix: '',
+        multiple: false,
+        defaultValue: '',
+        validate: {
+          required: false,
+          minLength: '',
+          maxLength: '',
+          pattern: '',
+          custom: ''
+        }
       }
-    }
-  });
-});
+    });
+  }
+]);
 app.run([
   '$templateCache',
   'FormioUtils',
@@ -694,34 +697,37 @@ app.run([
   }
 ]);
 
-app.config(function(formioComponentsProvider) {
-  formioComponentsProvider.register('address', {
-    title: 'Address',
-    template: function($scope) {
-      return $scope.component.multiple ? 'formio/components/address-multiple.html' : 'formio/components/address.html';
-    },
-    controller: function(settings, $scope, $http) {
-      $scope.address = {};
-      $scope.addresses = [];
-      $scope.refreshAddress = function(address) {
-        var params = {address: address, sensor: false};
-        return $http.get(
-          'http://maps.googleapis.com/maps/api/geocode/json',
-          {params: params}
-        ).then(function(response) {
-          $scope.addresses = response.data.results;
-        });
-      };
-    },
-    settings: {
-      input: true,
-      label: '',
-      key: '',
-      placeholder: '',
-      multiple: false
-    }
-  });
-});
+app.config([
+  'formioComponentsProvider',
+  function(formioComponentsProvider) {
+    formioComponentsProvider.register('address', {
+      title: 'Address',
+      template: function($scope) {
+        return $scope.component.multiple ? 'formio/components/address-multiple.html' : 'formio/components/address.html';
+      },
+      controller: function(settings, $scope, $http) {
+        $scope.address = {};
+        $scope.addresses = [];
+        $scope.refreshAddress = function(address) {
+          var params = {address: address, sensor: false};
+          return $http.get(
+            'http://maps.googleapis.com/maps/api/geocode/json',
+            {params: params}
+          ).then(function(response) {
+            $scope.addresses = response.data.results;
+          });
+        };
+      },
+      settings: {
+        input: true,
+        label: '',
+        key: '',
+        placeholder: '',
+        multiple: false
+      }
+    });
+  }
+]);
 app.run([
   '$templateCache',
   function($templateCache) {
@@ -775,25 +781,28 @@ app.directive('dateTimePicker', function() {
     }
   };
 });
-app.config(function(formioComponentsProvider) {
-  formioComponentsProvider.register('datetime', {
-    title: 'Date / Time',
-    template: 'formio/components/datetime.html',
-    settings: {
-      input: true,
-      label: '',
-      key: '',
-      placeholder: '',
-      prefix: '',
-      suffix: '',
-      multiple: false,
-      validate: {
-        required: false,
-        custom: ''
+app.config([
+  'formioComponentsProvider',
+  function(formioComponentsProvider) {
+    formioComponentsProvider.register('datetime', {
+      title: 'Date / Time',
+      template: 'formio/components/datetime.html',
+      settings: {
+        input: true,
+        label: '',
+        key: '',
+        placeholder: '',
+        prefix: '',
+        suffix: '',
+        multiple: false,
+        validate: {
+          required: false,
+          custom: ''
+        }
       }
-    }
-  });
-});
+    });
+  }
+]);
 app.run([
   '$templateCache',
   function($templateCache) {
@@ -803,33 +812,39 @@ app.run([
   }
 ]);
 
-app.config(function(formioComponentsProvider) {
-  formioComponentsProvider.register('email', {
-    title: 'Email',
-    template: 'formio/components/textfield.html',
-    settings: {
-      input: true,
-      inputType: 'email',
-      label: '',
-      key: '',
-      placeholder: '',
-      prefix: '',
-      suffix: ''
-    }
-  });
-});
+app.config([
+  'formioComponentsProvider',
+  function(formioComponentsProvider) {
+    formioComponentsProvider.register('email', {
+      title: 'Email',
+      template: 'formio/components/textfield.html',
+      settings: {
+        input: true,
+        inputType: 'email',
+        label: '',
+        key: '',
+        placeholder: '',
+        prefix: '',
+        suffix: ''
+      }
+    });
+  }
+]);
 
-app.config(function(formioComponentsProvider) {
-  formioComponentsProvider.register('fieldset', {
-    title: 'Field Set',
-    template: 'formio/components/fieldset.html',
-    settings: {
-      input: false,
-      legend: '',
-      components: []
-    }
-  });
-});
+app.config([
+  'formioComponentsProvider',
+  function(formioComponentsProvider) {
+    formioComponentsProvider.register('fieldset', {
+      title: 'Field Set',
+      template: 'formio/components/fieldset.html',
+      settings: {
+        input: false,
+        legend: '',
+        components: []
+      }
+    });
+  }
+]);
 app.run([
   '$templateCache',
   function($templateCache) {
@@ -842,16 +857,19 @@ app.run([
   }
 ]);
 
-app.config(function(formioComponentsProvider) {
-  formioComponentsProvider.register('hidden', {
-    title: 'Hidden',
-    template: 'formio/components/hidden.html',
-    settings: {
-      input: true,
-      key: ''
-    }
-  });
-});
+app.config([
+  'formioComponentsProvider',
+  function(formioComponentsProvider) {
+    formioComponentsProvider.register('hidden', {
+      title: 'Hidden',
+      template: 'formio/components/hidden.html',
+      settings: {
+        input: true,
+        key: ''
+      }
+    });
+  }
+]);
 app.run([
   '$templateCache',
   function($templateCache) {
@@ -861,33 +879,36 @@ app.run([
   }
 ]);
 
-app.config(function(formioComponentsProvider) {
-  formioComponentsProvider.register('number', {
-    title: 'Number',
-    template: 'formio/components/number.html',
-    settings: {
-      input: true,
-      inputType: 'number',
-      label: '',
-      key: '',
-      placeholder: '',
-      prefix: '',
-      suffix: '',
-      defaultValue: '',
-      validate: {
-        required: false,
-        min: '',
-        max: '',
-        greater: '',
-        less: '',
-        step: 'any',
-        integer: '',
-        multiple: '',
-        custom: ''
+app.config([
+  'formioComponentsProvider',
+  function(formioComponentsProvider) {
+    formioComponentsProvider.register('number', {
+      title: 'Number',
+      template: 'formio/components/number.html',
+      settings: {
+        input: true,
+        inputType: 'number',
+        label: '',
+        key: '',
+        placeholder: '',
+        prefix: '',
+        suffix: '',
+        defaultValue: '',
+        validate: {
+          required: false,
+          min: '',
+          max: '',
+          greater: '',
+          less: '',
+          step: 'any',
+          integer: '',
+          multiple: '',
+          custom: ''
+        }
       }
-    }
-  });
-});
+    });
+  }
+]);
 app.run([
   '$templateCache',
   'FormioUtils',
@@ -912,19 +933,22 @@ app.run([
 ]);
 
 
-app.config(function(formioComponentsProvider) {
-  formioComponentsProvider.register('panel', {
-    title: 'Panel',
-    template: 'formio/components/panel.html',
-    group: 'layout',
-    settings: {
-      input: false,
-      title: '',
-      theme: 'default',
-      components: []
-    }
-  });
-});
+app.config([
+  'formioComponentsProvider',
+  function(formioComponentsProvider) {
+    formioComponentsProvider.register('panel', {
+      title: 'Panel',
+      template: 'formio/components/panel.html',
+      group: 'layout',
+      settings: {
+        input: false,
+        title: '',
+        theme: 'default',
+        components: []
+      }
+    });
+  }
+]);
 app.run([
   '$templateCache',
   function($templateCache) {
@@ -939,37 +963,43 @@ app.run([
   }
 ]);
 
-app.config(function(formioComponentsProvider) {
-  formioComponentsProvider.register('password', {
-    title: 'Password',
-    template: 'formio/components/textfield.html',
-    settings: {
-      input: true,
-      inputType: 'password',
-      label: '',
-      key: '',
-      placeholder: '',
-      prefix: '',
-      suffix: ''
-    }
-  });
-});
+app.config([
+  'formioComponentsProvider',
+  function(formioComponentsProvider) {
+    formioComponentsProvider.register('password', {
+      title: 'Password',
+      template: 'formio/components/textfield.html',
+      settings: {
+        input: true,
+        inputType: 'password',
+        label: '',
+        key: '',
+        placeholder: '',
+        prefix: '',
+        suffix: ''
+      }
+    });
+  }
+]);
 
-app.config(function(formioComponentsProvider) {
-  formioComponentsProvider.register('phoneNumber', {
-    title: 'Phone Number',
-    template: 'formio/components/phoneNumber.html',
-    settings: {
-      input: true,
-      inputMask: '(999) 999-9999',
-      label: '',
-      key: '',
-      placeholder: '',
-      prefix: '',
-      suffix: ''
-    }
-  });
-});
+app.config([
+  'formioComponentsProvider',
+  function(formioComponentsProvider) {
+    formioComponentsProvider.register('phoneNumber', {
+      title: 'Phone Number',
+      template: 'formio/components/phoneNumber.html',
+      settings: {
+        input: true,
+        inputMask: '(999) 999-9999',
+        label: '',
+        key: '',
+        placeholder: '',
+        prefix: '',
+        suffix: ''
+      }
+    });
+  }
+]);
 app.run([
   '$templateCache',
   function($templateCache) {
@@ -985,68 +1015,71 @@ app.run([
   }
 ]);
 
-app.config(function(formioComponentsProvider) {
-  formioComponentsProvider.register('resource', {
-    title: 'Resource',
-    template: function($scope) {
-      return $scope.component.multiple ? 'formio/components/resource-multiple.html' : 'formio/components/resource.html';
-    },
-    controller: function(settings, $scope, $http, Formio) {
-      $scope.selectItems = [];
-      if (settings.resource) {
-        var formio = new Formio('/resource/' + settings.resource);
-        if (settings.searchExpression && settings.searchFields) {
-          var search = new RegExp(settings.searchExpression);
-          $scope.refreshSubmissions = function(input) {
-            if (!input) { return; }
-            var matches = input.match(search);
-            var params = {};
-            var shouldRequest = false;
-            if (matches && matches.length > 1) {
-              angular.forEach(settings.searchFields, function(field, index) {
-                if ((matches.length > (index + 1)) && matches[index + 1]) {
-                  params[field] = matches[index + 1];
-                  shouldRequest = true;
-                }
+app.config([
+  'formioComponentsProvider',
+  function(formioComponentsProvider) {
+    formioComponentsProvider.register('resource', {
+      title: 'Resource',
+      template: function($scope) {
+        return $scope.component.multiple ? 'formio/components/resource-multiple.html' : 'formio/components/resource.html';
+      },
+      controller: function(settings, $scope, $http, Formio) {
+        $scope.selectItems = [];
+        if (settings.resource) {
+          var formio = new Formio('/resource/' + settings.resource);
+          if (settings.searchExpression && settings.searchFields) {
+            var search = new RegExp(settings.searchExpression);
+            $scope.refreshSubmissions = function(input) {
+              if (!input) { return; }
+              var matches = input.match(search);
+              var params = {};
+              var shouldRequest = false;
+              if (matches && matches.length > 1) {
+                angular.forEach(settings.searchFields, function(field, index) {
+                  if ((matches.length > (index + 1)) && matches[index + 1]) {
+                    params[field] = matches[index + 1];
+                    shouldRequest = true;
+                  }
+                });
+              }
+
+              // Do not request unless we have parameters.
+              if (!shouldRequest) { return; }
+
+              // Load the submissions.
+              formio.loadSubmissions({
+                params: params
+              }).then(function(submissions) {
+                $scope.selectItems = submissions;
               });
-            }
+            };
+          }
+          else {
 
-            // Do not request unless we have parameters.
-            if (!shouldRequest) { return; }
-
-            // Load the submissions.
-            formio.loadSubmissions({
-              params: params
-            }).then(function(submissions) {
+            // Load all submissions.
+            $scope.refreshSubmissions = function() {};
+            formio.loadSubmissions().then(function(submissions) {
               $scope.selectItems = submissions;
             });
-          };
+          }
         }
-        else {
-
-          // Load all submissions.
-          $scope.refreshSubmissions = function() {};
-          formio.loadSubmissions().then(function(submissions) {
-            $scope.selectItems = submissions;
-          });
-        }
+      },
+      settings: {
+        input: true,
+        label: '',
+        key: '',
+        placeholder: '',
+        resource: '',
+        template: '<span>{{ item.data }}</span>',
+        searchExpression: '',
+        searchFields: '',
+        multiple: false,
+        refresh: false,
+        refreshDelay: 0
       }
-    },
-    settings: {
-      input: true,
-      label: '',
-      key: '',
-      placeholder: '',
-      resource: '',
-      template: '<span>{{ item.data }}</span>',
-      searchExpression: '',
-      searchFields: '',
-      multiple: false,
-      refresh: false,
-      refreshDelay: 0
-    }
-  });
-});
+    });
+  }
+]);
 app.run([
   '$templateCache',
   function($templateCache) {
@@ -1091,45 +1124,48 @@ app.directive('formioSelectItem', [
 ]);
 
 // Configure the Select component.
-app.config(function(formioComponentsProvider) {
-  formioComponentsProvider.register('select', {
-    title: 'Select',
-    template: function($scope) {
-      return $scope.component.multiple ? 'formio/components/select-multiple.html' : 'formio/components/select.html';
-    },
-    controller: function(settings, $scope, $http) {
-      $scope.nowrap = true;
-      $scope.selectItems = [];
+app.config([
+  'formioComponentsProvider',
+  function(formioComponentsProvider) {
+    formioComponentsProvider.register('select', {
+      title: 'Select',
+      template: function($scope) {
+        return $scope.component.multiple ? 'formio/components/select-multiple.html' : 'formio/components/select.html';
+      },
+      controller: function(settings, $scope, $http) {
+        $scope.nowrap = true;
+        $scope.selectItems = [];
 
-      // If this is a url, then load the file.
-      if (settings.dataSrc.substr(0, 4) === 'http') {
-        $http.get(settings.dataSrc)
-          .success(function(data) {
-            $scope.selectItems = data;
-          });
-      }
-      else if (settings.dataSrc) {
-        try {
-          $scope.selectItems = angular.fromJson(settings.dataSrc);
+        // If this is a url, then load the file.
+        if (settings.dataSrc.substr(0, 4) === 'http') {
+          $http.get(settings.dataSrc)
+            .success(function(data) {
+              $scope.selectItems = data;
+            });
         }
-        catch (error) {
-          $scope.selectItems = [];
+        else if (settings.dataSrc) {
+          try {
+            $scope.selectItems = angular.fromJson(settings.dataSrc);
+          }
+          catch (error) {
+            $scope.selectItems = [];
+          }
         }
+      },
+      settings: {
+        input: true,
+        label: '',
+        key: '',
+        placeholder: '',
+        dataSrc: '',
+        template: '',
+        multiple: false,
+        refresh: false,
+        refreshDelay: 0
       }
-    },
-    settings: {
-      input: true,
-      label: '',
-      key: '',
-      placeholder: '',
-      dataSrc: '',
-      template: '',
-      multiple: false,
-      refresh: false,
-      refreshDelay: 0
-    }
-  });
-});
+    });
+  }
+]);
 app.run([
   '$templateCache',
   function($templateCache) {
@@ -1152,30 +1188,33 @@ app.run([
   }
 ]);
 
-app.config(function(formioComponentsProvider) {
-  formioComponentsProvider.register('textarea', {
-    title: 'Text Area',
-    template: 'formio/components/textarea.html',
-    settings: {
-      input: true,
-      label: '',
-      key: '',
-      placeholder: '',
-      prefix: '',
-      suffix: '',
-      rows: 3,
-      multiple: false,
-      defaultValue: '',
-      validate: {
-        required: false,
-        minLength: '',
-        maxLength: '',
-        pattern: '',
-        custom: ''
+app.config([
+  'formioComponentsProvider',
+  function(formioComponentsProvider) {
+    formioComponentsProvider.register('textarea', {
+      title: 'Text Area',
+      template: 'formio/components/textarea.html',
+      settings: {
+        input: true,
+        label: '',
+        key: '',
+        placeholder: '',
+        prefix: '',
+        suffix: '',
+        rows: 3,
+        multiple: false,
+        defaultValue: '',
+        validate: {
+          required: false,
+          minLength: '',
+          maxLength: '',
+          pattern: '',
+          custom: ''
+        }
       }
-    }
-  });
-});
+    });
+  }
+]);
 app.run([
   '$templateCache',
   'FormioUtils',
@@ -1194,17 +1233,20 @@ app.run([
   }
 ]);
 
-app.config(function(formioComponentsProvider) {
-  formioComponentsProvider.register('well', {
-    title: 'Well',
-    template: 'formio/components/well.html',
-    group: 'layout',
-    settings: {
-      input: false,
-      components: []
-    }
-  });
-});
+app.config([
+  'formioComponentsProvider',
+  function(formioComponentsProvider) {
+    formioComponentsProvider.register('well', {
+      title: 'Well',
+      template: 'formio/components/well.html',
+      group: 'layout',
+      settings: {
+        input: false,
+        components: []
+      }
+    });
+  }
+]);
 app.run([
   '$templateCache',
   function($templateCache) {

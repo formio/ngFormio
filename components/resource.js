@@ -1,65 +1,68 @@
-app.config(function(formioComponentsProvider) {
-  formioComponentsProvider.register('resource', {
-    title: 'Resource',
-    template: function($scope) {
-      return $scope.component.multiple ? 'formio/components/resource-multiple.html' : 'formio/components/resource.html';
-    },
-    controller: function(settings, $scope, $http, Formio) {
-      $scope.selectItems = [];
-      if (settings.resource) {
-        var formio = new Formio('/resource/' + settings.resource);
-        if (settings.searchExpression && settings.searchFields) {
-          var search = new RegExp(settings.searchExpression);
-          $scope.refreshSubmissions = function(input) {
-            if (!input) { return; }
-            var matches = input.match(search);
-            var params = {};
-            var shouldRequest = false;
-            if (matches && matches.length > 1) {
-              angular.forEach(settings.searchFields, function(field, index) {
-                if ((matches.length > (index + 1)) && matches[index + 1]) {
-                  params[field] = matches[index + 1];
-                  shouldRequest = true;
-                }
+app.config([
+  'formioComponentsProvider',
+  function(formioComponentsProvider) {
+    formioComponentsProvider.register('resource', {
+      title: 'Resource',
+      template: function($scope) {
+        return $scope.component.multiple ? 'formio/components/resource-multiple.html' : 'formio/components/resource.html';
+      },
+      controller: function(settings, $scope, $http, Formio) {
+        $scope.selectItems = [];
+        if (settings.resource) {
+          var formio = new Formio('/resource/' + settings.resource);
+          if (settings.searchExpression && settings.searchFields) {
+            var search = new RegExp(settings.searchExpression);
+            $scope.refreshSubmissions = function(input) {
+              if (!input) { return; }
+              var matches = input.match(search);
+              var params = {};
+              var shouldRequest = false;
+              if (matches && matches.length > 1) {
+                angular.forEach(settings.searchFields, function(field, index) {
+                  if ((matches.length > (index + 1)) && matches[index + 1]) {
+                    params[field] = matches[index + 1];
+                    shouldRequest = true;
+                  }
+                });
+              }
+
+              // Do not request unless we have parameters.
+              if (!shouldRequest) { return; }
+
+              // Load the submissions.
+              formio.loadSubmissions({
+                params: params
+              }).then(function(submissions) {
+                $scope.selectItems = submissions;
               });
-            }
+            };
+          }
+          else {
 
-            // Do not request unless we have parameters.
-            if (!shouldRequest) { return; }
-
-            // Load the submissions.
-            formio.loadSubmissions({
-              params: params
-            }).then(function(submissions) {
+            // Load all submissions.
+            $scope.refreshSubmissions = function() {};
+            formio.loadSubmissions().then(function(submissions) {
               $scope.selectItems = submissions;
             });
-          };
+          }
         }
-        else {
-
-          // Load all submissions.
-          $scope.refreshSubmissions = function() {};
-          formio.loadSubmissions().then(function(submissions) {
-            $scope.selectItems = submissions;
-          });
-        }
+      },
+      settings: {
+        input: true,
+        label: '',
+        key: '',
+        placeholder: '',
+        resource: '',
+        template: '<span>{{ item.data }}</span>',
+        searchExpression: '',
+        searchFields: '',
+        multiple: false,
+        refresh: false,
+        refreshDelay: 0
       }
-    },
-    settings: {
-      input: true,
-      label: '',
-      key: '',
-      placeholder: '',
-      resource: '',
-      template: '<span>{{ item.data }}</span>',
-      searchExpression: '',
-      searchFields: '',
-      multiple: false,
-      refresh: false,
-      refreshDelay: 0
-    }
-  });
-});
+    });
+  }
+]);
 app.run([
   '$templateCache',
   function($templateCache) {

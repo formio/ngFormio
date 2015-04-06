@@ -1,14 +1,17 @@
-app.config(function(formioComponentsProvider) {
-  formioComponentsProvider.register('fieldset', {
-    title: 'Field Set',
-    template: 'formio/components/fieldset.html',
-    settings: {
-      input: false,
-      legend: '',
-      components: []
-    }
-  });
-});
+app.config([
+  'formioComponentsProvider',
+  function(formioComponentsProvider) {
+    formioComponentsProvider.register('fieldset', {
+      title: 'Field Set',
+      template: 'formio/components/fieldset.html',
+      settings: {
+        input: false,
+        legend: '',
+        components: []
+      }
+    });
+  }
+]);
 app.run([
   '$templateCache',
   function($templateCache) {

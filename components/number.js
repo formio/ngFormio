@@ -1,30 +1,33 @@
-app.config(function(formioComponentsProvider) {
-  formioComponentsProvider.register('number', {
-    title: 'Number',
-    template: 'formio/components/number.html',
-    settings: {
-      input: true,
-      inputType: 'number',
-      label: '',
-      key: '',
-      placeholder: '',
-      prefix: '',
-      suffix: '',
-      defaultValue: '',
-      validate: {
-        required: false,
-        min: '',
-        max: '',
-        greater: '',
-        less: '',
-        step: 'any',
-        integer: '',
-        multiple: '',
-        custom: ''
+app.config([
+  'formioComponentsProvider',
+  function(formioComponentsProvider) {
+    formioComponentsProvider.register('number', {
+      title: 'Number',
+      template: 'formio/components/number.html',
+      settings: {
+        input: true,
+        inputType: 'number',
+        label: '',
+        key: '',
+        placeholder: '',
+        prefix: '',
+        suffix: '',
+        defaultValue: '',
+        validate: {
+          required: false,
+          min: '',
+          max: '',
+          greater: '',
+          less: '',
+          step: 'any',
+          integer: '',
+          multiple: '',
+          custom: ''
+        }
       }
-    }
-  });
-});
+    });
+  }
+]);
 app.run([
   '$templateCache',
   'FormioUtils',
