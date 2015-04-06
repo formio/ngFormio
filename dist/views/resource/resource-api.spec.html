@@ -1,0 +1,6 @@
+<ng-include src="'views/resource/resource-api-nav.html'"></ng-include>
+<script src="bower_components/seamless/build/seamless.parent.min.js"></script>
+<iframe id="docs" ng-src="{{ getSwaggerURL() | trusted }}"></iframe>
+<script type="text/javascript">
+  jQuery('#docs').seamless();
+</script>
