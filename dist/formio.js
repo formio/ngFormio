@@ -748,17 +748,20 @@ app.run([
   }
 ]);
 
-app.config(function(formioComponentsProvider) {
-  formioComponentsProvider.register('container', {
-    title: 'Container',
-    template: 'formio/components/container.html',
-    group: 'layout',
-    settings: {
-      input: false,
-      columns: [[],[]]
-    }
-  });
-});
+app.config([
+  'formioComponentsProvider',
+  function(formioComponentsProvider) {
+    formioComponentsProvider.register('container', {
+      title: 'Container',
+      template: 'formio/components/container.html',
+      group: 'layout',
+      settings: {
+        input: false,
+        columns: [[],[]]
+      }
+    });
+  }
+]);
 app.run([
   '$templateCache',
   function($templateCache) {
