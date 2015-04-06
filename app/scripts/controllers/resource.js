@@ -146,13 +146,16 @@ app.factory('FormioAlerts', [
   }
 ]);
 
-app.service('Submission', function(Restangular) {
-  return {
-    on: function(resource, resourceId) {
-      return Restangular.service('submission', Restangular.one(resource, resourceId));
-    }
-  };
-});
+app.service('Submission', [
+  'Restangular',
+  function(Restangular) {
+    return {
+      on: function(resource, resourceId) {
+        return Restangular.service('submission', Restangular.one(resource, resourceId));
+      }
+    };
+  }
+]);
 
 // The resource list directive.
 app.directive('resourceList', function() {
