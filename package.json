@@ -1,7 +1,8 @@
 {
   "private": true,
   "engines": {
-    "node": ">=0.10.0"
+    "node": ">=0.10.0",
+    "formio": "https://github.com/formioapp/formio.git#99b713a60117713e5512ef34408f720329a000eb"
   },
   "devDependencies": {
     "autoprefixer-core": "^4.0.2",
