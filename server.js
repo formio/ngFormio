@@ -1,4 +1,5 @@
-var formio = require('formio')(require('config'));
+var config = require('config');
+var formio = require('formio')(config);
 var express = require('express');
 var nunjucks = require('nunjucks');
 var app = express();
@@ -28,5 +29,5 @@ app.get('/form/:formId/spec.html', function(req, res, next) {
 });
 
 app.use('/api', formio);
-console.log('Listening to port 3000');
-app.listen(3000);
+console.log('Listening to port ' + config.port);
+app.listen(config.port);
