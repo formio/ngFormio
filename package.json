@@ -36,7 +36,6 @@
   "dependencies": {
     "config": "^1.12.0",
     "express": "^4.12.3",
-    "formio": "formioapp/formio#99b713a60117713e5512ef34408f720329a000eb",
     "nunjucks": "^1.3.3",
     "swagger-ui": "^2.1.0-M2"
   }
