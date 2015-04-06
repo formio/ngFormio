@@ -26,11 +26,16 @@ angular
     '$urlRouterProvider',
     'FormioProvider',
     'RestangularProvider',
-    function ($stateProvider, $urlRouterProvider, FormioProvider, RestangularProvider) {
+    function (
+      $stateProvider,
+      $urlRouterProvider,
+      FormioProvider,
+      RestangularProvider
+    ) {
 
       // Set the base URL for our API.
-      FormioProvider.setBaseUrl('http://localhost:3000');
-      RestangularProvider.setBaseUrl('http://localhost:3000');
+      FormioProvider.setBaseUrl('/api');
+      RestangularProvider.setBaseUrl('/api');
 
       $stateProvider
         .state('home', {
@@ -42,11 +47,14 @@ angular
       $urlRouterProvider.otherwise('/');
     }
   ])
-  .filter('trusted', function ($sce) {
-    return function(url) {
-      return $sce.trustAsResourceUrl(url);
-    };
-  })
+  .filter('trusted', [
+    '$sce',
+    function ($sce) {
+      return function(url) {
+        return $sce.trustAsResourceUrl(url);
+      };
+    }
+  ])
   .run([
     '$state',
     '$stateParams',

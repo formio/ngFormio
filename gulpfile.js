@@ -9,11 +9,12 @@ gulp.task('html', ['styles'], require('./gulp/html')(gulp, plugins));
 gulp.task('images', require('./gulp/images')(gulp, plugins));
 gulp.task('fonts', require('./gulp/fonts')(gulp, plugins));
 gulp.task('extras', require('./gulp/extras')(gulp, plugins));
+gulp.task('views', require('./gulp/views')(gulp, plugins));
 gulp.task('clean', require('del').bind(null, ['.tmp', 'dist']));
 gulp.task('wiredep', require('./gulp/wiredep')(gulp, plugins));
 gulp.task('watch', require('./gulp/watch')(gulp, plugins));
 gulp.task('serve', ['wiredep', 'styles', 'fonts', 'watch']);
-gulp.task('build', ['jshint', 'wiredep', 'html', 'images', 'fonts', 'extras'], function () {
+gulp.task('build', ['jshint', 'wiredep', 'html', 'views', 'images', 'fonts', 'extras'], function () {
   return gulp.src('dist/**/*').pipe(plugins.size({title: 'build', gzip: true}));
 });
 

@@ -113,7 +113,9 @@ app.provider('Resource', [
 
 app.factory('FormioAlerts', [
   '$rootScope',
-  function($rootScope) {
+  function(
+    $rootScope
+  ) {
     var alerts = [];
     return {
       addAlert: function(alert) {
