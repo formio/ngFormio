@@ -1,0 +1,41 @@
+{
+  "port": 3000,
+  "mongo": "mongodb://localhost:27017/formio",
+  "passport": {
+    "jwt": {
+      "secret": "insert-some-secret-here"
+    },
+    "twitter": {
+      "name": "Twitter",
+      "protocol": "oauth",
+      "options": {
+        "consumerKey": "your-consumer-key",
+        "consumerSecret": "your-consumer-secret"
+      }
+    },
+    "github": {
+      "name": "GitHub",
+      "protocol": "oauth2",
+      "options": {
+        "clientID": "your-client-id",
+        "clientSecret": "your-client-secret"
+      }
+    },
+    "facebook": {
+      "name": "Facebook",
+      "protocol": "oauth2",
+      "options": {
+        "clientID": "your-client-id",
+        "clientSecret": "your-client-secret"
+      }
+    },
+    "google": {
+      "name": "Google",
+      "protocol": "oauth2",
+      "options": {
+        "clientID": "your-client-id",
+        "clientSecret": "your-client-secret"
+      }
+    }
+  }
+}
