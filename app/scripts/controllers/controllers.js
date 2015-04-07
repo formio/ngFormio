@@ -3,7 +3,8 @@ angular.module('formioApp.controllers', [
   'formioApp.controllers.resource',
   'formioApp.controllers.app',
   'formioApp.controllers.user',
-  'formioApp.controllers.import'
+  'formioApp.controllers.import',
+  'formioApp.controllers.help'
 ]).config([
   'ResourceProvider',
   function(ResourceProvider) {

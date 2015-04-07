@@ -56,6 +56,11 @@ angular
           url: '/import-export',
           templateUrl: 'views/import/index.html',
           controller: 'ImportExportController'
+        })
+        .state('help', {
+          url: '/help',
+          templateUrl: 'views/help/index.html',
+          controller: 'HelpIndexController'
         });
 
       // Otherwise go home.
