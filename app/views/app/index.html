@@ -1,1 +1,25 @@
-TO-DO: Add Applications page here.
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Description</th>
+      <th>Path</th>
+      <th>Operations</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr ng-repeat="app in apps">
+      <td>{{ app.title }}</td>
+      <td>{{ app.description }}</td>
+      <td>{{ app.name }}</td>
+      <td>
+        <div class="button-group">
+          <a ui-sref="viewApp({appId: app._id})" class="btn btn-primary"><span class="glyphicon glyphicon-eye-open"></span></a>&nbsp;
+          <a ui-sref="editApp({appId: app._id})" class="btn btn-default"><span class="glyphicon glyphicon-edit"></span></a>&nbsp;
+          <a ui-sref="deleteApp({appId: app._id})" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle"></span></a>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<button ui-sref="createApp()" type="button" class="btn btn-primary"<span class="glyphicon glyphicon-plus" aria-hidden="true"></span> New Application</button>

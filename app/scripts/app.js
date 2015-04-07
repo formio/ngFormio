@@ -47,6 +47,26 @@ angular
           templateUrl: 'views/app/index.html',
           controller: 'AppIndexController'
         })
+        .state('createApp', {
+          url: '/create/app',
+          templateUrl: 'views/app/create.html',
+          controller: 'AppCreateController'
+        })
+        .state('viewApp', {
+          url: '/app/:appId',
+          templateUrl: 'views/app/view.html',
+          controller: 'AppViewController'
+        })
+        .state('editApp', {
+          url: '/app/:appId/edit',
+          templateUrl: 'views/app/edit.html',
+          controller: 'AppEditController'
+        })
+        .state('deleteApp', {
+          url: '/app/:appId/delete',
+          templateUrl: 'views/app/delete.html',
+          controller: 'AppDeleteController'
+        })
         .state('userIndex', {
           url: '/user',
           templateUrl: 'views/user/index.html',
