@@ -34,13 +34,28 @@ angular
     ) {
 
       // Set the base URL for our API.
-      FormioProvider.setBaseUrl('/api');
-      RestangularProvider.setBaseUrl('/api');
+      FormioProvider.setBaseUrl('http://localhost:3000/api');
+      RestangularProvider.setBaseUrl('http://localhost:3000/api');
 
       $stateProvider
         .state('home', {
           url: '/?',
           templateUrl: 'views/home/home.html'
+        })
+        .state('appIndex', {
+          url: '/app',
+          templateUrl: 'views/app/index.html',
+          controller: 'AppIndexController'
+        })
+        .state('userIndex', {
+          url: '/user',
+          templateUrl: 'views/user/index.html',
+          controller: 'UserIndexController'
+        })
+        .state('importExport', {
+          url: '/import-export',
+          templateUrl: 'views/import/index.html',
+          controller: 'ImportExportController'
         });
 
       // Otherwise go home.
@@ -98,6 +113,9 @@ angular
         $rootScope.previousParams = fromParams;
         $rootScope.currentState = toState.name;
       });
+
+      // Set the active sidebar.
+      $rootScope.activeSideBar = 'apps';
 
       // Add back functionality to the template.
       $rootScope.back = function() {

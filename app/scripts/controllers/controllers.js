@@ -1,6 +1,9 @@
 'use strict';
 angular.module('formioApp.controllers', [
-  'formioApp.controllers.resource'
+  'formioApp.controllers.resource',
+  'formioApp.controllers.app',
+  'formioApp.controllers.user',
+  'formioApp.controllers.import'
 ]).config([
   'ResourceProvider',
   function(ResourceProvider) {

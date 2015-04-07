@@ -12,6 +12,7 @@
     "ngDialog": "~0.3.12",
     "ng-sortable": "~1.2.0",
     "ngFormBuilder": "https://github.com/formioapp/ngFormBuilder.git#c11cc081cec99d9fe507f3aaa4d3764fcf73cf03",
-    "seamless": "~0.0.3"
+    "seamless": "~0.0.3",
+    "font-awesome": "~4.3.0"
   }
 }

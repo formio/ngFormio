@@ -175,11 +175,15 @@ app.directive('resourceList', function() {
     },
     controller: [
       '$scope',
+      '$rootScope',
       'Restangular',
       function(
         $scope,
+        $rootScope,
         Restangular
       ) {
+        $rootScope.activeSideBar = 'apps';
+        $rootScope.noBreadcrumb = false;
         $scope.resources = [];
         $scope.resourcesPerPage = $scope.numPerPage;
         $scope.resourceUrl = Restangular.all($scope.resourceName).getRestangularUrl();
