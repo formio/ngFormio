@@ -1,49 +1,52 @@
+<ol class="breadcrumb">
+  <li><a ui-sref="home()"><i class="fa fa-home"></i></a></li>
+</ol>
 <div class="row">
-  <div class="col-sm-4">
+  <div class="col-sm-6">
     <div class="panel panel-success">
       <div class="panel-heading">
-        <h3 class="panel-title"><i class="fa fa-file-text-o"></i> <a ui-sref="listForms">Forms</a></h3>
+        <h3 class="panel-title"><a ui-sref="appIndex()"><i class="fa fa-th-large"></i> Applications</a></h3>
       </div>
       <div class="panel-body">
-        <resource-list resource-title="'Form'" resource-name="'form'" num-per-page="5"></resource-list>
+        <table class="table table-striped">
+          <thead>
+          <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Operations</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr ng-repeat="app in apps">
+            <td><a ui-sref="app.view({appId: app._id})">{{ app.name }}</a></td>
+            <td>{{ app.description }}</td>
+            <td>
+              <div class="button-group">
+                <a ui-sref="app.view({appId: app._id})" class="btn btn-primary"><span class="glyphicon glyphicon-eye-open"></span></a>&nbsp;
+                <a ui-sref="app.edit({appId: app._id})" class="btn btn-default"><span class="glyphicon glyphicon-edit"></span></a>&nbsp;
+                <a ui-sref="app.delete({appId: app._id})" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle"></span></a>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
       </div>
       <div class="panel-footer">
-        <a ui-sref="createForm" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Create Form</a>
+        <a ui-sref="createApp()" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Create Application</a>
       </div>
     </div>
   </div>
-  <div class="col-sm-4">
+  <div class="col-sm-6">
     <div class="panel panel-success">
       <div class="panel-heading">
-        <h3 class="panel-title"><i class="fa fa-database"></i> <a ui-sref="listResources">Resources</a></h3>
+        <h3 class="panel-title"><a ui-sref="userIndex()"><i class="fa fa-users"></i> Users</a></h3>
       </div>
       <div class="panel-body">
-        <resource-list resource-title="'Resource'" resource-name="'resource'" num-per-page="5"></resource-list>
+
       </div>
       <div class="panel-footer">
-        <a ui-sref="createResource" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Create Resource</a>
+        <a ui-sref="createResource" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> New User</a>
       </div>
     </div>
-  </div>
-  <div class="col-sm-4">
-    <div class="panel panel-success">
-      <div class="panel-heading">
-        <h3 class="panel-title"><i class="fa fa-user"></i> <a ui-sref="listResources">Roles <small>and permissions</small></a></h3>
-      </div>
-      <div class="panel-body">
-        <resource-list resource-title="'User'" resource-name="'user'" num-per-page="5"></resource-list>
-      </div>
-      <div class="panel-footer">
-        <a ui-sref="createResource" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> New Role</a>
-      </div>
-    </div>
-  </div>
-</div>
-<div class="row">
-  <div class="col-sm-4">
-  </div>
-  <div class="col-sm-4">
-  </div>
-  <div class="col-sm-4">
   </div>
 </div>

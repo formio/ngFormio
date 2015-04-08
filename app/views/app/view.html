@@ -5,10 +5,10 @@
         <h3 class="panel-title"><i class="fa fa-file-text-o"></i> <a ui-sref="listForms">Forms</a></h3>
       </div>
       <div class="panel-body">
-        <resource-list resource-title="'Form'" resource-name="'form'" num-per-page="5"></resource-list>
+        <resource-list app="currentApp" resource-title="'Form'" resource-name="'form'" num-per-page="5"></resource-list>
       </div>
       <div class="panel-footer">
-        <a ui-sref="createForm" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Create Form</a>
+        <a ui-sref="app.createForm" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Create Form</a>
       </div>
     </div>
   </div>
@@ -18,10 +18,10 @@
         <h3 class="panel-title"><i class="fa fa-database"></i> <a ui-sref="listResources">Resources</a></h3>
       </div>
       <div class="panel-body">
-        <resource-list resource-title="'Resource'" resource-name="'resource'" num-per-page="5"></resource-list>
+        <resource-list app="currentApp" resource-title="'Resource'" resource-name="'resource'" num-per-page="5"></resource-list>
       </div>
       <div class="panel-footer">
-        <a ui-sref="createResource" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Create Resource</a>
+        <a ui-sref="app.createResource" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Create Resource</a>
       </div>
     </div>
   </div>
@@ -31,10 +31,9 @@
         <h3 class="panel-title"><i class="fa fa-user"></i> <a ui-sref="listResources">Roles <small>and permissions</small></a></h3>
       </div>
       <div class="panel-body">
-        <resource-list resource-title="'User'" resource-name="'user'" num-per-page="5"></resource-list>
       </div>
       <div class="panel-footer">
-        <a ui-sref="createResource" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> New Role</a>
+        <a ui-sref="app.createResource" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> New Role</a>
       </div>
     </div>
   </div>
