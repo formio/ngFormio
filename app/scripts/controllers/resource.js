@@ -75,14 +75,14 @@ app.provider('Resource', [
           })
           .state('app.api' + resource.title + '.spec', {
             url: '/spec',
-            parent: 'app',
+            parent: 'app.api' + resource.title,
             templateUrl: 'views/resource/resource-api.spec.html',
             controller: 'ResourceAPISpecController',
             params: {resource: resource}
           })
           .state('app.api' + resource.title + '.embed', {
             url: '/embed',
-            parent: 'app',
+            parent: 'app.api' + resource.title,
             templateUrl: 'views/resource/resource-api.embed.html',
             controller: 'ResourceAPIEmbedController',
             params: {resource: resource}
@@ -248,6 +248,7 @@ app.controller('ResourceCreateController', [
     $scope.resource = {title: '', components: []};
     $scope.nav = {};
     $scope.resourceInfo = $stateParams.resource;
+    $scope.appId = $stateParams.appId;
     $scope.nav[$stateParams.resource.name] = {edit: true};
     if ($scope.resourceInfo.onCreate) {
       $scope.resourceInfo.onCreate($scope, $state, $stateParams, Restangular, FormioAlerts);
@@ -283,6 +284,7 @@ app.controller('ResourceEditController', [
     $scope.resource = {};
     $scope.nav = {};
     $scope.resourceInfo = $stateParams.resource;
+    $scope.appId = $stateParams.appId;
     $scope.nav[$stateParams.resource.name] = {edit: true};
     if ($scope.resourceInfo.onEdit) {
       $scope.resourceInfo.onEdit($scope, $state, $stateParams, Restangular, FormioAlerts);
@@ -346,14 +348,18 @@ app.controller('ResourceAPIController', [
     $stateParams,
     Restangular
   ) {
-    $scope.resource = Restangular
+    $scope.resource = {_id: $stateParams.id};
+    Restangular
       .one('app', $stateParams.appId)
       .one($stateParams.resource.name, $stateParams.id)
-      .get().$object;
+      .get().then(function(resource) {
+        $scope.resource = resource;
+      });
     $scope.resourceInfo = $stateParams.resource;
     $scope.nav = {};
     $scope.nav[$stateParams.resource.name] = {api: true};
     $state.transitionTo('app.api' + $stateParams.resource.title + '.spec', {
+      appId: $stateParams.appId,
       id: $stateParams.id
     });
   }
@@ -368,18 +374,22 @@ app.controller('ResourceAPISpecController', [
   ) {
     // Function to get the swagger url.
     $scope.getSwaggerURL = function() {
-      return 'http://localhost:3000/app/' + $stateParams.appId + '/form/' + $scope.resource._id + '/spec.html';
+      return 'http://localhost:3000/form/' + $scope.resource._id + '/spec.html';
     };
-    $scope.nav[$scope.$parent.resourceInfo.name] = {api: {spec: true}};
+    $scope.nav = {};
+    $scope.nav[$stateParams.resource.name] = {api: {spec: true}};
   }
 ]);
 
 app.controller('ResourceAPIEmbedController', [
+  '$stateParams',
   '$scope',
   function(
+    $stateParams,
     $scope
   ) {
-    $scope.nav[$scope.$parent.resourceInfo.name] = {api: {embed: true}};
+    $scope.nav = {};
+    $scope.nav[$stateParams.resource.name] = {api: {embed: true}};
   }
 ]);
 

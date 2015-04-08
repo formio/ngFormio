@@ -9,14 +9,14 @@
     <tbody>
       <tr data-ng-repeat="resource in resources">
         <td>
-          <a ui-sref="view{{ resourceInfo.title }}({id: resource._id})">
+          <a ui-sref="app.view{{ resourceInfo.title }}({id: resource._id})">
             {{ resource.title }}{{ resource.username }}
           </a>
         </td>
         <td>
           <div class="button-group">
-            <a ui-sref="edit{{ resourceInfo.title }}({id: resource._id})" class="btn btn-default"><span class="glyphicon glyphicon-edit"></span></a>
-            <a ui-sref="delete{{ resourceInfo.title }}({id: resource._id})" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle"></span></a>
+            <a ui-sref="app.edit{{ resourceInfo.title }}({id: resource._id})" class="btn btn-default"><span class="glyphicon glyphicon-edit"></span></a>
+            <a ui-sref="app.delete{{ resourceInfo.title }}({id: resource._id})" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle"></span></a>
           </div>
         </td>
       </tr>
