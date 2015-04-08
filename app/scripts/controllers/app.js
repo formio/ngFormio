@@ -36,7 +36,7 @@ app.controller('AppCreateController', [
           type: 'success',
           message: 'New application created!'
         });
-        $state.go('viewApp', {appId: app._id});
+        $state.go('app.view', {appId: app._id});
       }, FormioAlerts.onError.bind(FormioAlerts));
     };
   }
