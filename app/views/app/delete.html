@@ -1,1 +1,7 @@
-app delete page.
+<form class="form-horizontal" role="form" ng-submit="deleteApp()">
+  Are you sure you wish to delete the application <strong>{{ currentApp.name }}</strong>?
+  <div class="form-group">
+    <input type="submit" class="btn btn-danger" value="Yes"/>
+    <button ng-click="back()" type="button" class="btn btn-default">No</button>
+  </div>
+</form>

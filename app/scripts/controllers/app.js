@@ -62,3 +62,27 @@ app.controller('AppController', [
     });
   }
 ]);
+
+app.controller('AppDeleteController', [
+  '$scope',
+  '$state',
+  'Restangular',
+  'FormioAlerts',
+  function(
+    $scope,
+    $state,
+    Restangular,
+    FormioAlerts
+  ) {
+    $scope.deleteApp = function() {
+      if (!$scope.currentApp || !$scope.currentApp._id) { return; }
+      Restangular.one('app', $scope.currentApp._id).remove().then(function() {
+        FormioAlerts.addAlert({
+          type: 'success',
+          message: 'Application was deleted!'
+        });
+        $state.go('home');
+      }, FormioAlerts.onError.bind(FormioAlerts));
+    };
+  }
+]);
