@@ -18,7 +18,7 @@ app.run([
     $templateCache.put('formio/components/container.html',
       '<div class="row">' +
         '<div class="col-xs-6" ng-repeat="components in component.columns">' +
-          '<formio-component ng-repeat="component in components" component="component" data="data"></formio-component>' +
+          '<formio-component ng-repeat="component in components" component="component" data="data" formio="formio"></formio-component>' +
         '</div>' +
       '</div>'
     );

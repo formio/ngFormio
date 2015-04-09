@@ -17,7 +17,7 @@ app.run([
   function($templateCache) {
     $templateCache.put('formio/components/well.html',
       '<div class="well">' +
-        '<formio-component ng-repeat="component in component.components" component="component" data="data"></formio-component>' +
+        '<formio-component ng-repeat="component in component.components" component="component" data="data" formio="formio"></formio-component>' +
       '</div>'
     );
   }

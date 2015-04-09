@@ -30,15 +30,28 @@ app.provider('Formio', function() {
 
           // Ensure we have an instance of Formio.
           if (!(this instanceof Formio)) { return new Formio(path); }
+          this.appPath = '';
+          this.appUrl = '';
+          this.formPath = '';
           this.formUrl = '';
           this.subUrl = '';
           this.subId = '';
           if (path) {
+
+            // Get the application path.
+            this.appPath = path.replace(/\/(form|resource)\/.*/, '');
+
+            // Get the Form Path.
+            this.formPath = path.replace(/\/submission\/.*/, '');
+
             // Get the root URL.
             var url = baseUrl + path;
 
+            // Get the App URL.
+            this.appUrl = baseUrl + this.appPath;
+
             // Get the Form URL.
-            this.formUrl = url.replace(/\/submission\/.*/, '');
+            this.formUrl = baseUrl + this.formPath;
 
             // Get the submission URL.
             this.subUrl = '/submission';
@@ -61,7 +74,7 @@ app.provider('Formio', function() {
         };
 
         Formio.prototype.loadResources = function(query) {
-          return request(baseUrl + '/resource', query);
+          return request(this.appUrl + '/resource', query);
         };
         Formio.prototype.loadForm = function(query) {
           return request(this.formUrl, query);
@@ -284,7 +297,7 @@ app.directive('formio', function() {
         FormioScope
       ) {
         $scope.formioAlerts = [];
-        var loader = FormioScope.register($scope, {
+        $scope.formio = FormioScope.register($scope, {
           form: true,
           submission: true
         });
@@ -292,8 +305,8 @@ app.directive('formio', function() {
         // Called when the form is submitted.
         $scope.onSubmit = function(isValid) {
           if (!isValid) { return; }
-          if (loader) {
-            loader.saveSubmission($scope._submission).then(function(submission) {
+          if ($scope.formio) {
+            $scope.formio.saveSubmission($scope._submission).then(function(submission) {
               var message = submission.method === 'put' ? 'updated' : 'created';
               $scope.formioAlerts.push({
                 type: 'success',
@@ -425,7 +438,8 @@ app.directive('formioComponent', [
       restrict: 'E',
       scope: {
         component: '=',
-        data: '='
+        data: '=',
+        formio: '='
       },
       templateUrl: 'formio/component.html',
       controller: [
@@ -542,7 +556,7 @@ app.run([
         '<div ng-repeat="alert in formioAlerts" class="alert alert-{{ alert.type }}" role="alert">' +
           '{{ alert.message }}' +
         '</div>' +
-        '<formio-component ng-repeat="component in _form.components track by $index" component="component" data="_submission.data"></formio-component>' +
+        '<formio-component ng-repeat="component in _form.components track by $index" component="component" data="_submission.data" formio="formio"></formio-component>' +
         '<button type="submit" class="btn btn-primary" ng-disabled="formioForm.$invalid">Submit</button>' +
       '</form>'
     );
@@ -768,7 +782,7 @@ app.run([
     $templateCache.put('formio/components/container.html',
       '<div class="row">' +
         '<div class="col-xs-6" ng-repeat="components in component.columns">' +
-          '<formio-component ng-repeat="component in components" component="component" data="data"></formio-component>' +
+          '<formio-component ng-repeat="component in components" component="component" data="data" formio="formio"></formio-component>' +
         '</div>' +
       '</div>'
     );
@@ -854,7 +868,7 @@ app.run([
     $templateCache.put('formio/components/fieldset.html',
       '<fieldset>' +
         '<legend ng-if="component.legend">{{ component.legend }}</legend>' +
-        '<formio-component ng-repeat="component in component.components" component="component" data="data"></formio-component>' +
+        '<formio-component ng-repeat="component in component.components" component="component" data="data" formio="formio"></formio-component>' +
       '</fieldset>'
     );
   }
@@ -959,7 +973,7 @@ app.run([
       '<div class="panel panel-{{ component.theme }}">' +
         '<div ng-if="component.title" class="panel-heading"><h3 class="panel-title">{{ component.title }}</h3></div>' +
         '<div class="panel-body">' +
-          '<formio-component ng-repeat="component in component.components" component="component" data="data"></formio-component>' +
+          '<formio-component ng-repeat="component in component.components" component="component" data="data" formio="formio"></formio-component>' +
         '</div>' +
       '</div>'
     );
@@ -1029,7 +1043,7 @@ app.config([
       controller: function(settings, $scope, $http, Formio) {
         $scope.selectItems = [];
         if (settings.resource) {
-          var formio = new Formio('/resource/' + settings.resource);
+          var formio = new Formio($scope.formio.appPath + '/resource/' + settings.resource);
           if (settings.searchExpression && settings.searchFields) {
             var search = new RegExp(settings.searchExpression);
             $scope.refreshSubmissions = function(input) {
@@ -1255,7 +1269,7 @@ app.run([
   function($templateCache) {
     $templateCache.put('formio/components/well.html',
       '<div class="well">' +
-        '<formio-component ng-repeat="component in component.components" component="component" data="data"></formio-component>' +
+        '<formio-component ng-repeat="component in component.components" component="component" data="data" formio="formio"></formio-component>' +
       '</div>'
     );
   }
