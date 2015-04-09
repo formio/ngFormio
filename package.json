@@ -34,9 +34,14 @@
     "wiredep": "^2.0.0"
   },
   "dependencies": {
+    "async": "^0.9.0",
+    "basic-auth-connect": "^1.0.0",
     "config": "^1.12.0",
     "express": "^4.12.3",
+    "mongodb": "^2.0.27",
+    "nodemailer": "^1.3.2",
     "nunjucks": "^1.3.3",
-    "swagger-ui": "^2.1.0-M2"
+    "swagger-ui": "^2.1.0-M2",
+    "validator": "^3.37.0"
   }
 }

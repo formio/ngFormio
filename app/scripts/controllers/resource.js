@@ -354,12 +354,14 @@ app.controller('ResourceAPIController', [
 
 app.controller('ResourceAPISpecController', [
   '$scope',
+  'AppConfig',
   function(
-    $scope
+    $scope,
+    AppConfig
   ) {
     // Function to get the swagger url.
     $scope.getSwaggerURL = function() {
-      return 'http://localhost:3000/form/' + $scope.resource._id + '/spec.html';
+      return AppConfig.appBase + '/form/' + $scope.resource._id + '/spec.html';
     };
     $scope.nav[$scope.$parent.resourceInfo.name] = {api: {spec: true}};
   }

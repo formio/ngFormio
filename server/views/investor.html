@@ -1,0 +1,17 @@
+{% extends 'page.html' %}
+{% block form %}
+<div class="alert alert-info" role="alert">Thank you for your interest in our product. Please provide the following information and we will contact you soon with more information about our product.</div>
+<form action="/" method="POST">
+  <div class="form-group">
+    <input type="email" class="form-control" id="email" name="email" placeholder="Email" value="{{ email }}">
+  </div>
+  <div class="form-group">
+    <input type="text" class="form-control" id="firstName" name="firstName" placeholder="First Name">
+  </div>
+  <div class="form-group">
+    <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Last Name">
+  </div>
+  <input type="hidden" id="customerType" name="customerType" value="investor" />
+  <button type="submit" class="btn btn-primary btn-block">Submit</button>
+</form>
+{% endblock %}

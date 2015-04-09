@@ -1,0 +1,5 @@
+{
+  "host": "http://form.io",
+  "port": 0,
+  "mongo": "mongodb://localhost:27017/formio"
+}

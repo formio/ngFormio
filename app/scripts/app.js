@@ -21,21 +21,27 @@ angular
     'formioApp.services',
     'formioApp.directives'
   ])
+  .constant('AppConfig', {
+    appBase: 'http://localhost:3000',
+    apiBase: 'http://localhost:3000/api'
+  })
   .config([
     '$stateProvider',
     '$urlRouterProvider',
     'FormioProvider',
     'RestangularProvider',
+    'AppConfig',
     function (
       $stateProvider,
       $urlRouterProvider,
       FormioProvider,
-      RestangularProvider
+      RestangularProvider,
+      AppConfig
     ) {
 
       // Set the base URL for our API.
-      FormioProvider.setBaseUrl('http://localhost:3000/api');
-      RestangularProvider.setBaseUrl('http://localhost:3000/api');
+      FormioProvider.setBaseUrl(AppConfig.apiBase);
+      RestangularProvider.setBaseUrl(AppConfig.apiBase);
 
       $stateProvider
         .state('home', {
