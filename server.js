@@ -11,6 +11,13 @@ nunjucks.configure('server/views', {
   express   : app
 });
 
+// Host the dynamic app configuration.
+app.get('/config.js', function(req, res, next) {
+  res.render('js/config.js', {
+    appBase: config.host + '/app'
+  });
+});
+
 // Mount the brochure.
 app.use('/', require('./brochure')(config.brochure));
 

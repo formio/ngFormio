@@ -1,5 +1,10 @@
 {
   "host": "http://form.io",
-  "port": 0,
-  "mongo": "mongodb://localhost:27017/formio"
+  "port": 80,
+  "brochure": {
+    "mongo": "mongodb://localhost:27017/formio-brochure",
+  },
+  "formio": {
+    "mongo": "mongodb://localhost:27017/formio"
+  }
 }
