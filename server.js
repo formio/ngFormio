@@ -22,7 +22,7 @@ app.get('/config.js', function(req, res, next) {
 });
 
 // Mount bower_components as assets.
-app.use('/assets', express.static(__dirname + '/bower_components'));
+app.use('/bower_components', express.static(__dirname + '/bower_components'));
 
 // Mount the brochure.
 app.use('/', require('./brochure')(config.brochure));
@@ -32,9 +32,11 @@ if (!config.brochure.debug) {
   app.use('/app', basicAuth(config.brochure.admin.user, config.brochure.admin.pass));
 }
 
+// Include the swagger ui.
+app.use('/swagger', express.static(require('swagger-ui').dist));
+
 // Add the formio application.
 app.use('/app', express.static(__dirname + '/dist'));
-app.use('/app/swagger', express.static(require('swagger-ui').dist));
 
 // Show the docs page for the API.
 app.get('/app/spec.html', function (req, res, next) {
