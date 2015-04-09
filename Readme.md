@@ -40,13 +40,13 @@ In order to develop against the application, you will need to utilize Gulp.
   - ```npm install```
   - ```gulp watch```
   
-  ... create another terminal ...
+... create another terminal ...
   
   - ```cd bower_components/ngFormBuilder```
   - ```npm install```
   - ```gulp watch```
   
-  ... create another terminal ...
+... create another terminal ...
   
   - ```gulp serve```
   
