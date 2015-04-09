@@ -46,12 +46,35 @@ angular
       $stateProvider
         .state('home', {
           url: '/?',
-          templateUrl: 'views/home/home.html'
+          templateUrl: 'views/home/home.html',
+          controller: 'HomeController'
         })
-        .state('appIndex', {
-          url: '/app',
-          templateUrl: 'views/app/index.html',
-          controller: 'AppIndexController'
+        .state('app', {
+          url: '/app/:appId',
+          controller: 'AppController',
+          templateUrl: 'views/app/app.html'
+        })
+        .state('createApp', {
+          url: '/create/app',
+          templateUrl: 'views/app/create.html',
+          controller: 'AppCreateController'
+        })
+        .state('app.view', {
+          url: '/view',
+          parent: 'app',
+          templateUrl: 'views/app/view.html'
+        })
+        .state('app.edit', {
+          url: '/edit',
+          parent: 'app',
+          templateUrl: 'views/app/edit.html',
+          controller: 'AppEditController'
+        })
+        .state('app.delete', {
+          url: '/delete',
+          parent: 'app',
+          templateUrl: 'views/app/delete.html',
+          controller: 'AppDeleteController'
         })
         .state('userIndex', {
           url: '/user',
@@ -71,6 +94,21 @@ angular
 
       // Otherwise go home.
       $urlRouterProvider.otherwise('/');
+    }
+  ])
+  .controller('HomeController', [
+    '$scope',
+    'Restangular',
+    '$rootScope',
+    function(
+      $scope,
+      Restangular,
+      $rootScope
+    ) {
+      $rootScope.activeSideBar = 'home';
+      $rootScope.currentApp = null;
+      $scope.apps = Restangular.all('app').getList().$object;
+      $scope.users = Restangular.all('user').getList().$object;
     }
   ])
   .filter('trusted', [

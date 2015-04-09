@@ -13,7 +13,7 @@ module.exports = function(gulp, plugins) {
 
     // watch for changes
     gulp.watch([
-      'app/*.html',
+      'app/**/*.html',
       'app/scripts/**/*.js',
       'app/images/**/*',
       '.tmp/fonts/**/*'

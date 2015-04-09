@@ -24,7 +24,7 @@ app.get('/spec.html', function(req, res, next) {
 // Get the specs for each form.
 app.get('/form/:formId/spec.html', function(req, res, next) {
   res.render('docs.html', {
-    url: req.protocol + '://' + req.get('host') + '/api/form/:formId/spec.json'
+    url: req.protocol + '://' + req.get('host') + '/api/form/' + req.params.formId + '/spec.json'
   });
 });
 
