@@ -11,6 +11,9 @@ nunjucks.configure('server/views', {
   express   : app
 });
 
+// CORS Support
+app.use(require('cors')());
+
 // Host the dynamic app configuration.
 app.get('/config.js', function(req, res, next) {
   res.render('js/config.js', {
@@ -18,13 +21,19 @@ app.get('/config.js', function(req, res, next) {
   });
 });
 
+// Mount bower_components as assets.
+app.use('/assets', express.static(__dirname + '/bower_components'));
+
 // Mount the brochure.
 app.use('/', require('./brochure')(config.brochure));
 
 // Use swagger docs and assets.
-app.use('/app', basicAuth(config.brochure.admin.user, config.brochure.admin.pass));
+if (!config.brochure.debug) {
+  app.use('/app', basicAuth(config.brochure.admin.user, config.brochure.admin.pass));
+}
+
+// Add the formio application.
 app.use('/app', express.static(__dirname + '/dist'));
-app.use('/app/assets', express.static(__dirname + '/bower_components'));
 app.use('/app/swagger', express.static(require('swagger-ui').dist));
 
 // Show the docs page for the API.

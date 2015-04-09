@@ -2,6 +2,7 @@
   "host": "http://form.io",
   "port": 80,
   "brochure": {
+    "debug": false,
     "mongo": "mongodb://localhost:27017/formio-brochure",
   },
   "formio": {

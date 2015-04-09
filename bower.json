@@ -13,6 +13,7 @@
     "ng-sortable": "~1.2.0",
     "ngFormBuilder": "git@github.com:formioapp/ngFormBuilder.git#31de231e67fb5478dbc60a2dda5fc09116768a67",
     "seamless": "~0.0.3",
-    "font-awesome": "~4.3.0"
+    "font-awesome": "~4.3.0",
+    "angular-base64": "~2.0.4"
   }
 }
