@@ -18,7 +18,7 @@ module.exports = function(config) {
   });
 
   // Connect to the brochure application.
-  console.log('Connecting to MongoDB');
+  console.log('Connecting to ' + config.mongo);
   MongoClient.connect(config.mongo, function(err, db) {
 
     // Show an error if we didn't connect.
