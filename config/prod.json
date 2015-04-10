@@ -3,9 +3,9 @@
   "port": 80,
   "brochure": {
     "debug": false,
-    "mongo": "mongodb://formio:98uemXpNZFj6Fo4qb623G8r@ec2-54-149-252-161.us-west-2.compute.amazonaws.com:27017/formio-brochure"
+    "mongo": "mongodb://modb-4.formio.8491.mongodbdns.com:27000/formio-brochure"
   },
   "formio": {
-    "mongo": "mongodb://formio:98uemXpNZFj6Fo4qb623G8r@ec2-54-149-252-161.us-west-2.compute.amazonaws.com:27017/formio"
+    "mongo": "mongodb://modb-4.formio.8491.mongodbdns.com:27000/formio"
   }
 }
