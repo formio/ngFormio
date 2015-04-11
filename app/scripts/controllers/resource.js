@@ -87,6 +87,13 @@ app.provider('Resource', [
             controller: 'ResourceAPIEmbedController',
             params: {resource: resource}
           })
+          .state('app.list' + resource.title + 'Behaviors', {
+            url: resource.url + '/:id/behaviors',
+            parent: 'app',
+            templateUrl: 'views/resource/resource-behaviors.html',
+            controller: 'ResourceBehaviorsController',
+            params: {resource: resource}
+          })
           .state('app.list' + resource.title + 'Submissions', {
             url: resource.url + '/:id/submission',
             parent: 'app',
@@ -392,6 +399,20 @@ app.controller('ResourceAPIEmbedController', [
   ) {
     $scope.nav = {};
     $scope.nav[$stateParams.resource.name] = {api: {embed: true}};
+  }
+]);
+
+app.controller('ResourceBehaviorsController', [
+  '$scope',
+  '$stateParams',
+  function(
+    $scope,
+    $stateParams
+  ) {
+    $scope.nav = {};
+    $scope.nav[$stateParams.resource.name] = {'behaviors': true};
+    $scope.resourceInfo = $stateParams.resource;
+    $scope.resource = {_id: $stateParams.id};
   }
 ]);
 

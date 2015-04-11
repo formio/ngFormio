@@ -63,6 +63,7 @@ app.controller('AppController', [
   }
 ]);
 
+app.controller('AppEditController', function() {});
 app.controller('AppDeleteController', [
   '$scope',
   '$state',
