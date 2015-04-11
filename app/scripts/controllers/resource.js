@@ -88,8 +88,8 @@ app.provider('Resource', [
             params: {resource: resource}
           })
           .state('app.list' + resource.title + 'Behaviors', {
-            url: '/behaviors',
-            parent: 'app.view' + resource.title,
+            url: resource.url + '/:id/behaviors',
+            parent: 'app',
             templateUrl: 'views/resource/resource-behaviors.html',
             controller: 'ResourceBehaviorsController',
             params: {resource: resource}
@@ -411,6 +411,8 @@ app.controller('ResourceBehaviorsController', [
   ) {
     $scope.nav = {};
     $scope.nav[$stateParams.resource.name] = {'behaviors': true};
+    $scope.resourceInfo = $stateParams.resource;
+    $scope.resource = {_id: $stateParams.id};
   }
 ]);
 
