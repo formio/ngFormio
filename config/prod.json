@@ -1,5 +1,5 @@
 {
-  "host": "http://ec2-54-149-35-117.us-west-2.compute.amazonaws.com",
+  "host": "http://form.io",
   "port": 80,
   "brochure": {
     "debug": false,
