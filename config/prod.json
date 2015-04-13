@@ -1,11 +1,11 @@
 {
-  "host": "http://ec2-52-11-51-161.us-west-2.compute.amazonaws.com",
+  "host": "http://form.io",
   "port": 80,
   "brochure": {
     "debug": false,
-    "mongo": "mongodb://modb-4.formio.8491.mongodbdns.com:27000/formio-brochure"
+    "mongo": "mongodb://ec2-52-10-111-228.us-west-2.compute.amazonaws.com:27000/formio-brochure"
   },
   "formio": {
-    "mongo": "mongodb://modb-4.formio.8491.mongodbdns.com:27000/formio"
+    "mongo": "mongodb://ec2-52-10-111-228.us-west-2.compute.amazonaws.com:27000/formio"
   }
 }

@@ -59,7 +59,7 @@ module.exports = function(config) {
       var domain = 'form.io';
       var description = 'A revolutionary new API Platform';
       var hostname = 'form';
-      if (req.hostname.match(/opentech.io/)) {
+      if (req.hostname && req.hostname.match(/opentech.io/)) {
         title = 'opentech.io';
         domain = 'opentech.io';
         hostname = 'opentech';
