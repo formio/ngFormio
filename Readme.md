@@ -25,6 +25,8 @@ Next, you will then run npm and bower install, and then Update the submodules.
   - ```npm install```
   - ```bower install```
   - ```git submodule update --init --recursive```
+  - ```cd node_modules/formio```
+  - ```npm install```
   
 You should then be able to run the application locally by typing.
 
