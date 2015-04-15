@@ -7,6 +7,7 @@ app.provider('Formio', function() {
 
   // The default base url.
   var baseUrl = 'https://api.form.io';
+  var cache = {};
 
   // Return the provider interface.
   return {
@@ -28,45 +29,67 @@ app.provider('Formio', function() {
 
           // Ensure we have an instance of Formio.
           if (!(this instanceof Formio)) { return new Formio(path); }
+          this.appId = '';
           this.appPath = '';
           this.appUrl = '';
+
+          this.formId = '';
+          this.formType = '';
           this.formPath = '';
           this.formUrl = '';
-          this.subUrl = '';
+          this.formsUrl = '';
+
           this.subId = '';
+          this.subPath = '';
+          this.subUrl = '';
+          this.subsUrl = '';
           if (path) {
 
+            // Get the paths.
+            var paths = path.replace(/\/?app\//, '').split('/');
+
+            // Populate the parameters.
+            angular.forEach(['appId', 'formType', 'formId', '', 'subId'], function(param, index) {
+              if (param && (paths.length > index)) {
+                this[param] = paths[index];
+              }
+            }.bind(this));
+
             // Get the application path.
-            this.appPath = path.replace(/\/(form|resource)\/.*/, '');
+            this.appPath = this.appId ? ('/app/' + this.appId) : '';
+            this.appUrl = this.appPath ? baseUrl + this.appPath : '';
 
-            // Get the Form Path.
-            this.formPath = path.replace(/\/submission\/.*/, '');
+            // Get the form paths.
+            this.formPath = this.formId ? (this.appPath + '/' + this.formType + '/' + this.formId) : '';
+            this.formsUrl = this.formType ? (this.appUrl + '/' + this.formType) : '';
+            this.formUrl = this.formId ? (baseUrl + this.formPath) : this.formsUrl;
 
-            // Get the root URL.
-            var url = baseUrl + path;
-
-            // Get the App URL.
-            this.appUrl = baseUrl + this.appPath;
-
-            // Get the Form URL.
-            this.formUrl = baseUrl + this.formPath;
-
-            // Get the submission URL.
-            this.subUrl = '/submission';
-            this.subId = '';
-            var matches = url.match(/\/submission\/([^\/]+)/);
-            if (matches && (matches.length > 0)) {
-              this.subUrl = matches[0];
-              this.subId = matches[1];
-            }
+            // Get the submission paths.
+            this.subPath = this.subId ? (this.formPath + '/submission/' + this.subId) : '';
+            this.subsUrl = this.formPath ? (baseUrl + this.formPath) + '/submission' : '';
+            this.subUrl = this.subPath ? (baseUrl + this.subPath) : this.subsUrl;
           }
         };
 
         // Load the object.
         var request = function(url, query) {
           var deferred = $q.defer();
-          if (url) {
-            $http.get(url, query).success(deferred.resolve).error(deferred.reject);
+          if (!url) { return deferred.promise; }
+
+          // Get the cached promise to save multiple loads.
+          var cacheKey = url;
+          cacheKey += query ? angular.toJson(query) : '';
+          cacheKey = btoa(cacheKey);
+          if (cache.hasOwnProperty(cacheKey)) {
+            return cache[cacheKey];
+          }
+          else {
+
+            // Set the cache, then send the request.
+            cache[cacheKey] = deferred.promise;
+            $http.get(url, query).success(function(result) {
+              deferred.resolve(result);
+            }).error(deferred.reject);
           }
           return deferred.promise;
         };
@@ -75,22 +98,41 @@ app.provider('Formio', function() {
           return request(this.appUrl + '/resource', query);
         };
         Formio.prototype.loadForm = function(query) {
+          if (!this.formId) { return $q.defer().promise; }
           return request(this.formUrl, query);
+        };
+        Formio.prototype.saveForm = function(form) {
+          var deferred = $q.defer();
+          if (!this.formUrl) { return deferred.promise; }
+          var method = this.formId ? 'put' : 'post';
+          cache = {};
+          $http[method](this.formUrl, form)
+            .success(function (result) {
+              result.method = method;
+              deferred.resolve(result);
+            })
+            .error(deferred.reject);
+          return deferred.promise;
         };
         Formio.prototype.deleteForm = function() {
           var deferred = $q.defer();
+          if (!this.formId) { return deferred.promise; }
+          cache = {};
           $http.delete(this.formUrl).success(deferred.resolve).error(deferred.reject);
           return deferred.promise;
         };
         Formio.prototype.loadSubmission = function(query) {
-          return this.subId ? request(this.formUrl + this.subUrl, query) : request();
+          if (!this.subId) { return $q.defer().promise; }
+          return request(this.subUrl, query);
         };
         Formio.prototype.saveSubmission = function(submission) {
           var deferred = $q.defer();
+          if (!this.subUrl) { return deferred.promise; }
           var method = this.subId ? 'put' : 'post';
-          $http[method](this.formUrl + this.subUrl, {data: submission.data})
-            .success(function(result) {
+          $http[method](this.subUrl, {data: submission.data})
+            .success(function (result) {
               result.method = method;
+              cache = {};
               deferred.resolve(result);
             })
             .error(deferred.reject);
@@ -98,17 +140,13 @@ app.provider('Formio', function() {
         };
         Formio.prototype.deleteSubmission = function() {
           var deferred = $q.defer();
-          if (this.subId) {
-            $http.delete(this.formUrl + this.subUrl).success(deferred.resolve).error(deferred.reject);
-          }
+          if (!this.subId) { return deferred.promise; }
+          cache = {};
+          $http.delete(this.subUrl).success(deferred.resolve).error(deferred.reject);
           return deferred.promise;
         };
         Formio.prototype.loadSubmissions = function(query) {
-          var deferred = $q.defer();
-          request(this.formUrl + this.subUrl, query).then(function(submissions) {
-            deferred.resolve(submissions ? submissions : []);
-          }, deferred.reject);
-          return deferred.promise;
+          return request(this.subsUrl, query);
         };
 
         // Static methods.
