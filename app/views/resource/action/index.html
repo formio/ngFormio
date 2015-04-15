@@ -1,0 +1,22 @@
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Operations</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr data-ng-repeat="action in actions">
+        <td>
+            <a ui-sref="app.{{ resourceInfo.name }}.action.item.view({actionId: action._id})">{{ action.title }}</a>
+        </td>
+        <td>
+            <div class="button-group">
+                <a ui-sref="app.{{ resourceInfo.name }}.action.item.edit({actionId: action._id})" class="btn btn-default"><span class="glyphicon glyphicon-edit"></span></a>
+                <a ui-sref="app.{{ resourceInfo.name }}.action.item.delete({actionId: action._id})" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle"></span></a>
+            </div>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<a ui-sref="app.{{ resourceInfo.name }}.action.add" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Add Action</a>

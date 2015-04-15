@@ -32,8 +32,9 @@ app.provider('Resource', [
         var resourceParam = ' resource-title="\'' + resourceInfo.title + '\'"';
         resourceParam += ' resource-name="\'' + resourceInfo.name + '\'"';
         resources[resourceInfo.name] = resourceInfo;
+        var appState = 'app.' + resourceInfo.name;
         $stateProvider
-          .state('app.' + resourceInfo.name, {
+          .state(appState, {
             abstract: true,
             url: resourceInfo.url + '/:id',
             parent: 'app',
@@ -41,93 +42,111 @@ app.provider('Resource', [
             controller: 'ResourceController',
             params: {resourceInfo: resourceInfo}
           })
-          .state('app.' + resourceInfo.name + '.view', {
+          .state(appState + '.view', {
             url: '',
-            parent: 'app.' + resourceInfo.name,
+            parent: appState,
             templateUrl: 'views/resource/resource-view.html',
             controller: 'ResourceViewController'
           })
-          .state('app.' + resourceInfo.name + '.edit', {
+          .state(appState + '.edit', {
             url: '/edit',
-            parent: 'app.' + resourceInfo.name,
+            parent: appState,
             templateUrl: 'views/resource/resource-edit.html'
           })
-          .state('app.' + resourceInfo.name + '.delete', {
+          .state(appState + '.delete', {
             url: '/delete',
-            parent: 'app.' + resourceInfo.name,
+            parent: appState,
             templateUrl: 'views/resource/resource-delete.html',
             controller: 'ResourceDeleteController'
           })
-          .state('app.' + resourceInfo.name + '.create', {
+          .state(appState + '.create', {
             url: '/create/' + resourceInfo.name,
             parent: 'app',
             templateUrl: 'views/resource/resource-create.html',
             controller: 'ResourceCreateController',
             params: {resourceInfo: resourceInfo}
           })
-          .state('app.' + resourceInfo.name + '.index', {
+          .state(appState + '.index', {
             url: resourceInfo.url,
             parent: 'app',
             template: '<resource-list' + resourceParam + '></resource-list>'
           })
-          .state('app.' + resourceInfo.name + '.api', {
+          .state(appState + '.api', {
             url: '/api',
-            parent: 'app.' + resourceInfo.name,
+            parent: appState,
             templateUrl: 'views/resource/resource-api.html',
             controller: 'ResourceAPIController'
           })
-          .state('app.' + resourceInfo.name + '.api.spec', {
+          .state(appState + '.api.spec', {
             url: '/spec',
-            parent: 'app.' + resourceInfo.name + '.api',
+            parent: appState + '.api',
             templateUrl: 'views/resource/resource-api.spec.html',
             controller: 'ResourceAPISpecController'
           })
-          .state('app.' + resourceInfo.name + '.api.embed', {
+          .state(appState + '.api.embed', {
             url: '/embed',
-            parent: 'app.' + resourceInfo.name + '.api',
+            parent: appState + '.api',
             templateUrl: 'views/resource/resource-api.embed.html'
-          })
-          .state('app.' + resourceInfo.name + '.actions', {
-            url: '/actions',
-            parent: 'app.' + resourceInfo.name,
-            templateUrl: 'views/resource/resource-actions.html'
-          })
-          .state('app.' + resourceInfo.name + '.subs', {
+          });
+
+
+        var resourceStates = {};
+        resourceStates[appState + '.submission'] = {
+          path: '/submission',
+          indexController: 'ResourceSubmissionsController',
+          itemController: 'ResourceSubmissionController',
+          editController: 'ResourceSubmissionEditController',
+          deleteController: 'ResourceSubmissionDeleteController'
+        };
+        resourceStates[appState + '.action'] = {
+          path: '/action'
+        };
+        angular.forEach(resourceStates, function(info, state) {
+          $stateProvider.state(state, {
             abstract: true,
-            url: '/submission',
-            parent: 'app.' + resourceInfo.name,
+            url: info.path,
+            parent: appState,
             template: '<div ui-view></div>'
           })
-          .state('app.' + resourceInfo.name + '.subs.index', {
+          .state(state + '.index', {
             url: '',
-            parent: 'app.' + resourceInfo.name + '.subs',
-            templateUrl: 'views/resource/resource-submissions.html',
-            controller: 'ResourceSubmissionsController'
+            parent: state,
+            templateUrl: 'views/resource' + info.path + '/index.html',
+            controller: info.indexController
           })
-          .state('app.' + resourceInfo.name + '.subs.sub', {
+          .state(state + '.item', {
             abstract: true,
             url: '/:subId',
-            parent: 'app.' + resourceInfo.name + '.subs',
-            controller: 'ResourceSubmissionController',
-            templateUrl: 'views/resource/resource-submission.html'
+            parent: state,
+            controller: info.itemController,
+            templateUrl: 'views/resource' + info.path + '/item.html'
           })
-          .state('app.' + resourceInfo.name + '.subs.sub.view', {
+          .state(state + '.item.view', {
             url: '',
-            parent: 'app.' + resourceInfo.name + '.subs.sub',
-            templateUrl: 'views/resource/resource-submission-view.html'
+            parent: state + '.item',
+            templateUrl: 'views/resource' + info.path + '/view.html',
+              controller: info.viewController
           })
-          .state('app.' + resourceInfo.name + '.subs.sub.edit', {
+          .state(state + '.item.edit', {
             url: '/edit',
-            parent: 'app.' + resourceInfo.name + '.subs.sub',
-            templateUrl: 'views/resource/resource-submission-edit.html',
-            controller: 'ResourceSubmissionEditController'
+            parent: state + '.item',
+            templateUrl: 'views/resource' + info.path + '/edit.html',
+            controller: info.editController
           })
-          .state('app.' + resourceInfo.name + '.subs.sub.delete', {
+          .state(state + '.item.delete', {
             url: '/delete',
-            parent: 'app.' + resourceInfo.name + '.subs.sub',
-            templateUrl: 'views/resource/resource-submission-delete.html',
-            controller: 'ResourceSubmissionDeleteController'
+            parent: state + '.item',
+            templateUrl: 'views/resource' + info.path + '/delete.html',
+            controller: info.deleteController
           });
+        });
+
+        // Add the action adding state.
+        $stateProvider.state(appState + '.action.add', {
+          url: '/add',
+          parent: appState + '.action',
+          templateUrl: 'views/resource/action/add.html'
+        });
       },
       $get: function() {
         return resources;
@@ -292,7 +311,7 @@ app.controller('ResourceViewController', [
         type: 'success',
         message: 'New submission added!'
       });
-      $state.go('app.' + $scope.resourceInfo.name + '.subs.sub.view', {subId: submission._id});
+      $state.go('app.' + $scope.resourceInfo.name + '.submission.item.view', {subId: submission._id});
     });
   }
 ]);
@@ -362,6 +381,22 @@ app.controller('ResourceAPISpecController', [
   }
 ]);
 
+app.controller('ResourceActionIndexController', [
+  '$scope',
+  '$state',
+  'Formio',
+  function(
+    $scope,
+    $state,
+    Formio
+  ) {
+    $scope.actions = {};
+    $scope.formio.loadActions().then(function(actions) {
+      $scope.actions = actions;
+    }, FormioAlerts.onError.bind(FormioAlerts));
+  }
+]);
+
 app.controller('ResourceSubmissionsController', [
   '$scope',
   '$state',
@@ -370,19 +405,19 @@ app.controller('ResourceSubmissionsController', [
     $state
   ) {
     $scope.$on('submissionView', function(event, submission) {
-      $state.go('app.' + $scope.resourceInfo.name + '.subs.sub.view', {
+      $state.go('app.' + $scope.resourceInfo.name + '.submission.item.view', {
         subId: submission._id
       });
     });
 
     $scope.$on('submissionEdit', function(event, submission) {
-      $state.go('app.' + $scope.resourceInfo.name + '.subs.sub.edit', {
+      $state.go('app.' + $scope.resourceInfo.name + '.submission.item.edit', {
         subId: submission._id
       });
     });
 
     $scope.$on('submissionDelete', function(event, submission) {
-      $state.go('app.' + $scope.resourceInfo.name + '.subs.sub.delete', {
+      $state.go('app.' + $scope.resourceInfo.name + '.submission.item.delete', {
         subId: submission._id
       });
     });
@@ -432,12 +467,12 @@ app.controller('ResourceSubmissionEditController', [
         type: 'success',
         message: 'Submission was ' + message + '.'
       });
-      $state.go('app.' + $scope.resourceInfo.name + '.subs.index', {id: $scope.resourceId});
+      $state.go('app.' + $scope.resourceInfo.name + '.submission.index', {id: $scope.resourceId});
     });
 
     $scope.deleteSubmission = function() {
       $scope.formio.deleteSubmission().then(function() {
-        $state.go('app.' + $scope.resourceInfo.name + '.subs.index', {id: $scope.resourceId});
+        $state.go('app.' + $scope.resourceInfo.name + '.submission.index', {id: $scope.resourceId});
       }, FormioAlerts.onError.bind(FormioAlerts));
     };
   }
@@ -457,11 +492,11 @@ app.controller('ResourceSubmissionDeleteController', [
         type: 'success',
         message: 'Submission was deleted.'
       });
-      $state.go('app.' + $scope.resourceInfo.name + '.subs.index');
+      $state.go('app.' + $scope.resourceInfo.name + '.submission.index');
     });
 
     $scope.$on('cancel', function() {
-      $state.go('app.' + $scope.resourceInfo.name + '.subs.sub.view');
+      $state.go('app.' + $scope.resourceInfo.name + '.submission.item.view');
     });
 
     $scope.$on('formError', function(event, error) {

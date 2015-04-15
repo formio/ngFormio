@@ -50,7 +50,7 @@ angular
           controller: 'AppController',
           templateUrl: 'views/app/app.html'
         })
-        .state('createApp', {
+        .state('app.create', {
           url: '/create/app',
           templateUrl: 'views/app/create.html',
           controller: 'AppCreateController'
