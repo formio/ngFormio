@@ -33,101 +33,100 @@ app.provider('Resource', [
         resourceParam += ' resource-name="\'' + resourceInfo.name + '\'"';
         resources[resourceInfo.name] = resourceInfo;
         $stateProvider
-          .state('app.list' + resourceInfo.title + 's', {
-            url: resourceInfo.url,
-            parent: 'app',
-            template: '<resource-list' + resourceParam + '></resource-list>'
-          })
           .state('app.' + resourceInfo.name, {
+            abstract: true,
             url: resourceInfo.url + '/:id',
             parent: 'app',
             templateUrl: 'views/resource/resource-root.html',
             controller: 'ResourceController',
             params: {resourceInfo: resourceInfo}
           })
-          .state('app.view' + resourceInfo.title, {
-            url: resourceInfo.url + '/:id',
-            parent: 'app',
+          .state('app.' + resourceInfo.name + '.view', {
+            url: '',
+            parent: 'app.' + resourceInfo.name,
             templateUrl: 'views/resource/resource-view.html',
-            controller: 'ResourceViewController',
-            params: {resourceInfo: resourceInfo}
+            controller: 'ResourceViewController'
           })
-          .state('app.edit' + resourceInfo.title, {
-            url: resourceInfo.url + '/:id/edit',
-            parent: 'app',
-            templateUrl: 'views/resource/resource-edit.html',
-            controller: 'ResourceEditController',
-            params: {resourceInfo: resourceInfo}
+          .state('app.' + resourceInfo.name + '.edit', {
+            url: '/edit',
+            parent: 'app.' + resourceInfo.name,
+            templateUrl: 'views/resource/resource-edit.html'
           })
-          .state('app.delete' + resourceInfo.title, {
-            url: resourceInfo.url + '/:id/delete',
-            parent: 'app',
+          .state('app.' + resourceInfo.name + '.delete', {
+            url: '/delete',
+            parent: 'app.' + resourceInfo.name,
             templateUrl: 'views/resource/resource-delete.html',
-            controller: 'ResourceDeleteController',
-            params: {resourceInfo: resourceInfo}
+            controller: 'ResourceDeleteController'
           })
-          .state('app.create' + resourceInfo.title, {
+          .state('app.' + resourceInfo.name + '.create', {
             url: '/create/' + resourceInfo.name,
             parent: 'app',
             templateUrl: 'views/resource/resource-create.html',
             controller: 'ResourceCreateController',
             params: {resourceInfo: resourceInfo}
           })
-          .state('app.api' + resourceInfo.title, {
-            url: resourceInfo.url + '/:id/api',
+          .state('app.' + resourceInfo.name + '.index', {
+            url: resourceInfo.url,
             parent: 'app',
+            template: '<resource-list' + resourceParam + '></resource-list>'
+          })
+          .state('app.' + resourceInfo.name + '.api', {
+            url: '/api',
+            parent: 'app.' + resourceInfo.name,
             templateUrl: 'views/resource/resource-api.html',
-            controller: 'ResourceAPIController',
-            params: {resourceInfo: resourceInfo}
+            controller: 'ResourceAPIController'
           })
-          .state('app.api' + resourceInfo.title + '.spec', {
+          .state('app.' + resourceInfo.name + '.api.spec', {
             url: '/spec',
-            parent: 'app.api' + resourceInfo.title,
+            parent: 'app.' + resourceInfo.name + '.api',
             templateUrl: 'views/resource/resource-api.spec.html',
-            controller: 'ResourceAPISpecController',
-            params: {resourceInfo: resourceInfo}
+            controller: 'ResourceAPISpecController'
           })
-          .state('app.api' + resourceInfo.title + '.embed', {
+          .state('app.' + resourceInfo.name + '.api.embed', {
             url: '/embed',
-            parent: 'app.api' + resourceInfo.title,
-            templateUrl: 'views/resource/resource-api.embed.html',
-            controller: 'ResourceAPIEmbedController',
-            params: {resourceInfo: resourceInfo}
+            parent: 'app.' + resourceInfo.name + '.api',
+            templateUrl: 'views/resource/resource-api.embed.html'
           })
-          .state('app.list' + resourceInfo.title + 'Behaviors', {
-            url: resourceInfo.url + '/:id/behaviors',
-            parent: 'app',
-            templateUrl: 'views/resource/resource-behaviors.html',
-            controller: 'ResourceBehaviorsController',
-            params: {resourceInfo: resourceInfo}
+          .state('app.' + resourceInfo.name + '.actions', {
+            url: '/actions',
+            parent: 'app.' + resourceInfo.name,
+            templateUrl: 'views/resource/resource-actions.html'
           })
-          .state('app.list' + resourceInfo.title + 'Submissions', {
-            url: resourceInfo.url + '/:id/submission',
-            parent: 'app',
+          .state('app.' + resourceInfo.name + '.subs', {
+            abstract: true,
+            url: '/submission',
+            parent: 'app.' + resourceInfo.name,
+            template: '<div ui-view></div>'
+          })
+          .state('app.' + resourceInfo.name + '.subs.index', {
+            url: '',
+            parent: 'app.' + resourceInfo.name + '.subs',
             templateUrl: 'views/resource/resource-submissions.html',
-            controller: 'ResourceSubmissionsController',
-            params: {resourceInfo: resourceInfo}
+            controller: 'ResourceSubmissionsController'
           })
-          .state('app.view' + resourceInfo.title + 'Submission', {
-            url: resourceInfo.url + '/:id/submission/:subId',
-            parent: 'app',
-            templateUrl: 'views/resource/resource-submission-view.html',
-            controller: 'ResourceSubmissionViewController',
-            params: {resourceInfo: resourceInfo}
+          .state('app.' + resourceInfo.name + '.subs.sub', {
+            abstract: true,
+            url: '/:subId',
+            parent: 'app.' + resourceInfo.name + '.subs',
+            controller: 'ResourceSubmissionController',
+            templateUrl: 'views/resource/resource-submission.html'
           })
-          .state('app.edit' + resourceInfo.title + 'Submission', {
-            url: resourceInfo.url + '/:id/submission/:subId/edit',
-            parent: 'app',
+          .state('app.' + resourceInfo.name + '.subs.sub.view', {
+            url: '',
+            parent: 'app.' + resourceInfo.name + '.subs.sub',
+            templateUrl: 'views/resource/resource-submission-view.html'
+          })
+          .state('app.' + resourceInfo.name + '.subs.sub.edit', {
+            url: '/edit',
+            parent: 'app.' + resourceInfo.name + '.subs.sub',
             templateUrl: 'views/resource/resource-submission-edit.html',
-            controller: 'ResourceSubmissionEditController',
-            params: {resourceInfo: resourceInfo}
+            controller: 'ResourceSubmissionEditController'
           })
-          .state('app.delete' + resourceInfo.title + 'Submission', {
-            url: resourceInfo.url + '/:id/submission/:subId/delete',
-            parent: 'app',
+          .state('app.' + resourceInfo.name + '.subs.sub.delete', {
+            url: '/delete',
+            parent: 'app.' + resourceInfo.name + '.subs.sub',
             templateUrl: 'views/resource/resource-submission-delete.html',
-            controller: 'ResourceSubmissionDeleteController',
-            params: {resourceInfo: resourceInfo}
+            controller: 'ResourceSubmissionDeleteController'
           });
       },
       $get: function() {
@@ -160,7 +159,8 @@ app.factory('FormioAlerts', [
         return tempAlerts;
       },
       onError: function(error) {
-        _.each(error.data.errors, function(error) {
+        var errors = error.hasOwnProperty('errors') ? error.errors : error.data.errors;
+        _.each(errors, function (error) {
           this.addAlert({
             type: 'danger',
             message: error.message,
@@ -212,7 +212,92 @@ app.directive('resourceList', function() {
   };
 });
 
+/**
+ * Establish the resource scope.
+ * @param $scope
+ * @param $stateParams
+ * @param Formio
+ */
+var formioResourceScope = function($scope, $state, $stateParams, Formio) {
+
+  // Tests if the tab should be active.
+  $scope.isActive = function(state) {
+    return $state.current.name.indexOf(state) !== -1;
+  };
+
+  // Perform Camel Case.
+  var camelCase = function(input) {
+    return input.toLowerCase().replace(/ (.)/g, function(match, group1) {
+      return group1.toUpperCase();
+    });
+  };
+
+  // Application information.
+  $scope.appId = $stateParams.appId;
+
+  // Resource information.
+  $scope.resourceId = $stateParams.id;
+  $scope.resourceName = $stateParams.resourceInfo.name;
+  $scope.resourceUrl = '/app/' + $stateParams.appId + '/' + $stateParams.resourceInfo.name;
+  $scope.resourceUrl += $stateParams.id ? ('/' + $stateParams.id) : '';
+  $scope.resourceInfo = $stateParams.resourceInfo;
+  $scope.resource = {title: '', components: []};
+
+  // Attach the name to the title of the resource.
+  $scope.$watch('resource.title', function() {
+    $scope.resource.name = $scope.resource.title ? camelCase($scope.resource.title) : '';
+  });
+
+  // Load the resource and submissions.
+  $scope.formio = new Formio($scope.resourceUrl);
+
+  // Load the resource.
+  $scope.formio.loadForm().then(function(resource) {
+    $scope.resource = resource;
+  });
+
+  /**
+   * Used to save a new resource.
+   */
+  $scope.saveResource = function() {
+    $scope.formio.saveForm($scope.resource).then(function(resource) {
+      FormioAlerts.addAlert({
+        type: 'success',
+        message: 'Successfully created form!'
+      });
+      $state.go('app.' + $stateParams.resourceInfo.name + '.view', {id: resource._id});
+    }, FormioAlerts.onError.bind(FormioAlerts));
+  };
+};
+
 app.controller('ResourceController', [
+  '$scope',
+  '$state',
+  '$stateParams',
+  'Formio',
+  formioResourceScope
+]);
+
+app.controller('ResourceViewController', [
+  '$scope',
+  '$state',
+  'FormioAlerts',
+  function(
+    $scope,
+    $state,
+    FormioAlerts
+  ) {
+    $scope.$on('formSubmission', function(event, submission) {
+      FormioAlerts.addAlert({
+        type: 'success',
+        message: 'New submission added!'
+      });
+      $state.go('app.' + $scope.resourceInfo.name + '.subs.sub.view', {subId: submission._id});
+    });
+  }
+]);
+
+app.controller('ResourceCreateController', [
   '$scope',
   '$state',
   '$stateParams',
@@ -223,152 +308,28 @@ app.controller('ResourceController', [
     $stateParams,
     Formio
   ) {
-    $scope.nav = {};
-    $scope.nav[$stateParams.resourceInfo.name] = {};
-    $scope.resourceUrl = '/app/' + $stateParams.appId + '/' + $stateParams.resourceInfo.name + '/' + $stateParams.id;
-    $scope.resourceLoader = new Formio($scope.resourceUrl);
-    $scope.resourceInfo = $stateParams.resourceInfo;
-    $scope.resource = {};
-    $scope.resourceLoader.loadForm().then(function(resource) {
-      $scope.resource = resource;
-    });
-  }
-]);
-
-app.controller('ResourceViewController', [
-  '$scope',
-  '$state',
-  '$stateParams',
-  'FormioAlerts',
-  '$location',
-  function(
-    $scope,
-    $state,
-    $stateParams,
-    FormioAlerts,
-    $location
-  ) {
-    $scope.nav = {};
-    $scope.nav[$stateParams.resourceInfo.name] = {view: true};
-    $scope.resourceUrl = $location.url();
-    $scope.resourceInfo = $stateParams.resourceInfo;
-    $scope.resource = {};
-
-    $scope.$on('formLoad', function(event, form) {
-      $scope.resource = form;
-    });
-
-    $scope.$on('formSubmission', function(event, submission) {
-      FormioAlerts.addAlert({
-        type: 'success',
-        message: 'New submission added!'
-      });
-      $state.go('app.view' + $stateParams.resourceInfo.title + 'Submission', {id: $scope.resource._id, subId: submission._id});
-    });
-  }
-]);
-
-app.controller('ResourceCreateController', [
-  '$scope',
-  '$state',
-  '$stateParams',
-  'Restangular',
-  'FormioAlerts',
-  function(
-    $scope,
-    $state,
-    $stateParams,
-    Restangular,
-    FormioAlerts
-  ) {
-    $scope.resourceName = $stateParams.resourceInfo.name;
-    $scope.resource = {title: '', components: []};
-    $scope.nav = {};
-    $scope.resourceInfo = $stateParams.resourceInfo;
-    $scope.appId = $stateParams.appId;
-    $scope.nav[$stateParams.resourceInfo.name] = {edit: true};
-    if ($scope.resourceInfo.onCreate) {
-      $scope.resourceInfo.onCreate($scope, $state, $stateParams, Restangular, FormioAlerts);
-    }
-    $scope.saveResource = function() {
-      Restangular
-        .one('app', $stateParams.appId)
-        .all($stateParams.resourceInfo.name)
-        .post($scope.resource).then(function(resource) {
-          FormioAlerts.addAlert({
-            type: 'success',
-            message: 'Successfully created form!'
-          });
-          $state.go('app.api' + $stateParams.resourceInfo.title, {id: resource._id});
-        }, FormioAlerts.onError.bind(FormioAlerts));
-    };
-  }
-]);
-
-app.controller('ResourceEditController', [
-  '$scope',
-  '$state',
-  '$stateParams',
-  'Restangular',
-  'FormioAlerts',
-  function(
-    $scope,
-    $state,
-    $stateParams,
-    Restangular,
-    FormioAlerts
-  ) {
-    $scope.resource = {};
-    $scope.nav = {};
-    $scope.resourceInfo = $stateParams.resourceInfo;
-    $scope.appId = $stateParams.appId;
-    $scope.nav[$stateParams.resourceInfo.name] = {edit: true};
-    if ($scope.resourceInfo.onEdit) {
-      $scope.resourceInfo.onEdit($scope, $state, $stateParams, Restangular, FormioAlerts);
-    }
-    Restangular
-      .one('app', $stateParams.appId)
-      .one($stateParams.resourceInfo.name, $stateParams.id)
-      .get()
-      .then(function(resource) {
-        $scope.resource = resource;
-        $scope.saveResource = function() {
-          $scope.resource.save().then(function() {
-            FormioAlerts.addAlert({
-              type: 'success',
-              message: 'Saved form successfull.'
-            });
-            $state.go('app.view' + $stateParams.resourceInfo.title, {id: resource._id});
-          }, FormioAlerts.onError.bind(FormioAlerts));
-        };
-      });
+    formioResourceScope($scope, $state, $stateParams, Formio);
   }
 ]);
 
 app.controller('ResourceDeleteController', [
   '$scope',
   '$state',
-  '$stateParams',
-  'Restangular',
+  'Formio',
   'FormioAlerts',
   function(
     $scope,
     $state,
-    $stateParams,
-    Restangular,
+    Formio,
     FormioAlerts
   ) {
-    $scope.nav = {};
-    $scope.nav[$stateParams.resourceInfo.name] = {'delete': true};
-    $scope.resourceInfo = $stateParams.resourceInfo;
-    $scope.resource = Restangular.one('app', $stateParams.appId).one($stateParams.resourceInfo.name, $stateParams.id).get().$object;
     $scope.deleteResource = function() {
-      $scope.resource.remove().then(function() {
+      $scope.formio.deleteForm().then(function() {
         FormioAlerts.addAlert({
           type: 'success',
           message: 'Delete successfull.'
         });
-        $state.go('app.list' + $stateParams.resourceInfo.title + 's');
+        $state.go('app.' + $scope.resourceInfo.name + '.index');
       }, FormioAlerts.onError.bind(FormioAlerts));
     };
   }
@@ -377,178 +338,106 @@ app.controller('ResourceDeleteController', [
 app.controller('ResourceAPIController', [
   '$scope',
   '$state',
-  '$stateParams',
-  'Restangular',
   function(
     $scope,
-    $state,
-    $stateParams,
-    Restangular
+    $state
   ) {
-    $scope.resource = {_id: $stateParams.id};
-    Restangular
-      .one('app', $stateParams.appId)
-      .one($stateParams.resourceInfo.name, $stateParams.id)
-      .get().then(function(resource) {
-        $scope.resource = resource;
-      });
-    $scope.resourceInfo = $stateParams.resourceInfo;
-    $scope.nav = {};
-    $scope.nav[$stateParams.resourceInfo.name] = {api: true};
-    $state.transitionTo('app.api' + $stateParams.resourceInfo.title + '.spec', {
-      appId: $stateParams.appId,
-      id: $stateParams.id
+    $state.transitionTo('app.' + $scope.resourceInfo.name + '.api.spec', {
+      appId: $scope.appId,
+      id: $scope.resourceId
     });
   }
 ]);
 
 app.controller('ResourceAPISpecController', [
-  '$stateParams',
   '$scope',
   'AppConfig',
   function(
-    $stateParams,
     $scope,
     AppConfig
   ) {
-    // Function to get the swagger url.
     $scope.getSwaggerURL = function() {
       return AppConfig.appBase + '/form/' + $scope.resource._id + '/spec.html';
     };
-    $scope.nav = {};
-    $scope.nav[$stateParams.resourceInfo.name] = {api: {spec: true}};
-  }
-]);
-
-app.controller('ResourceAPIEmbedController', [
-  '$stateParams',
-  '$scope',
-  function(
-    $stateParams,
-    $scope
-  ) {
-    $scope.nav = {};
-    $scope.nav[$stateParams.resourceInfo.name] = {api: {embed: true}};
-  }
-]);
-
-app.controller('ResourceBehaviorsController', [
-  '$scope',
-  '$stateParams',
-  function(
-    $scope,
-    $stateParams
-  ) {
-    $scope.nav = {};
-    $scope.nav[$stateParams.resourceInfo.name] = {'behaviors': true};
-    $scope.resourceInfo = $stateParams.resourceInfo;
-    $scope.resource = {_id: $stateParams.id};
   }
 ]);
 
 app.controller('ResourceSubmissionsController', [
   '$scope',
   '$state',
-  '$stateParams',
-  '$location',
   function(
     $scope,
-    $state,
-    $stateParams,
-    $location
+    $state
   ) {
-    $scope.nav = {};
-    $scope.resourceInfo = $stateParams.resourceInfo;
-    $scope.nav[$stateParams.resourceInfo.name] = {submission: true};
-    $scope.resourceUrl = $location.url().replace('/submission', '');
-    $scope.resource = {};
-
-    $scope.$on('formLoad', function(event, form) {
-      $scope.resource = form;
-    });
-
     $scope.$on('submissionView', function(event, submission) {
-      $state.go('app.view' + $scope.resourceInfo.title + 'Submission', {
-        id: $scope.resource._id,
+      $state.go('app.' + $scope.resourceInfo.name + '.subs.sub.view', {
         subId: submission._id
       });
     });
 
     $scope.$on('submissionEdit', function(event, submission) {
-      $state.go('app.edit' + $scope.resourceInfo.title + 'Submission', {
-        id: $scope.resource._id,
+      $state.go('app.' + $scope.resourceInfo.name + '.subs.sub.edit', {
         subId: submission._id
       });
     });
 
     $scope.$on('submissionDelete', function(event, submission) {
-      $state.go('app.delete' + $scope.resourceInfo.title + 'Submission', {
-        id: $scope.resource._id,
+      $state.go('app.' + $scope.resourceInfo.name + '.subs.sub.delete', {
         subId: submission._id
       });
     });
   }
 ]);
 
-app.controller('ResourceSubmissionViewController', [
+app.controller('ResourceSubmissionController', [
   '$scope',
+  '$state',
   '$stateParams',
   'Formio',
-  'Restangular',
   function(
     $scope,
+    $state,
     $stateParams,
-    Formio,
-    Restangular
+    Formio
   ) {
-    $scope.nav = {form: {submission: {'view': true}}};
-    $scope.resourceInfo = $stateParams.resourceInfo;
+    // Submission information.
+    $scope.submissionId = $stateParams.subId;
+    $scope.submissionUrl = $scope.resourceUrl;
+    $scope.submissionUrl += $stateParams.subId ? ('/submission/' + $stateParams.subId) : '';
     $scope.submissionData = Formio.submissionData;
-    $scope.submission = Restangular.one('app', $stateParams.appId).one($stateParams.resourceInfo.name, $stateParams.id).one('submission', $stateParams.subId).get().$object;
-    $scope.resource = Restangular.one('app', $stateParams.appId).one($stateParams.resourceInfo.name, $stateParams.id).get().$object;
+    $scope.submission = {};
+
+    // Load the resource and submissions.
+    $scope.formio = new Formio($scope.submissionUrl);
+
+    // Load the submission.
+    $scope.formio.loadSubmission().then(function(submission) {
+      $scope.submission = submission;
+    });
   }
 ]);
 
 app.controller('ResourceSubmissionEditController', [
   '$scope',
   '$state',
-  '$stateParams',
   'FormioAlerts',
-  '$location',
   function(
     $scope,
     $state,
-    $stateParams,
-    FormioAlerts,
-    $location
+    FormioAlerts
   ) {
-    $scope.nav = {};
-    $scope.nav[$stateParams.resourceInfo.name] = {submission: {'edit': true}};
-    $scope.resourceInfo = $stateParams.resourceInfo;
-    $scope.submissionUrl = $location.url();
-    $scope.resource = {};
-    $scope.submission = {};
-
-    $scope.$on('formLoad', function(event, form) {
-      $scope.resource = form;
-    });
-
-    $scope.$on('submissionLoad', function(event, submission) {
-      $scope.submission = submission;
-    });
-
     $scope.$on('formSubmission', function(event, submission) {
       var message = (submission.method === 'put') ? 'updated' : 'created';
       FormioAlerts.addAlert({
         type: 'success',
         message: 'Submission was ' + message + '.'
       });
-      $state.go('app.list' + $stateParams.resourceInfo.title + 'Submissions', {id: $stateParams.id});
+      $state.go('app.' + $scope.resourceInfo.name + '.subs.index', {id: $scope.resourceId});
     });
 
     $scope.deleteSubmission = function() {
-      $scope.submission.remove().then(function() {
-        $state.go('app.list' + $stateParams.resourceInfo.title + 'Submissions', {id: $stateParams.id});
+      $scope.formio.deleteSubmission().then(function() {
+        $state.go('app.' + $scope.resourceInfo.name + '.subs.index', {id: $scope.resourceId});
       }, FormioAlerts.onError.bind(FormioAlerts));
     };
   }
@@ -557,32 +446,22 @@ app.controller('ResourceSubmissionEditController', [
 app.controller('ResourceSubmissionDeleteController', [
   '$scope',
   '$state',
-  '$stateParams',
   'FormioAlerts',
-  '$location',
   function(
     $scope,
     $state,
-    $stateParams,
-    FormioAlerts,
-    $location
+    FormioAlerts
   ) {
-    $scope.nav = {};
-    $scope.nav[$stateParams.resourceInfo.name] = {submission: {'delete': true}};
-    $scope.resource = {_id: $stateParams.id};
-    $scope.submissionUrl = $location.url();
-    $scope.resourceInfo = $stateParams.resourceInfo;
-
     $scope.$on('delete', function() {
       FormioAlerts.addAlert({
         type: 'success',
         message: 'Submission was deleted.'
       });
-      $state.go('app.list' + $stateParams.resourceInfo.title + 'Submissions', {id: $stateParams.id});
+      $state.go('app.' + $scope.resourceInfo.name + '.subs.index');
     });
 
     $scope.$on('cancel', function() {
-      $state.go('app.view' + $stateParams.resourceInfo.title + 'Submission', {id: $stateParams.id, subId: $stateParams.subId});
+      $state.go('app.' + $scope.resourceInfo.name + '.subs.sub.view');
     });
 
     $scope.$on('formError', function(event, error) {

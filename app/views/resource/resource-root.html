@@ -1,8 +1,8 @@
 <ul class="nav nav-tabs">
-    <li role="presentation" ng-class="{active:isActive(nav, resourceInfo.name, 'view')}"><a ui-sref="app.view{{ resourceInfo.title }}({id: resource._id})">View</a></li>
-    <li role="presentation" ng-class="{active:isActive(nav, resourceInfo.name, 'edit')}"><a ui-sref="app.edit{{ resourceInfo.title }}({id: resource._id})">Edit</a></li>
-    <li role="presentation" ng-class="{active:isActive(nav, resourceInfo.name, 'submission')}"><a ui-sref="app.list{{ resourceInfo.title }}Submissions({id: resource._id})">Submissions</a></li>
-    <li role="presentation" ng-class="{active:isActive(nav, resourceInfo.name, 'behaviors')}"><a ui-sref="app.list{{ resourceInfo.title }}Behaviors({id: resource._id})">Behaviors</a></li>
-    <li role="presentation" ng-class="{active:isActive(nav, resourceInfo.name, 'api')}"><a ui-sref="app.api{{ resourceInfo.title }}({id: resource._id})">API</a></li>
+    <li role="presentation" ng-class="{active:isActive('app.' + resourceInfo.name + '.view')}"><a ui-sref="app.{{ resourceInfo.name }}.view()">View</a></li>
+    <li role="presentation" ng-class="{active:isActive('app.' + resourceInfo.name + '.edit')}"><a ui-sref="app.{{ resourceInfo.name }}.edit()">Edit</a></li>
+    <li role="presentation" ng-class="{active:isActive('app.' + resourceInfo.name + '.subs')}"><a ui-sref="app.{{ resourceInfo.name }}.subs.index()">Submissions</a></li>
+    <li role="presentation" ng-class="{active:isActive('app.' + resourceInfo.name + '.actions')}"><a ui-sref="app.{{ resourceInfo.name }}.actions()">Actions</a></li>
+    <li role="presentation" ng-class="{active:isActive('app.' + resourceInfo.name + '.api')}"><a ui-sref="app.{{ resourceInfo.name }}.api()">API</a></li>
 </ul>
 <div ui-view></div>

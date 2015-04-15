@@ -134,22 +134,6 @@ angular
         $rootScope.alerts.splice(index, 1);
       };
 
-      // Determins if the navigation is active.
-      $rootScope.isActive = function() {
-        var active = true;
-        var nav = arguments[0];
-        for (var i = 1; i < arguments.length; i++) {
-          if (nav.hasOwnProperty(arguments[i])) {
-            nav = nav[arguments[i]];
-          }
-          else {
-            active = false;
-            break;
-          }
-        }
-        return active;
-      };
-
       $rootScope.$state = $state;
       $rootScope.$stateParams = $stateParams;
       $rootScope.$on('$stateChangeSuccess', function(ev, toState, toParams, fromState, fromParams) {

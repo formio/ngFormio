@@ -5,6 +5,6 @@
 <form-builder app="appId" form="resource"></form-builder>
 <div class="form-group">
   <input type="submit" class="btn btn-primary" ng-click="saveResource()" value="Save" />
-  <a class="btn btn-danger" ng-if="resource._id" ui-sref="app.delete{{ resourceInfo.title }}({id: resource._id})">Delete</a>
+  <a class="btn btn-danger" ng-if="resource._id" ui-sref="app.{{ resourceInfo.name }}.delete({id: resource._id})">Delete</a>
   <button type="button" class="btn btn-default" ng-click="back()">Cancel</button>
 </div>

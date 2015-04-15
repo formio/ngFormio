@@ -1,6 +1,9 @@
-<ng-include src="'views/resource/resource-nav.html'"></ng-include>
 <div class="jumbotron">
   <h3 class="text-success">Your Form API has been created!</h3>
   <p>An API was automatically generated for this form, which allows you to integrate this form or API within your application. Below is the API information that you need which maps to this form.</p>
 </div>
+<ul class="nav nav-tabs">
+  <li role="presentation" ng-class="{active:isActive('app.' + resourceInfo.name + '.api.spec')}"><a ui-sref="app.{{ resourceInfo.name }}.api.spec({id: resource._id})">Secification</a></li>
+  <li role="presentation" ng-class="{active:isActive('app.' + resourceInfo.name + '.api.embed')}"><a ui-sref="app.{{ resourceInfo.name }}.api.embed({id: resource._id})">Embed</a></li>
+</ul>
 <div ui-view></div>
