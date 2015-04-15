@@ -29,49 +29,50 @@ app.provider('Formio', function() {
 
           // Ensure we have an instance of Formio.
           if (!(this instanceof Formio)) { return new Formio(path); }
-          this.appId = '';
-          this.appPath = '';
-          this.appUrl = '';
+          if (!path) { return; }
 
-          this.formId = '';
-          this.formType = '';
-          this.formPath = '';
-          this.formUrl = '';
-          this.formsUrl = '';
+          // Get the paths.
+          var paths = path.replace(/\/?app\//, '').split('/');
 
-          this.subId = '';
-          this.subPath = '';
-          this.subUrl = '';
-          this.subsUrl = '';
-          if (path) {
+          // Populate the parameters.
+          angular.forEach(['appId', 'formType', 'formId', 'pathType', 'pathId'], function(param, index) {
+            if (param && (paths.length > index)) {
+              this[param] = paths[index];
+            }
+          }.bind(this));
 
-            // Get the paths.
-            var paths = path.replace(/\/?app\//, '').split('/');
+          // Get the application path.
+          this.appPath = this.appId ? ('/app/' + this.appId) : '';
+          this.appUrl = this.appPath ? baseUrl + this.appPath : '';
 
-            // Populate the parameters.
-            angular.forEach(['appId', 'formType', 'formId', '', 'subId'], function(param, index) {
-              if (param && (paths.length > index)) {
-                this[param] = paths[index];
-              }
-            }.bind(this));
+          // Create the resources URL.
+          this.resourcesUrl = this.appUrl + '/resource';
 
-            // Get the application path.
-            this.appPath = this.appId ? ('/app/' + this.appId) : '';
-            this.appUrl = this.appPath ? baseUrl + this.appPath : '';
+          // Get the form paths.
+          this.formPath = this.formId ? (this.appPath + '/' + this.formType + '/' + this.formId) : '';
+          this.formsUrl = this.formType ? (this.appUrl + '/' + this.formType) : '';
+          this.formUrl = this.formId ? (baseUrl + this.formPath) : this.formsUrl;
 
-            // Get the form paths.
-            this.formPath = this.formId ? (this.appPath + '/' + this.formType + '/' + this.formId) : '';
-            this.formsUrl = this.formType ? (this.appUrl + '/' + this.formType) : '';
-            this.formUrl = this.formId ? (baseUrl + this.formPath) : this.formsUrl;
+          // Get the submission paths.
+          this.subId = (this.pathType === 'submission') ? this.pathId : '';
+          this.subPath = this.subId ? (this.formPath + '/submission/' + this.subId) : '';
+          this.subsUrl = this.formPath ? (baseUrl + this.formPath) + '/submission' : '';
+          this.subUrl = this.subPath ? (baseUrl + this.subPath) : this.subsUrl;
 
-            // Get the submission paths.
-            this.subPath = this.subId ? (this.formPath + '/submission/' + this.subId) : '';
-            this.subsUrl = this.formPath ? (baseUrl + this.formPath) + '/submission' : '';
-            this.subUrl = this.subPath ? (baseUrl + this.subPath) : this.subsUrl;
-          }
+          // Get the actions path.
+          this.actionId = (this.pathType === 'action') ? this.pathId : '';
+          this.actionPath = this.actionId ? (this.formPath + '/action/' + this.actionId) : '';
+          this.actionsUrl = this.formPath ? (baseUrl + this.formPath) + '/action' : '';
+          this.actionUrl = this.actionPath ? (baseUrl + this.actionPath) : this.actionsUrl;
         };
 
-        // Load the object.
+        /**
+         * Perform a request GET request with caching abilities.
+         *
+         * @param url
+         * @param query
+         * @returns {*}
+         */
         var request = function(url, query) {
           var deferred = $q.defer();
           if (!url) { return deferred.promise; }
@@ -94,60 +95,94 @@ app.provider('Formio', function() {
           return deferred.promise;
         };
 
-        Formio.prototype.loadResources = function(query) {
-          return request(this.appUrl + '/resource', query);
+        /**
+         * Load a resource.
+         *
+         * @param type
+         * @returns {Function}
+         * @private
+         */
+        var _load = function(type) {
+          var _id = type + 'Id';
+          var _url = type + 'Url';
+          return function(query) {
+            if (!this[_id]) { return $q.defer().promise; }
+            return request(this[_url], query);
+          };
         };
-        Formio.prototype.loadForm = function(query) {
-          if (!this.formId) { return $q.defer().promise; }
-          return request(this.formUrl, query);
+
+        /**
+         * Save a resource.
+         *
+         * @param type
+         * @returns {Function}
+         * @private
+         */
+        var _save = function(type) {
+          var _id = type + 'Id';
+          var _url = type + 'Url';
+          return function(data) {
+            var deferred = $q.defer();
+            if (!this[_url]) { return deferred.promise; }
+            var method = this[_id] ? 'put' : 'post';
+            $http[method](this[_url], data)
+              .success(function (result) {
+                cache = {};
+                result.method = method;
+                deferred.resolve(result);
+              })
+              .error(deferred.reject);
+            return deferred.promise;
+          };
         };
-        Formio.prototype.saveForm = function(form) {
-          var deferred = $q.defer();
-          if (!this.formUrl) { return deferred.promise; }
-          var method = this.formId ? 'put' : 'post';
-          cache = {};
-          $http[method](this.formUrl, form)
-            .success(function (result) {
-              result.method = method;
-              deferred.resolve(result);
-            })
-            .error(deferred.reject);
-          return deferred.promise;
+
+        /**
+         * Delete a resource.
+         *
+         * @param type
+         * @returns {Function}
+         * @private
+         */
+        var _delete = function(type) {
+          var _id = type + 'Id';
+          var _url = type + 'Url';
+          return function() {
+            var deferred = $q.defer();
+            if (!this[_id]) { return deferred.promise; }
+            cache = {};
+            $http.delete(this[_url]).success(deferred.resolve).error(deferred.reject);
+            return deferred.promise;
+          };
         };
-        Formio.prototype.deleteForm = function() {
-          var deferred = $q.defer();
-          if (!this.formId) { return deferred.promise; }
-          cache = {};
-          $http.delete(this.formUrl).success(deferred.resolve).error(deferred.reject);
-          return deferred.promise;
+
+        /**
+         * Resource index method.
+         *
+         * @param type
+         * @returns {Function}
+         * @private
+         */
+        var _index = function(type) {
+          var _url = type + 'sUrl';
+          return function(query) {
+            return request(this[_url], query);
+          };
         };
-        Formio.prototype.loadSubmission = function(query) {
-          if (!this.subId) { return $q.defer().promise; }
-          return request(this.subUrl, query);
-        };
-        Formio.prototype.saveSubmission = function(submission) {
-          var deferred = $q.defer();
-          if (!this.subUrl) { return deferred.promise; }
-          var method = this.subId ? 'put' : 'post';
-          $http[method](this.subUrl, {data: submission.data})
-            .success(function (result) {
-              result.method = method;
-              cache = {};
-              deferred.resolve(result);
-            })
-            .error(deferred.reject);
-          return deferred.promise;
-        };
-        Formio.prototype.deleteSubmission = function() {
-          var deferred = $q.defer();
-          if (!this.subId) { return deferred.promise; }
-          cache = {};
-          $http.delete(this.subUrl).success(deferred.resolve).error(deferred.reject);
-          return deferred.promise;
-        };
-        Formio.prototype.loadSubmissions = function(query) {
-          return request(this.subsUrl, query);
-        };
+
+        // Define specific CRUD methods.
+        Formio.prototype.loadResources = _index('resource');
+        Formio.prototype.loadForm = _load('form');
+        Formio.prototype.saveForm = _save('form');
+        Formio.prototype.deleteForm = _delete('form');
+        Formio.prototype.loadForms = _index('form');
+        Formio.prototype.loadSubmission = _load('sub');
+        Formio.prototype.saveSubmission = _save('sub');
+        Formio.prototype.deleteSubmission = _delete('sub');
+        Formio.prototype.loadSubmissions = _index('sub');
+        Formio.prototype.loadAction = _load('action');
+        Formio.prototype.saveAction = _save('action');
+        Formio.prototype.deleteAction = _delete('action');
+        Formio.prototype.loadActions = _index('action');
 
         // Static methods.
         Formio.submissionData = function(data, component, onId) {
