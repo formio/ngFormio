@@ -11,7 +11,8 @@ app.config([
         key: '',
         placeholder: '',
         prefix: '',
-        suffix: ''
+        suffix: '',
+        defaultValue: ''
       }
     });
   }

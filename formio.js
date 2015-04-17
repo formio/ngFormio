@@ -88,9 +88,7 @@ app.provider('Formio', function() {
 
             // Set the cache, then send the request.
             cache[cacheKey] = deferred.promise;
-            $http.get(url, query).success(function(result) {
-              deferred.resolve(result);
-            }).error(deferred.reject);
+            $http.get(url, query).success(deferred.resolve).error(deferred.reject);
           }
           return deferred.promise;
         };
@@ -183,8 +181,12 @@ app.provider('Formio', function() {
         Formio.prototype.saveAction = _save('action');
         Formio.prototype.deleteAction = _delete('action');
         Formio.prototype.loadActions = _index('action');
+        Formio.prototype.availableActions = function() {
+          return request(this.formUrl + '/actions');
+        };
 
         // Static methods.
+        Formio.baseUrl = baseUrl;
         Formio.submissionData = function(data, component, onId) {
           if (!data) { return ''; }
           if (component.key.indexOf('.') !== -1) {
@@ -257,6 +259,18 @@ app.factory('FormioScope', [
         $scope._submission = $scope.submission || {data: {}};
         $scope._submissions = $scope.submissions || [];
 
+        // Used to set the form action.
+        var getAction = function(action) {
+          if (!action) { return ''; }
+          if (action.substr(0, 1) === '/') {
+            action = Formio.baseUrl + action;
+          }
+          return action;
+        };
+
+        // Set the action.
+        $scope._action = getAction($scope.action);
+
         // Allow sub components the ability to add new form components to the form.
         var addedData = {};
         $scope.$on('addFormComponent', function(event, component) {
@@ -265,6 +279,12 @@ app.factory('FormioScope', [
             var defaultComponent = formioComponents.components[component.type];
             $scope._form.components.push(angular.extend(defaultComponent.settings, component.settings));
           }
+        });
+
+        // Set the action if they provided it in the form.
+        $scope.$watch('form.action', function(value) {
+          if (!value) { return; }
+          $scope._action = getAction(value);
         });
 
         // Return the value and set the scope for the model input.
@@ -357,15 +377,20 @@ app.directive('formio', function() {
     replace: true,
     scope: {
       src: '=',
+      action: '=',
       form: '=',
       submission: '='
     },
     controller: [
       '$scope',
+      '$http',
       'FormioScope',
+      'Formio',
       function(
         $scope,
-        FormioScope
+        $http,
+        FormioScope,
+        Formio
       ) {
         $scope.formioAlerts = [];
         $scope.formio = FormioScope.register($scope, {
@@ -376,14 +401,28 @@ app.directive('formio', function() {
         // Called when the form is submitted.
         $scope.onSubmit = function(isValid) {
           if (!isValid) { return; }
-          if ($scope.formio) {
+
+          // Called when a submission has been made.
+          var onSubmitDone = function(method, submission) {
+            $scope.formioAlerts.push({
+              type: 'success',
+              message: 'Submission was ' + ((method === 'put') ? 'updated' : 'created') + '.'
+            });
+            $scope.$emit('formSubmission', submission);
+          };
+
+          // Allow custom action urls.
+          if ($scope._action) {
+            var method = $scope._submission._id ? 'put' : 'post';
+            $http[method]($scope._action, $scope._submission).success(function (submission) {
+              onSubmitDone(method, submission);
+            }).error(FormioScope.onError($scope));
+          }
+
+          // If they wish to submit to the default location.
+          else if ($scope.formio) {
             $scope.formio.saveSubmission($scope._submission).then(function(submission) {
-              var message = submission.method === 'put' ? 'updated' : 'created';
-              $scope.formioAlerts.push({
-                type: 'success',
-                message: 'Submission was ' + message + '.'
-              });
-              $scope.$emit('formSubmission', submission);
+              onSubmitDone(submission.method, submission);
             }, FormioScope.onError($scope));
           }
           else {
@@ -403,15 +442,18 @@ app.directive('formioDelete', function() {
     scope: {
       form: '=',
       submission: '=',
-      src: '='
+      src: '=',
+      action: '='
     },
     templateUrl: 'formio-delete.html',
     controller: [
       '$scope',
       'FormioScope',
+      '$http',
       function(
         $scope,
-        FormioScope
+        FormioScope,
+        $http
       ) {
         $scope.formioAlerts = [];
         var loader = FormioScope.register($scope, {
@@ -422,14 +464,23 @@ app.directive('formioDelete', function() {
         var methodName = 'delete' + resourceName.charAt(0).toUpperCase() + resourceName.slice(1);
         $scope.resourceName = resourceName;
         $scope.onDelete = function() {
-          if (typeof loader[methodName] === 'function') {
-            loader[methodName]().then(function (data) {
-              $scope.formioAlerts.push({
-                type: 'success',
-                message: 'Submission was deleted.'
-              });
-              $scope.$emit('delete', data);
-            }, FormioScope.onError($scope));
+
+          // Called when the delete is done.
+          var onDeleteDone = function(data) {
+            $scope.formioAlerts.push({
+              type: 'success',
+              message: 'Submission was deleted.'
+            });
+            $scope.$emit('delete', data);
+          };
+
+          if ($scope._action) {
+            $http.delete($scope._action).success(onDeleteDone).error(FormioScope.onError($scope));
+          }
+          else {
+            if (typeof loader[methodName] === 'function') {
+              loader[methodName]().then(onDeleteDone, FormioScope.onError($scope));
+            }
           }
         };
         $scope.onCancel = function() {
@@ -576,10 +627,23 @@ app.directive('formioComponent', [
             $scope.template = component.template;
           }
 
-          // Establish a default for data.
-          if ($scope.data && !$scope.data.hasOwnProperty($scope.component.key) && $scope.component.hasOwnProperty('defaultValue')) {
-            $scope.data[$scope.component.key] = $scope.component.multiple ? [$scope.component.defaultValue] : $scope.component.defaultValue;
-          }
+          $scope.$watch('component', function(scopeComponent) {
+            if (!scopeComponent) { return; }
+
+            // Allow component keys to look like "settings[username]"
+            if ($scope.component.key.indexOf('[') !== -1) {
+              var matches = $scope.component.key.match(/([^\[]+)\[([^]+)\]/);
+              if ((matches.length === 3) && $scope.data.hasOwnProperty(matches[1])) {
+                $scope.data = $scope.data[matches[1]];
+                $scope.component.key = matches[2];
+              }
+            }
+
+            // Establish a default for data.
+            if ($scope.data && !$scope.data.hasOwnProperty($scope.component.key) && $scope.component.hasOwnProperty('defaultValue')) {
+              $scope.data[$scope.component.key] = $scope.component.multiple ? [$scope.component.defaultValue] : $scope.component.defaultValue;
+            }
+          });
 
           // If the component has a controller.
           if (component.controller) {

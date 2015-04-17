@@ -28,9 +28,17 @@ app.config([
       template: function($scope) {
         return $scope.component.multiple ? 'formio/components/select-multiple.html' : 'formio/components/select.html';
       },
-      controller: function(settings, $scope, $http) {
+      controller: function(settings, $scope, $http, Formio) {
         $scope.nowrap = true;
         $scope.selectItems = [];
+        var valueProp = $scope.component.valueProperty;
+        $scope.getSelectItem = function(item) {
+          return valueProp ? item[valueProp] : item;
+        };
+
+        if (settings.dataSrc.substr(0, 1) === '/') {
+          settings.dataSrc = Formio.baseUrl + settings.dataSrc;
+        }
 
         // If this is a url, then load the file.
         if (settings.dataSrc.substr(0, 4) === 'http') {
@@ -54,7 +62,8 @@ app.config([
         key: '',
         placeholder: '',
         dataSrc: '',
-        template: '',
+        valueProperty: '',
+        template: '<span>{{ item }}</span>',
         multiple: false,
         refresh: false,
         refreshDelay: 0
@@ -71,7 +80,7 @@ app.run([
         '<ui-select-match placeholder="{{ component.placeholder }}">' +
           '<formio-select-item template="component.template" item="$item || $select.selected" select="$select"></formio-select-item>' +
         '</ui-select-match>' +
-        '<ui-select-choices repeat="item in selectItems | filter: $select.search">' +
+        '<ui-select-choices repeat="getSelectItem(item) as item in selectItems | filter: $select.search">' +
           '<formio-select-item template="component.template" item="item" select="$select"></formio-select-item>' +
         '</ui-select-choices>' +
       '</ui-select>'

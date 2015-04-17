@@ -7,6 +7,7 @@ app.config([
       settings: {
         input: false,
         legend: '',
+        key: '',
         components: []
       }
     });
