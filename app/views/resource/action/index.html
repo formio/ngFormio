@@ -24,5 +24,12 @@
             </tbody>
         </table>
     </div>
-    <div class="panel-footer"><a ui-sref="app.{{ resourceInfo.name }}.action.add" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Add Action</a></div>
+    <div class="panel-footer">
+        <form class="form-inline">
+            <div class="form-group">
+                <select id="action-select" name="action-select" ng-model="newAction" class="form-control" ng-options="action as action.title for action in availableActions"></select>
+            </div>
+            <a ng-click="addAction()" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Add Action</a>
+        </form>
+    </div>
 </div>

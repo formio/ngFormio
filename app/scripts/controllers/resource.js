@@ -7,6 +7,7 @@ var app = angular.module('formioApp.controllers.resource', [
   'ui.sortable',
   'ui.bootstrap.tabs',
   'ui.bootstrap.tpls',
+  'ui.bootstrap.accordion',
   'ngFormBuilder',
   'formio',
   'bgf.paginateAnything'
@@ -63,7 +64,7 @@ app.provider('Resource', [
             url: '/create/' + resourceInfo.name,
             parent: 'app',
             templateUrl: 'views/resource/resource-create.html',
-            controller: 'ResourceCreateController',
+            controller: 'ResourceController',
             params: {resourceInfo: resourceInfo}
           })
           .state(appState + '.index', {
@@ -93,13 +94,17 @@ app.provider('Resource', [
         var resourceStates = {};
         resourceStates[appState + '.submission'] = {
           path: '/submission',
+          id: 'subId',
           indexController: 'ResourceSubmissionsController',
           itemController: 'ResourceSubmissionController',
           editController: 'ResourceSubmissionEditController',
           deleteController: 'ResourceSubmissionDeleteController'
         };
         resourceStates[appState + '.action'] = {
-          path: '/action'
+          path: '/action',
+          id: 'actionId',
+          indexController: 'ResourceActionIndexController',
+          deleteController: 'ResourceActionDeleteController'
         };
         angular.forEach(resourceStates, function(info, state) {
           $stateProvider.state(state, {
@@ -116,7 +121,7 @@ app.provider('Resource', [
           })
           .state(state + '.item', {
             abstract: true,
-            url: '/:subId',
+            url: '/:' + info.id,
             parent: state,
             controller: info.itemController,
             templateUrl: 'views/resource' + info.path + '/item.html'
@@ -143,9 +148,11 @@ app.provider('Resource', [
 
         // Add the action adding state.
         $stateProvider.state(appState + '.action.add', {
-          url: '/add',
+          url: '/add/:actionName',
           parent: appState + '.action',
-          templateUrl: 'views/resource/action/add.html'
+          templateUrl: 'views/resource/action/add.html',
+          controller: 'ResourceActionAddController',
+          params: {action: null}
         });
       },
       $get: function() {
@@ -237,7 +244,7 @@ app.directive('resourceList', function() {
  * @param $stateParams
  * @param Formio
  */
-var formioResourceScope = function($scope, $state, $stateParams, Formio) {
+var formioResourceScope = function($scope, $state, $stateParams, Formio, FormioAlerts) {
 
   // Tests if the tab should be active.
   $scope.isActive = function(state) {
@@ -294,6 +301,7 @@ app.controller('ResourceController', [
   '$state',
   '$stateParams',
   'Formio',
+  'FormioAlerts',
   formioResourceScope
 ]);
 
@@ -313,21 +321,6 @@ app.controller('ResourceViewController', [
       });
       $state.go('app.' + $scope.resourceInfo.name + '.submission.item.view', {subId: submission._id});
     });
-  }
-]);
-
-app.controller('ResourceCreateController', [
-  '$scope',
-  '$state',
-  '$stateParams',
-  'Formio',
-  function(
-    $scope,
-    $state,
-    $stateParams,
-    Formio
-  ) {
-    formioResourceScope($scope, $state, $stateParams, Formio);
   }
 ]);
 
@@ -385,15 +378,82 @@ app.controller('ResourceActionIndexController', [
   '$scope',
   '$state',
   'Formio',
+  'FormioAlerts',
   function(
     $scope,
     $state,
-    Formio
+    Formio,
+    FormioAlerts
   ) {
+    $scope.newAction = {name: '', title: 'Select an Action'};
+    $scope.availableActions = {};
     $scope.actions = {};
+    $scope.addAction = function() {
+      if ($scope.newAction.name) {
+        $state.go('app.' + $scope.resourceInfo.name + '.action.add', {
+          actionName: $scope.newAction.name,
+          action: $scope.newAction
+        });
+      }
+      else {
+        FormioAlerts.addAlert({
+          type: 'danger',
+          message: 'You must add an action to continue.',
+          element: 'action-select'
+        });;
+      }
+    };
     $scope.formio.loadActions().then(function(actions) {
       $scope.actions = actions;
     }, FormioAlerts.onError.bind(FormioAlerts));
+    $scope.formio.availableActions().then(function(available) {
+      if (!available[0].name) {
+        available.shift();
+      }
+      available.unshift($scope.newAction);
+      $scope.availableActions = available;
+    });
+  }
+]);
+
+app.controller('ResourceActionAddController', [
+  '$scope',
+  '$stateParams',
+  function(
+    $scope,
+    $stateParams
+  ) {
+    $scope.action = $stateParams.action || {settingsForm: {}};
+    $scope.settings = $scope.action.defaults ? {data: $scope.action.defaults} : {data: {}};
+    if (!$stateParams.action && $stateParams.actionName) {
+      $scope.formio.availableActions().then(function(actions) {
+        angular.forEach(actions, function(action) {
+          if (action.name === $stateParams.actionName) {
+            $scope.action = _.merge($scope.action, action);
+            $scope.settings.data = action.defaults;
+            $scope.settings.data.settings = {};
+          }
+        });
+      });
+    }
+  }
+]);
+
+app.controller('ResourceActionDeleteController', [
+  '$scope',
+  '$stateParams',
+  function(
+    $scope,
+    $stateParams
+  ) {
+    $scope.action = $scope.resourceUrl + '/action/' + $stateParams.actionId;
+    $scope.$on('delete', function() {
+      FormioAlerts.addAlert({
+        type: 'success',
+        message: 'Action was deleted.'
+      });
+      $state.go('app.' + $scope.resourceInfo.name + '.action.index');
+    });
   }
 ]);
 
