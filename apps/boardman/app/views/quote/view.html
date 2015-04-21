@@ -1,0 +1,16 @@
+<ul class="nav nav-tabs">
+  <li role="presentation" class="active"><a ui-sref="viewQuote({quoteId: quote._id})">View</a></li>
+  <li role="presentation"><a ui-sref="editQuote({quoteId: quote._id})">Edit</a></li>
+</ul>
+<table class="table table-striped table-bordered">
+  <thead>
+    <tr>
+      <th ng-repeat="(key, value) in quote.data">{{ key }}</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td ng-repeat="(key, value) in quote.data">{{ value }}</td>
+    </tr>
+  </tbody>
+</table>

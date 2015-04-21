@@ -3,6 +3,7 @@ var formio = require('formio')(config.formio);
 var express = require('express');
 var nunjucks = require('nunjucks');
 var basicAuth = require('basic-auth-connect');
+var _ = require('lodash');
 var app = express();
 
 // Configure nunjucks.
@@ -30,10 +31,17 @@ app.use('/', require('./brochure')(config.brochure));
 // Use swagger docs and assets.
 if (!config.brochure.debug) {
   app.use('/app', basicAuth(config.brochure.admin.user, config.brochure.admin.pass));
+  app.use('/apps', basicAuth(config.brochure.admin.user, config.brochure.admin.pass));
 }
 
 // Include the swagger ui.
 app.use('/swagger', express.static(require('swagger-ui').dist));
+
+// Mount all of our apps.
+var apps = require('./apps/index');
+_.each(apps, function(path, name) {
+  app.use('/apps/' + name, express.static(path));
+});
 
 // Add the formio application.
 app.use('/app', express.static(__dirname + '/dist'));

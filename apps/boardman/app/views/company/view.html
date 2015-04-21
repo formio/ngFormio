@@ -1,0 +1,16 @@
+<ul class="nav nav-tabs">
+  <li role="presentation" class="active"><a ui-sref="viewCompany({companyId: company._id})">View</a></li>
+  <li role="presentation"><a ui-sref="editCompany({companyId: company._id})">Edit</a></li>
+</ul>
+<table class="table table-striped table-bordered">
+  <thead>
+  <tr>
+    <th ng-repeat="(key, value) in company.data">{{ key }}</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+    <td ng-repeat="(key, value) in company.data">{{ value }}</td>
+  </tr>
+  </tbody>
+</table>
