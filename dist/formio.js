@@ -473,7 +473,8 @@ app.directive('formioDelete', function() {
       form: '=',
       submission: '=',
       src: '=',
-      formAction: '='
+      formAction: '=',
+      resourceName: '='
     },
     templateUrl: 'formio-delete.html',
     controller: [
@@ -488,14 +489,19 @@ app.directive('formioDelete', function() {
         $http
       ) {
         $scope.formioAlerts = [];
+        var resourceName = 'resource';
         var loader = FormioScope.register($scope, {
           form: true,
           submission: true
         });
 
         if (loader) {
-          var resourceName = loader.subId ? 'submission' : 'form';
+          resourceName = loader.subId ? 'submission' : 'form';
           var methodName = 'delete' + resourceName.charAt(0).toUpperCase() + resourceName.slice(1);
+        }
+
+        // Set the resource name
+        if (!$scope.resourceName) {
           $scope.resourceName = resourceName;
         }
 
