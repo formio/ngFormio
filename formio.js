@@ -186,6 +186,7 @@ app.provider('Formio', function() {
         };
 
         // Static methods.
+        Formio.clearCache = function() { cache = {}; };
         Formio.baseUrl = baseUrl;
         Formio.submissionData = function(data, component, onId) {
           if (!data) { return ''; }
@@ -195,7 +196,13 @@ app.provider('Formio', function() {
             var currentKey = '';
             var setValue = false;
             angular.forEach(parts, function(key) {
-              if (!value.hasOwnProperty(key)) { return; }
+              if ((key !== '_id') && value.hasOwnProperty('_id')) {
+                value = value.data;
+              }
+              if (!value.hasOwnProperty(key)) {
+                setValue = false;
+                return;
+              }
               value = value[key];
               setValue = true;
               if (onId) {
@@ -262,6 +269,7 @@ app.factory('FormioScope', [
         // Used to set the form action.
         var getAction = function(action) {
           if (!action) { return ''; }
+          if ($scope.action) { return ''; }
           if (action.substr(0, 1) === '/') {
             action = Formio.baseUrl + action;
           }
@@ -269,7 +277,7 @@ app.factory('FormioScope', [
         };
 
         // Set the action.
-        $scope._action = getAction($scope.action);
+        $scope.action = getAction($scope.formAction);
 
         // Allow sub components the ability to add new form components to the form.
         var addedData = {};
@@ -284,7 +292,10 @@ app.factory('FormioScope', [
         // Set the action if they provided it in the form.
         $scope.$watch('form.action', function(value) {
           if (!value) { return; }
-          $scope._action = getAction(value);
+          var action = getAction(value);
+          if (action) {
+            $scope.action = action;
+          }
         });
 
         // Return the value and set the scope for the model input.
@@ -377,7 +388,7 @@ app.directive('formio', function() {
     replace: true,
     scope: {
       src: '=',
-      action: '=',
+      formAction: '=',
       form: '=',
       submission: '='
     },
@@ -402,6 +413,22 @@ app.directive('formio', function() {
         $scope.onSubmit = function(isValid) {
           if (!isValid) { return; }
 
+          // Create a sanitized submission object.
+          var submissionData = {data: {}};
+          if ($scope._submission._id) {
+            submissionData._id = $scope._submission._id;
+          }
+          angular.forEach($scope._form.components, function(component) {
+            if ($scope._submission.data.hasOwnProperty(component.key)) {
+              submissionData.data[component.key] = $scope._submission.data[component.key];
+            }
+          });
+          angular.forEach($scope._submission.data, function(value, key) {
+            if (submissionData.data.hasOwnProperty(key) && !value.hasOwnProperty('_id')) {
+              submissionData.data[key] = value;
+            }
+          });
+
           // Called when a submission has been made.
           var onSubmitDone = function(method, submission) {
             $scope.formioAlerts.push({
@@ -412,21 +439,22 @@ app.directive('formio', function() {
           };
 
           // Allow custom action urls.
-          if ($scope._action) {
-            var method = $scope._submission._id ? 'put' : 'post';
-            $http[method]($scope._action, $scope._submission).success(function (submission) {
+          if ($scope.action) {
+            var method = submissionData._id ? 'put' : 'post';
+            $http[method]($scope.action, submissionData).success(function (submission) {
+              Formio.clearCache();
               onSubmitDone(method, submission);
             }).error(FormioScope.onError($scope));
           }
 
           // If they wish to submit to the default location.
           else if ($scope.formio) {
-            $scope.formio.saveSubmission($scope._submission).then(function(submission) {
+            $scope.formio.saveSubmission(submissionData).then(function(submission) {
               onSubmitDone(submission.method, submission);
             }, FormioScope.onError($scope));
           }
           else {
-            $scope.$emit('formSubmission', $scope._submission);
+            $scope.$emit('formSubmission', submissionData);
           }
         };
       }
@@ -443,16 +471,18 @@ app.directive('formioDelete', function() {
       form: '=',
       submission: '=',
       src: '=',
-      action: '='
+      formAction: '='
     },
     templateUrl: 'formio-delete.html',
     controller: [
       '$scope',
       'FormioScope',
+      'Formio',
       '$http',
       function(
         $scope,
         FormioScope,
+        Formio,
         $http
       ) {
         $scope.formioAlerts = [];
@@ -460,9 +490,14 @@ app.directive('formioDelete', function() {
           form: true,
           submission: true
         });
-        var resourceName = loader.subId ? 'submission' : 'form';
-        var methodName = 'delete' + resourceName.charAt(0).toUpperCase() + resourceName.slice(1);
-        $scope.resourceName = resourceName;
+
+        if (loader) {
+          var resourceName = loader.subId ? 'submission' : 'form';
+          var methodName = 'delete' + resourceName.charAt(0).toUpperCase() + resourceName.slice(1);
+          $scope.resourceName = resourceName;
+        }
+
+        // Create delete capability.
         $scope.onDelete = function() {
 
           // Called when the delete is done.
@@ -471,13 +506,14 @@ app.directive('formioDelete', function() {
               type: 'success',
               message: 'Submission was deleted.'
             });
+            Formio.clearCache();
             $scope.$emit('delete', data);
           };
 
-          if ($scope._action) {
-            $http.delete($scope._action).success(onDeleteDone).error(FormioScope.onError($scope));
+          if ($scope.action) {
+            $http.delete($scope.action).success(onDeleteDone).error(FormioScope.onError($scope));
           }
-          else {
+          else if (loader) {
             if (typeof loader[methodName] === 'function') {
               loader[methodName]().then(onDeleteDone, FormioScope.onError($scope));
             }
@@ -627,23 +663,19 @@ app.directive('formioComponent', [
             $scope.template = component.template;
           }
 
-          $scope.$watch('component', function(scopeComponent) {
-            if (!scopeComponent) { return; }
-
-            // Allow component keys to look like "settings[username]"
-            if ($scope.component.key.indexOf('[') !== -1) {
-              var matches = $scope.component.key.match(/([^\[]+)\[([^]+)\]/);
-              if ((matches.length === 3) && $scope.data.hasOwnProperty(matches[1])) {
-                $scope.data = $scope.data[matches[1]];
-                $scope.component.key = matches[2];
-              }
+          // Allow component keys to look like "settings[username]"
+          if ($scope.component.key.indexOf('[') !== -1) {
+            var matches = $scope.component.key.match(/([^\[]+)\[([^]+)\]/);
+            if ((matches.length === 3) && $scope.data.hasOwnProperty(matches[1])) {
+              $scope.data = $scope.data[matches[1]];
+              $scope.component.key = matches[2];
             }
+          }
 
-            // Establish a default for data.
-            if ($scope.data && !$scope.data.hasOwnProperty($scope.component.key) && $scope.component.hasOwnProperty('defaultValue')) {
-              $scope.data[$scope.component.key] = $scope.component.multiple ? [$scope.component.defaultValue] : $scope.component.defaultValue;
-            }
-          });
+          // Establish a default for data.
+          if ($scope.data && !$scope.data.hasOwnProperty($scope.component.key) && $scope.component.hasOwnProperty('defaultValue')) {
+            $scope.data[$scope.component.key] = $scope.component.multiple ? [$scope.component.defaultValue] : $scope.component.defaultValue;
+          }
 
           // If the component has a controller.
           if (component.controller) {
