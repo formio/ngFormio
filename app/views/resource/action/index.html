@@ -12,10 +12,12 @@
             <tbody>
             <tr data-ng-repeat="action in actions">
                 <td>
-                    <a ui-sref="app.{{ resourceInfo.name }}.action.item.view({actionId: action._id})">{{ action.title }}</a>
+                    <span ng-if="!action._id">{{ action.title }}</span>
+                    <a ng-if="action._id" ui-sref="app.{{ resourceInfo.name }}.action.item.edit({actionId: action._id})">{{ action.title }}</a>
                 </td>
                 <td>
-                    <div class="button-group">
+                    <span ng-if="!action._id">none</span>
+                    <div class="button-group" ng-if="action._id">
                         <a ui-sref="app.{{ resourceInfo.name }}.action.item.edit({actionId: action._id})" class="btn btn-default"><span class="glyphicon glyphicon-edit"></span></a>
                         <a ui-sref="app.{{ resourceInfo.name }}.action.item.delete({actionId: action._id})" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle"></span></a>
                     </div>

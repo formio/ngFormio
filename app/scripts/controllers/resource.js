@@ -103,7 +103,11 @@ app.provider('Resource', [
         resourceStates[appState + '.action'] = {
           path: '/action',
           id: 'actionId',
+          enabled: {
+            view: false
+          },
           indexController: 'ResourceActionIndexController',
+          editController: 'ResourceActionEditController',
           deleteController: 'ResourceActionDeleteController'
         };
         angular.forEach(resourceStates, function(info, state) {
@@ -152,7 +156,7 @@ app.provider('Resource', [
           parent: appState + '.action',
           templateUrl: 'views/resource/action/add.html',
           controller: 'ResourceActionAddController',
-          params: {action: null}
+          params: {actionInfo: null}
         });
       },
       $get: function() {
@@ -392,7 +396,7 @@ app.controller('ResourceActionIndexController', [
       if ($scope.newAction.name) {
         $state.go('app.' + $scope.resourceInfo.name + '.action.add', {
           actionName: $scope.newAction.name,
-          action: $scope.newAction
+          actionInfo: $scope.newAction
         });
       }
       else {
@@ -416,42 +420,117 @@ app.controller('ResourceActionIndexController', [
   }
 ]);
 
+/**
+ * Load the action and action information.
+ *
+ * @param $scope
+ * @param $stateParams
+ */
+var loadActionInfo = function($scope, $stateParams, Formio) {
+
+  // Get the action information.
+  $scope.actionPath = '';
+  $scope.actionInfo = $stateParams.actionInfo || {settingsForm: {}};
+  $scope.action = {data: {settings: {}}};
+
+  // Get the action information.
+  var getActionInfo = function(name, done) {
+    $scope.formio.availableActions().then(function(actions) {
+      angular.forEach(actions, function(action) {
+        if (action.name === name) {
+          $scope.actionInfo = _.merge($scope.actionInfo, action);
+          if (done) { done($scope.actionInfo); }
+        }
+      });
+    });
+  };
+
+  /**
+   * Load an action into the scope.
+   * @param defaults
+   */
+  var loadAction = function(defaults) {
+    if ($stateParams.actionId) {
+      $scope.actionPath = $scope.formio.formPath + '/action/' + $stateParams.actionId;
+      var loader = new Formio($scope.actionPath);
+      loader.loadAction().then(function(action) {
+        $scope.action = _.merge($scope.action, {data: action});
+        getActionInfo(action.name);
+      });
+    }
+    else if (defaults) {
+      $scope.action = _.merge($scope.action, {data: defaults});
+      $scope.action.data.settings = {};
+    }
+  };
+
+  // Get the action information.
+  if (!$stateParams.actionInfo && $stateParams.actionName) {
+    getActionInfo($stateParams.actionName, function(info) {
+      loadAction(info.defaults);
+    });
+  }
+  else {
+
+    // Load the action.
+    loadAction($scope.actionInfo.defaults);
+  }
+}
+
 app.controller('ResourceActionAddController', [
   '$scope',
   '$stateParams',
+  '$state',
+  'FormioAlerts',
   function(
     $scope,
-    $stateParams
+    $stateParams,
+    $state,
+    FormioAlerts
   ) {
-    $scope.action = $stateParams.action || {settingsForm: {}};
-    $scope.settings = $scope.action.defaults ? {data: $scope.action.defaults} : {data: {}};
-    if (!$stateParams.action && $stateParams.actionName) {
-      $scope.formio.availableActions().then(function(actions) {
-        angular.forEach(actions, function(action) {
-          if (action.name === $stateParams.actionName) {
-            $scope.action = _.merge($scope.action, action);
-            $scope.settings.data = action.defaults;
-            $scope.settings.data.settings = {};
-          }
-        });
-      });
-    }
+    loadActionInfo($scope, $stateParams);
+    $scope.$on('formSubmission', function() {
+      FormioAlerts.addAlert({type: 'success', message: 'Action was created.'});
+      $state.go('app.' + $scope.resourceInfo.name + '.action.index');
+    });
+  }
+]);
+
+app.controller('ResourceActionEditController', [
+  '$scope',
+  '$stateParams',
+  '$state',
+  'Formio',
+  'FormioAlerts',
+  function(
+    $scope,
+    $stateParams,
+    $state,
+    Formio,
+    FormioAlerts
+  ) {
+    loadActionInfo($scope, $stateParams, Formio);
+    $scope.$on('formSubmission', function() {
+      FormioAlerts.addAlert({type: 'success', message: 'Action was updated.'});
+      $state.go('app.' + $scope.resourceInfo.name + '.action.index');
+    });
   }
 ]);
 
 app.controller('ResourceActionDeleteController', [
   '$scope',
   '$stateParams',
+  '$state',
+  'FormioAlerts',
   function(
     $scope,
-    $stateParams
+    $stateParams,
+    $state,
+    FormioAlerts
   ) {
-    $scope.action = $scope.resourceUrl + '/action/' + $stateParams.actionId;
+    $scope.actionPath = $scope.formio.formPath + '/action/' + $stateParams.actionId;
     $scope.$on('delete', function() {
-      FormioAlerts.addAlert({
-        type: 'success',
-        message: 'Action was deleted.'
-      });
+      FormioAlerts.addAlert({type: 'success', message: 'Action was deleted.'});
       $state.go('app.' + $scope.resourceInfo.name + '.action.index');
     });
   }
