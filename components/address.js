@@ -13,7 +13,10 @@ app.config([
           var params = {address: address, sensor: false};
           return $http.get(
             'http://maps.googleapis.com/maps/api/geocode/json',
-            {params: params}
+            {
+              params: params,
+              headers: {Authorization: undefined}
+            }
           ).then(function(response) {
             $scope.addresses = response.data.results;
           });
