@@ -404,7 +404,7 @@ app.controller('ResourceActionIndexController', [
           type: 'danger',
           message: 'You must add an action to continue.',
           element: 'action-select'
-        });;
+        });
       }
     };
     $scope.formio.loadActions().then(function(actions) {
@@ -475,7 +475,7 @@ var loadActionInfo = function($scope, $stateParams, Formio) {
     // Load the action.
     loadAction($scope.actionInfo.defaults);
   }
-}
+};
 
 app.controller('ResourceActionAddController', [
   '$scope',

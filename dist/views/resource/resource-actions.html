@@ -1,0 +1,23 @@
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th>Action</th>
+        <th>Operations</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr data-ng-repeat="action in actions">
+        <td>
+            <a ui-sref="app.{{ resourceInfo.name }}.action.view()">
+                {{ resource.title }}{{ resource.username }}
+            </a>
+        </td>
+        <td>
+            <div class="button-group">
+                <a ui-sref="app.{{ resourceInfo.name }}.action.edit({id: resource._id})" class="btn btn-default"><span class="glyphicon glyphicon-edit"></span></a>
+                <a ui-sref="app.{{ resourceInfo.name }}.action.delete({id: resource._id})" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle"></span></a>
+            </div>
+        </td>
+    </tr>
+    </tbody>
+</table>
