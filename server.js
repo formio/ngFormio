@@ -26,7 +26,7 @@ app.get('/config.js', function(req, res, next) {
 app.use('/bower_components', express.static(__dirname + '/bower_components'));
 
 // Mount the brochure.
-app.use('/', require('./brochure')(config.brochure));
+app.use('/', require('./src/brochure')(config.brochure));
 
 // Use swagger docs and assets.
 if (!config.brochure.debug) {
