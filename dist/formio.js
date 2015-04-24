@@ -192,6 +192,7 @@ app.provider('Formio', function() {
         Formio.baseUrl = baseUrl;
         Formio.submissionData = function(data, component, onId) {
           if (!data) { return ''; }
+          if (component.protected) { return '--- PROTECTED ---'; }
           if (component.key.indexOf('.') !== -1) {
             var value = data;
             var parts = component.key.split('.');
@@ -853,6 +854,7 @@ app.config([
         suffix: '',
         multiple: false,
         defaultValue: '',
+        protected: false,
         validate: {
           required: false,
           minLength: '',
@@ -1173,7 +1175,8 @@ app.config([
         key: '',
         placeholder: '',
         prefix: '',
-        suffix: ''
+        suffix: '',
+        protected: true
       }
     });
   }

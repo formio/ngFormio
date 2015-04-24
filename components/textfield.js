@@ -15,6 +15,7 @@ app.config([
         suffix: '',
         multiple: false,
         defaultValue: '',
+        protected: false,
         validate: {
           required: false,
           minLength: '',

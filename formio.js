@@ -190,6 +190,7 @@ app.provider('Formio', function() {
         Formio.baseUrl = baseUrl;
         Formio.submissionData = function(data, component, onId) {
           if (!data) { return ''; }
+          if (component.protected) { return '--- PROTECTED ---'; }
           if (component.key.indexOf('.') !== -1) {
             var value = data;
             var parts = component.key.split('.');
