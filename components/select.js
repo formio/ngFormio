@@ -66,7 +66,10 @@ app.config([
         template: '<span>{{ item }}</span>',
         multiple: false,
         refresh: false,
-        refreshDelay: 0
+        refreshDelay: 0,
+        protected: false,
+        unique: false,
+        persistent: true
       }
     });
   }

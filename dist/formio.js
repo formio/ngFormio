@@ -855,6 +855,8 @@ app.config([
         multiple: false,
         defaultValue: '',
         protected: false,
+        unique: false,
+        persistent: true,
         validate: {
           required: false,
           minLength: '',
@@ -1023,7 +1025,8 @@ app.config([
         placeholder: '',
         prefix: '',
         suffix: '',
-        defaultValue: ''
+        defaultValue: '',
+        unique: false
       }
     });
   }
@@ -1176,7 +1179,8 @@ app.config([
         placeholder: '',
         prefix: '',
         suffix: '',
-        protected: true
+        protected: true,
+        persistent: true
       }
     });
   }
@@ -1370,7 +1374,10 @@ app.config([
         template: '<span>{{ item }}</span>',
         multiple: false,
         refresh: false,
-        refreshDelay: 0
+        refreshDelay: 0,
+        protected: false,
+        unique: false,
+        persistent: true
       }
     });
   }

@@ -12,7 +12,8 @@ app.config([
         placeholder: '',
         prefix: '',
         suffix: '',
-        defaultValue: ''
+        defaultValue: '',
+        unique: false
       }
     });
   }

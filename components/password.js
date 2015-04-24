@@ -12,7 +12,8 @@ app.config([
         placeholder: '',
         prefix: '',
         suffix: '',
-        protected: true
+        protected: true,
+        persistent: true
       }
     });
   }

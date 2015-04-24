@@ -16,6 +16,8 @@ app.config([
         multiple: false,
         defaultValue: '',
         protected: false,
+        unique: false,
+        persistent: true,
         validate: {
           required: false,
           minLength: '',
