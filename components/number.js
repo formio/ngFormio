@@ -46,6 +46,7 @@ app.run([
         'max="{{ component.validate.max }}" ' +
         'step="{{ component.validate.step }}" ' +
         'placeholder="{{ component.placeholder }}" ' +
+        'custom-validator="component.validate.custom" ' +
         'formio-input-mask="{{ component.inputMask }}">'
     ));
   }

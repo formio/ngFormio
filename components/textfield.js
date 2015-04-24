@@ -45,6 +45,7 @@ app.run([
         'ng-required="component.validate.required" ' +
         'ng-minlength="component.validate.minLength" ' +
         'ng-maxlength="component.validate.maxLength" ' +
+        'custom-validator="component.validate.custom" ' +
         'placeholder="{{ component.placeholder }}" ' +
         'formio-input-mask="{{ component.inputMask }}">'
     ));

@@ -38,6 +38,7 @@ app.run([
         'ng-model="data[component.key]" ' +
         'id="{{ component.key }}" ' +
         'placeholder="{{ component.placeholder }}" ' +
+        'custom-validator="component.validate.custom" ' +
         'rows="{{ component.rows }}"></textarea>'
     ));
   }

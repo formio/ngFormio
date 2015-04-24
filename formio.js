@@ -565,6 +565,37 @@ app.directive('formioErrors', function() {
   };
 });
 
+app.directive('customValidator', function() {
+  return {
+    restrict: 'A',
+    require: 'ngModel',
+    link: function(scope, ele, attrs, ctrl) {
+      if (
+        !scope.component.validate ||
+        !scope.component.validate.custom
+      ) {
+        return;
+      }
+      ctrl.$parsers.unshift(function(input) {
+        console.log(scope.data);
+        var valid = true;
+        if (input) {
+          var custom = scope.component.validate.custom;
+          custom = custom.replace(/({{\s+(.*)\s+}})/, function(match, $1, $2) {
+            return scope.data[$2];
+          });
+          valid = eval(custom);
+          ctrl.$setValidity('custom', (valid === true));
+        }
+        if (valid !== true) {
+          scope.component.customError = valid;
+        }
+        return (valid === true) ? input : valid;
+      });
+    }
+  };
+});
+
 app.directive('formioSubmissions', function() {
   return {
     replace: true,
@@ -793,6 +824,7 @@ app.run([
         '<p class="help-block" ng-show="formioFieldForm[component.key].$error.minlength">{{ component.label }} must be longer than {{ component.validate.minLength - 1 }} characters.</p>' +
         '<p class="help-block" ng-show="formioFieldForm[component.key].$error.min">{{ component.label }} must be higher than {{ component.validate.min - 1 }}.</p>' +
         '<p class="help-block" ng-show="formioFieldForm[component.key].$error.max">{{ component.label }} must be lower than {{ component.validate.max + 1 }}.</p>' +
+        '<p class="help-block" ng-show="formioFieldForm[component.key].$error.custom">{{ component.customError }}</p>' +
       '</div>'
     );
   }
