@@ -579,7 +579,6 @@ app.directive('customValidator', function() {
         return;
       }
       ctrl.$parsers.unshift(function(input) {
-        console.log(scope.data);
         var valid = true;
         if (input) {
           var custom = scope.component.validate.custom;
