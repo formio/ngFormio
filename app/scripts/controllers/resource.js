@@ -318,7 +318,9 @@ app.controller('ResourceViewController', [
         type: 'success',
         message: 'New submission added!'
       });
-      $state.go('app.' + $scope.resourceInfo.name + '.submission.item.view', {subId: submission._id});
+      if (submission._id) {
+        $state.go('app.' + $scope.resourceInfo.name + '.submission.item.view', {subId: submission._id});
+      }
     });
   }
 ]);
