@@ -500,9 +500,7 @@ app.directive('formioDelete', function() {
         }
 
         // Set the resource name
-        if (!$scope.resourceName) {
-          $scope.resourceName = resourceName;
-        }
+        $scope._resourceName = $scope.resourceName || resourceName;
 
         // Create delete capability.
         $scope.onDelete = function() {
@@ -770,7 +768,7 @@ app.run([
         '<div ng-repeat="alert in formioAlerts" class="alert alert-{{ alert.type }}" role="alert">' +
           '{{ alert.message }}' +
         '</div>' +
-        '<h3>Are you sure you wish to delete the {{ resourceName }}?</h3>' +
+        '<h3>Are you sure you wish to delete the {{ _resourceName }}?</h3>' +
         '<div class="btn-toolbar">' +
           '<button ng-click="onDelete()" class="btn btn-danger">Yes</button>' +
           '<button ng-click="onCancel()" class="btn btn-default">No</button>' +
