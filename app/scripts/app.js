@@ -45,6 +45,23 @@ angular
           templateUrl: 'views/home/home.html',
           controller: 'HomeController'
         })
+        .state('auth', {
+          abstract: true,
+          url: '/auth',
+          templateUrl: 'views/user/auth.html'
+        })
+        .state('auth.login', {
+          url: '/login',
+          parent: 'auth',
+          templateUrl: 'views/user/login.html',
+          controller: 'UserLoginController'
+        })
+        .state('auth.register', {
+          url: '/register',
+          parent: 'auth',
+          templateUrl: 'views/user/register.html',
+          controller: 'UserRegisterController'
+        })
         .state('app', {
           url: '/app/:appId',
           controller: 'AppController',
@@ -71,11 +88,6 @@ angular
           parent: 'app',
           templateUrl: 'views/app/delete.html',
           controller: 'AppDeleteController'
-        })
-        .state('userIndex', {
-          url: '/user',
-          templateUrl: 'views/user/index.html',
-          controller: 'UserIndexController'
         })
         .state('importExport', {
           url: '/import-export',
@@ -145,6 +157,11 @@ angular
 
       // Set the active sidebar.
       $rootScope.activeSideBar = 'apps';
+
+      // Determine if a state is active.
+      $rootScope.isActive = function(state) {
+        return $state.current.name.indexOf(state) !== -1;
+      };
 
       // Add back functionality to the template.
       $rootScope.back = function() {

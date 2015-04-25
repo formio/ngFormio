@@ -250,11 +250,6 @@ app.directive('resourceList', function() {
  */
 var formioResourceScope = function($scope, $state, $stateParams, Formio, FormioAlerts) {
 
-  // Tests if the tab should be active.
-  $scope.isActive = function(state) {
-    return $state.current.name.indexOf(state) !== -1;
-  };
-
   // Perform Camel Case.
   var camelCase = function(input) {
     return input.toLowerCase().replace(/ (.)/g, function(match, group1) {

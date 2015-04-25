@@ -1,13 +1,16 @@
 'use strict';
 var app = angular.module('formioApp.controllers.user', []);
-app.controller('UserIndexController', [
+app.controller('UserLoginController', [
   '$scope',
-  '$rootScope',
   function(
-    $scope,
-    $rootScope
+    $scope
   ) {
-    $rootScope.activeSideBar = 'user';
-    $rootScope.noBreadcrumb = true;
+  }
+]);
+app.controller('UserRegisterController', [
+  '$scope',
+  function(
+    $scope
+  ) {
   }
 ]);
