@@ -132,11 +132,13 @@ angular
     '$stateParams',
     '$rootScope',
     'FormioAlerts',
+    'Formio',
     function(
       $state,
       $stateParams,
       $rootScope,
-      FormioAlerts
+      FormioAlerts,
+      Formio
     ) {
       $state.go('home');
 
