@@ -419,6 +419,9 @@ app.directive('formio', function() {
           if ($scope._submission._id) {
             submissionData._id = $scope._submission._id;
           }
+          if ($scope._submission.data._id) {
+            submissionData._id = $scope._submission.data._id;
+          }
           angular.forEach($scope._form.components, function(component) {
             if ($scope._submission.data.hasOwnProperty(component.key)) {
               submissionData.data[component.key] = $scope._submission.data[component.key];
