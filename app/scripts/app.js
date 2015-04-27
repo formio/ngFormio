@@ -197,7 +197,7 @@ angular
       };
 
       // Ensure they are logged.
-      $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams) {
+      $rootScope.$on('$stateChangeStart', function(event, toState) {
         $rootScope.authenticated = !!Formio.getToken();
         if (toState.name.substr(0, 4) === 'auth') { return; }
         if(!$rootScope.authenticated) {
