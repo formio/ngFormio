@@ -25,6 +25,9 @@ app.get('/config.js', function(req, res, next) {
 // Mount bower_components as assets.
 app.use('/bower_components', express.static(__dirname + '/bower_components'));
 
+// Mount the assets folder.
+app.use('/assets', express.static(__dirname + '/server/assets'));
+
 // Mount the brochure.
 app.use('/', require('./src/brochure')(config.brochure));
 
