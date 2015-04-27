@@ -21,9 +21,11 @@ app.provider('Formio', function() {
     $get: [
       '$http',
       '$q',
+      'formioInterceptor',
       function(
         $http,
-        $q
+        $q,
+        formioInterceptor
       ) {
 
         // The formio class.
@@ -188,8 +190,36 @@ app.provider('Formio', function() {
         };
 
         // Static methods.
+        Formio.loadApps = function() {
+          return request(baseUrl + '/app');
+        };
         Formio.clearCache = function() { cache = {}; };
         Formio.baseUrl = baseUrl;
+        Formio.setUser = function(user) {
+          if (!user) { return localStorage.removeItem('formioUser'); }
+          localStorage.setItem('formioUser', angular.toJson(user));
+        };
+        Formio.setToken = formioInterceptor.setToken.bind(formioInterceptor);
+        Formio.getToken = formioInterceptor.getToken.bind(formioInterceptor);
+        Formio.currentUser = function() {
+          var deferred = $q.defer();
+          var user = localStorage.getItem('formioUser');
+          if (user) { deferred.resolve(angular.fromJson(user)); return deferred.promise; }
+          $http.get(baseUrl + '/current').success(function(user) {
+            this.setUser(user);
+            deferred.resolve(user);
+          }.bind(this)).error(deferred.reject);
+          return deferred.promise;
+        };
+        Formio.logout= function() {
+          var deferred = $q.defer();
+          $http.get(baseUrl + '/logout').success(function() {
+            this.setToken(null);
+            this.setUser(null);
+            deferred.resolve();
+          }.bind(this)).error(deferred.reject);
+          return deferred.promise;
+        };
         Formio.submissionData = function(data, component, onId) {
           if (!data) { return ''; }
           if (component.protected) { return '--- PROTECTED ---'; }
@@ -355,30 +385,30 @@ app.factory('FormioUtils', function() {
       var required = '<span ng-if="component.validate.required" class="glyphicon glyphicon-asterisk form-control-feedback field-required" aria-hidden="true"></span>';
       var template =
         '<div ng-if="!component.multiple">' +
-          inputLabel + required +
-          '<div class="input-group" ng-if="component.prefix || component.suffix">' +
-            '<div class="input-group-addon" ng-if="!!component.prefix">{{ component.prefix }}</div>' +
-            input +
-            '<div class="input-group-addon" ng-if="!!component.suffix">{{ component.suffix }}</div>' +
-          '</div>' +
-          '<div ng-if="!component.prefix && !component.suffix">' + input + '</div>' +
+        inputLabel + required +
+        '<div class="input-group" ng-if="component.prefix || component.suffix">' +
+        '<div class="input-group-addon" ng-if="!!component.prefix">{{ component.prefix }}</div>' +
+        input +
+        '<div class="input-group-addon" ng-if="!!component.suffix">{{ component.suffix }}</div>' +
+        '</div>' +
+        '<div ng-if="!component.prefix && !component.suffix">' + input + '</div>' +
         '</div>' +
         '<div ng-if="component.multiple"><table class="table table-bordered">' +
-          inputLabel +
-          '<tr ng-repeat="value in data[component.key] track by $index">' +
-            '<td>' + required +
-              '<div class="input-group" ng-if="component.prefix || component.suffix">' +
-                '<div class="input-group-addon" ng-if="!!component.prefix">{{ component.prefix }}</div>' +
-                multiInput +
-                '<div class="input-group-addon" ng-if="!!component.suffix">{{ component.suffix }}</div>' +
-              '</div>' +
-              '<div ng-if="!component.prefix && !component.suffix">' + multiInput + '</div>' +
-            '</td>' +
-            '<td><a ng-click="removeFieldValue($index)" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle"></span></a></td>' +
-          '</tr>' +
-          '<tr>' +
-            '<td colspan="2"><a ng-click="addFieldValue()" class="btn btn-primary"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add another</a></td>' +
-          '</tr>' +
+        inputLabel +
+        '<tr ng-repeat="value in data[component.key] track by $index">' +
+        '<td>' + required +
+        '<div class="input-group" ng-if="component.prefix || component.suffix">' +
+        '<div class="input-group-addon" ng-if="!!component.prefix">{{ component.prefix }}</div>' +
+        multiInput +
+        '<div class="input-group-addon" ng-if="!!component.suffix">{{ component.suffix }}</div>' +
+        '</div>' +
+        '<div ng-if="!component.prefix && !component.suffix">' + multiInput + '</div>' +
+        '</td>' +
+        '<td><a ng-click="removeFieldValue($index)" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle"></span></a></td>' +
+        '</tr>' +
+        '<tr>' +
+        '<td colspan="2"><a ng-click="addFieldValue()" class="btn btn-primary"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add another</a></td>' +
+        '</tr>' +
         '</table></div>';
       return template;
     }
@@ -441,6 +471,8 @@ app.directive('formio', function() {
               type: 'success',
               message: 'Submission was ' + ((method === 'put') ? 'updated' : 'created') + '.'
             });
+
+            // Trigger the form submission.
             $scope.$emit('formSubmission', submission);
           };
 
@@ -586,6 +618,7 @@ app.directive('customValidator', function() {
           custom = custom.replace(/({{\s+(.*)\s+}})/, function(match, $1, $2) {
             return scope.data[$2];
           });
+          /* jshint evil: true */
           valid = eval(custom);
           ctrl.$setValidity('custom', (valid === true));
         }
@@ -752,6 +785,57 @@ app.directive('formioInputMask', function() {
     }
   };
 });
+
+app.factory('formioInterceptor', function() {
+  var Interceptor = {
+    token: '',
+    setToken: function(token) {
+      token = token || '';
+      if (token === this.token) { return; }
+      this.token = token;
+      if (!token) { return localStorage.removeItem('formioToken'); }
+      localStorage.setItem('formioToken', token);
+    },
+    getToken: function() {
+      if (this.token) { return this.token; }
+      var token = localStorage.getItem('formioToken') || '';
+      this.token = token;
+      return token;
+    }
+  };
+
+  /**
+   * Set the JWT token within the request.
+   *
+   * @type {function(this:{token: string, setToken: Function, getToken: Function})}
+   */
+  Interceptor.response = function(response) {
+    var token = response.headers('x-jwt-token');
+    if (token || (token === '')) { this.setToken(token); }
+    return response;
+  }.bind(Interceptor);
+
+  /**
+   * Set the token in the request headers.
+   *
+   * @type {function(this:{token: string, setToken: Function, getToken: Function})}
+   */
+  Interceptor.request = function(config) {
+    var token = this.getToken();
+    if (token) { config.headers['x-jwt-token'] = token; }
+    return config;
+  }.bind(Interceptor);
+  return Interceptor;
+});
+
+app.config([
+  '$httpProvider',
+  function(
+    $httpProvider
+  ) {
+    $httpProvider.interceptors.push('formioInterceptor');
+  }
+]);
 
 app.run([
   '$templateCache',
