@@ -197,6 +197,7 @@ angular
       };
 
       // Ensure they are logged.
+      /*
       $rootScope.$on('$stateChangeStart', function(event, toState) {
         $rootScope.authenticated = !!Formio.getToken();
         if (toState.name.substr(0, 4) === 'auth') { return; }
@@ -205,6 +206,7 @@ angular
           $state.go('auth.login');
         }
       });
+      */
 
       // Set the active sidebar.
       $rootScope.activeSideBar = 'apps';
