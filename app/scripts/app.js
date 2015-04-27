@@ -160,10 +160,10 @@ angular
     ) {
 
       // urls for Form.io forms.
-      $rootScope.formioAppUrl = '/app/553a40b9174a9d18bb566beb';
-      $rootScope.userForm = '/app/553a40b9174a9d18bb566beb/resource/553a4114174a9d18bb566bec';
-      $rootScope.userLoginForm = '/app/553a40b9174a9d18bb566beb/form/553a5799ab352f11dddb0f30';
-      $rootScope.userRegisterForm = '/app/553a40b9174a9d18bb566beb/form/553a57eeab352f11dddb0f31';
+      $rootScope.formioAppUrl = '/app/553db92f72f702e714dd9778';
+      $rootScope.userForm = '/app/553db92f72f702e714dd9778/resource/553db94e72f702e714dd9779';
+      $rootScope.userLoginForm = '/app/553db92f72f702e714dd9778/form/553dbe603c605f841af5b3a5';
+      $rootScope.userRegisterForm = '/app/553db92f72f702e714dd9778/form/553dbedd3c605f841af5b3a7';
 
       // Always redirect to login if they are not authenticated.
       $state.go('home');
@@ -197,7 +197,6 @@ angular
       };
 
       // Ensure they are logged.
-      /*
       $rootScope.$on('$stateChangeStart', function(event, toState) {
         $rootScope.authenticated = !!Formio.getToken();
         if (toState.name.substr(0, 4) === 'auth') { return; }
@@ -206,7 +205,6 @@ angular
           $state.go('auth.login');
         }
       });
-      */
 
       // Set the active sidebar.
       $rootScope.activeSideBar = 'apps';
