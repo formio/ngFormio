@@ -11,6 +11,7 @@
 angular
   .module('formioApp', [
     'ngSanitize',
+    'ngAnimate',
     'restangular',
     'ui.router',
     'ui.bootstrap.alert',
@@ -62,6 +63,21 @@ angular
           templateUrl: 'views/user/register.html',
           controller: 'UserRegisterController'
         })
+        .state('profile', {
+          abstract: true,
+          url: '/profile',
+          templateUrl: 'views/user/profile/profile.html'
+        })
+        .state('profile.view', {
+          url: '/view',
+          parent: 'profile',
+          templateUrl: 'views/user/profile/profile-view.html'
+        })
+        .state('profile.edit', {
+          url: '/edit',
+          parent: 'profile',
+          templateUrl: 'views/user/profile/profile-edit.html'
+        })
         .state('app', {
           url: '/app/:appId',
           controller: 'AppController',
@@ -106,17 +122,19 @@ angular
   ])
   .controller('HomeController', [
     '$scope',
-    'Restangular',
     '$rootScope',
+    'Formio',
     function(
       $scope,
-      Restangular,
-      $rootScope
+      $rootScope,
+      Formio
     ) {
       $rootScope.activeSideBar = 'home';
       $rootScope.currentApp = null;
-      $scope.apps = Restangular.all('app').getList().$object;
-      $scope.users = Restangular.all('user').getList().$object;
+      $scope.apps = {};
+      Formio.loadApps().then(function(apps) {
+        $scope.apps = apps;
+      });
     }
   ])
   .filter('trusted', [
@@ -140,7 +158,21 @@ angular
       FormioAlerts,
       Formio
     ) {
+
+      // urls for Form.io forms.
+      $rootScope.formioAppUrl = '/app/553a40b9174a9d18bb566beb';
+      $rootScope.userForm = '/app/553a40b9174a9d18bb566beb/resource/553a4114174a9d18bb566bec';
+      $rootScope.userLoginForm = '/app/553a40b9174a9d18bb566beb/form/553a5799ab352f11dddb0f30';
+      $rootScope.userRegisterForm = '/app/553a40b9174a9d18bb566beb/form/553a57eeab352f11dddb0f31';
+
+      // Always redirect to login if they are not authenticated.
       $state.go('home');
+
+      if (!$rootScope.user) {
+        Formio.currentUser().then(function(user) {
+          $rootScope.user = user;
+        });
+      }
 
       // Adding the alerts capability.
       $rootScope.alerts = [];
@@ -150,11 +182,28 @@ angular
 
       $rootScope.$state = $state;
       $rootScope.$stateParams = $stateParams;
-      $rootScope.$on('$stateChangeSuccess', function(ev, toState, toParams, fromState, fromParams) {
+      $rootScope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams) {
         $rootScope.alerts = FormioAlerts.getAlerts();
         $rootScope.previousState = fromState.name;
         $rootScope.previousParams = fromParams;
         $rootScope.currentState = toState.name;
+      });
+
+      // Logout of form.io.
+      $rootScope.logout = function() {
+        Formio.logout().then(function() {
+          $state.go('auth.login');
+        }, FormioAlerts.onError.bind(FormioAlerts));
+      };
+
+      // Ensure they are logged.
+      $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams) {
+        $rootScope.authenticated = !!Formio.getToken();
+        if (toState.name.substr(0, 4) === 'auth') { return; }
+        if(!$rootScope.authenticated) {
+          event.preventDefault();
+          $state.go('auth.login');
+        }
       });
 
       // Set the active sidebar.

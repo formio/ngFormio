@@ -1,10 +1,39 @@
 <div class="row">
   <div class="col-sm-4">
     <div class="panel panel-success">
-      <div class="panel-heading">
-        <h3 class="panel-title"><i class="fa fa-file-text-o"></i> <a ui-sref="listForms">Forms</a></h3>
+      <div class="panel-heading clearfix">
+        <h3 class="panel-title pull-left">
+          <i class="fa fa-database"></i>
+          <a ui-sref="listResources">Resources</a>
+        </h3>
+        <div class="btn-group pull-right">
+          <button style="color:#666" class="btn btn-default btn-circle btn-xs" ng-click="showResourceInfo = !showResourceInfo"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span></button>
+        </div>
       </div>
       <div class="panel-body">
+        <div class="alert alert-info" ng-show="showResourceInfo">
+          <strong>Resources</strong> are the objects within your application. Example: User, Vehicle ...
+        </div>
+        <resource-list app="currentApp" resource-title="'Resource'" resource-name="'resource'" num-per-page="5"></resource-list>
+      </div>
+      <div class="panel-footer">
+        <a ui-sref="app.resource.create" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Create Resource</a>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-4">
+    <div class="panel panel-success">
+      <div class="panel-heading clearfix">
+        <h3 class="panel-title pull-left">
+          <i class="fa fa-file-text-o"></i>
+          <a ui-sref="listForms">Forms</a>
+        </h3>
+        <div class="btn-group pull-right">
+          <button style="color:#666" class="btn btn-default btn-circle btn-xs" ng-click="showFormInfo = !showFormInfo"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span></button>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="alert alert-info" ng-show="showFormInfo">Forms represent multiple input interfaces for Resources. Example: Login Form, User Registration Form ...</div>
         <resource-list app="currentApp" resource-title="'Form'" resource-name="'form'" num-per-page="5"></resource-list>
       </div>
       <div class="panel-footer">
@@ -15,25 +44,13 @@
   <div class="col-sm-4">
     <div class="panel panel-success">
       <div class="panel-heading">
-        <h3 class="panel-title"><i class="fa fa-database"></i> <a ui-sref="listResources">Resources</a></h3>
+        <h3 class="panel-title"><i class="fa fa-gears"></i> API</h3>
       </div>
       <div class="panel-body">
-        <resource-list app="currentApp" resource-title="'Resource'" resource-name="'resource'" num-per-page="5"></resource-list>
-      </div>
-      <div class="panel-footer">
-        <a ui-sref="app.resource.create" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Create Resource</a>
-      </div>
-    </div>
-  </div>
-  <div class="col-sm-4">
-    <div class="panel panel-success">
-      <div class="panel-heading">
-        <h3 class="panel-title"><i class="fa fa-user"></i> <a ui-sref="listResources">Roles <small>and permissions</small></a></h3>
-      </div>
-      <div class="panel-body">
-      </div>
-      <div class="panel-footer">
-        <a ui-sref="app.resource.create" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> New Role</a>
+        <div class="alert alert-info">
+          <p>The Form.IO API allows you to integrate both forms and resources into your application using simple HTML elements.</p><br/>
+          <p>Much like how you can embed an image into your application using the <strong>&lt;img&gt;</strong> element, you can implement Form.IO forms and resources using a simple <strong>&lt;formio&gt;</strong> HTML element.</p>
+        </div>
       </div>
     </div>
   </div>

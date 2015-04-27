@@ -46,21 +46,21 @@
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right">
             <li><a ui-sref="home()"><i class="fa fa-home"></i></a></li>
-            <li class="dropdown user-dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-user"></i> travist<b class="caret"></b></a>
+            <li class="dropdown user-dropdown" ng-cloak>
+              <a ng-if="authenticated" href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-user"></i> {{ user.data.name }}<b class="caret"></b></a>
               <ul class="dropdown-menu">
-                <li><a href="#"><i class="fa fa-user"></i> Profile</a></li>
+                <li><a ui-sref="profile.view()"><i class="fa fa-user"></i> Profile</a></li>
                 <li><a href="#"><i class="fa fa-gear"></i> Settings</a></li>
                 <li class="divider"></li>
-                <li><a href="#"><i class="fa fa-power-off"></i> Log Out</a></li>
+                <li><a ng-click="logout()"><i class="fa fa-power-off"></i> Log Out</a></li>
               </ul>
             </li>
           </ul>
         </div>
       </div>
     </nav>
-    <div class="container-fluid">
-      <div class="row">
+    <div class="container-fluid" ng-cloak>
+      <div class="row" ng-if="authenticated">
         <div class="col-sm-2 col-md-2 sidebar">
           <ul class="nav nav-sidebar">
             <li ng-class="{active: (activeSideBar === 'home')}"><a ui-sref="home()"><i class="fa fa-home"></i> Home  <span ng-if="activeSideBar === 'apps'" class="sr-only">(current)</span></a></li>
@@ -69,6 +69,12 @@
           </ul>
         </div>
         <div class="col-sm-10 col-sm-offset-2 col-md-10 col-md-offset-2 main">
+          <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.message}}</alert>
+          <div ui-view></div>
+        </div>
+      </div>
+      <div class="row" ng-if="!authenticated">
+        <div class="col-sm-12 main">
           <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.message}}</alert>
           <div ui-view></div>
         </div>
@@ -107,6 +113,7 @@
     <script src="/bower_components/angular-drag-and-drop-lists/angular-drag-and-drop-lists.js"></script>
     <script src="/bower_components/ngFormBuilder/dist/ngFormBuilder.js"></script>
     <script src="/bower_components/angular-base64/angular-base64.js"></script>
+    <script src="/bower_components/angular-animate/angular-animate.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 
@@ -134,8 +141,8 @@
     <script src="/scripts/controllers/import.js"></script>
     <script src="/scripts/controllers/resource.js"></script>
     <script src="/scripts/controllers/user.js"></script>
-    <script src="/scripts/services/services.js"></script>
     <script src="/scripts/directives/partials.js"></script>
+    <script src="/scripts/services/services.js"></script>
     <!-- endinject -->
     <!-- endbuild -->
     <script src="/config.js" type="text/javascript"></script>
