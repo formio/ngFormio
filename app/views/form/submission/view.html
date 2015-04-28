@@ -14,7 +14,7 @@
 <h3>Submission Data</h3>
 <table class="table table-bordered table-hover" style="width: inherit;">
     <tbody>
-    <tr ng-repeat="component in resource.components | flattenComponents">
+    <tr ng-repeat="component in form.components | flattenComponents">
         <td class="active">{{ component.label }}</td>
         <td>{{ submissionData(submission.data, component) }}</td>
     </tr>

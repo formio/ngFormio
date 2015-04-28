@@ -11,14 +11,14 @@
         <table class="table table-striped">
           <thead>
           <tr>
-            <th>Name</th>
+            <th>Title</th>
             <th>Description</th>
             <th>Operations</th>
           </tr>
           </thead>
           <tbody>
           <tr ng-repeat="app in apps">
-            <td><a ui-sref="app.view({appId: app._id})">{{ app.name }}</a></td>
+            <td><a ui-sref="app.view({appId: app._id})">{{ app.title }}</a></td>
             <td>{{ app.description }}</td>
             <td>
               <div class="button-group">

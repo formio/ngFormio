@@ -29,9 +29,10 @@ app.controller('AppCreateController', [
     FormioAlerts
   ) {
     $rootScope.noBreadcrumb = false;
-    $scope.app = {};
-    $scope.createApplication = function() {
-      Restangular.all('app').post($scope.app).then(function(app) {
+    $scope.currentApp = {};
+    $scope.saveApplication = function() {
+      Restangular.all('app').post($scope.currentApp).then(function(app) {
+
         FormioAlerts.addAlert({
           type: 'success',
           message: 'New application created!'
@@ -63,7 +64,33 @@ app.controller('AppController', [
   }
 ]);
 
-app.controller('AppEditController', function() {});
+app.controller('AppEditController', [
+  '$scope',
+  '$rootScope',
+  '$state',
+  'Restangular',
+  'FormioAlerts',
+  function(
+    $scope,
+    $rootScope,
+    $state,
+    Restangular,
+    FormioAlerts
+  ) {
+    $rootScope.noBreadcrumb = false;
+    $scope.saveApplication = function() {
+      if (!$scope.currentApp) { return FormioAlerts.onError(new Error('No application found.')); }
+      $scope.currentApp.save().then(function() {
+        FormioAlerts.addAlert({
+          type: 'success',
+          message: 'Application saved.'
+        });
+        $state.go('home');
+      }, FormioAlerts.onError.bind(FormioAlerts));
+    };
+  }
+]);
+
 app.controller('AppDeleteController', [
   '$scope',
   '$state',
