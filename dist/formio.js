@@ -39,7 +39,7 @@ app.provider('Formio', function() {
           var paths = path.replace(/\/?app\//, '').split('/');
 
           // Populate the parameters.
-          angular.forEach(['appId', 'formType', 'formId', 'pathType', 'pathId'], function(param, index) {
+          angular.forEach(['appId', '', 'formId', 'pathType', 'pathId'], function(param, index) {
             if (param && (paths.length > index)) {
               this[param] = paths[index];
             }
@@ -49,12 +49,9 @@ app.provider('Formio', function() {
           this.appPath = this.appId ? ('/app/' + this.appId) : '';
           this.appUrl = this.appPath ? baseUrl + this.appPath : '';
 
-          // Create the resources URL.
-          this.resourcesUrl = this.appUrl + '/resource';
-
           // Get the form paths.
-          this.formPath = this.formId ? (this.appPath + '/' + this.formType + '/' + this.formId) : '';
-          this.formsUrl = this.formType ? (this.appUrl + '/' + this.formType) : '';
+          this.formPath = this.formId ? (this.appPath + '/form/' + this.formId) : '';
+          this.formsUrl = this.appUrl + '/form';
           this.formUrl = this.formId ? (baseUrl + this.formPath) : this.formsUrl;
 
           // Get the submission paths.
@@ -172,7 +169,6 @@ app.provider('Formio', function() {
         };
 
         // Define specific CRUD methods.
-        Formio.prototype.loadResources = _index('resource');
         Formio.prototype.loadForm = _load('form');
         Formio.prototype.saveForm = _save('form');
         Formio.prototype.deleteForm = _delete('form');
@@ -205,6 +201,8 @@ app.provider('Formio', function() {
           var deferred = $q.defer();
           var user = localStorage.getItem('formioUser');
           if (user) { deferred.resolve(angular.fromJson(user)); return deferred.promise; }
+          var token = localStorage.getItem('formioToken');
+          if (!token) { deferred.resolve(null); return deferred.promise; }
           $http.get(baseUrl + '/current').success(function(user) {
             this.setUser(user);
             deferred.resolve(user);
