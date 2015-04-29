@@ -1,0 +1,22 @@
+<h3>Submission Information</h3>
+<table class="table table-bordered table-hover" style="width: inherit;">
+    <tbody>
+    <tr>
+        <td class="active">Submitted</td>
+        <td>{{ submission.created | amDateFormat:'MMMM Do YYYY, h:mm:ss a'}}</td>
+    </tr>
+    <tr>
+        <td class="active">Modified</td>
+        <td>{{ submission.modified | amDateFormat:'MMMM Do YYYY, h:mm:ss a'}}</td>
+    </tr>
+    </tbody>
+</table>
+<h3>Submission Data</h3>
+<table class="table table-bordered table-hover" style="width: inherit;">
+    <tbody>
+    <tr ng-repeat="component in form.components | flattenComponents">
+        <td class="active">{{ component.label }}</td>
+        <td>{{ submissionData(submission.data, component) }}</td>
+    </tr>
+    </tbody>
+</table>

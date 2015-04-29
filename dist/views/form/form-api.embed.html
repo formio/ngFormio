@@ -1,0 +1,9 @@
+<h3>Embedding your form</h3>
+<p>There are two different ways to embed this form. If you are utilizing Angular.js in your application, then you can embed it using the Angular.js directive. Otherwise, you can use the iframe method of form embedding.</p>
+<h3>Angular.js Integration</h3>
+<p>Angular.js integration can be accomplished by first including the <logo></logo> JavaScript src in your HTML application.</p>
+<p><pre><code>&lt;script src="http://form.io/bower_components/formio/dist/formio.min.js" type="text/javascript"&gt;&lt;/script&gt;</code></pre></p>
+<p>Now, within your HTML source, you can use the <code>&lt;formio&gt;</code> directive like so.
+<pre><code>&lt;formio src="'/app/{{ appId }}/form/{{ form._id }}'"&gt;&lt;/formio&gt;</code></pre>
+</p>
+<h3>iframe Integration</h3>

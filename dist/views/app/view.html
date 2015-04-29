@@ -4,7 +4,7 @@
       <div class="panel-heading clearfix">
         <h3 class="panel-title pull-left">
           <i class="fa fa-database"></i>
-          <a ui-sref="listResources">Resources</a>
+          <a ui-sref="app.form.resourceIndex()">Resources</a>
         </h3>
         <div class="btn-group pull-right">
           <button style="color:#666" class="btn btn-default btn-circle btn-xs" ng-click="showResourceInfo = !showResourceInfo"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span></button>
@@ -14,10 +14,10 @@
         <div class="alert alert-info" ng-show="showResourceInfo">
           <strong>Resources</strong> are the objects within your application. Example: User, Vehicle ...
         </div>
-        <resource-list app="currentApp" resource-title="'Resource'" resource-name="'resource'" num-per-page="5"></resource-list>
+        <form-list app="currentApp" form-type="'resource'" num-per-page="5"></form-list>
       </div>
       <div class="panel-footer">
-        <a ui-sref="app.resource.create" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Create Resource</a>
+        <a ui-sref="app.form.createResource()" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Create Resource</a>
       </div>
     </div>
   </div>
@@ -26,7 +26,7 @@
       <div class="panel-heading clearfix">
         <h3 class="panel-title pull-left">
           <i class="fa fa-file-text-o"></i>
-          <a ui-sref="listForms">Forms</a>
+          <a ui-sref="app.form.formIndex()">Forms</a>
         </h3>
         <div class="btn-group pull-right">
           <button style="color:#666" class="btn btn-default btn-circle btn-xs" ng-click="showFormInfo = !showFormInfo"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span></button>
@@ -34,10 +34,10 @@
       </div>
       <div class="panel-body">
         <div class="alert alert-info" ng-show="showFormInfo">Forms represent multiple input interfaces for Resources. Example: Login Form, User Registration Form ...</div>
-        <resource-list app="currentApp" resource-title="'Form'" resource-name="'form'" num-per-page="5"></resource-list>
+        <form-list app="currentApp" form-type="'form'" num-per-page="5"></form-list>
       </div>
       <div class="panel-footer">
-        <a ui-sref="app.form.create" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Create Form</a>
+        <a ui-sref="app.form.createForm()" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Create Form</a>
       </div>
     </div>
   </div>

@@ -13,11 +13,10 @@ gulp.task('views', require('./gulp/views')(gulp, plugins));
 gulp.task('clean', require('del').bind(null, ['.tmp', 'dist']));
 gulp.task('wiredep', require('./gulp/wiredep')(gulp, plugins));
 gulp.task('watch', require('./gulp/watch')(gulp, plugins));
-gulp.task('serve', ['wiredep', 'styles', 'fonts', 'watch']);
-gulp.task('build', ['jshint', 'wiredep', 'html', 'views', 'images', 'fonts', 'extras'], function () {
+gulp.task('build', ['jshint', 'wiredep', 'styles', 'html', 'views', 'images', 'fonts', 'extras'], function () {
   return gulp.src('dist/**/*').pipe(plugins.size({title: 'build', gzip: true}));
 });
-
+gulp.task('serve', ['build', 'watch']);
 gulp.task('default', ['clean'], function () {
   gulp.start('build');
 });
