@@ -8,8 +8,37 @@ var app = angular.module('formio', []);
 app.provider('Formio', function() {
 
   // The default base url.
-  var baseUrl = 'https://api.form.io';
+  var baseUrl = '';
+  var rootUrl = '';
   var cache = {};
+
+  /**
+   * Returns parts of the URL that are important.
+   * Indexex
+   *  - 0: The full url
+   *  - 1: The protocol
+   *  - 2: The hostname
+   *  - 3: The rest
+   *
+   * @param url
+   * @returns {*}
+   */
+  var getUrlParts = function(url) {
+    return url.match(/^(http[s]?:\/\/)([^/]+)($|\/.*)/);
+  };
+
+  /**
+   * Get the root url to show all applications.
+   */
+  var getRootUrl = function() {
+    if (rootUrl) { return rootUrl; }
+    if (!baseUrl) { return ''; }
+    var parts = getUrlParts(baseUrl);
+    var domain = (parts.length > 2) ? parts[2].replace(/^[^.]+\./g, '') : '';
+    rootUrl = parts[1] + domain;
+    rootUrl += (parts.length > 3) ? parts[3] : '';
+    return rootUrl;
+  };
 
   // Return the provider interface.
   return {
@@ -22,10 +51,12 @@ app.provider('Formio', function() {
       '$http',
       '$q',
       'formioInterceptor',
+      '$location',
       function(
         $http,
         $q,
-        formioInterceptor
+        formioInterceptor,
+        $location
       ) {
 
         // The formio class.
@@ -35,36 +66,84 @@ app.provider('Formio', function() {
           if (!(this instanceof Formio)) { return new Formio(path); }
           if (!path) { return; }
 
-          // Get the paths.
-          var paths = path.replace(/\/?app\//, '').split('/');
+          // Initialize our variables.
+          this.appUrl = '';
+          this.appId = '';
+          this.appId = '';
+          this.formUrl = '';
+          this.formsUrl = '';
+          this.formId = '';
+          this.submissionsUrl = '';
+          this.submissionUrl = '';
+          this.submissionId = '';
+          this.actionsUrl = '';
+          this.actionId = '';
+          this.actionUrl = '';
 
-          // Populate the parameters.
-          angular.forEach(['appId', '', 'formId', 'pathType', 'pathId'], function(param, index) {
-            if (param && (paths.length > index)) {
-              this[param] = paths[index];
+          // Normalize to an absolute path.
+          if (path.indexOf('http') !== 0) {
+            baseUrl = baseUrl ? baseUrl : $location.absUrl().match(/http[s]?:\/\/[^/?]*/)[0] + '/app/api';
+            path = baseUrl + path;
+          }
+
+          var hostparts = getUrlParts(path);
+          var hostnames = (hostparts.length > 2) ? hostparts[2].split('.') : [];
+          var subdomain = '';
+          if (
+            ((hostnames.length === 2) && (hostnames[1].indexOf('localhost') === 0)) || (hostnames.length >= 3)
+          ) {
+            subdomain = hostnames[0];
+            this.appId = subdomain;
+          }
+
+          // Get the paths for this formio url.
+          var subs = path.match(/\/(submission|action)\/?([^?]*)/);
+          if (subs && subs.length > 1) {
+            subs.shift();
+          }
+
+          // Remove the submissions and actions from the path.
+          path = path.replace(/\/(submission|action).*/, '');
+          var paths = [];
+
+          // See if this url has a subdomain.
+          if (subdomain) {
+
+            // Get the paths.
+            paths = path.match(/(http[s]?:\/\/.*app\/api)\/?([^?]*)?/);
+            if (paths.length > 1) {
+              paths.shift();
             }
-          }.bind(this));
+          }
+          else {
+            var formpaths = path.match(/^http.*\/.*\/form\/?([^?]*)/);
+            if (formpaths && formpaths.length > 1) {
+              paths[1] = formpaths[1] ? 'form/' + formpaths[1] : '';
+              paths[0] = paths[1] ? path.replace('/' + paths[1], '') : path;
+            }
+            else {
 
-          // Get the application path.
-          this.appPath = this.appId ? ('/app/' + this.appId) : '';
-          this.appUrl = this.appPath ? baseUrl + this.appPath : '';
+              // Assume this is an app url.
+              paths[0] = path;
+            }
+          }
 
-          // Get the form paths.
-          this.formPath = this.formId ? (this.appPath + '/form/' + this.formId) : '';
-          this.formsUrl = this.appUrl + '/form';
-          this.formUrl = this.formId ? (baseUrl + this.formPath) : this.formsUrl;
-
-          // Get the submission paths.
-          this.subId = (this.pathType === 'submission') ? this.pathId : '';
-          this.subPath = this.subId ? (this.formPath + '/submission/' + this.subId) : '';
-          this.subsUrl = this.formPath ? (baseUrl + this.formPath) + '/submission' : '';
-          this.subUrl = this.subPath ? (baseUrl + this.subPath) : this.subsUrl;
-
-          // Get the actions path.
-          this.actionId = (this.pathType === 'action') ? this.pathId : '';
-          this.actionPath = this.actionId ? (this.formPath + '/action/' + this.actionId) : '';
-          this.actionsUrl = this.formPath ? (baseUrl + this.formPath) + '/action' : '';
-          this.actionUrl = this.actionPath ? (baseUrl + this.actionPath) : this.actionsUrl;
+          if (paths.length > 0) {
+            this.appUrl = (paths.length > 0) ? paths[0] : '';
+            this.appId = true;
+            this.formsUrl = this.appUrl ? (this.appUrl + '/form') : '';
+            this.formId = (paths.length > 1) ? paths[1] : '';
+            this.formUrl = this.appUrl ? (this.appUrl + '/' + this.formId) : '';
+            this.pathType = (subs && (subs.length > 0)) ? subs[0] : '';
+            angular.forEach(['submission', 'action'], function(item) {
+              var index = item + 'sUrl';
+              var itemId = item + 'Id';
+              var itemUrl = item + 'Url';
+              this[index] = this.formUrl ? (this.formUrl + '/' + item) : '';
+              this[itemId] = (subs && (this.pathType === item) && (subs.length > 1)) ? subs[1] : '';
+              this[itemUrl] = this[itemId] ? this[index] + '/' + this[itemId] : this[index];
+            }.bind(this));
+          }
         };
 
         /**
@@ -89,7 +168,12 @@ app.provider('Formio', function() {
 
             // Set the cache, then send the request.
             cache[cacheKey] = deferred.promise;
-            $http.get(url, query).success(deferred.resolve).error(deferred.reject);
+            try {
+              $http.get(url, query).success(deferred.resolve).error(deferred.reject);
+            }
+            catch (error) {
+              deferred.reject(error.message);
+            }
           }
           return deferred.promise;
         };
@@ -169,26 +253,25 @@ app.provider('Formio', function() {
         };
 
         // Define specific CRUD methods.
+        Formio.prototype.loadApp = _load('app');
+        Formio.prototype.saveApp = _save('app');
+        Formio.prototype.deleteApp = _delete('app');
         Formio.prototype.loadForm = _load('form');
         Formio.prototype.saveForm = _save('form');
         Formio.prototype.deleteForm = _delete('form');
         Formio.prototype.loadForms = _index('form');
-        Formio.prototype.loadSubmission = _load('sub');
-        Formio.prototype.saveSubmission = _save('sub');
-        Formio.prototype.deleteSubmission = _delete('sub');
-        Formio.prototype.loadSubmissions = _index('sub');
+        Formio.prototype.loadSubmission = _load('submission');
+        Formio.prototype.saveSubmission = _save('submission');
+        Formio.prototype.deleteSubmission = _delete('submission');
+        Formio.prototype.loadSubmissions = _index('submission');
         Formio.prototype.loadAction = _load('action');
         Formio.prototype.saveAction = _save('action');
         Formio.prototype.deleteAction = _delete('action');
         Formio.prototype.loadActions = _index('action');
-        Formio.prototype.availableActions = function() {
-          return request(this.formUrl + '/actions');
-        };
+        Formio.prototype.availableActions = function() { return request(this.formUrl + '/actions'); };
 
         // Static methods.
-        Formio.loadApps = function() {
-          return request(baseUrl + '/app');
-        };
+        Formio.loadApps = function() { return request(getRootUrl(baseUrl) + '/app'); };
         Formio.clearCache = function() { cache = {}; };
         Formio.baseUrl = baseUrl;
         Formio.setUser = function(user) {
@@ -215,7 +298,11 @@ app.provider('Formio', function() {
             this.setToken(null);
             this.setUser(null);
             deferred.resolve();
-          }.bind(this)).error(deferred.reject);
+          }.bind(this)).error(function() {
+            this.setToken(null);
+            this.setUser(null);
+            deferred.reject(new Error('Your session expired, please login again.'));
+          }.bind(this));
           return deferred.promise;
         };
         Formio.submissionData = function(data, component, onId) {
@@ -296,6 +383,7 @@ app.factory('FormioScope', [
         $scope._form = $scope.form || {};
         $scope._submission = $scope.submission || {data: {}};
         $scope._submissions = $scope.submissions || [];
+        angular.element('#formio-loading').show();
 
         // Used to set the form action.
         var getAction = function(action) {
@@ -337,6 +425,7 @@ app.factory('FormioScope', [
           if (options.form) {
             loader.loadForm().then(function(form) {
               $scope._form = form;
+              angular.element('#formio-loading').hide();
               $scope.$emit('formLoad', form);
             }, this.onError($scope));
           }
@@ -354,6 +443,8 @@ app.factory('FormioScope', [
           }
         }
         else {
+
+          $scope.formoLoaded = true;
 
           // Emit the events if these objects are already loaded.
           if ($scope._form) {
@@ -383,30 +474,30 @@ app.factory('FormioUtils', function() {
       var required = '<span ng-if="component.validate.required" class="glyphicon glyphicon-asterisk form-control-feedback field-required" aria-hidden="true"></span>';
       var template =
         '<div ng-if="!component.multiple">' +
-        inputLabel + required +
-        '<div class="input-group" ng-if="component.prefix || component.suffix">' +
-        '<div class="input-group-addon" ng-if="!!component.prefix">{{ component.prefix }}</div>' +
-        input +
-        '<div class="input-group-addon" ng-if="!!component.suffix">{{ component.suffix }}</div>' +
-        '</div>' +
-        '<div ng-if="!component.prefix && !component.suffix">' + input + '</div>' +
+          inputLabel + required +
+          '<div class="input-group" ng-if="component.prefix || component.suffix">' +
+            '<div class="input-group-addon" ng-if="!!component.prefix">{{ component.prefix }}</div>' +
+            input +
+            '<div class="input-group-addon" ng-if="!!component.suffix">{{ component.suffix }}</div>' +
+          '</div>' +
+          '<div ng-if="!component.prefix && !component.suffix">' + input + '</div>' +
         '</div>' +
         '<div ng-if="component.multiple"><table class="table table-bordered">' +
-        inputLabel +
-        '<tr ng-repeat="value in data[component.key] track by $index">' +
-        '<td>' + required +
-        '<div class="input-group" ng-if="component.prefix || component.suffix">' +
-        '<div class="input-group-addon" ng-if="!!component.prefix">{{ component.prefix }}</div>' +
-        multiInput +
-        '<div class="input-group-addon" ng-if="!!component.suffix">{{ component.suffix }}</div>' +
-        '</div>' +
-        '<div ng-if="!component.prefix && !component.suffix">' + multiInput + '</div>' +
-        '</td>' +
-        '<td><a ng-click="removeFieldValue($index)" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle"></span></a></td>' +
-        '</tr>' +
-        '<tr>' +
-        '<td colspan="2"><a ng-click="addFieldValue()" class="btn btn-primary"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add another</a></td>' +
-        '</tr>' +
+          inputLabel +
+          '<tr ng-repeat="value in data[component.key] track by $index">' +
+            '<td>' + required +
+              '<div class="input-group" ng-if="component.prefix || component.suffix">' +
+                '<div class="input-group-addon" ng-if="!!component.prefix">{{ component.prefix }}</div>' +
+                multiInput +
+                '<div class="input-group-addon" ng-if="!!component.suffix">{{ component.suffix }}</div>' +
+              '</div>' +
+              '<div ng-if="!component.prefix && !component.suffix">' + multiInput + '</div>' +
+            '</td>' +
+            '<td><a ng-click="removeFieldValue($index)" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle"></span></a></td>' +
+          '</tr>' +
+          '<tr>' +
+            '<td colspan="2"><a ng-click="addFieldValue()" class="btn btn-primary"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add another</a></td>' +
+          '</tr>' +
         '</table></div>';
       return template;
     }
@@ -524,14 +615,17 @@ app.directive('formioDelete', function() {
       ) {
         $scope.formioAlerts = [];
         var resourceName = 'resource';
+        var resourceTitle = 'Resource';
+        var methodName = '';
         var loader = FormioScope.register($scope, {
           form: true,
           submission: true
         });
 
         if (loader) {
-          resourceName = loader.subId ? 'submission' : 'form';
-          var methodName = 'delete' + resourceName.charAt(0).toUpperCase() + resourceName.slice(1);
+          resourceName = loader.submissionId ? 'submission' : 'form';
+          resourceTitle = resourceName.charAt(0).toUpperCase() + resourceName.slice(1);
+          methodName = 'delete' + resourceTitle;
         }
 
         // Set the resource name
@@ -544,7 +638,7 @@ app.directive('formioDelete', function() {
           var onDeleteDone = function(data) {
             $scope.formioAlerts.push({
               type: 'success',
-              message: 'Submission was deleted.'
+              message: resourceTitle + ' was deleted.'
             });
             Formio.clearCache();
             $scope.$emit('delete', data);
@@ -554,9 +648,9 @@ app.directive('formioDelete', function() {
             $http.delete($scope.action).success(onDeleteDone).error(FormioScope.onError($scope));
           }
           else if (loader) {
-            if (typeof loader[methodName] === 'function') {
-              loader[methodName]().then(onDeleteDone, FormioScope.onError($scope));
-            }
+            if (!methodName) { return; }
+            if (typeof loader[methodName] !== 'function') { return; }
+            loader[methodName]().then(onDeleteDone, FormioScope.onError($scope));
           }
         };
         $scope.onCancel = function() {
@@ -842,11 +936,12 @@ app.run([
     // The template for the formio forms.
     $templateCache.put('formio.html',
       '<form role="form" name="formioForm" ng-submit="onSubmit(formioForm.$valid)" novalidate>' +
+        '<i id="formio-loading" style="font-size: 2em;" class="fa fa-spinner fa-pulse"></i>' +
         '<div ng-repeat="alert in formioAlerts" class="alert alert-{{ alert.type }}" role="alert">' +
           '{{ alert.message }}' +
         '</div>' +
         '<formio-component ng-repeat="component in _form.components track by $index" component="component" data="_submission.data" formio="formio"></formio-component>' +
-        '<button type="submit" class="btn btn-primary" ng-disabled="formioForm.$invalid">Submit</button>' +
+        '<button ng-show="_form.components.length" type="submit" class="btn btn-primary" ng-disabled="formioForm.$invalid">Submit</button>' +
       '</form>'
     );
 
@@ -879,10 +974,10 @@ app.run([
             '<td>{{ submission.created | amDateFormat:\'l, h:mm:ss a\' }}</td>' +
             '<td>{{ submission.modified | amDateFormat:\'l, h:mm:ss a\' }}</td>' +
             '<td>' +
-              '<div class="button-group">' +
-                '<a ng-click="$emit(\'submissionView\', submission)" class="btn btn-primary"><span class="glyphicon glyphicon-eye-open"></span></a>&nbsp;' +
-                '<a ng-click="$emit(\'submissionEdit\', submission)" class="btn btn-default"><span class="glyphicon glyphicon-edit"></span></a>&nbsp;' +
-                '<a ng-click="$emit(\'submissionDelete\', submission)" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle"></span></a>' +
+              '<div class="button-group" style="display:flex;">' +
+                '<a ng-click="$emit(\'submissionView\', submission)" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-eye-open"></span></a>&nbsp;' +
+                '<a ng-click="$emit(\'submissionEdit\', submission)" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-edit"></span></a>&nbsp;' +
+                '<a ng-click="$emit(\'submissionDelete\', submission)" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove-circle"></span></a>' +
               '</div>' +
             '</td>' +
           '</tr>' +
@@ -1346,7 +1441,7 @@ app.config([
       controller: function(settings, $scope, $http, Formio) {
         $scope.selectItems = [];
         if (settings.resource) {
-          var formio = new Formio($scope.formio.appPath + '/resource/' + settings.resource);
+          var formio = new Formio($scope.formio.appUrl + '/form/' + settings.resource);
           if (settings.searchExpression && settings.searchFields) {
             var search = new RegExp(settings.searchExpression);
             $scope.refreshSubmissions = function(input) {
