@@ -83,9 +83,9 @@ angular
           controller: 'AppController',
           templateUrl: 'views/app/app.html'
         })
-        .state('app.create', {
+        .state('createApp', {
           url: '/create/app',
-          templateUrl: 'views/app/app-form.html',
+          templateUrl: 'views/app/create.html',
           controller: 'AppCreateController'
         })
         .state('app.view', {
@@ -104,6 +104,33 @@ angular
           parent: 'app',
           templateUrl: 'views/app/delete.html',
           controller: 'AppDeleteController'
+        })
+        .state('team', {
+          url: '/team/:teamId',
+          controller: 'TeamController',
+          templateUrl: 'views/team/team.html'
+        })
+        .state('createTeam', {
+          url: '/create/team',
+          controller: 'TeamCreateController',
+          templateUrl: 'views/team/create.html'
+        })
+        .state('team.view', {
+          url: '/view',
+          parent: 'team',
+          templateUrl: 'views/team/view.html'
+        })
+        .state('team.edit', {
+          url: '/edit',
+          parent: 'team',
+          controller: 'TeamEditController',
+          templateUrl: 'views/team/edit.html'
+        })
+        .state('team.delete', {
+          url: '/delete',
+          parent: 'team',
+          controller: 'TeamDeleteController',
+          templateUrl: 'views/team/delete.html'
         })
         .state('importExport', {
           url: '/import-export',
@@ -131,6 +158,8 @@ angular
     ) {
       $rootScope.activeSideBar = 'home';
       $rootScope.currentApp = null;
+      $scope.teams = [];
+      $scope.teamsUrl = $rootScope.teamForm + '/submission';
       $scope.apps = {};
       Formio.loadApps().then(function(apps) {
         $scope.apps = apps;
@@ -160,16 +189,10 @@ angular
     ) {
 
       // urls for Form.io forms.
-      /* PROD SETTINGS
-      $rootScope.formioAppUrl = '/app/553db92f72f702e714dd9778';
-      $rootScope.userForm = '/app/553db92f72f702e714dd9778/resource/553db94e72f702e714dd9779';
-      $rootScope.userLoginForm = '/app/553db92f72f702e714dd9778/form/553dbe603c605f841af5b3a5';
-      $rootScope.userRegisterForm = '/app/553db92f72f702e714dd9778/form/553dbedd3c605f841af5b3a7';
-      */
-      $rootScope.formioAppUrl = '/app/553a40b9174a9d18bb566beb';
-      $rootScope.userForm = '/app/553a40b9174a9d18bb566beb/resource/553a4114174a9d18bb566bec';
-      $rootScope.userLoginForm = '/app/553a40b9174a9d18bb566beb/form/553a5799ab352f11dddb0f30';
-      $rootScope.userRegisterForm = '/app/553a40b9174a9d18bb566beb/form/553a57eeab352f11dddb0f31';
+      $rootScope.userForm = 'http://formio.localhost:3000/app/api/user';
+      $rootScope.userLoginForm = 'http://formio.localhost:3000/app/api/user/login';
+      $rootScope.userRegisterForm = 'http://formio.localhost:3000/app/api/user/register';
+      $rootScope.teamForm = 'http://formio.localhost:3000/app/api/team';
 
       // Always redirect to login if they are not authenticated.
       $state.go('home');
@@ -203,7 +226,6 @@ angular
       };
 
       // Ensure they are logged.
-      /*
       $rootScope.$on('$stateChangeStart', function(event, toState) {
         $rootScope.authenticated = !!Formio.getToken();
         if (toState.name.substr(0, 4) === 'auth') { return; }
@@ -212,7 +234,6 @@ angular
           $state.go('auth.login');
         }
       });
-      */
 
       // Set the active sidebar.
       $rootScope.activeSideBar = 'apps';

@@ -15,24 +15,41 @@ app.controller('AppIndexController', [
   }
 ]);
 
+var refreshUsers = function(userForm, $scope) {
+  return function(filter) {
+    userForm.loadSubmissions({params: {'data.name': filter}}).then(function(users) {
+      $scope.users = [];
+      angular.forEach(users, function(user) {
+        $scope.users.push({
+          id: user._id,
+          name: user.data.name
+        });
+      });
+    });
+  };
+};
+
 app.controller('AppCreateController', [
   '$scope',
   '$rootScope',
   '$state',
   'Restangular',
   'FormioAlerts',
+  'Formio',
   function(
     $scope,
     $rootScope,
     $state,
     Restangular,
-    FormioAlerts
+    FormioAlerts,
+    Formio
   ) {
     $rootScope.noBreadcrumb = false;
     $scope.currentApp = {};
+    $scope.users = [];
+    $scope.refreshUsers = refreshUsers(new Formio($rootScope.userForm), $scope);
     $scope.saveApplication = function() {
       Restangular.all('app').post($scope.currentApp).then(function(app) {
-
         FormioAlerts.addAlert({
           type: 'success',
           message: 'New application created!'
@@ -47,17 +64,18 @@ app.controller('AppController', [
   '$scope',
   '$rootScope',
   '$stateParams',
-  'Restangular',
+  'Formio',
   function(
     $scope,
     $rootScope,
     $stateParams,
-    Restangular
+    Formio
   ) {
     $rootScope.activeSideBar = 'apps';
     $rootScope.noBreadcrumb = false;
-    $scope.currentApp = {_id: $stateParams.appId};
-    Restangular.one('app', $stateParams.appId).get().then(function(result) {
+    $scope.formio = new Formio('/app/' + $stateParams.appId);
+    $scope.currentApp = {_id: $stateParams.appId, access: []};
+    $scope.formio.loadApp().then(function(result) {
       $scope.currentApp = result;
       $rootScope.currentApp = result;
     });
@@ -68,49 +86,49 @@ app.controller('AppEditController', [
   '$scope',
   '$rootScope',
   '$state',
-  'Restangular',
   'FormioAlerts',
+  'Formio',
   function(
     $scope,
     $rootScope,
     $state,
-    Restangular,
-    FormioAlerts
+    FormioAlerts,
+    Formio
   ) {
     $rootScope.noBreadcrumb = false;
+    $scope.users = [];
+    $scope.refreshUsers = refreshUsers(new Formio($rootScope.userForm), $scope);
     $scope.saveApplication = function() {
-      if (!$scope.currentApp) { return FormioAlerts.onError(new Error('No application found.')); }
-      $scope.currentApp.save().then(function() {
+      if (!$scope.currentApp._id) { return FormioAlerts.onError(new Error('No application found.')); }
+      $scope.formio.saveApp($scope.currentApp).then(function () {
         FormioAlerts.addAlert({
           type: 'success',
           message: 'Application saved.'
         });
         $state.go('home');
-      }, FormioAlerts.onError.bind(FormioAlerts));
-    };
+      }).error(FormioAlerts.onError.bind(FormioAlerts));
+    }
   }
 ]);
 
 app.controller('AppDeleteController', [
   '$scope',
   '$state',
-  'Restangular',
   'FormioAlerts',
   function(
     $scope,
     $state,
-    Restangular,
     FormioAlerts
   ) {
     $scope.deleteApp = function() {
       if (!$scope.currentApp || !$scope.currentApp._id) { return; }
-      Restangular.one('app', $scope.currentApp._id).remove().then(function() {
+      $scope.formio.deleteApp().then(function() {
         FormioAlerts.addAlert({
           type: 'success',
           message: 'Application was deleted!'
         });
         $state.go('home');
-      }, FormioAlerts.onError.bind(FormioAlerts));
+      }).error(FormioAlerts.onError.bind(FormioAlerts));
     };
   }
 ]);

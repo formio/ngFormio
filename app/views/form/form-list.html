@@ -12,9 +12,9 @@
           <a ui-sref="app.form.view({formId: form._id})">{{ form.title }}</a>
         </td>
         <td>
-          <div class="button-group">
-            <a ui-sref="app.form.edit({formId: form._id})" class="btn btn-default"><span class="glyphicon glyphicon-edit"></span></a>
-            <a ui-sref="app.form.delete({formId: form._id})" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle"></span></a>
+          <div class="button-group" style="display:flex;">
+            <a ui-sref="app.form.edit({formId: form._id})" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-edit"></span></a>
+            <a ui-sref="app.form.delete({formId: form._id})" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove-circle"></span></a>
           </div>
         </td>
       </tr>

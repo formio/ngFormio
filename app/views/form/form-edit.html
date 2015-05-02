@@ -9,12 +9,12 @@
   </div>
   <input type="hidden" ng-model="form.type"/>
   <div id="form-group-name" class="form-group">
-    <label for="path" class="control-label">Path</label>
-    <div class="input-group" style="width: 300px;">
-      <span class="input-group-addon">https://{{ currentApp.name }}.form.io/api/</span>
+    <label for="path" class="control-label">API Path</label>
+    <div class="input-group" style="width: 350px;">
+      <span class="input-group-addon">https://{{ currentApp.name }}.form.io/app/api/</span>
       <input type="text" class="form-control" id="path" ng-model="form.path" placeholder="user">
     </div>
-    <small>The form path is used to change the URL to access this path within an application.</small>
+    <small>The REST API path to this form.</small>
   </div>
   <form-builder app="appId" form="form"></form-builder>
   <div ng-include="'views/form/form-settings.html'"></div>

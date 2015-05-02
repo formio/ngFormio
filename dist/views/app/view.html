@@ -14,7 +14,7 @@
         <div class="alert alert-info" ng-show="showResourceInfo">
           <strong>Resources</strong> are the objects within your application. Example: User, Vehicle ...
         </div>
-        <form-list app="currentApp" form-type="'resource'" num-per-page="5"></form-list>
+        <form-list form-type="'resource'" num-per-page="5"></form-list>
       </div>
       <div class="panel-footer">
         <a ui-sref="app.form.createResource()" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Create Resource</a>
@@ -34,7 +34,7 @@
       </div>
       <div class="panel-body">
         <div class="alert alert-info" ng-show="showFormInfo">Forms represent multiple input interfaces for Resources. Example: Login Form, User Registration Form ...</div>
-        <form-list app="currentApp" form-type="'form'" num-per-page="5"></form-list>
+        <form-list form-type="'form'" num-per-page="5"></form-list>
       </div>
       <div class="panel-footer">
         <a ui-sref="app.form.createForm()" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Create Form</a>

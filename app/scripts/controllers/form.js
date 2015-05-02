@@ -39,6 +39,7 @@ app.config([
       .state('app.form.delete', {
         url: '/delete',
         parent: 'app.form',
+        controller: 'FormDeleteController',
         templateUrl: 'views/form/form-delete.html'
       })
       .state('app.form.createForm', {
@@ -64,24 +65,7 @@ app.config([
         url: '/form',
         parent: 'app',
         template: '<form-list app="currentApp" form-type="\'resource\'" num-per-page="25"></form-list>'
-      })
-      .state('app.form.api', {
-        abstract: true,
-        url: '/api',
-        parent: 'app.form',
-        templateUrl: 'views/form/form-api.html'
-      })
-      .state('app.form.api.spec', {
-        url: '/spec',
-        parent: 'app.form.api',
-        templateUrl: 'views/form/form-api.spec.html'
-      })
-      .state('app.form.api.embed', {
-        url: '/embed',
-        parent: 'app.form.api',
-        templateUrl: 'views/form/form-api.embed.html'
       });
-
 
     var formStates = {};
     formStates['app.form.submission'] = {
@@ -227,6 +211,9 @@ app.controller('FormController', [
     // Load the form and submissions.
     $scope.formio = new Formio($scope.formUrl);
 
+    // Set the base url.
+    $scope.rootUrl = Formio.baseUrl;
+
     // Load the form.
     $scope.formio.loadForm().then(function(form) {
       $scope.form = form;
@@ -308,6 +295,33 @@ app.factory('FormioAlerts', [
   }
 ]);
 
+app.controller('FormDeleteController', [
+  '$scope',
+  '$state',
+  'FormioAlerts',
+  function(
+    $scope,
+    $state,
+    FormioAlerts
+  ) {
+    $scope.$on('delete', function() {
+      FormioAlerts.addAlert({
+        type: 'success',
+        message: 'Form was deleted.'
+      });
+      $state.go('app.view');
+    });
+
+    $scope.$on('cancel', function() {
+      $state.go('app.form.view');
+    });
+
+    $scope.$on('formError', function(event, error) {
+      FormioAlerts.onError(error);
+    });
+  }
+]);
+
 app.controller('FormActionIndexController', [
   '$scope',
   '$state',
@@ -359,7 +373,7 @@ app.controller('FormActionIndexController', [
 var loadActionInfo = function($scope, $stateParams, Formio) {
 
   // Get the action information.
-  $scope.actionPath = '';
+  $scope.actionUrl = '';
   $scope.actionInfo = $stateParams.actionInfo || {settingsForm: {}};
   $scope.action = {data: {settings: {}}};
 
@@ -381,8 +395,8 @@ var loadActionInfo = function($scope, $stateParams, Formio) {
    */
   var loadAction = function(defaults) {
     if ($stateParams.actionId) {
-      $scope.actionPath = $scope.formio.formPath + '/action/' + $stateParams.actionId;
-      var loader = new Formio($scope.actionPath);
+      $scope.actionUrl = $scope.formio.formUrl + '/action/' + $stateParams.actionId;
+      var loader = new Formio($scope.actionUrl);
       loader.loadAction().then(function(action) {
         $scope.action = _.merge($scope.action, {data: action});
         getActionInfo(action.name);
@@ -458,7 +472,7 @@ app.controller('FormActionDeleteController', [
     $state,
     FormioAlerts
   ) {
-    $scope.actionPath = $scope.formio.formPath + '/action/' + $stateParams.actionId;
+    $scope.actionUrl = $scope.formio.formUrl + '/action/' + $stateParams.actionId;
     $scope.$on('delete', function() {
       FormioAlerts.addAlert({type: 'success', message: 'Action was deleted.'});
       $state.go('app.form.action.index');

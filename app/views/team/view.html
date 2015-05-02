@@ -1,0 +1,14 @@
+<h3>{{ team.data.name }}</h3>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Member</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="member in team.data.members">
+            {{ member }}
+            <td>{{ member.data.name }}</td>
+        </tr>
+    </tbody>
+</table>
