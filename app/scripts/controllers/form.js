@@ -273,9 +273,10 @@ app.controller('FormController', [
     // Save a form.
     $scope.saveForm = function() {
       $scope.formio.saveForm($scope.form).then(function(form) {
+        var method = $stateParams.formId ? 'updated' : 'created';
         FormioAlerts.addAlert({
           type: 'success',
-          message: 'Successfully created form!'
+          message: 'Successfully ' + method + ' form!'
         });
         $state.go('app.form.view', {formId: form._id});
       }, FormioAlerts.onError.bind(FormioAlerts));
