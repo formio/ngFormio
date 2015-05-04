@@ -28,11 +28,16 @@ app.provider('Formio', function() {
   /**
    * Get the root url to show all applications.
    */
-  var getRootUrl = function() {
+  var getRootUrl = function(url) {
     if (rootUrl) { return rootUrl; }
-    if (!baseUrl) { return ''; }
-    var parts = getUrlParts(baseUrl);
-    var domain = (parts.length > 2) ? parts[2].replace(/^[^.]+\./g, '') : '';
+    if (!url) { return ''; }
+    var parts = getUrlParts(url);
+    if (parts.length <= 2) { return parts.join('.'); }
+    var domainParts = parts[2].split('.');
+    if (domainParts.length > 2) {
+      domainParts.splice(0, (domainParts.length - 2));
+    }
+    var domain = domainParts.join('.');
     rootUrl = parts[1] + domain;
     rootUrl += (parts.length > 3) ? parts[3] : '';
     return rootUrl;
