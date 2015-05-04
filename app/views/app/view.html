@@ -1,20 +1,17 @@
 <div class="row">
   <div class="col-sm-4">
     <div class="panel panel-success">
-      <div class="panel-heading clearfix">
-        <h3 class="panel-title pull-left">
+      <div class="panel-heading">
+        <h3 class="panel-title">
           <i class="fa fa-database"></i>
           <a ui-sref="app.form.resourceIndex()">Resources</a>
         </h3>
-        <div class="btn-group pull-right">
-          <button style="color:#666" class="btn btn-default btn-circle btn-xs" ng-click="showResourceInfo = !showResourceInfo"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span></button>
-        </div>
       </div>
       <div class="panel-body">
-        <div class="alert alert-info" ng-show="showResourceInfo">
+        <div class="alert alert-info" ng-show="!resources.length">
           <strong>Resources</strong> are the objects within your application. Example: User, Vehicle ...
         </div>
-        <form-list app="currentApp" form-type="'resource'" num-per-page="5"></form-list>
+        <form-list forms="resources" app="currentApp" form-type="'resource'" num-per-page="5"></form-list>
       </div>
       <div class="panel-footer">
         <a ui-sref="app.form.createResource()" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Create Resource</a>
@@ -23,18 +20,15 @@
   </div>
   <div class="col-sm-4">
     <div class="panel panel-success">
-      <div class="panel-heading clearfix">
-        <h3 class="panel-title pull-left">
+      <div class="panel-heading">
+        <h3 class="panel-title">
           <i class="fa fa-file-text-o"></i>
           <a ui-sref="app.form.formIndex()">Forms</a>
         </h3>
-        <div class="btn-group pull-right">
-          <button style="color:#666" class="btn btn-default btn-circle btn-xs" ng-click="showFormInfo = !showFormInfo"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span></button>
-        </div>
       </div>
       <div class="panel-body">
-        <div class="alert alert-info" ng-show="showFormInfo">Forms represent multiple input interfaces for Resources. Example: Login Form, User Registration Form ...</div>
-        <form-list app="currentApp" form-type="'form'" num-per-page="5"></form-list>
+        <div class="alert alert-info" ng-show="!forms.length">Forms represent multiple input interfaces for Resources. Example: Login Form, User Registration Form ...</div>
+        <form-list forms="forms" app="currentApp" form-type="'form'" num-per-page="5"></form-list>
       </div>
       <div class="panel-footer">
         <a ui-sref="app.form.createForm()" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Create Form</a>

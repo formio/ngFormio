@@ -144,6 +144,7 @@ app.directive('formList', function() {
     replace: true,
     templateUrl: 'views/form/form-list.html',
     scope: {
+      forms: '=',
       app: '=',
       formType: '=',
       numPerPage: '='
@@ -162,7 +163,6 @@ app.directive('formList', function() {
       ) {
         $rootScope.activeSideBar = 'apps';
         $rootScope.noBreadcrumb = false;
-        $scope.forms = [];
         $scope.formsPerPage = $scope.numPerPage;
         $scope.formsUrl = Formio.baseUrl + '/app/' + $scope.app._id + '/form?type=' + $scope.formType;
       }
@@ -215,17 +215,52 @@ app.controller('FormController', [
     $scope.rootUrl = Formio.baseUrl;
 
     // Load the form.
+    var anonId = '000000000000000000000000';
+    $scope.anonymous = false;
+    var checkAnonymous = function() {
+      var isAnon = false;
+      if ($scope.form) {
+        angular.forEach($scope.form.access, function(access, index) {
+          if (access.id === anonId) {
+            $scope.anonymous = true;
+            isAnon = index;
+          }
+        });
+      }
+      return isAnon;
+    };
+
+    $scope.onAnonymous = function(anon) {
+      if (!$scope.form) { return; }
+      if (anon) {
+        if (checkAnonymous() === false) {
+          $scope.form.access.push({
+            id: anonId,
+            name: 'Anonymous'
+          });
+        }
+      }
+      else {
+        var anonIndex = checkAnonymous();
+        if (anonIndex !== false) {
+          $scope.form.access.splice(anonIndex, 1);
+        }
+      }
+    };
+
+    // Load the form.
     $scope.formio.loadForm().then(function(form) {
       $scope.form = form;
+      checkAnonymous();
     });
 
     // Get the swagger URL.
     $scope.getSwaggerURL = function() {
-      return AppConfig.appBase + '/form/' + $scope.form._id + '/spec.html';
+      return AppConfig.appBase + '/form/' + $scope.form._id + '/spec.html?token=' + Formio.getToken();
     };
 
     // When a submission is made.
-    $scope.$on('formSubmission', function(event, submission) {
+    $scope.disableSubmissionHandler = $scope.$on('formSubmission', function(event, submission) {
       FormioAlerts.addAlert({
         type: 'success',
         message: 'New submission added!'
@@ -376,6 +411,7 @@ var loadActionInfo = function($scope, $stateParams, Formio) {
   $scope.actionUrl = '';
   $scope.actionInfo = $stateParams.actionInfo || {settingsForm: {}};
   $scope.action = {data: {settings: {}}};
+  $scope.disableSubmissionHandler();
 
   // Get the action information.
   var getActionInfo = function(name, done) {

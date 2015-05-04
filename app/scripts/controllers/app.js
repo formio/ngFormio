@@ -55,7 +55,15 @@ app.controller('AppCreateController', [
           message: 'New application created!'
         });
         $state.go('app.view', {appId: app._id});
-      }, FormioAlerts.onError.bind(FormioAlerts));
+      }, function(error) {
+        if (error.data.message && error.data.message.indexOf('duplicate key error index') !== -1) {
+          error.data.errors.name = {
+            path: 'name',
+            message: 'Application domain already exists. Please pick a different domain.'
+          };
+        }
+        FormioAlerts.onError(error);
+      });
     };
   }
 ]);
@@ -73,6 +81,8 @@ app.controller('AppController', [
   ) {
     $rootScope.activeSideBar = 'apps';
     $rootScope.noBreadcrumb = false;
+    $scope.resources = [];
+    $scope.forms = [];
     $scope.formio = new Formio('/app/' + $stateParams.appId);
     $scope.currentApp = {_id: $stateParams.appId, access: []};
     $scope.formio.loadApp().then(function(result) {

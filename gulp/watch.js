@@ -2,7 +2,7 @@ module.exports = function(gulp, plugins) {
   return function () {
     plugins.browserSync({
       notify: false,
-      port: 9000,
+      port: 9002,
       server: {
         baseDir: ['.tmp', 'app'],
         routes: {

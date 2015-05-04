@@ -63,6 +63,10 @@ angular
           templateUrl: 'views/user/register.html',
           controller: 'UserRegisterController'
         })
+        .state('settings', {
+          url: '/settings',
+          templateUrl: 'views/user/settings.html'
+        })
         .state('profile', {
           abstract: true,
           url: '/profile',

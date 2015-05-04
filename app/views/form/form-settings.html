@@ -1,6 +1,10 @@
 <accordion close-others="true">
     <accordion-group heading="Permissions" is-open="false">
-        TO-DO: Add permissions here.
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" ng-change="onAnonymous(anonymous)" ng-model="anonymous"> Anonymous access
+            </label>
+        </div>
     </accordion-group>
     <accordion-group heading="Advanced Settings" is-open="false">
         <div id="form-group-action" class="form-group">

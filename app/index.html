@@ -50,7 +50,7 @@
               <a ng-if="authenticated" href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-user"></i> {{ user.data.name }}<b class="caret"></b></a>
               <ul class="dropdown-menu">
                 <li><a ui-sref="profile.view()"><i class="fa fa-user"></i> Profile</a></li>
-                <li><a href="#"><i class="fa fa-gear"></i> Settings</a></li>
+                <li><a ui-sref="settings()"><i class="fa fa-gear"></i> Settings</a></li>
                 <li class="divider"></li>
                 <li><a ng-click="logout()"><i class="fa fa-power-off"></i> Log Out</a></li>
               </ul>
@@ -59,21 +59,8 @@
         </div>
       </div>
     </nav>
-    <div class="container-fluid" ng-cloak>
-      <div class="row" ng-if="authenticated">
-        <div class="col-sm-2 col-md-2 sidebar">
-          <ul class="nav nav-sidebar">
-            <li ng-class="{active: (activeSideBar === 'home')}"><a ui-sref="home()"><i class="fa fa-home"></i> Home  <span ng-if="activeSideBar === 'apps'" class="sr-only">(current)</span></a></li>
-            <li ng-class="{active: (activeSideBar === 'import')}"><a ui-sref="importExport()"><i class="fa fa-file-code-o"></i> Import / Export <span ng-if="activeSideBar === 'import'" class="sr-only">(current)</span></a></li>
-            <li ng-class="{active: (activeSideBar === 'help')}"><a ui-sref="help()"><i class="fa fa-question-circle"></i> Help <span ng-if="activeSideBar === 'help'" class="sr-only">(current)</span></a></li>
-          </ul>
-        </div>
-        <div class="col-sm-10 col-sm-offset-2 col-md-10 col-md-offset-2 main">
-          <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.message}}</alert>
-          <div ui-view></div>
-        </div>
-      </div>
-      <div class="row" ng-if="!authenticated">
+    <div class="container-fluid" id="main-wrapper" ng-cloak>
+      <div class="row">
         <div class="col-sm-12 main">
           <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.message}}</alert>
           <div ui-view></div>
@@ -142,8 +129,8 @@
     <script src="/scripts/controllers/import.js"></script>
     <script src="/scripts/controllers/team.js"></script>
     <script src="/scripts/controllers/user.js"></script>
-    <script src="/scripts/services/services.js"></script>
     <script src="/scripts/directives/partials.js"></script>
+    <script src="/scripts/services/services.js"></script>
     <!-- endinject -->
     <!-- endbuild -->
     <script src="/config.js" type="text/javascript"></script>
