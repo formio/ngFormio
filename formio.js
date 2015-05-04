@@ -922,6 +922,7 @@ app.factory('formioInterceptor', function() {
    * @type {function(this:{token: string, setToken: Function, getToken: Function})}
    */
   Interceptor.request = function(config) {
+    if (config.disableJWT) { return config; }
     var token = this.getToken();
     if (token) { config.headers['x-jwt-token'] = token; }
     return config;

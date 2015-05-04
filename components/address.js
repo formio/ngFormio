@@ -14,6 +14,7 @@ app.config([
           return $http.get(
             'http://maps.googleapis.com/maps/api/geocode/json',
             {
+              disableJWT: true,
               params: params,
               headers: {Authorization: undefined}
             }
