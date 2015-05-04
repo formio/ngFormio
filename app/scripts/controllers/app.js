@@ -117,7 +117,7 @@ app.controller('AppEditController', [
         });
         $state.go('home');
       }).error(FormioAlerts.onError.bind(FormioAlerts));
-    }
+    };
   }
 ]);
 

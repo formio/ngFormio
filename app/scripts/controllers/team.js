@@ -1,3 +1,5 @@
+'use strict';
+
 var app = angular.module('formioApp.controllers.team', []);
 
 app.controller('TeamCreateController', [
@@ -9,7 +11,7 @@ app.controller('TeamCreateController', [
     $state,
     FormioAlerts
   ) {
-    $scope.$on('formSubmission', function(event, team) {
+    $scope.$on('formSubmission', function() {
       FormioAlerts.addAlert({
         type: 'success',
         message: 'New team created!'
@@ -46,7 +48,7 @@ app.controller('TeamEditController', [
     $scope,
     $state
   ) {
-    $scope.$on('formSubmission', function(event, submission) {
+    $scope.$on('formSubmission', function() {
       $state.go('home');
     });
   }
