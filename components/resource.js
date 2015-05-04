@@ -13,7 +13,7 @@ app.config([
           if (settings.searchExpression && settings.searchFields) {
             var search = new RegExp(settings.searchExpression);
             $scope.refreshSubmissions = function(input) {
-              if (!input) { return; }
+              if (!input) { return []; }
               var matches = input.match(search);
               var params = {};
               var shouldRequest = false;
@@ -33,7 +33,7 @@ app.config([
               formio.loadSubmissions({
                 params: params
               }).then(function(submissions) {
-                $scope.selectItems = submissions;
+                $scope.selectItems = submissions || [];
               });
             };
           }
@@ -42,7 +42,7 @@ app.config([
             // Load all submissions.
             $scope.refreshSubmissions = function() {};
             formio.loadSubmissions().then(function(submissions) {
-              $scope.selectItems = submissions;
+              $scope.selectItems = submissions || [];
             });
           }
         }

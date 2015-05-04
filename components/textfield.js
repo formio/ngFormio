@@ -23,7 +23,8 @@ app.config([
           minLength: '',
           maxLength: '',
           pattern: '',
-          custom: ''
+          custom: '',
+          customPrivate: false
         }
       }
     });

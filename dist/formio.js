@@ -383,7 +383,6 @@ app.factory('FormioScope', [
         $scope._form = $scope.form || {};
         $scope._submission = $scope.submission || {data: {}};
         $scope._submissions = $scope.submissions || [];
-        angular.element('#formio-loading').show();
 
         // Used to set the form action.
         var getAction = function(action) {
@@ -419,25 +418,31 @@ app.factory('FormioScope', [
 
         // Return the value and set the scope for the model input.
         $scope.submissionData = Formio.submissionData;
+        var spinner = angular.element('#formio-loading');
 
         if ($scope.src) {
           loader = new Formio($scope.src);
           if (options.form) {
+            spinner.show();
             loader.loadForm().then(function(form) {
               $scope._form = form;
-              angular.element('#formio-loading').hide();
+              spinner.hide();
               $scope.$emit('formLoad', form);
             }, this.onError($scope));
           }
           if (options.submission) {
+            spinner.show();
             loader.loadSubmission().then(function(submission) {
               $scope._submission = submission;
+              spinner.hide();
               $scope.$emit('submissionLoad', submission);
             }, this.onError($scope));
           }
           if (options.submissions) {
+            spinner.show();
             loader.loadSubmissions().then(function(submissions) {
               $scope._submissions = submissions;
+              spinner.hide();
               $scope.$emit('submissionsLoad', submissions);
             }, this.onError($scope));
           }
@@ -445,6 +450,7 @@ app.factory('FormioScope', [
         else {
 
           $scope.formoLoaded = true;
+          spinner.hide();
 
           // Emit the events if these objects are already loaded.
           if ($scope._form) {
@@ -1071,7 +1077,8 @@ app.config([
           minLength: '',
           maxLength: '',
           pattern: '',
-          custom: ''
+          custom: '',
+          customPrivate: false
         }
       }
     });
@@ -1236,7 +1243,9 @@ app.config([
         prefix: '',
         suffix: '',
         defaultValue: '',
-        unique: false
+        protected: false,
+        unique: false,
+        persistent: true
       }
     });
   }
@@ -1445,7 +1454,7 @@ app.config([
           if (settings.searchExpression && settings.searchFields) {
             var search = new RegExp(settings.searchExpression);
             $scope.refreshSubmissions = function(input) {
-              if (!input) { return; }
+              if (!input) { return []; }
               var matches = input.match(search);
               var params = {};
               var shouldRequest = false;
@@ -1465,7 +1474,7 @@ app.config([
               formio.loadSubmissions({
                 params: params
               }).then(function(submissions) {
-                $scope.selectItems = submissions;
+                $scope.selectItems = submissions || [];
               });
             };
           }
@@ -1474,7 +1483,7 @@ app.config([
             // Load all submissions.
             $scope.refreshSubmissions = function() {};
             formio.loadSubmissions().then(function(submissions) {
-              $scope.selectItems = submissions;
+              $scope.selectItems = submissions || [];
             });
           }
         }

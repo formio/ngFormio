@@ -13,7 +13,9 @@ app.config([
         prefix: '',
         suffix: '',
         defaultValue: '',
-        unique: false
+        protected: false,
+        unique: false,
+        persistent: true
       }
     });
   }
