@@ -81,7 +81,14 @@ app.controller('AppController', [
   ) {
     $rootScope.activeSideBar = 'apps';
     $rootScope.noBreadcrumb = false;
+    $scope.resourcesLoading = true;
     $scope.resources = [];
+    $scope.$on('pagination:loadPage', function(status) {
+      var formType = status.targetScope.$parent.formType;
+      $scope[formType + 'sLoading'] = false;
+      angular.element('#' + formType + '-loader').hide();
+    });
+    $scope.formsLoading = true;
     $scope.forms = [];
     $scope.formio = new Formio('/app/' + $stateParams.appId);
     $scope.currentApp = {_id: $stateParams.appId, access: []};

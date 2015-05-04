@@ -8,7 +8,8 @@
         </h3>
       </div>
       <div class="panel-body">
-        <div class="alert alert-info" ng-show="!resources.length">
+        <i id="resource-loader" style="font-size: 2em;" class="fa fa-spinner fa-pulse"></i>
+        <div class="alert alert-info" ng-show="!resourcesLoading && !resources.length">
           <strong>Resources</strong> are the objects within your application. Example: User, Vehicle ...
         </div>
         <form-list forms="resources" app="currentApp" form-type="'resource'" num-per-page="5"></form-list>
@@ -27,7 +28,8 @@
         </h3>
       </div>
       <div class="panel-body">
-        <div class="alert alert-info" ng-show="!forms.length">Forms represent multiple input interfaces for Resources. Example: Login Form, User Registration Form ...</div>
+        <i id="form-loader" style="font-size: 2em;" class="fa fa-spinner fa-pulse"></i>
+        <div class="alert alert-info" ng-show="!formsLoading && !forms.length">Forms represent multiple input interfaces for Resources. Example: Login Form, User Registration Form ...</div>
         <form-list forms="forms" app="currentApp" form-type="'form'" num-per-page="5"></form-list>
       </div>
       <div class="panel-footer">

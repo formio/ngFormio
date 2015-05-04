@@ -163,9 +163,17 @@ angular
       $rootScope.activeSideBar = 'home';
       $rootScope.currentApp = null;
       $scope.teams = [];
+      $scope.teamsLoading = true;
       $scope.teamsUrl = $rootScope.teamForm + '/submission';
+      $scope.$on('pagination:loadPage', function() {
+        $scope.teamsLoading = false;
+        angular.element('#team-loader').hide();
+      });
       $scope.apps = {};
+      $scope.appsLoading = true;
       Formio.loadApps().then(function(apps) {
+        $scope.appsLoading = false;
+        angular.element('#apps-loader').hide();
         $scope.apps = apps;
       });
     }
