@@ -184,19 +184,21 @@ angular
     '$rootScope',
     'FormioAlerts',
     'Formio',
+    'AppConfig',
     function(
       $state,
       $stateParams,
       $rootScope,
       FormioAlerts,
-      Formio
+      Formio,
+      AppConfig
     ) {
 
       // urls for Form.io forms.
-      $rootScope.userForm = 'http://formio.localhost:3000/app/api/user';
-      $rootScope.userLoginForm = 'http://formio.localhost:3000/app/api/user/login';
-      $rootScope.userRegisterForm = 'http://formio.localhost:3000/app/api/user/register';
-      $rootScope.teamForm = 'http://formio.localhost:3000/app/api/team';
+      $rootScope.userForm = 'http://formio.' + AppConfig.baseUrl + '/app/api/user';
+      $rootScope.userLoginForm = 'http://formio.' + AppConfig.baseUrl + '/app/api/user/login';
+      $rootScope.userRegisterForm = 'http://formio.' + AppConfig.baseUrl + '/app/api/user/register';
+      $rootScope.teamForm = 'http://formio.' + AppConfig.baseUrl + '/app/api/team';
 
       // Always redirect to login if they are not authenticated.
       $state.go('home');

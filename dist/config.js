@@ -1,4 +1,5 @@
 angular.module('formioApp').constant('AppConfig', {
-  appBase: 'http://localhost:3000/app',
-  apiBase: 'http://localhost:3000/app/api'
+  baseUrl: 'form.io',
+  appBase: 'http://form.io/app',
+  apiBase: 'http://form.io/app/api'
 });
