@@ -32,12 +32,6 @@ app.use('/assets', express.static(__dirname + '/server/assets'));
 var brochure = require('./src/brochure')(config.brochure);
 app.use('/', brochure);
 
-// Use swagger docs and assets.
-if (!config.brochure.debug) {
-  app.use('/app', basicAuth(config.brochure.admin.user, config.brochure.admin.pass));
-  app.use('/apps', basicAuth(config.brochure.admin.user, config.brochure.admin.pass));
-}
-
 // Include the swagger ui.
 app.use('/swagger', express.static(require('swagger-ui').dist));
 
