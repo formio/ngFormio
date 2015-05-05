@@ -245,7 +245,7 @@ angular
         if (toState.name.substr(0, 4) === 'auth') { return; }
         if(!$rootScope.authenticated) {
           event.preventDefault();
-          $state.go('auth.login');
+          $state.go('auth.register');
         }
       });
 
