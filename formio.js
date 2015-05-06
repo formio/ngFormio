@@ -928,17 +928,6 @@ app.factory('formioInterceptor', function() {
   }.bind(Interceptor);
 
   /**
-   * Intercept the 401 error and redirect to login.
-   * @type {function(this:{token: string, setToken: Function, getToken: Function})}
-   */
-  Interceptor.responseError = function(response) {
-    if (response.status === 401) {
-      this.setUser(null);
-    }
-    return response;
-  }.bind(Interceptor);
-
-  /**
    * Set the token in the request headers.
    *
    * @type {function(this:{token: string, setToken: Function, getToken: Function})}
