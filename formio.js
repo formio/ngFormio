@@ -277,17 +277,15 @@ app.provider('Formio', function() {
         Formio.loadApps = function() { return request(getRootUrl(baseUrl) + '/app'); };
         Formio.clearCache = function() { cache = {}; };
         Formio.baseUrl = baseUrl;
-        Formio.setUser = function(user) {
-          if (!user) { return localStorage.removeItem('formioUser'); }
-          localStorage.setItem('formioUser', angular.toJson(user));
-        };
+        Formio.setUser = formioInterceptor.setUser.bind(formioInterceptor);
+        Formio.getUser = formioInterceptor.getUser.bind(formioInterceptor);
         Formio.setToken = formioInterceptor.setToken.bind(formioInterceptor);
         Formio.getToken = formioInterceptor.getToken.bind(formioInterceptor);
         Formio.currentUser = function() {
           var deferred = $q.defer();
-          var user = localStorage.getItem('formioUser');
+          var user = this.getUser();
           if (user) { deferred.resolve(angular.fromJson(user)); return deferred.promise; }
-          var token = localStorage.getItem('formioToken');
+          var token = this.getToken();
           if (!token) { deferred.resolve(null); return deferred.promise; }
           $http.get(baseUrl + '/current').success(function(user) {
             this.setUser(user);
@@ -295,7 +293,7 @@ app.provider('Formio', function() {
           }.bind(this)).error(deferred.reject);
           return deferred.promise;
         };
-        Formio.logout= function() {
+        Formio.logout = function() {
           var deferred = $q.defer();
           $http.get(baseUrl + '/logout').success(function() {
             this.setToken(null);
@@ -894,7 +892,10 @@ app.factory('formioInterceptor', function() {
       token = token || '';
       if (token === this.token) { return; }
       this.token = token;
-      if (!token) { return localStorage.removeItem('formioToken'); }
+      if (!token) {
+        this.setUser(null);
+        return localStorage.removeItem('formioToken');
+      }
       localStorage.setItem('formioToken', token);
     },
     getToken: function() {
@@ -902,6 +903,16 @@ app.factory('formioInterceptor', function() {
       var token = localStorage.getItem('formioToken') || '';
       this.token = token;
       return token;
+    },
+    setUser: function(user) {
+      if (!user) {
+        this.setToken(null);
+        return localStorage.removeItem('formioUser');
+      }
+      localStorage.setItem('formioUser', angular.toJson(user));
+    },
+    getUser: function() {
+      return localStorage.getItem('formioUser');
     }
   };
 
@@ -913,6 +924,17 @@ app.factory('formioInterceptor', function() {
   Interceptor.response = function(response) {
     var token = response.headers('x-jwt-token');
     if (token || (token === '')) { this.setToken(token); }
+    return response;
+  }.bind(Interceptor);
+
+  /**
+   * Intercept the 401 error and redirect to login.
+   * @type {function(this:{token: string, setToken: Function, getToken: Function})}
+   */
+  Interceptor.responseError = function(response) {
+    if (response.status === 401) {
+      this.setUser(null);
+    }
     return response;
   }.bind(Interceptor);
 
