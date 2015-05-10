@@ -1,8 +1,8 @@
 {
-  "name": "ngFormio",
+  "name": "formio",
   "version": "0.0.1",
-  "description": "",
-  "main": "dist/formio.js",
+  "description": "The form redering engine behind Form.IO.",
+  "main": "dist/formio.min.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
