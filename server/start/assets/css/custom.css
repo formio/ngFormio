@@ -1,0 +1,18 @@
+.reveal i.fa { font-family:FontAwesome; font-style: normal; }
+
+.reveal div.listsmall {
+    margin-left: 10px;
+    display: inline-block;
+    font-size: 0.6em;
+}
+
+.reveal .fullwidth, .reveal .fullwidth code {
+    width: 100%;
+}
+
+.reveal section img.trans-image {
+    display: inline;
+    border: none;
+    background: rgba(255,255,255,0);
+    box-shadow: none;
+}

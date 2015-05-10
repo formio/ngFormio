@@ -7,7 +7,8 @@ angular.module('formioApp.directives', [])
   return {
     restrict: 'E',
     scope: {
-      size: '@'
+      size: '@',
+      dotcolor: '@'
     },
     templateUrl: 'views/partials/logo.html'
   };

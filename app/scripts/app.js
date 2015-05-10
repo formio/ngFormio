@@ -155,10 +155,14 @@ angular
     '$scope',
     '$rootScope',
     'Formio',
+    '$window',
+    'AppConfig',
     function(
       $scope,
       $rootScope,
-      Formio
+      Formio,
+      $window,
+      AppConfig
     ) {
       $rootScope.activeSideBar = 'home';
       $rootScope.currentApp = null;
@@ -176,6 +180,10 @@ angular
         angular.element('#apps-loader').hide();
         $scope.apps = apps;
       });
+
+      $scope.startTutorial = function() {
+        $window.open('//' + AppConfig.baseUrl + '/start', 'formio-tutorial', 'height=640,width=960');
+      };
     }
   ])
   .filter('trusted', [
