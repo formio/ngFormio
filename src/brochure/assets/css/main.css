@@ -277,6 +277,17 @@ fieldset[disabled] .btn-xl.btn-success.active {
 .navbar-default .navbar-brand img {
   display: none;
 }
+.header-image {
+  width: 70%;
+}
+@media (max-width: 768px) {
+  .header-button {
+    display: block;
+  }
+  .header-image {
+    width: 100%;
+  }
+}
 @media (min-width: 768px) {
   .navbar-default {
     background-color: transparent;
