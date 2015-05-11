@@ -25,15 +25,11 @@ app.get('/config.js', function(req, res, next) {
 // Mount bower_components as assets.
 app.use('/bower_components', express.static(__dirname + '/bower_components'));
 
-// Mount the assets folder.
-app.use('/assets', express.static(__dirname + '/server/assets'));
-
 // Mount getting started presentation.
 app.use('/start', express.static(__dirname + '/server/start'));
 
 // Mount the brochure.
-var brochure = require('./src/brochure')(config.brochure);
-app.use('/', brochure);
+app.use('/', express.static(__dirname + '/src/brochure'));
 
 // Include the swagger ui.
 app.use('/swagger', express.static(require('swagger-ui').dist));

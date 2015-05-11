@@ -3,13 +3,15 @@
 </ol>
 <div class="row">
   <div class="col-sm-6">
-    <div class="jumbotron clearfix">
+    <div class="jumbotron well clearfix">
       <h2 style="color:#666;">Welcome to <logo ng-attr-size="1em" ng-attr-dotcolor="#333"></logo>!</h2>
       <p>Form.IO is a platform that enables developers to rapidly build modern web and mobile applications. Our intuitive drag & drop interface allows you to create both the forms and the RESTful API's all in one easy step! You build the app, we handle the Form I/O.</p>
-      <div class="col-sm-12" style="height: 200px; overflow: hidden;">
-        <div ng-click="startTutorial()" class="play-pres-overlay">
-          <div class="play-pres-overlay-play"><span class="glyphicon glyphicon-play-circle"></span>Start the tutorial</div>
-          <img src="images/formio-get-started.png" style="height: 200px;" />
+      <div class="row">
+        <div class="col-sm-12">
+          <div ng-click="startTutorial()" class="play-pres-overlay">
+            <div class="play-pres-overlay-play"><span class="glyphicon glyphicon-play-circle"></span>Start the tutorial</div>
+            <img width="100%" src="images/formio-get-started.png" />
+          </div>
         </div>
       </div>
     </div>
@@ -78,7 +80,7 @@
               </td>
               <td>
                 <div class="button-group" style="display:flex;">
-                  <a ui-sref="team.edit({teamId: team._id})" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-edit"></span></a>
+                  <a ui-sref="team.edit({teamId: team._id})" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-edit"></span></a>&nbsp;
                   <a ui-sref="team.delete({teamId: team._id})" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove-circle"></span></a>
                 </div>
               </td>

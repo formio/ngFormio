@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Form.IO - Fastest form & API workflow - anywhere</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="assets/css/main.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="assets/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Kaushan+Script' rel='stylesheet' type='text/css'>
+    <link href="https://fonts.googleapis.com/css?family=Comfortaa:400,700" rel="stylesheet" type="text/css">
+
+    <script src="assets/js/jquery.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+    <script src="http://form.io/bower_components/formio/dist/formio.min.js" type="text/javascript"></script>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <script type="text/javascript">
+        var startTutorial = function() {
+            window.open('http://form.io/start', 'formio-tutorial', 'height=640,width=960');
+        };
+        var app = angular.module('mainApp', [
+                'formio'
+        ]);
+    </script>
+</head>
+
+<body id="page-top" class="index" ng-app="mainApp">
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand page-scroll" href="#page-top"><img src="assets/img/logo.png" /></a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="hidden">
+                        <a href="#page-top"></a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" href="#about">About</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" href="#features">Features</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" href="#beta">Request Beta Access</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container-fluid -->
+    </nav>
+
+    <!-- Header -->
+    <header style="overflow:hidden;">
+        <div class="container">
+            <div class="row intro-text">
+                <div class="col-sm-8" style="margin-top: -30px;">
+                    <img width="70%" src="assets/img/logo-full.png" />
+                    <div class="row">
+                        <div class="col-md-8 col-md-offset-2">
+                            <p style="font-size: 1.4em;">Form.IO is a platform that enables developers to rapidly build modern web and mobile applications. Our intuitive drag & drop interface allows you to create both the forms and the RESTful API's all in one easy step! You build the app, we handle the Form I/O.</p>
+                            <a href="#beta" class="page-scroll btn btn-xl">Sign up for Beta!</a>&nbsp- or -&nbsp;<a href="app" class="btn btn-success btn-xl">Go to Beta <i class="fa fa-chevron-right"></i></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4" style="text-align: center;">
+                    <img class="formio-tree" src="assets/img/formio-tree.png" />
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- About Section -->
+    <section id="about">
+        <div class="container">
+            <div class="row text-center">
+                <div class="col-md-4">
+                    <span class="header-icon fa-stack">
+                        <i class="fa fa-circle fa-stack-2x text-secondary"></i>
+                        <i class="fa fa-magic fa-stack-1x fa-inverse"></i>
+                    </span>
+                    <h4 class="service-heading">One Step to Form's & API's</h4>
+                    <p class="text-muted">Formio offers the first development platform that builds Form's and API's in one simple step.</p>
+                </div>
+                <div class="col-md-4">
+                    <span class="header-icon fa-stack">
+                        <i class="fa fa-circle fa-stack-2x text-primary"></i>
+                        <i class="fa fa-mobile fa-stack-1x fa-inverse"></i>
+                    </span>
+                    <h4 class="service-heading">Mobile Ready!</h4>
+                    <p class="text-muted">Building mobile applications has never been easier. With Formio's Form and API integration technologies, building a mobile application is fast and easy!</p>
+                </div>
+                <div class="col-md-4">
+                    <span class="header-icon fa-stack" style="line-height: 1em;">
+                        <img height="180px;" src="assets/img/mean_stack.png" /></i>
+                    </span>
+                        <h4 class="service-heading">M.E.A.N Stack Based</h4>
+                        <p class="text-muted">&lt;<span class="text-primary">form</span><span class="text-secondary">io</span>&gt; is proud to be built on the M.E.A.N stack; a technology stack that is ideal for Web 3.0 applications.</p>
+                </div>
+            </div>
+            <div class="row text-center">
+                <div class="col-md-4">
+                    <span class="header-icon fa-stack" style="line-height: 1em;">
+                        <img height="180px;" src="assets/img/open-source.svg" /></i>
+                    </span>
+                    <h4 class="service-heading">Open Source API Platform</h4>
+                    <p class="text-muted">&lt;<span class="text-primary">form</span><span class="text-secondary">io</span>&gt; offers a complete Open Source solution so that gives you control over your data. Visit our GitHub page @ <a href="https://github.com/formio">https://github.com/formio</a></p>
+                </div>
+                <div class="col-md-4">
+                    <span class="header-icon fa-stack" style="line-height: 1em;">
+                        <img height="180px;" src="assets/img/angular.png" /></i>
+                    </span>
+                    <h4 class="service-heading">Angular.js Support</h4>
+                    <p class="text-muted">Using the powerful &lt;formio&gt; directive, you can easily embed your forms within your Angular.js application. And all of the I/O is provided for you!</p>
+                </div>
+                <div class="col-md-4">
+                    <span class="header-icon fa-stack">
+                        <i class="fa fa-circle fa-stack-2x text-secondary"></i>
+                        <i class="fa fa-lock fa-stack-1x fa-inverse"></i>
+                    </span>
+                    <h4 class="service-heading">Secure & Stable</h4>
+                    <p class="text-muted">Every form & API is protected using the latest validation and encryption technologies. Input validations apply to both forms as well as the auto-generated API interface.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Portfolio Grid Section -->
+    <section id="features" class="bg-light-gray">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h2 class="section-heading">Features</h2>
+                    <h3 class="section-subheading text-muted">Check out our amazing product offerings.</h3>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 col-sm-6 portfolio-item">
+                    <a href="#portfolioModal1" class="portfolio-link" data-toggle="modal">
+                        <div class="portfolio-hover">
+                            <div class="portfolio-hover-content">
+                                <i class="fa fa-plus fa-3x"></i>
+                            </div>
+                        </div>
+                        <img src="assets/img/formio-main.jpg" class="img-responsive" alt="">
+                    </a>
+                    <div class="portfolio-caption">
+                        <h4>Create Multiple applications</h4>
+                        <p class="text-muted">manage Development Teams</p>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 portfolio-item">
+                    <a href="#portfolioModal2" class="portfolio-link" data-toggle="modal">
+                        <div class="portfolio-hover">
+                            <div class="portfolio-hover-content">
+                                <i class="fa fa-plus fa-3x"></i>
+                            </div>
+                        </div>
+                        <img src="assets/img/formio-form-builder.jpg" class="img-responsive" alt="">
+                    </a>
+                    <div class="portfolio-caption">
+                        <h4>Simple Form Builder</h4>
+                        <p class="text-muted">with Drag & Drop interface</p>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 portfolio-item">
+                    <a href="#portfolioModal3" class="portfolio-link" data-toggle="modal">
+                        <div class="portfolio-hover">
+                            <div class="portfolio-hover-content">
+                                <i class="fa fa-plus fa-3x"></i>
+                            </div>
+                        </div>
+                        <img src="assets/img/formio-resource-view.jpg" class="img-responsive" alt="">
+                    </a>
+                    <div class="portfolio-caption">
+                        <h4>Create Resources</h4>
+                        <p class="text-muted">With corresponding Forms and API's</p>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 col-sm-6 portfolio-item">
+                    <a href="#portfolioModal4" class="portfolio-link" data-toggle="modal">
+                        <div class="portfolio-hover">
+                            <div class="portfolio-hover-content">
+                                <i class="fa fa-plus fa-3x"></i>
+                            </div>
+                        </div>
+                        <img src="assets/img/formio-form-view.jpg" class="img-responsive" alt="">
+                    </a>
+                    <div class="portfolio-caption">
+                        <h4>Create Forms</h4>
+                        <p class="text-muted">by reusing Resource fields</p>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 portfolio-item">
+                    <a href="#portfolioModal5" class="portfolio-link" data-toggle="modal">
+                        <div class="portfolio-hover">
+                            <div class="portfolio-hover-content">
+                                <i class="fa fa-plus fa-3x"></i>
+                            </div>
+                        </div>
+                        <img src="assets/img/formio-actions.jpg" class="img-responsive" alt="">
+                    </a>
+                    <div class="portfolio-caption">
+                        <h4>Customize behavior with Actions</h4>
+                        <p class="text-muted">Allows for complex API actions such as User Authentication</p>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 portfolio-item">
+                    <a href="#portfolioModal6" class="portfolio-link" data-toggle="modal">
+                        <div class="portfolio-hover">
+                            <div class="portfolio-hover-content">
+                                <i class="fa fa-plus fa-3x"></i>
+                            </div>
+                        </div>
+                        <img src="assets/img/formio-appembed.jpg" class="img-responsive" alt="">
+                    </a>
+                    <div class="portfolio-caption">
+                        <h4>Embed Formio in your Applications</h4>
+                        <p class="text-muted">Using our very own <strong>&lt;formio&gt;</strong> Angular.js directive.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <h3>Walk through the tutorial!</h3>
+                    <div onclick="startTutorial()" class="play-pres-overlay">
+                        <div class="play-pres-overlay-play"><span class="glyphicon glyphicon-play-circle"></span> Walk through the tutorial</div>
+                        <img width="100%" src="assets/img/formio-get-started.png" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Beta Section -->
+    <section id="beta">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h2 class="section-heading">Request Beta Access</h2>
+                    <h3 class="section-subheading" style="color:#bbb;">We are currently in <strong>Private Beta</strong>, which means you must request access to our Beta in order to try the product. Please send us a message and we will be happy to give you access!</h3>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12" style="color: #eee;">
+                    <formio src="'http://formio.form.io/app/api/beta'"></formio>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <span class="copyright">Copyright &copy; Form.IO 2015</span>
+                </div>
+                <!--
+                <div class="col-md-4">
+                    <ul class="list-inline social-buttons">
+                        <li><a href="#"><i class="fa fa-twitter"></i></a>
+                        </li>
+                        <li><a href="#"><i class="fa fa-facebook"></i></a>
+                        </li>
+                        <li><a href="#"><i class="fa fa-linkedin"></i></a>
+                        </li>
+                    </ul>
+                </div>
+                -->
+            </div>
+        </div>
+    </footer>
+
+    <!-- Portfolio Modals -->
+    <!-- Use the modals below to showcase details about your portfolio projects! -->
+
+    <!-- Portfolio Modal 1 -->
+    <div class="portfolio-modal modal fade" id="portfolioModal1" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-content">
+            <div class="close-modal" data-dismiss="modal">
+                <div class="lr">
+                    <div class="rl">
+                    </div>
+                </div>
+            </div>
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-8 col-lg-offset-2">
+                        <div class="modal-body">
+                            <!-- Project Details Go Here -->
+                            <h2>Formio Main Page</h2>
+                            <p class="item-intro text-muted">Create and manage multiple applications</p>
+                            <img class="img-responsive img-centered" src="assets/img/formio-main.jpg" alt="">
+                            <p>The Formio platform allows you to create multiple applications and development teams to help manage your applications in one easy place.</p>
+                            <button type="button" class="btn btn-primary" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Portfolio Modal 2 -->
+    <div class="portfolio-modal modal fade" id="portfolioModal2" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-content">
+            <div class="close-modal" data-dismiss="modal">
+                <div class="lr">
+                    <div class="rl">
+                    </div>
+                </div>
+            </div>
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-8 col-lg-offset-2">
+                        <div class="modal-body">
+                            <h2>Amazing Form Builder</h2>
+                            <p class="item-intro text-muted">Formio provides a state-of-the-art form builder that allows you to easily drag & drop your form components to create both the Form and API!</p>
+                            <img class="img-responsive img-centered" src="assets/img/formio-form-builder.jpg" alt="">
+                            <button type="button" class="btn btn-primary" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Portfolio Modal 3 -->
+    <div class="portfolio-modal modal fade" id="portfolioModal3" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-content">
+            <div class="close-modal" data-dismiss="modal">
+                <div class="lr">
+                    <div class="rl">
+                    </div>
+                </div>
+            </div>
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-8 col-lg-offset-2">
+                        <div class="modal-body">
+                            <h2>Create Resources</h2>
+                            <p class="item-intro text-muted">with corresponding Form's and API's</p>
+                            <img class="img-responsive img-centered" src="assets/img/formio-resource-view.jpg" alt="">
+                            <p>Each Resource is an object represented within your application. You can use a simple drag & drop form builder to easily create your Resource forms and the API's to go with them.</p>
+                            <button type="button" class="btn btn-primary" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Portfolio Modal 4 -->
+    <div class="portfolio-modal modal fade" id="portfolioModal4" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-content">
+            <div class="close-modal" data-dismiss="modal">
+                <div class="lr">
+                    <div class="rl">
+                    </div>
+                </div>
+            </div>
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-8 col-lg-offset-2">
+                        <div class="modal-body">
+                            <!-- Project Details Go Here -->
+                            <h2>Create Forms</h2>
+                            <p class="item-intro text-muted">Easily create forms by reusing Resource fields. Formio allows you to rapidly create forms that reference Resource information by dragging and dropping the Resource fields onto the form. Building form interfaces for your resources has never been easier!</p>
+                            <img class="img-responsive img-centered" src="assets/img/formio-form-view.jpg" alt="">
+                            <button type="button" class="btn btn-primary" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Portfolio Modal 5 -->
+    <div class="portfolio-modal modal fade" id="portfolioModal5" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-content">
+            <div class="close-modal" data-dismiss="modal">
+                <div class="lr">
+                    <div class="rl">
+                    </div>
+                </div>
+            </div>
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-8 col-lg-offset-2">
+                        <div class="modal-body">
+                            <!-- Project Details Go Here -->
+                            <h2>Customize Behavior with Actions</h2>
+                            <p class="item-intro text-muted">Formio's action system allows for complex functionality to be attached to the form submission. From Emails to User Authentication, anything is possible!</p>
+                            <img class="img-responsive img-centered" src="assets/img/formio-actions.jpg" alt="">
+                            <button type="button" class="btn btn-primary" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Portfolio Modal 6 -->
+    <div class="portfolio-modal modal fade" id="portfolioModal6" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-content">
+            <div class="close-modal" data-dismiss="modal">
+                <div class="lr">
+                    <div class="rl">
+                    </div>
+                </div>
+            </div>
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-8 col-lg-offset-2">
+                        <div class="modal-body">
+                            <!-- Project Details Go Here -->
+                            <h2>Embed formio into your Application.</h2>
+                            <p class="item-intro text-muted">Formio's form embedding technology allows you to utilize one single <strong>&lt;formio&gt;</strong> tag to embed the form in your application. It's as easy as an <strong>&lt;img&gt;</strong> tag! You can even directly theme the forms using simple CSS.</strong></p>
+                            <img class="img-responsive img-centered" src="assets/img/formio-appembed.jpg" alt="">
+                            <button type="button" class="btn btn-primary" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="assets/js/bootstrap.min.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
+    <script src="assets/js/classie.js"></script>
+    <script src="assets/js/cbpAnimatedHeader.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="assets/js/agency.js"></script>
+</body>
+
+</html>
