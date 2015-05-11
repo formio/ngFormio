@@ -274,6 +274,9 @@ fieldset[disabled] .btn-xl.btn-success.active {
   color: white;
   background-color: #0e5c8f;
 }
+.navbar-default .navbar-brand img {
+  display: none;
+}
 @media (min-width: 768px) {
   .navbar-default {
     background-color: transparent;
@@ -289,9 +292,6 @@ fieldset[disabled] .btn-xl.btn-success.active {
     -webkit-transition: all 0.3s;
     -moz-transition: all 0.3s;
     transition: all 0.3s;
-  }
-  .navbar-default .navbar-brand img {
-    display: none;
   }
   .navbar-default .navbar-nav > .active > a {
     border-radius: 3px;
