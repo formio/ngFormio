@@ -232,6 +232,11 @@ body {
   color:red;
 }
 
+/* Fixes line-height issue where labels don't line up caused by ngDialog */
+.checkbox label {
+  line-height: 1em;
+}
+
 /***************************** Required styles *****************************/
 
 /**
