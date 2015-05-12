@@ -479,7 +479,7 @@ app.factory('FormioUtils', function() {
     fieldWrap: function(input) {
       input = input + '<formio-errors></formio-errors>';
       var multiInput = input.replace('data[component.key]', 'data[component.key][$index]');
-      var inputLabel = '<label ng-if="component.label" for="{{ component.key }}" class="control-label">{{ component.label }}</label>';
+      var inputLabel = '<label ng-if="component.label && !component.hideLabel" for="{{ component.key }}" class="control-label">{{ component.label }}</label>';
       var required = '<span ng-if="component.validate.required" class="glyphicon glyphicon-asterisk form-control-feedback field-required" aria-hidden="true"></span>';
       var template =
         '<div ng-if="!component.multiple">' +
@@ -1176,6 +1176,54 @@ app.run([
     $templateCache.put('formio/components/address-multiple.html',
       $templateCache.get('formio/components/address.html').replace('<ui-select', '<ui-select multiple')
     );
+  }
+]);
+
+app.config([
+  'formioComponentsProvider',
+  function(formioComponentsProvider) {
+    formioComponentsProvider.register('checkbox', {
+      title: 'Check Box',
+      template: 'formio/components/checkbox.html',
+      settings: {
+        input: true,
+        inputType: 'checkbox',
+        // This hides the default label layout so we can use a special inline label
+        hideLabel: true,
+        label: '',
+        key: '',
+        prefix: '',
+        suffix: '',
+        defaultValue: false,
+        protected: false,
+        persistent: true,
+        validate: {
+          required: false,
+        }
+      }
+    });
+  }
+]);
+app.run([
+  '$templateCache',
+  'FormioUtils',
+  function(
+    $templateCache,
+    FormioUtils
+  ) {
+    $templateCache.put('formio/components/checkbox.html', FormioUtils.fieldWrap(
+      '<div class="checkbox">' +
+        '<label for={{ component.key }}>' +
+          '<input type="{{ component.inputType }}" ' +
+            'id="{{ component.key }}" ' +
+            'name="{{ component.key }}" ' +
+            'value="{{ component.key }}" ' +
+            'ng-model="data[component.key]" ' +
+            'ng-required="component.validate.required">' +
+          '{{ component.label }}' +
+        '</label>'+
+      '</div>'
+    ));
   }
 ]);
 
