@@ -230,6 +230,7 @@ body {
 
 .field-required {
   color:red;
+  z-index: 5;
 }
 
 /* Fixes line-height issue where labels don't line up caused by ngDialog */
