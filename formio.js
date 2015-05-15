@@ -62,6 +62,8 @@ app.provider('Formio', function() {
         $location
       ) {
 
+        var logoutQ = $q.defer();
+
         // The formio class.
         var Formio = function(path) {
 
@@ -150,6 +152,18 @@ app.provider('Formio', function() {
         };
 
         /**
+         * When a request error occurs.
+         * @param deferred
+         * @param error
+         */
+        var requestError = function(deferred) {
+          return function(error) {
+            if (error === 'Unauthorized') { logoutQ.reject(error); }
+            deferred.reject(error);
+          };
+        };
+
+        /**
          * Perform a request GET request with caching abilities.
          *
          * @param url
@@ -172,7 +186,7 @@ app.provider('Formio', function() {
             // Set the cache, then send the request.
             cache[cacheKey] = deferred.promise;
             try {
-              $http.get(url, query).success(deferred.resolve).error(deferred.reject);
+              $http.get(url, query).success(deferred.resolve).error(requestError(deferred));
             }
             catch (error) {
               deferred.reject(error.message);
@@ -217,7 +231,7 @@ app.provider('Formio', function() {
                 result.method = method;
                 deferred.resolve(result);
               })
-              .error(deferred.reject);
+              .error(requestError(deferred));
             return deferred.promise;
           };
         };
@@ -236,7 +250,7 @@ app.provider('Formio', function() {
             var deferred = $q.defer();
             if (!this[_id]) { return deferred.promise; }
             cache = {};
-            $http.delete(this[_url]).success(deferred.resolve).error(deferred.reject);
+            $http.delete(this[_url]).success(deferred.resolve).error(requestError(deferred));
             return deferred.promise;
           };
         };
@@ -290,21 +304,23 @@ app.provider('Formio', function() {
           $http.get(baseUrl + '/current').success(function(user) {
             this.setUser(user);
             deferred.resolve(user);
-          }.bind(this)).error(deferred.reject);
+          }.bind(this)).error(requestError(deferred));
           return deferred.promise;
         };
+
+        // Keep track of their logout callback.
+        Formio.onLogout = logoutQ.promise;
         Formio.logout = function() {
-          var deferred = $q.defer();
           $http.get(baseUrl + '/logout').success(function() {
             this.setToken(null);
             this.setUser(null);
-            deferred.resolve();
+            logoutQ.resolve();
           }.bind(this)).error(function() {
             this.setToken(null);
             this.setUser(null);
-            deferred.reject(new Error('Your session expired, please login again.'));
+            logoutQ.reject();
           }.bind(this));
-          return deferred.promise;
+          return Formio.onLogout;
         };
         Formio.submissionData = function(data, component, onId) {
           if (!data) { return ''; }
@@ -885,61 +901,77 @@ app.directive('formioInputMask', function() {
   };
 });
 
-app.factory('formioInterceptor', function() {
-  var Interceptor = {
-    token: '',
-    setToken: function(token) {
-      token = token || '';
-      if (token === this.token) { return; }
-      this.token = token;
-      if (!token) {
-        this.setUser(null);
-        return localStorage.removeItem('formioToken');
+app.factory('formioInterceptor', [
+  '$q',
+  function($q) {
+    var Interceptor = {
+      token: '',
+      setToken: function(token) {
+        token = token || '';
+        if (token === this.token) { return; }
+        this.token = token;
+        if (!token) {
+          this.setUser(null);
+          return localStorage.removeItem('formioToken');
+        }
+        localStorage.setItem('formioToken', token);
+      },
+      getToken: function() {
+        if (this.token) { return this.token; }
+        var token = localStorage.getItem('formioToken') || '';
+        this.token = token;
+        return token;
+      },
+      setUser: function(user) {
+        if (!user) {
+          this.setToken(null);
+          return localStorage.removeItem('formioUser');
+        }
+        localStorage.setItem('formioUser', angular.toJson(user));
+      },
+      getUser: function() {
+        return localStorage.getItem('formioUser');
       }
-      localStorage.setItem('formioToken', token);
-    },
-    getToken: function() {
-      if (this.token) { return this.token; }
-      var token = localStorage.getItem('formioToken') || '';
-      this.token = token;
-      return token;
-    },
-    setUser: function(user) {
-      if (!user) {
+    };
+
+    /**
+     * Set the JWT token within the request.
+     *
+     * @type {function(this:{token: string, setToken: Function, getToken: Function})}
+     */
+    Interceptor.response = function(response) {
+      var token = response.headers('x-jwt-token');
+      if (token || (token === '')) { this.setToken(token); }
+      return response;
+    }.bind(Interceptor);
+
+    /**
+     * Intercept a response error.
+     *
+     * @type {function(this:{token: string, setToken: Function, getToken: Function, setUser: Function, getUser: Function})}
+     */
+    Interceptor.responseError = function(response) {
+      if (parseInt(response.status, 10) === 401) {
+        response.loggedOut = true;
         this.setToken(null);
-        return localStorage.removeItem('formioUser');
       }
-      localStorage.setItem('formioUser', angular.toJson(user));
-    },
-    getUser: function() {
-      return localStorage.getItem('formioUser');
-    }
-  };
+      return $q.reject(response);
+    }.bind(Interceptor);
 
-  /**
-   * Set the JWT token within the request.
-   *
-   * @type {function(this:{token: string, setToken: Function, getToken: Function})}
-   */
-  Interceptor.response = function(response) {
-    var token = response.headers('x-jwt-token');
-    if (token || (token === '')) { this.setToken(token); }
-    return response;
-  }.bind(Interceptor);
-
-  /**
-   * Set the token in the request headers.
-   *
-   * @type {function(this:{token: string, setToken: Function, getToken: Function})}
-   */
-  Interceptor.request = function(config) {
-    if (config.disableJWT) { return config; }
-    var token = this.getToken();
-    if (token) { config.headers['x-jwt-token'] = token; }
-    return config;
-  }.bind(Interceptor);
-  return Interceptor;
-});
+    /**
+     * Set the token in the request headers.
+     *
+     * @type {function(this:{token: string, setToken: Function, getToken: Function})}
+     */
+    Interceptor.request = function(config) {
+      if (config.disableJWT) { return config; }
+      var token = this.getToken();
+      if (token) { config.headers['x-jwt-token'] = token; }
+      return config;
+    }.bind(Interceptor);
+    return Interceptor;
+  }
+]);
 
 app.config([
   '$httpProvider',
