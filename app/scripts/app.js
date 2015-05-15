@@ -240,11 +240,20 @@ angular
         $rootScope.currentState = toState.name;
       });
 
+      // Trigger when a logout occurs.
+      Formio.onLogout.then(function() {
+        $state.go('auth.login');
+      }, function() {
+        $state.go('auth.login');
+        FormioAlerts.addAlert({
+          type: 'danger',
+          message: 'Your session has expired. Please log in again.'
+        });
+      });
+
       // Logout of form.io.
       $rootScope.logout = function() {
-        Formio.logout().then(function() {
-          $state.go('auth.login');
-        }, FormioAlerts.onError.bind(FormioAlerts));
+        Formio.logout();
       };
 
       // Ensure they are logged.
