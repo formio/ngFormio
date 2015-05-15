@@ -477,7 +477,7 @@ app.factory('FormioUtils', function() {
     fieldWrap: function(input) {
       input = input + '<formio-errors></formio-errors>';
       var multiInput = input.replace('data[component.key]', 'data[component.key][$index]');
-      var inputLabel = '<label ng-if="component.label" for="{{ component.key }}" class="control-label">{{ component.label }}</label>';
+      var inputLabel = '<label ng-if="component.label && !component.hideLabel" for="{{ component.key }}" class="control-label">{{ component.label }}</label>';
       var required = '<span ng-if="component.validate.required" class="glyphicon glyphicon-asterisk form-control-feedback field-required" aria-hidden="true"></span>';
       var template =
         '<div ng-if="!component.multiple">' +
