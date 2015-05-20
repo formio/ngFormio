@@ -1,6 +1,7 @@
 {
   "host": "https://form.io",
   "formioHost": "https://formio.form.io",
+  "debug": false,
   "port": 80,
   "formio": {
     "mongo": "mongodb://ec2-52-10-111-228.us-west-2.compute.amazonaws.com:27000/formio"
