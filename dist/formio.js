@@ -88,7 +88,7 @@ app.provider('Formio', function() {
           this.actionUrl = '';
 
           // Normalize to an absolute path.
-          if (path.indexOf('http') !== 0) {
+          if ((path.indexOf('http') !== 0) && (path.indexOf('//') !== 0)) {
             baseUrl = baseUrl ? baseUrl : $location.absUrl().match(/http[s]?:\/\/[^/?]*/)[0] + '/app/api';
             path = baseUrl + path;
           }
