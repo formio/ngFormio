@@ -12,13 +12,21 @@ nunjucks.configure('server/views', {
   express   : app
 });
 
+// Make sure to redirect all http requests to https.
+app.use(function(req, res, next) {
+  if (config.debug || req.secure || (req.get('X-Forwarded-Proto') === 'https')) { return next(); }
+  res.redirect('https://' + req.get('Host') + req.url);
+});
+
 // CORS Support
 app.use(require('cors')());
 
 // Host the dynamic app configuration.
-app.get('/config.js', function(req, res, next) {
+app.get('/config.js', function(req, res) {
+  res.set('Content-Type', 'text/javascript');
   res.render('js/config.js', {
-    appBase: config.host + '/app'
+    host: config.host,
+    formioHost: config.formioHost
   });
 });
 

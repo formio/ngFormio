@@ -1,18 +1,8 @@
 {
   "host": "http://localhost:3000",
+  "formioHost": "http://formio.localhost:3000",
+  "debug": true,
   "port": 3000,
-  "brochure": {
-    "debug": true,
-    "mongo": "mongodb://localhost:27017/formio-brochure",
-    "email": {
-      "user": "no-reply@form.io",
-      "pass": "Jy3orME862G764Qdfm3DbHc"
-    },
-    "admin": {
-      "user": "formio",
-      "pass": "FoRmI@4ever!"
-    }
-  },
   "formio": {
     "mongo": "mongodb://localhost:27017/formio",
     "appSupport": true,

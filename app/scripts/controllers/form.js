@@ -155,16 +155,16 @@ app.directive('formList', function() {
     controller: [
       '$scope',
       '$rootScope',
-      'Formio',
+      'AppConfig',
       function(
         $scope,
         $rootScope,
-        Formio
+        AppConfig
       ) {
         $rootScope.activeSideBar = 'apps';
         $rootScope.noBreadcrumb = false;
         $scope.formsPerPage = $scope.numPerPage;
-        $scope.formsUrl = Formio.baseUrl + '/app/' + $scope.app._id + '/form?type=' + $scope.formType;
+        $scope.formsUrl = AppConfig.apiBase + '/app/' + $scope.app._id + '/form?type=' + $scope.formType;
       }
     ]
   };
@@ -210,9 +210,6 @@ app.controller('FormController', [
 
     // Load the form and submissions.
     $scope.formio = new Formio($scope.formUrl);
-
-    // Set the base url.
-    $scope.rootUrl = Formio.baseUrl;
 
     // Load the form.
     var anonId = '000000000000000000000000';

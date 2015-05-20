@@ -182,7 +182,7 @@ angular
       });
 
       $scope.startTutorial = function() {
-        $window.open('//' + AppConfig.baseUrl + '/start', 'formio-tutorial', 'height=640,width=960');
+        $window.open(AppConfig.tutorial, 'formio-tutorial', 'height=640,width=960');
       };
     }
   ])
@@ -210,11 +210,11 @@ angular
       AppConfig
     ) {
 
-      // urls for Form.io forms.
-      $rootScope.userForm = 'http://formio.' + AppConfig.baseUrl + '/app/api/user';
-      $rootScope.userLoginForm = 'http://formio.' + AppConfig.baseUrl + '/app/api/user/login';
-      $rootScope.userRegisterForm = 'http://formio.' + AppConfig.baseUrl + '/app/api/user/register';
-      $rootScope.teamForm = 'http://formio.' + AppConfig.baseUrl + '/app/api/team';
+      // Set the form.io forms in the root scope.
+      $rootScope.userForm = AppConfig.userForm;
+      $rootScope.userLoginForm = AppConfig.userLoginForm;
+      $rootScope.userRegisterForm = AppConfig.userRegisterForm;
+      $rootScope.teamForm = AppConfig.teamForm;
 
       // Always redirect to login if they are not authenticated.
       $state.go('home');
