@@ -25,6 +25,7 @@ app.use(require('cors')());
 app.get('/config.js', function(req, res) {
   res.set('Content-Type', 'text/javascript');
   res.render('js/config.js', {
+    forceSSL: config.debug ? 'false' : 'true',
     host: config.host,
     formioHost: config.formioHost
   });

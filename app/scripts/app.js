@@ -201,14 +201,23 @@ angular
     'FormioAlerts',
     'Formio',
     'AppConfig',
+    '$location',
+    '$window',
     function(
       $state,
       $stateParams,
       $rootScope,
       FormioAlerts,
       Formio,
-      AppConfig
+      AppConfig,
+      $location,
+      $window
     ) {
+
+      // Force SSL.
+      if (AppConfig.forceSSL && $location.protocol() !== 'https') {
+        $window.location.href = $location.absUrl().replace('http', 'https');
+      }
 
       // Set the form.io forms in the root scope.
       $rootScope.userForm = AppConfig.userForm;

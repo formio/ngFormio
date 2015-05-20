@@ -1,4 +1,5 @@
 angular.module('formioApp').constant('AppConfig', {
+  forceSSL: {{ forceSSL }},
   appBase: '{{ host }}/app',
   apiBase: '{{ host }}/app/api',
   tutorial: '{{ host }}/start',
