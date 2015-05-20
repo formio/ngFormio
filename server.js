@@ -12,6 +12,12 @@ nunjucks.configure('server/views', {
   express   : app
 });
 
+// The healthcheck.
+app.get('/health', function(req, res) {
+  // For now just send OK....
+  res.send('OK');
+});
+
 // Make sure to redirect all http requests to https.
 app.use(function(req, res, next) {
   if (config.debug || req.secure || (req.get('X-Forwarded-Proto') === 'https')) { return next(); }
@@ -29,12 +35,6 @@ app.get('/config.js', function(req, res) {
     host: config.host,
     formioHost: config.formioHost
   });
-});
-
-// The healthcheck.
-app.get('/health', function(req, res) {
-  // For now just send OK....
-  res.send('OK');
 });
 
 // Mount bower_components as assets.
