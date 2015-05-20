@@ -31,6 +31,12 @@ app.get('/config.js', function(req, res) {
   });
 });
 
+// The healthcheck.
+app.get('/health', function(req, res) {
+  // For now just send OK....
+  res.send('OK');
+});
+
 // Mount bower_components as assets.
 app.use('/bower_components', express.static(__dirname + '/bower_components'));
 
