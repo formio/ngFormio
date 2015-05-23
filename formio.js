@@ -693,7 +693,7 @@ app.filter('flattenComponents', function() {
     angular.forEach(components, function(component) {
       if (component.columns && (component.columns.length > 0)) {
         angular.forEach(component.columns, function(column) {
-          flatten(column, flattened);
+          flatten(column.components, flattened);
         });
       }
       else if (component.components && (component.components.length > 0)) {
@@ -852,7 +852,7 @@ app.directive('formioComponent', [
           }
 
           // Allow component keys to look like "settings[username]"
-          if ($scope.component.key.indexOf('[') !== -1) {
+          if ($scope.component.key && $scope.component.key.indexOf('[') !== -1) {
             var matches = $scope.component.key.match(/([^\[]+)\[([^]+)\]/);
             if ((matches.length === 3) && $scope.data.hasOwnProperty(matches[1])) {
               $scope.data = $scope.data[matches[1]];
