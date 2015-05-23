@@ -709,6 +709,12 @@ app.filter('flattenComponents', function() {
   };
 });
 
+app.filter('safehtml', function($sce) {
+  return function(html) {
+    return $sce.trustAsHtml(html);
+  };
+});
+
 app.directive('formioErrors', function() {
   return {
     scope: false,
@@ -1282,6 +1288,28 @@ app.run([
           '<formio-component ng-repeat="component in column.components" component="component" data="data" formio="formio"></formio-component>' +
         '</div>' +
       '</div>'
+    );
+  }
+]);
+
+app.config([
+  'formioComponentsProvider',
+  function(formioComponentsProvider) {
+    formioComponentsProvider.register('content', {
+      title: 'Content',
+      template: 'formio/components/content.html',
+      settings: {
+        input: false,
+        html: ''
+      }
+    });
+  }
+]);
+app.run([
+  '$templateCache',
+  function($templateCache) {
+    $templateCache.put('formio/components/content.html',
+      '<div ng-bind-html="component.html | safehtml"></div>'
     );
   }
 ]);
