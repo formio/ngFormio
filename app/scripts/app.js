@@ -18,6 +18,7 @@ angular
     'ui.bootstrap.tpls',
     'ui.select',
     'angularMoment',
+    'ngCkeditor',
     'formioApp.controllers',
     'formioApp.services',
     'formioApp.directives'
