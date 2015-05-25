@@ -707,11 +707,16 @@ app.filter('flattenComponents', function() {
   };
 });
 
-app.filter('safehtml', function($sce) {
-  return function(html) {
-    return $sce.trustAsHtml(html);
-  };
-});
+app.filter('safehtml', [
+  '$sce',
+  function(
+    $sce
+  ) {
+    return function(html) {
+      return $sce.trustAsHtml(html);
+    };
+  }
+]);
 
 app.directive('formioErrors', function() {
   return {
