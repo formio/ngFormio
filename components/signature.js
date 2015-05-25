@@ -28,7 +28,7 @@ app.directive('signature', function () {
     },
     require: '?ngModel',
     link: function (scope, element, attrs, ngModel) {
-      if (!ngModel) return;
+      if (!ngModel) { return; }
 
       // Sets the dimension of a width or height.
       var setDimension = function(dim) {
@@ -46,6 +46,7 @@ app.directive('signature', function () {
       setDimension('height');
 
       // Create the signature pad.
+      /* global SignaturePad:false */
       var signaturePad = new SignaturePad(element[0], {
         minWidth: scope.component.minWidth,
         maxWidth: scope.component.maxWidth,
@@ -65,19 +66,22 @@ app.directive('signature', function () {
         'border': '1px solid #f4f4f4'
       });
 
-      ngModel.$render = function () {
-        signaturePad.fromDataURL(ngModel.$viewValue)
-      };
-      signaturePad.onEnd = function () {
-        scope.$evalAsync(read);
-      };
-      read();
-      function read() {
+      function readSignature() {
         var dataUrl = signaturePad.toDataURL();
         ngModel.$setViewValue(dataUrl);
       }
+
+      ngModel.$render = function () {
+        signaturePad.fromDataURL(ngModel.$viewValue);
+      };
+      signaturePad.onEnd = function () {
+        scope.$evalAsync(readSignature);
+      };
+
+      // Read the signature.
+      readSignature();
     }
-  }
+  };
 });
 app.run([
   '$templateCache',
