@@ -493,7 +493,10 @@ app.factory('FormioUtils', function() {
     flattenComponents: function flatten(components, flattened) {
       flattened = flattened || {};
       angular.forEach(components, function(component) {
-        if (component.columns && (component.columns.length > 0)) {
+        if (component.tree) {
+          flattened[component.key] = component;
+        }
+        else if (component.columns && (component.columns.length > 0)) {
           angular.forEach(component.columns, function(column) {
             flatten(column.components, flattened);
           });
