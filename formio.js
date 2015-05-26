@@ -490,6 +490,23 @@ app.factory('FormioScope', [
 
 app.factory('FormioUtils', function() {
   return {
+    flattenComponents: function flatten(components, flattened) {
+      flattened = flattened || {};
+      angular.forEach(components, function(component) {
+        if (component.columns && (component.columns.length > 0)) {
+          angular.forEach(component.columns, function(column) {
+            flatten(column.components, flattened);
+          });
+        }
+        else if (component.components && (component.components.length > 0)) {
+          flatten(component.components, flattened);
+        }
+        else if (component.input) {
+          flattened[component.key] = component;
+        }
+      });
+      return flattened;
+    },
     fieldWrap: function(input) {
       input = input + '<formio-errors></formio-errors>';
       var multiInput = input.replace('data[component.key]', 'data[component.key][$index]');
@@ -542,11 +559,13 @@ app.directive('formio', function() {
       '$http',
       'FormioScope',
       'Formio',
+      'FormioUtils',
       function(
         $scope,
         $http,
         FormioScope,
-        Formio
+        Formio,
+        FormioUtils
       ) {
         $scope.formioAlerts = [];
         $scope.formio = FormioScope.register($scope, {
@@ -566,7 +585,9 @@ app.directive('formio', function() {
           if ($scope._submission.data._id) {
             submissionData._id = $scope._submission.data._id;
           }
-          angular.forEach($scope._form.components, function(component) {
+
+          var components = FormioUtils.flattenComponents($scope._form.components);
+          angular.forEach(components, function(component) {
             if ($scope._submission.data.hasOwnProperty(component.key)) {
               submissionData.data[component.key] = $scope._submission.data[component.key];
             }
@@ -687,25 +708,12 @@ app.directive('formioDelete', function() {
 /**
  * Filter to flatten form components.
  */
-app.filter('flattenComponents', function() {
-  return function flatten(components, flattened) {
-    flattened = flattened || {};
-    angular.forEach(components, function(component) {
-      if (component.columns && (component.columns.length > 0)) {
-        angular.forEach(component.columns, function(column) {
-          flatten(column.components, flattened);
-        });
-      }
-      else if (component.components && (component.components.length > 0)) {
-        flatten(component.components, flattened);
-      }
-      else if (component.input) {
-        flattened[component.key] = component;
-      }
-    });
-    return flattened;
-  };
-});
+app.filter('flattenComponents', [
+  'FormioUtils',
+  function(FormioUtils) {
+    return FormioUtils.flattenComponents;
+  }
+]);
 
 app.filter('safehtml', [
   '$sce',

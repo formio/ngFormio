@@ -42,7 +42,7 @@ app.run([
         '<ul class="dropdown-menu" role="menu">' +
           '<datetimepicker ' +
             'ng-model="data[component.key]" ' +
-            'data-datetimepicker-config="{ minuteStep: component.minuteStep, dropdownSelector: \'#\' + component.key + \'-dropdown\' }">' +
+            'data-datetimepicker-config="{minuteStep: component.minuteStep, dropdownSelector: \'#\' + component.key + \'-dropdown\'}">' +
           '</datetimepicker>' +
         '</ul>' +
       '</div>'
