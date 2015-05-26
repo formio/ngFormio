@@ -1,6 +1,6 @@
 (function () {
 'use strict';
-var app = angular.module('formio', []);
+var app = angular.module('formio', ['ui.bootstrap.datetimepicker']);
 
 /**
  * Create the formio provider.
@@ -1319,15 +1319,6 @@ app.run([
   }
 ]);
 
-app.directive('dateTimePicker', function() {
-  return {
-    restrict: 'AE',
-    scope: false,
-    link: function(scope, element) {
-      element.datetimepicker();
-    }
-  };
-});
 app.config([
   'formioComponentsProvider',
   function(formioComponentsProvider) {
@@ -1339,9 +1330,9 @@ app.config([
         label: '',
         key: '',
         placeholder: '',
-        prefix: '',
-        suffix: '',
-        multiple: false,
+        minuteStep: 15,
+        protected: false,
+        persistent: true,
         validate: {
           required: false,
           custom: ''
@@ -1352,10 +1343,31 @@ app.config([
 ]);
 app.run([
   '$templateCache',
-  function($templateCache) {
-    $templateCache.put('formio/components/datetime.html',
-      ''
-    );
+  'FormioUtils',
+  function($templateCache, FormioUtils) {
+    $templateCache.put('formio/components/datetime.html', FormioUtils.fieldWrap(
+      '<div class="dropdown">' +
+        '<a class="dropdown-toggle" id="{{ component.key + \'-dropdown\' }}"role="button" data-toggle="dropdown" data-target="#" href="javascript:void(0);">' +
+          '<div class="input-group">' +
+            '<span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>' +
+            '<input type="text"' +
+              'class="form-control" ' +
+              'id="{{ component.key }}" ' +
+              'name="{{ component.key }}" ' +
+              'data-ng-model="data[component.key]" ' +
+              'placeholder="{{ component.placeholder }}" ' +
+              'custom-validator="component.validate.custom" ' +
+              'ng-required="component.validate.required">' +
+          '</div>' +
+        '</a>' +
+        '<ul class="dropdown-menu" role="menu">' +
+          '<datetimepicker ' +
+            'ng-model="data[component.key]" ' +
+            'data-datetimepicker-config="{ minuteStep: component.minuteStep, dropdownSelector: \'#\' + component.key + \'-dropdown\' }">' +
+          '</datetimepicker>' +
+        '</ul>' +
+      '</div>'
+    ));
   }
 ]);
 
