@@ -2,7 +2,7 @@ app.config([
   'formioComponentsProvider',
   function(formioComponentsProvider) {
     formioComponentsProvider.register('datetime', {
-      title: 'Date / Time',
+      title: 'Date / Time (Coming Soon)',
       template: 'formio/components/datetime.html',
       settings: {
         input: true,
