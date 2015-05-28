@@ -9,6 +9,7 @@ app.provider('Formio', function() {
 
   // The default base url.
   var baseUrl = '';
+  var noalias = false;
   var rootUrl = '';
   var cache = {};
 
@@ -49,7 +50,8 @@ app.provider('Formio', function() {
   return {
 
     // Set the base URL for the formio API.
-    setBaseUrl: function(url) {
+    setBaseUrl: function(url, _noalias) {
+      noalias = _noalias;
       baseUrl = url;
     },
     $get: [
@@ -96,9 +98,9 @@ app.provider('Formio', function() {
           var hostparts = getUrlParts(path);
           var hostnames = (hostparts.length > 2) ? hostparts[2].split('.') : [];
           var subdomain = '';
-          if (
+          if (!noalias && (
             ((hostnames.length === 2) && (hostnames[1].indexOf('localhost') === 0)) || (hostnames.length >= 3)
-          ) {
+          )) {
             subdomain = hostnames[0];
             this.appId = subdomain;
           }
