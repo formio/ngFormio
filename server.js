@@ -3,7 +3,6 @@ var formio = require('formio')(config.formio);
 var express = require('express');
 var nunjucks = require('nunjucks');
 var basicAuth = require('basic-auth-connect');
-var MongoClient = require('mongodb').MongoClient;
 var _ = require('lodash');
 var app = express();
 
@@ -13,21 +12,13 @@ nunjucks.configure('server/views', {
   express   : app
 });
 
-// The database connection.
-var database = null;
-var connection = (typeof config.formio.mongo === 'string') ? config.formio.mongo : config.formio.mongo.join(',');
-MongoClient.connect(connection, function(err, db) {
-  if (err) { return console.log('Error connecting to database.'); }
-  console.log('Connected to database!');
-  database = db;
-});
-
 // The healthcheck.
 app.get('/health', function(req, res) {
-  if (!database) { return res.status(500); }
-  database.collection('applications').find({name: 'formio'}).toArray(function(err, result) {
-    if (err) { return res.status(500); }
-    if (!result || !result.length) { return res.status(500); }
+  if (!formio.resources) { return res.sendStatus(500); }
+  if (!formio.resources.application.model) { return res.sendStatus(500); }
+  formio.resources.application.model.findOne({name: 'formio'}, function(err, result) {
+    if (err) { return res.sendStatus(500); }
+    if (!result) { return res.status(500); }
     res.send('OK');
   });
 });
