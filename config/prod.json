@@ -4,6 +4,10 @@
   "debug": false,
   "port": 80,
   "formio": {
-    "mongo": "mongodb://ec2-52-10-111-228.us-west-2.compute.amazonaws.com:27000/formio"
+    "mongo": [
+      "mongodb://ec2-52-26-5-173.us-west-2.compute.amazonaws.com:27000/formio",
+      "mongodb://ec2-52-26-6-42.us-west-2.compute.amazonaws.com:27000/formio",
+      "mongodb://ec2-52-11-52-136.us-west-2.compute.amazonaws.com:27000/formio"
+    ]
   }
 }
