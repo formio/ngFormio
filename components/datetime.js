@@ -1,23 +1,23 @@
 app.config([
   'formioComponentsProvider',
   function(formioComponentsProvider) {
-    formioComponentsProvider.register('datetime', {
-      title: 'Date / Time',
-      template: 'formio/components/datetime.html',
-      settings: {
-        input: true,
-        label: '',
-        key: '',
-        placeholder: '',
-        minuteStep: 15,
-        protected: false,
-        persistent: true,
-        validate: {
-          required: false,
-          custom: ''
-        }
-      }
-    });
+    // formioComponentsProvider.register('datetime', {
+    //   title: 'Date / Time',
+    //   template: 'formio/components/datetime.html',
+    //   settings: {
+    //     input: true,
+    //     label: '',
+    //     key: '',
+    //     placeholder: '',
+    //     minuteStep: 15,
+    //     protected: false,
+    //     persistent: true,
+    //     validate: {
+    //       required: false,
+    //       custom: ''
+    //     }
+    //   }
+    // });
   }
 ]);
 app.run([
