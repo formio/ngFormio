@@ -58,6 +58,11 @@ In order to develop against the application, you will need to utilize Gulp.
   - ```gulp serve```
 
 You should now be able to see the form.io application @ http://localhost:9002.
+  
+With these watches running, you can now make changes directly within the formio and ngFormBuilder
+bower_components and those changes will be immediately reflected on the browser. You can then 
+check in any changes to the bower_components since each of these are simply a submodule of the
+base formio-app.
 
 Contributing
 ----------------
@@ -68,8 +73,3 @@ gulp build
 ```
 
 Then run the project using ```node server``` and then test the project @ https://localhost:3000 before committing your code to a pull request.
-  
-With these watches running, you can now make changes directly within the formio and ngFormBuilder
-bower_components and those changes will be immediately reflected on the browser. You can then 
-check in any changes to the bower_components since each of these are simply a submodule of the
-base formio-app.
