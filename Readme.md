@@ -20,6 +20,10 @@ Next, you will need to run MongoDB.
 
   - ```mongod```
 
+Next, get a database backup, and then do the following.
+ - Unzip the database so that it is a folder of BSON files.
+ - ```mongorestore --db formio formio```
+
 Next, you will then run npm and bower install, and then Update the submodules.
 
   - ```npm install```
