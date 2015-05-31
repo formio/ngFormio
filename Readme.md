@@ -34,6 +34,7 @@ Next, you will then run npm and bower install, and then Update the submodules.
   
 You should then be able to run the application locally by typing.
 
+  - ```cd ../..```
   - ```node server```
   
 You should then be able to go to http://localhost:3000 to see the https://form.io application.
