@@ -101,8 +101,14 @@ angular
         .state('app.edit', {
           url: '/edit',
           parent: 'app',
-          templateUrl: 'views/app/app-form.html',
+          templateUrl: 'views/app/edit.html',
           controller: 'AppEditController'
+        })
+        .state('app.settings', {
+          url: '/settings',
+          parent: 'app',
+          templateUrl: 'views/app/settings.html',
+          controller: 'AppSettingsController'
         })
         .state('app.delete', {
           url: '/delete',

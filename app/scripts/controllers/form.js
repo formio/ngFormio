@@ -314,15 +314,18 @@ app.factory('FormioAlerts', [
         alerts = [];
         return tempAlerts;
       },
-      onError: function (error) {
-        var errors = error.hasOwnProperty('errors') ? error.errors : error.data.errors;
-        _.each(errors, function (error) {
+      onError: function showError(error) {
+        if (error.message) {
           this.addAlert({
             type: 'danger',
             message: error.message,
             element: error.path
           });
-        }.bind(this));
+        }
+        else {
+          var errors = error.hasOwnProperty('errors') ? error.errors : error.data.errors;
+          _.each(errors, showError.bind(this));
+        }
       }
     };
   }

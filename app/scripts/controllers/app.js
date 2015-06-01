@@ -73,11 +73,15 @@ app.controller('AppController', [
   '$rootScope',
   '$stateParams',
   'Formio',
+  'FormioAlerts',
+  '$state',
   function(
     $scope,
     $rootScope,
     $stateParams,
-    Formio
+    Formio,
+    FormioAlerts,
+    $state
   ) {
     $rootScope.activeSideBar = 'apps';
     $rootScope.noBreadcrumb = false;
@@ -96,6 +100,20 @@ app.controller('AppController', [
       $scope.currentApp = result;
       $rootScope.currentApp = result;
     });
+
+    // Save the application.
+    $scope.saveApplication = function() {
+      if (!$scope.currentApp._id) { return FormioAlerts.onError(new Error('No application found.')); }
+      $scope.formio.saveApp($scope.currentApp).then(function (app) {
+        FormioAlerts.addAlert({
+          type: 'success',
+          message: 'Application saved.'
+        });
+        $state.go('app.view', {
+          appId: app._id
+        });
+      }, FormioAlerts.onError.bind(FormioAlerts));
+    };
   }
 ]);
 
@@ -103,28 +121,26 @@ app.controller('AppEditController', [
   '$scope',
   '$rootScope',
   '$state',
-  'FormioAlerts',
   'Formio',
   function(
     $scope,
     $rootScope,
     $state,
-    FormioAlerts,
     Formio
   ) {
     $rootScope.noBreadcrumb = false;
     $scope.users = [];
     $scope.refreshUsers = refreshUsers(new Formio($rootScope.userForm), $scope);
-    $scope.saveApplication = function() {
-      if (!$scope.currentApp._id) { return FormioAlerts.onError(new Error('No application found.')); }
-      $scope.formio.saveApp($scope.currentApp).then(function () {
-        FormioAlerts.addAlert({
-          type: 'success',
-          message: 'Application saved.'
-        });
-        $state.go('home');
-      }).error(FormioAlerts.onError.bind(FormioAlerts));
-    };
+  }
+]);
+
+app.controller('AppSettingsController', [
+  '$scope',
+  function(
+    $scope
+  ) {
+    $scope.active = 'email';
+    $scope.subActive = '';
   }
 ]);
 
@@ -145,7 +161,7 @@ app.controller('AppDeleteController', [
           message: 'Application was deleted!'
         });
         $state.go('home');
-      }).error(FormioAlerts.onError.bind(FormioAlerts));
+      }, FormioAlerts.onError.bind(FormioAlerts));
     };
   }
 ]);

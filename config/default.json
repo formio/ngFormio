@@ -7,8 +7,8 @@
     "mongo": "mongodb://localhost:27017/formio",
     "appSupport": true,
     "email": {
-      "user": "no-reply@form.io",
-      "pass": "Jy3orME862G764Qdfm3DbHc"
+      "username": "formio",
+      "password": "5a4tUUz1&rJ0"
     },
     "jwt": {
       "secret": "h3cb9%9H9y8p24uU4s",
