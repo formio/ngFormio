@@ -23,4 +23,5 @@
         </ui-select>
     </div>
     <button type="submit" class="btn btn-primary">Save</button>
+    <a ng-if="currentApp && currentApp._id" ui-sref="app.delete()" class="btn btn-danger">Delete</a>
 </form>
