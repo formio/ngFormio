@@ -16,7 +16,7 @@ module.exports = function(gulp, plugins) {
         cwd: 'app/'
       })))
       .pipe(wiredep({
-        exclude: ['bootstrap-sass-official', 'bower_components/bootstrap'],
+        exclude: ['bootstrap-sass-official', 'bower_components/bootstrap/'],
         ignorePath: /^(\.\.\/)*\.\./
       }))
       .pipe(gulp.dest('app'));
