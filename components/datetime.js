@@ -9,7 +9,29 @@ app.config([
         label: '',
         key: '',
         placeholder: '',
-        minuteStep: 15,
+        format: 'yyyy-MM-dd HH:mm',
+        default: '',
+        enableDate: true,
+        enableTime: true,
+        datePicker: {
+          minDate: null,
+          maxDate: null,
+          showWeeks: true,
+          startingDay: 1,
+          initDate: '',
+          minMode: 'day',
+          maxMode: 'year',
+          yearRange: '20'
+        },
+        timePicker: {
+          hourStep: 1,
+          minuteStep: 1,
+          showMeridian: true,
+          meridians: null,
+          readonlyInput: false,
+          mousewheel: true,
+          arrowkeys: true
+        },
         protected: false,
         persistent: true,
         validate: {
@@ -25,27 +47,23 @@ app.run([
   'FormioUtils',
   function($templateCache, FormioUtils) {
     $templateCache.put('formio/components/datetime.html', FormioUtils.fieldWrap(
-      '<div class="dropdown">' +
-        '<a class="dropdown-toggle" id="{{ component.key + \'-dropdown\' }}"role="button" data-toggle="dropdown" data-target="#" href="javascript:void(0);">' +
-          '<div class="input-group">' +
-            '<span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>' +
-            '<input type="text"' +
-              'class="form-control" ' +
-              'id="{{ component.key }}" ' +
-              'name="{{ component.key }}" ' +
-              'data-ng-model="data[component.key]" ' +
-              'placeholder="{{ component.placeholder }}" ' +
-              'custom-validator="component.validate.custom" ' +
-              'ng-required="component.validate.required">' +
-          '</div>' +
-        '</a>' +
-        '<ul class="dropdown-menu" role="menu">' +
-          '<datetimepicker ' +
-            'ng-model="data[component.key]" ' +
-            'data-datetimepicker-config="{minuteStep: component.minuteStep, dropdownSelector: \'#\' + component.key + \'-dropdown\'}">' +
-          '</datetimepicker>' +
-        '</ul>' +
-      '</div>'
+      '<p class="input-group">' +
+        '<input type="text" class="form-control" ' +
+          'ng-init="calendarOpen = false" ' +
+          'is-open="calendarOpen" ' +
+          'datetime-picker="component.format" ' +
+          'enable-date="component.enableDate" ' +
+          'enable-time="component.enableTime" ' +
+          'ng-model="data[component.key]" ' +
+          'datepicker-options="component.datePicker" ' +
+          'timepicker-options="component.timePicker" />' +
+        '<span class="input-group-btn">' +
+          '<button type="button" class="btn btn-default" ng-click="calendarOpen = true">' +
+            '<i ng-if="component.enableDate" class="fa fa-calendar"></i>' +
+            '<i ng-if="!component.enableDate" class="fa fa-clock-o"></i>' +
+          '</button>' +
+        '</span>' +
+      '</p>'
     ));
   }
 ]);

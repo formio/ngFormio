@@ -1,4 +1,7 @@
-var app = angular.module('formio', []);
+var app = angular.module('formio', [
+  'ui.bootstrap',
+  'ui.bootstrap.datetimepicker'
+]);
 
 /**
  * Create the formio provider.
