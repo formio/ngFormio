@@ -10,14 +10,14 @@ app.config([
         key: '',
         placeholder: '',
         format: 'yyyy-MM-dd HH:mm',
-        default: '',
         enableDate: true,
         enableTime: true,
+        minDate: null,
+        maxDate: null,
+        datepickerMode: 'day',
         datePicker: {
-          minDate: null,
-          maxDate: null,
           showWeeks: true,
-          startingDay: 1,
+          startingDay: 0,
           initDate: '',
           minMode: 'day',
           maxMode: 'year',
@@ -27,7 +27,6 @@ app.config([
           hourStep: 1,
           minuteStep: 1,
           showMeridian: true,
-          meridians: null,
           readonlyInput: false,
           mousewheel: true,
           arrowkeys: true
@@ -47,14 +46,20 @@ app.run([
   'FormioUtils',
   function($templateCache, FormioUtils) {
     $templateCache.put('formio/components/datetime.html', FormioUtils.fieldWrap(
-      '<p class="input-group">' +
+      '<div class="input-group">' +
         '<input type="text" class="form-control" ' +
+          'ng-focus="calendarOpen = true" ' +
+          'ng-click="calendarOpen = true" ' +
           'ng-init="calendarOpen = false" ' +
           'is-open="calendarOpen" ' +
-          'datetime-picker="component.format" ' +
+          'datetime-picker="{{ component.format }}" ' +
+          'min-date="component.minDate" ' +
+          'max-date="component.maxDate" ' +
+          'datepicker-mode="component.datepickerMode" ' +
           'enable-date="component.enableDate" ' +
           'enable-time="component.enableTime" ' +
           'ng-model="data[component.key]" ' +
+          'placeholder="{{ component.placeholder }}" ' +
           'datepicker-options="component.datePicker" ' +
           'timepicker-options="component.timePicker" />' +
         '<span class="input-group-btn">' +
@@ -63,7 +68,7 @@ app.run([
             '<i ng-if="!component.enableDate" class="fa fa-clock-o"></i>' +
           '</button>' +
         '</span>' +
-      '</p>'
+      '</div>'
     ));
   }
 ]);
