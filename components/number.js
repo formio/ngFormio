@@ -17,8 +17,6 @@ app.config([
           required: false,
           min: '',
           max: '',
-          greater: '',
-          less: '',
           step: 'any',
           integer: '',
           multiple: '',
