@@ -11,6 +11,22 @@ body {
   padding-top: 50px;
 }
 
+.form-field-type-hidden {
+  margin: 0;
+  padding: 0;
+}
+
+.component-form-group.component-type-hidden {
+  height: 3em;
+  border: 2px dashed #ddd;
+}
+
+.component-form-group.component-type-hidden .form-group {
+  text-align: center;
+  color: #aaa;
+  padding-top: 0.5em;
+}
+
 .datetime-picker div > table .btn-default {
   border: 0;
   background-color: #fff;
