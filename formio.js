@@ -1068,7 +1068,7 @@ app.run([
     // A formio component template.
     $templateCache.put('formio/component.html',
       '<ng-form name="formioFieldForm">' +
-        '<div class="form-group has-feedback" id="form-group-{{ component.key }}" ng-class="{\'has-error\': formioFieldForm[component.key].$invalid && !formioFieldForm[component.key].$pristine }">' +
+        '<div class="form-group has-feedback form-field-type-{{ component.type }}" id="form-group-{{ component.key }}" ng-class="{\'has-error\': formioFieldForm[component.key].$invalid && !formioFieldForm[component.key].$pristine }">' +
           '<formio-element></formio-element>' +
         '</div>' +
       '</ng-form>'

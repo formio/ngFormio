@@ -6,7 +6,11 @@ app.config([
       template: 'formio/components/hidden.html',
       settings: {
         input: true,
-        key: ''
+        key: '',
+        label: '',
+        protected: false,
+        unique: false,
+        persistent: true
       }
     });
   }
@@ -15,7 +19,7 @@ app.run([
   '$templateCache',
   function($templateCache) {
     $templateCache.put('formio/components/hidden.html',
-      '<input type="hidden" id="{{ component.key }}" name="{{ component.key }} ng-model="data[component.key]">'
+      '<input type="hidden" id="{{ component.key }}" name="{{ component.key }}" ng-model="data[component.key]">'
     );
   }
 ]);

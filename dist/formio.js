@@ -1070,7 +1070,7 @@ app.run([
     // A formio component template.
     $templateCache.put('formio/component.html',
       '<ng-form name="formioFieldForm">' +
-        '<div class="form-group has-feedback" id="form-group-{{ component.key }}" ng-class="{\'has-error\': formioFieldForm[component.key].$invalid && !formioFieldForm[component.key].$pristine }">' +
+        '<div class="form-group has-feedback form-field-type-{{ component.type }}" id="form-group-{{ component.key }}" ng-class="{\'has-error\': formioFieldForm[component.key].$invalid && !formioFieldForm[component.key].$pristine }">' +
           '<formio-element></formio-element>' +
         '</div>' +
       '</ng-form>'
@@ -1468,7 +1468,11 @@ app.config([
       template: 'formio/components/hidden.html',
       settings: {
         input: true,
-        key: ''
+        key: '',
+        label: '',
+        protected: false,
+        unique: false,
+        persistent: true
       }
     });
   }
@@ -1477,7 +1481,7 @@ app.run([
   '$templateCache',
   function($templateCache) {
     $templateCache.put('formio/components/hidden.html',
-      '<input type="hidden" id="{{ component.key }}" name="{{ component.key }} ng-model="data[component.key]">'
+      '<input type="hidden" id="{{ component.key }}" name="{{ component.key }}" ng-model="data[component.key]">'
     );
   }
 ]);
