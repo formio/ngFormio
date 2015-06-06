@@ -1,4 +1,5 @@
-var config = require('config');
+require('dotenv').load({silent: true});
+var config = require('./config')();
 var formio = require('formio')(config.formio);
 var express = require('express');
 var nunjucks = require('nunjucks');
