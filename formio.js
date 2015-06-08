@@ -636,11 +636,6 @@ app.directive('formio', function() {
             $scope.$emit('formSubmission', submissionData);
           }
         };
-
-        // Handle the form submit event.
-        $scope.$on('submit', function() {
-          $scope.onSubmit();
-        });
       }
     ],
     templateUrl: 'formio.html'
