@@ -582,8 +582,8 @@ app.directive('formio', function() {
         });
 
         // Called when the form is submitted.
-        $scope.onSubmit = function(isValid) {
-          if (!isValid) { return; }
+        $scope.onSubmit = function() {
+          if (!$scope.formioForm.$valid) { return; }
 
           // Create a sanitized submission object.
           var submissionData = {data: {}};
@@ -636,6 +636,11 @@ app.directive('formio', function() {
             $scope.$emit('formSubmission', submissionData);
           }
         };
+
+        // Handle the form submit event.
+        $scope.$on('submit', function() {
+          $scope.onSubmit();
+        });
       }
     ],
     templateUrl: 'formio.html'
@@ -812,7 +817,8 @@ app.directive('formioComponent', [
       scope: {
         component: '=',
         data: '=',
-        formio: '='
+        formio: '=',
+        form: '='
       },
       templateUrl: 'formio/component.html',
       controller: [
@@ -1015,13 +1021,12 @@ app.run([
 
     // The template for the formio forms.
     $templateCache.put('formio.html',
-      '<form role="form" name="formioForm" ng-submit="onSubmit(formioForm.$valid)" novalidate>' +
+      '<form role="form" name="formioForm" novalidate>' +
         '<i id="formio-loading" style="font-size: 2em;" class="fa fa-spinner fa-pulse"></i>' +
         '<div ng-repeat="alert in formioAlerts" class="alert alert-{{ alert.type }}" role="alert">' +
           '{{ alert.message }}' +
         '</div>' +
-        '<formio-component ng-repeat="component in _form.components track by $index" component="component" data="_submission.data" formio="formio"></formio-component>' +
-        '<button ng-show="_form.components.length" type="submit" class="btn btn-primary" ng-disabled="formioForm.$invalid">Submit</button>' +
+        '<formio-component ng-repeat="component in _form.components track by $index" component="component" data="_submission.data" form="formioForm" formio="formio"></formio-component>' +
       '</form>'
     );
 
