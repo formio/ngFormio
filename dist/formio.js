@@ -1197,7 +1197,7 @@ app.config([
         $scope.refreshAddress = function(address) {
           var params = {address: address, sensor: false};
           return $http.get(
-            'http://maps.googleapis.com/maps/api/geocode/json',
+            'https://maps.googleapis.com/maps/api/geocode/json',
             {
               disableJWT: true,
               params: params,
