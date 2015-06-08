@@ -16,7 +16,7 @@
             <accordion-group heading="Form API" is-open="true" class="panel-info">
                 <p><strong>Your form API is now ready to use!</strong> The following API was created that maps directly to this form interface.</p>
                 <p>This API can be found by going to the following URL.</p>
-                <p><pre><code>http://{{ currentApp.name }}.form.io/app/api/{{ form.path }}</code></pre></p>
+                <p><pre><code>https://{{ currentApp.name }}.form.io/app/api/{{ form.path }}</code></pre></p>
             </accordion-group>
             <accordion-group heading="API Specification" class="panel-info">
                 <iframe id="docs" ng-src="{{ getSwaggerURL() | trusted }}"></iframe>
@@ -29,9 +29,9 @@
             </accordion-group>
             <accordion-group heading="Application Embedding" class="panel-info">
                 <p>To add this form to your application, start by including the following script in your application.</p>
-                <p><pre><code>&lt;script src="http://form.io/bower_components/formio/dist/formio.min.js" type="text/javascript"&gt;&lt;/script&gt;</code></pre></p>
+                <p><pre><code>&lt;script src="https://form.io/bower_components/formio/dist/formio.min.js" type="text/javascript"&gt;&lt;/script&gt;</code></pre></p>
                 <p>Now, within your HTML source, you can use the <strong><code style="color:#333;">&lt;formio&gt;</code></strong> directive like so.
-                <pre><code>&lt;formio src="'http://{{ currentApp.name }}.form.io/app/api/{{ form.path }}'"&gt;&lt;/formio&gt;</code></pre>
+                <pre><code>&lt;formio src="'https://{{ currentApp.name }}.form.io/app/api/{{ form.path }}'"&gt;&lt;/formio&gt;</code></pre>
             </accordion-group>
         </accordion>
     </div>
