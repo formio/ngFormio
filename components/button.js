@@ -25,7 +25,7 @@ app.run([
     $templateCache
   ) {
     $templateCache.put('formio/components/button.html',
-      '<button type="button" ng-class="{\'btn-block\': component.block}" class="btn btn-{{ component.theme }} btn-{{ component.size }}" ng-disabled="component.disableOnInvalid && form.$invalid" ng-click="$emit(component.action)">' +
+      '<button ng-class="{\'btn-block\': component.block}" class="btn btn-{{ component.theme }} btn-{{ component.size }}" ng-disabled="component.disableOnInvalid && form.$invalid" ng-click="$emit(component.action)">' +
         '<span ng-if="component.leftIcon" class="{{ component.leftIcon }}" aria-hidden="true"></span>' +
         '<span ng-if="component.leftIcon && component.label">&nbsp;</span>' +
         '{{ component.label }}' +

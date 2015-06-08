@@ -1023,7 +1023,7 @@ app.run([
 
     // The template for the formio forms.
     $templateCache.put('formio.html',
-      '<form role="form" name="formioForm" novalidate>' +
+      '<form role="form" name="formioForm" ng-submit="onSubmit()" novalidate>' +
         '<i id="formio-loading" style="font-size: 2em;" class="fa fa-spinner fa-pulse"></i>' +
         '<div ng-repeat="alert in formioAlerts" class="alert alert-{{ alert.type }}" role="alert">' +
           '{{ alert.message }}' +
@@ -1270,7 +1270,7 @@ app.run([
     $templateCache
   ) {
     $templateCache.put('formio/components/button.html',
-      '<button type="button" ng-class="{\'btn-block\': component.block}" class="btn btn-{{ component.theme }} btn-{{ component.size }}" ng-disabled="component.disableOnInvalid && form.$invalid" ng-click="$emit(component.action)">' +
+      '<button ng-class="{\'btn-block\': component.block}" class="btn btn-{{ component.theme }} btn-{{ component.size }}" ng-disabled="component.disableOnInvalid && form.$invalid" ng-click="$emit(component.action)">' +
         '<span ng-if="component.leftIcon" class="{{ component.leftIcon }}" aria-hidden="true"></span>' +
         '<span ng-if="component.leftIcon && component.label">&nbsp;</span>' +
         '{{ component.label }}' +
