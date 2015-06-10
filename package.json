@@ -3,6 +3,11 @@
   "engines": {
     "node": ">=0.10.0"
   },
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Warning: no test specified\" && exit 0"
+  },
+  "main": "./server.js",
   "devDependencies": {
     "autoprefixer-core": "^4.0.2",
     "browser-sync": "^1.8.2",
@@ -47,6 +52,7 @@
     "cors": "^2.5.3",
     "dotenv": "^1.1.0",
     "express": "^4.12.3",
+    "formio": "git+ssh://git@github.com/formio/formio.git",
     "lodash": "^3.6.0",
     "moment": "^2.10.2",
     "mongodb": "^2.0.27",
