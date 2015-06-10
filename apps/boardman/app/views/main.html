@@ -8,7 +8,7 @@
   <div class="col-sm-4">
     <div class="panel panel-success">
       <div class="panel-heading">
-        <h3 class="panel-title"><a ui-sref="listQuotes()" class="btn btn-default"><i class="fa fa-dollar"></i> Quotes</a></h3>
+        <h3 class="panel-title"><a ui-sref="quoteIndex()" class="btn btn-default"><i class="fa fa-dollar"></i> Quotes</a></h3>
       </div>
       <div class="panel-body">
         <table class="table table-striped">
@@ -22,13 +22,13 @@
           <tbody>
           <tr data-ng-repeat="quote in quotes">
             <td>
-              <a ui-sref="viewQuote({quoteId: quote._id})">{{ quote.data.type }}</a>
+              <a ui-sref="quote.view({id: quote._id})">{{ quote.data.type }}</a>
             </td>
             <td>{{ quote.created | amDateFormat:'MMMM Do YYYY' }}</td>
             <td>
               <div class="button-group">
-                <a ui-sref="editQuote({quoteId: quote._id})" class="btn btn-default"><span class="glyphicon glyphicon-edit"></span></a>
-                <a ui-sref="deleteQuote({quoteId: quote._id})" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle"></span></a>
+                <a ui-sref="quote.edit({id: quote._id})" class="btn btn-default"><span class="glyphicon glyphicon-edit"></span></a>
+                <a ui-sref="quote.delete({id: quote._id})" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle"></span></a>
               </div>
             </td>
           </tr>
@@ -37,14 +37,14 @@
         <bgf-pagination collection="quotes" url="quotesUrl" per-page="5" template-url="./views/pager.html"></bgf-pagination>
       </div>
       <div class="panel-footer">
-        <a ui-sref="createQuote()" class="btn btn-primary btn-lg"><i class="glyphicon glyphicon-plus"></i> New Quote</a>
+        <a ui-sref="quoteCreate()" class="btn btn-primary btn-lg"><i class="glyphicon glyphicon-plus"></i> New Quote</a>
       </div>
     </div>
   </div>
   <div class="col-sm-4">
     <div class="panel panel-success">
       <div class="panel-heading">
-        <h3 class="panel-title"><a ui-sref="listCustomers()" class="btn btn-default"><i class="fa fa-users"></i> Customers</a></h3>
+        <h3 class="panel-title"><a ui-sref="customerIndex()" class="btn btn-default"><i class="fa fa-users"></i> Customers</a></h3>
       </div>
       <div class="panel-body">
         <table class="table table-striped">
@@ -58,15 +58,15 @@
           <tbody>
           <tr data-ng-repeat="customer in customers">
             <td>
-              <a ui-sref="viewCustomer({customerId: customer._id})">
+              <a ui-sref="customer.view({id: customer._id})">
                 {{ customer.data.firstName }} {{ customer.data.lastName }}
               </a>
             </td>
             <td>{{ customer.created | amDateFormat:'MMMM Do YYYY' }}</td>
             <td>
               <div class="button-group">
-                <a ui-sref="editCustomer({customerId: customer._id})" class="btn btn-default"><span class="glyphicon glyphicon-edit"></span></a>
-                <a ui-sref="deleteCustomer({customerId: customer._id})" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle"></span></a>
+                <a ui-sref="customer.edit({id: customer._id})" class="btn btn-default"><span class="glyphicon glyphicon-edit"></span></a>
+                <a ui-sref="customer.delete({id: customer._id})" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle"></span></a>
               </div>
             </td>
           </tr>
@@ -75,14 +75,14 @@
         <bgf-pagination collection="customers" url="customersUrl" per-page="5" template-url="./views/pager.html"></bgf-pagination>
       </div>
       <div class="panel-footer">
-        <a ui-sref="createCustomer()" class="btn btn-primary btn-lg"><i class="fa fa-user-plus"></i> New Customer</a>
+        <a ui-sref="customerCreate()" class="btn btn-primary btn-lg"><i class="fa fa-user-plus"></i> New Customer</a>
       </div>
     </div>
   </div>
   <div class="col-sm-4">
     <div class="panel panel-success">
       <div class="panel-heading">
-        <h3 class="panel-title"><a ui-sref="listCompanies()" class="btn btn-default"><i class="fa fa-building"></i> Companies</a></h3>
+        <h3 class="panel-title"><a ui-sref="companyIndex()" class="btn btn-default"><i class="fa fa-building"></i> Companies</a></h3>
       </div>
       <div class="panel-body">
         <table class="table table-striped">
@@ -96,13 +96,13 @@
           <tbody>
           <tr data-ng-repeat="company in companies">
             <td>
-              <a ui-sref="viewCompany({companyId: company._id})">{{ company.data.name }}</a>
+              <a ui-sref="company.view({id: company._id})">{{ company.data.name }}</a>
             </td>
             <td>{{ company.created | amDateFormat:'MMMM Do YYYY' }}</td>
             <td>
               <div class="button-group">
-                <a ui-sref="editCompany({companyId: company._id})" class="btn btn-default"><span class="glyphicon glyphicon-edit"></span></a>
-                <a ui-sref="deleteCompany({companyId: company._id})" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle"></span></a>
+                <a ui-sref="company.edit({id: company._id})" class="btn btn-default"><span class="glyphicon glyphicon-edit"></span></a>
+                <a ui-sref="company.delete({id: company._id})" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle"></span></a>
               </div>
             </td>
           </tr>
@@ -111,75 +111,7 @@
         <bgf-pagination collection="companies" url="companiesUrl" per-page="5" template-url="./views/pager.html"></bgf-pagination>
       </div>
       <div class="panel-footer">
-        <a ui-sref="createCompany()" class="btn btn-primary btn-lg"><i class="glyphicon glyphicon-plus"></i> New Company</a>
-      </div>
-    </div>
-  </div>
-</div>
-<div class="row">
-  <div class="col-sm-4">
-    <div class="panel panel-success">
-      <div class="panel-heading">
-        <h3 class="panel-title"><a ui-sref="listAgents()" class="btn btn-default"><i class="fa fa-money"></i> Sales Agents</a></h3>
-      </div>
-      <div class="panel-body">
-        <table class="table table-striped">
-          <thead>
-          <tr>
-            <th>Name</th>
-            <th>Submitted</th>
-            <th>Operations</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr data-ng-repeat="agent in agents">
-            <td>
-              <a ui-sref="viewAgent({agentId: agent._id})">
-                {{ agent.data.firstName }} {{ agent.data.lastName }}
-              </a>
-            </td>
-            <td>{{ agent.created | amDateFormat:'MMMM Do YYYY' }}</td>
-            <td>
-              <div class="button-group">
-                <a ui-sref="editAgent({agentId: agent._id})" class="btn btn-default"><span class="glyphicon glyphicon-edit"></span></a>
-                <a ui-sref="deleteAgent({agentId: agent._id})" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle"></span></a>
-              </div>
-            </td>
-          </tr>
-          </tbody>
-        </table>
-        <bgf-pagination collection="agents" url="agentsUrl" per-page="5" template-url="./views/pager.html"></bgf-pagination>
-      </div>
-      <div class="panel-footer">
-        <a ui-sref="createAgent()" class="btn btn-primary btn-lg"><i class="glyphicon glyphicon-plus"></i> New Agent</a>
-      </div>
-    </div>
-  </div>
-  <div class="col-sm-4">
-    <div class="panel panel-primary">
-      <div class="panel-heading">
-        <h3 class="panel-title"><i class="fa fa-file-excel-o"></i> Reports</h3>
-      </div>
-      <div class="panel-body">
-        <button type="button" class="btn btn-success btn-block">Overview</button>
-        <button type="button" class="btn btn-success btn-block">Sales Report</button>
-        <button type="button" class="btn btn-success btn-block">Quote Backlog</button>
-        <button type="button" class="btn btn-success btn-block">Export(s)</button>
-      </div>
-    </div>
-  </div>
-  <div class="col-sm-4">
-    <div class="panel panel-primary">
-      <div class="panel-heading">
-        <h3 class="panel-title"><i class="fa fa-line-chart"></i> Analytics</h3>
-      </div>
-      <div class="panel-body" style="font-size: 1.2em;">
-        <div class="well">
-          <i class="fa fa-pie-chart"></i> Graphs
-        </div>
-        <div class="well">
-          <i class="fa fa-bar-chart"></i> Business Metrics
-        </div>
+        <a ui-sref="companyCreate()" class="btn btn-primary btn-lg"><i class="glyphicon glyphicon-plus"></i> New Company</a>
       </div>
     </div>
   </div>

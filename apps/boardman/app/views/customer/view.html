@@ -1,16 +1,12 @@
-<ul class="nav nav-tabs">
-  <li role="presentation" class="active"><a ui-sref="viewCustomer({customerId: customer._id})">View</a></li>
-  <li role="presentation"><a ui-sref="editCustomer({customerId: customer._id})">Edit</a></li>
-</ul>
 <table class="table table-striped table-bordered">
   <thead>
-  <tr>
-    <th ng-repeat="(key, value) in customer.data">{{ key }}</th>
-  </tr>
+    <tr>
+      <th ng-repeat="(key, value) in resource.data">{{ key }}</th>
+    </tr>
   </thead>
   <tbody>
-  <tr>
-    <td ng-repeat="(key, value) in customer.data">{{ value }}</td>
-  </tr>
+    <tr>
+      <td ng-repeat="(key, value) in resource.data">{{ value }}</td>
+    </tr>
   </tbody>
 </table>

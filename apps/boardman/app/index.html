@@ -8,108 +8,75 @@
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
     <!-- build:css(.) styles/vendor.css -->
     <!-- bower:css -->
-    <link rel="stylesheet" href="bower_components/angular-ui-select/dist/select.css" />
     <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.css" />
+    <link rel="stylesheet" href="bower_components/angular-ui-select/dist/select.css" />
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
     <!-- endbower -->
     <!-- endbuild -->
     <!-- build:css(.tmp) styles/main.css -->
     <link rel="stylesheet" href="styles/main.css">
     <!-- endbuild -->
+
+    <link href='http://fonts.googleapis.com/css?family=Vast+Shadow' rel='stylesheet' type='text/css'>
   </head>
   <body ng-app="boardmanApp">
     <!--[if lt IE 7]>
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
-
     <!-- Add your site or application content here -->
     <div class="header">
       <div class="navbar navbar-default" role="navigation">
         <div class="container">
           <div class="navbar-header">
-
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#js-navbar-collapse">
+            <button ng-if="authenticated" type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#js-navbar-collapse">
               <span class="sr-only">Toggle navigation</span>
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
             </button>
-
-            <a class="navbar-brand" href="#/">boardman</a>
+            <a class="navbar-brand logo" href="#/">Boardman Inc.</a>
           </div>
-
           <div class="collapse navbar-collapse" id="js-navbar-collapse">
-
             <ul class="nav navbar-nav">
-              <li class="active"><a href="#/">Home</a></li>
+              <li ng-if="authenticated" class="active"><a href="#/">Home</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li ng-if="authenticated"><a href="#">Hello {{ user.data.firstName }} {{ user.data.lastName }}</a></li>
+              <li ng-if="authenticated"><a href='#' ng-click="logout()"><span class="glyphicon glyphicon-off" aria-hidden="true"></span> Logout</a></li>
             </ul>
           </div>
         </div>
       </div>
     </div>
-
+    <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.message}}</alert>
     <div class="container" ui-view></div>
-
     <div class="footer">
       <div class="container">
-        <p><span class="glyphicon glyphicon-heart"></span> from form.io</p>
+        <p></p>
       </div>
     </div>
-
-
-    <!-- Google Analytics: change UA-XXXXX-X to be your site's ID -->
-     <script>
-       !function(A,n,g,u,l,a,r){A.GoogleAnalyticsObject=l,A[l]=A[l]||function(){
-       (A[l].q=A[l].q||[]).push(arguments)},A[l].l=+new Date,a=n.createElement(g),
-       r=n.getElementsByTagName(g)[0],a.src=u,r.parentNode.insertBefore(a,r)
-       }(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-       ga('create', 'UA-XXXXX-X');
-       ga('send', 'pageview');
-    </script>
 
     <!-- build:js(.) scripts/vendor.js -->
     <!-- bower:js -->
     <script src="bower_components/jquery/dist/jquery.js"></script>
     <script src="bower_components/angular/angular.js"></script>
-    <script src="bower_components/bootstrap-sass-official/assets/javascripts/bootstrap.js"></script>
-    <script src="bower_components/lodash/lodash.js"></script>
-    <script src="bower_components/restangular/dist/restangular.js"></script>
     <script src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
+    <script src="bower_components/jquery.maskedinput/dist/jquery.maskedinput.js"></script>
+    <script src="bower_components/angular-ui-select/dist/select.js"></script>
+    <script src="bower_components/angular-paginate-anything/dist/paginate-anything-tpls.js"></script>
     <script src="bower_components/moment/moment.js"></script>
     <script src="bower_components/angular-moment/angular-moment.js"></script>
-    <script src="bower_components/angular-ui-select/dist/select.js"></script>
+    <script src="bower_components/signature_pad/signature_pad.js"></script>
+    <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
     <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
-    <script src="bower_components/jquery.maskedinput/dist/jquery.maskedinput.js"></script>
-    <script src="bower_components/angular-paginate-anything/dist/paginate-anything-tpls.js"></script>
+    <script src="bower_components/bootstrap-ui-datetime-picker/dist/datetime-picker.min.js"></script>
+    <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+    <script src="bower_components/formio/dist/formio.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 
-    <!-- Include Form.IO -->
-    <script src="http://form.io/bower_components/formio/dist/formio.min.js"></script>
-
     <!-- build:js({.tmp,app}) scripts/scripts.js -->
     <script src="scripts/app.js"></script>
-    <script src="scripts/controllers/main.js"></script>
-    <script src="scripts/controllers/quote/create.js"></script>
-    <script src="scripts/controllers/quote/view.js"></script>
-    <script src="scripts/controllers/quote/edit.js"></script>
-    <script src="scripts/controllers/quote/delete.js"></script>
-    <script src="scripts/controllers/quote/index.js"></script>
-    <script src="scripts/controllers/customer/index.js"></script>
-    <script src="scripts/controllers/customer/view.js"></script>
-    <script src="scripts/controllers/customer/edit.js"></script>
-    <script src="scripts/controllers/customer/delete.js"></script>
-    <script src="scripts/controllers/customer/create.js"></script>
-    <script src="scripts/controllers/company/index.js"></script>
-    <script src="scripts/controllers/company/create.js"></script>
-    <script src="scripts/controllers/company/view.js"></script>
-    <script src="scripts/controllers/company/edit.js"></script>
-    <script src="scripts/controllers/company/delete.js"></script>
-    <script src="scripts/controllers/agent/index.js"></script>
-    <script src="scripts/controllers/agent/create.js"></script>
-    <script src="scripts/controllers/agent/view.js"></script>
-    <script src="scripts/controllers/agent/edit.js"></script>
-    <script src="scripts/controllers/agent/delete.js"></script>
     <!-- endbuild -->
 </body>
 </html>
