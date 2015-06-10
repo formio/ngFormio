@@ -14,7 +14,7 @@ app.directive('formioFileInput', function(){
       '<div class="input-group">' +
         '<span class="input-group-btn">' +
           '<span class="btn btn-primary" ' +
-            'style="position: relative; overflow: hidden;">' +
+            'style="position: relative; overflow: hidden;" ng-if="!uploading">' +
             '<input type="file" ' +
               'style="position: absolute; top: 0; right: 0; min-width: 100%; min-height: 100%; font-size: 100px; text-align: right; filter: alpha(opacity=0); opacity: 0; outline: none; background: white; cursor: inherit; display: block;" ' +
               'id="{{ component.key }}" ' +
@@ -23,10 +23,10 @@ app.directive('formioFileInput', function(){
               '/>' +
               '<i class="glyphicon glyphicon-folder-open"></i> &nbsp;Browse…' +
           '</span>' +
-          '<button class="btn btn-default" ng-show="fileInput.value" ng-click="removeFile()"><i class="glyphicon glyphicon-remove-circle"></i> Cancel</button>' +
+          '<button type="button" class="btn btn-default" ng-show="fileInput.value" ng-click="removeFile()"><i class="glyphicon glyphicon-remove-circle"></i> Cancel</button>' +
         '</span>' +
-        '<input type="text" class="form-control" value="{{ fileInput.files[0].name || fileInput.value  }}" readonly placeholder="Select a file…" ng-if="!uploading"/>' +
-        '<div class="progress" ng-if="uploading" style="height: 39px; margin-bottom: 0;">' +
+        '<input type="text" class="form-control" value="{{ fileInput.files[0].name || fileInput.value  }}" readonly placeholder="Select a file…" ng-hide="uploading"/>' +
+        '<div class="progress" ng-show="uploading" style="height: 39px; margin-bottom: 0;">' +
           '<div class="progress-bar progress-bar-striped active" role="progressbar" ng-style="{ \'width\': uploadedPercent }" style="padding-top: 5px;">' +
             '{{ uploadedPercent }}' +
           '</div>' +
@@ -68,6 +68,7 @@ app.directive('formioFileInput', function(){
               // This may or may not run during a digest.
               // Cannot use $apply while already in a digest, but $timeout will run it next digest.
               $timeout(function() {
+                angular.element($scope.fileInput).val(null);
                 $scope.fileInput = null;
               });
               $scope.$broadcast('error', errorReason);
@@ -103,6 +104,7 @@ app.directive('formioFileInput', function(){
           $scope.uploader = null;
         }
         if($scope.fileInput) {
+          angular.element($scope.fileInput).val(null);
           $scope.fileInput = null;
         }
         // Trigger event to update model in link function
@@ -115,7 +117,6 @@ app.directive('formioFileInput', function(){
         return !value;
       };
       var updateValue = function(value) {
-        console.log('updateValue', value);
         ngModel.$setViewValue(value);
         ngModel.$setDirty();  
         ngModel.$render();
