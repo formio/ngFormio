@@ -33,27 +33,35 @@ app.config([
         $scope.selectItems = [];
         var valueProp = $scope.component.valueProperty;
         $scope.getSelectItem = function(item) {
+          if(settings.dataSrc === 'values') {
+            return 'value';
+          }
           return valueProp ? item[valueProp] : item;
         };
 
-        if (settings.dataSrc.substr(0, 1) === '/') {
-          settings.dataSrc = Formio.baseUrl + settings.dataSrc;
-        }
-
-        // If this is a url, then load the file.
-        if (settings.dataSrc.substr(0, 4) === 'http') {
-          $http.get(settings.dataSrc)
-            .success(function(data) {
-              $scope.selectItems = data;
-            });
-        }
-        else if (settings.dataSrc) {
-          try {
-            $scope.selectItems = angular.fromJson(settings.dataSrc);
-          }
-          catch (error) {
+        switch(settings.dataSrc) {
+          case 'values':
+            $scope.selectItems = settings.data.values;
+            break;
+          case 'json':
+            try {
+              $scope.selectItems = angular.fromJson(settings.data.json);
+            }
+            catch (error) {
+              $scope.selectItems = [];
+            }
+            break;
+          case 'url':
+            if(settings.data.url.substr(0, 1) === '/') {
+              settings.data.url = Formio.baseUrl + settings.data.url;
+            }
+            $http.get(settings.data.url)
+              .success(function(data) {
+                $scope.selectItems = data;
+              });
+            break;
+          default:
             $scope.selectItems = [];
-          }
         }
       },
       settings: {
@@ -62,7 +70,19 @@ app.config([
         label: '',
         key: '',
         placeholder: '',
-        dataSrc: '',
+        data: {
+          values: [{
+            value: 'value1',
+            label: 'Value 1'
+          },
+          {
+            value: 'value2',
+            label: 'Value 2'
+          }],
+          json: '',
+          url: ''
+        },
+        dataSrc: 'values',
         valueProperty: '',
         template: '<span>{{ item }}</span>',
         multiple: false,
