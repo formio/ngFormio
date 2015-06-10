@@ -1,8 +1,12 @@
 (function () {
 'use strict';
 var app = angular.module('formio', [
+  'ngSanitize',
   'ui.bootstrap',
-  'ui.bootstrap.datetimepicker'
+  'ui.bootstrap.datetimepicker',
+  'ui.select',
+  'angularMoment',
+  'bgf.paginateAnything'
 ]);
 
 /**
