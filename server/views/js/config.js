@@ -6,5 +6,6 @@ angular.module('formioApp').constant('AppConfig', {
   userForm: '{{ formioHost }}/app/api/user',
   userLoginForm: '{{ formioHost }}/app/api/user/login',
   userRegisterForm: '{{ formioHost }}/app/api/user/register',
-  teamForm: '{{ formioHost }}/app/api/team'
+  teamForm: '{{ formioHost }}/app/api/team',
+  betaForm: '{{ formioHost }}/app/api/beta'
 });

@@ -14,5 +14,6 @@ angular.module('formioApp').constant('AppConfig', {
   userForm: 'http://formio.localhost:3000/app/api/user',
   userLoginForm: 'http://formio.localhost:3000/app/api/user/login',
   userRegisterForm: 'http://formio.localhost:3000/app/api/user/register',
-  teamForm: 'http://formio.localhost:3000/app/api/team'
+  teamForm: 'http://formio.localhost:3000/app/api/team',
+  betaForm: 'http://formio.localhost:3000/app/api/beta'
 });
