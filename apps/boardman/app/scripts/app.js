@@ -139,8 +139,8 @@ angular
               $scope.quotesUrl = $rootScope.quoteForm + '/submission';
               $scope.customers = [];
               $scope.customersUrl = $rootScope.customerForm + '/submission';
-              $scope.companies = [];
-              $scope.companiesUrl = $rootScope.companyForm + '/submission';
+              $scope.opportunities = [];
+              $scope.opportunitiesUrl = $rootScope.opportunityForm + '/submission';
             }
           ]
         })
@@ -165,7 +165,7 @@ angular
       // Register the resources.
       ResourceProvider.register('quote');
       ResourceProvider.register('customer');
-      ResourceProvider.register('company');
+      ResourceProvider.register('opportunity');
       ResourceProvider.register('agent');
 
       $urlRouterProvider.otherwise('/');
@@ -225,7 +225,7 @@ angular
       $rootScope.baseUrl = formioBaseUrl;
       $rootScope.quoteForm = boardmanAPI + '/quote';
       $rootScope.customerForm = boardmanAPI + '/customer';
-      $rootScope.companyForm = boardmanAPI + '/company';
+      $rootScope.opportunityForm = boardmanAPI + '/opportunity';
       $rootScope.userLoginForm = boardmanAPI + '/agent/login';
 
       // Set the user who is logged in.

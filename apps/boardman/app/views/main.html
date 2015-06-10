@@ -5,7 +5,43 @@
   <p><a class="btn btn-primary btn-lg btn-block" ui-sref="listCompanies()" role="button"><span class="glyphicon glyphicon glyphicon-user" aria-hidden="true"></span> Companies</a></a></p>
 </div>-->
 <div class="row">
-  <div class="col-sm-4">
+  <div class="col-md-4">
+    <div class="panel panel-success">
+      <div class="panel-heading">
+        <h3 class="panel-title"><a ui-sref="opportunityIndex()" class="btn btn-default"><i class="fa fa-building"></i> Opportunities</a></h3>
+      </div>
+      <div class="panel-body">
+        <table class="table table-striped">
+          <thead>
+          <tr>
+            <th>Name</th>
+            <th>Submitted</th>
+            <th>Operations</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr data-ng-repeat="opportunity in opportunities">
+            <td>
+              <a ui-sref="company.view({id: company._id})">{{ opportunity.data.customer.name }}</a>
+            </td>
+            <td>{{ opportunity.created | amDateFormat:'MMMM Do YYYY' }}</td>
+            <td>
+              <div class="button-group">
+                <a ui-sref="opportunity.edit({id: opportunity._id})" class="btn btn-default"><span class="glyphicon glyphicon-edit"></span></a>
+                <a ui-sref="opportunity.delete({id: opportunity._id})" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle"></span></a>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+        <bgf-pagination collection="opportunities" url="opportunitiesUrl" per-page="5" template-url="./views/pager.html"></bgf-pagination>
+      </div>
+      <div class="panel-footer">
+        <a ui-sref="opportunityCreate()" class="btn btn-primary btn-lg"><i class="glyphicon glyphicon-plus"></i> New Opportunity</a>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
     <div class="panel panel-success">
       <div class="panel-heading">
         <h3 class="panel-title"><a ui-sref="quoteIndex()" class="btn btn-default"><i class="fa fa-dollar"></i> Quotes</a></h3>
@@ -41,7 +77,7 @@
       </div>
     </div>
   </div>
-  <div class="col-sm-4">
+  <div class="col-md-4">
     <div class="panel panel-success">
       <div class="panel-heading">
         <h3 class="panel-title"><a ui-sref="customerIndex()" class="btn btn-default"><i class="fa fa-users"></i> Customers</a></h3>
@@ -76,42 +112,6 @@
       </div>
       <div class="panel-footer">
         <a ui-sref="customerCreate()" class="btn btn-primary btn-lg"><i class="fa fa-user-plus"></i> New Customer</a>
-      </div>
-    </div>
-  </div>
-  <div class="col-sm-4">
-    <div class="panel panel-success">
-      <div class="panel-heading">
-        <h3 class="panel-title"><a ui-sref="companyIndex()" class="btn btn-default"><i class="fa fa-building"></i> Companies</a></h3>
-      </div>
-      <div class="panel-body">
-        <table class="table table-striped">
-          <thead>
-          <tr>
-            <th>Name</th>
-            <th>Submitted</th>
-            <th>Operations</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr data-ng-repeat="company in companies">
-            <td>
-              <a ui-sref="company.view({id: company._id})">{{ company.data.name }}</a>
-            </td>
-            <td>{{ company.created | amDateFormat:'MMMM Do YYYY' }}</td>
-            <td>
-              <div class="button-group">
-                <a ui-sref="company.edit({id: company._id})" class="btn btn-default"><span class="glyphicon glyphicon-edit"></span></a>
-                <a ui-sref="company.delete({id: company._id})" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle"></span></a>
-              </div>
-            </td>
-          </tr>
-          </tbody>
-        </table>
-        <bgf-pagination collection="companies" url="companiesUrl" per-page="5" template-url="./views/pager.html"></bgf-pagination>
-      </div>
-      <div class="panel-footer">
-        <a ui-sref="companyCreate()" class="btn btn-primary btn-lg"><i class="glyphicon glyphicon-plus"></i> New Company</a>
       </div>
     </div>
   </div>
