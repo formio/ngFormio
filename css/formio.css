@@ -1,0 +1,30 @@
+.field-required {
+  color:red;
+  z-index: 5;
+}
+
+.form-field-type-hidden {
+  margin: 0;
+  padding: 0;
+}
+
+.datetime-picker div > table .btn-default {
+  border: 0;
+  background-color: #fff;
+}
+
+.datetime-picker div > table .btn-default:hover {
+  background-color: #ccc;
+}
+
+.datetime-picker div > table .btn-default.active {
+  background-color: #ccc;
+}
+
+.has-feedback .datetime-picker .form-control {
+  padding: inherit;
+}
+
+.form-control.btn-default {
+  background-color: #fff;
+}

@@ -4,7 +4,10 @@
   "authors": [
     "Travis Tidwell <travis@form.io>"
   ],
-  "main": "dist/formio.js",
+  "main": [
+    "dist/formio.js",
+    "css/formio.css"
+  ],
   "description": "The Form.IO form renderer.",
   "keywords": [
     "angularjs",
