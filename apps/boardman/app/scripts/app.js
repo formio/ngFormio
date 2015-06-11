@@ -255,6 +255,9 @@ angular
       // Logout of form.io.
       $rootScope.logout = function() {
         Formio.logout();
+        Formio.setToken(null);
+        Formio.setUser(null);
+        $state.go('auth.login');
       };
 
       $rootScope.isActive = function(state) {
