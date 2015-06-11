@@ -1756,12 +1756,18 @@ app.config([
         $scope.selectItems = [];
         if (settings.resource) {
           var formio = new Formio($scope.formio.appUrl + '/form/' + settings.resource);
+          var params = {};
+
+          // If they wish to filter the results.
+          if (settings.selectFields) {
+            params.select = settings.selectFields;
+          }
+
           if (settings.searchExpression && settings.searchFields) {
             var search = new RegExp(settings.searchExpression);
             $scope.refreshSubmissions = function(input) {
               if (!input) { return []; }
               var matches = input.match(search);
-              var params = {};
               var shouldRequest = false;
               if (matches && matches.length > 1) {
                 angular.forEach(settings.searchFields, function(field, index) {
@@ -1774,23 +1780,20 @@ app.config([
 
               // Do not request unless we have parameters.
               if (!shouldRequest) { return; }
-
-              // Load the submissions.
-              formio.loadSubmissions({
-                params: params
-              }).then(function(submissions) {
-                $scope.selectItems = submissions || [];
-              });
             };
           }
           else {
 
             // Load all submissions.
             $scope.refreshSubmissions = function() {};
-            formio.loadSubmissions().then(function(submissions) {
-              $scope.selectItems = submissions || [];
-            });
           }
+
+          // Load the submissions.
+          formio.loadSubmissions({
+            params: params
+          }).then(function(submissions) {
+            $scope.selectItems = submissions || [];
+          });
         }
       },
       settings: {
@@ -1800,6 +1803,7 @@ app.config([
         placeholder: '',
         resource: '',
         template: '<span>{{ item.data }}</span>',
+        selectFields: '',
         searchExpression: '',
         searchFields: '',
         multiple: false,
