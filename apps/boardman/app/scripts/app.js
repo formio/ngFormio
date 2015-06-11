@@ -38,6 +38,7 @@ angular
               templateUrl: 'views/resource/index.html',
               controller: ['$scope', '$state', function ($scope, $state) {
                 $scope.resourceName = name;
+                $scope.resourceForm = $scope[formName];
                 $scope.$on('submissionView', function(event, submission) {
                   $state.go(name + '.view', {id: submission._id});
                 });
