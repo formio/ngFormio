@@ -14,7 +14,8 @@ var boardmanAPI = 'https://boardman.form.io/app/api';
 angular
   .module('boardmanApp', [
     'formio',
-    'ui.router'
+    'ui.router',
+    'ngMap'
   ])
   .filter('ucfirst', [function() {
     return function(input) {
@@ -76,7 +77,12 @@ angular
               templateUrl: 'views/' + name + '/view.html',
               controller: ['$scope', '$stateParams', 'Formio', function ($scope, $stateParams, Formio) {
                 $scope.resource = {};
+                $scope.position = {lat: '40.74', lng: '-74.18'};
                 (new Formio($scope.resourceUrl)).loadSubmission().then(function(submission) {
+                  if (submission.data.address) {
+                    $scope.position.lat = submission.data.address.geometry.location.lat;
+                    $scope.position.lng = submission.data.address.geometry.location.lng;
+                  }
                   $scope.resource = submission;
                 });
               }]
@@ -135,8 +141,8 @@ angular
               $scope,
               $rootScope
             ) {
-              $scope.quotes = [];
-              $scope.quotesUrl = $rootScope.quoteForm + '/submission';
+              $scope.contracts = [];
+              $scope.contractsUrl = $rootScope.contractForm + '/submission';
               $scope.customers = [];
               $scope.customersUrl = $rootScope.customerForm + '/submission';
               $scope.opportunities = [];
@@ -163,7 +169,7 @@ angular
         });
 
       // Register the resources.
-      ResourceProvider.register('quote');
+      ResourceProvider.register('contract');
       ResourceProvider.register('customer');
       ResourceProvider.register('opportunity');
       ResourceProvider.register('agent');
@@ -221,9 +227,9 @@ angular
       FormioAlerts
     ) {
 
-      // Set the quote form.
+      // Set the forms
       $rootScope.baseUrl = formioBaseUrl;
-      $rootScope.quoteForm = boardmanAPI + '/quote';
+      $rootScope.contractForm = boardmanAPI + '/contract';
       $rootScope.customerForm = boardmanAPI + '/customer';
       $rootScope.opportunityForm = boardmanAPI + '/opportunity';
       $rootScope.userLoginForm = boardmanAPI + '/agent/login';

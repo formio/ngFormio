@@ -8,79 +8,40 @@
   <div class="col-md-4">
     <div class="panel panel-success">
       <div class="panel-heading">
-        <h3 class="panel-title"><a ui-sref="opportunityIndex()" class="btn btn-default"><i class="fa fa-building"></i> Opportunities</a></h3>
+        <h3 class="panel-title"><a ui-sref="opportunityIndex()" class="btn btn-success"><i class="fa fa-building"></i> Opportunities</a></h3>
       </div>
       <div class="panel-body">
         <table class="table table-striped">
           <thead>
           <tr>
-            <th>Name</th>
+            <th>For</th>
+            <th>Type</th>
             <th>Submitted</th>
-            <th>Operations</th>
           </tr>
           </thead>
           <tbody>
           <tr data-ng-repeat="opportunity in opportunities">
             <td>
-              <a ui-sref="company.view({id: company._id})">{{ opportunity.data.customer.name }}</a>
+              <a ui-sref="opportunity.view({id: opportunity._id})">{{ opportunity.data.customer.data.name }}</a>
+            </td>
+            <td>
+              <a ui-sref="opportunity.view({id: opportunity._id})">{{ opportunity.data.quoteType }}</a>
             </td>
             <td>{{ opportunity.created | amDateFormat:'MMMM Do YYYY' }}</td>
-            <td>
-              <div class="button-group">
-                <a ui-sref="opportunity.edit({id: opportunity._id})" class="btn btn-default"><span class="glyphicon glyphicon-edit"></span></a>
-                <a ui-sref="opportunity.delete({id: opportunity._id})" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle"></span></a>
-              </div>
-            </td>
           </tr>
           </tbody>
         </table>
         <bgf-pagination collection="opportunities" url="opportunitiesUrl" per-page="5" template-url="./views/pager.html"></bgf-pagination>
       </div>
       <div class="panel-footer">
-        <a ui-sref="opportunityCreate()" class="btn btn-primary btn-lg"><i class="glyphicon glyphicon-plus"></i> New Opportunity</a>
+        <a ui-sref="opportunityCreate()" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i> New Opportunity</a>
       </div>
     </div>
   </div>
   <div class="col-md-4">
     <div class="panel panel-success">
       <div class="panel-heading">
-        <h3 class="panel-title"><a ui-sref="quoteIndex()" class="btn btn-default"><i class="fa fa-dollar"></i> Quotes</a></h3>
-      </div>
-      <div class="panel-body">
-        <table class="table table-striped">
-          <thead>
-          <tr>
-            <th>Type</th>
-            <th>Submitted</th>
-            <th>Operations</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr data-ng-repeat="quote in quotes">
-            <td>
-              <a ui-sref="quote.view({id: quote._id})">{{ quote.data.type }}</a>
-            </td>
-            <td>{{ quote.created | amDateFormat:'MMMM Do YYYY' }}</td>
-            <td>
-              <div class="button-group">
-                <a ui-sref="quote.edit({id: quote._id})" class="btn btn-default"><span class="glyphicon glyphicon-edit"></span></a>
-                <a ui-sref="quote.delete({id: quote._id})" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle"></span></a>
-              </div>
-            </td>
-          </tr>
-          </tbody>
-        </table>
-        <bgf-pagination collection="quotes" url="quotesUrl" per-page="5" template-url="./views/pager.html"></bgf-pagination>
-      </div>
-      <div class="panel-footer">
-        <a ui-sref="quoteCreate()" class="btn btn-primary btn-lg"><i class="glyphicon glyphicon-plus"></i> New Quote</a>
-      </div>
-    </div>
-  </div>
-  <div class="col-md-4">
-    <div class="panel panel-success">
-      <div class="panel-heading">
-        <h3 class="panel-title"><a ui-sref="customerIndex()" class="btn btn-default"><i class="fa fa-users"></i> Customers</a></h3>
+        <h3 class="panel-title"><a ui-sref="customerIndex()" class="btn btn-success"><i class="fa fa-users"></i> Customers</a></h3>
       </div>
       <div class="panel-body">
         <table class="table table-striped">
@@ -94,9 +55,7 @@
           <tbody>
           <tr data-ng-repeat="customer in customers">
             <td>
-              <a ui-sref="customer.view({id: customer._id})">
-                {{ customer.data.firstName }} {{ customer.data.lastName }}
-              </a>
+              <a ui-sref="customer.view({id: customer._id})">{{ customer.data.name }}</a>
             </td>
             <td>{{ customer.created | amDateFormat:'MMMM Do YYYY' }}</td>
             <td>
@@ -111,7 +70,40 @@
         <bgf-pagination collection="customers" url="customersUrl" per-page="5" template-url="./views/pager.html"></bgf-pagination>
       </div>
       <div class="panel-footer">
-        <a ui-sref="customerCreate()" class="btn btn-primary btn-lg"><i class="fa fa-user-plus"></i> New Customer</a>
+        <a ui-sref="customerCreate()" class="btn btn-primary"><i class="fa fa-user-plus"></i> New Customer</a>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="panel panel-success">
+      <div class="panel-heading">
+        <h3 class="panel-title"><a ui-sref="contractIndex()" class="btn btn-success"><i class="fa fa-dollar"></i> Contracts</a></h3>
+      </div>
+      <div class="panel-body">
+        <table class="table table-striped">
+          <thead>
+          <tr>
+            <th>Company</th>
+            <th>Opportunity</th>
+            <th>Submitted</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr data-ng-repeat="contract in contracts">
+            <td>
+              <a ui-sref="contract.view({id: contract._id})">{{ contract.data.customer.data.name }}</a>
+            </td>
+            <td>
+              <a ui-sref="contract.view({id: contract._id})">{{ contract.data.opportunity.data.opportunityNumber }}</a>
+            </td>
+            <td>{{ contract.created | amDateFormat:'MMMM Do YYYY' }}</td>
+          </tr>
+          </tbody>
+        </table>
+        <bgf-pagination collection="contracts" url="contractsUrl" per-page="5" template-url="./views/pager.html"></bgf-pagination>
+      </div>
+      <div class="panel-footer">
+        <a ui-sref="contractCreate()" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i> New Contract</a>
       </div>
     </div>
   </div>

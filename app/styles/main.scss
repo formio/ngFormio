@@ -11,11 +11,6 @@ body {
   padding-top: 50px;
 }
 
-.form-field-type-hidden {
-  margin: 0;
-  padding: 0;
-}
-
 .component-form-group.component-type-hidden {
   height: 3em;
   border: 2px dashed #ddd;
@@ -25,27 +20,6 @@ body {
   text-align: center;
   color: #aaa;
   padding-top: 0.5em;
-}
-
-.datetime-picker div > table .btn-default {
-  border: 0;
-  background-color: #fff;
-}
-
-.datetime-picker div > table .btn-default:hover {
-  background-color: #ccc;
-}
-
-.datetime-picker div > table .btn-default.active {
-  background-color: #ccc;
-}
-
-.has-feedback .datetime-picker .form-control {
-  padding: inherit;
-}
-
-.form-control.btn-default {
-  background-color: #fff;
 }
 
 ul.dropdown-menu {
@@ -281,11 +255,6 @@ ul.dropdown-menu {
 .submission-nav {
   margin-top: 10px;
   margin-bottom: 20px;
-}
-
-.field-required {
-  color:red;
-  z-index: 5;
 }
 
 /* Fixes line-height issue where labels don't line up caused by ngDialog */
