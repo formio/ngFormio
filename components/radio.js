@@ -6,6 +6,7 @@ app.config([
       template: 'formio/components/radio.html',
       settings: {
         input: true,
+        tableView: true,
         inputType: 'radio',
         label: '',
         key: '',
@@ -47,6 +48,7 @@ app.run([
             'value="{{ v.value }}" ' +
             'ng-model="data[component.key]" ' +
             'ng-required="component.validate.required" ' +
+            'ng-disabled="readOnly"' +
             'custom-validator="component.validate.custom">' +
           '{{ v.label }}' +
         '</label>' +

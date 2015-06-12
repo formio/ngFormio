@@ -6,6 +6,7 @@ app.config([
       template: 'formio/components/hidden.html',
       settings: {
         input: true,
+        tableView: true,
         key: '',
         label: '',
         protected: false,

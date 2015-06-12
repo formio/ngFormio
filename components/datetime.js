@@ -6,6 +6,7 @@ app.config([
       template: 'formio/components/datetime.html',
       settings: {
         input: true,
+        tableView: true,
         label: '',
         key: '',
         placeholder: '',
@@ -51,6 +52,7 @@ app.run([
           'ng-focus="calendarOpen = true" ' +
           'ng-click="calendarOpen = true" ' +
           'ng-init="calendarOpen = false" ' +
+          'ng-disabled="readOnly" ' +
           'is-open="calendarOpen" ' +
           'datetime-picker="{{ component.format }}" ' +
           'min-date="component.minDate" ' +

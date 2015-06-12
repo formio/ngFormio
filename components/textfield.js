@@ -6,6 +6,7 @@ app.config([
       template: 'formio/components/textfield.html',
       settings: {
         input: true,
+        tableView: true,
         inputType: 'text',
         inputMask: '',
         label: '',
@@ -42,6 +43,7 @@ app.run([
         'class="form-control" ' +
         'id="{{ component.key }}" ' +
         'name="{{ component.key }}" ' +
+        'ng-disabled="readOnly" ' +
         'ng-model="data[component.key]" ' +
         'ng-required="component.validate.required" ' +
         'ng-minlength="component.validate.minLength" ' +

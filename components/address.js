@@ -1,3 +1,4 @@
+/*jshint camelcase: false */
 app.config([
   'formioComponentsProvider',
   function(formioComponentsProvider) {
@@ -23,8 +24,12 @@ app.config([
           });
         };
       },
+      tableView: function(data) {
+        return data ? data.formatted_address : '';
+      },
       settings: {
         input: true,
+        tableView: true,
         label: '',
         key: '',
         placeholder: '',
@@ -38,7 +43,7 @@ app.run([
   function($templateCache) {
     $templateCache.put('formio/components/address.html',
       '<label ng-if="component.label" for="{{ component.key }}">{{ component.label }}</label>' +
-      '<ui-select ng-model="data[component.key]" id="{{ component.key }}" theme="bootstrap">' +
+      '<ui-select ng-model="data[component.key]" ng-disabled="readOnly" id="{{ component.key }}" theme="bootstrap">' +
         '<ui-select-match placeholder="{{ component.placeholder }}">{{$item.formatted_address || $select.selected.formatted_address}}</ui-select-match>' +
         '<ui-select-choices repeat="address in addresses track by $index" refresh="refreshAddress($select.search)" refresh-delay="1000">' +
           '<div ng-bind-html="address.formatted_address | highlight: $select.search"></div>' +

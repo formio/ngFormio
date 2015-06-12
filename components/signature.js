@@ -4,8 +4,12 @@ app.config([
     formioComponentsProvider.register('signature', {
       title: 'Signature',
       template: 'formio/components/signature.html',
+      tableView: function(data) {
+        return data ? 'Yes' : 'No';
+      },
       settings: {
         input: true,
+        tableView: true,
         label: '',
         key: 'signature',
         placeholder: '',
@@ -91,9 +95,12 @@ app.run([
     FormioUtils
   ) {
     $templateCache.put('formio/components/signature.html', FormioUtils.fieldWrap(
-      '<a class="btn btn-xs btn-default" style="position:absolute; left: 0; top: 0; z-index: 1000" ng-click="component.clearSignature()"><span class="glyphicon glyphicon-repeat"></span></a>' +
-      '<canvas signature component="component" ng-model="data[component.key]"></canvas>' +
-      '<div class="formio-signature-footer" style="text-align: center;color:#C3C3C3;">{{ component.footer }}</div>'
+      '<img ng-if="readOnly" ng-attr-src="{{data[component.key]}}" src="" />' +
+      '<span ng-if="!readOnly">' +
+        '<a class="btn btn-xs btn-default" style="position:absolute; left: 0; top: 0; z-index: 1000" ng-click="component.clearSignature()"><span class="glyphicon glyphicon-repeat"></span></a>' +
+        '<canvas signature component="component" ng-model="data[component.key]"></canvas>' +
+        '<div class="formio-signature-footer" style="text-align: center;color:#C3C3C3;">{{ component.footer }}</div>' +
+      '</span>'
     ));
   }
 ]);

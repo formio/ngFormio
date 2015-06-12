@@ -335,7 +335,6 @@ app.provider('Formio', function() {
         };
         Formio.submissionData = function(data, component, onId) {
           if (!data) { return ''; }
-          if (component.protected) { return '--- PROTECTED ---'; }
           if (component.key.indexOf('.') !== -1) {
             var value = data;
             var parts = component.key.split('.');
@@ -445,7 +444,13 @@ app.factory('FormioScope', [
         });
 
         // Return the value and set the scope for the model input.
-        $scope.submissionData = Formio.submissionData;
+        $scope.submissionData = function(data, component) {
+          var value = Formio.submissionData(data, component);
+          var componentInfo = formioComponents.components[component.type];
+          if (!componentInfo.tableView) { return value; }
+          return componentInfo.tableView(value, component);
+        };
+
         var spinner = angular.element('#formio-loading');
 
         if ($scope.src) {
@@ -566,7 +571,8 @@ app.directive('formio', function() {
       src: '=',
       formAction: '=',
       form: '=',
-      submission: '='
+      submission: '=',
+      readOnly: '='
     },
     controller: [
       '$scope',
@@ -786,7 +792,8 @@ app.directive('formioSubmissions', function() {
     scope: {
       src: '=',
       form: '=',
-      submissions: '='
+      submissions: '=',
+      perPage: '='
     },
     templateUrl: 'formio/submissions.html',
     controller: [
@@ -796,9 +803,19 @@ app.directive('formioSubmissions', function() {
         $scope,
         FormioScope
       ) {
-        FormioScope.register($scope, {
+        $scope.formio = FormioScope.register($scope, {
           form: true,
-          submissions: true
+          submissions: false
+        });
+
+        $scope.tableView = function(component) {
+          return !component.hasOwnProperty('tableView') || component.tableView;
+        };
+
+        $scope.$watch('_submissions', function(submissions) {
+          if (submissions && submissions.length > 0) {
+            $scope.$emit('submissionLoad', $scope._submissions);
+          }
         });
       }
     ]
@@ -819,7 +836,8 @@ app.directive('formioComponent', [
         component: '=',
         data: '=',
         formio: '=',
-        form: '='
+        form: '=',
+        readOnly: '='
       },
       templateUrl: 'formio/component.html',
       controller: [
@@ -1027,7 +1045,7 @@ app.run([
         '<div ng-repeat="alert in formioAlerts" class="alert alert-{{ alert.type }}" role="alert">' +
           '{{ alert.message }}' +
         '</div>' +
-        '<formio-component ng-repeat="component in _form.components track by $index" component="component" data="_submission.data" form="formioForm" formio="formio"></formio-component>' +
+        '<formio-component ng-repeat="component in _form.components track by $index" component="component" data="_submission.data" form="formioForm" formio="formio" read-only="readOnly"></formio-component>' +
       '</form>'
     );
 
@@ -1044,31 +1062,48 @@ app.run([
       '</form>'
     );
 
+    $templateCache.put('formio/pager.html',
+      '<div class="paginate-anything">' +
+        '<ul class="pagination pagination-{{size}} links" ng-if="numPages > 1">' +
+          '<li ng-class="{disabled: page <= 0}"><a href ng-click="gotoPage(page-1)">&laquo;</a></li>' +
+          '<li ng-if="linkGroupFirst() > 0"><a href ng-click="gotoPage(0)">1</a></li>' +
+          '<li ng-if="linkGroupFirst() > 1" class="disabled"><a href>&hellip;</a></li>' +
+          '<li ng-repeat="p in [linkGroupFirst(), linkGroupLast()] | makeRange" ng-class="{active: p === page}"><a href ng-click="gotoPage(p)">{{p+1}}</a></li>' +
+          '<li ng-if="linkGroupLast() < numPages - 2" class="disabled"><a href>&hellip;</a></li>' +
+          '<li ng-if="isFinite() && linkGroupLast() < numPages - 1"><a href ng-click="gotoPage(numPages-1)">{{numPages}}</a></li>' +
+          '<li ng-class="{disabled: page >= numPages - 1}"><a href ng-click="gotoPage(page+1)">&raquo;</a></li>' +
+        '</ul>' +
+      '</div>'
+    );
+
     $templateCache.put('formio/submissions.html',
-      '<table class="table">' +
-        '<thead>' +
-          '<tr>' +
-            '<th ng-repeat="component in _form.components | flattenComponents">{{ component.label }}</th>' +
-            '<th>Submitted</th>' +
-            '<th>Updated</th>' +
-            '<th>Operations</th>' +
-          '</tr>' +
-        '</thead>' +
-        '<tbody>' +
-          '<tr ng-repeat="submission in _submissions">' +
-            '<td ng-repeat="component in _form.components | flattenComponents">{{ submissionData(submission.data, component) }}</td>' +
-            '<td>{{ submission.created | amDateFormat:\'l, h:mm:ss a\' }}</td>' +
-            '<td>{{ submission.modified | amDateFormat:\'l, h:mm:ss a\' }}</td>' +
-            '<td>' +
-              '<div class="button-group" style="display:flex;">' +
-                '<a ng-click="$emit(\'submissionView\', submission)" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-eye-open"></span></a>&nbsp;' +
-                '<a ng-click="$emit(\'submissionEdit\', submission)" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-edit"></span></a>&nbsp;' +
-                '<a ng-click="$emit(\'submissionDelete\', submission)" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove-circle"></span></a>' +
-              '</div>' +
-            '</td>' +
-          '</tr>' +
-        '</tbody>' +
-      '</table>'
+      '<div>' +
+        '<table class="table">' +
+          '<thead>' +
+            '<tr>' +
+              '<th ng-repeat="component in _form.components | flattenComponents" ng-if="tableView(component)">{{ component.label || component.key }}</th>' +
+              '<th>Submitted</th>' +
+              '<th>Updated</th>' +
+              '<th>Operations</th>' +
+            '</tr>' +
+          '</thead>' +
+          '<tbody>' +
+            '<tr ng-repeat="submission in _submissions">' +
+              '<td ng-repeat="component in _form.components | flattenComponents" ng-if="tableView(component)">{{ submissionData(submission.data, component) }}</td>' +
+              '<td>{{ submission.created | amDateFormat:\'l, h:mm:ss a\' }}</td>' +
+              '<td>{{ submission.modified | amDateFormat:\'l, h:mm:ss a\' }}</td>' +
+              '<td>' +
+                '<div class="button-group" style="display:flex;">' +
+                  '<a ng-click="$emit(\'submissionView\', submission)" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-eye-open"></span></a>&nbsp;' +
+                  '<a ng-click="$emit(\'submissionEdit\', submission)" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-edit"></span></a>&nbsp;' +
+                  '<a ng-click="$emit(\'submissionDelete\', submission)" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove-circle"></span></a>' +
+                '</div>' +
+              '</td>' +
+            '</tr>' +
+          '</tbody>' +
+        '</table>' +
+        '<bgf-pagination collection="_submissions" url="formio.submissionsUrl" per-page="perPage" template-url="formio/pager.html"></bgf-pagination>' +
+      '</div>'
     );
 
     // A formio component template.
@@ -1140,6 +1175,7 @@ app.config([
       template: 'formio/components/textfield.html',
       settings: {
         input: true,
+        tableView: true,
         inputType: 'text',
         inputMask: '',
         label: '',
@@ -1176,6 +1212,7 @@ app.run([
         'class="form-control" ' +
         'id="{{ component.key }}" ' +
         'name="{{ component.key }}" ' +
+        'ng-disabled="readOnly" ' +
         'ng-model="data[component.key]" ' +
         'ng-required="component.validate.required" ' +
         'ng-minlength="component.validate.minLength" ' +
@@ -1187,6 +1224,7 @@ app.run([
   }
 ]);
 
+/*jshint camelcase: false */
 app.config([
   'formioComponentsProvider',
   function(formioComponentsProvider) {
@@ -1212,8 +1250,12 @@ app.config([
           });
         };
       },
+      tableView: function(data) {
+        return data ? data.formatted_address : '';
+      },
       settings: {
         input: true,
+        tableView: true,
         label: '',
         key: '',
         placeholder: '',
@@ -1227,7 +1269,7 @@ app.run([
   function($templateCache) {
     $templateCache.put('formio/components/address.html',
       '<label ng-if="component.label" for="{{ component.key }}">{{ component.label }}</label>' +
-      '<ui-select ng-model="data[component.key]" id="{{ component.key }}" theme="bootstrap">' +
+      '<ui-select ng-model="data[component.key]" ng-disabled="readOnly" id="{{ component.key }}" theme="bootstrap">' +
         '<ui-select-match placeholder="{{ component.placeholder }}">{{$item.formatted_address || $select.selected.formatted_address}}</ui-select-match>' +
         '<ui-select-choices repeat="address in addresses track by $index" refresh="refreshAddress($select.search)" refresh-delay="1000">' +
           '<div ng-bind-html="address.formatted_address | highlight: $select.search"></div>' +
@@ -1251,6 +1293,7 @@ app.config([
       settings: {
         input: true,
         label: 'Submit',
+        tableView: false,
         key: 'submit',
         size: 'md',
         leftIcon: '',
@@ -1269,7 +1312,7 @@ app.run([
     $templateCache
   ) {
     $templateCache.put('formio/components/button.html',
-      '<button ng-class="{\'btn-block\': component.block}" class="btn btn-{{ component.theme }} btn-{{ component.size }}" ng-disabled="component.disableOnInvalid && form.$invalid" ng-click="$emit(component.action)">' +
+      '<button ng-class="{\'btn-block\': component.block}" class="btn btn-{{ component.theme }} btn-{{ component.size }}" ng-disabled="readOnly || (component.disableOnInvalid && form.$invalid)" ng-click="$emit(component.action)">' +
         '<span ng-if="component.leftIcon" class="{{ component.leftIcon }}" aria-hidden="true"></span>' +
         '<span ng-if="component.leftIcon && component.label">&nbsp;</span>' +
         '{{ component.label }}' +
@@ -1290,6 +1333,7 @@ app.config([
       settings: {
         input: true,
         inputType: 'checkbox',
+        tableView: true,
         // This hides the default label layout so we can use a special inline label
         hideLabel: true,
         label: '',
@@ -1320,6 +1364,7 @@ app.run([
             'id="{{ component.key }}" ' +
             'name="{{ component.key }}" ' +
             'value="{{ component.key }}" ' +
+            'ng-disabled="readOnly" ' +
             'ng-model="data[component.key]" ' +
             'ng-required="component.validate.required">' +
           '{{ component.label }}' +
@@ -1349,7 +1394,7 @@ app.run([
     $templateCache.put('formio/components/columns.html',
       '<div class="row">' +
         '<div class="col-xs-6" ng-repeat="column in component.columns">' +
-          '<formio-component ng-repeat="component in column.components" component="component" data="data" formio="formio"></formio-component>' +
+          '<formio-component ng-repeat="component in column.components" component="component" data="data" formio="formio" read-only="readOnly"></formio-component>' +
         '</div>' +
       '</div>'
     );
@@ -1386,6 +1431,7 @@ app.config([
       template: 'formio/components/datetime.html',
       settings: {
         input: true,
+        tableView: true,
         label: '',
         key: '',
         placeholder: '',
@@ -1431,6 +1477,7 @@ app.run([
           'ng-focus="calendarOpen = true" ' +
           'ng-click="calendarOpen = true" ' +
           'ng-init="calendarOpen = false" ' +
+          'ng-disabled="readOnly" ' +
           'is-open="calendarOpen" ' +
           'datetime-picker="{{ component.format }}" ' +
           'min-date="component.minDate" ' +
@@ -1461,6 +1508,7 @@ app.config([
       template: 'formio/components/textfield.html',
       settings: {
         input: true,
+        tableView: true,
         inputType: 'email',
         label: '',
         key: '',
@@ -1484,6 +1532,7 @@ app.config([
       template: 'formio/components/fieldset.html',
       settings: {
         input: false,
+        tableView: true,
         legend: '',
         key: '',
         components: []
@@ -1497,7 +1546,7 @@ app.run([
     $templateCache.put('formio/components/fieldset.html',
       '<fieldset>' +
         '<legend ng-if="component.legend">{{ component.legend }}</legend>' +
-        '<formio-component ng-repeat="component in component.components" component="component" data="data" formio="formio"></formio-component>' +
+        '<formio-component ng-repeat="component in component.components" component="component" data="data" formio="formio" read-only="readOnly"></formio-component>' +
       '</fieldset>'
     );
   }
@@ -1511,6 +1560,7 @@ app.config([
       template: 'formio/components/hidden.html',
       settings: {
         input: true,
+        tableView: true,
         key: '',
         label: '',
         protected: false,
@@ -1537,6 +1587,7 @@ app.config([
       template: 'formio/components/number.html',
       settings: {
         input: true,
+        tableView: true,
         inputType: 'number',
         label: '',
         key: '',
@@ -1571,6 +1622,7 @@ app.run([
         'name="{{ component.key }}" ' +
         'ng-model="data[component.key]" ' +
         'ng-required="component.validate.required" ' +
+        'ng-disabled="readOnly" ' +
         'min="{{ component.validate.min }}" ' +
         'max="{{ component.validate.max }}" ' +
         'step="{{ component.validate.step }}" ' +
@@ -1626,7 +1678,7 @@ app.run([
       '<div class="panel panel-{{ component.theme }}">' +
         '<div ng-if="component.title" class="panel-heading"><h3 class="panel-title">{{ component.title }}</h3></div>' +
         '<div class="panel-body">' +
-          '<formio-component ng-repeat="component in component.components" component="component" data="data" formio="formio"></formio-component>' +
+          '<formio-component ng-repeat="component in component.components" component="component" data="data" formio="formio" read-only="readOnly"></formio-component>' +
         '</div>' +
       '</div>'
     );
@@ -1639,8 +1691,12 @@ app.config([
     formioComponentsProvider.register('password', {
       title: 'Password',
       template: 'formio/components/textfield.html',
+      tableView: function() {
+        return '--- PROTECTED ---';
+      },
       settings: {
         input: true,
+        tableView: false,
         inputType: 'password',
         label: '',
         key: '',
@@ -1662,6 +1718,7 @@ app.config([
       template: 'formio/components/phoneNumber.html',
       settings: {
         input: true,
+        tableView: true,
         inputMask: '(999) 999-9999',
         label: '',
         key: '',
@@ -1679,7 +1736,7 @@ app.run([
       '<label ng-if="component.label" for="{{ component.key }}">{{ component.label }}</label>' +
       '<div class="input-group" ng-if="component.prefix || component.suffix">' +
         '<div class="input-group-addon" ng-if="!!component.prefix">{{ component.prefix }}</div>' +
-        '<input type="text" class="form-control" ng-model="data[component.key]" id="{{ component.key }}" placeholder="{{ component.placeholder }}" formio-input-mask="{{ component.inputMask }}">' +
+        '<input type="text" class="form-control" ng-model="data[component.key]" ng-disabled="readOnly" id="{{ component.key }}" placeholder="{{ component.placeholder }}" formio-input-mask="{{ component.inputMask }}">' +
         '<div class="input-group-addon" ng-if="!!component.suffix">{{ component.suffix }}</div>' +
       '</div>' +
       '<input ng-if="!component.prefix && !component.suffix" type="text" class="form-control" ng-model="data[component.key]" id="{{ component.key }}" placeholder="{{ component.placeholder }}" formio-input-mask="{{ component.inputMask }}">'
@@ -1695,6 +1752,7 @@ app.config([
       template: 'formio/components/radio.html',
       settings: {
         input: true,
+        tableView: true,
         inputType: 'radio',
         label: '',
         key: '',
@@ -1736,6 +1794,7 @@ app.run([
             'value="{{ v.value }}" ' +
             'ng-model="data[component.key]" ' +
             'ng-required="component.validate.required" ' +
+            'ng-disabled="readOnly"' +
             'custom-validator="component.validate.custom">' +
           '{{ v.label }}' +
         '</label>' +
@@ -1749,6 +1808,9 @@ app.config([
   function(formioComponentsProvider) {
     formioComponentsProvider.register('resource', {
       title: 'Resource',
+      tableView: function(data) {
+        return data ? data._id : '';
+      },
       template: function($scope) {
         return $scope.component.multiple ? 'formio/components/resource-multiple.html' : 'formio/components/resource.html';
       },
@@ -1798,6 +1860,7 @@ app.config([
       },
       settings: {
         input: true,
+        tableView: true,
         label: '',
         key: '',
         placeholder: '',
@@ -1818,7 +1881,7 @@ app.run([
   function($templateCache) {
     $templateCache.put('formio/components/resource.html',
       '<label ng-if="component.label" for="{{ component.key }}">{{ component.label }}</label>' +
-      '<ui-select ng-model="data[component.key]" id="{{ component.key }}" theme="bootstrap">' +
+      '<ui-select ng-model="data[component.key]" ng-disabled="readOnly" id="{{ component.key }}" theme="bootstrap">' +
         '<ui-select-match placeholder="{{ component.placeholder }}">' +
           '<formio-select-item template="component.template" item="$item || $select.selected" select="$select"></formio-select-item>' +
         '</ui-select-match>' +
@@ -1895,6 +1958,7 @@ app.config([
       },
       settings: {
         input: true,
+        tableView: true,
         label: '',
         key: '',
         placeholder: '',
@@ -1916,7 +1980,7 @@ app.run([
   function($templateCache) {
     $templateCache.put('formio/components/select.html',
       '<label ng-if="component.label" for="{{ component.key }}">{{ component.label }}</label>' +
-      '<ui-select ng-model="data[component.key]" id="{{ component.key }}" theme="bootstrap">' +
+      '<ui-select ng-model="data[component.key]" ng-disabled="readOnly" id="{{ component.key }}" theme="bootstrap">' +
         '<ui-select-match placeholder="{{ component.placeholder }}">' +
           '<formio-select-item template="component.template" item="$item || $select.selected" select="$select"></formio-select-item>' +
         '</ui-select-match>' +
@@ -1939,8 +2003,12 @@ app.config([
     formioComponentsProvider.register('signature', {
       title: 'Signature',
       template: 'formio/components/signature.html',
+      tableView: function(data) {
+        return data ? 'Yes' : 'No';
+      },
       settings: {
         input: true,
+        tableView: true,
         label: '',
         key: 'signature',
         placeholder: '',
@@ -2026,9 +2094,12 @@ app.run([
     FormioUtils
   ) {
     $templateCache.put('formio/components/signature.html', FormioUtils.fieldWrap(
-      '<a class="btn btn-xs btn-default" style="position:absolute; left: 0; top: 0; z-index: 1000" ng-click="component.clearSignature()"><span class="glyphicon glyphicon-repeat"></span></a>' +
-      '<canvas signature component="component" ng-model="data[component.key]"></canvas>' +
-      '<div class="formio-signature-footer" style="text-align: center;color:#C3C3C3;">{{ component.footer }}</div>'
+      '<img ng-if="readOnly" ng-attr-src="{{data[component.key]}}" src="" />' +
+      '<span ng-if="!readOnly">' +
+        '<a class="btn btn-xs btn-default" style="position:absolute; left: 0; top: 0; z-index: 1000" ng-click="component.clearSignature()"><span class="glyphicon glyphicon-repeat"></span></a>' +
+        '<canvas signature component="component" ng-model="data[component.key]"></canvas>' +
+        '<div class="formio-signature-footer" style="text-align: center;color:#C3C3C3;">{{ component.footer }}</div>' +
+      '</span>'
     ));
   }
 ]);
@@ -2041,6 +2112,7 @@ app.config([
       template: 'formio/components/textarea.html',
       settings: {
         input: true,
+        tableView: true,
         label: '',
         key: '',
         placeholder: '',
@@ -2071,6 +2143,7 @@ app.run([
       '<textarea ' +
         'class="form-control" ' +
         'ng-model="data[component.key]" ' +
+        'ng-disabled="readOnly" ' +
         'id="{{ component.key }}" ' +
         'placeholder="{{ component.placeholder }}" ' +
         'custom-validator="component.validate.custom" ' +
@@ -2098,7 +2171,7 @@ app.run([
   function($templateCache) {
     $templateCache.put('formio/components/well.html',
       '<div class="well">' +
-        '<formio-component ng-repeat="component in component.components" component="component" data="data" formio="formio"></formio-component>' +
+        '<formio-component ng-repeat="component in component.components" component="component" data="data" formio="formio" read-only="readOnly"></formio-component>' +
       '</div>'
     );
   }

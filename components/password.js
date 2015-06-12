@@ -4,8 +4,12 @@ app.config([
     formioComponentsProvider.register('password', {
       title: 'Password',
       template: 'formio/components/textfield.html',
+      tableView: function() {
+        return '--- PROTECTED ---';
+      },
       settings: {
         input: true,
+        tableView: false,
         inputType: 'password',
         label: '',
         key: '',

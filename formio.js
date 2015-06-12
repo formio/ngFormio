@@ -333,7 +333,6 @@ app.provider('Formio', function() {
         };
         Formio.submissionData = function(data, component, onId) {
           if (!data) { return ''; }
-          if (component.protected) { return '--- PROTECTED ---'; }
           if (component.key.indexOf('.') !== -1) {
             var value = data;
             var parts = component.key.split('.');
@@ -443,7 +442,13 @@ app.factory('FormioScope', [
         });
 
         // Return the value and set the scope for the model input.
-        $scope.submissionData = Formio.submissionData;
+        $scope.submissionData = function(data, component) {
+          var value = Formio.submissionData(data, component);
+          var componentInfo = formioComponents.components[component.type];
+          if (!componentInfo.tableView) { return value; }
+          return componentInfo.tableView(value, component);
+        };
+
         var spinner = angular.element('#formio-loading');
 
         if ($scope.src) {
@@ -564,7 +569,8 @@ app.directive('formio', function() {
       src: '=',
       formAction: '=',
       form: '=',
-      submission: '='
+      submission: '=',
+      readOnly: '='
     },
     controller: [
       '$scope',
@@ -784,7 +790,8 @@ app.directive('formioSubmissions', function() {
     scope: {
       src: '=',
       form: '=',
-      submissions: '='
+      submissions: '=',
+      perPage: '='
     },
     templateUrl: 'formio/submissions.html',
     controller: [
@@ -794,9 +801,19 @@ app.directive('formioSubmissions', function() {
         $scope,
         FormioScope
       ) {
-        FormioScope.register($scope, {
+        $scope.formio = FormioScope.register($scope, {
           form: true,
-          submissions: true
+          submissions: false
+        });
+
+        $scope.tableView = function(component) {
+          return !component.hasOwnProperty('tableView') || component.tableView;
+        };
+
+        $scope.$watch('_submissions', function(submissions) {
+          if (submissions && submissions.length > 0) {
+            $scope.$emit('submissionLoad', $scope._submissions);
+          }
         });
       }
     ]
@@ -817,7 +834,8 @@ app.directive('formioComponent', [
         component: '=',
         data: '=',
         formio: '=',
-        form: '='
+        form: '=',
+        readOnly: '='
       },
       templateUrl: 'formio/component.html',
       controller: [
@@ -1025,7 +1043,7 @@ app.run([
         '<div ng-repeat="alert in formioAlerts" class="alert alert-{{ alert.type }}" role="alert">' +
           '{{ alert.message }}' +
         '</div>' +
-        '<formio-component ng-repeat="component in _form.components track by $index" component="component" data="_submission.data" form="formioForm" formio="formio"></formio-component>' +
+        '<formio-component ng-repeat="component in _form.components track by $index" component="component" data="_submission.data" form="formioForm" formio="formio" read-only="readOnly"></formio-component>' +
       '</form>'
     );
 
@@ -1042,31 +1060,48 @@ app.run([
       '</form>'
     );
 
+    $templateCache.put('formio/pager.html',
+      '<div class="paginate-anything">' +
+        '<ul class="pagination pagination-{{size}} links" ng-if="numPages > 1">' +
+          '<li ng-class="{disabled: page <= 0}"><a href ng-click="gotoPage(page-1)">&laquo;</a></li>' +
+          '<li ng-if="linkGroupFirst() > 0"><a href ng-click="gotoPage(0)">1</a></li>' +
+          '<li ng-if="linkGroupFirst() > 1" class="disabled"><a href>&hellip;</a></li>' +
+          '<li ng-repeat="p in [linkGroupFirst(), linkGroupLast()] | makeRange" ng-class="{active: p === page}"><a href ng-click="gotoPage(p)">{{p+1}}</a></li>' +
+          '<li ng-if="linkGroupLast() < numPages - 2" class="disabled"><a href>&hellip;</a></li>' +
+          '<li ng-if="isFinite() && linkGroupLast() < numPages - 1"><a href ng-click="gotoPage(numPages-1)">{{numPages}}</a></li>' +
+          '<li ng-class="{disabled: page >= numPages - 1}"><a href ng-click="gotoPage(page+1)">&raquo;</a></li>' +
+        '</ul>' +
+      '</div>'
+    );
+
     $templateCache.put('formio/submissions.html',
-      '<table class="table">' +
-        '<thead>' +
-          '<tr>' +
-            '<th ng-repeat="component in _form.components | flattenComponents">{{ component.label }}</th>' +
-            '<th>Submitted</th>' +
-            '<th>Updated</th>' +
-            '<th>Operations</th>' +
-          '</tr>' +
-        '</thead>' +
-        '<tbody>' +
-          '<tr ng-repeat="submission in _submissions">' +
-            '<td ng-repeat="component in _form.components | flattenComponents">{{ submissionData(submission.data, component) }}</td>' +
-            '<td>{{ submission.created | amDateFormat:\'l, h:mm:ss a\' }}</td>' +
-            '<td>{{ submission.modified | amDateFormat:\'l, h:mm:ss a\' }}</td>' +
-            '<td>' +
-              '<div class="button-group" style="display:flex;">' +
-                '<a ng-click="$emit(\'submissionView\', submission)" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-eye-open"></span></a>&nbsp;' +
-                '<a ng-click="$emit(\'submissionEdit\', submission)" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-edit"></span></a>&nbsp;' +
-                '<a ng-click="$emit(\'submissionDelete\', submission)" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove-circle"></span></a>' +
-              '</div>' +
-            '</td>' +
-          '</tr>' +
-        '</tbody>' +
-      '</table>'
+      '<div>' +
+        '<table class="table">' +
+          '<thead>' +
+            '<tr>' +
+              '<th ng-repeat="component in _form.components | flattenComponents" ng-if="tableView(component)">{{ component.label || component.key }}</th>' +
+              '<th>Submitted</th>' +
+              '<th>Updated</th>' +
+              '<th>Operations</th>' +
+            '</tr>' +
+          '</thead>' +
+          '<tbody>' +
+            '<tr ng-repeat="submission in _submissions">' +
+              '<td ng-repeat="component in _form.components | flattenComponents" ng-if="tableView(component)">{{ submissionData(submission.data, component) }}</td>' +
+              '<td>{{ submission.created | amDateFormat:\'l, h:mm:ss a\' }}</td>' +
+              '<td>{{ submission.modified | amDateFormat:\'l, h:mm:ss a\' }}</td>' +
+              '<td>' +
+                '<div class="button-group" style="display:flex;">' +
+                  '<a ng-click="$emit(\'submissionView\', submission)" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-eye-open"></span></a>&nbsp;' +
+                  '<a ng-click="$emit(\'submissionEdit\', submission)" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-edit"></span></a>&nbsp;' +
+                  '<a ng-click="$emit(\'submissionDelete\', submission)" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove-circle"></span></a>' +
+                '</div>' +
+              '</td>' +
+            '</tr>' +
+          '</tbody>' +
+        '</table>' +
+        '<bgf-pagination collection="_submissions" url="formio.submissionsUrl" per-page="perPage" template-url="formio/pager.html"></bgf-pagination>' +
+      '</div>'
     );
 
     // A formio component template.

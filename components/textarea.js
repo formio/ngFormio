@@ -6,6 +6,7 @@ app.config([
       template: 'formio/components/textarea.html',
       settings: {
         input: true,
+        tableView: true,
         label: '',
         key: '',
         placeholder: '',
@@ -36,6 +37,7 @@ app.run([
       '<textarea ' +
         'class="form-control" ' +
         'ng-model="data[component.key]" ' +
+        'ng-disabled="readOnly" ' +
         'id="{{ component.key }}" ' +
         'placeholder="{{ component.placeholder }}" ' +
         'custom-validator="component.validate.custom" ' +

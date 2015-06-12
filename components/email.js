@@ -6,6 +6,7 @@ app.config([
       template: 'formio/components/textfield.html',
       settings: {
         input: true,
+        tableView: true,
         inputType: 'email',
         label: '',
         key: '',

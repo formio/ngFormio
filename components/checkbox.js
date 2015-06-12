@@ -7,6 +7,7 @@ app.config([
       settings: {
         input: true,
         inputType: 'checkbox',
+        tableView: true,
         // This hides the default label layout so we can use a special inline label
         hideLabel: true,
         label: '',
@@ -37,6 +38,7 @@ app.run([
             'id="{{ component.key }}" ' +
             'name="{{ component.key }}" ' +
             'value="{{ component.key }}" ' +
+            'ng-disabled="readOnly" ' +
             'ng-model="data[component.key]" ' +
             'ng-required="component.validate.required">' +
           '{{ component.label }}' +

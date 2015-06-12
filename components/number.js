@@ -6,6 +6,7 @@ app.config([
       template: 'formio/components/number.html',
       settings: {
         input: true,
+        tableView: true,
         inputType: 'number',
         label: '',
         key: '',
@@ -40,6 +41,7 @@ app.run([
         'name="{{ component.key }}" ' +
         'ng-model="data[component.key]" ' +
         'ng-required="component.validate.required" ' +
+        'ng-disabled="readOnly" ' +
         'min="{{ component.validate.min }}" ' +
         'max="{{ component.validate.max }}" ' +
         'step="{{ component.validate.step }}" ' +

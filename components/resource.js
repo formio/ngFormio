@@ -3,6 +3,9 @@ app.config([
   function(formioComponentsProvider) {
     formioComponentsProvider.register('resource', {
       title: 'Resource',
+      tableView: function(data) {
+        return data ? data._id : '';
+      },
       template: function($scope) {
         return $scope.component.multiple ? 'formio/components/resource-multiple.html' : 'formio/components/resource.html';
       },
@@ -52,6 +55,7 @@ app.config([
       },
       settings: {
         input: true,
+        tableView: true,
         label: '',
         key: '',
         placeholder: '',
@@ -72,7 +76,7 @@ app.run([
   function($templateCache) {
     $templateCache.put('formio/components/resource.html',
       '<label ng-if="component.label" for="{{ component.key }}">{{ component.label }}</label>' +
-      '<ui-select ng-model="data[component.key]" id="{{ component.key }}" theme="bootstrap">' +
+      '<ui-select ng-model="data[component.key]" ng-disabled="readOnly" id="{{ component.key }}" theme="bootstrap">' +
         '<ui-select-match placeholder="{{ component.placeholder }}">' +
           '<formio-select-item template="component.template" item="$item || $select.selected" select="$select"></formio-select-item>' +
         '</ui-select-match>' +
