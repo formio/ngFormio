@@ -446,6 +446,13 @@ app.factory('FormioScope', [
           var value = Formio.submissionData(data, component);
           var componentInfo = formioComponents.components[component.type];
           if (!componentInfo.tableView) { return value; }
+          if (component.multiple && (value.length > 0)) {
+            var values = [];
+            angular.forEach(value, function(arrayValue) {
+              values.push(componentInfo.tableView(arrayValue, component));
+            });
+            return values;
+          }
           return componentInfo.tableView(value, component);
         };
 
