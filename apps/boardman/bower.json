@@ -4,7 +4,7 @@
   "dependencies": {
     "angular-ui-router": "~0.2.13",
     "font-awesome": "~4.3.0",
-    "formio": "~0.0.19",
+    "formio": "~0.0.20",
     "ngmap": "~1.7.11",
     "bootswatch": "~3.3.4+1"
   },
