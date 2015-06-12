@@ -2040,21 +2040,6 @@ app.directive('signature', function () {
     link: function (scope, element, attrs, ngModel) {
       if (!ngModel) { return; }
 
-      // Sets the dimension of a width or height.
-      var setDimension = function(dim) {
-        if (scope.component[dim].slice(-1) === '%') {
-          var percent = parseFloat(scope.component[dim].slice(0, -1)) / 100;
-          element[0][dim] = element.parent()[dim]() * percent;
-        }
-        else {
-          element[0][dim] = parseInt(scope.component[dim], 10);
-        }
-      };
-
-      // Set the width and height of the canvas.
-      setDimension('width');
-      setDimension('height');
-
       // Create the signature pad.
       /* global SignaturePad:false */
       var signaturePad = new SignaturePad(element[0], {
@@ -2073,7 +2058,9 @@ app.directive('signature', function () {
       element.css({
         'border-radius': '4px',
         'box-shadow': '0 0 5px rgba(0, 0, 0, 0.02) inset',
-        'border': '1px solid #f4f4f4'
+        'border': '1px solid #f4f4f4',
+        'width': scope.component.width,
+        'height': scope.component.height
       });
 
       function readSignature() {
