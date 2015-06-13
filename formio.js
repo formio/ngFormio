@@ -618,7 +618,7 @@ app.directive('formio', function() {
             }
           });
           angular.forEach($scope._submission.data, function(value, key) {
-            if (submissionData.data.hasOwnProperty(key) && !value.hasOwnProperty('_id')) {
+            if (value && submissionData.data.hasOwnProperty(key) && !value.hasOwnProperty('_id')) {
               submissionData.data[key] = value;
             }
           });
