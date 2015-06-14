@@ -19,6 +19,20 @@ app.directive('formioSelectItem', [
   }
 ]);
 
+app.directive('uiSelectRequired', function () {
+  return {
+    require: 'ngModel',
+    link: function (scope, element, attrs, ngModel) {
+      if (!attrs.ngRequired) { return; }
+      scope.$watch(function () {
+        return ngModel.$modelValue;
+      }, function () {
+        ngModel.$setValidity('required', !!(ngModel.$modelValue && ngModel.$modelValue.length));
+      });
+    }
+  };
+});
+
 // Configure the Select component.
 app.config([
   'formioComponentsProvider',
@@ -104,7 +118,7 @@ app.run([
     $templateCache.put('formio/components/select.html',
       '<label ng-if="component.label" for="{{ component.key }}">{{ component.label }}</label>' +
       '<span ng-if="component.validate.required" class="glyphicon glyphicon-asterisk form-control-feedback field-required" aria-hidden="true"></span>' +
-      '<ui-select ng-model="data[component.key]" ng-disabled="readOnly" ng-required="component.validate.required" id="{{ component.key }}" theme="bootstrap">' +
+      '<ui-select ui-select-required ng-model="data[component.key]" ng-disabled="readOnly" ng-required="component.validate.required" id="{{ component.key }}" theme="bootstrap">' +
         '<ui-select-match placeholder="{{ component.placeholder }}">' +
           '<formio-select-item template="component.template" item="$item || $select.selected" select="$select"></formio-select-item>' +
         '</ui-select-match>' +
