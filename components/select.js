@@ -90,7 +90,10 @@ app.config([
         refreshDelay: 0,
         protected: false,
         unique: false,
-        persistent: true
+        persistent: true,
+        validate: {
+          required: false
+        }
       }
     });
   }
@@ -100,7 +103,8 @@ app.run([
   function($templateCache) {
     $templateCache.put('formio/components/select.html',
       '<label ng-if="component.label" for="{{ component.key }}">{{ component.label }}</label>' +
-      '<ui-select ng-model="data[component.key]" ng-disabled="readOnly" id="{{ component.key }}" theme="bootstrap">' +
+      '<span ng-if="component.validate.required" class="glyphicon glyphicon-asterisk form-control-feedback field-required" aria-hidden="true"></span>' +
+      '<ui-select ng-model="data[component.key]" ng-disabled="readOnly" ng-required="component.validate.required" id="{{ component.key }}" theme="bootstrap">' +
         '<ui-select-match placeholder="{{ component.placeholder }}">' +
           '<formio-select-item template="component.template" item="$item || $select.selected" select="$select"></formio-select-item>' +
         '</ui-select-match>' +

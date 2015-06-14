@@ -1282,7 +1282,8 @@ app.run([
   function($templateCache) {
     $templateCache.put('formio/components/address.html',
       '<label ng-if="component.label" for="{{ component.key }}">{{ component.label }}</label>' +
-      '<ui-select ng-model="data[component.key]" ng-disabled="readOnly" id="{{ component.key }}" theme="bootstrap">' +
+      '<span ng-if="component.validate.required" class="glyphicon glyphicon-asterisk form-control-feedback field-required" aria-hidden="true"></span>' +
+      '<ui-select ng-model="data[component.key]" ng-disabled="readOnly" ng-required="component.validate.required" id="{{ component.key }}" theme="bootstrap">' +
         '<ui-select-match placeholder="{{ component.placeholder }}">{{$item.formatted_address || $select.selected.formatted_address}}</ui-select-match>' +
         '<ui-select-choices repeat="address in addresses track by $index" refresh="refreshAddress($select.search)" refresh-delay="1000">' +
           '<div ng-bind-html="address.formatted_address | highlight: $select.search"></div>' +
@@ -1728,7 +1729,7 @@ app.config([
   function(formioComponentsProvider) {
     formioComponentsProvider.register('phoneNumber', {
       title: 'Phone Number',
-      template: 'formio/components/phoneNumber.html',
+      template: 'formio/components/textfield.html',
       settings: {
         input: true,
         tableView: true,
@@ -1738,6 +1739,7 @@ app.config([
         placeholder: '',
         prefix: '',
         suffix: '',
+        multiple: false,
         protected: false,
         unique: false,
         persistent: true,
@@ -1746,20 +1748,6 @@ app.config([
         }
       }
     });
-  }
-]);
-app.run([
-  '$templateCache',
-  function($templateCache) {
-    $templateCache.put('formio/components/phoneNumber.html',
-      '<label ng-if="component.label" for="{{ component.key }}">{{ component.label }}</label>' +
-      '<div class="input-group" ng-if="component.prefix || component.suffix">' +
-        '<div class="input-group-addon" ng-if="!!component.prefix">{{ component.prefix }}</div>' +
-        '<input type="text" class="form-control" ng-model="data[component.key]" ng-disabled="readOnly" id="{{ component.key }}" placeholder="{{ component.placeholder }}" formio-input-mask="{{ component.inputMask }}">' +
-        '<div class="input-group-addon" ng-if="!!component.suffix">{{ component.suffix }}</div>' +
-      '</div>' +
-      '<input ng-if="!component.prefix && !component.suffix" type="text" class="form-control" ng-model="data[component.key]" id="{{ component.key }}" placeholder="{{ component.placeholder }}" formio-input-mask="{{ component.inputMask }}">'
-    );
   }
 ]);
 
@@ -2009,7 +1997,10 @@ app.config([
         refreshDelay: 0,
         protected: false,
         unique: false,
-        persistent: true
+        persistent: true,
+        validate: {
+          required: false
+        }
       }
     });
   }
@@ -2019,7 +2010,8 @@ app.run([
   function($templateCache) {
     $templateCache.put('formio/components/select.html',
       '<label ng-if="component.label" for="{{ component.key }}">{{ component.label }}</label>' +
-      '<ui-select ng-model="data[component.key]" ng-disabled="readOnly" id="{{ component.key }}" theme="bootstrap">' +
+      '<span ng-if="component.validate.required" class="glyphicon glyphicon-asterisk form-control-feedback field-required" aria-hidden="true"></span>' +
+      '<ui-select ng-model="data[component.key]" ng-disabled="readOnly" ng-required="component.validate.required" id="{{ component.key }}" theme="bootstrap">' +
         '<ui-select-match placeholder="{{ component.placeholder }}">' +
           '<formio-select-item template="component.template" item="$item || $select.selected" select="$select"></formio-select-item>' +
         '</ui-select-match>' +
