@@ -22,8 +22,7 @@ angular
     'angularMoment',
     'ngCkeditor',
     'formioApp.controllers',
-    'formioApp.services',
-    'formioApp.directives'
+    'formioApp.services'
   ])
   .config([
     '$stateProvider',

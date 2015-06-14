@@ -1,10 +1,7 @@
-$icon-font-path: '../fonts/';
 @import "variables.scss";
-
 // bower:scss
 @import "bower_components/bootstrap-sass-official/assets/stylesheets/_bootstrap.scss";
 // endbower
-
 @import "bower_components/bootswatch/yeti/_bootswatch.scss";
 
 body {
