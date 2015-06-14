@@ -34,7 +34,7 @@ app.config([
         var valueProp = $scope.component.valueProperty;
         $scope.getSelectItem = function(item) {
           if(settings.dataSrc === 'values') {
-            return 'value';
+            return item.value;
           }
           return valueProp ? item[valueProp] : item;
         };
@@ -84,7 +84,7 @@ app.config([
         },
         dataSrc: 'values',
         valueProperty: '',
-        template: '<span>{{ item }}</span>',
+        template: '<span>{{ item.label }}</span>',
         multiple: false,
         refresh: false,
         refreshDelay: 0,
