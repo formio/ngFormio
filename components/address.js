@@ -33,7 +33,13 @@ app.config([
         label: '',
         key: '',
         placeholder: '',
-        multiple: false
+        multiple: false,
+        protected: false,
+        unique: false,
+        persistent: true,
+        validate: {
+          required: false
+        }
       }
     });
   }

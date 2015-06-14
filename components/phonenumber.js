@@ -12,7 +12,13 @@ app.config([
         key: '',
         placeholder: '',
         prefix: '',
-        suffix: ''
+        suffix: '',
+        protected: false,
+        unique: false,
+        persistent: true,
+        validate: {
+          required: false
+        }
       }
     });
   }
