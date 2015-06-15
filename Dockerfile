@@ -5,9 +5,7 @@ COPY . /src
 WORKDIR /src
 
 # node modules need to be compiled for the host platform.
-RUN npm install
-RUN npm install -g bower
-RUN bower install --allow-root
+RUN ./script.sh -bn
 
 EXPOSE       80
 

@@ -61,17 +61,12 @@ Next, get a database backup, and then do the following.
  - Unzip the database so that it is a folder of BSON files.
  - ```mongorestore --db formio formio```
 
-Next, you will then run npm and bower install, and then Update the submodules.
+Next, use the setup.sh script to run npm and bower install, and update the submodules.
 
-  - ```npm install```
-  - ```bower install```
-  - ```git submodule update --init --recursive```
-  - ```cd node_modules/formio```
-  - ```npm install```
+  - ```./script.sh -bng```
   
 You should then be able to run the application locally by typing.
 
-  - ```cd ../..```
   - ```node server```
   
 You should then be able to go to http://localhost:3000 to see the https://form.io application.
