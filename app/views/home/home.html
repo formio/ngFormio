@@ -57,43 +57,5 @@
         </div>
       </div>
     </div>
-    <div class="row">
-      <div class="panel panel-success">
-        <div class="panel-heading">
-          <h3 class="panel-title"><i class="fa fa-users"></i> Teams</h3>
-        </div>
-        <div class="panel-body">
-          <i id="team-loader" style="font-size: 2em;" class="fa fa-spinner fa-pulse"></i>
-          <div class="alert alert-info" ng-show="!teamsLoading && !teams.length">
-            Teams include the people within your organization that need access to certain applications for development purposes.
-          </div>
-          <table ng-if="!teamsLoading && teams.length" class="table table-striped">
-            <thead>
-            <tr>
-              <th>Team Name</th>
-              <th>Operations</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr data-ng-repeat="team in teams">
-              <td>
-                <a ui-sref="team.view({teamId: team._id})">{{ team.data.name }}</a>
-              </td>
-              <td>
-                <div class="button-group" style="display:flex;">
-                  <a ui-sref="team.edit({teamId: team._id})" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-edit"></span></a>&nbsp;
-                  <a ui-sref="team.delete({teamId: team._id})" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove-circle"></span></a>
-                </div>
-              </td>
-            </tr>
-            </tbody>
-            <bgf-pagination collection="teams" url="teamsUrl" per-page="5" template-url="./views/partials/pager.html"></bgf-pagination>
-          </table>
-        </div>
-        <div class="panel-footer">
-          <a ui-sref="createTeam()" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> New Team</a>
-        </div>
-      </div>
-    </div>
   </div>
 </div>
