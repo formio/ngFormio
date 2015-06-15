@@ -36,13 +36,16 @@ In this docker command, we are downloading and running a mongodb instance.
   - mongo is the name of the docker image to use from docker hub.
   - -v /opt/lib/mongodb:/data/db will map the drive on your local machine to inside the container so the data persists even if the container is destroyed.
   
+Next, get a database backup, and then do the following.
+ - Unzip the database so that it is a folder of BSON files.
+ - ```mongorestore --db formio formio```
+
 Next, we will run the formio-app server.
 
+  - ```./setup.sh -dgf```
   - ```docker run --name formio-app -p 80:3000 --link mongo-server:mongo -d formio/node-server -v $(pwd):/src```
-  - ```docker exec formio-app cd /src; rm -rf node_modules; npm install; npm install -g bower```
-  - ```docker exec formio-app cd /src; rm -rf bower_components; bower install --allow-root```
   
-We need to redownload all node_modules since some are compiled for the mac and won't run within the docker container.  Port 80 in the container is mapped to port 3000 so the url http://localhost:3000 should now be running the node app.  --link will automatically link the mongodb instance with the correct environment variables so the container knows how to use it. -v will replace the existing /src dir with a link to your current code directory so any changes are immediately seen within the app.
+This will redownload all node_modules since some are compiled for the mac and won't run within the docker container.  Port 80 in the container is mapped to port 3000 so the url http://localhost:3000 should now be running the node app.  --link will automatically link the mongodb instance with the correct environment variables so the container knows how to use it. -v will replace the existing /src dir with a link to your current code directory so any changes are immediately seen within the app.
 
 Installation (Manual)
 ------------
