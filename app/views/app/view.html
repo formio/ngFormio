@@ -14,8 +14,8 @@
         </div>
         <form-list forms="resources" app="currentApp" form-type="'resource'" num-per-page="5"></form-list>
       </div>
-      <div class="panel-footer">
-        <a ui-sref="app.form.createResource()" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Create Resource Form</a>
+      <div class="panel-footer text-right">
+        <a ui-sref="app.form.createResource()" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> New Resource Form</a>
       </div>
     </div>
   </div>
@@ -32,8 +32,8 @@
         <div class="alert alert-info" ng-show="!formsLoading && !forms.length">Composite Forms represent multiple input interfaces for Resources. Example: Login Form, User Registration Form ...</div>
         <form-list forms="forms" app="currentApp" form-type="'form'" num-per-page="5"></form-list>
       </div>
-      <div class="panel-footer">
-        <a ui-sref="app.form.createForm()" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Create Composite Form</a>
+      <div class="panel-footer text-right">
+        <a ui-sref="app.form.createForm()" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> New Composite Form</a>
       </div>
     </div>
   </div>
