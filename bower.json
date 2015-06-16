@@ -9,7 +9,7 @@
     "restangular": "~1.5.1",
     "angular-bootstrap": "~0.13.0",
     "angular-moment": "~0.9.2",
-    "ngDialog": "~0.3.12",  
+    "ngDialog": "~0.3.12",
     "ng-sortable": "~1.2.0",
     "seamless": "~0.0.3",
     "font-awesome": "~4.3.0",
