@@ -40,6 +40,10 @@ ul.dropdown-menu {
   -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#55000000, endColorstr=#55000000)";
 }
 
+.play-pres-overlay img {
+  cursor: pointer !important;
+}
+
 .play-pres-overlay .play-pres-overlay-play {
   position: absolute;
   top: 50%;
@@ -52,7 +56,7 @@ ul.dropdown-menu {
   cursor: pointer !important;
   border: none;
   opacity: 0.9;
-  padding-top: 12px;
+  padding: 5px;
   z-index:3;
   color: #eee;
   border-radius: 10px;
