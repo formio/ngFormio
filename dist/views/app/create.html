@@ -2,4 +2,24 @@
   <li><a ui-sref="home()"><i class="fa fa-home"></i></a></li>
   <li ng-if="currentApp"><a ui-sref="app.view({appId: currentApp._id})">{{ currentApp.name }}</a></li>
 </ol>
-<ng-include src="'views/app/edit.html'"></ng-include>
+<h2>New Application</h2>
+<div class="row">
+  <div class="col-sm-8">
+    <ng-include src="'views/app/edit.html'"></ng-include>
+  </div>
+  <div class="col-sm-4">
+    <div class="panel panel-success">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-check"></i> Best Practices</h3>
+      </div>
+      <div class="panel-body">
+        <div class="alert alert-info">
+          <p>Enter a title and description for your application.</p><br/>
+          <p>You will need a unique sub domain for your application. This is where the API endpoints will be hosted on.</p>
+          <p>Don't worry though, we'll take care of the hard parts.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
