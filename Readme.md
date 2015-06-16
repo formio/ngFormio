@@ -9,6 +9,7 @@ executable for the whole https://form.io system. The main components that are in
  
 Installation (Docker)
 ------------
+http://viget.com/extend/how-to-use-docker-on-os-x-the-missing-guide
 In order to install and run this application with docker, you will need to download and install.
 
   - boot2docker: https://github.com/boot2docker/osx-installer/releases/latest
@@ -16,34 +17,39 @@ In order to install and run this application with docker, you will need to downl
   
 Next, open a terminal window and type the following to initialize boot2docker
 
-  - ```boot2docker up```
   - ```boot2docker init```
+  - ```VBoxManage modifyvm "boot2docker-vm" --natpf1 "tcp-port27017,tcp,,27017,,27017"``` This will forward host port 27017 to the boot2docker vm.
+  - ```VBoxManage modifyvm "boot2docker-vm" --natpf1 "tcp-port3000,tcp,,3000,,300"``` This will forward host port 3000 to the boot2docker vm.
+  - ```boot2docker start```
   - ```$(boot2docker shellinit)```
-  
+   
 In the future, if you get an error about unable to connect to docker, run the shellinit again. You may want to add the variables to your .profile.
 
-Next, start up a mongodb server in docker with the following commands.
+Next, start up a mongodb server in docker with the following command.
 
-  - ```mkdir /opt/lib/mongodb``` (This is where the data will live).
-  - ```docker run --name mongo-server -p 27017 -d mongo -v /opt/lib/mongodb:/data/db```
-  - ```npm install -g bower```
+  - ```docker run --name mongo-server -p 27017:27017 -d mongo```
   
 In this docker command, we are downloading and running a mongodb instance.
  
   - --name mongo-server will name the server.
-  - -p 27017 will map the port to your computer so you can directly access mongodb.
+  - -p 27017:27017 will map the port to the boot2docker-vm.
   - -d will daemonize it so it will run in the background.
   - mongo is the name of the docker image to use from docker hub.
-  - -v /opt/lib/mongodb:/data/db will map the drive on your local machine to inside the container so the data persists even if the container is destroyed.
   
+You can control the mongo server with these commands.
+
+  - ```docker start mongo-server```
+  - ```docker stop mongo-server```
+
 Next, get a database backup, and then do the following.
+
  - Unzip the database so that it is a folder of BSON files.
  - ```mongorestore --db formio formio```
 
 Next, we will run the formio-app server.
 
-  - ```./setup.sh -dgf```
-  - ```docker run --name formio-app -p 80:3000 --link mongo-server:mongo -d formio/node-server -v $(pwd):/src```
+  - ```./setup.sh -ds```
+  - ```docker run --name formio-app -p 3000:80 --link mongo-server:mongo -d -v $(pwd):/src formio/formio-app```
   
 This will redownload all node_modules since some are compiled for the mac and won't run within the docker container.  Port 80 in the container is mapped to port 3000 so the url http://localhost:3000 should now be running the node app.  --link will automatically link the mongodb instance with the correct environment variables so the container knows how to use it. -v will replace the existing /src dir with a link to your current code directory so any changes are immediately seen within the app.
 

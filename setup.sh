@@ -14,46 +14,47 @@ This script will install required repositories and libraries.
 OPTIONS:
    -h      Show this message
    -d      Delete existing node_modules and bower_components
-   -g      Install git submodules
+   -s      Install git submodules
    -n      Install node modules
    -b      Install bower components
    -a      Do everything
-   -f      Force (y) to all questions
-   -v      Verbose
+   -g      Run gulp build
 EOF
 }
 
-DELETE=false
-GIT=false
-NODE=false
-BOWER=false
-FORCE=false
-while getopts "hdgnbaf" OPTION; do
+DELETE=
+GIT=
+NODE=
+BOWER=
+FORCE=
+GULP=
+while getopts "hdsnbag" OPTION; do
   case $OPTION in
     h)
       usage
       exit 1
       ;;
     d)
-      DELETE=true
+      DELETE=1
       ;;
-    g)
-      GIT=true
+    s)
+      GIT=1
       ;;
     n)
-      NODE=true
+      NODE=1
       ;;
     b)
-      BOWER=true
+      BOWER=1
+      ;;
+    g)
+      GULP=1
       ;;
     a)
-      DELETE=true
-      GIT=true
-      NODE=true
-      BOWER=true
-      ;;
-    f)
-      FORCE=true
+      DELETE=1
+      GIT=1
+      NODE=1
+      BOWER=1
+      GULP=1
       ;;
     ?)
       usage
@@ -61,50 +62,59 @@ while getopts "hdgnbaf" OPTION; do
   esac
 done
 
-if [[ -z $GIT ]] && [[ -z $NODE ]] && [[ -z $BOWER ]]; then
-   usage
-   exit 1
+# By default, do everything.
+if [[ -z $GIT ]] && [[ -z $NODE ]] && [[ -z $BOWER ]] && [[ -z $GULP ]]; then
+echo "$GIT"
+      DELETE=1
+      GIT=1
+      NODE=1
+      BOWER=1
+      GULP=1
 fi
 
 cd $DIR
-if $DELETE; then
-  if !$FORCE; then
-    echo "This will remove sub component repositories. You should commit and push any outstanding changes to github."
-    read -p "Are you sure you want to do a full rebuild? " -n 1 -r
-    echo    # (optional) move to a new line
-    if [[ ! $REPLY =~ ^[Yy]$ ]]
-    then
-        exit 1
-    fi
-  fi
+if [ $DELETE ]; then
   echo "Removing node_modules"
-  rm -rf node_modules
+  (GLOBIGNORE='node_modules/formio'; rm -rf node_modules/*)
+  rm -rf node_modules/formio/node_modules
+  rm -rf bower_components/formio/node_modules
+  rm -rf bower_components/ngFormBuilder/node_modules
   echo "Removing bower_components"
-  rm -rf bower_components
+  (GLOBIGNORE='bower_components/formio:bower_components/ngFormBuilder'; rm -rf bower_components/*)
+  echo "Removing build directory"
+  rm -rf dist
 fi
 
-if $GIT; then
-  echo "Installing git submodules"
+if [ $GIT ]; then
+  echo "Updating git submodules"
   git submodule update --init --recursive
 fi
 
-if $NODE; then
+if [ $NODE ]; then
   echo "Installing node modules"
-  npm install
+  npm cache clean
+  npm install -ddd
   cd node_modules/formio
-  npm install
+  npm install -ddd
   cd $DIR
   cd bower_components/formio
   npm install
   cd $DIR
 fi
 
-if $BOWER; then
+if [ $BOWER ]; then
   echo "Installing bower components"
   npm install -g bower
   bower install --allow-root
   cd bower_components/ngFormBuilder
   npm install
+  cd $DIR
+fi
+
+if [ $GULP ]; then
+  echo "Building site"
+  npm install -g gulp
+  gulp build
   cd $DIR
 fi
 
