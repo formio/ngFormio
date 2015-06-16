@@ -15,13 +15,6 @@
         <label for="description">Description</label>
         <input type="text" class="form-control" id="description" ng-model="currentApp.description" placeholder="Enter a short description for your application/website.">
     </div>
-    <div class="form-group">
-        <label for="access">Application Access</label>
-        <ui-select multiple ng-model="currentApp.access" id="access" name="access" theme="bootstrap" ng-disabled="disabled" reset-search-input="true" style="width: 300px;">
-            <ui-select-match placeholder="Select who should have access">{{ $item.name }}</ui-select-match>
-            <ui-select-choices repeat="user in users" refresh="refreshUsers($select.search)" refresh-delay="100"><span>{{ user.name }}</span></ui-select-choices>
-        </ui-select>
-    </div>
     <button type="submit" class="btn btn-primary">Save</button>
     <a ng-if="currentApp && currentApp._id" ui-sref="app.delete()" class="btn btn-danger">Delete</a>
 </form>
