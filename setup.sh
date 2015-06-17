@@ -16,6 +16,7 @@ OPTIONS:
    -d      Delete existing node_modules and bower_components
    -s      Install git submodules
    -n      Install node modules
+   -r      Rebuild node modules
    -b      Install bower components
    -a      Do everything
    -g      Run gulp build
@@ -25,10 +26,11 @@ EOF
 DELETE=
 GIT=
 NODE=
+REBUILD=
 BOWER=
 FORCE=
 GULP=
-while getopts "hdsnbag" OPTION; do
+while getopts "hdsnrbag" OPTION; do
   case $OPTION in
     h)
       usage
@@ -43,6 +45,9 @@ while getopts "hdsnbag" OPTION; do
     n)
       NODE=1
       ;;
+    r)
+      REBUILD=1
+      ;;
     b)
       BOWER=1
       ;;
@@ -53,6 +58,7 @@ while getopts "hdsnbag" OPTION; do
       DELETE=1
       GIT=1
       NODE=1
+      REBUILD=1
       BOWER=1
       GULP=1
       ;;
@@ -63,11 +69,11 @@ while getopts "hdsnbag" OPTION; do
 done
 
 # By default, do everything.
-if [[ -z $DELETE ]] && [[ -z $GIT ]] && [[ -z $NODE ]] && [[ -z $BOWER ]] && [[ -z $GULP ]]; then
-echo "$GIT"
+if [[ -z $DELETE ]] && [[ -z $GIT ]] && [[ -z $NODE ]] && [[ -z $BOWER ]] && [[ -z $GULP ]] &&  [[ -z $REBUILD ]]; then
       DELETE=1
       GIT=1
       NODE=1
+      REBUILD=1
       BOWER=1
       GULP=1
 fi
@@ -100,14 +106,34 @@ if [ $NODE ]; then
   cd bower_components/formio
   npm install
   cd $DIR
+  cd bower_components/ngFormBuilder
+  npm install
+  cd $DIR
 fi
 
 if [ $BOWER ]; then
   echo "Installing bower components"
   npm install -g bower
-  bower install --allow-root -s
+  bower install --allow-root -s -F
+  cd bower_components/formio
+  bower install --allow-root -s -F
+  cd $DIR
   cd bower_components/ngFormBuilder
-  npm install
+  bower install --allow-root -s -F
+  cd $DIR
+fi
+
+if [ $REBUILD ]; then
+  echo "Rebuilding node modules"
+  npm rebuild
+  cd node_modules/formio
+  npm rebuild
+  cd $DIR
+  cd bower_components/formio
+  npm rebuild
+  cd $DIR
+  cd bower_components/ngFormBuilder
+  npm rebuild
   cd $DIR
 fi
 

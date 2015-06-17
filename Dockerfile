@@ -1,10 +1,13 @@
 FROM ubuntu:14.04
 MAINTAINER Randall Knutson <randall@form.io>
 
-RUN apt-get install -y curl
-RUN curl -sL https://deb.nodesource.com/setup_0.12 | sudo bash -
+RUN apt-get install -y curl && curl -sL https://deb.nodesource.com/setup_0.12 | sudo bash -
 RUN apt-get update && apt-get install -y \
   build-essential \
+  autoconf \
+  nasm \
+  zlib1g-dev \
+  libpng-dev \
   libkrb5-dev \
   python \
   git \
@@ -14,13 +17,13 @@ COPY . /src
 WORKDIR /src
 
 # node modules need to be compiled for the host platform.
-RUN ./setup.sh -dbng
+RUN ./setup.sh -bnrg
 
 EXPOSE       80
 
-ENTRYPOINT ["node"]
+ENTRYPOINT   ["node"]
 
-CMD ["/src/server.js"]
+CMD          ["server"]
 
 # Clean up APT when done.
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*

@@ -19,11 +19,11 @@ Next, open a terminal window and type the following to initialize boot2docker
 
   - ```boot2docker init```
   - ```VBoxManage modifyvm "boot2docker-vm" --natpf1 "tcp-port27017,tcp,,27017,,27017"``` This will forward host port 27017 to the boot2docker vm.
-  - ```VBoxManage modifyvm "boot2docker-vm" --natpf1 "tcp-port3000,tcp,,3000,,300"``` This will forward host port 3000 to the boot2docker vm.
+  - ```VBoxManage modifyvm "boot2docker-vm" --natpf1 "tcp-port3000,tcp,,3000,,3000"``` This will forward host port 3000 to the boot2docker vm.
   - ```boot2docker start```
   - ```$(boot2docker shellinit)```
    
-In the future, if you get an error about unable to connect to docker, run the shellinit again. You may want to add the variables to your .profile.
+In the future, if you get an error about unable to connect to docker, run the shellinit again. You may want to add the variables to your ~/.bash_profile.
 
 Next, start up a mongodb server in docker with the following command.
 
@@ -46,9 +46,9 @@ Next, get a database backup, and then do the following.
  - Unzip the database so that it is a folder of BSON files.
  - ```mongorestore --db formio formio```
 
-Next, we will run the formio-app server.
+Next, we will run the formio-app server. (This does not currently work because node packages need to be recompiled for linux).
 
-  - ```./setup.sh -ds```
+  - ```./setup.sh -snbrg```
   - ```docker run --name formio-app -p 3000:80 --link mongo-server:mongo -d -v $(pwd):/src formio/formio-app```
   
 This will redownload all node_modules since some are compiled for the mac and won't run within the docker container.  Port 80 in the container is mapped to port 3000 so the url http://localhost:3000 should now be running the node app.  --link will automatically link the mongodb instance with the correct environment variables so the container knows how to use it. -v will replace the existing /src dir with a link to your current code directory so any changes are immediately seen within the app.
