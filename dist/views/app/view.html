@@ -4,18 +4,18 @@
       <div class="panel-heading">
         <h3 class="panel-title">
           <i class="fa fa-database"></i>
-          <a ui-sref="app.form.resourceIndex()">Resources</a>
+          <a ui-sref="app.form.resourceIndex()">Resource Forms</a>
         </h3>
       </div>
       <div class="panel-body">
         <i id="resource-loader" style="font-size: 2em;" class="fa fa-spinner fa-pulse"></i>
         <div class="alert alert-info" ng-show="!resourcesLoading && !resources.length">
-          <strong>Resources</strong> are the objects within your application. Example: User, Vehicle ...
+          <strong>Resource Forms</strong> are the objects within your application. Example: User, Vehicle ...
         </div>
         <form-list forms="resources" app="currentApp" form-type="'resource'" num-per-page="5"></form-list>
       </div>
-      <div class="panel-footer">
-        <a ui-sref="app.form.createResource()" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Create Resource</a>
+      <div class="panel-footer text-right">
+        <a ui-sref="app.form.createResource()" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> New Resource Form</a>
       </div>
     </div>
   </div>
@@ -24,16 +24,16 @@
       <div class="panel-heading">
         <h3 class="panel-title">
           <i class="fa fa-file-text-o"></i>
-          <a ui-sref="app.form.formIndex()">Forms</a>
+          <a ui-sref="app.form.formIndex()">Composite Forms</a>
         </h3>
       </div>
       <div class="panel-body">
         <i id="form-loader" style="font-size: 2em;" class="fa fa-spinner fa-pulse"></i>
-        <div class="alert alert-info" ng-show="!formsLoading && !forms.length">Forms represent multiple input interfaces for Resources. Example: Login Form, User Registration Form ...</div>
+        <div class="alert alert-info" ng-show="!formsLoading && !forms.length">Composite Forms represent multiple input interfaces for Resources. Example: Login Form, User Registration Form ...</div>
         <form-list forms="forms" app="currentApp" form-type="'form'" num-per-page="5"></form-list>
       </div>
-      <div class="panel-footer">
-        <a ui-sref="app.form.createForm()" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Create Form</a>
+      <div class="panel-footer text-right">
+        <a ui-sref="app.form.createForm()" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> New Composite Form</a>
       </div>
     </div>
   </div>
