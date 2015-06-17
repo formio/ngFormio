@@ -63,7 +63,7 @@ while getopts "hdsnbag" OPTION; do
 done
 
 # By default, do everything.
-if [[ -z $GIT ]] && [[ -z $NODE ]] && [[ -z $BOWER ]] && [[ -z $GULP ]]; then
+if [[ -z $DELETE ]] && [[ -z $GIT ]] && [[ -z $NODE ]] && [[ -z $BOWER ]] && [[ -z $GULP ]]; then
 echo "$GIT"
       DELETE=1
       GIT=1
@@ -93,9 +93,9 @@ fi
 if [ $NODE ]; then
   echo "Installing node modules"
   npm cache clean
-  npm install -ddd
+  npm install
   cd node_modules/formio
-  npm install -ddd
+  npm install
   cd $DIR
   cd bower_components/formio
   npm install
@@ -105,7 +105,7 @@ fi
 if [ $BOWER ]; then
   echo "Installing bower components"
   npm install -g bower
-  bower install --allow-root
+  bower install --allow-root -s
   cd bower_components/ngFormBuilder
   npm install
   cd $DIR

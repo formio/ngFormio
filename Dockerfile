@@ -5,6 +5,7 @@ RUN apt-get install -y curl
 RUN curl -sL https://deb.nodesource.com/setup_0.12 | sudo bash -
 RUN apt-get update && apt-get install -y \
   build-essential \
+  libkrb5-dev \
   python \
   git \
   nodejs
@@ -17,7 +18,7 @@ RUN ./setup.sh -dbng
 
 EXPOSE       80
 
-ENTRYPOINT["nodejs"]
+ENTRYPOINT ["node"]
 
 CMD ["/src/server.js"]
 
