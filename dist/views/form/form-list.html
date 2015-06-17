@@ -1,25 +1,19 @@
 <div>
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Operations</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr data-ng-repeat="form in forms">
-        <td>
-          <a ui-sref="app.form.view({formId: form._id})">{{ form.title }}</a>
-        </td>
-        <td>
-          <div class="button-group" style="display:flex;">
+  <ul class="list-group">
+    <li class="list-group-item" data-ng-repeat="form in forms">
+      <div class="row">
+        <div class="col-sm-8">
+          <a ui-sref="app.form.view({formId: form._id})"><h5>{{ form.title }}</h5></a>
+        </div>
+        <div class="col-sm-4">
+          <div class="button-group pull-right" style="display:flex;">
             <a ui-sref="app.form.edit({formId: form._id})" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-edit"></span> Edit</a>&nbsp;
             <a ui-sref="app.form.delete({formId: form._id})" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove-circle"></span> Delete</a>
           </div>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+        </div>
+      </div>
+    </li>
+  </ul>
   <bgf-pagination
     collection="forms"
     url="formsUrl"
