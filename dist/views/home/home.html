@@ -30,11 +30,11 @@
         </div>
         <div class="panel-body">
           <i id="apps-loader" style="font-size: 2em;" class="fa fa-spinner fa-pulse"></i>
-          <div class="alert alert-info" ng-show="!appsLoading && !apps.length">
+          <div class="alert alert-info" ng-show="!appsLoading">
             Applications are web-based HTML software. Whether you are building a new website, or a mobile application, you can
             create separate Applications used for each of these products.
           </div>
-          <table ng-show="!appsLoading && apps.length" class="table">
+          <table ng-show="!appsLoading && apps.length" class="table table-striped">
             <tbody>
             <tr ng-repeat="app in apps">
               <td>
@@ -44,7 +44,6 @@
                   </div>
                   <div class="col-sm-7">
                     <div class="button-group pull-right" style="display:flex;">
-                      <a ui-sref="app.view({appId: app._id})" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-eye-open"></span> View </a>&nbsp;
                       <a ui-sref="app.edit({appId: app._id})" class="btn btn-success btn-xs"><span class="glyphicon glyphicon-edit"></span> Edit</a>&nbsp;
                       <a ui-sref="app.settings({appId: app._id})" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-cog"></span> Settings</a>&nbsp;
                       <a ui-sref="app.delete({appId: app._id})" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove-circle"></span> Delete</a>
