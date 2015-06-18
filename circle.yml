@@ -4,7 +4,7 @@ machine:
 
 dependencies:
   override:
-    - ./setup.sh -ds
+    - ./setup.sh -snbr
     - docker info
     - docker build -t formio/formio-app:$CIRCLE_SHA1 .
 

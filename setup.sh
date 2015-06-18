@@ -103,12 +103,6 @@ if [ $NODE ]; then
   cd node_modules/formio
   npm install
   cd $DIR
-  cd bower_components/formio
-  npm install
-  cd $DIR
-  cd bower_components/ngFormBuilder
-  npm install
-  cd $DIR
 fi
 
 if [ $BOWER ]; then
@@ -125,14 +119,6 @@ fi
 
 if [ $REBUILD ]; then
   echo "Rebuilding node modules"
-  npm rebuild
-  cd node_modules/formio
-  npm rebuild
-  cd $DIR
-  cd bower_components/formio
-  npm rebuild
-  cd $DIR
-  cd bower_components/ngFormBuilder
   npm rebuild
   cd $DIR
 fi
