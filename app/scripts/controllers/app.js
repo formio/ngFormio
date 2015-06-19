@@ -29,6 +29,30 @@ var refreshUsers = function(userForm, $scope) {
   };
 };
 
+/*
+* Prevents user inputting non-alphanumeric characters or starting the domain with a hyphen.
+* Also automatically lowercases the domain.
+* Having hyphens at the end is allowed (else user can't type hyphens)
+* but should be stripped on submit.
+*/
+app.directive('validSubdomain', function(){
+  return {
+    require: 'ngModel',
+    link: function(scope, element, attrs, ngModel) {
+      
+      var invalidRegex = /[^0-9a-z\-]|^\-/g;
+      ngModel.$parsers.push(function (inputValue) {
+        var transformedInput = inputValue.toLowerCase().replace(invalidRegex, ''); 
+        if (transformedInput !== inputValue) {
+          ngModel.$setViewValue(transformedInput);
+          ngModel.$render();
+        }         
+        return transformedInput;
+     });
+    }
+  };
+});
+
 app.controller('AppCreateController', [
   '$scope',
   '$rootScope',
@@ -49,6 +73,9 @@ app.controller('AppCreateController', [
     $scope.users = [];
     $scope.refreshUsers = refreshUsers(new Formio($rootScope.userForm), $scope);
     $scope.saveApplication = function() {
+      // Need to strip hyphens at the end before submitting
+      $scope.currentApp.name = $scope.currentApp.name.toLowerCase().replace(/[^0-9a-z\-]|^\-+|\-+$/g, '');
+
       Restangular.all('app').post($scope.currentApp).then(function(app) {
         FormioAlerts.addAlert({
           type: 'success',
@@ -61,6 +88,13 @@ app.controller('AppCreateController', [
             path: 'name',
             message: 'Application domain already exists. Please pick a different domain.'
           };
+        }
+        if(error.errors) {
+          angular.forEach(error.errors, function(error){
+            if(error.message) {
+              FormioAlerts.onError(error);
+            }
+          });
         }
         FormioAlerts.onError(error);
       });
@@ -103,6 +137,9 @@ app.controller('AppController', [
 
     // Save the application.
     $scope.saveApplication = function() {
+      // Need to strip hyphens at the end before submitting
+      $scope.currentApp.name = $scope.currentApp.name.toLowerCase().replace(/[^0-9a-z\-]|^\-+|\-+$/g, '');
+
       if (!$scope.currentApp._id) { return FormioAlerts.onError(new Error('No application found.')); }
       $scope.formio.saveApp($scope.currentApp).then(function (app) {
         FormioAlerts.addAlert({
@@ -112,7 +149,18 @@ app.controller('AppController', [
         $state.go('app.view', {
           appId: app._id
         });
-      }, FormioAlerts.onError.bind(FormioAlerts));
+      }, function(error) {
+        if(error.errors) {
+          angular.forEach(error.errors, function(error){
+            if(error.message) {
+              FormioAlerts.onError(error);
+            }
+          });
+        }
+        else {
+          FormioAlerts.onError(error);
+        }
+      });
     };
   }
 ]);

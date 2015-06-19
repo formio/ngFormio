@@ -244,11 +244,16 @@ app.controller('FormController', [
         }
       }
     };
+    // Default to anonymous for new forms
+    if(!$scope.formId) {
+      $scope.onAnonymous(true);
+    }
 
     // Load the form.
     $scope.formio.loadForm().then(function(form) {
       $scope.form = form;
       checkAnonymous();
+
     });
 
     // Get the swagger URL.
