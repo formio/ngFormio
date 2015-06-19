@@ -27,8 +27,23 @@ ul.dropdown-menu {
   padding: 6px 0 0 0;
 }
 
-.breadcrumb {
-  font-size: 14px;
+.navbar-header {
+  .breadcrumb>li+li:before {
+    content: ">";
+  }
+  .breadcrumb {
+    float: left;
+    margin: 6px 10px;
+    font-size: 14px;
+    border: none;
+    text-transform: none;
+    background: none;
+    li {
+      a {
+        color: #FFFFFF;
+      }
+    }
+  }
 }
 
 .play-pres-overlay {
@@ -261,6 +276,31 @@ ul.dropdown-menu {
 /* Fixes line-height issue where labels don't line up caused by ngDialog */
 .checkbox label, .radio label {
   line-height: 1em;
+}
+
+.app-nav {
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 10px;
+  .app-title {
+    font-weight: normal;
+    margin-left: 0px;
+    margin-right: 30px;
+    margin-top: 0px;
+    margin-bottom: 0;
+    font-size: 2em;
+  }
+
+  .app-url {
+    margin: 20px 5px 0 0;
+  }
+  .app-row {
+    position: relative;
+    .app-options {
+      position: absolute;
+      right: 0;
+      bottom: 5px;
+    }
+  }
 }
 
 .form-title {

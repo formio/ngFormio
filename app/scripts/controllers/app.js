@@ -11,6 +11,7 @@ app.controller('AppIndexController', [
   ) {
     $rootScope.noBreadcrumb = false;
     $rootScope.currentApp = false;
+    $rootScope.currentForm = false;
     $scope.apps = Restangular.all('app').getList().$object;
   }
 ]);
@@ -39,14 +40,13 @@ app.directive('validSubdomain', function(){
   return {
     require: 'ngModel',
     link: function(scope, element, attrs, ngModel) {
-      
       var invalidRegex = /[^0-9a-z\-]|^\-/g;
       ngModel.$parsers.push(function (inputValue) {
-        var transformedInput = inputValue.toLowerCase().replace(invalidRegex, ''); 
+        var transformedInput = inputValue.toLowerCase().replace(invalidRegex, '');
         if (transformedInput !== inputValue) {
           ngModel.$setViewValue(transformedInput);
           ngModel.$render();
-        }         
+        }
         return transformedInput;
      });
     }

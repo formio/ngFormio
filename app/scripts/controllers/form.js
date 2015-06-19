@@ -163,6 +163,7 @@ app.directive('formList', function() {
       ) {
         $rootScope.activeSideBar = 'apps';
         $rootScope.noBreadcrumb = false;
+        $rootScope.currentForm = false;
         $scope.formsPerPage = $scope.numPerPage;
         $scope.formsUrl = AppConfig.apiBase + '/app/' + $scope.app._id + '/form?type=' + $scope.formType;
       }
@@ -174,6 +175,7 @@ app.controller('FormController', [
   '$scope',
   '$state',
   '$stateParams',
+  '$rootScope',
   'Formio',
   'FormioAlerts',
   'AppConfig',
@@ -181,6 +183,7 @@ app.controller('FormController', [
     $scope,
     $state,
     $stateParams,
+    $rootScope,
     Formio,
     FormioAlerts,
     AppConfig
@@ -248,6 +251,7 @@ app.controller('FormController', [
     // Load the form.
     $scope.formio.loadForm().then(function(form) {
       $scope.form = form;
+      $rootScope.currentForm = $scope.form;
       checkAnonymous();
     });
 
@@ -289,6 +293,8 @@ app.controller('FormController', [
         $state.go('app.form.index');
       }, FormioAlerts.onError.bind(FormioAlerts));
     };
+
+    $rootScope.currentForm = $scope.form;
   }
 ]);
 
