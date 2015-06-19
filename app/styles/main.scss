@@ -273,6 +273,13 @@ ul.dropdown-menu {
 
 .form-nav {
   border-bottom: 1px solid #ddd;
+  li {
+    padding-bottom: 5px;
+  }
+}
+
+.col-margin-bottom {
+  margin-bottom: 15px;
 }
 
 /***************************** Required styles *****************************/
