@@ -163,17 +163,14 @@ angular
     '$scope',
     '$rootScope',
     'Formio',
-    '$window',
-    'AppConfig',
     function(
       $scope,
       $rootScope,
-      Formio,
-      $window,
-      AppConfig
+      Formio
     ) {
       $rootScope.activeSideBar = 'home';
       $rootScope.currentApp = null;
+      $rootScope.currentForm = null;
       $scope.teams = [];
       $scope.teamsLoading = true;
       $scope.teamsUrl = $rootScope.teamForm + '/submission';
@@ -188,10 +185,6 @@ angular
         angular.element('#apps-loader').hide();
         $scope.apps = apps;
       });
-
-      $scope.startTutorial = function() {
-        $window.open(AppConfig.tutorial, 'formio-tutorial', 'height=640,width=960');
-      };
     }
   ])
   .filter('trusted', [
@@ -232,6 +225,11 @@ angular
       $rootScope.userLoginForm = AppConfig.userLoginForm;
       $rootScope.userRegisterForm = AppConfig.userRegisterForm;
       $rootScope.teamForm = AppConfig.teamForm;
+
+      // Start the tutorial.
+      $rootScope.startTutorial = function() {
+        $window.open(AppConfig.tutorial, 'formio-tutorial', 'height=640,width=960');
+      };
 
       // Always redirect to login if they are not authenticated.
       $state.go('home');
