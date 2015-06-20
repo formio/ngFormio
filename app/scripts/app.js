@@ -257,8 +257,12 @@ angular
 
       // Trigger when a logout occurs.
       Formio.onLogout.then(function() {
+        $rootScope.currentApp = null;
+        $rootScope.currentForm = null;
         $state.go('auth.login');
       }, function() {
+        $rootScope.currentApp = null;
+        $rootScope.currentForm = null;
         $state.go('auth.login');
         FormioAlerts.addAlert({
           type: 'danger',
