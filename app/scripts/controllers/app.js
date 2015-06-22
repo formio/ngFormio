@@ -89,13 +89,6 @@ app.controller('AppCreateController', [
             message: 'Application domain already exists. Please pick a different domain.'
           };
         }
-        if(error.errors) {
-          angular.forEach(error.errors, function(error){
-            if(error.message) {
-              FormioAlerts.onError(error);
-            }
-          });
-        }
         FormioAlerts.onError(error);
       });
     };
@@ -150,16 +143,7 @@ app.controller('AppController', [
           appId: app._id
         });
       }, function(error) {
-        if(error.errors) {
-          angular.forEach(error.errors, function(error){
-            if(error.message) {
-              FormioAlerts.onError(error);
-            }
-          });
-        }
-        else {
-          FormioAlerts.onError(error);
-        }
+        FormioAlerts.onError(error);
       });
     };
   }
