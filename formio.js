@@ -599,8 +599,9 @@ app.directive('formio', function() {
         });
 
         // Called when the form is submitted.
-        $scope.onSubmit = function() {
-          if (!$scope.formioForm.$valid) { return; }
+        $scope.onSubmit = function(form) {
+          if (!$scope.formioForm.$valid || form.submitting) { return; }
+          form.submitting = true;
 
           // Create a sanitized submission object.
           var submissionData = {data: {}};
@@ -629,7 +630,7 @@ app.directive('formio', function() {
               type: 'success',
               message: 'Submission was ' + ((method === 'put') ? 'updated' : 'created') + '.'
             });
-
+            form.submitting = false;
             // Trigger the form submission.
             $scope.$emit('formSubmission', submission);
           };
@@ -640,14 +641,20 @@ app.directive('formio', function() {
             $http[method]($scope.action, submissionData).success(function (submission) {
               Formio.clearCache();
               onSubmitDone(method, submission);
-            }).error(FormioScope.onError($scope));
+            }).error(FormioScope.onError($scope))
+            .finally(function() {
+              form.submitting = false;
+            });
           }
 
           // If they wish to submit to the default location.
           else if ($scope.formio) {
             $scope.formio.saveSubmission(submissionData).then(function(submission) {
               onSubmitDone(submission.method, submission);
-            }, FormioScope.onError($scope));
+            }, FormioScope.onError($scope))
+            .finally(function() {
+              form.submitting = false;
+            });
           }
           else {
             $scope.$emit('formSubmission', submissionData);
@@ -1045,7 +1052,7 @@ app.run([
 
     // The template for the formio forms.
     $templateCache.put('formio.html',
-      '<form role="form" name="formioForm" ng-submit="onSubmit()" novalidate>' +
+      '<form role="form" name="formioForm" ng-submit="onSubmit(formioForm)" novalidate>' +
         '<i id="formio-loading" style="font-size: 2em;" class="fa fa-spinner fa-pulse"></i>' +
         '<div ng-repeat="alert in formioAlerts" class="alert alert-{{ alert.type }}" role="alert">' +
           '{{ alert.message }}' +
