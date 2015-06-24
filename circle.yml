@@ -1,16 +1,38 @@
 machine:
+  python:
+    version: 2.7.3
   services:
     - docker
+    - mongodb
+  environment:
+    SHORT_SHA: $(echo $CIRCLE_SHA1 | cut -b1-7)
+    FEATURE_ID: $(echo $CIRCLE_BRANCH | sed -E "s/feature\/(fa-[0-9]*).*/\1/")
+    IMAGE_PATH: "formio/formio-app"
+    TAG_NAME: "$CIRCLE_BRANCH-$SHORT_SHA"
 
 dependencies:
   override:
     - ./setup.sh -snbr
-    - docker info
-    - docker build -t formio/formio-app:$CIRCLE_SHA1 .
+    - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+    - docker build -t $IMAGE_PATH:$TAG_NAME .
+#    - copy database file from s3?
+#    - mongorestore --db formio formio
 
 deployment:
-  hub:
-    branch: master
+  release:
+    branch: release/*
     commands:
-      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-#      - docker push formio/formio-app:$CIRCLE_SHA1
+      - pip install awscli
+      - docker push $IMAGE_PATH:$TAG_NAME
+      - ./scripts/deploy.sh $TAG_NAME stage
+  feature:
+    branch: feature/fa-*
+    commands:
+      - pip install awscli
+      - docker push $IMAGE_PATH:$TAG_NAME
+      - ./scripts/deploy.sh $TAG_NAME $FEATURE_ID.test
+  develop:
+    branch: develop
+    commands:
+      - pip install awscli
+      - docker push $IMAGE_PATH:$TAG_NAME test

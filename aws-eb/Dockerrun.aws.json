@@ -1,0 +1,17 @@
+{
+  "AWSEBDockerrunVersion": "1",
+  "Authentication": {
+    "Bucket": "formiobot-docker",
+    "Key": "formiobot.dockercfg"
+  },
+  "Image": {
+    "Name": "formio/formio-app:<TAG>",
+    "Update": "true"
+  },
+  "Ports": [
+    {
+      "ContainerPort": "80"
+    }
+  ],
+  "Logging": "/var/log/nodejs"
+}

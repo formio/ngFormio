@@ -17,7 +17,7 @@ COPY . /src
 WORKDIR /src
 
 # node modules need to be compiled for the host platform.
-RUN ./setup.sh -bnrg
+RUN ./scripts/setup.sh -bnrg
 
 EXPOSE       80
 

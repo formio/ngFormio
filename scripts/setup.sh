@@ -1,8 +1,8 @@
 #! /bin/bash
 # Save the original current directory so we can return to it at the end of the script.
 CURDIR=$(pwd)
-# Get the directory of this script. Use its location as the root of where we run things.
-DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+# Get the parent directory of this script. Use its location as the root of where we run things.
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )
 
 # Function to print out how to use this script.
 usage() {
