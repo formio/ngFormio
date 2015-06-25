@@ -10,8 +10,8 @@ EB_BUCKET=formio-ecs-bucket
 APPLICATION_NAME=form.io
 ENVIRONMENT_CONFIG=DevConfig
 HOSTED_ZONE_ID=ZITLBCTQPADKN
-MONGO_SERVER=ec2-52-25-221-252.us-west-2.compute.amazonaws.com
-MONGO1=mongodb://$MONGO_SERVER/$TAG_NAME
+MONGO_SERVER=mongoadmin:mKo6Go3XsxzrsbnG@ec2-52-25-221-252.us-west-2.compute.amazonaws.com
+MONGO1=mongodb://$MONGO_SERVER/$ENVIRONMENT
 AWSDIR=aws-eb
 
 # Don't allow deploying to production. Sanity check.
@@ -32,7 +32,7 @@ echo "Creating $TAG_NAME.zip file."
 mkdir -p $AWSDIR/versions/$TAG_NAME
 sed "s/<TAG>/$TAG_NAME/" < $AWSDIR/Dockerrun.aws.json > $AWSDIR/versions/$TAG_NAME/Dockerrun.aws.json
 mkdir -p $AWSDIR/versions/$TAG_NAME/.ebextensions
-sed "s/<MONGO1>/$(echo $MONGO1 | sed -e 's/[\/&]/\\&/g')/" < $AWSDIR/.ebextensions/app.config > $AWSDIR/versions/$TAG_NAME/.ebextensions/app.config
+sed -e "s/<MONGO1>/$(echo $MONGO1 | sed -e 's/[\/&]/\\&/g')/" -e "s/<ENVIRONMENT>/$ENVIRONMENT/" < $AWSDIR/.ebextensions/app.config > $AWSDIR/versions/$TAG_NAME/.ebextensions/app.config
 cd $AWSDIR/versions/$TAG_NAME
 zip -r ../$TAG_NAME.zip * .ebextensions/*
 cd ../../..
@@ -70,7 +70,7 @@ if [[ -z $EXISTS ]]; then
   aws route53 change-resource-record-sets --hosted-zone-id $HOSTED_ZONE_ID --change-batch file://$DIR/$AWSDIR/versions/$TAG_NAME/DNSAdd.json
 else
   echo "Existing environment found. Updating application version to $TAG_NAME."
-  aws elasticbeanstalk update-environment --environment-name formio-env --version-label $TAG_NAME
+  aws elasticbeanstalk update-environment --environment-name $ENVIRONMENT--version-label $TAG_NAME
   # TODO: Should we reload the database each deploy?
 fi
 

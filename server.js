@@ -15,11 +15,11 @@ nunjucks.configure('server/views', {
 
 // The healthcheck.
 app.get('/health', function(req, res) {
-  if (!formio.resources) { return res.sendStatus(500); }
-  if (!formio.resources.application.model) { return res.sendStatus(500); }
+  if (!formio.resources) { return res.status(500).send("No Resources"); }
+  if (!formio.resources.application.model) { return res.status(500).send("No application model"); }
   formio.resources.application.model.findOne({name: 'formio'}, function(err, result) {
-    if (err) { return res.sendStatus(500); }
-    if (!result) { return res.status(500); }
+    if (err) { return res.status(500).send(err); }
+    if (!result) { return res.status(500).send('Formio application not found'); }
     res.send('OK');
   });
 });
