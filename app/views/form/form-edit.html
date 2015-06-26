@@ -1,3 +1,6 @@
+<ul class="nav nav-pills form-nav" ng-if="!formId">
+  <li role="presentation"><span ng-switch="form.type" class="navbar-text form-title">New {{ capitalize(form.type) }}</span></li>
+</ul>
 <form role="form" novalidate>
   <div id="form-group-title" class="form-group">
     <label for="title" class="control-label">Title</label>
@@ -20,6 +23,6 @@
   <div ng-include="'views/form/form-settings.html'"></div>
   <div class="form-group pull-right">
     <a class="btn btn-default" ng-click="back()">Cancel</a>
-    <input type="submit" class="btn btn-primary" ng-click="saveForm()" value="Save {{ capitalize(form.type)  }}" />
+    <input type="submit" class="btn btn-primary" ng-click="saveForm()" value="{{formId ? 'Save' : 'Create'}} {{ capitalize(form.type)  }}" />
   </div>
 </form>
