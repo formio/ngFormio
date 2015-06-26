@@ -10,7 +10,7 @@ EB_BUCKET=formio-ecs-bucket
 APPLICATION_NAME=form.io
 ENVIRONMENT_CONFIG=DevConfig
 HOSTED_ZONE_ID=ZITLBCTQPADKN
-MONGO_SERVER=mongoadmin:mKo6Go3XsxzrsbnG@ec2-52-25-221-252.us-west-2.compute.amazonaws.com
+MONGO_SERVER=ec2-52-25-221-252.us-west-2.compute.amazonaws.com:27017
 MONGO1=mongodb://$MONGO_SERVER/$ENVIRONMENT
 AWSDIR=aws-eb
 
@@ -70,7 +70,7 @@ if [[ -z $EXISTS ]]; then
   aws route53 change-resource-record-sets --hosted-zone-id $HOSTED_ZONE_ID --change-batch file://$DIR/$AWSDIR/versions/$TAG_NAME/DNSAdd.json
 else
   echo "Existing environment found. Updating application version to $TAG_NAME."
-  aws elasticbeanstalk update-environment --environment-name $ENVIRONMENT--version-label $TAG_NAME
+  aws elasticbeanstalk update-environment --environment-name $ENVIRONMENT --version-label $TAG_NAME
   # TODO: Should we reload the database each deploy?
 fi
 

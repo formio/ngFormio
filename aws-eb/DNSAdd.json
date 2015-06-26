@@ -12,6 +12,18 @@
           "EvaluateTargetHealth": true
         }
       }
+    },
+    {
+      "Action": "UPSERT",
+      "ResourceRecordSet": {
+        "Name": "*.<ENVIRONMENT>.form.io.",
+        "Type": "A",
+        "AliasTarget": {
+          "HostedZoneId": "<ALIAS_ZONE>",
+          "DNSName": "<DNS_NAME>",
+          "EvaluateTargetHealth": true
+        }
+      }
     }
   ]
 }
