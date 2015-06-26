@@ -312,12 +312,9 @@ app.factory('FormioAlerts', [
     var alerts = [];
     return {
       addAlert: function (alert) {
-        $rootScope.alerts.push(alert);
-        if (alert.element) {
+        alerts.push(alert);
+        if(alert.element) {
           angular.element('#form-group-' + alert.element).addClass('has-error');
-        }
-        else {
-          alerts.push(alert);
         }
       },
       getAlerts: function () {
@@ -326,18 +323,35 @@ app.factory('FormioAlerts', [
         alerts = [];
         return tempAlerts;
       },
-      onError: function showError(error) {
-        if (error.message) {
+      onError: function (error) {
+        var errors = error.hasOwnProperty('errors') ? error.errors : error.data && error.data.errors;
+        if(errors && (Object.keys(errors).length || errors.length) > 0) {
+          _.each(errors, (function(e) {
+            if(e.message || _.isString(e)) {
+              this.addAlert({
+                type: 'danger',
+                message: e.message || e,
+                element: e.path
+              });
+            }
+          }).bind(this));
+        }
+        else if (error.message) {
           this.addAlert({
             type: 'danger',
             message: error.message,
             element: error.path
           });
         }
-        else {
-          var errors = error.hasOwnProperty('errors') ? error.errors : error.data.errors;
-          _.each(errors, showError.bind(this));
-        }
+
+        // Remove error class from old alerts before clearing them.
+        _.each($rootScope.alerts, function(alert){
+          if(alert.element && !_.find(alerts, 'element', alert.element)) {
+            angular.element('#form-group-' + alert.element).removeClass('has-error');
+          }
+        });
+        // Clear old alerts with new alerts.
+        $rootScope.alerts = this.getAlerts();
       }
     };
   }
