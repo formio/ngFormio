@@ -53,6 +53,46 @@ app.directive('validSubdomain', function(){
   };
 });
 
+/*
+* Adds an async validator to check a URL for uniqueness
+* Options:
+*   unique-checker="/some/formio/endpoint" (required, url to POST)
+*   unique-checker-param="nameOfRequestParam" (name of param in request)
+*   unique-checker-result-prop="nameOfResultProp" (name of property in result to check)
+*/
+app.directive('uniqueChecker', ['$http', '$q', 'Formio', function($http, $q, Formio){
+  return {
+    scope: {
+      url: '@uniqueChecker',
+      param: '@uniqueCheckerParam',
+      resultProp: '@uniqueCheckerResultProp'
+    },
+    require: 'ngModel',
+    restrict: 'A',
+    link: function($scope, el, attrs, ngModel) {
+      ngModel.$asyncValidators.unique = function(modelValue, viewValue) {
+        $scope.param = $scope.param || 'name';
+        $scope.resultProp = $scope.resultProp || 'available';
+        var value = modelValue || viewValue;
+        var req = {};
+        req[$scope.param] = value;
+
+        if(!value) {
+          return $q.reject();
+        }
+
+        return $http.post(Formio.baseUrl + $scope.url, req)
+          .then(function(response) {
+            if(!response.data.available) {
+              return $q.reject('unavailable');
+            }
+            return true;
+          });
+      };
+    }
+  };
+}]);
+
 app.controller('AppCreateController', [
   '$scope',
   '$rootScope',
