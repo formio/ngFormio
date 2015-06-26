@@ -204,6 +204,7 @@ app.controller('FormController', [
     $scope.formUrl = '/app/' + $stateParams.appId + '/form';
     $scope.formUrl += $stateParams.formId ? ('/' + $stateParams.formId) : '';
     var formType = $stateParams.formType || 'form';
+    $scope.capitalize = _.capitalize;
     $scope.form = {title: '', type: formType, components: [], access: []};
 
     // Attach the name to the title of the form.
