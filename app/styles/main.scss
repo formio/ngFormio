@@ -27,17 +27,37 @@ ul.dropdown-menu {
   padding: 6px 0 0 0;
 }
 
-.breadcrumb {
-  font-size: 14px;
+.navbar-header {
+  .breadcrumb>li+li:before {
+    content: ">";
+  }
+  .breadcrumb {
+    float: left;
+    margin: 6px 10px;
+    font-size: 14px;
+    border: none;
+    text-transform: none;
+    background: none;
+    li {
+      a {
+        color: #FFFFFF;
+      }
+    }
+  }
 }
 
 .play-pres-overlay {
+  position: relative;
   text-align:center;
   z-index:2;
   background: rgb(0, 0, 0);
   background: rgba(0, 0, 0, 0.3);
   filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#55000000, endColorstr=#55000000);
   -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#55000000, endColorstr=#55000000)";
+}
+
+.play-pres-overlay img {
+  cursor: pointer !important;
 }
 
 .play-pres-overlay .play-pres-overlay-play {
@@ -52,7 +72,7 @@ ul.dropdown-menu {
   cursor: pointer !important;
   border: none;
   opacity: 0.9;
-  padding-top: 12px;
+  padding: 5px;
   z-index:3;
   color: #eee;
   border-radius: 10px;
@@ -257,6 +277,64 @@ ul.dropdown-menu {
 /* Fixes line-height issue where labels don't line up caused by ngDialog */
 .checkbox label, .radio label {
   line-height: 1em;
+}
+
+.app-nav {
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 10px;
+  .app-title {
+    font-weight: normal;
+    margin-left: 0px;
+    margin-right: 30px;
+    margin-top: 0px;
+    margin-bottom: 0;
+    font-size: 2em;
+  }
+
+  .app-url {
+    margin: 20px 5px 0 0;
+  }
+  .app-row {
+    position: relative;
+    .app-options {
+      position: absolute;
+      right: 0;
+      bottom: 5px;
+    }
+  }
+}
+
+.form-title {
+  margin-left: 0px;
+  margin-top: 0px;
+  margin-bottom: 4px;
+  font-size: 2em;
+}
+
+.form-nav {
+  border-bottom: 1px solid #ddd;
+  li {
+    padding-bottom: 5px;
+  }
+  .form-nav-right {
+    float: right;
+  }
+  .resource-label {
+    display: inline;
+    padding: .2em .6em .3em;
+    font-size: 80%;
+    font-weight: 500;
+    line-height: 3.5;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: .25em;
+    margin-right: 30px;
+  }
+}
+
+.col-margin-bottom {
+  margin-bottom: 15px;
 }
 
 /***************************** Required styles *****************************/

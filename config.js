@@ -46,6 +46,8 @@ module.exports = function(width) {
     config.formio.jwt.secret = process.env.JWT_SECRET;
     config.formio.jwt.expireTime = process.env.JWT_EXPIRE_TIME || 240;
   }
+  config.reservedSubdomains = ["test", "www", "api", "help", "support"];
+
   return config;
 
 }
