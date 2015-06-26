@@ -389,13 +389,13 @@ app.factory('FormioScope', [
           if (error.name === 'ValidationError') {
             angular.element('#form-group-' + error.details[0].path).addClass('has-error');
             var message = 'ValidationError: ' + error.details[0].message;
-            $scope.formioAlerts.push({
+            $scope.showAlerts({
               type: 'danger',
               message: message
             });
           }
           else {
-            $scope.formioAlerts.push({
+            $scope.showAlerts({
               type: 'danger',
               message: error
             });
@@ -593,6 +593,10 @@ app.directive('formio', function() {
         FormioUtils
       ) {
         $scope.formioAlerts = [];
+        // Shows the given alerts (single or array), and dismisses old alerts
+        $scope.showAlerts = function(alerts) {
+          $scope.formioAlerts = [].concat(alerts);
+        };
         $scope.formio = FormioScope.register($scope, {
           form: true,
           submission: true
@@ -626,7 +630,7 @@ app.directive('formio', function() {
 
           // Called when a submission has been made.
           var onSubmitDone = function(method, submission) {
-            $scope.formioAlerts.push({
+            $scope.showAlerts({
               type: 'success',
               message: 'Submission was ' + ((method === 'put') ? 'updated' : 'created') + '.'
             });
@@ -690,6 +694,10 @@ app.directive('formioDelete', function() {
         $http
       ) {
         $scope.formioAlerts = [];
+        // Shows the given alerts (single or array), and dismisses old alerts
+        $scope.showAlerts = function(alerts) {
+          $scope.formioAlerts = [].concat(alerts);
+        };
         var resourceName = 'resource';
         var resourceTitle = 'Resource';
         var methodName = '';
@@ -712,7 +720,7 @@ app.directive('formioDelete', function() {
 
           // Called when the delete is done.
           var onDeleteDone = function(data) {
-            $scope.formioAlerts.push({
+            $scope.showAlerts({
               type: 'success',
               message: resourceTitle + ' was deleted.'
             });
