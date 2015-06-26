@@ -18,9 +18,8 @@
   </div>
   <form-builder app="appId" form="form"></form-builder>
   <div ng-include="'views/form/form-settings.html'"></div>
-  <div class="form-group">
-    <input type="submit" class="btn btn-primary" ng-click="saveForm()" value="Save" />
-    <a class="btn btn-danger" ng-if="form._id" ui-sref="app.form.delete()">Delete</a>
-    <button type="button" class="btn btn-default" ng-click="back()">Cancel</button>
+  <div class="form-group pull-right">
+    <a class="btn btn-default" ng-click="back()">Cancel</a>
+    <input type="submit" class="btn btn-primary" ng-click="saveForm()" value="Save {{ capitalize(form.type)  }}" />
   </div>
 </form>
