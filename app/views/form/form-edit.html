@@ -1,3 +1,6 @@
+<ul class="nav nav-pills form-nav" ng-if="!formId">
+  <li role="presentation"><span ng-switch="form.type" class="navbar-text form-title">New {{ capitalize(form.type) }}</span></li>
+</ul>
 <form role="form" novalidate>
   <div id="form-group-title" class="form-group">
     <label for="title" class="control-label">Title</label>
@@ -12,15 +15,14 @@
     <label for="path" class="control-label">API Path</label>
     <div class="input-group" style="width: 350px;">
       <span class="input-group-addon">https://{{ currentApp.name }}.form.io/app/api/</span>
-      <input type="text" class="form-control" id="path" ng-model="form.path" placeholder="user">
+      <input type="text" class="form-control" id="path" ng-model="form.path" placeholder="user" style="width: 200px;">
     </div>
     <small>The REST API path to this form.</small>
   </div>
   <form-builder app="appId" form="form"></form-builder>
   <div ng-include="'views/form/form-settings.html'"></div>
-  <div class="form-group">
-    <input type="submit" class="btn btn-primary" ng-click="saveForm()" value="Save" />
-    <a class="btn btn-danger" ng-if="form._id" ui-sref="app.form.delete()">Delete</a>
-    <button type="button" class="btn btn-default" ng-click="back()">Cancel</button>
+  <div class="form-group pull-right">
+    <a class="btn btn-default" ng-click="back()">Cancel</a>
+    <input type="submit" class="btn btn-primary" ng-click="saveForm()" value="{{formId ? 'Save' : 'Create'}} {{ capitalize(form.type)  }}" />
   </div>
 </form>
