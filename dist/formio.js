@@ -391,13 +391,13 @@ app.factory('FormioScope', [
           if (error.name === 'ValidationError') {
             angular.element('#form-group-' + error.details[0].path).addClass('has-error');
             var message = 'ValidationError: ' + error.details[0].message;
-            $scope.formioAlerts.push({
+            $scope.showAlerts({
               type: 'danger',
               message: message
             });
           }
           else {
-            $scope.formioAlerts.push({
+            $scope.showAlerts({
               type: 'danger',
               message: error
             });
@@ -595,14 +595,19 @@ app.directive('formio', function() {
         FormioUtils
       ) {
         $scope.formioAlerts = [];
+        // Shows the given alerts (single or array), and dismisses old alerts
+        $scope.showAlerts = function(alerts) {
+          $scope.formioAlerts = [].concat(alerts);
+        };
         $scope.formio = FormioScope.register($scope, {
           form: true,
           submission: true
         });
 
         // Called when the form is submitted.
-        $scope.onSubmit = function() {
-          if (!$scope.formioForm.$valid) { return; }
+        $scope.onSubmit = function(form) {
+          if (!$scope.formioForm.$valid || form.submitting) { return; }
+          form.submitting = true;
 
           // Create a sanitized submission object.
           var submissionData = {data: {}};
@@ -627,11 +632,11 @@ app.directive('formio', function() {
 
           // Called when a submission has been made.
           var onSubmitDone = function(method, submission) {
-            $scope.formioAlerts.push({
+            $scope.showAlerts({
               type: 'success',
               message: 'Submission was ' + ((method === 'put') ? 'updated' : 'created') + '.'
             });
-
+            form.submitting = false;
             // Trigger the form submission.
             $scope.$emit('formSubmission', submission);
           };
@@ -642,14 +647,20 @@ app.directive('formio', function() {
             $http[method]($scope.action, submissionData).success(function (submission) {
               Formio.clearCache();
               onSubmitDone(method, submission);
-            }).error(FormioScope.onError($scope));
+            }).error(FormioScope.onError($scope))
+            .finally(function() {
+              form.submitting = false;
+            });
           }
 
           // If they wish to submit to the default location.
           else if ($scope.formio) {
             $scope.formio.saveSubmission(submissionData).then(function(submission) {
               onSubmitDone(submission.method, submission);
-            }, FormioScope.onError($scope));
+            }, FormioScope.onError($scope))
+            .finally(function() {
+              form.submitting = false;
+            });
           }
           else {
             $scope.$emit('formSubmission', submissionData);
@@ -685,6 +696,10 @@ app.directive('formioDelete', function() {
         $http
       ) {
         $scope.formioAlerts = [];
+        // Shows the given alerts (single or array), and dismisses old alerts
+        $scope.showAlerts = function(alerts) {
+          $scope.formioAlerts = [].concat(alerts);
+        };
         var resourceName = 'resource';
         var resourceTitle = 'Resource';
         var methodName = '';
@@ -707,7 +722,7 @@ app.directive('formioDelete', function() {
 
           // Called when the delete is done.
           var onDeleteDone = function(data) {
-            $scope.formioAlerts.push({
+            $scope.showAlerts({
               type: 'success',
               message: resourceTitle + ' was deleted.'
             });
@@ -1047,7 +1062,7 @@ app.run([
 
     // The template for the formio forms.
     $templateCache.put('formio.html',
-      '<form role="form" name="formioForm" ng-submit="onSubmit()" novalidate>' +
+      '<form role="form" name="formioForm" ng-submit="onSubmit(formioForm)" novalidate>' +
         '<i id="formio-loading" style="font-size: 2em;" class="fa fa-spinner fa-pulse"></i>' +
         '<div ng-repeat="alert in formioAlerts" class="alert alert-{{ alert.type }}" role="alert">' +
           '{{ alert.message }}' +
@@ -1326,12 +1341,13 @@ app.run([
     $templateCache
   ) {
     $templateCache.put('formio/components/button.html',
-      '<button ng-class="{\'btn-block\': component.block}" class="btn btn-{{ component.theme }} btn-{{ component.size }}" ng-disabled="readOnly || (component.disableOnInvalid && form.$invalid)" ng-click="$emit(component.action)">' +
+      '<button ng-class="{\'btn-block\': component.block}" class="btn btn-{{ component.theme }} btn-{{ component.size }}" ng-disabled="readOnly || form.submitting || (component.disableOnInvalid && form.$invalid)" ng-click="$emit(component.action)">' +
         '<span ng-if="component.leftIcon" class="{{ component.leftIcon }}" aria-hidden="true"></span>' +
         '<span ng-if="component.leftIcon && component.label">&nbsp;</span>' +
         '{{ component.label }}' +
         '<span ng-if="component.rightIcon && component.label">&nbsp;</span>' +
         '<span ng-if="component.rightIcon" class="{{ component.rightIcon }}" aria-hidden="true"></span>' +
+        ' <i ng-if="component.action == \'submit\' && form.submitting" class="fa fa-spinner fa-pulse"></i>' +
       '</button>'
     );
   }
