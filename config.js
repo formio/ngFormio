@@ -1,4 +1,4 @@
-module.exports = function(width) {
+module.exports = function() {
   var config = {
     "formio": {}
   };
@@ -15,6 +15,7 @@ module.exports = function(width) {
   config.port = port;
   config.formioHost = formioHost;
   config.debug = process.env.DEBUG || false;
+  config.https = process.env.HTTPS || true;
 
   if (process.env.MONGO1) {
     config.formio.mongo = [];
@@ -43,7 +44,8 @@ module.exports = function(width) {
   }
 
   if (process.env.JWT_SECRET) {
-    config.formio.jwt.secret = process.env.JWT_SECRET;
+    config.formio.jwt = {}
+    config.formio.jwt.secret = process.env.JWT_SECRET || "abc123";
     config.formio.jwt.expireTime = process.env.JWT_EXPIRE_TIME || 240;
   }
   config.reservedSubdomains = ["test", "www", "api", "help", "support"];

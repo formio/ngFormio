@@ -109,12 +109,6 @@ if [ $BOWER ]; then
   echo "Installing bower components"
   npm install -g bower
   bower install --allow-root -s -F
-  cd bower_components/formio
-  bower install --allow-root -s -F
-  cd $DIR
-  cd bower_components/ngFormBuilder
-  bower install --allow-root -s -F
-  cd $DIR
 fi
 
 if [ $REBUILD ]; then

@@ -6,33 +6,34 @@ machine:
     - mongodb
   environment:
     SHORT_SHA: $(echo $CIRCLE_SHA1 | cut -b1-7)
-    FEATURE_ID: $(echo $CIRCLE_BRANCH | sed -E "s/feature\/(fa-[0-9]*).*/\1/")
+    EPIC_ID: $(echo $CIRCLE_BRANCH | sed -E "s/epic\/([a-zA-Z0-9\.-_]*).*/\1/")
+    RELEASE_ID: $(echo $CIRCLE_BRANCH | sed -E "s/release\/([a-zA-Z0-9\.-_]*).*/\1/")
     IMAGE_PATH: "formio/formio-app"
     TAG_NAME: "$CIRCLE_BRANCH-$SHORT_SHA"
 
 dependencies:
   override:
-    - ./setup.sh -snbr
+    - ./scripts/setup.sh -snb
     - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
     - docker build -t $IMAGE_PATH:$TAG_NAME .
-#    - copy database file from s3?
-#    - mongorestore --db formio formio
 
-deployment:
-  release:
-    branch: release/*
-    commands:
-      - pip install awscli
-      - docker push $IMAGE_PATH:$TAG_NAME
-      - ./scripts/deploy.sh $TAG_NAME stage
-  feature:
-    branch: feature/fa-*
-    commands:
-      - pip install awscli
-      - docker push $IMAGE_PATH:$TAG_NAME
-      - ./scripts/deploy.sh $TAG_NAME $FEATURE_ID.test
-  develop:
-    branch: develop
-    commands:
-      - pip install awscli
-      - docker push $IMAGE_PATH:$TAG_NAME test
+
+
+#deployment:
+#  release:
+#    branch: release/*
+#    commands:
+#      - pip install awscli
+#      - docker push $IMAGE_PATH:$RELEASE_ID
+#      - ./scripts/deploy.sh $RELEASE_ID test
+#  epic:
+#    branch: epic/*
+#    commands:
+#      - pip install awscli
+#      - docker push $IMAGE_PATH:$EPIC_ID
+#      - ./scripts/deploy.sh $EPIC_ID $EPIC_ID.int
+#  develop:
+#    branch: develop
+#    commands:
+#      - pip install awscli
+#      - docker push $IMAGE_PATH:$TAG_NAME int
