@@ -255,12 +255,7 @@ angular
         $rootScope.currentState = toState.name;
       });
 
-      // Trigger when a logout occurs.
-      Formio.onLogout.then(function() {
-        $rootScope.currentApp = null;
-        $rootScope.currentForm = null;
-        $state.go('auth.login');
-      }, function() {
+      var logoutError = function() {
         $rootScope.currentApp = null;
         $rootScope.currentForm = null;
         $state.go('auth.login');
@@ -268,11 +263,17 @@ angular
           type: 'danger',
           message: 'Your session has expired. Please log in again.'
         });
-      });
+      }
+      // Catches error from expired/invalid session.
+      $rootScope.$on('formio.unauthorized', logoutError);
 
-      // Logout of form.io.
+      // Logout of form.io and go to login page.
       $rootScope.logout = function() {
-        Formio.logout();
+        Formio.logout().then(function() {
+          $rootScope.currentApp = null;
+          $rootScope.currentForm = null;
+          $state.go('auth.login');
+        }).catch(logoutError);
       };
 
       // Ensure they are logged.
