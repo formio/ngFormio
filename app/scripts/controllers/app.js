@@ -114,7 +114,9 @@ app.controller('AppCreateController', [
     $scope.refreshUsers = refreshUsers(new Formio($rootScope.userForm), $scope);
     $scope.saveApplication = function() {
       // Need to strip hyphens at the end before submitting
-      $scope.currentApp.name = $scope.currentApp.name.toLowerCase().replace(/[^0-9a-z\-]|^\-+|\-+$/g, '');
+      if($scope.currentApp.name) {
+        $scope.currentApp.name = $scope.currentApp.name.toLowerCase().replace(/[^0-9a-z\-]|^\-+|\-+$/g, '');
+      }
 
       Restangular.all('app').post($scope.currentApp).then(function(app) {
         FormioAlerts.addAlert({
@@ -171,7 +173,9 @@ app.controller('AppController', [
     // Save the application.
     $scope.saveApplication = function() {
       // Need to strip hyphens at the end before submitting
-      $scope.currentApp.name = $scope.currentApp.name.toLowerCase().replace(/[^0-9a-z\-]|^\-+|\-+$/g, '');
+      if($scope.currentApp.name) {
+        $scope.currentApp.name = $scope.currentApp.name.toLowerCase().replace(/[^0-9a-z\-]|^\-+|\-+$/g, '');
+      }
 
       if (!$scope.currentApp._id) { return FormioAlerts.onError(new Error('No application found.')); }
       $scope.formio.saveApp($scope.currentApp).then(function (app) {
