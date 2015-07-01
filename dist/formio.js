@@ -1992,10 +1992,12 @@ app.config([
             if(settings.data.url.substr(0, 1) === '/') {
               settings.data.url = Formio.baseUrl + settings.data.url;
             }
-            $http.get(settings.data.url)
-              .success(function(data) {
-                $scope.selectItems = data;
-              });
+            $http.get(settings.data.url, {
+              disableJWT: true,
+              headers: {Authorization: undefined}
+            }).success(function(data) {
+              $scope.selectItems = data;
+            });
             break;
           default:
             $scope.selectItems = [];
