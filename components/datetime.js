@@ -53,6 +53,7 @@ app.run([
           'ng-click="calendarOpen = true" ' +
           'ng-init="calendarOpen = false" ' +
           'ng-disabled="readOnly" ' +
+          'ng-required="component.validate.required" ' +
           'is-open="calendarOpen" ' +
           'datetime-picker="{{ component.format }}" ' +
           'min-date="component.minDate" ' +
