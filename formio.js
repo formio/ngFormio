@@ -64,14 +64,14 @@ app.provider('Formio', function() {
       '$q',
       'formioInterceptor',
       '$location',
+      '$rootScope',
       function(
         $http,
         $q,
         formioInterceptor,
-        $location
+        $location,
+        $rootScope
       ) {
-
-        var logoutQ = $q.defer();
 
         // The formio class.
         var Formio = function(path) {
@@ -167,7 +167,9 @@ app.provider('Formio', function() {
          */
         var requestError = function(deferred) {
           return function(error) {
-            if (error === 'Unauthorized') { logoutQ.reject(error); }
+            if (error === 'Unauthorized') {
+              $rootScope.$broadcast('formio.unauthorized', error);
+            }
             deferred.reject(error);
           };
         };
@@ -318,18 +320,11 @@ app.provider('Formio', function() {
         };
 
         // Keep track of their logout callback.
-        Formio.onLogout = logoutQ.promise;
         Formio.logout = function() {
-          $http.get(baseUrl + '/logout').success(function() {
+          return $http.get(baseUrl + '/logout').finally(function() {
             this.setToken(null);
             this.setUser(null);
-            logoutQ.resolve();
-          }.bind(this)).error(function() {
-            this.setToken(null);
-            this.setUser(null);
-            logoutQ.reject();
           }.bind(this));
-          return Formio.onLogout;
         };
         Formio.submissionData = function(data, component, onId) {
           if (!data) { return ''; }
