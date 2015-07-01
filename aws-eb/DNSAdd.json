@@ -4,7 +4,7 @@
     {
       "Action": "UPSERT",
       "ResourceRecordSet": {
-        "Name": "<ENVIRONMENT>.form.io.",
+        "Name": "<ENVIRONMENT>.test-form.io.",
         "Type": "A",
         "AliasTarget": {
           "HostedZoneId": "<ALIAS_ZONE>",
@@ -16,7 +16,7 @@
     {
       "Action": "UPSERT",
       "ResourceRecordSet": {
-        "Name": "*.<ENVIRONMENT>.form.io.",
+        "Name": "*.<ENVIRONMENT>.test-form.io.",
         "Type": "A",
         "AliasTarget": {
           "HostedZoneId": "<ALIAS_ZONE>",

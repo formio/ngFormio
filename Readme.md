@@ -105,6 +105,16 @@ bower_components and those changes will be immediately reflected on the browser.
 check in any changes to the bower_components since each of these are simply a submodule of the
 base formio-app.
 
+Deployment
+---------------
+There are five steps that need to be run to deploy a new version.
+
+  - ```./scripts/setup.sh -snb```
+  - ```docker build -t formio/formio-app:$TAG_NAME .```
+  - ```docker push formio/formio-app:$TAG_NAME```
+  - ```./scripts/createVersion.sh $TAG_NAME```
+  - ```./scripts/deployVersion.sh $TAG_NAME $ENVIRONMENT```
+
 Contributing
 ----------------
 Before you contribute your code to this repository, make sure you compile the project by typing the following in the terminal.

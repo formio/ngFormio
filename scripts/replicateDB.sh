@@ -1,5 +1,5 @@
 # Note: This file is NOT automatically deployed. It is here for reference purposed and must be manually placed on the mongo-dev server.
-#! /bin/bash
+#!/usr/bin/env bash
 
 PROD_SERVER=ec2-xxx-xxx-xxx-xxx.us-west-2.compute.amazonaws.com
 PROD_PORT=27000
