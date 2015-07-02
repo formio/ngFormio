@@ -546,10 +546,14 @@ app.controller('FormActionDeleteController', [
 app.controller('FormSubmissionsController', [
   '$scope',
   '$state',
+  'Formio',
   function(
     $scope,
-    $state
+    $state,
+    Formio
   ) {
+    $scope.token = Formio.getToken();
+
     $scope.$on('submissionView', function(event, submission) {
       $state.go('app.form.submission.item.view', {
         subId: submission._id
