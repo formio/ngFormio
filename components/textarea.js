@@ -38,6 +38,7 @@ app.run([
         'class="form-control" ' +
         'ng-model="data[component.key]" ' +
         'ng-disabled="readOnly" ' +
+        'ng-required="component.validate.required" ' +
         'id="{{ component.key }}" ' +
         'placeholder="{{ component.placeholder }}" ' +
         'custom-validator="component.validate.custom" ' +

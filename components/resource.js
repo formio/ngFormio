@@ -66,17 +66,20 @@ app.config([
         searchFields: '',
         multiple: false,
         refresh: false,
-        refreshDelay: 0
+        refreshDelay: 0,
+        validate: {
+          required: false
+        }
       }
     });
   }
 ]);
 app.run([
   '$templateCache',
-  function($templateCache) {
-    $templateCache.put('formio/components/resource.html',
-      '<label ng-if="component.label" for="{{ component.key }}">{{ component.label }}</label>' +
-      '<ui-select ng-model="data[component.key]" ng-disabled="readOnly" id="{{ component.key }}" theme="bootstrap">' +
+  'FormioUtils',
+  function($templateCache, FormioUtils) {
+    $templateCache.put('formio/components/resource.html', FormioUtils.fieldWrap(
+      '<ui-select ng-model="data[component.key]" ng-disabled="readOnly" ng-required="component.validate.required" id="{{ component.key }}" name="{{ component.key }}" theme="bootstrap">' +
         '<ui-select-match placeholder="{{ component.placeholder }}">' +
           '<formio-select-item template="component.template" item="$item || $select.selected" select="$select"></formio-select-item>' +
         '</ui-select-match>' +
@@ -84,7 +87,7 @@ app.run([
           '<formio-select-item template="component.template" item="item" select="$select"></formio-select-item>' +
         '</ui-select-choices>' +
       '</ui-select>'
-    );
+    ));
 
     // Change the ui-select to ui-select multiple.
     $templateCache.put('formio/components/resource-multiple.html',
