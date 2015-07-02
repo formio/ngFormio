@@ -13,29 +13,32 @@ machine:
 
 dependencies:
   override:
+    - pip install awscli
     - ./scripts/setup.sh -snb
     - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
     - docker build -t $IMAGE_PATH:$TAG_NAME .
+
+test:
+  pre:
+    - docker run -d -p 9200:80 $IMAGE_PATH:$TAG_NAME; sleep 10
+    - curl --retry 10 --retry-delay 5 -v http://localhost:9200
 
 deployment:
   release:
     branch: release/*
     commands:
-      - pip install awscli
       - docker push $IMAGE_PATH:$RELEASE_ID
       - ./scripts/createVersion.sh $RELEASE_ID
       - ./scripts/deployVersion.sh $RELEASE_ID test
-  epic:
-    branch: epic/*
-    commands:
-      - pip install awscli
-      - docker push $IMAGE_PATH:$EPIC_ID
-      - ./scripts/createVersion.sh $EPIC_ID
-      - ./scripts/deployVersion.sh $EPIC_ID $EPIC_ID_develop
+#  epic:
+#    branch: epic/*
+#    commands:
+#      - docker push $IMAGE_PATH:$EPIC_ID
+#      - ./scripts/createVersion.sh $EPIC_ID
+#      - ./scripts/deployVersion.sh $EPIC_ID $EPIC_ID_develop
   develop:
     branch: develop
     commands:
-      - pip install awscli
-      - docker push $IMAGE_PATH:$TAG_NAME integration
+      - docker push $IMAGE_PATH:$TAG_NAME
       - ./scripts/createVersion.sh $TAG_NAME
       - ./scripts/deployVersion.sh $TAG_NAME develop
