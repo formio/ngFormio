@@ -8,15 +8,15 @@ module.exports = function() {
   var domain = process.env.DOMAIN || 'form.io';
   var port = process.env.PORT || 80;
   var app = process.env.APP || 'formio'
-  var host = protocol + domain;
-  var formioHost = protocol + app + '.' + domain;
+  var host = protocol + "://" + domain;
+  var formioHost = protocol + "://" + app + '.' + domain;
 
-  config.https = protocol == 'https';
   if (port != 80) {
     host += ':' + port;
     formioHost += ':' + port;
   }
 
+  config.https = protocol == "https";
   config.host = host;
   config.port = port;
   config.formioHost = formioHost;

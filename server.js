@@ -26,7 +26,7 @@ app.get('/health', function(req, res) {
 
 // Make sure to redirect all http requests to https.
 app.use(function(req, res, next) {
-  if (config.https || req.secure || (req.get('X-Forwarded-Proto') === 'https')) { return next(); }
+  if (!config.https || req.secure || (req.get('X-Forwarded-Proto') === 'https')) { return next(); }
   res.redirect('https://' + req.get('Host') + req.url);
 });
 
@@ -37,7 +37,7 @@ app.use(require('cors')());
 app.get('/config.js', function(req, res) {
   res.set('Content-Type', 'text/javascript');
   res.render('js/config.js', {
-    forceSSL: config.https ? 'false' : 'true',
+    forceSSL: config.https ? 'true' : 'false',
     host: config.host,
     formioHost: config.formioHost
   });
