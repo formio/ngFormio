@@ -3,7 +3,6 @@ module.exports = function() {
     "formio": {}
   };
 
-
   var protocol =  process.env.PROTOCOL || "https";
   var domain = process.env.DOMAIN || 'form.io';
   var port = process.env.PORT || 80;
@@ -42,7 +41,8 @@ module.exports = function() {
 
   config.formio.appSupport = process.env.APP_SUPPORT || true;
 
-  config.reservedSubdomains = ["test", "www", "api", "help", "support"];
+  config.formio.reservedSubdomains = ["test", "www", "api", "help", "support"];
+  config.formio.reservedForms = [];
 
   // TODO: Need a better way of setting the formio specific configurations.
   if (process.env.SENDGRID_USERNAME) {
