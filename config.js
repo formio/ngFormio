@@ -3,20 +3,19 @@ module.exports = function() {
     "formio": {}
   };
 
-  config.https = process.env.HTTPS || true;
-
-  var protocol = (config.https != "false") ? 'https://' : 'http://';
+  var protocol =  process.env.PROTOCOL || "https";
   var domain = process.env.DOMAIN || 'form.io';
   var port = process.env.PORT || 80;
   var app = process.env.APP || 'formio'
-  var host = protocol + domain;
-  var formioHost = protocol + app + '.' + domain;
+  var host = protocol + "://" + domain;
+  var formioHost = protocol + "://" + app + '.' + domain;
 
   if (port != 80) {
     host += ':' + port;
     formioHost += ':' + port;
   }
 
+  config.https = protocol == "https";
   config.host = host;
   config.port = port;
   config.formioHost = formioHost;

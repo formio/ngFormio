@@ -10,6 +10,7 @@ machine:
     RELEASE_ID: $(echo $CIRCLE_BRANCH | sed -E "s/release\/([a-zA-Z0-9\.-_]*).*/\1/")
     IMAGE_PATH: "formio/formio-app"
     TAG_NAME: "$CIRCLE_BRANCH-$SHORT_SHA"
+    AWS_DEFAULT_REGION: "us-west-2"
 
 dependencies:
   override:
