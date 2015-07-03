@@ -25,12 +25,12 @@ test:
     - curl --retry 10 --retry-delay 5 -v http://localhost:9200
 
 deployment:
-  release:
-    branch: release/*
-    commands:
-      - docker push $IMAGE_PATH:$RELEASE_ID
-      - ./scripts/createVersion.sh $RELEASE_ID
-      - ./scripts/deployVersion.sh $RELEASE_ID test
+#  release:
+#    branch: release/*
+#    commands:
+#      - docker push $IMAGE_PATH:$RELEASE_ID
+#      - ./scripts/createVersion.sh $RELEASE_ID
+#      - ./scripts/deployVersion.sh $RELEASE_ID test
 #  epic:
 #    branch: epic/*
 #    commands:
