@@ -3,19 +3,23 @@ module.exports = function() {
     "formio": {}
   };
 
-  var host = process.env.HOST || 'https://form.io';
-  var formioHost = process.env.FORMIOHOST || 'https://formio.form.io';
+  var protocol =  process.env.PROTOCOL || "https";
+  var domain = process.env.DOMAIN || 'form.io';
   var port = process.env.PORT || 80;
+  var app = process.env.APP || 'formio'
+  var host = protocol + "://" + domain;
+  var formioHost = protocol + "://" + app + '.' + domain;
 
   if (port != 80) {
     host += ':' + port;
     formioHost += ':' + port;
   }
+
+  config.https = protocol == "https";
   config.host = host;
   config.port = port;
   config.formioHost = formioHost;
   config.debug = process.env.DEBUG || false;
-  config.https = process.env.HTTPS || true;
 
   if (process.env.MONGO1) {
     config.formio.mongo = [];
@@ -37,7 +41,12 @@ module.exports = function() {
 
   config.formio.appSupport = process.env.APP_SUPPORT || true;
 
+  config.formio.reservedSubdomains = ["test", "www", "api", "help", "support"];
+  config.formio.reservedForms = [];
+
+  // TODO: Need a better way of setting the formio specific configurations.
   if (process.env.SENDGRID_USERNAME) {
+    config.formio.email = {};
     config.formio.email.type = 'sendgrid';
     config.formio.email.username = process.env.SENDGRID_USERNAME;
     config.formio.email.password = process.env.SENDGRID_PASSWORD;
@@ -48,9 +57,7 @@ module.exports = function() {
     config.formio.jwt.secret = process.env.JWT_SECRET || "abc123";
     config.formio.jwt.expireTime = process.env.JWT_EXPIRE_TIME || 240;
   }
-  config.reservedSubdomains = ["test", "www", "api", "help", "support"];
 
   return config;
 
 }
-
