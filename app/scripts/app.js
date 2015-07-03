@@ -264,6 +264,7 @@ angular
           message: 'Your session has expired. Please log in again.'
         });
       };
+
       // Catches error from expired/invalid session.
       $rootScope.$on('formio.unauthorized', logoutError);
 
