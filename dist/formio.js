@@ -66,14 +66,14 @@ app.provider('Formio', function() {
       '$q',
       'formioInterceptor',
       '$location',
+      '$rootScope',
       function(
         $http,
         $q,
         formioInterceptor,
-        $location
+        $location,
+        $rootScope
       ) {
-
-        var logoutQ = $q.defer();
 
         // The formio class.
         var Formio = function(path) {
@@ -169,7 +169,9 @@ app.provider('Formio', function() {
          */
         var requestError = function(deferred) {
           return function(error) {
-            if (error === 'Unauthorized') { logoutQ.reject(error); }
+            if (error === 'Unauthorized') {
+              $rootScope.$broadcast('formio.unauthorized', error);
+            }
             deferred.reject(error);
           };
         };
@@ -320,18 +322,11 @@ app.provider('Formio', function() {
         };
 
         // Keep track of their logout callback.
-        Formio.onLogout = logoutQ.promise;
         Formio.logout = function() {
-          $http.get(baseUrl + '/logout').success(function() {
+          return $http.get(baseUrl + '/logout').finally(function() {
             this.setToken(null);
             this.setUser(null);
-            logoutQ.resolve();
-          }.bind(this)).error(function() {
-            this.setToken(null);
-            this.setUser(null);
-            logoutQ.reject();
           }.bind(this));
-          return Formio.onLogout;
         };
         Formio.submissionData = function(data, component, onId) {
           if (!data) { return ''; }
@@ -1508,6 +1503,7 @@ app.run([
           'ng-click="calendarOpen = true" ' +
           'ng-init="calendarOpen = false" ' +
           'ng-disabled="readOnly" ' +
+          'ng-required="component.validate.required" ' +
           'is-open="calendarOpen" ' +
           'datetime-picker="{{ component.format }}" ' +
           'min-date="component.minDate" ' +
@@ -1894,17 +1890,20 @@ app.config([
         searchFields: '',
         multiple: false,
         refresh: false,
-        refreshDelay: 0
+        refreshDelay: 0,
+        validate: {
+          required: false
+        }
       }
     });
   }
 ]);
 app.run([
   '$templateCache',
-  function($templateCache) {
-    $templateCache.put('formio/components/resource.html',
-      '<label ng-if="component.label" for="{{ component.key }}">{{ component.label }}</label>' +
-      '<ui-select ng-model="data[component.key]" ng-disabled="readOnly" id="{{ component.key }}" theme="bootstrap">' +
+  'FormioUtils',
+  function($templateCache, FormioUtils) {
+    $templateCache.put('formio/components/resource.html', FormioUtils.fieldWrap(
+      '<ui-select ng-model="data[component.key]" ng-disabled="readOnly" ng-required="component.validate.required" id="{{ component.key }}" name="{{ component.key }}" theme="bootstrap">' +
         '<ui-select-match placeholder="{{ component.placeholder }}">' +
           '<formio-select-item template="component.template" item="$item || $select.selected" select="$select"></formio-select-item>' +
         '</ui-select-match>' +
@@ -1912,7 +1911,7 @@ app.run([
           '<formio-select-item template="component.template" item="item" select="$select"></formio-select-item>' +
         '</ui-select-choices>' +
       '</ui-select>'
-    );
+    ));
 
     // Change the ui-select to ui-select multiple.
     $templateCache.put('formio/components/resource-multiple.html',
@@ -1970,6 +1969,9 @@ app.config([
         $scope.selectItems = [];
         var valueProp = $scope.component.valueProperty;
         $scope.getSelectItem = function(item) {
+          if(!item) {
+            return '';
+          }
           if(settings.dataSrc === 'values') {
             return item.value;
           }
@@ -2041,16 +2043,17 @@ app.run([
   '$templateCache',
   function($templateCache) {
     $templateCache.put('formio/components/select.html',
-      '<label ng-if="component.label" for="{{ component.key }}">{{ component.label }}</label>' +
+      '<label ng-if="component.label" for="{{ component.key }}" class="control-label">{{ component.label }}</label>' +
       '<span ng-if="component.validate.required" class="glyphicon glyphicon-asterisk form-control-feedback field-required" aria-hidden="true"></span>' +
-      '<ui-select ui-select-required ng-model="data[component.key]" ng-disabled="readOnly" ng-required="component.validate.required" id="{{ component.key }}" theme="bootstrap">' +
+      '<ui-select ui-select-required ng-model="data[component.key]" name="{{ component.key }}" ng-disabled="readOnly" ng-required="component.validate.required" id="{{ component.key }}" theme="bootstrap">' +
         '<ui-select-match placeholder="{{ component.placeholder }}">' +
           '<formio-select-item template="component.template" item="$item || $select.selected" select="$select"></formio-select-item>' +
         '</ui-select-match>' +
         '<ui-select-choices repeat="getSelectItem(item) as item in selectItems | filter: $select.search">' +
           '<formio-select-item template="component.template" item="item" select="$select"></formio-select-item>' +
         '</ui-select-choices>' +
-      '</ui-select>'
+      '</ui-select>' +
+      '<formio-errors></formio-errors>'
     );
 
     // Change the ui-select to ui-select multiple.
@@ -2081,7 +2084,10 @@ app.config([
         penColor: 'black',
         backgroundColor: 'rgb(245,245,235)',
         minWidth: '0.5',
-        maxWidth: '2.5'
+        maxWidth: '2.5',
+        validate: {
+          required: false
+        }
       }
     });
   }
@@ -2095,6 +2101,10 @@ app.directive('signature', function () {
     require: '?ngModel',
     link: function (scope, element, attrs, ngModel) {
       if (!ngModel) { return; }
+
+      // Sets the label of component for error display.
+      scope.component.label = 'Signature';
+      scope.component.hideLabel = true;
 
       // Sets the dimension of a width or height.
       var setDimension = function(dim) {
@@ -2124,6 +2134,7 @@ app.directive('signature', function () {
       // Clear the signature.
       scope.component.clearSignature = function() {
         signaturePad.clear();
+        readSignature();
       };
 
       // Set some CSS properties.
@@ -2134,8 +2145,11 @@ app.directive('signature', function () {
       });
 
       function readSignature() {
-        var dataUrl = signaturePad.toDataURL();
-        ngModel.$setViewValue(dataUrl);
+        if(scope.component.validate.required && signaturePad.isEmpty()) {
+          ngModel.$setViewValue('');
+        } else {
+          ngModel.$setViewValue(signaturePad.toDataURL());
+        }
       }
 
       ngModel.$render = function () {
@@ -2145,8 +2159,10 @@ app.directive('signature', function () {
         scope.$evalAsync(readSignature);
       };
 
-      // Read the signature.
-      readSignature();
+      // Read initial empty canvas, unless signature is required, then keep it pristine
+      if(!scope.component.validate.required) {
+        readSignature();
+      }
     }
   };
 });
@@ -2161,7 +2177,7 @@ app.run([
       '<img ng-if="readOnly" ng-attr-src="{{data[component.key]}}" src="" />' +
       '<div ng-if="!readOnly" style="width: {{ component.width }}; height: {{ component.height }};">' +
         '<a class="btn btn-xs btn-default" style="position:absolute; left: 0; top: 0; z-index: 1000" ng-click="component.clearSignature()"><span class="glyphicon glyphicon-repeat"></span></a>' +
-        '<canvas signature component="component" ng-model="data[component.key]"></canvas>' +
+        '<canvas signature component="component" name="{{ component.key }}" ng-model="data[component.key]" ng-required="component.validate.required"></canvas>' +
         '<div class="formio-signature-footer" style="text-align: center;color:#C3C3C3;">{{ component.footer }}</div>' +
       '</div>'
     ));
@@ -2208,6 +2224,7 @@ app.run([
         'class="form-control" ' +
         'ng-model="data[component.key]" ' +
         'ng-disabled="readOnly" ' +
+        'ng-required="component.validate.required" ' +
         'id="{{ component.key }}" ' +
         'placeholder="{{ component.placeholder }}" ' +
         'custom-validator="component.validate.custom" ' +
