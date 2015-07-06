@@ -1,6 +1,6 @@
-.field-required {
+.field-required:after {
   color:red;
-  z-index: 5;
+  content:" *";
 }
 
 .form-field-type-hidden {
