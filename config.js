@@ -20,6 +20,7 @@ module.exports = function() {
   config.port = port;
   config.formioHost = formioHost;
   config.debug = process.env.DEBUG || false;
+  config.formio.domain = domain;
 
   if (process.env.MONGO1) {
     config.formio.mongo = [];
