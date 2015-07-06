@@ -3,6 +3,11 @@
   content:" *";
 }
 
+.field-required-inline {
+  color:red;
+  z-index: 5;
+}
+
 .form-field-type-hidden {
   margin: 0;
   padding: 0;
