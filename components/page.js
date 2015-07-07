@@ -14,7 +14,7 @@ app.run([
   '$templateCache',
   function($templateCache) {
     $templateCache.put('formio/components/page.html',
-      '<formio-component ng-repeat="component in component.components" component="component" data="data" formio="formio"></formio-component>'
+      '<formio-component ng-repeat="component in component.components" ng-if="componentFound(component)" component="component" data="data" formio="formio"></formio-component>'
     );
   }
 ]);
