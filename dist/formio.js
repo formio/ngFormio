@@ -582,12 +582,14 @@ app.directive('formio', function() {
       'FormioScope',
       'Formio',
       'FormioUtils',
+      'formioComponents',
       function(
         $scope,
         $http,
         FormioScope,
         Formio,
-        FormioUtils
+        FormioUtils,
+        formioComponents
       ) {
         $scope.formioAlerts = [];
         // Shows the given alerts (single or array), and dismisses old alerts
@@ -598,6 +600,11 @@ app.directive('formio', function() {
           form: true,
           submission: true
         });
+
+        // See if a component is found in the registry.
+        $scope.componentFound = function(component) {
+          return formioComponents.components.hasOwnProperty(component.type);
+        };
 
         // Called when the form is submitted.
         $scope.onSubmit = function(form) {
@@ -892,8 +899,14 @@ app.directive('formioComponent', [
             });
           }
 
+          // See if a component is found in the registry.
+          $scope.componentFound = function(component) {
+            return formioComponents.components.hasOwnProperty(component.type);
+          };
+
           // Get the settings.
           var component = formioComponents.components[$scope.component.type];
+          if (!component) { return; }
 
           // Set the component with the defaults from the component settings.
           angular.forEach(component.settings, function(value, key) {
@@ -1062,7 +1075,7 @@ app.run([
         '<div ng-repeat="alert in formioAlerts" class="alert alert-{{ alert.type }}" role="alert">' +
           '{{ alert.message }}' +
         '</div>' +
-        '<formio-component ng-repeat="component in _form.components track by $index" component="component" data="_submission.data" form="formioForm" formio="formio" read-only="readOnly"></formio-component>' +
+        '<formio-component ng-repeat="component in _form.components track by $index" ng-if="componentFound(component)" component="component" data="_submission.data" form="formioForm" formio="formio" read-only="readOnly"></formio-component>' +
       '</form>'
     );
 
@@ -1419,7 +1432,7 @@ app.run([
     $templateCache.put('formio/components/columns.html',
       '<div class="row">' +
         '<div class="col-xs-6" ng-repeat="column in component.columns">' +
-          '<formio-component ng-repeat="component in column.components" component="component" data="data" formio="formio" read-only="readOnly"></formio-component>' +
+          '<formio-component ng-repeat="component in column.components" ng-if="componentFound(component)" component="component" data="data" formio="formio" read-only="readOnly"></formio-component>' +
         '</div>' +
       '</div>'
     );
@@ -1572,7 +1585,7 @@ app.run([
     $templateCache.put('formio/components/fieldset.html',
       '<fieldset>' +
         '<legend ng-if="component.legend">{{ component.legend }}</legend>' +
-        '<formio-component ng-repeat="component in component.components" component="component" data="data" formio="formio" read-only="readOnly"></formio-component>' +
+        '<formio-component ng-repeat="component in component.components" ng-if="componentFound(component)" component="component" data="data" formio="formio" read-only="readOnly"></formio-component>' +
       '</fieldset>'
     );
   }
@@ -1676,7 +1689,7 @@ app.run([
   '$templateCache',
   function($templateCache) {
     $templateCache.put('formio/components/page.html',
-      '<formio-component ng-repeat="component in component.components" component="component" data="data" formio="formio"></formio-component>'
+      '<formio-component ng-repeat="component in component.components" ng-if="componentFound(component)" component="component" data="data" formio="formio"></formio-component>'
     );
   }
 ]);
@@ -1704,7 +1717,7 @@ app.run([
       '<div class="panel panel-{{ component.theme }}">' +
         '<div ng-if="component.title" class="panel-heading"><h3 class="panel-title">{{ component.title }}</h3></div>' +
         '<div class="panel-body">' +
-          '<formio-component ng-repeat="component in component.components" component="component" data="data" formio="formio" read-only="readOnly"></formio-component>' +
+          '<formio-component ng-repeat="component in component.components" ng-if="componentFound(component)" component="component" data="data" formio="formio" read-only="readOnly"></formio-component>' +
         '</div>' +
       '</div>'
     );
@@ -2252,7 +2265,7 @@ app.run([
   function($templateCache) {
     $templateCache.put('formio/components/well.html',
       '<div class="well">' +
-        '<formio-component ng-repeat="component in component.components" component="component" data="data" formio="formio" read-only="readOnly"></formio-component>' +
+        '<formio-component ng-repeat="component in component.components" ng-if="componentFound(component)" component="component" data="data" formio="formio" read-only="readOnly"></formio-component>' +
       '</div>'
     );
   }

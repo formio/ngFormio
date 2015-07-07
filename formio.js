@@ -580,12 +580,14 @@ app.directive('formio', function() {
       'FormioScope',
       'Formio',
       'FormioUtils',
+      'formioComponents',
       function(
         $scope,
         $http,
         FormioScope,
         Formio,
-        FormioUtils
+        FormioUtils,
+        formioComponents
       ) {
         $scope.formioAlerts = [];
         // Shows the given alerts (single or array), and dismisses old alerts
@@ -596,6 +598,11 @@ app.directive('formio', function() {
           form: true,
           submission: true
         });
+
+        // See if a component is found in the registry.
+        $scope.componentFound = function(component) {
+          return formioComponents.components.hasOwnProperty(component.type);
+        };
 
         // Called when the form is submitted.
         $scope.onSubmit = function(form) {
@@ -890,8 +897,14 @@ app.directive('formioComponent', [
             });
           }
 
+          // See if a component is found in the registry.
+          $scope.componentFound = function(component) {
+            return formioComponents.components.hasOwnProperty(component.type);
+          };
+
           // Get the settings.
           var component = formioComponents.components[$scope.component.type];
+          if (!component) { return; }
 
           // Set the component with the defaults from the component settings.
           angular.forEach(component.settings, function(value, key) {
@@ -1060,7 +1073,7 @@ app.run([
         '<div ng-repeat="alert in formioAlerts" class="alert alert-{{ alert.type }}" role="alert">' +
           '{{ alert.message }}' +
         '</div>' +
-        '<formio-component ng-repeat="component in _form.components track by $index" component="component" data="_submission.data" form="formioForm" formio="formio" read-only="readOnly"></formio-component>' +
+        '<formio-component ng-repeat="component in _form.components track by $index" ng-if="componentFound(component)" component="component" data="_submission.data" form="formioForm" formio="formio" read-only="readOnly"></formio-component>' +
       '</form>'
     );
 
