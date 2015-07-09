@@ -11,7 +11,7 @@
     "angular-moment": "~0.9.2",
     "ngDialog": "~0.3.12",
     "ng-sortable": "~1.2.0",
-    "ngFormBuilder": "git@github.com:formio/ngFormBuilder.git#cc8ef6e81311f4b27dbdae1e9794cc2669ea94d5",
+    "ngFormBuilder": "git@github.com:formio/ngFormBuilder.git#19565661cbd2b48352140e5527e70b83f256d69d",
     "seamless": "~0.0.3",
     "font-awesome": "~4.3.0",
     "angular-base64": "~2.0.4",
