@@ -38,6 +38,7 @@ app.get('/config.js', function(req, res) {
   res.set('Content-Type', 'text/javascript');
   res.render('js/config.js', {
     forceSSL: config.https ? 'true' : 'false',
+    domain: config.formio.domain,
     host: config.host,
     formioHost: config.formioHost
   });
