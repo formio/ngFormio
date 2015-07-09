@@ -16,6 +16,7 @@ app.provider('Formio', function() {
 
   // The default base url.
   var baseUrl = '';
+  var domain;
   var noalias = false;
   var rootUrl = '';
   var cache = {};
@@ -43,12 +44,16 @@ app.provider('Formio', function() {
     if (!url) { return ''; }
     var parts = getUrlParts(url);
     if (parts.length <= 2) { return parts.join('.'); }
-    var domainParts = parts[2].split('.');
-    if (domainParts.length > 2) {
-      domainParts.splice(0, (domainParts.length - 2));
+    var rootDomain = domain;
+    // Revert to old behavior if domain is not set.
+    if(!rootDomain) {
+      var domainParts = parts[2].split('.');
+      if(domainParts.length > 2) {
+        domainParts.splice(0, (domainParts.length - 2));
+      }
+      rootDomain = domainParts.join('.');
     }
-    var domain = domainParts.join('.');
-    rootUrl = parts[1] + domain;
+    rootUrl = parts[1] + rootDomain;
     rootUrl += (parts.length > 3) ? parts[3] : '';
     return rootUrl;
   };
@@ -60,6 +65,9 @@ app.provider('Formio', function() {
     setBaseUrl: function(url, _noalias) {
       noalias = _noalias;
       baseUrl = url;
+    },
+    setDomain: function(dom) {
+      domain = dom;
     },
     $get: [
       '$http',
@@ -103,13 +111,32 @@ app.provider('Formio', function() {
           }
 
           var hostparts = getUrlParts(path);
-          var hostnames = (hostparts.length > 2) ? hostparts[2].split('.') : [];
+          var hostnames = [];
           var subdomain = '';
-          if (!noalias && (
-            ((hostnames.length === 2) && (hostnames[1].indexOf('localhost') === 0)) || (hostnames.length >= 3)
-          )) {
-            subdomain = hostnames[0];
-            this.appId = subdomain;
+          if(domain) {
+            if(hostparts.length > 2) {
+              var domainIndex = hostparts[2].indexOf(domain);
+              if(domainIndex !== 0) {
+                // Ignore "." between subdomains & domain
+                domainIndex--;
+              }
+              hostnames = hostnames.concat(hostparts[2].substring(0, domainIndex).split('.'));
+              hostnames = hostnames.concat(domain);
+            }
+            if (!noalias && hostnames.length >= 2) {
+              subdomain = hostnames[0];
+              this.appId = subdomain;
+            }
+          }
+          // Revert to old behavior if domain is not set
+          else {
+            hostnames = (hostparts.length > 2) ? hostparts[2].split('.') : [];
+            if(!noalias && (
+              ((hostnames.length === 2) && (hostnames[1].indexOf('localhost') === 0)) || (hostnames.length >= 3)
+              )) {
+              subdomain = hostnames[0];
+              this.appId = subdomain;
+            }
           }
 
           // Get the paths for this formio url.
