@@ -328,7 +328,7 @@ app.provider('Formio', function() {
         Formio.prototype.availableActions = function() { return request(this.formUrl + '/actions'); };
 
         // Static methods.
-        Formio.loadApps = function() { return request(getRootUrl(baseUrl) + '/app'); };
+        Formio.loadApps = function() { return request(baseUrl + '/app'); };
         Formio.clearCache = function() { cache = {}; };
         Formio.baseUrl = baseUrl;
         Formio.setUser = formioInterceptor.setUser.bind(formioInterceptor);
