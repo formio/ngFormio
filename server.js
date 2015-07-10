@@ -1,27 +1,16 @@
+'use strict';
+
 require('dotenv').load({silent: true});
 var config = require('./config')();
-var formio = require('formio')(config.formio);
 var express = require('express');
 var nunjucks = require('nunjucks');
-var basicAuth = require('basic-auth-connect');
 var _ = require('lodash');
 var app = express();
 
 // Configure nunjucks.
 nunjucks.configure('server/views', {
   autoescape: true,
-  express   : app
-});
-
-// The healthcheck.
-app.get('/health', function(req, res) {
-  if (!formio.resources) { return res.status(500).send("No Resources"); }
-  if (!formio.resources.application.model) { return res.status(500).send("No application model"); }
-  formio.resources.application.model.findOne({name: 'formio'}, function(err, result) {
-    if (err) { return res.status(500).send(err); }
-    if (!result) { return res.status(500).send('Formio application not found'); }
-    res.send('OK');
-  });
+  express: app
 });
 
 // Make sure to redirect all http requests to https.
@@ -79,6 +68,20 @@ app.get('/app/form/:formId/spec.html', function (req, res, next) {
   });
 });
 
-app.use('/app/api', formio);
-console.log('Listening to port ' + config.port);
-app.listen(config.port);
+// Mount the api server.
+require('formio')(config.formio, function(formio) {
+  // The healthcheck.
+  app.get('/health', function(req, res) {
+    if (!formio.resources) { return res.status(500).send('No Resources'); }
+    if (!formio.resources.application.model) { return res.status(500).send('No application model'); }
+    formio.resources.application.model.findOne({name: 'formio'}, function(err, result) {
+      if (err) { return res.status(500).send(err); }
+      if (!result) { return res.status(500).send('Formio application not found'); }
+      res.send('OK');
+    });
+  });
+
+  app.use('/app/api', formio);
+  console.log('Listening to port ' + config.port);
+  app.listen(config.port);
+});

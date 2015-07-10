@@ -1,6 +1,8 @@
+'use strict';
+
 module.exports = function() {
   var config = {
-    "formio": {}
+    'formio': {}
   };
 
   var protocol =  process.env.PROTOCOL || "https";
@@ -10,7 +12,7 @@ module.exports = function() {
   var host = protocol + "://" + domain;
   var formioHost = protocol + "://" + app + '.' + domain;
 
-  if (port != 80) {
+  if (port !== 80) {
     host += ':' + port;
     formioHost += ':' + port;
   }
@@ -37,7 +39,7 @@ module.exports = function() {
     var mongoAddr = process.env.MONGO_PORT_27017_TCP_ADDR || 'localhost';
     var mongoPort = process.env.MONGO_PORT_27017_TCP_PORT || 27017;
     var mongoCollection = process.env.MONGO_COLLECTION || 'formio';
-    config.formio.mongo = "mongodb://" + mongoAddr + ":" + mongoPort + "/" + mongoCollection;
+    config.formio.mongo = 'mongodb://' + mongoAddr + ':' + mongoPort + '/' + mongoCollection;
   }
 
   config.formio.appSupport = process.env.APP_SUPPORT || true;
@@ -54,11 +56,18 @@ module.exports = function() {
   }
 
   if (process.env.JWT_SECRET) {
-    config.formio.jwt = {}
-    config.formio.jwt.secret = process.env.JWT_SECRET || "abc123";
+    config.formio.jwt = {};
+    config.formio.jwt.secret = process.env.JWT_SECRET || 'abc123';
     config.formio.jwt.expireTime = process.env.JWT_EXPIRE_TIME || 240;
   }
+//<<<<<<< HEAD
+//
+//  return config;
+//
+//}
+//=======
+  config.reservedSubdomains = ['test', 'www', 'api', 'help', 'support'];
 
   return config;
-
-}
+};
+//>>>>>>> FA-61 Updating code for coding standards, adding changes for updates to router mounting for the formio api server.
