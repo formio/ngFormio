@@ -6,12 +6,12 @@ machine:
     - mongodb
   environment:
     IMAGE_PATH: "formio/formio-app"
-    TAG_NAME: $(echo ./scripts/getTagName.sh $CIRCLE_BRANCH $CIRCLE_SHA1)
+    TAG_NAME: $(./scripts/getTagName.sh $CIRCLE_BRANCH $CIRCLE_SHA1)
     AWS_DEFAULT_REGION: "us-west-2"
 
 dependencies:
   override:
-    - echo "RELEASE_REGEX:$RELEASE_REGEX"; echo "LAST_RELEASE:$LAST_RELEASE"; echo "SEMVER:$SEMVER"; echo "TAG_NAME:$TAG_NAME"
+    - echo "TAG_NAME:$TAG_NAME"
     - pip install awscli
     - ./scripts/setup.sh -snb
     - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
