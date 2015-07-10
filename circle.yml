@@ -16,6 +16,7 @@ machine:
 
 dependencies:
   override:
+    - env
     - pip install awscli
     - ./scripts/setup.sh -snb
     - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
@@ -23,7 +24,6 @@ dependencies:
 
 test:
   pre:
-    - env
     - docker run -d -p 9200:80 $IMAGE_PATH:$TAG_NAME; sleep 10
     - curl --retry 10 --retry-delay 5 -v http://localhost:9200
 
