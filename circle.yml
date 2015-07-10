@@ -15,7 +15,7 @@ machine:
 
 dependencies:
   override:
-    - echo $CIRCLE_BRANCH | sed -E -e "s/release\/([a-zA-Z0-9\._]*).*/\1/" -e "s/x/*/g"
+    - echo "RELEASE_REGEX:$RELEASE_REGEX"; echo "LAST_RELEASE:$LAST_RELEASE"; echo "SEMVER:$SEMVER"; echo "TAG_NAME:$TAG_NAME"
     - pip install awscli
     - ./scripts/setup.sh -snb
     - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
