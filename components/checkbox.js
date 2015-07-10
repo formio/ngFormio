@@ -33,7 +33,7 @@ app.run([
   ) {
     $templateCache.put('formio/components/checkbox.html', FormioUtils.fieldWrap(
       '<div class="checkbox">' +
-        '<label for={{ component.key }}>' +
+        '<label for={{ component.key }} ng-class="{\'field-required\': component.validate.required}">' +
           '<input type="{{ component.inputType }}" ' +
             'id="{{ component.key }}" ' +
             'name="{{ component.key }}" ' +
