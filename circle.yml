@@ -6,10 +6,12 @@ machine:
     - mongodb
   environment:
     SHORT_SHA: $(echo $CIRCLE_SHA1 | cut -b1-7)
-    EPIC_ID: $(echo $CIRCLE_BRANCH | sed -E "s/epic\/([a-zA-Z0-9\.-_]*).*/\1/")
-    RELEASE_ID: $(echo $CIRCLE_BRANCH | sed -E "s/release\/([a-zA-Z0-9\.-_]*).*/\1/")
+    BRANCH: $(echo $CIRCLE_BRANCH | sed -E "s/\//-/g")
+    RELEASE_REGEX: $(echo $BRANCH | sed -E "s/release-([a-zA-Z0-9\._]*).*/\1/" | sed -E "s/x/*/g")
+    LAST_RELEASE: $(git tag -l $RELEASE_REGEX | tail -n 1)
+    SEMVER: $(if [ -z $LAST_RELEASE ]; then echo $RELEASE_REGEX | sed -E "s/*/0/g"; else ./scripts/incrementVersion.sh -p $LAST_RELEASE; fi)
     IMAGE_PATH: "formio/formio-app"
-    TAG_NAME: "$CIRCLE_BRANCH-$SHORT_SHA"
+    TAG_NAME: $(if [[ $SEMVER =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then echo $SEMVER; else echo "$BRANCH-$SHORT_SHA"; fi)
     AWS_DEFAULT_REGION: "us-west-2"
 
 dependencies:
@@ -25,18 +27,12 @@ test:
     - curl --retry 10 --retry-delay 5 -v http://localhost:9200
 
 deployment:
-#  release:
-#    branch: release/*
-#    commands:
-#      - docker push $IMAGE_PATH:$RELEASE_ID
-#      - ./scripts/createVersion.sh $RELEASE_ID
-#      - ./scripts/deployVersion.sh $RELEASE_ID test
-#  epic:
-#    branch: epic/*
-#    commands:
-#      - docker push $IMAGE_PATH:$EPIC_ID
-#      - ./scripts/createVersion.sh $EPIC_ID
-#      - ./scripts/deployVersion.sh $EPIC_ID $EPIC_ID_develop
+  release:
+    branch: release/*
+    commands:
+      - docker push $IMAGE_PATH:$TAG_NAME
+      - ./scripts/createVersion.sh $TAG_NAME
+      - ./scripts/deployVersion.sh $TAG_NAME test
   develop:
     branch: develop
     commands:

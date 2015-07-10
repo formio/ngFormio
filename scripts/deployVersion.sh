@@ -19,7 +19,7 @@ AWSDIR=aws-eb
 # Don't allow deploying to production. Sanity check.
 if [ $ENVIRONMENT == "prod" ]; then
   echo "Deploying to production is not allowed with this script."
-#  exit 1;
+  exit 1;
 fi
 
 # Make sure we have values.
