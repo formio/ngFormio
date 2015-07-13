@@ -6,11 +6,11 @@ machine:
     - mongodb
   environment:
     IMAGE_PATH: "formio/formio-app"
-    TAG_NAME: $(./scripts/getTagName.sh $CIRCLE_BRANCH $CIRCLE_SHA1)
     AWS_DEFAULT_REGION: "us-west-2"
 
 dependencies:
   override:
+    - echo 'export TAG_NAME=$(./scripts/getTagName.sh $CIRCLE_BRANCH $CIRCLE_SHA1)' >> ~/.circlerc
     - echo "TAG_NAME:$TAG_NAME"
     - pip install awscli
     - ./scripts/setup.sh -snb
