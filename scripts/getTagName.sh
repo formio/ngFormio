@@ -14,6 +14,8 @@ RELEASE_REGEX=$(echo $CIRCLE_BRANCH | sed -E -e "s/release\/([a-zA-Z0-9\._]*).*/
 LAST_RELEASE=$(git tag -l $RELEASE_REGEX | tail -n 1)
 SEMVER=$(if [ -z $LAST_RELEASE ]; then echo $RELEASE_REGEX | sed -E -e "s/\*/0/g"; else ./scripts/incrementVersion.sh -p $LAST_RELEASE; fi)
 TAG=$(if [[ $SEMVER =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then echo $SEMVER; else echo $CIRCLE_BRANCH-$SHORT_SHA | sed -E -e "s/\//-/g"; fi)
-git tag $TAG
-git push --tags
+if [[ $TAG =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+  git tag $TAG
+  git push --tags
+fi
 echo $TAG
