@@ -5,37 +5,50 @@ machine:
     - docker
     - mongodb
   environment:
-    SHORT_SHA: $(echo $CIRCLE_SHA1 | cut -b1-7)
-    RELEASE_REGEX: $(echo $CIRCLE_BRANCH | sed -E -e "s/release\/([a-zA-Z0-9\._]*).*/\1/" -e "s/x/*/g")
-    LAST_RELEASE: $(git tag -l $RELEASE_REGEX | tail -n 1)
-    SEMVER: $(if [ -z $LAST_RELEASE ]; then echo $RELEASE_REGEX | sed -E -e "s/*/0/g"; else ./scripts/incrementVersion.sh -p $LAST_RELEASE; fi)
     IMAGE_PATH: "formio/formio-app"
-    TAG_NAME: $(if [[ $SEMVER =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then echo $SEMVER; else echo "$CIRCLE_BRANCH-$SHORT_SHA"; fi)
     AWS_DEFAULT_REGION: "us-west-2"
 
 dependencies:
   override:
-    - echo "RELEASE_REGEX:$RELEASE_REGEX"; echo "LAST_RELEASE:$LAST_RELEASE"; echo "SEMVER:$SEMVER"; echo "TAG_NAME:$TAG_NAME"
+    - echo "TAG_NAME:$TAG_NAME":
+        environment:
+          TAG_NAME: $(./scripts/getTagName.sh $CIRCLE_BRANCH $CIRCLE_SHA1)
     - pip install awscli
     - ./scripts/setup.sh -snb
     - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-    - docker build -t $IMAGE_PATH:$TAG_NAME .
+    - docker build -t $IMAGE_PATH:$TAG_NAME .:
+        environment:
+          TAG_NAME: $(./scripts/getTagName.sh $CIRCLE_BRANCH $CIRCLE_SHA1)
 
 test:
   pre:
-    - docker run -d -p 9200:80 $IMAGE_PATH:$TAG_NAME; sleep 10
+    - docker run -d -p 9200:80 $IMAGE_PATH:$TAG_NAME; sleep 10:
+        environment:
+          TAG_NAME: $(./scripts/getTagName.sh $CIRCLE_BRANCH $CIRCLE_SHA1)
     - curl --retry 10 --retry-delay 5 -v http://localhost:9200
 
 deployment:
   release:
     branch: release/*
     commands:
-      - docker push $IMAGE_PATH:$TAG_NAME
-      - ./scripts/createVersion.sh $TAG_NAME
-      - ./scripts/deployVersion.sh $TAG_NAME test
+      - docker push $IMAGE_PATH:$TAG_NAME:
+        environment:
+          TAG_NAME: $(./scripts/getTagName.sh $CIRCLE_BRANCH $CIRCLE_SHA1)
+      - ./scripts/createVersion.sh $TAG_NAME:
+        environment:
+          TAG_NAME: $(./scripts/getTagName.sh $CIRCLE_BRANCH $CIRCLE_SHA1)
+      - ./scripts/deployVersion.sh $TAG_NAME test:
+        environment:
+          TAG_NAME: $(./scripts/getTagName.sh $CIRCLE_BRANCH $CIRCLE_SHA1)
   develop:
     branch: develop
     commands:
-      - docker push $IMAGE_PATH:$TAG_NAME
-      - ./scripts/createVersion.sh $TAG_NAME
-      - ./scripts/deployVersion.sh $TAG_NAME develop
+      - docker push $IMAGE_PATH:$TAG_NAME:
+        environment:
+          TAG_NAME: $(./scripts/getTagName.sh $CIRCLE_BRANCH $CIRCLE_SHA1)
+      - ./scripts/createVersion.sh $TAG_NAME:
+        environment:
+          TAG_NAME: $(./scripts/getTagName.sh $CIRCLE_BRANCH $CIRCLE_SHA1)
+      - ./scripts/deployVersion.sh $TAG_NAME develop:
+        environment:
+          TAG_NAME: $(./scripts/getTagName.sh $CIRCLE_BRANCH $CIRCLE_SHA1)
