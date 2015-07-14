@@ -242,23 +242,21 @@ angular
         });
       }
 
-      // Trigger when a logout occurs.
-      Formio.onLogout.then(function() {
-        $state.go('auth.login');
-      }, function() {
+      var logoutError = function() {
         $state.go('auth.login');
         FormioAlerts.addAlert({
           type: 'danger',
           message: 'Your session has expired. Please log in again.'
         });
-      });
+      };
 
-      // Logout of form.io.
+      $rootScope.$on('formio.unauthorized', logoutError);
+
+      // Trigger when a logout occurs.
       $rootScope.logout = function() {
-        Formio.logout();
-        Formio.setToken(null);
-        Formio.setUser(null);
-        $state.go('auth.login');
+        Formio.logout().then(function() {
+          $state.go('auth.login');
+        }).catch(logoutError);
       };
 
       $rootScope.isActive = function(state) {
