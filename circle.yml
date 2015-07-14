@@ -10,10 +10,10 @@ machine:
 
 dependencies:
   override:
-    - echo "./scripts/getTagName.sh $CIRCLE_BRANCH $CIRCLE_SHA1" >> ~/.circlerc
-    - echo "TAG_NAME1:$TAG_NAME1":
+#    - echo "export TAG_NAME=$(./scripts/getTagName.sh $CIRCLE_BRANCH $CIRCLE_SHA1)" >> ~/.circlerc
+    - echo "TAG_NAME:$TAG_NAME":
         environment:
-          TAG_NAME1: $(./scripts/getTagName.sh $CIRCLE_BRANCH $CIRCLE_SHA1)
+          TAG_NAME: $(./scripts/getTagName.sh $CIRCLE_BRANCH $CIRCLE_SHA1)
     - pip install awscli
     - ./scripts/setup.sh -snb
 #    - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
