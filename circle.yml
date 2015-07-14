@@ -11,7 +11,12 @@ machine:
 
 dependencies:
   override:
-    - echo TAG_NAME:$TAG_NAME
+    - echo TAG_NAME:$TAG_NAME:
+      environment:
+        TAG_NAME: $(./scripts/getTagName.sh)
+    - echo TAG_NAME:$TAG_NAME:
+      environment:
+        TAG_NAME: $(./scripts/getTagName.sh)
 #    - pip install awscli
 #    - ./scripts/setup.sh -snb
 #    - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
