@@ -10,7 +10,7 @@ machine:
 
 dependencies:
   override:
-    - git tag $TAG_NAME:
+    - echo $TAG_NAME:
         environment:
           TAG_NAME: $(./scripts/getTagName.sh)
     - git push --tags
