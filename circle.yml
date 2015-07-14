@@ -12,20 +12,20 @@ dependencies:
   override:
     - git tag $TAG_NAME:
         environment:
-          TAG_NAME: $(./scripts/getTagName.sh $CIRCLE_BRANCH $CIRCLE_SHA1)
+          TAG_NAME: $(./scripts/getTagName.sh)
     - git push --tags
     - pip install awscli
     - ./scripts/setup.sh -snb
     - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
     - docker build -t $IMAGE_PATH:$TAG_NAME .:
         environment:
-          TAG_NAME: $(./scripts/getTagName.sh $CIRCLE_BRANCH $CIRCLE_SHA1)
+          TAG_NAME: $(./scripts/getTagName.sh)
 
 test:
   pre:
     - docker run -d -p 9200:80 $IMAGE_PATH:$TAG_NAME; sleep 10:
         environment:
-          TAG_NAME: $(./scripts/getTagName.sh $CIRCLE_BRANCH $CIRCLE_SHA1)
+          TAG_NAME: $(./scripts/getTagName.sh)
     - curl --retry 10 --retry-delay 5 -v http://localhost:9200
 
 deployment:
@@ -34,22 +34,22 @@ deployment:
     commands:
       - docker push $IMAGE_PATH:$TAG_NAME:
           environment:
-            TAG_NAME: $(./scripts/getTagName.sh $CIRCLE_BRANCH $CIRCLE_SHA1)
+            TAG_NAME: $(./scripts/getTagName.sh)
       - ./scripts/createVersion.sh $TAG_NAME:
           environment:
-            TAG_NAME: $(./scripts/getTagName.sh $CIRCLE_BRANCH $CIRCLE_SHA1)
+            TAG_NAME: $(./scripts/getTagName.sh)
       - ./scripts/deployVersion.sh $TAG_NAME test:
           environment:
-            TAG_NAME: $(./scripts/getTagName.sh $CIRCLE_BRANCH $CIRCLE_SHA1)
+            TAG_NAME: $(./scripts/getTagName.sh)
   develop:
     branch: develop
     commands:
       - docker push $IMAGE_PATH:$TAG_NAME:
           environment:
-            TAG_NAME: $(./scripts/getTagName.sh $CIRCLE_BRANCH $CIRCLE_SHA1)
+            TAG_NAME: $(./scripts/getTagName.sh)
       - ./scripts/createVersion.sh $TAG_NAME:
           environment:
-            TAG_NAME: $(./scripts/getTagName.sh $CIRCLE_BRANCH $CIRCLE_SHA1)
+            TAG_NAME: $(./scripts/getTagName.sh)
       - ./scripts/deployVersion.sh $TAG_NAME develop:
           environment:
-            TAG_NAME: $(./scripts/getTagName.sh $CIRCLE_BRANCH $CIRCLE_SHA1)
+            TAG_NAME: $(./scripts/getTagName.sh)
