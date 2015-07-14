@@ -29,7 +29,7 @@ test:
 
 deployment:
   release:
-    branch: release/*
+    branch: /release\/.*/
     commands:
       - docker push $IMAGE_PATH:$TAG_NAME:
           environment:
