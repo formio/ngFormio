@@ -10,7 +10,7 @@ machine:
 
 dependencies:
   override:
-    - ./scripts/getTagName.sh $CIRCLE_BRANCH $CIRCLE_SHA1
+    - echo "./scripts/getTagName.sh $CIRCLE_BRANCH $CIRCLE_SHA1" >> ~/.circlerc
     - echo "TAG_NAME:$TAG_NAME"
     - pip install awscli
     - ./scripts/setup.sh -snb
