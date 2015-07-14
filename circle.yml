@@ -10,28 +10,28 @@ machine:
 
 dependencies:
   override:
-    - echo 'export TAG_NAME=$(./scripts/getTagName.sh $CIRCLE_BRANCH $CIRCLE_SHA1)' >> ~/.circlerc
+    - ./scripts/getTagName.sh $CIRCLE_BRANCH $CIRCLE_SHA1
     - echo "TAG_NAME:$TAG_NAME"
     - pip install awscli
     - ./scripts/setup.sh -snb
-    - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-    - docker build -t $IMAGE_PATH:$TAG_NAME .
+#    - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+#    - docker build -t $IMAGE_PATH:$TAG_NAME .
 
 test:
   pre:
     - docker run -d -p 9200:80 $IMAGE_PATH:$TAG_NAME; sleep 10
     - curl --retry 10 --retry-delay 5 -v http://localhost:9200
 
-deployment:
-  release:
-    branch: release/*
-    commands:
-      - docker push $IMAGE_PATH:$TAG_NAME
-      - ./scripts/createVersion.sh $TAG_NAME
-      - ./scripts/deployVersion.sh $TAG_NAME test
-  develop:
-    branch: develop
-    commands:
-      - docker push $IMAGE_PATH:$TAG_NAME
-      - ./scripts/createVersion.sh $TAG_NAME
-      - ./scripts/deployVersion.sh $TAG_NAME develop
+#deployment:
+#  release:
+#    branch: release/*
+#    commands:
+#      - docker push $IMAGE_PATH:$TAG_NAME
+#      - ./scripts/createVersion.sh $TAG_NAME
+#      - ./scripts/deployVersion.sh $TAG_NAME test
+#  develop:
+#    branch: develop
+#    commands:
+#      - docker push $IMAGE_PATH:$TAG_NAME
+#      - ./scripts/createVersion.sh $TAG_NAME
+#      - ./scripts/deployVersion.sh $TAG_NAME develop
