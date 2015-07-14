@@ -1,11 +1,19 @@
 #!/usr/bin/env bash
 # This file will return the correct tag based on the branch name and commit SHA.
 
-BRANCH=$1
-SHA=$2
-SHORT_SHA=$(echo $SHA | cut -b1-7)
-RELEASE_REGEX=$(echo $BRANCH | sed -E -e "s/release\/([a-zA-Z0-9\._]*).*/\1/" -e "s/x/*/g")
+# First check if this sha is already tagged.
+TAG=$(git tag --points-at HEAD)
+if [[ ! -z $TAG ]]; then
+  echo $TAG
+  exit
+fi
+
+# Create a tag.
+SHORT_SHA=$(echo $CIRCLE_SHA1 | cut -b1-7)
+RELEASE_REGEX=$(echo $CIRCLE_BRANCH | sed -E -e "s/release\/([a-zA-Z0-9\._]*).*/\1/" -e "s/x/*/g")
 LAST_RELEASE=$(git tag -l $RELEASE_REGEX | tail -n 1)
 SEMVER=$(if [ -z $LAST_RELEASE ]; then echo $RELEASE_REGEX | sed -E -e "s/\*/0/g"; else ./scripts/incrementVersion.sh -p $LAST_RELEASE; fi)
-TAG_NAME=$(if [[ $SEMVER =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then echo $SEMVER; else echo $BRANCH-$SHORT_SHA | sed -E -e "s/\//-/g"; fi)
-echo $TAG_NAME
+TAG=$(if [[ $SEMVER =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then echo $SEMVER; else echo $CIRCLE_BRANCH-$SHORT_SHA | sed -E -e "s/\//-/g"; fi)
+git tag $TAG
+git push --tags
+echo $TAG
