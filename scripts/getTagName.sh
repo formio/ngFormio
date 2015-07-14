@@ -13,6 +13,6 @@ LAST_RELEASE=$(git tag -l $RELEASE_REGEX | tail -n 1)
 echo LAST_RELEASE:$LAST_RELEASE
 SEMVER=$(if [ -z $LAST_RELEASE ]; then echo $RELEASE_REGEX | sed -E -e "s/\*/0/g"; else ./scripts/incrementVersion.sh -p $LAST_RELEASE; fi)
 echo SEMVER:$SEMVER
-export TAG_NAME=$(if [[ $SEMVER =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then echo $SEMVER; else echo $BRANCH-$SHORT_SHA | sed -E -e "s/\//-/g"; fi)
-echo TAG_NAME:$TAG_NAME
+export TAG_NAME1=$(if [[ $SEMVER =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then echo $SEMVER; else echo $BRANCH-$SHORT_SHA | sed -E -e "s/\//-/g"; fi)
+echo TAG_NAME1:$TAG_NAME1
 
