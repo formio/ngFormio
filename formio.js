@@ -16,7 +16,6 @@ app.provider('Formio', function() {
   var baseUrl = '';
   var domain;
   var noalias = false;
-  var rootUrl = '';
   var cache = {};
 
   /**
@@ -32,28 +31,6 @@ app.provider('Formio', function() {
    */
   var getUrlParts = function(url) {
     return url.match(/^(http[s]?:\/\/)([^/]+)($|\/.*)/);
-  };
-
-  /**
-   * Get the root url to show all applications.
-   */
-  var getRootUrl = function(url) {
-    if (rootUrl) { return rootUrl; }
-    if (!url) { return ''; }
-    var parts = getUrlParts(url);
-    if (parts.length <= 2) { return parts.join('.'); }
-    var rootDomain = domain;
-    // Revert to old behavior if domain is not set.
-    if(!rootDomain) {
-      var domainParts = parts[2].split('.');
-      if(domainParts.length > 2) {
-        domainParts.splice(0, (domainParts.length - 2));
-      }
-      rootDomain = domainParts.join('.');
-    }
-    rootUrl = parts[1] + rootDomain;
-    rootUrl += (parts.length > 3) ? parts[3] : '';
-    return rootUrl;
   };
 
   // Return the provider interface.

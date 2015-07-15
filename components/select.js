@@ -69,13 +69,19 @@ app.config([
             }
             break;
           case 'url':
+            var options = {};
             if(settings.data.url.substr(0, 1) === '/') {
               settings.data.url = Formio.baseUrl + settings.data.url;
             }
-            $http.get(settings.data.url, {
-              disableJWT: true,
-              headers: {Authorization: undefined}
-            }).success(function(data) {
+
+            // Disable auth for outgoing requests.
+            if (settings.data.url.indexOf(Formio.baseUrl) === -1) {
+              options = {
+                disableJWT: true,
+                headers: {Authorization: undefined}
+              };
+            }
+            $http.get(settings.data.url, options).success(function(data) {
               $scope.selectItems = data;
             });
             break;
