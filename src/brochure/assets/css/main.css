@@ -9,6 +9,21 @@ body {
   width: 85%;
   margin-bottom: -80px;
 }
+
+.video-wrapper {
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 */
+  padding-top: 25px;
+  height: 0;
+}
+.video-wrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
 .play-pres-overlay {
   text-align: center;
   z-index: 2;
@@ -278,7 +293,7 @@ fieldset[disabled] .btn-xl.btn-success.active {
   display: none;
 }
 .header-image {
-  width: 70%;
+  width: 90%;
 }
 @media (max-width: 768px) {
   .header-button {
