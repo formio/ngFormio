@@ -27,7 +27,6 @@ test:
         environment:
           TAG_NAME: $(./scripts/getTagName.sh)
     - docker logs formio-server
-    - curl --retry 10 --retry-delay 5 -v http://localhost:9200
 
 deployment:
   release:
