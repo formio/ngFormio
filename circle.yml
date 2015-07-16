@@ -23,9 +23,10 @@ dependencies:
 
 test:
   pre:
-    - docker run -d -p 9200:80 -e "MONGO1=$MONGO" $IMAGE_PATH:$TAG_NAME; sleep 10:
+    - docker run -d -p 9200:80 -e "MONGO1=$MONGO" -name formio-server $IMAGE_PATH:$TAG_NAME; sleep 10:
         environment:
           TAG_NAME: $(./scripts/getTagName.sh)
+    - docker logs formio-server
     - curl --retry 10 --retry-delay 5 -v http://localhost:9200
 
 deployment:
