@@ -1064,6 +1064,13 @@ app.config([
   function(
     $httpProvider
   ) {
+    if (!$httpProvider.defaults.headers.get) {
+      $httpProvider.defaults.headers.get = {};
+    }
+
+    // Disable IE caching for GET requests.
+    $httpProvider.defaults.headers.get['Cache-Control'] = 'no-cache';
+    $httpProvider.defaults.headers.get.Pragma = 'no-cache';
     $httpProvider.interceptors.push('formioInterceptor');
   }
 ]);
