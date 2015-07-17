@@ -11,7 +11,6 @@
 angular
   .module('formioApp', [
     'ngSanitize',
-    'ngAnimate',
     'restangular',
     'ui.router',
     'ui.bootstrap',
@@ -111,6 +110,34 @@ angular
           parent: 'app',
           templateUrl: 'views/app/settings.html',
           controller: 'AppSettingsController'
+        })
+        .state('app.settings.email', {
+          url: '/email',
+          parent: 'app.settings',
+          templateUrl: 'views/app/email/email.html'
+        })
+        .state('app.settings.roles', {
+          abstract: true,
+          url: '/roles',
+          parent: 'app.settings',
+          templateUrl: 'views/app/roles/roles.html'
+        })
+        .state('app.settings.roles.view', {
+          url: '',
+          parent: 'app.settings.roles',
+          templateUrl: 'views/app/roles/view.html'
+        })
+        .state('app.settings.roles.edit', {
+          url: '/:roleId/edit',
+          parent: 'app.settings.roles',
+          templateUrl: 'views/app/roles/edit.html',
+          controller: 'RoleController'
+        })
+        .state('app.settings.roles.delete', {
+          url: '/:roleId/delete',
+          parent: 'app.settings.roles',
+          templateUrl: 'views/app/roles/delete.html',
+          controller: 'RoleController'
         })
         .state('app.delete', {
           url: '/delete',

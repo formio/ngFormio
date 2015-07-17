@@ -144,13 +144,15 @@ app.controller('AppController', [
   'Formio',
   'FormioAlerts',
   '$state',
+  '$http',
   function(
     $scope,
     $rootScope,
     $stateParams,
     Formio,
     FormioAlerts,
-    $state
+    $state,
+    $http
   ) {
     $rootScope.activeSideBar = 'apps';
     $rootScope.noBreadcrumb = false;
@@ -165,10 +167,21 @@ app.controller('AppController', [
     $scope.forms = [];
     $scope.formio = new Formio('/app/' + $stateParams.appId);
     $scope.currentApp = {_id: $stateParams.appId, access: []};
+    $scope.rolesLoading = true;
     $scope.formio.loadApp().then(function(result) {
       $scope.currentApp = result;
       $rootScope.currentApp = result;
     });
+
+    $http.get($scope.formio.appUrl + '/role')
+    .then(function(result) {
+        $scope.currentAppRoles = result.data;
+        $scope.rolesLoading = false;
+    });
+
+    $scope.getRole = function(id) {
+      return _.find($scope.currentAppRoles, {_id: id});
+    };
 
     // Save the application.
     $scope.saveApplication = function() {
@@ -212,11 +225,34 @@ app.controller('AppEditController', [
 
 app.controller('AppSettingsController', [
   '$scope',
+  '$state',
+  'FormioAlerts',
   function(
-    $scope
+    $scope,
+    $state,
+    FormioAlerts
   ) {
-    $scope.active = 'email';
-    $scope.subActive = '';
+    // Go to first settings section
+    if($state.current.name === 'app.settings') {
+      $state.go('app.settings.email', {location: 'replace'});
+    }
+
+    // Save the application.
+    $scope.saveApplication = function() {
+      if (!$scope.currentApp._id) { return FormioAlerts.onError(new Error('No application found.')); }
+      $scope.formio.saveApp($scope.currentApp).then(function (app) {
+        FormioAlerts.addAlert({
+          type: 'success',
+          message: 'Application saved.'
+        });
+        // Reload state so alerts display.
+        $state.go($state.current.name, {
+          appId: app._id
+        }, {reload: true});
+      }, function(error) {
+        FormioAlerts.onError(error);
+      });
+    };
   }
 ]);
 
