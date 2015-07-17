@@ -54,34 +54,44 @@ _.each(apps, function(path, name) {
 // Add the formio application.
 app.use('/app', express.static(__dirname + '/dist'));
 
-// Show the docs page for the API.
-app.get('/app/spec.html', function (req, res, next) {
-  res.render('docs.html', {
-    url: req.protocol + '://' + req.get('host') + '/api/spec.json'
-  });
-});
-
-// Get the specs for each form.
-app.get('/app/form/:formId/spec.html', function (req, res, next) {
-  res.render('docs.html', {
-    url: '/app/api/form/' + req.params.formId + '/spec.json'
-  });
-});
-
 // Mount the api server.
 require('formio')(config.formio, function(formio) {
+  // Show the docs page for the API.
+  formio.get('/spec.html', function (req, res, next) {
+    res.render('docs.html', {
+      url: req.protocol + '://' + req.get('host') + '/api/spec.json'
+    });
+  });
+
+  // Get the specs for each form.
+  formio.get('/project/:projectId/form/:formId/spec.html', function (req, res, next) {
+    res.render('docs.html', {
+      url: req.protocol + '://' + req.get('host') +'/api/project/' + req.params.projectId + '/form/' + req.params.formId + '/spec.json'
+    });
+  });
+
   // The healthcheck.
   app.get('/health', function(req, res) {
-    if (!formio.resources) { return res.status(500).send('No Resources'); }
-    if (!formio.resources.application.model) { return res.status(500).send('No application model'); }
-    formio.resources.application.model.findOne({name: 'formio'}, function(err, result) {
-      if (err) { return res.status(500).send(err); }
-      if (!result) { return res.status(500).send('Formio application not found'); }
+    if (!formio.resources) {
+      return res.status(500).send('No Resources');
+    }
+    if (!formio.resources.project.model) {
+      return res.status(500).send('No Project model');
+    }
+
+    formio.resources.project.model.findOne({name: 'formio'}, function(err, result) {
+      if (err) {
+        return res.status(500).send(err);
+      }
+      if (!result) {
+        return res.status(500).send('Formio Project not found');
+      }
+
       res.send('OK');
     });
   });
 
-  app.use('/app/api', formio);
+  app.use('/api', formio);
   console.log('Listening to port ' + config.port);
   app.listen(config.port);
 });

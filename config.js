@@ -8,9 +8,9 @@ module.exports = function() {
   var protocol = process.env.PROTOCOL || 'https';
   var domain = process.env.DOMAIN || 'form.io';
   var port = process.env.PORT || 80;
-  var app = process.env.APP || 'formio';
+  var project = process.env.PROJECT || 'formio';
   var host = protocol + '://' + domain;
-  var formioHost = protocol + '://' + app + '.' + domain;
+  var formioHost = protocol + '://' + project + '.' + domain;
 
   if (port !== 80) {
     host += ':' + port;
@@ -42,7 +42,7 @@ module.exports = function() {
     config.formio.mongo = 'mongodb://' + mongoAddr + ':' + mongoPort + '/' + mongoCollection;
   }
 
-  config.formio.appSupport = process.env.APP_SUPPORT || true;
+  config.formio.projectSupport = process.env.PROJECT_SUPPORT || true;
   config.formio.reservedSubdomains = ['test', 'www', 'api', 'help', 'support'];
   config.formio.reservedForms = ['submission', 'export'];
 

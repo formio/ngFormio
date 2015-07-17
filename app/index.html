@@ -64,8 +64,8 @@
                 <img height="40px;" src="images/formio-logo.png" />
               </a>
               <ol class="breadcrumb">
-                <li ng-if="currentApp"><a ui-sref="app.view({appId: currentApp._id})">{{ currentApp.title }}</a></li>
-                <li ng-if="currentForm"><a ui-sref="app.form.view({formId: currentForm._id})">{{ currentForm.title }}</a></li>
+                <li ng-if="currentProject"><a ui-sref="project.view({projectId: currentProject._id})">{{ currentProject.title }}</a></li>
+                <li ng-if="currentForm"><a ui-sref="project.form.view({formId: currentForm._id})">{{ currentForm.title }}</a></li>
               </ol>
             </div>
             <div id="navbar" class="navbar-collapse collapse">
@@ -154,11 +154,11 @@
     <!-- build:js scripts/app.js -->
     <!-- inject:js -->
     <script src="/scripts/app.js"></script>
-    <script src="/scripts/controllers/app.js"></script>
     <script src="/scripts/controllers/controllers.js"></script>
     <script src="/scripts/controllers/form.js"></script>
     <script src="/scripts/controllers/help.js"></script>
     <script src="/scripts/controllers/import.js"></script>
+    <script src="/scripts/controllers/project.js"></script>
     <script src="/scripts/controllers/team.js"></script>
     <script src="/scripts/controllers/user.js"></script>
     <script src="/scripts/services/services.js"></script>

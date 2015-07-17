@@ -4,19 +4,19 @@
       <div class="panel-heading">
         <h3 class="panel-title">
           <i class="fa fa-database"></i>
-          <a ui-sref="app.form.resourceIndex()">Resources</a>
+          <a ui-sref="project.form.resourceIndex()">Resources</a>
           <a class="pull-right" href="http://help.form.io/userguide/#resources" target="_blank"><i class="glyphicon glyphicon-question-sign "></i></a>
         </h3>
       </div>
       <div class="panel-body">
         <i id="resource-loader" style="font-size: 2em;" class="fa fa-spinner fa-pulse"></i>
         <div class="well" ng-show="!resourcesLoading">
-          Resources are the objects within your application. Example: User, Company, Vehicle, etc.
+          Resources are the objects within your Project. Example: User, Company, Vehicle, etc.
         </div>
-        <form-list forms="resources" app="currentApp" form-type="'resource'" num-per-page="5"></form-list>
+        <form-list forms="resources" project="currentProject" form-type="'resource'" num-per-page="5"></form-list>
       </div>
       <div class="panel-footer text-right">
-        <a ui-sref="app.form.createResource()" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> New Resource</a>
+        <a ui-sref="project.form.createResource()" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> New Resource</a>
       </div>
     </div>
   </div>
@@ -25,7 +25,7 @@
       <div class="panel-heading">
         <h3 class="panel-title">
           <i class="fa fa-file-text-o"></i>
-          <a ui-sref="app.form.formIndex()">Forms</a>
+          <a ui-sref="project.form.formIndex()">Forms</a>
           <a class="pull-right" href="http://help.form.io/userguide/#forms" target="_blank"><i class="glyphicon glyphicon-question-sign "></i></a>
         </h3>
       </div>
@@ -34,22 +34,22 @@
         <div class="well" ng-show="!formsLoading">
           Forms serve as a composite input interface for Resources as well as free-form user input. Example: Login Form, Contact Form, etc.
         </div>
-        <form-list forms="forms" app="currentApp" form-type="'form'" num-per-page="5"></form-list>
+        <form-list forms="forms" project="currentProject" form-type="'form'" num-per-page="5"></form-list>
       </div>
       <div class="panel-footer text-right">
-        <a ui-sref="app.form.createForm()" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> New Form</a>
+        <a ui-sref="project.form.createForm()" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> New Form</a>
       </div>
     </div>
   </div>
   <div class="col-sm-4">
     <div class="panel panel-info">
       <div class="panel-heading">
-        <h3 class="panel-title"><span class="glyphicon glyphicon-info-sign"></span> Getting started with your app</h3>
+        <h3 class="panel-title"><span class="glyphicon glyphicon-info-sign"></span> Getting started with your Project</h3>
       </div>
       <div class="panel-body">
         <p>Form.IO provides the forms and resource structure behind your custom application. Start by creating the <strong>Resources</strong>, and then create the free-form <strong>Forms</strong> that your application needs.</p>
         <p>Once you have created the Resources and Forms, you can embed them within your application using the <strong>&lt;formio&gt;</strong> Angular.js directive. It works just like an &lt;img&gt; tag, but used for Form I/O.</p>
-        <p>It is recommended to walk through the tutorial, which provides a step-by-step tuturial on how to build an application with Form.IO.</p>
+        <p>It is recommended to walk through the tutorial, which provides a step-by-step tutorial on how to build an application with Form.IO.</p>
         <p><div ng-click="startTutorial()" class="play-pres-overlay">
           <div class="play-pres-overlay-play"><span class="glyphicon glyphicon-play-circle"></span>Start the tutorial</div>
           <img width="100%" src="images/formio-get-started.png" />

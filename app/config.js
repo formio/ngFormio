@@ -10,11 +10,11 @@ angular.module('formioApp').constant('AppConfig', {
   forceSSL: false,
   domain: 'localhost:3000',
   appBase: 'http://localhost:3000/app',
-  apiBase: 'http://localhost:3000/app/api',
+  apiBase: 'http://localhost:3000/api',
   tutorial: 'http://localhost:3000/start',
-  userForm: 'http://formio.localhost:3000/app/api/user',
-  userLoginForm: 'http://formio.localhost:3000/app/api/user/login',
-  userRegisterForm: 'http://formio.localhost:3000/app/api/user/register',
-  teamForm: 'http://formio.localhost:3000/app/api/team',
-  betaForm: 'http://formio.localhost:3000/app/api/beta'
+  userForm: 'http://formio.localhost:3000/api/user',
+  userLoginForm: 'http://formio.localhost:3000/api/user/login',
+  userRegisterForm: 'http://formio.localhost:3000/api/user/register',
+  teamForm: 'http://formio.localhost:3000/api/team',
+  betaForm: 'http://formio.localhost:3000/api/beta'
 });

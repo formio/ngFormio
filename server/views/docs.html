@@ -50,7 +50,7 @@
     jQuery.seamless.connect();
     jQuery(function () {
       window.swaggerUi = new SwaggerUi({
-        url: '{{ url }}?x-jwt-token=' + QueryString.token,
+        url: QueryString.token ? '{{ url }}?x-jwt-token=' + QueryString.token : '{{ url }}',
         dom_id: "swagger-ui-container",
         supportedSubmitMethods: ['get', 'post', 'put', 'delete'],
         docExpansion: "none",

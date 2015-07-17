@@ -8,8 +8,8 @@
  *
  * Main module of the application.
  */
-var formioBaseUrl = 'https://form.io/app/api';
-var boardmanAPI = 'https://boardman.form.io/app/api';
+var formioBaseUrl = 'https://form.io/api';
+var boardmanAPI = 'https://boardman.form.io/api';
 
 angular
   .module('boardmanApp', [

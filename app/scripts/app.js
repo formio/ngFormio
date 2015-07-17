@@ -85,38 +85,38 @@ angular
           parent: 'profile',
           templateUrl: 'views/user/profile/profile-edit.html'
         })
-        .state('app', {
-          url: '/app/:appId',
-          controller: 'AppController',
-          templateUrl: 'views/app/app.html'
+        .state('project', {
+          url: '/project/:projectId',
+          controller: 'ProjectController',
+          templateUrl: 'views/project/project.html'
         })
-        .state('createApp', {
-          url: '/create/app',
-          templateUrl: 'views/app/create.html',
-          controller: 'AppCreateController'
+        .state('createProject', {
+          url: '/create/project',
+          templateUrl: 'views/project/create.html',
+          controller: 'ProjectCreateController'
         })
-        .state('app.view', {
+        .state('project.view', {
           url: '/view',
-          parent: 'app',
-          templateUrl: 'views/app/view.html'
+          parent: 'project',
+          templateUrl: 'views/project/view.html'
         })
-        .state('app.edit', {
+        .state('project.edit', {
           url: '/edit',
-          parent: 'app',
-          templateUrl: 'views/app/edit.html',
-          controller: 'AppEditController'
+          parent: 'project',
+          templateUrl: 'views/project/edit.html',
+          controller: 'ProjectEditController'
         })
-        .state('app.settings', {
+        .state('project.settings', {
           url: '/settings',
-          parent: 'app',
-          templateUrl: 'views/app/settings.html',
-          controller: 'AppSettingsController'
+          parent: 'project',
+          templateUrl: 'views/project/settings.html',
+          controller: 'ProjectSettingsController'
         })
-        .state('app.delete', {
+        .state('project.delete', {
           url: '/delete',
-          parent: 'app',
-          templateUrl: 'views/app/delete.html',
-          controller: 'AppDeleteController'
+          parent: 'project',
+          templateUrl: 'views/project/delete.html',
+          controller: 'ProjectDeleteController'
         })
         .state('team', {
           url: '/team/:teamId',
@@ -170,7 +170,7 @@ angular
       Formio
     ) {
       $rootScope.activeSideBar = 'home';
-      $rootScope.currentApp = null;
+      $rootScope.currentProject = null;
       $rootScope.currentForm = null;
       $scope.teams = [];
       $scope.teamsLoading = true;
@@ -179,12 +179,12 @@ angular
         $scope.teamsLoading = false;
         angular.element('#team-loader').hide();
       });
-      $scope.apps = {};
-      $scope.appsLoading = true;
-      Formio.loadApps().then(function(apps) {
-        $scope.appsLoading = false;
-        angular.element('#apps-loader').hide();
-        $scope.apps = apps;
+      $scope.projects = {};
+      $scope.projectsLoading = true;
+      Formio.loadProjects().then(function(projects) {
+        $scope.projectsLoading = false;
+        angular.element('#projects-loader').hide();
+        $scope.projects = projects;
       });
     }
   ])
@@ -257,7 +257,7 @@ angular
       });
 
       var logoutError = function() {
-        $rootScope.currentApp = null;
+        $rootScope.currentProject = null;
         $rootScope.currentForm = null;
         $state.go('auth.login');
         FormioAlerts.addAlert({
@@ -272,7 +272,7 @@ angular
       // Logout of form.io and go to login page.
       $rootScope.logout = function() {
         Formio.logout().then(function() {
-          $rootScope.currentApp = null;
+          $rootScope.currentProject = null;
           $rootScope.currentForm = null;
           $state.go('auth.login');
         }).catch(logoutError);
@@ -289,7 +289,7 @@ angular
       });
 
       // Set the active sidebar.
-      $rootScope.activeSideBar = 'apps';
+      $rootScope.activeSideBar = 'projects';
 
       // Determine if a state is active.
       $rootScope.isActive = function(state) {

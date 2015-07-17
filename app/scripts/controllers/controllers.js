@@ -1,7 +1,8 @@
 'use strict';
+
 angular.module('formioApp.controllers', [
   'formioApp.controllers.form',
-  'formioApp.controllers.app',
+  'formioApp.controllers.project',
   'formioApp.controllers.team',
   'formioApp.controllers.user',
   'formioApp.controllers.import',

@@ -1,5 +1,7 @@
 'use strict';
+
 var app = angular.module('formioApp.controllers.help', []);
+
 app.controller('HelpIndexController', [
   '$scope',
   '$rootScope',

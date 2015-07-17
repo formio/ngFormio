@@ -1,6 +1,8 @@
 'use strict';
-var app = angular.module('formioApp.controllers.app', []);
-app.controller('AppIndexController', [
+
+var app = angular.module('formioApp.controllers.project', []);
+
+app.controller('ProjectIndexController', [
   '$scope',
   '$rootScope',
   'Restangular',
@@ -10,9 +12,9 @@ app.controller('AppIndexController', [
     Restangular
   ) {
     $rootScope.noBreadcrumb = false;
-    $rootScope.currentApp = false;
+    $rootScope.currentProject = false;
     $rootScope.currentForm = false;
-    $scope.apps = Restangular.all('app').getList().$object;
+    $scope.projects = Restangular.all('project').getList().$object;
   }
 ]);
 
@@ -93,7 +95,7 @@ app.directive('uniqueChecker', ['$http', '$q', 'Formio', function($http, $q, For
   };
 }]);
 
-app.controller('AppCreateController', [
+app.controller('ProjectCreateController', [
   '$scope',
   '$rootScope',
   '$state',
@@ -109,26 +111,26 @@ app.controller('AppCreateController', [
     Formio
   ) {
     $rootScope.noBreadcrumb = false;
-    $scope.currentApp = {};
+    $scope.currentProject = {};
     $scope.users = [];
     $scope.refreshUsers = refreshUsers(new Formio($rootScope.userForm), $scope);
-    $scope.saveApplication = function() {
+    $scope.saveProject = function() {
       // Need to strip hyphens at the end before submitting
-      if($scope.currentApp.name) {
-        $scope.currentApp.name = $scope.currentApp.name.toLowerCase().replace(/[^0-9a-z\-]|^\-+|\-+$/g, '');
+      if($scope.currentProject.name) {
+        $scope.currentProject.name = $scope.currentProject.name.toLowerCase().replace(/[^0-9a-z\-]|^\-+|\-+$/g, '');
       }
 
-      Restangular.all('app').post($scope.currentApp).then(function(app) {
+      Restangular.all('project').post($scope.currentProject).then(function(project) {
         FormioAlerts.addAlert({
           type: 'success',
-          message: 'New application created!'
+          message: 'New Project created!'
         });
-        $state.go('app.view', {appId: app._id});
+        $state.go('project.view', {projectId: project._id});
       }, function(error) {
         if (error.data.message && error.data.message.indexOf('duplicate key error index') !== -1) {
           error.data.errors.name = {
             path: 'name',
-            message: 'Application domain already exists. Please pick a different domain.'
+            message: 'Project domain already exists. Please pick a different domain.'
           };
         }
         FormioAlerts.onError(error);
@@ -137,7 +139,7 @@ app.controller('AppCreateController', [
   }
 ]);
 
-app.controller('AppController', [
+app.controller('ProjectController', [
   '$scope',
   '$rootScope',
   '$stateParams',
@@ -152,7 +154,7 @@ app.controller('AppController', [
     FormioAlerts,
     $state
   ) {
-    $rootScope.activeSideBar = 'apps';
+    $rootScope.activeSideBar = 'projects';
     $rootScope.noBreadcrumb = false;
     $scope.resourcesLoading = true;
     $scope.resources = [];
@@ -163,28 +165,28 @@ app.controller('AppController', [
     });
     $scope.formsLoading = true;
     $scope.forms = [];
-    $scope.formio = new Formio('/app/' + $stateParams.appId);
-    $scope.currentApp = {_id: $stateParams.appId, access: []};
-    $scope.formio.loadApp().then(function(result) {
-      $scope.currentApp = result;
-      $rootScope.currentApp = result;
+    $scope.formio = new Formio('/project/' + $stateParams.projectId);
+    $scope.currentProject = {_id: $stateParams.projectId, access: []};
+    $scope.formio.loadProject().then(function(result) {
+      $scope.currentProject = result;
+      $rootScope.currentProject = result;
     });
 
-    // Save the application.
-    $scope.saveApplication = function() {
+    // Save the Project.
+    $scope.saveProject = function() {
       // Need to strip hyphens at the end before submitting
-      if($scope.currentApp.name) {
-        $scope.currentApp.name = $scope.currentApp.name.toLowerCase().replace(/[^0-9a-z\-]|^\-+|\-+$/g, '');
+      if($scope.currentProject.name) {
+        $scope.currentProject.name = $scope.currentProject.name.toLowerCase().replace(/[^0-9a-z\-]|^\-+|\-+$/g, '');
       }
 
-      if (!$scope.currentApp._id) { return FormioAlerts.onError(new Error('No application found.')); }
-      $scope.formio.saveApp($scope.currentApp).then(function (app) {
+      if (!$scope.currentProject._id) { return FormioAlerts.onError(new Error('No Project found.')); }
+      $scope.formio.saveProject($scope.currentProject).then(function (project) {
         FormioAlerts.addAlert({
           type: 'success',
-          message: 'Application saved.'
+          message: 'Project saved.'
         });
-        $state.go('app.view', {
-          appId: app._id
+        $state.go('project.view', {
+          projectId: project._id
         });
       }, function(error) {
         FormioAlerts.onError(error);
@@ -193,7 +195,7 @@ app.controller('AppController', [
   }
 ]);
 
-app.controller('AppEditController', [
+app.controller('ProjectEditController', [
   '$scope',
   '$rootScope',
   '$state',
@@ -210,7 +212,7 @@ app.controller('AppEditController', [
   }
 ]);
 
-app.controller('AppSettingsController', [
+app.controller('ProjectSettingsController', [
   '$scope',
   function(
     $scope
@@ -220,7 +222,7 @@ app.controller('AppSettingsController', [
   }
 ]);
 
-app.controller('AppDeleteController', [
+app.controller('ProjectDeleteController', [
   '$scope',
   '$state',
   'FormioAlerts',
@@ -229,12 +231,12 @@ app.controller('AppDeleteController', [
     $state,
     FormioAlerts
   ) {
-    $scope.deleteApp = function() {
-      if (!$scope.currentApp || !$scope.currentApp._id) { return; }
-      $scope.formio.deleteApp().then(function() {
+    $scope.deleteProject = function() {
+      if (!$scope.currentProject || !$scope.currentProject._id) { return; }
+      $scope.formio.deleteProject().then(function() {
         FormioAlerts.addAlert({
           type: 'success',
-          message: 'Application was deleted!'
+          message: 'Project was deleted!'
         });
         $state.go('home');
       }, FormioAlerts.onError.bind(FormioAlerts));

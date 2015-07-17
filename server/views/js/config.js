@@ -2,11 +2,11 @@ angular.module('formioApp').constant('AppConfig', {
   forceSSL: {{ forceSSL }},
   domain: '{{ domain }}',
   appBase: '{{ host }}/app',
-  apiBase: '{{ host }}/app/api',
+  apiBase: '{{ host }}/api',
   tutorial: '{{ host }}/start',
-  userForm: '{{ formioHost }}/app/api/user',
-  userLoginForm: '{{ formioHost }}/app/api/user/login',
-  userRegisterForm: '{{ formioHost }}/app/api/user/register',
-  teamForm: '{{ formioHost }}/app/api/team',
-  betaForm: '{{ formioHost }}/app/api/beta'
+  userForm: '{{ formioHost }}/api/user',
+  userLoginForm: '{{ formioHost }}/api/user/login',
+  userRegisterForm: '{{ formioHost }}/api/user/register',
+  teamForm: '{{ formioHost }}/api/team',
+  betaForm: '{{ formioHost }}/api/beta'
 });

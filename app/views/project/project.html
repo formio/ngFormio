@@ -1,0 +1,19 @@
+<div ng-if="!currentForm" class="app-nav">
+  <div class="row app-row">
+    <div class="col-sm-6">
+      <div class="app-title">{{ currentProject.title }}</div>
+      <div class="app-description">{{ currentProject.description }}</div>
+    </div>
+    <div class="col-sm-6 app-options">
+      <div class="pull-right">
+        <ul class="nav nav-pills" ng-if="currentProject">
+          <li role="presentation"><div class="well well-sm" style="margin: 0 10px 0 0;">https://{{ currentProject.name }}.form.io/</div></li>
+          <li role="presentation" ng-class="{active:isActive('project.view')}"><a ui-sref="project.view()">View</a></li>
+          <li role="presentation" ng-class="{active:isActive('project.edit')}"><a ui-sref="project.edit()">Edit</a></li>
+          <li role="presentation" ng-class="{active:isActive('project.settings')}"><a ui-sref="project.settings()">Settings</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+<div ui-view></div>
