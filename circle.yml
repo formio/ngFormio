@@ -1,3 +1,10 @@
+general:
+  branches:
+    only:
+      - develop
+      - /feature\/.*/
+      - /release\/.*/
+
 machine:
   python:
     version: 2.7.3
