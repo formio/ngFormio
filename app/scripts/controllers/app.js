@@ -168,13 +168,11 @@ app.controller('AppController', [
     $scope.formio = new Formio('/app/' + $stateParams.appId);
     $scope.currentApp = {_id: $stateParams.appId, access: []};
     $scope.rolesLoading = true;
-    $scope.formio.loadApp().then(function(result) {
+    $scope.loadAppPromise = $scope.formio.loadApp().then(function(result) {
       $scope.currentApp = result;
       $rootScope.currentApp = result;
-    });
-
-    $http.get($scope.formio.appUrl + '/role')
-    .then(function(result) {
+      return $http.get($scope.formio.appUrl + '/role');
+    }).then(function(result) {
         $scope.currentAppRoles = result.data;
         $scope.rolesLoading = false;
     });
