@@ -15,5 +15,9 @@
   "undef": true,
   "unused": true,
   "strict": true,
-  "jquery": true
+  "jquery": true,
+  "predef": [
+    "angular",
+    "_"
+  ]
 }
