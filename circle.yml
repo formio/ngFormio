@@ -27,6 +27,10 @@ dependencies:
     - docker build -t $IMAGE_PATH:$TAG_NAME .:
         environment:
           TAG_NAME: $(./scripts/getTagName.sh)
+  post:
+    - wget http://selenium-release.storage.googleapis.com/2.44/selenium-server-standalone-2.46.0.jar
+    - java -jar selenium-server-standalone-2.46.0.jar:
+        background: true
 
 test:
   pre:

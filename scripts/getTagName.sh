@@ -19,5 +19,5 @@ if [[ $SEMVER =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
   echo $SEMVER
 else
   SHORT_SHA=$(echo $CIRCLE_SHA1 | cut -b1-7)
-  echo $CIRCLE_BRANCH-$SHORT_SHA | sed -E -e "s/[^a-zA-Z0-9\-_]/_/g"
+  echo $CIRCLE_BRANCH-$SHORT_SHA | sed -E -e "s/[^a-zA-Z0-9\._]/_/g"
 fi
