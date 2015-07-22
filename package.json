@@ -5,7 +5,7 @@
   },
   "scripts": {
     "start": "node server.js",
-    "test": "mocha --reporter spec test/test.js"
+    "test": "mocha --timeout 10000 --reporter spec test/test.js"
   },
   "main": "./server.js",
   "devDependencies": {

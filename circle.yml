@@ -30,7 +30,7 @@ dependencies:
 
 test:
   pre:
-    - docker run -d -p 9200:80 -e "MONGO1=$MONGO" -name formio-server $IMAGE_PATH:$TAG_NAME; sleep 10:
+    - docker run -d -p 3000:80 -e "MONGO1=$MONGO" -name formio-server $IMAGE_PATH:$TAG_NAME; sleep 10:
         environment:
           TAG_NAME: $(./scripts/getTagName.sh)
     - docker logs formio-server

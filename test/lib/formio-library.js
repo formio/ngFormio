@@ -12,12 +12,12 @@ module.exports = (function() {
         path = '/'
       }
       this.driver.url(path).then(function() {
-        next();
+        setTimeout(next, 500);
       });
     })
     .when("I click (?:on )?the link $LINK", function(link, next) {
       this.driver.click("=" + link).then(function() {
-        next();
+        setTimeout(next, 500);
       });
     })
     .then("the title is $TITLE", function(given_title, next) {

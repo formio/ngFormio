@@ -14,6 +14,7 @@ var url = protocol + '://' + domain;
 if (port != 80) {
   url += ':' + port;
 }
+console.log("Testing " + url);
 var options = {
   baseUrl: url,
   desiredCapabilities: {
