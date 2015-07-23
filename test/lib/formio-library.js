@@ -166,7 +166,10 @@ module.exports = function(formio) {
     .given('I am logged in as $EMAIL with password $PASSWORD', function(email, password, next) {
       authUser('formio', 'user', email, password, function(res) {
         if (res) {
-
+          driver.localStorage('POST', {key: 'formioToken', value: res.token.token})
+            .then(function() {
+               next();
+            });
         }
         else {
           next(new Error('Authentication Failed.'));

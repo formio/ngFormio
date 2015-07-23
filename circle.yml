@@ -14,7 +14,7 @@ machine:
   environment:
     IMAGE_PATH: "formio/formio-app"
     AWS_DEFAULT_REGION: "us-west-2"
-    MONGO: "mongodb://localhost:27017/formio_test"
+    MONGO: "mongodb://localhost:27017/formio"
 
 dependencies:
   override:
@@ -31,7 +31,7 @@ dependencies:
     - wget http://selenium-release.storage.googleapis.com/2.46/selenium-server-standalone-2.46.0.jar
     - java -jar selenium-server-standalone-2.46.0.jar:
         background: true
-    - ./scripts/importDb.sh formio_test
+    - ./scripts/importDb.sh formio
 
 test:
   pre:
