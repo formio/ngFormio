@@ -6,4 +6,4 @@ FILE=formio.tgz
 
 aws s3 cp s3://$EB_BUCKET/$FILE .
 tar -xzvf $FILE
-mongorestore --db $DB formio/develop
+mongorestore --drop --db $DB formio/develop

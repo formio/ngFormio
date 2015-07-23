@@ -1,10 +1,15 @@
 /* global before, afterEach, after, featureFile, scenarios, steps */
 "use strict";
 
+// Boot up the formio server so we can access the resources.
+require('dotenv').load({silent: true});
+var config = require('../config')();
+var formioClass = require('formio');
+
 var Yadda = require('yadda');
 Yadda.plugins.mocha.StepLevelPlugin.init();
 
-var library = require('./lib/formio-library');
+var libraryClass = require('./lib/formio-library');
 var webdriver = require('webdriverio');
 
 var protocol = process.env.PROTOCOL || 'http';
@@ -23,6 +28,8 @@ var options = {
 };
 var fs = require('fs');
 var driver;
+var formio;
+var library;
 
 new Yadda.FeatureFileSearch('./test/features').each(function(file) {
   featureFile(file, function(feature) {
@@ -37,7 +44,16 @@ new Yadda.FeatureFileSearch('./test/features').each(function(file) {
 
     scenarios(feature.scenarios, function(scenario) {
       steps(scenario.steps, function(step, done) {
-        Yadda.createInstance(library, { driver: driver }).run(step, done);
+        if (!formio) {
+          formioClass(config.formio, function(res) {
+            formio = res;
+            library = libraryClass(formio);
+            Yadda.createInstance(library, { driver: driver }).run(step, done);
+          });
+        }
+        else {
+          Yadda.createInstance(library, { driver: driver }).run(step, done);
+        }
       });
     });
 
