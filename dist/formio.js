@@ -68,9 +68,8 @@ app.provider('Formio', function() {
           if (!path) { return; }
 
           // Initialize our variables.
-          this.appUrl = '';
-          this.appId = '';
-          this.appId = '';
+          this.projectUrl = '';
+          this.projectId = '';
           this.formUrl = '';
           this.formsUrl = '';
           this.formId = '';
@@ -83,7 +82,7 @@ app.provider('Formio', function() {
 
           // Normalize to an absolute path.
           if ((path.indexOf('http') !== 0) && (path.indexOf('//') !== 0)) {
-            baseUrl = baseUrl ? baseUrl : $location.absUrl().match(/http[s]?:\/\/[^/?]*/)[0] + '/app/api';
+            baseUrl = baseUrl ? baseUrl : $location.absUrl().match(/http[s]?:\/\/[^/?]*/)[0] + '/api';
             path = baseUrl + path;
           }
 
@@ -102,7 +101,7 @@ app.provider('Formio', function() {
             }
             if (!noalias && hostnames.length >= 2) {
               subdomain = hostnames[0];
-              this.appId = subdomain;
+              this.projectId = subdomain;
             }
           }
           // Revert to old behavior if domain is not set
@@ -112,7 +111,7 @@ app.provider('Formio', function() {
               ((hostnames.length === 2) && (hostnames[1].indexOf('localhost') === 0)) || (hostnames.length >= 3)
               )) {
               subdomain = hostnames[0];
-              this.appId = subdomain;
+              this.projectId = subdomain;
             }
           }
 
@@ -130,7 +129,7 @@ app.provider('Formio', function() {
           if (subdomain) {
 
             // Get the paths.
-            paths = path.match(/(http[s]?:\/\/.*app\/api)\/?([^?]*)?/);
+            paths = path.match(/(http[s]?:\/\/.*\/api)\/?([^?]*)?/);
             if (paths.length > 1) {
               paths.shift();
             }
@@ -142,18 +141,17 @@ app.provider('Formio', function() {
               paths[0] = paths[1] ? path.replace('/' + paths[1], '') : path;
             }
             else {
-
-              // Assume this is an app url.
+              // Assume this is a project url.
               paths[0] = path;
             }
           }
 
           if (paths.length > 0) {
-            this.appUrl = (paths.length > 0) ? paths[0] : '';
-            this.appId = true;
-            this.formsUrl = this.appUrl ? (this.appUrl + '/form') : '';
+            this.projectUrl = (paths.length > 0) ? paths[0] : '';
+            this.projectId = true;
+            this.formsUrl = this.projectUrl ? (this.projectUrl + '/form') : '';
             this.formId = (paths.length > 1) ? paths[1] : '';
-            this.formUrl = this.appUrl ? (this.appUrl + '/' + this.formId) : '';
+            this.formUrl = this.projectUrl ? (this.projectUrl + '/' + this.formId) : '';
             this.pathType = (subs && (subs.length > 0)) ? subs[0] : '';
             angular.forEach(['submission', 'action'], function(item) {
               var index = item + 'sUrl';
@@ -287,9 +285,9 @@ app.provider('Formio', function() {
         };
 
         // Define specific CRUD methods.
-        Formio.prototype.loadApp = _load('app');
-        Formio.prototype.saveApp = _save('app');
-        Formio.prototype.deleteApp = _delete('app');
+        Formio.prototype.loadProject = _load('project');
+        Formio.prototype.saveProject = _save('project');
+        Formio.prototype.deleteProject = _delete('project');
         Formio.prototype.loadForm = _load('form');
         Formio.prototype.saveForm = _save('form');
         Formio.prototype.deleteForm = _delete('form');
@@ -305,7 +303,7 @@ app.provider('Formio', function() {
         Formio.prototype.availableActions = function() { return request(this.formUrl + '/actions'); };
 
         // Static methods.
-        Formio.loadApps = function() { return request(baseUrl + '/app'); };
+        Formio.loadProjects = function() { return request(baseUrl + '/project'); };
         Formio.clearCache = function() { cache = {}; };
         Formio.baseUrl = baseUrl;
         Formio.setUser = formioInterceptor.setUser.bind(formioInterceptor);
