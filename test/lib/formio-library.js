@@ -119,12 +119,8 @@ module.exports = function(formio) {
       if (path === 'home') {
         path = '/'
       }
-      var checkAngular = function(done) {
-
-      }
-
       this.driver.url(path).then(function() {
-        setTimeout(next, 500);
+        setTimeout(next, 3500);
       });
     })
     .given('an account exists with the email $EMAIL and the password $PASSWORD', function(email, password, next) {
@@ -191,9 +187,13 @@ module.exports = function(formio) {
         });
     })
     .when('I click (?:on )?the $BUTTON button', function(button, next) {
-      this.driver.click('button=' + button).then(function() {
-        setTimeout(next, 500);
-      });
+      this.driver.click('button=' + button)
+        .then(function() {
+          setTimeout(next, 500);
+        })
+        .catch(function(err) {
+          next(err);
+        });
     })
     .when('I enter $TEXT in the $FIELD field', function(text, field, next) {
       this.driver.setValue(field, text)

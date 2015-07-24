@@ -35,10 +35,9 @@ dependencies:
 
 test:
   pre:
-    - docker run -d -e "MONGO1=$MONGO" -e "PROTOCOL=http" -e "DOMAIN=localhost" -e "PORT=3000" --name formio-server --net=host $IMAGE_PATH:$TAG_NAME; sleep 10:
+    - docker run -d -e "MONGO1=$MONGO" -e "PROTOCOL=http" -e "DOMAIN=localhost" -e "PORT=3000" --name formio-server --net=host $IMAGE_PATH:$TAG_NAME; sleep 2:
         environment:
           TAG_NAME: $(./scripts/getTagName.sh)
-    - docker ps -a
     - docker logs formio-server
     - curl --retry 10 --retry-delay 5 -v http://localhost:3000
 
