@@ -9,7 +9,6 @@ module.exports = function() {
   var domain = process.env.DOMAIN || 'form.io';
   var port = process.env.PORT || 80;
   var app = process.env.APP || 'formio';
-  var listen = process.env.LISTEN || port;
   var host = protocol + '://' + domain;
   var formioHost = protocol + '://' + app + '.' + domain;
 
@@ -21,7 +20,6 @@ module.exports = function() {
   config.https = (protocol === 'https');
   config.host = host;
   config.port = port;
-  config.listen = listen;
   config.formioHost = formioHost;
   config.debug = process.env.DEBUG || false;
   config.formio.domain = domain;

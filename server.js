@@ -96,6 +96,6 @@ require('formio')(config.formio, function(formio) {
   }, formio.update.sanityCheck);
 
   app.use('/app/api', formio);
-  console.log('Listening to port ' + config.listen);
-  app.listen(config.listen);
+  console.log('Listening to port ' + config.port);
+  app.listen(config.port);
 });
