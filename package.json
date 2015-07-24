@@ -5,7 +5,7 @@
   },
   "scripts": {
     "start": "node server.js",
-    "test": "PROTOCOL=http DOMAIN=localhost mocha --timeout 5000 --reporter spec test/test.js"
+    "test": "PROTOCOL=http DOMAIN=localhost PORT=3000 mocha --timeout 5000 --reporter spec test/test.js"
   },
   "main": "./server.js",
   "devDependencies": {
