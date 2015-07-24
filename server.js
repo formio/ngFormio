@@ -15,7 +15,10 @@ nunjucks.configure('server/views', {
 
 // Make sure to redirect all http requests to https.
 app.use(function(req, res, next) {
-  if (!config.https || req.secure || (req.get('X-Forwarded-Proto') === 'https') || req.url === '/health') { return next(); }
+  if (!config.https || req.secure || (req.get('X-Forwarded-Proto') === 'https') || req.url === '/health') {
+    return next();
+  }
+
   res.redirect('https://' + req.get('Host') + req.url);
 });
 
@@ -90,7 +93,7 @@ require('formio')(config.formio, function(formio) {
       // Proceed with db schema sanity check middleware.
       next();
     });
-  }, formio.updates.sanityCheck);
+  }, formio.update.sanityCheck);
 
   app.use('/app/api', formio);
   console.log('Listening to port ' + config.port);
