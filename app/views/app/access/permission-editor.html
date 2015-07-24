@@ -1,0 +1,23 @@
+<div>
+  <table class="table table-striped">
+    <tbody>
+    <tr>
+      <th>Permission</th>
+      <th>Roles</th>
+    </tr>
+    <tr ng-repeat="permission in permissions">
+      <td class="col-xs-3">
+        <label for="{{permission.type}}_role" form-builder-tooltip="{{getPermissionTooltip(permission)}}">{{getPermissionLabel(permission)}}</label>
+      </td>
+      <td class="col-xs-9">
+        <ui-select multiple ng-model="permission.roles" theme="bootstrap" reset-search-input="true" name="{{permission.type}}_role" id="{{permission.type}}_role">
+          <ui-select-match placeholder="Select roles...">{{$item.title}}</ui-select-match>
+          <ui-select-choices repeat="role._id as role in roles | filter: $select.search">
+          <div>{{ role.title }}</div>
+          </ui-select-choices>
+        </ui-select>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
