@@ -14,7 +14,7 @@ machine:
   environment:
     IMAGE_PATH: "formio/formio-app"
     AWS_DEFAULT_REGION: "us-west-2"
-    MONGO: "mongodb://localhost:27017/formio_test"
+    MONGO: "mongodb://localhost:27017/formio"
 
 dependencies:
   override:
@@ -27,13 +27,20 @@ dependencies:
     - docker build -t $IMAGE_PATH:$TAG_NAME .:
         environment:
           TAG_NAME: $(./scripts/getTagName.sh)
+  post:
+    - wget http://selenium-release.storage.googleapis.com/2.46/selenium-server-standalone-2.46.0.jar
+    - java -jar selenium-server-standalone-2.46.0.jar:
+        background: true
+    - ./scripts/importDb.sh formio
 
 test:
   pre:
-    - docker run -d -p 9200:80 -e "MONGO1=$MONGO" -name formio-server $IMAGE_PATH:$TAG_NAME; sleep 10:
+    - sudo bash -c "echo \"127.0.0.1 formio.localhost\" >> /etc/hosts"
+    - docker run -d -e "MONGO1=$MONGO" -e "PROTOCOL=http" -e "DOMAIN=localhost" -e "PORT=3000" --name formio-server --net=host $IMAGE_PATH:$TAG_NAME; sleep 2:
         environment:
           TAG_NAME: $(./scripts/getTagName.sh)
     - docker logs formio-server
+    - curl --retry 10 --retry-delay 5 -v http://localhost:3000
 
 deployment:
   release:

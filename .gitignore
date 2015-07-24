@@ -8,3 +8,4 @@ test/bower_components
 .idea
 dist
 aws-eb/versions
+test/screenshots/*.png
