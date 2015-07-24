@@ -120,7 +120,7 @@ module.exports = function(formio) {
         path = '/'
       }
       this.driver.url(path).then(function() {
-        setTimeout(next, 3500);
+        setTimeout(next, 500);
       });
     })
     .given('an account exists with the email $EMAIL and the password $PASSWORD', function(email, password, next) {
