@@ -114,10 +114,15 @@ module.exports = function(formio) {
   }
 
   var library = English.library()
-    .given('I am (?:on|at) (?:the )?(.+?)(?: page)?$', function(path, next) {
+    .given("I am (?:on|at) (?:the )?(.+?)(?: page)?$", function(url, next) {
+      var path = url;
       if (path === 'home') {
         path = '/'
       }
+      var checkAngular = function(done) {
+
+      }
+
       this.driver.url(path).then(function() {
         setTimeout(next, 500);
       });
