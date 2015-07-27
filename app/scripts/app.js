@@ -11,7 +11,6 @@
 angular
   .module('formioApp', [
     'ngSanitize',
-    'ngAnimate',
     'restangular',
     'ui.router',
     'ui.bootstrap',
@@ -37,7 +36,6 @@ angular
       RestangularProvider,
       AppConfig
     ) {
-
       // Set the base URL for our API.
       FormioProvider.setBaseUrl(AppConfig.apiBase);
       FormioProvider.setDomain(AppConfig.domain);
@@ -111,6 +109,40 @@ angular
           parent: 'project',
           templateUrl: 'views/project/settings.html',
           controller: 'ProjectSettingsController'
+        })
+        .state('project.settings.email', {
+          url: '/email',
+          parent: 'project.settings',
+          templateUrl: 'views/project/email/email.html'
+        })
+        .state('project.settings.roles', {
+          abstract: true,
+          url: '/roles',
+          parent: 'project.settings',
+          templateUrl: 'views/project/roles/roles.html'
+        })
+        .state('project.settings.roles.view', {
+          url: '',
+          parent: 'project.settings.roles',
+          templateUrl: 'views/project/roles/view.html'
+        })
+        .state('project.settings.roles.edit', {
+          url: '/:roleId/edit',
+          parent: 'project.settings.roles',
+          templateUrl: 'views/project/roles/edit.html',
+          controller: 'RoleController'
+        })
+        .state('project.settings.roles.delete', {
+          url: '/:roleId/delete',
+          parent: 'project.settings.roles',
+          templateUrl: 'views/project/roles/delete.html',
+          controller: 'RoleController'
+        })
+        .state('project.settings.access', {
+          url: '/access',
+          parent: 'project.settings',
+          templateUrl: 'views/project/access/access.html',
+          controller: 'AccessController'
         })
         .state('project.delete', {
           url: '/delete',

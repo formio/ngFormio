@@ -11,7 +11,8 @@ RUN apt-get update && apt-get install -y \
   libkrb5-dev \
   python \
   git \
-  nodejs
+  nodejs \
+  mongodb-clients
 
 COPY . /src
 WORKDIR /src

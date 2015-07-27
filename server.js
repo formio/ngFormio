@@ -15,7 +15,10 @@ nunjucks.configure('server/views', {
 
 // Make sure to redirect all http requests to https.
 app.use(function(req, res, next) {
-  if (!config.https || req.secure || (req.get('X-Forwarded-Proto') === 'https')) { return next(); }
+  if (!config.https || req.secure || (req.get('X-Forwarded-Proto') === 'https') || req.url === '/health') {
+    return next();
+  }
+
   res.redirect('https://' + req.get('Host') + req.url);
 });
 
@@ -51,7 +54,7 @@ _.each(apps, function(path, name) {
   app.use('/apps/' + name, express.static(path));
 });
 
-// Add the formio application.
+// Add the formio Project.
 app.use('/app', express.static(__dirname + '/dist'));
 
 // Mount the api server.
@@ -70,8 +73,8 @@ require('formio')(config.formio, function(formio) {
     });
   });
 
-  // The healthcheck.
-  app.get('/health', function(req, res) {
+  // The formio app sanity endpoint.
+  app.get('/health', function(req, res, next) {
     if (!formio.resources) {
       return res.status(500).send('No Resources');
     }
@@ -87,9 +90,10 @@ require('formio')(config.formio, function(formio) {
         return res.status(500).send('Formio Project not found');
       }
 
-      res.send('OK');
+      // Proceed with db schema sanity check middleware.
+      next();
     });
-  });
+  }, formio.update.sanityCheck);
 
   app.use('/api', formio);
   console.log('Listening to port ' + config.port);

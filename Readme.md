@@ -115,6 +115,22 @@ There are five steps that need to be run to deploy a new version.
   - ```./scripts/createVersion.sh $TAG_NAME```
   - ```./scripts/deployVersion.sh $TAG_NAME $ENVIRONMENT```
 
+Testing
+-------
+You can run the test framework on your localhost by installing selenium and mocha and then using the npm test.
+
+  - ```brew install selenium-server-standalone```
+  - ```brew install chromedriver```
+  - ```npm install -g mocha```
+  - ```ln -sfv /usr/local/opt/selenium-server-standalone/*.plist ~/Library/LaunchAgents```
+  - ```launchctl load ~/Library/LaunchAgents/homebrew.mxcl.selenium-server-standalone.plist```
+  - ```ln -sfv /usr/local/opt/chromedriver/*.plist ~/Library/LaunchAgents```
+  - ```launchctl load ~/Library/LaunchAgents/homebrew.mxcl.chromedriver.plist```
+  
+After running these commands, selenium will be installed with the chrome webdriver and started on port 4444 to recieve requests. To run the tests type:
+
+  - ```npm test```
+
 Contributing
 ----------------
 Before you contribute your code to this repository, make sure you compile the project by typing the following in the terminal.

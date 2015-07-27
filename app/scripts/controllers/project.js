@@ -146,13 +146,15 @@ app.controller('ProjectController', [
   'Formio',
   'FormioAlerts',
   '$state',
+  '$http',
   function(
     $scope,
     $rootScope,
     $stateParams,
     Formio,
     FormioAlerts,
-    $state
+    $state,
+    $http
   ) {
     $rootScope.activeSideBar = 'projects';
     $rootScope.noBreadcrumb = false;
@@ -167,12 +169,21 @@ app.controller('ProjectController', [
     $scope.forms = [];
     $scope.formio = new Formio('/project/' + $stateParams.projectId);
     $scope.currentProject = {_id: $stateParams.projectId, access: []};
-    $scope.formio.loadProject().then(function(result) {
+    $scope.rolesLoading = true;
+    $scope.loadProjectPromise = $scope.formio.loadProject().then(function(result) {
       $scope.currentProject = result;
       $rootScope.currentProject = result;
+      return $http.get($scope.formio.projectUrl + '/role');
+    }).then(function(result) {
+      $scope.currentProjectRoles = result.data;
+      $scope.rolesLoading = false;
     });
 
-    // Save the Project.
+    $scope.getRole = function(id) {
+      return _.find($scope.currentProjectRoles, {_id: id});
+    };
+
+    // Save the project.
     $scope.saveProject = function() {
       // Need to strip hyphens at the end before submitting
       if($scope.currentProject.name) {
@@ -180,7 +191,7 @@ app.controller('ProjectController', [
       }
 
       if (!$scope.currentProject._id) { return FormioAlerts.onError(new Error('No Project found.')); }
-      $scope.formio.saveProject($scope.currentProject).then(function (project) {
+      $scope.formio.saveProject($scope.currentProject).then(function(project) {
         FormioAlerts.addAlert({
           type: 'success',
           message: 'Project saved.'
@@ -214,11 +225,34 @@ app.controller('ProjectEditController', [
 
 app.controller('ProjectSettingsController', [
   '$scope',
+  '$state',
+  'FormioAlerts',
   function(
-    $scope
+    $scope,
+    $state,
+    FormioAlerts
   ) {
-    $scope.active = 'email';
-    $scope.subActive = '';
+    // Go to first settings section
+    if($state.current.name === 'project.settings') {
+      $state.go('project.settings.email', {location: 'replace'});
+    }
+
+    // Save the Project.
+    $scope.saveProject = function() {
+      if (!$scope.currentProject._id) { return FormioAlerts.onError(new Error('No Project found.')); }
+      $scope.formio.saveProject($scope.currentProject).then(function(project) {
+        FormioAlerts.addAlert({
+          type: 'success',
+          message: 'Project saved.'
+        });
+        // Reload state so alerts display.
+        $state.go($state.current.name, {
+          projectId: project._id
+        }, {reload: true});
+      }, function(error) {
+        FormioAlerts.onError(error);
+      });
+    };
   }
 ]);
 

@@ -86,6 +86,7 @@ app.config([
       editController: 'FormActionEditController',
       deleteController: 'FormActionDeleteController'
     };
+
     angular.forEach(formStates, function(info, state) {
       $stateProvider.state(state, {
         abstract: true,
@@ -179,6 +180,7 @@ app.controller('FormController', [
   'Formio',
   'FormioAlerts',
   'AppConfig',
+  '$q',
   function(
     $scope,
     $state,
@@ -186,9 +188,9 @@ app.controller('FormController', [
     $rootScope,
     Formio,
     FormioAlerts,
-    AppConfig
+    AppConfig,
+    $q
   ) {
-
     // Perform Camel Case.
     var camelCase = function(input) {
       return input.toLowerCase().replace(/ (.)/g, function(match, group1) {
@@ -201,11 +203,11 @@ app.controller('FormController', [
 
     // Resource information.
     $scope.formId = $stateParams.formId;
-    $scope.formUrl = '/project/' + $stateParams.projectId + '/form';
+    $scope.formUrl = '/project/' + $scope.projectId + '/form';
     $scope.formUrl += $stateParams.formId ? ('/' + $stateParams.formId) : '';
     var formType = $stateParams.formType || 'form';
     $scope.capitalize = _.capitalize;
-    $scope.form = {title: '', type: formType, components: [], access: []};
+    $scope.form = {title: '', type: formType, components: [], access: [], submissionAccess: []};
 
     // Attach the name to the title of the form.
     $scope.$watch('form.title', function() {
@@ -216,58 +218,93 @@ app.controller('FormController', [
     $scope.formio = new Formio($scope.formUrl);
 
     // Load the form.
-    var anonId = '000000000000000000000000';
-    $scope.anonymous = false;
-    var checkAnonymous = function() {
-      var isAnon = false;
-      if ($scope.form) {
-        angular.forEach($scope.form.access, function(access, index) {
-          if (access.id === anonId) {
-            $scope.anonymous = true;
-            isAnon = index;
-          }
-        });
-      }
-      return isAnon;
-    };
-
-    $scope.onAnonymous = function(anon) {
-      if (!$scope.form) { return; }
-      if (anon) {
-        if (checkAnonymous() === false) {
-          $scope.form.access.push({
-            id: anonId,
-            name: 'Anonymous'
-          });
-        }
-      }
-      else {
-        var anonIndex = checkAnonymous();
-        if (anonIndex !== false) {
-          $scope.form.access.splice(anonIndex, 1);
-        }
-      }
-    };
-    // Default to anonymous for new forms
-    if(!$scope.formId) {
-      $scope.onAnonymous(true);
+    if($scope.formId) {
+      $scope.loadFormPromise = $scope.formio.loadForm().then(function(form) {
+        $scope.form = form;
+        $rootScope.currentForm = $scope.form;
+      });
+    }
+    else {
+      $scope.loadFormPromise = $q.when();
     }
 
-    // Load the form.
-    $scope.formio.loadForm().then(function(form) {
-      $scope.form = form;
-      $rootScope.currentForm = $scope.form;
-      checkAnonymous();
+    $scope.formAccessLabels = {
+      'create_all': {
+        label: 'Create All',
+        tooltip: 'The Create All permission will allow a user, with one of the given Roles, to create a Form level entity, regardless of who owns the Form. Additionally with this permission, a user can define the owner of an entity. E.g. a Form Action.'
+      },
+      'read_all': {
+        label: 'Read All',
+        tooltip: 'The Read All permission will allow a user, with one of the given Roles, to read a Form level entity, regardless of who owns the Form. E.g. The Form itself or its Actions.'
+      },
+      'update_all': {
+        label: 'Update All',
+        tooltip: 'The Update All permission will allow a user, with one of the given Roles, to update a Form level entity, regardless of who owns the Form. Additionally with this permission, a user can change the owner of an entity. E.g. The Form itself or its Actions.'
+      },
+      'delete_all': {
+        label: 'Delete All',
+        tooltip: 'The Delete All permission will allow a user, with one of the given Roles, to delete a Form level entity, regardless of who owns the Form. E.g. The Form itself or its Actions.'
+      },
+      'create_own': {
+        label: 'Create Own',
+        tooltip: 'The Create Own permission will allow a user, with one of the given Roles, to create a Form level entity. Upon creating an entity, the user will be defined as its Owner. E.g. a Form Action.'
+      },
+      'read_own': {
+        label: 'Read Own',
+        tooltip: 'The Read Own permission will allow a user, with one of the given Roles, to read a Form level entity. A user can only read an entity if they are defined as its owner. E.g. The Form itself or its Actions.'
+      },
+      'update_own': {
+        label: 'Update Own',
+        tooltip: 'The Update Own permission will allow a user, with one of the given Roles, to update a Form level entity. A user can only update an entity if they are defined as its owner. E.g. The Form itself or its Actions.'
+      },
+      'delete_own': {
+        label: 'Delete Own',
+        tooltip: 'The Delete Own permission will allow a user, with one of the given Roles, to delete a Form level entity. A user can only delete an entity if they are defined as its owner. E.g. The Form itself or its Actions.'
+      }
+    };
 
-    });
+    $scope.submissionAccessLabels = {
+      'create_all': {
+        label: 'Create All',
+        tooltip: 'The Create All permission will allow a user, with one of the given Roles, to create a Submission. Additionally with this permission, a user can define the owner of the Submission.'
+      },
+      'read_all': {
+        label: 'Read All',
+        tooltip: 'The Read All permission will allow a user, with one of the given Roles, to read a Submission, regardless of who owns the Submission.'
+      },
+      'update_all': {
+        label: 'Update All',
+        tooltip: 'The Update All permission will allow a user, with one of the given Roles, to update a Submission, regardless of who owns the Submission. Additionally with this permission, a user can change the owner of a Submission.'
+      },
+      'delete_all': {
+        label: 'Delete All',
+        tooltip: 'The Delete All permission will allow a user, with one of the given Roles, to delete a Submission, regardless of who owns the Submission.'
+      },
+      'create_own': {
+        label: 'Create Own',
+        tooltip: 'The Create Own permission will allow a user, with one of the given Roles, to create a Submission. Upon creating the Submission, the user will be defined as its owner.'
+      },
+      'read_own': {
+        label: 'Read Own',
+        tooltip: 'The Read Own permission will allow a user, with one of the given Roles, to read a Submission. A user can only read a Submission if they are defined as its owner.'
+      },
+      'update_own': {
+        label: 'Update Own',
+        tooltip: 'The Update Own permission will allow a user, with one of the given Roles, to update a Submission. A user can only update a Submission if they are defined as its owner.'
+      },
+      'delete_own': {
+        label: 'Delete Own',
+        tooltip: 'The Delete Own permission will allow a user, with one of the given Roles, to delete a Submission. A user can only delete a Submission if they are defined as its owner.'
+      }
+    };
 
     // Get the swagger URL.
     $scope.getSwaggerURL = function() {
-      return AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/form/' + $scope.form._id + '/spec.html?token=' + Formio.getToken();
+      return AppConfig.apiBase + '/project/' + $scope.projectId + '/form/' + $scope.form._id + '/spec.html?token=' + Formio.getToken();
     };
 
     // When a submission is made.
-      $scope.disableSubmissionHandler = $scope.$on('formSubmission', function(event, submission) {
+    $scope.disableSubmissionHandler = $scope.$on('formSubmission', function(event, submission) {
       FormioAlerts.addAlert({
         type: 'success',
         message: 'New submission added!'

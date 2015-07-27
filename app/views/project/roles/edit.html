@@ -1,0 +1,16 @@
+<h4>Edit {{ originalRole.title || 'New' }} Role</h4>
+<form name="roleForm" ng-submit="saveRole()" novalidate>
+  <div id="form-group-title" class="form-group" ng-class="{'has-error': roleForm.title.$invalid && roleForm.title.$dirty}">
+    <label for="title" class="control-label">Title</label>
+    <input ng-model="role.title" ng-required="true" type="text" class="form-control" id="title" name="title" placeholder="Role Title">
+  </div>
+  <div id="form-group-description" class="form-group">
+    <label for="description" class="control-label">description</label>
+    <input ng-model="role.description" type="text" class="form-control" id="description" name="description" placeholder="Role description">
+  </div>
+  <div class="pull-right">
+      <a ng-if="role._id" ui-sref="project.settings.roles.delete({roleId: role._id})" class="btn btn-danger">Delete</a>
+      <a ng-if="!role._id" ui-sref="project.settings.roles.view()" class="btn btn-default">Cancel</a>
+      <button type="submit" class="btn btn-primary" ng-disabled="roleForm.$invalid">{{role._id ? 'Save Changes' : 'Create Role'}}</button>
+  </div>
+</form>
