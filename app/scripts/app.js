@@ -145,6 +145,11 @@ angular
           templateUrl: 'views/app/access/access.html',
           controller: 'AccessController'
         })
+        .state('app.settings.office365', {
+          url: '/office365',
+          parent: 'app.settings',
+          templateUrl: 'views/app/office365/office365.html'
+        })
         .state('app.delete', {
           url: '/delete',
           parent: 'app',
