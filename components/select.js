@@ -69,7 +69,7 @@ app.config([
             }
             break;
           case 'url':
-            var options = {};
+            var options = {cache: true};
             if(settings.data.url.substr(0, 1) === '/') {
               settings.data.url = Formio.baseUrl + settings.data.url;
             }

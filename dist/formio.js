@@ -1282,7 +1282,11 @@ app.config([
             {
               disableJWT: true,
               params: params,
-              headers: {Authorization: undefined}
+              headers: {
+                Authorization: undefined,
+                Pragma: undefined,
+                'Cache-Control': undefined
+              }
             }
           ).then(function(response) {
             $scope.addresses = response.data.results;
@@ -2013,7 +2017,7 @@ app.config([
             }
             break;
           case 'url':
-            var options = {};
+            var options = {cache: true};
             if(settings.data.url.substr(0, 1) === '/') {
               settings.data.url = Formio.baseUrl + settings.data.url;
             }
