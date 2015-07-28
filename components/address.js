@@ -17,7 +17,11 @@ app.config([
             {
               disableJWT: true,
               params: params,
-              headers: {Authorization: undefined}
+              headers: {
+                Authorization: undefined,
+                Pragma: undefined,
+                'Cache-Control': undefined
+              }
             }
           ).then(function(response) {
             $scope.addresses = response.data.results;
