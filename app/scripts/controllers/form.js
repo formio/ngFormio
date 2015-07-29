@@ -66,7 +66,7 @@ app.config([
         parent: 'app',
         template: '<form-list app="currentApp" form-type="\'resource\'" num-per-page="25"></form-list>'
       })
-      .state('app.form.permission.index', {
+      .state('app.form.permission', {
         url: '/permission',
         parent: 'app.form',
         templateUrl: 'views/form/permission/index.html',
@@ -193,6 +193,7 @@ app.controller('FormController', [
   'Formio',
   'FormioAlerts',
   'AppConfig',
+  'SubmissionAccessLabels',
   '$q',
   function(
     $scope,
@@ -202,6 +203,7 @@ app.controller('FormController', [
     Formio,
     FormioAlerts,
     AppConfig,
+    SubmissionAccessLabels,
     $q
   ) {
 
@@ -241,42 +243,7 @@ app.controller('FormController', [
     else {
       $scope.loadFormPromise = $q.when();
     }
-
-    $scope.submissionAccessLabels = {
-      'create_all': {
-        label: 'Create All',
-        tooltip: 'The Create All permission will allow a user, with one of the given Roles, to create a Submission. Additionally with this permission, a user can define the owner of the Submission.'
-      },
-      'read_all': {
-        label: 'Read All',
-        tooltip: 'The Read All permission will allow a user, with one of the given Roles, to read a Submission, regardless of who owns the Submission.'
-      },
-      'update_all': {
-        label: 'Update All',
-        tooltip: 'The Update All permission will allow a user, with one of the given Roles, to update a Submission, regardless of who owns the Submission. Additionally with this permission, a user can change the owner of a Submission.'
-      },
-      'delete_all': {
-        label: 'Delete All',
-        tooltip: 'The Delete All permission will allow a user, with one of the given Roles, to delete a Submission, regardless of who owns the Submission.'
-      },
-      'create_own': {
-        label: 'Create Own',
-        tooltip: 'The Create Own permission will allow a user, with one of the given Roles, to create a Submission. Upon creating the Submission, the user will be defined as its owner.'
-      },
-      'read_own': {
-        label: 'Read Own',
-        tooltip: 'The Read Own permission will allow a user, with one of the given Roles, to read a Submission. A user can only read a Submission if they are defined as its owner.'
-      },
-      'update_own': {
-        label: 'Update Own',
-        tooltip: 'The Update Own permission will allow a user, with one of the given Roles, to update a Submission. A user can only update a Submission if they are defined as its owner.'
-      },
-      'delete_own': {
-        label: 'Delete Own',
-        tooltip: 'The Delete Own permission will allow a user, with one of the given Roles, to delete a Submission. A user can only delete a Submission if they are defined as its owner.'
-      }
-    };
-
+    $scope.submissionAccessLabels = SubmissionAccessLabels;
     // Get the swagger URL.
     $scope.getSwaggerURL = function() {
       return AppConfig.appBase + '/form/' + $scope.form._id + '/spec.html?token=' + Formio.getToken();
@@ -670,3 +637,38 @@ app.controller('FormSubmissionDeleteController', [
     });
   }
 ]);
+
+app.constant('SubmissionAccessLabels', {
+  'create_all': {
+    label: 'Create All',
+    tooltip: 'The Create All permission will allow a user, with one of the given Roles, to create a Submission. Additionally with this permission, a user can define the owner of the Submission.'
+  },
+  'read_all': {
+    label: 'Read All',
+    tooltip: 'The Read All permission will allow a user, with one of the given Roles, to read a Submission, regardless of who owns the Submission.'
+  },
+  'update_all': {
+    label: 'Update All',
+    tooltip: 'The Update All permission will allow a user, with one of the given Roles, to update a Submission, regardless of who owns the Submission. Additionally with this permission, a user can change the owner of a Submission.'
+  },
+  'delete_all': {
+    label: 'Delete All',
+    tooltip: 'The Delete All permission will allow a user, with one of the given Roles, to delete a Submission, regardless of who owns the Submission.'
+  },
+  'create_own': {
+    label: 'Create Own',
+    tooltip: 'The Create Own permission will allow a user, with one of the given Roles, to create a Submission. Upon creating the Submission, the user will be defined as its owner.'
+  },
+  'read_own': {
+    label: 'Read Own',
+    tooltip: 'The Read Own permission will allow a user, with one of the given Roles, to read a Submission. A user can only read a Submission if they are defined as its owner.'
+  },
+  'update_own': {
+    label: 'Update Own',
+    tooltip: 'The Update Own permission will allow a user, with one of the given Roles, to update a Submission. A user can only update a Submission if they are defined as its owner.'
+  },
+  'delete_own': {
+    label: 'Delete Own',
+    tooltip: 'The Delete Own permission will allow a user, with one of the given Roles, to delete a Submission. A user can only delete a Submission if they are defined as its owner.'
+  }
+});
