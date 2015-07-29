@@ -55,9 +55,7 @@ app.controller('RoleController', [
         });
 
         $scope.back();
-      }).catch(function(err) {
-        FormioAlerts.onError({message: (err.status === 404) ? 'Role not found' : err.data});
-      });
+      }).catch(FormioAlerts.onError.bind(FormioAlerts));
     };
 
     $scope.deleteRole = function() {
