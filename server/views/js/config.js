@@ -2,7 +2,7 @@ angular.module('formioApp').constant('AppConfig', {
   forceSSL: {{ forceSSL }},
   domain: '{{ domain }}',
   appBase: '{{ host }}/app',
-  apiBase: '{{ host }}/api',
+  apiBase: '{{ apiHost }}',
   tutorial: '{{ host }}/start',
   userForm: '{{ formioHost }}/api/user',
   userLoginForm: '{{ formioHost }}/api/user/login',

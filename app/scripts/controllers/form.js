@@ -300,7 +300,7 @@ app.controller('FormController', [
 
     // Get the swagger URL.
     $scope.getSwaggerURL = function() {
-      return AppConfig.apiBase + '/project/' + $scope.projectId + '/form/' + $scope.form._id + '/spec.html?token=' + Formio.getToken();
+      return AppConfig.apiBase + '/project/' + $scope.projectId + '/form/' + $scope.formId + '/spec.html?token=' + Formio.getToken();
     };
 
     // When a submission is made.

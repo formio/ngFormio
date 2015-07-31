@@ -5,6 +5,7 @@ var config = require('./config')();
 var express = require('express');
 var nunjucks = require('nunjucks');
 var _ = require('lodash');
+var vhost = require('vhost');
 var app = express();
 
 // Configure nunjucks.
@@ -32,6 +33,7 @@ app.get('/config.js', function(req, res) {
     forceSSL: config.https ? 'true' : 'false',
     domain: config.formio.domain,
     host: config.host,
+    apiHost: config.apiHost,
     formioHost: config.formioHost
   });
 });
@@ -95,6 +97,7 @@ require('formio')(config.formio, function(formio) {
     });
   }, formio.update.sanityCheck);
 
+  app.use(vhost('api.' + config.formio.domain, formio));
   app.use('/api', formio);
   console.log('Listening to port ' + config.port);
   app.listen(config.port);

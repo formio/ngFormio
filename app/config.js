@@ -10,7 +10,7 @@ angular.module('formioApp').constant('AppConfig', {
   forceSSL: false,
   domain: 'localhost:3000',
   appBase: 'http://localhost:3000/app',
-  apiBase: 'http://localhost:3000/api',
+  apiBase: 'http://api.localhost:3000',
   tutorial: 'http://localhost:3000/start',
   userForm: 'http://formio.localhost:3000/api/user',
   userLoginForm: 'http://formio.localhost:3000/api/user/login',

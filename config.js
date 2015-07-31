@@ -2,7 +2,7 @@
 
 var _ = require('lodash');
 var debug = {
-  config: require('debug')('config')
+  config: require('debug')('formio:config')
 };
 
 module.exports = function() {
@@ -15,16 +15,19 @@ module.exports = function() {
   var port = process.env.PORT || 80;
   var project = process.env.PROJECT || 'formio';
   var host = protocol + '://' + domain;
+  var apiHost = protocol + '://api.' + domain;
   var formioHost = protocol + '://' + project + '.' + domain;
 
   if (port !== 80) {
     host += ':' + port;
+    apiHost += ':' + port;
     formioHost += ':' + port;
   }
 
   config.https = (protocol === 'https');
   config.host = host;
   config.port = port;
+  config.apiHost = apiHost;
   config.formioHost = formioHost;
   config.debug = process.env.DEBUG || false;
   config.formio.domain = domain;
@@ -67,7 +70,7 @@ module.exports = function() {
 
   // Allow the config to be displayed when debugged.
   var sanitized = _.clone(config);
-  sanitized = _.pick(sanitized, ['port', 'host', 'formioHost', 'formio']);
+  sanitized = _.pick(sanitized, ['port', 'host', 'formioHost', 'apiHost', 'formio']);
   sanitized.formio = _.pick(sanitized.formio, ['domain', 'schema', 'mongo']);
 
   // Only output sanitized data.
