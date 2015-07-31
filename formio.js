@@ -80,7 +80,7 @@ app.provider('Formio', function() {
 
           // Normalize to an absolute path.
           if ((path.indexOf('http') !== 0) && (path.indexOf('//') !== 0)) {
-            baseUrl = baseUrl ? baseUrl : $location.absUrl().match(/http[s]?:\/\/[^/?]*/)[0] + '/api';
+            baseUrl = baseUrl ? baseUrl : $location.absUrl().match(/http[s]?:\/\/api./)[0];
             path = baseUrl + path;
           }
 
@@ -105,9 +105,9 @@ app.provider('Formio', function() {
           // Revert to old behavior if domain is not set
           else {
             hostnames = (hostparts.length > 2) ? hostparts[2].split('.') : [];
-            if(!noalias && (
-              ((hostnames.length === 2) && (hostnames[1].indexOf('localhost') === 0)) || (hostnames.length >= 3)
-              )) {
+            if(!noalias &&
+              (((hostnames.length === 2) && (hostnames[1].indexOf('localhost') === 0)) || (hostnames.length >= 3))
+            ) {
               subdomain = hostnames[0];
               this.projectId = subdomain;
             }
@@ -124,8 +124,7 @@ app.provider('Formio', function() {
           var paths = [];
 
           // See if this url has a subdomain.
-          if (subdomain) {
-
+          if (subdomain && subdomain !== 'api') {
             // Get the paths.
             paths = path.match(/(http[s]?:\/\/.*\/api)\/?([^?]*)?/);
             if (paths.length > 1) {
@@ -145,7 +144,7 @@ app.provider('Formio', function() {
           }
 
           if (paths.length > 0) {
-            this.projectUrl = (paths.length > 0) ? paths[0] : '';
+            this.projectUrl = paths[0];
             this.projectId = true;
             this.formsUrl = this.projectUrl ? (this.projectUrl + '/form') : '';
             this.formId = (paths.length > 1) ? paths[1] : '';
@@ -165,7 +164,6 @@ app.provider('Formio', function() {
         /**
          * When a request error occurs.
          * @param deferred
-         * @param error
          */
         var requestError = function(deferred) {
           return function(error) {
