@@ -11,4 +11,4 @@ Feature: Home Page Brochure
   Scenario: The Go to Beta link works.
     Given I am on the home page
     When I click on the Go to Beta link
-    Then I am on the /project/#/auth/register page
+    Then I am on the /app/#/auth/register page

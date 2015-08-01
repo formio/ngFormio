@@ -17,7 +17,7 @@ module.exports = function(formio) {
         callback(project);
       }
     });
-  }
+  };
 
   var getForm = function(projectId, formName, callback, errorCallback) {
     formio.resources.form.model.findOne({project: projectId, name: formName}, function (err, form) {
@@ -31,7 +31,7 @@ module.exports = function(formio) {
         callback(form);
       }
     });
-  }
+  };
 
   var getSubmission = function(filter, callback, errorCallback) {
     formio.resources.submission.model.findOne(filter, function (err, submission) {
@@ -42,7 +42,7 @@ module.exports = function(formio) {
         callback(submission);
       }
     });
-  }
+  };
 
   var createSubmission = function(submission, callback, errorCallback) {
     formio.resources.submission.model.create(submission, function (err, submission) {
@@ -53,7 +53,7 @@ module.exports = function(formio) {
         callback(submission);
       }
     });
-  }
+  };
 
   var authUser = function(projectName, formName, email, password, callback, errorCallback) {
     getProject('formio', function(project) {
@@ -68,17 +68,15 @@ module.exports = function(formio) {
         })
       }, errorCallback);
     }, errorCallback);
-  }
+  };
 
   var createUser = function(projectName, formName, email, password, callback, errorCallback) {
     getProject(projectName, function(project) {
       getForm(project._id, formName, function(form) {
         var encrypt = require('formio/app/actions/fields/password');
         var req = {
-          body:
-          {
-            data:
-            {
+          body: {
+            data: {
               email: email,
               password: password
             }
@@ -97,7 +95,7 @@ module.exports = function(formio) {
         });
       }, errorCallback);
     }, errorCallback);
-  }
+  };
 
   var createAndAuthUser = function(email, password, next) {
     createUser('formio', 'user', email, password, function() {
@@ -110,8 +108,7 @@ module.exports = function(formio) {
         }
       });
     }, next);
-
-  }
+  };
 
   var library = English.library()
     .given("I am (?:on|at) (?:the )?(.+?)(?: page)?$", function(url, next) {
@@ -270,7 +267,7 @@ module.exports = function(formio) {
         .catch(function(err) {
           next(err);
       });
-    })
+    });
 
   return library;
 };
