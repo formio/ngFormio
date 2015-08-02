@@ -286,6 +286,9 @@ angular
         $rootScope.previousState = fromState.name;
         $rootScope.previousParams = fromParams;
         $rootScope.currentState = toState.name;
+
+        // Dispatch angular event for testing.
+        $window.document.dispatchEvent(new CustomEvent('angularLoaded'));
       });
 
       var logoutError = function() {
