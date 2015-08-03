@@ -639,36 +639,32 @@ app.controller('FormSubmissionDeleteController', [
 ]);
 
 app.constant('SubmissionAccessLabels', {
-  'create_all': {
-    label: 'Create All',
-    tooltip: 'The Create All permission will allow a user, with one of the given Roles, to create a Submission. Additionally with this permission, a user can define the owner of the Submission.'
-  },
   'read_all': {
-    label: 'Read All',
-    tooltip: 'The Read All permission will allow a user, with one of the given Roles, to read a Submission, regardless of who owns the Submission.'
+    label: 'Read All Submissions',
+    tooltip: 'The Read All Submissions permission will allow a user, with one of the given Roles, to read a Submission, regardless of who owns the Submission.'
   },
   'update_all': {
-    label: 'Update All',
-    tooltip: 'The Update All permission will allow a user, with one of the given Roles, to update a Submission, regardless of who owns the Submission. Additionally with this permission, a user can change the owner of a Submission.'
+    label: 'Update All Submissions',
+    tooltip: 'The Update All Submissions permission will allow a user, with one of the given Roles, to update a Submission, regardless of who owns the Submission. Additionally with this permission, a user can change the owner of a Submission.'
   },
   'delete_all': {
-    label: 'Delete All',
-    tooltip: 'The Delete All permission will allow a user, with one of the given Roles, to delete a Submission, regardless of who owns the Submission.'
+    label: 'Delete All Submissions',
+    tooltip: 'The Delete All Submissions permission will allow a user, with one of the given Roles, to delete a Submission, regardless of who owns the Submission.'
   },
   'create_own': {
-    label: 'Create Own',
-    tooltip: 'The Create Own permission will allow a user, with one of the given Roles, to create a Submission. Upon creating the Submission, the user will be defined as its owner.'
+    label: 'Create Own Submissions',
+    tooltip: 'The Create Own Submissions permission will allow a user, with one of the given Roles, to create a Submission. Upon creating the Submission, the user will be defined as its owner.'
   },
   'read_own': {
-    label: 'Read Own',
-    tooltip: 'The Read Own permission will allow a user, with one of the given Roles, to read a Submission. A user can only read a Submission if they are defined as its owner.'
+    label: 'Read Own Submissions',
+    tooltip: 'The Read Own Submissions permission will allow a user, with one of the given Roles, to read a Submission. A user can only read a Submission if they are defined as its owner.'
   },
   'update_own': {
-    label: 'Update Own',
-    tooltip: 'The Update Own permission will allow a user, with one of the given Roles, to update a Submission. A user can only update a Submission if they are defined as its owner.'
+    label: 'Update Own Submissions',
+    tooltip: 'The Update Own Submissions permission will allow a user, with one of the given Roles, to update a Submission. A user can only update a Submission if they are defined as its owner.'
   },
   'delete_own': {
-    label: 'Delete Own',
-    tooltip: 'The Delete Own permission will allow a user, with one of the given Roles, to delete a Submission. A user can only delete a Submission if they are defined as its owner.'
+    label: 'Delete Own Submissions',
+    tooltip: 'The Delete Own Submissions permission will allow a user, with one of the given Roles, to delete a Submission. A user can only delete a Submission if they are defined as its owner.'
   }
 });
