@@ -1,7 +1,7 @@
 <br/>
 <div class="panel panel-info">
   <div class="panel-heading">
-    <h3 class="panel-title">Permissions
+    <h3 class="panel-title">User Permissions
       <a class="pull-right" href="http://help.form.io/userguide/#permissions" target="_blank">
         <i class="glyphicon glyphicon-question-sign "></i>
       </a>
@@ -9,7 +9,7 @@
   </div>
   <div class="panel-body">
     <div class="well">
-      Permissions allow you to control who create, view, and modify form submissions. Here you may assign Project Roles to permissions. Roles can be created and edited in <a ui-sref="app.settings.roles.view({appId: currentApp._id})">Project Settings</a>.
+      User Permissions allow you to control who can create, view, and modify form submissions. Here you may assign Project Roles to permissions. <strong>Roles</strong> can be created and edited in <a ui-sref="app.settings.roles.view({appId: currentApp._id})">Project Settings</a>.
     </div>
     <div ng-if="form.submissionAccess">
       <permission-editor permissions="form.submissionAccess" labels="submissionAccessLabels" roles="currentAppRoles" wait-for="loadFormPromise"></permission-editor>
