@@ -139,12 +139,6 @@ angular
           templateUrl: 'views/app/roles/delete.html',
           controller: 'RoleController'
         })
-        .state('app.settings.access', {
-          url: '/access',
-          parent: 'app.settings',
-          templateUrl: 'views/app/access/access.html',
-          controller: 'AccessController'
-        })
         .state('app.delete', {
           url: '/delete',
           parent: 'app',

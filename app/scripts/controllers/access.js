@@ -76,9 +76,9 @@ app.directive('permissionEditor', ['$q', function($q) {
         _.each(PERMISSION_TYPES, function(permission, type) {
           var existingPerm = _.find($scope.permissions, {type: type});
           tempPerms.push(existingPerm || {
-            type: type,
-            roles: []
-          });
+              type: type,
+              roles: []
+            });
         });
         // Replace permissions with complete set of permissions
         $scope.permissions.splice.apply($scope.permissions, [0, $scope.permissions.length].concat(tempPerms));
