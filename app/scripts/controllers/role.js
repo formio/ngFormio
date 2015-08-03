@@ -27,11 +27,13 @@ app.controller('RoleController', [
       $scope.formio.loadForms().then(function(result) {
         $scope.assignedForms = result.filter(function(form){
           form.rolePermissions = form.submissionAccess.filter(function(perm) {
-            return _.contains(perm.roles, $state.params.roleId);
+            return _.contains(perm.roles, $state.params.roleId) && SubmissionAccessLabels[perm.type];
           });
-          form.permissionList = form.rolePermissions.map(function(p){
-            return SubmissionAccessLabels[p.type].label;
-          }).join(', ');
+          form.permissionList = _(form.rolePermissions).map(function(p){
+            if(SubmissionAccessLabels[p.type]) {
+              return SubmissionAccessLabels[p.type].label;
+            }
+          }).compact().value().join(', ');
           return form.rolePermissions.length;
         });
       });

@@ -5,7 +5,7 @@
       <th>Permission</th>
       <th>Roles</th>
     </tr>
-    <tr ng-repeat="permission in permissions">
+    <tr ng-repeat="permission in getPermissionsToShow()">
       <td class="col-xs-3">
         <label for="{{permission.type}}_role" form-builder-tooltip="{{getPermissionTooltip(permission)}}">{{getPermissionLabel(permission)}}</label>
       </td>
