@@ -11,10 +11,9 @@ Yadda.plugins.mocha.StepLevelPlugin.init();
 
 var libraryClass = require('./lib/formio-library');
 var webdriver = require('webdriverio');
-
 var protocol = process.env.PROTOCOL || 'http';
 var domain = process.env.DOMAIN || 'localhost';
-var port = process.env.PORT || 80;
+var port = process.env.PORT || 3000;
 var url = protocol + '://' + domain;
 if (port != 80) {
   url += ':' + port;

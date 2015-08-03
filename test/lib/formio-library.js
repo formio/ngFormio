@@ -119,6 +119,10 @@ module.exports = function(formio) {
       if (path === 'home') {
         path = '/'
       }
+      var checkAngular = function(done) {
+
+      }
+
       this.driver.url(path).then(function() {
         setTimeout(next, 500);
       });
