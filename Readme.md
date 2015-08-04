@@ -73,7 +73,7 @@ Next, get a database backup, and then do the following.
 Next, use the setup.sh script to run npm and bower install, and update the submodules.
 
   - ```cd scripts```
-  - ```./setup.sh -bng```
+  - ```./setup.sh -bngs```
   
 You should then be able to run the application locally by typing.
 
