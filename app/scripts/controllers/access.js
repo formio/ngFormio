@@ -49,16 +49,16 @@ app.controller('AccessController', ['$scope', function($scope) {
  * Can also pass promise as `waitFor` to wait for before initializing the permissions.
  */
 app.directive('permissionEditor', ['$q', function($q) {
-  var PERMISSION_TYPES = {
-    'create_all': 'Create All',
-    'read_all': 'Read All',
-    'update_all': 'Update All',
-    'delete_all': 'Delete All',
-    'create_own': 'Create Own',
-    'read_own': 'Read Own',
-    'update_own': 'Update Own',
-    'delete_own': 'Delete Own'
-  };
+  var PERMISSION_TYPES = [
+    'create_all',
+    'read_all',
+    'update_all',
+    'delete_all',
+    'create_own',
+    'read_own',
+    'update_own',
+    'delete_own'
+  ];
 
   return {
     scope: {
@@ -73,16 +73,24 @@ app.directive('permissionEditor', ['$q', function($q) {
       // Fill in missing permissions / enforce order
       ($scope.waitFor || $q.when()).then(function(){
         var tempPerms = [];
-        _.each(PERMISSION_TYPES, function(permission, type) {
+        _.each(PERMISSION_TYPES, function(type) {
           var existingPerm = _.find($scope.permissions, {type: type});
           tempPerms.push(existingPerm || {
-            type: type,
-            roles: []
-          });
+              type: type,
+              roles: []
+            });
         });
         // Replace permissions with complete set of permissions
         $scope.permissions.splice.apply($scope.permissions, [0, $scope.permissions.length].concat(tempPerms));
       });
+
+      $scope.getPermissionsToShow = function() {
+        return $scope.permissions.filter($scope.shouldShowPermission);
+      };
+
+      $scope.shouldShowPermission = function(permission) {
+        return !!$scope.labels[permission.type];
+      };
 
       $scope.getPermissionLabel = function(permission) {
         return $scope.labels[permission.type].label;

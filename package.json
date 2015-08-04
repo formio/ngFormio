@@ -38,7 +38,7 @@
     "opn": "^1.0.0",
     "require-dir": "^0.3.0",
     "vinyl-paths": "^1.0.0",
-    "webdriverio": "^3.1.0",
+    "webdriverjs-angular": "0.1.3",
     "wiredep": "^2.0.0",
     "yadda": "^0.14.1",
     "yargs": "^3.8.0"
@@ -50,7 +50,7 @@
     "debug": "^2.2.0",
     "dotenv": "1.2.0",
     "express": "4.12.3",
-    "formio": "git+ssh://git@github.com/formio/formio.git#d11767640a3956ddd75fd99758f59f33ace1d0a9",
+    "formio": "git+ssh://git@github.com/formio/formio.git#c34c994de3b422924f18da962b37bb09772e351c",
     "lodash": "3.10.0",
     "moment": "2.10.3",
     "nodemailer": "1.4.0",

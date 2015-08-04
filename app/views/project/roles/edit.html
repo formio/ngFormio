@@ -1,16 +1,43 @@
-<h4>Edit {{ originalRole.title || 'New' }} Role</h4>
 <form name="roleForm" ng-submit="saveRole()" novalidate>
+  <legend>Edit {{ originalRole.title || 'New' }} Role</legend>
   <div id="form-group-title" class="form-group" ng-class="{'has-error': roleForm.title.$invalid && roleForm.title.$dirty}">
     <label for="title" class="control-label">Title</label>
     <input ng-model="role.title" ng-required="true" type="text" class="form-control" id="title" name="title" placeholder="Role Title">
   </div>
   <div id="form-group-description" class="form-group">
-    <label for="description" class="control-label">description</label>
+    <label for="description" class="control-label">Description</label>
     <input ng-model="role.description" type="text" class="form-control" id="description" name="description" placeholder="Role description">
   </div>
   <div class="pull-right">
       <a ng-if="role._id" ui-sref="project.settings.roles.delete({roleId: role._id})" class="btn btn-danger">Delete</a>
       <a ng-if="!role._id" ui-sref="project.settings.roles.view()" class="btn btn-default">Cancel</a>
       <button type="submit" class="btn btn-primary" ng-disabled="roleForm.$invalid">{{role._id ? 'Save Changes' : 'Create Role'}}</button>
+  </div>
+  <div ng-if="role._id">
+    <legend>Assigned Permissions</legend>
+    <i id="assigned-permissions-loader" ng-if="!assignedForms" style="font-size: 2em;" class="fa fa-spinner fa-pulse"></i>
+    <p ng-if="assignedForms.length == 0">This role has not yet been assigned any permissions in any forms yet. To give this role permissions, visit the Permissions page for the form you wish to give permissions for.</p>
+    <table ng-if="assignedForms.length != 0" class="table table-striped">
+      <tbody>
+      <tr>
+        <th>Form</th>
+        <th>Permissions</th>
+        <th></th>
+      </tr>
+      <tr ng-repeat="form in assignedForms">
+        <td class="col-xs-3">
+          {{form.title}}
+        </td>
+        <td class="col-xs-8">
+          {{form.permissionList}}
+        </td>
+        <td class="col-xs-1">
+          <div class="button-group pull-right" style="display:flex;">
+            <a ui-sref="project.form.permission({projectId: currentProject._id, formId: form._id})" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-edit"></span> Edit</a>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
   </div>
 </form>

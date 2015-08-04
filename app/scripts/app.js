@@ -138,11 +138,10 @@ angular
           templateUrl: 'views/project/roles/delete.html',
           controller: 'RoleController'
         })
-        .state('project.settings.access', {
-          url: '/access',
+        .state('project.settings.office365', {
+          url: '/office365',
           parent: 'project.settings',
-          templateUrl: 'views/project/access/access.html',
-          controller: 'AccessController'
+          templateUrl: 'views/project/office365/office365.html'
         })
         .state('project.delete', {
           url: '/delete',

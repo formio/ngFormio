@@ -65,6 +65,12 @@ app.config([
         url: '/form',
         parent: 'project',
         template: '<form-list project="currentProject" form-type="\'resource\'" num-per-page="25"></form-list>'
+      })
+      .state('project.form.permission', {
+        url: '/permission',
+        parent: 'project.form',
+        templateUrl: 'views/form/permission/index.html',
+        controller: 'FormSubmissionsController'
       });
 
     var formStates = {};
@@ -135,6 +141,14 @@ app.config([
       controller: 'FormActionAddController',
       params: {actionInfo: null}
     });
+
+    // Add permission state.
+    $stateProvider.state('project.form.permissionIndex', {
+      url: '/permission',
+      parent: 'project.form',
+      templateUrl: 'views/form/permission/index.html',
+      controller: 'FormController'
+    });
   }
 ]);
 
@@ -180,6 +194,7 @@ app.controller('FormController', [
   'Formio',
   'FormioAlerts',
   'AppConfig',
+  'SubmissionAccessLabels',
   '$q',
   function(
     $scope,
@@ -189,6 +204,7 @@ app.controller('FormController', [
     Formio,
     FormioAlerts,
     AppConfig,
+    SubmissionAccessLabels,
     $q
   ) {
     // Perform Camel Case.
@@ -198,7 +214,7 @@ app.controller('FormController', [
       });
     };
 
-    // Application information.
+    // Project information.
     $scope.projectId = $stateParams.projectId;
 
     // Resource information.
@@ -227,77 +243,7 @@ app.controller('FormController', [
     else {
       $scope.loadFormPromise = $q.when();
     }
-
-    $scope.formAccessLabels = {
-      'create_all': {
-        label: 'Create All',
-        tooltip: 'The Create All permission will allow a user, with one of the given Roles, to create a Form level entity, regardless of who owns the Form. Additionally with this permission, a user can define the owner of an entity. E.g. a Form Action.'
-      },
-      'read_all': {
-        label: 'Read All',
-        tooltip: 'The Read All permission will allow a user, with one of the given Roles, to read a Form level entity, regardless of who owns the Form. E.g. The Form itself or its Actions.'
-      },
-      'update_all': {
-        label: 'Update All',
-        tooltip: 'The Update All permission will allow a user, with one of the given Roles, to update a Form level entity, regardless of who owns the Form. Additionally with this permission, a user can change the owner of an entity. E.g. The Form itself or its Actions.'
-      },
-      'delete_all': {
-        label: 'Delete All',
-        tooltip: 'The Delete All permission will allow a user, with one of the given Roles, to delete a Form level entity, regardless of who owns the Form. E.g. The Form itself or its Actions.'
-      },
-      'create_own': {
-        label: 'Create Own',
-        tooltip: 'The Create Own permission will allow a user, with one of the given Roles, to create a Form level entity. Upon creating an entity, the user will be defined as its Owner. E.g. a Form Action.'
-      },
-      'read_own': {
-        label: 'Read Own',
-        tooltip: 'The Read Own permission will allow a user, with one of the given Roles, to read a Form level entity. A user can only read an entity if they are defined as its owner. E.g. The Form itself or its Actions.'
-      },
-      'update_own': {
-        label: 'Update Own',
-        tooltip: 'The Update Own permission will allow a user, with one of the given Roles, to update a Form level entity. A user can only update an entity if they are defined as its owner. E.g. The Form itself or its Actions.'
-      },
-      'delete_own': {
-        label: 'Delete Own',
-        tooltip: 'The Delete Own permission will allow a user, with one of the given Roles, to delete a Form level entity. A user can only delete an entity if they are defined as its owner. E.g. The Form itself or its Actions.'
-      }
-    };
-
-    $scope.submissionAccessLabels = {
-      'create_all': {
-        label: 'Create All',
-        tooltip: 'The Create All permission will allow a user, with one of the given Roles, to create a Submission. Additionally with this permission, a user can define the owner of the Submission.'
-      },
-      'read_all': {
-        label: 'Read All',
-        tooltip: 'The Read All permission will allow a user, with one of the given Roles, to read a Submission, regardless of who owns the Submission.'
-      },
-      'update_all': {
-        label: 'Update All',
-        tooltip: 'The Update All permission will allow a user, with one of the given Roles, to update a Submission, regardless of who owns the Submission. Additionally with this permission, a user can change the owner of a Submission.'
-      },
-      'delete_all': {
-        label: 'Delete All',
-        tooltip: 'The Delete All permission will allow a user, with one of the given Roles, to delete a Submission, regardless of who owns the Submission.'
-      },
-      'create_own': {
-        label: 'Create Own',
-        tooltip: 'The Create Own permission will allow a user, with one of the given Roles, to create a Submission. Upon creating the Submission, the user will be defined as its owner.'
-      },
-      'read_own': {
-        label: 'Read Own',
-        tooltip: 'The Read Own permission will allow a user, with one of the given Roles, to read a Submission. A user can only read a Submission if they are defined as its owner.'
-      },
-      'update_own': {
-        label: 'Update Own',
-        tooltip: 'The Update Own permission will allow a user, with one of the given Roles, to update a Submission. A user can only update a Submission if they are defined as its owner.'
-      },
-      'delete_own': {
-        label: 'Delete Own',
-        tooltip: 'The Delete Own permission will allow a user, with one of the given Roles, to delete a Submission. A user can only delete a Submission if they are defined as its owner.'
-      }
-    };
-
+    $scope.submissionAccessLabels = SubmissionAccessLabels;
     // Get the swagger URL.
     $scope.getSwaggerURL = function() {
       return AppConfig.apiBase + '/project/' + $scope.projectId + '/form/' + $scope.formId + '/spec.html?token=' + Formio.getToken();
@@ -692,3 +638,33 @@ app.controller('FormSubmissionDeleteController', [
   }
 ]);
 
+app.constant('SubmissionAccessLabels', {
+  'read_all': {
+    label: 'Read All Submissions',
+    tooltip: 'The Read All Submissions permission will allow a user, with one of the given Roles, to read a Submission, regardless of who owns the Submission.'
+  },
+  'update_all': {
+    label: 'Update All Submissions',
+    tooltip: 'The Update All Submissions permission will allow a user, with one of the given Roles, to update a Submission, regardless of who owns the Submission. Additionally with this permission, a user can change the owner of a Submission.'
+  },
+  'delete_all': {
+    label: 'Delete All Submissions',
+    tooltip: 'The Delete All Submissions permission will allow a user, with one of the given Roles, to delete a Submission, regardless of who owns the Submission.'
+  },
+  'create_own': {
+    label: 'Create Own Submissions',
+    tooltip: 'The Create Own Submissions permission will allow a user, with one of the given Roles, to create a Submission. Upon creating the Submission, the user will be defined as its owner.'
+  },
+  'read_own': {
+    label: 'Read Own Submissions',
+    tooltip: 'The Read Own Submissions permission will allow a user, with one of the given Roles, to read a Submission. A user can only read a Submission if they are defined as its owner.'
+  },
+  'update_own': {
+    label: 'Update Own Submissions',
+    tooltip: 'The Update Own Submissions permission will allow a user, with one of the given Roles, to update a Submission. A user can only update a Submission if they are defined as its owner.'
+  },
+  'delete_own': {
+    label: 'Delete Own Submissions',
+    tooltip: 'The Delete Own Submissions permission will allow a user, with one of the given Roles, to delete a Submission. A user can only delete a Submission if they are defined as its owner.'
+  }
+});

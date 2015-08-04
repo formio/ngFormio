@@ -31,7 +31,6 @@ module.exports = function() {
   config.formioHost = formioHost;
   config.debug = process.env.DEBUG || false;
   config.formio.domain = domain;
-  config.formio.schema = '1.0.0';
 
   if (process.env.MONGO1) {
     config.formio.mongo = [];

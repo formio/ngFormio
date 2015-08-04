@@ -4,7 +4,7 @@
 require('dotenv').load({silent: true});
 var config = require('../config')();
 var Yadda = require('yadda');
-var webdriver = require('webdriverio');
+var webdriver = require('webdriverjs-angular');
 var fs = require('fs');
 var driver = null;
 var formio = null;
@@ -19,7 +19,8 @@ var options = {
   baseUrl: url,
   desiredCapabilities: {
     browserName: 'chrome'
-  }
+  },
+  ngRoot: 'body'
 };
 
 Yadda.plugins.mocha.StepLevelPlugin.init();
@@ -30,20 +31,12 @@ new Yadda.FeatureFileSearch('./test/features').each(function(file) {
 
   featureFile(file, function(feature) {
     before(function(done) {
+      this.timeout(60000);
+
       driver = webdriver
         .remote(options)
-        .init(done);
-    });
-
-    beforeEach(function(done) {
-      driver.execute(function() {
-          window.document.addEventListener('angularLoaded', function(e) {
-            return true;
-          });
-        })
-        .then(function() {
-          done();
-        });
+        .init()
+        .url('http://localhost:3000', done);
     });
 
     scenarios(feature.scenarios, function(scenario) {

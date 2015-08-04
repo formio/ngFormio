@@ -6,7 +6,7 @@ var English = Yadda.localisation.English;
 
 module.exports = function(formio) {
   var getProject = function(projectName, next) {
-    formio.resources.project.model.findOne({'name': 'formio'}, function (err, project) {
+    formio.resources.project.model.findOne({'name': 'formio'}, function(err, project) {
       if (err) {
         return next(err);
       }
@@ -19,7 +19,7 @@ module.exports = function(formio) {
   };
 
   var getForm = function(projectId, formName, next) {
-    formio.resources.form.model.findOne({project: projectId, name: formName}, function (err, form) {
+    formio.resources.form.model.findOne({project: projectId, name: formName}, function(err, form) {
       if (err) {
         return next(err);
       }
@@ -32,7 +32,7 @@ module.exports = function(formio) {
   };
 
   var getSubmission = function(filter, next) {
-    formio.resources.submission.model.findOne(filter, function (err, submission) {
+    formio.resources.submission.model.findOne(filter, function(err, submission) {
       if (err) {
         return next(err);
       }
@@ -42,7 +42,7 @@ module.exports = function(formio) {
   };
 
   var createSubmission = function(submission, next) {
-    formio.resources.submission.model.create(submission, function (err, submission) {
+    formio.resources.submission.model.create(submission, function(err, submission) {
       if (err) {
         return next(err);
       }
@@ -54,12 +54,14 @@ module.exports = function(formio) {
   var authUser = function(projectName, formName, email, password, next) {
     getProject('formio', function(err, project) {
       if (err) {
-        return next(err);
+        // Throw errors that show the db is in a bad state, no tests can pass without this.
+        throw err;
       }
 
       getForm(project._id, 'user', function(err, form) {
         if (err) {
-          return next(err);
+          // Throw errors that show the db is in a bad state, no tests can pass without this.
+          throw err;
         }
 
         formio.auth.authenticate(form, 'email', 'password', email, password, function(err, res) {
@@ -76,12 +78,14 @@ module.exports = function(formio) {
   var createUser = function(projectName, formName, email, password, next) {
     getProject(projectName, function(err, project) {
       if (err) {
-        return next(err);
+        // Throw errors that show the db is in a bad state, no tests can pass without this.
+        throw err;
       }
 
       getForm(project._id, formName, function(err, form) {
         if (err) {
-          return next(err);
+          // Throw errors that show the db is in a bad state, no tests can pass without this.
+          throw err;
         }
 
         var encrypt = require('formio/app/actions/fields/password');
@@ -128,7 +132,7 @@ module.exports = function(formio) {
 
   var library = English.library()
     .given('I am (?:on|at) (?:the )?(.+?)(?: page)?$', function(url, next) {
-      var path = (url === 'home') ? '/' : url;
+      var path = (url === 'home') ? 'http://localhost:3000/' : 'http://localhost:3000' + url;
 
       this.driver.url(path)
         .then(function() {
@@ -137,10 +141,7 @@ module.exports = function(formio) {
     })
     .given('an account exists with the email $EMAIL and the password $PASSWORD', function(email, password, next) {
       authUser('formio', 'user', email, password, function(err, res) {
-        if (err) {
-          return next(err);
-        }
-        if (!res) {
+        if (err || !res) {
           // User doesn't exist. Create it.
           return createUser('formio', 'user', email, password, next, next);
         }
@@ -152,14 +153,7 @@ module.exports = function(formio) {
     .given('I am logged out', function(next) {
       this.driver.localStorage('DELETE', 'formioToken')
         .then(function() {
-          // Only continue when the localStorage manipulation is done.
-          this.driver.waitUntil(function() {
-            return this.driver.localStorage('GET', 'formioToken', function(err, res) {
-              return ((!err) && (!res.value)) ? true : false;
-            });
-          }.bind(this), 5000).then(function() {
-            next();
-          });
+          next();
         }.bind(this))
         .catch(function(err) {
           next(err);
@@ -176,7 +170,7 @@ module.exports = function(formio) {
 
         driver.localStorage('POST', {key: 'formioToken', value: res.token.token})
           .then(function() {
-            driver.url('/project')
+            driver.url('http://localhost:3000/app')
               .then(function(){
                 next();
               });
@@ -199,7 +193,7 @@ module.exports = function(formio) {
       });
     })
     .when('I click (?:on )?the $LINK link', function(link, next) {
-      this.driver.waitForExist('=' + link, 5000)
+      this.driver.waitForExist('=' + link)
         .then(function() {
           this.driver.click('=' + link)
             .then(function() {
@@ -208,34 +202,37 @@ module.exports = function(formio) {
             .catch(function(err) {
               next(err);
             });
-        }.bind(this));
+        }.bind(this))
+        .catch(function(err) {
+          next(err);
+        });
     })
     .when('I click (?:on )?the $BUTTON button', function(button, next) {
-      this.driver.waitForExist('button=' + button, 5000)
+      this.driver.click('//div[@id=\'form-group-submit\']//button[\'' + button + '\']')
         .then(function() {
-          this.driver.click('button=' + button)
+          next();
+        });
+    })
+    .when('I enter $TEXT in the $FIELD field', function(text, field, next) {
+      this.driver.waitForExist(field)
+        .then(function() {
+          this.driver.setValue(field, text)
             .then(function() {
               next();
             })
             .catch(function(err) {
               next(err);
             });
-        }.bind(this));
-    })
-    .when('I enter $TEXT in the $FIELD field', function(text, field, next) {
-      this.driver.setValue(field, text)
-        .then(function() {
-          next();
-        })
+        }.bind(this))
         .catch(function(err) {
           next(err);
         });
     })
-    .then('the title is $TITLE', function(given_title, next) {
+    .then('the title is $TITLE', function(title, next) {
       this.driver.getTitle()
-        .then(function(title) {
+        .then(function(res) {
           try {
-            assert.equal(title, given_title);
+            assert.equal(res, title);
             next();
           }
           catch(err) {
@@ -247,43 +244,40 @@ module.exports = function(formio) {
         });
     })
     .then('I am (?:on|at) (?:the )?(.+?)(?: page)$', function(path, next) {
-      path = (path === 'home') ? '/' : path;
-      var url = this.driver.options.baseUrl + path;
+      path = (path === 'home') ? 'http://localhost:3000/' : 'http://localhost:3000' + path;
 
-      this.driver.waitUntil(function() {
-        return this.driver.url().then(function(res) {
-          try {
-            assert.equal(res.value, url);
-            return true;
-          }
-          catch(err) {
-            return false;
-          }
+      this.driver.url()
+        .then(function(res) {
+          assert.equal(res.value, path);
+          next();
         });
-      }.bind(this), 5000).then(function() {
-        next();
-      });
     })
     .then('I have been logged in', function(next) {
-      this.driver.waitUntil(function() {
-        return this.driver.localStorage('GET', 'formioToken', function(err, res) {
-            return ((!err) && (res.value)) ? res.value : false;
-        });
-      }.bind(this), 5000).then(function(token) {
-        next();
+      this.driver.localStorage('GET', 'formioToken', function(err, res) {
+        if (err) {
+          return next(err);
+        }
+        if ((!err) && (res.value)) {
+          return next();
+        }
+
+        next(new Error('No formioToken found; ' + JSON.stringify(res)));
       });
     })
     .then('I have not been logged in', function(next) {
-      this.driver.waitUntil(function() {
-        return this.driver.localStorage('GET', 'formioToken', function(err, res) {
-          return ((!err) && (!res.value)) ? true : false;
-        });
-      }.bind(this), 5000).then(function() {
+      this.driver.localStorage('GET', 'formioToken', function(err, res) {
+        if (err) {
+          return next(err);
+        }
+        if ((!err) && (res.value)) {
+          return next(new Error('User still logged in: ' + JSON.stringify(res)));
+        }
+
         next();
       });
     })
     .then('I see an alert with (?:the text )?$TEXT', function(text, next) {
-      this.driver.waitForExist('.alert=' + text, 1000)
+      this.driver.waitForExist('//div[@role=\'' + text + '\']')
         .then(function(err, html) {
           next();
         })

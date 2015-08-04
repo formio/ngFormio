@@ -1,14 +1,4 @@
 <accordion close-others="true">
-  <accordion-group heading="Form Access Settings">
-    <div ng-if="form.access">
-      <permission-editor permissions="form.access" labels="formAccessLabels" roles="currentProjectRoles" wait-for="loadFormPromise"></permission-editor>
-    </div>
-  </accordion-group>
-  <accordion-group heading="Submission Access Settings">
-    <div ng-if="form.submissionAccess">
-      <permission-editor permissions="form.submissionAccess" labels="submissionAccessLabels" roles="currentProjectRoles" wait-for="loadFormPromise"></permission-editor>
-    </div>
-  </accordion-group>
   <accordion-group heading="Advanced Settings">
     <div id="form-group-action" class="form-group">
       <label for="action" class="control-label">Custom Action URL</label>
