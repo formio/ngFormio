@@ -19,8 +19,8 @@
     </div>
     <small>The REST API path to this form.</small>
   </div>
-  <form-builder app="appId" form="form"></form-builder>
   <div ng-include="'views/form/form-settings.html'"></div>
+  <form-builder app="appId" form="form"></form-builder>
   <div class="form-group pull-right">
     <a class="btn btn-default" ng-click="back()">Cancel</a>
     <input type="submit" class="btn btn-primary" ng-click="saveForm()" value="{{formId ? 'Save' : 'Create'}} {{ capitalize(form.type)  }}" />
