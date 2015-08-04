@@ -2024,7 +2024,11 @@ app.config([
             if (settings.data.url.indexOf(Formio.baseUrl) === -1) {
               options = {
                 disableJWT: true,
-                headers: {Authorization: undefined}
+                headers: {
+                  Authorization: undefined,
+                  Pragma: undefined,
+                  'Cache-Control': undefined
+                }
               };
             }
             $http.get(settings.data.url, options).success(function(data) {
@@ -2055,6 +2059,7 @@ app.config([
         },
         dataSrc: 'values',
         valueProperty: '',
+        defaultValue: '',
         template: '<span>{{ item.label }}</span>',
         multiple: false,
         refresh: false,
