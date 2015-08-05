@@ -60,6 +60,7 @@ app.config([
         key: '',
         placeholder: '',
         resource: '',
+        defaultValue: '',
         template: '<span>{{ item.data }}</span>',
         selectFields: '',
         searchExpression: '',

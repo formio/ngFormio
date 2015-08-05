@@ -921,6 +921,7 @@ app.directive('formioComponent', [
 
           // Add a new field value.
           $scope.addFieldValue = function() {
+            $scope.data[$scope.component.key] = $scope.data[$scope.component.key] || [];
             $scope.data[$scope.component.key].push('');
           };
 
@@ -1912,6 +1913,7 @@ app.config([
         key: '',
         placeholder: '',
         resource: '',
+        defaultValue: '',
         template: '<span>{{ item.data }}</span>',
         selectFields: '',
         searchExpression: '',
