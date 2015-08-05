@@ -52,7 +52,7 @@
     "cors": "^2.5.3",
     "dotenv": "^1.1.0",
     "express": "^4.12.3",
-    "formio": "git+ssh://git@github.com/formio/formio.git#0.1.10",
+    "formio": "git+ssh://git@github.com/formio/formio.git#0.1.11",
     "lodash": "^3.6.0",
     "moment": "^2.10.2",
     "mongodb": "^2.0.27",
