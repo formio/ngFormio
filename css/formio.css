@@ -13,20 +13,20 @@
   padding: 0;
 }
 
-.datetime-picker div > table .btn-default {
+.datetime-picker-dropdown div > table .btn-default {
   border: 0;
   background-color: #fff;
 }
 
-.datetime-picker div > table .btn-default:hover {
+.datetime-picker-dropdown div > table .btn-default:hover {
   background-color: #ccc;
 }
 
-.datetime-picker div > table .btn-default.active {
+.datetime-picker-dropdown div > table .btn-default.active {
   background-color: #ccc;
 }
 
-.has-feedback .datetime-picker .form-control {
+.has-feedback .datetime-picker-dropdown .form-control {
   padding: inherit;
 }
 
