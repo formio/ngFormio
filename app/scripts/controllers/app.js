@@ -175,6 +175,12 @@ app.controller('AppController', [
     }).then(function(result) {
         $scope.currentAppRoles = result.data;
         $scope.rolesLoading = false;
+    }).catch(function(err) {
+      FormioAlerts.addAlert({
+        type: 'danger',
+        message: 'Could not load Application (' + (err.message || err) + ')'
+      });
+      $state.go('home');
     });
 
     $scope.getRole = function(id) {
