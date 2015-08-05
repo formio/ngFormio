@@ -1256,6 +1256,7 @@ app.run([
         'name="{{ component.key }}" ' +
         'ng-disabled="readOnly" ' +
         'ng-model="data[component.key]" ' +
+        'ng-model-options="{ debounce: 500 }" ' +
         'ng-required="component.validate.required" ' +
         'ng-minlength="component.validate.minLength" ' +
         'ng-maxlength="component.validate.maxLength" ' +
