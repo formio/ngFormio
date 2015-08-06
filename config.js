@@ -43,6 +43,9 @@ module.exports = function() {
     config.formio.mongo = 'mongodb://' + mongoAddr + ':' + mongoPort + '/' + mongoCollection;
   }
 
+  // This secret is used to encrypt certain DB fields at rest in the mongo database
+  config.formio.mongoSecret = process.env.DB_SECRET || 'abc123';
+
   config.formio.appSupport = process.env.APP_SUPPORT || true;
   config.formio.reservedSubdomains = ['test', 'www', 'api', 'help', 'support'];
   config.formio.reservedForms = ['submission', 'export'];
