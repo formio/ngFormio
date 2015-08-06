@@ -63,10 +63,5 @@ module.exports = function() {
   config.formio.jwt.secret = process.env.JWT_SECRET || 'abc123';
   config.formio.jwt.expireTime = process.env.JWT_EXPIRE_TIME || 240;
 
-  // Output config for logging.
-  console.log('Received config settings:');
-  console.log(config);
-  console.log();
-
   return config;
 };
