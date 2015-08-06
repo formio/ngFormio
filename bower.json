@@ -22,7 +22,7 @@
     "bootswatch": "3.3.4+1",
     "signature_pad": "~1.3.6",
     "bootstrap-ui-datetime-picker": "~1.1.0",
-    "formio": "git+ssh://git@github.com/formio/ngFormio.git#~0.0.36"
+    "formio": "git+ssh://git@github.com/formio/ngFormio.git#f7df98513"
   },
   "resolutions": {
     "angular": "~1.3.15",
