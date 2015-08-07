@@ -917,6 +917,7 @@ app.directive('formioComponent', [
 
           // Add a new field value.
           $scope.addFieldValue = function() {
+            $scope.data[$scope.component.key] = $scope.data[$scope.component.key] || [];
             $scope.data[$scope.component.key].push('');
           };
 
@@ -1860,7 +1861,7 @@ app.config([
       controller: function(settings, $scope, $http, Formio) {
         $scope.selectItems = [];
         if (settings.resource) {
-          var formio = new Formio($scope.formio.appUrl + '/form/' + settings.resource);
+          var formio = new Formio($scope.formio.projectUrl + '/form/' + settings.resource);
           var params = {};
 
           // If they wish to filter the results.
@@ -1908,6 +1909,7 @@ app.config([
         key: '',
         placeholder: '',
         resource: '',
+        defaultValue: '',
         template: '<span>{{ item.data }}</span>',
         selectFields: '',
         searchExpression: '',

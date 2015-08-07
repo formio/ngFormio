@@ -12,7 +12,7 @@ app.config([
       controller: function(settings, $scope, $http, Formio) {
         $scope.selectItems = [];
         if (settings.resource) {
-          var formio = new Formio($scope.formio.appUrl + '/form/' + settings.resource);
+          var formio = new Formio($scope.formio.projectUrl + '/form/' + settings.resource);
           var params = {};
 
           // If they wish to filter the results.
@@ -60,6 +60,7 @@ app.config([
         key: '',
         placeholder: '',
         resource: '',
+        defaultValue: '',
         template: '<span>{{ item.data }}</span>',
         selectFields: '',
         searchExpression: '',
