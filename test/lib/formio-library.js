@@ -51,6 +51,23 @@ module.exports = function(formio) {
     });
   };
 
+  var ensureOnPage = function(path, next) {
+    if (!path) {
+      path = '/app/#';
+    }
+    this.driver.url()
+      .then(function(res) {
+        // Already on the page.
+        if (res.value === path) {
+          return next();
+        }
+        this.driver.url(path)
+          .then(function() {
+            next();
+          });
+      });
+  }
+
   var authUser = function(appName, formName, email, password, next) {
     getApp('formio', function(err, app) {
       if (err) {
@@ -170,10 +187,10 @@ module.exports = function(formio) {
 
         driver.localStorage('POST', {key: 'formioToken', value: res.token.token})
           .then(function() {
-            driver.url('http://localhost:3000/app')
-              .then(function(){
-                next();
-              });
+            next();
+          })
+          .catch(function(err) {
+            next(err);
           });
       });
     })
@@ -228,6 +245,22 @@ module.exports = function(formio) {
           next(err);
         });
     })
+    .when('I expand the user menu', function(next) {
+      var driver = this.driver
+      driver.waitForExist('#user-menu')
+        .then(function() {
+          driver.click('#user-menu')
+            .then(function() {
+              next();
+            })
+            .catch(function(err) {
+              next(err);
+            })
+        })
+        .catch(function(err) {
+          next(err);
+        });
+    })
     .then('the title is $TITLE', function(title, next) {
       this.driver.getTitle()
         .then(function(res) {
@@ -264,7 +297,7 @@ module.exports = function(formio) {
         next(new Error('No formioToken found; ' + JSON.stringify(res)));
       });
     })
-    .then('I have not been logged in', function(next) {
+    .then('I have been logged out', function(next) {
       this.driver.localStorage('GET', 'formioToken', function(err, res) {
         if (err) {
           return next(err);

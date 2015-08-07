@@ -4,7 +4,7 @@ Feature: Login Functionality
     Given I am on /app/#/auth/login
     And I am logged out
     When I click the Submit button
-    Then I have not been logged in
+    Then I have been logged out
     And I see an alert with the text Password not provided.
 
   Scenario: Bad password
@@ -14,7 +14,7 @@ Feature: Login Functionality
     When I enter test@example.com in the #user\.email field
     And I enter Badpass in the #user\.password field
     And I click the Submit button
-    Then I have not been logged in
+    Then I have been logged out
     And I see an alert with the text Incorrect password
 
   Scenario: Missing email
@@ -22,7 +22,7 @@ Feature: Login Functionality
     And I am logged out
     When I enter Badpass in the #user\.password field
     And I click the Submit button
-    Then I have not been logged in
+    Then I have been logged out
     And I see an alert with the text Missing username
 
   Scenario: Logging in
@@ -33,3 +33,9 @@ Feature: Login Functionality
     And I enter Testpass in the #user\.password field
     And I click the Submit button
     Then I have been logged in
+
+  Scenario: Logging out
+    Given I am on /app/#
+    When I expand the user menu
+    And I click the Log Out link
+    Then I have been logged out

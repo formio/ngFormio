@@ -13,7 +13,6 @@
     <link rel="stylesheet" href="/bower_components/ngDialog/css/ngDialog.css" />
     <link rel="stylesheet" href="/bower_components/ngDialog/css/ngDialog-theme-default.css" />
     <link rel="stylesheet" href="/bower_components/ng-sortable/dist/ng-sortable.css" />
-    <link rel="stylesheet" href="/bower_components/ng-sortable/dist/ng-sortable.style.css" />
     <link rel="stylesheet" href="/bower_components/formio/css/formio.css" />
     <link rel="stylesheet" href="/bower_components/font-awesome/css/font-awesome.css" />
     <!-- endbower -->
@@ -72,12 +71,12 @@
             <div id="navbar" class="navbar-collapse collapse">
               <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown user-dropdown" ng-cloak>
-                  <a ng-if="authenticated" href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-user"></i> {{ user.data.name }}<b class="caret"></b></a>
+                  <a ng-if="authenticated" href="#" class="dropdown-toggle" id="user-menu" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-user"></i> {{ user.data.name }}<b class="caret"></b></a>
                   <ul class="dropdown-menu">
                     <li><a ui-sref="profile.view()"><i class="fa fa-user"></i> Profile</a></li>
                     <li><a ui-sref="settings()"><i class="fa fa-gear"></i> Settings</a></li>
                     <li class="divider"></li>
-                    <li><a href="" ng-click="logout()"><i class="fa fa-power-off"></i> Log Out</a></li>
+                    <li><a href="" id="logout" ng-click="logout()"><i class="fa fa-power-off"></i> Log Out</a></li>
                   </ul>
                 </li>
                 <li>
