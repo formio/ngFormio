@@ -9,8 +9,8 @@ var formioClass = require('formio');
 var Yadda = require('yadda');
 Yadda.plugins.mocha.StepLevelPlugin.init();
 
-var libraryClass = require('./lib/formio-library');
-var webdriver = require('webdriverio');
+var library = require('./lib/formio-library');
+var webdriver = require('webdriverjs-angular');
 var protocol = process.env.PROTOCOL || 'http';
 var domain = process.env.DOMAIN || 'localhost';
 var port = process.env.PORT || 3000;
