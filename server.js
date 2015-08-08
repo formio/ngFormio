@@ -99,6 +99,6 @@ require('formio')(config.formio, function(formio) {
 
   app.use(vhost('api.' + config.formio.domain, formio));
   app.use('/api', formio);
-  console.log('Listening to port ' + config.port);
+  console.log(' > Listening to ' + config.host);
   app.listen(config.port);
 });

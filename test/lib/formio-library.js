@@ -6,7 +6,7 @@ var English = Yadda.localisation.English;
 
 module.exports = function(formio) {
   var getProject = function(projectName, next) {
-    formio.resources.project.model.findOne({'name': 'formio'}, function(err, project) {
+    formio.resources.project.model.findOne({'name': projectName}, function(err, project) {
       if (err) {
         return next(err);
       }
