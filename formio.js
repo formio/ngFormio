@@ -126,8 +126,8 @@ app.provider('Formio', function() {
           // See if this url has a subdomain.
           if (subdomain && subdomain !== 'api') {
             // Get the paths.
-            paths = path.match(/(http[s]?:\/\/.*\/api)\/?([^?]*)?/);
-            if (paths.length > 1) {
+            paths = path.match(/(http[s]?:\/\/?.*\..*?)\/([^?]*)?/);
+            if (paths && paths.length > 1) {
               paths.shift();
             }
           }
