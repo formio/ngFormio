@@ -408,6 +408,20 @@ ul.component-list li {
   position: relative;
 }
 
+/**
+ * An overlay that is shown while dragging. This way, elements like iframes in
+ * a content component do not interfere with dragging.
+ */
+.dropzone .dndOverlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 99999;
+  opacity: 0;
+}
+
 /***************************** Element Selection *****************************/
 
 .dropzone .selected .item {
