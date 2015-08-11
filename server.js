@@ -4,6 +4,7 @@ require('dotenv').load({silent: true});
 var config = require('./config')();
 var express = require('express');
 var nunjucks = require('nunjucks');
+var vhost = require('vhost');
 var _ = require('lodash');
 var app = express();
 
@@ -31,7 +32,7 @@ app.get('/config.js', function(req, res) {
   res.render('js/config.js', {
     forceSSL: config.https ? 'true' : 'false',
     domain: config.formio.domain,
-    appHost: config.appHost,
+    appHost: config.host,
     apiHost: config.apiHost,
     formioHost: config.formioHost
   });
@@ -61,16 +62,25 @@ app.use('/app', express.static(__dirname + '/dist'));
 // Show the docs page for the API.
 app.get('/spec.html', function (req, res, next) {
   res.render('docs.html', {
-    url: config.formioHost + '/spec.json'
+    url: '/spec.json'
   });
 });
 
 // Get the specs for each form.
 app.get('/project/:projectId/form/:formId/spec.html', function (req, res, next) {
   res.render('docs.html', {
-    url: req.protocol + '://' + req.params.projectId +'.' + config.apiHost + '/form/' + req.params.formId + '/spec.json'
+    url: '/project/' + req.params.projectId + '/form/' + req.params.formId + '/spec.json'
   });
 });
 
-console.log(' > Listening to ' + config.appHost);
-app.listen(config.appPort);
+// Mount the api server.
+require('formio')(config.formio, function(formio) {
+  // Route all subdomain requests to the API server.
+  app.use(vhost('*.' + config.formio.domain, formio));
+
+  // Mount the Formio API server at the root.
+  app.use('/', formio);
+
+  console.log(' > Listening to ' + config.host);
+  app.listen(config.port);
+});

@@ -11,40 +11,30 @@ module.exports = function() {
   };
 
   var protocol = process.env.PROTOCOL || 'https';
+  var project = process.env.PROJECT || 'formio';
 
   // Set the App settings.
-  var appDomain = process.env.APP_DOMAIN || 'form.io';
-  var appPort = process.env.APP_PORT || 80;
-  var appHost = protocol + '://' + appDomain;
+  var domain = process.env.DOMAIN || 'form.io';
+  var port = process.env.PORT || 80;
+  var host = protocol + '://' + domain;
+  var apiHost = protocol + '://api.' + domain;
+  var formioHost = protocol + '://' + project + '.' + domain;
 
-  if (appPort !== 80) {
-    appHost += ':' + appPort;
-  }
-
-  // Set the API settings.
-  var apiDomain = process.env.API_DOMAIN || 'form.io';
-  var apiPort = process.env.API_PORT || 80;
-  var apiHost = protocol + '://api.' + apiDomain;
-  var project = process.env.PROJECT || 'formio';
-  var formioHost = protocol + '://' + project + '.' + apiDomain;
-
-  if (apiHost !== 80) {
-    apiHost += ':' + apiPort;
-    formioHost += ':' + apiPort;
+  if (port !== 80) {
+    host += ':' + port;
+    apiHost += ':' + port;
+    formioHost += ':' + port;
   }
 
   // Configure app server settings.
   config.debug = process.env.DEBUG || false;
   config.https = (protocol === 'https');
-  config.appDomain = appDomain;
-  config.appPort = appPort;
-  config.appHost = appHost;
-
-  config.apiDomain = apiDomain;
-  config.apiPort = apiPort;
-  config.apiHost = apiHost;
+  config.domain = domain;
+  config.port = port;
+  config.host = host;
 
   config.project = project;
+  config.apiHost = apiHost;
   config.formioHost = formioHost;
 
   if (process.env.MONGO1) {
@@ -87,7 +77,7 @@ module.exports = function() {
   // Allow the config to be displayed when debugged.
   var sanitized = _.clone(config);
   sanitized = _.pick(sanitized, [
-    'https', 'appDomain', 'appPort', 'appHost', 'apiDomain', 'apiPort', 'apiHost', 'project', 'formioHost', 'debug'
+    'https', 'domain', 'port', 'host', 'project', 'formioHost', 'apiHost', 'debug'
   ]);
   sanitized.formio = _.pick(sanitized.formio, ['domain', 'schema', 'mongo']);
 
