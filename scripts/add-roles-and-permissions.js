@@ -64,7 +64,7 @@ var pruneMongo = function() {
   });
 
   // Prune orphan submissions.
-  db.submissions.find().forEach(function(submission) {
+  db.submissions.find().snapshot().forEach(function(submission) {
     var form = db.forms.findOne({_id: submission.form});
 
     if (!form) {
@@ -94,7 +94,7 @@ var pruneMongo = function() {
  * Update the Application Model.
  */
 var updateApplications = function() {
-  var applications = db.applications.find();
+  var applications = db.applications.find().snapshot();
   applications.forEach(function(application) {
     // For each application, create 3 roles: Administrator, Authenticated, and Anonymous.
     db.roles.insert({title: 'Administrator', description: 'The Administrator Role.', app: application._id});
@@ -143,10 +143,9 @@ var updateApplications = function() {
  * Update the Form Model.
  */
 var updateForms = function() {
-  var forms = db.forms.find();
-  forms.forEach(function(form) {
-    // confirm each form references a valid application
+  var forms = db.forms.find().snapshot();
 
+  forms.forEach(function(form) {
     // Fix forms without access defined - db.forms.find({'access.0': {$exists: false}});
     var access = form.hasOwnProperty('access')
       ? form.access
@@ -189,8 +188,6 @@ var updateForms = function() {
       }
     }
     else {
-      // printjson('null:');
-      // printjson(form._id);
       form.owner = null;
     }
 
@@ -286,7 +283,7 @@ var updateForms = function() {
  * Update the Submission Model.
  */
 var updateSubmission = function() {
-  var submissions = db.submissions.find();
+  var submissions = db.submissions.find().snapshot();
   submissions.forEach(function(submission) {
     var access = submission.access;
     var form = db.forms.findOne({_id: submission.form});
