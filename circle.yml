@@ -67,3 +67,16 @@ deployment:
       - ./scripts/deployVersion.sh $TAG_NAME develop:
           environment:
             TAG_NAME: $(./scripts/getTagName.sh)
+  feature:
+    branch: /feature\/.*/
+    commands:
+      - docker push $IMAGE_PATH:$TAG_NAME:
+          environment:
+            TAG_NAME: $(./scripts/getTagName.sh)
+      - ./scripts/createVersion.sh $TAG_NAME:
+          environment:
+            TAG_NAME: $(./scripts/getTagName.sh)
+      - ./scripts/deployVersion.sh $TAG_NAME $FEATURE:
+          environment:
+            TAG_NAME: $(./scripts/getTagName.sh)
+            FEATURE: $(./scripts/getFeatureName.sh)
