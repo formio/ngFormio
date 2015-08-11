@@ -14,15 +14,11 @@
   <div id="form-group-name" class="form-group">
     <label for="path" class="control-label">API Path</label>
     <div class="input-group" style="width: 350px;">
-      <span class="input-group-addon">https://{{ currentProject.name }}.form.io/api/</span>
+      <span class="input-group-addon">https://{{ currentProject.name }}.form.io/</span>
       <input type="text" class="form-control" id="path" ng-model="form.path" placeholder="user" style="width: 200px;">
     </div>
     <small>The REST API path to this form.</small>
   </div>
-<<<<<<< HEAD
-  <form-builder project="projectId" form="form"></form-builder>
-=======
->>>>>>> 7d22fa0e810e610c4d6eb9dacdb9e66376596416
   <div ng-include="'views/form/form-settings.html'"></div>
   <form-builder project="projectId" form="form"></form-builder>
   <div class="form-group pull-right">

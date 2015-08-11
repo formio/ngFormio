@@ -5,7 +5,6 @@ var config = require('./config')();
 var express = require('express');
 var nunjucks = require('nunjucks');
 var _ = require('lodash');
-var vhost = require('vhost');
 var app = express();
 
 // Configure nunjucks.
@@ -32,7 +31,7 @@ app.get('/config.js', function(req, res) {
   res.render('js/config.js', {
     forceSSL: config.https ? 'true' : 'false',
     domain: config.formio.domain,
-    host: config.host,
+    appHost: config.appHost,
     apiHost: config.apiHost,
     formioHost: config.formioHost
   });
@@ -59,46 +58,19 @@ _.each(apps, function(path, name) {
 // Add the formio Project.
 app.use('/app', express.static(__dirname + '/dist'));
 
-// Mount the api server.
-require('formio')(config.formio, function(formio) {
-  // Show the docs page for the API.
-  formio.get('/spec.html', function (req, res, next) {
-    res.render('docs.html', {
-      url: req.protocol + '://' + req.get('host') + '/api/spec.json'
-    });
+// Show the docs page for the API.
+app.get('/spec.html', function (req, res, next) {
+  res.render('docs.html', {
+    url: config.formioHost + '/spec.json'
   });
-
-  // Get the specs for each form.
-  formio.get('/project/:projectId/form/:formId/spec.html', function (req, res, next) {
-    res.render('docs.html', {
-      url: req.protocol + '://' + req.get('host') +'/api/project/' + req.params.projectId + '/form/' + req.params.formId + '/spec.json'
-    });
-  });
-
-  // The formio app sanity endpoint.
-  app.get('/health', function(req, res, next) {
-    if (!formio.resources) {
-      return res.status(500).send('No Resources');
-    }
-    if (!formio.resources.project.model) {
-      return res.status(500).send('No Project model');
-    }
-
-    formio.resources.project.model.findOne({name: 'formio'}, function(err, result) {
-      if (err) {
-        return res.status(500).send(err);
-      }
-      if (!result) {
-        return res.status(500).send('Formio Project not found');
-      }
-
-      // Proceed with db schema sanity check middleware.
-      next();
-    });
-  }, formio.update.sanityCheck);
-
-  app.use(vhost('api.' + config.formio.domain, formio));
-  app.use('/api', formio);
-  console.log(' > Listening to ' + config.host);
-  app.listen(config.port);
 });
+
+// Get the specs for each form.
+app.get('/project/:projectId/form/:formId/spec.html', function (req, res, next) {
+  res.render('docs.html', {
+    url: req.protocol + '://' + req.params.projectId +'.' + config.apiHost + '/form/' + req.params.formId + '/spec.json'
+  });
+});
+
+console.log(' > Listening to ' + config.appHost);
+app.listen(config.appPort);
