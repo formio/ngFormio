@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-TAG_NAME=$1   
+TAG_NAME=$1
 EB_BUCKET=formio-ecs-bucket
 AWSDIR=aws-eb
 APPLICATION_NAME=form.io
