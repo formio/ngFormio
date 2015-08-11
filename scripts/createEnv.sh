@@ -36,7 +36,7 @@ aws elasticbeanstalk create-environment --application-name $APPLICATION_NAME --e
 
 # Wait for the load balancer to be initialized. We can't create the dns resource record until it is.
 echo "Waiting for the load balancer to be initialized."
-for a in {1..100}
+for a in {1..100} 
 do
   LOAD_BALANCER=`aws elasticbeanstalk describe-environment-resources --environment-name $ENVIRONMENT --query 'EnvironmentResources.LoadBalancers[0].Name' --output text`
   if [[ $LOAD_BALANCER != 'None' ]]; then
