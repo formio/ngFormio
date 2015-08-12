@@ -1,4 +1,4 @@
-FROM ubuntu:14.04:latest
+FROM ubuntu:14.04
 MAINTAINER Randall Knutson <randall@form.io>
 
 RUN apt-get install -y curl && curl -sL https://deb.nodesource.com/setup_0.12 | sudo bash -
