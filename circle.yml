@@ -24,10 +24,6 @@ dependencies:
     - "~/bower_components"
 
   override:
-    - if [[ -e ~/docker/image.tar ]]; then docker load -i ~/docker/image.tar; fi
-    - docker build -t circleci/elasticsearch .
-    - mkdir -p ~/docker; docker save circleci/elasticsearch > ~/docker/image.tar
-  override:
     - echo $TAG_NAME:
         environment:
           TAG_NAME: $(./scripts/getTagName.sh)
