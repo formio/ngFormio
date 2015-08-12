@@ -30,6 +30,7 @@ module.exports = function() {
   config.debug = process.env.DEBUG || false;
   config.https = (protocol === 'https');
   config.domain = domain;
+  config.formio.domain = domain;
   config.port = port;
   config.host = host;
 

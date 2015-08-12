@@ -31,7 +31,7 @@ app.get('/config.js', function(req, res) {
   res.set('Content-Type', 'text/javascript');
   res.render('js/config.js', {
     forceSSL: config.https ? 'true' : 'false',
-    domain: config.formio.domain,
+    domain: config.domain,
     appHost: config.host,
     apiHost: config.apiHost,
     formioHost: config.formioHost
@@ -60,14 +60,14 @@ _.each(apps, function(path, name) {
 app.use('/app', express.static(__dirname + '/dist'));
 
 // Show the docs page for the API.
-app.get('/spec.html', function (req, res, next) {
+app.get('/spec.html', function(req, res, next) {
   res.render('docs.html', {
     url: '/spec.json'
   });
 });
 
 // Get the specs for each form.
-app.get('/project/:projectId/form/:formId/spec.html', function (req, res, next) {
+app.get('/project/:projectId/form/:formId/spec.html', function(req, res, next) {
   res.render('docs.html', {
     url: '/project/' + req.params.projectId + '/form/' + req.params.formId + '/spec.json'
   });
@@ -76,10 +76,7 @@ app.get('/project/:projectId/form/:formId/spec.html', function (req, res, next) 
 // Mount the api server.
 require('formio')(config.formio, function(formio) {
   // Route all subdomain requests to the API server.
-  app.use(vhost('*.' + config.formio.domain, formio));
-
-  // Mount the Formio API server at the root.
-  app.use('/', formio);
+  app.use(vhost('*.' + config.domain, formio));
 
   console.log(' > Listening to ' + config.host);
   app.listen(config.port);
