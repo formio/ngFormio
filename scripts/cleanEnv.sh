@@ -1,4 +1,4 @@
-#!/usr/bin/env bash 
+#!/usr/bin/env bash
 
 # Using docker on servers tends to fill up the free space on the server with old releases. This script will find
 # all servers in an environment and clean up old releases.

@@ -4,6 +4,7 @@ general:
       - develop
       - /feature\/.*/
       - /release\/.*/
+      - /fix\/.*/
 
 machine:
   python:
