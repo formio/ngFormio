@@ -5,6 +5,9 @@ var Yadda = require('yadda');
 var English = Yadda.localisation.English;
 
 module.exports = function(formio) {
+  // Global timeout for wait* commands.
+  var timeout = 60000;
+
   var getProject = function(projectName, next) {
     formio.resources.project.model.findOne({'name': projectName}, function(err, project) {
       if (err) {
@@ -193,7 +196,7 @@ module.exports = function(formio) {
       });
     })
     .when('I click (?:on )?the $LINK link', function(link, next) {
-      this.driver.waitForExist('=' + link)
+      this.driver.waitForExist('=' + link, timeout)
         .then(function() {
           this.driver.click('=' + link)
             .then(function() {
@@ -214,7 +217,7 @@ module.exports = function(formio) {
         });
     })
     .when('I enter $TEXT in the $FIELD field', function(text, field, next) {
-      this.driver.waitForExist(field)
+      this.driver.waitForExist(field, timeout)
         .then(function() {
           this.driver.setValue(field, text)
             .then(function() {
@@ -277,10 +280,14 @@ module.exports = function(formio) {
       });
     })
     .then('I see an alert with (?:the text )?$TEXT', function(text, next) {
-      this.driver.waitForExist('//div[@role=\'' + text + '\']')
-        .then(function(err, html) {
-          next();
-        })
+      this.driver.waitForExist('//div[@role=\'alert\']', timeout)
+        .then(function() {
+          this.driver.getText('//div[@role=\'alert\']')
+            .then(function(alert) {
+              assert.equal(text, alert);
+              next();
+            });
+        }.bind(this))
         .catch(function(err) {
           next(err);
         });
