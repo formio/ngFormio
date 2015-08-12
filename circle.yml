@@ -18,16 +18,27 @@ machine:
     MONGO: "mongodb://localhost:27017/formio"
 
 dependencies:
+  cache_directories:
+    - "~/docker"
+    - "~/node_modules"
+    - "~/bower_components"
+
+  override:
+    - if [[ -e ~/docker/image.tar ]]; then docker load -i ~/docker/image.tar; fi
+    - docker build -t circleci/elasticsearch .
+    - mkdir -p ~/docker; docker save circleci/elasticsearch > ~/docker/image.tar
   override:
     - echo $TAG_NAME:
         environment:
           TAG_NAME: $(./scripts/getTagName.sh)
     - pip install awscli
     - ./scripts/setup.sh -snb
+    - if [[ -e ~/docker/formio-app.tar ]]; then docker load -i ~/docker/formio-app.tar; fi
     - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
     - docker build -t $IMAGE_PATH:$TAG_NAME .:
         environment:
           TAG_NAME: $(./scripts/getTagName.sh)
+    - mkdir -p ~/docker; docker save $IMAGE_PATH > ~/docker/formio-app.tar
   post:
     - wget http://selenium-release.storage.googleapis.com/2.46/selenium-server-standalone-2.46.0.jar
     - java -jar selenium-server-standalone-2.46.0.jar:
