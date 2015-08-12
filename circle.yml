@@ -20,8 +20,6 @@ machine:
 dependencies:
   cache_directories:
     - "~/docker"
-    - "~/node_modules"
-    - "~/bower_components"
 
   override:
     - echo $TAG_NAME:
