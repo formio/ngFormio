@@ -43,7 +43,7 @@ dependencies:
     - java -jar selenium-server-standalone-2.46.0.jar:
         background: true
     - ./scripts/importDb.sh formio
-
+ 
 test:
   pre:
     - sudo bash -c "echo \"127.0.0.1 formio.localhost\" >> /etc/hosts"
