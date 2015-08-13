@@ -170,6 +170,9 @@ app.provider('Formio', function() {
             if (error === 'Unauthorized') {
               $rootScope.$broadcast('formio.unauthorized', error);
             }
+            else if (error === 'Login Timeout') {
+              $rootScope.$broadcast('formio.sessionExpired', error);
+            }
             deferred.reject(error);
           };
         };
@@ -1021,8 +1024,14 @@ app.factory('formioInterceptor', [
      * @type {function(this:{token: string, setToken: Function, getToken: Function})}
      */
     Interceptor.response = function(response) {
+      var responseCode = parseInt(response.status, 10);
       var token = response.headers('x-jwt-token');
-      if (token || (token === '')) { this.setToken(token); }
+      if (responseCode === 200 && token && token !== '') {
+        this.setToken(token);
+      }
+      else if (responseCode === 204 && token && token === '') {
+        this.setToken(token);
+      }
       return response;
     }.bind(Interceptor);
 
@@ -1032,7 +1041,7 @@ app.factory('formioInterceptor', [
      * @type {function(this:{token: string, setToken: Function, getToken: Function, setUser: Function, getUser: Function})}
      */
     Interceptor.responseError = function(response) {
-      if (parseInt(response.status, 10) === 401) {
+      if (parseInt(response.status, 10) === 440) {
         response.loggedOut = true;
         this.setToken(null);
       }
