@@ -52,4 +52,4 @@ sed -e "s/<ENVIRONMENT>/$ENVIRONMENT/" -e "s/<DNS_NAME>/$DNS_NAME/" -e "s/<ALIAS
 echo "Adding recordset for $ENVIRONMENT.develop-form.io."
 aws route53 change-resource-record-sets --hosted-zone-id $HOSTED_ZONE_ID --change-batch file://$DIR/$AWSDIR/versions/$TAG_NAME/DNSAdd.json
 
-ssh $MONGO_SERVER "~/restore.sh $ENVIRONMENT"
+ssh ec2-user@$MONGO_SERVER "~/restore.sh $ENVIRONMENT"
