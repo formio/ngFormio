@@ -211,13 +211,10 @@ module.exports = function(formio) {
         });
     })
     .when('I click (?:on )?the $BUTTON button', function(button, next) {
-      this.driver.element('//div[@id=\'form-group-submit\']//button[\'' + button + '\']')
+      this.driver.click('//div[@id=\'form-group-submit\']//button[\'' + button + '\']')
         .then(function() {
-          this.driver.click('//div[@id=\'form-group-submit\']//button[\'' + button + '\']')
-            .then(function() {
-              next();
-            });
-        }.bind(this));
+          next();
+        });
     })
     .when('I enter $TEXT in the $FIELD field', function(text, field, next) {
       this.driver.waitForExist(field, timeout)
