@@ -287,6 +287,16 @@ angular
         $rootScope.currentState = toState.name;
       });
 
+      var authError = function() {
+        $rootScope.currentApp = null;
+        $rootScope.currentForm = null;
+        $state.go('home');
+        FormioAlerts.addAlert({
+          type: 'danger',
+          message: 'You are not authorized to perform the requested operation.'
+        });
+      };
+
       var logoutError = function() {
         $rootScope.currentProject = null;
         $rootScope.currentForm = null;
@@ -298,7 +308,10 @@ angular
       };
 
       // Catches error from expired/invalid session.
-      $rootScope.$on('formio.unauthorized', logoutError);
+      $rootScope.$on('formio.unauthorized', authError);
+
+      // Catches error from expired/invalid session.
+      $rootScope.$on('formio.sessionExpired', logoutError);
 
       // Logout of form.io and go to login page.
       $rootScope.logout = function() {
