@@ -31,12 +31,10 @@ new Yadda.FeatureFileSearch('./test/features').each(function(file) {
 
   featureFile(file, function(feature) {
     before(function(done) {
-      this.timeout(60000);
-
       driver = webdriver
         .remote(options)
         .init()
-        .url('http://localhost:3000', done);
+        .url(options.baseUrl, done);
     });
 
     scenarios(feature.scenarios, function(scenario) {
