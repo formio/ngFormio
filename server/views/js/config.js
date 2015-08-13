@@ -1,12 +1,12 @@
 angular.module('formioApp').constant('AppConfig', {
   forceSSL: {{ forceSSL }},
   domain: '{{ domain }}',
-  appBase: '{{ host }}/app',
-  apiBase: '{{ host }}/app/api',
+  appBase: '{{ appHost }}/app',
+  apiBase: '{{ apiHost }}',
   tutorial: '{{ host }}/start',
-  userForm: '{{ formioHost }}/app/api/user',
-  userLoginForm: '{{ formioHost }}/app/api/user/login',
-  userRegisterForm: '{{ formioHost }}/app/api/user/register',
-  teamForm: '{{ formioHost }}/app/api/team',
-  betaForm: '{{ formioHost }}/app/api/beta'
+  userForm: '{{ formioHost }}/user',
+  userLoginForm: '{{ formioHost }}/user/login',
+  userRegisterForm: '{{ formioHost }}/user/register',
+  teamForm: '{{ formioHost }}/team',
+  betaForm: '{{ formioHost }}/beta'
 });

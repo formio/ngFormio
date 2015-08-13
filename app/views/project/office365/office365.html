@@ -1,0 +1,29 @@
+<div class="well">
+  <h4>Microsoft Office 365</h4>
+  <p>Enter the following information for your Microsoft Office 365 application.</p>
+</div>
+<div class="form-group">
+  <label for="tenant">Office 365 Tenant</label>
+  <input ng-model="currentProject.settings.office365.tenant" type="text" class="form-control" id="tenant" placeholder="Example: example.onmicrosoft.com">
+</div>
+<div class="form-group">
+  <label for="clientId">Application Client ID</label>
+  <input ng-model="currentProject.settings.office365.clientId" type="text" class="form-control" id="clientId" placeholder="Example: 55e1a765-58c7-4443-z75e-75b902e22cce">
+</div>
+<div class="form-group">
+  <label for="email">Office 365 Email</label>
+  <input ng-model="currentProject.settings.office365.email" type="text" class="form-control" id="email" placeholder="Example: joe@example.onmicrosoft.com">
+</div>
+<div class="form-group">
+  <label for="cert" class="control-label">Application Certificate Private Key</label>
+  <textarea class="form-control" ng-model="currentProject.settings.office365.cert" id="cert" placeholder="-----BEGIN RSA PRIVATE KEY-----
+MIIEpAIBAA...
+...
+...URWowVb1mgvjQ==
+-----END RSA PRIVATE KEY-----" rows="10"></textarea>
+</div>
+<div class="form-group">
+  <label for="thumbprint">Application Certificate Thumbprint</label>
+  <input ng-model="currentProject.settings.office365.thumbprint" type="text" class="form-control" id="thumbprint" placeholder="Enter the Hexidecimal formatted thumbprint for your certificate.">
+</div>
+<button class="btn btn-primary" ng-click="saveProject()">Save Settings</button>

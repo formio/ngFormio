@@ -17,33 +17,33 @@
     <div class="row">
       <div class="panel panel-success">
         <div class="panel-heading">
-          <h3 class="panel-title"><a ui-sref="appIndex()"><i class="fa fa-th-large"></i> My Applications</a></h3>
+          <h3 class="panel-title"><a ui-sref="projectIndex()"><i class="fa fa-th-large"></i> My Projects</a></h3>
         </div>
         <div class="panel-body">
-          <i id="apps-loader" style="font-size: 2em;" class="fa fa-spinner fa-pulse"></i>
-          <div class="well" ng-show="!appsLoading">
-            Applications are web-based HTML software. Whether you are building a new website, or a mobile application, you can
-            create separate Applications used for each of these products.
+          <i id="projects-loader" style="font-size: 2em;" class="fa fa-spinner fa-pulse"></i>
+          <div class="well" ng-show="!projectsLoading">
+            Projects are web-based HTML software. Whether you are building a new website, or a mobile application, you can
+            create separate Projects used for each of these products.
           </div>
-          <table ng-show="!appsLoading && apps.length" class="table table-striped">
+          <table ng-show="!projectsLoading && projects.length" class="table table-striped">
             <tbody>
-            <tr ng-repeat="app in apps">
+            <tr ng-repeat="project in projects">
               <td>
                 <div class="row">
                   <div class="col-sm-5">
-                    <h4><a ui-sref="app.view({appId: app._id})">{{ app.title }}</a></h4>
+                    <h4><a ui-sref="project.view({projectId: project._id})">{{ project.title }}</a></h4>
                   </div>
                   <div class="col-sm-7">
                     <div class="button-group pull-right" style="display:flex;">
-                      <a ui-sref="app.edit({appId: app._id})" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-edit"></span> Edit</a>&nbsp;
-                      <a ui-sref="app.settings({appId: app._id})" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-cog"></span> Settings</a>&nbsp;
-                      <a ui-sref="app.delete({appId: app._id})" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-trash"></span></a>
+                      <a ui-sref="project.edit({projectId: project._id})" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-edit"></span> Edit</a>&nbsp;
+                      <a ui-sref="project.settings({projectId: project._id})" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-cog"></span> Settings</a>&nbsp;
+                      <a ui-sref="project.delete({projectId: project._id})" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-trash"></span></a>
                     </div>
                   </div>
                 </div>
                 <div class="row">
                   <div class="col-sm-12">
-                    {{ app.description }}
+                    {{ project.description }}
                   </div>
                 </div>
               </td>
@@ -52,7 +52,7 @@
           </table>
         </div>
         <div class="panel-footer text-right">
-          <a ui-sref="createApp()" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> New Application</a>
+          <a ui-sref="createProject()" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> New Project</a>
         </div>
       </div>
     </div>

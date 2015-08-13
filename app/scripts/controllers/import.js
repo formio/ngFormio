@@ -1,5 +1,7 @@
 'use strict';
+
 var app = angular.module('formioApp.controllers.import', []);
+
 app.controller('ImportExportController', [
   '$scope',
   '$rootScope',
