@@ -16,16 +16,16 @@
             <accordion-group heading="Form API" is-open="true" class="panel-info">
                 <p><strong>Your form API is now ready to use!</strong> The following API was created that maps directly to this form interface.</p>
                 <p>This API can be found by going to the following URL.</p>
-                <p><pre><code>https://{{ currentApp.name }}.form.io/app/api/{{ form.path }}</code></pre></p>
+                <p><pre><code>https://{{ currentProject.name }}.form.io/api/{{ form.path }}</code></pre></p>
             </accordion-group>
-            <accordion-group heading="Application Embedding" class="panel-info">
-              <p>To add this form to your application, use <a target="_blank" href="http://bower.io/">Bower</a> to download the Form.IO library and its dependencies.</p>
+            <accordion-group heading="Project Embedding" class="panel-info">
+              <p>To add this form to your Application, use <a target="_blank" href="http://bower.io/">Bower</a> to download the Form.IO library and its dependencies.</p>
               <p><pre><code>bower install formio</code></pre></p>
-              <p>Next, ensure your webpage has all of the application dependencies added to the &lt;script&gt; tag. For a simple example, refer to the following example.</p>
+              <p>Next, ensure your webpage has all of the Project dependencies added to the &lt;script&gt; tag. For a simple example, refer to the following example.</p>
               <p><a target="_blank" href="https://github.com/formio/formio-form/blob/master/index.html">Example Simple Form Embedding</a></p>
               <p>We recommend using a tool called <a target="_blank" href="https://github.com/taptapship/wiredep">Wiredep</a> to automatically add all the dependencies to the &lt;script&gt; section.</p>
               <p>Now, within your HTML source, you can use the <strong><code style="color:#333;">&lt;formio&gt;</code></strong> directive like so.
-              <pre><code>&lt;formio src="'https://{{ currentApp.name }}.form.io/app/api/{{ form.path }}'"&gt;&lt;/formio&gt;</code></pre>
+              <pre><code>&lt;formio src="'https://{{ currentProject.name }}.form.io/api/{{ form.path }}'"&gt;&lt;/formio&gt;</code></pre>
             </accordion-group>
             <accordion-group heading="API Specification" class="panel-info">
                 <iframe id="docs" ng-src="{{ getSwaggerURL() | trusted }}"></iframe>

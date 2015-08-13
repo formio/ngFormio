@@ -36,7 +36,6 @@ angular
       RestangularProvider,
       AppConfig
     ) {
-
       // Set the base URL for our API.
       FormioProvider.setBaseUrl(AppConfig.apiBase);
       FormioProvider.setDomain(AppConfig.domain);
@@ -84,71 +83,71 @@ angular
           parent: 'profile',
           templateUrl: 'views/user/profile/profile-edit.html'
         })
-        .state('app', {
-          url: '/app/:appId',
-          controller: 'AppController',
-          templateUrl: 'views/app/app.html'
+        .state('project', {
+          url: '/project/:projectId',
+          controller: 'ProjectController',
+          templateUrl: 'views/project/project.html'
         })
-        .state('createApp', {
-          url: '/create/app',
-          templateUrl: 'views/app/create.html',
-          controller: 'AppCreateController'
+        .state('createProject', {
+          url: '/create/project',
+          templateUrl: 'views/project/create.html',
+          controller: 'ProjectCreateController'
         })
-        .state('app.view', {
+        .state('project.view', {
           url: '/view',
-          parent: 'app',
-          templateUrl: 'views/app/view.html'
+          parent: 'project',
+          templateUrl: 'views/project/view.html'
         })
-        .state('app.edit', {
+        .state('project.edit', {
           url: '/edit',
-          parent: 'app',
-          templateUrl: 'views/app/edit.html',
-          controller: 'AppEditController'
+          parent: 'project',
+          templateUrl: 'views/project/edit.html',
+          controller: 'ProjectEditController'
         })
-        .state('app.settings', {
+        .state('project.settings', {
           url: '/settings',
-          parent: 'app',
-          templateUrl: 'views/app/settings.html',
-          controller: 'AppSettingsController'
+          parent: 'project',
+          templateUrl: 'views/project/settings.html',
+          controller: 'ProjectSettingsController'
         })
-        .state('app.settings.email', {
+        .state('project.settings.email', {
           url: '/email',
-          parent: 'app.settings',
-          templateUrl: 'views/app/email/email.html'
+          parent: 'project.settings',
+          templateUrl: 'views/project/email/email.html'
         })
-        .state('app.settings.roles', {
+        .state('project.settings.roles', {
           abstract: true,
           url: '/roles',
-          parent: 'app.settings',
-          templateUrl: 'views/app/roles/roles.html'
+          parent: 'project.settings',
+          templateUrl: 'views/project/roles/roles.html'
         })
-        .state('app.settings.roles.view', {
+        .state('project.settings.roles.view', {
           url: '',
-          parent: 'app.settings.roles',
-          templateUrl: 'views/app/roles/view.html'
+          parent: 'project.settings.roles',
+          templateUrl: 'views/project/roles/view.html'
         })
-        .state('app.settings.roles.edit', {
+        .state('project.settings.roles.edit', {
           url: '/:roleId/edit',
-          parent: 'app.settings.roles',
-          templateUrl: 'views/app/roles/edit.html',
+          parent: 'project.settings.roles',
+          templateUrl: 'views/project/roles/edit.html',
           controller: 'RoleController'
         })
-        .state('app.settings.roles.delete', {
+        .state('project.settings.roles.delete', {
           url: '/:roleId/delete',
-          parent: 'app.settings.roles',
-          templateUrl: 'views/app/roles/delete.html',
+          parent: 'project.settings.roles',
+          templateUrl: 'views/project/roles/delete.html',
           controller: 'RoleController'
         })
-        .state('app.settings.office365', {
+        .state('project.settings.office365', {
           url: '/office365',
-          parent: 'app.settings',
-          templateUrl: 'views/app/office365/office365.html'
+          parent: 'project.settings',
+          templateUrl: 'views/project/office365/office365.html'
         })
-        .state('app.delete', {
+        .state('project.delete', {
           url: '/delete',
-          parent: 'app',
-          templateUrl: 'views/app/delete.html',
-          controller: 'AppDeleteController'
+          parent: 'project',
+          templateUrl: 'views/project/delete.html',
+          controller: 'ProjectDeleteController'
         })
         .state('team', {
           url: '/team/:teamId',
@@ -202,7 +201,7 @@ angular
       Formio
     ) {
       $rootScope.activeSideBar = 'home';
-      $rootScope.currentApp = null;
+      $rootScope.currentProject = null;
       $rootScope.currentForm = null;
       $scope.teams = [];
       $scope.teamsLoading = true;
@@ -211,12 +210,12 @@ angular
         $scope.teamsLoading = false;
         angular.element('#team-loader').hide();
       });
-      $scope.apps = {};
-      $scope.appsLoading = true;
-      Formio.loadApps().then(function(apps) {
-        $scope.appsLoading = false;
-        angular.element('#apps-loader').hide();
-        $scope.apps = apps;
+      $scope.projects = {};
+      $scope.projectsLoading = true;
+      Formio.loadProjects().then(function(projects) {
+        $scope.projectsLoading = false;
+        angular.element('#projects-loader').hide();
+        $scope.projects = projects;
       });
     }
   ])
@@ -299,7 +298,7 @@ angular
       };
 
       var logoutError = function() {
-        $rootScope.currentApp = null;
+        $rootScope.currentProject = null;
         $rootScope.currentForm = null;
         $state.go('auth.login');
         FormioAlerts.addAlert({
@@ -317,7 +316,7 @@ angular
       // Logout of form.io and go to login page.
       $rootScope.logout = function() {
         Formio.logout().then(function() {
-          $rootScope.currentApp = null;
+          $rootScope.currentProject = null;
           $rootScope.currentForm = null;
           $state.go('auth.login');
         }).catch(logoutError);
@@ -334,7 +333,7 @@ angular
       });
 
       // Set the active sidebar.
-      $rootScope.activeSideBar = 'apps';
+      $rootScope.activeSideBar = 'projects';
 
       // Determine if a state is active.
       $rootScope.isActive = function(state) {

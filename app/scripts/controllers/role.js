@@ -42,7 +42,7 @@ app.controller('RoleController', [
       $scope.role = {
         title: '',
         description: '',
-        app: $scope.currentApp._id
+        project: $scope.currentProject._id
       };
     }
 
@@ -53,18 +53,18 @@ app.controller('RoleController', [
         return;
       }
       var method = $scope.role._id ? 'put' : 'post';
-      var url = $scope.formio.appUrl + '/role';
+      var url = $scope.formio.projectUrl + '/role';
       if($scope.role._id) {
         url += '/' + $scope.role._id;
       }
       return $http[method](url, $scope.role)
       .then(function(result) {
         if(!$scope.role._id) {
-          $scope.currentAppRoles.push(result.data);
+          $scope.currentProjectRoles.push(result.data);
         }
         else {
-          var index = _.findIndex($scope.currentAppRoles, {_id: $scope.role._id});
-          $scope.currentAppRoles.splice(index, 1, result.data);
+          var index = _.findIndex($scope.currentProjectRoles, {_id: $scope.role._id});
+          $scope.currentProjectRoles.splice(index, 1, result.data);
         }
 
         FormioAlerts.addAlert({
@@ -80,10 +80,10 @@ app.controller('RoleController', [
       if(!$scope.role || !$scope.role._id) {
         return FormioAlerts.onError(new Error('No role found.'));
       }
-      $http.delete($scope.formio.appUrl + '/role/' + $scope.role._id)
+      $http.delete($scope.formio.projectUrl + '/role/' + $scope.role._id)
       .then(function() {
-        var index = _.findIndex($scope.currentAppRoles, {_id: $scope.role._id});
-        $scope.currentAppRoles.splice(index, 1);
+        var index = _.findIndex($scope.currentProjectRoles, {_id: $scope.role._id});
+        $scope.currentProjectRoles.splice(index, 1);
 
         FormioAlerts.addAlert({
           type: 'success',

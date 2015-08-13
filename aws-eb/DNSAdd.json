@@ -1,10 +1,10 @@
 {
-  "Comment": "Add a recordset to route53 to point to <ENVIRONMENT>.form.io",
+  "Comment": "Add a recordset to route53 to point to <ENVIRONMENT>.develop-form.io",
   "Changes": [
     {
       "Action": "UPSERT",
       "ResourceRecordSet": {
-        "Name": "<ENVIRONMENT>.test-form.io.",
+        "Name": "<ENVIRONMENT>.develop-form.io.",
         "Type": "A",
         "AliasTarget": {
           "HostedZoneId": "<ALIAS_ZONE>",
@@ -16,7 +16,7 @@
     {
       "Action": "UPSERT",
       "ResourceRecordSet": {
-        "Name": "*.<ENVIRONMENT>.test-form.io.",
+        "Name": "*.<ENVIRONMENT>.develop-form.io.",
         "Type": "A",
         "AliasTarget": {
           "HostedZoneId": "<ALIAS_ZONE>",
