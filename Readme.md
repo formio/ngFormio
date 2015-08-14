@@ -3,9 +3,9 @@ http://form.io main application.
 This repository is the main application for the Form.IO project which brings in the separate components into a single
 executable for the whole https://form.io system. The main components that are included are as follows.
 
- - **ngFormio** @ /bower_components/formio - The Form.IO renderer - https://github.com/formioapp/ngFormio
- - **ngFormBuilder** @ /bower_components/ngFormBuilder - The Form.IO form builder - https://github.com/formioapp/ngFormBuilder
- - **formio** @ /node_modules/formio - The Form.IO core server - https://github.com/formioapp/formio
+ - **ngFormio** @ /bower_components/formio - The Form.IO renderer - https://github.com/formio/ngFormio
+ - **ngFormBuilder** @ /bower_components/ngFormBuilder - The Form.IO form builder - https://github.com/formio/ngFormBuilder
+ - **formio** @ /node_modules/formio - The Form.IO core server - https://github.com/formio/formio
  
 Installation (Docker)
 ------------
@@ -72,7 +72,8 @@ Next, get a database backup, and then do the following.
 
 Next, use the setup.sh script to run npm and bower install, and update the submodules.
 
-  - ```./script.sh -bng```
+  - ```cd scripts```
+  - ```./setup.sh -bngs```
   
 You should then be able to run the application locally by typing.
 

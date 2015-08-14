@@ -1,5 +1,7 @@
 'use strict';
+
 var app = angular.module('formioApp.controllers.user', []);
+
 app.controller('UserLoginController', [
   '$scope',
   '$state',
@@ -16,6 +18,7 @@ app.controller('UserLoginController', [
     });
   }
 ]);
+
 app.controller('UserRegisterController', [
   '$scope',
   '$state',

@@ -5,85 +5,119 @@ var Yadda = require('yadda');
 var English = Yadda.localisation.English;
 
 module.exports = function(formio) {
-  var getApp = function(appName, callback, errorCallback) {
-    formio.resources.application.model.findOne({'name': 'formio'}, function (err, app) {
-      if (err) {
-        errorCallback(err);
-      }
-      else if (!app) {
-        errorCallback('Application not found');
-      }
-      else {
-        callback(app);
-      }
-    });
-  }
+  // Global timeout for wait* commands.
+  var timeout = 60000;
 
-  var getForm = function(appId, formName, callback, errorCallback) {
-    formio.resources.form.model.findOne({app: appId, name: formName}, function (err, form) {
+  var getProject = function(projectName, next) {
+    formio.resources.project.model.findOne({'name': projectName}, function(err, project) {
       if (err) {
-        errorCallback(err);
+        return next(err);
+      }
+      else if (!project) {
+        return next(new Error('Project not found'));
+      }
+
+      next(null, project);
+    });
+  };
+
+  var getForm = function(projectId, formName, next) {
+    formio.resources.form.model.findOne({project: projectId, name: formName}, function(err, form) {
+      if (err) {
+        return next(err);
       }
       else if (!form) {
-        errorCallback('Form not found');
+        return next(new Error('Form not found'));
       }
-      else {
-        callback(form);
-      }
-    });
-  }
 
-  var getSubmission = function(filter, callback, errorCallback) {
-    formio.resources.submission.model.findOne(filter, function (err, submission) {
+      next(null, form);
+    });
+  };
+
+  var getSubmission = function(filter, next) {
+    formio.resources.submission.model.findOne(filter, function(err, submission) {
       if (err) {
-        errorCallback(err);
+        return next(err);
       }
-      else {
-        callback(submission);
-      }
-    });
-  }
 
-  var createSubmission = function(submission, callback, errorCallback) {
-    formio.resources.submission.model.create(submission, function (err, submission) {
+      next(null, submission);
+    });
+  };
+
+  var createSubmission = function(submission, next) {
+    formio.resources.submission.model.create(submission, function(err, submission) {
       if (err) {
-        errorCallback(err);
+        return next(err);
       }
-      else {
-        callback(submission);
-      }
+
+      next(null, submission);
     });
+  };
+
+  var ensureOnPage = function(path, next) {
+    if (!path) {
+      path = '/app/#';
+    }
+    this.driver.url()
+      .then(function(res) {
+        // Already on the page.
+        if (res.value === path) {
+          return next();
+        }
+        this.driver.url(path)
+          .then(function() {
+            next();
+          });
+      });
   }
 
-  var authUser = function(appName, formName, email, password, callback, errorCallback) {
-    getApp('formio', function(app) {
-      getForm(app._id, 'user', function(form) {
+  var authUser = function(projectName, formName, email, password, next) {
+    getProject('formio', function(err, project) {
+      if (err) {
+        // Throw errors that show the db is in a bad state, no tests can pass without this.
+        throw err;
+      }
+
+      getForm(project._id, 'user', function(err, form) {
+        if (err) {
+          // Throw errors that show the db is in a bad state, no tests can pass without this.
+          throw err;
+        }
+
         formio.auth.authenticate(form, 'email', 'password', email, password, function(err, res) {
           if (err) {
-            callback(null);
+            return next(err);
           }
-          else {
-            callback(res);
-          }
-        })
-      }, errorCallback);
-    }, errorCallback);
-  }
 
-  var createUser = function(appName, formName, email, password, callback, errorCallback) {
-    getApp(appName, function(app) {
-      getForm(app._id, formName, function(form) {
+          next(null, res);
+        });
+      });
+    });
+  };
+
+  var createUser = function(projectName, formName, email, password, next) {
+    getProject(projectName, function(err, project) {
+      if (err) {
+        // Throw errors that show the db is in a bad state, no tests can pass without this.
+        throw err;
+      }
+
+      getForm(project._id, formName, function(err, form) {
+        if (err) {
+          // Throw errors that show the db is in a bad state, no tests can pass without this.
+          throw err;
+        }
+
         var encrypt = require('formio/app/actions/fields/password');
         var req = {
-          body:
-          {
-            data:
-            {
+          body: {
+            data: {
               email: email,
               password: password
             }
           }
         };
+
         encrypt.beforePost({key: 'password'}, req, {}, function() {
           createSubmission({
             form: form._id,
@@ -91,57 +125,56 @@ module.exports = function(formio) {
               email: email,
               password:req.body.data.password
             }
-          }, function(user) {
-            callback(user);
-          }, errorCallback);
+          }, next);
         });
-      }, errorCallback);
-    }, errorCallback);
-  }
+      });
+    });
+  };
 
   var createAndAuthUser = function(email, password, next) {
-    createUser('formio', 'user', email, password, function() {
-      authUser('formio', 'user', email, password, function(res) {
-        if (res) {
-          next(null, res);
-        }
-        else {
-          next(new Error('Authentication Failed.'));
-        }
-      });
-    }, next);
+    createUser('formio', 'user', email, password, function(err, user) {
+      if (err) {
+        return next(err);
+      }
 
-  }
+      authUser('formio', 'user', email, password, function(err, res) {
+        if (err) {
+          return next(err);
+        }
+        if (!res) {
+          return next(new Error('Authentication Failed.'));
+        }
+
+        next(null, res);
+      });
+    });
+  };
 
   var library = English.library()
-    .given("I am (?:on|at) (?:the )?(.+?)(?: page)?$", function(url, next) {
-      var path = url;
-      if (path === 'home') {
-        path = '/'
-      }
-      this.driver.url(path).then(function() {
-        setTimeout(next, 500);
-      });
+    .given('I am (?:on|at) (?:the )?(.+?)(?: page)?$', function(url, next) {
+      var path = (url === 'home') ? 'http://localhost:3000/' : 'http://localhost:3000' + url;
+
+      this.driver.url(path)
+        .then(function() {
+          next();
+        });
     })
     .given('an account exists with the email $EMAIL and the password $PASSWORD', function(email, password, next) {
-      authUser('formio', 'user', email, password, function(res) {
-        if (!res) {
+      authUser('formio', 'user', email, password, function(err, res) {
+        if (err || !res) {
           // User doesn't exist. Create it.
-          createUser('formio', 'user', email, password, function() {
-            next();
-          }, next);
+          return createUser('formio', 'user', email, password, next, next);
         }
-        else {
-          // User already exists. Do nothing.
-          next();
-        }
+
+        // User already exists. Do nothing.
+        next();
       });
     })
     .given('I am logged out', function(next) {
       this.driver.localStorage('DELETE', 'formioToken')
         .then(function() {
           next();
-        })
+        }.bind(this))
         .catch(function(err) {
           next(err);
         });
@@ -152,63 +185,90 @@ module.exports = function(formio) {
       var driver = this.driver;
       createAndAuthUser(email, password, function(err, res) {
         if (err) {
-          next(err);
+          return next(err);
         }
-        else {
-          driver.localStorage('POST', {key: 'formioToken', value: res.token.token})
-            .then(function() {
-              driver.url('/app').then(function() {
-                setTimeout(next, 500);
-              })
-            });
-        }
+
+        driver.localStorage('POST', {key: 'formioToken', value: res.token.token})
+          .then(function() {
+            next();
+          })
+          .catch(function(err) {
+            next(err);
+          });
       });
     })
     .given('I am logged in as $EMAIL with password $PASSWORD', function(email, password, next) {
-      authUser('formio', 'user', email, password, function(res) {
-        if (res) {
-          driver.localStorage('POST', {key: 'formioToken', value: res.token.token})
-            .then(function() {
-               next();
-            });
+      authUser('formio', 'user', email, password, function(err, res) {
+        if (err) {
+          return next(err);
         }
-        else {
-          next(new Error('Authentication Failed.'));
+        if (!res) {
+          return next(new Error('Authentication Failed.'));
         }
+
+        driver.localStorage('POST', {key: 'formioToken', value: res.token.token})
+          .then(function() {
+            next();
+          });
       });
     })
     .when('I click (?:on )?the $LINK link', function(link, next) {
-      this.driver.click('=' + link)
+      this.driver.waitForExist('=' + link, timeout)
         .then(function() {
-          setTimeout(next, 500);
-        })
+          this.driver.click('=' + link)
+            .then(function() {
+              next();
+            })
+            .catch(function(err) {
+              next(err);
+            });
+        }.bind(this))
         .catch(function(err) {
           next(err);
         });
     })
     .when('I click (?:on )?the $BUTTON button', function(button, next) {
-      this.driver.click('button=' + button)
+      this.driver.click('//div[@id=\'form-group-submit\']//button[\'' + button + '\']')
         .then(function() {
-          setTimeout(next, 500);
-        })
-        .catch(function(err) {
-          next(err);
+          next();
         });
     })
     .when('I enter $TEXT in the $FIELD field', function(text, field, next) {
-      this.driver.setValue(field, text)
+      this.driver.waitForExist(field, timeout)
         .then(function() {
-          next();
+          this.driver.setValue(field, text)
+            .then(function() {
+              next();
+            })
+            .catch(function(err) {
+              next(err);
+            });
+        }.bind(this))
+        .catch(function(err) {
+          next(err);
+        });
+    })
+    .when('I expand the user menu', function(next) {
+      var driver = this.driver
+      driver.waitForExist('#user-menu')
+        .then(function() {
+          driver.click('#user-menu')
+            .then(function() {
+              next();
+            })
+            .catch(function(err) {
+              next(err);
+            })
         })
         .catch(function(err) {
           next(err);
         });
     })
-    .then('the title is $TITLE', function(given_title, next) {
+    .then('the title is $TITLE', function(title, next) {
       this.driver.getTitle()
-        .then(function(title) {
+        .then(function(res) {
           try {
-            assert.equal(title, given_title);
+            assert.equal(res, title);
             next();
           }
           catch(err) {
@@ -220,22 +280,12 @@ module.exports = function(formio) {
         });
     })
     .then('I am (?:on|at) (?:the )?(.+?)(?: page)$', function(path, next) {
-      if (path === 'home') {
-        path = '/'
-      }
-      var url = this.driver.options.baseUrl + path;
+      path = (path === 'home') ? 'http://localhost:3000/' : 'http://localhost:3000' + path;
+
       this.driver.url()
         .then(function(res) {
-          try {
-            assert.equal(res.value, url);
-            next();
-          }
-          catch(err) {
-            next(err);
-          }
-        })
-        .catch(function(err) {
-          next(err);
+          assert.equal(res.value, path);
+          next();
         });
     })
     .then('I have been logged in', function(next) {
@@ -243,34 +293,38 @@ module.exports = function(formio) {
         if (err) {
           return next(err);
         }
-        else if (!res.value) {
-          return next(new Error('No token set.'));
+        if ((!err) && (res.value)) {
+          return next();
         }
+
+        next(new Error('No formioToken found; ' + JSON.stringify(res)));
+      });
+    })
+    .then('I have been logged out', function(next) {
+      this.driver.localStorage('GET', 'formioToken', function(err, res) {
+        if (err) {
+          return next(err);
+        }
+        if ((!err) && (res.value)) {
+          return next(new Error('User still logged in: ' + JSON.stringify(res)));
+        }
+
         next();
       });
     })
-    .then('I have not been logged in', function(next) {
-      this.driver.localStorage('GET', 'formioToken', function(err, res) {
-        if (err) {
-          next(err);
-        }
-        else if (res.value) {
-          next(new Error('Token set.'));
-        }
-        else {
-          next();
-        }
-      });
-    })
     .then('I see an alert with (?:the text )?$TEXT', function(text, next) {
-      this.driver.element('.alert=' + text)
-        .then(function(err, html) {
-          next();
-        })
+      this.driver.waitForExist('//div[@role=\'alert\']', timeout)
+        .then(function() {
+          this.driver.getText('//div[@role=\'alert\']')
+            .then(function(alert) {
+              assert.equal(text, alert);
+              next();
+            });
+        }.bind(this))
         .catch(function(err) {
           next(err);
-      });
-    })
+        });
+    });
 
   return library;
 };

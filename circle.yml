@@ -4,6 +4,7 @@ general:
       - develop
       - /feature\/.*/
       - /release\/.*/
+      - /bugfix\/.*/
 
 machine:
   python:
@@ -17,30 +18,42 @@ machine:
     MONGO: "mongodb://localhost:27017/formio"
 
 dependencies:
+  cache_directories:
+    - "~/docker"
+    - "~/mongodb-linux-x86_64-ubuntu1204-3.0.5"
+  pre:
+    - if [[ ! -d mongodb-linux-x86_64-ubuntu1204-3.0.5 ]]; then wget http://downloads.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1204-3.0.5.tgz && tar xvzf mongodb-linux-x86_64-ubuntu1204-3.0.5.tgz; fi
+    - sudo /etc/init.d/mongodb stop
+    - sudo cp mongodb-linux-x86_64-ubuntu1204-3.0.5/bin/* /usr/bin
+    - sudo /etc/init.d/mongodb start
   override:
     - echo $TAG_NAME:
         environment:
           TAG_NAME: $(./scripts/getTagName.sh)
     - pip install awscli
     - ./scripts/setup.sh -snb
+    - if [[ -e ~/docker/formio-app.tar ]]; then docker load -i ~/docker/formio-app.tar; fi
     - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
     - docker build -t $IMAGE_PATH:$TAG_NAME .:
         environment:
           TAG_NAME: $(./scripts/getTagName.sh)
+    - mkdir -p ~/docker; docker save $IMAGE_PATH > ~/docker/formio-app.tar
   post:
     - wget http://selenium-release.storage.googleapis.com/2.46/selenium-server-standalone-2.46.0.jar
     - java -jar selenium-server-standalone-2.46.0.jar:
         background: true
     - ./scripts/importDb.sh formio
-
+ 
 test:
   pre:
     - sudo bash -c "echo \"127.0.0.1 formio.localhost\" >> /etc/hosts"
-    - docker run -d -e "MONGO1=$MONGO" -e "PROTOCOL=http" -e "DOMAIN=localhost" -e "PORT=3000" --name formio-server --net=host $IMAGE_PATH:$TAG_NAME; sleep 2:
+    - sudo bash -c "echo \"127.0.0.1 api.localhost\" >> /etc/hosts"
+    - docker run -d -e "MONGO1=$MONGO" -e "PROTOCOL=http" -e "DOMAIN=localhost" -e "PORT=3000" -e "DEBUG=formio:*" --name formio-server --net=host $IMAGE_PATH:$TAG_NAME; sleep 10:
         environment:
           TAG_NAME: $(./scripts/getTagName.sh)
     - docker logs formio-server
     - curl --retry 10 --retry-delay 5 -v http://localhost:3000
+    - curl --retry 10 --retry-delay 5 -v http://api.localhost:3000/health
 
 deployment:
   release:
@@ -67,3 +80,16 @@ deployment:
       - ./scripts/deployVersion.sh $TAG_NAME develop:
           environment:
             TAG_NAME: $(./scripts/getTagName.sh)
+  feature:
+    branch: /feature\/.*/
+    commands:
+      - docker push $IMAGE_PATH:$TAG_NAME:
+          environment:
+            TAG_NAME: $(./scripts/getTagName.sh)
+      - ./scripts/createVersion.sh $TAG_NAME:
+          environment:
+            TAG_NAME: $(./scripts/getTagName.sh)
+      - ./scripts/deployVersion.sh $TAG_NAME $FEATURE:
+          environment:
+            TAG_NAME: $(./scripts/getTagName.sh)
+            FEATURE: $(./scripts/getFeatureName.sh)
