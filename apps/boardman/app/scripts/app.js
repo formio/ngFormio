@@ -250,7 +250,7 @@ angular
         });
       };
 
-      $rootScope.$on('formio.unauthorized', logoutError);
+      $rootScope.$on('formio.sessionExpired', logoutError);
 
       // Trigger when a logout occurs.
       $rootScope.logout = function() {
