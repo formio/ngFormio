@@ -115,6 +115,11 @@ angular
           parent: 'project.settings',
           templateUrl: 'views/project/email/email.html'
         })
+        .state('project.settings.databases', {
+          url: '/databases',
+          parent: 'project.settings',
+          templateUrl: 'views/project/databases/index.html'
+        })
         .state('project.settings.roles', {
           abstract: true,
           url: '/roles',
