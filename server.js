@@ -75,6 +75,29 @@ app.get('/project/:projectId/form/:formId/spec.html', function(req, res, next) {
 
 // Mount the api server.
 require('formio')(config.formio, function(formio) {
+
+  // The formio app sanity endpoint.
+  app.get('/health', function(req, res, next) {
+    if (!formio.resources) {
+      return res.status(500).send('No Resources');
+    }
+    if (!formio.resources.project.model) {
+      return res.status(500).send('No Project model');
+    }
+
+    formio.resources.project.model.findOne({name: 'formio'}, function(err, result) {
+      if (err) {
+        return res.status(500).send(err);
+      }
+      if (!result) {
+        return res.status(500).send('Formio Project not found');
+      }
+
+      // Proceed with db schema sanity check middleware.
+      next();
+    });
+  }, formio.update.sanityCheck);
+
   // Route all subdomain requests to the API server.
   app.use(vhost('*.' + config.domain, formio));
 
