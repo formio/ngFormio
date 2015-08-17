@@ -1,6 +1,7 @@
 <div class="row">
   <div class="col-sm-2 well">
     <ul class="nav nav-pills nav-stacked">
+      <li role="presentation" ng-class="{active:($state.includes('project.settings.project'))}"><a ui-sref="project.settings.project">General Settings</a></li>
       <li role="presentation" ng-class="{active:($state.includes('project.settings.email'))}"><a ui-sref="project.settings.email">Email Settings</a></li>
       <li role="presentation" ng-class="{active:($state.includes('project.settings.roles'))}"><a ui-sref="project.settings.roles.view">Roles</a></li>
       <li role="presentation" ng-class="{active:($state.includes('project.settings.office365'))}"><a ui-sref="project.settings.office365">Office 365</a></li>

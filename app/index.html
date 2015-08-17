@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="/bower_components/ngDialog/css/ngDialog.css" />
     <link rel="stylesheet" href="/bower_components/ngDialog/css/ngDialog-theme-default.css" />
     <link rel="stylesheet" href="/bower_components/ng-sortable/dist/ng-sortable.css" />
+    <link rel="stylesheet" href="/bower_components/ng-sortable/dist/ng-sortable.style.css" />
     <link rel="stylesheet" href="/bower_components/formio/css/formio.css" />
     <link rel="stylesheet" href="/bower_components/font-awesome/css/font-awesome.css" />
     <!-- endbower -->
@@ -64,7 +65,7 @@
                 <img height="40px;" src="images/formio-logo.png" />
               </a>
               <ol class="breadcrumb">
-                <li ng-if="currentProject"><a ui-sref="project.view({projectId: currentProject._id})">{{ currentProject.title }}</a></li>
+                <li ng-if="currentProject"><a ui-sref="project.edit({projectId: currentProject._id})">{{ currentProject.title }}</a></li>
                 <li ng-if="currentForm"><a ui-sref="project.form.view({formId: currentForm._id})">{{ currentForm.title }}</a></li>
               </ol>
             </div>
@@ -156,7 +157,6 @@
     <!-- build:js scripts/app.js -->
     <!-- inject:js -->
     <script src="/scripts/app.js"></script>
-    <script src="/scripts/services/services.js"></script>
     <script src="/scripts/controllers/access.js"></script>
     <script src="/scripts/controllers/controllers.js"></script>
     <script src="/scripts/controllers/form.js"></script>
@@ -166,6 +166,7 @@
     <script src="/scripts/controllers/role.js"></script>
     <script src="/scripts/controllers/team.js"></script>
     <script src="/scripts/controllers/user.js"></script>
+    <script src="/scripts/services/services.js"></script>
     <!-- endinject -->
     <!-- endbuild -->
 

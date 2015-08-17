@@ -2,22 +2,6 @@
 
 var app = angular.module('formioApp.controllers.project', []);
 
-app.controller('ProjectIndexController', [
-  '$scope',
-  '$rootScope',
-  'Restangular',
-  function(
-    $scope,
-    $rootScope,
-    Restangular
-  ) {
-    $rootScope.noBreadcrumb = false;
-    $rootScope.currentProject = false;
-    $rootScope.currentForm = false;
-    $scope.projects = Restangular.all('project').getList().$object;
-  }
-]);
-
 var refreshUsers = function(userForm, $scope) {
   return function(filter) {
     userForm.loadSubmissions({params: {'data.name': filter}}).then(function(users) {
@@ -125,7 +109,7 @@ app.controller('ProjectCreateController', [
           type: 'success',
           message: 'New Project created!'
         });
-        $state.go('project.view', {projectId: project._id});
+        $state.go('project.edit', {projectId: project._id});
       }, function(error) {
         if (error.data.message && error.data.message.indexOf('duplicate key error index') !== -1) {
           error.data.errors.name = {
@@ -182,63 +166,38 @@ app.controller('ProjectController', [
     $scope.getRole = function(id) {
       return _.find($scope.currentProjectRoles, {_id: id});
     };
+  }
+]);
 
-    // Save the project.
+app.controller('ProjectSettingsController', [
+  '$scope',
+  '$rootScope',
+  '$state',
+  'FormioAlerts',
+  'Formio',
+  function(
+    $scope,
+    $rootScope,
+    $state,
+    FormioAlerts,
+    Formio
+  ) {
+    // Go to first settings section
+    if($state.current.name === 'project.settings') {
+      $state.go('project.settings.project', {location: 'replace'});
+    }
+
+    $rootScope.noBreadcrumb = false;
+    $scope.users = [];
+    $scope.refreshUsers = refreshUsers(new Formio($rootScope.userForm), $scope);
+
+    // Save the Project.
     $scope.saveProject = function() {
       // Need to strip hyphens at the end before submitting
       if($scope.currentProject.name) {
         $scope.currentProject.name = $scope.currentProject.name.toLowerCase().replace(/[^0-9a-z\-]|^\-+|\-+$/g, '');
       }
 
-      if (!$scope.currentProject._id) { return FormioAlerts.onError(new Error('No Project found.')); }
-      $scope.formio.saveProject($scope.currentProject).then(function(project) {
-        FormioAlerts.addAlert({
-          type: 'success',
-          message: 'Project saved.'
-        });
-        $state.go('project.view', {
-          projectId: project._id
-        });
-      }, function(error) {
-        FormioAlerts.onError(error);
-      });
-    };
-  }
-]);
-
-app.controller('ProjectEditController', [
-  '$scope',
-  '$rootScope',
-  '$state',
-  'Formio',
-  function(
-    $scope,
-    $rootScope,
-    $state,
-    Formio
-  ) {
-    $rootScope.noBreadcrumb = false;
-    $scope.users = [];
-    $scope.refreshUsers = refreshUsers(new Formio($rootScope.userForm), $scope);
-  }
-]);
-
-app.controller('ProjectSettingsController', [
-  '$scope',
-  '$state',
-  'FormioAlerts',
-  function(
-    $scope,
-    $state,
-    FormioAlerts
-  ) {
-    // Go to first settings section
-    if($state.current.name === 'project.settings') {
-      $state.go('project.settings.email', {location: 'replace'});
-    }
-
-    // Save the Project.
-    $scope.saveProject = function() {
       if (!$scope.currentProject._id) { return FormioAlerts.onError(new Error('No Project found.')); }
       $scope.formio.saveProject($scope.currentProject).then(function(project) {
         FormioAlerts.addAlert({

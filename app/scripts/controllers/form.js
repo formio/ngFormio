@@ -354,7 +354,7 @@ app.controller('FormDeleteController', [
         type: 'success',
         message: 'Form was deleted.'
       });
-      $state.go('project.view');
+      $state.go('project.edit');
     });
 
     $scope.$on('cancel', function() {

@@ -31,12 +31,11 @@
               <td>
                 <div class="row">
                   <div class="col-sm-5">
-                    <h4><a ui-sref="project.view({projectId: project._id})">{{ project.title }}</a></h4>
+                    <h4><a ui-sref="project.edit({projectId: project._id})">{{ project.title }}</a></h4>
                   </div>
                   <div class="col-sm-7">
                     <div class="button-group pull-right" style="display:flex;">
                       <a ui-sref="project.edit({projectId: project._id})" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-edit"></span> Edit</a>&nbsp;
-                      <a ui-sref="project.settings({projectId: project._id})" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-cog"></span> Settings</a>&nbsp;
                       <a ui-sref="project.delete({projectId: project._id})" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-trash"></span></a>
                     </div>
                   </div>
