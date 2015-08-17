@@ -2178,6 +2178,15 @@ app.directive('signature', function () {
         backgroundColor: scope.component.backgroundColor
       });
 
+      scope.$watch('component.penColor', function(newValue) {
+        signaturePad.penColor = newValue;
+      });
+
+      scope.$watch('component.backgroundColor', function(newValue) {
+        signaturePad.backgroundColor = newValue;
+        signaturePad.clear();
+      });
+
       // Clear the signature.
       scope.component.clearSignature = function() {
         signaturePad.clear();
