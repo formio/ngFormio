@@ -1,29 +1,42 @@
 'use strict';
 
+var _ = require('lodash');
+var debug = {
+  config: require('debug')('formio:config')
+};
+
 module.exports = function() {
   var config = {
     'formio': {}
   };
 
   var protocol = process.env.PROTOCOL || 'https';
+  var project = process.env.PROJECT || 'formio';
+
+  // Set the App settings.
   var domain = process.env.DOMAIN || 'form.io';
   var port = process.env.PORT || 80;
-  var app = process.env.APP || 'formio';
   var host = protocol + '://' + domain;
-  var formioHost = protocol + '://' + app + '.' + domain;
+  var apiHost = protocol + '://api.' + domain;
+  var formioHost = protocol + '://' + project + '.' + domain;
 
   if (port !== 80) {
     host += ':' + port;
+    apiHost += ':' + port;
     formioHost += ':' + port;
   }
 
-  config.https = (protocol === 'https');
-  config.host = host;
-  config.port = port;
-  config.formioHost = formioHost;
+  // Configure app server settings.
   config.debug = process.env.DEBUG || false;
+  config.https = (protocol === 'https');
+  config.domain = domain;
   config.formio.domain = domain;
-  config.formio.schema = '1.0.0';
+  config.port = port;
+  config.host = host;
+
+  config.project = project;
+  config.apiHost = apiHost;
+  config.formioHost = formioHost;
 
   if (process.env.MONGO1) {
     config.formio.mongo = [];
@@ -45,8 +58,7 @@ module.exports = function() {
 
   // This secret is used to encrypt certain DB fields at rest in the mongo database
   config.formio.mongoSecret = process.env.DB_SECRET || 'abc123';
-
-  config.formio.appSupport = process.env.APP_SUPPORT || true;
+  config.formio.projectSupport = process.env.PROJECT_SUPPORT || true;
   config.formio.reservedSubdomains = ['test', 'www', 'api', 'help', 'support'];
   config.formio.reservedForms = ['submission', 'export'];
 
@@ -63,5 +75,14 @@ module.exports = function() {
   config.formio.jwt.secret = process.env.JWT_SECRET || 'abc123';
   config.formio.jwt.expireTime = process.env.JWT_EXPIRE_TIME || 240;
 
+  // Allow the config to be displayed when debugged.
+  var sanitized = _.clone(config);
+  sanitized = _.pick(sanitized, [
+    'https', 'domain', 'port', 'host', 'project', 'formioHost', 'apiHost', 'debug'
+  ]);
+  sanitized.formio = _.pick(sanitized.formio, ['domain', 'schema', 'mongo']);
+
+  // Only output sanitized data.
+  debug.config(sanitized);
   return config;
 };

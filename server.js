@@ -4,6 +4,7 @@ require('dotenv').load({silent: true});
 var config = require('./config')();
 var express = require('express');
 var nunjucks = require('nunjucks');
+var vhost = require('vhost');
 var _ = require('lodash');
 var app = express();
 
@@ -30,8 +31,9 @@ app.get('/config.js', function(req, res) {
   res.set('Content-Type', 'text/javascript');
   res.render('js/config.js', {
     forceSSL: config.https ? 'true' : 'false',
-    domain: config.formio.domain,
-    host: config.host,
+    domain: config.domain,
+    appHost: config.host,
+    apiHost: config.apiHost,
     formioHost: config.formioHost
   });
 });
@@ -54,49 +56,28 @@ _.each(apps, function(path, name) {
   app.use('/apps/' + name, express.static(path));
 });
 
-// Add the formio application.
+// Add the formio Project.
 app.use('/app', express.static(__dirname + '/dist'));
 
 // Show the docs page for the API.
-app.get('/app/spec.html', function (req, res, next) {
+app.get('/spec.html', function(req, res, next) {
   res.render('docs.html', {
-    url: req.protocol + '://' + req.get('host') + '/api/spec.json'
+    url: '/spec.json'
   });
 });
 
 // Get the specs for each form.
-app.get('/app/form/:formId/spec.html', function (req, res, next) {
+app.get('/project/:projectId/form/:formId/spec.html', function(req, res, next) {
   res.render('docs.html', {
-    url: '/app/api/form/' + req.params.formId + '/spec.json'
+    url: '/project/' + req.params.projectId + '/form/' + req.params.formId + '/spec.json'
   });
 });
 
 // Mount the api server.
 require('formio')(config.formio, function(formio) {
-  // The formio app sanity endpoint.
-  app.get('/health', function(req, res, next) {
-    if (!formio.resources) {
-      return res.status(500).send('No Resources');
-    }
-    if (!formio.resources.application.model) {
-      return res.status(500).send('No application model');
-    }
+  // Route all subdomain requests to the API server.
+  app.use(vhost('*.' + config.domain, formio));
 
-    formio.resources.application.model.findOne({name: 'formio'}, function(err, result) {
-      if (err) {
-        return res.status(500).send(err);
-      }
-      if (!result) {
-        return res.status(500).send('Formio application not found');
-      }
-
-      // Proceed with db schema sanity check middleware.
-      next();
-    });
-  }, formio.update.sanityCheck);
-
-  app.use('/app/api', formio);
-  console.log('Starting server');
   console.log(' > Listening to ' + config.host);
   app.listen(config.port);
 });

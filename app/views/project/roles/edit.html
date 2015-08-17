@@ -9,8 +9,8 @@
     <input ng-model="role.description" type="text" class="form-control" id="description" name="description" placeholder="Role description">
   </div>
   <div class="pull-right">
-      <a ng-if="role._id" ui-sref="app.settings.roles.delete({roleId: role._id})" class="btn btn-danger">Delete</a>
-      <a ng-if="!role._id" ui-sref="app.settings.roles.view()" class="btn btn-default">Cancel</a>
+      <a ng-if="role._id" ui-sref="project.settings.roles.delete({roleId: role._id})" class="btn btn-danger">Delete</a>
+      <a ng-if="!role._id" ui-sref="project.settings.roles.view()" class="btn btn-default">Cancel</a>
       <button type="submit" class="btn btn-primary" ng-disabled="roleForm.$invalid">{{role._id ? 'Save Changes' : 'Create Role'}}</button>
   </div>
   <div ng-if="role._id">
@@ -33,7 +33,7 @@
         </td>
         <td class="col-xs-1">
           <div class="button-group pull-right" style="display:flex;">
-            <a ui-sref="app.form.permission({appId: currentApp._id, formId: form._id})" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-edit"></span> Edit</a>
+            <a ui-sref="project.form.permission({projectId: currentProject._id, formId: form._id})" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-edit"></span> Edit</a>
           </div>
         </td>
       </tr>
