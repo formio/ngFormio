@@ -1,0 +1,34 @@
+<br/>
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Form.io Swagger API Explorer
+      <a class="pull-right" href="http://help.form.io/userguide/#explorer" target="_blank">
+        <i class="glyphicon glyphicon-question-sign "></i>
+      </a>
+    </h3>
+  </div>
+
+  <br>
+
+  <div class="panel-heading">
+    <h4 class="panel-title">Build your own Developer Program</h4>
+  </div>
+  <div class="panel-body">
+    <p><b>You don't need the API Explorer to create and use Form.io forms in HTML.</b></p>
+    <p>You can quickly build forms and add them using simple HTML with our <a href="#" target="_blank">quick start guide</a>.</p>
+    <p>The API explorer helps programmers quickly integrate your Forms into other programs like Phone apps, other servers, and other programming languages.  Think of it as your own Developer Program.</p>
+  </div>
+
+  <div class="panel-heading">
+    <h4 class="panel-title">Swagger-UI API Explorer</h4>
+  </div>
+  <div class="panel-body">
+    <iframe id="docs" ng-src="{{ getSwaggerURL() | trusted }}"></iframe>
+    <script type="text/javascript">
+      jQuery('#docs').seamless({
+        spinner: '',
+        loading: ''
+      });
+    </script>
+  </div>
+</div>

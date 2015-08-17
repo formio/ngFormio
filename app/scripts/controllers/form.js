@@ -71,6 +71,12 @@ app.config([
         parent: 'project.form',
         templateUrl: 'views/form/permission/index.html',
         controller: 'FormSubmissionsController'
+      })
+      .state('project.form.explorer', {
+        url: '/explorer',
+        parent: 'project.form',
+        templateUrl: 'views/form/explorer/index.html',
+        controller: 'FormExplorerController'
       });
 
     var formStates = {};
@@ -245,8 +251,9 @@ app.controller('FormController', [
     }
     $scope.submissionAccessLabels = SubmissionAccessLabels;
     // Get the swagger URL.
-    $scope.getSwaggerURL = function() {
-      return AppConfig.apiBase + '/project/' + $scope.projectId + '/form/' + $scope.formId + '/spec.html?token=' + Formio.getToken();
+    $scope.getSwaggerURL = function(format) {
+      format = format || 'html';
+      return AppConfig.apiBase + '/project/' + $scope.projectId + '/form/' + $scope.formId + '/spec.'+format+'?token=' + Formio.getToken();
     };
 
     // When a submission is made.
@@ -668,3 +675,17 @@ app.constant('SubmissionAccessLabels', {
     tooltip: 'The Delete Own Submissions permission will allow a user, with one of the given Roles, to delete a Submission. A user can only delete a Submission if they are defined as its owner.'
   }
 });
+
+
+app.controller('FormExplorerController', [
+  '$scope',
+  '$state',
+  'Formio',
+  function(
+    $scope,
+    $state,
+    Formio
+  ) {
+    $scope.token = Formio.getToken();
+  }
+]);
