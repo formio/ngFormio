@@ -8,8 +8,8 @@
  *
  * Main module of the application.
  */
-var formioBaseUrl = 'https://form.io/api';
-var boardmanAPI = 'https://boardman.form.io/api';
+var formioBaseUrl = 'http://api.localhost:3000';
+var boardmanAPI = 'http://boardman.localhost:3000';
 
 angular
   .module('boardmanApp', [
@@ -250,7 +250,7 @@ angular
         });
       };
 
-      $rootScope.$on('formio.unauthorized', logoutError);
+      $rootScope.$on('formio.sessionExpired', logoutError);
 
       // Trigger when a logout occurs.
       $rootScope.logout = function() {

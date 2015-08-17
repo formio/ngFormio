@@ -25,6 +25,9 @@ body {
 
 ul.dropdown-menu {
   padding-bottom: 5px;
+  li > a {
+    cursor: pointer;
+  }
 }
 
 .navbar-brand {
