@@ -2,20 +2,6 @@
 
 var app = angular.module('formioApp.controllers.project', []);
 
-var refreshUsers = function(userForm, $scope) {
-  return function(filter) {
-    userForm.loadSubmissions({params: {'data.name': filter}}).then(function(users) {
-      $scope.users = [];
-      angular.forEach(users, function(user) {
-        $scope.users.push({
-          id: user._id,
-          name: user.data.name
-        });
-      });
-    });
-  };
-};
-
 /*
 * Prevents user inputting non-alphanumeric characters or starting the domain with a hyphen.
 * Also automatically lowercases the domain.
@@ -85,19 +71,15 @@ app.controller('ProjectCreateController', [
   '$state',
   'Restangular',
   'FormioAlerts',
-  'Formio',
   function(
     $scope,
     $rootScope,
     $state,
     Restangular,
-    FormioAlerts,
-    Formio
+    FormioAlerts
   ) {
     $rootScope.noBreadcrumb = false;
     $scope.currentProject = {};
-    $scope.users = [];
-    $scope.refreshUsers = refreshUsers(new Formio($rootScope.userForm), $scope);
     $scope.saveProject = function() {
       // Need to strip hyphens at the end before submitting
       if($scope.currentProject.name) {
@@ -174,22 +156,16 @@ app.controller('ProjectSettingsController', [
   '$rootScope',
   '$state',
   'FormioAlerts',
-  'Formio',
   function(
     $scope,
     $rootScope,
     $state,
-    FormioAlerts,
-    Formio
+    FormioAlerts
   ) {
     // Go to first settings section
     if($state.current.name === 'project.settings') {
       $state.go('project.settings.project', {location: 'replace'});
     }
-
-    $rootScope.noBreadcrumb = false;
-    $scope.users = [];
-    $scope.refreshUsers = refreshUsers(new Formio($rootScope.userForm), $scope);
 
     // Save the Project.
     $scope.saveProject = function() {
