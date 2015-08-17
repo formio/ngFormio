@@ -1,4 +1,4 @@
-<div ng-if="!$state.includes('project.form')" class="app-nav">
+<div ng-if="!($state.includes('project.form') || $state.includes('project.form.createForm'))" class="app-nav">
   <div class="row app-row">
     <div class="col-sm-6">
       <div class="app-title">{{ currentProject.title }}</div>
