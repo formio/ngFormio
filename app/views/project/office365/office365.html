@@ -15,7 +15,7 @@
   <input ng-model="currentProject.settings.office365.email" type="text" class="form-control" id="email" placeholder="Example: joe@example.onmicrosoft.com">
 </div>
 <div class="form-group">
-  <label for="cert" class="control-label">Application Certificate Private Key</label>
+  <label for="cert" class="control-label">Private Key</label>
   <textarea class="form-control" ng-model="currentProject.settings.office365.cert" id="cert" placeholder="-----BEGIN RSA PRIVATE KEY-----
 MIIEpAIBAA...
 ...
@@ -23,7 +23,7 @@ MIIEpAIBAA...
 -----END RSA PRIVATE KEY-----" rows="10"></textarea>
 </div>
 <div class="form-group">
-  <label for="thumbprint">Application Certificate Thumbprint</label>
-  <input ng-model="currentProject.settings.office365.thumbprint" type="text" class="form-control" id="thumbprint" placeholder="Enter the Hexidecimal formatted thumbprint for your certificate.">
+  <label for="thumbprint">Certificate Fingerprint</label>
+  <input ng-model="currentProject.settings.office365.thumbprint" type="text" class="form-control" id="thumbprint" placeholder="Enter the Hexidecimal formatted fingerprint for your certificate.">
 </div>
 <button class="btn btn-primary" ng-click="saveProject()">Save Settings</button>
