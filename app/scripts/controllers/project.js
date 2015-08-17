@@ -180,7 +180,7 @@ app.controller('ProjectController', [
     }).catch(function(err) {
       FormioAlerts.addAlert({
         type: 'danger',
-        message: 'Could not load Application (' + (err.message || err) + ')'
+        message: 'Could not load Project (' + (err.message || err) + ')'
       });
       $state.go('home');
     });
