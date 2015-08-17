@@ -177,6 +177,12 @@ app.controller('ProjectController', [
     }).then(function(result) {
       $scope.currentProjectRoles = result.data;
       $scope.rolesLoading = false;
+    }).catch(function(err) {
+      FormioAlerts.addAlert({
+        type: 'danger',
+        message: 'Could not load Project (' + (err.message || err) + ')'
+      });
+      $state.go('home');
     });
 
     $scope.getRole = function(id) {
