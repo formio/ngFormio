@@ -3,7 +3,6 @@
 require('dotenv').load({silent: true});
 var config = require('./config')();
 var express = require('express');
-var formioCors = require('./formioCors');
 var nunjucks = require('nunjucks');
 var vhost = require('vhost');
 var _ = require('lodash');
@@ -95,9 +94,6 @@ require('formio')(config.formio, function(formio) {
       next();
     });
   }, formio.update.sanityCheck);
-
-  // CORS Support
-  app.use(formioCors(formio));
 
   // Route all subdomain requests to the API server.
   app.use(vhost('*.' + config.domain, formio));
