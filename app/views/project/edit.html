@@ -18,6 +18,10 @@
         <label for="description" class="control-label">Description</label>
         <input type="text" class="form-control" id="description" ng-model="currentProject.description" placeholder="Enter a short description for your project/website.">
     </div>
+    <div id="form-group-cors" class="form-group">
+        <label for="cors" class="control-label">CORS - Cross Origin Resource Sharing</label>
+        <textarea class="form-control" id="cors" ng-model="currentProject.cors" placeholder="List all domains forms will be embedded on. Use * to allow all domains. Using * can be a security issue. Separate multiple domains with commas."></textarea>
+    </div>
     <div class="pull-right">
         <a ng-if="currentProject && currentProject._id" ui-sref="project.delete()" class="btn btn-danger">Delete</a>
         <a ng-if="!currentProject._id" ui-sref="home()" class="btn btn-default">Cancel</a>
