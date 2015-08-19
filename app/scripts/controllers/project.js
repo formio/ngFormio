@@ -116,8 +116,15 @@ app.controller('ProjectCreateController', [
     $scope.refreshUsers = refreshUsers(new Formio($rootScope.userForm), $scope);
     $scope.saveProject = function() {
       // Need to strip hyphens at the end before submitting
-      if($scope.currentProject.name) {
+      if ($scope.currentProject.name) {
         $scope.currentProject.name = $scope.currentProject.name.toLowerCase().replace(/[^0-9a-z\-]|^\-+|\-+$/g, '');
+      }
+      // Default all new projects to have cors set to '*'.
+      if (!$scope.currentProject.settings) {
+        $scope.currentProject.settings = {};
+      }
+      if (!$scope.currentProject.settings.cors) {
+        $scope.currentProject.settings.cors = '*';
       }
 
       Restangular.all('project').post($scope.currentProject).then(function(project) {
