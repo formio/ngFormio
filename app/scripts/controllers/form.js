@@ -352,7 +352,7 @@ app.controller('FormDeleteController', [
     $scope.$on('delete', function() {
       FormioAlerts.addAlert({
         type: 'success',
-        message: 'Form was deleted.'
+        message: _.capitalize($scope.form.type) + ' was deleted.'
       });
       $state.go('project.view');
     });
