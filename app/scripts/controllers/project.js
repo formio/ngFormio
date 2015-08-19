@@ -178,10 +178,18 @@ app.controller('ProjectController', [
       $scope.currentProjectRoles = result.data;
       $scope.rolesLoading = false;
     }).catch(function(err) {
-      FormioAlerts.addAlert({
-        type: 'danger',
-        message: 'Could not load Project (' + (err.message || err) + ')'
-      });
+      if (!err) {
+        FormioAlerts.addAlert({
+          type: 'danger',
+          message: window.location.origin + ' is not allowed to access the API. To fix this, go to your project page on https://form.io and add ' + window.location.origin + ' to your project CORS settings.'
+        });
+      }
+      else {
+        FormioAlerts.addAlert({
+          type: 'danger',
+          message: 'Could not load Project (' + (err.message || err) + ')'
+        });
+      }
       $state.go('home');
     });
 

@@ -143,6 +143,11 @@ angular
           templateUrl: 'views/project/roles/delete.html',
           controller: 'RoleController'
         })
+        .state('project.settings.cors', {
+          url: '/cors',
+          parent: 'project.settings',
+          templateUrl: 'views/project/cors/index.html'
+        })
         .state('project.settings.office365', {
           url: '/office365',
           parent: 'project.settings',
