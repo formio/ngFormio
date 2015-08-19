@@ -1,5 +1,5 @@
 <ol class="breadcrumb">
     <li><a ui-sref="home()"><i class="fa fa-home"></i></a></li>
-    <li ng-if="currentProject"><a ui-sref="project.view({projectId: currentProject._id})">{{ currentProject.name }}</a></li>
+    <li ng-if="currentProject"><a ui-sref="project.edit({projectId: currentProject._id})">{{ currentProject.name }}</a></li>
 </ol>
 <formio src="teamForm"></formio>

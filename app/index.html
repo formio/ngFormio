@@ -65,7 +65,7 @@
                 <img height="40px;" src="images/formio-logo.png" />
               </a>
               <ol class="breadcrumb">
-                <li ng-if="currentProject"><a ui-sref="project.view({projectId: currentProject._id})">{{ currentProject.title }}</a></li>
+                <li ng-if="currentProject"><a ui-sref="project.edit({projectId: currentProject._id})">{{ currentProject.title }}</a></li>
                 <li ng-if="currentForm"><a ui-sref="project.form.view({formId: currentForm._id})">{{ currentForm.title }}</a></li>
               </ol>
             </div>

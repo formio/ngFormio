@@ -361,7 +361,7 @@ app.controller('FormDeleteController', [
         type: 'success',
         message: 'Form was deleted.'
       });
-      $state.go('project.view');
+      $state.go('project.edit');
     });
 
     $scope.$on('cancel', function() {
@@ -478,13 +478,19 @@ app.controller('FormActionAddController', [
   '$scope',
   '$stateParams',
   '$state',
+  '$cacheFactory',
   'FormioAlerts',
   function(
     $scope,
     $stateParams,
     $state,
+    $cacheFactory,
     FormioAlerts
   ) {
+    // Invalidate cache so actions fetch fresh request for
+    // component selection inputs.
+    $cacheFactory.get('$http').removeAll();
+
     loadActionInfo($scope, $stateParams);
     $scope.$on('formSubmission', function() {
       FormioAlerts.addAlert({type: 'success', message: 'Action was created.'});

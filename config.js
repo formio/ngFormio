@@ -36,6 +36,7 @@ module.exports = function() {
 
   config.project = project;
   config.apiHost = apiHost;
+  config.formio.apiHost = apiHost;
   config.formioHost = formioHost;
 
   if (process.env.MONGO1) {

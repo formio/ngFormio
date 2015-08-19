@@ -11,7 +11,10 @@
         <h3 class="panel-title"><a ui-sref="opportunityIndex()" class="btn btn-success"><i class="fa fa-building"></i> Opportunities</a></h3>
       </div>
       <div class="panel-body">
-        <table class="table table-striped">
+        <div ng-if="opportunities.length == 0" class="alert alert-info" role="alert">
+          You currently do not have any opportunties associated with your account. Click <strong>New Opportunity</strong> to add one.
+        </div>
+        <table ng-if="opportunities.length > 0" class="table table-striped">
           <thead>
           <tr>
             <th>For</th>
@@ -44,7 +47,10 @@
         <h3 class="panel-title"><a ui-sref="customerIndex()" class="btn btn-success"><i class="fa fa-users"></i> Customers</a></h3>
       </div>
       <div class="panel-body">
-        <table class="table table-striped">
+        <div ng-if="customers.length == 0" class="alert alert-info" role="alert">
+          You currently no customers associated with this application. Click <strong>New Customer</strong> to add one.
+        </div>
+        <table ng-if="customers.length > 0" class="table table-striped">
           <thead>
           <tr>
             <th>Name</th>
@@ -80,7 +86,10 @@
         <h3 class="panel-title"><a ui-sref="contractIndex()" class="btn btn-success"><i class="fa fa-dollar"></i> Contracts</a></h3>
       </div>
       <div class="panel-body">
-        <table class="table table-striped">
+        <div ng-if="contracts.length == 0" class="alert alert-info" role="alert">
+          You currently do not have any contracts associated with your account. Click <strong>New Contract</strong> to add one.
+        </div>
+        <table ng-if="contracts.length > 0" class="table table-striped">
           <thead>
           <tr>
             <th>Company</th>
