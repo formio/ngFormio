@@ -2,22 +2,6 @@
 
 var app = angular.module('formioApp.controllers.project', []);
 
-app.controller('ProjectIndexController', [
-  '$scope',
-  '$rootScope',
-  'Restangular',
-  function(
-    $scope,
-    $rootScope,
-    Restangular
-  ) {
-    $rootScope.noBreadcrumb = false;
-    $rootScope.currentProject = false;
-    $rootScope.currentForm = false;
-    $scope.projects = Restangular.all('project').getList().$object;
-  }
-]);
-
 var refreshUsers = function(userForm, $scope) {
   return function(filter) {
     userForm.loadSubmissions({params: {'data.name': filter}}).then(function(users) {
@@ -99,14 +83,12 @@ app.controller('ProjectCreateController', [
   '$scope',
   '$rootScope',
   '$state',
-  'Restangular',
   'FormioAlerts',
   'Formio',
   function(
     $scope,
     $rootScope,
     $state,
-    Restangular,
     FormioAlerts,
     Formio
   ) {
@@ -114,13 +96,14 @@ app.controller('ProjectCreateController', [
     $scope.currentProject = {};
     $scope.users = [];
     $scope.refreshUsers = refreshUsers(new Formio($rootScope.userForm), $scope);
+    var formio = new Formio();
     $scope.saveProject = function() {
       // Need to strip hyphens at the end before submitting
       if($scope.currentProject.name) {
         $scope.currentProject.name = $scope.currentProject.name.toLowerCase().replace(/[^0-9a-z\-]|^\-+|\-+$/g, '');
       }
 
-      Restangular.all('project').post($scope.currentProject).then(function(project) {
+      formio.saveProject($scope.currentProject).then(function(project) {
         FormioAlerts.addAlert({
           type: 'success',
           message: 'New Project created!'
