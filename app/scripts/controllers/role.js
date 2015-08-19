@@ -92,7 +92,15 @@ app.controller('RoleController', [
 
         $scope.back();
       }).catch(function(err) {
-        FormioAlerts.onError({message: (err.status === 404) ? 'Role not found' : err.data});
+        var error = {};
+        switch(err.status) {
+          case 404: error.message = 'Role not found.';
+            break;
+          case 405: error.message = 'The ' + $scope.role.title + ' role is required. This can be renamed but not deleted, because it is the role assigned to unauthenticated users.';
+            break;
+          default: error.message = err.data;
+        }
+        FormioAlerts.onError(error);
       });
     };
 
