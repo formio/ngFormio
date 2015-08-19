@@ -386,7 +386,13 @@ app.factory('FormioScope', [
     return {
       onError: function($scope) {
         return function(error) {
-          if (error.name === 'ValidationError') {
+          if (!error) {
+            $scope.showAlerts({
+              type: 'danger',
+              message: window.location.origin + ' is not allowed to access the API. To fix this, go to your project page on https://form.io and add ' + window.location.origin + ' to your project CORS settings.'
+            });
+          }
+          else if (error.name === 'ValidationError') {
             angular.element('#form-group-' + error.details[0].path).addClass('has-error');
             var message = 'ValidationError: ' + error.details[0].message;
             $scope.showAlerts({
@@ -1046,6 +1052,9 @@ app.factory('formioInterceptor', [
       if (parseInt(response.status, 10) === 440) {
         response.loggedOut = true;
         this.setToken(null);
+      }
+      else if (parseInt(response.status, 10) === 0) {
+        console.log(window.location.origin + ' is not allowed to access the API. To fix this, go to your project page on https://form.io and add ' + window.location.origin + ' to your project CORS settings.');
       }
       return $q.reject(response);
     }.bind(Interceptor);
