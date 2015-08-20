@@ -18,7 +18,6 @@ app.provider('Formio', function() {
   var baseUrl = '';
   var domain;
   var noalias = false;
-  var rootUrl = '';
   var cache = {};
 
   /**
@@ -34,28 +33,6 @@ app.provider('Formio', function() {
    */
   var getUrlParts = function(url) {
     return url.match(/^(http[s]?:\/\/)([^/]+)($|\/.*)/);
-  };
-
-  /**
-   * Get the root url to show all applications.
-   */
-  var getRootUrl = function(url) {
-    if (rootUrl) { return rootUrl; }
-    if (!url) { return ''; }
-    var parts = getUrlParts(url);
-    if (parts.length <= 2) { return parts.join('.'); }
-    var rootDomain = domain;
-    // Revert to old behavior if domain is not set.
-    if(!rootDomain) {
-      var domainParts = parts[2].split('.');
-      if(domainParts.length > 2) {
-        domainParts.splice(0, (domainParts.length - 2));
-      }
-      rootDomain = domainParts.join('.');
-    }
-    rootUrl = parts[1] + rootDomain;
-    rootUrl += (parts.length > 3) ? parts[3] : '';
-    return rootUrl;
   };
 
   // Return the provider interface.
@@ -91,9 +68,8 @@ app.provider('Formio', function() {
           if (!path) { return; }
 
           // Initialize our variables.
-          this.appUrl = '';
-          this.appId = '';
-          this.appId = '';
+          this.projectUrl = '';
+          this.projectId = '';
           this.formUrl = '';
           this.formsUrl = '';
           this.formId = '';
@@ -106,7 +82,7 @@ app.provider('Formio', function() {
 
           // Normalize to an absolute path.
           if ((path.indexOf('http') !== 0) && (path.indexOf('//') !== 0)) {
-            baseUrl = baseUrl ? baseUrl : $location.absUrl().match(/http[s]?:\/\/[^/?]*/)[0] + '/app/api';
+            baseUrl = baseUrl ? baseUrl : $location.absUrl().match(/http[s]?:\/\/api./)[0];
             path = baseUrl + path;
           }
 
@@ -125,17 +101,17 @@ app.provider('Formio', function() {
             }
             if (!noalias && hostnames.length >= 2) {
               subdomain = hostnames[0];
-              this.appId = subdomain;
+              this.projectId = subdomain;
             }
           }
           // Revert to old behavior if domain is not set
           else {
             hostnames = (hostparts.length > 2) ? hostparts[2].split('.') : [];
-            if(!noalias && (
-              ((hostnames.length === 2) && (hostnames[1].indexOf('localhost') === 0)) || (hostnames.length >= 3)
-              )) {
+            if(!noalias &&
+              (((hostnames.length === 2) && (hostnames[1].indexOf('localhost') === 0)) || (hostnames.length >= 3))
+            ) {
               subdomain = hostnames[0];
-              this.appId = subdomain;
+              this.projectId = subdomain;
             }
           }
 
@@ -150,11 +126,10 @@ app.provider('Formio', function() {
           var paths = [];
 
           // See if this url has a subdomain.
-          if (subdomain) {
-
+          if (subdomain && subdomain !== 'api') {
             // Get the paths.
-            paths = path.match(/(http[s]?:\/\/.*app\/api)\/?([^?]*)?/);
-            if (paths.length > 1) {
+            paths = path.match(/(http[s]?:\/\/?.*\..*?)\/([^?]*)?/);
+            if (paths && paths.length > 1) {
               paths.shift();
             }
           }
@@ -165,18 +140,17 @@ app.provider('Formio', function() {
               paths[0] = paths[1] ? path.replace('/' + paths[1], '') : path;
             }
             else {
-
-              // Assume this is an app url.
+              // Assume this is a project url.
               paths[0] = path;
             }
           }
 
           if (paths.length > 0) {
-            this.appUrl = (paths.length > 0) ? paths[0] : '';
-            this.appId = true;
-            this.formsUrl = this.appUrl ? (this.appUrl + '/form') : '';
+            this.projectUrl = paths[0];
+            this.projectId = true;
+            this.formsUrl = this.projectUrl ? (this.projectUrl + '/form') : '';
             this.formId = (paths.length > 1) ? paths[1] : '';
-            this.formUrl = this.appUrl ? (this.appUrl + '/' + this.formId) : '';
+            this.formUrl = this.projectUrl ? (this.projectUrl + '/' + this.formId) : '';
             this.pathType = (subs && (subs.length > 0)) ? subs[0] : '';
             angular.forEach(['submission', 'action'], function(item) {
               var index = item + 'sUrl';
@@ -192,12 +166,14 @@ app.provider('Formio', function() {
         /**
          * When a request error occurs.
          * @param deferred
-         * @param error
          */
         var requestError = function(deferred) {
           return function(error) {
             if (error === 'Unauthorized') {
               $rootScope.$broadcast('formio.unauthorized', error);
+            }
+            else if (error === 'Login Timeout') {
+              $rootScope.$broadcast('formio.sessionExpired', error);
             }
             deferred.reject(error);
           };
@@ -310,9 +286,9 @@ app.provider('Formio', function() {
         };
 
         // Define specific CRUD methods.
-        Formio.prototype.loadApp = _load('app');
-        Formio.prototype.saveApp = _save('app');
-        Formio.prototype.deleteApp = _delete('app');
+        Formio.prototype.loadProject = _load('project');
+        Formio.prototype.saveProject = _save('project');
+        Formio.prototype.deleteProject = _delete('project');
         Formio.prototype.loadForm = _load('form');
         Formio.prototype.saveForm = _save('form');
         Formio.prototype.deleteForm = _delete('form');
@@ -328,7 +304,7 @@ app.provider('Formio', function() {
         Formio.prototype.availableActions = function() { return request(this.formUrl + '/actions'); };
 
         // Static methods.
-        Formio.loadApps = function() { return request(baseUrl + '/app'); };
+        Formio.loadProjects = function() { return request(baseUrl + '/project'); };
         Formio.clearCache = function() { cache = {}; };
         Formio.baseUrl = baseUrl;
         Formio.setUser = formioInterceptor.setUser.bind(formioInterceptor);
@@ -944,6 +920,7 @@ app.directive('formioComponent', [
 
           // Add a new field value.
           $scope.addFieldValue = function() {
+            $scope.data[$scope.component.key] = $scope.data[$scope.component.key] || [];
             $scope.data[$scope.component.key].push('');
           };
 
@@ -1049,8 +1026,14 @@ app.factory('formioInterceptor', [
      * @type {function(this:{token: string, setToken: Function, getToken: Function})}
      */
     Interceptor.response = function(response) {
+      var responseCode = parseInt(response.status, 10);
       var token = response.headers('x-jwt-token');
-      if (token || (token === '')) { this.setToken(token); }
+      if (responseCode === 200 && token && token !== '') {
+        this.setToken(token);
+      }
+      else if (responseCode === 204 && token && token === '') {
+        this.setToken(token);
+      }
       return response;
     }.bind(Interceptor);
 
@@ -1060,7 +1043,7 @@ app.factory('formioInterceptor', [
      * @type {function(this:{token: string, setToken: Function, getToken: Function, setUser: Function, getUser: Function})}
      */
     Interceptor.responseError = function(response) {
-      if (parseInt(response.status, 10) === 401) {
+      if (parseInt(response.status, 10) === 440) {
         response.loggedOut = true;
         this.setToken(null);
       }
@@ -1087,6 +1070,13 @@ app.config([
   function(
     $httpProvider
   ) {
+    if (!$httpProvider.defaults.headers.get) {
+      $httpProvider.defaults.headers.get = {};
+    }
+
+    // Disable IE caching for GET requests.
+    $httpProvider.defaults.headers.get['Cache-Control'] = 'no-cache';
+    $httpProvider.defaults.headers.get.Pragma = 'no-cache';
     $httpProvider.interceptors.push('formioInterceptor');
   }
 ]);
@@ -1271,6 +1261,7 @@ app.run([
         'name="{{ component.key }}" ' +
         'ng-disabled="readOnly" ' +
         'ng-model="data[component.key]" ' +
+        'ng-model-options="{ debounce: 500 }" ' +
         'ng-required="component.validate.required" ' +
         'ng-minlength="component.validate.minLength" ' +
         'ng-maxlength="component.validate.maxLength" ' +
@@ -1300,7 +1291,11 @@ app.config([
             {
               disableJWT: true,
               params: params,
-              headers: {Authorization: undefined}
+              headers: {
+                Authorization: undefined,
+                Pragma: undefined,
+                'Cache-Control': undefined
+              }
             }
           ).then(function(response) {
             $scope.addresses = response.data.results;
@@ -1335,7 +1330,7 @@ app.run([
       '<span ng-if="!component.label && component.validate.required" class="glyphicon glyphicon-asterisk form-control-feedback field-required-inline" aria-hidden="true"></span>' +
       '<ui-select ng-model="data[component.key]" ng-disabled="readOnly" ng-required="component.validate.required" id="{{ component.key }}" theme="bootstrap">' +
         '<ui-select-match placeholder="{{ component.placeholder }}">{{$item.formatted_address || $select.selected.formatted_address}}</ui-select-match>' +
-        '<ui-select-choices repeat="address in addresses track by $index" refresh="refreshAddress($select.search)" refresh-delay="1000">' +
+        '<ui-select-choices repeat="address in addresses track by $index" refresh="refreshAddress($select.search)" refresh-delay="500">' +
           '<div ng-bind-html="address.formatted_address | highlight: $select.search"></div>' +
         '</ui-select-choices>' +
       '</ui-select>'
@@ -1876,7 +1871,7 @@ app.config([
       controller: function(settings, $scope, $http, Formio) {
         $scope.selectItems = [];
         if (settings.resource) {
-          var formio = new Formio($scope.formio.appUrl + '/form/' + settings.resource);
+          var formio = new Formio($scope.formio.projectUrl + '/form/' + settings.resource);
           var params = {};
 
           // If they wish to filter the results.
@@ -1924,6 +1919,7 @@ app.config([
         key: '',
         placeholder: '',
         resource: '',
+        defaultValue: '',
         template: '<span>{{ item.data }}</span>',
         selectFields: '',
         searchExpression: '',
@@ -2031,13 +2027,23 @@ app.config([
             }
             break;
           case 'url':
+            var options = {cache: true};
             if(settings.data.url.substr(0, 1) === '/') {
               settings.data.url = Formio.baseUrl + settings.data.url;
             }
-            $http.get(settings.data.url, {
-              disableJWT: true,
-              headers: {Authorization: undefined}
-            }).success(function(data) {
+
+            // Disable auth for outgoing requests.
+            if (settings.data.url.indexOf(Formio.baseUrl) === -1) {
+              options = {
+                disableJWT: true,
+                headers: {
+                  Authorization: undefined,
+                  Pragma: undefined,
+                  'Cache-Control': undefined
+                }
+              };
+            }
+            $http.get(settings.data.url, options).success(function(data) {
               $scope.selectItems = data;
             });
             break;
@@ -2065,6 +2071,7 @@ app.config([
         },
         dataSrc: 'values',
         valueProperty: '',
+        defaultValue: '',
         template: '<span>{{ item.label }}</span>',
         multiple: false,
         refresh: false,
@@ -2169,6 +2176,15 @@ app.directive('signature', function () {
         maxWidth: scope.component.maxWidth,
         penColor: scope.component.penColor,
         backgroundColor: scope.component.backgroundColor
+      });
+
+      scope.$watch('component.penColor', function(newValue) {
+        signaturePad.penColor = newValue;
+      });
+
+      scope.$watch('component.backgroundColor', function(newValue) {
+        signaturePad.backgroundColor = newValue;
+        signaturePad.clear();
       });
 
       // Clear the signature.
