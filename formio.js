@@ -63,7 +63,13 @@ app.provider('Formio', function() {
 
           // Ensure we have an instance of Formio.
           if (!(this instanceof Formio)) { return new Formio(path); }
-          if (!path) { return; }
+          if (!path) {
+            // Allow user to create new projects if this was instantiated without
+            // a url
+            this.projectUrl = baseUrl + '/project';
+            this.projectId = false;
+            return;
+          }
 
           // Initialize our variables.
           this.projectUrl = '';
