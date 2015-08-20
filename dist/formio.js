@@ -706,7 +706,6 @@ app.directive('formioDelete', function() {
           $scope.formioAlerts = [].concat(alerts);
         };
         var resourceName = 'resource';
-        var resourceTitle = 'Resource';
         var methodName = '';
         var loader = FormioScope.register($scope, {
           form: true,
@@ -715,16 +714,18 @@ app.directive('formioDelete', function() {
 
         if (loader) {
           resourceName = loader.submissionId ? 'submission' : 'form';
-          resourceTitle = resourceName.charAt(0).toUpperCase() + resourceName.slice(1);
+          var resourceTitle = resourceName.charAt(0).toUpperCase() + resourceName.slice(1);
           methodName = 'delete' + resourceTitle;
         }
 
         // Set the resource name
-        $scope._resourceName = $scope.resourceName || resourceName;
+        $scope._resourceName = resourceName;
 
         // Create delete capability.
         $scope.onDelete = function() {
-
+          // Rebuild resourceTitle, $scope.resourceName could have changed
+          var resourceName = $scope.resourceName || $scope._resourceName;
+          var resourceTitle = resourceName.charAt(0).toUpperCase() + resourceName.slice(1);
           // Called when the delete is done.
           var onDeleteDone = function(data) {
             $scope.showAlerts({
@@ -1101,7 +1102,7 @@ app.run([
         '<div ng-repeat="alert in formioAlerts" class="alert alert-{{ alert.type }}" role="alert">' +
           '{{ alert.message }}' +
         '</div>' +
-        '<h3>Are you sure you wish to delete the {{ _resourceName }}?</h3>' +
+        '<h3>Are you sure you wish to delete the {{ resourceName || _resourceName }}?</h3>' +
         '<div class="btn-toolbar">' +
           '<button ng-click="onDelete()" class="btn btn-danger">Yes</button>' +
           '<button ng-click="onCancel()" class="btn btn-default">No</button>' +
