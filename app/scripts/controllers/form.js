@@ -389,9 +389,8 @@ app.controller('FormActionIndexController', [
         });
       }
       else {
-        FormioAlerts.addAlert({
-          type: 'danger',
-          message: 'You must add an action to continue.',
+        FormioAlerts.onError({
+          message: 'You must select an action to add.',
           element: 'action-select'
         });
       }
