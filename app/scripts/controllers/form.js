@@ -238,7 +238,13 @@ app.controller('FormController', [
       $scope.loadFormPromise = $scope.formio.loadForm().then(function(form) {
         $scope.form = form;
         $rootScope.currentForm = $scope.form;
-      });
+      }, FormioAlerts.onError.bind(FormioAlerts));
+      $scope.formio.loadActions().then(function(actions) {
+        $scope.actions = actions;
+        $scope.hasAuthAction = actions.some(function(action) {
+          return action.name === 'auth'
+        });
+      }, FormioAlerts.onError.bind(FormioAlerts));
     }
     else {
       $scope.loadFormPromise = $q.when();
@@ -380,7 +386,6 @@ app.controller('FormActionIndexController', [
   ) {
     $scope.newAction = {name: '', title: 'Select an Action'};
     $scope.availableActions = {};
-    $scope.actions = {};
     $scope.addAction = function() {
       if ($scope.newAction.name) {
         $state.go('project.form.action.add', {
@@ -528,6 +533,10 @@ app.controller('FormActionDeleteController', [
       FormioAlerts.addAlert({type: 'success', message: 'Action was deleted.'});
       $state.go('project.form.action.index');
     });
+    $scope.$on('cancel', function() {
+      $state.go('project.form.action.index');
+    });
+
   }
 ]);
 
