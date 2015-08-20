@@ -22,7 +22,7 @@
     "bootswatch": "3.3.4+1",
     "signature_pad": "~1.3.6",
     "bootstrap-ui-datetime-picker": "~1.1.0",
-    "formio": "https://github.com/formio/ngFormio.git#feature/fa-261-cors"
+    "formio": "https://github.com/formio/ngFormio.git#700f62873"
   },
   "resolutions": {
     "angular": "~1.3.15",
