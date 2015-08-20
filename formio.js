@@ -874,9 +874,13 @@ app.directive('formioComponent', [
           $http
         ) {
 
+          $scope.resetForm = function() {
+            $scope.data = {};
+          };
+
           // Initialize the data.
           if (!$scope.data) {
-            $scope.data = {};
+            $scope.resetForm();
           }
 
           // If this component references an object, we need to determine the
