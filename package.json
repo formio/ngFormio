@@ -50,7 +50,7 @@
     "debug": "^2.2.0",
     "dotenv": "1.2.0",
     "express": "4.12.3",
-    "formio": "git+ssh://git@github.com/formio/formio.git#0.2.1",
+    "formio": "git+ssh://git@github.com/formio/formio.git#develop",
     "lodash": "3.10.0",
     "moment": "2.10.3",
     "nodemailer": "1.4.0",
