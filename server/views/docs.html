@@ -52,8 +52,8 @@
     }();
 
     function addApiKeyAuthorization(key){
-      var apiKeyAuth = new ApiKeyAuthorization( "Authorization", "Bearer " + key, "header" );
-      //window.swaggerUi.api.clientAuthorizations.add( "bearer", apiKeyAuth );
+      var apiKeyAuth = new ApiKeyAuthorization( "x-jwt-token", key, "header" );
+      window.authorizations.add("key", apiKeyAuth);
     }
 
     // Connect the child to the parent.
