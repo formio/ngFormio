@@ -4,6 +4,7 @@ app.config([
     formioComponentsProvider.register('content', {
       title: 'Content',
       template: 'formio/components/content.html',
+      group: 'layout',
       settings: {
         input: false,
         html: ''

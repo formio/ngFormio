@@ -4,6 +4,7 @@ app.config([
     formioComponentsProvider.register('fieldset', {
       title: 'Field Set',
       template: 'formio/components/fieldset.html',
+      group: 'layout',
       settings: {
         input: false,
         tableView: true,

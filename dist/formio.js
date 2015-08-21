@@ -1493,6 +1493,7 @@ app.config([
     formioComponentsProvider.register('content', {
       title: 'Content',
       template: 'formio/components/content.html',
+      group: 'layout',
       settings: {
         input: false,
         html: ''
@@ -1617,6 +1618,7 @@ app.config([
     formioComponentsProvider.register('fieldset', {
       title: 'Field Set',
       template: 'formio/components/fieldset.html',
+      group: 'layout',
       settings: {
         input: false,
         tableView: true,
