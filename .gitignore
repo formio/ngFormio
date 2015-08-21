@@ -9,3 +9,4 @@ test/bower_components
 dist
 aws-eb/versions
 test/screenshots/*.png
+*~
