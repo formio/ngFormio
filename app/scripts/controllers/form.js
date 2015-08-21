@@ -242,7 +242,7 @@ app.controller('FormController', [
       $scope.formio.loadActions().then(function(actions) {
         $scope.actions = actions;
         $scope.hasAuthAction = actions.some(function(action) {
-          return action.name === 'auth'
+          return action.name === 'auth';
         });
       }, FormioAlerts.onError.bind(FormioAlerts));
     }
