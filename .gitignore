@@ -1,12 +1,8 @@
 .DS_Store
 node_modules
 .env
-.tmp
-.sass-cache
-bower_components
 test/bower_components
 .idea
-dist
-aws-eb/versions
+deployment/aws-eb/versions
 test/screenshots/*.png
 *~

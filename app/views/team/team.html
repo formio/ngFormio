@@ -1,9 +1,0 @@
-<ol class="breadcrumb">
-    <li><a ui-sref="home()"><i class="fa fa-home"></i></a></li>
-    <li ng-if="currentProject"><a ui-sref="project.edit({projectId: currentProject._id})">{{ currentProject.name }}</a></li>
-</ol>
-<ul class="nav nav-tabs">
-    <li role="presentation" ng-class="{active:isActive('team.view')}"><a ui-sref="team.view()">View</a></li>
-    <li role="presentation" ng-class="{active:isActive('team.edit')}"><a ui-sref="team.edit()">Edit</a></li>
-</ul>
-<div ui-view></div>

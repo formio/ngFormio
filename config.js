@@ -29,6 +29,7 @@ module.exports = function() {
   // Configure app server settings.
   config.debug = process.env.DEBUG || false;
   config.https = (protocol === 'https');
+  config.protocol = protocol;
   config.domain = domain;
   config.formio.domain = domain;
   config.port = port;

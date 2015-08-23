@@ -38,26 +38,11 @@ app.get('/config.js', function(req, res) {
   });
 });
 
-// Mount bower_components as assets.
-app.use('/bower_components', express.static(__dirname + '/bower_components'));
-
 // Mount getting started presentation.
 app.use('/start', express.static(__dirname + '/server/start'));
 
-// Mount the brochure.
-app.use('/', express.static(__dirname + '/src/brochure'));
-
 // Include the swagger ui.
 app.use('/swagger', express.static(require('swagger-ui').dist));
-
-// Mount all of our apps.
-var apps = require('./apps/index');
-_.each(apps, function(path, name) {
-  app.use('/apps/' + name, express.static(path));
-});
-
-// Add the formio Project.
-app.use('/app', express.static(__dirname + '/dist'));
 
 // Show the docs page for the API.
 app.get('/spec.html', function(req, res, next) {
@@ -101,6 +86,6 @@ require('formio')(config.formio, function(formio) {
   // Route all subdomain requests to the API server.
   app.use(vhost('*.' + config.domain, formio));
 
-  console.log(' > Listening to ' + config.host);
+  console.log(' > Listening to ' + config.protocol + '://*.' + config.domain + ':' + config.port);
   app.listen(config.port);
 });
