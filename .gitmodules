@@ -1,9 +1,0 @@
-[submodule "bower_components/ngFormBuilder"]
-	path = bower_components/ngFormBuilder
-	url = git@github.com:formio/ngFormBuilder.git
-[submodule "bower_components/formio"]
-	path = bower_components/formio
-	url = git@github.com:formio/ngFormio.git
-[submodule "node_modules/formio"]
-	path = node_modules/formio
-	url = git@github.com:formio/formio.git
