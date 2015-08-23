@@ -7,7 +7,8 @@
     "start": "node index.js",
     "test": "PROTOCOL=http DOMAIN=localhost PORT=3000 mocha --timeout 30000 --reporter spec test/test.js"
   },
-  "main": "./server.js",
+  "main": "./index.js",
+  "formio-server": "0.6.9",
   "devDependencies": {
     "autoprefixer-core": "^4.0.2",
     "browser-sync": "^1.8.2",
