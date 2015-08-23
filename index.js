@@ -34,7 +34,7 @@ _.each(apps, function(path, name) {
 });
 
 // Add the formio Project.
-app.use('/app', express.static(__dirname + '/src/app'));
+app.use('/app', express.static(__dirname + '/dist'));
 
 console.log(' > Listening on port ' + config.port);
 app.listen(config.port);
