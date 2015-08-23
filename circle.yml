@@ -18,9 +18,6 @@ machine:
     MONGO: "mongodb://localhost:27017/formio"
 
 dependencies:
-  cache_directories:
-    - "~/docker"
-    - "~/mongodb-linux-x86_64-ubuntu1204-3.0.5"
   pre:
     - if [[ ! -d mongodb-linux-x86_64-ubuntu1204-3.0.5 ]]; then wget http://downloads.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1204-3.0.5.tgz && tar xvzf mongodb-linux-x86_64-ubuntu1204-3.0.5.tgz; fi
     - sudo /etc/init.d/mongodb stop
@@ -32,18 +29,16 @@ dependencies:
           TAG_NAME: $(./scripts/getTagName.sh)
     - pip install awscli
     - ./scripts/setup.sh -snb
-    - if [[ -e ~/docker/formio-app.tar ]]; then docker load -i ~/docker/formio-app.tar; fi
     - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
     - docker build -t $IMAGE_PATH:$TAG_NAME .:
         environment:
           TAG_NAME: $(./scripts/getTagName.sh)
-    - mkdir -p ~/docker; docker save $IMAGE_PATH > ~/docker/formio-app.tar
   post:
     - wget http://selenium-release.storage.googleapis.com/2.46/selenium-server-standalone-2.46.0.jar
     - java -jar selenium-server-standalone-2.46.0.jar:
         background: true
     - ./scripts/importDb.sh formio
- 
+
 test:
   pre:
     - sudo bash -c "echo \"127.0.0.1 formio.localhost\" >> /etc/hosts"

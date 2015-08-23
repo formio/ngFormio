@@ -238,7 +238,13 @@ app.controller('FormController', [
       $scope.loadFormPromise = $scope.formio.loadForm().then(function(form) {
         $scope.form = form;
         $rootScope.currentForm = $scope.form;
-      });
+      }, FormioAlerts.onError.bind(FormioAlerts));
+      $scope.formio.loadActions().then(function(actions) {
+        $scope.actions = actions;
+        $scope.hasAuthAction = actions.some(function(action) {
+          return action.name === 'auth'
+        });
+      }, FormioAlerts.onError.bind(FormioAlerts));
     }
     else {
       $scope.loadFormPromise = $q.when();
@@ -352,9 +358,9 @@ app.controller('FormDeleteController', [
     $scope.$on('delete', function() {
       FormioAlerts.addAlert({
         type: 'success',
-        message: 'Form was deleted.'
+        message: _.capitalize($scope.form.type) + ' was deleted.'
       });
-      $state.go('project.view');
+      $state.go('project.edit');
     });
 
     $scope.$on('cancel', function() {
@@ -380,7 +386,6 @@ app.controller('FormActionIndexController', [
   ) {
     $scope.newAction = {name: '', title: 'Select an Action'};
     $scope.availableActions = {};
-    $scope.actions = {};
     $scope.addAction = function() {
       if ($scope.newAction.name) {
         $state.go('project.form.action.add', {
@@ -389,9 +394,8 @@ app.controller('FormActionIndexController', [
         });
       }
       else {
-        FormioAlerts.addAlert({
-          type: 'danger',
-          message: 'You must add an action to continue.',
+        FormioAlerts.onError({
+          message: 'You must select an action to add.',
           element: 'action-select'
         });
       }
@@ -471,13 +475,19 @@ app.controller('FormActionAddController', [
   '$scope',
   '$stateParams',
   '$state',
+  '$cacheFactory',
   'FormioAlerts',
   function(
     $scope,
     $stateParams,
     $state,
+    $cacheFactory,
     FormioAlerts
   ) {
+    // Invalidate cache so actions fetch fresh request for
+    // component selection inputs.
+    $cacheFactory.get('$http').removeAll();
+
     loadActionInfo($scope, $stateParams);
     $scope.$on('formSubmission', function() {
       FormioAlerts.addAlert({type: 'success', message: 'Action was created.'});
@@ -523,6 +533,10 @@ app.controller('FormActionDeleteController', [
       FormioAlerts.addAlert({type: 'success', message: 'Action was deleted.'});
       $state.go('project.form.action.index');
     });
+    $scope.$on('cancel', function() {
+      $state.go('project.form.action.index');
+    });
+
   }
 ]);
 
