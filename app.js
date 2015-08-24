@@ -7,7 +7,7 @@ var _ = require('lodash');
 var app = express();
 
 // Host the dynamic app configuration.
-//app.get('/config.js', function(req, res) {
+//app.get('/app/config.js', function(req, res) {
 //  res.set('Content-Type', 'text/javascript');
 //  res.render('js/config.js', {
 //    forceSSL: config.https ? 'true' : 'false',
