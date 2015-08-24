@@ -1,11 +1,11 @@
 module.exports = function(gulp, plugins) {
   return function () {
-    return gulp.src('app/images/**/*')
+    return gulp.src('src/app/images/**/*')
       .pipe(plugins.cache(plugins.imagemin({
         progressive: true,
         interlaced: true,
         svgoPlugins: [{cleanupIDs: false}]
       })))
-      .pipe(gulp.dest('dist/images'));
+      .pipe(gulp.dest('dist/app/images'));
   };
 };

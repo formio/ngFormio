@@ -18,23 +18,12 @@ var app = express();
 //  });
 //});
 
+// TODO: Can we get rid of this?
 // Mount bower_components as assets.
-app.use('/bower_components', express.static(__dirname + '/bower_components'));
-
-// Mount getting started presentation.
-app.use('/start', express.static(__dirname + '/src/start/html'));
-
-// Mount the brochure.
-app.use('/', express.static(__dirname + '/src/brochure'));
-
-// Mount all of our apps.
-var apps = require('./src/apps/index');
-_.each(apps, function(path, name) {
-  app.use('/apps/' + name, express.static(path));
-});
+//app.use('/bower_components', express.static(__dirname + '/bower_components'));
 
 // Add the formio Project.
-app.use('/app', express.static(__dirname + '/dist'));
+app.use('/', express.static(__dirname + '/dist'));
 
 console.log(' > Listening on port ' + config.port);
 app.listen(config.port);

@@ -4,7 +4,7 @@ module.exports = function(gulp, plugins) {
       notify: false,
       port: 9002,
       server: {
-        baseDir: ['.tmp', 'app'],
+        baseDir: ['.tmp', 'src/app'],
         routes: {
           '/bower_components': 'bower_components'
         }
@@ -13,13 +13,13 @@ module.exports = function(gulp, plugins) {
 
     // watch for changes
     gulp.watch([
-      'app/**/*.html',
-      'app/scripts/**/*.js',
-      'app/images/**/*',
+      'src/app/**/*.html',
+      'src/app/scripts/**/*.js',
+      'src/app/images/**/*',
       '.tmp/fonts/**/*'
     ]).on('change', plugins.browserSync.reload);
-    gulp.watch('app/styles/**/*.scss', ['styles']);
-    gulp.watch('app/fonts/**/*', ['fonts']);
+    gulp.watch('src/app/styles/**/*.scss', ['styles']);
+    gulp.watch('src/app/fonts/**/*', ['fonts']);
     gulp.watch('bower.json', ['wiredep', 'fonts']);
   };
 };
