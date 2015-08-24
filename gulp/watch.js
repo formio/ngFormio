@@ -4,9 +4,10 @@ module.exports = function(gulp, plugins) {
       notify: false,
       port: 9002,
       server: {
-        baseDir: ['.tmp', 'src/app'],
+        baseDir: ['.tmp', 'src'],
         routes: {
-          '/bower_components': 'bower_components'
+          '/bower_components': 'bower_components',
+          '/': 'src/brochure'
         }
       }
     });

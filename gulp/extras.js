@@ -12,9 +12,5 @@ module.exports = function(gulp, plugins) {
     ], {
       dot: true
     }).pipe(gulp.dest('dist/app'));
-    // The old system did all apps but we only have one and it shouldn't be here anyway so hard code for now.
-    gulp.src([
-      'src/apps/boardman/dist/**'
-    ]).pipe(gulp.dest('dist/apps/boardman'));
   };
 };

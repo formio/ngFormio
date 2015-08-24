@@ -18,10 +18,6 @@ var app = express();
 //  });
 //});
 
-// TODO: Can we get rid of this?
-// Mount bower_components as assets.
-//app.use('/bower_components', express.static(__dirname + '/bower_components'));
-
 // Add the formio Project.
 app.use('/', express.static(__dirname + '/dist'));
 
