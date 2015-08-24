@@ -27,6 +27,7 @@ Next, install dependencies.
 
   - ```bower install```
   - ```npm install```
+  - ```git submodule update --init --recursive```
   
 You should then be able to run the application locally by typing.
 

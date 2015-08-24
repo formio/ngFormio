@@ -9,7 +9,7 @@ var apiBase = protocol + '//api.' + serverHost;
 var formioBase = protocol + '//formio.' + serverHost;
 angular.module('formioApp').constant('AppConfig', {
   forceSSL: false,
-  domain: host,
+//  domain: host,
   appBase: appBase,
   tutorial: appBase + '/start',
   apiBase: apiBase,
