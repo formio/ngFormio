@@ -43,5 +43,11 @@
     "wiredep": "^2.0.0",
     "yadda": "^0.14.1",
     "yargs": "^3.8.0"
+  },
+  "dependencies": {
+    "debug": "^2.2.0",
+    "dotenv": "1.2.0",
+    "express": "4.12.3",
+    "lodash": "^3.10.1"
   }
 }
