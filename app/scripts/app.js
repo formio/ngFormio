@@ -93,22 +93,21 @@ angular
           templateUrl: 'views/project/create.html',
           controller: 'ProjectCreateController'
         })
-        .state('project.view', {
-          url: '/view',
-          parent: 'project',
-          templateUrl: 'views/project/view.html'
-        })
         .state('project.edit', {
           url: '/edit',
           parent: 'project',
-          templateUrl: 'views/project/edit.html',
-          controller: 'ProjectEditController'
+          templateUrl: 'views/project/edit.html'
         })
         .state('project.settings', {
           url: '/settings',
           parent: 'project',
           templateUrl: 'views/project/settings.html',
           controller: 'ProjectSettingsController'
+        })
+        .state('project.settings.project', {
+          url: '/project',
+          parent: 'project.settings',
+          templateUrl: 'views/project/project-settings.html'
         })
         .state('project.settings.email', {
           url: '/email',
