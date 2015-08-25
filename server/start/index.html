@@ -83,13 +83,17 @@
             <img style="height: 12em;" src="assets/images/build/formio-register.png" />
         </section>
         <section>
-            <p>Create an application</p>
-            <small>NOTE: Your application will need a different domain name.</small>
+            <p>Create a project</p>
+            <img src="assets/images/build/formio-new-project.png" />
+        </section>
+        <section>
+            <p>Provide project information.</p>
+            <small>NOTE: Your project will need a different domain name.</small>
             <img style="height: 12em;" src="assets/images/build/formio-app.png" />
         </section>
         <section>
           <p>Building the <strong>User</strong> resource.</p>
-          <p>Click on <strong>New Resource</strong> on your application home page.</p>
+          <p>Click on <strong>New Resource</strong> on your project home page.</p>
           <img style="height: 12em;" src="assets/images/build/formio-create-user-resource.png" />
         </section>
         <section>
@@ -121,11 +125,20 @@
         </section>
         <section>
             <p>Click <strong>Save</strong> and You now have a <strong>User</strong> resource w/ corresponding API</p>
-            <img src="assets/images/build/formio-user-done.png" />
+            <img style="height: 12em;" src="assets/images/build/formio-user-done.png" />
+        </section>
+        <section>
+            <p>Click <strong>Actions</strong> and then add a new action called <br/><strong>Role Assignment</strong></p>
+            <img src="assets/images/build/formio-user-role-action.png" />
+        </section>
+        <section>
+            <p>Select <strong>New Resource</strong>, <strong>Add Role</strong>, and <strong>Authenticated</strong></p>
+            <p><small>This assigns new registrants the role of "Authenticated" within your application.</small></p>
+            <img style="height:12em;" src="assets/images/build/formio-user-role-add.png" />
         </section>
         <section>
             <p>Building the <strong>User Login Form</strong></p>
-            <p>Click on <strong>New Form</strong> on your application home page.</p>
+            <p>Click on <strong>New Form</strong> on your project home page.</p>
             <img style="height: 12em;" src="assets/images/build/formio-user-login-click-create.png" />
         </section>
         <section>
@@ -141,13 +154,17 @@
             <img style="height: 11em;" src="assets/images/build/formio-user-login-done.png" />
         </section>
         <section>
+          <p>Enable Anonymous submissions by clicking on <strong>Permissions</strong> and add <strong>Anonymous</strong> to <strong>Create Own Submissions</strong></p>
+          <img style="height: 13em;" src="assets/images/build/formio-user-login-perms.png" />
+        </section>
+        <section>
             <p>To handle Authentication, click on the <strong>Actions</strong> tab</p>
             <p>Select <strong>Authentication</strong> action and then click <strong>Add Action</strong></p>
             <img src="assets/images/build/formio-user-login-actions.png" />
         </section>
         <section>
             <p>Select <strong>Existing Resource</strong>, <strong>Email</strong>, and <strong>Password</strong></p>
-            <img style="height: 11em;" src="assets/images/build/user-login-auth-action.png" />
+            <img style="height: 11em;" src="assets/images/build/formio-user-login-auth-action.png" />
         </section>
         <section>
             <p>Clicking <strong>Submit</strong> will now create the Login Auth action!</p>
@@ -155,16 +172,16 @@
         </section>
         <section>
             <p>Building the <strong>User Registration Form</strong></p>
-            <p>Click on <strong>New Form</strong> on your application home page.</p>
-            <img style="height: 10em;" src="assets/images/build/formio-user-reg-click-create.png" />
+            <p>Click on <strong>New Form</strong> on your project home page.</p>
+            <img style="height: 12em;" src="assets/images/build/formio-user-reg-click-create.png" />
         </section>
         <section>
             <p>Provide a title and API path for the Register form.</p>
-            <img src="assets/images/build/formio-user-register.png" />
+            <img style="height: 12em;" src="assets/images/build/formio-user-register.png" />
         </section>
         <section>
-            <p>Drag, Drop and Rename the User resource fields.</p>
-            <img src="assets/images/build/formio-user-register-fields.png" />
+            <p>Drag and Drop the User resource fields.</p>
+            <img style="height: 13em;" src="assets/images/build/formio-user-register-fields.png" />
         </section>
         <section>
             <p>Implement Verify Password by adding a new Password field</p>
@@ -173,7 +190,11 @@
         </section>
         <section>
             <p>Click <strong>Save</strong> and You now have a <strong>User Registration</strong> form w/ corresponding API</p>
-            <img style="height: 11em;" src="assets/images/build/formio-user-register-form.png" />
+            <img style="height: 12em;" src="assets/images/build/formio-user-register-form.png" />
+        </section>
+        <section>
+            <p>Enable Anonymous submissions by clicking on <strong>Permissions</strong> and add <strong>Anonymous</strong> to <strong>Create Own Submissions</strong></p>
+            <img style="height: 13em;" src="assets/images/build/formio-user-register-perms.png" />
         </section>
         <section>
             <p>To handle Authentication, click on the <strong>Actions</strong> tab</p>
@@ -191,7 +212,7 @@
         <section>
             <p>Create a <strong>Director</strong> resource.</p>
             <small><ul>
-                <li><strong>Text Field</strong> called <strong>Name</strong></li>
+                <li>Required <strong>Text Field</strong> called <strong>Name</strong></li>
                 <li><strong>Phone Number</strong> field called <strong>Phone Number</strong></li>
                 <li><strong>Address</strong> field called <strong>Address</strong></li>
             </ul></small><br/>
@@ -202,12 +223,16 @@
             <img style="height: 12em;" src="assets/images/build/formio-director-form-done.png" />
         </section>
         <section>
+          <p>Enable Authenticated use by clicking on <strong>Permissions</strong> and add <strong>Authenticated</strong> to all "own" permissions.</p>
+          <img style="height: 13em;" src="assets/images/build/formio-director-form-perms.png" />
+        </section>
+        <section>
             <p>Create a <strong>Movie</strong> resource.</p>
             <small><ul>
-                <li><strong>Text Field</strong> called <strong>Title</strong></li>
-                <li><strong>Text Field</strong> called <strong>Video</strong></li>
+                <li>Required <strong>Text Field</strong> called <strong>Title</strong></li>
+                <li>Required <strong>Text Field</strong> called <strong>Video</strong></li>
             </ul></small><br/>
-            <img style="height: 10em;" src="assets/images/build/formio-movie-fields.png" />
+            <img style="height: 12em;" src="assets/images/build/formio-movie-fields.png" />
         </section>
         <section>
             <p>Drag & Drop <strong>Resource</strong> field.</p>
@@ -217,6 +242,10 @@
         <section>
             <small><p>Click <strong>Save</strong> and You now have a <strong>Movie</strong> form w/ corresponding API</p></small>
             <img style="height: 12em;" src="assets/images/build/formio-movie-form-done.png" />
+        </section>
+        <section>
+          <p>Enable Authenticated use by clicking on <strong>Permissions</strong> and add <strong>Authenticated</strong> to all "own" permissions.</p>
+          <img style="height: 13em;" src="assets/images/build/formio-movie-perms.png" />
         </section>
         <section>
             <p>Download the Example Movie Application</p>
