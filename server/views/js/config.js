@@ -3,7 +3,7 @@ angular.module('formioApp').constant('AppConfig', {
   domain: '{{ domain }}',
   appBase: '{{ appHost }}/app',
   apiBase: '{{ apiHost }}',
-  tutorial: '{{ host }}/start',
+  tutorial: 'http://help.form.io/start',
   userForm: '{{ formioHost }}/user',
   userLoginForm: '{{ formioHost }}/user/login',
   userRegisterForm: '{{ formioHost }}/user/register',
