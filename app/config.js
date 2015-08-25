@@ -11,7 +11,7 @@ angular.module('formioApp').constant('AppConfig', {
   domain: 'localhost:3000',
   appBase: 'http://localhost:3000/app',
   apiBase: 'http://api.localhost:3000',
-  tutorial: 'http://localhost:3000/start',
+  tutorial: 'http://help.form.io/start',
   userForm: 'http://formio.localhost:3000/user',
   userLoginForm: 'http://formio.localhost:3000/user/login',
   userRegisterForm: 'http://formio.localhost:3000/user/register',
