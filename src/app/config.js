@@ -11,7 +11,7 @@ angular.module('formioApp').constant('AppConfig', {
   forceSSL: false,
 //  domain: host,
   appBase: appBase,
-  tutorial: appBase + '/start',
+  tutorial: 'http://help.form.io/start',
   apiBase: apiBase,
   userForm: formioBase + '/user',
   userLoginForm: formioBase + '/user/login',

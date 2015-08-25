@@ -4,9 +4,6 @@ module.exports = function(gulp, plugins) {
       'src/brochure/**/*'
     ]).pipe(gulp.dest('dist/'));
     gulp.src([
-      'src/start/html/**/*'
-    ]).pipe(gulp.dest('dist/start'));
-    gulp.src([
       'src/app/*.*',
       '!src/app/*.html'
     ], {
