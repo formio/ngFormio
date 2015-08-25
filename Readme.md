@@ -1,39 +1,39 @@
 http://form.io main application.
 ================================
 This repository is the main application for the Form.IO project which brings in the separate components into a single
-executable for the whole https://form.io system. The main components that are included are as follows.
+executable for the app part of the website. It is designed to be compiled and run from a CDN but includes tools to run
+locally as a node server or from gulp. You MUST be running a formio-server and connect to it or the site will not work.
 
- - **ngFormio** @ /bower_components/formio - The Form.IO renderer - https://github.com/formio/ngFormio
+ - **ngFormio** @ /bower_components/ngFormio - The Form.IO renderer - https://github.com/formio/ngFormio
  - **ngFormBuilder** @ /bower_components/ngFormBuilder - The Form.IO form builder - https://github.com/formio/ngFormBuilder
  
 Installation (Manual)
 ------------
-In order to install and run this application, you will first need to install Node.JS, Gulp, Bower, and MongoDB.
+In order to install and run this application, you will first need to install Node.JS, Gulp, and Bower. In addition, you
+you will need to run the formio-server, preferredly on port 3000. See https://github.com/formio/formio-server for
+instructions on running it.
 
   - ```brew install node```
-  - ```brew install mongodb```
   - ```npm install -g bower```
   - ```npm install -g gulp```
   
-Next, you will need to run MongoDB.
-
-  - ```mongod```
-
-Next, get a database backup, and then do the following.
- - Unzip the database so that it is a folder of BSON files.
- - ```mongorestore --db formio formio```
-
 Next, install dependencies.
 
   - ```bower install```
   - ```npm install```
   - ```git submodule update --init --recursive```
   
+Next, build the site.
+
+  - ```gulp build```
+  
+You can configure which port to run the app server on by creating a .env file and putting PORT=3001 in it. 
+  
 You should then be able to run the application locally by typing.
 
   - ```node app```
   
-You should then be able to go to http://localhost:3000 to see the https://form.io application.
+You should then be able to go to http://localhost:3001 to see the https://form.io application.
 
 Developing
 ------------
