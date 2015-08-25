@@ -45,3 +45,8 @@
   text-overflow: ellipsis;
   display: block;
 }
+
+/* Fix Safari bug that prevents you from typing in draggable password fields */
+input[type="password"][draggable="true"] {
+  -webkit-user-select:text !important;
+}
