@@ -2,6 +2,7 @@
 
 require('dotenv').load({silent: true});
 var config = require('./config')();
+var jslogger = require('jslogger')({key: config.jslogger});
 var express = require('express');
 var nunjucks = require('nunjucks');
 var vhost = require('vhost');
@@ -101,6 +102,21 @@ require('formio')(config.formio, function(formio) {
   // Route all subdomain requests to the API server.
   app.use(vhost('*.' + config.domain, formio));
 
+  // Log any handled errors.
+  app.use(function(err, req, res, next) {
+    if (err) {
+      console.log(err.stack);
+      jslogger.log(err.stack);
+    }
+    next();
+  });
+
   console.log(' > Listening to ' + config.host);
   app.listen(config.port);
+});
+
+process.on('uncaughtException', function(err) {
+  console.log('Uncaught exception: ' + err.stack);
+  jslogger.log(err.stack);
+  process.exit(1);
 });
