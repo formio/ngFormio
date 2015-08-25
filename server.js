@@ -42,9 +42,6 @@ app.get('/config.js', function(req, res) {
 // Mount bower_components as assets.
 app.use('/bower_components', express.static(__dirname + '/bower_components'));
 
-// Mount getting started presentation.
-app.use('/start', express.static(__dirname + '/server/start'));
-
 // Mount the brochure.
 app.use('/', express.static(__dirname + '/src/brochure'));
 
