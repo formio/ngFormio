@@ -100,13 +100,13 @@ require('formio')(config.formio, function(formio) {
   app.use(vhost('*.' + config.domain, formio));
 
   // Log any handled errors.
-  app.use(function(err, req, res, next) {
-    if (err) {
-      console.log(err.stack);
-      jslogger.log(err.stack);
-    }
-    next();
-  });
+  //app.use(function(err, req, res, next) {
+  //  if (err && err.stack) {
+  //    console.log(err.stack);
+  //    jslogger.log(err.stack);
+  //  }
+  //  return next(err);
+  //});
 
   console.log(' > Listening to ' + config.host);
   app.listen(config.port);
