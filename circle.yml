@@ -20,6 +20,7 @@ machine:
     IMAGE_PATH: "formio/formio-server"
     AWS_DEFAULT_REGION: "us-west-2"
     MONGO: "mongodb://localhost:27017/formio"
+    APPPORT: 3001
 
 dependencies:
   pre:
@@ -48,9 +49,9 @@ test:
     - sudo bash -c "echo \"127.0.0.1 api.localhost\" >> /etc/hosts"
     - docker run -d -e "MONGO1=$MONGO" -e "PROTOCOL=http" -e "DOMAIN=localhost" -e "PORT=3000" -e "DEBUG=formio:*" --name formio-server --net=host $IMAGE_PATH:$TAG_NAME; sleep 10
     - docker logs formio-server
-    - cd formio-app && npm start:
+    - cd formio-app && PORT=$APPPORT npm start:
         background: true
-    - curl --retry 10 --retry-delay 5 -v http://localhost:3001
+    - curl --retry 10 --retry-delay 5 -v http://localhost:$APPPORT
     - curl --retry 10 --retry-delay 5 -v http://api.localhost:3000/health
 
 deployment:
