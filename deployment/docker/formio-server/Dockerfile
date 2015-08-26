@@ -6,7 +6,7 @@ COPY . /src
 WORKDIR /src
 
 # node modules need to be compiled for the host platform.
-RUN ./deployment/scripts/setup.sh -bnrg
+RUN npm rebuild
 
 EXPOSE       80
 
