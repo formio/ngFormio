@@ -10,7 +10,7 @@ app.config([
         inputType: 'text',
         inputMask: '',
         label: '',
-        key: '',
+        key: 'textField',
         placeholder: '',
         prefix: '',
         suffix: '',

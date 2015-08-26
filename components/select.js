@@ -97,7 +97,7 @@ app.config([
         input: true,
         tableView: true,
         label: '',
-        key: '',
+        key: 'selectField',
         placeholder: '',
         data: {
           values: [{

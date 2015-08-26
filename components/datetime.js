@@ -8,7 +8,7 @@ app.config([
         input: true,
         tableView: true,
         label: '',
-        key: '',
+        key: 'datetimeField',
         placeholder: '',
         format: 'yyyy-MM-dd HH:mm',
         enableDate: true,

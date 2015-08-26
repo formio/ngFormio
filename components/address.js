@@ -35,7 +35,7 @@ app.config([
         input: true,
         tableView: true,
         label: '',
-        key: '',
+        key: 'addressField',
         placeholder: '',
         multiple: false,
         protected: false,

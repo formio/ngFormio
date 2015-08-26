@@ -11,7 +11,7 @@ app.config([
         // This hides the default label layout so we can use a special inline label
         hideLabel: true,
         label: '',
-        key: '',
+        key: 'checkboxField',
         prefix: '',
         suffix: '',
         defaultValue: false,
