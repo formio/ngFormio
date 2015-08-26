@@ -86,11 +86,6 @@ require('formio')(config.formio, function(formio) {
   // Route all subdomain requests to the API server.
   app.use(vhost('*.' + config.domain, formio));
 
-  // If we get to this request, this is a bad request as we don't know how to handle it.
-  app.use(function(req, res, next) {
-    res.status(400).send('Bad Request');
-  });
-
   console.log(' > Listening to ' + config.protocol + '://*.' + config.domain + ':' + config.port);
   app.listen(config.port);
 });
