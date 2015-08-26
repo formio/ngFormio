@@ -23,9 +23,6 @@ app.use(function(req, res, next) {
   res.redirect('https://' + req.get('Host') + req.url);
 });
 
-// CORS Support
-app.use(require('cors')());
-
 // Host the dynamic app configuration.
 app.get('/config.js', function(req, res) {
   res.set('Content-Type', 'text/javascript');

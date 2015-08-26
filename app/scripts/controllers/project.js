@@ -81,8 +81,15 @@ app.controller('ProjectCreateController', [
     var formio = new Formio();
     $scope.saveProject = function() {
       // Need to strip hyphens at the end before submitting
-      if($scope.currentProject.name) {
+      if ($scope.currentProject.name) {
         $scope.currentProject.name = $scope.currentProject.name.toLowerCase().replace(/[^0-9a-z\-]|^\-+|\-+$/g, '');
+      }
+      // Default all new projects to have cors set to '*'.
+      if (!$scope.currentProject.settings) {
+        $scope.currentProject.settings = {};
+      }
+      if (!$scope.currentProject.settings.cors) {
+        $scope.currentProject.settings.cors = '*';
       }
 
       formio.saveProject($scope.currentProject).then(function(project) {
@@ -143,10 +150,18 @@ app.controller('ProjectController', [
       $scope.currentProjectRoles = result.data;
       $scope.rolesLoading = false;
     }).catch(function(err) {
-      FormioAlerts.addAlert({
-        type: 'danger',
-        message: 'Could not load Project (' + (err.message || err) + ')'
-      });
+      if (!err) {
+        FormioAlerts.addAlert({
+          type: 'danger',
+          message: window.location.origin + ' is not allowed to access the API. To fix this, go to your project page on https://form.io and add ' + window.location.origin + ' to your project CORS settings.'
+        });
+      }
+      else {
+        FormioAlerts.addAlert({
+          type: 'danger',
+          message: 'Could not load Project (' + (err.message || err) + ')'
+        });
+      }
       $state.go('home');
     });
 
