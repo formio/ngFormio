@@ -905,6 +905,7 @@ app.directive('formioComponent', [
                   $scope.$emit('addFormComponent', {
                     type: 'hidden',
                     settings: {
+                      tableView: false,
                       key: idPath + '_id'
                     }
                   });
