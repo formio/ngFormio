@@ -70,11 +70,13 @@ app.controller('ProjectCreateController', [
   '$rootScope',
   '$state',
   'FormioAlerts',
+  'Formio',
   function(
     $scope,
     $rootScope,
     $state,
-    FormioAlerts
+    FormioAlerts,
+    Formio
   ) {
     $rootScope.noBreadcrumb = false;
     $scope.currentProject = {};
