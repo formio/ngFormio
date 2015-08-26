@@ -11,7 +11,6 @@
 angular
   .module('formioApp', [
     'ngSanitize',
-    'restangular',
     'ui.router',
     'ui.bootstrap',
     'ui.bootstrap.alert',
@@ -27,19 +26,16 @@ angular
     '$stateProvider',
     '$urlRouterProvider',
     'FormioProvider',
-    'RestangularProvider',
     'AppConfig',
     function (
       $stateProvider,
       $urlRouterProvider,
       FormioProvider,
-      RestangularProvider,
       AppConfig
     ) {
       // Set the base URL for our API.
       FormioProvider.setBaseUrl(AppConfig.apiBase);
       FormioProvider.setDomain(AppConfig.domain);
-      RestangularProvider.setBaseUrl(AppConfig.apiBase);
 
       $stateProvider
         .state('home', {

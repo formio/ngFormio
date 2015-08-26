@@ -69,24 +69,23 @@ app.controller('ProjectCreateController', [
   '$scope',
   '$rootScope',
   '$state',
-  'Restangular',
   'FormioAlerts',
   function(
     $scope,
     $rootScope,
     $state,
-    Restangular,
     FormioAlerts
   ) {
     $rootScope.noBreadcrumb = false;
     $scope.currentProject = {};
+    var formio = new Formio();
     $scope.saveProject = function() {
       // Need to strip hyphens at the end before submitting
       if($scope.currentProject.name) {
         $scope.currentProject.name = $scope.currentProject.name.toLowerCase().replace(/[^0-9a-z\-]|^\-+|\-+$/g, '');
       }
 
-      Restangular.all('project').post($scope.currentProject).then(function(project) {
+      formio.saveProject($scope.currentProject).then(function(project) {
         FormioAlerts.addAlert({
           type: 'success',
           message: 'New Project created!'

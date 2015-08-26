@@ -500,15 +500,21 @@ app.controller('FormActionEditController', [
   '$scope',
   '$stateParams',
   '$state',
+  '$cacheFactory',
   'Formio',
   'FormioAlerts',
   function(
     $scope,
     $stateParams,
     $state,
+    $cacheFactory,
     Formio,
     FormioAlerts
   ) {
+    // Invalidate cache so actions fetch fresh request for
+    // component selection inputs.
+    $cacheFactory.get('$http').removeAll();
+
     loadActionInfo($scope, $stateParams, Formio);
     $scope.$on('formSubmission', function() {
       FormioAlerts.addAlert({type: 'success', message: 'Action was updated.'});
