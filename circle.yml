@@ -38,7 +38,7 @@ dependencies:
     - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
     - docker build -t $IMAGE_PATH:$TAG_NAME deployment/docker/formio-server/.
     - git clone git@github.com:formio/formio-app.git
-    - cd formio-app && npm install && bower install && git submodule update --init --recursive && cd bower_components/ngFormBuild && bower install && cd ../ngFormio && bower install && cd ../.. && gulp
+    - cd formio-app && npm install && bower install --allow-root -s -F && rm -rf bower_components/ngForm* && git submodule update --init --recursive && cd bower_components/ngFormBuild && bower install && cd ../ngFormio && bower install && cd ../.. && gulp
   post:
     - ./deployment/scripts/importDb.sh formio
 
