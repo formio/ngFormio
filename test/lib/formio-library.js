@@ -152,7 +152,7 @@ module.exports = function(formio) {
 
   var library = English.library()
     .given('I am (?:on|at) (?:the )?(.+?)(?: page)?$', function(url, next) {
-      var path = (url === 'home') ? 'http://localhost:3000/' : 'http://localhost:3000' + url;
+      var path = (url === 'home') ? formio.config.appHost + '/' : formio.config.appHost + url;
 
       this.driver.url(path)
         .then(function() {
@@ -280,7 +280,7 @@ module.exports = function(formio) {
         });
     })
     .then('I am (?:on|at) (?:the )?(.+?)(?: page)$', function(path, next) {
-      path = (path === 'home') ? 'http://localhost:3000/' : 'http://localhost:3000' + path;
+      path = (path === 'home') ? formio.config.appHost + '/' : formio.config.appHost + path;
 
       this.driver.url()
         .then(function(res) {

@@ -5,7 +5,7 @@
   },
   "scripts": {
     "start": "node server.js",
-    "test": "PROTOCOL=http DOMAIN=localhost PORT=3000 mocha --timeout 30000 --reporter spec test/test.js"
+    "test": "APPPROTOCOL=http APPDOMAIN=localhost APPPORT=3001 mocha --timeout 30000 --reporter spec test/test.js"
   },
   "main": "./server.js",
   "dependencies": {
@@ -24,5 +24,9 @@
     "swagger-ui": "^2.1.8-M1",
     "validator": "3.41.2",
     "vhost": "^3.0.1"
+  },
+  "devDependencies": {
+    "webdriverjs-angular": "^0.1.3",
+    "yadda": "^0.15.2"
   }
 }

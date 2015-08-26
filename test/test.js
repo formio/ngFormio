@@ -5,13 +5,12 @@ require('dotenv').load({silent: true});
 var config = require('../config')();
 var Yadda = require('yadda');
 var webdriver = require('webdriverjs-angular');
-var fs = require('fs');
 var driver = null;
 var formio = null;
 var library = null;
-var protocol = process.env.PROTOCOL || 'http';
-var domain = process.env.DOMAIN || 'localhost';
-var port = process.env.PORT || 80;
+var protocol = process.env.APPPROTOCOL || 'http';
+var domain = process.env.APPDOMAIN || 'localhost';
+var port = process.env.APPPORT || 80;
 var url = (port === 80)
   ? protocol + '://' + domain
   : protocol + '://' + domain + ':' + port;
@@ -34,7 +33,7 @@ new Yadda.FeatureFileSearch('./test/features').each(function(file) {
       driver = webdriver
         .remote(options)
         .init()
-        .url(options.baseUrl, done);
+        .url(options.baseUrl + '/app', done);
     });
 
     scenarios(feature.scenarios, function(scenario) {
@@ -69,6 +68,7 @@ function loadApiServer(done) {
 
   require('formio')(config.formio, function(server) {
     formio = server;
+    formio.config.appHost = options.baseUrl;
     library = require('./lib/formio-library')(formio);
     done();
   });
