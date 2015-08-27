@@ -32,7 +32,7 @@ dependencies:
     - java -jar selenium-server-standalone-2.46.0.jar:
         background: true
     - pip install awscli
-    - npm install -g bower gulp
+    - npm install -g bower gulp mocha
   override:
     - echo $TAG_NAME
     - npm install && git submodule update --init --recursive && cd node_modules/formio && npm install
