@@ -35,11 +35,11 @@ dependencies:
     - npm install -g bower gulp mocha
   override:
     - echo $TAG_NAME
-    - npm install && git submodule update --init --recursive && cd node_modules/formio && npm install
+    - ./deployment/scripts/serverInstall.sh
     - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
     - docker build -t $IMAGE_PATH:$TAG_NAME -f deployment/docker/formio-server/Dockerfile .
     - git clone git@github.com:formio/formio-app.git
-    - cd formio-app && npm install && bower install --allow-root -s -F && rm -rf bower_components/ngForm* && git submodule update --init --recursive && cd bower_components/ngFormBuilder && bower install && cd ../ngFormio && bower install && cd ../.. && gulp
+    - cd formio-app && ../deployment/scripts/appInstall.sh
   post:
     - ./deployment/scripts/importDb.sh formio
 
@@ -47,10 +47,11 @@ test:
   pre:
     - sudo bash -c "echo \"127.0.0.1 formio.localhost\" >> /etc/hosts"
     - sudo bash -c "echo \"127.0.0.1 api.localhost\" >> /etc/hosts"
-    - docker run -d -e "MONGO1=$MONGO" -e "PROTOCOL=http" -e "DOMAIN=localhost" -e "PORT=3000" -e "DEBUG=formio:*" --name formio-server --net=host $IMAGE_PATH:$TAG_NAME; sleep 10
-    - docker logs formio-server
+    - docker run -d -e "MONGO1=$MONGO" -e "PROTOCOL=http" -e "DOMAIN=localhost" -e "PORT=3000" -e "DEBUG=formio:*" --name formio-server --net=host $IMAGE_PATH:$TAG_NAME
     - cd formio-app && PORT=$APPPORT npm start:
         background: true
+    - sleep 10
+    - docker logs formio-server
     - curl --retry 10 --retry-delay 5 -v http://localhost:$APPPORT
     - curl --retry 10 --retry-delay 5 -v http://api.localhost:3000/health
 
