@@ -2,6 +2,7 @@ general:
   branches:
     only:
       - develop
+      - test
       - /feature\/.*/
       - /^\d+\.\d+\.\d+$/
       - /bugfix\/.*/
