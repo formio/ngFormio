@@ -7,8 +7,8 @@ var _ = require('lodash');
 var app = express();
 
 // Host the dynamic app configuration.
-app.get('/app/config.js', function(req, res) {
-  require('fs').readFile(__dirname + '/dist/app/config.js', 'utf8', function(err, data) {
+app.get('/config.js', function(req, res) {
+  require('fs').readFile(__dirname + '/dist/config.js', 'utf8', function(err, data) {
     if (err) {
       res.send(404);
     }
