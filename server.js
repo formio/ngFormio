@@ -14,6 +14,16 @@ nunjucks.configure('server/views', {
   express: app
 });
 
+// Redirect www to the right server.
+app.use(function(req, res, next) {
+  if (req.get('Host').split('.')[0] !== 'www') {
+    return next();
+  }
+  var parts = req.get('Host').split('.');
+  parts.shift(); // Remove www
+  res.redirect('http://' + parts.join('.') + req.url);
+});
+
 // Make sure to redirect all http requests to https.
 app.use(function(req, res, next) {
   if (!config.https || req.secure || (req.get('X-Forwarded-Proto') === 'https') || req.url === '/health') {
