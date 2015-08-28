@@ -5,7 +5,7 @@
     "Key": "formiobot.dockercfg"
   },
   "Image": {
-    "Name": "formio/formio-app:<TAG>",
+    "Name": "formio/formio-server:<TAG>",
     "Update": "true"
   },
   "Ports": [

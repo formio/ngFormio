@@ -2,12 +2,12 @@
 
 TAG_NAME=$1
 EB_BUCKET=formio-ecs-bucket
-AWSDIR=aws-eb
+AWSDIR=deployment/aws-eb
 APPLICATION_NAME=form.io
 
 # Make sure we have values.
 if [[ -z $TAG_NAME ]]; then
-  echo "Include the tag name and environment as parameters."
+  echo "Include the tag name as parameter."
   echo "Example: ./scripts/createVersion.sh TAG_NAME"
   exit 1
 fi
@@ -20,7 +20,7 @@ mkdir -p $AWSDIR/versions/$TAG_NAME/.ebextensions
 cp $AWSDIR/.ebextensions/app.config $AWSDIR/versions/$TAG_NAME/.ebextensions/app.config
 cd $AWSDIR/versions/$TAG_NAME
 zip -r ../$TAG_NAME.zip * .ebextensions/*
-cd ../../..
+cd ../../../..
 echo "Uploading $AWSDIR/versions/$TAG_NAME.zip to s3://$EB_BUCKET/$TAG_NAME.zip"
 aws s3 cp $AWSDIR/versions/$TAG_NAME.zip s3://$EB_BUCKET/$TAG_NAME.zip
 
