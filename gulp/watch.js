@@ -4,29 +4,21 @@ module.exports = function(gulp, plugins) {
 
     bs.init({
       notify: false,
-      startPath: '/app',
       port: 9002,
-      files: {
-
-      },
       server: {
-        baseDir: ['.tmp', 'src'],
-        routes: {
-          '/bower_components': 'bower_components',
-          '/': 'src/brochure'
-        }
+        baseDir: ['.tmp', 'src']
       }
     });
 
     // watch for changes
     gulp.watch([
-      'src/app/**/*.html',
-      'src/app/scripts/**/*.js',
-      'src/app/images/**/*',
+      'src/**/*.html',
+      'src/scripts/**/*.js',
+      'src/images/**/*',
       '.tmp/fonts/**/*'
     ]).on('change', bs.reload);
-    gulp.watch('src/app/styles/**/*.scss', ['styles']);
-    gulp.watch('src/app/fonts/**/*', ['fonts']);
+    gulp.watch('src/styles/**/*.scss', ['styles']);
+    gulp.watch('src/fonts/**/*', ['fonts']);
     gulp.watch('bower.json', ['wiredep', 'fonts']);
   };
 };

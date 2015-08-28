@@ -17,8 +17,6 @@ gulp.task('img-cache', function(done) {
 gulp.task('clean', ['img-cache'], require('del').bind(null, ['.tmp', 'dist']));
 gulp.task('wiredep', require('./gulp/wiredep')(gulp, plugins));
 gulp.task('watch', require('./gulp/watch')(gulp, plugins));
-gulp.task('less', require('./gulp/less')(gulp, plugins));
-gulp.task('watchless', require('./gulp/watchless')(gulp, plugins));
 gulp.task('serve', ['wiredep', 'styles', 'fonts', 'watch']);
 gulp.task('build', ['jshint', 'wiredep', 'html', 'views', 'images', 'libraries', 'fonts', 'extras'], function() {
   return gulp.src('dist/**/*').pipe(plugins.size({title: 'build', gzip: true}));
