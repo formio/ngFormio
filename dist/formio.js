@@ -537,6 +537,24 @@ app.factory('FormioUtils', function() {
       });
       return flattened;
     },
+    eachComponent: function eachComponent(components, fn) {
+      if(!components) {
+        return;
+      }
+      angular.forEach(components, function(component) {
+        if (component.columns) {
+          angular.forEach(component.columns, function(column) {
+            eachComponent(column.components, fn);
+          });
+        }
+        else if (component.components) {
+          eachComponent(component.components, fn);
+        }
+        else {
+          fn(component);
+        }
+      });
+    },
     fieldWrap: function(input) {
       input = input + '<formio-errors></formio-errors>';
       var multiInput = input.replace('data[component.key]', 'data[component.key][$index]');
