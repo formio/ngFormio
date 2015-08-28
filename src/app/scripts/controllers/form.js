@@ -525,7 +525,16 @@ app.controller('FormActionAddController', [
       if(actionInfo && actionInfo.name === 'sql') {
         FormioUtils.eachComponent(actionInfo.settingsForm.components, function(component) {
           if(component.key === 'settings[type]' && JSON.parse(component.data.json).length === 0) {
-            FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> You do not have any SQL servers configured. You can add a SQL server in your <a href="#/project/'+$scope.projectId+'/settings/databases">Project Settings</a>');
+            FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> You do not have any SQL servers configured. You can add a SQL server in your <a href="#/project/'+$scope.projectId+'/settings/databases">Project Settings</a>.');
+          }
+        });
+      }
+
+      // Email action missing transports (other than the default one).
+      if(actionInfo && actionInfo.name === 'email') {
+        FormioUtils.eachComponent(actionInfo.settingsForm.components, function(component) {
+          if(component.key === 'settings[transport]' && JSON.parse(component.data.json).length <= 1) {
+            FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> You do not have any email transports configured. You can add an email transport in your <a href="#/project/'+$scope.projectId+'/settings/email">Project Settings</a>, or you can use the default transport (charges may apply).');
           }
         });
       }
