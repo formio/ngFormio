@@ -69,6 +69,6 @@ deployment:
     branch: test
     commands:
       - cd formio-app/dist && tar -czvf ../../${TAG_NAME}.tgz *
-      - aws s3 cp ${CIRCLE_BRANCH}.tgz s3://formio-app-releases/${TAG_NAME}.tgz
+      - aws s3 cp ${TAG_NAME}.tgz s3://formio-app-releases/${TAG_NAME}.tgz
       - docker push $IMAGE_PATH:$TAG_NAME
       - ./deployment/scripts/createVersion.sh $TAG_NAME
