@@ -1097,7 +1097,7 @@ app.run([
     // The template for the formio forms.
     $templateCache.put('formio.html',
       '<form role="form" name="formioForm" ng-submit="onSubmit(formioForm)" novalidate>' +
-        '<i id="formio-loading" style="font-size: 2em;" class="fa fa-spinner fa-pulse"></i>' +
+        '<i id="formio-loading" style="font-size: 2em;" class="glyphicon glyphicon-repeat glyphicon-spin"></i>' +
         '<div ng-repeat="alert in formioAlerts" class="alert alert-{{ alert.type }}" role="alert">' +
           '{{ alert.message }}' +
         '</div>' +
