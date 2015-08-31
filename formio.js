@@ -350,6 +350,10 @@ app.provider('Formio', function() {
                 setValue = false;
                 return;
               }
+              // Convert old single field data in submissions to multiple
+              if(key === parts[parts.length - 1] && component.multiple && !Array.isArray(value[key])) {
+                value[key] = [value[key]];
+              }
               value = value[key];
               setValue = true;
               if (onId) {
@@ -366,6 +370,10 @@ app.provider('Formio', function() {
             return '';
           }
           else {
+            // Convert old single field data in submissions to multiple
+            if(component.multiple && !Array.isArray(data[component.key])) {
+              data[component.key] = [data[component.key]];
+            }
             return data[component.key];
           }
         };
@@ -893,8 +901,7 @@ app.directive('formioComponent', [
           // value by navigating through the object.
           if (
             $scope.component &&
-            $scope.component.key &&
-            $scope.component.key.indexOf('.') !== -1
+            $scope.component.key
           ) {
             $scope.$watch('data', function(data) {
               if (!data || angular.equals({}, data)) { return; }
