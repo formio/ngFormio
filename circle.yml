@@ -3,9 +3,11 @@ general:
     only:
       - develop
       - /feature\/.*/
-      - /^\d+\.\d+\.\d+$/
       - /bugfix\/.*/
+  tags:
+    only:
       - /build-.*/
+      - /^\d+\.\d+\.\d+$/
 
 machine:
   node:
