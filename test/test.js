@@ -33,7 +33,7 @@ new Yadda.FeatureFileSearch('./test/features').each(function(file) {
       driver = webdriver
         .remote(options)
         .init()
-        .url(options.baseUrl + '/app', done);
+        .url(options.baseUrl, done);
     });
 
     scenarios(feature.scenarios, function(scenario) {
