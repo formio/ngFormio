@@ -1965,7 +1965,7 @@ app.run([
   'FormioUtils',
   function($templateCache, FormioUtils) {
     $templateCache.put('formio/components/resource.html', FormioUtils.fieldWrap(
-      '<ui-select ng-model="data[component.key]" ng-disabled="readOnly" ng-required="component.validate.required" id="{{ component.key }}" name="{{ component.key }}" theme="bootstrap">' +
+      '<ui-select ui-select-open-on-focus ng-model="data[component.key]" ng-disabled="readOnly" ng-required="component.validate.required" id="{{ component.key }}" name="{{ component.key }}" theme="bootstrap">' +
         '<ui-select-match placeholder="{{ component.placeholder }}">' +
           '<formio-select-item template="component.template" item="$item || $select.selected" select="$select"></formio-select-item>' +
         '</ui-select-match>' +
@@ -2016,6 +2016,32 @@ app.directive('uiSelectRequired', function () {
     }
   };
 });
+
+// A hack to have ui-select open on focus
+app.directive('uiSelectOpenOnFocus', ['$timeout', function($timeout){
+  return {
+    require: 'uiSelect',
+    restrict: 'A',
+    link: function($scope, el, attrs, uiSelect) {
+      var closing = false;
+
+      angular.element(uiSelect.focusser).on('focus', function() {
+        if(!closing) {
+          uiSelect.activate();
+        }
+      });
+
+      // Because ui-select immediately focuses the focusser after closing
+      // we need to not re-activate after closing
+      $scope.$on('uis:close', function() {
+        closing = true;
+        $timeout(function() { // I'm so sorry
+          closing = false;
+        });
+      });
+    }
+  };
+}]);
 
 // Configure the Select component.
 app.config([
@@ -2118,7 +2144,7 @@ app.run([
     $templateCache.put('formio/components/select.html',
       '<label ng-if="component.label" for="{{ component.key }}" class="control-label" ng-class="{\'field-required\': component.validate.required}">{{ component.label }}</label>' +
       '<span ng-if="!component.label && component.validate.required" class="glyphicon glyphicon-asterisk form-control-feedback field-required-inline" aria-hidden="true"></span>' +
-      '<ui-select ui-select-required ng-model="data[component.key]" name="{{ component.key }}" ng-disabled="readOnly" ng-required="component.validate.required" id="{{ component.key }}" theme="bootstrap">' +
+      '<ui-select ui-select-required ui-select-open-on-focus ng-model="data[component.key]" name="{{ component.key }}" ng-disabled="readOnly" ng-required="component.validate.required" id="{{ component.key }}" theme="bootstrap">' +
         '<ui-select-match placeholder="{{ component.placeholder }}">' +
           '<formio-select-item template="component.template" item="$item || $select.selected" select="$select"></formio-select-item>' +
         '</ui-select-match>' +
