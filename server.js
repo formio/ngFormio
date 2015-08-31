@@ -9,7 +9,7 @@ var _ = require('lodash');
 var app = express();
 
 // Configure nunjucks.
-nunjucks.configure('server/views', {
+nunjucks.configure('views', {
   autoescape: true,
   express: app
 });
