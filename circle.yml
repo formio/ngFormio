@@ -5,6 +5,7 @@ general:
       - /feature\/.*/
       - /^\d+\.\d+\.\d+$/
       - /bugfix\/.*/
+      - /build-.*/
 
 machine:
   node:
