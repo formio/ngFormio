@@ -207,12 +207,6 @@ app.controller('FormController', [
     SubmissionAccessLabels,
     $q
   ) {
-    // Perform Camel Case.
-    var camelCase = function(input) {
-      return input.toLowerCase().replace(/ (.)/g, function(match, group1) {
-        return group1.toUpperCase();
-      });
-    };
 
     // Project information.
     $scope.projectId = $stateParams.projectId;
@@ -227,7 +221,7 @@ app.controller('FormController', [
 
     // Attach the name to the title of the form.
     $scope.$watch('form.title', function() {
-      $scope.form.name = $scope.form.title ? camelCase($scope.form.title) : '';
+      $scope.form.name = _.camelCase($scope.form.title);
     });
 
     // Load the form and submissions.
