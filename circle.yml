@@ -57,7 +57,7 @@ test:
 
 deployment:
   release:
-    branch: /^\d+\.\d+\.\d+$/
+    tag: /^\d+\.\d+\.\d+$/
     commands:
       - cd formio-app/dist && tar -czvf ../../${CIRCLE_BRANCH}.tgz *
       - aws s3 cp ${CIRCLE_BRANCH}.tgz s3://formio-app-releases/${CIRCLE_BRANCH}.tgz
@@ -65,7 +65,7 @@ deployment:
       - docker push $IMAGE_PATH:$CIRCLE_BRANCH
       - ./deployment/scripts/createVersion.sh $CIRCLE_BRANCH
   build:
-    branch: /build_.*/
+    tag: /build-.*/
     commands:
       - cd formio-app/dist && tar -czvf ../../${CIRClE_BRANCH}.tgz *
       - aws s3 cp ${CIRClE_BRANCH}.tgz s3://formio-app-releases/${CIRClE_BRANCH}.tgz
