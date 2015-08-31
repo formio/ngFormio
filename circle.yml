@@ -4,8 +4,6 @@ general:
       - develop
       - /feature\/.*/
       - /bugfix\/.*/
-  tags:
-    only:
       - /build-.*/
       - /^\d+\.\d+\.\d+$/
 
