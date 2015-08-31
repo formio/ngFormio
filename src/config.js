@@ -4,9 +4,15 @@
 var protocol = window.location.protocol;
 var host = window.location.host;
 var serverHost = host;
+var parts = host.split('.');
+if (parts[0] === 'portal') {
+  parts.shift();
+  serverHost = parts.join('.');
+}
+var apiProtocol = (host.split(':')[0] !== 'localhost') ? 'https' : protocol;
 var appBase = protocol + '//' + host;
-var apiBase = protocol + '//api.' + serverHost;
-var formioBase = protocol + '//formio.' + serverHost;
+var apiBase = apiProtocol + '//api.' + serverHost;
+var formioBase = apiProtocol + '//formio.' + serverHost;
 angular.module('formioApp').constant('AppConfig', {
   forceSSL: false,
 //  domain: host,
