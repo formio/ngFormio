@@ -37,7 +37,7 @@ dependencies:
     - echo $TAG_NAME
     - ./serverSetup.sh
     - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-    - docker build -t $IMAGE_PATH:$TAG_NAME -f deployment/docker/formio-server/Dockerfile .
+    - docker build -t $IMAGE_PATH:$SHORT_SHA -f deployment/docker/formio-server/Dockerfile .
     - git clone -b $CIRCLE_BRANCH git@github.com:formio/formio-app.git
     - cd formio-app && ./appSetup.sh
   post:
@@ -47,7 +47,7 @@ test:
   pre:
     - sudo bash -c "echo \"127.0.0.1 formio.localhost\" >> /etc/hosts"
     - sudo bash -c "echo \"127.0.0.1 api.localhost\" >> /etc/hosts"
-    - docker run -d -e "MONGO1=$MONGO" -e "PROTOCOL=http" -e "DOMAIN=localhost" -e "PORT=3000" -e "DEBUG=formio:*" --name formio-server --net=host $IMAGE_PATH:$TAG_NAME
+    - docker run -d -e "MONGO1=$MONGO" -e "PROTOCOL=http" -e "DOMAIN=localhost" -e "PORT=3000" -e "DEBUG=formio:*" --name formio-server --net=host $IMAGE_PATH:$SHORT_SHA
     - cd formio-app && PORT=$APPPORT npm start:
         background: true
     - sleep 10
@@ -61,13 +61,14 @@ deployment:
     commands:
       - cd formio-app/dist && tar -czvf ../../${CIRCLE_BRANCH}.tgz *
       - aws s3 cp ${CIRCLE_BRANCH}.tgz s3://formio-app-releases/${CIRCLE_BRANCH}.tgz
-      - docker tag $IMAGE_PATH:$TAG_NAME $IMAGE_PATH:$CIRClE_BRANCH
+      - docker tag $IMAGE_PATH:$SHORT_SHA $IMAGE_PATH:$CIRClE_BRANCH
       - docker push $IMAGE_PATH:$CIRCLE_BRANCH
       - ./deployment/scripts/createVersion.sh $CIRCLE_BRANCH
-  develop:
-    branch: develop
+  build:
+    branch: /build_.*/
     commands:
-      - cd formio-app/dist && tar -czvf ../../${TAG_NAME}.tgz *
-      - aws s3 cp ${TAG_NAME}.tgz s3://formio-app-releases/${TAG_NAME}.tgz
-      - docker push $IMAGE_PATH:$TAG_NAME
-      - ./deployment/scripts/createVersion.sh $TAG_NAME
+      - cd formio-app/dist && tar -czvf ../../${CIRClE_BRANCH}.tgz *
+      - aws s3 cp ${CIRClE_BRANCH}.tgz s3://formio-app-releases/${CIRClE_BRANCH}.tgz
+      - docker tag $IMAGE_PATH:$SHORT_SHA $IMAGE_PATH:$CIRClE_BRANCH
+      - docker push $IMAGE_PATH:$CIRClE_BRANCH
+      - ./deployment/scripts/createVersion.sh $CIRClE_BRANCH
