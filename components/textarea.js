@@ -8,7 +8,7 @@ app.config([
         input: true,
         tableView: true,
         label: '',
-        key: '',
+        key: 'textareaField',
         placeholder: '',
         prefix: '',
         suffix: '',

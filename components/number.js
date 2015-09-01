@@ -9,7 +9,7 @@ app.config([
         tableView: true,
         inputType: 'number',
         label: '',
-        key: '',
+        key: 'numberField',
         placeholder: '',
         prefix: '',
         suffix: '',
