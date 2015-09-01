@@ -34,3 +34,19 @@ app.provider('formioComponents', function() {
     }
   };
 });
+
+app.directive('safeMultipleToSingle', [function(){
+  return {
+    require: 'ngModel',
+    restrict: 'A',
+    link: function($scope, el, attrs, ngModel) {
+      ngModel.$formatters.push(function(modelValue) {
+        if(!$scope.component.multiple && Array.isArray(modelValue)) {
+          return modelValue[0] || '';
+        }
+
+        return modelValue;
+      });
+    }
+  };
+}]);
