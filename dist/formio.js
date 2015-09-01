@@ -127,8 +127,6 @@ app.provider('Formio', function() {
             subs.shift();
           }
 
-          // Remove the submissions and actions from the path.
-          path = path.replace(/\/(submission|action).*/, '');
           var paths = [];
 
           // See if this url has a subdomain.
@@ -140,6 +138,9 @@ app.provider('Formio', function() {
             }
           }
           else {
+            // Remove the submissions and actions from the path.
+            path = path.replace(/\/(submission|action).*/, '');
+
             var formpaths = path.match(/^http.*\/.*\/form\/?([^?]*)/);
             if (formpaths && formpaths.length > 1) {
               paths[1] = formpaths[1] ? 'form/' + formpaths[1] : '';
