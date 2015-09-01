@@ -23,12 +23,10 @@ app.directive('uiSelectRequired', function () {
   return {
     require: 'ngModel',
     link: function (scope, element, attrs, ngModel) {
-      if (!attrs.ngRequired) { return; }
-      scope.$watch(function () {
-        return ngModel.$modelValue;
-      }, function () {
-        ngModel.$setValidity('required', !!(ngModel.$modelValue && ngModel.$modelValue.length));
-      });
+      var oldIsEmpty = ngModel.$isEmpty;
+      ngModel.$isEmpty = function (value) {
+        return (Array.isArray(value) && value.length === 0) || oldIsEmpty(value);
+      };
     }
   };
 });
