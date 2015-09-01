@@ -1126,7 +1126,7 @@ app.run([
     // The template for the formio forms.
     $templateCache.put('formio.html',
       '<form role="form" name="formioForm" ng-submit="onSubmit(formioForm)" novalidate>' +
-        '<i id="formio-loading" style="font-size: 2em;" class="fa fa-spinner fa-pulse"></i>' +
+        '<i id="formio-loading" style="font-size: 2em;" class="glyphicon glyphicon-repeat glyphicon-spin"></i>' +
         '<div ng-repeat="alert in formioAlerts" class="alert alert-{{ alert.type }}" role="alert">' +
           '{{ alert.message }}' +
         '</div>' +
@@ -1447,7 +1447,7 @@ app.run([
           '{{ component.label }}' +
           '<span ng-if="component.rightIcon && component.label">&nbsp;</span>' +
           '<span ng-if="component.rightIcon" class="{{ component.rightIcon }}" aria-hidden="true"></span>' +
-          ' <i ng-if="component.action == \'submit\' && form.submitting" class="fa fa-spinner fa-pulse"></i>' +
+          ' <i ng-if="component.action == \'submit\' && form.submitting" class="glyphicon glyphicon-repeat glyphicon-spin"></i>' +
       '</button>'
     );
   }
@@ -1622,8 +1622,8 @@ app.run([
           'timepicker-options="component.timePicker" />' +
         '<span class="input-group-btn">' +
           '<button type="button" class="btn btn-default" ng-click="calendarOpen = true">' +
-            '<i ng-if="component.enableDate" class="fa fa-calendar"></i>' +
-            '<i ng-if="!component.enableDate" class="fa fa-clock-o"></i>' +
+            '<i ng-if="component.enableDate" class="glyphicon glyphicon-calendar"></i>' +
+            '<i ng-if="!component.enableDate" class="glyphicon glyphicon-time"></i>' +
           '</button>' +
         '</span>' +
       '</div>'
