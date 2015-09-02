@@ -13,5 +13,11 @@
       "ContainerPort": "80"
     }
   ],
+  "Volumes": [
+    {
+      "HostDirectory": "/etc",
+      "ContainerDirectory": "/tmp/etc"
+    }
+  ],
   "Logging": "/var/log/nodejs"
 }
