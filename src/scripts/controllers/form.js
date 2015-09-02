@@ -213,12 +213,6 @@ app.controller('FormController', [
     SubmissionAccessLabels,
     $q
   ) {
-    // Perform Camel Case.
-    var camelCase = function(input) {
-      return input.toLowerCase().replace(/ (.)/g, function(match, group1) {
-        return group1.toUpperCase();
-      });
-    };
 
     // Project information.
     $scope.projectId = $stateParams.projectId;
@@ -233,7 +227,7 @@ app.controller('FormController', [
 
     // Attach the name to the title of the form.
     $scope.$watch('form.title', function() {
-      $scope.form.name = $scope.form.title ? camelCase($scope.form.title) : '';
+      $scope.form.name = _.camelCase($scope.form.title);
     });
 
     // Load the form and submissions.
@@ -318,6 +312,18 @@ app.factory('FormioAlerts', [
         alerts.length = 0;
         alerts = [];
         return tempAlerts;
+      },
+      warn: function (warning) {
+        if(!warning) {
+          return;
+        }
+        this.addAlert({
+          type: 'warning',
+          message: warning.message || warning
+        });
+
+        // Clear old alerts with new alerts.
+        $rootScope.alerts = this.getAlerts();
       },
       onError: function (error) {
         var errors = error.hasOwnProperty('errors') ? error.errors : error.data && error.data.errors;
@@ -420,63 +426,77 @@ app.controller('FormActionIndexController', [
   }
 ]);
 
-/**
- * Load the action and action information.
- *
- * @param $scope
- * @param $stateParams
- */
-var loadActionInfo = function($scope, $stateParams, Formio) {
+app.factory('ActionInfoLoader', [
+  '$q',
+  'Formio',
+  function(
+    $q,
+    Formio
+  ) {
+    return {
+      /**
+       * Load the action and action information.
+       *
+       * @param $scope
+       * @param $stateParams
+       */
+      load: function($scope, $stateParams) {
+        // Get the action information.
+        $scope.actionUrl = '';
+        $scope.actionInfo = $stateParams.actionInfo || {settingsForm: {}};
+        $scope.action = {data: {settings: {}}};
+        $scope.disableSubmissionHandler();
 
-  // Get the action information.
-  $scope.actionUrl = '';
-  $scope.actionInfo = $stateParams.actionInfo || {settingsForm: {}};
-  $scope.action = {data: {settings: {}}};
-  $scope.disableSubmissionHandler();
+        // Get the action information.
+        var getActionInfo = function(name) {
+          return $scope.formio.availableActions().then(function(actions) {
+            var foundAction;
+            angular.forEach(actions, function(action) {
+              if (action.name === name) {
+                foundAction = action;
+              }
+            });
+            if(foundAction) {
+              $scope.actionInfo = _.merge($scope.actionInfo, foundAction);
+              return $scope.actionInfo;
+            }
+          });
+        };
 
-  // Get the action information.
-  var getActionInfo = function(name, done) {
-    $scope.formio.availableActions().then(function(actions) {
-      angular.forEach(actions, function(action) {
-        if (action.name === name) {
-          $scope.actionInfo = _.merge($scope.actionInfo, action);
-          if (done) { done($scope.actionInfo); }
+        /**
+         * Load an action into the scope.
+         * @param defaults
+         */
+        var loadAction = function(defaults) {
+          if ($stateParams.actionId) {
+            $scope.actionUrl = $scope.formio.formUrl + '/action/' + $stateParams.actionId;
+            var loader = new Formio($scope.actionUrl);
+            return loader.loadAction().then(function(action) {
+              $scope.action = _.merge($scope.action, {data: action});
+              return getActionInfo(action.name);
+            });
+          }
+          else if (defaults) {
+            $scope.action = _.merge($scope.action, {data: defaults});
+            $scope.action.data.settings = {};
+            return $q.when($scope.actionInfo);
+          }
+        };
+
+        // Get the action information.
+        if (!$stateParams.actionInfo && $stateParams.actionName) {
+          return getActionInfo($stateParams.actionName).then(function(info) {
+            return loadAction(info.defaults);
+          });
         }
-      });
-    });
-  };
-
-  /**
-   * Load an action into the scope.
-   * @param defaults
-   */
-  var loadAction = function(defaults) {
-    if ($stateParams.actionId) {
-      $scope.actionUrl = $scope.formio.formUrl + '/action/' + $stateParams.actionId;
-      var loader = new Formio($scope.actionUrl);
-      loader.loadAction().then(function(action) {
-        $scope.action = _.merge($scope.action, {data: action});
-        getActionInfo(action.name);
-      });
-    }
-    else if (defaults) {
-      $scope.action = _.merge($scope.action, {data: defaults});
-      $scope.action.data.settings = {};
-    }
-  };
-
-  // Get the action information.
-  if (!$stateParams.actionInfo && $stateParams.actionName) {
-    getActionInfo($stateParams.actionName, function(info) {
-      loadAction(info.defaults);
-    });
+        else {
+          // Load the action.
+          return loadAction($scope.actionInfo.defaults);
+        }
+      }
+    } ;
   }
-  else {
-
-    // Load the action.
-    loadAction($scope.actionInfo.defaults);
-  }
-};
+  ]);
 
 app.controller('FormActionAddController', [
   '$scope',
@@ -484,22 +504,48 @@ app.controller('FormActionAddController', [
   '$state',
   '$cacheFactory',
   'FormioAlerts',
+  'FormioUtils',
+  'ActionInfoLoader',
   function(
     $scope,
     $stateParams,
     $state,
     $cacheFactory,
-    FormioAlerts
+    FormioAlerts,
+    FormioUtils,
+    ActionInfoLoader
   ) {
     // Invalidate cache so actions fetch fresh request for
     // component selection inputs.
     $cacheFactory.get('$http').removeAll();
 
-    loadActionInfo($scope, $stateParams);
+    ActionInfoLoader.load($scope, $stateParams).then(function(actionInfo) {
+      // Helpful warnings for certain actions
+
+      // SQL Action missing sql server warning
+      if(actionInfo && actionInfo.name === 'sql') {
+        FormioUtils.eachComponent(actionInfo.settingsForm.components, function(component) {
+          if(component.key === 'settings[type]' && JSON.parse(component.data.json).length === 0) {
+            FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> You do not have any SQL servers configured. You can add a SQL server in your <a href="#/project/'+$scope.projectId+'/settings/databases">Project Settings</a>.');
+          }
+        });
+      }
+
+      // Email action missing transports (other than the default one).
+      if(actionInfo && actionInfo.name === 'email') {
+        FormioUtils.eachComponent(actionInfo.settingsForm.components, function(component) {
+          if(component.key === 'settings[transport]' && JSON.parse(component.data.json).length <= 1) {
+            FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> You do not have any email transports configured. You can add an email transport in your <a href="#/project/'+$scope.projectId+'/settings/email">Project Settings</a>, or you can use the default transport (charges may apply).');
+          }
+        });
+      }
+    });
+
     $scope.$on('formSubmission', function() {
       FormioAlerts.addAlert({type: 'success', message: 'Action was created.'});
       $state.go('project.form.action.index');
     });
+
   }
 ]);
 
@@ -510,19 +556,21 @@ app.controller('FormActionEditController', [
   '$cacheFactory',
   'Formio',
   'FormioAlerts',
+  'ActionInfoLoader',
   function(
     $scope,
     $stateParams,
     $state,
     $cacheFactory,
     Formio,
-    FormioAlerts
+    FormioAlerts,
+    ActionInfoLoader
   ) {
     // Invalidate cache so actions fetch fresh request for
     // component selection inputs.
     $cacheFactory.get('$http').removeAll();
 
-    loadActionInfo($scope, $stateParams, Formio);
+    ActionInfoLoader.load($scope, $stateParams, Formio);
     $scope.$on('formSubmission', function() {
       FormioAlerts.addAlert({type: 'success', message: 'Action was updated.'});
       $state.go('project.form.action.index');

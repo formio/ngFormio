@@ -76,7 +76,6 @@
                   <a ng-if="authenticated" href="#" class="dropdown-toggle" id="user-menu" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-user"></i> {{ user.data.name }}<b class="caret"></b></a>
                   <ul class="dropdown-menu">
                     <li><a ui-sref="profile.view()"><i class="fa fa-user"></i> Profile</a></li>
-                    <li><a ui-sref="settings()"><i class="fa fa-gear"></i> Settings</a></li>
                     <li class="divider"></li>
                     <li><a href="" id="logout" ng-click="logout()"><i class="fa fa-power-off"></i> Log Out</a></li>
                   </ul>
@@ -94,7 +93,7 @@
     <div class="container-fluid" id="main-wrapper" ng-cloak>
       <div class="row">
         <div class="col-sm-12 main">
-          <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.message}}</alert>
+          <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)" ng-bind-html="alert.message"></alert>
           <div ui-view></div>
         </div>
       </div>
@@ -140,6 +139,7 @@
     <script src="/bower_components/ckeditor/ckeditor.js"></script>
     <script src="/bower_components/ng-ckeditor/ng-ckeditor.js"></script>
     <script src="/bower_components/ngFormBuilder/dist/ngFormBuilder.js"></script>
+    <script src="/bower_components/seamless/build/seamless.parent.min.js"></script>
     <script src="/bower_components/angular-base64/angular-base64.js"></script>
     <script src="/bower_components/angular-animate/angular-animate.js"></script>
     <!-- endbower -->
