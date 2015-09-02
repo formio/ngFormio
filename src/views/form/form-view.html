@@ -1,0 +1,43 @@
+<br/>
+<div class="row">
+    <div class="col-sm-7">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Preview</h3>
+            </div>
+            <div class="panel-body">
+                <div ng-if="hasAuthAction" ng-cloak class="alert alert-warning" role="alert"><i class="glyphicon glyphicon-exclamation-sign"></i> This preview is read only because this form contains an Authentication action.</div>
+                <formio src="formUrl" read-only="hasAuthAction"></formio>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-5">
+        <accordion close-others="true">
+            <accordion-group heading="Form API" is-open="true" class="panel-info">
+                <p><strong>Your form API is now ready to use!</strong> The following API was created that maps directly to this form interface.</p>
+                <p>This API can be found by going to the following URL.</p>
+                <p><pre><code>https://{{ currentProject.name }}.form.io/{{ form.path }}</code></pre></p>
+            </accordion-group>
+            <accordion-group heading="Project Embedding" class="panel-info">
+              <p>To add this form to your Application, use <a target="_blank" href="http://bower.io/">Bower</a> to download the Form.IO library and its dependencies.</p>
+              <p><pre><code>bower install formio</code></pre></p>
+              <p>Next, ensure your webpage has all of the Project dependencies added to the &lt;script&gt; tag. For a simple example, refer to the following example.</p>
+              <p><a target="_blank" href="https://github.com/formio/formio-form/blob/master/index.html">Example Simple Form Embedding</a></p>
+              <p>We recommend using a tool called <a target="_blank" href="https://github.com/taptapship/wiredep">Wiredep</a> to automatically add all the dependencies to the &lt;script&gt; section.</p>
+              <p>Now, within your HTML source, you can use the <strong><code style="color:#333;">&lt;formio&gt;</code></strong> directive like so.
+              <pre><code>&lt;formio src="'https://{{ currentProject.name }}.form.io/{{ form.path }}'"&gt;&lt;/formio&gt;</code></pre>
+            </accordion-group>
+            <accordion-group heading="API Explorer" class="panel-info">
+
+              <p><b>Explore and Test your Form API</b></p>
+              <p>We created a <a href="{{ getSwaggerURL('json') | trusted }}" target="_blank">Swagger API spec</a> for your "{{form.title}}" Form.</p>
+              <p><i>What's Swagger?</i>  Swagger 2.0 is an <a href="http://swagger.io/" target="_blank">industry standard API specification</a>, designed to make building and using API's easier.</p>
+
+              <p>We've also integrated an API Explorer to make browsing and testing your API even easier.</p>
+
+              <a class="btn btn-success" ui-sref="project.form.explorer">"{{form.title}}" Form API Explorer</a>
+
+              </accordion-group>
+        </accordion>
+    </div>
+</div>

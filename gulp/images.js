@@ -1,6 +1,6 @@
 module.exports = function(gulp, plugins) {
   return function () {
-    return gulp.src('app/images/**/*')
+    return gulp.src('src/images/**/*')
       .pipe(plugins.cache(plugins.imagemin({
         progressive: true,
         interlaced: true,
