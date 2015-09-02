@@ -1,24 +1,25 @@
 module.exports = function(gulp, plugins) {
   return function () {
     var wiredep = require('wiredep').stream;
-    gulp.src('app/styles/*.scss')
+    gulp.src('src/styles/*.scss')
       .pipe(wiredep({
         ignorePath: /^(\.\.\/)+/
       }))
-      .pipe(gulp.dest('app/styles'));
+      .pipe(gulp.dest('src/styles'));
 
-    gulp.src('app/*.html')
+    gulp.src('src/*.html')
       .pipe(plugins.inject(gulp.src([
         'scripts/**/*.js',
         'styles/**/*.css'
       ], {
         read: false,
-        cwd: 'app/'
-      })))
+        cwd: 'src/'
+      }),
+        { relative: true}))
       .pipe(wiredep({
         exclude: ['bootstrap-sass-official', 'bower_components/bootstrap/'],
         ignorePath: /^(\.\.\/)*\.\./
       }))
-      .pipe(gulp.dest('app'));
+      .pipe(gulp.dest('src'));
   };
 };
