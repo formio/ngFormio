@@ -45,18 +45,9 @@
     "debug": "^2.2.0",
     "dotenv": "1.2.0",
     "express": "4.12.3",
-<<<<<<< HEAD
-    "formio": "git+ssh://git@github.com/formio/formio.git#feature/fa-248-swagger-is-awesome",
-    "lodash": "3.10.0",
-    "moment": "2.10.3",
-    "nodemailer": "1.4.0",
-    "nunjucks": "1.3.4",
-    "postcss": "4.1.16",
     "swagger-ui": "^2.1.8-M1",
     "validator": "3.41.2",
-    "vhost": "^3.0.1"
-=======
+    "vhost": "^3.0.1",
     "lodash": "^3.10.1"
->>>>>>> develop
   }
 }
