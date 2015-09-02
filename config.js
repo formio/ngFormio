@@ -32,6 +32,8 @@ module.exports = function() {
   config.protocol = protocol;
   config.domain = domain;
   config.formio.domain = domain;
+  config.formio.protocol = protocol;
+  config.formio.baseUrl = domain + (port!==80 ? ':'+port : '');
   config.port = port;
   config.host = host;
 
