@@ -76,7 +76,7 @@ app.config([
         url: '/explorer',
         parent: 'project.form',
         templateUrl: 'views/form/explorer/index.html',
-        controller: 'FormExplorerController'
+        controller: 'ExplorerController'
       });
 
     var formStates = {};
@@ -745,7 +745,7 @@ app.constant('SubmissionAccessLabels', {
 });
 
 
-app.controller('FormExplorerController', [
+app.controller('ExplorerController', [
   '$scope',
   '$state',
   'Formio',
