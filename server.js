@@ -2,6 +2,7 @@
 
 require('dotenv').load({silent: true});
 var config = require('./config')();
+var jslogger = require('jslogger')({key: config.jslogger});
 var express = require('express');
 var nunjucks = require('nunjucks');
 var vhost = require('vhost');
@@ -98,4 +99,10 @@ require('formio')(config.formio, function(formio) {
 
   console.log(' > Listening to ' + config.protocol + '://*.' + config.domain + ':' + config.port);
   app.listen(config.port);
+});
+
+process.on('uncaughtException', function(err) {
+  console.log('Uncaught exception: ' + err.stack);
+  jslogger.log(err.stack);
+  process.exit(1);
 });

@@ -76,6 +76,7 @@ module.exports = function() {
   config.formio.jwt = {};
   config.formio.jwt.secret = process.env.JWT_SECRET || 'abc123';
   config.formio.jwt.expireTime = process.env.JWT_EXPIRE_TIME || 240;
+  config.jslogger = process.env.JS_LOGGER || 123;
 
   // Allow the config to be displayed when debugged.
   var sanitized = _.clone(config);
