@@ -352,18 +352,18 @@ app.provider('Formio', function() {
                 value = value.data;
               }
 
+              // Return if the key is not found on the value.
+              if (!value.hasOwnProperty(key)) {
+                return;
+              }
+
               // Convert old single field data in submissions to multiple
               if(key === parts[parts.length - 1] && component.multiple && !Array.isArray(value[key])) {
                 value[key] = [value[key]];
               }
 
               // Set the value of this key.
-              if (value.hasOwnProperty(key)) {
-                value = value[key];
-              }
-              else {
-                return;
-              }
+              value = value[key];
             }
             return value;
           }
