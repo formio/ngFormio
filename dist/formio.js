@@ -337,35 +337,25 @@ app.provider('Formio', function() {
             this.setUser(null);
           }.bind(this));
         };
-        Formio.submissionData = function(data, component, onId) {
+        Formio.fieldData = function(data, component) {
           if (!data) { return ''; }
           if (component.key.indexOf('.') !== -1) {
             var value = data;
             var parts = component.key.split('.');
-            var currentKey = '';
-            var setValue = false;
-            angular.forEach(parts, function(key) {
-              if ((key !== '_id') && value.hasOwnProperty('_id')) {
+            var key = '';
+            for (var i = 0; i < parts.length; i++) {
+              key = parts[i];
+              if (value.hasOwnProperty('_id')) {
                 value = value.data;
               }
-              if (!value.hasOwnProperty(key)) {
-                setValue = false;
+              if (value.hasOwnProperty(key)) {
+                value = value[key];
+              }
+              else {
                 return;
               }
-              value = value[key];
-              setValue = true;
-              if (onId) {
-                currentKey += key + '.';
-                onId(currentKey, value);
-              }
-            });
-
-            if (setValue) {
-              data[component.key] = value;
-              return value;
             }
-
-            return '';
+            return value;
           }
           else {
             return data[component.key];
@@ -448,8 +438,8 @@ app.factory('FormioScope', [
         });
 
         // Return the value and set the scope for the model input.
-        $scope.submissionData = function(data, component) {
-          var value = Formio.submissionData(data, component);
+        $scope.fieldData = function(data, component) {
+          var value = Formio.fieldData(data, component);
           var componentInfo = formioComponents.components[component.type];
           if (!componentInfo.tableView) { return value; }
           if (component.multiple && (value.length > 0)) {
@@ -478,6 +468,9 @@ app.factory('FormioScope', [
             spinner.show();
             loader.loadSubmission().then(function(submission) {
               $scope._submission = submission;
+              if (!$scope._submission.data) {
+                $scope._submission.data = {};
+              }
               spinner.hide();
               $scope.$emit('submissionLoad', submission);
             }, this.onError($scope));
@@ -636,7 +629,7 @@ app.directive('formio', function() {
             }
           });
           angular.forEach($scope._submission.data, function(value, key) {
-            if (value && submissionData.data.hasOwnProperty(key) && !value.hasOwnProperty('_id')) {
+            if (value && !value.hasOwnProperty('_id')) {
               submissionData.data[key] = value;
             }
           });
@@ -898,18 +891,17 @@ app.directive('formioComponent', [
             $scope.component.key &&
             $scope.component.key.indexOf('.') !== -1
           ) {
+            var root = $scope.component.key.split('.').shift();
             $scope.$watch('data', function(data) {
               if (!data || angular.equals({}, data)) { return; }
-              Formio.submissionData($scope.data, $scope.component, function(idPath, value) {
-                if (value.hasOwnProperty('_id')) {
-                  $scope.$emit('addFormComponent', {
-                    type: 'hidden',
-                    settings: {
-                      key: idPath + '_id'
-                    }
-                  });
-                }
-              });
+              if (!data.hasOwnProperty(root) || angular.equals({}, data[root])) { return; }
+              if (data[root].hasOwnProperty('_id')) {
+                $scope.data[root + '._id'] = data[root]._id;
+              }
+              var value = Formio.fieldData(data, $scope.component);
+              if (value !== undefined) {
+                $scope.data[$scope.component.key] = value;
+              }
             });
           }
 
@@ -1147,7 +1139,7 @@ app.run([
           '</thead>' +
           '<tbody>' +
             '<tr ng-repeat="submission in _submissions">' +
-              '<td ng-repeat="component in _form.components | flattenComponents" ng-if="tableView(component)">{{ submissionData(submission.data, component) }}</td>' +
+              '<td ng-repeat="component in _form.components | flattenComponents" ng-if="tableView(component)">{{ fieldData(submission.data, component) }}</td>' +
               '<td>{{ submission.created | amDateFormat:\'l, h:mm:ss a\' }}</td>' +
               '<td>{{ submission.modified | amDateFormat:\'l, h:mm:ss a\' }}</td>' +
               '<td>' +
