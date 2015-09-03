@@ -9,17 +9,8 @@ app.config([
         tableView: true,
         inputType: 'radio',
         label: '',
-        key: '',
-        values: [
-          {
-            value: 'value1',
-            label: 'Value 1'
-          },
-          {
-            value: 'value2',
-            label: 'Value 2'
-          }
-        ],
+        key: 'radioField',
+        values: [],
         defaultValue: '',
         protected: false,
         persistent: true,

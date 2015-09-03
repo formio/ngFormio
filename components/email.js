@@ -9,7 +9,7 @@ app.config([
         tableView: true,
         inputType: 'email',
         label: '',
-        key: '',
+        key: 'emailField',
         placeholder: '',
         prefix: '',
         suffix: '',

@@ -9,7 +9,7 @@ app.config([
         tableView: true,
         inputMask: '(999) 999-9999',
         label: '',
-        key: '',
+        key: 'phonenumberField',
         placeholder: '',
         prefix: '',
         suffix: '',

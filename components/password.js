@@ -12,7 +12,7 @@ app.config([
         tableView: false,
         inputType: 'password',
         label: '',
-        key: '',
+        key: 'passwordField',
         placeholder: '',
         prefix: '',
         suffix: '',

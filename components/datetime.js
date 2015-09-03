@@ -8,7 +8,7 @@ app.config([
         input: true,
         tableView: true,
         label: '',
-        key: '',
+        key: 'datetimeField',
         placeholder: '',
         format: 'yyyy-MM-dd HH:mm',
         enableDate: true,
@@ -67,8 +67,8 @@ app.run([
           'timepicker-options="component.timePicker" />' +
         '<span class="input-group-btn">' +
           '<button type="button" class="btn btn-default" ng-click="calendarOpen = true">' +
-            '<i ng-if="component.enableDate" class="fa fa-calendar"></i>' +
-            '<i ng-if="!component.enableDate" class="fa fa-clock-o"></i>' +
+            '<i ng-if="component.enableDate" class="glyphicon glyphicon-calendar"></i>' +
+            '<i ng-if="!component.enableDate" class="glyphicon glyphicon-time"></i>' +
           '</button>' +
         '</span>' +
       '</div>'

@@ -7,7 +7,7 @@ app.config([
       settings: {
         input: true,
         tableView: true,
-        key: '',
+        key: 'hiddenField',
         label: '',
         protected: false,
         unique: false,

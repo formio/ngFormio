@@ -9,7 +9,7 @@ app.config([
         tableView: true,
         inputType: 'number',
         label: '',
-        key: '',
+        key: 'numberField',
         placeholder: '',
         prefix: '',
         suffix: '',
@@ -42,6 +42,7 @@ app.run([
         'ng-model="data[component.key]" ' +
         'ng-required="component.validate.required" ' +
         'ng-disabled="readOnly" ' +
+        'safe-multiple-to-single ' +
         'min="{{ component.validate.min }}" ' +
         'max="{{ component.validate.max }}" ' +
         'step="{{ component.validate.step }}" ' +
