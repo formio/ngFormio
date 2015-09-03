@@ -922,11 +922,14 @@ app.directive('formioComponent', [
             $scope.component &&
             $scope.component.key
           ) {
-            var root = $scope.component.key.split('.').shift();
+            var root = '';
+            if ($scope.component.key.indexOf('.') !== -1) {
+              root = $scope.component.key.split('.').shift();
+            }
             $scope.$watch('data', function(data) {
               if (!data || angular.equals({}, data)) { return; }
-              if (!data.hasOwnProperty(root) || angular.equals({}, data[root])) { return; }
-              if (data[root].hasOwnProperty('_id')) {
+              if (root && (!data.hasOwnProperty(root) || angular.equals({}, data[root]))) { return; }
+              if (root && data[root].hasOwnProperty('_id')) {
                 $scope.data[root + '._id'] = data[root]._id;
               }
               var value = Formio.fieldData(data, $scope.component);
