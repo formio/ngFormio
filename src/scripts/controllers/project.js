@@ -120,6 +120,7 @@ app.controller('ProjectController', [
   'Formio',
   'FormioAlerts',
   '$state',
+  'AppConfig',
   '$http',
   function(
     $scope,
@@ -128,6 +129,7 @@ app.controller('ProjectController', [
     Formio,
     FormioAlerts,
     $state,
+    AppConfig,
     $http
   ) {
     $rootScope.activeSideBar = 'projects';
@@ -169,6 +171,13 @@ app.controller('ProjectController', [
 
     $scope.getRole = function(id) {
       return _.find($scope.currentProjectRoles, {_id: id});
+    };
+
+    $scope.getSwaggerURL = function(format) {
+      format = format || 'html';
+      var ret = AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/spec.'+format+'?token=' + Formio.getToken();
+      console.log(ret);
+      return ret;
     };
   }
 ]);

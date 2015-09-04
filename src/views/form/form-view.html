@@ -27,15 +27,17 @@
               <p>Now, within your HTML source, you can use the <strong><code style="color:#333;">&lt;formio&gt;</code></strong> directive like so.
               <pre><code>&lt;formio src="'https://{{ currentProject.name }}.form.io/{{ form.path }}'"&gt;&lt;/formio&gt;</code></pre>
             </accordion-group>
-            <accordion-group heading="API Specification" class="panel-info">
-                <iframe id="docs" ng-src="{{ getSwaggerURL() | trusted }}"></iframe>
-                <script type="text/javascript">
-                    jQuery('#docs').seamless({
-                        spinner: '',
-                        loading: ''
-                    });
-                </script>
-            </accordion-group>
+            <accordion-group heading="API Explorer" class="panel-info">
+
+              <p><b>Explore and Test your Form API</b></p>
+              <p>We created a <a href="{{ getSwaggerURL('json') | trusted }}" target="_blank">Swagger API spec</a> for your "{{form.title}}" Form.</p>
+              <p><i>What's Swagger?</i>  Swagger 2.0 is an <a href="http://swagger.io/" target="_blank">industry standard API specification</a>, designed to make building and using API's easier.</p>
+
+              <p>We've also integrated an API Explorer to make browsing and testing your API even easier.</p>
+
+              <a class="btn btn-success" ui-sref="project.form.explorer">"{{form.title}}" Form API Explorer</a>
+
+              </accordion-group>
         </accordion>
     </div>
 </div>

@@ -45,6 +45,9 @@
     "debug": "^2.2.0",
     "dotenv": "1.2.0",
     "express": "4.12.3",
+    "swagger-ui": "^2.1.8-M1",
+    "validator": "3.41.2",
+    "vhost": "^3.0.1",
     "lodash": "^3.10.1"
   }
 }

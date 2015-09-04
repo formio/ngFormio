@@ -90,6 +90,12 @@ angular
           parent: 'project',
           templateUrl: 'views/project/edit.html'
         })
+        .state('project.explorer', {
+          url: '/explorer',
+          parent: 'project',
+          templateUrl: 'views/project/explorer/index.html',
+          controller: 'ExplorerController'
+        })
         .state('project.settings', {
           url: '/settings',
           parent: 'project',
