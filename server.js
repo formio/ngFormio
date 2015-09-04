@@ -55,15 +55,15 @@ app.use('/start', express.static(__dirname + '/server/start'));
 // Include the swagger ui.
 app.use('/swagger', express.static(require('swagger-ui').dist));
 
-// Show the docs page for the API.
-app.get('/spec.html', function(req, res, next) {
+// Get the specs for each form.
+app.get('/project/:projectId/spec.html', function(req, res) {
   res.render('docs.html', {
-    url: '/spec.json'
+    url: '/project/' + req.params.projectId + '/spec.json'
   });
 });
 
 // Get the specs for each form.
-app.get('/project/:projectId/form/:formId/spec.html', function(req, res, next) {
+app.get('/project/:projectId/form/:formId/spec.html', function(req, res) {
   res.render('docs.html', {
     url: '/project/' + req.params.projectId + '/form/' + req.params.formId + '/spec.json'
   });

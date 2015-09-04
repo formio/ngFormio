@@ -6,3 +6,4 @@ test/bower_components
 deployment/aws-eb/versions
 test/screenshots/*.png
 *~
+npm-debug.log
