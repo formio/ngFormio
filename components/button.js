@@ -47,7 +47,7 @@ app.run([
           '{{ component.label }}' +
           '<span ng-if="component.rightIcon && component.label">&nbsp;</span>' +
           '<span ng-if="component.rightIcon" class="{{ component.rightIcon }}" aria-hidden="true"></span>' +
-          ' <i ng-if="component.action == \'submit\' && form.submitting" class="glyphicon glyphicon-repeat glyphicon-spin"></i>' +
+          ' <i ng-if="component.action == \'submit\' && form.submitting" class="glyphicon glyphicon-refresh glyphicon-spin"></i>' +
       '</button>'
     );
   }
