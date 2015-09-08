@@ -508,3 +508,33 @@ ul.component-list li {
 .ui-select-toggle.btn {
   text-align: left;
 }
+
+.feedback {
+  position: fixed;
+  right: 10px;
+  bottom: 20px;
+  width: auto;
+  .feedback-link {
+    padding: 10px;
+    background-color: #6eb246;
+    color: white;
+    &:hover {
+      text-decoration: none;
+    }
+  }
+  &.open {
+    width: 400px;
+    margin: 5px;
+    padding: 5px;
+    background-color: #fafafa;
+    border: 1px solid #e8e8e8;
+  }
+  #formio-loading {
+    display: none;
+  }
+  .feedback-cancel {
+    position: absolute;
+    top: 0;
+    right: 3px;
+  }
+}

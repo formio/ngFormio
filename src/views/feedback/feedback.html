@@ -1,0 +1,7 @@
+<div class="feedback" ng-class="{open: open}" ng-controller="FeedbackController">
+  <a ng-if="!open" class="feedback-link" ng-click="showFeedback()">Feedback <i class="fa fa-plus"></i>&nbsp;</a>
+  <div ng-if="open">
+    <h3>Have some feedback?</h3><a class="feedback-cancel" ng-click="hideFeedback()">Close</a>
+    <formio src="'https://formio.form.io/feedback'"></formio>
+  </div>
+</div>

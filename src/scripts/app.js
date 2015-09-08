@@ -258,6 +258,7 @@ angular
       $rootScope.userLoginForm = AppConfig.userLoginForm;
       $rootScope.userRegisterForm = AppConfig.userRegisterForm;
       $rootScope.teamForm = AppConfig.teamForm;
+      $rootScope.feedbackForm = AppConfig.feedbackForm;
 
       // Start the tutorial.
       $rootScope.startTutorial = function() {
