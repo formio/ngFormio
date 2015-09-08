@@ -518,6 +518,7 @@ ul.component-list li {
     padding: 10px;
     background-color: #6eb246;
     color: white;
+    cursor: pointer;
     &:hover {
       text-decoration: none;
     }
@@ -529,12 +530,12 @@ ul.component-list li {
     background-color: #fafafa;
     border: 1px solid #e8e8e8;
   }
-  #formio-loading {
-    display: none;
-  }
   .feedback-cancel {
+    margin: 5px;
     position: absolute;
     top: 0;
     right: 3px;
+    cursor: pointer;
+    text-decoration: none;
   }
 }

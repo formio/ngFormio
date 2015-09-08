@@ -1,7 +1,11 @@
-<div class="feedback" ng-class="{open: open}" ng-controller="FeedbackController">
-  <a ng-if="!open" class="feedback-link" ng-click="showFeedback()">Feedback <i class="fa fa-plus"></i>&nbsp;</a>
-  <div ng-if="open">
-    <h3>Have some feedback?</h3><a class="feedback-cancel" ng-click="hideFeedback()">Close</a>
-    <formio src="'https://formio.form.io/feedback'"></formio>
+<div class="feedback" ng-class="state" ng-controller="FeedbackController">
+  <a ng-if="state == 'closed'" class="feedback-link" ng-click="showFeedback()">Feedback <i class="fa fa-plus"></i>&nbsp;</a>
+  <div ng-if="state == 'open'">
+    <h4>Have some feedback?</h4>
+    <a class="feedback-cancel" ng-click="hideFeedback()">Close</a>
+    <formio src="feedbackForm"></formio>
+  </div>
+  <div ng-if="state == 'thanks'">
+    <h4>Thank you!</h4>
   </div>
 </div>

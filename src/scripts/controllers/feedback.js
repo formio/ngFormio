@@ -13,16 +13,26 @@ app.directive('formioFeedback', function() {
 
 app.controller('FeedbackController', [
   '$scope',
-  'AppConfig',
+  '$timeout',
   function(
     $scope,
-    AppConfig
+    $timeout
   ) {
+    $scope.state = 'closed';
     $scope.showFeedback = function() {
-      $scope.open = true;
+      $scope.state = 'open';
     }
     $scope.hideFeedback = function() {
-      $scope.open = false;
+      $scope.state = 'closed';
     }
+    $scope.$on('formSubmission', function() {
+      $scope.state = 'thanks';
+      $timeout(function() {
+        $scope.state = 'closed';
+      }, 2000);
+    });
+    $scope.$on('formLoad', function(err, form) {
+      console.log(form);
+    });
   }
 ]);
