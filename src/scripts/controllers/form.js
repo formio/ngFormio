@@ -34,6 +34,7 @@ app.config([
       .state('project.form.edit', {
         url: '/edit',
         parent: 'project.form',
+        controller: 'FormEditController',
         templateUrl: 'views/form/form-edit.html'
       })
       .state('project.form.delete', {
@@ -291,6 +292,20 @@ app.controller('FormController', [
     };
 
     $rootScope.currentForm = $scope.form;
+  }
+]);
+
+app.controller('FormEditController', [
+  '$scope',
+  function(
+    $scope
+  ) {
+    $scope.originalForm = _.cloneDeep($scope.form);
+    // Revert to original form and go back
+    $scope.cancel = function() {
+      _.assign($scope.form, $scope.originalForm);
+      $scope.back();
+    }
   }
 ]);
 
