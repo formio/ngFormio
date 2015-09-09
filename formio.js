@@ -907,7 +907,11 @@ app.directive('formioComponent', [
         ) {
 
           $scope.resetForm = function() {
-            $scope.data = {};
+            // Manually remove each key so we don't lose a reference to original
+            // data in child scopes.
+            for(var key in $scope.data) {
+              delete $scope.data[key];
+            }
           };
 
           // Initialize the data.
