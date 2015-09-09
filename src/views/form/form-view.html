@@ -24,6 +24,13 @@
               <p>Next, ensure your webpage has all of the Project dependencies added to the &lt;script&gt; tag. For a simple example, refer to the following example.</p>
               <p><a target="_blank" href="https://github.com/formio/formio-form/blob/master/index.html">Example Simple Form Embedding</a></p>
               <p>We recommend using a tool called <a target="_blank" href="https://github.com/taptapship/wiredep">Wiredep</a> to automatically add all the dependencies to the &lt;script&gt; section.</p>
+              <p>Then you need to add formio as a dependency to your application's Angular module</p>
+              <p><pre><code>&lt;body ng-app="formApp"&gt;
+              ...
+              &lt;script type="text/javascript"&gt;
+                angular.module('formApp', ['formio']);
+              &lt;/script&gt;
+              </code></pre></p>
               <p>Now, within your HTML source, you can use the <strong><code style="color:#333;">&lt;formio&gt;</code></strong> directive like so.
               <pre><code>&lt;formio src="'https://{{ currentProject.name }}.form.io/{{ form.path }}'"&gt;&lt;/formio&gt;</code></pre>
             </accordion-group>
