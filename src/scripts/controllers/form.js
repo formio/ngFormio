@@ -305,7 +305,7 @@ app.controller('FormEditController', [
     $scope.cancel = function() {
       _.assign($scope.form, $scope.originalForm);
       $scope.back();
-    }
+    };
   }
 ]);
 
