@@ -21,10 +21,10 @@ app.controller('FeedbackController', [
     $scope.state = 'closed';
     $scope.showFeedback = function() {
       $scope.state = 'open';
-    }
+    };
     $scope.hideFeedback = function() {
       $scope.state = 'closed';
-    }
+    };
     $scope.$on('formSubmission', function() {
       $scope.state = 'thanks';
       $timeout(function() {
