@@ -1129,7 +1129,7 @@ app.run([
     // The template for the formio forms.
     $templateCache.put('formio.html',
       '<form role="form" name="formioForm" ng-submit="onSubmit(formioForm)" novalidate>' +
-        '<i id="formio-loading" style="font-size: 2em;" class="glyphicon glyphicon-repeat glyphicon-spin"></i>' +
+        '<i id="formio-loading" style="font-size: 2em;" class="glyphicon glyphicon-refresh glyphicon-spin"></i>' +
         '<div ng-repeat="alert in formioAlerts" class="alert alert-{{ alert.type }}" role="alert">' +
           '{{ alert.message }}' +
         '</div>' +
@@ -1450,7 +1450,7 @@ app.run([
           '{{ component.label }}' +
           '<span ng-if="component.rightIcon && component.label">&nbsp;</span>' +
           '<span ng-if="component.rightIcon" class="{{ component.rightIcon }}" aria-hidden="true"></span>' +
-          ' <i ng-if="component.action == \'submit\' && form.submitting" class="glyphicon glyphicon-repeat glyphicon-spin"></i>' +
+          ' <i ng-if="component.action == \'submit\' && form.submitting" class="glyphicon glyphicon-refresh glyphicon-spin"></i>' +
       '</button>'
     );
   }
@@ -2324,7 +2324,7 @@ app.run([
     $templateCache.put('formio/components/signature.html', FormioUtils.fieldWrap(
       '<img ng-if="readOnly" ng-attr-src="{{data[component.key]}}" src="" />' +
       '<div ng-if="!readOnly" style="width: {{ component.width }}; height: {{ component.height }};">' +
-        '<a class="btn btn-xs btn-default" style="position:absolute; left: 0; top: 0; z-index: 1000" ng-click="component.clearSignature()"><span class="glyphicon glyphicon-repeat"></span></a>' +
+        '<a class="btn btn-xs btn-default" style="position:absolute; left: 0; top: 0; z-index: 1000" ng-click="component.clearSignature()"><span class="glyphicon glyphicon-refresh"></span></a>' +
         '<canvas signature component="component" name="{{ component.key }}" ng-model="data[component.key]" ng-required="component.validate.required"></canvas>' +
         '<div class="formio-signature-footer" style="text-align: center;color:#C3C3C3;" ng-class="{\'field-required\': component.validate.required}">{{ component.footer }}</div>' +
       '</div>'
