@@ -8,7 +8,6 @@ app.config([
         input: false,
         tableView: true,
         legend: '',
-        key: '',
         components: []
       }
     });
