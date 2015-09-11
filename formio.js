@@ -391,10 +391,10 @@ app.factory('FormioScope', [
     formioComponents
   ) {
     return {
-      onError: function($scope) {
+      onError: function($scope, $element) {
         return function(error) {
           if (error.name === 'ValidationError') {
-            angular.element('#form-group-' + error.details[0].path).addClass('has-error');
+            $element.find('#form-group-' + error.details[0].path).addClass('has-error');
             var message = 'ValidationError: ' + error.details[0].message;
             $scope.showAlerts({
               type: 'danger',
@@ -410,7 +410,7 @@ app.factory('FormioScope', [
           $scope.$emit('formError', error);
         };
       },
-      register: function($scope, options) {
+      register: function($scope, $element, options) {
         var loader = null;
         $scope._form = $scope.form || {};
         $scope._submission = $scope.submission || {data: {}};
@@ -463,7 +463,7 @@ app.factory('FormioScope', [
           return componentInfo.tableView(value, component);
         };
 
-        var spinner = angular.element('#formio-loading');
+        var spinner = $element.find('#formio-loading');
 
         if ($scope.src) {
           loader = new Formio($scope.src);
@@ -610,6 +610,7 @@ app.directive('formio', function() {
     controller: [
       '$scope',
       '$http',
+      '$element',
       'FormioScope',
       'Formio',
       'FormioUtils',
@@ -617,6 +618,7 @@ app.directive('formio', function() {
       function(
         $scope,
         $http,
+        $element,
         FormioScope,
         Formio,
         FormioUtils,
@@ -627,7 +629,7 @@ app.directive('formio', function() {
         $scope.showAlerts = function(alerts) {
           $scope.formioAlerts = [].concat(alerts);
         };
-        $scope.formio = FormioScope.register($scope, {
+        $scope.formio = FormioScope.register($scope, $element, {
           form: true,
           submission: true
         });
@@ -680,7 +682,7 @@ app.directive('formio', function() {
             $http[method]($scope.action, submissionData).success(function (submission) {
               Formio.clearCache();
               onSubmitDone(method, submission);
-            }).error(FormioScope.onError($scope))
+            }).error(FormioScope.onError($scope, $element))
             .finally(function() {
               form.submitting = false;
             });
@@ -690,7 +692,7 @@ app.directive('formio', function() {
           else if ($scope.formio) {
             $scope.formio.saveSubmission(submissionData).then(function(submission) {
               onSubmitDone(submission.method, submission);
-            }, FormioScope.onError($scope))
+            }, FormioScope.onError($scope, $element))
             .finally(function() {
               form.submitting = false;
             });
@@ -719,11 +721,13 @@ app.directive('formioDelete', function() {
     templateUrl: 'formio-delete.html',
     controller: [
       '$scope',
+      '$element',
       'FormioScope',
       'Formio',
       '$http',
       function(
         $scope,
+        $element,
         FormioScope,
         Formio,
         $http
@@ -735,7 +739,7 @@ app.directive('formioDelete', function() {
         };
         var resourceName = 'resource';
         var methodName = '';
-        var loader = FormioScope.register($scope, {
+        var loader = FormioScope.register($scope, $element, {
           form: true,
           submission: true
         });
@@ -765,12 +769,12 @@ app.directive('formioDelete', function() {
           };
 
           if ($scope.action) {
-            $http.delete($scope.action).success(onDeleteDone).error(FormioScope.onError($scope));
+            $http.delete($scope.action).success(onDeleteDone).error(FormioScope.onError($scope, $element));
           }
           else if (loader) {
             if (!methodName) { return; }
             if (typeof loader[methodName] !== 'function') { return; }
-            loader[methodName]().then(onDeleteDone, FormioScope.onError($scope));
+            loader[methodName]().then(onDeleteDone, FormioScope.onError($scope, $element));
           }
         };
         $scope.onCancel = function() {
@@ -854,12 +858,14 @@ app.directive('formioSubmissions', function() {
     templateUrl: 'formio/submissions.html',
     controller: [
       '$scope',
+      '$element',
       'FormioScope',
       function(
         $scope,
+        $element,
         FormioScope
       ) {
-        $scope.formio = FormioScope.register($scope, {
+        $scope.formio = FormioScope.register($scope, $element, {
           form: true,
           submissions: false
         });
