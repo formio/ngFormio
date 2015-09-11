@@ -226,10 +226,12 @@ app.controller('FormController', [
     $scope.capitalize = _.capitalize;
     $scope.form = {title: '', type: formType, components: [], access: [], submissionAccess: []};
 
-    // Attach the name to the title of the form.
-    $scope.$watch('form.title', function() {
-      $scope.form.name = _.camelCase($scope.form.title);
-    });
+    // Match name of form to title if not customized.
+    $scope.titleChange = function(oldTitle) {
+      if (!$scope.form.name || $scope.form.name === _.camelCase(oldTitle)) {
+        $scope.form.name = _.camelCase($scope.form.title);
+      }
+    }
 
     // Load the form and submissions.
     $scope.formio = new Formio($scope.formUrl);

@@ -4,7 +4,7 @@
 <form role="form" novalidate>
   <div id="form-group-title" class="form-group">
     <label for="title" class="control-label">Title</label>
-    <input type="text" ng-model="form.title" class="form-control" id="title" placeholder="Enter the form title"/>
+    <input type="text" ng-model="form.title" ng-change="titleChange('{{form.title}}')" class="form-control" id="title" placeholder="Enter the form title"/>
   </div>
   <div id="form-group-name" class="form-group">
     <label for="name" class="control-label">Name</label>
