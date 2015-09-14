@@ -231,7 +231,7 @@ app.controller('FormController', [
       if (!$scope.form.name || $scope.form.name === _.camelCase(oldTitle)) {
         $scope.form.name = _.camelCase($scope.form.title);
       }
-    }
+    };
 
     // Load the form and submissions.
     $scope.formio = new Formio($scope.formUrl);

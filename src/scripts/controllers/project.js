@@ -71,16 +71,51 @@ app.controller('ProjectCreateController', [
   '$state',
   'FormioAlerts',
   'Formio',
+  '$http',
   function(
     $scope,
     $rootScope,
     $state,
     FormioAlerts,
-    Formio
+    Formio,
+    $http
   ) {
     $rootScope.noBreadcrumb = false;
-    $scope.currentProject = {};
+    $scope.currentProject = {template: 'default'};
     var formio = new Formio();
+
+    // The project templates.
+    $scope.templates = [
+      {
+        "title": "Default",
+        "template": "default"
+      },
+      {
+        "title": "Empty",
+        "template": "empty"
+      }
+    ];
+
+    // Try to load the external template source.
+    $http.get(
+      'http://help.form.io/templates/index.json',
+      {
+        disableJWT: true,
+        headers: {
+          Authorization: undefined,
+          Pragma: undefined,
+          'Cache-Control': undefined
+        }
+      }
+    ).success(function (result) {
+      angular.forEach(result, function(template) {
+        if (template.name === $scope.currentProject.template) {
+          $scope.currentProject.template = template.template;
+        }
+      });
+      $scope.templates = result;
+    });
+
     $scope.saveProject = function() {
       // Need to strip hyphens at the end before submitting
       if ($scope.currentProject.name) {

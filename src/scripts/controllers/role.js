@@ -25,7 +25,7 @@ app.controller('RoleController', [
       $scope.role = _.cloneDeep($scope.originalRole);
       // Load forms that assign this role permissions
       $scope.formio.loadForms().then(function(result) {
-        $scope.assignedForms = result.filter(function(form){
+        $scope.assignedForms = !result ? [] : result.filter(function(form){
           form.rolePermissions = form.submissionAccess.filter(function(perm) {
             return _.contains(perm.roles, $state.params.roleId) && SubmissionAccessLabels[perm.type];
           });

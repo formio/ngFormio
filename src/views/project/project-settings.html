@@ -18,6 +18,11 @@
         <label for="description" class="control-label">Description</label>
         <input type="text" class="form-control" id="description" ng-model="currentProject.description" placeholder="Enter a short description for your project/website.">
     </div>
+    <div id="form-group-template" class="form-group" ng-if="currentProject.template">
+      <label for="description" class="control-label">Template</label>
+      <select class="form-control" ng-model="currentProject.template" ng-options="template.template as template.title for template in templates"></select>
+      <p>The project template will automatically create some Resources and Forms to help bootstrap your project.</p>
+    </div>
     <div class="pull-right">
         <a ng-if="currentProject && currentProject._id" ui-sref="project.delete()" class="btn btn-danger">Delete</a>
         <a ng-if="!currentProject._id" ui-sref="home()" class="btn btn-default">Cancel</a>
