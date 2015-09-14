@@ -3,7 +3,7 @@
   <div ng-if="state == 'open'">
     <h4>Have some feedback?</h4>
     <a class="feedback-cancel" ng-click="hideFeedback()">Close</a>
-    <formio src="feedbackForm"></formio>
+    <formio src="feedbackForm" submission="feedbackInfo"></formio>
   </div>
   <div ng-if="state == 'thanks'">
     <h4>Thank you!</h4>

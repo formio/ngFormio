@@ -13,13 +13,25 @@ app.directive('formioFeedback', function() {
 
 app.controller('FeedbackController', [
   '$scope',
+  '$rootScope',
   '$timeout',
   function(
     $scope,
+    $rootScope,
     $timeout
   ) {
     $scope.state = 'closed';
+    $scope.feedbackInfo = {};
     $scope.showFeedback = function() {
+      $scope.feedbackInfo = {
+        data: {
+          url: window.location.href,
+          user: {
+            email: $rootScope.user.data.email,
+            id: $rootScope.user._id
+          }
+        }
+      }
       $scope.state = 'open';
     };
     $scope.hideFeedback = function() {
@@ -30,9 +42,6 @@ app.controller('FeedbackController', [
       $timeout(function() {
         $scope.state = 'closed';
       }, 2000);
-    });
-    $scope.$on('formLoad', function(err, form) {
-      console.log(form);
     });
   }
 ]);
