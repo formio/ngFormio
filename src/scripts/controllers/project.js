@@ -169,6 +169,7 @@ app.controller('ProjectController', [
   ) {
     $rootScope.activeSideBar = 'projects';
     $rootScope.noBreadcrumb = false;
+    $scope.token = Formio.getToken();
     $scope.resourcesLoading = true;
     $scope.resources = [];
     $scope.$on('pagination:loadPage', function(status) {
