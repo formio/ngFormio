@@ -342,6 +342,14 @@ formioServer.init({
       }
       return _hasAccess;
     },
+    exportOptions: function(options, req, res) {
+      var currentProject = cache.currentProject(req);
+      options.title = currentProject.title;
+      options.name = currentProject.name;
+      options.description = currentProject.description;
+      options.projectId = req.projectId || req.params.projectId || 0;
+      return options;
+    },
     requestParams: function(req, params) {
       var projectId = params.project;
       if (projectId && projectId === 'available') {
