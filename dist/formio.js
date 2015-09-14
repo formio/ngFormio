@@ -986,14 +986,19 @@ app.directive('formioComponent', [
             }
           }
 
-          // Establish a default for data.
-          if ($scope.data && !$scope.data.hasOwnProperty($scope.component.key) && $scope.component.hasOwnProperty('defaultValue')) {
-            $scope.data[$scope.component.key] = $scope.component.multiple ? [$scope.component.defaultValue] : $scope.component.defaultValue;
-          }
-
           // If the component has a controller.
           if (component.controller) {
             component.controller($scope.component, $scope, $http, Formio);
+          }
+
+          // Establish a default for data.
+          if ($scope.data && !$scope.data.hasOwnProperty($scope.component.key) && $scope.component.hasOwnProperty('defaultValue')) {
+            if($scope.component.multiple && !angular.isArray($scope.component.defaultValue)) {
+              $scope.data[$scope.component.key] = [$scope.component.defaultValue];
+            }
+            else {
+              $scope.data[$scope.component.key] = $scope.component.defaultValue;
+            }
           }
         }
       ]
@@ -1933,6 +1938,9 @@ app.config([
       },
       controller: function(settings, $scope, $http, Formio) {
         $scope.selectItems = [];
+        if(settings.multiple) {
+          settings.defaultValue = [];
+        }
         if (settings.resource) {
           var formio = new Formio($scope.formio.projectUrl + '/form/' + settings.resource);
           var params = {};
@@ -2103,6 +2111,10 @@ app.config([
           }
           return valueProp ? item[valueProp] : item;
         };
+
+        if(settings.multiple) {
+          settings.defaultValue = [];
+        }
 
         switch(settings.dataSrc) {
           case 'values':
