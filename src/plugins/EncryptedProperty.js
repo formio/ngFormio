@@ -58,10 +58,16 @@ module.exports = function(schema, options) {
     }
 
     var decipher = crypto.createDecipher('aes-256-cbc', secret);
-    var decryptedJSON = Buffer.concat([
+    var decryptedJSON = '';
+    try {
+      decryptedJSON = Buffer.concat([
         decipher.update(cipherbuffer), // Buffer contains encrypted utf8
         decipher.final()
-    ]);
+      ]);
+    }
+    catch (e) {
+      decryptedJSON = '{}';
+    }
 
     return JSON.parse(decryptedJSON);  // This can throw a exception
   };
