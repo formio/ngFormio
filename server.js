@@ -103,6 +103,12 @@ require('formio')(config.formio, function(formio) {
 
 process.on('uncaughtException', function(err) {
   console.log('Uncaught exception: ' + err.stack);
-  jslogger.log(err.stack);
-  process.exit(1);
+  jslogger.log({
+    message: err.message,
+    stacktrace: err.stack
+  });
+  // Give jslogger time to log before exiting.
+  setTimeout(function() {
+    process.exit(1);
+  }, 1500);
 });
