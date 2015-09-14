@@ -24,6 +24,5 @@ angular.module('formioApp').constant('AppConfig', {
   userRegisterForm: formioBase + '/user/register',
   teamForm: formioBase + '/team',
   betaForm: formioBase + '/beta',
-  //feedbackForm: formioBase + '/feedback'
-  feedbackForm: 'https://formio.form.io/feedback'
+  feedbackForm: formioBase + '/feedback'
 });
