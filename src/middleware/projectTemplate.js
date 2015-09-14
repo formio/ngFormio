@@ -124,7 +124,9 @@ module.exports = function(formio) {
       // Import the template.
       importTemplate(template);
     }
-    else if (template.indexOf('http') !== -1) {
+
+    // Allow templates from http://help.form.io/templates.
+    else if (template.indexOf('http://help.form.io/templates') === 0) {
       request({
         url: template,
         json: true
@@ -141,6 +143,8 @@ module.exports = function(formio) {
         importTemplate(body);
       })
     }
+
+    // Check for template that is already provided.
     else if (formio.templates.hasOwnProperty(template)) {
 
       // Import the template.
