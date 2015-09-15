@@ -128,6 +128,9 @@ formioServer.init({
         case 'token':
           app.use(formio.middleware.tokenHandler);
           return true;
+        case 'logout':
+          app.get('/logout', formio.auth.logout);
+          return true;
         case 'current':
           app.get('/current', formio.auth.currentUser);
           return true;
@@ -295,7 +298,7 @@ formioServer.init({
 
         debug('Checking for Formio Access.');
         debug('Formio URL: ' + req.url);
-        if (req.url === '/current') {
+        if (req.url === '/current' || req.url === '/logout') {
           if (req.token) {
             return true;
           }
