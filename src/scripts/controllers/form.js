@@ -624,28 +624,33 @@ app.controller('FormActionEditController', [
       if(actionInfo && actionInfo.name === 'auth') {
         // Track if the action was just loaded.
         var forcedOnce = false;
+        var ele = angular.element('#form-group-role');
 
         $scope.$watch('action.data.settings', function(current, old) {
-          if(current.hasOwnProperty('association')) {
-            angular.element('#form-group-role').css('display', current.association === 'new' ? '' : 'none');
-          }
-
-          // Make the role required for submission if this is a new association.
-          if (
-            current.hasOwnProperty('association') &&
+          // Make the role setting required if this is for new resource associations.
+          if(
+            (current.hasOwnProperty('association') &&
             old.hasOwnProperty('association') &&
-            current.association !== old.association ||
+            current.association !== old.association) ||
             !forcedOnce
           ) {
-            if (!forcedOnce) forcedOnce = true;
+            if(!forcedOnce) forcedOnce = true;
 
             // Find the role settings component, and require it as needed.
             angular.forEach(actionInfo.settingsForm.components, function(component) {
-              if (component.key && component.key === 'settings' && component.components) {
+              if(component.key && component.key === 'settings' && component.components) {
                 angular.forEach(component.components, function(setting) {
-                  if (setting && setting.key === 'role') {
+                  if(setting && setting.key === 'role') {
+                    // Update the validation settings.
                     setting.validate = setting.validate || {};
-                    setting.validate.required = (current.association === 'new') ? true : false;
+                    setting.validate.required = (current.association === 'new' ? true : false);
+
+                    // Update the visibility of the role element.
+                    if(current.hasOwnProperty('association')) {
+                      ele.ready(function() {
+                        ele.css('display', (current.association === 'new' ? '' : 'none'));
+                      });
+                    }
                   }
                 });
               }
