@@ -31,7 +31,7 @@ app.controller('FeedbackController', [
             id: $rootScope.user._id
           }
         }
-      }
+      };
       $scope.state = 'open';
     };
     $scope.hideFeedback = function() {
