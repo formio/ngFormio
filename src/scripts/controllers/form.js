@@ -571,16 +571,16 @@ app.controller('FormActionAddController', [
             current.association !== old.association
           ) {
             // Find the role settings component, and require it as needed.
-            angular.forEach(actionInfo.settingsForm.components, function(component) {
-              if (component.key && component.key === 'settings' && component.components) {
-                angular.forEach(component.components, function(setting) {
-                  if (setting && setting.key === 'role') {
-                    setting.validate = setting.validate || {};
-                    setting.validate.required = (current.association === 'new') ? true : false;
-                  }
-                });
+            FormioUtils.eachComponent(actionInfo.settingsForm.components, function(component) {
+              if (component.key && component.key === 'role') {
+                // Update the validation settings.
+                component.validate = component.validate || {};
+                component.validate.required = (current.association === 'new' ? true : false);
               }
             });
+
+            // Dont save the old role settings if this is an existing association.
+            current.role = (current.role && (current.association === 'new')) || '';
           }
         }, true);
       }
@@ -606,6 +606,7 @@ app.controller('FormActionEditController', [
   'Formio',
   'FormioAlerts',
   'ActionInfoLoader',
+  'FormioUtils',
   '$timeout',
   function(
     $scope,
@@ -615,6 +616,7 @@ app.controller('FormActionEditController', [
     Formio,
     FormioAlerts,
     ActionInfoLoader,
+    FormioUtils,
     $timeout
   ) {
     // Invalidate cache so actions fetch fresh request for
@@ -638,15 +640,11 @@ app.controller('FormActionEditController', [
             return;
           }
 
-          angular.forEach(formComponents, function(component) {
-            if(component.key && component.key === 'settings' && component.components) {
-              angular.forEach(component.components, function(setting) {
-                if(setting && setting.key === 'role') {
-                  // Update the validation settings.
-                  setting.validate = setting.validate || {};
-                  setting.validate.required = (association === 'new' ? true : false);
-                }
-              });
+          FormioUtils.eachComponent(formComponents, function(component) {
+            if (component.key && component.key === 'role') {
+              // Update the validation settings.
+              component.validate = component.validate || {};
+              component.validate.required = (association === 'new' ? true : false);
             }
           });
         };
