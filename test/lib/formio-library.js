@@ -108,7 +108,7 @@ module.exports = function(formio) {
           throw err;
         }
 
-        var encrypt = require('formio/app/actions/fields/password');
+        var encrypt = require('formio/app/actions/fields/password')(formio);
         var req = {
           body: {
             data: {

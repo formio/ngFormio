@@ -66,7 +66,11 @@ function loadApiServer(done) {
     return done();
   }
 
-  require('formio')(config.formio, function(server) {
+  var formioServer = require('formio')(config.formio);
+  var app = require('express')();
+  var settings = require('../src/hooks/settings')(app, formioServer);
+  // Start the api server.
+  formioServer.init(settings).then(function(server) {
     formio = server;
     formio.config.appHost = options.baseUrl;
     library = require('./lib/formio-library')(formio);
