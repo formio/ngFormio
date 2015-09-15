@@ -511,9 +511,9 @@ app.factory('ActionInfoLoader', [
           return loadAction($scope.actionInfo.defaults);
         }
       }
-    } ;
+    };
   }
-  ]);
+]);
 
 app.controller('FormActionAddController', [
   '$scope',
@@ -556,13 +556,45 @@ app.controller('FormActionAddController', [
           }
         });
       }
+
+      // Auth action alert for new resource missing role assignment.
+      if(actionInfo && actionInfo.name === 'auth') {
+        $scope.$watch('action.data.settings', function(current, old) {
+          if(current.hasOwnProperty('association')) {
+            angular.element('#form-group-role').css('display', current.association === 'new' ? '' : 'none');
+          }
+
+          // Make the role required for submission if this is a new association.
+          if (
+            current.hasOwnProperty('association') &&
+            old.hasOwnProperty('association') &&
+            current.association !== old.association
+          ) {
+            // Find the role settings component, and require it as needed.
+            angular.forEach(actionInfo.settingsForm.components, function(component) {
+              if (component.key && component.key === 'settings' && component.components) {
+                angular.forEach(component.components, function(setting) {
+                  if (setting && setting.key === 'role') {
+                    setting.validate = setting.validate || {};
+                    setting.validate.required = (current.association === 'new') ? true : false;
+                  }
+                });
+              }
+            });
+          }
+        }, true);
+      }
+
+      // Role action alert for new resource missing role assignment.
+      if(actionInfo && actionInfo.name === 'role') {
+        FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> The Role Assignment Action requires a Resource Form component with the API key, \'submission\', to modify existing Resource submissions.');
+      }
     });
 
     $scope.$on('formSubmission', function() {
       FormioAlerts.addAlert({type: 'success', message: 'Action was created.'});
       $state.go('project.form.action.index');
     });
-
   }
 ]);
 
@@ -587,7 +619,42 @@ app.controller('FormActionEditController', [
     // component selection inputs.
     $cacheFactory.get('$http').removeAll();
 
-    ActionInfoLoader.load($scope, $stateParams, Formio);
+    ActionInfoLoader.load($scope, $stateParams, Formio).then(function(actionInfo) {
+      // Auth action validation changes for new resource missing role assignment.
+      if(actionInfo && actionInfo.name === 'auth') {
+        // Track if the action was just loaded.
+        var forcedOnce = false;
+
+        $scope.$watch('action.data.settings', function(current, old) {
+          if(current.hasOwnProperty('association')) {
+            angular.element('#form-group-role').css('display', current.association === 'new' ? '' : 'none');
+          }
+
+          // Make the role required for submission if this is a new association.
+          if (
+            current.hasOwnProperty('association') &&
+            old.hasOwnProperty('association') &&
+            current.association !== old.association ||
+            !forcedOnce
+          ) {
+            if (!forcedOnce) forcedOnce = true;
+
+            // Find the role settings component, and require it as needed.
+            angular.forEach(actionInfo.settingsForm.components, function(component) {
+              if (component.key && component.key === 'settings' && component.components) {
+                angular.forEach(component.components, function(setting) {
+                  if (setting && setting.key === 'role') {
+                    setting.validate = setting.validate || {};
+                    setting.validate.required = (current.association === 'new') ? true : false;
+                  }
+                });
+              }
+            });
+          }
+        }, true);
+      }
+    });
+
     $scope.$on('formSubmission', function() {
       FormioAlerts.addAlert({type: 'success', message: 'Action was updated.'});
       $state.go('project.form.action.index');
