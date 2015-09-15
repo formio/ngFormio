@@ -11,6 +11,9 @@ app.config([
       },
       controller: function(settings, $scope, $http, Formio) {
         $scope.selectItems = [];
+        if(settings.multiple) {
+          settings.defaultValue = [];
+        }
         if (settings.resource) {
           var formio = new Formio($scope.formio.projectUrl + '/form/' + settings.resource);
           var params = {};

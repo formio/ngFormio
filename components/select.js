@@ -80,6 +80,10 @@ app.config([
           return valueProp ? item[valueProp] : item;
         };
 
+        if(settings.multiple) {
+          settings.defaultValue = [];
+        }
+
         switch(settings.dataSrc) {
           case 'values':
             $scope.selectItems = settings.data.values;
