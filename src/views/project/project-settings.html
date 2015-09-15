@@ -18,10 +18,49 @@
         <label for="description" class="control-label">Description</label>
         <input type="text" class="form-control" id="description" ng-model="currentProject.description" placeholder="Enter a short description for your project/website.">
     </div>
-    <div id="form-group-template" class="form-group" ng-if="currentProject.template">
+    <div id="form-group-template" class="form-group" ng-if="currentProject.template && !hasTemplate">
       <label for="description" class="control-label">Template</label>
       <select class="form-control" ng-model="currentProject.template" ng-options="template.template as template.title for template in templates"></select>
       <p>The project template will automatically create some Resources and Forms to help bootstrap your project.</p>
+      <span class="btn btn-primary btn-file">
+        Select File <input id="template-select" type="file" accept=".json" onchange="angular.element(this).scope().loadTemplate.call(this)">
+      </span>
+    </div>
+    <div ng-if="hasTemplate">
+      <div class="panel panel-default">
+        <div class="panel-heading">Template Information</div>
+        <div class="panel-body">
+          <table class="table">
+            <tr><td>Title</td><td>{{ currentProject.template.title }}</td></tr>
+            <tr><td>Name</td><td>{{ currentProject.template.name }}</td></tr>
+            <tr><td>Description</td><td>{{ currentProject.template.description }}</td></tr>
+            <tr>
+              <td>Roles</td>
+              <td>
+                <span class="label label-primary" style="margin-right: 5px;" ng-repeat="role in currentProject.template.roles">{{ role.title }}</span>
+              </td>
+            </tr>
+            <tr>
+              <td>Resources</td>
+              <td>
+                <span class="label label-primary" style="margin-right: 5px;" ng-repeat="resource in currentProject.template.resources">{{ resource.title }}</span>
+              </td>
+            </tr>
+            <tr>
+              <td>Forms</td>
+              <td>
+                <span class="label label-primary" style="margin-right: 5px;" ng-repeat="form in currentProject.template.forms">{{ form.title }}</span>
+              </td>
+            </tr>
+            <tr>
+              <td>Actions</td>
+              <td>
+                <span class="label label-primary" style="margin-right: 5px;" ng-repeat="action in currentProject.template.actions">{{ action.title }} for {{ action.form }}</span>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
     </div>
     <div class="pull-right">
         <a ng-if="currentProject && currentProject._id" ui-sref="project.delete()" class="btn btn-danger">Delete</a>

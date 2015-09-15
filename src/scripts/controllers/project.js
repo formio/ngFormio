@@ -82,6 +82,7 @@ app.controller('ProjectCreateController', [
   ) {
     $rootScope.noBreadcrumb = false;
     $scope.currentProject = {template: 'default'};
+    $scope.hasTemplate = false;
     var formio = new Formio();
 
     // The project templates.
@@ -95,6 +96,31 @@ app.controller('ProjectCreateController', [
         "template": "empty"
       }
     ];
+
+    $scope.loadTemplate = function() {
+      var input = angular.element(this).get(0);
+      if (!input || input.length === 0) {
+        return;
+      }
+      var template = input.files[0];
+
+      if (typeof window.FileReader !== 'function') {
+        return;
+      }
+
+      if (!template) {
+        return;
+      }
+
+      // Read the file.
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        $scope.currentProject.template = JSON.parse(e.target.result);
+        $scope.hasTemplate = true;
+        $scope.$apply();
+      };
+      reader.readAsText(template);
+    };
 
     // Try to load the external template source.
     $http.get(
