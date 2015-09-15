@@ -150,6 +150,11 @@ angular
           parent: 'project.settings',
           templateUrl: 'views/project/office365/office365.html'
         })
+        .state('project.settings.export', {
+          url: '/export',
+          parent: 'project.settings',
+          templateUrl: 'views/project/export.html'
+        })
         .state('project.delete', {
           url: '/delete',
           parent: 'project',
@@ -258,6 +263,9 @@ angular
       if (AppConfig.forceSSL && $location.protocol() !== 'https') {
         $window.location.href = $location.absUrl().replace('http', 'https');
       }
+
+      // Set the configuration on the rootScope.
+      $rootScope.appConfig = AppConfig;
 
       // Set the form.io forms in the root scope.
       $rootScope.userForm = AppConfig.userForm;

@@ -71,16 +71,77 @@ app.controller('ProjectCreateController', [
   '$state',
   'FormioAlerts',
   'Formio',
+  '$http',
   function(
     $scope,
     $rootScope,
     $state,
     FormioAlerts,
-    Formio
+    Formio,
+    $http
   ) {
     $rootScope.noBreadcrumb = false;
-    $scope.currentProject = {};
+    $scope.currentProject = {template: 'default'};
+    $scope.hasTemplate = false;
     var formio = new Formio();
+
+    // The project templates.
+    $scope.templates = [
+      {
+        "title": "Default",
+        "template": "default"
+      },
+      {
+        "title": "Empty",
+        "template": "empty"
+      }
+    ];
+
+    $scope.loadTemplate = function() {
+      var input = angular.element(this).get(0);
+      if (!input || input.length === 0) {
+        return;
+      }
+      var template = input.files[0];
+
+      if (typeof window.FileReader !== 'function') {
+        return;
+      }
+
+      if (!template) {
+        return;
+      }
+
+      // Read the file.
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        $scope.currentProject.template = JSON.parse(e.target.result);
+        $scope.hasTemplate = true;
+        $scope.$apply();
+      };
+      reader.readAsText(template);
+    };
+
+    // Try to load the external template source.
+    $http.get(
+      'http://help.form.io/templates/index.json',
+      {
+        disableJWT: true,
+        headers: {
+          Authorization: undefined,
+          Pragma: undefined,
+          'Cache-Control': undefined
+        }
+      }
+    ).success(function (result) {
+      angular.forEach(result, function(template) {
+        if (template.name === $scope.currentProject.template) {
+          $scope.currentProject.template = template.template;
+        }
+      });
+      $scope.templates = result;
+    });
+
     $scope.saveProject = function() {
       // Need to strip hyphens at the end before submitting
       if ($scope.currentProject.name) {
@@ -134,6 +195,7 @@ app.controller('ProjectController', [
   ) {
     $rootScope.activeSideBar = 'projects';
     $rootScope.noBreadcrumb = false;
+    $scope.token = Formio.getToken();
     $scope.resourcesLoading = true;
     $scope.resources = [];
     $scope.$on('pagination:loadPage', function(status) {
