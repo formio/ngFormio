@@ -2,7 +2,7 @@
 
 // Boot up the formio server so we can access the resources.
 require('dotenv').load({silent: true});
-var config = require('../config')();
+var config = require('../config');
 var Yadda = require('yadda');
 var webdriver = require('webdriverjs-angular');
 var driver = null;
