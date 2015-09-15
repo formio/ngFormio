@@ -7,11 +7,12 @@ var express = require('express');
 var nunjucks = require('nunjucks');
 var debug = require('debug')('formio:permissions');
 var _ = require('lodash');
-var cors = require('cors');
 var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
 var app = express();
-app.use(cors());
+var favicon = require('serve-favicon');
+
+app.use(favicon(__dirname + '/favicon.ico'));
 
 // Add Middleware necessary for REST API's
 app.use(bodyParser.urlencoded({extended: true}));
@@ -66,7 +67,7 @@ app.get('/config.js', function(req, res) {
 app.use('/start', express.static(__dirname + '/server/start'));
 
 // Include the swagger ui.
-app.use('/swagger', express.static(require('swagger-ui').dist));
+app.use('/swagger', express.static(require('swagger-ui/index').dist));
 
 // Get the specs for each form.
 app.get('/project/:projectId/spec.html', function(req, res) {
@@ -78,7 +79,7 @@ app.get('/project/:projectId/spec.html', function(req, res) {
 // Get the specs for each form.
 app.get('/project/:projectId/form/:formId/spec.html', function(req, res) {
   res.render('docs.html', {
-    url: '/project/' + req.projectId + '/form/' + req.formId + '/spec.json'
+    url: '/project/' + req.params.projectId + '/form/' + req.params.formId + '/spec.json'
   });
 });
 
