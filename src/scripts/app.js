@@ -44,21 +44,20 @@ angular
           controller: 'HomeController'
         })
         .state('auth', {
-          abstract: true,
           url: '/auth',
-          templateUrl: 'views/user/auth.html'
-        })
-        .state('auth.login', {
-          url: '/login',
-          parent: 'auth',
-          templateUrl: 'views/user/login.html',
-          controller: 'UserLoginController'
-        })
-        .state('auth.register', {
-          url: '/register',
-          parent: 'auth',
-          templateUrl: 'views/user/register.html',
-          controller: 'UserRegisterController'
+          views: {
+            '' : {
+              templateUrl: 'views/user/auth.html',
+            },
+            'login@auth': {
+              templateUrl: 'views/user/login.html',
+              controller: 'UserLoginController'
+            },
+            'register@auth': {
+              templateUrl: 'views/user/register.html',
+              controller: 'UserRegisterController'
+            }
+          }
         })
         .state('profile', {
           abstract: true,
@@ -316,7 +315,7 @@ angular
       var logoutError = function() {
         $rootScope.currentProject = null;
         $rootScope.currentForm = null;
-        $state.go('auth.login');
+        $state.go('auth');
         FormioAlerts.addAlert({
           type: 'danger',
           message: 'Your session has expired. Please log in again.'
@@ -334,7 +333,7 @@ angular
         Formio.logout().then(function() {
           $rootScope.currentProject = null;
           $rootScope.currentForm = null;
-          $state.go('auth.login');
+          $state.go('auth');
         }).catch(logoutError);
       };
 
@@ -344,7 +343,7 @@ angular
         if (toState.name.substr(0, 4) === 'auth') { return; }
         if(!$rootScope.authenticated) {
           event.preventDefault();
-          $state.go('auth.register');
+          $state.go('auth');
         }
       });
 
