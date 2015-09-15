@@ -17,11 +17,13 @@ angular.module('formioApp').constant('AppConfig', {
   forceSSL: false,
 //  domain: host,
   appBase: appBase,
+  serverHost: serverHost,
   tutorial: 'http://help.form.io/start',
   apiBase: apiBase,
   userForm: formioBase + '/user',
   userLoginForm: formioBase + '/user/login',
   userRegisterForm: formioBase + '/user/register',
   teamForm: formioBase + '/team',
-  betaForm: formioBase + '/beta'
+  betaForm: formioBase + '/beta',
+  feedbackForm: formioBase + '/feedback'
 });

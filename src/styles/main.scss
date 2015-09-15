@@ -8,6 +8,26 @@ body {
   padding-top: 50px;
 }
 
+.btn-file {
+  position: relative;
+  overflow: hidden;
+}
+.btn-file input[type=file] {
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: 100%;
+  min-height: 100%;
+  font-size: 100px;
+  text-align: right;
+  filter: alpha(opacity=0);
+  opacity: 0;
+  outline: none;
+  background: white;
+  cursor: inherit;
+  display: block;
+}
+
 .submissions-header {
   margin-top: 10px;
 }
@@ -511,4 +531,35 @@ ul.component-list li {
 
 .ui-select-toggle.btn {
   text-align: left;
+}
+
+.feedback {
+  position: fixed;
+  right: 10px;
+  bottom: 20px;
+  width: auto;
+  .feedback-link {
+    padding: 10px;
+    background-color: #6eb246;
+    color: white;
+    cursor: pointer;
+    &:hover {
+      text-decoration: none;
+    }
+  }
+  &.open {
+    width: 400px;
+    margin: 5px;
+    padding: 5px;
+    background-color: #fafafa;
+    border: 1px solid #e8e8e8;
+  }
+  .feedback-cancel {
+    margin: 5px;
+    position: absolute;
+    top: 0;
+    right: 3px;
+    cursor: pointer;
+    text-decoration: none;
+  }
 }
