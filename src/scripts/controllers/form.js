@@ -420,7 +420,9 @@ app.controller('FormActionIndexController', [
       if ($scope.newAction.name) {
         $state.go('project.form.action.add', {
           actionName: $scope.newAction.name,
-          actionInfo: $scope.newAction
+          // Rendering actionInfo.settingsForm modifies it, so to prevent
+          // that carrying over to other new actions, we deep clone it.
+          actionInfo: _.cloneDeep($scope.newAction)
         });
       }
       else {
