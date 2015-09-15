@@ -606,6 +606,7 @@ app.controller('FormActionEditController', [
   'Formio',
   'FormioAlerts',
   'ActionInfoLoader',
+  '$timeout',
   function(
     $scope,
     $stateParams,
@@ -613,7 +614,8 @@ app.controller('FormActionEditController', [
     $cacheFactory,
     Formio,
     FormioAlerts,
-    ActionInfoLoader
+    ActionInfoLoader,
+    $timeout
   ) {
     // Invalidate cache so actions fetch fresh request for
     // component selection inputs.
@@ -622,39 +624,52 @@ app.controller('FormActionEditController', [
     ActionInfoLoader.load($scope, $stateParams, Formio).then(function(actionInfo) {
       // Auth action validation changes for new resource missing role assignment.
       if(actionInfo && actionInfo.name === 'auth') {
-        // Track if the action was just loaded.
-        var forcedOnce = false;
-        var ele = angular.element('#form-group-role');
+        var toggleVisible = function(association) {
+          if(!association) {
+            return;
+          }
 
+          angular.element('#form-group-role').css('display', (association === 'new' ? '' : 'none'));
+        };
+
+        // Find the role settings component, and require it as needed.
+        var toggleRequired = function(association, formComponents) {
+          if(!formComponents || !association) {
+            return;
+          }
+
+          angular.forEach(formComponents, function(component) {
+            if(component.key && component.key === 'settings' && component.components) {
+              angular.forEach(component.components, function(setting) {
+                if(setting && setting.key === 'role') {
+                  // Update the validation settings.
+                  setting.validate = setting.validate || {};
+                  setting.validate.required = (association === 'new' ? true : false);
+                }
+              });
+            }
+          });
+        };
+
+        // Force the validation to be run on page load.
+        $timeout(function() {
+          var action = $scope.action.data.settings || {};
+          toggleVisible(action.association);
+          toggleRequired(action.association, actionInfo.settingsForm.components);
+        });
+
+        // Watch for changes to the action settings.
         $scope.$watch('action.data.settings', function(current, old) {
           // Make the role setting required if this is for new resource associations.
-          if(
-            (current.hasOwnProperty('association') &&
+          if(current.hasOwnProperty('association') &&
             old.hasOwnProperty('association') &&
-            current.association !== old.association) ||
-            !forcedOnce
+            current.association !== old.association
           ) {
-            if(!forcedOnce) forcedOnce = true;
+            toggleVisible(current.association);
+            toggleRequired(current.association, actionInfo.settingsForm.components);
 
-            // Find the role settings component, and require it as needed.
-            angular.forEach(actionInfo.settingsForm.components, function(component) {
-              if(component.key && component.key === 'settings' && component.components) {
-                angular.forEach(component.components, function(setting) {
-                  if(setting && setting.key === 'role') {
-                    // Update the validation settings.
-                    setting.validate = setting.validate || {};
-                    setting.validate.required = (current.association === 'new' ? true : false);
-
-                    // Update the visibility of the role element.
-                    if(current.hasOwnProperty('association')) {
-                      ele.ready(function() {
-                        ele.css('display', (current.association === 'new' ? '' : 'none'));
-                      });
-                    }
-                  }
-                });
-              }
-            });
+            // Dont save the old role settings if this is an existing association.
+            current.role = (current.role && (current.association === 'new')) || '';
           }
         }, true);
       }
