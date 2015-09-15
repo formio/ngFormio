@@ -2,26 +2,15 @@
 <script src="/bower_components/seamless/build/seamless.parent.min.js"></script>
 <div class="panel panel-default">
   <div class="panel-heading">
-    <h3 class="panel-title">API Explorer - Your Form.io Developer Program
+    <h4 class="panel-title">{{currentProject.title}}
+      <span>API Explorer</span>
       <a class="pull-right" href="http://help.form.io/userguide/#explorer" target="_blank">
         <i class="glyphicon glyphicon-question-sign "></i>
       </a>
-    </h3>
+    </h4>
   </div>
-
   <div class="panel-body">
-    <p><b>Wait!  You don't need the API Explorer to create and use Form.io Forms in HTML web and phone apps.</b></p>
-    <p>Building and using forms in HTML is a breeze with the <a href="http://help.form.io/intro/" target="_blank">Form.io Getting Started Guide</a>.</p>
-    <p>The <a href="{{ getSwaggerURL('json') | trusted }}" target="_blank">{{currentProject.title}} Swagger API spec</a> and API Explorer help developers quickly integrate your {{currentProject.title}} Form Submissions into non-HTML programs like native phone apps, legacy and enterprise systems, embedded IoT (Internet of Things) apps, and other programming languages.</p>
-    <p><i>What's Swagger?</i>  Swagger 2.0 is an <a href="http://swagger.io/" target="_blank">industry standard API specification</a>, designed to make building and using API's easier.</p>
-    <p>Think of this as your own Form.io Developer Program.</p>
     <p><b>Warning: The API Explorer can change and delete your *live* Form Submission data.</b></p>
-  </div>
-
-  <div class="panel-heading">
-    <h4 class="panel-title">{{currentProject.title}} API Explorer</h4>
-  </div>
-  <div class="panel-body">
     <iframe id="docs" ng-src="{{ getSwaggerURL() | trusted }}"></iframe>
     <script type="text/javascript">
       jQuery('#docs').seamless({
