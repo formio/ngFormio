@@ -1,6 +1,9 @@
-var request = require("request");
+'use strict';
+
+var request = require('request');
 var _ = require('lodash');
 var jwt = require('jsonwebtoken');
+
 module.exports = function(formio) {
   return function(req, res, next) {
     // If the Project was not created, skip this bootstrapping process.
@@ -96,7 +99,7 @@ module.exports = function(formio) {
     };
 
     // Method to import the template.
-    var importTemplate = function (template) {
+    var importTemplate = function(template) {
 
       // Import the template within formio.
       formio.import.template(template, {
