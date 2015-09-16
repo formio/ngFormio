@@ -511,9 +511,9 @@ app.factory('ActionInfoLoader', [
           return loadAction($scope.actionInfo.defaults);
         }
       }
-    } ;
+    };
   }
-  ]);
+]);
 
 app.controller('FormActionAddController', [
   '$scope',
@@ -556,13 +556,45 @@ app.controller('FormActionAddController', [
           }
         });
       }
+
+      // Auth action alert for new resource missing role assignment.
+      if(actionInfo && actionInfo.name === 'auth') {
+        $scope.$watch('action.data.settings', function(current, old) {
+          if(current.hasOwnProperty('association')) {
+            angular.element('#form-group-role').css('display', current.association === 'new' ? '' : 'none');
+          }
+
+          // Make the role required for submission if this is a new association.
+          if (
+            current.hasOwnProperty('association') &&
+            old.hasOwnProperty('association') &&
+            current.association !== old.association
+          ) {
+            // Find the role settings component, and require it as needed.
+            FormioUtils.eachComponent(actionInfo.settingsForm.components, function(component) {
+              if (component.key && component.key === 'role') {
+                // Update the validation settings.
+                component.validate = component.validate || {};
+                component.validate.required = (current.association === 'new' ? true : false);
+              }
+            });
+
+            // Dont save the old role settings if this is an existing association.
+            current.role = (current.role && (current.association === 'new')) || '';
+          }
+        }, true);
+      }
+
+      // Role action alert for new resource missing role assignment.
+      if(actionInfo && actionInfo.name === 'role') {
+        FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> The Role Assignment Action requires a Resource Form component with the API key, \'submission\', to modify existing Resource submissions.');
+      }
     });
 
     $scope.$on('formSubmission', function() {
       FormioAlerts.addAlert({type: 'success', message: 'Action was created.'});
       $state.go('project.form.action.index');
     });
-
   }
 ]);
 
@@ -574,6 +606,8 @@ app.controller('FormActionEditController', [
   'Formio',
   'FormioAlerts',
   'ActionInfoLoader',
+  'FormioUtils',
+  '$timeout',
   function(
     $scope,
     $stateParams,
@@ -581,13 +615,64 @@ app.controller('FormActionEditController', [
     $cacheFactory,
     Formio,
     FormioAlerts,
-    ActionInfoLoader
+    ActionInfoLoader,
+    FormioUtils,
+    $timeout
   ) {
     // Invalidate cache so actions fetch fresh request for
     // component selection inputs.
     $cacheFactory.get('$http').removeAll();
 
-    ActionInfoLoader.load($scope, $stateParams, Formio);
+    ActionInfoLoader.load($scope, $stateParams, Formio).then(function(actionInfo) {
+      // Auth action validation changes for new resource missing role assignment.
+      if(actionInfo && actionInfo.name === 'auth') {
+        var toggleVisible = function(association) {
+          if(!association) {
+            return;
+          }
+
+          angular.element('#form-group-role').css('display', (association === 'new' ? '' : 'none'));
+        };
+
+        // Find the role settings component, and require it as needed.
+        var toggleRequired = function(association, formComponents) {
+          if(!formComponents || !association) {
+            return;
+          }
+
+          FormioUtils.eachComponent(formComponents, function(component) {
+            if (component.key && component.key === 'role') {
+              // Update the validation settings.
+              component.validate = component.validate || {};
+              component.validate.required = (association === 'new' ? true : false);
+            }
+          });
+        };
+
+        // Force the validation to be run on page load.
+        $timeout(function() {
+          var action = $scope.action.data.settings || {};
+          toggleVisible(action.association);
+          toggleRequired(action.association, actionInfo.settingsForm.components);
+        });
+
+        // Watch for changes to the action settings.
+        $scope.$watch('action.data.settings', function(current, old) {
+          // Make the role setting required if this is for new resource associations.
+          if(current.hasOwnProperty('association') &&
+            old.hasOwnProperty('association') &&
+            current.association !== old.association
+          ) {
+            toggleVisible(current.association);
+            toggleRequired(current.association, actionInfo.settingsForm.components);
+
+            // Dont save the old role settings if this is an existing association.
+            current.role = (current.role && (current.association === 'new')) || '';
+          }
+        }, true);
+      }
+    });
+
     $scope.$on('formSubmission', function() {
       FormioAlerts.addAlert({type: 'success', message: 'Action was updated.'});
       $state.go('project.form.action.index');
