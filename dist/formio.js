@@ -1223,13 +1223,13 @@ app.run([
 
     $templateCache.put('formio/errors.html',
       '<div ng-show="formioFieldForm[component.key].$error && !formioFieldForm[component.key].$pristine">' +
-        '<p class="help-block" ng-show="formioFieldForm[component.key].$error.email">{{ component.label }} must be a valid email.</p>' +
-        '<p class="help-block" ng-show="formioFieldForm[component.key].$error.required">{{ component.label }} is required.</p>' +
-        '<p class="help-block" ng-show="formioFieldForm[component.key].$error.number">{{ component.label }} must be a number.</p>' +
-        '<p class="help-block" ng-show="formioFieldForm[component.key].$error.maxlength">{{ component.label }} must be shorter than {{ component.validate.maxLength + 1 }} characters.</p>' +
-        '<p class="help-block" ng-show="formioFieldForm[component.key].$error.minlength">{{ component.label }} must be longer than {{ component.validate.minLength - 1 }} characters.</p>' +
-        '<p class="help-block" ng-show="formioFieldForm[component.key].$error.min">{{ component.label }} must be higher than {{ component.validate.min - 1 }}.</p>' +
-        '<p class="help-block" ng-show="formioFieldForm[component.key].$error.max">{{ component.label }} must be lower than {{ component.validate.max + 1 }}.</p>' +
+        '<p class="help-block" ng-show="formioFieldForm[component.key].$error.email">{{ component.label || component.key }} must be a valid email.</p>' +
+        '<p class="help-block" ng-show="formioFieldForm[component.key].$error.required">{{ component.label || component.key }} is required.</p>' +
+        '<p class="help-block" ng-show="formioFieldForm[component.key].$error.number">{{ component.label || component.key }} must be a number.</p>' +
+        '<p class="help-block" ng-show="formioFieldForm[component.key].$error.maxlength">{{ component.label || component.key }} must be shorter than {{ component.validate.maxLength + 1 }} characters.</p>' +
+        '<p class="help-block" ng-show="formioFieldForm[component.key].$error.minlength">{{ component.label || component.key }} must be longer than {{ component.validate.minLength - 1 }} characters.</p>' +
+        '<p class="help-block" ng-show="formioFieldForm[component.key].$error.min">{{ component.label || component.key }} must be higher than {{ component.validate.min - 1 }}.</p>' +
+        '<p class="help-block" ng-show="formioFieldForm[component.key].$error.max">{{ component.label || component.key }} must be lower than {{ component.validate.max + 1 }}.</p>' +
         '<p class="help-block" ng-show="formioFieldForm[component.key].$error.custom">{{ component.customError }}</p>' +
       '</div>'
     );
