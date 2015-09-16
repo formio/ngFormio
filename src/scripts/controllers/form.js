@@ -73,11 +73,11 @@ app.config([
         templateUrl: 'views/form/permission/index.html',
         controller: 'FormSubmissionsController'
       })
-      .state('project.form.explorer', {
-        url: '/explorer',
+      .state('project.form.api', {
+        url: '/api',
         parent: 'project.form',
-        templateUrl: 'views/form/explorer/index.html',
-        controller: 'ExplorerController'
+        templateUrl: 'views/form/api/index.html',
+        controller: 'ApiController'
       });
 
     var formStates = {};
@@ -762,7 +762,7 @@ app.constant('SubmissionAccessLabels', {
 });
 
 
-app.controller('ExplorerController', [
+app.controller('ApiController', [
   '$scope',
   '$state',
   'Formio',

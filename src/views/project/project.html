@@ -8,7 +8,7 @@
       <div class="pull-right">
         <ul class="nav nav-pills" ng-if="currentProject">
           <li role="presentation" ng-class="{active:isActive('project.explorer')}">
-            <a ui-sref="project.explorer">API: https://{{ currentProject.name }}.form.io/</a>
+            <a ui-sref="project.api">https://{{ currentProject.name }}.form.io/</a>
           </li>
           <li role="presentation" ng-class="{active:isActive('project.edit')}"><a ui-sref="project.edit()">Edit</a></li>
           <li role="presentation" ng-class="{active:isActive('project.settings')}"><a ui-sref="project.settings()">Settings</a></li>
