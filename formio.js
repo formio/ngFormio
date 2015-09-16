@@ -83,6 +83,7 @@ app.provider('Formio', function() {
           this.actionsUrl = '';
           this.actionId = '';
           this.actionUrl = '';
+          this.query = '';
 
           // Normalize to an absolute path.
           if ((path.indexOf('http') !== 0) && (path.indexOf('//') !== 0)) {
@@ -125,9 +126,13 @@ app.provider('Formio', function() {
             subs.shift();
           }
 
-          // Remove the submissions and actions from the path.
+          // Get the base path without submissions and actions.
+          // Quick way to test... http://jsfiddle.net/travistidwell/wL49L766/4/
           var paths = [];
-          path = path.replace(/\/(submission|action)$|\/(submission|action)\/.*/, '');
+          var queryparts = path.split('?');
+          this.query = (queryparts.length > 1) ? '?' + queryparts[1] : '';
+          path = queryparts[0].replace(/\/(submission|action)($|\/.*)/, '');
+          path = path.replace(/\/$/, '');
 
           // See if this url has a subdomain.
           if (subdomain && subdomain !== 'api') {
@@ -227,7 +232,7 @@ app.provider('Formio', function() {
           var _url = type + 'Url';
           return function(query) {
             if (!this[_id]) { return $q.defer().promise; }
-            return request(this[_url], query);
+            return request(this[_url] + this.query, query);
           };
         };
 
@@ -245,7 +250,7 @@ app.provider('Formio', function() {
             var deferred = $q.defer();
             if (!this[_url]) { return deferred.promise; }
             var method = this[_id] ? 'put' : 'post';
-            $http[method](this[_url], data)
+            $http[method](this[_url] + this.query, data)
               .success(function (result) {
                 cache = {};
                 result.method = method;
