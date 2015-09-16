@@ -149,7 +149,7 @@ module.exports = function(router) {
         label: field.title + ' Field',
         key: 'settings[' + fieldKey + ']',
         placeholder: 'Select the ' + field.title + ' field',
-        template: '<span>{{ item.label }}</span>',
+        template: '<span>{{ item.label || item.key }}</span>',
         dataSrc: 'url',
         data: {url: dataSrc},
         valueProperty: 'key',
