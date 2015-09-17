@@ -107,7 +107,9 @@ module.exports = function(router) {
         payload.properties[hubspotKey] = data;
       });
 
-      util.connect(router, req).then(function(hubspot) {
+      util.connect(router, req, function(err, hubspot) {
+        if (err) { return next(); }
+
         hubspot.contacts_create_update(payload, function(err, result) {
           if (err) {
             // Should we do something with the error?
