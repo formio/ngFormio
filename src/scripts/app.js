@@ -90,11 +90,11 @@ angular
           parent: 'project',
           templateUrl: 'views/project/edit.html'
         })
-        .state('project.explorer', {
-          url: '/explorer',
+        .state('project.api', {
+          url: '/api',
           parent: 'project',
-          templateUrl: 'views/project/explorer/index.html',
-          controller: 'ExplorerController'
+          templateUrl: 'views/project/api/index.html',
+          controller: 'ApiController'
         })
         .state('project.settings', {
           url: '/settings',
