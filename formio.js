@@ -68,6 +68,7 @@ app.provider('Formio', function() {
             // a url
             this.projectUrl = baseUrl + '/project';
             this.projectId = false;
+            this.query = '';
             return;
           }
 
