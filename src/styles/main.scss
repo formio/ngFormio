@@ -371,6 +371,12 @@ pre code {
   white-space: pre-line;
 }
 
+// Only works with 1 column. If you need more, nest them.
+.col-centered {
+  float: none;
+  margin: 0 auto;
+}
+
 /***************************** Required styles *****************************/
 
 /**
@@ -533,6 +539,8 @@ ul.component-list li {
   text-align: left;
 }
 
+/***************************** Feedback *****************************/
+
 .feedback {
   position: fixed;
   right: 10px;
@@ -561,5 +569,123 @@ ul.component-list li {
     right: 3px;
     cursor: pointer;
     text-decoration: none;
+  }
+}
+
+/***************************** Auth Page *****************************/
+
+
+.login-container, .register-container {
+  color: rgba(255, 255, 255, .935);
+
+  padding-top: 90px;
+  padding-bottom: 90px;
+  border-radius: 10px;
+  min-height: 575px;
+
+  box-shadow: 3px 3px 5px 2px rgba(0,0,0, .33);
+
+  .signup-preamble {
+    font-weight: 100;
+  }
+
+  .auth-title {
+    font-weight:500;
+    margin: 0;
+    padding-bottom: 30px;
+    text-align: center;
+  }
+
+  // Hide our labels
+  label {
+    display: none;
+  }
+
+  input {
+    border-radius: 5px;
+    border: none;
+
+    &::-webkit-input-placeholder {
+      font-style: italic;
+    }
+    &::-moz-placeholder { /* Firefox 19+ */
+      font-style: italic;
+    }
+    &:-ms-input-placeholder {
+      font-style: italic;
+    }
+    &:-moz-placeholder { /* Firefox 18- */
+      font-style: italic;
+    }
+  }
+
+  .form-group {
+    margin-bottom: 10px;
+  }
+
+  button[type="submit"] {
+    margin-top: 20px;
+    border: none;
+    border-radius: 5px;
+  }
+
+  // Right align Forgot password link and terms of service agreement
+  // ckeditor doesn't let us put classes on html :(
+  .form-group div[ng-bind-html] p {
+    text-align: right;
+    font-weight: 100;
+    a {
+      color: #FFF;
+      // text-decoration: none;
+    }
+  }
+
+  // Turn error message into box
+  .has-error  {
+    .form-control {
+      border: 1px solid darken($brand-danger, 5%);
+    }
+    .help-block {
+      background-color: $brand-danger;
+      border: 1px solid darken($brand-danger, 5%);
+      color: #FFF;
+      padding: 4px 12px;
+      border-radius: 3px;
+    }
+  }
+}
+
+.login-container {
+  background-color: $brand-primary;
+
+  @media (min-width: $screen-md-min) {
+    margin-right: 15px;
+  }
+
+  @media (max-width: $screen-md-min) {
+    margin-bottom: 15px;
+  }
+
+
+  button[type="submit"] {
+    margin-top: 87px;
+    background-color: $brand-secondary;
+  }
+}
+
+.register-container {
+  background-color: $brand-secondary;
+
+  @media (min-width: $screen-md-min) {
+    margin-left: 15px;
+  }
+
+  button[type="submit"] {
+    background-color: $brand-primary;
+  }
+
+  // Hide required asterisks, required is implied
+  .field-required-inline {
+    display: none;
   }
 }
