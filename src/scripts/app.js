@@ -150,6 +150,11 @@ angular
           parent: 'project.settings',
           templateUrl: 'views/project/office365/office365.html'
         })
+        .state('project.settings.hubspot', {
+          url: '/hubspot',
+          parent: 'project.settings',
+          templateUrl: 'views/project/hubspot/hubspot.html'
+        })
         .state('project.settings.export', {
           url: '/export',
           parent: 'project.settings',
