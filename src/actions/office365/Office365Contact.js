@@ -180,7 +180,7 @@ module.exports = function(router) {
    * @param cb
    *   The callback function to execute upon completion.
    */
-  Office365ContactAction.prototype.resolve = function(req, res, next) {
+  Office365ContactAction.prototype.resolve = function(handler, method, req, res, next) {
     var payload = {};
 
     // Only add the payload for post and put.

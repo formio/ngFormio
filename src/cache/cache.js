@@ -56,7 +56,8 @@ module.exports = function(formio) {
         return cb(null, cache.projects[id]);
       }
 
-      var query = {_id: formio.mongoose.Types.ObjectId(id), deleted: {$eq: null}};
+      id = (typeof id === 'string') ? formio.mongoose.Types.ObjectId(id) : id;
+      var query = {_id: id, deleted: {$eq: null}};
       var params = req.params;
       formio.resources.project.model.findOne(query).exec(function (err, result) {
 
