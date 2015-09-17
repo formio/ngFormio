@@ -118,6 +118,11 @@ module.exports = function(app, formioServer) {
       fieldUrl: function (url, form, field) {
         return '/project/' + form.project + url;
       },
+      host: function(host, req) {
+        // Load the project settings.
+        var project = cache.currentProject(req);
+        return project.name + '.' + host;
+      },
       token: function (token, user, form) {
         token.form.project = form.project;
         return token;
