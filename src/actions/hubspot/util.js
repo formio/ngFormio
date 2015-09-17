@@ -2,7 +2,6 @@
 
 var _ = require('lodash');
 var hubspotApi = require('node-hubspot');
-var Q = require('q');
 
 module.exports = {
   /**
@@ -12,17 +11,16 @@ module.exports = {
    * @param req
    * @returns {*}
    */
-  connect: function(router, req) {
-    var deferred = Q.defer();
+  connect: function(router, req, next) {
     router.formio.hook.settings(req, function(err, settings) {
       if (err) {
-        return deferred.reject(err);
+        return next(err);
       }
       if (!settings) {
-        return deferred.reject('No settings found.');
+        return next('No settings found.');
       }
       if (!settings.hubspot) {
-        return deferred.reject('Hubspot not configured.');
+        return next('Hubspot not configured.');
       }
 
       var hubspot = hubspotApi({
@@ -30,10 +28,8 @@ module.exports = {
         version: 'v3'
       });
 
-      deferred.resolve(hubspot);
+      next(null, hubspot);
     });
-
-    return deferred.promise;
   },
   /**
    * Parse an address from Google Maps to Office 365.
