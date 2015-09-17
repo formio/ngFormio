@@ -18,7 +18,9 @@ module.exports = function(router) {
   HubspotContactAction.prototype = Object.create(router.formio.Action.prototype);
   HubspotContactAction.prototype.constructor = HubspotContactAction;
   HubspotContactAction.info = function(req, res, next) {
-    util.connect(router, req).then(function(hubspot) {
+    util.connect(router, req, function(err, hubspot) {
+      if (err) { return next(); }
+
       // Create the panel for all the fields.
       var fieldPanel = {
         type: 'panel',
