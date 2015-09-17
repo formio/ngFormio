@@ -59,6 +59,24 @@ angular
             }
           }
         })
+        .state('auth-resetpass-send', {
+          url: '/resetsend',
+          templateUrl: 'views/user/resetpass/resetsend.html',
+          controller: 'ResetPasswordSendController'
+        })
+        .state('auth-resetpass-send-done', {
+          url: '/resetsend/done',
+          templateUrl: 'views/user/resetpass/resetsend-done.html'
+        })
+        .state('auth-resetpass', {
+          url: '/resetpass?x-jwt-token',
+          templateUrl: 'views/user/resetpass/resetpass.html',
+          controller: 'ResetPasswordController'
+        })
+        .state('auth-resetpass-done', {
+          url: '/resetpass/done',
+          templateUrl: 'views/user/resetpass/resetpass-done.html'
+        })
         .state('profile', {
           abstract: true,
           url: '/profile',
@@ -277,6 +295,7 @@ angular
       $rootScope.userRegisterForm = AppConfig.userRegisterForm;
       $rootScope.teamForm = AppConfig.teamForm;
       $rootScope.feedbackForm = AppConfig.feedbackForm;
+      $rootScope.resetPassForm = AppConfig.resetPassForm;
 
       // Start the tutorial.
       $rootScope.startTutorial = function() {
