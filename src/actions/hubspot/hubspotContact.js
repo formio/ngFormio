@@ -75,7 +75,7 @@ module.exports = function(router) {
    * @param cb
    *   The callback function to execute upon completion.
    */
-  HubspotContactAction.prototype.resolve = function(req, res, next) {
+  HubspotContactAction.prototype.resolve = function(handler, method, req, res, next) {
     // Store the current resource.
     var currentResource = res.resource;
 
