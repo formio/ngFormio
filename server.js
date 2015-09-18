@@ -16,7 +16,7 @@ var favicon = require('serve-favicon');
 app.use(function(req, res, next) {
   var hostname = req.get('Host');
   var names = hostname.split('.');
-  if ((names.length === 2) && (names[0] !== 'localhost')) {
+  if ((names.length === 2) && (names[1] !== 'localhost')) {
     res.redirect('http://www.' + hostname + req.url);
     res.end();
   }
