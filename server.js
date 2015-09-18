@@ -15,8 +15,13 @@ var favicon = require('serve-favicon');
 // Redirect all root traffic to www
 app.use(function(req, res, next) {
   var hostname = req.get('Host');
-  if (hostname.split('.').length === 2) {
+  var names = hostname.split('.');
+  if ((names.length === 2) && (names[0] !== 'localhost')) {
     res.redirect('http://www.' + hostname + req.url);
+    res.end();
+  }
+  else {
+    next();
   }
 });
 
