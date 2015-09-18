@@ -23,12 +23,20 @@ app.controller('FeedbackController', [
     $scope.state = 'closed';
     $scope.feedbackInfo = {};
     $scope.showFeedback = function() {
+      if ($rootScope.user && $rootScope.user.data) {
+        var email = $rootScope.user.data.email;
+        var id = $rootScope.user._id;
+      }
+      else {
+        var email = 'anonymous@example.com';
+        var id = '';
+      }
       $scope.feedbackInfo = {
         data: {
           url: window.location.href,
           user: {
-            email: $rootScope.user.data.email,
-            id: $rootScope.user._id
+            email: email,
+            id: id
           }
         }
       };
