@@ -637,6 +637,14 @@ app.directive('formio', function() {
         $scope.showAlerts = function(alerts) {
           $scope.formioAlerts = [].concat(alerts);
         };
+
+        // Add the live form parameter to the url.
+        if ($scope.src && ($scope.src.indexOf('live=') === -1)) {
+          $scope.src += ($scope.src.indexOf('?') === -1) ? '?' : '&';
+          $scope.src += 'live=1';
+        }
+
+        // Create the formio object.
         $scope.formio = FormioScope.register($scope, $element, {
           form: true,
           submission: true
