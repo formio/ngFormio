@@ -631,7 +631,7 @@ ul.component-list li {
 
   // Right align Forgot password link and terms of service agreement
   // ckeditor doesn't let us put classes on html :(
-  .form-group div[ng-bind-html] p {
+  p {
     text-align: right;
     font-weight: 100;
     a {
