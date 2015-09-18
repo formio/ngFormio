@@ -15,7 +15,7 @@ module.exports = function(formio) {
         type: String,
         description: 'The name of the project.',
         required: true,
-        index: {unique: true}
+        index: true
       },
       description: {
         type: String,
@@ -63,7 +63,7 @@ module.exports = function(formio) {
       search._id = {$ne: this._id};
     }
 
-    formio.mongoose.model('project').findOne(search).lean(true).exec(function(err, result) {
+    formio.mongoose.model('project').findOne(search).exec(function(err, result) {
       if (err || result) {
         return done(false);
       }
