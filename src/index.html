@@ -51,55 +51,131 @@
     <!--[if lt IE 10]>
       <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
-    <nav class="navbar navbar-default navbar-fixed-top">
-      <div class="container">
-        <div class="row">
-          <div class="col-sm-12">
-            <div class="navbar-header">
-              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-              </button>
-              <a ui-sref="home()" class="navbar-brand">
-                <img height="35px;" src="images/formio-logo-white.png" />
-              </a>
-              <ol class="breadcrumb">
-                <li ng-if="currentProject"><a ui-sref="project.edit({projectId: currentProject._id})">{{ currentProject.title }}</a></li>
-                <li ng-if="currentForm"><a ui-sref="project.form.view({formId: currentForm._id})">{{ currentForm.title }}</a></li>
-              </ol>
-            </div>
-            <div id="navbar" class="navbar-collapse collapse">
-              <ul class="nav navbar-nav navbar-right">
-                <li class="dropdown user-dropdown" ng-cloak>
-                  <a ng-if="authenticated" href="#" class="dropdown-toggle" id="user-menu" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-user"></i> {{ user.data.name }}<b class="caret"></b></a>
-                  <ul class="dropdown-menu">
-                    <li><a ui-sref="profile.view()"><i class="fa fa-user"></i> Profile</a></li>
-                    <li class="divider"></li>
-                    <li><a href="" id="logout" ng-click="logout()"><i class="fa fa-power-off"></i> Log Out</a></li>
-                  </ul>
-                </li>
-                <li>
-                  <a href="http://help.form.io" target="_blank"><i class="fa fa-life-ring"></i> Help</a>
-                </li>
-              </ul>
+    <div id="content">
+      <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                  <span class="sr-only">Toggle navigation</span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+                </button>
+                <a ui-sref="home()" class="navbar-brand">
+                  <img height="35px;" src="images/formio-logo-white.png" />
+                </a>
+                <ol class="breadcrumb">
+                  <li ng-if="currentProject"><a ui-sref="project.edit({projectId: currentProject._id})">{{ currentProject.title }}</a></li>
+                  <li ng-if="currentForm"><a ui-sref="project.form.view({formId: currentForm._id})">{{ currentForm.title }}</a></li>
+                </ol>
+              </div>
+              <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav navbar-right">
+                  <li class="dropdown user-dropdown" ng-cloak>
+                    <a ng-if="authenticated" href="#" class="dropdown-toggle" id="user-menu" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-user"></i> {{ user.data.name }}<b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                      <li><a ui-sref="profile.view()"><i class="fa fa-user"></i> Profile</a></li>
+                      <li class="divider"></li>
+                      <li><a href="" id="logout" ng-click="logout()"><i class="fa fa-power-off"></i> Log Out</a></li>
+                    </ul>
+                  </li>
+                  <li>
+                    <a href="http://help.form.io" target="_blank"><i class="fa fa-life-ring"></i> Help</a>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </nav>
+      </nav>
 
-    <div class="container-fluid" id="main-wrapper" ng-cloak>
-      <div class="row">
-        <div class="col-sm-12 main">
-          <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)" ng-bind-html="alert.message"></alert>
-          <div ui-view></div>
+      <div class="container-fluid" id="main-wrapper" ng-cloak>
+        <div class="row">
+          <div class="col-sm-12 main">
+            <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)" ng-bind-html="alert.message"></alert>
+            <div ui-view></div>
+          </div>
         </div>
       </div>
+
+      <formio-feedback></formio-feedback>
+
     </div>
 
-    <formio-feedback></formio-feedback>
+
+
+    <footer>
+      <div class="blue">
+        <img id="footer-logo" src="images/formio-logo-green.png" alt="<form.io>">
+        <img id="footer-divider" src="images/footer-border.png">
+      </div>
+      <div class="green">
+        <div class="container">
+          <div class="row" id="footer-content">
+          <div class="col-lg-8">
+            <div class="row">
+              <div class="col-lg-3 col-sm-6">
+                <h3>&lt;form.io&gt;</h3>
+                <ul>
+                  <li><a href="https://form.io/#features">Features</a></li>
+                  <li><a href="http://www.form.io/#overview">Overview</a></li>
+                </ul>
+              </div>
+              <div class="col-lg-3 col-sm-6">
+                <h3>Resources</h3>
+                <ul>
+                  <li><a href="http://help.form.io">Learning Center</a></li>
+                  <li><a href="http://help.form.io">Documentation</a></li>
+                  <li><a href="http://help.form.io/support/">Support</a></li>
+                </ul>
+              </div>
+              <div class="col-lg-3 col-sm-6">
+                <h3>News</h3>
+                <ul>
+                  <li><a href="http://www.form.io/blog">Read our blog</a></li>
+                  <li><a href="http://www.form.io/blog">In the News</a></li>
+                  <li><a href="http://www.form.io/form.io-press-kit">Download Press Kit</a></li>
+                </ul>
+              </div>
+              <div class="col-lg-3 col-sm-6">
+                <h3>Community</h3>
+                <ul>
+                  <li><a href="https://github.com/formio/"><i class="fa fa-github-alt"></i> Fork Us on Github</a></li>
+                  <li><a href="https://www.facebook.com/form.ioapp"><i class="fa fa-facebook"></i> Connect on Facebook</a></li>
+                  <li><a href="https://twitter.com/form_io"><i class="fa fa-twitter"></i> Follow us on Twitter</a></li>
+                  <li><a href="https://www.linkedin.com/company/form-io"><i class="fa fa-linkedin"></i> Connect on LinkedIn</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          </div>
+          <div class="row" id="footer-nav">
+            <div class="col-xs-12 col-centered">
+              <div class="row">
+                <div class="footer-nav-item col-md-2"><a href="http://www.form.io/#overview">Overview</a></div>
+                <div class="footer-nav-item col-md-2"><a href="http://www.form.io/#features">Features</a></div>
+                <div class="footer-nav-item col-md-2"><a href="https://help.form.io">Documentation</a></div>
+                <div class="footer-nav-item col-md-2"><a href="https://help.form.io/support">Support</a></div>
+              </div>
+            </div>
+          </div>
+          <div class="row text-center">
+            <a href="http://www.form.io/form.io-privacy-policy" target="_blank">Privacy Policy</a>
+            &nbsp; | &nbsp;
+            <a href="http://www.form.io/form-terms-of-use" target="_blank">Terms of Service</a>
+            &nbsp; | &nbsp;
+            <a href="http://www.form.io/form.io-software-licensing-agreement" target="_blank">Software Agreement</a>
+            &nbsp; | &nbsp;
+            <a href="http://www.form.io/form.io-open-source-license-agreement" target="_blank">Open-Source License</a>
+          </div>
+        </div>
+        <div class="row text-center">
+          <p id="copyright"><small>© Copyright 2015. FORM LLC. All rights reserved.</small></p>
+        </div>
+      </div>
+    </footer>
 
     <!-- JSLogger error loggin -->
     <script type="text/javascript">

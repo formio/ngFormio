@@ -546,9 +546,10 @@ ul.component-list li {
   right: 10px;
   bottom: 20px;
   width: auto;
+  z-index: 5;
   .feedback-link {
     padding: 10px;
-    background-color: #6eb246;
+    background-color: $brand-primary;
     color: white;
     cursor: pointer;
     &:hover {
@@ -688,4 +689,121 @@ ul.component-list li {
   .field-required-inline {
     display: none;
   }
+}
+
+/***************************** Footer *****************************/
+
+@font-face {
+    font-family: 'HelveticaNeueLTStd-MdCn';
+    src: url('//cdn2.hubspot.net/hubfs/1549875/Form_Site/fonts/HelveticaNeueLTStd-MdCn.eot?#iefix&t=1442590693060') format('embedded-opentype'),url('//cdn2.hubspot.net/hubfs/1549875/Form_Site/fonts/HelveticaNeueLTStd-MdCn.otf?t=1442590693060') format('opentype'),url('//cdn2.hubspot.net/hubfs/1549875/Form_Site/fonts/HelveticaNeueLTStd-MdCn.woff?t=1442590693060') format('woff'),url('//cdn2.hubspot.net/hubfs/1549875/Form_Site/fonts/HelveticaNeueLTStd-MdCn.ttf?t=1442590693060') format('truetype'),url('//cdn2.hubspot.net/hubfs/1549875/Form_Site/fonts/HelveticaNeueLTStd-MdCn.svg#HelveticaNeueLTStd-MdCn?t=1442590693060') format('svg');
+    font-weight: normal;
+    font-style: normal
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  display: table;
+  width: 100%;
+  height: 100%;
+}
+
+#content {
+  display: table-row;
+  height: auto;
+}
+
+footer {
+  display: table-row;
+  height: 1px;
+  // width: 100%;
+  color: #FFF;
+
+  a, a:hover, a:active {
+    color: #FFF
+  }
+
+  .blue {
+    background: $brand-primary;
+    height: 80px;
+    position: relative;
+  }
+
+  .green {
+    padding-top: 25px;
+    background: #56b147;
+  }
+
+  #footer-logo {
+    float: right;
+    height: 40px;
+    margin-right: 40px;
+    margin-top: 15px;
+  }
+
+  #footer-divider {
+    width: 100%;
+    height: 80px;
+    position: absolute;
+    bottom: -45px;
+  }
+
+  h3 {
+    padding-top: 15px;
+    font-size: 28px;
+    line-height: 32px;
+    padding-bottom: 30px;
+    color: #FFF;
+    font-family: 'HelveticaNeueLTStd-MdCn';
+    letter-spacing: 1px;
+  }
+
+  ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  #footer-content ul {
+    font-size: 14px;
+    li {
+      padding: 10px 0 10px 0;
+      .fa {
+        width: 15px;
+      }
+    }
+    li:not(:first-child) {
+      border-top: #70d160 solid 1px;
+    }
+  }
+
+  #footer-nav {
+    margin-top: 30px;
+    margin-bottom: 30px;
+    font-family: 'HelveticaNeueLTStd-MdCn';
+    font-size: 18px;
+    line-height: 18px;
+    text-transform: uppercase;
+    text-align: center;
+    @media(min-width: $screen-md-min) {
+      .footer-nav-item:not(:first-child) {
+        border-left: #8dc34a solid 1px;
+      }
+    }
+    @media(max-width: $screen-md-min) {
+      .footer-nav-item {
+        padding: 5px;
+        text-align: left;
+      }
+    }
+
+
+  }
+
+  #copyright {
+    padding: 5px;
+  }
+
 }
