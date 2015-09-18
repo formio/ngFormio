@@ -85,7 +85,7 @@ app.provider('Formio', function() {
           this.actionsUrl = '';
           this.actionId = '';
           this.actionUrl = '';
-          this.query = '';
+          this.pageQuery = '';
 
           // Normalize to an absolute path.
           if ((path.indexOf('http') !== 0) && (path.indexOf('//') !== 0)) {
@@ -132,7 +132,7 @@ app.provider('Formio', function() {
           // Quick way to test... http://jsfiddle.net/travistidwell/wL49L766/4/
           var paths = [];
           var queryparts = path.split('?');
-          this.query = (queryparts.length > 1) ? '?' + queryparts[1] : '';
+          this.pageQuery = (queryparts.length > 1) ? '?' + queryparts[1] : '';
           path = queryparts[0].replace(/\/(submission|action)($|\/.*)/, '');
           path = path.replace(/\/$/, '');
 
@@ -234,7 +234,8 @@ app.provider('Formio', function() {
           var _url = type + 'Url';
           return function(query) {
             if (!this[_id]) { return $q.defer().promise; }
-            return request(this[_url] + this.query, query);
+            var pageQuery = this.pageQuery ? this.pageQuery : '';
+            return request(this[_url] + pageQuery, query);
           };
         };
 
@@ -252,7 +253,8 @@ app.provider('Formio', function() {
             var deferred = $q.defer();
             if (!this[_url]) { return deferred.promise; }
             var method = this[_id] ? 'put' : 'post';
-            $http[method](this[_url] + this.query, data)
+            var pageQuery = this.pageQuery ? this.pageQuery : '';
+            $http[method](this[_url] + pageQuery, data)
               .success(function (result) {
                 cache = {};
                 result.method = method;
