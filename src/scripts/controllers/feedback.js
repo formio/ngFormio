@@ -23,13 +23,11 @@ app.controller('FeedbackController', [
     $scope.state = 'closed';
     $scope.feedbackInfo = {};
     $scope.showFeedback = function() {
+      var email = 'anonymous@example.com';
+      var id = '';
       if ($rootScope.user && $rootScope.user.data) {
-        var email = $rootScope.user.data.email;
-        var id = $rootScope.user._id;
-      }
-      else {
-        var email = 'anonymous@example.com';
-        var id = '';
+        email = $rootScope.user.data.email;
+        id = $rootScope.user._id;
       }
       $scope.feedbackInfo = {
         data: {
