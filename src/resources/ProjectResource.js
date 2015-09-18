@@ -3,6 +3,7 @@
 var Resource = require('resourcejs');
 var config = require('../../config');
 var _ = require('lodash');
+var debug = require('debug')('formio:resources:projects');
 
 module.exports = function(router, formio) {
   var resource = Resource(
@@ -49,11 +50,13 @@ module.exports = function(router, formio) {
       return res.status(200).send({available: false});
     }
 
-    resource.model.findOne({name: req.body.name}, function(err, project) {
+    resource.model.findOne({name: req.body.name, deleted: {$eq: null}}, function(err, project) {
       if (err) {
+        debug(err);
         return next(err);
       }
 
+      debug('Project is available: ' + !project);
       return res.status(200).json({available: !project});
     });
   });
