@@ -18,6 +18,7 @@ dependencies:
     - npm install -g bower gulp mocha
   override:
     - ./appSetup.sh
+    - echo $TAG > dist/version.txt
 
 test:
   pre:
