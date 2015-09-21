@@ -11,6 +11,8 @@ var library = null;
 var protocol = process.env.APPPROTOCOL || 'http';
 var domain = process.env.APPDOMAIN || 'localhost';
 var port = process.env.APPPORT || 80;
+var serverHost = process.env.SERVERHOST || 'localhost:3000';
+var serverProtocol = process.env.SERVERPROTOCOL || 'http';
 var url = (port === 80)
   ? protocol + '://' + domain
   : protocol + '://' + domain + ':' + port;
@@ -21,11 +23,17 @@ var options = {
   },
   ngRoot: 'body'
 };
+var config = {
+  protocol: protocol,
+  baseUrl: url,
+  serverProtocol: serverProtocol,
+  serverHost: serverHost
+}
 
 Yadda.plugins.mocha.StepLevelPlugin.init();
 new Yadda.FeatureFileSearch('./test/features').each(function(file) {
   before(function(done) {
-    library = require('./lib/formio-library')()
+    library = require('./lib/formio-library')(config)
     done();
   });
 
@@ -39,9 +47,7 @@ new Yadda.FeatureFileSearch('./test/features').each(function(file) {
 
     scenarios(feature.scenarios, function(scenario) {
       steps(scenario.steps, function(step, done) {
-        loadApiServer(function() {
-          Yadda.createInstance(library, { driver: driver }).run(step, done);
-        });
+        Yadda.createInstance(library, { driver: driver }).run(step, done);
       });
     });
 

@@ -3,60 +3,61 @@
 var assert = require('assert');
 var Yadda = require('yadda');
 var English = Yadda.localisation.English;
+var request = require('request');
 
-module.exports = function(formio) {
+module.exports = function(config) {
   // Global timeout for wait* commands.
   var timeout = 60000;
 
-  var getProject = function(projectName, next) {
-    formio.resources.project.model.findOne({'name': projectName}, function(err, project) {
-      if (err) {
-        return next(err);
-      }
-      else if (!project) {
-        return next(new Error('Project not found'));
-      }
-
-      next(null, project);
-    });
-  };
-
-  var getForm = function(projectId, formName, next) {
-    formio.resources.form.model.findOne({project: projectId, name: formName}, function(err, form) {
-      if (err) {
-        return next(err);
-      }
-      else if (!form) {
-        return next(new Error('Form not found'));
-      }
-
-      next(null, form);
-    });
-  };
-
-  var getSubmission = function(filter, next) {
-    formio.resources.submission.model.findOne(filter, function(err, submission) {
-      if (err) {
-        return next(err);
-      }
-
-      next(null, submission);
-    });
-  };
-
-  var createSubmission = function(submission, next) {
-    formio.resources.submission.model.create(submission, function(err, submission) {
-      if (err) {
-        return next(err);
-      }
-
-      next(null, submission);
-    });
-  };
+  //var getProject = function(projectName, next) {
+  //  formio.resources.project.model.findOne({'name': projectName}, function(err, project) {
+  //    if (err) {
+  //      return next(err);
+  //    }
+  //    else if (!project) {
+  //      return next(new Error('Project not found'));
+  //    }
+  //
+  //    next(null, project);
+  //  });
+  //};
+  //
+  //var getForm = function(projectId, formName, next) {
+  //  formio.resources.form.model.findOne({project: projectId, name: formName}, function(err, form) {
+  //    if (err) {
+  //      return next(err);
+  //    }
+  //    else if (!form) {
+  //      return next(new Error('Form not found'));
+  //    }
+  //
+  //    next(null, form);
+  //  });
+  //};
+  //
+  //var getSubmission = function(filter, next) {
+  //  formio.resources.submission.model.findOne(filter, function(err, submission) {
+  //    if (err) {
+  //      return next(err);
+  //    }
+  //
+  //    next(null, submission);
+  //  });
+  //};
+  //
+  //var createSubmission = function(submission, next) {
+  //  formio.resources.submission.model.create(submission, function(err, submission) {
+  //    if (err) {
+  //      return next(err);
+  //    }
+  //
+  //    next(null, submission);
+  //  });
+  //};
 
   var ensureOnPage = function(path, next) {
     if (!path) {
-      path = '/app/#';
+      path = '/#';
     }
     this.driver.url()
       .then(function(res) {
@@ -72,72 +73,48 @@ module.exports = function(formio) {
   }
 
   var authUser = function(projectName, formName, email, password, next) {
-    getProject('formio', function(err, project) {
-      if (err) {
-        // Throw errors that show the db is in a bad state, no tests can pass without this.
-        throw err;
-      }
-
-      getForm(project._id, 'user', function(err, form) {
-        if (err) {
-          // Throw errors that show the db is in a bad state, no tests can pass without this.
-          throw err;
+    request({
+      "rejectUnauthorized": false,
+      uri: config.serverProtocol + '://' + projectName + '.' + config.serverHost + '/' + formName + '/submission',
+      method: 'POST',
+      form: {
+        data: {
+          'user.email': email,
+          'user.password': password
         }
-
-        formio.auth.authenticate(form, 'email', 'password', email, password, function(err, res) {
-          if (err) {
-            return next(err);
-          }
-
-          next(null, res);
-        });
-      });
+      }
+    }, function(err, response, body) {
+      if (err) return next(err);
+      next(null, body);
     });
   };
 
   var createUser = function(projectName, formName, email, password, next) {
-    getProject(projectName, function(err, project) {
-      if (err) {
-        // Throw errors that show the db is in a bad state, no tests can pass without this.
-        throw err;
-      }
-
-      getForm(project._id, formName, function(err, form) {
-        if (err) {
-          // Throw errors that show the db is in a bad state, no tests can pass without this.
-          throw err;
+    request({
+      "rejectUnauthorized": false,
+      uri: config.serverProtocol + '://' + projectName + '.' + config.serverHost + '/' + formName + '/submission',
+      method: 'POST',
+      form: {
+        data: {
+          'user.email': email,
+          'user.name': Date.now(),
+          'user.password': password,
+          'verifyPassword': password
         }
-
-        var encrypt = require('formio/app/actions/fields/password')(formio);
-        var req = {
-          body: {
-            data: {
-              email: email,
-              password: password
-            }
-          }
-        };
-
-        encrypt.beforePost({key: 'password'}, req, {}, function() {
-          createSubmission({
-            form: form._id,
-            data: {
-              email: email,
-              password:req.body.data.password
-            }
-          }, next);
-        });
-      });
+      }
+    }, function(err, response, body) {
+      if (err) return next(err);
+      next(null, body.toJSON());
     });
   };
 
   var createAndAuthUser = function(email, password, next) {
-    createUser('formio', 'user', email, password, function(err, user) {
+    createUser('formio', 'user/register', email, password, function(err, user) {
       if (err) {
         return next(err);
       }
 
-      authUser('formio', 'user', email, password, function(err, res) {
+      authUser('formio', 'user/login', email, password, function(err, res) {
         if (err) {
           return next(err);
         }
@@ -152,7 +129,7 @@ module.exports = function(formio) {
 
   var library = English.library()
     .given('I am (?:on|at) (?:the )?(.+?)(?: page)?$', function(url, next) {
-      var path = (url === 'home') ? formio.config.appHost + '/' : formio.config.appHost + url;
+      var path = (url === 'home') ? config.baseUrl + '/' : config.baseUrl + url;
 
       this.driver.url(path)
         .then(function() {
@@ -160,10 +137,10 @@ module.exports = function(formio) {
         });
     })
     .given('an account exists with the email $EMAIL and the password $PASSWORD', function(email, password, next) {
-      authUser('formio', 'user', email, password, function(err, res) {
-        if (err || !res) {
+      authUser('formio', 'user/login', email, password, function(err, res) {
+        if (err || res === 'Invalid user') {
           // User doesn't exist. Create it.
-          return createUser('formio', 'user', email, password, next, next);
+          return createUser('formio', 'user/register', email, password, next);
         }
 
         // User already exists. Do nothing.
@@ -198,7 +175,7 @@ module.exports = function(formio) {
       });
     })
     .given('I am logged in as $EMAIL with password $PASSWORD', function(email, password, next) {
-      authUser('formio', 'user', email, password, function(err, res) {
+      authUser('formio', 'user/login', email, password, function(err, res) {
         if (err) {
           return next(err);
         }
@@ -228,7 +205,7 @@ module.exports = function(formio) {
         });
     })
     .when('I click (?:on )?the $BUTTON button', function(button, next) {
-      this.driver.click('//div[@id=\'form-group-submit\']//button[\'' + button + '\']')
+      this.driver.click('//button[contains(.,\'' + button + '\')]')
         .then(function() {
           next();
         });
@@ -280,7 +257,7 @@ module.exports = function(formio) {
         });
     })
     .then('I am (?:on|at) (?:the )?(.+?)(?: page)$', function(path, next) {
-      path = (path === 'home') ? formio.config.appHost + '/' : formio.config.appHost + path;
+      path = (path === 'home') ? config.baseUrl + '/' : config.baseUrl + path;
 
       this.driver.url()
         .then(function(res) {

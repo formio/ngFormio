@@ -6,6 +6,8 @@ machine:
     TAG: ${CIRCLE_BRANCH:-$(echo $CIRCLE_TAG)}
     AWS_DEFAULT_REGION: "us-west-2"
     PORT: 3001
+    SERVERHOST: test-form.io
+    SERVERPROTOCOL: http
 
 dependencies:
   pre:
@@ -19,7 +21,7 @@ dependencies:
 
 test:
   pre:
-    - PORT=$PORT SERVERHOST=test-form.io npm start:
+    - PORT=$PORT npm start:
         background: true
     - sleep 10
 
