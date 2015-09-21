@@ -1,0 +1,36 @@
+machine:
+  node:
+    version: 0.12.7
+  environment:
+    SHORT_SHA: $(echo $CIRCLE_SHA1 | cut -b1-7)
+    TAG: ${CIRCLE_BRANCH:-$(echo $CIRCLE_TAG)}
+    AWS_DEFAULT_REGION: "us-west-2"
+    PORT: 3001
+
+dependencies:
+  pre:
+    - wget http://selenium-release.storage.googleapis.com/2.46/selenium-server-standalone-2.46.0.jar
+    - java -jar selenium-server-standalone-2.46.0.jar:
+        background: true
+    - pip install awscli
+    - npm install -g bower gulp mocha
+  override:
+    - ./appSetup.sh
+
+test:
+  pre:
+    - PORT=$PORT SERVERHOST=test-form.io npm start:
+        background: true
+    - sleep 10
+
+deployment:
+  release:
+    tag: /^\d+\.\d+\.\d+$/
+    commands:
+      - cd dist && tar -czvf ../${TAG}.tgz *
+      - aws s3 cp ${TAG}.tgz s3://formio-app-releases/${TAG}.tgz
+  build:
+    tag: /build-.*/
+    commands:
+      - cd dist && tar -czvf ../${TAG}.tgz *
+      - aws s3 cp ${TAG}.tgz s3://formio-app-releases/${TAG}.tgz
