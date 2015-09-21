@@ -5,7 +5,6 @@
   },
   "scripts": {
     "start": "node app.js",
-//    "test": "APPPROTOCOL=http APPDOMAIN=portal.localhost APPPORT=3001 mocha --timeout 30000 --reporter spec test/test.js"
     "test": "echo \"Warning: no test specified\" && exit 0"
   },
   "main": "./index.js",
