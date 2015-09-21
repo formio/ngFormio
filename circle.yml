@@ -21,7 +21,7 @@ dependencies:
 
 test:
   pre:
-    - PORT=$PORT npm start:
+    - npm start:
         background: true
     - sleep 10
 
