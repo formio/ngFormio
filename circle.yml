@@ -12,7 +12,6 @@ machine:
     IMAGE_PATH: "formio/formio-server"
     AWS_DEFAULT_REGION: "us-west-2"
     MONGO: "mongodb://localhost:27017/formio"
-    APPPORT: 3001
 
 dependencies:
   pre:
@@ -20,18 +19,13 @@ dependencies:
     - sudo /etc/init.d/mongodb stop
     - sudo cp mongodb-linux-x86_64-ubuntu1204-3.0.5/bin/* /usr/bin
     - sudo /etc/init.d/mongodb start
-    - wget http://selenium-release.storage.googleapis.com/2.46/selenium-server-standalone-2.46.0.jar
-    - java -jar selenium-server-standalone-2.46.0.jar:
-        background: true
     - pip install awscli
-    - npm install -g bower gulp mocha
+    - npm install -g mocha
   override:
     - echo $TAG_NAME
     - ./serverSetup.sh
     - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
     - docker build -t $IMAGE_PATH:$SHORT_SHA -f deployment/docker/formio-server/Dockerfile .
-    - git clone -b $TAG git@github.com:formio/formio-app.git
-    - cd formio-app && ./appSetup.sh
   post:
     - ./deployment/scripts/importDb.sh formio
 
@@ -40,27 +34,20 @@ test:
     - sudo bash -c "echo \"127.0.0.1 formio.localhost\" >> /etc/hosts"
     - sudo bash -c "echo \"127.0.0.1 api.localhost\" >> /etc/hosts"
     - docker run -d -e "MONGO1=$MONGO" -e "PROTOCOL=http" -e "DOMAIN=localhost" -e "PORT=3000" -e "DEBUG=formio:*" --name formio-server --net=host $IMAGE_PATH:$SHORT_SHA
-    - cd formio-app && PORT=$APPPORT npm start:
-        background: true
     - sleep 10
     - docker logs formio-server
-    - curl --retry 10 --retry-delay 5 -v http://localhost:$APPPORT
     - curl --retry 10 --retry-delay 5 -v http://api.localhost:3000/health
 
 deployment:
   release:
     tag: /^\d+\.\d+\.\d+$/
     commands:
-      - cd formio-app/dist && tar -czvf ../../${TAG}.tgz *
-      - aws s3 cp ${TAG}.tgz s3://formio-app-releases/${TAG}.tgz
       - docker tag $IMAGE_PATH:$SHORT_SHA $IMAGE_PATH:$TAG
       - docker push $IMAGE_PATH:$TAG
       - ./deployment/scripts/createVersion.sh $TAG
   build:
     tag: /build-.*/
     commands:
-      - cd formio-app/dist && tar -czvf ../../${TAG}.tgz *
-      - aws s3 cp ${TAG}.tgz s3://formio-app-releases/${TAG}.tgz
       - docker tag $IMAGE_PATH:$SHORT_SHA $IMAGE_PATH:$TAG
       - docker push $IMAGE_PATH:$TAG
       - ./deployment/scripts/createVersion.sh $TAG
