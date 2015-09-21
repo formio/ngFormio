@@ -12,6 +12,19 @@ var methodOverride = require('method-override');
 var app = express();
 var favicon = require('serve-favicon');
 
+// Redirect all root traffic to www
+app.use(function(req, res, next) {
+  var hostname = req.get('Host');
+  var names = hostname.split('.');
+  if ((names.length === 2) && (names[1].search(/^localhost(:[0-9]+)?$/) === -1)) {
+    res.redirect('http://www.' + hostname + req.url);
+    res.end();
+  }
+  else {
+    next();
+  }
+});
+
 app.use(favicon(__dirname + '/favicon.ico'));
 
 // Add Middleware necessary for REST API's
@@ -27,16 +40,6 @@ nunjucks.configure('views', {
   autoescape: true,
   express: app,
   watch: false
-});
-
-// Redirect www to the right server.
-app.use(function(req, res, next) {
-  if (req.get('Host').split('.')[0] !== 'www') {
-    return next();
-  }
-  var parts = req.get('Host').split('.');
-  parts.shift(); // Remove www
-  res.redirect('http://' + parts.join('.') + req.url);
 });
 
 // Make sure to redirect all http requests to https.
