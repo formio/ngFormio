@@ -32,7 +32,7 @@ config.protocol = protocol;
 config.domain = domain;
 config.formio.domain = domain;
 config.formio.protocol = protocol;
-config.formio.baseUrl = domain + (port!==80 ? ':'+port : '');
+config.formio.baseUrl = domain + (port !== 80 ? ':' + port : '');
 config.port = port;
 config.host = host;
 
@@ -78,11 +78,11 @@ config.formio.jwt.expireTime = process.env.JWT_EXPIRE_TIME || 240;
 config.jslogger = process.env.JS_LOGGER || 123;
 
 // Allow the config to be displayed when debugged.
-var sanitized = _.clone(config);
+var sanitized = _.clone(config, true);
 sanitized = _.pick(sanitized, [
   'https', 'domain', 'port', 'host', 'project', 'formioHost', 'apiHost', 'debug'
 ]);
-sanitized.formio = _.pick(sanitized.formio, ['domain', 'schema', 'mongo']);
+sanitized.formio = _.pick(_.clone(config.formio), ['domain', 'schema', 'mongo']);
 
 // Only output sanitized data.
 debug.config(sanitized);

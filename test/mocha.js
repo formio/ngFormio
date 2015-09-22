@@ -1,0 +1,699 @@
+'use strict';
+
+var request = require('supertest');
+var assert = require('assert');
+var _ = require('lodash');
+var Q = require('q');
+var express = require('express');
+var path = require('path');
+var _formio = path.dirname(require.resolve('formio'));
+var _test = path.join(_formio, 'test');
+var async = require('async');
+var chance = new (require('chance'))();
+
+var docker = process.env.DOCKER || false;
+var app = null;
+var template = null;
+var ready = null;
+
+process.on('uncaughtException', function(err) {
+  console.log(err.stack);
+});
+
+if (docker) {
+  app = 'http://api.localhost:3000';
+  template = require(path.join(_test, 'template'))();
+}
+else {
+  ready = Q.defer();
+
+  require('./bootstrap')()
+    .then(function(state) {
+      app = state.app;
+      template = state.template;
+
+      ready.resolve();
+    });
+}
+
+/**
+ * The _id's for known formio entities.
+ */
+var formio = {
+  owner: {
+    data: {
+      name: chance.word(),
+      email: chance.email(),
+      password: 'test123'
+    }
+  },
+  project: {
+    _id: '553db92f72f702e714dd9778'
+  },
+  formRegister: {
+    _id: '553dbedd3c605f841af5b3a7'
+  },
+  formLogin: {
+    _id: '553dbe603c605f841af5b3a5'
+  },
+  resource: {
+    _id: '553db94e72f702e714dd9779'
+  }
+};
+
+/**
+ * Create a simulated Form.io environment for testing.
+ */
+describe('Bootstrap', function() {
+  describe('Recreate Formio', function() {
+    before(function(done) {
+      if (docker) return done();
+
+      ready.promise.then(done);
+    });
+
+    it('Should remove old test data', function(done) {
+      if (docker) return done();
+
+      /**
+       * Remove all documents using a mongoose model.
+       *
+       * @param model
+       *   The mongoose model to delete.
+       * @param next
+       *   The callback to execute.
+       */
+      var dropDocuments = function(model, next) {
+        model.remove({}, function(err) {
+          if (err) {
+            return next(err);
+          }
+
+          next();
+        });
+      };
+
+      // Remove all test documents for roles.
+      var dropRoles = function() {
+        dropDocuments(app.formio.roles.resource.model, done);
+      };
+
+      // Remove all test documents for actions.
+      var dropActions = function() {
+        dropDocuments(app.formio.actions.model, dropRoles);
+      };
+
+      // Remove all test documents for submissions.
+      var dropSubmissions = function() {
+        dropDocuments(app.formio.resources.submission.model, dropActions);
+      };
+
+      // Remove all test documents for forms.
+      var dropForms = function() {
+        dropDocuments(app.formio.resources.form.model, dropSubmissions);
+      };
+
+      // Remove all test documents for Projects.
+      var dropProjects = function() {
+        dropDocuments(app.formio.resources.project.model, dropForms);
+      };
+
+      // Clear out all test data, starting with Projects.
+      dropProjects();
+    });
+
+    it('Should be able to bootstrap Form.io', function(done) {
+      if (docker) return done();
+
+      /**
+       * Store a document using a mongoose model.
+       *
+       * @param model
+       *   The mongoose model to use for document storage.
+       * @param document
+       *   The document to store in Mongo.
+       * @param next
+       *   The callback to execute.
+       */
+      var storeDocument = function(model, document, next) {
+        model.create(formio[document], function(err, result) {
+          if (err) {
+            return done(err);
+          }
+
+          formio[document] = result;
+          next();
+        });
+      };
+
+      // Create the initial submission for the initialForm form.
+      var createSubmission = function() {
+        formio.owner = {
+          data: formio.owner.data,
+          form: formio.formRegister._id
+        };
+
+        storeDocument(app.formio.resources.submission.model, 'owner', done);
+      };
+
+      // Attach the auth action for the initialForm.
+      var createActionRegister = function() {
+        formio.actionRegister = {
+          title: 'Authentication',
+          name: 'auth',
+          handler: ['before'],
+          method: ['create'],
+          priority: 0,
+          settings: {
+            association: 'new',
+            username: 'user.username',
+            password: 'user.password'
+          },
+          form: formio.formRegister._id
+        };
+
+        storeDocument(app.formio.actions.model, 'actionRegister', createSubmission);
+      };
+
+      // Attach the auth action for the initialForm.
+      var createActionLogin = function() {
+        formio.actionLogin = {
+          title: 'Authentication',
+          name: 'auth',
+          handler: ['before'],
+          method: ['create'],
+          priority: 0,
+          settings: {
+            association: 'existing',
+            username: 'user.username',
+            password: 'user.password'
+          },
+          form: formio.formLogin._id
+        };
+
+        storeDocument(app.formio.actions.model, 'actionLogin', createActionRegister);
+      };
+
+      // Create the initial form to register users.
+      var createRegisterForm = function() {
+        formio.formRegister = {
+          title: 'User Register',
+          name: 'register',
+          path: 'user/register',
+          type: 'form',
+          project: formio.project._id,
+          access: [
+            {type: 'read_all', roles: [formio.roleAnonymous._id]}
+          ],
+          submissionAccess: [
+            {type: 'create_own', roles: [formio.roleAnonymous._id]}
+          ],
+          components: [
+            {
+              type: 'textfield',
+              validate: {
+                custom: '',
+                pattern: '',
+                maxLength: '',
+                minLength: '',
+                required: false
+              },
+              defaultValue: '',
+              multiple: false,
+              suffix: '',
+              prefix: '',
+              placeholder: 'username',
+              key: 'user.username',
+              label: 'username',
+              inputMask: '',
+              inputType: 'text',
+              input: true
+            },
+            {
+              type: 'password',
+              suffix: '',
+              prefix: '',
+              placeholder: 'password',
+              key: 'user.password',
+              label: 'password',
+              inputType: 'password',
+              input: true
+            },
+            {
+              theme: 'primary',
+              disableOnInvalid: true,
+              action: 'submit',
+              block: false,
+              rightIcon: '',
+              leftIcon: '',
+              size: 'md',
+              key: 'submit',
+              label: 'Submit',
+              input: true,
+              type: 'button'
+            }
+          ]
+        };
+
+        storeDocument(app.formio.resources.form.model, 'formRegister', createActionLogin);
+      };
+
+      // Create the initial form to authenticate against our resource.
+      var createLoginForm = function() {
+        formio.formLogin = {
+          title: 'User Login',
+          name: 'login',
+          path: 'user/login',
+          type: 'form',
+          project: formio.project._id,
+          access: [
+            {type: 'read_all', roles: [formio.roleAnonymous._id]}
+          ],
+          submissionAccess: [
+            {type: 'create_own', roles: [formio.roleAnonymous._id]}
+          ],
+          components: [
+            {
+              type: 'textfield',
+              validate: {
+                custom: '',
+                pattern: '',
+                maxLength: '',
+                minLength: '',
+                required: false
+              },
+              defaultValue: '',
+              multiple: false,
+              suffix: '',
+              prefix: '',
+              placeholder: 'username',
+              key: 'user.username',
+              label: 'username',
+              inputMask: '',
+              inputType: 'text',
+              input: true
+            },
+            {
+              type: 'password',
+              suffix: '',
+              prefix: '',
+              placeholder: 'password',
+              key: 'user.password',
+              label: 'password',
+              inputType: 'password',
+              input: true
+            },
+            {
+              theme: 'primary',
+              disableOnInvalid: true,
+              action: 'submit',
+              block: false,
+              rightIcon: '',
+              leftIcon: '',
+              size: 'md',
+              key: 'submit',
+              label: 'Submit',
+              input: true,
+              type: 'button'
+            }
+          ]
+        };
+
+        storeDocument(app.formio.resources.form.model, 'formLogin', createRegisterForm);
+      };
+
+      // Create the initial resource to for users.
+      var createResource = function() {
+        formio.resource = {
+          title: 'Users',
+          name: 'user',
+          path: 'user',
+          type: 'resource',
+          project: formio.project._id,
+          access: [],
+          submissionAccess: [
+            {type: 'read_own', roles: [formio.roleAuthenticated._id]},
+            {type: 'update_own', roles: [formio.roleAuthenticated._id]},
+            {type: 'delete_own', roles: [formio.roleAuthenticated._id]}
+          ],
+          components: [
+            {
+              type: 'textfield',
+              validate: {
+                custom: '',
+                pattern: '',
+                maxLength: '',
+                minLength: '',
+                required: false
+              },
+              defaultValue: '',
+              multiple: false,
+              suffix: '',
+              prefix: '',
+              placeholder: 'username',
+              key: 'username',
+              label: 'username',
+              inputMask: '',
+              inputType: 'text',
+              input: true
+            },
+            {
+              type: 'password',
+              suffix: '',
+              prefix: '',
+              placeholder: 'password',
+              key: 'password',
+              label: 'password',
+              inputType: 'password',
+              input: true
+            }
+          ]
+        };
+
+        storeDocument(app.formio.resources.form.model, 'resource', createLoginForm);
+      };
+
+      // Set the default Project access.
+      var setDefaultProjectAccess = function() {
+        app.formio.resources.project.model.findById(formio.project._id, function(err, document) {
+          if (err) {
+            return done(err);
+          }
+
+          // Update the default role for this Project.
+          document.defaultAccess = formio.roleAnonymous._id;
+          document.access = [{type: 'read_all', roles: [formio.roleAnonymous._id]}];
+
+          // Save the changes to the Form.io Project and continue.
+          document.save(function(err) {
+            if (err) {
+              return done(err);
+            }
+
+            // No error occurred, document the changes.
+            formio.project.defaultAccess = formio.roleAnonymous._id;
+
+            // Call next callback.
+            createResource();
+          });
+        });
+
+      };
+
+      // Create the initial anonymous role for Form.io.
+      var createRoleAnonymous = function() {
+        formio.roleAnonymous = {
+          title: 'Anonymous',
+          description: 'A role for Anonymous Users.',
+          project: formio.project._id
+        };
+
+        storeDocument(app.formio.roles.resource.model, 'roleAnonymous', setDefaultProjectAccess);
+      };
+
+      // Create the initial authenticated role for Form.io.
+      var createRoleAuthenticated = function() {
+        formio.roleAuthenticated = {
+          title: 'Authenticated',
+          description: 'A role for Authenticated Users.',
+          project: formio.project._id
+        };
+
+        storeDocument(app.formio.roles.resource.model, 'roleAuthenticated', createRoleAnonymous);
+      };
+
+      // Create the initial adminstrator role for Form.io.
+      var createRoleAdministrator = function() {
+        formio.roleAdministrator = {
+          title: 'Administrator',
+          description: 'A role for Administrative Users.',
+          project: formio.project._id
+        };
+
+        storeDocument(app.formio.roles.resource.model, 'roleAdministrator', createRoleAuthenticated);
+      };
+
+      // Create the initial Project for Form.io.
+      var createProject = function() {
+        formio.project = {
+          title: 'Form.io Test',
+          name: 'formio',
+          description: 'This is a test version of formio.',
+          settings: {
+            cors: '*'
+          }
+        };
+
+        storeDocument(app.formio.resources.project.model, 'project', createRoleAdministrator);
+      };
+
+      // Create the initial Form.io Project.
+      createProject();
+    });
+  });
+
+  describe('Initial access tests', function() {
+    it('A user can access the register form', function(done) {
+      request(app)
+        .get('/project/' + formio.project._id + '/form/' + formio.formRegister._id)
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .end(function(err, res) {
+          if (err) {
+            return done(err);
+          }
+
+          done();
+        });
+    });
+
+    it('Should be able to register a new user for Form.io', function(done) {
+      request(app)
+        .post('/project/' + formio.project._id + '/form/' + formio.formRegister._id + '/submission')
+        .send({
+          data: {
+            'user.name': formio.owner.data.name,
+            'user.email': formio.owner.data.email,
+            'user.password': formio.owner.data.password
+          }
+        })
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .end(function(err, res) {
+          if (err) {
+            return done(err);
+          }
+
+          var response = res.body;
+          assert(response.hasOwnProperty('_id'), 'The response should contain an `_id`.');
+          assert(response.hasOwnProperty('modified'), 'The response should contain a `modified` timestamp.');
+          assert(response.hasOwnProperty('created'), 'The response should contain a `created` timestamp.');
+          assert(response.hasOwnProperty('data'), 'The response should contain a submission `data` object.');
+          assert(response.data.hasOwnProperty('name'), 'The submission `data` should contain the `name`.');
+          assert.equal(response.data.name, formio.owner.data.name);
+          assert(response.data.hasOwnProperty('email'), 'The submission `data` should contain the `email`.');
+          assert.equal(response.data.email, formio.owner.data.email);
+          assert(!response.data.hasOwnProperty('password'), 'The submission `data` should not contain the `password`.');
+          assert(response.hasOwnProperty('form'), 'The response should contain the resource `form`.');
+          assert.equal(response.form, formio.resource._id);
+          assert(res.headers.hasOwnProperty('x-jwt-token'), 'The response should contain a `x-jwt-token` header.');
+
+          // Update our testProject.owners data.
+          var tempPassword = formio.owner.data.password;
+          formio.owner = response;
+          formio.owner.data.password = tempPassword;
+
+          // Store the JWT for future API calls.
+          formio.owner.token = res.headers['x-jwt-token'];
+
+          done();
+        });
+    });
+
+    it('A Form.io User should be able to login', function(done) {
+      request(app)
+        .post('/project/' + formio.project._id + '/form/' + formio.formLogin._id + '/submission')
+        .send({
+          data: {
+            'user.email': formio.owner.data.email,
+            'user.password': formio.owner.data.password
+          }
+        })
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err, res) {
+          if (err) {
+            return done(err);
+          }
+
+          var response = res.body;
+          assert(response.hasOwnProperty('_id'), 'The response should contain an `_id`.');
+          assert(response.hasOwnProperty('modified'), 'The response should contain a `modified` timestamp.');
+          assert(response.hasOwnProperty('created'), 'The response should contain a `created` timestamp.');
+          assert(response.hasOwnProperty('data'), 'The response should contain a submission `data` object.');
+          assert(response.data.hasOwnProperty('name'), 'The submission `data` should contain the `name`.');
+          assert.equal(response.data.name, formio.owner.data.name);
+          assert(response.data.hasOwnProperty('email'), 'The submission `data` should contain the `email`.');
+          assert.equal(response.data.email, formio.owner.data.email);
+          assert(!response.hasOwnProperty('password'), 'The submission `data` should not contain the `password`.');
+          assert(!response.data.hasOwnProperty('password'), 'The submission `data` should not contain the `password`.');
+          assert(response.hasOwnProperty('form'), 'The response should contain the resource `form`.');
+          assert.equal(response.form, formio.resource._id);
+          assert(res.headers.hasOwnProperty('x-jwt-token'), 'The response should contain a `x-jwt-token` header.');
+
+          // Update our testProject.owners data.
+          var tempPassword = formio.owner.data.password;
+          formio.owner = response;
+          formio.owner.data.password = tempPassword;
+
+          // Store the JWT for future API calls.
+          formio.owner.token = res.headers['x-jwt-token'];
+
+          done();
+        });
+    });
+
+    it('A Form.io User should be able to create a project from a template', function(done) {
+      // Update the template with current data for future tests.
+      var mapProjectToTemplate = function(project, template, callback) {
+        var mapActions = function(forms, cb) {
+          var form = null;
+          for (var a = 0; a < forms.length || 0; a++) {
+            form = forms[a];
+
+            request(app)
+              .get('/form/' + form._id + '/actions?limit=9999')
+              .set('x-jwt-token', formio.owner.token)
+              .expect('Content-Type', /json/)
+              .expect(200)
+              .end(function(err, res) {
+                if (err) return cb(err);
+
+                // Update the JWT for future API calls.
+                formio.owner.token = res.headers['x-jwt-token'];
+
+                res.body.forEach(function(action) {
+                  template.actions[form.name] = template.actions[form.name] || {};
+                  template.actions[form.name] = action;
+                });
+              });
+          }
+
+          cb();
+        };
+
+        var mapForms = function(cb) {
+          request(app)
+            .get('/form?limit=9999')
+            .set('x-jwt-token', formio.owner.token)
+            .expect('Content-Type', /json/)
+            .expect(200)
+            .end(function(err, res) {
+              if (err) return cb(err);
+
+              // Update the JWT for future API calls.
+              formio.owner.token = res.headers['x-jwt-token'];
+
+              res.body.forEach(function(form) {
+                template[form.type + 's'][form.name] = template[form.type + 's'][form.name] || {};
+                template[form.type + 's'][form.name] = form;
+              });
+              mapActions(res.body, cb);
+            });
+        };
+
+        var mapRoles = function(cb) {
+          request(app)
+            .get('/role?limit=9999')
+            .set('x-jwt-token', formio.owner.token)
+            .expect('Content-Type', /json/)
+            .expect(200)
+            .end(function(err, res) {
+              if (err) return cb(err);
+
+              // Update the JWT for future API calls.
+              formio.owner.token = res.headers['x-jwt-token'];
+
+              res.body.forEach(function(role) {
+                template.roles[role.title.toLowerCase()] = template.roles[role.title.toLowerCase()] || {};
+                template.roles[role.title.toLowerCase()] = role;
+              });
+              cb();
+            });
+        };
+
+        async.series([
+          mapForms,
+          mapRoles
+        ], function(err) {
+          if (err) {
+            console.log(template);
+            return callback(err);
+          }
+
+          callback();
+        });
+      };
+
+      template.title = chance.word();
+      template.name = chance.word();
+      template.description = chance.sentence();
+
+      request(app)
+        .post('/project')
+        .send({
+          title: template.title,
+          name: template.name,
+          description: template.description,
+          template: _.omit(template, 'users')
+        })
+        .set('x-jwt-token', formio.owner.token)
+        .expect('Content-Type', /json/)
+        .expect(201)
+        .end(function(err, res) {
+          if (err) {
+            return done(err);
+          }
+
+          var response = res.body;
+          assert(response.hasOwnProperty('_id'), 'The response should contain an `_id`.');
+          assert(response.hasOwnProperty('modified'), 'The response should contain a `modified` timestamp.');
+          assert(response.hasOwnProperty('created'), 'The response should contain a `created` timestamp.');
+          assert(response.hasOwnProperty('access'), 'The response should contain an the `access`.');
+          assert.equal(response.access[0].type, 'create_all');
+          assert.notEqual(response.access[0].roles, [], 'The create_all Administrator `role` should not be empty.');
+          assert.equal(response.access[1].type, 'read_all');
+          assert.notEqual(response.access[1].roles, [], 'The read_all Administrator `role` should not be empty.');
+          assert.equal(response.access[2].type, 'update_all');
+          assert.notEqual(response.access[2].roles, [], 'The update_all Administrator `role` should not be empty.');
+          assert.equal(response.access[3].type, 'delete_all');
+          assert.notEqual(response.access[3].roles, [], 'The delete_all Administrator `role` should not be empty.');
+          assert.notEqual(response.defaultAccess, [], 'The Projects default `role` should not be empty.');
+          assert.equal(response.name, template.name);
+          assert.equal(response.description, template.description);
+
+          template.project = template.project || {};
+          template.project = response;
+
+          if (docker) {
+            app += '/project/' + response._id;
+          }
+
+          // Store the JWT for future API calls.
+          formio.owner.token = res.headers['x-jwt-token'];
+
+          mapProjectToTemplate(response._id, template, done);
+        });
+    });
+
+    it('Load all tests', function() {
+      require(path.join(_test, 'auth'))(app, template);
+      require(path.join(_test, 'roles'))(app, template);
+      require(path.join(_test, 'form'))(app, template);
+      require(path.join(_test, 'resource'))(app, template);
+      require(path.join(_test, 'nested'))(app, template);
+      require(path.join(_test, 'actions'))(app, template);
+      require(path.join(_test, 'submission'))(app, template);
+    });
+  });
+});

@@ -102,6 +102,7 @@ module.exports = function(app, formioServer) {
         return actions;
       },
       emailTransports: function (transports, settings) {
+        settings = settings || {};
         var office365 = settings.office365 || {};
         if (office365.tenant && office365.clientId && office365.email && office365.cert && office365.thumbprint) {
           transports.push(
