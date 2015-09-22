@@ -70,8 +70,7 @@ app.config([
       .state('project.form.permission', {
         url: '/permission',
         parent: 'project.form',
-        templateUrl: 'views/form/permission/index.html',
-        controller: 'FormSubmissionsController'
+        templateUrl: 'views/form/permission/index.html'
       })
       .state('project.form.api', {
         url: '/api',
@@ -147,14 +146,6 @@ app.config([
       templateUrl: 'views/form/action/add.html',
       controller: 'FormActionAddController',
       params: {actionInfo: null}
-    });
-
-    // Add permission state.
-    $stateProvider.state('project.form.permissionIndex', {
-      url: '/permission',
-      parent: 'project.form',
-      templateUrl: 'views/form/permission/index.html',
-      controller: 'FormController'
     });
   }
 ]);
@@ -708,29 +699,278 @@ app.controller('FormActionDeleteController', [
 app.controller('FormSubmissionsController', [
   '$scope',
   '$state',
+  '$http',
+  '$timeout',
+  '$window',
+  '$q',
   'Formio',
+  'FormioUtils',
+  'FormioAlerts',
+  'formioComponents',
+  'ngDialog',
   function(
     $scope,
     $state,
-    Formio
+    $http,
+    $timeout,
+    $window,
+    $q,
+    Formio,
+    FormioUtils,
+    FormioAlerts,
+    formioComponents,
+    ngDialog
   ) {
-    $scope.token = Formio.getToken();
+    // Returns true if component should appear in table
+    $scope.tableView = function(component) {
+      return !component.hasOwnProperty('tableView') || component.tableView;
+    };
 
-    $scope.$on('submissionView', function(event, submission) {
+    // Creates resourcejs sort query from kendo datasource read options
+    var getSortQuery = function(options) {
+      return _.map(options, function(opt) {
+        return (opt.dir === 'desc' ? '-' : '') + opt.field;
+      }).join(' ');
+    };
+
+    // Define grid options
+    $scope.gridOptions = {
+      allowCopy: {
+        delimiter: ','
+      },
+      filterable: {
+        operators: {
+          string: {
+            eq: 'Is equal to',
+            neq: 'Is not equal to',
+            startswith: 'Starts with',
+            contains: 'Contains',
+            doesnotcontain: 'Does not contain',
+            endswith: 'Ends with',
+            matchesregex: 'Matches (RegExp)',
+            gt: 'Greater than',
+            gte: 'Greater than or equal to',
+            lt: 'Less than',
+            lte: 'Less than or equal to'
+          }
+        },
+        mode: 'menu',
+        extra: false
+      },
+      pageable: {
+        numeric: false,
+        input: true,
+        refresh: true,
+        pageSizes: [5, 10, 25, 50, 100, 'all']
+      },
+      sortable: {
+        mode: 'multiple'
+      },
+      resizable: true,
+      reorderable: true,
+      selectable: 'multiple, row',
+      columnMenu: true,
+      // This defaults to 'data' and screws everything up,
+      // so we set it to something that isn't a property on submissions
+      templateSettings: { paramName: 'notdata' },
+      toolbar:
+        '<div>' +
+          '<button class="btn btn-default btn-xs" ng-click="view()" ng-disabled="selected().length != 1" ng-class="{\'btn-primary\':selected().length == 1}">' +
+            '<span class="glyphicon glyphicon-eye-open"></span> View' +
+          '</button>&nbsp;' +
+          '<button class="btn btn-default btn-xs" ng-click="edit()" ng-disabled="selected().length != 1" ng-class="{\'btn-primary\':selected().length == 1}">' +
+            '<span class="glyphicon glyphicon-edit"></span> Edit' +
+          '</button>&nbsp;' +
+          '<button class="btn btn-default btn-xs" ng-click="delete()" ng-disabled="selected().length < 1" ng-class="{\'btn-danger\':selected().length >= 1}">' +
+            '<span class="glyphicon glyphicon-remove-circle"></span> Delete' +
+          '</button>' +
+        '</div>',
+      change: $scope.$apply.bind($scope),
+      dataSource: new kendo.data.DataSource({
+        page: 1,
+        pageSize: 10,
+        serverPaging: true,
+        serverSorting: true,
+        serverFiltering: true,
+        sort: {
+          dir: 'desc',
+          field: 'created'
+        },
+        schema: {
+          model: {
+            id: '_id'
+          },
+          total: function(result) {
+            var match = result.headers('content-range').match(/\d+-\d+\/(\d+)/);
+            return (match && match[1]) || 0;
+          },
+          data: 'data'
+        },
+        transport: {
+          read: function(options) {
+            var filters = options.data.filter && options.data.filter.filters;
+            var params = {
+              limit: options.data.take,
+              skip: options.data.skip,
+              sort: getSortQuery(options.data.sort)
+            };
+            _.each(filters, function(filter) {
+              switch(filter.operator) {
+                case 'eq': params[filter.field] = filter.value;
+                  break;
+                case 'neq': params[filter.field + '__ne'] = filter.value;
+                  break;
+                case 'startswith': params[filter.field + '__regex'] = '/^' + filter.value + '/i';
+                  break;
+                case 'endswith': params[filter.field + '__regex'] = '/' + filter.value + '$/i';
+                  break;
+                case 'contains': params[filter.field + '__regex'] = '/' + _.escapeRegExp(filter.value) + '/i';
+                  break;
+                case 'doesnotcontain': params[filter.field + '__regex'] = '/^((?!' + _.escapeRegExp(filter.value) + ').)*$/i';
+                  break;
+                case 'matchesregex': params[filter.field + '__regex'] = filter.value;
+                  break;
+                case 'gt': params[filter.field + '__gt'] = filter.value;
+                  break;
+                case 'gte': params[filter.field + '__gte'] = filter.value;
+                  break;
+                case 'lt': params[filter.field + '__lt'] = filter.value;
+                  break;
+                case 'lte': params[filter.field + '__lte'] = filter.value;
+                  break;
+
+
+              }
+            });
+            $http.get($scope.formio.submissionsUrl, {
+              params: params
+            })
+            .then(options.success)
+            .catch(function(err) {
+              FormioAlerts.onError(err);
+              options.error(err);
+            });
+          },
+          destroy: function(options) {
+            $scope.recentlyDeletedPromises.push($http.delete($scope.formio.submissionUrl + '/' + options.data._id)
+            .then(options.success)
+            .catch(function(err) {
+              FormioAlerts.onError(err);
+              options.error(err);
+            }));
+          }
+        }
+      }),
+    };
+
+    // Kendo Grids aren't horizontally scrollable unless you give
+    // them a fixed width. 100% stretches the page.
+    // This manually resizes the grid so that we can have scrollbars
+    $scope.$on('kendoWidgetCreated', function(event, widget) {
+      var resizeGrid = function() {
+        widget.element.width(0);
+        widget.element.width(widget.element.parent().width());
+      };
+      resizeGrid();
+      angular.element($window).bind('resize', resizeGrid);
+      $scope.$on('$destroy', function() {
+        angular.element($window).unbind('resize', resizeGrid);
+      });
+    });
+
+
+
+    $scope.selected = function() {
+      return $scope.grid && _.map($scope.grid.select(), $scope.grid.dataItem.bind($scope.grid));
+    };
+
+    $scope.view = function() {
       $state.go('project.form.submission.item.view', {
-        subId: submission._id
+        subId: $scope.selected()[0]._id
       });
-    });
+    };
 
-    $scope.$on('submissionEdit', function(event, submission) {
+    $scope.edit = function() {
       $state.go('project.form.submission.item.edit', {
-        subId: submission._id
+        subId: $scope.selected()[0]._id
       });
-    });
+    };
 
-    $scope.$on('submissionDelete', function(event, submission) {
-      $state.go('project.form.submission.item.delete', {
-        subId: submission._id
+
+    // Kendo ain't give us promises!!
+    $scope.recentlyDeletedPromises = [];
+
+    $scope.delete = function() {
+      ngDialog.open({
+        template: 'views/form/submission/delete-confirmation.html',
+        showClose: false,
+        scope: $scope
+      }).closePromise.then(function(e) {
+        var cancelled = e.value === false || e.value === '$closeButton' || e.value === '$document';
+        if(!cancelled) {
+          var dataSource = $scope.gridOptions.dataSource;
+          $scope.recentlyDeletedPromises = [];
+          _.each($scope.selected(), dataSource.remove.bind(dataSource));
+          dataSource.sync();
+          $q.all($scope.recentlyDeletedPromises).finally(dataSource.read.bind(dataSource));
+        }
+      });
+    };
+
+    // When form is loaded, create the columns
+    $scope.loadFormPromise.then(function() {
+      $timeout(function() { // Won't load on state change without this for some reason
+        $scope.gridOptions.columns = _(FormioUtils.flattenComponents($scope.form.components))
+        .filter($scope.tableView)
+        .map(function(component){
+          return {
+            field: 'data.' + component.key,
+            title: component.label || component.key,
+            template: function(dataItem) {
+              var value = Formio.fieldData(dataItem.data, component);
+              var componentInfo = formioComponents.components[component.type];
+              if (!componentInfo.tableView) { return (value === undefined) ? '' : value; }
+              if (component.multiple && (value.length > 0)) {
+                var values = [];
+                angular.forEach(value, function(arrayValue) {
+                  arrayValue = componentInfo.tableView(arrayValue, component);
+                  if(arrayValue === undefined) {
+                    return values.push('');
+                  }
+                  values.push(componentInfo.tableView(arrayValue, component));
+                });
+                return values;
+              }
+              value = componentInfo.tableView(value, component);
+              if(value === undefined) {
+                return '';
+              }
+              return value;
+            },
+            // Disabling sorting on embedded fields because it doesn't work in resourcejs yet
+            sortable: component.key.indexOf('.') === -1,
+            width: '200px'
+          };
+        })
+        .value()
+        .concat([
+          {
+            field: 'created',
+            title: 'Submitted',
+            width: '200px',
+            template: function(dataItem) {
+              return moment(dataItem.created).format('lll');
+            }
+          },
+          {
+            field: 'modified',
+            title: 'Updated',
+            width: '200px',
+            template: function(dataItem) {
+              return moment(dataItem.modified).format('lll');
+            }
+          }
+        ]);
       });
     });
   }
