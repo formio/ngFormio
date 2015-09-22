@@ -7,7 +7,7 @@ machine:
     AWS_DEFAULT_REGION: "us-west-2"
     PORT: 3001
     SERVERHOST: test-form.io
-    SERVERPROTOCOL: http
+    SERVERPROTOCOL: https
 
 dependencies:
   pre:
