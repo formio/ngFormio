@@ -1,4 +1,4 @@
-Feature: Login Functionality
+Feature: Register Functionality
 
   Scenario: Empty Register
     Given I am on /#/auth

@@ -24,7 +24,6 @@ test:
   pre:
     - npm start:
         background: true
-    - sleep 10
 
 deployment:
   release:
