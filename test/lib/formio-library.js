@@ -4,10 +4,68 @@ var assert = require('assert');
 var Yadda = require('yadda');
 var English = Yadda.localisation.English;
 var request = require('request');
+var chance = require('chance').Chance();
+var _ = require('lodash');
 
 module.exports = function(config) {
   // Global timeout for wait* commands.
   var timeout = 60000;
+  var state = {};
+  /**
+   * Wrap the string function for usernames.
+   *
+   * @param options
+   * @returns {*}
+   */
+  chance.username = function(options) {
+    options = options || {};
+    _.extend(options, {
+      length: 10,
+      pool: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+    });
+    return this.string(options);
+  }
+
+  /**
+   * Wrap the string function for passwords.
+   * @param options
+   * @returns {*}
+   */
+  chance.password = function(options) {
+    options = options || {};
+    _.extend(options, {
+      length: 12
+    });
+    return this.string(options);
+  }
+
+  var replacements = function(text) {
+    // Regex to find ${string}.
+    var regex = /\$\{(.+?[^\}])\}/g;
+    text = text.replace(regex, function(match, str) {
+      if (state[str]) {
+        return state[str];
+      }
+      var parts = str.split('-');
+      // If we've substituted this before use the same value.
+      // If chance knows the type, fulfill with the chance library.
+      if (typeof chance[parts[1]] === 'function') {
+        state[str] = chance[parts[1]]();
+        return state[str];
+      }
+      // Don't know how to handle it.
+      return '';
+    });
+    return text;
+  };
+
+  var handleResponse = function(err, response, body, next) {
+    if (err) return next(err);
+    if (response.statusCode != 200) {
+      return next(body);
+    }
+    next(null, body);
+  }
 
   //var getProject = function(projectName, next) {
   //  formio.resources.project.model.findOne({'name': projectName}, function(err, project) {
@@ -84,12 +142,11 @@ module.exports = function(config) {
         }
       }
     }, function(err, response, body) {
-      if (err) return next(err);
-      next(null, body);
+      handleResponse(err, response, body, next);
     });
   };
 
-  var createUser = function(projectName, formName, email, password, next) {
+  var createUser = function(projectName, formName, username, email, password, next) {
     request({
       "rejectUnauthorized": false,
       uri: config.serverProtocol + '://' + projectName + '.' + config.serverHost + '/' + formName + '/submission',
@@ -97,19 +154,18 @@ module.exports = function(config) {
       form: {
         data: {
           'user.email': email,
-          'user.name': Date.now(),
+          'user.name': username,
           'user.password': password,
           'verifyPassword': password
         }
       }
     }, function(err, response, body) {
-      if (err) return next(err);
-      next(null, body.toJSON());
+      handleResponse(err, response, body, next);
     });
   };
 
-  var createAndAuthUser = function(email, password, next) {
-    createUser('formio', 'user/register', email, password, function(err, user) {
+  var createAndAuthUser = function(username, email, password, next) {
+    createUser('formio', 'user/register', username, email, password, function(err, user) {
       if (err) {
         return next(err);
       }
@@ -136,11 +192,14 @@ module.exports = function(config) {
           next();
         });
     })
-    .given('an account exists with the email $EMAIL and the password $PASSWORD', function(email, password, next) {
+    .given('an account exists with the username $USERNAME, email $EMAIL and password $PASSWORD', function(username, email, password, next) {
+      username = replacements(username);
+      email = replacements(email);
+      password = replacements(password);
       authUser('formio', 'user/login', email, password, function(err, res) {
         if (err || res === 'Invalid user') {
           // User doesn't exist. Create it.
-          return createUser('formio', 'user/register', email, password, next);
+          return createUser('formio', 'user/register', username, email, password, next);
         }
 
         // User already exists. Do nothing.
@@ -157,10 +216,11 @@ module.exports = function(config) {
         });
     })
     .given('I am logged in', function(next) {
+      var username = Math.random().toString(36).substring(7);
       var email = Math.random().toString(36).substring(7) + '@example.com';
       var password = Math.random().toString(36).substring(7);
       var driver = this.driver;
-      createAndAuthUser(email, password, function(err, res) {
+      createAndAuthUser(username, email, password, function(err, res) {
         if (err) {
           return next(err);
         }
@@ -213,6 +273,7 @@ module.exports = function(config) {
     .when('I enter $TEXT in the $FIELD field', function(text, field, next) {
       this.driver.waitForExist(field, timeout)
         .then(function() {
+          text = replacements(text);
           this.driver.setValue(field, text)
             .then(function() {
               next();
@@ -240,6 +301,9 @@ module.exports = function(config) {
         .catch(function(err) {
           next(err);
         });
+    })
+    .when('I wait $TIME milliseconds', function(time, next) {
+      this.driver.pause(time).then(next);
     })
     .then('the title is $TITLE', function(title, next) {
       this.driver.getTitle()
@@ -296,10 +360,29 @@ module.exports = function(config) {
             .then(function(alert) {
               assert.equal(text, alert);
               next();
+            })
+            .catch(function(err) {
+              next(err);
             });
         }.bind(this))
         .catch(function(err) {
           next(err);
+        });
+    })
+    .then('I see $TEXT', function(text, next) {
+      this.driver.waitForExist('//*[text()=\'' + text + '\']', 500)
+        .then(function(found) {
+          next();
+        })
+        .catch(function(err) {
+          next(err);
+        });
+    })
+    .then('the $BUTTON button is disabled', function(button, next) {
+      this.driver.isEnabled('//button[contains(.,\'' + button + '\')]')
+        .then(function(isEnabled) {
+          assert(!isEnabled, 'Button ' + button + ' is enabled when it should be disabled');
+          next();
         });
     });
 
