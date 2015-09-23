@@ -305,10 +305,10 @@ ul.dropdown-menu {
   line-height: 1em;
 }
 
-.app-nav {
+.project-nav {
   border-bottom: 1px solid #ddd;
   margin-bottom: 10px;
-  .app-title {
+  .project-title {
     font-weight: normal;
     margin-left: 0px;
     margin-right: 30px;
@@ -317,17 +317,15 @@ ul.dropdown-menu {
     font-size: 2em;
   }
 
-  .app-url {
-    margin: 20px 5px 0 0;
+  .project-description {
+    overflow: hidden;
+    display: inline-block;
+    text-overflow: ellipsis;
   }
-  .app-row {
-    position: relative;
-    .app-options {
-      position: absolute;
-      right: 0;
-      bottom: 5px;
-    }
-  }
+}
+
+.project-description, .project-url {
+  word-break: break-all;
 }
 
 .form-title {
@@ -375,6 +373,11 @@ pre code {
 .col-centered {
   float: none;
   margin: 0 auto;
+}
+
+.required-field:after {
+  color:red;
+  content:" *";
 }
 
 /***************************** Required styles *****************************/

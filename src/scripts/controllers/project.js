@@ -259,6 +259,12 @@ app.controller('ProjectSettingsController', [
     if($state.current.name === 'project.settings') {
       $state.go('project.settings.project', {location: 'replace'});
     }
+    $scope.loadProjectPromise.then(function() {
+      // Mask child scope's reference to currentProject with a clone
+      // Parent reference gets updated when we reload after saving
+      $scope.currentProject = _.cloneDeep($scope.currentProject);
+    });
+
 
     // Save the Project.
     $scope.saveProject = function() {
@@ -273,7 +279,7 @@ app.controller('ProjectSettingsController', [
           type: 'success',
           message: 'Project saved.'
         });
-        // Reload state so alerts display.
+        // Reload state so alerts display and project updates.
         $state.go($state.current.name, {
           projectId: project._id
         }, {reload: true});
