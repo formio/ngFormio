@@ -1,3 +1,5 @@
+'use strict';
+
 var _ = require('lodash');
 var debug = require('debug')('formio:settings');
 var o365Util = require('../actions/office365/util');
@@ -300,7 +302,7 @@ module.exports = function(app, formioServer) {
         return cache;
       },
       submissionRequestQuery: function (query, req) {
-        query.projectId = req.projectId
+        query.projectId = req.projectId;
         return query;
       },
       submissionRequestTokenQuery: function (query, token) {
@@ -315,30 +317,29 @@ module.exports = function(app, formioServer) {
          *
          * @param done
          */
-        var updateProject = function (done) {
+        var updateProject = function(_role, done) {
+          var _debug = require('debug')('formio:settings:updateProject');
+
           formioServer.formio.resources.project.model.findOne({
-            query: {
-              _id: formioServer.formio.mongoose.Types.ObjectId(projectId)
-            },
-            $snapshot: true
+            _id: formioServer.formio.mongoose.Types.ObjectId(projectId)
           }, function (err, project) {
             if (err) {
-              debug(err);
+              _debug(err);
               return done(err);
             }
             if (!project) {
-              debug('No Project found with projectId: ' + projectId);
+              _debug('No Project found with projectId: ' + projectId);
               return done();
             }
 
             // Add the new roleId to the access list for read_all (project).
-            debug('Loaded project: ' + JSON.stringify(project));
+            _debug('Loaded project: ' + JSON.stringify(project));
             project.access = project.access || [];
             var found = false;
             for (var a = 0; a < project.access.length; a++) {
               if (project.access[a].type === 'read_all') {
                 project.access[a].roles = project.access[a].roles || [];
-                project.access[a].roles.push(roleId);
+                project.access[a].roles.push(_role);
                 project.access[a].roles = _.uniq(project.access[a].roles);
                 found = true;
               }
@@ -348,38 +349,34 @@ module.exports = function(app, formioServer) {
             if (!found) {
               project.access.push({
                 type: 'read_all',
-                roles: [roleId]
+                roles: [_role]
               });
             }
 
             // Save the updated permissions.
-            formioServer.formio.resources.project.model.update(
-              {_id: formioServer.formio.mongoose.Types.ObjectId(projectId)},
-              {$set: {access: project.access}},
-              {new: true},
-              function (err, doc) {
-                if (err) {
-                  debug(err);
-                  return done(err);
-                }
-
-                debug(project.access);
-                done();
+            project.save(function(err) {
+              if (err) {
+                _debug(err);
+                return done(err);
               }
-            );
+
+              _debug('Updated Project: ' + JSON.stringify(project.toObject()));
+              done();
+            });
           });
         };
 
         // Update the project when new roles are added.
-        handlers.shift(updateProject);
+        handlers.unshift(updateProject);
         return handlers;
       },
       roleQuery: function (query, req) {
-        query.project = req.projectId ? req.projectId : req.params.projectId;
+        var projectId = req.projectId || req.params.projectId;
+        query.project = formioServer.formio.mongoose.Types.ObjectId(projectId);
         return query;
       },
       roleRoutes: function (routes) {
-        routes.before.unshift(require('../middleware/projectFilter'));
+        routes.before.unshift(require('../middleware/bootstrapEntityProject'), require('../middleware/projectFilter'));
         return routes;
       },
       roleSearch: function (search, model, value) {
