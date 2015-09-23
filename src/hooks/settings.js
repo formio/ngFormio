@@ -148,6 +148,8 @@ module.exports = function(app, formioServer) {
         return req.token.user._id === req.projectOwner;
       },
       getAccess: function (handlers, req, res, access) {
+        var _debug = require('debug')('formio:settings:getAccess');
+
         // Get the permissions for an Project with the given ObjectId.
         handlers.unshift(function getProjectAccess(callback) {
           // Build the access object for this project.
@@ -159,12 +161,14 @@ module.exports = function(app, formioServer) {
           }
 
           // Load the project.
-          cache.loadProject(req, req.projectId, function (err, project) {
+          cache.loadProject(req, req.projectId, function(err, project) {
             if (err) {
-              return callback(400);
+              _debug(err);
+              return callback(err);
             }
             if (!project) {
-              return callback(404);
+              _debug('No project found with projectId: ' + req.projectId);
+              return callback('No project found with projectId: ' + req.projectId);
             }
 
             // Store the Project Owners UserId, because they will have all permissions.

@@ -1,5 +1,9 @@
 'use strict';
 
+var debug = {
+  loadProject: require('debug')('formio:cache:loadProject')
+};
+
 module.exports = function(formio) {
   return {
     loadProjectByName: function(req, name, cb) {
@@ -56,7 +60,16 @@ module.exports = function(formio) {
         return cb(null, cache.projects[id]);
       }
 
-      id = (typeof id === 'string') ? formio.mongoose.Types.ObjectId(id) : id;
+      debug.loadProject(typeof id + ': ' + id);
+
+      try {
+        id = (typeof id === 'string') ? formio.mongoose.Types.ObjectId(id) : id;
+      }
+      catch(e) {
+        debug.loadProject(e);
+        return cb('Invalid Project Id given.');
+      }
+
       var query = {_id: id, deleted: {$eq: null}};
       var params = req.params;
       formio.resources.project.model.findOne(query).exec(function (err, result) {

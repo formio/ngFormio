@@ -23,6 +23,16 @@ module.exports = function() {
   app.use(bodyParser.json());
   app.use(methodOverride('X-HTTP-Method-Override'));
 
+  // Error handler for malformed JSON
+  app.use(function(err, req, res, next) {
+    if (err instanceof SyntaxError) {
+      res.status(400).send(err.message);
+    }
+    else {
+      next();
+    }
+  });
+
   // Bootstrap the formio test environment.
   var _server = require('formio')(config);
 
