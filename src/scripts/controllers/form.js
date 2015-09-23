@@ -419,10 +419,7 @@ app.controller('FormActionIndexController', [
     $scope.addAction = function() {
       if ($scope.newAction.name) {
         $state.go('project.form.action.add', {
-          actionName: $scope.newAction.name,
-          // Rendering actionInfo.settingsForm modifies it, so to prevent
-          // that carrying over to other new actions, we deep clone it.
-          actionInfo: _.cloneDeep($scope.newAction)
+          actionName: $scope.newAction.name
         });
       }
       else {
@@ -468,15 +465,9 @@ app.factory('ActionInfoLoader', [
 
         // Get the action information.
         var getActionInfo = function(name) {
-          return $scope.formio.availableActions().then(function(actions) {
-            var foundAction;
-            angular.forEach(actions, function(action) {
-              if (action.name === name) {
-                foundAction = action;
-              }
-            });
-            if(foundAction) {
-              $scope.actionInfo = _.merge($scope.actionInfo, foundAction);
+          return $scope.formio.actionInfo(name).then(function(actionInfo) {
+            if(actionInfo) {
+              $scope.actionInfo = _.merge($scope.actionInfo, actionInfo);
               return $scope.actionInfo;
             }
           });
