@@ -32,6 +32,16 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 app.use(methodOverride('X-HTTP-Method-Override'));
 
+// Error handler for malformed JSON
+app.use(function(err, req, res, next) {
+  if (err instanceof SyntaxError) {
+    res.status(400).send(err.message);
+  }
+  else {
+    next();
+  }
+});
+
 // Create the formio server.
 var formioServer = require('formio')(config.formio);
 

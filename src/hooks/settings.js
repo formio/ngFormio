@@ -3,6 +3,7 @@
 var _ = require('lodash');
 var debug = require('debug')('formio:settings');
 var o365Util = require('../actions/office365/util');
+var nodeUrl = require('url');
 
 module.exports = function(app, formioServer) {
   // Include the request cache.
@@ -208,12 +209,15 @@ module.exports = function(app, formioServer) {
         return entity;
       },
       access: function (hasAccess, req, access) {
+        var _debug = require('debug')('formio:settings:access');
+        var _url = nodeUrl.parse(req.url).pathname;
 
         // Determine if the current request has access to the given Project.
         if (!Boolean(req.projectId)) {
-          if (req.method === 'POST' && req.url === '/project') {
+          if (req.method === 'POST' && _url === '/project') {
             if (req.token) {
               // User is authenticated.
+              _debug('true');
               return true;
             }
 
@@ -221,36 +225,46 @@ module.exports = function(app, formioServer) {
             return false;
           }
 
-          debug('Checking for Formio Access.');
-          debug('Formio URL: ' + req.url);
-          if (req.url === '/current' || req.url === '/logout') {
+          _debug('Checking for Formio Access.');
+          _debug('Formio URL: ' + _url);
+          if (_url === '/current' || _url === '/logout') {
             if (req.token) {
+              _debug('true');
               return true;
             }
           }
 
-          if (req.url === '/project') {
+          if (_url === '/project') {
             if (req.token) {
+              _debug('true');
               return true;
             }
           }
 
-          if (req.url === '/project/available') {
+          if (_url === '/project/available') {
+            _debug('true');
             return true;
           }
 
-          if (req.url === '/spec.json' || req.url === '/spec.html') {
+          if (_url === '/spec.json' || _url === '/spec.html') {
+            _debug('true');
             return true;
           }
 
           // This req is unauthorized.
+          _debug('false');
           return false;
         }
         else {
-          return formioServer.formio.access.hasAccess(req, access, {
+          _debug('Checking Project Access.');
+          _debug('URL: ' + _url);
+          var _access = formioServer.formio.access.hasAccess(req, access, {
             type: 'project',
             id: req.projectId
           });
+
+          _debug(_access);
+          return _access;
         }
       },
       hasAccess: function (_hasAccess, req, access) {
