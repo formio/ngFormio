@@ -61,7 +61,6 @@ module.exports = function(formio) {
       }
 
       debug.loadProject(typeof id + ': ' + id);
-
       try {
         id = (typeof id === 'string') ? formio.mongoose.Types.ObjectId(id) : id;
       }
