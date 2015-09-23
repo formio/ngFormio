@@ -10,23 +10,17 @@ var _formio = path.dirname(require.resolve('formio'));
 var _test = path.join(_formio, 'test');
 var async = require('async');
 var chance = new (require('chance'))();
-
-var docker = process.env.DOCKER || false;
+var docker = process.env.DOCKER;
 var app = null;
 var template = null;
-var ready = null;
+var hook = require(path.join(_formio, 'app/util/hook'))({hooks: require('./hooks')});
+var ready = Q.defer();
 
 process.on('uncaughtException', function(err) {
   console.log(err.stack);
 });
 
-if (docker) {
-  app = 'http://api.localhost:3000';
-  template = require(path.join(_test, 'template'))();
-}
-else {
-  ready = Q.defer();
-
+if (!docker) {
   require('./bootstrap')()
     .then(function(state) {
       app = state.app;
@@ -34,6 +28,10 @@ else {
 
       ready.resolve();
     });
+}
+else {
+  app = 'http://api.localhost:3000';
+  template = require(path.join(_test, 'template'))();
 }
 
 /**
@@ -146,16 +144,6 @@ describe('Bootstrap', function() {
         });
       };
 
-      // Create the initial submission for the initialForm form.
-      var createSubmission = function() {
-        formio.owner = {
-          data: formio.owner.data,
-          form: formio.formRegister._id
-        };
-
-        storeDocument(app.formio.resources.submission.model, 'owner', done);
-      };
-
       // Attach the auth action for the initialForm.
       var createActionRegister = function() {
         formio.actionRegister = {
@@ -166,13 +154,14 @@ describe('Bootstrap', function() {
           priority: 0,
           settings: {
             association: 'new',
-            username: 'user.username',
+            role: formio.roleAuthenticated._id,
+            username: 'user.email',
             password: 'user.password'
           },
           form: formio.formRegister._id
         };
 
-        storeDocument(app.formio.actions.model, 'actionRegister', createSubmission);
+        storeDocument(app.formio.actions.model, 'actionRegister', done);
       };
 
       // Attach the auth action for the initialForm.
@@ -185,7 +174,7 @@ describe('Bootstrap', function() {
           priority: 0,
           settings: {
             association: 'existing',
-            username: 'user.username',
+            username: 'user.email',
             password: 'user.password'
           },
           form: formio.formLogin._id
@@ -210,23 +199,23 @@ describe('Bootstrap', function() {
           ],
           components: [
             {
-              type: 'textfield',
+              type: 'email',
               validate: {
                 custom: '',
                 pattern: '',
                 maxLength: '',
                 minLength: '',
-                required: false
+                required: true
               },
               defaultValue: '',
               multiple: false,
               suffix: '',
               prefix: '',
-              placeholder: 'username',
-              key: 'user.username',
-              label: 'username',
+              placeholder: 'email',
+              key: 'user.email',
+              label: 'email',
               inputMask: '',
-              inputType: 'text',
+              inputType: 'email',
               input: true
             },
             {
@@ -274,23 +263,23 @@ describe('Bootstrap', function() {
           ],
           components: [
             {
-              type: 'textfield',
+              type: 'email',
               validate: {
                 custom: '',
                 pattern: '',
                 maxLength: '',
                 minLength: '',
-                required: false
+                required: true
               },
               defaultValue: '',
               multiple: false,
               suffix: '',
               prefix: '',
-              placeholder: 'username',
-              key: 'user.username',
-              label: 'username',
+              placeholder: 'email',
+              key: 'user.email',
+              label: 'email',
               inputMask: '',
-              inputType: 'text',
+              inputType: 'email',
               input: true
             },
             {
@@ -338,21 +327,41 @@ describe('Bootstrap', function() {
           ],
           components: [
             {
+              type: 'email',
+              validate: {
+                custom: '',
+                pattern: '',
+                maxLength: '',
+                minLength: '',
+                required: true
+              },
+              defaultValue: '',
+              multiple: false,
+              suffix: '',
+              prefix: '',
+              placeholder: 'email',
+              key: 'email',
+              label: 'email',
+              inputMask: '',
+              inputType: 'email',
+              input: true
+            },
+            {
               type: 'textfield',
               validate: {
                 custom: '',
                 pattern: '',
                 maxLength: '',
                 minLength: '',
-                required: false
+                required: true
               },
               defaultValue: '',
               multiple: false,
               suffix: '',
               prefix: '',
-              placeholder: 'username',
-              key: 'username',
-              label: 'username',
+              placeholder: 'name',
+              key: 'name',
+              label: 'name',
               inputMask: '',
               inputType: 'text',
               input: true
@@ -405,7 +414,9 @@ describe('Bootstrap', function() {
         formio.roleAnonymous = {
           title: 'Anonymous',
           description: 'A role for Anonymous Users.',
-          project: formio.project._id
+          project: formio.project._id,
+          default: true,
+          admin: false
         };
 
         storeDocument(app.formio.roles.resource.model, 'roleAnonymous', setDefaultProjectAccess);
@@ -416,7 +427,9 @@ describe('Bootstrap', function() {
         formio.roleAuthenticated = {
           title: 'Authenticated',
           description: 'A role for Authenticated Users.',
-          project: formio.project._id
+          project: formio.project._id,
+          default: false,
+          admin: false
         };
 
         storeDocument(app.formio.roles.resource.model, 'roleAuthenticated', createRoleAnonymous);
@@ -427,7 +440,9 @@ describe('Bootstrap', function() {
         formio.roleAdministrator = {
           title: 'Administrator',
           description: 'A role for Administrative Users.',
-          project: formio.project._id
+          project: formio.project._id,
+          default: false,
+          admin: true
         };
 
         storeDocument(app.formio.roles.resource.model, 'roleAdministrator', createRoleAuthenticated);
@@ -562,7 +577,7 @@ describe('Bootstrap', function() {
             form = forms[a];
 
             request(app)
-              .get('/form/' + form._id + '/actions?limit=9999')
+              .get('/project/' + template.project._id + '/form/' + form._id + '/actions?limit=9999')
               .set('x-jwt-token', formio.owner.token)
               .expect('Content-Type', /json/)
               .expect(200)
@@ -584,7 +599,7 @@ describe('Bootstrap', function() {
 
         var mapForms = function(cb) {
           request(app)
-            .get('/form?limit=9999')
+            .get('/project/' + template.project._id + '/form?limit=9999')
             .set('x-jwt-token', formio.owner.token)
             .expect('Content-Type', /json/)
             .expect(200)
@@ -604,7 +619,7 @@ describe('Bootstrap', function() {
 
         var mapRoles = function(cb) {
           request(app)
-            .get('/role?limit=9999')
+            .get('/project/' + template.project._id + '/role?limit=9999')
             .set('x-jwt-token', formio.owner.token)
             .expect('Content-Type', /json/)
             .expect(200)
@@ -675,10 +690,6 @@ describe('Bootstrap', function() {
           template.project = template.project || {};
           template.project = response;
 
-          if (docker) {
-            app += '/project/' + response._id;
-          }
-
           // Store the JWT for future API calls.
           formio.owner.token = res.headers['x-jwt-token'];
 
@@ -687,13 +698,13 @@ describe('Bootstrap', function() {
     });
 
     it('Load all tests', function() {
-      require(path.join(_test, 'auth'))(app, template);
-      require(path.join(_test, 'roles'))(app, template);
-      require(path.join(_test, 'form'))(app, template);
-      require(path.join(_test, 'resource'))(app, template);
-      require(path.join(_test, 'nested'))(app, template);
-      require(path.join(_test, 'actions'))(app, template);
-      require(path.join(_test, 'submission'))(app, template);
+      require(path.join(_test, 'auth'))(app, template, hook);
+      require(path.join(_test, 'roles'))(app, template, hook);
+      require(path.join(_test, 'form'))(app, template, hook);
+      require(path.join(_test, 'resource'))(app, template, hook);
+      require(path.join(_test, 'nested'))(app, template, hook);
+      require(path.join(_test, 'actions'))(app, template, hook);
+      require(path.join(_test, 'submission'))(app, template, hook);
     });
   });
 });

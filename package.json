@@ -5,7 +5,8 @@
   },
   "scripts": {
     "start": "node server.js",
-    "test": "APPPROTOCOL=http APPDOMAIN=portal.localhost APPPORT=3001 mocha --timeout 30000 --reporter spec test/test.js"
+    "test": "env TEST_SUITE=1 MONGO_COLLECTION=formio-test mocha -b -t 30000 test/mocha.js",
+    "docker": "env DOCKER=1 TEST_SUITE=1 mocha -b -t 30000 test/mocha.js"
   },
   "main": "./server.js",
   "dependencies": {
