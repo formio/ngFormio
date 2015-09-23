@@ -130,6 +130,18 @@ module.exports = function(router) {
   Office365ContactAction.prototype = Object.create(router.formio.Action.prototype);
   Office365ContactAction.prototype.constructor = Office365ContactAction;
   Office365ContactAction.info = function(req, res, next) {
+    next(null, {
+      name: 'office365contact',
+      title: 'Office 365 Contacts',
+      description: 'Allows you to integrate into your Office 365 Contacts.',
+      priority: 0,
+      defaults: {
+        handler: ['after'],
+        method: ['create', 'update', 'delete']
+      }
+    });
+  }
+  Office365ContactAction.settingsForm = function(req, res, next) {
 
     // Create the panel for all the fields.
     var fieldPanel = {
@@ -157,17 +169,7 @@ module.exports = function(router) {
       });
     });
 
-    next(null, {
-      name: 'office365contact',
-      title: 'Office 365 Contacts',
-      description: 'Allows you to integrate into your Office 365 Contacts.',
-      priority: 0,
-      defaults: {
-        handler: ['after'],
-        method: ['create', 'update', 'delete']
-      },
-      settingsForm: [fieldPanel]
-    });
+    next(null, [fieldPanel]);
   };
 
   /**

@@ -21,13 +21,6 @@ module.exports = function(router) {
   Office365CalendarAction.prototype = Object.create(router.formio.Action.prototype);
   Office365CalendarAction.prototype.constructor = Office365CalendarAction;
   Office365CalendarAction.info = function(req, res, next) {
-
-    // Create the select items for each office 365 field.
-    var dataSrc = router.formio.hook.alter('url', '/form/' + req.params.formId + '/components', req);
-
-    // The Microsoft Timezones JSON.
-    var timeZones = 'https://gist.githubusercontent.com/travist/1c7b4ba5289e38dc3a9e/raw/306d24a1efefcb0d70e8978d7272a575625c1843/timezones.json';
-
     next(null, {
       name: 'office365calendar',
       title: 'Office 365 Calendar',
@@ -36,117 +29,126 @@ module.exports = function(router) {
       defaults: {
         handler: ['after'],
         method: ['create', 'update', 'delete']
-      },
-      settingsForm: [
-        {
-          label: 'Subject',
-          key: 'settings[subject]',
-          inputType: 'text',
-          defaultValue: '',
-          input: true,
-          placeholder: 'Event Subject',
-          type: 'textfield',
-          multiple: false,
-          required: true
-        },
-        {
-          label: 'Body',
-          key: 'settings[body]',
-          type: 'textarea',
-          defaultValue: '',
-          multiple: false,
-          rows: 3,
-          suffix: '',
-          prefix: '',
-          placeholder: 'Enter the event body you would like to include.',
-          input: true
-        },
-        {
-          label: 'Attendees',
-          key: 'settings[attendees]',
-          defaultValue: '',
-          input: true,
-          placeholder: 'Include the following attendees',
-          prefix: '',
-          suffix: '',
-          type: 'email',
-          multiple: true
-        },
-        {
-          type: 'select',
-          input: true,
-          label: 'Time Zone',
-          key: 'settings[timezone]',
-          placeholder: 'Select the time zone for the events.',
-          template: '<span>{{ item.display }}</span>',
-          dataSrc: 'url',
-          data: {url: timeZones},
-          valueProperty: 'timezone',
-          defaultValue: 'Central America Standard Time',
-          multiple: false
-        },
-        {
-          type: 'select',
-          input: true,
-          label: 'Start Time Field',
-          key: 'settings[start]',
-          placeholder: 'Select the start time field',
-          template: '<span>{{ item.label || item.key }}</span>',
-          dataSrc: 'url',
-          data: {url: dataSrc},
-          valueProperty: 'key',
-          multiple: false
-        },
-        {
-          type: 'select',
-          input: true,
-          label: 'End Time Field',
-          key: 'settings[end]',
-          placeholder: 'Select the end time field',
-          template: '<span>{{ item.label || item.key }}</span>',
-          dataSrc: 'url',
-          data: {url: dataSrc},
-          valueProperty: 'key',
-          multiple: false
-        },
-        {
-          type: 'select',
-          input: true,
-          label: 'Location Field',
-          key: 'settings[location]',
-          placeholder: 'Select the location field',
-          template: '<span>{{ item.label || item.key }}</span>',
-          dataSrc: 'url',
-          data: {url: dataSrc},
-          valueProperty: 'key',
-          multiple: false
-        },
-        {
-          label: 'Categories',
-          key: 'settings[categories]',
-          inputType: 'text',
-          defaultValue: '',
-          input: true,
-          placeholder: 'Use the following categories',
-          prefix: '',
-          suffix: '',
-          type: 'textfield',
-          multiple: true
-        },
-        {
-          label: 'Web Link',
-          key: 'settings[weblink]',
-          inputType: 'text',
-          defaultValue: '',
-          input: true,
-          placeholder: 'The web link to provide for the events created.',
-          prefix: '',
-          suffix: '',
-          type: 'textfield',
-          multiple: false
-        }
-      ]
+      }
     });
+  }
+  Office365CalendarAction.settingsForm = function(req, res, next) {
+
+    // Create the select items for each office 365 field.
+    var dataSrc = router.formio.hook.alter('url', '/form/' + req.params.formId + '/components', req);
+
+    // The Microsoft Timezones JSON.
+    var timeZones = 'https://gist.githubusercontent.com/travist/1c7b4ba5289e38dc3a9e/raw/306d24a1efefcb0d70e8978d7272a575625c1843/timezones.json';
+
+    next(null, [
+      {
+        label: 'Subject',
+        key: 'settings[subject]',
+        inputType: 'text',
+        defaultValue: '',
+        input: true,
+        placeholder: 'Event Subject',
+        type: 'textfield',
+        multiple: false,
+        required: true
+      },
+      {
+        label: 'Body',
+        key: 'settings[body]',
+        type: 'textarea',
+        defaultValue: '',
+        multiple: false,
+        rows: 3,
+        suffix: '',
+        prefix: '',
+        placeholder: 'Enter the event body you would like to include.',
+        input: true
+      },
+      {
+        label: 'Attendees',
+        key: 'settings[attendees]',
+        defaultValue: '',
+        input: true,
+        placeholder: 'Include the following attendees',
+        prefix: '',
+        suffix: '',
+        type: 'email',
+        multiple: true
+      },
+      {
+        type: 'select',
+        input: true,
+        label: 'Time Zone',
+        key: 'settings[timezone]',
+        placeholder: 'Select the time zone for the events.',
+        template: '<span>{{ item.display }}</span>',
+        dataSrc: 'url',
+        data: {url: timeZones},
+        valueProperty: 'timezone',
+        defaultValue: 'Central America Standard Time',
+        multiple: false
+      },
+      {
+        type: 'select',
+        input: true,
+        label: 'Start Time Field',
+        key: 'settings[start]',
+        placeholder: 'Select the start time field',
+        template: '<span>{{ item.label || item.key }}</span>',
+        dataSrc: 'url',
+        data: {url: dataSrc},
+        valueProperty: 'key',
+        multiple: false
+      },
+      {
+        type: 'select',
+        input: true,
+        label: 'End Time Field',
+        key: 'settings[end]',
+        placeholder: 'Select the end time field',
+        template: '<span>{{ item.label || item.key }}</span>',
+        dataSrc: 'url',
+        data: {url: dataSrc},
+        valueProperty: 'key',
+        multiple: false
+      },
+      {
+        type: 'select',
+        input: true,
+        label: 'Location Field',
+        key: 'settings[location]',
+        placeholder: 'Select the location field',
+        template: '<span>{{ item.label || item.key }}</span>',
+        dataSrc: 'url',
+        data: {url: dataSrc},
+        valueProperty: 'key',
+        multiple: false
+      },
+      {
+        label: 'Categories',
+        key: 'settings[categories]',
+        inputType: 'text',
+        defaultValue: '',
+        input: true,
+        placeholder: 'Use the following categories',
+        prefix: '',
+        suffix: '',
+        type: 'textfield',
+        multiple: true
+      },
+      {
+        label: 'Web Link',
+        key: 'settings[weblink]',
+        inputType: 'text',
+        defaultValue: '',
+        input: true,
+        placeholder: 'The web link to provide for the events created.',
+        prefix: '',
+        suffix: '',
+        type: 'textfield',
+        multiple: false
+      }
+    ]);
   };
 
   /**
