@@ -314,6 +314,7 @@ app.provider('Formio', function() {
         Formio.prototype.deleteAction = _delete('action');
         Formio.prototype.loadActions = _index('action');
         Formio.prototype.availableActions = function() { return request(this.formUrl + '/actions'); };
+        Formio.prototype.actionInfo = function(name) { return request(this.formUrl + '/actions/' + name); };
 
         // Static methods.
         Formio.loadProjects = function() { return request(baseUrl + '/project'); };
