@@ -9,17 +9,20 @@ module.exports = function(formio) {
       title: {
         type: String,
         description: 'The project title.',
-        required: true
+        required: true,
+        maxlength: 63
       },
       name: {
         type: String,
         description: 'The name of the project.',
         required: true,
+        maxlength: 63,
         index: true
       },
       description: {
         type: String,
-        description: 'A description for the project.'
+        description: 'A description for the project.',
+        maxlength: 512
       },
       owner: {
         type: formio.mongoose.Schema.Types.ObjectId,
