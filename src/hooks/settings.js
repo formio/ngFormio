@@ -1,6 +1,9 @@
+'use strict';
+
 var _ = require('lodash');
 var debug = require('debug')('formio:settings');
 var o365Util = require('../actions/office365/util');
+var nodeUrl = require('url');
 
 module.exports = function(app, formioServer) {
   // Include the request cache.
@@ -102,6 +105,7 @@ module.exports = function(app, formioServer) {
         return actions;
       },
       emailTransports: function (transports, settings) {
+        settings = settings || {};
         var office365 = settings.office365 || {};
         if (office365.tenant && office365.clientId && office365.email && office365.cert && office365.thumbprint) {
           transports.push(
@@ -144,6 +148,8 @@ module.exports = function(app, formioServer) {
         return req.token.user._id === req.projectOwner;
       },
       getAccess: function (handlers, req, res, access) {
+        var _debug = require('debug')('formio:settings:getAccess');
+
         // Get the permissions for an Project with the given ObjectId.
         handlers.unshift(function getProjectAccess(callback) {
           // Build the access object for this project.
@@ -155,12 +161,14 @@ module.exports = function(app, formioServer) {
           }
 
           // Load the project.
-          cache.loadProject(req, req.projectId, function (err, project) {
+          cache.loadProject(req, req.projectId, function(err, project) {
             if (err) {
-              return callback(400);
+              _debug(err);
+              return callback(err);
             }
             if (!project) {
-              return callback(404);
+              _debug('No project found with projectId: ' + req.projectId);
+              return callback('No project found with projectId: ' + req.projectId);
             }
 
             // Store the Project Owners UserId, because they will have all permissions.
@@ -205,12 +213,15 @@ module.exports = function(app, formioServer) {
         return entity;
       },
       access: function (hasAccess, req, access) {
+        var _debug = require('debug')('formio:settings:access');
+        var _url = nodeUrl.parse(req.url).pathname;
 
         // Determine if the current request has access to the given Project.
         if (!Boolean(req.projectId)) {
-          if (req.method === 'POST' && req.url === '/project') {
+          if (req.method === 'POST' && _url === '/project') {
             if (req.token) {
               // User is authenticated.
+              _debug('true');
               return true;
             }
 
@@ -218,36 +229,46 @@ module.exports = function(app, formioServer) {
             return false;
           }
 
-          debug('Checking for Formio Access.');
-          debug('Formio URL: ' + req.url);
-          if (req.url === '/current' || req.url === '/logout') {
+          _debug('Checking for Formio Access.');
+          _debug('Formio URL: ' + _url);
+          if (_url === '/current' || _url === '/logout') {
             if (req.token) {
+              _debug('true');
               return true;
             }
           }
 
-          if (req.url === '/project') {
+          if (_url === '/project') {
             if (req.token) {
+              _debug('true');
               return true;
             }
           }
 
-          if (req.url === '/project/available') {
+          if (_url === '/project/available') {
+            _debug('true');
             return true;
           }
 
-          if (req.url === '/spec.json' || req.url === '/spec.html') {
+          if (_url === '/spec.json' || _url === '/spec.html') {
+            _debug('true');
             return true;
           }
 
           // This req is unauthorized.
+          _debug('false');
           return false;
         }
         else {
-          return formioServer.formio.access.hasAccess(req, access, {
+          _debug('Checking Project Access.');
+          _debug('URL: ' + _url);
+          var _access = formioServer.formio.access.hasAccess(req, access, {
             type: 'project',
             id: req.projectId
           });
+
+          _debug(_access);
+          return _access;
         }
       },
       hasAccess: function (_hasAccess, req, access) {
@@ -299,7 +320,7 @@ module.exports = function(app, formioServer) {
         return cache;
       },
       submissionRequestQuery: function (query, req) {
-        query.projectId = req.projectId
+        query.projectId = req.projectId;
         return query;
       },
       submissionRequestTokenQuery: function (query, token) {
@@ -314,30 +335,29 @@ module.exports = function(app, formioServer) {
          *
          * @param done
          */
-        var updateProject = function (done) {
+        var updateProject = function(_role, done) {
+          var _debug = require('debug')('formio:settings:updateProject');
+
           formioServer.formio.resources.project.model.findOne({
-            query: {
-              _id: formioServer.formio.mongoose.Types.ObjectId(projectId)
-            },
-            $snapshot: true
+            _id: formioServer.formio.mongoose.Types.ObjectId(projectId)
           }, function (err, project) {
             if (err) {
-              debug(err);
+              _debug(err);
               return done(err);
             }
             if (!project) {
-              debug('No Project found with projectId: ' + projectId);
+              _debug('No Project found with projectId: ' + projectId);
               return done();
             }
 
             // Add the new roleId to the access list for read_all (project).
-            debug('Loaded project: ' + JSON.stringify(project));
+            _debug('Loaded project: ' + JSON.stringify(project));
             project.access = project.access || [];
             var found = false;
             for (var a = 0; a < project.access.length; a++) {
               if (project.access[a].type === 'read_all') {
                 project.access[a].roles = project.access[a].roles || [];
-                project.access[a].roles.push(roleId);
+                project.access[a].roles.push(_role);
                 project.access[a].roles = _.uniq(project.access[a].roles);
                 found = true;
               }
@@ -347,38 +367,34 @@ module.exports = function(app, formioServer) {
             if (!found) {
               project.access.push({
                 type: 'read_all',
-                roles: [roleId]
+                roles: [_role]
               });
             }
 
             // Save the updated permissions.
-            formioServer.formio.resources.project.model.update(
-              {_id: formioServer.formio.mongoose.Types.ObjectId(projectId)},
-              {$set: {access: project.access}},
-              {new: true},
-              function (err, doc) {
-                if (err) {
-                  debug(err);
-                  return done(err);
-                }
-
-                debug(project.access);
-                done();
+            project.save(function(err) {
+              if (err) {
+                _debug(err);
+                return done(err);
               }
-            );
+
+              _debug('Updated Project: ' + JSON.stringify(project.toObject()));
+              done();
+            });
           });
         };
 
         // Update the project when new roles are added.
-        handlers.shift(updateProject);
+        handlers.unshift(updateProject);
         return handlers;
       },
       roleQuery: function (query, req) {
-        query.project = req.projectId ? req.projectId : req.params.projectId;
+        var projectId = req.projectId || req.params.projectId;
+        query.project = formioServer.formio.mongoose.Types.ObjectId(projectId);
         return query;
       },
       roleRoutes: function (routes) {
-        routes.before.unshift(require('../middleware/projectFilter'));
+        routes.before.unshift(require('../middleware/bootstrapEntityProject'), require('../middleware/projectFilter'));
         return routes;
       },
       roleSearch: function (search, model, value) {

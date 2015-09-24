@@ -1,7 +1,6 @@
 'use strict';
 
 var debug = require('debug')('formio:middleware:deleteProjectHandler');
-var mongoose = require('mongoose');
 
 /**
  * The deleteProjectHandler middleware.
