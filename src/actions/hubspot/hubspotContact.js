@@ -18,6 +18,18 @@ module.exports = function(router) {
   HubspotContactAction.prototype = Object.create(router.formio.Action.prototype);
   HubspotContactAction.prototype.constructor = HubspotContactAction;
   HubspotContactAction.info = function(req, res, next) {
+    next(null, {
+      name: 'hubspotContact',
+      title: 'Hubspot Contacts',
+      description: 'Allows you to integrate into your Hubspot Contacts.',
+      priority: 0,
+      defaults: {
+        handler: ['after'],
+        method: ['create', 'update']
+      }
+    });
+  }
+  HubspotContactAction.settingsForm = function(req, res, next) {
     util.connect(router, req, function(err, hubspot) {
       if (err) { return next(); }
 
@@ -52,17 +64,7 @@ module.exports = function(router) {
           });
         });
 
-        next(null, {
-          name: 'hubspotContact',
-          title: 'Hubspot Contacts',
-          description: 'Allows you to integrate into your Hubspot Contacts.',
-          priority: 0,
-          defaults: {
-            handler: ['after'],
-            method: ['create', 'update']
-          },
-          settingsForm: [fieldPanel]
-        });
+        next(null, [fieldPanel]);
       });
     });
   };
