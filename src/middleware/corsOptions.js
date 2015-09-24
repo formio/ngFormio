@@ -43,7 +43,8 @@ module.exports = function(router) {
       }
 
       // Build the list of supported domains.
-      var cors = settings.cors || '';
+      settings = settings || {};
+      var cors = settings.cors || '*';
       whitelist = whitelist.concat(cors.split(/[\s,]+/));
 
       // Support * for domain name.

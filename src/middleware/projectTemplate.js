@@ -113,7 +113,7 @@ module.exports = function(formio) {
         }
       }, function(err) {
         if (err) {
-          return next('An error occured with the template import.');
+          return next('An error occurred with the template import.');
         }
 
         // Update the project with this template.

@@ -33,10 +33,13 @@ test:
   pre:
     - sudo bash -c "echo \"127.0.0.1 formio.localhost\" >> /etc/hosts"
     - sudo bash -c "echo \"127.0.0.1 api.localhost\" >> /etc/hosts"
-    - docker run -d -e "MONGO1=$MONGO" -e "PROTOCOL=http" -e "DOMAIN=localhost" -e "PORT=3000" -e "DEBUG=formio:*" --name formio-server --net=host $IMAGE_PATH:$SHORT_SHA
+  post:
+    - docker run -d -e "MONGO1=$MONGO" -e "PROTOCOL=http" -e "DOMAIN=localhost" -e "PORT=3000" -e "DEBUG=formio:*,formio:*:*" --name formio-server --net=host $IMAGE_PATH:$SHORT_SHA
     - sleep 10
     - docker logs formio-server
     - curl --retry 10 --retry-delay 5 -v http://api.localhost:3000/health
+    - npm run-script docker
+    - docker logs formio-server > $CIRCLE_ARTIFACTS/formio-server.log 2>$CIRCLE_ARTIFACTS/error.log
 
 deployment:
   release:
