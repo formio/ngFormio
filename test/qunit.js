@@ -251,7 +251,6 @@ angular.module('ngFormio', ['formio'])
         for (var path in tests) {
           var test = tests[path];
           var formio = new Formio(path);
-          console.log(formio);
           for (var param in test) {
             assert.equal(formio[param], test[param], param + ' must match.');
           }

@@ -99,7 +99,7 @@ module.exports = function() {
             // Register a specific path.
             var registerPath = function(name, base) {
               this[name + 'sUrl'] = base + '/' + name;
-              var regex = new RegExp('\/' + name + '\/([0-9]+)');
+              var regex = new RegExp('\/' + name + '\/([^/]+)');
               if (path.search(regex) !== -1) {
                 parts = path.match(regex);
                 this[name + 'Url'] = parts ? (base + parts[0]) : '';
@@ -226,9 +226,9 @@ module.exports = function() {
           var _url = type + 'Url';
           return function(data) {
             var deferred = $q.defer();
-            if (!this[_url]) { return deferred.promise; }
             var method = this[_id] ? 'put' : 'post';
-            $http[method](this[_url] + this.query, data)
+            _url = this[_id] ? this[_url] : this[type + 'sUrl'];
+            $http[method](_url + this.query, data)
               .success(function (result) {
                 cache = {};
                 result.method = method;
