@@ -1,0 +1,7 @@
+<form id="confirm-delete-submission-dialog">
+  <p>Are you sure you want to delete {{ selected().length > 1 ? 'these ' + selected().length + ' submissions' : 'this submission'}}?</p>
+  <div class="form-group">
+    <button type="submit" class="btn btn-danger pull-right" ng-click="closeThisDialog(true)">Delete</button>&nbsp;
+    <button type="button" class="btn btn-default pull-right" style="margin-right: 5px;" ng-click="closeThisDialog(false)">Cancel</button>&nbsp;
+  </div>
+</form>

@@ -2,4 +2,4 @@
   <a class="btn btn-default" href="{{ formio.formUrl }}/export?format=json&x-jwt-token={{ token }}">Export JSON</a>
   <a class="btn btn-default" href="{{ formio.formUrl }}/export?format=csv&x-jwt-token={{ token }}">Export CSV</a>
 </div>
-<formio-submissions src="formUrl" per-page="25"></formio-submissions>
+<div kendo-grid="grid" k-options="gridOptions" k-ng-delay="gridOptions.columns" style="width:0"></div>
