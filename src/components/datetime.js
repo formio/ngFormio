@@ -2,10 +2,13 @@ module.exports = function (app) {
 
   app.config([
     'formioComponentsProvider',
-    function (formioComponentsProvider) {
+    function(formioComponentsProvider) {
       formioComponentsProvider.register('datetime', {
         title: 'Date / Time',
         template: 'formio/components/datetime.html',
+        tableView: function(data) {
+          return '<span>{{ "' + data + '" | date: "' + this.settings.format + '" }}</span>';
+        },
         settings: {
           input: true,
           tableView: true,
@@ -47,7 +50,7 @@ module.exports = function (app) {
   app.run([
     '$templateCache',
     'FormioUtils',
-    function ($templateCache, FormioUtils) {
+    function($templateCache, FormioUtils) {
       $templateCache.put('formio/components/datetime.html', FormioUtils.fieldWrap(
         '<div class="input-group">' +
         '<input type="text" class="form-control" ' +
