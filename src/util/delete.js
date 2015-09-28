@@ -1,6 +1,7 @@
 'use strict';
 
 var _ = require('lodash');
+var async = require('async');
 var debug = {
   submission: require('debug')('formio:util:delete#submission'),
   form: require('debug')('formio:util:delete#form'),
@@ -83,19 +84,26 @@ module.exports = function(formio) {
     }
 
     // Find all the forms that are associated with the given projectId and have not been deleted.
-    formio.resources.form.model.find(
-      {project: projectId, deleted: {$eq: null}}
-    ).select('_id').lean(true).exec(function(err, formIds) {
+    var query = {project: projectId, deleted: {$eq: null}};
+    debug.form('form.find: ' + JSON.stringify(query));
+    formio.resources.form.model.find(query, function(err, formIds) {
       if (err) {
         debug.form(err);
         return next(err);
       }
-      if (!formIds) {
+      if (!formIds || formIds.length === 0) {
         debug.form('No forms found with the project: ' + projectId);
         return next();
       }
 
-      formio.resources.form.model.find({_id: {$in: formIds}, deleted: {$eq: null}}, function(err, forms) {
+      // Filter _ids
+      formIds = _.map(formIds, function(element) {
+        return element._id;
+      });
+
+      query = {_id: {$in: formIds}, deleted: {$eq: null}};
+      debug.form('form.find: ' + JSON.stringify(query));
+      formio.resources.form.model.find(query).snapshot({$snapshot: true}).exec(function(err, forms) {
         if (err) {
           debug.form(err);
           return next(err);
@@ -106,33 +114,38 @@ module.exports = function(formio) {
         }
 
         // Mark all un-deleted forms as deleted.
-        forms.forEach(function(form) {
+        async.eachSeries(forms, function(form, cb) {
           form.deleted = (new Date()).getTime();
           form.save(function(err, form) {
             if (err) {
-              debug.form(err);
-              return next(err);
+              return cb(err);
             }
 
             debug.form(form);
+            cb();
           });
-        });
-
-        // Delete all the actions for the given list of forms.
-        deleteAction(formIds, function(err) {
+        }, function(err) {
           if (err) {
             debug.form(err);
             return next(err);
           }
 
-          // Update all submissions related to the newly deleted forms, as being deleted.
-          deleteSubmission(formIds, function(err) {
+          // Delete all the actions for the given list of forms.
+          deleteAction(formIds, function(err) {
             if (err) {
               debug.form(err);
               return next(err);
             }
 
-            next();
+            // Update all submissions related to the newly deleted forms, as being deleted.
+            deleteSubmission(formIds, function(err) {
+              if (err) {
+                debug.form(err);
+                return next(err);
+              }
+
+              next();
+            });
           });
         });
       });
@@ -206,7 +219,9 @@ module.exports = function(formio) {
       return next();
     }
 
-    formio.roles.resource.model.find({project: projectId, deleted: {$eq: null}}, function(err, roles) {
+    var query = {project: projectId, deleted: {$eq: null}};
+    debug.role('role.find: ' + JSON.stringify(query));
+    formio.roles.resource.model.find(query, function(err, roles) {
       if (err) {
         debug.role(err);
         return next(err);
@@ -216,19 +231,24 @@ module.exports = function(formio) {
         return next();
       }
 
-      roles.forEach(function(role) {
+      async.eachSeries(roles, function(role, cb) {
         role.deleted = (new Date()).getTime();
         role.save(function(err, role) {
           if (err) {
-            debug.role(err);
-            return next(err);
+            return cb(err);
           }
 
           debug.role(role);
+          cb();
         });
-      });
+      }, function(err) {
+        if (err) {
+          debug.role(err);
+          return next(err);
+        }
 
-      next();
+        next();
+      });
     });
   };
 
@@ -248,10 +268,12 @@ module.exports = function(formio) {
       return next();
     }
 
-    formio.resources.project.model.findOne({_id: projectId, deleted: {$eq: null}}, function(err, project) {
+    var query = {_id: projectId, deleted: {$eq: null}};
+    debug.project('project.findOne: ' + JSON.stringify(query));
+    formio.resources.project.model.findOne(query, function(err, project) {
       if (err) {
         debug.project(err);
-        return next(err);
+        return next(err.message || err);
       }
       if (!project) {
         debug.project('No project found with _id: ' + projectId);
@@ -262,19 +284,19 @@ module.exports = function(formio) {
       project.save(function(err, project) {
         if (err) {
           debug.project(err);
-          return next(err);
+          return next(err.message || err);
         }
 
         deleteRole(projectId, function(err) {
           if (err) {
             debug.project(err);
-            return next(err);
+            return next(err.message || err);
           }
 
           deleteForm(projectId, function(err) {
             if (err) {
               debug.project(err);
-              return next(err);
+              return next(err.message || err);
             }
 
             debug.project(project);
