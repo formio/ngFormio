@@ -754,9 +754,7 @@ app.controller('FormSubmissionsController', [
         refresh: true,
         pageSizes: [5, 10, 25, 50, 100, 'all']
       },
-      sortable: {
-        mode: 'multiple'
-      },
+      sortable: true,
       resizable: true,
       reorderable: true,
       selectable: 'multiple, row',
