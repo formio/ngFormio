@@ -1,4 +1,5 @@
 'use strict';
+
 var config = require('../../config');
 var tld = require('tldjs');
 var debug = {
@@ -11,7 +12,6 @@ var debug = {
  * Middleware to resolve a form alias into its components.
  */
 module.exports = function(formio) {
-
   var cache = require('../cache/cache')(formio);
 
   // Skip the alias handler.

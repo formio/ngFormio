@@ -41,6 +41,16 @@ config.apiHost = apiHost;
 config.formio.apiHost = apiHost;
 config.formioHost = formioHost;
 
+// The redis configuration.
+config.redis = {
+  port: process.env.REDIS_PORT || 6379,
+  address: process.env.REDIS_ADDR || 'localhost'
+};
+
+if (process.env.REDIS_PASS) {
+  config.redis.password = process.env.REDIS_PASS;
+}
+
 if (process.env.MONGO1) {
   config.formio.mongo = [];
   config.formio.mongo.push(process.env.MONGO1);

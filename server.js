@@ -11,6 +11,10 @@ var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
 var app = express();
 var favicon = require('serve-favicon');
+var analytics = require('./src/analytics/index')(config);
+
+// Hook each request and add analytics support.
+app.use(analytics.hook);
 
 // Redirect all root traffic to www
 app.use(function(req, res, next) {
@@ -99,10 +103,11 @@ app.get('/project/:projectId/form/:formId/spec.html', function(req, res) {
 // Establish our url alias middleware.
 app.use(require('./src/middleware/alias')(formioServer.formio));
 
+// Hook the app and bootstrap the formio hooks.
 var settings = require('./src/hooks/settings')(app, formioServer);
+
 // Start the api server.
 formioServer.init(settings).then(function(formio) {
-
   // The formio app sanity endpoint.
   app.get('/health', function(req, res, next) {
     if (!formio.resources) {
@@ -137,6 +142,7 @@ process.on('uncaughtException', function(err) {
     message: err.message,
     stacktrace: err.stack
   });
+
   // Give jslogger time to log before exiting.
   setTimeout(function() {
     process.exit(1);

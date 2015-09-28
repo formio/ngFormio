@@ -1,7 +1,7 @@
 'use strict';
 
 require('dotenv').load();
-var config = require('../config').formio;
+var config = require('../config');
 var Q = require('q');
 var path = require('path');
 var bodyParser = require('body-parser');
@@ -9,6 +9,7 @@ var methodOverride = require('method-override');
 var nunjucks = require('nunjucks');
 var express = require('express');
 var app = express();
+var analytics = require('../src/analytics/index')(config);
 
 // Build the paths for bootstrapping the formio test suite.
 var _formio = path.dirname(require.resolve('formio'));
@@ -17,6 +18,9 @@ var _bootstrap = path.join(_test, 'bootstrap');
 
 module.exports = function() {
   var bootstrap = Q.defer();
+
+  // Hook each request and add analytics support.
+  app.use(analytics.hook);
 
   // Add Middleware necessary for REST API's
   app.use(bodyParser.urlencoded({extended: true}));
@@ -34,7 +38,7 @@ module.exports = function() {
   });
 
   // Bootstrap the formio test environment.
-  var _server = require('formio')(config);
+  var _server = require('formio')(config.formio);
 
   // Configure nunjucks.
   nunjucks.configure('views', {
@@ -69,11 +73,11 @@ module.exports = function() {
   app.get('/config.js', function(req, res) {
     res.set('Content-Type', 'text/javascript');
     res.render('js/config.js', {
-      forceSSL: config.https ? 'true' : 'false',
-      domain: config.domain,
-      appHost: config.host,
-      apiHost: config.apiHost,
-      formioHost: config.formioHost
+      forceSSL: config.formio.https ? 'true' : 'false',
+      domain: config.formio.domain,
+      appHost: config.formio.host,
+      apiHost: config.formio.apiHost,
+      formioHost: config.formio.formioHost
     });
   });
 
@@ -100,8 +104,14 @@ module.exports = function() {
   // Establish our url alias middleware.
   app.use(require('../src/middleware/alias')(_server.formio));
 
+  // Hook the app and bootstrap the formio hooks.
   var _settings = require('../src/hooks/settings')(app, _server);
-  require(_bootstrap)(app, _server, _settings, '/project/:projectId', config)
+
+  // Hook each request and add analytics support.
+  app.use(analytics.hook);
+
+  // Start the api server.
+  require(_bootstrap)(app, _server, _settings, '/project/:projectId', config.formio)
     .then(function(state) {
       bootstrap.resolve({
         app: state.app,
