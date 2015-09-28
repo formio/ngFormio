@@ -20,7 +20,8 @@ angular
     'angularMoment',
     'ngCkeditor',
     'formioApp.controllers',
-    'formioApp.services'
+    'formioApp.services',
+    'kendo.directives'
   ])
   .config([
     '$stateProvider',
