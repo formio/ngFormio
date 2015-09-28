@@ -4,6 +4,9 @@ app.config([
     formioComponentsProvider.register('datetime', {
       title: 'Date / Time',
       template: 'formio/components/datetime.html',
+      tableView: function(data) {
+        return '<span>{{ "' + data + '" | date: "' + this.settings.format + '" }}</span>';
+      },
       settings: {
         input: true,
         tableView: true,
