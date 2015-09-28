@@ -21,13 +21,14 @@
     "bootswatch": "3.3.4+1",
     "signature_pad": "~1.3.6",
     "bootstrap-ui-datetime-picker": "~1.1.0",
+    "kendo-ui": "kendo-ui-core#2015.2.902+SP2",
     "ngFormio": "git+ssh://git@github.com/formio/ngFormio.git#0.2.0",
-    "kendo-ui": "kendo-ui-core#~2015.2.902+SP2"
   },
   "resolutions": {
     "angular": "~1.3.15",
     "angular-moment": "~0.10.1",
-    "angular-bootstrap": "~0.13.0"
+    "angular-bootstrap": "~0.13.0",
+    "ngFormio": "0.2.0"
   },
   "overrides": {
     "kendo-ui": {
