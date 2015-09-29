@@ -100,12 +100,13 @@ app.config([
     };
 
     angular.forEach(formStates, function(info, state) {
-      $stateProvider.state(state, {
-        abstract: true,
-        url: info.path,
-        parent: 'project.form',
-        template: '<div ui-view></div>'
-      })
+      $stateProvider
+        .state(state, {
+          abstract: true,
+          url: info.path,
+          parent: 'project.form',
+          template: '<div ui-view></div>'
+        })
         .state(state + '.index', {
           url: '',
           parent: state,
@@ -251,7 +252,8 @@ app.controller('FormController', [
     };
 
     // When a submission is made.
-    $scope.disableSubmissionHandler = $scope.$on('formSubmission', function(event, submission) {
+    $scope.$on('formSubmission', function(event, submission) {
+      event.stopPropagation();
       FormioAlerts.addAlert({
         type: 'success',
         message: 'New submission added!'
@@ -283,6 +285,12 @@ app.controller('FormController', [
         $state.go('project.form.index');
       }, FormioAlerts.onError.bind(FormioAlerts));
     };
+
+    // Called when the form is updated.
+    $scope.$on('formUpdate', function(event, form) {
+      event.stopPropagation();
+      $scope.form.components = form.components;
+    });
 
     $rootScope.currentForm = $scope.form;
   }
@@ -376,7 +384,8 @@ app.controller('FormDeleteController', [
     $state,
     FormioAlerts
   ) {
-    $scope.$on('delete', function() {
+    $scope.$on('delete', function(event) {
+      event.stopPropagation();
       FormioAlerts.addAlert({
         type: 'success',
         message: _.capitalize($scope.form.type) + ' was deleted.'
@@ -384,11 +393,13 @@ app.controller('FormDeleteController', [
       $state.go('project.edit');
     });
 
-    $scope.$on('cancel', function() {
+    $scope.$on('cancel', function(event) {
+      event.stopPropagation();
       $state.go('project.form.view');
     });
 
     $scope.$on('formError', function(event, error) {
+      event.stopPropagation();
       FormioAlerts.onError(error);
     });
   }
@@ -452,7 +463,6 @@ app.factory('ActionInfoLoader', [
         $scope.actionUrl = '';
         $scope.actionInfo = $stateParams.actionInfo || {settingsForm: {}};
         $scope.action = {data: {settings: {}}};
-        $scope.disableSubmissionHandler();
 
         // Get the action information.
         var getActionInfo = function(name) {
@@ -575,7 +585,8 @@ app.controller('FormActionAddController', [
       }
     });
 
-    $scope.$on('formSubmission', function() {
+    $scope.$on('formSubmission', function(event) {
+      event.stopPropagation();
       FormioAlerts.addAlert({type: 'success', message: 'Action was created.'});
       $state.go('project.form.action.index');
     });
@@ -657,7 +668,8 @@ app.controller('FormActionEditController', [
       }
     });
 
-    $scope.$on('formSubmission', function() {
+    $scope.$on('formSubmission', function(event) {
+      event.stopPropagation();
       FormioAlerts.addAlert({type: 'success', message: 'Action was updated.'});
       $state.go('project.form.action.index');
     });
@@ -676,11 +688,13 @@ app.controller('FormActionDeleteController', [
     FormioAlerts
   ) {
     $scope.actionUrl = $scope.formio.formUrl + '/action/' + $stateParams.actionId;
-    $scope.$on('delete', function() {
+    $scope.$on('delete', function(event) {
+      event.stopPropagation();
       FormioAlerts.addAlert({type: 'success', message: 'Action was deleted.'});
       $state.go('project.form.action.index');
     });
-    $scope.$on('cancel', function() {
+    $scope.$on('cancel', function(event) {
+      event.stopPropagation();
       $state.go('project.form.action.index');
     });
 
@@ -1005,6 +1019,7 @@ app.controller('FormSubmissionEditController', [
     FormioAlerts
   ) {
     $scope.$on('formSubmission', function(event, submission) {
+      event.stopPropagation();
       var message = (submission.method === 'put') ? 'updated' : 'created';
       FormioAlerts.addAlert({
         type: 'success',
@@ -1030,7 +1045,8 @@ app.controller('FormSubmissionDeleteController', [
     $state,
     FormioAlerts
   ) {
-    $scope.$on('delete', function() {
+    $scope.$on('delete', function(event) {
+      event.stopPropagation();
       FormioAlerts.addAlert({
         type: 'success',
         message: 'Submission was deleted.'
@@ -1038,11 +1054,13 @@ app.controller('FormSubmissionDeleteController', [
       $state.go('project.form.submission.index');
     });
 
-    $scope.$on('cancel', function() {
+    $scope.$on('cancel', function(event) {
+      event.stopPropagation();
       $state.go('project.form.submission.item.view');
     });
 
     $scope.$on('formError', function(event, error) {
+      event.stopPropagation();
       FormioAlerts.onError(error);
     });
   }
