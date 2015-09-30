@@ -5,7 +5,7 @@ var config = require('./config');
 var jslogger = require('jslogger')({key: config.jslogger});
 var express = require('express');
 var nunjucks = require('nunjucks');
-var debug = require('debug')('formio:permissions');
+var debug = require('debug')('formio:server');
 var _ = require('lodash');
 var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
@@ -48,6 +48,9 @@ app.use(function(err, req, res, next) {
 
 // Create the formio server.
 var formioServer = require('formio')(config.formio);
+
+// Attach the analytics to the formio server.
+formioServer.analytics = analytics;
 
 // Configure nunjucks.
 nunjucks.configure('views', {

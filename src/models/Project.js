@@ -2,6 +2,7 @@
 
 var _ = require('lodash');
 var EncryptedProperty = require('../plugins/EncryptedProperty');
+
 module.exports = function(formio) {
   var cache = require('../cache/cache')(formio);
   var model = formio.BaseModel({
@@ -30,6 +31,12 @@ module.exports = function(formio) {
         index: true,
         default: null
       },
+      plan: {
+        type: String,
+        enum: ['basic', 'team1', 'team2', 'team3'],
+        default: 'basic',
+        index: true
+      },
       deleted: {
         type: Number,
         default: null
@@ -40,8 +47,8 @@ module.exports = function(formio) {
 
   // Encrypt 'settings' property at rest in MongoDB.
   model.schema.plugin(EncryptedProperty, {
-    secret:     formio.config.mongoSecret,
-    plainName:  'settings'
+    secret: formio.config.mongoSecret,
+    plainName: 'settings'
   });
 
   // Validation

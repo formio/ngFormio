@@ -1,6 +1,6 @@
 'use strict';
 
-require('dotenv').load();
+require('dotenv').load({silent: true});
 var config = require('../config');
 var Q = require('q');
 var path = require('path');
@@ -9,6 +9,7 @@ var methodOverride = require('method-override');
 var nunjucks = require('nunjucks');
 var express = require('express');
 var app = express();
+var debug = require('debug')('formio:server');
 var analytics = require('../src/analytics/index')(config);
 
 // Build the paths for bootstrapping the formio test suite.
@@ -39,6 +40,9 @@ module.exports = function() {
 
   // Bootstrap the formio test environment.
   var _server = require('formio')(config.formio);
+
+  // Attach the analytics to the formio server.
+  _server.analytics = analytics;
 
   // Configure nunjucks.
   nunjucks.configure('views', {

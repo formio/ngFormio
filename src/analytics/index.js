@@ -4,7 +4,8 @@ var Redis = require('redis');
 var onFinished = require('on-finished');
 var debug = {
   record: require('debug')('formio:analytics:record'),
-  hook: require('debug')('formio:analytics:hook')
+  hook: require('debug')('formio:analytics:hook'),
+  getCalls: require('debug')('formio:analytics:getCalls')
 };
 var url = require('url');
 
@@ -51,7 +52,7 @@ module.exports = function(config) {
     var now = new Date();
     var key = now.getUTCMonth() + ':' + project;
     debug.record('Start: ' + start);
-    debug.record('dt: ' + now.getTime() - start);
+    debug.record('dt: ' + (now.getTime() - Number.parseInt(start, 10)).toString());
     var delta = start
       ? now.getTime() - start
       : 0;
@@ -99,9 +100,35 @@ module.exports = function(config) {
   };
 
   /**
+   * Get the number of calls made for the given month and project.
+   *
+   * @param month {number|string}
+   *   The month number to search for (0-11).
+   * @param project {string}
+   *   The Project Id to search for.
+   */
+  var getCalls = function(month, project, next) {
+    if (!redis || !month || !project) {
+      req.getCalls('Skipping');
+      return next();
+    }
+
+    var key = month.toString() + ':' + project.toString();
+    redis.llen(key, function(err, value) {
+      if (err) {
+        return next(err);
+      }
+
+      debug.getCalls(key + ' -> ' + value);
+      next(null, value);
+    });
+  };
+
+  /**
    * Expose the redis interface for analytics.
    */
   return {
-    hook: hook
+    hook: hook,
+    getCalls: getCalls
   };
 };
