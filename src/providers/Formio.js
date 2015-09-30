@@ -39,6 +39,10 @@ module.exports = function() {
           };
         };
 
+        Formio.onRequestDone = function() {
+          $rootScope.$apply();
+        }
+
         // Return the formio interface.
         return Formio;
       }
