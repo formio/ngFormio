@@ -381,8 +381,13 @@ angular
       };
 
       // Add back functionality to the template.
-      $rootScope.back = function() {
-        $state.go($rootScope.previousState, $rootScope.previousParams);
+      $rootScope.back = function(defaultState, defaultParams) {
+        if($rootScope.previousState) {
+          $state.go($rootScope.previousState, $rootScope.previousParams);
+        }
+        else {
+          $state.go(defaultState, defaultParams);
+        }
       };
     }
   ]);
