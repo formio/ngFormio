@@ -340,7 +340,12 @@ angular
       var logoutError = function() {
         $rootScope.currentProject = null;
         $rootScope.currentForm = null;
-        $state.go('auth');
+        if ($state.is('auth')) {
+          $window.location.reload();
+        }
+        else {
+          $state.go('auth');
+        }
         FormioAlerts.addAlert({
           type: 'danger',
           message: 'Your session has expired. Please log in again.'
