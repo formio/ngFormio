@@ -15,6 +15,7 @@ var app = null;
 var template = null;
 var hook = require(path.join(_formio, 'app/util/hook'))({hooks: require('./hooks')});
 var ready = Q.defer();
+var _server = null;
 
 process.on('uncaughtException', function(err) {
   console.log(err.stack);
@@ -23,6 +24,7 @@ process.on('uncaughtException', function(err) {
 if (!docker) {
   require('./bootstrap')()
     .then(function(state) {
+      _server = state.server;
       app = state.app;
       template = state.template;
 
@@ -580,6 +582,7 @@ describe('Bootstrap', function() {
       require(path.join(_test, 'actions'))(app, template, hook);
       require(path.join(_test, 'submission'))(app, template, hook);
       require('./misc')(app, template, hook);
+      require('./analytics')(app, template, hook);
     });
   })
 });

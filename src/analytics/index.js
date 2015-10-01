@@ -128,6 +128,7 @@ module.exports = function(config) {
    * Expose the redis interface for analytics.
    */
   return {
+    redis: redis,
     hook: hook,
     getCalls: getCalls
   };

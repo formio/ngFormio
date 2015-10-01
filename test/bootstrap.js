@@ -111,9 +111,6 @@ module.exports = function() {
   // Hook the app and bootstrap the formio hooks.
   var _settings = require('../src/hooks/settings')(app, _server);
 
-  // Hook each request and add analytics support.
-  app.use(analytics.hook);
-
   // Start the api server.
   require(_bootstrap)(app, _server, _settings, '/project/:projectId', config.formio)
     .then(function(state) {
