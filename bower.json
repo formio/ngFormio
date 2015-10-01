@@ -21,8 +21,10 @@
     "bootswatch": "3.3.4+1",
     "signature_pad": "~1.3.6",
     "bootstrap-ui-datetime-picker": "~1.1.0",
+    "angular-paginate-anything": "~4.1.2",
     "kendo-ui": "kendo-ui-core#2015.2.902+SP2",
-    "ngFormio": "git+ssh://git@github.com/formio/ngFormio.git#develop"
+    "ngFormio": "git+ssh://git@github.com/formio/ngFormio.git#develop",
+    "jquery.maskedinput": "~1.4.1"
   },
   "resolutions": {
     "angular": "~1.3.15",
