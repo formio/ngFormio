@@ -6,12 +6,30 @@ var _ = require('lodash');
 var debug = require('debug')('formio:resources:projects');
 
 module.exports = function(router, formio) {
+  var removeProjectSettings = function(req, res, next) {
+    if (req.token && req.projectOwner && (req.token.user._id === req.projectOwner)) {
+      debug('Showing project settings!');
+      return next();
+    }
+
+    debug('Skipping project settings!');
+    debug(res.resource.item);
+    formio.middleware.filterResourcejsResponse(['settings']).call(this, req, res, next);
+  };
+
   var resource = Resource(
     router,
     '',
     'project',
     formio.mongoose.model('project', formio.schemas.project)
   ).rest({
+    beforeGet: [
+      formio.middleware.filterMongooseExists({field: 'deleted', isNull: true})
+    ],
+    afterGet: [
+      formio.middleware.filterResourcejsResponse(['deleted', '__v']),
+      removeProjectSettings
+    ],
     beforePost: [
       formio.middleware.filterMongooseExists({field: 'deleted', isNull: true}),
       function(req, res, next) {
@@ -26,19 +44,32 @@ module.exports = function(router, formio) {
     ],
     afterPost: [
       require('../middleware/projectTemplate')(formio),
-      formio.middleware.filterResourcejsResponse(['deleted', '__v'])
+      formio.middleware.filterResourcejsResponse(['deleted', '__v']),
+      removeProjectSettings
     ],
     beforeIndex: [
       formio.middleware.filterMongooseExists({field: 'deleted', isNull: true}),
       formio.middleware.ownerFilter
     ],
+    afterIndex: [
+      formio.middleware.filterResourcejsResponse(['deleted', '__v']),
+      removeProjectSettings
+    ],
     beforePut: [
       formio.middleware.filterMongooseExists({field: 'deleted', isNull: true}),
       formio.middleware.condensePermissionTypes
     ],
+    afterPut: [
+      formio.middleware.filterResourcejsResponse(['deleted', '__v']),
+      removeProjectSettings
+    ],
     beforeDelete: [
       formio.middleware.filterMongooseExists({field: 'deleted', isNull: true}),
       require('../middleware/deleteProjectHandler')(formio)
+    ],
+    afterDelete: [
+      formio.middleware.filterResourcejsResponse(['deleted', '__v']),
+      removeProjectSettings
     ]
   });
 

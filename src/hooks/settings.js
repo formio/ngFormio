@@ -133,19 +133,24 @@ module.exports = function(app, formioServer) {
         return token;
       },
       isAdmin: function (isAdmin, req) {
+        var _debug = require('debug')('formio:settings:isAdmin');
 
         // If no user is found, then return false.
         if (!req.token || !req.token.user) {
+          _debug('Skipping - No user given');
           return false;
         }
 
         // Ensure we have a projectOwner
         if (!req.projectOwner) {
+          _debug('Skipping - No project owner');
           return false;
         }
 
         // Project owners are default admins.
-        return req.token.user._id === req.projectOwner;
+        isAdmin = (req.token.user._id === req.projectOwner);
+        _debug(isAdmin);
+        return isAdmin;
       },
       getAccess: function (handlers, req, res, access) {
         var _debug = require('debug')('formio:settings:getAccess');

@@ -93,7 +93,6 @@ module.exports = function(app, template, hook) {
         mapRoles
       ], function(err) {
         if (err) {
-          console.log(template);
           return callback(err);
         }
 
