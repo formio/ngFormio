@@ -10,7 +10,7 @@ var protocol = process.env.PROTOCOL || 'https';
 var project = process.env.PROJECT || 'formio';
 
 config.reservedSubdomains = ['test', 'www', 'api', 'help', 'support', 'portal'];
-config.formio.reservedForms = ['submission', 'export', 'role', 'current', 'logout', 'import'];
+config.formio.reservedForms = ['submission', 'export', 'role', 'current', 'logout', 'import', 'form'];
 
 // Set the App settings.
 var domain = process.env.DOMAIN || 'form.io';

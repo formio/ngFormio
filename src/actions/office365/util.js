@@ -128,7 +128,13 @@ module.exports = {
       if (!settings) {
         return deferred.reject('No settings found.');
       }
-      if (!settings.office365) {
+      if (
+        !settings.office365 ||
+        !settings.office365.tenant ||
+        !settings.office365.clientId ||
+        !settings.office365.cert ||
+        !settings.office365.thumbprint
+      ) {
         return deferred.reject('Office 365 Not configured.');
       }
 
@@ -152,7 +158,7 @@ module.exports = {
           });
         }
       );
-    });
+    }.bind(this));
 
     return deferred.promise;
   },
