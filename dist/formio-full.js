@@ -61143,7 +61143,8 @@ module.exports = function() {
 
           // If they wish to submit to the default location.
           else if ($scope.formio) {
-            $scope.formio.saveSubmission(submissionData).then(function(submission) {
+            $scope.formio.saveSubmission(angular.copy(submissionData)) // copy to remove angular $$hashKey
+              .then(function(submission) {
               onSubmitDone(submission.method, submission);
             }, FormioScope.onError($scope, $element))
               .finally(function() {
