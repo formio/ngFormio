@@ -264,7 +264,8 @@ app.controller('FormController', [
 
     // Save a form.
     $scope.saveForm = function() {
-      $scope.formio.saveForm($scope.form).then(function(form) {
+      $scope.formio.saveForm(angular.copy($scope.form)) // Copy to remove angular $$hashKey
+      .then(function(form) {
         var method = $stateParams.formId ? 'updated' : 'created';
         FormioAlerts.addAlert({
           type: 'success',
