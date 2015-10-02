@@ -265,9 +265,13 @@ module.exports = function(config) {
         });
     })
     .when('I click (?:on )?the $BUTTON button', function(button, next) {
-      this.driver.click('//button[contains(.,\'' + button + '\')]')
+      var driver = this.driver
+      this.driver.waitForExist('//button[contains(.,\'' + button + '\')]', 500)
         .then(function() {
-          next();
+          driver.click('//button[contains(.,\'' + button + '\')]')
+            .then(function() {
+              next();
+            });
         });
     })
     .when('I enter $TEXT in the $FIELD field', function(text, field, next) {
@@ -345,15 +349,18 @@ module.exports = function(config) {
       });
     })
     .then('I have been logged out', function(next) {
-      this.driver.localStorage('GET', 'formioToken', function(err, res) {
-        if (err) {
-          return next(err);
-        }
-        if ((!err) && (res.value)) {
-          return next(new Error('User still logged in: ' + JSON.stringify(res)));
-        }
+      var driver = this.driver;
+      this.driver.pause(500).then(function(){
+        driver.localStorage('GET', 'formioToken', function(err, res) {
+          if (err) {
+            return next(err);
+          }
+          if ((!err) && (res.value)) {
+            return next(new Error('User still logged in: ' + JSON.stringify(res)));
+          }
 
-        next();
+          next();
+        });
       });
     })
     .then('I see an alert with (?:the text )?$TEXT', function(text, next) {
