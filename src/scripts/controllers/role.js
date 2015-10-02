@@ -72,7 +72,7 @@ app.controller('RoleController', [
           message: 'Role successfully ' + ($scope.role._id ? 'saved' : 'created') + '.'
         });
 
-        $scope.back();
+        $scope.back('project.settings.roles.view');
       }).catch(FormioAlerts.onError.bind(FormioAlerts));
     };
 
@@ -90,7 +90,7 @@ app.controller('RoleController', [
           message: 'Role successfully deleted.'
         });
 
-        $scope.back();
+        $scope.back('project.settings.roles.view');
       }).catch(function(err) {
         var error = {};
         switch(err.status) {

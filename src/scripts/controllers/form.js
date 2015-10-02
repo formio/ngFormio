@@ -205,7 +205,6 @@ app.controller('FormController', [
     SubmissionAccessLabels,
     $q
   ) {
-
     // Project information.
     $scope.projectId = $stateParams.projectId;
 
@@ -290,14 +289,21 @@ app.controller('FormController', [
 
 app.controller('FormEditController', [
   '$scope',
+  '$q',
   function(
-    $scope
+    $scope,
+    $q
   ) {
-    $scope.originalForm = _.cloneDeep($scope.form);
+    // Clone original form after it has loaded, or immediately
+    // if we're not loading a form
+    ($scope.loadFormPromise || $q.when()).then(function() {
+      $scope.originalForm = _.cloneDeep($scope.form);
+    });
+
     // Revert to original form and go back
     $scope.cancel = function() {
       _.assign($scope.form, $scope.originalForm);
-      $scope.back();
+      $scope.back('project.form.view');
     };
   }
 ]);
