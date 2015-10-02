@@ -13,7 +13,7 @@
         <div class="well" ng-show="!resourcesLoading">
           Resources are the objects within your Project. Example: User, Company, Vehicle, etc.
         </div>
-        <form-list forms="resources" project="currentProject" form-type="'resource'" num-per-page="5"></form-list>
+        <form-list forms="resources" project="currentProject" form-type="'resource'" num-per-page="10"></form-list>
       </div>
       <div class="panel-footer text-right">
         <a ui-sref="project.form.createResource()" class="btn btn-success"><span class="glyphicon glyphicon-plus"></span> New Resource</a>
@@ -34,7 +34,7 @@
         <div class="well" ng-show="!formsLoading">
           Forms serve as a composite input interface for Resources as well as free-form user input. Example: Login Form, Contact Form, etc.
         </div>
-        <form-list forms="forms" project="currentProject" form-type="'form'" num-per-page="5"></form-list>
+        <form-list forms="forms" project="currentProject" form-type="'form'" num-per-page="10"></form-list>
       </div>
       <div class="panel-footer text-right">
         <a ui-sref="project.form.createForm()" class="btn btn-success"><span class="glyphicon glyphicon-plus"></span> New Form</a>

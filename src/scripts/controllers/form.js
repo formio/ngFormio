@@ -100,12 +100,13 @@ app.config([
     };
 
     angular.forEach(formStates, function(info, state) {
-      $stateProvider.state(state, {
-        abstract: true,
-        url: info.path,
-        parent: 'project.form',
-        template: '<div ui-view></div>'
-      })
+      $stateProvider
+        .state(state, {
+          abstract: true,
+          url: info.path,
+          parent: 'project.form',
+          template: '<div ui-view></div>'
+        })
         .state(state + '.index', {
           url: '',
           parent: state,
@@ -205,7 +206,6 @@ app.controller('FormController', [
     SubmissionAccessLabels,
     $q
   ) {
-
     // Project information.
     $scope.projectId = $stateParams.projectId;
 
@@ -251,7 +251,8 @@ app.controller('FormController', [
     };
 
     // When a submission is made.
-    $scope.disableSubmissionHandler = $scope.$on('formSubmission', function(event, submission) {
+    $scope.$on('formSubmission', function(event, submission) {
+      event.stopPropagation();
       FormioAlerts.addAlert({
         type: 'success',
         message: 'New submission added!'
@@ -284,20 +285,33 @@ app.controller('FormController', [
       }, FormioAlerts.onError.bind(FormioAlerts));
     };
 
+    // Called when the form is updated.
+    $scope.$on('formUpdate', function(event, form) {
+      event.stopPropagation();
+      $scope.form.components = form.components;
+    });
+
     $rootScope.currentForm = $scope.form;
   }
 ]);
 
 app.controller('FormEditController', [
   '$scope',
+  '$q',
   function(
-    $scope
+    $scope,
+    $q
   ) {
-    $scope.originalForm = _.cloneDeep($scope.form);
+    // Clone original form after it has loaded, or immediately
+    // if we're not loading a form
+    ($scope.loadFormPromise || $q.when()).then(function() {
+      $scope.originalForm = _.cloneDeep($scope.form);
+    });
+
     // Revert to original form and go back
     $scope.cancel = function() {
       _.assign($scope.form, $scope.originalForm);
-      $scope.back();
+      $scope.back('project.form.view');
     };
   }
 ]);
@@ -376,7 +390,8 @@ app.controller('FormDeleteController', [
     $state,
     FormioAlerts
   ) {
-    $scope.$on('delete', function() {
+    $scope.$on('delete', function(event) {
+      event.stopPropagation();
       FormioAlerts.addAlert({
         type: 'success',
         message: _.capitalize($scope.form.type) + ' was deleted.'
@@ -384,11 +399,13 @@ app.controller('FormDeleteController', [
       $state.go('project.edit');
     });
 
-    $scope.$on('cancel', function() {
+    $scope.$on('cancel', function(event) {
+      event.stopPropagation();
       $state.go('project.form.view');
     });
 
     $scope.$on('formError', function(event, error) {
+      event.stopPropagation();
       FormioAlerts.onError(error);
     });
   }
@@ -452,7 +469,6 @@ app.factory('ActionInfoLoader', [
         $scope.actionUrl = '';
         $scope.actionInfo = $stateParams.actionInfo || {settingsForm: {}};
         $scope.action = {data: {settings: {}}};
-        $scope.disableSubmissionHandler();
 
         // Get the action information.
         var getActionInfo = function(name) {
@@ -575,7 +591,8 @@ app.controller('FormActionAddController', [
       }
     });
 
-    $scope.$on('formSubmission', function() {
+    $scope.$on('formSubmission', function(event) {
+      event.stopPropagation();
       FormioAlerts.addAlert({type: 'success', message: 'Action was created.'});
       $state.go('project.form.action.index');
     });
@@ -657,7 +674,8 @@ app.controller('FormActionEditController', [
       }
     });
 
-    $scope.$on('formSubmission', function() {
+    $scope.$on('formSubmission', function(event) {
+      event.stopPropagation();
       FormioAlerts.addAlert({type: 'success', message: 'Action was updated.'});
       $state.go('project.form.action.index');
     });
@@ -676,11 +694,13 @@ app.controller('FormActionDeleteController', [
     FormioAlerts
   ) {
     $scope.actionUrl = $scope.formio.formUrl + '/action/' + $stateParams.actionId;
-    $scope.$on('delete', function() {
+    $scope.$on('delete', function(event) {
+      event.stopPropagation();
       FormioAlerts.addAlert({type: 'success', message: 'Action was deleted.'});
       $state.go('project.form.action.index');
     });
-    $scope.$on('cancel', function() {
+    $scope.$on('cancel', function(event) {
+      event.stopPropagation();
       $state.go('project.form.action.index');
     });
 
@@ -724,136 +744,6 @@ app.controller('FormSubmissionsController', [
       }).join(' ');
     };
 
-    // Define grid options
-    $scope.gridOptions = {
-      allowCopy: {
-        delimiter: ','
-      },
-      filterable: {
-        operators: {
-          string: {
-            eq: 'Is equal to',
-            neq: 'Is not equal to',
-            startswith: 'Starts with',
-            contains: 'Contains',
-            doesnotcontain: 'Does not contain',
-            endswith: 'Ends with',
-            matchesregex: 'Matches (RegExp)',
-            gt: 'Greater than',
-            gte: 'Greater than or equal to',
-            lt: 'Less than',
-            lte: 'Less than or equal to'
-          }
-        },
-        mode: 'menu',
-        extra: false
-      },
-      pageable: {
-        numeric: false,
-        input: true,
-        refresh: true,
-        pageSizes: [5, 10, 25, 50, 100, 'all']
-      },
-      sortable: {
-        mode: 'multiple'
-      },
-      resizable: true,
-      reorderable: true,
-      selectable: 'multiple, row',
-      columnMenu: true,
-      // This defaults to 'data' and screws everything up,
-      // so we set it to something that isn't a property on submissions
-      templateSettings: { paramName: 'notdata' },
-      toolbar:
-        '<div>' +
-          '<button class="btn btn-default btn-xs" ng-click="view()" ng-disabled="selected().length != 1" ng-class="{\'btn-primary\':selected().length == 1}">' +
-            '<span class="glyphicon glyphicon-eye-open"></span> View' +
-          '</button>&nbsp;' +
-          '<button class="btn btn-default btn-xs" ng-click="edit()" ng-disabled="selected().length != 1" ng-class="{\'btn-primary\':selected().length == 1}">' +
-            '<span class="glyphicon glyphicon-edit"></span> Edit' +
-          '</button>&nbsp;' +
-          '<button class="btn btn-default btn-xs" ng-click="delete()" ng-disabled="selected().length < 1" ng-class="{\'btn-danger\':selected().length >= 1}">' +
-            '<span class="glyphicon glyphicon-remove-circle"></span> Delete' +
-          '</button>' +
-        '</div>',
-      change: $scope.$apply.bind($scope),
-      dataSource: new kendo.data.DataSource({
-        page: 1,
-        pageSize: 10,
-        serverPaging: true,
-        serverSorting: true,
-        serverFiltering: true,
-        sort: {
-          dir: 'desc',
-          field: 'created'
-        },
-        schema: {
-          model: {
-            id: '_id'
-          },
-          total: function(result) {
-            var match = result.headers('content-range').match(/\d+-\d+\/(\d+)/);
-            return (match && match[1]) || 0;
-          },
-          data: 'data'
-        },
-        transport: {
-          read: function(options) {
-            var filters = options.data.filter && options.data.filter.filters;
-            var params = {
-              limit: options.data.take,
-              skip: options.data.skip,
-              sort: getSortQuery(options.data.sort)
-            };
-            _.each(filters, function(filter) {
-              switch(filter.operator) {
-                case 'eq': params[filter.field] = filter.value;
-                  break;
-                case 'neq': params[filter.field + '__ne'] = filter.value;
-                  break;
-                case 'startswith': params[filter.field + '__regex'] = '/^' + filter.value + '/i';
-                  break;
-                case 'endswith': params[filter.field + '__regex'] = '/' + filter.value + '$/i';
-                  break;
-                case 'contains': params[filter.field + '__regex'] = '/' + _.escapeRegExp(filter.value) + '/i';
-                  break;
-                case 'doesnotcontain': params[filter.field + '__regex'] = '/^((?!' + _.escapeRegExp(filter.value) + ').)*$/i';
-                  break;
-                case 'matchesregex': params[filter.field + '__regex'] = filter.value;
-                  break;
-                case 'gt': params[filter.field + '__gt'] = filter.value;
-                  break;
-                case 'gte': params[filter.field + '__gte'] = filter.value;
-                  break;
-                case 'lt': params[filter.field + '__lt'] = filter.value;
-                  break;
-                case 'lte': params[filter.field + '__lte'] = filter.value;
-                  break;
-
-
-              }
-            });
-            $http.get($scope.formio.submissionsUrl, {
-              params: params
-            })
-            .then(options.success)
-            .catch(function(err) {
-              FormioAlerts.onError(err);
-              options.error(err);
-            });
-          },
-          destroy: function(options) {
-            $scope.recentlyDeletedPromises.push($http.delete($scope.formio.submissionUrl + '/' + options.data._id)
-            .then(options.success)
-            .catch(function(err) {
-              FormioAlerts.onError(err);
-              options.error(err);
-            }));
-          }
-        }
-      }),
-    };
-
     // Kendo Grids aren't horizontally scrollable unless you give
     // them a fixed width. 100% stretches the page.
     // This manually resizes the grid so that we can have scrollbars
@@ -868,8 +758,6 @@ app.controller('FormSubmissionsController', [
         angular.element($window).unbind('resize', resizeGrid);
       });
     });
-
-
 
     $scope.selected = function() {
       return $scope.grid && _.map($scope.grid.select(), $scope.grid.dataItem.bind($scope.grid));
@@ -886,7 +774,6 @@ app.controller('FormSubmissionsController', [
         subId: $scope.selected()[0]._id
       });
     };
-
 
     // Kendo ain't give us promises!!
     $scope.recentlyDeletedPromises = [];
@@ -911,9 +798,129 @@ app.controller('FormSubmissionsController', [
     // When form is loaded, create the columns
     $scope.loadFormPromise.then(function() {
       $timeout(function() { // Won't load on state change without this for some reason
-        $scope.gridOptions.columns = _(FormioUtils.flattenComponents($scope.form.components))
+
+        // Define DataSource
+        var dataSource = new kendo.data.DataSource({
+          page: 1,
+          pageSize: 10,
+          serverPaging: true,
+          serverSorting: true,
+          serverFiltering: true,
+          sort: {
+            dir: 'desc',
+            field: 'created'
+          },
+          schema: {
+            model: {
+              id: '_id',
+              fields: _(FormioUtils.flattenComponents($scope.form.components))
+                .filter($scope.tableView)
+                .map(function(component) {
+                  var type;
+                  switch(component.type) {
+                    case 'checkbox': type = 'boolean';
+                      break;
+                    case 'datetime': type = 'date';
+                      break;
+                    case 'number': type = 'number';
+                      break;
+                    default: type = 'string';
+                  }
+                  return [
+                    'data.' + component.key, // Key
+                    {                        // Value
+                      type: type
+                    }
+                  ];
+                })
+                .concat([
+                  ['created', {type: 'date'}],
+                  ['modified', {type: 'date'}]
+                ])
+                .zipObject()
+                .value()
+            },
+            total: function(result) {
+              var match = result.headers('content-range').match(/\d+-\d+\/(\d+)/);
+              return (match && match[1]) || 0;
+            },
+            data: 'data'
+          },
+          transport: {
+            read: function(options) {
+              var filters = options.data.filter && options.data.filter.filters;
+              var params = {
+                limit: options.data.take,
+                skip: options.data.skip,
+                sort: getSortQuery(options.data.sort)
+              };
+              _.each(filters, function(filter) {
+                switch(filter.operator) {
+                  case 'eq': params[filter.field] = filter.value;
+                    break;
+                  case 'neq': params[filter.field + '__ne'] = filter.value;
+                    break;
+                  case 'startswith': params[filter.field + '__regex'] = '/^' + filter.value + '/i';
+                    break;
+                  case 'endswith': params[filter.field + '__regex'] = '/' + filter.value + '$/i';
+                    break;
+                  case 'contains': params[filter.field + '__regex'] = '/' + _.escapeRegExp(filter.value) + '/i';
+                    break;
+                  case 'doesnotcontain': params[filter.field + '__regex'] = '/^((?!' + _.escapeRegExp(filter.value) + ').)*$/i';
+                    break;
+                  case 'matchesregex': params[filter.field + '__regex'] = filter.value;
+                    break;
+                  case 'gt': params[filter.field + '__gt'] = filter.value;
+                    break;
+                  case 'gte': params[filter.field + '__gte'] = filter.value;
+                    break;
+                  case 'lt': params[filter.field + '__lt'] = filter.value;
+                    break;
+                  case 'lte': params[filter.field + '__lte'] = filter.value;
+                    break;
+
+
+                }
+              });
+              $http.get($scope.formio.submissionsUrl, {
+                params: params
+              })
+              .then(options.success)
+              .catch(function(err) {
+                FormioAlerts.onError(err);
+                options.error(err);
+              });
+            },
+            destroy: function(options) {
+              $scope.recentlyDeletedPromises.push($http.delete($scope.formio.submissionUrl + '/' + options.data._id)
+              .then(options.success)
+              .catch(function(err) {
+                FormioAlerts.onError(err);
+                options.error(err);
+              }));
+            }
+          }
+        });
+
+        // Generate columns
+        var columns = _(FormioUtils.flattenComponents($scope.form.components))
         .filter($scope.tableView)
         .map(function(component){
+          var filterable;
+          switch(component.type) {
+            case 'datetime': filterable = { ui: 'datetimepicker' };
+              break;
+            // Filtering is not supported for these data types in resourcejs yet
+            case 'address':
+            case 'checkbox':
+            case 'number':
+            case 'resource':
+            case 'signature':
+              filterable = false;
+              break;
+            default: filterable = true;
+          }
+          console.log(component.type, filterable);
           return {
             field: 'data.' + component.key,
             title: component.label || component.key,
@@ -940,7 +947,8 @@ app.controller('FormSubmissionsController', [
             },
             // Disabling sorting on embedded fields because it doesn't work in resourcejs yet
             sortable: component.key.indexOf('.') === -1,
-            width: '200px'
+            width: '200px',
+            filterable: filterable
           };
         })
         .value()
@@ -949,6 +957,9 @@ app.controller('FormSubmissionsController', [
             field: 'created',
             title: 'Submitted',
             width: '200px',
+            filterable: {
+              ui: 'datetimepicker'
+            },
             template: function(dataItem) {
               return moment(dataItem.created).format('lll');
             }
@@ -957,11 +968,77 @@ app.controller('FormSubmissionsController', [
             field: 'modified',
             title: 'Updated',
             width: '200px',
+            filterable: {
+              ui: 'datetimepicker'
+            },
             template: function(dataItem) {
               return moment(dataItem.modified).format('lll');
             }
           }
         ]);
+
+        // Define grid options
+        $scope.gridOptions = {
+          allowCopy: {
+            delimiter: ','
+          },
+          filterable: {
+            operators: {
+              string: {
+                eq: 'Is equal to',
+                neq: 'Is not equal to',
+                startswith: 'Starts with',
+                contains: 'Contains',
+                doesnotcontain: 'Does not contain',
+                endswith: 'Ends with',
+                matchesregex: 'Matches (RegExp)',
+                gt: 'Greater than',
+                gte: 'Greater than or equal to',
+                lt: 'Less than',
+                lte: 'Less than or equal to'
+              },
+              date: {
+                gt: 'Is after',
+                lt: 'Is before'
+              }
+            },
+            messages: {
+              isTrue: 'True',
+              isFalse: 'False'
+            },
+            mode: 'menu',
+            extra: false
+          },
+          pageable: {
+            numeric: false,
+            input: true,
+            refresh: true,
+            pageSizes: [5, 10, 25, 50, 100, 'all']
+          },
+          sortable: true,
+          resizable: true,
+          reorderable: true,
+          selectable: 'multiple, row',
+          columnMenu: true,
+          // This defaults to 'data' and screws everything up,
+          // so we set it to something that isn't a property on submissions
+          templateSettings: { paramName: 'notdata' },
+          toolbar:
+            '<div>' +
+              '<button class="btn btn-default btn-xs" ng-click="view()" ng-disabled="selected().length != 1" ng-class="{\'btn-primary\':selected().length == 1}">' +
+                '<span class="glyphicon glyphicon-eye-open"></span> View' +
+              '</button>&nbsp;' +
+              '<button class="btn btn-default btn-xs" ng-click="edit()" ng-disabled="selected().length != 1" ng-class="{\'btn-primary\':selected().length == 1}">' +
+                '<span class="glyphicon glyphicon-edit"></span> Edit' +
+              '</button>&nbsp;' +
+              '<button class="btn btn-default btn-xs" ng-click="delete()" ng-disabled="selected().length < 1" ng-class="{\'btn-danger\':selected().length >= 1}">' +
+                '<span class="glyphicon glyphicon-remove-circle"></span> Delete' +
+              '</button>' +
+            '</div>',
+          change: $scope.$apply.bind($scope),
+          dataSource: dataSource,
+          columns: columns
+        };
       });
     });
   }
@@ -1005,6 +1082,7 @@ app.controller('FormSubmissionEditController', [
     FormioAlerts
   ) {
     $scope.$on('formSubmission', function(event, submission) {
+      event.stopPropagation();
       var message = (submission.method === 'put') ? 'updated' : 'created';
       FormioAlerts.addAlert({
         type: 'success',
@@ -1030,7 +1108,8 @@ app.controller('FormSubmissionDeleteController', [
     $state,
     FormioAlerts
   ) {
-    $scope.$on('delete', function() {
+    $scope.$on('delete', function(event) {
+      event.stopPropagation();
       FormioAlerts.addAlert({
         type: 'success',
         message: 'Submission was deleted.'
@@ -1038,11 +1117,13 @@ app.controller('FormSubmissionDeleteController', [
       $state.go('project.form.submission.index');
     });
 
-    $scope.$on('cancel', function() {
+    $scope.$on('cancel', function(event) {
+      event.stopPropagation();
       $state.go('project.form.submission.item.view');
     });
 
     $scope.$on('formError', function(event, error) {
+      event.stopPropagation();
       FormioAlerts.onError(error);
     });
   }

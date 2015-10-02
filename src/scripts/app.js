@@ -327,7 +327,8 @@ angular
         $rootScope.currentState = toState.name;
       });
 
-      var authError = function() {
+      var authError = function(event) {
+        event.stopPropagation();
         $rootScope.currentApp = null;
         $rootScope.currentForm = null;
         $state.go('home');
@@ -337,10 +338,16 @@ angular
         });
       };
 
-      var logoutError = function() {
+      var logoutError = function(event) {
+        event.stopPropagation();
         $rootScope.currentProject = null;
         $rootScope.currentForm = null;
-        $state.go('auth');
+        if ($state.is('auth')) {
+          $window.location.reload();
+        }
+        else {
+          $state.go('auth');
+        }
         FormioAlerts.addAlert({
           type: 'danger',
           message: 'Your session has expired. Please log in again.'
@@ -381,8 +388,13 @@ angular
       };
 
       // Add back functionality to the template.
-      $rootScope.back = function() {
-        $state.go($rootScope.previousState, $rootScope.previousParams);
+      $rootScope.back = function(defaultState, defaultParams) {
+        if($rootScope.previousState) {
+          $state.go($rootScope.previousState, $rootScope.previousParams);
+        }
+        else {
+          $state.go(defaultState, defaultParams);
+        }
       };
     }
   ]);

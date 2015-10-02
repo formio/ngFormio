@@ -43,7 +43,8 @@ app.controller('FeedbackController', [
     $scope.hideFeedback = function() {
       $scope.state = 'closed';
     };
-    $scope.$on('formSubmission', function() {
+    $scope.$on('formSubmission', function(event) {
+      event.stopPropagation();
       $scope.state = 'thanks';
       $timeout(function() {
         $scope.state = 'closed';

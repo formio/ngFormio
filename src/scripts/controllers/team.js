@@ -11,7 +11,8 @@ app.controller('TeamCreateController', [
     $state,
     FormioAlerts
   ) {
-    $scope.$on('formSubmission', function() {
+    $scope.$on('formSubmission', function(event) {
+      event.stopPropagation();
       FormioAlerts.addAlert({
         type: 'success',
         message: 'New team created!'
@@ -48,7 +49,8 @@ app.controller('TeamEditController', [
     $scope,
     $state
   ) {
-    $scope.$on('formSubmission', function() {
+    $scope.$on('formSubmission', function(event) {
+      event.stopPropagation();
       $state.go('home');
     });
   }
@@ -63,7 +65,8 @@ app.controller('TeamDeleteController', [
     $state,
     FormioAlerts
   ) {
-    $scope.$on('delete', function() {
+    $scope.$on('delete', function(event) {
+      event.stopPropagation();
       FormioAlerts.addAlert({
         type: 'success',
         message: 'Team was deleted.'
