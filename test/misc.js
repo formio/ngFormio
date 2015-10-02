@@ -61,6 +61,79 @@ module.exports = function(app, template, hook) {
           done();
         });
     });
+
+    it('The Project settings will be exposed for the Project Owner', function(done) {
+      var verifySettings = function(cb) {
+        var newSettings = {foo: 'bar', cors: '*'};
+
+        request(app)
+          .put('/project/' + template.project._id)
+          .set('x-jwt-token', template.formio.owner.token)
+          .send({settings: newSettings})
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end(function(err, res) {
+            if (err) {
+              return cb(err);
+            }
+
+            var response = res.body;
+            assert.equal(response.hasOwnProperty('settings'), true);
+            assert.deepEqual(response.settings, newSettings);
+            template.project = response;
+
+            // Store the JWT for future API calls.
+            template.formio.owner.token = res.headers['x-jwt-token'];
+
+            cb();
+          });
+      };
+
+      // Update/create project settings before checking.
+      verifySettings(function(err) {
+        if (err) {
+          return done(err);
+        }
+
+        request(app)
+          .get('/project/' + template.project._id)
+          .set('x-jwt-token', template.formio.owner.token)
+          .expect(200)
+          .end(function(err, res) {
+            if(err) {
+              return done(err);
+            }
+
+            var response = res.body || {};
+            assert.equal(response.hasOwnProperty('settings'), true);
+
+            // Store the JWT for future API calls.
+            template.formio.owner.token = res.headers['x-jwt-token'];
+
+            done();
+          });
+      });
+    });
+
+    it('The Project settings should not be exposed for members with access that are not the Owner', function(done) {
+      request(app)
+        .get('/project/' + template.project._id)
+        .set('x-jwt-token', template.users.admin.token)
+        .expect(200)
+        .end(function(err, res) {
+          if(err) {
+            return done(err);
+          }
+
+          var response = res.body || {};
+          assert.equal(response.hasOwnProperty('settings'), false);
+
+          // Store the JWT for future API calls.
+          template.users.admin.token = res.headers['x-jwt-token'];
+
+          done();
+        });
+    });
   });
 
   describe('Forms', function() {
