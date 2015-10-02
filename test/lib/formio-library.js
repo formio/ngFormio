@@ -210,7 +210,7 @@ module.exports = function(config) {
       this.driver.localStorage('DELETE', 'formioToken')
         .then(function() {
           next();
-        }.bind(this))
+        })
         .catch(function(err) {
           next(err);
         });
@@ -330,15 +330,18 @@ module.exports = function(config) {
         });
     })
     .then('I have been logged in', function(next) {
-      this.driver.localStorage('GET', 'formioToken', function(err, res) {
-        if (err) {
-          return next(err);
-        }
-        if ((!err) && (res.value)) {
-          return next();
-        }
+      var driver = this.driver;
+      this.driver.pause(500).then(function(){
+        driver.localStorage('GET', 'formioToken', function(err, res) {
+          if (err) {
+            return next(err);
+          }
+          if ((!err) && (res.value)) {
+            return next();
+          }
 
-        next(new Error('No formioToken found; ' + JSON.stringify(res)));
+          next(new Error('No formioToken found; ' + JSON.stringify(res)));
+        });
       });
     })
     .then('I have been logged out', function(next) {
