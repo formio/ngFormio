@@ -11,7 +11,8 @@ app.controller('UserLoginController', [
     $state,
     $rootScope
   ) {
-    $scope.$on('formSubmission', function(err, submission) {
+    $scope.$on('formSubmission', function(event, submission) {
+      event.stopPropagation();
       if (!submission) { return; }
       $rootScope.user = submission;
       $state.go('home');
@@ -28,7 +29,8 @@ app.controller('UserRegisterController', [
     $state,
     $rootScope
   ) {
-    $scope.$on('formSubmission', function(err, submission) {
+    $scope.$on('formSubmission', function(event, submission) {
+      event.stopPropagation();
       if (!submission) { return; }
       $rootScope.user = submission;
       $state.go('home');
@@ -44,7 +46,8 @@ app.controller('ResetPasswordSendController', [
     $scope,
     $state
   ) {
-    $scope.$on('formSubmission', function(err, submission) {
+    $scope.$on('formSubmission', function(event, submission) {
+      event.stopPropagation();
       if (!submission) { return; }
       $state.go('auth-resetpass-send-done');
     });
@@ -63,7 +66,8 @@ app.controller('ResetPasswordController', [
     $stateParams
   ) {
     $scope.resetPassFormWithToken = $rootScope.resetPassForm + '?x-jwt-token=' + $stateParams['x-jwt-token'];
-    $scope.$on('formSubmission', function(err, submission) {
+    $scope.$on('formSubmission', function(event, submission) {
+      event.stopPropagation();
       if (!submission) { return; }
       $state.go('auth-resetpass-done');
     });

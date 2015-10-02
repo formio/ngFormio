@@ -327,7 +327,8 @@ angular
         $rootScope.currentState = toState.name;
       });
 
-      var authError = function() {
+      var authError = function(event) {
+        event.stopPropagation();
         $rootScope.currentApp = null;
         $rootScope.currentForm = null;
         $state.go('home');
@@ -337,7 +338,8 @@ angular
         });
       };
 
-      var logoutError = function() {
+      var logoutError = function(event) {
+        event.stopPropagation();
         $rootScope.currentProject = null;
         $rootScope.currentForm = null;
         if ($state.is('auth')) {
