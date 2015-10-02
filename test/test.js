@@ -81,6 +81,21 @@ angular.module('ngFormio', ['formio'])
             submissionId: '',
             query: ''
           },
+          'http://api.form.io/project/092934882': {
+            projectUrl: 'http://api.form.io/project/092934882',
+            projectsUrl: 'http://api.form.io/project',
+            projectId: '092934882',
+            formsUrl: 'http://api.form.io/project/092934882/form',
+            formUrl: '',
+            formId: '',
+            actionsUrl: 'http://api.form.io/project/092934882/action',
+            actionUrl: '',
+            actionId: '',
+            submissionsUrl: 'http://api.form.io/project/092934882/submission',
+            submissionUrl: '',
+            submissionId: '',
+            query: ''
+          },
           'http://form.io/project/092934882/form/23234234234234/submission/2987388987982': {
             projectUrl: 'http://form.io/project/092934882',
             projectsUrl: 'http://form.io/project',
@@ -251,7 +266,6 @@ angular.module('ngFormio', ['formio'])
         for (var path in tests) {
           var test = tests[path];
           var formio = new Formio(path);
-          console.log(formio);
           for (var param in test) {
             assert.equal(formio[param], test[param], param + ' must match.');
           }
