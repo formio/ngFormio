@@ -49,10 +49,10 @@ module.exports = function(app, formioServer) {
             return true;
           case 'logout':
             app.get('/logout', formio.auth.logout);
-            return true;
+            return false;
           case 'current':
             app.get('/current', formio.auth.currentUser);
-            return true;
+            return false;
           case 'perms':
             app.use(formio.middleware.permissionHandler);
             return true;
