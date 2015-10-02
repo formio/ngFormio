@@ -926,9 +926,17 @@ app.controller('FormSubmissionsController', [
             field: 'data.' + component.key,
             title: component.label || component.key,
             template: function(dataItem) {
-              var value = Formio.fieldData(dataItem.data, component);
+              var value = Formio.fieldData(dataItem.data.toJSON(), component);
               var componentInfo = formioComponents.components[component.type];
-              if (!componentInfo.tableView) { return (value === undefined) ? '' : value; }
+              if (!componentInfo.tableView) {
+                if(value === undefined) {
+                  return '';
+                }
+                if(component.multiple) {
+                  return value.join(', ');
+                }
+                return value;
+              }
               if (component.multiple && (value.length > 0)) {
                 var values = [];
                 angular.forEach(value, function(arrayValue) {
@@ -938,7 +946,7 @@ app.controller('FormSubmissionsController', [
                   }
                   values.push(componentInfo.tableView(arrayValue, component));
                 });
-                return values;
+                return values.join(', ');
               }
               value = componentInfo.tableView(value, component);
               if(value === undefined) {
