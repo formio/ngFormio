@@ -61284,6 +61284,9 @@ module.exports = [
               $scope.data[$scope.component.key] = $scope.component.defaultValue;
             }
           }
+          else if ($scope.data && !$scope.data.hasOwnProperty($scope.component.key) && $scope.component.multiple) {
+            $scope.data[$scope.component.key] = [];
+          }
         }
       ]
     };
