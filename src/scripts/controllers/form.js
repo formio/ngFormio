@@ -944,7 +944,7 @@ app.controller('FormSubmissionsController', [
                   if(arrayValue === undefined) {
                     return values.push('');
                   }
-                  values.push(componentInfo.tableView(arrayValue, component));
+                  values.push(arrayValue);
                 });
                 return values.join(', ');
               }
