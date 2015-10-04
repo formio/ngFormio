@@ -335,7 +335,7 @@ module.exports = function(config) {
     })
     .then('I have been logged in', function(next) {
       var driver = this.driver;
-      this.driver.pause(500).then(function(){
+      this.driver.pause(700).then(function(){
         driver.localStorage('GET', 'formioToken', function(err, res) {
           if (err) {
             return next(err);
