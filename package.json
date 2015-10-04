@@ -23,6 +23,7 @@
     "gulp-wrapper": "^0.1.5",
     "karma": "^0.13.10",
     "node-qunit-phantomjs": "^1.2.1",
+    "strictify": "^0.2.0",
     "vinyl-source-stream": "^1.1.0"
   },
   "dependencies": {

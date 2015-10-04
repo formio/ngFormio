@@ -1,5 +1,3 @@
-'use strict'
-
 global.jQuery = require('jquery');
 require('jquery.maskedinput/src/jquery.maskedinput');
 require('angular');

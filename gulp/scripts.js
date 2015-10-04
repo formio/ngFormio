@@ -2,6 +2,7 @@ module.exports = function(gulp, plugins) {
   return function () {
     plugins.browserify({
       entries: './src/formio.js',
+      transform: ['strictify'],
       debug: true
     })
       .bundle()
@@ -10,7 +11,10 @@ module.exports = function(gulp, plugins) {
       .pipe(plugins.rename('formio.min.js'))
       .pipe(plugins.streamify(plugins.uglify()))
       .pipe(gulp.dest('dist/'));
-    return plugins.browserify('./src/formio-full.js')
+    return plugins.browserify({
+      entries: './src/formio-full.js',
+      transform: ['strictify']
+    })
       .bundle()
       .pipe(plugins.source('formio-full.js'))
       .pipe(gulp.dest('dist/'))
