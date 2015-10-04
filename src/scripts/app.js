@@ -230,10 +230,12 @@ angular
     '$scope',
     '$rootScope',
     'Formio',
+    'FormioAlerts',
     function(
       $scope,
       $rootScope,
-      Formio
+      Formio,
+      FormioAlerts
     ) {
       $rootScope.activeSideBar = 'home';
       $rootScope.currentProject = null;
@@ -251,7 +253,7 @@ angular
         $scope.projectsLoading = false;
         angular.element('#projects-loader').hide();
         $scope.projects = projects;
-      });
+      }).catch(FormioAlerts.onError.bind(FormioAlerts));
     }
   ])
   .filter('trusted', [

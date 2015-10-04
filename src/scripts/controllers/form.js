@@ -264,7 +264,8 @@ app.controller('FormController', [
 
     // Save a form.
     $scope.saveForm = function() {
-      $scope.formio.saveForm($scope.form).then(function(form) {
+      $scope.formio.saveForm(angular.copy($scope.form)) // Copy to remove angular $$hashKey
+      .then(function(form) {
         var method = $stateParams.formId ? 'updated' : 'created';
         FormioAlerts.addAlert({
           type: 'success',
@@ -925,9 +926,17 @@ app.controller('FormSubmissionsController', [
             field: 'data.' + component.key,
             title: component.label || component.key,
             template: function(dataItem) {
-              var value = Formio.fieldData(dataItem.data, component);
+              var value = Formio.fieldData(dataItem.data.toJSON(), component);
               var componentInfo = formioComponents.components[component.type];
-              if (!componentInfo.tableView) { return (value === undefined) ? '' : value; }
+              if (!componentInfo.tableView) {
+                if(value === undefined) {
+                  return '';
+                }
+                if(component.multiple) {
+                  return value.join(', ');
+                }
+                return value;
+              }
               if (component.multiple && (value.length > 0)) {
                 var values = [];
                 angular.forEach(value, function(arrayValue) {
@@ -935,9 +944,9 @@ app.controller('FormSubmissionsController', [
                   if(arrayValue === undefined) {
                     return values.push('');
                   }
-                  values.push(componentInfo.tableView(arrayValue, component));
+                  values.push(arrayValue);
                 });
-                return values;
+                return values.join(', ');
               }
               value = componentInfo.tableView(value, component);
               if(value === undefined) {
