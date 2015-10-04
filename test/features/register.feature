@@ -37,7 +37,7 @@ Feature: Register Functionality
     And I enter ${register-password} in the .register-container #user\.password field
     And I enter ${register-password} in the .register-container #verifyPassword field
     And I click the REGISTER button
-    Then I see an alert with the text "Username must be unique."
+    Then I see an alert with the text Username must be unique.
 
   Scenario: Email unique
     Given an account exists with the username ${register-username}, email ${register-email} and password ${register-password}
@@ -48,7 +48,7 @@ Feature: Register Functionality
     And I enter ${register-password} in the .register-container #user\.password field
     And I enter ${register-password} in the .register-container #verifyPassword field
     And I click the REGISTER button
-    Then I see an alert with the text "Email must be unique."
+    Then I see an alert with the text Email must be unique.
 
   Scenario: Successful registration
     And I am on /#/auth
