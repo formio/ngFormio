@@ -18,30 +18,28 @@ module.exports = function() {
     $get: [
       'formioInterceptor',
       '$rootScope',
+      '$q',
       function(
         formioInterceptor,
-        $rootScope
+        $rootScope,
+        $q
       ) {
 
-        /**
-         * When a request error occurs.
-         * @param deferred
-         */
-        Formio.onRequestError = function(deferred) {
-          return function(error) {
+        // Wrap Formio.request's promises with $q so $apply gets called correctly.
+        var request = Formio.request;
+        Formio.request = function() {
+          return $q.when(request.apply(Formio, arguments))
+          .catch(function(error) {
             if (error === 'Unauthorized') {
               $rootScope.$broadcast('formio.unauthorized', error);
             }
             else if (error === 'Login Timeout') {
               $rootScope.$broadcast('formio.sessionExpired', error);
             }
-            deferred.reject(error);
-          };
+            // Propagate error
+            throw error;
+          });
         };
-
-        Formio.onRequestDone = function() {
-          $rootScope.$apply();
-        }
 
         // Return the formio interface.
         return Formio;

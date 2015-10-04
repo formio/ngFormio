@@ -92,7 +92,7 @@ module.exports = [
               $scope.$emit('formLoad', form);
             }, this.onError($scope));
           }
-          if (options.submission) {
+          if (options.submission && loader.submissionId) {
             spinner.show();
             loader.loadSubmission().then(function(submission) {
               $scope._submission = submission;
