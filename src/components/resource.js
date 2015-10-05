@@ -78,6 +78,8 @@ module.exports = function (app) {
           multiple: false,
           refresh: false,
           refreshDelay: 0,
+          protected: false,
+          persistent: true,
           validate: {
             required: false
           }

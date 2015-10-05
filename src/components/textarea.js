@@ -17,6 +17,8 @@ module.exports = function (app) {
           rows: 3,
           multiple: false,
           defaultValue: '',
+          protected: false,
+          persistent: true,
           validate: {
             required: false,
             minLength: '',

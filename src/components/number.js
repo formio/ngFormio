@@ -16,6 +16,8 @@ module.exports = function (app) {
           prefix: '',
           suffix: '',
           defaultValue: '',
+          protected: false,
+          persistent: true,
           validate: {
             required: false,
             min: '',
