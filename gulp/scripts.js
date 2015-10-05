@@ -1,25 +1,38 @@
-module.exports = function(gulp, plugins) {
-  return function () {
-    plugins.browserify({
+var path = require('path');
+module.exports = function(gulp, plugins, watch) {
+
+  return function() {
+    var bundle = plugins.browserify({
       entries: './src/formio.js',
       transform: ['strictify'],
       debug: true
-    })
-      .bundle()
-      .pipe(plugins.source('formio.js'))
-      .pipe(gulp.dest('dist/'))
-      .pipe(plugins.rename('formio.min.js'))
-      .pipe(plugins.streamify(plugins.uglify()))
-      .pipe(gulp.dest('dist/'));
-    return plugins.browserify({
-      entries: './src/formio-full.js',
-      transform: ['strictify']
-    })
-      .bundle()
-      .pipe(plugins.source('formio-full.js'))
-      .pipe(gulp.dest('dist/'))
-      .pipe(plugins.rename('formio-full.min.js'))
-      .pipe(plugins.streamify(plugins.uglify()))
-      .pipe(gulp.dest('dist/'));
+    });
+
+    var build = function() {
+      return bundle
+        .bundle()
+        .pipe(plugins.source('formio.js'))
+        .pipe(gulp.dest('dist/'))
+        .pipe(plugins.if(!watch,
+          plugins.rename('formio.min.js')
+          .pipe(plugins.streamify(plugins.uglify()))
+          .pipe(gulp.dest('dist/'))
+        ));
+    };
+
+    if(watch) {
+      bundle = plugins.watchify(bundle);
+      bundle.on('update', function(files) {
+        console.log('Changed files: ', files.map(path.relative.bind(path, process.cwd())).join(', '));
+        console.log('Rebuilding dist/formio.js...');
+        build();
+      });
+      bundle.on('log', function(msg) {
+        console.log(msg);
+      });
+    }
+
+    return build();
   };
+
 };
