@@ -1,6 +1,6 @@
 module.exports = function(gulp, plugins) {
   return function () {
-    var assets = plugins.useref.assets({searchPath: ['.tmp', 'src', '.']});
+    var assets = plugins.useref.assets();
     gulp.src('src/*.html')
       .pipe(assets)
       .pipe(plugins.if('*.js', plugins.uglify()))
