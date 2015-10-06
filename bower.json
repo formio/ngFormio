@@ -5,7 +5,7 @@
     "Travis Tidwell <travis@form.io>"
   ],
   "main": [
-    "dist/formio-full.js",
+    "dist/formio.js",
     "css/formio.css"
   ],
   "description": "The Form.IO form renderer.",
