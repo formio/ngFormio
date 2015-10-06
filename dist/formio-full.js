@@ -61305,6 +61305,7 @@ module.exports = [
       scope: false,
       link: function(scope, element) {
         element.replaceWith($compile($templateCache.get(scope.template))(scope));
+        scope.$emit('formElementRender', element);
       },
       controller: function() {
         // This is required for some reason as it will occasionally throw an error without it.
@@ -61411,6 +61412,17 @@ module.exports = [
         $scope._form = $scope.form || {};
         $scope._submission = $scope.submission || {data: {}};
         $scope._submissions = $scope.submissions || [];
+
+        // Keep track of the elements rendered.
+        var elementsRendered = 0;
+        $scope.$on('formElementRender', function() {
+          elementsRendered++;
+          if (elementsRendered === $scope._form.components.length) {
+            setTimeout(function() {
+              $scope.$emit('formRender', $scope._form);
+            }, 1);
+          }
+        });
 
         // Used to set the form action.
         var getAction = function(action) {
