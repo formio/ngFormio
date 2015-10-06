@@ -402,7 +402,7 @@ app.controller('FormDeleteController', [
 
     $scope.$on('cancel', function(event) {
       event.stopPropagation();
-      $state.go('project.form.view');
+      $scope.back('project.form.view');
     });
 
     $scope.$on('formError', function(event, error) {
@@ -1128,7 +1128,7 @@ app.controller('FormSubmissionDeleteController', [
 
     $scope.$on('cancel', function(event) {
       event.stopPropagation();
-      $state.go('project.form.submission.item.view');
+      $scope.back('project.form.submission.item.view');
     });
 
     $scope.$on('formError', function(event, error) {
