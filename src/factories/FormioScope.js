@@ -31,6 +31,17 @@ module.exports = [
         $scope._submission = $scope.submission || {data: {}};
         $scope._submissions = $scope.submissions || [];
 
+        // Keep track of the elements rendered.
+        var elementsRendered = 0;
+        $scope.$on('formElementRender', function() {
+          elementsRendered++;
+          if (elementsRendered === $scope._form.components.length) {
+            setTimeout(function() {
+              $scope.$emit('formRender', $scope._form);
+            }, 1);
+          }
+        });
+
         // Used to set the form action.
         var getAction = function(action) {
           if (!action) { return ''; }
