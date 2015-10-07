@@ -40,9 +40,10 @@ module.exports = function (app) {
           $scope.openOAuth = function(settings) {
             var params = {
               response_type: 'code',
-              client_id: settings.clientID,
+              client_id: settings.clientId,
               redirect_uri: window.location.origin || window.location.protocol + '//' + window.location.host,
-              state: settings.state
+              state: settings.state,
+              scope: settings.scope
             };
             params = Object.keys(params).map(function(key) {
               return key + '=' + encodeURIComponent(params[key]);
@@ -63,16 +64,21 @@ module.exports = function (app) {
                     params[split[0]] = split[1];
                     return params;
                   }, {});
+                  // TODO: check for error response here
                   if(settings.state !== params.state) {
                     throw new Error('OAuth state does not match!' + settings.state + ' ' + params.state);
                   }
                   var submission = { data: {}, oauth: {} };
                   submission.oauth[settings.provider] = params;
+                  submission.oauth[settings.provider].redirectURI = window.location.origin || window.location.protocol + '//' + window.location.host;
                   $scope.form.submitting = true;
                   $scope.formio.saveSubmission(submission)
                   .then(function(submission) {
                     // Trigger the form submission.
                     $scope.$emit('formSubmission', submission);
+                  })
+                  .catch(function(error) {
+                    // TODO: figure out how to show this error
                   })
                   .finally(function() {
                     $scope.form.submitting = false;
@@ -80,7 +86,9 @@ module.exports = function (app) {
                 }
               }
               catch(error) {
-                console.error(error);
+                if(error.name !== 'SecurityError') {
+                  console.error(error);
+                }
               }
               if(!popup || popup.closed || popup.closed === undefined) {
                 clearInterval(interval);
