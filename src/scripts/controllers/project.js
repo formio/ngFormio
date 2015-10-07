@@ -223,9 +223,13 @@ app.controller('ProjectController', [
         });
       }
       else {
+        var error = err.message || err;
+        if(typeof err === 'object') {
+          error = JSON.stringify(error);
+        }
         FormioAlerts.addAlert({
           type: 'danger',
-          message: 'Could not load Project (' + (err.message || err) + ')'
+          message: 'Could not load Project (' + error + ')'
         });
       }
       $state.go('home');
