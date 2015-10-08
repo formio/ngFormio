@@ -11,6 +11,7 @@ var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
 var app = express();
 var favicon = require('serve-favicon');
+var ua = require('universal-analytics');
 
 // Redirect all root traffic to www
 app.use(function(req, res, next) {
@@ -98,6 +99,15 @@ app.get('/project/:projectId/form/:formId/spec.html', function(req, res) {
 
 // Establish our url alias middleware.
 app.use(require('./src/middleware/alias')(formioServer.formio));
+
+// Adding google analytics to our api.
+if (config.domain === 'form.io') {
+  app.use(function(req, res, next) {
+    next();
+    var visitor = ua('UA-58453303-4');
+    visitor.pageview(req.url).send();
+  });
+}
 
 var settings = require('./src/hooks/settings')(app, formioServer);
 // Start the api server.
