@@ -893,7 +893,7 @@ app.controller('FormSubmissionsController', [
               });
             },
             destroy: function(options) {
-              $scope.recentlyDeletedPromises.push($http.delete($scope.formio.submissionUrl + '/' + options.data._id)
+              $scope.recentlyDeletedPromises.push($http.delete($scope.formio.submissionsUrl + '/' + options.data._id)
               .then(options.success)
               .catch(function(err) {
                 FormioAlerts.onError(err);
