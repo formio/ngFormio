@@ -33,9 +33,10 @@ module.exports = function() {
         };
 
         // Add the live form parameter to the url.
-        if ($scope.src && ($scope.src.indexOf('live=') === -1)) {
-          $scope.src += ($scope.src.indexOf('?') === -1) ? '?' : '&';
-          $scope.src += 'live=1';
+        $scope._src = $scope.src;
+        if ($scope._src && ($scope._src.indexOf('live=') === -1)) {
+          $scope._src += ($scope._src.indexOf('?') === -1) ? '?' : '&';
+          $scope._src += 'live=1';
         }
 
         // Create the formio object.
