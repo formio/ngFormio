@@ -164,6 +164,11 @@ module.exports = function(router) {
   Office365CalendarAction.prototype.resolve = function(handler, method, req, res, next) {
     var payload = {};
 
+    // Skip if there are no settings.
+    if (!this.settings) {
+      return next();
+    }
+
     // Only add the payload for post and put.
     if (req.method === 'POST' || req.method === 'PUT') {
       payload = {

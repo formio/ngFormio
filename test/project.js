@@ -7,6 +7,25 @@ var async = require('async');
 var chance = new (require('chance'))();
 
 module.exports = function(app, template, hook) {
+  /**
+   * Helper function to confirm the given properties are not present.
+   */
+  var not = function(item, properties) {
+    if (!item || !properties) {
+      return;
+    }
+    if (!(properties instanceof Array)) {
+      return;
+    }
+
+    var list = [].concat(item);
+    list.forEach(function(i) {
+      for(var a = 0; a < properties.length; a++) {
+        assert.equal(i.hasOwnProperty(properties[a].toString()), false);
+      }
+    });
+  };
+
   describe('Projects', function() {
     template.title = chance.word();
     template.name = chance.word();
@@ -93,7 +112,6 @@ module.exports = function(app, template, hook) {
         mapRoles
       ], function(err) {
         if (err) {
-          console.log(template);
           return callback(err);
         }
 
@@ -129,6 +147,9 @@ module.exports = function(app, template, hook) {
           assert.notEqual(response.defaultAccess, [], 'The Projects default `role` should not be empty.');
           assert.equal(response.name, template.name);
           assert.equal(response.description, template.description);
+
+          // Check that the response does not contain these properties.
+          not(response, ['__v', 'deleted', 'settings_encrypted']);
 
           template.project = template.project || {};
           template.project = response;
@@ -205,6 +226,10 @@ module.exports = function(app, template, hook) {
           assert.notEqual(response.defaultAccess, [], 'The Projects default `role` should not be empty.');
           assert.equal(response.name, template.project.name);
           assert.equal(response.description, template.project.description);
+
+          // Check that the response does not contain these properties.
+          not(response, ['__v', 'deleted', 'settings_encrypted']);
+
           template.project = response;
 
           // Store the JWT for future API calls.
@@ -246,6 +271,10 @@ module.exports = function(app, template, hook) {
           assert.notEqual(response.defaultAccess, [], 'The Projects default `role` should not be empty.');
           assert.equal(response.name, template.project.name);
           assert.equal(response.description, newDescription);
+
+          // Check that the response does not contain these properties.
+          not(response, ['__v', 'deleted', 'settings_encrypted']);
+
           template.project = response;
 
           // Store the JWT for future API calls.
@@ -272,6 +301,10 @@ module.exports = function(app, template, hook) {
           var response = res.body;
           assert.equal(response.hasOwnProperty('settings'), true);
           assert.deepEqual(response.settings, newSettings);
+
+          // Check that the response does not contain these properties.
+          not(response, ['__v', 'deleted', 'settings_encrypted']);
+
           template.project = response;
 
           // Store the JWT for future API calls.
@@ -295,6 +328,9 @@ module.exports = function(app, template, hook) {
           var response = res.body;
           assert.equal(response.length, 1);
           assert.equal(response[0].name, template.project.name);
+
+          // Check that the response does not contain these properties.
+          not(response, ['__v', 'deleted', 'settings_encrypted']);
 
           // Store the JWT for future API calls.
           template.formio.owner.token = res.headers['x-jwt-token'];
@@ -429,6 +465,10 @@ module.exports = function(app, template, hook) {
           assert.notEqual(response.defaultAccess, [], 'The Projects default `role` should not be empty.');
           assert.equal(response.name, template.project.name);
           assert.equal(response.description, template.project.description);
+
+          // Check that the response does not contain these properties.
+          not(response, ['__v', 'deleted', 'settings_encrypted']);
+
           template.project = response;
 
           // Store the JWT for future API calls.
@@ -540,6 +580,10 @@ module.exports = function(app, template, hook) {
           assert.notEqual(response.defaultAccess, [], 'The Projects default `role` should not be empty.');
           assert.equal(response.name, originalProject.name);
           assert.equal(response.description, originalProject.description);
+
+          // Check that the response does not contain these properties.
+          not(response, ['__v', 'deleted', 'settings_encrypted']);
+
           template.project = response;
 
           // Store the JWT for future API calls.
