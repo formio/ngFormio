@@ -38,6 +38,15 @@ module.exports = function() {
         }
       });
     },
+    getComponent: function getComponent(components, key) {
+      var result;
+      this.eachComponent(components, function(component) {
+        if(component.key === key) {
+          result = component;
+        }
+      });
+      return result;
+    },
     fieldWrap: function(input) {
       input = input + '<formio-errors></formio-errors>';
       var multiInput = input.replace('data[component.key]', 'data[component.key][$index]');
