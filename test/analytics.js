@@ -51,7 +51,7 @@ module.exports = function(app, template, hook) {
         });
     });
 
-    it('A project which has exceeded its API limit should not fulfill requests', function(done) {
+    it('A project which has exceeded its API limit should still fulfill requests (throttled)', function(done) {
       // Override the basic project limits for tests.
       var old = app._server.plans.limits['basic'];
       app._server.plans.limits['basic'] = 1;
@@ -59,7 +59,7 @@ module.exports = function(app, template, hook) {
       request(app)
         .get('/project/' + template.project._id)
         .set('x-jwt-token', template.formio.owner.token)
-        .expect(402)
+        .expect(200)
         .end(function(err, res) {
           if (err) {
             return done(err);
