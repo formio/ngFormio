@@ -13,7 +13,7 @@ var chance = new (require('chance'))();
 var docker = process.env.DOCKER;
 var app = null;
 var template = null;
-var hook = require(path.join(_formio, 'app/util/hook'))({hooks: require('./hooks')});
+var hook = require(path.join(_formio, 'src/util/hook'))({hooks: require('./hooks')});
 var ready = Q.defer();
 
 process.on('uncaughtException', function(err) {
