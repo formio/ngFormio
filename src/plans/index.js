@@ -60,7 +60,7 @@ module.exports = function(formioServer, cache) {
       getPlan(req, function(err, plan, project) {
         // Ignore project plans, if not interacting with a project.
         if (!err && !plan) {
-          return cb(null);
+          return cb();
         }
 
         if (err) {

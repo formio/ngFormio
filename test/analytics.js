@@ -7,7 +7,7 @@ var async = require('async');
 
 module.exports = function(app, template, hook) {
   describe('Analytics', function() {
-    if (!app.formio || !app._server.analytics || !app._server.analytics.redis) return;
+    if (!app.formio || !app._server || !app._server.analytics || !app._server.analytics.isConnected()) return;
 
     var redis = app._server.analytics.redis;
     it('Should clear all the redis data', function(done) {
@@ -108,6 +108,31 @@ module.exports = function(app, template, hook) {
 
           done();
         });
+    });
+
+    it('The API server will run smoothly without analytics if redis crashes', function(done) {
+      redis.debug('segfault', function() {
+        request(app)
+          .get('/project/' + template.project._id)
+          .set('x-jwt-token', template.formio.owner.token)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end(function(err, res) {
+            if (err) {
+              return done(err);
+            }
+
+            var response = res.body;
+            assert.equal(response.plan, 'basic');
+
+            template.project = res.body;
+
+            // Store the JWT for future API calls.
+            template.formio.owner.token = res.headers['x-jwt-token'];
+
+            done();
+          });
+      });
     });
   });
 };

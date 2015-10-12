@@ -3,6 +3,8 @@
 var Redis = require('redis');
 var onFinished = require('on-finished');
 var debug = {
+  isConnected: require('debug')('formio:analytics:isConnected'),
+  connect: require('debug')('formio:analytics:connect'),
   record: require('debug')('formio:analytics:record'),
   hook: require('debug')('formio:analytics:hook'),
   getCalls: require('debug')('formio:analytics:getCalls')
@@ -17,15 +19,65 @@ var url = require('url');
 module.exports = function(config) {
   var redis = null;
 
-  // Configure the redis connection.
-  if (config.redis && config.redis.port && config.redis.address) {
-    var opts = {};
-    if (config.redis.password) {
-      opts.auth_pass = config.redis.password;
+  /**
+   * Simple function to help determine if redis is currently connected.
+   *
+   * @returns {boolean}
+   */
+  var isConnected = function() {
+    if (redis && redis.hasOwnProperty('connected') && redis.connected === true) {
+      debug.isConnected(true);
+      return true;
+    }
+    else {
+      debug.isConnected(false);
+      return false;
+    }
+  };
+
+  /**
+   * Configure the redis connection.
+   */
+  var connect = function() {
+    // Only connect once.
+    if (isConnected()) {
+      return;
     }
 
-    redis = Redis.createClient(config.redis.port, config.redis.address, opts);
-  }
+    // Configure the redis connection.
+    if (config.redis && config.redis.port && config.redis.address) {
+      var opts = {};
+      if (config.redis.password) {
+        opts.auth_pass = config.redis.password;
+      }
+
+      // Attempt to connect to redis 1 time only.
+      redis = Redis.createClient(config.redis.port, config.redis.address, opts);
+      redis.max_attempts = 1;
+
+      // Attach debugging to specific events, unset redis ref on error/disconnect.
+      redis.on('ready', function() {
+        debug.connect('Connected');
+      });
+      redis.on('error', function(err) {
+        redis = null;
+        debug.connect(err.message || err);
+      });
+      redis.on('end', function() {
+        redis = null;
+        debug.connect('End');
+      });
+
+      return;
+    }
+    else {
+      debug.connect('Redis options not found or incomplete: ' + JSON.stringify(config.redis || {}));
+      return;
+    }
+  };
+
+  // Try the connection on server start.
+  connect();
 
   /**
    * Express middleware for tracking request analytics.
@@ -36,8 +88,9 @@ module.exports = function(config) {
    *   The requested url for this request.
    */
   var record = function(project, path, start) {
-    if (!redis) {
-      debug.record('Skipping');
+    connect();
+    if (!isConnected()) {
+      debug.record('Skipping, redis not found.');
       return;
     }
     if (!project) {
@@ -76,6 +129,11 @@ module.exports = function(config) {
    * @param next
    */
   var hook = function(req, res, next) {
+    connect();
+    if (!isConnected()) {
+      return next();
+    }
+
     // Attach the request start time.
     req._start = (new Date()).getTime();
     debug.hook(req._start);
@@ -108,8 +166,9 @@ module.exports = function(config) {
    *   The Project Id to search for.
    */
   var getCalls = function(month, project, next) {
-    if (!redis || !month || !project) {
-      req.getCalls('Skipping');
+    connect();
+    if (!isConnected() || !month || !project) {
+      debug.getCalls('Skipping');
       return next();
     }
 
@@ -129,6 +188,8 @@ module.exports = function(config) {
    */
   return {
     redis: redis,
+    isConnected: isConnected,
+    connect: connect,
     hook: hook,
     getCalls: getCalls
   };
