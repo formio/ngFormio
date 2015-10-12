@@ -99,6 +99,16 @@ app.get('/project/:projectId/form/:formId/spec.html', function(req, res) {
 // Establish our url alias middleware.
 app.use(require('./src/middleware/alias')(formioServer.formio));
 
+// Adding google analytics to our api.
+if (config.gaTid) {
+  var ua = require('universal-analytics');
+  app.use(function(req, res, next) {
+    next();
+    var visitor = ua(config.gaTid);
+    visitor.pageview(req.url).send();
+  });
+}
+
 var settings = require('./src/hooks/settings')(app, formioServer);
 // Start the api server.
 formioServer.init(settings).then(function(formio) {
