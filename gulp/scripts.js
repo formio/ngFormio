@@ -11,6 +11,10 @@ module.exports = function(gulp, plugins, watch) {
     var build = function() {
       return bundle
         .bundle()
+        .on('error', function(err){
+          console.log(err);
+          this.emit('end');
+        })
         .pipe(plugins.source('formio.js'))
         .pipe(gulp.dest('dist/'))
         .pipe(plugins.if(!watch,
