@@ -88,12 +88,12 @@ app.controller('ProjectCreateController', [
     // The project templates.
     $scope.templates = [
       {
-        "title": "Default",
-        "template": "default"
+        title: 'Default',
+        template: 'default'
       },
       {
-        "title": "Empty",
-        "template": "empty"
+        title: 'Empty',
+        template: 'empty'
       }
     ];
 

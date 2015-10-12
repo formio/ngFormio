@@ -36,6 +36,7 @@
     "gulp-wrapper": "^0.1.5",
     "jshint-stylish": "^1.0.0",
     "main-bower-files": "^2.5.0",
+    "merge-stream": "^1.0.0",
     "opn": "^1.0.0",
     "require-dir": "^0.3.0",
     "vinyl-paths": "^1.0.0",
