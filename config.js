@@ -19,6 +19,9 @@ var host = protocol + '://' + domain;
 var apiHost = protocol + '://api.' + domain;
 var formioHost = protocol + '://' + project + '.' + domain;
 
+// Setup Google Analytics.
+config.gaTid = process.env.GOOGLE_ANALYTICS_TID || '';
+
 if (port !== 80) {
   host += ':' + port;
   apiHost += ':' + port;
