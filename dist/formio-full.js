@@ -59315,7 +59315,7 @@ return jQuery;
 }(this, function () {
 
 /*!
- * Signature Pad v1.4.0
+ * Signature Pad v1.5.1
  * https://github.com/szimek/signature_pad
  *
  * Copyright 2015 Szymon Nowak
@@ -59391,6 +59391,7 @@ var SignaturePad = (function (document) {
         this._handleTouchEnd = function (event) {
             var wasCanvasTouched = event.target === self._canvas;
             if (wasCanvasTouched) {
+                event.preventDefault();
                 self._strokeEnd(event);
             }
         };
@@ -59465,7 +59466,6 @@ var SignaturePad = (function (document) {
     };
 
     SignaturePad.prototype._handleMouseEvents = function () {
-        var self = this;
         this._mouseButtonDown = false;
 
         this._canvas.addEventListener("mousedown", this._handleMouseDown);
@@ -59474,14 +59474,17 @@ var SignaturePad = (function (document) {
     };
 
     SignaturePad.prototype._handleTouchEvents = function () {
-        var self = this;
-
         // Pass touch events to canvas element on mobile IE.
         this._canvas.style.msTouchAction = 'none';
 
         this._canvas.addEventListener("touchstart", this._handleTouchStart);
         this._canvas.addEventListener("touchmove", this._handleTouchMove);
         document.addEventListener("touchend", this._handleTouchEnd);
+    };
+
+    SignaturePad.prototype.on = function () {
+        this._handleMouseEvents();
+        this._handleTouchEvents();
     };
 
     SignaturePad.prototype.off = function () {
@@ -61294,6 +61297,86 @@ module.exports = [
 
 },{}],58:[function(require,module,exports){
 "use strict";
+module.exports = function() {
+  return {
+    restrict: 'E',
+    replace: true,
+    scope: {
+      form: '=',
+      submission: '=',
+      src: '=',
+      formAction: '=',
+      resourceName: '='
+    },
+    templateUrl: 'formio-delete.html',
+    controller: [
+      '$scope',
+      '$element',
+      'FormioScope',
+      'Formio',
+      '$http',
+      function(
+        $scope,
+        $element,
+        FormioScope,
+        Formio,
+        $http
+      ) {
+        $scope.formioAlerts = [];
+        // Shows the given alerts (single or array), and dismisses old alerts
+        $scope.showAlerts = function(alerts) {
+          $scope.formioAlerts = [].concat(alerts);
+        };
+        var resourceName = 'resource';
+        var methodName = '';
+        var loader = FormioScope.register($scope, $element, {
+          form: true,
+          submission: true
+        });
+
+        if (loader) {
+          resourceName = loader.submissionId ? 'submission' : 'form';
+          var resourceTitle = resourceName.charAt(0).toUpperCase() + resourceName.slice(1);
+          methodName = 'delete' + resourceTitle;
+        }
+
+        // Set the resource name
+        $scope._resourceName = resourceName;
+
+        // Create delete capability.
+        $scope.onDelete = function() {
+          // Rebuild resourceTitle, $scope.resourceName could have changed
+          var resourceName = $scope.resourceName || $scope._resourceName;
+          var resourceTitle = resourceName.charAt(0).toUpperCase() + resourceName.slice(1);
+          // Called when the delete is done.
+          var onDeleteDone = function(data) {
+            $scope.showAlerts({
+              type: 'success',
+              message: resourceTitle + ' was deleted.'
+            });
+            Formio.clearCache();
+            $scope.$emit('delete', data);
+          };
+
+          if ($scope.action) {
+            $http.delete($scope.action).success(onDeleteDone).error(FormioScope.onError($scope, $element));
+          }
+          else if (loader) {
+            if (!methodName) { return; }
+            if (typeof loader[methodName] !== 'function') { return; }
+            loader[methodName]().then(onDeleteDone, FormioScope.onError($scope, $element));
+          }
+        };
+        $scope.onCancel = function() {
+          $scope.$emit('cancel');
+        };
+      }
+    ]
+  };
+};
+
+},{}],59:[function(require,module,exports){
+"use strict";
 module.exports = [
   '$compile',
   '$templateCache',
@@ -61314,7 +61397,7 @@ module.exports = [
   }
 ];
 
-},{}],59:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -61324,7 +61407,7 @@ module.exports = function() {
   };
 };
 
-},{}],60:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -61337,7 +61420,7 @@ module.exports = function() {
   };
 };
 
-},{}],61:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -61378,7 +61461,7 @@ module.exports = function() {
   };
 };
 
-},{}],62:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -61527,7 +61610,7 @@ module.exports = [
   }
 ];
 
-},{}],63:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -61606,7 +61689,7 @@ module.exports = function() {
   };
 };
 
-},{}],64:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 "use strict";
 module.exports = [
   '$q',
@@ -61686,7 +61769,7 @@ module.exports = [
   }
 ];
 
-},{}],65:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 "use strict";
 module.exports = [
   'FormioUtils',
@@ -61695,7 +61778,7 @@ module.exports = [
   }
 ];
 
-},{}],66:[function(require,module,exports){
+},{}],67:[function(require,module,exports){
 "use strict";
 module.exports = [
   '$sce',
@@ -61708,7 +61791,7 @@ module.exports = [
   }
 ];
 
-},{}],67:[function(require,module,exports){
+},{}],68:[function(require,module,exports){
 (function (global){
 "use strict";
 global.jQuery = require('jquery');
@@ -61725,7 +61808,7 @@ require('angular-ui-bootstrap');
 require('./formio');
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./formio":68,"angular":10,"angular-moment":1,"angular-paginate-anything":3,"angular-sanitize":5,"angular-ui-bootstrap":6,"angular-ui-select/select":8,"bootstrap":12,"bootstrap-ui-datetime-picker/dist/datetime-picker":11,"jquery":30,"jquery.maskedinput/src/jquery.maskedinput":29,"signature_pad":31}],68:[function(require,module,exports){
+},{"./formio":69,"angular":10,"angular-moment":1,"angular-paginate-anything":3,"angular-sanitize":5,"angular-ui-bootstrap":6,"angular-ui-select/select":8,"bootstrap":12,"bootstrap-ui-datetime-picker/dist/datetime-picker":11,"jquery":30,"jquery.maskedinput/src/jquery.maskedinput":29,"signature_pad":31}],69:[function(require,module,exports){
 "use strict";
 var app = angular.module('formio', [
   'ngSanitize',
@@ -61752,7 +61835,7 @@ app.factory('formioInterceptor', require('./factories/formioInterceptor'));
 
 app.directive('formio', require('./directives/formio'));
 
-app.directive('formioDelete', require('./directives/formio'));
+app.directive('formioDelete', require('./directives/formioDelete'));
 
 app.directive('formioErrors', require('./directives/formioErrors'));
 
@@ -61887,7 +61970,7 @@ app.run([
 
 require('./components');
 
-},{"./components":42,"./directives/customValidator":55,"./directives/formio":56,"./directives/formioComponent":57,"./directives/formioElement":58,"./directives/formioErrors":59,"./directives/formioInputMask":60,"./directives/formioSubmissions":61,"./factories/FormioScope":62,"./factories/FormioUtils":63,"./factories/formioInterceptor":64,"./filters/flattenComponents":65,"./filters/safehtml":66,"./providers/Formio":69}],69:[function(require,module,exports){
+},{"./components":42,"./directives/customValidator":55,"./directives/formio":56,"./directives/formioComponent":57,"./directives/formioDelete":58,"./directives/formioElement":59,"./directives/formioErrors":60,"./directives/formioInputMask":61,"./directives/formioSubmissions":62,"./factories/FormioScope":63,"./factories/FormioUtils":64,"./factories/formioInterceptor":65,"./filters/flattenComponents":66,"./filters/safehtml":67,"./providers/Formio":70}],70:[function(require,module,exports){
 "use strict";
 module.exports = function() {
 
@@ -61937,4 +62020,4 @@ module.exports = function() {
   };
 };
 
-},{"formiojs":26}]},{},[67]);
+},{"formiojs":26}]},{},[68]);

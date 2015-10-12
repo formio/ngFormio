@@ -23,7 +23,7 @@ app.factory('formioInterceptor', require('./factories/formioInterceptor'));
 
 app.directive('formio', require('./directives/formio'));
 
-app.directive('formioDelete', require('./directives/formio'));
+app.directive('formioDelete', require('./directives/formioDelete'));
 
 app.directive('formioErrors', require('./directives/formioErrors'));
 
