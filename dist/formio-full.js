@@ -60215,6 +60215,8 @@ module.exports = function (app) {
           prefix: '',
           suffix: '',
           defaultValue: '',
+          protected: false,
+          persistent: true,
           validate: {
             required: false,
             min: '',
@@ -60511,6 +60513,8 @@ module.exports = function (app) {
           multiple: false,
           refresh: false,
           refreshDelay: 0,
+          protected: false,
+          persistent: true,
           validate: {
             required: false
           }
@@ -60755,6 +60759,8 @@ module.exports = function (app) {
           backgroundColor: 'rgb(245,245,235)',
           minWidth: '0.5',
           maxWidth: '2.5',
+          protected: false,
+          persistent: true,
           validate: {
             required: false
           }
@@ -60885,6 +60891,8 @@ module.exports = function (app) {
           rows: 3,
           multiple: false,
           defaultValue: '',
+          protected: false,
+          persistent: true,
           validate: {
             required: false,
             minLength: '',

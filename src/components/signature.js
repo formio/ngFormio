@@ -22,6 +22,8 @@ module.exports = function (app) {
           backgroundColor: 'rgb(245,245,235)',
           minWidth: '0.5',
           maxWidth: '2.5',
+          protected: false,
+          persistent: true,
           validate: {
             required: false
           }
