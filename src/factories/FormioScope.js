@@ -27,6 +27,7 @@ module.exports = [
       },
       register: function($scope, $element, options) {
         var loader = null;
+        $scope._src = $scope._src || $scope.src || '';
         $scope._form = $scope.form || {};
         $scope._submission = $scope.submission || {data: {}};
         $scope._submissions = $scope.submissions || [];
@@ -91,8 +92,8 @@ module.exports = [
 
         var spinner = $element.find('#formio-loading');
 
-        if ($scope.src) {
-          loader = new Formio($scope.src);
+        if ($scope._src) {
+          loader = new Formio($scope._src);
           if (options.form) {
             spinner.show();
             loader.loadForm().then(function(form) {

@@ -61079,9 +61079,10 @@ module.exports = function() {
         };
 
         // Add the live form parameter to the url.
-        if ($scope.src && ($scope.src.indexOf('live=') === -1)) {
-          $scope.src += ($scope.src.indexOf('?') === -1) ? '?' : '&';
-          $scope.src += 'live=1';
+        $scope._src = $scope.src;
+        if ($scope._src && ($scope._src.indexOf('live=') === -1)) {
+          $scope._src += ($scope._src.indexOf('?') === -1) ? '?' : '&';
+          $scope._src += 'live=1';
         }
 
         // Create the formio object.
@@ -61492,6 +61493,7 @@ module.exports = [
       },
       register: function($scope, $element, options) {
         var loader = null;
+        $scope._src = $scope._src || $scope.src || '';
         $scope._form = $scope.form || {};
         $scope._submission = $scope.submission || {data: {}};
         $scope._submissions = $scope.submissions || [];
@@ -61556,8 +61558,8 @@ module.exports = [
 
         var spinner = $element.find('#formio-loading');
 
-        if ($scope.src) {
-          loader = new Formio($scope.src);
+        if ($scope._src) {
+          loader = new Formio($scope._src);
           if (options.form) {
             spinner.show();
             loader.loadForm().then(function(form) {
