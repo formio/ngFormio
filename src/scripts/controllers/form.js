@@ -735,7 +735,9 @@ app.controller('FormSubmissionsController', [
   ) {
     // Returns true if component should appear in table
     $scope.tableView = function(component) {
-      return !component.hasOwnProperty('tableView') || component.tableView;
+      return !component.protected &&
+        (!component.hasOwnProperty('persistent') || component.persistent) &&
+        (!component.hasOwnProperty('tableView') || component.tableView);
     };
 
     // Creates resourcejs sort query from kendo datasource read options
@@ -921,7 +923,6 @@ app.controller('FormSubmissionsController', [
               break;
             default: filterable = true;
           }
-          console.log(component.type, filterable);
           return {
             field: 'data.' + component.key,
             title: component.label || component.key,
