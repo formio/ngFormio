@@ -40,7 +40,7 @@ module.exports = function(app, template, hook) {
 
             var response = res.body;
             assert.equal(length, 1);
-            assert.equal(response.plan, 'basic');
+            assert.equal(response.plan, 'community');
 
             template.project = response;
 
@@ -52,9 +52,9 @@ module.exports = function(app, template, hook) {
     });
 
     it('A project which has exceeded its API limit should still fulfill requests (throttled)', function(done) {
-      // Override the basic project limits for tests.
-      var old = app._server.plans.limits['basic'];
-      app._server.plans.limits['basic'] = 1;
+      // Override the community project limits for tests.
+      var old = app._server.formio.plans.limits['community'];
+      app._server.formio.plans.limits['community'] = 1;
 
       request(app)
         .get('/project/' + template.project._id)
@@ -71,8 +71,8 @@ module.exports = function(app, template, hook) {
               return done(err);
             }
 
-            // Reset the basic plan limits.
-            app._server.plans.limits['basic'] = old;
+            // Reset the community plan limits.
+            app._server.formio.plans.limits['community'] = old;
 
             // Store the JWT for future API calls.
             template.formio.owner.token = res.headers['x-jwt-token'];
@@ -81,7 +81,7 @@ module.exports = function(app, template, hook) {
         });
     });
 
-    it('The API server will run smoothly without analytics if redis crashes', function(done) {
+    it('The API server will run smoothly without analytics', function(done) {
       var old = app._server.analytics.redis;
       app._server.analytics.redis = null;
 
@@ -96,7 +96,7 @@ module.exports = function(app, template, hook) {
           }
 
           var response = res.body;
-          assert.equal(response.plan, 'basic');
+          assert.equal(response.plan, 'community');
 
           template.project = res.body;
 
@@ -123,7 +123,7 @@ module.exports = function(app, template, hook) {
             }
 
             var response = res.body;
-            assert.equal(response.plan, 'basic');
+            assert.equal(response.plan, 'community');
 
             template.project = res.body;
 

@@ -5,6 +5,7 @@ var assert = require('assert');
 var _ = require('lodash');
 var async = require('async');
 var chance = new (require('chance'))();
+var uuidRegex = /^([a-zA-Z0-9]{8}-[a-zA-Z0-9]{4}-4[a-zA-Z0-9]{3}-[89aAbB]{1}[a-zA-Z0-9]{3}-[a-zA-Z0-9]{12})$/;
 
 module.exports = function(app, template, hook) {
   /**
@@ -27,14 +28,9 @@ module.exports = function(app, template, hook) {
   };
 
   describe('Projects', function() {
-    template.title = chance.word();
-    template.name = chance.word();
-    template.description = chance.sentence();
-
     var tempProject = {
-      title: template.title,
-      name: template.name,
-      description: template.description,
+      title: chance.word(),
+      description: chance.sentence(),
       template: _.omit(_.omit(template, 'users'), 'formio')
     };
     var originalProject = _.cloneDeep(tempProject, true);
@@ -145,14 +141,14 @@ module.exports = function(app, template, hook) {
           assert.equal(response.access[3].type, 'delete_all');
           assert.notEqual(response.access[3].roles, [], 'The delete_all Administrator `role` should not be empty.');
           assert.notEqual(response.defaultAccess, [], 'The Projects default `role` should not be empty.');
-          assert.equal(response.name, template.name);
-          assert.equal(response.description, template.description);
+          assert.equal(response.hasOwnProperty('name'), true);
+          assert.notEqual(response.name.search(uuidRegex), -1);
+          assert.equal(response.description, tempProject.description);
 
           // Check that the response does not contain these properties.
           not(response, ['__v', 'deleted', 'settings_encrypted']);
 
-          template.project = template.project || {};
-          template.project = response;
+          template.project = response
 
           // Store the JWT for future API calls.
           template.formio.owner.token = res.headers['x-jwt-token'];
@@ -161,17 +157,25 @@ module.exports = function(app, template, hook) {
         });
     });
 
-    it('A Project must have a unique name', function(done) {
+    var tempProjects = [];
+    var nameTest = {};
+    it('A Project on the community plan will have a uuid generated name on creation', function(done) {
       request(app)
         .post('/project')
         .set('x-jwt-token', template.formio.owner.token)
-        .send(_.omit(tempProject, 'template'))
+        .send(tempProject)
         .expect('Content-Type', /json/)
-        .expect(400)
+        .expect(200)
         .end(function(err, res) {
           if (err) {
             return done(err);
           }
+
+          var response = res.body;
+          assert.equal(response.hasOwnProperty('name'), true);
+          assert.notEqual(response.name.search(uuidRegex), -1);
+          nameTest = response.body;
+          tempProjects.push(response.body);
 
           // Store the JWT for future API calls.
           template.formio.owner.token = res.headers['x-jwt-token'];
@@ -180,21 +184,86 @@ module.exports = function(app, template, hook) {
         });
     });
 
-    it('A Project must have a name', function(done) {
+    it('A Project on the community plan should not be able to change the uuid generated name on project update', function(done) {
+      var attempt = chance.word({length: 10});
+
       request(app)
-        .post('/project')
+        .put('/project/' + nameTest._id)
         .set('x-jwt-token', template.formio.owner.token)
-        .send(_.omit(tempProject, 'name'))
+        .send({name: attempt})
         .expect('Content-Type', /json/)
-        .expect(400)
+        .expect(200)
         .end(function(err, res) {
           if (err) {
             return done(err);
           }
 
+          var response = res.body;
+          assert.equal(response.hasOwnProperty('name'), true);
+          assert.equal(response.name, nameTest.name);
+          assert.notEqual(response.name.search(uuidRegex), -1);
+
           // Store the JWT for future API calls.
           template.formio.owner.token = res.headers['x-jwt-token'];
 
+          nameTest = null;
+          done();
+        });
+    });
+
+    var corsTest = {};
+    it('A Project on the community plan will not be able to set cors options on creation', function(done) {
+      request(app)
+        .post('/project')
+        .set('x-jwt-token', template.formio.owner.token)
+        .send({
+          title: chance.word({length: 10}),
+          description: chance.sentence()
+        })
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err, res) {
+          if (err) {
+            return done(err);
+          }
+
+          var response = res.body;
+          assert.equal(response.hasOwnProperty('settings'), true);
+          assert.equal(response.settings.hasOwnProperty('cors'), true);
+          assert.equal(response.settings.cors, '*');
+          corsTest = response;
+          tempProjects.push(response.body);
+
+          // Store the JWT for future API calls.
+          template.formio.owner.token = res.headers['x-jwt-token'];
+
+          done();
+        });
+    });
+
+    it('A Project on the community plan will not be able to set cors options on project update', function(done) {
+      var attempt = '*,www.example.com';
+
+      request(app)
+        .put('/project')
+        .set('x-jwt-token', template.formio.owner.token)
+        .send({settings: {cors: attempt}})
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err, res) {
+          if (err) {
+            return done(err);
+          }
+
+          var response = res.body;
+          assert.equal(response.hasOwnProperty('settings'), true);
+          assert.equal(response.settings.hasOwnProperty('cors'), true);
+          assert.equal(response.settings.cors, '*');
+
+          // Store the JWT for future API calls.
+          template.formio.owner.token = res.headers['x-jwt-token'];
+
+          corsTest = null;
           done();
         });
     });
@@ -285,7 +354,7 @@ module.exports = function(app, template, hook) {
     });
 
     it('A Form.io User should be able to update the settings of their Project', function(done) {
-      var newSettings = {email: {gmail: {auth: {user: 'test@example.com', pass: 'test123'}}}};
+      var newSettings = {cors: '*', email: {gmail: {auth: {user: 'test@example.com', pass: 'test123'}}}};
 
       request(app)
         .put('/project/' + template.project._id)
@@ -578,7 +647,8 @@ module.exports = function(app, template, hook) {
           assert.equal(response.access[3].type, 'delete_all');
           assert.notEqual(response.access[3].roles, [], 'The delete_all Administrator `role` should not be empty.');
           assert.notEqual(response.defaultAccess, [], 'The Projects default `role` should not be empty.');
-          assert.equal(response.name, originalProject.name);
+          assert.equal(response.hasOwnProperty('name'), true);
+          assert.notEqual(response.name.search(uuidRegex), -1);
           assert.equal(response.description, originalProject.description);
 
           // Check that the response does not contain these properties.
@@ -591,6 +661,28 @@ module.exports = function(app, template, hook) {
 
           mapProjectToTemplate(response._id, template, done);
         });
+    });
+
+    it('Project Normalization', function(done) {
+      tempProjects.forEach(function(p) {
+        request(app)
+          .delete('/project/' + p._id)
+          .set('x-jwt-token', template.formio.owner.token)
+          .expect(204)
+          .end(function(err, res) {
+            if (err) {
+              return done(err);
+            }
+
+            var response = res.text;
+            assert.equal(response, '');
+
+            // Store the JWT for future API calls.
+            template.formio.owner.token = res.headers['x-jwt-token'];
+          });
+      });
+
+      done();
     });
   });
 };
