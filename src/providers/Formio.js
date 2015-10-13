@@ -14,11 +14,9 @@ module.exports = function() {
       // Remove this?
     },
     $get: [
-      'formioInterceptor',
       '$rootScope',
       '$q',
       function(
-        formioInterceptor,
         $rootScope,
         $q
       ) {

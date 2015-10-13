@@ -1,77 +1,46 @@
 module.exports = [
   '$q',
-  function($q) {
+  '$rootScope',
+  'Formio',
+  function($q, $rootScope, Formio) {
     var Interceptor = {
-      token: '',
-      setToken: function(token) {
-        token = token || '';
-        if (token === this.token) { return; }
-        this.token = token;
-        if (!token) {
-          this.setUser(null);
-          return localStorage.removeItem('formioToken');
+      /**
+       * Update JWT token received from response.
+       */
+      response: function(response) {
+        var token = response.headers('x-jwt-token');
+        if (response.status >= 200 && response.status < 300 && token && token !== '') {
+          Formio.setToken(token);
         }
-        localStorage.setItem('formioToken', token);
+        return response;
       },
-      getToken: function() {
-        if (this.token) { return this.token; }
-        var token = localStorage.getItem('formioToken') || '';
-        this.token = token;
-        return token;
-      },
-      setUser: function(user) {
-        if (!user) {
-          this.setToken(null);
-          return localStorage.removeItem('formioUser');
+
+      /**
+       * Intercept a response error.
+       */
+      responseError: function(response) {
+        if (parseInt(response.status, 10) === 440) {
+          response.loggedOut = true;
+          Formio.setToken(null);
+          $rootScope.$broadcast('formio.sessionExpired', response.body);
         }
-        localStorage.setItem('formioUser', angular.toJson(user));
+        else if(parseInt(response.status, 10) === 401) {
+          $rootScope.$broadcast('formio.unauthorized', response.body);
+        }
+        return $q.reject(response);
       },
-      getUser: function() {
-        return localStorage.getItem('formioUser');
+
+      /**
+       * Set the token in the request headers.
+       */
+      request: function(config) {
+        if (config.disableJWT) { return config; }
+        var token = Formio.getToken();
+        if (token) { config.headers['x-jwt-token'] = token; }
+        return config;
       }
     };
 
-    /**
-     * Set the JWT token within the request.
-     *
-     * @type {function(this:{token: string, setToken: Function, getToken: Function})}
-     */
-    Interceptor.response = function(response) {
-      var responseCode = parseInt(response.status, 10);
-      var token = response.headers('x-jwt-token');
-      if (responseCode === 200 && token && token !== '') {
-        this.setToken(token);
-      }
-      else if (responseCode === 204 && token && token === '') {
-        this.setToken(token);
-      }
-      return response;
-    }.bind(Interceptor);
-
-    /**
-     * Intercept a response error.
-     *
-     * @type {function(this:{token: string, setToken: Function, getToken: Function, setUser: Function, getUser: Function})}
-     */
-    Interceptor.responseError = function(response) {
-      if (parseInt(response.status, 10) === 440) {
-        response.loggedOut = true;
-        this.setToken(null);
-      }
-      return $q.reject(response);
-    }.bind(Interceptor);
-
-    /**
-     * Set the token in the request headers.
-     *
-     * @type {function(this:{token: string, setToken: Function, getToken: Function})}
-     */
-    Interceptor.request = function(config) {
-      if (config.disableJWT) { return config; }
-      var token = this.getToken();
-      if (token) { config.headers['x-jwt-token'] = token; }
-      return config;
-    }.bind(Interceptor);
     return Interceptor;
   }
 ];
