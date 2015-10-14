@@ -10,7 +10,7 @@ module.exports = function(app, formioServer) {
   var cache = require('../cache/cache')(formioServer.formio);
 
   // Attach the project plans to the formioServer
-  formioServer.plans = require('../plans/index')(formioServer, cache);
+  formioServer.formio.plans = require('../plans/index')(formioServer, cache);
 
   return {
     settings: function (settings, req, cb) {
@@ -159,7 +159,7 @@ module.exports = function(app, formioServer) {
 
         // Get the permissions for an Project with the given ObjectId.
         handlers.unshift(
-          formioServer.plans.checkRequest(req, res),
+          formioServer.formio.plans.checkRequest(req, res),
           function getProjectAccess(callback) {
             // Build the access object for this project.
             access.project = {};

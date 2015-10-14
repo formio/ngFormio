@@ -1,8 +1,8 @@
 'use strict';
 
 var debug = {
-  checkRequest: require('debug')('formio:plans#checkRequest'),
-  getPlan: require('debug')('formio:plans#getPlan')
+  checkRequest: require('debug')('formio:plans:checkRequest'),
+  getPlan: require('debug')('formio:plans:getPlan')
 };
 
 module.exports = function(formioServer, cache) {
@@ -29,7 +29,7 @@ module.exports = function(formioServer, cache) {
     // Ignore project plans, if not interacting with a project.
     if (!req.projectId) {
       debug.getPlan('No project given.');
-      return next(null, null);
+      return next(null, 'community');
     }
 
     cache.loadProject(req, req.projectId, function(err, project) {
@@ -59,7 +59,8 @@ module.exports = function(formioServer, cache) {
     return function(cb) {
       getPlan(req, function(err, plan, project) {
         // Ignore project plans, if not interacting with a project.
-        if (!err && !plan) {
+        if (!err && !project) {
+          debug.checkRequest('Skipping project plans, not interacting with a project..');
           return cb();
         }
 
@@ -72,7 +73,7 @@ module.exports = function(formioServer, cache) {
         var _plan = limits[plan];
 
         // Ignore limits for the formio project.
-        if (project.name && project.name === 'formio') {
+        if (project.hasOwnProperty('name') && project.name && project.name === 'formio') {
           return cb();
         }
 
