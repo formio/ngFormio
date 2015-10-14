@@ -3,7 +3,7 @@
 var gulp = require('gulp');
 var plugins = require('gulp-load-plugins')();
 plugins.browserSync = require('browser-sync');
-gulp.task('styles', require('./gulp/styles')(gulp, plugins));
+gulp.task('styles', ['wiredep'], require('./gulp/styles')(gulp, plugins));
 gulp.task('jshint', require('./gulp/jshint')(gulp, plugins));
 gulp.task('html', ['styles'], require('./gulp/html')(gulp, plugins));
 gulp.task('images', require('./gulp/images')(gulp, plugins));
