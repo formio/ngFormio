@@ -1,11 +1,12 @@
 module.exports = function(gulp, plugins) {
   return function () {
     var stream = require('merge-stream')();
+    var gutil = require('gulp-util');
 
     var assets = plugins.useref.assets({searchPath: ['.tmp', 'src', '.']});
     stream.add(gulp.src('src/*.html')
       .pipe(assets)
-      .pipe(plugins.if('*.js', plugins.uglify()))
+      .pipe(plugins.if('*.js', plugins.uglify().on('error', gutil.log)))
       .pipe(plugins.if('*.css', plugins.csso()))
       .pipe(assets.restore())
       .pipe(plugins.useref())
