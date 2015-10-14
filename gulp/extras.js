@@ -1,6 +1,6 @@
 module.exports = function(gulp, plugins) {
   return function () {
-    gulp.src([
+    return gulp.src([
       'src/*.*',
       '!src/*.html'
     ], {

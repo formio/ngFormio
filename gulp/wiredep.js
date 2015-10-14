@@ -1,13 +1,15 @@
 module.exports = function(gulp, plugins) {
   return function () {
+    var stream = require('merge-stream')();
+
     var wiredep = require('wiredep').stream;
-    gulp.src('src/styles/*.scss')
+    stream.add(gulp.src('src/styles/*.scss')
       .pipe(wiredep({
         ignorePath: /^(\.\.\/)+/
       }))
-      .pipe(gulp.dest('src/styles'));
+      .pipe(gulp.dest('src/styles')));
 
-    gulp.src('src/*.html')
+    stream.add(gulp.src('src/*.html')
       .pipe(plugins.inject(gulp.src([
         'scripts/**/*.js',
         'styles/**/*.css'
@@ -20,6 +22,8 @@ module.exports = function(gulp, plugins) {
         exclude: ['bootstrap-sass-official', 'bower_components/bootstrap/'],
         ignorePath: /^(\.\.\/)*\.\./
       }))
-      .pipe(gulp.dest('src'));
+      .pipe(gulp.dest('src')));
+
+    return stream;
   };
 };
