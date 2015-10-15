@@ -32,7 +32,7 @@ module.exports = function (app) {
               FormioUtils) {
       $templateCache.put('formio/components/radio.html', FormioUtils.fieldWrap(
         '<div class="radio" ng-repeat="v in component.values track by $index">' +
-        '<label class="control-label" for="value">' +
+        '<label class="control-label" for="{{ v.value }}">' +
         '<input type="{{ component.inputType }}" ' +
         'id="{{ v.value }}" ' +
         'name="{{ component.key }}" ' +
