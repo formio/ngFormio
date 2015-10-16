@@ -83,6 +83,8 @@ app.controller('ProjectCreateController', [
     $rootScope.noBreadcrumb = false;
     $scope.currentProject = {template: 'default'};
     $scope.hasTemplate = false;
+    $scope.showName = false;
+
     var formio = new Formio();
 
     // The project templates.
@@ -143,10 +145,6 @@ app.controller('ProjectCreateController', [
     });
 
     $scope.saveProject = function() {
-      // Need to strip hyphens at the end before submitting
-      if ($scope.currentProject.name) {
-        $scope.currentProject.name = $scope.currentProject.name.toLowerCase().replace(/[^0-9a-z\-]|^\-+|\-+$/g, '');
-      }
       // Default all new projects to have cors set to '*'.
       if (!$scope.currentProject.settings) {
         $scope.currentProject.settings = {};
@@ -211,6 +209,7 @@ app.controller('ProjectController', [
     $scope.loadProjectPromise = $scope.formio.loadProject().then(function(result) {
       $scope.currentProject = result;
       $rootScope.currentProject = result;
+      $scope.showName = !(result.plan && result.plan === 'community');
       return $http.get($scope.formio.projectUrl + '/role');
     }).then(function(result) {
       $scope.currentProjectRoles = result.data;
@@ -237,9 +236,7 @@ app.controller('ProjectController', [
 
     $scope.getSwaggerURL = function(format) {
       format = format || 'html';
-      var ret = AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/spec.'+format+'?token=' + Formio.getToken();
-      console.log(ret);
-      return ret;
+      return AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/spec.' + format + '?token=' + Formio.getToken();
     };
   }
 ]);
@@ -262,9 +259,9 @@ app.controller('ProjectSettingsController', [
     $scope.loadProjectPromise.then(function() {
       // Mask child scope's reference to currentProject with a clone
       // Parent reference gets updated when we reload after saving
+      $scope.currentProject.plan = $scope.currentProject.plan || 'community';
       $scope.currentProject = _.cloneDeep($scope.currentProject);
     });
-
 
     // Save the Project.
     $scope.saveProject = function() {
