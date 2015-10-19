@@ -11,7 +11,7 @@
     "angular-moment": "~0.9.2",
     "ngDialog": "~0.3.12",
     "ng-sortable": "~1.2.0",
-    "ngFormBuilder": "git+ssh://git@github.com/formio/ngFormBuilder.git#develop",
+    "ngFormBuilder": "git+ssh://git@github.com/formio/ngFormBuilder.git#0.2.8",
     "seamless": "~0.0.5",
     "font-awesome": "~4.3.0",
     "angular-base64": "~2.0.4",
@@ -23,7 +23,7 @@
     "bootstrap-ui-datetime-picker": "~1.1.0",
     "angular-paginate-anything": "~4.1.2",
     "kendo-ui": "kendo-ui-core#2015.2.902+SP2",
-    "ngFormio": "git+ssh://git@github.com/formio/ngFormio.git#develop",
+    "ngFormio": "git+ssh://git@github.com/formio/ngFormio.git#0.3.8",
     "jquery.maskedinput": "~1.4.1"
   },
   "resolutions": {
