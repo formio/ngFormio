@@ -84,7 +84,6 @@ app.controller('ProjectCreateController', [
     $scope.currentProject = {template: 'default'};
     $scope.hasTemplate = false;
     $scope.showName = false;
-
     var formio = new Formio();
 
     // The project templates.
