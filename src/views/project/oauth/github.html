@@ -1,0 +1,13 @@
+<div class="well">
+  <h4>GitHub OAuth Settings</h4>
+  <p>This allows you to use GitHub user accounts to authenticate. To set up GitHub OAuth, go to your <a href="https://github.com/settings/developers">GitHub account settings</a> and register a new application.</p>
+  <p>Fill in the application details. The <strong>Authorization callback URL</strong> MUST be set to the domain name of your application (ex: <code>http://mydomain.com</code>. Then save your client ID and secret below.</p>
+</div>
+<div class="form-group">
+  <label for="githubClientId">Client ID</label>
+  <input ng-model="currentProject.settings.oauth.github.clientId" type="text" class="form-control" id="githubClientId" name="githubClientId" placeholder="Enter Github Application Client ID">
+</div>
+<div class="form-group">
+  <label for="githubClientSecret">Client Secret</label>
+  <input ng-model="currentProject.settings.oauth.github.clientSecret" type="text" class="form-control" id="githubClientSecret" name="githubClientSecret" placeholder="Enter Github Application Client Secret">
+</div>

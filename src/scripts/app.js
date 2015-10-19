@@ -135,6 +135,11 @@ angular
           parent: 'project.settings',
           templateUrl: 'views/project/databases/index.html'
         })
+        .state('project.settings.oauth', {
+          url: '/oauth',
+          parent: 'project.settings',
+          templateUrl: 'views/project/oauth/index.html'
+        })
         .state('project.settings.roles', {
           abstract: true,
           url: '/roles',
