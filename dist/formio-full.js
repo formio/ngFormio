@@ -59785,15 +59785,105 @@ module.exports = function (app) {
           theme: 'primary'
         },
         controller: function (settings, $scope) {
-          $scope.onClick = function () {
-            switch (settings.action) {
+          $scope.onClick = function() {
+            switch(settings.action) {
               case 'submit':
                 return;
               case 'reset':
                 $scope.resetForm();
                 break;
+              case 'oauth':
+                if($scope.hasOwnProperty('form')) {
+                  if(!settings.oauth) {
+                    $scope.showAlerts({
+                      type: 'danger',
+                      message: 'You must assign this button to an OAuth action before it will work.'
+                    });
+                    break;
+                  }
+                  $scope.openOAuth(settings.oauth);
+                }
+                break;
             }
           };
+
+          $scope.openOAuth = function(settings) {
+            var params = {
+              response_type: 'code',
+              client_id: settings.clientId,
+              redirect_uri: window.location.origin || window.location.protocol + '//' + window.location.host,
+              state: settings.state,
+              scope: settings.scope,
+              display: settings.display
+            };
+            params = Object.keys(params).map(function(key) {
+              return key + '=' + encodeURIComponent(params[key]);
+            }).join('&');
+
+            var url = settings.authURI + '?' + params;
+
+            // TODO: make window options from oauth settings, have better defaults
+            var popup = window.open(url, settings.provider, 'width=1020,height=618');
+            var interval = setInterval(function() {
+              try {
+                var popupHost = popup.location.host;
+                var currentHost = window.location.host;
+                if(popup && !popup.closed && popupHost === currentHost && popup.location.search) {
+                  popup.close();
+                  var params = popup.location.search.substr(1).split('&').reduce(function(params, param) {
+                    var split = param.split('=');
+                    params[split[0]] = split[1];
+                    return params;
+                  }, {});
+                  if(params.error) {
+                    $scope.showAlerts({
+                      type: 'danger',
+                      message: params.error_description || params.error
+                    });
+                    return;
+                  }
+                  // TODO: check for error response here
+                  if(settings.state !== params.state) {
+                    $scope.showAlerts({
+                      type: 'danger',
+                      message: 'OAuth state does not match. Please try logging in again.'
+                    });
+                    return;
+                  }
+                  var submission = { data: {}, oauth: {} };
+                  submission.oauth[settings.provider] = params;
+                  submission.oauth[settings.provider].redirectURI = window.location.origin || window.location.protocol + '//' + window.location.host;
+                  $scope.form.submitting = true;
+                  $scope.formio.saveSubmission(submission)
+                  .then(function(submission) {
+                    // Trigger the form submission.
+                    $scope.$emit('formSubmission', submission);
+                  })
+                  .catch(function(error) {
+                    $scope.showAlerts({
+                      type: 'danger',
+                      message: error.message || error
+                    });
+                  })
+                  .finally(function() {
+                    $scope.form.submitting = false;
+                  });
+                }
+              }
+              catch(error) {
+                if(error.name !== 'SecurityError') {
+                  $scope.showAlerts({
+                    type: 'danger',
+                    message: error.message || error
+                  });
+                }
+              }
+              if(!popup || popup.closed || popup.closed === undefined) {
+                clearInterval(interval);
+              }
+            }, 100);
+          };
+
         }
       });
     }
@@ -61082,7 +61172,7 @@ module.exports = function() {
       ) {
         $scope.formioAlerts = [];
         // Shows the given alerts (single or array), and dismisses old alerts
-        $scope.showAlerts = function(alerts) {
+        this.showAlerts = $scope.showAlerts = function(alerts) {
           $scope.formioAlerts = [].concat(alerts);
         };
 
@@ -61185,6 +61275,7 @@ module.exports = [
     return {
       replace: true,
       restrict: 'E',
+      require: '?^formio',
       scope: {
         component: '=',
         data: '=',
@@ -61193,6 +61284,16 @@ module.exports = [
         readOnly: '='
       },
       templateUrl: 'formio/component.html',
+      link: function($scope, el, attrs, formioCtrl) {
+        if(formioCtrl) {
+          $scope.showAlerts = formioCtrl.showAlerts.bind(formioCtrl);
+        }
+        else {
+          $scope.showAlerts = function() {
+            throw new Error('Cannot call $scope.showAlerts unless this component is inside a formio directive.');
+          };
+        }
+      },
       controller: [
         '$scope',
         '$http',
@@ -61249,7 +61350,7 @@ module.exports = [
           // Set the component with the defaults from the component settings.
           angular.forEach(component.settings, function(value, key) {
             if (!$scope.component.hasOwnProperty(key)) {
-              $scope.component[key] = value;
+              $scope.component[key] = angular.copy(value);
             }
           });
 
@@ -61661,6 +61762,15 @@ module.exports = function() {
           fn(component);
         }
       });
+    },
+    getComponent: function getComponent(components, key) {
+      var result;
+      this.eachComponent(components, function(component) {
+        if(component.key === key) {
+          result = component;
+        }
+      });
+      return result;
     },
     fieldWrap: function(input) {
       input = input + '<formio-errors></formio-errors>';

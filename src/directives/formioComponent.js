@@ -8,6 +8,7 @@ module.exports = [
     return {
       replace: true,
       restrict: 'E',
+      require: '?^formio',
       scope: {
         component: '=',
         data: '=',
@@ -16,6 +17,16 @@ module.exports = [
         readOnly: '='
       },
       templateUrl: 'formio/component.html',
+      link: function($scope, el, attrs, formioCtrl) {
+        if(formioCtrl) {
+          $scope.showAlerts = formioCtrl.showAlerts.bind(formioCtrl);
+        }
+        else {
+          $scope.showAlerts = function() {
+            throw new Error('Cannot call $scope.showAlerts unless this component is inside a formio directive.');
+          };
+        }
+      },
       controller: [
         '$scope',
         '$http',
@@ -72,7 +83,7 @@ module.exports = [
           // Set the component with the defaults from the component settings.
           angular.forEach(component.settings, function(value, key) {
             if (!$scope.component.hasOwnProperty(key)) {
-              $scope.component[key] = value;
+              $scope.component[key] = angular.copy(value);
             }
           });
 

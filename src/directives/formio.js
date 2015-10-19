@@ -28,7 +28,7 @@ module.exports = function() {
       ) {
         $scope.formioAlerts = [];
         // Shows the given alerts (single or array), and dismisses old alerts
-        $scope.showAlerts = function(alerts) {
+        this.showAlerts = $scope.showAlerts = function(alerts) {
           $scope.formioAlerts = [].concat(alerts);
         };
 
