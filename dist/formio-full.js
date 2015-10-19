@@ -56316,6 +56316,12 @@ module.exports = [
             });
           }
           else {
+            if(error instanceof Error) {
+              error = error.toString();
+            }
+            else if(typeof error === 'object') {
+              error = JSON.stringify(error);
+            }
             $scope.showAlerts({
               type: 'danger',
               message: error
@@ -59551,6 +59557,9 @@ module.exports = function(_baseUrl, _noalias, _domain) {
     // Get the cached promise to save multiple loads.
     var cacheKey = btoa(url);
     if (method === 'GET' && cache.hasOwnProperty(cacheKey)) {
+      cache[cacheKey].finally(function() {
+        Formio.onRequestDone();
+      });
       return cache[cacheKey];
     }
     else {
@@ -59654,9 +59663,9 @@ module.exports = function(_baseUrl, _noalias, _domain) {
 
   Formio.currentUser = function() {
     var user = this.getUser();
-    if (user) { return Q(user) }
+    if (user) { return Q().thenResolve(user) }
     var token = this.getToken();
-    if (!token) { return Q(null) }
+    if (!token) { return Q().thenResolve(null) }
     return this.request(baseUrl + '/current')
       .then(function(response) {
         if (response.ok) {
@@ -59671,7 +59680,6 @@ module.exports = function(_baseUrl, _noalias, _domain) {
     return this.request(baseUrl + '/logout').finally(function() {
       this.setToken(null);
       this.setUser(null);
-      Formio.clearCache();
     }.bind(this));
   };
   Formio.fieldData = function(data, component) {
