@@ -390,9 +390,9 @@ module.exports = function(config) {
     })
     .then('the $BUTTON button is disabled', function(button, next) {
       var driver = this.driver;
-      this.driver.waitForExist('//button[contains(.,\'' + button + '\')]', 500)
+      this.driver.waitForExist('//button[text()=\'' + button + '\']', 500)
         .then(function() {
-          driver.isEnabled('//button[contains(.,\'' + button + '\')]')
+          driver.isEnabled('//button[text()=\'' + button + '\']')
             .then(function(isEnabled) {
               assert(!isEnabled, 'Button ' + button + ' is enabled when it should be disabled');
               next();
