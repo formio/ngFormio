@@ -610,7 +610,7 @@ app.controller('FormActionEditController', [
         if(association === 'new' && provider) {
           angular.element('[id^=form-group-autofill-' + provider + ']').css('display', '');
         }
-      }
+      };
 
       if(actionInfo && actionInfo.name === 'oauth') {
         // Show warning if button component has no options
@@ -623,7 +623,7 @@ app.controller('FormActionEditController', [
           var action = $scope.action.data.settings || {};
           toggleVisible(action.association);
           toggleRequired(action.association, actionInfo.settingsForm.components);
-          showProviderFields(action.association, action.provider)
+          showProviderFields(action.association, action.provider);
         });
 
         // Watch for changes to the action settings.
@@ -632,14 +632,14 @@ app.controller('FormActionEditController', [
           if(current.association !== old.association) {
             toggleVisible(current.association);
             toggleRequired(current.association, actionInfo.settingsForm.components);
-            showProviderFields(current.association, current.provider)
+            showProviderFields(current.association, current.provider);
 
             // Dont save the old role settings if this is an existing association.
             current.role = (current.role && (current.association === 'new')) || '';
           }
 
           if(current.provider !== old.provider) {
-            showProviderFields(current.association, current.provider)
+            showProviderFields(current.association, current.provider);
           }
         }, true);
       }
@@ -651,7 +651,7 @@ app.controller('FormActionEditController', [
       $state.go('project.form.action.index');
     });
   }
-])
+]);
 
 app.controller('FormActionDeleteController', [
   '$scope',
