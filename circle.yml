@@ -6,6 +6,7 @@ machine:
   services:
     - docker
     - mongodb
+    - redis
   environment:
     SHORT_SHA: $(echo $CIRCLE_SHA1 | cut -b1-7)
     TAG: ${CIRCLE_BRANCH:-$(echo $CIRCLE_TAG)}
@@ -33,13 +34,20 @@ test:
   pre:
     - sudo bash -c "echo \"127.0.0.1 formio.localhost\" >> /etc/hosts"
     - sudo bash -c "echo \"127.0.0.1 api.localhost\" >> /etc/hosts"
+    - sudo pkill redis-server
+  override:
+    - redis-server &> $CIRCLE_ARTIFACTS/redis.log:
+          background: true
+    - DEBUG=formio:*,formio:*:* npm test &> $CIRCLE_ARTIFACTS/formio-server.log
   post:
+    - redis-server &> $CIRCLE_ARTIFACTS/docker-redis.log:
+          background: true
     - docker run -d -e "MONGO1=$MONGO" -e "PROTOCOL=http" -e "DOMAIN=localhost" -e "PORT=3000" -e "DEBUG=formio:*,formio:*:*" --name formio-server --net=host $IMAGE_PATH:$SHORT_SHA
     - sleep 10
     - docker logs formio-server
     - curl --retry 10 --retry-delay 5 -v http://api.localhost:3000/health
     - npm run-script docker
-    - docker logs formio-server > $CIRCLE_ARTIFACTS/formio-server.log 2>$CIRCLE_ARTIFACTS/error.log
+    - docker logs formio-server &> $CIRCLE_ARTIFACTS/docker-formio-server.log
 
 deployment:
   release:
