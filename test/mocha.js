@@ -14,26 +14,25 @@ var docker = process.env.DOCKER;
 var app = null;
 var template = null;
 var hook = require(path.join(_formio, 'src/util/hook'))({hooks: require('./hooks')});
-var ready = Q.defer();
 var _server = null;
+var ready;
 
 process.on('uncaughtException', function(err) {
   console.log(err.stack);
 });
 
 if (!docker) {
-  require('./bootstrap')()
+  ready = require('./bootstrap')()
     .then(function(state) {
       _server = state.server;
       app = state.app;
       template = state.template;
-
-      ready.resolve();
     });
 }
 else {
   app = 'http://api.localhost:3000';
   template = require(path.join(_test, 'template'))();
+  ready = Q();
 }
 
 /**
@@ -41,10 +40,8 @@ else {
  */
 describe('Bootstrap', function() {
   describe('Recreate Formio', function() {
-    before(function(done) {
-      if (docker) return done();
-
-      ready.promise.then(done);
+    before(function() {
+      return ready;
     });
 
     it('Attach Formio properties', function(done) {
@@ -571,18 +568,43 @@ describe('Bootstrap', function() {
     });
   });
 
-  describe('Final Formio Tests', function() {
-    it('Load all tests', function() {
-      require('./project')(app, template, hook);
-      require(path.join(_test, 'auth'))(app, template, hook);
-      require(path.join(_test, 'roles'))(app, template, hook);
-      require(path.join(_test, 'form'))(app, template, hook);
-      require(path.join(_test, 'resource'))(app, template, hook);
-      require(path.join(_test, 'nested'))(app, template, hook);
-      require(path.join(_test, 'actions'))(app, template, hook);
-      require(path.join(_test, 'submission'))(app, template, hook);
-      require('./misc')(app, template, hook);
-      require('./analytics')(app, template, hook);
+  after(function() {
+    describe('Final Tests', function() {
+      describe('Formio-Server', function() {
+        require('./project')(app, template, hook);
+      });
+
+      var originalSettingsHook;
+      describe('Formio', function() {
+        before(function() {
+          if (!app.formio) return;
+          // Override settings hook for formio tests
+          originalSettingsHook = app.formio.hooks.settings;
+          app.formio.hooks.settings = require('./formioHooks.js')(_test).settings;
+        });
+
+        // Set up formio specific hooks
+        var formioHook = require(path.join(_formio, 'src/util/hook'))({hooks: require('./formioHooks.js')(_test)});
+
+        require(path.join(_test, 'auth'))(app, template, formioHook);
+        require(path.join(_test, 'roles'))(app, template, formioHook);
+        require(path.join(_test, 'form'))(app, template, formioHook);
+        require(path.join(_test, 'resource'))(app, template, formioHook);
+        require(path.join(_test, 'nested'))(app, template, formioHook);
+        require(path.join(_test, 'actions'))(app, template, formioHook);
+        require(path.join(_test, 'submission'))(app, template, formioHook);
+        require(path.join(_test, 'oauth'))(app, template, formioHook);
+        require('./analytics')(app, template, formioHook);
+      });
+
+      describe('Formio-Server tests that depend on Formio tests', function() {
+        before(function() {
+          if (!app.formio) return;
+          // Restore settings hook
+          app.formio.hooks.settings = originalSettingsHook;
+        });
+        require('./misc')(app, template, hook);
+      });
     });
-  })
+  });
 });
