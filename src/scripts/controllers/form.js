@@ -694,6 +694,18 @@ app.controller('FormActionEditController', [
           }
         }, true);
       }
+
+      // Check for, and warn about premium actions being present.
+      if(
+        actionInfo &&
+        actionInfo.hasOwnProperty('premium') &&
+        actionInfo.premium === true &&
+        $scope.currentProject &&
+        $scope.currentProject.hasOwnProperty('plan') &&
+        $scope.currentProject.plan === 'community'
+      ) {
+        FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> This is a Premium Action, please upgrade your <a href="https://www.form.io/pricing">Project Plan</a> to enable it.');
+      }
     });
 
     $scope.$on('formSubmission', function(event) {
