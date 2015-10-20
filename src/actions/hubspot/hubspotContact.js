@@ -20,15 +20,17 @@ module.exports = function(router) {
   HubspotContactAction.info = function(req, res, next) {
     next(null, {
       name: 'hubspotContact',
-      title: 'Hubspot Contacts',
+      title: 'Hubspot Contacts (Premium)',
       description: 'Allows you to integrate into your Hubspot Contacts.',
+      premium: true,
       priority: 0,
       defaults: {
         handler: ['after'],
         method: ['create', 'update']
       }
     });
-  }
+  };
+
   HubspotContactAction.settingsForm = function(req, res, next) {
     util.connect(router, req, function(err, hubspot) {
       if (err) { return next(); }
@@ -45,7 +47,8 @@ module.exports = function(router) {
       hubspot.contacts_properties({version: 'v2'}, function(err, properties) {
         var filteredProperties = _.filter(_.sortBy(properties, 'label'), function(property) {
           return !property.readOnlyValue && !property.hidden;
-        })
+        });
+
         // TODO: Make email required.
         // Create the select items for each hubspot field.
         var dataSrc = router.formio.hook.alter('url', '/form/' + req.params.formId + '/components', req);

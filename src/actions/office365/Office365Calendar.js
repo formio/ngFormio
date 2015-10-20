@@ -6,7 +6,6 @@ var util = require('./util');
 var moment = require('moment');
 
 module.exports = function(router) {
-
   /**
    * Office365CalendarAction class.
    *   This class is used to create the Office 365 Contact action.
@@ -23,17 +22,18 @@ module.exports = function(router) {
   Office365CalendarAction.info = function(req, res, next) {
     next(null, {
       name: 'office365calendar',
-      title: 'Office 365 Calendar',
+      title: 'Office 365 Calendar (Premium)',
       description: 'Allows you to integrate into your Office 365 Calendar.',
+      premium: true,
       priority: 0,
       defaults: {
         handler: ['after'],
         method: ['create', 'update', 'delete']
       }
     });
-  }
-  Office365CalendarAction.settingsForm = function(req, res, next) {
+  };
 
+  Office365CalendarAction.settingsForm = function(req, res, next) {
     // Create the select items for each office 365 field.
     var dataSrc = router.formio.hook.alter('url', '/form/' + req.params.formId + '/components', req);
 
