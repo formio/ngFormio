@@ -144,7 +144,7 @@ app.config([
       url: '/add/:actionName',
       parent: 'project.form.action',
       templateUrl: 'views/form/action/add.html',
-      controller: 'FormActionAddController',
+      controller: 'FormActionEditController',
       params: {actionInfo: null}
     });
   }
@@ -246,7 +246,7 @@ app.controller('FormController', [
 
         $scope.actions = actions;
         $scope.hasAuthAction = actions.some(function(action) {
-          return action.name === 'auth';
+          return action.name === 'auth' || action.name === 'oauth';
         });
       }, FormioAlerts.onError.bind(FormioAlerts));
     }
@@ -526,107 +526,11 @@ app.factory('ActionInfoLoader', [
   }
 ]);
 
-app.controller('FormActionAddController', [
-  '$scope',
-  '$stateParams',
-  '$state',
-  '$cacheFactory',
-  'FormioAlerts',
-  'FormioUtils',
-  'ActionInfoLoader',
-  function(
-    $scope,
-    $stateParams,
-    $state,
-    $cacheFactory,
-    FormioAlerts,
-    FormioUtils,
-    ActionInfoLoader
-  ) {
-    // Invalidate cache so actions fetch fresh request for
-    // component selection inputs.
-    $cacheFactory.get('$http').removeAll();
-
-    // Helpful warnings for certain actions
-    ActionInfoLoader.load($scope, $stateParams).then(function(actionInfo) {
-      // SQL Action missing sql server warning
-      if(actionInfo && actionInfo.name === 'sql') {
-        FormioUtils.eachComponent(actionInfo.settingsForm.components, function(component) {
-          if(component.key === 'settings[type]' && JSON.parse(component.data.json).length === 0) {
-            FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> You do not have any SQL servers configured. You can add a SQL server in your <a href="#/project/'+$scope.projectId+'/settings/databases">Project Settings</a>.');
-          }
-        });
-      }
-
-      // Email action missing transports (other than the default one).
-      if(actionInfo && actionInfo.name === 'email') {
-        FormioUtils.eachComponent(actionInfo.settingsForm.components, function(component) {
-          if(component.key === 'settings[transport]' && JSON.parse(component.data.json).length <= 1) {
-            FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> You do not have any email transports configured. You can add an email transport in your <a href="#/project/'+$scope.projectId+'/settings/email">Project Settings</a>, or you can use the default transport (charges may apply).');
-          }
-        });
-      }
-
-      // Auth action alert for new resource missing role assignment.
-      if(actionInfo && actionInfo.name === 'auth') {
-        $scope.$watch('action.data.settings', function(current, old) {
-          if(current.hasOwnProperty('association')) {
-            angular.element('#form-group-role').css('display', current.association === 'new' ? '' : 'none');
-          }
-
-          // Make the role required for submission if this is a new association.
-          if (
-            current.hasOwnProperty('association') &&
-            old.hasOwnProperty('association') &&
-            current.association !== old.association
-          ) {
-            // Find the role settings component, and require it as needed.
-            FormioUtils.eachComponent(actionInfo.settingsForm.components, function(component) {
-              if (component.key && component.key === 'role') {
-                // Update the validation settings.
-                component.validate = component.validate || {};
-                component.validate.required = (current.association === 'new' ? true : false);
-              }
-            });
-
-            // Dont save the old role settings if this is an existing association.
-            current.role = (current.role && (current.association === 'new')) || '';
-          }
-        }, true);
-      }
-
-      // Role action alert for new resource missing role assignment.
-      if(actionInfo && actionInfo.name === 'role') {
-        FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> The Role Assignment Action requires a Resource Form component with the API key, \'submission\', to modify existing Resource submissions.');
-      }
-
-      // Check for, and warn about premium actions being present.
-      if(
-        actionInfo &&
-        actionInfo.hasOwnProperty('premium') &&
-        actionInfo.premium === true &&
-        $scope.currentProject &&
-        $scope.currentProject.hasOwnProperty('plan') &&
-        $scope.currentProject.plan === 'community'
-      ) {
-        FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> This is a Premium Action, please upgrade your <a href="https://www.form.io/pricing">Project Plan</a> to enable it.');
-      }
-    });
-
-    $scope.$on('formSubmission', function(event) {
-      event.stopPropagation();
-      FormioAlerts.addAlert({type: 'success', message: 'Action was created.'});
-      $state.go('project.form.action.index');
-    });
-  }
-]);
-
 app.controller('FormActionEditController', [
   '$scope',
   '$stateParams',
   '$state',
   '$cacheFactory',
-  'Formio',
   'FormioAlerts',
   'ActionInfoLoader',
   'FormioUtils',
@@ -636,7 +540,6 @@ app.controller('FormActionEditController', [
     $stateParams,
     $state,
     $cacheFactory,
-    Formio,
     FormioAlerts,
     ActionInfoLoader,
     FormioUtils,
@@ -646,32 +549,56 @@ app.controller('FormActionEditController', [
     // component selection inputs.
     $cacheFactory.get('$http').removeAll();
 
-    ActionInfoLoader.load($scope, $stateParams, Formio).then(function(actionInfo) {
+    // Helpful warnings for certain actions
+    ActionInfoLoader.load($scope, $stateParams).then(function(actionInfo) {
+      // SQL Action missing sql server warning
+      if(actionInfo && actionInfo.name === 'sql') {
+        var typeComponent = FormioUtils.getComponent(actionInfo.settingsForm.components, 'settings[type]');
+        if(JSON.parse(typeComponent.data.json).length === 0) {
+          FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> You do not have any SQL servers configured. You can add a SQL server in your <a href="#/project/'+$scope.projectId+'/settings/databases">Project Settings</a>.');
+        }
+      }
+
+      // Email action missing transports (other than the default one).
+      if(actionInfo && actionInfo.name === 'email') {
+        var transportComponent = FormioUtils.getComponent(actionInfo.settingsForm.components, 'settings[transport]');
+        if(JSON.parse(transportComponent.data.json).length <= 1) {
+          FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> You do not have any email transports configured. You can add an email transport in your <a href="#/project/'+$scope.projectId+'/settings/email">Project Settings</a>, or you can use the default transport (charges may apply).');
+        }
+      }
+
+      // Role action alert for new resource missing role assignment.
+      if(actionInfo && actionInfo.name === 'role') {
+        FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> The Role Assignment Action requires a Resource Form component with the API key, \'submission\', to modify existing Resource submissions.');
+      }
+
+      // Hide role settings component as needed
+      var toggleVisible = function(association) {
+        if(!association) {
+          return;
+        }
+
+        angular.element('#form-group-role').css('display', (association === 'new' ? '' : 'none'));
+        angular.element('#form-group-resource').css('display', (association === 'link' ? 'none' : ''));
+      };
+
+      // Find the role settings component, and require it as needed.
+      var toggleRequired = function(association, formComponents) {
+        if(!formComponents || !association) {
+          return;
+        }
+
+        var roleComponent = FormioUtils.getComponent(formComponents, 'role');
+        var resourceComponent = FormioUtils.getComponent(formComponents, 'resource');
+        // Update the validation settings.
+        roleComponent.validate = roleComponent.validate || {};
+        roleComponent.validate.required = (association === 'new' ? true : false);
+        resourceComponent.validate = resourceComponent.validate || {};
+        resourceComponent.validate.required = (association === 'link' ? false : true);
+      };
+
       // Auth action validation changes for new resource missing role assignment.
       if(actionInfo && actionInfo.name === 'auth') {
-        var toggleVisible = function(association) {
-          if(!association) {
-            return;
-          }
-
-          angular.element('#form-group-role').css('display', (association === 'new' ? '' : 'none'));
-        };
-
-        // Find the role settings component, and require it as needed.
-        var toggleRequired = function(association, formComponents) {
-          if(!formComponents || !association) {
-            return;
-          }
-
-          FormioUtils.eachComponent(formComponents, function(component) {
-            if (component.key && component.key === 'role') {
-              // Update the validation settings.
-              component.validate = component.validate || {};
-              component.validate.required = (association === 'new' ? true : false);
-            }
-          });
-        };
-
         // Force the validation to be run on page load.
         $timeout(function() {
           var action = $scope.action.data.settings || {};
@@ -682,15 +609,51 @@ app.controller('FormActionEditController', [
         // Watch for changes to the action settings.
         $scope.$watch('action.data.settings', function(current, old) {
           // Make the role setting required if this is for new resource associations.
-          if(current.hasOwnProperty('association') &&
-            old.hasOwnProperty('association') &&
-            current.association !== old.association
-          ) {
+          if(current.association !== old.association) {
             toggleVisible(current.association);
             toggleRequired(current.association, actionInfo.settingsForm.components);
 
             // Dont save the old role settings if this is an existing association.
             current.role = (current.role && (current.association === 'new')) || '';
+          }
+        }, true);
+      }
+
+      var showProviderFields = function(association, provider) {
+        angular.element('[id^=form-group-autofill-]').css('display', 'none');
+        if(association === 'new' && provider) {
+          angular.element('[id^=form-group-autofill-' + provider + ']').css('display', '');
+        }
+      };
+
+      if(actionInfo && actionInfo.name === 'oauth') {
+        // Show warning if button component has no options
+        var buttonComponent = FormioUtils.getComponent(actionInfo.settingsForm.components, 'settings[button]');
+        if(JSON.parse(buttonComponent.data.json).length === 0) {
+          FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> You do not have any Button components with the `oauth` action on this form, which is required to use this action. You can add a Button component on the <a href="#/project/'+$scope.projectId+'/form/'+$scope.formId+'/edit">form edit page</a>.');
+        }
+        // Force the validation to be run on page load.
+        $timeout(function() {
+          var action = $scope.action.data.settings || {};
+          toggleVisible(action.association);
+          toggleRequired(action.association, actionInfo.settingsForm.components);
+          showProviderFields(action.association, action.provider);
+        });
+
+        // Watch for changes to the action settings.
+        $scope.$watch('action.data.settings', function(current, old) {
+          // Make the role setting required if this is for new resource associations.
+          if(current.association !== old.association) {
+            toggleVisible(current.association);
+            toggleRequired(current.association, actionInfo.settingsForm.components);
+            showProviderFields(current.association, current.provider);
+
+            // Dont save the old role settings if this is an existing association.
+            current.role = (current.role && (current.association === 'new')) || '';
+          }
+
+          if(current.provider !== old.provider) {
+            showProviderFields(current.association, current.provider);
           }
         }, true);
       }
@@ -768,7 +731,9 @@ app.controller('FormSubmissionsController', [
   ) {
     // Returns true if component should appear in table
     $scope.tableView = function(component) {
-      return !component.hasOwnProperty('tableView') || component.tableView;
+      return !component.protected &&
+        (!component.hasOwnProperty('persistent') || component.persistent) &&
+        (!component.hasOwnProperty('tableView') || component.tableView);
     };
 
     // Creates resourcejs sort query from kendo datasource read options
