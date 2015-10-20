@@ -1,7 +1,6 @@
 'use strict';
 
 /* global _: false */
-
 var app = angular.module('formioApp.controllers.form', [
   'ngDialog',
   'ui.sortable',
@@ -234,6 +233,17 @@ app.controller('FormController', [
         $rootScope.currentForm = $scope.form;
       }, FormioAlerts.onError.bind(FormioAlerts));
       $scope.formio.loadActions().then(function(actions) {
+        // Get the available actions for the form, to check if premium actions are present.
+        $scope.formio.availableActions().then(function(available) {
+          var premium = _.pluck(_.filter(available, function(action) {
+            return (action.hasOwnProperty('premium') && action.premium === true);
+          }), 'name');
+
+          $scope.hasPremAction = _.some(actions, function(action) {
+            return (action.hasOwnProperty('name') && action.name && premium.indexOf(action.name) !== -1)
+          });
+        });
+
         $scope.actions = actions;
         $scope.hasAuthAction = actions.some(function(action) {
           return action.name === 'auth';
@@ -537,9 +547,8 @@ app.controller('FormActionAddController', [
     // component selection inputs.
     $cacheFactory.get('$http').removeAll();
 
+    // Helpful warnings for certain actions
     ActionInfoLoader.load($scope, $stateParams).then(function(actionInfo) {
-      // Helpful warnings for certain actions
-
       // SQL Action missing sql server warning
       if(actionInfo && actionInfo.name === 'sql') {
         FormioUtils.eachComponent(actionInfo.settingsForm.components, function(component) {
@@ -589,6 +598,18 @@ app.controller('FormActionAddController', [
       // Role action alert for new resource missing role assignment.
       if(actionInfo && actionInfo.name === 'role') {
         FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> The Role Assignment Action requires a Resource Form component with the API key, \'submission\', to modify existing Resource submissions.');
+      }
+
+      // Check for, and warn about premium actions being present.
+      if(
+        actionInfo &&
+        actionInfo.hasOwnProperty('premium') &&
+        actionInfo.premium === true &&
+        $scope.currentProject &&
+        $scope.currentProject.hasOwnProperty('plan') &&
+        $scope.currentProject.plan === 'community'
+      ) {
+        FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> This is a Premium Action, please upgrade your <a href="https://www.form.io/pricing">Project Plan</a> to enable it.');
       }
     });
 
@@ -921,7 +942,6 @@ app.controller('FormSubmissionsController', [
               break;
             default: filterable = true;
           }
-          console.log(component.type, filterable);
           return {
             field: 'data.' + component.key,
             title: component.label || component.key,
@@ -1168,7 +1188,6 @@ app.constant('SubmissionAccessLabels', {
     tooltip: 'The Delete Own Submissions permission will allow a user, with one of the given Roles, to delete a Submission. A user can only delete a Submission if they are defined as its owner.'
   }
 });
-
 
 app.controller('ApiController', [
   '$scope',
