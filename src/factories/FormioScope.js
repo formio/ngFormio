@@ -17,6 +17,12 @@ module.exports = [
             });
           }
           else {
+            if(error instanceof Error) {
+              error = error.toString();
+            }
+            else if(typeof error === 'object') {
+              error = JSON.stringify(error);
+            }
             $scope.showAlerts({
               type: 'danger',
               message: error

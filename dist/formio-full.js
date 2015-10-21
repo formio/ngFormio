@@ -57068,8 +57068,52 @@ jQuery.extend({
 
 		if ( value !== undefined ) {
 
+<<<<<<< HEAD
 			if ( value === null ) {
 				jQuery.removeAttr( elem, name );
+=======
+},{}],60:[function(require,module,exports){
+"use strict";
+module.exports = [
+  'Formio',
+  'formioComponents',
+  function(
+    Formio,
+    formioComponents
+  ) {
+    return {
+      onError: function($scope, $element) {
+        return function(error) {
+          if (error.name === 'ValidationError') {
+            $element.find('#form-group-' + error.details[0].path).addClass('has-error');
+            var message = 'ValidationError: ' + error.details[0].message;
+            $scope.showAlerts({
+              type: 'danger',
+              message: message
+            });
+          }
+          else {
+            if(error instanceof Error) {
+              error = error.toString();
+            }
+            else if(typeof error === 'object') {
+              error = JSON.stringify(error);
+            }
+            $scope.showAlerts({
+              type: 'danger',
+              message: error
+            });
+          }
+          $scope.$emit('formError', error);
+        };
+      },
+      register: function($scope, $element, options) {
+        var loader = null;
+        $scope._src = $scope._src || $scope.src || '';
+        $scope._form = $scope.form || {};
+        $scope._submission = $scope.submission || {data: {}};
+        $scope._submissions = $scope.submissions || [];
+>>>>>>> origin/feature/oauth-final
 
 			} else if ( hooks && "set" in hooks && (ret = hooks.set( elem, value, name )) !== undefined ) {
 				return ret;
@@ -59147,9 +59191,32 @@ jQuery.fn.extend({
 jQuery.each( { scrollLeft: "pageXOffset", scrollTop: "pageYOffset" }, function( method, prop ) {
 	var top = "pageYOffset" === prop;
 
+<<<<<<< HEAD
 	jQuery.fn[ method ] = function( val ) {
 		return access( this, function( elem, method, val ) {
 			var win = getWindow( elem );
+=======
+    // Get the cached promise to save multiple loads.
+    var cacheKey = btoa(url);
+    if (method === 'GET' && cache.hasOwnProperty(cacheKey)) {
+      cache[cacheKey].finally(function() {
+        Formio.onRequestDone();
+      });
+      return cache[cacheKey];
+    }
+    else {
+      var promise = Q()
+      .then(function() {
+        // Set up and fetch request
+        var headers = new Headers({
+          'Accept': 'application/json',
+          'Content-type': 'application/json; charset=UTF-8'
+        });
+        var token = Formio.getToken();
+        if (token) {
+          headers.append('x-jwt-token', token);
+        }
+>>>>>>> origin/feature/oauth-final
 
 			if ( val === undefined ) {
 				return win ? win[ prop ] : elem[ method ];
@@ -59197,6 +59264,7 @@ jQuery.each( { Height: "height", Width: "width" }, function( name, type ) {
 			var chainable = arguments.length && ( defaultExtra || typeof margin !== "boolean" ),
 				extra = defaultExtra || ( margin === true || value === true ? "margin" : "border" );
 
+<<<<<<< HEAD
 			return access( this, function( elem, type, value ) {
 				var doc;
 
@@ -59206,6 +59274,37 @@ jQuery.each( { Height: "height", Width: "width" }, function( name, type ) {
 					// https://github.com/jquery/jquery/pull/764
 					return elem.document.documentElement[ "client" + name ];
 				}
+=======
+  Formio.currentUser = function() {
+    var user = this.getUser();
+    if (user) { return Q().thenResolve(user) }
+    var token = this.getToken();
+    if (!token) { return Q().thenResolve(null) }
+    return this.request(baseUrl + '/current')
+      .then(function(response) {
+        if (response.ok) {
+          Formio.setUser(response);
+        }
+        return response;
+      });
+  };
+
+// Keep track of their logout callback.
+  Formio.logout = function() {
+    return this.request(baseUrl + '/logout').finally(function() {
+      this.setToken(null);
+      this.setUser(null);
+    }.bind(this));
+  };
+  Formio.fieldData = function(data, component) {
+    if (!data) { return ''; }
+    if (component.key.indexOf('.') !== -1) {
+      var value = data;
+      var parts = component.key.split('.');
+      var key = '';
+      for (var i = 0; i < parts.length; i++) {
+        key = parts[i];
+>>>>>>> origin/feature/oauth-final
 
 				// Get document width or height
 				if ( elem.nodeType === 9 ) {
