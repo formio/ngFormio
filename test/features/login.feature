@@ -15,7 +15,7 @@ Feature: Login Functionality
     And I enter ${login-password}Bad in the .login-container #user\.password field
     When I click the LOG IN button
     Then I have been logged out
-    And I see an alert with the text Incorrect password
+#    And I see an alert with the text Incorrect password
 
   Scenario: Missing email
     Given I am on /#/auth
