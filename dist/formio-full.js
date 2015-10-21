@@ -41445,8 +41445,8 @@ module.exports = angular;
 
 },{"./angular":9}],11:[function(require,module,exports){
 // https://github.com/Gillardo/bootstrap-ui-datetime-picker
-// Version: 1.2.5
-// Released: 2015-09-24 
+// Version: 1.2.6
+// Released: 2015-10-21 
 angular.module('ui.bootstrap.datetimepicker', ['ui.bootstrap.dateparser', 'ui.bootstrap.position'])
     .constant('uiDatetimePickerConfig', {
         dateFormat: 'yyyy-MM-dd HH:mm',
@@ -41708,11 +41708,9 @@ angular.module('ui.bootstrap.datetimepicker', ['ui.bootstrap.dateparser', 'ui.bo
                         element.val(date);
                         ngModel.$setViewValue(date);
 
-                        if (dt === null) {
-                            scope.close();
-                        } else if (closeOnDateSelection) {
+                        if (closeOnDateSelection) {
                             // do not close when using timePicker as make impossible to choose a time
-                            if (scope.showPicker != 'time') {
+                            if (scope.showPicker != 'time' && date != null) {
                                 // if time is enabled, swap to timePicker
                                 if (scope.enableTime) {
                                     // need to delay this, else timePicker never shown
@@ -41803,11 +41801,12 @@ angular.module('ui.bootstrap.datetimepicker', ['ui.bootstrap.dateparser', 'ui.bo
                         }
                     };
 
-                    scope.select = function (date) {
+                    scope.select = function (opt) {
 
-                        var isNow = date === 'now';
+                        var date = null;
+                        var isNow = opt === 'now';
 
-                        if (date === 'today' || date == 'now') {
+                        if (opt === 'today' || opt == 'now') {
                             var now = new Date();
                             if (angular.isDate(scope.date)) {
                                 date = new Date(scope.date);
@@ -41819,6 +41818,9 @@ angular.module('ui.bootstrap.datetimepicker', ['ui.bootstrap.dateparser', 'ui.bo
                         }
 
                         scope.dateSelection(date);
+
+                        if (opt == 'clear')
+                            scope.close();
                     };
 
                     scope.close = function () {
@@ -41887,12 +41889,12 @@ angular.module('ui.bootstrap.datetimepicker').run(['$templateCache', function($t
   'use strict';
 
   $templateCache.put('template/date-picker.html',
-    "<ul ng-if=\"isOpen && showPicker == 'date'\" class=\"dropdown-menu dropdown-menu-left datetime-picker-dropdown\" ng-style=dropdownStyle style=left:inherit ng-keydown=keydown($event) ng-click=$event.stopPropagation()><li style=\"padding:0 5px 5px 5px\" class=date-picker-menu><div ng-transclude></div></li><li ng-if=showButtonBar style=padding:5px><span class=\"btn-group pull-left\" style=margin-right:10px><button type=button class=\"btn btn-sm btn-info\" ng-click=\"select('today')\" ng-disabled=\"isDisabled('today')\">{{ getText('today') }}</button> <button type=button class=\"btn btn-sm btn-danger\" ng-click=select(null)>{{ getText('clear') }}</button></span> <span class=\"btn-group pull-right\"><button ng-if=enableTime type=button class=\"btn btn-sm btn-default\" ng-click=\"changePicker($event, 'time')\">{{ getText('time')}}</button> <button type=button class=\"btn btn-sm btn-success\" ng-click=close()>{{ getText('close') }}</button></span></li></ul>"
+    "<ul ng-if=\"isOpen && showPicker == 'date'\" class=\"dropdown-menu dropdown-menu-left datetime-picker-dropdown\" ng-style=dropdownStyle style=left:inherit ng-keydown=keydown($event) ng-click=$event.stopPropagation()><li style=\"padding:0 5px 5px 5px\" class=date-picker-menu><div ng-transclude></div></li><li ng-if=showButtonBar style=padding:5px><span class=\"btn-group pull-left\" style=margin-right:10px><button type=button class=\"btn btn-sm btn-info\" ng-click=\"select('today')\" ng-disabled=\"isDisabled('today')\">{{ getText('today') }}</button> <button type=button class=\"btn btn-sm btn-danger\" ng-click=\"select('clear')\">{{ getText('clear') }}</button></span> <span class=\"btn-group pull-right\"><button ng-if=enableTime type=button class=\"btn btn-sm btn-default\" ng-click=\"changePicker($event, 'time')\">{{ getText('time')}}</button> <button type=button class=\"btn btn-sm btn-success\" ng-click=close()>{{ getText('close') }}</button></span></li></ul>"
   );
 
 
   $templateCache.put('template/time-picker.html',
-    "<ul ng-if=\"isOpen && showPicker == 'time'\" class=\"dropdown-menu dropdown-menu-left datetime-picker-dropdown\" ng-style=dropdownStyle style=left:inherit ng-keydown=keydown($event) ng-click=$event.stopPropagation()><li style=\"padding:0 5px 5px 5px\" class=time-picker-menu><div ng-transclude></div></li><li ng-if=showButtonBar style=padding:5px><span class=\"btn-group pull-left\" style=margin-right:10px><button type=button class=\"btn btn-sm btn-info\" ng-click=\"select('now')\" ng-disabled=\"isDisabled('now')\">{{ getText('now') }}</button> <button type=button class=\"btn btn-sm btn-danger\" ng-click=select(null)>{{ getText('clear') }}</button></span> <span class=\"btn-group pull-right\"><button ng-if=enableDate type=button class=\"btn btn-sm btn-default\" ng-click=\"changePicker($event, 'date')\">{{ getText('date')}}</button> <button type=button class=\"btn btn-sm btn-success\" ng-click=close()>{{ getText('close') }}</button></span></li></ul>"
+    "<ul ng-if=\"isOpen && showPicker == 'time'\" class=\"dropdown-menu dropdown-menu-left datetime-picker-dropdown\" ng-style=dropdownStyle style=left:inherit ng-keydown=keydown($event) ng-click=$event.stopPropagation()><li style=\"padding:0 5px 5px 5px\" class=time-picker-menu><div ng-transclude></div></li><li ng-if=showButtonBar style=padding:5px><span class=\"btn-group pull-left\" style=margin-right:10px><button type=button class=\"btn btn-sm btn-info\" ng-click=\"select('now')\" ng-disabled=\"isDisabled('now')\">{{ getText('now') }}</button> <button type=button class=\"btn btn-sm btn-danger\" ng-click=\"select('clear')\">{{ getText('clear') }}</button></span> <span class=\"btn-group pull-right\"><button ng-if=enableDate type=button class=\"btn btn-sm btn-default\" ng-click=\"changePicker($event, 'date')\">{{ getText('date')}}</button> <button type=button class=\"btn btn-sm btn-success\" ng-click=close()>{{ getText('close') }}</button></span></li></ul>"
   );
 
 }]);
@@ -47081,9 +47083,6 @@ module.exports = function(_baseUrl, _noalias, _domain) {
     // Get the cached promise to save multiple loads.
     var cacheKey = btoa(url);
     if (method === 'GET' && cache.hasOwnProperty(cacheKey)) {
-      cache[cacheKey].finally(function() {
-        Formio.onRequestDone();
-      });
       return cache[cacheKey];
     }
     else {
@@ -47187,9 +47186,9 @@ module.exports = function(_baseUrl, _noalias, _domain) {
 
   Formio.currentUser = function() {
     var user = this.getUser();
-    if (user) { return Q().thenResolve(user) }
+    if (user) { return Q(user) }
     var token = this.getToken();
-    if (!token) { return Q().thenResolve(null) }
+    if (!token) { return Q(null) }
     return this.request(baseUrl + '/current')
       .then(function(response) {
         if (response.ok) {
@@ -47204,6 +47203,7 @@ module.exports = function(_baseUrl, _noalias, _domain) {
     return this.request(baseUrl + '/logout').finally(function() {
       this.setToken(null);
       this.setUser(null);
+      Formio.clearCache();
     }.bind(this));
   };
   Formio.fieldData = function(data, component) {
@@ -57068,52 +57068,8 @@ jQuery.extend({
 
 		if ( value !== undefined ) {
 
-<<<<<<< HEAD
 			if ( value === null ) {
 				jQuery.removeAttr( elem, name );
-=======
-},{}],60:[function(require,module,exports){
-"use strict";
-module.exports = [
-  'Formio',
-  'formioComponents',
-  function(
-    Formio,
-    formioComponents
-  ) {
-    return {
-      onError: function($scope, $element) {
-        return function(error) {
-          if (error.name === 'ValidationError') {
-            $element.find('#form-group-' + error.details[0].path).addClass('has-error');
-            var message = 'ValidationError: ' + error.details[0].message;
-            $scope.showAlerts({
-              type: 'danger',
-              message: message
-            });
-          }
-          else {
-            if(error instanceof Error) {
-              error = error.toString();
-            }
-            else if(typeof error === 'object') {
-              error = JSON.stringify(error);
-            }
-            $scope.showAlerts({
-              type: 'danger',
-              message: error
-            });
-          }
-          $scope.$emit('formError', error);
-        };
-      },
-      register: function($scope, $element, options) {
-        var loader = null;
-        $scope._src = $scope._src || $scope.src || '';
-        $scope._form = $scope.form || {};
-        $scope._submission = $scope.submission || {data: {}};
-        $scope._submissions = $scope.submissions || [];
->>>>>>> origin/feature/oauth-final
 
 			} else if ( hooks && "set" in hooks && (ret = hooks.set( elem, value, name )) !== undefined ) {
 				return ret;
@@ -59191,32 +59147,9 @@ jQuery.fn.extend({
 jQuery.each( { scrollLeft: "pageXOffset", scrollTop: "pageYOffset" }, function( method, prop ) {
 	var top = "pageYOffset" === prop;
 
-<<<<<<< HEAD
 	jQuery.fn[ method ] = function( val ) {
 		return access( this, function( elem, method, val ) {
 			var win = getWindow( elem );
-=======
-    // Get the cached promise to save multiple loads.
-    var cacheKey = btoa(url);
-    if (method === 'GET' && cache.hasOwnProperty(cacheKey)) {
-      cache[cacheKey].finally(function() {
-        Formio.onRequestDone();
-      });
-      return cache[cacheKey];
-    }
-    else {
-      var promise = Q()
-      .then(function() {
-        // Set up and fetch request
-        var headers = new Headers({
-          'Accept': 'application/json',
-          'Content-type': 'application/json; charset=UTF-8'
-        });
-        var token = Formio.getToken();
-        if (token) {
-          headers.append('x-jwt-token', token);
-        }
->>>>>>> origin/feature/oauth-final
 
 			if ( val === undefined ) {
 				return win ? win[ prop ] : elem[ method ];
@@ -59264,7 +59197,6 @@ jQuery.each( { Height: "height", Width: "width" }, function( name, type ) {
 			var chainable = arguments.length && ( defaultExtra || typeof margin !== "boolean" ),
 				extra = defaultExtra || ( margin === true || value === true ? "margin" : "border" );
 
-<<<<<<< HEAD
 			return access( this, function( elem, type, value ) {
 				var doc;
 
@@ -59274,37 +59206,6 @@ jQuery.each( { Height: "height", Width: "width" }, function( name, type ) {
 					// https://github.com/jquery/jquery/pull/764
 					return elem.document.documentElement[ "client" + name ];
 				}
-=======
-  Formio.currentUser = function() {
-    var user = this.getUser();
-    if (user) { return Q().thenResolve(user) }
-    var token = this.getToken();
-    if (!token) { return Q().thenResolve(null) }
-    return this.request(baseUrl + '/current')
-      .then(function(response) {
-        if (response.ok) {
-          Formio.setUser(response);
-        }
-        return response;
-      });
-  };
-
-// Keep track of their logout callback.
-  Formio.logout = function() {
-    return this.request(baseUrl + '/logout').finally(function() {
-      this.setToken(null);
-      this.setUser(null);
-    }.bind(this));
-  };
-  Formio.fieldData = function(data, component) {
-    if (!data) { return ''; }
-    if (component.key.indexOf('.') !== -1) {
-      var value = data;
-      var parts = component.key.split('.');
-      var key = '';
-      for (var i = 0; i < parts.length; i++) {
-        key = parts[i];
->>>>>>> origin/feature/oauth-final
 
 				// Get document width or height
 				if ( elem.nodeType === 9 ) {
@@ -61691,6 +61592,12 @@ module.exports = [
             });
           }
           else {
+            if(error instanceof Error) {
+              error = error.toString();
+            }
+            else if(typeof error === 'object') {
+              error = JSON.stringify(error);
+            }
             $scope.showAlerts({
               type: 'danger',
               message: error
