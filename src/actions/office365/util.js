@@ -123,13 +123,17 @@ module.exports = {
    * @returns {*}
    */
   connect: function(router, req) {
-    var deferred = Q.defer();
+    if (req.o365) {
+      return req.o365.promise;
+    }
+
+    req.o365 = Q.defer();
     router.formio.hook.settings(req, function(err, settings) {
       if (err) {
-        return deferred.reject(err);
+        return req.o365.reject(err);
       }
       if (!settings) {
-        return deferred.reject('No settings found.');
+        return req.o365.reject('No settings found.');
       }
       if (
         !settings.office365 ||
@@ -138,7 +142,7 @@ module.exports = {
         !settings.office365.cert ||
         !settings.office365.thumbprint
       ) {
-        return deferred.reject('Office 365 Not configured.');
+        return req.o365.reject('Office 365 Not configured.');
       }
 
       // Create the AuthenticationContext.
@@ -152,18 +156,17 @@ module.exports = {
         settings.office365.thumbprint,
         function (err, response) {
           if (err) {
-            return deferred.reject(err);
+            return req.o365.reject(err);
           }
 
-          deferred.resolve({
+          req.o365.resolve({
             settings: settings,
             response: response
           });
         }
       );
     }.bind(this));
-
-    return deferred.promise;
+    return req.o365.promise;
   },
 
   /**
