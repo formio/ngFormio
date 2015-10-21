@@ -5,6 +5,9 @@ var adal = require('adal-node');
 var uuid = require('node-uuid');
 var AuthenticationContext = adal.AuthenticationContext;
 var nunjucks = require('nunjucks');
+nunjucks.configure([], {
+  watch: false
+});
 var request = require('request');
 var Q = require('q');
 
