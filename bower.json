@@ -23,7 +23,7 @@
     "bootstrap-ui-datetime-picker": "~1.1.0",
     "angular-paginate-anything": "~4.1.2",
     "kendo-ui": "kendo-ui-core#2015.2.902+SP2",
-    "ngFormio": "git+ssh://git@github.com/formio/ngFormio.git#0.3.10",
+    "ngFormio": "git+ssh://git@github.com/formio/ngFormio.git#0.3.11",
     "jquery.maskedinput": "~1.4.1"
   },
   "resolutions": {
