@@ -55,7 +55,7 @@ module.exports = function (app) {
           }
           else {
             element[0][dim] = parseInt(scope.component[dim], 10);
-            scope.component[dim] += 'px';
+            scope.component[dim] = element[0][dim] + 'px';
           }
         };
 
