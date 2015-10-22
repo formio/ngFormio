@@ -800,8 +800,8 @@ app.controller('FormSubmissionsController', [
                     default: type = 'string';
                   }
                   return [
-                    'data.' + component.key, // Key
-                    {                        // Value
+                    'data.' + component.key.replace(/\./g, '.data.'), // Key
+                    {                                                 // Value
                       type: type
                     }
                   ];
@@ -894,7 +894,7 @@ app.controller('FormSubmissionsController', [
             default: filterable = true;
           }
           return {
-            field: 'data.' + component.key,
+            field: 'data.' + component.key.replace(/\./g, '.data.'),
             title: component.label || component.key,
             template: function(dataItem) {
               var value = Formio.fieldData(dataItem.data.toJSON(), component);
