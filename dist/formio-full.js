@@ -60575,7 +60575,6 @@ module.exports = function (app) {
           defaultValue: '',
           template: '<span>{{ item.data }}</span>',
           selectFields: '',
-          searchExpression: '',
           searchFields: '',
           multiple: false,
           refresh: false,
