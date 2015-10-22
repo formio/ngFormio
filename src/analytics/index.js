@@ -77,9 +77,6 @@ module.exports = function(config) {
     }
   };
 
-  // Try the connection on server start.
-  connect();
-
   /**
    * Express middleware for tracking request analytics.
    *

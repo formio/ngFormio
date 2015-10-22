@@ -51,6 +51,8 @@ var formioServer = require('formio')(config.formio);
 
 // Attach the analytics to the formio server.
 formioServer.analytics = analytics;
+// Try the connection on server start.
+formioServer.analytics.connect();
 
 // Configure nunjucks.
 nunjucks.configure('views', {
