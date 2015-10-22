@@ -151,6 +151,7 @@ app.run([
         '<p class="help-block" ng-show="formioFieldForm[component.key].$error.min">{{ component.label || component.key }} must be higher than {{ component.validate.min - 1 }}.</p>' +
         '<p class="help-block" ng-show="formioFieldForm[component.key].$error.max">{{ component.label || component.key }} must be lower than {{ component.validate.max + 1 }}.</p>' +
         '<p class="help-block" ng-show="formioFieldForm[component.key].$error.custom">{{ component.customError }}</p>' +
+        '<p class="help-block" ng-show="formioFieldForm[component.key].$error.pattern">{{ component.label || component.key }} does not match the pattern {{ component.validate.pattern }}</p>' +
       '</div>'
     );
   }
