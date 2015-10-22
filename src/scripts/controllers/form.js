@@ -885,8 +885,6 @@ app.controller('FormSubmissionsController', [
               break;
             // Filtering is not supported for these data types in resourcejs yet
             case 'address':
-            case 'checkbox':
-            case 'number':
             case 'resource':
             case 'signature':
               filterable = false;
@@ -926,7 +924,6 @@ app.controller('FormSubmissionsController', [
               return value;
             },
             // Disabling sorting on embedded fields because it doesn't work in resourcejs yet
-            sortable: component.key.indexOf('.') === -1,
             width: '200px',
             filterable: filterable
           };
