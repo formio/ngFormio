@@ -73,3 +73,21 @@ app.controller('ResetPasswordController', [
     });
   }
 ]);
+
+app.controller('ProfileController', [
+  '$scope',
+  '$rootScope',
+  function(
+    $scope,
+    $rootScope
+  ) {
+    $scope.isLinked = function() {
+      if(!$scope.user) return false;
+      return !!(_.find($scope.user.externalIds, {type: 'github'}));
+    };
+
+    $scope.$on('formSubmission', function(event, submission) {
+      $rootScope.user = submission;
+    });
+  }
+]);

@@ -81,7 +81,8 @@ angular
         .state('profile', {
           abstract: true,
           url: '/profile',
-          templateUrl: 'views/user/profile/profile.html'
+          templateUrl: 'views/user/profile/profile.html',
+          controller: 'ProfileController'
         })
         .state('profile.view', {
           url: '/view',
@@ -301,6 +302,7 @@ angular
       $rootScope.userForm = AppConfig.userForm;
       $rootScope.userLoginForm = AppConfig.userLoginForm;
       $rootScope.userRegisterForm = AppConfig.userRegisterForm;
+      $rootScope.userLinkGithubForm = AppConfig.userLinkGithubForm;
       $rootScope.teamForm = AppConfig.teamForm;
       $rootScope.feedbackForm = AppConfig.feedbackForm;
       $rootScope.resetPassForm = AppConfig.resetPassForm;
