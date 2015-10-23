@@ -73,3 +73,30 @@ app.controller('ResetPasswordController', [
     });
   }
 ]);
+
+app.controller('ProfileController', [
+  '$scope',
+  '$rootScope',
+  'Formio',
+  function(
+    $scope,
+    $rootScope,
+    Formio
+  ) {
+    $scope.isLinked = function() {
+      if(!$scope.user) return false;
+      return !!(_.find($scope.user.externalIds, {type: 'github'}));
+    };
+
+    $scope.userLoading = true;
+    Formio.currentUser().then(function(user) {
+      $rootScope.user = user;
+      $scope.profileUrl = $rootScope.userForm + '/submission/' + $rootScope.user._id;
+      $scope.userLoading = false;
+    });
+
+    $scope.$on('formSubmission', function(event, submission) {
+      $rootScope.user = submission;
+    });
+  }
+]);

@@ -264,23 +264,6 @@ angular
       }).catch(FormioAlerts.onError.bind(FormioAlerts));
     }
   ])
-  .controller('ProfileController', [
-    '$scope',
-    '$rootScope',
-    'Formio',
-    function(
-      $scope,
-      $rootScope,
-      Formio
-    ) {
-      $scope.userLoading = true;
-      Formio.currentUser().then(function(user) {
-        $rootScope.user = user;
-        $scope.profileUrl = $rootScope.userForm + '/submission/' + $rootScope.user._id;
-        $scope.userLoading = false;
-      });
-    }
-  ])
   .filter('trusted', [
     '$sce',
     function ($sce) {
@@ -321,6 +304,7 @@ angular
       $rootScope.userForm = AppConfig.userForm;
       $rootScope.userLoginForm = AppConfig.userLoginForm;
       $rootScope.userRegisterForm = AppConfig.userRegisterForm;
+      $rootScope.userLinkGithubForm = AppConfig.userLinkGithubForm;
       $rootScope.teamForm = AppConfig.teamForm;
       $rootScope.feedbackForm = AppConfig.feedbackForm;
       $rootScope.resetPassForm = AppConfig.resetPassForm;

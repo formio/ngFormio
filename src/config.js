@@ -23,6 +23,7 @@ angular.module('formioApp').constant('AppConfig', {
   userForm: formioBase + '/user',
   userLoginForm: formioBase + '/user/login',
   userRegisterForm: formioBase + '/user/register',
+  userLinkGithubForm: formioBase + '/user/link/github',
   teamForm: formioBase + '/team',
   betaForm: formioBase + '/beta',
   feedbackForm: formioBase + '/feedback',
