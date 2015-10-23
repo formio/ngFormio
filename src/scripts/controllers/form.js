@@ -1140,7 +1140,6 @@ app.constant('SubmissionAccessLabels', {
   }
 });
 
-
 app.controller('ApiController', [
   '$scope',
   '$state',

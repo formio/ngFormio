@@ -48,7 +48,7 @@ angular
           url: '/auth',
           views: {
             '' : {
-              templateUrl: 'views/user/auth.html',
+              templateUrl: 'views/user/auth.html'
             },
             'login@auth': {
               templateUrl: 'views/user/login.html',
@@ -81,16 +81,19 @@ angular
         .state('profile', {
           abstract: true,
           url: '/profile',
+          controller: 'ProfileController',
           templateUrl: 'views/user/profile/profile.html'
         })
         .state('profile.view', {
           url: '/view',
           parent: 'profile',
+          controller: 'ProfileController',
           templateUrl: 'views/user/profile/profile-view.html'
         })
         .state('profile.edit', {
           url: '/edit',
           parent: 'profile',
+          controller: 'ProfileController',
           templateUrl: 'views/user/profile/profile-edit.html'
         })
         .state('project', {
@@ -259,6 +262,23 @@ angular
         angular.element('#projects-loader').hide();
         $scope.projects = projects;
       }).catch(FormioAlerts.onError.bind(FormioAlerts));
+    }
+  ])
+  .controller('ProfileController', [
+    '$scope',
+    '$rootScope',
+    'Formio',
+    function(
+      $scope,
+      $rootScope,
+      Formio
+    ) {
+      $scope.userLoading = true;
+      Formio.currentUser().then(function(user) {
+        $rootScope.user = user;
+        $scope.profileUrl = $rootScope.userForm + '/submission/' + $rootScope.user._id;
+        $scope.userLoading = false;
+      });
     }
   ])
   .filter('trusted', [
