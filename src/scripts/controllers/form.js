@@ -858,6 +858,26 @@ app.controller('FormSubmissionsController', [
               $http.get($scope.formio.submissionsUrl, {
                 params: params
               })
+              .then(function(result) {
+                // Fill in gaps in data so Kendo doesn't crash on missing nested fields
+                _(FormioUtils.flattenComponents($scope.form.components))
+                .filter($scope.tableView)
+                .each(function(component) {
+                  _.each(result.data, function(row) {
+                    var key = 'data.' + component.key.replace(/\./g, '.data.');
+                    var value = _.get(row, key);
+                    if(value === undefined) {
+                      // This looks like it does nothing but it ensures
+                      // that the path to the key is reachable by
+                      // creating objects that don't exist
+                      _.set(row, key, undefined);
+                    }
+                  });
+
+                })
+                .value();
+                return result;
+              })
               .then(options.success)
               .catch(function(err) {
                 FormioAlerts.onError(err);
