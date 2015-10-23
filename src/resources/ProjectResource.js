@@ -39,7 +39,7 @@ module.exports = function(router, formio) {
         }
         next();
       },
-      formio.middleware.bootstrapEntityOwner,
+      formio.middleware.bootstrapEntityOwner(false),
       formio.middleware.condensePermissionTypes
     ],
     afterPost: [
