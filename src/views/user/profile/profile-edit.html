@@ -1,1 +1,13 @@
 <formio src="userForm + '/submission/' + user._id"></formio>
+
+<fieldset>
+  <legend>Link with GitHub</legend>
+  <div ng-if="isLinked()">
+    <p>Your account is linked with GitHub!</p>
+  </div>
+  <div ng-if="!isLinked()">
+    <formio src="userLinkGithubForm"></formio>
+  </div>
+
+
+</fieldset>
