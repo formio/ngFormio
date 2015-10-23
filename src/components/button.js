@@ -36,6 +36,13 @@ module.exports = function (app) {
                     });
                     break;
                   }
+                  if(settings.oauth.error) {
+                    $scope.showAlerts({
+                      type: 'danger',
+                      message: settings.oauth.error
+                    });
+                    break;
+                  }
                   $scope.openOAuth(settings.oauth);
                 }
                 break;
