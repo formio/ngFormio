@@ -3,7 +3,6 @@
 var Redis = require('redis');
 var onFinished = require('on-finished');
 var debug = {
-  isConnected: require('debug')('formio:analytics:isConnected'),
   connect: require('debug')('formio:analytics:connect'),
   record: require('debug')('formio:analytics:record'),
   hook: require('debug')('formio:analytics:hook'),
@@ -21,32 +20,28 @@ module.exports = function(config) {
   var redis = null;
 
   /**
-   * Simple function to help determine if redis is currently connected.
+   * Get the redis connection.
    *
-   * @returns {boolean}
+   * @returns {*}
    */
-  var isConnected = function() {
-    if (redis && redis.hasOwnProperty('connected') && redis.connected === true) {
-      debug.isConnected(true);
-      return true;
-    }
-    else {
-      debug.isConnected(false);
-      return false;
-    }
+  var getRedis = function() {
+    return redis;
   };
 
   /**
    * Configure the redis connection.
+   *
+   * @returns {boolean}
+   *   If the server is connected or not.
    */
   var connect = function() {
     // Only connect once.
-    if (isConnected()) {
-      return;
+    if (redis && redis.hasOwnProperty('connected') && redis.connected === true) {
+      debug.connect('Already connected.');
+      return true;
     }
-
-    // Configure the redis connection.
-    if (config.redis && config.redis.port && config.redis.address) {
+    // Redis is not currently connected, attempt to configure the connection.
+    else if (config.redis && config.redis.port && config.redis.address) {
       var opts = {};
       if (config.redis.password) {
         opts.auth_pass = config.redis.password;
@@ -68,12 +63,10 @@ module.exports = function(config) {
         redis = null;
         debug.connect('End');
       });
-
-      return;
     }
     else {
       debug.connect('Redis options not found or incomplete: ' + JSON.stringify(config.redis || {}));
-      return;
+      return false;
     }
   };
 
@@ -88,8 +81,7 @@ module.exports = function(config) {
    *   The date timestamp this request started.
    */
   var record = function(project, path, start) {
-    connect();
-    if (!isConnected()) {
+    if (!connect()) {
       debug.record('Skipping, redis not found.');
       return;
     }
@@ -102,10 +94,9 @@ module.exports = function(config) {
       return;
     }
 
+    // Update the redis key, dependent on if this is a submission or non-submission request.
     var now = new Date();
     var key = now.getUTCMonth() + ':' + project;
-
-    // Update the redis key, dependent on if this is a submission or non-submission request.
     if (!submission.test(path)) {
       debug.record('Updating key, non-submission request: ' + path);
       key += ':ns';
@@ -123,7 +114,7 @@ module.exports = function(config) {
 
     redis.rpush(key, value, function(err, length) {
       if (err) {
-        console.error(err);
+        debug.record(err);
         return;
       }
 
@@ -139,8 +130,7 @@ module.exports = function(config) {
    * @param next
    */
   var hook = function(req, res, next) {
-    connect();
-    if (!isConnected()) {
+    if (!connect()) {
       return next();
     }
 
@@ -174,10 +164,10 @@ module.exports = function(config) {
    *   The month number to search for (0-11).
    * @param project {string}
    *   The Project Id to search for.
+   * @param next {function}
    */
   var getCalls = function(month, project, next) {
-    connect();
-    if (!isConnected() || !month || !project) {
+    if (!connect() || !month || !project) {
       debug.getCalls('Skipping');
       return next();
     }
@@ -198,8 +188,7 @@ module.exports = function(config) {
    * Expose the redis interface for analytics.
    */
   return {
-    redis: redis,
-    isConnected: isConnected,
+    getRedis: getRedis,
     connect: connect,
     hook: hook,
     getCalls: getCalls

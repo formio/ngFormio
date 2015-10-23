@@ -49,7 +49,7 @@ app.use(function(err, req, res, next) {
 // Create the formio server.
 var formioServer = require('formio')(config.formio);
 
-// Attach the analytics to the formio server.
+// Attach the analytics to the formio server and attempt to connect.
 formioServer.analytics = analytics;
 // Try the connection on server start.
 formioServer.analytics.connect();

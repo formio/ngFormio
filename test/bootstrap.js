@@ -43,6 +43,8 @@ module.exports = function() {
 
   // Attach the analytics to the formio server.
   _server.analytics = analytics;
+  // Try the connection on server start.
+  _server.analytics.connect();
 
   // Configure nunjucks.
   nunjucks.configure('views', {

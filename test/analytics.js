@@ -7,9 +7,9 @@ var async = require('async');
 
 module.exports = function(app, template, hook) {
   describe('Analytics', function() {
-    if (!app.formio || !app._server || !app._server.analytics || !app._server.analytics.isConnected()) return;
+    if (!app.formio || !app._server || !app._server.analytics || !app._server.analytics.connect()) return;
 
-    var redis = app._server.analytics.redis;
+    var redis = app._server.analytics.getRedis();
     it('Should clear all the redis data', function(done) {
       redis.flushall(function(err, val) {
         if (err) {
