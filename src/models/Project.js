@@ -31,6 +31,10 @@ module.exports = function(formio) {
         index: true,
         default: null
       },
+      primary: {
+        type: Boolean,
+        default: false
+      },
       deleted: {
         type: Number,
         default: null

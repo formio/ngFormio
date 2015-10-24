@@ -46,6 +46,7 @@ module.exports = function(app, formioServer) {
             return true;
           case 'token':
             app.use(formio.middleware.tokenHandler);
+            app.use(require('../middleware/userProject')(cache));
             return true;
           case 'logout':
             app.get('/logout', formio.auth.logout);
@@ -223,47 +224,48 @@ module.exports = function(app, formioServer) {
 
         // Determine if the current request has access to the given Project.
         if (!Boolean(req.projectId)) {
-          if (req.method === 'POST' && _url === '/project') {
-            if (req.token) {
-              // User is authenticated.
+          // No project but authenticated.
+          if (req.token) {
+            if (req.method === 'POST' && _url === '/project') {
+              _debug('true');
+              return req.userProject.primary;
+            }
+
+            // @TODO: Should this be restricted to only primary projects as well?
+            if (_url === '/project') {
               _debug('true');
               return true;
             }
 
-            // User is not authenticated and therefore cannot make a new project.
+            if (_url === '/project/available') {
+              _debug('true');
+              return req.userProject.primary;
+            }
+
+            _debug('Checking for Formio Access.');
+            _debug('Formio URL: ' + _url);
+            if (_url === '/current' || _url === '/logout') {
+              _debug('true');
+              return true;
+            }
+
+            // This req is unauthorized.
+            _debug('false');
             return false;
           }
-
-          _debug('Checking for Formio Access.');
-          _debug('Formio URL: ' + _url);
-          if (_url === '/current' || _url === '/logout') {
-            if (req.token) {
+          // No project but anonymous.
+          else {
+            if (_url === '/spec.json' || _url === '/spec.html') {
               _debug('true');
               return true;
             }
-          }
 
-          if (_url === '/project') {
-            if (req.token) {
-              _debug('true');
-              return true;
-            }
+            // This req is unauthorized.
+            _debug('false');
+            return false;
           }
-
-          if (_url === '/project/available') {
-            _debug('true');
-            return true;
-          }
-
-          if (_url === '/spec.json' || _url === '/spec.html') {
-            _debug('true');
-            return true;
-          }
-
-          // This req is unauthorized.
-          _debug('false');
-          return false;
         }
+        // Has project.
         else {
           _debug('Checking Project Access.');
           _debug('URL: ' + _url);
