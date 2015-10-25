@@ -1,6 +1,10 @@
 'use strict';
 
 var _ = require('lodash');
+var nunjucks = require('nunjucks');
+nunjucks.configure([], {
+  watch: false
+});
 var debug = require('debug')('formio:settings');
 var o365Util = require('../actions/office365/util');
 var nodeUrl = require('url');
