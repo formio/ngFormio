@@ -17,6 +17,8 @@ module.exports = function(router, formio) {
     formio.middleware.filterResourcejsResponse(['settings']).call(this, req, res, next);
   };
 
+  var hiddenFields = ['deleted', '__v', 'primary'];
+
   var resource = Resource(
     router,
     '',
@@ -27,7 +29,7 @@ module.exports = function(router, formio) {
       formio.middleware.filterMongooseExists({field: 'deleted', isNull: true})
     ],
     afterGet: [
-      formio.middleware.filterResourcejsResponse(['deleted', '__v']),
+      formio.middleware.filterResourcejsResponse(hiddenFields),
       removeProjectSettings
     ],
     beforePost: [
@@ -44,7 +46,7 @@ module.exports = function(router, formio) {
     ],
     afterPost: [
       require('../middleware/projectTemplate')(formio),
-      formio.middleware.filterResourcejsResponse(['deleted', '__v']),
+      formio.middleware.filterResourcejsResponse(hiddenFields),
       removeProjectSettings
     ],
     beforeIndex: [
@@ -52,7 +54,7 @@ module.exports = function(router, formio) {
       formio.middleware.ownerFilter
     ],
     afterIndex: [
-      formio.middleware.filterResourcejsResponse(['deleted', '__v']),
+      formio.middleware.filterResourcejsResponse(hiddenFields),
       removeProjectSettings
     ],
     beforePut: [
@@ -60,7 +62,7 @@ module.exports = function(router, formio) {
       formio.middleware.condensePermissionTypes
     ],
     afterPut: [
-      formio.middleware.filterResourcejsResponse(['deleted', '__v']),
+      formio.middleware.filterResourcejsResponse(hiddenFields),
       removeProjectSettings
     ],
     beforeDelete: [
@@ -68,7 +70,7 @@ module.exports = function(router, formio) {
       require('../middleware/deleteProjectHandler')(formio)
     ],
     afterDelete: [
-      formio.middleware.filterResourcejsResponse(['deleted', '__v']),
+      formio.middleware.filterResourcejsResponse(hiddenFields),
       removeProjectSettings
     ]
   });
