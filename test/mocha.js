@@ -453,6 +453,7 @@ describe('Bootstrap', function() {
           title: 'Form.io Test',
           name: 'formio',
           description: 'This is a test version of formio.',
+          primary: true,
           settings: {
             cors: '*'
           }

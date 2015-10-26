@@ -37,6 +37,10 @@ module.exports = function(formio) {
         default: 'community',
         index: true
       },
+      primary: {
+        type: Boolean,
+        default: false
+      },
       deleted: {
         type: Number,
         default: null

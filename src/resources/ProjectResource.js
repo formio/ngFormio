@@ -19,6 +19,7 @@ module.exports = function(router, formio) {
 
   // Load the project plan filter for use.
   formio.middleware.projectPlanFilter = require('../middleware/projectPlanFilter')(formio);
+  var hiddenFields = ['deleted', '__v', 'primary'];
 
   var resource = Resource(
     router,
@@ -30,7 +31,7 @@ module.exports = function(router, formio) {
       formio.middleware.filterMongooseExists({field: 'deleted', isNull: true})
     ],
     afterGet: [
-      formio.middleware.filterResourcejsResponse(['deleted', '__v']),
+      formio.middleware.filterResourcejsResponse(hiddenFields),
       removeProjectSettings
     ],
     beforePost: [
@@ -42,13 +43,13 @@ module.exports = function(router, formio) {
         }
         next();
       },
-      formio.middleware.bootstrapEntityOwner,
+      formio.middleware.bootstrapEntityOwner(false),
       formio.middleware.condensePermissionTypes,
       formio.middleware.projectPlanFilter
     ],
     afterPost: [
       require('../middleware/projectTemplate')(formio),
-      formio.middleware.filterResourcejsResponse(['deleted', '__v']),
+      formio.middleware.filterResourcejsResponse(hiddenFields),
       removeProjectSettings
     ],
     beforeIndex: [
@@ -56,7 +57,7 @@ module.exports = function(router, formio) {
       formio.middleware.ownerFilter
     ],
     afterIndex: [
-      formio.middleware.filterResourcejsResponse(['deleted', '__v']),
+      formio.middleware.filterResourcejsResponse(hiddenFields),
       removeProjectSettings
     ],
     beforePut: [
@@ -65,7 +66,7 @@ module.exports = function(router, formio) {
       formio.middleware.projectPlanFilter
     ],
     afterPut: [
-      formio.middleware.filterResourcejsResponse(['deleted', '__v']),
+      formio.middleware.filterResourcejsResponse(hiddenFields),
       removeProjectSettings
     ],
     beforeDelete: [
@@ -73,7 +74,7 @@ module.exports = function(router, formio) {
       require('../middleware/deleteProjectHandler')(formio)
     ],
     afterDelete: [
-      formio.middleware.filterResourcejsResponse(['deleted', '__v']),
+      formio.middleware.filterResourcejsResponse(hiddenFields),
       removeProjectSettings
     ]
   });

@@ -2,6 +2,9 @@
 
 var _ = require('lodash');
 var nunjucks = require('nunjucks');
+nunjucks.configure([], {
+  watch: false
+});
 var util = require('./util');
 var moment = require('moment');
 

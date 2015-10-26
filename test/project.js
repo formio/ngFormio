@@ -146,7 +146,7 @@ module.exports = function(app, template, hook) {
           assert.equal(response.description, tempProject.description);
 
           // Check that the response does not contain these properties.
-          not(response, ['__v', 'deleted', 'settings_encrypted']);
+          not(response, ['__v', 'deleted', 'settings_encrypted', 'primary']);
 
           template.project = response;
 
@@ -186,7 +186,7 @@ module.exports = function(app, template, hook) {
           assert.equal(response.description, template.project.description);
 
           // Check that the response does not contain these properties.
-          not(response, ['__v', 'deleted', 'settings_encrypted']);
+          not(response, ['__v', 'deleted', 'settings_encrypted', 'primary']);
 
           template.project = response;
 
@@ -541,7 +541,7 @@ module.exports = function(app, template, hook) {
           assert.equal(response.description, originalProject.description);
 
           // Check that the response does not contain these properties.
-          not(response, ['__v', 'deleted', 'settings_encrypted']);
+          not(response, ['__v', 'deleted', 'settings_encrypted', 'primary']);
 
           template.project = response;
 
