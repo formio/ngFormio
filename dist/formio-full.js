@@ -60758,8 +60758,6 @@ module.exports = function (app) {
                 }
                 $http.get(settings.data.url, options)
                   .then(function (data) {
-                    console.log(data);
-                    console.log('success');
                     $scope.selectItems = data;
                   });
               }
