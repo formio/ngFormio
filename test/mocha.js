@@ -490,10 +490,11 @@ describe('Bootstrap', function() {
             'user.password': template.formio.owner.data.password
           }
         })
-        .expect(200)
+        //.expect(200)
         .expect('Content-Type', /json/)
         .end(function(err, res) {
           if (err) {
+            console.log(error);
             return done(err);
           }
 
