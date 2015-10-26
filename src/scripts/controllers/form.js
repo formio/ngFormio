@@ -572,6 +572,15 @@ app.controller('FormActionEditController', [
         FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> The Role Assignment Action requires a Resource Form component with the API key, \'submission\', to modify existing Resource submissions.');
       }
 
+      // Hubspot action missing settings due to missing API key.
+      if(actionInfo && actionInfo.name === 'hubspotContact') {
+        var settingsComponent = FormioUtils.getComponent(actionInfo.settingsForm.components, 'settings');
+        if(!settingsComponent.components || settingsComponent.components.length == 1) {
+          FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> You have not yet configured your Hubspot API key. You can configure your Hubspot API key in your <a href="#/project/'+$scope.projectId+'/settings/hubspot">Project Settings</a>.');
+          $scope.formDisabled = true;
+        }
+      }
+
       // Hide role settings component as needed
       var toggleVisible = function(association) {
         if(!association) {
@@ -826,8 +835,8 @@ app.controller('FormSubmissionsController', [
                     default: type = 'string';
                   }
                   return [
-                    'data.' + component.key, // Key
-                    {                        // Value
+                    'data.' + component.key.replace(/\./g, '.data.'), // Key
+                    {                                                 // Value
                       type: type
                     }
                   ];
@@ -884,6 +893,26 @@ app.controller('FormSubmissionsController', [
               $http.get($scope.formio.submissionsUrl, {
                 params: params
               })
+              .then(function(result) {
+                // Fill in gaps in data so Kendo doesn't crash on missing nested fields
+                _(FormioUtils.flattenComponents($scope.form.components))
+                .filter($scope.tableView)
+                .each(function(component) {
+                  _.each(result.data, function(row) {
+                    var key = 'data.' + component.key.replace(/\./g, '.data.');
+                    var value = _.get(row, key);
+                    if(value === undefined) {
+                      // This looks like it does nothing but it ensures
+                      // that the path to the key is reachable by
+                      // creating objects that don't exist
+                      _.set(row, key, undefined);
+                    }
+                  });
+
+                })
+                .value();
+                return result;
+              })
               .then(options.success)
               .catch(function(err) {
                 FormioAlerts.onError(err);
@@ -911,8 +940,6 @@ app.controller('FormSubmissionsController', [
               break;
             // Filtering is not supported for these data types in resourcejs yet
             case 'address':
-            case 'checkbox':
-            case 'number':
             case 'resource':
             case 'signature':
               filterable = false;
@@ -920,7 +947,7 @@ app.controller('FormSubmissionsController', [
             default: filterable = true;
           }
           return {
-            field: 'data.' + component.key,
+            field: 'data.' + component.key.replace(/\./g, '.data.'),
             title: component.label || component.key,
             template: function(dataItem) {
               var value = Formio.fieldData(dataItem.data.toJSON(), component);
@@ -952,7 +979,6 @@ app.controller('FormSubmissionsController', [
               return value;
             },
             // Disabling sorting on embedded fields because it doesn't work in resourcejs yet
-            sortable: component.key.indexOf('.') === -1,
             width: '200px',
             filterable: filterable
           };

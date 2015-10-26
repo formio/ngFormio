@@ -48,7 +48,7 @@ angular
           url: '/auth',
           views: {
             '' : {
-              templateUrl: 'views/user/auth.html',
+              templateUrl: 'views/user/auth.html'
             },
             'login@auth': {
               templateUrl: 'views/user/login.html',
@@ -81,17 +81,19 @@ angular
         .state('profile', {
           abstract: true,
           url: '/profile',
-          templateUrl: 'views/user/profile/profile.html',
-          controller: 'ProfileController'
+          controller: 'ProfileController',
+          templateUrl: 'views/user/profile/profile.html'
         })
         .state('profile.view', {
           url: '/view',
           parent: 'profile',
+          controller: 'ProfileController',
           templateUrl: 'views/user/profile/profile-view.html'
         })
         .state('profile.edit', {
           url: '/edit',
           parent: 'profile',
+          controller: 'ProfileController',
           templateUrl: 'views/user/profile/profile-edit.html'
         })
         .state('project', {
