@@ -115,8 +115,8 @@ module.exports = function (app) {
                   };
                 }
                 $http.get(settings.data.url, options)
-                  .then(function (data) {
-                    $scope.selectItems = data;
+                  .then(function (result) {
+                    $scope.selectItems = result.data;
                   });
               }
               break;
