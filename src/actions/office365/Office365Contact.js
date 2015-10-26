@@ -2,8 +2,8 @@
 
 var _ = require('lodash');
 var util = require('./util');
-module.exports = function(router) {
 
+module.exports = function(router) {
   // The available fields.
   var office365Fields = {
     AssistantName: {
@@ -132,17 +132,18 @@ module.exports = function(router) {
   Office365ContactAction.info = function(req, res, next) {
     next(null, {
       name: 'office365contact',
-      title: 'Office 365 Contacts',
+      title: 'Office 365 Contacts (Premium)',
       description: 'Allows you to integrate into your Office 365 Contacts.',
+      premium: true,
       priority: 0,
       defaults: {
         handler: ['after'],
         method: ['create', 'update', 'delete']
       }
     });
-  }
-  Office365ContactAction.settingsForm = function(req, res, next) {
+  };
 
+  Office365ContactAction.settingsForm = function(req, res, next) {
     // Create the panel for all the fields.
     var fieldPanel = {
       type: 'panel',
@@ -175,11 +176,15 @@ module.exports = function(router) {
   /**
    * Execute the action.
    *
+   * @param handler
+   *   todo
+   * @param method
+   *   todo
    * @param req
    *   The Express request object.
    * @param res
    *   The Express response object.
-   * @param cb
+   * @param next
    *   The callback function to execute upon completion.
    */
   Office365ContactAction.prototype.resolve = function(handler, method, req, res, next) {

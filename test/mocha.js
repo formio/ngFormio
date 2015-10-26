@@ -14,6 +14,7 @@ var docker = process.env.DOCKER;
 var app = null;
 var template = null;
 var hook = require(path.join(_formio, 'src/util/hook'))({hooks: require('./hooks')});
+var _server = null;
 var ready;
 
 process.on('uncaughtException', function(err) {
@@ -23,6 +24,7 @@ process.on('uncaughtException', function(err) {
 if (!docker) {
   ready = require('./bootstrap')()
     .then(function(state) {
+      _server = state.server;
       app = state.app;
       template = state.template;
     });
@@ -578,7 +580,7 @@ describe('Bootstrap', function() {
         before(function() {
           if (!app.formio) return;
           // Override settings hook for formio tests
-          var originalSettingsHook = app.formio.hooks.settings;
+          originalSettingsHook = app.formio.hooks.settings;
           app.formio.hooks.settings = require('./formioHooks.js')(_test).settings;
         });
 
@@ -593,6 +595,7 @@ describe('Bootstrap', function() {
         require(path.join(_test, 'actions'))(app, template, formioHook);
         require(path.join(_test, 'submission'))(app, template, formioHook);
         require(path.join(_test, 'oauth'))(app, template, formioHook);
+        require('./analytics')(app, template, formioHook);
       });
 
       describe('Formio-Server tests that depend on Formio tests', function() {
@@ -603,9 +606,6 @@ describe('Bootstrap', function() {
         });
         require('./misc')(app, template, hook);
       });
-
     });
   });
-
-
 });

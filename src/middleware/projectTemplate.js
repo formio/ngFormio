@@ -3,6 +3,7 @@
 var request = require('request');
 var _ = require('lodash');
 var jwt = require('jsonwebtoken');
+var debug = require('debug')('formio:middleware:projectTemplate');
 
 module.exports = function(formio) {
   return function(req, res, next) {
@@ -19,10 +20,10 @@ module.exports = function(formio) {
 
     // Update the owner of the Project, and give them the Administrator Role.
     var updateProjectOwner = function(template, adminRoles) {
-
       // Find the Project owner by id, and add the administrator role of this Project to their roles.
       formio.resources.submission.model.findOne({_id: project.owner, deleted: {$eq: null}}, function(err, owner) {
         if (err) {
+          debug(err);
           return next(err);
         }
 
@@ -37,16 +38,18 @@ module.exports = function(formio) {
         });
 
         var roles = owner.roles;
-        owner.save(function(saveErr) {
-          if (saveErr) {
-            return next(saveErr);
+        owner.save(function(err) {
+          if (err) {
+            debug(err);
+            return next(err);
           }
 
           // Update the users jwt token to reflect the user role changes.
           var token = formio.util.getHeader(req, 'x-jwt-token');
-          jwt.verify(token, formio.config.jwt.secret, function(error, decoded) {
-            if (error) {
-              return next(error);
+          jwt.verify(token, formio.config.jwt.secret, function(err, decoded) {
+            if (err) {
+              debug(err);
+              return next(err);
             }
 
             // Add the user roles to the token.
@@ -70,7 +73,6 @@ module.exports = function(formio) {
 
     // Update the Project and attach the anonymous role as the default Role.
     var updateProject = function(template) {
-
       // Give the project owner all the administrator roles.
       var adminRoles = [];
       _.each(template.roles, function(role) {
@@ -90,6 +92,7 @@ module.exports = function(formio) {
       // Save the project.
       project.save(function(err) {
         if (err) {
+          debug(err);
           return next(err);
         }
 
@@ -100,6 +103,8 @@ module.exports = function(formio) {
 
     // Method to import the template.
     var importTemplate = function(template) {
+      var _debug = require('debug')('formio:middleware:projectTemplate#importTemplate');
+      _debug(template);
 
       // Import the template within formio.
       formio.import.template(template, {
@@ -111,8 +116,9 @@ module.exports = function(formio) {
           item.project = project._id;
           return item;
         }
-      }, function(err) {
+      }, function(err, template) {
         if (err) {
+          _debug(err);
           return next('An error occurred with the template import.');
         }
 
@@ -122,20 +128,20 @@ module.exports = function(formio) {
     };
 
     // Allow external templates.
+    debug('template: ' + template + ', typeof ' + typeof template);
     if (typeof template === 'object') {
-
       // Import the template.
       importTemplate(template);
     }
-
     // Allow templates from http://help.form.io/templates.
     else if (template.indexOf('http://help.form.io/templates') === 0) {
       request({
         url: template,
         json: true
-      }, function (err, response, body) {
+      }, function(err, response, body) {
         if (err) {
-          return next(err.message);
+          debug(err);
+          return next(err.message || err);
         }
 
         if (response.statusCode !== 200) {
@@ -144,17 +150,14 @@ module.exports = function(formio) {
 
         // Import the template.
         importTemplate(body);
-      })
+      });
     }
-
     // Check for template that is already provided.
     else if (formio.templates.hasOwnProperty(template)) {
-
       // Import the template.
       importTemplate(formio.templates[template]);
     }
     else {
-
       // Unknown template.
       return next('Unknown template.');
     }

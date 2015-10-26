@@ -31,6 +31,12 @@ module.exports = function(formio) {
         index: true,
         default: null
       },
+      plan: {
+        type: String,
+        enum: ['community', 'basic', 'team1', 'team2', 'team3'],
+        default: 'community',
+        index: true
+      },
       primary: {
         type: Boolean,
         default: false

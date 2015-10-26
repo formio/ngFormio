@@ -17,6 +17,8 @@ module.exports = function(router, formio) {
     formio.middleware.filterResourcejsResponse(['settings']).call(this, req, res, next);
   };
 
+  // Load the project plan filter for use.
+  formio.middleware.projectPlanFilter = require('../middleware/projectPlanFilter')(formio);
   var hiddenFields = ['deleted', '__v', 'primary'];
 
   var resource = Resource(
@@ -42,7 +44,8 @@ module.exports = function(router, formio) {
         next();
       },
       formio.middleware.bootstrapEntityOwner(false),
-      formio.middleware.condensePermissionTypes
+      formio.middleware.condensePermissionTypes,
+      formio.middleware.projectPlanFilter
     ],
     afterPost: [
       require('../middleware/projectTemplate')(formio),
@@ -59,7 +62,8 @@ module.exports = function(router, formio) {
     ],
     beforePut: [
       formio.middleware.filterMongooseExists({field: 'deleted', isNull: true}),
-      formio.middleware.condensePermissionTypes
+      formio.middleware.condensePermissionTypes,
+      formio.middleware.projectPlanFilter
     ],
     afterPut: [
       formio.middleware.filterResourcejsResponse(hiddenFields),

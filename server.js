@@ -5,12 +5,16 @@ var config = require('./config');
 var jslogger = require('jslogger')({key: config.jslogger});
 var express = require('express');
 var nunjucks = require('nunjucks');
-var debug = require('debug')('formio:permissions');
+var debug = require('debug')('formio:server');
 var _ = require('lodash');
 var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
 var app = express();
 var favicon = require('serve-favicon');
+var analytics = require('./src/analytics/index')(config);
+
+// Hook each request and add analytics support.
+app.use(analytics.hook);
 
 // Redirect all root traffic to www
 app.use(function(req, res, next) {
@@ -44,6 +48,11 @@ app.use(function(err, req, res, next) {
 
 // Create the formio server.
 var formioServer = require('formio')(config.formio);
+
+// Attach the analytics to the formio server and attempt to connect.
+formioServer.analytics = analytics;
+// Try the connection on server start.
+formioServer.analytics.connect();
 
 // Configure nunjucks.
 nunjucks.configure('views', {
@@ -109,10 +118,11 @@ if (config.gaTid) {
   });
 }
 
+// Hook the app and bootstrap the formio hooks.
 var settings = require('./src/hooks/settings')(app, formioServer);
+
 // Start the api server.
 formioServer.init(settings).then(function(formio) {
-
   // The formio app sanity endpoint.
   app.get('/health', function(req, res, next) {
     if (!formio.resources) {
@@ -147,6 +157,7 @@ process.on('uncaughtException', function(err) {
     message: err.message,
     stacktrace: err.stack
   });
+
   // Give jslogger time to log before exiting.
   setTimeout(function() {
     process.exit(1);

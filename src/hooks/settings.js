@@ -13,6 +13,9 @@ module.exports = function(app, formioServer) {
   // Include the request cache.
   var cache = require('../cache/cache')(formioServer.formio);
 
+  // Attach the project plans to the formioServer
+  formioServer.formio.plans = require('../plans/index')(formioServer, cache);
+
   return {
     settings: function (settings, req, cb) {
       if (!req.projectId) {
@@ -89,7 +92,6 @@ module.exports = function(app, formioServer) {
         return _.assign(resources, require('../resources/resources')(app, formioServer.formio));
       },
       models: function (models) {
-
         // Add the project to the form schema.
         models.form.schema.add({
           project: {
@@ -161,50 +163,53 @@ module.exports = function(app, formioServer) {
         var _debug = require('debug')('formio:settings:getAccess');
 
         // Get the permissions for an Project with the given ObjectId.
-        handlers.unshift(function getProjectAccess(callback) {
-          // Build the access object for this project.
-          access.project = {};
+        handlers.unshift(
+          formioServer.formio.plans.checkRequest(req, res),
+          function getProjectAccess(callback) {
+            // Build the access object for this project.
+            access.project = {};
 
-          // Skip project access if no projectId was given.
-          if (!req.projectId) {
-            return callback(null, access);
-          }
-
-          // Load the project.
-          cache.loadProject(req, req.projectId, function(err, project) {
-            if (err) {
-              _debug(err);
-              return callback(err);
-            }
-            if (!project) {
-              _debug('No project found with projectId: ' + req.projectId);
-              return callback('No project found with projectId: ' + req.projectId);
+            // Skip project access if no projectId was given.
+            if (!req.projectId) {
+              return callback(null, access);
             }
 
-            // Store the Project Owners UserId, because they will have all permissions.
-            if (project.owner) {
-              access.project.owner = project.owner.toString();
+            // Load the project.
+            cache.loadProject(req, req.projectId, function(err, project) {
+              if (err) {
+                _debug(err);
+                return callback(err);
+              }
+              if (!project) {
+                _debug('No project found with projectId: ' + req.projectId);
+                return callback('No project found with projectId: ' + req.projectId);
+              }
 
-              // Add the UserId of the Project Owner for the ownerFilter middleware.
-              req.projectOwner = access.project.owner;
-            }
+              // Store the Project Owners UserId, because they will have all permissions.
+              if (project.owner) {
+                access.project.owner = project.owner.toString();
 
-            // Add the other defined access types.
-            if (project.access) {
-              project.access.forEach(function (permission) {
-                access.project[permission.type] = access.project[permission.type] || [];
+                // Add the UserId of the Project Owner for the ownerFilter middleware.
+                req.projectOwner = access.project.owner;
+              }
 
-                // Convert the roles from BSON to comparable strings.
-                permission.roles.forEach(function (id) {
-                  access.project[permission.type].push(id.toString());
+              // Add the other defined access types.
+              if (project.access) {
+                project.access.forEach(function (permission) {
+                  access.project[permission.type] = access.project[permission.type] || [];
+
+                  // Convert the roles from BSON to comparable strings.
+                  permission.roles.forEach(function (id) {
+                    access.project[permission.type].push(id.toString());
+                  });
                 });
-              });
-            }
+              }
 
-            // Pass the access of this project to the next function.
-            return callback(null);
-          });
-        });
+              // Pass the access of this project to the next function.
+              return callback(null);
+            });
+          }
+        );
         return handlers;
       },
       accessEntity: function (entity, req) {
