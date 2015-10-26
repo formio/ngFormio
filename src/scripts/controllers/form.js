@@ -558,6 +558,15 @@ app.controller('FormActionEditController', [
         }
       }
 
+      // Hubspot action missing settings due to missing API key.
+      if(actionInfo && actionInfo.name === 'hubspotContact') {
+        var settingsComponent = FormioUtils.getComponent(actionInfo.settingsForm.components, 'settings');
+        if(!settingsComponent.components || settingsComponent.components.length == 1) {
+          FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> You have not yet configured your Hubspot API key. You can configure your Hubspot API key in your <a href="#/project/'+$scope.projectId+'/settings/hubspot">Project Settings</a>.');
+          $scope.formDisabled = true;
+        }
+      }
+
       // Hide role settings component as needed
       var toggleVisible = function(association) {
         if(!association) {
