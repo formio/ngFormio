@@ -240,7 +240,7 @@ app.controller('FormController', [
           }), 'name');
 
           $scope.hasPremAction = _.some(actions, function(action) {
-            return (action.hasOwnProperty('name') && action.name && premium.indexOf(action.name) !== -1)
+            return (action.hasOwnProperty('name') && action.name && premium.indexOf(action.name) !== -1);
           });
         });
 
