@@ -1,7 +1,7 @@
 {
-  "title": "Admin",
+  "title": "Formio",
   "description": "The admin project template for docker installs.",
-  "name": "admin",
+  "name": "formio",
   "primary": true,
   "roles": {
     "administrator": {
@@ -24,11 +24,11 @@
     }
   },
   "forms": {
-    "adminLogin": {
-      "title": "Admin Login",
+    "userLogin": {
+      "title": "User Login",
       "type": "form",
-      "name": "adminLogin",
-      "path": "login",
+      "name": "userLogin",
+      "path": "user/login",
       "components": [
         {
           "input": true,
@@ -36,7 +36,7 @@
           "inputType": "email",
           "label": "Email",
           "lockKey": true,
-          "key": "admin.email",
+          "key": "user.email",
           "placeholder": "Enter your email address",
           "prefix": "",
           "suffix": "",
@@ -52,7 +52,7 @@
           "inputType": "password",
           "label": "Password",
           "lockKey": true,
-          "key": "admin.password",
+          "key": "user.password",
           "placeholder": "Enter your password.",
           "prefix": "",
           "suffix": "",
@@ -97,7 +97,7 @@
     "action0": {
       "title": "Role Assignment",
       "name": "role",
-      "form": "admin",
+      "form": "user",
       "settings": {
         "association": "new",
         "type": "add",
@@ -114,11 +114,11 @@
     "action1": {
       "title": "Authentication",
       "name": "auth",
-      "form": "adminLogin",
+      "form": "userLogin",
       "settings": {
         "association": "existing",
-        "password": "admin.password",
-        "username": "admin.email"
+        "password": "user.password",
+        "username": "user.email"
       },
       "priority": 0,
       "method": [
@@ -130,11 +130,11 @@
     }
   },
   "resources": {
-    "admin": {
-      "title": "Admin",
+    "user": {
+      "title": "User",
       "type": "resource",
-      "name": "admin",
-      "path": "admin",
+      "name": "user",
+      "path": "user",
       "components": [
         {
           "input": true,

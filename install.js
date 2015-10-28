@@ -15,10 +15,10 @@ module.exports = function(formio, done) {
 
   var steps = {
     readJson: function(done) {
-      console.log(' > Setting up admin project.');
+      console.log(' > Setting up formio project.');
 
       try {
-        fs.readFile('./deployment/import/admin.json', function(err, data) {
+        fs.readFile('./deployment/import/formio.json', function(err, data) {
           if (err) { return done(err); }
           template = JSON.parse(data);
           done();
@@ -38,7 +38,7 @@ module.exports = function(formio, done) {
         return project;
       }
 
-      console.log(' > Importing admin project.');
+      console.log(' > Importing formio project.');
       importer.project = importer.createInstall(formio.mongoose.models.project, parseProject);
       var items = [''];
       importer.project(template, items, function(err) {
@@ -75,7 +75,7 @@ module.exports = function(formio, done) {
 
         // Create the root user submission.
         formio.resources.submission.model.create({
-          form: template.resources.admin._id,
+          form: template.resources.user._id,
           data: {
             email: process.env.ADMIN_EMAIL,
             password: hash
@@ -139,7 +139,7 @@ module.exports = function(formio, done) {
       return done(err);
     }
 
-    console.log(' > Finished setting up admin project.');
+    console.log(' > Finished setting up formio project.');
     done();
   });
 
