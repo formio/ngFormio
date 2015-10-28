@@ -440,14 +440,14 @@ module.exports = function(app, template, hook) {
       request(app)
         .delete('/project/' + template.project._id)
         .set('x-jwt-token', template.formio.owner.token)
-        .expect(204)
+        .expect(200)
         .end(function(err, res) {
           if (err) {
             return done(err);
           }
 
-          var response = res.text;
-          assert.equal(response, '');
+          var response = res.body;
+          assert.deepEqual(response, {});
 
           // Store the JWT for future API calls.
           template.formio.owner.token = res.headers['x-jwt-token'];

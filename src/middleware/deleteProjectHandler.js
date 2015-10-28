@@ -26,7 +26,7 @@ module.exports = function(formio) {
       }
 
       debug('Complete');
-      return res.sendStatus(204);
+      return res.sendStatus(200);
     });
   };
 };
