@@ -8,6 +8,7 @@ var debug = {
 var config = {formio: {}};
 var protocol = process.env.PROTOCOL || 'https';
 var project = process.env.PROJECT || 'formio';
+var plan = process.env.PROJECT_PLAN || 'community';
 
 config.reservedSubdomains = ['test', 'www', 'api', 'help', 'support', 'portal'];
 config.formio.reservedForms = ['submission', 'export', 'role', 'current', 'logout', 'import', 'form'];
@@ -40,6 +41,7 @@ config.port = port;
 config.host = host;
 
 config.project = project;
+config.plan = plan;
 config.apiHost = apiHost;
 config.formio.apiHost = apiHost;
 config.formioHost = formioHost;
@@ -93,7 +95,7 @@ config.jslogger = process.env.JS_LOGGER || 123;
 // Allow the config to be displayed when debugged.
 var sanitized = _.clone(config, true);
 sanitized = _.pick(sanitized, [
-  'https', 'domain', 'port', 'host', 'project', 'formioHost', 'apiHost', 'debug'
+  'https', 'domain', 'port', 'host', 'project', 'plan', 'formioHost', 'apiHost', 'debug'
 ]);
 sanitized.formio = _.pick(_.clone(config.formio), ['domain', 'schema', 'mongo']);
 

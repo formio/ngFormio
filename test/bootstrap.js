@@ -11,6 +11,7 @@ var express = require('express');
 var app = express();
 var debug = require('debug')('formio:server');
 var analytics = require('../src/analytics/index')(config);
+var _ = require('lodash');
 
 // Build the paths for bootstrapping the formio test suite.
 var _formio = path.dirname(require.resolve('formio'));
@@ -40,6 +41,9 @@ module.exports = function() {
 
   // Bootstrap the formio test environment.
   var _server = require('formio')(config.formio);
+
+  // Attach the formio-server config.
+  _server.config = _.omit(config, 'formio');
 
   // Attach the analytics to the formio server.
   _server.analytics = analytics;

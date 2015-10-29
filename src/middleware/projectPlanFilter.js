@@ -56,7 +56,7 @@ module.exports = function(formio) {
 
       debug(plan);
       switch (plan.toString()) {
-        case 'formio':
+        case 'commercial':
         case 'team3':
         case 'team2':
         case 'team1':
