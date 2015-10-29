@@ -11,6 +11,8 @@ nunjucks.configure([], {
 var request = require('request');
 var Q = require('q');
 
+var qRequest = Q.denodeify(request);
+
 module.exports = {
   /**
    * The baseUrl for Office 365 API.
@@ -27,15 +29,20 @@ module.exports = {
    * @param payload
    * @returns {Promise.<T>|*}
    */
-  request: function(router, req, res, resource, type, payload) {
+  request: function(router, req, res, resource, type, authType, payload) {
 
     // Store the current resource.
     var currentResource = res.resource;
 
     // Connect to Office 365.
-    return this.connect(router, req).then(function(connection) {
-      var deferred = Q.defer();
-
+    var connectPromise;
+    if(authType === 'application') {
+      connectPromise = this.connectWithCertificate(router, req);
+    }
+    else {
+      connectPromise = this.connectWithOAuth(router, req, res);
+    }
+    return connectPromise.then(function(connection) {
       // The URL to request.
       var url = this.baseUrl + "/api/v1.0/users('" + connection.settings.office365.email + "')/" + resource;
       var externalId = '';
@@ -58,82 +65,66 @@ module.exports = {
       }
 
       // Perform the request.
-      request({
+      qRequest({
         url: url,
         method: method,
         json: true,
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + connection.response.accessToken,
+          'Authorization': 'Bearer ' + connection.accessToken,
           'User-Agent': 'form.io/1.0',
           'client-request-id': uuid.v4(),
           'return-client-request-id': true,
           'Date': (new Date()).toUTCString()
         },
         body: payload
-      }, function(error, response, body) {
-
-        // Reject the promise if an error occured.
-        if (error) {
-          return deferred.reject(error);
-        }
-        if (!response) {
-          return deferred.reject(new Error('No response from Office 365.'));
-        }
-
+      })
+      .spread(function(response, body) {
         // Make sure we have a body.
-        if (response.body) {
+        if (!body) {
+          throw new Error('No response from Office 365');
+        }
 
-          // Reject if the body says we have an error.
-          if (response.body.hasOwnProperty('error') && response.body.error) {
-            return deferred.reject(response.body.error);
-          }
+        // Reject if the body says we have an error.
+        if (body.error) {
+          throw body.error;
+        }
 
-          // Only add an externalId if none is provided.
-          if ((req.method === 'POST') && !externalId && response.body.Id) {
+        // Only add an externalId if none is provided.
+        if ((req.method === 'POST') && !externalId && body.Id) {
 
-            // Update the resource with the external Id.
-            router.formio.resources.submission.model.update({
-              _id: currentResource.item._id
-            }, {
-              $push: {
-                externalIds: {
-                  type: type,
-                  id: response.body.Id
-                }
+          // Update the resource with the external Id.
+          return router.formio.resources.submission.model.update({
+            _id: currentResource.item._id
+          }, {
+            $push: {
+              externalIds: {
+                type: type,
+                id: body.Id
               }
-            }, function (err, result) {
-              if (err) {
-                return deferred.reject(err);
-              }
-            });
-          }
+            }
+          });
         }
       });
-
-      return deferred.promise;
     }.bind(this));
   },
 
   /**
-   * Connect to Office 365 and provide a token.
+   * Connect to Office 365 with client certificate and provide a token.
    *
    * @param router
    * @param req
    * @returns {*}
    */
-  connect: function(router, req) {
+  connectWithCertificate: function(router, req) {
     if (req.o365) {
-      return req.o365.promise;
+      return req.o365;
     }
 
-    req.o365 = Q.defer();
-    router.formio.hook.settings(req, function(err, settings) {
-      if (err) {
-        return req.o365.reject(err);
-      }
+    req.o365 = Q.ninvoke(router.formio.hook, 'settings', req)
+    .then(function(settings) {
       if (!settings) {
-        return req.o365.reject('No settings found.');
+        throw 'No settings found.';
       }
       if (
         !settings.office365 ||
@@ -142,31 +133,63 @@ module.exports = {
         !settings.office365.cert ||
         !settings.office365.thumbprint
       ) {
-        return req.o365.reject('Office 365 Not configured.');
+        throw 'Office 365 Not configured.';
       }
 
       // Create the AuthenticationContext.
       var context = new AuthenticationContext('https://login.windows.net/' + settings.office365.tenant);
 
-      // Authenticate to Office 365.
-      context.acquireTokenWithClientCertificate(
+        // Authenticate to Office 365.
+      return Q.ninvoke(context, 'acquireTokenWithClientCertificate',
         this.baseUrl + '/',
         settings.office365.clientId,
         settings.office365.cert,
-        settings.office365.thumbprint,
-        function (err, response) {
-          if (err) {
-            return req.o365.reject(err);
-          }
-
-          req.o365.resolve({
-            settings: settings,
-            response: response
-          });
-        }
-      );
+        settings.office365.thumbprint
+      )
+      .then(function(result) {
+        return {
+          settings: settings,
+          accessToken: result.accessToken
+        };
+      });
     }.bind(this));
-    return req.o365.promise;
+
+    return req.o365;
+  },
+
+  /**
+   * Get current user's oauth access token
+   *
+   * @param router
+   * @param req
+   * @param res
+   * @returns {*}
+   */
+  connectWithOAuth: function(router, req, res) {
+    var token = req.token;
+    if(!token) {
+      return Q.reject('Must be logged in to connect with Office 365 via OAuth.');
+    }
+    if (req.o365) {
+      return req.o365;
+    }
+
+    req.o365 = Q.all([
+      router.formio.oauth.getUserToken(req, res, 'office365', token.user._id),
+      Q.ninvoke(router.formio.hook, 'settings', req)
+    ])
+    .spread(function(accessToken, settings) {
+      return {
+        accessToken: accessToken,
+        settings: settings
+      }
+    })
+    .catch(function(err) {
+      console.error(err);
+      throw err
+    });
+
+    return req.o365;
   },
 
   /**

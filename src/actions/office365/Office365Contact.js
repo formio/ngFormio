@@ -170,7 +170,36 @@ module.exports = function(router) {
       });
     });
 
-    next(null, [fieldPanel]);
+    next(null, [
+      {
+        type: 'select',
+        input: true,
+        label: 'Authentication Method',
+        key: 'settings[authType]',
+        placeholder: 'Select the method of authentication to use.',
+        template: '<span>{{ item.title }}</span>',
+        defaultValue: 'application',
+        dataSrc: 'json',
+        data: {
+          json: JSON.stringify([
+            {
+              type: 'delegated',
+              title: 'OAuth Delegated'
+            },
+            {
+              type: 'application',
+              title: 'Application Certificate'
+            }
+          ])
+        },
+        valueProperty: 'type',
+        multiple: false,
+        validate: {
+          required: true
+        }
+      },
+      fieldPanel
+    ]);
   };
 
   /**
@@ -194,6 +223,9 @@ module.exports = function(router) {
     if (!this.settings) {
       return next();
     }
+
+    // Default authType to 'application'
+    var authType = this.settings.authType || 'application';
 
     // Only add the payload for post and put.
     if (req.method === 'POST' || req.method === 'PUT') {
@@ -232,7 +264,7 @@ module.exports = function(router) {
     }
 
     // Perform the request.
-    util.request(router, req, res, 'contacts', 'Office365Contact', payload);
+    util.request(router, req, res, 'contacts', 'Office365Contact', authType,  payload);
 
     // Move onto the next middleware.
     next();
