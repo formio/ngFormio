@@ -51,6 +51,7 @@ module.exports = function (app) {
         'placeholder="{{ component.placeholder }}" ' +
         'custom-validator="component.validate.custom" ' +
         'ui-mask="{{ component.inputMask }}" ' +
+        'ui-mask-placeholder="" ' + // avoids regular placeholder mixing with mask placeholder
         'ui-options="uiMaskOptions" ' +
         '>'
       ));

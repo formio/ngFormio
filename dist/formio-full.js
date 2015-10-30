@@ -55215,6 +55215,7 @@ module.exports = function (app) {
         'placeholder="{{ component.placeholder }}" ' +
         'custom-validator="component.validate.custom" ' +
         'ui-mask="{{ component.inputMask }}" ' +
+        'ui-mask-placeholder="" ' + // avoids regular placeholder mixing with mask placeholder
         'ui-options="uiMaskOptions" ' +
         '>'
       ));
@@ -55929,6 +55930,7 @@ module.exports = function (app) {
         'custom-validator="component.validate.custom" ' +
         'placeholder="{{ component.placeholder }}" ' +
         'ui-mask="{{ component.inputMask }}" ' +
+        'ui-mask-placeholder="" ' +
         'ui-options="uiMaskOptions" ' +
         '>'
       ));
