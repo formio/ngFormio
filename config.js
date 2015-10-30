@@ -4,11 +4,10 @@ var _ = require('lodash');
 var debug = {
   config: require('debug')('formio:config')
 };
-
 var config = {formio: {}};
 var protocol = process.env.PROTOCOL || 'https';
 var project = process.env.PROJECT || 'formio';
-var plan = process.env.PROJECT_PLAN || 'community';
+var plan = process.env.PROJECT_PLAN || 'commercial';
 
 config.reservedSubdomains = ['test', 'www', 'api', 'help', 'support', 'portal'];
 config.formio.reservedForms = ['submission', 'export', 'role', 'current', 'logout', 'import', 'form'];

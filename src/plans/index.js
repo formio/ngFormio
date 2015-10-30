@@ -16,7 +16,7 @@ module.exports = function(formioServer, cache) {
     commercial: Number.MAX_VALUE
   };
 
-  var basePlan = formioServer.config.plan || 'community';
+  var basePlan = formioServer.config.plan || 'commercial';
   debug.plans('Base Plan: ' + basePlan);
 
   /**
