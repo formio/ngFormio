@@ -3,6 +3,7 @@ var app = angular.module('formio', [
   'ui.bootstrap',
   'ui.bootstrap.datetimepicker',
   'ui.select',
+  'ui.mask',
   'angularMoment',
   'bgf.paginateAnything'
 ]);
@@ -34,8 +35,6 @@ app.directive('formioSubmissions', require('./directives/formioSubmissions'));
 app.directive('formioComponent', require('./directives/formioComponent'));
 
 app.directive('formioElement', require('./directives/formioElement'));
-
-app.directive('formioInputMask', require('./directives/formioInputMask'));
 
 /**
  * Filter to flatten form components.

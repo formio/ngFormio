@@ -50,7 +50,9 @@ module.exports = function (app) {
         'step="{{ component.validate.step }}" ' +
         'placeholder="{{ component.placeholder }}" ' +
         'custom-validator="component.validate.custom" ' +
-        'formio-input-mask="{{ component.inputMask }}">'
+        'ui-mask="{{ component.inputMask }}" ' +
+        'ui-options="uiMaskOptions" ' +
+        '>'
       ));
     }
   ]);
