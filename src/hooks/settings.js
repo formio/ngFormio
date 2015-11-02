@@ -445,6 +445,9 @@ module.exports = function(app, formioServer) {
           if (err) { return done(err); }
           done(null, form.machineName + ':' + machineName);
         });
+      },
+      machineNameExport: function(machineName) {
+        return machineName.split(':').slice(-1)[0];
       }
     }
   }
