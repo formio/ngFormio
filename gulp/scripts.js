@@ -5,23 +5,23 @@ module.exports = function(gulp, plugins, watch) {
     var bundle = plugins.browserify({
       entries: './src/formio.js',
       transform: ['strictify'],
-      debug: true
+      debug: watch
     });
 
     var build = function() {
       return bundle
         .bundle()
+        .pipe(plugins.source('formio.js'))
+        .pipe(gulp.dest('dist/'))
+        .pipe(plugins.if(!watch, plugins.combine(
+          plugins.rename('formio.min.js'),
+          plugins.streamify(plugins.uglify()),
+          gulp.dest('dist/')
+        )))
         .on('error', function(err){
           console.log(err);
           this.emit('end');
-        })
-        .pipe(plugins.source('formio.js'))
-        .pipe(gulp.dest('dist/'))
-        .pipe(plugins.if(!watch,
-          plugins.rename('formio.min.js')
-          .pipe(plugins.streamify(plugins.uglify()))
-          .pipe(gulp.dest('dist/'))
-        ));
+        });
     };
 
     if(watch) {
