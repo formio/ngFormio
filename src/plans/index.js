@@ -1,6 +1,7 @@
 'use strict';
 
 var debug = {
+  plans: require('debug')('formio:plans'),
   checkRequest: require('debug')('formio:plans:checkRequest'),
   getPlan: require('debug')('formio:plans:getPlan')
 };
@@ -11,8 +12,12 @@ module.exports = function(formioServer, cache) {
     basic: 10000,
     team1: 250000,
     team2: 500000,
-    team3: 2000000
+    team3: 2000000,
+    commercial: Number.MAX_VALUE
   };
+
+  var basePlan = formioServer.config.plan || 'commercial';
+  debug.plans('Base Plan: ' + basePlan);
 
   /**
    * Get the plan for the project in the request.
@@ -29,7 +34,7 @@ module.exports = function(formioServer, cache) {
     // Ignore project plans, if not interacting with a project.
     if (!req.projectId) {
       debug.getPlan('No project given.');
-      return next(null, 'community');
+      return next(null, basePlan);
     }
 
     cache.loadProject(req, req.projectId, function(err, project) {
@@ -38,9 +43,9 @@ module.exports = function(formioServer, cache) {
         return next(err || 'Project not found.');
       }
 
-      if (project.hasOwnProperty('name') && project.name && project.name === 'formio') {
-        debug.getPlan('formio');
-        return next(null, 'formio', project);
+      if (project.hasOwnProperty('primary') && project.primary === true) {
+        debug.getPlan('commercial');
+        return next(null, 'commercial', project);
       }
 
       // Only allow plans defined within the limits definition.
@@ -49,9 +54,9 @@ module.exports = function(formioServer, cache) {
         return next(null, project.plan, project);
       }
 
-      // Default the project to the community plan if not defined in the limits.
-      debug.getPlan('community');
-      return next(null, 'community', project);
+      // Default the project to the basePlan plan if not defined in the limits.
+      debug.getPlan(basePlan);
+      return next(null, basePlan, project);
     });
   };
 
