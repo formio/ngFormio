@@ -5,6 +5,7 @@ var plugins = require('gulp-load-plugins')();
 plugins.source = require('vinyl-source-stream');
 plugins.browserify = require('browserify');
 plugins.watchify = require('watchify');
+plugins.combine = require('stream-combiner2');
 
 gulp.task('clean', require('del').bind(null, ['dist']));
 gulp.task('jshint', require('./gulp/jshint')(gulp, plugins));
