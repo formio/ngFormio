@@ -131,14 +131,7 @@ module.exports = function (app) {
           key: 'selectField',
           placeholder: '',
           data: {
-            values: [{
-              value: 'value1',
-              label: 'Value 1'
-            },
-              {
-                value: 'value2',
-                label: 'Value 2'
-              }],
+            values: [],
             json: '',
             url: ''
           },

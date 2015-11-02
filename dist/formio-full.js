@@ -55627,14 +55627,7 @@ module.exports = function (app) {
           key: 'selectField',
           placeholder: '',
           data: {
-            values: [{
-              value: 'value1',
-              label: 'Value 1'
-            },
-              {
-                value: 'value2',
-                label: 'Value 2'
-              }],
+            values: [],
             json: '',
             url: ''
           },
@@ -55930,7 +55923,7 @@ module.exports = function (app) {
         'custom-validator="component.validate.custom" ' +
         'placeholder="{{ component.placeholder }}" ' +
         'ui-mask="{{ component.inputMask }}" ' +
-        'ui-mask-placeholder="" ' +
+        'ui-mask-placeholder="" ' + // avoids regular placeholder mixing with mask placeholder
         'ui-options="uiMaskOptions" ' +
         '>'
       ));
