@@ -35,6 +35,18 @@ module.exports = [
           $http
         ) {
 
+          // Options to match jquery.maskedinput masks
+          $scope.uiMaskOptions = {
+            maskDefinitions: {
+              '9': /\d/,
+              'a': /[a-zA-Z]/,
+              '*': /[a-zA-Z0-9]/
+            },
+            clearOnBlur: false,
+            eventsToHandle: ['input', 'keyup', 'click', 'focus'],
+            silentEvents: ['click', 'focus']
+          };
+
           $scope.resetForm = function() {
             // Manually remove each key so we don't lose a reference to original
             // data in child scopes.

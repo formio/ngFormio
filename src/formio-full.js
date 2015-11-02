@@ -1,5 +1,5 @@
 global.jQuery = require('jquery');
-require('jquery.maskedinput/src/jquery.maskedinput');
+require('angular-ui-mask');
 require('angular');
 require('angular-ui-select/select');
 require('angular-paginate-anything');

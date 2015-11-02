@@ -53,7 +53,10 @@ module.exports = function (app) {
         'ng-pattern="component.validate.pattern" ' +
         'custom-validator="component.validate.custom" ' +
         'placeholder="{{ component.placeholder }}" ' +
-        'formio-input-mask="{{ component.inputMask }}">'
+        'ui-mask="{{ component.inputMask }}" ' +
+        'ui-mask-placeholder="" ' + // avoids regular placeholder mixing with mask placeholder
+        'ui-options="uiMaskOptions" ' +
+        '>'
       ));
     }
   ]);
