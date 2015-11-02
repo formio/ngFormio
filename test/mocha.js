@@ -92,7 +92,7 @@ describe('Bootstrap', function() {
 
       // Remove all test documents for roles.
       var dropRoles = function() {
-        dropDocuments(app.formio.roles.resource.model, done);
+        dropDocuments(app.formio.resources.role.model, done);
       };
 
       // Remove all test documents for actions.
@@ -418,7 +418,7 @@ describe('Bootstrap', function() {
           admin: false
         };
 
-        storeDocument(app.formio.roles.resource.model, 'roleAnonymous', setDefaultProjectAccess);
+        storeDocument(app.formio.resources.role.model, 'roleAnonymous', setDefaultProjectAccess);
       };
 
       // Create the initial authenticated role for Form.io.
@@ -431,7 +431,7 @@ describe('Bootstrap', function() {
           admin: false
         };
 
-        storeDocument(app.formio.roles.resource.model, 'roleAuthenticated', createRoleAnonymous);
+        storeDocument(app.formio.resources.role.model, 'roleAuthenticated', createRoleAnonymous);
       };
 
       // Create the initial adminstrator role for Form.io.
@@ -444,7 +444,7 @@ describe('Bootstrap', function() {
           admin: true
         };
 
-        storeDocument(app.formio.roles.resource.model, 'roleAdministrator', createRoleAuthenticated);
+        storeDocument(app.formio.resources.role.model, 'roleAdministrator', createRoleAuthenticated);
       };
 
       // Create the initial Project for Form.io.

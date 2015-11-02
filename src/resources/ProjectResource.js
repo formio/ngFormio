@@ -19,7 +19,7 @@ module.exports = function(router, formio) {
 
   // Load the project plan filter for use.
   formio.middleware.projectPlanFilter = require('../middleware/projectPlanFilter')(formio);
-  var hiddenFields = ['deleted', '__v', 'primary'];
+  var hiddenFields = ['deleted', '__v', 'machineName', 'primary'];
 
   var resource = Resource(
     router,
@@ -66,6 +66,7 @@ module.exports = function(router, formio) {
       formio.middleware.projectPlanFilter
     ],
     afterPut: [
+      require('../middleware/projectTemplate')(formio),
       formio.middleware.filterResourcejsResponse(hiddenFields),
       removeProjectSettings
     ],

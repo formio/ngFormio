@@ -59,6 +59,14 @@ module.exports = function(formio, done) {
         form: function(form) {
           form.project = project._id;
           return form;
+        },
+        roleQuery: function(query) {
+          query.project = project._id;
+          return query;
+        },
+        formQuery: function(query) {
+          query.project = project._id;
+          return query;
         }
       };
       importer.template(template, alter, function(err, template) {

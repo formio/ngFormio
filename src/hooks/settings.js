@@ -427,6 +427,24 @@ module.exports = function(app, formioServer) {
           }
         });
         return schema;
+      },
+      formMachineName: function(machineName, document, done) {
+        formioServer.formio.resources.project.model.findOne({_id: document.project}).exec(function (err, project) {
+          if (err) { return done(err); }
+          done(null, project.machineName + ':' + machineName);
+        });
+      },
+      roleMachineName: function(machineName, document, done) {
+        formioServer.formio.resources.project.model.findOne({_id: document.project}).exec(function (err, project) {
+          if (err) { return done(err); }
+          done(null, project.machineName + ':' + machineName);
+        });
+      },
+      actionMachineName: function(machineName, document, done) {
+        formioServer.formio.resources.form.model.findOne({_id: document.form}).exec(function (err, form) {
+          if (err) { return done(err); }
+          done(null, form.machineName + ':' + machineName);
+        });
       }
     }
   }

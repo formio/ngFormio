@@ -221,7 +221,7 @@ module.exports = function(formio) {
 
     var query = {project: projectId, deleted: {$eq: null}};
     debug.role('role.find: ' + JSON.stringify(query));
-    formio.roles.resource.model.find(query, function(err, roles) {
+    formio.resources.role.model.find(query, function(err, roles) {
       if (err) {
         debug.role(err);
         return next(err);
