@@ -39,6 +39,7 @@ test:
     - redis-server &> $CIRCLE_ARTIFACTS/redis.log:
           background: true
     - DEBUG=formio:*,formio:*:* npm test &> $CIRCLE_ARTIFACTS/formio-server.log
+    - mv ./covreporter/ $CIRCLE_ARTIFACTS/coverage
   post:
     - redis-server &> $CIRCLE_ARTIFACTS/docker-redis.log:
           background: true
