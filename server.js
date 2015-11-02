@@ -19,6 +19,12 @@ app.use(analytics.hook);
 // Redirect all root traffic to www
 app.use(function(req, res, next) {
   var hostname = req.get('Host');
+
+  if (!hostname.hasOwnProperty('split') || typeof hostname !== 'string') {
+    console.error(hostname);
+    console.error(req);
+  }
+
   var names = hostname.split('.');
   if ((names.length === 2) && (names[1].search(/^localhost(:[0-9]+)?$/) === -1)) {
     res.redirect('http://www.' + hostname + req.url);
