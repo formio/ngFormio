@@ -336,6 +336,9 @@ angular
         $rootScope.previousState = fromState.name;
         $rootScope.previousParams = fromParams;
         $rootScope.currentState = toState.name;
+        // Trigger Google Analytics pageview
+        $window.ga('set', 'page', $location.url());
+        $window.ga('send', 'pageview');
       });
 
       var authError = function() {
