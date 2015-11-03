@@ -803,6 +803,34 @@ app.controller('FormSubmissionsController', [
       });
     };
 
+    var stopScroll = function(element) {
+      var activeElement;
+
+      angular.element($window.document).bind('mousewheel DOMMouseScroll', function(e) {
+          var scrollTo = null;
+
+          if (!angular.element(activeElement).closest('.k-popup').length) {
+            return;
+          }
+
+          if (e.type === 'mousewheel') {
+              scrollTo = (e.originalEvent.wheelDelta * -1);
+          }
+          else if (e.type === 'DOMMouseScroll') {
+              scrollTo = 40 * e.originalEvent.detail;
+          }
+
+          if (scrollTo) {
+              e.preventDefault();
+              element.scrollTop(scrollTo + element.scrollTop());
+          }
+      });
+
+      angular.element($window.document).on('mouseover', function(e) {
+            activeElement = e.target;
+      });
+    };
+
     // When form is loaded, create the columns
     $scope.loadFormPromise.then(function() {
       $timeout(function() { // Won't load on state change without this for some reason
@@ -1069,7 +1097,13 @@ app.controller('FormSubmissionsController', [
             '</div>',
           change: $scope.$apply.bind($scope),
           dataSource: dataSource,
-          columns: columns
+          columns: columns,
+          columnMenuInit: function(e) {
+            e.container.find('[data-role=dropdownlist]').each(function() {
+              var widget = angular.element(this).data('kendoDropDownList');
+              stopScroll(widget.ul.parent());
+            });
+          }
         };
       });
     });
