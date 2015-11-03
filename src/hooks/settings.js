@@ -135,10 +135,20 @@ module.exports = function(app, formioServer) {
         var project = cache.currentProject(req);
         return project.name + '.' + host;
       },
-      token: function (token, user, form) {
+
+      /**
+       * Modify the given token
+       *
+       * @param token
+       * @param user
+       * @param form
+       * @returns {*}
+       */
+      token: function(token, user, form, next) {
         token.form.project = form.project;
-        return token;
+        return next(token);
       },
+
       isAdmin: function (isAdmin, req) {
         var _debug = require('debug')('formio:settings:isAdmin');
 
@@ -227,11 +237,22 @@ module.exports = function(app, formioServer) {
         }
         return entity;
       },
+
+      /**
+       * Determine if the current request has access to the given Project.
+       *
+       * @param hasAccess
+       * @param req
+       * @param access
+       *
+       * @returns {Boolean}
+       *   If the current request has access to the current project.
+       */
       access: function (hasAccess, req, access) {
         var _debug = require('debug')('formio:settings:access');
         var _url = nodeUrl.parse(req.url).pathname;
 
-        // Determine if the current request has access to the given Project.
+        // Check requests not pointed at specific projects.
         if (!Boolean(req.projectId)) {
           // No project but authenticated.
           if (req.token) {
