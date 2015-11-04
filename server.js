@@ -19,14 +19,18 @@ app.use(analytics.hook);
 // Redirect all root traffic to www
 app.use(function(req, res, next) {
   var hostname = req.get('Host');
+  var names = null;
 
-  if (!hostname.hasOwnProperty('split') || typeof hostname !== 'string') {
+  try {
+    names = hostname.split('.');
+  } catch(e) {
+    console.error(e);
     console.error(hostname);
     console.error(req);
+    return next();
   }
 
-  var names = hostname.split('.');
-  if ((names.length === 2) && (names[1].search(/^localhost(:[0-9]+)?$/) === -1)) {
+  if (names && (names.length === 2) && (names[1].search(/^localhost(:[0-9]+)?$/) === -1)) {
     res.redirect('http://www.' + hostname + req.url);
     res.end();
   }
