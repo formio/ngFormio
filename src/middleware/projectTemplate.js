@@ -6,6 +6,7 @@ var jwt = require('jsonwebtoken');
 var debug = require('debug')('formio:middleware:projectTemplate');
 
 module.exports = function(formio) {
+  var hook = require('formio/src/util/hook')(formio);
   return function(req, res, next) {
     // If the Project was not created, skip this bootstrapping process.
     if (res.resource.status !== 201) {
@@ -108,13 +109,28 @@ module.exports = function(formio) {
 
       // Import the template within formio.
       formio.import.template(template, {
-        role: function(item) {
+        role: function(item, done) {
           item.project = project._id;
-          return item;
+          hook.alter('roleMachineName', item.machineName, item, function(err, machineName) {
+            if (err) { done(err); }
+            item.machineName = machineName;
+            done(null, item);
+          });
         },
-        form: function(item) {
+        form: function(item, done) {
           item.project = project._id;
-          return item;
+          hook.alter('formMachineName', item.machineName, item, function(err, machineName) {
+            if (err) { done(err); }
+            item.machineName = machineName;
+            done(null, item);
+          });
+        },
+        action: function(item, done) {
+          hook.alter('actionMachineName', item.machineName, item, function(err, machineName) {
+            if (err) { done(err); }
+            item.machineName = machineName;
+            done(null, item);
+          });
         }
       }, function(err, template) {
         if (err) {
