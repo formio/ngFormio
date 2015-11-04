@@ -137,16 +137,19 @@ module.exports = function(app, formioServer) {
       },
 
       /**
-       * Modify the given token
+       * Modify the given token.
        *
-       * @param token
-       * @param user
-       * @param form
-       * @returns {*}
+       * @param token {Object}
+       *   The initial formio user token.
+       * @param form {Object}
+       *   The initial formio user resource form.
+       *
+       * @returns {Object}
+       *   The modified token.
        */
-      token: function(token, user, form, next) {
+      token: function(token, form) {
         token.form.project = form.project;
-        return next(token);
+        return token;
       },
 
       isAdmin: function (isAdmin, req) {
@@ -343,10 +346,42 @@ module.exports = function(app, formioServer) {
       cors: function () {
         return require('../middleware/corsOptions')(formioServer)
       },
-      formQuery: function (query, req) {
-        req.projectId = req.projectId || req.params.projectId || 0;
-        query.project = formioServer.formio.mongoose.Types.ObjectId(req.projectId);
-        return query;
+
+      /**
+       * Hook a form query and add the requested projects information.
+       *
+       * @param query {Object}
+       *   The Mongoose query to be performed.
+       * @param req {Object}
+       *   The Express request.
+       * @param formio {Boolean}
+       *   Whether or not the query is being used against the formio project.
+       *
+       * @returns {Object}
+       *   The modified mongoose request object.
+       */
+      formQuery: function(query, req, formio) {
+        var _debug = require('debug')('formio:settings:formQuery');
+
+        // Determine which project to use, one in the request, or formio.
+        if (formio && formio === true) {
+          cache.loadProjectByName(req, 'formio', function(err, _id) {
+            if (err || !_id) {
+              _debug(err || 'The formio project was not found..');
+              return query;
+            }
+
+            query.project = formioServer.formio.mongoose.Types.ObjectId(_id);
+            _debug(query);
+            return query;
+          });
+        }
+        else {
+          req.projectId = req.projectId || req.params.projectId || 0;
+          query.project = formioServer.formio.mongoose.Types.ObjectId(req.projectId);
+          _debug(query);
+          return query;
+        }
       },
       formSearch: function (search, model, value) {
         search.project = model.project;
