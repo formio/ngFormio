@@ -166,10 +166,7 @@ formioServer.init(settings).then(function(formio) {
 
 process.on('uncaughtException', function(err) {
   console.log('Uncaught exception: ' + err.stack);
-  jslogger.log({
-    message: err.message,
-    stacktrace: err.stack
-  });
+  jslogger.log(err);
 
   // Give jslogger time to log before exiting.
   setTimeout(function() {
