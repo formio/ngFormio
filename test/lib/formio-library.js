@@ -67,69 +67,6 @@ module.exports = function(config) {
     next(null, body);
   }
 
-  //var getProject = function(projectName, next) {
-  //  formio.resources.project.model.findOne({'name': projectName}, function(err, project) {
-  //    if (err) {
-  //      return next(err);
-  //    }
-  //    else if (!project) {
-  //      return next(new Error('Project not found'));
-  //    }
-  //
-  //    next(null, project);
-  //  });
-  //};
-  //
-  //var getForm = function(projectId, formName, next) {
-  //  formio.resources.form.model.findOne({project: projectId, name: formName}, function(err, form) {
-  //    if (err) {
-  //      return next(err);
-  //    }
-  //    else if (!form) {
-  //      return next(new Error('Form not found'));
-  //    }
-  //
-  //    next(null, form);
-  //  });
-  //};
-  //
-  //var getSubmission = function(filter, next) {
-  //  formio.resources.submission.model.findOne(filter, function(err, submission) {
-  //    if (err) {
-  //      return next(err);
-  //    }
-  //
-  //    next(null, submission);
-  //  });
-  //};
-  //
-  //var createSubmission = function(submission, next) {
-  //  formio.resources.submission.model.create(submission, function(err, submission) {
-  //    if (err) {
-  //      return next(err);
-  //    }
-  //
-  //    next(null, submission);
-  //  });
-  //};
-
-  var ensureOnPage = function(path, next) {
-    if (!path) {
-      path = '/#';
-    }
-    this.driver.url()
-      .then(function(res) {
-        // Already on the page.
-        if (res.value === path) {
-          return next();
-        }
-        this.driver.url(path)
-          .then(function() {
-            next();
-          });
-      });
-  }
-
   var authUser = function(projectName, formName, email, password, next) {
     request({
       "rejectUnauthorized": false,
