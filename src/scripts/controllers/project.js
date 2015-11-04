@@ -72,13 +72,15 @@ app.controller('ProjectCreateController', [
   'FormioAlerts',
   'Formio',
   '$http',
+  'GoogleAnalytics',
   function(
     $scope,
     $rootScope,
     $state,
     FormioAlerts,
     Formio,
-    $http
+    $http,
+    GoogleAnalytics
   ) {
     $rootScope.noBreadcrumb = false;
     $scope.currentProject = {template: 'default'};
@@ -157,6 +159,7 @@ app.controller('ProjectCreateController', [
           type: 'success',
           message: 'New Project created!'
         });
+        GoogleAnalytics.sendEvent('Project', 'create', null, 1);
         $state.go('project.edit', {projectId: project._id});
       }, function(error) {
         if (error.data.message && error.data.message.indexOf('duplicate key error index') !== -1) {
@@ -248,11 +251,13 @@ app.controller('ProjectSettingsController', [
   '$scope',
   '$rootScope',
   '$state',
+  'GoogleAnalytics',
   'FormioAlerts',
   function(
     $scope,
     $rootScope,
     $state,
+    GoogleAnalytics,
     FormioAlerts
   ) {
     // Go to first settings section
@@ -279,6 +284,7 @@ app.controller('ProjectSettingsController', [
           type: 'success',
           message: 'Project saved.'
         });
+        GoogleAnalytics.sendEvent('Project', 'update', null, 1);
         // Reload state so alerts display and project updates.
         $state.go($state.current.name, {
           projectId: project._id
@@ -294,10 +300,12 @@ app.controller('ProjectDeleteController', [
   '$scope',
   '$state',
   'FormioAlerts',
+  'GoogleAnalytics',
   function(
     $scope,
     $state,
-    FormioAlerts
+    FormioAlerts,
+    GoogleAnalytics
   ) {
     $scope.deleteProject = function() {
       if (!$scope.currentProject || !$scope.currentProject._id) { return; }
@@ -306,6 +314,7 @@ app.controller('ProjectDeleteController', [
           type: 'success',
           message: 'Project was deleted!'
         });
+        GoogleAnalytics.sendEvent('Project', 'delete', null, 1);
         $state.go('home');
       }, FormioAlerts.onError.bind(FormioAlerts));
     };
