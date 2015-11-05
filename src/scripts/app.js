@@ -279,6 +279,7 @@ angular
     'FormioAlerts',
     'Formio',
     'AppConfig',
+    'GoogleAnalytics',
     '$location',
     '$window',
     function(
@@ -288,6 +289,7 @@ angular
       FormioAlerts,
       Formio,
       AppConfig,
+      GoogleAnalytics,
       $location,
       $window
     ) {
@@ -336,6 +338,7 @@ angular
         $rootScope.previousState = fromState.name;
         $rootScope.previousParams = fromParams;
         $rootScope.currentState = toState.name;
+        GoogleAnalytics.sendPageView();
       });
 
       var authError = function() {
@@ -406,4 +409,26 @@ angular
         }
       };
     }
-  ]);
+  ])
+  .factory('GoogleAnalytics', ['$window', '$state', function($window, $state) {
+    // Recursively build the whole state url
+    // This gets the url without substitutions, to send
+    // to Google Analytics
+    var getFullStateUrl = function(state) {
+      if(state.parent) {
+        return getFullStateUrl($state.get(state.parent)) + state.url;
+      }
+      return state.url;
+    };
+
+    return {
+      sendPageView: function() {
+        $window.ga('set', 'page', getFullStateUrl($state.current));
+        $window.ga('send', 'pageview');
+      },
+
+      sendEvent: function(category, action, label, value) {
+        $window.ga('send', 'event', category, action, label, value);
+      }
+    };
+  }]);
