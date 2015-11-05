@@ -236,7 +236,7 @@ module.exports = function(app, formioServer) {
           // No project but authenticated.
           if (req.token) {
             if (req.method === 'POST' && _url === '/project') {
-              _debug('true');
+              _debug(req.userProject.primary);
               return req.userProject.primary;
             }
 
@@ -247,7 +247,7 @@ module.exports = function(app, formioServer) {
             }
 
             if (_url === '/project/available') {
-              _debug('true');
+              _debug(req.userProject.primary);
               return req.userProject.primary;
             }
 

@@ -45,6 +45,33 @@ module.exports = function(router) {
 
     next(null, [
       {
+        type: 'select',
+        input: true,
+        label: 'Authentication Method',
+        key: 'settings[authType]',
+        placeholder: 'Select the method of authentication to use.',
+        template: '<span>{{ item.title }}</span>',
+        defaultValue: 'application',
+        dataSrc: 'json',
+        data: {
+          json: JSON.stringify([
+            {
+              type: 'delegated',
+              title: 'OAuth Delegated'
+            },
+            {
+              type: 'application',
+              title: 'Application Certificate'
+            }
+          ])
+        },
+        valueProperty: 'type',
+        multiple: false,
+        validate: {
+          required: true
+        }
+      },
+      {
         label: 'Subject',
         key: 'settings[subject]',
         inputType: 'text',
@@ -172,6 +199,9 @@ module.exports = function(router) {
       return next();
     }
 
+    // Default authType to 'application'
+    var authType = this.settings.authType || 'application';
+
     // Only add the payload for post and put.
     if (req.method === 'POST' || req.method === 'PUT') {
       payload = {
@@ -195,7 +225,7 @@ module.exports = function(router) {
     }
 
     // Perform the request.
-    util.request(router, req, res, 'events', 'Office365Calendar', payload);
+    util.request(router, req, res, 'events', 'Office365Calendar', authType, payload);
 
     // Move onto the next middleware.
     next();

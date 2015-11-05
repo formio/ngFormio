@@ -19,8 +19,18 @@ app.use(analytics.hook);
 // Redirect all root traffic to www
 app.use(function(req, res, next) {
   var hostname = req.get('Host');
-  var names = hostname.split('.');
-  if ((names.length === 2) && (names[1].search(/^localhost(:[0-9]+)?$/) === -1)) {
+  var names = null;
+
+  try {
+    names = hostname.split('.');
+  } catch(e) {
+    console.error(e);
+    console.error(hostname);
+    console.error(req);
+    return next();
+  }
+
+  if (names && (names.length === 2) && (names[1].search(/^localhost(:[0-9]+)?$/) === -1)) {
     res.redirect('http://www.' + hostname + req.url);
     res.end();
   }
@@ -48,6 +58,9 @@ app.use(function(err, req, res, next) {
 
 // Create the formio server.
 var formioServer = require('formio')(config.formio);
+
+// Attach the formio-server config.
+formioServer.config = _.omit(config, 'formio');
 
 // Attach the analytics to the formio server and attempt to connect.
 formioServer.analytics = analytics;
@@ -172,10 +185,7 @@ formioServer.init(settings).then(function(formio) {
 
 process.on('uncaughtException', function(err) {
   console.log('Uncaught exception: ' + err.stack);
-  jslogger.log({
-    message: err.message,
-    stacktrace: err.stack
-  });
+  jslogger.log(err);
 
   // Give jslogger time to log before exiting.
   setTimeout(function() {
