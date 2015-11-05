@@ -92,2402 +92,6 @@ process.chdir = function (dir) {
 process.umask = function() { return 0; };
 
 },{}],2:[function(require,module,exports){
-"use strict";
-module.exports = function (app) {
-
-  /*jshint camelcase: false */
-  app.config([
-    'formioComponentsProvider',
-    function (formioComponentsProvider) {
-      formioComponentsProvider.register('address', {
-        title: 'Address',
-        template: function ($scope) {
-          return $scope.component.multiple ? 'formio/components/address-multiple.html' : 'formio/components/address.html';
-        },
-        controller: function (settings, $scope, $http) {
-          $scope.address = {};
-          $scope.addresses = [];
-          $scope.refreshAddress = function (address) {
-            var params = {address: address, sensor: false};
-            return $http.get(
-              'https://maps.googleapis.com/maps/api/geocode/json',
-              {
-                disableJWT: true,
-                params: params,
-                headers: {
-                  Authorization: undefined,
-                  Pragma: undefined,
-                  'Cache-Control': undefined
-                }
-              }
-            ).then(function (response) {
-                $scope.addresses = response.data.results;
-              });
-          };
-        },
-        tableView: function (data) {
-          return data ? data.formatted_address : '';
-        },
-        settings: {
-          input: true,
-          tableView: true,
-          label: '',
-          key: 'addressField',
-          placeholder: '',
-          multiple: false,
-          protected: false,
-          unique: false,
-          persistent: true,
-          validate: {
-            required: false
-          }
-        }
-      });
-    }
-  ]);
-  app.run([
-    '$templateCache',
-    function ($templateCache) {
-      $templateCache.put('formio/components/address.html',
-        '<label ng-if="component.label" for="{{ component.key }}" ng-class="{\'field-required\': component.validate.required}">{{ component.label }}</label>' +
-        '<span ng-if="!component.label && component.validate.required" class="glyphicon glyphicon-asterisk form-control-feedback field-required-inline" aria-hidden="true"></span>' +
-        '<ui-select ng-model="data[component.key]" safe-multiple-to-single ng-disabled="readOnly" ng-required="component.validate.required" id="{{ component.key }}" theme="bootstrap">' +
-        '<ui-select-match placeholder="{{ component.placeholder }}">{{$item.formatted_address || $select.selected.formatted_address}}</ui-select-match>' +
-        '<ui-select-choices repeat="address in addresses track by $index" refresh="refreshAddress($select.search)" refresh-delay="500">' +
-        '<div ng-bind-html="address.formatted_address | highlight: $select.search"></div>' +
-        '</ui-select-choices>' +
-        '</ui-select>'
-      );
-
-      // Change the ui-select to ui-select multiple.
-      $templateCache.put('formio/components/address-multiple.html',
-        $templateCache.get('formio/components/address.html').replace('<ui-select', '<ui-select multiple')
-      );
-    }
-  ]);
-};
-
-},{}],3:[function(require,module,exports){
-"use strict";
-module.exports = function (app) {
-
-  app.config([
-    'formioComponentsProvider',
-    function (formioComponentsProvider) {
-      formioComponentsProvider.register('button', {
-        title: 'Button',
-        template: 'formio/components/button.html',
-        settings: {
-          input: true,
-          label: 'Submit',
-          tableView: false,
-          key: 'submit',
-          size: 'md',
-          leftIcon: '',
-          rightIcon: '',
-          block: false,
-          action: 'submit',
-          disableOnInvalid: true,
-          theme: 'primary'
-        },
-        controller: function (settings, $scope) {
-          $scope.onClick = function() {
-            switch(settings.action) {
-              case 'submit':
-                return;
-              case 'reset':
-                $scope.resetForm();
-                break;
-              case 'oauth':
-                if($scope.hasOwnProperty('form')) {
-                  if(!settings.oauth) {
-                    $scope.showAlerts({
-                      type: 'danger',
-                      message: 'You must assign this button to an OAuth action before it will work.'
-                    });
-                    break;
-                  }
-                  if(settings.oauth.error) {
-                    $scope.showAlerts({
-                      type: 'danger',
-                      message: settings.oauth.error
-                    });
-                    break;
-                  }
-                  $scope.openOAuth(settings.oauth);
-                }
-                break;
-            }
-          };
-
-          $scope.openOAuth = function(settings) {
-            var params = {
-              response_type: 'code',
-              client_id: settings.clientId,
-              redirect_uri: window.location.origin || window.location.protocol + '//' + window.location.host,
-              state: settings.state,
-              scope: settings.scope,
-              display: settings.display
-            };
-            params = Object.keys(params).map(function(key) {
-              return key + '=' + encodeURIComponent(params[key]);
-            }).join('&');
-
-            var url = settings.authURI + '?' + params;
-
-            // TODO: make window options from oauth settings, have better defaults
-            var popup = window.open(url, settings.provider, 'width=1020,height=618');
-            var interval = setInterval(function() {
-              try {
-                var popupHost = popup.location.host;
-                var currentHost = window.location.host;
-                if(popup && !popup.closed && popupHost === currentHost && popup.location.search) {
-                  popup.close();
-                  var params = popup.location.search.substr(1).split('&').reduce(function(params, param) {
-                    var split = param.split('=');
-                    params[split[0]] = split[1];
-                    return params;
-                  }, {});
-                  if(params.error) {
-                    $scope.showAlerts({
-                      type: 'danger',
-                      message: params.error_description || params.error
-                    });
-                    return;
-                  }
-                  // TODO: check for error response here
-                  if(settings.state !== params.state) {
-                    $scope.showAlerts({
-                      type: 'danger',
-                      message: 'OAuth state does not match. Please try logging in again.'
-                    });
-                    return;
-                  }
-                  var submission = { data: {}, oauth: {} };
-                  submission.oauth[settings.provider] = params;
-                  submission.oauth[settings.provider].redirectURI = window.location.origin || window.location.protocol + '//' + window.location.host;
-                  $scope.form.submitting = true;
-                  $scope.formio.saveSubmission(submission)
-                  .then(function(submission) {
-                    // Trigger the form submission.
-                    $scope.$emit('formSubmission', submission);
-                  })
-                  .catch(function(error) {
-                    $scope.showAlerts({
-                      type: 'danger',
-                      message: error.message || error
-                    });
-                  })
-                  .finally(function() {
-                    $scope.form.submitting = false;
-                  });
-                }
-              }
-              catch(error) {
-                if(error.name !== 'SecurityError') {
-                  $scope.showAlerts({
-                    type: 'danger',
-                    message: error.message || error
-                  });
-                }
-              }
-              if(!popup || popup.closed || popup.closed === undefined) {
-                clearInterval(interval);
-              }
-            }, 100);
-          };
-
-        }
-      });
-    }
-  ]);
-  app.run([
-    '$templateCache',
-    function ($templateCache) {
-      $templateCache.put('formio/components/button.html',
-        '<button type="{{component.action == \'submit\' ? \'submit\' : \'button\'}}"' +
-        'ng-class="{\'btn-block\': component.block}"' +
-        'class="btn btn-{{ component.theme }} btn-{{ component.size }}"' +
-        'ng-disabled="readOnly || form.submitting || (component.disableOnInvalid && form.$invalid)"' +
-        'ng-click="onClick()">' +
-        '<span ng-if="component.leftIcon" class="{{ component.leftIcon }}" aria-hidden="true"></span>' +
-        '<span ng-if="component.leftIcon && component.label">&nbsp;</span>' +
-        '{{ component.label }}' +
-        '<span ng-if="component.rightIcon && component.label">&nbsp;</span>' +
-        '<span ng-if="component.rightIcon" class="{{ component.rightIcon }}" aria-hidden="true"></span>' +
-        ' <i ng-if="component.action == \'submit\' && form.submitting" class="glyphicon glyphicon-refresh glyphicon-spin"></i>' +
-        '</button>'
-      );
-    }
-  ]);
-};
-
-},{}],4:[function(require,module,exports){
-"use strict";
-module.exports = function (app) {
-
-  app.config([
-    'formioComponentsProvider',
-    function (formioComponentsProvider) {
-      formioComponentsProvider.register('checkbox', {
-        title: 'Check Box',
-        template: 'formio/components/checkbox.html',
-        settings: {
-          input: true,
-          inputType: 'checkbox',
-          tableView: true,
-          // This hides the default label layout so we can use a special inline label
-          hideLabel: true,
-          label: '',
-          key: 'checkboxField',
-          prefix: '',
-          suffix: '',
-          defaultValue: false,
-          protected: false,
-          persistent: true,
-          validate: {
-            required: false,
-          }
-        }
-      });
-    }
-  ]);
-  app.run([
-    '$templateCache',
-    'FormioUtils',
-    function ($templateCache,
-              FormioUtils) {
-      $templateCache.put('formio/components/checkbox.html', FormioUtils.fieldWrap(
-        '<div class="checkbox">' +
-        '<label for="{{ component.key }}" ng-class="{\'field-required\': component.validate.required}">' +
-        '<input type="{{ component.inputType }}" ' +
-        'id="{{ component.key }}" ' +
-        'name="{{ component.key }}" ' +
-        'value="{{ component.key }}" ' +
-        'ng-disabled="readOnly" ' +
-        'ng-model="data[component.key]" ' +
-        'ng-required="component.validate.required">' +
-        '{{ component.label }}' +
-        '</label>' +
-        '</div>'
-      ));
-    }
-  ]);
-};
-
-},{}],5:[function(require,module,exports){
-"use strict";
-module.exports = function (app) {
-
-  app.config([
-    'formioComponentsProvider',
-    function (formioComponentsProvider) {
-      formioComponentsProvider.register('columns', {
-        title: 'Columns',
-        template: 'formio/components/columns.html',
-        group: 'layout',
-        settings: {
-          input: false,
-          columns: [{components: []}, {components: []}]
-        }
-      });
-    }
-  ]);
-  app.run([
-    '$templateCache',
-    function ($templateCache) {
-      $templateCache.put('formio/components/columns.html',
-        '<div class="row">' +
-        '<div class="col-xs-6" ng-repeat="column in component.columns">' +
-        '<formio-component ng-repeat="component in column.components" ng-if="componentFound(component)" component="component" data="data" formio="formio" read-only="readOnly"></formio-component>' +
-        '</div>' +
-        '</div>'
-      );
-    }
-  ]);
-};
-
-},{}],6:[function(require,module,exports){
-"use strict";
-module.exports = function (app) {
-
-  app.provider('formioComponents', function () {
-    var components = {};
-    var groups = {
-      __component: {
-        title: 'Form Components'
-      },
-      layout: {
-        title: 'Layout Components'
-      }
-    };
-    return {
-      addGroup: function (name, group) {
-        groups[name] = group;
-      },
-      register: function (type, component, group) {
-        if (!components[type]) {
-          components[type] = component;
-        }
-        else {
-          angular.extend(components[type], component);
-        }
-
-        // Set the type for this component.
-        if (!components[type].group) {
-          components[type].group = group || '__component';
-        }
-        components[type].settings.type = type;
-      },
-      $get: function () {
-        return {
-          components: components,
-          groups: groups
-        };
-      }
-    };
-  });
-
-  app.directive('safeMultipleToSingle', [function () {
-    return {
-      require: 'ngModel',
-      restrict: 'A',
-      link: function ($scope, el, attrs, ngModel) {
-        ngModel.$formatters.push(function (modelValue) {
-          if (!$scope.component.multiple && Array.isArray(modelValue)) {
-            return modelValue[0] || '';
-          }
-
-          return modelValue;
-        });
-      }
-    };
-  }]);
-};
-
-},{}],7:[function(require,module,exports){
-"use strict";
-module.exports = function (app) {
-
-  app.config([
-    'formioComponentsProvider',
-    function (formioComponentsProvider) {
-      formioComponentsProvider.register('content', {
-        title: 'Content',
-        template: 'formio/components/content.html',
-        settings: {
-          input: false,
-          html: ''
-        }
-      });
-    }
-  ]);
-  app.run([
-    '$templateCache',
-    function ($templateCache) {
-      $templateCache.put('formio/components/content.html',
-        '<div ng-bind-html="component.html | safehtml"></div>'
-      );
-    }
-  ]);
-};
-
-},{}],8:[function(require,module,exports){
-"use strict";
-module.exports = function (app) {
-
-  app.config([
-    'formioComponentsProvider',
-    function(formioComponentsProvider) {
-      formioComponentsProvider.register('datetime', {
-        title: 'Date / Time',
-        template: 'formio/components/datetime.html',
-        tableView: function(data) {
-          return '<span>{{ "' + data + '" | date: "' + this.settings.format + '" }}</span>';
-        },
-        settings: {
-          input: true,
-          tableView: true,
-          label: '',
-          key: 'datetimeField',
-          placeholder: '',
-          format: 'yyyy-MM-dd HH:mm',
-          enableDate: true,
-          enableTime: true,
-          minDate: null,
-          maxDate: null,
-          datepickerMode: 'day',
-          datePicker: {
-            showWeeks: true,
-            startingDay: 0,
-            initDate: '',
-            minMode: 'day',
-            maxMode: 'year',
-            yearRange: '20'
-          },
-          timePicker: {
-            hourStep: 1,
-            minuteStep: 1,
-            showMeridian: true,
-            readonlyInput: false,
-            mousewheel: true,
-            arrowkeys: true
-          },
-          protected: false,
-          persistent: true,
-          validate: {
-            required: false,
-            custom: ''
-          }
-        }
-      });
-    }
-  ]);
-  app.run([
-    '$templateCache',
-    'FormioUtils',
-    function($templateCache, FormioUtils) {
-      $templateCache.put('formio/components/datetime.html', FormioUtils.fieldWrap(
-        '<div class="input-group">' +
-        '<input type="text" class="form-control" ' +
-        'ng-focus="calendarOpen = true" ' +
-        'ng-click="calendarOpen = true" ' +
-        'ng-init="calendarOpen = false" ' +
-        'ng-disabled="readOnly" ' +
-        'ng-required="component.validate.required" ' +
-        'is-open="calendarOpen" ' +
-        'datetime-picker="{{ component.format }}" ' +
-        'min-date="component.minDate" ' +
-        'max-date="component.maxDate" ' +
-        'datepicker-mode="component.datepickerMode" ' +
-        'enable-date="component.enableDate" ' +
-        'enable-time="component.enableTime" ' +
-        'ng-model="data[component.key]" ' +
-        'placeholder="{{ component.placeholder }}" ' +
-        'datepicker-options="component.datePicker" ' +
-        'timepicker-options="component.timePicker" />' +
-        '<span class="input-group-btn">' +
-        '<button type="button" class="btn btn-default" ng-click="calendarOpen = true">' +
-        '<i ng-if="component.enableDate" class="glyphicon glyphicon-calendar"></i>' +
-        '<i ng-if="!component.enableDate" class="glyphicon glyphicon-time"></i>' +
-        '</button>' +
-        '</span>' +
-        '</div>'
-      ));
-    }
-  ]);
-};
-
-},{}],9:[function(require,module,exports){
-"use strict";
-module.exports = function (app) {
-
-  app.config([
-    'formioComponentsProvider',
-    function (formioComponentsProvider) {
-      formioComponentsProvider.register('email', {
-        title: 'Email',
-        template: 'formio/components/textfield.html',
-        settings: {
-          input: true,
-          tableView: true,
-          inputType: 'email',
-          label: '',
-          key: 'emailField',
-          placeholder: '',
-          prefix: '',
-          suffix: '',
-          defaultValue: '',
-          protected: false,
-          unique: false,
-          persistent: true
-        }
-      });
-    }
-  ]);
-};
-
-},{}],10:[function(require,module,exports){
-"use strict";
-module.exports = function (app) {
-
-  app.config([
-    'formioComponentsProvider',
-    function (formioComponentsProvider) {
-      formioComponentsProvider.register('fieldset', {
-        title: 'Field Set',
-        template: 'formio/components/fieldset.html',
-        settings: {
-          input: false,
-          tableView: true,
-          legend: '',
-          components: []
-        }
-      });
-    }
-  ]);
-  app.run([
-    '$templateCache',
-    function ($templateCache) {
-      $templateCache.put('formio/components/fieldset.html',
-        '<fieldset>' +
-        '<legend ng-if="component.legend">{{ component.legend }}</legend>' +
-        '<formio-component ng-repeat="component in component.components" ng-if="componentFound(component)" component="component" data="data" formio="formio" read-only="readOnly"></formio-component>' +
-        '</fieldset>'
-      );
-    }
-  ]);
-};
-
-},{}],11:[function(require,module,exports){
-"use strict";
-module.exports = function (app) {
-
-  app.config([
-    'formioComponentsProvider',
-    function (formioComponentsProvider) {
-      formioComponentsProvider.register('hidden', {
-        title: 'Hidden',
-        template: 'formio/components/hidden.html',
-        settings: {
-          input: true,
-          tableView: true,
-          key: 'hiddenField',
-          label: '',
-          protected: false,
-          unique: false,
-          persistent: true
-        }
-      });
-    }
-  ]);
-  app.run([
-    '$templateCache',
-    function ($templateCache) {
-      $templateCache.put('formio/components/hidden.html',
-        '<input type="hidden" id="{{ component.key }}" name="{{ component.key }}" ng-model="data[component.key]">'
-      );
-    }
-  ]);
-};
-
-},{}],12:[function(require,module,exports){
-"use strict";
-var app = angular.module('formio');
-
-require('./components')(app);
-require('./textfield')(app);
-require('./address')(app);
-require('./button')(app);
-require('./checkbox')(app);
-require('./columns')(app);
-require('./content')(app);
-require('./datetime')(app);
-require('./email')(app);
-require('./fieldset')(app);
-require('./hidden')(app);
-require('./number')(app);
-require('./page')(app);
-require('./panel')(app);
-require('./password')(app);
-require('./phonenumber')(app);
-require('./radio')(app);
-require('./resource')(app);
-require('./select')(app);
-require('./signature')(app);
-require('./textarea')(app);
-require('./well')(app);
-
-},{"./address":2,"./button":3,"./checkbox":4,"./columns":5,"./components":6,"./content":7,"./datetime":8,"./email":9,"./fieldset":10,"./hidden":11,"./number":13,"./page":14,"./panel":15,"./password":16,"./phonenumber":17,"./radio":18,"./resource":19,"./select":20,"./signature":21,"./textarea":22,"./textfield":23,"./well":24}],13:[function(require,module,exports){
-"use strict";
-module.exports = function (app) {
-
-  app.config([
-    'formioComponentsProvider',
-    function (formioComponentsProvider) {
-      formioComponentsProvider.register('number', {
-        title: 'Number',
-        template: 'formio/components/number.html',
-        settings: {
-          input: true,
-          tableView: true,
-          inputType: 'number',
-          label: '',
-          key: 'numberField',
-          placeholder: '',
-          prefix: '',
-          suffix: '',
-          defaultValue: '',
-          protected: false,
-          persistent: true,
-          validate: {
-            required: false,
-            min: '',
-            max: '',
-            step: 'any',
-            integer: '',
-            multiple: '',
-            custom: ''
-          }
-        }
-      });
-    }
-  ]);
-  app.run([
-    '$templateCache',
-    'FormioUtils',
-    function ($templateCache,
-              FormioUtils) {
-      $templateCache.put('formio/components/number.html', FormioUtils.fieldWrap(
-        '<input type="{{ component.inputType }}" ' +
-        'class="form-control" ' +
-        'id="{{ component.key }}" ' +
-        'name="{{ component.key }}" ' +
-        'ng-model="data[component.key]" ' +
-        'ng-required="component.validate.required" ' +
-        'ng-disabled="readOnly" ' +
-        'safe-multiple-to-single ' +
-        'min="{{ component.validate.min }}" ' +
-        'max="{{ component.validate.max }}" ' +
-        'step="{{ component.validate.step }}" ' +
-        'placeholder="{{ component.placeholder }}" ' +
-        'custom-validator="component.validate.custom" ' +
-        'ui-mask="{{ component.inputMask }}" ' +
-        'ui-mask-placeholder="" ' + // avoids regular placeholder mixing with mask placeholder
-        'ui-options="uiMaskOptions" ' +
-        '>'
-      ));
-    }
-  ]);
-};
-
-},{}],14:[function(require,module,exports){
-"use strict";
-module.exports = function (app) {
-
-  app.config([
-    'formioComponentsProvider',
-    function (formioComponentsProvider) {
-      formioComponentsProvider.register('page', {
-        template: 'formio/components/page.html',
-        settings: {
-          input: false,
-          components: []
-        }
-      });
-    }
-  ]);
-  app.run([
-    '$templateCache',
-    function ($templateCache) {
-      $templateCache.put('formio/components/page.html',
-        '<formio-component ng-repeat="component in component.components" ng-if="componentFound(component)" component="component" data="data" formio="formio"></formio-component>'
-      );
-    }
-  ]);
-};
-
-},{}],15:[function(require,module,exports){
-"use strict";
-module.exports = function (app) {
-
-  app.config([
-    'formioComponentsProvider',
-    function (formioComponentsProvider) {
-      formioComponentsProvider.register('panel', {
-        title: 'Panel',
-        template: 'formio/components/panel.html',
-        group: 'layout',
-        settings: {
-          input: false,
-          title: '',
-          theme: 'default',
-          components: []
-        }
-      });
-    }
-  ]);
-  app.run([
-    '$templateCache',
-    function ($templateCache) {
-      $templateCache.put('formio/components/panel.html',
-        '<div class="panel panel-{{ component.theme }}">' +
-        '<div ng-if="component.title" class="panel-heading"><h3 class="panel-title">{{ component.title }}</h3></div>' +
-        '<div class="panel-body">' +
-        '<formio-component ng-repeat="component in component.components" ng-if="componentFound(component)" component="component" data="data" formio="formio" read-only="readOnly"></formio-component>' +
-        '</div>' +
-        '</div>'
-      );
-    }
-  ]);
-};
-
-},{}],16:[function(require,module,exports){
-"use strict";
-module.exports = function (app) {
-
-  app.config([
-    'formioComponentsProvider',
-    function (formioComponentsProvider) {
-      formioComponentsProvider.register('password', {
-        title: 'Password',
-        template: 'formio/components/textfield.html',
-        tableView: function () {
-          return '--- PROTECTED ---';
-        },
-        settings: {
-          input: true,
-          tableView: false,
-          inputType: 'password',
-          label: '',
-          key: 'passwordField',
-          placeholder: '',
-          prefix: '',
-          suffix: '',
-          protected: true,
-          persistent: true
-        }
-      });
-    }
-  ]);
-};
-
-},{}],17:[function(require,module,exports){
-"use strict";
-module.exports = function (app) {
-
-  app.config([
-    'formioComponentsProvider',
-    function (formioComponentsProvider) {
-      formioComponentsProvider.register('phoneNumber', {
-        title: 'Phone Number',
-        template: 'formio/components/textfield.html',
-        settings: {
-          input: true,
-          tableView: true,
-          inputMask: '(999) 999-9999',
-          label: '',
-          key: 'phonenumberField',
-          placeholder: '',
-          prefix: '',
-          suffix: '',
-          multiple: false,
-          protected: false,
-          unique: false,
-          persistent: true,
-          validate: {
-            required: false
-          }
-        }
-      });
-    }
-  ]);
-};
-
-},{}],18:[function(require,module,exports){
-"use strict";
-module.exports = function (app) {
-
-  app.config([
-    'formioComponentsProvider',
-    function (formioComponentsProvider) {
-      formioComponentsProvider.register('radio', {
-        title: 'Radio',
-        template: 'formio/components/radio.html',
-        settings: {
-          input: true,
-          tableView: true,
-          inputType: 'radio',
-          label: '',
-          key: 'radioField',
-          values: [],
-          defaultValue: '',
-          protected: false,
-          persistent: true,
-          validate: {
-            required: false,
-            custom: '',
-            customPrivate: false
-          }
-        }
-      });
-    }
-  ]);
-  app.run([
-    '$templateCache',
-    'FormioUtils',
-    function ($templateCache,
-              FormioUtils) {
-      $templateCache.put('formio/components/radio.html', FormioUtils.fieldWrap(
-        '<div class="radio" ng-repeat="v in component.values track by $index">' +
-        '<label class="control-label" for="{{ v.value }}">' +
-        '<input type="{{ component.inputType }}" ' +
-        'id="{{ v.value }}" ' +
-        'name="{{ component.key }}" ' +
-        'value="{{ v.value }}" ' +
-        'ng-model="data[component.key]" ' +
-        'ng-required="component.validate.required" ' +
-        'ng-disabled="readOnly"' +
-        'custom-validator="component.validate.custom">' +
-        '{{ v.label }}' +
-        '</label>' +
-        '</div>'
-      ));
-    }
-  ]);
-};
-
-},{}],19:[function(require,module,exports){
-"use strict";
-module.exports = function (app) {
-
-  app.config([
-    'formioComponentsProvider',
-    function (formioComponentsProvider) {
-      formioComponentsProvider.register('resource', {
-        title: 'Resource',
-        tableView: function (data) {
-          return data ? data._id : '';
-        },
-        template: function ($scope) {
-          return $scope.component.multiple ? 'formio/components/resource-multiple.html' : 'formio/components/resource.html';
-        },
-        controller: function (settings, $scope, $http, Formio) {
-          $scope.selectItems = [];
-          if (settings.multiple) {
-            settings.defaultValue = [];
-          }
-          if (settings.resource) {
-            var formio = new Formio($scope.formio.projectUrl + '/form/' + settings.resource);
-              $scope.refreshSubmissions = function (input) {
-              var params = {};
-              // If they wish to return only some fields.
-              if (settings.selectFields) {
-                params.select = settings.selectFields;
-              }
-              if (settings.searchFields && input) {
-                angular.forEach(settings.searchFields, function (field, index) {
-                  params[field] = input;
-                });
-              }
-              // Load the submissions.
-              formio.loadSubmissions({
-                params: params
-              }).then(function (submissions) {
-                $scope.selectItems = submissions || [];
-              });
-            };
-
-            $scope.refreshSubmissions();
-          }
-        },
-        settings: {
-          input: true,
-          tableView: true,
-          label: '',
-          key: 'resourceField',
-          placeholder: '',
-          resource: '',
-          defaultValue: '',
-          template: '<span>{{ item.data }}</span>',
-          selectFields: '',
-          searchFields: '',
-          multiple: false,
-          refresh: false,
-          refreshDelay: 0,
-          protected: false,
-          persistent: true,
-          validate: {
-            required: false
-          }
-        }
-      });
-    }
-  ]);
-
-  app.run([
-    '$templateCache',
-    function ($templateCache) {
-      $templateCache.put('formio/components/resource.html',
-        '<label ng-if="component.label" for="{{ component.key }}" class="control-label" ng-class="{\'field-required\': component.validate.required}">{{ component.label }}</label>' +
-        '<span ng-if="!component.label && component.validate.required" class="glyphicon glyphicon-asterisk form-control-feedback field-required-inline" aria-hidden="true"></span>' +
-        '<ui-select ui-select-required safe-multiple-to-single ui-select-open-on-focus ng-model="data[component.key]" ng-disabled="readOnly" ng-required="component.validate.required" id="{{ component.key }}" name="{{ component.key }}" theme="bootstrap">' +
-        '<ui-select-match placeholder="{{ component.placeholder }}">' +
-        '<formio-select-item template="component.template" item="$item || $select.selected" select="$select"></formio-select-item>' +
-        '</ui-select-match>' +
-        '<ui-select-choices repeat="item in selectItems | filter: $select.search" refresh="refreshSubmissions($select.search)" refresh-delay="250">' +
-        '<formio-select-item template="component.template" item="item" select="$select"></formio-select-item>' +
-        '</ui-select-choices>' +
-        '</ui-select>' +
-        '<formio-errors></formio-errors>'
-      );
-
-      // Change the ui-select to ui-select multiple.
-      $templateCache.put('formio/components/resource-multiple.html',
-        $templateCache.get('formio/components/resource.html').replace('<ui-select', '<ui-select multiple')
-      );
-    }
-  ]);
-};
-
-},{}],20:[function(require,module,exports){
-"use strict";
-module.exports = function (app) {
-
-  app.directive('formioSelectItem', [
-    '$compile',
-    function ($compile) {
-      return {
-        restrict: 'E',
-        scope: {
-          template: '=',
-          item: '=',
-          select: '='
-        },
-        link: function (scope, element) {
-          if (scope.template) {
-            element.html($compile(angular.element(scope.template))(scope));
-          }
-        }
-      };
-    }
-  ]);
-
-  app.directive('uiSelectRequired', function () {
-    return {
-      require: 'ngModel',
-      link: function (scope, element, attrs, ngModel) {
-        var oldIsEmpty = ngModel.$isEmpty;
-        ngModel.$isEmpty = function (value) {
-          return (Array.isArray(value) && value.length === 0) || oldIsEmpty(value);
-        };
-      }
-    };
-  });
-
-// A hack to have ui-select open on focus
-  app.directive('uiSelectOpenOnFocus', ['$timeout', function ($timeout) {
-    return {
-      require: 'uiSelect',
-      restrict: 'A',
-      link: function ($scope, el, attrs, uiSelect) {
-        var closing = false;
-
-        angular.element(uiSelect.focusser).on('focus', function () {
-          if (!closing) {
-            uiSelect.activate();
-          }
-        });
-
-        // Because ui-select immediately focuses the focusser after closing
-        // we need to not re-activate after closing
-        $scope.$on('uis:close', function () {
-          closing = true;
-          $timeout(function () { // I'm so sorry
-            closing = false;
-          });
-        });
-      }
-    };
-  }]);
-
-// Configure the Select component.
-  app.config([
-    'formioComponentsProvider',
-    function (formioComponentsProvider) {
-      formioComponentsProvider.register('select', {
-        title: 'Select',
-        template: function ($scope) {
-          return $scope.component.multiple ? 'formio/components/select-multiple.html' : 'formio/components/select.html';
-        },
-        controller: function (settings, $scope, $http, Formio) {
-          $scope.nowrap = true;
-          $scope.selectItems = [];
-          var valueProp = $scope.component.valueProperty;
-          $scope.getSelectItem = function (item) {
-            if (!item) {
-              return '';
-            }
-            if (settings.dataSrc === 'values') {
-              return item.value;
-            }
-            return valueProp ? item[valueProp] : item;
-          };
-
-          if (settings.multiple) {
-            settings.defaultValue = [];
-          }
-
-          switch (settings.dataSrc) {
-            case 'values':
-              $scope.selectItems = settings.data.values;
-              break;
-            case 'json':
-              try {
-                $scope.selectItems = angular.fromJson(settings.data.json);
-              }
-              catch (error) {
-                $scope.selectItems = [];
-              }
-              break;
-            case 'url':
-              if (settings.data.url) {
-                var options = {cache: true};
-                if (settings.data.url.substr(0, 1) === '/') {
-                  settings.data.url = Formio.baseUrl + settings.data.url;
-                }
-
-                // Disable auth for outgoing requests.
-                if (settings.data.url.indexOf(Formio.baseUrl) === -1) {
-                  options = {
-                    disableJWT: true,
-                    headers: {
-                      Authorization: undefined,
-                      Pragma: undefined,
-                      'Cache-Control': undefined
-                    }
-                  };
-                }
-                $http.get(settings.data.url, options)
-                  .then(function (result) {
-                    $scope.selectItems = result.data;
-                  });
-              }
-              break;
-            default:
-              $scope.selectItems = [];
-          }
-        },
-        settings: {
-          input: true,
-          tableView: true,
-          label: '',
-          key: 'selectField',
-          placeholder: '',
-          data: {
-            values: [],
-            json: '',
-            url: ''
-          },
-          dataSrc: 'values',
-          valueProperty: '',
-          defaultValue: '',
-          template: '<span>{{ item.label }}</span>',
-          multiple: false,
-          refresh: false,
-          refreshDelay: 0,
-          protected: false,
-          unique: false,
-          persistent: true,
-          validate: {
-            required: false
-          }
-        }
-      });
-    }
-  ]);
-  app.run([
-    '$templateCache',
-    function ($templateCache) {
-      $templateCache.put('formio/components/select.html',
-        '<label ng-if="component.label" for="{{ component.key }}" class="control-label" ng-class="{\'field-required\': component.validate.required}">{{ component.label }}</label>' +
-        '<span ng-if="!component.label && component.validate.required" class="glyphicon glyphicon-asterisk form-control-feedback field-required-inline" aria-hidden="true"></span>' +
-        '<ui-select ui-select-required ui-select-open-on-focus ng-model="data[component.key]" safe-multiple-to-single name="{{ component.key }}" ng-disabled="readOnly" ng-required="component.validate.required" id="{{ component.key }}" theme="bootstrap">' +
-        '<ui-select-match placeholder="{{ component.placeholder }}">' +
-        '<formio-select-item template="component.template" item="$item || $select.selected" select="$select"></formio-select-item>' +
-        '</ui-select-match>' +
-        '<ui-select-choices repeat="getSelectItem(item) as item in selectItems | filter: $select.search">' +
-        '<formio-select-item template="component.template" item="item" select="$select"></formio-select-item>' +
-        '</ui-select-choices>' +
-        '</ui-select>' +
-        '<formio-errors></formio-errors>'
-      );
-
-      // Change the ui-select to ui-select multiple.
-      $templateCache.put('formio/components/select-multiple.html',
-        $templateCache.get('formio/components/select.html').replace('<ui-select', '<ui-select multiple')
-      );
-    }
-  ]);
-};
-
-},{}],21:[function(require,module,exports){
-"use strict";
-module.exports = function (app) {
-
-  app.config([
-    'formioComponentsProvider',
-    function (formioComponentsProvider) {
-      formioComponentsProvider.register('signature', {
-        title: 'Signature',
-        template: 'formio/components/signature.html',
-        tableView: function (data) {
-          return data ? 'Yes' : 'No';
-        },
-        settings: {
-          input: true,
-          tableView: true,
-          label: '',
-          key: 'signature',
-          placeholder: '',
-          footer: 'Sign above',
-          width: '100%',
-          height: '150',
-          penColor: 'black',
-          backgroundColor: 'rgb(245,245,235)',
-          minWidth: '0.5',
-          maxWidth: '2.5',
-          protected: false,
-          persistent: true,
-          validate: {
-            required: false
-          }
-        }
-      });
-    }
-  ]);
-  app.directive('signature', function () {
-    return {
-      restrict: 'A',
-      scope: {
-        component: '='
-      },
-      require: '?ngModel',
-      link: function (scope, element, attrs, ngModel) {
-        if (!ngModel) {
-          return;
-        }
-
-        // Sets the label of component for error display.
-        scope.component.label = 'Signature';
-        scope.component.hideLabel = true;
-
-        // Sets the dimension of a width or height.
-        var setDimension = function (dim) {
-          if (scope.component[dim].slice(-1) === '%') {
-            var percent = parseFloat(scope.component[dim].slice(0, -1)) / 100;
-            element[0][dim] = element.parent()[dim]() * percent;
-          }
-          else {
-            element[0][dim] = parseInt(scope.component[dim], 10);
-            scope.component[dim] = element[0][dim] + 'px';
-          }
-        };
-
-        // Set the width and height of the canvas.
-        setDimension('width');
-        setDimension('height');
-
-        // Create the signature pad.
-        /* global SignaturePad:false */
-        var signaturePad = new SignaturePad(element[0], {
-          minWidth: scope.component.minWidth,
-          maxWidth: scope.component.maxWidth,
-          penColor: scope.component.penColor,
-          backgroundColor: scope.component.backgroundColor
-        });
-
-        scope.$watch('component.penColor', function (newValue) {
-          signaturePad.penColor = newValue;
-        });
-
-        scope.$watch('component.backgroundColor', function (newValue) {
-          signaturePad.backgroundColor = newValue;
-          signaturePad.clear();
-        });
-
-        // Clear the signature.
-        scope.component.clearSignature = function () {
-          signaturePad.clear();
-          readSignature();
-        };
-
-        // Set some CSS properties.
-        element.css({
-          'border-radius': '4px',
-          'box-shadow': '0 0 5px rgba(0, 0, 0, 0.02) inset',
-          'border': '1px solid #f4f4f4'
-        });
-
-        function readSignature() {
-          if (scope.component.validate.required && signaturePad.isEmpty()) {
-            ngModel.$setViewValue('');
-          } else {
-            ngModel.$setViewValue(signaturePad.toDataURL());
-          }
-        }
-
-        ngModel.$render = function () {
-          signaturePad.fromDataURL(ngModel.$viewValue);
-        };
-        signaturePad.onEnd = function () {
-          scope.$evalAsync(readSignature);
-        };
-
-        // Read initial empty canvas, unless signature is required, then keep it pristine
-        if (!scope.component.validate.required) {
-          readSignature();
-        }
-      }
-    };
-  });
-  app.run([
-    '$templateCache',
-    'FormioUtils',
-    function ($templateCache,
-              FormioUtils) {
-      $templateCache.put('formio/components/signature.html', FormioUtils.fieldWrap(
-        '<img ng-if="readOnly" ng-attr-src="{{data[component.key]}}" src="" />' +
-        '<div ng-if="!readOnly" style="width: {{ component.width }}; height: {{ component.height }};">' +
-        '<a class="btn btn-xs btn-default" style="position:absolute; left: 0; top: 0; z-index: 1000" ng-click="component.clearSignature()"><span class="glyphicon glyphicon-refresh"></span></a>' +
-        '<canvas signature component="component" name="{{ component.key }}" ng-model="data[component.key]" ng-required="component.validate.required"></canvas>' +
-        '<div class="formio-signature-footer" style="text-align: center;color:#C3C3C3;" ng-class="{\'field-required\': component.validate.required}">{{ component.footer }}</div>' +
-        '</div>'
-      ));
-    }
-  ]);
-};
-
-},{}],22:[function(require,module,exports){
-"use strict";
-module.exports = function (app) {
-
-  app.config([
-    'formioComponentsProvider',
-    function (formioComponentsProvider) {
-      formioComponentsProvider.register('textarea', {
-        title: 'Text Area',
-        template: 'formio/components/textarea.html',
-        settings: {
-          input: true,
-          tableView: true,
-          label: '',
-          key: 'textareaField',
-          placeholder: '',
-          prefix: '',
-          suffix: '',
-          rows: 3,
-          multiple: false,
-          defaultValue: '',
-          protected: false,
-          persistent: true,
-          validate: {
-            required: false,
-            minLength: '',
-            maxLength: '',
-            pattern: '',
-            custom: ''
-          }
-        }
-      });
-    }
-  ]);
-  app.run([
-    '$templateCache',
-    'FormioUtils',
-    function ($templateCache,
-              FormioUtils) {
-      $templateCache.put('formio/components/textarea.html', FormioUtils.fieldWrap(
-        '<textarea ' +
-        'class="form-control" ' +
-        'ng-model="data[component.key]" ' +
-        'ng-disabled="readOnly" ' +
-        'ng-required="component.validate.required" ' +
-        'safe-multiple-to-single ' +
-        'id="{{ component.key }}" ' +
-        'placeholder="{{ component.placeholder }}" ' +
-        'custom-validator="component.validate.custom" ' +
-        'rows="{{ component.rows }}"></textarea>'
-      ));
-    }
-  ]);
-};
-
-},{}],23:[function(require,module,exports){
-"use strict";
-module.exports = function (app) {
-
-  app.config([
-    'formioComponentsProvider',
-    function (formioComponentsProvider) {
-      formioComponentsProvider.register('textfield', {
-        title: 'Text Field',
-        template: 'formio/components/textfield.html',
-        settings: {
-          input: true,
-          tableView: true,
-          inputType: 'text',
-          inputMask: '',
-          label: '',
-          key: 'textField',
-          placeholder: '',
-          prefix: '',
-          suffix: '',
-          multiple: false,
-          defaultValue: '',
-          protected: false,
-          unique: false,
-          persistent: true,
-          validate: {
-            required: false,
-            minLength: '',
-            maxLength: '',
-            pattern: '',
-            custom: '',
-            customPrivate: false
-          }
-        }
-      });
-    }
-  ]);
-  app.run([
-    '$templateCache',
-    'FormioUtils',
-    function ($templateCache,
-              FormioUtils) {
-      $templateCache.put('formio/components/textfield.html', FormioUtils.fieldWrap(
-        '<input type="{{ component.inputType }}" ' +
-        'class="form-control" ' +
-        'id="{{ component.key }}" ' +
-        'name="{{ component.key }}" ' +
-        'ng-disabled="readOnly" ' +
-        'ng-model="data[component.key]" ' +
-        'ng-model-options="{ debounce: 500 }" ' +
-        'safe-multiple-to-single ' +
-        'ng-required="component.validate.required" ' +
-        'ng-minlength="component.validate.minLength" ' +
-        'ng-maxlength="component.validate.maxLength" ' +
-        'ng-pattern="component.validate.pattern" ' +
-        'custom-validator="component.validate.custom" ' +
-        'placeholder="{{ component.placeholder }}" ' +
-        'ui-mask="{{ component.inputMask }}" ' +
-        'ui-mask-placeholder="" ' + // avoids regular placeholder mixing with mask placeholder
-        'ui-options="uiMaskOptions" ' +
-        '>'
-      ));
-    }
-  ]);
-};
-
-},{}],24:[function(require,module,exports){
-"use strict";
-module.exports = function (app) {
-
-  app.config([
-    'formioComponentsProvider',
-    function (formioComponentsProvider) {
-      formioComponentsProvider.register('well', {
-        title: 'Well',
-        template: 'formio/components/well.html',
-        group: 'layout',
-        settings: {
-          input: false,
-          components: []
-        }
-      });
-    }
-  ]);
-  app.run([
-    '$templateCache',
-    function ($templateCache) {
-      $templateCache.put('formio/components/well.html',
-        '<div class="well">' +
-        '<formio-component ng-repeat="component in component.components" ng-if="componentFound(component)" component="component" data="data" formio="formio" read-only="readOnly"></formio-component>' +
-        '</div>'
-      );
-    }
-  ]);
-};
-
-},{}],25:[function(require,module,exports){
-"use strict";
-module.exports = function() {
-  return {
-    restrict: 'A',
-    require: 'ngModel',
-    link: function(scope, ele, attrs, ctrl) {
-      if (
-        !scope.component.validate ||
-        !scope.component.validate.custom
-      ) {
-        return;
-      }
-      ctrl.$parsers.unshift(function(input) {
-        var valid = true;
-        if (input) {
-          var custom = scope.component.validate.custom;
-          custom = custom.replace(/({{\s+(.*)\s+}})/, function(match, $1, $2) {
-            return scope.data[$2];
-          });
-          /* jshint evil: true */
-          valid = eval(custom);
-          ctrl.$setValidity('custom', (valid === true));
-        }
-        if (valid !== true) {
-          scope.component.customError = valid;
-        }
-        return (valid === true) ? input : valid;
-      });
-    }
-  };
-};
-
-},{}],26:[function(require,module,exports){
-"use strict";
-module.exports = function() {
-  return {
-    restrict: 'E',
-    replace: true,
-    scope: {
-      src: '=',
-      formAction: '=',
-      form: '=',
-      submission: '=',
-      readOnly: '='
-    },
-    controller: [
-      '$scope',
-      '$http',
-      '$element',
-      'FormioScope',
-      'Formio',
-      'FormioUtils',
-      'formioComponents',
-      function(
-        $scope,
-        $http,
-        $element,
-        FormioScope,
-        Formio,
-        FormioUtils,
-        formioComponents
-      ) {
-        $scope.formioAlerts = [];
-        // Shows the given alerts (single or array), and dismisses old alerts
-        this.showAlerts = $scope.showAlerts = function(alerts) {
-          $scope.formioAlerts = [].concat(alerts);
-        };
-
-        // Add the live form parameter to the url.
-        $scope._src = $scope.src;
-        if ($scope._src && ($scope._src.indexOf('live=') === -1)) {
-          $scope._src += ($scope._src.indexOf('?') === -1) ? '?' : '&';
-          $scope._src += 'live=1';
-        }
-
-        // Create the formio object.
-        $scope.formio = FormioScope.register($scope, $element, {
-          form: true,
-          submission: true
-        });
-
-        // See if a component is found in the registry.
-        $scope.componentFound = function(component) {
-          return formioComponents.components.hasOwnProperty(component.type);
-        };
-
-        // Called when the form is submitted.
-        $scope.onSubmit = function(form) {
-          if (!$scope.formioForm.$valid || form.submitting) { return; }
-          form.submitting = true;
-
-          // Create a sanitized submission object.
-          var submissionData = {data: {}};
-          if ($scope._submission._id) {
-            submissionData._id = $scope._submission._id;
-          }
-          if ($scope._submission.data._id) {
-            submissionData._id = $scope._submission.data._id;
-          }
-
-          var components = FormioUtils.flattenComponents($scope._form.components);
-          angular.forEach(components, function(component) {
-            if ($scope._submission.data.hasOwnProperty(component.key)) {
-              submissionData.data[component.key] = $scope._submission.data[component.key];
-            }
-          });
-          angular.forEach($scope._submission.data, function(value, key) {
-            if (value && !value.hasOwnProperty('_id')) {
-              submissionData.data[key] = value;
-            }
-          });
-
-          // Called when a submission has been made.
-          var onSubmitDone = function(method, submission) {
-            $scope.showAlerts({
-              type: 'success',
-              message: 'Submission was ' + ((method === 'put') ? 'updated' : 'created') + '.'
-            });
-            form.submitting = false;
-            // Trigger the form submission.
-            $scope.$emit('formSubmission', submission);
-          };
-
-          // Allow custom action urls.
-          if ($scope.action) {
-            var method = submissionData._id ? 'put' : 'post';
-            $http[method]($scope.action, submissionData).success(function (submission) {
-              Formio.clearCache();
-              onSubmitDone(method, submission);
-            }).error(FormioScope.onError($scope, $element))
-              .finally(function() {
-                form.submitting = false;
-              });
-          }
-
-          // If they wish to submit to the default location.
-          else if ($scope.formio) {
-            $scope.formio.saveSubmission(angular.copy(submissionData)) // copy to remove angular $$hashKey
-              .then(function(submission) {
-              onSubmitDone(submission.method, submission);
-            }, FormioScope.onError($scope, $element))
-              .finally(function() {
-                form.submitting = false;
-              });
-          }
-          else {
-            $scope.$emit('formSubmission', submissionData);
-          }
-        };
-      }
-    ],
-    templateUrl: 'formio.html'
-  };
-};
-
-},{}],27:[function(require,module,exports){
-"use strict";
-module.exports = [
-  'Formio',
-  'formioComponents',
-  function(
-    Formio,
-    formioComponents
-  ) {
-    return {
-      replace: true,
-      restrict: 'E',
-      require: '?^formio',
-      scope: {
-        component: '=',
-        data: '=',
-        formio: '=',
-        form: '=',
-        readOnly: '='
-      },
-      templateUrl: 'formio/component.html',
-      link: function($scope, el, attrs, formioCtrl) {
-        if(formioCtrl) {
-          $scope.showAlerts = formioCtrl.showAlerts.bind(formioCtrl);
-        }
-        else {
-          $scope.showAlerts = function() {
-            throw new Error('Cannot call $scope.showAlerts unless this component is inside a formio directive.');
-          };
-        }
-      },
-      controller: [
-        '$scope',
-        '$http',
-        function(
-          $scope,
-          $http
-        ) {
-
-          // Options to match jquery.maskedinput masks
-          $scope.uiMaskOptions = {
-            maskDefinitions: {
-              '9': /\d/,
-              'a': /[a-zA-Z]/,
-              '*': /[a-zA-Z0-9]/
-            },
-            clearOnBlur: false,
-            eventsToHandle: ['input', 'keyup', 'click', 'focus'],
-            silentEvents: ['click', 'focus']
-          };
-
-          $scope.resetForm = function() {
-            // Manually remove each key so we don't lose a reference to original
-            // data in child scopes.
-            for(var key in $scope.data) {
-              delete $scope.data[key];
-            }
-          };
-
-          // Initialize the data.
-          if (!$scope.data) {
-            $scope.resetForm();
-          }
-
-          // If this component references an object, we need to determine the
-          // value by navigating through the object.
-          if (
-            $scope.component &&
-            $scope.component.key
-          ) {
-            var root = '';
-            if ($scope.component.key.indexOf('.') !== -1) {
-              root = $scope.component.key.split('.').shift();
-            }
-            $scope.$watch('data', function(data) {
-              if (!data || angular.equals({}, data)) { return; }
-              if (root && (!data.hasOwnProperty(root) || angular.equals({}, data[root]))) { return; }
-              if (root && data[root].hasOwnProperty('_id')) {
-                $scope.data[root + '._id'] = data[root]._id;
-              }
-              var value = Formio.fieldData(data, $scope.component);
-              if (value !== undefined) {
-                $scope.data[$scope.component.key] = value;
-              }
-            });
-          }
-
-          // See if a component is found in the registry.
-          $scope.componentFound = function(component) {
-            return formioComponents.components.hasOwnProperty(component.type);
-          };
-
-          // Get the settings.
-          var component = formioComponents.components[$scope.component.type];
-          if (!component) { return; }
-
-          // Set the component with the defaults from the component settings.
-          angular.forEach(component.settings, function(value, key) {
-            if (!$scope.component.hasOwnProperty(key)) {
-              $scope.component[key] = angular.copy(value);
-            }
-          });
-
-          // Add a new field value.
-          $scope.addFieldValue = function() {
-            $scope.data[$scope.component.key] = $scope.data[$scope.component.key] || [];
-            $scope.data[$scope.component.key].push('');
-          };
-
-          // Remove a field value.
-          $scope.removeFieldValue = function(index) {
-            $scope.data[$scope.component.key].splice(index, 1);
-          };
-
-          // Set the template for the component.
-          if (typeof component.template === 'function') {
-            $scope.template = component.template($scope);
-          }
-          else {
-            $scope.template = component.template;
-          }
-
-          // Allow component keys to look like "settings[username]"
-          if ($scope.component.key && $scope.component.key.indexOf('[') !== -1) {
-            var matches = $scope.component.key.match(/([^\[]+)\[([^]+)\]/);
-            if ((matches.length === 3) && $scope.data.hasOwnProperty(matches[1])) {
-              $scope.data = $scope.data[matches[1]];
-              $scope.component.key = matches[2];
-            }
-          }
-
-          // If the component has a controller.
-          if (component.controller) {
-            component.controller($scope.component, $scope, $http, Formio);
-          }
-
-          // Establish a default for data.
-          if ($scope.data && !$scope.data.hasOwnProperty($scope.component.key) && $scope.component.hasOwnProperty('defaultValue')) {
-            if($scope.component.multiple && !angular.isArray($scope.component.defaultValue)) {
-              $scope.data[$scope.component.key] = [$scope.component.defaultValue];
-            }
-            else {
-              $scope.data[$scope.component.key] = $scope.component.defaultValue;
-            }
-          }
-          else if ($scope.data && !$scope.data.hasOwnProperty($scope.component.key) && $scope.component.multiple) {
-            $scope.data[$scope.component.key] = [];
-          }
-        }
-      ]
-    };
-  }
-];
-
-},{}],28:[function(require,module,exports){
-"use strict";
-module.exports = function() {
-  return {
-    restrict: 'E',
-    replace: true,
-    scope: {
-      form: '=',
-      submission: '=',
-      src: '=',
-      formAction: '=',
-      resourceName: '='
-    },
-    templateUrl: 'formio-delete.html',
-    controller: [
-      '$scope',
-      '$element',
-      'FormioScope',
-      'Formio',
-      '$http',
-      function(
-        $scope,
-        $element,
-        FormioScope,
-        Formio,
-        $http
-      ) {
-        $scope.formioAlerts = [];
-        // Shows the given alerts (single or array), and dismisses old alerts
-        $scope.showAlerts = function(alerts) {
-          $scope.formioAlerts = [].concat(alerts);
-        };
-        var resourceName = 'resource';
-        var methodName = '';
-        var loader = FormioScope.register($scope, $element, {
-          form: true,
-          submission: true
-        });
-
-        if (loader) {
-          resourceName = loader.submissionId ? 'submission' : 'form';
-          var resourceTitle = resourceName.charAt(0).toUpperCase() + resourceName.slice(1);
-          methodName = 'delete' + resourceTitle;
-        }
-
-        // Set the resource name
-        $scope._resourceName = resourceName;
-
-        // Create delete capability.
-        $scope.onDelete = function() {
-          // Rebuild resourceTitle, $scope.resourceName could have changed
-          var resourceName = $scope.resourceName || $scope._resourceName;
-          var resourceTitle = resourceName.charAt(0).toUpperCase() + resourceName.slice(1);
-          // Called when the delete is done.
-          var onDeleteDone = function(data) {
-            $scope.showAlerts({
-              type: 'success',
-              message: resourceTitle + ' was deleted.'
-            });
-            Formio.clearCache();
-            $scope.$emit('delete', data);
-          };
-
-          if ($scope.action) {
-            $http.delete($scope.action).success(onDeleteDone).error(FormioScope.onError($scope, $element));
-          }
-          else if (loader) {
-            if (!methodName) { return; }
-            if (typeof loader[methodName] !== 'function') { return; }
-            loader[methodName]().then(onDeleteDone, FormioScope.onError($scope, $element));
-          }
-        };
-        $scope.onCancel = function() {
-          $scope.$emit('cancel');
-        };
-      }
-    ]
-  };
-};
-
-},{}],29:[function(require,module,exports){
-"use strict";
-module.exports = [
-  '$compile',
-  '$templateCache',
-  function(
-    $compile,
-    $templateCache
-  ) {
-    return {
-      scope: false,
-      link: function(scope, element) {
-        element.replaceWith($compile($templateCache.get(scope.template))(scope));
-        scope.$emit('formElementRender', element);
-      },
-      controller: function() {
-        // This is required for some reason as it will occasionally throw an error without it.
-      }
-    };
-  }
-];
-
-},{}],30:[function(require,module,exports){
-"use strict";
-module.exports = function() {
-  return {
-    scope: false,
-    restrict: 'E',
-    templateUrl: 'formio/errors.html'
-  };
-};
-
-},{}],31:[function(require,module,exports){
-"use strict";
-module.exports = function() {
-  return {
-    replace: true,
-    restrict: 'E',
-    scope: {
-      src: '=',
-      form: '=',
-      submissions: '=',
-      perPage: '='
-    },
-    templateUrl: 'formio/submissions.html',
-    controller: [
-      '$scope',
-      '$element',
-      'FormioScope',
-      function(
-        $scope,
-        $element,
-        FormioScope
-      ) {
-        $scope.formio = FormioScope.register($scope, $element, {
-          form: true,
-          submissions: false
-        });
-
-        $scope.tableView = function(component) {
-          return !component.hasOwnProperty('tableView') || component.tableView;
-        };
-
-        $scope.$watch('_submissions', function(submissions) {
-          if (submissions && submissions.length > 0) {
-            $scope.$emit('submissionLoad', $scope._submissions);
-          }
-        });
-      }
-    ]
-  };
-};
-
-},{}],32:[function(require,module,exports){
-"use strict";
-module.exports = [
-  'Formio',
-  'formioComponents',
-  function(
-    Formio,
-    formioComponents
-  ) {
-    return {
-      onError: function($scope, $element) {
-        return function(error) {
-          if (error.name === 'ValidationError') {
-            $element.find('#form-group-' + error.details[0].path).addClass('has-error');
-            var message = 'ValidationError: ' + error.details[0].message;
-            $scope.showAlerts({
-              type: 'danger',
-              message: message
-            });
-          }
-          else {
-            if(error instanceof Error) {
-              error = error.toString();
-            }
-            else if(typeof error === 'object') {
-              error = JSON.stringify(error);
-            }
-            $scope.showAlerts({
-              type: 'danger',
-              message: error
-            });
-          }
-          $scope.$emit('formError', error);
-        };
-      },
-      register: function($scope, $element, options) {
-        var loader = null;
-        $scope._src = $scope._src || $scope.src || '';
-        $scope._form = $scope.form || {};
-        $scope._submission = $scope.submission || {data: {}};
-        $scope._submissions = $scope.submissions || [];
-
-        // Keep track of the elements rendered.
-        var elementsRendered = 0;
-        $scope.$on('formElementRender', function() {
-          elementsRendered++;
-          if (elementsRendered === $scope._form.components.length) {
-            setTimeout(function() {
-              $scope.$emit('formRender', $scope._form);
-            }, 1);
-          }
-        });
-
-        // Used to set the form action.
-        var getAction = function(action) {
-          if (!action) { return ''; }
-          if ($scope.action) { return ''; }
-          if (action.substr(0, 1) === '/') {
-            action = Formio.baseUrl + action;
-          }
-          return action;
-        };
-
-        // Set the action.
-        $scope.action = getAction($scope.formAction);
-
-        // Allow sub components the ability to add new form components to the form.
-        var addedData = {};
-        $scope.$on('addFormComponent', function(event, component) {
-          if (!addedData.hasOwnProperty(component.settings.key)) {
-            addedData[component.settings.key] = true;
-            var defaultComponent = formioComponents.components[component.type];
-            $scope._form.components.push(angular.extend(defaultComponent.settings, component.settings));
-          }
-        });
-
-        // Set the action if they provided it in the form.
-        $scope.$watch('form.action', function(value) {
-          if (!value) { return; }
-          var action = getAction(value);
-          if (action) {
-            $scope.action = action;
-          }
-        });
-
-        // Return the value and set the scope for the model input.
-        $scope.fieldData = function(data, component) {
-          var value = Formio.fieldData(data, component);
-          var componentInfo = formioComponents.components[component.type];
-          if (!componentInfo.tableView) { return value; }
-          if (component.multiple && (value.length > 0)) {
-            var values = [];
-            angular.forEach(value, function(arrayValue) {
-              values.push(componentInfo.tableView(arrayValue, component));
-            });
-            return values;
-          }
-          return componentInfo.tableView(value, component);
-        };
-
-        var spinner = $element.find('#formio-loading');
-
-        if ($scope._src) {
-          loader = new Formio($scope._src);
-          if (options.form) {
-            spinner.show();
-            loader.loadForm().then(function(form) {
-              $scope._form = form;
-              spinner.hide();
-              $scope.$emit('formLoad', form);
-            }, this.onError($scope));
-          }
-          if (options.submission && loader.submissionId) {
-            spinner.show();
-            loader.loadSubmission().then(function(submission) {
-              $scope._submission = submission;
-              if (!$scope._submission.data) {
-                $scope._submission.data = {};
-              }
-              spinner.hide();
-              $scope.$emit('submissionLoad', submission);
-            }, this.onError($scope));
-          }
-          if (options.submissions) {
-            spinner.show();
-            loader.loadSubmissions().then(function(submissions) {
-              $scope._submissions = submissions;
-              spinner.hide();
-              $scope.$emit('submissionsLoad', submissions);
-            }, this.onError($scope));
-          }
-        }
-        else {
-
-          $scope.formoLoaded = true;
-          spinner.hide();
-
-          // Emit the events if these objects are already loaded.
-          if ($scope._form) {
-            $scope.$emit('formLoad', $scope._form);
-          }
-          if ($scope._submission) {
-            $scope.$emit('submissionLoad', $scope._submission);
-          }
-          if ($scope._submissions) {
-            $scope.$emit('submissionsLoad', $scope._submissions);
-          }
-        }
-
-        // Return the loader.
-        return loader;
-      }
-    };
-  }
-];
-
-},{}],33:[function(require,module,exports){
-"use strict";
-module.exports = function() {
-  return {
-    flattenComponents: function flatten(components, flattened) {
-      flattened = flattened || {};
-      angular.forEach(components, function(component) {
-        if (component.tree) {
-          flattened[component.key] = component;
-        }
-        else if (component.columns && (component.columns.length > 0)) {
-          angular.forEach(component.columns, function(column) {
-            flatten(column.components, flattened);
-          });
-        }
-        else if (component.components && (component.components.length > 0)) {
-          flatten(component.components, flattened);
-        }
-        else if (component.input) {
-          flattened[component.key] = component;
-        }
-      });
-      return flattened;
-    },
-    eachComponent: function eachComponent(components, fn) {
-      if(!components) {
-        return;
-      }
-      angular.forEach(components, function(component) {
-        if (component.columns) {
-          angular.forEach(component.columns, function(column) {
-            eachComponent(column.components, fn);
-          });
-        }
-        else if (component.components) {
-          eachComponent(component.components, fn);
-        }
-        else {
-          fn(component);
-        }
-      });
-    },
-    getComponent: function getComponent(components, key) {
-      var result;
-      this.eachComponent(components, function(component) {
-        if(component.key === key) {
-          result = component;
-        }
-      });
-      return result;
-    },
-    fieldWrap: function(input) {
-      input = input + '<formio-errors></formio-errors>';
-      var multiInput = input.replace('data[component.key]', 'data[component.key][$index]');
-      var inputLabel = '<label ng-if="component.label && !component.hideLabel" for="{{ component.key }}" class="control-label" ng-class="{\'field-required\': component.validate.required}">{{ component.label }}</label>';
-      var requiredInline = '<span ng-if="!component.label && component.validate.required" class="glyphicon glyphicon-asterisk form-control-feedback field-required-inline" aria-hidden="true"></span>';
-      var template =
-        '<div ng-if="!component.multiple">' +
-        inputLabel + requiredInline +
-        '<div class="input-group" ng-if="component.prefix || component.suffix">' +
-        '<div class="input-group-addon" ng-if="!!component.prefix">{{ component.prefix }}</div>' +
-        input +
-        '<div class="input-group-addon" ng-if="!!component.suffix">{{ component.suffix }}</div>' +
-        '</div>' +
-        '<div ng-if="!component.prefix && !component.suffix">' + input + '</div>' +
-        '</div>' +
-        '<div ng-if="component.multiple"><table class="table table-bordered">' +
-        inputLabel +
-        '<tr ng-repeat="value in data[component.key] track by $index">' +
-        '<td>' + requiredInline +
-        '<div class="input-group" ng-if="component.prefix || component.suffix">' +
-        '<div class="input-group-addon" ng-if="!!component.prefix">{{ component.prefix }}</div>' +
-        multiInput +
-        '<div class="input-group-addon" ng-if="!!component.suffix">{{ component.suffix }}</div>' +
-        '</div>' +
-        '<div ng-if="!component.prefix && !component.suffix">' + multiInput + '</div>' +
-        '</td>' +
-        '<td><a ng-click="removeFieldValue($index)" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle"></span></a></td>' +
-        '</tr>' +
-        '<tr>' +
-        '<td colspan="2"><a ng-click="addFieldValue()" class="btn btn-primary"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add another</a></td>' +
-        '</tr>' +
-        '</table></div>';
-      return template;
-    }
-  };
-};
-
-},{}],34:[function(require,module,exports){
-"use strict";
-module.exports = [
-  '$q',
-  '$rootScope',
-  'Formio',
-  function($q, $rootScope, Formio) {
-    var Interceptor = {
-      /**
-       * Update JWT token received from response.
-       */
-      response: function(response) {
-        var token = response.headers('x-jwt-token');
-        if (response.status >= 200 && response.status < 300 && token && token !== '') {
-          Formio.setToken(token);
-        }
-        return response;
-      },
-
-      /**
-       * Intercept a response error.
-       */
-      responseError: function(response) {
-        if (parseInt(response.status, 10) === 440) {
-          response.loggedOut = true;
-          Formio.setToken(null);
-          $rootScope.$broadcast('formio.sessionExpired', response.body);
-        }
-        else if(parseInt(response.status, 10) === 401) {
-          $rootScope.$broadcast('formio.unauthorized', response.body);
-        }
-        return $q.reject(response);
-      },
-
-      /**
-       * Set the token in the request headers.
-       */
-      request: function(config) {
-        if (config.disableJWT) { return config; }
-        var token = Formio.getToken();
-        if (token) { config.headers['x-jwt-token'] = token; }
-        return config;
-      }
-    };
-
-    return Interceptor;
-  }
-];
-
-},{}],35:[function(require,module,exports){
-"use strict";
-module.exports = [
-  'FormioUtils',
-  function(FormioUtils) {
-    return FormioUtils.flattenComponents;
-  }
-];
-
-},{}],36:[function(require,module,exports){
-"use strict";
-module.exports = [
-  '$sce',
-  function(
-    $sce
-  ) {
-    return function(html) {
-      return $sce.trustAsHtml(html);
-    };
-  }
-];
-
-},{}],37:[function(require,module,exports){
-"use strict";
-var app = angular.module('formio', [
-  'ngSanitize',
-  'ui.bootstrap',
-  'ui.bootstrap.datetimepicker',
-  'ui.select',
-  'ui.mask',
-  'angularMoment',
-  'bgf.paginateAnything'
-]);
-
-/**
- * Create the formio provider.
- */
-app.provider('Formio', require('./providers/Formio'));
-
-/**
- * Provides a way to regsiter the Formio scope.
- */
-app.factory('FormioScope', require('./factories/FormioScope'));
-
-app.factory('FormioUtils', require('./factories/FormioUtils'));
-
-app.factory('formioInterceptor', require('./factories/formioInterceptor'));
-
-app.directive('formio', require('./directives/formio'));
-
-app.directive('formioDelete', require('./directives/formioDelete'));
-
-app.directive('formioErrors', require('./directives/formioErrors'));
-
-app.directive('customValidator', require('./directives/customValidator'));
-
-app.directive('formioSubmissions', require('./directives/formioSubmissions'));
-
-app.directive('formioComponent', require('./directives/formioComponent'));
-
-app.directive('formioElement', require('./directives/formioElement'));
-
-/**
- * Filter to flatten form components.
- */
-app.filter('flattenComponents', require('./filters/flattenComponents'));
-
-app.filter('safehtml', require('./filters/safehtml'));
-
-app.config([
-  '$httpProvider',
-  function(
-    $httpProvider
-  ) {
-    if (!$httpProvider.defaults.headers.get) {
-      $httpProvider.defaults.headers.get = {};
-    }
-
-    // Disable IE caching for GET requests.
-    $httpProvider.defaults.headers.get['Cache-Control'] = 'no-cache';
-    $httpProvider.defaults.headers.get.Pragma = 'no-cache';
-    $httpProvider.interceptors.push('formioInterceptor');
-  }
-]);
-
-app.run([
-  '$templateCache',
-  function($templateCache) {
-
-    // The template for the formio forms.
-    $templateCache.put('formio.html',
-      '<form role="form" name="formioForm" ng-submit="onSubmit(formioForm)" novalidate>' +
-        '<i id="formio-loading" style="font-size: 2em;" class="glyphicon glyphicon-refresh glyphicon-spin"></i>' +
-        '<div ng-repeat="alert in formioAlerts" class="alert alert-{{ alert.type }}" role="alert">' +
-          '{{ alert.message }}' +
-        '</div>' +
-        '<formio-component ng-repeat="component in _form.components track by $index" ng-if="componentFound(component)" component="component" data="_submission.data" form="formioForm" formio="formio" read-only="readOnly"></formio-component>' +
-      '</form>'
-    );
-
-    $templateCache.put('formio-delete.html', '' +
-      '<form role="form">' +
-        '<div ng-repeat="alert in formioAlerts" class="alert alert-{{ alert.type }}" role="alert">' +
-          '{{ alert.message }}' +
-        '</div>' +
-        '<h3>Are you sure you wish to delete the {{ resourceName || _resourceName }}?</h3>' +
-        '<div class="btn-toolbar">' +
-          '<button ng-click="onDelete()" class="btn btn-danger">Yes</button>' +
-          '<button ng-click="onCancel()" class="btn btn-default">No</button>' +
-        '</div>' +
-      '</form>'
-    );
-
-    $templateCache.put('formio/pager.html',
-      '<div class="paginate-anything">' +
-        '<ul class="pagination pagination-{{size}} links" ng-if="numPages > 1">' +
-          '<li ng-class="{disabled: page <= 0}"><a href ng-click="gotoPage(page-1)">&laquo;</a></li>' +
-          '<li ng-if="linkGroupFirst() > 0"><a href ng-click="gotoPage(0)">1</a></li>' +
-          '<li ng-if="linkGroupFirst() > 1" class="disabled"><a href>&hellip;</a></li>' +
-          '<li ng-repeat="p in [linkGroupFirst(), linkGroupLast()] | makeRange" ng-class="{active: p === page}"><a href ng-click="gotoPage(p)">{{p+1}}</a></li>' +
-          '<li ng-if="linkGroupLast() < numPages - 2" class="disabled"><a href>&hellip;</a></li>' +
-          '<li ng-if="isFinite() && linkGroupLast() < numPages - 1"><a href ng-click="gotoPage(numPages-1)">{{numPages}}</a></li>' +
-          '<li ng-class="{disabled: page >= numPages - 1}"><a href ng-click="gotoPage(page+1)">&raquo;</a></li>' +
-        '</ul>' +
-      '</div>'
-    );
-
-    $templateCache.put('formio/submissions.html',
-      '<div>' +
-        '<table class="table">' +
-          '<thead>' +
-            '<tr>' +
-              '<th ng-repeat="component in _form.components | flattenComponents" ng-if="tableView(component)">{{ component.label || component.key }}</th>' +
-              '<th>Submitted</th>' +
-              '<th>Updated</th>' +
-              '<th>Operations</th>' +
-            '</tr>' +
-          '</thead>' +
-          '<tbody>' +
-            '<tr ng-repeat="submission in _submissions">' +
-              '<td ng-repeat="component in _form.components | flattenComponents" ng-if="tableView(component)">{{ fieldData(submission.data, component) }}</td>' +
-              '<td>{{ submission.created | amDateFormat:\'l, h:mm:ss a\' }}</td>' +
-              '<td>{{ submission.modified | amDateFormat:\'l, h:mm:ss a\' }}</td>' +
-              '<td>' +
-                '<div class="button-group" style="display:flex;">' +
-                  '<a ng-click="$emit(\'submissionView\', submission)" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-eye-open"></span></a>&nbsp;' +
-                  '<a ng-click="$emit(\'submissionEdit\', submission)" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-edit"></span></a>&nbsp;' +
-                  '<a ng-click="$emit(\'submissionDelete\', submission)" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove-circle"></span></a>' +
-                '</div>' +
-              '</td>' +
-            '</tr>' +
-          '</tbody>' +
-        '</table>' +
-        '<bgf-pagination collection="_submissions" url="formio.submissionsUrl" per-page="perPage" template-url="formio/pager.html"></bgf-pagination>' +
-      '</div>'
-    );
-
-    // A formio component template.
-    $templateCache.put('formio/component.html',
-      '<ng-form name="formioFieldForm" class="formio-component-{{ component.key }}">' +
-        '<div class="form-group has-feedback form-field-type-{{ component.type }}" id="form-group-{{ component.key }}" ng-class="{\'has-error\': formioFieldForm[component.key].$invalid && !formioFieldForm[component.key].$pristine }">' +
-          '<formio-element></formio-element>' +
-        '</div>' +
-      '</ng-form>'
-    );
-
-    $templateCache.put('formio/errors.html',
-      '<div ng-show="formioFieldForm[component.key].$error && !formioFieldForm[component.key].$pristine">' +
-        '<p class="help-block" ng-show="formioFieldForm[component.key].$error.email">{{ component.label || component.key }} must be a valid email.</p>' +
-        '<p class="help-block" ng-show="formioFieldForm[component.key].$error.required">{{ component.label || component.key }} is required.</p>' +
-        '<p class="help-block" ng-show="formioFieldForm[component.key].$error.number">{{ component.label || component.key }} must be a number.</p>' +
-        '<p class="help-block" ng-show="formioFieldForm[component.key].$error.maxlength">{{ component.label || component.key }} must be shorter than {{ component.validate.maxLength + 1 }} characters.</p>' +
-        '<p class="help-block" ng-show="formioFieldForm[component.key].$error.minlength">{{ component.label || component.key }} must be longer than {{ component.validate.minLength - 1 }} characters.</p>' +
-        '<p class="help-block" ng-show="formioFieldForm[component.key].$error.min">{{ component.label || component.key }} must be higher than {{ component.validate.min - 1 }}.</p>' +
-        '<p class="help-block" ng-show="formioFieldForm[component.key].$error.max">{{ component.label || component.key }} must be lower than {{ component.validate.max + 1 }}.</p>' +
-        '<p class="help-block" ng-show="formioFieldForm[component.key].$error.custom">{{ component.customError }}</p>' +
-        '<p class="help-block" ng-show="formioFieldForm[component.key].$error.pattern">{{ component.label || component.key }} does not match the pattern {{ component.validate.pattern }}</p>' +
-      '</div>'
-    );
-  }
-]);
-
-require('./components');
-
-},{"./components":12,"./directives/customValidator":25,"./directives/formio":26,"./directives/formioComponent":27,"./directives/formioDelete":28,"./directives/formioElement":29,"./directives/formioErrors":30,"./directives/formioSubmissions":31,"./factories/FormioScope":32,"./factories/FormioUtils":33,"./factories/formioInterceptor":34,"./filters/flattenComponents":35,"./filters/safehtml":36,"./providers/Formio":38}],38:[function(require,module,exports){
-"use strict";
-module.exports = function() {
-
-  // The formio class.
-  var Formio = require('formiojs')();
-
-  // Return the provider interface.
-  return {
-
-    // Set the base URL for the formio API.
-    setBaseUrl: function(url, _noalias) {
-      Formio.setBaseUrl(url, _noalias);
-    },
-    setDomain: function(dom) {
-      // Remove this?
-    },
-    $get: [
-      '$rootScope',
-      '$q',
-      function(
-        $rootScope,
-        $q
-      ) {
-
-        // Wrap Formio.request's promises with $q so $apply gets called correctly.
-        var request = Formio.request;
-        Formio.request = function() {
-          return $q.when(request.apply(Formio, arguments))
-          .catch(function(error) {
-            if (error === 'Unauthorized') {
-              $rootScope.$broadcast('formio.unauthorized', error);
-            }
-            else if (error === 'Login Timeout') {
-              $rootScope.$broadcast('formio.sessionExpired', error);
-            }
-            // Propagate error
-            throw error;
-          });
-        };
-
-        // Return the formio interface.
-        return Formio;
-      }
-    ]
-  };
-};
-
-},{"formiojs":39}],39:[function(require,module,exports){
 (function (global){
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formiojs = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function (process){
@@ -5039,10 +2643,21 @@ module.exports = function(_baseUrl, _noalias, _domain) {
       path = baseUrl + path;
     }
 
-    var hostparts = getUrlParts(path);
+    var hostparts = '';
     var parts = [];
-    var hostName = hostparts[1] + hostparts[2];
-    path = hostparts.length > 3 ? hostparts[3] : '';
+    var hostName = '';
+
+    if (baseUrl) {
+      hostName = baseUrl;
+      hostparts = path.match(new RegExp(hostName + '($|\/.*)'));
+      path = hostparts.length > 1 ? hostparts[1] : '';
+    }
+    else {
+      hostparts = getUrlParts(path);
+      hostName = hostparts[1] + hostparts[2];
+      path = hostparts.length > 3 ? hostparts[3] : '';
+    }
+
     var queryparts = path.split('?');
     if (queryparts.length > 1) {
       path = queryparts[0];
@@ -5243,7 +2858,10 @@ module.exports = function(_baseUrl, _noalias, _domain) {
           if (response.status === 204) {
             return {};
           }
-          return response.json();
+          if (response.headers.get('content-type').indexOf('application/json') !== -1) {
+            return response.json();
+          }
+          return response.text();
         }
         else {
           if (response.status === 440) {
@@ -5374,7 +2992,7 @@ module.exports = function(_baseUrl, _noalias, _domain) {
 
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"Q":40,"_process":1,"whatwg-fetch":41}],40:[function(require,module,exports){
+},{"Q":3,"_process":1,"whatwg-fetch":4}],3:[function(require,module,exports){
 (function (process){
 // vim:ts=4:sts=4:sw=4:
 /*!
@@ -7426,7 +5044,7 @@ return Q;
 });
 
 }).call(this,require('_process'))
-},{"_process":1}],41:[function(require,module,exports){
+},{"_process":1}],4:[function(require,module,exports){
 (function() {
   'use strict';
 
@@ -7758,4 +5376,2400 @@ return Q;
   self.fetch.polyfill = true
 })();
 
-},{}]},{},[37]);
+},{}],5:[function(require,module,exports){
+"use strict";
+module.exports = function (app) {
+
+  /*jshint camelcase: false */
+  app.config([
+    'formioComponentsProvider',
+    function (formioComponentsProvider) {
+      formioComponentsProvider.register('address', {
+        title: 'Address',
+        template: function ($scope) {
+          return $scope.component.multiple ? 'formio/components/address-multiple.html' : 'formio/components/address.html';
+        },
+        controller: function (settings, $scope, $http) {
+          $scope.address = {};
+          $scope.addresses = [];
+          $scope.refreshAddress = function (address) {
+            var params = {address: address, sensor: false};
+            return $http.get(
+              'https://maps.googleapis.com/maps/api/geocode/json',
+              {
+                disableJWT: true,
+                params: params,
+                headers: {
+                  Authorization: undefined,
+                  Pragma: undefined,
+                  'Cache-Control': undefined
+                }
+              }
+            ).then(function (response) {
+                $scope.addresses = response.data.results;
+              });
+          };
+        },
+        tableView: function (data) {
+          return data ? data.formatted_address : '';
+        },
+        settings: {
+          input: true,
+          tableView: true,
+          label: '',
+          key: 'addressField',
+          placeholder: '',
+          multiple: false,
+          protected: false,
+          unique: false,
+          persistent: true,
+          validate: {
+            required: false
+          }
+        }
+      });
+    }
+  ]);
+  app.run([
+    '$templateCache',
+    function ($templateCache) {
+      $templateCache.put('formio/components/address.html',
+        '<label ng-if="component.label" for="{{ component.key }}" ng-class="{\'field-required\': component.validate.required}">{{ component.label }}</label>' +
+        '<span ng-if="!component.label && component.validate.required" class="glyphicon glyphicon-asterisk form-control-feedback field-required-inline" aria-hidden="true"></span>' +
+        '<ui-select ng-model="data[component.key]" safe-multiple-to-single ng-disabled="readOnly" ng-required="component.validate.required" id="{{ component.key }}" theme="bootstrap">' +
+        '<ui-select-match placeholder="{{ component.placeholder }}">{{$item.formatted_address || $select.selected.formatted_address}}</ui-select-match>' +
+        '<ui-select-choices repeat="address in addresses track by $index" refresh="refreshAddress($select.search)" refresh-delay="500">' +
+        '<div ng-bind-html="address.formatted_address | highlight: $select.search"></div>' +
+        '</ui-select-choices>' +
+        '</ui-select>'
+      );
+
+      // Change the ui-select to ui-select multiple.
+      $templateCache.put('formio/components/address-multiple.html',
+        $templateCache.get('formio/components/address.html').replace('<ui-select', '<ui-select multiple')
+      );
+    }
+  ]);
+};
+
+},{}],6:[function(require,module,exports){
+"use strict";
+module.exports = function (app) {
+
+  app.config([
+    'formioComponentsProvider',
+    function (formioComponentsProvider) {
+      formioComponentsProvider.register('button', {
+        title: 'Button',
+        template: 'formio/components/button.html',
+        settings: {
+          input: true,
+          label: 'Submit',
+          tableView: false,
+          key: 'submit',
+          size: 'md',
+          leftIcon: '',
+          rightIcon: '',
+          block: false,
+          action: 'submit',
+          disableOnInvalid: true,
+          theme: 'primary'
+        },
+        controller: function (settings, $scope) {
+          $scope.onClick = function() {
+            switch(settings.action) {
+              case 'submit':
+                return;
+              case 'reset':
+                $scope.resetForm();
+                break;
+              case 'oauth':
+                if($scope.hasOwnProperty('form')) {
+                  if(!settings.oauth) {
+                    $scope.showAlerts({
+                      type: 'danger',
+                      message: 'You must assign this button to an OAuth action before it will work.'
+                    });
+                    break;
+                  }
+                  if(settings.oauth.error) {
+                    $scope.showAlerts({
+                      type: 'danger',
+                      message: settings.oauth.error
+                    });
+                    break;
+                  }
+                  $scope.openOAuth(settings.oauth);
+                }
+                break;
+            }
+          };
+
+          $scope.openOAuth = function(settings) {
+            var params = {
+              response_type: 'code',
+              client_id: settings.clientId,
+              redirect_uri: window.location.origin || window.location.protocol + '//' + window.location.host,
+              state: settings.state,
+              scope: settings.scope,
+              display: settings.display
+            };
+            params = Object.keys(params).map(function(key) {
+              return key + '=' + encodeURIComponent(params[key]);
+            }).join('&');
+
+            var url = settings.authURI + '?' + params;
+
+            // TODO: make window options from oauth settings, have better defaults
+            var popup = window.open(url, settings.provider, 'width=1020,height=618');
+            var interval = setInterval(function() {
+              try {
+                var popupHost = popup.location.host;
+                var currentHost = window.location.host;
+                if(popup && !popup.closed && popupHost === currentHost && popup.location.search) {
+                  popup.close();
+                  var params = popup.location.search.substr(1).split('&').reduce(function(params, param) {
+                    var split = param.split('=');
+                    params[split[0]] = split[1];
+                    return params;
+                  }, {});
+                  if(params.error) {
+                    $scope.showAlerts({
+                      type: 'danger',
+                      message: params.error_description || params.error
+                    });
+                    return;
+                  }
+                  // TODO: check for error response here
+                  if(settings.state !== params.state) {
+                    $scope.showAlerts({
+                      type: 'danger',
+                      message: 'OAuth state does not match. Please try logging in again.'
+                    });
+                    return;
+                  }
+                  var submission = { data: {}, oauth: {} };
+                  submission.oauth[settings.provider] = params;
+                  submission.oauth[settings.provider].redirectURI = window.location.origin || window.location.protocol + '//' + window.location.host;
+                  $scope.form.submitting = true;
+                  $scope.formio.saveSubmission(submission)
+                  .then(function(submission) {
+                    // Trigger the form submission.
+                    $scope.$emit('formSubmission', submission);
+                  })
+                  .catch(function(error) {
+                    $scope.showAlerts({
+                      type: 'danger',
+                      message: error.message || error
+                    });
+                  })
+                  .finally(function() {
+                    $scope.form.submitting = false;
+                  });
+                }
+              }
+              catch(error) {
+                if(error.name !== 'SecurityError') {
+                  $scope.showAlerts({
+                    type: 'danger',
+                    message: error.message || error
+                  });
+                }
+              }
+              if(!popup || popup.closed || popup.closed === undefined) {
+                clearInterval(interval);
+              }
+            }, 100);
+          };
+
+        }
+      });
+    }
+  ]);
+  app.run([
+    '$templateCache',
+    function ($templateCache) {
+      $templateCache.put('formio/components/button.html',
+        '<button type="{{component.action == \'submit\' ? \'submit\' : \'button\'}}"' +
+        'ng-class="{\'btn-block\': component.block}"' +
+        'class="btn btn-{{ component.theme }} btn-{{ component.size }}"' +
+        'ng-disabled="readOnly || form.submitting || (component.disableOnInvalid && form.$invalid)"' +
+        'ng-click="onClick()">' +
+        '<span ng-if="component.leftIcon" class="{{ component.leftIcon }}" aria-hidden="true"></span>' +
+        '<span ng-if="component.leftIcon && component.label">&nbsp;</span>' +
+        '{{ component.label }}' +
+        '<span ng-if="component.rightIcon && component.label">&nbsp;</span>' +
+        '<span ng-if="component.rightIcon" class="{{ component.rightIcon }}" aria-hidden="true"></span>' +
+        ' <i ng-if="component.action == \'submit\' && form.submitting" class="glyphicon glyphicon-refresh glyphicon-spin"></i>' +
+        '</button>'
+      );
+    }
+  ]);
+};
+
+},{}],7:[function(require,module,exports){
+"use strict";
+module.exports = function (app) {
+
+  app.config([
+    'formioComponentsProvider',
+    function (formioComponentsProvider) {
+      formioComponentsProvider.register('checkbox', {
+        title: 'Check Box',
+        template: 'formio/components/checkbox.html',
+        settings: {
+          input: true,
+          inputType: 'checkbox',
+          tableView: true,
+          // This hides the default label layout so we can use a special inline label
+          hideLabel: true,
+          label: '',
+          key: 'checkboxField',
+          prefix: '',
+          suffix: '',
+          defaultValue: false,
+          protected: false,
+          persistent: true,
+          validate: {
+            required: false,
+          }
+        }
+      });
+    }
+  ]);
+  app.run([
+    '$templateCache',
+    'FormioUtils',
+    function ($templateCache,
+              FormioUtils) {
+      $templateCache.put('formio/components/checkbox.html', FormioUtils.fieldWrap(
+        '<div class="checkbox">' +
+        '<label for="{{ component.key }}" ng-class="{\'field-required\': component.validate.required}">' +
+        '<input type="{{ component.inputType }}" ' +
+        'id="{{ component.key }}" ' +
+        'name="{{ component.key }}" ' +
+        'value="{{ component.key }}" ' +
+        'ng-disabled="readOnly" ' +
+        'ng-model="data[component.key]" ' +
+        'ng-required="component.validate.required">' +
+        '{{ component.label }}' +
+        '</label>' +
+        '</div>'
+      ));
+    }
+  ]);
+};
+
+},{}],8:[function(require,module,exports){
+"use strict";
+module.exports = function (app) {
+
+  app.config([
+    'formioComponentsProvider',
+    function (formioComponentsProvider) {
+      formioComponentsProvider.register('columns', {
+        title: 'Columns',
+        template: 'formio/components/columns.html',
+        group: 'layout',
+        settings: {
+          input: false,
+          columns: [{components: []}, {components: []}]
+        }
+      });
+    }
+  ]);
+  app.run([
+    '$templateCache',
+    function ($templateCache) {
+      $templateCache.put('formio/components/columns.html',
+        '<div class="row">' +
+        '<div class="col-xs-6" ng-repeat="column in component.columns">' +
+        '<formio-component ng-repeat="component in column.components" ng-if="componentFound(component)" component="component" data="data" formio="formio" read-only="readOnly"></formio-component>' +
+        '</div>' +
+        '</div>'
+      );
+    }
+  ]);
+};
+
+},{}],9:[function(require,module,exports){
+"use strict";
+module.exports = function (app) {
+
+  app.provider('formioComponents', function () {
+    var components = {};
+    var groups = {
+      __component: {
+        title: 'Form Components'
+      },
+      layout: {
+        title: 'Layout Components'
+      }
+    };
+    return {
+      addGroup: function (name, group) {
+        groups[name] = group;
+      },
+      register: function (type, component, group) {
+        if (!components[type]) {
+          components[type] = component;
+        }
+        else {
+          angular.extend(components[type], component);
+        }
+
+        // Set the type for this component.
+        if (!components[type].group) {
+          components[type].group = group || '__component';
+        }
+        components[type].settings.type = type;
+      },
+      $get: function () {
+        return {
+          components: components,
+          groups: groups
+        };
+      }
+    };
+  });
+
+  app.directive('safeMultipleToSingle', [function () {
+    return {
+      require: 'ngModel',
+      restrict: 'A',
+      link: function ($scope, el, attrs, ngModel) {
+        ngModel.$formatters.push(function (modelValue) {
+          if (!$scope.component.multiple && Array.isArray(modelValue)) {
+            return modelValue[0] || '';
+          }
+
+          return modelValue;
+        });
+      }
+    };
+  }]);
+};
+
+},{}],10:[function(require,module,exports){
+"use strict";
+module.exports = function (app) {
+
+  app.config([
+    'formioComponentsProvider',
+    function (formioComponentsProvider) {
+      formioComponentsProvider.register('content', {
+        title: 'Content',
+        template: 'formio/components/content.html',
+        settings: {
+          input: false,
+          html: ''
+        }
+      });
+    }
+  ]);
+  app.run([
+    '$templateCache',
+    function ($templateCache) {
+      $templateCache.put('formio/components/content.html',
+        '<div ng-bind-html="component.html | safehtml"></div>'
+      );
+    }
+  ]);
+};
+
+},{}],11:[function(require,module,exports){
+"use strict";
+module.exports = function (app) {
+
+  app.config([
+    'formioComponentsProvider',
+    function(formioComponentsProvider) {
+      formioComponentsProvider.register('datetime', {
+        title: 'Date / Time',
+        template: 'formio/components/datetime.html',
+        tableView: function(data) {
+          return '<span>{{ "' + data + '" | date: "' + this.settings.format + '" }}</span>';
+        },
+        settings: {
+          input: true,
+          tableView: true,
+          label: '',
+          key: 'datetimeField',
+          placeholder: '',
+          format: 'yyyy-MM-dd HH:mm',
+          enableDate: true,
+          enableTime: true,
+          minDate: null,
+          maxDate: null,
+          datepickerMode: 'day',
+          datePicker: {
+            showWeeks: true,
+            startingDay: 0,
+            initDate: '',
+            minMode: 'day',
+            maxMode: 'year',
+            yearRange: '20'
+          },
+          timePicker: {
+            hourStep: 1,
+            minuteStep: 1,
+            showMeridian: true,
+            readonlyInput: false,
+            mousewheel: true,
+            arrowkeys: true
+          },
+          protected: false,
+          persistent: true,
+          validate: {
+            required: false,
+            custom: ''
+          }
+        }
+      });
+    }
+  ]);
+  app.run([
+    '$templateCache',
+    'FormioUtils',
+    function($templateCache, FormioUtils) {
+      $templateCache.put('formio/components/datetime.html', FormioUtils.fieldWrap(
+        '<div class="input-group">' +
+        '<input type="text" class="form-control" ' +
+        'ng-focus="calendarOpen = true" ' +
+        'ng-click="calendarOpen = true" ' +
+        'ng-init="calendarOpen = false" ' +
+        'ng-disabled="readOnly" ' +
+        'ng-required="component.validate.required" ' +
+        'is-open="calendarOpen" ' +
+        'datetime-picker="{{ component.format }}" ' +
+        'min-date="component.minDate" ' +
+        'max-date="component.maxDate" ' +
+        'datepicker-mode="component.datepickerMode" ' +
+        'enable-date="component.enableDate" ' +
+        'enable-time="component.enableTime" ' +
+        'ng-model="data[component.key]" ' +
+        'placeholder="{{ component.placeholder }}" ' +
+        'datepicker-options="component.datePicker" ' +
+        'timepicker-options="component.timePicker" />' +
+        '<span class="input-group-btn">' +
+        '<button type="button" class="btn btn-default" ng-click="calendarOpen = true">' +
+        '<i ng-if="component.enableDate" class="glyphicon glyphicon-calendar"></i>' +
+        '<i ng-if="!component.enableDate" class="glyphicon glyphicon-time"></i>' +
+        '</button>' +
+        '</span>' +
+        '</div>'
+      ));
+    }
+  ]);
+};
+
+},{}],12:[function(require,module,exports){
+"use strict";
+module.exports = function (app) {
+
+  app.config([
+    'formioComponentsProvider',
+    function (formioComponentsProvider) {
+      formioComponentsProvider.register('email', {
+        title: 'Email',
+        template: 'formio/components/textfield.html',
+        settings: {
+          input: true,
+          tableView: true,
+          inputType: 'email',
+          label: '',
+          key: 'emailField',
+          placeholder: '',
+          prefix: '',
+          suffix: '',
+          defaultValue: '',
+          protected: false,
+          unique: false,
+          persistent: true
+        }
+      });
+    }
+  ]);
+};
+
+},{}],13:[function(require,module,exports){
+"use strict";
+module.exports = function (app) {
+
+  app.config([
+    'formioComponentsProvider',
+    function (formioComponentsProvider) {
+      formioComponentsProvider.register('fieldset', {
+        title: 'Field Set',
+        template: 'formio/components/fieldset.html',
+        settings: {
+          input: false,
+          tableView: true,
+          legend: '',
+          components: []
+        }
+      });
+    }
+  ]);
+  app.run([
+    '$templateCache',
+    function ($templateCache) {
+      $templateCache.put('formio/components/fieldset.html',
+        '<fieldset>' +
+        '<legend ng-if="component.legend">{{ component.legend }}</legend>' +
+        '<formio-component ng-repeat="component in component.components" ng-if="componentFound(component)" component="component" data="data" formio="formio" read-only="readOnly"></formio-component>' +
+        '</fieldset>'
+      );
+    }
+  ]);
+};
+
+},{}],14:[function(require,module,exports){
+"use strict";
+module.exports = function (app) {
+
+  app.config([
+    'formioComponentsProvider',
+    function (formioComponentsProvider) {
+      formioComponentsProvider.register('hidden', {
+        title: 'Hidden',
+        template: 'formio/components/hidden.html',
+        settings: {
+          input: true,
+          tableView: true,
+          key: 'hiddenField',
+          label: '',
+          protected: false,
+          unique: false,
+          persistent: true
+        }
+      });
+    }
+  ]);
+  app.run([
+    '$templateCache',
+    function ($templateCache) {
+      $templateCache.put('formio/components/hidden.html',
+        '<input type="hidden" id="{{ component.key }}" name="{{ component.key }}" ng-model="data[component.key]">'
+      );
+    }
+  ]);
+};
+
+},{}],15:[function(require,module,exports){
+"use strict";
+var app = angular.module('formio');
+
+require('./components')(app);
+require('./textfield')(app);
+require('./address')(app);
+require('./button')(app);
+require('./checkbox')(app);
+require('./columns')(app);
+require('./content')(app);
+require('./datetime')(app);
+require('./email')(app);
+require('./fieldset')(app);
+require('./hidden')(app);
+require('./number')(app);
+require('./page')(app);
+require('./panel')(app);
+require('./password')(app);
+require('./phonenumber')(app);
+require('./radio')(app);
+require('./resource')(app);
+require('./select')(app);
+require('./signature')(app);
+require('./textarea')(app);
+require('./well')(app);
+
+},{"./address":5,"./button":6,"./checkbox":7,"./columns":8,"./components":9,"./content":10,"./datetime":11,"./email":12,"./fieldset":13,"./hidden":14,"./number":16,"./page":17,"./panel":18,"./password":19,"./phonenumber":20,"./radio":21,"./resource":22,"./select":23,"./signature":24,"./textarea":25,"./textfield":26,"./well":27}],16:[function(require,module,exports){
+"use strict";
+module.exports = function (app) {
+
+  app.config([
+    'formioComponentsProvider',
+    function (formioComponentsProvider) {
+      formioComponentsProvider.register('number', {
+        title: 'Number',
+        template: 'formio/components/number.html',
+        settings: {
+          input: true,
+          tableView: true,
+          inputType: 'number',
+          label: '',
+          key: 'numberField',
+          placeholder: '',
+          prefix: '',
+          suffix: '',
+          defaultValue: '',
+          protected: false,
+          persistent: true,
+          validate: {
+            required: false,
+            min: '',
+            max: '',
+            step: 'any',
+            integer: '',
+            multiple: '',
+            custom: ''
+          }
+        }
+      });
+    }
+  ]);
+  app.run([
+    '$templateCache',
+    'FormioUtils',
+    function ($templateCache,
+              FormioUtils) {
+      $templateCache.put('formio/components/number.html', FormioUtils.fieldWrap(
+        '<input type="{{ component.inputType }}" ' +
+        'class="form-control" ' +
+        'id="{{ component.key }}" ' +
+        'name="{{ component.key }}" ' +
+        'ng-model="data[component.key]" ' +
+        'ng-required="component.validate.required" ' +
+        'ng-disabled="readOnly" ' +
+        'safe-multiple-to-single ' +
+        'min="{{ component.validate.min }}" ' +
+        'max="{{ component.validate.max }}" ' +
+        'step="{{ component.validate.step }}" ' +
+        'placeholder="{{ component.placeholder }}" ' +
+        'custom-validator="component.validate.custom" ' +
+        'ui-mask="{{ component.inputMask }}" ' +
+        'ui-mask-placeholder="" ' + // avoids regular placeholder mixing with mask placeholder
+        'ui-options="uiMaskOptions" ' +
+        '>'
+      ));
+    }
+  ]);
+};
+
+},{}],17:[function(require,module,exports){
+"use strict";
+module.exports = function (app) {
+
+  app.config([
+    'formioComponentsProvider',
+    function (formioComponentsProvider) {
+      formioComponentsProvider.register('page', {
+        template: 'formio/components/page.html',
+        settings: {
+          input: false,
+          components: []
+        }
+      });
+    }
+  ]);
+  app.run([
+    '$templateCache',
+    function ($templateCache) {
+      $templateCache.put('formio/components/page.html',
+        '<formio-component ng-repeat="component in component.components" ng-if="componentFound(component)" component="component" data="data" formio="formio"></formio-component>'
+      );
+    }
+  ]);
+};
+
+},{}],18:[function(require,module,exports){
+"use strict";
+module.exports = function (app) {
+
+  app.config([
+    'formioComponentsProvider',
+    function (formioComponentsProvider) {
+      formioComponentsProvider.register('panel', {
+        title: 'Panel',
+        template: 'formio/components/panel.html',
+        group: 'layout',
+        settings: {
+          input: false,
+          title: '',
+          theme: 'default',
+          components: []
+        }
+      });
+    }
+  ]);
+  app.run([
+    '$templateCache',
+    function ($templateCache) {
+      $templateCache.put('formio/components/panel.html',
+        '<div class="panel panel-{{ component.theme }}">' +
+        '<div ng-if="component.title" class="panel-heading"><h3 class="panel-title">{{ component.title }}</h3></div>' +
+        '<div class="panel-body">' +
+        '<formio-component ng-repeat="component in component.components" ng-if="componentFound(component)" component="component" data="data" formio="formio" read-only="readOnly"></formio-component>' +
+        '</div>' +
+        '</div>'
+      );
+    }
+  ]);
+};
+
+},{}],19:[function(require,module,exports){
+"use strict";
+module.exports = function (app) {
+
+  app.config([
+    'formioComponentsProvider',
+    function (formioComponentsProvider) {
+      formioComponentsProvider.register('password', {
+        title: 'Password',
+        template: 'formio/components/textfield.html',
+        tableView: function () {
+          return '--- PROTECTED ---';
+        },
+        settings: {
+          input: true,
+          tableView: false,
+          inputType: 'password',
+          label: '',
+          key: 'passwordField',
+          placeholder: '',
+          prefix: '',
+          suffix: '',
+          protected: true,
+          persistent: true
+        }
+      });
+    }
+  ]);
+};
+
+},{}],20:[function(require,module,exports){
+"use strict";
+module.exports = function (app) {
+
+  app.config([
+    'formioComponentsProvider',
+    function (formioComponentsProvider) {
+      formioComponentsProvider.register('phoneNumber', {
+        title: 'Phone Number',
+        template: 'formio/components/textfield.html',
+        settings: {
+          input: true,
+          tableView: true,
+          inputMask: '(999) 999-9999',
+          label: '',
+          key: 'phonenumberField',
+          placeholder: '',
+          prefix: '',
+          suffix: '',
+          multiple: false,
+          protected: false,
+          unique: false,
+          persistent: true,
+          validate: {
+            required: false
+          }
+        }
+      });
+    }
+  ]);
+};
+
+},{}],21:[function(require,module,exports){
+"use strict";
+module.exports = function (app) {
+
+  app.config([
+    'formioComponentsProvider',
+    function (formioComponentsProvider) {
+      formioComponentsProvider.register('radio', {
+        title: 'Radio',
+        template: 'formio/components/radio.html',
+        settings: {
+          input: true,
+          tableView: true,
+          inputType: 'radio',
+          label: '',
+          key: 'radioField',
+          values: [],
+          defaultValue: '',
+          protected: false,
+          persistent: true,
+          validate: {
+            required: false,
+            custom: '',
+            customPrivate: false
+          }
+        }
+      });
+    }
+  ]);
+  app.run([
+    '$templateCache',
+    'FormioUtils',
+    function ($templateCache,
+              FormioUtils) {
+      $templateCache.put('formio/components/radio.html', FormioUtils.fieldWrap(
+        '<div class="radio" ng-repeat="v in component.values track by $index">' +
+        '<label class="control-label" for="{{ v.value }}">' +
+        '<input type="{{ component.inputType }}" ' +
+        'id="{{ v.value }}" ' +
+        'name="{{ component.key }}" ' +
+        'value="{{ v.value }}" ' +
+        'ng-model="data[component.key]" ' +
+        'ng-required="component.validate.required" ' +
+        'ng-disabled="readOnly"' +
+        'custom-validator="component.validate.custom">' +
+        '{{ v.label }}' +
+        '</label>' +
+        '</div>'
+      ));
+    }
+  ]);
+};
+
+},{}],22:[function(require,module,exports){
+"use strict";
+module.exports = function (app) {
+
+  app.config([
+    'formioComponentsProvider',
+    function (formioComponentsProvider) {
+      formioComponentsProvider.register('resource', {
+        title: 'Resource',
+        tableView: function (data) {
+          return data ? data._id : '';
+        },
+        template: function ($scope) {
+          return $scope.component.multiple ? 'formio/components/resource-multiple.html' : 'formio/components/resource.html';
+        },
+        controller: function (settings, $scope, $http, Formio) {
+          $scope.selectItems = [];
+          if (settings.multiple) {
+            settings.defaultValue = [];
+          }
+          if (settings.resource) {
+            var formio = new Formio($scope.formio.projectUrl + '/form/' + settings.resource);
+              $scope.refreshSubmissions = function (input) {
+              var params = {};
+              // If they wish to return only some fields.
+              if (settings.selectFields) {
+                params.select = settings.selectFields;
+              }
+              if (settings.searchFields && input) {
+                angular.forEach(settings.searchFields, function (field, index) {
+                  params[field] = input;
+                });
+              }
+              // Load the submissions.
+              formio.loadSubmissions({
+                params: params
+              }).then(function (submissions) {
+                $scope.selectItems = submissions || [];
+              });
+            };
+
+            $scope.refreshSubmissions();
+          }
+        },
+        settings: {
+          input: true,
+          tableView: true,
+          label: '',
+          key: 'resourceField',
+          placeholder: '',
+          resource: '',
+          defaultValue: '',
+          template: '<span>{{ item.data }}</span>',
+          selectFields: '',
+          searchFields: '',
+          multiple: false,
+          refresh: false,
+          refreshDelay: 0,
+          protected: false,
+          persistent: true,
+          validate: {
+            required: false
+          }
+        }
+      });
+    }
+  ]);
+
+  app.run([
+    '$templateCache',
+    function ($templateCache) {
+      $templateCache.put('formio/components/resource.html',
+        '<label ng-if="component.label" for="{{ component.key }}" class="control-label" ng-class="{\'field-required\': component.validate.required}">{{ component.label }}</label>' +
+        '<span ng-if="!component.label && component.validate.required" class="glyphicon glyphicon-asterisk form-control-feedback field-required-inline" aria-hidden="true"></span>' +
+        '<ui-select ui-select-required safe-multiple-to-single ui-select-open-on-focus ng-model="data[component.key]" ng-disabled="readOnly" ng-required="component.validate.required" id="{{ component.key }}" name="{{ component.key }}" theme="bootstrap">' +
+        '<ui-select-match placeholder="{{ component.placeholder }}">' +
+        '<formio-select-item template="component.template" item="$item || $select.selected" select="$select"></formio-select-item>' +
+        '</ui-select-match>' +
+        '<ui-select-choices repeat="item in selectItems | filter: $select.search" refresh="refreshSubmissions($select.search)" refresh-delay="250">' +
+        '<formio-select-item template="component.template" item="item" select="$select"></formio-select-item>' +
+        '</ui-select-choices>' +
+        '</ui-select>' +
+        '<formio-errors></formio-errors>'
+      );
+
+      // Change the ui-select to ui-select multiple.
+      $templateCache.put('formio/components/resource-multiple.html',
+        $templateCache.get('formio/components/resource.html').replace('<ui-select', '<ui-select multiple')
+      );
+    }
+  ]);
+};
+
+},{}],23:[function(require,module,exports){
+"use strict";
+module.exports = function (app) {
+
+  app.directive('formioSelectItem', [
+    '$compile',
+    function ($compile) {
+      return {
+        restrict: 'E',
+        scope: {
+          template: '=',
+          item: '=',
+          select: '='
+        },
+        link: function (scope, element) {
+          if (scope.template) {
+            element.html($compile(angular.element(scope.template))(scope));
+          }
+        }
+      };
+    }
+  ]);
+
+  app.directive('uiSelectRequired', function () {
+    return {
+      require: 'ngModel',
+      link: function (scope, element, attrs, ngModel) {
+        var oldIsEmpty = ngModel.$isEmpty;
+        ngModel.$isEmpty = function (value) {
+          return (Array.isArray(value) && value.length === 0) || oldIsEmpty(value);
+        };
+      }
+    };
+  });
+
+// A hack to have ui-select open on focus
+  app.directive('uiSelectOpenOnFocus', ['$timeout', function ($timeout) {
+    return {
+      require: 'uiSelect',
+      restrict: 'A',
+      link: function ($scope, el, attrs, uiSelect) {
+        var closing = false;
+
+        angular.element(uiSelect.focusser).on('focus', function () {
+          if (!closing) {
+            uiSelect.activate();
+          }
+        });
+
+        // Because ui-select immediately focuses the focusser after closing
+        // we need to not re-activate after closing
+        $scope.$on('uis:close', function () {
+          closing = true;
+          $timeout(function () { // I'm so sorry
+            closing = false;
+          });
+        });
+      }
+    };
+  }]);
+
+// Configure the Select component.
+  app.config([
+    'formioComponentsProvider',
+    function (formioComponentsProvider) {
+      formioComponentsProvider.register('select', {
+        title: 'Select',
+        template: function ($scope) {
+          return $scope.component.multiple ? 'formio/components/select-multiple.html' : 'formio/components/select.html';
+        },
+        controller: function (settings, $scope, $http, Formio) {
+          $scope.nowrap = true;
+          $scope.selectItems = [];
+          var valueProp = $scope.component.valueProperty;
+          $scope.getSelectItem = function (item) {
+            if (!item) {
+              return '';
+            }
+            if (settings.dataSrc === 'values') {
+              return item.value;
+            }
+            return valueProp ? item[valueProp] : item;
+          };
+
+          if (settings.multiple) {
+            settings.defaultValue = [];
+          }
+
+          switch (settings.dataSrc) {
+            case 'values':
+              $scope.selectItems = settings.data.values;
+              break;
+            case 'json':
+              try {
+                $scope.selectItems = angular.fromJson(settings.data.json);
+              }
+              catch (error) {
+                $scope.selectItems = [];
+              }
+              break;
+            case 'url':
+              if (settings.data.url) {
+                var options = {cache: true};
+                if (settings.data.url.substr(0, 1) === '/') {
+                  settings.data.url = Formio.baseUrl + settings.data.url;
+                }
+
+                // Disable auth for outgoing requests.
+                if (settings.data.url.indexOf(Formio.baseUrl) === -1) {
+                  options = {
+                    disableJWT: true,
+                    headers: {
+                      Authorization: undefined,
+                      Pragma: undefined,
+                      'Cache-Control': undefined
+                    }
+                  };
+                }
+                $http.get(settings.data.url, options)
+                  .then(function (result) {
+                    $scope.selectItems = result.data;
+                  });
+              }
+              break;
+            default:
+              $scope.selectItems = [];
+          }
+        },
+        settings: {
+          input: true,
+          tableView: true,
+          label: '',
+          key: 'selectField',
+          placeholder: '',
+          data: {
+            values: [],
+            json: '',
+            url: ''
+          },
+          dataSrc: 'values',
+          valueProperty: '',
+          defaultValue: '',
+          template: '<span>{{ item.label }}</span>',
+          multiple: false,
+          refresh: false,
+          refreshDelay: 0,
+          protected: false,
+          unique: false,
+          persistent: true,
+          validate: {
+            required: false
+          }
+        }
+      });
+    }
+  ]);
+  app.run([
+    '$templateCache',
+    function ($templateCache) {
+      $templateCache.put('formio/components/select.html',
+        '<label ng-if="component.label" for="{{ component.key }}" class="control-label" ng-class="{\'field-required\': component.validate.required}">{{ component.label }}</label>' +
+        '<span ng-if="!component.label && component.validate.required" class="glyphicon glyphicon-asterisk form-control-feedback field-required-inline" aria-hidden="true"></span>' +
+        '<ui-select ui-select-required ui-select-open-on-focus ng-model="data[component.key]" safe-multiple-to-single name="{{ component.key }}" ng-disabled="readOnly" ng-required="component.validate.required" id="{{ component.key }}" theme="bootstrap">' +
+        '<ui-select-match placeholder="{{ component.placeholder }}">' +
+        '<formio-select-item template="component.template" item="$item || $select.selected" select="$select"></formio-select-item>' +
+        '</ui-select-match>' +
+        '<ui-select-choices repeat="getSelectItem(item) as item in selectItems | filter: $select.search">' +
+        '<formio-select-item template="component.template" item="item" select="$select"></formio-select-item>' +
+        '</ui-select-choices>' +
+        '</ui-select>' +
+        '<formio-errors></formio-errors>'
+      );
+
+      // Change the ui-select to ui-select multiple.
+      $templateCache.put('formio/components/select-multiple.html',
+        $templateCache.get('formio/components/select.html').replace('<ui-select', '<ui-select multiple')
+      );
+    }
+  ]);
+};
+
+},{}],24:[function(require,module,exports){
+"use strict";
+module.exports = function (app) {
+
+  app.config([
+    'formioComponentsProvider',
+    function (formioComponentsProvider) {
+      formioComponentsProvider.register('signature', {
+        title: 'Signature',
+        template: 'formio/components/signature.html',
+        tableView: function (data) {
+          return data ? 'Yes' : 'No';
+        },
+        settings: {
+          input: true,
+          tableView: true,
+          label: '',
+          key: 'signature',
+          placeholder: '',
+          footer: 'Sign above',
+          width: '100%',
+          height: '150',
+          penColor: 'black',
+          backgroundColor: 'rgb(245,245,235)',
+          minWidth: '0.5',
+          maxWidth: '2.5',
+          protected: false,
+          persistent: true,
+          validate: {
+            required: false
+          }
+        }
+      });
+    }
+  ]);
+  app.directive('signature', function () {
+    return {
+      restrict: 'A',
+      scope: {
+        component: '='
+      },
+      require: '?ngModel',
+      link: function (scope, element, attrs, ngModel) {
+        if (!ngModel) {
+          return;
+        }
+
+        // Sets the label of component for error display.
+        scope.component.label = 'Signature';
+        scope.component.hideLabel = true;
+
+        // Sets the dimension of a width or height.
+        var setDimension = function (dim) {
+          if (scope.component[dim].slice(-1) === '%') {
+            var percent = parseFloat(scope.component[dim].slice(0, -1)) / 100;
+            element[0][dim] = element.parent()[dim]() * percent;
+          }
+          else {
+            element[0][dim] = parseInt(scope.component[dim], 10);
+            scope.component[dim] = element[0][dim] + 'px';
+          }
+        };
+
+        // Set the width and height of the canvas.
+        setDimension('width');
+        setDimension('height');
+
+        // Create the signature pad.
+        /* global SignaturePad:false */
+        var signaturePad = new SignaturePad(element[0], {
+          minWidth: scope.component.minWidth,
+          maxWidth: scope.component.maxWidth,
+          penColor: scope.component.penColor,
+          backgroundColor: scope.component.backgroundColor
+        });
+
+        scope.$watch('component.penColor', function (newValue) {
+          signaturePad.penColor = newValue;
+        });
+
+        scope.$watch('component.backgroundColor', function (newValue) {
+          signaturePad.backgroundColor = newValue;
+          signaturePad.clear();
+        });
+
+        // Clear the signature.
+        scope.component.clearSignature = function () {
+          signaturePad.clear();
+          readSignature();
+        };
+
+        // Set some CSS properties.
+        element.css({
+          'border-radius': '4px',
+          'box-shadow': '0 0 5px rgba(0, 0, 0, 0.02) inset',
+          'border': '1px solid #f4f4f4'
+        });
+
+        function readSignature() {
+          if (scope.component.validate.required && signaturePad.isEmpty()) {
+            ngModel.$setViewValue('');
+          } else {
+            ngModel.$setViewValue(signaturePad.toDataURL());
+          }
+        }
+
+        ngModel.$render = function () {
+          signaturePad.fromDataURL(ngModel.$viewValue);
+        };
+        signaturePad.onEnd = function () {
+          scope.$evalAsync(readSignature);
+        };
+
+        // Read initial empty canvas, unless signature is required, then keep it pristine
+        if (!scope.component.validate.required) {
+          readSignature();
+        }
+      }
+    };
+  });
+  app.run([
+    '$templateCache',
+    'FormioUtils',
+    function ($templateCache,
+              FormioUtils) {
+      $templateCache.put('formio/components/signature.html', FormioUtils.fieldWrap(
+        '<img ng-if="readOnly" ng-attr-src="{{data[component.key]}}" src="" />' +
+        '<div ng-if="!readOnly" style="width: {{ component.width }}; height: {{ component.height }};">' +
+        '<a class="btn btn-xs btn-default" style="position:absolute; left: 0; top: 0; z-index: 1000" ng-click="component.clearSignature()"><span class="glyphicon glyphicon-refresh"></span></a>' +
+        '<canvas signature component="component" name="{{ component.key }}" ng-model="data[component.key]" ng-required="component.validate.required"></canvas>' +
+        '<div class="formio-signature-footer" style="text-align: center;color:#C3C3C3;" ng-class="{\'field-required\': component.validate.required}">{{ component.footer }}</div>' +
+        '</div>'
+      ));
+    }
+  ]);
+};
+
+},{}],25:[function(require,module,exports){
+"use strict";
+module.exports = function (app) {
+
+  app.config([
+    'formioComponentsProvider',
+    function (formioComponentsProvider) {
+      formioComponentsProvider.register('textarea', {
+        title: 'Text Area',
+        template: 'formio/components/textarea.html',
+        settings: {
+          input: true,
+          tableView: true,
+          label: '',
+          key: 'textareaField',
+          placeholder: '',
+          prefix: '',
+          suffix: '',
+          rows: 3,
+          multiple: false,
+          defaultValue: '',
+          protected: false,
+          persistent: true,
+          validate: {
+            required: false,
+            minLength: '',
+            maxLength: '',
+            pattern: '',
+            custom: ''
+          }
+        }
+      });
+    }
+  ]);
+  app.run([
+    '$templateCache',
+    'FormioUtils',
+    function ($templateCache,
+              FormioUtils) {
+      $templateCache.put('formio/components/textarea.html', FormioUtils.fieldWrap(
+        '<textarea ' +
+        'class="form-control" ' +
+        'ng-model="data[component.key]" ' +
+        'ng-disabled="readOnly" ' +
+        'ng-required="component.validate.required" ' +
+        'safe-multiple-to-single ' +
+        'id="{{ component.key }}" ' +
+        'placeholder="{{ component.placeholder }}" ' +
+        'custom-validator="component.validate.custom" ' +
+        'rows="{{ component.rows }}"></textarea>'
+      ));
+    }
+  ]);
+};
+
+},{}],26:[function(require,module,exports){
+"use strict";
+module.exports = function (app) {
+
+  app.config([
+    'formioComponentsProvider',
+    function (formioComponentsProvider) {
+      formioComponentsProvider.register('textfield', {
+        title: 'Text Field',
+        template: 'formio/components/textfield.html',
+        settings: {
+          input: true,
+          tableView: true,
+          inputType: 'text',
+          inputMask: '',
+          label: '',
+          key: 'textField',
+          placeholder: '',
+          prefix: '',
+          suffix: '',
+          multiple: false,
+          defaultValue: '',
+          protected: false,
+          unique: false,
+          persistent: true,
+          validate: {
+            required: false,
+            minLength: '',
+            maxLength: '',
+            pattern: '',
+            custom: '',
+            customPrivate: false
+          }
+        }
+      });
+    }
+  ]);
+  app.run([
+    '$templateCache',
+    'FormioUtils',
+    function ($templateCache,
+              FormioUtils) {
+      $templateCache.put('formio/components/textfield.html', FormioUtils.fieldWrap(
+        '<input type="{{ component.inputType }}" ' +
+        'class="form-control" ' +
+        'id="{{ component.key }}" ' +
+        'name="{{ component.key }}" ' +
+        'ng-disabled="readOnly" ' +
+        'ng-model="data[component.key]" ' +
+        'ng-model-options="{ debounce: 500 }" ' +
+        'safe-multiple-to-single ' +
+        'ng-required="component.validate.required" ' +
+        'ng-minlength="component.validate.minLength" ' +
+        'ng-maxlength="component.validate.maxLength" ' +
+        'ng-pattern="component.validate.pattern" ' +
+        'custom-validator="component.validate.custom" ' +
+        'placeholder="{{ component.placeholder }}" ' +
+        'ui-mask="{{ component.inputMask }}" ' +
+        'ui-mask-placeholder="" ' + // avoids regular placeholder mixing with mask placeholder
+        'ui-options="uiMaskOptions" ' +
+        '>'
+      ));
+    }
+  ]);
+};
+
+},{}],27:[function(require,module,exports){
+"use strict";
+module.exports = function (app) {
+
+  app.config([
+    'formioComponentsProvider',
+    function (formioComponentsProvider) {
+      formioComponentsProvider.register('well', {
+        title: 'Well',
+        template: 'formio/components/well.html',
+        group: 'layout',
+        settings: {
+          input: false,
+          components: []
+        }
+      });
+    }
+  ]);
+  app.run([
+    '$templateCache',
+    function ($templateCache) {
+      $templateCache.put('formio/components/well.html',
+        '<div class="well">' +
+        '<formio-component ng-repeat="component in component.components" ng-if="componentFound(component)" component="component" data="data" formio="formio" read-only="readOnly"></formio-component>' +
+        '</div>'
+      );
+    }
+  ]);
+};
+
+},{}],28:[function(require,module,exports){
+"use strict";
+module.exports = function() {
+  return {
+    restrict: 'A',
+    require: 'ngModel',
+    link: function(scope, ele, attrs, ctrl) {
+      if (
+        !scope.component.validate ||
+        !scope.component.validate.custom
+      ) {
+        return;
+      }
+      ctrl.$parsers.unshift(function(input) {
+        var valid = true;
+        if (input) {
+          var custom = scope.component.validate.custom;
+          custom = custom.replace(/({{\s+(.*)\s+}})/, function(match, $1, $2) {
+            return scope.data[$2];
+          });
+          /* jshint evil: true */
+          valid = eval(custom);
+          ctrl.$setValidity('custom', (valid === true));
+        }
+        if (valid !== true) {
+          scope.component.customError = valid;
+        }
+        return (valid === true) ? input : valid;
+      });
+    }
+  };
+};
+
+},{}],29:[function(require,module,exports){
+"use strict";
+module.exports = function() {
+  return {
+    restrict: 'E',
+    replace: true,
+    scope: {
+      src: '=',
+      formAction: '=',
+      form: '=',
+      submission: '=',
+      readOnly: '='
+    },
+    controller: [
+      '$scope',
+      '$http',
+      '$element',
+      'FormioScope',
+      'Formio',
+      'FormioUtils',
+      'formioComponents',
+      function(
+        $scope,
+        $http,
+        $element,
+        FormioScope,
+        Formio,
+        FormioUtils,
+        formioComponents
+      ) {
+        $scope.formioAlerts = [];
+        // Shows the given alerts (single or array), and dismisses old alerts
+        this.showAlerts = $scope.showAlerts = function(alerts) {
+          $scope.formioAlerts = [].concat(alerts);
+        };
+
+        // Add the live form parameter to the url.
+        $scope._src = $scope.src;
+        if ($scope._src && ($scope._src.indexOf('live=') === -1)) {
+          $scope._src += ($scope._src.indexOf('?') === -1) ? '?' : '&';
+          $scope._src += 'live=1';
+        }
+
+        // Create the formio object.
+        $scope.formio = FormioScope.register($scope, $element, {
+          form: true,
+          submission: true
+        });
+
+        // See if a component is found in the registry.
+        $scope.componentFound = function(component) {
+          return formioComponents.components.hasOwnProperty(component.type);
+        };
+
+        // Called when the form is submitted.
+        $scope.onSubmit = function(form) {
+          if (!$scope.formioForm.$valid || form.submitting) { return; }
+          form.submitting = true;
+
+          // Create a sanitized submission object.
+          var submissionData = {data: {}};
+          if ($scope._submission._id) {
+            submissionData._id = $scope._submission._id;
+          }
+          if ($scope._submission.data._id) {
+            submissionData._id = $scope._submission.data._id;
+          }
+
+          var components = FormioUtils.flattenComponents($scope._form.components);
+          angular.forEach(components, function(component) {
+            if ($scope._submission.data.hasOwnProperty(component.key)) {
+              submissionData.data[component.key] = $scope._submission.data[component.key];
+            }
+          });
+          angular.forEach($scope._submission.data, function(value, key) {
+            if (value && !value.hasOwnProperty('_id')) {
+              submissionData.data[key] = value;
+            }
+          });
+
+          // Called when a submission has been made.
+          var onSubmitDone = function(method, submission) {
+            $scope.showAlerts({
+              type: 'success',
+              message: 'Submission was ' + ((method === 'put') ? 'updated' : 'created') + '.'
+            });
+            form.submitting = false;
+            // Trigger the form submission.
+            $scope.$emit('formSubmission', submission);
+          };
+
+          // Allow custom action urls.
+          if ($scope.action) {
+            var method = submissionData._id ? 'put' : 'post';
+            $http[method]($scope.action, submissionData).success(function (submission) {
+              Formio.clearCache();
+              onSubmitDone(method, submission);
+            }).error(FormioScope.onError($scope, $element))
+              .finally(function() {
+                form.submitting = false;
+              });
+          }
+
+          // If they wish to submit to the default location.
+          else if ($scope.formio) {
+            $scope.formio.saveSubmission(angular.copy(submissionData)) // copy to remove angular $$hashKey
+              .then(function(submission) {
+              onSubmitDone(submission.method, submission);
+            }, FormioScope.onError($scope, $element))
+              .finally(function() {
+                form.submitting = false;
+              });
+          }
+          else {
+            $scope.$emit('formSubmission', submissionData);
+          }
+        };
+      }
+    ],
+    templateUrl: 'formio.html'
+  };
+};
+
+},{}],30:[function(require,module,exports){
+"use strict";
+module.exports = [
+  'Formio',
+  'formioComponents',
+  function(
+    Formio,
+    formioComponents
+  ) {
+    return {
+      replace: true,
+      restrict: 'E',
+      require: '?^formio',
+      scope: {
+        component: '=',
+        data: '=',
+        formio: '=',
+        form: '=',
+        readOnly: '='
+      },
+      templateUrl: 'formio/component.html',
+      link: function($scope, el, attrs, formioCtrl) {
+        if(formioCtrl) {
+          $scope.showAlerts = formioCtrl.showAlerts.bind(formioCtrl);
+        }
+        else {
+          $scope.showAlerts = function() {
+            throw new Error('Cannot call $scope.showAlerts unless this component is inside a formio directive.');
+          };
+        }
+      },
+      controller: [
+        '$scope',
+        '$http',
+        function(
+          $scope,
+          $http
+        ) {
+
+          // Options to match jquery.maskedinput masks
+          $scope.uiMaskOptions = {
+            maskDefinitions: {
+              '9': /\d/,
+              'a': /[a-zA-Z]/,
+              '*': /[a-zA-Z0-9]/
+            },
+            clearOnBlur: false,
+            eventsToHandle: ['input', 'keyup', 'click', 'focus'],
+            silentEvents: ['click', 'focus']
+          };
+
+          $scope.resetForm = function() {
+            // Manually remove each key so we don't lose a reference to original
+            // data in child scopes.
+            for(var key in $scope.data) {
+              delete $scope.data[key];
+            }
+          };
+
+          // Initialize the data.
+          if (!$scope.data) {
+            $scope.resetForm();
+          }
+
+          // If this component references an object, we need to determine the
+          // value by navigating through the object.
+          if (
+            $scope.component &&
+            $scope.component.key
+          ) {
+            var root = '';
+            if ($scope.component.key.indexOf('.') !== -1) {
+              root = $scope.component.key.split('.').shift();
+            }
+            $scope.$watch('data', function(data) {
+              if (!data || angular.equals({}, data)) { return; }
+              if (root && (!data.hasOwnProperty(root) || angular.equals({}, data[root]))) { return; }
+              if (root && data[root].hasOwnProperty('_id')) {
+                $scope.data[root + '._id'] = data[root]._id;
+              }
+              var value = Formio.fieldData(data, $scope.component);
+              if (value !== undefined) {
+                $scope.data[$scope.component.key] = value;
+              }
+            });
+          }
+
+          // See if a component is found in the registry.
+          $scope.componentFound = function(component) {
+            return formioComponents.components.hasOwnProperty(component.type);
+          };
+
+          // Get the settings.
+          var component = formioComponents.components[$scope.component.type];
+          if (!component) { return; }
+
+          // Set the component with the defaults from the component settings.
+          angular.forEach(component.settings, function(value, key) {
+            if (!$scope.component.hasOwnProperty(key)) {
+              $scope.component[key] = angular.copy(value);
+            }
+          });
+
+          // Add a new field value.
+          $scope.addFieldValue = function() {
+            $scope.data[$scope.component.key] = $scope.data[$scope.component.key] || [];
+            $scope.data[$scope.component.key].push('');
+          };
+
+          // Remove a field value.
+          $scope.removeFieldValue = function(index) {
+            $scope.data[$scope.component.key].splice(index, 1);
+          };
+
+          // Set the template for the component.
+          if (typeof component.template === 'function') {
+            $scope.template = component.template($scope);
+          }
+          else {
+            $scope.template = component.template;
+          }
+
+          // Allow component keys to look like "settings[username]"
+          if ($scope.component.key && $scope.component.key.indexOf('[') !== -1) {
+            var matches = $scope.component.key.match(/([^\[]+)\[([^]+)\]/);
+            if ((matches.length === 3) && $scope.data.hasOwnProperty(matches[1])) {
+              $scope.data = $scope.data[matches[1]];
+              $scope.component.key = matches[2];
+            }
+          }
+
+          // If the component has a controller.
+          if (component.controller) {
+            component.controller($scope.component, $scope, $http, Formio);
+          }
+
+          // Establish a default for data.
+          if ($scope.data && !$scope.data.hasOwnProperty($scope.component.key) && $scope.component.hasOwnProperty('defaultValue')) {
+            if($scope.component.multiple && !angular.isArray($scope.component.defaultValue)) {
+              $scope.data[$scope.component.key] = [$scope.component.defaultValue];
+            }
+            else {
+              $scope.data[$scope.component.key] = $scope.component.defaultValue;
+            }
+          }
+          else if ($scope.data && !$scope.data.hasOwnProperty($scope.component.key) && $scope.component.multiple) {
+            $scope.data[$scope.component.key] = [];
+          }
+        }
+      ]
+    };
+  }
+];
+
+},{}],31:[function(require,module,exports){
+"use strict";
+module.exports = function() {
+  return {
+    restrict: 'E',
+    replace: true,
+    scope: {
+      form: '=',
+      submission: '=',
+      src: '=',
+      formAction: '=',
+      resourceName: '='
+    },
+    templateUrl: 'formio-delete.html',
+    controller: [
+      '$scope',
+      '$element',
+      'FormioScope',
+      'Formio',
+      '$http',
+      function(
+        $scope,
+        $element,
+        FormioScope,
+        Formio,
+        $http
+      ) {
+        $scope.formioAlerts = [];
+        // Shows the given alerts (single or array), and dismisses old alerts
+        $scope.showAlerts = function(alerts) {
+          $scope.formioAlerts = [].concat(alerts);
+        };
+        var resourceName = 'resource';
+        var methodName = '';
+        var loader = FormioScope.register($scope, $element, {
+          form: true,
+          submission: true
+        });
+
+        if (loader) {
+          resourceName = loader.submissionId ? 'submission' : 'form';
+          var resourceTitle = resourceName.charAt(0).toUpperCase() + resourceName.slice(1);
+          methodName = 'delete' + resourceTitle;
+        }
+
+        // Set the resource name
+        $scope._resourceName = resourceName;
+
+        // Create delete capability.
+        $scope.onDelete = function() {
+          // Rebuild resourceTitle, $scope.resourceName could have changed
+          var resourceName = $scope.resourceName || $scope._resourceName;
+          var resourceTitle = resourceName.charAt(0).toUpperCase() + resourceName.slice(1);
+          // Called when the delete is done.
+          var onDeleteDone = function(data) {
+            $scope.showAlerts({
+              type: 'success',
+              message: resourceTitle + ' was deleted.'
+            });
+            Formio.clearCache();
+            $scope.$emit('delete', data);
+          };
+
+          if ($scope.action) {
+            $http.delete($scope.action).success(onDeleteDone).error(FormioScope.onError($scope, $element));
+          }
+          else if (loader) {
+            if (!methodName) { return; }
+            if (typeof loader[methodName] !== 'function') { return; }
+            loader[methodName]().then(onDeleteDone, FormioScope.onError($scope, $element));
+          }
+        };
+        $scope.onCancel = function() {
+          $scope.$emit('cancel');
+        };
+      }
+    ]
+  };
+};
+
+},{}],32:[function(require,module,exports){
+"use strict";
+module.exports = [
+  '$compile',
+  '$templateCache',
+  function(
+    $compile,
+    $templateCache
+  ) {
+    return {
+      scope: false,
+      link: function(scope, element) {
+        element.replaceWith($compile($templateCache.get(scope.template))(scope));
+        scope.$emit('formElementRender', element);
+      },
+      controller: function() {
+        // This is required for some reason as it will occasionally throw an error without it.
+      }
+    };
+  }
+];
+
+},{}],33:[function(require,module,exports){
+"use strict";
+module.exports = function() {
+  return {
+    scope: false,
+    restrict: 'E',
+    templateUrl: 'formio/errors.html'
+  };
+};
+
+},{}],34:[function(require,module,exports){
+"use strict";
+module.exports = function() {
+  return {
+    replace: true,
+    restrict: 'E',
+    scope: {
+      src: '=',
+      form: '=',
+      submissions: '=',
+      perPage: '='
+    },
+    templateUrl: 'formio/submissions.html',
+    controller: [
+      '$scope',
+      '$element',
+      'FormioScope',
+      function(
+        $scope,
+        $element,
+        FormioScope
+      ) {
+        $scope.formio = FormioScope.register($scope, $element, {
+          form: true,
+          submissions: false
+        });
+
+        $scope.tableView = function(component) {
+          return !component.hasOwnProperty('tableView') || component.tableView;
+        };
+
+        $scope.$watch('_submissions', function(submissions) {
+          if (submissions && submissions.length > 0) {
+            $scope.$emit('submissionLoad', $scope._submissions);
+          }
+        });
+      }
+    ]
+  };
+};
+
+},{}],35:[function(require,module,exports){
+"use strict";
+module.exports = [
+  'Formio',
+  'formioComponents',
+  function(
+    Formio,
+    formioComponents
+  ) {
+    return {
+      onError: function($scope, $element) {
+        return function(error) {
+          if (error.name === 'ValidationError') {
+            $element.find('#form-group-' + error.details[0].path).addClass('has-error');
+            var message = 'ValidationError: ' + error.details[0].message;
+            $scope.showAlerts({
+              type: 'danger',
+              message: message
+            });
+          }
+          else {
+            if(error instanceof Error) {
+              error = error.toString();
+            }
+            else if(typeof error === 'object') {
+              error = JSON.stringify(error);
+            }
+            $scope.showAlerts({
+              type: 'danger',
+              message: error
+            });
+          }
+          $scope.$emit('formError', error);
+        };
+      },
+      register: function($scope, $element, options) {
+        var loader = null;
+        $scope._src = $scope._src || $scope.src || '';
+        $scope._form = $scope.form || {};
+        $scope._submission = $scope.submission || {data: {}};
+        $scope._submissions = $scope.submissions || [];
+
+        // Keep track of the elements rendered.
+        var elementsRendered = 0;
+        $scope.$on('formElementRender', function() {
+          elementsRendered++;
+          if (elementsRendered === $scope._form.components.length) {
+            setTimeout(function() {
+              $scope.$emit('formRender', $scope._form);
+            }, 1);
+          }
+        });
+
+        // Used to set the form action.
+        var getAction = function(action) {
+          if (!action) { return ''; }
+          if ($scope.action) { return ''; }
+          if (action.substr(0, 1) === '/') {
+            action = Formio.baseUrl + action;
+          }
+          return action;
+        };
+
+        // Set the action.
+        $scope.action = getAction($scope.formAction);
+
+        // Allow sub components the ability to add new form components to the form.
+        var addedData = {};
+        $scope.$on('addFormComponent', function(event, component) {
+          if (!addedData.hasOwnProperty(component.settings.key)) {
+            addedData[component.settings.key] = true;
+            var defaultComponent = formioComponents.components[component.type];
+            $scope._form.components.push(angular.extend(defaultComponent.settings, component.settings));
+          }
+        });
+
+        // Set the action if they provided it in the form.
+        $scope.$watch('form.action', function(value) {
+          if (!value) { return; }
+          var action = getAction(value);
+          if (action) {
+            $scope.action = action;
+          }
+        });
+
+        // Return the value and set the scope for the model input.
+        $scope.fieldData = function(data, component) {
+          var value = Formio.fieldData(data, component);
+          var componentInfo = formioComponents.components[component.type];
+          if (!componentInfo.tableView) { return value; }
+          if (component.multiple && (value.length > 0)) {
+            var values = [];
+            angular.forEach(value, function(arrayValue) {
+              values.push(componentInfo.tableView(arrayValue, component));
+            });
+            return values;
+          }
+          return componentInfo.tableView(value, component);
+        };
+
+        var spinner = $element.find('#formio-loading');
+
+        if ($scope._src) {
+          loader = new Formio($scope._src);
+          if (options.form) {
+            spinner.show();
+            loader.loadForm().then(function(form) {
+              $scope._form = form;
+              spinner.hide();
+              $scope.$emit('formLoad', form);
+            }, this.onError($scope));
+          }
+          if (options.submission && loader.submissionId) {
+            spinner.show();
+            loader.loadSubmission().then(function(submission) {
+              $scope._submission = submission;
+              if (!$scope._submission.data) {
+                $scope._submission.data = {};
+              }
+              spinner.hide();
+              $scope.$emit('submissionLoad', submission);
+            }, this.onError($scope));
+          }
+          if (options.submissions) {
+            spinner.show();
+            loader.loadSubmissions().then(function(submissions) {
+              $scope._submissions = submissions;
+              spinner.hide();
+              $scope.$emit('submissionsLoad', submissions);
+            }, this.onError($scope));
+          }
+        }
+        else {
+
+          $scope.formoLoaded = true;
+          spinner.hide();
+
+          // Emit the events if these objects are already loaded.
+          if ($scope._form) {
+            $scope.$emit('formLoad', $scope._form);
+          }
+          if ($scope._submission) {
+            $scope.$emit('submissionLoad', $scope._submission);
+          }
+          if ($scope._submissions) {
+            $scope.$emit('submissionsLoad', $scope._submissions);
+          }
+        }
+
+        // Return the loader.
+        return loader;
+      }
+    };
+  }
+];
+
+},{}],36:[function(require,module,exports){
+"use strict";
+module.exports = function() {
+  return {
+    flattenComponents: function flatten(components, flattened) {
+      flattened = flattened || {};
+      angular.forEach(components, function(component) {
+        if (component.tree) {
+          flattened[component.key] = component;
+        }
+        else if (component.columns && (component.columns.length > 0)) {
+          angular.forEach(component.columns, function(column) {
+            flatten(column.components, flattened);
+          });
+        }
+        else if (component.components && (component.components.length > 0)) {
+          flatten(component.components, flattened);
+        }
+        else if (component.input) {
+          flattened[component.key] = component;
+        }
+      });
+      return flattened;
+    },
+    eachComponent: function eachComponent(components, fn) {
+      if(!components) {
+        return;
+      }
+      angular.forEach(components, function(component) {
+        if (component.columns) {
+          angular.forEach(component.columns, function(column) {
+            eachComponent(column.components, fn);
+          });
+        }
+        else if (component.components) {
+          eachComponent(component.components, fn);
+        }
+        else {
+          fn(component);
+        }
+      });
+    },
+    getComponent: function getComponent(components, key) {
+      var result;
+      this.eachComponent(components, function(component) {
+        if(component.key === key) {
+          result = component;
+        }
+      });
+      return result;
+    },
+    fieldWrap: function(input) {
+      input = input + '<formio-errors></formio-errors>';
+      var multiInput = input.replace('data[component.key]', 'data[component.key][$index]');
+      var inputLabel = '<label ng-if="component.label && !component.hideLabel" for="{{ component.key }}" class="control-label" ng-class="{\'field-required\': component.validate.required}">{{ component.label }}</label>';
+      var requiredInline = '<span ng-if="!component.label && component.validate.required" class="glyphicon glyphicon-asterisk form-control-feedback field-required-inline" aria-hidden="true"></span>';
+      var template =
+        '<div ng-if="!component.multiple">' +
+        inputLabel + requiredInline +
+        '<div class="input-group" ng-if="component.prefix || component.suffix">' +
+        '<div class="input-group-addon" ng-if="!!component.prefix">{{ component.prefix }}</div>' +
+        input +
+        '<div class="input-group-addon" ng-if="!!component.suffix">{{ component.suffix }}</div>' +
+        '</div>' +
+        '<div ng-if="!component.prefix && !component.suffix">' + input + '</div>' +
+        '</div>' +
+        '<div ng-if="component.multiple"><table class="table table-bordered">' +
+        inputLabel +
+        '<tr ng-repeat="value in data[component.key] track by $index">' +
+        '<td>' + requiredInline +
+        '<div class="input-group" ng-if="component.prefix || component.suffix">' +
+        '<div class="input-group-addon" ng-if="!!component.prefix">{{ component.prefix }}</div>' +
+        multiInput +
+        '<div class="input-group-addon" ng-if="!!component.suffix">{{ component.suffix }}</div>' +
+        '</div>' +
+        '<div ng-if="!component.prefix && !component.suffix">' + multiInput + '</div>' +
+        '</td>' +
+        '<td><a ng-click="removeFieldValue($index)" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle"></span></a></td>' +
+        '</tr>' +
+        '<tr>' +
+        '<td colspan="2"><a ng-click="addFieldValue()" class="btn btn-primary"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add another</a></td>' +
+        '</tr>' +
+        '</table></div>';
+      return template;
+    }
+  };
+};
+
+},{}],37:[function(require,module,exports){
+"use strict";
+module.exports = [
+  '$q',
+  '$rootScope',
+  'Formio',
+  function($q, $rootScope, Formio) {
+    var Interceptor = {
+      /**
+       * Update JWT token received from response.
+       */
+      response: function(response) {
+        var token = response.headers('x-jwt-token');
+        if (response.status >= 200 && response.status < 300 && token && token !== '') {
+          Formio.setToken(token);
+        }
+        return response;
+      },
+
+      /**
+       * Intercept a response error.
+       */
+      responseError: function(response) {
+        if (parseInt(response.status, 10) === 440) {
+          response.loggedOut = true;
+          Formio.setToken(null);
+          $rootScope.$broadcast('formio.sessionExpired', response.body);
+        }
+        else if(parseInt(response.status, 10) === 401) {
+          $rootScope.$broadcast('formio.unauthorized', response.body);
+        }
+        return $q.reject(response);
+      },
+
+      /**
+       * Set the token in the request headers.
+       */
+      request: function(config) {
+        if (config.disableJWT) { return config; }
+        var token = Formio.getToken();
+        if (token) { config.headers['x-jwt-token'] = token; }
+        return config;
+      }
+    };
+
+    return Interceptor;
+  }
+];
+
+},{}],38:[function(require,module,exports){
+"use strict";
+module.exports = [
+  'FormioUtils',
+  function(FormioUtils) {
+    return FormioUtils.flattenComponents;
+  }
+];
+
+},{}],39:[function(require,module,exports){
+"use strict";
+module.exports = [
+  '$sce',
+  function(
+    $sce
+  ) {
+    return function(html) {
+      return $sce.trustAsHtml(html);
+    };
+  }
+];
+
+},{}],40:[function(require,module,exports){
+"use strict";
+var app = angular.module('formio', [
+  'ngSanitize',
+  'ui.bootstrap',
+  'ui.bootstrap.datetimepicker',
+  'ui.select',
+  'ui.mask',
+  'angularMoment',
+  'bgf.paginateAnything'
+]);
+
+/**
+ * Create the formio provider.
+ */
+app.provider('Formio', require('./providers/Formio'));
+
+/**
+ * Provides a way to regsiter the Formio scope.
+ */
+app.factory('FormioScope', require('./factories/FormioScope'));
+
+app.factory('FormioUtils', require('./factories/FormioUtils'));
+
+app.factory('formioInterceptor', require('./factories/formioInterceptor'));
+
+app.directive('formio', require('./directives/formio'));
+
+app.directive('formioDelete', require('./directives/formioDelete'));
+
+app.directive('formioErrors', require('./directives/formioErrors'));
+
+app.directive('customValidator', require('./directives/customValidator'));
+
+app.directive('formioSubmissions', require('./directives/formioSubmissions'));
+
+app.directive('formioComponent', require('./directives/formioComponent'));
+
+app.directive('formioElement', require('./directives/formioElement'));
+
+/**
+ * Filter to flatten form components.
+ */
+app.filter('flattenComponents', require('./filters/flattenComponents'));
+
+app.filter('safehtml', require('./filters/safehtml'));
+
+app.config([
+  '$httpProvider',
+  function(
+    $httpProvider
+  ) {
+    if (!$httpProvider.defaults.headers.get) {
+      $httpProvider.defaults.headers.get = {};
+    }
+
+    // Disable IE caching for GET requests.
+    $httpProvider.defaults.headers.get['Cache-Control'] = 'no-cache';
+    $httpProvider.defaults.headers.get.Pragma = 'no-cache';
+    $httpProvider.interceptors.push('formioInterceptor');
+  }
+]);
+
+app.run([
+  '$templateCache',
+  function($templateCache) {
+
+    // The template for the formio forms.
+    $templateCache.put('formio.html',
+      '<form role="form" name="formioForm" ng-submit="onSubmit(formioForm)" novalidate>' +
+        '<i id="formio-loading" style="font-size: 2em;" class="glyphicon glyphicon-refresh glyphicon-spin"></i>' +
+        '<div ng-repeat="alert in formioAlerts" class="alert alert-{{ alert.type }}" role="alert">' +
+          '{{ alert.message }}' +
+        '</div>' +
+        '<formio-component ng-repeat="component in _form.components track by $index" ng-if="componentFound(component)" component="component" data="_submission.data" form="formioForm" formio="formio" read-only="readOnly"></formio-component>' +
+      '</form>'
+    );
+
+    $templateCache.put('formio-delete.html', '' +
+      '<form role="form">' +
+        '<div ng-repeat="alert in formioAlerts" class="alert alert-{{ alert.type }}" role="alert">' +
+          '{{ alert.message }}' +
+        '</div>' +
+        '<h3>Are you sure you wish to delete the {{ resourceName || _resourceName }}?</h3>' +
+        '<div class="btn-toolbar">' +
+          '<button ng-click="onDelete()" class="btn btn-danger">Yes</button>' +
+          '<button ng-click="onCancel()" class="btn btn-default">No</button>' +
+        '</div>' +
+      '</form>'
+    );
+
+    $templateCache.put('formio/pager.html',
+      '<div class="paginate-anything">' +
+        '<ul class="pagination pagination-{{size}} links" ng-if="numPages > 1">' +
+          '<li ng-class="{disabled: page <= 0}"><a href ng-click="gotoPage(page-1)">&laquo;</a></li>' +
+          '<li ng-if="linkGroupFirst() > 0"><a href ng-click="gotoPage(0)">1</a></li>' +
+          '<li ng-if="linkGroupFirst() > 1" class="disabled"><a href>&hellip;</a></li>' +
+          '<li ng-repeat="p in [linkGroupFirst(), linkGroupLast()] | makeRange" ng-class="{active: p === page}"><a href ng-click="gotoPage(p)">{{p+1}}</a></li>' +
+          '<li ng-if="linkGroupLast() < numPages - 2" class="disabled"><a href>&hellip;</a></li>' +
+          '<li ng-if="isFinite() && linkGroupLast() < numPages - 1"><a href ng-click="gotoPage(numPages-1)">{{numPages}}</a></li>' +
+          '<li ng-class="{disabled: page >= numPages - 1}"><a href ng-click="gotoPage(page+1)">&raquo;</a></li>' +
+        '</ul>' +
+      '</div>'
+    );
+
+    $templateCache.put('formio/submissions.html',
+      '<div>' +
+        '<table class="table">' +
+          '<thead>' +
+            '<tr>' +
+              '<th ng-repeat="component in _form.components | flattenComponents" ng-if="tableView(component)">{{ component.label || component.key }}</th>' +
+              '<th>Submitted</th>' +
+              '<th>Updated</th>' +
+              '<th>Operations</th>' +
+            '</tr>' +
+          '</thead>' +
+          '<tbody>' +
+            '<tr ng-repeat="submission in _submissions">' +
+              '<td ng-repeat="component in _form.components | flattenComponents" ng-if="tableView(component)">{{ fieldData(submission.data, component) }}</td>' +
+              '<td>{{ submission.created | amDateFormat:\'l, h:mm:ss a\' }}</td>' +
+              '<td>{{ submission.modified | amDateFormat:\'l, h:mm:ss a\' }}</td>' +
+              '<td>' +
+                '<div class="button-group" style="display:flex;">' +
+                  '<a ng-click="$emit(\'submissionView\', submission)" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-eye-open"></span></a>&nbsp;' +
+                  '<a ng-click="$emit(\'submissionEdit\', submission)" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-edit"></span></a>&nbsp;' +
+                  '<a ng-click="$emit(\'submissionDelete\', submission)" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove-circle"></span></a>' +
+                '</div>' +
+              '</td>' +
+            '</tr>' +
+          '</tbody>' +
+        '</table>' +
+        '<bgf-pagination collection="_submissions" url="formio.submissionsUrl" per-page="perPage" template-url="formio/pager.html"></bgf-pagination>' +
+      '</div>'
+    );
+
+    // A formio component template.
+    $templateCache.put('formio/component.html',
+      '<ng-form name="formioFieldForm" class="formio-component-{{ component.key }}">' +
+        '<div class="form-group has-feedback form-field-type-{{ component.type }}" id="form-group-{{ component.key }}" ng-class="{\'has-error\': formioFieldForm[component.key].$invalid && !formioFieldForm[component.key].$pristine }">' +
+          '<formio-element></formio-element>' +
+        '</div>' +
+      '</ng-form>'
+    );
+
+    $templateCache.put('formio/errors.html',
+      '<div ng-show="formioFieldForm[component.key].$error && !formioFieldForm[component.key].$pristine">' +
+        '<p class="help-block" ng-show="formioFieldForm[component.key].$error.email">{{ component.label || component.key }} must be a valid email.</p>' +
+        '<p class="help-block" ng-show="formioFieldForm[component.key].$error.required">{{ component.label || component.key }} is required.</p>' +
+        '<p class="help-block" ng-show="formioFieldForm[component.key].$error.number">{{ component.label || component.key }} must be a number.</p>' +
+        '<p class="help-block" ng-show="formioFieldForm[component.key].$error.maxlength">{{ component.label || component.key }} must be shorter than {{ component.validate.maxLength + 1 }} characters.</p>' +
+        '<p class="help-block" ng-show="formioFieldForm[component.key].$error.minlength">{{ component.label || component.key }} must be longer than {{ component.validate.minLength - 1 }} characters.</p>' +
+        '<p class="help-block" ng-show="formioFieldForm[component.key].$error.min">{{ component.label || component.key }} must be higher than {{ component.validate.min - 1 }}.</p>' +
+        '<p class="help-block" ng-show="formioFieldForm[component.key].$error.max">{{ component.label || component.key }} must be lower than {{ component.validate.max + 1 }}.</p>' +
+        '<p class="help-block" ng-show="formioFieldForm[component.key].$error.custom">{{ component.customError }}</p>' +
+        '<p class="help-block" ng-show="formioFieldForm[component.key].$error.pattern">{{ component.label || component.key }} does not match the pattern {{ component.validate.pattern }}</p>' +
+      '</div>'
+    );
+  }
+]);
+
+require('./components');
+
+},{"./components":15,"./directives/customValidator":28,"./directives/formio":29,"./directives/formioComponent":30,"./directives/formioDelete":31,"./directives/formioElement":32,"./directives/formioErrors":33,"./directives/formioSubmissions":34,"./factories/FormioScope":35,"./factories/FormioUtils":36,"./factories/formioInterceptor":37,"./filters/flattenComponents":38,"./filters/safehtml":39,"./providers/Formio":41}],41:[function(require,module,exports){
+"use strict";
+module.exports = function() {
+
+  // The formio class.
+  var Formio = require('formiojs')();
+
+  // Return the provider interface.
+  return {
+
+    // Set the base URL for the formio API.
+    setBaseUrl: function(url, _noalias) {
+      Formio.setBaseUrl(url, _noalias);
+    },
+    setDomain: function(dom) {
+      // Remove this?
+    },
+    $get: [
+      '$rootScope',
+      '$q',
+      function(
+        $rootScope,
+        $q
+      ) {
+
+        // Wrap Formio.request's promises with $q so $apply gets called correctly.
+        var request = Formio.request;
+        Formio.request = function() {
+          return $q.when(request.apply(Formio, arguments))
+          .catch(function(error) {
+            if (error === 'Unauthorized') {
+              $rootScope.$broadcast('formio.unauthorized', error);
+            }
+            else if (error === 'Login Timeout') {
+              $rootScope.$broadcast('formio.sessionExpired', error);
+            }
+            // Propagate error
+            throw error;
+          });
+        };
+
+        // Return the formio interface.
+        return Formio;
+      }
+    ]
+  };
+};
+
+},{"formiojs":2}]},{},[40]);
