@@ -56743,8 +56743,8 @@ module.exports = [
 (function (global){
 "use strict";
 global.jQuery = require('jquery');
-require('angular-ui-mask');
 require('angular');
+require('angular-ui-mask');
 require('angular-ui-select/select');
 require('angular-paginate-anything');
 require('angular-moment');
@@ -56968,7 +56968,6 @@ module.exports = function() {
 
 },{"formiojs":67}],67:[function(require,module,exports){
 (function (global){
-"use strict";
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formiojs = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function (process){
 // vim:ts=4:sts=4:sw=4:
@@ -59686,9 +59685,6 @@ module.exports = function(_baseUrl, _noalias, _domain) {
     // Get the cached promise to save multiple loads.
     var cacheKey = btoa(url);
     if (method === 'GET' && cache.hasOwnProperty(cacheKey)) {
-      cache[cacheKey].finally(function() {
-        Formio.onRequestDone();
-      });
       return cache[cacheKey];
     }
     else {
@@ -59792,9 +59788,9 @@ module.exports = function(_baseUrl, _noalias, _domain) {
 
   Formio.currentUser = function() {
     var user = this.getUser();
-    if (user) { return Q().thenResolve(user) }
+    if (user) { return Q(user) }
     var token = this.getToken();
-    if (!token) { return Q().thenResolve(null) }
+    if (!token) { return Q(null) }
     return this.request(baseUrl + '/current')
       .then(function(response) {
         if (response.ok) {
@@ -59809,6 +59805,7 @@ module.exports = function(_baseUrl, _noalias, _domain) {
     return this.request(baseUrl + '/logout').finally(function() {
       this.setToken(null);
       this.setUser(null);
+      Formio.clearCache();
     }.bind(this));
   };
   Formio.fieldData = function(data, component) {

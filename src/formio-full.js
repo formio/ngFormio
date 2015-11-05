@@ -1,6 +1,6 @@
 global.jQuery = require('jquery');
-require('angular-ui-mask');
 require('angular');
+require('angular-ui-mask');
 require('angular-ui-select/select');
 require('angular-paginate-anything');
 require('angular-moment');
