@@ -86,6 +86,9 @@ module.exports = function(router) {
    *   The callback function to execute upon completion.
    */
   HubspotContactAction.prototype.resolve = function(handler, method, req, res, next) {
+    // Dont block on the hubspot request.
+    next();
+
     // Store the current resource.
     var currentResource = res.resource;
 
@@ -118,14 +121,14 @@ module.exports = function(router) {
       util.connect(router, req, function(err, hubspot) {
         if (err) {
           debug(err);
-          return next();
+          return;
         }
 
         hubspot.contacts_create_update(payload, function(err, result) {
           // Should we do something with the error?
           if (err) {
             debug(err);
-            return next();
+            return;
           }
 
           if (!externalId && result.vid) {
@@ -143,10 +146,8 @@ module.exports = function(router) {
               if (err) {
                 // Should we do something with the error?
                 debug(err);
+                return;
               }
-
-              // Move onto the next middleware.
-              return next();
             });
           }
         });
@@ -155,7 +156,6 @@ module.exports = function(router) {
     else if (req.method === 'DELETE') {
       // TODO: If vid exists on formio contact, delete from hubspot.
       // node-hubspot.js does not currently have a contact_delete function. Will need to add.
-      next();
     }
   };
 
