@@ -2,6 +2,7 @@
 
 var _ = require('lodash');
 var util = require('./util');
+var debug = require('debug')('formio:action:hubspot');
 
 module.exports = function(router) {
   /**
@@ -75,11 +76,13 @@ module.exports = function(router) {
   /**
    * Execute the action.
    *
+   * @param handler
+   * @param method
    * @param req
    *   The Express request object.
    * @param res
    *   The Express response object.
-   * @param cb
+   * @param next
    *   The callback function to execute upon completion.
    */
   HubspotContactAction.prototype.resolve = function(handler, method, req, res, next) {
@@ -113,41 +116,47 @@ module.exports = function(router) {
       });
 
       util.connect(router, req, function(err, hubspot) {
-        if (err) { return next(); }
+        if (err) {
+          debug(err);
+          return next();
+        }
 
         hubspot.contacts_create_update(payload, function(err, result) {
+          // Should we do something with the error?
           if (err) {
-            // Should we do something with the error?
+            debug(err);
+            return next();
           }
-          else {
-            if (!externalId && result.vid) {
-              // Update the resource with the external Id.
-              router.formio.resources.submission.model.update({
-                _id: currentResource.item._id
-              }, {
-                $push: {
-                  externalIds: {
-                    type: 'hubspotContact',
-                    id: result.vid
-                  }
+
+          if (!externalId && result.vid) {
+            // Update the resource with the external Id.
+            router.formio.resources.submission.model.update({
+              _id: currentResource.item._id
+            }, {
+              $push: {
+                externalIds: {
+                  type: 'hubspotContact',
+                  id: result.vid
                 }
-              }, function (err, result) {
-                if (err) {
-                  // Should we do something with the error?
-                }
-              });
-            }
+              }
+            }, function (err, result) {
+              if (err) {
+                // Should we do something with the error?
+                debug(err);
+              }
+
+              // Move onto the next middleware.
+              return next();
+            });
           }
         });
       });
-      }
+    }
     else if (req.method === 'DELETE') {
       // TODO: If vid exists on formio contact, delete from hubspot.
       // node-hubspot.js does not currently have a contact_delete function. Will need to add.
+      next();
     }
-
-    // Move onto the next middleware.
-    next();
   };
 
   return HubspotContactAction;
