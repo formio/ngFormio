@@ -162,7 +162,7 @@ app.controller('ProjectCreateController', [
         GoogleAnalytics.sendEvent('Project', 'create', null, 1);
         $state.go('project.edit', {projectId: project._id});
       }, function(error) {
-        if (error.data.message && error.data.message.indexOf('duplicate key error index') !== -1) {
+        if (error.data && error.data.message && error.data.message.indexOf('duplicate key error index') !== -1) {
           error.data.errors.name = {
             path: 'name',
             message: 'Project domain already exists. Please pick a different domain.'
