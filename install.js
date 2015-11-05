@@ -3,6 +3,7 @@ var fs = require('fs');
 var _ = require('lodash');
 
 module.exports = function(formio, done) {
+  var hook = require('formio/src/util/hook')(formio);
 
   if (!process.env.ADMIN_EMAIL || !process.env.ADMIN_PASS) {
     return done('Cannot set up server. Please set environment variables for ADMIN_EMAIL and ADMIN_PASS and restart the server.');
@@ -52,21 +53,28 @@ module.exports = function(formio, done) {
 
       // Add project id to roles and forms.
       var alter = {
-        role: function(role) {
-          role.project = project._id;
-          return role;
+        role: function(item, done) {
+          item.project = project._id;
+          hook.alter('roleMachineName', item.machineName, item, function(err, machineName) {
+            if (err) { done(err); }
+            item.machineName = machineName;
+            done(null, item);
+          });
         },
-        form: function(form) {
-          form.project = project._id;
-          return form;
+        form: function(item, done) {
+          item.project = project._id;
+          hook.alter('formMachineName', item.machineName, item, function(err, machineName) {
+            if (err) { done(err); }
+            item.machineName = machineName;
+            done(null, item);
+          });
         },
-        roleQuery: function(query) {
-          query.project = project._id;
-          return query;
-        },
-        formQuery: function(query) {
-          query.project = project._id;
-          return query;
+        action: function(item, done) {
+          hook.alter('actionMachineName', item.machineName, item, function(err, machineName) {
+            if (err) { done(err); }
+            item.machineName = machineName;
+            done(null, item);
+          });
         }
       };
       importer.template(template, alter, function(err, template) {
@@ -77,8 +85,7 @@ module.exports = function(formio, done) {
     createRootAccount: function(done) {
       console.log(' > Creating root user account.');
 
-      var password = require('formio/src/actions/fields/password.js')(formio);
-      password.encryptPassword(process.env.ADMIN_PASS, function(err, hash) {
+      formio.encrypt(process.env.ADMIN_PASS, function(err, hash) {
         if (err) { return done(err); }
 
         // Create the root user submission.
