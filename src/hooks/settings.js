@@ -8,6 +8,7 @@ nunjucks.configure([], {
 var debug = require('debug')('formio:settings');
 var o365Util = require('../actions/office365/util');
 var nodeUrl = require('url');
+var async = require('async');
 
 module.exports = function(app, formioServer) {
   // Include the request cache.
@@ -15,6 +16,9 @@ module.exports = function(app, formioServer) {
 
   // Attach the project plans to the formioServer
   formioServer.formio.plans = require('../plans/index')(formioServer, cache);
+
+  // Atach the teams to formioServer.
+  formioServer.formio.teams = require('../teams/index')(formioServer);
 
   return {
     settings: function (settings, req, cb) {
@@ -345,6 +349,37 @@ module.exports = function(app, formioServer) {
       },
       cors: function () {
         return require('../middleware/corsOptions')(formioServer)
+      },
+
+      /**
+       * Hook the user object and modify the roles to include the users team id's.
+       *
+       * @param user {Object}
+       *   The current user object to modify.
+       * @param next {Function}
+       *   The callback function to invoke with the modified user object.
+       */
+      user: function(user, next) {
+        var _debug = require('debug')('formio:settings:user');
+        user.roles = user.roles || [];
+
+        formioServer.formio.teams.getTeams(user._id)
+          .then(function(teams) {
+            // Filter the teams to only contain the team ids.
+            _debug(teams);
+            teams = _.map(teams, function(team) {
+              return team._id.toString();
+            });
+
+            // Add the users team ids, to their roles.
+            user.roles = _.without(user.roles.concat(teams), null);
+            _debug(user.roles);
+
+            return next(user);
+          }, function(err) {
+            _debug(err);
+            return next(user);
+          });
       },
 
       /**
