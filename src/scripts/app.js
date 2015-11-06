@@ -251,7 +251,8 @@ angular
       $scope.teams = [];
       $scope.teamsLoading = true;
       $scope.teamsUrl = $rootScope.teamForm + '/submission';
-      $scope.$on('pagination:loadPage', function() {
+      Formio.request($scope.teamsUrl, 'GET').then(function(teams) {
+        $scope.teams = teams;
         $scope.teamsLoading = false;
         angular.element('#team-loader').hide();
       });
