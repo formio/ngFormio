@@ -361,18 +361,28 @@ module.exports = function(app, formioServer) {
        */
       user: function(user, next) {
         var _debug = require('debug')('formio:settings:user');
+        var util = formioServer.formio.util;
         user.roles = user.roles || [];
 
-        formioServer.formio.teams.getTeams(user._id)
+        // Convert all the roles to strings
+        user.roles = _.map(user.roles, function(role) {
+          if (role) {
+            return util.idToString(role);
+          }
+        });
+
+        formioServer.formio.teams.getTeams(user)
           .then(function(teams) {
             // Filter the teams to only contain the team ids.
             _debug(teams);
             teams = _.map(teams, function(team) {
-              return team._id.toString();
+              if (team) {
+                return util.idToString(team._id);
+              }
             });
 
             // Add the users team ids, to their roles.
-            user.roles = _.without(user.roles.concat(teams), null);
+            user.roles = _.without(user.roles.concat(teams), null, undefined);
             _debug(user.roles);
 
             return next(user);

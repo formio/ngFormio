@@ -26,7 +26,7 @@ module.exports = function(formio) {
   // Handle the request.
   return function(req, res, next) {
 
-    // Determing if this is a local domain or not.
+    // Determine if this is a local domain or not.
     var local = false;
 
     // Ignore the subdomain if they provide the config.

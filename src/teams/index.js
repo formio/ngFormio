@@ -51,6 +51,7 @@ module.exports = function(formioServer) {
    * @returns {Promise}
    */
   var getTeams = function(user) {
+    var util = formioServer.formio.util;
     var q = Q.defer();
 
     loadTeams(function(teamResource) {
@@ -63,23 +64,17 @@ module.exports = function(formioServer) {
         return q.reject('No user given.');
       }
 
-      // Try to convert the given user id to a mongo bson id.
-      var id = null;
-      try {
-        id = formioServer.formio.mongoose.Types.ObjectId(user._id);
-      } catch(e) {
-        id = user._id;
-      }
-
+      // Search for teams with id's stored as both BSON and strings.
       var query = {
         form: teamResource,
-        members: {$in: [id]},
+        'data.members': {$elemMatch: {_id: {$in: [util.idToBson(user._id), util.idToString(user._id)]}}},
         deleted: {$eq: null}
       };
-      debug.getTeams(query);
+      debug.getTeams(JSON.stringify(query));
 
       formioServer.formio.resources.submission.model.find(query, function(err, documents) {
         if (err) {
+          debug.getTeams(err);
           return q.reject(err);
         }
 
