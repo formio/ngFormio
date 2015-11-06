@@ -13,6 +13,9 @@ module.exports = function() {
     setDomain: function(dom) {
       // Remove this?
     },
+    cacheOfflineProject: function(url, path) {
+      Formio.cacheOfflineProject(url, path);
+    },
     $get: [
       '$rootScope',
       '$q',
@@ -35,6 +38,12 @@ module.exports = function() {
             // Propagate error
             throw error;
           });
+        };
+
+        // Same with Formio.makeRequest.
+        var makeRequest = Formio.prototype.makeRequest;
+        Formio.prototype.makeRequest = function() {
+          return $q.when(makeRequest.apply(this, arguments));
         };
 
         // Return the formio interface.

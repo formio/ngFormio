@@ -56935,6 +56935,9 @@ module.exports = function() {
     setDomain: function(dom) {
       // Remove this?
     },
+    cacheOfflineProject: function(url, path) {
+      Formio.cacheOfflineProject(url, path);
+    },
     $get: [
       '$rootScope',
       '$q',
@@ -56957,6 +56960,12 @@ module.exports = function() {
             // Propagate error
             throw error;
           });
+        };
+
+        // Same with Formio.makeRequest.
+        var makeRequest = Formio.prototype.makeRequest;
+        Formio.prototype.makeRequest = function() {
+          return $q.when(makeRequest.apply(this, arguments));
         };
 
         // Return the formio interface.
@@ -59115,6 +59124,270 @@ process.chdir = function (dir) {
 process.umask = function() { return 0; };
 
 },{}],3:[function(require,module,exports){
+'use strict';
+
+//
+// We store our EE objects in a plain object whose properties are event names.
+// If `Object.create(null)` is not supported we prefix the event names with a
+// `~` to make sure that the built-in object properties are not overridden or
+// used as an attack vector.
+// We also assume that `Object.create(null)` is available when the event name
+// is an ES6 Symbol.
+//
+var prefix = typeof Object.create !== 'function' ? '~' : false;
+
+/**
+ * Representation of a single EventEmitter function.
+ *
+ * @param {Function} fn Event handler to be called.
+ * @param {Mixed} context Context for function execution.
+ * @param {Boolean} once Only emit once
+ * @api private
+ */
+function EE(fn, context, once) {
+  this.fn = fn;
+  this.context = context;
+  this.once = once || false;
+}
+
+/**
+ * Minimal EventEmitter interface that is molded against the Node.js
+ * EventEmitter interface.
+ *
+ * @constructor
+ * @api public
+ */
+function EventEmitter() { /* Nothing to set */ }
+
+/**
+ * Holds the assigned EventEmitters by name.
+ *
+ * @type {Object}
+ * @private
+ */
+EventEmitter.prototype._events = undefined;
+
+/**
+ * Return a list of assigned event listeners.
+ *
+ * @param {String} event The events that should be listed.
+ * @param {Boolean} exists We only need to know if there are listeners.
+ * @returns {Array|Boolean}
+ * @api public
+ */
+EventEmitter.prototype.listeners = function listeners(event, exists) {
+  var evt = prefix ? prefix + event : event
+    , available = this._events && this._events[evt];
+
+  if (exists) return !!available;
+  if (!available) return [];
+  if (available.fn) return [available.fn];
+
+  for (var i = 0, l = available.length, ee = new Array(l); i < l; i++) {
+    ee[i] = available[i].fn;
+  }
+
+  return ee;
+};
+
+/**
+ * Emit an event to all registered event listeners.
+ *
+ * @param {String} event The name of the event.
+ * @returns {Boolean} Indication if we've emitted an event.
+ * @api public
+ */
+EventEmitter.prototype.emit = function emit(event, a1, a2, a3, a4, a5) {
+  var evt = prefix ? prefix + event : event;
+
+  if (!this._events || !this._events[evt]) return false;
+
+  var listeners = this._events[evt]
+    , len = arguments.length
+    , args
+    , i;
+
+  if ('function' === typeof listeners.fn) {
+    if (listeners.once) this.removeListener(event, listeners.fn, undefined, true);
+
+    switch (len) {
+      case 1: return listeners.fn.call(listeners.context), true;
+      case 2: return listeners.fn.call(listeners.context, a1), true;
+      case 3: return listeners.fn.call(listeners.context, a1, a2), true;
+      case 4: return listeners.fn.call(listeners.context, a1, a2, a3), true;
+      case 5: return listeners.fn.call(listeners.context, a1, a2, a3, a4), true;
+      case 6: return listeners.fn.call(listeners.context, a1, a2, a3, a4, a5), true;
+    }
+
+    for (i = 1, args = new Array(len -1); i < len; i++) {
+      args[i - 1] = arguments[i];
+    }
+
+    listeners.fn.apply(listeners.context, args);
+  } else {
+    var length = listeners.length
+      , j;
+
+    for (i = 0; i < length; i++) {
+      if (listeners[i].once) this.removeListener(event, listeners[i].fn, undefined, true);
+
+      switch (len) {
+        case 1: listeners[i].fn.call(listeners[i].context); break;
+        case 2: listeners[i].fn.call(listeners[i].context, a1); break;
+        case 3: listeners[i].fn.call(listeners[i].context, a1, a2); break;
+        default:
+          if (!args) for (j = 1, args = new Array(len -1); j < len; j++) {
+            args[j - 1] = arguments[j];
+          }
+
+          listeners[i].fn.apply(listeners[i].context, args);
+      }
+    }
+  }
+
+  return true;
+};
+
+/**
+ * Register a new EventListener for the given event.
+ *
+ * @param {String} event Name of the event.
+ * @param {Functon} fn Callback function.
+ * @param {Mixed} context The context of the function.
+ * @api public
+ */
+EventEmitter.prototype.on = function on(event, fn, context) {
+  var listener = new EE(fn, context || this)
+    , evt = prefix ? prefix + event : event;
+
+  if (!this._events) this._events = prefix ? {} : Object.create(null);
+  if (!this._events[evt]) this._events[evt] = listener;
+  else {
+    if (!this._events[evt].fn) this._events[evt].push(listener);
+    else this._events[evt] = [
+      this._events[evt], listener
+    ];
+  }
+
+  return this;
+};
+
+/**
+ * Add an EventListener that's only called once.
+ *
+ * @param {String} event Name of the event.
+ * @param {Function} fn Callback function.
+ * @param {Mixed} context The context of the function.
+ * @api public
+ */
+EventEmitter.prototype.once = function once(event, fn, context) {
+  var listener = new EE(fn, context || this, true)
+    , evt = prefix ? prefix + event : event;
+
+  if (!this._events) this._events = prefix ? {} : Object.create(null);
+  if (!this._events[evt]) this._events[evt] = listener;
+  else {
+    if (!this._events[evt].fn) this._events[evt].push(listener);
+    else this._events[evt] = [
+      this._events[evt], listener
+    ];
+  }
+
+  return this;
+};
+
+/**
+ * Remove event listeners.
+ *
+ * @param {String} event The event we want to remove.
+ * @param {Function} fn The listener that we need to find.
+ * @param {Mixed} context Only remove listeners matching this context.
+ * @param {Boolean} once Only remove once listeners.
+ * @api public
+ */
+EventEmitter.prototype.removeListener = function removeListener(event, fn, context, once) {
+  var evt = prefix ? prefix + event : event;
+
+  if (!this._events || !this._events[evt]) return this;
+
+  var listeners = this._events[evt]
+    , events = [];
+
+  if (fn) {
+    if (listeners.fn) {
+      if (
+           listeners.fn !== fn
+        || (once && !listeners.once)
+        || (context && listeners.context !== context)
+      ) {
+        events.push(listeners);
+      }
+    } else {
+      for (var i = 0, length = listeners.length; i < length; i++) {
+        if (
+             listeners[i].fn !== fn
+          || (once && !listeners[i].once)
+          || (context && listeners[i].context !== context)
+        ) {
+          events.push(listeners[i]);
+        }
+      }
+    }
+  }
+
+  //
+  // Reset the array, or remove it completely if we have no more listeners.
+  //
+  if (events.length) {
+    this._events[evt] = events.length === 1 ? events[0] : events;
+  } else {
+    delete this._events[evt];
+  }
+
+  return this;
+};
+
+/**
+ * Remove all listeners or only the listeners for the specified event.
+ *
+ * @param {String} event The event want to remove all listeners for.
+ * @api public
+ */
+EventEmitter.prototype.removeAllListeners = function removeAllListeners(event) {
+  if (!this._events) return this;
+
+  if (event) delete this._events[prefix ? prefix + event : event];
+  else this._events = prefix ? {} : Object.create(null);
+
+  return this;
+};
+
+//
+// Alias methods names because people roll like that.
+//
+EventEmitter.prototype.off = EventEmitter.prototype.removeListener;
+EventEmitter.prototype.addListener = EventEmitter.prototype.on;
+
+//
+// This function doesn't apply anymore.
+//
+EventEmitter.prototype.setMaxListeners = function setMaxListeners() {
+  return this;
+};
+
+//
+// Expose the prefix.
+//
+EventEmitter.prefixed = prefix;
+
+//
+// Expose the module.
+//
+if ('undefined' !== typeof module) {
+  module.exports = EventEmitter;
+}
+
+},{}],4:[function(require,module,exports){
 (function() {
   'use strict';
 
@@ -59446,21 +59719,46 @@ process.umask = function() { return 0; };
   self.fetch.polyfill = true
 })();
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 'use strict'
 
 module.exports = function(_baseUrl, _noalias, _domain) {
   require('whatwg-fetch');
   var Q = require('Q');
+  var EventEmitter = require('eventemitter3');
+
+  // Prefix used with offline cache entries in localStorage
+  var OFFLINE_CACHE_PREFIX = 'formioCache-';
+  var OFFLINE_QUEUE_KEY = 'formioOfflineQueue';
 
 // The default base url.
   var baseUrl = _baseUrl || '';
   var noalias = _noalias || false;
+
+  // The temporary GET request cache storage
   var cache = {};
+
+  // The persistent offline cache storage
+  var offlineCache = {};
+
+  // The queue of submissions made offline
+  var offlineQueue = JSON.parse(localStorage.getItem(OFFLINE_QUEUE_KEY) || '[]');
+
+  // The current request from the offline queue that is being processed
+  var currentOfflineRequest = null;
+
+  // Flag to force offline mode
+  var forceOffline = false;
+
+  // Flag to set if Formio should auto dequeue offline requests when online
+  var autoDequeue = true;
+
+  // Promise that resolves when ready to make requests
+  var ready = Q();
 
   /**
    * Returns parts of the URL that are important.
-   * Indexex
+   * Indexes
    *  - 0: The full url
    *  - 1: The protocol
    *  - 2: The hostname
@@ -59481,6 +59779,30 @@ module.exports = function(_baseUrl, _noalias, _domain) {
       }
     return str.join("&");
   }
+
+  /**
+   * Removes duplicate forms from offline cached project.
+   * Duplicates can occur if form is renamed (old and new
+   * stored under different names but have same id/path).
+   * NOTE: modifies the given object
+   *
+   * @param project Cached project
+   */
+  var removeCacheDuplicates = function(project) {
+    Object.keys(project.forms).forEach(function(name) {
+      var form = project.forms[name];
+      if (!form) { // form was deleted
+        return;
+      }
+      Object.keys(project.forms).forEach(function(otherName) {
+        var otherForm = project.forms[otherName];
+        if ((form._id === otherForm._id || form.path === otherForm.path) &&
+            new Date(otherForm.modified) < new Date(form.modified)) {
+            delete project.forms[otherName];
+        }
+      });
+    });
+  };
 
   // The formio class.
   var Formio = function(path) {
@@ -59600,7 +59922,7 @@ module.exports = function(_baseUrl, _noalias, _domain) {
         query = '?' + serialize(query.params);
       }
       if (!this[_id]) { return Q.reject('Missing ' + _id); }
-      return Formio.request(this[_url] + this.query);
+      return this.makeRequest(type, this[_url] + this.query);
     };
   };
 
@@ -59618,7 +59940,7 @@ module.exports = function(_baseUrl, _noalias, _domain) {
       var method = this[_id] ? 'put' : 'post';
       var reqUrl = this[_id] ? this[_url] : this[type + 'sUrl'];
       cache = {};
-      return Formio.request(reqUrl + this.query, method, data);
+      return this.makeRequest(type, reqUrl + this.query, method, data);
     };
   };
 
@@ -59635,7 +59957,7 @@ module.exports = function(_baseUrl, _noalias, _domain) {
     return function() {
       if (!this[_id]) { Q.reject('Nothing to delete'); }
       cache = {};
-      return Formio.request(this[_url], 'delete');
+      return this.makeRequest(type, this[_url], 'delete');
     };
   };
 
@@ -59647,14 +59969,108 @@ module.exports = function(_baseUrl, _noalias, _domain) {
    * @private
    */
   var _index = function(type) {
-    var _url = type + 'sUrl';
+    var _url = type + 'Url';
     return function(query) {
       query = query || '';
       if (typeof query === 'object') {
         query = '?' + serialize(query.params);
       }
-      return Formio.request(this[_url] + query);
+      return this.makeRequest(type, this[_url] + query);
     };
+  };
+
+  // Returns cached results if offline, otherwise calls Formio.request
+  Formio.prototype.makeRequest = function(type, url, method, data) {
+    var self = this;
+    var offline = Formio.isOffline();
+    method = (method || 'GET').toUpperCase();
+
+    return ready // Wait until offline caching is finished
+    .then(function() {
+      // Try to get offline cached response if offline
+      var cache = offlineCache[self.projectId];
+
+      // Form GET
+      if (type === 'form' && method === 'GET' && offline) {
+        if (!cache || !cache.forms) {
+          return null;
+        }
+        // Find and return form
+        return Object.keys(cache.forms).reduce(function(result, name) {
+          if (result) return result;
+          // TODO: verify this works with longform URLs too
+          var form = cache.forms[name];
+          if (form._id === self.formId || form.path === self.formId) return form;
+        }, null);
+      }
+
+      // Form INDEX
+      if (type === 'forms' && method === 'GET' && offline) {
+        if (!cache || !cache.forms) {
+          return null;
+        }
+        return cache.forms;
+      }
+
+      // Submission POST
+      if (type === 'submission' && method === 'POST' && offline) {
+        // Store request in offline queue
+        offlineQueue.push({
+            type: type,
+            url: url,
+            method: method,
+            data: data
+        });
+        localStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(offlineQueue));
+        Formio.offline.emit('queue', offlineQueue[offlineQueue.length - 1]);
+
+        // Send fake response
+        var user = Formio.getUser();
+        return {
+            // _id: can't give an _id,
+            owner: user ? user._id : null,
+            offline: true,
+            form: self.formId,
+            data: data,
+            created: new Date().toISOString(),
+            modified: new Date().toISOString(),
+            externalIds: [],
+            roles: []
+        };
+      }
+
+    })
+    .then(function(result) {
+      // Make regular request if no offline response returned
+      return result || Formio.request(url, method, data);
+    })
+    .then(function(result) {
+      // Check if need to update cache after request
+      var cache = offlineCache[self.projectId];
+      if (!cache) return result; // Skip caching
+
+      if (type === 'form' && method !== 'DELETE') {
+        cache.forms[result.name] = result;
+      }
+      else if (type === 'form' && method === 'DELETE') {
+        delete cache.forms[result.name];
+      }
+      else if (type === 'forms' && method === 'GET') {
+        // Don't replace all forms, as some may be omitted due to permissions
+        result.forEach(function(form) {
+          cache.forms[form.name] = form;
+        });
+      }
+      else {
+        // Nothing to cache
+        return result;
+      }
+
+      // Update localStorage
+      removeCacheDuplicates(cache); // Clean up duplicates
+      localStorage.setItem(OFFLINE_CACHE_PREFIX + self.projectId, JSON.stringify(cache));
+      return result;
+    });
   };
 
   // Define specific CRUD methods.
@@ -59664,101 +60080,99 @@ module.exports = function(_baseUrl, _noalias, _domain) {
   Formio.prototype.loadForm = _load('form');
   Formio.prototype.saveForm = _save('form');
   Formio.prototype.deleteForm = _delete('form');
-  Formio.prototype.loadForms = _index('form');
+  Formio.prototype.loadForms = _index('forms');
   Formio.prototype.loadSubmission = _load('submission');
   Formio.prototype.saveSubmission = _save('submission');
   Formio.prototype.deleteSubmission = _delete('submission');
-  Formio.prototype.loadSubmissions = _index('submission');
+  Formio.prototype.loadSubmissions = _index('submissions');
   Formio.prototype.loadAction = _load('action');
   Formio.prototype.saveAction = _save('action');
   Formio.prototype.deleteAction = _delete('action');
-  Formio.prototype.loadActions = _index('action');
+  Formio.prototype.loadActions = _index('actions');
   Formio.prototype.availableActions = function() { return Formio.request(this.formUrl + '/actions'); };
   Formio.prototype.actionInfo = function(name) { return Formio.request(this.formUrl + '/actions/' + name); };
 
   // Static methods.
-  Formio.loadProjects = function(query) {
-    query = query || '';
-    if (typeof query === 'object') {
-      query = '?' + serialize(query.params);
-    }
-    return this.request(baseUrl + '/project' + query);
-};
+  Formio.loadProjects = function() { return this.request(baseUrl + '/project'); };
   Formio.request = function(url, method, data) {
     if (!url) { return Q.reject('No url provided'); }
     method = (method || 'GET').toUpperCase();
-
-    // Get the cached promise to save multiple loads.
     var cacheKey = btoa(url);
-    if (method === 'GET' && cache.hasOwnProperty(cacheKey)) {
-      return cache[cacheKey];
-    }
-    else {
-      var promise = Q()
-      .then(function() {
-        // Set up and fetch request
-        var headers = new Headers({
-          'Accept': 'application/json',
-          'Content-type': 'application/json; charset=UTF-8'
-        });
-        var token = Formio.getToken();
-        if (token) {
-          headers.append('x-jwt-token', token);
-        }
 
-        var options = {
-          method: method,
-          headers: headers,
-          mode: 'cors'
-        };
-        if (data) {
-          options.body = JSON.stringify(data);
-        }
+    return Q().then(function() {
+      // Get the cached promise to save multiple loads.
+      if (method === 'GET' && cache.hasOwnProperty(cacheKey)) {
+        return cache[cacheKey];
+      }
+      else {
+        return Q()
+        .then(function() {
+          // Set up and fetch request
+          var headers = new Headers({
+            'Accept': 'application/json',
+            'Content-type': 'application/json; charset=UTF-8'
+          });
+          var token = Formio.getToken();
+          if (token) {
+            headers.append('x-jwt-token', token);
+          }
 
-        return fetch(url, options);
-      })
-      .then(function(response) {
-        // Handle fetch results
-        if (response.ok) {
-          var token = response.headers.get('x-jwt-token');
-          if (response.status >= 200 && response.status < 300 && token && token !== '') {
-            Formio.setToken(token);
+          var options = {
+            method: method,
+            headers: headers,
+            mode: 'cors'
+          };
+          if (data) {
+            options.body = JSON.stringify(data);
           }
-          // 204 is no content. Don't try to .json() it.
-          if (response.status === 204) {
-            return {};
-          }
-          if (response.headers.get('content-type').indexOf('application/json') !== -1) {
+
+          return fetch(url, options);
+        })
+        .catch(function(err) {
+          err.message = 'Could not connect to API server (' + err.message + ')';
+          throw err;
+        })
+        .then(function(response) {
+          // Handle fetch results
+          if (response.ok) {
+            var token = response.headers.get('x-jwt-token');
+            if (response.status >= 200 && response.status < 300 && token && token !== '') {
+              Formio.setToken(token);
+            }
+            // 204 is no content. Don't try to .json() it.
+            if (response.status === 204) {
+              return {};
+            }
             return response.json();
           }
-          return response.text();
-        }
-        else {
-          if (response.status === 440) {
-            Formio.setToken(null);
+          else {
+            if (response.status === 440) {
+              Formio.setToken(null);
+            }
+            // Parse and return the error as a rejected promise to reject this promise
+            return (response.headers.get('content-type').indexOf('application/json') !== -1 ?
+              response.json() : response.text())
+              .then(function(error){
+                throw error;
+              });
           }
-          // Parse and return the error as a rejected promise to reject this promise
-          return (response.headers.get('content-type').indexOf('application/json') !== -1 ?
-            response.json() : response.text())
-            .then(function(error){
-              throw error;
-            });
-        }
-      })
-      .catch(function(err) {
-        // Remove failed promises from cache
-        delete cache[cacheKey];
-        // Propagate error so client can handle accordingly
-        throw err;
-      });
-
+        })
+        .catch(function(err) {
+          // Remove failed promises from cache
+          delete cache[cacheKey];
+          // Propagate error so client can handle accordingly
+          throw err;
+        });
+      }
+    })
+    .then(function(result) {
       // Save the cache
       if (method === 'GET') {
-        cache[cacheKey] = promise;
+        cache[cacheKey] = Q(result);
       }
 
-      return promise;
-    }
+      return result;
+    });
   };
 
   Formio.setToken = function(token) {
@@ -59770,6 +60184,7 @@ module.exports = function(_baseUrl, _noalias, _domain) {
       return localStorage.removeItem('formioToken');
     }
     localStorage.setItem('formioToken', token);
+    Formio.currentUser(); // Run this so user is updated if null
   };
   Formio.getToken = function() {
     if (this.token) { return this.token; }
@@ -59782,10 +60197,10 @@ module.exports = function(_baseUrl, _noalias, _domain) {
       this.setToken(null);
       return localStorage.removeItem('formioUser');
     }
-    localStorage.setItem('formioUser', user);
+    localStorage.setItem('formioUser', JSON.stringify(user));
   };
   Formio.getUser = function() {
-    return localStorage.getItem('formioUser');
+    return JSON.parse(localStorage.getItem('formioUser') || null);
   };
 
   Formio.setBaseUrl = function(url, _noalias) {
@@ -59801,12 +60216,10 @@ module.exports = function(_baseUrl, _noalias, _domain) {
     var token = this.getToken();
     if (!token) { return Q(null) }
     return this.request(baseUrl + '/current')
-      .then(function(response) {
-        if (response.ok) {
-          Formio.setUser(response);
-        }
-        return response;
-      });
+    .then(function(response) {
+      Formio.setUser(response);
+      return response;
+    });
   };
 
 // Keep track of their logout callback.
@@ -59837,7 +60250,7 @@ module.exports = function(_baseUrl, _noalias, _domain) {
         }
 
         // Convert old single field data in submissions to multiple
-        if(key === parts[parts.length - 1] && component.multiple && !Array.isArray(value[key])) {
+        if (key === parts[parts.length - 1] && component.multiple && !Array.isArray(value[key])) {
           value[key] = [value[key]];
         }
 
@@ -59848,21 +60261,172 @@ module.exports = function(_baseUrl, _noalias, _domain) {
     }
     else {
       // Convert old single field data in submissions to multiple
-      if(component.multiple && !Array.isArray(data[component.key])) {
+      if (component.multiple && !Array.isArray(data[component.key])) {
         data[component.key] = [data[component.key]];
       }
       return data[component.key];
     }
   };
-  return Formio;
-}
 
-},{"Q":1,"whatwg-fetch":3}]},{},[4])(4)
+  /**
+   * EventEmitter for offline mode events.
+   * See Node.js documentation for API documentation: https://nodejs.org/api/events.html
+   */
+  Formio.offline = new EventEmitter();
+
+  /**
+   * Sets up a project to be cached offline
+   * @param  url  The url to the project (same as you would pass to Formio constructor)
+   * @param  path Optional. Path to local project.json definition to get initial project forms from if offline.
+   * @return {[type]}      [description]
+   */
+  Formio.cacheOfflineProject = function(url, path) {
+    var formio = new Formio(url);
+    var projectId = formio.projectId;
+    var projectUrl = formio.projectUrl;
+
+    var projectPromise;
+    // Offline
+    // if (Formio.isOffline()) {
+      // Try to return cached first
+      var cached = localStorage.getItem(OFFLINE_CACHE_PREFIX + projectId);
+      if (cached) {
+        projectPromise = Q(JSON.parse(cached));
+      }
+      // Otherwise grab offline project definition
+      else if (path) {
+        projectPromise = fetch(path)
+        .then(function(response) {
+          return response.json();
+        })
+        .then(function(project) {
+          Object.keys(project.forms.forms).forEach(function(formName) {
+            // Set modified time as early as possible so any newer
+            // form will override this one if there's a name conflict.
+            project.forms[formName].created = new Date(0).toISOString();
+            project.forms[formName].modified = new Date(0).toISOString();
+          });
+          return project;
+        });
+      }
+      else {
+        // Return an empty project so requests start caching offline.
+        projectPromise = Q({ forms: {} });
+      }
+    // }
+    // TODO: fix forms index endpoint to show forms you have permission to
+    // // Online
+    // else {
+    //   // Load and use the latest list of forms
+    //   projectPromise = formio.loadForms()
+    //   .then(function(forms) {
+    //     return {forms: forms}
+    //   });
+    // }
+
+
+    // Add this promise to the ready chain
+    return ready = ready.then(function() {
+      return projectPromise.then(function(project) {
+        localStorage.setItem(OFFLINE_CACHE_PREFIX + projectId, JSON.stringify(project));
+        offlineCache[projectId] = project;
+      })
+    })
+    .catch(function(err) {
+      console.error('Error trying to cache offline storage:', err);
+      // Swallow the error so failing caching doesn't halt the ready promise chain
+    });
+  };
+
+  /**
+   * Clears the offline cache. This will also stop previously
+   * cached projects from caching future requests for offline access.
+   */
+  Formio.clearOfflineCache = function() {
+    // Clear in-memory cache
+    offlineCache = {};
+    // Clear localStorage cache
+    for(var i = 0; i < localStorage.length; i++) {
+      var key = localStorage.key(i);
+      if (key.indexOf(OFFLINE_CACHE_PREFIX) === 0) {
+        localStorage.removeItem(key);
+      }
+    }
+  };
+
+  /**
+   * Forces Formio to go into offline mode.
+   * @param offline
+   */
+  Formio.setOffline = function(offline) {
+    var oldOffline = Formio.isOffline();
+    forceOffline = offline;
+
+    // If autoDequeue enabled and was offline before
+    // and not now, start dequeuing
+    if(autoDequeue && oldOffline && !Formio.isOffline()) {
+      Formio.dequeueOfflineRequests();
+    }
+  };
+
+  /**
+   * @return true if Formio is in offline mode (forced or not),
+   *         false otherwise
+   */
+  Formio.isOffline = function() {
+    return forceOffline || !navigator.onLine;
+  };
+
+  Formio.setAutoDequeue = function(auto) {
+    autoDequeue = auto;
+  };
+
+  /**
+   * Attempts to send requests queued while offline.
+   * Each request is sent one at a time. A request that
+   * fails will emit the `formError` event on Formio.offline,
+   * and stop dequeuing further requests.
+   */
+  Formio.dequeueOfflineRequests = function() {
+    if(currentOfflineRequest || !offlineQueue.length) {
+      return;
+    }
+    currentOfflineRequest = offlineQueue.shift();
+    Formio.offline.emit('dequeue', currentOfflineRequest);
+    Formio.request(currentOfflineRequest.url, currentOfflineRequest.method, currentOfflineRequest.data)
+    .then(function(submission) {
+      Formio.offline.emit('formSubmission', submission);
+      localStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(offlineQueue));
+
+      // Continue to next queue item
+      currentOfflineRequest = null;
+      Formio.dequeueOfflineRequests();
+    })
+    .catch(function(err) {
+      localStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(offlineQueue));
+      var request = currentOfflineRequest;
+      currentOfflineRequest = null;
+      Formio.offline.emit('formError', request);
+      // Stop sending requests
+    });
+  };
+
+  window.addEventListener('online', function() {
+    if(autoDequeue) {
+      Formio.dequeueOfflineRequests();
+    }
+  });
+
+
+  return Formio;
+};
+
+},{"Q":1,"eventemitter3":3,"whatwg-fetch":4}]},{},[5])(5)
 });
 
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"Q":68,"_process":26,"whatwg-fetch":69}],68:[function(require,module,exports){
+},{"Q":68,"_process":26,"eventemitter3":69,"whatwg-fetch":70}],68:[function(require,module,exports){
 (function (process){
 // vim:ts=4:sts=4:sw=4:
 /*!
@@ -61915,6 +62479,270 @@ return Q;
 
 }).call(this,require('_process'))
 },{"_process":26}],69:[function(require,module,exports){
+'use strict';
+
+//
+// We store our EE objects in a plain object whose properties are event names.
+// If `Object.create(null)` is not supported we prefix the event names with a
+// `~` to make sure that the built-in object properties are not overridden or
+// used as an attack vector.
+// We also assume that `Object.create(null)` is available when the event name
+// is an ES6 Symbol.
+//
+var prefix = typeof Object.create !== 'function' ? '~' : false;
+
+/**
+ * Representation of a single EventEmitter function.
+ *
+ * @param {Function} fn Event handler to be called.
+ * @param {Mixed} context Context for function execution.
+ * @param {Boolean} once Only emit once
+ * @api private
+ */
+function EE(fn, context, once) {
+  this.fn = fn;
+  this.context = context;
+  this.once = once || false;
+}
+
+/**
+ * Minimal EventEmitter interface that is molded against the Node.js
+ * EventEmitter interface.
+ *
+ * @constructor
+ * @api public
+ */
+function EventEmitter() { /* Nothing to set */ }
+
+/**
+ * Holds the assigned EventEmitters by name.
+ *
+ * @type {Object}
+ * @private
+ */
+EventEmitter.prototype._events = undefined;
+
+/**
+ * Return a list of assigned event listeners.
+ *
+ * @param {String} event The events that should be listed.
+ * @param {Boolean} exists We only need to know if there are listeners.
+ * @returns {Array|Boolean}
+ * @api public
+ */
+EventEmitter.prototype.listeners = function listeners(event, exists) {
+  var evt = prefix ? prefix + event : event
+    , available = this._events && this._events[evt];
+
+  if (exists) return !!available;
+  if (!available) return [];
+  if (available.fn) return [available.fn];
+
+  for (var i = 0, l = available.length, ee = new Array(l); i < l; i++) {
+    ee[i] = available[i].fn;
+  }
+
+  return ee;
+};
+
+/**
+ * Emit an event to all registered event listeners.
+ *
+ * @param {String} event The name of the event.
+ * @returns {Boolean} Indication if we've emitted an event.
+ * @api public
+ */
+EventEmitter.prototype.emit = function emit(event, a1, a2, a3, a4, a5) {
+  var evt = prefix ? prefix + event : event;
+
+  if (!this._events || !this._events[evt]) return false;
+
+  var listeners = this._events[evt]
+    , len = arguments.length
+    , args
+    , i;
+
+  if ('function' === typeof listeners.fn) {
+    if (listeners.once) this.removeListener(event, listeners.fn, undefined, true);
+
+    switch (len) {
+      case 1: return listeners.fn.call(listeners.context), true;
+      case 2: return listeners.fn.call(listeners.context, a1), true;
+      case 3: return listeners.fn.call(listeners.context, a1, a2), true;
+      case 4: return listeners.fn.call(listeners.context, a1, a2, a3), true;
+      case 5: return listeners.fn.call(listeners.context, a1, a2, a3, a4), true;
+      case 6: return listeners.fn.call(listeners.context, a1, a2, a3, a4, a5), true;
+    }
+
+    for (i = 1, args = new Array(len -1); i < len; i++) {
+      args[i - 1] = arguments[i];
+    }
+
+    listeners.fn.apply(listeners.context, args);
+  } else {
+    var length = listeners.length
+      , j;
+
+    for (i = 0; i < length; i++) {
+      if (listeners[i].once) this.removeListener(event, listeners[i].fn, undefined, true);
+
+      switch (len) {
+        case 1: listeners[i].fn.call(listeners[i].context); break;
+        case 2: listeners[i].fn.call(listeners[i].context, a1); break;
+        case 3: listeners[i].fn.call(listeners[i].context, a1, a2); break;
+        default:
+          if (!args) for (j = 1, args = new Array(len -1); j < len; j++) {
+            args[j - 1] = arguments[j];
+          }
+
+          listeners[i].fn.apply(listeners[i].context, args);
+      }
+    }
+  }
+
+  return true;
+};
+
+/**
+ * Register a new EventListener for the given event.
+ *
+ * @param {String} event Name of the event.
+ * @param {Functon} fn Callback function.
+ * @param {Mixed} context The context of the function.
+ * @api public
+ */
+EventEmitter.prototype.on = function on(event, fn, context) {
+  var listener = new EE(fn, context || this)
+    , evt = prefix ? prefix + event : event;
+
+  if (!this._events) this._events = prefix ? {} : Object.create(null);
+  if (!this._events[evt]) this._events[evt] = listener;
+  else {
+    if (!this._events[evt].fn) this._events[evt].push(listener);
+    else this._events[evt] = [
+      this._events[evt], listener
+    ];
+  }
+
+  return this;
+};
+
+/**
+ * Add an EventListener that's only called once.
+ *
+ * @param {String} event Name of the event.
+ * @param {Function} fn Callback function.
+ * @param {Mixed} context The context of the function.
+ * @api public
+ */
+EventEmitter.prototype.once = function once(event, fn, context) {
+  var listener = new EE(fn, context || this, true)
+    , evt = prefix ? prefix + event : event;
+
+  if (!this._events) this._events = prefix ? {} : Object.create(null);
+  if (!this._events[evt]) this._events[evt] = listener;
+  else {
+    if (!this._events[evt].fn) this._events[evt].push(listener);
+    else this._events[evt] = [
+      this._events[evt], listener
+    ];
+  }
+
+  return this;
+};
+
+/**
+ * Remove event listeners.
+ *
+ * @param {String} event The event we want to remove.
+ * @param {Function} fn The listener that we need to find.
+ * @param {Mixed} context Only remove listeners matching this context.
+ * @param {Boolean} once Only remove once listeners.
+ * @api public
+ */
+EventEmitter.prototype.removeListener = function removeListener(event, fn, context, once) {
+  var evt = prefix ? prefix + event : event;
+
+  if (!this._events || !this._events[evt]) return this;
+
+  var listeners = this._events[evt]
+    , events = [];
+
+  if (fn) {
+    if (listeners.fn) {
+      if (
+           listeners.fn !== fn
+        || (once && !listeners.once)
+        || (context && listeners.context !== context)
+      ) {
+        events.push(listeners);
+      }
+    } else {
+      for (var i = 0, length = listeners.length; i < length; i++) {
+        if (
+             listeners[i].fn !== fn
+          || (once && !listeners[i].once)
+          || (context && listeners[i].context !== context)
+        ) {
+          events.push(listeners[i]);
+        }
+      }
+    }
+  }
+
+  //
+  // Reset the array, or remove it completely if we have no more listeners.
+  //
+  if (events.length) {
+    this._events[evt] = events.length === 1 ? events[0] : events;
+  } else {
+    delete this._events[evt];
+  }
+
+  return this;
+};
+
+/**
+ * Remove all listeners or only the listeners for the specified event.
+ *
+ * @param {String} event The event want to remove all listeners for.
+ * @api public
+ */
+EventEmitter.prototype.removeAllListeners = function removeAllListeners(event) {
+  if (!this._events) return this;
+
+  if (event) delete this._events[prefix ? prefix + event : event];
+  else this._events = prefix ? {} : Object.create(null);
+
+  return this;
+};
+
+//
+// Alias methods names because people roll like that.
+//
+EventEmitter.prototype.off = EventEmitter.prototype.removeListener;
+EventEmitter.prototype.addListener = EventEmitter.prototype.on;
+
+//
+// This function doesn't apply anymore.
+//
+EventEmitter.prototype.setMaxListeners = function setMaxListeners() {
+  return this;
+};
+
+//
+// Expose the prefix.
+//
+EventEmitter.prefixed = prefix;
+
+//
+// Expose the module.
+//
+if ('undefined' !== typeof module) {
+  module.exports = EventEmitter;
+}
+
+},{}],70:[function(require,module,exports){
 (function() {
   'use strict';
 
