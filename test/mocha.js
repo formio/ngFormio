@@ -62,6 +62,9 @@ describe('Bootstrap', function() {
         formLogin: {
           _id: '553dbe603c605f841af5b3a5'
         },
+        formTeam: {
+          _id: '55479ce7685637ab440a0765'
+        },
         resource: {
           _id: '553db94e72f702e714dd9779'
         }
@@ -310,6 +313,82 @@ describe('Bootstrap', function() {
         storeDocument(app.formio.resources.form.model, 'formLogin', createRegisterForm);
       };
 
+      // Create the initial form for teams.
+      var createTeamForm = function() {
+        template.formio.formTeam = {
+          title: 'Team',
+          type: 'resource',
+          name: 'team',
+          path: 'team',
+          project: template.formio.project._id,
+          access: [
+            {type: 'read_all', roles: [template.formio.roleAuthenticated._id]}
+          ],
+          submissionAccess: [
+            {type: 'create_own', roles: [template.formio.roleAuthenticated._id]},
+            {type: 'read_own', roles: [template.formio.roleAuthenticated._id]},
+            {type: 'update_own', roles: [template.formio.roleAuthenticated._id]},
+            {type: 'delete_own', roles: [template.formio.roleAuthenticated._id]}
+          ],
+          components: [
+            {
+              lockKey: true,
+              type: 'textfield',
+              validate: {
+                customPrivate: false,
+                custom: '',
+                pattern: '',
+                maxLength: '',
+                minLength: '',
+                required: false
+              },
+              persistent: true,
+              unique: false,
+              protected: false,
+              defaultValue: '',
+              multiple: false,
+              suffix: '',
+              prefix: '',
+              placeholder: 'Enter the name for this team',
+              key: 'name',
+              label: 'Team Name',
+              inputMask: '',
+              inputType: 'text',
+              input: true
+            },
+            {
+              type: 'resource',
+              refreshDelay: 0,
+              refresh: false,
+              multiple: true,
+              searchFields: '',
+              searchExpression: '',
+              template: '<span>{{ item.data.name }}</span>',
+              resource: '553db94e72f702e714dd9779',
+              placeholder: 'Select the members on this team.',
+              key: 'members',
+              label: 'Members',
+              input: true
+            },
+            {
+              theme: 'primary',
+              disableOnInvalid: true,
+              action: 'submit',
+              block: false,
+              rightIcon: '',
+              leftIcon: '',
+              size: 'md',
+              key: 'submit',
+              label: 'Submit',
+              input: true,
+              type: 'button'
+            }
+          ]
+        };
+
+        storeDocument(app.formio.resources.form.model, 'formTeam', createLoginForm);
+      };
+
       // Create the initial resource to for users.
       var createResource = function() {
         template.formio.resource = {
@@ -378,7 +457,7 @@ describe('Bootstrap', function() {
           ]
         };
 
-        storeDocument(app.formio.resources.form.model, 'resource', createLoginForm);
+        storeDocument(app.formio.resources.form.model, 'resource', createTeamForm);
       };
 
       // Set the default Project access.
