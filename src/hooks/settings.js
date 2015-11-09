@@ -308,6 +308,7 @@ module.exports = function(app, formioServer) {
         options.title = currentProject.title;
         options.name = currentProject.name;
         options.description = currentProject.description;
+        options.plan = currentProject.plan;
         options.projectId = req.projectId || req.params.projectId || 0;
         return options;
       },
