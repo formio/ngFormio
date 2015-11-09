@@ -39,6 +39,7 @@ module.exports = function(router, formio) {
       function(req, res, next) {
         if (req.body && req.body.template) {
           req.template = req.body.template;
+          req.templateMode = 'create';
           delete req.body.template;
         }
         next();
@@ -62,6 +63,14 @@ module.exports = function(router, formio) {
     ],
     beforePut: [
       formio.middleware.filterMongooseExists({field: 'deleted', isNull: true}),
+      function(req, res, next) {
+        if (req.body && req.body.template) {
+          req.template = req.body.template;
+          req.templateMode = 'update';
+          delete req.body.template;
+        }
+        next();
+      },
       formio.middleware.condensePermissionTypes,
       formio.middleware.projectPlanFilter
     ],
