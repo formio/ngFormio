@@ -431,6 +431,21 @@ module.exports = function(app, formioServer) {
         }
         return _hasAccess;
       },
+
+      /**
+       * Hook the available permission types in the PermissionSchema.
+       *
+       * @param available {Array}
+       *   The available permission types.
+       *
+       * @return {Array}
+       *   The updated permission types.
+       */
+      permissionSchema: function(available) {
+        available.push('team_read', 'team_write', 'team_admin');
+        return available;
+      },
+
       exportOptions: function (options, req, res) {
         var currentProject = cache.currentProject(req);
         options.title = currentProject.title;
