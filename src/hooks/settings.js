@@ -176,6 +176,22 @@ module.exports = function(app, formioServer) {
         _debug(isAdmin);
         return isAdmin;
       },
+
+      /**
+       * Modify the access handlers.
+       *
+       * @param handlers {Array}
+       *   The array of handlers for the access endpoints.
+       * @param req {Object}
+       *   The Express request Object.
+       * @param res {Object}
+       *   The Express request Object.
+       * @param access {Object}
+       *   The formio access object.
+       *
+       * @returns {Array}
+       *   The modified access handlers.
+       */
       getAccess: function (handlers, req, res, access) {
         var _debug = require('debug')('formio:settings:getAccess');
 
