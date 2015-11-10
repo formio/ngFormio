@@ -195,60 +195,129 @@ module.exports = function(app, formioServer) {
       getAccess: function (handlers, req, res, access) {
         var _debug = require('debug')('formio:settings:getAccess');
 
+        /**
+         * Calculate the project access.
+         *
+         * @param callback {Function}
+         *   The callback function to invoke after completion.
+         */
+        var getProjectAccess = function(callback) {
+          // Build the access object for this project.
+          access.project = {};
+
+          // Skip project access if no projectId was given.
+          if (!req.projectId) {
+            return callback(null);
+          }
+
+          // Load the project.
+          cache.loadProject(req, req.projectId, function(err, project) {
+            if (err) {
+              _debug(err);
+              return callback(err);
+            }
+            if (!project) {
+              _debug('No project found with projectId: ' + req.projectId);
+              return callback('No project found with projectId: ' + req.projectId);
+            }
+
+            // Store the Project Owners UserId, because they will have all permissions.
+            if (project.owner) {
+              access.project.owner = project.owner.toString();
+
+              // Add the UserId of the Project Owner for the ownerFilter middleware.
+              req.projectOwner = access.project.owner;
+            }
+
+            // Add the other defined access types.
+            if (project.access) {
+              project.access.forEach(function (permission) {
+                access.project[permission.type] = access.project[permission.type] || [];
+
+                // Convert the roles from BSON to comparable strings.
+                permission.roles.forEach(function (id) {
+                  access.project[permission.type].push(id.toString());
+                });
+              });
+            }
+
+            // Pass the access of this project to the next function.
+            return callback(null);
+          });
+        };
+
+        var getTeamAccess = function(callback) {
+          // Modify the project access with teams functionality.
+          access.project = access.project || {};
+
+          // Skip teams access if no projectId was given.
+          if (!req.projectId) {
+            return callback(null);
+          }
+
+          // Load the project.
+          cache.loadProject(req, req.projectId, function(err, project) {
+            if (err) {
+              _debug(err);
+              return callback(err);
+            }
+            if (!project) {
+              _debug('No project found with projectId: ' + req.projectId);
+              return callback('No project found with projectId: ' + req.projectId);
+            }
+
+            // Skip teams processing, if this projects plan does not support teams.
+            if (!project.plan || project.plan === 'community' || project.plan === 'basic') {
+              return callback(null);
+            }
+
+            // Iterate the project access permissions, and search for teams functionality.
+            if (project.access) {
+              var teamAccess = _.filter(project.access, function(permission) {
+                return _.startsWith(permission.type, 'team_');
+              });
+              _debug('Team Permissions: ' + JSON.stringify(teamAccess));
+
+              teamAccess.forEach(function(permission) {
+                if (permission.type === 'team_read') {
+
+                }
+                else if (permission.type === 'team_write') {
+
+                }
+                else if (permission.type === 'team_admin') {
+
+                }
+              });
+            }
+
+            // Pass the access of this Team to the next function.
+            return callback(null);
+          });
+        };
+
         // Get the permissions for an Project with the given ObjectId.
         handlers.unshift(
           formioServer.formio.plans.checkRequest(req, res),
-          function getProjectAccess(callback) {
-            // Build the access object for this project.
-            access.project = {};
-
-            // Skip project access if no projectId was given.
-            if (!req.projectId) {
-              return callback(null, access);
-            }
-
-            // Load the project.
-            cache.loadProject(req, req.projectId, function(err, project) {
-              if (err) {
-                _debug(err);
-                return callback(err);
-              }
-              if (!project) {
-                _debug('No project found with projectId: ' + req.projectId);
-                return callback('No project found with projectId: ' + req.projectId);
-              }
-
-              // Store the Project Owners UserId, because they will have all permissions.
-              if (project.owner) {
-                access.project.owner = project.owner.toString();
-
-                // Add the UserId of the Project Owner for the ownerFilter middleware.
-                req.projectOwner = access.project.owner;
-              }
-
-              // Add the other defined access types.
-              if (project.access) {
-                project.access.forEach(function (permission) {
-                  access.project[permission.type] = access.project[permission.type] || [];
-
-                  // Convert the roles from BSON to comparable strings.
-                  permission.roles.forEach(function (id) {
-                    access.project[permission.type].push(id.toString());
-                  });
-                });
-              }
-
-              // Pass the access of this project to the next function.
-              return callback(null);
-            });
-          }
+          getProjectAccess
         );
         return handlers;
       },
+
+      /**
+       * Hook they access entity and perform additional logic.
+       *
+       * @param entity {Object}
+       *   The access entity object.
+       * @param req {Object}
+       *   The Express request Object.
+       *
+       * @returns {Object}
+       *   The updated access entity object.
+       */
       accessEntity: function (entity, req) {
         if (entity.type == 'form') {
-
-          // If this is a create form or index form, use project as the access entity.
+          // If this is a create form or index form, use the project as the access entity.
           var createForm = ((req.method === 'POST') && (Boolean(req.formId) === false));
           var indexForm = ((req.method === 'GET') && (Boolean(req.formId) === false));
           if (createForm || indexForm) {
@@ -258,6 +327,7 @@ module.exports = function(app, formioServer) {
             };
           }
         }
+
         return entity;
       },
 
@@ -331,6 +401,20 @@ module.exports = function(app, formioServer) {
           return _access;
         }
       },
+
+      /**
+       * Hook the hasAccess results.
+       *
+       * @param _hasAccess {Boolean}
+       *   If the request has access to perform the given action
+       * @param req {Object}
+       *   The Express request Object.
+       * @param access {Object}
+       *   The calculated access object.
+       *
+       * @returns {Boolean}
+       *   If the user has access based on the request.
+       */
       hasAccess: function (_hasAccess, req, access) {
         if (req.token && access.project && access.project.owner) {
           if (req.token.user._id === access.project.owner) {
