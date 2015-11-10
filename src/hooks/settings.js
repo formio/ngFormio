@@ -279,14 +279,126 @@ module.exports = function(app, formioServer) {
               _debug('Team Permissions: ' + JSON.stringify(teamAccess));
 
               teamAccess.forEach(function(permission) {
+                _debug(permission);
+
+                /**
+                 * For the team_read permission, the following need to be added:
+                 *   - read_all permissions on the project
+                 *   - read_all permissions on all forms
+                 *   - read_all permissions on all submissions
+                 */
                 if (permission.type === 'team_read') {
+                  // Modify the project access.
+                  access.project = access.project || {};
+                  access.project.read_all = access.project.read_all || [];
 
+                  // Modify the form access.
+                  access.form = access.form || {};
+                  access.form.read_all = access.form.read_all || [];
+
+                  // Modify the submission access.
+                  access.submission = access.submission || {};
+                  access.submission.read_all = access.submission.read_all || [];
+
+                  // Iterate each team in the team_read roles, and add their permissions.
+                  permission.roles = permission.roles || [];
+                  permission.roles.forEach(function(id) {
+                    access.project.read_all.push(id.toString());
+                    access.form.read_all.push(id.toString());
+                    access.submission.read_all.push(id.toString());
+                  });
                 }
+
+                /**
+                 * For the team_write permission, the following need to be added:
+                 *   - create_all permissions on the project
+                 *   - create_all permissions on all forms
+                 *   - read_all permissions on the project
+                 *   - read_all permissions on all forms
+                 *   - update_all permissions on the project
+                 *   - update_all permissions on all forms
+                 *   - delete_all permissions on all forms
+                 */
                 else if (permission.type === 'team_write') {
+                  // Modify the project access.
+                  access.project = access.project || {};
+                  access.project.create_all = access.project.create_all || [];
+                  access.project.read_all = access.project.read_all || [];
+                  access.project.update_all = access.project.update_all || [];
 
+                  // Modify the form access.
+                  access.form = access.form || {};
+                  access.form.create_all = access.form.create_all || [];
+                  access.form.read_all = access.form.read_all || [];
+                  access.form.update_all = access.form.update_all || [];
+                  access.form.delete_all = access.form.delete_all || [];
+
+                  // Iterate each team in the team_write roles, and add their permissions.
+                  permission.roles = permission.roles || [];
+                  permission.roles.forEach(function(id) {
+                    access.project.create_all.push(id.toString());
+                    access.project.read_all.push(id.toString());
+                    access.project.update_all.push(id.toString());
+
+                    access.form.create_all.push(id.toString());
+                    access.form.read_all.push(id.toString());
+                    access.form.update_all.push(id.toString());
+                    access.form.delete_all.push(id.toString());
+                  });
                 }
-                else if (permission.type === 'team_admin') {
 
+                /**
+                 * For the team_admin permission, the following need to be added:
+                 *   - create_all permissions on the project
+                 *   - create_all permissions on all forms
+                 *   - create_all permissions on all submissions
+                 *   - read_all permissions on the project
+                 *   - read_all permissions on all forms
+                 *   - read_all permissions on all submissions
+                 *   - update_all permissions on the project
+                 *   - update_all permissions on all forms
+                 *   - update_all permissions on all submissions
+                 *   - delete_all permissions on all forms
+                 *   - delete_all permissions on all submissions
+                 */
+                else if (permission.type === 'team_admin') {
+                  // Modify the project access.
+                  access.project = access.project || {};
+                  access.project.create_all = access.project.create_all || [];
+                  access.project.read_all = access.project.read_all || [];
+                  access.project.update_all = access.project.update_all || [];
+
+                  // Modify the form access.
+                  access.form = access.form || {};
+                  access.form.create_all = access.form.create_all || [];
+                  access.form.read_all = access.form.read_all || [];
+                  access.form.update_all = access.form.update_all || [];
+                  access.form.delete_all = access.form.delete_all || [];
+
+                  // Modify the submission access.
+                  access.submission = access.submission || {};
+                  access.submission.create_all = access.submission.create_all || [];
+                  access.submission.read_all = access.submission.read_all || [];
+                  access.submission.update_all = access.submission.update_all || [];
+                  access.submission.delete_all = access.submission.delete_all || [];
+
+                  // Iterate each team in the team_admin roles, and add their permissions.
+                  permission.roles = permission.roles || [];
+                  permission.roles.forEach(function(id) {
+                    access.project.create_all.push(id.toString());
+                    access.project.read_all.push(id.toString());
+                    access.project.update_all.push(id.toString());
+
+                    access.form.create_all.push(id.toString());
+                    access.form.read_all.push(id.toString());
+                    access.form.update_all.push(id.toString());
+                    access.form.delete_all.push(id.toString());
+
+                    access.submission.create_all.push(id.toString());
+                    access.submission.read_all.push(id.toString());
+                    access.submission.update_all.push(id.toString());
+                    access.submission.delete_all.push(id.toString());
+                  });
                 }
               });
             }
@@ -299,7 +411,8 @@ module.exports = function(app, formioServer) {
         // Get the permissions for an Project with the given ObjectId.
         handlers.unshift(
           formioServer.formio.plans.checkRequest(req, res),
-          getProjectAccess
+          getProjectAccess,
+          getTeamAccess
         );
         return handlers;
       },
