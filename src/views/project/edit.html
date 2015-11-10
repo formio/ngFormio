@@ -5,7 +5,7 @@
         <h3 class="panel-title">
           <i class="fa fa-database"></i>
           <span>Resources</span>
-          <a class="pull-right" href="http://help.form.io/userguide/#resources" target="_blank"><i class="glyphicon glyphicon-question-sign "></i></a>
+          <a class="pull-right" href="http://help.form.io/userguide/#resources" target="_blank"><i class="glyphicon glyphicon-question-sign"></i></a>
         </h3>
       </div>
       <div class="panel-body">
@@ -26,7 +26,7 @@
         <h3 class="panel-title">
           <i class="fa fa-file-text-o"></i>
           <span>Forms</span>
-          <a class="pull-right" href="http://help.form.io/userguide/#forms" target="_blank"><i class="glyphicon glyphicon-question-sign "></i></a>
+          <a class="pull-right" href="http://help.form.io/userguide/#forms" target="_blank"><i class="glyphicon glyphicon-question-sign"></i></a>
         </h3>
       </div>
       <div class="panel-body">
@@ -42,6 +42,18 @@
     </div>
   </div>
   <div class="col-sm-4">
+    <div class="panel panel-info" ng-if="currentProject.settings.preview">
+      <div class="panel-heading">
+        <h3 class="panel-title"><span class="glyphicon glyphicon-info-sign"></span> Preview your project</h3>
+      </div>
+      <div class="panel-body">
+        <p>This project was generated from a template that provides a preview app. Check out how your project looks!</p>
+        <div class="form-group pull-right">
+          <a ng-href="{{getPreviewURL()}}" target="_blank" class="btn btn-primary">Preview Project</a>
+        </div>
+
+      </div>
+    </div>
     <div class="panel panel-info">
       <div class="panel-heading">
         <h3 class="panel-title"><span class="glyphicon glyphicon-info-sign"></span> Getting started with your Project</h3>

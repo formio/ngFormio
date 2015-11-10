@@ -1,75 +1,53 @@
+<div class="row row-video">
+  <a class="video-banner" href="" ng-click="showIntroVideo()" ng-hide="introVideoVisible">
+    <img src="/images/formio-logo-with-slogan.png" alt="&lt;form.io&gt; - fastest FORM &amp; API workflow - anywhere." />
+    <div class="video-play-icon"><span class="icon-bg"><span class="glyphicon glyphicon-play"></span></span></div>
+  </a>
+  <div id="intro-video-container" ng-if="introVideoVisible" ng-class="{'video-open': introVideoExpanded}">
+    <iframe id="intro-video" src="https://www.youtube.com/embed/hrggvEniXFI?rel=0&amp;showinfo=0&amp;autoplay=1" frameborder="0" allowfullscreen></iframe>
+  </div>
+  <p class="text-muted text-center"><span class="glyphicon glyphicon-question-sign"></span> First time here? Watch the intro video above or try our <a href="http://help.form.io/start">walkthrough tutorial</a>.</p>
+</div>
+<hr>
 <div class="row">
-  <div class="col-sm-6">
-    <div class="jumbotron well clearfix">
-      <h3 style="color:#666;">Welcome to <img height="34px;" src="images/formio-logo.png" /></h3>
-      <p style="font-size: 1.3em;">Form.io is a platform that enables developers to rapidly build modern web and mobile applications. Our intuitive drag & drop interface allows you to create both the forms and the RESTful API's all in one easy step! <strong style="color:#666;">You build the app, we handle the Form I/O.</strong></p>
-      <div class="row">
-        <div class="col-sm-12">
-          <iframe width="100%" height="275px" src="https://www.youtube.com/embed/hrggvEniXFI?rel=0&amp;showinfo=0" frameborder="0" allowfullscreen></iframe>
-        </div>
+  <h2 class="text-center">Projects</h2>
+  <div class="col-sm-12 projects">
+    <div class="row">
+      <div class="col-sm-4">
+        <a class="project-create" ui-sref="createProject()">
+          <h4><p class="create-link">Create Project <br /><span class="glyphicon glyphicon-plus circle"></span></p></h4>
+        </a>
       </div>
-      <div class="row">
-        <div class="col-sm-12">
-          <div ng-click="startTutorial()">
-            <button class="btn btn-info btn-block">Walk through tutorial</button>
-          </div>
-        </div>
+      <div class="col-sm-4" ng-repeat="project in projects">
+        <a class="project" ui-sref="project.edit({projectId: project._id})" title="{{ project.title }}">
+          <p class="project-plan pull-right"><small>
+            <span class="label" ng-class="getPlanLabel(project.plan)">{{ getPlanName(project.plan) | uppercase }}</span>
+          </small></p>
+          <h4 class="project-title ellipsis">{{ project.title }}</h4>
+          <p class="project-url ellipsis"><strong>{{project.name}}</strong>.form.io</p>
+          <p class="project-description ellipsis">{{ project.description | characters: 50 }}&nbsp;</p>
+            <!-- TODO: Add this back in when we have api stats -->
+          <!-- <p class="progress-label text-center"><small>Monthly API Calls</small></p>
+          <div class="progress">
+            <div class="progress-bar progress-bar-success" role="progressbar" ng-style="{'min-width': '2em', width: '50%'}"></div>
+            <span><small>100,000/1,000,000</small></span>
+          </div> -->
+        </a>
       </div>
     </div>
   </div>
-  <div class="col-sm-6">
-    <div class="row">
-      <div class="panel panel-success" ng-if="projects.length === 0">
-        <div class="panel-heading">
-          <h3 class="panel-title">Getting started is easy.</h3>
-        </div>
-        <div class="panel-body">
-          <p>Use our <strong>command line utility</strong> to <strong>bootstrap</strong> a working application.</p>
-          <p><pre>npm install -g formio-cli</pre></p>
-          <p><pre>formio bootstrap formio/formio-app-todo</pre></p>
-          <p><small>Note: You must have <a target="_blank" href="https://nodejs.org">Node.js</a> installed on your machine.</small></p>
-          <p><small>Other applications can be found @ <a target="_blank" href="https://github.com/formio?query=formio-app-">https://github.com/formio</a></small></p>
-        </div>
-      </div>
-      <div class="panel panel-primary">
-        <div class="panel-heading">
-          <h3 class="panel-title"><a ui-sref="projectIndex()"><i class="fa fa-th-large"></i> My Projects</a></h3>
-        </div>
-        <div class="panel-body">
-          <i id="projects-loader" style="font-size: 2em;" class="fa fa-spinner fa-pulse"></i>
-          <div class="well" ng-show="!projectsLoading">
-            Projects are web-based HTML software. Whether you are building a new website, or a mobile application, you can
-            create separate Projects used for each of these products.
-          </div>
-          <table ng-show="!projectsLoading && projects.length" class="table table-striped">
-            <tbody>
-            <tr ng-repeat="project in projects">
-              <td>
-                <div class="row">
-                  <div class="col-sm-5">
-                    <h4><a ui-sref="project.edit({projectId: project._id})">{{ project.title }}</a></h4>
-                  </div>
-                  <div class="col-sm-7">
-                    <div class="button-group pull-right" style="display:flex;">
-                      <a ui-sref="project.edit({projectId: project._id})" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-edit"></span> Edit</a>&nbsp;
-                      <a ui-sref="project.delete({projectId: project._id})" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-trash"></span></a>
-                    </div>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-sm-12 project-description">
-                  {{ project.description }}
-                  </div>
-                </div>
-              </td>
-            </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="panel-footer text-right">
-          <a ui-sref="createProject()" class="btn btn-success"><span class="glyphicon glyphicon-plus"></span> New Project</a>
-        </div>
-      </div>
-    </div>
+</div>
+<hr ng-if="projects.length != 0">
+<div class="row" ng-if="projects.length != 0">
+  <div class="col-md-3 col-vertical-center col-md-offset-3 col-sm-6">
+    <h3>Bootstrap an application</h3>
+    <p>If you're comfortable with a terminal, you can use our <strong>command line utility</strong> to <strong>bootstrap</strong> a working application from a template.</p>
+    <p><small>Note: You must have <a target="_blank" href="https://nodejs.org">Node.js</a> installed on your machine.</small></p>
+    <p><small>Other applications can be found @ <a target="_blank" href="https://github.com/formio?query=formio-app-">https://github.com/formio</a></small></p>
+  </div><!-- fix extra space causing column wrap
+  --><div class="col-vertical-center col-md-3 col-sm-6">
+<pre>npm install -g formio-cli
+formio bootstrap formio/formio-app-todo
+</pre>
   </div>
 </div>
