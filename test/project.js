@@ -186,7 +186,7 @@ module.exports = function(app, template, hook) {
           assert.equal(response.description, template.project.description);
 
           // Check that the response does not contain these properties.
-          not(response, ['__v', 'deleted', 'settings_encrypted', 'primary']);
+          not(response, ['__v', 'deleted', 'settings_encrypted', 'primary', 'machineName']);
 
           template.project = response;
 
@@ -495,7 +495,7 @@ module.exports = function(app, template, hook) {
     it('A Deleted Project should not have any active Roles', function(done) {
       if (!app.formio) return done();
 
-      app.formio.roles.resource.model.find({project: template.project._id, deleted: {$eq: null}})
+      app.formio.resources.role.model.find({project: template.project._id, deleted: {$eq: null}})
         .exec(function(err, results) {
           if (err) {
             return done(err);
@@ -541,7 +541,7 @@ module.exports = function(app, template, hook) {
           assert.equal(response.description, originalProject.description);
 
           // Check that the response does not contain these properties.
-          not(response, ['__v', 'deleted', 'settings_encrypted', 'primary']);
+          not(response, ['__v', 'deleted', 'settings_encrypted', 'primary', 'machineName']);
 
           template.project = response;
 

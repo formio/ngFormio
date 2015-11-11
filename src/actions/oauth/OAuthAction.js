@@ -282,7 +282,7 @@ module.exports = function(router) {
       // Load resource
       Q.denodeify(formio.cache.loadFormByName.bind(formio.cache))(req, self.settings.resource),
       // Load role
-      formio.roles.resource.model.findOne(roleQuery)
+      formio.resources.role.model.findOne(roleQuery)
     ])
     .spread(function(submission, resource, role) {
       if (!submission) {

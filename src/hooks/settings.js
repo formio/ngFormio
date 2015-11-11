@@ -309,6 +309,7 @@ module.exports = function(app, formioServer) {
         options.title = currentProject.title;
         options.name = currentProject.name;
         options.description = currentProject.description;
+        options.plan = currentProject.plan;
         options.projectId = req.projectId || req.params.projectId || 0;
         return options;
       },
@@ -454,6 +455,27 @@ module.exports = function(app, formioServer) {
           }
         });
         return schema;
+      },
+      formMachineName: function(machineName, document, done) {
+        formioServer.formio.resources.project.model.findOne({_id: document.project}).exec(function (err, project) {
+          if (err) { return done(err); }
+          done(null, project.machineName + ':' + machineName);
+        });
+      },
+      roleMachineName: function(machineName, document, done) {
+        formioServer.formio.resources.project.model.findOne({_id: document.project}).exec(function (err, project) {
+          if (err) { return done(err); }
+          done(null, project.machineName + ':' + machineName);
+        });
+      },
+      actionMachineName: function(machineName, document, done) {
+        formioServer.formio.resources.form.model.findOne({_id: document.form}).exec(function (err, form) {
+          if (err) { return done(err); }
+          done(null, form.machineName + ':' + machineName);
+        });
+      },
+      machineNameExport: function(machineName) {
+        return machineName.split(':').slice(-1)[0];
       }
     }
   }

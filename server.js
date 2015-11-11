@@ -139,34 +139,52 @@ var settings = require('./src/hooks/settings')(app, formioServer);
 
 // Start the api server.
 formioServer.init(settings).then(function(formio) {
-  // The formio app sanity endpoint.
-  app.get('/health', function(req, res, next) {
-    if (!formio.resources) {
-      return res.status(500).send('No Resources');
-    }
-    if (!formio.resources.project.model) {
-      return res.status(500).send('No Project model');
-    }
+  var start = function() {
 
-    formio.resources.project.model.findOne({name: 'formio'}, function(err, result) {
-      if (err) {
-        return res.status(500).send(err);
+    // The formio app sanity endpoint.
+    app.get('/health', function(req, res, next) {
+      if (!formio.resources) {
+        return res.status(500).send('No Resources');
       }
-      if (!result) {
-        return res.status(500).send('Formio Project not found');
+      if (!formio.resources.project.model) {
+        return res.status(500).send('No Project model');
       }
 
-      // Proceed with db schema sanity check middleware.
-      next();
-    });
-  }, formio.update.sanityCheck);
+      formio.resources.project.model.findOne({primary: true}, function(err, result) {
+        if (err) {
+          return res.status(500).send(err);
+        }
+        if (!result) {
+          return res.status(500).send('No Primary Project not found');
+        }
 
-  // Mount formio at /project/:projectId.
-  app.use('/project/:projectId', formioServer);
-  console.log(' > Listening to ' + config.protocol + '://' + config.domain + ':' + config.port);
-  app.listen(config.port);
-})
-.done();
+        // Proceed with db schema sanity check middleware.
+        next();
+      });
+    }, formio.update.sanityCheck);
+
+    // Mount formio at /project/:projectId.
+    app.use('/project/:projectId', formioServer);
+    console.log(' > Listening to ' + config.protocol + '://' + config.domain + ':' + config.port);
+    app.listen(config.port);
+  };
+
+  formio.db.collection('projects').count(function(err, numProjects) {
+    if (numProjects > 0) {
+      return start();
+    }
+    else {
+      console.log(' > No projects found. Setting up server.');
+      require('./install')(formio, function(err) {
+        if (err) {
+          // Throw an error and exit.
+          throw new Error(err);
+        }
+        return start();
+      });
+    }
+  });
+});
 
 process.on('uncaughtException', function(err) {
   console.log('Uncaught exception:');
