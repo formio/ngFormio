@@ -598,6 +598,7 @@ module.exports = function(app, formioServer) {
       user: function(user, next) {
         var _debug = require('debug')('formio:settings:user');
         var util = formioServer.formio.util;
+        _debug(user);
         user.roles = user.roles || [];
 
         // Convert all the roles to strings
@@ -607,7 +608,7 @@ module.exports = function(app, formioServer) {
           }
         });
 
-        formioServer.formio.teams.getTeams(user)
+        return formioServer.formio.teams.getTeams(user)
           .then(function(teams) {
             // Filter the teams to only contain the team ids.
             _debug(teams);
@@ -621,11 +622,12 @@ module.exports = function(app, formioServer) {
             user.roles = _.without(user.roles.concat(teams), null, undefined);
             _debug(user.roles);
 
-            return next(user);
+            return next(null, user);
           }, function(err) {
             _debug(err);
-            return next(user);
-          });
+            return next(null, user);
+          })
+          .denodeify(next);
       },
 
       /**
