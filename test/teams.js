@@ -54,5 +54,184 @@ module.exports = function(app, template, hook) {
     it('A Team member should be able to remove themselves from the Team', function(done) {
       done();
     });
+
+    describe('Permissions - team_read', function() {
+      // Project tests
+      it('A Team member with team_read, should not be able to create a project role', function(done) {
+        done();
+      });
+
+      it('A Team member with team_read, should be able to read the project data', function(done) {
+        done();
+      });
+
+      it('A Team member with team_read, should not be able to read the project settings data', function(done) {
+        done();
+      });
+
+      it('A Team member with team_read, should not be able to update the project settings data', function(done) {
+        done();
+      });
+
+      it('A Team member with team_read, should not be able to delete the project', function(done) {
+        done();
+      });
+
+      // Form tests
+      it('A Team member with team_read, should not be able to create a form', function(done) {
+        done();
+      });
+
+      it('A Team member with team_read, should be able to read any form', function(done) {
+        done();
+      });
+
+      it('A Team member with team_read, should not be able to update any', function(done) {
+        done();
+      });
+
+      it('A Team member with team_read, should not be able to delete a form', function(done) {
+        done();
+      });
+
+      // Submission tests
+      it('A Team member with team_read, should not be able to create a submission', function(done) {
+        done();
+      });
+
+      it('A Team member with team_read, should not be able to read a submission', function(done) {
+        done();
+      });
+
+      it('A Team member with team_read, should not be able to update a submission', function(done) {
+        done();
+      });
+
+      it('A Team member with team_read, should not be able to delete a submission', function(done) {
+        done();
+      });
+    });
+
+    describe('Permissions - team_write', function() {
+      // Project tests
+      it('A Team member with team_write, should be able to create a project role', function(done) {
+        done();
+      });
+
+      it('A Team member with team_write, should be able to read the project data', function(done) {
+        done();
+      });
+
+      it('A Team member with team_write, should not be able to read the project settings data', function(done) {
+        done();
+      });
+
+      it('A Team member with team_write, should not be able to update the project settings data', function(done) {
+        done();
+      });
+
+      it('A Team member with team_write, should be able to update the project data', function(done) {
+        done();
+      });
+
+      it('A Team member with team_write, should not be able to delete the project', function(done) {
+        done();
+      });
+
+      // Form tests
+      it('A Team member with team_write, should be able to create a form', function(done) {
+        done();
+      });
+
+      it('A Team member with team_write, should be able to read a form', function(done) {
+        done();
+      });
+
+      it('A Team member with team_write, should be able to update a form', function(done) {
+        done();
+      });
+
+      it('A Team member with team_write, should be able to delete a form', function(done) {
+        done();
+      });
+
+      // Submission tests
+      it('A Team member with team_write, should not be able to create a submission', function(done) {
+        done();
+      });
+
+      it('A Team member with team_write, should be able to read a submission', function(done) {
+        done();
+      });
+
+      it('A Team member with team_write, should be able to update a submission', function(done) {
+        done();
+      });
+
+      it('A Team member with team_write, should be able to delete a submission', function(done) {
+        done();
+      });
+    });
+
+    describe('Permissions - team_admin', function() {
+      // Project tests
+      it('A Team member with team_admin, should be able to create a project role', function(done) {
+        done();
+      });
+
+      it('A Team member with team_admin, should be able to read the project data', function(done) {
+        done();
+      });
+
+      it('A Team member with team_admin, should be able to read the project settings data', function(done) {
+        done();
+      });
+
+      it('A Team member with team_admin, should be able to update the project settings data', function(done) {
+        done();
+      });
+
+      it('A Team member with team_admin, should be able to update the project data', function(done) {
+        done();
+      });
+
+      it('A Team member with team_admin, should not be able to delete the project', function(done) {
+        done();
+      });
+
+      // Form tests
+      it('A Team member with team_admin, should be able to create a form', function(done) {
+        done();
+      });
+
+      it('A Team member with team_admin, should be able to read a form', function(done) {
+        done();
+      });
+
+      it('A Team member with team_admin, should be able to update a form', function(done) {
+        done();
+      });
+
+      it('A Team member with team_admin, should be able to delete a form', function(done) {
+        done();
+      });
+
+      // Submission tests
+      it('A Team member with team_admin, should be able to create a submission', function(done) {
+        done();
+      });
+
+      it('A Team member with team_admin, should be able to read a submission', function(done) {
+        done();
+      });
+
+      it('A Team member with team_admin, should be able to update a submission', function(done) {
+        done();
+      });
+
+      it('A Team member with team_admin, should be able to delete a submission', function(done) {
+        done();
+      });
+    });
   });
 };

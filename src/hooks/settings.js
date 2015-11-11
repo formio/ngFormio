@@ -246,6 +246,12 @@ module.exports = function(app, formioServer) {
           });
         };
 
+        /**
+         * Calculate the team access.
+         *
+         * @param callback {Function}
+         *   The callback function to invoke after completion.
+         */
         var getTeamAccess = function(callback) {
           // Modify the project access with teams functionality.
           access.project = access.project || {};
