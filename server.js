@@ -67,6 +67,9 @@ formioServer.analytics = analytics;
 // Try the connection on server start.
 formioServer.analytics.connect();
 
+// Import the OAuth providers
+formioServer.formio.oauth = require('./src/oauth/oauth')(formioServer.formio);
+
 // Configure nunjucks.
 nunjucks.configure('views', {
   autoescape: true,
@@ -162,7 +165,8 @@ formioServer.init(settings).then(function(formio) {
   app.use('/project/:projectId', formioServer);
   console.log(' > Listening to ' + config.protocol + '://' + config.domain + ':' + config.port);
   app.listen(config.port);
-});
+})
+.done();
 
 process.on('uncaughtException', function(err) {
   console.log('Uncaught exception:');

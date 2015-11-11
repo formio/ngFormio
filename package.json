@@ -46,6 +46,7 @@
     "eslint-config-formio": "0.0.0",
     "jscoverage": "^0.6.0",
     "mocha": "^2.3.2",
+    "sinon": "^1.17.2",
     "supertest": "^1.1.0"
   }
 }
