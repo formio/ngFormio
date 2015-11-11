@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "test": "env TEST_SUITE=1 PROTOCOL=http DOMAIN=localhost PORT=3000 MONGO_COLLECTION=formio-test PROJECT_PLAN=community mocha -r jscoverage --covout=html -b -t 30000 test/mocha.js",
-    "docker": "env DOCKER=1 TEST_SUITE=1 PROTOCOL=http DOMAIN=localhost PORT=3000 mocha -b -t 30000 test/mocha.js"
+    "docker": "env DOCKER=1 TEST_SUITE=1 PROTOCOL=http DOMAIN=localhost PORT=3000 mocha -b -t 30000 test/mocha.js",
+    "lint": "eslint src *.js"
   },
   "main": "./server.js",
   "dependencies": {
@@ -41,8 +42,11 @@
   },
   "devDependencies": {
     "chance": "^0.7.7",
+    "eslint": "^1.9.0",
+    "eslint-config-formio": "0.0.0",
     "jscoverage": "^0.6.0",
     "mocha": "^2.3.2",
+    "sinon": "^1.17.2",
     "supertest": "^1.1.0"
   }
 }

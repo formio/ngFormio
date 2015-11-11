@@ -594,7 +594,6 @@ describe('Bootstrap', function() {
         require(path.join(_test, 'nested'))(app, template, formioHook);
         require(path.join(_test, 'actions'))(app, template, formioHook);
         require(path.join(_test, 'submission'))(app, template, formioHook);
-        require(path.join(_test, 'oauth'))(app, template, formioHook);
         require('./analytics')(app, template, formioHook);
       });
 
@@ -605,6 +604,7 @@ describe('Bootstrap', function() {
           app.formio.hooks.settings = originalSettingsHook;
         });
         require('./misc')(app, template, hook);
+        require('./oauth')(app, template, hook);
       });
     });
   });
