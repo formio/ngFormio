@@ -50,6 +50,9 @@ module.exports = function() {
   // Try the connection on server start.
   _server.analytics.connect();
 
+  // Import the OAuth providers
+  _server.formio.oauth = require('../src/oauth/oauth')(_server.formio);
+
   // Configure nunjucks.
   nunjucks.configure('views', {
     autoescape: true,

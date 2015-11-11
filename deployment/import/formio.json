@@ -1,0 +1,236 @@
+{
+  "title": "Formio",
+  "description": "The admin project template for docker installs.",
+  "name": "formio",
+  "primary": true,
+  "roles": {
+    "administrator": {
+      "title": "Administrator",
+      "description": "A role for Administrative Users.",
+      "admin": true,
+      "default": false
+    },
+    "authenticated": {
+      "title": "Authenticated",
+      "description": "A role for Authenticated Users.",
+      "admin": false,
+      "default": false
+    },
+    "anonymous": {
+      "title": "Anonymous",
+      "description": "A role for Anonymous Users.",
+      "admin": false,
+      "default": true
+    }
+  },
+  "forms": {
+    "userLogin": {
+      "title": "User Login",
+      "type": "form",
+      "name": "userLogin",
+      "path": "user/login",
+      "components": [
+        {
+          "input": true,
+          "tableView": true,
+          "inputType": "email",
+          "label": "Email",
+          "lockKey": true,
+          "key": "user.email",
+          "placeholder": "Enter your email address",
+          "prefix": "",
+          "suffix": "",
+          "defaultValue": "",
+          "protected": false,
+          "unique": false,
+          "persistent": true,
+          "type": "email"
+        },
+        {
+          "input": true,
+          "tableView": false,
+          "inputType": "password",
+          "label": "Password",
+          "lockKey": true,
+          "key": "user.password",
+          "placeholder": "Enter your password.",
+          "prefix": "",
+          "suffix": "",
+          "protected": true,
+          "persistent": true,
+          "type": "password"
+        },
+        {
+          "input": true,
+          "label": "Submit",
+          "tableView": false,
+          "key": "submit",
+          "size": "md",
+          "leftIcon": "",
+          "rightIcon": "",
+          "block": false,
+          "action": "submit",
+          "disableOnInvalid": true,
+          "theme": "primary",
+          "type": "button"
+        }
+      ],
+      "access": [
+        {
+          "type": "read_all",
+          "roles": [
+            "anonymous"
+          ]
+        }
+      ],
+      "submissionAccess": [
+        {
+          "type": "create_own",
+          "roles": [
+            "anonymous"
+          ]
+        }
+      ]
+    }
+  },
+  "actions": {
+    "action0": {
+      "title": "Role Assignment",
+      "name": "role",
+      "form": "user",
+      "settings": {
+        "association": "new",
+        "type": "add",
+        "role": "administrator"
+      },
+      "priority": 1,
+      "method": [
+        "create"
+      ],
+      "handler": [
+        "after"
+      ]
+    },
+    "action1": {
+      "title": "Authentication",
+      "name": "auth",
+      "form": "userLogin",
+      "settings": {
+        "association": "existing",
+        "password": "user.password",
+        "username": "user.email"
+      },
+      "priority": 0,
+      "method": [
+        "create"
+      ],
+      "handler": [
+        "before"
+      ]
+    }
+  },
+  "resources": {
+    "user": {
+      "title": "User",
+      "type": "resource",
+      "name": "user",
+      "path": "user",
+      "components": [
+        {
+          "input": true,
+          "tableView": true,
+          "inputType": "email",
+          "label": "Email",
+          "key": "email",
+          "placeholder": "Enter your email address",
+          "prefix": "",
+          "suffix": "",
+          "defaultValue": "",
+          "protected": false,
+          "unique": false,
+          "persistent": true,
+          "type": "email"
+        },
+        {
+          "input": true,
+          "tableView": false,
+          "inputType": "password",
+          "label": "Password",
+          "key": "password",
+          "placeholder": "Enter your password.",
+          "prefix": "",
+          "suffix": "",
+          "protected": true,
+          "persistent": true,
+          "type": "password"
+        },
+        {
+          "input": true,
+          "label": "Submit",
+          "tableView": false,
+          "key": "submit",
+          "size": "md",
+          "leftIcon": "",
+          "rightIcon": "",
+          "block": false,
+          "action": "submit",
+          "disableOnInvalid": true,
+          "theme": "primary",
+          "type": "button"
+        }
+      ],
+      "access": [
+        {
+          "type": "read_all",
+          "roles": [
+            "anonymous",
+            "authenticated",
+            "administrator"
+          ]
+        }
+      ],
+      "submissionAccess": [
+        {
+          "type": "create_all",
+          "roles": [
+            "administrator"
+          ]
+        },
+        {
+          "type": "read_all",
+          "roles": [
+            "administrator"
+          ]
+        },
+        {
+          "type": "update_all",
+          "roles": [
+            "administrator"
+          ]
+        },
+        {
+          "type": "delete_all",
+          "roles": [
+            "administrator"
+          ]
+        },
+        {
+          "type": "create_own",
+          "roles": []
+        },
+        {
+          "type": "read_own",
+          "roles": []
+        },
+        {
+          "type": "update_own",
+          "roles": []
+        },
+        {
+          "type": "delete_own",
+          "roles": []
+        }
+      ]
+    }
+  }
+}

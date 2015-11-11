@@ -6,9 +6,16 @@ var jwt = require('jsonwebtoken');
 var debug = require('debug')('formio:middleware:projectTemplate');
 
 module.exports = function(formio) {
+  var hook = require('formio/src/util/hook')(formio);
   return function(req, res, next) {
+    // If we are creating a project without a template, use the default template.
+    if (res.resource.statue === 201 && !req.templateMode) {
+      req.templateMode = 'create';
+    }
     // If the Project was not created, skip this bootstrapping process.
-    if (res.resource.status !== 201) {
+    debug('Template Mode: ' + req.templateMode);
+    if (!req.templateMode) {
+      debug('Skipping template import');
       return next();
     }
 
@@ -108,13 +115,28 @@ module.exports = function(formio) {
 
       // Import the template within formio.
       formio.import.template(template, {
-        role: function(item) {
+        role: function(item, done) {
           item.project = project._id;
-          return item;
+          hook.alter('roleMachineName', item.machineName, item, function(err, machineName) {
+            if (err) { done(err); }
+            item.machineName = machineName;
+            done(null, item);
+          });
         },
-        form: function(item) {
+        form: function(item, done) {
           item.project = project._id;
-          return item;
+          hook.alter('formMachineName', item.machineName, item, function(err, machineName) {
+            if (err) { done(err); }
+            item.machineName = machineName;
+            done(null, item);
+          });
+        },
+        action: function(item, done) {
+          hook.alter('actionMachineName', item.machineName, item, function(err, machineName) {
+            if (err) { done(err); }
+            item.machineName = machineName;
+            done(null, item);
+          });
         }
       }, function(err, template) {
         if (err) {
@@ -122,8 +144,13 @@ module.exports = function(formio) {
           return next('An error occurred with the template import.');
         }
 
-        // Update the project with this template.
-        updateProject(template);
+        if (req.templateMode === 'create') {
+          // Update the project with this template.
+          updateProject(template);
+        }
+        else {
+          return next();
+        }
       });
     };
 

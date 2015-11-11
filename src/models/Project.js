@@ -86,5 +86,12 @@ module.exports = function(formio) {
     });
   }, 'The Project name must be unique.');
 
+  // Add machineName to the schema.
+  model.schema.plugin(require('formio/src/plugins/machineName'));
+
+  model.schema.machineName = function(document, done) {
+    done(null, document.name);
+  };
+
   return model;
 };

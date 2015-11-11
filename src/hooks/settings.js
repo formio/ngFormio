@@ -113,6 +113,7 @@ module.exports = function(app, formioServer) {
         actions.office365contact = require('../actions/office365/Office365Contact')(formioServer);
         actions.office365calendar = require('../actions/office365/Office365Calendar')(formioServer);
         actions.hubspotContact = require('../actions/hubspot/hubspotContact')(formioServer);
+        actions.oauth = require('../actions/oauth/OAuthAction')(formioServer);
         return actions;
       },
       emailTransports: function (transports, settings) {
@@ -570,6 +571,7 @@ module.exports = function(app, formioServer) {
         options.title = currentProject.title;
         options.name = currentProject.name;
         options.description = currentProject.description;
+        options.plan = currentProject.plan;
         options.projectId = req.projectId || req.params.projectId || 0;
         return options;
       },
@@ -582,7 +584,7 @@ module.exports = function(app, formioServer) {
         return params;
       },
       cors: function () {
-        return require('../middleware/corsOptions')(formioServer)
+        return require('../middleware/corsOptions')(formioServer);
       },
 
       /**
@@ -670,6 +672,13 @@ module.exports = function(app, formioServer) {
         cache.projects = {};
         return cache;
       },
+      submissionRequest: function(actualPayload, requestedPayload) {
+        // Whitelist the requested payload data that is processed by formio
+        if(requestedPayload.oauth && (typeof requestedPayload.oauth === 'object')) {
+          actualPayload.oauth = requestedPayload.oauth;
+        }
+        return actualPayload;
+      },
       submissionRequestQuery: function (query, req) {
         query.projectId = req.projectId;
         return query;
@@ -677,6 +686,25 @@ module.exports = function(app, formioServer) {
       submissionRequestTokenQuery: function (query, token) {
         query.projectId = token.form.project;
         return query;
+      },
+      submissionRoutes: function (routes) {
+        var filterExternalTokens = formioServer.formio.middleware.filterResourcejsResponse(['externalTokens']);
+        _(['afterGet', 'afterIndex', 'afterPost', 'afterPut', 'afterDelete'])
+        .each(function(handler) {
+          routes[handler].push(filterExternalTokens);
+        });
+
+        return routes;
+      },
+      submissionSchema: function (schema) {
+        // Defines what each external Token should be.
+        var ExternalTokenSchema = formioServer.formio.mongoose.Schema({
+          type: String,
+          token: String,
+          exp: Date
+        });
+        schema.externalTokens = [ExternalTokenSchema];
+        return schema;
       },
       newRoleAccess: function (handlers, req) {
         var projectId = req.projectId;
@@ -762,6 +790,27 @@ module.exports = function(app, formioServer) {
           }
         });
         return schema;
+      },
+      formMachineName: function(machineName, document, done) {
+        formioServer.formio.resources.project.model.findOne({_id: document.project}).exec(function (err, project) {
+          if (err) { return done(err); }
+          done(null, project.machineName + ':' + machineName);
+        });
+      },
+      roleMachineName: function(machineName, document, done) {
+        formioServer.formio.resources.project.model.findOne({_id: document.project}).exec(function (err, project) {
+          if (err) { return done(err); }
+          done(null, project.machineName + ':' + machineName);
+        });
+      },
+      actionMachineName: function(machineName, document, done) {
+        formioServer.formio.resources.form.model.findOne({_id: document.form}).exec(function (err, form) {
+          if (err) { return done(err); }
+          done(null, form.machineName + ':' + machineName);
+        });
+      },
+      machineNameExport: function(machineName) {
+        return machineName.split(':').slice(-1)[0];
       }
     }
   }

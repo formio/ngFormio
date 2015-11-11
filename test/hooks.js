@@ -9,8 +9,9 @@ module.exports = {
      * @param template
      * @returns {string}
      */
-    url: function(url, template) {
-      return '/project/' + template.project._id + url;
+    url: function(url, template, projectName) {
+      projectName = projectName || 'project';
+      return '/project/' + template[projectName]._id + url;
     }
   }
 };
