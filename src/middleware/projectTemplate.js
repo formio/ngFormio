@@ -89,6 +89,13 @@ module.exports = function(formio) {
         {type: 'delete_all', roles: adminRoles}
       ];
 
+      // Save preview info to settings if available
+      if(template.preview) {
+        var settings = _.cloneDeep(project.settings);
+        settings.preview = template.preview;
+        project.set('settings', settings);
+      }
+
       // Save the project.
       project.save(function(err) {
         if (err) {
