@@ -304,6 +304,9 @@ app.controller('ProjectPlanController', [
         project: $scope.currentProject._id
       }
     }
+    $scope.$on('formSubmission', function() {
+      $scope.submitted = true;
+    });
   }
 ]);
 
