@@ -6,12 +6,10 @@ var _ = require('lodash');
 var async = require('async');
 
 module.exports = function(app, template, hook) {
-  if (!app.formio) return;
-
   describe('Teams', function() {
     it('A Formio User should be able to access the Team Form', function(done) {
       request(app)
-        .get('/project/' + template.project._id + '/form/' + template.formio.formTeam._id)
+        .get('/project/' + template.formio.project._id + '/form/' + template.formio.teamResource._id)
         .set('x-jwt-token', template.formio.owner.token)
         .expect('Content-Type', /json/)
         .expect(200)
