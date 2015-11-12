@@ -303,7 +303,7 @@ app.controller('ProjectPlanController', [
       data: {
         project: $scope.currentProject._id
       }
-    }
+    };
     $scope.$on('formSubmission', function() {
       $scope.submitted = true;
     });
