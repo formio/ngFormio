@@ -296,6 +296,17 @@ app.controller('ProjectSettingsController', [
   }
 ]);
 
+app.controller('ProjectPlanController', [
+  '$scope',
+  function($scope) {
+    $scope.submission = {
+      data: {
+        project: $scope.currentProject._id
+      }
+    }
+  }
+]);
+
 app.controller('ProjectDeleteController', [
   '$scope',
   '$state',
