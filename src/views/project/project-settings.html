@@ -23,7 +23,7 @@
         <input type="text" class="form-control" name="name" disabled="true" ng-model="currentProject.name" title="{{ currentProject.name }}" placeholder="myproject">
         <span class="input-group-addon">.form.io</span>
       </div>
-      <p class="help-block">Upgrade your <a href="https://www.form.io/pricing">project plan</a> for access to a custom domain.</p>
+      <p class="help-block">Upgrade your <a ui-sref="project.settings.plan">project plan</a> for access to a custom domain.</p>
     </div>
     <div id="form-group-description" class="form-group" ng-class="{'has-error': projectForm.description.$invalid}">
         <label for="description" class="control-label">Description</label>

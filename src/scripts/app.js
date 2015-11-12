@@ -128,6 +128,12 @@ angular
           parent: 'project.settings',
           templateUrl: 'views/project/project-settings.html'
         })
+        .state('project.settings.plan', {
+          url: '/plan',
+          parent: 'project.settings',
+          templateUrl: 'views/project/project-plan.html',
+          controller: 'ProjectPlanController'
+        })
         .state('project.settings.email', {
           url: '/email',
           parent: 'project.settings',
@@ -310,6 +316,7 @@ angular
       $rootScope.teamForm = AppConfig.teamForm;
       $rootScope.feedbackForm = AppConfig.feedbackForm;
       $rootScope.resetPassForm = AppConfig.resetPassForm;
+      $rootScope.planForm = AppConfig.planForm;
 
       // Start the tutorial.
       $rootScope.startTutorial = function() {

@@ -687,7 +687,7 @@ app.controller('FormActionEditController', [
         $scope.currentProject.hasOwnProperty('plan') &&
         $scope.currentProject.plan === 'community'
       ) {
-        FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> This is a Premium Action, please upgrade your <a href="https://www.form.io/pricing">Project Plan</a> to enable it.');
+        FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> This is a Premium Action, please upgrade your <a ui-sref="project.settings.plan">project plan</a> to enable it.');
       }
     });
 
