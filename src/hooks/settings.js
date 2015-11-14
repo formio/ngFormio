@@ -17,8 +17,8 @@ module.exports = function(app, formioServer) {
   // Attach the project plans to the formioServer
   formioServer.formio.plans = require('../plans/index')(formioServer, cache);
 
-  // Atach the teams to formioServer.
-  formioServer.formio.teams = require('../teams/index')(formioServer);
+  // Attach the teams to formioServer.
+  formioServer.formio.teams = require('../teams/index')(app, formioServer);
 
   return {
     settings: function (settings, req, cb) {
@@ -43,8 +43,7 @@ module.exports = function(app, formioServer) {
       init: function (type, formio) {
         switch (type) {
           case 'alias':
-
-            // Dyanmically set the baseUrl.
+            // Dynamically set the baseUrl.
             formio.middleware.alias.baseUrl = function (req) {
               return '/project/' + req.projectId;
             };
@@ -647,6 +646,7 @@ module.exports = function(app, formioServer) {
         var _debug = require('debug')('formio:settings:formQuery');
 
         // Determine which project to use, one in the request, or formio.
+        _debug('formio: ' + formio);
         if (formio && formio === true) {
           cache.loadProjectByName(req, 'formio', function(err, _id) {
             if (err || !_id) {

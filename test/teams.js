@@ -137,15 +137,14 @@ module.exports = function(app, template, hook) {
         .post('/team/' + template.team1._id + '/leave')
         .set('x-jwt-token', template.users.user1.token)
         .send()
-        .expect('Content-Type', /json/)
-        .expect(401)
+        .expect(200)
         .end(function(err, res) {
           if (err) {
             return done(err);
           }
 
           // Store the JWT for future API calls.
-          template.template.users.user1.token = res.headers['x-jwt-token'];
+          template.users.user1.token = res.headers['x-jwt-token'];
 
           done();
         });

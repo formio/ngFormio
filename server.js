@@ -64,8 +64,7 @@ formioServer.config = _.omit(config, 'formio');
 
 // Attach the analytics to the formio server and attempt to connect.
 formioServer.analytics = analytics;
-// Try the connection on server start.
-formioServer.analytics.connect();
+formioServer.analytics.connect(); // Try the connection on server start.
 
 // Import the OAuth providers
 formioServer.formio.oauth = require('./src/oauth/oauth')(formioServer.formio);
