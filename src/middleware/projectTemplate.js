@@ -3,6 +3,7 @@
 var request = require('request');
 var _ = require('lodash');
 var jwt = require('jsonwebtoken');
+var isURL = require('is-url');
 var debug = require('debug')('formio:middleware:projectTemplate');
 
 module.exports = function(formio) {
@@ -96,6 +97,13 @@ module.exports = function(formio) {
         {type: 'delete_all', roles: adminRoles}
       ];
 
+      // Save preview info to settings if available
+      if(template.preview) {
+        var settings = _.cloneDeep(project.settings);
+        settings.preview = template.preview;
+        project.set('settings', settings);
+      }
+
       // Save the project.
       project.save(function(err) {
         if (err) {
@@ -161,7 +169,7 @@ module.exports = function(formio) {
       importTemplate(template);
     }
     // Allow templates from http://help.form.io/templates.
-    else if (template.indexOf('http://help.form.io/templates') === 0) {
+    else if (isURL(template)) {
       request({
         url: template,
         json: true
