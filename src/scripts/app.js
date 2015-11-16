@@ -20,7 +20,6 @@ angular
     'angularMoment',
     'ngCkeditor',
     'formioApp.controllers',
-    'formioApp.services',
     'formioApp.utils',
     'kendo.directives',
     'truncate'
