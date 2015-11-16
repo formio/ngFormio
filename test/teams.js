@@ -150,6 +150,29 @@ module.exports = function(app, template, hook) {
         });
     });
 
+    it('The Team should not have any members, after the final user leaves.', function(done) {
+      request(app)
+        .get('/project/' + template.formio.project._id + '/form/' + template.formio.teamResource._id + '/submission/' + template.team1._id)
+        .set('x-jwt-token', template.formio.owner.token)
+        .expect(200)
+        .end(function(err, res) {
+          if (err) {
+            return done(err);
+          }
+
+          var response = res.body;
+          assert.equal(response.data.members.length, 0);
+
+          // Store the JWT for future API calls.
+          template.formio.owner.token = res.headers['x-jwt-token'];
+
+          // Update the team reference for later.
+          template.team1 = response;
+
+          done();
+        });
+    });
+
     describe('Permissions - team_read', function() {
       // Project tests
       it('A Team member with team_read, should not be able to create a project role', function(done) {

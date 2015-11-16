@@ -69,6 +69,7 @@ module.exports = function(app, formioServer) {
         });
 
         // Save the updated team.
+        document.markModified('data.members');
         document.save(function(err, update) {
           if (err) {
             debug.leaveTeams(err);
