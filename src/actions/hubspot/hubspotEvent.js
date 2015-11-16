@@ -7,22 +7,22 @@ var debug = require('debug')('formio:action:hubspot');
 module.exports = function(router) {
   /**
    * HubspotContactAction class.
-   *   This class is used to create the Hubspot Contact action.
+   *   This class is used to create the Hubspot Event action.
    *
    * @constructor
    */
-  var HubspotContactAction = function(data, req, res) {
+  var HubspotEventAction = function(data, req, res) {
     router.formio.Action.call(this, data, req, res);
   };
 
   // Derive from Action.
-  HubspotContactAction.prototype = Object.create(router.formio.Action.prototype);
-  HubspotContactAction.prototype.constructor = HubspotContactAction;
-  HubspotContactAction.info = function(req, res, next) {
+  HubspotEventAction.prototype = Object.create(router.formio.Action.prototype);
+  HubspotEventAction.prototype.constructor = HubspotEventAction;
+  HubspotEventAction.info = function(req, res, next) {
     next(null, {
-      name: 'hubspotContact',
-      title: 'Hubspot Contacts (Premium)',
-      description: 'Allows you to integrate into your Hubspot Contacts.',
+      name: 'hubspotEvent',
+      title: 'Hubspot Events (Premium)',
+      description: 'Allows you to integrate into Hubspot Events.',
       premium: true,
       priority: 0,
       defaults: {
@@ -32,7 +32,7 @@ module.exports = function(router) {
     });
   };
 
-  HubspotContactAction.settingsForm = function(req, res, next) {
+  HubspotEventAction.settingsForm = function(req, res, next) {
     util.connect(router, req, function(err, hubspot) {
       if (err) { return next(); }
 
@@ -44,6 +44,10 @@ module.exports = function(router) {
         input: false,
         components: []
       };
+
+      fieldPanel.components.push({
+
+      });
 
       hubspot.contacts_properties({version: 'v2'}, function(err, properties) {
         var filteredProperties = _.filter(_.sortBy(properties, 'label'), function(property) {
@@ -85,7 +89,7 @@ module.exports = function(router) {
    * @param next
    *   The callback function to execute upon completion.
    */
-  HubspotContactAction.prototype.resolve = function(handler, method, req, res, next) {
+  HubspotEventAction.prototype.resolve = function(handler, method, req, res, next) {
     // Dont block on the hubspot request.
     next();
 
@@ -93,7 +97,7 @@ module.exports = function(router) {
     var currentResource = res.resource;
 
     // Get the externalId for this resource.
-    var externalId = _.result(_.find(currentResource.item.externalIds, {type: 'hubspotContact'}), 'id');
+    var externalId = _.result(_.find(currentResource.item.externalIds, {type: 'hubspotEvent'}), 'id');
 
     var payload = {
       properties: {}
@@ -138,7 +142,7 @@ module.exports = function(router) {
             }, {
               $push: {
                 externalIds: {
-                  type: 'hubspotContact',
+                  type: 'hubspotEvent',
                   id: result.vid
                 }
               }
@@ -159,5 +163,5 @@ module.exports = function(router) {
     }
   };
 
-  return HubspotContactAction;
+  return HubspotEventAction;
 };
