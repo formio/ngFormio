@@ -3,6 +3,7 @@
 var request = require('request');
 var _ = require('lodash');
 var jwt = require('jsonwebtoken');
+var isURL = require('is-url');
 var debug = require('debug')('formio:middleware:projectTemplate');
 
 module.exports = function(formio) {
@@ -141,7 +142,7 @@ module.exports = function(formio) {
       importTemplate(template);
     }
     // Allow templates from http://help.form.io/templates.
-    else if (template.indexOf('http://help.form.io/templates') === 0) {
+    else if (isURL(template)) {
       request({
         url: template,
         json: true

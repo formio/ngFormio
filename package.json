@@ -18,6 +18,7 @@
     "debug": "^2.2.0",
     "dotenv": "1.2.0",
     "express": "4.12.3",
+    "is-url": "^1.2.1",
     "jslogger": "^1.0.3",
     "jsonwebtoken": "^5.0.5",
     "lodash": "3.10.0",
