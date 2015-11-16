@@ -5,7 +5,7 @@
         <td>
           <div class="row">
             <div class="col-sm-8">
-              <a ui-sref="project.form.view({formId: form._id})"><h5>{{ form.title }}</h5></a>
+              <a ui-sref="project.form.view({formId: form._id})"><h5>{{ form.title | characters:25:true}}</h5></a>
             </div>
             <div class="col-sm-4">
               <div class="button-group pull-right" style="display:flex;">

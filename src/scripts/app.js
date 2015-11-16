@@ -20,8 +20,9 @@ angular
     'angularMoment',
     'ngCkeditor',
     'formioApp.controllers',
-    'formioApp.services',
-    'kendo.directives'
+    'formioApp.utils',
+    'kendo.directives',
+    'truncate'
   ])
   .config([
     '$stateProvider',
@@ -245,11 +246,13 @@ angular
     '$rootScope',
     'Formio',
     'FormioAlerts',
+    '$timeout',
     function(
       $scope,
       $rootScope,
       Formio,
-      FormioAlerts
+      FormioAlerts,
+      $timeout
     ) {
       $rootScope.activeSideBar = 'home';
       $rootScope.currentProject = null;
@@ -263,11 +266,53 @@ angular
       });
       $scope.projects = {};
       $scope.projectsLoading = true;
-      Formio.loadProjects().then(function(projects) {
+      // TODO: query for unlimited projects instead of this limit
+      Formio.loadProjects('?limit=9007199254740991&sort=-modified').then(function(projects) {
         $scope.projectsLoading = false;
         angular.element('#projects-loader').hide();
         $scope.projects = projects;
       }).catch(FormioAlerts.onError.bind(FormioAlerts));
+
+      $scope.showIntroVideo = function() {
+        $scope.introVideoVisible = true;
+        // Need to expand video after it's visible to have transition effect
+        $timeout(function() {
+          $scope.introVideoExpanded = true;
+        }, 50);
+      };
+
+      var planStyle = {
+        community: {
+          name: 'Community',
+          labelStyle: 'label-community'
+        },
+        basic: {
+          name: 'Basic',
+          labelStyle: 'label-info'
+        },
+        team1: {
+          name: 'Team',
+          labelStyle: 'label-success'
+        },
+        team2: {
+          name: 'Team',
+          labelStyle: 'label-success'
+        },
+        team3: {
+          name: 'Team',
+          labelStyle: 'label-success'
+        }
+      };
+
+      $scope.getPlanName = function(plan) {
+        if(!planStyle[plan]) return '';
+        return planStyle[plan].name;
+      };
+
+      $scope.getPlanLabel = function(plan) {
+        if(!planStyle[plan]) return '';
+        return planStyle[plan].labelStyle;
+      };
     }
   ])
   .filter('trusted', [
@@ -341,6 +386,7 @@ angular
       $rootScope.$state = $state;
       $rootScope.$stateParams = $stateParams;
       $rootScope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams) {
+        $window.document.body.scrollTop = $window.document.documentElement.scrollTop = 0;
         $rootScope.alerts = FormioAlerts.getAlerts();
         $rootScope.previousState = fromState.name;
         $rootScope.previousParams = fromParams;

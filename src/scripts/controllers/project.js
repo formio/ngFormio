@@ -86,19 +86,28 @@ app.controller('ProjectCreateController', [
     $scope.currentProject = {template: 'default'};
     $scope.hasTemplate = false;
     $scope.showName = false;
+    $scope.templateLimit = 3;
     var formio = new Formio();
 
     // The project templates.
     $scope.templates = [
       {
-        title: 'Default',
+        "title": "Default",
+        "name": "default",
+        "description": "A default project with User and Admin resources and their respective authentication forms.",
         template: 'default'
       },
       {
-        title: 'Empty',
+        "title": "Empty",
+        "name": "empty",
+        "description": "An empty project with no forms or resources. Create a project with a fresh start!",
         template: 'empty'
       }
     ];
+
+    $scope.showAllTemplates = function() {
+      $scope.templateLimit = Infinity;
+    };
 
     $scope.loadTemplate = function() {
       var input = angular.element(this).get(0);
@@ -118,11 +127,18 @@ app.controller('ProjectCreateController', [
       // Read the file.
       var reader = new FileReader();
       reader.onload = function(e) {
+        $scope.oldTemplate = $scope.currentProject.template;
         $scope.currentProject.template = JSON.parse(e.target.result);
         $scope.hasTemplate = true;
         $scope.$apply();
       };
       reader.readAsText(template);
+    };
+
+    $scope.unloadTemplate = function() {
+      $scope.currentProject.template = $scope.oldTemplate;
+      $scope.oldTemplate = null;
+      $scope.hasTemplate = false;
     };
 
     // Try to load the external template source.
@@ -183,6 +199,7 @@ app.controller('ProjectController', [
   '$state',
   'AppConfig',
   '$http',
+  '$location',
   function(
     $scope,
     $rootScope,
@@ -191,7 +208,8 @@ app.controller('ProjectController', [
     FormioAlerts,
     $state,
     AppConfig,
-    $http
+    $http,
+    $location
   ) {
     $rootScope.activeSideBar = 'projects';
     $rootScope.noBreadcrumb = false;
@@ -243,6 +261,16 @@ app.controller('ProjectController', [
     $scope.getSwaggerURL = function(format) {
       format = format || 'html';
       return AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/spec.' + format + '?token=' + Formio.getToken();
+    };
+
+    $scope.getPreviewURL = function() {
+      var url = 'http://help.form.io/project';
+      url += '?project=' + encodeURIComponent($scope.currentProject.name);
+      url += '&previewUrl=' + encodeURIComponent($scope.currentProject.settings.preview.url);
+      url += '&host=' + encodeURIComponent(AppConfig.serverHost);
+      url += '&protocol=' + encodeURIComponent($location.protocol());
+      url += '&repo=' + encodeURIComponent($scope.currentProject.settings.preview.repo);
+      return url;
     };
   }
 ]);
