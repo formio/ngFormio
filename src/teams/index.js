@@ -58,7 +58,6 @@ module.exports = function(app, formioServer) {
         // Filter the _ids.
         document.data.members = _.uniq(_.reject(document.data.members, {_id: util.idToString(req.token.user._id)}));
 
-        // Convert each _id back to bson for storage.
         // Convert each _id to strings for comparison.
         document.data.members = _.map(document.data.members, function(element) {
           if (element._id) {

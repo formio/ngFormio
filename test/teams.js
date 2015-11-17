@@ -437,9 +437,12 @@ module.exports = function(app, template, hook) {
                   return done(err);
                 }
 
+                var proj = _.clone(template.project);
+                proj.access.push({type: 'team_read', roles: []});
+
                 // Confirm that the project wasnt modified.
                 var response = res.body;
-                assert.deepEqual(_.omit(template.project, 'modified'), _.omit(response, 'modified'));
+                assert.deepEqual(_.omit(proj, 'modified'), _.omit(response, 'modified'));
                 template.projet = response;
 
                 // Store the JWT for future API calls.
