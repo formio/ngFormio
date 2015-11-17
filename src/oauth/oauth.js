@@ -23,7 +23,7 @@ module.exports = function(formio) {
         return Q.reject('Invalid provider name');
       }
 
-      return formio.resources.submission.model.findOne({_id: userId})
+      return Q(formio.resources.submission.model.findOne({_id: userId}))
       .then(function(user) {
         if (!user) {
           throw 'Could not find user';

@@ -1,5 +1,5 @@
 'use strict';
-
+var Q = require('q');
 module.exports = function(formio) {
 
   /**
@@ -20,7 +20,7 @@ module.exports = function(formio) {
       return next(new Error('Missing OAuth ID'));
     }
 
-    return formio.resources.submission.model.findOne(
+    return Q(formio.resources.submission.model.findOne(
       {
         form: form._id,
         externalIds: {
@@ -31,7 +31,7 @@ module.exports = function(formio) {
         },
         deleted: {$eq: null}
       }
-    )
+    ))
     .then(function(user) {
       if (!user) {
         return null;
