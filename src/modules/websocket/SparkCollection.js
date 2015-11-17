@@ -51,7 +51,7 @@ SparkCollection.prototype.connect = function(redis) {
  */
 SparkCollection.prototype.get = function(key) {
   if (this.redis) {
-    return Q.ninvoke(this.redis, 'get', 'spark-' + key);
+    return Q.ninvoke(this.redis, 'get', 'spark:' + key);
   }
   else if (this.sparks.hasOwnProperty(key)) {
     var deferred = Q.defer();
@@ -69,7 +69,7 @@ SparkCollection.prototype.get = function(key) {
  */
 SparkCollection.prototype.set = function(key, obj) {
   if (this.redis) {
-    return Q.ninvoke(this.redis, 'set', 'spark-' + key, obj);
+    return Q.ninvoke(this.redis, 'set', 'spark:' + key, obj);
   }
   else {
     var deferred = Q.defer();
@@ -87,7 +87,7 @@ SparkCollection.prototype.set = function(key, obj) {
 SparkCollection.prototype.clear = function() {
   var deferred = Q.defer();
   if (this.redis) {
-    this.redis.keys('spark-*', function(err, keys) {
+    this.redis.keys('spark:*', function(err, keys) {
       async.eachSeries(keys, this.redis.del.bind(this.redis), function() {
         deferred.resolve();
       });
@@ -108,7 +108,7 @@ SparkCollection.prototype.clear = function() {
  */
 SparkCollection.prototype.del = function(key) {
   if (this.redis) {
-    return Q.ninvoke(this.redis, 'del', 'spark-' + key);
+    return Q.ninvoke(this.redis, 'del', 'spark:' + key);
   }
   else if (this.sparks.hasOwnProperty(key)) {
     var deferred = Q.defer();
