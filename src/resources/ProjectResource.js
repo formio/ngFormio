@@ -19,8 +19,11 @@ module.exports = function(router, formio) {
 
   // Load the project plan filter for use.
   formio.middleware.projectPlanFilter = require('../middleware/projectPlanFilter')(formio);
-  var hiddenFields = ['deleted', '__v', 'machineName', 'primary'];
 
+  // Load the team owner filter for use.
+  formio.middleware.projectAccessFilter = require('../middleware/projectAccessFilter')(formio);
+
+  var hiddenFields = ['deleted', '__v', 'machineName', 'primary'];
   var resource = Resource(
     router,
     '',
@@ -72,6 +75,7 @@ module.exports = function(router, formio) {
         next();
       },
       formio.middleware.condensePermissionTypes,
+      formio.middleware.projectAccessFilter,
       formio.middleware.projectPlanFilter
     ],
     afterPut: [

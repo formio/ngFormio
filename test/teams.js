@@ -385,12 +385,17 @@ module.exports = function(app, template, hook) {
               .put('/project/' + template.project._id)
               .set('x-jwt-token', template.formio.owner.token)
               .send({ access: oldResponse.access })
-              .expect('Content-Type', /text/)
-              .expect(401)
+              .expect('Content-Type', /json/)
+              .expect(200)
               .end(function(err, res) {
                 if (err) {
                   return done(err);
                 }
+
+                // Confirm that the project wasnt modified.
+                var response = res.body;
+                assert.deepEqual(_.omit(template.project, 'modified'), _.omit(response, 'modified'));
+                template.projet = response;
 
                 // Store the JWT for future API calls.
                 template.formio.owner.token = res.headers['x-jwt-token'];
