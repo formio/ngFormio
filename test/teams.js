@@ -473,16 +473,140 @@ module.exports = function(app, template, hook) {
             done();
           });
       });
+
+      after(function(done) {
+        // Add a member to the team for the permission tests.
+        request(app)
+          .put('/project/' + template.formio.project._id + '/form/' + template.formio.teamResource._id + '/submission/' + template.team1._id)
+          .set('x-jwt-token', template.formio.owner.token)
+          .send({
+            data: {
+              members: [
+                {_id: template.formio.user1._id}
+              ]
+            }
+          })
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end(function(err, res) {
+            if (err) {
+              return done(err);
+            }
+
+            var response = res.body;
+            assert.equal(response.data.members.length, 1);
+            assert.equal(response.data.members[0]._id, template.formio.user1._id);
+
+            // Store the JWT for future API calls.
+            template.formio.owner.token = res.headers['x-jwt-token'];
+
+            // Update the team reference for later.
+            template.team1 = response;
+
+            done();
+          });
+      });
     });
 
     describe('Permissions - team_read', function() {
+      // Bootstrap
+      it('A Project Owner should be able to add one of their teams to have access with the team_read permission', function(done) {
+        var teamAccess = {type: 'team_read', roles: [template.team1._id]};
+
+        request(app)
+          .get('/project/' + template.project._id)
+          .set('x-jwt-token', template.formio.owner.token)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end(function(err, res) {
+            if (err) {
+              return done(err);
+            }
+
+            // Update the users project access with the new team.
+            var oldResponse = res.body;
+            var oldAccess = _.clone(oldResponse.access);
+
+            // Store the JWT for future API calls.
+            template.formio.owner.token = res.headers['x-jwt-token'];
+
+            request(app)
+              .put('/project/' + template.project._id)
+              .set('x-jwt-token', template.formio.owner.token)
+              .send({ access: oldResponse.access.concat(teamAccess) })
+              .expect('Content-Type', /json/)
+              .expect(200)
+              .end(function(err, res) {
+                if (err) {
+                  return done(err);
+                }
+
+                var found = false;
+                var response = res.body;
+                response.access.forEach(function(element) {
+                  if (element.type === 'team_read') {
+                    found = true;
+                    assert.notEqual(template.team1._id, null);
+                    assert.notEqual(template.team1._id, '');
+                    assert.deepEqual(element, teamAccess);
+                  }
+                });
+
+                assert.equal(found, true);
+
+                // Update the project.
+                template.project = response;
+
+                // Store the JWT for future API calls.
+                template.formio.owner.token = res.headers['x-jwt-token'];
+
+                done();
+              });
+          });
+      });
+
       // Project tests
       it('A Team member with team_read, should not be able to create a project role', function(done) {
-        done();
+        request(app)
+          .post('/project/' + template.project._id + '/role')
+          .set('x-jwt-token', template.formio.user1.token)
+          .send({
+            title: chance.word(),
+            description: chance.sentence()
+          })
+          .expect('Content-Type', /text/)
+          .expect(401)
+          .end(function(err, res) {
+            if (err) {
+              return done(err);
+            }
+
+            // Store the JWT for future API calls.
+            template.formio.user1.token = res.headers['x-jwt-token'];
+
+            done();
+          });
       });
 
       it('A Team member with team_read, should be able to read the project data', function(done) {
-        done();
+        request(app)
+          .get('/project/' + template.project._id)
+          .set('x-jwt-token', template.formio.user1.token)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end(function(err, res) {
+            if (err) {
+              return done(err);
+            }
+
+            var response = res.body;
+            assert.deepEqual(_.omit('modified', template.project), _.omit('modified', response));
+
+            // Store the JWT for future API calls.
+            template.formio.user1.token = res.headers['x-jwt-token'];
+
+            done();
+          });
       });
 
       it('A Team member with team_read, should not be able to read the project settings data', function(done) {
@@ -529,6 +653,56 @@ module.exports = function(app, template, hook) {
 
       it('A Team member with team_read, should not be able to delete a submission', function(done) {
         done();
+      });
+
+      // Normalization
+      it('A Project Owner should be able to add one of their teams to have access with the team_read permission', function(done) {
+        request(app)
+          .get('/project/' + template.project._id)
+          .set('x-jwt-token', template.formio.owner.token)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end(function(err, res) {
+            if (err) {
+              return done(err);
+            }
+
+            // Update the users project access with the new team.
+            var oldResponse = res.body;
+            var oldAccess = _.clone(oldResponse.access);
+            var newAccess = _.filter(oldAccess, function(permission) {
+              if (permission.type && !_.startsWith(permission.type, 'team_')) {
+                return permission;
+              }
+            });
+
+            // Store the JWT for future API calls.
+            template.formio.owner.token = res.headers['x-jwt-token'];
+
+            request(app)
+              .put('/project/' + template.project._id)
+              .set('x-jwt-token', template.formio.owner.token)
+              .send({ access: newAccess })
+              .expect('Content-Type', /json/)
+              .expect(200)
+              .end(function(err, res) {
+                if (err) {
+                  return done(err);
+                }
+
+                var response = res.body;
+                assert.notEqual(oldAccess.length, newAccess.length);
+                assert.equal(oldAccess.length, (newAccess.length + 1));
+
+                // Update the project.
+                template.project = response;
+
+                // Store the JWT for future API calls.
+                template.formio.owner.token = res.headers['x-jwt-token'];
+
+                done();
+              });
+          });
       });
     });
 
