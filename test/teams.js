@@ -230,7 +230,52 @@ module.exports = function(app, template, hook) {
       });
 
       it('A Project Owner should be able to remove a team from their project', function(done) {
-        done();
+        request(app)
+          .get('/project/' + template.project._id)
+          .set('x-jwt-token', template.formio.owner.token)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end(function(err, res) {
+            if (err) {
+              return done(err);
+            }
+
+            // Update the users project access with the new team.
+            var oldResponse = res.body;
+            var oldAccess = _.clone(oldResponse.access);
+            var newAccess = _.filter(oldAccess, function(permission) {
+              if (permission.type && !_.startsWith(permission.type, 'team_')) {
+                return permission;
+              }
+            });
+
+            // Store the JWT for future API calls.
+            template.formio.owner.token = res.headers['x-jwt-token'];
+
+            request(app)
+              .put('/project/' + template.project._id)
+              .set('x-jwt-token', template.formio.owner.token)
+              .send({ access: newAccess })
+              .expect('Content-Type', /json/)
+              .expect(200)
+              .end(function(err, res) {
+                if (err) {
+                  return done(err);
+                }
+
+                var response = res.body;
+                assert.notEqual(oldAccess.length, newAccess.length);
+                assert.equal(oldAccess.length, (newAccess.length + 1));
+
+                // Update the project.
+                template.project = response;
+
+                // Store the JWT for future API calls.
+                template.formio.owner.token = res.headers['x-jwt-token'];
+
+                done();
+              });
+          });
       });
     });
 
@@ -409,38 +454,20 @@ module.exports = function(app, template, hook) {
         var teamAccess = {type: 'team_read', roles: [template.team2._id]};
 
         request(app)
-          .get('/project/' + template.project._id)
-          .set('x-jwt-token', template.users.user1.token)
-          .expect('Content-Type', /json/)
-          .expect(200)
+          .put('/project/' + template.project._id)
+          .set('x-jwt-token', template.formio.user1.token)
+          .send({ access: [teamAccess] })
+          .expect('Content-Type', /text/)
+          .expect(401)
           .end(function(err, res) {
             if (err) {
               return done(err);
             }
 
-            // Update the users project access with the new team.
-            var oldResponse = res.body;
-            oldResponse.access.push(teamAccess);
-
             // Store the JWT for future API calls.
-            template.users.user1.token = res.headers['x-jwt-token'];
+            template.formio.user1.token = res.headers['x-jwt-token'];
 
-            request(app)
-              .put('/project/' + template.project._id)
-              .set('x-jwt-token', template.users.user1.token)
-              .send({ access: oldResponse.access })
-              .expect('Content-Type', /text/)
-              .expect(401)
-              .end(function(err, res) {
-                if (err) {
-                  return done(err);
-                }
-
-                // Store the JWT for future API calls.
-                template.users.user1.token = res.headers['x-jwt-token'];
-
-                done();
-              });
+            done();
           });
       });
     });
