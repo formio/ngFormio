@@ -5,7 +5,8 @@ var Q = require('q');
 var _ = require('lodash');
 var chance = new require('chance')();
 module.exports = function(formio) {
-  var cache = require('../cache/cache')(formio);
+  var cache = require('../../cache/cache')(formio);
+  var SparkCollection = require('./SparkCollection');
 
   /**
    * ProjectSocket
@@ -18,7 +19,6 @@ module.exports = function(formio) {
   var ProjectSocket = function(server, config) {
     this.config = config;
     this.server = server;
-    this.ready = false;
     this.requests = [];
 
     var redis = {
@@ -30,147 +30,147 @@ module.exports = function(formio) {
       redis.auth_pass = config.redis.password;
     }
 
-    // Store all of our spark/project mappings in redis.
-    this.sparks = null;
+    // Get the redis server.
+    var redisServer = null;
     try {
-      this.sparks = Redis.createClient(redis);
+      redisServer = Redis.createClient(redis);
     }
     catch (err) {
-      console.log('Redis Server not found. Websocket support disabled.');
+      redisServer = null;
     }
 
-    // Check for a redis connection.
-    if (this.sparks) {
-      this.sparks.on('error', function(err) {
-        this.ready = false;
-        console.log('Redis Server not found. Websocket support disabled.');
+    // Create the place to store all of our sparks.
+    this.sparks = new SparkCollection();
+    this.sparks.connect(redisServer).then(function() {
+
+      var primusConfig = {
+        transformer: 'websockets'
+      };
+
+      if (redisServer) {
+        primusConfig.redis = redisServer;
+      }
+
+      // Create the primus server.
+      this.primus = new Primus(server, primusConfig);
+
+      // Include the plugins.
+      this.primus.use('omega-supreme', require('omega-supreme'));
+      this.primus.use('metroplex', require('metroplex'));
+
+      // Authorize each request.
+      this.primus.authorize(this.authorize.bind(this));
+
+      // Handle global primus data communication.
+      this.primus.on('data', function(data) {
+        if (data.type === 'response' && data.id) {
+          this.handleResponse(data);
+        }
       }.bind(this));
-      this.sparks.on('ready', function() {
 
-        // Create the primus server.
-        this.primus = new Primus(server, {
-          transformer: 'websockets',
-          redis: Redis.createClient(redis)
-        });
+      // Trigger when a new connection is made.
+      this.primus.on('connection', function (spark) {
 
-        // Include the plugins.
-        this.primus.use('omega-supreme', require('omega-supreme'));
-        this.primus.use('metroplex', require('metroplex'));
+        var projectId = spark.request.project._id.toString();
 
-        // Authorize each request.
-        this.primus.authorize(this.authorize.bind(this));
+        // Get the sparkId from the project.
+        this.sparks.get(projectId).then(function(connection) {
 
-        // Handle global primus data communication.
-        this.primus.on('data', function(data) {
-          if (data.type === 'response' && data.id) {
-            this.handleResponse(data);
+          // Close existing connections open for this project.
+          if (connection) {
+            connection = JSON.parse(connection);
+            this.primus.spark(connection.sparkId).end();
+            this.sparks.del(projectId);
           }
-        }.bind(this));
 
-        // Trigger when a new connection is made.
-        this.primus.on('connection', function (spark) {
+          // Remove the spark if it ends.
+          spark.on('end', function() {
+            this.sparks.del(projectId);
+          }.bind(this));
 
-          var projectId = spark.request.project._id.toString();
-          var sparkKey = 'spark-' + projectId;
+          // Handle data from our socket.
+          spark.on('data', function(data) {
 
-          // Get the sparkId from the project.
-          this.sparks.get(sparkKey, function(err, connection) {
+            // Allow them to bind to certain messages within a project.
+            if (data.type === 'bind') {
 
-            // Close existing connections open for this project.
-            if (connection) {
-              connection = JSON.parse(connection);
-              this.primus.spark(connection.sparkId).end();
-              this.sparks.del(sparkKey);
+              // Load the existing sparks for this project.
+              this.sparks.get(projectId).then(function(connection) {
+
+                // Use the existing connection or create a new one.
+                connection = connection ? JSON.parse(connection) : {
+                  token: spark.request.apitoken,
+                  sparkId: spark.id,
+                  bindings: []
+                };
+
+                // Do not allow them to create more than 100 bindings within a connection.
+                if (connection.bindings.length > 100) {
+                  return;
+                }
+
+                // The binding definition.
+                var binding = {
+                  method: data.bind.method.toUpperCase(),
+                  form: data.bind.form,
+                  sync: data.bind.sync || false
+                };
+
+                // Look for an existing binding.
+                var currentIndex = _.findIndex(connection.bindings, _.pick(binding, 'method', 'form'));
+                if (currentIndex !== -1) {
+                  connection.bindings[currentIndex] = binding;
+                }
+                else {
+                  connection.bindings.push(binding);
+                }
+
+                // Store the connection back into redis.
+                this.sparks.set(projectId, JSON.stringify(connection)).then(function() {
+                  spark.write({
+                    type: 'ack',
+                    msg: data
+                  });
+                }).catch(function(err) {
+                  spark.write({
+                    type: 'ack',
+                    error: err.toString()
+                  })
+                });
+              }.bind(this));
             }
 
-            // Remove the spark if it ends.
-            spark.on('end', function() {
-              this.sparks.del(sparkKey);
-            }.bind(this));
+            // A request that was forwarded from another server.
+            if (data.type === 'request') {
 
-            // Handle data from our socket.
-            spark.on('data', function(data) {
+              // Handle this request.
+              this.handle(data).then(function(response) {
 
-              // Allow them to bind to certain messages within a project.
-              if (data.type === 'bind') {
-
-                // Load the existing sparks for this project.
-                this.sparks.get(sparkKey, function(err, connection) {
-
-                  // Use the existing connection or create a new one.
-                  connection = connection ? JSON.parse(connection) : {
+                // Send the response back to the original server.
+                this.primus.forward(data.address, response, null, function(url) {
+                  url.query = {
+                    primus: 1,
                     token: spark.request.apitoken,
-                    sparkId: spark.id,
-                    bindings: []
+                    projectId: data.request.params.projectId
                   };
+                  return url;
+                }, function() {});
+              }.bind(this));
+            }
 
-                  // Do not allow them to create more than 100 bindings within a connection.
-                  if (connection.bindings.length > 100) {
-                    return;
-                  }
-
-                  // The binding definition.
-                  var binding = {
-                    method: data.bind.method.toUpperCase(),
-                    form: data.bind.form,
-                    sync: data.bind.sync || false
-                  };
-
-                  // Look for an existing binding.
-                  var currentIndex = _.findIndex(connection.bindings, _.pick(binding, 'method', 'form'));
-                  if (currentIndex !== -1) {
-                    connection.bindings[currentIndex] = binding;
-                  }
-                  else {
-                    connection.bindings.push(binding);
-                  }
-
-                  // Store the connection back into redis.
-                  this.sparks.set(sparkKey, JSON.stringify(connection), function(err) {
-                    spark.write({
-                      type: 'ack',
-                      error: err ? err.toString() : '',
-                      msg: data
-                    });
-                  });
-                }.bind(this));
-              }
-
-              // A request that was forwarded from another server.
-              if (data.type === 'request') {
-
-                // Handle this request.
-                this.handle(data).then(function(response) {
-
-                  // Send the response back to the original server.
-                  this.primus.forward(data.address, response, null, function(url) {
-                    url.query = {
-                      primus: 1,
-                      token: spark.request.apitoken,
-                      projectId: data.request.params.projectId
-                    };
-                    return url;
-                  }, function() {});
-                }.bind(this));
-              }
-
-              // A response that came from our socket.
-              if (data.type === 'response' && data.id) {
-                this.handleResponse(data);
-                spark.write({
-                  type: 'ack',
-                  error: '',
-                  msg: data
-                });
-              }
-            }.bind(this));
+            // A response that came from our socket.
+            if (data.type === 'response' && data.id) {
+              this.handleResponse(data);
+              spark.write({
+                type: 'ack',
+                error: '',
+                msg: data
+              });
+            }
           }.bind(this));
         }.bind(this));
-
-        // Say we are ready.
-        this.ready = true;
       }.bind(this));
-    }
+    }.bind(this));
   };
 
   /**
@@ -307,7 +307,7 @@ module.exports = function(formio) {
 
     // Ensure we have everything we need for socket connection.
     if (
-      !this.ready ||
+      !this.sparks.ready ||
       !request ||
       !request.request ||
       !request.request.params ||
@@ -319,9 +319,9 @@ module.exports = function(formio) {
     }
 
     // Get the connection for this project.
-    this.sparks.get('spark-' + request.request.params.projectId, function(err, connection) {
+    this.sparks.get(request.request.params.projectId).then(function(connection) {
 
-      if (err || !connection) {
+      if (!connection) {
         deferred.resolve();
         return;
       }
@@ -385,7 +385,9 @@ module.exports = function(formio) {
       if (!binding.sync) {
         deferred.resolve();
       }
-    }.bind(this));
+    }.bind(this)).catch(function() {
+      deferred.resolve();
+    });
 
     // Return a promise.
     return deferred.promise;

@@ -10,7 +10,7 @@ var config = require('../config');
 module.exports = function(app, template, hook) {
   var ProjectSocket = null;
   if (typeof app !== 'string') {
-    ProjectSocket = require('../src/modules/ProjectSocket')(app.formio);
+    ProjectSocket = require('../src/modules/websocket/ProjectSocket')(app.formio);
   }
 
   describe('Web Sockets', function() {
@@ -321,7 +321,7 @@ module.exports = function(app, template, hook) {
     var newServer = function(done) {
       var server = http.createServer();
       var primus = new ProjectSocket(server, config);
-      primus.sparks.flushdb();
+      primus.sparks.clear();
       server.port = port++;
       server.url = 'http://localhost:'+ server.port;
       server.listen(server.port, done);
