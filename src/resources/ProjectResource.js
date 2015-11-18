@@ -53,16 +53,26 @@ module.exports = function(router, formio) {
       formio.middleware.filterResourcejsResponse(hiddenFields),
       removeProjectSettings,
       function(req, res, next) {
-        var modReq = _.clone(req);
-        modReq.projectId = '553db92f72f702e714dd9778';
-        var projectFieldName = 'numprojects';
-        var options = {settings: {}};
-        options.settings[projectFieldName + '_action'] = 'increment';
-        options.settings[projectFieldName + '_value'] = '1';
+        // move on as we don't need to wait on results.
+        next();
 
-        var ActionClass = formio.actions.actions['hubspotContactFields'];
-        var action = new ActionClass(options, modReq, res);
-        action.resolve('after', 'create', modReq, res, next);
+        if (process.env.hasOwnProperty('HUBSPOT_PROJECT_FIELD')) {
+          formio.resources.project.model.findOne({
+            name: 'formio',
+            primary: true
+          }).exec(function(err, project) {
+            var modReq = _.clone(req);
+            modReq.projectId = project._id;
+            var projectFieldName = process.env.HUBSPOT_PROJECT_FIELD;
+            var options = {settings: {}};
+            options.settings[projectFieldName + '_action'] = 'increment';
+            options.settings[projectFieldName + '_value'] = '1';
+
+            var ActionClass = formio.actions.actions['hubspotContactFields'];
+            var action = new ActionClass(options, modReq, res);
+            action.resolve('after', 'create', modReq, res, function() {});
+          });
+        }
       }
     ],
     beforeIndex: [
