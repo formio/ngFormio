@@ -143,7 +143,7 @@ app.controller('ProjectCreateController', [
 
     // Try to load the external template source.
     $http.get(
-      'http://help.form.io/templates/index.json',
+      'https://formio.github.io/help.form.io/templates/index.json',
       {
         disableJWT: true,
         headers: {
