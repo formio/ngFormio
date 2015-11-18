@@ -2449,16 +2449,17 @@ module.exports = function() {
   // Return the provider interface.
   return {
 
-    // Set the base URL for the formio API.
-    setBaseUrl: function(url, _noalias) {
-      Formio.setBaseUrl(url, _noalias);
-    },
+    // Expose Formio configuration functions
+    setBaseUrl: Formio.setBaseUrl,
+    cacheOfflineProject: Formio.cacheOfflineProject,
+    clearCache: Formio.clearCache,
+    clearOfflineCache: Formio.clearOfflineCache,
+    setOffline: Formio.setOffline,
+    isOffline: Formio.isOffline,
     setDomain: function(dom) {
       // Remove this?
     },
-    cacheOfflineProject: function(url, path) {
-      Formio.cacheOfflineProject(url, path);
-    },
+
     $get: [
       '$rootScope',
       '$q',
