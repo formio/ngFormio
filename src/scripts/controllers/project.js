@@ -143,7 +143,7 @@ app.controller('ProjectCreateController', [
 
     // Try to load the external template source.
     $http.get(
-      'https://cdn.rawgit.com/formio/help.form.io/gh-pages/templates/index.json',
+      'http://help.form.io/templates/index.json',
       {
         disableJWT: true,
         headers: {
