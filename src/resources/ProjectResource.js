@@ -51,7 +51,19 @@ module.exports = function(router, formio) {
     afterPost: [
       require('../middleware/projectTemplate')(formio),
       formio.middleware.filterResourcejsResponse(hiddenFields),
-      removeProjectSettings
+      removeProjectSettings,
+      function(req, res, next) {
+        var modReq = _.clone(req);
+        modReq.projectId = '553db92f72f702e714dd9778';
+        var projectFieldName = 'numprojects';
+        var options = {settings: {}};
+        options.settings[projectFieldName + '_action'] = 'increment';
+        options.settings[projectFieldName + '_value'] = '1';
+
+        var ActionClass = formio.actions.actions['hubspotContactFields'];
+        var action = new ActionClass(options, modReq, res);
+        action.resolve('after', 'create', modReq, res, next);
+      }
     ],
     beforeIndex: [
       formio.middleware.filterMongooseExists({field: 'deleted', isNull: true}),
