@@ -259,6 +259,9 @@ module.exports = function(router) {
         }
       }
 
+      if (!req.token) {
+        return;
+      }
       router.formio.cache.loadSubmission(req, req.token.form._id, req.token.user._id, function (err, user) {
         if (err) { return debug(err); }
 
