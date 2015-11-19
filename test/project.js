@@ -3,6 +3,7 @@
 var request = require('supertest');
 var assert = require('assert');
 var _ = require('lodash');
+var moment = require('moment');
 var async = require('async');
 var chance = new (require('chance'))();
 var uuidRegex = /^([a-z]{15})$/;
@@ -145,6 +146,19 @@ module.exports = function(app, template, hook) {
           assert.notEqual(response.name.search(uuidRegex), -1);
           assert.equal(response.description, tempProject.description);
 
+          // Check plan and api calls info
+          if (app.formio) {
+            var plan = process.env.PROJECT_PLAN;
+            assert.equal(response.plan, plan, 'The plan should match the default new project plan.');
+            assert.deepEqual(response.apiCalls, {
+              used: 0,
+              remaining: app.formio.plans.limits[response.plan],
+              limit: app.formio.plans.limits[response.plan],
+              reset: moment().startOf('month').add(1, 'month').toISOString()
+            });
+          }
+
+
           // Check that the response does not contain these properties.
           not(response, ['__v', 'deleted', 'settings_encrypted', 'primary']);
 
@@ -184,6 +198,18 @@ module.exports = function(app, template, hook) {
           assert.notEqual(response.defaultAccess, [], 'The Projects default `role` should not be empty.');
           assert.equal(response.name, template.project.name);
           assert.equal(response.description, template.project.description);
+
+          // Check plan and api calls info
+          if (app.formio) {
+            var plan = process.env.PROJECT_PLAN;
+            assert.equal(response.plan, plan, 'The plan should match the default new project plan.');
+            assert.deepEqual(response.apiCalls, {
+              used: 0,
+              remaining: app.formio.plans.limits[response.plan],
+              limit: app.formio.plans.limits[response.plan],
+              reset: moment().startOf('month').add(1, 'month').toISOString()
+            });
+          }
 
           // Check that the response does not contain these properties.
           not(response, ['__v', 'deleted', 'settings_encrypted', 'primary', 'machineName']);
@@ -229,6 +255,18 @@ module.exports = function(app, template, hook) {
           assert.notEqual(response.defaultAccess, [], 'The Projects default `role` should not be empty.');
           assert.equal(response.name, template.project.name);
           assert.equal(response.description, newDescription);
+
+          // Check plan and api calls info
+          if (app.formio) {
+            var plan = process.env.PROJECT_PLAN;
+            assert.equal(response.plan, plan, 'The plan should match the default new project plan.');
+            assert.deepEqual(response.apiCalls, {
+              used: 0,
+              remaining: app.formio.plans.limits[response.plan],
+              limit: app.formio.plans.limits[response.plan],
+              reset: moment().startOf('month').add(1, 'month').toISOString()
+            });
+          }
 
           // Check that the response does not contain these properties.
           not(response, ['__v', 'deleted', 'settings_encrypted']);
@@ -286,6 +324,18 @@ module.exports = function(app, template, hook) {
           var response = res.body;
           assert.equal(response.length, 1);
           assert.equal(response[0].name, template.project.name);
+
+          // Check plan and api calls info
+          if (app.formio) {
+            var plan = process.env.PROJECT_PLAN;
+            assert.equal(response[0].plan, plan, 'The plan should match the default new project plan.');
+            assert.deepEqual(response[0].apiCalls, {
+              used: 0,
+              remaining: app.formio.plans.limits[response[0].plan],
+              limit: app.formio.plans.limits[response[0].plan],
+              reset: moment().startOf('month').add(1, 'month').toISOString()
+            });
+          }
 
           // Check that the response does not contain these properties.
           not(response, ['__v', 'deleted', 'settings_encrypted']);

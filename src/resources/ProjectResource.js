@@ -5,7 +5,8 @@ var config = require('../../config');
 var _ = require('lodash');
 var debug = require('debug')('formio:resources:projects');
 
-module.exports = function(router, formio) {
+module.exports = function(router, formioServer) {
+  var formio = formioServer.formio;
   var removeProjectSettings = function(req, res, next) {
     if (req.token && req.projectOwner && (req.token.user._id === req.projectOwner)) {
       debug('Showing project settings!');
@@ -19,6 +20,7 @@ module.exports = function(router, formio) {
 
   // Load the project plan filter for use.
   formio.middleware.projectPlanFilter = require('../middleware/projectPlanFilter')(formio);
+  formio.middleware.projectAnalytics = require('../middleware/projectAnalytics')(formioServer);
   var hiddenFields = ['deleted', '__v', 'machineName', 'primary'];
 
   var resource = Resource(
@@ -32,7 +34,8 @@ module.exports = function(router, formio) {
     ],
     afterGet: [
       formio.middleware.filterResourcejsResponse(hiddenFields),
-      removeProjectSettings
+      removeProjectSettings,
+      formio.middleware.projectAnalytics
     ],
     beforePost: [
       formio.middleware.filterMongooseExists({field: 'deleted', isNull: true}),
@@ -52,6 +55,7 @@ module.exports = function(router, formio) {
       require('../middleware/projectTemplate')(formio),
       formio.middleware.filterResourcejsResponse(hiddenFields),
       removeProjectSettings,
+      formio.middleware.projectAnalytics,
       function(req, res, next) {
         // move on as we don't need to wait on results.
         next();
@@ -81,7 +85,8 @@ module.exports = function(router, formio) {
     ],
     afterIndex: [
       formio.middleware.filterResourcejsResponse(hiddenFields),
-      removeProjectSettings
+      removeProjectSettings,
+      formio.middleware.projectAnalytics
     ],
     beforePut: [
       formio.middleware.filterMongooseExists({field: 'deleted', isNull: true}),
@@ -99,7 +104,8 @@ module.exports = function(router, formio) {
     afterPut: [
       require('../middleware/projectTemplate')(formio),
       formio.middleware.filterResourcejsResponse(hiddenFields),
-      removeProjectSettings
+      removeProjectSettings,
+      formio.middleware.projectAnalytics
     ],
     beforeDelete: [
       formio.middleware.filterMongooseExists({field: 'deleted', isNull: true}),

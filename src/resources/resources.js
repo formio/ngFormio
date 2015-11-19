@@ -1,7 +1,7 @@
 'use strict';
 
-module.exports = function(router, formio) {
+module.exports = function(router, formioServer) {
   return {
-    project: require('./ProjectResource')(router, formio)
+    project: require('./ProjectResource')(router, formioServer)
   };
 };
