@@ -246,12 +246,14 @@ angular
     '$rootScope',
     'Formio',
     'FormioAlerts',
+    'ProjectPlans',
     '$timeout',
     function(
       $scope,
       $rootScope,
       Formio,
       FormioAlerts,
+      ProjectPlans,
       $timeout
     ) {
       $rootScope.activeSideBar = 'home';
@@ -281,38 +283,10 @@ angular
         }, 50);
       };
 
-      var planStyle = {
-        community: {
-          name: 'Community',
-          labelStyle: 'label-community'
-        },
-        basic: {
-          name: 'Basic',
-          labelStyle: 'label-info'
-        },
-        team1: {
-          name: 'Team',
-          labelStyle: 'label-success'
-        },
-        team2: {
-          name: 'Team',
-          labelStyle: 'label-success'
-        },
-        team3: {
-          name: 'Team',
-          labelStyle: 'label-success'
-        }
-      };
-
-      $scope.getPlanName = function(plan) {
-        if(!planStyle[plan]) return '';
-        return planStyle[plan].name;
-      };
-
-      $scope.getPlanLabel = function(plan) {
-        if(!planStyle[plan]) return '';
-        return planStyle[plan].labelStyle;
-      };
+      $scope.getPlanName = ProjectPlans.getPlanName.bind(ProjectPlans);
+      $scope.getPlanLabel = ProjectPlans.getPlanLabel.bind(ProjectPlans);
+      $scope.getAPICallsPercent = ProjectPlans.getAPICallsPercent.bind(ProjectPlans);
+      $scope.getProgressBarClass = ProjectPlans.getProgressBarClass.bind(ProjectPlans);
     }
   ])
   .filter('trusted', [
@@ -484,4 +458,47 @@ angular
         $window.ga('send', 'event', category, action, label, value);
       }
     };
-  }]);
+  }])
+  .constant('ProjectPlans', {
+    plans: {
+      community: {
+        name: 'Community',
+        labelStyle: 'label-community'
+      },
+      basic: {
+        name: 'Basic',
+        labelStyle: 'label-info'
+      },
+      team1: {
+        name: 'Team',
+        labelStyle: 'label-success'
+      },
+      team2: {
+        name: 'Team',
+        labelStyle: 'label-success'
+      },
+      team3: {
+        name: 'Team',
+        labelStyle: 'label-success'
+      }
+    },
+    getPlanName: function(plan) {
+      if(!this.plans[plan]) return '';
+      return this.plans[plan].name;
+    },
+    getPlanLabel: function(plan) {
+      if(!this.plans[plan]) return '';
+      return this.plans[plan].labelStyle;
+    },
+    getAPICallsPercent: function(apiCalls) {
+      var percent = apiCalls.used / apiCalls.limit * 100;
+      return (percent > 100) ? '100%' : percent + '%';
+    },
+    getProgressBarClass: function(apiCalls) {
+      if(!apiCalls) return 'progress-bar-success';
+      var percentUsed = apiCalls.used / apiCalls.limit;
+      if(percentUsed >= 0.9) return 'progress-bar-danger';
+      if(percentUsed >= 0.7) return 'progress-bar-warning';
+      return 'progress-bar-success';
+    }
+  });

@@ -198,6 +198,7 @@ app.controller('ProjectController', [
   'FormioAlerts',
   '$state',
   'AppConfig',
+  'ProjectPlans',
   '$http',
   '$location',
   function(
@@ -208,6 +209,7 @@ app.controller('ProjectController', [
     FormioAlerts,
     $state,
     AppConfig,
+    ProjectPlans,
     $http,
     $location
   ) {
@@ -272,6 +274,11 @@ app.controller('ProjectController', [
       url += '&repo=' + encodeURIComponent($scope.currentProject.settings.preview.repo);
       return url;
     };
+
+    $scope.getPlanName = ProjectPlans.getPlanName.bind(ProjectPlans);
+    $scope.getPlanLabel = ProjectPlans.getPlanLabel.bind(ProjectPlans);
+    $scope.getAPICallsPercent = ProjectPlans.getAPICallsPercent.bind(ProjectPlans);
+    $scope.getProgressBarClass = ProjectPlans.getProgressBarClass.bind(ProjectPlans);
   }
 ]);
 

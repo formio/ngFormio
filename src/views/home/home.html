@@ -24,14 +24,13 @@
             <span class="label" ng-class="getPlanLabel(project.plan)">{{ getPlanName(project.plan) | uppercase }}</span>
           </small></p>
           <h4 class="project-title ellipsis">{{ project.title }}</h4>
-          <p class="project-url ellipsis"><strong>{{project.name}}</strong>.form.io</p>
+          <p class="project-url ellipsis"><strong>{{ project.name }}</strong>.form.io</p>
           <p class="project-description ellipsis">{{ project.description | characters: 50 }}&nbsp;</p>
-            <!-- TODO: Add this back in when we have api stats -->
-          <!-- <p class="progress-label text-center"><small>Monthly API Calls</small></p>
+          <p class="progress-label text-center"><small>Monthly API Calls</small></p>
           <div class="progress">
-            <div class="progress-bar progress-bar-success" role="progressbar" ng-style="{'min-width': '2em', width: '50%'}"></div>
-            <span><small>100,000/1,000,000</small></span>
-          </div> -->
+            <div class="progress-bar" role="progressbar" ng-style="{width: project.apiCalls.used / project.apiCalls.limit * 100 + '%'}" ng-class="getProgressBarClass(project.apiCalls)"></div>
+            <span><small>{{ project.apiCalls.used | number }}/{{ project.apiCalls.limit | number }}</small></span>
+          </div>
         </a>
       </div>
     </div>
