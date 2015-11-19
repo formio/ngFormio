@@ -3,6 +3,7 @@
 var _ = require('lodash');
 var util = require('./util');
 var debug = require('debug')('formio:action:hubspot');
+var nunjucks = require('nunjucks');
 
 module.exports = function(router) {
   /**
@@ -21,8 +22,8 @@ module.exports = function(router) {
   HubspotContactAction.info = function(req, res, next) {
     next(null, {
       name: 'hubspotContact',
-      title: 'Hubspot Contacts (Premium)',
-      description: 'Allows you to integrate into your Hubspot Contacts.',
+      title: 'Hubspot Contact (Premium)',
+      description: 'Allows you to change contact fields in hubspot.',
       premium: true,
       priority: 0,
       defaults: {
@@ -34,7 +35,7 @@ module.exports = function(router) {
 
   HubspotContactAction.settingsForm = function(req, res, next) {
     util.connect(router, req, function(err, hubspot) {
-      if (err) { return next(); }
+      if (err) { return next(null, {}); }
 
       // Create the panel for all the fields.
       var fieldPanel = {
@@ -46,26 +47,92 @@ module.exports = function(router) {
       };
 
       hubspot.contacts_properties({version: 'v2'}, function(err, properties) {
+        var fieldSrc = router.formio.hook.alter('url', '/form/' + req.params.formId + '/components', req);
         var filteredProperties = _.filter(_.sortBy(properties, 'label'), function(property) {
           return !property.readOnlyValue && !property.hidden;
         });
 
-        // TODO: Make email required.
         // Create the select items for each hubspot field.
-        var dataSrc = router.formio.hook.alter('url', '/form/' + req.params.formId + '/components', req);
+        var optionsSrc = [
+          {
+            label: "No change",
+            value: ""
+          },
+          {
+            label: "Field",
+            value: "field"
+          },
+          {
+            label: "Value",
+            value: "value"
+          },
+          {
+            label: "Increment",
+            value: "increment"
+          },
+          {
+            label: "Decrement",
+            value: "decrement"
+          },
+          {
+            label: "Current Datetime",
+            value: "currentdt"
+          }
+        ];
         _.each(filteredProperties, function(field) {
-          fieldPanel.components.push({
-            type: 'select',
-            input: true,
-            label: field.label + ' Field',
-            key: 'settings[' + field.name + ']',
-            placeholder: 'Select the ' + field.label + ' field',
-            template: '<span>{{ item.label || item.key }}</span>',
-            dataSrc: 'url',
-            data: {url: dataSrc},
-            valueProperty: 'key',
-            multiple: false
-          });
+          var fieldOptions = {
+            type: 'fieldset',
+            legend: field.label + ' Field',
+            input: false,
+            components: [
+              {
+                type: 'columns',
+                input: false,
+                columns: [
+                  {
+                    components: [
+                      {
+                        type: 'select',
+                        key: 'settings[' + field.name + '_action]',
+                        label: "Action",
+                        input: true,
+                        placeholder: 'Select an action to change',
+                        template: '<span>{{ item.label || item.value }}</span>',
+                        dataSrc: 'values',
+                        data: {values: optionsSrc},
+                        valueProperty: '',
+                        multiple: false
+                      },
+                    ]
+                  },
+                  {
+                    components: [
+                      {
+                        type: 'textfield',
+                        key: 'settings[' + field.name + '_value]',
+                        label: 'Value',
+                        input: true,
+                        multiple: false
+                      },
+                      {
+                        type: 'select',
+                        key: 'settings[' + field.name + '_field]',
+                        label: 'Field',
+                        input: true,
+                        placeholder: 'Select the field for ' + field.label,
+                        template: '<span>{{ item.label || item.key }}</span>',
+                        dataSrc: 'url',
+                        data: {url: fieldSrc},
+                        valueProperty: 'key',
+                        multiple: false
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+          fieldPanel.components.push(fieldOptions);
         });
 
         next(null, [fieldPanel]);
@@ -86,57 +153,50 @@ module.exports = function(router) {
    *   The callback function to execute upon completion.
    */
   HubspotContactAction.prototype.resolve = function(handler, method, req, res, next) {
+    var actionInfo = this;
     // Dont block on the hubspot request.
     next();
 
-    // Store the current resource.
-    var currentResource = res.resource;
+    util.connect(router, req, function(err, hubspot) {
+      if (err) {
+        debug(err);
+        return;
+      }
 
-    // Get the externalId for this resource.
-    var externalId = _.result(_.find(currentResource.item.externalIds, {type: 'hubspotContact'}), 'id');
+      // Store the current resource.
+      var currentResource = res.resource;
 
-    var payload = {
-      properties: {}
-    };
-
-    // Only add the payload for post and put.
-    if (req.method === 'POST' || req.method === 'PUT') {
-
-      // Iterate over all the settings for this action.
-      _.each(this.settings, function (formKey, hubspotKey) {
-        // Only continue for fields that are provided in the request.
-        if (!req.body.data.hasOwnProperty(formKey)) { return; }
-
-        // Get the data.
-        var data = req.body.data[formKey];
-
-        // Email needs to be in the payload as well as properties.
-        if (hubspotKey === 'email') {
-          payload.email = data;
-        }
-
-        payload.properties[hubspotKey] = data;
+      // Limit to _action fields with a value set.
+      var fields = _.pick(actionInfo.settings, function (value, key) {
+        return value && _.endsWith(key, '_action')
       });
 
-      util.connect(router, req, function(err, hubspot) {
-        if (err) {
-          debug(err);
-          return;
-        }
+      // Remove _action from the field names so we can map everything out.
+      fields = _.mapKeys(fields, function (value, key) {
+        return key.substring(0, key.length - 7);
+      });
 
-        hubspot.contacts_create_update(payload, function(err, result) {
-          // Should we do something with the error?
-          if (err) {
-            debug(err);
-            return;
-          }
+      var getContactById = function (vid, done) {
+        debug('vid: ' + vid);
+        hubspot.contacts_contact_by_id({vid: vid}, function(err, result) {
+          if (err) { return done(err); }
+          debug(result);
+          done(null, result);
+        });
+      };
 
-          if (!externalId && result.vid) {
-            // Update the resource with the external Id.
+      var createOrUpdate = function (email, user, done) {
+        debug('searching for ' + email);
+        hubspot.contacts_create_update({email: email}, function(err, result) {
+          if (err) { return done(err); }
+          debug(result);
+          if (user) {
+            // Save off the vid to the user's account.
             router.formio.resources.submission.model.update({
-              _id: currentResource.item._id
+              _id: user._id
             }, {
               $push: {
+                // Add the external ids
                 externalIds: {
                   type: 'hubspotContact',
                   id: result.vid
@@ -144,19 +204,95 @@ module.exports = function(router) {
               }
             }, function (err, result) {
               if (err) {
-                // Should we do something with the error?
                 debug(err);
                 return;
               }
             });
           }
+          done(null, result.vid);
+        })
+      }
+
+      var updateContact = function (contact) {
+        var payload = {
+          contact_id: contact.vid,
+          properties: {}
+        };
+
+        _.each(fields, function (action, key) {
+          var value = actionInfo.settings[key + '_value'] || actionInfo.settings[key + '_field'];
+          var current = contact.properties.hasOwnProperty(key) ? contact.properties[key].value : null;
+          payload.properties[key] = processField(action, key, value, current);
         });
+
+        debug(payload);
+        hubspot.contacts_properties_update(payload, function(err) {
+          if (err) { return debug(err); }
+        });
+      }
+
+      var processField = function(action, key, value, current) {
+        switch(action) {
+          case 'field':
+            var parts = value.split('.');
+            if (parts.length > 1) {
+              return req.body.data[parts[0]].data[parts[1]];
+            }
+            return req.body.data[value];
+            break;
+          case 'value':
+            return nunjucks.renderString(value, currentResource);
+            break;
+          case 'increment':
+            value = parseInt(value) || 1;
+            current = parseInt(current) || 0;
+            return current + value;
+            break;
+          case 'decrement':
+            value = parseInt(value) || 1;
+            current = parseInt(current) || 0;
+            return current - value;
+            break;
+          case 'currentdt':
+            return Date.now();
+            break;
+        }
+      }
+
+      router.formio.cache.loadSubmission(req, req.token.form._id, req.token.user._id, function (err, user) {
+        if (err) { return debug(err); }
+
+        var email, externalId;
+        if (user) {
+          externalId = _.result(_.find(user.externalIds, {type: 'hubspotContact'}), 'id');
+          // We are assuming an email field here which may not be the case with other projects.
+          if (!externalId && user.data.hasOwnProperty('email')) {
+            email = user.data.email;
+          }
+        }
+
+        // if no user, don't do anything as we can't identify them.
+        if (!user) {
+          return debug('no user found');
+        }
+
+        if (externalId) {
+          getContactById(externalId, function (err, contact) {
+            if (err) { return debug(err); }
+            updateContact(contact);
+          });
+        }
+        else if (email) {
+          createOrUpdate(email, user, function (err, contactId) {
+            if (err) { return debug(err); }
+            getContactById(contactId, function (err, contact) {
+              if (err) { return debug(err); }
+              updateContact(contact);
+            });
+          });
+        }
       });
-    }
-    else if (req.method === 'DELETE') {
-      // TODO: If vid exists on formio contact, delete from hubspot.
-      // node-hubspot.js does not currently have a contact_delete function. Will need to add.
-    }
+    });
   };
 
   return HubspotContactAction;

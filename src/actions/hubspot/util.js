@@ -22,6 +22,9 @@ module.exports = {
       if (!settings.hubspot) {
         return next('Hubspot not configured.');
       }
+      if (!settings.hubspot.apikey) {
+        return next('Hubspot not configured.');
+      }
 
       var hubspot = hubspotApi({
         api_key: settings.hubspot.apikey,

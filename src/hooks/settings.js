@@ -109,7 +109,6 @@ module.exports = function(app, formioServer) {
         actions.office365contact = require('../actions/office365/Office365Contact')(formioServer);
         actions.office365calendar = require('../actions/office365/Office365Calendar')(formioServer);
         actions.hubspotContact = require('../actions/hubspot/hubspotContact')(formioServer);
-        actions.hubspotContactFields = require('../actions/hubspot/hubspotContactFields')(formioServer);
         actions.oauth = require('../actions/oauth/OAuthAction')(formioServer);
         return actions;
       },
