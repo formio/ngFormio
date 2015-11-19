@@ -13,6 +13,12 @@ var app = express();
 var favicon = require('serve-favicon');
 var analytics = require('./src/analytics/index')(config);
 
+// Create the app server.
+app.server = require('http').createServer(app);
+app.listen = function() {
+  return app.server.listen.apply(app.server, arguments)
+};
+
 // Hook each request and add analytics support.
 app.use(analytics.hook);
 
@@ -57,18 +63,18 @@ app.use(function(err, req, res, next) {
 });
 
 // Create the formio server.
-var formioServer = require('formio')(config.formio);
+app.formio = require('formio')(config.formio);
 
 // Attach the formio-server config.
-formioServer.config = _.omit(config, 'formio');
+app.formio.config = _.omit(config, 'formio');
 
 // Attach the analytics to the formio server and attempt to connect.
-formioServer.analytics = analytics;
+app.formio.analytics = analytics;
 // Try the connection on server start.
-formioServer.analytics.connect();
+app.formio.analytics.connect();
 
 // Import the OAuth providers
-formioServer.formio.oauth = require('./src/oauth/oauth')(formioServer.formio);
+app.formio.formio.oauth = require('./src/oauth/oauth')(app.formio.formio);
 
 // Configure nunjucks.
 nunjucks.configure('views', {
@@ -122,7 +128,7 @@ app.get('/project/:projectId/form/:formId/spec.html', function(req, res) {
 });
 
 // Establish our url alias middleware.
-app.use(require('./src/middleware/alias')(formioServer.formio));
+app.use(require('./src/middleware/alias')(app.formio.formio));
 
 // Adding google analytics to our api.
 if (config.gaTid) {
@@ -134,11 +140,11 @@ if (config.gaTid) {
   });
 }
 
-// Hook the app and bootstrap the formio hooks.
-var settings = require('./src/hooks/settings')(app, formioServer);
+app.modules = require('./src/modules/modules')(app, config);
+var settings = require('./src/hooks/settings')(app, app.formio);
 
 // Start the api server.
-formioServer.init(settings).then(function(formio) {
+app.formio.init(settings).then(function(formio) {
   var start = function() {
 
     // The formio app sanity endpoint.
@@ -164,7 +170,7 @@ formioServer.init(settings).then(function(formio) {
     }, formio.update.sanityCheck);
 
     // Mount formio at /project/:projectId.
-    app.use('/project/:projectId', formioServer);
+    app.use('/project/:projectId', app.formio);
     console.log(' > Listening to ' + config.protocol + '://' + config.domain + ':' + config.port);
     app.listen(config.port);
   };
