@@ -671,9 +671,6 @@ footer {
         width: 100%;
         text-align: center;
       }
-      .progress-bar {
-        min-width: 2em;
-      }
     }
   }
 }
@@ -794,4 +791,18 @@ footer {
 .col-more-templates {
   padding-left: 0;
   padding-right: 0;
+}
+
+/***************************** Edit Project *****************************/
+.panel-project-info {
+  .media-icon-large {
+    font-size: 48px;
+    width: 64px;
+    text-align: center;
+  }
+
+  .progress {
+    margin-top: 10px;
+    margin-bottom: 0;
+  }
 }
