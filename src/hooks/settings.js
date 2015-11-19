@@ -89,7 +89,7 @@ module.exports = function(app, formioServer) {
     },
     alter: {
       resources: function (resources) {
-        return _.assign(resources, require('../resources/resources')(app, formioServer.formio));
+        return _.assign(resources, require('../resources/resources')(app, formioServer));
       },
       models: function (models) {
         // Add the project to the form schema.
