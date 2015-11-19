@@ -134,7 +134,7 @@ module.exports = function (app) {
     '$templateCache',
     function ($templateCache) {
       $templateCache.put('formio/components/button.html',
-        '<button type="{{component.action == \'submit\' ? \'submit\' : \'button\'}}"' +
+        '<button type="{{component.action == \'submit\' || component.action == \'reset\' ? component.action : \'button\'}}"' +
         'ng-class="{\'btn-block\': component.block}"' +
         'class="btn btn-{{ component.theme }} btn-{{ component.size }}"' +
         'ng-disabled="readOnly || form.submitting || (component.disableOnInvalid && form.$invalid)"' +
