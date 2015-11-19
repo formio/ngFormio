@@ -491,14 +491,14 @@ angular
       return this.plans[plan].labelStyle;
     },
     getAPICallsPercent: function(apiCalls) {
-      var percent = apiCalls.used / apiCalls.limit * 100
+      var percent = apiCalls.used / apiCalls.limit * 100;
       return (percent > 100) ? '100%' : percent + '%';
     },
     getProgressBarClass: function(apiCalls) {
       if(!apiCalls) return 'progress-bar-success';
       var percentUsed = apiCalls.used / apiCalls.limit;
-      if(percentUsed >= .9) return 'progress-bar-danger';
-      if(percentUsed >= .7) return 'progress-bar-warning';
-      return 'progress-bar-success'
+      if(percentUsed >= 0.9) return 'progress-bar-danger';
+      if(percentUsed >= 0.7) return 'progress-bar-warning';
+      return 'progress-bar-success';
     }
   });
