@@ -195,6 +195,7 @@ app.formio.init(settings).then(function(formio) {
 process.on('uncaughtException', function(err) {
   console.log('Uncaught exception:');
   console.log(err);
+  console.log(err.stack);
   jslogger.log({
     message: err.stack || err.message,
     fileName: err.fileName,

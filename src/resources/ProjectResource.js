@@ -55,7 +55,29 @@ module.exports = function(router, formioServer) {
       require('../middleware/projectTemplate')(formio),
       formio.middleware.filterResourcejsResponse(hiddenFields),
       removeProjectSettings,
-      formio.middleware.projectAnalytics
+      formio.middleware.projectAnalytics,
+      function(req, res, next) {
+        // move on as we don't need to wait on results.
+        next();
+
+        if (process.env.hasOwnProperty('HUBSPOT_PROJECT_FIELD')) {
+          formio.resources.project.model.findOne({
+            name: 'formio',
+            primary: true
+          }).exec(function(err, project) {
+            var modReq = _.clone(req);
+            modReq.projectId = project._id;
+            var projectFieldName = process.env.HUBSPOT_PROJECT_FIELD;
+            var options = {settings: {}};
+            options.settings[projectFieldName + '_action'] = 'increment';
+            options.settings[projectFieldName + '_value'] = '1';
+
+            var ActionClass = formio.actions.actions['hubspotContactFields'];
+            var action = new ActionClass(options, modReq, res);
+            action.resolve('after', 'create', modReq, res, function() {});
+          });
+        }
+      }
     ],
     beforeIndex: [
       formio.middleware.filterMongooseExists({field: 'deleted', isNull: true}),
