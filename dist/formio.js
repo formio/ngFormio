@@ -2456,6 +2456,8 @@ module.exports = function() {
     clearOfflineCache: Formio.clearOfflineCache,
     setOffline: Formio.setOffline,
     isOffline: Formio.isOffline,
+    offline: Formio.offline,
+    dequeueOfflineRequests: Formio.dequeueOfflineRequests,
     setDomain: function(dom) {
       // Remove this?
     },
