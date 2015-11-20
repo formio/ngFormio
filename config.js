@@ -74,7 +74,7 @@ else {
 }
 
 // This secret is used to encrypt certain DB fields at rest in the mongo database
-config.formio.mongoSecret = process.env.DB_SECRET || 'abc123';
+config.formio.mongoSecret = process.env.DB_SECRET || null;
 config.formio.mongoSecretOld = process.env.DB_SECRET_OLD || false;
 
 // TODO: Need a better way of setting the formio specific configurations.
@@ -89,7 +89,7 @@ if (process.env.SENDGRID_USERNAME) {
 config.formio.jwt = {};
 config.formio.jwt.secret = process.env.JWT_SECRET || 'abc123';
 config.formio.jwt.expireTime = process.env.JWT_EXPIRE_TIME || 240;
-config.jslogger = process.env.JS_LOGGER || 123;
+config.jslogger = process.env.JS_LOGGER || null;
 
 // Allow the config to be displayed when debugged.
 var sanitized = _.clone(config, true);
