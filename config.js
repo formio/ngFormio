@@ -74,7 +74,7 @@ else {
 }
 
 // This secret is used to encrypt certain DB fields at rest in the mongo database
-config.formio.mongoSecret = process.env.DB_SECRET || null;
+config.formio.mongoSecret = process.env.DB_SECRET || 'abc123';
 config.formio.mongoSecretOld = process.env.DB_SECRET_OLD || false;
 
 // TODO: Need a better way of setting the formio specific configurations.
