@@ -337,6 +337,7 @@ module.exports = function(app, formioServer) {
                   access.project.create_all = access.project.create_all || [];
                   access.project.read_all = access.project.read_all || [];
                   access.project.update_all = access.project.update_all || [];
+                  access.project.delete_all = access.project.delete_all || [];
 
                   // Modify the form access.
                   access.form = access.form || {};
@@ -351,6 +352,7 @@ module.exports = function(app, formioServer) {
                     access.project.create_all.push(id.toString());
                     access.project.read_all.push(id.toString());
                     access.project.update_all.push(id.toString());
+                    access.project.delete_all.push(id.toString());
 
                     access.form.create_all.push(id.toString());
                     access.form.read_all.push(id.toString());
@@ -442,7 +444,14 @@ module.exports = function(app, formioServer) {
        *   The updated access entity object.
        */
       accessEntity: function (entity, req) {
-        if (entity.type == 'form') {
+        if(!entity && req.projectId) {
+          // If the entity does not exist, and a projectId is present, then this is a project related access check.
+          entity = {
+            type: 'project',
+            id: req.projectId
+          }
+        }
+        else if(entity && entity.type == 'form') {
           // If this is a create form or index form, use the project as the access entity.
           var createForm = ((req.method === 'POST') && (Boolean(req.formId) === false));
           var indexForm = ((req.method === 'GET') && (Boolean(req.formId) === false));
@@ -458,21 +467,26 @@ module.exports = function(app, formioServer) {
       },
 
       /**
-       * Determine if the current request has access to the given Project.
+       * A secondary access check if router.formio.access.hasAccess fails.
        *
-       * @param hasAccess
-       * @param req
-       * @param access
+       * @param _hasAccess {Boolean}
+       *   If the request has access to perform the given action
+       * @param req {Object}
+       *   The Express request Object.
+       * @param access {Object}
+       *   The calculated access object.
+       * @param entity {Object}
+       *   The access entity object.
        *
        * @returns {Boolean}
-       *   If the current request has access to the current project.
+       *   If the user has access based on the request.
        */
-      access: function (hasAccess, req, access) {
-        var _debug = require('debug')('formio:settings:access');
+      hasAccess: function(_hasAccess, req, access, entity) {
+        var _debug = require('debug')('formio:settings:hasAccess');
         var _url = nodeUrl.parse(req.url).pathname;
 
         // Check requests not pointed at specific projects.
-        if (!Boolean(req.projectId)) {
+        if(!entity && !Boolean(req.projectId)) {
           // No project but authenticated.
           if (req.token) {
             if (req.method === 'POST' && _url === '/project') {
@@ -514,35 +528,9 @@ module.exports = function(app, formioServer) {
             return false;
           }
         }
-        // Has project.
-        else {
-          _debug('Checking Project Access.');
-          _debug('URL: ' + _url);
-          var _access = formioServer.formio.access.hasAccess(req, access, {
-            type: 'project',
-            id: req.projectId
-          });
 
-          _debug(_access);
-          return _access;
-        }
-      },
-
-      /**
-       * Hook the hasAccess results.
-       *
-       * @param _hasAccess {Boolean}
-       *   If the request has access to perform the given action
-       * @param req {Object}
-       *   The Express request Object.
-       * @param access {Object}
-       *   The calculated access object.
-       *
-       * @returns {Boolean}
-       *   If the user has access based on the request.
-       */
-      hasAccess: function (_hasAccess, req, access) {
-        if (req.token && access.project && access.project.owner) {
+        // This request was made against a project and access was denied, check if the user is the owner.
+        else if(req.token && access.project && access.project.owner) {
           if (req.token.user._id === access.project.owner) {
             if (
               (req.method === 'POST' || req.method === 'PUT') &&
@@ -552,10 +540,12 @@ module.exports = function(app, formioServer) {
             }
 
             // Allow the project owner to have access to everything.
-            _hasAccess = true;
+            return true;
           }
         }
-        return _hasAccess;
+
+        // Access was not explicitly granted, therefore it was denied.
+        return false;
       },
 
       /**
