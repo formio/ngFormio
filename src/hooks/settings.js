@@ -193,8 +193,6 @@ module.exports = function(app, formioServer) {
        *   The modified access handlers.
        */
       getAccess: function (handlers, req, res, access) {
-        var _debug = require('debug')('formio:settings:getAccess');
-
         /**
          * Calculate the project access.
          *
@@ -202,11 +200,14 @@ module.exports = function(app, formioServer) {
          *   The callback function to invoke after completion.
          */
         var getProjectAccess = function(callback) {
+          var _debug = require('debug')('formio:settings:getAccess#getProjectAccess');
+
           // Build the access object for this project.
           access.project = {};
 
           // Skip project access if no projectId was given.
           if (!req.projectId) {
+            _debug('Skipping, no req.projectId');
             return callback(null);
           }
 
@@ -242,6 +243,7 @@ module.exports = function(app, formioServer) {
             }
 
             // Pass the access of this project to the next function.
+            _debug(JSON.stringify(access));
             return callback(null);
           });
         };
@@ -253,11 +255,14 @@ module.exports = function(app, formioServer) {
          *   The callback function to invoke after completion.
          */
         var getTeamAccess = function(callback) {
+          var _debug = require('debug')('formio:settings:getAccess#getTeamAccess');
+
           // Modify the project access with teams functionality.
           access.project = access.project || {};
 
           // Skip teams access if no projectId was given.
           if (!req.projectId) {
+            _debug('Skipping, no req.projectId');
             return callback(null);
           }
 
@@ -273,6 +278,7 @@ module.exports = function(app, formioServer) {
             }
 
             // Skip teams processing, if this projects plan does not support teams.
+            _debug(project);
             if (!project.plan || project.plan === 'community' || project.plan === 'basic') {
               return callback(null);
             }
@@ -410,6 +416,7 @@ module.exports = function(app, formioServer) {
             }
 
             // Pass the access of this Team to the next function.
+            _debug(JSON.stringify(access));
             return callback(null);
           });
         };
@@ -598,27 +605,25 @@ module.exports = function(app, formioServer) {
         var _debug = require('debug')('formio:settings:user');
         var util = formioServer.formio.util;
         _debug(user);
+
+        // Force the user reference to be an object rather than a mongoose document.
+        try {
+          user = user.toObject();
+        } catch(e) {}
+
         user.roles = user.roles || [];
 
         // Convert all the roles to strings
-        user.roles = _.map(user.roles, function(role) {
-          if (role) {
-            return util.idToString(role);
-          }
-        });
+        user.roles = _.map(_.filter(user.roles), util.idToString);
 
-        return formioServer.formio.teams.getTeams(user)
+        return formioServer.formio.teams.getTeams(user, true)
           .then(function(teams) {
             // Filter the teams to only contain the team ids.
             _debug(teams);
-            teams = _.map(teams, function(team) {
-              if (team) {
-                return util.idToString(team._id);
-              }
-            });
+            teams = _.map(_.filter(_.pluck(teams, '_id')), util.idToString);
 
             // Add the users team ids, to their roles.
-            user.roles = _.without(user.roles.concat(teams), null, undefined);
+            user.roles = _.uniq(user.roles.concat(teams));
             _debug(user.roles);
 
             return next(null, user);

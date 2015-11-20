@@ -118,10 +118,12 @@ module.exports = function(app, formioServer) {
    *
    * @param user {Object}
    *   The user Submission object.
+   * @param owner {Boolean}
+   *   Determines if the query should include teams owned buy the given user.
    *
    * @returns {Promise}
    */
-  var getTeams = function(user) {
+  var getTeams = function(user, owner) {
     var util = formioServer.formio.util;
     var q = Q.defer();
 
@@ -135,14 +137,25 @@ module.exports = function(app, formioServer) {
         return q.reject('No user given.');
       }
 
-      // Search for teams with id's stored as both BSON and strings.
+      // Build the search query for teams.
       var query = {
         form: teamResource,
-        'data.members': {$elemMatch: {_id: {$in: [util.idToBson(user._id), util.idToString(user._id)]}}},
         deleted: {$eq: null}
       };
-      debug.getTeams(JSON.stringify(query));
 
+      debug.getTeams(owner);
+      if (owner) {
+        query['$or'] = [
+          {'data.members': {$elemMatch: {_id: {$in: [util.idToBson(user._id), util.idToString(user._id)]}}}},
+          {owner: {$in: [util.idToBson(user._id), util.idToString(user._id)]}}
+        ];
+      }
+      else {
+        // Search for teams with id's stored as both BSON and strings.
+        query['data.members'] = {$elemMatch: {_id: {$in: [util.idToBson(user._id), util.idToString(user._id)]}}};
+      }
+
+      debug.getTeams(JSON.stringify(query));
       formioServer.formio.resources.submission.model.find(query, function(err, documents) {
         if (err) {
           debug.getTeams(err);
@@ -150,6 +163,7 @@ module.exports = function(app, formioServer) {
         }
 
         // Coerce results into an array and return the teams as objects.
+        debug.getTeams(documents);
         documents = documents || [];
         documents = _.map(documents, function(team) {
           return team.toObject();

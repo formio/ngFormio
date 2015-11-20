@@ -8,6 +8,11 @@ var chance = new (require('chance'))();
 
 module.exports = function(app, template, hook) {
   describe('Teams', function() {
+    // Cannot run these tests without access to formio instance
+    if (!app.formio) {
+      return;
+    }
+
     describe('Single Team Tests', function() {
       it('A Formio User should be able to access the Team Form', function(done) {
         request(app)
@@ -25,6 +30,46 @@ module.exports = function(app, template, hook) {
 
             done();
           });
+      });
+
+      it('A Formio User can not make a team without having a project on the team plan', function(done) {
+        done();
+      });
+
+      it('Upgrade the project to a team project plan', function(done) {
+        app.formio.resources.project.model.findOne({_id: template.project._id, deleted: {$eq: null}}, function(err, project) {
+          if(err) {
+            return done(err);
+          }
+
+          project.plan = 'team1';
+          project.save(function(err) {
+            if(err) {
+              return done(err);
+            }
+
+            // Update the template version of the project.
+            request(app)
+              .get('/project/' + template.project._id)
+              .set('x-jwt-token', template.formio.owner.token)
+              .expect('Content-Type', /json/)
+              .expect(200)
+              .end(function(err, res) {
+                if (err) {
+                  return done(err);
+                }
+
+                // Update the project.
+                var response = res.body;
+                template.project = response;
+
+                // Store the JWT for future API calls.
+                template.formio.owner.token = res.headers['x-jwt-token'];
+
+                done();
+              });
+          });
+        });
       });
 
       it('A Formio User should be able to create a Team', function(done) {
@@ -52,10 +97,6 @@ module.exports = function(app, template, hook) {
 
             done();
           });
-      });
-
-      it('The Team Owners token should contain the Team _id in the roles list', function(done) {
-        done();
       });
 
       it('The Team Owner should be able to add a Formio user to their Team', function(done) {
@@ -722,15 +763,12 @@ module.exports = function(app, template, hook) {
               foo: 'bar'
             }
           })
-          .expect('Content-Type', /json/)
-          .expect(200)
+          .expect('Content-Type', /text/)
+          .expect(401)
           .end(function(err, res) {
             if (err) {
               return done(err);
             }
-
-            var response = res.body;
-            assert.equal(response.hasOwnProperty('settings'), false);
 
             // Store the JWT for future API calls.
             template.formio.user1.token = res.headers['x-jwt-token'];
@@ -743,8 +781,8 @@ module.exports = function(app, template, hook) {
         request(app)
           .delete('/project/' + template.project._id)
           .set('x-jwt-token', template.formio.user1.token)
-          .expect('Content-Type', /json/)
-          .expect(400)
+          .expect('Content-Type', /text/)
+          .expect(401)
           .end(function(err, res) {
             if (err) {
               return done(err);
@@ -812,8 +850,8 @@ module.exports = function(app, template, hook) {
         request(app)
           .get('/project/' + template.project._id + '/form/' + testForm._id)
           .set('x-jwt-token', template.formio.user1.token)
-          .expect('Content-Type', /text/)
-          .expect(401)
+          .expect('Content-Type', /json/)
+          .expect(200)
           .end(function(err, res) {
             if (err) {
               return done(err);
@@ -891,7 +929,7 @@ module.exports = function(app, template, hook) {
           });
       });
 
-      it('A Team member with team_read, should not be able to read a submission', function(done) {
+      it('A Team member with team_read, should be able to read a submission', function(done) {
         request(app)
           .get('/project/' + template.project._id + '/form/' + testForm._id + '/submission/' + testSubmission._id)
           .set('x-jwt-token', template.formio.user1.token)
@@ -900,8 +938,8 @@ module.exports = function(app, template, hook) {
               foo: 'bar2'
             }
           })
-          .expect('Content-Type', /text/)
-          .expect(401)
+          .expect('Content-Type', /json/)
+          .expect(200)
           .end(function(err, res) {
             if (err) {
               return done(err);
@@ -1133,7 +1171,6 @@ module.exports = function(app, template, hook) {
         request(app)
           .delete('/project/' + template.project._id + '/form/' + testForm._id + '/submission/' + testSubmission._id)
           .set('x-jwt-token', template.formio.owner.token)
-          .expect('Content-Type', /json/)
           .expect(200)
           .end(function(err, res) {
             if (err) {
@@ -1153,7 +1190,6 @@ module.exports = function(app, template, hook) {
         request(app)
           .delete('/project/' + template.project._id + '/form/' + testForm._id)
           .set('x-jwt-token', template.formio.owner.token)
-          .expect('Content-Type', /json/)
           .expect(200)
           .end(function(err, res) {
             if (err) {
