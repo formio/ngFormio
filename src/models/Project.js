@@ -33,8 +33,8 @@ module.exports = function(formio) {
       },
       plan: {
         type: String,
-        enum: ['community', 'basic', 'team1', 'team2', 'team3'],
-        default: 'community',
+        enum: ['community', 'basic', 'team1', 'team2', 'team3', 'commercial'],
+        default: formio.config.plan || 'commercial',
         index: true
       },
       primary: {
