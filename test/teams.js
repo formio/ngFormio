@@ -32,46 +32,6 @@ module.exports = function(app, template, hook) {
           });
       });
 
-      it('A Formio User can not make a team without having a project on the team plan', function(done) {
-        done();
-      });
-
-      it('Upgrade the project to a team project plan', function(done) {
-        app.formio.resources.project.model.findOne({_id: template.project._id, deleted: {$eq: null}}, function(err, project) {
-          if(err) {
-            return done(err);
-          }
-
-          project.plan = 'team1';
-          project.save(function(err) {
-            if(err) {
-              return done(err);
-            }
-
-            // Update the template version of the project.
-            request(app)
-              .get('/project/' + template.project._id)
-              .set('x-jwt-token', template.formio.owner.token)
-              .expect('Content-Type', /json/)
-              .expect(200)
-              .end(function(err, res) {
-                if (err) {
-                  return done(err);
-                }
-
-                // Update the project.
-                var response = res.body;
-                template.project = response;
-
-                // Store the JWT for future API calls.
-                template.formio.owner.token = res.headers['x-jwt-token'];
-
-                done();
-              });
-          });
-        });
-      });
-
       it('A Formio User should be able to create a Team', function(done) {
         request(app)
           .post('/project/' + template.formio.project._id + '/form/' + template.formio.teamResource._id + '/submission')
@@ -175,7 +135,7 @@ module.exports = function(app, template, hook) {
           });
       });
 
-      it('A Project Owner should be able to add a Team they own to their project', function(done) {
+      it('A Project Owner should not be able to add a Team they own to their project, if its not on a team plan', function(done) {
         var teamAccess = {type: 'team_read', roles: [template.team1._id]};
 
         request(app)
@@ -190,7 +150,6 @@ module.exports = function(app, template, hook) {
 
             // Update the users project access with the new team.
             var oldResponse = res.body;
-            var oldAccess = _.clone(oldResponse.access);
 
             // Store the JWT for future API calls.
             template.formio.owner.token = res.headers['x-jwt-token'];
@@ -206,17 +165,106 @@ module.exports = function(app, template, hook) {
                   return done(err);
                 }
 
+                // Confirm that the team role was not added to the projects permissions.
                 var response = res.body;
-                assert.notEqual(response.access.length, oldAccess.length);
-                assert.equal(response.access.length, (oldAccess.length + 1));
+                var found = false;
+                response.access.forEach(function(permission) {
+                  if(permission.type === 'team_read') {
+                    found = true;
+                    assert.equal(permission.roles.length, 0);
+                  }
+                });
+                assert.equal(found, true);
 
+                // Update the project.
+                template.project = response;
+
+                // Store the JWT for future API calls.
+                template.formio.owner.token = res.headers['x-jwt-token'];
+
+                done();
+              });
+          });
+      });
+
+      it('Upgrade the project to a team project plan', function(done) {
+        app.formio.resources.project.model.findOne({_id: template.project._id, deleted: {$eq: null}}, function(err, project) {
+          if(err) {
+            return done(err);
+          }
+
+          project.plan = 'team1';
+          project.save(function(err) {
+            if(err) {
+              return done(err);
+            }
+
+            // Update the template version of the project.
+            request(app)
+              .get('/project/' + template.project._id)
+              .set('x-jwt-token', template.formio.owner.token)
+              .expect('Content-Type', /json/)
+              .expect(200)
+              .end(function(err, res) {
+                if (err) {
+                  return done(err);
+                }
+
+                // Update the project.
+                var response = res.body;
+                template.project = response;
+
+                // Store the JWT for future API calls.
+                template.formio.owner.token = res.headers['x-jwt-token'];
+
+                done();
+              });
+          });
+        });
+      });
+
+      it('A Project Owner should be able to add a Team they own to their project, if its on a team plan', function(done) {
+        var teamAccess = {type: 'team_read', roles: [template.team1._id]};
+
+        request(app)
+          .get('/project/' + template.project._id)
+          .set('x-jwt-token', template.formio.owner.token)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end(function(err, res) {
+            if (err) {
+              return done(err);
+            }
+
+            // Update the users project access with the new team.
+            var oldResponse = res.body;
+
+            // Store the JWT for future API calls.
+            template.formio.owner.token = res.headers['x-jwt-token'];
+
+            request(app)
+              .put('/project/' + template.project._id)
+              .set('x-jwt-token', template.formio.owner.token)
+              .send({ access: oldResponse.access.concat(teamAccess) })
+              .expect('Content-Type', /json/)
+              .expect(200)
+              .end(function(err, res) {
+                if (err) {
+                  return done(err);
+                }
+
+                // Confirm that the team role was not added to the projects permissions.
+                var response = res.body;
+                var found = false;
                 response.access.forEach(function(element) {
-                  if (element.type === 'team_read') {
+                  if(element.type === 'team_read') {
+                    found = true;
                     assert.notEqual(template.team1._id, null);
                     assert.notEqual(template.team1._id, '');
                     assert.deepEqual(element, teamAccess);
                   }
                 });
+                assert.equal(found, true);
 
                 // Update the project.
                 template.project = response;

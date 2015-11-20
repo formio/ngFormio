@@ -116,14 +116,16 @@ module.exports = function(app, formioServer) {
   /**
    * Get the teams that the given user is associated with.
    *
-   * @param user {Object}
-   *   The user Submission object.
+   * @param user {Object|String}
+   *   The user Submission object or user _id.
+   * @param member {Boolean}
+   *   Determines if the query should include teams the given user is a member of.
    * @param owner {Boolean}
    *   Determines if the query should include teams owned buy the given user.
    *
    * @returns {Promise}
    */
-  var getTeams = function(user, owner) {
+  var getTeams = function(user, member, owner) {
     var util = formioServer.formio.util;
     var q = Q.defer();
 
@@ -137,22 +139,33 @@ module.exports = function(app, formioServer) {
         return q.reject('No user given.');
       }
 
+      // Force the user ref to be the _id.
+      user = user._id || user;
+
       // Build the search query for teams.
       var query = {
         form: teamResource,
         deleted: {$eq: null}
       };
 
-      debug.getTeams(owner);
-      if (owner) {
+      // Modify the search query based on the given criteria, search for BSON and string versions of ids.
+      debug.getTeams('User: ' + util.idToString(user) + ', Member: ' + member + ', Owner: ' + owner);
+      if(member && owner) {
         query['$or'] = [
-          {'data.members': {$elemMatch: {_id: {$in: [util.idToBson(user._id), util.idToString(user._id)]}}}},
-          {owner: {$in: [util.idToBson(user._id), util.idToString(user._id)]}}
+          {'data.members': {$elemMatch: {_id: {$in: [util.idToBson(user), util.idToString(user)]}}}},
+          {owner: {$in: [util.idToBson(user), util.idToString(user)]}}
         ];
       }
+      else if(member && !owner) {
+        query['data.members'] = {$elemMatch: {_id: {$in: [util.idToBson(user), util.idToString(user)]}}};
+      }
+      else if(!member && owner) {
+        query['owner'] = {$in: [util.idToBson(user), util.idToString(user)]};
+      }
       else {
-        // Search for teams with id's stored as both BSON and strings.
-        query['data.members'] = {$elemMatch: {_id: {$in: [util.idToBson(user._id), util.idToString(user._id)]}}};
+        // Fail safely for incorrect usage of getTeams.
+        debug.getTeams('Could not build team query because given parameters were incorrect.');
+        return q.resolve([]);
       }
 
       debug.getTeams(JSON.stringify(query));

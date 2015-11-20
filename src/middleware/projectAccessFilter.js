@@ -54,26 +54,13 @@ module.exports = function(formio) {
 
         // Update the accessIds with the project roles.
         roles = roles || [];
-        roles = _.map(roles, function(role) {
-          return formio.util.idToString(role._id)
-        });
+        roles = _.map(_.pluck(roles, '_id'), formio.util.idToString);
         accessIds = accessIds.concat(roles);
 
-        // Find all the Teams owned by the project owner.
-        formio.resources.submission.model.find({deleted: {$eq: null}, owner: project.owner.toString()}, function(err, teams) {
-          if (err) {
-            debug(err);
-            return res.sendStatus(400);
-          }
-
-          // Update the accessIds with the owners teams.
-          teams = teams || [];
-          teams = _.map(teams, function(team) {
-            return formio.util.idToString(team._id);
-          });
-          accessIds = accessIds.concat(teams);
-          accessIds = _.uniq(accessIds);
-
+        /**
+         * Filter the access obj in the current request based on the calculated accessIds.
+         */
+        var filterAccess = function() {
           // Check the accessIds in the original request.
           debug('Allowed Roles: ' + JSON.stringify(accessIds));
           debug('Given access: ' + JSON.stringify(req.body.access));
@@ -88,8 +75,33 @@ module.exports = function(formio) {
           });
 
           debug('New Access: ' + JSON.stringify(req.body.access));
-          next();
-        });
+        };
+
+        // Only proceed with teams access check if the project plan supports teams.
+        project.plan = project.plan || '';
+        if (!_.startsWith(project.plan, 'team')) {
+          debug('Skipping team access check, plan: ' + project.plan);
+          filterAccess();
+          return next();
+        }
+
+        // Find all the Teams owned by the project owner.
+        formio.teams.getTeams(project.owner, false, true)
+          .then(function(teams) {
+            teams = teams || [];
+            teams = _.map(_.pluck(teams, '_id'), formio.util.idToString);
+
+            accessIds = accessIds.concat(teams);
+            accessIds = _.uniq(_.filter(accessIds));
+
+            filterAccess();
+            next();
+          }, function(err) {
+            debug(err);
+
+            filterAccess();
+            next();
+          });
       });
     });
   }

@@ -616,7 +616,7 @@ module.exports = function(app, formioServer) {
         // Convert all the roles to strings
         user.roles = _.map(_.filter(user.roles), util.idToString);
 
-        return formioServer.formio.teams.getTeams(user, true)
+        return formioServer.formio.teams.getTeams(user, true, true)
           .then(function(teams) {
             // Filter the teams to only contain the team ids.
             _debug(teams);
