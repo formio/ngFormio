@@ -285,6 +285,7 @@ angular
 
       $scope.getPlanName = ProjectPlans.getPlanName.bind(ProjectPlans);
       $scope.getPlanLabel = ProjectPlans.getPlanLabel.bind(ProjectPlans);
+      $scope.getAPICallsLimit = ProjectPlans.getAPICallsLimit.bind(ProjectPlans);
       $scope.getAPICallsPercent = ProjectPlans.getAPICallsPercent.bind(ProjectPlans);
       $scope.getProgressBarClass = ProjectPlans.getProgressBarClass.bind(ProjectPlans);
     }
@@ -459,46 +460,61 @@ angular
       }
     };
   }])
-  .constant('ProjectPlans', {
-    plans: {
-      community: {
-        name: 'Community',
-        labelStyle: 'label-community'
+  .factory('ProjectPlans', ['$filter', function($filter) {
+    return {
+      plans: {
+        community: {
+          name: 'Community',
+          labelStyle: 'label-community'
+        },
+        basic: {
+          name: 'Basic',
+          labelStyle: 'label-info'
+        },
+        team1: {
+          name: 'Team',
+          labelStyle: 'label-success'
+        },
+        team2: {
+          name: 'Team',
+          labelStyle: 'label-success'
+        },
+        team3: {
+          name: 'Team',
+          labelStyle: 'label-success'
+        },
+        commercial: {
+          name: 'Commercial',
+          labelStyle: 'label-commercial'
+        }
       },
-      basic: {
-        name: 'Basic',
-        labelStyle: 'label-info'
+      getPlanName: function(plan) {
+        if(!this.plans[plan]) return '';
+        return this.plans[plan].name;
       },
-      team1: {
-        name: 'Team',
-        labelStyle: 'label-success'
+      getPlanLabel: function(plan) {
+        if(!this.plans[plan]) return '';
+        return this.plans[plan].labelStyle;
       },
-      team2: {
-        name: 'Team',
-        labelStyle: 'label-success'
+      getAPICallsLimit: function(apiCalls) {
+        if(!apiCalls.limit) {
+          return '∞';
+        }
+        return $filter('number')(apiCalls.limit);
       },
-      team3: {
-        name: 'Team',
-        labelStyle: 'label-success'
+      getAPICallsPercent: function(apiCalls) {
+        if(!apiCalls.limit) {
+          return '0%';
+        }
+        var percent = apiCalls.used / apiCalls.limit * 100;
+        return (percent > 100) ? '100%' : percent + '%';
+      },
+      getProgressBarClass: function(apiCalls) {
+        if(!apiCalls || !apiCalls.limit) return 'progress-bar-success';
+        var percentUsed = apiCalls.used / apiCalls.limit;
+        if(percentUsed >= 0.9) return 'progress-bar-danger';
+        if(percentUsed >= 0.7) return 'progress-bar-warning';
+        return 'progress-bar-success';
       }
-    },
-    getPlanName: function(plan) {
-      if(!this.plans[plan]) return '';
-      return this.plans[plan].name;
-    },
-    getPlanLabel: function(plan) {
-      if(!this.plans[plan]) return '';
-      return this.plans[plan].labelStyle;
-    },
-    getAPICallsPercent: function(apiCalls) {
-      var percent = apiCalls.used / apiCalls.limit * 100;
-      return (percent > 100) ? '100%' : percent + '%';
-    },
-    getProgressBarClass: function(apiCalls) {
-      if(!apiCalls) return 'progress-bar-success';
-      var percentUsed = apiCalls.used / apiCalls.limit;
-      if(percentUsed >= 0.9) return 'progress-bar-danger';
-      if(percentUsed >= 0.7) return 'progress-bar-warning';
-      return 'progress-bar-success';
-    }
-  });
+    };
+  }]);

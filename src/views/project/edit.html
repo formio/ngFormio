@@ -81,7 +81,7 @@
             <div class="progress">
               <div class="progress-bar" role="progressbar" ng-style="{width: getAPICallsPercent(currentProject.apiCalls)}" ng-class="getProgressBarClass(currentProject.apiCalls)"></div>
             </div>
-            <p class="text-center text-muted progress-caption"><small>{{ currentProject.apiCalls.used | number }}/{{ currentProject.apiCalls.limit | number }}</small></p>
+            <p class="text-center text-muted progress-caption"><small>{{ currentProject.apiCalls.used | number }} / {{ getAPICallsLimit(currentProject.apiCalls) }}</small></p>
           </div>
         </div>
       </div>

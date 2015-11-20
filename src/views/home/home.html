@@ -29,7 +29,7 @@
           <p class="progress-label text-center"><small>Monthly API Calls</small></p>
           <div class="progress">
             <div class="progress-bar" role="progressbar" ng-style="{width: project.apiCalls.used / project.apiCalls.limit * 100 + '%'}" ng-class="getProgressBarClass(project.apiCalls)"></div>
-            <span><small>{{ project.apiCalls.used | number }}/{{ project.apiCalls.limit | number }}</small></span>
+            <span><small>{{ project.apiCalls.used | number }} / {{ getAPICallsLimit(project.apiCalls) }}</small></span>
           </div>
         </a>
       </div>

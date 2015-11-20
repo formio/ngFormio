@@ -277,6 +277,7 @@ app.controller('ProjectController', [
 
     $scope.getPlanName = ProjectPlans.getPlanName.bind(ProjectPlans);
     $scope.getPlanLabel = ProjectPlans.getPlanLabel.bind(ProjectPlans);
+    $scope.getAPICallsLimit = ProjectPlans.getAPICallsLimit.bind(ProjectPlans);
     $scope.getAPICallsPercent = ProjectPlans.getAPICallsPercent.bind(ProjectPlans);
     $scope.getProgressBarClass = ProjectPlans.getProgressBarClass.bind(ProjectPlans);
   }
