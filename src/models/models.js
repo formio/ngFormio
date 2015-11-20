@@ -2,6 +2,6 @@
 
 module.exports = function(router) {
   return {
-    project: require('./Project')(router.formio)
+    project: require('./Project')(router)
   };
 };

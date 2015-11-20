@@ -3,7 +3,8 @@
 var _ = require('lodash');
 var EncryptedProperty = require('../plugins/EncryptedProperty');
 
-module.exports = function(formio) {
+module.exports = function(router) {
+  var formio = router.formio;
   var cache = require('../cache/cache')(formio);
   var model = formio.BaseModel({
     schema: new formio.mongoose.Schema({
@@ -34,7 +35,7 @@ module.exports = function(formio) {
       plan: {
         type: String,
         enum: ['community', 'basic', 'team1', 'team2', 'team3', 'commercial'],
-        default: formio.config.plan || 'commercial',
+        default: router.config.plan || 'commercial',
         index: true
       },
       primary: {
