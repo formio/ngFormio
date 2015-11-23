@@ -2,7 +2,9 @@
 
 require('dotenv').load({silent: true});
 var config = require('./config');
-var jslogger = require('jslogger')({key: config.jslogger});
+if (config.jslogger) {
+  var jslogger = require('jslogger')({key: config.jslogger});
+}
 var express = require('express');
 var nunjucks = require('nunjucks');
 var debug = require('debug')('formio:server');
@@ -192,18 +194,20 @@ app.formio.init(settings).then(function(formio) {
   });
 });
 
-process.on('uncaughtException', function(err) {
-  console.log('Uncaught exception:');
-  console.log(err);
-  console.log(err.stack);
-  jslogger.log({
-    message: err.stack || err.message,
-    fileName: err.fileName,
-    lineNumber: err.lineNumber
-  });
+if (config.jslogger) {
+  process.on('uncaughtException', function(err) {
+    console.log('Uncaught exception:');
+    console.log(err);
+    console.log(err.stack);
+    jslogger.log({
+      message: err.stack || err.message,
+      fileName: err.fileName,
+      lineNumber: err.lineNumber
+    });
 
-  // Give jslogger time to log before exiting.
-  setTimeout(function() {
-    process.exit(1);
-  }, 1500);
-});
+    // Give jslogger time to log before exiting.
+    setTimeout(function() {
+      process.exit(1);
+    }, 1500);
+  });
+}
