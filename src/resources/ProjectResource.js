@@ -72,7 +72,7 @@ module.exports = function(router, formioServer) {
             options.settings[projectFieldName + '_action'] = 'increment';
             options.settings[projectFieldName + '_value'] = '1';
 
-            var ActionClass = formio.actions.actions['hubspotContactFields'];
+            var ActionClass = formio.actions.actions['hubspotContact'];
             var action = new ActionClass(options, modReq, res);
             action.resolve('after', 'create', modReq, res, function() {});
           });
