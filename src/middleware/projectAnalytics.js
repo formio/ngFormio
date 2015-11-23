@@ -21,8 +21,8 @@ module.exports = function(formioServer) {
       var limit = formioServer.formio.plans.limits[project.plan];
       var info = {
         used: used,
-        remaining: limit - used,
-        limit: limit,
+        remaining: project.plan === 'commercial' ? null : limit - used,
+        limit: project.plan === 'commercial' ? null : limit,
         reset: moment().startOf('month').add(1, 'month').toISOString()
       };
       debug('API Call Info:', info);
