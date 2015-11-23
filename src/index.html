@@ -70,7 +70,7 @@
                 <a ui-sref="home()" class="navbar-brand">
                   <img height="35px;" src="images/formio-logo-white.png" />
                 </a>
-                <ol class="breadcrumb">
+                <ol class="breadcrumb" ng-cloak>
                   <li ng-if="currentProject"><a ui-sref="project.edit({projectId: currentProject._id})">{{ currentProject.title | characters:25:true }}</a></li>
                   <li ng-if="currentForm"><a ui-sref="project.form.view({formId: currentForm._id})">{{ currentForm.title | characters:25:true}}</a></li>
                 </ol>
