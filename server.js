@@ -139,7 +139,6 @@ var settings = require('./src/hooks/settings')(app, formioServer);
 // Start the api server.
 formioServer.init(settings).then(function(formio) {
   var start = function() {
-
     // The formio app sanity endpoint.
     app.get('/health', function(req, res, next) {
       if (!formio.resources) {

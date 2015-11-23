@@ -1148,6 +1148,7 @@ module.exports = function(app, template, hook) {
       });
 
       // Project tests
+      var tempRole = null;
       it('A Team member with team_write, should be able to create a project role', function(done) {
         request(app)
           .post('/project/' + template.project._id + '/role')
@@ -1163,8 +1164,31 @@ module.exports = function(app, template, hook) {
               return done(err);
             }
 
+            var response = res.body;
+
             // Store the JWT for future API calls.
             template.formio.user1.token = res.headers['x-jwt-token'];
+
+            tempRole = response;
+
+            done();
+          });
+      });
+
+      it('A Team member with team_write, should be able to delete a project role', function(done) {
+        request(app)
+          .delete('/project/' + template.project._id + '/role/' + tempRole._id)
+          .set('x-jwt-token', template.formio.user1.token)
+          .expect(200)
+          .end(function(err, res) {
+            if (err) {
+              return done(err);
+            }
+
+            // Store the JWT for future API calls.
+            template.formio.user1.token = res.headers['x-jwt-token'];
+
+            tempRole = null;
 
             done();
           });
