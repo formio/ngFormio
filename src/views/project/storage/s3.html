@@ -1,0 +1,20 @@
+<div class="well">
+  <h4>S3 Storage</h4>
+  <p>You may use any S3 compatible storage system for files. Enter your access credentials below.</p>
+</div>
+<div class="form-group">
+  <label for="AWSBucket">Bucket Name</label>
+  <input ng-model="currentProject.settings.storage.s3.AWSBucket" type="text" class="form-control" id="AWSBucket" name="AWSBucket" placeholder="Enter your bucket name.">
+</div>
+<div class="form-group">
+  <label for="AWSAccessKeyId">Access Key</label>
+  <input ng-model="currentProject.settings.storage.s3.AWSAccessKeyId" type="text" class="form-control" id="AWSAccessKeyId" name="AWSAccessKeyId" placeholder="Enter your AWS Access Key">
+</div>
+<div class="form-group">
+  <label for="AWSSecretKey">Secret Key</label>
+  <input ng-model="currentProject.settings.storage.s3.AWSSecretKey" type="password" class="form-control" id="AWSSecretKey" name="AWSSecretKey" placeholder="Enter your AWS Secret Key">
+</div>
+<div class="form-group">
+  <label for="acl">Access Control List</label>
+  <input ng-model="currentProject.settings.storage.s3.acl" type="text" class="form-control" id="acl" name="acl" placeholder="Enter an Access Control List">
+</div>

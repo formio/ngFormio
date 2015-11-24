@@ -140,6 +140,11 @@ angular
           parent: 'project.settings',
           templateUrl: 'views/project/email/email.html'
         })
+        .state('project.settings.storage', {
+          url: '/storage',
+          parent: 'project.settings',
+          templateUrl: 'views/project/storage/storage.html'
+        })
         .state('project.settings.databases', {
           url: '/databases',
           parent: 'project.settings',
