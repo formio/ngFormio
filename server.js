@@ -142,6 +142,8 @@ if (config.gaTid) {
   });
 }
 
+app.storage = require('./src/storage')(app);
+
 app.modules = require('./src/modules/modules')(app, config);
 var settings = require('./src/hooks/settings')(app, app.formio);
 
