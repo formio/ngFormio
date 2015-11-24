@@ -79,7 +79,10 @@ module.exports = function(formio) {
           // Close existing connections open for this project.
           if (connection) {
             connection = JSON.parse(connection);
-            this.primus.spark(connection.sparkId).end();
+            var currentSpark = this.primus.spark(connection.sparkId);
+            if (currentSpark) {
+              currentSpark.end();
+            }
             this.sparks.del(projectId);
           }
 
