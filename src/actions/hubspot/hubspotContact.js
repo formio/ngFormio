@@ -55,27 +55,27 @@ module.exports = function(router) {
         // Create the select items for each hubspot field.
         var optionsSrc = [
           {
-            label: "No change",
+            label: "No mapping",
             value: ""
           },
           {
-            label: "Field",
+            label: "Map to a form field",
             value: "field"
           },
           {
-            label: "Value",
+            label: "Set to static or rendered value",
             value: "value"
           },
           {
-            label: "Increment",
+            label: "Increment a number",
             value: "increment"
           },
           {
-            label: "Decrement",
+            label: "Decrement a number",
             value: "decrement"
           },
           {
-            label: "Current Datetime",
+            label: "Set to current datetime",
             value: "currentdt"
           }
         ];
@@ -220,9 +220,9 @@ module.exports = function(router) {
         };
 
         _.each(fields, function (action, key) {
-          var value = actionInfo.settings[key + '_value'] || actionInfo.settings[key + '_field'];
+          var extension = (action === 'field' ? '_field' : '_value');
           var current = contact.properties.hasOwnProperty(key) ? contact.properties[key].value : null;
-          payload.properties[key] = processField(action, key, value, current);
+          payload.properties[key] = processField(action, key, actionInfo.settings[key + extension], current);
         });
 
         debug(payload);
@@ -266,7 +266,15 @@ module.exports = function(router) {
         if (err) { return debug(err); }
 
         var email, externalId;
-        if (user) {
+        // First check for an email field in mappings.
+        _.each(fields, function(value, key) {
+          if (key === 'email') {
+            email = processField(value, key, actionInfo.settings[key + '_' + value], '');
+          }
+        });
+
+        // If email field is not mapped, use the current user.
+        if (!email && user) {
           externalId = _.result(_.find(user.externalIds, {type: 'hubspotContact'}), 'id');
           // We are assuming an email field here which may not be the case with other projects.
           if (!externalId && user.data.hasOwnProperty('email')) {
@@ -275,17 +283,19 @@ module.exports = function(router) {
         }
 
         // if no user, don't do anything as we can't identify them.
-        if (!user) {
-          return debug('no user found');
+        if (!externalId && !email) {
+          return debug('no identifier found');
         }
 
         if (externalId) {
+          debug('externalId: ' + externalId);
           getContactById(externalId, function (err, contact) {
             if (err) { return debug(err); }
             updateContact(contact);
           });
         }
         else if (email) {
+          debug('email: ' + email);
           createOrUpdate(email, user, function (err, contactId) {
             if (err) { return debug(err); }
             getContactById(contactId, function (err, contact) {
