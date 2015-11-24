@@ -8,8 +8,25 @@ var debug = require('debug')('formio:resources:projects');
 module.exports = function(router, formio) {
   var removeProjectSettings = function(req, res, next) {
     if (req.token && req.projectOwner && (req.token.user._id === req.projectOwner)) {
-      debug('Showing project settings!');
+      debug('Showing project settings to Owner');
       return next();
+    }
+    else if (req.projectId && req.user) {
+      var cache = require('../cache/cache')(formio);
+      cache.loadProject(req, req.projectId, function(err, project) {
+        if (err) {
+          debug(err);
+        }
+        else {
+          var access = _.map(_.pluck(_.filter(project.access, {type: 'team_admin'}), 'roles'), formio.util.idToString);
+          var roles = _.map(req.user.roles, formio.util.idToString);
+
+          if( _.intersection(access, req.user.roles).length !== 0) {
+            debug('Showing project settings to team_admin user');
+            return next();
+          }
+        }
+      });
     }
 
     debug('Skipping project settings!');

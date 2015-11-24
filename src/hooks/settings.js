@@ -381,6 +381,7 @@ module.exports = function(app, formioServer) {
                   access.project.create_all = access.project.create_all || [];
                   access.project.read_all = access.project.read_all || [];
                   access.project.update_all = access.project.update_all || [];
+                  access.project.delete_all = access.project.delete_all || [];
 
                   // Modify the form access.
                   access.form = access.form || {};
@@ -402,6 +403,7 @@ module.exports = function(app, formioServer) {
                     access.project.create_all.push(id.toString());
                     access.project.read_all.push(id.toString());
                     access.project.update_all.push(id.toString());
+                    access.project.delete_all.push(id.toString());
 
                     access.form.create_all.push(id.toString());
                     access.form.read_all.push(id.toString());
