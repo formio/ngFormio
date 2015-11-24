@@ -13,6 +13,12 @@ var debug = require('debug')('formio:server');
 var analytics = require('../src/analytics/index')(config);
 var _ = require('lodash');
 
+// Create the app server.
+app.server = require('http').createServer(app);
+app.listen = function() {
+  return app.server.listen.apply(app.server, arguments)
+};
+
 // Build the paths for bootstrapping the formio test suite.
 var _formio = path.dirname(require.resolve('formio'));
 var _test = path.join(_formio, 'test');
@@ -40,18 +46,18 @@ module.exports = function() {
   });
 
   // Bootstrap the formio test environment.
-  var _server = require('formio')(config.formio);
+  app.formio = require('formio')(config.formio);
 
   // Attach the formio-server config.
-  _server.config = _.omit(config, 'formio');
+  app.formio.config = _.omit(config, 'formio');
 
   // Attach the analytics to the formio server.
-  _server.analytics = analytics;
+  app.formio.analytics = analytics;
   // Try the connection on server start.
-  _server.analytics.connect();
+  app.formio.analytics.connect();
 
   // Import the OAuth providers
-  _server.formio.oauth = require('../src/oauth/oauth')(_server.formio);
+  app.formio.formio.oauth = require('../src/oauth/oauth')(app.formio.formio);
 
   // Configure nunjucks.
   nunjucks.configure('views', {
@@ -115,14 +121,16 @@ module.exports = function() {
   });
 
   // Establish our url alias middleware.
-  app.use(require('../src/middleware/alias')(_server.formio));
+  app.use(require('../src/middleware/alias')(app.formio.formio));
 
   // Hook the app and bootstrap the formio hooks.
-  var _settings = require('../src/hooks/settings')(app, _server);
+  app.modules = require('../src/modules/modules')(app, config);
+  var _settings = require('../src/hooks/settings')(app, app.formio);
 
   // Start the api server.
-  require(_bootstrap)(app, _server, _settings, '/project/:projectId', config.formio)
+  require(_bootstrap)(app, app.formio, _settings, '/project/:projectId', config.formio)
     .then(function(state) {
+      app.listen(config.port);
       bootstrap.resolve({
         app: state.app,
         template: state.template

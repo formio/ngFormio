@@ -61,6 +61,11 @@ module.exports = function(formio) {
         case 'team2':
         case 'team1':
         case 'basic':
+          // Ensure a name gets set if not sent.
+          if (!req.body.hasOwnProperty('name')) {
+            debug('No project name sent. Setting to random.');
+            req.body.name = domain();
+          }
           return next();
           break;
         case 'community':
