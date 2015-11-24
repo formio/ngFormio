@@ -193,6 +193,7 @@ app.controller('FormController', [
   'FormioAlerts',
   'AppConfig',
   'SubmissionAccessLabels',
+  'GoogleAnalytics',
   '$q',
   function(
     $scope,
@@ -203,6 +204,7 @@ app.controller('FormController', [
     FormioAlerts,
     AppConfig,
     SubmissionAccessLabels,
+    GoogleAnalytics,
     $q
   ) {
     // Project information.
@@ -267,6 +269,7 @@ app.controller('FormController', [
         type: 'success',
         message: 'New submission added!'
       });
+      GoogleAnalytics.sendEvent('Submission', 'create', null, 1);
       if (submission._id) {
         $state.go('project.form.submission.item.view', {subId: submission._id});
       }
@@ -281,6 +284,9 @@ app.controller('FormController', [
           type: 'success',
           message: 'Successfully ' + method + ' form!'
         });
+        var action = $stateParams.formId ? 'update' : 'create';
+        GoogleAnalytics.sendEvent('Form', action, null, 1);
+
         $state.go('project.form.view', {formId: form._id});
       }, FormioAlerts.onError.bind(FormioAlerts));
     };
@@ -396,10 +402,12 @@ app.controller('FormDeleteController', [
   '$scope',
   '$state',
   'FormioAlerts',
+  'GoogleAnalytics',
   function(
     $scope,
     $state,
-    FormioAlerts
+    FormioAlerts,
+    GoogleAnalytics
   ) {
     $scope.$on('delete', function(event) {
       event.stopPropagation();
@@ -407,6 +415,7 @@ app.controller('FormDeleteController', [
         type: 'success',
         message: _.capitalize($scope.form.type) + ' was deleted.'
       });
+      GoogleAnalytics.sendEvent('Form', 'delete', null, 1);
       $state.go('project.edit');
     });
 
@@ -534,6 +543,7 @@ app.controller('FormActionEditController', [
   'FormioAlerts',
   'ActionInfoLoader',
   'FormioUtils',
+  'GoogleAnalytics',
   '$timeout',
   function(
     $scope,
@@ -543,6 +553,7 @@ app.controller('FormActionEditController', [
     FormioAlerts,
     ActionInfoLoader,
     FormioUtils,
+    GoogleAnalytics,
     $timeout
   ) {
     // Invalidate cache so actions fetch fresh request for
@@ -574,11 +585,40 @@ app.controller('FormActionEditController', [
 
       // Hubspot action missing settings due to missing API key.
       if(actionInfo && actionInfo.name === 'hubspotContact') {
-        var settingsComponent = FormioUtils.getComponent(actionInfo.settingsForm.components, 'settings');
-        if(!settingsComponent.components || settingsComponent.components.length == 1) {
+        var showFields = function(key, value) {
+          var fields = {
+            '_value': 'none',
+            '_field': 'none'
+          };
+          switch(value) {
+            case 'field':
+              fields._field = '';
+              break;
+            case 'value':
+            case 'increment':
+            case 'decrement':
+              fields._value = '';
+              break;
+          }
+          angular.element('#form-group-' + key + '_value').css('display', fields._value);
+          angular.element('#form-group-' + key + '_field').css('display', fields._field);
+        };
+
+        if(!$scope.currentProject.settings || !$scope.currentProject.settings.hubspot || !$scope.currentProject.settings.hubspot.apikey) {
           FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> You have not yet configured your Hubspot API key. You can configure your Hubspot API key in your <a href="#/project/'+$scope.projectId+'/settings/hubspot">Project Settings</a>.');
           $scope.formDisabled = true;
         }
+        FormioUtils.eachComponent(actionInfo.settingsForm.components, function(component) {
+          var result = component.key.match(/settings\[(.*)_action\]/);
+          if (result) {
+            $timeout(function() {
+              showFields(result[1], $scope.action.data.settings[result[1] + '_action']);
+            });
+            $scope.$watch('action.data.settings.' + result[1] + '_action', function(current, old) {
+              showFields(result[1], current);
+            });
+          }
+        });
       }
 
       // Hide role settings component as needed
@@ -676,14 +716,17 @@ app.controller('FormActionEditController', [
         $scope.currentProject.hasOwnProperty('plan') &&
         $scope.currentProject.plan === 'community'
       ) {
-        FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> This is a Premium Action, please upgrade your <a href="https://www.form.io/pricing">Project Plan</a> to enable it.');
+        FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> This is a Premium Action, please upgrade your <a ui-sref="project.settings.plan">project plan</a> to enable it.');
       }
     });
 
     $scope.$on('formSubmission', function(event) {
       event.stopPropagation();
-      FormioAlerts.addAlert({type: 'success', message: 'Action was updated.'});
+      var method = $scope.actionUrl ? 'updated' : 'created';
+      FormioAlerts.addAlert({type: 'success', message: 'Action was ' + method + '.'});
       $state.go('project.form.action.index');
+      var eventAction = $scope.actionUrl ? 'update' : 'create';
+      GoogleAnalytics.sendEvent('Action', eventAction, null, 1);
     });
   }
 ]);
@@ -693,16 +736,19 @@ app.controller('FormActionDeleteController', [
   '$stateParams',
   '$state',
   'FormioAlerts',
+  'GoogleAnalytics',
   function(
     $scope,
     $stateParams,
     $state,
-    FormioAlerts
+    FormioAlerts,
+    GoogleAnalytics
   ) {
     $scope.actionUrl = $scope.formio.formUrl + '/action/' + $stateParams.actionId;
     $scope.$on('delete', function(event) {
       event.stopPropagation();
       FormioAlerts.addAlert({type: 'success', message: 'Action was deleted.'});
+      GoogleAnalytics.sendEvent('Action', 'delete', null, 1);
       $state.go('project.form.action.index');
     });
     $scope.$on('cancel', function(event) {
@@ -724,6 +770,7 @@ app.controller('FormSubmissionsController', [
   'FormioUtils',
   'FormioAlerts',
   'formioComponents',
+  'GoogleAnalytics',
   'ngDialog',
   function(
     $scope,
@@ -736,6 +783,7 @@ app.controller('FormSubmissionsController', [
     FormioUtils,
     FormioAlerts,
     formioComponents,
+    GoogleAnalytics,
     ngDialog
   ) {
     // Returns true if component should appear in table
@@ -800,6 +848,34 @@ app.controller('FormSubmissionsController', [
           dataSource.sync();
           $q.all($scope.recentlyDeletedPromises).finally(dataSource.read.bind(dataSource));
         }
+      });
+    };
+
+    var stopScroll = function(element) {
+      var activeElement;
+
+      angular.element($window.document).bind('mousewheel DOMMouseScroll', function(e) {
+          var scrollTo = null;
+
+          if (!angular.element(activeElement).closest('.k-popup').length) {
+            return;
+          }
+
+          if (e.type === 'mousewheel') {
+              scrollTo = (e.originalEvent.wheelDelta * -1);
+          }
+          else if (e.type === 'DOMMouseScroll') {
+              scrollTo = 40 * e.originalEvent.detail;
+          }
+
+          if (scrollTo) {
+              e.preventDefault();
+              element.scrollTop(scrollTo + element.scrollTop());
+          }
+      });
+
+      angular.element($window.document).on('mouseover', function(e) {
+            activeElement = e.target;
       });
     };
 
@@ -921,7 +997,10 @@ app.controller('FormSubmissionsController', [
             },
             destroy: function(options) {
               $scope.recentlyDeletedPromises.push($http.delete($scope.formio.submissionsUrl + '/' + options.data._id)
-              .then(options.success)
+              .then(function(result) {
+                GoogleAnalytics.sendEvent('Submission', 'delete', null, 1);
+                options.success();
+              })
               .catch(function(err) {
                 FormioAlerts.onError(err);
                 options.error(err);
@@ -1069,7 +1148,13 @@ app.controller('FormSubmissionsController', [
             '</div>',
           change: $scope.$apply.bind($scope),
           dataSource: dataSource,
-          columns: columns
+          columns: columns,
+          columnMenuInit: function(e) {
+            e.container.find('[data-role=dropdownlist]').each(function() {
+              var widget = angular.element(this).data('kendoDropDownList');
+              stopScroll(widget.ul.parent());
+            });
+          }
         };
       });
     });
@@ -1108,10 +1193,12 @@ app.controller('FormSubmissionEditController', [
   '$scope',
   '$state',
   'FormioAlerts',
+  'GoogleAnalytics',
   function(
     $scope,
     $state,
-    FormioAlerts
+    FormioAlerts,
+    GoogleAnalytics
   ) {
     $scope.$on('formSubmission', function(event, submission) {
       event.stopPropagation();
@@ -1120,14 +1207,9 @@ app.controller('FormSubmissionEditController', [
         type: 'success',
         message: 'Submission was ' + message + '.'
       });
+      GoogleAnalytics.sendEvent('Submission', 'update', null, 1);
       $state.go('project.form.submission.index', {formId: $scope.formId});
     });
-
-    $scope.deleteSubmission = function() {
-      $scope.formio.deleteSubmission().then(function() {
-        $state.go('project.form.submission.index', {formId: $scope.formId});
-      }, FormioAlerts.onError.bind(FormioAlerts));
-    };
   }
 ]);
 
@@ -1135,10 +1217,12 @@ app.controller('FormSubmissionDeleteController', [
   '$scope',
   '$state',
   'FormioAlerts',
+  'GoogleAnalytics',
   function(
     $scope,
     $state,
-    FormioAlerts
+    FormioAlerts,
+    GoogleAnalytics
   ) {
     $scope.$on('delete', function(event) {
       event.stopPropagation();
@@ -1146,6 +1230,7 @@ app.controller('FormSubmissionDeleteController', [
         type: 'success',
         message: 'Submission was deleted.'
       });
+      GoogleAnalytics.sendEvent('Submission', 'delete', null, 1);
       $state.go('project.form.submission.index');
     });
 

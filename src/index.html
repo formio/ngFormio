@@ -70,13 +70,16 @@
                 <a ui-sref="home()" class="navbar-brand">
                   <img height="35px;" src="images/formio-logo-white.png" />
                 </a>
-                <ol class="breadcrumb">
-                  <li ng-if="currentProject"><a ui-sref="project.edit({projectId: currentProject._id})">{{ currentProject.title }}</a></li>
-                  <li ng-if="currentForm"><a ui-sref="project.form.view({formId: currentForm._id})">{{ currentForm.title }}</a></li>
+                <ol class="breadcrumb" ng-cloak>
+                  <li ng-if="currentProject"><a ui-sref="project.edit({projectId: currentProject._id})">{{ currentProject.title | characters:25:true }}</a></li>
+                  <li ng-if="currentForm"><a ui-sref="project.form.view({formId: currentForm._id})">{{ currentForm.title | characters:25:true}}</a></li>
                 </ol>
               </div>
               <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav navbar-right">
+                  <li>
+                    <a href="http://help.form.io" target="_blank"><i class="fa fa-life-ring"></i> Help</a>
+                  </li>
                   <li class="dropdown user-dropdown" ng-cloak>
                     <a ng-if="authenticated" href="#" class="dropdown-toggle" id="user-menu" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-user"></i> {{ user.data.name }}<b class="caret"></b></a>
                     <ul class="dropdown-menu">
@@ -84,9 +87,6 @@
                       <li class="divider"></li>
                       <li><a href="" id="logout" ng-click="logout()"><i class="fa fa-power-off"></i> Log Out</a></li>
                     </ul>
-                  </li>
-                  <li>
-                    <a href="http://help.form.io" target="_blank"><i class="fa fa-life-ring"></i> Help</a>
                   </li>
                 </ul>
               </div>
@@ -196,7 +196,6 @@
       })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
       ga('create', 'UA-58453303-1', 'auto');
-      ga('send', 'pageview');
     </script>
 
     <!-- build:js scripts/vendor.js -->
@@ -213,8 +212,8 @@
     <script src="/bower_components/ng-sortable/dist/ng-sortable.js"></script>
     <script src="/bower_components/angular-paginate-anything/dist/paginate-anything-tpls.js"></script>
     <script src="/bower_components/bootstrap-ui-datetime-picker/dist/datetime-picker.min.js"></script>
-    <script src="/bower_components/jquery.maskedinput/dist/jquery.maskedinput.js"></script>
     <script src="/bower_components/signature_pad/signature_pad.js"></script>
+    <script src="/bower_components/angular-ui-mask/dist/mask.js"></script>
     <script src="/bower_components/ngFormio/dist/formio.js"></script>
     <script src="/bower_components/angular-drag-and-drop-lists/angular-drag-and-drop-lists.js"></script>
     <script src="/bower_components/lodash/lodash.js"></script>
@@ -226,6 +225,7 @@
     <script src="/bower_components/angular-animate/angular-animate.js"></script>
     <script src="/bower_components/kendo-ui/js/kendo.ui.core.min.js"></script>
     <script src="/bower_components/kendo-ui/js/kendo.angular.min.js"></script>
+    <script src="/bower_components/angular-truncate-2/src/angular-truncate-2.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 
@@ -257,7 +257,7 @@
     <script src="scripts/controllers/role.js"></script>
     <script src="scripts/controllers/team.js"></script>
     <script src="scripts/controllers/user.js"></script>
-    <script src="scripts/services/services.js"></script>
+    <script src="scripts/utils/utils.js"></script>
     <!-- endinject -->
     <!-- endbuild -->
 

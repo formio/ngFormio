@@ -4,11 +4,14 @@
 <form role="form" novalidate>
   <div id="form-group-title" class="form-group">
     <label for="title" class="control-label">Title</label>
-    <input type="text" ng-model="form.title" ng-change="titleChange('{{form.title}}')" class="form-control" id="title" placeholder="Enter the form title"/>
+    <input type="text" ng-model="form.title" ng-change="titleChange('{{form.title}}')" class="form-control" id="title" placeholder="Enter the form title" autofocus="!formId"/>
   </div>
-  <div id="form-group-name" class="form-group">
+  <div id="form-group-name" class="form-group" ng-class="{'has-warning': originalForm.name && form.name !== originalForm.name}">
     <label for="name" class="control-label">Name</label>
     <input type="text" ng-model="form.name" class="form-control" id="name" placeholder="Enter the form machine name"/>
+    <p ng-if="originalForm.name && form.name !== originalForm.name" class="help-block"><span class="glyphicon glyphicon-exclamation-sign"></span>
+      Changing the name of a form will break embedded components in other forms that refer to this form. Make sure you know what you're doing before changing the form name.
+    </p>
   </div>
   <input type="hidden" ng-model="form.type"/>
   <div id="form-group-path" class="form-group">

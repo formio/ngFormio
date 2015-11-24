@@ -5,7 +5,7 @@
         <h3 class="panel-title">
           <i class="fa fa-database"></i>
           <span>Resources</span>
-          <a class="pull-right" href="http://help.form.io/userguide/#resources" target="_blank"><i class="glyphicon glyphicon-question-sign "></i></a>
+          <a class="pull-right" href="http://help.form.io/userguide/#resources" target="_blank"><i class="glyphicon glyphicon-question-sign"></i></a>
         </h3>
       </div>
       <div class="panel-body">
@@ -26,7 +26,7 @@
         <h3 class="panel-title">
           <i class="fa fa-file-text-o"></i>
           <span>Forms</span>
-          <a class="pull-right" href="http://help.form.io/userguide/#forms" target="_blank"><i class="glyphicon glyphicon-question-sign "></i></a>
+          <a class="pull-right" href="http://help.form.io/userguide/#forms" target="_blank"><i class="glyphicon glyphicon-question-sign"></i></a>
         </h3>
       </div>
       <div class="panel-body">
@@ -42,19 +42,48 @@
     </div>
   </div>
   <div class="col-sm-4">
-    <div class="panel panel-info">
+    <div class="panel panel-info" ng-if="currentProject.settings.preview">
       <div class="panel-heading">
-        <h3 class="panel-title"><span class="glyphicon glyphicon-info-sign"></span> Getting started with your Project</h3>
+        <h3 class="panel-title"><span class="glyphicon glyphicon-info-sign"></span> Preview your project</h3>
       </div>
       <div class="panel-body">
-        <p>Form.IO provides the forms and resource structure behind your custom application. Start by creating the <strong>Resources</strong>, and then create the free-form <strong>Forms</strong> that your application needs.</p>
-        <p>Once you have created the Resources and Forms, you can embed them within your application using the <strong>&lt;formio&gt;</strong> Angular.js directive. It works just like an &lt;img&gt; tag, but used for Form I/O.</p>
-        <p>It is recommended to walk through the tutorial, which provides a step-by-step tutorial on how to build an Project with Form.IO.</p>
-        <p><div ng-click="startTutorial()" class="play-pres-overlay">
-          <div class="play-pres-overlay-play"><span class="glyphicon glyphicon-play-circle"></span>Start the tutorial</div>
-          <img width="100%" src="images/formio-get-started.png" />
-        </div></p>
-        <p>For more information, check out the <a href="http://help.form.io/userguide/" target="_blank">complete documentation</a>.</p>
+        <p>This project was generated from a template that provides a preview app. Check out how your project looks!</p>
+        <div class="form-group pull-right">
+          <a ng-href="{{getPreviewURL()}}" target="_blank" class="btn btn-primary">Preview Project</a>
+        </div>
+
+      </div>
+    </div>
+    <div class="panel panel-info panel-project-info">
+      <div class="panel-heading">
+        <h3 class="panel-title"><span class="glyphicon glyphicon-info-sign"></span> Project Info</h3>
+      </div>
+      <div class="panel-body">
+        <div class="media" ng-if="currentProject.plan">
+          <div class="media-left media-middle">
+            <div class="media-object">
+              <i class="fa fa-cloud text-muted media-icon-large"></i>
+            </div>
+          </div>
+          <div class="media-body">
+            <h5 class="media-heading">Current Plan</h5>
+            <h4>{{ getPlanName(currentProject.plan) }}</h4>
+          </div>
+        </div>
+        <div class="media" ng-if="currentProject.apiCalls">
+          <div class="media-left">
+            <div class="media-object">
+              <i class="fa fa-exchange text-muted media-icon-large"></i>
+            </div>
+          </div>
+          <div class="media-body">
+            <h5 class="media-heading">API Calls</h5>
+            <div class="progress">
+              <div class="progress-bar" role="progressbar" ng-style="{width: getAPICallsPercent(currentProject.apiCalls)}" ng-class="getProgressBarClass(currentProject.apiCalls)"></div>
+            </div>
+            <p class="text-center text-muted progress-caption"><small>{{ currentProject.apiCalls.used | number }} / {{ getAPICallsLimit(currentProject.apiCalls) }}</small></p>
+          </div>
+        </div>
       </div>
     </div>
   </div>

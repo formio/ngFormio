@@ -72,31 +72,42 @@ app.controller('ProjectCreateController', [
   'FormioAlerts',
   'Formio',
   '$http',
+  'GoogleAnalytics',
   function(
     $scope,
     $rootScope,
     $state,
     FormioAlerts,
     Formio,
-    $http
+    $http,
+    GoogleAnalytics
   ) {
     $rootScope.noBreadcrumb = false;
     $scope.currentProject = {template: 'default'};
     $scope.hasTemplate = false;
     $scope.showName = false;
+    $scope.templateLimit = 3;
     var formio = new Formio();
 
     // The project templates.
     $scope.templates = [
       {
-        title: 'Default',
+        "title": "Default",
+        "name": "default",
+        "description": "A default project with User and Admin resources and their respective authentication forms.",
         template: 'default'
       },
       {
-        title: 'Empty',
+        "title": "Empty",
+        "name": "empty",
+        "description": "An empty project with no forms or resources. Create a project with a fresh start!",
         template: 'empty'
       }
     ];
+
+    $scope.showAllTemplates = function() {
+      $scope.templateLimit = Infinity;
+    };
 
     $scope.loadTemplate = function() {
       var input = angular.element(this).get(0);
@@ -116,6 +127,7 @@ app.controller('ProjectCreateController', [
       // Read the file.
       var reader = new FileReader();
       reader.onload = function(e) {
+        $scope.oldTemplate = $scope.currentProject.template;
         $scope.currentProject.template = JSON.parse(e.target.result);
         $scope.hasTemplate = true;
         $scope.$apply();
@@ -123,9 +135,15 @@ app.controller('ProjectCreateController', [
       reader.readAsText(template);
     };
 
+    $scope.unloadTemplate = function() {
+      $scope.currentProject.template = $scope.oldTemplate;
+      $scope.oldTemplate = null;
+      $scope.hasTemplate = false;
+    };
+
     // Try to load the external template source.
     $http.get(
-      'https://cdn.rawgit.com/formio/help.form.io/gh-pages/templates/index.json',
+      'https://formio.github.io/help.form.io/templates/index.json',
       {
         disableJWT: true,
         headers: {
@@ -157,9 +175,10 @@ app.controller('ProjectCreateController', [
           type: 'success',
           message: 'New Project created!'
         });
+        GoogleAnalytics.sendEvent('Project', 'create', null, 1);
         $state.go('project.edit', {projectId: project._id});
       }, function(error) {
-        if (error.data.message && error.data.message.indexOf('duplicate key error index') !== -1) {
+        if (error.data && error.data.message && error.data.message.indexOf('duplicate key error index') !== -1) {
           error.data.errors.name = {
             path: 'name',
             message: 'Project domain already exists. Please pick a different domain.'
@@ -179,7 +198,9 @@ app.controller('ProjectController', [
   'FormioAlerts',
   '$state',
   'AppConfig',
+  'ProjectPlans',
   '$http',
+  '$location',
   function(
     $scope,
     $rootScope,
@@ -188,7 +209,9 @@ app.controller('ProjectController', [
     FormioAlerts,
     $state,
     AppConfig,
-    $http
+    ProjectPlans,
+    $http,
+    $location
   ) {
     $rootScope.activeSideBar = 'projects';
     $rootScope.noBreadcrumb = false;
@@ -241,6 +264,22 @@ app.controller('ProjectController', [
       format = format || 'html';
       return AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/spec.' + format + '?token=' + Formio.getToken();
     };
+
+    $scope.getPreviewURL = function() {
+      var url = 'http://help.form.io/project';
+      url += '?project=' + encodeURIComponent($scope.currentProject.name);
+      url += '&previewUrl=' + encodeURIComponent($scope.currentProject.settings.preview.url);
+      url += '&host=' + encodeURIComponent(AppConfig.serverHost);
+      url += '&protocol=' + encodeURIComponent($location.protocol());
+      url += '&repo=' + encodeURIComponent($scope.currentProject.settings.preview.repo);
+      return url;
+    };
+
+    $scope.getPlanName = ProjectPlans.getPlanName.bind(ProjectPlans);
+    $scope.getPlanLabel = ProjectPlans.getPlanLabel.bind(ProjectPlans);
+    $scope.getAPICallsLimit = ProjectPlans.getAPICallsLimit.bind(ProjectPlans);
+    $scope.getAPICallsPercent = ProjectPlans.getAPICallsPercent.bind(ProjectPlans);
+    $scope.getProgressBarClass = ProjectPlans.getProgressBarClass.bind(ProjectPlans);
   }
 ]);
 
@@ -248,11 +287,13 @@ app.controller('ProjectSettingsController', [
   '$scope',
   '$rootScope',
   '$state',
+  'GoogleAnalytics',
   'FormioAlerts',
   function(
     $scope,
     $rootScope,
     $state,
+    GoogleAnalytics,
     FormioAlerts
   ) {
     // Go to first settings section
@@ -279,6 +320,7 @@ app.controller('ProjectSettingsController', [
           type: 'success',
           message: 'Project saved.'
         });
+        GoogleAnalytics.sendEvent('Project', 'update', null, 1);
         // Reload state so alerts display and project updates.
         $state.go($state.current.name, {
           projectId: project._id
@@ -290,14 +332,30 @@ app.controller('ProjectSettingsController', [
   }
 ]);
 
+app.controller('ProjectPlanController', [
+  '$scope',
+  function($scope) {
+    $scope.submission = {
+      data: {
+        project: $scope.currentProject._id
+      }
+    };
+    $scope.$on('formSubmission', function() {
+      $scope.submitted = true;
+    });
+  }
+]);
+
 app.controller('ProjectDeleteController', [
   '$scope',
   '$state',
   'FormioAlerts',
+  'GoogleAnalytics',
   function(
     $scope,
     $state,
-    FormioAlerts
+    FormioAlerts,
+    GoogleAnalytics
   ) {
     $scope.deleteProject = function() {
       if (!$scope.currentProject || !$scope.currentProject._id) { return; }
@@ -306,6 +364,7 @@ app.controller('ProjectDeleteController', [
           type: 'success',
           message: 'Project was deleted!'
         });
+        GoogleAnalytics.sendEvent('Project', 'delete', null, 1);
         $state.go('home');
       }, FormioAlerts.onError.bind(FormioAlerts));
     };

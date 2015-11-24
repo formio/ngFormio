@@ -6,15 +6,18 @@ app.controller('UserLoginController', [
   '$scope',
   '$state',
   '$rootScope',
+  'GoogleAnalytics',
   function(
     $scope,
     $state,
-    $rootScope
+    $rootScope,
+    GoogleAnalytics
   ) {
     $scope.$on('formSubmission', function(event, submission) {
       event.stopPropagation();
       if (!submission) { return; }
       $rootScope.user = submission;
+      GoogleAnalytics.sendEvent('User', 'login', null, 1);
       $state.go('home');
     });
   }
@@ -24,15 +27,18 @@ app.controller('UserRegisterController', [
   '$scope',
   '$state',
   '$rootScope',
+  'GoogleAnalytics',
   function(
     $scope,
     $state,
-    $rootScope
+    $rootScope,
+    GoogleAnalytics
   ) {
     $scope.$on('formSubmission', function(event, submission) {
       event.stopPropagation();
       if (!submission) { return; }
       $rootScope.user = submission;
+      GoogleAnalytics.sendEvent('User', 'register', null, 1);
       $state.go('home');
     });
   }

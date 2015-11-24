@@ -20,8 +20,9 @@ angular
     'angularMoment',
     'ngCkeditor',
     'formioApp.controllers',
-    'formioApp.services',
-    'kendo.directives'
+    'formioApp.utils',
+    'kendo.directives',
+    'truncate'
   ])
   .config([
     '$stateProvider',
@@ -127,6 +128,12 @@ angular
           url: '/project',
           parent: 'project.settings',
           templateUrl: 'views/project/project-settings.html'
+        })
+        .state('project.settings.plan', {
+          url: '/plan',
+          parent: 'project.settings',
+          templateUrl: 'views/project/project-plan.html',
+          controller: 'ProjectPlanController'
         })
         .state('project.settings.email', {
           url: '/email',
@@ -239,11 +246,15 @@ angular
     '$rootScope',
     'Formio',
     'FormioAlerts',
+    'ProjectPlans',
+    '$timeout',
     function(
       $scope,
       $rootScope,
       Formio,
-      FormioAlerts
+      FormioAlerts,
+      ProjectPlans,
+      $timeout
     ) {
       $rootScope.activeSideBar = 'home';
       $rootScope.currentProject = null;
@@ -258,11 +269,26 @@ angular
       });
       $scope.projects = {};
       $scope.projectsLoading = true;
-      Formio.loadProjects().then(function(projects) {
+      // TODO: query for unlimited projects instead of this limit
+      Formio.loadProjects('?limit=9007199254740991&sort=-modified').then(function(projects) {
         $scope.projectsLoading = false;
         angular.element('#projects-loader').hide();
         $scope.projects = projects;
       }).catch(FormioAlerts.onError.bind(FormioAlerts));
+
+      $scope.showIntroVideo = function() {
+        $scope.introVideoVisible = true;
+        // Need to expand video after it's visible to have transition effect
+        $timeout(function() {
+          $scope.introVideoExpanded = true;
+        }, 50);
+      };
+
+      $scope.getPlanName = ProjectPlans.getPlanName.bind(ProjectPlans);
+      $scope.getPlanLabel = ProjectPlans.getPlanLabel.bind(ProjectPlans);
+      $scope.getAPICallsLimit = ProjectPlans.getAPICallsLimit.bind(ProjectPlans);
+      $scope.getAPICallsPercent = ProjectPlans.getAPICallsPercent.bind(ProjectPlans);
+      $scope.getProgressBarClass = ProjectPlans.getProgressBarClass.bind(ProjectPlans);
     }
   ])
   .filter('trusted', [
@@ -280,6 +306,7 @@ angular
     'FormioAlerts',
     'Formio',
     'AppConfig',
+    'GoogleAnalytics',
     '$location',
     '$window',
     function(
@@ -289,6 +316,7 @@ angular
       FormioAlerts,
       Formio,
       AppConfig,
+      GoogleAnalytics,
       $location,
       $window
     ) {
@@ -309,6 +337,7 @@ angular
       $rootScope.teamForm = AppConfig.teamForm;
       $rootScope.feedbackForm = AppConfig.feedbackForm;
       $rootScope.resetPassForm = AppConfig.resetPassForm;
+      $rootScope.planForm = AppConfig.planForm;
 
       // Start the tutorial.
       $rootScope.startTutorial = function() {
@@ -333,10 +362,12 @@ angular
       $rootScope.$state = $state;
       $rootScope.$stateParams = $stateParams;
       $rootScope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams) {
+        $window.document.body.scrollTop = $window.document.documentElement.scrollTop = 0;
         $rootScope.alerts = FormioAlerts.getAlerts();
         $rootScope.previousState = fromState.name;
         $rootScope.previousParams = fromParams;
         $rootScope.currentState = toState.name;
+        GoogleAnalytics.sendPageView();
       });
 
       var authError = function() {
@@ -407,4 +438,84 @@ angular
         }
       };
     }
-  ]);
+  ])
+  .factory('GoogleAnalytics', ['$window', '$state', function($window, $state) {
+    // Recursively build the whole state url
+    // This gets the url without substitutions, to send
+    // to Google Analytics
+    var getFullStateUrl = function(state) {
+      if(state.parent) {
+        return getFullStateUrl($state.get(state.parent)) + state.url;
+      }
+      return state.url;
+    };
+
+    return {
+      sendPageView: function() {
+        $window.ga('set', 'page', getFullStateUrl($state.current));
+        $window.ga('send', 'pageview');
+      },
+
+      sendEvent: function(category, action, label, value) {
+        $window.ga('send', 'event', category, action, label, value);
+      }
+    };
+  }])
+  .factory('ProjectPlans', ['$filter', function($filter) {
+    return {
+      plans: {
+        community: {
+          name: 'Community',
+          labelStyle: 'label-community'
+        },
+        basic: {
+          name: 'Basic',
+          labelStyle: 'label-info'
+        },
+        team1: {
+          name: 'Team',
+          labelStyle: 'label-success'
+        },
+        team2: {
+          name: 'Team',
+          labelStyle: 'label-success'
+        },
+        team3: {
+          name: 'Team',
+          labelStyle: 'label-success'
+        },
+        commercial: {
+          name: 'Commercial',
+          labelStyle: 'label-commercial'
+        }
+      },
+      getPlanName: function(plan) {
+        if(!this.plans[plan]) return '';
+        return this.plans[plan].name;
+      },
+      getPlanLabel: function(plan) {
+        if(!this.plans[plan]) return '';
+        return this.plans[plan].labelStyle;
+      },
+      getAPICallsLimit: function(apiCalls) {
+        if(!apiCalls.limit) {
+          return '∞';
+        }
+        return $filter('number')(apiCalls.limit);
+      },
+      getAPICallsPercent: function(apiCalls) {
+        if(!apiCalls.limit) {
+          return '0%';
+        }
+        var percent = apiCalls.used / apiCalls.limit * 100;
+        return (percent > 100) ? '100%' : percent + '%';
+      },
+      getProgressBarClass: function(apiCalls) {
+        if(!apiCalls || !apiCalls.limit) return 'progress-bar-success';
+        var percentUsed = apiCalls.used / apiCalls.limit;
+        if(percentUsed >= 0.9) return 'progress-bar-danger';
+        if(percentUsed >= 0.7) return 'progress-bar-warning';
+        return 'progress-bar-success';
+      }
+    };
+  }]);

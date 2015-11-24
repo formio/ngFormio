@@ -1,6 +1,10 @@
 @import "variables.scss";
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+  display: none !important;
+}
+
 body {
-  padding-top: 50px;
+  padding-top: 45px;
 }
 
 .btn-file {
@@ -190,6 +194,10 @@ ul.dropdown-menu {
 .main {
   padding: 20px;
 }
+
+#main-wrapper {
+  min-height: 80vh;
+}
 @media (min-width: 768px) {
   #main-wrapper {
     margin: 0;
@@ -308,6 +316,10 @@ pre code {
 .required-field:after {
   color:red;
   content:" *";
+}
+
+.panel-default .panel-title .text-muted {
+  color: #999;
 }
 
 /***************************** Feedback *****************************/
@@ -582,4 +594,224 @@ footer {
 .k-filter-menu input[type=radio] {
   margin-right: 5px;
   margin-left: 10px;
+}
+
+/***************************** Landing Page *****************************/
+.projects {
+  padding-top: 20px;
+  padding-bottom: 50px;
+  .project-create {
+    display: block;
+    text-decoration: none;
+    background-color: transparentize($brand-primary, .75);
+    border: 4px dashed transparentize($brand-primary, .75);
+    color: transparentize($brand-primary, .25);
+    text-align: center;
+    height: 200px;
+    margin-bottom: 30px;
+    .create-link {
+      display: block;
+      padding-top: 50px;
+      .glyphicon {
+        margin-top: 5px;
+        background: transparentize($brand-primary, .25);
+        color: #FFF;
+        padding: 6px;
+        padding-left: 8px;
+        font-size: 15px;
+        border-radius: 100%;
+      }
+    }
+    transition: .15s;
+    &:hover {
+      background-color: lighten(transparentize($brand-primary, .75), 10%);
+    }
+    &:active {
+      background-color: lighten(transparentize($brand-primary, .75), 20%);
+    }
+  }
+  .project {
+    display: block;
+    position: relative;
+    text-decoration: none;
+    background-color: $brand-primary;
+    border: 1px solid darken($brand-primary, 10%);
+    overflow: hidden;
+    transition: .15s;
+    &:hover {
+      background-color: lighten($brand-primary, 5%);
+    }
+    &:active {
+      background-color: lighten($brand-primary, 10%);
+    }
+    color: $gray-lighter;
+    height: 200px;
+    margin-bottom: 30px;
+    padding: 10px 15px;
+    .project-title {
+      font-weight: 600;
+    }
+    .project-plan {
+      margin-top: 9px;
+    }
+    .project-url {
+      // Lighten this up a bit so it's easier to read
+      color: saturate(lighten($brand-secondary, 10%), 20%);
+    }
+
+    .progress-label {
+      padding-top: 10px;
+      color: transparentize($gray-lighter, .33);
+      margin-bottom: 0;
+    }
+    .progress {
+      background-color: darken($brand-primary, 10%);
+      border: 1px solid darken($brand-primary, 20%);
+      position: relative;
+      span {
+        position: absolute;
+        display: block;
+        top: -1px;
+        width: 100%;
+        text-align: center;
+      }
+    }
+  }
+}
+
+.row.row-video {
+  padding: 15px 0 0;
+  $gradient-start: rgba(241,252,251,1);
+  $gradient-end: rgba(178,219,229,1);
+  .video-banner {
+    display: block;
+    height: 100px;
+    padding: 15px 0;
+    position: relative;
+    text-align: center;
+    background: -moz-radial-gradient(center, circle cover, $gradient-start 0%, $gradient-end 100%); /* FF3.6+ */
+    background: -webkit-radial-gradient(center, circle cover, $gradient-start 0%, $gradient-end 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-radial-gradient(center, circle cover, $gradient-start 0%, $gradient-end 100%); /* Opera 11.10+ */
+    background: -ms-radial-gradient(center, circle cover, $gradient-start 0%, $gradient-end 100%); /* IE 10+ */
+    background: radial-gradient(circle at center, $gradient-start 0%, $gradient-end 100%);/* W3C */
+    img {
+      height: 100%;
+      width: auto;
+    }
+
+    .video-play-icon {
+      position: absolute;
+      width: 100%;
+      top: 30%;
+      font-size: 24px;
+      color: #FFF;
+      .icon-bg {
+        background: rgba(0, 0, 0, .75);
+        transition: .15s;
+        border-radius: 100%;
+        width: 40px;
+        height: 40px;
+        display: inline-block;
+        padding-top: 4px;
+        padding-left: 2px;
+      }
+
+    }
+
+    &:hover .icon-bg{
+      background: $brand-secondary;
+    }
+  }
+  #intro-video-container {
+    // A trick to get video to size itself responsively
+    // with a constant aspect ratio
+    position: relative;
+    padding-top: 30px;
+    height: 100px;
+    overflow: hidden;
+    transition: padding-bottom .5s;
+    &.video-open {
+      height: 0;
+      padding-bottom: 42.85%; // ~21:9 aspect ratio
+    }
+
+    #intro-video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+  }
+  .video-banner, #intro-video-container {
+    margin-bottom: 5px;
+  }
+}
+
+.label-community {
+  background-color: darken($brand-primary, 10%);
+  color: #FFF;
+}
+
+.label-commercial {
+  background-color: #CD69C9;
+  color: #FFF;
+}
+
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.col-code {
+  width: 100%;
+}
+
+// NOTE: this needs to be applied to all cols in a row
+.col-vertical-center {
+  display: inline-block;
+  vertical-align: middle;
+  float: none;
+}
+
+/***************************** Create Project *****************************/
+
+.template-card {
+  margin-bottom: 10px;
+  margin-top: 10px;
+  border: 1px solid lightgray;
+  padding: 10px 5px;
+  cursor: pointer;
+  transition: .15s;
+  &:hover {
+    background: lighten($brand-secondary, 40%);
+  }
+  &.template-card-selected, &.template-card-selected:hover {
+    background: $brand-secondary;
+    color: #FFF;
+    border: 1px solid darken($brand-secondary, 10%);
+    .text-muted {
+      color: #FFF;
+    }
+  }
+}
+
+.col-more-templates {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/***************************** Edit Project *****************************/
+.panel-project-info {
+  .media-icon-large {
+    font-size: 48px;
+    width: 64px;
+    text-align: center;
+  }
+
+  .progress {
+    margin-top: 10px;
+    margin-bottom: 0;
+  }
 }

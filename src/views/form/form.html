@@ -1,5 +1,5 @@
 <ul class="nav nav-pills form-nav">
-  <li role="presentation"><span ng-switch="form.type" class="navbar-text form-title">{{ form.title }}</span></li>
+  <li role="presentation"><span ng-switch="form.type" class="navbar-text form-title">{{ form.title | characters:25:true}}</span></li>
   <li role="presentation"><span class="resource-label label-default">{{ form.type | uppercase }}</span></li>
   <li role="presentation" class="form-nav-right" ng-class="{active:isActive('project.form.submission')}"><a ui-sref="project.form.submission.index()">Submissions</a></li>
   <li role="presentation" class="form-nav-right" ng-class="{active:isActive('project.form.permission')}"><a ui-sref="project.form.permission()">Permissions</a></li>
