@@ -3,6 +3,8 @@
 var _ = require('lodash');
 var Q = require('q');
 var debug = {
+  teamAll: require('debug')('formio:teams:teamAll'),
+  teamOwn: require('debug')('formio:teams:teamOwn'),
   leaveTeams: require('debug')('formio:teams:leaveTeams'),
   loadTeams: require('debug')('formio:teams:loadTeams'),
   getTeams: require('debug')('formio:teams:getTeams')
@@ -11,6 +13,48 @@ var debug = {
 module.exports = function(app, formioServer) {
   // The formio teams resource id.
   var _teamResource = null;
+
+  /**
+   * Expose the functionality to find all of a users teams.
+   */
+  app.get('/team/all', formioServer.formio.middleware.tokenHandler, function(req, res, next) {
+    if (!req.token || !req.token.user._id) {
+      return res.sendStatus(401);
+    }
+
+    getTeams(req.token.user, true, true)
+      .then(function(teams) {
+        teams = teams || [];
+
+        debug.teamAll(teams);
+        return res.status(200).json(teams);
+      }, function(err) {
+        debug.teamAll(err);
+        return res.sendStatus(400);
+      });
+  });
+
+  /**
+   * Expose the functionality to find all the teams a user owns.
+   */
+  app.get('/team/own', formioServer.formio.middleware.tokenHandler, function(req, res, next) {
+    debug.teamOwn(!req.token || !req.token.user._id);
+
+    if (!req.token || !req.token.user._id) {
+      return res.sendStatus(401);
+    }
+
+    getTeams(req.token.user, false, true)
+      .then(function(teams) {
+        teams = teams || [];
+
+        debug.teamOwn(teams);
+        return res.status(200).json(teams);
+      }, function(err) {
+        debug.teamOwn(err);
+        return res.sendStatus(400);
+      });
+  });
 
   /**
    * Expose the functionality to allow a user leave a team.

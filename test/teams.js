@@ -135,6 +135,93 @@ module.exports = function(app, template, hook) {
           });
       });
 
+      it('A Team member should see the Team when they request /team/all', function(done) {
+        request(app)
+          .get('/team/all')
+          .set('x-jwt-token', template.users.user1.token)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end(function(err, res) {
+            if (err) {
+              return done(err);
+            }
+
+            var response = res.body;
+            assert.equal(response.length, 1);
+            assert.equal(response[0]._id, template.team1._id);
+
+            // Store the JWT for future API calls.
+            template.users.user1.token = res.headers['x-jwt-token'];
+
+            done();
+          });
+      });
+
+      it('A Team member should not see the Team when they request /team/own', function(done) {
+        request(app)
+          .get('/team/own')
+          .set('x-jwt-token', template.users.user1.token)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end(function(err, res) {
+            if (err) {
+              return done(err);
+            }
+
+            var response = res.body;
+            assert.equal(response.length, 0);
+
+            // Store the JWT for future API calls.
+            template.users.user1.token = res.headers['x-jwt-token'];
+
+            done();
+          });
+      });
+
+      it('A Team owner should see their Team when they request /team/all', function(done) {
+        request(app)
+          .get('/team/all')
+          .set('x-jwt-token', template.formio.owner.token)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end(function(err, res) {
+            if (err) {
+              return done(err);
+            }
+
+            var response = res.body;
+            assert.equal(response.length, 1);
+            assert.equal(response[0]._id, template.team1._id);
+
+            // Store the JWT for future API calls.
+            template.formio.owner.token = res.headers['x-jwt-token'];
+
+            done();
+          });
+      });
+
+      it('A Team owner should see their Team when they request /team/own', function(done) {
+        request(app)
+          .get('/team/own')
+          .set('x-jwt-token', template.formio.owner.token)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end(function(err, res) {
+            if (err) {
+              return done(err);
+            }
+
+            var response = res.body;
+            assert.equal(response.length, 1);
+            assert.equal(response[0]._id, template.team1._id);
+
+            // Store the JWT for future API calls.
+            template.formio.owner.token = res.headers['x-jwt-token'];
+
+            done();
+          });
+      });
+
       it('A Project Owner should not be able to add a Team they own to their project, if its not on a team plan', function(done) {
         var teamAccess = {type: 'team_read', roles: [template.team1._id]};
 
