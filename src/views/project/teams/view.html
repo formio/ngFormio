@@ -1,0 +1,25 @@
+<div class="alert alert-warning" ng-show="!teamsLoading">
+  <i class="glyphicon glyphicon-exclamation-sign"></i>&nbsp;Teams are groups of Form.io users that work together on projects. Teams are available for <a href="https://www.form.io/pricing">TeamPro</a> users.
+</div>
+<table ng-show="!teamsLoading && teams.length" class="table table-striped">
+  <tbody>
+  <tr ng-repeat="team in teams">
+    <td>
+      <div class="row">
+        <div class="col-sm-5">
+          <h4><a ui-sref="team.edit({teamId: team._id})">{{ team.data.name }}</a></h4>
+        </div>
+        <div class="col-sm-7">
+          <div class="button-group pull-right" style="display:flex;">
+            <a ui-sref="team.edit({teamId: team._id})" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-edit"></span> Edit</a>&nbsp;
+            <a ui-sref="team.delete({teamId: team._id})" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-trash"></span></a>
+          </div>
+        </div>
+      </div>
+    </td>
+  </tr>
+  </tbody>
+</table>
+<div class="text-right">
+  <a ui-sref="createTeam()" class="btn btn-success"><span class="glyphicon glyphicon-plus"></span> New Team</a>
+</div>

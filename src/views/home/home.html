@@ -37,37 +37,23 @@
   </div>
 </div>
 <div class="row">
-  <div class="panel panel-primary">
-    <div class="panel-heading">
-      <h3 class="panel-title"><a ui-sref="teamIndex()" style="text-decoration:none;"><i class="fa fa-users"></i> My Teams</a></h3>
-    </div>
-    <div class="panel-body">
-      <i id="team-loader" style="font-size: 2em;" class="fa fa-spinner fa-pulse"></i>
-      <div class="well" ng-show="!teamsLoading">
-        Teams are groups of Form.io users that work together on projects. Teams are available for <a href="https://www.form.io/pricing">TeamPro</a> users.
+  <h2 class="text-center">Teams</h2>
+  <div class="col-sm-12 teams">
+    <div class="row">
+      <div class="col-sm-4">
+        <a class="team-create" ui-sref="createTeam()">
+          <h4><p class="create-link">Create Team <br><span class="glyphicon glyphicon-plus circle"></span></p></h4>
+        </a>
       </div>
-      <table ng-show="!teamsLoading && teams.length" class="table table-striped">
-        <tbody>
-        <tr ng-repeat="team in teams">
-          <td>
-            <div class="row">
-              <div class="col-sm-5">
-                <h4><a ui-sref="team.edit({teamId: team._id})">{{ team.data.name }}</a></h4>
-              </div>
-              <div class="col-sm-7">
-                <div class="button-group pull-right" style="display:flex;">
-                  <a ui-sref="team.edit({teamId: team._id})" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-edit"></span> Edit</a>&nbsp;
-                  <a ui-sref="team.delete({teamId: team._id})" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-trash"></span></a>
-                </div>
-              </div>
-            </div>
-          </td>
-        </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="panel-footer text-right">
-      <a ui-sref="createTeam()" class="btn btn-success"><span class="glyphicon glyphicon-plus"></span> New Team</a>
+      <div class="col-sm-4" ng-repeat="team in teams">
+        <a class="team" ui-sref="team.edit({teamId: team._id})" title="{{ team.data.name }}">
+          <p class="team-owner pull-right"><small>
+            <span class="label label-team">{{ team.owner === user._id ? 'OWNER' : 'MEMBER'}}</span>
+          </small></p>
+          <h4 class="team-title ellipsis">{{ team.data.name }}</h4>
+          <p class="team-members ellipsis"><i class="fa fa-users"></i>&nbsp;<strong>{{ team.data.members.length || 0 }}</strong></p>
+        </a>
+      </div>
     </div>
   </div>
 </div>

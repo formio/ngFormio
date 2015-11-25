@@ -228,6 +228,8 @@ app.controller('ProjectController', [
     $scope.formio = new Formio('/project/' + $stateParams.projectId);
     $scope.currentProject = {_id: $stateParams.projectId, access: []};
     $scope.rolesLoading = true;
+    $scope.teamsLoading = true;
+
     $scope.loadProjectPromise = $scope.formio.loadProject().then(function(result) {
       $scope.currentProject = result;
       $rootScope.currentProject = result;
@@ -236,6 +238,10 @@ app.controller('ProjectController', [
     }).then(function(result) {
       $scope.currentProjectRoles = result.data;
       $scope.rolesLoading = false;
+      return Formio.request(AppConfig.apiBase + '/team/all', 'GET');
+    }).then(function(result) {
+      $scope.teams = result;
+      $scope.teamsLoading = false;
     }).catch(function(err) {
       if (!err) {
         FormioAlerts.addAlert({

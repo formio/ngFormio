@@ -597,10 +597,12 @@ footer {
 }
 
 /***************************** Landing Page *****************************/
-.projects {
+.projects,
+.teams {
   padding-top: 20px;
   padding-bottom: 50px;
-  .project-create {
+  .project-create,
+  .team-create {
     display: block;
     text-decoration: none;
     background-color: transparentize($brand-primary, .75);
@@ -630,7 +632,8 @@ footer {
       background-color: lighten(transparentize($brand-primary, .75), 20%);
     }
   }
-  .project {
+  .project,
+  .team {
     display: block;
     position: relative;
     text-decoration: none;
@@ -648,10 +651,12 @@ footer {
     height: 200px;
     margin-bottom: 30px;
     padding: 10px 15px;
-    .project-title {
+    .project-title,
+    .team-name {
       font-weight: 600;
     }
-    .project-plan {
+    .project-plan,
+    .team-owner {
       margin-top: 9px;
     }
     .project-url {
@@ -675,6 +680,39 @@ footer {
         width: 100%;
         text-align: center;
       }
+    }
+  }
+}
+
+.teams {
+  .team-create {
+    background-color: transparentize($brand-secondary, .75);
+    border: 4px dashed transparentize($brand-secondary, .75);
+    color: transparentize($brand-secondary, .25);
+    .create-link {
+      .glyphicon {
+        background: transparentize($brand-secondary, .25);
+      }
+    }
+    &:hover {
+      background-color: lighten(transparentize($brand-secondary, .75), 10%);
+    }
+    &:active {
+      background-color: lighten(transparentize($brand-secondary, .75), 20%);
+    }
+  }
+  .team {
+    background-color: $brand-secondary;
+    border: 1px solid darken($brand-secondary, 10%);
+    &:hover {
+      background-color: lighten($brand-secondary, 5%);
+    }
+    &:active {
+      background-color: lighten($brand-secondary, 10%);
+    }
+    .team-url {
+      // Lighten this up a bit so it's easier to read
+      color: saturate(lighten($brand-primary, 10%), 20%);
     }
   }
 }
@@ -755,6 +793,11 @@ footer {
 
 .label-commercial {
   background-color: #CD69C9;
+  color: #FFF;
+}
+
+.label-team {
+  background-color: darken($brand-secondary, 10%);
   color: #FFF;
 }
 

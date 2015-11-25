@@ -173,6 +173,29 @@ angular
           templateUrl: 'views/project/roles/delete.html',
           controller: 'RoleController'
         })
+        .state('project.settings.teams', {
+          abstract: true,
+          url: '/teams',
+          parent: 'project.settings',
+          templateUrl: 'views/project/teams/teams.html'
+        })
+        .state('project.settings.teams.view', {
+          url: '',
+          parent: 'project.settings.teams',
+          templateUrl: 'views/project/teams/view.html'
+        })
+        .state('project.settings.teams.edit', {
+          url: '/:teamId/edit',
+          parent: 'project.settings.teams',
+          controller: 'TeamEditController',
+          templateUrl: 'views/project/edit.html'
+        })
+        .state('project.settings.teams.delete', {
+          url: '/:teamId/delete',
+          parent: 'project.settings.teams',
+          controller: 'TeamDeleteController',
+          templateUrl: 'views/project/delete.html'
+        })
         .state('project.settings.cors', {
           url: '/cors',
           parent: 'project.settings',
@@ -259,14 +282,14 @@ angular
       $rootScope.activeSideBar = 'home';
       $rootScope.currentProject = null;
       $rootScope.currentForm = null;
+
       $scope.teams = [];
       $scope.teamsLoading = true;
-      $scope.teamsUrl = $rootScope.teamForm + '/submission';
-      Formio.request($scope.teamsUrl, 'GET').then(function(teams) {
-        $scope.teams = teams;
+      Formio.request($scope.appConfig.apiBase + '/team/all', 'GET').then(function(results) {
+        $scope.teams = results;
         $scope.teamsLoading = false;
-        angular.element('#team-loader').hide();
       });
+
       $scope.projects = {};
       $scope.projectsLoading = true;
       // TODO: query for unlimited projects instead of this limit
