@@ -364,6 +364,28 @@ module.exports = function(app, template, hook) {
           });
       });
 
+      it('A Project Owner should be able to access /team/project/:projectId to see all the teams associated with the project', function(done) {
+        request(app)
+          .get('/team/project/' + template.project._id)
+          .set('x-jwt-token', template.formio.owner.token)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end(function(err, res) {
+            if (err) {
+              return done(err);
+            }
+
+            var response = res.body;
+            assert.equal(response.length, 1);
+            assert.equal(response[0]._id, template.team1._id);
+
+            // Store the JWT for future API calls.
+            template.formio.owner.token = res.headers['x-jwt-token'];
+
+            done();
+          });
+      });
+
       it('A Team member should be able to remove themselves from the Team', function(done) {
         request(app)
           .post('/team/' + template.team1._id + '/leave')
@@ -952,6 +974,28 @@ module.exports = function(app, template, hook) {
           });
       });
 
+      it('A Team member with team_read should be able to access /team/project/:projectId', function(done) {
+        request(app)
+          .get('/team/project/' + template.project._id)
+          .set('x-jwt-token', template.formio.user1.token)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end(function(err, res) {
+            if (err) {
+              return done(err);
+            }
+
+            var response = res.body;
+            assert.equal(response.length, 1);
+            assert.equal(response[0]._id, template.team1._id);
+
+            // Store the JWT for future API calls.
+            template.formio.user1.token = res.headers['x-jwt-token'];
+
+            done();
+          });
+      });
+
       it('A Team member with team_read, should not be able to read the project settings data', function(done) {
         request(app)
           .get('/project/' + template.project._id)
@@ -1423,6 +1467,28 @@ module.exports = function(app, template, hook) {
 
             var response = res.body;
             assert.deepEqual(_.omit('modified', template.project), _.omit('modified', response));
+
+            // Store the JWT for future API calls.
+            template.formio.user1.token = res.headers['x-jwt-token'];
+
+            done();
+          });
+      });
+
+      it('A Team member with team_write should be able to access /team/project/:projectId', function(done) {
+        request(app)
+          .get('/team/project/' + template.project._id)
+          .set('x-jwt-token', template.formio.user1.token)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end(function(err, res) {
+            if (err) {
+              return done(err);
+            }
+
+            var response = res.body;
+            assert.equal(response.length, 1);
+            assert.equal(response[0]._id, template.team1._id);
 
             // Store the JWT for future API calls.
             template.formio.user1.token = res.headers['x-jwt-token'];
@@ -1980,6 +2046,28 @@ module.exports = function(app, template, hook) {
 
             var response = res.body;
             assert.deepEqual(_.omit('modified', template.project), _.omit('modified', response));
+
+            // Store the JWT for future API calls.
+            template.formio.user1.token = res.headers['x-jwt-token'];
+
+            done();
+          });
+      });
+
+      it('A Team member with team_admin should be able to access /team/project/:projectId', function(done) {
+        request(app)
+          .get('/team/project/' + template.project._id)
+          .set('x-jwt-token', template.formio.user1.token)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end(function(err, res) {
+            if (err) {
+              return done(err);
+            }
+
+            var response = res.body;
+            assert.equal(response.length, 1);
+            assert.equal(response[0]._id, template.team1._id);
 
             // Store the JWT for future API calls.
             template.formio.user1.token = res.headers['x-jwt-token'];
