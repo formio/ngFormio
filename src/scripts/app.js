@@ -182,19 +182,26 @@ angular
         .state('project.settings.teams.view', {
           url: '',
           parent: 'project.settings.teams',
+          controller: 'ProjectTeamViewController',
           templateUrl: 'views/project/teams/view.html'
+        })
+        .state('project.settings.teams.add', {
+          url: '/add',
+          parent: 'project.settings.teams',
+          controller: 'ProjectTeamEditController',
+          templateUrl: 'views/project/teams/edit.html'
         })
         .state('project.settings.teams.edit', {
           url: '/:teamId/edit',
           parent: 'project.settings.teams',
-          controller: 'TeamEditController',
-          templateUrl: 'views/project/edit.html'
+          controller: 'ProjectTeamEditController',
+          templateUrl: 'views/project/teams/edit.html'
         })
         .state('project.settings.teams.delete', {
           url: '/:teamId/delete',
           parent: 'project.settings.teams',
-          controller: 'TeamDeleteController',
-          templateUrl: 'views/project/delete.html'
+          controller: 'ProjectTeamDeleteController',
+          templateUrl: 'views/project/teams/delete.html'
         })
         .state('project.settings.cors', {
           url: '/cors',
@@ -541,4 +548,23 @@ angular
         return 'progress-bar-success';
       }
     };
-  }]);
+  }])
+  .factory('TeamPermissions', function() {
+    return {
+      permissions: {
+        team_read: {
+          label: 'Read'
+        },
+        team_write: {
+          label: 'Write'
+        },
+        team_admin: {
+          label: 'Admin'
+        }
+      },
+      getPermissionLabel: function(type) {
+        if(!this.permissions[type]) return '';
+        return this.permissions[type].label;
+      }
+    }
+  });

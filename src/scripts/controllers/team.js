@@ -42,6 +42,26 @@ app.controller('TeamController', [
   }
 ]);
 
+app.controller('TeamAddController', [
+  '$scope',
+  '$state',
+  'FormioAlerts',
+  function(
+    $scope,
+    $state,
+    FormioAlerts
+  ) {
+    $scope.$on('formSubmission', function(event) {
+      event.stopPropagation();
+      FormioAlerts.addAlert({
+        type: 'success',
+        message: 'Team was deleted.'
+      });
+      $state.go('project.settings.teams.view');
+    });
+  }
+]);
+
 app.controller('TeamEditController', [
   '$scope',
   '$state',
