@@ -36,7 +36,7 @@ module.exports = function(app, formioServer) {
         return res.sendStatus(401);
       }
 
-      getProjectTeams(req, req.projectId, function(err, teams) {
+      getProjectTeams(req, req.projectId, function(err, teams, permissions) {
         if(err) {
           return res.sendStatus(400);
         }
@@ -51,6 +51,15 @@ module.exports = function(app, formioServer) {
             return res.sendStatus(400);
           })
           .then(function(teams) {
+            // Inject the original team permissions with each team.
+            teams = _.forEach(teams, function(team) {
+              if(team._id && permissions[team._id]) {
+                team.permission = permissions[team._id];
+              }
+
+              return team;
+            });
+
             return res.status(200).json(teams);
           }, function(err) {
             return res.sendStatus(400);
@@ -305,16 +314,34 @@ module.exports = function(app, formioServer) {
         return next(err);
       }
 
-      var teams = _.flatten(_.pluck(_.filter(project.access, function(permission) {
+      // Get the teams and their access.
+      var teams = _.filter(project.access, function(permission) {
         if(_.startsWith(permission.type, 'team_')) {
           return true;
         }
 
         return false;
-      }), 'roles')) || [];
+      });
       debug.getProjectTeams(teams);
 
-      next(null, teams);
+
+      // Build the team:permission map.
+      var permissions = {};
+      _.forEach(teams, function(permission) {
+        // Iterate each permission role and associate it with the original permission type.
+        permission.roles = permission.roles || [];
+        _.forEach(permission.roles, function(role) {
+          permissions[role] = permission.type;
+        });
+      });
+      debug.getProjectTeams(permissions);
+
+
+      // Separate the teams from their roles for a flat list.
+      teams = _.flatten(_.pluck(teams, 'roles')) || [];
+      debug.getProjectTeams(teams);
+
+      next(null, teams, permissions);
     });
   };
 

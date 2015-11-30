@@ -989,6 +989,9 @@ module.exports = function(app, template, hook) {
             assert.equal(response.length, 1);
             assert.equal(response[0]._id, template.team1._id);
 
+            // Check that the teams role was injected into the response.
+            assert.equal(response[0].permission, 'team_read');
+
             // Store the JWT for future API calls.
             template.formio.user1.token = res.headers['x-jwt-token'];
 
@@ -1489,6 +1492,9 @@ module.exports = function(app, template, hook) {
             var response = res.body;
             assert.equal(response.length, 1);
             assert.equal(response[0]._id, template.team1._id);
+
+            // Check that the teams role was injected into the response.
+            assert.equal(response[0].permission, 'team_write');
 
             // Store the JWT for future API calls.
             template.formio.user1.token = res.headers['x-jwt-token'];
@@ -2068,6 +2074,9 @@ module.exports = function(app, template, hook) {
             var response = res.body;
             assert.equal(response.length, 1);
             assert.equal(response[0]._id, template.team1._id);
+
+            // Check that the teams role was injected into the response.
+            assert.equal(response[0].permission, 'team_admin');
 
             // Store the JWT for future API calls.
             template.formio.user1.token = res.headers['x-jwt-token'];
