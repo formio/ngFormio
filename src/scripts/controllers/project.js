@@ -448,9 +448,45 @@ app.controller('ProjectTeamEditController', [
 
 app.controller('ProjectTeamDeleteController', [
   '$scope',
+  '$stateParams',
+  'FormioAlerts',
+  'GoogleAnalytics',
+  '$state',
   function(
-    $scope
+    $scope,
+    $stateParams,
+    FormioAlerts,
+    GoogleAnalytics,
+    $state
   ) {
+    $scope.removeTeam = _.filter($scope.currentProjectTeams, {_id: $stateParams.teamId})[0];
+    $scope.saveTeam = function() {
+      if(!$scope.removeTeam || !$scope.removeTeam) return $state.go('project.settings.teams.view', null, {reload: true});
+
+      // Search the present permissions to remove the given permission.
+      var access = $scope.currentProject.access ||  [];
+      access = _.forEach(access, function(permission) {
+        permission.roles = permission.roles || [];
+        permission.roles = _.without(permission.roles, $scope.removeTeam._id);
+      });
+
+      // Update the current project access with the new team access.
+      $scope.currentProject.access = access;
+
+      // Use the formio service to save the current project.
+      if (!$scope.currentProject._id) { return FormioAlerts.onError(new Error('No Project found.')); }
+      $scope.formio.saveProject($scope.currentProject).then(function(project) {
+        FormioAlerts.addAlert({
+          type: 'success',
+          message: 'Team removed.'
+        });
+        GoogleAnalytics.sendEvent('Project', 'update', null, 1);
+        // Reload state so alerts display and project updates.
+        $state.go('project.settings.teams.view', null, {reload: true});
+      }, function(error) {
+        FormioAlerts.onError(error);
+      });
+    };
   }
 ]);
 
