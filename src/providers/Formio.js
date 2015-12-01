@@ -10,11 +10,16 @@ module.exports = function() {
     setBaseUrl: Formio.setBaseUrl,
     cacheOfflineProject: Formio.cacheOfflineProject,
     clearCache: Formio.clearCache,
-    clearOfflineCache: Formio.clearOfflineCache,
-    setOffline: Formio.setOffline,
-    isOffline: Formio.isOffline,
+    clearOfflineData: Formio.clearOfflineData,
+    forceOffline: Formio.forceOffline,
+    isForcedOffline: Formio.isForcedOffline,
+    queueSubmissions: Formio.queueSubmissions,
     offline: Formio.offline,
-    dequeueOfflineRequests: Formio.dequeueOfflineRequests,
+    dequeueSubmissions: Formio.dequeueSubmissions,
+    submissionQueueLength: Formio.submissionQueueLength,
+    getNextQueuedSubmission: Formio.getNextQueuedSubmission,
+    setNextQueuedSubmission: Formio.setNextQueuedSubmission,
+    skipNextQueuedSubmission: Formio.skipNextQueuedSubmission,
     setDomain: function(dom) {
       // Remove this?
     },
@@ -48,6 +53,19 @@ module.exports = function() {
         Formio.prototype.makeRequest = function() {
           return $q.when(makeRequest.apply(this, arguments));
         };
+
+        // Broadcast offline events from $rootScope
+        ['queue', 'dequeue', 'requeue', 'formSubmission', 'formError', 'queueEmpty']
+        .forEach(function(offlineEvent) {
+          Formio.offline.on(offlineEvent, function() {
+            var event = 'formio.offline.' + offlineEvent;
+            var args = [].splice.call(arguments, 0);
+            args = [event].concat(args);
+            $rootScope.$apply(function() {
+              $rootScope.$broadcast.apply($rootScope, args);
+            });
+          });
+        });
 
         // Return the formio interface.
         return Formio;

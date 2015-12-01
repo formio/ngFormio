@@ -20,7 +20,7 @@ module.exports = function() {
       ) {
         $scope.formio = FormioScope.register($scope, $element, {
           form: true,
-          submissions: false
+          submissions: true
         });
 
         $scope.tableView = function(component) {
