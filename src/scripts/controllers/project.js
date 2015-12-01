@@ -394,14 +394,15 @@ app.controller('ProjectTeamEditController', [
     // Only allow users to select teams that do not have permissions yet.
     var current = _.pluck($scope.currentProjectTeams, '_id');
 
-    // If editing a old permission, allow it to be selected again.
+    // If editing a old permission, only allow the current team to be edited.
     if($scope.addTeam._id) {
-      current = _.without(current, $scope.addTeam._id);
+      $scope.uniqueEligibleTeams = _.filter($scope.currentProjectTeams, {_id: $scope.addTeam._id});
     }
-
-    $scope.uniqueEligibleTeams = _.filter($scope.currentProjectEligibleTeams, function(team) {
-      return (current.indexOf(team._id) === -1);
-    });
+    else {
+      $scope.uniqueEligibleTeams = _.filter($scope.currentProjectEligibleTeams, function(team) {
+        return (current.indexOf(team._id) === -1);
+      });
+    }
 
     // Save the new team access with the existing project permissions.
     $scope.saveTeam = function() {
