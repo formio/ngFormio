@@ -1939,7 +1939,8 @@ module.exports = function() {
       src: '=',
       form: '=',
       submissions: '=',
-      perPage: '='
+      perPage: '=',
+      onClickSubmission: '&'
     },
     templateUrl: 'formio/submissions.html',
     controller: [
@@ -2401,15 +2402,15 @@ app.run([
             '</tr>' +
           '</thead>' +
           '<tbody>' +
-            '<tr ng-repeat="submission in _submissions">' +
+            '<tr ng-repeat="submission in _submissions" class="formio-submission" ng-click="onClickSubmission({submission:submission})">' +
               '<td ng-repeat="component in _form.components | flattenComponents" ng-if="tableView(component)">{{ fieldData(submission.data, component) }}</td>' +
               '<td>{{ submission.created | amDateFormat:\'l, h:mm:ss a\' }}</td>' +
               '<td>{{ submission.modified | amDateFormat:\'l, h:mm:ss a\' }}</td>' +
               '<td>' +
                 '<div class="button-group" style="display:flex;">' +
-                  '<a ng-click="$emit(\'submissionView\', submission)" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-eye-open"></span></a>&nbsp;' +
-                  '<a ng-click="$emit(\'submissionEdit\', submission)" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-edit"></span></a>&nbsp;' +
-                  '<a ng-click="$emit(\'submissionDelete\', submission)" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove-circle"></span></a>' +
+                  '<a ng-click="$emit(\'submissionView\', submission); $event.stopPropagation();" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-eye-open"></span></a>&nbsp;' +
+                  '<a ng-click="$emit(\'submissionEdit\', submission); $event.stopPropagation();" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-edit"></span></a>&nbsp;' +
+                  '<a ng-click="$emit(\'submissionDelete\', submission); $event.stopPropagation();" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove-circle"></span></a>' +
                 '</div>' +
               '</td>' +
             '</tr>' +

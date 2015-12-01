@@ -6,7 +6,8 @@ module.exports = function() {
       src: '=',
       form: '=',
       submissions: '=',
-      perPage: '='
+      perPage: '=',
+      onClickSubmission: '&'
     },
     templateUrl: 'formio/submissions.html',
     controller: [
