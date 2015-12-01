@@ -7,7 +7,14 @@
   </thead>
   <tbody>
     <tr ng-repeat="member in team.data.members">
-      <td>{{ member.data.name }}</td>
+      <td>
+        <div class="col-sm-11">
+          {{ member.data.name }}
+        </div>
+        <div class="col-sm-1">
+          <button ng-show="(team.owner !== member._id) && (member._id === user._id)" class="btn btn-danger btn-xs" ng-click="leaveTeam(team._id)">Leave</button>
+        </div>
+      </td>
     </tr>
   </tbody>
 </table>

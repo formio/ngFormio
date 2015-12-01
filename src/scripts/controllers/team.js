@@ -42,6 +42,49 @@ app.controller('TeamController', [
   }
 ]);
 
+app.controller('TeamViewController', [
+  '$scope',
+  '$stateParams',
+  '$rootScope',
+  'Formio',
+  'AppConfig',
+  'FormioAlerts',
+  'GoogleAnalytics',
+  '$state',
+  function(
+    $scope,
+    $stateParams,
+    $rootScope,
+    Formio,
+    AppConfig,
+    FormioAlerts,
+    GoogleAnalytics,
+    $state
+  ) {
+    $scope.leaveTeam = function(id) {
+      // Always clear cache for the current teams.
+      Formio.clearCache();
+
+      if(!id) return $state.go('home', null, {reload: true});
+
+      Formio.request(AppConfig.apiBase + '/team/' + id + '/leave', 'POST')
+        .then(function() {
+          FormioAlerts.addAlert({
+            type: 'success',
+            message: 'Team membership updated.'
+          });
+          GoogleAnalytics.sendEvent('Submission', 'update', null, 1);
+
+          // Reload state so alerts display and project updates.
+          $state.go('home', null, {reload: true});
+        }, function(err) {
+          console.log(err);
+          $state.go('home', null, {reload: true});
+        });
+    };
+  }
+]);
+
 app.controller('TeamAddController', [
   '$scope',
   '$state',

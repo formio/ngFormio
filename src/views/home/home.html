@@ -36,7 +36,7 @@
     </div>
   </div>
 </div>
-<div class="row" ng-show="teamsEnabled || teamMember">
+<div class="row" ng-show="!teamsLoading && (teamsEnabled || teamMember)">
   <h2 class="text-center">Teams</h2>
   <div class="col-sm-12 teams">
     <div class="row">
@@ -46,7 +46,7 @@
         </a>
       </div>
       <div class="col-sm-4" ng-repeat="team in teams">
-        <a class="team" ui-sref="team.edit({teamId: team._id})" title="{{ team.data.name }}">
+        <a class="team" ui-sref="{{team.owner === user._id ? 'team.edit({teamId: team._id})' : 'team.view({teamId: team._id})'}}" title="{{ team.data.name }}">
           <p class="team-owner pull-right"><small>
             <span class="label label-team">{{ team.owner === user._id ? 'OWNER' : 'MEMBER'}}</span>
           </small></p>

@@ -242,6 +242,7 @@ angular
         .state('team.view', {
           url: '/view',
           parent: 'team',
+          controller: 'TeamViewController',
           templateUrl: 'views/team/view.html'
         })
         .state('team.edit', {
