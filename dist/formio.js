@@ -1956,6 +1956,12 @@ module.exports = function() {
           submissions: true
         });
 
+        $scope.currentPage = 1;
+        $scope.pageChanged = function(page) {
+          $scope.skip = (page - 1) * $scope.perPage;
+          $scope.updateSubmissions();
+        };
+
         $scope.tableView = function(component) {
           return !component.hasOwnProperty('tableView') || component.tableView;
         };
@@ -2006,6 +2012,7 @@ module.exports = [
         };
       },
       register: function($scope, $element, options) {
+        var self = this;
         var loader = null;
         $scope._src = $scope._src || $scope.src || '';
         $scope._form = $scope.form || {};
@@ -2070,6 +2077,18 @@ module.exports = [
           return componentInfo.tableView(value, component);
         };
 
+        $scope.updateSubmissions = function() {
+          spinner.show();
+          var params = {};
+          if($scope.perPage) params.limit = $scope.perPage;
+          if($scope.skip) params.skip = $scope.skip;
+          loader.loadSubmissions({ params: params }).then(function(submissions) {
+            $scope._submissions = submissions;
+            spinner.hide();
+            $scope.$emit('submissionsLoad', submissions);
+          }, self.onError($scope));
+        };
+
         var spinner = $element.find('#formio-loading');
 
         if ($scope._src) {
@@ -2094,12 +2113,7 @@ module.exports = [
             }, this.onError($scope));
           }
           if (options.submissions) {
-            spinner.show();
-            loader.loadSubmissions().then(function(submissions) {
-              $scope._submissions = submissions;
-              spinner.hide();
-              $scope.$emit('submissionsLoad', submissions);
-            }, this.onError($scope));
+            $scope.updateSubmissions();
           }
         }
         else {
@@ -2293,8 +2307,7 @@ var app = angular.module('formio', [
   'ui.bootstrap.datetimepicker',
   'ui.select',
   'ui.mask',
-  'angularMoment',
-  'bgf.paginateAnything'
+  'angularMoment'
 ]);
 
 /**
@@ -2376,20 +2389,6 @@ app.run([
       '</form>'
     );
 
-    $templateCache.put('formio/pager.html',
-      '<div class="paginate-anything">' +
-        '<ul class="pagination pagination-{{size}} links" ng-if="numPages > 1">' +
-          '<li ng-class="{disabled: page <= 0}"><a href ng-click="gotoPage(page-1)">&laquo;</a></li>' +
-          '<li ng-if="linkGroupFirst() > 0"><a href ng-click="gotoPage(0)">1</a></li>' +
-          '<li ng-if="linkGroupFirst() > 1" class="disabled"><a href>&hellip;</a></li>' +
-          '<li ng-repeat="p in [linkGroupFirst(), linkGroupLast()] | makeRange" ng-class="{active: p === page}"><a href ng-click="gotoPage(p)">{{p+1}}</a></li>' +
-          '<li ng-if="linkGroupLast() < numPages - 2" class="disabled"><a href>&hellip;</a></li>' +
-          '<li ng-if="isFinite() && linkGroupLast() < numPages - 1"><a href ng-click="gotoPage(numPages-1)">{{numPages}}</a></li>' +
-          '<li ng-class="{disabled: page >= numPages - 1}"><a href ng-click="gotoPage(page+1)">&raquo;</a></li>' +
-        '</ul>' +
-      '</div>'
-    );
-
     $templateCache.put('formio/submissions.html',
       '<div>' +
         '<table class="table">' +
@@ -2416,7 +2415,18 @@ app.run([
             '</tr>' +
           '</tbody>' +
         '</table>' +
-        '<bgf-pagination collection="_submissions" url="formio.submissionsUrl" per-page="perPage" template-url="formio/pager.html"></bgf-pagination>' +
+        '<pagination ' +
+          'ng-if="_submissions.serverCount > perPage" ' +
+          'ng-model="currentPage" ' +
+          'ng-change="pageChanged(currentPage)" ' +
+          'total-items="_submissions.serverCount" ' +
+          'items-per-page="perPage" ' +
+          'direction-links="false" ' +
+          'boundary-links="true" ' +
+          'first-text="&laquo;" ' +
+          'last-text="&raquo;" ' +
+          '>' +
+        '</pagination>' +
       '</div>'
     );
 
@@ -8797,7 +8807,21 @@ module.exports = function(_baseUrl, _noalias, _domain) {
             if (response.status === 204) {
               return {};
             }
-            return response.json();
+            return response.json()
+            .then(function(result) {
+              // Add some content-range metadata to the result here
+              var range = response.headers.get('content-range');
+              if (range) {
+                range = range.split('/');
+                if(range[0] !== '*') {
+                  var skipLimit = range[0].split('-');
+                  result.skip = Number(skipLimit[0]);
+                  result.limit = skipLimit[1] - skipLimit[0] + 1;
+                }
+                result.serverCount = range[1] === '*' ? range[1] : Number(range[1]);
+              }
+              return result;
+            });
           }
           else {
             if (response.status === 440) {
@@ -11310,7 +11334,7 @@ return Q;
 
 var MACHINE_ID = parseInt(Math.random() * 0xFFFFFF, 10);
 var index = ObjectID.index = parseInt(Math.random() * 0xFFFFFF, 10);
-var pid = typeof process === 'undefined' || typeof process.pid !== 'number' ? Math.floor(0xFFFF) : process.pid % 0xFFFF;
+var pid = typeof process === 'undefined' || (typeof process.pid !== 'number' ? Math.floor(Math.random() * 100000) : process.pid) % 0xFFFF;
 
 /**
  * Determine if an object is Buffer

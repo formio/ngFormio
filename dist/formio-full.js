@@ -3831,366 +3831,6 @@
 
 }));
 },{}],3:[function(require,module,exports){
-(function() {
-  'use strict';
-
-  // 1 2 5 10 25 50 100 250 500 etc
-  function quantizedNumber(i) {
-    var adjust = [1, 2.5, 5];
-    return Math.floor(Math.pow(10, Math.floor(i/3)) * adjust[i % 3]);
-  }
-
-  // the j such that quantizedNumber(j) is closest to i
-  function quantizedIndex(i) {
-    if(i < 1) { return 0; }
-    var group = Math.floor(Math.log(i) / Math.LN10),
-        offset = i/(2.5 * Math.pow(10, group));
-    if(offset >= 3) {
-      group++;
-      offset = 0;
-    }
-    return 3*group + Math.round(Math.min(2, offset));
-  }
-
-  function quantize(i) {
-    if(i === Infinity) { return Infinity; }
-    return quantizedNumber(quantizedIndex(i));
-  }
-
-  // don't overwrite default response transforms
-  function appendTransform(defaults, transform) {
-    defaults = angular.isArray(defaults) ? defaults : [defaults];
-    return (transform) ? defaults.concat(transform) : defaults;
-  }
-
-  angular.module('bgf.paginateAnything', []).
-
-    directive('bgfPagination', function () {
-      var defaultLinkGroupSize = 3, defaultClientLimit = 250, defaultPerPage = 50;
-
-      return {
-        restrict: 'AE',
-        scope: {
-          // required
-          url: '=',
-          collection: '=',
-
-          // optional
-          urlParams: '=?',
-          headers: '=?',
-          page: '=?',
-          perPage: '=?',
-          perPagePresets: '=?',
-          autoPresets: '=?',
-          clientLimit: '=?',
-          linkGroupSize: '=?',
-          reloadPage: '=?',
-          size: '=?',
-          passive: '@',
-          transformResponse: '=?',
-          method: '@',
-          postData: '=?',
-
-          // directive -> app communication only
-          numPages: '=?',
-          numItems: '=?',
-          serverLimit: '=?',
-          rangeFrom: '=?',
-          rangeTo: '=?'
-        },
-        templateUrl: function(element, attr) {
-          return attr.templateUrl || 'src/paginate-anything.html';
-        },
-        replace: true,
-        controller: ['$scope', '$http', function($scope, $http) {
-
-          $scope.reloadPage   = false;
-          $scope.serverLimit  = Infinity; // it's not known yet
-          $scope.Math         = window.Math; // Math for the template
-
-          if(typeof $scope.autoPresets !== 'boolean') {
-            $scope.autoPresets = true;
-          }
-
-          var lgs = $scope.linkGroupSize, cl = $scope.clientLimit;
-          $scope.linkGroupSize  = typeof lgs === 'number' ? lgs : defaultLinkGroupSize;
-          $scope.clientLimit    = typeof cl  === 'number' ? cl : defaultClientLimit;
-
-          $scope.updatePresets  = function () {
-            if($scope.autoPresets) {
-              var presets = [], i;
-              for(i = Math.min(3, quantizedIndex($scope.perPage || defaultPerPage));
-                  i <= quantizedIndex(Math.min($scope.clientLimit, $scope.serverLimit));
-                  i++) {
-                presets.push(quantizedNumber(i));
-              }
-              $scope.perPagePresets = presets;
-            } else {
-              $scope.perPagePresets = $scope.perPagePresets.filter(
-                function (preset) { return preset <= $scope.serverLimit; }
-              ).concat([$scope.serverLimit]);
-            }
-          };
-
-          $scope.gotoPage = function (i) {
-            if(i < 0 || i*$scope.perPage >= $scope.numItems) {
-              return;
-            }
-            $scope.page = i;
-          };
-
-          $scope.linkGroupFirst = function() {
-            var rightDebt = Math.max( 0,
-              $scope.linkGroupSize - ($scope.numPages - 1 - ($scope.page + 2))
-            );
-            return Math.max( 0,
-              $scope.page - ($scope.linkGroupSize + rightDebt)
-            );
-          };
-
-          $scope.linkGroupLast = function() {
-            var leftDebt = Math.max( 0,
-              $scope.linkGroupSize - ($scope.page - 2)
-            );
-            return Math.min( $scope.numPages-1,
-              $scope.page + ($scope.linkGroupSize + leftDebt)
-            );
-          };
-
-          $scope.isFinite = function() {
-            return $scope.numPages < Infinity;
-          };
-
-          function requestRange(request) {
-            $scope.$emit('pagination:loadStart', request);
-            $http({
-              method: $scope.method || 'GET',
-              url: $scope.url,
-              params: $scope.urlParams,
-              data: $scope.postData,
-              headers: angular.extend(
-                {}, $scope.headers,
-                { 'Range-Unit': 'items', Range: [request.from, request.to].join('-') }
-              ),
-              transformResponse: appendTransform($http.defaults.transformResponse, $scope.transformResponse)
-            }).success(function (data, status, headers, config) {
-              var response = parseRange(headers('Content-Range'));
-              if(status === 204 || (response && response.total === 0)) {
-                $scope.numItems = 0;
-                $scope.collection = [];
-              } else {
-                $scope.numItems = response ? response.total : data.length;
-                $scope.collection = data || [];
-              }
-
-              if(response) {
-                $scope.rangeFrom = response.from;
-                $scope.rangeTo   = response.to;
-                if(length(response) < response.total) {
-                  if(
-                    ( request.to < response.total - 1) ||
-                    (response.to < response.total - 1 && response.total < request.to)
-                  ) {
-                    if(!$scope.perPage || length(response) < $scope.perPage) {
-                      if($scope.autoPresets) {
-                        var idx = quantizedIndex(length(response));
-                        if(quantizedNumber(idx) > length(response)) {
-                          idx--;
-                        }
-                        $scope.serverLimit = quantizedNumber(idx);
-                      } else {
-                        $scope.serverLimit = length(response);
-                      }
-                      $scope.perPage = $scope.Math.min(
-                        $scope.serverLimit,
-                        $scope.clientLimit
-                      );
-                    }
-                  }
-                }
-              }
-              $scope.numPages = Math.ceil($scope.numItems / ($scope.perPage || defaultPerPage));
-
-              $scope.$emit('pagination:loadPage', status, config);
-            }).error(function (data, status, headers, config) {
-              $scope.$emit('pagination:error', status, config);
-            });
-          }
-
-          $scope.page = $scope.page || 0;
-          $scope.size = $scope.size || 'md';
-          if($scope.autoPresets) {
-            $scope.updatePresets();
-          }
-
-          $scope.$watch('page', function(newPage, oldPage) {
-            if($scope.passive === 'true') { return; }
-
-            if(newPage !== oldPage) {
-              if(newPage < 0 || newPage*$scope.perPage >= $scope.numItems) {
-                return;
-              }
-
-              var pp = $scope.perPage || defaultPerPage;
-
-              if($scope.autoPresets) {
-                pp = quantize(pp);
-              }
-
-              requestRange({
-                from: newPage * pp,
-                to: (newPage+1) * pp - 1
-              });
-            }
-          });
-
-          $scope.$watch('perPage', function(newPp, oldPp) {
-            if($scope.passive === 'true') { return; }
-
-            if(typeof(oldPp) === 'number' && newPp !== oldPp) {
-              var first = $scope.page * oldPp;
-              var newPage = Math.floor(first / newPp);
-
-              if($scope.page !== newPage) {
-                $scope.page = newPage;
-              } else {
-                requestRange({
-                  from: $scope.page * newPp,
-                  to: ($scope.page+1) * newPp - 1
-                });
-              }
-            }
-          });
-
-          $scope.$watch('serverLimit', function(newLimit, oldLimit) {
-            if($scope.passive === 'true') { return; }
-
-            if(newLimit !== oldLimit) {
-              $scope.updatePresets();
-            }
-          });
-
-          $scope.$watch('url', function(newUrl, oldUrl) {
-            if($scope.passive === 'true') { return; }
-
-            if(newUrl !== oldUrl) {
-              if($scope.page === 0){
-                $scope.reloadPage = true;
-              } else {
-                $scope.page = 0;
-              }
-            }
-          });
-
-          $scope.$watch('urlParams', function(newParams, oldParams) {
-            if($scope.passive === 'true') { return; }
-
-            if(!angular.equals(newParams, oldParams)) {
-              if($scope.page === 0){
-                $scope.reloadPage = true;
-              } else {
-                $scope.page = 0;
-              }
-            }
-          }, true);
-
-          $scope.$watch('headers', function(newHeaders, oldHeaders) {
-            if($scope.passive === 'true') { return; }
-
-            if(!angular.equals(newHeaders, oldHeaders)) {
-              if($scope.page === 0){
-                $scope.reloadPage = true;
-              } else {
-                $scope.page = 0;
-              }
-            }
-          }, true);
-
-          $scope.$watch('reloadPage', function(newVal, oldVal) {
-            if($scope.passive === 'true') { return; }
-
-            if(newVal === true && oldVal === false) {
-              $scope.reloadPage = false;
-              requestRange({
-                from: $scope.page * $scope.perPage,
-                to: ($scope.page+1) * $scope.perPage - 1
-              });
-            }
-          });
-
-          $scope.$watch('transformResponse', function(newTransform, oldTransform) {
-            if($scope.passive === 'true') { return; }
-            if(!newTransform || !oldTransform) { return; }
-
-            // If applying a transform to returned data, it makes sense to start at the first page if changed
-            // Unfortunately it's not really possible to compare function equality
-            // In lieu of that, for now we'll compare string representations of them.
-            if(!angular.equals(newTransform.toString(), oldTransform.toString())) {
-              if($scope.page === 0){
-                $scope.reloadPage = true;
-              } else {
-                $scope.page = 0;
-              }
-            }
-          }, true);
-
-          var pp = $scope.perPage || defaultPerPage;
-
-          if($scope.autoPresets) {
-            pp = quantize(pp);
-          }
-
-          requestRange({
-            from: $scope.page * pp,
-            to: ($scope.page+1) * pp - 1
-          });
-        }]
-      };
-    }).
-
-    filter('makeRange', function() {
-      // http://stackoverflow.com/a/14932395/3102996
-      return function(input) {
-        var lowBound, highBound;
-        switch (input.length) {
-        case 1:
-          lowBound = 0;
-          highBound = parseInt(input[0], 10) - 1;
-          break;
-        case 2:
-          lowBound = parseInt(input[0], 10);
-          highBound = parseInt(input[1], 10);
-          break;
-        default:
-          return input;
-        }
-        var result = [];
-        for (var i = lowBound; i <= highBound; i++) { result.push(i); }
-        return result;
-      };
-    });
-
-
-  function parseRange(hdr) {
-    var m = hdr && hdr.match(/^(?:items )?(\d+)-(\d+)\/(\d+|\*)$/);
-    if(m) {
-      return {
-        from: +m[1],
-        to: +m[2],
-        total: m[3] === '*' ? Infinity : +m[3]
-      };
-    } else if(hdr === '*/0') {
-      return { total: 0 };
-    }
-    return null;
-  }
-
-  function length(range) {
-    return range.to - range.from + 1;
-  }
-}());
-
-},{}],4:[function(require,module,exports){
 /**
  * @license AngularJS v1.4.7
  * (c) 2010-2015 Google, Inc. http://angularjs.org
@@ -4875,15 +4515,15 @@ angular.module('ngSanitize').filter('linky', ['$sanitize', function($sanitize) {
 
 })(window, window.angular);
 
-},{}],5:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 require('./angular-sanitize');
 module.exports = 'ngSanitize';
 
-},{"./angular-sanitize":4}],6:[function(require,module,exports){
+},{"./angular-sanitize":3}],5:[function(require,module,exports){
 require('./ui-bootstrap-tpls');
 module.exports = 'ui.bootstrap';
 
-},{"./ui-bootstrap-tpls":7}],7:[function(require,module,exports){
+},{"./ui-bootstrap-tpls":6}],6:[function(require,module,exports){
 /*
  * angular-ui-bootstrap
  * http://angular-ui.github.io/bootstrap/
@@ -10720,7 +10360,7 @@ angular.module("template/typeahead/typeahead-popup.html", []).run(["$templateCac
     "");
 }]);
 !angular.$$csp() && angular.element(document).find('head').prepend('<style type="text/css">.ng-animate.item:not(.left):not(.right){-webkit-transition:0s ease-in-out left;transition:0s ease-in-out left}</style>');
-},{}],8:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 /*!
  * angular-ui-mask
  * https://github.com/angular-ui/ui-mask
@@ -11309,7 +10949,7 @@ angular.module('ui.mask', [])
         ]);
 
 }());
-},{}],9:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 /*!
  * ui-select
  * http://github.com/angular-ui/ui-select
@@ -13126,7 +12766,7 @@ $templateCache.put("select2/select.tpl.html","<div class=\"ui-select-container s
 $templateCache.put("selectize/choices.tpl.html","<div ng-show=\"$select.open\" class=\"ui-select-choices ui-select-dropdown selectize-dropdown single\"><div class=\"ui-select-choices-content selectize-dropdown-content\"><div class=\"ui-select-choices-group optgroup\" role=\"listbox\"><div ng-show=\"$select.isGrouped\" class=\"ui-select-choices-group-label optgroup-header\" ng-bind=\"$group.name\"></div><div role=\"option\" class=\"ui-select-choices-row\" ng-class=\"{active: $select.isActive(this), disabled: $select.isDisabled(this)}\"><div class=\"option ui-select-choices-row-inner\" data-selectable=\"\"></div></div></div></div></div>");
 $templateCache.put("selectize/match.tpl.html","<div ng-hide=\"($select.open || $select.isEmpty())\" class=\"ui-select-match\" ng-transclude=\"\"></div>");
 $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container selectize-control single\" ng-class=\"{\'open\': $select.open}\"><div class=\"selectize-input\" ng-class=\"{\'focus\': $select.open, \'disabled\': $select.disabled, \'selectize-focus\' : $select.focus}\" ng-click=\"$select.activate()\"><div class=\"ui-select-match\"></div><input type=\"text\" autocomplete=\"off\" tabindex=\"-1\" class=\"ui-select-search ui-select-toggle\" ng-click=\"$select.toggle($event)\" placeholder=\"{{$select.placeholder}}\" ng-model=\"$select.search\" ng-hide=\"!$select.searchEnabled || ($select.selected && !$select.open)\" ng-disabled=\"$select.disabled\" aria-label=\"{{ $select.baseTitle }}\"></div><div class=\"ui-select-choices\"></div></div>");}]);
-},{}],10:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 /**
  * @license AngularJS v1.4.7
  * (c) 2010-2015 Google, Inc. http://angularjs.org
@@ -42031,11 +41671,11 @@ $provide.value("$locale", {
 })(window, document);
 
 !window.angular.$$csp().noInlineStyle && window.angular.element(document.head).prepend('<style type="text/css">@charset "UTF-8";[ng\\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide:not(.ng-hide-animate){display:none !important;}ng\\:form{display:block;}.ng-animate-shim{visibility:hidden;}.ng-anchor{position:absolute;}</style>');
-},{}],11:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 require('./angular');
 module.exports = angular;
 
-},{"./angular":10}],12:[function(require,module,exports){
+},{"./angular":9}],11:[function(require,module,exports){
 // https://github.com/Gillardo/bootstrap-ui-datetime-picker
 // Version: 1.2.6
 // Released: 2015-10-21 
@@ -42491,7 +42131,7 @@ angular.module('ui.bootstrap.datetimepicker').run(['$templateCache', function($t
 
 }]);
 
-},{}],13:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 // This file is autogenerated via the `commonjs` Grunt task. You can require() this file in a CommonJS environment.
 require('../../js/transition.js')
 require('../../js/alert.js')
@@ -42505,7 +42145,7 @@ require('../../js/popover.js')
 require('../../js/scrollspy.js')
 require('../../js/tab.js')
 require('../../js/affix.js')
-},{"../../js/affix.js":14,"../../js/alert.js":15,"../../js/button.js":16,"../../js/carousel.js":17,"../../js/collapse.js":18,"../../js/dropdown.js":19,"../../js/modal.js":20,"../../js/popover.js":21,"../../js/scrollspy.js":22,"../../js/tab.js":23,"../../js/tooltip.js":24,"../../js/transition.js":25}],14:[function(require,module,exports){
+},{"../../js/affix.js":13,"../../js/alert.js":14,"../../js/button.js":15,"../../js/carousel.js":16,"../../js/collapse.js":17,"../../js/dropdown.js":18,"../../js/modal.js":19,"../../js/popover.js":20,"../../js/scrollspy.js":21,"../../js/tab.js":22,"../../js/tooltip.js":23,"../../js/transition.js":24}],13:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: affix.js v3.3.5
  * http://getbootstrap.com/javascript/#affix
@@ -42669,7 +42309,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],15:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: alert.js v3.3.5
  * http://getbootstrap.com/javascript/#alerts
@@ -42765,7 +42405,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],16:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: button.js v3.3.5
  * http://getbootstrap.com/javascript/#buttons
@@ -42887,7 +42527,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],17:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: carousel.js v3.3.5
  * http://getbootstrap.com/javascript/#carousel
@@ -43126,7 +42766,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],18:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: collapse.js v3.3.5
  * http://getbootstrap.com/javascript/#collapse
@@ -43339,7 +42979,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],19:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: dropdown.js v3.3.5
  * http://getbootstrap.com/javascript/#dropdowns
@@ -43506,7 +43146,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],20:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: modal.js v3.3.5
  * http://getbootstrap.com/javascript/#modals
@@ -43845,7 +43485,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],21:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: popover.js v3.3.5
  * http://getbootstrap.com/javascript/#popovers
@@ -43955,7 +43595,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],22:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: scrollspy.js v3.3.5
  * http://getbootstrap.com/javascript/#scrollspy
@@ -44129,7 +43769,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],23:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: tab.js v3.3.5
  * http://getbootstrap.com/javascript/#tabs
@@ -44286,7 +43926,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],24:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: tooltip.js v3.3.5
  * http://getbootstrap.com/javascript/#tooltip
@@ -44802,7 +44442,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],25:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: transition.js v3.3.5
  * http://getbootstrap.com/javascript/#transitions
@@ -44863,7 +44503,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],26:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -44956,7 +44596,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],27:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v2.1.4
  * http://jquery.com/
@@ -54168,7 +53808,7 @@ return jQuery;
 
 }));
 
-},{}],28:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 (function (root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module unless amdModuleId is set
@@ -54553,7 +54193,7 @@ return SignaturePad;
 
 }));
 
-},{}],29:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -54629,7 +54269,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],30:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -54784,7 +54424,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],31:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -54837,7 +54477,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],32:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -54869,7 +54509,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],33:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -54927,7 +54567,7 @@ module.exports = function (app) {
   }]);
 };
 
-},{}],34:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -54954,7 +54594,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],35:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -55040,7 +54680,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],36:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -55069,7 +54709,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],37:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -55101,7 +54741,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],38:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -55133,7 +54773,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],39:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 "use strict";
 var app = angular.module('formio');
 
@@ -55160,7 +54800,7 @@ require('./signature')(app);
 require('./textarea')(app);
 require('./well')(app);
 
-},{"./address":29,"./button":30,"./checkbox":31,"./columns":32,"./components":33,"./content":34,"./datetime":35,"./email":36,"./fieldset":37,"./hidden":38,"./number":40,"./page":41,"./panel":42,"./password":43,"./phonenumber":44,"./radio":45,"./resource":46,"./select":47,"./signature":48,"./textarea":49,"./textfield":50,"./well":51}],40:[function(require,module,exports){
+},{"./address":28,"./button":29,"./checkbox":30,"./columns":31,"./components":32,"./content":33,"./datetime":34,"./email":35,"./fieldset":36,"./hidden":37,"./number":39,"./page":40,"./panel":41,"./password":42,"./phonenumber":43,"./radio":44,"./resource":45,"./select":46,"./signature":47,"./textarea":48,"./textfield":49,"./well":50}],39:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -55223,7 +54863,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],41:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -55249,7 +54889,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],42:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -55284,7 +54924,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],43:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -55314,7 +54954,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],44:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -55346,7 +54986,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],45:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -55399,7 +55039,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],46:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -55492,7 +55132,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],47:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -55673,7 +55313,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],48:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -55810,7 +55450,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],49:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -55865,7 +55505,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],50:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -55931,7 +55571,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],51:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -55961,7 +55601,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],52:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -55994,7 +55634,7 @@ module.exports = function() {
   };
 };
 
-},{}],53:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -56125,7 +55765,7 @@ module.exports = function() {
   };
 };
 
-},{}],54:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -56279,7 +55919,7 @@ module.exports = [
   }
 ];
 
-},{}],55:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -56359,7 +55999,7 @@ module.exports = function() {
   };
 };
 
-},{}],56:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 "use strict";
 module.exports = [
   '$compile',
@@ -56381,7 +56021,7 @@ module.exports = [
   }
 ];
 
-},{}],57:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -56391,7 +56031,7 @@ module.exports = function() {
   };
 };
 
-},{}],58:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -56418,6 +56058,12 @@ module.exports = function() {
           submissions: true
         });
 
+        $scope.currentPage = 1;
+        $scope.pageChanged = function(page) {
+          $scope.skip = (page - 1) * $scope.perPage;
+          $scope.updateSubmissions();
+        };
+
         $scope.tableView = function(component) {
           return !component.hasOwnProperty('tableView') || component.tableView;
         };
@@ -56432,7 +56078,7 @@ module.exports = function() {
   };
 };
 
-},{}],59:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -56468,6 +56114,7 @@ module.exports = [
         };
       },
       register: function($scope, $element, options) {
+        var self = this;
         var loader = null;
         $scope._src = $scope._src || $scope.src || '';
         $scope._form = $scope.form || {};
@@ -56532,6 +56179,18 @@ module.exports = [
           return componentInfo.tableView(value, component);
         };
 
+        $scope.updateSubmissions = function() {
+          spinner.show();
+          var params = {};
+          if($scope.perPage) params.limit = $scope.perPage;
+          if($scope.skip) params.skip = $scope.skip;
+          loader.loadSubmissions({ params: params }).then(function(submissions) {
+            $scope._submissions = submissions;
+            spinner.hide();
+            $scope.$emit('submissionsLoad', submissions);
+          }, self.onError($scope));
+        };
+
         var spinner = $element.find('#formio-loading');
 
         if ($scope._src) {
@@ -56556,12 +56215,7 @@ module.exports = [
             }, this.onError($scope));
           }
           if (options.submissions) {
-            spinner.show();
-            loader.loadSubmissions().then(function(submissions) {
-              $scope._submissions = submissions;
-              spinner.hide();
-              $scope.$emit('submissionsLoad', submissions);
-            }, this.onError($scope));
+            $scope.updateSubmissions();
           }
         }
         else {
@@ -56588,7 +56242,7 @@ module.exports = [
   }
 ];
 
-},{}],60:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -56676,7 +56330,7 @@ module.exports = function() {
   };
 };
 
-},{}],61:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 "use strict";
 module.exports = [
   '$q',
@@ -56725,7 +56379,7 @@ module.exports = [
   }
 ];
 
-},{}],62:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 "use strict";
 module.exports = [
   'FormioUtils',
@@ -56734,7 +56388,7 @@ module.exports = [
   }
 ];
 
-},{}],63:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 "use strict";
 module.exports = [
   '$sce',
@@ -56747,14 +56401,13 @@ module.exports = [
   }
 ];
 
-},{}],64:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 (function (global){
 "use strict";
 global.jQuery = require('jquery');
 require('angular');
 require('angular-ui-mask');
 require('angular-ui-select/select');
-require('angular-paginate-anything');
 require('angular-moment');
 require('angular-sanitize');
 require('signature_pad');
@@ -56764,7 +56417,7 @@ require('angular-ui-bootstrap');
 require('./formio');
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./formio":65,"angular":11,"angular-moment":1,"angular-paginate-anything":3,"angular-sanitize":5,"angular-ui-bootstrap":6,"angular-ui-mask":8,"angular-ui-select/select":9,"bootstrap":13,"bootstrap-ui-datetime-picker/dist/datetime-picker":12,"jquery":27,"signature_pad":28}],65:[function(require,module,exports){
+},{"./formio":64,"angular":10,"angular-moment":1,"angular-sanitize":4,"angular-ui-bootstrap":5,"angular-ui-mask":7,"angular-ui-select/select":8,"bootstrap":12,"bootstrap-ui-datetime-picker/dist/datetime-picker":11,"jquery":26,"signature_pad":27}],64:[function(require,module,exports){
 "use strict";
 var app = angular.module('formio', [
   'ngSanitize',
@@ -56772,8 +56425,7 @@ var app = angular.module('formio', [
   'ui.bootstrap.datetimepicker',
   'ui.select',
   'ui.mask',
-  'angularMoment',
-  'bgf.paginateAnything'
+  'angularMoment'
 ]);
 
 /**
@@ -56855,20 +56507,6 @@ app.run([
       '</form>'
     );
 
-    $templateCache.put('formio/pager.html',
-      '<div class="paginate-anything">' +
-        '<ul class="pagination pagination-{{size}} links" ng-if="numPages > 1">' +
-          '<li ng-class="{disabled: page <= 0}"><a href ng-click="gotoPage(page-1)">&laquo;</a></li>' +
-          '<li ng-if="linkGroupFirst() > 0"><a href ng-click="gotoPage(0)">1</a></li>' +
-          '<li ng-if="linkGroupFirst() > 1" class="disabled"><a href>&hellip;</a></li>' +
-          '<li ng-repeat="p in [linkGroupFirst(), linkGroupLast()] | makeRange" ng-class="{active: p === page}"><a href ng-click="gotoPage(p)">{{p+1}}</a></li>' +
-          '<li ng-if="linkGroupLast() < numPages - 2" class="disabled"><a href>&hellip;</a></li>' +
-          '<li ng-if="isFinite() && linkGroupLast() < numPages - 1"><a href ng-click="gotoPage(numPages-1)">{{numPages}}</a></li>' +
-          '<li ng-class="{disabled: page >= numPages - 1}"><a href ng-click="gotoPage(page+1)">&raquo;</a></li>' +
-        '</ul>' +
-      '</div>'
-    );
-
     $templateCache.put('formio/submissions.html',
       '<div>' +
         '<table class="table">' +
@@ -56895,7 +56533,18 @@ app.run([
             '</tr>' +
           '</tbody>' +
         '</table>' +
-        '<bgf-pagination collection="_submissions" url="formio.submissionsUrl" per-page="perPage" template-url="formio/pager.html"></bgf-pagination>' +
+        '<pagination ' +
+          'ng-if="_submissions.serverCount > perPage" ' +
+          'ng-model="currentPage" ' +
+          'ng-change="pageChanged(currentPage)" ' +
+          'total-items="_submissions.serverCount" ' +
+          'items-per-page="perPage" ' +
+          'direction-links="false" ' +
+          'boundary-links="true" ' +
+          'first-text="&laquo;" ' +
+          'last-text="&raquo;" ' +
+          '>' +
+        '</pagination>' +
       '</div>'
     );
 
@@ -56926,7 +56575,7 @@ app.run([
 
 require('./components');
 
-},{"./components":39,"./directives/customValidator":52,"./directives/formio":53,"./directives/formioComponent":54,"./directives/formioDelete":55,"./directives/formioElement":56,"./directives/formioErrors":57,"./directives/formioSubmissions":58,"./factories/FormioScope":59,"./factories/FormioUtils":60,"./factories/formioInterceptor":61,"./filters/flattenComponents":62,"./filters/safehtml":63,"./providers/Formio":66}],66:[function(require,module,exports){
+},{"./components":38,"./directives/customValidator":51,"./directives/formio":52,"./directives/formioComponent":53,"./directives/formioDelete":54,"./directives/formioElement":55,"./directives/formioErrors":56,"./directives/formioSubmissions":57,"./factories/FormioScope":58,"./factories/FormioUtils":59,"./factories/formioInterceptor":60,"./filters/flattenComponents":61,"./filters/safehtml":62,"./providers/Formio":65}],65:[function(require,module,exports){
 "use strict";
 module.exports = function() {
 
@@ -57004,7 +56653,7 @@ module.exports = function() {
   };
 };
 
-},{"formiojs":67}],67:[function(require,module,exports){
+},{"formiojs":66}],66:[function(require,module,exports){
 (function (global){
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formiojs = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function (process){
@@ -63276,7 +62925,21 @@ module.exports = function(_baseUrl, _noalias, _domain) {
             if (response.status === 204) {
               return {};
             }
-            return response.json();
+            return response.json()
+            .then(function(result) {
+              // Add some content-range metadata to the result here
+              var range = response.headers.get('content-range');
+              if (range) {
+                range = range.split('/');
+                if(range[0] !== '*') {
+                  var skipLimit = range[0].split('-');
+                  result.skip = Number(skipLimit[0]);
+                  result.limit = skipLimit[1] - skipLimit[0] + 1;
+                }
+                result.serverCount = range[1] === '*' ? range[1] : Number(range[1]);
+              }
+              return result;
+            });
           }
           else {
             if (response.status === 440) {
@@ -63732,7 +63395,7 @@ module.exports = function(_baseUrl, _noalias, _domain) {
 
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"Q":68,"_process":26,"bson-objectid":69,"eventemitter3":70,"localforage":71,"shallow-copy":72,"whatwg-fetch":73}],68:[function(require,module,exports){
+},{"Q":67,"_process":25,"bson-objectid":68,"eventemitter3":69,"localforage":70,"shallow-copy":71,"whatwg-fetch":72}],67:[function(require,module,exports){
 (function (process){
 // vim:ts=4:sts=4:sw=4:
 /*!
@@ -65784,12 +65447,12 @@ return Q;
 });
 
 }).call(this,require('_process'))
-},{"_process":26}],69:[function(require,module,exports){
+},{"_process":25}],68:[function(require,module,exports){
 (function (process){
 
 var MACHINE_ID = parseInt(Math.random() * 0xFFFFFF, 10);
 var index = ObjectID.index = parseInt(Math.random() * 0xFFFFFF, 10);
-var pid = typeof process === 'undefined' || typeof process.pid !== 'number' ? Math.floor(0xFFFF) : process.pid % 0xFFFF;
+var pid = typeof process === 'undefined' || (typeof process.pid !== 'number' ? Math.floor(Math.random() * 100000) : process.pid) % 0xFFFF;
 
 /**
  * Determine if an object is Buffer
@@ -65968,7 +65631,7 @@ ObjectID.prototype.toString = ObjectID.prototype.toHexString;
 
 
 }).call(this,require('_process'))
-},{"_process":26}],70:[function(require,module,exports){
+},{"_process":25}],69:[function(require,module,exports){
 'use strict';
 
 //
@@ -66232,7 +65895,7 @@ if ('undefined' !== typeof module) {
   module.exports = EventEmitter;
 }
 
-},{}],71:[function(require,module,exports){
+},{}],70:[function(require,module,exports){
 (function (process,global){
 /*!
     localForage -- Offline Storage, Improved
@@ -69016,7 +68679,7 @@ return /******/ (function(modules) { // webpackBootstrap
 });
 ;
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":26}],72:[function(require,module,exports){
+},{"_process":25}],71:[function(require,module,exports){
 module.exports = function (obj) {
     if (!obj || typeof obj !== 'object') return obj;
     
@@ -69053,7 +68716,7 @@ var isArray = Array.isArray || function (xs) {
     return {}.toString.call(xs) === '[object Array]';
 };
 
-},{}],73:[function(require,module,exports){
+},{}],72:[function(require,module,exports){
 (function() {
   'use strict';
 
@@ -69385,4 +69048,4 @@ var isArray = Array.isArray || function (xs) {
   self.fetch.polyfill = true
 })();
 
-},{}]},{},[64]);
+},{}]},{},[63]);

@@ -23,6 +23,12 @@ module.exports = function() {
           submissions: true
         });
 
+        $scope.currentPage = 1;
+        $scope.pageChanged = function(page) {
+          $scope.skip = (page - 1) * $scope.perPage;
+          $scope.updateSubmissions();
+        };
+
         $scope.tableView = function(component) {
           return !component.hasOwnProperty('tableView') || component.tableView;
         };

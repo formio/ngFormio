@@ -2,7 +2,6 @@ global.jQuery = require('jquery');
 require('angular');
 require('angular-ui-mask');
 require('angular-ui-select/select');
-require('angular-paginate-anything');
 require('angular-moment');
 require('angular-sanitize');
 require('signature_pad');
