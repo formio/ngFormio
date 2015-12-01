@@ -290,11 +290,30 @@ angular
       $rootScope.currentProject = null;
       $rootScope.currentForm = null;
 
+      // Determine if the current users can make teams or is a team member.
+      $scope.teamsEnabled = false;
+      $scope.teamMember = false;
+
       $scope.teams = [];
       $scope.teamsLoading = true;
       Formio.request($scope.appConfig.apiBase + '/team/all', 'GET').then(function(results) {
         $scope.teams = results;
         $scope.teamsLoading = false;
+
+        // See if the current user is a member of any of the given teams.
+        if (!$rootScope.user) {
+          Formio.currentUser().then(function(user) {
+            $rootScope.user = user;
+            $scope.teamMember = _.any(results, function(team) {
+              return ($rootScope.user && team.owner !== $rootScope.user._id) || false;
+            });
+          });
+        }
+        else {
+          $scope.teamMember = _.any(results, function(team) {
+            return ($rootScope.user && team.owner !== $rootScope.user._id) || false;
+          });
+        }
       });
 
       $scope.projects = {};
@@ -304,6 +323,10 @@ angular
         $scope.projectsLoading = false;
         angular.element('#projects-loader').hide();
         $scope.projects = projects;
+        $scope.teamsEnabled = _.any(projects, function(project) {
+          project.plan = project.plan || '';
+          return _.startsWith(project.plan, 'team');
+        });
       }).catch(FormioAlerts.onError.bind(FormioAlerts));
 
       $scope.showIntroVideo = function() {

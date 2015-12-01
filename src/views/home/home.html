@@ -36,11 +36,11 @@
     </div>
   </div>
 </div>
-<div class="row">
+<div class="row" ng-show="teamsEnabled || teamMember">
   <h2 class="text-center">Teams</h2>
   <div class="col-sm-12 teams">
     <div class="row">
-      <div class="col-sm-4">
+      <div class="col-sm-4" ng-show="teamsEnabled">
         <a class="team-create" ui-sref="createTeam()">
           <h4><p class="create-link">Create Team <br><span class="glyphicon glyphicon-plus circle"></span></p></h4>
         </a>
