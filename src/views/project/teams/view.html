@@ -17,7 +17,7 @@
     <tr ng-repeat="team in currentProjectTeams">
       <td>
         <div class="row">
-          <div class="col-sm-8">
+          <div class="col-sm-8 ellipsis">
             <h4><a ui-sref="project.settings.teams.edit({teamId: team._id})">{{ team.data.name }}</a></h4>
           </div>
           <div class="col-sm-2">

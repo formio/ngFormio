@@ -411,6 +411,11 @@ app.controller('ProjectTeamEditController', [
 
       // Search the present permissions to add the new permission.
       access = _.forEach(access, function(permission) {
+        // Remove all the old permissions.
+        permission.roles = permission.roles || [];
+        permission.roles = _.without(permission.roles, $scope.addTeam._id);
+
+        // Add the given role to the new permission type.
         if (permission.type === $scope.addTeam.permission) {
           found = true;
 
