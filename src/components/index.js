@@ -10,6 +10,7 @@ require('./content')(app);
 require('./datetime')(app);
 require('./email')(app);
 require('./fieldset')(app);
+require('./file')(app);
 require('./hidden')(app);
 require('./number')(app);
 require('./page')(app);
