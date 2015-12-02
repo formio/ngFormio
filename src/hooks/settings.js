@@ -9,6 +9,7 @@ var debug = require('debug')('formio:settings');
 var o365Util = require('../actions/office365/util');
 var nodeUrl = require('url');
 var fs = require('fs');
+var path = require('path');
 
 module.exports = function(app, formioServer) {
   // Include the request cache.
@@ -511,8 +512,8 @@ module.exports = function(app, formioServer) {
         var files = files || [];
 
         _debug(files);
-        _debug('Private updates: ' + __dirname + '/../db/updates');
-        fs.readdir(__dirname + '/../db/updates', function(err, _files) {
+        _debug('Private updates: ' + path.join(__dirname, '../db/updates'));
+        fs.readdir(path.join(__dirname, '../db/updates'), function(err, _files) {
           if(err) {
             _debug(err);
             return next(err);
@@ -542,7 +543,7 @@ module.exports = function(app, formioServer) {
 
         // Attempt to resolve the private update.
         try {
-          update = require(__dirname + '/../db/updates/' + name);
+          update = require(path.join(__dirname, '../db/updates/', name));
         }
         catch(e) {
           _debug(e);
