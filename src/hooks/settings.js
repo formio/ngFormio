@@ -8,6 +8,7 @@ nunjucks.configure([], {
 var debug = require('debug')('formio:settings');
 var o365Util = require('../actions/office365/util');
 var nodeUrl = require('url');
+var fs = require('fs');
 
 module.exports = function(app, formioServer) {
   // Include the request cache.
@@ -476,6 +477,78 @@ module.exports = function(app, formioServer) {
       },
       machineNameExport: function(machineName) {
         return machineName.split(':').slice(-1)[0];
+      },
+
+      /**
+       * A hook to expose the current formio code version.
+       *
+       * @param version {String}
+       *   The current formio core code version.
+       */
+      codeSchema: function(version) {
+        var _debug = require('debug')('formio:settings:codeSchema');
+        var pkg = require('../../package.json');
+
+        _debug(pkg);
+        if(pkg && pkg.schema && pkg.schema !== null) {
+          version = pkg.schema;
+        }
+
+        _debug(version);
+        return version;
+      },
+
+      /**
+       * A hook to expose the update system on system load.
+       *
+       * @param files {Array}
+       *   The publicly available updates.
+       * @param next {Function}
+       *   The next function to invoke after altering the file list.
+       */
+      getUpdates: function(files, next) {
+        var _debug = require('debug')('formio:settings:getUpdates');
+        var files = files || [];
+
+        _debug(files);
+        _debug('Private updates: ' + __dirname + '/../db/updates');
+        fs.readdir(__dirname + '/../db/updates', function(err, _files) {
+          if(err) {
+            _debug(err);
+            return next(err);
+          }
+
+          _files = _files.map(function(name) {
+            _debug('Update found: ' + name);
+            return name.split('.js')[0];
+          });
+
+          // Add the private updates to the original file list and continue.
+          files = files.concat(_files);
+          _debug('All files: ' + JSON.stringify(files));
+          next(null, files);
+        });
+      },
+
+      /**
+       * A hook to expose the update file paths.
+       *
+       * @param name {String}
+       *   The
+       */
+      updateLocation: function(name) {
+        var _debug = require('debug')('formio:settings:updateLocation');
+        var update = null;
+
+        // Attempt to resolve the private update.
+        try {
+          update = require(__dirname + '/../db/updates/' + name);
+        }
+        catch(e) {
+          _debug(e);
+        }
+
+        return update;
       }
     }
   }
