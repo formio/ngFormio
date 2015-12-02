@@ -519,6 +519,7 @@ module.exports = function(app, formioServer) {
             return next(err);
           }
 
+          _debug(_files);
           _files = _files.map(function(name) {
             _debug('Update found: ' + name);
             return name.split('.js')[0];
