@@ -60542,9 +60542,17 @@ module.exports = function (app) {
       };
 
       // This fixes new fields having an empty space in the array.
-      if ($scope.data[$scope.component.key][0] === '') {
+      if ($scope.data && $scope.data[$scope.component.key][0] === '') {
         $scope.data[$scope.component.key].splice(0, 1);
       }
+
+      $scope.fileSize = function(a,b,c,d,e){
+        return (b=Math,c=b.log,d=1024,e=c(a)/c(d)|0,a/b.pow(d,e)).toFixed(2)+' '+(e?'kMGTPEZY'[--e]+'B':'Bytes');
+      };
+
+      $scope.getFile = function(file) {
+        console.log(file);
+      };
 
       $scope.upload = function(files) {
         if ($scope.component.storage && files && files.length) {
@@ -60553,12 +60561,14 @@ module.exports = function (app) {
               angular.forEach(files, function(file) {
                 $scope.fileUploads[file.name] = {
                   name: file.name,
+                  size: file.size,
                   status: 'info',
                   message: 'Starting upload'
                 };
-                Formio.request($scope.formio.projectUrl + '/storage/s3', 'POST', {name: file.name, size: file.size, type: file.type})
+                Formio.request($scope.formio.formUrl + '/storage/s3', 'POST', {name: file.name, size: file.size, type: file.type})
                   .then(function(response) {
                     response.data.file = file;
+                    response.data.key += $scope.component.dir + file.name;
                     var upload = Upload.upload(response);
                     upload
                       .then(function(resp) {
@@ -60566,25 +60576,25 @@ module.exports = function (app) {
                         delete $scope.fileUploads[file.name];
                         $scope.data[$scope.component.key].push({
                           name: file.name,
+                          storage: 's3',
                           bucket: response.data.bucket,
-                          location: response.data.key
+                          location: response.data.key,
+                          url: response.url + response.data.key,
+                          size: file.size,
+                          type: file.type
                         });
                       }, function(resp) {
                         // Handle error
                         var oParser = new DOMParser();
                         var oDOM = oParser.parseFromString(resp.data, 'text/xml');
-                        $scope.fileUploads[file.name] = {
-                          name: file.name,
-                          status: 'error',
-                          message: oDOM.getElementsByTagName('Message')[0].innerHTML
-                        };
+                        $scope.fileUploads[file.name].status = 'error';
+                        $scope.fileUploads[file.name].message = oDOM.getElementsByTagName('Message')[0].innerHTML;
+                        delete $scope.fileUploads[file.name].progress;
                       }, function(evt) {
                         // Progress notify
-                        $scope.fileUploads[file.name] = {
-                          name: file.name,
-                          status: 'progress',
-                          progress: parseInt(100.0 * evt.loaded / evt.total)
-                        };
+                        $scope.fileUploads[file.name].status = 'progress';
+                        $scope.fileUploads[file.name].progress = parseInt(100.0 * evt.loaded / evt.total);
+                        delete $scope.fileUploads[file.name].message;
                         //console.log('progress: ' + parseInt(100.0 * evt.loaded / evt.total) + '% file :'+ evt.config.data.file.name);
                       });
                   });
@@ -60604,24 +60614,30 @@ module.exports = function (app) {
         '<label ng-if="component.label && !component.hideLabel" for="{{ component.key }}" class="control-label" ng-class="{\'field-required\': component.validate.required}">{{ component.label }}</label>' +
         '<span ng-if="!component.label && component.validate.required" class="glyphicon glyphicon-asterisk form-control-feedback field-required-inline" aria-hidden="true"></span>' +
         '<div ng-controller="formioFile">' +
-        '<div ng-repeat="file in data[component.key] track by $index">{{ file.name }} <span ng-if="!readOnly" ng-click="removeFile($index)"><span class="glyphicon glyphicon-remove-circle"></span></span></div>' +
-        '<div ng-if="!readOnly">' +
-          '<div ngf-drop="upload($files)" class="fileSelector" ngf-drag-over-class="' + "'" + 'fileDragOver' + "'" + '" ngf-multiple="component.multiple"><span class="glyphicon glyphicon-remove-circle"></span>Drop files to attach, or <a href="#" ngf-select="upload($files)" ngf-multiple="component.multiple">browse</a>.</div>' +
-          '<div ng-if="!component.storage" class="alert alert-warning">No storage has been set for this field. File uploads are disabled until storage is set up.</div>' +
-          '<div ngf-no-file-drop>File Drag/Drop is not supported for this browser</div>' +
+        '<div ng-repeat="file in data[component.key] track by $index" class="file">' +
+        ' <span class="fileName control-label"><a href="{{ file.url }}" ng-click="$event.preventDefault();getFile(file)" target="_blank">{{ file.name }}</a></span>' +
+        ' <span class="fileSize control-label">{{ fileSize(file.size) }}</span>' +
+        ' <span ng-if="!readOnly" ng-click="removeFile($index)"class="glyphicon glyphicon-remove"></span>' +
         '</div>' +
-        '<div ng-repeat="fileUpload in fileUploads track by $index" ng-class="{' + "'has-error'" + ': fileUpload.status === '+ "'error'" +'}">' +
-          '<div>{{ fileUpload.name }}</div>' +
-          '<span ng-if="fileUpload.status === ' + "'progress'" + '">' +
-            '<div class="progress">' +
-              '<div class="progress-bar" role="progressbar" aria-valuenow="{{fileUpload.progress}}" aria-valuemin="0" aria-valuemax="100" style="width:{{fileUpload.progress}}%">' +
-                '<span class="sr-only">{{fileUpload.progress}}% Complete</span>' +
-              '</div>' +
-            '</div>' +
-          '</span>' +
-          '<span ng-if="!fileUpload.status !== ' + "'progress'" + '" class="bg-{{ fileUpload.status }} help-block">' +
-            '{{ fileUpload.message }}' +
-          '</span>' +
+        '<div ng-if="!readOnly">' +
+        ' <div ngf-drop="upload($files)" class="fileSelector" ngf-drag-over-class="' + "'" + 'fileDragOver' + "'" + '" ngf-multiple="component.multiple"><span class="glyphicon glyphicon-cloud-upload"></span>Drop files to attach, or <a href="#" ngf-select="upload($files)" ngf-multiple="component.multiple">browse</a>.</div>' +
+        ' <div ng-if="!component.storage" class="alert alert-warning">No storage has been set for this field. File uploads are disabled until storage is set up.</div>' +
+        ' <div ngf-no-file-drop>File Drag/Drop is not supported for this browser</div>' +
+        '</div>' +
+        '<div ng-repeat="fileUpload in fileUploads track by $index" ng-class="{' + "'has-error'" + ': fileUpload.status === '+ "'error'" +'}" class="file">' +
+        ' <span class="fileName control-label">{{ fileUpload.name }}</span>' +
+        ' <span class="fileSize control-label">{{ fileSize(fileUpload.size) }}</span>' +
+        ' <span ng-click="removeUpload($index)" class="glyphicon glyphicon-remove"></span>' +
+        ' <span ng-if="fileUpload.status === ' + "'progress'" + '">' +
+        '   <div class="progress">' +
+        '     <div class="progress-bar" role="progressbar" aria-valuenow="{{fileUpload.progress}}" aria-valuemin="0" aria-valuemax="100" style="width:{{fileUpload.progress}}%">' +
+        '       <span class="sr-only">{{fileUpload.progress}}% Complete</span>' +
+        '     </div>' +
+        '   </div>' +
+        ' </span>' +
+        ' <div ng-if="!fileUpload.status !== ' + "'progress'" + '" class="bg-{{ fileUpload.status }} control-label">' +
+        '   {{ fileUpload.message }} ' +
+        ' </div>' +
         '</div>' +
       '</div>'
       );
