@@ -88,6 +88,9 @@ app.run([
 
     $templateCache.put('formio/submissions.html',
       '<div>' +
+        '<div ng-repeat="alert in formioAlerts" class="alert alert-{{ alert.type }}" role="alert">' +
+          '{{ alert.message }}' +
+        '</div>' +
         '<table class="table">' +
           '<thead>' +
             '<tr>' +
@@ -98,7 +101,7 @@ app.run([
             '</tr>' +
           '</thead>' +
           '<tbody>' +
-            '<tr ng-repeat="submission in _submissions" class="formio-submission" ng-click="onClickSubmission({submission:submission})">' +
+            '<tr ng-repeat="submission in _submissions" class="formio-submission" ng-click="$emit(\'submissionView\', submission)">' +
               '<td ng-repeat="component in _form.components | flattenComponents" ng-if="tableView(component)">{{ fieldData(submission.data, component) }}</td>' +
               '<td>{{ submission.created | amDateFormat:\'l, h:mm:ss a\' }}</td>' +
               '<td>{{ submission.modified | amDateFormat:\'l, h:mm:ss a\' }}</td>' +

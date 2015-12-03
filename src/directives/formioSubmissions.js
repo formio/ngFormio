@@ -6,8 +6,7 @@ module.exports = function() {
       src: '=',
       form: '=',
       submissions: '=',
-      perPage: '=',
-      onClickSubmission: '&'
+      perPage: '='
     },
     templateUrl: 'formio/submissions.html',
     controller: [
@@ -19,6 +18,13 @@ module.exports = function() {
         $element,
         FormioScope
       ) {
+        $scope.formioAlerts = [];
+        // Shows the given alerts (single or array), and dismisses old alerts
+        this.showAlerts = $scope.showAlerts = function(alerts) {
+          $scope.formioAlerts = [].concat(alerts);
+        };
+
+        $scope.perPage = $scope.perPage === undefined ? 10 : $scope.perPage;
         $scope.formio = FormioScope.register($scope, $element, {
           form: true,
           submissions: true
