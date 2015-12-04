@@ -51,6 +51,7 @@ app.controller('TeamViewController', [
   'FormioAlerts',
   'GoogleAnalytics',
   '$state',
+  'TeamPermissions',
   function(
     $scope,
     $stateParams,
@@ -59,8 +60,17 @@ app.controller('TeamViewController', [
     AppConfig,
     FormioAlerts,
     GoogleAnalytics,
-    $state
+    $state,
+    TeamPermissions
   ) {
+    $scope.getPermissionLabel = TeamPermissions.getPermissionLabel.bind(TeamPermissions);
+    $scope.teamPermissionsLoaded = false;
+    Formio.request(AppConfig.apiBase + '/team/' + $stateParams.teamId + '/projects', 'GET')
+      .then(function(teams) {
+        $scope.teamPermissionsLoaded = true;
+        $scope.teamPermissions = teams;
+      });
+
     $scope.leaveTeam = function(id) {
       // Always clear cache for the current teams.
       Formio.clearCache();
