@@ -4,7 +4,7 @@ var AWS = require('aws-sdk');
 module.exports = function(router) {
   var cache = require('../cache/cache')(router.formio.formio);
 
-  router.get('/project/:projectId/form/:formId/submission/storage/s3',
+  router.get('/project/:projectId/form/:formId/storage/s3',
     router.formio.formio.middleware.tokenHandler,
     function(req, res, next) {
       if(!req.projectId && req.params.projectId) {
@@ -36,7 +36,7 @@ module.exports = function(router) {
     }
   );
 
-  router.post('/project/:projectId/form/:formId/submission/storage/s3',
+  router.post('/project/:projectId/form/:formId/storage/s3',
     router.formio.formio.middleware.tokenHandler,
     function(req, res, next) {
       if(!req.projectId && req.params.projectId) {
