@@ -4,11 +4,13 @@ var _ = require('lodash');
 var Q = require('q');
 var debug = {
   teamAll: require('debug')('formio:teams:teamAll'),
+  teamProjects: require('debug')('formio:teams:teamProjects'),
   teamOwn: require('debug')('formio:teams:teamOwn'),
   leaveTeams: require('debug')('formio:teams:leaveTeams'),
   loadTeams: require('debug')('formio:teams:loadTeams'),
   getTeams: require('debug')('formio:teams:getTeams'),
   getProjectTeams: require('debug')('formio:teams:getProjectTeams'),
+  getProjectPermission: require('debug')('formio:teams:getProjectPermission'),
   getDisplayableTeams: require('debug')('formio:teams:getDisplayableTeams'),
   filterTeamsForDisplay: require('debug')('formio:teams:filterTeamsForDisplay')
 };
@@ -47,8 +49,6 @@ module.exports = function(app, formioServer) {
         getDisplayableTeams(teams)
           .then(function(teams) {
             return filterTeamsForDisplay(teams);
-          }, function(err) {
-            return res.sendStatus(400);
           })
           .then(function(teams) {
             // Inject the original team permissions with each team.
@@ -61,7 +61,8 @@ module.exports = function(app, formioServer) {
             });
 
             return res.status(200).json(teams);
-          }, function(err) {
+          })
+          .catch(function(err) {
             return res.sendStatus(400);
           });
       });
@@ -72,7 +73,7 @@ module.exports = function(app, formioServer) {
    * Expose the functionality to find all of a users teams.
    */
   app.get('/team/all', formioServer.formio.middleware.tokenHandler, function(req, res, next) {
-    if (!req.token || !req.token.user._id) {
+    if(!req.token || !req.token.user._id) {
       return res.sendStatus(401);
     }
 
@@ -83,7 +84,8 @@ module.exports = function(app, formioServer) {
 
         debug.teamAll(teams);
         return res.status(200).json(teams);
-      }, function(err) {
+      })
+      .catch(function(err) {
         debug.teamAll(err);
         return res.sendStatus(400);
       });
@@ -93,9 +95,7 @@ module.exports = function(app, formioServer) {
    * Expose the functionality to find all the teams a user owns.
    */
   app.get('/team/own', formioServer.formio.middleware.tokenHandler, function(req, res, next) {
-    debug.teamOwn(!req.token || !req.token.user._id);
-
-    if (!req.token || !req.token.user._id) {
+    if(!req.token || !req.token.user._id) {
       return res.sendStatus(401);
     }
 
@@ -106,7 +106,8 @@ module.exports = function(app, formioServer) {
 
         debug.teamOwn(teams);
         return res.status(200).json(teams);
-      }, function(err) {
+      })
+      .catch(function(err) {
         debug.teamOwn(err);
         return res.sendStatus(400);
       });
@@ -118,12 +119,12 @@ module.exports = function(app, formioServer) {
   app.post('/team/:teamId/leave', formioServer.formio.middleware.tokenHandler, function(req, res, next) {
     var util = formioServer.formio.util;
 
-    if (!req.token || !req.token.user._id || !req.params.teamId) {
+    if(!req.token || !req.token.user._id || !req.params.teamId) {
       return res.sendStatus(401);
     }
 
     loadTeams(function(team) {
-      if (!team) {
+      if(!team) {
         return res.sendStatus(400);
       }
 
@@ -136,7 +137,7 @@ module.exports = function(app, formioServer) {
       debug.leaveTeams(JSON.stringify(query));
 
       formioServer.formio.resources.submission.model.findOne(query, function(err, document) {
-        if (err || !document) {
+        if(err || !document) {
           debug.leaveTeams(err);
           return res.sendStatus(400);
         }
@@ -160,7 +161,7 @@ module.exports = function(app, formioServer) {
 
         // Convert each _id to strings for comparison.
         document.data.members = _.map(document.data.members, function(element) {
-          if (element._id) {
+          if(element._id) {
             element._id = util.idToBson(element._id);
           }
 
@@ -170,7 +171,7 @@ module.exports = function(app, formioServer) {
         // Save the updated team.
         document.markModified('data.members');
         document.save(function(err, update) {
-          if (err) {
+          if(err) {
             debug.leaveTeams(err);
             return res.sendStatus(400);
           }
@@ -183,25 +184,116 @@ module.exports = function(app, formioServer) {
   });
 
   /**
+   * Get the given teams permissions within the given project.
+   *
+   * @param project {Object}
+   *   The project object.
+   * @param team {String|Object}
+   *   The given team to search for.
+   *
+   * @returns {String}
+   *   The permission that the given team has within the given project.
+   */
+  var getProjectPermission = function(project, team) {
+    debug.getProjectPermission('project: ' + JSON.stringify(project));
+    debug.getProjectPermission('team: ' + team);
+    project.access = project.access || [];
+
+    // Get the permission type starting with team_.
+    var type = _.filter(project.access, function(access) {
+      access.type = access.type || '';
+      access.roles = access.roles || [];
+      access.roles = _.map(access.roles, formioServer.formio.util.idToString);
+
+      var starts = _.startsWith(access.type, 'team_');
+      var contains = _.contains(access.roles, formioServer.formio.util.idToString(team));
+
+      debug.getProjectPermission('access: ' + JSON.stringify(access));
+      debug.getProjectPermission('starts: ' + starts);
+      debug.getProjectPermission('contains: ' + contains);
+      return starts && contains;
+    });
+    debug.getProjectPermission(type);
+
+    // A team should never have more than one permission.
+    if(type.length > 1) {
+      console.error('The given project: ' + JSON.stringify(project) + '\n has a team with more than one permission: ' + team);
+
+      // Return the highest access permission.
+      var permissions = _.pluck(type, 'type');
+      debug.getProjectPermission(permissions);
+
+      if(_.contains(permissions, 'team_admin')) return 'team_admin';
+      if(_.contains(permissions, 'team_write')) return 'team_write';
+      if(_.contains(permissions, 'team_read')) return 'team_read';
+    }
+
+    return type[0].type || '';
+  };
+
+  /**
+   * Allow a user with permission to get all the associated projects and roles that the current team is associated with.
+   */
+  app.get('/team/:teamId/projects', formioServer.formio.middleware.tokenHandler, function(req, res, next) {
+    if(!req.params.teamId) {
+      debug.teamProjects('Skipping, no teamId given');
+      return res.sendStatus(400);
+    }
+
+    var _team = req.params.teamId;
+    var query = {
+      $and: [
+        {$or: [{'access.type': 'team_read'}, {'access.type': 'team_write'}, {'access.type': 'team_admin'}]},
+        {'access.roles': {$in: [formioServer.formio.util.idToString(_team), formioServer.formio.util.idToBson(_team)]}}
+      ],
+      deleted: {$eq: null}
+    };
+
+    debug.teamProjects(query);
+    formioServer.formio.resources.project.model.find(query, function(err, projects) {
+      if(err) {
+        debug.teamProjects(err);
+        return res.sendStatus(400);
+      }
+
+      var response = [];
+      _.forEach(projects, function(project) {
+        project = project.toObject();
+
+        response.push({
+          _id: project._id,
+          title: project.title,
+          name: project.name,
+          owner: project.owner,
+          permission: getProjectPermission(project, _team)
+        });
+      });
+
+      debug.teamProjects(response);
+      return res.status(200).json(response);
+    });
+  });
+
+  /**
    * Utility function to load the formio team resource.
    *
    * @param next {Function}
    *   The callback to invoke once the teams resource is loaded.
    */
   var loadTeams = function(next) {
-    if (_teamResource) {
+    if(_teamResource) {
       return next(_teamResource);
     }
 
     formioServer.formio.resources.project.model.findOne({name: 'formio'}, function(err, formio) {
-      if (err) {
+      if(err) {
         debug.loadTeams(err);
         return next(null);
       }
 
       debug.loadTeams('formio project: ' + formio._id);
       formioServer.formio.resources.form.model.findOne({name: 'team', project: formio._id}, function(err, teamResource) {
-        if (err) {
+        if(err) {
           debug.loadTeams(err);
           return next(null);
         }
@@ -231,10 +323,10 @@ module.exports = function(app, formioServer) {
 
     loadTeams(function(teamResource) {
       // Skip the teams functionality if no user or resource is found.
-      if (!teamResource) {
-        return q.reject('No team resource found.')
+      if(!teamResource) {
+        return q.reject('No team resource found.');
       }
-      if (!user || user.hasOwnProperty('_id') && !user._id) {
+      if(!user || user.hasOwnProperty('_id') && !user._id) {
         debug.getTeams(user);
         return q.reject('No user given.');
       }
@@ -270,7 +362,7 @@ module.exports = function(app, formioServer) {
 
       debug.getTeams(JSON.stringify(query));
       formioServer.formio.resources.submission.model.find(query, function(err, documents) {
-        if (err) {
+        if(err) {
           debug.getTeams(err);
           return q.reject(err);
         }
@@ -360,7 +452,7 @@ module.exports = function(app, formioServer) {
     loadTeams(function(teamResource) {
       // Skip the teams functionality if no user or resource is found.
       if(!teamResource) {
-        return q.reject('No team resource found.')
+        return q.reject('No team resource found.');
       }
       if(!teams || teams.hasOwnProperty('_id') && !teams._id) {
         debug.getDisplayableTeams(teams);

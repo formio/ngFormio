@@ -386,6 +386,80 @@ module.exports = function(app, template, hook) {
           });
       });
 
+      it('A Project Owner should be able to access /team/:teamId/projects to see all the projects associated with this team', function(done) {
+        request(app)
+          .get('/team/' + template.team1._id + '/projects')
+          .set('x-jwt-token', template.formio.owner.token)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end(function(err, res) {
+            if (err) {
+              return done(err);
+            }
+
+            var response = res.body;
+            assert.equal(response.length, 1);
+            assert.equal(response[0]._id, template.project._id);
+            assert.equal(response[0].title, template.project.title);
+            assert.equal(response[0].name, template.project.name);
+            assert.equal(response[0].owner, template.project.owner);
+            assert.equal(response[0].permission, 'team_read');
+
+            // Store the JWT for future API calls.
+            template.formio.owner.token = res.headers['x-jwt-token'];
+
+            done();
+          });
+      });
+
+      it('A Team member should be able to access /team/:teamId/projects to see all the projects associated with this team', function(done) {
+        request(app)
+          .get('/team/' + template.team1._id + '/projects')
+          .set('x-jwt-token', template.users.user1.token)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end(function(err, res) {
+            if (err) {
+              return done(err);
+            }
+
+            var response = res.body;
+            assert.equal(response.length, 1);
+            assert.equal(response[0]._id, template.project._id);
+            assert.equal(response[0].title, template.project.title);
+            assert.equal(response[0].name, template.project.name);
+            assert.equal(response[0].owner, template.project.owner);
+            assert.equal(response[0].permission, 'team_read');
+
+            // Store the JWT for future API calls.
+            template.users.user1.token = res.headers['x-jwt-token'];
+
+            done();
+          });
+      });
+
+      it('An anonymous user should be able to access /team/:teamId/projects to see all the projects associated with this team', function(done) {
+        request(app)
+          .get('/team/' + template.team1._id + '/projects')
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end(function(err, res) {
+            if (err) {
+              return done(err);
+            }
+
+            var response = res.body;
+            assert.equal(response.length, 1);
+            assert.equal(response[0]._id, template.project._id);
+            assert.equal(response[0].title, template.project.title);
+            assert.equal(response[0].name, template.project.name);
+            assert.equal(response[0].owner, template.project.owner);
+            assert.equal(response[0].permission, 'team_read');
+
+            done();
+          });
+      });
+
       it('A Team member should be able to remove themselves from the Team', function(done) {
         request(app)
           .post('/team/' + template.team1._id + '/leave')

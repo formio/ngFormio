@@ -96,7 +96,8 @@ module.exports = function(formio) {
 
             filterAccess();
             next();
-          }, function(err) {
+          })
+          .catch(function(err) {
             debug(err);
 
             filterAccess();

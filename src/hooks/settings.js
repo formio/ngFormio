@@ -10,8 +10,11 @@ var o365Util = require('../actions/office365/util');
 var nodeUrl = require('url');
 var fs = require('fs');
 var path = require('path');
+var Q = require('q');
 
-module.exports = function(app, formioServer) {
+module.exports = function(app) {
+  var formioServer = app.formio;
+
   // Include the request cache.
   var cache = require('../cache/cache')(formioServer.formio);
 
@@ -609,7 +612,7 @@ module.exports = function(app, formioServer) {
         // Convert all the roles to strings
         user.roles = _.map(_.filter(user.roles), util.idToString);
 
-        return formioServer.formio.teams.getTeams(user, true, true)
+        formioServer.formio.teams.getTeams(user, true, true)
           .then(function(teams) {
             // Filter the teams to only contain the team ids.
             _debug(teams);
@@ -619,12 +622,9 @@ module.exports = function(app, formioServer) {
             user.roles = _.uniq(user.roles.concat(teams));
             _debug(user.roles);
 
-            return next(null, user);
-          }, function(err) {
-            _debug(err);
-            return next(null, user);
+            return user;
           })
-          .denodeify(next);
+          .nodeify(next);
       },
 
       /**
