@@ -10,6 +10,7 @@
     "lint": "eslint src *.js"
   },
   "main": "./server.js",
+  "schema": "3.0.1-rc.1",
   "dependencies": {
     "adal-node": "^0.1.15",
     "async": "1.3.0",

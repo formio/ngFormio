@@ -878,12 +878,12 @@ module.exports = function(app) {
         // Attempt to resolve the private update.
         try {
           update = require(path.join(__dirname, '../db/updates/', name));
+          return update;
         }
         catch(e) {
           _debug(e);
+          return null;
         }
-
-        return update;
       }
     }
   }
