@@ -1,52 +1,51 @@
-<div class="row row-video">
-  <a class="video-banner" href="" ng-click="showIntroVideo()" ng-hide="introVideoVisible">
-    <img src="/images/formio-logo-with-slogan.png" alt="&lt;form.io&gt; - fastest FORM &amp; API workflow - anywhere." />
-    <div class="video-play-icon"><span class="icon-bg"><span class="glyphicon glyphicon-play"></span></span></div>
-  </a>
-  <div id="intro-video-container" ng-if="introVideoVisible" ng-class="{'video-open': introVideoExpanded}">
-    <iframe id="intro-video" src="https://www.youtube.com/embed/hrggvEniXFI?rel=0&amp;showinfo=0&amp;autoplay=1" frameborder="0" allowfullscreen></iframe>
-  </div>
-  <p class="text-muted text-center"><span class="glyphicon glyphicon-question-sign"></span> First time here? Watch the intro video above or try our <a href="http://help.form.io/start">walkthrough tutorial</a>.</p>
-</div>
-<hr>
 <div class="row">
-  <h2 class="text-center">Projects</h2>
   <div class="col-sm-12 projects">
     <div class="row">
       <div class="col-sm-4">
         <a class="project-create" ui-sref="createProject()">
-          <h4><p class="create-link">Create Project <br /><span class="glyphicon glyphicon-plus circle"></span></p></h4>
+          <h4><p class="create-link"><span class="glyphicon glyphicon-plus circle"></span> Create Project</p></h4>
         </a>
       </div>
+      <div class="project"  ui-sref="createProject()" ng-if="!projects.length">
+        <h4 class="project-title">Step 1: Create your project</h4>
+        <ng-include src="'views/project/help.html'"></ng-include>
+        <ul class="list-inline">
+          <li><a ui-sref="createProject()" class="btn btn-lg btn-primary"><span class="glyphicon glyphicon-plus circle"></span> Create Project</a></li>
+        </ul>
+      </div>
       <div class="col-sm-4" ng-repeat="project in projects">
-        <a class="project" ui-sref="project.edit({projectId: project._id})" title="{{ project.title }}">
-          <p class="project-plan pull-right"><small>
+        <div class="project" ng-click="goToProject(project)" title="{{ project.title }}">
+          <h4 class="project-title ellipsis"><a ui-sref="project.edit({projectId: project._id})">{{ project.title }}</a></h4>
+          <p class="project-plan"><small>
             <span class="label" ng-class="getPlanLabel(project.plan)">{{ getPlanName(project.plan) | uppercase }}</span>
           </small></p>
-          <h4 class="project-title ellipsis">{{ project.title }}</h4>
-          <p class="project-url ellipsis"><strong>{{ project.name }}</strong>.form.io</p>
+          <p class="project-url ellipsis" ui-sref="project.edit({projectId: project._id})"><strong>{{ project.name }}</strong>.form.io</p>
           <p class="project-description ellipsis">{{ project.description | characters: 50 }}&nbsp;</p>
           <p class="progress-label text-center"><small>Monthly API Calls</small></p>
           <div class="progress">
             <div class="progress-bar" role="progressbar" ng-style="{width: project.apiCalls.used / project.apiCalls.limit * 100 + '%'}" ng-class="getProgressBarClass(project.apiCalls)"></div>
             <span><small>{{ project.apiCalls.used | number }} / {{ getAPICallsLimit(project.apiCalls) }}</small></span>
           </div>
-        </a>
+          <ul class="list-inline" style="z-index:1000;">
+            <li><a ui-sref="project.edit({projectId: project._id})" class="btn btn-default">Manage</a></li>
+            <li><a ng-href="{{getPreviewURL(project)}}" target="_blank" ng-disabled="!project.settings.preview"class="btn btn-default">Preview</a></li>
+            <li><a ui-sref="project.settings.plan({projectId: project._id})" class="btn btn-default">Upgrade Plan</a></li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
 </div>
 <hr ng-if="projects.length != 0">
 <div class="row" ng-if="projects.length != 0">
-  <div class="col-md-3 col-vertical-center col-md-offset-3 col-sm-6">
+  <div class="col-md-4 col-vertical-center col-md-offset-1 col-sm-6">
     <h3>Bootstrap an application</h3>
     <p>If you're comfortable with a terminal, you can use our <strong>command line utility</strong> to <strong>bootstrap</strong> a working application from a template.</p>
     <p><small>Note: You must have <a target="_blank" href="https://nodejs.org">Node.js</a> installed on your machine.</small></p>
     <p><small>Other applications can be found @ <a target="_blank" href="https://github.com/formio?query=formio-app-">https://github.com/formio</a></small></p>
-  </div><!-- fix extra space causing column wrap
-  --><div class="col-vertical-center col-md-3 col-sm-6">
-<pre>npm install -g formio-cli
-formio bootstrap formio/formio-app-todo
-</pre>
+  </div>
+  <div class="col-vertical-center col-md-5 col-sm-6">
+  <pre>npm install -g formio-cli
+formio bootstrap formio/formio-app-todo</pre>
   </div>
 </div>

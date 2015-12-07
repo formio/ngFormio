@@ -256,6 +256,7 @@ angular
       ProjectPlans,
       $timeout
     ) {
+      $rootScope.showHeader = true;
       $rootScope.activeSideBar = 'home';
       $rootScope.currentProject = null;
       $rootScope.currentForm = null;
@@ -362,12 +363,28 @@ angular
       $rootScope.$stateParams = $stateParams;
       $rootScope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams) {
         $window.document.body.scrollTop = $window.document.documentElement.scrollTop = 0;
+        $rootScope.showHeader = false;
         $rootScope.alerts = FormioAlerts.getAlerts();
         $rootScope.previousState = fromState.name;
         $rootScope.previousParams = fromParams;
         $rootScope.currentState = toState.name;
         GoogleAnalytics.sendPageView();
       });
+
+      $rootScope.goToProject = function(project) {
+        $state.go('project.edit', {projectId: project._id});
+      };
+
+      $rootScope.getPreviewURL = function(project) {
+        if (!project.settings || !project.settings.preview) { return ''; }
+        var url = 'http://help.form.io/project';
+        url += '?project=' + encodeURIComponent(project.name);
+        url += '&previewUrl=' + encodeURIComponent(project.settings.preview.url);
+        url += '&host=' + encodeURIComponent(AppConfig.serverHost);
+        url += '&protocol=' + encodeURIComponent($location.protocol());
+        url += '&repo=' + encodeURIComponent(project.settings.preview.repo);
+        return url;
+      };
 
       var authError = function() {
         $rootScope.currentApp = null;
