@@ -27,9 +27,9 @@
             <span><small>{{ project.apiCalls.used | number }} / {{ getAPICallsLimit(project.apiCalls) }}</small></span>
           </div>
           <ul class="list-inline" style="z-index:1000;">
-            <li><a ui-sref="project.edit({projectId: project._id})" class="btn btn-default">Manage</a></li>
-            <li><a ng-href="{{getPreviewURL(project)}}" target="_blank" ng-disabled="!project.settings.preview"class="btn btn-default">Preview</a></li>
-            <li><a ui-sref="project.settings.plan({projectId: project._id})" class="btn btn-default">Upgrade Plan</a></li>
+            <li><a ui-sref="project.edit({projectId: project._id})" class="btn btn-default btn-sm">Manage</a></li>
+            <li><a ng-href="{{getPreviewURL(project)}}" target="_blank" ng-disabled="!project.settings.preview"class="btn btn-default btn-sm">Preview</a></li>
+            <li><a ui-sref="project.settings.plan({projectId: project._id})" class="btn btn-default btn-sm">Upgrade Plan</a></li>
           </ul>
         </div>
       </div>
