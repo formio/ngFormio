@@ -15,8 +15,8 @@ $gray-light:             lighten($gray-base, 60%);   // #999
 $gray-lighter:           lighten($gray-base, 93.5%); // #eee
 
 $brand-primary:         #127abe;
-$brand-secondary:       #56b147;
-$brand-success:         lighten($brand-secondary, 10%);
+$brand-secondary:       #4EAA17;
+$brand-success:         lighten($brand-secondary, 5%);
 $brand-info:            lighten($brand-primary, 25%);
 $brand-warning:         #E99002;
 $brand-danger:          #F04124;
@@ -361,7 +361,7 @@ $navbar-padding-vertical:          (($navbar-height - $line-height-computed) / 2
 $navbar-collapse-max-height:       340px;
 
 $navbar-default-color:             #fff;
-$navbar-default-bg:                #56b147;
+$navbar-default-bg:                $brand-secondary;
 $navbar-default-border:            darken($navbar-default-bg, 6.5%);
 
 // Navbar links

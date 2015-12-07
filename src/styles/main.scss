@@ -1,4 +1,5 @@
 @import "variables.scss";
+@import "mixins.scss";
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
   display: none !important;
 }
@@ -59,7 +60,7 @@ ul.dropdown-menu {
   }
   .breadcrumb {
     float: left;
-    margin: 6px 10px;
+    margin: 0;
     font-size: 14px;
     border: none;
     text-transform: none;
@@ -498,96 +499,40 @@ body {
 }
 
 footer {
-  display: table-row;
-  height: 1px;
-  // width: 100%;
-  color: #FFF;
-
-  a, a:hover, a:active {
-    color: #FFF
+  color: #f0f0f0;
+  padding: 0 0 25px 0;
+  text-align: center;
+  background-color: darken($brand-secondary, 2%);
+  a {
+    color: white;
   }
-
-  .blue {
-    background: $brand-primary;
-    height: 80px;
-    position: relative;
+  .section-heading {
+    color: #eee;
   }
-
-  .green {
-    padding-top: 25px;
-    background: #56b147;
-  }
-
-  #footer-logo {
-    float: right;
-    height: 40px;
-    margin-right: 40px;
-    margin-top: 15px;
-  }
-
-  #footer-divider {
+  .footer-banner img {
+    margin-top: -2.2em;
     width: 100%;
-    height: 80px;
-    position: absolute;
-    bottom: -45px;
   }
-
-  h3 {
-    padding-top: 15px;
-    font-size: 28px;
-    line-height: 32px;
-    padding-bottom: 30px;
-    color: #FFF;
-    font-family: 'HelveticaNeueLTStd-MdCn';
-    letter-spacing: 1px;
-  }
-
-  ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-  }
-
-  #footer-content ul {
-    font-size: 14px;
-    li {
-      padding: 10px 0 10px 0;
-      .fa {
-        width: 15px;
-      }
-    }
-    li:not(:first-child) {
-      border-top: #70d160 solid 1px;
+  .list-group .list-group-item {
+    font-size: 1.2em;
+    background-color:$brand-secondary;
+    border-color: lighten($brand-secondary, 10%);
+    i {
+      font-size: 1.5em;
+      float: left;
     }
   }
-
-  #footer-nav {
-    margin-top: 30px;
-    margin-bottom: 30px;
-    font-family: 'HelveticaNeueLTStd-MdCn';
-    font-size: 18px;
-    line-height: 18px;
-    text-transform: uppercase;
-    text-align: center;
-    @media(min-width: $screen-md-min) {
-      .footer-nav-item:not(:first-child) {
-        border-left: #8dc34a solid 1px;
-      }
-    }
-    @media(max-width: $screen-md-min) {
-      .footer-nav-item {
-        padding: 5px;
-        text-align: left;
-      }
-    }
-
-
+  span.copyright {
+    line-height: 40px;
+    @include heading-font();
+    text-transform: none;
   }
-
-  #copyright {
-    padding: 5px;
+  ul.quicklinks {
+    margin-bottom: 0;
+    line-height: 40px;
+    @include heading-font();
+    text-transform: none;
   }
-
 }
 
 /***************************** Kendo UI *****************************/
@@ -597,9 +542,34 @@ footer {
 }
 
 /***************************** Landing Page *****************************/
+.welcome-banner {
+  background-color: $brand-secondary;
+  color: #eee;
+  text-align: center;
+  padding-top: 30px;
+  margin-bottom: 0;
+  &.jumbotron h1 {
+    font-size: 56px;
+  }
+  .list-inline {
+    padding-top: 30px;
+  }
+  .btn-lg {
+    background-color: $brand-secondary;
+    border: solid #eee 2px;
+    color: #eee;
+    &:hover {
+      background-color: lighten($brand-secondary, 5%);
+    }
+  }
+}
+
+.breadcrumb .label {
+  border-radius: 20px;
+}
+
 .projects {
   padding-top: 20px;
-  padding-bottom: 50px;
   .project-create {
     display: block;
     text-decoration: none;
@@ -607,11 +577,11 @@ footer {
     border: 4px dashed transparentize($brand-primary, .75);
     color: transparentize($brand-primary, .25);
     text-align: center;
-    height: 200px;
+    height: 270px;
     margin-bottom: 30px;
     .create-link {
       display: block;
-      padding-top: 50px;
+      padding-top: 90px;
       .glyphicon {
         margin-top: 5px;
         background: transparentize($brand-primary, .25);
@@ -634,40 +604,49 @@ footer {
     display: block;
     position: relative;
     text-decoration: none;
-    background-color: $brand-primary;
-    border: 1px solid darken($brand-primary, 10%);
+    background-color: $gray-lighter;
+    border: 2px solid darken($gray-lighter, 10%);
     overflow: hidden;
     transition: .15s;
+    height: 270px;
     &:hover {
-      background-color: lighten($brand-primary, 5%);
+      background-color: lighten($gray-lighter, 5%);
     }
     &:active {
-      background-color: lighten($brand-primary, 10%);
+      background-color: lighten($gray-lighter, 10%);
     }
-    color: $gray-lighter;
-    height: 200px;
+    color: $gray-light;
     margin-bottom: 30px;
     padding: 10px 15px;
-    .project-title {
+    .project-title a {
       font-weight: 600;
+      color: $gray-light;
     }
     .project-plan {
       margin-top: 9px;
     }
     .project-url {
       // Lighten this up a bit so it's easier to read
-      color: saturate(lighten($brand-secondary, 10%), 20%);
+      color: lighten($brand-primary, 10%);
     }
 
     .progress-label {
       padding-top: 10px;
-      color: transparentize($gray-lighter, .33);
       margin-bottom: 0;
     }
+    .list-inline {
+      text-align: center;
+    }
     .progress {
-      background-color: darken($brand-primary, 10%);
-      border: 1px solid darken($brand-primary, 20%);
+      background-color: white;
+      border: 1px solid lighten($brand-primary, 10%);
+      padding: 0;
       position: relative;
+      color: #666;
+      margin-bottom: 10px;
+      .progress-bar-success {
+        background-color: lighten($brand-secondary, 10%);
+      }
       span {
         position: absolute;
         display: block;
@@ -677,6 +656,10 @@ footer {
       }
     }
   }
+}
+
+.project-help-panel {
+  margin-top: 92px;
 }
 
 .row.row-video {
@@ -749,7 +732,7 @@ footer {
 }
 
 .label-community {
-  background-color: darken($brand-primary, 10%);
+  background-color: $brand-primary;
   color: #FFF;
 }
 

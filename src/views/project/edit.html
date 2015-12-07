@@ -49,9 +49,8 @@
       <div class="panel-body">
         <p>This project was generated from a template that provides a preview app. Check out how your project looks!</p>
         <div class="form-group pull-right">
-          <a ng-href="{{getPreviewURL()}}" target="_blank" class="btn btn-primary">Preview Project</a>
+          <a ng-href="{{getPreviewURL(currentProject)}}" target="_blank" class="btn btn-primary">Preview Project</a>
         </div>
-
       </div>
     </div>
     <div class="panel panel-info panel-project-info">
@@ -66,6 +65,7 @@
             </div>
           </div>
           <div class="media-body">
+            <a ui-sref="project.settings.plan()" class="btn btn-default pull-right">Upgrade Plan</a>
             <h5 class="media-heading">Current Plan</h5>
             <h4>{{ getPlanName(currentProject.plan) }}</h4>
           </div>
