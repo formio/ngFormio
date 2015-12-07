@@ -65,7 +65,7 @@ describe('Bootstrap', function() {
         formTeam: {
           _id: '55479ce7685637ab440a0765'
         },
-        resource: {
+        userResource: {
           _id: '553db94e72f702e714dd9779'
         }
       };

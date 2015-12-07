@@ -95,7 +95,7 @@ module.exports = function(db, config, tools, done) {
       }
     ];
 
-    forms.updateOne({_id: form._id, project: project._id}, {components: form.components, submissionAccess: form.submissionAccess}, function(err) {
+    forms.updateOne({_id: form._id, project: project._id}, {$set: {components: form.components, submissionAccess: form.submissionAccess}}, function(err) {
       if(err) {
         return cb(err);
       }
