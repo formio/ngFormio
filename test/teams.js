@@ -280,7 +280,7 @@ module.exports = function(app, template, hook) {
             return done(err);
           }
 
-          project.plan = 'team1';
+          project.plan = 'team';
           project.save(function(err) {
             if(err) {
               return done(err);

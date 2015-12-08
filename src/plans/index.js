@@ -8,11 +8,9 @@ var debug = {
 
 module.exports = function(formioServer, cache) {
   var limits = {
-    community: 1000,
-    basic: 10000,
-    team1: 250000,
-    team2: 500000,
-    team3: 2000000,
+    basic: 1000,
+    independent: 10000,
+    team: 250000,
     commercial: Number.MAX_VALUE
   };
 

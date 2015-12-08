@@ -104,12 +104,39 @@ module.exports = function(db, config, tools, done) {
     });
   };
 
+  var convertProjectPlan = function(from, to, cb) {
+    projects.updateMany({plan: from}, {$set: {plan: to}}, function(err) {
+      if(err) {
+        return cb(err);
+      }
+
+      cb();
+    });
+  };
+
+  var updateProjectPlans = function(cb) {
+    async.series([
+      async.apply(convertProjectPlan, 'basic', 'independent'),
+      async.apply(convertProjectPlan, 'community', 'basic'),
+      async.apply(convertProjectPlan, 'team1', 'team'),
+      async.apply(convertProjectPlan, 'team2', 'team'),
+      async.apply(convertProjectPlan, 'team3', 'team')
+    ], function(err) {
+      if(err) {
+        return cb(err);
+      }
+
+      return cb();
+    });
+  };
+
   // Execute update 3.0.1-rc.1
   async.waterfall([
     getFormio,
     getTeams,
     removeOldTeams,
-    updateTeams
+    updateTeams,
+    updateProjectPlans
   ], function(err) {
     if(err) {
       return done(err);

@@ -40,7 +40,7 @@ module.exports = function(app, template, hook) {
 
             var response = res.body;
             assert.equal(length, 1);
-            assert.equal(response.plan, 'community');
+            assert.equal(response.plan, 'basic');
 
             template.project = response;
 
@@ -87,9 +87,9 @@ module.exports = function(app, template, hook) {
     });
 
     it('A project which has exceeded its API limit should still fulfill requests (throttled)', function(done) {
-      // Override the community project limits for tests.
-      var old = app._server.formio.plans.limits['community'];
-      app._server.formio.plans.limits['community'] = 1;
+      // Override the basic project limits for tests.
+      var old = app._server.formio.plans.limits['basic'];
+      app._server.formio.plans.limits['basic'] = 1;
 
       request(app)
         .get('/project/' + template.project._id)
@@ -106,8 +106,8 @@ module.exports = function(app, template, hook) {
               return done(err);
             }
 
-            // Reset the community plan limits.
-            app._server.formio.plans.limits['community'] = old;
+            // Reset the basic plan limits.
+            app._server.formio.plans.limits['basic'] = old;
 
             // Store the JWT for future API calls.
             template.formio.owner.token = res.headers['x-jwt-token'];
@@ -131,7 +131,7 @@ module.exports = function(app, template, hook) {
           }
 
           var response = res.body;
-          assert.equal(response.plan, 'community');
+          assert.equal(response.plan, 'basic');
 
           template.project = res.body;
 
@@ -158,7 +158,7 @@ module.exports = function(app, template, hook) {
             }
 
             var response = res.body;
-            assert.equal(response.plan, 'community');
+            assert.equal(response.plan, 'basic');
 
             template.project = res.body;
 

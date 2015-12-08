@@ -283,7 +283,7 @@ module.exports = function(app) {
 
             // Skip teams processing, if this projects plan does not support teams.
             _debug(project);
-            if (!project.plan || project.plan === 'community' || project.plan === 'basic') {
+            if (!project.plan || project.plan === 'basic' || project.plan === 'independent') {
               return callback(null);
             }
 
