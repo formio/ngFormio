@@ -233,7 +233,7 @@ app.controller('ProjectController', [
     $scope.loadProjectPromise = $scope.formio.loadProject().then(function(result) {
       $scope.currentProject = result;
       $rootScope.currentProject = result;
-      $scope.showName = !(result.plan && result.plan === 'community');
+      $scope.showName = !(result.plan && result.plan === 'basic');
       return $http.get($scope.formio.projectUrl + '/role');
     }).then(function(result) {
       $scope.currentProjectRoles = result.data;
@@ -315,7 +315,7 @@ app.controller('ProjectSettingsController', [
     $scope.loadProjectPromise.then(function() {
       // Mask child scope's reference to currentProject with a clone
       // Parent reference gets updated when we reload after saving
-      $scope.currentProject.plan = $scope.currentProject.plan || 'community';
+      $scope.currentProject.plan = $scope.currentProject.plan || 'basic';
       $scope.currentProject = _.cloneDeep($scope.currentProject);
 
       $scope.currentProjectTeams = []; // Get the current project teams.

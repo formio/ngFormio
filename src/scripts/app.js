@@ -518,23 +518,15 @@ angular
   .factory('ProjectPlans', ['$filter', function($filter) {
     return {
       plans: {
-        community: {
-          name: 'Community',
-          labelStyle: 'label-community'
-        },
         basic: {
           name: 'Basic',
           labelStyle: 'label-info'
         },
-        team1: {
-          name: 'Team',
-          labelStyle: 'label-success'
+        independent: {
+          name: 'Independent',
+          labelStyle: 'label-independent'
         },
-        team2: {
-          name: 'Team',
-          labelStyle: 'label-success'
-        },
-        team3: {
+        team: {
           name: 'Team',
           labelStyle: 'label-success'
         },
@@ -590,5 +582,5 @@ angular
         if(!this.permissions[type]) return '';
         return this.permissions[type].label;
       }
-    }
+    };
   });
