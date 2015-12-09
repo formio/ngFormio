@@ -271,16 +271,6 @@ app.controller('ProjectController', [
       return AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/spec.' + format + '?token=' + Formio.getToken();
     };
 
-    $scope.getPreviewURL = function() {
-      var url = 'http://help.form.io/project';
-      url += '?project=' + encodeURIComponent($scope.currentProject.name);
-      url += '&previewUrl=' + encodeURIComponent($scope.currentProject.settings.preview.url);
-      url += '&host=' + encodeURIComponent(AppConfig.serverHost);
-      url += '&protocol=' + encodeURIComponent($location.protocol());
-      url += '&repo=' + encodeURIComponent($scope.currentProject.settings.preview.repo);
-      return url;
-    };
-
     $scope.getPlanName = ProjectPlans.getPlanName.bind(ProjectPlans);
     $scope.getPlanLabel = ProjectPlans.getPlanLabel.bind(ProjectPlans);
     $scope.getAPICallsLimit = ProjectPlans.getAPICallsLimit.bind(ProjectPlans);
