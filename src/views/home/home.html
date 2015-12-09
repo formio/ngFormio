@@ -26,14 +26,30 @@
             <div class="progress-bar" role="progressbar" ng-style="{width: project.apiCalls.used / project.apiCalls.limit * 100 + '%'}" ng-class="getProgressBarClass(project.apiCalls)"></div>
             <span><small>{{ project.apiCalls.used | number }} / {{ getAPICallsLimit(project.apiCalls) }}</small></span>
           </div>
-          <ul class="list-inline" style="z-index:1000;">
-            <li><a ui-sref="project.edit({projectId: project._id})" class="btn btn-default btn-sm">Manage</a></li>
-            <li><a ng-href="{{getPreviewURL(project)}}" target="_blank" ng-disabled="!project.settings.preview"class="btn btn-default btn-sm">Preview</a></li>
-            <li><a ui-sref="project.settings.plan({projectId: project._id})" class="btn btn-default btn-sm">Upgrade Plan</a></li>
-          </ul>
+          <div class="row" style="z-index:1000;">
+            <div class="col-sm-12">
+              <button ui-sref="project.edit({projectId: project._id})" class="btn btn-default btn-xs">Manage</button>
+              <button ng-href="{{getPreviewURL(project)}}" target="_blank" ng-disabled="!project.settings.preview"class="btn btn-default btn-xs">Preview</button>
+              <button ui-sref="project.settings.plan({projectId: project._id})" class="btn btn-default btn-xs">Upgrade Plan</button>
+            </div>
+          </div>
+          <div class="row project-teams" ng-show="!teamsLoading && (project.teams.length > 0)">
+            <div class="col-sm-12">
+              <small>
+                Teams: <a class="view-all ellipsis pull-right" ng-show="project.teams.length > 3" ui-sref="project.settings.teams.view({projectId: project._id})">View All</a>
+                <a class="ellipsis" ui-sref="team.view({teamId: team._id})" ng-repeat="team in project.teams | limitTo: 3"><br>{{team.data.name}}</a>
+              </small>
+            </div>
+          </div>
         </div>
       </div>
     </div>
+  </div>
+</div>
+<div class="row" ng-show="!teamsLoading && !(teamsEnabled || teamMember)">
+  <h2 class="text-center">Teams</h2>
+  <div class="col-sm-offset-2 col-vertical-center col-sm-8 teams">
+    <span class="team-upgrade">Want to work collaboratively? <a href="https://form.io/#pricing">Upgrade</a> a project to TeamPro to enable Team functionality.</span>
   </div>
 </div>
 <div class="row" ng-show="!teamsLoading && (teamsEnabled || teamMember)">
@@ -46,12 +62,18 @@
         </a>
       </div>
       <div class="col-sm-4" ng-repeat="team in teams">
-        <div class="team" ui-sref="team.view({teamId: team._id})">
+        <div class="team">
           <h4 class="team-name ellipsis"><a ui-sref="team.edit({teamId: team._id})">{{ team.data.name }}</a></h4>
           <p class="team-owner"><small>
             <span class="label label-success">{{ team.owner === user._id ? 'OWNER' : 'MEMBER'}}</span>
           </small></p>
           <p class="ellipsis"><i class="fa fa-users"></i>&nbsp;<strong>{{ team.data.members.length || 0 }}</strong></p>
+          <div class="row">
+            <div class="col-sm-12">
+              <button class="btn btn-default btn-sm" ui-sref="team.view({teamId: team._id})">View</button>
+              <button class="btn btn-default btn-sm" ng-show="team.owner === user._id" ui-sref="team.edit({teamId: team._id})">Manage</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -59,13 +81,13 @@
 </div>
 <hr ng-if="projects.length != 0">
 <div class="row" ng-if="projects.length != 0">
-  <div class="col-md-4 col-vertical-center col-md-offset-1 col-sm-6">
+  <div class="col-md-4 col-vertical-center col-md-offset-1 col-sm-6 col-xs-6">
     <h3>Bootstrap an application</h3>
     <p>If you're comfortable with a terminal, you can use our <strong>command line utility</strong> to <strong>bootstrap</strong> a working application from a template.</p>
     <p><small>Note: You must have <a target="_blank" href="https://nodejs.org">Node.js</a> installed on your machine.</small></p>
     <p><small>Other applications can be found @ <a target="_blank" href="https://github.com/formio?query=formio-app-">https://github.com/formio</a></small></p>
   </div>
-  <div class="col-vertical-center col-md-5 col-sm-6">
+  <div class="col-vertical-center col-md-5 col-sm-6 col-xs-6">
   <pre>npm install -g formio-cli
 formio bootstrap formio/formio-app-todo</pre>
   </div>

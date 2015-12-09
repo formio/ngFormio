@@ -279,13 +279,15 @@ angular
     'FormioAlerts',
     'ProjectPlans',
     '$timeout',
+    '$q',
     function(
       $scope,
       $rootScope,
       Formio,
       FormioAlerts,
       ProjectPlans,
-      $timeout
+      $timeout,
+      $q
     ) {
       $rootScope.showHeader = true;
       $rootScope.activeSideBar = 'home';
@@ -298,7 +300,7 @@ angular
 
       $scope.teams = [];
       $scope.teamsLoading = true;
-      Formio.request($scope.appConfig.apiBase + '/team/all', 'GET').then(function(results) {
+      var _teamsPromise = Formio.request($scope.appConfig.apiBase + '/team/all', 'GET').then(function(results) {
         $scope.teams = results;
         $scope.teamsLoading = false;
 
@@ -321,7 +323,7 @@ angular
       $scope.projects = {};
       $scope.projectsLoading = true;
       // TODO: query for unlimited projects instead of this limit
-      Formio.loadProjects('?limit=9007199254740991&sort=-modified').then(function(projects) {
+      var _projectsPromise = Formio.loadProjects('?limit=9007199254740991&sort=-modified').then(function(projects) {
         $scope.projectsLoading = false;
         angular.element('#projects-loader').hide();
         $scope.projects = projects;
@@ -330,6 +332,35 @@ angular
           return _.startsWith(project.plan, 'team');
         });
       }).catch(FormioAlerts.onError.bind(FormioAlerts));
+
+      // Inject the projects teams into the model if available
+      $q.all([_teamsPromise, _projectsPromise]).then(function() {
+        $scope.projects = _.map($scope.projects, function(project) {
+          project.teams = project.teams || [];
+
+          // Build the projects teams list if present in the permissions.
+          _.forEach(project.access, function(permission) {
+            if(_.startsWith(permission.type, 'team_')) {
+              permission.roles = permission.roles || [];
+              project.teams.push(permission.roles);
+            }
+          });
+
+          // Filter and translate the teams for use on the ui.
+          project.teams = _.uniq(_.flattenDeep(project.teams));
+          project.teams = _.map(project.teams, function(team) {
+            _.forEach($scope.teams, function(loadedTeam) {
+              if(loadedTeam._id === team) {
+                team = loadedTeam;
+              }
+            });
+
+            return team;
+          });
+
+          return project;
+        });
+      });
 
       $scope.showIntroVideo = function() {
         $scope.introVideoVisible = true;
@@ -544,7 +575,7 @@ angular
           labelStyle: 'label-warning'
         },
         team: {
-          name: 'Team',
+          name: 'Team Pro',
           labelStyle: 'label-success'
         },
         commercial: {

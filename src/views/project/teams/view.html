@@ -1,7 +1,6 @@
 <div class="alert alert-warning" ng-show="!teamsLoading">
   <i class="glyphicon glyphicon-exclamation-sign"></i>&nbsp;Teams are groups of Form.io users that work together on projects. Teams are available for <a href="https://www.form.io/pricing">TeamPro</a> users.
 </div>
-
 <table ng-show="!teamsLoading" class="table table-striped">
   <tbody>
     <tr ng-show="currentProject.owner === user._id && currentProjectTeams && currentProjectTeams.length === 0">
