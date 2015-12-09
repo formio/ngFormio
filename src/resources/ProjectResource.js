@@ -98,6 +98,8 @@ module.exports = function(router, formioServer) {
             var options = {settings: {}};
             options.settings[projectFieldName + '_action'] = 'increment';
             options.settings[projectFieldName + '_value'] = '1';
+            options.settings['lifecyclestage_action'] = 'value';
+            options.settings['lifecyclestage_value'] = 'opportunity';
 
             var ActionClass = formio.actions.actions['hubspotContact'];
             var action = new ActionClass(options, modReq, res);
