@@ -92,185 +92,6 @@ process.chdir = function (dir) {
 process.umask = function() { return 0; };
 
 },{}],2:[function(require,module,exports){
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-'use strict';
-
-// If obj.hasOwnProperty has been overridden, then calling
-// obj.hasOwnProperty(prop) will break.
-// See: https://github.com/joyent/node/issues/1707
-function hasOwnProperty(obj, prop) {
-  return Object.prototype.hasOwnProperty.call(obj, prop);
-}
-
-module.exports = function(qs, sep, eq, options) {
-  sep = sep || '&';
-  eq = eq || '=';
-  var obj = {};
-
-  if (typeof qs !== 'string' || qs.length === 0) {
-    return obj;
-  }
-
-  var regexp = /\+/g;
-  qs = qs.split(sep);
-
-  var maxKeys = 1000;
-  if (options && typeof options.maxKeys === 'number') {
-    maxKeys = options.maxKeys;
-  }
-
-  var len = qs.length;
-  // maxKeys <= 0 means that we should not limit keys count
-  if (maxKeys > 0 && len > maxKeys) {
-    len = maxKeys;
-  }
-
-  for (var i = 0; i < len; ++i) {
-    var x = qs[i].replace(regexp, '%20'),
-        idx = x.indexOf(eq),
-        kstr, vstr, k, v;
-
-    if (idx >= 0) {
-      kstr = x.substr(0, idx);
-      vstr = x.substr(idx + 1);
-    } else {
-      kstr = x;
-      vstr = '';
-    }
-
-    k = decodeURIComponent(kstr);
-    v = decodeURIComponent(vstr);
-
-    if (!hasOwnProperty(obj, k)) {
-      obj[k] = v;
-    } else if (isArray(obj[k])) {
-      obj[k].push(v);
-    } else {
-      obj[k] = [obj[k], v];
-    }
-  }
-
-  return obj;
-};
-
-var isArray = Array.isArray || function (xs) {
-  return Object.prototype.toString.call(xs) === '[object Array]';
-};
-
-},{}],3:[function(require,module,exports){
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-'use strict';
-
-var stringifyPrimitive = function(v) {
-  switch (typeof v) {
-    case 'string':
-      return v;
-
-    case 'boolean':
-      return v ? 'true' : 'false';
-
-    case 'number':
-      return isFinite(v) ? v : '';
-
-    default:
-      return '';
-  }
-};
-
-module.exports = function(obj, sep, eq, name) {
-  sep = sep || '&';
-  eq = eq || '=';
-  if (obj === null) {
-    obj = undefined;
-  }
-
-  if (typeof obj === 'object') {
-    return map(objectKeys(obj), function(k) {
-      var ks = encodeURIComponent(stringifyPrimitive(k)) + eq;
-      if (isArray(obj[k])) {
-        return map(obj[k], function(v) {
-          return ks + encodeURIComponent(stringifyPrimitive(v));
-        }).join(sep);
-      } else {
-        return ks + encodeURIComponent(stringifyPrimitive(obj[k]));
-      }
-    }).join(sep);
-
-  }
-
-  if (!name) return '';
-  return encodeURIComponent(stringifyPrimitive(name)) + eq +
-         encodeURIComponent(stringifyPrimitive(obj));
-};
-
-var isArray = Array.isArray || function (xs) {
-  return Object.prototype.toString.call(xs) === '[object Array]';
-};
-
-function map (xs, f) {
-  if (xs.map) return xs.map(f);
-  var res = [];
-  for (var i = 0; i < xs.length; i++) {
-    res.push(f(xs[i], i));
-  }
-  return res;
-}
-
-var objectKeys = Object.keys || function (obj) {
-  var res = [];
-  for (var key in obj) {
-    if (Object.prototype.hasOwnProperty.call(obj, key)) res.push(key);
-  }
-  return res;
-};
-
-},{}],4:[function(require,module,exports){
-'use strict';
-
-exports.decode = exports.parse = require('./decode');
-exports.encode = exports.stringify = require('./encode');
-
-},{"./decode":2,"./encode":3}],5:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -346,7 +167,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],6:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -501,7 +322,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],7:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -554,7 +375,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],8:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -586,7 +407,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],9:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -644,7 +465,7 @@ module.exports = function (app) {
   }]);
 };
 
-},{}],10:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -671,7 +492,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],11:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -757,7 +578,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],12:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -786,7 +607,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],13:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -818,7 +639,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],14:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -850,7 +671,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],15:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 var app = angular.module('formio');
 
@@ -877,7 +698,7 @@ require('./signature')(app);
 require('./textarea')(app);
 require('./well')(app);
 
-},{"./address":5,"./button":6,"./checkbox":7,"./columns":8,"./components":9,"./content":10,"./datetime":11,"./email":12,"./fieldset":13,"./hidden":14,"./number":16,"./page":17,"./panel":18,"./password":19,"./phonenumber":20,"./radio":21,"./resource":22,"./select":23,"./signature":24,"./textarea":25,"./textfield":26,"./well":27}],16:[function(require,module,exports){
+},{"./address":2,"./button":3,"./checkbox":4,"./columns":5,"./components":6,"./content":7,"./datetime":8,"./email":9,"./fieldset":10,"./hidden":11,"./number":13,"./page":14,"./panel":15,"./password":16,"./phonenumber":17,"./radio":18,"./resource":19,"./select":20,"./signature":21,"./textarea":22,"./textfield":23,"./well":24}],13:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -940,7 +761,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],17:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -966,7 +787,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],18:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -1001,7 +822,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],19:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -1031,7 +852,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],20:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -1063,7 +884,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],21:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -1116,7 +937,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],22:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -1209,7 +1030,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],23:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -1390,7 +1211,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],24:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -1527,7 +1348,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],25:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -1582,7 +1403,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],26:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -1648,7 +1469,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],27:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -1678,7 +1499,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],28:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -1711,7 +1532,7 @@ module.exports = function() {
   };
 };
 
-},{}],29:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -1842,7 +1663,7 @@ module.exports = function() {
   };
 };
 
-},{}],30:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -1996,7 +1817,7 @@ module.exports = [
   }
 ];
 
-},{}],31:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -2076,7 +1897,7 @@ module.exports = function() {
   };
 };
 
-},{}],32:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 "use strict";
 module.exports = [
   '$compile',
@@ -2098,7 +1919,7 @@ module.exports = [
   }
 ];
 
-},{}],33:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -2108,7 +1929,7 @@ module.exports = function() {
   };
 };
 
-},{}],34:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -2162,7 +1983,7 @@ module.exports = function() {
   };
 };
 
-},{}],35:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -2326,7 +2147,7 @@ module.exports = [
   }
 ];
 
-},{}],36:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -2414,7 +2235,7 @@ module.exports = function() {
   };
 };
 
-},{}],37:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 "use strict";
 module.exports = [
   '$q',
@@ -2463,7 +2284,7 @@ module.exports = [
   }
 ];
 
-},{}],38:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 "use strict";
 module.exports = [
   'FormioUtils',
@@ -2472,7 +2293,7 @@ module.exports = [
   }
 ];
 
-},{}],39:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 "use strict";
 module.exports = [
   '$sce',
@@ -2485,7 +2306,7 @@ module.exports = [
   }
 ];
 
-},{}],40:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 "use strict";
 var app = angular.module('formio', [
   'ngSanitize',
@@ -2646,7 +2467,7 @@ app.run([
 
 require('./components');
 
-},{"./components":15,"./directives/customValidator":28,"./directives/formio":29,"./directives/formioComponent":30,"./directives/formioDelete":31,"./directives/formioElement":32,"./directives/formioErrors":33,"./directives/formioSubmissions":34,"./factories/FormioScope":35,"./factories/FormioUtils":36,"./factories/formioInterceptor":37,"./filters/flattenComponents":38,"./filters/safehtml":39,"./providers/Formio":41}],41:[function(require,module,exports){
+},{"./components":12,"./directives/customValidator":25,"./directives/formio":26,"./directives/formioComponent":27,"./directives/formioDelete":28,"./directives/formioElement":29,"./directives/formioErrors":30,"./directives/formioSubmissions":31,"./factories/FormioScope":32,"./factories/FormioUtils":33,"./factories/formioInterceptor":34,"./filters/flattenComponents":35,"./filters/safehtml":36,"./providers/Formio":38}],38:[function(require,module,exports){
 "use strict";
 module.exports = function() {
 
@@ -2658,18 +2479,8 @@ module.exports = function() {
 
     // Expose Formio configuration functions
     setBaseUrl: Formio.setBaseUrl,
-    cacheOfflineProject: Formio.cacheOfflineProject,
-    clearCache: Formio.clearCache,
-    clearOfflineData: Formio.clearOfflineData,
-    forceOffline: Formio.forceOffline,
-    isForcedOffline: Formio.isForcedOffline,
-    queueSubmissions: Formio.queueSubmissions,
-    offline: Formio.offline,
-    dequeueSubmissions: Formio.dequeueSubmissions,
-    submissionQueueLength: Formio.submissionQueueLength,
-    getNextQueuedSubmission: Formio.getNextQueuedSubmission,
-    setNextQueuedSubmission: Formio.setNextQueuedSubmission,
-    skipNextQueuedSubmission: Formio.skipNextQueuedSubmission,
+    registerPlugin: Formio.registerPlugin,
+    getPlugin: Formio.getPlugin,
     setDomain: function(dom) {
       // Remove this?
     },
@@ -2682,10 +2493,8 @@ module.exports = function() {
         $q
       ) {
 
-        // Wrap Formio.request's promises with $q so $apply gets called correctly.
-        var request = Formio.request;
-        Formio.request = function() {
-          return $q.when(request.apply(Formio, arguments))
+        var wrapQPromise = function(promise) {
+          return $q.when(promise)
           .catch(function(error) {
             if (error === 'Unauthorized') {
               $rootScope.$broadcast('formio.unauthorized', error);
@@ -2698,22 +2507,20 @@ module.exports = function() {
           });
         };
 
-        // Same with Formio.makeRequest.
-        var makeRequest = Formio.prototype.makeRequest;
-        Formio.prototype.makeRequest = function() {
-          return $q.when(makeRequest.apply(this, arguments));
-        };
+        Formio.registerPlugin({
+          priority: -100,
+          // Wrap Formio.request's promises with $q so $apply gets called correctly.
+          wrapRequestPromise: wrapQPromise,
+          wrapStaticRequestPromise: wrapQPromise
+        }, 'ngFormioPromiseWrapper');
 
         // Broadcast offline events from $rootScope
-        ['queue', 'dequeue', 'requeue', 'formSubmission', 'formError', 'queueEmpty']
-        .forEach(function(offlineEvent) {
-          Formio.offline.on(offlineEvent, function() {
-            var event = 'formio.offline.' + offlineEvent;
-            var args = [].splice.call(arguments, 0);
-            args = [event].concat(args);
-            $rootScope.$apply(function() {
-              $rootScope.$broadcast.apply($rootScope, args);
-            });
+        Formio.events.onAny(function() {
+          var event = 'formio.' + this.event;
+          var args = [].splice.call(arguments, 0);
+          args.unshift(event);
+          $rootScope.$apply(function() {
+            $rootScope.$broadcast.apply($rootScope, args);
           });
         });
 
@@ -2724,7 +2531,7 @@ module.exports = function() {
   };
 };
 
-},{"formiojs/src/formio.js":74}],42:[function(require,module,exports){
+},{"formiojs/src/formio.js":43}],39:[function(require,module,exports){
 (function (process){
 // vim:ts=4:sts=4:sw=4:
 /*!
@@ -4776,5762 +4583,582 @@ return Q;
 });
 
 }).call(this,require('_process'))
-},{"_process":1}],43:[function(require,module,exports){
-(function (process){
-
-var MACHINE_ID = parseInt(Math.random() * 0xFFFFFF, 10);
-var index = ObjectID.index = parseInt(Math.random() * 0xFFFFFF, 10);
-var pid = typeof process === 'undefined' || (typeof process.pid !== 'number' ? Math.floor(Math.random() * 100000) : process.pid) % 0xFFFF;
-
-/**
- * Determine if an object is Buffer
- *
- * Author:   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
- * License:  MIT
- *
- */
-var isBuffer = function (obj) {
-  return !!(
-  obj != null &&
-  obj.constructor &&
-  typeof obj.constructor.isBuffer === 'function' &&
-  obj.constructor.isBuffer(obj)
-  )
-};
-
-/**
- * Create a new immutable ObjectID instance
- *
- * @class Represents the BSON ObjectID type
- * @param {String|Number} arg Can be a 24 byte hex string, 12 byte binary string or a Number.
- * @return {Object} instance of ObjectID.
- */
-function ObjectID(arg) {
-  if(!(this instanceof ObjectID)) return new ObjectID(arg);
-  if(arg && ((arg instanceof ObjectID) || arg._bsontype==="ObjectID"))
-    return arg;
-
-  var buf;
-
-  if(isBuffer(arg) || (Array.isArray(arg) && arg.length===12)) {
-    buf = Array.prototype.slice.call(arg);
-  }
-  else if(typeof arg === "string") {
-    if(arg.length!==12 && !ObjectID.isValid(arg))
-      throw new Error("Argument passed in must be a single String of 12 bytes or a string of 24 hex characters");
-
-    buf = buffer(arg);
-  }
-  else if(/number|undefined/.test(typeof arg)) {
-    buf = buffer(generate(arg));
-  }
-
-  Object.defineProperty(this, "id", {
-    enumerable: true,
-    get: function() { return String.fromCharCode.apply(this, buf); }
-  });
-  Object.defineProperty(this, "str", {
-    get: function() { return buf.map(hex.bind(this, 2)).join(''); }
-  });
-}
-module.exports = ObjectID;
-ObjectID.generate = generate;
-
-/**
- * Creates an ObjectID from a second based number, with the rest of the ObjectID zeroed out. Used for comparisons or sorting the ObjectID.
- *
- * @param {Number} time an integer number representing a number of seconds.
- * @return {ObjectID} return the created ObjectID
- * @api public
- */
-ObjectID.createFromTime = function(time){
-  time = parseInt(time, 10) % 0xFFFFFFFF;
-  return new ObjectID(hex(8,time)+"0000000000000000");
-};
-
-/**
- * Creates an ObjectID from a hex string representation of an ObjectID.
- *
- * @param {String} hexString create a ObjectID from a passed in 24 byte hexstring.
- * @return {ObjectID} return the created ObjectID
- * @api public
- */
-ObjectID.createFromHexString = function(hexString) {
-  if(!ObjectID.isValid(hexString))
-    throw new Error("Invalid ObjectID hex string");
-
-  return new ObjectID(hexString);
-};
-
-/**
- * Checks if a value is a valid bson ObjectId
- *
- * @param {String} objectid Can be a 24 byte hex string or an instance of ObjectID.
- * @return {Boolean} return true if the value is a valid bson ObjectID, return false otherwise.
- * @api public
- *
- * THE NATIVE DOCUMENTATION ISN'T CLEAR ON THIS GUY!
- * http://mongodb.github.io/node-mongodb-native/api-bson-generated/objectid.html#objectid-isvalid
- */
-ObjectID.isValid = function(objectid) {
-  if(!objectid) return false;
-
-  //call .toString() to get the hex if we're
-  // working with an instance of ObjectID
-  return /^[0-9A-F]{24}$/i.test(objectid.toString());
-};
-
-ObjectID.prototype = {
-  _bsontype: 'ObjectID',
-
-  /**
-   * Return the ObjectID id as a 24 byte hex string representation
-   *
-   * @return {String} return the 24 byte hex string representation.
-   * @api public
-   */
-  toHexString: function() {
-    return this.str;
-  },
-
-  /**
-   * Compares the equality of this ObjectID with `otherID`.
-   *
-   * @param {Object} other ObjectID instance to compare against.
-   * @return {Boolean} the result of comparing two ObjectID's
-   * @api public
-   */
-  equals: function (other){
-    return !!other && this.str === other.toString();
-  },
-
-  /**
-   * Returns the generation date (accurate up to the second) that this ID was generated.
-   *
-   * @return {Date} the generation date
-   * @api public
-   */
-  getTimestamp: function(){
-    return new Date(parseInt(this.str.substr(0,8), 16) * 1000);
-  }
-};
-
-function next() {
-  return index = (index+1) % 0xFFFFFF;
-}
-
-function generate(time) {
-  if (typeof time !== 'number')
-    time = Date.now()/1000;
-
-  //keep it in the ring!
-  time = parseInt(time, 10) % 0xFFFFFFFF;
-
-  //FFFFFFFF FFFFFF FFFF FFFFFF
-  return hex(8,time) + hex(6,MACHINE_ID) + hex(4,pid) + hex(6,next());
-}
-
-function hex(length, n) {
-  n = n.toString(16);
-  return (n.length===length)? n : "00000000".substring(n.length, length) + n;
-}
-
-function buffer(str) {
-  var i=0,out=[];
-
-  if(str.length===24)
-    for(;i<24; out.push(parseInt(str[i]+str[i+1], 16)),i+=2);
-
-  else if(str.length===12)
-    for(;i<12; out.push(str.charCodeAt(i)),i++);
-
-  return out;
-}
-
-/**
- * Converts to a string representation of this Id.
- *
- * @return {String} return the 24 byte hex string representation.
- * @api private
- */
-ObjectID.prototype.inspect = function() { return "ObjectID("+this+")" };
-ObjectID.prototype.toJSON = ObjectID.prototype.toHexString;
-ObjectID.prototype.toString = ObjectID.prototype.toHexString;
-
-
-}).call(this,require('_process'))
-},{"_process":1}],44:[function(require,module,exports){
-'use strict';
-
-//
-// We store our EE objects in a plain object whose properties are event names.
-// If `Object.create(null)` is not supported we prefix the event names with a
-// `~` to make sure that the built-in object properties are not overridden or
-// used as an attack vector.
-// We also assume that `Object.create(null)` is available when the event name
-// is an ES6 Symbol.
-//
-var prefix = typeof Object.create !== 'function' ? '~' : false;
-
-/**
- * Representation of a single EventEmitter function.
- *
- * @param {Function} fn Event handler to be called.
- * @param {Mixed} context Context for function execution.
- * @param {Boolean} once Only emit once
- * @api private
- */
-function EE(fn, context, once) {
-  this.fn = fn;
-  this.context = context;
-  this.once = once || false;
-}
-
-/**
- * Minimal EventEmitter interface that is molded against the Node.js
- * EventEmitter interface.
- *
- * @constructor
- * @api public
- */
-function EventEmitter() { /* Nothing to set */ }
-
-/**
- * Holds the assigned EventEmitters by name.
- *
- * @type {Object}
- * @private
- */
-EventEmitter.prototype._events = undefined;
-
-/**
- * Return a list of assigned event listeners.
- *
- * @param {String} event The events that should be listed.
- * @param {Boolean} exists We only need to know if there are listeners.
- * @returns {Array|Boolean}
- * @api public
- */
-EventEmitter.prototype.listeners = function listeners(event, exists) {
-  var evt = prefix ? prefix + event : event
-    , available = this._events && this._events[evt];
-
-  if (exists) return !!available;
-  if (!available) return [];
-  if (available.fn) return [available.fn];
-
-  for (var i = 0, l = available.length, ee = new Array(l); i < l; i++) {
-    ee[i] = available[i].fn;
-  }
-
-  return ee;
-};
-
-/**
- * Emit an event to all registered event listeners.
- *
- * @param {String} event The name of the event.
- * @returns {Boolean} Indication if we've emitted an event.
- * @api public
- */
-EventEmitter.prototype.emit = function emit(event, a1, a2, a3, a4, a5) {
-  var evt = prefix ? prefix + event : event;
-
-  if (!this._events || !this._events[evt]) return false;
-
-  var listeners = this._events[evt]
-    , len = arguments.length
-    , args
-    , i;
-
-  if ('function' === typeof listeners.fn) {
-    if (listeners.once) this.removeListener(event, listeners.fn, undefined, true);
-
-    switch (len) {
-      case 1: return listeners.fn.call(listeners.context), true;
-      case 2: return listeners.fn.call(listeners.context, a1), true;
-      case 3: return listeners.fn.call(listeners.context, a1, a2), true;
-      case 4: return listeners.fn.call(listeners.context, a1, a2, a3), true;
-      case 5: return listeners.fn.call(listeners.context, a1, a2, a3, a4), true;
-      case 6: return listeners.fn.call(listeners.context, a1, a2, a3, a4, a5), true;
-    }
-
-    for (i = 1, args = new Array(len -1); i < len; i++) {
-      args[i - 1] = arguments[i];
-    }
-
-    listeners.fn.apply(listeners.context, args);
-  } else {
-    var length = listeners.length
-      , j;
-
-    for (i = 0; i < length; i++) {
-      if (listeners[i].once) this.removeListener(event, listeners[i].fn, undefined, true);
-
-      switch (len) {
-        case 1: listeners[i].fn.call(listeners[i].context); break;
-        case 2: listeners[i].fn.call(listeners[i].context, a1); break;
-        case 3: listeners[i].fn.call(listeners[i].context, a1, a2); break;
-        default:
-          if (!args) for (j = 1, args = new Array(len -1); j < len; j++) {
-            args[j - 1] = arguments[j];
-          }
-
-          listeners[i].fn.apply(listeners[i].context, args);
-      }
-    }
-  }
-
-  return true;
-};
-
-/**
- * Register a new EventListener for the given event.
- *
- * @param {String} event Name of the event.
- * @param {Functon} fn Callback function.
- * @param {Mixed} context The context of the function.
- * @api public
- */
-EventEmitter.prototype.on = function on(event, fn, context) {
-  var listener = new EE(fn, context || this)
-    , evt = prefix ? prefix + event : event;
-
-  if (!this._events) this._events = prefix ? {} : Object.create(null);
-  if (!this._events[evt]) this._events[evt] = listener;
-  else {
-    if (!this._events[evt].fn) this._events[evt].push(listener);
-    else this._events[evt] = [
-      this._events[evt], listener
-    ];
-  }
-
-  return this;
-};
-
-/**
- * Add an EventListener that's only called once.
- *
- * @param {String} event Name of the event.
- * @param {Function} fn Callback function.
- * @param {Mixed} context The context of the function.
- * @api public
- */
-EventEmitter.prototype.once = function once(event, fn, context) {
-  var listener = new EE(fn, context || this, true)
-    , evt = prefix ? prefix + event : event;
-
-  if (!this._events) this._events = prefix ? {} : Object.create(null);
-  if (!this._events[evt]) this._events[evt] = listener;
-  else {
-    if (!this._events[evt].fn) this._events[evt].push(listener);
-    else this._events[evt] = [
-      this._events[evt], listener
-    ];
-  }
-
-  return this;
-};
-
-/**
- * Remove event listeners.
- *
- * @param {String} event The event we want to remove.
- * @param {Function} fn The listener that we need to find.
- * @param {Mixed} context Only remove listeners matching this context.
- * @param {Boolean} once Only remove once listeners.
- * @api public
- */
-EventEmitter.prototype.removeListener = function removeListener(event, fn, context, once) {
-  var evt = prefix ? prefix + event : event;
-
-  if (!this._events || !this._events[evt]) return this;
-
-  var listeners = this._events[evt]
-    , events = [];
-
-  if (fn) {
-    if (listeners.fn) {
-      if (
-           listeners.fn !== fn
-        || (once && !listeners.once)
-        || (context && listeners.context !== context)
-      ) {
-        events.push(listeners);
-      }
-    } else {
-      for (var i = 0, length = listeners.length; i < length; i++) {
-        if (
-             listeners[i].fn !== fn
-          || (once && !listeners[i].once)
-          || (context && listeners[i].context !== context)
-        ) {
-          events.push(listeners[i]);
-        }
-      }
-    }
-  }
-
-  //
-  // Reset the array, or remove it completely if we have no more listeners.
-  //
-  if (events.length) {
-    this._events[evt] = events.length === 1 ? events[0] : events;
-  } else {
-    delete this._events[evt];
-  }
-
-  return this;
-};
-
-/**
- * Remove all listeners or only the listeners for the specified event.
- *
- * @param {String} event The event want to remove all listeners for.
- * @api public
- */
-EventEmitter.prototype.removeAllListeners = function removeAllListeners(event) {
-  if (!this._events) return this;
-
-  if (event) delete this._events[prefix ? prefix + event : event];
-  else this._events = prefix ? {} : Object.create(null);
-
-  return this;
-};
-
-//
-// Alias methods names because people roll like that.
-//
-EventEmitter.prototype.off = EventEmitter.prototype.removeListener;
-EventEmitter.prototype.addListener = EventEmitter.prototype.on;
-
-//
-// This function doesn't apply anymore.
-//
-EventEmitter.prototype.setMaxListeners = function setMaxListeners() {
-  return this;
-};
-
-//
-// Expose the prefix.
-//
-EventEmitter.prefixed = prefix;
-
-//
-// Expose the module.
-//
-if ('undefined' !== typeof module) {
-  module.exports = EventEmitter;
-}
-
-},{}],45:[function(require,module,exports){
-(function (process,global){
+},{"_process":1}],40:[function(require,module,exports){
 /*!
-    localForage -- Offline Storage, Improved
-    Version 1.3.0
-    https://mozilla.github.io/localForage
-    (c) 2013-2015 Mozilla, Apache License 2.0
-*/
-(function() {
-var define, requireModule, require, requirejs;
+ * EventEmitter2
+ * https://github.com/hij1nx/EventEmitter2
+ *
+ * Copyright (c) 2013 hij1nx
+ * Licensed under the MIT license.
+ */
+;!function(undefined) {
 
-(function() {
-  var registry = {}, seen = {};
-
-  define = function(name, deps, callback) {
-    registry[name] = { deps: deps, callback: callback };
+  var isArray = Array.isArray ? Array.isArray : function _isArray(obj) {
+    return Object.prototype.toString.call(obj) === "[object Array]";
   };
+  var defaultMaxListeners = 10;
 
-  requirejs = require = requireModule = function(name) {
-  requirejs._eak_seen = registry;
-
-    if (seen[name]) { return seen[name]; }
-    seen[name] = {};
-
-    if (!registry[name]) {
-      throw new Error("Could not find module " + name);
+  function init() {
+    this._events = {};
+    if (this._conf) {
+      configure.call(this, this._conf);
     }
+  }
 
-    var mod = registry[name],
-        deps = mod.deps,
-        callback = mod.callback,
-        reified = [],
-        exports;
+  function configure(conf) {
+    if (conf) {
 
-    for (var i=0, l=deps.length; i<l; i++) {
-      if (deps[i] === 'exports') {
-        reified.push(exports = {});
+      this._conf = conf;
+
+      conf.delimiter && (this.delimiter = conf.delimiter);
+      conf.maxListeners && (this._events.maxListeners = conf.maxListeners);
+      conf.wildcard && (this.wildcard = conf.wildcard);
+      conf.newListener && (this.newListener = conf.newListener);
+
+      if (this.wildcard) {
+        this.listenerTree = {};
+      }
+    }
+  }
+
+  function EventEmitter(conf) {
+    this._events = {};
+    this.newListener = false;
+    configure.call(this, conf);
+  }
+
+  //
+  // Attention, function return type now is array, always !
+  // It has zero elements if no any matches found and one or more
+  // elements (leafs) if there are matches
+  //
+  function searchListenerTree(handlers, type, tree, i) {
+    if (!tree) {
+      return [];
+    }
+    var listeners=[], leaf, len, branch, xTree, xxTree, isolatedBranch, endReached,
+        typeLength = type.length, currentType = type[i], nextType = type[i+1];
+    if (i === typeLength && tree._listeners) {
+      //
+      // If at the end of the event(s) list and the tree has listeners
+      // invoke those listeners.
+      //
+      if (typeof tree._listeners === 'function') {
+        handlers && handlers.push(tree._listeners);
+        return [tree];
       } else {
-        reified.push(requireModule(resolve(deps[i])));
+        for (leaf = 0, len = tree._listeners.length; leaf < len; leaf++) {
+          handlers && handlers.push(tree._listeners[leaf]);
+        }
+        return [tree];
       }
     }
 
-    var value = callback.apply(this, reified);
-    return seen[name] = exports || value;
-
-    function resolve(child) {
-      if (child.charAt(0) !== '.') { return child; }
-      var parts = child.split("/");
-      var parentBase = name.split("/").slice(0, -1);
-
-      for (var i=0, l=parts.length; i<l; i++) {
-        var part = parts[i];
-
-        if (part === '..') { parentBase.pop(); }
-        else if (part === '.') { continue; }
-        else { parentBase.push(part); }
-      }
-
-      return parentBase.join("/");
-    }
-  };
-})();
-
-define("promise/all", 
-  ["./utils","exports"],
-  function(__dependency1__, __exports__) {
-    "use strict";
-    /* global toString */
-
-    var isArray = __dependency1__.isArray;
-    var isFunction = __dependency1__.isFunction;
-
-    /**
-      Returns a promise that is fulfilled when all the given promises have been
-      fulfilled, or rejected if any of them become rejected. The return promise
-      is fulfilled with an array that gives all the values in the order they were
-      passed in the `promises` array argument.
-
-      Example:
-
-      ```javascript
-      var promise1 = RSVP.resolve(1);
-      var promise2 = RSVP.resolve(2);
-      var promise3 = RSVP.resolve(3);
-      var promises = [ promise1, promise2, promise3 ];
-
-      RSVP.all(promises).then(function(array){
-        // The array here would be [ 1, 2, 3 ];
-      });
-      ```
-
-      If any of the `promises` given to `RSVP.all` are rejected, the first promise
-      that is rejected will be given as an argument to the returned promises's
-      rejection handler. For example:
-
-      Example:
-
-      ```javascript
-      var promise1 = RSVP.resolve(1);
-      var promise2 = RSVP.reject(new Error("2"));
-      var promise3 = RSVP.reject(new Error("3"));
-      var promises = [ promise1, promise2, promise3 ];
-
-      RSVP.all(promises).then(function(array){
-        // Code here never runs because there are rejected promises!
-      }, function(error) {
-        // error.message === "2"
-      });
-      ```
-
-      @method all
-      @for RSVP
-      @param {Array} promises
-      @param {String} label
-      @return {Promise} promise that is fulfilled when all `promises` have been
-      fulfilled, or rejected if any of them become rejected.
-    */
-    function all(promises) {
-      /*jshint validthis:true */
-      var Promise = this;
-
-      if (!isArray(promises)) {
-        throw new TypeError('You must pass an array to all.');
-      }
-
-      return new Promise(function(resolve, reject) {
-        var results = [], remaining = promises.length,
-        promise;
-
-        if (remaining === 0) {
-          resolve([]);
-        }
-
-        function resolver(index) {
-          return function(value) {
-            resolveAll(index, value);
-          };
-        }
-
-        function resolveAll(index, value) {
-          results[index] = value;
-          if (--remaining === 0) {
-            resolve(results);
+    if ((currentType === '*' || currentType === '**') || tree[currentType]) {
+      //
+      // If the event emitted is '*' at this part
+      // or there is a concrete match at this patch
+      //
+      if (currentType === '*') {
+        for (branch in tree) {
+          if (branch !== '_listeners' && tree.hasOwnProperty(branch)) {
+            listeners = listeners.concat(searchListenerTree(handlers, type, tree[branch], i+1));
           }
         }
-
-        for (var i = 0; i < promises.length; i++) {
-          promise = promises[i];
-
-          if (promise && isFunction(promise.then)) {
-            promise.then(resolver(i), reject);
-          } else {
-            resolveAll(i, promise);
-          }
-        }
-      });
-    }
-
-    __exports__.all = all;
-  });
-define("promise/asap", 
-  ["exports"],
-  function(__exports__) {
-    "use strict";
-    var browserGlobal = (typeof window !== 'undefined') ? window : {};
-    var BrowserMutationObserver = browserGlobal.MutationObserver || browserGlobal.WebKitMutationObserver;
-    var local = (typeof global !== 'undefined') ? global : (this === undefined? window:this);
-
-    // node
-    function useNextTick() {
-      return function() {
-        process.nextTick(flush);
-      };
-    }
-
-    function useMutationObserver() {
-      var iterations = 0;
-      var observer = new BrowserMutationObserver(flush);
-      var node = document.createTextNode('');
-      observer.observe(node, { characterData: true });
-
-      return function() {
-        node.data = (iterations = ++iterations % 2);
-      };
-    }
-
-    function useSetTimeout() {
-      return function() {
-        local.setTimeout(flush, 1);
-      };
-    }
-
-    var queue = [];
-    function flush() {
-      for (var i = 0; i < queue.length; i++) {
-        var tuple = queue[i];
-        var callback = tuple[0], arg = tuple[1];
-        callback(arg);
-      }
-      queue = [];
-    }
-
-    var scheduleFlush;
-
-    // Decide what async method to use to triggering processing of queued callbacks:
-    if (typeof process !== 'undefined' && {}.toString.call(process) === '[object process]') {
-      scheduleFlush = useNextTick();
-    } else if (BrowserMutationObserver) {
-      scheduleFlush = useMutationObserver();
-    } else {
-      scheduleFlush = useSetTimeout();
-    }
-
-    function asap(callback, arg) {
-      var length = queue.push([callback, arg]);
-      if (length === 1) {
-        // If length is 1, that means that we need to schedule an async flush.
-        // If additional callbacks are queued before the queue is flushed, they
-        // will be processed by this flush that we are scheduling.
-        scheduleFlush();
-      }
-    }
-
-    __exports__.asap = asap;
-  });
-define("promise/config", 
-  ["exports"],
-  function(__exports__) {
-    "use strict";
-    var config = {
-      instrument: false
-    };
-
-    function configure(name, value) {
-      if (arguments.length === 2) {
-        config[name] = value;
-      } else {
-        return config[name];
-      }
-    }
-
-    __exports__.config = config;
-    __exports__.configure = configure;
-  });
-define("promise/polyfill", 
-  ["./promise","./utils","exports"],
-  function(__dependency1__, __dependency2__, __exports__) {
-    "use strict";
-    /*global self*/
-    var RSVPPromise = __dependency1__.Promise;
-    var isFunction = __dependency2__.isFunction;
-
-    function polyfill() {
-      var local;
-
-      if (typeof global !== 'undefined') {
-        local = global;
-      } else if (typeof window !== 'undefined' && window.document) {
-        local = window;
-      } else {
-        local = self;
-      }
-
-      var es6PromiseSupport = 
-        "Promise" in local &&
-        // Some of these methods are missing from
-        // Firefox/Chrome experimental implementations
-        "resolve" in local.Promise &&
-        "reject" in local.Promise &&
-        "all" in local.Promise &&
-        "race" in local.Promise &&
-        // Older version of the spec had a resolver object
-        // as the arg rather than a function
-        (function() {
-          var resolve;
-          new local.Promise(function(r) { resolve = r; });
-          return isFunction(resolve);
-        }());
-
-      if (!es6PromiseSupport) {
-        local.Promise = RSVPPromise;
-      }
-    }
-
-    __exports__.polyfill = polyfill;
-  });
-define("promise/promise", 
-  ["./config","./utils","./all","./race","./resolve","./reject","./asap","exports"],
-  function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, __dependency7__, __exports__) {
-    "use strict";
-    var config = __dependency1__.config;
-    var configure = __dependency1__.configure;
-    var objectOrFunction = __dependency2__.objectOrFunction;
-    var isFunction = __dependency2__.isFunction;
-    var now = __dependency2__.now;
-    var all = __dependency3__.all;
-    var race = __dependency4__.race;
-    var staticResolve = __dependency5__.resolve;
-    var staticReject = __dependency6__.reject;
-    var asap = __dependency7__.asap;
-
-    var counter = 0;
-
-    config.async = asap; // default async is asap;
-
-    function Promise(resolver) {
-      if (!isFunction(resolver)) {
-        throw new TypeError('You must pass a resolver function as the first argument to the promise constructor');
-      }
-
-      if (!(this instanceof Promise)) {
-        throw new TypeError("Failed to construct 'Promise': Please use the 'new' operator, this object constructor cannot be called as a function.");
-      }
-
-      this._subscribers = [];
-
-      invokeResolver(resolver, this);
-    }
-
-    function invokeResolver(resolver, promise) {
-      function resolvePromise(value) {
-        resolve(promise, value);
-      }
-
-      function rejectPromise(reason) {
-        reject(promise, reason);
-      }
-
-      try {
-        resolver(resolvePromise, rejectPromise);
-      } catch(e) {
-        rejectPromise(e);
-      }
-    }
-
-    function invokeCallback(settled, promise, callback, detail) {
-      var hasCallback = isFunction(callback),
-          value, error, succeeded, failed;
-
-      if (hasCallback) {
-        try {
-          value = callback(detail);
-          succeeded = true;
-        } catch(e) {
-          failed = true;
-          error = e;
-        }
-      } else {
-        value = detail;
-        succeeded = true;
-      }
-
-      if (handleThenable(promise, value)) {
-        return;
-      } else if (hasCallback && succeeded) {
-        resolve(promise, value);
-      } else if (failed) {
-        reject(promise, error);
-      } else if (settled === FULFILLED) {
-        resolve(promise, value);
-      } else if (settled === REJECTED) {
-        reject(promise, value);
-      }
-    }
-
-    var PENDING   = void 0;
-    var SEALED    = 0;
-    var FULFILLED = 1;
-    var REJECTED  = 2;
-
-    function subscribe(parent, child, onFulfillment, onRejection) {
-      var subscribers = parent._subscribers;
-      var length = subscribers.length;
-
-      subscribers[length] = child;
-      subscribers[length + FULFILLED] = onFulfillment;
-      subscribers[length + REJECTED]  = onRejection;
-    }
-
-    function publish(promise, settled) {
-      var child, callback, subscribers = promise._subscribers, detail = promise._detail;
-
-      for (var i = 0; i < subscribers.length; i += 3) {
-        child = subscribers[i];
-        callback = subscribers[i + settled];
-
-        invokeCallback(settled, child, callback, detail);
-      }
-
-      promise._subscribers = null;
-    }
-
-    Promise.prototype = {
-      constructor: Promise,
-
-      _state: undefined,
-      _detail: undefined,
-      _subscribers: undefined,
-
-      then: function(onFulfillment, onRejection) {
-        var promise = this;
-
-        var thenPromise = new this.constructor(function() {});
-
-        if (this._state) {
-          var callbacks = arguments;
-          config.async(function invokePromiseCallback() {
-            invokeCallback(promise._state, thenPromise, callbacks[promise._state - 1], promise._detail);
-          });
-        } else {
-          subscribe(this, thenPromise, onFulfillment, onRejection);
+        return listeners;
+      } else if(currentType === '**') {
+        endReached = (i+1 === typeLength || (i+2 === typeLength && nextType === '*'));
+        if(endReached && tree._listeners) {
+          // The next element has a _listeners, add it to the handlers.
+          listeners = listeners.concat(searchListenerTree(handlers, type, tree, typeLength));
         }
 
-        return thenPromise;
-      },
-
-      'catch': function(onRejection) {
-        return this.then(null, onRejection);
-      }
-    };
-
-    Promise.all = all;
-    Promise.race = race;
-    Promise.resolve = staticResolve;
-    Promise.reject = staticReject;
-
-    function handleThenable(promise, value) {
-      var then = null,
-      resolved;
-
-      try {
-        if (promise === value) {
-          throw new TypeError("A promises callback cannot return that same promise.");
-        }
-
-        if (objectOrFunction(value)) {
-          then = value.then;
-
-          if (isFunction(then)) {
-            then.call(value, function(val) {
-              if (resolved) { return true; }
-              resolved = true;
-
-              if (value !== val) {
-                resolve(promise, val);
-              } else {
-                fulfill(promise, val);
+        for (branch in tree) {
+          if (branch !== '_listeners' && tree.hasOwnProperty(branch)) {
+            if(branch === '*' || branch === '**') {
+              if(tree[branch]._listeners && !endReached) {
+                listeners = listeners.concat(searchListenerTree(handlers, type, tree[branch], typeLength));
               }
-            }, function(val) {
-              if (resolved) { return true; }
-              resolved = true;
-
-              reject(promise, val);
-            });
-
-            return true;
+              listeners = listeners.concat(searchListenerTree(handlers, type, tree[branch], i));
+            } else if(branch === nextType) {
+              listeners = listeners.concat(searchListenerTree(handlers, type, tree[branch], i+2));
+            } else {
+              // No match on this one, shift into the tree but not in the type array.
+              listeners = listeners.concat(searchListenerTree(handlers, type, tree[branch], i));
+            }
           }
         }
-      } catch (error) {
-        if (resolved) { return true; }
-        reject(promise, error);
+        return listeners;
+      }
+
+      listeners = listeners.concat(searchListenerTree(handlers, type, tree[currentType], i+1));
+    }
+
+    xTree = tree['*'];
+    if (xTree) {
+      //
+      // If the listener tree will allow any match for this part,
+      // then recursively explore all branches of the tree
+      //
+      searchListenerTree(handlers, type, xTree, i+1);
+    }
+
+    xxTree = tree['**'];
+    if(xxTree) {
+      if(i < typeLength) {
+        if(xxTree._listeners) {
+          // If we have a listener on a '**', it will catch all, so add its handler.
+          searchListenerTree(handlers, type, xxTree, typeLength);
+        }
+
+        // Build arrays of matching next branches and others.
+        for(branch in xxTree) {
+          if(branch !== '_listeners' && xxTree.hasOwnProperty(branch)) {
+            if(branch === nextType) {
+              // We know the next element will match, so jump twice.
+              searchListenerTree(handlers, type, xxTree[branch], i+2);
+            } else if(branch === currentType) {
+              // Current node matches, move into the tree.
+              searchListenerTree(handlers, type, xxTree[branch], i+1);
+            } else {
+              isolatedBranch = {};
+              isolatedBranch[branch] = xxTree[branch];
+              searchListenerTree(handlers, type, { '**': isolatedBranch }, i+1);
+            }
+          }
+        }
+      } else if(xxTree._listeners) {
+        // We have reached the end and still on a '**'
+        searchListenerTree(handlers, type, xxTree, typeLength);
+      } else if(xxTree['*'] && xxTree['*']._listeners) {
+        searchListenerTree(handlers, type, xxTree['*'], typeLength);
+      }
+    }
+
+    return listeners;
+  }
+
+  function growListenerTree(type, listener) {
+
+    type = typeof type === 'string' ? type.split(this.delimiter) : type.slice();
+
+    //
+    // Looks for two consecutive '**', if so, don't add the event at all.
+    //
+    for(var i = 0, len = type.length; i+1 < len; i++) {
+      if(type[i] === '**' && type[i+1] === '**') {
+        return;
+      }
+    }
+
+    var tree = this.listenerTree;
+    var name = type.shift();
+
+    while (name) {
+
+      if (!tree[name]) {
+        tree[name] = {};
+      }
+
+      tree = tree[name];
+
+      if (type.length === 0) {
+
+        if (!tree._listeners) {
+          tree._listeners = listener;
+        }
+        else if(typeof tree._listeners === 'function') {
+          tree._listeners = [tree._listeners, listener];
+        }
+        else if (isArray(tree._listeners)) {
+
+          tree._listeners.push(listener);
+
+          if (!tree._listeners.warned) {
+
+            var m = defaultMaxListeners;
+
+            if (typeof this._events.maxListeners !== 'undefined') {
+              m = this._events.maxListeners;
+            }
+
+            if (m > 0 && tree._listeners.length > m) {
+
+              tree._listeners.warned = true;
+              console.error('(node) warning: possible EventEmitter memory ' +
+                            'leak detected. %d listeners added. ' +
+                            'Use emitter.setMaxListeners() to increase limit.',
+                            tree._listeners.length);
+              console.trace();
+            }
+          }
+        }
         return true;
       }
-
-      return false;
+      name = type.shift();
     }
-
-    function resolve(promise, value) {
-      if (promise === value) {
-        fulfill(promise, value);
-      } else if (!handleThenable(promise, value)) {
-        fulfill(promise, value);
-      }
-    }
-
-    function fulfill(promise, value) {
-      if (promise._state !== PENDING) { return; }
-      promise._state = SEALED;
-      promise._detail = value;
-
-      config.async(publishFulfillment, promise);
-    }
-
-    function reject(promise, reason) {
-      if (promise._state !== PENDING) { return; }
-      promise._state = SEALED;
-      promise._detail = reason;
-
-      config.async(publishRejection, promise);
-    }
-
-    function publishFulfillment(promise) {
-      publish(promise, promise._state = FULFILLED);
-    }
-
-    function publishRejection(promise) {
-      publish(promise, promise._state = REJECTED);
-    }
-
-    __exports__.Promise = Promise;
-  });
-define("promise/race", 
-  ["./utils","exports"],
-  function(__dependency1__, __exports__) {
-    "use strict";
-    /* global toString */
-    var isArray = __dependency1__.isArray;
-
-    /**
-      `RSVP.race` allows you to watch a series of promises and act as soon as the
-      first promise given to the `promises` argument fulfills or rejects.
-
-      Example:
-
-      ```javascript
-      var promise1 = new RSVP.Promise(function(resolve, reject){
-        setTimeout(function(){
-          resolve("promise 1");
-        }, 200);
-      });
-
-      var promise2 = new RSVP.Promise(function(resolve, reject){
-        setTimeout(function(){
-          resolve("promise 2");
-        }, 100);
-      });
-
-      RSVP.race([promise1, promise2]).then(function(result){
-        // result === "promise 2" because it was resolved before promise1
-        // was resolved.
-      });
-      ```
-
-      `RSVP.race` is deterministic in that only the state of the first completed
-      promise matters. For example, even if other promises given to the `promises`
-      array argument are resolved, but the first completed promise has become
-      rejected before the other promises became fulfilled, the returned promise
-      will become rejected:
-
-      ```javascript
-      var promise1 = new RSVP.Promise(function(resolve, reject){
-        setTimeout(function(){
-          resolve("promise 1");
-        }, 200);
-      });
-
-      var promise2 = new RSVP.Promise(function(resolve, reject){
-        setTimeout(function(){
-          reject(new Error("promise 2"));
-        }, 100);
-      });
-
-      RSVP.race([promise1, promise2]).then(function(result){
-        // Code here never runs because there are rejected promises!
-      }, function(reason){
-        // reason.message === "promise2" because promise 2 became rejected before
-        // promise 1 became fulfilled
-      });
-      ```
-
-      @method race
-      @for RSVP
-      @param {Array} promises array of promises to observe
-      @param {String} label optional string for describing the promise returned.
-      Useful for tooling.
-      @return {Promise} a promise that becomes fulfilled with the value the first
-      completed promises is resolved with if the first completed promise was
-      fulfilled, or rejected with the reason that the first completed promise
-      was rejected with.
-    */
-    function race(promises) {
-      /*jshint validthis:true */
-      var Promise = this;
-
-      if (!isArray(promises)) {
-        throw new TypeError('You must pass an array to race.');
-      }
-      return new Promise(function(resolve, reject) {
-        var results = [], promise;
-
-        for (var i = 0; i < promises.length; i++) {
-          promise = promises[i];
-
-          if (promise && typeof promise.then === 'function') {
-            promise.then(resolve, reject);
-          } else {
-            resolve(promise);
-          }
-        }
-      });
-    }
-
-    __exports__.race = race;
-  });
-define("promise/reject", 
-  ["exports"],
-  function(__exports__) {
-    "use strict";
-    /**
-      `RSVP.reject` returns a promise that will become rejected with the passed
-      `reason`. `RSVP.reject` is essentially shorthand for the following:
-
-      ```javascript
-      var promise = new RSVP.Promise(function(resolve, reject){
-        reject(new Error('WHOOPS'));
-      });
-
-      promise.then(function(value){
-        // Code here doesn't run because the promise is rejected!
-      }, function(reason){
-        // reason.message === 'WHOOPS'
-      });
-      ```
-
-      Instead of writing the above, your code now simply becomes the following:
-
-      ```javascript
-      var promise = RSVP.reject(new Error('WHOOPS'));
-
-      promise.then(function(value){
-        // Code here doesn't run because the promise is rejected!
-      }, function(reason){
-        // reason.message === 'WHOOPS'
-      });
-      ```
-
-      @method reject
-      @for RSVP
-      @param {Any} reason value that the returned promise will be rejected with.
-      @param {String} label optional string for identifying the returned promise.
-      Useful for tooling.
-      @return {Promise} a promise that will become rejected with the given
-      `reason`.
-    */
-    function reject(reason) {
-      /*jshint validthis:true */
-      var Promise = this;
-
-      return new Promise(function (resolve, reject) {
-        reject(reason);
-      });
-    }
-
-    __exports__.reject = reject;
-  });
-define("promise/resolve", 
-  ["exports"],
-  function(__exports__) {
-    "use strict";
-    function resolve(value) {
-      /*jshint validthis:true */
-      if (value && typeof value === 'object' && value.constructor === this) {
-        return value;
-      }
-
-      var Promise = this;
-
-      return new Promise(function(resolve) {
-        resolve(value);
-      });
-    }
-
-    __exports__.resolve = resolve;
-  });
-define("promise/utils", 
-  ["exports"],
-  function(__exports__) {
-    "use strict";
-    function objectOrFunction(x) {
-      return isFunction(x) || (typeof x === "object" && x !== null);
-    }
-
-    function isFunction(x) {
-      return typeof x === "function";
-    }
-
-    function isArray(x) {
-      return Object.prototype.toString.call(x) === "[object Array]";
-    }
-
-    // Date.now is not available in browsers < IE9
-    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/now#Compatibility
-    var now = Date.now || function() { return new Date().getTime(); };
-
-
-    __exports__.objectOrFunction = objectOrFunction;
-    __exports__.isFunction = isFunction;
-    __exports__.isArray = isArray;
-    __exports__.now = now;
-  });
-requireModule('promise/polyfill').polyfill();
-}());(function webpackUniversalModuleDefinition(root, factory) {
-	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory();
-	else if(typeof define === 'function' && define.amd)
-		define([], factory);
-	else if(typeof exports === 'object')
-		exports["localforage"] = factory();
-	else
-		root["localforage"] = factory();
-})(this, function() {
-return /******/ (function(modules) { // webpackBootstrap
-/******/ 	// The module cache
-/******/ 	var installedModules = {};
-
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-
-/******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId])
-/******/ 			return installedModules[moduleId].exports;
-
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = installedModules[moduleId] = {
-/******/ 			exports: {},
-/******/ 			id: moduleId,
-/******/ 			loaded: false
-/******/ 		};
-
-/******/ 		// Execute the module function
-/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-
-/******/ 		// Flag the module as loaded
-/******/ 		module.loaded = true;
-
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-
-
-/******/ 	// expose the modules object (__webpack_modules__)
-/******/ 	__webpack_require__.m = modules;
-
-/******/ 	// expose the module cache
-/******/ 	__webpack_require__.c = installedModules;
-
-/******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "";
-
-/******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(0);
-/******/ })
-/************************************************************************/
-/******/ ([
-/* 0 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	exports.__esModule = true;
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-	(function () {
-	    'use strict';
-
-	    // Custom drivers are stored here when `defineDriver()` is called.
-	    // They are shared across all instances of localForage.
-	    var CustomDrivers = {};
-
-	    var DriverType = {
-	        INDEXEDDB: 'asyncStorage',
-	        LOCALSTORAGE: 'localStorageWrapper',
-	        WEBSQL: 'webSQLStorage'
-	    };
-
-	    var DefaultDriverOrder = [DriverType.INDEXEDDB, DriverType.WEBSQL, DriverType.LOCALSTORAGE];
-
-	    var LibraryMethods = ['clear', 'getItem', 'iterate', 'key', 'keys', 'length', 'removeItem', 'setItem'];
-
-	    var DefaultConfig = {
-	        description: '',
-	        driver: DefaultDriverOrder.slice(),
-	        name: 'localforage',
-	        // Default DB size is _JUST UNDER_ 5MB, as it's the highest size
-	        // we can use without a prompt.
-	        size: 4980736,
-	        storeName: 'keyvaluepairs',
-	        version: 1.0
-	    };
-
-	    // Check to see if IndexedDB is available and if it is the latest
-	    // implementation; it's our preferred backend library. We use "_spec_test"
-	    // as the name of the database because it's not the one we'll operate on,
-	    // but it's useful to make sure its using the right spec.
-	    // See: https://github.com/mozilla/localForage/issues/128
-	    var driverSupport = (function (self) {
-	        // Initialize IndexedDB; fall back to vendor-prefixed versions
-	        // if needed.
-	        var indexedDB = indexedDB || self.indexedDB || self.webkitIndexedDB || self.mozIndexedDB || self.OIndexedDB || self.msIndexedDB;
-
-	        var result = {};
-
-	        result[DriverType.WEBSQL] = !!self.openDatabase;
-	        result[DriverType.INDEXEDDB] = !!(function () {
-	            // We mimic PouchDB here; just UA test for Safari (which, as of
-	            // iOS 8/Yosemite, doesn't properly support IndexedDB).
-	            // IndexedDB support is broken and different from Blink's.
-	            // This is faster than the test case (and it's sync), so we just
-	            // do this. *SIGH*
-	            // http://bl.ocks.org/nolanlawson/raw/c83e9039edf2278047e9/
-	            //
-	            // We test for openDatabase because IE Mobile identifies itself
-	            // as Safari. Oh the lulz...
-	            if (typeof self.openDatabase !== 'undefined' && self.navigator && self.navigator.userAgent && /Safari/.test(self.navigator.userAgent) && !/Chrome/.test(self.navigator.userAgent)) {
-	                return false;
-	            }
-	            try {
-	                return indexedDB && typeof indexedDB.open === 'function' &&
-	                // Some Samsung/HTC Android 4.0-4.3 devices
-	                // have older IndexedDB specs; if this isn't available
-	                // their IndexedDB is too old for us to use.
-	                // (Replaces the onupgradeneeded test.)
-	                typeof self.IDBKeyRange !== 'undefined';
-	            } catch (e) {
-	                return false;
-	            }
-	        })();
-
-	        result[DriverType.LOCALSTORAGE] = !!(function () {
-	            try {
-	                return self.localStorage && 'setItem' in self.localStorage && self.localStorage.setItem;
-	            } catch (e) {
-	                return false;
-	            }
-	        })();
-
-	        return result;
-	    })(this);
-
-	    var isArray = Array.isArray || function (arg) {
-	        return Object.prototype.toString.call(arg) === '[object Array]';
-	    };
-
-	    function callWhenReady(localForageInstance, libraryMethod) {
-	        localForageInstance[libraryMethod] = function () {
-	            var _args = arguments;
-	            return localForageInstance.ready().then(function () {
-	                return localForageInstance[libraryMethod].apply(localForageInstance, _args);
-	            });
-	        };
-	    }
-
-	    function extend() {
-	        for (var i = 1; i < arguments.length; i++) {
-	            var arg = arguments[i];
-
-	            if (arg) {
-	                for (var key in arg) {
-	                    if (arg.hasOwnProperty(key)) {
-	                        if (isArray(arg[key])) {
-	                            arguments[0][key] = arg[key].slice();
-	                        } else {
-	                            arguments[0][key] = arg[key];
-	                        }
-	                    }
-	                }
-	            }
-	        }
-
-	        return arguments[0];
-	    }
-
-	    function isLibraryDriver(driverName) {
-	        for (var driver in DriverType) {
-	            if (DriverType.hasOwnProperty(driver) && DriverType[driver] === driverName) {
-	                return true;
-	            }
-	        }
-
-	        return false;
-	    }
-
-	    var LocalForage = (function () {
-	        function LocalForage(options) {
-	            _classCallCheck(this, LocalForage);
-
-	            this.INDEXEDDB = DriverType.INDEXEDDB;
-	            this.LOCALSTORAGE = DriverType.LOCALSTORAGE;
-	            this.WEBSQL = DriverType.WEBSQL;
-
-	            this._defaultConfig = extend({}, DefaultConfig);
-	            this._config = extend({}, this._defaultConfig, options);
-	            this._driverSet = null;
-	            this._initDriver = null;
-	            this._ready = false;
-	            this._dbInfo = null;
-
-	            this._wrapLibraryMethodsWithReady();
-	            this.setDriver(this._config.driver);
-	        }
-
-	        // The actual localForage object that we expose as a module or via a
-	        // global. It's extended by pulling in one of our other libraries.
-
-	        // Set any config values for localForage; can be called anytime before
-	        // the first API call (e.g. `getItem`, `setItem`).
-	        // We loop through options so we don't overwrite existing config
-	        // values.
-
-	        LocalForage.prototype.config = function config(options) {
-	            // If the options argument is an object, we use it to set values.
-	            // Otherwise, we return either a specified config value or all
-	            // config values.
-	            if (typeof options === 'object') {
-	                // If localforage is ready and fully initialized, we can't set
-	                // any new configuration values. Instead, we return an error.
-	                if (this._ready) {
-	                    return new Error("Can't call config() after localforage " + 'has been used.');
-	                }
-
-	                for (var i in options) {
-	                    if (i === 'storeName') {
-	                        options[i] = options[i].replace(/\W/g, '_');
-	                    }
-
-	                    this._config[i] = options[i];
-	                }
-
-	                // after all config options are set and
-	                // the driver option is used, try setting it
-	                if ('driver' in options && options.driver) {
-	                    this.setDriver(this._config.driver);
-	                }
-
-	                return true;
-	            } else if (typeof options === 'string') {
-	                return this._config[options];
-	            } else {
-	                return this._config;
-	            }
-	        };
-
-	        // Used to define a custom driver, shared across all instances of
-	        // localForage.
-
-	        LocalForage.prototype.defineDriver = function defineDriver(driverObject, callback, errorCallback) {
-	            var promise = new Promise(function (resolve, reject) {
-	                try {
-	                    var driverName = driverObject._driver;
-	                    var complianceError = new Error('Custom driver not compliant; see ' + 'https://mozilla.github.io/localForage/#definedriver');
-	                    var namingError = new Error('Custom driver name already in use: ' + driverObject._driver);
-
-	                    // A driver name should be defined and not overlap with the
-	                    // library-defined, default drivers.
-	                    if (!driverObject._driver) {
-	                        reject(complianceError);
-	                        return;
-	                    }
-	                    if (isLibraryDriver(driverObject._driver)) {
-	                        reject(namingError);
-	                        return;
-	                    }
-
-	                    var customDriverMethods = LibraryMethods.concat('_initStorage');
-	                    for (var i = 0; i < customDriverMethods.length; i++) {
-	                        var customDriverMethod = customDriverMethods[i];
-	                        if (!customDriverMethod || !driverObject[customDriverMethod] || typeof driverObject[customDriverMethod] !== 'function') {
-	                            reject(complianceError);
-	                            return;
-	                        }
-	                    }
-
-	                    var supportPromise = Promise.resolve(true);
-	                    if ('_support' in driverObject) {
-	                        if (driverObject._support && typeof driverObject._support === 'function') {
-	                            supportPromise = driverObject._support();
-	                        } else {
-	                            supportPromise = Promise.resolve(!!driverObject._support);
-	                        }
-	                    }
-
-	                    supportPromise.then(function (supportResult) {
-	                        driverSupport[driverName] = supportResult;
-	                        CustomDrivers[driverName] = driverObject;
-	                        resolve();
-	                    }, reject);
-	                } catch (e) {
-	                    reject(e);
-	                }
-	            });
-
-	            promise.then(callback, errorCallback);
-	            return promise;
-	        };
-
-	        LocalForage.prototype.driver = function driver() {
-	            return this._driver || null;
-	        };
-
-	        LocalForage.prototype.getDriver = function getDriver(driverName, callback, errorCallback) {
-	            var self = this;
-	            var getDriverPromise = (function () {
-	                if (isLibraryDriver(driverName)) {
-	                    switch (driverName) {
-	                        case self.INDEXEDDB:
-	                            return new Promise(function (resolve, reject) {
-	                                resolve(__webpack_require__(1));
-	                            });
-	                        case self.LOCALSTORAGE:
-	                            return new Promise(function (resolve, reject) {
-	                                resolve(__webpack_require__(2));
-	                            });
-	                        case self.WEBSQL:
-	                            return new Promise(function (resolve, reject) {
-	                                resolve(__webpack_require__(4));
-	                            });
-	                    }
-	                } else if (CustomDrivers[driverName]) {
-	                    return Promise.resolve(CustomDrivers[driverName]);
-	                }
-
-	                return Promise.reject(new Error('Driver not found.'));
-	            })();
-
-	            getDriverPromise.then(callback, errorCallback);
-	            return getDriverPromise;
-	        };
-
-	        LocalForage.prototype.getSerializer = function getSerializer(callback) {
-	            var serializerPromise = new Promise(function (resolve, reject) {
-	                resolve(__webpack_require__(3));
-	            });
-	            if (callback && typeof callback === 'function') {
-	                serializerPromise.then(function (result) {
-	                    callback(result);
-	                });
-	            }
-	            return serializerPromise;
-	        };
-
-	        LocalForage.prototype.ready = function ready(callback) {
-	            var self = this;
-
-	            var promise = self._driverSet.then(function () {
-	                if (self._ready === null) {
-	                    self._ready = self._initDriver();
-	                }
-
-	                return self._ready;
-	            });
-
-	            promise.then(callback, callback);
-	            return promise;
-	        };
-
-	        LocalForage.prototype.setDriver = function setDriver(drivers, callback, errorCallback) {
-	            var self = this;
-
-	            if (!isArray(drivers)) {
-	                drivers = [drivers];
-	            }
-
-	            var supportedDrivers = this._getSupportedDrivers(drivers);
-
-	            function setDriverToConfig() {
-	                self._config.driver = self.driver();
-	            }
-
-	            function initDriver(supportedDrivers) {
-	                return function () {
-	                    var currentDriverIndex = 0;
-
-	                    function driverPromiseLoop() {
-	                        while (currentDriverIndex < supportedDrivers.length) {
-	                            var driverName = supportedDrivers[currentDriverIndex];
-	                            currentDriverIndex++;
-
-	                            self._dbInfo = null;
-	                            self._ready = null;
-
-	                            return self.getDriver(driverName).then(function (driver) {
-	                                self._extend(driver);
-	                                setDriverToConfig();
-
-	                                self._ready = self._initStorage(self._config);
-	                                return self._ready;
-	                            })['catch'](driverPromiseLoop);
-	                        }
-
-	                        setDriverToConfig();
-	                        var error = new Error('No available storage method found.');
-	                        self._driverSet = Promise.reject(error);
-	                        return self._driverSet;
-	                    }
-
-	                    return driverPromiseLoop();
-	                };
-	            }
-
-	            // There might be a driver initialization in progress
-	            // so wait for it to finish in order to avoid a possible
-	            // race condition to set _dbInfo
-	            var oldDriverSetDone = this._driverSet !== null ? this._driverSet['catch'](function () {
-	                return Promise.resolve();
-	            }) : Promise.resolve();
-
-	            this._driverSet = oldDriverSetDone.then(function () {
-	                var driverName = supportedDrivers[0];
-	                self._dbInfo = null;
-	                self._ready = null;
-
-	                return self.getDriver(driverName).then(function (driver) {
-	                    self._driver = driver._driver;
-	                    setDriverToConfig();
-	                    self._wrapLibraryMethodsWithReady();
-	                    self._initDriver = initDriver(supportedDrivers);
-	                });
-	            })['catch'](function () {
-	                setDriverToConfig();
-	                var error = new Error('No available storage method found.');
-	                self._driverSet = Promise.reject(error);
-	                return self._driverSet;
-	            });
-
-	            this._driverSet.then(callback, errorCallback);
-	            return this._driverSet;
-	        };
-
-	        LocalForage.prototype.supports = function supports(driverName) {
-	            return !!driverSupport[driverName];
-	        };
-
-	        LocalForage.prototype._extend = function _extend(libraryMethodsAndProperties) {
-	            extend(this, libraryMethodsAndProperties);
-	        };
-
-	        LocalForage.prototype._getSupportedDrivers = function _getSupportedDrivers(drivers) {
-	            var supportedDrivers = [];
-	            for (var i = 0, len = drivers.length; i < len; i++) {
-	                var driverName = drivers[i];
-	                if (this.supports(driverName)) {
-	                    supportedDrivers.push(driverName);
-	                }
-	            }
-	            return supportedDrivers;
-	        };
-
-	        LocalForage.prototype._wrapLibraryMethodsWithReady = function _wrapLibraryMethodsWithReady() {
-	            // Add a stub for each driver API method that delays the call to the
-	            // corresponding driver method until localForage is ready. These stubs
-	            // will be replaced by the driver methods as soon as the driver is
-	            // loaded, so there is no performance impact.
-	            for (var i = 0; i < LibraryMethods.length; i++) {
-	                callWhenReady(this, LibraryMethods[i]);
-	            }
-	        };
-
-	        LocalForage.prototype.createInstance = function createInstance(options) {
-	            return new LocalForage(options);
-	        };
-
-	        return LocalForage;
-	    })();
-
-	    var localForage = new LocalForage();
-
-	    exports['default'] = localForage;
-	}).call(typeof window !== 'undefined' ? window : self);
-	module.exports = exports['default'];
-
-/***/ },
-/* 1 */
-/***/ function(module, exports) {
-
-	// Some code originally from async_storage.js in
-	// [Gaia](https://github.com/mozilla-b2g/gaia).
-	'use strict';
-
-	exports.__esModule = true;
-	(function () {
-	    'use strict';
-
-	    var globalObject = this;
-	    // Initialize IndexedDB; fall back to vendor-prefixed versions if needed.
-	    var indexedDB = indexedDB || this.indexedDB || this.webkitIndexedDB || this.mozIndexedDB || this.OIndexedDB || this.msIndexedDB;
-
-	    // If IndexedDB isn't available, we get outta here!
-	    if (!indexedDB) {
-	        return;
-	    }
-
-	    var DETECT_BLOB_SUPPORT_STORE = 'local-forage-detect-blob-support';
-	    var supportsBlobs;
-	    var dbContexts;
-
-	    // Abstracts constructing a Blob object, so it also works in older
-	    // browsers that don't support the native Blob constructor. (i.e.
-	    // old QtWebKit versions, at least).
-	    function _createBlob(parts, properties) {
-	        parts = parts || [];
-	        properties = properties || {};
-	        try {
-	            return new Blob(parts, properties);
-	        } catch (e) {
-	            if (e.name !== 'TypeError') {
-	                throw e;
-	            }
-	            var BlobBuilder = globalObject.BlobBuilder || globalObject.MSBlobBuilder || globalObject.MozBlobBuilder || globalObject.WebKitBlobBuilder;
-	            var builder = new BlobBuilder();
-	            for (var i = 0; i < parts.length; i += 1) {
-	                builder.append(parts[i]);
-	            }
-	            return builder.getBlob(properties.type);
-	        }
-	    }
-
-	    // Transform a binary string to an array buffer, because otherwise
-	    // weird stuff happens when you try to work with the binary string directly.
-	    // It is known.
-	    // From http://stackoverflow.com/questions/14967647/ (continues on next line)
-	    // encode-decode-image-with-base64-breaks-image (2013-04-21)
-	    function _binStringToArrayBuffer(bin) {
-	        var length = bin.length;
-	        var buf = new ArrayBuffer(length);
-	        var arr = new Uint8Array(buf);
-	        for (var i = 0; i < length; i++) {
-	            arr[i] = bin.charCodeAt(i);
-	        }
-	        return buf;
-	    }
-
-	    // Fetch a blob using ajax. This reveals bugs in Chrome < 43.
-	    // For details on all this junk:
-	    // https://github.com/nolanlawson/state-of-binary-data-in-the-browser#readme
-	    function _blobAjax(url) {
-	        return new Promise(function (resolve, reject) {
-	            var xhr = new XMLHttpRequest();
-	            xhr.open('GET', url);
-	            xhr.withCredentials = true;
-	            xhr.responseType = 'arraybuffer';
-
-	            xhr.onreadystatechange = function () {
-	                if (xhr.readyState !== 4) {
-	                    return;
-	                }
-	                if (xhr.status === 200) {
-	                    return resolve({
-	                        response: xhr.response,
-	                        type: xhr.getResponseHeader('Content-Type')
-	                    });
-	                }
-	                reject({ status: xhr.status, response: xhr.response });
-	            };
-	            xhr.send();
-	        });
-	    }
-
-	    //
-	    // Detect blob support. Chrome didn't support it until version 38.
-	    // In version 37 they had a broken version where PNGs (and possibly
-	    // other binary types) aren't stored correctly, because when you fetch
-	    // them, the content type is always null.
-	    //
-	    // Furthermore, they have some outstanding bugs where blobs occasionally
-	    // are read by FileReader as null, or by ajax as 404s.
-	    //
-	    // Sadly we use the 404 bug to detect the FileReader bug, so if they
-	    // get fixed independently and released in different versions of Chrome,
-	    // then the bug could come back. So it's worthwhile to watch these issues:
-	    // 404 bug: https://code.google.com/p/chromium/issues/detail?id=447916
-	    // FileReader bug: https://code.google.com/p/chromium/issues/detail?id=447836
-	    //
-	    function _checkBlobSupportWithoutCaching(idb) {
-	        return new Promise(function (resolve, reject) {
-	            var blob = _createBlob([''], { type: 'image/png' });
-	            var txn = idb.transaction([DETECT_BLOB_SUPPORT_STORE], 'readwrite');
-	            txn.objectStore(DETECT_BLOB_SUPPORT_STORE).put(blob, 'key');
-	            txn.oncomplete = function () {
-	                // have to do it in a separate transaction, else the correct
-	                // content type is always returned
-	                var blobTxn = idb.transaction([DETECT_BLOB_SUPPORT_STORE], 'readwrite');
-	                var getBlobReq = blobTxn.objectStore(DETECT_BLOB_SUPPORT_STORE).get('key');
-	                getBlobReq.onerror = reject;
-	                getBlobReq.onsuccess = function (e) {
-
-	                    var storedBlob = e.target.result;
-	                    var url = URL.createObjectURL(storedBlob);
-
-	                    _blobAjax(url).then(function (res) {
-	                        resolve(!!(res && res.type === 'image/png'));
-	                    }, function () {
-	                        resolve(false);
-	                    }).then(function () {
-	                        URL.revokeObjectURL(url);
-	                    });
-	                };
-	            };
-	        })['catch'](function () {
-	            return false; // error, so assume unsupported
-	        });
-	    }
-
-	    function _checkBlobSupport(idb) {
-	        if (typeof supportsBlobs === 'boolean') {
-	            return Promise.resolve(supportsBlobs);
-	        }
-	        return _checkBlobSupportWithoutCaching(idb).then(function (value) {
-	            supportsBlobs = value;
-	            return supportsBlobs;
-	        });
-	    }
-
-	    // encode a blob for indexeddb engines that don't support blobs
-	    function _encodeBlob(blob) {
-	        return new Promise(function (resolve, reject) {
-	            var reader = new FileReader();
-	            reader.onerror = reject;
-	            reader.onloadend = function (e) {
-	                var base64 = btoa(e.target.result || '');
-	                resolve({
-	                    __local_forage_encoded_blob: true,
-	                    data: base64,
-	                    type: blob.type
-	                });
-	            };
-	            reader.readAsBinaryString(blob);
-	        });
-	    }
-
-	    // decode an encoded blob
-	    function _decodeBlob(encodedBlob) {
-	        var arrayBuff = _binStringToArrayBuffer(atob(encodedBlob.data));
-	        return _createBlob([arrayBuff], { type: encodedBlob.type });
-	    }
-
-	    // is this one of our fancy encoded blobs?
-	    function _isEncodedBlob(value) {
-	        return value && value.__local_forage_encoded_blob;
-	    }
-
-	    // Open the IndexedDB database (automatically creates one if one didn't
-	    // previously exist), using any options set in the config.
-	    function _initStorage(options) {
-	        var self = this;
-	        var dbInfo = {
-	            db: null
-	        };
-
-	        if (options) {
-	            for (var i in options) {
-	                dbInfo[i] = options[i];
-	            }
-	        }
-
-	        // Initialize a singleton container for all running localForages.
-	        if (!dbContexts) {
-	            dbContexts = {};
-	        }
-
-	        // Get the current context of the database;
-	        var dbContext = dbContexts[dbInfo.name];
-
-	        // ...or create a new context.
-	        if (!dbContext) {
-	            dbContext = {
-	                // Running localForages sharing a database.
-	                forages: [],
-	                // Shared database.
-	                db: null
-	            };
-	            // Register the new context in the global container.
-	            dbContexts[dbInfo.name] = dbContext;
-	        }
-
-	        // Register itself as a running localForage in the current context.
-	        dbContext.forages.push(this);
-
-	        // Create an array of readiness of the related localForages.
-	        var readyPromises = [];
-
-	        function ignoreErrors() {
-	            // Don't handle errors here,
-	            // just makes sure related localForages aren't pending.
-	            return Promise.resolve();
-	        }
-
-	        for (var j = 0; j < dbContext.forages.length; j++) {
-	            var forage = dbContext.forages[j];
-	            if (forage !== this) {
-	                // Don't wait for itself...
-	                readyPromises.push(forage.ready()['catch'](ignoreErrors));
-	            }
-	        }
-
-	        // Take a snapshot of the related localForages.
-	        var forages = dbContext.forages.slice(0);
-
-	        // Initialize the connection process only when
-	        // all the related localForages aren't pending.
-	        return Promise.all(readyPromises).then(function () {
-	            dbInfo.db = dbContext.db;
-	            // Get the connection or open a new one without upgrade.
-	            return _getOriginalConnection(dbInfo);
-	        }).then(function (db) {
-	            dbInfo.db = db;
-	            if (_isUpgradeNeeded(dbInfo, self._defaultConfig.version)) {
-	                // Reopen the database for upgrading.
-	                return _getUpgradedConnection(dbInfo);
-	            }
-	            return db;
-	        }).then(function (db) {
-	            dbInfo.db = dbContext.db = db;
-	            self._dbInfo = dbInfo;
-	            // Share the final connection amongst related localForages.
-	            for (var k in forages) {
-	                var forage = forages[k];
-	                if (forage !== self) {
-	                    // Self is already up-to-date.
-	                    forage._dbInfo.db = dbInfo.db;
-	                    forage._dbInfo.version = dbInfo.version;
-	                }
-	            }
-	        });
-	    }
-
-	    function _getOriginalConnection(dbInfo) {
-	        return _getConnection(dbInfo, false);
-	    }
-
-	    function _getUpgradedConnection(dbInfo) {
-	        return _getConnection(dbInfo, true);
-	    }
-
-	    function _getConnection(dbInfo, upgradeNeeded) {
-	        return new Promise(function (resolve, reject) {
-	            if (dbInfo.db) {
-	                if (upgradeNeeded) {
-	                    dbInfo.db.close();
-	                } else {
-	                    return resolve(dbInfo.db);
-	                }
-	            }
-
-	            var dbArgs = [dbInfo.name];
-
-	            if (upgradeNeeded) {
-	                dbArgs.push(dbInfo.version);
-	            }
-
-	            var openreq = indexedDB.open.apply(indexedDB, dbArgs);
-
-	            if (upgradeNeeded) {
-	                openreq.onupgradeneeded = function (e) {
-	                    var db = openreq.result;
-	                    try {
-	                        db.createObjectStore(dbInfo.storeName);
-	                        if (e.oldVersion <= 1) {
-	                            // Added when support for blob shims was added
-	                            db.createObjectStore(DETECT_BLOB_SUPPORT_STORE);
-	                        }
-	                    } catch (ex) {
-	                        if (ex.name === 'ConstraintError') {
-	                            globalObject.console.warn('The database "' + dbInfo.name + '"' + ' has been upgraded from version ' + e.oldVersion + ' to version ' + e.newVersion + ', but the storage "' + dbInfo.storeName + '" already exists.');
-	                        } else {
-	                            throw ex;
-	                        }
-	                    }
-	                };
-	            }
-
-	            openreq.onerror = function () {
-	                reject(openreq.error);
-	            };
-
-	            openreq.onsuccess = function () {
-	                resolve(openreq.result);
-	            };
-	        });
-	    }
-
-	    function _isUpgradeNeeded(dbInfo, defaultVersion) {
-	        if (!dbInfo.db) {
-	            return true;
-	        }
-
-	        var isNewStore = !dbInfo.db.objectStoreNames.contains(dbInfo.storeName);
-	        var isDowngrade = dbInfo.version < dbInfo.db.version;
-	        var isUpgrade = dbInfo.version > dbInfo.db.version;
-
-	        if (isDowngrade) {
-	            // If the version is not the default one
-	            // then warn for impossible downgrade.
-	            if (dbInfo.version !== defaultVersion) {
-	                globalObject.console.warn('The database "' + dbInfo.name + '"' + ' can\'t be downgraded from version ' + dbInfo.db.version + ' to version ' + dbInfo.version + '.');
-	            }
-	            // Align the versions to prevent errors.
-	            dbInfo.version = dbInfo.db.version;
-	        }
-
-	        if (isUpgrade || isNewStore) {
-	            // If the store is new then increment the version (if needed).
-	            // This will trigger an "upgradeneeded" event which is required
-	            // for creating a store.
-	            if (isNewStore) {
-	                var incVersion = dbInfo.db.version + 1;
-	                if (incVersion > dbInfo.version) {
-	                    dbInfo.version = incVersion;
-	                }
-	            }
-
-	            return true;
-	        }
-
-	        return false;
-	    }
-
-	    function getItem(key, callback) {
-	        var self = this;
-
-	        // Cast the key to a string, as that's all we can set as a key.
-	        if (typeof key !== 'string') {
-	            globalObject.console.warn(key + ' used as a key, but it is not a string.');
-	            key = String(key);
-	        }
-
-	        var promise = new Promise(function (resolve, reject) {
-	            self.ready().then(function () {
-	                var dbInfo = self._dbInfo;
-	                var store = dbInfo.db.transaction(dbInfo.storeName, 'readonly').objectStore(dbInfo.storeName);
-	                var req = store.get(key);
-
-	                req.onsuccess = function () {
-	                    var value = req.result;
-	                    if (value === undefined) {
-	                        value = null;
-	                    }
-	                    if (_isEncodedBlob(value)) {
-	                        value = _decodeBlob(value);
-	                    }
-	                    resolve(value);
-	                };
-
-	                req.onerror = function () {
-	                    reject(req.error);
-	                };
-	            })['catch'](reject);
-	        });
-
-	        executeCallback(promise, callback);
-	        return promise;
-	    }
-
-	    // Iterate over all items stored in database.
-	    function iterate(iterator, callback) {
-	        var self = this;
-
-	        var promise = new Promise(function (resolve, reject) {
-	            self.ready().then(function () {
-	                var dbInfo = self._dbInfo;
-	                var store = dbInfo.db.transaction(dbInfo.storeName, 'readonly').objectStore(dbInfo.storeName);
-
-	                var req = store.openCursor();
-	                var iterationNumber = 1;
-
-	                req.onsuccess = function () {
-	                    var cursor = req.result;
-
-	                    if (cursor) {
-	                        var value = cursor.value;
-	                        if (_isEncodedBlob(value)) {
-	                            value = _decodeBlob(value);
-	                        }
-	                        var result = iterator(value, cursor.key, iterationNumber++);
-
-	                        if (result !== void 0) {
-	                            resolve(result);
-	                        } else {
-	                            cursor['continue']();
-	                        }
-	                    } else {
-	                        resolve();
-	                    }
-	                };
-
-	                req.onerror = function () {
-	                    reject(req.error);
-	                };
-	            })['catch'](reject);
-	        });
-
-	        executeCallback(promise, callback);
-
-	        return promise;
-	    }
-
-	    function setItem(key, value, callback) {
-	        var self = this;
-
-	        // Cast the key to a string, as that's all we can set as a key.
-	        if (typeof key !== 'string') {
-	            globalObject.console.warn(key + ' used as a key, but it is not a string.');
-	            key = String(key);
-	        }
-
-	        var promise = new Promise(function (resolve, reject) {
-	            var dbInfo;
-	            self.ready().then(function () {
-	                dbInfo = self._dbInfo;
-	                return _checkBlobSupport(dbInfo.db);
-	            }).then(function (blobSupport) {
-	                if (!blobSupport && value instanceof Blob) {
-	                    return _encodeBlob(value);
-	                }
-	                return value;
-	            }).then(function (value) {
-	                var transaction = dbInfo.db.transaction(dbInfo.storeName, 'readwrite');
-	                var store = transaction.objectStore(dbInfo.storeName);
-
-	                // The reason we don't _save_ null is because IE 10 does
-	                // not support saving the `null` type in IndexedDB. How
-	                // ironic, given the bug below!
-	                // See: https://github.com/mozilla/localForage/issues/161
-	                if (value === null) {
-	                    value = undefined;
-	                }
-
-	                var req = store.put(value, key);
-	                transaction.oncomplete = function () {
-	                    // Cast to undefined so the value passed to
-	                    // callback/promise is the same as what one would get out
-	                    // of `getItem()` later. This leads to some weirdness
-	                    // (setItem('foo', undefined) will return `null`), but
-	                    // it's not my fault localStorage is our baseline and that
-	                    // it's weird.
-	                    if (value === undefined) {
-	                        value = null;
-	                    }
-
-	                    resolve(value);
-	                };
-	                transaction.onabort = transaction.onerror = function () {
-	                    var err = req.error ? req.error : req.transaction.error;
-	                    reject(err);
-	                };
-	            })['catch'](reject);
-	        });
-
-	        executeCallback(promise, callback);
-	        return promise;
-	    }
-
-	    function removeItem(key, callback) {
-	        var self = this;
-
-	        // Cast the key to a string, as that's all we can set as a key.
-	        if (typeof key !== 'string') {
-	            globalObject.console.warn(key + ' used as a key, but it is not a string.');
-	            key = String(key);
-	        }
-
-	        var promise = new Promise(function (resolve, reject) {
-	            self.ready().then(function () {
-	                var dbInfo = self._dbInfo;
-	                var transaction = dbInfo.db.transaction(dbInfo.storeName, 'readwrite');
-	                var store = transaction.objectStore(dbInfo.storeName);
-
-	                // We use a Grunt task to make this safe for IE and some
-	                // versions of Android (including those used by Cordova).
-	                // Normally IE won't like `.delete()` and will insist on
-	                // using `['delete']()`, but we have a build step that
-	                // fixes this for us now.
-	                var req = store['delete'](key);
-	                transaction.oncomplete = function () {
-	                    resolve();
-	                };
-
-	                transaction.onerror = function () {
-	                    reject(req.error);
-	                };
-
-	                // The request will be also be aborted if we've exceeded our storage
-	                // space.
-	                transaction.onabort = function () {
-	                    var err = req.error ? req.error : req.transaction.error;
-	                    reject(err);
-	                };
-	            })['catch'](reject);
-	        });
-
-	        executeCallback(promise, callback);
-	        return promise;
-	    }
-
-	    function clear(callback) {
-	        var self = this;
-
-	        var promise = new Promise(function (resolve, reject) {
-	            self.ready().then(function () {
-	                var dbInfo = self._dbInfo;
-	                var transaction = dbInfo.db.transaction(dbInfo.storeName, 'readwrite');
-	                var store = transaction.objectStore(dbInfo.storeName);
-	                var req = store.clear();
-
-	                transaction.oncomplete = function () {
-	                    resolve();
-	                };
-
-	                transaction.onabort = transaction.onerror = function () {
-	                    var err = req.error ? req.error : req.transaction.error;
-	                    reject(err);
-	                };
-	            })['catch'](reject);
-	        });
-
-	        executeCallback(promise, callback);
-	        return promise;
-	    }
-
-	    function length(callback) {
-	        var self = this;
-
-	        var promise = new Promise(function (resolve, reject) {
-	            self.ready().then(function () {
-	                var dbInfo = self._dbInfo;
-	                var store = dbInfo.db.transaction(dbInfo.storeName, 'readonly').objectStore(dbInfo.storeName);
-	                var req = store.count();
-
-	                req.onsuccess = function () {
-	                    resolve(req.result);
-	                };
-
-	                req.onerror = function () {
-	                    reject(req.error);
-	                };
-	            })['catch'](reject);
-	        });
-
-	        executeCallback(promise, callback);
-	        return promise;
-	    }
-
-	    function key(n, callback) {
-	        var self = this;
-
-	        var promise = new Promise(function (resolve, reject) {
-	            if (n < 0) {
-	                resolve(null);
-
-	                return;
-	            }
-
-	            self.ready().then(function () {
-	                var dbInfo = self._dbInfo;
-	                var store = dbInfo.db.transaction(dbInfo.storeName, 'readonly').objectStore(dbInfo.storeName);
-
-	                var advanced = false;
-	                var req = store.openCursor();
-	                req.onsuccess = function () {
-	                    var cursor = req.result;
-	                    if (!cursor) {
-	                        // this means there weren't enough keys
-	                        resolve(null);
-
-	                        return;
-	                    }
-
-	                    if (n === 0) {
-	                        // We have the first key, return it if that's what they
-	                        // wanted.
-	                        resolve(cursor.key);
-	                    } else {
-	                        if (!advanced) {
-	                            // Otherwise, ask the cursor to skip ahead n
-	                            // records.
-	                            advanced = true;
-	                            cursor.advance(n);
-	                        } else {
-	                            // When we get here, we've got the nth key.
-	                            resolve(cursor.key);
-	                        }
-	                    }
-	                };
-
-	                req.onerror = function () {
-	                    reject(req.error);
-	                };
-	            })['catch'](reject);
-	        });
-
-	        executeCallback(promise, callback);
-	        return promise;
-	    }
-
-	    function keys(callback) {
-	        var self = this;
-
-	        var promise = new Promise(function (resolve, reject) {
-	            self.ready().then(function () {
-	                var dbInfo = self._dbInfo;
-	                var store = dbInfo.db.transaction(dbInfo.storeName, 'readonly').objectStore(dbInfo.storeName);
-
-	                var req = store.openCursor();
-	                var keys = [];
-
-	                req.onsuccess = function () {
-	                    var cursor = req.result;
-
-	                    if (!cursor) {
-	                        resolve(keys);
-	                        return;
-	                    }
-
-	                    keys.push(cursor.key);
-	                    cursor['continue']();
-	                };
-
-	                req.onerror = function () {
-	                    reject(req.error);
-	                };
-	            })['catch'](reject);
-	        });
-
-	        executeCallback(promise, callback);
-	        return promise;
-	    }
-
-	    function executeCallback(promise, callback) {
-	        if (callback) {
-	            promise.then(function (result) {
-	                callback(null, result);
-	            }, function (error) {
-	                callback(error);
-	            });
-	        }
-	    }
-
-	    var asyncStorage = {
-	        _driver: 'asyncStorage',
-	        _initStorage: _initStorage,
-	        iterate: iterate,
-	        getItem: getItem,
-	        setItem: setItem,
-	        removeItem: removeItem,
-	        clear: clear,
-	        length: length,
-	        key: key,
-	        keys: keys
-	    };
-
-	    exports['default'] = asyncStorage;
-	}).call(typeof window !== 'undefined' ? window : self);
-	module.exports = exports['default'];
-
-/***/ },
-/* 2 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// If IndexedDB isn't available, we'll fall back to localStorage.
-	// Note that this will have considerable performance and storage
-	// side-effects (all data will be serialized on save and only data that
-	// can be converted to a string via `JSON.stringify()` will be saved).
-	'use strict';
-
-	exports.__esModule = true;
-	(function () {
-	    'use strict';
-
-	    var globalObject = this;
-	    var localStorage = null;
-
-	    // If the app is running inside a Google Chrome packaged webapp, or some
-	    // other context where localStorage isn't available, we don't use
-	    // localStorage. This feature detection is preferred over the old
-	    // `if (window.chrome && window.chrome.runtime)` code.
-	    // See: https://github.com/mozilla/localForage/issues/68
-	    try {
-	        // If localStorage isn't available, we get outta here!
-	        // This should be inside a try catch
-	        if (!this.localStorage || !('setItem' in this.localStorage)) {
-	            return;
-	        }
-	        // Initialize localStorage and create a variable to use throughout
-	        // the code.
-	        localStorage = this.localStorage;
-	    } catch (e) {
-	        return;
-	    }
-
-	    // Config the localStorage backend, using options set in the config.
-	    function _initStorage(options) {
-	        var self = this;
-	        var dbInfo = {};
-	        if (options) {
-	            for (var i in options) {
-	                dbInfo[i] = options[i];
-	            }
-	        }
-
-	        dbInfo.keyPrefix = dbInfo.name + '/';
-
-	        if (dbInfo.storeName !== self._defaultConfig.storeName) {
-	            dbInfo.keyPrefix += dbInfo.storeName + '/';
-	        }
-
-	        self._dbInfo = dbInfo;
-
-	        return new Promise(function (resolve, reject) {
-	            resolve(__webpack_require__(3));
-	        }).then(function (lib) {
-	            dbInfo.serializer = lib;
-	            return Promise.resolve();
-	        });
-	    }
-
-	    // Remove all keys from the datastore, effectively destroying all data in
-	    // the app's key/value store!
-	    function clear(callback) {
-	        var self = this;
-	        var promise = self.ready().then(function () {
-	            var keyPrefix = self._dbInfo.keyPrefix;
-
-	            for (var i = localStorage.length - 1; i >= 0; i--) {
-	                var key = localStorage.key(i);
-
-	                if (key.indexOf(keyPrefix) === 0) {
-	                    localStorage.removeItem(key);
-	                }
-	            }
-	        });
-
-	        executeCallback(promise, callback);
-	        return promise;
-	    }
-
-	    // Retrieve an item from the store. Unlike the original async_storage
-	    // library in Gaia, we don't modify return values at all. If a key's value
-	    // is `undefined`, we pass that value to the callback function.
-	    function getItem(key, callback) {
-	        var self = this;
-
-	        // Cast the key to a string, as that's all we can set as a key.
-	        if (typeof key !== 'string') {
-	            globalObject.console.warn(key + ' used as a key, but it is not a string.');
-	            key = String(key);
-	        }
-
-	        var promise = self.ready().then(function () {
-	            var dbInfo = self._dbInfo;
-	            var result = localStorage.getItem(dbInfo.keyPrefix + key);
-
-	            // If a result was found, parse it from the serialized
-	            // string into a JS object. If result isn't truthy, the key
-	            // is likely undefined and we'll pass it straight to the
-	            // callback.
-	            if (result) {
-	                result = dbInfo.serializer.deserialize(result);
-	            }
-
-	            return result;
-	        });
-
-	        executeCallback(promise, callback);
-	        return promise;
-	    }
-
-	    // Iterate over all items in the store.
-	    function iterate(iterator, callback) {
-	        var self = this;
-
-	        var promise = self.ready().then(function () {
-	            var dbInfo = self._dbInfo;
-	            var keyPrefix = dbInfo.keyPrefix;
-	            var keyPrefixLength = keyPrefix.length;
-	            var length = localStorage.length;
-
-	            // We use a dedicated iterator instead of the `i` variable below
-	            // so other keys we fetch in localStorage aren't counted in
-	            // the `iterationNumber` argument passed to the `iterate()`
-	            // callback.
-	            //
-	            // See: github.com/mozilla/localForage/pull/435#discussion_r38061530
-	            var iterationNumber = 1;
-
-	            for (var i = 0; i < length; i++) {
-	                var key = localStorage.key(i);
-	                if (key.indexOf(keyPrefix) !== 0) {
-	                    continue;
-	                }
-	                var value = localStorage.getItem(key);
-
-	                // If a result was found, parse it from the serialized
-	                // string into a JS object. If result isn't truthy, the
-	                // key is likely undefined and we'll pass it straight
-	                // to the iterator.
-	                if (value) {
-	                    value = dbInfo.serializer.deserialize(value);
-	                }
-
-	                value = iterator(value, key.substring(keyPrefixLength), iterationNumber++);
-
-	                if (value !== void 0) {
-	                    return value;
-	                }
-	            }
-	        });
-
-	        executeCallback(promise, callback);
-	        return promise;
-	    }
-
-	    // Same as localStorage's key() method, except takes a callback.
-	    function key(n, callback) {
-	        var self = this;
-	        var promise = self.ready().then(function () {
-	            var dbInfo = self._dbInfo;
-	            var result;
-	            try {
-	                result = localStorage.key(n);
-	            } catch (error) {
-	                result = null;
-	            }
-
-	            // Remove the prefix from the key, if a key is found.
-	            if (result) {
-	                result = result.substring(dbInfo.keyPrefix.length);
-	            }
-
-	            return result;
-	        });
-
-	        executeCallback(promise, callback);
-	        return promise;
-	    }
-
-	    function keys(callback) {
-	        var self = this;
-	        var promise = self.ready().then(function () {
-	            var dbInfo = self._dbInfo;
-	            var length = localStorage.length;
-	            var keys = [];
-
-	            for (var i = 0; i < length; i++) {
-	                if (localStorage.key(i).indexOf(dbInfo.keyPrefix) === 0) {
-	                    keys.push(localStorage.key(i).substring(dbInfo.keyPrefix.length));
-	                }
-	            }
-
-	            return keys;
-	        });
-
-	        executeCallback(promise, callback);
-	        return promise;
-	    }
-
-	    // Supply the number of keys in the datastore to the callback function.
-	    function length(callback) {
-	        var self = this;
-	        var promise = self.keys().then(function (keys) {
-	            return keys.length;
-	        });
-
-	        executeCallback(promise, callback);
-	        return promise;
-	    }
-
-	    // Remove an item from the store, nice and simple.
-	    function removeItem(key, callback) {
-	        var self = this;
-
-	        // Cast the key to a string, as that's all we can set as a key.
-	        if (typeof key !== 'string') {
-	            globalObject.console.warn(key + ' used as a key, but it is not a string.');
-	            key = String(key);
-	        }
-
-	        var promise = self.ready().then(function () {
-	            var dbInfo = self._dbInfo;
-	            localStorage.removeItem(dbInfo.keyPrefix + key);
-	        });
-
-	        executeCallback(promise, callback);
-	        return promise;
-	    }
-
-	    // Set a key's value and run an optional callback once the value is set.
-	    // Unlike Gaia's implementation, the callback function is passed the value,
-	    // in case you want to operate on that value only after you're sure it
-	    // saved, or something like that.
-	    function setItem(key, value, callback) {
-	        var self = this;
-
-	        // Cast the key to a string, as that's all we can set as a key.
-	        if (typeof key !== 'string') {
-	            globalObject.console.warn(key + ' used as a key, but it is not a string.');
-	            key = String(key);
-	        }
-
-	        var promise = self.ready().then(function () {
-	            // Convert undefined values to null.
-	            // https://github.com/mozilla/localForage/pull/42
-	            if (value === undefined) {
-	                value = null;
-	            }
-
-	            // Save the original value to pass to the callback.
-	            var originalValue = value;
-
-	            return new Promise(function (resolve, reject) {
-	                var dbInfo = self._dbInfo;
-	                dbInfo.serializer.serialize(value, function (value, error) {
-	                    if (error) {
-	                        reject(error);
-	                    } else {
-	                        try {
-	                            localStorage.setItem(dbInfo.keyPrefix + key, value);
-	                            resolve(originalValue);
-	                        } catch (e) {
-	                            // localStorage capacity exceeded.
-	                            // TODO: Make this a specific error/event.
-	                            if (e.name === 'QuotaExceededError' || e.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
-	                                reject(e);
-	                            }
-	                            reject(e);
-	                        }
-	                    }
-	                });
-	            });
-	        });
-
-	        executeCallback(promise, callback);
-	        return promise;
-	    }
-
-	    function executeCallback(promise, callback) {
-	        if (callback) {
-	            promise.then(function (result) {
-	                callback(null, result);
-	            }, function (error) {
-	                callback(error);
-	            });
-	        }
-	    }
-
-	    var localStorageWrapper = {
-	        _driver: 'localStorageWrapper',
-	        _initStorage: _initStorage,
-	        // Default API, from Gaia/localStorage.
-	        iterate: iterate,
-	        getItem: getItem,
-	        setItem: setItem,
-	        removeItem: removeItem,
-	        clear: clear,
-	        length: length,
-	        key: key,
-	        keys: keys
-	    };
-
-	    exports['default'] = localStorageWrapper;
-	}).call(typeof window !== 'undefined' ? window : self);
-	module.exports = exports['default'];
-
-/***/ },
-/* 3 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	exports.__esModule = true;
-	(function () {
-	    'use strict';
-
-	    // Sadly, the best way to save binary data in WebSQL/localStorage is serializing
-	    // it to Base64, so this is how we store it to prevent very strange errors with less
-	    // verbose ways of binary <-> string data storage.
-	    var BASE_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
-
-	    var BLOB_TYPE_PREFIX = '~~local_forage_type~';
-	    var BLOB_TYPE_PREFIX_REGEX = /^~~local_forage_type~([^~]+)~/;
-
-	    var SERIALIZED_MARKER = '__lfsc__:';
-	    var SERIALIZED_MARKER_LENGTH = SERIALIZED_MARKER.length;
-
-	    // OMG the serializations!
-	    var TYPE_ARRAYBUFFER = 'arbf';
-	    var TYPE_BLOB = 'blob';
-	    var TYPE_INT8ARRAY = 'si08';
-	    var TYPE_UINT8ARRAY = 'ui08';
-	    var TYPE_UINT8CLAMPEDARRAY = 'uic8';
-	    var TYPE_INT16ARRAY = 'si16';
-	    var TYPE_INT32ARRAY = 'si32';
-	    var TYPE_UINT16ARRAY = 'ur16';
-	    var TYPE_UINT32ARRAY = 'ui32';
-	    var TYPE_FLOAT32ARRAY = 'fl32';
-	    var TYPE_FLOAT64ARRAY = 'fl64';
-	    var TYPE_SERIALIZED_MARKER_LENGTH = SERIALIZED_MARKER_LENGTH + TYPE_ARRAYBUFFER.length;
-
-	    // Get out of our habit of using `window` inline, at least.
-	    var globalObject = this;
-
-	    // Abstracts constructing a Blob object, so it also works in older
-	    // browsers that don't support the native Blob constructor. (i.e.
-	    // old QtWebKit versions, at least).
-	    function _createBlob(parts, properties) {
-	        parts = parts || [];
-	        properties = properties || {};
-
-	        try {
-	            return new Blob(parts, properties);
-	        } catch (err) {
-	            if (err.name !== 'TypeError') {
-	                throw err;
-	            }
-
-	            var BlobBuilder = globalObject.BlobBuilder || globalObject.MSBlobBuilder || globalObject.MozBlobBuilder || globalObject.WebKitBlobBuilder;
-
-	            var builder = new BlobBuilder();
-	            for (var i = 0; i < parts.length; i += 1) {
-	                builder.append(parts[i]);
-	            }
-
-	            return builder.getBlob(properties.type);
-	        }
-	    }
-
-	    // Serialize a value, afterwards executing a callback (which usually
-	    // instructs the `setItem()` callback/promise to be executed). This is how
-	    // we store binary data with localStorage.
-	    function serialize(value, callback) {
-	        var valueString = '';
-	        if (value) {
-	            valueString = value.toString();
-	        }
-
-	        // Cannot use `value instanceof ArrayBuffer` or such here, as these
-	        // checks fail when running the tests using casper.js...
-	        //
-	        // TODO: See why those tests fail and use a better solution.
-	        if (value && (value.toString() === '[object ArrayBuffer]' || value.buffer && value.buffer.toString() === '[object ArrayBuffer]')) {
-	            // Convert binary arrays to a string and prefix the string with
-	            // a special marker.
-	            var buffer;
-	            var marker = SERIALIZED_MARKER;
-
-	            if (value instanceof ArrayBuffer) {
-	                buffer = value;
-	                marker += TYPE_ARRAYBUFFER;
-	            } else {
-	                buffer = value.buffer;
-
-	                if (valueString === '[object Int8Array]') {
-	                    marker += TYPE_INT8ARRAY;
-	                } else if (valueString === '[object Uint8Array]') {
-	                    marker += TYPE_UINT8ARRAY;
-	                } else if (valueString === '[object Uint8ClampedArray]') {
-	                    marker += TYPE_UINT8CLAMPEDARRAY;
-	                } else if (valueString === '[object Int16Array]') {
-	                    marker += TYPE_INT16ARRAY;
-	                } else if (valueString === '[object Uint16Array]') {
-	                    marker += TYPE_UINT16ARRAY;
-	                } else if (valueString === '[object Int32Array]') {
-	                    marker += TYPE_INT32ARRAY;
-	                } else if (valueString === '[object Uint32Array]') {
-	                    marker += TYPE_UINT32ARRAY;
-	                } else if (valueString === '[object Float32Array]') {
-	                    marker += TYPE_FLOAT32ARRAY;
-	                } else if (valueString === '[object Float64Array]') {
-	                    marker += TYPE_FLOAT64ARRAY;
-	                } else {
-	                    callback(new Error('Failed to get type for BinaryArray'));
-	                }
-	            }
-
-	            callback(marker + bufferToString(buffer));
-	        } else if (valueString === '[object Blob]') {
-	            // Conver the blob to a binaryArray and then to a string.
-	            var fileReader = new FileReader();
-
-	            fileReader.onload = function () {
-	                // Backwards-compatible prefix for the blob type.
-	                var str = BLOB_TYPE_PREFIX + value.type + '~' + bufferToString(this.result);
-
-	                callback(SERIALIZED_MARKER + TYPE_BLOB + str);
-	            };
-
-	            fileReader.readAsArrayBuffer(value);
-	        } else {
-	            try {
-	                callback(JSON.stringify(value));
-	            } catch (e) {
-	                console.error("Couldn't convert value into a JSON string: ", value);
-
-	                callback(null, e);
-	            }
-	        }
-	    }
-
-	    // Deserialize data we've inserted into a value column/field. We place
-	    // special markers into our strings to mark them as encoded; this isn't
-	    // as nice as a meta field, but it's the only sane thing we can do whilst
-	    // keeping localStorage support intact.
-	    //
-	    // Oftentimes this will just deserialize JSON content, but if we have a
-	    // special marker (SERIALIZED_MARKER, defined above), we will extract
-	    // some kind of arraybuffer/binary data/typed array out of the string.
-	    function deserialize(value) {
-	        // If we haven't marked this string as being specially serialized (i.e.
-	        // something other than serialized JSON), we can just return it and be
-	        // done with it.
-	        if (value.substring(0, SERIALIZED_MARKER_LENGTH) !== SERIALIZED_MARKER) {
-	            return JSON.parse(value);
-	        }
-
-	        // The following code deals with deserializing some kind of Blob or
-	        // TypedArray. First we separate out the type of data we're dealing
-	        // with from the data itself.
-	        var serializedString = value.substring(TYPE_SERIALIZED_MARKER_LENGTH);
-	        var type = value.substring(SERIALIZED_MARKER_LENGTH, TYPE_SERIALIZED_MARKER_LENGTH);
-
-	        var blobType;
-	        // Backwards-compatible blob type serialization strategy.
-	        // DBs created with older versions of localForage will simply not have the blob type.
-	        if (type === TYPE_BLOB && BLOB_TYPE_PREFIX_REGEX.test(serializedString)) {
-	            var matcher = serializedString.match(BLOB_TYPE_PREFIX_REGEX);
-	            blobType = matcher[1];
-	            serializedString = serializedString.substring(matcher[0].length);
-	        }
-	        var buffer = stringToBuffer(serializedString);
-
-	        // Return the right type based on the code/type set during
-	        // serialization.
-	        switch (type) {
-	            case TYPE_ARRAYBUFFER:
-	                return buffer;
-	            case TYPE_BLOB:
-	                return _createBlob([buffer], { type: blobType });
-	            case TYPE_INT8ARRAY:
-	                return new Int8Array(buffer);
-	            case TYPE_UINT8ARRAY:
-	                return new Uint8Array(buffer);
-	            case TYPE_UINT8CLAMPEDARRAY:
-	                return new Uint8ClampedArray(buffer);
-	            case TYPE_INT16ARRAY:
-	                return new Int16Array(buffer);
-	            case TYPE_UINT16ARRAY:
-	                return new Uint16Array(buffer);
-	            case TYPE_INT32ARRAY:
-	                return new Int32Array(buffer);
-	            case TYPE_UINT32ARRAY:
-	                return new Uint32Array(buffer);
-	            case TYPE_FLOAT32ARRAY:
-	                return new Float32Array(buffer);
-	            case TYPE_FLOAT64ARRAY:
-	                return new Float64Array(buffer);
-	            default:
-	                throw new Error('Unkown type: ' + type);
-	        }
-	    }
-
-	    function stringToBuffer(serializedString) {
-	        // Fill the string into a ArrayBuffer.
-	        var bufferLength = serializedString.length * 0.75;
-	        var len = serializedString.length;
-	        var i;
-	        var p = 0;
-	        var encoded1, encoded2, encoded3, encoded4;
-
-	        if (serializedString[serializedString.length - 1] === '=') {
-	            bufferLength--;
-	            if (serializedString[serializedString.length - 2] === '=') {
-	                bufferLength--;
-	            }
-	        }
-
-	        var buffer = new ArrayBuffer(bufferLength);
-	        var bytes = new Uint8Array(buffer);
-
-	        for (i = 0; i < len; i += 4) {
-	            encoded1 = BASE_CHARS.indexOf(serializedString[i]);
-	            encoded2 = BASE_CHARS.indexOf(serializedString[i + 1]);
-	            encoded3 = BASE_CHARS.indexOf(serializedString[i + 2]);
-	            encoded4 = BASE_CHARS.indexOf(serializedString[i + 3]);
-
-	            /*jslint bitwise: true */
-	            bytes[p++] = encoded1 << 2 | encoded2 >> 4;
-	            bytes[p++] = (encoded2 & 15) << 4 | encoded3 >> 2;
-	            bytes[p++] = (encoded3 & 3) << 6 | encoded4 & 63;
-	        }
-	        return buffer;
-	    }
-
-	    // Converts a buffer to a string to store, serialized, in the backend
-	    // storage library.
-	    function bufferToString(buffer) {
-	        // base64-arraybuffer
-	        var bytes = new Uint8Array(buffer);
-	        var base64String = '';
-	        var i;
-
-	        for (i = 0; i < bytes.length; i += 3) {
-	            /*jslint bitwise: true */
-	            base64String += BASE_CHARS[bytes[i] >> 2];
-	            base64String += BASE_CHARS[(bytes[i] & 3) << 4 | bytes[i + 1] >> 4];
-	            base64String += BASE_CHARS[(bytes[i + 1] & 15) << 2 | bytes[i + 2] >> 6];
-	            base64String += BASE_CHARS[bytes[i + 2] & 63];
-	        }
-
-	        if (bytes.length % 3 === 2) {
-	            base64String = base64String.substring(0, base64String.length - 1) + '=';
-	        } else if (bytes.length % 3 === 1) {
-	            base64String = base64String.substring(0, base64String.length - 2) + '==';
-	        }
-
-	        return base64String;
-	    }
-
-	    var localforageSerializer = {
-	        serialize: serialize,
-	        deserialize: deserialize,
-	        stringToBuffer: stringToBuffer,
-	        bufferToString: bufferToString
-	    };
-
-	    exports['default'] = localforageSerializer;
-	}).call(typeof window !== 'undefined' ? window : self);
-	module.exports = exports['default'];
-
-/***/ },
-/* 4 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/*
-	 * Includes code from:
-	 *
-	 * base64-arraybuffer
-	 * https://github.com/niklasvh/base64-arraybuffer
-	 *
-	 * Copyright (c) 2012 Niklas von Hertzen
-	 * Licensed under the MIT license.
-	 */
-	'use strict';
-
-	exports.__esModule = true;
-	(function () {
-	    'use strict';
-
-	    var globalObject = this;
-	    var openDatabase = this.openDatabase;
-
-	    // If WebSQL methods aren't available, we can stop now.
-	    if (!openDatabase) {
-	        return;
-	    }
-
-	    // Open the WebSQL database (automatically creates one if one didn't
-	    // previously exist), using any options set in the config.
-	    function _initStorage(options) {
-	        var self = this;
-	        var dbInfo = {
-	            db: null
-	        };
-
-	        if (options) {
-	            for (var i in options) {
-	                dbInfo[i] = typeof options[i] !== 'string' ? options[i].toString() : options[i];
-	            }
-	        }
-
-	        var dbInfoPromise = new Promise(function (resolve, reject) {
-	            // Open the database; the openDatabase API will automatically
-	            // create it for us if it doesn't exist.
-	            try {
-	                dbInfo.db = openDatabase(dbInfo.name, String(dbInfo.version), dbInfo.description, dbInfo.size);
-	            } catch (e) {
-	                return self.setDriver(self.LOCALSTORAGE).then(function () {
-	                    return self._initStorage(options);
-	                }).then(resolve)['catch'](reject);
-	            }
-
-	            // Create our key/value table if it doesn't exist.
-	            dbInfo.db.transaction(function (t) {
-	                t.executeSql('CREATE TABLE IF NOT EXISTS ' + dbInfo.storeName + ' (id INTEGER PRIMARY KEY, key unique, value)', [], function () {
-	                    self._dbInfo = dbInfo;
-	                    resolve();
-	                }, function (t, error) {
-	                    reject(error);
-	                });
-	            });
-	        });
-
-	        return new Promise(function (resolve, reject) {
-	            resolve(__webpack_require__(3));
-	        }).then(function (lib) {
-	            dbInfo.serializer = lib;
-	            return dbInfoPromise;
-	        });
-	    }
-
-	    function getItem(key, callback) {
-	        var self = this;
-
-	        // Cast the key to a string, as that's all we can set as a key.
-	        if (typeof key !== 'string') {
-	            globalObject.console.warn(key + ' used as a key, but it is not a string.');
-	            key = String(key);
-	        }
-
-	        var promise = new Promise(function (resolve, reject) {
-	            self.ready().then(function () {
-	                var dbInfo = self._dbInfo;
-	                dbInfo.db.transaction(function (t) {
-	                    t.executeSql('SELECT * FROM ' + dbInfo.storeName + ' WHERE key = ? LIMIT 1', [key], function (t, results) {
-	                        var result = results.rows.length ? results.rows.item(0).value : null;
-
-	                        // Check to see if this is serialized content we need to
-	                        // unpack.
-	                        if (result) {
-	                            result = dbInfo.serializer.deserialize(result);
-	                        }
-
-	                        resolve(result);
-	                    }, function (t, error) {
-
-	                        reject(error);
-	                    });
-	                });
-	            })['catch'](reject);
-	        });
-
-	        executeCallback(promise, callback);
-	        return promise;
-	    }
-
-	    function iterate(iterator, callback) {
-	        var self = this;
-
-	        var promise = new Promise(function (resolve, reject) {
-	            self.ready().then(function () {
-	                var dbInfo = self._dbInfo;
-
-	                dbInfo.db.transaction(function (t) {
-	                    t.executeSql('SELECT * FROM ' + dbInfo.storeName, [], function (t, results) {
-	                        var rows = results.rows;
-	                        var length = rows.length;
-
-	                        for (var i = 0; i < length; i++) {
-	                            var item = rows.item(i);
-	                            var result = item.value;
-
-	                            // Check to see if this is serialized content
-	                            // we need to unpack.
-	                            if (result) {
-	                                result = dbInfo.serializer.deserialize(result);
-	                            }
-
-	                            result = iterator(result, item.key, i + 1);
-
-	                            // void(0) prevents problems with redefinition
-	                            // of `undefined`.
-	                            if (result !== void 0) {
-	                                resolve(result);
-	                                return;
-	                            }
-	                        }
-
-	                        resolve();
-	                    }, function (t, error) {
-	                        reject(error);
-	                    });
-	                });
-	            })['catch'](reject);
-	        });
-
-	        executeCallback(promise, callback);
-	        return promise;
-	    }
-
-	    function setItem(key, value, callback) {
-	        var self = this;
-
-	        // Cast the key to a string, as that's all we can set as a key.
-	        if (typeof key !== 'string') {
-	            globalObject.console.warn(key + ' used as a key, but it is not a string.');
-	            key = String(key);
-	        }
-
-	        var promise = new Promise(function (resolve, reject) {
-	            self.ready().then(function () {
-	                // The localStorage API doesn't return undefined values in an
-	                // "expected" way, so undefined is always cast to null in all
-	                // drivers. See: https://github.com/mozilla/localForage/pull/42
-	                if (value === undefined) {
-	                    value = null;
-	                }
-
-	                // Save the original value to pass to the callback.
-	                var originalValue = value;
-
-	                var dbInfo = self._dbInfo;
-	                dbInfo.serializer.serialize(value, function (value, error) {
-	                    if (error) {
-	                        reject(error);
-	                    } else {
-	                        dbInfo.db.transaction(function (t) {
-	                            t.executeSql('INSERT OR REPLACE INTO ' + dbInfo.storeName + ' (key, value) VALUES (?, ?)', [key, value], function () {
-	                                resolve(originalValue);
-	                            }, function (t, error) {
-	                                reject(error);
-	                            });
-	                        }, function (sqlError) {
-	                            // The transaction failed; check
-	                            // to see if it's a quota error.
-	                            if (sqlError.code === sqlError.QUOTA_ERR) {
-	                                // We reject the callback outright for now, but
-	                                // it's worth trying to re-run the transaction.
-	                                // Even if the user accepts the prompt to use
-	                                // more storage on Safari, this error will
-	                                // be called.
-	                                //
-	                                // TODO: Try to re-run the transaction.
-	                                reject(sqlError);
-	                            }
-	                        });
-	                    }
-	                });
-	            })['catch'](reject);
-	        });
-
-	        executeCallback(promise, callback);
-	        return promise;
-	    }
-
-	    function removeItem(key, callback) {
-	        var self = this;
-
-	        // Cast the key to a string, as that's all we can set as a key.
-	        if (typeof key !== 'string') {
-	            globalObject.console.warn(key + ' used as a key, but it is not a string.');
-	            key = String(key);
-	        }
-
-	        var promise = new Promise(function (resolve, reject) {
-	            self.ready().then(function () {
-	                var dbInfo = self._dbInfo;
-	                dbInfo.db.transaction(function (t) {
-	                    t.executeSql('DELETE FROM ' + dbInfo.storeName + ' WHERE key = ?', [key], function () {
-	                        resolve();
-	                    }, function (t, error) {
-
-	                        reject(error);
-	                    });
-	                });
-	            })['catch'](reject);
-	        });
-
-	        executeCallback(promise, callback);
-	        return promise;
-	    }
-
-	    // Deletes every item in the table.
-	    // TODO: Find out if this resets the AUTO_INCREMENT number.
-	    function clear(callback) {
-	        var self = this;
-
-	        var promise = new Promise(function (resolve, reject) {
-	            self.ready().then(function () {
-	                var dbInfo = self._dbInfo;
-	                dbInfo.db.transaction(function (t) {
-	                    t.executeSql('DELETE FROM ' + dbInfo.storeName, [], function () {
-	                        resolve();
-	                    }, function (t, error) {
-	                        reject(error);
-	                    });
-	                });
-	            })['catch'](reject);
-	        });
-
-	        executeCallback(promise, callback);
-	        return promise;
-	    }
-
-	    // Does a simple `COUNT(key)` to get the number of items stored in
-	    // localForage.
-	    function length(callback) {
-	        var self = this;
-
-	        var promise = new Promise(function (resolve, reject) {
-	            self.ready().then(function () {
-	                var dbInfo = self._dbInfo;
-	                dbInfo.db.transaction(function (t) {
-	                    // Ahhh, SQL makes this one soooooo easy.
-	                    t.executeSql('SELECT COUNT(key) as c FROM ' + dbInfo.storeName, [], function (t, results) {
-	                        var result = results.rows.item(0).c;
-
-	                        resolve(result);
-	                    }, function (t, error) {
-
-	                        reject(error);
-	                    });
-	                });
-	            })['catch'](reject);
-	        });
-
-	        executeCallback(promise, callback);
-	        return promise;
-	    }
-
-	    // Return the key located at key index X; essentially gets the key from a
-	    // `WHERE id = ?`. This is the most efficient way I can think to implement
-	    // this rarely-used (in my experience) part of the API, but it can seem
-	    // inconsistent, because we do `INSERT OR REPLACE INTO` on `setItem()`, so
-	    // the ID of each key will change every time it's updated. Perhaps a stored
-	    // procedure for the `setItem()` SQL would solve this problem?
-	    // TODO: Don't change ID on `setItem()`.
-	    function key(n, callback) {
-	        var self = this;
-
-	        var promise = new Promise(function (resolve, reject) {
-	            self.ready().then(function () {
-	                var dbInfo = self._dbInfo;
-	                dbInfo.db.transaction(function (t) {
-	                    t.executeSql('SELECT key FROM ' + dbInfo.storeName + ' WHERE id = ? LIMIT 1', [n + 1], function (t, results) {
-	                        var result = results.rows.length ? results.rows.item(0).key : null;
-	                        resolve(result);
-	                    }, function (t, error) {
-	                        reject(error);
-	                    });
-	                });
-	            })['catch'](reject);
-	        });
-
-	        executeCallback(promise, callback);
-	        return promise;
-	    }
-
-	    function keys(callback) {
-	        var self = this;
-
-	        var promise = new Promise(function (resolve, reject) {
-	            self.ready().then(function () {
-	                var dbInfo = self._dbInfo;
-	                dbInfo.db.transaction(function (t) {
-	                    t.executeSql('SELECT key FROM ' + dbInfo.storeName, [], function (t, results) {
-	                        var keys = [];
-
-	                        for (var i = 0; i < results.rows.length; i++) {
-	                            keys.push(results.rows.item(i).key);
-	                        }
-
-	                        resolve(keys);
-	                    }, function (t, error) {
-
-	                        reject(error);
-	                    });
-	                });
-	            })['catch'](reject);
-	        });
-
-	        executeCallback(promise, callback);
-	        return promise;
-	    }
-
-	    function executeCallback(promise, callback) {
-	        if (callback) {
-	            promise.then(function (result) {
-	                callback(null, result);
-	            }, function (error) {
-	                callback(error);
-	            });
-	        }
-	    }
-
-	    var webSQLStorage = {
-	        _driver: 'webSQLStorage',
-	        _initStorage: _initStorage,
-	        iterate: iterate,
-	        getItem: getItem,
-	        setItem: setItem,
-	        removeItem: removeItem,
-	        clear: clear,
-	        length: length,
-	        key: key,
-	        keys: keys
-	    };
-
-	    exports['default'] = webSQLStorage;
-	}).call(typeof window !== 'undefined' ? window : self);
-	module.exports = exports['default'];
-
-/***/ }
-/******/ ])
-});
-;
-}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":1}],46:[function(require,module,exports){
-/**
- * lodash 3.7.0 (Custom Build) <https://lodash.com/>
- * Build: `lodash modern modularize exports="npm" -o ./`
- * Copyright 2012-2015 The Dojo Foundation <http://dojofoundation.org/>
- * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
- * Copyright 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
- * Available under MIT license <https://lodash.com/license>
- */
-var baseGet = require('lodash._baseget'),
-    toPath = require('lodash._topath');
-
-/**
- * Gets the property value of `path` on `object`. If the resolved value is
- * `undefined` the `defaultValue` is used in its place.
- *
- * @static
- * @memberOf _
- * @category Object
- * @param {Object} object The object to query.
- * @param {Array|string} path The path of the property to get.
- * @param {*} [defaultValue] The value returned if the resolved value is `undefined`.
- * @returns {*} Returns the resolved value.
- * @example
- *
- * var object = { 'a': [{ 'b': { 'c': 3 } }] };
- *
- * _.get(object, 'a[0].b.c');
- * // => 3
- *
- * _.get(object, ['a', '0', 'b', 'c']);
- * // => 3
- *
- * _.get(object, 'a.b.c', 'default');
- * // => 'default'
- */
-function get(object, path, defaultValue) {
-  var result = object == null ? undefined : baseGet(object, toPath(path), path + '');
-  return result === undefined ? defaultValue : result;
-}
-
-module.exports = get;
-
-},{"lodash._baseget":47,"lodash._topath":48}],47:[function(require,module,exports){
-/**
- * lodash 3.7.2 (Custom Build) <https://lodash.com/>
- * Build: `lodash modern modularize exports="npm" -o ./`
- * Copyright 2012-2015 The Dojo Foundation <http://dojofoundation.org/>
- * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
- * Copyright 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
- * Available under MIT license <https://lodash.com/license>
- */
-
-/**
- * The base implementation of `get` without support for string paths
- * and default values.
- *
- * @private
- * @param {Object} object The object to query.
- * @param {Array} path The path of the property to get.
- * @param {string} [pathKey] The key representation of path.
- * @returns {*} Returns the resolved value.
- */
-function baseGet(object, path, pathKey) {
-  if (object == null) {
-    return;
-  }
-  if (pathKey !== undefined && pathKey in toObject(object)) {
-    path = [pathKey];
-  }
-  var index = 0,
-      length = path.length;
-
-  while (object != null && index < length) {
-    object = object[path[index++]];
-  }
-  return (index && index == length) ? object : undefined;
-}
-
-/**
- * Converts `value` to an object if it's not one.
- *
- * @private
- * @param {*} value The value to process.
- * @returns {Object} Returns the object.
- */
-function toObject(value) {
-  return isObject(value) ? value : Object(value);
-}
-
-/**
- * Checks if `value` is the [language type](https://es5.github.io/#x8) of `Object`.
- * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
- *
- * @static
- * @memberOf _
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is an object, else `false`.
- * @example
- *
- * _.isObject({});
- * // => true
- *
- * _.isObject([1, 2, 3]);
- * // => true
- *
- * _.isObject(1);
- * // => false
- */
-function isObject(value) {
-  // Avoid a V8 JIT bug in Chrome 19-20.
-  // See https://code.google.com/p/v8/issues/detail?id=2291 for more details.
-  var type = typeof value;
-  return !!value && (type == 'object' || type == 'function');
-}
-
-module.exports = baseGet;
-
-},{}],48:[function(require,module,exports){
-/**
- * lodash 3.8.1 (Custom Build) <https://lodash.com/>
- * Build: `lodash modern modularize exports="npm" -o ./`
- * Copyright 2012-2015 The Dojo Foundation <http://dojofoundation.org/>
- * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
- * Copyright 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
- * Available under MIT license <https://lodash.com/license>
- */
-var isArray = require('lodash.isarray');
-
-/** Used to match property names within property paths. */
-var rePropName = /[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\n\\]|\\.)*?)\2)\]/g;
-
-/** Used to match backslashes in property paths. */
-var reEscapeChar = /\\(\\)?/g;
-
-/**
- * Converts `value` to a string if it's not one. An empty string is returned
- * for `null` or `undefined` values.
- *
- * @private
- * @param {*} value The value to process.
- * @returns {string} Returns the string.
- */
-function baseToString(value) {
-  return value == null ? '' : (value + '');
-}
-
-/**
- * Converts `value` to property path array if it's not one.
- *
- * @private
- * @param {*} value The value to process.
- * @returns {Array} Returns the property path array.
- */
-function toPath(value) {
-  if (isArray(value)) {
-    return value;
-  }
-  var result = [];
-  baseToString(value).replace(rePropName, function(match, number, quote, string) {
-    result.push(quote ? string.replace(reEscapeChar, '$1') : (number || match));
-  });
-  return result;
-}
-
-module.exports = toPath;
-
-},{"lodash.isarray":49}],49:[function(require,module,exports){
-/**
- * lodash 3.0.4 (Custom Build) <https://lodash.com/>
- * Build: `lodash modern modularize exports="npm" -o ./`
- * Copyright 2012-2015 The Dojo Foundation <http://dojofoundation.org/>
- * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
- * Copyright 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
- * Available under MIT license <https://lodash.com/license>
- */
-
-/** `Object#toString` result references. */
-var arrayTag = '[object Array]',
-    funcTag = '[object Function]';
-
-/** Used to detect host constructors (Safari > 5). */
-var reIsHostCtor = /^\[object .+?Constructor\]$/;
-
-/**
- * Checks if `value` is object-like.
- *
- * @private
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
- */
-function isObjectLike(value) {
-  return !!value && typeof value == 'object';
-}
-
-/** Used for native method references. */
-var objectProto = Object.prototype;
-
-/** Used to resolve the decompiled source of functions. */
-var fnToString = Function.prototype.toString;
-
-/** Used to check objects for own properties. */
-var hasOwnProperty = objectProto.hasOwnProperty;
-
-/**
- * Used to resolve the [`toStringTag`](http://ecma-international.org/ecma-262/6.0/#sec-object.prototype.tostring)
- * of values.
- */
-var objToString = objectProto.toString;
-
-/** Used to detect if a method is native. */
-var reIsNative = RegExp('^' +
-  fnToString.call(hasOwnProperty).replace(/[\\^$.*+?()[\]{}|]/g, '\\$&')
-  .replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g, '$1.*?') + '$'
-);
-
-/* Native method references for those with the same name as other `lodash` methods. */
-var nativeIsArray = getNative(Array, 'isArray');
-
-/**
- * Used as the [maximum length](http://ecma-international.org/ecma-262/6.0/#sec-number.max_safe_integer)
- * of an array-like value.
- */
-var MAX_SAFE_INTEGER = 9007199254740991;
-
-/**
- * Gets the native function at `key` of `object`.
- *
- * @private
- * @param {Object} object The object to query.
- * @param {string} key The key of the method to get.
- * @returns {*} Returns the function if it's native, else `undefined`.
- */
-function getNative(object, key) {
-  var value = object == null ? undefined : object[key];
-  return isNative(value) ? value : undefined;
-}
-
-/**
- * Checks if `value` is a valid array-like length.
- *
- * **Note:** This function is based on [`ToLength`](http://ecma-international.org/ecma-262/6.0/#sec-tolength).
- *
- * @private
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a valid length, else `false`.
- */
-function isLength(value) {
-  return typeof value == 'number' && value > -1 && value % 1 == 0 && value <= MAX_SAFE_INTEGER;
-}
-
-/**
- * Checks if `value` is classified as an `Array` object.
- *
- * @static
- * @memberOf _
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is correctly classified, else `false`.
- * @example
- *
- * _.isArray([1, 2, 3]);
- * // => true
- *
- * _.isArray(function() { return arguments; }());
- * // => false
- */
-var isArray = nativeIsArray || function(value) {
-  return isObjectLike(value) && isLength(value.length) && objToString.call(value) == arrayTag;
-};
-
-/**
- * Checks if `value` is classified as a `Function` object.
- *
- * @static
- * @memberOf _
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is correctly classified, else `false`.
- * @example
- *
- * _.isFunction(_);
- * // => true
- *
- * _.isFunction(/abc/);
- * // => false
- */
-function isFunction(value) {
-  // The use of `Object#toString` avoids issues with the `typeof` operator
-  // in older versions of Chrome and Safari which return 'function' for regexes
-  // and Safari 8 equivalents which return 'object' for typed array constructors.
-  return isObject(value) && objToString.call(value) == funcTag;
-}
-
-/**
- * Checks if `value` is the [language type](https://es5.github.io/#x8) of `Object`.
- * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
- *
- * @static
- * @memberOf _
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is an object, else `false`.
- * @example
- *
- * _.isObject({});
- * // => true
- *
- * _.isObject([1, 2, 3]);
- * // => true
- *
- * _.isObject(1);
- * // => false
- */
-function isObject(value) {
-  // Avoid a V8 JIT bug in Chrome 19-20.
-  // See https://code.google.com/p/v8/issues/detail?id=2291 for more details.
-  var type = typeof value;
-  return !!value && (type == 'object' || type == 'function');
-}
-
-/**
- * Checks if `value` is a native function.
- *
- * @static
- * @memberOf _
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a native function, else `false`.
- * @example
- *
- * _.isNative(Array.prototype.push);
- * // => true
- *
- * _.isNative(_);
- * // => false
- */
-function isNative(value) {
-  if (value == null) {
-    return false;
-  }
-  if (isFunction(value)) {
-    return reIsNative.test(fnToString.call(value));
-  }
-  return isObjectLike(value) && reIsHostCtor.test(value);
-}
-
-module.exports = isArray;
-
-},{}],50:[function(require,module,exports){
-/**
- * lodash 3.4.4 (Custom Build) <https://lodash.com/>
- * Build: `lodash modern modularize exports="npm" -o ./`
- * Copyright 2012-2015 The Dojo Foundation <http://dojofoundation.org/>
- * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
- * Copyright 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
- * Available under MIT license <https://lodash.com/license>
- */
-var baseSortByOrder = require('lodash._basesortbyorder'),
-    isIterateeCall = require('lodash._isiterateecall'),
-    isArray = require('lodash.isarray');
-
-/**
- * This method is like `_.sortByAll` except that it allows specifying the
- * sort orders of the iteratees to sort by. If `orders` is unspecified, all
- * values are sorted in ascending order. Otherwise, a value is sorted in
- * ascending order if its corresponding order is "asc", and descending if "desc".
- *
- * If a property name is provided for an iteratee the created `_.property`
- * style callback returns the property value of the given element.
- *
- * If an object is provided for an iteratee the created `_.matches` style
- * callback returns `true` for elements that have the properties of the given
- * object, else `false`.
- *
- * @static
- * @memberOf _
- * @category Collection
- * @param {Array|Object|string} collection The collection to iterate over.
- * @param {Function[]|Object[]|string[]} iteratees The iteratees to sort by.
- * @param {boolean[]} [orders] The sort orders of `iteratees`.
- * @param- {Object} [guard] Enables use as a callback for functions like `_.reduce`.
- * @returns {Array} Returns the new sorted array.
- * @example
- *
- * var users = [
- *   { 'user': 'fred',   'age': 48 },
- *   { 'user': 'barney', 'age': 34 },
- *   { 'user': 'fred',   'age': 42 },
- *   { 'user': 'barney', 'age': 36 }
- * ];
- *
- * // sort by `user` in ascending order and by `age` in descending order
- * _.map(_.sortByOrder(users, ['user', 'age'], ['asc', 'desc']), _.values);
- * // => [['barney', 36], ['barney', 34], ['fred', 48], ['fred', 42]]
- */
-function sortByOrder(collection, iteratees, orders, guard) {
-  if (collection == null) {
-    return [];
-  }
-  if (guard && isIterateeCall(iteratees, orders, guard)) {
-    orders = undefined;
-  }
-  if (!isArray(iteratees)) {
-    iteratees = iteratees == null ? [] : [iteratees];
-  }
-  if (!isArray(orders)) {
-    orders = orders == null ? [] : [orders];
-  }
-  return baseSortByOrder(collection, iteratees, orders);
-}
-
-module.exports = sortByOrder;
-
-},{"lodash._basesortbyorder":55,"lodash._isiterateecall":70,"lodash.isarray":71}],51:[function(require,module,exports){
-/**
- * lodash 3.0.4 (Custom Build) <https://lodash.com/>
- * Build: `lodash modern modularize exports="npm" -o ./`
- * Copyright 2012-2015 The Dojo Foundation <http://dojofoundation.org/>
- * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
- * Copyright 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
- * Available under MIT license <https://lodash.com/license>
- */
-var keys = require('lodash.keys');
-
-/**
- * Used as the [maximum length](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-number.max_safe_integer)
- * of an array-like value.
- */
-var MAX_SAFE_INTEGER = 9007199254740991;
-
-/**
- * The base implementation of `_.forEach` without support for callback
- * shorthands and `this` binding.
- *
- * @private
- * @param {Array|Object|string} collection The collection to iterate over.
- * @param {Function} iteratee The function invoked per iteration.
- * @returns {Array|Object|string} Returns `collection`.
- */
-var baseEach = createBaseEach(baseForOwn);
-
-/**
- * The base implementation of `baseForIn` and `baseForOwn` which iterates
- * over `object` properties returned by `keysFunc` invoking `iteratee` for
- * each property. Iteratee functions may exit iteration early by explicitly
- * returning `false`.
- *
- * @private
- * @param {Object} object The object to iterate over.
- * @param {Function} iteratee The function invoked per iteration.
- * @param {Function} keysFunc The function to get the keys of `object`.
- * @returns {Object} Returns `object`.
- */
-var baseFor = createBaseFor();
-
-/**
- * The base implementation of `_.forOwn` without support for callback
- * shorthands and `this` binding.
- *
- * @private
- * @param {Object} object The object to iterate over.
- * @param {Function} iteratee The function invoked per iteration.
- * @returns {Object} Returns `object`.
- */
-function baseForOwn(object, iteratee) {
-  return baseFor(object, iteratee, keys);
-}
-
-/**
- * The base implementation of `_.property` without support for deep paths.
- *
- * @private
- * @param {string} key The key of the property to get.
- * @returns {Function} Returns the new function.
- */
-function baseProperty(key) {
-  return function(object) {
-    return object == null ? undefined : object[key];
-  };
-}
-
-/**
- * Creates a `baseEach` or `baseEachRight` function.
- *
- * @private
- * @param {Function} eachFunc The function to iterate over a collection.
- * @param {boolean} [fromRight] Specify iterating from right to left.
- * @returns {Function} Returns the new base function.
- */
-function createBaseEach(eachFunc, fromRight) {
-  return function(collection, iteratee) {
-    var length = collection ? getLength(collection) : 0;
-    if (!isLength(length)) {
-      return eachFunc(collection, iteratee);
-    }
-    var index = fromRight ? length : -1,
-        iterable = toObject(collection);
-
-    while ((fromRight ? index-- : ++index < length)) {
-      if (iteratee(iterable[index], index, iterable) === false) {
-        break;
-      }
-    }
-    return collection;
-  };
-}
-
-/**
- * Creates a base function for `_.forIn` or `_.forInRight`.
- *
- * @private
- * @param {boolean} [fromRight] Specify iterating from right to left.
- * @returns {Function} Returns the new base function.
- */
-function createBaseFor(fromRight) {
-  return function(object, iteratee, keysFunc) {
-    var iterable = toObject(object),
-        props = keysFunc(object),
-        length = props.length,
-        index = fromRight ? length : -1;
-
-    while ((fromRight ? index-- : ++index < length)) {
-      var key = props[index];
-      if (iteratee(iterable[key], key, iterable) === false) {
-        break;
-      }
-    }
-    return object;
-  };
-}
-
-/**
- * Gets the "length" property value of `object`.
- *
- * **Note:** This function is used to avoid a [JIT bug](https://bugs.webkit.org/show_bug.cgi?id=142792)
- * that affects Safari on at least iOS 8.1-8.3 ARM64.
- *
- * @private
- * @param {Object} object The object to query.
- * @returns {*} Returns the "length" value.
- */
-var getLength = baseProperty('length');
-
-/**
- * Checks if `value` is a valid array-like length.
- *
- * **Note:** This function is based on [`ToLength`](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-tolength).
- *
- * @private
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a valid length, else `false`.
- */
-function isLength(value) {
-  return typeof value == 'number' && value > -1 && value % 1 == 0 && value <= MAX_SAFE_INTEGER;
-}
-
-/**
- * Converts `value` to an object if it's not one.
- *
- * @private
- * @param {*} value The value to process.
- * @returns {Object} Returns the object.
- */
-function toObject(value) {
-  return isObject(value) ? value : Object(value);
-}
-
-/**
- * Checks if `value` is the [language type](https://es5.github.io/#x8) of `Object`.
- * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
- *
- * @static
- * @memberOf _
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is an object, else `false`.
- * @example
- *
- * _.isObject({});
- * // => true
- *
- * _.isObject([1, 2, 3]);
- * // => true
- *
- * _.isObject(1);
- * // => false
- */
-function isObject(value) {
-  // Avoid a V8 JIT bug in Chrome 19-20.
-  // See https://code.google.com/p/v8/issues/detail?id=2291 for more details.
-  var type = typeof value;
-  return !!value && (type == 'object' || type == 'function');
-}
-
-module.exports = baseEach;
-
-},{"lodash.keys":52}],52:[function(require,module,exports){
-/**
- * lodash 3.1.2 (Custom Build) <https://lodash.com/>
- * Build: `lodash modern modularize exports="npm" -o ./`
- * Copyright 2012-2015 The Dojo Foundation <http://dojofoundation.org/>
- * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
- * Copyright 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
- * Available under MIT license <https://lodash.com/license>
- */
-var getNative = require('lodash._getnative'),
-    isArguments = require('lodash.isarguments'),
-    isArray = require('lodash.isarray');
-
-/** Used to detect unsigned integer values. */
-var reIsUint = /^\d+$/;
-
-/** Used for native method references. */
-var objectProto = Object.prototype;
-
-/** Used to check objects for own properties. */
-var hasOwnProperty = objectProto.hasOwnProperty;
-
-/* Native method references for those with the same name as other `lodash` methods. */
-var nativeKeys = getNative(Object, 'keys');
-
-/**
- * Used as the [maximum length](http://ecma-international.org/ecma-262/6.0/#sec-number.max_safe_integer)
- * of an array-like value.
- */
-var MAX_SAFE_INTEGER = 9007199254740991;
-
-/**
- * The base implementation of `_.property` without support for deep paths.
- *
- * @private
- * @param {string} key The key of the property to get.
- * @returns {Function} Returns the new function.
- */
-function baseProperty(key) {
-  return function(object) {
-    return object == null ? undefined : object[key];
-  };
-}
-
-/**
- * Gets the "length" property value of `object`.
- *
- * **Note:** This function is used to avoid a [JIT bug](https://bugs.webkit.org/show_bug.cgi?id=142792)
- * that affects Safari on at least iOS 8.1-8.3 ARM64.
- *
- * @private
- * @param {Object} object The object to query.
- * @returns {*} Returns the "length" value.
- */
-var getLength = baseProperty('length');
-
-/**
- * Checks if `value` is array-like.
- *
- * @private
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is array-like, else `false`.
- */
-function isArrayLike(value) {
-  return value != null && isLength(getLength(value));
-}
-
-/**
- * Checks if `value` is a valid array-like index.
- *
- * @private
- * @param {*} value The value to check.
- * @param {number} [length=MAX_SAFE_INTEGER] The upper bounds of a valid index.
- * @returns {boolean} Returns `true` if `value` is a valid index, else `false`.
- */
-function isIndex(value, length) {
-  value = (typeof value == 'number' || reIsUint.test(value)) ? +value : -1;
-  length = length == null ? MAX_SAFE_INTEGER : length;
-  return value > -1 && value % 1 == 0 && value < length;
-}
-
-/**
- * Checks if `value` is a valid array-like length.
- *
- * **Note:** This function is based on [`ToLength`](http://ecma-international.org/ecma-262/6.0/#sec-tolength).
- *
- * @private
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a valid length, else `false`.
- */
-function isLength(value) {
-  return typeof value == 'number' && value > -1 && value % 1 == 0 && value <= MAX_SAFE_INTEGER;
-}
-
-/**
- * A fallback implementation of `Object.keys` which creates an array of the
- * own enumerable property names of `object`.
- *
- * @private
- * @param {Object} object The object to query.
- * @returns {Array} Returns the array of property names.
- */
-function shimKeys(object) {
-  var props = keysIn(object),
-      propsLength = props.length,
-      length = propsLength && object.length;
-
-  var allowIndexes = !!length && isLength(length) &&
-    (isArray(object) || isArguments(object));
-
-  var index = -1,
-      result = [];
-
-  while (++index < propsLength) {
-    var key = props[index];
-    if ((allowIndexes && isIndex(key, length)) || hasOwnProperty.call(object, key)) {
-      result.push(key);
-    }
-  }
-  return result;
-}
-
-/**
- * Checks if `value` is the [language type](https://es5.github.io/#x8) of `Object`.
- * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
- *
- * @static
- * @memberOf _
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is an object, else `false`.
- * @example
- *
- * _.isObject({});
- * // => true
- *
- * _.isObject([1, 2, 3]);
- * // => true
- *
- * _.isObject(1);
- * // => false
- */
-function isObject(value) {
-  // Avoid a V8 JIT bug in Chrome 19-20.
-  // See https://code.google.com/p/v8/issues/detail?id=2291 for more details.
-  var type = typeof value;
-  return !!value && (type == 'object' || type == 'function');
-}
-
-/**
- * Creates an array of the own enumerable property names of `object`.
- *
- * **Note:** Non-object values are coerced to objects. See the
- * [ES spec](http://ecma-international.org/ecma-262/6.0/#sec-object.keys)
- * for more details.
- *
- * @static
- * @memberOf _
- * @category Object
- * @param {Object} object The object to query.
- * @returns {Array} Returns the array of property names.
- * @example
- *
- * function Foo() {
- *   this.a = 1;
- *   this.b = 2;
- * }
- *
- * Foo.prototype.c = 3;
- *
- * _.keys(new Foo);
- * // => ['a', 'b'] (iteration order is not guaranteed)
- *
- * _.keys('hi');
- * // => ['0', '1']
- */
-var keys = !nativeKeys ? shimKeys : function(object) {
-  var Ctor = object == null ? undefined : object.constructor;
-  if ((typeof Ctor == 'function' && Ctor.prototype === object) ||
-      (typeof object != 'function' && isArrayLike(object))) {
-    return shimKeys(object);
-  }
-  return isObject(object) ? nativeKeys(object) : [];
-};
-
-/**
- * Creates an array of the own and inherited enumerable property names of `object`.
- *
- * **Note:** Non-object values are coerced to objects.
- *
- * @static
- * @memberOf _
- * @category Object
- * @param {Object} object The object to query.
- * @returns {Array} Returns the array of property names.
- * @example
- *
- * function Foo() {
- *   this.a = 1;
- *   this.b = 2;
- * }
- *
- * Foo.prototype.c = 3;
- *
- * _.keysIn(new Foo);
- * // => ['a', 'b', 'c'] (iteration order is not guaranteed)
- */
-function keysIn(object) {
-  if (object == null) {
-    return [];
-  }
-  if (!isObject(object)) {
-    object = Object(object);
-  }
-  var length = object.length;
-  length = (length && isLength(length) &&
-    (isArray(object) || isArguments(object)) && length) || 0;
-
-  var Ctor = object.constructor,
-      index = -1,
-      isProto = typeof Ctor == 'function' && Ctor.prototype === object,
-      result = Array(length),
-      skipIndexes = length > 0;
-
-  while (++index < length) {
-    result[index] = (index + '');
-  }
-  for (var key in object) {
-    if (!(skipIndexes && isIndex(key, length)) &&
-        !(key == 'constructor' && (isProto || !hasOwnProperty.call(object, key)))) {
-      result.push(key);
-    }
-  }
-  return result;
-}
-
-module.exports = keys;
-
-},{"lodash._getnative":53,"lodash.isarguments":54,"lodash.isarray":71}],53:[function(require,module,exports){
-/**
- * lodash 3.9.1 (Custom Build) <https://lodash.com/>
- * Build: `lodash modern modularize exports="npm" -o ./`
- * Copyright 2012-2015 The Dojo Foundation <http://dojofoundation.org/>
- * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
- * Copyright 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
- * Available under MIT license <https://lodash.com/license>
- */
-
-/** `Object#toString` result references. */
-var funcTag = '[object Function]';
-
-/** Used to detect host constructors (Safari > 5). */
-var reIsHostCtor = /^\[object .+?Constructor\]$/;
-
-/**
- * Checks if `value` is object-like.
- *
- * @private
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
- */
-function isObjectLike(value) {
-  return !!value && typeof value == 'object';
-}
-
-/** Used for native method references. */
-var objectProto = Object.prototype;
-
-/** Used to resolve the decompiled source of functions. */
-var fnToString = Function.prototype.toString;
-
-/** Used to check objects for own properties. */
-var hasOwnProperty = objectProto.hasOwnProperty;
-
-/**
- * Used to resolve the [`toStringTag`](http://ecma-international.org/ecma-262/6.0/#sec-object.prototype.tostring)
- * of values.
- */
-var objToString = objectProto.toString;
-
-/** Used to detect if a method is native. */
-var reIsNative = RegExp('^' +
-  fnToString.call(hasOwnProperty).replace(/[\\^$.*+?()[\]{}|]/g, '\\$&')
-  .replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g, '$1.*?') + '$'
-);
-
-/**
- * Gets the native function at `key` of `object`.
- *
- * @private
- * @param {Object} object The object to query.
- * @param {string} key The key of the method to get.
- * @returns {*} Returns the function if it's native, else `undefined`.
- */
-function getNative(object, key) {
-  var value = object == null ? undefined : object[key];
-  return isNative(value) ? value : undefined;
-}
-
-/**
- * Checks if `value` is classified as a `Function` object.
- *
- * @static
- * @memberOf _
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is correctly classified, else `false`.
- * @example
- *
- * _.isFunction(_);
- * // => true
- *
- * _.isFunction(/abc/);
- * // => false
- */
-function isFunction(value) {
-  // The use of `Object#toString` avoids issues with the `typeof` operator
-  // in older versions of Chrome and Safari which return 'function' for regexes
-  // and Safari 8 equivalents which return 'object' for typed array constructors.
-  return isObject(value) && objToString.call(value) == funcTag;
-}
-
-/**
- * Checks if `value` is the [language type](https://es5.github.io/#x8) of `Object`.
- * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
- *
- * @static
- * @memberOf _
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is an object, else `false`.
- * @example
- *
- * _.isObject({});
- * // => true
- *
- * _.isObject([1, 2, 3]);
- * // => true
- *
- * _.isObject(1);
- * // => false
- */
-function isObject(value) {
-  // Avoid a V8 JIT bug in Chrome 19-20.
-  // See https://code.google.com/p/v8/issues/detail?id=2291 for more details.
-  var type = typeof value;
-  return !!value && (type == 'object' || type == 'function');
-}
-
-/**
- * Checks if `value` is a native function.
- *
- * @static
- * @memberOf _
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a native function, else `false`.
- * @example
- *
- * _.isNative(Array.prototype.push);
- * // => true
- *
- * _.isNative(_);
- * // => false
- */
-function isNative(value) {
-  if (value == null) {
-    return false;
-  }
-  if (isFunction(value)) {
-    return reIsNative.test(fnToString.call(value));
-  }
-  return isObjectLike(value) && reIsHostCtor.test(value);
-}
-
-module.exports = getNative;
-
-},{}],54:[function(require,module,exports){
-/**
- * lodash 3.0.4 (Custom Build) <https://lodash.com/>
- * Build: `lodash modern modularize exports="npm" -o ./`
- * Copyright 2012-2015 The Dojo Foundation <http://dojofoundation.org/>
- * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
- * Copyright 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
- * Available under MIT license <https://lodash.com/license>
- */
-
-/**
- * Checks if `value` is object-like.
- *
- * @private
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
- */
-function isObjectLike(value) {
-  return !!value && typeof value == 'object';
-}
-
-/** Used for native method references. */
-var objectProto = Object.prototype;
-
-/** Used to check objects for own properties. */
-var hasOwnProperty = objectProto.hasOwnProperty;
-
-/** Native method references. */
-var propertyIsEnumerable = objectProto.propertyIsEnumerable;
-
-/**
- * Used as the [maximum length](http://ecma-international.org/ecma-262/6.0/#sec-number.max_safe_integer)
- * of an array-like value.
- */
-var MAX_SAFE_INTEGER = 9007199254740991;
-
-/**
- * The base implementation of `_.property` without support for deep paths.
- *
- * @private
- * @param {string} key The key of the property to get.
- * @returns {Function} Returns the new function.
- */
-function baseProperty(key) {
-  return function(object) {
-    return object == null ? undefined : object[key];
-  };
-}
-
-/**
- * Gets the "length" property value of `object`.
- *
- * **Note:** This function is used to avoid a [JIT bug](https://bugs.webkit.org/show_bug.cgi?id=142792)
- * that affects Safari on at least iOS 8.1-8.3 ARM64.
- *
- * @private
- * @param {Object} object The object to query.
- * @returns {*} Returns the "length" value.
- */
-var getLength = baseProperty('length');
-
-/**
- * Checks if `value` is array-like.
- *
- * @private
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is array-like, else `false`.
- */
-function isArrayLike(value) {
-  return value != null && isLength(getLength(value));
-}
-
-/**
- * Checks if `value` is a valid array-like length.
- *
- * **Note:** This function is based on [`ToLength`](http://ecma-international.org/ecma-262/6.0/#sec-tolength).
- *
- * @private
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a valid length, else `false`.
- */
-function isLength(value) {
-  return typeof value == 'number' && value > -1 && value % 1 == 0 && value <= MAX_SAFE_INTEGER;
-}
-
-/**
- * Checks if `value` is classified as an `arguments` object.
- *
- * @static
- * @memberOf _
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is correctly classified, else `false`.
- * @example
- *
- * _.isArguments(function() { return arguments; }());
- * // => true
- *
- * _.isArguments([1, 2, 3]);
- * // => false
- */
-function isArguments(value) {
-  return isObjectLike(value) && isArrayLike(value) &&
-    hasOwnProperty.call(value, 'callee') && !propertyIsEnumerable.call(value, 'callee');
-}
-
-module.exports = isArguments;
-
-},{}],55:[function(require,module,exports){
-/**
- * lodash 3.5.3 (Custom Build) <https://lodash.com/>
- * Build: `lodash modern modularize exports="npm" -o ./`
- * Copyright 2012-2015 The Dojo Foundation <http://dojofoundation.org/>
- * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
- * Copyright 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
- * Available under MIT license <https://lodash.com/license>
- */
-var arrayMap = require('lodash._arraymap'),
-    baseCallback = require('lodash._basecallback'),
-    baseCompareAscending = require('lodash._basecompareascending'),
-    baseEach = require('lodash._baseeach'),
-    baseSortBy = require('lodash._basesortby');
-
-/**
- * Used by `_.sortByOrder` to compare multiple properties of a value to another
- * and stable sort them.
- *
- * If `orders` is unspecified, all valuess are sorted in ascending order. Otherwise,
- * a value is sorted in ascending order if its corresponding order is "asc", and
- * descending if "desc".
- *
- * @private
- * @param {Object} object The object to compare.
- * @param {Object} other The other object to compare.
- * @param {boolean[]} orders The order to sort by for each property.
- * @returns {number} Returns the sort order indicator for `object`.
- */
-function compareMultiple(object, other, orders) {
-  var index = -1,
-      objCriteria = object.criteria,
-      othCriteria = other.criteria,
-      length = objCriteria.length,
-      ordersLength = orders.length;
-
-  while (++index < length) {
-    var result = baseCompareAscending(objCriteria[index], othCriteria[index]);
-    if (result) {
-      if (index >= ordersLength) {
-        return result;
-      }
-      var order = orders[index];
-      return result * ((order === 'asc' || order === true) ? 1 : -1);
-    }
-  }
-  // Fixes an `Array#sort` bug in the JS engine embedded in Adobe applications
-  // that causes it, under certain circumstances, to provide the same value for
-  // `object` and `other`. See https://github.com/jashkenas/underscore/pull/1247
-  // for more details.
-  //
-  // This also ensures a stable sort in V8 and other engines.
-  // See https://code.google.com/p/v8/issues/detail?id=90 for more details.
-  return object.index - other.index;
-}
-
-/**
- * Used as the [maximum length](http://ecma-international.org/ecma-262/6.0/#sec-number.max_safe_integer)
- * of an array-like value.
- */
-var MAX_SAFE_INTEGER = 9007199254740991;
-
-/**
- * The base implementation of `_.map` without support for callback shorthands
- * and `this` binding.
- *
- * @private
- * @param {Array|Object|string} collection The collection to iterate over.
- * @param {Function} iteratee The function invoked per iteration.
- * @returns {Array} Returns the new mapped array.
- */
-function baseMap(collection, iteratee) {
-  var index = -1,
-      result = isArrayLike(collection) ? Array(collection.length) : [];
-
-  baseEach(collection, function(value, key, collection) {
-    result[++index] = iteratee(value, key, collection);
-  });
-  return result;
-}
-
-/**
- * The base implementation of `_.property` without support for deep paths.
- *
- * @private
- * @param {string} key The key of the property to get.
- * @returns {Function} Returns the new function.
- */
-function baseProperty(key) {
-  return function(object) {
-    return object == null ? undefined : object[key];
-  };
-}
-
-/**
- * The base implementation of `_.sortByOrder` without param guards.
- *
- * @private
- * @param {Array|Object|string} collection The collection to iterate over.
- * @param {Function[]|Object[]|string[]} iteratees The iteratees to sort by.
- * @param {boolean[]} orders The sort orders of `iteratees`.
- * @returns {Array} Returns the new sorted array.
- */
-function baseSortByOrder(collection, iteratees, orders) {
-  var index = -1;
-
-  iteratees = arrayMap(iteratees, function(iteratee) { return baseCallback(iteratee); });
-
-  var result = baseMap(collection, function(value) {
-    var criteria = arrayMap(iteratees, function(iteratee) { return iteratee(value); });
-    return { 'criteria': criteria, 'index': ++index, 'value': value };
-  });
-
-  return baseSortBy(result, function(object, other) {
-    return compareMultiple(object, other, orders);
-  });
-}
-
-/**
- * Gets the "length" property value of `object`.
- *
- * **Note:** This function is used to avoid a [JIT bug](https://bugs.webkit.org/show_bug.cgi?id=142792)
- * that affects Safari on at least iOS 8.1-8.3 ARM64.
- *
- * @private
- * @param {Object} object The object to query.
- * @returns {*} Returns the "length" value.
- */
-var getLength = baseProperty('length');
-
-/**
- * Checks if `value` is array-like.
- *
- * @private
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is array-like, else `false`.
- */
-function isArrayLike(value) {
-  return value != null && isLength(getLength(value));
-}
-
-/**
- * Checks if `value` is a valid array-like length.
- *
- * **Note:** This function is based on [`ToLength`](http://ecma-international.org/ecma-262/6.0/#sec-tolength).
- *
- * @private
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a valid length, else `false`.
- */
-function isLength(value) {
-  return typeof value == 'number' && value > -1 && value % 1 == 0 && value <= MAX_SAFE_INTEGER;
-}
-
-module.exports = baseSortByOrder;
-
-},{"lodash._arraymap":56,"lodash._basecallback":57,"lodash._basecompareascending":68,"lodash._baseeach":51,"lodash._basesortby":69}],56:[function(require,module,exports){
-/**
- * lodash 3.0.0 (Custom Build) <https://lodash.com/>
- * Build: `lodash modern modularize exports="npm" -o ./`
- * Copyright 2012-2015 The Dojo Foundation <http://dojofoundation.org/>
- * Based on Underscore.js 1.7.0 <http://underscorejs.org/LICENSE>
- * Copyright 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
- * Available under MIT license <https://lodash.com/license>
- */
-
-/**
- * A specialized version of `_.map` for arrays without support for callback
- * shorthands or `this` binding.
- *
- * @private
- * @param {Array} array The array to iterate over.
- * @param {Function} iteratee The function invoked per iteration.
- * @returns {Array} Returns the new mapped array.
- */
-function arrayMap(array, iteratee) {
-  var index = -1,
-      length = array.length,
-      result = Array(length);
-
-  while (++index < length) {
-    result[index] = iteratee(array[index], index, array);
-  }
-  return result;
-}
-
-module.exports = arrayMap;
-
-},{}],57:[function(require,module,exports){
-/**
- * lodash 3.3.1 (Custom Build) <https://lodash.com/>
- * Build: `lodash modern modularize exports="npm" -o ./`
- * Copyright 2012-2015 The Dojo Foundation <http://dojofoundation.org/>
- * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
- * Copyright 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
- * Available under MIT license <https://lodash.com/license>
- */
-var baseIsEqual = require('lodash._baseisequal'),
-    bindCallback = require('lodash._bindcallback'),
-    isArray = require('lodash.isarray'),
-    pairs = require('lodash.pairs');
-
-/** Used to match property names within property paths. */
-var reIsDeepProp = /\.|\[(?:[^[\]]*|(["'])(?:(?!\1)[^\n\\]|\\.)*?\1)\]/,
-    reIsPlainProp = /^\w*$/,
-    rePropName = /[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\n\\]|\\.)*?)\2)\]/g;
-
-/** Used to match backslashes in property paths. */
-var reEscapeChar = /\\(\\)?/g;
-
-/**
- * Converts `value` to a string if it's not one. An empty string is returned
- * for `null` or `undefined` values.
- *
- * @private
- * @param {*} value The value to process.
- * @returns {string} Returns the string.
- */
-function baseToString(value) {
-  return value == null ? '' : (value + '');
-}
-
-/**
- * The base implementation of `_.callback` which supports specifying the
- * number of arguments to provide to `func`.
- *
- * @private
- * @param {*} [func=_.identity] The value to convert to a callback.
- * @param {*} [thisArg] The `this` binding of `func`.
- * @param {number} [argCount] The number of arguments to provide to `func`.
- * @returns {Function} Returns the callback.
- */
-function baseCallback(func, thisArg, argCount) {
-  var type = typeof func;
-  if (type == 'function') {
-    return thisArg === undefined
-      ? func
-      : bindCallback(func, thisArg, argCount);
-  }
-  if (func == null) {
-    return identity;
-  }
-  if (type == 'object') {
-    return baseMatches(func);
-  }
-  return thisArg === undefined
-    ? property(func)
-    : baseMatchesProperty(func, thisArg);
-}
-
-/**
- * The base implementation of `get` without support for string paths
- * and default values.
- *
- * @private
- * @param {Object} object The object to query.
- * @param {Array} path The path of the property to get.
- * @param {string} [pathKey] The key representation of path.
- * @returns {*} Returns the resolved value.
- */
-function baseGet(object, path, pathKey) {
-  if (object == null) {
-    return;
-  }
-  if (pathKey !== undefined && pathKey in toObject(object)) {
-    path = [pathKey];
-  }
-  var index = 0,
-      length = path.length;
-
-  while (object != null && index < length) {
-    object = object[path[index++]];
-  }
-  return (index && index == length) ? object : undefined;
-}
-
-/**
- * The base implementation of `_.isMatch` without support for callback
- * shorthands and `this` binding.
- *
- * @private
- * @param {Object} object The object to inspect.
- * @param {Array} matchData The propery names, values, and compare flags to match.
- * @param {Function} [customizer] The function to customize comparing objects.
- * @returns {boolean} Returns `true` if `object` is a match, else `false`.
- */
-function baseIsMatch(object, matchData, customizer) {
-  var index = matchData.length,
-      length = index,
-      noCustomizer = !customizer;
-
-  if (object == null) {
-    return !length;
-  }
-  object = toObject(object);
-  while (index--) {
-    var data = matchData[index];
-    if ((noCustomizer && data[2])
-          ? data[1] !== object[data[0]]
-          : !(data[0] in object)
-        ) {
-      return false;
-    }
-  }
-  while (++index < length) {
-    data = matchData[index];
-    var key = data[0],
-        objValue = object[key],
-        srcValue = data[1];
-
-    if (noCustomizer && data[2]) {
-      if (objValue === undefined && !(key in object)) {
-        return false;
-      }
-    } else {
-      var result = customizer ? customizer(objValue, srcValue, key) : undefined;
-      if (!(result === undefined ? baseIsEqual(srcValue, objValue, customizer, true) : result)) {
-        return false;
-      }
-    }
-  }
-  return true;
-}
-
-/**
- * The base implementation of `_.matches` which does not clone `source`.
- *
- * @private
- * @param {Object} source The object of property values to match.
- * @returns {Function} Returns the new function.
- */
-function baseMatches(source) {
-  var matchData = getMatchData(source);
-  if (matchData.length == 1 && matchData[0][2]) {
-    var key = matchData[0][0],
-        value = matchData[0][1];
-
-    return function(object) {
-      if (object == null) {
-        return false;
-      }
-      return object[key] === value && (value !== undefined || (key in toObject(object)));
-    };
-  }
-  return function(object) {
-    return baseIsMatch(object, matchData);
-  };
-}
-
-/**
- * The base implementation of `_.matchesProperty` which does not clone `srcValue`.
- *
- * @private
- * @param {string} path The path of the property to get.
- * @param {*} srcValue The value to compare.
- * @returns {Function} Returns the new function.
- */
-function baseMatchesProperty(path, srcValue) {
-  var isArr = isArray(path),
-      isCommon = isKey(path) && isStrictComparable(srcValue),
-      pathKey = (path + '');
-
-  path = toPath(path);
-  return function(object) {
-    if (object == null) {
-      return false;
-    }
-    var key = pathKey;
-    object = toObject(object);
-    if ((isArr || !isCommon) && !(key in object)) {
-      object = path.length == 1 ? object : baseGet(object, baseSlice(path, 0, -1));
-      if (object == null) {
-        return false;
-      }
-      key = last(path);
-      object = toObject(object);
-    }
-    return object[key] === srcValue
-      ? (srcValue !== undefined || (key in object))
-      : baseIsEqual(srcValue, object[key], undefined, true);
-  };
-}
-
-/**
- * The base implementation of `_.property` without support for deep paths.
- *
- * @private
- * @param {string} key The key of the property to get.
- * @returns {Function} Returns the new function.
- */
-function baseProperty(key) {
-  return function(object) {
-    return object == null ? undefined : object[key];
-  };
-}
-
-/**
- * A specialized version of `baseProperty` which supports deep paths.
- *
- * @private
- * @param {Array|string} path The path of the property to get.
- * @returns {Function} Returns the new function.
- */
-function basePropertyDeep(path) {
-  var pathKey = (path + '');
-  path = toPath(path);
-  return function(object) {
-    return baseGet(object, path, pathKey);
-  };
-}
-
-/**
- * The base implementation of `_.slice` without an iteratee call guard.
- *
- * @private
- * @param {Array} array The array to slice.
- * @param {number} [start=0] The start position.
- * @param {number} [end=array.length] The end position.
- * @returns {Array} Returns the slice of `array`.
- */
-function baseSlice(array, start, end) {
-  var index = -1,
-      length = array.length;
-
-  start = start == null ? 0 : (+start || 0);
-  if (start < 0) {
-    start = -start > length ? 0 : (length + start);
-  }
-  end = (end === undefined || end > length) ? length : (+end || 0);
-  if (end < 0) {
-    end += length;
-  }
-  length = start > end ? 0 : ((end - start) >>> 0);
-  start >>>= 0;
-
-  var result = Array(length);
-  while (++index < length) {
-    result[index] = array[index + start];
-  }
-  return result;
-}
-
-/**
- * Gets the propery names, values, and compare flags of `object`.
- *
- * @private
- * @param {Object} object The object to query.
- * @returns {Array} Returns the match data of `object`.
- */
-function getMatchData(object) {
-  var result = pairs(object),
-      length = result.length;
-
-  while (length--) {
-    result[length][2] = isStrictComparable(result[length][1]);
-  }
-  return result;
-}
-
-/**
- * Checks if `value` is a property name and not a property path.
- *
- * @private
- * @param {*} value The value to check.
- * @param {Object} [object] The object to query keys on.
- * @returns {boolean} Returns `true` if `value` is a property name, else `false`.
- */
-function isKey(value, object) {
-  var type = typeof value;
-  if ((type == 'string' && reIsPlainProp.test(value)) || type == 'number') {
     return true;
   }
-  if (isArray(value)) {
-    return false;
-  }
-  var result = !reIsDeepProp.test(value);
-  return result || (object != null && value in toObject(object));
-}
 
-/**
- * Checks if `value` is suitable for strict equality comparisons, i.e. `===`.
- *
- * @private
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` if suitable for strict
- *  equality comparisons, else `false`.
- */
-function isStrictComparable(value) {
-  return value === value && !isObject(value);
-}
+  // By default EventEmitters will print a warning if more than
+  // 10 listeners are added to it. This is a useful default which
+  // helps finding memory leaks.
+  //
+  // Obviously not all Emitters should be limited to 10. This function allows
+  // that to be increased. Set to zero for unlimited.
 
-/**
- * Converts `value` to an object if it's not one.
- *
- * @private
- * @param {*} value The value to process.
- * @returns {Object} Returns the object.
- */
-function toObject(value) {
-  return isObject(value) ? value : Object(value);
-}
+  EventEmitter.prototype.delimiter = '.';
 
-/**
- * Converts `value` to property path array if it's not one.
- *
- * @private
- * @param {*} value The value to process.
- * @returns {Array} Returns the property path array.
- */
-function toPath(value) {
-  if (isArray(value)) {
-    return value;
-  }
-  var result = [];
-  baseToString(value).replace(rePropName, function(match, number, quote, string) {
-    result.push(quote ? string.replace(reEscapeChar, '$1') : (number || match));
-  });
-  return result;
-}
+  EventEmitter.prototype.setMaxListeners = function(n) {
+    this._events || init.call(this);
+    this._events.maxListeners = n;
+    if (!this._conf) this._conf = {};
+    this._conf.maxListeners = n;
+  };
 
-/**
- * Gets the last element of `array`.
- *
- * @static
- * @memberOf _
- * @category Array
- * @param {Array} array The array to query.
- * @returns {*} Returns the last element of `array`.
- * @example
- *
- * _.last([1, 2, 3]);
- * // => 3
- */
-function last(array) {
-  var length = array ? array.length : 0;
-  return length ? array[length - 1] : undefined;
-}
+  EventEmitter.prototype.event = '';
 
-/**
- * Checks if `value` is the [language type](https://es5.github.io/#x8) of `Object`.
- * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
- *
- * @static
- * @memberOf _
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is an object, else `false`.
- * @example
- *
- * _.isObject({});
- * // => true
- *
- * _.isObject([1, 2, 3]);
- * // => true
- *
- * _.isObject(1);
- * // => false
- */
-function isObject(value) {
-  // Avoid a V8 JIT bug in Chrome 19-20.
-  // See https://code.google.com/p/v8/issues/detail?id=2291 for more details.
-  var type = typeof value;
-  return !!value && (type == 'object' || type == 'function');
-}
+  EventEmitter.prototype.once = function(event, fn) {
+    this.many(event, 1, fn);
+    return this;
+  };
 
-/**
- * This method returns the first argument provided to it.
- *
- * @static
- * @memberOf _
- * @category Utility
- * @param {*} value Any value.
- * @returns {*} Returns `value`.
- * @example
- *
- * var object = { 'user': 'fred' };
- *
- * _.identity(object) === object;
- * // => true
- */
-function identity(value) {
-  return value;
-}
+  EventEmitter.prototype.many = function(event, ttl, fn) {
+    var self = this;
 
-/**
- * Creates a function that returns the property value at `path` on a
- * given object.
- *
- * @static
- * @memberOf _
- * @category Utility
- * @param {Array|string} path The path of the property to get.
- * @returns {Function} Returns the new function.
- * @example
- *
- * var objects = [
- *   { 'a': { 'b': { 'c': 2 } } },
- *   { 'a': { 'b': { 'c': 1 } } }
- * ];
- *
- * _.map(objects, _.property('a.b.c'));
- * // => [2, 1]
- *
- * _.pluck(_.sortBy(objects, _.property(['a', 'b', 'c'])), 'a.b.c');
- * // => [1, 2]
- */
-function property(path) {
-  return isKey(path) ? baseProperty(path) : basePropertyDeep(path);
-}
+    if (typeof fn !== 'function') {
+      throw new Error('many only accepts instances of Function');
+    }
 
-module.exports = baseCallback;
+    function listener() {
+      if (--ttl === 0) {
+        self.off(event, listener);
+      }
+      fn.apply(this, arguments);
+    }
 
-},{"lodash._baseisequal":58,"lodash._bindcallback":63,"lodash.isarray":71,"lodash.pairs":64}],58:[function(require,module,exports){
-/**
- * lodash 3.0.7 (Custom Build) <https://lodash.com/>
- * Build: `lodash modern modularize exports="npm" -o ./`
- * Copyright 2012-2015 The Dojo Foundation <http://dojofoundation.org/>
- * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
- * Copyright 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
- * Available under MIT license <https://lodash.com/license>
- */
-var isArray = require('lodash.isarray'),
-    isTypedArray = require('lodash.istypedarray'),
-    keys = require('lodash.keys');
+    listener._origin = fn;
 
-/** `Object#toString` result references. */
-var argsTag = '[object Arguments]',
-    arrayTag = '[object Array]',
-    boolTag = '[object Boolean]',
-    dateTag = '[object Date]',
-    errorTag = '[object Error]',
-    numberTag = '[object Number]',
-    objectTag = '[object Object]',
-    regexpTag = '[object RegExp]',
-    stringTag = '[object String]';
+    this.on(event, listener);
 
-/**
- * Checks if `value` is object-like.
- *
- * @private
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
- */
-function isObjectLike(value) {
-  return !!value && typeof value == 'object';
-}
+    return self;
+  };
 
-/** Used for native method references. */
-var objectProto = Object.prototype;
+  EventEmitter.prototype.emit = function() {
 
-/** Used to check objects for own properties. */
-var hasOwnProperty = objectProto.hasOwnProperty;
+    this._events || init.call(this);
 
-/**
- * Used to resolve the [`toStringTag`](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-object.prototype.tostring)
- * of values.
- */
-var objToString = objectProto.toString;
+    var type = arguments[0];
 
-/**
- * A specialized version of `_.some` for arrays without support for callback
- * shorthands and `this` binding.
- *
- * @private
- * @param {Array} array The array to iterate over.
- * @param {Function} predicate The function invoked per iteration.
- * @returns {boolean} Returns `true` if any element passes the predicate check,
- *  else `false`.
- */
-function arraySome(array, predicate) {
-  var index = -1,
-      length = array.length;
+    if (type === 'newListener' && !this.newListener) {
+      if (!this._events.newListener) { return false; }
+    }
 
-  while (++index < length) {
-    if (predicate(array[index], index, array)) {
+    // Loop through the *_all* functions and invoke them.
+    if (this._all) {
+      var l = arguments.length;
+      var args = new Array(l - 1);
+      for (var i = 1; i < l; i++) args[i - 1] = arguments[i];
+      for (i = 0, l = this._all.length; i < l; i++) {
+        this.event = type;
+        this._all[i].apply(this, args);
+      }
+    }
+
+    // If there is no 'error' event listener then throw.
+    if (type === 'error') {
+
+      if (!this._all &&
+        !this._events.error &&
+        !(this.wildcard && this.listenerTree.error)) {
+
+        if (arguments[1] instanceof Error) {
+          throw arguments[1]; // Unhandled 'error' event
+        } else {
+          throw new Error("Uncaught, unspecified 'error' event.");
+        }
+        return false;
+      }
+    }
+
+    var handler;
+
+    if(this.wildcard) {
+      handler = [];
+      var ns = typeof type === 'string' ? type.split(this.delimiter) : type.slice();
+      searchListenerTree.call(this, handler, ns, this.listenerTree, 0);
+    }
+    else {
+      handler = this._events[type];
+    }
+
+    if (typeof handler === 'function') {
+      this.event = type;
+      if (arguments.length === 1) {
+        handler.call(this);
+      }
+      else if (arguments.length > 1)
+        switch (arguments.length) {
+          case 2:
+            handler.call(this, arguments[1]);
+            break;
+          case 3:
+            handler.call(this, arguments[1], arguments[2]);
+            break;
+          // slower
+          default:
+            var l = arguments.length;
+            var args = new Array(l - 1);
+            for (var i = 1; i < l; i++) args[i - 1] = arguments[i];
+            handler.apply(this, args);
+        }
       return true;
     }
-  }
-  return false;
-}
+    else if (handler) {
+      var l = arguments.length;
+      var args = new Array(l - 1);
+      for (var i = 1; i < l; i++) args[i - 1] = arguments[i];
 
-/**
- * The base implementation of `_.isEqual` without support for `this` binding
- * `customizer` functions.
- *
- * @private
- * @param {*} value The value to compare.
- * @param {*} other The other value to compare.
- * @param {Function} [customizer] The function to customize comparing values.
- * @param {boolean} [isLoose] Specify performing partial comparisons.
- * @param {Array} [stackA] Tracks traversed `value` objects.
- * @param {Array} [stackB] Tracks traversed `other` objects.
- * @returns {boolean} Returns `true` if the values are equivalent, else `false`.
- */
-function baseIsEqual(value, other, customizer, isLoose, stackA, stackB) {
-  if (value === other) {
-    return true;
-  }
-  if (value == null || other == null || (!isObject(value) && !isObjectLike(other))) {
-    return value !== value && other !== other;
-  }
-  return baseIsEqualDeep(value, other, baseIsEqual, customizer, isLoose, stackA, stackB);
-}
-
-/**
- * A specialized version of `baseIsEqual` for arrays and objects which performs
- * deep comparisons and tracks traversed objects enabling objects with circular
- * references to be compared.
- *
- * @private
- * @param {Object} object The object to compare.
- * @param {Object} other The other object to compare.
- * @param {Function} equalFunc The function to determine equivalents of values.
- * @param {Function} [customizer] The function to customize comparing objects.
- * @param {boolean} [isLoose] Specify performing partial comparisons.
- * @param {Array} [stackA=[]] Tracks traversed `value` objects.
- * @param {Array} [stackB=[]] Tracks traversed `other` objects.
- * @returns {boolean} Returns `true` if the objects are equivalent, else `false`.
- */
-function baseIsEqualDeep(object, other, equalFunc, customizer, isLoose, stackA, stackB) {
-  var objIsArr = isArray(object),
-      othIsArr = isArray(other),
-      objTag = arrayTag,
-      othTag = arrayTag;
-
-  if (!objIsArr) {
-    objTag = objToString.call(object);
-    if (objTag == argsTag) {
-      objTag = objectTag;
-    } else if (objTag != objectTag) {
-      objIsArr = isTypedArray(object);
-    }
-  }
-  if (!othIsArr) {
-    othTag = objToString.call(other);
-    if (othTag == argsTag) {
-      othTag = objectTag;
-    } else if (othTag != objectTag) {
-      othIsArr = isTypedArray(other);
-    }
-  }
-  var objIsObj = objTag == objectTag,
-      othIsObj = othTag == objectTag,
-      isSameTag = objTag == othTag;
-
-  if (isSameTag && !(objIsArr || objIsObj)) {
-    return equalByTag(object, other, objTag);
-  }
-  if (!isLoose) {
-    var objIsWrapped = objIsObj && hasOwnProperty.call(object, '__wrapped__'),
-        othIsWrapped = othIsObj && hasOwnProperty.call(other, '__wrapped__');
-
-    if (objIsWrapped || othIsWrapped) {
-      return equalFunc(objIsWrapped ? object.value() : object, othIsWrapped ? other.value() : other, customizer, isLoose, stackA, stackB);
-    }
-  }
-  if (!isSameTag) {
-    return false;
-  }
-  // Assume cyclic values are equal.
-  // For more information on detecting circular references see https://es5.github.io/#JO.
-  stackA || (stackA = []);
-  stackB || (stackB = []);
-
-  var length = stackA.length;
-  while (length--) {
-    if (stackA[length] == object) {
-      return stackB[length] == other;
-    }
-  }
-  // Add `object` and `other` to the stack of traversed objects.
-  stackA.push(object);
-  stackB.push(other);
-
-  var result = (objIsArr ? equalArrays : equalObjects)(object, other, equalFunc, customizer, isLoose, stackA, stackB);
-
-  stackA.pop();
-  stackB.pop();
-
-  return result;
-}
-
-/**
- * A specialized version of `baseIsEqualDeep` for arrays with support for
- * partial deep comparisons.
- *
- * @private
- * @param {Array} array The array to compare.
- * @param {Array} other The other array to compare.
- * @param {Function} equalFunc The function to determine equivalents of values.
- * @param {Function} [customizer] The function to customize comparing arrays.
- * @param {boolean} [isLoose] Specify performing partial comparisons.
- * @param {Array} [stackA] Tracks traversed `value` objects.
- * @param {Array} [stackB] Tracks traversed `other` objects.
- * @returns {boolean} Returns `true` if the arrays are equivalent, else `false`.
- */
-function equalArrays(array, other, equalFunc, customizer, isLoose, stackA, stackB) {
-  var index = -1,
-      arrLength = array.length,
-      othLength = other.length;
-
-  if (arrLength != othLength && !(isLoose && othLength > arrLength)) {
-    return false;
-  }
-  // Ignore non-index properties.
-  while (++index < arrLength) {
-    var arrValue = array[index],
-        othValue = other[index],
-        result = customizer ? customizer(isLoose ? othValue : arrValue, isLoose ? arrValue : othValue, index) : undefined;
-
-    if (result !== undefined) {
-      if (result) {
-        continue;
+      var listeners = handler.slice();
+      for (var i = 0, l = listeners.length; i < l; i++) {
+        this.event = type;
+        listeners[i].apply(this, args);
       }
-      return false;
+      return (listeners.length > 0) || !!this._all;
     }
-    // Recursively compare arrays (susceptible to call stack limits).
-    if (isLoose) {
-      if (!arraySome(other, function(othValue) {
-            return arrValue === othValue || equalFunc(arrValue, othValue, customizer, isLoose, stackA, stackB);
-          })) {
-        return false;
+    else {
+      return !!this._all;
+    }
+
+  };
+
+  EventEmitter.prototype.on = function(type, listener) {
+
+    if (typeof type === 'function') {
+      this.onAny(type);
+      return this;
+    }
+
+    if (typeof listener !== 'function') {
+      throw new Error('on only accepts instances of Function');
+    }
+    this._events || init.call(this);
+
+    // To avoid recursion in the case that type == "newListeners"! Before
+    // adding it to the listeners, first emit "newListeners".
+    this.emit('newListener', type, listener);
+
+    if(this.wildcard) {
+      growListenerTree.call(this, type, listener);
+      return this;
+    }
+
+    if (!this._events[type]) {
+      // Optimize the case of one listener. Don't need the extra array object.
+      this._events[type] = listener;
+    }
+    else if(typeof this._events[type] === 'function') {
+      // Adding the second element, need to change to array.
+      this._events[type] = [this._events[type], listener];
+    }
+    else if (isArray(this._events[type])) {
+      // If we've already got an array, just append.
+      this._events[type].push(listener);
+
+      // Check for listener leak
+      if (!this._events[type].warned) {
+
+        var m = defaultMaxListeners;
+
+        if (typeof this._events.maxListeners !== 'undefined') {
+          m = this._events.maxListeners;
+        }
+
+        if (m > 0 && this._events[type].length > m) {
+
+          this._events[type].warned = true;
+          console.error('(node) warning: possible EventEmitter memory ' +
+                        'leak detected. %d listeners added. ' +
+                        'Use emitter.setMaxListeners() to increase limit.',
+                        this._events[type].length);
+          console.trace();
+        }
       }
-    } else if (!(arrValue === othValue || equalFunc(arrValue, othValue, customizer, isLoose, stackA, stackB))) {
-      return false;
     }
-  }
-  return true;
-}
-
-/**
- * A specialized version of `baseIsEqualDeep` for comparing objects of
- * the same `toStringTag`.
- *
- * **Note:** This function only supports comparing values with tags of
- * `Boolean`, `Date`, `Error`, `Number`, `RegExp`, or `String`.
- *
- * @private
- * @param {Object} value The object to compare.
- * @param {Object} other The other object to compare.
- * @param {string} tag The `toStringTag` of the objects to compare.
- * @returns {boolean} Returns `true` if the objects are equivalent, else `false`.
- */
-function equalByTag(object, other, tag) {
-  switch (tag) {
-    case boolTag:
-    case dateTag:
-      // Coerce dates and booleans to numbers, dates to milliseconds and booleans
-      // to `1` or `0` treating invalid dates coerced to `NaN` as not equal.
-      return +object == +other;
-
-    case errorTag:
-      return object.name == other.name && object.message == other.message;
-
-    case numberTag:
-      // Treat `NaN` vs. `NaN` as equal.
-      return (object != +object)
-        ? other != +other
-        : object == +other;
-
-    case regexpTag:
-    case stringTag:
-      // Coerce regexes to strings and treat strings primitives and string
-      // objects as equal. See https://es5.github.io/#x15.10.6.4 for more details.
-      return object == (other + '');
-  }
-  return false;
-}
-
-/**
- * A specialized version of `baseIsEqualDeep` for objects with support for
- * partial deep comparisons.
- *
- * @private
- * @param {Object} object The object to compare.
- * @param {Object} other The other object to compare.
- * @param {Function} equalFunc The function to determine equivalents of values.
- * @param {Function} [customizer] The function to customize comparing values.
- * @param {boolean} [isLoose] Specify performing partial comparisons.
- * @param {Array} [stackA] Tracks traversed `value` objects.
- * @param {Array} [stackB] Tracks traversed `other` objects.
- * @returns {boolean} Returns `true` if the objects are equivalent, else `false`.
- */
-function equalObjects(object, other, equalFunc, customizer, isLoose, stackA, stackB) {
-  var objProps = keys(object),
-      objLength = objProps.length,
-      othProps = keys(other),
-      othLength = othProps.length;
-
-  if (objLength != othLength && !isLoose) {
-    return false;
-  }
-  var index = objLength;
-  while (index--) {
-    var key = objProps[index];
-    if (!(isLoose ? key in other : hasOwnProperty.call(other, key))) {
-      return false;
-    }
-  }
-  var skipCtor = isLoose;
-  while (++index < objLength) {
-    key = objProps[index];
-    var objValue = object[key],
-        othValue = other[key],
-        result = customizer ? customizer(isLoose ? othValue : objValue, isLoose? objValue : othValue, key) : undefined;
-
-    // Recursively compare objects (susceptible to call stack limits).
-    if (!(result === undefined ? equalFunc(objValue, othValue, customizer, isLoose, stackA, stackB) : result)) {
-      return false;
-    }
-    skipCtor || (skipCtor = key == 'constructor');
-  }
-  if (!skipCtor) {
-    var objCtor = object.constructor,
-        othCtor = other.constructor;
-
-    // Non `Object` object instances with different constructors are not equal.
-    if (objCtor != othCtor &&
-        ('constructor' in object && 'constructor' in other) &&
-        !(typeof objCtor == 'function' && objCtor instanceof objCtor &&
-          typeof othCtor == 'function' && othCtor instanceof othCtor)) {
-      return false;
-    }
-  }
-  return true;
-}
-
-/**
- * Checks if `value` is the [language type](https://es5.github.io/#x8) of `Object`.
- * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
- *
- * @static
- * @memberOf _
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is an object, else `false`.
- * @example
- *
- * _.isObject({});
- * // => true
- *
- * _.isObject([1, 2, 3]);
- * // => true
- *
- * _.isObject(1);
- * // => false
- */
-function isObject(value) {
-  // Avoid a V8 JIT bug in Chrome 19-20.
-  // See https://code.google.com/p/v8/issues/detail?id=2291 for more details.
-  var type = typeof value;
-  return !!value && (type == 'object' || type == 'function');
-}
-
-module.exports = baseIsEqual;
-
-},{"lodash.isarray":71,"lodash.istypedarray":59,"lodash.keys":60}],59:[function(require,module,exports){
-/**
- * lodash 3.0.2 (Custom Build) <https://lodash.com/>
- * Build: `lodash modern modularize exports="npm" -o ./`
- * Copyright 2012-2015 The Dojo Foundation <http://dojofoundation.org/>
- * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
- * Copyright 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
- * Available under MIT license <https://lodash.com/license>
- */
-
-/** `Object#toString` result references. */
-var argsTag = '[object Arguments]',
-    arrayTag = '[object Array]',
-    boolTag = '[object Boolean]',
-    dateTag = '[object Date]',
-    errorTag = '[object Error]',
-    funcTag = '[object Function]',
-    mapTag = '[object Map]',
-    numberTag = '[object Number]',
-    objectTag = '[object Object]',
-    regexpTag = '[object RegExp]',
-    setTag = '[object Set]',
-    stringTag = '[object String]',
-    weakMapTag = '[object WeakMap]';
-
-var arrayBufferTag = '[object ArrayBuffer]',
-    float32Tag = '[object Float32Array]',
-    float64Tag = '[object Float64Array]',
-    int8Tag = '[object Int8Array]',
-    int16Tag = '[object Int16Array]',
-    int32Tag = '[object Int32Array]',
-    uint8Tag = '[object Uint8Array]',
-    uint8ClampedTag = '[object Uint8ClampedArray]',
-    uint16Tag = '[object Uint16Array]',
-    uint32Tag = '[object Uint32Array]';
-
-/** Used to identify `toStringTag` values of typed arrays. */
-var typedArrayTags = {};
-typedArrayTags[float32Tag] = typedArrayTags[float64Tag] =
-typedArrayTags[int8Tag] = typedArrayTags[int16Tag] =
-typedArrayTags[int32Tag] = typedArrayTags[uint8Tag] =
-typedArrayTags[uint8ClampedTag] = typedArrayTags[uint16Tag] =
-typedArrayTags[uint32Tag] = true;
-typedArrayTags[argsTag] = typedArrayTags[arrayTag] =
-typedArrayTags[arrayBufferTag] = typedArrayTags[boolTag] =
-typedArrayTags[dateTag] = typedArrayTags[errorTag] =
-typedArrayTags[funcTag] = typedArrayTags[mapTag] =
-typedArrayTags[numberTag] = typedArrayTags[objectTag] =
-typedArrayTags[regexpTag] = typedArrayTags[setTag] =
-typedArrayTags[stringTag] = typedArrayTags[weakMapTag] = false;
-
-/**
- * Checks if `value` is object-like.
- *
- * @private
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
- */
-function isObjectLike(value) {
-  return !!value && typeof value == 'object';
-}
-
-/** Used for native method references. */
-var objectProto = Object.prototype;
-
-/**
- * Used to resolve the [`toStringTag`](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-object.prototype.tostring)
- * of values.
- */
-var objToString = objectProto.toString;
-
-/**
- * Used as the [maximum length](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-number.max_safe_integer)
- * of an array-like value.
- */
-var MAX_SAFE_INTEGER = 9007199254740991;
-
-/**
- * Checks if `value` is a valid array-like length.
- *
- * **Note:** This function is based on [`ToLength`](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-tolength).
- *
- * @private
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a valid length, else `false`.
- */
-function isLength(value) {
-  return typeof value == 'number' && value > -1 && value % 1 == 0 && value <= MAX_SAFE_INTEGER;
-}
-
-/**
- * Checks if `value` is classified as a typed array.
- *
- * @static
- * @memberOf _
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is correctly classified, else `false`.
- * @example
- *
- * _.isTypedArray(new Uint8Array);
- * // => true
- *
- * _.isTypedArray([]);
- * // => false
- */
-function isTypedArray(value) {
-  return isObjectLike(value) && isLength(value.length) && !!typedArrayTags[objToString.call(value)];
-}
-
-module.exports = isTypedArray;
-
-},{}],60:[function(require,module,exports){
-arguments[4][52][0].apply(exports,arguments)
-},{"dup":52,"lodash._getnative":61,"lodash.isarguments":62,"lodash.isarray":71}],61:[function(require,module,exports){
-arguments[4][53][0].apply(exports,arguments)
-},{"dup":53}],62:[function(require,module,exports){
-arguments[4][54][0].apply(exports,arguments)
-},{"dup":54}],63:[function(require,module,exports){
-/**
- * lodash 3.0.1 (Custom Build) <https://lodash.com/>
- * Build: `lodash modern modularize exports="npm" -o ./`
- * Copyright 2012-2015 The Dojo Foundation <http://dojofoundation.org/>
- * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
- * Copyright 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
- * Available under MIT license <https://lodash.com/license>
- */
-
-/**
- * A specialized version of `baseCallback` which only supports `this` binding
- * and specifying the number of arguments to provide to `func`.
- *
- * @private
- * @param {Function} func The function to bind.
- * @param {*} thisArg The `this` binding of `func`.
- * @param {number} [argCount] The number of arguments to provide to `func`.
- * @returns {Function} Returns the callback.
- */
-function bindCallback(func, thisArg, argCount) {
-  if (typeof func != 'function') {
-    return identity;
-  }
-  if (thisArg === undefined) {
-    return func;
-  }
-  switch (argCount) {
-    case 1: return function(value) {
-      return func.call(thisArg, value);
-    };
-    case 3: return function(value, index, collection) {
-      return func.call(thisArg, value, index, collection);
-    };
-    case 4: return function(accumulator, value, index, collection) {
-      return func.call(thisArg, accumulator, value, index, collection);
-    };
-    case 5: return function(value, other, key, object, source) {
-      return func.call(thisArg, value, other, key, object, source);
-    };
-  }
-  return function() {
-    return func.apply(thisArg, arguments);
+    return this;
   };
-}
 
-/**
- * This method returns the first argument provided to it.
- *
- * @static
- * @memberOf _
- * @category Utility
- * @param {*} value Any value.
- * @returns {*} Returns `value`.
- * @example
- *
- * var object = { 'user': 'fred' };
- *
- * _.identity(object) === object;
- * // => true
- */
-function identity(value) {
-  return value;
-}
+  EventEmitter.prototype.onAny = function(fn) {
 
-module.exports = bindCallback;
-
-},{}],64:[function(require,module,exports){
-/**
- * lodash 3.0.1 (Custom Build) <https://lodash.com/>
- * Build: `lodash modern modularize exports="npm" -o ./`
- * Copyright 2012-2015 The Dojo Foundation <http://dojofoundation.org/>
- * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
- * Copyright 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
- * Available under MIT license <https://lodash.com/license>
- */
-var keys = require('lodash.keys');
-
-/**
- * Converts `value` to an object if it's not one.
- *
- * @private
- * @param {*} value The value to process.
- * @returns {Object} Returns the object.
- */
-function toObject(value) {
-  return isObject(value) ? value : Object(value);
-}
-
-/**
- * Checks if `value` is the [language type](https://es5.github.io/#x8) of `Object`.
- * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
- *
- * @static
- * @memberOf _
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is an object, else `false`.
- * @example
- *
- * _.isObject({});
- * // => true
- *
- * _.isObject([1, 2, 3]);
- * // => true
- *
- * _.isObject(1);
- * // => false
- */
-function isObject(value) {
-  // Avoid a V8 JIT bug in Chrome 19-20.
-  // See https://code.google.com/p/v8/issues/detail?id=2291 for more details.
-  var type = typeof value;
-  return !!value && (type == 'object' || type == 'function');
-}
-
-/**
- * Creates a two dimensional array of the key-value pairs for `object`,
- * e.g. `[[key1, value1], [key2, value2]]`.
- *
- * @static
- * @memberOf _
- * @category Object
- * @param {Object} object The object to query.
- * @returns {Array} Returns the new array of key-value pairs.
- * @example
- *
- * _.pairs({ 'barney': 36, 'fred': 40 });
- * // => [['barney', 36], ['fred', 40]] (iteration order is not guaranteed)
- */
-function pairs(object) {
-  object = toObject(object);
-
-  var index = -1,
-      props = keys(object),
-      length = props.length,
-      result = Array(length);
-
-  while (++index < length) {
-    var key = props[index];
-    result[index] = [key, object[key]];
-  }
-  return result;
-}
-
-module.exports = pairs;
-
-},{"lodash.keys":65}],65:[function(require,module,exports){
-arguments[4][52][0].apply(exports,arguments)
-},{"dup":52,"lodash._getnative":66,"lodash.isarguments":67,"lodash.isarray":71}],66:[function(require,module,exports){
-arguments[4][53][0].apply(exports,arguments)
-},{"dup":53}],67:[function(require,module,exports){
-arguments[4][54][0].apply(exports,arguments)
-},{"dup":54}],68:[function(require,module,exports){
-/**
- * lodash 3.0.2 (Custom Build) <https://lodash.com/>
- * Build: `lodash modern modularize exports="npm" -o ./`
- * Copyright 2012-2015 The Dojo Foundation <http://dojofoundation.org/>
- * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
- * Copyright 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
- * Available under MIT license <https://lodash.com/license>
- */
-
-/**
- * The base implementation of `compareAscending` which compares values and
- * sorts them in ascending order without guaranteeing a stable sort.
- *
- * @private
- * @param {*} value The value to compare.
- * @param {*} other The other value to compare.
- * @returns {number} Returns the sort order indicator for `value`.
- */
-function baseCompareAscending(value, other) {
-  if (value !== other) {
-    var valIsNull = value === null,
-        valIsUndef = value === undefined,
-        valIsReflexive = value === value;
-
-    var othIsNull = other === null,
-        othIsUndef = other === undefined,
-        othIsReflexive = other === other;
-
-    if ((value > other && !othIsNull) || !valIsReflexive ||
-        (valIsNull && !othIsUndef && othIsReflexive) ||
-        (valIsUndef && othIsReflexive)) {
-      return 1;
+    if (typeof fn !== 'function') {
+      throw new Error('onAny only accepts instances of Function');
     }
-    if ((value < other && !valIsNull) || !othIsReflexive ||
-        (othIsNull && !valIsUndef && valIsReflexive) ||
-        (othIsUndef && valIsReflexive)) {
-      return -1;
+
+    if(!this._all) {
+      this._all = [];
     }
-  }
-  return 0;
-}
 
-module.exports = baseCompareAscending;
-
-},{}],69:[function(require,module,exports){
-/**
- * lodash 3.0.0 (Custom Build) <https://lodash.com/>
- * Build: `lodash modern modularize exports="npm" -o ./`
- * Copyright 2012-2015 The Dojo Foundation <http://dojofoundation.org/>
- * Based on Underscore.js 1.7.0 <http://underscorejs.org/LICENSE>
- * Copyright 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
- * Available under MIT license <https://lodash.com/license>
- */
-
-/**
- * The base implementation of `_.sortBy` and `_.sortByAll` which uses `comparer`
- * to define the sort order of `array` and replaces criteria objects with their
- * corresponding values.
- *
- * @private
- * @param {Array} array The array to sort.
- * @param {Function} comparer The function to define sort order.
- * @returns {Array} Returns `array`.
- */
-function baseSortBy(array, comparer) {
-  var length = array.length;
-
-  array.sort(comparer);
-  while (length--) {
-    array[length] = array[length].value;
-  }
-  return array;
-}
-
-module.exports = baseSortBy;
-
-},{}],70:[function(require,module,exports){
-/**
- * lodash 3.0.9 (Custom Build) <https://lodash.com/>
- * Build: `lodash modern modularize exports="npm" -o ./`
- * Copyright 2012-2015 The Dojo Foundation <http://dojofoundation.org/>
- * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
- * Copyright 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
- * Available under MIT license <https://lodash.com/license>
- */
-
-/** Used to detect unsigned integer values. */
-var reIsUint = /^\d+$/;
-
-/**
- * Used as the [maximum length](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-number.max_safe_integer)
- * of an array-like value.
- */
-var MAX_SAFE_INTEGER = 9007199254740991;
-
-/**
- * The base implementation of `_.property` without support for deep paths.
- *
- * @private
- * @param {string} key The key of the property to get.
- * @returns {Function} Returns the new function.
- */
-function baseProperty(key) {
-  return function(object) {
-    return object == null ? undefined : object[key];
+    // Add the function to the event listener collection.
+    this._all.push(fn);
+    return this;
   };
-}
 
-/**
- * Gets the "length" property value of `object`.
- *
- * **Note:** This function is used to avoid a [JIT bug](https://bugs.webkit.org/show_bug.cgi?id=142792)
- * that affects Safari on at least iOS 8.1-8.3 ARM64.
- *
- * @private
- * @param {Object} object The object to query.
- * @returns {*} Returns the "length" value.
- */
-var getLength = baseProperty('length');
+  EventEmitter.prototype.addListener = EventEmitter.prototype.on;
 
-/**
- * Checks if `value` is array-like.
- *
- * @private
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is array-like, else `false`.
- */
-function isArrayLike(value) {
-  return value != null && isLength(getLength(value));
-}
+  EventEmitter.prototype.off = function(type, listener) {
+    if (typeof listener !== 'function') {
+      throw new Error('removeListener only takes instances of Function');
+    }
 
-/**
- * Checks if `value` is a valid array-like index.
- *
- * @private
- * @param {*} value The value to check.
- * @param {number} [length=MAX_SAFE_INTEGER] The upper bounds of a valid index.
- * @returns {boolean} Returns `true` if `value` is a valid index, else `false`.
- */
-function isIndex(value, length) {
-  value = (typeof value == 'number' || reIsUint.test(value)) ? +value : -1;
-  length = length == null ? MAX_SAFE_INTEGER : length;
-  return value > -1 && value % 1 == 0 && value < length;
-}
+    var handlers,leafs=[];
 
-/**
- * Checks if the provided arguments are from an iteratee call.
- *
- * @private
- * @param {*} value The potential iteratee value argument.
- * @param {*} index The potential iteratee index or key argument.
- * @param {*} object The potential iteratee object argument.
- * @returns {boolean} Returns `true` if the arguments are from an iteratee call, else `false`.
- */
-function isIterateeCall(value, index, object) {
-  if (!isObject(object)) {
-    return false;
+    if(this.wildcard) {
+      var ns = typeof type === 'string' ? type.split(this.delimiter) : type.slice();
+      leafs = searchListenerTree.call(this, null, ns, this.listenerTree, 0);
+    }
+    else {
+      // does not use listeners(), so no side effect of creating _events[type]
+      if (!this._events[type]) return this;
+      handlers = this._events[type];
+      leafs.push({_listeners:handlers});
+    }
+
+    for (var iLeaf=0; iLeaf<leafs.length; iLeaf++) {
+      var leaf = leafs[iLeaf];
+      handlers = leaf._listeners;
+      if (isArray(handlers)) {
+
+        var position = -1;
+
+        for (var i = 0, length = handlers.length; i < length; i++) {
+          if (handlers[i] === listener ||
+            (handlers[i].listener && handlers[i].listener === listener) ||
+            (handlers[i]._origin && handlers[i]._origin === listener)) {
+            position = i;
+            break;
+          }
+        }
+
+        if (position < 0) {
+          continue;
+        }
+
+        if(this.wildcard) {
+          leaf._listeners.splice(position, 1);
+        }
+        else {
+          this._events[type].splice(position, 1);
+        }
+
+        if (handlers.length === 0) {
+          if(this.wildcard) {
+            delete leaf._listeners;
+          }
+          else {
+            delete this._events[type];
+          }
+        }
+        return this;
+      }
+      else if (handlers === listener ||
+        (handlers.listener && handlers.listener === listener) ||
+        (handlers._origin && handlers._origin === listener)) {
+        if(this.wildcard) {
+          delete leaf._listeners;
+        }
+        else {
+          delete this._events[type];
+        }
+      }
+    }
+
+    return this;
+  };
+
+  EventEmitter.prototype.offAny = function(fn) {
+    var i = 0, l = 0, fns;
+    if (fn && this._all && this._all.length > 0) {
+      fns = this._all;
+      for(i = 0, l = fns.length; i < l; i++) {
+        if(fn === fns[i]) {
+          fns.splice(i, 1);
+          return this;
+        }
+      }
+    } else {
+      this._all = [];
+    }
+    return this;
+  };
+
+  EventEmitter.prototype.removeListener = EventEmitter.prototype.off;
+
+  EventEmitter.prototype.removeAllListeners = function(type) {
+    if (arguments.length === 0) {
+      !this._events || init.call(this);
+      return this;
+    }
+
+    if(this.wildcard) {
+      var ns = typeof type === 'string' ? type.split(this.delimiter) : type.slice();
+      var leafs = searchListenerTree.call(this, null, ns, this.listenerTree, 0);
+
+      for (var iLeaf=0; iLeaf<leafs.length; iLeaf++) {
+        var leaf = leafs[iLeaf];
+        leaf._listeners = null;
+      }
+    }
+    else {
+      if (!this._events[type]) return this;
+      this._events[type] = null;
+    }
+    return this;
+  };
+
+  EventEmitter.prototype.listeners = function(type) {
+    if(this.wildcard) {
+      var handlers = [];
+      var ns = typeof type === 'string' ? type.split(this.delimiter) : type.slice();
+      searchListenerTree.call(this, handlers, ns, this.listenerTree, 0);
+      return handlers;
+    }
+
+    this._events || init.call(this);
+
+    if (!this._events[type]) this._events[type] = [];
+    if (!isArray(this._events[type])) {
+      this._events[type] = [this._events[type]];
+    }
+    return this._events[type];
+  };
+
+  EventEmitter.prototype.listenersAny = function() {
+
+    if(this._all) {
+      return this._all;
+    }
+    else {
+      return [];
+    }
+
+  };
+
+  if (typeof define === 'function' && define.amd) {
+     // AMD. Register as an anonymous module.
+    define(function() {
+      return EventEmitter;
+    });
+  } else if (typeof exports === 'object') {
+    // CommonJS
+    exports.EventEmitter2 = EventEmitter;
   }
-  var type = typeof index;
-  if (type == 'number'
-      ? (isArrayLike(object) && isIndex(index, object.length))
-      : (type == 'string' && index in object)) {
-    var other = object[index];
-    return value === value ? (value === other) : (other !== other);
+  else {
+    // Browser global.
+    window.EventEmitter2 = EventEmitter;
   }
-  return false;
-}
+}();
 
-/**
- * Checks if `value` is a valid array-like length.
- *
- * **Note:** This function is based on [`ToLength`](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-tolength).
- *
- * @private
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a valid length, else `false`.
- */
-function isLength(value) {
-  return typeof value == 'number' && value > -1 && value % 1 == 0 && value <= MAX_SAFE_INTEGER;
-}
-
-/**
- * Checks if `value` is the [language type](https://es5.github.io/#x8) of `Object`.
- * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
- *
- * @static
- * @memberOf _
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is an object, else `false`.
- * @example
- *
- * _.isObject({});
- * // => true
- *
- * _.isObject([1, 2, 3]);
- * // => true
- *
- * _.isObject(1);
- * // => false
- */
-function isObject(value) {
-  // Avoid a V8 JIT bug in Chrome 19-20.
-  // See https://code.google.com/p/v8/issues/detail?id=2291 for more details.
-  var type = typeof value;
-  return !!value && (type == 'object' || type == 'function');
-}
-
-module.exports = isIterateeCall;
-
-},{}],71:[function(require,module,exports){
-arguments[4][49][0].apply(exports,arguments)
-},{"dup":49}],72:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 module.exports = function (obj) {
     if (!obj || typeof obj !== 'object') return obj;
     
@@ -10568,7 +5195,7 @@ var isArray = Array.isArray || function (xs) {
     return {}.toString.call(xs) === '[object Array]';
 };
 
-},{}],73:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 (function() {
   'use strict';
 
@@ -10900,64 +5527,67 @@ var isArray = Array.isArray || function (xs) {
   self.fetch.polyfill = true
 })();
 
-},{}],74:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 'use strict'
 
 require('whatwg-fetch');
 var Q = require('Q');
-var EventEmitter = require('eventemitter3');
-var ObjectId = require('bson-objectid');
+var EventEmitter = require('eventemitter2').EventEmitter2;
 var copy = require('shallow-copy');
-var querystring = require('querystring');
-var _get = require('lodash.get');
-var _sortByOrder = require('lodash.sortByOrder');
-
-var localForage = require('localforage').createInstance({
-  name: 'formio',
-  version: 1.0,
-  storeName: 'formio',
-  description: 'The offline storage for formio data.'
-});
-
-// Prefix used with offline cache entries in localForage
-var OFFLINE_CACHE_PREFIX = 'formioCache-';
-var OFFLINE_SUBMISISON_CACHE_PREFIX = 'formioSubmissionCache-';
-var OFFLINE_QUEUE_KEY = 'formioOfflineQueue';
 
 module.exports = function(_baseUrl, _noalias, _domain) {
 // The default base url.
   var baseUrl = _baseUrl || '';
   var noalias = _noalias || false;
 
-  // Promise that resolves when ready to make requests
-  var ready = Q();
+  var plugins = [];
 
   // The temporary GET request cache storage
   var cache = {};
 
-  // The persistent offline cache storage
-  var offlineCache = {};
+  var noop = function(){};
+  var identity = function(value) { return value; };
 
-  // The queue of submissions made offline
-  var submissionQueue = [];
-  var loadSubmissionQueuePromise = localForage.getItem(OFFLINE_QUEUE_KEY)
-  .then(function(queue) {
-    submissionQueue = queue || [];
-  })
-  .catch(function(err) {
-    console.error('Failed to restore offline submission queue:', err);
-  });
-  ready = ready.thenResolve(loadSubmissionQueuePromise);
+  // Will invoke a function on all plugins.
+  // Returns a promise that resolves when all promises
+  // returned by the plugins have resolved.
+  // Should be used when you want plugins to prepare for an event
+  // but don't want any data returned.
+  var pluginWait = function(pluginFn) {
+    var args = [].slice.call(arguments, 1);
+    return Q.all(plugins.map(function(plugin) {
+      return (plugin[pluginFn] || noop).apply(plugin, args);
+    }));
+  };
 
-  // Flag indicating if submission queue is currently being processed
-  var dequeuing = false;
+  // Will invoke a function on plugins from highest priority
+  // to lowest until one returns a value. Returns null if no
+  // plugins return a value.
+  // Should be used when you want just one plugin to handle things.
+  var pluginGet = function(pluginFn) {
+    var args = [].slice.call(arguments, 0);
+    var callPlugin = function(index, pluginFn) {
+      var plugin = plugins[index];
+      if (!plugin) return Q(null);
+      return Q((plugin && plugin[pluginFn] || noop).apply(plugin, [].slice.call(arguments, 2)))
+      .then(function(result) {
+        if (result !== null && result !== undefined) return result;
+        return callPlugin.apply(null, [index + 1].concat(args));
+      });
+    };
+    return callPlugin.apply(null, [0].concat(args));
+  };
 
-  // Flag to queue submission requests
-  var queueSubmissions = false;
-
-  // Flag to force offline mode
-  var forcedOffline = false;
-
+  // Will invoke a function on plugins from highest priority to
+  // lowest, building a promise chain from their return values
+  // Should be used when all plugins need to process a promise's
+  // success or failure
+  var pluginAlter = function(pluginFn, value) {
+    var args = [].slice.call(arguments, 2);
+    return plugins.reduce(function(value, plugin) {
+        return (plugin[pluginFn] || identity).apply(plugin, [value].concat(args));
+    }, value);
+  };
 
 
   /**
@@ -10983,156 +5613,6 @@ module.exports = function(_baseUrl, _noalias, _domain) {
       }
     return str.join("&");
   };
-
-  /**
-   * Removes duplicate forms from offline cached project.
-   * Duplicates can occur if form is renamed (old and new
-   * stored under different names but have same id/path).
-   * NOTE: modifies the given object
-   *
-   * @param project Cached project
-   */
-  var removeCacheDuplicates = function(project) {
-    Object.keys(project.forms).forEach(function(name) {
-      var form = project.forms[name];
-      if (!form) { // form was deleted
-        return;
-      }
-      Object.keys(project.forms).forEach(function(otherName) {
-        var otherForm = project.forms[otherName];
-        if ((form._id === otherForm._id || form.path === otherForm.path) &&
-            new Date(otherForm.modified) < new Date(form.modified)) {
-            delete project.forms[otherName];
-        }
-      });
-    });
-  };
-
-  var savingPromise;
-
-  // Saves the submissionQueue to localForage
-  var saveQueue = function() {
-    if(savingPromise) {
-      // Already waiting to save
-      return savingPromise;
-    }
-    ready = ready.then(function() {
-      savingPromise = null;
-      return localForage.setItem(OFFLINE_QUEUE_KEY, submissionQueue);
-    })
-    .catch(function(err) {
-      console.err('Error persisting submission queue:', err);
-      // Swallow error so it doesn't halt the ready chain
-    });
-    savingPromise = ready;
-    return ready;
-  };
-
-  var saveOfflineSubmission = function(formId, submission) {
-    var formInfo = resolveFormId(formId);
-    formId = formInfo.path || formInfo._id;
-    console.log('saving submission', formId, submission._id);
-    if(!submission._id) {
-      debugger;
-    }
-    var offlineSubmission = copy(submission);
-    offlineSubmission.offline = true;
-    return localForage.setItem(
-      OFFLINE_SUBMISISON_CACHE_PREFIX + formId + '-' + submission._id,
-      offlineSubmission
-    ).catch(function(err) {
-      console.error('Failed to save offline submission:', err);
-      throw err;
-    });
-  };
-
-  // Finds and returns a submission from the offline data
-  var getOfflineSubmission = function(formId, submissionId) {
-    var formInfo = resolveFormId(formId);
-    // Try to load offline cached submission
-    return localForage.getItem(
-      OFFLINE_SUBMISISON_CACHE_PREFIX + formInfo.path + '-' + submissionId
-    ).then(function(submission) {
-      return submission || localForage.getItem(
-        OFFLINE_SUBMISISON_CACHE_PREFIX + formInfo._id + '-' + submissionId
-      );
-    })
-    .then(function(submission) {
-      // Go through the submission queue for any newer submissions
-      // TODO: handle PUT requests and modify the result with them
-      return submissionQueue.reduce(function(result, queuedRequest) {
-        if (queuedRequest.request.data._id === submissionId) {
-          return queuedRequest.request.data;
-        }
-        return result;
-      }, submission);
-    })
-    .catch(function(err) {
-      console.error('Failed to retrieve offline submission:', err);
-      throw err;
-    });
-  };
-
-  // A unique filter function to be used with Array.prototype.filter
-  var uniqueFilter = function(value, index, self) {
-    return self.indexOf(value) === index;
-  };
-
-  // Returns all queued submission id's for a given form
-  var getQueuedSubmissionIds = function(formId) {
-    var formInfo = resolveFormId(formId);
-    return submissionQueue.filter(function(queuedRequest) {
-      return queuedRequest.request.form === formInfo.path ||
-        queuedRequest.request.form === formInfo._id;
-    })
-    .map(function(queuedRequest) {
-      return queuedRequest.request.data._id;
-    })
-    .filter(uniqueFilter);
-  };
-
-  // Given a form _id or path, returns an object with both
-  // if available offline
-  var resolveFormId = function(formId) {
-    if (ObjectId.isValid(formId)) {
-      // formId is the form's _id
-      var result = {
-        _id: formId,
-        path: null
-      };
-      Object.keys(offlineCache).forEach(function(projectId) {
-        Object.keys(offlineCache[projectId].forms).forEach(function(formPath) {
-          var form = offlineCache[projectId].forms[formPath];
-          if (form._id === formId) {
-            result = {
-              _id: formId,
-              path: formPath
-            };
-          }
-        });
-      });
-
-      return result;
-    }
-    else {
-      // formId is the form's path
-      var result = {
-        _id: null,
-        path: formId
-      }
-      Object.keys(offlineCache).forEach(function(projectId) {
-        var form = offlineCache[projectId].forms[formId];
-        if (form) {
-          result = {
-            _id: form._id,
-            path: formId
-          };
-        }
-      });
-
-      return result;
-    }
-  }
 
   // The formio class.
   var Formio = function(path) {
@@ -11211,6 +5691,11 @@ module.exports = function(_baseUrl, _noalias, _domain) {
       };
 
       registerItems(['project', 'form', ['submission', 'action']], hostName);
+
+      if(!this.projectId) {
+        this.projectUrl = hostName;
+        this.projectId = (hostparts.length > 2) ? hostparts[2].split('.')[0] : '';
+      }
     }
     else {
 
@@ -11317,278 +5802,27 @@ module.exports = function(_baseUrl, _noalias, _domain) {
       opts = {};
     }
 
-    return ready // Wait until offline caching is finished
+    var requestArgs = {
+      formio: self,
+      type: type,
+      url: url,
+      method: method,
+      data: data,
+      opts: opts
+    };
+
+    var request = pluginWait('preRequest', requestArgs)
     .then(function() {
-      // If queuing is enabled, requests need to be queued regardless of if
-      // we're online or offline.
-      if (queueSubmissions && !opts.skipQueue && type === 'submission' && method === 'POST') {
-        // Push request to end of offline queue
-        var queuedRequest = {
-            request: {
-              type: type,
-              url: url,
-              method: method,
-              data: data,
-              form: self.formId,
-              formUrl: self.formUrl
-            }
-        };
-        // Set enumerable to false, IndexedDB doesn't like serializing
-        // Q Deferred objects.
-        Object.defineProperty(queuedRequest, 'deferred', {
-          enumerable: false,
-          value: Q.defer()
-        });
-
-        submissionQueue.push(queuedRequest);
-        saveQueue();
-        Formio.offline.emit('queue', queuedRequest.request);
-
-        // Start the submission queue
-        Formio.dequeueSubmissions();
-
-        return queuedRequest.deferred.promise;
-      }
-
-      if(Formio.isForcedOffline()) {
-        // Fake a network error so we go straight into offline logic
-        var err = new Error('Formio is forced into offline mode.');
-        err.networkError = true;
-        throw err;
-      }
-
-      return Formio.request(url, method, data);
-    })
-    .catch(function(err) {
-      if(!err.networkError) {
-        // A regular error, no offline logic needed
-        throw err;
-      }
-
-      // Try to get offline cached response if offline
-      var cache = offlineCache[self.projectId];
-
-      // Form GET
-      if (type === 'form' && method === 'GET') {
-        if (!cache || !cache.forms) {
-          throw err; // No cache available
+      return pluginGet('request', requestArgs)
+      .then(function(result) {
+        if (result === null || result === undefined) {
+          return Formio.request(url, method, data);
         }
-        // Find and return form
-        var form = Object.keys(cache.forms).reduce(function(result, name) {
-          if (result) return result;
-          var form = cache.forms[name];
-          if (form._id === self.formId || form.path === self.formId) return form;
-        }, null);
-
-        if(!form) {
-          err.message += ' (No offline cached data found)';
-          throw err;
-        }
-
-        return form;
-      }
-
-      // Form INDEX
-      if (type === 'forms' && method === 'GET') {
-        if (!cache || !cache.forms) {
-          throw err; // No cache available
-        }
-        return cache.forms;
-      }
-
-      // Submission GET
-      if (type === 'submission' && method === 'GET') {
-        return getOfflineSubmission(self.formId, self.submissionId)
-        .then(function(submission) {
-          if(!submission) {
-            throw err;
-          }
-          return submission;
-        });
-      }
-
-      // Submission INDEX
-      if (type === 'submissions' && method === 'GET') {
-        return localForage.keys()
-        .then(function(keys) {
-          keys = keys.concat(
-            getQueuedSubmissionIds(self.formId)
-            .map(function(submissionId) {
-              return OFFLINE_SUBMISISON_CACHE_PREFIX + self.formId + '-' + submissionId
-            })
-          ).filter(uniqueFilter);
-          var formInfo = resolveFormId(self.formId);
-
-          return Q.all(
-            keys.filter(function(key) {
-              return key.indexOf(OFFLINE_SUBMISISON_CACHE_PREFIX + formInfo.path) === 0 ||
-                key.indexOf(OFFLINE_SUBMISISON_CACHE_PREFIX + formInfo._id) === 0;
-            })
-            .map(function(key) {
-              var submissionId = key.split('-')[2];
-              return getOfflineSubmission(self.formId, submissionId);
-            })
-          ).then(function(submissions) {
-            var serverCount = submissions.length;
-            var qs = querystring.parse(url.split('?')[1] || '');
-
-            if (qs.sort) {
-              var sort = (qs.sort).split(/\s+/);
-              var order = [];
-              sort = sort.map(function(prop) {
-                if (prop.charAt(0) === '-') {
-                  order.push('desc');
-                  return prop.substring(1);
-                }
-                order.push('asc');
-                return prop;
-              });
-              submissions = _sortByOrder(submissions, sort, order);
-            }
-
-
-            Object.keys(qs).forEach(function(param) {
-              var value = qs[param];
-              var filter = param.split('__')[1];
-              var param = param.split('__')[0];
-              var filterFn = null;
-              switch(param) {
-                case 'sort':
-                case 'limit':
-                case 'skip':
-                case 'select': break; // Do nothing
-                default:
-                  switch(filter) {
-                    case undefined: filterFn = function(submission) {
-                        return _get(submission, param) == value;
-                      };
-                      break;
-                    case 'ne': filterFn = function(submission) {
-                        return _get(submission, param) != value;
-                      };
-                      break;
-                    case 'gt': filterFn = function(submission) {
-                        return _get(submission, param) > value;
-                      };
-                      break;
-                    case 'gte': filterFn = function(submission) {
-                        return _get(submission, param) >= value;
-                      };
-                      break;
-                    case 'lt': filterFn = function(submission) {
-                        return _get(submission, param) < value;
-                      };
-                      break;
-                    case 'lte': filterFn = function(submission) {
-                        return _get(submission, param) <= value;
-                      };
-                      break;
-                    case 'in': filterFn = function(submission) {
-                        return value.split(',').indexOf(_get(submission, param)) !== -1;
-                      };
-                      break;
-                    case 'regex': filterFn = function(submission) {
-                        var parts = value.match(/\/?([^/]+)\/?([^/]+)?/);
-                        var regex = new RegExp(parts[1], parts[2]);
-                        return _get(submission, param).match(regex);
-                      };
-                      break;
-                  }
-                  break;
-              }
-              if(filterFn) {
-                submissions = submissions.filter(filterFn);
-              }
-            });
-            var limit = Number(qs.limit) || 10;
-            var skip = Number(qs.skip) || 0;
-            if(skip !== 0 || limit < submissions.length) {
-              submissions = submissions.slice(skip, skip + limit);
-            }
-            submissions.limit = limit;
-            submissions.skip = skip;
-            submissions.serverCount = serverCount;
-
-            return submissions;
-          });
-        });
-      }
-
-      throw err; // No offline logic, just throw the error
-    })
-    .then(function(result) {
-      // Check if need to update cache after request
-      var cache = offlineCache[self.projectId];
-      if (!cache) return result; // Skip caching
-
-      if (type === 'form' && method !== 'DELETE' && !result.offline) {
-        if (new Date(cache.forms[result.name].modified) >= new Date(result.modified)) {
-          // Cache is up to date
-          return result;
-        }
-        var cachedResult = copy(result);
-        cachedResult.offline = true;
-        cache.forms[result.name] = cachedResult;
-      }
-      else if (type === 'form' && method === 'DELETE') {
-        delete cache.forms[result.name];
-      }
-      else if (type === 'forms' && method === 'GET') {
-        if (result.length && result[0].offline) {
-          return result; // skip caching because this is offline cached data
-        }
-        // Don't replace all forms, as some may be omitted due to permissions
-        result.forEach(function(form) {
-          var cachedForm = copy(form);
-          cachedForm.offline = true;
-          cache.forms[form.name] = cachedForm;
-        });
-      }
-      else if (type === 'submission' && method !== 'DELETE' && !result.offline) {
-        return saveOfflineSubmission(self.formId, result)
-        .then(function() {
-          return result;
-        });
-      }
-      else if (type === 'submission' && method === 'DELETE') {
-        var formInfo = resolveFormId(self.formId);
-        return Q.all([
-          localForage.removeItem(
-            OFFLINE_SUBMISISON_CACHE_PREFIX + formInfo.path + '-' + self.submissionId
-          ),
-          localForage.removeItem(
-            OFFLINE_SUBMISISON_CACHE_PREFIX + formInfo._id + '-' + self.submissionId
-          ),
-        ])
-        .catch(function(err) {
-          console.error('Failed to delete offline submission:', err);
-        })
-        .then(function() {
-          return result;
-        });
-      }
-      else if (type === 'submissions' && method === 'GET') {
-        if(result.length && result[0].offline) {
-          return result; // skip caching because this is offline cached data
-        }
-        return Q.all(result.map(saveOfflineSubmission.bind(null, self.formId)))
-        .thenResolve(result);
-      }
-      else {
-        // Nothing to cache
         return result;
-      }
-
-      // Update localForage
-      removeCacheDuplicates(cache); // Clean up duplicates
-      ready = ready.thenResolve(localForage.setItem(OFFLINE_CACHE_PREFIX + self.projectId, cache))
-      .catch(function(err) {
-        // Swallow error so it doesn't halt the ready chain
-        console.error(err);
       });
-
-      return result;
     });
+
+    return pluginAlter('wrapRequestPromise', request, requestArgs);
   };
 
   // Define specific CRUD methods.
@@ -11607,17 +5841,41 @@ module.exports = function(_baseUrl, _noalias, _domain) {
   Formio.prototype.saveAction = _save('action');
   Formio.prototype.deleteAction = _delete('action');
   Formio.prototype.loadActions = _index('actions');
-  Formio.prototype.availableActions = function() { return Formio.request(this.formUrl + '/actions'); };
-  Formio.prototype.actionInfo = function(name) { return Formio.request(this.formUrl + '/actions/' + name); };
+  Formio.prototype.availableActions = function() { return this.makeRequest('availableActions', this.formUrl + '/actions'); };
+  Formio.prototype.actionInfo = function(name) { return this.makeRequest('actionInfo', this.formUrl + '/actions/' + name); };
+
+  Formio.makeStaticRequest = function(url, method, data) {
+    var self = this;
+    method = (method || 'GET').toUpperCase();
+
+    var requestArgs = {
+      url: url,
+      method: method,
+      data: data
+    };
+
+    var request = pluginWait('preStaticRequest', requestArgs)
+    .then(function() {
+      return pluginGet('staticRequest', requestArgs)
+      .then(function(result) {
+        if (result === null || result === undefined) {
+          return Formio.request(url, method, data);
+        }
+        return result;
+      });
+    });
+
+    return pluginAlter('wrapStaticRequestPromise', request, requestArgs);
+  }
 
   // Static methods.
-  Formio.loadProjects = function() { return this.request(baseUrl + '/project'); };
+  Formio.loadProjects = function() { return this.makeStaticRequest(baseUrl + '/project'); };
   Formio.request = function(url, method, data) {
     if (!url) { return Q.reject('No url provided'); }
     method = (method || 'GET').toUpperCase();
     var cacheKey = btoa(url);
 
-    return ready.then(function() {
+    return Q().then(function() {
       // Get the cached promise to save multiple loads.
       if (method === 'GET' && cache.hasOwnProperty(cacheKey)) {
         return cache[cacheKey];
@@ -11662,11 +5920,12 @@ module.exports = function(_baseUrl, _noalias, _domain) {
             if (response.status === 204) {
               return {};
             }
-            return response.json()
+            return (response.headers.get('content-type').indexOf('application/json') !== -1 ?
+              response.json() : response.text())
             .then(function(result) {
               // Add some content-range metadata to the result here
               var range = response.headers.get('content-range');
-              if (range) {
+              if (range && typeof result === 'object') {
                 range = range.split('/');
                 if(range[0] !== '*') {
                   var skipLimit = range[0].split('-');
@@ -11704,7 +5963,15 @@ module.exports = function(_baseUrl, _noalias, _domain) {
         cache[cacheKey] = Q(result);
       }
 
-      return result;
+      // Shallow copy result so modifications don't end up in cache
+      if(Array.isArray(result)) {
+        var resultCopy = result.map(copy);
+        resultCopy.skip = result.skip;
+        resultCopy.limit = result.limit;
+        resultCopy.serverCount = result.serverCount;
+        return resultCopy;
+      }
+      return copy(result);
     });
   };
 
@@ -11748,7 +6015,7 @@ module.exports = function(_baseUrl, _noalias, _domain) {
     if (user) { return Q(user) }
     var token = this.getToken();
     if (!token) { return Q(null) }
-    return this.request(baseUrl + '/current')
+    return this.makeStaticRequest(baseUrl + '/current')
     .then(function(response) {
       Formio.setUser(response);
       return response;
@@ -11757,7 +6024,7 @@ module.exports = function(_baseUrl, _noalias, _domain) {
 
 // Keep track of their logout callback.
   Formio.logout = function() {
-    return this.request(baseUrl + '/logout').finally(function() {
+    return this.makeStaticRequest(baseUrl + '/logout').finally(function() {
       this.setToken(null);
       this.setUser(null);
       Formio.clearCache();
@@ -11805,262 +6072,36 @@ module.exports = function(_baseUrl, _noalias, _domain) {
    * EventEmitter for offline mode events.
    * See Node.js documentation for API documentation: https://nodejs.org/api/events.html
    */
-  Formio.offline = new EventEmitter();
+  Formio.events = new EventEmitter({
+    wildcard: false,
+    maxListeners: 0
+  });
 
   /**
-   * Sets up a project to be cached offline
-   * @param  url  The url to the project (same as you would pass to Formio constructor)
-   * @param  path Optional. Path to local project.json definition to get initial project forms from if offline.
-   * @return {[type]}      [description]
+   * Register a plugin with Formio.js
+   * @param plugin The plugin to register. See plugin documentation.
+   * @param name   Optional name to later retrieve plugin with.
    */
-  Formio.cacheOfflineProject = function(url, path) {
-    var formio = new Formio(url);
-    var projectId = formio.projectId;
-
-    var projectPromise = localForage.getItem(OFFLINE_CACHE_PREFIX + projectId)
-    .then(function(cached) {
-      if (cached) {
-        return cached;
-      }
-
-      // Otherwise grab offline project definition
-      else if (path) {
-        return fetch(path)
-        .then(function(response) {
-          return response.json();
-        })
-        .then(function(project) {
-          project.forms = project.forms || {};
-
-          // Move resources into forms collection, easier to manage that way
-          Object.keys(project.resources || {}).forEach(function(resourceName) {
-            project.forms[resourceName] = project.resources[resourceName];
-          });
-          delete project.resources;
-
-          Object.keys(project.forms).forEach(function(formName) {
-            // Set modified time as early as possible so any newer
-            // form will override this one if there's a name conflict.
-            project.forms[formName].created = new Date(0).toISOString();
-            project.forms[formName].modified = new Date(0).toISOString();
-            project.forms[formName].offline = true;
-          });
-          return project;
-        });
-      }
-
-      else {
-        // Return an empty project so requests start caching offline.
-        return { forms: {} };
-      }
-
+  Formio.registerPlugin = function(plugin, name) {
+    plugins.push(plugin);
+    plugins.sort(function(a, b) {
+      return (b.priority || 0) - (a.priority || 0);
     });
-
-    // Add this promise to the ready chain
-    ready = ready.thenResolve(projectPromise)
-    .then(function(project) {
-      offlineCache[projectId] = project;
-      return localForage.setItem(OFFLINE_CACHE_PREFIX + projectId, project);
-    })
-    .catch(function(err) {
-      console.error('Error trying to cache offline storage:', err);
-      // Swallow the error so failing caching doesn't halt the ready promise chain
-    });
-    return ready;
+    plugin.__name = name;
+    (plugin.init || noop).call(plugin, Formio);
   };
 
   /**
-   * Clears the offline cache. This will also stop previously
-   * cached projects from caching future requests for offline access.
+   * Returns the plugin registered with the given name.
    */
-  Formio.clearOfflineData = function() {
-    // Clear in-memory cache
-    offlineCache = {};
-    submissionQueue = [];
-    // Clear localForage cache
-    localForage.keys()
-    .then(function(keys) {
-      return Q.all(keys.map(function(key) {
-        if (key.indexOf(OFFLINE_CACHE_PREFIX) === 0 ||
-            key.indexOf(OFFLINE_SUBMISISON_CACHE_PREFIX) === 0) {
-          return localForage.removeItem(key);
-        }
-      }));
-    })
-    .then(function() {
-      return localForage.setItem(OFFLINE_QUEUE_KEY, []);
-    });
-
-  };
-
-  /**
-   * Forces Formio to go into offline mode.
-   * @param offline
-   */
-  Formio.forceOffline = function(offline) {
-    forcedOffline = offline;
-  };
-
-  /**
-   * @return true if Formio is in offline mode (forced or not),
-   *         false otherwise
-   */
-  Formio.isForcedOffline = function() {
-    return forcedOffline;
-  };
-
-  /**
-   * Sets whether form submission requests should
-   * be queued. If enabled, submissions are queued to run one
-   * after another. Failed submissions halt the queue, which
-   * can be restarted by calling Formio.dequeueSubmissions().
-   *
-   * If disabled (default), submission requests are sent immediately.
-   * @param queue
-   */
-  Formio.queueSubmissions = function(queue) {
-    queueSubmissions = queue;
-  };
-
-  /**
-   * Returns a promise that resolves with the number of
-   * submissions left in the submission queue.
-   */
-  Formio.submissionQueueLength = function() {
-    return submissionQueue.length;
-  };
-
-  /**
-   * Returns a promise that resolves with the next
-   * queued submission to be sent.
-   */
-  Formio.getNextQueuedSubmission = function() {
-    return submissionQueue[0].request;
-  };
-
-  /**
-   * Sets the next queued submission to be sent.
-   * Returns a promise that resolves when the next
-   * submission has been successfully set.
-   */
-  Formio.setNextQueuedSubmission = function(request) {
-    submissionQueue[0].request = request;
-    saveQueue();
-  };
-
-  /**
-   * Skips the next queued submission to be sent.
-   * Returns a promise when the submission has been
-   * successfully skipped.
-   */
-  Formio.skipNextQueuedSubmission = function() {
-    submissionQueue.shift();
-    saveQueue();
-  };
-
-  /**
-   * Attempts to send queued submission requests.
-   * Each request is sent one at a time. A request that
-   * fails will emit the `formError` event on Formio.offline,
-   * and stop dequeuing further requests
-   */
-  Formio.dequeueSubmissions = function() {
-    ready.then(function() {
-      if (dequeuing) {
-        return;
-      }
-
-      if (!submissionQueue.length) {
-        Formio.offline.emit('queueEmpty');
-        return;
-      }
-
-      var request = submissionQueue[0].request;
-      dequeuing = true;
-
-      var requestPromise;
-      if (Formio.isForcedOffline()) {
-        // Fake a network error so we go straight into offline logic
-        var err = new Error('Formio is forced into offline mode.');
-        err.networkError = true;
-        requestPromise = Q.reject(err);
-      }
-      else {
-        Formio.offline.emit('dequeue', request);
-        requestPromise = Q(Formio.request(request.url, request.method, request.data));
-      }
-
-
-      return requestPromise
-      .then(function(submission) {
-        // Remove request from queue
-        var queuedRequest = submissionQueue.shift();
-        saveQueue();
-        saveOfflineSubmission(queuedRequest.request.form, submission);
-        // Resolve promise if it hasn't already been resolved with a fake value
-        if(queuedRequest.deferred && queuedRequest.deferred.promise.inspect().state === 'pending') {
-          queuedRequest.deferred.resolve(submission);
-        }
-        else {
-          // Emit submission if promise isn't available to reject
-          Formio.offline.emit('formSubmission', submission);
-        }
-
-        // Continue to next queue item
-        dequeuing = false;
-        Formio.dequeueSubmissions();
-      })
-      .catch(function(err) {
-        // Stop dequeuing because we got a network error trying to request
-        dequeuing = null;
-
-        if (!err.networkError) {
-          var queuedRequest = submissionQueue[0];
-          if(queuedRequest.deferred && queuedRequest.deferred.promise.inspect().state === 'pending') {
-            // If we can reject the promise, no need to keep it in the queue
-            submissionQueue.shift();
-            saveQueue();
-            queuedRequest.deferred.reject(err);
-          }
-          else {
-            // Emit error if promise isn't available to reject
-            Formio.offline.emit('formError', err, request);
-          }
-        }
-
-        // Emit an event indicating that the request will be retried later
-        // if it hasn't already been removed from the queue
-        if (queuedRequest === submissionQueue[0]) {
-          Formio.offline.emit('requeue', request);
-        }
-
-        // Go through all queued requests and resolve with fake data so
-        // app can continue offline
-        submissionQueue.forEach(function(queuedRequest) {
-          if(queuedRequest.deferred && queuedRequest.deferred.promise.inspect().state === 'pending') {
-            var user = Formio.getUser();
-
-            queuedRequest.request.data = {
-              _id: ObjectId.generate(),
-              owner: user ? user._id : null,
-              offline: true,
-              form: queuedRequest.request.form,
-              data: queuedRequest.request.data.data,
-              created: new Date().toISOString(),
-              modified: new Date().toISOString(),
-              externalIds: [],
-              roles: []
-            };
-            queuedRequest.deferred.resolve(queuedRequest.request.data);
-          }
-        });
-        saveQueue();
-
-      });
-    });
+  Formio.getPlugin = function(name) {
+    return plugins.reduce(function(result, plugin) {
+      if (result) return result;
+      if (plugin.__name === name) return plugin;
+    }, null);
   };
 
   return Formio;
 };
 
-},{"Q":42,"bson-objectid":43,"eventemitter3":44,"localforage":45,"lodash.get":46,"lodash.sortByOrder":50,"querystring":4,"shallow-copy":72,"whatwg-fetch":73}]},{},[40]);
+},{"Q":39,"eventemitter2":40,"shallow-copy":41,"whatwg-fetch":42}]},{},[37]);

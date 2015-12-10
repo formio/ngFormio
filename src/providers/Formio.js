@@ -8,18 +8,8 @@ module.exports = function() {
 
     // Expose Formio configuration functions
     setBaseUrl: Formio.setBaseUrl,
-    cacheOfflineProject: Formio.cacheOfflineProject,
-    clearCache: Formio.clearCache,
-    clearOfflineData: Formio.clearOfflineData,
-    forceOffline: Formio.forceOffline,
-    isForcedOffline: Formio.isForcedOffline,
-    queueSubmissions: Formio.queueSubmissions,
-    offline: Formio.offline,
-    dequeueSubmissions: Formio.dequeueSubmissions,
-    submissionQueueLength: Formio.submissionQueueLength,
-    getNextQueuedSubmission: Formio.getNextQueuedSubmission,
-    setNextQueuedSubmission: Formio.setNextQueuedSubmission,
-    skipNextQueuedSubmission: Formio.skipNextQueuedSubmission,
+    registerPlugin: Formio.registerPlugin,
+    getPlugin: Formio.getPlugin,
     setDomain: function(dom) {
       // Remove this?
     },
@@ -32,10 +22,8 @@ module.exports = function() {
         $q
       ) {
 
-        // Wrap Formio.request's promises with $q so $apply gets called correctly.
-        var request = Formio.request;
-        Formio.request = function() {
-          return $q.when(request.apply(Formio, arguments))
+        var wrapQPromise = function(promise) {
+          return $q.when(promise)
           .catch(function(error) {
             if (error === 'Unauthorized') {
               $rootScope.$broadcast('formio.unauthorized', error);
@@ -48,22 +36,20 @@ module.exports = function() {
           });
         };
 
-        // Same with Formio.makeRequest.
-        var makeRequest = Formio.prototype.makeRequest;
-        Formio.prototype.makeRequest = function() {
-          return $q.when(makeRequest.apply(this, arguments));
-        };
+        Formio.registerPlugin({
+          priority: -100,
+          // Wrap Formio.request's promises with $q so $apply gets called correctly.
+          wrapRequestPromise: wrapQPromise,
+          wrapStaticRequestPromise: wrapQPromise
+        }, 'ngFormioPromiseWrapper');
 
         // Broadcast offline events from $rootScope
-        ['queue', 'dequeue', 'requeue', 'formSubmission', 'formError', 'queueEmpty']
-        .forEach(function(offlineEvent) {
-          Formio.offline.on(offlineEvent, function() {
-            var event = 'formio.offline.' + offlineEvent;
-            var args = [].splice.call(arguments, 0);
-            args = [event].concat(args);
-            $rootScope.$apply(function() {
-              $rootScope.$broadcast.apply($rootScope, args);
-            });
+        Formio.events.onAny(function() {
+          var event = 'formio.' + this.event;
+          var args = [].splice.call(arguments, 0);
+          args.unshift(event);
+          $rootScope.$apply(function() {
+            $rootScope.$broadcast.apply($rootScope, args);
           });
         });
 
