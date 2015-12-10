@@ -412,6 +412,30 @@ module.exports = function(app, template, hook) {
           });
       });
 
+      it('A Team member should be able to see projects related to the team when accessing /projects', function(done) {
+        request(app)
+          .get('/project')
+          .set('x-jwt-token', template.users.user1.token)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end(function(err, res) {
+            if (err) {
+              return done(err);
+            }
+
+            var response = res.body;
+            assert.equal(response instanceof Array, true);
+            assert.notEqual(response.length, 0);
+            assert.equal(response.length, 1);
+            assert.equal(response[0]._id, template.project._id);
+
+            // Store the JWT for future API calls.
+            template.users.user1.token = res.headers['x-jwt-token'];
+
+            done();
+          });
+      });
+
       it('A Team member should be able to access /team/:teamId/projects to see all the projects associated with this team', function(done) {
         request(app)
           .get('/team/' + template.team1._id + '/projects')

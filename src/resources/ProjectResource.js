@@ -46,6 +46,9 @@ module.exports = function(router, formioServer) {
   // Load the project analytics middleware.
   formio.middleware.projectAnalytics = require('../middleware/projectAnalytics')(formioServer);
 
+  // Load the project index filter middleware.
+  formio.middleware.projectIndexFilter = require('../middleware/projectIndexFilter')(formioServer);
+
   // Load the team owner filter for use.
   formio.middleware.projectAccessFilter = require('../middleware/projectAccessFilter')(formio);
 
@@ -110,7 +113,7 @@ module.exports = function(router, formioServer) {
     ],
     beforeIndex: [
       formio.middleware.filterMongooseExists({field: 'deleted', isNull: true}),
-      formio.middleware.ownerFilter
+      formio.middleware.projectIndexFilter
     ],
     afterIndex: [
       formio.middleware.filterResourcejsResponse(hiddenFields),
