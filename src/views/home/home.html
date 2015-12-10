@@ -14,11 +14,9 @@
         </ul>
       </div>
       <div class="col-sm-4" ng-repeat="project in projects">
-        <div class="project" ng-click="goToProject(project)" title="{{ project.title }}">
+        <div class="project well" ng-click="goToProject(project)" title="{{ project.title }}">
+          <span class="label project-plan-label" ng-class="getPlanLabel(project.plan)">{{ getPlanName(project.plan) | uppercase }}</span>
           <h4 class="project-title ellipsis"><a ui-sref="project.edit({projectId: project._id})">{{ project.title }}</a></h4>
-          <p class="project-plan"><small>
-            <span class="label" ng-class="getPlanLabel(project.plan)">{{ getPlanName(project.plan) | uppercase }}</span>
-          </small></p>
           <p class="project-url ellipsis" ui-sref="project.edit({projectId: project._id})"><strong>{{ project.name }}</strong>.form.io</p>
           <p class="project-description ellipsis">{{ project.description | characters: 50 }}&nbsp;</p>
           <p class="progress-label text-center"><small>Monthly API Calls</small></p>
@@ -26,11 +24,52 @@
             <div class="progress-bar" role="progressbar" ng-style="{width: project.apiCalls.used / project.apiCalls.limit * 100 + '%'}" ng-class="getProgressBarClass(project.apiCalls)"></div>
             <span><small>{{ project.apiCalls.used | number }} / {{ getAPICallsLimit(project.apiCalls) }}</small></span>
           </div>
-          <ul class="list-inline" style="z-index:1000;">
-            <li><a ui-sref="project.edit({projectId: project._id})" class="btn btn-default btn-sm">Manage</a></li>
-            <li><a ng-href="{{getPreviewURL(project)}}" target="_blank" ng-disabled="!project.settings.preview"class="btn btn-default btn-sm">Preview</a></li>
-            <li><a ui-sref="project.settings.plan({projectId: project._id})" class="btn btn-default btn-sm">Upgrade Plan</a></li>
-          </ul>
+          <div class="row" style="z-index:1000;">
+            <div class="col-sm-4 project-tile-button"><button ui-sref="project.edit({projectId: project._id})" class="btn btn-default btn-xs btn-block">Manage</button></div>
+            <div class="col-sm-4 project-tile-button"><button ng-href="{{getPreviewURL(project)}}" target="_blank" ng-disabled="!project.settings.preview"class="btn btn-default btn-xs btn-block"">Preview</button></div>
+            <div class="col-sm-4 project-tile-button"><button ui-sref="project.settings.plan({projectId: project._id})" class="btn btn-default btn-xs btn-block"">Upgrade Plan</button></div>
+          </div>
+          <div class="row project-teams">
+            <div class="col-sm-12">
+              <a ng-show="teamSupport(project)" ui-sref="project.settings.teams.add({projectId: project._id})" class="btn btn-default btn-sm project-add-team"><i class="fa fa-user-plus"></i></a>
+              <h4 class="text-center">Teams <i class="fa fa-users"></i></h4>
+              <div ng-show="!teamSupport(project)"><a ui-sref="project.settings.plan({projectId: project._id})">Upgrade Plan</a> to enable teams for this project.</div>
+              <div ng-show="teamSupport(project)"><span ui-sref="team.view({teamId: team._id})" ng-repeat="team in project.teams track by $index" class="label label-default ellipsis project-team-label">{{team.data.name}}</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row" ng-show="!teamsLoading && !(teamsEnabled || teamMember)">
+  <h2 class="text-center">Teams</h2>
+  <div class="col-sm-offset-2 col-vertical-center col-sm-8 teams">
+    <span class="team-upgrade">Want to work collaboratively? <a href="https://form.io/#pricing">Upgrade</a> a project to TeamPro to enable Team functionality.</span>
+  </div>
+</div>
+<div class="row" ng-show="!teamsLoading && (teamsEnabled || teamMember)">
+  <h2 class="text-center">Teams</h2>
+  <div class="col-sm-12 teams">
+    <div class="row">
+      <div class="col-sm-4" ng-show="teamsEnabled">
+        <a class="team-create" ui-sref="createTeam()">
+          <h4><p class="create-link"><span class="glyphicon glyphicon-plus circle"></span> Create Team</p></h4>
+        </a>
+      </div>
+      <div class="col-sm-4" ng-repeat="team in teams">
+        <div class="team well">
+          <h4 class="team-name ellipsis"><a ui-sref="team.edit({teamId: team._id})">{{ team.data.name }}</a></h4>
+          <p class="team-owner"><small>
+            <span class="label label-success">{{ team.owner === user._id ? 'OWNER' : 'MEMBER'}}</span>
+          </small></p>
+          <p class="ellipsis"><i class="fa fa-users"></i>&nbsp;<strong>{{ team.data.members.length || 0 }}</strong></p>
+          <div class="row">
+            <div class="col-sm-12">
+              <button class="btn btn-default btn-sm" ui-sref="team.view({teamId: team._id})">View</button>
+              <button class="btn btn-default btn-sm" ng-show="team.owner === user._id" ui-sref="team.edit({teamId: team._id})">Manage</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -38,13 +77,13 @@
 </div>
 <hr ng-if="projects.length != 0">
 <div class="row" ng-if="projects.length != 0">
-  <div class="col-md-4 col-vertical-center col-md-offset-1 col-sm-6">
+  <div class="col-md-4 col-vertical-center col-md-offset-1 col-sm-6 col-xs-6">
     <h3>Bootstrap an application</h3>
     <p>If you're comfortable with a terminal, you can use our <strong>command line utility</strong> to <strong>bootstrap</strong> a working application from a template.</p>
     <p><small>Note: You must have <a target="_blank" href="https://nodejs.org">Node.js</a> installed on your machine.</small></p>
     <p><small>Other applications can be found @ <a target="_blank" href="https://github.com/formio?query=formio-app-">https://github.com/formio</a></small></p>
   </div>
-  <div class="col-vertical-center col-md-5 col-sm-6">
+  <div class="col-vertical-center col-md-5 col-sm-6 col-xs-6">
   <pre>npm install -g formio-cli
 formio bootstrap formio/formio-app-todo</pre>
   </div>

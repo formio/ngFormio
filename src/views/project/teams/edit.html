@@ -1,0 +1,29 @@
+<div class="alert alert-warning" ng-show="!teamsLoading">
+  <i class="glyphicon glyphicon-exclamation-sign"></i>&nbsp;Teams are groups of Form.io users that work together on projects. Teams are available for <a href="https://www.form.io/pricing">TeamPro</a> users.
+</div>
+
+<form name="teamForm" ng-submit="saveTeam()" novalidate>
+  <div class="form-group">
+    <div class="row">
+      <div class="col-sm-6">
+        <select class="form-control" ng-model="addTeam._id" ng-required="true">
+          <option value="" ng-disabled="true">Team</option>
+          <option ng-repeat="team in uniqueEligibleTeams" name="{{team.data.name}}" value="{{team._id}}" ng-selected="addTeam._id === team._id">{{team.data.name}}</option>
+        </select>
+      </div>
+      <div class="col-sm-6">
+        <select class="form-control" ng-model="addTeam.permission" ng-required="true">
+          <option value="" ng-disabled="true">Permission</option>
+          <option value="team_read">Read</option>
+          <option value="team_write">Write</option>
+          <option value="team_admin">Admin</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div ng-show="currentProject.owner === user._id" class="text-right">
+    <a ui-sref="project.settings.teams.view" class="btn btn-default">Cancel</a>
+    <button type="submit" class="btn btn-success" ng-disabled="teamForm.$invalid">Save</button>
+  </div>
+</form>

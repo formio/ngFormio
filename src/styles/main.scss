@@ -324,7 +324,6 @@ pre code {
 }
 
 /***************************** Feedback *****************************/
-
 .feedback {
   position: fixed;
   right: 10px;
@@ -358,8 +357,6 @@ pre code {
 }
 
 /***************************** Auth Page *****************************/
-
-
 .login-container, .register-container {
   color: rgba(255, 255, 255, .935);
 
@@ -475,7 +472,6 @@ pre code {
 }
 
 /***************************** Footer *****************************/
-
 @font-face {
     font-family: 'HelveticaNeueLTStd-MdCn';
     src: url('//cdn2.hubspot.net/hubfs/1549875/Form_Site/fonts/HelveticaNeueLTStd-MdCn.eot?#iefix&t=1442590693060') format('embedded-opentype'),url('//cdn2.hubspot.net/hubfs/1549875/Form_Site/fonts/HelveticaNeueLTStd-MdCn.otf?t=1442590693060') format('opentype'),url('//cdn2.hubspot.net/hubfs/1549875/Form_Site/fonts/HelveticaNeueLTStd-MdCn.woff?t=1442590693060') format('woff'),url('//cdn2.hubspot.net/hubfs/1549875/Form_Site/fonts/HelveticaNeueLTStd-MdCn.ttf?t=1442590693060') format('truetype'),url('//cdn2.hubspot.net/hubfs/1549875/Form_Site/fonts/HelveticaNeueLTStd-MdCn.svg#HelveticaNeueLTStd-MdCn?t=1442590693060') format('svg');
@@ -568,20 +564,22 @@ footer {
   border-radius: 20px;
 }
 
-.projects {
+.projects,
+.teams {
   padding-top: 20px;
-  .project-create {
+  .project-create,
+  .team-create {
     display: block;
     text-decoration: none;
     background-color: transparentize($brand-primary, .75);
     border: 4px dashed transparentize($brand-primary, .75);
     color: transparentize($brand-primary, .25);
     text-align: center;
-    height: 270px;
+    height: 320px;
     margin-bottom: 30px;
     .create-link {
       display: block;
-      padding-top: 90px;
+      padding-top: 125px;
       .glyphicon {
         margin-top: 5px;
         background: transparentize($brand-primary, .25);
@@ -600,15 +598,13 @@ footer {
       background-color: lighten(transparentize($brand-primary, .75), 20%);
     }
   }
-  .project {
-    display: block;
-    position: relative;
+  .project,
+  .team,
+  .team-upgrade {
     text-decoration: none;
-    background-color: $gray-lighter;
-    border: 2px solid darken($gray-lighter, 10%);
     overflow: hidden;
     transition: .15s;
-    height: 270px;
+    height: 320px;
     &:hover {
       background-color: lighten($gray-lighter, 5%);
     }
@@ -617,19 +613,26 @@ footer {
     }
     color: $gray-light;
     margin-bottom: 30px;
-    padding: 10px 15px;
-    .project-title a {
+    .project-plan-label {
+      float: right;
+    }
+    .project-tile-button {
+      padding-left: 5px;
+      padding-right: 5px;
+    }
+    .project-title a,
+    .team-name a {
       font-weight: 600;
       color: $gray-light;
     }
-    .project-plan {
+    .project-plan,
+    .team-owner {
       margin-top: 9px;
     }
     .project-url {
       // Lighten this up a bit so it's easier to read
       color: lighten($brand-primary, 10%);
     }
-
     .progress-label {
       padding-top: 10px;
       margin-bottom: 0;
@@ -655,11 +658,64 @@ footer {
         text-align: center;
       }
     }
+    .project-teams {
+      margin-left: -19px;
+      margin-right: -19px;
+      margin-top: 10px;
+      background-color: $gray-lighter;
+      height: 90px;
+      .project-add-team {
+        position: absolute;
+        right: 0;
+        top: 0;
+        padding: 5px 8px;
+      }
+      .project-team-label {
+        color: white;
+        margin-right: 4px;
+        background-color: darken($brand-secondary, 6%);
+        display: inline-block;
+      }
+      .view-all {
+        cursor: pointer;
+        text-decoration: underline;
+      }
+    }
+  }
+  .project-help-panel {
+    margin-top: 92px;
   }
 }
 
-.project-help-panel {
-  margin-top: 92px;
+.teams {
+  .team-create {
+    height: 175px;
+    background-color: transparentize($brand-secondary, .75);
+    border: 4px dashed transparentize($brand-secondary, .75);
+    color: transparentize($brand-secondary, .25);
+    .create-link {
+      padding-top: 55px;
+      .glyphicon {
+        background: transparentize($brand-secondary, .25);
+      }
+    }
+    &:hover {
+      background-color: lighten(transparentize($brand-secondary, .75), 10%);
+    }
+    &:active {
+      background-color: lighten(transparentize($brand-secondary, .75), 20%);
+    }
+  }
+  .team-upgrade {
+    height: auto;
+  }
+  .team {
+    height: 175px;
+    .team-members {
+      // Lighten this up a bit so it's easier to read
+      color: saturate(lighten($brand-secondary, 10%), 20%);
+    }
+  }
 }
 
 .row.row-video {
@@ -731,11 +787,6 @@ footer {
   }
 }
 
-.label-community {
-  background-color: $brand-primary;
-  color: #FFF;
-}
-
 .label-commercial {
   background-color: #CD69C9;
   color: #FFF;
@@ -759,7 +810,6 @@ footer {
 }
 
 /***************************** Create Project *****************************/
-
 .template-card {
   margin-bottom: 10px;
   margin-top: 10px;
