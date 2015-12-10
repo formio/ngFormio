@@ -31,7 +31,7 @@
           </div>
           <div class="row project-teams">
             <div class="col-sm-12">
-              <a ng-show="teamSupport(project)" ui-sref="project.settings.teams.add({projectId: project._id})" class="btn btn-default btn-sm project-add-team"><i class="fa fa-user-plus"></i></a>
+              <a ng-show="teamSupport(project)" ui-sref="project.settings.teams.add({projectId: project._id})" class="btn btn-default btn-xs project-add-team"><i class="fa fa-user-plus"></i></a>
               <h4 class="text-center">Teams <i class="fa fa-users"></i></h4>
               <div ng-show="!teamSupport(project)"><a ui-sref="project.settings.plan({projectId: project._id})">Upgrade Plan</a> to enable teams for this project.</div>
               <div ng-show="teamSupport(project)"><span ui-sref="team.view({teamId: team._id})" ng-repeat="team in project.teams track by $index" class="label label-default ellipsis project-team-label">{{team.data.name}}</span></div>
