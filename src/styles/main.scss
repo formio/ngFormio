@@ -575,11 +575,11 @@ footer {
     border: 4px dashed transparentize($brand-primary, .75);
     color: transparentize($brand-primary, .25);
     text-align: center;
-    height: 350px;
+    height: 320px;
     margin-bottom: 30px;
     .create-link {
       display: block;
-      padding-top: 140px;
+      padding-top: 125px;
       .glyphicon {
         margin-top: 5px;
         background: transparentize($brand-primary, .25);
@@ -601,14 +601,10 @@ footer {
   .project,
   .team,
   .team-upgrade {
-    display: block;
-    position: relative;
     text-decoration: none;
-    background-color: $gray-lighter;
-    border: 2px solid darken($gray-lighter, 10%);
     overflow: hidden;
     transition: .15s;
-    height: 350px;
+    height: 320px;
     &:hover {
       background-color: lighten($gray-lighter, 5%);
     }
@@ -617,7 +613,13 @@ footer {
     }
     color: $gray-light;
     margin-bottom: 30px;
-    padding: 10px 15px;
+    .project-plan-label {
+      float: right;
+    }
+    .project-tile-button {
+      padding-left: 5px;
+      padding-right: 5px;
+    }
     .project-title a,
     .team-name a {
       font-weight: 600;
@@ -657,7 +659,23 @@ footer {
       }
     }
     .project-teams {
-      padding-top: 10px;
+      margin-left: -19px;
+      margin-right: -19px;
+      margin-top: 10px;
+      background-color: $gray-lighter;
+      height: 90px;
+      .project-add-team {
+        position: absolute;
+        right: 0;
+        top: 0;
+        padding: 5px 8px;
+      }
+      .project-team-label {
+        color: white;
+        margin-right: 4px;
+        background-color: darken($brand-secondary, 6%);
+        display: inline-block;
+      }
       .view-all {
         cursor: pointer;
         text-decoration: underline;

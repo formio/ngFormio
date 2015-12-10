@@ -320,6 +320,10 @@ angular
         }
       });
 
+      $scope.teamSupport = function(project) {
+        return (project.plan === 'team' || project.plan === 'commercial');
+      };
+
       $scope.projects = {};
       $scope.projectsLoading = true;
       // TODO: query for unlimited projects instead of this limit
@@ -336,7 +340,7 @@ angular
       // Inject the projects teams into the model if available
       $q.all([_teamsPromise, _projectsPromise]).then(function() {
         $scope.projects = _.map($scope.projects, function(project) {
-          project.teams = project.teams || [];
+          project.teams = [];
 
           // Build the projects teams list if present in the permissions.
           _.forEach(project.access, function(permission) {

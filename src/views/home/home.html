@@ -14,11 +14,9 @@
         </ul>
       </div>
       <div class="col-sm-4" ng-repeat="project in projects">
-        <div class="project" ng-click="goToProject(project)" title="{{ project.title }}">
+        <div class="project well" ng-click="goToProject(project)" title="{{ project.title }}">
+          <span class="label project-plan-label" ng-class="getPlanLabel(project.plan)">{{ getPlanName(project.plan) | uppercase }}</span>
           <h4 class="project-title ellipsis"><a ui-sref="project.edit({projectId: project._id})">{{ project.title }}</a></h4>
-          <p class="project-plan"><small>
-            <span class="label" ng-class="getPlanLabel(project.plan)">{{ getPlanName(project.plan) | uppercase }}</span>
-          </small></p>
           <p class="project-url ellipsis" ui-sref="project.edit({projectId: project._id})"><strong>{{ project.name }}</strong>.form.io</p>
           <p class="project-description ellipsis">{{ project.description | characters: 50 }}&nbsp;</p>
           <p class="progress-label text-center"><small>Monthly API Calls</small></p>
@@ -27,18 +25,16 @@
             <span><small>{{ project.apiCalls.used | number }} / {{ getAPICallsLimit(project.apiCalls) }}</small></span>
           </div>
           <div class="row" style="z-index:1000;">
-            <div class="col-sm-12">
-              <button ui-sref="project.edit({projectId: project._id})" class="btn btn-default btn-xs">Manage</button>
-              <button ng-href="{{getPreviewURL(project)}}" target="_blank" ng-disabled="!project.settings.preview"class="btn btn-default btn-xs">Preview</button>
-              <button ui-sref="project.settings.plan({projectId: project._id})" class="btn btn-default btn-xs">Upgrade Plan</button>
-            </div>
+            <div class="col-sm-4 project-tile-button"><button ui-sref="project.edit({projectId: project._id})" class="btn btn-default btn-xs btn-block">Manage</button></div>
+            <div class="col-sm-4 project-tile-button"><button ng-href="{{getPreviewURL(project)}}" target="_blank" ng-disabled="!project.settings.preview"class="btn btn-default btn-xs btn-block"">Preview</button></div>
+            <div class="col-sm-4 project-tile-button"><button ui-sref="project.settings.plan({projectId: project._id})" class="btn btn-default btn-xs btn-block"">Upgrade Plan</button></div>
           </div>
-          <div class="row project-teams" ng-show="!teamsLoading && (project.teams.length > 0)">
+          <div class="row project-teams">
             <div class="col-sm-12">
-              <small>
-                Teams: <a class="view-all ellipsis pull-right" ng-show="project.teams.length > 3" ui-sref="project.settings.teams.view({projectId: project._id})">View All</a>
-                <a class="ellipsis" ui-sref="team.view({teamId: team._id})" ng-repeat="team in project.teams | limitTo: 3"><br>{{team.data.name}}</a>
-              </small>
+              <a ng-show="teamSupport(project)" ui-sref="project.settings.teams.add({projectId: project._id})" class="btn btn-default btn-sm project-add-team"><i class="fa fa-user-plus"></i></a>
+              <h4 class="text-center">Teams <i class="fa fa-users"></i></h4>
+              <div ng-show="!teamSupport(project)"><a ui-sref="project.settings.plan({projectId: project._id})">Upgrade Plan</a> to enable teams for this project.</div>
+              <div ng-show="teamSupport(project)"><span ui-sref="team.view({teamId: team._id})" ng-repeat="team in project.teams track by $index" class="label label-default ellipsis project-team-label">{{team.data.name}}</span></div>
             </div>
           </div>
         </div>
@@ -62,7 +58,7 @@
         </a>
       </div>
       <div class="col-sm-4" ng-repeat="team in teams">
-        <div class="team">
+        <div class="team well">
           <h4 class="team-name ellipsis"><a ui-sref="team.edit({teamId: team._id})">{{ team.data.name }}</a></h4>
           <p class="team-owner"><small>
             <span class="label label-success">{{ team.owner === user._id ? 'OWNER' : 'MEMBER'}}</span>
