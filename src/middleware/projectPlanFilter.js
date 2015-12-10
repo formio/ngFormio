@@ -18,7 +18,7 @@ module.exports = function(formio) {
   /**
    * Helper function to filter name changes and force name assignment on creation.
    *
-   * Note: For community plans.
+   * Note: For basic plans.
    *
    * @param req
    */
@@ -34,7 +34,7 @@ module.exports = function(formio) {
   /**
    * Helper function to filter cors changes and force cors settings on creation.
    *
-   * Note: For community plans.
+   * Note: For basic plans.
    *
    * @param req
    */
@@ -57,10 +57,8 @@ module.exports = function(formio) {
       debug(plan);
       switch (plan.toString()) {
         case 'commercial':
-        case 'team3':
-        case 'team2':
-        case 'team1':
-        case 'basic':
+        case 'team':
+        case 'independent':
           // Ensure a name gets set if not sent.
           if (!req.body.hasOwnProperty('name')) {
             debug('No project name sent. Setting to random.');
@@ -68,7 +66,7 @@ module.exports = function(formio) {
           }
           return next();
           break;
-        case 'community':
+        case 'basic':
         default:
           debug(req.body);
 

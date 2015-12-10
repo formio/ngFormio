@@ -62,7 +62,10 @@ describe('Bootstrap', function() {
         formLogin: {
           _id: '553dbe603c605f841af5b3a5'
         },
-        resource: {
+        formTeam: {
+          _id: '55479ce7685637ab440a0765'
+        },
+        userResource: {
           _id: '553db94e72f702e714dd9779'
         }
       };
@@ -310,9 +313,85 @@ describe('Bootstrap', function() {
         storeDocument(app.formio.resources.form.model, 'formLogin', createRegisterForm);
       };
 
+      // Create the initial form for teams.
+      var createTeamResource = function() {
+        template.formio.teamResource = {
+          title: 'Team',
+          type: 'resource',
+          name: 'team',
+          path: 'team',
+          project: template.formio.project._id,
+          access: [
+            {type: 'read_all', roles: [template.formio.roleAuthenticated._id]}
+          ],
+          submissionAccess: [
+            {type: 'create_own', roles: [template.formio.roleAuthenticated._id]},
+            {type: 'read_own', roles: [template.formio.roleAuthenticated._id]},
+            {type: 'update_own', roles: [template.formio.roleAuthenticated._id]},
+            {type: 'delete_own', roles: [template.formio.roleAuthenticated._id]}
+          ],
+          components: [
+            {
+              lockKey: true,
+              type: 'textfield',
+              validate: {
+                customPrivate: false,
+                custom: '',
+                pattern: '',
+                maxLength: '',
+                minLength: '',
+                required: false
+              },
+              persistent: true,
+              unique: false,
+              protected: false,
+              defaultValue: '',
+              multiple: false,
+              suffix: '',
+              prefix: '',
+              placeholder: 'Enter the name for this team',
+              key: 'name',
+              label: 'Team Name',
+              inputMask: '',
+              inputType: 'text',
+              input: true
+            },
+            {
+              type: 'resource',
+              refreshDelay: 0,
+              refresh: false,
+              multiple: true,
+              searchFields: '',
+              searchExpression: '',
+              template: '<span>{{ item.data.name }}</span>',
+              resource: template.formio.userResource._id,
+              placeholder: 'Select the members on this team.',
+              key: 'members',
+              label: 'Members',
+              input: true
+            },
+            {
+              theme: 'primary',
+              disableOnInvalid: true,
+              action: 'submit',
+              block: false,
+              rightIcon: '',
+              leftIcon: '',
+              size: 'md',
+              key: 'submit',
+              label: 'Submit',
+              input: true,
+              type: 'button'
+            }
+          ]
+        };
+
+        storeDocument(app.formio.resources.form.model, 'teamResource', createLoginForm);
+      };
+
       // Create the initial resource to for users.
-      var createResource = function() {
-        template.formio.resource = {
+      var createUserResource = function() {
+        template.formio.userResource = {
           title: 'Users',
           name: 'user',
           path: 'user',
@@ -378,7 +457,7 @@ describe('Bootstrap', function() {
           ]
         };
 
-        storeDocument(app.formio.resources.form.model, 'resource', createLoginForm);
+        storeDocument(app.formio.resources.form.model, 'userResource', createTeamResource);
       };
 
       // Set the default Project access.
@@ -402,7 +481,7 @@ describe('Bootstrap', function() {
             template.formio.project.defaultAccess = template.formio.roleAnonymous._id;
 
             // Call next callback.
-            createResource();
+            createUserResource();
           });
         });
 
@@ -510,7 +589,7 @@ describe('Bootstrap', function() {
           assert.equal(response.data.email, template.formio.owner.data.email);
           assert(!response.data.hasOwnProperty('password'), 'The submission `data` should not contain the `password`.');
           assert(response.hasOwnProperty('form'), 'The response should contain the resource `form`.');
-          assert.equal(response.form, template.formio.resource._id);
+          assert.equal(response.form, template.formio.userResource._id);
           assert(res.headers.hasOwnProperty('x-jwt-token'), 'The response should contain a `x-jwt-token` header.');
 
           // Update our testProject.owners data.
@@ -553,7 +632,7 @@ describe('Bootstrap', function() {
           assert(!response.hasOwnProperty('password'), 'The submission `data` should not contain the `password`.');
           assert(!response.data.hasOwnProperty('password'), 'The submission `data` should not contain the `password`.');
           assert(response.hasOwnProperty('form'), 'The response should contain the resource `form`.');
-          assert.equal(response.form, template.formio.resource._id);
+          assert.equal(response.form, template.formio.userResource._id);
           assert(res.headers.hasOwnProperty('x-jwt-token'), 'The response should contain a `x-jwt-token` header.');
 
           // Update our testProject.owners data.
@@ -596,6 +675,7 @@ describe('Bootstrap', function() {
         require(path.join(_test, 'actions'))(app, template, formioHook);
         require(path.join(_test, 'submission'))(app, template, formioHook);
         require('./analytics')(app, template, formioHook);
+        require('./teams')(app, template, formioHook);
       });
 
       describe('Formio-Server tests that depend on Formio tests', function() {
