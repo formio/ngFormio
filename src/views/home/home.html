@@ -18,7 +18,7 @@
           <span class="label project-plan-label" ng-class="getPlanLabel(project.plan)">{{ getPlanName(project.plan) | uppercase }}</span>
           <h4 class="project-title ellipsis"><a ui-sref="project.edit({projectId: project._id})">{{ project.title }}</a></h4>
           <p class="project-url ellipsis" ui-sref="project.edit({projectId: project._id})"><strong>{{ project.name }}</strong>.form.io</p>
-          <p class="project-description ellipsis">{{ project.description | characters: 50 }}&nbsp;</p>
+          <p class="project-description ellipsis">{{ project.description | characters: 50 }}&nbsp;</p><hr/>
           <p class="progress-label text-center"><small>Monthly API Calls</small></p>
           <div class="progress">
             <div class="progress-bar" role="progressbar" ng-style="{width: project.apiCalls.used / project.apiCalls.limit * 100 + '%'}" ng-class="getProgressBarClass(project.apiCalls)"></div>

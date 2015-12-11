@@ -623,6 +623,9 @@ footer {
     .project-teams-header {
       margin-top: 5px;
     }
+    .project-title {
+      margin-top: 0;
+    }
     .project-title a,
     .team-name a {
       font-weight: 600;
@@ -637,7 +640,6 @@ footer {
       color: lighten($brand-primary, 10%);
     }
     .progress-label {
-      padding-top: 10px;
       margin-bottom: 0;
     }
     .list-inline {
@@ -664,9 +666,9 @@ footer {
     .project-teams {
       margin-left: -19px;
       margin-right: -19px;
-      margin-top:26px;
+      margin-top:10px;
       background-color: $gray-lighter;
-      height: 75px;
+      height: 80px;
       .project-add-team {
         position: absolute;
         right: 0;
