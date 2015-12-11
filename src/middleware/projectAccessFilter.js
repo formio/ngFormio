@@ -79,7 +79,7 @@ module.exports = function(formio) {
 
         // Only proceed with teams access check if the project plan supports teams.
         project.plan = project.plan || '';
-        if (!_.startsWith(project.plan, 'team')) {
+        if (!(project.plan === 'team' || project.plan === 'commercial')) {
           debug('Skipping team access check, plan: ' + project.plan);
           filterAccess();
           return next();
