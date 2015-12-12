@@ -50,14 +50,23 @@ SparkCollection.prototype.connect = function(redis) {
  * @returns {*}
  */
 SparkCollection.prototype.get = function(key) {
+  var deferred = Q.defer();
   if (this.redis) {
-    return Q.ninvoke(this.redis, 'get', 'spark:' + key);
+    var promise = Q.ninvoke(this.redis, 'get', 'spark:' + key);
+    if (promise) {
+      return promise;
+    }
+    else {
+      deferred.reject('Could not find spark.');
+    }
   }
   else if (this.sparks.hasOwnProperty(key)) {
-    var deferred = Q.defer();
-    deferred.resolve(his.sparks[key]);
-    return deferred.promise;
+    deferred.resolve(this.sparks[key]);
   }
+  else {
+    deferred.reject('No spark found.');
+  }
+  return deferred.promise;
 };
 
 /**

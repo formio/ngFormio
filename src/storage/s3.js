@@ -10,6 +10,9 @@ module.exports = function(router) {
       if(!req.projectId && req.params.projectId) {
         req.projectId = req.params.projectId;
       }
+      if (!req.formId && req.params.formId) {
+        req.formId = req.params.formId;
+      }
       next();
     },
     router.formio.formio.middleware.permissionHandler,
@@ -41,6 +44,9 @@ module.exports = function(router) {
     function(req, res, next) {
       if(!req.projectId && req.params.projectId) {
         req.projectId = req.params.projectId;
+      }
+      if (!req.formId && req.params.formId) {
+        req.formId = req.params.formId;
       }
       next();
     },

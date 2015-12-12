@@ -277,6 +277,19 @@ module.exports = function(app, formioServer) {
         }
         // Has project.
         else {
+          var url = req.url.split('/');
+
+          // Use submission permissions for access to file signing endpoints.
+          if (url[5] === 'storage' && url[6] === 's3') {
+            _debug('Checking s3 signing access');
+            var _access = formioServer.formio.access.hasAccess(req, access, {
+              type: 'submission',
+              id: req.submissionId
+            });
+            _debug(_access);
+            return _access;
+          }
+
           _debug('Checking Project Access.');
           _debug('URL: ' + _url);
           var _access = formioServer.formio.access.hasAccess(req, access, {

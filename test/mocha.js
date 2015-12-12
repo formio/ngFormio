@@ -573,7 +573,7 @@ describe('Bootstrap', function() {
     describe('Final Tests', function() {
       describe('Formio-Server', function() {
         require('./project')(app, template, hook);
-        require('./websockets')(app, template, hook);
+        //require('./websockets')(app, template, hook);
       });
 
       var originalSettingsHook;
@@ -605,7 +605,8 @@ describe('Bootstrap', function() {
           app.formio.hooks.settings = originalSettingsHook;
         });
         require('./misc')(app, template, hook);
-        require('./oauth')(app, template, hook);
+        //require('./oauth')(app, template, hook);
+        require('./s3')(app, template, hook);
       });
     });
   });
