@@ -43,10 +43,10 @@ test:
   post:
     - redis-server &> $CIRCLE_ARTIFACTS/docker-redis.log:
           background: true
-    - docker run -d -e "MONGO1=$MONGO" -e "PROTOCOL=http" -e "DOMAIN=localhost" -e "PORT=3000" -e "DEBUG=formio:*,formio:*:*" -e "PROJECT_PLAN=community" --name formio-server --net=host $IMAGE_PATH:$SHORT_SHA
-    - sleep 10
+    - docker run -d -e "MONGO1=$MONGO" -e "PROTOCOL=http" -e "DOMAIN=localhost" -e "PORT=3000" -e "DEBUG=formio:*,formio:*:*" -e "PROJECT_PLAN=basic" --name formio-server --net=host $IMAGE_PATH:$SHORT_SHA
+    - sleep 5
     - docker logs formio-server
-    - curl --retry 10 --retry-delay 5 -v http://api.localhost:3000/health
+    - wget --tries=10 --retry-connrefused --wait=6 -v http://api.localhost:3000/health
     - npm run-script docker
     - docker logs formio-server &> $CIRCLE_ARTIFACTS/docker-formio-server.log
 

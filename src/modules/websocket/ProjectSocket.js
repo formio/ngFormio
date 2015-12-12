@@ -66,6 +66,15 @@ module.exports = function(formio) {
         if (data.type === 'response' && data.id) {
           this.handleResponse(data);
         }
+
+        // End an existing spark.
+        if (data.type === 'remove') {
+          var currentSpark = this.primus.spark(data.connection.sparkId);
+          if (currentSpark) {
+            currentSpark.end();
+            this.sparks.del(data.projectId);
+          }
+        }
       }.bind(this));
 
       // Trigger when a new connection is made.
@@ -79,8 +88,22 @@ module.exports = function(formio) {
           // Close existing connections open for this project.
           if (connection) {
             connection = JSON.parse(connection);
-            this.primus.spark(connection.sparkId).end();
-            this.sparks.del(projectId);
+            var currentSpark = this.primus.spark(connection.sparkId);
+            if (currentSpark) {
+              currentSpark.end();
+              this.sparks.del(projectId);
+            }
+            else {
+              this.forward(connection, {
+                type: 'remove',
+                connection: connection,
+                projectId: projectId
+              }, function(err) {
+                if (err) {
+                  this.sparks.del(projectId);
+                }
+              }.bind(this));
+            }
           }
 
           // Remove the spark if it ends.

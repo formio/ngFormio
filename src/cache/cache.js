@@ -54,7 +54,7 @@ module.exports = function(formio) {
      * @param id
      * @param cb
      */
-    loadProject: function (req, id, cb) {
+    loadProject: function(req, id, cb) {
       var cache = formio.cache.cache(req);
       if (cache.projects[id]) {
         return cb(null, cache.projects[id]);
