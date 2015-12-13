@@ -30,11 +30,11 @@
             <div class="col-sm-4 project-tile-button"><button ui-sref="project.settings.plan({projectId: project._id})" class="btn btn-default btn-xs btn-block"">Upgrade Plan</button></div>
           </div>
           <div class="row project-teams">
-            <div class="col-sm-12">
-              <a ng-show="teamSupport(project)" ui-sref="project.settings.teams.add({projectId: project._id})" class="btn btn-primary btn-xs project-add-team"><i class="fa fa-user-plus"></i></a>
-              <h5 class="text-center project-teams-header">Teams <i class="fa fa-users"></i></h5>
-              <div ng-show="!teamSupport(project)"><a ui-sref="project.settings.plan({projectId: project._id})">Upgrade Plan</a> to enable teams for this project.</div>
-              <div ng-show="teamSupport(project)"><span ui-sref="team.view({teamId: team._id})" ng-repeat="team in project.teams track by $index" ng-if="team.data.name" class="label label-default ellipsis project-team-label">{{team.data.name}}</span></div>
+            <h5 class="text-center project-teams-header">Teams <i class="fa fa-users"></i></h5><hr />
+            <div ng-show="!teamSupport(project)" class="project-team-upgrade"><a ui-sref="project.settings.plan({projectId: project._id})">Upgrade Plan</a> to enable teams for this project.</div>
+            <div ng-show="teamSupport(project)">
+              <span ui-sref="team.view({teamId: team._id})" ng-repeat="team in project.teams track by $index" ng-if="team.data.name" class="label label-default ellipsis project-team-label">{{team.data.name}}</span>
+              <a ng-show="teamSupport(project)" ui-sref="project.settings.teams.add({projectId: project._id})"><span class="label label-default ellipsis project-add-team"><i class="fa fa-user-plus"></i> Add Team</span></a>
             </div>
           </div>
         </div>

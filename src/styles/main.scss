@@ -601,6 +601,7 @@ footer {
   .project,
   .team,
   .team-upgrade {
+    position: relative;
     text-decoration: none;
     overflow: hidden;
     transition: .15s;
@@ -622,6 +623,7 @@ footer {
     }
     .project-teams-header {
       margin-top: 5px;
+      margin-bottom: 5px;
     }
     .project-title {
       margin-top: 0;
@@ -636,8 +638,7 @@ footer {
       margin-top: 9px;
     }
     .project-url {
-      // Lighten this up a bit so it's easier to read
-      color: lighten($brand-primary, 10%);
+      color: $brand-primary;
     }
     .progress-label {
       margin-bottom: 0;
@@ -664,23 +665,28 @@ footer {
       }
     }
     .project-teams {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
       margin-left: -19px;
       margin-right: -19px;
-      margin-top:10px;
+      padding: 0 4px;
       background-color: $gray-lighter;
-      height: 80px;
-      .project-add-team {
-        position: absolute;
-        right: 0;
-        top: 0;
-        padding: 2px 4px;
-        font-size: 0.8em;
+      hr {
+        margin: 4px 0 4px 0;
       }
-      .project-team-label {
+      .project-team-upgrade {
+        text-align: center;
+      }
+      .project-team-label, .project-add-team {
         color: white;
         margin-right: 4px;
         background-color: darken($brand-secondary, 6%);
         display: inline-block;
+        padding: 4px 6px;
+      }
+      .project-add-team {
+        background-color: $brand-primary;
       }
       .view-all {
         cursor: pointer;
