@@ -1,5 +1,6 @@
 var CryptoJS = require('crypto-js');
 var AWS = require('aws-sdk');
+var debug = require('debug')('formio:storage:s3');
 
 module.exports = function(router) {
   var cache = require('../cache/cache')(router.formio.formio);
@@ -7,6 +8,7 @@ module.exports = function(router) {
   router.get('/project/:projectId/form/:formId/storage/s3',
     router.formio.formio.middleware.tokenHandler,
     function(req, res, next) {
+      debug('Setting project and form ids for get');
       if(!req.projectId && req.params.projectId) {
         req.projectId = req.params.projectId;
       }
@@ -17,7 +19,9 @@ module.exports = function(router) {
     },
     router.formio.formio.middleware.permissionHandler,
     function(req, res) {
+      debug('Signing GET request');
       cache.loadProject(req, req.projectId, function(err, project) {
+        debug('Project Loaded: ' + req.projectId);
         if (!project.settings.storage || !project.settings.storage.s3) {
           return res.status(400).send('Storage settings not set.');
         }
@@ -33,6 +37,7 @@ module.exports = function(router) {
           if (err) {
             return res.status(400).send(err);
           }
+          debug(url);
           res.send(url);
         });
       });
@@ -42,6 +47,7 @@ module.exports = function(router) {
   router.post('/project/:projectId/form/:formId/storage/s3',
     router.formio.formio.middleware.tokenHandler,
     function(req, res, next) {
+      debug('Setting project and form ids for post');
       if(!req.projectId && req.params.projectId) {
         req.projectId = req.params.projectId;
       }
@@ -52,7 +58,9 @@ module.exports = function(router) {
     },
     router.formio.formio.middleware.permissionHandler,
     function(req, res) {
+      debug('Signing POST request');
       cache.loadProject(req, req.projectId, function(err, project) {
+        debug('Project Loaded: ' + req.projectId);
         if (!project.settings.storage || !project.settings.storage.s3) {
           return res.status(400).send('Storage settings not set.');
         }
@@ -85,6 +93,7 @@ module.exports = function(router) {
           }
         };
         response.data.signature = CryptoJS.HmacSHA1(response.data.policy, project.settings.storage.s3.AWSSecretKey).toString(CryptoJS.enc.Base64);
+        debug(response);
         return res.send(response);
       });
     }

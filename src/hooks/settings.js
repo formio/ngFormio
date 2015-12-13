@@ -469,6 +469,14 @@ module.exports = function(app) {
           }
         }
 
+        var url = req.url.split('/');
+        if (url[5] === 'storage' && url[6] === 's3') {
+          entity = {
+            type: 'submission',
+            id: ''
+          }
+        }
+
         return entity;
       },
 

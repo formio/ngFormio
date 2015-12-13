@@ -2,6 +2,8 @@
 
 var request = require('supertest');
 var assert = require('assert');
+var CryptoJS = require('crypto-js');
+var AWS = require('aws-sdk');
 
 module.exports = function(app, template, hook) {
   describe('S3 setup', function() {
@@ -183,7 +185,6 @@ module.exports = function(app, template, hook) {
         .expect(200)
         .expect('Content-Type', /json/)
         .end(function(err, res) {
-          console.log(res.body);
           if (err) {
             return done(err);
           }
@@ -211,12 +212,13 @@ module.exports = function(app, template, hook) {
           }
 
           // Policy signatures are time sensitive so we have to match the time or the signatures won't work.
-          var serverPolicy = JSON.parse(btoa(res.body.data.policy));
+          var serverPolicy = JSON.parse(new Buffer(res.body.data.policy, 'base64').toString('binary'));
           policy.expiration = serverPolicy.expiration;
 
           var policyBase64 = new Buffer(JSON.stringify(policy)).toString('base64');
 
           assert.equal(res.body.data.policy, policyBase64);
+          assert.equal(res.body.data.signature, CryptoJS.HmacSHA1(policyBase64, template.project.settings.storage.s3.AWSSecretKey).toString(CryptoJS.enc.Base64));
 
           template.users.tempUser.token = res.headers['x-jwt-token'];
 
@@ -224,7 +226,39 @@ module.exports = function(app, template, hook) {
         });
     });
 
-    it('Does not allows access to s3 signing POSTs for users with without permission', function(done) {
+    it('Allows access to s3 signing GETs for users with permission', function(done) {
+      var file = {
+        key: 'upload/myfile.doc',
+        bucket: 'testbucket'
+      };
+      request(app)
+        .get('/project/' + template.project._id + '/form/' + template.forms.uploadForm._id + '/storage/s3')
+        .set('x-jwt-token', template.users.tempUser.token)
+        .send(file)
+        .expect(200)
+        .expect('Content-Type', /text\/html/)
+        .end(function (err, res) {
+          if (err) {
+            return done(err);
+          }
+          var s3 = new AWS.S3({
+            accessKeyId: template.project.settings.storage.s3.AWSAccessKeyId,
+            secretAccessKey: template.project.settings.storage.s3.AWSSecretKey
+          });
+          s3.getSignedUrl('getObject', {
+            Bucket: file.bucket,
+            Key: file.key
+          }, function(err, url) {
+            if (err) {
+              done(err);
+            }
+            assert.equal(res.text, url);
+            done();
+          });
+        });
+    });
+
+    it('Does not allows access to s3 signing POSTs for users without permission', function(done) {
       var file = {
         name: 'myfile.doc',
         type: 'application/document',
@@ -232,6 +266,23 @@ module.exports = function(app, template, hook) {
       };
       request(app)
         .post('/project/' + template.project._id + '/form/' + template.forms.uploadForm._id + '/storage/s3')
+        .send(file)
+        .expect(401)
+        .end(function(err, res) {
+          if (err) {
+            return done(err);
+          }
+          done();
+        });
+    });
+
+    it('Does not allows access to s3 signing GETs for users without permission', function(done) {
+      var file = {
+        bucket: 'application/document',
+        key: 'upload/myfile.doc'
+      };
+      request(app)
+        .get('/project/' + template.project._id + '/form/' + template.forms.uploadForm._id + '/storage/s3')
         .send(file)
         .expect(401)
         .end(function(err, res) {
