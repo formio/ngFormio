@@ -42,6 +42,9 @@ module.exports = function (app) {
       };
 
       // This fixes new fields having an empty space in the array.
+      if ($scope.data[$scope.component.key] === '') {
+        $scope.data[$scope.component.key] = [];
+      }
       if ($scope.data && $scope.data[$scope.component.key][0] === '') {
         $scope.data[$scope.component.key].splice(0, 1);
       }
@@ -54,9 +57,9 @@ module.exports = function (app) {
         // If this is not a public file, get a signed url and open in new tab.
         if (file.acl !== 'public-read') {
           evt.preventDefault();
-          Formio.request($scope.formio.formUrl + '/storage/s3', 'POST', { type: 'get', file: file})
+          Formio.request($scope.formio.formUrl + '/storage/s3?bucket=' + file.bucket + '&key=' + file.key, 'GET')
             .then(function(response) {
-              $window.open(response, '_blank');
+              $window.open(response.url, '_blank');
             })
             .catch(function(response) {
               // Is alert the best way to do this? User is expecting an immediate notification due to attempting to download a file.
@@ -76,13 +79,13 @@ module.exports = function (app) {
                   status: 'info',
                   message: 'Starting upload'
                 };
-                Formio.request($scope.formio.formUrl + '/storage/s3', 'POST', { type: 'put', file: {name: file.name, size: file.size, type: file.type}})
+                Formio.request($scope.formio.formUrl + '/storage/s3', 'POST', {name: file.name, size: file.size, type: file.type})
                   .then(function(response) {
                     var request = {
                       url: response.url,
                       method: 'POST',
                       data: response.data
-                    }
+                    };
                     request.data.file = file;
                     request.data.key += $scope.component.dir + file.name;
                     var upload = Upload.upload(request);
