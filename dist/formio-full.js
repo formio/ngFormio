@@ -47587,7 +47587,7 @@ module.exports = function(_baseUrl, _noalias, _domain) {
         str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
       }
     return str.join("&");
-  }
+  };
 
   // The formio class.
   var Formio = function(path) {
@@ -47654,13 +47654,15 @@ module.exports = function(_baseUrl, _noalias, _domain) {
       // Register an array of items.
       var registerItems = function(items, base, staticBase) {
         for (var i in items) {
-          var item = items[i];
-          if (item instanceof Array) {
-            registerItems(item, base, true);
-          }
-          else {
-            var newBase = registerPath(item, base);
-            base = staticBase ? base : newBase;
+          if (items.hasOwnProperty(i)) {
+            var item = items[i];
+            if (item instanceof Array) {
+              registerItems(item, base, true);
+            }
+            else {
+              var newBase = registerPath(item, base);
+              base = staticBase ? base : newBase;
+            }
           }
         }
       };
@@ -47682,11 +47684,13 @@ module.exports = function(_baseUrl, _noalias, _domain) {
       this.formId = path.replace(/^\/+|\/+$/g, '');
       var items = ['submission', 'action'];
       for (var i in items) {
-        var item = items[i];
-        this[item + 'sUrl'] = hostName + path + '/' + item;
-        if ((this.pathType === item) && (subs.length > 2) && subs[2]) {
-          this[item + 'Id'] = subs[2].replace(/^\/+|\/+$/g, '');
-          this[item + 'Url'] = hostName + path + subs[0];
+        if (items.hasOwnProperty(i)) {
+          var item = items[i];
+          this[item + 'sUrl'] = hostName + path + '/' + item;
+          if ((this.pathType === item) && (subs.length > 2) && subs[2]) {
+            this[item + 'Id'] = subs[2].replace(/^\/+|\/+$/g, '');
+            this[item + 'Url'] = hostName + path + subs[0];
+          }
         }
       }
     }
@@ -47704,10 +47708,16 @@ module.exports = function(_baseUrl, _noalias, _domain) {
     var _url = type + 'Url';
     return function(query) {
       if (typeof query === 'object') {
-        query = '?' + serialize(query.params);
+        query = serialize(query.params);
+      }
+      if (query) {
+        query = this.query ? (this.query + '&' + query) : ('?' + query);
+      }
+      else {
+        query = this.query;
       }
       if (!this[_id]) { return Q.reject('Missing ' + _id); }
-      return Formio.request(this[_url] + this.query);
+      return Formio.request(this[_url] + query);
     };
   };
 
@@ -47790,7 +47800,7 @@ module.exports = function(_baseUrl, _noalias, _domain) {
       query = '?' + serialize(query.params);
     }
     return this.request(baseUrl + '/project' + query);
-};
+  };
   Formio.request = function(url, method, data) {
     if (!url) { return Q.reject('No url provided'); }
     method = (method || 'GET').toUpperCase();
@@ -47899,7 +47909,7 @@ module.exports = function(_baseUrl, _noalias, _domain) {
     baseUrl = url;
     noalias = _noalias;
     Formio.baseUrl = baseUrl;
-  }
+  };
   Formio.clearCache = function() { cache = {}; };
 
   Formio.currentUser = function() {
@@ -47962,7 +47972,7 @@ module.exports = function(_baseUrl, _noalias, _domain) {
     }
   };
   return Formio;
-}
+};
 
 },{"Q":1,"whatwg-fetch":3}]},{},[4])(4)
 });
@@ -60528,10 +60538,12 @@ module.exports = function (app) {
   ]);
   app.controller('formioFile', [
     '$scope',
+    '$window',
     'Upload',
     'Formio',
     function(
       $scope,
+      $window,
       Upload,
       Formio
     ) {
@@ -60541,7 +60553,15 @@ module.exports = function (app) {
         $scope.data[$scope.component.key].splice(index, 1);
       };
 
+      $scope.removeUpload = function(index) {
+        console.log(index);
+        delete $scope.fileUploads[index];
+      };
+
       // This fixes new fields having an empty space in the array.
+      if ($scope.data[$scope.component.key] === '') {
+        $scope.data[$scope.component.key] = [];
+      }
       if ($scope.data && $scope.data[$scope.component.key][0] === '') {
         $scope.data[$scope.component.key].splice(0, 1);
       }
@@ -60550,8 +60570,19 @@ module.exports = function (app) {
         return (b=Math,c=b.log,d=1024,e=c(a)/c(d)|0,a/b.pow(d,e)).toFixed(2)+' '+(e?'kMGTPEZY'[--e]+'B':'Bytes');
       };
 
-      $scope.getFile = function(file) {
-        console.log(file);
+      $scope.getFile = function(evt, file) {
+        // If this is not a public file, get a signed url and open in new tab.
+        if (file.acl !== 'public-read') {
+          evt.preventDefault();
+          Formio.request($scope.formio.formUrl + '/storage/s3?bucket=' + file.bucket + '&key=' + file.key, 'GET')
+            .then(function(response) {
+              $window.open(response.url, '_blank');
+            })
+            .catch(function(response) {
+              // Is alert the best way to do this? User is expecting an immediate notification due to attempting to download a file.
+              alert(response);
+            });
+        }
       };
 
       $scope.upload = function(files) {
@@ -60567,9 +60598,14 @@ module.exports = function (app) {
                 };
                 Formio.request($scope.formio.formUrl + '/storage/s3', 'POST', {name: file.name, size: file.size, type: file.type})
                   .then(function(response) {
-                    response.data.file = file;
-                    response.data.key += $scope.component.dir + file.name;
-                    var upload = Upload.upload(response);
+                    var request = {
+                      url: response.url,
+                      method: 'POST',
+                      data: response.data
+                    };
+                    request.data.file = file;
+                    request.data.key += $scope.component.dir + file.name;
+                    var upload = Upload.upload(request);
                     upload
                       .then(function(resp) {
                         // Handle upload finished.
@@ -60577,9 +60613,10 @@ module.exports = function (app) {
                         $scope.data[$scope.component.key].push({
                           name: file.name,
                           storage: 's3',
-                          bucket: response.data.bucket,
-                          location: response.data.key,
-                          url: response.url + response.data.key,
+                          bucket: response.bucket,
+                          key: request.data.key,
+                          url: response.url + request.data.key,
+                          acl: request.data.acl,
                           size: file.size,
                           type: file.type
                         });
@@ -60615,9 +60652,10 @@ module.exports = function (app) {
         '<span ng-if="!component.label && component.validate.required" class="glyphicon glyphicon-asterisk form-control-feedback field-required-inline" aria-hidden="true"></span>' +
         '<div ng-controller="formioFile">' +
         '<div ng-repeat="file in data[component.key] track by $index" class="file">' +
-        ' <span class="fileName control-label"><a href="{{ file.url }}" ng-click="$event.preventDefault();getFile(file)" target="_blank">{{ file.name }}</a></span>' +
-        ' <span class="fileSize control-label">{{ fileSize(file.size) }}</span>' +
-        ' <span ng-if="!readOnly" ng-click="removeFile($index)"class="glyphicon glyphicon-remove"></span>' +
+        ' <div class="row">' +
+        '   <div class="fileName control-label col-sm-10"><a href="{{ file.url }}" ng-click="getFile($event, file)" target="_blank">{{ file.name }}</a> <span ng-if="!readOnly" ng-click="removeFile($index)"class="glyphicon glyphicon-remove"></span></div>' +
+        '   <div class="fileSize control-label col-sm-2 text-right">{{ fileSize(file.size) }}</div>' +
+        ' </div>' +
         '</div>' +
         '<div ng-if="!readOnly">' +
         ' <div ngf-drop="upload($files)" class="fileSelector" ngf-drag-over-class="' + "'" + 'fileDragOver' + "'" + '" ngf-multiple="component.multiple"><span class="glyphicon glyphicon-cloud-upload"></span>Drop files to attach, or <a href="#" ngf-select="upload($files)" ngf-multiple="component.multiple">browse</a>.</div>' +
@@ -60625,18 +60663,23 @@ module.exports = function (app) {
         ' <div ngf-no-file-drop>File Drag/Drop is not supported for this browser</div>' +
         '</div>' +
         '<div ng-repeat="fileUpload in fileUploads track by $index" ng-class="{' + "'has-error'" + ': fileUpload.status === '+ "'error'" +'}" class="file">' +
-        ' <span class="fileName control-label">{{ fileUpload.name }}</span>' +
-        ' <span class="fileSize control-label">{{ fileSize(fileUpload.size) }}</span>' +
-        ' <span ng-click="removeUpload($index)" class="glyphicon glyphicon-remove"></span>' +
-        ' <span ng-if="fileUpload.status === ' + "'progress'" + '">' +
-        '   <div class="progress">' +
-        '     <div class="progress-bar" role="progressbar" aria-valuenow="{{fileUpload.progress}}" aria-valuemin="0" aria-valuemax="100" style="width:{{fileUpload.progress}}%">' +
-        '       <span class="sr-only">{{fileUpload.progress}}% Complete</span>' +
+        ' <div class="row">' +
+        '   <div class="fileName control-label col-sm-10">{{ fileUpload.name }} <span ng-click="removeUpload(fileUpload.name)" class="glyphicon glyphicon-remove"></span></div>' +
+        '   <div class="fileSize control-label col-sm-2 text-right">{{ fileSize(fileUpload.size) }}</div>' +
+        ' </div>' +
+        ' <div class="row">' +
+        '   <div class="col-sm-12">' +
+        '   <span ng-if="fileUpload.status === ' + "'progress'" + '">' +
+        '     <div class="progress">' +
+        '       <div class="progress-bar" role="progressbar" aria-valuenow="{{fileUpload.progress}}" aria-valuemin="0" aria-valuemax="100" style="width:{{fileUpload.progress}}%">' +
+        '         <span class="sr-only">{{fileUpload.progress}}% Complete</span>' +
+        '       </div>' +
         '     </div>' +
+        '   </span>' +
+        '   <div ng-if="!fileUpload.status !== ' + "'progress'" + '" class="bg-{{ fileUpload.status }} control-label">' +
+        '     {{ fileUpload.message }} ' +
         '   </div>' +
-        ' </span>' +
-        ' <div ng-if="!fileUpload.status !== ' + "'progress'" + '" class="bg-{{ fileUpload.status }} control-label">' +
-        '   {{ fileUpload.message }} ' +
+        '   </div>' +
         ' </div>' +
         '</div>' +
       '</div>'
