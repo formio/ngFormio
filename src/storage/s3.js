@@ -25,7 +25,10 @@ module.exports = function(router) {
         if (!project.settings.storage || !project.settings.storage.s3) {
           return res.status(400).send('Storage settings not set.');
         }
-        var file = req.body;
+        var file = {
+          bucket: req.query.bucket,
+          key: req.query.key
+        };
         var s3 = new AWS.S3({
           accessKeyId: project.settings.storage.s3.AWSAccessKeyId,
           secretAccessKey: project.settings.storage.s3.AWSSecretKey

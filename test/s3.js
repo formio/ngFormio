@@ -232,9 +232,8 @@ module.exports = function(app, template, hook) {
         bucket: 'testbucket'
       };
       request(app)
-        .get('/project/' + template.project._id + '/form/' + template.forms.uploadForm._id + '/storage/s3')
+        .get('/project/' + template.project._id + '/form/' + template.forms.uploadForm._id + '/storage/s3?bucket=testbucket&key=upload/myfile.doc')
         .set('x-jwt-token', template.users.tempUser.token)
-        .send(file)
         .expect(200)
         .expect('Content-Type', /json/)
         .end(function (err, res) {
@@ -282,8 +281,7 @@ module.exports = function(app, template, hook) {
         key: 'upload/myfile.doc'
       };
       request(app)
-        .get('/project/' + template.project._id + '/form/' + template.forms.uploadForm._id + '/storage/s3')
-        .send(file)
+        .get('/project/' + template.project._id + '/form/' + template.forms.uploadForm._id + '/storage/s3?bucket=testbucket&key=upload/myfile.doc')
         .expect(401)
         .end(function(err, res) {
           if (err) {
