@@ -14,6 +14,105 @@ module.exports = function(app, template, hook) {
     }
 
     describe('Single Team Tests', function() {
+      it('An anonymous user should not be able to access /team/members without a search query', function(done) {
+        request(app)
+          .get('/team/members')
+          .expect('Content-Type', /text/)
+          .expect(401)
+          .end(function(err, res) {
+            if (err) {
+              return done(err);
+            }
+
+            done();
+          });
+      });
+
+      it('An anonymous user should not be able to access /team/members with a search query', function(done) {
+        request(app)
+          .get('/team/members?name=' + template.users.user1.data.name)
+          .expect('Content-Type', /text/)
+          .expect(401)
+          .end(function(err, res) {
+            if (err) {
+              return done(err);
+            }
+
+            done();
+          });
+      });
+
+      it('A Formio user should not be able to access /team/members without a search query', function(done) {
+        request(app)
+          .get('/team/members')
+          .set('x-jwt-token', template.users.user1.token)
+          .expect('Content-Type', /text/)
+          .expect(400)
+          .end(function(err, res) {
+            if (err) {
+              return done(err);
+            }
+
+            done();
+          });
+      });
+
+      it('A Formio user should be able to access /team/members with a search query', function(done) {
+        request(app)
+          .get('/team/members?name=' + template.formio.owner.data.name)
+          .set('x-jwt-token', template.formio.owner.token)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end(function(err, res) {
+            if (err) {
+              return done(err);
+            }
+
+            var response = res.body;
+            assert.notEqual(response.length, 0);
+
+            var found = false;
+            _.forEach(response, function(user) {
+              if (user._id === template.formio.owner._id) {
+                found = true;
+              }
+            });
+
+            assert.equal(found, true);
+
+            // Store the JWT for future API calls.
+            template.formio.owner.token = res.headers['x-jwt-token'];
+
+            done();
+          });
+      });
+
+      it('The /team/members endpoint should only return a list of user _ids and names', function(done) {
+        request(app)
+          .get('/team/members?name=' + template.formio.owner.data.name)
+          .set('x-jwt-token', template.formio.owner.token)
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end(function(err, res) {
+            if (err) {
+              return done(err);
+            }
+
+            var response = res.body;
+            assert.notEqual(response.length, 0);
+
+            _.forEach(response, function(user) {
+              assert.deepEqual(Object.keys(user), ['_id', 'data']);
+              assert.deepEqual(Object.keys(user.data), ['name']);
+            });
+
+            // Store the JWT for future API calls.
+            template.formio.owner.token = res.headers['x-jwt-token'];
+
+            done();
+          });
+      });
+
       it('A Formio User should be able to access the Team Form', function(done) {
         request(app)
           .get('/project/' + template.formio.project._id + '/form/' + template.formio.teamResource._id)

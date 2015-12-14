@@ -3,10 +3,12 @@
 var _ = require('lodash');
 var Q = require('q');
 var debug = {
+  teamUsers: require('debug')('formio:teams:teamUsers'),
   teamAll: require('debug')('formio:teams:teamAll'),
   teamProjects: require('debug')('formio:teams:teamProjects'),
   teamOwn: require('debug')('formio:teams:teamOwn'),
   leaveTeams: require('debug')('formio:teams:leaveTeams'),
+  loadUsers: require('debug')('formio:teams:loadUsers'),
   loadTeams: require('debug')('formio:teams:loadTeams'),
   getTeams: require('debug')('formio:teams:getTeams'),
   getProjectTeams: require('debug')('formio:teams:getProjectTeams'),
@@ -18,6 +20,62 @@ var debug = {
 module.exports = function(app, formioServer) {
   // The formio teams resource id.
   var _teamResource = null;
+  // The formio user resource id.
+  var _userResource = null;
+
+  /**
+   * Allow all formio users to be able to query the existing users available for teams.
+   */
+  app.get(
+    '/team/members',
+    formioServer.formio.middleware.tokenHandler,
+    function(req, res, next) {
+      if(!req.token || !req.token.user._id) {
+        return res.sendStatus(401);
+      }
+
+      var query = req.query || null;
+      debug.teamUsers('search: ' + JSON.stringify(query));
+      if(!query) {
+        return res.status(400).send('A search query is required.');
+      }
+      else if (!query.name) {
+        return res.status(400).send('Expected a query of type: `name`');
+      }
+      else {
+        query = new RegExp(query.name);
+      }
+
+      loadUsers(function(users) {
+        // limit the query results and sort them by name accuracy.
+        formioServer.formio.resources.submission.model
+          .find({deleted: {$eq: null}, form: users, 'data.name': {$regex: query}})
+          .sort({'data.name': 1})
+          .limit(10)
+          .exec(function(err, users) {
+            if(err) {
+              debug.teamUsers(err);
+              return res.sendStatus(400);
+            }
+
+            debug.teamUsers(users);
+            var clean = _.map(users, function(user) {
+              user.data = user.data || {};
+
+              return {
+                _id: user._id || '',
+                data: {
+                  name: user.data.name || ''
+                }
+              }
+            });
+
+            debug.teamUsers(clean);
+            return res.status(200).json(clean);
+          });
+      });
+    }
+  );
 
   /**
    * Allow a user with permissions to get all the teams associated with the given project.
@@ -301,6 +359,37 @@ module.exports = function(app, formioServer) {
         debug.loadTeams('team resource: ' + teamResource._id);
         _teamResource = teamResource._id;
         return next(_teamResource);
+      });
+    });
+  };
+
+  /**
+   * Utility function to load the formio user resource.
+   *
+   * @param next {Function}
+   *   The callback to invoke once the user resource is loaded.
+   */
+  var loadUsers = function(next) {
+    if(_userResource) {
+      return next(_userResource);
+    }
+
+    formioServer.formio.resources.project.model.findOne({name: 'formio'}, function(err, formio) {
+      if(err) {
+        debug.loadUsers(err);
+        return next(null);
+      }
+
+      debug.loadUsers('formio project: ' + formio._id);
+      formioServer.formio.resources.form.model.findOne({name: 'user', project: formio._id}, function(err, userResource) {
+        if(err) {
+          debug.loadUsers(err);
+          return next(null);
+        }
+
+        debug.loadUsers('user resource: ' + userResource._id);
+        _userResource = userResource._id;
+        return next(_userResource);
       });
     });
   };
