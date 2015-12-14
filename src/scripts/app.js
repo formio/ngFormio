@@ -180,6 +180,36 @@ angular
           templateUrl: 'views/project/roles/delete.html',
           controller: 'RoleController'
         })
+        .state('project.settings.teams', {
+          abstract: true,
+          url: '/teams',
+          parent: 'project.settings',
+          templateUrl: 'views/project/teams/teams.html'
+        })
+        .state('project.settings.teams.view', {
+          url: '',
+          parent: 'project.settings.teams',
+          controller: 'ProjectTeamViewController',
+          templateUrl: 'views/project/teams/view.html'
+        })
+        .state('project.settings.teams.add', {
+          url: '/add',
+          parent: 'project.settings.teams',
+          controller: 'ProjectTeamEditController',
+          templateUrl: 'views/project/teams/edit.html'
+        })
+        .state('project.settings.teams.edit', {
+          url: '/:teamId/edit',
+          parent: 'project.settings.teams',
+          controller: 'ProjectTeamEditController',
+          templateUrl: 'views/project/teams/edit.html'
+        })
+        .state('project.settings.teams.delete', {
+          url: '/:teamId/delete',
+          parent: 'project.settings.teams',
+          controller: 'ProjectTeamDeleteController',
+          templateUrl: 'views/project/teams/delete.html'
+        })
         .state('project.settings.cors', {
           url: '/cors',
           parent: 'project.settings',
@@ -219,6 +249,7 @@ angular
         .state('team.view', {
           url: '/view',
           parent: 'team',
+          controller: 'TeamViewController',
           templateUrl: 'views/team/view.html'
         })
         .state('team.edit', {
@@ -255,32 +286,92 @@ angular
     'FormioAlerts',
     'ProjectPlans',
     '$timeout',
+    '$q',
     function(
       $scope,
       $rootScope,
       Formio,
       FormioAlerts,
       ProjectPlans,
-      $timeout
+      $timeout,
+      $q
     ) {
+      $rootScope.showHeader = true;
       $rootScope.activeSideBar = 'home';
       $rootScope.currentProject = null;
       $rootScope.currentForm = null;
+
+      // Determine if the current users can make teams or is a team member.
+      $scope.teamsEnabled = false;
+      $scope.teamMember = false;
+
       $scope.teams = [];
       $scope.teamsLoading = true;
-      $scope.teamsUrl = $rootScope.teamForm + '/submission';
-      $scope.$on('pagination:loadPage', function() {
+      var _teamsPromise = Formio.request($scope.appConfig.apiBase + '/team/all', 'GET').then(function(results) {
+        $scope.teams = results;
         $scope.teamsLoading = false;
-        angular.element('#team-loader').hide();
+
+        // See if the current user is a member of any of the given teams.
+        if (!$rootScope.user) {
+          Formio.currentUser().then(function(user) {
+            $rootScope.user = user;
+            $scope.teamMember = _.any(results, function(team) {
+              return ($rootScope.user && team.owner !== $rootScope.user._id) || false;
+            });
+          });
+        }
+        else {
+          $scope.teamMember = _.any(results, function(team) {
+            return ($rootScope.user && team.owner !== $rootScope.user._id) || false;
+          });
+        }
       });
+
+      $scope.teamSupport = function(project) {
+        return (project.plan === 'team' || project.plan === 'commercial');
+      };
+
       $scope.projects = {};
       $scope.projectsLoading = true;
       // TODO: query for unlimited projects instead of this limit
-      Formio.loadProjects('?limit=9007199254740991&sort=-modified').then(function(projects) {
+      var _projectsPromise = Formio.loadProjects('?limit=9007199254740991&sort=-modified').then(function(projects) {
         $scope.projectsLoading = false;
         angular.element('#projects-loader').hide();
         $scope.projects = projects;
+        $scope.teamsEnabled = _.any(projects, function(project) {
+          project.plan = project.plan || '';
+          return _.startsWith(project.plan, 'team');
+        });
       }).catch(FormioAlerts.onError.bind(FormioAlerts));
+
+      // Inject the projects teams into the model if available
+      $q.all([_teamsPromise, _projectsPromise]).then(function() {
+        $scope.projects = _.map($scope.projects, function(project) {
+          project.teams = [];
+
+          // Build the projects teams list if present in the permissions.
+          _.forEach(project.access, function(permission) {
+            if(_.startsWith(permission.type, 'team_')) {
+              permission.roles = permission.roles || [];
+              project.teams.push(permission.roles);
+            }
+          });
+
+          // Filter and translate the teams for use on the ui.
+          project.teams = _.uniq(_.flattenDeep(project.teams));
+          project.teams = _.map(project.teams, function(team) {
+            _.forEach($scope.teams, function(loadedTeam) {
+              if(loadedTeam._id === team) {
+                team = loadedTeam;
+              }
+            });
+
+            return team;
+          });
+
+          return project;
+        });
+      });
 
       $scope.showIntroVideo = function() {
         $scope.introVideoVisible = true;
@@ -369,12 +460,28 @@ angular
       $rootScope.$stateParams = $stateParams;
       $rootScope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams) {
         $window.document.body.scrollTop = $window.document.documentElement.scrollTop = 0;
+        $rootScope.showHeader = false;
         $rootScope.alerts = FormioAlerts.getAlerts();
         $rootScope.previousState = fromState.name;
         $rootScope.previousParams = fromParams;
         $rootScope.currentState = toState.name;
         GoogleAnalytics.sendPageView();
       });
+
+      $rootScope.goToProject = function(project) {
+        $state.go('project.edit', {projectId: project._id});
+      };
+
+      $rootScope.getPreviewURL = function(project) {
+        if (!project.settings || !project.settings.preview) { return ''; }
+        var url = 'http://help.form.io/project';
+        url += '?project=' + encodeURIComponent(project.name);
+        url += '&previewUrl=' + encodeURIComponent(project.settings.preview.url);
+        url += '&host=' + encodeURIComponent(AppConfig.serverHost);
+        url += '&protocol=' + encodeURIComponent($location.protocol());
+        url += '&repo=' + encodeURIComponent(project.settings.preview.repo);
+        return url;
+      };
 
       var authError = function() {
         $rootScope.currentApp = null;
@@ -470,24 +577,16 @@ angular
   .factory('ProjectPlans', ['$filter', function($filter) {
     return {
       plans: {
-        community: {
-          name: 'Community',
-          labelStyle: 'label-community'
-        },
         basic: {
           name: 'Basic',
           labelStyle: 'label-info'
         },
-        team1: {
-          name: 'Team',
-          labelStyle: 'label-success'
+        independent: {
+          name: 'Independent',
+          labelStyle: 'label-warning'
         },
-        team2: {
-          name: 'Team',
-          labelStyle: 'label-success'
-        },
-        team3: {
-          name: 'Team',
+        team: {
+          name: 'Team Pro',
           labelStyle: 'label-success'
         },
         commercial: {
@@ -524,4 +623,23 @@ angular
         return 'progress-bar-success';
       }
     };
-  }]);
+  }])
+  .factory('TeamPermissions', function() {
+    return {
+      permissions: {
+        team_read: {
+          label: 'Read'
+        },
+        team_write: {
+          label: 'Write'
+        },
+        team_admin: {
+          label: 'Admin'
+        }
+      },
+      getPermissionLabel: function(type) {
+        if(!this.permissions[type]) return '';
+        return this.permissions[type].label;
+      }
+    };
+  });

@@ -1,0 +1,112 @@
+// Bootstrap Button Variant
+
+@mixin button-variant($color, $background, $border)
+{
+  color: $color;
+  background-color: $background;
+  border-color: $border;
+
+  &:hover,
+  &:focus,
+  &:active,
+  &.active,
+  .open .dropdown-toggle & {
+    color: $color;
+    background-color: darken($background, 10%);
+    border-color: darken($border, 12%);
+  }
+  &:active,
+  &.active,
+  .open .dropdown-toggle & {
+    background-image: none;
+  }
+  &.disabled,
+  &[disabled],
+  fieldset[disabled] & {
+    &,
+    &:hover,
+    &:focus,
+    &:active,
+    &.active {
+      background-color: $background;
+      border-color: $border;
+    }
+  }
+
+  .badge {
+    color: $background;
+    background-color: $color;
+  }
+}
+
+@mixin price-panel($color) {
+  &>.panel-heading {
+    color: #fff;
+    background-color: $color;
+    border-color: lighten($color, 10%);
+    border-bottom: 1px solid $color;
+  }
+
+
+  &>.panel-body {
+    color: #fff;
+    background-color: lighten($color, 10%);
+  }
+
+
+  &>.panel-body .lead{
+    text-shadow: 0px 3px 0px rgba(50,50,50, .3);
+  }
+
+  & .list-group-item {
+    color: #333;
+    background-color: rgba(50,50,50, .01);
+    font-weight:600;
+    text-shadow: 0px 1px 0px rgba(250,250,250, .75);
+  }
+}
+
+@mixin transition($prop, $time) {
+  -webkit-transition: $prop $time;
+  -moz-transition: $prop $time;
+  transition: $prop $time;
+}
+
+@mixin border-radius($radius) {
+  -webkit-border-radius: $radius;
+  -moz-border-radius: $radius;
+  -ms-border-radius: $radius;
+  border-radius: $radius;
+}
+
+// Background Features
+
+@mixin background-cover() {
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  background-size: cover;
+  -o-background-size: cover;
+}
+
+// Font Selections
+
+@mixin serif-font()
+{
+  font-family: "Open Sans", Helvetica, Arial, sans-serif;
+}
+
+@mixin script-font()
+{
+  font-family: "Confortaa", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+@mixin body-font()
+{
+  font-family: "Open Sans", Helvetica, Arial, sans-serif;
+}
+
+@mixin heading-font()
+{
+  font-family: "Confortaa", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  text-transform: uppercase;
+}

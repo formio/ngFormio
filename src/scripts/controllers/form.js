@@ -714,7 +714,7 @@ app.controller('FormActionEditController', [
         actionInfo.premium === true &&
         $scope.currentProject &&
         $scope.currentProject.hasOwnProperty('plan') &&
-        $scope.currentProject.plan === 'community'
+        $scope.currentProject.plan === 'basic'
       ) {
         FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> This is a Premium Action, please upgrade your <a ui-sref="project.settings.plan">project plan</a> to enable it.');
       }

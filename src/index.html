@@ -30,6 +30,7 @@
     <!-- endinject -->
     <!-- endbuild -->
 
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,700' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Comfortaa:400,700' rel='stylesheet' type='text/css'>
     <script src="lib/ckeditor/ckeditor.js" type="text/javascript"></script>
     <!-- Favicons -->
@@ -67,11 +68,12 @@
                   <span class="icon-bar"></span>
                   <span class="icon-bar"></span>
                 </button>
-                <a ui-sref="home()" class="navbar-brand">
+                <a href="https://form.io" class="navbar-brand">
                   <img height="35px;" src="images/formio-logo-white.png" />
                 </a>
                 <ol class="breadcrumb" ng-cloak>
-                  <li ng-if="currentProject"><a ui-sref="project.edit({projectId: currentProject._id})">{{ currentProject.title | characters:25:true }}</a></li>
+                  <li><a ui-sref="home()" class="btn btn-success btn-sm"><span class="glyphicon glyphicon-home" aria-hidden="true"></span></a></li>
+                  <li ng-if="currentProject"><a ui-sref="project.edit({projectId: currentProject._id})"><span class="label label-default">{{ currentProject.title | characters:25:true }}</span></a></li>
                   <li ng-if="currentForm"><a ui-sref="project.form.view({formId: currentForm._id})">{{ currentForm.title | characters:25:true}}</a></li>
                 </ol>
               </div>
@@ -94,7 +96,18 @@
           </div>
         </div>
       </nav>
-
+      <div class="jumbotron welcome-banner" ng-cloak ng-if="showHeader">
+        <div class="container">
+          <h1>Welcome to <img style="height:1em;" src="images/formio-logo-white.png"></h1>
+          <p>Take a look at these resources to help you get started.</p>
+          <ul class="list-inline">
+            <li><a class="btn btn-default btn-lg" href="http://help.form.io/start" target="_blank"  role="button"><i class="fa fa-play-circle-o"></i> 5 min. tutorial</a></li>
+            <li><a class="btn btn-default btn-lg" href="http://help.form.io/intro" target="_blank"  role="button"><i class="fa fa-clock-o"></i> Quickstart</a></li>
+            <li><a class="btn btn-default btn-lg" href="http://help.form.io/userguide" target="_blank" role="button"><i class="fa fa-search"></i> Users Guide</a></li>
+            <li><a class="btn btn-default btn-lg" href="http://help.form.io/api" target="_blank" role="button"><i class="fa fa-file-code-o"></i> API Docs</a></li>
+          </ul>
+        </div>
+      </div>
       <div class="container-fluid" id="main-wrapper" ng-cloak>
         <div class="row">
           <div class="col-sm-12 main">
@@ -111,71 +124,46 @@
 
 
     <footer>
-      <div class="blue">
-        <img id="footer-logo" src="images/formio-logo-green.png" alt="&lt;form.io&gt;">
-        <img id="footer-divider" src="images/footer-border.png">
-      </div>
-      <div class="green">
-        <div class="container">
-          <div class="row" id="footer-content">
-          <div class="col-lg-8">
-            <div class="row">
-              <div class="col-lg-3 col-sm-6">
-                <h3>&lt;form.io&gt;</h3>
-                <ul>
-                  <li><a href="https://form.io/#features">Features</a></li>
-                  <li><a href="http://www.form.io/#overview">Overview</a></li>
-                </ul>
-              </div>
-              <div class="col-lg-3 col-sm-6">
-                <h3>Resources</h3>
-                <ul>
-                  <li><a href="http://help.form.io">Learning Center</a></li>
-                  <li><a href="http://help.form.io">Documentation</a></li>
-                  <li><a href="http://help.form.io/support/">Support</a></li>
-                </ul>
-              </div>
-              <div class="col-lg-3 col-sm-6">
-                <h3>News</h3>
-                <ul>
-                  <li><a href="http://www.form.io/blog">Read our blog</a></li>
-                  <li><a href="http://www.form.io/blog">In the News</a></li>
-                  <li><a href="http://www.form.io/form.io-press-kit">Download Press Kit</a></li>
-                </ul>
-              </div>
-              <div class="col-lg-3 col-sm-6">
-                <h3>Community</h3>
-                <ul>
-                  <li><a href="https://github.com/formio/"><i class="fa fa-github-alt"></i> Fork Us on Github</a></li>
-                  <li><a href="https://www.facebook.com/form.ioapp"><i class="fa fa-facebook"></i> Connect on Facebook</a></li>
-                  <li><a href="https://twitter.com/form_io"><i class="fa fa-twitter"></i> Follow us on Twitter</a></li>
-                  <li><a href="https://www.linkedin.com/company/form-io"><i class="fa fa-linkedin"></i> Connect on LinkedIn</a></li>
-                </ul>
-              </div>
-            </div>
+      <div class="footer-banner"><img src="images/footerlogo-before.png" /></div>
+      <div class="container">
+        <div class="row">
+          <div class="col-md-3">
+            <h3 class="section-heading"><i class="fa fa-book"></i> Resources</h3>
+            <ul class="list-group">
+              <li class="list-group-item"><a href="http://help.form.io"><i class="fa fa-book"></i> Documentation</a></li>
+              <li class="list-group-item"><a href="http://help.form.io/support"><i class="fa fa-support"></i> Support</a></li>
+            </ul>
           </div>
+          <div class="col-md-3">
+            <h3 class="section-heading"><i class="fa fa-bullhorn"></i> News</h3>
+            <ul class="list-group">
+              <li class="list-group-item"><a href="http://blog.form.io/blog"><i class="fa fa-laptop"></i> Read our Blog</a></li>
+              <li class="list-group-item"><a href="http://blog.form.io/blog"><i class="fa fa-newspaper-o"></i> In the News</a></li>
+              <li class="list-group-item"><a href="http://blog.form.io/form.io-press-kit"><i class="fa fa-hashtag"></i> Press Kit</a></li>
+            </ul>
           </div>
-          <div class="row" id="footer-nav">
-            <div class="col-xs-12 col-centered">
-              <div class="row">
-                <div class="footer-nav-item col-md-2"><a href="http://www.form.io/#overview">Overview</a></div>
-                <div class="footer-nav-item col-md-2"><a href="http://www.form.io/#features">Features</a></div>
-                <div class="footer-nav-item col-md-2"><a href="https://help.form.io">Documentation</a></div>
-                <div class="footer-nav-item col-md-2"><a href="https://help.form.io/support">Support</a></div>
-              </div>
-            </div>
+          <div class="col-md-3">
+            <h3 class="section-heading"><i class="fa fa-users"></i> Community</h3>
+            <ul class="list-group">
+              <li class="list-group-item"><a href="https://github.com/formio/formio"><i class="fa fa-github"></i> Fork us on Github</a></li>
+              <li class="list-group-item"><a href="https://twitter.com/form_io"><i class="fa fa-twitter-square"></i> Follow on Twitter</a></li>
+              <li class="list-group-item"><a href="https://www.facebook.com/form.ioapp?fref=ts"><i class="fa fa-facebook-official"></i> Connect on Facebook</a></li>
+              <li class="list-group-item"><a href="https://www.linkedin.com/company/form-io"><i class="fa fa-linkedin-square"></i> Connect on LinkedIn</a></li>
+            </ul>
           </div>
-          <div class="row text-center">
-            <a href="http://www.form.io/form.io-privacy-policy" target="_blank">Privacy Policy</a>
-            &nbsp; | &nbsp;
-            <a href="http://www.form.io/form-terms-of-use" target="_blank">Terms of Service</a>
-            &nbsp; | &nbsp;
-            <a href="http://www.form.io/form.io-software-licensing-agreement" target="_blank">Software Agreement</a>
-            &nbsp; | &nbsp;
-            <a href="http://www.form.io/form.io-open-source-license-agreement" target="_blank">Open-Source License</a>
+          <div class="col-md-3">
+            <ul class="list-group">
+              <li class="list-group-item"><img src="images/formio-tree.png" style="width:60%; margin: 0 auto;" /></li>
+              <li class="list-group-item"><a href="http://blog.form.io/form.io-privacy-policy">Privacy Policy</a></li>
+              <li class="list-group-item"><a href="http://blog.form.io/form-terms-of-use">Terms of Use</a></li>
+              <li class="list-group-item"><a href="http://blog.form.io/form.io-software-licensing-agreement">Software Agreement</a></li>
+              <li class="list-group-item"><a href="http://blog.form.io/form.io-open-source-license-agreement">Open Source License</a></li>
+            </ul>
           </div>
-          <div class="row text-center">
-            <p id="copyright"><small>© Copyright 2015. FORM LLC. All rights reserved.</small></p>
+        </div>
+        <div class="row">
+          <div class="col-md-4 col-md-offset-8">
+            <span class="copyright">Copyright &copy; Form.io LLC 2015. All rights reserved</span>
           </div>
         </div>
       </div>

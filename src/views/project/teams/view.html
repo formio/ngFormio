@@ -1,0 +1,39 @@
+<div class="alert alert-warning" ng-show="!teamsLoading">
+  <i class="glyphicon glyphicon-exclamation-sign"></i>&nbsp;Teams are groups of Form.io users that work together on projects. Teams are available for <a href="https://www.form.io/pricing">TeamPro</a> users.
+</div>
+<table ng-show="!teamsLoading" class="table table-striped">
+  <tbody>
+    <tr ng-show="currentProject.owner === user._id && currentProjectTeams && currentProjectTeams.length === 0">
+      <td>
+        <div class="row">
+          <div class="col-sm-12">
+            <h4>{{ currentProjectEligibleTeams.length || 0 }} eligible Teams.</h4>
+          </div>
+        </div>
+      </td>
+    </tr>
+
+    <tr ng-repeat="team in currentProjectTeams">
+      <td>
+        <div class="row">
+          <div class="col-sm-8 ellipsis">
+            <h4><a ui-sref="project.settings.teams.edit({teamId: team._id})">{{ team.data.name }}</a></h4>
+          </div>
+          <div class="col-sm-2">
+            <h4>{{ getPermissionLabel(team.permission) }}</h4>
+          </div>
+          <div class="col-sm-2">
+            <div class="button-group pull-right" style="display:flex;">
+              <a ui-sref="project.settings.teams.edit({teamId: team._id})" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-edit"></span> Edit</a>&nbsp;
+              <a ui-sref="project.settings.teams.delete({teamId: team._id})" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-trash"></span></a>
+            </div>
+          </div>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<div ng-show="currentProject.owner === user._id" class="text-right">
+  <a ui-sref="project.settings.teams.add()" class="btn btn-success"><span class="glyphicon glyphicon-plus"></span> Add Team</a>
+</div>

@@ -1,4 +1,5 @@
 @import "variables.scss";
+@import "mixins.scss";
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
   display: none !important;
 }
@@ -59,7 +60,7 @@ ul.dropdown-menu {
   }
   .breadcrumb {
     float: left;
-    margin: 6px 10px;
+    margin: 0;
     font-size: 14px;
     border: none;
     text-transform: none;
@@ -323,7 +324,6 @@ pre code {
 }
 
 /***************************** Feedback *****************************/
-
 .feedback {
   position: fixed;
   right: 10px;
@@ -357,8 +357,6 @@ pre code {
 }
 
 /***************************** Auth Page *****************************/
-
-
 .login-container, .register-container {
   color: rgba(255, 255, 255, .935);
 
@@ -474,7 +472,6 @@ pre code {
 }
 
 /***************************** Footer *****************************/
-
 @font-face {
     font-family: 'HelveticaNeueLTStd-MdCn';
     src: url('//cdn2.hubspot.net/hubfs/1549875/Form_Site/fonts/HelveticaNeueLTStd-MdCn.eot?#iefix&t=1442590693060') format('embedded-opentype'),url('//cdn2.hubspot.net/hubfs/1549875/Form_Site/fonts/HelveticaNeueLTStd-MdCn.otf?t=1442590693060') format('opentype'),url('//cdn2.hubspot.net/hubfs/1549875/Form_Site/fonts/HelveticaNeueLTStd-MdCn.woff?t=1442590693060') format('woff'),url('//cdn2.hubspot.net/hubfs/1549875/Form_Site/fonts/HelveticaNeueLTStd-MdCn.ttf?t=1442590693060') format('truetype'),url('//cdn2.hubspot.net/hubfs/1549875/Form_Site/fonts/HelveticaNeueLTStd-MdCn.svg#HelveticaNeueLTStd-MdCn?t=1442590693060') format('svg');
@@ -498,96 +495,40 @@ body {
 }
 
 footer {
-  display: table-row;
-  height: 1px;
-  // width: 100%;
-  color: #FFF;
-
-  a, a:hover, a:active {
-    color: #FFF
+  color: #f0f0f0;
+  padding: 0 0 25px 0;
+  text-align: center;
+  background-color: darken($brand-secondary, 2%);
+  a {
+    color: white;
   }
-
-  .blue {
-    background: $brand-primary;
-    height: 80px;
-    position: relative;
+  .section-heading {
+    color: #eee;
   }
-
-  .green {
-    padding-top: 25px;
-    background: #56b147;
-  }
-
-  #footer-logo {
-    float: right;
-    height: 40px;
-    margin-right: 40px;
-    margin-top: 15px;
-  }
-
-  #footer-divider {
+  .footer-banner img {
+    margin-top: -2.2em;
     width: 100%;
-    height: 80px;
-    position: absolute;
-    bottom: -45px;
   }
-
-  h3 {
-    padding-top: 15px;
-    font-size: 28px;
-    line-height: 32px;
-    padding-bottom: 30px;
-    color: #FFF;
-    font-family: 'HelveticaNeueLTStd-MdCn';
-    letter-spacing: 1px;
-  }
-
-  ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-  }
-
-  #footer-content ul {
-    font-size: 14px;
-    li {
-      padding: 10px 0 10px 0;
-      .fa {
-        width: 15px;
-      }
-    }
-    li:not(:first-child) {
-      border-top: #70d160 solid 1px;
+  .list-group .list-group-item {
+    font-size: 1.2em;
+    background-color:$brand-secondary;
+    border-color: lighten($brand-secondary, 10%);
+    i {
+      font-size: 1.5em;
+      float: left;
     }
   }
-
-  #footer-nav {
-    margin-top: 30px;
-    margin-bottom: 30px;
-    font-family: 'HelveticaNeueLTStd-MdCn';
-    font-size: 18px;
-    line-height: 18px;
-    text-transform: uppercase;
-    text-align: center;
-    @media(min-width: $screen-md-min) {
-      .footer-nav-item:not(:first-child) {
-        border-left: #8dc34a solid 1px;
-      }
-    }
-    @media(max-width: $screen-md-min) {
-      .footer-nav-item {
-        padding: 5px;
-        text-align: left;
-      }
-    }
-
-
+  span.copyright {
+    line-height: 40px;
+    @include heading-font();
+    text-transform: none;
   }
-
-  #copyright {
-    padding: 5px;
+  ul.quicklinks {
+    margin-bottom: 0;
+    line-height: 40px;
+    @include heading-font();
+    text-transform: none;
   }
-
 }
 
 /***************************** Kendo UI *****************************/
@@ -597,21 +538,48 @@ footer {
 }
 
 /***************************** Landing Page *****************************/
-.projects {
+.welcome-banner {
+  background-color: $brand-secondary;
+  color: #eee;
+  text-align: center;
+  padding-top: 30px;
+  margin-bottom: 0;
+  &.jumbotron h1 {
+    font-size: 56px;
+  }
+  .list-inline {
+    padding-top: 30px;
+  }
+  .btn-lg {
+    background-color: $brand-secondary;
+    border: solid #eee 2px;
+    color: #eee;
+    &:hover {
+      background-color: lighten($brand-secondary, 5%);
+    }
+  }
+}
+
+.breadcrumb .label {
+  border-radius: 20px;
+}
+
+.projects,
+.teams {
   padding-top: 20px;
-  padding-bottom: 50px;
-  .project-create {
+  .project-create,
+  .team-create {
     display: block;
     text-decoration: none;
     background-color: transparentize($brand-primary, .75);
     border: 4px dashed transparentize($brand-primary, .75);
     color: transparentize($brand-primary, .25);
     text-align: center;
-    height: 200px;
+    height: 320px;
     margin-bottom: 30px;
     .create-link {
       display: block;
-      padding-top: 50px;
+      padding-top: 125px;
       .glyphicon {
         margin-top: 5px;
         background: transparentize($brand-primary, .25);
@@ -630,44 +598,64 @@ footer {
       background-color: lighten(transparentize($brand-primary, .75), 20%);
     }
   }
-  .project {
-    display: block;
+  .project,
+  .team,
+  .team-upgrade {
     position: relative;
     text-decoration: none;
-    background-color: $brand-primary;
-    border: 1px solid darken($brand-primary, 10%);
     overflow: hidden;
     transition: .15s;
+    height: 320px;
     &:hover {
-      background-color: lighten($brand-primary, 5%);
+      background-color: lighten($gray-lighter, 5%);
     }
     &:active {
-      background-color: lighten($brand-primary, 10%);
+      background-color: lighten($gray-lighter, 10%);
     }
-    color: $gray-lighter;
-    height: 200px;
+    color: $gray-light;
     margin-bottom: 30px;
-    padding: 10px 15px;
-    .project-title {
-      font-weight: 600;
+    .project-plan-label {
+      float: right;
     }
-    .project-plan {
+    .project-tile-button {
+      padding-left: 5px;
+      padding-right: 5px;
+    }
+    .project-teams-header {
+      margin-top: 5px;
+      margin-bottom: 5px;
+    }
+    .project-title {
+      margin-top: 0;
+    }
+    .project-title a,
+    .team-name a {
+      font-weight: 600;
+      color: $gray-light;
+    }
+    .project-plan,
+    .team-owner {
       margin-top: 9px;
     }
     .project-url {
-      // Lighten this up a bit so it's easier to read
-      color: saturate(lighten($brand-secondary, 10%), 20%);
+      color: $brand-primary;
     }
-
     .progress-label {
-      padding-top: 10px;
-      color: transparentize($gray-lighter, .33);
       margin-bottom: 0;
     }
+    .list-inline {
+      text-align: center;
+    }
     .progress {
-      background-color: darken($brand-primary, 10%);
-      border: 1px solid darken($brand-primary, 20%);
+      background-color: white;
+      border: 1px solid lighten($brand-primary, 10%);
+      padding: 0;
       position: relative;
+      color: #666;
+      margin-bottom: 10px;
+      .progress-bar-success {
+        background-color: lighten($brand-secondary, 10%);
+      }
       span {
         position: absolute;
         display: block;
@@ -675,6 +663,69 @@ footer {
         width: 100%;
         text-align: center;
       }
+    }
+    .project-teams {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      margin-left: -19px;
+      margin-right: -19px;
+      padding: 0 4px;
+      background-color: $gray-lighter;
+      hr {
+        margin: 4px 0 4px 0;
+      }
+      .project-team-upgrade {
+        text-align: center;
+      }
+      .project-team-label, .project-add-team {
+        color: white;
+        margin-right: 4px;
+        background-color: darken($brand-secondary, 6%);
+        display: inline-block;
+        padding: 4px 6px;
+      }
+      .project-add-team {
+        background-color: $brand-primary;
+      }
+      .view-all {
+        cursor: pointer;
+        text-decoration: underline;
+      }
+    }
+  }
+  .project-help-panel {
+    margin-top: 92px;
+  }
+}
+
+.teams {
+  .team-create {
+    height: 175px;
+    background-color: transparentize($brand-secondary, .75);
+    border: 4px dashed transparentize($brand-secondary, .75);
+    color: transparentize($brand-secondary, .25);
+    .create-link {
+      padding-top: 55px;
+      .glyphicon {
+        background: transparentize($brand-secondary, .25);
+      }
+    }
+    &:hover {
+      background-color: lighten(transparentize($brand-secondary, .75), 10%);
+    }
+    &:active {
+      background-color: lighten(transparentize($brand-secondary, .75), 20%);
+    }
+  }
+  .team-upgrade {
+    height: auto;
+  }
+  .team {
+    height: 175px;
+    .team-members {
+      // Lighten this up a bit so it's easier to read
+      color: saturate(lighten($brand-secondary, 10%), 20%);
     }
   }
 }
@@ -748,11 +799,6 @@ footer {
   }
 }
 
-.label-community {
-  background-color: darken($brand-primary, 10%);
-  color: #FFF;
-}
-
 .label-commercial {
   background-color: #CD69C9;
   color: #FFF;
@@ -776,7 +822,6 @@ footer {
 }
 
 /***************************** Create Project *****************************/
-
 .template-card {
   margin-bottom: 10px;
   margin-top: 10px;

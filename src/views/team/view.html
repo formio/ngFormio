@@ -1,14 +1,41 @@
 <h3>{{ team.data.name }}</h3>
 <table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Member</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr ng-repeat="member in team.data.members">
-            {{ member }}
-            <td>{{ member.data.name }}</td>
-        </tr>
-    </tbody>
+  <thead>
+    <tr>
+      <th>Member</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr ng-repeat="member in team.data.members">
+      <td>
+        <div class="col-sm-11">
+          {{ member.data.name }}
+        </div>
+        <div class="col-sm-1">
+          <button ng-show="(team.owner !== member._id) && (member._id === user._id)" class="btn btn-danger btn-xs" ng-click="leaveTeam(team._id)">Leave</button>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<h3>Team Permissions</h3>
+<table class="table table-striped">
+  <thead>
+  <tr>
+    <th class="col-sm-6">Project</th>
+    <th class="col-sm-6">Permission</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr ng-repeat="project in teamPermissions">
+    <td class="col-sm-6 ellipsis">{{project.title}}</td>
+    <td class="col-sm-5">{{ getPermissionLabel(project.permission) }}</td>
+    <td class="col-sm-1">
+      <button ui-sref="project.settings.teams.edit({teamId: team._id, projectId: project._id})" class="btn btn-default btn-xs">
+        <span class="glyphicon glyphicon-edit"></span>&nbsp;Edit
+      </button>
+    </td>
+  </tr>
+  </tbody>
 </table>
