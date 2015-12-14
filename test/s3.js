@@ -236,7 +236,7 @@ module.exports = function(app, template, hook) {
         .set('x-jwt-token', template.users.tempUser.token)
         .send(file)
         .expect(200)
-        .expect('Content-Type', /text\/html/)
+        .expect('Content-Type', /json/)
         .end(function (err, res) {
           if (err) {
             return done(err);
@@ -252,7 +252,7 @@ module.exports = function(app, template, hook) {
             if (err) {
               done(err);
             }
-            assert.equal(res.text, url);
+            assert.equal(res.body.url, url);
             done();
           });
         });

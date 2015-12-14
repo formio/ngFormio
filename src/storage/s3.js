@@ -38,7 +38,9 @@ module.exports = function(router) {
             return res.status(400).send(err);
           }
           debug(url);
-          res.send(url);
+          res.send({
+            url: url
+          });
         });
       });
     }
