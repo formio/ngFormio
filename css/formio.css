@@ -1,0 +1,77 @@
+.field-required:after {
+  color:red;
+  content:" *";
+}
+
+.field-required-inline {
+  color:red;
+  z-index: 5;
+}
+
+.form-field-type-hidden {
+  margin: 0;
+  padding: 0;
+}
+
+.datetime-picker-dropdown div > table .btn-default {
+  border: 0;
+  background-color: #fff;
+}
+
+.datetime-picker-dropdown div > table .btn-default:hover {
+  background-color: #ccc;
+}
+
+.datetime-picker-dropdown div > table .btn-default.active {
+  background-color: #ccc;
+}
+
+.has-feedback .datetime-picker-dropdown .form-control {
+  padding: inherit;
+}
+
+.form-control.btn-default {
+  background-color: #fff;
+}
+
+/* Handle overflow of long matched placeholder/text without covering caret */
+.has-feedback .form-control.ui-select-toggle {
+  padding-right: 20px;
+}
+.ui-select-placeholder, .ui-select-match-text {
+  width: 100%;
+  margin-right: -15px;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+/* Fix Safari bug that prevents you from typing in draggable password fields */
+input[type="password"][draggable="true"] {
+  -webkit-user-select:text !important;
+}
+
+.glyphicon-spin {
+  -webkit-animation: spin-anim 1s infinite;
+  animation: spin-anim 1s infinite;
+}
+@-webkit-keyframes spin-anim {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(359deg);
+    transform: rotate(359deg);
+  }
+}
+@keyframes spin-anim {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(359deg);
+    transform: rotate(359deg);
+  }
+}
