@@ -42,7 +42,7 @@ module.exports = function (app) {
       };
 
       // This fixes new fields having an empty space in the array.
-      if ($scope.data[$scope.component.key] === '') {
+      if ($scope.data && $scope.data[$scope.component.key] === '') {
         $scope.data[$scope.component.key] = [];
       }
       if ($scope.data && $scope.data[$scope.component.key][0] === '') {
@@ -87,7 +87,8 @@ module.exports = function (app) {
                       data: response.data
                     };
                     request.data.file = file;
-                    request.data.key += $scope.component.dir + file.name;
+                    var dir = $scope.component.dir || '';
+                    request.data.key += dir + file.name;
                     var upload = Upload.upload(request);
                     upload
                       .then(function(resp) {
