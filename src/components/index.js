@@ -20,5 +20,6 @@ require('./radio')(app);
 require('./resource')(app);
 require('./select')(app);
 require('./signature')(app);
+require('./table')(app);
 require('./textarea')(app);
 require('./well')(app);
