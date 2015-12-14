@@ -84,6 +84,8 @@ module.exports = function (app) {
             settings.defaultValue = [];
           }
 
+          $scope.refreshItems = angular.noop;
+
           switch (settings.dataSrc) {
             case 'values':
               $scope.selectItems = settings.data.values;
@@ -114,10 +116,27 @@ module.exports = function (app) {
                     }
                   };
                 }
-                $http.get(settings.data.url, options)
+
+                var loaded = false;
+                $scope.refreshItems = function(input) {
+                  var url = settings.data.url;
+
+                  if(settings.searchField && input) {
+                    url += ((url.indexOf('?') === -1) ? '?' : '&') +
+                      encodeURIComponent(settings.searchField) +
+                      '=' +
+                      encodeURIComponent(input);
+                  }
+                  else if(loaded) {
+                    return; // Skip if we've loaded before, to avoid multiple requests
+                  }
+                  $http.get(url, options)
                   .then(function (result) {
                     $scope.selectItems = result.data;
+                    loaded = true;
                   });
+                };
+                $scope.refreshItems();
               }
               break;
             default:
@@ -140,8 +159,6 @@ module.exports = function (app) {
           defaultValue: '',
           template: '<span>{{ item.label }}</span>',
           multiple: false,
-          refresh: false,
-          refreshDelay: 0,
           protected: false,
           unique: false,
           persistent: true,
@@ -162,7 +179,7 @@ module.exports = function (app) {
         '<ui-select-match placeholder="{{ component.placeholder }}">' +
         '<formio-select-item template="component.template" item="$item || $select.selected" select="$select"></formio-select-item>' +
         '</ui-select-match>' +
-        '<ui-select-choices repeat="getSelectItem(item) as item in selectItems | filter: $select.search">' +
+        '<ui-select-choices repeat="getSelectItem(item) as item in selectItems | filter: $select.search" refresh="refreshItems($select.search)" refresh-delay="250">' +
         '<formio-select-item template="component.template" item="item" select="$select"></formio-select-item>' +
         '</ui-select-choices>' +
         '</ui-select>' +

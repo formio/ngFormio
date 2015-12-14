@@ -18,7 +18,7 @@ module.exports = function (app) {
           }
           if (settings.resource) {
             var formio = new Formio($scope.formio.projectUrl + '/form/' + settings.resource);
-              $scope.refreshSubmissions = function (input) {
+            $scope.refreshSubmissions = function (input) {
               var params = {};
               // If they wish to return only some fields.
               if (settings.selectFields) {
@@ -52,8 +52,6 @@ module.exports = function (app) {
           selectFields: '',
           searchFields: '',
           multiple: false,
-          refresh: false,
-          refreshDelay: 0,
           protected: false,
           persistent: true,
           validate: {
