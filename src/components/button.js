@@ -55,9 +55,12 @@ module.exports = function (app) {
               client_id: settings.clientId,
               redirect_uri: window.location.origin || window.location.protocol + '//' + window.location.host,
               state: settings.state,
-              scope: settings.scope,
-              display: settings.display
+              scope: settings.scope
             };
+            // Make display optional.
+            if (settings.display) {
+              params.display = settings.display;
+            }
             params = Object.keys(params).map(function(key) {
               return key + '=' + encodeURIComponent(params[key]);
             }).join('&');
