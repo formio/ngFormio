@@ -110,128 +110,129 @@ angular
         })
         .state('project.edit', {
           url: '/edit',
-          parent: 'project',
           templateUrl: 'views/project/edit.html'
         })
         .state('project.data', {
           url: '/data',
-          parent: 'project',
           templateUrl: 'views/data/index.html'
+        })
+        .state('project.preview', {
+          url: '/preview',
+          templateUrl: 'views/project/preview.html',
+          controller: [
+            '$scope',
+            '$sce',
+            '$location',
+            function(
+              $scope,
+              $sce,
+              $location
+            ) {
+              $scope.previewUrl = '';
+              $scope.$watch('currentProject', function(project) {
+                if (!project.settings || !project.settings.preview) { return; }
+                var url = project.settings.preview.url;
+                url += '?apiUrl=' + encodeURIComponent(AppConfig.apiBase);
+                url += '&appUrl=' + encodeURIComponent($location.protocol() + '://' + project.name + '.' + AppConfig.serverHost);
+                $scope.previewUrl = $sce.trustAsResourceUrl(url);
+              });
+
+            }
+          ]
         })
         .state('project.api', {
           url: '/api',
-          parent: 'project',
           templateUrl: 'views/project/api/index.html',
           controller: 'ApiController'
         })
         .state('project.settings', {
           url: '/settings',
-          parent: 'project',
           templateUrl: 'views/project/settings.html',
           controller: 'ProjectSettingsController'
         })
         .state('project.settings.project', {
           url: '/project',
-          parent: 'project.settings',
           templateUrl: 'views/project/project-settings.html'
         })
         .state('project.settings.plan', {
           url: '/plan',
-          parent: 'project.settings',
           templateUrl: 'views/project/project-plan.html',
           controller: 'ProjectPlanController'
         })
         .state('project.settings.email', {
           url: '/email',
-          parent: 'project.settings',
           templateUrl: 'views/project/email/email.html'
         })
         .state('project.settings.databases', {
           url: '/databases',
-          parent: 'project.settings',
           templateUrl: 'views/project/databases/index.html'
         })
         .state('project.settings.oauth', {
           url: '/oauth',
-          parent: 'project.settings',
           templateUrl: 'views/project/oauth/index.html'
         })
         .state('project.settings.roles', {
           abstract: true,
           url: '/roles',
-          parent: 'project.settings',
           templateUrl: 'views/project/roles/roles.html'
         })
         .state('project.settings.roles.view', {
           url: '',
-          parent: 'project.settings.roles',
           templateUrl: 'views/project/roles/view.html'
         })
         .state('project.settings.roles.edit', {
           url: '/:roleId/edit',
-          parent: 'project.settings.roles',
           templateUrl: 'views/project/roles/edit.html',
           controller: 'RoleController'
         })
         .state('project.settings.roles.delete', {
           url: '/:roleId/delete',
-          parent: 'project.settings.roles',
           templateUrl: 'views/project/roles/delete.html',
           controller: 'RoleController'
         })
         .state('project.settings.teams', {
           abstract: true,
           url: '/teams',
-          parent: 'project.settings',
           templateUrl: 'views/project/teams/teams.html'
         })
         .state('project.settings.teams.view', {
           url: '',
-          parent: 'project.settings.teams',
           controller: 'ProjectTeamViewController',
           templateUrl: 'views/project/teams/view.html'
         })
         .state('project.settings.teams.add', {
           url: '/add',
-          parent: 'project.settings.teams',
           controller: 'ProjectTeamEditController',
           templateUrl: 'views/project/teams/edit.html'
         })
         .state('project.settings.teams.edit', {
           url: '/:teamId/edit',
-          parent: 'project.settings.teams',
           controller: 'ProjectTeamEditController',
           templateUrl: 'views/project/teams/edit.html'
         })
         .state('project.settings.teams.delete', {
           url: '/:teamId/delete',
-          parent: 'project.settings.teams',
           controller: 'ProjectTeamDeleteController',
           templateUrl: 'views/project/teams/delete.html'
         })
         .state('project.settings.cors', {
           url: '/cors',
-          parent: 'project.settings',
           templateUrl: 'views/project/cors/index.html'
         })
         .state('project.settings.office365', {
           url: '/office365',
-          parent: 'project.settings',
           templateUrl: 'views/project/office365/office365.html'
         })
         .state('project.settings.hubspot', {
           url: '/hubspot',
-          parent: 'project.settings',
           templateUrl: 'views/project/hubspot/hubspot.html'
         })
         .state('project.settings.export', {
           url: '/export',
-          parent: 'project.settings',
           templateUrl: 'views/project/export.html'
         })
         .state('project.delete', {
           url: '/delete',
-          parent: 'project',
           templateUrl: 'views/project/delete.html',
           controller: 'ProjectDeleteController'
         })
@@ -247,19 +248,16 @@ angular
         })
         .state('team.view', {
           url: '/view',
-          parent: 'team',
           controller: 'TeamViewController',
           templateUrl: 'views/team/view.html'
         })
         .state('team.edit', {
           url: '/edit',
-          parent: 'team',
           controller: 'TeamEditController',
           templateUrl: 'views/team/edit.html'
         })
         .state('team.delete', {
           url: '/delete',
-          parent: 'team',
           controller: 'TeamDeleteController',
           templateUrl: 'views/team/delete.html'
         })

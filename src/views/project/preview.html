@@ -1,0 +1,16 @@
+<div class="row project-section-header">
+  <div class="col-sm-12">
+    <a class="btn btn-primary project-section-header-button" href="http://help.form.io/embedding/" target="_blank"><i class="fa fa-life-ring"></i> Help</a>
+    <h2><i class="fa fa-laptop"></i> Application Preview</h2>
+    <p>Form.io can serve as the data platform for your application. You can easily <strong>embed</strong> your Forms and Resources directly into your application creating an easy-to-maintain application data management solution.</p>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-12" style="text-align: center;">
+    <h3>Example Application</h3>
+    <div id="application-preview">
+      <img src="images/tablet.png" class="img-responsive" />
+      <iframe ng-if="previewUrl" id="application-frame" ng-src="{{ previewUrl }}" frameborder="0"></iframe>
+    </div>
+  </div>
+</div>

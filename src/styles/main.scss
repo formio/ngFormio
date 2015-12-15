@@ -369,8 +369,28 @@ $project-header-color: lighten($brand-primary, 55%);
   }
 }
 
+#application-preview {
+  position: relative;
+  img { width: 100%; }
+  #application-frame {
+    position: absolute;
+    top: 12.5%;
+    left: 10%;
+    width: 79%;
+    height: 75%;
+  }
+}
+
 .project-section-content {
   margin-top: 10px;
+}
+
+.project-resource-page, .project-form-page {
+  .project-section-content {
+    .panel {
+      border: none;
+    }
+  }
 }
 
 .project-section-header-button {
@@ -412,7 +432,6 @@ $project-header-color: lighten($brand-primary, 55%);
         a {
           background-color: $brand-secondary;
           border: solid darken($brand-secondary, 10%) 2px;
-          border-radius: 10px;
           color: $project-header-color;
           &:hover {
             background-color: darken($brand-secondary, 10%);
