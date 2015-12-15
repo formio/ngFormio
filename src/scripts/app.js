@@ -129,12 +129,23 @@ angular
               $location
             ) {
               $scope.previewUrl = '';
+              $scope.repo = '';
+              $scope.hasTemplate = true;
               $scope.$watch('currentProject', function(project) {
-                if (!project.settings || !project.settings.preview) { return; }
+                if (!project.settings) { return; }
+                if (!project.settings.preview) {
+                  $scope.hasTemplate = false;
+                  project.settings.preview = {
+                    repo: 'https://github.com/formio/formio-app-template',
+                    url: 'http://formio.github.io/formio-app-template/'
+                  };
+                }
+
                 var url = project.settings.preview.url;
                 url += '?apiUrl=' + encodeURIComponent(AppConfig.apiBase);
                 url += '&appUrl=' + encodeURIComponent($location.protocol() + '://' + project.name + '.' + AppConfig.serverHost);
                 $scope.previewUrl = $sce.trustAsResourceUrl(url);
+                $scope.repo = project.settings.preview.repo;
               });
 
             }

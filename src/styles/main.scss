@@ -239,7 +239,7 @@ $project-header-color: lighten($brand-primary, 55%);
       background-color: darken($brand-primary, 20%);
       & > a, & > a:focus {
         background-color: darken($brand-primary, 5%);
-        border-right: solid darken($brand-secondary, 2%) 8px;
+        border-right: solid $brand-secondary 8px;
       }
     }
   }
@@ -357,7 +357,7 @@ $project-header-color: lighten($brand-primary, 55%);
   color: $project-header-color;
   margin-top: -10px;
   padding: 20px;
-  border-bottom: solid darken($brand-secondary, 2%) 8px;
+  border-bottom: solid $brand-secondary 8px;
   h2 {
     a {
       color: $project-header-color;
