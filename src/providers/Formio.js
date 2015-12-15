@@ -1,7 +1,7 @@
 module.exports = function() {
 
   // The formio class.
-  var Formio = require('formiojs/src/formio.js')();
+  var Formio = require('formiojs/src/formio.js');
 
   // Return the provider interface.
   return {
