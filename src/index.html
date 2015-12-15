@@ -71,17 +71,14 @@
                 <a href="https://form.io" class="navbar-brand">
                   <img height="35px;" src="images/formio-logo-white.png" />
                 </a>
-                <ol class="breadcrumb" ng-cloak>
-                  <li><a ui-sref="home()" class="btn btn-success btn-sm"><span class="glyphicon glyphicon-home" aria-hidden="true"></span></a></li>
-                  <li ng-if="currentProject"><a ui-sref="project.edit({projectId: currentProject._id})"><span class="label label-default">{{ currentProject.title | characters:25:true }}</span></a></li>
-                  <li ng-if="currentForm"><a ui-sref="project.form.view({formId: currentForm._id})">{{ currentForm.title | characters:25:true}}</a></li>
-                </ol>
               </div>
               <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                  <li><a ui-sref="home" style="font-size: 1.5em;"><i class="fa fa-th-large"></i> Projects</a></li>
+                  <li><a ui-sref="home" style="font-size: 1.5em;"><i class="fa fa-users"></i> Teams</a></li>
+                </ul>
                 <ul class="nav navbar-nav navbar-right">
-                  <li>
-                    <a href="http://help.form.io" target="_blank"><i class="fa fa-life-ring"></i> Help</a>
-                  </li>
+                  <li><a href="http://help.form.io" target="_blank"><i class="fa fa-life-ring"></i> Help</a></li>
                   <li class="dropdown user-dropdown" ng-cloak>
                     <a ng-if="authenticated" href="#" class="dropdown-toggle" id="user-menu" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-user"></i> {{ user.data.name }}<b class="caret"></b></a>
                     <ul class="dropdown-menu">

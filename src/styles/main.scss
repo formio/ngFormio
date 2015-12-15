@@ -162,7 +162,7 @@ ul.dropdown-menu {
 @media (min-width: $screen-sm-min) {
   .sidebar {
     position: fixed;
-    top: 51px;
+    top: 45px;
     bottom: 0;
     left: 0;
     z-index: 1000;
@@ -222,6 +222,7 @@ $project-header-color: lighten($brand-primary, 55%);
   width: 7%;
   .nav > li {
     & > a {
+      height: 90px;
       padding: 20px 15px;
       color: $project-header-color;
       &:hover {
@@ -278,6 +279,10 @@ $project-header-color: lighten($brand-primary, 55%);
   margin-bottom: 0;
 }
 
+.navbar-nav {
+  margin-left: 20px;
+}
+
 .form-builder-body {
   width: 100%;
 }
@@ -304,6 +309,7 @@ $project-header-color: lighten($brand-primary, 55%);
   background-color: $gray-lighter;
   border-bottom: 1px solid #ddd;
   padding: 10px;
+  min-height: 90px;
   .project-title {
     font-weight: normal;
     margin-left: 0px;
