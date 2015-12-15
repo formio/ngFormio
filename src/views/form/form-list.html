@@ -5,12 +5,24 @@
         <td>
           <div class="row">
             <div class="col-sm-8">
-              <a ui-sref="project.form.view({formId: form._id})"><h5>{{ form.title | characters:25:true}}</h5></a>
+              <a ui-sref="project.{{ formType }}.form.edit({formId: form._id})" ng-if="!listMode || (listMode == 'forms')"><h5>{{ form.title | characters:25:true}}</h5></a>
+              <a ui-sref="project.{{ formType }}.form.submission.index({formId: form._id})" ng-if="listMode == 'data'"><h5>{{ form.title | characters:25:true}}</h5></a>
             </div>
             <div class="col-sm-4">
-              <div class="button-group pull-right" style="display:flex;">
-                <a ui-sref="project.form.edit({formId: form._id})" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-edit"></span> Edit</a>&nbsp;
-                <a ui-sref="project.form.delete({formId: form._id, formType: formType})" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-trash"></span></a>
+              <div class="button-group pull-right">
+                <span ng-if="!listMode || (listMode == 'forms')" style="display:flex;">
+                  <a ui-sref="project.{{ formType }}.form.view({formId: form._id})" class="btn btn-success btn-xs"><i class="fa fa-eye"></i> View</a>&nbsp;
+                  <a ui-sref="project.{{ formType }}.form.edit({formId: form._id})" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-edit"></span> Edit</a>&nbsp;
+                  <a ui-sref="project.{{ formType }}.form.submission.index({formId: form._id})" class="btn btn-info btn-xs"><i class="fa fa-table"></i> Data</a>&nbsp;
+                  <a ui-sref="project.{{ formType }}.form.action.index({formId: form._id})" class="btn btn-warning btn-xs"><i class="fa fa-paper-plane"></i> Actions</a>&nbsp;
+                  <a ui-sref="project.{{ formType }}.form.permission({formId: form._id})" class="btn btn-default btn-xs"><i class="fa fa-lock"></i> Access</a>&nbsp;
+                  <a ui-sref="project.{{ formType }}.form.delete({formId: form._id, formType: formType})" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-trash"></span></a>
+                </span>
+                <span ng-if="listMode == 'data'" style="display:flex;">
+                  <a ui-sref="project.{{ formType }}.form.submission.index({formId: form._id})" class="btn btn-info btn-xs"><i class="fa fa-table"></i> Data</a>&nbsp;
+                  <a ng-click="export(form, 'json')" class="btn btn-warning btn-xs">{...} Export JSON</a>&nbsp;
+                  <a ng-click="export(form, 'csv')" class="btn btn-success btn-xs"><i class="fa fa-file-text-o"></i> Export CSV</a>&nbsp;
+                </span>
               </div>
             </div>
           </div>

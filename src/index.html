@@ -108,12 +108,10 @@
           </ul>
         </div>
       </div>
-      <div class="container-fluid" id="main-wrapper" ng-cloak>
-        <div class="row">
-          <div class="col-sm-12 main">
-            <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)" ng-bind-html="alert.message"></alert>
-            <div ui-view></div>
-          </div>
+      <div class="row {{ mainClass }}" id="main-wrapper" ng-cloak>
+        <div class="col-sm-12 main">
+          <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)" ng-bind-html="alert.message"></alert>
+          <div ui-view></div>
         </div>
       </div>
 

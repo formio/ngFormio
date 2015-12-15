@@ -1,5 +1,5 @@
 <div class="row">
-  <div class="col-sm-4">
+  <div class="col-sm-6">
     <div class="panel panel-primary">
       <div class="panel-heading">
         <h3 class="panel-title">
@@ -11,16 +11,16 @@
       <div class="panel-body">
         <i id="resource-loader" style="font-size: 2em;" class="fa fa-spinner fa-pulse"></i>
         <div class="well" ng-show="!resourcesLoading">
-          Resources are the objects within your Project. Example: User, Company, Vehicle, etc.
+          Resources are the objects within your Application. Example: User, Company, Vehicle, etc.
         </div>
         <form-list forms="resources" project="currentProject" form-type="'resource'" num-per-page="10"></form-list>
       </div>
       <div class="panel-footer text-right">
-        <a ui-sref="project.form.createResource()" class="btn btn-success"><span class="glyphicon glyphicon-plus"></span> New Resource</a>
+        <a ui-sref="project.resource.create" class="btn btn-success"><span class="glyphicon glyphicon-plus"></span> New Resource</a>
       </div>
     </div>
   </div>
-  <div class="col-sm-4">
+  <div class="col-sm-6">
     <div class="panel panel-primary">
       <div class="panel-heading">
         <h3 class="panel-title">
@@ -32,16 +32,16 @@
       <div class="panel-body">
         <i id="form-loader" style="font-size: 2em;" class="fa fa-spinner fa-pulse"></i>
         <div class="well" ng-show="!formsLoading">
-          Forms serve as a composite input interface for Resources as well as free-form user input. Example: Login Form, Contact Form, etc.
+          Forms serve as an input interface for Resources as well as free-form user input within your Application. Example: Login Form, Contact Form, etc.
         </div>
         <form-list forms="forms" project="currentProject" form-type="'form'" num-per-page="10"></form-list>
       </div>
       <div class="panel-footer text-right">
-        <a ui-sref="project.form.createForm()" class="btn btn-success"><span class="glyphicon glyphicon-plus"></span> New Form</a>
+        <a ui-sref="project.form.create" class="btn btn-success"><span class="glyphicon glyphicon-plus"></span> New Form</a>
       </div>
     </div>
   </div>
-  <div class="col-sm-4">
+<!--  <div class="col-sm-4">
     <div class="panel panel-info" ng-if="currentProject.settings.preview">
       <div class="panel-heading">
         <h3 class="panel-title"><span class="glyphicon glyphicon-info-sign"></span> Preview your project</h3>
@@ -86,5 +86,5 @@
         </div>
       </div>
     </div>
-  </div>
+  </div>-->
 </div>

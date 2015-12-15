@@ -98,6 +98,7 @@ angular
           templateUrl: 'views/user/profile/profile-edit.html'
         })
         .state('project', {
+          abstract: true,
           url: '/project/:projectId',
           controller: 'ProjectController',
           templateUrl: 'views/project/project.html'
@@ -111,6 +112,11 @@ angular
           url: '/edit',
           parent: 'project',
           templateUrl: 'views/project/edit.html'
+        })
+        .state('project.data', {
+          url: '/data',
+          parent: 'project',
+          templateUrl: 'views/data/index.html'
         })
         .state('project.api', {
           url: '/api',
@@ -462,7 +468,7 @@ angular
       });
 
       $rootScope.goToProject = function(project) {
-        $state.go('project.edit', {projectId: project._id});
+        $state.go('project.resource.index', {projectId: project._id});
       };
 
       $rootScope.getPreviewURL = function(project) {
@@ -518,12 +524,25 @@ angular
 
       // Ensure they are logged.
       $rootScope.$on('$stateChangeStart', function(event, toState) {
-        $rootScope.authenticated = !!Formio.getToken();
+        $rootScope.userToken = Formio.getToken();
+        $rootScope.authenticated = !!$rootScope.userToken;
         if (toState.name.substr(0, 4) === 'auth') { return; }
         if(!$rootScope.authenticated) {
           event.preventDefault();
           $state.go('auth');
         }
+      });
+
+      $rootScope.$on('$stateChangeSuccess', function(event, state) {
+        var parts = state.name.split('.');
+        var classes = [];
+        var currentClass = [];
+        for (var i in parts) {
+          currentClass.push(parts[i]);
+          var className = currentClass.join('-');
+          classes.push(className + '-page');
+        }
+        $rootScope.mainClass = classes.join(' ');
       });
 
       // Set the active sidebar.
@@ -596,13 +615,13 @@ angular
         return this.plans[plan].labelStyle;
       },
       getAPICallsLimit: function(apiCalls) {
-        if(!apiCalls.limit) {
+        if(!apiCalls || !apiCalls.limit) {
           return '∞';
         }
         return $filter('number')(apiCalls.limit);
       },
       getAPICallsPercent: function(apiCalls) {
-        if(!apiCalls.limit) {
+        if(!apiCalls || !apiCalls.limit) {
           return '0%';
         }
         var percent = apiCalls.used / apiCalls.limit * 100;

@@ -279,6 +279,10 @@ app.controller('ProjectController', [
   }
 ]);
 
+app.controller('ProjectDataController', [
+
+]);
+
 app.controller('ProjectSettingsController', [
   '$scope',
   '$rootScope',

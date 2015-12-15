@@ -16,8 +16,8 @@
       <div class="col-sm-4" ng-repeat="project in projects">
         <div class="project well" ng-click="goToProject(project)" title="{{ project.title }}">
           <span class="label project-plan-label" ng-class="getPlanLabel(project.plan)">{{ getPlanName(project.plan) | uppercase }}</span>
-          <h4 class="project-title ellipsis"><a ui-sref="project.edit({projectId: project._id})">{{ project.title }}</a></h4>
-          <p class="project-url ellipsis" ui-sref="project.edit({projectId: project._id})"><strong>{{ project.name }}</strong>.form.io</p>
+          <h4 class="project-title ellipsis"><a ui-sref="project.resource.index({projectId: project._id})">{{ project.title }}</a></h4>
+          <p class="project-url ellipsis" ui-sref="project.resource.index({projectId: project._id})"><strong>{{ project.name }}</strong>.form.io</p>
           <p class="project-description ellipsis">{{ project.description | characters: 50 }}&nbsp;</p><hr/>
           <p class="progress-label text-center"><small>Monthly API Calls</small></p>
           <div class="progress">
@@ -25,7 +25,7 @@
             <span><small>{{ project.apiCalls.used | number }} / {{ getAPICallsLimit(project.apiCalls) }}</small></span>
           </div>
           <div class="row" style="z-index:1000;">
-            <div class="col-sm-4 project-tile-button"><button ui-sref="project.edit({projectId: project._id})" class="btn btn-default btn-xs btn-block">Manage</button></div>
+            <div class="col-sm-4 project-tile-button"><button ui-sref="project.resource.index({projectId: project._id})" class="btn btn-default btn-xs btn-block">Manage</button></div>
             <div class="col-sm-4 project-tile-button"><button ng-href="{{getPreviewURL(project)}}" target="_blank" ng-disabled="!project.settings.preview"class="btn btn-default btn-xs btn-block"">Preview</button></div>
             <div class="col-sm-4 project-tile-button"><button ui-sref="project.settings.plan({projectId: project._id})" class="btn btn-default btn-xs btn-block"">Upgrade Plan</button></div>
           </div>

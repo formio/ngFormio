@@ -159,7 +159,7 @@ ul.dropdown-menu {
 .sidebar {
   display: none;
 }
-@media (min-width: 768px) {
+@media (min-width: $screen-sm-min) {
   .sidebar {
     position: fixed;
     top: 51px;
@@ -192,29 +192,85 @@ ul.dropdown-menu {
   background-color: #428bca;
 }
 
-.main {
-  padding: 20px;
-}
-
-#main-wrapper {
-  min-height: 80vh;
-}
-@media (min-width: 768px) {
+@media (min-width: $screen-sm-min) {
   #main-wrapper {
     margin: 0;
-  }
-  .main {
-    padding-right: 40px;
-    padding-left: 40px;
   }
 }
 @media (min-width: 1024px) {
   #main-wrapper {
-    margin: 0 100px;
+    margin-right: 100px;
+    margin-left: 100px;
   }
 }
+
+#main-wrapper {
+  min-height: 80px;
+  margin-bottom: 40px;
+  &.project-page {
+    margin: 0;
+  }
+}
+
+$project-header-color: lighten($brand-primary, 55%);
+
+.project-sidebar {
+  border: none;
+  background-color: darken($brand-primary, 25%);
+  text-align: center;
+  padding-top: 0;
+  width: 7%;
+  .nav > li {
+    & > a {
+      padding: 20px 15px;
+      color: $project-header-color;
+      &:hover {
+        background-color: darken($brand-primary, 20%);
+      }
+      span {
+        font-size: 0.6em;
+      }
+      i {
+        font-size: 2em;
+      }
+    }
+    &.active {
+      background-color: darken($brand-primary, 20%);
+      & > a, & > a:focus {
+        background-color: darken($brand-primary, 5%);
+        border-right: solid darken($brand-secondary, 2%) 8px;
+      }
+    }
+  }
+}
+
+.project-main {
+  margin-left: 7%;
+  width: 93%;
+  padding: 0;
+}
+
+@media (max-width: $screen-sm-min) {
+  .project-main {
+    margin-left: 0;
+    width: 100%;
+  }
+}
+
+.project-content {
+  padding: 10px 10px 40px 10px;
+}
+
 .main .page-header {
   margin-top: 0;
+}
+
+.project-page {
+  margin-left: 80px;
+}
+
+#main-wrapper.auth-page {
+  margin-top: 40px;
 }
 
 .navbar {
@@ -245,8 +301,9 @@ ul.dropdown-menu {
 }
 
 .project-nav {
+  background-color: $gray-lighter;
   border-bottom: 1px solid #ddd;
-  margin-bottom: 10px;
+  padding: 10px;
   .project-title {
     font-weight: normal;
     margin-left: 0px;
@@ -254,6 +311,12 @@ ul.dropdown-menu {
     margin-top: 0px;
     margin-bottom: 0;
     font-size: 2em;
+    .project-title-link {
+      color: $gray;
+      &:hover, &:focus {
+        text-decoration: none;
+      }
+    }
   }
 
   .project-description {
@@ -263,8 +326,64 @@ ul.dropdown-menu {
   }
 }
 
-.project-description, .project-url {
+.project-description, .project-swagger {
   word-break: break-all;
+}
+
+.project-swagger-button {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  font-size: 0.5em;
+  line-height: 1.2em;
+  background-color: #ddd;
+  border: solid white 2px;
+  border-radius: 20px;
+  padding: 2px 8px;
+  &:hover {
+    background-color: $gray-lighter;
+    text-decoration: none;
+  }
+}
+
+.project-section-header {
+  background-color: darken($brand-primary, 5%);
+  color: $project-header-color;
+  margin-top: -10px;
+  padding: 20px;
+  border-bottom: solid darken($brand-secondary, 2%) 8px;
+  h2 {
+    a {
+      color: $project-header-color;
+      &:hover, &:focus {
+        text-decoration: none;
+      }
+    }
+    margin: 0 0 10px 0;
+  }
+}
+
+.project-section-content {
+  margin-top: 10px;
+}
+
+.project-section-header-button {
+  float: right;
+  border: solid $project-header-color 2px;
+  margin-top: 1em;
+}
+
+.project-header-block {
+  text-align: right;
+}
+
+.project-requests-progress {
+  margin-bottom: 0;
+  height: 31px;
+}
+
+.upgrade-plan-header-button {
+  padding: 4px 8px;
 }
 
 .form-title {
@@ -275,7 +394,30 @@ ul.dropdown-menu {
 }
 
 .form-nav {
-  border-bottom: 1px solid #ddd;
+  border-top: solid $project-header-color 2px;
+  background-color: $gray-lighter;
+  color: $gray;
+  padding: 5px 0 5px 20px;
+  margin-bottom: 10px;
+  .nav-pills {
+    li {
+      padding: 0;
+      &.form-nav-right {
+        a {
+          background-color: $brand-secondary;
+          border: solid darken($brand-secondary, 10%) 2px;
+          border-radius: 10px;
+          color: $project-header-color;
+          &:hover {
+            background-color: darken($brand-secondary, 10%);
+          }
+        }
+        &.active a {
+          background-color: $brand-primary;
+        }
+      }
+    }
+  }
   li {
     padding-bottom: 5px;
   }
@@ -283,16 +425,16 @@ ul.dropdown-menu {
     float: right;
   }
   .resource-label {
+    color: white;
+    background-color: $gray-light;
     display: inline;
-    padding: .2em .6em .3em;
+    padding: 0.3em 0.5em;
     font-size: 80%;
     font-weight: 500;
-    line-height: 3.5;
     text-align: center;
     white-space: nowrap;
-    vertical-align: baseline;
     border-radius: .25em;
-    margin-right: 30px;
+    line-height: 3.7em;
   }
 }
 
