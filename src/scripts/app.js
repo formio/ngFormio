@@ -333,7 +333,7 @@ angular
         $scope.projects = projects;
         $scope.teamsEnabled = _.any(projects, function(project) {
           project.plan = project.plan || '';
-          return _.startsWith(project.plan, 'team');
+          return (project.plan === 'team' || project.plan === 'commercial');
         });
       }).catch(FormioAlerts.onError.bind(FormioAlerts));
 
