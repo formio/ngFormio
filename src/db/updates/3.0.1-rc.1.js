@@ -57,7 +57,36 @@ module.exports = function(db, config, tools, done) {
     form.components[0].validate.required = true;
 
     // Update the resource form component to only search names and store them.
-    form.components[1].searchFields = ['data.name__regex'];
+    form.components[1] = {
+      'input': true,
+      'tableView': true,
+      'label': 'Members',
+      'key': 'members',
+      'placeholder': 'Select the members on this team.',
+      'data': {
+        'values': [{
+          'value': '',
+          'label': ''
+        }],
+        'json': '',
+        'url': 'https://api.form.io/team/members'
+      },
+      'dataSrc': 'url',
+      'valueProperty': '',
+      'defaultValue': [],
+      'template': '<span>{{ item.data.name }}</span>',
+      'multiple': true,
+      'refresh': false,
+      'refreshDelay': 0,
+      'protected': false,
+      'unique': true,
+      'persistent': true,
+      'validate': {
+        'required': false
+      },
+      'type': 'select',
+      'searchField': 'name'
+    };
 
     // Update the submission access to allow all users to see a team
     form.submissionAccess = [
