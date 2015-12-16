@@ -142,7 +142,7 @@ angular
                 }
 
                 var url = project.settings.preview.url;
-                url += '?apiUrl=' + encodeURIComponent(AppConfig.apiBase);
+                url += '/?apiUrl=' + encodeURIComponent(AppConfig.apiBase);
                 url += '&appUrl=' + encodeURIComponent($location.protocol() + '://' + project.name + '.' + AppConfig.serverHost);
                 $scope.previewUrl = $sce.trustAsResourceUrl(url);
                 $scope.repo = project.settings.preview.repo;
