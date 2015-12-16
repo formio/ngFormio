@@ -301,6 +301,20 @@ module.exports = function(config) {
       });
     })
     .then('I see an alert with (?:the text )?$TEXT', function(text, next) {
+      this.driver.waitForExist('//div[@class=\'ui-notification\']/div[@class=\'message\']', timeout)
+        .then(function() {
+          this.driver.getText('//div[@class=\'ui-notification\']/div[@class=\'message\']')
+            .then(function(alert) {
+              assert.equal(text, alert);
+              next();
+            })
+            .catch(function(err) {
+              next(err);
+            });
+        }.bind(this))
+        .catch(function(err) {
+          next(err);
+        });
       this.driver.waitForExist('//div[@role=\'alert\']', timeout)
         .then(function() {
           this.driver.getText('//div[@role=\'alert\']')
