@@ -290,6 +290,7 @@ app.controller('FormController', [
 
     // Save a form.
     $scope.saveForm = function() {
+      angular.element('.has-error').removeClass('has-error');
       $scope.formio.saveForm(angular.copy($scope.form)) // Copy to remove angular $$hashKey
       .then(function(form) {
         var method = $stateParams.formId ? 'updated' : 'created';
@@ -403,13 +404,6 @@ app.factory('FormioAlerts', [
             element: error.path
           });
         }
-
-        // Remove error class from old alerts before clearing them.
-        _.each($rootScope.alerts, function(alert){
-          if(alert.element && !_.find(alerts, 'element', alert.element)) {
-            angular.element('#form-group-' + alert.element).removeClass('has-error');
-          }
-        });
       }
     };
   }
