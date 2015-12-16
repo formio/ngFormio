@@ -1,7 +1,11 @@
 <div class="row form-nav">
   <div class="col-sm-12">
     <ul class="nav nav-pills">
-      <li role="presentation"><span ng-switch="form.type" class="navbar-text form-title">{{ form.title | characters:25:true}}</span>&nbsp;<span class="resource-label label-default">{{ form.type | uppercase }}</span></li>
+      <li role="presentation">
+        <span ng-switch="form.type" class="navbar-text form-title">{{ form.title | characters:25:true}}</span>&nbsp;
+        <span class="resource-label label-default">{{ form.type | uppercase }}</span>&nbsp;
+        <button ng-if="isActive('project.' +  formInfo.type + '.form.edit')" ng-click="saveForm()" class="btn btn-primary">{{formId ? 'Save' : 'Create'}} {{ capitalize(form.type)  }}</button>
+      </li>
       <li role="presentation" class="form-nav-right" ng-class="{active:isActive('project.{{ formInfo.type }}.form.submission')}"><a ui-sref="project.{{ formInfo.type }}.form.submission.index">Submissions</a></li>
       <li role="presentation" class="form-nav-right" ng-class="{active:isActive('project.{{ formInfo.type }}.form.permission')}"><a ui-sref="project.{{ formInfo.type }}.form.permission">Permissions</a></li>
       <li role="presentation" class="form-nav-right" ng-class="{active:isActive('project.{{ formInfo.type }}.form.api')}"><a ui-sref="project.{{ formInfo.type }}.form.api">API</a></li>

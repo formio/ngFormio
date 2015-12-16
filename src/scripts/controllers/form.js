@@ -52,6 +52,7 @@ app.config([
               $state
             ) {
               $scope.formInfo = $state.current.data;
+              $scope.infoTemplate = 'views/form/' + $scope.formInfo.type + '-info.html';
             }
           ],
           data: typeInfo[type]

@@ -2,11 +2,12 @@
   <div class="col-sm-12">
     <div class="panel panel-primary">
       <div class="panel-body">
+        <ng-include ng-if="!forms.length" src="infoTemplate"></ng-include>
         <i id="{{ formInfo.type }}-loader" style="font-size: 2em;" class="fa fa-spinner fa-pulse"></i>
         <form-list forms="forms" project="currentProject" form-type="formInfo.type" num-per-page="10"></form-list>
       </div>
       <div class="panel-footer">
-        <a ui-sref="project[formInfo.type].create()" class="btn btn-success"><span class="glyphicon glyphicon-plus"></span> New {{ formInfo.name }}</a>
+        <a ui-sref="project.{{ formInfo.type }}.create()" class="btn btn-success"><span class="glyphicon glyphicon-plus"></span> New {{ formInfo.name }}</a>
       </div>
     </div>
   </div>
