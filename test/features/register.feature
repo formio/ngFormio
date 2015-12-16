@@ -3,7 +3,7 @@ Feature: Register Functionality
   Scenario: Empty Register
     Given I am on /#/auth
     And I am logged out
-    When I wait 200 milliseconds
+    When I wait 500 milliseconds
     Then the REGISTER button is disabled
 
   Scenario: Username only
