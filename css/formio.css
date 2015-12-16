@@ -75,3 +75,21 @@ input[type="password"][draggable="true"] {
     transform: rotate(359deg);
   }
 }
+
+.form-field-type-file .fileSelector,
+.component-type-file .fileSelector {
+  padding: 15px;
+  border: 2px dashed #ddd;
+  text-align: center;
+}
+
+.form-field-type-file .fileSelector.fileDragOver,
+.component-type-file .fileSelector.fileDragOver {
+  border-color: #127abe;
+}
+
+.form-field-type-file .fileSelector .glyphicon,
+.component-type-file .fileSelector .glyphicon {
+  font-size: 20px;
+  margin-right: 5px;
+}
