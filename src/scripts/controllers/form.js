@@ -348,22 +348,31 @@ app.controller('FormEditController', [
 
 app.factory('FormioAlerts', [
   '$rootScope',
+  'Notification',
   function (
-    $rootScope
+    $rootScope,
+    Notification
   ) {
-    var alerts = [];
     return {
       addAlert: function (alert) {
-        alerts.push(alert);
-        if(alert.element) {
+        switch (alert.type) {
+          case 'danger':
+            Notification.error({message: alert.message});
+            break;
+          case 'info':
+            Notification.info({message: alert.message});
+            break;
+          case 'success':
+            Notification.success({message: alert.message});
+            break;
+          case 'warning':
+            Notification.warning({message: alert.message});
+            break;
+        }
+
+        if (alert.element) {
           angular.element('#form-group-' + alert.element).addClass('has-error');
         }
-      },
-      getAlerts: function () {
-        var tempAlerts = angular.copy(alerts);
-        alerts.length = 0;
-        alerts = [];
-        return tempAlerts;
       },
       warn: function (warning) {
         if(!warning) {
@@ -373,9 +382,6 @@ app.factory('FormioAlerts', [
           type: 'warning',
           message: warning.message || warning
         });
-
-        // Clear old alerts with new alerts.
-        $rootScope.alerts = this.getAlerts();
       },
       onError: function (error) {
         var errors = error.hasOwnProperty('errors') ? error.errors : error.data && error.data.errors;
@@ -404,8 +410,6 @@ app.factory('FormioAlerts', [
             angular.element('#form-group-' + alert.element).removeClass('has-error');
           }
         });
-        // Clear old alerts with new alerts.
-        $rootScope.alerts = this.getAlerts();
       }
     };
   }

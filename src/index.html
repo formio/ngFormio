@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="/bower_components/font-awesome/css/font-awesome.css" />
     <link rel="stylesheet" href="/bower_components/kendo-ui/styles/kendo.common.min.css" />
     <link rel="stylesheet" href="/bower_components/kendo-ui/styles/kendo.bootstrap.min.css" />
+    <link rel="stylesheet" href="/bower_components/angular-ui-notification/dist/angular-ui-notification.css" />
     <!-- endbower -->
     <!-- endbuild -->
 
@@ -107,16 +108,11 @@
       </div>
       <div class="row {{ mainClass }}" id="main-wrapper" ng-cloak>
         <div class="col-sm-12 main">
-          <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)" ng-bind-html="alert.message"></alert>
           <div ui-view></div>
         </div>
       </div>
-
       <formio-feedback></formio-feedback>
-
     </div>
-
-
 
     <footer>
       <div class="footer-banner"><img src="images/footerlogo-before.png" /></div>
@@ -209,6 +205,7 @@
     <script src="/bower_components/kendo-ui/js/kendo.ui.core.min.js"></script>
     <script src="/bower_components/kendo-ui/js/kendo.angular.min.js"></script>
     <script src="/bower_components/angular-truncate-2/src/angular-truncate-2.js"></script>
+    <script src="/bower_components/angular-ui-notification/dist/angular-ui-notification.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 

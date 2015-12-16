@@ -17,6 +17,7 @@ angular
     'ui.bootstrap.tpls',
     'ui.select',
     'ui.bootstrap.datetimepicker',
+    'ui-notification',
     'angularMoment',
     'ngCkeditor',
     'formioApp.controllers',
@@ -458,18 +459,11 @@ angular
         });
       }
 
-      // Adding the alerts capability.
-      $rootScope.alerts = [];
-      $rootScope.closeAlert = function(index) {
-        $rootScope.alerts.splice(index, 1);
-      };
-
       $rootScope.$state = $state;
       $rootScope.$stateParams = $stateParams;
       $rootScope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams) {
         $window.document.body.scrollTop = $window.document.documentElement.scrollTop = 0;
         $rootScope.showHeader = false;
-        $rootScope.alerts = FormioAlerts.getAlerts();
         $rootScope.previousState = fromState.name;
         $rootScope.previousParams = fromParams;
         $rootScope.currentState = toState.name;
