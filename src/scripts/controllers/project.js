@@ -95,13 +95,21 @@ app.controller('ProjectCreateController', [
         "title": "Default",
         "name": "default",
         "description": "A default project with User and Admin resources and their respective authentication forms.",
-        template: 'default'
+        template: 'default',
+        "preview": {
+          "url": "http://formio.github.io/formio-app-basic",
+          "repo": "https://github.com/formio/formio-app-basic"
+        }
       },
       {
         "title": "Empty",
         "name": "empty",
         "description": "An empty project with no forms or resources. Create a project with a fresh start!",
-        template: 'empty'
+        template: 'empty',
+        "preview": {
+          "url": "http://formio.github.io/formio-app-template",
+          "repo": "https://github.com/formio/formio-app-template"
+        }
       }
     ];
 
