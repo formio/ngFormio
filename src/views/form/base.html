@@ -1,8 +1,6 @@
-<div class="row project-section-header">
-  <div class="col-sm-12">
-    <a class="btn btn-primary project-section-header-button" href="{{ formInfo.help }}" target="_blank"><i class="fa fa-life-ring"></i> Help</a>
-    <h2><a ui-sref="project.{{ formInfo.type }}.index"><i class="{{ formInfo.icon }}"></i> {{ formInfo.title }}</a></h2>
-    <p>{{ formInfo.description }}</p>
-  </div>
+<div class="project-section-header">
+  <a class="btn btn-primary project-section-header-button" href="{{ formInfo.help }}" target="_blank"><i class="fa fa-life-ring"></i> Help</a>
+  <h2><a ui-sref="project.{{ formInfo.type }}.index"><i class="{{ formInfo.icon }}"></i> {{ formInfo.title }}</a></h2>
+  <p>{{ formInfo.description }}</p>
 </div>
-<div ui-view></div>
+<div class="project-section-content" ui-view></div>

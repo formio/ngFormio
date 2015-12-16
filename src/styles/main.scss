@@ -206,7 +206,11 @@ ul.dropdown-menu {
 
 #main-wrapper {
   min-height: 80px;
+  margin-top: 20px;
   margin-bottom: 40px;
+  &.auth-page {
+    margin-top: 40px;
+  }
   &.project-page {
     margin: 0;
   }
@@ -259,19 +263,11 @@ $project-header-color: lighten($brand-primary, 55%);
 }
 
 .project-content {
-  padding: 10px 10px 40px 10px;
+  margin-bottom: 40px;
 }
 
 .main .page-header {
   margin-top: 0;
-}
-
-.project-page {
-  margin-left: 80px;
-}
-
-#main-wrapper.auth-page {
-  margin-top: 40px;
 }
 
 .navbar {
@@ -355,7 +351,6 @@ $project-header-color: lighten($brand-primary, 55%);
 .project-section-header {
   background-color: darken($brand-primary, 5%);
   color: $project-header-color;
-  margin-top: -10px;
   padding: 20px;
   border-bottom: solid $brand-secondary 8px;
   h2 {
@@ -367,6 +362,14 @@ $project-header-color: lighten($brand-primary, 55%);
     }
     margin: 0 0 10px 0;
   }
+}
+
+.project-section-inner-content {
+  padding: 20px;
+}
+
+.project-form-form-view-page .form-content, .project-resource-form-view-page .form-content {
+  background-color: #666;
 }
 
 #application-preview {
@@ -381,13 +384,9 @@ $project-header-color: lighten($brand-primary, 55%);
   }
 }
 
-.project-section-content {
-  margin-top: 10px;
-}
-
 .project-resource-page, .project-form-page {
   .project-section-content {
-    .panel {
+    .form-list-panel.panel {
       border: none;
     }
   }
@@ -423,12 +422,11 @@ $project-header-color: lighten($brand-primary, 55%);
   border-top: solid $project-header-color 2px;
   background-color: $gray-lighter;
   color: $gray;
-  padding: 5px 0 5px 20px;
-  margin-bottom: 10px;
+  padding: 5px 10px;
   .nav-pills {
     li {
       padding: 0;
-      &.form-nav-right {
+      &.form-nav {
         a {
           background-color: $brand-secondary;
           border: solid darken($brand-secondary, 10%) 2px;
@@ -461,6 +459,10 @@ $project-header-color: lighten($brand-primary, 55%);
     border-radius: .25em;
     line-height: 3.7em;
   }
+}
+
+.form-content {
+  padding: 20px;
 }
 
 .col-margin-bottom {
@@ -861,9 +863,10 @@ footer {
       }
     }
   }
-  .project-help-panel {
-    margin-top: 92px;
-  }
+}
+
+.project-help-panel {
+  margin-top: 1.6em;
 }
 
 .teams {
@@ -996,6 +999,17 @@ footer {
   padding: 10px 5px;
   cursor: pointer;
   transition: .15s;
+  .project-tile-icon {
+    text-align: center;
+    font-size: 7em;
+    line-height: 0.1em;
+    color: darken($brand-secondary, 10%);
+    margin: 0;
+    padding: 0;
+  }
+  .caption h4 {
+    text-align: center;
+  }
   &:hover {
     background: lighten($brand-secondary, 40%);
   }
@@ -1003,8 +1017,11 @@ footer {
     background: $brand-secondary;
     color: #FFF;
     border: 1px solid darken($brand-secondary, 10%);
-    .text-muted {
-      color: #FFF;
+    .caption h4 {
+      color: #fff;
+    }
+    .text-muted, .project-tile-icon {
+      color: lighten($brand-secondary, 60%);
     }
   }
 }

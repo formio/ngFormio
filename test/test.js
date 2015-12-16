@@ -4,7 +4,7 @@
 require('dotenv').load({silent: true});
 var config = require('../config');
 var Yadda = require('yadda');
-var webdriver = require('webdriverjs-angular');
+var webdriver = require('webdriverio');
 var driver = null;
 var formio = null;
 var library = null;

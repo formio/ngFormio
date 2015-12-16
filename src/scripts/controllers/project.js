@@ -184,7 +184,7 @@ app.controller('ProjectCreateController', [
           message: 'New Project created!'
         });
         GoogleAnalytics.sendEvent('Project', 'create', null, 1);
-        $state.go('project.edit', {projectId: project._id});
+        $state.go('project.resource.index', {projectId: project._id});
       }, function(error) {
         if (error.data && error.data.message && error.data.message.indexOf('duplicate key error index') !== -1) {
           error.data.errors.name = {

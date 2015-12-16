@@ -1,35 +1,35 @@
-<div class="row project-section-header">
-  <div class="col-sm-12">
-    <h2><i class="fa fa-table"></i> Data</h2>
-    <p>Anytime someone submits a form within Form.io, that data is stored and can be managed here.</p>
-  </div>
+<div class="project-section-header">
+  <h2><i class="fa fa-table"></i> Data</h2>
+  <p>Anytime someone submits a form within Form.io, that data is stored and can be managed here.</p>
 </div>
-<div class="row project-section-content">
-  <div class="col-sm-6">
-    <div class="panel panel-primary">
-      <div class="panel-heading">
-        <h3 class="panel-title">
-          <i class="fa fa-database"></i>
-          <span>Resources</span>
-        </h3>
-      </div>
-      <div class="panel-body">
-        <i id="resource-loader" style="font-size: 2em;" class="fa fa-spinner fa-pulse"></i>
-        <form-list forms="resources" list-mode="'data'" project="currentProject" form-type="'resource'" num-per-page="10"></form-list>
+<div class="project-section-content project-section-inner-content">
+  <div class="row">
+    <div class="col-sm-6">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <h3 class="panel-title">
+            <i class="fa fa-database"></i>
+            <span>Resources</span>
+          </h3>
+        </div>
+        <div class="panel-body">
+          <i id="resource-loader" style="font-size: 2em;" class="fa fa-spinner fa-pulse"></i>
+          <form-list forms="resources" list-mode="'data'" project="currentProject" form-type="'resource'" num-per-page="10"></form-list>
+        </div>
       </div>
     </div>
-  </div>
-  <div class="col-sm-6">
-    <div class="panel panel-primary">
-      <div class="panel-heading">
-        <h3 class="panel-title">
-          <i class="fa fa-file-text-o"></i>
-          <span>Forms</span>
-        </h3>
-      </div>
-      <div class="panel-body">
-        <i id="form-loader" style="font-size: 2em;" class="fa fa-spinner fa-pulse"></i>
-        <form-list forms="forms" list-mode="'data'" project="currentProject" form-type="'form'" num-per-page="10"></form-list>
+    <div class="col-sm-6">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <h3 class="panel-title">
+            <i class="fa fa-file-text-o"></i>
+            <span>Forms</span>
+          </h3>
+        </div>
+        <div class="panel-body">
+          <i id="form-loader" style="font-size: 2em;" class="fa fa-spinner fa-pulse"></i>
+          <form-list forms="forms" list-mode="'data'" project="currentProject" form-type="'form'" num-per-page="10"></form-list>
+        </div>
       </div>
     </div>
   </div>

@@ -1,0 +1,42 @@
+<div class="panel panel-success">
+  <div class="panel-heading">
+    <h3 class="panel-title">Embed Code</h3>
+  </div>
+  <div class="panel-body">
+    Here is the code you will use to embed this form within your application.
+    <span><pre style="font-size:1.2em;"><code>&lt;formio src="'https://{{ currentProject.name }}.form.io/{{ form.path }}'"&gt;&lt;/formio&gt;</code></pre></span>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-6">
+    <div class="panel panel-info">
+      <div class="panel-heading">
+        <h3 class="panel-title">Getting Started</h3>
+      </div>
+      <div class="panel-body">
+        <p>To add this form to your Application, use <a target="_blank" href="http://bower.io/">Bower</a> to download the Form.IO library and its dependencies.</p>
+        <p><pre><code>bower install formio#master</code></pre></p>
+        <p>Next, ensure your webpage has all of the Project dependencies added to the &lt;script&gt; tag. For a simple example, refer to the following example.</p>
+        <p><a target="_blank" href="https://github.com/formio/formio-form/blob/master/index.html">Example Simple Form Embedding</a></p>
+        <p>We recommend using a tool called <a target="_blank" href="https://github.com/taptapship/wiredep">Wiredep</a> to automatically add all the dependencies to the &lt;script&gt; section.</p>
+        <p>Then you need to add formio as a dependency to your application's Angular module</p>
+        <p><pre><code>&lt;body ng-app="formApp"&gt;
+        ...
+        &lt;script type="text/javascript"&gt;
+        angular.module('formApp', ['formio']);
+        &lt;/script&gt;
+      </code></pre></p>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6">
+    <div class="panel panel-info">
+      <div class="panel-heading">
+        <h3 class="panel-title">Example Application</h3>
+      </div>
+      <div class="panel-body">
+        <p>If you are getting started, it may be easiest to first download our starter template project found @ <a target="_blank" href="https://github.com/formio/formio-app-template">https://github.com/formio/formio-app-template</a></p>
+      </div>
+    </div>
+  </div>
+</div>

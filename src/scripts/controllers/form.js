@@ -75,12 +75,16 @@ app.config([
         })
         .state(parentName + '.form.view', {
           url: '/',
-          templateUrl: 'views/form/form-view.html'
+          templateUrl: 'views/form/' + type + '-view.html'
         })
         .state(parentName + '.form.edit', {
           url: '/edit',
           controller: 'FormEditController',
           templateUrl: 'views/form/form-edit.html'
+        })
+        .state(parentName + '.form.embed', {
+          url: '/embed',
+          templateUrl: 'views/form/form-embed.html'
         })
         .state(parentName + '.form.delete', {
           url: '/delete',
@@ -427,7 +431,7 @@ app.controller('FormDeleteController', [
         message: _.capitalize($scope.form.type) + ' was deleted.'
       });
       GoogleAnalytics.sendEvent('Form', 'delete', null, 1);
-      $state.go('project.edit');
+      $state.go('project.resource.index');
     });
 
     $scope.$on('cancel', function(event) {
