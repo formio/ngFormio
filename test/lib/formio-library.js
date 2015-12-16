@@ -242,7 +242,9 @@ module.exports = function(config) {
         });
     })
     .when('I wait $TIME milliseconds', function(time, next) {
-      this.driver.pause(time).then(next);
+      this.driver.pause(time).then(function() {
+        next();
+      }).catch(next);
     })
     .then('the title is $TITLE', function(title, next) {
       this.driver.getTitle()
