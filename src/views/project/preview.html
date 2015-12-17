@@ -19,7 +19,7 @@
         <p><a class="btn btn-success btn-block" href="{{ repo }}" target="_blank">{{ repo }}</a></p>
         <div ng-if="hasTemplate">
           <p>Then change the <strong>/src/config.js</strong> to say the following.</p>
-          <p><small><pre>var APP_URL = 'https://{{ currentProject.name }}.form.io';</pre></small></p>
+          <p><small><pre>var APP_URL = '{{ projectApi }}';</pre></small></p>
           <p>Then you can run the app by typing the following in your terminal within the directory of the download.</p>
           <p><small>
       <pre>npm install;

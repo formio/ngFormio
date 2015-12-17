@@ -1,31 +1,33 @@
-<ul class="nav nav-pills form-nav row" ng-if="!formId">
+<ul class="nav nav-pills form-nav" ng-if="!formId">
   <li role="presentation"><span ng-switch="form.type" class="navbar-text form-title">New {{ capitalize(form.type) }}</span></li>
 </ul>
-<form role="form" novalidate>
-  <div id="form-group-title" class="form-group">
-    <label for="title" class="control-label">Title</label>
-    <input type="text" ng-model="form.title" ng-change="titleChange('{{form.title}}')" class="form-control" id="title" placeholder="Enter the form title" autofocus="!formId"/>
-  </div>
-  <div id="form-group-name" class="form-group" ng-class="{'has-warning': originalForm.name && form.name !== originalForm.name}">
-    <label for="name" class="control-label">Name</label>
-    <input type="text" ng-model="form.name" class="form-control" id="name" placeholder="Enter the form machine name"/>
-    <p ng-if="originalForm.name && form.name !== originalForm.name" class="help-block"><span class="glyphicon glyphicon-exclamation-sign"></span>
-      Changing the name of a form will break embedded components in other forms that refer to this form. Make sure you know what you're doing before changing the form name.
-    </p>
-  </div>
-  <input type="hidden" ng-model="form.type"/>
-  <div id="form-group-path" class="form-group">
-    <label for="path" class="control-label">API Path</label>
-    <div class="input-group" style="width: 350px;">
-      <span class="input-group-addon">https://{{ currentProject.name }}.form.io/</span>
-      <input type="text" class="form-control" id="path" ng-model="form.path" placeholder="example" style="width: 200px; text-transform: lowercase">
+<div ng-class="{'form-content': !formId}">
+  <form role="form" novalidate>
+    <div id="form-group-title" class="form-group">
+      <label for="title" class="control-label">Title</label>
+      <input type="text" ng-model="form.title" ng-change="titleChange('{{form.title}}')" class="form-control" id="title" placeholder="Enter the form title" autofocus="!formId"/>
     </div>
-    <small>The REST API path to this form.</small>
-  </div>
-  <div ng-include="'views/form/form-settings.html'"></div>
-  <form-builder src="formUrl"></form-builder>
-  <div class="form-group pull-right">
-    <a class="btn btn-default" ng-click="formId ? cancel() : $state.go('project.edit')">Cancel</a>
-    <input type="submit" class="btn btn-primary" ng-click="saveForm()" value="{{formId ? 'Save' : 'Create'}} {{ capitalize(form.type)  }}" />
-  </div>
-</form>
+    <div id="form-group-name" class="form-group" ng-class="{'has-warning': originalForm.name && form.name !== originalForm.name}">
+      <label for="name" class="control-label">Name</label>
+      <input type="text" ng-model="form.name" class="form-control" id="name" placeholder="Enter the form machine name"/>
+      <p ng-if="originalForm.name && form.name !== originalForm.name" class="help-block"><span class="glyphicon glyphicon-exclamation-sign"></span>
+        Changing the name of a form will break embedded components in other forms that refer to this form. Make sure you know what you're doing before changing the form name.
+      </p>
+    </div>
+    <input type="hidden" ng-model="form.type"/>
+    <div id="form-group-path" class="form-group">
+      <label for="path" class="control-label">API Path</label>
+      <div class="input-group" style="width: 350px;">
+        <span class="input-group-addon">https://{{ currentProject.name }}.form.io/</span>
+        <input type="text" class="form-control" id="path" ng-model="form.path" placeholder="example" style="width: 200px; text-transform: lowercase">
+      </div>
+      <small>The REST API path to this form.</small>
+    </div>
+    <div ng-include="'views/form/form-settings.html'"></div>
+    <form-builder src="formUrl"></form-builder>
+    <div class="form-group pull-right">
+      <a class="btn btn-default" ng-click="formId ? cancel() : $state.go('project.edit')">Cancel</a>
+      <input type="submit" class="btn btn-primary" ng-click="saveForm()" value="{{formId ? 'Save' : 'Create'}} {{ capitalize(form.type)  }}" />
+    </div>
+  </form>
+</div>

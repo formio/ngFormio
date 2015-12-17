@@ -208,7 +208,6 @@ app.controller('ProjectController', [
   'AppConfig',
   'ProjectPlans',
   '$http',
-  '$location',
   function(
     $scope,
     $rootScope,
@@ -218,8 +217,7 @@ app.controller('ProjectController', [
     $state,
     AppConfig,
     ProjectPlans,
-    $http,
-    $location
+    $http
   ) {
     $rootScope.activeSideBar = 'projects';
     $rootScope.noBreadcrumb = false;
@@ -235,11 +233,13 @@ app.controller('ProjectController', [
     $scope.forms = [];
     $scope.formio = new Formio('/project/' + $stateParams.projectId);
     $scope.currentProject = {_id: $stateParams.projectId, access: []};
+    $scope.projectApi = '';
     $scope.rolesLoading = true;
     $scope.teamsLoading = true;
 
     $scope.loadProjectPromise = $scope.formio.loadProject().then(function(result) {
       $scope.currentProject = result;
+      $scope.projectApi = AppConfig.protocol + '//' + result.name + '.' + AppConfig.serverHost;
       $rootScope.currentProject = result;
       $scope.showName = !(result.plan && result.plan === 'basic');
       return $http.get($scope.formio.projectUrl + '/role');
