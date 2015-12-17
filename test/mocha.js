@@ -686,6 +686,7 @@ describe('Bootstrap', function() {
         });
         require('./misc')(app, template, hook);
         require('./oauth')(app, template, hook);
+        require('./s3')(app, template, hook);
       });
     });
   });

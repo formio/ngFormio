@@ -469,6 +469,15 @@ module.exports = function(app) {
           }
         }
 
+        var url = nodeUrl.parse(req.url).pathname.split('/');
+        debug(url);
+        if (url[5] === 'storage' && url[6] === 's3') {
+          entity = {
+            type: 'submission',
+            id: ''
+          }
+        }
+
         return entity;
       },
 
@@ -535,8 +544,21 @@ module.exports = function(app) {
           }
         }
 
-        // This request was made against a project and access was denied, check if the user is the owner.
         else if(req.token && access.project && access.project.owner) {
+          var url = req.url.split('/');
+
+          // Use submission permissions for access to file signing endpoints.
+          if (url[5] === 'storage' && url[6] === 's3') {
+            _debug('Checking s3 signing access');
+            var _access = formioServer.formio.access.hasAccess(req, access, {
+              type: 'submission',
+              id: req.submissionId
+            });
+            _debug(_access);
+            return _access;
+          }
+
+          // This request was made against a project and access was denied, check if the user is the owner.
           if (req.token.user._id === access.project.owner) {
             if (
               (req.method === 'POST' || req.method === 'PUT') &&
