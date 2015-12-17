@@ -116,10 +116,56 @@ module.exports = function (app) {
                         $scope.fileUploads[file.name].status = 'progress';
                         $scope.fileUploads[file.name].progress = parseInt(100.0 * evt.loaded / evt.total);
                         delete $scope.fileUploads[file.name].message;
-                        //console.log('progress: ' + parseInt(100.0 * evt.loaded / evt.total) + '% file :'+ evt.config.data.file.name);
                       });
                   });
               });
+              break;
+            case 'dropbox':
+              angular.forEach(files, function(file) {
+                $scope.fileUploads[file.name] = {
+                  name: file.name,
+                  size: file.size,
+                  status: 'info',
+                  message: 'Starting upload'
+                };
+                var dir = $scope.component.dir || '';
+                var request = {
+                  url: 'https://content.dropboxapi.com/2/files/upload',
+                  method: 'POST',
+                  headers: {
+                    'Authorization': 'Bearer ' + $scope.currentUser.externalTokens[0].token,
+                    'Dropbox-API-Arg': JSON.stringify({
+                      path: dir + file.name,
+                      mode: 'add',
+                      autorename: true,
+                      mute: false
+                    })
+                  }
+                  data: {
+                    file: file
+                  }
+                };
+                var upload = Upload.upload(request);
+                upload
+                  .then(function(resp) {
+                    // Handle upload finished.
+                    delete $scope.fileUploads[file.name];
+                    resp.storage = 'dropbox';
+                    $scope.data[$scope.component.key].push(resp);
+                  }, function(resp) {
+                    // Handle error
+                    var oParser = new DOMParser();
+                    var oDOM = oParser.parseFromString(resp.data, 'text/xml');
+                    $scope.fileUploads[file.name].status = 'error';
+                    $scope.fileUploads[file.name].message = oDOM.getElementsByTagName('Message')[0].innerHTML;
+                    delete $scope.fileUploads[file.name].progress;
+                  }, function(evt) {
+                    // Progress notify
+                    $scope.fileUploads[file.name].status = 'progress';
+                    $scope.fileUploads[file.name].progress = parseInt(100.0 * evt.loaded / evt.total);
+                    delete $scope.fileUploads[file.name].message;
+                  });
+              })
               break;
           }
         }
