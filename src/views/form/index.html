@@ -1,5 +1,5 @@
-<div class="panel panel-primary">
-  <div class="panel-body form-list-panel">
+<div class="panel panel-primary form-list-panel">
+  <div class="panel-body">
     <ng-include ng-if="!forms.length" src="infoTemplate"></ng-include>
     <i id="{{ formInfo.type }}-loader" style="font-size: 2em;" class="fa fa-spinner fa-pulse"></i>
     <form-list forms="forms" project="currentProject" form-type="formInfo.type" num-per-page="10"></form-list>
