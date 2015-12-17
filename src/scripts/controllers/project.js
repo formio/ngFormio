@@ -208,6 +208,7 @@ app.controller('ProjectController', [
   'AppConfig',
   'ProjectPlans',
   '$http',
+  'ProjectUpgradeDialog',
   function(
     $scope,
     $rootScope,
@@ -217,7 +218,8 @@ app.controller('ProjectController', [
     $state,
     AppConfig,
     ProjectPlans,
-    $http
+    $http,
+    ProjectUpgradeDialog
   ) {
     $rootScope.activeSideBar = 'projects';
     $rootScope.noBreadcrumb = false;
@@ -286,6 +288,8 @@ app.controller('ProjectController', [
     $scope.getAPICallsLimit = ProjectPlans.getAPICallsLimit.bind(ProjectPlans);
     $scope.getAPICallsPercent = ProjectPlans.getAPICallsPercent.bind(ProjectPlans);
     $scope.getProgressBarClass = ProjectPlans.getProgressBarClass.bind(ProjectPlans);
+
+    $scope.showUpgradeDialog = ProjectUpgradeDialog.show.bind(ProjectUpgradeDialog);
   }
 ]);
 
@@ -553,6 +557,115 @@ app.controller('ProjectDeleteController', [
         GoogleAnalytics.sendEvent('Project', 'delete', null, 1);
         $state.go('home');
       }, FormioAlerts.onError.bind(FormioAlerts));
+    };
+  }
+]);
+
+app.factory('ProjectUpgradeDialog', [
+  '$rootScope',
+  '$state',
+  'Formio',
+  'FormioAlerts',
+  'ngDialog',
+  'AppConfig',
+  'ProjectPlans',
+  'UserInfo',
+  '$http',
+  function(
+    $rootScope,
+    $state,
+    Formio,
+    FormioAlerts,
+    ngDialog,
+    AppConfig,
+    ProjectPlans,
+    UserInfo,
+    $http
+  ) {
+    return {
+      show: function(project) {
+        if ($rootScope.user._id !== project.owner) {
+          FormioAlerts.onError({
+            message: 'You must be a project\'s owner to upgrade its plan.'
+          });
+          return;
+        }
+        ngDialog.open({
+          template: 'views/project/upgradeDialog.html',
+          showClose: true,
+          className: 'ngdialog-theme-default project-upgrade',
+          controller: [
+            '$scope',
+            function($scope) {
+              var loadPaymentInfo = function() {
+                $scope.paymentInfoLoading = true;
+                UserInfo.getPaymentInfo()
+                .then(function(paymentInfo) {
+                  $scope.paymentInfo = paymentInfo;
+                  $scope.paymentInfoLoading = false;
+                })
+                .catch(FormioAlerts.onError.bind(FormioAlerts));
+              };
+
+              loadPaymentInfo();
+
+              var getActiveForm = function() {
+                if(!$scope.paymentInfoLoading && !$scope.paymentInfo) {
+                  return $scope.paymentForm;
+                }
+                if(!$scope.paymentInfoLoading && $scope.paymentInfo &&
+                  $scope.selectedPlan === 'commercial') {
+                  return $scope.commercialContactForm;
+                }
+              };
+
+              $scope.$on('formSubmission', function() {
+                if(getActiveForm() === $scope.paymentForm) {
+                  loadPaymentInfo();
+                }
+                else if(getActiveForm() === $scope.commercialContactForm) {
+                  $scope.commercialContactFormSubmitted = true;
+                }
+              });
+
+              $scope.changePaymentInfo = function() {
+                $scope.paymentInfo = null;
+              };
+              $scope.setSelectedPlan = function(plan) {
+                $scope.selectedPlan = plan;
+              };
+
+              $scope.upgradeProject = function(plan) {
+                $http.post(AppConfig.apiBase + '/project/' + project._id + '/upgrade',
+                  {plan: plan}
+                )
+                .then(function() {
+                  $scope.closeThisDialog(true);
+                  Formio.clearCache();
+                  $state.reload();
+                })
+                .catch(FormioAlerts.onError.bind(FormioAlerts));
+              };
+
+              $scope.capitalize = _.capitalize;
+              $scope.plans = ProjectPlans.getPlans();
+              $scope.getPlan = ProjectPlans.getPlan.bind(ProjectPlans);
+              $scope.paymentForm = AppConfig.paymentForm;
+              $scope.commercialContactForm = AppConfig.commercialContactForm;
+              $scope.commercialContactSubmission = {
+                data: {
+                  project: project._id,
+                  contactName: $rootScope.user.data.fullName,
+                  contactEmail: $rootScope.user.data.email
+                }
+              };
+              // TODO: default this to next highest plan
+              $scope.selectedPlan = 'independent';
+
+            }
+          ]
+        });
+      }
     };
   }
 ]);
