@@ -1,28 +1,31 @@
 {
   "private": true,
   "engines": {
-    "node": ">=0.12.0"
+    "node": ">=4.2.0"
   },
   "scripts": {
     "start": "node server.js",
-    "test": "env TEST_SUITE=1 PROTOCOL=http DOMAIN=localhost PORT=3000 MONGO_COLLECTION=formio-test PROJECT_PLAN=community mocha -r jscoverage --covout=html -b -t 30000 test/mocha.js",
+    "test": "env TEST_SUITE=1 PROTOCOL=http DOMAIN=localhost PORT=3000 MONGO_COLLECTION=formio-test PROJECT_PLAN=basic mocha -r jscoverage --covout=html -b -t 60000 test/mocha.js",
     "docker": "env DOCKER=1 TEST_SUITE=1 PROTOCOL=http DOMAIN=localhost PORT=3000 mocha -b -t 30000 test/mocha.js",
     "lint": "eslint src *.js"
   },
   "main": "./server.js",
+  "schema": "3.0.1-rc.1",
   "dependencies": {
     "adal-node": "^0.1.15",
     "async": "1.3.0",
+    "aws-sdk": "^2.2.20",
     "body-parser": "^1.13.3",
     "config": "1.12.0",
     "cors": "^2.7.1",
+    "crypto-js": "^3.1.5",
     "debug": "^2.2.0",
     "dotenv": "1.2.0",
     "express": "4.12.3",
     "is-url": "^1.2.1",
     "jslogger": "^1.0.3",
     "jsonwebtoken": "^5.0.5",
-    "lodash": "3.10.0",
+    "lodash": "^3.10.1",
     "method-override": "^2.3.5",
     "metroplex": "0.0.9",
     "moment": "2.10.3",

@@ -9,20 +9,50 @@ module.exports = function(router, formioServer) {
   var formio = formioServer.formio;
   var removeProjectSettings = function(req, res, next) {
     if (req.token && req.projectOwner && (req.token.user._id === req.projectOwner)) {
-      debug('Showing project settings!');
+      debug('Showing project settings to Owner');
       return next();
     }
+    else if (req.projectId && req.user) {
+      var cache = require('../cache/cache')(formio);
+      cache.loadProject(req, req.projectId, function(err, project) {
+        if(!err) {
+          var access = _.map(_.pluck(_.filter(project.access, {type: 'team_admin'}), 'roles'), formio.util.idToString);
+          var roles = _.map(req.user.roles, formio.util.idToString);
 
-    debug('Skipping project settings!');
-    debug(res.resource.item);
-    formio.middleware.filterResourcejsResponse(['settings']).call(this, req, res, next);
+          if( _.intersection(access, req.user.roles).length !== 0) {
+            debug('Showing project settings to team_admin user');
+            return next();
+          }
+        }
+        else {
+          debug(err);
+        }
+
+        debug('Skipping project settings!');
+        debug(res.resource.item);
+        formio.middleware.filterResourcejsResponse(['settings']).call(this, req, res, next);
+      });
+    }
+    else {
+      debug('Skipping project settings!');
+      debug(res.resource.item);
+      formio.middleware.filterResourcejsResponse(['settings']).call(this, req, res, next);
+    }
   };
 
   // Load the project plan filter for use.
   formio.middleware.projectPlanFilter = require('../middleware/projectPlanFilter')(formio);
-  formio.middleware.projectAnalytics = require('../middleware/projectAnalytics')(formioServer);
-  var hiddenFields = ['deleted', '__v', 'machineName', 'primary'];
 
+  // Load the project analytics middleware.
+  formio.middleware.projectAnalytics = require('../middleware/projectAnalytics')(formioServer);
+
+  // Load the project index filter middleware.
+  formio.middleware.projectIndexFilter = require('../middleware/projectIndexFilter')(formioServer);
+
+  // Load the team owner filter for use.
+  formio.middleware.projectAccessFilter = require('../middleware/projectAccessFilter')(formio);
+
+  var hiddenFields = ['deleted', '__v', 'machineName', 'primary'];
   var resource = Resource(
     router,
     '',
@@ -71,6 +101,8 @@ module.exports = function(router, formioServer) {
             var options = {settings: {}};
             options.settings[projectFieldName + '_action'] = 'increment';
             options.settings[projectFieldName + '_value'] = '1';
+            options.settings['lifecyclestage_action'] = 'value';
+            options.settings['lifecyclestage_value'] = 'opportunity';
 
             var ActionClass = formio.actions.actions['hubspotContact'];
             var action = new ActionClass(options, modReq, res);
@@ -81,7 +113,7 @@ module.exports = function(router, formioServer) {
     ],
     beforeIndex: [
       formio.middleware.filterMongooseExists({field: 'deleted', isNull: true}),
-      formio.middleware.ownerFilter
+      formio.middleware.projectIndexFilter
     ],
     afterIndex: [
       formio.middleware.filterResourcejsResponse(hiddenFields),
@@ -99,6 +131,7 @@ module.exports = function(router, formioServer) {
         next();
       },
       formio.middleware.condensePermissionTypes,
+      formio.middleware.projectAccessFilter,
       formio.middleware.projectPlanFilter
     ],
     afterPut: [

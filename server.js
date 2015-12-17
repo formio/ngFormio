@@ -72,8 +72,7 @@ app.formio.config = _.omit(config, 'formio');
 
 // Attach the analytics to the formio server and attempt to connect.
 app.formio.analytics = analytics;
-// Try the connection on server start.
-app.formio.analytics.connect();
+app.formio.analytics.connect(); // Try the connection on server start.
 
 // Import the OAuth providers
 app.formio.formio.oauth = require('./src/oauth/oauth')(app.formio.formio);
@@ -142,13 +141,14 @@ if (config.gaTid) {
   });
 }
 
+app.storage = require('./src/storage')(app);
+
 app.modules = require('./src/modules/modules')(app, config);
-var settings = require('./src/hooks/settings')(app, app.formio);
+var settings = require('./src/hooks/settings')(app);
 
 // Start the api server.
 app.formio.init(settings).then(function(formio) {
   var start = function() {
-
     // The formio app sanity endpoint.
     app.get('/health', function(req, res, next) {
       if (!formio.resources) {

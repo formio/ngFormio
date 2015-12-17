@@ -1,6 +1,6 @@
 machine:
   node:
-    version: 0.12.7
+    version: 4.2.3
   python:
     version: 2.7.3
   services:
@@ -21,6 +21,12 @@ dependencies:
     - sudo cp mongodb-linux-x86_64-ubuntu1204-3.0.5/bin/* /usr/bin
     - sudo /etc/init.d/mongodb start
     - pip install awscli
+    - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test && sudo apt-get update
+    - sudo apt-get install -y gcc-4.9 g++-4.9
+    - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.6 10
+    - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.6 10
+    - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.9 20
+    - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 20
     - npm install -g mocha
   override:
     - echo $TAG_NAME
@@ -43,10 +49,10 @@ test:
   post:
     - redis-server &> $CIRCLE_ARTIFACTS/docker-redis.log:
           background: true
-    - docker run -d -e "MONGO1=$MONGO" -e "PROTOCOL=http" -e "DOMAIN=localhost" -e "PORT=3000" -e "DEBUG=formio:*,formio:*:*" -e "PROJECT_PLAN=community" --name formio-server --net=host $IMAGE_PATH:$SHORT_SHA
-    - sleep 10
+    - docker run -d -e "MONGO1=$MONGO" -e "PROTOCOL=http" -e "DOMAIN=localhost" -e "PORT=3000" -e "DEBUG=formio:*,formio:*:*" -e "PROJECT_PLAN=basic" --name formio-server --net=host $IMAGE_PATH:$SHORT_SHA
+    - sleep 5
     - docker logs formio-server
-    - curl --retry 10 --retry-delay 5 -v http://api.localhost:3000/health
+    - wget --tries=10 --retry-connrefused --wait=6 -v http://api.localhost:3000/health
     - npm run-script docker
     - docker logs formio-server &> $CIRCLE_ARTIFACTS/docker-formio-server.log
 

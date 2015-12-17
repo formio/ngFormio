@@ -604,8 +604,8 @@ module.exports = function(app, template, hook) {
   });
 
   describe('Project Plans', function() {
-    describe('Community Plan', function() {
-      it('Confirm the project is on the community plan', function(done) {
+    describe('Basic Plan', function() {
+      it('Confirm the project is on the basic plan', function(done) {
         request(app)
           .get('/project/' + template.project._id)
           .set('x-jwt-token', template.formio.owner.token)
@@ -618,7 +618,7 @@ module.exports = function(app, template, hook) {
 
             var response = res.body;
             assert.equal(response.hasOwnProperty('plan'), true);
-            assert.equal(response.plan, 'community');
+            assert.equal(response.plan, 'basic');
 
             // Store the JWT for future API calls.
             template.formio.owner.token = res.headers['x-jwt-token'];
@@ -627,7 +627,7 @@ module.exports = function(app, template, hook) {
           });
       });
 
-      it('A Project on the community plan will have a uuid generated name on creation', function(done) {
+      it('A Project on the basic plan will have a uuid generated name on creation', function(done) {
         request(app)
           .get('/project/' + template.project._id)
           .set('x-jwt-token', template.formio.owner.token)
@@ -649,7 +649,7 @@ module.exports = function(app, template, hook) {
           });
       });
 
-      it('A Project on the community plan should not be able to change the uuid generated name on project update', function(done) {
+      it('A Project on the basic plan should not be able to change the uuid generated name on project update', function(done) {
         var attempt = chance.word({length: 10});
 
         request(app)
@@ -675,7 +675,7 @@ module.exports = function(app, template, hook) {
           });
       });
 
-      it('A Project on the community plan will not be able to set cors options on creation', function(done) {
+      it('A Project on the basic plan will not be able to set cors options on creation', function(done) {
         request(app)
           .get('/project/' + template.project._id)
           .set('x-jwt-token', template.formio.owner.token)
@@ -698,7 +698,7 @@ module.exports = function(app, template, hook) {
           });
       });
 
-      it('A Project on the community plan will not be able to set cors options on project update', function(done) {
+      it('A Project on the basic plan will not be able to set cors options on project update', function(done) {
         var attempt = '*,www.example.com';
 
         request(app)

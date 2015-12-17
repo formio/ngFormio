@@ -22,6 +22,9 @@ module.exports = function(formio) {
 
     // The Project that was just created.
     var project = res.resource.item;
+    if (!project) {
+      return next('No project found.');
+    }
 
     // The project template they wish to use.
     var template = req.template || 'default';
@@ -36,9 +39,7 @@ module.exports = function(formio) {
         }
 
         // Attempt to remove array with one null element, inserted by mongo.
-        if ((owner.roles.length === 1) && (owner.roles[0] === null)) {
-          owner.roles = [];
-        }
+        owner.roles = _.filter(owner.roles || []);
 
         // Add the administrative roles of this Project to the creators roles.
         _.each(adminRoles, function(adminRole) {
@@ -126,7 +127,7 @@ module.exports = function(formio) {
         role: function(item, done) {
           item.project = project._id;
           hook.alter('roleMachineName', item.machineName, item, function(err, machineName) {
-            if (err) { done(err); }
+            if (err) { return done(err); }
             item.machineName = machineName;
             done(null, item);
           });
@@ -134,14 +135,14 @@ module.exports = function(formio) {
         form: function(item, done) {
           item.project = project._id;
           hook.alter('formMachineName', item.machineName, item, function(err, machineName) {
-            if (err) { done(err); }
+            if (err) { return done(err); }
             item.machineName = machineName;
             done(null, item);
           });
         },
         action: function(item, done) {
           hook.alter('actionMachineName', item.machineName, item, function(err, machineName) {
-            if (err) { done(err); }
+            if (err) { return done(err); }
             item.machineName = machineName;
             done(null, item);
           });

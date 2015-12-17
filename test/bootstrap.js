@@ -59,6 +59,9 @@ module.exports = function() {
   // Import the OAuth providers
   app.formio.formio.oauth = require('../src/oauth/oauth')(app.formio.formio);
 
+  // Import storage providers.
+  app.storage = require('../src/storage')(app);
+
   // Configure nunjucks.
   nunjucks.configure('views', {
     autoescape: true,
