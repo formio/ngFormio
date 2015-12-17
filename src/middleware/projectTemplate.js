@@ -22,6 +22,9 @@ module.exports = function(formio) {
 
     // The Project that was just created.
     var project = res.resource.item;
+    if (!project) {
+      return next('No project found.');
+    }
 
     // The project template they wish to use.
     var template = req.template || 'default';
