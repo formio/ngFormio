@@ -1,7 +1,7 @@
 {
   "private": true,
   "engines": {
-    "node": ">=0.12.0"
+    "node": ">=4.2.0"
   },
   "scripts": {
     "start": "node server.js",
@@ -23,7 +23,7 @@
     "is-url": "^1.2.1",
     "jslogger": "^1.0.3",
     "jsonwebtoken": "^5.0.5",
-    "lodash": "3.10.0",
+    "lodash": "^3.10.1",
     "method-override": "^2.3.5",
     "metroplex": "0.0.9",
     "moment": "2.10.3",

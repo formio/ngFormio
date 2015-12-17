@@ -1,7 +1,7 @@
 FROM ubuntu:14.04
 MAINTAINER Randall Knutson <randall@form.io>
 
-RUN apt-get install -y curl && curl -sL https://deb.nodesource.com/setup_0.12 | sudo bash -
+RUN apt-get install -y curl && curl -sL https://deb.nodesource.com/setup_4.x | sudo bash -
 RUN apt-get update && apt-get install -y \
   build-essential \
   autoconf \
