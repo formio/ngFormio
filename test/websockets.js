@@ -21,9 +21,8 @@ module.exports = function(app, template, hook) {
     var formUrl = '';
 
     // Helper method used to bind to a socket.
-    var bind = function(server, formId, sync) {
+    var bind = function(client, formId, sync) {
       var deferred = Q.defer();
-      var client = new Socket(server + '?token=' + template.formio.owner.token + '&project=' + project.name);
       client.on('error', function(err) {
         client.end();
         deferred.reject(err);
@@ -69,75 +68,68 @@ module.exports = function(app, template, hook) {
         });
     });
 
+    var callDone = function(client, done, err) {
+      client.end();
+      _.once(done)(err);
+    };
+
     it('Should not allow a connection without a token or project', function(done) {
       var client = new Socket(url);
       client.on('error', function() {
-        client.end();
-        _.once(done)();
+        callDone(client, done)
       });
       client.on('open', function() {
-        client.end();
-        _.once(done)('Should not receive any data.');
+        callDone(client, done, 'Should not receive any data.');
       });
     });
 
     it('Should not allow a connection without a project', function(done) {
       var client = new Socket(url + '?token=' + template.formio.owner.token);
       client.on('error', function() {
-        client.end();
-        _.once(done)();
+        callDone(client, done);
       });
       client.on('open', function() {
-        client.end();
-        _.once(done)('Should not receive any data.');
+        callDone(client, done, 'Should not receive any data.');
       });
     });
 
     it('Should not allow a connection without a token', function(done) {
       var client = new Socket(url + '?project=' + project.name);
       client.on('error', function() {
-        client.end();
-        _.once(done)();
+        callDone(client, done);
       });
       client.on('open', function() {
-        client.end();
-        _.once(done)('Should not receive any data.');
+        callDone(client, done, 'Should not receive any data.');
       });
     });
 
     it('Should not allow a connection with an invalid token', function(done) {
       var client = new Socket(url + '?token=1234&project=' + project.name);
       client.on('error', function() {
-        client.end();
-        _.once(done)();
+        callDone(client, done);
       });
       client.on('open', function() {
-        client.end();
-        _.once(done)('Should not receive any data.');
+        callDone(client, done, 'Should not receive any data.');
       });
     });
 
     it('Should not allow a connection with a project you don\'t own', function(done) {
       var client = new Socket(url + '?token=' + template.formio.owner.token + '&project=formio');
       client.on('error', function() {
-        client.end();
-        _.once(done)();
+        callDone(client, done);
       });
       client.on('open', function() {
-        client.end();
-        _.once(done)('Should not receive any data.');
+        callDone(client, done, 'Should not receive any data.');
       });
     });
 
     it('Should allow a connection to your project', function(done) {
       var client = new Socket(url + '?token=' + template.formio.owner.token + '&project=' + project.name);
       client.on('error', function(err) {
-        client.end();
-        _.once(done)(err);
+        callDone(client, done, err);
       });
       client.on('open', function() {
-        client.end();
-        _.once(done)();
+        callDone(client, done);
       });
     });
 
@@ -176,8 +168,7 @@ module.exports = function(app, template, hook) {
 
       var client = new Socket(url + '?token=' + template.formio.owner.token + '&project=' + project.name);
       client.on('error', function(err) {
-        client.end();
-        _.once(done)(err);
+        callDone(client, done, err);
       });
       client.on('open', function() {
         formUrl = '/project/' + project._id + '/form';
@@ -189,7 +180,7 @@ module.exports = function(app, template, hook) {
           .expect(201)
           .end(function(err, res) {
             if (err) {
-              return _.once(done)(err);
+              return callDone(client, done, err);
             }
 
             form = res.body;
@@ -201,33 +192,32 @@ module.exports = function(app, template, hook) {
               .send({data: {foo: 'bar'}})
               .end(function(err, res) {
                 if (err) {
-                  return _.once(done)(err);
+                  return callDone(client, done, err);
                 }
                 template.formio.owner.token = res.headers['x-jwt-token'];
                 setTimeout(function() {
-                  client.end();
-                  _.once(done)();
+                  callDone(client, done);
                 }, 200);
               });
           });
       });
       client.on('data', function(data) {
         if (data.type === 'request') {
-          _.once(done)('We should not have received the submission information.');
+          callDone(client, done, 'We should not have received the submission information.');
         }
       });
     });
 
     it('Should allow you to receive events from a submission.', function(done) {
-      bind(url, form._id).then(function(client) {
+      var client = new Socket(url + '?token=' + template.formio.owner.token + '&project=' + project.name);
+      bind(client, form._id).then(function() {
         client.on('data', function(data) {
           if (data.type === 'request') {
             assert.equal(data.request.method, 'POST');
             assert.equal(data.request.body.data.foo, 'bar');
             assert.equal(data.request.params.formId, form._id);
             assert.equal(data.request.params.projectId, project._id);
-            client.end();
-            _.once(done)();
+            callDone(client, done);
           }
         });
 
@@ -237,15 +227,18 @@ module.exports = function(app, template, hook) {
           .send({data: {foo: 'bar'}})
           .end(function(err, res) {
             if (err) {
-              return _.once(done)(err);
+              return callDone(client, done, err);
             }
             template.formio.owner.token = res.headers['x-jwt-token'];
           });
-      }).catch(_.once(done));
+      }).catch(function(err) {
+        callDone(client, err);
+      });
     });
 
     it('Should allow a modification with blocking request.', function(done) {
-      bind(url, form._id, true).then(function(client) {
+      var client = new Socket(url + '?token=' + template.formio.owner.token + '&project=' + project.name);
+      bind(client, form._id, true).then(function(client) {
         client.on('data', function(data) {
           if (data.type === 'request') {
             assert.equal(data.request.method, 'POST');
@@ -269,20 +262,23 @@ module.exports = function(app, template, hook) {
           .send({data: {foo: 'bar2'}})
           .end(function(err, res) {
             if (err) {
-              return _.once(done)(err);
+              return callDone(client, done, err);
             }
 
             // Ensure that the value was in fact changed...
             client.end();
             assert.equal(res.body.data.foo, 'bar3');
             template.formio.owner.token = res.headers['x-jwt-token'];
-            _.once(done)();
+            callDone(client, done);
           });
-      }).catch(_.once(done));
+      }).catch(function(err) {
+        callDone(client, done, err);
+      });
     });
 
     it('Should allow a change in status.', function(done) {
-      bind(url, form._id, true).then(function(client) {
+      var client = new Socket(url + '?token=' + template.formio.owner.token + '&project=' + project.name);
+      bind(client, form._id, true).then(function(client) {
         client.on('data', function(data) {
           if (data.type === 'request') {
             // Invalidate the request.
@@ -302,14 +298,15 @@ module.exports = function(app, template, hook) {
           .set('x-jwt-token', template.formio.owner.token)
           .send({data: {foo: 'bar4'}})
           .expect(400)
-          .end(function(err, res) {
-            client.end();
+          .end(function(err) {
             if (err) {
-              return _.once(done)(err);
+              return callDone(client, done, err);
             }
-            _.once(done)();
+            callDone(client, done);
           });
-      }).catch(_.once(done));
+      }).catch(function(err) {
+        callDone(client, done, err);
+      });
     });
 
     var http = require('http');
@@ -373,7 +370,8 @@ module.exports = function(app, template, hook) {
       }
       var opened = false;
       var Socket = Primus.createSocket();
-      bind(socketUrl(server1.server.port), form._id, true).then(function(client) {
+      var client = new Socket(socketUrl(server1.server.port) + '?token=' + template.formio.owner.token + '&project=' + project.name);
+      bind(client, form._id, true).then(function(client) {
         opened = true;
 
         // The client is bound to server1, but should receive the request from server2.
@@ -392,18 +390,14 @@ module.exports = function(app, template, hook) {
         // Send a message to server2.
         server2.send(socketRequest()).then(function(response) {
           if (!response) {
-            client.end();
-            return _.once(done)(new Error('Socket message failed.'));
+            return callDone(client, done, new Error('Socket message failed.'));
           }
           assert.equal(response.response.test, 'hello');
-
-          // Close the client.
-          client.end();
 
           // Close the servers.
           server1.close(function () {
             server2.close(function() {
-              _.once(done)();
+              callDone(client, done);
             });
           });
         });
