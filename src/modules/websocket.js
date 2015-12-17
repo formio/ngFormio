@@ -21,7 +21,8 @@ module.exports = function(app, config) {
     socket.send(request).then(function(data) {
       if (data && data.response) {
         if (data.response.status && (data.response.status !== 200)) {
-          return next(data.response);
+          res.status(data.response.status).json(data.response.message);
+          return;
         }
         if (data.response.body) {
           _.assign(req.body, data.response.body);
