@@ -18,10 +18,23 @@ module.exports = function() {
         $element,
         FormioScope
       ) {
+        $scope.formioAlerts = [];
+        // Shows the given alerts (single or array), and dismisses old alerts
+        this.showAlerts = $scope.showAlerts = function(alerts) {
+          $scope.formioAlerts = [].concat(alerts);
+        };
+
+        $scope.perPage = $scope.perPage === undefined ? 10 : $scope.perPage;
         $scope.formio = FormioScope.register($scope, $element, {
           form: true,
-          submissions: false
+          submissions: true
         });
+
+        $scope.currentPage = 1;
+        $scope.pageChanged = function(page) {
+          $scope.skip = (page - 1) * $scope.perPage;
+          $scope.updateSubmissions();
+        };
 
         $scope.tableView = function(component) {
           return !component.hasOwnProperty('tableView') || component.tableView;
