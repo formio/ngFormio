@@ -223,6 +223,7 @@ app.controller('ProjectController', [
     $rootScope.noBreadcrumb = false;
     $scope.token = Formio.getToken();
     $scope.resourcesLoading = true;
+    $scope.projectsLoaded = false;
     $scope.resources = [];
     $scope.$on('pagination:loadPage', function(status) {
       var formType = status.targetScope.$parent.formType;
@@ -242,6 +243,7 @@ app.controller('ProjectController', [
       $scope.projectApi = AppConfig.protocol + '//' + result.name + '.' + AppConfig.serverHost;
       $rootScope.currentProject = result;
       $scope.showName = !(result.plan && result.plan === 'basic');
+      $scope.projectsLoaded = true;
       return $http.get($scope.formio.projectUrl + '/role');
     }).then(function(result) {
       $scope.currentProjectRoles = result.data;
