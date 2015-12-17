@@ -22,7 +22,8 @@ angular
     'formioApp.controllers',
     'formioApp.utils',
     'kendo.directives',
-    'truncate'
+    'truncate',
+    'ngFileUpload'
   ])
   .config([
     '$stateProvider',
@@ -139,6 +140,12 @@ angular
           url: '/email',
           parent: 'project.settings',
           templateUrl: 'views/project/email/email.html'
+        })
+        .state('project.settings.storage', {
+          url: '/storage',
+          parent: 'project.settings',
+          templateUrl: 'views/project/storage/storage.html',
+          controller: 'ProjectStorageController'
         })
         .state('project.settings.databases', {
           url: '/databases',

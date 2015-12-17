@@ -500,6 +500,24 @@ app.controller('ProjectPlanController', [
   }
 ]);
 
+app.controller('ProjectStorageController', [
+  '$scope',
+  function($scope) {
+    $scope.$watch('currentProject.settings.storage.s3.bucket', function(current, old) {
+      if ($scope.currentProject.settings && $scope.currentProject.settings.storage && $scope.currentProject.settings.storage.s3) {
+        // If bucket isn't valid, remove the bucketUrl as well.
+        if (!$scope.currentProject.settings.storage.s3.bucket) {
+          $scope.currentProject.settings.storage.s3.bucketUrl = '';
+        }
+        // If bucketUrl is blank or the old value, change it.
+        if (!$scope.currentProject.settings.storage.s3.bucketUrl || $scope.currentProject.settings.storage.s3.bucketUrl === 'https://' + old + '.s3.amazonaws.com/') {
+          $scope.currentProject.settings.storage.s3.bucketUrl = 'https://' + current + '.s3.amazonaws.com/';
+        }
+      }
+    });
+  }
+]);
+
 app.controller('ProjectDeleteController', [
   '$scope',
   '$state',
