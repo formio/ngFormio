@@ -35,20 +35,22 @@
       <div class="panel panel-default">
         <div class="panel-heading">
           <div class="panel-title">
-            <span>Project Template</span>
+            <span>Select a template</span>
             <a class="pull-right text-muted" href="http://help.form.io/userguide/#project-templates" target="_blank"><i class="glyphicon glyphicon-question-sign"></i></a>
           </div>
         </div>
         <div class="panel-body">
           <p>These project templates will automatically create some Resources and Forms to help bootstrap your project.</p>
-          <div class="row" ng-repeat="template in templates | limitTo:templateLimit" ng-click="currentProject.template = template.template">
-            <div class="template-card col-xs-10 col-xs-offset-1" ng-class="{'template-card-selected': template.template == currentProject.template}">
-              <div class="col-xs-12">
-                <h4><input ng-hide="true" type="radio" name="{{template.name}}" value="{{template.template}}" ng-model="currentProject.template"></h4>
-                <h4>{{template.title}}</h4>
-                <p class="text-muted">{{template.description}}</p>
+          <div class="row">
+            <div class="col-sm-6 col-md-4" ng-repeat="template in templates | limitTo:templateLimit" ng-click="currentProject.template = template.template">
+              <div class="thumbnail template-card" ng-class="{'template-card-selected': template.template == currentProject.template}">
+                <div class="project-tile-icon"><i class="fa fa-html5"></i></div>
+                <div class="caption">
+                  <input ng-hide="true" type="radio" name="{{template.name}}" value="{{template.template}}" ng-model="currentProject.template">
+                  <h4>{{template.title}}</h4>
+                  <p class="text-muted">{{template.description}}</p>
+                </div>
               </div>
-
             </div>
           </div>
           <div class="row" ng-hide="templates.length <= templateLimit">
@@ -65,7 +67,7 @@
           </div>
           <div class="row">
             <div class="col-xs-12">
-              <span class="btn btn-primary btn-block btn-file">
+              <span class="btn btn-default btn-block btn-file">
                 Upload Your Own Template <input id="template-select" type="file" accept=".json" onchange="angular.element(this).scope().loadTemplate.call(this)">
               </span>
             </div>

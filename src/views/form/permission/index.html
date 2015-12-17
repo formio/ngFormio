@@ -1,4 +1,3 @@
-<br/>
 <div class="panel panel-info">
   <div class="panel-heading">
     <h3 class="panel-title">User Permissions
@@ -15,7 +14,7 @@
       <permission-editor permissions="form.submissionAccess" labels="submissionAccessLabels" roles="currentProjectRoles" wait-for="loadFormPromise"></permission-editor>
     </div>
     <div class="form-group pull-right">
-      <a class="btn btn-default" ng-click="back('project.form.view')">Cancel</a>
+      <a class="btn btn-default" ng-click="back('project.{{ formInfo.type }}.form.view')">Cancel</a>
       <input type="submit" class="btn btn-primary" ng-click="saveForm()" value="Save Changes" />
     </div>
   </div>

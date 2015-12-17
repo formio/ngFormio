@@ -18,6 +18,7 @@ angular.module('formioApp').constant('AppConfig', {
 //  domain: host,
   appBase: appBase,
   serverHost: serverHost,
+  protocol: apiProtocol,
   tutorial: 'http://help.form.io/start',
   apiBase: apiBase,
   userForm: formioBase + '/user',

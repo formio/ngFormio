@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="/bower_components/font-awesome/css/font-awesome.css" />
     <link rel="stylesheet" href="/bower_components/kendo-ui/styles/kendo.common.min.css" />
     <link rel="stylesheet" href="/bower_components/kendo-ui/styles/kendo.bootstrap.min.css" />
+    <link rel="stylesheet" href="/bower_components/angular-ui-notification/dist/angular-ui-notification.css" />
     <!-- endbower -->
     <!-- endbuild -->
 
@@ -71,17 +72,14 @@
                 <a href="https://form.io" class="navbar-brand">
                   <img height="35px;" src="images/formio-logo-white.png" />
                 </a>
-                <ol class="breadcrumb" ng-cloak>
-                  <li><a ui-sref="home()" class="btn btn-success btn-sm"><span class="glyphicon glyphicon-home" aria-hidden="true"></span></a></li>
-                  <li ng-if="currentProject"><a ui-sref="project.edit({projectId: currentProject._id})"><span class="label label-default">{{ currentProject.title | characters:25:true }}</span></a></li>
-                  <li ng-if="currentForm"><a ui-sref="project.form.view({formId: currentForm._id})">{{ currentForm.title | characters:25:true}}</a></li>
-                </ol>
               </div>
               <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                  <li><a ui-sref="home" style="font-size: 1.5em;"><i class="fa fa-th-large"></i> Projects</a></li>
+                  <li><a ui-sref="home" style="font-size: 1.5em;"><i class="fa fa-users"></i> Teams</a></li>
+                </ul>
                 <ul class="nav navbar-nav navbar-right">
-                  <li>
-                    <a href="http://help.form.io" target="_blank"><i class="fa fa-life-ring"></i> Help</a>
-                  </li>
+                  <li><a href="http://help.form.io" target="_blank"><i class="fa fa-life-ring"></i> Help</a></li>
                   <li class="dropdown user-dropdown" ng-cloak>
                     <a ng-if="authenticated" href="#" class="dropdown-toggle" id="user-menu" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-user"></i> {{ user.data.name }}<b class="caret"></b></a>
                     <ul class="dropdown-menu">
@@ -108,20 +106,13 @@
           </ul>
         </div>
       </div>
-      <div class="container-fluid" id="main-wrapper" ng-cloak>
-        <div class="row">
-          <div class="col-sm-12 main">
-            <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)" ng-bind-html="alert.message"></alert>
-            <div ui-view></div>
-          </div>
+      <div class="row {{ mainClass }}" id="main-wrapper" ng-cloak>
+        <div class="col-sm-12 main">
+          <div ui-view></div>
         </div>
       </div>
-
       <formio-feedback></formio-feedback>
-
     </div>
-
-
 
     <footer>
       <div class="footer-banner"><img src="images/footerlogo-before.png" /></div>
@@ -214,6 +205,7 @@
     <script src="/bower_components/kendo-ui/js/kendo.ui.core.min.js"></script>
     <script src="/bower_components/kendo-ui/js/kendo.angular.min.js"></script>
     <script src="/bower_components/angular-truncate-2/src/angular-truncate-2.js"></script>
+    <script src="/bower_components/angular-ui-notification/dist/angular-ui-notification.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 

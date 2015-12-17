@@ -1,6 +1,5 @@
-<br/>
 <div class="row">
-    <div class="col-sm-7">
+    <div class="col-sm-10 col-sm-offset-1">
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title">Preview</h3>
@@ -11,30 +10,5 @@
                 <formio src="formUrl" read-only="hasAuthAction"></formio>
             </div>
         </div>
-    </div>
-    <div class="col-sm-5">
-        <accordion close-others="true">
-            <accordion-group heading="Form API" is-open="true" class="panel-info">
-                <p><strong>Your form API is now ready to use!</strong> The following API was created that maps directly to this form interface.</p>
-                <p>This API can be found by going to the following URL.</p>
-                <p><pre><code>https://{{ currentProject.name }}.form.io/{{ form.path }}</code></pre></p>
-            </accordion-group>
-            <accordion-group heading="Project Embedding" class="panel-info">
-              <p>To add this form to your Application, use <a target="_blank" href="http://bower.io/">Bower</a> to download the Form.IO library and its dependencies.</p>
-              <p><pre><code>bower install formio</code></pre></p>
-              <p>Next, ensure your webpage has all of the Project dependencies added to the &lt;script&gt; tag. For a simple example, refer to the following example.</p>
-              <p><a target="_blank" href="https://github.com/formio/formio-form/blob/master/index.html">Example Simple Form Embedding</a></p>
-              <p>We recommend using a tool called <a target="_blank" href="https://github.com/taptapship/wiredep">Wiredep</a> to automatically add all the dependencies to the &lt;script&gt; section.</p>
-              <p>Then you need to add formio as a dependency to your application's Angular module</p>
-              <p><pre><code>&lt;body ng-app="formApp"&gt;
-              ...
-              &lt;script type="text/javascript"&gt;
-                angular.module('formApp', ['formio']);
-              &lt;/script&gt;
-              </code></pre></p>
-              <p>Now, within your HTML source, you can use the <strong><code style="color:#333;">&lt;formio&gt;</code></strong> directive like so.
-              <pre><code>&lt;formio src="'https://{{ currentProject.name }}.form.io/{{ form.path }}'"&gt;&lt;/formio&gt;</code></pre>
-            </accordion-group>
-        </accordion>
     </div>
 </div>

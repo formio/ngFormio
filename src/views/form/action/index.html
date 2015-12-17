@@ -1,4 +1,3 @@
-<br/>
 <div class="panel panel-info">
     <div class="panel-heading">
       <a class="pull-right" href="http://help.form.io/userguide/#actions" target="_blank"><i class="glyphicon glyphicon-question-sign "></i></a>
@@ -17,13 +16,13 @@
             <tr data-ng-repeat="action in actions">
                 <td>
                     <span ng-if="!action._id">{{ action.title }}</span>
-                    <a ng-if="action._id" ui-sref="project.form.action.item.edit({actionId: action._id})">{{ action.title }}</a>
+                    <a ng-if="action._id" ui-sref="project.{{ formInfo.type }}.form.action.item.edit({actionId: action._id})">{{ action.title }}</a>
                 </td>
                 <td>
                     <span ng-if="!action._id">none</span>
                     <div class="button-group" style="display:flex;" ng-if="action._id">
-                        <a ui-sref="project.form.action.item.edit({actionId: action._id})" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-edit"></span></a>&nbsp;
-                        <a ui-sref="project.form.action.item.delete({actionId: action._id})" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove-circle"></span></a>
+                        <a ui-sref="project.{{ formInfo.type }}.form.action.item.edit({actionId: action._id})" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-edit"></span></a>&nbsp;
+                        <a ui-sref="project.{{ formInfo.type }}.form.action.item.delete({actionId: action._id})" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove-circle"></span></a>
                     </div>
                 </td>
             </tr>

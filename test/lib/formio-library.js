@@ -202,30 +202,28 @@ module.exports = function(config) {
         });
     })
     .when('I click (?:on )?the $BUTTON button', function(button, next) {
-      var driver = this.driver
-      this.driver.waitForExist('//button[contains(.,\'' + button + '\')]', 500)
+      var driver = this.driver;
+      driver.pause(1000)
         .then(function() {
-          driver.click('//button[contains(.,\'' + button + '\')]')
-            .then(function() {
-              next();
-            });
+          return driver.waitForExist('//button[contains(.,\'' + button + '\')]', timeout);
+        })
+        .then(function() {
+          return driver.click('//button[contains(.,\'' + button + '\')]');
+        })
+        .then(function() {
+          next();
         });
     })
     .when('I enter $TEXT in the $FIELD field', function(text, field, next) {
-      this.driver.waitForExist(field, timeout)
+      var driver = this.driver;
+      driver.waitForExist(field, timeout)
         .then(function() {
-          text = replacements(text);
-          this.driver.setValue(field, text)
-            .then(function() {
-              next();
-            })
-            .catch(function(err) {
-              next(err);
-            });
-        }.bind(this))
-        .catch(function(err) {
-          next(err);
-        });
+          return driver.setValue(field, replacements(text));
+        })
+        .then(function() {
+          next();
+        })
+        .catch(next);
     })
     .when('I expand the user menu', function(next) {
       var driver = this.driver
@@ -244,7 +242,9 @@ module.exports = function(config) {
         });
     })
     .when('I wait $TIME milliseconds', function(time, next) {
-      this.driver.pause(time).then(next);
+      this.driver.pause(time).then(function() {
+        next();
+      }).catch(next);
     })
     .then('the title is $TITLE', function(title, next) {
       this.driver.getTitle()
@@ -300,10 +300,19 @@ module.exports = function(config) {
         });
       });
     })
-    .then('I see an alert with (?:the text )?$TEXT', function(text, next) {
-      this.driver.waitForExist('//div[@role=\'alert\']', timeout)
+    .then('I see a notification with (?:the text )?$TEXT', function(text, next) {
+      var driver = this.driver;
+      driver.waitForExist('//div[@class=\'ui-notification\']/div[@class=\'message\']', timeout)
         .then(function() {
-          this.driver.getText('//div[@role=\'alert\']')
+          return driver.getText('//div[@class=\'ui-notification\']/div[@class=\'message\']');
+        })
+        .then(function(alert) {
+          assert.equal(text, alert);
+        });
+
+      this.driver.waitForExist('//div[@class=\'ui-notification\']/div[@class=\'message\']', timeout)
+        .then(function() {
+          this.driver.getText('//div[@class=\'ui-notification\']/div[@class=\'message\']')
             .then(function(alert) {
               assert.equal(text, alert);
               next();
@@ -315,6 +324,18 @@ module.exports = function(config) {
         .catch(function(err) {
           next(err);
         });
+    })
+    .then('I see an alert with (?:the text )?$TEXT', function(text, next) {
+      var driver = this.driver;
+      driver.waitForExist('//div[@role=\'alert\']', timeout)
+        .then(function() {
+          return driver.getText('//div[@role=\'alert\']');
+        })
+        .then(function(alert) {
+          assert.equal(text, alert);
+          next();
+        })
+        .catch(next);
     })
     .then('I see $TEXT', function(text, next) {
       this.driver.waitForExist('//*[text()=\'' + text + '\']', 500)

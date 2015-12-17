@@ -1,0 +1,54 @@
+<div class="row">
+  <div class="col-sm-6">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Resource Information</h3>
+      </div>
+      <div class="panel-body">
+        <div class="well">
+          <p>Resources are objects that can be used to create complex data structures within your application. The fields within a resource can be reused within other forms, as well as linked together to create complex nested resource relationships.</p>
+          <p>Form.io utilizes a <strong>form builder interface</strong> to create new resources, which not only creates the data model, but also automatically reflects that model onto a RESTful interface.</p>
+        </div>
+        <table class="table table-bordered table-striped">
+          <tbody>
+            <tr>
+              <th>API Endpoint</th>
+              <td><a ui-sref="project.{{ formInfo.type }}.form.api">{{ projectApi }}/{{ form.path }}</a></td>
+            </tr>
+          </tbody>
+        </table>
+        <h4>Fields</h4>
+        <table class="table table-bordered table-striped">
+          <thead>
+            <tr>
+              <th>Field</th>
+              <th>Key</th>
+              <th>Type</th>
+              <th>Persistent</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="component in components">
+              <td>{{ component.label }}</td>
+              <td>{{ component.key }}</td>
+              <td>{{ component.type }}</td>
+              <td>{{ component.persistent }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Preview</h3>
+      </div>
+      <div class="panel-body">
+        <div ng-if="hasAuthAction" ng-cloak class="alert alert-warning" role="alert"><i class="glyphicon glyphicon-exclamation-sign"></i> This preview is read only because this form contains an Authentication action.</div>
+        <div ng-if="hasPremAction" ng-cloak class="alert alert-warning" role="alert"><i class="glyphicon glyphicon-exclamation-sign"></i> This form contains a Premium action, upgrade your <a ui-sref="project.settings.plan">project plan</a> to enable it.</div>
+        <formio src="formUrl" read-only="hasAuthAction"></formio>
+      </div>
+    </div>
+  </div>
+</div>
