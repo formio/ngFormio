@@ -1,6 +1,6 @@
 machine:
   node:
-    version: 0.12.7
+    version: 4.2.3
   environment:
     SHORT_SHA: $(echo $CIRCLE_SHA1 | cut -b1-7)
     TAG: ${CIRCLE_BRANCH:-$(echo $CIRCLE_TAG)}

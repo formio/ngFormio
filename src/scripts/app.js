@@ -23,7 +23,8 @@ angular
     'formioApp.controllers',
     'formioApp.utils',
     'kendo.directives',
-    'truncate'
+    'truncate',
+    'ngFileUpload'
   ])
   .config([
     '$stateProvider',
@@ -174,6 +175,12 @@ angular
         .state('project.settings.email', {
           url: '/email',
           templateUrl: 'views/project/email/email.html'
+        })
+        .state('project.settings.storage', {
+          url: '/storage',
+          parent: 'project.settings',
+          templateUrl: 'views/project/storage/storage.html',
+          controller: 'ProjectStorageController'
         })
         .state('project.settings.databases', {
           url: '/databases',
@@ -349,7 +356,7 @@ angular
         $scope.projects = projects;
         $scope.teamsEnabled = _.any(projects, function(project) {
           project.plan = project.plan || '';
-          return _.startsWith(project.plan, 'team');
+          return (project.plan === 'team' || project.plan === 'commercial');
         });
       }).catch(FormioAlerts.onError.bind(FormioAlerts));
 
