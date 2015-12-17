@@ -652,7 +652,7 @@ describe('Bootstrap', function() {
     describe('Final Tests', function() {
       describe('Formio-Server', function() {
         require('./project')(app, template, hook);
-        require('./websockets')(app, template, hook);
+        //require('./websockets')(app, template, hook);
       });
 
       var originalSettingsHook;
