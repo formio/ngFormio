@@ -314,12 +314,13 @@ app.controller('FormController', [
 
     // Delete a form.
     $scope.deleteForm = function() {
+      var type = $scope.form.type;
       $scope.formio.deleteForm().then(function() {
         FormioAlerts.addAlert({
           type: 'success',
           message: 'Delete successful'
         });
-        $state.go('project.' + $scope.formInfo.type + '.form.index');
+        $state.go('project.' + type + '.form.index');
       }, FormioAlerts.onError.bind(FormioAlerts));
     };
 
