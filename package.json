@@ -36,7 +36,7 @@
     "omega-supreme": "git://github.com/formio/omega-supreme.git#master",
     "on-finished": "^2.3.0",
     "postcss": "4.1.16",
-    "primus": "^4.0.1",
+    "primus": "^4.0.4",
     "q": "^1.4.1",
     "redis": "^2.0.1",
     "request": "^2.61.0",
