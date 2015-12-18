@@ -139,7 +139,7 @@ angular
                   $scope.hasTemplate = false;
                   project.settings.preview = {
                     repo: 'https://github.com/formio/formio-app-template',
-                    url: 'http://formio.github.io/formio-app-template/'
+                    url: $location.protocol() + '://formio.github.io/formio-app-template/'
                   };
                 }
 
