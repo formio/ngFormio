@@ -139,11 +139,11 @@ angular
                   $scope.hasTemplate = false;
                   project.settings.preview = {
                     repo: 'https://github.com/formio/formio-app-template',
-                    url: $location.protocol() + '://formio.github.io/formio-app-template/'
+                    url: 'http://formio.github.io/formio-app-template/'
                   };
                 }
 
-                var url = project.settings.preview.url;
+                var url = project.settings.preview.url.replace('http://', $location.protocol() + '://');
                 url += '/?apiUrl=' + encodeURIComponent(AppConfig.apiBase);
                 url += '&appUrl=' + encodeURIComponent($location.protocol() + '://' + project.name + '.' + AppConfig.serverHost);
                 $scope.previewUrl = $sce.trustAsResourceUrl(url);
