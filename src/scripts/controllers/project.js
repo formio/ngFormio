@@ -296,15 +296,55 @@ app.controller('ProjectDataController', [
     AppConfig,
     Formio
   ) {
+    // Get the current time.
     var curr = new Date();
-    $scope.displayOptions = {
+    $scope.viewDate = {
+      year: curr.getUTCFullYear(),
+      month: curr.getUTCMonth(),
+      day: curr.getUTCDate()
+    };
+    $scope.label = {
+      year: 'Yearly Submissions by Month',
+      month: 'Monthly Submissions by Day',
+      day: 'Daily Submissions by Hour'
+    };
+    $scope.analyticsOptions = {
+      height: 300,
       low: 0,
-      onlyInteger: true
+      lineSmooth: false,
+      fullWidth: true,
+      axisX: {
+        onlyInteger: true
+      },
+      axisY: {
+        onlyInteger: true
+      }
+    };
+    $scope.analyticsEvents = {
+      draw: function(data) {
+        // Intercept each chart point and register a click event.
+        if(data.type === 'point') {
+          // Register a click event to modify the graph based on the current view and click location.
+          data.element._node.onclick = function() {
+            if($scope.currentType === 'year') {
+              $scope.viewDate.month = data.index;
+              $scope.displayView('month', true);
+            }
+            else if($scope.currentType === 'month') {
+              // Adjust day for non-zero index.
+              $scope.viewDate.day = data.index + 1;
+              $scope.displayView('day', true);
+            }
+          }
+        }
+      }
     };
 
+    // Draw the initial analytics graph view (for the current month).
     $scope.analyticsLoading = true;
     Formio.request(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/analytics/year/' + curr.getUTCFullYear() + '/month/' + curr.getUTCMonth(), 'GET')
       .then(function(data) {
+        $scope.currentType = 'month';
         $scope.analytics = {
           labels: _.pluck(data, 'day'),
           series: [
@@ -314,6 +354,92 @@ app.controller('ProjectDataController', [
 
         $scope.analyticsLoading = false;
       });
+
+    /**
+     * View switcher utility to graph the data for the current view type.
+     *
+     * @param {String} type
+     *   The type of view to display: year, month, view.
+     * @param {Boolean} [cached]
+     *   If the view should use the the $scope.viewDate time rather than the current time.
+     */
+    $scope.displayView = function(type, cached) {
+      var _y = curr.getUTCFullYear();
+      var _m = curr.getUTCMonth();
+      var _d = curr.getUTCDate();
+      if(cached) {
+        _y = $scope.viewDate.year;
+        _m = $scope.viewDate.month;
+        _d = $scope.viewDate.day;
+      }
+      else {
+        // Clear the cache values;
+        $scope.viewDate.year = _y;
+        $scope.viewDate.month = _m;
+        $scope.viewDate.day = _d;
+      }
+
+      if(type === 'year') {
+        $scope.analyticsLoading = true;
+        Formio.request(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/analytics/year/' + _y, 'GET')
+          .then(function(data) {
+            $scope.currentType = type;
+            $scope.analytics = {
+              labels: _.pluck(data, 'month'),
+              series: [
+                _.pluck(data, 'submissions')
+              ]
+            };
+
+            $scope.analyticsLoading = false;
+            $scope.$apply();
+          });
+      }
+      else if(type === 'month') {
+        $scope.analyticsLoading = true;
+        Formio.request(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/analytics/year/' + _y + '/month/' + _m, 'GET')
+          .then(function(data) {
+            $scope.currentType = type;
+            $scope.analytics = {
+              labels: _.pluck(data, 'day'),
+              series: [
+                _.pluck(data, 'submissions')
+              ]
+            };
+
+            $scope.analyticsLoading = false;
+            $scope.$apply();
+          });
+      }
+      else if(type === 'day') {
+        $scope.analyticsLoading = true;
+        Formio.request(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/analytics/year/' + _y + '/month/' + _m + '/day/' + _d, 'GET')
+          .then(function(data) {
+            $scope.currentType = type;
+            var utcHrs = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23];
+
+            // Default each hr to have no submissions.
+            var parsedData = [];
+            _.forEach(utcHrs, function(hr) {
+              parsedData[hr] = 0;
+            });
+
+            // Convert the raw timestamps into hours that they occurred in.
+            _.forEach(data.submissions, function(_event) {
+              var temp = new Date(parseInt(_event));
+              parsedData[temp.getUTCHours()] = parsedData[temp.getUTCHours()] + 1;
+            });
+
+            $scope.analytics = {
+              labels: utcHrs,
+              series: [parsedData]
+            };
+
+            $scope.analyticsLoading = false;
+            $scope.$apply();
+          });
+      }
+    };
   }
 ]);
 

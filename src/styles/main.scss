@@ -1044,3 +1044,29 @@ footer {
     margin-bottom: 0;
   }
 }
+
+/***************************** Project Data *****************************/
+.project-data {
+  h3, h4 {
+    text-align: center;
+  }
+  .ct-chart,
+  .ct-label {
+    font-family: $font-family-base;
+    font-size: $font-size-small;
+  }
+
+  // Variable analytics graph.
+  .ct-chart-line {
+    .ct-series-a .ct-line {
+      stroke: $brand-secondary
+    }
+    .ct-series-a .ct-point {
+      stroke: $brand-primary;
+
+      &:hover {
+        stroke-width: 20px !important;
+      }
+    }
+  }
+}

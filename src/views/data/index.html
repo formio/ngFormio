@@ -2,16 +2,17 @@
   <h2><i class="fa fa-table"></i> Data</h2>
   <p>Anytime someone submits a form within Form.io, that data is stored and can be managed here.</p>
 </div>
-<div class="project-section-content project-section-inner-content">
+<div class="project-section-content project-section-inner-content project-data">
   <div class="row" ng-controller="ProjectDataController">
-    <div class="col-sm-6">
-      <chartist class="ct-chart" chartist-data="analytics" chartist-chart-type="Line" chartist-chart-options="displayOptions"></chartist>
+    <div class="col-sm-12">
+      <h3 class="center">{{label[currentType]}}</h3>
+      <h4>{{viewDate.year}} / {{viewDate.month}} / {{viewDate.day}}</h4>
+      <chartist class="ct-chart" chartist-data="analytics" chartist-chart-type="Line" chartist-chart-options="analyticsOptions" chartist-events="analyticsEvents"></chartist>
+      <button class="btn btn-default btn-xs" ng-click="displayView('year')">Year</button>
+      <button class="btn btn-default btn-xs" ng-click="displayView('month')">Month</button>
+      <button class="btn btn-default btn-xs" ng-click="displayView('day')">Day</button>
     </div>
-    <div class="col-sm-6">
-
-    </div>
-  </div>
-
+  </div><br>
   <div class="row">
     <div class="col-sm-6">
       <div class="panel panel-primary">
