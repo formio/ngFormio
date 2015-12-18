@@ -55,7 +55,7 @@ module.exports = [
           if (!action) { return ''; }
           if ($scope.action) { return ''; }
           if (action.substr(0, 1) === '/') {
-            action = Formio.baseUrl + action;
+            action = Formio.getBaseUrl() + action;
           }
           return action;
         };
