@@ -24,7 +24,6 @@ module.exports = function(app, template, hook) {
     var bind = function(client, formId, sync) {
       var deferred = Q.defer();
       client.on('error', function(err) {
-        client.end();
         deferred.reject(err);
       });
       client.on('open', function() {
@@ -266,7 +265,6 @@ module.exports = function(app, template, hook) {
             }
 
             // Ensure that the value was in fact changed...
-            client.end();
             assert.equal(res.body.data.foo, 'bar3');
             template.formio.owner.token = res.headers['x-jwt-token'];
             callDone(client, done);
@@ -401,6 +399,9 @@ module.exports = function(app, template, hook) {
             });
           });
         });
+      })
+      .catch(function(err) {
+        callDone(client, done, err);
       });
     });
   });
