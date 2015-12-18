@@ -1383,8 +1383,8 @@ module.exports = function(app, template, hook) {
 
             var response = res.body;
             assert.deepEqual(
-              _.omit(response, 'externalIds', 'modified'),
-              _.omit(template.users.oauthUser1, 'token', 'externalIds', 'modified'),
+              _.omit(response, 'externalIds', 'modified', 'externalTokens'),
+              _.omit(template.users.oauthUser1, 'token', 'externalIds', 'modified', 'externalTokens'),
               'The response should match the previously registered user');
             assert.equal(response.externalIds.length, 2);
             assert.notEqual(_.find(response.externalIds, {
