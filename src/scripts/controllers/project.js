@@ -1,6 +1,6 @@
 'use strict';
 
-var app = angular.module('formioApp.controllers.project', []);
+var app = angular.module('formioApp.controllers.project', ['angular-chartist']);
 
 /*
 * Prevents user inputting non-alphanumeric characters or starting the domain with a hyphen.
@@ -288,7 +288,33 @@ app.controller('ProjectController', [
 ]);
 
 app.controller('ProjectDataController', [
+  '$scope',
+  'AppConfig',
+  'Formio',
+  function(
+    $scope,
+    AppConfig,
+    Formio
+  ) {
+    var curr = new Date();
+    $scope.displayOptions = {
+      low: 0,
+      onlyInteger: true
+    };
 
+    $scope.analyticsLoading = true;
+    Formio.request(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/analytics/year/' + curr.getUTCFullYear() + '/month/' + curr.getUTCMonth(), 'GET')
+      .then(function(data) {
+        $scope.analytics = {
+          labels: _.pluck(data, 'day'),
+          series: [
+            _.pluck(data, 'submissions')
+          ]
+        };
+
+        $scope.analyticsLoading = false;
+      });
+  }
 ]);
 
 app.controller('ProjectSettingsController', [
