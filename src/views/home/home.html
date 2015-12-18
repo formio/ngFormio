@@ -6,7 +6,7 @@
           <h4><p class="create-link"><span class="glyphicon glyphicon-plus circle"></span> Create Project</p></h4>
         </a>
       </div>
-      <div class="project well"  ui-sref="createProject()" ng-if="!projects.length">
+      <div class="project well"  ui-sref="createProject()" ng-if="projectsLoaded && !projects.length" ng-cloak>
         <h4 class="project-title">Step 1: Create your project</h4>
         <ng-include src="'views/project/help.html'"></ng-include>
         <ul class="list-inline">

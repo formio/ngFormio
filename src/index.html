@@ -74,7 +74,7 @@
                 </a>
               </div>
               <div id="navbar" class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
+                <ul class="nav navbar-nav" ng-if="authenticated" ng-cloak>
                   <li><a ui-sref="home" style="font-size: 1.5em;"><i class="fa fa-th-large"></i> Projects</a></li>
                   <li><a ui-sref="home" style="font-size: 1.5em;"><i class="fa fa-users"></i> Teams</a></li>
                 </ul>
