@@ -311,7 +311,6 @@ module.exports = function(app, template, hook) {
             assert(response.externalIds[0].hasOwnProperty('created'), 'The externalId should contain a `created` timestamp.');
             assert.equal(response.externalIds[0].type, app.formio.oauth.providers.office365.name, 'The externalId should be for office365 oauth.');
             assert.equal(response.externalIds[0].id, TEST_USER.Id, 'The externalId should match test user 1\'s id.');
-            assert(!response.hasOwnProperty('externalTokens'), 'The response should not contain `externalTokens`');
             assert(!response.hasOwnProperty('deleted'), 'The response should not contain `deleted`');
             assert(!response.hasOwnProperty('__v'), 'The response should not contain `__v`');
             assert(res.headers.hasOwnProperty('x-jwt-token'), 'The response should contain a `x-jwt-token` header.');
@@ -363,7 +362,6 @@ module.exports = function(app, template, hook) {
             assert(response.externalIds[0].hasOwnProperty('created'), 'The externalId should contain a `created` timestamp.');
             assert.equal(response.externalIds[0].type, app.formio.oauth.providers.office365.name, 'The externalId should be for office365 oauth.');
             assert.equal(response.externalIds[0].id, TEST_USER.Id, 'The externalId should match test user 1\'s id.');
-            assert(!response.hasOwnProperty('externalTokens'), 'The response should not contain `externalTokens`');
             assert(!response.hasOwnProperty('deleted'), 'The response should not contain `deleted`');
             assert(!response.hasOwnProperty('__v'), 'The response should not contain `__v`');
             assert(res.headers.hasOwnProperty('x-jwt-token'), 'The response should contain a `x-jwt-token` header.');
