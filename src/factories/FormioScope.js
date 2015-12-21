@@ -32,6 +32,7 @@ module.exports = [
         };
       },
       register: function($scope, $element, options) {
+        var self = this;
         var loader = null;
         $scope._src = $scope._src || $scope.src || '';
         $scope._form = $scope.form || {};
@@ -54,7 +55,7 @@ module.exports = [
           if (!action) { return ''; }
           if ($scope.action) { return ''; }
           if (action.substr(0, 1) === '/') {
-            action = Formio.baseUrl + action;
+            action = Formio.getBaseUrl() + action;
           }
           return action;
         };
@@ -96,6 +97,18 @@ module.exports = [
           return componentInfo.tableView(value, component);
         };
 
+        $scope.updateSubmissions = function() {
+          spinner.show();
+          var params = {};
+          if($scope.perPage) params.limit = $scope.perPage;
+          if($scope.skip) params.skip = $scope.skip;
+          loader.loadSubmissions({ params: params }).then(function(submissions) {
+            $scope._submissions = submissions;
+            spinner.hide();
+            $scope.$emit('submissionsLoad', submissions);
+          }, self.onError($scope));
+        };
+
         var spinner = $element.find('#formio-loading');
 
         if ($scope._src) {
@@ -120,12 +133,7 @@ module.exports = [
             }, this.onError($scope));
           }
           if (options.submissions) {
-            spinner.show();
-            loader.loadSubmissions().then(function(submissions) {
-              $scope._submissions = submissions;
-              spinner.hide();
-              $scope.$emit('submissionsLoad', submissions);
-            }, this.onError($scope));
+            $scope.updateSubmissions();
           }
         }
         else {

@@ -4,8 +4,7 @@ var app = angular.module('formio', [
   'ui.bootstrap.datetimepicker',
   'ui.select',
   'ui.mask',
-  'angularMoment',
-  'bgf.paginateAnything'
+  'angularMoment'
 ]);
 
 /**
@@ -87,22 +86,11 @@ app.run([
       '</form>'
     );
 
-    $templateCache.put('formio/pager.html',
-      '<div class="paginate-anything">' +
-        '<ul class="pagination pagination-{{size}} links" ng-if="numPages > 1">' +
-          '<li ng-class="{disabled: page <= 0}"><a href ng-click="gotoPage(page-1)">&laquo;</a></li>' +
-          '<li ng-if="linkGroupFirst() > 0"><a href ng-click="gotoPage(0)">1</a></li>' +
-          '<li ng-if="linkGroupFirst() > 1" class="disabled"><a href>&hellip;</a></li>' +
-          '<li ng-repeat="p in [linkGroupFirst(), linkGroupLast()] | makeRange" ng-class="{active: p === page}"><a href ng-click="gotoPage(p)">{{p+1}}</a></li>' +
-          '<li ng-if="linkGroupLast() < numPages - 2" class="disabled"><a href>&hellip;</a></li>' +
-          '<li ng-if="isFinite() && linkGroupLast() < numPages - 1"><a href ng-click="gotoPage(numPages-1)">{{numPages}}</a></li>' +
-          '<li ng-class="{disabled: page >= numPages - 1}"><a href ng-click="gotoPage(page+1)">&raquo;</a></li>' +
-        '</ul>' +
-      '</div>'
-    );
-
     $templateCache.put('formio/submissions.html',
       '<div>' +
+        '<div ng-repeat="alert in formioAlerts" class="alert alert-{{ alert.type }}" role="alert">' +
+          '{{ alert.message }}' +
+        '</div>' +
         '<table class="table">' +
           '<thead>' +
             '<tr>' +
@@ -113,21 +101,32 @@ app.run([
             '</tr>' +
           '</thead>' +
           '<tbody>' +
-            '<tr ng-repeat="submission in _submissions">' +
+            '<tr ng-repeat="submission in _submissions" class="formio-submission" ng-click="$emit(\'submissionView\', submission)">' +
               '<td ng-repeat="component in _form.components | flattenComponents" ng-if="tableView(component)">{{ fieldData(submission.data, component) }}</td>' +
               '<td>{{ submission.created | amDateFormat:\'l, h:mm:ss a\' }}</td>' +
               '<td>{{ submission.modified | amDateFormat:\'l, h:mm:ss a\' }}</td>' +
               '<td>' +
                 '<div class="button-group" style="display:flex;">' +
-                  '<a ng-click="$emit(\'submissionView\', submission)" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-eye-open"></span></a>&nbsp;' +
-                  '<a ng-click="$emit(\'submissionEdit\', submission)" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-edit"></span></a>&nbsp;' +
-                  '<a ng-click="$emit(\'submissionDelete\', submission)" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove-circle"></span></a>' +
+                  '<a ng-click="$emit(\'submissionView\', submission); $event.stopPropagation();" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-eye-open"></span></a>&nbsp;' +
+                  '<a ng-click="$emit(\'submissionEdit\', submission); $event.stopPropagation();" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-edit"></span></a>&nbsp;' +
+                  '<a ng-click="$emit(\'submissionDelete\', submission); $event.stopPropagation();" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove-circle"></span></a>' +
                 '</div>' +
               '</td>' +
             '</tr>' +
           '</tbody>' +
         '</table>' +
-        '<bgf-pagination collection="_submissions" url="formio.submissionsUrl" per-page="perPage" template-url="formio/pager.html"></bgf-pagination>' +
+        '<pagination ' +
+          'ng-if="_submissions.serverCount > perPage" ' +
+          'ng-model="currentPage" ' +
+          'ng-change="pageChanged(currentPage)" ' +
+          'total-items="_submissions.serverCount" ' +
+          'items-per-page="perPage" ' +
+          'direction-links="false" ' +
+          'boundary-links="true" ' +
+          'first-text="&laquo;" ' +
+          'last-text="&raquo;" ' +
+          '>' +
+        '</pagination>' +
       '</div>'
     );
 

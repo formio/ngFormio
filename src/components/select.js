@@ -102,11 +102,11 @@ module.exports = function (app) {
               if (settings.data.url) {
                 var options = {cache: true};
                 if (settings.data.url.substr(0, 1) === '/') {
-                  settings.data.url = Formio.baseUrl + settings.data.url;
+                  settings.data.url = Formio.getBaseUrl() + settings.data.url;
                 }
 
                 // Disable auth for outgoing requests.
-                if (settings.data.url.indexOf(Formio.baseUrl) === -1) {
+                if (settings.data.url.indexOf(Formio.getBaseUrl()) === -1) {
                   options = {
                     disableJWT: true,
                     headers: {

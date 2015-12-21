@@ -129,18 +129,20 @@ module.exports = function (app) {
                   message: 'Starting upload'
                 };
                 var dir = $scope.component.dir || '';
+                var dropboxToken = _.pluck(_.filter($scope.user.externalTokens, {type: 'dropbox'}), 'token');
+                console.log(dropboxToken);
                 var request = {
                   url: 'https://content.dropboxapi.com/2/files/upload',
                   method: 'POST',
                   headers: {
-                    'Authorization': 'Bearer ' + $scope.currentUser.externalTokens[0].token,
+                    'Authorization': 'Bearer ' + dropboxToken,
                     'Dropbox-API-Arg': JSON.stringify({
                       path: dir + file.name,
                       mode: 'add',
                       autorename: true,
                       mute: false
                     })
-                  }
+                  },
                   data: {
                     file: file
                   }
@@ -165,7 +167,7 @@ module.exports = function (app) {
                     $scope.fileUploads[file.name].progress = parseInt(100.0 * evt.loaded / evt.total);
                     delete $scope.fileUploads[file.name].message;
                   });
-              })
+              });
               break;
           }
         }
