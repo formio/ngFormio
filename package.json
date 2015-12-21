@@ -1,11 +1,11 @@
 {
   "private": true,
   "engines": {
-    "node": ">=0.12.0"
+    "node": ">=4.2.0"
   },
   "scripts": {
     "start": "node app.js",
-    "test": "APPPROTOCOL=http APPDOMAIN=portal.localhost APPPORT=$PORT mocha --timeout 30000 --reporter spec test/test.js"
+    "test": "APPPROTOCOL=http APPDOMAIN=portal.localhost APPPORT=$PORT mocha --timeout 60000 --reporter spec test/test.js"
   },
   "main": "./index.js",
   "devDependencies": {
@@ -55,6 +55,7 @@
     "swagger-ui": "^2.1.8-M1",
     "validator": "3.41.2",
     "vhost": "^3.0.1",
+    "webdriverio": "^3.3.0",
     "webdriverjs-angular": "^0.1.3",
     "yadda": "^0.15.2"
   }

@@ -159,10 +159,10 @@ ul.dropdown-menu {
 .sidebar {
   display: none;
 }
-@media (min-width: 768px) {
+@media (min-width: $screen-sm-min) {
   .sidebar {
     position: fixed;
-    top: 51px;
+    top: 45px;
     bottom: 0;
     left: 0;
     z-index: 1000;
@@ -192,27 +192,80 @@ ul.dropdown-menu {
   background-color: #428bca;
 }
 
-.main {
-  padding: 20px;
-}
-
-#main-wrapper {
-  min-height: 80vh;
-}
-@media (min-width: 768px) {
+@media (min-width: $screen-sm-min) {
   #main-wrapper {
     margin: 0;
-  }
-  .main {
-    padding-right: 40px;
-    padding-left: 40px;
   }
 }
 @media (min-width: 1024px) {
   #main-wrapper {
-    margin: 0 100px;
+    margin-right: 100px;
+    margin-left: 100px;
   }
 }
+
+#main-wrapper {
+  min-height: 80px;
+  margin-top: 20px;
+  margin-bottom: 40px;
+  &.auth-page {
+    margin-top: 40px;
+  }
+  &.project-page {
+    margin: 0;
+  }
+}
+
+$project-header-color: lighten($brand-primary, 55%);
+
+.project-sidebar {
+  border: none;
+  background-color: darken($brand-primary, 25%);
+  text-align: center;
+  padding-top: 0;
+  width: 6%;
+  .nav > li {
+    & > a {
+      height: 90px;
+      padding: 20px 15px;
+      color: $project-header-color;
+      &:hover {
+        background-color: darken($brand-primary, 20%);
+      }
+      span {
+        font-size: 0.6em;
+      }
+      i {
+        font-size: 2em;
+      }
+    }
+    &.active {
+      background-color: darken($brand-primary, 20%);
+      & > a, & > a:focus {
+        background-color: darken($brand-primary, 5%);
+        border-right: solid $brand-secondary 8px;
+      }
+    }
+  }
+}
+
+.project-main {
+  margin-left: 6%;
+  width: 94%;
+  padding: 0;
+}
+
+@media (max-width: $screen-sm-min) {
+  .project-main {
+    margin-left: 0;
+    width: 100%;
+  }
+}
+
+.project-content {
+  margin-bottom: 40px;
+}
+
 .main .page-header {
   margin-top: 0;
 }
@@ -220,6 +273,10 @@ ul.dropdown-menu {
 .navbar {
   border-radius: 0;
   margin-bottom: 0;
+}
+
+.navbar-nav {
+  margin-left: 20px;
 }
 
 .form-builder-body {
@@ -245,8 +302,10 @@ ul.dropdown-menu {
 }
 
 .project-nav {
+  background-color: $gray-lighter;
   border-bottom: 1px solid #ddd;
-  margin-bottom: 10px;
+  padding: 10px;
+  min-height: 90px;
   .project-title {
     font-weight: normal;
     margin-left: 0px;
@@ -254,6 +313,12 @@ ul.dropdown-menu {
     margin-top: 0px;
     margin-bottom: 0;
     font-size: 2em;
+    .project-title-link {
+      color: $gray;
+      &:hover, &:focus {
+        text-decoration: none;
+      }
+    }
   }
 
   .project-description {
@@ -263,8 +328,87 @@ ul.dropdown-menu {
   }
 }
 
-.project-description, .project-url {
+.project-description, .project-swagger {
   word-break: break-all;
+}
+
+.project-swagger-button {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  font-size: 0.5em;
+  line-height: 1.2em;
+  background-color: #ddd;
+  border: solid white 2px;
+  border-radius: 20px;
+  padding: 2px 8px;
+  &:hover {
+    background-color: $gray-lighter;
+    text-decoration: none;
+  }
+}
+
+.project-section-header {
+  background-color: darken($brand-primary, 5%);
+  color: $project-header-color;
+  padding: 20px;
+  border-bottom: solid $brand-secondary 8px;
+  h2 {
+    a {
+      color: $project-header-color;
+      &:hover, &:focus {
+        text-decoration: none;
+      }
+    }
+    margin: 0 0 10px 0;
+  }
+}
+
+.project-section-inner-content {
+  padding: 20px;
+}
+
+.project-form-form-view-page .form-content, .project-resource-form-view-page .form-content {
+  background-color: #666;
+}
+
+#application-preview {
+  position: relative;
+  img { width: 100%; }
+  #application-frame {
+    position: absolute;
+    top: 12.5%;
+    left: 10%;
+    width: 79%;
+    height: 75%;
+  }
+}
+
+.project-resource-page, .project-form-page {
+  .project-section-content {
+    .form-list-panel.panel {
+      border: none;
+    }
+  }
+}
+
+.project-section-header-button {
+  float: right;
+  border: solid $project-header-color 2px;
+  margin-top: 1em;
+}
+
+.project-header-block {
+  text-align: right;
+}
+
+.project-requests-progress {
+  margin-bottom: 0;
+  height: 31px;
+}
+
+.upgrade-plan-header-button {
+  padding: 4px 8px;
 }
 
 .form-title {
@@ -275,7 +419,28 @@ ul.dropdown-menu {
 }
 
 .form-nav {
-  border-bottom: 1px solid #ddd;
+  border-top: solid $project-header-color 2px;
+  background-color: $gray-lighter;
+  color: $gray;
+  padding: 5px 10px;
+  .nav-pills {
+    li {
+      padding: 0;
+      &.form-nav {
+        a {
+          background-color: $brand-secondary;
+          border: solid darken($brand-secondary, 10%) 2px;
+          color: $project-header-color;
+          &:hover {
+            background-color: darken($brand-secondary, 10%);
+          }
+        }
+        &.active a {
+          background-color: $brand-primary;
+        }
+      }
+    }
+  }
   li {
     padding-bottom: 5px;
   }
@@ -283,17 +448,21 @@ ul.dropdown-menu {
     float: right;
   }
   .resource-label {
+    color: white;
+    background-color: $gray-light;
     display: inline;
-    padding: .2em .6em .3em;
+    padding: 0.3em 0.5em;
     font-size: 80%;
     font-weight: 500;
-    line-height: 3.5;
     text-align: center;
     white-space: nowrap;
-    vertical-align: baseline;
     border-radius: .25em;
-    margin-right: 30px;
+    line-height: 3.7em;
   }
+}
+
+.form-content {
+  padding: 20px;
 }
 
 .col-margin-bottom {
@@ -694,9 +863,10 @@ footer {
       }
     }
   }
-  .project-help-panel {
-    margin-top: 92px;
-  }
+}
+
+.project-help-panel {
+  margin-top: 1.6em;
 }
 
 .teams {
@@ -829,6 +999,17 @@ footer {
   padding: 10px 5px;
   cursor: pointer;
   transition: .15s;
+  .project-tile-icon {
+    text-align: center;
+    font-size: 7em;
+    line-height: 0.1em;
+    color: darken($brand-secondary, 10%);
+    margin: 0;
+    padding: 0;
+  }
+  .caption h4 {
+    text-align: center;
+  }
   &:hover {
     background: lighten($brand-secondary, 40%);
   }
@@ -836,8 +1017,11 @@ footer {
     background: $brand-secondary;
     color: #FFF;
     border: 1px solid darken($brand-secondary, 10%);
-    .text-muted {
-      color: #FFF;
+    .caption h4 {
+      color: #fff;
+    }
+    .text-muted, .project-tile-icon {
+      color: lighten($brand-secondary, 60%);
     }
   }
 }

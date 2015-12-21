@@ -17,6 +17,7 @@ angular
     'ui.bootstrap.tpls',
     'ui.select',
     'ui.bootstrap.datetimepicker',
+    'ui-notification',
     'angularMoment',
     'ngCkeditor',
     'formioApp.controllers',
@@ -99,6 +100,7 @@ angular
           templateUrl: 'views/user/profile/profile-edit.html'
         })
         .state('project', {
+          abstract: true,
           url: '/project/:projectId',
           controller: 'ProjectController',
           templateUrl: 'views/project/project.html'
@@ -110,35 +112,68 @@ angular
         })
         .state('project.edit', {
           url: '/edit',
-          parent: 'project',
           templateUrl: 'views/project/edit.html'
+        })
+        .state('project.data', {
+          url: '/data',
+          templateUrl: 'views/data/index.html'
+        })
+        .state('project.preview', {
+          url: '/preview',
+          templateUrl: 'views/project/preview.html',
+          controller: [
+            '$scope',
+            '$sce',
+            '$location',
+            function(
+              $scope,
+              $sce,
+              $location
+            ) {
+              $scope.previewUrl = '';
+              $scope.repo = '';
+              $scope.hasTemplate = true;
+              $scope.$watch('currentProject', function(project) {
+                if (!project.settings) { return; }
+                if (!project.settings.preview) {
+                  $scope.hasTemplate = false;
+                  project.settings.preview = {
+                    repo: 'https://github.com/formio/formio-app-template',
+                    url: 'http://formio.github.io/formio-app-template/'
+                  };
+                }
+
+                var url = project.settings.preview.url.replace('http://', $location.protocol() + '://');
+                url += '/?apiUrl=' + encodeURIComponent(AppConfig.apiBase);
+                url += '&appUrl=' + encodeURIComponent($location.protocol() + '://' + project.name + '.' + AppConfig.serverHost);
+                $scope.previewUrl = $sce.trustAsResourceUrl(url);
+                $scope.repo = project.settings.preview.repo;
+              });
+
+            }
+          ]
         })
         .state('project.api', {
           url: '/api',
-          parent: 'project',
           templateUrl: 'views/project/api/index.html',
           controller: 'ApiController'
         })
         .state('project.settings', {
           url: '/settings',
-          parent: 'project',
           templateUrl: 'views/project/settings.html',
           controller: 'ProjectSettingsController'
         })
         .state('project.settings.project', {
           url: '/project',
-          parent: 'project.settings',
           templateUrl: 'views/project/project-settings.html'
         })
         .state('project.settings.plan', {
           url: '/plan',
-          parent: 'project.settings',
           templateUrl: 'views/project/project-plan.html',
           controller: 'ProjectPlanController'
         })
         .state('project.settings.email', {
           url: '/email',
-          parent: 'project.settings',
           templateUrl: 'views/project/email/email.html'
         })
         .state('project.settings.storage', {
@@ -149,90 +184,74 @@ angular
         })
         .state('project.settings.databases', {
           url: '/databases',
-          parent: 'project.settings',
           templateUrl: 'views/project/databases/index.html'
         })
         .state('project.settings.oauth', {
           url: '/oauth',
-          parent: 'project.settings',
           templateUrl: 'views/project/oauth/index.html'
         })
         .state('project.settings.roles', {
           abstract: true,
           url: '/roles',
-          parent: 'project.settings',
           templateUrl: 'views/project/roles/roles.html'
         })
         .state('project.settings.roles.view', {
           url: '',
-          parent: 'project.settings.roles',
           templateUrl: 'views/project/roles/view.html'
         })
         .state('project.settings.roles.edit', {
           url: '/:roleId/edit',
-          parent: 'project.settings.roles',
           templateUrl: 'views/project/roles/edit.html',
           controller: 'RoleController'
         })
         .state('project.settings.roles.delete', {
           url: '/:roleId/delete',
-          parent: 'project.settings.roles',
           templateUrl: 'views/project/roles/delete.html',
           controller: 'RoleController'
         })
         .state('project.settings.teams', {
           abstract: true,
           url: '/teams',
-          parent: 'project.settings',
           templateUrl: 'views/project/teams/teams.html'
         })
         .state('project.settings.teams.view', {
           url: '',
-          parent: 'project.settings.teams',
           controller: 'ProjectTeamViewController',
           templateUrl: 'views/project/teams/view.html'
         })
         .state('project.settings.teams.add', {
           url: '/add',
-          parent: 'project.settings.teams',
           controller: 'ProjectTeamEditController',
           templateUrl: 'views/project/teams/edit.html'
         })
         .state('project.settings.teams.edit', {
           url: '/:teamId/edit',
-          parent: 'project.settings.teams',
           controller: 'ProjectTeamEditController',
           templateUrl: 'views/project/teams/edit.html'
         })
         .state('project.settings.teams.delete', {
           url: '/:teamId/delete',
-          parent: 'project.settings.teams',
           controller: 'ProjectTeamDeleteController',
           templateUrl: 'views/project/teams/delete.html'
         })
         .state('project.settings.cors', {
           url: '/cors',
-          parent: 'project.settings',
           templateUrl: 'views/project/cors/index.html'
         })
         .state('project.settings.office365', {
           url: '/office365',
-          parent: 'project.settings',
           templateUrl: 'views/project/office365/office365.html'
         })
         .state('project.settings.hubspot', {
           url: '/hubspot',
-          parent: 'project.settings',
           templateUrl: 'views/project/hubspot/hubspot.html'
         })
         .state('project.settings.export', {
           url: '/export',
-          parent: 'project.settings',
           templateUrl: 'views/project/export.html'
         })
         .state('project.delete', {
           url: '/delete',
-          parent: 'project',
           templateUrl: 'views/project/delete.html',
           controller: 'ProjectDeleteController'
         })
@@ -248,19 +267,16 @@ angular
         })
         .state('team.view', {
           url: '/view',
-          parent: 'team',
           controller: 'TeamViewController',
           templateUrl: 'views/team/view.html'
         })
         .state('team.edit', {
           url: '/edit',
-          parent: 'team',
           controller: 'TeamEditController',
           templateUrl: 'views/team/edit.html'
         })
         .state('team.delete', {
           url: '/delete',
-          parent: 'team',
           controller: 'TeamDeleteController',
           templateUrl: 'views/team/delete.html'
         })
@@ -450,18 +466,11 @@ angular
         });
       }
 
-      // Adding the alerts capability.
-      $rootScope.alerts = [];
-      $rootScope.closeAlert = function(index) {
-        $rootScope.alerts.splice(index, 1);
-      };
-
       $rootScope.$state = $state;
       $rootScope.$stateParams = $stateParams;
       $rootScope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams) {
         $window.document.body.scrollTop = $window.document.documentElement.scrollTop = 0;
         $rootScope.showHeader = false;
-        $rootScope.alerts = FormioAlerts.getAlerts();
         $rootScope.previousState = fromState.name;
         $rootScope.previousParams = fromParams;
         $rootScope.currentState = toState.name;
@@ -469,7 +478,7 @@ angular
       });
 
       $rootScope.goToProject = function(project) {
-        $state.go('project.edit', {projectId: project._id});
+        $state.go('project.resource.index', {projectId: project._id});
       };
 
       $rootScope.getPreviewURL = function(project) {
@@ -525,12 +534,25 @@ angular
 
       // Ensure they are logged.
       $rootScope.$on('$stateChangeStart', function(event, toState) {
-        $rootScope.authenticated = !!Formio.getToken();
+        $rootScope.userToken = Formio.getToken();
+        $rootScope.authenticated = !!$rootScope.userToken;
         if (toState.name.substr(0, 4) === 'auth') { return; }
         if(!$rootScope.authenticated) {
           event.preventDefault();
           $state.go('auth');
         }
+      });
+
+      $rootScope.$on('$stateChangeSuccess', function(event, state) {
+        var parts = state.name.split('.');
+        var classes = [];
+        var currentClass = [];
+        for (var i in parts) {
+          currentClass.push(parts[i]);
+          var className = currentClass.join('-');
+          classes.push(className + '-page');
+        }
+        $rootScope.mainClass = classes.join(' ');
       });
 
       // Set the active sidebar.
@@ -603,13 +625,13 @@ angular
         return this.plans[plan].labelStyle;
       },
       getAPICallsLimit: function(apiCalls) {
-        if(!apiCalls.limit) {
+        if(!apiCalls || !apiCalls.limit) {
           return '∞';
         }
         return $filter('number')(apiCalls.limit);
       },
       getAPICallsPercent: function(apiCalls) {
-        if(!apiCalls.limit) {
+        if(!apiCalls || !apiCalls.limit) {
           return '0%';
         }
         var percent = apiCalls.used / apiCalls.limit * 100;

@@ -3,6 +3,7 @@ Feature: Register Functionality
   Scenario: Empty Register
     Given I am on /#/auth
     And I am logged out
+    When I wait 500 milliseconds
     Then the REGISTER button is disabled
 
   Scenario: Username only
@@ -26,6 +27,7 @@ Feature: Register Functionality
     And I enter ${register-password} in the .register-container #user\.password field
     And I enter ${register-password}Bad in the .register-container #verifyPassword field
     Then the REGISTER button is disabled
+    When I wait 1000 milliseconds
     And I see Passwords must match
 
   Scenario: Username unique

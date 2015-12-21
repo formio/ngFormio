@@ -17,135 +17,148 @@ app.config([
   function(
     $stateProvider
   ) {
-    $stateProvider
-      .state('project.form', {
-        abstract: true,
-        url: '/form/:formId',
-        parent: 'project',
-        templateUrl: 'views/form/form.html',
-        controller: 'FormController'
-      })
-      .state('project.form.view', {
-        url: '',
-        parent: 'project.form',
-        templateUrl: 'views/form/form-view.html'
-      })
-      .state('project.form.edit', {
-        url: '/edit',
-        parent: 'project.form',
-        controller: 'FormEditController',
-        templateUrl: 'views/form/form-edit.html'
-      })
-      .state('project.form.delete', {
-        url: '/delete',
-        parent: 'project.form',
-        controller: 'FormDeleteController',
-        templateUrl: 'views/form/form-delete.html'
-      })
-      .state('project.form.createForm', {
-        url: '/create/form',
-        parent: 'project',
-        templateUrl: 'views/form/form-edit.html',
-        controller: 'FormController',
-        params: {formType: 'form'}
-      })
-      .state('project.form.createResource', {
-        url: '/create/resource',
-        parent: 'project',
-        templateUrl: 'views/form/form-edit.html',
-        controller: 'FormController',
-        params: {formType: 'resource'}
-      })
-      .state('project.form.formIndex', {
-        url: '/form',
-        parent: 'project',
-        template: '<form-list project="currentProject" form-type="\'form\'" num-per-page="25"></form-list>'
-      })
-      .state('project.form.resourceIndex', {
-        url: '/form',
-        parent: 'project',
-        template: '<form-list project="currentProject" form-type="\'resource\'" num-per-page="25"></form-list>'
-      })
-      .state('project.form.permission', {
-        url: '/permission',
-        parent: 'project.form',
-        templateUrl: 'views/form/permission/index.html'
-      })
-      .state('project.form.api', {
-        url: '/api',
-        parent: 'project.form',
-        templateUrl: 'views/form/api/index.html',
-        controller: 'ApiController'
+    var typeInfo = {
+      form: {
+        type: 'form',
+        title: 'Forms',
+        name: 'Form',
+        icon: 'fa fa-tasks',
+        help: 'http://help.form.io/userguide/#forms',
+        description: 'Forms serve as an input interface for Resources as well as free-form user input within your Application. Example: Login Form, Contact Form, etc.'
+      },
+      resource: {
+        type: 'resource',
+        title: 'Resources',
+        name: 'Resource',
+        icon: 'fa fa-database',
+        help: 'http://help.form.io/userguide/#resources',
+        description: 'Resources are the objects within your Application. Example: User, Company, Vehicle, etc.'
+      }
+    };
+
+    // Create states for both forms and resources.
+    angular.forEach(['resource', 'form'], function(type) {
+      var parentName = 'project.' + type;
+      $stateProvider
+        .state(parentName, {
+          abstract: true,
+          url: '/' + type,
+          templateUrl: 'views/form/base.html',
+          controller: [
+            '$scope',
+            '$state',
+            function(
+              $scope,
+              $state
+            ) {
+              $scope.formInfo = $state.current.data;
+              $scope.infoTemplate = 'views/form/' + $scope.formInfo.type + '-info.html';
+            }
+          ],
+          data: typeInfo[type]
+        })
+        .state(parentName + '.index', {
+          url: '/',
+          templateUrl: 'views/form/index.html'
+        })
+        .state(parentName + '.create', {
+          url: '/create/' + type,
+          templateUrl: 'views/form/form-edit.html',
+          controller: 'FormController',
+          params: {formType: type}
+        })
+        .state(parentName + '.form', {
+          abstract: true,
+          url: '/:formId',
+          templateUrl: 'views/form/form.html',
+          controller: 'FormController'
+        })
+        .state(parentName + '.form.view', {
+          url: '/',
+          templateUrl: 'views/form/' + type + '-view.html'
+        })
+        .state(parentName + '.form.edit', {
+          url: '/edit',
+          controller: 'FormEditController',
+          templateUrl: 'views/form/form-edit.html'
+        })
+        .state(parentName + '.form.embed', {
+          url: '/embed',
+          templateUrl: 'views/form/form-embed.html'
+        })
+        .state(parentName + '.form.delete', {
+          url: '/delete',
+          controller: 'FormDeleteController',
+          templateUrl: 'views/form/form-delete.html'
+        })
+        .state(parentName + '.form.permission', {
+          url: '/permission',
+          templateUrl: 'views/form/permission/index.html'
+        })
+        .state(parentName + '.form.api', {
+          url: '/api',
+          templateUrl: 'views/form/api/index.html',
+          controller: 'ApiController'
+        });
+
+      var formStates = {};
+      formStates[parentName + '.form.submission'] = {
+        path: '/submission',
+        id: 'subId',
+        indexController: 'FormSubmissionsController',
+        itemController: 'FormSubmissionController',
+        editController: 'FormSubmissionEditController',
+        deleteController: 'FormSubmissionDeleteController'
+      };
+      formStates[parentName + '.form.action'] = {
+        path: '/action',
+        id: 'actionId',
+        indexController: 'FormActionIndexController',
+        editController: 'FormActionEditController',
+        deleteController: 'FormActionDeleteController'
+      };
+
+      angular.forEach(formStates, function(info, state) {
+        $stateProvider
+          .state(state, {
+            abstract: true,
+            url: info.path,
+            template: '<div ui-view></div>'
+          })
+          .state(state + '.index', {
+            url: '',
+            templateUrl: 'views/form' + info.path + '/index.html',
+            controller: info.indexController
+          })
+          .state(state + '.item', {
+            abstract: true,
+            url: '/:' + info.id,
+            controller: info.itemController,
+            templateUrl: 'views/form' + info.path + '/item.html'
+          })
+          .state(state + '.item.view', {
+            url: '',
+            templateUrl: 'views/form' + info.path + '/view.html'
+          })
+          .state(state + '.item.edit', {
+            url: '/edit',
+            templateUrl: 'views/form' + info.path + '/edit.html',
+            controller: info.editController
+          })
+          .state(state + '.item.delete', {
+            url: '/delete',
+            templateUrl: 'views/form' + info.path + '/delete.html',
+            controller: info.deleteController
+          });
       });
 
-    var formStates = {};
-    formStates['project.form.submission'] = {
-      path: '/submission',
-      id: 'subId',
-      indexController: 'FormSubmissionsController',
-      itemController: 'FormSubmissionController',
-      editController: 'FormSubmissionEditController',
-      deleteController: 'FormSubmissionDeleteController'
-    };
-    formStates['project.form.action'] = {
-      path: '/action',
-      id: 'actionId',
-      enabled: {
-        view: false
-      },
-      indexController: 'FormActionIndexController',
-      editController: 'FormActionEditController',
-      deleteController: 'FormActionDeleteController'
-    };
-
-    angular.forEach(formStates, function(info, state) {
-      $stateProvider
-        .state(state, {
-          abstract: true,
-          url: info.path,
-          parent: 'project.form',
-          template: '<div ui-view></div>'
-        })
-        .state(state + '.index', {
-          url: '',
-          parent: state,
-          templateUrl: 'views/form' + info.path + '/index.html',
-          controller: info.indexController
-        })
-        .state(state + '.item', {
-          abstract: true,
-          url: '/:' + info.id,
-          parent: state,
-          controller: info.itemController,
-          templateUrl: 'views/form' + info.path + '/item.html'
-        })
-        .state(state + '.item.view', {
-          url: '',
-          parent: state + '.item',
-          templateUrl: 'views/form' + info.path + '/view.html',
-          controller: info.viewController
-        })
-        .state(state + '.item.edit', {
-          url: '/edit',
-          parent: state + '.item',
-          templateUrl: 'views/form' + info.path + '/edit.html',
-          controller: info.editController
-        })
-        .state(state + '.item.delete', {
-          url: '/delete',
-          parent: state + '.item',
-          templateUrl: 'views/form' + info.path + '/delete.html',
-          controller: info.deleteController
-        });
-    });
-
-    // Add the action adding state.
-    $stateProvider.state('project.form.action.add', {
-      url: '/add/:actionName',
-      parent: 'project.form.action',
-      templateUrl: 'views/form/action/add.html',
-      controller: 'FormActionEditController',
-      params: {actionInfo: null}
+      // Add the action adding state.
+      $stateProvider.state(parentName + '.form.action.add', {
+        url: '/add/:actionName',
+        templateUrl: 'views/form/action/add.html',
+        controller: 'FormActionEditController',
+        params: {actionInfo: null}
+      });
     });
   }
 ]);
@@ -160,7 +173,8 @@ app.directive('formList', function() {
       forms: '=',
       project: '=',
       formType: '=',
-      numPerPage: '='
+      numPerPage: '=',
+      listMode: '='
     },
     compile: function(element, attrs) {
       if (!attrs.numPerPage) { attrs.numPerPage = 25; }
@@ -179,6 +193,9 @@ app.directive('formList', function() {
         $rootScope.currentForm = false;
         $scope.formsPerPage = $scope.numPerPage;
         $scope.formsUrl = AppConfig.apiBase + '/project/' + $scope.project._id + '/form?type=' + $scope.formType;
+        $scope.export = function(form, type) {
+          window.open(AppConfig.apiBase + '/project/' + $scope.project._id + '/form/' + form._id + '/export?format=' + type + '&x-jwt-token=' + $rootScope.userToken);
+        };
       }
     ]
   };
@@ -191,6 +208,7 @@ app.controller('FormController', [
   '$rootScope',
   'Formio',
   'FormioAlerts',
+  'FormioUtils',
   'AppConfig',
   'SubmissionAccessLabels',
   'GoogleAnalytics',
@@ -202,6 +220,7 @@ app.controller('FormController', [
     $rootScope,
     Formio,
     FormioAlerts,
+    FormioUtils,
     AppConfig,
     SubmissionAccessLabels,
     GoogleAnalytics,
@@ -233,6 +252,7 @@ app.controller('FormController', [
       $scope.loadFormPromise = $scope.formio.loadForm().then(function(form) {
         $scope.form = form;
         $rootScope.currentForm = $scope.form;
+        $scope.components = FormioUtils.flattenComponents($scope.form.components);
       }, FormioAlerts.onError.bind(FormioAlerts));
       $scope.formio.loadActions().then(function(actions) {
         // Get the available actions for the form, to check if premium actions are present.
@@ -271,12 +291,13 @@ app.controller('FormController', [
       });
       GoogleAnalytics.sendEvent('Submission', 'create', null, 1);
       if (submission._id) {
-        $state.go('project.form.submission.item.view', {subId: submission._id});
+        $state.go('project.' + $scope.formInfo.type + '.form.submission.item.view', {subId: submission._id});
       }
     });
 
     // Save a form.
     $scope.saveForm = function() {
+      angular.element('.has-error').removeClass('has-error');
       $scope.formio.saveForm(angular.copy($scope.form)) // Copy to remove angular $$hashKey
       .then(function(form) {
         var method = $stateParams.formId ? 'updated' : 'created';
@@ -287,18 +308,19 @@ app.controller('FormController', [
         var action = $stateParams.formId ? 'update' : 'create';
         GoogleAnalytics.sendEvent('Form', action, null, 1);
 
-        $state.go('project.form.view', {formId: form._id});
+        $state.go('project.' + $scope.formInfo.type + '.form.view', {formId: form._id});
       }, FormioAlerts.onError.bind(FormioAlerts));
     };
 
     // Delete a form.
     $scope.deleteForm = function() {
+      var type = $scope.form.type;
       $scope.formio.deleteForm().then(function() {
         FormioAlerts.addAlert({
           type: 'success',
           message: 'Delete successful'
         });
-        $state.go('project.form.index');
+        $state.go('project.' + type + '.form.index');
       }, FormioAlerts.onError.bind(FormioAlerts));
     };
 
@@ -328,29 +350,38 @@ app.controller('FormEditController', [
     // Revert to original form and go back
     $scope.cancel = function() {
       _.assign($scope.form, $scope.originalForm);
-      $scope.back('project.form.view');
+      $scope.back('project.' + $scope.formInfo.type + '.form.view');
     };
   }
 ]);
 
 app.factory('FormioAlerts', [
   '$rootScope',
+  'Notification',
   function (
-    $rootScope
+    $rootScope,
+    Notification
   ) {
-    var alerts = [];
     return {
       addAlert: function (alert) {
-        alerts.push(alert);
-        if(alert.element) {
+        switch (alert.type) {
+          case 'danger':
+            Notification.error({message: alert.message});
+            break;
+          case 'info':
+            Notification.info({message: alert.message});
+            break;
+          case 'success':
+            Notification.success({message: alert.message});
+            break;
+          case 'warning':
+            Notification.warning({message: alert.message});
+            break;
+        }
+
+        if (alert.element) {
           angular.element('#form-group-' + alert.element).addClass('has-error');
         }
-      },
-      getAlerts: function () {
-        var tempAlerts = angular.copy(alerts);
-        alerts.length = 0;
-        alerts = [];
-        return tempAlerts;
       },
       warn: function (warning) {
         if(!warning) {
@@ -360,9 +391,6 @@ app.factory('FormioAlerts', [
           type: 'warning',
           message: warning.message || warning
         });
-
-        // Clear old alerts with new alerts.
-        $rootScope.alerts = this.getAlerts();
       },
       onError: function (error) {
         var errors = error.hasOwnProperty('errors') ? error.errors : error.data && error.data.errors;
@@ -384,15 +412,6 @@ app.factory('FormioAlerts', [
             element: error.path
           });
         }
-
-        // Remove error class from old alerts before clearing them.
-        _.each($rootScope.alerts, function(alert){
-          if(alert.element && !_.find(alerts, 'element', alert.element)) {
-            angular.element('#form-group-' + alert.element).removeClass('has-error');
-          }
-        });
-        // Clear old alerts with new alerts.
-        $rootScope.alerts = this.getAlerts();
       }
     };
   }
@@ -416,12 +435,12 @@ app.controller('FormDeleteController', [
         message: _.capitalize($scope.form.type) + ' was deleted.'
       });
       GoogleAnalytics.sendEvent('Form', 'delete', null, 1);
-      $state.go('project.edit');
+      $state.go('project.resource.index');
     });
 
     $scope.$on('cancel', function(event) {
       event.stopPropagation();
-      $scope.back('project.form.view');
+      $scope.back('project.' + $scope.formInfo.type + '.form.view');
     });
 
     $scope.$on('formError', function(event, error) {
@@ -446,7 +465,7 @@ app.controller('FormActionIndexController', [
     $scope.availableActions = {};
     $scope.addAction = function() {
       if ($scope.newAction.name) {
-        $state.go('project.form.action.add', {
+        $state.go('project.' + $scope.formInfo.type + '.form.action.add', {
           actionName: $scope.newAction.name
         });
       }
@@ -724,7 +743,7 @@ app.controller('FormActionEditController', [
       event.stopPropagation();
       var method = $scope.actionUrl ? 'updated' : 'created';
       FormioAlerts.addAlert({type: 'success', message: 'Action was ' + method + '.'});
-      $state.go('project.form.action.index');
+      $state.go('project.' + $scope.formInfo.type + '.form.action.index');
       var eventAction = $scope.actionUrl ? 'update' : 'create';
       GoogleAnalytics.sendEvent('Action', eventAction, null, 1);
     });
@@ -749,11 +768,11 @@ app.controller('FormActionDeleteController', [
       event.stopPropagation();
       FormioAlerts.addAlert({type: 'success', message: 'Action was deleted.'});
       GoogleAnalytics.sendEvent('Action', 'delete', null, 1);
-      $state.go('project.form.action.index');
+      $state.go('project.' + $scope.formInfo.type + '.form.action.index');
     });
     $scope.$on('cancel', function(event) {
       event.stopPropagation();
-      $state.go('project.form.action.index');
+      $state.go('project.' + $scope.formInfo.type + '.form.action.index');
     });
 
   }
@@ -820,13 +839,13 @@ app.controller('FormSubmissionsController', [
     };
 
     $scope.view = function() {
-      $state.go('project.form.submission.item.view', {
+      $state.go('project.' + $scope.formInfo.type + '.form.submission.item.view', {
         subId: $scope.selected()[0]._id
       });
     };
 
     $scope.edit = function() {
-      $state.go('project.form.submission.item.edit', {
+      $state.go('project.' + $scope.formInfo.type + '.form.submission.item.edit', {
         subId: $scope.selected()[0]._id
       });
     };
@@ -1208,7 +1227,7 @@ app.controller('FormSubmissionEditController', [
         message: 'Submission was ' + message + '.'
       });
       GoogleAnalytics.sendEvent('Submission', 'update', null, 1);
-      $state.go('project.form.submission.index', {formId: $scope.formId});
+      $state.go('project.' + $scope.formInfo.type + '.form.submission.index', {formId: $scope.formId});
     });
   }
 ]);
@@ -1231,12 +1250,12 @@ app.controller('FormSubmissionDeleteController', [
         message: 'Submission was deleted.'
       });
       GoogleAnalytics.sendEvent('Submission', 'delete', null, 1);
-      $state.go('project.form.submission.index');
+      $state.go('project.' + $scope.formInfo.type + '.form.submission.index');
     });
 
     $scope.$on('cancel', function(event) {
       event.stopPropagation();
-      $scope.back('project.form.submission.item.view');
+      $scope.back('project.' + $scope.formInfo.type + '.form.submission.item.view');
     });
 
     $scope.$on('formError', function(event, error) {

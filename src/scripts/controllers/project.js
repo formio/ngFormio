@@ -95,13 +95,21 @@ app.controller('ProjectCreateController', [
         "title": "Default",
         "name": "default",
         "description": "A default project with User and Admin resources and their respective authentication forms.",
-        template: 'default'
+        template: 'default',
+        "preview": {
+          "url": "http://formio.github.io/formio-app-basic",
+          "repo": "https://github.com/formio/formio-app-basic"
+        }
       },
       {
         "title": "Empty",
         "name": "empty",
         "description": "An empty project with no forms or resources. Create a project with a fresh start!",
-        template: 'empty'
+        template: 'empty',
+        "preview": {
+          "url": "http://formio.github.io/formio-app-template",
+          "repo": "https://github.com/formio/formio-app-template"
+        }
       }
     ];
 
@@ -176,7 +184,7 @@ app.controller('ProjectCreateController', [
           message: 'New Project created!'
         });
         GoogleAnalytics.sendEvent('Project', 'create', null, 1);
-        $state.go('project.edit', {projectId: project._id});
+        $state.go('project.resource.index', {projectId: project._id});
       }, function(error) {
         if (error.data && error.data.message && error.data.message.indexOf('duplicate key error index') !== -1) {
           error.data.errors.name = {
@@ -200,7 +208,6 @@ app.controller('ProjectController', [
   'AppConfig',
   'ProjectPlans',
   '$http',
-  '$location',
   function(
     $scope,
     $rootScope,
@@ -210,13 +217,13 @@ app.controller('ProjectController', [
     $state,
     AppConfig,
     ProjectPlans,
-    $http,
-    $location
+    $http
   ) {
     $rootScope.activeSideBar = 'projects';
     $rootScope.noBreadcrumb = false;
     $scope.token = Formio.getToken();
     $scope.resourcesLoading = true;
+    $scope.projectsLoaded = false;
     $scope.resources = [];
     $scope.$on('pagination:loadPage', function(status) {
       var formType = status.targetScope.$parent.formType;
@@ -227,13 +234,16 @@ app.controller('ProjectController', [
     $scope.forms = [];
     $scope.formio = new Formio('/project/' + $stateParams.projectId);
     $scope.currentProject = {_id: $stateParams.projectId, access: []};
+    $scope.projectApi = '';
     $scope.rolesLoading = true;
     $scope.teamsLoading = true;
 
     $scope.loadProjectPromise = $scope.formio.loadProject().then(function(result) {
       $scope.currentProject = result;
+      $scope.projectApi = AppConfig.protocol + '//' + result.name + '.' + AppConfig.serverHost;
       $rootScope.currentProject = result;
       $scope.showName = !(result.plan && result.plan === 'basic');
+      $scope.projectsLoaded = true;
       return $http.get($scope.formio.projectUrl + '/role');
     }).then(function(result) {
       $scope.currentProjectRoles = result.data;
@@ -277,6 +287,10 @@ app.controller('ProjectController', [
     $scope.getAPICallsPercent = ProjectPlans.getAPICallsPercent.bind(ProjectPlans);
     $scope.getProgressBarClass = ProjectPlans.getProgressBarClass.bind(ProjectPlans);
   }
+]);
+
+app.controller('ProjectDataController', [
+
 ]);
 
 app.controller('ProjectSettingsController', [
