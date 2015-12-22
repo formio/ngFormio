@@ -22,6 +22,7 @@
     "install": "~1.0.4",
     "kendo-ui": "kendo-ui-core#2015.2.902+SP2",
     "lodash": "~3.10.1",
+    "moment": "~2.10.6",
     "ng-file-upload": "~10.0.2",
     "ng-sortable": "~1.2.0",
     "ngDialog": "~0.3.12",

@@ -1069,4 +1069,12 @@ footer {
       }
     }
   }
+
+  .ct-label.ct-horizontal.ct-end {
+    -moz-transform: rotate(30deg) translateY(20px);
+    -webkit-transform: rotate(30deg) translateY(20px);
+    -o-transform: rotate(30deg) translateY(20px);
+    -ms-transform: rotate(30deg) translateY(20px);
+    transform: rotate(30deg) translateY(20px);
+  }
 }

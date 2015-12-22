@@ -302,13 +302,13 @@ app.controller('ProjectDataController', [
     var curr = new Date();
     $scope.viewDate = {
       year: curr.getUTCFullYear(),
-      month: curr.getUTCMonth(),
+      month: (curr.getUTCMonth() + 1),
       day: curr.getUTCDate()
     };
     $scope.label = {
-      year: 'Yearly Submissions by Month',
-      month: 'Monthly Submissions by Day',
-      day: 'Daily Submissions by Hour'
+      year: 'Yearly Submission Requests by Month',
+      month: 'Monthly Submission Requests by Day',
+      day: 'Daily Submission Requests by Hour'
     };
     $scope.analyticsOptions = {
       height: 300,
@@ -329,12 +329,13 @@ app.controller('ProjectDataController', [
           // Register a click event to modify the graph based on the current view and click location.
           data.element._node.onclick = function() {
             if($scope.currentType === 'year') {
-              $scope.viewDate.month = data.index;
+              // Adjust month for non-zero index.
+              $scope.viewDate.month = (data.index + 1);
               $scope.displayView('month', true);
             }
             else if($scope.currentType === 'month') {
               // Adjust day for non-zero index.
-              $scope.viewDate.day = data.index + 1;
+              $scope.viewDate.day = (data.index + 1);
               $scope.displayView('day', true);
             }
           }
@@ -344,11 +345,13 @@ app.controller('ProjectDataController', [
 
     // Draw the initial analytics graph view (for the current month).
     $scope.analyticsLoading = true;
-    Formio.request(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/analytics/year/' + curr.getUTCFullYear() + '/month/' + curr.getUTCMonth(), 'GET')
+    Formio.request(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/analytics/year/' + curr.getUTCFullYear() + '/month/' + (curr.getUTCMonth() + 1), 'GET')
       .then(function(data) {
         $scope.currentType = 'month';
         $scope.analytics = {
-          labels: _.pluck(data, 'day'),
+          labels: _.map(_.pluck(data, 'day'), function(day) {
+            return _.add(day, 1);
+          }),
           series: [
             _.pluck(data, 'submissions')
           ]
@@ -367,7 +370,7 @@ app.controller('ProjectDataController', [
      */
     $scope.displayView = function(type, cached) {
       var _y = curr.getUTCFullYear();
-      var _m = curr.getUTCMonth();
+      var _m = curr.getUTCMonth() + 1;
       var _d = curr.getUTCDate();
       if(cached) {
         _y = $scope.viewDate.year;
@@ -387,7 +390,9 @@ app.controller('ProjectDataController', [
           .then(function(data) {
             $scope.currentType = type;
             $scope.analytics = {
-              labels: _.pluck(data, 'month'),
+              labels: _.map(_.pluck(data, 'month'), function(month) {
+                return _.add(month, 1);
+              }),
               series: [
                 _.pluck(data, 'submissions')
               ]
@@ -403,7 +408,9 @@ app.controller('ProjectDataController', [
           .then(function(data) {
             $scope.currentType = type;
             $scope.analytics = {
-              labels: _.pluck(data, 'day'),
+              labels: _.map(_.pluck(data, 'day'), function(day) {
+                return _.add(day, 1);
+              }),
               series: [
                 _.pluck(data, 'submissions')
               ]
@@ -415,10 +422,91 @@ app.controller('ProjectDataController', [
       }
       else if(type === 'day') {
         $scope.analyticsLoading = true;
+
+        /**
+         * Get the local hourly timestamps that relate to utc 0-23 to display as labels.
+         *
+         * @param year {Number}
+         *   The current year in question.
+         * @param month {Number}
+         *   The current month in question.
+         * @param day {Number}
+         *   The current day in question.
+         *
+         * @returns {Array}
+         *   The Labels to be associated with utc 0-23 corresponding data.
+         */
+        var calculateLocalTimeLabels = function(year, month, day) {
+          var local = [];
+
+          // Calculate the current utc offset in rounded hours.
+          var start = null;
+          var moment = moment(year + '-' + month + '-' + day);
+          var offset = Math.ceil(((new Date()).getTimezoneOffset() / 60));
+          if(offset > 0) {
+            // Behind utc by the given amount.
+            start = (23 - offset);
+            moment.subtract(1, 'days');
+          }
+          else {
+            // Current timezone is ahead of utc.
+            start = (0 - offset);
+          }
+
+          // Change the am flag based on the start of display labels.
+          var am = (start > 11) ? false : true;
+          for(var i = 0; i < 24; i++) {
+            // Flip the am flag when the clock wraps around.
+            var output = ((start + i) % 12);
+            if(output === 0) {
+              am = !am;
+
+              // When the am flag wraps, set the output to 12 rather than 0.
+              output = 12;
+
+              moment.add(1, 'days');
+            }
+
+            // Add each label sequentially in the utc order.
+            local.push('' + moment.format('M/D/YYYY') + ' ' + output + (am ? 'AM' : 'PM'));
+          }
+
+          return local;
+        };
+
         Formio.request(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/analytics/year/' + _y + '/month/' + _m + '/day/' + _d, 'GET')
           .then(function(data) {
             $scope.currentType = type;
             var utcHrs = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23];
+            var displayHrs = calculateLocalTimeLabels(_y, _m, _d);
+
+            //// Calculate the current utc offset in rounded hours.
+            //var start = null;
+            //var offset = Math.ceil(((new Date()).getTimezoneOffset() / 60));
+            //if(offset > 0) {
+            //  // Behind utc by the given amount.
+            //  start = (23 - offset);
+            //}
+            //else {
+            //  // Current timezone is ahead of utc.
+            //  start = (0 - offset);
+            //}
+            //
+            //// Change the am flag based on the start of display labels.
+            //var am = (start > 11) ? false : true;
+            //for(var i = 0; i < 24; i++) {
+            //  // Flip the am flag when the clock wraps around.
+            //  var output = ((start + i) % 12);
+            //  if(output === 0) {
+            //    am = !am;
+            //
+            //    // When the am flag wraps, set the output to 12 rather than 0.
+            //    output = 12;
+            //  }
+            //
+            //  // Add each label sequentially in the utc order.
+            //  displayHrs.push('' + output + (am ? 'AM' : 'PM'));
+            //}
 
             // Default each hr to have no submissions.
             var parsedData = [];
@@ -433,7 +521,7 @@ app.controller('ProjectDataController', [
             });
 
             $scope.analytics = {
-              labels: utcHrs,
+              labels: displayHrs,
               series: [parsedData]
             };
 
