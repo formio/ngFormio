@@ -43,4 +43,11 @@ Now that you have the library installed, you can then do the following to add a 
   - Create a Form within your project. This will then give you an API url like the following. ```https://myapp.form.io/myform```.
   - You can then embed this form within your application by providing the following.
   
-  ```<formio src="'https://myapp.form.io/myform'"></formio>
+  ```<formio src="'https://myapp.form.io/myform'"></formio>```
+  
+This not only renders the form dyanmically within your application, but also automatically hooks up that form to the API
+backend that is provided from Form.io. 
+
+Enjoy!
+
+The Form.io Team!
