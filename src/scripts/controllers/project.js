@@ -659,8 +659,13 @@ app.factory('ProjectUpgradeDialog', [
                   contactEmail: $rootScope.user.data.email
                 }
               };
-              // TODO: default this to next highest plan
-              $scope.selectedPlan = 'independent';
+              $scope.selectedPlan = _.find($scope.plans, {order: $scope.getPlan(project.plan).order + 1});
+              if($scope.selectedPlan) {
+                $scope.selectedPlan = $scope.selectedPlan.name;
+              }
+              if($scope.selectedPlan === undefined || $scope.selectedPlan === 'commercial') {
+                $scope.selectedPlan = 'team';
+              }
 
             }
           ]
