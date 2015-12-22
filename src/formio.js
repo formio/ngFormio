@@ -4,7 +4,8 @@ var app = angular.module('formio', [
   'ui.bootstrap.datetimepicker',
   'ui.select',
   'ui.mask',
-  'angularMoment'
+  'angularMoment',
+  'ngFileUpload'
 ]);
 
 /**
