@@ -1047,13 +1047,28 @@ footer {
 
 /***************************** Project Data *****************************/
 .project-data {
+  chartist {
+    height: 375px !important;
+    display: block;
+  }
   h3, h4 {
     text-align: center;
   }
-  .ct-chart,
   .ct-label {
     font-family: $font-family-base;
     font-size: $font-size-small;
+    color: $text-color;
+    fill: $text-color;
+
+    &.ct-horizontal {
+      width: 125px !important;
+
+      -moz-transform: rotate(30deg) translate(0px, 45px);
+      -webkit-transform: rotate(30deg) translate(0px, 45px);
+      -o-transform: rotate(30deg) translate(0px, 45px);
+      -ms-transform: rotate(30deg) translate(0px, 45px);
+      transform: rotate(30deg) translate(0px, 45px);
+    }
   }
 
   // Variable analytics graph.
@@ -1069,12 +1084,7 @@ footer {
       }
     }
   }
-
-  .ct-label.ct-horizontal.ct-end {
-    -moz-transform: rotate(30deg) translateY(20px);
-    -webkit-transform: rotate(30deg) translateY(20px);
-    -o-transform: rotate(30deg) translateY(20px);
-    -ms-transform: rotate(30deg) translateY(20px);
-    transform: rotate(30deg) translateY(20px);
+  .chart-buttons {
+    text-align: center;
   }
 }

@@ -293,10 +293,12 @@ app.controller('ProjectDataController', [
   '$scope',
   'AppConfig',
   'Formio',
+  'moment',
   function(
     $scope,
     AppConfig,
-    Formio
+    Formio,
+    moment
   ) {
     // Get the current time.
     var curr = new Date();
@@ -311,16 +313,10 @@ app.controller('ProjectDataController', [
       day: 'Daily Submission Requests by Hour'
     };
     $scope.analyticsOptions = {
-      height: 300,
+      height: '300px',
       low: 0,
       lineSmooth: false,
-      fullWidth: true,
-      axisX: {
-        onlyInteger: true
-      },
-      axisY: {
-        onlyInteger: true
-      }
+      onlyInteger: true
     };
     $scope.analyticsEvents = {
       draw: function(data) {
@@ -360,6 +356,13 @@ app.controller('ProjectDataController', [
         $scope.analyticsLoading = false;
       });
 
+    // Simple ui tools to aid in switching the default view.
+    $scope.graphType = 'Month';
+    $scope.types = ['Year', 'Month', 'Day'];
+    $scope.graphChange = function() {
+      $scope.displayView(($scope.graphType || '').toLowerCase());
+    };
+
     /**
      * View switcher utility to graph the data for the current view type.
      *
@@ -373,6 +376,7 @@ app.controller('ProjectDataController', [
       var _m = curr.getUTCMonth() + 1;
       var _d = curr.getUTCDate();
       if(cached) {
+        $scope.graphType = '';
         _y = $scope.viewDate.year;
         _m = $scope.viewDate.month;
         _d = $scope.viewDate.day;
@@ -441,12 +445,12 @@ app.controller('ProjectDataController', [
 
           // Calculate the current utc offset in rounded hours.
           var start = null;
-          var moment = moment(year + '-' + month + '-' + day);
+          var time = moment(year + '-' + month + '-' + day);
           var offset = Math.ceil(((new Date()).getTimezoneOffset() / 60));
           if(offset > 0) {
             // Behind utc by the given amount.
             start = (23 - offset);
-            moment.subtract(1, 'days');
+            time.subtract(1, 'days');
           }
           else {
             // Current timezone is ahead of utc.
@@ -464,11 +468,11 @@ app.controller('ProjectDataController', [
               // When the am flag wraps, set the output to 12 rather than 0.
               output = 12;
 
-              moment.add(1, 'days');
+              time.add(1, 'days');
             }
 
             // Add each label sequentially in the utc order.
-            local.push('' + moment.format('M/D/YYYY') + ' ' + output + (am ? 'AM' : 'PM'));
+            local.push('' + output + (am ? 'AM' : 'PM') + ' ' + time.format('M/D/YYYY'));
           }
 
           return local;
@@ -479,34 +483,6 @@ app.controller('ProjectDataController', [
             $scope.currentType = type;
             var utcHrs = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23];
             var displayHrs = calculateLocalTimeLabels(_y, _m, _d);
-
-            //// Calculate the current utc offset in rounded hours.
-            //var start = null;
-            //var offset = Math.ceil(((new Date()).getTimezoneOffset() / 60));
-            //if(offset > 0) {
-            //  // Behind utc by the given amount.
-            //  start = (23 - offset);
-            //}
-            //else {
-            //  // Current timezone is ahead of utc.
-            //  start = (0 - offset);
-            //}
-            //
-            //// Change the am flag based on the start of display labels.
-            //var am = (start > 11) ? false : true;
-            //for(var i = 0; i < 24; i++) {
-            //  // Flip the am flag when the clock wraps around.
-            //  var output = ((start + i) % 12);
-            //  if(output === 0) {
-            //    am = !am;
-            //
-            //    // When the am flag wraps, set the output to 12 rather than 0.
-            //    output = 12;
-            //  }
-            //
-            //  // Add each label sequentially in the utc order.
-            //  displayHrs.push('' + output + (am ? 'AM' : 'PM'));
-            //}
 
             // Default each hr to have no submissions.
             var parsedData = [];
