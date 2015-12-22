@@ -144,7 +144,7 @@ angular
                   };
                 }
 
-                var url = project.settings.preview.url;
+                var url = project.settings.preview.url.replace('http://', $location.protocol() + '://');
                 url += '/?apiUrl=' + encodeURIComponent(AppConfig.apiBase);
                 url += '&appUrl=' + encodeURIComponent($location.protocol() + '://' + project.name + '.' + AppConfig.serverHost);
                 $scope.previewUrl = $sce.trustAsResourceUrl(url);

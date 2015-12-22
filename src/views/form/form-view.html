@@ -1,14 +1,10 @@
-<div class="row">
-    <div class="col-sm-10 col-sm-offset-1">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">Preview</h3>
-            </div>
-            <div class="panel-body">
-                <div ng-if="hasAuthAction" ng-cloak class="alert alert-warning" role="alert"><i class="glyphicon glyphicon-exclamation-sign"></i> This preview is read only because this form contains an Authentication action.</div>
-                <div ng-if="hasPremAction" ng-cloak class="alert alert-warning" role="alert"><i class="glyphicon glyphicon-exclamation-sign"></i> This form contains a Premium action, upgrade your <a ui-sref="project.settings.plan">project plan</a> to enable it.</div>
-                <formio src="formUrl" read-only="hasAuthAction"></formio>
-            </div>
-        </div>
-    </div>
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Preview</h3>
+  </div>
+  <div class="panel-body">
+    <div ng-if="hasAuthAction" ng-cloak class="alert alert-warning" role="alert"><i class="glyphicon glyphicon-exclamation-sign"></i> This preview is read only because this form contains an Authentication action.</div>
+    <div ng-if="hasPremAction" ng-cloak class="alert alert-warning" role="alert"><i class="glyphicon glyphicon-exclamation-sign"></i> This form contains a Premium action, upgrade your <a ui-sref="project.settings.plan">project plan</a> to enable it.</div>
+    <formio src="formUrl" read-only="hasAuthAction"></formio>
+  </div>
 </div>
