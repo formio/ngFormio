@@ -135,12 +135,22 @@ module.exports = function (app) {
         '<label ng-if="component.label && !component.hideLabel" for="{{ component.key }}" class="control-label" ng-class="{\'field-required\': component.validate.required}">{{ component.label }}</label>' +
         '<span ng-if="!component.label && component.validate.required" class="glyphicon glyphicon-asterisk form-control-feedback field-required-inline" aria-hidden="true"></span>' +
         '<div ng-controller="formioFile">' +
-        '<div ng-repeat="file in data[component.key] track by $index" class="file">' +
-        ' <div class="row">' +
-        '   <div class="fileName control-label col-sm-10"><a href="{{ file.url }}" ng-click="getFile($event, file)" target="_blank">{{ file.name }}</a> <span ng-if="!readOnly" ng-click="removeFile($index)"class="glyphicon glyphicon-remove"></span></div>' +
-        '   <div class="fileSize control-label col-sm-2 text-right">{{ fileSize(file.size) }}</div>' +
-        ' </div>' +
-        '</div>' +
+        '<table class="table table-striped table-bordered" ng-if="data[component.key].length">' +
+          '<thead>' +
+            '<tr>' +
+              '<td style="width:1%;white-space:nowrap;"></td>' +
+              '<th>File Name</th>' +
+              '<th>Size</th>' +
+            '</tr>' +
+          '</thead>' +
+          '<tbody>' +
+            '<tr ng-repeat="file in data[component.key] track by $index">' +
+              '<td style="width:1%;white-space:nowrap;"><a  ng-if="!readOnly" href="#" ng-click="removeFile($index)" style="padding: 2px 4px;" class="btn btn-sm btn-default"><span class="glyphicon glyphicon-remove"></span></a></td>' +
+              '<td><a href="{{ file.url }}" ng-click="getFile($event, file)" target="_blank">{{ file.name }}</a></td>' +
+              '<td>{{ fileSize(file.size) }}</td>' +
+            '</tr>' +
+          '</tbody>' +
+        '</table>' +
         '<div ng-if="!readOnly">' +
         ' <div ngf-drop="upload($files)" class="fileSelector" ngf-drag-over-class="' + "'" + 'fileDragOver' + "'" + '" ngf-multiple="component.multiple"><span class="glyphicon glyphicon-cloud-upload"></span>Drop files to attach, or <a href="#" ngf-select="upload($files)" ngf-multiple="component.multiple">browse</a>.</div>' +
         ' <div ng-if="!component.storage" class="alert alert-warning">No storage has been set for this field. File uploads are disabled until storage is set up.</div>' +
