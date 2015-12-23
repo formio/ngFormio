@@ -1,6 +1,6 @@
 'use strict';
 
-var app = angular.module('formioApp.controllers.project', []);
+var app = angular.module('formioApp.controllers.project', ['angular-chartist']);
 
 /*
 * Prevents user inputting non-alphanumeric characters or starting the domain with a hyphen.
@@ -294,7 +294,208 @@ app.controller('ProjectController', [
 ]);
 
 app.controller('ProjectDataController', [
+  '$scope',
+  'AppConfig',
+  'Formio',
+  'moment',
+  function(
+    $scope,
+    AppConfig,
+    Formio,
+    moment
+  ) {
+    // Get the current time.
+    var curr = new Date();
+    $scope.viewDate = {
+      year: curr.getUTCFullYear(),
+      month: (curr.getUTCMonth() + 1),
+      day: curr.getUTCDate()
+    };
+    $scope.label = {
+      year: 'Yearly Submission Requests by Month',
+      month: 'Monthly Submission Requests by Day',
+      day: 'Daily Submission Requests by Hour'
+    };
+    $scope.analyticsOptions = {
+      height: '300px',
+      low: 0,
+      lineSmooth: false,
+      axisY: {
+        onlyInteger: true
+      }
+    };
+    $scope.analyticsEvents = {
+      draw: function(data) {
+        // Intercept each chart point and register a click event.
+        if(data.type === 'point') {
+          // Register a click event to modify the graph based on the current view and click location.
+          data.element._node.onclick = function() {
+            if($scope.currentType === 'year') {
+              // Adjust month for non-zero index.
+              $scope.viewDate.month = (data.index + 1);
+              $scope.displayView('month', true);
+            }
+            else if($scope.currentType === 'month') {
+              // Adjust day for non-zero index.
+              $scope.viewDate.day = (data.index + 1);
+              $scope.displayView('day', true);
+            }
+          };
+        }
+      }
+    };
 
+    /**
+     * View switcher utility to graph the data for the current view type.
+     *
+     * @param {String} type
+     *   The type of view to display: year, month, view.
+     * @param {Boolean} [cached]
+     *   If the view should use the the $scope.viewDate time rather than the current time.
+     */
+    $scope.displayView = function(type, cached) {
+      var _y = curr.getUTCFullYear();
+      var _m = curr.getUTCMonth() + 1;
+      var _d = curr.getUTCDate();
+      if(cached) {
+        $scope.graphType = '';
+        _y = $scope.viewDate.year;
+        _m = $scope.viewDate.month;
+        _d = $scope.viewDate.day;
+      }
+      else {
+        // Clear the cache values;
+        $scope.viewDate.year = _y;
+        $scope.viewDate.month = _m;
+        $scope.viewDate.day = _d;
+      }
+
+      if(type === 'year') {
+        $scope.analyticsLoading = true;
+        Formio.request(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/analytics/year/' + _y, 'GET')
+          .then(function(data) {
+            $scope.currentType = type;
+            $scope.analytics = {
+              labels: _.map(_.pluck(data, 'month'), function(month) {
+                return _.add(month, 1);
+              }),
+              series: [
+                _.pluck(data, 'submissions')
+              ]
+            };
+
+            $scope.analyticsLoading = false;
+            $scope.$apply();
+          });
+      }
+      else if(type === 'month') {
+        $scope.analyticsLoading = true;
+        Formio.request(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/analytics/year/' + _y + '/month/' + _m, 'GET')
+          .then(function(data) {
+            $scope.currentType = type;
+            $scope.analytics = {
+              labels: _.map(_.pluck(data, 'day'), function(day) {
+                return _.add(day, 1);
+              }),
+              series: [
+                _.pluck(data, 'submissions')
+              ]
+            };
+
+            $scope.analyticsLoading = false;
+            $scope.$apply();
+          });
+      }
+      else if(type === 'day') {
+        $scope.analyticsLoading = true;
+
+        /**
+         * Get the local hourly timestamps that relate to utc 0-23 to display as labels.
+         *
+         * @param year {Number}
+         *   The current year in question.
+         * @param month {Number}
+         *   The current month in question.
+         * @param day {Number}
+         *   The current day in question.
+         *
+         * @returns {Array}
+         *   The Labels to be associated with utc 0-23 corresponding data.
+         */
+        var calculateLocalTimeLabels = function(year, month, day) {
+          var local = [];
+
+          // Calculate the current utc offset in rounded hours.
+          var start = null;
+          var time = moment(year + ' ' + month + ' ' + day, 'YYYY MM DD');
+          var offset = Math.ceil(((new Date()).getTimezoneOffset() / 60));
+          if(offset > 0) {
+            // Behind utc by the given amount.
+            start = (24 - offset);
+            time.subtract(1, 'days');
+          }
+          else {
+            // Current timezone is ahead of utc.
+            start = (0 - offset);
+          }
+
+          // Change the am flag based on the start of display labels.
+          var am = (start > 11) ? false : true;
+          for(var i = 0; i < 24; i++) {
+            // Flip the am flag when the clock wraps around.
+            var output = ((start + i) % 12);
+            if(output === 0) {
+              am = !am;
+
+              // When the am flag wraps, set the output to 12 rather than 0.
+              output = 12;
+
+              time.add(1, 'days');
+            }
+
+            // Add each label sequentially in the utc order.
+            local.push('' + output + (am ? 'AM' : 'PM') + ' ' + time.format('M/D/YYYY'));
+          }
+
+          return local;
+        };
+
+        Formio.request(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/analytics/year/' + _y + '/month/' + _m + '/day/' + _d, 'GET')
+          .then(function(data) {
+            $scope.currentType = type;
+            var utcHrs = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23];
+            var displayHrs = calculateLocalTimeLabels(_y, _m, _d);
+
+            // Default each hr to have no submissions.
+            var parsedData = [];
+            _.forEach(utcHrs, function(hr) {
+              parsedData[hr] = 0;
+            });
+
+            // Convert the raw timestamps into hours that they occurred in.
+            _.forEach(data.submissions, function(_event) {
+              var temp = new Date(parseInt(_event));
+              parsedData[temp.getUTCHours()] = parsedData[temp.getUTCHours()] + 1;
+            });
+
+            $scope.analytics = {
+              labels: displayHrs,
+              series: [parsedData]
+            };
+
+            $scope.analyticsLoading = false;
+            $scope.$apply();
+          });
+      }
+    };
+
+    // Simple ui tools to aid in switching the default view.
+    $scope.graphType = 'Month';
+    $scope.types = ['Year', 'Month', 'Day'];
+    $scope.graphChange = function() {
+      $scope.displayView(($scope.graphType || '').toLowerCase());
+    };
+  }
 ]);
 
 app.controller('ProjectSettingsController', [

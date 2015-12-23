@@ -134,7 +134,8 @@ angular
         })
         .state('project.data', {
           url: '/data',
-          templateUrl: 'views/data/index.html'
+          templateUrl: 'views/data/index.html',
+          controller: 'ProjectDataController'
         })
         .state('project.preview', {
           url: '/preview',

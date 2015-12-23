@@ -1045,6 +1045,50 @@ footer {
   }
 }
 
+/***************************** Project Data *****************************/
+.project-data {
+  chartist {
+    height: 375px !important;
+    display: block;
+  }
+  h3, h4 {
+    text-align: center;
+  }
+  .ct-label {
+    font-family: $font-family-base;
+    font-size: $font-size-small;
+    color: $text-color;
+    fill: $text-color;
+
+    &.ct-horizontal {
+      width: 125px !important;
+
+      -moz-transform: rotate(30deg) translate(0px, 45px);
+      -webkit-transform: rotate(30deg) translate(0px, 45px);
+      -o-transform: rotate(30deg) translate(0px, 45px);
+      -ms-transform: rotate(30deg) translate(0px, 45px);
+      transform: rotate(30deg) translate(0px, 45px);
+    }
+  }
+
+  // Variable analytics graph.
+  .ct-chart-line {
+    .ct-series-a .ct-line {
+      stroke: $brand-secondary
+    }
+    .ct-series-a .ct-point {
+      stroke: $brand-primary;
+
+      &:hover {
+        stroke-width: 20px !important;
+      }
+    }
+  }
+  .chart-buttons {
+    text-align: center;
+  }
+}
+
 /********************* Project Plan Upgrade Dialog *********************/
 .ngdialog.ngdialog-theme-default.project-upgrade .ngdialog-content {
   padding: 0;

@@ -10,18 +10,19 @@
     <!-- build:css styles/vendor.css -->
     <link rel="stylesheet" href="/styles/base.css" />
     <!-- bower:css -->
+    <link rel="stylesheet" href="/bower_components/chartist/dist/chartist.min.css" />
+    <link rel="stylesheet" href="/bower_components/angular-ui-notification/dist/angular-ui-notification.css" />
     <link rel="stylesheet" href="/bower_components/angular-ui-select/dist/select.css" />
-    <link rel="stylesheet" href="/bower_components/ngDialog/css/ngDialog.css" />
-    <link rel="stylesheet" href="/bower_components/ngDialog/css/ngDialog-theme-default.css" />
-    <link rel="stylesheet" href="/bower_components/ng-sortable/dist/ng-sortable.css" />
-    <link rel="stylesheet" href="/bower_components/ng-sortable/dist/ng-sortable.style.css" />
-    <link rel="stylesheet" href="/bower_components/ngFormio/css/formio.css" />
-    <link rel="stylesheet" href="/bower_components/ng-ckeditor/ng-ckeditor.css" />
-    <link rel="stylesheet" href="/bower_components/ngFormBuilder/css/formBuilder.css" />
     <link rel="stylesheet" href="/bower_components/font-awesome/css/font-awesome.css" />
     <link rel="stylesheet" href="/bower_components/kendo-ui/styles/kendo.common.min.css" />
     <link rel="stylesheet" href="/bower_components/kendo-ui/styles/kendo.bootstrap.min.css" />
-    <link rel="stylesheet" href="/bower_components/angular-ui-notification/dist/angular-ui-notification.css" />
+    <link rel="stylesheet" href="/bower_components/ng-sortable/dist/ng-sortable.css" />
+    <link rel="stylesheet" href="/bower_components/ng-sortable/dist/ng-sortable.style.css" />
+    <link rel="stylesheet" href="/bower_components/ngDialog/css/ngDialog.css" />
+    <link rel="stylesheet" href="/bower_components/ngDialog/css/ngDialog-theme-default.css" />
+    <link rel="stylesheet" href="/bower_components/ngFormio/css/formio.css" />
+    <link rel="stylesheet" href="/bower_components/ng-ckeditor/ng-ckeditor.css" />
+    <link rel="stylesheet" href="/bower_components/ngFormBuilder/css/formBuilder.css" />
     <!-- endbower -->
     <!-- endbuild -->
 
@@ -182,32 +183,34 @@
     <!-- bower:js -->
     <script src="/bower_components/jquery/dist/jquery.js"></script>
     <script src="/bower_components/angular/angular.js"></script>
-    <script src="/bower_components/angular-ui-router/release/angular-ui-router.js"></script>
-    <script src="/bower_components/angular-ui-select/dist/select.js"></script>
-    <script src="/bower_components/angular-sanitize/angular-sanitize.js"></script>
+    <script src="/bower_components/angular-animate/angular-animate.js"></script>
+    <script src="/bower_components/angular-base64/angular-base64.js"></script>
     <script src="/bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+    <script src="/bower_components/chartist/dist/chartist.min.js"></script>
+    <script src="/bower_components/angular-chartist.js/dist/angular-chartist.js"></script>
     <script src="/bower_components/moment/moment.js"></script>
     <script src="/bower_components/angular-moment/angular-moment.js"></script>
-    <script src="/bower_components/ngDialog/js/ngDialog.js"></script>
-    <script src="/bower_components/ng-sortable/dist/ng-sortable.js"></script>
+    <script src="/bower_components/angular-paginate-anything/dist/paginate-anything-tpls.js"></script>
+    <script src="/bower_components/angular-sanitize/angular-sanitize.js"></script>
+    <script src="/bower_components/angular-truncate-2/src/angular-truncate-2.js"></script>
+    <script src="/bower_components/angular-ui-notification/dist/angular-ui-notification.js"></script>
+    <script src="/bower_components/angular-ui-router/release/angular-ui-router.js"></script>
+    <script src="/bower_components/angular-ui-select/dist/select.js"></script>
     <script src="/bower_components/bootstrap-ui-datetime-picker/dist/datetime-picker.min.js"></script>
+    <script src="/bower_components/kendo-ui/js/kendo.ui.core.min.js"></script>
+    <script src="/bower_components/kendo-ui/js/kendo.angular.min.js"></script>
+    <script src="/bower_components/lodash/lodash.js"></script>
+    <script src="/bower_components/ng-file-upload/ng-file-upload.js"></script>
+    <script src="/bower_components/ng-sortable/dist/ng-sortable.js"></script>
+    <script src="/bower_components/ngDialog/js/ngDialog.js"></script>
     <script src="/bower_components/signature_pad/signature_pad.js"></script>
     <script src="/bower_components/angular-ui-mask/dist/mask.js"></script>
     <script src="/bower_components/ngFormio/dist/formio.js"></script>
     <script src="/bower_components/angular-drag-and-drop-lists/angular-drag-and-drop-lists.js"></script>
-    <script src="/bower_components/lodash/lodash.js"></script>
     <script src="/bower_components/ckeditor/ckeditor.js"></script>
     <script src="/bower_components/ng-ckeditor/ng-ckeditor.js"></script>
     <script src="/bower_components/ngFormBuilder/dist/ngFormBuilder.js"></script>
     <script src="/bower_components/seamless/build/seamless.parent.min.js"></script>
-    <script src="/bower_components/angular-base64/angular-base64.js"></script>
-    <script src="/bower_components/angular-animate/angular-animate.js"></script>
-    <script src="/bower_components/angular-paginate-anything/dist/paginate-anything-tpls.js"></script>
-    <script src="/bower_components/kendo-ui/js/kendo.ui.core.min.js"></script>
-    <script src="/bower_components/kendo-ui/js/kendo.angular.min.js"></script>
-    <script src="/bower_components/angular-truncate-2/src/angular-truncate-2.js"></script>
-    <script src="/bower_components/angular-ui-notification/dist/angular-ui-notification.js"></script>
-    <script src="/bower_components/ng-file-upload/ng-file-upload.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 
@@ -229,7 +232,6 @@
     <!-- build:js scripts/app.js -->
     <!-- inject:js -->
     <script src="scripts/app.js"></script>
-    <script src="scripts/utils/utils.js"></script>
     <script src="scripts/controllers/access.js"></script>
     <script src="scripts/controllers/controllers.js"></script>
     <script src="scripts/controllers/feedback.js"></script>
@@ -240,6 +242,7 @@
     <script src="scripts/controllers/role.js"></script>
     <script src="scripts/controllers/team.js"></script>
     <script src="scripts/controllers/user.js"></script>
+    <script src="scripts/utils/utils.js"></script>
     <!-- endinject -->
     <!-- endbuild -->
 
