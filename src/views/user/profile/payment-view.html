@@ -1,0 +1,12 @@
+<div ng-if="!paymentInfoLoading && paymentInfo">
+  <h4>{{capitalize(paymentInfo.cardType)}} ending in {{paymentInfo.ccNumber.substr(-4)}}</h4>
+  <p class="text-muted">Expires on {{paymentInfo.ccExpiryMonth}}/{{paymentInfo.ccExpiryYear}}</p>
+  <p>Name on Card: {{paymentInfo.cardholderName}}</p>
+</div>
+<div ng-if="!paymentInfoLoading && !paymentInfo">
+  <p>You have not registered a payment method yet.</p>
+</div>
+
+<div class="form-group">
+  <a class="btn btn-primary" ui-sref="profile.payment.edit()">{{paymentInfo ? 'Change Credit Card' : 'Add Credit Card'}}</a>
+</div>

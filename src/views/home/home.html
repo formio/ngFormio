@@ -26,8 +26,8 @@
           </div>
           <div class="row" style="z-index:1000;">
             <div class="col-sm-4 project-tile-button"><button ui-sref="project.resource.index({projectId: project._id})" class="btn btn-default btn-xs btn-block">Manage</button></div>
-            <div class="col-sm-4 project-tile-button"><button ng-href="{{getPreviewURL(project)}}" target="_blank" ng-disabled="!project.settings.preview"class="btn btn-default btn-xs btn-block"">Preview</button></div>
-            <div class="col-sm-4 project-tile-button"><button ui-sref="project.settings.plan({projectId: project._id})" class="btn btn-default btn-xs btn-block"">Upgrade Plan</button></div>
+            <div class="col-sm-4 project-tile-button"><button ng-href="{{getPreviewURL(project)}}" target="_blank" ng-disabled="!project.settings.preview"class="btn btn-default btn-xs btn-block">Preview</button></div>
+            <div class="col-sm-4 project-tile-button"><button ng-disabled="!isProjectOwner(project)" ng-click="showUpgradeDialog(project); $event.stopPropagation();" class="btn btn-default btn-xs btn-block" title="{{!isProjectOwner(project) ? 'You must be a project owner to upgrade its plan' : ''}}">Upgrade Plan</button></div>
           </div>
           <div class="row project-teams">
             <h5 class="text-center project-teams-header">Teams <i class="fa fa-users"></i></h5><hr />

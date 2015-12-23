@@ -24,7 +24,7 @@
       </div>
       <div class="col-sm-2 project-header-block">
         <h5>Current Plan:&nbsp;&nbsp;<div class="label label-primary">{{ getPlanName(currentProject.plan) }}</div></h5>
-        <a ui-sref="project.settings.plan()" class="btn btn-default btn-block pull-right upgrade-plan-header-button">Upgrade Plan</a>
+        <a ng-click="showUpgradeDialog(currentProject)" ng-disabled="!isProjectOwner(currentProject)" class="btn btn-default btn-block pull-right upgrade-plan-header-button">Upgrade Plan</a>
       </div>
     </div>
     <div class="project-content" ui-view></div>

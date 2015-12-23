@@ -106,3 +106,70 @@ app.controller('ProfileController', [
     });
   }
 ]);
+
+app.controller('ProfilePaymentController', [
+  '$scope',
+  '$state',
+  '$rootScope',
+  'Formio',
+  'FormioAlerts',
+  'UserInfo',
+  'AppConfig',
+  function(
+    $scope,
+    $state,
+    $rootScope,
+    Formio,
+    FormioAlerts,
+    UserInfo,
+    AppConfig
+  ) {
+    $scope.paymentForm = AppConfig.paymentForm;
+    $scope.capitalize = _.capitalize;
+
+    var loadPaymentInfo = function() {
+      $scope.paymentInfoLoading = true;
+      UserInfo.getPaymentInfo()
+      .then(function(paymentInfo) {
+        $scope.paymentInfo = paymentInfo;
+        $scope.paymentInfoLoading = false;
+      })
+      .catch(FormioAlerts.onError.bind(FormioAlerts));
+    };
+
+    loadPaymentInfo();
+
+    $scope.$on('formSubmission', function() {
+      $state.go('profile.payment.view');
+      loadPaymentInfo();
+    });
+  }
+]);
+
+app.factory('UserInfo', [
+  'Formio',
+  'AppConfig',
+  '$rootScope',
+  '$q',
+  function(
+    Formio,
+    AppConfig,
+    $rootScope,
+    $q
+  ) {
+    return {
+      getPaymentInfo: function() {
+        if (!$rootScope.user) $q.reject('Must be logged in to get payment info.');
+
+        var formio = new Formio(AppConfig.paymentForm);
+        return formio.loadSubmissions()
+        .then(function(submissions) {
+          if(!submissions || !submissions.length) {
+            return null;
+          }
+          return submissions[0].data;
+        });
+      }
+    };
+  }
+]);
