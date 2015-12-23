@@ -316,7 +316,9 @@ app.controller('ProjectDataController', [
       height: '300px',
       low: 0,
       lineSmooth: false,
-      onlyInteger: true
+      axisY: {
+        onlyInteger: true
+      }
     };
     $scope.analyticsEvents = {
       draw: function(data) {
@@ -337,30 +339,6 @@ app.controller('ProjectDataController', [
           }
         }
       }
-    };
-
-    // Draw the initial analytics graph view (for the current month).
-    $scope.analyticsLoading = true;
-    Formio.request(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/analytics/year/' + curr.getUTCFullYear() + '/month/' + (curr.getUTCMonth() + 1), 'GET')
-      .then(function(data) {
-        $scope.currentType = 'month';
-        $scope.analytics = {
-          labels: _.map(_.pluck(data, 'day'), function(day) {
-            return _.add(day, 1);
-          }),
-          series: [
-            _.pluck(data, 'submissions')
-          ]
-        };
-
-        $scope.analyticsLoading = false;
-      });
-
-    // Simple ui tools to aid in switching the default view.
-    $scope.graphType = 'Month';
-    $scope.types = ['Year', 'Month', 'Day'];
-    $scope.graphChange = function() {
-      $scope.displayView(($scope.graphType || '').toLowerCase());
     };
 
     /**
@@ -445,11 +423,11 @@ app.controller('ProjectDataController', [
 
           // Calculate the current utc offset in rounded hours.
           var start = null;
-          var time = moment(year + '-' + month + '-' + day);
+          var time = moment(year + ' ' + month + ' ' + day, 'YYYY MM DD');
           var offset = Math.ceil(((new Date()).getTimezoneOffset() / 60));
           if(offset > 0) {
             // Behind utc by the given amount.
-            start = (23 - offset);
+            start = (24 - offset);
             time.subtract(1, 'days');
           }
           else {
@@ -505,6 +483,13 @@ app.controller('ProjectDataController', [
             $scope.$apply();
           });
       }
+    };
+
+    // Simple ui tools to aid in switching the default view.
+    $scope.graphType = 'Month';
+    $scope.types = ['Year', 'Month', 'Day'];
+    $scope.graphChange = function() {
+      $scope.displayView(($scope.graphType || '').toLowerCase());
     };
   }
 ]);
