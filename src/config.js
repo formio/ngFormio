@@ -30,6 +30,5 @@ angular.module('formioApp').constant('AppConfig', {
   teamForm: formioBase + '/team',
   betaForm: formioBase + '/beta',
   feedbackForm: formioBase + '/feedback',
-  resetPassForm: formioBase + '/resetpass',
-  planForm: formioBase + '/plan'
+  resetPassForm: formioBase + '/resetpass'
 });
