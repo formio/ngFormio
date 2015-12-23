@@ -336,7 +336,7 @@ app.controller('ProjectDataController', [
               $scope.viewDate.day = (data.index + 1);
               $scope.displayView('day', true);
             }
-          }
+          };
         }
       }
     };
