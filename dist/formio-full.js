@@ -54926,11 +54926,15 @@ module.exports = function (app) {
   ]);
   app.controller('formioFile', [
     '$scope',
+    '$rootScope',
+    '$http',
     '$window',
     'Upload',
     'Formio',
     function(
       $scope,
+      $rootScope,
+      $http,
       $window,
       Upload,
       Formio
@@ -55034,44 +55038,107 @@ module.exports = function (app) {
                   message: 'Starting upload'
                 };
                 var dir = $scope.component.dir || '';
-                var dropboxToken = _.pluck(_.filter($scope.user.externalTokens, {type: 'dropbox'}), 'token');
-                console.log(dropboxToken);
-                var request = {
-                  url: 'https://content.dropboxapi.com/2/files/upload',
-                  method: 'POST',
-                  headers: {
-                    'Authorization': 'Bearer ' + dropboxToken,
-                    'Dropbox-API-Arg': JSON.stringify({
-                      path: dir + file.name,
-                      mode: 'add',
-                      autorename: true,
-                      mute: false
-                    })
-                  },
-                  data: {
-                    file: file
-                  }
-                };
-                var upload = Upload.upload(request);
-                upload
-                  .then(function(resp) {
-                    // Handle upload finished.
-                    delete $scope.fileUploads[file.name];
-                    resp.storage = 'dropbox';
-                    $scope.data[$scope.component.key].push(resp);
-                  }, function(resp) {
-                    // Handle error
-                    var oParser = new DOMParser();
-                    var oDOM = oParser.parseFromString(resp.data, 'text/xml');
-                    $scope.fileUploads[file.name].status = 'error';
-                    $scope.fileUploads[file.name].message = oDOM.getElementsByTagName('Message')[0].innerHTML;
-                    delete $scope.fileUploads[file.name].progress;
-                  }, function(evt) {
-                    // Progress notify
+                var dropboxToken = _.result(_.find($rootScope.user.externalTokens, {type: 'dropbox'}), 'token');
+                if (!dropboxToken) {
+                  $scope.fileUploads[file.name].status = 'error';
+                  $scope.fileUploads[file.name].message = 'You must authenticate with dropbox before uploading files.';
+                }
+                else {
+                  //var reader = new FileReader({'blob': true});
+                  //
+                  //reader.onload = function(evt) {
+                  //  var fileData = e.target.result;
+
+                  // Both Upload service and $http don't handle files as application/octet-stream which is required by dropbox.
+                  var xhr = new XMLHttpRequest();
+
+                  xhr.upload.onprogress = function(evt) {
+                    console.log('progress');
+                    console.log(evt);
                     $scope.fileUploads[file.name].status = 'progress';
                     $scope.fileUploads[file.name].progress = parseInt(100.0 * evt.loaded / evt.total);
                     delete $scope.fileUploads[file.name].message;
-                  });
+                  };
+
+                  xhr.onload = function(evt) {
+                    if (xhr.status == 200) {
+                      // Success!
+                      console.log('done!');
+                    }
+                    else {
+                      console.log('error');
+                      console.log(evt);
+                    }
+                  }
+
+                  xhr.open('POST', 'https://content.dropboxapi.com/2/files/upload');
+                  xhr.setRequestHeader('Authorization', 'Bearer ' + dropboxToken);
+                  xhr.setRequestHeader('Content-Type', 'application/octet-stream');
+                  xhr.setRequestHeader('Dropbox-API-Arg', JSON.stringify({
+                    path: '/' + dir + file.name,
+                    mode: 'add',
+                    autorename: true,
+                    mute: false
+                  }));
+                  //xhr.overrideMimeType('application/octet-stream');
+
+                  xhr.send(file);
+
+                  var request = {
+                    url: 'https://content.dropboxapi.com/2/files/upload',
+                    method: 'POST',
+                    headers: {
+                      'Authorization': 'Bearer ' + dropboxToken,
+                      'Content-Type': 'application/octet-stream',
+                      'Dropbox-API-Arg': JSON.stringify({
+                        path: '/' + dir + file.name,
+                        mode: 'add',
+                        autorename: true,
+                        mute: false
+                      })
+                    },
+                    withCredentials: false,
+                    disableJWT: true,
+                    data: file
+                  };
+                    //$http(request).then(
+                    //  function successCallback(response) {
+                    //    console.log(response);
+                    //  },
+                    //  function errorCallback(response) {
+                    //    console.log(response);
+                    //  }
+                    //);
+                  //};
+                  //
+                  //reader.onerror = function(evt) {
+                  //  $scope.fileUploads[file.name].status = 'error';
+                  //  $scope.fileUploads[file.name].message = reader.error || 'Unable to upload';
+                  //  delete $scope.fileUploads[file.name].progress;
+                  //};
+                  //
+                  //reader.onprogress = function(evt) {
+                  //  $scope.fileUploads[file.name].status = 'progress';
+                  //  $scope.fileUploads[file.name].progress = parseInt(100.0 * evt.loaded / evt.total);
+                  //  delete $scope.fileUploads[file.name].message;
+                  //};
+                  //
+                  //reader.readAsArrayBuffer(file);
+
+                  //var upload = Upload.upload(request);
+                  //upload
+                  //  .then(function(resp) {
+                  //    // Handle upload finished.
+                  //    delete $scope.fileUploads[file.name];
+                  //    resp.storage = 'dropbox';
+                  //    $scope.data[$scope.component.key].push(resp);
+                  //  }, function(resp) {
+                  //    // Handle error
+                  //    console.log(resp.data);
+                  //  }, function(evt) {
+                  //    // Progress notify
+                  //  });
+                }
               });
               break;
           }

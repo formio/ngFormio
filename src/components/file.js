@@ -21,11 +21,15 @@ module.exports = function (app) {
   ]);
   app.controller('formioFile', [
     '$scope',
+    '$rootScope',
+    '$http',
     '$window',
     'Upload',
     'Formio',
     function(
       $scope,
+      $rootScope,
+      $http,
       $window,
       Upload,
       Formio
@@ -54,17 +58,23 @@ module.exports = function (app) {
       };
 
       $scope.getFile = function(evt, file) {
-        // If this is not a public file, get a signed url and open in new tab.
-        if (file.acl !== 'public-read') {
-          evt.preventDefault();
-          Formio.request($scope.formio.formUrl + '/storage/s3?bucket=' + file.bucket + '&key=' + file.key, 'GET')
-            .then(function(response) {
-              $window.open(response.url, '_blank');
-            })
-            .catch(function(response) {
-              // Is alert the best way to do this? User is expecting an immediate notification due to attempting to download a file.
-              alert(response);
-            });
+        switch(file.storage) {
+          case 's3':
+            // If this is not a public file, get a signed url and open in new tab.
+            if (file.acl !== 'public-read') {
+              evt.preventDefault();
+              Formio.request($scope.formio.formUrl + '/storage/s3?bucket=' + file.bucket + '&key=' + file.key, 'GET')
+                .then(function(response) {
+                  $window.open(response.url, '_blank');
+                })
+                .catch(function(response) {
+                  // Is alert the best way to do this? User is expecting an immediate notification due to attempting to download a file.
+                  alert(response);
+                });
+            }
+            break;
+          case 'dropbox':
+            break;
         }
       };
 
@@ -129,44 +139,51 @@ module.exports = function (app) {
                   message: 'Starting upload'
                 };
                 var dir = $scope.component.dir || '';
-                var dropboxToken = _.pluck(_.filter($scope.user.externalTokens, {type: 'dropbox'}), 'token');
-                console.log(dropboxToken);
-                var request = {
-                  url: 'https://content.dropboxapi.com/2/files/upload',
-                  method: 'POST',
-                  headers: {
-                    'Authorization': 'Bearer ' + dropboxToken,
-                    'Dropbox-API-Arg': JSON.stringify({
-                      path: dir + file.name,
-                      mode: 'add',
-                      autorename: true,
-                      mute: false
-                    })
-                  },
-                  data: {
-                    file: file
-                  }
-                };
-                var upload = Upload.upload(request);
-                upload
-                  .then(function(resp) {
-                    // Handle upload finished.
-                    delete $scope.fileUploads[file.name];
-                    resp.storage = 'dropbox';
-                    $scope.data[$scope.component.key].push(resp);
-                  }, function(resp) {
-                    // Handle error
-                    var oParser = new DOMParser();
-                    var oDOM = oParser.parseFromString(resp.data, 'text/xml');
-                    $scope.fileUploads[file.name].status = 'error';
-                    $scope.fileUploads[file.name].message = oDOM.getElementsByTagName('Message')[0].innerHTML;
-                    delete $scope.fileUploads[file.name].progress;
-                  }, function(evt) {
-                    // Progress notify
+                var dropboxToken = _.result(_.find($rootScope.user.externalTokens, {type: 'dropbox'}), 'token');
+                if (!dropboxToken) {
+                  $scope.fileUploads[file.name].status = 'error';
+                  $scope.fileUploads[file.name].message = 'You must authenticate with dropbox before uploading files.';
+                }
+                else {
+                  // Both Upload service and $http don't handle files as application/octet-stream which is required by dropbox.
+                  var xhr = new XMLHttpRequest();
+
+                  var onProgress = function(evt) {
                     $scope.fileUploads[file.name].status = 'progress';
                     $scope.fileUploads[file.name].progress = parseInt(100.0 * evt.loaded / evt.total);
                     delete $scope.fileUploads[file.name].message;
-                  });
+                    $scope.$apply();
+                  };
+
+                  xhr.upload.onprogress = onProgress;
+
+                  xhr.onload = function(evt) {
+                    if (xhr.status == 200) {
+                      var resp = JSON.parse(xhr.response);
+                      delete $scope.fileUploads[file.name];
+                      resp.storage = 'dropbox';
+                      $scope.data[$scope.component.key].push(resp);
+                      $scope.$apply();
+                    }
+                    else {
+                      $scope.fileUploads[file.name].status = 'error';
+                      $scope.fileUploads[file.name].message = xhr.response || 'Unable to upload file';
+                      $scope.$apply();
+                    }
+                  };
+
+                  xhr.open('POST', 'https://content.dropboxapi.com/2/files/upload');
+                  xhr.setRequestHeader('Authorization', 'Bearer ' + dropboxToken);
+                  xhr.setRequestHeader('Content-Type', 'application/octet-stream');
+                  xhr.setRequestHeader('Dropbox-API-Arg', JSON.stringify({
+                    path: '/' + dir + file.name,
+                    mode: 'add',
+                    autorename: true,
+                    mute: false
+                  }));
+
+                  xhr.send(file);
+                }
               });
               break;
           }
