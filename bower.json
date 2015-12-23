@@ -20,7 +20,7 @@
     "angular": "~1.4.8",
     "angular-bootstrap": "~0.14.3",
     "angular-moment": "~0.10.3",
-    "ui-select": "angular-ui-select#~0.13.2",
+    "angular-ui-select": "angular-ui-select#~0.13.2",
     "bootstrap": "~3.3.6",
     "bootstrap-ui-datetime-picker": "~2.0.4",
     "signature_pad": "~1.5.2",

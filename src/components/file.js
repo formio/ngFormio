@@ -59,12 +59,14 @@ module.exports = function (app) {
         '$scope',
         'Formio',
         '$window',
-        '$http'
+        '$http',
+        '$rootScope',
         function (
           $scope,
           Formio,
           $window,
-          $http
+          $http,
+          $rootScope
         ) {
           $scope.getFile = function (evt) {
             switch($scope.file.storage) {
@@ -84,6 +86,7 @@ module.exports = function (app) {
                 break;
               case 'dropbox':
                 evt.preventDefault();
+                var dropboxToken = _.result(_.find($rootScope.user.externalTokens, {type: 'dropbox'}), 'token');
                 $http({
                   method: 'POST',
                   url: 'https://api.dropboxapi.com/2/sharing/create_shared_link_with_settings',
@@ -92,13 +95,13 @@ module.exports = function (app) {
                     'Content-Type': 'application/json',
                   },
                   data: {
-                    path: $scope.file.path,
-                    short_url: false
-                  }
+                    path: $scope.file.path_lower
+                  },
+                  disableJWT: true
                 }).then(function successCallback(response) {
-                  $window.open(response.url, '_blank');
+                  $window.open(response.data.url, '_blank');
                 }, function errorCallback(response) {
-                  alert(response.error_summary);
+                  alert(response.data);
                 });
                 break;
             }
