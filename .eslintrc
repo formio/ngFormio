@@ -1,0 +1,10 @@
+{
+  "extends": "formio",
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "globals": {
+    "angular": true
+  }
+}

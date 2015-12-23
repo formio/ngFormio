@@ -53,7 +53,7 @@ module.exports = function() {
 
         // Called when the form is submitted.
         $scope.onSubmit = function(form) {
-          if (!$scope.formioForm.$valid || form.submitting) { return; }
+          if (!$scope.formioForm.$valid || form.submitting) return;
           form.submitting = true;
 
           // Create a sanitized submission object.
@@ -89,7 +89,7 @@ module.exports = function() {
           };
 
           var submitEvent = $scope.$emit('formSubmit', submissionData);
-          if(submitEvent.defaultPrevented) {
+          if (submitEvent.defaultPrevented) {
             // Listener wants to cancel the form submission
             return;
           }

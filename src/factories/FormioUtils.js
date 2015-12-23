@@ -21,7 +21,7 @@ module.exports = function() {
       return flattened;
     },
     eachComponent: function eachComponent(components, fn) {
-      if(!components) {
+      if (!components) {
         return;
       }
       angular.forEach(components, function(component) {
@@ -41,7 +41,7 @@ module.exports = function() {
     getComponent: function getComponent(components, key) {
       var result;
       this.eachComponent(components, function(component) {
-        if(component.key === key) {
+        if (component.key === key) {
           result = component;
         }
       });

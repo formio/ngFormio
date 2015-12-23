@@ -122,13 +122,13 @@ module.exports = function (app) {
                 $scope.refreshItems = function(input) {
                   var url = settings.data.url;
 
-                  if(settings.searchField && input) {
+                  if (settings.searchField && input) {
                     url += ((url.indexOf('?') === -1) ? '?' : '&') +
                       encodeURIComponent(settings.searchField) +
                       '=' +
                       encodeURIComponent(input);
                   }
-                  else if(loaded) {
+                  else if (loaded) {
                     return; // Skip if we've loaded before, to avoid multiple requests
                   }
                   $http.get(url, options)

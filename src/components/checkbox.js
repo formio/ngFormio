@@ -21,7 +21,7 @@ module.exports = function (app) {
           protected: false,
           persistent: true,
           validate: {
-            required: false,
+            required: false
           }
         }
       });

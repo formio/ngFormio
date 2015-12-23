@@ -15,7 +15,7 @@ module.exports = function (app) {
           placeholder: '',
           multiple: false,
           defaultValue: '',
-          protected: false,
+          protected: false
         }
       });
     }

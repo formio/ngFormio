@@ -18,7 +18,7 @@ module.exports = [
       },
       templateUrl: 'formio/component.html',
       link: function($scope, el, attrs, formioCtrl) {
-        if(formioCtrl) {
+        if (formioCtrl) {
           $scope.showAlerts = formioCtrl.showAlerts.bind(formioCtrl);
         }
         else {
@@ -50,7 +50,7 @@ module.exports = [
           $scope.resetForm = function() {
             // Manually remove each key so we don't lose a reference to original
             // data in child scopes.
-            for(var key in $scope.data) {
+            for (var key in $scope.data) {
               delete $scope.data[key];
             }
           };
@@ -71,8 +71,8 @@ module.exports = [
               root = $scope.component.key.split('.').shift();
             }
             $scope.$watch('data', function(data) {
-              if (!data || angular.equals({}, data)) { return; }
-              if (root && (!data.hasOwnProperty(root) || angular.equals({}, data[root]))) { return; }
+              if (!data || angular.equals({}, data)) return;
+              if (root && (!data.hasOwnProperty(root) || angular.equals({}, data[root]))) return;
               if (root && data[root].hasOwnProperty('_id')) {
                 $scope.data[root + '._id'] = data[root]._id;
               }
@@ -90,7 +90,7 @@ module.exports = [
 
           // Get the settings.
           var component = formioComponents.components[$scope.component.type];
-          if (!component) { return; }
+          if (!component) return;
 
           // Set the component with the defaults from the component settings.
           angular.forEach(component.settings, function(value, key) {
@@ -134,7 +134,7 @@ module.exports = [
 
           // Establish a default for data.
           if ($scope.data && !$scope.data.hasOwnProperty($scope.component.key) && $scope.component.hasOwnProperty('defaultValue')) {
-            if($scope.component.multiple && !angular.isArray($scope.component.defaultValue)) {
+            if ($scope.component.multiple && !angular.isArray($scope.component.defaultValue)) {
               $scope.data[$scope.component.key] = [$scope.component.defaultValue];
             }
             else {

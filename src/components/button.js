@@ -22,22 +22,22 @@ module.exports = function (app) {
         },
         controller: function (settings, $scope) {
           $scope.onClick = function() {
-            switch(settings.action) {
+            switch (settings.action) {
               case 'submit':
                 return;
               case 'reset':
                 $scope.resetForm();
                 break;
               case 'oauth':
-                if($scope.hasOwnProperty('form')) {
-                  if(!settings.oauth) {
+                if ($scope.hasOwnProperty('form')) {
+                  if (!settings.oauth) {
                     $scope.showAlerts({
                       type: 'danger',
                       message: 'You must assign this button to an OAuth action before it will work.'
                     });
                     break;
                   }
-                  if(settings.oauth.error) {
+                  if (settings.oauth.error) {
                     $scope.showAlerts({
                       type: 'danger',
                       message: settings.oauth.error
@@ -74,14 +74,14 @@ module.exports = function (app) {
               try {
                 var popupHost = popup.location.host;
                 var currentHost = window.location.host;
-                if(popup && !popup.closed && popupHost === currentHost && popup.location.search) {
+                if (popup && !popup.closed && popupHost === currentHost && popup.location.search) {
                   popup.close();
                   var params = popup.location.search.substr(1).split('&').reduce(function(params, param) {
                     var split = param.split('=');
                     params[split[0]] = split[1];
                     return params;
                   }, {});
-                  if(params.error) {
+                  if (params.error) {
                     $scope.showAlerts({
                       type: 'danger',
                       message: params.error_description || params.error
@@ -89,14 +89,14 @@ module.exports = function (app) {
                     return;
                   }
                   // TODO: check for error response here
-                  if(settings.state !== params.state) {
+                  if (settings.state !== params.state) {
                     $scope.showAlerts({
                       type: 'danger',
                       message: 'OAuth state does not match. Please try logging in again.'
                     });
                     return;
                   }
-                  var submission = { data: {}, oauth: {} };
+                  var submission = {data: {}, oauth: {}};
                   submission.oauth[settings.provider] = params;
                   submission.oauth[settings.provider].redirectURI = window.location.origin || window.location.protocol + '//' + window.location.host;
                   $scope.form.submitting = true;
@@ -116,15 +116,15 @@ module.exports = function (app) {
                   });
                 }
               }
-              catch(error) {
-                if(error.name !== 'SecurityError') {
+              catch (error) {
+                if (error.name !== 'SecurityError') {
                   $scope.showAlerts({
                     type: 'danger',
                     message: error.message || error
                   });
                 }
               }
-              if(!popup || popup.closed || popup.closed === undefined) {
+              if (!popup || popup.closed || popup.closed === undefined) {
                 clearInterval(interval);
               }
             }, 100);

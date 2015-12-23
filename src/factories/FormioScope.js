@@ -17,10 +17,10 @@ module.exports = [
             });
           }
           else {
-            if(error instanceof Error) {
+            if (error instanceof Error) {
               error = error.toString();
             }
-            else if(typeof error === 'object') {
+            else if (typeof error === 'object') {
               error = JSON.stringify(error);
             }
             $scope.showAlerts({
@@ -52,8 +52,8 @@ module.exports = [
 
         // Used to set the form action.
         var getAction = function(action) {
-          if (!action) { return ''; }
-          if ($scope.action) { return ''; }
+          if (!action) return '';
+          if ($scope.action) return '';
           if (action.substr(0, 1) === '/') {
             action = Formio.getBaseUrl() + action;
           }
@@ -75,7 +75,7 @@ module.exports = [
 
         // Set the action if they provided it in the form.
         $scope.$watch('form.action', function(value) {
-          if (!value) { return; }
+          if (!value) return;
           var action = getAction(value);
           if (action) {
             $scope.action = action;
@@ -86,7 +86,7 @@ module.exports = [
         $scope.fieldData = function(data, component) {
           var value = Formio.fieldData(data, component);
           var componentInfo = formioComponents.components[component.type];
-          if (!componentInfo.tableView) { return value; }
+          if (!componentInfo.tableView) return value;
           if (component.multiple && (value.length > 0)) {
             var values = [];
             angular.forEach(value, function(arrayValue) {
@@ -97,19 +97,19 @@ module.exports = [
           return componentInfo.tableView(value, component);
         };
 
+        var spinner = $element.find('#formio-loading');
+
         $scope.updateSubmissions = function() {
           spinner.show();
           var params = {};
-          if($scope.perPage) params.limit = $scope.perPage;
-          if($scope.skip) params.skip = $scope.skip;
-          loader.loadSubmissions({ params: params }).then(function(submissions) {
+          if ($scope.perPage) params.limit = $scope.perPage;
+          if ($scope.skip) params.skip = $scope.skip;
+          loader.loadSubmissions({params: params}).then(function(submissions) {
             $scope._submissions = submissions;
             spinner.hide();
             $scope.$emit('submissionsLoad', submissions);
           }, self.onError($scope));
         };
-
-        var spinner = $element.find('#formio-loading');
 
         if ($scope._src) {
           loader = new Formio($scope._src);

@@ -24,7 +24,7 @@ module.exports = [
           Formio.setToken(null);
           $rootScope.$broadcast('formio.sessionExpired', response.body);
         }
-        else if(parseInt(response.status, 10) === 401) {
+        else if (parseInt(response.status, 10) === 401) {
           $rootScope.$broadcast('formio.unauthorized', response.body);
         }
         return $q.reject(response);
@@ -34,9 +34,9 @@ module.exports = [
        * Set the token in the request headers.
        */
       request: function(config) {
-        if (config.disableJWT) { return config; }
+        if (config.disableJWT) return config;
         var token = Formio.getToken();
-        if (token) { config.headers['x-jwt-token'] = token; }
+        if (token) config.headers['x-jwt-token'] = token;
         return config;
       }
     };

@@ -63,8 +63,8 @@ module.exports = function() {
             $http.delete($scope.action).success(onDeleteDone).error(FormioScope.onError($scope, $element));
           }
           else if (loader) {
-            if (!methodName) { return; }
-            if (typeof loader[methodName] !== 'function') { return; }
+            if (!methodName) return;
+            if (typeof loader[methodName] !== 'function') return;
             loader[methodName]().then(onDeleteDone, FormioScope.onError($scope, $element));
           }
         };
