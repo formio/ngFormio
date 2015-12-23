@@ -4,7 +4,6 @@ module.exports = function(gulp, plugins, watch) {
   return function() {
     var bundle = plugins.browserify({
       entries: './src/formio.js',
-      transform: ['strictify'],
       debug: watch
     });
 

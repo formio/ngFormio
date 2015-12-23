@@ -1,3 +1,4 @@
+var fs = require('fs');
 module.exports = function (app) {
 
   app.config([
@@ -31,19 +32,7 @@ module.exports = function (app) {
     function ($templateCache,
               FormioUtils) {
       $templateCache.put('formio/components/radio.html', FormioUtils.fieldWrap(
-        '<div class="radio" ng-repeat="v in component.values track by $index">' +
-        '<label class="control-label" for="{{ v.value }}">' +
-        '<input type="{{ component.inputType }}" ' +
-        'id="{{ v.value }}" ' +
-        'name="{{ component.key }}" ' +
-        'value="{{ v.value }}" ' +
-        'ng-model="data[component.key]" ' +
-        'ng-required="component.validate.required" ' +
-        'ng-disabled="readOnly"' +
-        'custom-validator="component.validate.custom">' +
-        '{{ v.label }}' +
-        '</label>' +
-        '</div>'
+        fs.readFileSync(__dirname + '/../templates/components/radio.html', 'utf8')
       ));
     }
   ]);

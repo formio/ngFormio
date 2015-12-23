@@ -1,3 +1,4 @@
+var fs = require('fs');
 module.exports = function (app) {
 
   app.config([
@@ -37,23 +38,7 @@ module.exports = function (app) {
     function ($templateCache,
               FormioUtils) {
       $templateCache.put('formio/components/number.html', FormioUtils.fieldWrap(
-        '<input type="{{ component.inputType }}" ' +
-        'class="form-control" ' +
-        'id="{{ component.key }}" ' +
-        'name="{{ component.key }}" ' +
-        'ng-model="data[component.key]" ' +
-        'ng-required="component.validate.required" ' +
-        'ng-disabled="readOnly" ' +
-        'safe-multiple-to-single ' +
-        'min="{{ component.validate.min }}" ' +
-        'max="{{ component.validate.max }}" ' +
-        'step="{{ component.validate.step }}" ' +
-        'placeholder="{{ component.placeholder }}" ' +
-        'custom-validator="component.validate.custom" ' +
-        'ui-mask="{{ component.inputMask }}" ' +
-        'ui-mask-placeholder="" ' + // avoids regular placeholder mixing with mask placeholder
-        'ui-options="uiMaskOptions" ' +
-        '>'
+        fs.readFileSync(__dirname + '/../templates/components/number.html', 'utf8')
       ));
     }
   ]);

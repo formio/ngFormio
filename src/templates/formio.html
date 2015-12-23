@@ -1,0 +1,7 @@
+<form role="form" name="formioForm" ng-submit="onSubmit(formioForm)" novalidate>
+  <i id="formio-loading" style="font-size: 2em;" class="glyphicon glyphicon-refresh glyphicon-spin"></i>
+  <div ng-repeat="alert in formioAlerts" class="alert alert-{{ alert.type }}" role="alert">
+    {{ alert.message }}
+  </div>
+  <formio-component ng-repeat="component in _form.components track by $index" ng-if="componentFound(component)" component="component" data="_submission.data" form="formioForm" formio="formio" read-only="readOnly"></formio-component>
+</form>

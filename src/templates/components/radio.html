@@ -1,0 +1,13 @@
+<div class="radio" ng-repeat="v in component.values track by $index">
+  <label class="control-label" for="{{ v.value }}">
+    <input type="{{ component.inputType }}"
+    id="{{ v.value }}"
+    name="{{ component.key }}"
+    value="{{ v.value }}"
+    ng-model="data[component.key]"
+    ng-required="component.validate.required"
+    ng-disabled="readOnly"
+    custom-validator="component.validate.custom">
+    {{ v.label }}
+  </label>
+</div>

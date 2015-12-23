@@ -1,3 +1,4 @@
+var fs = require('fs');
 module.exports = function (app) {
 
   /*jshint camelcase: false */
@@ -54,14 +55,7 @@ module.exports = function (app) {
     '$templateCache',
     function ($templateCache) {
       $templateCache.put('formio/components/address.html',
-        '<label ng-if="component.label" for="{{ component.key }}" ng-class="{\'field-required\': component.validate.required}">{{ component.label }}</label>' +
-        '<span ng-if="!component.label && component.validate.required" class="glyphicon glyphicon-asterisk form-control-feedback field-required-inline" aria-hidden="true"></span>' +
-        '<ui-select ng-model="data[component.key]" safe-multiple-to-single ng-disabled="readOnly" ng-required="component.validate.required" id="{{ component.key }}" theme="bootstrap">' +
-        '<ui-select-match placeholder="{{ component.placeholder }}">{{$item.formatted_address || $select.selected.formatted_address}}</ui-select-match>' +
-        '<ui-select-choices repeat="address in addresses" refresh="refreshAddress($select.search)" refresh-delay="500">' +
-        '<div ng-bind-html="address.formatted_address | highlight: $select.search"></div>' +
-        '</ui-select-choices>' +
-        '</ui-select>'
+        fs.readFileSync(__dirname + '/../templates/components/address.html', 'utf8')
       );
 
       // Change the ui-select to ui-select multiple.

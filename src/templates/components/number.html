@@ -1,0 +1,17 @@
+<input type="{{ component.inputType }}"
+class="form-control"
+id="{{ component.key }}"
+name="{{ component.key }}"
+ng-model="data[component.key]"
+ng-required="component.validate.required"
+ng-disabled="readOnly"
+safe-multiple-to-single
+min="{{ component.validate.min }}"
+max="{{ component.validate.max }}"
+step="{{ component.validate.step }}"
+placeholder="{{ component.placeholder }}"
+custom-validator="component.validate.custom"
+ui-mask="{{ component.inputMask }}"
+ui-mask-placeholder=""
+ui-options="uiMaskOptions"
+>

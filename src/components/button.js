@@ -1,3 +1,4 @@
+var fs = require('fs');
 module.exports = function (app) {
 
   app.config([
@@ -137,18 +138,7 @@ module.exports = function (app) {
     '$templateCache',
     function ($templateCache) {
       $templateCache.put('formio/components/button.html',
-        '<button type="{{component.action == \'submit\' || component.action == \'reset\' ? component.action : \'button\'}}"' +
-        'ng-class="{\'btn-block\': component.block}"' +
-        'class="btn btn-{{ component.theme }} btn-{{ component.size }}"' +
-        'ng-disabled="readOnly || form.submitting || (component.disableOnInvalid && form.$invalid)"' +
-        'ng-click="onClick()">' +
-        '<span ng-if="component.leftIcon" class="{{ component.leftIcon }}" aria-hidden="true"></span>' +
-        '<span ng-if="component.leftIcon && component.label">&nbsp;</span>' +
-        '{{ component.label }}' +
-        '<span ng-if="component.rightIcon && component.label">&nbsp;</span>' +
-        '<span ng-if="component.rightIcon" class="{{ component.rightIcon }}" aria-hidden="true"></span>' +
-        ' <i ng-if="component.action == \'submit\' && form.submitting" class="glyphicon glyphicon-refresh glyphicon-spin"></i>' +
-        '</button>'
+        fs.readFileSync(__dirname + '/../templates/components/button.html', 'utf8')
       );
     }
   ]);

@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "brfs": "^1.4.1",
     "browserify": "^12.0.1",
     "del": "^1.1.1",
     "gulp": "^3.8.11",
@@ -41,5 +42,8 @@
     "jquery": "^2.1.4",
     "ng-file-upload": "^10.1.11",
     "signature_pad": "^1.5.2"
+  },
+  "browserify": {
+    "transform": ["strictify", "brfs"]
   }
 }
