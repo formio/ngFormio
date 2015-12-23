@@ -24,7 +24,8 @@ angular
     'formioApp.utils',
     'kendo.directives',
     'truncate',
-    'ngFileUpload'
+    'ngFileUpload',
+    'ngDialog'
   ])
   .config([
     '$stateProvider',
@@ -98,6 +99,23 @@ angular
           parent: 'profile',
           controller: 'ProfileController',
           templateUrl: 'views/user/profile/profile-edit.html'
+        })
+        .state('profile.payment', {
+          url: '/payment',
+          parent: 'profile',
+          abstract: true,
+          controller: 'ProfilePaymentController',
+          templateUrl: 'views/user/profile/payment.html'
+        })
+        .state('profile.payment.view', {
+          url: '/view',
+          parent: 'profile.payment',
+          templateUrl: 'views/user/profile/payment-view.html'
+        })
+        .state('profile.payment.edit', {
+          url: '/edit',
+          parent: 'profile.payment',
+          templateUrl: 'views/user/profile/payment-edit.html'
         })
         .state('project', {
           abstract: true,
@@ -302,6 +320,7 @@ angular
     'Formio',
     'FormioAlerts',
     'ProjectPlans',
+    'ProjectUpgradeDialog',
     '$timeout',
     '$q',
     function(
@@ -310,6 +329,7 @@ angular
       Formio,
       FormioAlerts,
       ProjectPlans,
+      ProjectUpgradeDialog,
       $timeout,
       $q
     ) {
@@ -403,7 +423,10 @@ angular
       $scope.getAPICallsLimit = ProjectPlans.getAPICallsLimit.bind(ProjectPlans);
       $scope.getAPICallsPercent = ProjectPlans.getAPICallsPercent.bind(ProjectPlans);
       $scope.getProgressBarClass = ProjectPlans.getProgressBarClass.bind(ProjectPlans);
+
+      $scope.showUpgradeDialog = ProjectUpgradeDialog.show.bind(ProjectUpgradeDialog);
     }
+
   ])
   .filter('trusted', [
     '$sce',
@@ -466,6 +489,16 @@ angular
           $rootScope.user = user;
         });
       }
+
+      $rootScope.isProjectOwner = function(project) {
+        return $rootScope.user && $rootScope.user._id === project.owner;
+      };
+
+      // Adding the alerts capability.
+      $rootScope.alerts = [];
+      $rootScope.closeAlert = function(index) {
+        $rootScope.alerts.splice(index, 1);
+      };
 
       $rootScope.$state = $state;
       $rootScope.$stateParams = $stateParams;
@@ -601,25 +634,43 @@ angular
     return {
       plans: {
         basic: {
-          name: 'Basic',
-          labelStyle: 'label-info'
+          order: 1,
+          name: 'basic',
+          title: 'Basic',
+          labelStyle: 'label-info',
+          priceDescription: 'Free'
         },
         independent: {
-          name: 'Independent',
-          labelStyle: 'label-warning'
+          order: 2,
+          name: 'independent',
+          title: 'Independent',
+          labelStyle: 'label-warning',
+          priceDescription: '$15/mo'
         },
         team: {
-          name: 'Team Pro',
-          labelStyle: 'label-success'
+          order: 3,
+          name: 'team',
+          title: 'Team Pro',
+          labelStyle: 'label-success',
+          priceDescription: 'Starting at $100/mo'
         },
         commercial: {
-          name: 'Commercial',
-          labelStyle: 'label-commercial'
+          order: 4,
+          name: 'commercial',
+          title: 'Commercial',
+          labelStyle: 'label-commercial',
+          priceDescription: 'Starting at $250/mo per instance'
         }
+      },
+      getPlans: function() {
+        return _(this.plans).values().sort('order').value();
+      },
+      getPlan: function(plan) {
+        return this.plans[plan];
       },
       getPlanName: function(plan) {
         if(!this.plans[plan]) return '';
-        return this.plans[plan].name;
+        return this.plans[plan].title;
       },
       getPlanLabel: function(plan) {
         if(!this.plans[plan]) return '';

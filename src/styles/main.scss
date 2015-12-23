@@ -1088,3 +1088,92 @@ footer {
     text-align: center;
   }
 }
+
+/********************* Project Plan Upgrade Dialog *********************/
+.ngdialog.ngdialog-theme-default.project-upgrade .ngdialog-content {
+  padding: 0;
+  border-radius: 0;
+  @media (max-width: $screen-sm-min) {
+    width: 100%;
+  }
+  @media (min-width: $screen-sm-min) {
+    width: 95%;
+  }
+  @media (min-width: $screen-md-min) {
+    width: $container-md - 75px;
+  }
+  @media (min-width: $screen-lg-min) {
+    width: $container-lg - 150px;
+  }
+}
+
+.project-upgrade-dialog {
+  @media (min-width: $screen-sm-min) {
+    display: flex;
+  }
+  .table {
+    .fa-check {
+      color: #FFF;
+    }
+
+    .fa-times {
+      color: $brand-danger;
+    }
+  }
+  .selected-plan {
+    cursor: pointer;
+    padding-left: 5px;
+    .price-description {
+      color: transparentize($gray-lighter, .25);
+    }
+  }
+  .form-column {
+    padding: 1em 3em 1em 2em;
+
+    .payment-info {
+      &:not(:first-of-type) {
+        margin-top: 0;
+      }
+      margin-bottom: 5px;
+    }
+  }
+  .plan-column {
+    padding: 1em;
+    background-color: #FFF;
+    color: $gray-lighter;
+
+    &.plan-column-basic {
+      background-color: darken($price-panel-basic, 10%);
+    }
+
+    &.plan-column-independent {
+      background-color: darken($price-panel-independent, 10%);
+    }
+
+    &.plan-column-team {
+      background-color: darken($price-panel-team, 10%);
+    }
+
+    &.plan-column-commercial {
+      background-color: darken($price-panel-commercial, 10%);
+    }
+
+    .table {
+      &.feature-table > tbody > tr > td {
+        border-top: 1px solid transparentize(#FFF, .85);
+      }
+      .table {
+        background-color: transparent;
+        & > tbody > tr > td {
+          border: 1px solid transparentize(#FFF, .5);
+        }
+      }
+    }
+  }
+  .plan-menu-item {
+    h3 {
+      margin-top: 10.5px;
+
+    }
+  }
+}
