@@ -252,7 +252,6 @@ app.controller('FormController', [
       $scope.loadFormPromise = $scope.formio.loadForm().then(function(form) {
         $scope.form = form;
         $rootScope.currentForm = $scope.form;
-        $scope.components = FormioUtils.flattenComponents($scope.form.components);
       }, FormioAlerts.onError.bind(FormioAlerts));
       $scope.formio.loadActions().then(function(actions) {
         // Get the available actions for the form, to check if premium actions are present.
