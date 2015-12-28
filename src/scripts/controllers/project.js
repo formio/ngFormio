@@ -42,10 +42,20 @@ app.directive('uniqueChecker', ['$http', '$q', 'Formio', function($http, $q, For
     require: 'ngModel',
     restrict: 'A',
     link: function($scope, el, attrs, ngModel) {
+      var original = '';
       ngModel.$asyncValidators.unique = function(modelValue, viewValue) {
+        var value = modelValue || viewValue;
+        if (!original && value) {
+          original = value;
+        }
+        if (original && original === value) {
+          var deferred = $q.defer();
+          return deferred.promise;
+          deferred.resolve();
+        }
+
         $scope.param = $scope.param || 'name';
         $scope.resultProp = $scope.resultProp || 'available';
-        var value = modelValue || viewValue;
         var req = {};
         req[$scope.param] = value;
 

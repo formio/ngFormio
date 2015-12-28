@@ -38,10 +38,7 @@
     "ngFormio": "0.3.8",
     "angular-sanitize": "~1.4.7",
     "lodash": "~3.10.1",
-    "angular-bootstrap": "~0.14.0",
     "bootstrap-ui-datetime-picker": "~2.0.4",
-    "ng-file-upload": "~10.1.11",
-    "signature_pad": "~1.5.2",
     "moment": "~2.10.6"
   },
   "overrides": {
