@@ -117,14 +117,19 @@ module.exports = function (app) {
     '$window',
     'Upload',
     'Formio',
+    'FormioPlugins',
     function(
       $scope,
       $rootScope,
       $window,
       Upload,
-      Formio
+      Formio,
+      FormioPlugins
     ) {
       $scope.fileUploads = {};
+
+      var plugins = FormioPlugins.get('storage');
+      console.log(plugins);
 
       $scope.removeUpload = function(index) {
         console.log(index);
@@ -141,6 +146,26 @@ module.exports = function (app) {
 
       $scope.upload = function(files) {
         if ($scope.component.storage && files && files.length) {
+          var plugin = FormioPlugins.get('storage', $scope.component.storage);
+          if (plugin) {
+            $scope.fileUploads[file.name] = {
+              name: file.name,
+              size: file.size,
+              status: 'info',
+              message: 'Starting upload'
+            };
+            angular.forEach(files, function(file) {
+              plugin.uploadFile(file);
+            });
+          }
+          else {
+            $scope.fileUploads[file.name] = {
+              name: file.name,
+              size: file.size,
+              status: 'error',
+              message: 'Storage plugin not found'
+            };
+          }
           switch($scope.component.storage) {
             case 's3':
               angular.forEach(files, function(file) {

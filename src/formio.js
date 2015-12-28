@@ -9,9 +9,11 @@ var app = angular.module('formio', [
 ]);
 
 /**
- * Create the formio provider.
+ * Create the formio providers.
  */
 app.provider('Formio', require('./providers/Formio'));
+
+app.provider('FormioPlugins', require('./providers/FormioPlugins'));
 
 /**
  * Provides a way to regsiter the Formio scope.
