@@ -53,7 +53,7 @@ app.directive('uniqueChecker', ['$http', '$q', 'Formio', function($http, $q, For
           return $q.reject();
         }
 
-        return $http.post(Formio.baseUrl + $scope.url, req)
+        return $http.post(Formio.getBaseUrl() + $scope.url, req)
           .then(function(response) {
             if(!response.data.available) {
               return $q.reject('unavailable');
