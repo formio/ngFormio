@@ -28,7 +28,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr ng-repeat="component in components">
+            <tr ng-repeat="component in form.components | flattenComponents">
               <td>{{ component.label }}</td>
               <td>{{ component.key }}</td>
               <td>{{ component.type }}</td>
