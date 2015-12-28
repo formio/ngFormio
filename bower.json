@@ -22,7 +22,7 @@
     "chartist": "~0.9.5",
     "angular-chartist.js": "~3.3.12",
     "bootswatch": "3.3.4+1",
-    "signature_pad": "~1.3.6"
+    "signature_pad": "~1.3.6",
     "bootstrap-ui-datetime-picker": "~1.1.0",
     "angular-paginate-anything": "~4.1.2",
     "kendo-ui": "kendo-ui-core#2015.2.902+SP2",
