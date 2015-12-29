@@ -1,0 +1,12 @@
+global.jQuery = require('jquery');
+require('angular');
+require('angular-ui-mask');
+require('angular-ui-select/select');
+require('angular-moment');
+require('angular-sanitize');
+require('signature_pad');
+require('ng-file-upload');
+require('bootstrap');
+require('bootstrap-ui-datetime-picker/dist/datetime-picker');
+require('angular-ui-bootstrap');
+require('./formio');
