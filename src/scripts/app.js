@@ -194,7 +194,7 @@ angular
         .state('project.settings.email', {
           url: '/email',
           parent: 'project.settings',
-          templateUrl: 'views/project/email/email.html',
+          templateUrl: 'views/project/email/email.html'
         })
         .state('project.settings.storage', {
           url: '/storage',

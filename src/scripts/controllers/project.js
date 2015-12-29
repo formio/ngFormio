@@ -734,51 +734,13 @@ app.controller('ProjectSendgridEmailController', [
   function(
     $scope
   ) {
-    $scope.options = ['Credentials', 'API Key'];
-
     // Force the sendgrid settings to be defined.
     $scope.currentProject.settings = $scope.currentProject.settings || {};
     $scope.currentProject.settings.email = $scope.currentProject.settings.email || {};
     $scope.currentProject.settings.email.sendgrid = $scope.currentProject.settings.email.sendgrid || {};
     $scope.currentProject.settings.email.sendgrid.auth = $scope.currentProject.settings.email.sendgrid.auth || {};
-    $scope.currentProject.settings.email.sendgrid.auth.api_user = $scope.currentProject.settings.email.sendgrid.auth.api_user || '';
+    $scope.currentProject.settings.email.sendgrid.auth.api_user = $scope.currentProject.settings.email.sendgrid.auth.api_user || 'apikey';
     $scope.currentProject.settings.email.sendgrid.auth.api_key = $scope.currentProject.settings.email.sendgrid.auth.api_key || '';
-
-    // Determine the display labels and initial selection.
-    if (_.get($scope.currentProject, 'settings.email.sendgrid.auth.api_user') === 'apikey') {
-      $scope.selected = 'API Key';
-      $scope.passwordLabel = 'API Key';
-      $scope.passwordPlaceholder = 'SendGrid API Key';
-    }
-    else {
-      $scope.selected = 'Credentials';
-      $scope.passwordLabel = 'Password';
-      $scope.passwordPlaceholder = 'SendGrid API Password';
-    }
-
-    // Change the display based on the api_user value.
-    $scope.$watch('currentProject.settings.email.sendgrid.auth.api_user', function(current, old) {
-      if ((current !== old) && (current === 'apikey')) {
-        $scope.selected = 'API Key';
-      }
-    });
-
-    // Watch for the selected item to change.
-    $scope.$watch('selected', function(current, old) {
-      if (current !== old) {
-        if (current === 'API Key') {
-          // Set the api user for sendgrid.
-          $scope.currentProject.settings.email.sendgrid.auth.api_user = 'apikey';
-          $scope.passwordLabel = 'API Key';
-          $scope.passwordPlaceholder = 'SendGrid API Key';
-        }
-        else {
-          $scope.currentProject.settings.email.sendgrid.auth.api_user = '';
-          $scope.passwordLabel = 'Password';
-          $scope.passwordPlaceholder = 'SendGrid API Password';
-        }
-      }
-    });
   }
 ]);
 
