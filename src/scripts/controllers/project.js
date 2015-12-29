@@ -50,8 +50,8 @@ app.directive('uniqueChecker', ['$http', '$q', 'Formio', function($http, $q, For
         }
         if (original && original === value) {
           var deferred = $q.defer();
-          return deferred.promise;
           deferred.resolve();
+          return deferred.promise;
         }
 
         $scope.param = $scope.param || 'name';
