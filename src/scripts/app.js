@@ -193,7 +193,8 @@ angular
         })
         .state('project.settings.email', {
           url: '/email',
-          templateUrl: 'views/project/email/email.html'
+          parent: 'project.settings',
+          templateUrl: 'views/project/email/email.html',
         })
         .state('project.settings.storage', {
           url: '/storage',
