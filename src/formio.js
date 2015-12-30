@@ -61,6 +61,8 @@ app.config([
   }
 ]);
 
+require('./plugins')(app);
+
 app.run([
   '$templateCache',
   function($templateCache) {
