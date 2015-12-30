@@ -24,7 +24,8 @@ angular
     'formioApp.utils',
     'kendo.directives',
     'truncate',
-    'ngFileUpload'
+    'ngFileUpload',
+    'ng-formio-plugins'
   ])
   .config([
     '$stateProvider',
