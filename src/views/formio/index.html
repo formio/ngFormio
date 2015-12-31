@@ -1,11 +1,18 @@
-<div class="row" style="overflow: visible;">
+<div class="row" style="overflow: visible;" ng-init="updateUsage()">
   <div class="col-md-10 col-md-offset-1">
     <div class="row">
 
       <br>
       <div class="row">
         <div class="col-md-12">
-          <h3>Monthly Submission Requests for {{viewDate.month}}/{{viewDate.year}}, by Project</h3>
+          <h3>{{showDaily ? 'Daily' : 'Monthly'}} Submission Requests for
+            <select ng-model="viewDate.month" ng-options="month for month in months" ng-change="updateUsage()"></select> /
+            <select ng-show="showDaily" ng-model="viewDate.day" ng-options="day for day in days" ng-change="updateUsage()"></select>
+            {{showDaily ? ' / ' : ''}}
+            <select ng-model="viewDate.year" ng-options="year for year in years" ng-change="updateUsage()"></select>
+            , by Project
+          </h3>
+          <button class="btn btn-default btn-xs" ng-click="toggle('showDaily')">Show {{showDaily ? 'Monthly' : 'Daily'}}</button>
           <button class="btn btn-default btn-xs" ng-click="toggle('showCreated')">{{showCreated ? 'Hide' : 'Show'}} Created</button>
           <button class="btn btn-default btn-xs" ng-click="toggle('showIds')">{{showIds ? 'Hide' : 'Show'}} _id's</button>
           <table class="table table-striped">
@@ -44,7 +51,14 @@
       <br>
       <div class="row">
         <div class="col-md-12">
-          <h3>Monthly Non-Submission Requests for {{viewDate.month}}/{{viewDate.year}}, by Project</h3>
+          <h3>{{showDaily ? 'Daily' : 'Monthly'}} Non-Submission Requests for
+            <select ng-model="viewDate.month" ng-options="month for month in months" ng-change="updateUsage()"></select> /
+            <select ng-show="showDaily" ng-model="viewDate.day" ng-options="day for day in days" ng-change="updateUsage()"></select>
+            {{showDaily ? ' / ' : ''}}
+            <select ng-model="viewDate.year" ng-options="year for year in years" ng-change="updateUsage()"></select>
+            , by Project
+          </h3>
+          <button class="btn btn-default btn-xs" ng-click="toggle('showDaily')">Show {{showDaily ? 'Monthly' : 'Daily'}}</button>
           <button class="btn btn-default btn-xs" ng-click="toggle('showCreated')">{{showCreated ? 'Hide' : 'Show'}} Created</button>
           <button class="btn btn-default btn-xs" ng-click="toggle('showIds')">{{showIds ? 'Hide' : 'Show'}} _id's</button>
           <table class="table table-striped">
