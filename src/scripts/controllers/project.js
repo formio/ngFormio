@@ -508,6 +508,170 @@ app.controller('ProjectDataController', [
   }
 ]);
 
+app.controller('ProjectFormioController', [
+  '$scope',
+  'Formio',
+  'AppConfig',
+  function(
+    $scope,
+    Formio,
+    AppConfig
+  ) {
+    $scope.showCreated = false;
+    $scope.showIds = false;
+    $scope.toggle = function(btn) {
+      $scope[btn] = !$scope[btn];
+    };
+
+    // Get the current time.
+    var curr = new Date();
+    $scope.viewDate = {
+      year: curr.getUTCFullYear(),
+      month: (curr.getUTCMonth() + 1),
+      day: curr.getUTCDate()
+    };
+
+    /**
+     *
+     * @param projectIds
+     * @param next
+     */
+    var getProjectData = function(projectIds, next) {
+      if (!(projectIds instanceof Array)) {
+        projectIds = [projectIds];
+      }
+
+      Formio.request(AppConfig.apiBase + '/analytics/translate/project', 'POST', projectIds)
+        .then(function(data) {
+          return next(data);
+        });
+    };
+
+    /**
+     *
+     * @param ownerIds
+     * @param next
+     */
+    var getOwnerData = function(ownerIds, next) {
+      if (!(ownerIds instanceof Array)) {
+        ownerIds = [ownerIds];
+      }
+
+      Formio.request(AppConfig.apiBase + '/analytics/translate/owner', 'POST', ownerIds)
+        .then(function(data) {
+          return next(data);
+        });
+    };
+
+    /**
+     * Merge two arrays of objects together using the shared key as a primary index.
+     *
+     * @param {Array} original
+     * @param {Array} potentiallyNew
+     * @param [String] key
+     * @returns {Array}
+     */
+    var merge = function(original, potentiallyNew, key) {
+      if (!key) {
+        key = '_id';
+      }
+
+      // Build a map with the new data.
+      var potentialMap = {};
+      _.forEach(potentiallyNew, function(element) {
+        potentialMap[element[key]] = element;
+      });
+
+      return _(original)
+        .map(function(element) {
+          if (potentialMap[element[key]]) {
+            return _.merge(element, potentialMap[element[key]]);
+          }
+
+          return element;
+        })
+        .value();
+    };
+
+    $scope.usageLoading = true;
+    Formio.request(AppConfig.apiBase + '/analytics/project/year/' + $scope.viewDate.year + '/month/' + $scope.viewDate.month, 'GET')
+    .then(function(data) {
+      data = _(data)
+        .map(function(element) {
+          var calls = element[0];
+          var key = element[1].split(':');
+          var _y = key[0];
+          var _m = key[1];
+          var _d = key[2];
+          var project = key[3];
+          var type = key[4];
+
+          return {_id: project, calls: calls, type: type, year: _y, month: _m, day: _d};
+        })
+        .value();
+
+      $scope.monthlyUsage = _(data)
+        .groupBy(function(element) {
+          return element._id;
+        })
+        .map(function(groups, _id) {
+          var submissions = _(groups)
+            .filter({type: 's'})
+            .pluck('calls')
+            .value();
+          var nonsubmissions = _(groups)
+            .filter({type: 'ns'})
+            .pluck('calls')
+            .value();
+
+          return {
+            _id: _id,
+            submissions: _.sum(submissions),
+            nonsubmissions: _.sum(nonsubmissions)
+          };
+        })
+        .value();
+
+      $scope.monthlySubmissions = _($scope.monthlyUsage)
+        .sortByOrder(['submissions'], ['desc'])
+        .take(20)
+        .value();
+      $scope.monthlyNonsubmissions = _($scope.monthlyUsage)
+        .sortByOrder(['nonsubmissions'], ['desc'])
+        .take(20)
+        .value();
+
+      $scope.usageLoading = false;
+      $scope.$apply();
+
+      // Update project data for top submissions.
+      var allProjects = _.uniq(_.pluck($scope.monthlySubmissions, '_id').concat(_.pluck($scope.monthlyNonsubmissions, '_id')));
+      getProjectData(allProjects, function(submissionData) {
+        $scope.monthlySubmissions = merge($scope.monthlySubmissions, submissionData);
+        $scope.monthlyNonsubmissions = merge($scope.monthlyNonsubmissions, submissionData);
+        $scope.$apply();
+
+        var allOwners = _.uniq(_.pluck($scope.monthlySubmissions, 'owner').concat(_.pluck($scope.monthlyNonsubmissions, 'owner')));
+        getOwnerData(allOwners, function(ownerData) {
+          // Change the data response format for merge.
+          ownerData = _(ownerData)
+            .map(function(element) {
+              return {
+                owner: element._id,
+                ownerData: element.data
+              };
+            })
+            .value();
+
+          $scope.monthlySubmissions = merge($scope.monthlySubmissions, ownerData, 'owner');
+          $scope.monthlyNonsubmissions = merge($scope.monthlyNonsubmissions, ownerData, 'owner');
+          $scope.$apply();
+        });
+      });
+    });
+  }
+]);
+
 app.controller('ProjectSettingsController', [
   '$scope',
   '$rootScope',
