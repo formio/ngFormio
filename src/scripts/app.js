@@ -186,11 +186,6 @@ angular
           url: '/project',
           templateUrl: 'views/project/project-settings.html'
         })
-        .state('project.settings.plan', {
-          url: '/plan',
-          templateUrl: 'views/project/project-plan.html',
-          controller: 'ProjectPlanController'
-        })
         .state('project.settings.email', {
           url: '/email',
           templateUrl: 'views/project/email/email.html'
