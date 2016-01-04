@@ -138,6 +138,11 @@ angular
           templateUrl: 'views/data/index.html',
           controller: 'ProjectDataController'
         })
+        .state('project.formio', {
+          url: '/formio',
+          templateUrl: 'views/formio/index.html',
+          controller: 'ProjectFormioController'
+        })
         .state('project.preview', {
           url: '/preview',
           templateUrl: 'views/project/preview.html',
