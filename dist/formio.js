@@ -4307,25 +4307,15 @@ module.exports = function (app) {
       template: '<a href="{{ file.url }}" ng-click="getFile($event)" target="_blank">{{ file.name }}</a>',
       controller: [
         '$scope',
-        'Formio',
-        '$window',
+        'FormioPlugins',
         function (
           $scope,
-          Formio,
-          $window
+          FormioPlugins
         ) {
           $scope.getFile = function (evt) {
-            // If this is not a public file, get a signed url and open in new tab.
-            if ($scope.file.acl !== 'public-read') {
-              evt.preventDefault();
-              Formio.request($scope.form + '/storage/s3?bucket=' + $scope.file.bucket + '&key=' + $scope.file.key, 'GET')
-                .then(function (response) {
-                  $window.open(response.url, '_blank');
-                })
-                .catch(function (response) {
-                  // Is alert the best way to do this? User is expecting an immediate notification due to attempting to download a file.
-                  alert(response);
-                });
+            var plugin = FormioPlugins('storage', $scope.file.storage);
+            if (plugin) {
+              plugin.downloadFile(evt, $scope.file, $scope);
             }
           };
         }
@@ -4335,17 +4325,14 @@ module.exports = function (app) {
 
   app.controller('formioFileUpload', [
     '$scope',
-    'Upload',
-    'Formio',
+    'FormioPlugins',
     function(
       $scope,
-      Upload,
-      Formio
+      FormioPlugins
     ) {
       $scope.fileUploads = {};
 
       $scope.removeUpload = function(index) {
-        console.log(index);
         delete $scope.fileUploads[index];
       };
 
@@ -4359,57 +4346,35 @@ module.exports = function (app) {
 
       $scope.upload = function(files) {
         if ($scope.component.storage && files && files.length) {
-          switch($scope.component.storage) {
-            case 's3':
-              angular.forEach(files, function(file) {
-                $scope.fileUploads[file.name] = {
-                  name: file.name,
-                  size: file.size,
-                  status: 'info',
-                  message: 'Starting upload'
-                };
-                Formio.request($scope.formio.formUrl + '/storage/s3', 'POST', {name: file.name, size: file.size, type: file.type})
-                  .then(function(response) {
-                    var request = {
-                      url: response.url,
-                      method: 'POST',
-                      data: response.data
-                    };
-                    request.data.file = file;
-                    var dir = $scope.component.dir || '';
-                    request.data.key += dir + file.name;
-                    var upload = Upload.upload(request);
-                    upload
-                      .then(function(resp) {
-                        // Handle upload finished.
-                        delete $scope.fileUploads[file.name];
-                        $scope.data[$scope.component.key].push({
-                          name: file.name,
-                          storage: 's3',
-                          bucket: response.bucket,
-                          key: request.data.key,
-                          url: response.url + request.data.key,
-                          acl: request.data.acl,
-                          size: file.size,
-                          type: file.type
-                        });
-                      }, function(resp) {
-                        // Handle error
-                        var oParser = new DOMParser();
-                        var oDOM = oParser.parseFromString(resp.data, 'text/xml');
-                        $scope.fileUploads[file.name].status = 'error';
-                        $scope.fileUploads[file.name].message = oDOM.getElementsByTagName('Message')[0].innerHTML;
-                        delete $scope.fileUploads[file.name].progress;
-                      }, function(evt) {
-                        // Progress notify
-                        $scope.fileUploads[file.name].status = 'progress';
-                        $scope.fileUploads[file.name].progress = parseInt(100.0 * evt.loaded / evt.total);
-                        delete $scope.fileUploads[file.name].message;
-                        //console.log('progress: ' + parseInt(100.0 * evt.loaded / evt.total) + '% file :'+ evt.config.data.file.name);
-                      });
-                  });
-              });
-              break;
+          var plugin = FormioPlugins('storage', $scope.component.storage);
+          if (plugin) {
+            angular.forEach(files, function(file) {
+              $scope.fileUploads[file.name] = {
+                name: file.name,
+                size: file.size,
+                status: 'info',
+                message: 'Starting upload'
+              };
+              plugin.uploadFile(file, $scope.fileUploads[file.name], $scope)
+                .then(function(fileInfo) {
+                  delete $scope.fileUploads[file.name];
+                  fileInfo.storage = $scope.component.storage;
+                  $scope.data[$scope.component.key].push(fileInfo);
+                })
+                .catch(function(message) {
+                  $scope.fileUploads[file.name].status = 'error';
+                  $scope.fileUploads[file.name].message = message;
+                  delete $scope.fileUploads[file.name].progress;
+                });
+            });
+          }
+          else {
+            $scope.fileUploads[file.name] = {
+              name: file.name,
+              size: file.size,
+              status: 'error',
+              message: 'Storage plugin not found'
+            };
           }
         }
       };
@@ -6223,9 +6188,11 @@ var app = angular.module('formio', [
 ]);
 
 /**
- * Create the formio provider.
+ * Create the formio providers.
  */
 app.provider('Formio', require('./providers/Formio'));
+
+app.provider('FormioPlugins', require('./providers/FormioPlugins'));
 
 /**
  * Provides a way to regsiter the Formio scope.
@@ -6272,6 +6239,8 @@ app.config([
     $httpProvider.interceptors.push('formioInterceptor');
   }
 ]);
+
+require('./plugins')(app);
 
 app.run([
   '$templateCache',
@@ -6372,7 +6341,66 @@ app.run([
 
 require('./components');
 
-},{"./components":18,"./directives/customValidator":32,"./directives/formio":33,"./directives/formioComponent":34,"./directives/formioDelete":35,"./directives/formioElement":36,"./directives/formioErrors":37,"./directives/formioSubmissions":38,"./factories/FormioScope":39,"./factories/FormioUtils":40,"./factories/formioInterceptor":41,"./filters/flattenComponents":42,"./filters/safehtml":43,"./providers/Formio":45}],45:[function(require,module,exports){
+},{"./components":18,"./directives/customValidator":32,"./directives/formio":33,"./directives/formioComponent":34,"./directives/formioDelete":35,"./directives/formioElement":36,"./directives/formioErrors":37,"./directives/formioSubmissions":38,"./factories/FormioScope":39,"./factories/FormioUtils":40,"./factories/formioInterceptor":41,"./filters/flattenComponents":42,"./filters/safehtml":43,"./plugins":45,"./providers/Formio":47,"./providers/FormioPlugins":48}],45:[function(require,module,exports){
+"use strict";
+module.exports = function(app) {
+  require('./storage/url')(app);
+};
+
+},{"./storage/url":46}],46:[function(require,module,exports){
+"use strict";
+module.exports = function(app) {
+  app.config([
+    'FormioPluginsProvider',
+    'FormioStorageUrlProvider',
+    function (
+      FormioPluginsProvider,
+      FormioStorageUrlProvider
+    ) {
+      FormioPluginsProvider.register('storage', 'url', FormioStorageUrlProvider.$get());
+    }
+  ]);
+
+  app.factory('FormioStorageUrl', [
+    '$q',
+    'Upload',
+    function (
+      $q,
+      Upload
+    ) {
+      return {
+        title: 'Url',
+        name: 'url',
+        uploadFile: function(file, status, $scope) {
+          var defer = $q.defer();
+          console.log('test');
+          Upload.upload({
+            url: $scope.component.url,
+            data: {
+              file: file
+            }
+          })
+            .then(function(resp) {
+              defer.resolve(resp);
+            }, function(resp) {
+              defer.reject(resp.data);
+            }, function (evt) {
+              // Progress notify
+              status.status = 'progress';
+              status.progress = parseInt(100.0 * evt.loaded / evt.total);
+              delete status.message;
+            });
+          return defer.promise;
+        },
+        downloadFile: function(evt, file, $scope) {
+          // Do nothing which will cause a normal link click to occur.
+        }
+      };
+    }]
+  );
+};
+
+},{}],47:[function(require,module,exports){
 "use strict";
 module.exports = function() {
 
@@ -6437,4 +6465,36 @@ module.exports = function() {
   };
 };
 
-},{"formiojs/src/formio.js":6}]},{},[44]);
+},{"formiojs/src/formio.js":6}],48:[function(require,module,exports){
+"use strict";
+
+module.exports = function() {
+
+  var plugins = {};
+
+  return {
+
+    register: function(type, name, plugin) {
+      if (!plugins[type]) {
+        plugins[type] = {};
+      }
+      plugins[type][name] = plugin;
+    },
+
+    $get: [
+      function() {
+        return function(type, name) {
+          if (type) {
+            if (name) {
+              return plugins[type][name] || false;
+            }
+            return plugins[type] || false;
+          }
+          return plugins;
+        };
+      }
+    ]
+  };
+};
+
+},{}]},{},[44]);
