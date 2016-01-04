@@ -715,6 +715,35 @@ app.controller('ProjectTeamDeleteController', [
   }
 ]);
 
+app.controller('ProjectPlanController', [
+  '$scope',
+  function($scope) {
+    $scope.submission = {
+      data: {
+        project: $scope.currentProject._id
+      }
+    };
+    $scope.$on('formSubmission', function() {
+      $scope.submitted = true;
+    });
+  }
+]);
+
+app.controller('ProjectSendgridEmailController', [
+  '$scope',
+  function(
+    $scope
+  ) {
+    // Force the sendgrid settings to be defined.
+    $scope.currentProject.settings = $scope.currentProject.settings || {};
+    $scope.currentProject.settings.email = $scope.currentProject.settings.email || {};
+    $scope.currentProject.settings.email.sendgrid = $scope.currentProject.settings.email.sendgrid || {};
+    $scope.currentProject.settings.email.sendgrid.auth = $scope.currentProject.settings.email.sendgrid.auth || {};
+    $scope.currentProject.settings.email.sendgrid.auth.api_user = $scope.currentProject.settings.email.sendgrid.auth.api_user || 'apikey';
+    $scope.currentProject.settings.email.sendgrid.auth.api_key = $scope.currentProject.settings.email.sendgrid.auth.api_key || '';
+  }
+]);
+
 app.controller('ProjectStorageController', [
   '$scope',
   function($scope) {
