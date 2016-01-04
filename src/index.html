@@ -10,17 +10,15 @@
     <!-- build:css styles/vendor.css -->
     <link rel="stylesheet" href="/styles/base.css" />
     <!-- bower:css -->
-    <link rel="stylesheet" href="/bower_components/angular-ui-select/dist/select.css" />
+    <link rel="stylesheet" href="/bower_components/ng-sortable/dist/ng-sortable.css" />
     <link rel="stylesheet" href="/bower_components/ngDialog/css/ngDialog.css" />
     <link rel="stylesheet" href="/bower_components/ngDialog/css/ngDialog-theme-default.css" />
-    <link rel="stylesheet" href="/bower_components/ng-sortable/dist/ng-sortable.css" />
-    <link rel="stylesheet" href="/bower_components/ng-sortable/dist/ng-sortable.style.css" />
-    <link rel="stylesheet" href="/bower_components/formio/css/formio.css" />
     <link rel="stylesheet" href="/bower_components/ng-ckeditor/ng-ckeditor.css" />
+    <link rel="stylesheet" href="/bower_components/ui-select/dist/select.css" />
+    <link rel="stylesheet" href="/bower_components/formio/css/formio.css" />
     <link rel="stylesheet" href="/bower_components/ng-dialog/css/ngDialog.css" />
     <link rel="stylesheet" href="/bower_components/ng-dialog/css/ngDialog-theme-default.css" />
     <link rel="stylesheet" href="/bower_components/ngFormBuilder/css/formBuilder.css" />
-    <link rel="stylesheet" href="/bower_components/font-awesome/css/font-awesome.css" />
     <link rel="stylesheet" href="/bower_components/chartist/dist/chartist.min.css" />
     <link rel="stylesheet" href="/bower_components/kendo-ui/styles/kendo.common.min.css" />
     <link rel="stylesheet" href="/bower_components/kendo-ui/styles/kendo.bootstrap.min.css" />
@@ -98,23 +96,7 @@
           </div>
         </div>
       </nav>
-      <div class="jumbotron welcome-banner" ng-cloak ng-if="showHeader">
-        <div class="container">
-          <h1>Welcome to <img style="height:1em;" src="images/formio-logo-white.png"></h1>
-          <p>Take a look at these resources to help you get started.</p>
-          <ul class="list-inline">
-            <li><a class="btn btn-default btn-lg" href="http://help.form.io/start" target="_blank"  role="button"><i class="fa fa-play-circle-o"></i> 5 min. tutorial</a></li>
-            <li><a class="btn btn-default btn-lg" href="http://help.form.io/intro" target="_blank"  role="button"><i class="fa fa-clock-o"></i> Quickstart</a></li>
-            <li><a class="btn btn-default btn-lg" href="http://help.form.io/userguide" target="_blank" role="button"><i class="fa fa-search"></i> Users Guide</a></li>
-            <li><a class="btn btn-default btn-lg" href="http://help.form.io/api" target="_blank" role="button"><i class="fa fa-file-code-o"></i> API Docs</a></li>
-          </ul>
-        </div>
-      </div>
-      <div class="row {{ mainClass }}" id="main-wrapper" ng-cloak>
-        <div class="col-sm-12 main">
-          <div ui-view></div>
-        </div>
-      </div>
+      <div class="{{ mainClass }}" id="main-wrapper" ui-view ng-cloak></div>
       <formio-feedback></formio-feedback>
     </div>
 
@@ -186,27 +168,26 @@
     <script src="/bower_components/jquery/dist/jquery.js"></script>
     <script src="/bower_components/angular/angular.js"></script>
     <script src="/bower_components/angular-ui-router/release/angular-ui-router.js"></script>
-    <script src="/bower_components/angular-ui-select/dist/select.js"></script>
     <script src="/bower_components/angular-sanitize/angular-sanitize.js"></script>
     <script src="/bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
     <script src="/bower_components/moment/moment.js"></script>
     <script src="/bower_components/angular-moment/angular-moment.js"></script>
-    <script src="/bower_components/ngDialog/js/ngDialog.js"></script>
     <script src="/bower_components/ng-sortable/dist/ng-sortable.js"></script>
+    <script src="/bower_components/angular-drag-and-drop-lists/angular-drag-and-drop-lists.js"></script>
+    <script src="/bower_components/ngDialog/js/ngDialog.js"></script>
+    <script src="/bower_components/lodash/lodash.js"></script>
+    <script src="/bower_components/ckeditor/ckeditor.js"></script>
+    <script src="/bower_components/ng-ckeditor/ng-ckeditor.js"></script>
     <script src="/bower_components/ng-file-upload/ng-file-upload.js"></script>
+    <script src="/bower_components/ui-select/dist/select.js"></script>
     <script src="/bower_components/bootstrap-ui-datetime-picker/dist/datetime-picker.min.js"></script>
     <script src="/bower_components/signature_pad/signature_pad.js"></script>
     <script src="/bower_components/angular-ui-mask/dist/mask.js"></script>
     <script src="/bower_components/formio/dist/formio.js"></script>
-    <script src="/bower_components/angular-drag-and-drop-lists/angular-drag-and-drop-lists.js"></script>
-    <script src="/bower_components/lodash/lodash.js"></script>
-    <script src="/bower_components/ckeditor/ckeditor.js"></script>
-    <script src="/bower_components/ng-ckeditor/ng-ckeditor.js"></script>
     <script src="/bower_components/ng-dialog/js/ngDialog.js"></script>
     <script src="/bower_components/ngFormBuilder/dist/ngFormBuilder.js"></script>
     <script src="/bower_components/seamless/build/seamless.parent.min.js"></script>
     <script src="/bower_components/angular-base64/angular-base64.js"></script>
-    <script src="/bower_components/angular-animate/angular-animate.js"></script>
     <script src="/bower_components/chartist/dist/chartist.min.js"></script>
     <script src="/bower_components/angular-chartist.js/dist/angular-chartist.js"></script>
     <script src="/bower_components/angular-paginate-anything/dist/paginate-anything-tpls.js"></script>
@@ -220,18 +201,18 @@
     <!-- endbuild -->
 
     <!-- build:js scripts/plugins.js -->
-    <script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/affix.js"></script>
-    <script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/alert.js"></script>
-    <script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/dropdown.js"></script>
-    <script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/tooltip.js"></script>
-    <script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/modal.js"></script>
-    <script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/transition.js"></script>
-    <script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/button.js"></script>
-    <script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/popover.js"></script>
-    <script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/carousel.js"></script>
-    <script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/scrollspy.js"></script>
-    <script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/collapse.js"></script>
-    <script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/tab.js"></script>
+    <script src="/bower_components/bootstrap-sass/assets/javascripts/bootstrap/affix.js"></script>
+    <script src="/bower_components/bootstrap-sass/assets/javascripts/bootstrap/alert.js"></script>
+    <script src="/bower_components/bootstrap-sass/assets/javascripts/bootstrap/dropdown.js"></script>
+    <script src="/bower_components/bootstrap-sass/assets/javascripts/bootstrap/tooltip.js"></script>
+    <script src="/bower_components/bootstrap-sass/assets/javascripts/bootstrap/modal.js"></script>
+    <script src="/bower_components/bootstrap-sass/assets/javascripts/bootstrap/transition.js"></script>
+    <script src="/bower_components/bootstrap-sass/assets/javascripts/bootstrap/button.js"></script>
+    <script src="/bower_components/bootstrap-sass/assets/javascripts/bootstrap/popover.js"></script>
+    <script src="/bower_components/bootstrap-sass/assets/javascripts/bootstrap/carousel.js"></script>
+    <script src="/bower_components/bootstrap-sass/assets/javascripts/bootstrap/scrollspy.js"></script>
+    <script src="/bower_components/bootstrap-sass/assets/javascripts/bootstrap/collapse.js"></script>
+    <script src="/bower_components/bootstrap-sass/assets/javascripts/bootstrap/tab.js"></script>
     <!-- endbuild -->
 
     <!-- build:js scripts/app.js -->

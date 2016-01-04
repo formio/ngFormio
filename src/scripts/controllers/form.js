@@ -3,7 +3,6 @@
 /* global _: false */
 var app = angular.module('formioApp.controllers.form', [
   'ngDialog',
-  'ui.sortable',
   'ui.bootstrap.tabs',
   'ui.bootstrap.tpls',
   'ui.bootstrap.accordion',

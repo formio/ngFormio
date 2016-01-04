@@ -120,7 +120,7 @@ angular
         })
         .state('project', {
           abstract: true,
-          url: '/project/:projectId',
+          url: '/project/:projectId?welcome',
           controller: 'ProjectController',
           templateUrl: 'views/project/project.html'
         })
@@ -316,20 +316,124 @@ angular
       $urlRouterProvider.otherwise('/');
     }
   ])
+  .factory('FormioProject', [
+    '$http',
+    '$q',
+    'Formio',
+    'FormioAlerts',
+    'GoogleAnalytics',
+    function(
+      $http,
+      $q,
+      Formio,
+      FormioAlerts,
+      GoogleAnalytics
+    ) {
+      var loaded = false;
+      var templates = [
+        {
+          "title": "Default",
+          "name": "default",
+          "description": "A default project with User and Admin resources and their respective authentication forms.",
+          template: 'default',
+          "preview": {
+            "url": "http://formio.github.io/formio-app-basic",
+            "repo": "https://github.com/formio/formio-app-basic"
+          }
+        },
+        {
+          "title": "Empty",
+          "name": "empty",
+          "description": "An empty project with no forms or resources. Create a project with a fresh start!",
+          template: 'empty',
+          "preview": {
+            "url": "http://formio.github.io/formio-app-template",
+            "repo": "https://github.com/formio/formio-app-template"
+          }
+        }
+      ];
+
+      return {
+        createProject: function(project) {
+          var deferred = $q.defer();
+          var formio = new Formio();
+
+          // Default all new projects to have cors set to '*'.
+          if (!project.settings) {
+            project.settings = {};
+          }
+          if (!project.settings.cors) {
+            project.settings.cors = '*';
+          }
+
+          formio.saveProject(project).then(function(project) {
+            FormioAlerts.addAlert({
+              type: 'success',
+              message: 'New Project created!'
+            });
+            GoogleAnalytics.sendEvent('Project', 'create', null, 1);
+            deferred.resolve(project);
+          }, function(error) {
+            if (error.data && error.data.message && error.data.message.indexOf('duplicate key error index') !== -1) {
+              error.data.errors.name = {
+                path: 'name',
+                message: 'Project domain already exists. Please pick a different domain.'
+              };
+            }
+            FormioAlerts.onError(error);
+            deferred.reject();
+          });
+          return deferred.promise;
+        },
+        loadTemplates: function() {
+          var deferred = $q.defer();
+          if (loaded) {
+            deferred.resolve(templates);
+            return deferred.promise;
+          }
+
+          // Try to load the external template source.
+          $http.get(
+            'https://formio.github.io/help.form.io/templates/index.json',
+            {
+              disableJWT: true,
+              headers: {
+                Authorization: undefined,
+                Pragma: undefined,
+                'Cache-Control': undefined
+              }
+            }
+          ).then(function (result) {
+            templates = (result && result.data) ? result.data : templates;
+            loaded = true;
+            deferred.resolve(templates);
+          }, function() {
+            loaded = true;
+            deferred.resolve(templates);
+          });
+          return deferred.promise;
+        }
+      };
+    }
+  ])
   .controller('HomeController', [
     '$scope',
+    '$state',
     '$rootScope',
     'Formio',
     'FormioAlerts',
+    'FormioProject',
     'ProjectPlans',
     'ProjectUpgradeDialog',
     '$timeout',
     '$q',
     function(
       $scope,
+      $state,
       $rootScope,
       Formio,
       FormioAlerts,
+      FormioProject,
       ProjectPlans,
       ProjectUpgradeDialog,
       $timeout,
@@ -368,6 +472,17 @@ angular
 
       $scope.teamSupport = function(project) {
         return (project.plan === 'team' || project.plan === 'commercial');
+      };
+
+      $scope.templates = [];
+      FormioProject.loadTemplates().then(function(templates) {
+        $scope.templates = templates;
+      });
+
+      $scope.createProject = function(template) {
+        FormioProject.createProject(template).then(function(project) {
+          $state.go('project.resource.index', {projectId: project._id, welcome: true});
+        });
       };
 
       $scope.projects = {};

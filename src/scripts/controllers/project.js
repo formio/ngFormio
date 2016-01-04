@@ -81,47 +81,30 @@ app.controller('ProjectCreateController', [
   '$state',
   'FormioAlerts',
   'Formio',
-  '$http',
-  'GoogleAnalytics',
+  'FormioProject',
   function(
     $scope,
     $rootScope,
     $state,
     FormioAlerts,
     Formio,
-    $http,
-    GoogleAnalytics
+    FormioProject
   ) {
     $rootScope.noBreadcrumb = false;
     $scope.currentProject = {template: 'default'};
     $scope.hasTemplate = false;
     $scope.showName = false;
     $scope.templateLimit = 3;
-    var formio = new Formio();
 
-    // The project templates.
-    $scope.templates = [
-      {
-        "title": "Default",
-        "name": "default",
-        "description": "A default project with User and Admin resources and their respective authentication forms.",
-        template: 'default',
-        "preview": {
-          "url": "http://formio.github.io/formio-app-basic",
-          "repo": "https://github.com/formio/formio-app-basic"
+    $scope.templates = [];
+    FormioProject.loadTemplates().then(function(templates) {
+      $scope.templates = templates;
+      angular.forEach(templates, function(template) {
+        if (template.name === $scope.currentProject.template) {
+          $scope.currentProject.template = template.template;
         }
-      },
-      {
-        "title": "Empty",
-        "name": "empty",
-        "description": "An empty project with no forms or resources. Create a project with a fresh start!",
-        template: 'empty',
-        "preview": {
-          "url": "http://formio.github.io/formio-app-template",
-          "repo": "https://github.com/formio/formio-app-template"
-        }
-      }
-    ];
+      });
+    });
 
     $scope.showAllTemplates = function() {
       $scope.templateLimit = Infinity;
@@ -159,50 +142,9 @@ app.controller('ProjectCreateController', [
       $scope.hasTemplate = false;
     };
 
-    // Try to load the external template source.
-    $http.get(
-      'https://formio.github.io/help.form.io/templates/index.json',
-      {
-        disableJWT: true,
-        headers: {
-          Authorization: undefined,
-          Pragma: undefined,
-          'Cache-Control': undefined
-        }
-      }
-    ).success(function (result) {
-      angular.forEach(result, function(template) {
-        if (template.name === $scope.currentProject.template) {
-          $scope.currentProject.template = template.template;
-        }
-      });
-      $scope.templates = result;
-    });
-
     $scope.saveProject = function() {
-      // Default all new projects to have cors set to '*'.
-      if (!$scope.currentProject.settings) {
-        $scope.currentProject.settings = {};
-      }
-      if (!$scope.currentProject.settings.cors) {
-        $scope.currentProject.settings.cors = '*';
-      }
-
-      formio.saveProject($scope.currentProject).then(function(project) {
-        FormioAlerts.addAlert({
-          type: 'success',
-          message: 'New Project created!'
-        });
-        GoogleAnalytics.sendEvent('Project', 'create', null, 1);
+      FormioProject.createProject($scope.currentProject).then(function(project) {
         $state.go('project.resource.index', {projectId: project._id});
-      }, function(error) {
-        if (error.data && error.data.message && error.data.message.indexOf('duplicate key error index') !== -1) {
-          error.data.errors.name = {
-            path: 'name',
-            message: 'Project domain already exists. Please pick a different domain.'
-          };
-        }
-        FormioAlerts.onError(error);
       });
     };
   }
@@ -233,6 +175,10 @@ app.controller('ProjectController', [
   ) {
     $rootScope.activeSideBar = 'projects';
     $rootScope.noBreadcrumb = false;
+    if ($stateParams.welcome) {
+      $('#project-welcome-modal').modal('show');
+    }
+
     $scope.token = Formio.getToken();
     $scope.resourcesLoading = true;
     $scope.projectsLoaded = false;
