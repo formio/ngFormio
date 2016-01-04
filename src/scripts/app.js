@@ -25,7 +25,8 @@ angular
     'kendo.directives',
     'truncate',
     'ngFileUpload',
-    'ngDialog'
+    'ngDialog',
+    'ng-formio-plugins'
   ])
   .config([
     '$stateProvider',
@@ -137,6 +138,11 @@ angular
           templateUrl: 'views/data/index.html',
           controller: 'ProjectDataController'
         })
+        .state('project.formio', {
+          url: '/formio',
+          templateUrl: 'views/formio/index.html',
+          controller: 'ProjectFormioController'
+        })
         .state('project.preview', {
           url: '/preview',
           templateUrl: 'views/project/preview.html',
@@ -186,13 +192,9 @@ angular
           url: '/project',
           templateUrl: 'views/project/project-settings.html'
         })
-        .state('project.settings.plan', {
-          url: '/plan',
-          templateUrl: 'views/project/project-plan.html',
-          controller: 'ProjectPlanController'
-        })
         .state('project.settings.email', {
           url: '/email',
+          parent: 'project.settings',
           templateUrl: 'views/project/email/email.html'
         })
         .state('project.settings.storage', {

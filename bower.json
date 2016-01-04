@@ -22,7 +22,8 @@
     "bootstrap-ui-datetime-picker": "~2.0.5",
     "angular-paginate-anything": "~4.1.2",
     "kendo-ui": "kendo-ui-core#2015.2.902+SP2",
-    "formio": "~0.5.4",
+    "formio": "~0.5.6",
+    "ng-formio-plugins": "git+ssh://git@github.com/formio/ng-formio-plugins.git#develop",
     "lodash": "~3.10.1",
     "angular-truncate-2": "~0.4.2",
     "angular-ui-notification": "~0.1.0",
@@ -39,6 +40,10 @@
     "lodash": "~3.10.1",
     "bootstrap-ui-datetime-picker": "~2.0.5",
     "moment": "~2.11.0"
+    "angular-ui-select": "~0.13.2",
+    "signature_pad": "~1.5.2",
+    "angular-bootstrap": "~0.14.0",
+    "ng-file-upload": "~10.1.11"
   },
   "overrides": {
     "kendo-ui": {

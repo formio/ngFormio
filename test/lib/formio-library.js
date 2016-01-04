@@ -354,7 +354,13 @@ module.exports = function(config) {
             .then(function(isEnabled) {
               assert(!isEnabled, 'Button ' + button + ' is enabled when it should be disabled');
               next();
+            })
+            .catch(function(err) {
+              next(err);
             });
+        })
+        .catch(function(err) {
+          next(err);
         });
     });
 

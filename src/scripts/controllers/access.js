@@ -2,8 +2,6 @@
 
 var app = angular.module('formioApp.controllers.access', ['ngFormBuilder']);
 
-
-
 app.controller('AccessController', ['$scope', function($scope) {
   $scope.permissionLabels = {
     'create_all': {
