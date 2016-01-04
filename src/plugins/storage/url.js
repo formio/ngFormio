@@ -22,7 +22,6 @@ module.exports = function(app) {
         name: 'url',
         uploadFile: function(file, status, $scope) {
           var defer = $q.defer();
-          console.log('test');
           Upload.upload({
             url: $scope.component.url,
             data: {

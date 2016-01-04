@@ -1,0 +1,14 @@
+<div class="table-responsive">
+  <table ng-class="{'table-striped': component.striped, 'table-bordered': component.bordered, 'table-hover': component.hover, 'table-condensed': component.condensed}" class="table">
+    <thead ng-if="component.header.length">
+      <th ng-repeat="header in component.header">{{ header }}</th>
+    </thead>
+    <tbody>
+      <tr ng-repeat="row in component.rows track by $index">
+        <td ng-repeat="column in row track by $index">
+          <formio-component ng-repeat="component in column.components" component="component" data="data" formio="formio"></formio-component>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

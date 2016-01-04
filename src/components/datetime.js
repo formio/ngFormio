@@ -1,3 +1,4 @@
+var fs = require('fs');
 module.exports = function (app) {
 
   app.config([
@@ -52,31 +53,7 @@ module.exports = function (app) {
     'FormioUtils',
     function($templateCache, FormioUtils) {
       $templateCache.put('formio/components/datetime.html', FormioUtils.fieldWrap(
-        '<div class="input-group">' +
-        '<input type="text" class="form-control" ' +
-        'ng-focus="calendarOpen = true" ' +
-        'ng-click="calendarOpen = true" ' +
-        'ng-init="calendarOpen = false" ' +
-        'ng-disabled="readOnly" ' +
-        'ng-required="component.validate.required" ' +
-        'is-open="calendarOpen" ' +
-        'datetime-picker="{{ component.format }}" ' +
-        'min-date="component.minDate" ' +
-        'max-date="component.maxDate" ' +
-        'datepicker-mode="component.datepickerMode" ' +
-        'enable-date="component.enableDate" ' +
-        'enable-time="component.enableTime" ' +
-        'ng-model="data[component.key]" ' +
-        'placeholder="{{ component.placeholder }}" ' +
-        'datepicker-options="component.datePicker" ' +
-        'timepicker-options="component.timePicker" />' +
-        '<span class="input-group-btn">' +
-        '<button type="button" class="btn btn-default" ng-click="calendarOpen = true">' +
-        '<i ng-if="component.enableDate" class="glyphicon glyphicon-calendar"></i>' +
-        '<i ng-if="!component.enableDate" class="glyphicon glyphicon-time"></i>' +
-        '</button>' +
-        '</span>' +
-        '</div>'
+        fs.readFileSync(__dirname + '/../templates/components/datetime.html', 'utf8')
       ));
     }
   ]);

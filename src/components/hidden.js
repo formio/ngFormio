@@ -1,3 +1,4 @@
+var fs = require('fs');
 module.exports = function (app) {
 
   app.config([
@@ -22,7 +23,7 @@ module.exports = function (app) {
     '$templateCache',
     function ($templateCache) {
       $templateCache.put('formio/components/hidden.html',
-        '<input type="hidden" id="{{ component.key }}" name="{{ component.key }}" ng-model="data[component.key]">'
+        fs.readFileSync(__dirname + '/../templates/components/hidden.html', 'utf8')
       );
     }
   ]);

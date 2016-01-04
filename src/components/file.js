@@ -1,3 +1,4 @@
+var fs = require('fs');
 module.exports = function (app) {
 
   app.config([
@@ -14,7 +15,7 @@ module.exports = function (app) {
           placeholder: '',
           multiple: false,
           defaultValue: '',
-          protected: false,
+          protected: false
         }
       });
     }
@@ -137,53 +138,11 @@ module.exports = function (app) {
     ) {
 
       $templateCache.put('formio/components/formio-file-list.html',
-        '<table class="table table-striped table-bordered">' +
-          '<thead>' +
-            '<tr>' +
-              '<td ng-if="!readOnly" style="width:1%;white-space:nowrap;"></td>' +
-              '<th>File Name</th>' +
-              '<th>Size</th>' +
-            '</tr>' +
-          '</thead>' +
-          '<tbody>' +
-            '<tr ng-repeat="file in files track by $index">' +
-              '<td ng-if="!readOnly" style="width:1%;white-space:nowrap;"><a ng-if="!readOnly" href="#" ng-click="removeFile($event, $index)" style="padding: 2px 4px;" class="btn btn-sm btn-default"><span class="glyphicon glyphicon-remove"></span></a></td>' +
-              '<td><formio-file file="file" form="form"></formio-file></td>' +
-              '<td>{{ fileSize(file.size) }}</td>' +
-            '</tr>' +
-          '</tbody>' +
-        '</table>'
+        fs.readFileSync(__dirname + '/../templates/components/formio-file-list.html', 'utf8')
       );
 
       $templateCache.put('formio/components/file.html',
-        '<label ng-if="component.label && !component.hideLabel" for="{{ component.key }}" class="control-label" ng-class="{\'field-required\': component.validate.required}">{{ component.label }}</label>' +
-        '<span ng-if="!component.label && component.validate.required" class="glyphicon glyphicon-asterisk form-control-feedback field-required-inline" aria-hidden="true"></span>' +
-        '<div ng-controller="formioFileUpload">' +
-          '<formio-file-list files="data[component.key]" form="formio.formUrl"></formio-file-list>' +
-          '<div ng-if="!readOnly">' +
-            '<div ngf-drop="upload($files)" class="fileSelector" ngf-drag-over-class="' + "'" + 'fileDragOver' + "'" + '" ngf-multiple="component.multiple"><span class="glyphicon glyphicon-cloud-upload"></span>Drop files to attach, or <a href="#" ngf-select="upload($files)" ngf-multiple="component.multiple">browse</a>.</div>' +
-            '<div ng-if="!component.storage" class="alert alert-warning">No storage has been set for this field. File uploads are disabled until storage is set up.</div>' +
-            '<div ngf-no-file-drop>File Drag/Drop is not supported for this browser</div>' +
-          '</div>' +
-          '<div ng-repeat="fileUpload in fileUploads track by $index" ng-class="{' + "'has-error'" + ': fileUpload.status === '+ "'error'" +'}" class="file">' +
-            '<div class="row">' +
-              '<div class="fileName control-label col-sm-10">{{ fileUpload.name }} <span ng-click="removeUpload(fileUpload.name)" class="glyphicon glyphicon-remove"></span></div>' +
-              '<div class="fileSize control-label col-sm-2 text-right">{{ fileSize(fileUpload.size) }}</div>' +
-            '</div>' +
-            '<div class="row">' +
-              '<div class="col-sm-12">' +
-                '<span ng-if="fileUpload.status === ' + "'progress'" + '">' +
-                  '<div class="progress">' +
-                    '<div class="progress-bar" role="progressbar" aria-valuenow="{{fileUpload.progress}}" aria-valuemin="0" aria-valuemax="100" style="width:{{fileUpload.progress}}%">' +
-                      '<span class="sr-only">{{fileUpload.progress}}% Complete</span>' +
-                    '</div>' +
-                  '</div>' +
-                '</span>' +
-                '<div ng-if="!fileUpload.status !== ' + "'progress'" + '" class="bg-{{ fileUpload.status }} control-label">{{ fileUpload.message }}</div>' +
-              '</div>' +
-            '</div>' +
-          '</div>' +
-        '</div>'
+        fs.readFileSync(__dirname + '/../templates/components/file.html', 'utf8')
       );
     }
   ]);

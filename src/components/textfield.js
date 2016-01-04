@@ -1,3 +1,4 @@
+var fs = require('fs');
 module.exports = function (app) {
 
   app.config([
@@ -39,24 +40,7 @@ module.exports = function (app) {
     function ($templateCache,
               FormioUtils) {
       $templateCache.put('formio/components/textfield.html', FormioUtils.fieldWrap(
-        '<input type="{{ component.inputType }}" ' +
-        'class="form-control" ' +
-        'id="{{ component.key }}" ' +
-        'name="{{ component.key }}" ' +
-        'ng-disabled="readOnly" ' +
-        'ng-model="data[component.key]" ' +
-        'ng-model-options="{ debounce: 500 }" ' +
-        'safe-multiple-to-single ' +
-        'ng-required="component.validate.required" ' +
-        'ng-minlength="component.validate.minLength" ' +
-        'ng-maxlength="component.validate.maxLength" ' +
-        'ng-pattern="component.validate.pattern" ' +
-        'custom-validator="component.validate.custom" ' +
-        'placeholder="{{ component.placeholder }}" ' +
-        'ui-mask="{{ component.inputMask }}" ' +
-        'ui-mask-placeholder="" ' + // avoids regular placeholder mixing with mask placeholder
-        'ui-options="uiMaskOptions" ' +
-        '>'
+        fs.readFileSync(__dirname + '/../templates/components/textfield.html', 'utf8')
       ));
     }
   ]);

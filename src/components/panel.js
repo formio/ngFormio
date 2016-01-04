@@ -1,3 +1,4 @@
+var fs = require('fs');
 module.exports = function (app) {
 
   app.config([
@@ -20,12 +21,7 @@ module.exports = function (app) {
     '$templateCache',
     function ($templateCache) {
       $templateCache.put('formio/components/panel.html',
-        '<div class="panel panel-{{ component.theme }}">' +
-        '<div ng-if="component.title" class="panel-heading"><h3 class="panel-title">{{ component.title }}</h3></div>' +
-        '<div class="panel-body">' +
-        '<formio-component ng-repeat="component in component.components" ng-if="componentFound(component)" component="component" data="data" formio="formio" read-only="readOnly"></formio-component>' +
-        '</div>' +
-        '</div>'
+        fs.readFileSync(__dirname + '/../templates/components/panel.html', 'utf8')
       );
     }
   ]);

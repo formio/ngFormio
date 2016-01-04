@@ -1,3 +1,4 @@
+var fs = require('fs');
 module.exports = function (app) {
 
   app.config([
@@ -36,16 +37,7 @@ module.exports = function (app) {
     function ($templateCache,
               FormioUtils) {
       $templateCache.put('formio/components/textarea.html', FormioUtils.fieldWrap(
-        '<textarea ' +
-        'class="form-control" ' +
-        'ng-model="data[component.key]" ' +
-        'ng-disabled="readOnly" ' +
-        'ng-required="component.validate.required" ' +
-        'safe-multiple-to-single ' +
-        'id="{{ component.key }}" ' +
-        'placeholder="{{ component.placeholder }}" ' +
-        'custom-validator="component.validate.custom" ' +
-        'rows="{{ component.rows }}"></textarea>'
+        fs.readFileSync(__dirname + '/../templates/components/textarea.html', 'utf8')
       ));
     }
   ]);

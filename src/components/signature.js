@@ -1,3 +1,4 @@
+var fs = require('fs');
 module.exports = function (app) {
 
   app.config([
@@ -97,7 +98,8 @@ module.exports = function (app) {
         function readSignature() {
           if (scope.component.validate.required && signaturePad.isEmpty()) {
             ngModel.$setViewValue('');
-          } else {
+          }
+          else {
             ngModel.$setViewValue(signaturePad.toDataURL());
           }
         }
@@ -122,12 +124,7 @@ module.exports = function (app) {
     function ($templateCache,
               FormioUtils) {
       $templateCache.put('formio/components/signature.html', FormioUtils.fieldWrap(
-        '<img ng-if="readOnly" ng-attr-src="{{data[component.key]}}" src="" />' +
-        '<div ng-if="!readOnly" style="width: {{ component.width }}; height: {{ component.height }};">' +
-        '<a class="btn btn-xs btn-default" style="position:absolute; left: 0; top: 0; z-index: 1000" ng-click="component.clearSignature()"><span class="glyphicon glyphicon-refresh"></span></a>' +
-        '<canvas signature component="component" name="{{ component.key }}" ng-model="data[component.key]" ng-required="component.validate.required"></canvas>' +
-        '<div class="formio-signature-footer" style="text-align: center;color:#C3C3C3;" ng-class="{\'field-required\': component.validate.required}">{{ component.footer }}</div>' +
-        '</div>'
+        fs.readFileSync(__dirname + '/../templates/components/signature.html', 'utf8')
       ));
     }
   ]);

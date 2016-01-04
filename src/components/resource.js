@@ -1,3 +1,4 @@
+var fs = require('fs');
 module.exports = function (app) {
 
   app.config([
@@ -66,17 +67,7 @@ module.exports = function (app) {
     '$templateCache',
     function ($templateCache) {
       $templateCache.put('formio/components/resource.html',
-        '<label ng-if="component.label" for="{{ component.key }}" class="control-label" ng-class="{\'field-required\': component.validate.required}">{{ component.label }}</label>' +
-        '<span ng-if="!component.label && component.validate.required" class="glyphicon glyphicon-asterisk form-control-feedback field-required-inline" aria-hidden="true"></span>' +
-        '<ui-select ui-select-required safe-multiple-to-single ui-select-open-on-focus ng-model="data[component.key]" ng-disabled="readOnly" ng-required="component.validate.required" id="{{ component.key }}" name="{{ component.key }}" theme="bootstrap">' +
-        '<ui-select-match placeholder="{{ component.placeholder }}">' +
-        '<formio-select-item template="component.template" item="$item || $select.selected" select="$select"></formio-select-item>' +
-        '</ui-select-match>' +
-        '<ui-select-choices repeat="item in selectItems | filter: $select.search" refresh="refreshSubmissions($select.search)" refresh-delay="250">' +
-        '<formio-select-item template="component.template" item="item" select="$select"></formio-select-item>' +
-        '</ui-select-choices>' +
-        '</ui-select>' +
-        '<formio-errors></formio-errors>'
+        fs.readFileSync(__dirname + '/../templates/components/resource.html', 'utf8')
       );
 
       // Change the ui-select to ui-select multiple.

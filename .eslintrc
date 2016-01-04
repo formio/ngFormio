@@ -1,0 +1,13 @@
+{
+  "extends": "formio",
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "globals": {
+    "angular": true
+  },
+  "rules": {
+    "new-cap": [2, {"capIsNewExceptions": ["FormioPlugins"]}]
+  }
+}

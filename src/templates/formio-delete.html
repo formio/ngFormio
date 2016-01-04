@@ -1,0 +1,10 @@
+<form role="form">
+  <div ng-repeat="alert in formioAlerts" class="alert alert-{{ alert.type }}" role="alert">
+    {{ alert.message }}
+  </div>
+  <h3>Are you sure you wish to delete the {{ resourceName || _resourceName }}?</h3>
+  <div class="btn-toolbar">
+    <button ng-click="onDelete()" class="btn btn-danger">Yes</button>
+    <button ng-click="onCancel()" class="btn btn-default">No</button>
+  </div>
+</form>

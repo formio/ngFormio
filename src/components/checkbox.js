@@ -1,3 +1,4 @@
+var fs = require('fs');
 module.exports = function (app) {
 
   app.config([
@@ -20,7 +21,7 @@ module.exports = function (app) {
           protected: false,
           persistent: true,
           validate: {
-            required: false,
+            required: false
           }
         }
       });
@@ -32,18 +33,7 @@ module.exports = function (app) {
     function ($templateCache,
               FormioUtils) {
       $templateCache.put('formio/components/checkbox.html', FormioUtils.fieldWrap(
-        '<div class="checkbox">' +
-        '<label for="{{ component.key }}" ng-class="{\'field-required\': component.validate.required}">' +
-        '<input type="{{ component.inputType }}" ' +
-        'id="{{ component.key }}" ' +
-        'name="{{ component.key }}" ' +
-        'value="{{ component.key }}" ' +
-        'ng-disabled="readOnly" ' +
-        'ng-model="data[component.key]" ' +
-        'ng-required="component.validate.required">' +
-        '{{ component.label }}' +
-        '</label>' +
-        '</div>'
+        fs.readFileSync(__dirname + '/../templates/components/checkbox.html', 'utf8')
       ));
     }
   ]);
