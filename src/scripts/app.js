@@ -780,7 +780,7 @@ angular
         }
       },
       getPlans: function() {
-        return _(this.plans).values().sort('order').value();
+        return _(this.plans).values().sortBy('order').value();
       },
       getPlan: function(plan) {
         return this.plans[plan];
