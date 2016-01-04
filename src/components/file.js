@@ -97,8 +97,8 @@ module.exports = function (app) {
       $scope.upload = function(files) {
         if ($scope.component.storage && files && files.length) {
           var plugin = FormioPlugins('storage', $scope.component.storage);
-          if (plugin) {
-            angular.forEach(files, function(file) {
+          angular.forEach(files, function(file) {
+            if (plugin) {
               $scope.fileUploads[file.name] = {
                 name: file.name,
                 size: file.size,
@@ -116,16 +116,16 @@ module.exports = function (app) {
                   $scope.fileUploads[file.name].message = message;
                   delete $scope.fileUploads[file.name].progress;
                 });
-            });
-          }
-          else {
-            $scope.fileUploads[file.name] = {
-              name: file.name,
-              size: file.size,
-              status: 'error',
-              message: 'Storage plugin not found'
-            };
-          }
+            }
+            else {
+              $scope.fileUploads[file.name] = {
+                name: file.name,
+                size: file.size,
+                status: 'error',
+                message: 'Storage plugin not found'
+              };
+            }
+          });
         }
       };
     }
