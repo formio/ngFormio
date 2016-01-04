@@ -229,13 +229,13 @@ $project-header-color: lighten($brand-primary, 55%);
 
 .new-project-row {
   position:relative;
-  padding: 30px 0 0 0;
+  padding: 35px 0 0 0;
   background-color: darken($brand-primary, 25%);
   color: $project-header-color;
   .new-project-header {
     position:absolute;
     top: 0;
-    margin: 5px 0 0 0;
+    margin: 10px 0 0 0;
   }
   .new-project-section {
     float: left;
@@ -1229,5 +1229,11 @@ footer {
       margin-top: 10.5px;
 
     }
+  }
+}
+
+@media (max-width: $screen-md-max) {
+  .container {
+    width: 100%;
   }
 }
