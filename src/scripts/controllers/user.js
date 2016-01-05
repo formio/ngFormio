@@ -162,7 +162,9 @@ app.factory('UserInfo', [
         if (!$rootScope.user) $q.reject('Must be logged in to get payment info.');
 
         var formio = new Formio(AppConfig.paymentForm);
-        return formio.loadSubmissions()
+        return formio.loadSubmissions({params: {
+          owner: $rootScope.user._id
+        }})
         .then(function(submissions) {
           if(!submissions || !submissions.length) {
             return null;

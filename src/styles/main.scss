@@ -197,12 +197,6 @@ ul.dropdown-menu {
     margin: 0;
   }
 }
-@media (min-width: 1024px) {
-  #main-wrapper {
-    margin-right: 100px;
-    margin-left: 100px;
-  }
-}
 
 #main-wrapper {
   min-height: 80px;
@@ -216,7 +210,58 @@ ul.dropdown-menu {
   }
 }
 
+#main-wrapper.home-page {
+  margin-top: 0;
+}
+
 $project-header-color: lighten($brand-primary, 55%);
+
+.welcome-info-strip {
+  background-color: $brand-secondary;
+  color: $gray-lighter;
+  padding-bottom: 20px;
+  font-size: 23px;
+  font-weight: 200;
+  p {
+    margin-bottom: 0;
+  }
+}
+
+.new-project-row {
+  position:relative;
+  padding: 35px 0 0 0;
+  background-color: darken($brand-primary, 25%);
+  color: $project-header-color;
+  .new-project-header {
+    position:absolute;
+    top: 0;
+    margin: 10px 0 0 0;
+  }
+  .new-project-section {
+    float: left;
+    margin-right: 10px;
+  }
+}
+
+.project-template-item {
+  .project-template-card {
+    .project-template-img {
+      width: 133px;
+      height: 100px;
+      border: solid $brand-primary 4px;
+      &:hover {
+        cursor: pointer;
+        border: solid lighten($brand-primary, 20%) 4px;
+      }
+    }
+    .project-template-info {
+      text-align: center;
+      h5 {
+        line-height: 1.3em;
+      }
+    }
+  }
+}
 
 .project-sidebar {
   border: none;
@@ -308,10 +353,7 @@ $project-header-color: lighten($brand-primary, 55%);
   min-height: 90px;
   .project-title {
     font-weight: normal;
-    margin-left: 0px;
-    margin-right: 30px;
-    margin-top: 0px;
-    margin-bottom: 0;
+    margin: 0;
     font-size: 2em;
     .project-title-link {
       color: $gray;
@@ -324,28 +366,16 @@ $project-header-color: lighten($brand-primary, 55%);
   .project-description {
     overflow: hidden;
     display: inline-block;
-    text-overflow: ellipsis;
   }
 }
 
-.project-description, .project-swagger {
+hr.project-section-separator {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.project-swagger {
   word-break: break-all;
-}
-
-.project-swagger-button {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  font-size: 0.5em;
-  line-height: 1.2em;
-  background-color: #ddd;
-  border: solid white 2px;
-  border-radius: 20px;
-  padding: 2px 8px;
-  &:hover {
-    background-color: $gray-lighter;
-    text-decoration: none;
-  }
 }
 
 .project-section-header {
@@ -711,7 +741,8 @@ footer {
   background-color: $brand-secondary;
   color: #eee;
   text-align: center;
-  padding-top: 30px;
+  padding-top: 10px;
+  padding-bottom: 30px;
   margin-bottom: 0;
   &.jumbotron h1 {
     font-size: 56px;
@@ -733,9 +764,28 @@ footer {
   border-radius: 20px;
 }
 
+.project-title-section {
+  margin-bottom: 0;
+  .project-swagger-item {
+    vertical-align: top;
+    font-size: 1.5em;
+    line-height: 1.5em;
+    margin-top: 2px;
+    .project-swagger-button {
+      border: solid white 2px;
+    }
+  }
+}
+
+.existing-projects-section {
+  border-right: 1px solid $gray-lighter;
+  .project-description {
+    max-height: 50px;
+  }
+}
+
 .projects,
 .teams {
-  padding-top: 20px;
   .project-create,
   .team-create {
     display: block;
@@ -784,7 +834,9 @@ footer {
     color: $gray-light;
     margin-bottom: 30px;
     .project-plan-label {
-      float: right;
+      position:absolute;
+      top: 0;
+      right: 0;
     }
     .project-tile-button {
       padding-left: 5px;
@@ -797,10 +849,12 @@ footer {
     .project-title {
       margin-top: 0;
     }
-    .project-title a,
-    .team-name a {
-      font-weight: 600;
-      color: $gray-light;
+    .project-title, .team-name {
+      margin-top: 0;
+      a {
+        font-weight: 600;
+        color: $gray-light;
+      }
     }
     .project-plan,
     .team-owner {
@@ -1187,5 +1241,11 @@ footer {
       margin-top: 10.5px;
 
     }
+  }
+}
+
+@media (max-width: $screen-md-max) {
+  .container {
+    width: 100%;
   }
 }
