@@ -144,7 +144,8 @@ app.controller('ProjectCreateController', [
 
     $scope.saveProject = function() {
       FormioProject.createProject($scope.currentProject).then(function(project) {
-        $state.go('project.resource.index', {projectId: project._id, welcome: true});
+        localStorage.setItem('showWelcome', 1);
+        $state.go('project.resource.index', {projectId: project._id});
       });
     };
   }
@@ -175,7 +176,8 @@ app.controller('ProjectController', [
   ) {
     $rootScope.activeSideBar = 'projects';
     $rootScope.noBreadcrumb = false;
-    if ($stateParams.welcome) {
+    if (parseInt(localStorage.getItem('showWelcome'), 10)) {
+      localStorage.setItem('showWelcome', 0);
       $('#project-welcome-modal').modal('show');
     }
 
