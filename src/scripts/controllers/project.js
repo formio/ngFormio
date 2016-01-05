@@ -684,7 +684,7 @@ app.controller('ProjectFormioController', [
           (element.data && element.data.fullName ? element.data.fullName : '') + ',' +
           (element.data && element.data.email ? element.data.email : '') + ',' +
           (element.created ? element.created : '') + ',' +
-          (element.deleted ? element.deleted : '') + '\n'
+          (element.deleted ? element.deleted : '') + '\n';
       });
 
       csv += '\nNew Projects\n';
