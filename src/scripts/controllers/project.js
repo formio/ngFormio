@@ -465,6 +465,8 @@ app.controller('ProjectFormioController', [
     AppConfig,
     $window
   ) {
+    $scope.views = ['Overview', 'Usage', 'Users', 'Projects'];
+    $scope.view = $scope.views[0];
     $scope.showDaily = false;
     $scope.showCreated = false;
     $scope.showIds = false;
@@ -563,6 +565,61 @@ app.controller('ProjectFormioController', [
         .value();
     };
 
+    /**
+     * Get the formio projects created during the configured time period, to the next logical unit of time.
+     */
+    var getProjectsCreated = function() {
+      var url = AppConfig.apiBase + '/analytics/created/projects/year/' + $scope.viewDate.year + '/month/' + $scope.viewDate.month;
+      if ($scope.showDaily) {
+        url += '/day/' + $scope.viewDate.day;
+      }
+
+      Formio.request(url, 'GET')
+        .then(function(data) {
+          $scope.projectsCreated = _(data)
+            .sortByOrder(['created'], ['desc'])
+            .value();
+
+          var allOwners = _.pluck(data, 'owner');
+          getOwnerData(allOwners, function(ownerData) {
+            // Change the data response format for merge.
+            ownerData = _(ownerData)
+              .map(function(element) {
+                return {
+                  owner: element._id,
+                  ownerData: element.data
+                };
+              })
+              .value();
+
+            $scope.projectsCreated = merge($scope.projectsCreated, ownerData, 'owner');
+            $scope.$apply();
+          });
+        });
+    };
+
+    /**
+     * Get the formio users created during the configured time period, to the next logical unit of time.
+     */
+    var getUsersCreated = function() {
+      var url = AppConfig.apiBase + '/analytics/created/users/year/' + $scope.viewDate.year + '/month/' + $scope.viewDate.month;
+      if ($scope.showDaily) {
+        url += '/day/' + $scope.viewDate.day;
+      }
+
+      Formio.request(url, 'GET')
+        .then(function(data) {
+          $scope.usersCreated = _(data)
+            .sortByOrder(['created'], ['desc'])
+            .value();
+
+          $scope.$apply();
+        });
+    };
+
+    /**
+     * Export the current data to csv.
+     */
     $scope.downloadUsage = function() {
       var title = '';
       var csv = '';
@@ -577,11 +634,15 @@ app.controller('ProjectFormioController', [
       title += $scope.viewDate.year + '.csv';
       csv += 'Year,' + $scope.viewDate.year + '\n\n';
 
-      // Add the total submission calls to the data.
+      // Add the overview data.
+      csv += 'Overview\n';
+      csv += 'Projects Created,' + ($scope.projectsCreated.length || 0) + '\n';
+      csv += 'Users Created,' + ($scope.usersCreated.length || 0) + '\n';
       csv += 'Submissions,' + $scope.totalMonthlySubmissions + '\n';
-      csv += 'Non-Submissions,' + $scope.totalMonthlyNonsubmissions + '\n\n';
+      csv += 'Non-Submissions,' + $scope.totalMonthlyNonsubmissions + '\n';
 
       // Add the header labels and submission data.
+      csv += '\nProject API Submission Usage\n';
       csv += 'Project _id,Project Requests,Request Type,Project Name,Project Title,Project Plan,Project Created,Owner _id,Owner Name,Owner Email\n';
       _.forEach($scope.monthlySubmissions, function(element) {
         csv +=
@@ -598,12 +659,39 @@ app.controller('ProjectFormioController', [
       });
 
       // Add the header labels again and nonsubmission data.
-      csv += '\nProject _id,Project Requests,Request Type,Project Name,Project Title,Project Plan,Project Created,Owner _id,Owner Name,Owner Email\n';
+      csv += '\nProject API Non-Submission Usage\n';
+      csv += 'Project _id,Project Requests,Request Type,Project Name,Project Title,Project Plan,Project Created,Owner _id,Owner Name,Owner Email\n';
       _.forEach($scope.monthlySubmissions, function(element) {
         csv +=
           (element._id ? element._id : '') + ',' +
           (element.submissions ? element.submissions : '') + ',' +
           'nonsubmission,' +
+          (element.name ? element.name : '') + ',' +
+          (element.title ? element.title : '') + ',' +
+          (element.plan ? element.plan : '') + ',' +
+          (element.created ? element.created : '') + ',' +
+          (element.owner ? element.owner : '') + ',' +
+          (element.ownerData && element.ownerData.name ? element.ownerData.name : '') + ',' +
+          (element.ownerData && element.ownerData.email ? element.ownerData.email : '') + '\n';
+      });
+
+      csv += '\nNew Users\n';
+      csv += 'User _id,User Name,User Full Name,User Email,Created,Deleted\n';
+      _.forEach($scope.usersCreated, function(element) {
+        csv +=
+          (element._id ? element._id : '') + ',' +
+          (element.data && element.data.name ? element.data.name : '') + ',' +
+          (element.data && element.data.fullName ? element.data.fullName : '') + ',' +
+          (element.data && element.data.email ? element.data.email : '') + ',' +
+          (element.created ? element.created : '') + ',' +
+          (element.deleted ? element.deleted : '') + '\n';
+      });
+
+      csv += '\nNew Projects\n';
+      csv += 'Project _id,Project Name,Project Title,Project Plan,Created,Owner _id,Owner Name,Owner Email\n';
+      _.forEach($scope.projectsCreated, function(element) {
+        csv +=
+          (element._id ? element._id : '') + ',' +
           (element.name ? element.name : '') + ',' +
           (element.title ? element.title : '') + ',' +
           (element.plan ? element.plan : '') + ',' +
@@ -623,6 +711,12 @@ app.controller('ProjectFormioController', [
     $scope.usageLoading = false;
     $scope.updateUsage = function() {
       $scope.usageLoading = true;
+
+      // Load the number of projects created during this reference time.
+      getProjectsCreated();
+
+      // Load the number of users created during this reference time.
+      getUsersCreated();
 
       var url = AppConfig.apiBase + '/analytics/project/year/' + $scope.viewDate.year + '/month/' + $scope.viewDate.month;
       if ($scope.showDaily) {
