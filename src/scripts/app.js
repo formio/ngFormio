@@ -723,6 +723,13 @@ angular
           $state.go(defaultState, defaultParams);
         }
       };
+
+      // CKEditor whitelist
+      // On approved elements allow:
+      //   - Any attribute beginning with 'data-'
+      //   - Any inline style
+      //   - Any class name
+      CKEDITOR.config.allowedContent = '*[data-*]{*}(*)';
     }
   ])
   .factory('GoogleAnalytics', ['$window', '$state', function($window, $state) {
