@@ -604,7 +604,7 @@ app.controller('FormActionEditController', [
       if (actionInfo && actionInfo.name === 'oauth') {
         var providers = FormioUtils.getComponent(actionInfo.settingsForm.components, 'settings[provider]');
         if (providers.data && providers.data.json && providers.data.json === '[]') {
-          FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> The OAuth Action requires a provider to be configured, before it can be used. You can add an OAuth provider in your <a href="#/project/' + $scope.projectId + '/settings/oauth">Project Settings</a>.')
+          FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> The OAuth Action requires a provider to be configured, before it can be used. You can add an OAuth provider in your <a href="#/project/'+$scope.projectId+'/settings/oauth">Project Settings</a>.');
         }
       }
 
