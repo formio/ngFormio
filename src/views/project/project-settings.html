@@ -116,6 +116,15 @@
     </div>
     <div class="form-group" ng-if="currentProject && currentProject._id">
       <div class="panel panel-default">
+        <div class="panel-heading">Export Project</div>
+        <div class="panel-body">
+          <p>The following button will export your project as a JSON file that can then be used as a template for other projects.</p>
+          <a href="//api.{{ appConfig.serverHost }}/project/{{ currentProject._id }}/export?x-jwt-token={{ token }}" class="btn btn-primary">Export Project</a>
+        </div>
+      </div>
+    </div>
+    <div class="form-group" ng-if="currentProject && currentProject._id">
+      <div class="panel panel-default">
         <div class="panel-heading">Delete Project</div>
         <div class="panel-body">
           <p>Deleting a project will make it disappear forever! This cannot be undone, so make sure you really want to delete it.</p>
