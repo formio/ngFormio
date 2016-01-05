@@ -1,5 +1,5 @@
 <div class="well submissions-header">
-  <a class="btn btn-default" href="{{ formio.formUrl }}/export?format=json&x-jwt-token={{ token }}">Export JSON</a>
-  <a class="btn btn-default" href="{{ formio.formUrl }}/export?format=csv&x-jwt-token={{ token }}">Export CSV</a>
+  <a class="btn btn-warning" href="{{ formio.formUrl }}/export?format=json&x-jwt-token={{ token }}">{...} Export JSON</a>
+  <a class="btn btn-success" href="{{ formio.formUrl }}/export?format=csv&x-jwt-token={{ token }}"><i class="fa fa-file-text-o"></i> Export CSV</a>
 </div>
 <div kendo-grid="grid" k-options="gridOptions" k-ng-delay="gridOptions.columns" style="width:0"></div>
