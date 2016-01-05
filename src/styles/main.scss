@@ -8,6 +8,11 @@ body {
   padding-top: 45px;
 }
 
+.btn {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .btn-file {
   position: relative;
   overflow: hidden;
