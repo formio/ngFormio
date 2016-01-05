@@ -64194,7 +64194,7 @@ module.exports = function (app) {
     function ($templateCache,
               FormioUtils) {
       $templateCache.put('formio/components/radio.html', FormioUtils.fieldWrap(
-        "<div class=\"radio\" ng-repeat=\"v in component.values track by $index\">\n  <label class=\"control-label\" for=\"{{ v.value }}\">\n    <input type=\"{{ component.inputType }}\"\n    id=\"{{ v.value }}\"\n    name=\"{{ component.key }}\"\n    value=\"{{ v.value }}\"\n    ng-model=\"data[component.key]\"\n    ng-required=\"component.validate.required\"\n    ng-disabled=\"readOnly\"\n    custom-validator=\"component.validate.custom\">\n    {{ v.label }}\n  </label>\n</div>\n"
+        "<div ng-class=\"component.inline ? 'radio-inline' : 'radio'\" ng-repeat=\"v in component.values track by $index\">\n  <label class=\"control-label\" for=\"{{ v.value }}\">\n    <input type=\"{{ component.inputType }}\"\n    id=\"{{ v.value }}\"\n    name=\"{{ component.key }}\"\n    value=\"{{ v.value }}\"\n    ng-model=\"data[component.key]\"\n    ng-required=\"component.validate.required\"\n    ng-disabled=\"readOnly\"\n    custom-validator=\"component.validate.custom\">\n    {{ v.label }}\n  </label>\n</div>\n"
       ));
     }
   ]);
