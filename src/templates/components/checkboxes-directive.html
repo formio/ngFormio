@@ -1,0 +1,15 @@
+<div class="checkboxes">
+  <div ng-class="component.inline ? 'checkbox-inline' : 'checkbox'" ng-repeat="v in component.values track by $index">
+    <label class="control-label" for="{{ component.key }}-{{ v.value }}">
+      <input type="checkbox"
+      id="{{ component.key }}-{{ v.value }}"
+      name="{{ component.key }}-{{ v.value }}"
+      value="{{ v.value }}"
+      ng-disabled="readOnly"
+      ng-click="toggleCheckbox(v.value)"
+      ng-checked="model[v.value]"
+      >
+      {{ v.label }}
+    </label>
+  </div>
+</div>

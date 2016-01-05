@@ -15,8 +15,6 @@ module.exports = function (app) {
           hideLabel: true,
           label: '',
           key: 'checkboxField',
-          prefix: '',
-          suffix: '',
           defaultValue: false,
           protected: false,
           persistent: true,
@@ -30,11 +28,10 @@ module.exports = function (app) {
   app.run([
     '$templateCache',
     'FormioUtils',
-    function ($templateCache,
-              FormioUtils) {
-      $templateCache.put('formio/components/checkbox.html', FormioUtils.fieldWrap(
+    function ($templateCache) {
+      $templateCache.put('formio/components/checkbox.html',
         fs.readFileSync(__dirname + '/../templates/components/checkbox.html', 'utf8')
-      ));
+      );
     }
   ]);
 };

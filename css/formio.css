@@ -101,3 +101,7 @@ input[type="password"][draggable="true"] {
   font-size: 20px;
   margin-right: 5px;
 }
+
+.checkboxes .checkbox-inline input[type="checkbox"] {
+  margin-top: 4px;
+}
