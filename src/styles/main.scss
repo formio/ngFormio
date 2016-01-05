@@ -1089,6 +1089,18 @@ footer {
   }
 }
 
+.formio-data {
+  h3 {
+    vertical-align: middle;
+  }
+  .control-panel {
+    margin-top: 25px;
+    select {
+      vertical-align: middle;
+    }
+  }
+}
+
 /********************* Project Plan Upgrade Dialog *********************/
 .ngdialog.ngdialog-theme-default.project-upgrade .ngdialog-content {
   padding: 0;

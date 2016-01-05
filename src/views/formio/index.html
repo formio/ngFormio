@@ -1,68 +1,101 @@
-<div class="row" style="overflow: visible;" ng-init="updateUsage()">
+<div class="formio-data row" style="overflow: visible;" ng-init="updateUsage()">
   <div class="col-md-10 col-md-offset-1">
+    <!-- Controls -->
     <div class="row">
-
-      <br>
-      <div class="row">
-        <div class="col-md-12">
-          <h3>{{showDaily ? 'Daily' : 'Monthly'}} Submission Requests for
+      <div class="panel panel-default control-panel">
+        <div class="panel-heading">
+          Controls
+        </div>
+        <div class="panel-body">
+          <h3>Current Dashboard View: <select style="vertical-align:middle;" ng-model="view" ng-options="type for type in views"></select></h3>
+          <h3>
+            Current Date View:
             <select ng-model="viewDate.month" ng-options="month for month in months" ng-change="updateUsage()"></select> /
             <select ng-show="showDaily" ng-model="viewDate.day" ng-options="day for day in days" ng-change="updateUsage()"></select>
             {{showDaily ? ' / ' : ''}}
-            <select ng-model="viewDate.year" ng-options="year for year in years" ng-change="updateUsage()"></select>
-            , by Project ({{totalMonthlySubmissions}})
+            <select style="vertical-align:middle;" ng-model="viewDate.year" ng-options="year for year in years" ng-change="updateUsage()"></select>
+            <button class="btn btn-primary btn-xs" ng-click="toggle('showDaily')">Show {{showDaily ? 'Monthly' : 'Daily'}}</button>
           </h3>
-          <button class="btn btn-default btn-xs" ng-click="toggle('showDaily')">Show {{showDaily ? 'Monthly' : 'Daily'}}</button>
-          <button class="btn btn-default btn-xs" ng-click="toggle('showCreated')">{{showCreated ? 'Hide' : 'Show'}} Created</button>
-          <button class="btn btn-default btn-xs" ng-click="toggle('showIds')">{{showIds ? 'Hide' : 'Show'}} _id's</button>
-          <button class="btn btn-default btn-xs" ng-click="downloadUsage()">Export CSV</button>
+          <br>
+          <button class="btn btn-primary btn-xs" ng-click="toggle('showCreated')">{{showCreated ? 'Hide' : 'Show'}} Created</button>
+          <button class="btn btn-primary btn-xs" ng-click="toggle('showIds')">{{showIds ? 'Hide' : 'Show'}} _id's</button>
+          <button class="btn btn-primary btn-xs" ng-click="downloadUsage()">Export CSV</button>
+        </div>
+      </div>
+    </div>
+    <br>
+
+    <!-- The Overview display -->
+    <div class="row" ng-if="view === 'Overview'">
+      <div class="row">
+        <div class="col-md-6">
+          <h3>Projects Created: {{projectsCreated.length || 0}}</h3>
+        </div>
+        <div class="col-md-6">
+          <h3>Users Created: {{usersCreated.length || 0}}</h3>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <h3>Total Submissions: {{totalMonthlySubmissions || 0}}</h3>
+        </div>
+        <div class="col-md-6">
+          <h3>Total Non-Submissions: {{totalMonthlyNonsubmissions || 0}}</h3>
+        </div>
+      </div>
+    </div>
+
+    <!-- The Usage display -->
+    <div class="row" ng-if="view === 'Usage'">
+      <div class="row">
+        <div class="col-md-12">
+          <h3>
+            {{showDaily ? 'Daily' : 'Monthly'}}
+            Submission Requests for
+            {{ viewDate.month + ' / ' + (showDaily ? viewDate.month + ' / ' : '') + viewDate.year }},
+            by Project ({{totalMonthlySubmissions}})
+          </h3>
           <table class="table table-striped">
             <thead>
-              <tr>
-                <td>#</td>
-                <td ng-if="showIds">Project _id</td>
-                <td>Project Requests</td>
-                <td>Project Name</td>
-                <td>Project Title</td>
-                <td>Project Plan</td>
-                <td ng-if="showCreated">Project Created</td>
-                <td ng-if="showIds">Owner _id</td>
-                <td>Owner Name</td>
-                <td>Owner Email</td>
-              </tr>
+            <tr>
+              <td>#</td>
+              <td ng-if="showIds">Project _id</td>
+              <td>Project Requests</td>
+              <td>Project Name</td>
+              <td>Project Title</td>
+              <td>Project Plan</td>
+              <td ng-if="showCreated">Project Created</td>
+              <td ng-if="showIds">Owner _id</td>
+              <td>Owner Name</td>
+              <td>Owner Email</td>
+            </tr>
             </thead>
             <tbody>
-              <tr ng-repeat="element in monthlySubmissions track by $index">
-                <td>{{$index + 1}}</td>
-                <td ng-if="showIds">{{element._id}}</td>
-                <td>{{element.submissions}}</td>
-                <td>{{element.name}}</td>
-                <td>{{element.title}}</td>
-                <td>{{element.plan}}</td>
-                <td ng-if="showCreated">{{element.created}}</td>
-                <td ng-if="showIds">{{element.owner}}</td>
-                <td>{{element.ownerData.name}}</td>
-                <td>{{element.ownerData.email}}</td>
-              </tr>
+            <tr ng-repeat="element in monthlySubmissions track by $index">
+              <td>{{$index + 1}}</td>
+              <td ng-if="showIds">{{element._id}}</td>
+              <td>{{element.submissions}}</td>
+              <td>{{element.name}}</td>
+              <td>{{element.title}}</td>
+              <td>{{element.plan}}</td>
+              <td ng-if="showCreated">{{element.created}}</td>
+              <td ng-if="showIds">{{element.owner}}</td>
+              <td>{{element.ownerData.name}}</td>
+              <td>{{element.ownerData.email}}</td>
+            </tr>
             </tbody>
           </table>
         </div>
       </div>
-
       <br>
       <div class="row">
         <div class="col-md-12">
-          <h3>{{showDaily ? 'Daily' : 'Monthly'}} Non-Submission Requests for
-            <select ng-model="viewDate.month" ng-options="month for month in months" ng-change="updateUsage()"></select> /
-            <select ng-show="showDaily" ng-model="viewDate.day" ng-options="day for day in days" ng-change="updateUsage()"></select>
-            {{showDaily ? ' / ' : ''}}
-            <select ng-model="viewDate.year" ng-options="year for year in years" ng-change="updateUsage()"></select>
-            , by Project ({{totalMonthlyNonsubmissions}})
+          <h3>
+            {{showDaily ? 'Daily' : 'Monthly'}}
+            Non-Submission Requests for
+            {{viewDate.month + ' / ' + (showDaily ? viewDate.month + ' / ' : '') + viewDate.year}},
+            by Project ({{totalMonthlyNonsubmissions}})
           </h3>
-          <button class="btn btn-default btn-xs" ng-click="toggle('showDaily')">Show {{showDaily ? 'Monthly' : 'Daily'}}</button>
-          <button class="btn btn-default btn-xs" ng-click="toggle('showCreated')">{{showCreated ? 'Hide' : 'Show'}} Created</button>
-          <button class="btn btn-default btn-xs" ng-click="toggle('showIds')">{{showIds ? 'Hide' : 'Show'}} _id's</button>
-          <button class="btn btn-default btn-xs" ng-click="downloadUsage()">Export CSV</button>
           <table class="table table-striped">
             <thead>
               <tr>
@@ -95,7 +128,86 @@
           </table>
         </div>
       </div>
+    </div>
 
+    <!-- The Users Display -->
+    <div class="row" ng-if="view === 'Users'">
+      <div class="row">
+        <div class="col-md-12">
+          <h3>
+            New Users by
+            {{showDaily ? 'Day' : 'Month'}}
+            for
+            {{viewDate.month + ' / ' + (showDaily ? viewDate.month + ' / ' : '') + viewDate.year}}
+          </h3>
+          <table class="table table-striped">
+            <thead>
+            <tr>
+              <td>#</td>
+              <td ng-if="showIds">User _id</td>
+              <td>User Name</td>
+              <td>User Full Name</td>
+              <td>User Email</td>
+              <td ng-if="showCreated">Created</td>
+              <td>Deleted</td>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="element in usersCreated track by $index">
+              <td>{{$index + 1}}</td>
+              <td ng-if="showIds">{{element._id}}</td>
+              <td>{{element.data.name}}</td>
+              <td>{{element.data.fullName}}</td>
+              <td>{{element.data.email}}</td>
+              <td ng-if="showCreated">{{element.created}}</td>
+              <td>{{element.deleted}}</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- The Projects Display -->
+    <div class="row" ng-if="view === 'Projects'">
+      <div class="row">
+        <div class="col-md-12">
+          <h3>
+            New Projects by
+            {{showDaily ? 'Day' : 'Month'}}
+            for
+            {{viewDate.month + ' / ' + (showDaily ? viewDate.month + ' / ' : '') + viewDate.year}}
+          </h3>
+          <table class="table table-striped">
+            <thead>
+            <tr>
+              <td>#</td>
+              <td ng-if="showIds">Project _id</td>
+              <td>Project Name</td>
+              <td>Project Title</td>
+              <td>Project Plan</td>
+              <td ng-if="showCreated">Project Created</td>
+              <td ng-if="showIds">Owner _id</td>
+              <td>Owner Name</td>
+              <td>Owner Email</td>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="element in projectsCreated track by $index">
+              <td>{{$index + 1}}</td>
+              <td ng-if="showIds">{{element._id}}</td>
+              <td>{{element.name}}</td>
+              <td>{{element.title}}</td>
+              <td>{{element.plan}}</td>
+              <td ng-if="showCreated">{{element.created}}</td>
+              <td ng-if="showIds">{{element.owner}}</td>
+              <td>{{element.ownerData.name}}</td>
+              <td>{{element.ownerData.email}}</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 </div>
