@@ -144,7 +144,7 @@ app.controller('ProjectCreateController', [
 
     $scope.saveProject = function() {
       FormioProject.createProject($scope.currentProject).then(function(project) {
-        $state.go('project.resource.index', {projectId: project._id});
+        $state.go('project.resource.index', {projectId: project._id, welcome: true});
       });
     };
   }
