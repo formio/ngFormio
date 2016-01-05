@@ -600,6 +600,14 @@ app.controller('FormActionEditController', [
         FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> The Role Assignment Action requires a Resource Form component with the API key, \'submission\', to modify existing Resource submissions.');
       }
 
+      // Oauth action alert for new resource missing role assignment.
+      if (actionInfo && actionInfo.name === 'oauth') {
+        var providers = FormioUtils.getComponent(actionInfo.settingsForm.components, 'settings[provider]');
+        if (providers.data && providers.data.json && providers.data.json === '[]') {
+          FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> The OAuth Action requires a provider to be configured, before it can be used. You can add an OAuth provider in your <a href="#/project/'+$scope.projectId+'/settings/oauth">Project Settings</a>.');
+        }
+      }
+
       // Hubspot action missing settings due to missing API key.
       if(actionInfo && actionInfo.name === 'hubspotContact') {
         var showFields = function(key, value) {
