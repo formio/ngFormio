@@ -433,7 +433,7 @@ app.controller('FormDeleteController', [
         message: _.capitalize($scope.form.type) + ' was deleted.'
       });
       GoogleAnalytics.sendEvent('Form', 'delete', null, 1);
-      $state.go('project.resource.index');
+      $scope.back('project.' + $scope.formInfo.type + '.form.view');
     });
 
     $scope.$on('cancel', function(event) {
