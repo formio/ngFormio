@@ -1,4 +1,4 @@
-<div class="col-md-1 project-sidebar sidebar">
+<div class="project-sidebar sidebar">
   <ul class="nav nav-sidebar">
     <li ng-class="{active: isActive('project.resource') && !isActive('project.form.form.submission')}"><a ui-sref="project.resource.index"><i class="fa fa-database"></i><br/><span>Resources</span></a></li>
     <li ng-class="{active: isActive('project.form')}"><a ui-sref="project.form.index"><i class="fa fa-tasks"></i><br/><span>Forms</span></a></li>
@@ -11,22 +11,22 @@
   </ul>
 </div>
 
-<div class="col-md-11 col-md-offset-1 project-main">
+<div class="project-main">
   <div class="row project-nav">
-    <div class="col-sm-8">
+    <div class="col-md-8 col-sm-6">
       <ul class="list-inline project-title-section">
         <li><div class="project-title ellipsis"><a ui-sref="project.edit" class="project-title-link">{{ currentProject.title }}</a></div></li>
         <li class="project-swagger-item"><a ui-sref="project.api" class="label label-default project-swagger-button">https://{{ currentProject.name }}.form.io</a></li>
       </ul>
       <div class="project-description">{{ currentProject.description }}</div>
     </div>
-    <div class="col-sm-2 project-header-block">
+    <div class="col-md-2 col-sm-3 project-header-block">
       <h5>Requests:&nbsp;&nbsp;<small>{{ currentProject.apiCalls.used | number }} / {{ getAPICallsLimit(currentProject.apiCalls) }}</small></h5>
       <div class="progress project-requests-progress">
         <div class="progress-bar" role="progressbar" ng-style="{width: getAPICallsPercent(currentProject.apiCalls)}" ng-class="getProgressBarClass(currentProject.apiCalls)"></div>
       </div>
     </div>
-    <div class="col-sm-2 project-header-block">
+    <div class="col-md-2 col-sm-3 project-header-block">
       <h5>Current Plan:&nbsp;&nbsp;<div class="label label-primary">{{ getPlanName(currentProject.plan) }}</div></h5>
       <a ng-click="showUpgradeDialog(currentProject)" ng-disabled="!isProjectOwner(currentProject)" class="btn btn-default btn-block pull-right upgrade-plan-header-button">Upgrade Plan</a>
     </div>
