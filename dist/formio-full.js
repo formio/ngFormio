@@ -63647,7 +63647,7 @@ module.exports = function (app) {
     '$templateCache',
     function ($templateCache) {
       $templateCache.put('formio/components/content.html',
-        '<div ng-bind-html="component.html | safehtml"></div>'
+        "<div ng-bind-html=\"component.html | safehtml\"></div>\n"
       );
     }
   ]);

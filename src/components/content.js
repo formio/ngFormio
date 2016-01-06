@@ -18,7 +18,7 @@ module.exports = function (app) {
     '$templateCache',
     function ($templateCache) {
       $templateCache.put('formio/components/content.html',
-        '<div ng-bind-html="component.html | safehtml"></div>'
+        fs.readFileSync(__dirname + '/../templates/components/content.html', 'utf8')
       );
     }
   ]);
