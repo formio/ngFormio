@@ -13,6 +13,7 @@ require('./email')(app);
 require('./fieldset')(app);
 require('./file')(app);
 require('./hidden')(app);
+require('./htmlelement')(app);
 require('./number')(app);
 require('./page')(app);
 require('./panel')(app);
