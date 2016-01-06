@@ -354,8 +354,9 @@ $project-header-color: lighten($brand-primary, 55%);
 .project-nav {
   background-color: $gray-lighter;
   border-bottom: 1px solid #ddd;
-  padding: 10px;
+  padding: 10px 0 10px 0;
   min-height: 90px;
+  margin: 0;
   .project-title {
     font-weight: normal;
     margin: 0;
@@ -374,7 +375,7 @@ $project-header-color: lighten($brand-primary, 55%);
   }
 }
 
-hr.project-section-separator {
+div.project-section-separator {
   margin-top: 10px;
   margin-bottom: 10px;
 }
