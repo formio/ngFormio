@@ -9,22 +9,25 @@ module.exports = function() {
       ) {
         return;
       }
-      ctrl.$parsers.unshift(function(input) {
+      ctrl.$validators.custom = function(modelValue, viewValue) {
         var valid = true;
-        if (input) {
-          var custom = scope.component.validate.custom;
-          custom = custom.replace(/({{\s+(.*)\s+}})/, function(match, $1, $2) {
-            return scope.data[$2];
-          });
-          /* jshint evil: true */
-          valid = eval(custom);
-          ctrl.$setValidity('custom', (valid === true));
-        }
+        var input = modelValue || viewValue;
+
+        var custom = scope.component.validate.custom;
+        custom = custom.replace(/({{\s+(.*)\s+}})/, function(match, $1, $2) {
+          return scope.data[$2];
+        });
+
+        /* jshint evil: true */
+        eval(custom);
+
         if (valid !== true) {
           scope.component.customError = valid;
+          return false;
         }
-        return (valid === true) ? input : valid;
-      });
+
+        return true;
+      };
     }
   };
 };
