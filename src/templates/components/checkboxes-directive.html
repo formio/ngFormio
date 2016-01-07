@@ -5,6 +5,7 @@
       id="{{ component.key }}-{{ v.value }}"
       name="{{ component.key }}-{{ v.value }}"
       value="{{ v.value }}"
+      tabindex="{{ component.tabindex || 0 }}"
       ng-disabled="readOnly"
       ng-click="toggleCheckbox(v.value)"
       ng-checked="model[v.value]"

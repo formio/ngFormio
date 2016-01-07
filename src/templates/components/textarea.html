@@ -5,6 +5,7 @@ ng-disabled="readOnly"
 ng-required="component.validate.required"
 safe-multiple-to-single
 id="{{ component.key }}"
+tabindex="{{ component.tabindex || 0 }}"
 placeholder="{{ component.placeholder }}"
 custom-validator="component.validate.custom"
 rows="{{ component.rows }}"></textarea>
