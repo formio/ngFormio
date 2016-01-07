@@ -3495,11 +3495,22 @@ Formio.getBaseUrl = function() {
 Formio.clearCache = function() { cache = {}; };
 
 Formio.currentUser = function() {
+  var url = baseUrl + '/current';
   var user = this.getUser();
-  if (user) { return Q(user) }
+  if (user) {
+    return pluginAlter('wrapStaticRequestPromise', Q(user), {
+      url: url,
+      method: 'GET'
+    })
+  }
   var token = this.getToken();
-  if (!token) { return Q(null) }
-  return this.makeStaticRequest(baseUrl + '/current')
+  if (!token) {
+    return pluginAlter('wrapStaticRequestPromise', Q(null), {
+      url: url,
+      method: 'GET'
+    })
+  }
+  return this.makeStaticRequest(url)
   .then(function(response) {
     Formio.setUser(response);
     return response;
@@ -3958,94 +3969,6 @@ module.exports = function (app) {
 
 module.exports = function (app) {
 
-  app.directive('formioCheckboxes', [function() {
-    return {
-      restrict: 'E',
-      replace: true,
-      require: 'ngModel',
-      scope: {
-        component: '=',
-        readOnly: '=',
-        model: '=ngModel'
-      },
-      templateUrl: 'formio/components/checkboxes-directive.html',
-      link: function($scope, el, attrs, ngModel) {
-        // Initialize model
-        var model = {};
-        angular.forEach($scope.component.values, function(v) {
-          model[v.value] = !!ngModel.$viewValue[v.value];
-        });
-        ngModel.$setViewValue(model);
-        ngModel.$setPristine(true);
-
-        ngModel.$isEmpty = function(value) {
-          return Object.keys(value).every(function(key) {
-            return !value[key];
-          });
-        };
-
-        $scope.toggleCheckbox = function(value) {
-          var model = angular.copy(ngModel.$viewValue);
-          model[value] = !model[value];
-          ngModel.$setViewValue(model);
-        };
-      }
-    };
-  }]);
-
-  app.config([
-    'formioComponentsProvider',
-    function (formioComponentsProvider) {
-      formioComponentsProvider.register('checkboxes', {
-        title: 'Check Boxes',
-        template: 'formio/components/checkboxes.html',
-        tableView: function (data) {
-          if (!data) return '';
-
-          return Object.keys(data)
-          .filter(function(key) {
-            return data[key];
-          })
-          .join(', ');
-        },
-        settings: {
-          input: true,
-          inputType: 'checkboxes',
-          tableView: true,
-          label: '',
-          key: 'checkboxesField',
-          values: [],
-          defaultValue: {},
-          inline: false,
-          protected: false,
-          persistent: true,
-          validate: {
-            required: false
-          }
-        }
-      });
-    }
-  ]);
-
-  app.run([
-    '$templateCache',
-    'FormioUtils',
-    function ($templateCache) {
-      $templateCache.put('formio/components/checkboxes-directive.html',
-        "<div class=\"checkboxes\">\n  <div ng-class=\"component.inline ? 'checkbox-inline' : 'checkbox'\" ng-repeat=\"v in component.values track by $index\">\n    <label class=\"control-label\" for=\"{{ component.key }}-{{ v.value }}\">\n      <input type=\"checkbox\"\n      id=\"{{ component.key }}-{{ v.value }}\"\n      name=\"{{ component.key }}-{{ v.value }}\"\n      value=\"{{ v.value }}\"\n      tabindex=\"{{ component.tabindex || 0 }}\"\n      ng-disabled=\"readOnly\"\n      ng-click=\"toggleCheckbox(v.value)\"\n      ng-checked=\"model[v.value]\"\n      >\n      {{ v.label }}\n    </label>\n  </div>\n</div>\n"
-      );
-      $templateCache.put('formio/components/checkboxes.html',
-        "<label ng-if=\"component.label\" for=\"{{ component.key }}\" class=\"control-label\" ng-class=\"{'field-required': component.validate.required}\">{{ component.label }}</label>\n<formio-checkboxes\n  name=\"{{ component.key }}\"\n  ng-model=\"data[component.key]\"\n  ng-model-options=\"{allowInvalid: true}\"\n  component=\"component\"\n  read-only=\"readOnly\"\n  ng-required=\"component.validate.required\"\n  custom-validator=\"component.validate.custom\"\n  ></formio-checkboxes>\n<formio-errors></formio-errors>\n"
-      );
-    }
-  ]);
-};
-
-},{}],11:[function(require,module,exports){
-"use strict";
-
-module.exports = function (app) {
-
   app.config([
     'formioComponentsProvider',
     function (formioComponentsProvider) {
@@ -4070,7 +3993,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],12:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -4128,7 +4051,7 @@ module.exports = function (app) {
   }]);
 };
 
-},{}],13:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -4156,7 +4079,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],14:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -4219,7 +4142,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],15:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -4248,7 +4171,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],16:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -4279,7 +4202,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],17:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -4431,7 +4354,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],18:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -4464,7 +4387,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],19:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -4543,7 +4466,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],20:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 "use strict";
 var app = angular.module('formio');
 
@@ -4552,7 +4475,6 @@ require('./textfield')(app);
 require('./address')(app);
 require('./button')(app);
 require('./checkbox')(app);
-require('./checkboxes')(app);
 require('./columns')(app);
 require('./content')(app);
 require('./datetime')(app);
@@ -4569,12 +4491,13 @@ require('./phonenumber')(app);
 require('./radio')(app);
 require('./resource')(app);
 require('./select')(app);
+require('./selectboxes')(app);
 require('./signature')(app);
 require('./table')(app);
 require('./textarea')(app);
 require('./well')(app);
 
-},{"./address":7,"./button":8,"./checkbox":9,"./checkboxes":10,"./columns":11,"./components":12,"./content":13,"./datetime":14,"./email":15,"./fieldset":16,"./file":17,"./hidden":18,"./htmlelement":19,"./number":21,"./page":22,"./panel":23,"./password":24,"./phonenumber":25,"./radio":26,"./resource":27,"./select":28,"./signature":29,"./table":30,"./textarea":31,"./textfield":32,"./well":33}],21:[function(require,module,exports){
+},{"./address":7,"./button":8,"./checkbox":9,"./columns":10,"./components":11,"./content":12,"./datetime":13,"./email":14,"./fieldset":15,"./file":16,"./hidden":17,"./htmlelement":18,"./number":20,"./page":21,"./panel":22,"./password":23,"./phonenumber":24,"./radio":25,"./resource":26,"./select":27,"./selectboxes":28,"./signature":29,"./table":30,"./textarea":31,"./textfield":32,"./well":33}],20:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -4622,7 +4545,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],22:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -4649,7 +4572,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],23:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -4680,7 +4603,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],24:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -4710,7 +4633,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],25:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -4742,7 +4665,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],26:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -4784,7 +4707,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],27:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -4866,7 +4789,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],28:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -5050,6 +4973,93 @@ module.exports = function (app) {
       // Change the ui-select to ui-select multiple.
       $templateCache.put('formio/components/select-multiple.html',
         $templateCache.get('formio/components/select.html').replace('<ui-select', '<ui-select multiple')
+      );
+    }
+  ]);
+};
+
+},{}],28:[function(require,module,exports){
+"use strict";
+
+module.exports = function (app) {
+
+  app.directive('formioSelectBoxes', [function() {
+    return {
+      restrict: 'E',
+      replace: true,
+      require: 'ngModel',
+      scope: {
+        component: '=',
+        readOnly: '=',
+        model: '=ngModel'
+      },
+      templateUrl: 'formio/components/selectboxes-directive.html',
+      link: function($scope, el, attrs, ngModel) {
+        // Initialize model
+        var model = {};
+        angular.forEach($scope.component.values, function(v) {
+          model[v.value] = !!ngModel.$viewValue[v.value];
+        });
+        ngModel.$setViewValue(model);
+        ngModel.$setPristine(true);
+
+        ngModel.$isEmpty = function(value) {
+          return Object.keys(value).every(function(key) {
+            return !value[key];
+          });
+        };
+
+        $scope.toggleCheckbox = function(value) {
+          var model = angular.copy(ngModel.$viewValue);
+          model[value] = !model[value];
+          ngModel.$setViewValue(model);
+        };
+      }
+    };
+  }]);
+
+  app.config([
+    'formioComponentsProvider',
+    function (formioComponentsProvider) {
+      formioComponentsProvider.register('selectboxes', {
+        title: 'Select Boxes',
+        template: 'formio/components/selectboxes.html',
+        tableView: function (data) {
+          if (!data) return '';
+
+          return Object.keys(data)
+          .filter(function(key) {
+            return data[key];
+          })
+          .join(', ');
+        },
+        settings: {
+          input: true,
+          tableView: true,
+          label: '',
+          key: 'selectboxesField',
+          values: [],
+          defaultValue: {},
+          inline: false,
+          protected: false,
+          persistent: true,
+          validate: {
+            required: false
+          }
+        }
+      });
+    }
+  ]);
+
+  app.run([
+    '$templateCache',
+    'FormioUtils',
+    function ($templateCache) {
+      $templateCache.put('formio/components/selectboxes-directive.html',
+        "<div class=\"select-boxes\">\n  <div ng-class=\"component.inline ? 'checkbox-inline' : 'checkbox'\" ng-repeat=\"v in component.values track by $index\">\n    <label class=\"control-label\" for=\"{{ component.key }}-{{ v.value }}\">\n      <input type=\"checkbox\"\n      id=\"{{ component.key }}-{{ v.value }}\"\n      name=\"{{ component.key }}-{{ v.value }}\"\n      value=\"{{ v.value }}\"\n      tabindex=\"{{ component.tabindex || 0 }}\"\n      ng-disabled=\"readOnly\"\n      ng-click=\"toggleCheckbox(v.value)\"\n      ng-checked=\"model[v.value]\"\n      >\n      {{ v.label }}\n    </label>\n  </div>\n</div>\n"
+      );
+      $templateCache.put('formio/components/selectboxes.html',
+        "<label ng-if=\"component.label\" for=\"{{ component.key }}\" class=\"control-label\" ng-class=\"{'field-required': component.validate.required}\">{{ component.label }}</label>\n<formio-select-boxes\n  name=\"{{ component.key }}\"\n  ng-model=\"data[component.key]\"\n  ng-model-options=\"{allowInvalid: true}\"\n  component=\"component\"\n  read-only=\"readOnly\"\n  ng-required=\"component.validate.required\"\n  custom-validator=\"component.validate.custom\"\n  ></formio-select-boxes>\n<formio-errors></formio-errors>\n"
       );
     }
   ]);
@@ -6264,7 +6274,7 @@ app.run([
 
 require('./components');
 
-},{"./components":20,"./directives/customValidator":34,"./directives/formio":35,"./directives/formioComponent":36,"./directives/formioDelete":37,"./directives/formioElement":38,"./directives/formioErrors":39,"./directives/formioSubmissions":40,"./factories/FormioScope":41,"./factories/FormioUtils":42,"./factories/formioInterceptor":43,"./filters/flattenComponents":44,"./filters/safehtml":45,"./plugins":47,"./providers/Formio":49,"./providers/FormioPlugins":50}],47:[function(require,module,exports){
+},{"./components":19,"./directives/customValidator":34,"./directives/formio":35,"./directives/formioComponent":36,"./directives/formioDelete":37,"./directives/formioElement":38,"./directives/formioErrors":39,"./directives/formioSubmissions":40,"./factories/FormioScope":41,"./factories/FormioUtils":42,"./factories/formioInterceptor":43,"./filters/flattenComponents":44,"./filters/safehtml":45,"./plugins":47,"./providers/Formio":49,"./providers/FormioPlugins":50}],47:[function(require,module,exports){
 "use strict";
 module.exports = function(app) {
   require('./storage/url')(app);

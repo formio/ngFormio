@@ -1,7 +1,7 @@
 var fs = require('fs');
 module.exports = function (app) {
 
-  app.directive('formioCheckboxes', [function() {
+  app.directive('formioSelectBoxes', [function() {
     return {
       restrict: 'E',
       replace: true,
@@ -11,7 +11,7 @@ module.exports = function (app) {
         readOnly: '=',
         model: '=ngModel'
       },
-      templateUrl: 'formio/components/checkboxes-directive.html',
+      templateUrl: 'formio/components/selectboxes-directive.html',
       link: function($scope, el, attrs, ngModel) {
         // Initialize model
         var model = {};
@@ -39,9 +39,9 @@ module.exports = function (app) {
   app.config([
     'formioComponentsProvider',
     function (formioComponentsProvider) {
-      formioComponentsProvider.register('checkboxes', {
-        title: 'Check Boxes',
-        template: 'formio/components/checkboxes.html',
+      formioComponentsProvider.register('selectboxes', {
+        title: 'Select Boxes',
+        template: 'formio/components/selectboxes.html',
         tableView: function (data) {
           if (!data) return '';
 
@@ -53,10 +53,9 @@ module.exports = function (app) {
         },
         settings: {
           input: true,
-          inputType: 'checkboxes',
           tableView: true,
           label: '',
-          key: 'checkboxesField',
+          key: 'selectboxesField',
           values: [],
           defaultValue: {},
           inline: false,
@@ -74,11 +73,11 @@ module.exports = function (app) {
     '$templateCache',
     'FormioUtils',
     function ($templateCache) {
-      $templateCache.put('formio/components/checkboxes-directive.html',
-        fs.readFileSync(__dirname + '/../templates/components/checkboxes-directive.html', 'utf8')
+      $templateCache.put('formio/components/selectboxes-directive.html',
+        fs.readFileSync(__dirname + '/../templates/components/selectboxes-directive.html', 'utf8')
       );
-      $templateCache.put('formio/components/checkboxes.html',
-        fs.readFileSync(__dirname + '/../templates/components/checkboxes.html', 'utf8')
+      $templateCache.put('formio/components/selectboxes.html',
+        fs.readFileSync(__dirname + '/../templates/components/selectboxes.html', 'utf8')
       );
     }
   ]);
