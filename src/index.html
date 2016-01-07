@@ -76,13 +76,13 @@
                 </a>
               </div>
               <div id="navbar" class="navbar-collapse collapse">
-                <ul class="nav navbar-nav" ng-if="authenticated && currentProject" ng-cloak>
+                <ul class="nav navbar-nav" ng-if="authenticated && (currentProject || $state.includes('profile'))" ng-cloak>
                   <li><a ui-sref="home" style="font-size: 1.5em;"><i class="fa fa-th-large"></i> Projects</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                   <li><a href="http://help.form.io" target="_blank"><i class="fa fa-life-ring"></i> Help</a></li>
                   <li class="dropdown user-dropdown" ng-cloak>
-                    <a ng-if="authenticated" href="#" class="dropdown-toggle" id="user-menu" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-user"></i> {{ user.data.name }}<b class="caret"></b></a>
+                    <a ng-if="authenticated" class="dropdown-toggle" id="user-menu" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-user"></i> {{ user.data.name }}<b class="caret"></b></a>
                     <ul class="dropdown-menu">
                       <li><a ui-sref="profile.view()"><i class="fa fa-user"></i> Profile</a></li>
                       <li><a ui-sref="profile.payment.view()"><i class="fa fa-credit-card"></i> Payment Info</a></li>
