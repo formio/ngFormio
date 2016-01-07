@@ -1,6 +1,6 @@
 {
   "name": "formio",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "The form redering engine behind Form.IO.",
   "main": "dist/formio.min.js",
   "scripts": {
