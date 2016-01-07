@@ -99,7 +99,6 @@ app.controller('ProfileController', [
       $rootScope.user = user;
       $scope.profileUrl = $rootScope.userForm + '/submission/' + $rootScope.user._id;
       $scope.userLoading = false;
-      $scope.$apply();
     });
 
     $scope.$on('formSubmission', function(event, submission) {
