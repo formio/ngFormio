@@ -1,5 +1,5 @@
 <ng-form name="formioFieldForm" class="formio-component-{{ component.key }}">
-  <div class="form-group has-feedback form-field-type-{{ component.type }} {{component.customClass}}" id="form-group-{{ component.key }}" ng-class="{'has-error': formioFieldForm[component.key].$invalid && !formioFieldForm[component.key].$pristine }">
+  <div class="form-group has-feedback form-field-type-{{ component.type }} {{component.customClass}}" id="form-group-{{ component.key }}" ng-class="{'has-error': formioFieldForm[component.key].$invalid && !formioFieldForm[component.key].$pristine }" ng-style="component.style">
     <formio-element></formio-element>
   </div>
 </ng-form>
