@@ -1,97 +1,4 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-// shim for using process in browser
-
-var process = module.exports = {};
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
-
-function cleanUpNextTick() {
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
-}
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = setTimeout(cleanUpNextTick);
-    draining = true;
-
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            if (currentQueue) {
-                currentQueue[queueIndex].run();
-            }
-        }
-        queueIndex = -1;
-        len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    clearTimeout(timeout);
-}
-
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
-        }
-    }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-        setTimeout(drainQueue, 0);
-    }
-};
-
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
-}
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
-};
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
-
-},{}],2:[function(require,module,exports){
 (function (process){
 // vim:ts=4:sts=4:sw=4:
 /*!
@@ -2143,7 +2050,7 @@ return Q;
 });
 
 }).call(this,require('_process'))
-},{"_process":1}],3:[function(require,module,exports){
+},{"_process":6}],2:[function(require,module,exports){
 /*!
  * EventEmitter2
  * https://github.com/hij1nx/EventEmitter2
@@ -2718,7 +2625,7 @@ return Q;
   }
 }();
 
-},{}],4:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 module.exports = function (obj) {
     if (!obj || typeof obj !== 'object') return obj;
     
@@ -2755,7 +2662,7 @@ var isArray = Array.isArray || function (xs) {
     return {}.toString.call(xs) === '[object Array]';
 };
 
-},{}],5:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 (function() {
   'use strict';
 
@@ -3087,7 +2994,7 @@ var isArray = Array.isArray || function (xs) {
   self.fetch.polyfill = true
 })();
 
-},{}],6:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 'use strict';
 
 require('whatwg-fetch');
@@ -3588,22 +3495,11 @@ Formio.getBaseUrl = function() {
 Formio.clearCache = function() { cache = {}; };
 
 Formio.currentUser = function() {
-  var url = baseUrl + '/current';
   var user = this.getUser();
-  if (user) {
-    return pluginAlter('wrapStaticRequestPromise', Q(user), {
-      url: url,
-      method: 'GET'
-    })
-  }
+  if (user) { return Q(user) }
   var token = this.getToken();
-  if (!token) {
-    return pluginAlter('wrapStaticRequestPromise', Q(null), {
-      url: url,
-      method: 'GET'
-    })
-  }
-  return this.makeStaticRequest(url)
+  if (!token) { return Q(null) }
+  return this.makeStaticRequest(baseUrl + '/current')
   .then(function(response) {
     Formio.setUser(response);
     return response;
@@ -3706,7 +3602,100 @@ Formio.deregisterPlugin = function(plugin) {
 
 module.exports = Formio;
 
-},{"Q":2,"eventemitter2":3,"shallow-copy":4,"whatwg-fetch":5}],7:[function(require,module,exports){
+},{"Q":1,"eventemitter2":2,"shallow-copy":3,"whatwg-fetch":4}],6:[function(require,module,exports){
+// shim for using process in browser
+
+var process = module.exports = {};
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = setTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    clearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        setTimeout(drainQueue, 0);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+},{}],7:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -4161,7 +4150,7 @@ module.exports = function (app) {
     '$templateCache',
     function ($templateCache) {
       $templateCache.put('formio/components/content.html',
-        '<div ng-bind-html="component.html | safehtml"></div>'
+        "<div ng-bind-html=\"component.html | safehtml\"></div>\n"
       );
     }
   ]);
@@ -4476,6 +4465,85 @@ module.exports = function (app) {
 
 },{}],19:[function(require,module,exports){
 "use strict";
+
+module.exports = function (app) {
+
+  app.directive('formioHtmlElement', [
+    '$sanitize',
+    function($sanitize) {
+      return {
+        restrict: 'E',
+        scope: {
+          component: '='
+        },
+        templateUrl: 'formio/components/htmlelement-directive.html',
+        link: function($scope) {
+          var createElement = function() {
+            var element = angular.element(
+              '<' + $scope.component.tag + '>' + '</' + $scope.component.tag + '>'
+            );
+
+            element.html($scope.component.content);
+
+            element.attr('class', $scope.component.className);
+            angular.forEach($scope.component.attrs, function(attr) {
+              if (!attr.attr) return;
+              element.attr(attr.attr, attr.value);
+            });
+
+            try {
+              $scope.html = $sanitize(element.prop('outerHTML'));
+              $scope.parseError = null;
+            }
+            catch (err) {
+              // Isolate the message and store it.
+              $scope.parseError = err.message
+              .split('\n')[0]
+              .replace('[$sanitize:badparse]', '');
+            }
+
+          };
+
+          createElement();
+
+          $scope.$watch('component', createElement, true);
+        }
+      };
+  }]);
+
+  app.config([
+    'formioComponentsProvider',
+    function (formioComponentsProvider) {
+      formioComponentsProvider.register('htmlelement', {
+        title: 'HTML Element',
+        template: 'formio/components/htmlelement.html',
+        settings: {
+          input: false,
+          tag: 'p',
+          attrs: [],
+          className: '',
+          content: ''
+        }
+      });
+    }
+  ]);
+
+  app.run([
+    '$templateCache',
+    function ($templateCache) {
+      $templateCache.put('formio/components/htmlelement.html',
+        '<formio-html-element component="component"></div>'
+      );
+
+      $templateCache.put('formio/components/htmlelement-directive.html',
+        "<div class=\"alert alert-warning\" ng-if=\"parseError\">{{ parseError }}</div>\n<div ng-bind-html=\"html\"></div>\n"
+      );
+    }
+  ]);
+};
+
+},{}],20:[function(require,module,exports){
+"use strict";
 var app = angular.module('formio');
 
 require('./components')(app);
@@ -4491,6 +4559,7 @@ require('./email')(app);
 require('./fieldset')(app);
 require('./file')(app);
 require('./hidden')(app);
+require('./htmlelement')(app);
 require('./number')(app);
 require('./page')(app);
 require('./panel')(app);
@@ -4504,7 +4573,7 @@ require('./table')(app);
 require('./textarea')(app);
 require('./well')(app);
 
-},{"./address":7,"./button":8,"./checkbox":9,"./checkboxes":10,"./columns":11,"./components":12,"./content":13,"./datetime":14,"./email":15,"./fieldset":16,"./file":17,"./hidden":18,"./number":20,"./page":21,"./panel":22,"./password":23,"./phonenumber":24,"./radio":25,"./resource":26,"./select":27,"./signature":28,"./table":29,"./textarea":30,"./textfield":31,"./well":32}],20:[function(require,module,exports){
+},{"./address":7,"./button":8,"./checkbox":9,"./checkboxes":10,"./columns":11,"./components":12,"./content":13,"./datetime":14,"./email":15,"./fieldset":16,"./file":17,"./hidden":18,"./htmlelement":19,"./number":21,"./page":22,"./panel":23,"./password":24,"./phonenumber":25,"./radio":26,"./resource":27,"./select":28,"./signature":29,"./table":30,"./textarea":31,"./textfield":32,"./well":33}],21:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -4552,7 +4621,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -4579,7 +4648,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -4610,7 +4679,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -4640,7 +4709,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -4672,7 +4741,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -4714,7 +4783,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -4796,7 +4865,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -4985,7 +5054,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],28:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -5119,7 +5188,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],29:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -5160,7 +5229,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],30:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -5207,7 +5276,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],31:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -5257,7 +5326,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],32:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -5286,7 +5355,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],33:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -5322,7 +5391,7 @@ module.exports = function() {
   };
 };
 
-},{}],34:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -5452,7 +5521,7 @@ module.exports = function() {
   };
 };
 
-},{}],35:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -5606,7 +5675,7 @@ module.exports = [
   }
 ];
 
-},{}],36:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -5686,7 +5755,7 @@ module.exports = function() {
   };
 };
 
-},{}],37:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 "use strict";
 module.exports = [
   '$compile',
@@ -5708,7 +5777,7 @@ module.exports = [
   }
 ];
 
-},{}],38:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -5718,7 +5787,7 @@ module.exports = function() {
   };
 };
 
-},{}],39:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -5772,7 +5841,7 @@ module.exports = function() {
   };
 };
 
-},{}],40:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -5936,7 +6005,7 @@ module.exports = [
   }
 ];
 
-},{}],41:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -6024,7 +6093,7 @@ module.exports = function() {
   };
 };
 
-},{}],42:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 "use strict";
 module.exports = [
   '$q',
@@ -6073,7 +6142,7 @@ module.exports = [
   }
 ];
 
-},{}],43:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 "use strict";
 module.exports = [
   'FormioUtils',
@@ -6082,7 +6151,7 @@ module.exports = [
   }
 ];
 
-},{}],44:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 "use strict";
 module.exports = [
   '$sce',
@@ -6095,7 +6164,7 @@ module.exports = [
   }
 ];
 
-},{}],45:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 "use strict";
 
 
@@ -6194,13 +6263,13 @@ app.run([
 
 require('./components');
 
-},{"./components":19,"./directives/customValidator":33,"./directives/formio":34,"./directives/formioComponent":35,"./directives/formioDelete":36,"./directives/formioElement":37,"./directives/formioErrors":38,"./directives/formioSubmissions":39,"./factories/FormioScope":40,"./factories/FormioUtils":41,"./factories/formioInterceptor":42,"./filters/flattenComponents":43,"./filters/safehtml":44,"./plugins":46,"./providers/Formio":48,"./providers/FormioPlugins":49}],46:[function(require,module,exports){
+},{"./components":20,"./directives/customValidator":34,"./directives/formio":35,"./directives/formioComponent":36,"./directives/formioDelete":37,"./directives/formioElement":38,"./directives/formioErrors":39,"./directives/formioSubmissions":40,"./factories/FormioScope":41,"./factories/FormioUtils":42,"./factories/formioInterceptor":43,"./filters/flattenComponents":44,"./filters/safehtml":45,"./plugins":47,"./providers/Formio":49,"./providers/FormioPlugins":50}],47:[function(require,module,exports){
 "use strict";
 module.exports = function(app) {
   require('./storage/url')(app);
 };
 
-},{"./storage/url":47}],47:[function(require,module,exports){
+},{"./storage/url":48}],48:[function(require,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -6252,7 +6321,7 @@ module.exports = function(app) {
   );
 };
 
-},{}],48:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 "use strict";
 module.exports = function() {
 
@@ -6317,7 +6386,7 @@ module.exports = function() {
   };
 };
 
-},{"formiojs/src/formio.js":6}],49:[function(require,module,exports){
+},{"formiojs/src/formio.js":5}],50:[function(require,module,exports){
 "use strict";
 
 module.exports = function() {
@@ -6349,4 +6418,4 @@ module.exports = function() {
   };
 };
 
-},{}]},{},[45]);
+},{}]},{},[46]);
