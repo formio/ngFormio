@@ -433,7 +433,7 @@ app.controller('FormDeleteController', [
         message: _.capitalize($scope.form.type) + ' was deleted.'
       });
       GoogleAnalytics.sendEvent('Form', 'delete', null, 1);
-      $state.go('project.resource.index');
+      $scope.back('project.' + $scope.formInfo.type + '.form.view');
     });
 
     $scope.$on('cancel', function(event) {
@@ -598,6 +598,14 @@ app.controller('FormActionEditController', [
       // Role action alert for new resource missing role assignment.
       if(actionInfo && actionInfo.name === 'role') {
         FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> The Role Assignment Action requires a Resource Form component with the API key, \'submission\', to modify existing Resource submissions.');
+      }
+
+      // Oauth action alert for new resource missing role assignment.
+      if (actionInfo && actionInfo.name === 'oauth') {
+        var providers = FormioUtils.getComponent(actionInfo.settingsForm.components, 'settings[provider]');
+        if (providers.data && providers.data.json && providers.data.json === '[]') {
+          FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> The OAuth Action requires a provider to be configured, before it can be used. You can add an OAuth provider in your <a href="#/project/'+$scope.projectId+'/settings/oauth">Project Settings</a>.');
+        }
       }
 
       // Hubspot action missing settings due to missing API key.

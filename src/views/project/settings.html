@@ -4,6 +4,7 @@
   <p>Each project contains its own settings for configuring 3rd Party Interfaces, Database connections, Roles & Permissions, and more.</p>
 </div>
 <div class="alert alert-success" role="alert"><i class="fa fa-lock fa-lg"></i> Project Settings are encrypted for your protection.</div>
+
 <div style="padding: 0 10px 20px 0;">
   <div class="row">
     <div class="col-sm-2 well">
@@ -29,4 +30,10 @@
       </ng-form>
     </div>
   </div>
+</div>
+<div class="col-sm-10" style="padding: 0 20px 40px 0;">
+  <ng-form>
+    <i id="project-loader" ng-if="!currentProject" style="font-size: 2em;" class="fa fa-spinner fa-pulse"></i>
+    <div ng-if="currentProject" ui-view></div>
+  </ng-form>
 </div>

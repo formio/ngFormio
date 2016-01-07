@@ -120,7 +120,7 @@ angular
         })
         .state('project', {
           abstract: true,
-          url: '/project/:projectId?welcome',
+          url: '/project/:projectId',
           controller: 'ProjectController',
           templateUrl: 'views/project/project.html'
         })
@@ -486,7 +486,8 @@ angular
 
       $scope.createProject = function(template) {
         FormioProject.createProject(template).then(function(project) {
-          $state.go('project.resource.index', {projectId: project._id, welcome: true});
+          localStorage.setItem('showWelcome', 1);
+          $state.go('project.resource.index', {projectId: project._id});
         });
       };
 
@@ -728,6 +729,13 @@ angular
           $state.go(defaultState, defaultParams);
         }
       };
+
+      // CKEditor whitelist
+      // On approved elements allow:
+      //   - Any attribute beginning with 'data-'
+      //   - Any inline style
+      //   - Any class name
+      CKEDITOR.config.allowedContent = '*[data-*]{*}(*)';
     }
   ])
   .factory('GoogleAnalytics', ['$window', '$state', function($window, $state) {

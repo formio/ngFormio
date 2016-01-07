@@ -3,16 +3,20 @@
     <h1>Welcome to <img style="height:1em;" src="images/formio-logo-white.png"></h1>
     <ul class="list-inline">
       <li><a class="btn btn-default btn-lg" href="http://help.form.io/start" target="_blank"  role="button"><i class="fa fa-play-circle-o"></i> 5 min. tutorial</a></li>
-      <li><a class="btn btn-default btn-lg" href="http://help.form.io/intro" target="_blank"  role="button"><i class="fa fa-clock-o"></i> Quickstart</a></li>
-      <li><a class="btn btn-default btn-lg" href="http://help.form.io/userguide" target="_blank" role="button"><i class="fa fa-search"></i> Users Guide</a></li>
-      <li><a class="btn btn-default btn-lg" href="http://help.form.io/api" target="_blank" role="button"><i class="fa fa-file-code-o"></i> API Docs</a></li>
+      <li><a class="btn btn-default btn-lg" href="http://help.form.io/intro" target="_blank"  role="button"><i class="fa fa-clock-o"></i> Getting Started</a></li>
+      <li><a class="btn btn-default btn-lg" href="http://help.form.io/userguide" target="_blank" role="button"><i class="fa fa-search"></i> User Guide</a></li>
+      <li><a class="btn btn-default btn-lg" href="http://help.form.io/api" target="_blank" role="button"><i class="fa fa-file-code-o"></i> Developer Info</a></li>
     </ul>
   </div>
 </div>
-<div class="welcome-info-strip text-center row">
-  <div class="col-sm-8 col-sm-offset-2">
-    <p>Form.io is a combined Form and API platform for Web applications.</p>
-    <p>You can either create a New Project or start with a fully functional application template.</p>
+<div class="welcome-info-strip">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-10 col-sm-offset-1 text-center">
+        <p>Form.io is a combined Form and API platform for Web applications.</p>
+        <p>You can either create a New Project or start with a fully functional application template.</p>
+      </div>
+    </div>
   </div>
 </div>
 <div class="new-project-row" ng-if="showHeader">
@@ -23,7 +27,7 @@
           <div class="project-template-card" ui-sref="createProject()">
             <img class="project-template-img" src="images/empty-project.png" />
             <div class="project-template-info">
-              <h5 class="ellipsis">Create Project</h5>
+              <h5 class="ellipsis">Custom Project</h5>
             </div>
           </div>
         </li>
@@ -63,7 +67,7 @@
             <h4 class="project-title ellipsis"><a ui-sref="project.resource.index({projectId: project._id})">{{ project.title }}</a></h4>
             <p class="project-url ellipsis" ui-sref="project.resource.index({projectId: project._id})"><strong>{{ project.name }}</strong>.form.io</p>
             <p class="project-description">{{ project.description | characters: 50 }}</p>
-            <hr class="project-section-separator"></hr>
+            <div class="project-section-separator"></div>
             <p class="progress-label text-center"><small>Monthly API Calls</small></p>
             <div class="progress">
               <div class="progress-bar" role="progressbar" ng-style="{width: project.apiCalls.used / project.apiCalls.limit * 100 + '%'}" ng-class="getProgressBarClass(project.apiCalls)"></div>
@@ -101,18 +105,5 @@
         <a ui-sref="createTeam()" class="btn btn-primary btn-block"><span class="glyphicon glyphicon-plus circle"></span> Create Team</a>
       </div>
     </div>
-  </div>
-</div>
-<hr ng-if="projects.length != 0">
-<div ng-if="projects.length != 0">
-  <div class="col-md-4 col-vertical-center col-md-offset-2 col-sm-6 col-xs-6">
-    <h3>Bootstrap an application</h3>
-    <p>If you're comfortable with a terminal, you can use our <strong>command line utility</strong> to <strong>bootstrap</strong> a working application from a template.</p>
-    <p><small>Note: You must have <a target="_blank" href="https://nodejs.org">Node.js</a> installed on your machine.</small></p>
-    <p><small>Other applications can be found @ <a target="_blank" href="https://github.com/formio?query=formio-app-">https://github.com/formio</a></small></p>
-  </div>
-  <div class="col-vertical-center col-md-4 col-sm-6 col-xs-6">
-  <pre>npm install -g formio-cli
-formio bootstrap formio/formio-app-todo</pre>
   </div>
 </div>

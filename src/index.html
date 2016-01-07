@@ -11,11 +11,11 @@
     <link rel="stylesheet" href="/styles/base.css" />
     <!-- bower:css -->
     <link rel="stylesheet" href="/bower_components/ng-sortable/dist/ng-sortable.css" />
+    <link rel="stylesheet" href="/bower_components/angular-ui-select/dist/select.css" />
+    <link rel="stylesheet" href="/bower_components/formio/css/formio.css" />
     <link rel="stylesheet" href="/bower_components/ngDialog/css/ngDialog.css" />
     <link rel="stylesheet" href="/bower_components/ngDialog/css/ngDialog-theme-default.css" />
     <link rel="stylesheet" href="/bower_components/ng-ckeditor/ng-ckeditor.css" />
-    <link rel="stylesheet" href="/bower_components/ui-select/dist/select.css" />
-    <link rel="stylesheet" href="/bower_components/formio/css/formio.css" />
     <link rel="stylesheet" href="/bower_components/ng-dialog/css/ngDialog.css" />
     <link rel="stylesheet" href="/bower_components/ng-dialog/css/ngDialog-theme-default.css" />
     <link rel="stylesheet" href="/bower_components/ngFormBuilder/css/formBuilder.css" />
@@ -23,6 +23,7 @@
     <link rel="stylesheet" href="/bower_components/kendo-ui/styles/kendo.common.min.css" />
     <link rel="stylesheet" href="/bower_components/kendo-ui/styles/kendo.bootstrap.min.css" />
     <link rel="stylesheet" href="/bower_components/angular-ui-notification/dist/angular-ui-notification.css" />
+    <link rel="stylesheet" href="/bower_components/ui-select/dist/select.css" />
     <!-- endbower -->
     <!-- endbuild -->
 
@@ -75,14 +76,13 @@
                 </a>
               </div>
               <div id="navbar" class="navbar-collapse collapse">
-                <ul class="nav navbar-nav" ng-if="authenticated" ng-cloak>
+                <ul class="nav navbar-nav" ng-if="authenticated && (currentProject || $state.includes('profile'))" ng-cloak>
                   <li><a ui-sref="home" style="font-size: 1.5em;"><i class="fa fa-th-large"></i> Projects</a></li>
-                  <li><a ui-sref="home" style="font-size: 1.5em;"><i class="fa fa-users"></i> Teams</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                   <li><a href="http://help.form.io" target="_blank"><i class="fa fa-life-ring"></i> Help</a></li>
                   <li class="dropdown user-dropdown" ng-cloak>
-                    <a ng-if="authenticated" href="#" class="dropdown-toggle" id="user-menu" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-user"></i> {{ user.data.name }}<b class="caret"></b></a>
+                    <a ng-if="authenticated" class="dropdown-toggle" id="user-menu" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-user"></i> {{ user.data.name }}<b class="caret"></b></a>
                     <ul class="dropdown-menu">
                       <li><a ui-sref="profile.view()"><i class="fa fa-user"></i> Profile</a></li>
                       <li><a ui-sref="profile.payment.view()"><i class="fa fa-credit-card"></i> Payment Info</a></li>
@@ -105,41 +105,55 @@
       <div class="container">
         <div class="row">
           <div class="col-md-3">
-            <h3 class="section-heading"><i class="fa fa-book"></i> Resources</h3>
+            <h3 class="section-heading"><i class="fa fa-wrench"></i> Tools & Examples</h3>
             <ul class="list-group">
-              <li class="list-group-item"><a href="http://help.form.io"><i class="fa fa-book"></i> Documentation</a></li>
+              <li class="list-group-item"><a href="http://help.form.io/start"><i class="fa fa-youtube-play"></i> 5 minute tutorial</a></li>
+              <li class="list-group-item"><a href="https://github.com/formio?utf8=%E2%9C%93&query=formio-app-"><i class="fa fa-tablet"></i> Example Apps</a></li>
+              <li class="list-group-item"><a href="https://github.com/formio"><i class="fa fa-star"></i> Open Source Projects</a></li>
               <li class="list-group-item"><a href="http://help.form.io/support"><i class="fa fa-support"></i> Support</a></li>
             </ul>
           </div>
           <div class="col-md-3">
-            <h3 class="section-heading"><i class="fa fa-bullhorn"></i> News</h3>
+            <h3 class="section-heading"><i class="fa fa-book"></i> Documentation</h3>
             <ul class="list-group">
-              <li class="list-group-item"><a href="http://blog.form.io/blog"><i class="fa fa-laptop"></i> Read our Blog</a></li>
-              <li class="list-group-item"><a href="http://blog.form.io/blog"><i class="fa fa-newspaper-o"></i> In the News</a></li>
-              <li class="list-group-item"><a href="http://blog.form.io/form.io-press-kit"><i class="fa fa-hashtag"></i> Press Kit</a></li>
+              <li class="list-group-item"><a href="http://help.form.io/intro"><i class="fa fa-rocket"></i> Getting Started</a></li>
+              <li class="list-group-item"><a href="http://help.form.io/userguide"><i class="fa fa-laptop"></i> User Guide</a></li>
+              <li class="list-group-item"><a href="http://help.form.io/api"><i class="fa fa-server"></i> Developer Info</a></li>
+              <li class="list-group-item"><a href="http://help.form.io/integrations"><i class="fa fa-cloud"></i> 3rd Party Integrations</a></li>
             </ul>
           </div>
           <div class="col-md-3">
-            <h3 class="section-heading"><i class="fa fa-users"></i> Community</h3>
+            <h3 class="section-heading"><i class="fa fa-cloud"></i> Integrations</h3>
             <ul class="list-group">
-              <li class="list-group-item"><a href="https://github.com/formio/formio"><i class="fa fa-github"></i> Fork us on Github</a></li>
-              <li class="list-group-item"><a href="https://twitter.com/form_io"><i class="fa fa-twitter-square"></i> Follow on Twitter</a></li>
-              <li class="list-group-item"><a href="https://www.facebook.com/form.ioapp?fref=ts"><i class="fa fa-facebook-official"></i> Connect on Facebook</a></li>
-              <li class="list-group-item"><a href="https://www.linkedin.com/company/form-io"><i class="fa fa-linkedin-square"></i> Connect on LinkedIn</a></li>
+              <li class="list-group-item"><a href="http://help.form.io/integrations/#email"><i class="fa fa-envelope"></i> Email Providers</a></li>
+              <li class="list-group-item"><a href="http://help.form.io/integrations/#filestorage"><i class="fa fa-file"></i> File Storage Providers</a></li>
+              <li class="list-group-item"><a href="http://help.form.io/integrations/#oauth"><i class="fa fa-user"></i> OAuth Providers</a></li>
+              <li class="list-group-item"><a href="http://help.form.io/integrations/#office365"><i class="fa fa-windows"></i> Microsoft Office 365</a></li>
             </ul>
           </div>
+          <div class="col-md-3">
+            <h3 class="section-heading"><i class="fa fa-space-shuttle"></i> Advanced Features</h3>
+            <ul class="list-group">
+              <li class="list-group-item"><a href="http://help.form.io/api/#bootstrap"><i class="fa fa-copy"></i> Application Cloning</a></li>
+              <li class="list-group-item"><a href="http://help.form.io/api/#middleware"><i class="fa fa-cogs"></i> Remote Middleware</a></li>
+              <li class="list-group-item"><a href="http://help.form.io/api/#offline"><i class="fa fa-wifi"></i> Offline Mode</a></li>
+              <li class="list-group-item"><a href="http://help.form.io/userguide/#docker"><i class="fa fa-ship"></i> Docker Deployments</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="row">
           <div class="col-md-3">
             <ul class="list-group">
               <li class="list-group-item"><img src="images/formio-tree.png" style="width:60%; margin: 0 auto;" /></li>
+            </ul>
+          </div>
+          <div class="col-md-9">
+            <ul class="list-group">
               <li class="list-group-item"><a href="http://blog.form.io/form.io-privacy-policy">Privacy Policy</a></li>
               <li class="list-group-item"><a href="http://blog.form.io/form-terms-of-use">Terms of Use</a></li>
               <li class="list-group-item"><a href="http://blog.form.io/form.io-software-licensing-agreement">Software Agreement</a></li>
               <li class="list-group-item"><a href="http://blog.form.io/form.io-open-source-license-agreement">Open Source License</a></li>
             </ul>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-4 col-md-offset-8">
             <span class="copyright">Copyright &copy; Form.io LLC 2015. All rights reserved</span>
           </div>
         </div>
@@ -173,17 +187,17 @@
     <script src="/bower_components/moment/moment.js"></script>
     <script src="/bower_components/angular-moment/angular-moment.js"></script>
     <script src="/bower_components/ng-sortable/dist/ng-sortable.js"></script>
+    <script src="/bower_components/ng-file-upload/ng-file-upload.js"></script>
+    <script src="/bower_components/angular-ui-select/dist/select.js"></script>
+    <script src="/bower_components/bootstrap-ui-datetime-picker/dist/datetime-picker.min.js"></script>
+    <script src="/bower_components/signature_pad/signature_pad.js"></script>
+    <script src="/bower_components/angular-ui-mask/dist/mask.js"></script>
+    <script src="/bower_components/formio/dist/formio.js"></script>
     <script src="/bower_components/angular-drag-and-drop-lists/angular-drag-and-drop-lists.js"></script>
     <script src="/bower_components/ngDialog/js/ngDialog.js"></script>
     <script src="/bower_components/lodash/lodash.js"></script>
     <script src="/bower_components/ckeditor/ckeditor.js"></script>
     <script src="/bower_components/ng-ckeditor/ng-ckeditor.js"></script>
-    <script src="/bower_components/ng-file-upload/ng-file-upload.js"></script>
-    <script src="/bower_components/ui-select/dist/select.js"></script>
-    <script src="/bower_components/bootstrap-ui-datetime-picker/dist/datetime-picker.min.js"></script>
-    <script src="/bower_components/signature_pad/signature_pad.js"></script>
-    <script src="/bower_components/angular-ui-mask/dist/mask.js"></script>
-    <script src="/bower_components/formio/dist/formio.js"></script>
     <script src="/bower_components/ng-dialog/js/ngDialog.js"></script>
     <script src="/bower_components/ngFormBuilder/dist/ngFormBuilder.js"></script>
     <script src="/bower_components/seamless/build/seamless.parent.min.js"></script>
@@ -197,6 +211,7 @@
     <script src="/bower_components/angular-truncate-2/src/angular-truncate-2.js"></script>
     <script src="/bower_components/angular-ui-notification/dist/angular-ui-notification.js"></script>
     <script src="/bower_components/es6-promise/promise.js"></script>
+    <script src="/bower_components/ui-select/dist/select.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 
