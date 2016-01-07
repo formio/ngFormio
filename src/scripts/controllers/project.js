@@ -162,6 +162,7 @@ app.controller('ProjectController', [
   'ProjectPlans',
   '$http',
   'ProjectUpgradeDialog',
+  '$q',
   function(
     $scope,
     $rootScope,
@@ -172,7 +173,8 @@ app.controller('ProjectController', [
     AppConfig,
     ProjectPlans,
     $http,
-    ProjectUpgradeDialog
+    ProjectUpgradeDialog,
+    $q
   ) {
     $rootScope.activeSideBar = 'projects';
     $rootScope.noBreadcrumb = false;
@@ -195,8 +197,6 @@ app.controller('ProjectController', [
     $scope.formio = new Formio('/project/' + $stateParams.projectId);
     $scope.currentProject = {_id: $stateParams.projectId, access: []};
     $scope.projectApi = '';
-    $scope.rolesLoading = true;
-    $scope.teamsLoading = true;
 
     $scope.loadProjectPromise = $scope.formio.loadProject().then(function(result) {
       $scope.currentProject = result;
@@ -204,14 +204,75 @@ app.controller('ProjectController', [
       $rootScope.currentProject = result;
       $scope.showName = !(result.plan && result.plan === 'basic');
       $scope.projectsLoaded = true;
-      return $http.get($scope.formio.projectUrl + '/role');
-    }).then(function(result) {
-      $scope.currentProjectRoles = result.data;
-      $scope.rolesLoading = false;
-      return Formio.request(AppConfig.apiBase + '/team/all', 'GET');
-    }).then(function(result) {
-      $scope.teams = result;
-      $scope.teamsLoading = false;
+
+      $scope.rolesLoading = true;
+      $http.get($scope.formio.projectUrl + '/role').then(function(result) {
+        $scope.currentProjectRoles = result.data;
+        $scope.rolesLoading = false;
+      });
+
+      // Load the users teams.
+      $scope.userTeamsLoading = true;
+      var userTeamsPromise = $http.get(AppConfig.apiBase + '/team/all', 'GET').then(function(result) {
+        $scope.userTeams = result.data;
+        $scope.userTeamsLoading = false;
+      });
+
+      // Load the projects teams.
+      $scope.projectTeamsLoading = true;
+      var projectTeamsPromise = $http.get(AppConfig.apiBase + '/team/project/' + $scope.currentProject._id, 'GET').then(function(result) {
+        $scope.projectTeams = result.data;
+        $scope.projectTeamsLoading = false;
+      });
+
+      // Calculate the users highest role within the project.
+      $q.all([userTeamsPromise, projectTeamsPromise]).then(function() {
+        var roles = _.has($scope.user, 'roles') ? $scope.user.roles : [];
+        var teams = _($scope.userTeams ? $scope.userTeams : [])
+          .pluck('_id')
+          .filter()
+          .value();
+        var allRoles = _(roles.concat(teams)).filter().value();
+        var highestRole = null;
+
+        /**
+         * Determine if the user contains a role of the given type.
+         *
+         * @param {String} type
+         *   The type of role to search for.
+         * @returns {boolean}
+         *   If the current user has the role or not.
+         */
+        var hasRoles = function(type) {
+          var potential = _($scope.projectTeams)
+            .filter({permission: type})
+            .pluck('_id')
+            .value();
+          return (_.intersection(allRoles, potential).length > 0);
+        };
+
+        if (_.has($scope.user, '_id') && _.has($scope.currentProject, 'owner') &&  ($scope.user._id === $scope.currentProject.owner)) {
+          highestRole = 'owner';
+        }
+        else if (hasRoles('team_admin')) {
+          highestRole = 'team_admin';
+        }
+        else if (hasRoles('team_write')) {
+          highestRole = 'team_write';
+        }
+        else if (hasRoles('team_read')) {
+          highestRole = 'team_read';
+        }
+        else {
+          highestRole = 'anonymous';
+        }
+
+        $scope.highestRole = highestRole;
+      });
+
+      $scope.projectSettingsVisible = function() {
+        return ($scope.highestRole === 'owner' || $scope.highestRole === 'team_admin');
+      };
     }).catch(function(err) {
       if (!err) {
         FormioAlerts.addAlert({
