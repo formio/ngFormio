@@ -105,41 +105,53 @@
       <div class="container">
         <div class="row">
           <div class="col-md-3">
-            <h3 class="section-heading"><i class="fa fa-book"></i> Resources</h3>
+            <h3 class="section-heading"><i class="fa fa-wrench"></i> Tools & Examples</h3>
             <ul class="list-group">
-              <li class="list-group-item"><a href="http://help.form.io"><i class="fa fa-book"></i> Documentation</a></li>
+              <li class="list-group-item"><a href="http://help.form.io/start"><i class="fa fa-youtube-play"></i> 5 minute tutorial</a></li>
+              <li class="list-group-item"><a href="https://github.com/formio?utf8=%E2%9C%93&query=formio-app-"><i class="fa fa-tablet"></i> Example Apps</a></li>
+              <li class="list-group-item"><a href="https://github.com/formio"><i class="fa fa-star"></i> Open Source Projects</a></li>
               <li class="list-group-item"><a href="http://help.form.io/support"><i class="fa fa-support"></i> Support</a></li>
             </ul>
           </div>
           <div class="col-md-3">
-            <h3 class="section-heading"><i class="fa fa-bullhorn"></i> News</h3>
+            <h3 class="section-heading"><i class="fa fa-book"></i> Documentation</h3>
             <ul class="list-group">
-              <li class="list-group-item"><a href="http://blog.form.io/blog"><i class="fa fa-laptop"></i> Read our Blog</a></li>
-              <li class="list-group-item"><a href="http://blog.form.io/blog"><i class="fa fa-newspaper-o"></i> In the News</a></li>
-              <li class="list-group-item"><a href="http://blog.form.io/form.io-press-kit"><i class="fa fa-hashtag"></i> Press Kit</a></li>
+              <li class="list-group-item"><a href="http://help.form.io/intro"><i class="fa fa-rocket"></i> Getting Started</a></li>
+              <li class="list-group-item"><a href="http://help.form.io/userguide"><i class="fa fa-laptop"></i> User Guide</a></li>
+              <li class="list-group-item"><a href="http://help.form.io/api"><i class="fa fa-server"></i> Developer Info</a></li>
+              <li class="list-group-item"><a href="http://help.form.io/integrations"><i class="fa fa-cloud"></i> 3rd Party Integrations</a></li>
             </ul>
           </div>
           <div class="col-md-3">
-            <h3 class="section-heading"><i class="fa fa-users"></i> Community</h3>
+            <h3 class="section-heading"><i class="fa fa-cloud"></i> Integrations</h3>
             <ul class="list-group">
-              <li class="list-group-item"><a href="https://github.com/formio/formio"><i class="fa fa-github"></i> Fork us on Github</a></li>
-              <li class="list-group-item"><a href="https://twitter.com/form_io"><i class="fa fa-twitter-square"></i> Follow on Twitter</a></li>
-              <li class="list-group-item"><a href="https://www.facebook.com/form.ioapp?fref=ts"><i class="fa fa-facebook-official"></i> Connect on Facebook</a></li>
-              <li class="list-group-item"><a href="https://www.linkedin.com/company/form-io"><i class="fa fa-linkedin-square"></i> Connect on LinkedIn</a></li>
+              <li class="list-group-item"><a href="http://help.form.io/integrations/#email"><i class="fa fa-envelope"></i> Email Providers</a></li>
+              <li class="list-group-item"><a href="http://help.form.io/integrations/#filestorage"><i class="fa fa-file"></i> File Storage Providers</a></li>
+              <li class="list-group-item"><a href="http://help.form.io/integrations/#oauth"><i class="fa fa-user"></i> OAuth Providers</a></li>
+              <li class="list-group-item"><a href="http://help.form.io/integrations/#office365"><i class="fa fa-windows"></i> Microsoft Office 365</a></li>
             </ul>
           </div>
           <div class="col-md-3">
+            <h3 class="section-heading"><i class="fa fa-space-shuttle"></i> Advanced Features</h3>
             <ul class="list-group">
-              <li class="list-group-item"><img src="images/formio-tree.png" style="width:60%; margin: 0 auto;" /></li>
+              <li class="list-group-item"><a href="http://help.form.io/api/#bootstrap"><i class="fa fa-copy"></i> Application Cloning</a></li>
+              <li class="list-group-item"><a href="http://help.form.io/api/#middleware"><i class="fa fa-cogs"></i> Remote Middleware</a></li>
+              <li class="list-group-item"><a href="http://help.form.io/api/#offline"><i class="fa fa-wifi"></i> Offline Mode</a></li>
+              <li class="list-group-item"><a href="http://help.form.io/userguide/#docker"><i class="fa fa-ship"></i> Docker Deployments</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-3">
+            <li class="list-group-item"><img src="images/formio-tree.png" style="width:60%; margin: 0 auto;" /></li>
+          </div>
+          <div class="col-md-9">
+            <ul class="list-group">
               <li class="list-group-item"><a href="http://blog.form.io/form.io-privacy-policy">Privacy Policy</a></li>
               <li class="list-group-item"><a href="http://blog.form.io/form-terms-of-use">Terms of Use</a></li>
               <li class="list-group-item"><a href="http://blog.form.io/form.io-software-licensing-agreement">Software Agreement</a></li>
               <li class="list-group-item"><a href="http://blog.form.io/form.io-open-source-license-agreement">Open Source License</a></li>
             </ul>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-4 col-md-offset-8">
             <span class="copyright">Copyright &copy; Form.io LLC 2015. All rights reserved</span>
           </div>
         </div>
@@ -219,6 +231,7 @@
     <!-- build:js scripts/app.js -->
     <!-- inject:js -->
     <script src="scripts/app.js"></script>
+    <script src="scripts/utils/utils.js"></script>
     <script src="scripts/controllers/access.js"></script>
     <script src="scripts/controllers/controllers.js"></script>
     <script src="scripts/controllers/feedback.js"></script>
@@ -229,7 +242,6 @@
     <script src="scripts/controllers/role.js"></script>
     <script src="scripts/controllers/team.js"></script>
     <script src="scripts/controllers/user.js"></script>
-    <script src="scripts/utils/utils.js"></script>
     <!-- endinject -->
     <!-- endbuild -->
 
