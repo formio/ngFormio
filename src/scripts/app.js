@@ -33,7 +33,7 @@ angular
     '$urlRouterProvider',
     'FormioProvider',
     'AppConfig',
-    function (
+    function(
       $stateProvider,
       $urlRouterProvider,
       FormioProvider,
@@ -52,7 +52,7 @@ angular
         .state('auth', {
           url: '/auth',
           views: {
-            '' : {
+            '': {
               templateUrl: 'views/user/auth.html'
             },
             'login@auth': {
@@ -159,7 +159,9 @@ angular
               $scope.repo = '';
               $scope.hasTemplate = true;
               $scope.$watch('currentProject', function(project) {
-                if (!project.settings) { return; }
+                if (!project.settings) {
+                  return;
+                }
                 if (!project.settings.preview) {
                   $scope.hasTemplate = false;
                   project.settings.preview = {
@@ -306,11 +308,11 @@ angular
           templateUrl: 'views/import/index.html',
           controller: 'ImportExportController'
         })
-		.state('project.settings.googlesheets', {
-		  url: '/googlesheets/googlesheet',
-		  parent: 'project.settings',
-		  templateUrl: 'views/project/googlesheet/googlesheet.html'
-		})
+        .state('project.settings.googlesheets', {
+          url: '/googlesheets/googlesheet',
+          parent: 'project.settings',
+          templateUrl: 'views/project/googlesheet/googlesheet.html'
+        })
         .state('help', {
           url: '/help',
           templateUrl: 'views/help/index.html',
@@ -335,28 +337,25 @@ angular
       GoogleAnalytics
     ) {
       var loaded = false;
-      var templates = [
-        {
-          "title": "Default",
-          "name": "default",
-          "description": "A default project with User and Admin resources and their respective authentication forms.",
-          template: 'default',
-          "preview": {
-            "url": "http://formio.github.io/formio-app-basic",
-            "repo": "https://github.com/formio/formio-app-basic"
-          }
-        },
-        {
-          "title": "Empty",
-          "name": "empty",
-          "description": "An empty project with no forms or resources. Create a project with a fresh start!",
-          template: 'empty',
-          "preview": {
-            "url": "http://formio.github.io/formio-app-template",
-            "repo": "https://github.com/formio/formio-app-template"
-          }
+      var templates = [{
+        "title": "Default",
+        "name": "default",
+        "description": "A default project with User and Admin resources and their respective authentication forms.",
+        template: 'default',
+        "preview": {
+          "url": "http://formio.github.io/formio-app-basic",
+          "repo": "https://github.com/formio/formio-app-basic"
         }
-      ];
+      }, {
+        "title": "Empty",
+        "name": "empty",
+        "description": "An empty project with no forms or resources. Create a project with a fresh start!",
+        template: 'empty',
+        "preview": {
+          "url": "http://formio.github.io/formio-app-template",
+          "repo": "https://github.com/formio/formio-app-template"
+        }
+      }];
 
       return {
         createProject: function(project) {
@@ -399,8 +398,7 @@ angular
 
           // Try to load the external template source.
           $http.get(
-            'https://formio.github.io/help.form.io/templates/index.json',
-            {
+            'https://formio.github.io/help.form.io/templates/index.json', {
               disableJWT: true,
               headers: {
                 Authorization: undefined,
@@ -408,7 +406,7 @@ angular
                 'Cache-Control': undefined
               }
             }
-          ).then(function (result) {
+          ).then(function(result) {
             templates = (result && result.data) ? result.data : templates;
             loaded = true;
             deferred.resolve(templates);
@@ -467,8 +465,7 @@ angular
               return ($rootScope.user && team.owner !== $rootScope.user._id) || false;
             });
           });
-        }
-        else {
+        } else {
           $scope.teamMember = _.any(results, function(team) {
             return ($rootScope.user && team.owner !== $rootScope.user._id) || false;
           });
@@ -487,7 +484,9 @@ angular
       $scope.createProject = function(template) {
         FormioProject.createProject(template).then(function(project) {
           localStorage.setItem('showWelcome', 1);
-          $state.go('project.resource.index', {projectId: project._id});
+          $state.go('project.resource.index', {
+            projectId: project._id
+          });
         });
       };
 
@@ -511,7 +510,7 @@ angular
 
           // Build the projects teams list if present in the permissions.
           _.forEach(project.access, function(permission) {
-            if(_.startsWith(permission.type, 'team_')) {
+            if (_.startsWith(permission.type, 'team_')) {
               permission.roles = permission.roles || [];
               project.teams.push(permission.roles);
             }
@@ -521,7 +520,7 @@ angular
           project.teams = _.uniq(_.flattenDeep(project.teams));
           project.teams = _.map(project.teams, function(team) {
             _.forEach($scope.teams, function(loadedTeam) {
-              if(loadedTeam._id === team) {
+              if (loadedTeam._id === team) {
                 team = loadedTeam;
               }
             });
@@ -553,7 +552,7 @@ angular
   ])
   .filter('trusted', [
     '$sce',
-    function ($sce) {
+    function($sce) {
       return function(url) {
         return $sce.trustAsResourceUrl(url);
       };
@@ -635,11 +634,15 @@ angular
       });
 
       $rootScope.goToProject = function(project) {
-        $state.go('project.resource.index', {projectId: project._id});
+        $state.go('project.resource.index', {
+          projectId: project._id
+        });
       };
 
       $rootScope.getPreviewURL = function(project) {
-        if (!project.settings || !project.settings.preview) { return ''; }
+        if (!project.settings || !project.settings.preview) {
+          return '';
+        }
         var url = 'http://help.form.io/project';
         url += '?project=' + encodeURIComponent(project.name);
         url += '&previewUrl=' + encodeURIComponent(project.settings.preview.url);
@@ -664,8 +667,7 @@ angular
         $rootScope.currentForm = null;
         if ($state.is('auth')) {
           $window.location.reload();
-        }
-        else {
+        } else {
           $state.go('auth');
         }
         FormioAlerts.addAlert({
@@ -692,9 +694,11 @@ angular
       // Ensure they are logged.
       $rootScope.$on('$stateChangeStart', function(event, toState) {
         $rootScope.userToken = Formio.getToken();
-        $rootScope.authenticated = !!$rootScope.userToken;
-        if (toState.name.substr(0, 4) === 'auth') { return; }
-        if(!$rootScope.authenticated) {
+        $rootScope.authenticated = !! $rootScope.userToken;
+        if (toState.name.substr(0, 4) === 'auth') {
+          return;
+        }
+        if (!$rootScope.authenticated) {
           event.preventDefault();
           $state.go('auth');
         }
@@ -722,10 +726,9 @@ angular
 
       // Add back functionality to the template.
       $rootScope.back = function(defaultState, defaultParams) {
-        if($rootScope.previousState) {
+        if ($rootScope.previousState) {
           $state.go($rootScope.previousState, $rootScope.previousParams);
-        }
-        else {
+        } else {
           $state.go(defaultState, defaultParams);
         }
       };
@@ -738,96 +741,100 @@ angular
       CKEDITOR.config.allowedContent = '*[data-*]{*}(*)';
     }
   ])
-  .factory('GoogleAnalytics', ['$window', '$state', function($window, $state) {
-    // Recursively build the whole state url
-    // This gets the url without substitutions, to send
-    // to Google Analytics
-    var getFullStateUrl = function(state) {
-      if(state.parent) {
-        return getFullStateUrl($state.get(state.parent)) + state.url;
-      }
-      return state.url;
-    };
+  .factory('GoogleAnalytics', ['$window', '$state',
+    function($window, $state) {
+      // Recursively build the whole state url
+      // This gets the url without substitutions, to send
+      // to Google Analytics
+      var getFullStateUrl = function(state) {
+        if (state.parent) {
+          return getFullStateUrl($state.get(state.parent)) + state.url;
+        }
+        return state.url;
+      };
 
-    return {
-      sendPageView: function() {
-        $window.ga('set', 'page', getFullStateUrl($state.current));
-        $window.ga('send', 'pageview');
-      },
+      return {
+        sendPageView: function() {
+          $window.ga('set', 'page', getFullStateUrl($state.current));
+          $window.ga('send', 'pageview');
+        },
 
-      sendEvent: function(category, action, label, value) {
-        $window.ga('send', 'event', category, action, label, value);
-      }
-    };
-  }])
-  .factory('ProjectPlans', ['$filter', function($filter) {
-    return {
-      plans: {
-        basic: {
-          order: 1,
-          name: 'basic',
-          title: 'Basic',
-          labelStyle: 'label-info',
-          priceDescription: 'Free'
-        },
-        independent: {
-          order: 2,
-          name: 'independent',
-          title: 'Independent',
-          labelStyle: 'label-warning',
-          priceDescription: '$15/mo'
-        },
-        team: {
-          order: 3,
-          name: 'team',
-          title: 'Team Pro',
-          labelStyle: 'label-success',
-          priceDescription: 'Starting at $100/mo'
-        },
-        commercial: {
-          order: 4,
-          name: 'commercial',
-          title: 'Commercial',
-          labelStyle: 'label-commercial',
-          priceDescription: 'Starting at $250/mo per instance'
+        sendEvent: function(category, action, label, value) {
+          $window.ga('send', 'event', category, action, label, value);
         }
-      },
-      getPlans: function() {
-        return _(this.plans).values().sortBy('order').value();
-      },
-      getPlan: function(plan) {
-        return this.plans[plan];
-      },
-      getPlanName: function(plan) {
-        if(!this.plans[plan]) return '';
-        return this.plans[plan].title;
-      },
-      getPlanLabel: function(plan) {
-        if(!this.plans[plan]) return '';
-        return this.plans[plan].labelStyle;
-      },
-      getAPICallsLimit: function(apiCalls) {
-        if(!apiCalls || !apiCalls.limit) {
-          return '∞';
+      };
+    }
+  ])
+  .factory('ProjectPlans', ['$filter',
+    function($filter) {
+      return {
+        plans: {
+          basic: {
+            order: 1,
+            name: 'basic',
+            title: 'Basic',
+            labelStyle: 'label-info',
+            priceDescription: 'Free'
+          },
+          independent: {
+            order: 2,
+            name: 'independent',
+            title: 'Independent',
+            labelStyle: 'label-warning',
+            priceDescription: '$15/mo'
+          },
+          team: {
+            order: 3,
+            name: 'team',
+            title: 'Team Pro',
+            labelStyle: 'label-success',
+            priceDescription: 'Starting at $100/mo'
+          },
+          commercial: {
+            order: 4,
+            name: 'commercial',
+            title: 'Commercial',
+            labelStyle: 'label-commercial',
+            priceDescription: 'Starting at $250/mo per instance'
+          }
+        },
+        getPlans: function() {
+          return _(this.plans).values().sortBy('order').value();
+        },
+        getPlan: function(plan) {
+          return this.plans[plan];
+        },
+        getPlanName: function(plan) {
+          if (!this.plans[plan]) return '';
+          return this.plans[plan].title;
+        },
+        getPlanLabel: function(plan) {
+          if (!this.plans[plan]) return '';
+          return this.plans[plan].labelStyle;
+        },
+        getAPICallsLimit: function(apiCalls) {
+          if (!apiCalls || !apiCalls.limit) {
+            return '∞';
+          }
+          return $filter('number')(apiCalls.limit);
+        },
+        getAPICallsPercent: function(apiCalls) {
+          if (!apiCalls || !apiCalls.limit) {
+            return '0%';
+          }
+          var percent = apiCalls.used / apiCalls.limit * 100;
+          return (percent > 100) ? '100%' : percent + '%';
+        },
+        getProgressBarClass: function(apiCalls) {
+          if (!apiCalls || !apiCalls.limit) return 'progress-bar-success';
+          var percentUsed = apiCalls.used / apiCalls.limit;
+          if (percentUsed >= 0.9) return 'progress-bar-danger';
+          if (percentUsed >= 0.7) return 'progress-bar-warning';
+          return 'progress-bar-success';
         }
-        return $filter('number')(apiCalls.limit);
-      },
-      getAPICallsPercent: function(apiCalls) {
-        if(!apiCalls || !apiCalls.limit) {
-          return '0%';
-        }
-        var percent = apiCalls.used / apiCalls.limit * 100;
-        return (percent > 100) ? '100%' : percent + '%';
-      },
-      getProgressBarClass: function(apiCalls) {
-        if(!apiCalls || !apiCalls.limit) return 'progress-bar-success';
-        var percentUsed = apiCalls.used / apiCalls.limit;
-        if(percentUsed >= 0.9) return 'progress-bar-danger';
-        if(percentUsed >= 0.7) return 'progress-bar-warning';
-        return 'progress-bar-success';
-      }
-    };
-  }])
+      };
+    }
+  ])
   .factory('TeamPermissions', function() {
     return {
       permissions: {
@@ -842,7 +849,7 @@ angular
         }
       },
       getPermissionLabel: function(type) {
-        if(!this.permissions[type]) return '';
+        if (!this.permissions[type]) return '';
         return this.permissions[type].label;
       }
     };
