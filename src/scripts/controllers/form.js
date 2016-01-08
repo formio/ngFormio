@@ -303,10 +303,13 @@ app.controller('FormController', [
           type: 'success',
           message: 'Successfully ' + method + ' form!'
         });
-        var action = $stateParams.formId ? 'update' : 'create';
-        GoogleAnalytics.sendEvent('Form', action, null, 1);
+        GoogleAnalytics.sendEvent('Form', method.substring(0, method.length - 1), null, 1);
 
-        $state.go('project.' + $scope.formInfo.type + '.form.view', {formId: form._id});
+        if(method === 'created') {
+          // Reload page to start editing as an existing form.
+          $state.go('project.' + $scope.formInfo.type + '.form.edit', {formId: form._id});
+        }
+
       }, FormioAlerts.onError.bind(FormioAlerts));
     };
 
