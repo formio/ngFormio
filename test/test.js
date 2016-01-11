@@ -2,7 +2,6 @@
 
 // Boot up the formio server so we can access the resources.
 require('dotenv').load({silent: true});
-var config = require('../config');
 var Yadda = require('yadda');
 var webdriver = require('webdriverjs-angular');
 var driver = null;
@@ -28,12 +27,12 @@ var config = {
   baseUrl: url,
   serverProtocol: serverProtocol,
   serverHost: serverHost
-}
+};
 
 Yadda.plugins.mocha.StepLevelPlugin.init();
 new Yadda.FeatureFileSearch('./test/features').each(function(file) {
   before(function(done) {
-    library = require('./lib/formio-library')(config)
+    library = require('./lib/formio-library')(config);
     done();
   });
 

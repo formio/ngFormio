@@ -11,6 +11,7 @@ module.exports = function(config) {
   // Global timeout for wait* commands.
   var timeout = 60000;
   var state = {};
+
   /**
    * Wrap the string function for usernames.
    *
@@ -24,7 +25,7 @@ module.exports = function(config) {
       pool: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
     });
     return this.string(options);
-  }
+  };
 
   /**
    * Wrap the string function for passwords.
@@ -37,8 +38,13 @@ module.exports = function(config) {
       length: 12
     });
     return this.string(options);
-  }
+  };
 
+  /**
+   *
+   * @param text
+   * @returns {*}
+   */
   var replacements = function(text) {
     // Regex to find ${string}.
     var regex = /\$\{(.+?[^\}])\}/g;
@@ -59,14 +65,32 @@ module.exports = function(config) {
     return text;
   };
 
+  /**
+   *
+   * @param err
+   * @param response
+   * @param body
+   * @param next
+   * @returns {*}
+   */
   var handleResponse = function(err, response, body, next) {
-    if (err) return next(err);
+    if (err) {
+      return next(err);
+    }
     if (response.statusCode != 200) {
       return next(body);
     }
     next(null, body);
-  }
+  };
 
+  /**
+   *
+   * @param projectName
+   * @param formName
+   * @param email
+   * @param password
+   * @param next
+   */
   var authUser = function(projectName, formName, email, password, next) {
     request({
       "rejectUnauthorized": false,
@@ -83,6 +107,15 @@ module.exports = function(config) {
     });
   };
 
+  /**
+   *
+   * @param projectName
+   * @param formName
+   * @param username
+   * @param email
+   * @param password
+   * @param next
+   */
   var createUser = function(projectName, formName, username, email, password, next) {
     request({
       "rejectUnauthorized": false,
@@ -101,6 +134,13 @@ module.exports = function(config) {
     });
   };
 
+  /**
+   *
+   * @param username
+   * @param email
+   * @param password
+   * @param next
+   */
   var createAndAuthUser = function(username, email, password, next) {
     createUser('formio', 'user/register', username, email, password, function(err, user) {
       if (err) {
@@ -162,7 +202,7 @@ module.exports = function(config) {
           return next(err);
         }
 
-        driver.localStorage('POST', {key: 'formioToken', value: res.token.token})
+        driver.localStorage('POST', {key: 'formioToken', value: res})
           .then(function() {
             next();
           })
@@ -226,7 +266,7 @@ module.exports = function(config) {
         .catch(next);
     })
     .when('I expand the user menu', function(next) {
-      var driver = this.driver
+      var driver = this.driver;
       driver.waitForExist('#user-menu')
         .then(function() {
           driver.click('#user-menu')

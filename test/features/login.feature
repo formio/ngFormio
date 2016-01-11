@@ -15,7 +15,7 @@ Feature: Login Functionality
     And I enter ${login-password}Bad in the .login-container #user\.password field
     When I click the LOG IN button
     Then I have been logged out
-#    And I see an alert with the text Incorrect password
+    And I see an alert with the text Incorrect password
 
   Scenario: Missing email
     Given I am on /#/auth
@@ -24,6 +24,23 @@ Feature: Login Functionality
     And I click the LOG IN button
     Then I have been logged out
     And I see an alert with the text Missing username
+
+  Scenario: Missing password
+    Given I am on /#/auth
+    And I am logged out
+    When I enter ${login-email} in the .login-container #user\.email field
+    And I click the LOG IN button
+    Then I have been logged out
+    And I see an alert with the text Password not provided.
+
+  Scenario: Unknown user
+    Given I am on /#/auth
+    And I am logged out
+    When I enter ${login2-email} in the .login-container #user\.email field
+    And I enter ${login2-password} in the .login-container #user\.password field
+    And I click the LOG IN button
+    Then I have been logged out
+    And I see an alert with the text Invalid user
 
   Scenario: Logging in
     Given an account exists with the username ${login-username}, email ${login-email} and password ${login-password}

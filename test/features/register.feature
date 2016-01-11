@@ -6,10 +6,36 @@ Feature: Register Functionality
     When I wait 500 milliseconds
     Then the REGISTER button is disabled
 
-  Scenario: Username only
+  Scenario: No username
+    Given I am on /#/auth
+    And I am logged out
+    When I enter ${register-email} in the .register-container #user\.email field
+    And I enter ${register-password} in the .register-container #user\.password field
+    And I enter ${register-password} in the .register-container #verifyPassword field
+    Then the REGISTER button is disabled
+
+  Scenario: No email
     Given I am on /#/auth
     And I am logged out
     When I enter ${register-username} in the .register-container #user\.name field
+    And I enter ${register-password} in the .register-container #user\.password field
+    And I enter ${register-password} in the .register-container #verifyPassword field
+    Then the REGISTER button is disabled
+
+  Scenario: No password
+    Given I am on /#/auth
+    And I am logged out
+    When I enter ${register-email} in the .register-container #user\.email field
+    And I enter ${register-username} in the .register-container #user\.name field
+    And I enter ${register-password} in the .register-container #verifyPassword field
+    Then the REGISTER button is disabled
+
+  Scenario: No verify password
+    Given I am on /#/auth
+    And I am logged out
+    When I enter ${register-email} in the .register-container #user\.email field
+    And I enter ${register-username} in the .register-container #user\.name field
+    And I enter ${register-password} in the .register-container #user\.password field
     Then the REGISTER button is disabled
 
   Scenario: Bad email
