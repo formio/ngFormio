@@ -49,8 +49,8 @@ module.exports = function(config) {
     // Regex to find ${string}.
     var regex = /\$\{(.+?[^\}])\}/g;
     text = text.replace(regex, function(match, str) {
-      if (state[str]) {
-        return state[str];
+      if (_.has(state, str)) {
+        return _.get(state, str);
       }
       var parts = str.split('-');
       // If we've substituted this before use the same value.
@@ -80,7 +80,9 @@ module.exports = function(config) {
     if (response.statusCode != 200) {
       return next(body);
     }
-    next(null, body);
+
+    var token = response.headers['x-jwt-token'] || '';
+    next(null, body, token);
   };
 
   /**
@@ -93,7 +95,7 @@ module.exports = function(config) {
    */
   var authUser = function(projectName, formName, email, password, next) {
     request({
-      "rejectUnauthorized": false,
+      rejectUnauthorized: false,
       uri: config.serverProtocol + '://' + projectName + '.' + config.serverHost + '/' + formName + '/submission',
       method: 'POST',
       form: {
@@ -118,7 +120,7 @@ module.exports = function(config) {
    */
   var createUser = function(projectName, formName, username, email, password, next) {
     request({
-      "rejectUnauthorized": false,
+      rejectUnauthorized: false,
       uri: config.serverProtocol + '://' + projectName + '.' + config.serverHost + '/' + formName + '/submission',
       method: 'POST',
       form: {
@@ -147,7 +149,7 @@ module.exports = function(config) {
         return next(err);
       }
 
-      authUser('formio', 'user/login', email, password, function(err, res) {
+      authUser('formio', 'user/login', email, password, function(err, res, token) {
         if (err) {
           return next(err);
         }
@@ -155,7 +157,7 @@ module.exports = function(config) {
           return next(new Error('Authentication Failed.'));
         }
 
-        next(null, res);
+        next(null, res, token);
       });
     });
   };
@@ -192,27 +194,53 @@ module.exports = function(config) {
           next(err);
         });
     })
-    .given('I am logged in', function(next) {
-      var username = Math.random().toString(36).substring(7);
-      var email = Math.random().toString(36).substring(7) + '@example.com';
-      var password = Math.random().toString(36).substring(7);
-      var driver = this.driver;
-      createAndAuthUser(username, email, password, function(err, res) {
-        if (err) {
-          return next(err);
-        }
+    .given('I am logged in(?: for )?(.+)?$', function(tempUser, next) {
+      if (!next && tempUser) {
+        next = tempUser;
+        tempUser = null;
+      }
 
-        driver.localStorage('POST', {key: 'formioToken', value: res})
-          .then(function() {
-            next();
-          })
-          .catch(function(err) {
-            next(err);
-          });
-      });
+      var driver = this.driver;
+      if (tempUser && state[tempUser]) {
+        authUser('formio', 'user/login', state[tempUser].email, state[tempUser].password, function(err, res, token) {
+          if (err) {
+            return next(err);
+          }
+          if (!res) {
+            return next(new Error('Authentication Failed.'));
+          }
+
+          driver.localStorage('POST', {key: 'formioToken', value: token})
+            .then(function() {
+              next();
+            })
+            .catch(function(err) {
+              next(err);
+            });
+        });
+      }
+      else {
+        state[tempUser] = {};
+        state[tempUser].username = Math.random().toString(36).substring(7);
+        state[tempUser].email = Math.random().toString(36).substring(7) + '@example.com';
+        state[tempUser].password = Math.random().toString(36).substring(7);
+        createAndAuthUser(state[tempUser].username, state[tempUser].email, state[tempUser].password, function(err, res, token) {
+          if (err) {
+            return next(err);
+          }
+
+          driver.localStorage('POST', {key: 'formioToken', value: token})
+            .then(function() {
+              next();
+            })
+            .catch(function(err) {
+              next(err);
+            });
+        });
+      }
     })
     .given('I am logged in as $EMAIL with password $PASSWORD', function(email, password, next) {
-      authUser('formio', 'user/login', email, password, function(err, res) {
+      authUser('formio', 'user/login', email, password, function(err, res, token) {
         if (err) {
           return next(err);
         }
@@ -220,7 +248,7 @@ module.exports = function(config) {
           return next(new Error('Authentication Failed.'));
         }
 
-        driver.localStorage('POST', {key: 'formioToken', value: res.token.token})
+        driver.localStorage('POST', {key: 'formioToken', value: token})
           .then(function() {
             next();
           });
@@ -378,6 +406,8 @@ module.exports = function(config) {
         .catch(next);
     })
     .then('I see $TEXT', function(text, next) {
+      text = replacements(text);
+
       this.driver.waitForExist('//*[text()=\'' + text + '\']', 500)
         .then(function(found) {
           next();
