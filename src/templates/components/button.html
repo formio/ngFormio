@@ -2,6 +2,7 @@
 ng-class="{'btn-block': component.block}"
 class="btn btn-{{ component.theme }} btn-{{ component.size }}"
 ng-disabled="readOnly || form.submitting || (component.disableOnInvalid && form.$invalid)"
+tabindex="{{ component.tabindex || 0 }}"
 ng-click="onClick()">
   <span ng-if="component.leftIcon" class="{{ component.leftIcon }}" aria-hidden="true"></span>
   <span ng-if="component.leftIcon && component.label">&nbsp;</span>{{ component.label }}<span ng-if="component.rightIcon && component.label">&nbsp;</span>

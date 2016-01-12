@@ -3,7 +3,7 @@
 <div ng-controller="formioFileUpload">
   <formio-file-list files="data[component.key]" form="formio.formUrl"></formio-file-list>
   <div ng-if="!readOnly">
-    <div ngf-drop="upload($files)" class="fileSelector" ngf-drag-over-class="'fileDragOver'" ngf-multiple="component.multiple"><span class="glyphicon glyphicon-cloud-upload"></span>Drop files to attach, or <a href="#" ngf-select="upload($files)" ngf-multiple="component.multiple">browse</a>.</div>
+    <div ngf-drop="upload($files)" class="fileSelector" ngf-drag-over-class="'fileDragOver'" ngf-multiple="component.multiple"><span class="glyphicon glyphicon-cloud-upload"></span>Drop files to attach, or <a href="#" ngf-select="upload($files)" tabindex="{{ component.tabindex || 0 }}" ngf-multiple="component.multiple">browse</a>.</div>
     <div ng-if="!component.storage" class="alert alert-warning">No storage has been set for this field. File uploads are disabled until storage is set up.</div>
     <div ngf-no-file-drop>File Drag/Drop is not supported for this browser</div>
   </div>

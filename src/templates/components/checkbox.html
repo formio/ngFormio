@@ -4,6 +4,7 @@
     id="{{ component.key }}"
     name="{{ component.key }}"
     value="{{ component.key }}"
+    tabindex="{{ component.tabindex || 0 }}"
     ng-disabled="readOnly"
     ng-model="data[component.key]"
     ng-required="component.validate.required">
