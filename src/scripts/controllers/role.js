@@ -46,8 +46,6 @@ app.controller('RoleController', [
       };
     }
 
-
-
     $scope.saveRole = function() {
       if($scope.roleForm.$invalid) {
         return;
@@ -103,6 +101,5 @@ app.controller('RoleController', [
         FormioAlerts.onError(error);
       });
     };
-
   }
 ]);
