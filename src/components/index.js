@@ -8,6 +8,7 @@ require('./checkbox')(app);
 require('./checkboxes')(app);
 require('./columns')(app);
 require('./content')(app);
+require('./custom')(app);
 require('./datetime')(app);
 require('./email')(app);
 require('./fieldset')(app);

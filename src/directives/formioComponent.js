@@ -83,14 +83,8 @@ module.exports = [
             });
           }
 
-          // See if a component is found in the registry.
-          $scope.componentFound = function(component) {
-            return formioComponents.components.hasOwnProperty(component.type);
-          };
-
           // Get the settings.
-          var component = formioComponents.components[$scope.component.type];
-          if (!component) return;
+          var component = formioComponents.components[$scope.component.type] || formioComponents.components['custom'];
 
           // Set the component with the defaults from the component settings.
           angular.forEach(component.settings, function(value, key) {

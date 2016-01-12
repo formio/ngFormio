@@ -17,15 +17,13 @@ module.exports = function() {
       'FormioScope',
       'Formio',
       'FormioUtils',
-      'formioComponents',
       function(
         $scope,
         $http,
         $element,
         FormioScope,
         Formio,
-        FormioUtils,
-        formioComponents
+        FormioUtils
       ) {
         $scope.formioAlerts = [];
         // Shows the given alerts (single or array), and dismisses old alerts
@@ -45,11 +43,6 @@ module.exports = function() {
           form: true,
           submission: true
         });
-
-        // See if a component is found in the registry.
-        $scope.componentFound = function(component) {
-          return formioComponents.components.hasOwnProperty(component.type);
-        };
 
         // Called when the form is submitted.
         $scope.onSubmit = function(form) {

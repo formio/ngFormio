@@ -63621,7 +63621,7 @@ module.exports = function (app) {
     '$templateCache',
     function ($templateCache) {
       $templateCache.put('formio/components/columns.html',
-        "<div class=\"row\">\n  <div class=\"col-xs-6\" ng-repeat=\"column in component.columns\">\n    <formio-component ng-repeat=\"component in column.components\" ng-if=\"componentFound(component)\" component=\"component\" data=\"data\" formio=\"formio\" read-only=\"readOnly\"></formio-component>\n  </div>\n</div>\n"
+        "<div class=\"row\">\n  <div class=\"col-xs-6\" ng-repeat=\"column in component.columns\">\n    <formio-component ng-repeat=\"component in column.components\" component=\"component\" data=\"data\" formio=\"formio\" read-only=\"readOnly\"></formio-component>\n  </div>\n</div>\n"
       );
     }
   ]);
@@ -63720,6 +63720,33 @@ module.exports = function (app) {
 
   app.config([
     'formioComponentsProvider',
+    function (formioComponentsProvider) {
+      formioComponentsProvider.register('custom', {
+        title: 'Custom',
+        template: 'formio/components/custom.html',
+        settings: {
+          'foo': 'bar'
+        }
+      });
+    }
+  ]);
+  app.run([
+    '$templateCache',
+    function ($templateCache) {
+      $templateCache.put('formio/components/custom.html',
+        "<div class=\"panel panel-default\">\n  <div class=\"panel-body text-muted text-center\">\n    Custom Component ({{ component.type }})\n  </div>\n</div>\n"
+      );
+    }
+  ]);
+};
+
+},{}],44:[function(require,module,exports){
+"use strict";
+
+module.exports = function (app) {
+
+  app.config([
+    'formioComponentsProvider',
     function(formioComponentsProvider) {
       formioComponentsProvider.register('datetime', {
         title: 'Date / Time',
@@ -63776,7 +63803,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],44:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -63805,7 +63832,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],45:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -63829,13 +63856,13 @@ module.exports = function (app) {
     '$templateCache',
     function ($templateCache) {
       $templateCache.put('formio/components/fieldset.html',
-        "<fieldset>\n  <legend ng-if=\"component.legend\">{{ component.legend }}</legend>\n  <formio-component ng-repeat=\"component in component.components\" ng-if=\"componentFound(component)\" component=\"component\" data=\"data\" formio=\"formio\" read-only=\"readOnly\"></formio-component>\n</fieldset>\n"
+        "<fieldset>\n  <legend ng-if=\"component.legend\">{{ component.legend }}</legend>\n  <formio-component ng-repeat=\"component in component.components\" component=\"component\" data=\"data\" formio=\"formio\" read-only=\"readOnly\"></formio-component>\n</fieldset>\n"
       );
     }
   ]);
 };
 
-},{}],46:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -63987,7 +64014,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],47:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -64020,7 +64047,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],48:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -64099,7 +64126,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],49:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 "use strict";
 var app = angular.module('formio');
 
@@ -64111,6 +64138,7 @@ require('./checkbox')(app);
 require('./checkboxes')(app);
 require('./columns')(app);
 require('./content')(app);
+require('./custom')(app);
 require('./datetime')(app);
 require('./email')(app);
 require('./fieldset')(app);
@@ -64130,7 +64158,7 @@ require('./table')(app);
 require('./textarea')(app);
 require('./well')(app);
 
-},{"./address":36,"./button":37,"./checkbox":38,"./checkboxes":39,"./columns":40,"./components":41,"./content":42,"./datetime":43,"./email":44,"./fieldset":45,"./file":46,"./hidden":47,"./htmlelement":48,"./number":50,"./page":51,"./panel":52,"./password":53,"./phonenumber":54,"./radio":55,"./resource":56,"./select":57,"./signature":58,"./table":59,"./textarea":60,"./textfield":61,"./well":62}],50:[function(require,module,exports){
+},{"./address":36,"./button":37,"./checkbox":38,"./checkboxes":39,"./columns":40,"./components":41,"./content":42,"./custom":43,"./datetime":44,"./email":45,"./fieldset":46,"./file":47,"./hidden":48,"./htmlelement":49,"./number":51,"./page":52,"./panel":53,"./password":54,"./phonenumber":55,"./radio":56,"./resource":57,"./select":58,"./signature":59,"./table":60,"./textarea":61,"./textfield":62,"./well":63}],51:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -64178,7 +64206,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],51:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -64199,13 +64227,13 @@ module.exports = function (app) {
     '$templateCache',
     function ($templateCache) {
       $templateCache.put('formio/components/page.html',
-        "<formio-component ng-repeat=\"component in component.components\" ng-if=\"componentFound(component)\" component=\"component\" data=\"data\" formio=\"formio\"></formio-component>\n"
+        "<formio-component ng-repeat=\"component in component.components\" component=\"component\" data=\"data\" formio=\"formio\"></formio-component>\n"
       );
     }
   ]);
 };
 
-},{}],52:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -64230,13 +64258,13 @@ module.exports = function (app) {
     '$templateCache',
     function ($templateCache) {
       $templateCache.put('formio/components/panel.html',
-        "<div class=\"panel panel-{{ component.theme }}\">\n  <div ng-if=\"component.title\" class=\"panel-heading\">\n    <h3 class=\"panel-title\">{{ component.title }}</h3>\n  </div>\n  <div class=\"panel-body\">\n    <formio-component ng-repeat=\"component in component.components\" ng-if=\"componentFound(component)\" component=\"component\" data=\"data\" formio=\"formio\" read-only=\"readOnly\"></formio-component>\n  </div>\n</div>\n"
+        "<div class=\"panel panel-{{ component.theme }}\">\n  <div ng-if=\"component.title\" class=\"panel-heading\">\n    <h3 class=\"panel-title\">{{ component.title }}</h3>\n  </div>\n  <div class=\"panel-body\">\n    <formio-component ng-repeat=\"component in component.components\" component=\"component\" data=\"data\" formio=\"formio\" read-only=\"readOnly\"></formio-component>\n  </div>\n</div>\n"
       );
     }
   ]);
 };
 
-},{}],53:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -64266,7 +64294,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],54:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -64298,7 +64326,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],55:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -64340,7 +64368,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],56:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -64422,7 +64450,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],57:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -64611,7 +64639,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],58:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -64745,7 +64773,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],59:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -64786,7 +64814,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],60:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -64833,7 +64861,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],61:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -64883,7 +64911,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],62:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -64906,13 +64934,13 @@ module.exports = function (app) {
     '$templateCache',
     function ($templateCache) {
       $templateCache.put('formio/components/well.html',
-        "<div class=\"well\">\n  <formio-component ng-repeat=\"component in component.components\" ng-if=\"componentFound(component)\" component=\"component\" data=\"data\" formio=\"formio\" read-only=\"readOnly\"></formio-component>\n</div>\n"
+        "<div class=\"well\">\n  <formio-component ng-repeat=\"component in component.components\" component=\"component\" data=\"data\" formio=\"formio\" read-only=\"readOnly\"></formio-component>\n</div>\n"
       );
     }
   ]);
 };
 
-},{}],63:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -64948,7 +64976,7 @@ module.exports = function() {
   };
 };
 
-},{}],64:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -64969,15 +64997,13 @@ module.exports = function() {
       'FormioScope',
       'Formio',
       'FormioUtils',
-      'formioComponents',
       function(
         $scope,
         $http,
         $element,
         FormioScope,
         Formio,
-        FormioUtils,
-        formioComponents
+        FormioUtils
       ) {
         $scope.formioAlerts = [];
         // Shows the given alerts (single or array), and dismisses old alerts
@@ -64997,11 +65023,6 @@ module.exports = function() {
           form: true,
           submission: true
         });
-
-        // See if a component is found in the registry.
-        $scope.componentFound = function(component) {
-          return formioComponents.components.hasOwnProperty(component.type);
-        };
 
         // Called when the form is submitted.
         $scope.onSubmit = function(form) {
@@ -65078,7 +65099,7 @@ module.exports = function() {
   };
 };
 
-},{}],65:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -65165,14 +65186,8 @@ module.exports = [
             });
           }
 
-          // See if a component is found in the registry.
-          $scope.componentFound = function(component) {
-            return formioComponents.components.hasOwnProperty(component.type);
-          };
-
           // Get the settings.
-          var component = formioComponents.components[$scope.component.type];
-          if (!component) return;
+          var component = formioComponents.components[$scope.component.type] || formioComponents.components['custom'];
 
           // Set the component with the defaults from the component settings.
           angular.forEach(component.settings, function(value, key) {
@@ -65232,7 +65247,7 @@ module.exports = [
   }
 ];
 
-},{}],66:[function(require,module,exports){
+},{}],67:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -65312,7 +65327,7 @@ module.exports = function() {
   };
 };
 
-},{}],67:[function(require,module,exports){
+},{}],68:[function(require,module,exports){
 "use strict";
 module.exports = [
   '$compile',
@@ -65334,7 +65349,7 @@ module.exports = [
   }
 ];
 
-},{}],68:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -65344,7 +65359,7 @@ module.exports = function() {
   };
 };
 
-},{}],69:[function(require,module,exports){
+},{}],70:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -65398,7 +65413,7 @@ module.exports = function() {
   };
 };
 
-},{}],70:[function(require,module,exports){
+},{}],71:[function(require,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -65562,7 +65577,7 @@ module.exports = [
   }
 ];
 
-},{}],71:[function(require,module,exports){
+},{}],72:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -65650,7 +65665,7 @@ module.exports = function() {
   };
 };
 
-},{}],72:[function(require,module,exports){
+},{}],73:[function(require,module,exports){
 "use strict";
 module.exports = [
   '$q',
@@ -65699,7 +65714,7 @@ module.exports = [
   }
 ];
 
-},{}],73:[function(require,module,exports){
+},{}],74:[function(require,module,exports){
 "use strict";
 module.exports = [
   'FormioUtils',
@@ -65708,7 +65723,7 @@ module.exports = [
   }
 ];
 
-},{}],74:[function(require,module,exports){
+},{}],75:[function(require,module,exports){
 "use strict";
 module.exports = [
   '$sce',
@@ -65721,7 +65736,7 @@ module.exports = [
   }
 ];
 
-},{}],75:[function(require,module,exports){
+},{}],76:[function(require,module,exports){
 (function (global){
 "use strict";
 global.jQuery = require('jquery');
@@ -65738,7 +65753,7 @@ require('angular-ui-bootstrap');
 require('./formio');
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./formio":76,"angular":11,"angular-moment":1,"angular-sanitize":4,"angular-ui-bootstrap":5,"angular-ui-mask":8,"angular-ui-select/select":9,"bootstrap":13,"bootstrap-ui-datetime-picker/dist/datetime-picker":12,"jquery":32,"ng-file-upload":34,"signature_pad":35}],76:[function(require,module,exports){
+},{"./formio":77,"angular":11,"angular-moment":1,"angular-sanitize":4,"angular-ui-bootstrap":5,"angular-ui-mask":8,"angular-ui-select/select":9,"bootstrap":13,"bootstrap-ui-datetime-picker/dist/datetime-picker":12,"jquery":32,"ng-file-upload":34,"signature_pad":35}],77:[function(require,module,exports){
 "use strict";
 
 
@@ -65813,7 +65828,7 @@ app.run([
 
     // The template for the formio forms.
     $templateCache.put('formio.html',
-      "<form role=\"form\" name=\"formioForm\" ng-submit=\"onSubmit(formioForm)\" novalidate>\n  <i id=\"formio-loading\" style=\"font-size: 2em;\" class=\"glyphicon glyphicon-refresh glyphicon-spin\"></i>\n  <div ng-repeat=\"alert in formioAlerts\" class=\"alert alert-{{ alert.type }}\" role=\"alert\">\n    {{ alert.message }}\n  </div>\n  <formio-component ng-repeat=\"component in _form.components track by $index\" ng-if=\"componentFound(component)\" component=\"component\" data=\"_submission.data\" form=\"formioForm\" formio=\"formio\" read-only=\"readOnly\"></formio-component>\n</form>\n"
+      "<form role=\"form\" name=\"formioForm\" ng-submit=\"onSubmit(formioForm)\" novalidate>\n  <i id=\"formio-loading\" style=\"font-size: 2em;\" class=\"glyphicon glyphicon-refresh glyphicon-spin\"></i>\n  <div ng-repeat=\"alert in formioAlerts\" class=\"alert alert-{{ alert.type }}\" role=\"alert\">\n    {{ alert.message }}\n  </div>\n  <formio-component ng-repeat=\"component in _form.components track by $index\" component=\"component\" data=\"_submission.data\" form=\"formioForm\" formio=\"formio\" read-only=\"readOnly\"></formio-component>\n</form>\n"
     );
 
     $templateCache.put('formio-delete.html',
@@ -65837,13 +65852,13 @@ app.run([
 
 require('./components');
 
-},{"./components":49,"./directives/customValidator":63,"./directives/formio":64,"./directives/formioComponent":65,"./directives/formioDelete":66,"./directives/formioElement":67,"./directives/formioErrors":68,"./directives/formioSubmissions":69,"./factories/FormioScope":70,"./factories/FormioUtils":71,"./factories/formioInterceptor":72,"./filters/flattenComponents":73,"./filters/safehtml":74,"./plugins":77,"./providers/Formio":79,"./providers/FormioPlugins":80}],77:[function(require,module,exports){
+},{"./components":50,"./directives/customValidator":64,"./directives/formio":65,"./directives/formioComponent":66,"./directives/formioDelete":67,"./directives/formioElement":68,"./directives/formioErrors":69,"./directives/formioSubmissions":70,"./factories/FormioScope":71,"./factories/FormioUtils":72,"./factories/formioInterceptor":73,"./filters/flattenComponents":74,"./filters/safehtml":75,"./plugins":78,"./providers/Formio":80,"./providers/FormioPlugins":81}],78:[function(require,module,exports){
 "use strict";
 module.exports = function(app) {
   require('./storage/url')(app);
 };
 
-},{"./storage/url":78}],78:[function(require,module,exports){
+},{"./storage/url":79}],79:[function(require,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -65895,7 +65910,7 @@ module.exports = function(app) {
   );
 };
 
-},{}],79:[function(require,module,exports){
+},{}],80:[function(require,module,exports){
 "use strict";
 module.exports = function() {
 
@@ -65960,7 +65975,7 @@ module.exports = function() {
   };
 };
 
-},{"formiojs/src/formio.js":31}],80:[function(require,module,exports){
+},{"formiojs/src/formio.js":31}],81:[function(require,module,exports){
 "use strict";
 
 module.exports = function() {
@@ -65992,4 +66007,4 @@ module.exports = function() {
   };
 };
 
-},{}]},{},[75]);
+},{}]},{},[76]);
