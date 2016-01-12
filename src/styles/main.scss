@@ -1163,6 +1163,44 @@ footer {
   }
 }
 
+.form-list {
+  h5 {
+    margin: 0;
+    padding: 5px;
+    line-height: inherit;
+  }
+
+  .list-group {
+    padding: 0px;
+
+    .list-group-item {
+      padding: 10px 0 10px 0;
+      border: none;
+      &:nth-child(odd) {
+        background-color: $table-bg-accent;
+      }
+      .row {
+        margin: 0;
+      }
+
+      .form-list-buttons {
+        text-align: right;
+        @media (max-width: $screen-xs) {
+          text-align: left;
+        }
+
+        .dropdown-button-menu {
+          display: inline-block;
+          position: relative;
+          ul {
+            padding-bottom: 0;
+          }
+        }
+      }
+    }
+  }
+}
+
 /********************* Project Plan Upgrade Dialog *********************/
 .ngdialog.ngdialog-theme-default.project-upgrade .ngdialog-content {
   padding: 0;
