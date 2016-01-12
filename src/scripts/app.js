@@ -730,7 +730,7 @@ angular
       //   - Any attribute beginning with 'data-'
       //   - Any inline style
       //   - Any class name
-      CKEDITOR.config.allowedContent = '*[data-*]{*}(*)';
+      CKEDITOR.config.extraAllowedContent = '*[data-*]{*}(*)';
     }
   ])
   .factory('GoogleAnalytics', ['$window', '$state', function($window, $state) {
