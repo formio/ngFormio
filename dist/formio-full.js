@@ -51099,19 +51099,19 @@ module.exports = {
     if (!components) return;
 
     components.forEach(function(component) {
-      if (component.columns) {
+      if (component.columns && Array.isArray(component.columns)) {
         component.columns.forEach(function(column) {
           eachComponent(column.components, fn);
         });
       }
 
-      else if (component.rows) {
+      else if (component.rows && Array.isArray(component.rows)) {
         [].concat.apply([], component.rows).forEach(function(row) {
           eachComponent(row.components, fn);
         });
       }
 
-      else if (component.components) {
+      else if (component.components && Array.isArray(component.components)) {
         eachComponent(component.components, fn);
       }
 
