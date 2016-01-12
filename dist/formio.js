@@ -1,97 +1,4 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-// shim for using process in browser
-
-var process = module.exports = {};
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
-
-function cleanUpNextTick() {
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
-}
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = setTimeout(cleanUpNextTick);
-    draining = true;
-
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            if (currentQueue) {
-                currentQueue[queueIndex].run();
-            }
-        }
-        queueIndex = -1;
-        len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    clearTimeout(timeout);
-}
-
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
-        }
-    }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-        setTimeout(drainQueue, 0);
-    }
-};
-
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
-}
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
-};
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
-
-},{}],2:[function(require,module,exports){
 (function (process){
 // vim:ts=4:sts=4:sw=4:
 /*!
@@ -2143,7 +2050,7 @@ return Q;
 });
 
 }).call(this,require('_process'))
-},{"_process":1}],3:[function(require,module,exports){
+},{"_process":6}],2:[function(require,module,exports){
 /*!
  * EventEmitter2
  * https://github.com/hij1nx/EventEmitter2
@@ -2718,7 +2625,7 @@ return Q;
   }
 }();
 
-},{}],4:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 module.exports = function (obj) {
     if (!obj || typeof obj !== 'object') return obj;
     
@@ -2755,7 +2662,7 @@ var isArray = Array.isArray || function (xs) {
     return {}.toString.call(xs) === '[object Array]';
 };
 
-},{}],5:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 (function() {
   'use strict';
 
@@ -3087,7 +2994,7 @@ var isArray = Array.isArray || function (xs) {
   self.fetch.polyfill = true
 })();
 
-},{}],6:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 'use strict';
 
 require('whatwg-fetch');
@@ -3706,7 +3613,164 @@ Formio.deregisterPlugin = function(plugin) {
 
 module.exports = Formio;
 
-},{"Q":2,"eventemitter2":3,"shallow-copy":4,"whatwg-fetch":5}],7:[function(require,module,exports){
+},{"Q":1,"eventemitter2":2,"shallow-copy":3,"whatwg-fetch":4}],6:[function(require,module,exports){
+// shim for using process in browser
+
+var process = module.exports = {};
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = setTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    clearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        setTimeout(drainQueue, 0);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+},{}],7:[function(require,module,exports){
+module.exports = {
+  /**
+   * Iterate through each component within a form.
+   * @param components
+   * @param fn
+   */
+  eachComponent: function eachComponent(components, fn) {
+    if (!components) return;
+
+    components.forEach(function(component) {
+      if (component.columns) {
+        component.columns.forEach(function(column) {
+          eachComponent(column.components, fn);
+        });
+      }
+
+      else if (component.rows) {
+        [].concat.apply([], component.rows).forEach(function(row) {
+          eachComponent(row.components, fn);
+        });
+      }
+
+      else if (component.components) {
+        eachComponent(component.components, fn);
+      }
+
+      else {
+        fn(component);
+      }
+    });
+  },
+
+  /**
+   * Get a component by its key
+   * @param components
+   * @param key The key of the component to get
+   * @returns The component that matches the given key, or undefined if not found.
+   */
+  getComponent: function getComponent(components, key) {
+    var result;
+    module.exports.eachComponent(components, function(component) {
+      if (component.key === key) {
+        result = component;
+      }
+    });
+    return result;
+  },
+
+  /**
+   * Flatten the form components for data manipulation.
+   * @param components
+   * @param flattened
+   * @returns {*|{}}
+   */
+  flattenComponents: function flattenComponents(components) {
+    var flattened = {};
+    module.exports.eachComponent(components, function(component) {
+      flattened[component.key] = component;
+    });
+    return flattened;
+  }
+};
+
+},{}],8:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -3776,7 +3840,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -3924,7 +3988,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -3964,7 +4028,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -3993,7 +4057,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -4051,7 +4115,7 @@ module.exports = function (app) {
   }]);
 };
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -4079,7 +4143,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -4104,7 +4168,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -4167,7 +4231,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -4196,7 +4260,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -4227,7 +4291,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -4379,7 +4443,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -4412,7 +4476,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -4491,7 +4555,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 "use strict";
 var app = angular.module('formio');
 
@@ -4523,7 +4587,7 @@ require('./table')(app);
 require('./textarea')(app);
 require('./well')(app);
 
-},{"./address":7,"./button":8,"./checkbox":9,"./columns":10,"./components":11,"./content":12,"./custom":13,"./datetime":14,"./email":15,"./fieldset":16,"./file":17,"./hidden":18,"./htmlelement":19,"./number":21,"./page":22,"./panel":23,"./password":24,"./phonenumber":25,"./radio":26,"./resource":27,"./select":28,"./selectboxes":29,"./signature":30,"./table":31,"./textarea":32,"./textfield":33,"./well":34}],21:[function(require,module,exports){
+},{"./address":8,"./button":9,"./checkbox":10,"./columns":11,"./components":12,"./content":13,"./custom":14,"./datetime":15,"./email":16,"./fieldset":17,"./file":18,"./hidden":19,"./htmlelement":20,"./number":22,"./page":23,"./panel":24,"./password":25,"./phonenumber":26,"./radio":27,"./resource":28,"./select":29,"./selectboxes":30,"./signature":31,"./table":32,"./textarea":33,"./textfield":34,"./well":35}],22:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -4571,7 +4635,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -4598,7 +4662,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -4629,7 +4693,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -4659,7 +4723,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -4691,7 +4755,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -4733,7 +4797,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -4815,7 +4879,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],28:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -5004,7 +5068,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],29:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -5091,7 +5155,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],30:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -5225,7 +5289,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],31:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -5266,7 +5330,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],32:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -5313,7 +5377,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],33:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -5363,7 +5427,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],34:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -5392,7 +5456,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],35:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -5428,7 +5492,7 @@ module.exports = function() {
   };
 };
 
-},{}],36:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -5551,7 +5615,7 @@ module.exports = function() {
   };
 };
 
-},{}],37:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -5699,7 +5763,7 @@ module.exports = [
   }
 ];
 
-},{}],38:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -5779,7 +5843,7 @@ module.exports = function() {
   };
 };
 
-},{}],39:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 "use strict";
 module.exports = [
   '$compile',
@@ -5801,7 +5865,7 @@ module.exports = [
   }
 ];
 
-},{}],40:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -5811,7 +5875,7 @@ module.exports = function() {
   };
 };
 
-},{}],41:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -5865,7 +5929,7 @@ module.exports = function() {
   };
 };
 
-},{}],42:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -6029,57 +6093,15 @@ module.exports = [
   }
 ];
 
-},{}],43:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 "use strict";
+var formioUtils = require('formio-utils');
+
 module.exports = function() {
   return {
-    flattenComponents: function flatten(components, flattened) {
-      flattened = flattened || {};
-      angular.forEach(components, function(component) {
-        if (component.tree) {
-          flattened[component.key] = component;
-        }
-        else if (component.columns && (component.columns.length > 0)) {
-          angular.forEach(component.columns, function(column) {
-            flatten(column.components, flattened);
-          });
-        }
-        else if (component.components && (component.components.length > 0)) {
-          flatten(component.components, flattened);
-        }
-        else if (component.input) {
-          flattened[component.key] = component;
-        }
-      });
-      return flattened;
-    },
-    eachComponent: function eachComponent(components, fn) {
-      if (!components) {
-        return;
-      }
-      angular.forEach(components, function(component) {
-        if (component.columns) {
-          angular.forEach(component.columns, function(column) {
-            eachComponent(column.components, fn);
-          });
-        }
-        else if (component.components) {
-          eachComponent(component.components, fn);
-        }
-        else {
-          fn(component);
-        }
-      });
-    },
-    getComponent: function getComponent(components, key) {
-      var result;
-      this.eachComponent(components, function(component) {
-        if (component.key === key) {
-          result = component;
-        }
-      });
-      return result;
-    },
+    flattenComponents: formioUtils.flattenComponents,
+    eachComponent: formioUtils.eachComponent,
+    getComponent: formioUtils.getComponent,
     fieldWrap: function(input) {
       input = input + '<formio-errors></formio-errors>';
       var multiInput = input.replace('data[component.key]', 'data[component.key][$index]');
@@ -6117,7 +6139,7 @@ module.exports = function() {
   };
 };
 
-},{}],44:[function(require,module,exports){
+},{"formio-utils":7}],45:[function(require,module,exports){
 "use strict";
 module.exports = [
   '$q',
@@ -6166,7 +6188,7 @@ module.exports = [
   }
 ];
 
-},{}],45:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 "use strict";
 module.exports = [
   'FormioUtils',
@@ -6175,7 +6197,7 @@ module.exports = [
   }
 ];
 
-},{}],46:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 "use strict";
 module.exports = [
   '$sce',
@@ -6188,7 +6210,7 @@ module.exports = [
   }
 ];
 
-},{}],47:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 "use strict";
 
 
@@ -6287,13 +6309,13 @@ app.run([
 
 require('./components');
 
-},{"./components":20,"./directives/customValidator":35,"./directives/formio":36,"./directives/formioComponent":37,"./directives/formioDelete":38,"./directives/formioElement":39,"./directives/formioErrors":40,"./directives/formioSubmissions":41,"./factories/FormioScope":42,"./factories/FormioUtils":43,"./factories/formioInterceptor":44,"./filters/flattenComponents":45,"./filters/safehtml":46,"./plugins":48,"./providers/Formio":50,"./providers/FormioPlugins":51}],48:[function(require,module,exports){
+},{"./components":21,"./directives/customValidator":36,"./directives/formio":37,"./directives/formioComponent":38,"./directives/formioDelete":39,"./directives/formioElement":40,"./directives/formioErrors":41,"./directives/formioSubmissions":42,"./factories/FormioScope":43,"./factories/FormioUtils":44,"./factories/formioInterceptor":45,"./filters/flattenComponents":46,"./filters/safehtml":47,"./plugins":49,"./providers/Formio":51,"./providers/FormioPlugins":52}],49:[function(require,module,exports){
 "use strict";
 module.exports = function(app) {
   require('./storage/url')(app);
 };
 
-},{"./storage/url":49}],49:[function(require,module,exports){
+},{"./storage/url":50}],50:[function(require,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -6345,7 +6367,7 @@ module.exports = function(app) {
   );
 };
 
-},{}],50:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 "use strict";
 module.exports = function() {
 
@@ -6410,7 +6432,7 @@ module.exports = function() {
   };
 };
 
-},{"formiojs/src/formio.js":6}],51:[function(require,module,exports){
+},{"formiojs/src/formio.js":5}],52:[function(require,module,exports){
 "use strict";
 
 module.exports = function() {
@@ -6442,4 +6464,4 @@ module.exports = function() {
   };
 };
 
-},{}]},{},[47]);
+},{}]},{},[48]);
