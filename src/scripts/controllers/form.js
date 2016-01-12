@@ -541,6 +541,8 @@ app.factory('ActionInfoLoader', [
         if (!$stateParams.actionInfo && $stateParams.actionName) {
           return getActionInfo($stateParams.actionName).then(function(info) {
             return loadAction(info.defaults);
+          }).catch(function(error) {
+            $scope.error = error;
           });
         }
         else {
