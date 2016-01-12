@@ -7,9 +7,7 @@ module.exports = function (app) {
       formioComponentsProvider.register('custom', {
         title: 'Custom',
         template: 'formio/components/custom.html',
-        settings: {
-          'foo': 'bar'
-        }
+        settings: {}
       });
     }
   ]);
