@@ -160,24 +160,18 @@ ul.dropdown-menu {
   border-radius: 35px;
 }
 
-/* Hide for mobile, show later */
 .sidebar {
-  display: none;
-}
-@media (min-width: $screen-sm-min) {
-  .sidebar {
-    position: fixed;
-    top: 45px;
-    bottom: 0;
-    left: 0;
-    z-index: 1000;
-    display: block;
-    padding: 20px;
-    overflow-x: hidden;
-    overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
-    background-color: #444;
-    border-right: 1px solid #eee;
-  }
+  position: fixed;
+  top: 45px;
+  bottom: 0;
+  left: 0;
+  z-index: 1000;
+  display: block;
+  padding: 20px;
+  overflow-x: hidden;
+  overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+  background-color: #444;
+  border-right: 1px solid #eee;
 }
 
 /* Sidebar navigation */
@@ -272,28 +266,31 @@ $project-header-color: lighten($brand-primary, 55%);
   border: none;
   background-color: darken($brand-primary, 25%);
   text-align: center;
-  padding-top: 0;
+  padding: 0;
   width: 6%;
-  .nav > li {
-    & > a {
-      height: 90px;
-      padding: 20px 15px;
-      color: $project-header-color;
-      &:hover {
+  .nav {
+    margin: 0;
+    li {
+      & > a {
+        height: 90px;
+        padding: 20px 0 0 0;
+        color: $project-header-color;
+        &:hover {
+          background-color: darken($brand-primary, 20%);
+        }
+        span {
+          font-size: 0.6em;
+        }
+        i {
+          font-size: 2em;
+        }
+      }
+      &.active {
         background-color: darken($brand-primary, 20%);
-      }
-      span {
-        font-size: 0.6em;
-      }
-      i {
-        font-size: 2em;
-      }
-    }
-    &.active {
-      background-color: darken($brand-primary, 20%);
-      & > a, & > a:focus {
-        background-color: darken($brand-primary, 5%);
-        border-right: solid $brand-secondary 8px;
+        & > a, & > a:focus {
+          background-color: darken($brand-primary, 5%);
+          border-right: solid $brand-secondary 8px;
+        }
       }
     }
   }
@@ -303,13 +300,6 @@ $project-header-color: lighten($brand-primary, 55%);
   margin-left: 6%;
   width: 94%;
   padding: 0;
-}
-
-@media (max-width: $screen-sm-min) {
-  .project-main {
-    margin-left: 0;
-    width: 100%;
-  }
 }
 
 .project-content {
