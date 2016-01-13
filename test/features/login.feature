@@ -8,11 +8,11 @@ Feature: Login Functionality
     And I see an alert with the text Password not provided.
 
   Scenario: Bad password
-    Given an account exists with the username ${login-username}, email ${login-email} and password ${login-password}
+    Given an account exists with the username ${random-name>login.name}, email ${random-email>login.email} and password ${random-password>login.password}
     And I am on /#/auth
     And I am logged out
-    When I enter ${login-email} in the .login-container #user\.email field
-    And I enter ${login-password}Bad in the .login-container #user\.password field
+    When I enter ${login.email} in the .login-container #user\.email field
+    And I enter ${random-password} in the .login-container #user\.password field
     When I click the LOG IN button
     Then I have been logged out
     And I see an alert with the text Incorrect password
@@ -20,7 +20,7 @@ Feature: Login Functionality
   Scenario: Missing email
     Given I am on /#/auth
     And I am logged out
-    When I enter Badpass in the .login-container #user\.password field
+    When I enter ${random-password} in the .login-container #user\.password field
     And I click the LOG IN button
     Then I have been logged out
     And I see an alert with the text Missing username
@@ -28,7 +28,7 @@ Feature: Login Functionality
   Scenario: Missing password
     Given I am on /#/auth
     And I am logged out
-    When I enter ${login-email} in the .login-container #user\.email field
+    When I enter ${random-email} in the .login-container #user\.email field
     And I click the LOG IN button
     Then I have been logged out
     And I see an alert with the text Password not provided.
@@ -36,18 +36,18 @@ Feature: Login Functionality
   Scenario: Unknown user
     Given I am on /#/auth
     And I am logged out
-    When I enter ${login2-email} in the .login-container #user\.email field
-    And I enter ${login2-password} in the .login-container #user\.password field
+    When I enter ${random-email} in the .login-container #user\.email field
+    And I enter ${random-password} in the .login-container #user\.password field
     And I click the LOG IN button
     Then I have been logged out
     And I see an alert with the text Invalid user
 
   Scenario: Logging in
-    Given an account exists with the username ${login-username}, email ${login-email} and password ${login-password}
+    Given an account exists with the username ${random-name>login2.name}, email ${random-email>login2.email} and password ${random-password>login2.password}
     And I am on /#/auth
     And I am logged out
-    When I enter ${login-email} in the .login-container #user\.email field
-    And I enter ${login-password} in the .login-container #user\.password field
+    When I enter ${login2.email} in the .login-container #user\.email field
+    And I enter ${login2.password} in the .login-container #user\.password field
     And I click the LOG IN button
     Then I have been logged in
 
