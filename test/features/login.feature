@@ -5,7 +5,7 @@ Feature: Login Functionality
     And I am logged out
     When I click the LOG IN button
     Then I have been logged out
-    And I see an alert with the text Password not provided.
+    And I see .alert with the text Password not provided.
 
   Scenario: Bad password
     Given an account exists with the username ${random-name>login.name}, email ${random-email>login.email} and password ${random-password>login.password}
@@ -15,7 +15,7 @@ Feature: Login Functionality
     And I enter ${random-password} in the .login-container #user\.password field
     When I click the LOG IN button
     Then I have been logged out
-    And I see an alert with the text Incorrect password
+    And I see .alert with the text Incorrect password
 
   Scenario: Missing email
     Given I am on /#/auth
@@ -23,7 +23,7 @@ Feature: Login Functionality
     When I enter ${random-password} in the .login-container #user\.password field
     And I click the LOG IN button
     Then I have been logged out
-    And I see an alert with the text Missing username
+    And I see .alert with the text Missing username
 
   Scenario: Missing password
     Given I am on /#/auth
@@ -31,7 +31,7 @@ Feature: Login Functionality
     When I enter ${random-email} in the .login-container #user\.email field
     And I click the LOG IN button
     Then I have been logged out
-    And I see an alert with the text Password not provided.
+    And I see .alert with the text Password not provided.
 
   Scenario: Unknown user
     Given I am on /#/auth
@@ -40,7 +40,7 @@ Feature: Login Functionality
     And I enter ${random-password} in the .login-container #user\.password field
     And I click the LOG IN button
     Then I have been logged out
-    And I see an alert with the text Invalid user
+    And I see .alert with the text Invalid user
 
   Scenario: Logging in
     Given an account exists with the username ${random-name>login2.name}, email ${random-email>login2.email} and password ${random-password>login2.password}

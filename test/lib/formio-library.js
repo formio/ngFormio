@@ -9,7 +9,7 @@ var _ = require('lodash');
 
 module.exports = function(config) {
   // Global timeout for wait* commands.
-  var timeout = 60000;
+  var timeout = 10000;
   var state = {};
 
   /**
@@ -56,6 +56,10 @@ module.exports = function(config) {
         return chance.email();
       case 'password':
         return chance.password();
+      case 'title':
+        return chance.word({length: chance.natural({min: 5, max: 40})});
+      case 'description':
+        return chance.sentence();
       default:
         return '';
     }
@@ -104,6 +108,10 @@ module.exports = function(config) {
    * @returns {*}
    */
   var replacements = function(text) {
+    if (text === '${empty}') {
+      return '';
+    }
+
     // Regex to find ${string}.
     var regex = /\$\{(.+?[^\}])\}/g;
 
@@ -181,9 +189,7 @@ module.exports = function(config) {
 
         next(null, body);
       })
-      .catch(function(err) {
-        next(err);
-      });
+      .catch(next);
   };
 
   /**
@@ -277,7 +283,8 @@ module.exports = function(config) {
       driver.url(path)
         .then(function() {
           next();
-        });
+        })
+        .catch(next);
     })
     .given('an account exists with the username $USERNAME, email $EMAIL and password $PASSWORD', function(username, email, password, next) {
       username = replacements(username);
@@ -301,9 +308,7 @@ module.exports = function(config) {
         .then(function() {
           next();
         })
-        .catch(function(err) {
-          next(err);
-        });
+        .catch(next);
     })
     .given('I am logged in(?: for )?(.+)?$', function(tempUser, next) {
       if (!next && tempUser) {
@@ -355,65 +360,45 @@ module.exports = function(config) {
     .when('I click (?:on )?the $LINK link', function(link, next) {
       var driver = this.driver;
       driver.waitForExist('=' + link, timeout)
-        .then(function() {
-          driver.click('=' + link)
-            .then(function() {
-              next();
-            })
-            .catch(function(err) {
-              next(err);
-            });
-        })
-        .catch(function(err) {
-          next(err);
-        });
-    })
-    .when('I click (?:on )?the $BUTTON button', function(button, next) {
-      var driver = this.driver;
-      driver.pause(1000)
-        .then(function() {
-          return driver.waitForExist('//button[contains(.,\'' + button + '\')]', timeout);
-        })
-        .then(function() {
-          return driver.click('//button[contains(.,\'' + button + '\')]');
-        })
-        .then(function() {
-          next();
-        });
-    })
-    .when('I enter $TEXT in the $FIELD field', function(text, field, next) {
-      var driver = this.driver;
-      driver.waitForExist(field, timeout)
-        .then(function() {
-          return driver.setValue(field, replacements(text));
-        })
+        .click('=' + link)
         .then(function() {
           next();
         })
         .catch(next);
     })
+    .when('I click (?:on )?the $BUTTON button', function(button, next) {
+      var driver = this.driver;
+      driver.waitForExist('//button[contains(.,\'' + button + '\')]', timeout)
+        .click('//button[contains(.,\'' + button + '\')]')
+        .then(next)
+        .catch(next);
+    })
+    .when('I click on the $element element', function(element, next) {
+      var driver = this.driver;
+      driver.waitForExist(element, timeout)
+        .click(element)
+        .then(next)
+        .catch(next);
+    })
+    .when('I enter $TEXT in the $FIELD field', function(text, field, next) {
+      var driver = this.driver;
+      driver.waitForExist(field, timeout)
+        .setValue(field, replacements(text))
+        .then(next)
+        .catch(next);
+    })
     .when('I expand the user menu', function(next) {
       var driver = this.driver;
       driver.waitForExist('#user-menu')
-        .then(function() {
-          driver.click('#user-menu')
-            .then(function() {
-              next();
-            })
-            .catch(function(err) {
-              next(err);
-            })
-        })
-        .catch(function(err) {
-          next(err);
-        });
+        .click('#user-menu')
+        .then(next)
+        .catch(next);
     })
     .when('I wait $TIME milliseconds', function(time, next) {
       var driver = this.driver;
       driver.pause(time)
-        .then(function() {
-          next();
-        }).catch(next);
+        .then(next)
+        .catch(next);
     })
     .then('the title is $TITLE', function(title, next) {
       var driver = this.driver;
@@ -427,9 +412,7 @@ module.exports = function(config) {
             next(err);
           }
         })
-        .catch(function(err) {
-          next(err);
-        });
+        .catch(next);
     })
     .then('I am (?:on|at) (?:the )?(.+?)(?: page)$', function(path, next) {
       path = (path === 'home') ? config.baseUrl + '/' : config.baseUrl + path;
@@ -439,12 +422,13 @@ module.exports = function(config) {
         .then(function(res) {
           assert.equal(res.value, path);
           next();
-        });
+        })
+        .catch(next);
     })
     .then('I have been logged in', function(next) {
       var driver = this.driver;
-      driver.pause(700).then(function(){
-        driver.localStorage('GET', 'formioToken', function(err, res) {
+      driver.pause(700)
+        .localStorage('GET', 'formioToken', function(err, res) {
           if (err) {
             return next(err);
           }
@@ -453,13 +437,13 @@ module.exports = function(config) {
           }
 
           next(new Error('No formioToken found; ' + JSON.stringify(res)));
-        });
-      });
+        })
+        .catch(next);
     })
     .then('I have been logged out', function(next) {
       var driver = this.driver;
-      driver.pause(500).then(function(){
-        driver.localStorage('GET', 'formioToken', function(err, res) {
+      driver.pause(500)
+        .localStorage('GET', 'formioToken', function(err, res) {
           if (err) {
             return next(err);
           }
@@ -468,42 +452,28 @@ module.exports = function(config) {
           }
 
           next();
-        });
-      });
+        })
+        .catch(next);
     })
     .then('I see a notification with (?:the text )?$TEXT', function(text, next) {
-      var driver = this.driver;
-      driver.waitForExist('//div[@class=\'ui-notification\']/div[@class=\'message\']', timeout)
-        .then(function() {
-          return driver.getText('//div[@class=\'ui-notification\']/div[@class=\'message\']');
-        })
-        .then(function(alert) {
-          assert.equal(text, alert);
-        });
+      text = replacements(text);
 
-      driver.waitForExist('//div[@class=\'ui-notification\']/div[@class=\'message\']', timeout)
-        .then(function() {
-          driver.getText('//div[@class=\'ui-notification\']/div[@class=\'message\']')
-            .then(function(alert) {
-              assert.equal(text, alert);
-              next();
-            })
-            .catch(function(err) {
-              next(err);
-            });
-        })
-        .catch(function(err) {
-          next(err);
-        });
-    })
-    .then('I see an alert with (?:the text )?$TEXT', function(text, next) {
       var driver = this.driver;
-      driver.waitForExist('//div[@role=\'alert\']', timeout)
-        .then(function() {
-          return driver.getText('//div[@role=\'alert\']');
-        })
+      driver.waitForVisible('//div[@class=\'ui-notification\']/div[@class=\'message\']', timeout)
+        .getText('//div[@class=\'ui-notification\']/div[@class=\'message\']')
         .then(function(alert) {
           assert.equal(text, alert);
+        })
+        .catch(next);
+    })
+    .then('I see the plaintext $text', function(text, next) {
+      text = replacements(text);
+
+      var driver = this.driver;
+      driver.waitForExist('//*[text()=\'' + text + '\']', timeout)
+        .isVisible('//*[text()=\'' + text + '\']')
+        .then(function(visible) {
+          assert.equal(visible, true);
           next();
         })
         .catch(next);
@@ -512,31 +482,65 @@ module.exports = function(config) {
       text = replacements(text);
 
       var driver = this.driver;
-      driver.waitForExist('//*[text()=\'' + text + '\']', 500)
-        .then(function(found) {
+      driver.waitForExist('//*[*=\'' + text + '\' or text()=\'' + text + '\']', timeout)
+        .isVisible('//*[*=\'' + text + '\' or text()=\'' + text + '\']')
+        .then(function(visible) {
+          if (!(visible instanceof Array)) {
+            visible = [visible];
+          }
+
+          assert.equal(_.any(visible), true);
           next();
         })
-        .catch(function(err) {
-          next(err);
-        });
+        .catch(next);
+    })
+    .then('I see an input $element with the value $value', function(element, value, next) {
+      value = replacements(value);
+
+      var driver = this.driver;
+      driver.waitForExist(element, timeout)
+        .isVisible(element)
+        .then(function(visible) {
+          if (!(visible instanceof Array)) {
+            visible = [visible];
+          }
+
+          assert(_.any(visible));
+        })
+        .getValue(element)
+        .then(function(found) {
+          assert.equal(found, value);
+          next();
+        })
+        .catch(next);
+    })
+    .then('I see $element with the text $text', function(element, text, next) {
+      text = replacements(text);
+
+      var driver = this.driver;
+      driver.waitForExist(element, timeout)
+        .isVisible(element)
+        .then(function(visible) {
+          if (!(visible instanceof Array)) {
+            visible = [visible];
+          }
+
+          assert(_.any(visible));
+        })
+        .getText(element)
+        .then(function(found) {
+          assert.equal(found, text);
+          next();
+        })
+        .catch(next);
     })
     .then('the $BUTTON button is disabled', function(button, next) {
       var driver = this.driver;
-      driver.waitForExist('//button[text()=\'' + button + '\']', 500)
+      driver.waitForVisible('//button[text()=\'' + button + '\']', timeout)
         .then(function() {
           next();
-          //driver.isEnabled('//button[text()=\'' + button + '\']')
-          //  .then(function(isEnabled) {
-          //    assert(!isEnabled, 'Button ' + button + ' is enabled when it should be disabled');
-          //    next();
-          //  })
-          //  .catch(function(err) {
-          //    next(err);
-          //  });
         })
-        .catch(function(err) {
-          next(err);
-        });
+        .catch(next);
     })
     .then('the user account for $user was updated with $new for $old', function(user, newValue, oldKey, next) {
       if (!user || !newValue || !oldKey) {
@@ -598,6 +602,14 @@ module.exports = function(config) {
 
         next(null, res);
       });
+    })
+    .then('I see the application creation modal', function(next) {
+      var driver = this.driver;
+      driver.waitForVisible('//div[@id="project-welcome-modal"]', timeout)
+        .then(function() {
+          return next();
+        })
+        .catch(next);
     });
 
   return library;

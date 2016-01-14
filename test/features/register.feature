@@ -54,7 +54,7 @@ Feature: Register Functionality
     And I enter ${random-password} in the .register-container #verifyPassword field
     Then the REGISTER button is disabled
     When I wait 1000 milliseconds
-    And I see Passwords must match
+    And I see Passwords must match.
 
   Scenario: Username unique
     Given an account exists with the username ${random-name>register.name}, email ${random-email>register.email} and password ${random-password>register.password}
@@ -65,7 +65,7 @@ Feature: Register Functionality
     And I enter ${random-password>register2.password} in the .register-container #user\.password field
     And I enter ${register2.password} in the .register-container #verifyPassword field
     And I click the REGISTER button
-    Then I see an alert with the text Username must be unique.
+    Then I see .alert with the text Username must be unique.
 
   Scenario: Email unique
     Given an account exists with the username ${random-name>register2.name}, email ${random-email>register2.email} and password ${random-password>register2.password}
@@ -76,7 +76,7 @@ Feature: Register Functionality
     And I enter ${random-password>register3.password} in the .register-container #user\.password field
     And I enter ${register3.password} in the .register-container #verifyPassword field
     And I click the REGISTER button
-    Then I see an alert with the text Email must be unique.
+    Then I see .alert with the text Email must be unique.
 
   Scenario: Successful registration
     And I am on /#/auth
