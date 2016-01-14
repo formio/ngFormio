@@ -55,7 +55,7 @@
   <div class="row">
     <div class="col-md-9 existing-projects-section">
       <h2>Existing Projects</h2>
-      <div class="project well"  ui-sref="createProject()" ng-if="projectsLoaded && !projects.length" ng-cloak>
+      <div class="project well" ng-if="projectsLoaded && !projects.length" ng-cloak>
         <h4 class="project-title">Step 1: Create your project</h4>
         <ng-include src="'views/project/help.html'"></ng-include>
         <a ui-sref="createProject()" class="btn btn-md btn-primary"><span class="glyphicon glyphicon-plus circle"></span> Create Project</a>
