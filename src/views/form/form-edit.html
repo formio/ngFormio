@@ -24,10 +24,6 @@
       <small>The REST API path to this form.</small>
     </div>
     <div ng-include="'views/form/form-settings.html'"></div>
-    <form-builder src="formUrl"></form-builder>
-    <div class="form-group pull-right">
-      <a class="btn btn-default" ng-click="formId ? cancel() : $state.go('project.edit')">Cancel</a>
-      <input type="submit" class="btn btn-primary" ng-click="saveForm()" value="{{formId ? 'Save' : 'Create'}} {{ capitalize(form.type)  }}" />
-    </div>
+    <form-builder src="formUrl" type="form.type" on-save="saveForm" on-cancel="cancel"></form-builder>
   </form>
 </div>

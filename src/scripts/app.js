@@ -635,7 +635,7 @@ angular
 
       $rootScope.getPreviewURL = function(project) {
         if (!project.settings || !project.settings.preview) { return ''; }
-        var url = 'http://help.form.io/project';
+        var url = 'https://help.form.io/project/';
         url += '?project=' + encodeURIComponent(project.name);
         url += '&previewUrl=' + encodeURIComponent(project.settings.preview.url);
         url += '&host=' + encodeURIComponent(AppConfig.serverHost);
@@ -730,7 +730,7 @@ angular
       //   - Any attribute beginning with 'data-'
       //   - Any inline style
       //   - Any class name
-      CKEDITOR.config.allowedContent = '*[data-*]{*}(*)';
+      CKEDITOR.config.extraAllowedContent = '*[data-*]{*}(*)';
     }
   ])
   .factory('GoogleAnalytics', ['$window', '$state', function($window, $state) {
