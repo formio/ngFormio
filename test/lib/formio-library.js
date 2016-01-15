@@ -275,6 +275,41 @@ module.exports = function(config) {
     });
   };
 
+  /**
+   * Create a project via the api with the given title and description for the current user.
+   *
+   * @param driver
+   * @param title
+   * @param description
+   * @param next
+   */
+  var createProject = function(driver, title, description, next) {
+    driver.localStorage('GET', 'formioToken', function(err, res) {
+      if (err) {
+        return next(err);
+      }
+      if (!res || !res.value) {
+        return next('Not Authenticated!');
+      }
+
+      request({
+        rejectUnauthorized: false,
+        uri: config.serverProtocol + '://api.' + config.serverHost + '/project',
+        method: 'POST',
+        form: {
+          title: title,
+          description: description
+        },
+        headers: {
+          'x-jwt-token': res.value
+        }
+      }, function(err, response, body) {
+        handleResponse(driver, err, response, body, next);
+      });
+    })
+    .catch(next);
+  };
+
   var library = English.library()
     .given('I am (?:on|at) (?:the )?(.+?)(?: page)?$', function(url, next) {
       var path = (url === 'home') ? config.baseUrl + '/' : config.baseUrl + url;
@@ -357,6 +392,19 @@ module.exports = function(config) {
         next();
       });
     })
+    .given('A project exists with the $title and $description', function(title, description, next) {
+      title = replacements(title);
+      description = replacements(description);
+
+      var driver = this.driver;
+      createProject(driver, title, description, function(err, res) {
+        if (err) {
+          return next(err);
+        }
+
+        next(null, res);
+      });
+    })
     .when('I click (?:on )?the $LINK link', function(link, next) {
       var driver = this.driver;
       driver.waitForExist('=' + link, timeout)
@@ -421,6 +469,18 @@ module.exports = function(config) {
       driver.url()
         .then(function(res) {
           assert.equal(res.value, path);
+          next();
+        })
+        .catch(next);
+    })
+    .then('I am on the $title project portal', function(title, next) {
+      title = replacements(title);
+
+      var driver = this.driver;
+      driver.waitForExist('.project-title-link')
+        .getText('.project-title-link')
+        .then(function(found) {
+          assert.equal(found, title);
           next();
         })
         .catch(next);
