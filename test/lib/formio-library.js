@@ -178,7 +178,8 @@ module.exports = function(config) {
     }
 
     var token = response.headers['x-jwt-token'] || '';
-    driver.localStorage('POST', {key: 'formioToken', value: token})
+    driver.localStorage('DELETE')
+      .localStorage('POST', {key: 'formioToken', value: token})
       .then(function() {
         if (typeof body === 'string') {
           try {
@@ -424,6 +425,7 @@ module.exports = function(config) {
     .when('I click on the $element element', function(element, next) {
       var driver = this.driver;
       driver.waitForExist(element, timeout)
+        .waitForVisible(element, timeout)
         .click(element)
         .then(next)
         .catch(next);
@@ -487,33 +489,53 @@ module.exports = function(config) {
     })
     .then('I have been logged in', function(next) {
       var driver = this.driver;
-      driver.pause(700)
-        .localStorage('GET', 'formioToken', function(err, res) {
-          if (err) {
-            return next(err);
-          }
-          if ((!err) && (res.value)) {
-            return next();
-          }
+      var tries = 0;
 
-          next(new Error('No formioToken found; ' + JSON.stringify(res)));
-        })
-        .catch(next);
+      (function attempt() {
+        if (tries > 9) {
+          return next(new Error('No formioToken found.'));
+        }
+
+        driver.pause(50)
+          .localStorage('GET', 'formioToken', function(err, res) {
+            if (err) {
+              return next(err);
+            }
+            if (res.value) {
+              return next();
+            }
+
+            tries += 1;
+            attempt();
+          })
+          .catch(next);
+      })();
     })
     .then('I have been logged out', function(next) {
       var driver = this.driver;
-      driver.pause(500)
-        .localStorage('GET', 'formioToken', function(err, res) {
-          if (err) {
-            return next(err);
-          }
-          if ((!err) && (res.value)) {
-            return next(new Error('User still logged in: ' + JSON.stringify(res)));
-          }
+      var _old = {};
+      var tries = 0;
 
-          next();
-        })
-        .catch(next);
+      (function attempt() {
+        if (tries > 9) {
+          return next(new Error('User still logged in: ' + JSON.stringify(_old)));
+        }
+
+        driver.pause(50)
+          .localStorage('GET', 'formioToken', function(err, res) {
+            if (err) {
+              return next(err);
+            }
+            if (!res.value) {
+              return next();
+            }
+
+            _old = res.value;
+            tries += 1;
+            attempt();
+          })
+          .catch(next);
+      })();
     })
     .then('I see a notification with (?:the text )?$TEXT', function(text, next) {
       text = replacements(text);
@@ -589,7 +611,14 @@ module.exports = function(config) {
         })
         .getText(element)
         .then(function(found) {
-          assert.equal(found, text);
+          try {
+            assert.equal(found, text);
+            return next();
+          }
+          catch(e) {}
+
+          assert(_.startsWith(found, text) || _.endsWith(found, text));
+
           next();
         })
         .catch(next);
