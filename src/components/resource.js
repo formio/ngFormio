@@ -20,7 +20,7 @@ module.exports = function (app) {
           if (settings.resource) {
             var formio = new Formio($scope.formio.projectUrl + '/form/' + settings.resource);
             $scope.refreshSubmissions = function (input) {
-              var params = {};
+              var params = settings.params || {};
               // If they wish to return only some fields.
               if (settings.selectFields) {
                 params.select = settings.selectFields;
