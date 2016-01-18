@@ -8,7 +8,6 @@
     <li role="presentation" class="form-nav" ng-class="{active:isActive('project.{{ formInfo.type }}.form.api')}"><a ui-sref="project.{{ formInfo.type }}.form.api">API</a></li>
     <li role="presentation" class="form-nav" ng-class="{active:isActive('project.{{ formInfo.type }}.form.permission')}"><a ui-sref="project.{{ formInfo.type }}.form.permission">Permissions</a></li>
     <li role="presentation" class="form-nav" ng-class="{active:isActive('project.{{ formInfo.type }}.form.submission')}"><a ui-sref="project.{{ formInfo.type }}.form.submission.index">Submissions</a></li>
-    <li role="presentation" class="form-nav-right"><button ng-if="isActive('project.' +  formInfo.type + '.form.edit')" ng-click="saveForm()" class="btn btn-primary">{{formId ? 'Save' : 'Create'}} {{ capitalize(form.type)  }}</button></li>
   </ul>
 </div>
 <div class="form-content" ui-view></div>
