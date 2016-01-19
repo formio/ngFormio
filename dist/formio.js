@@ -1,97 +1,4 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-// shim for using process in browser
-
-var process = module.exports = {};
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
-
-function cleanUpNextTick() {
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
-}
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = setTimeout(cleanUpNextTick);
-    draining = true;
-
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            if (currentQueue) {
-                currentQueue[queueIndex].run();
-            }
-        }
-        queueIndex = -1;
-        len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    clearTimeout(timeout);
-}
-
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
-        }
-    }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-        setTimeout(drainQueue, 0);
-    }
-};
-
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
-}
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
-};
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
-
-},{}],2:[function(require,module,exports){
 (function (process){
 // vim:ts=4:sts=4:sw=4:
 /*!
@@ -2143,7 +2050,7 @@ return Q;
 });
 
 }).call(this,require('_process'))
-},{"_process":1}],3:[function(require,module,exports){
+},{"_process":6}],2:[function(require,module,exports){
 /*!
  * EventEmitter2
  * https://github.com/hij1nx/EventEmitter2
@@ -2718,7 +2625,7 @@ return Q;
   }
 }();
 
-},{}],4:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 module.exports = function (obj) {
     if (!obj || typeof obj !== 'object') return obj;
     
@@ -2755,7 +2662,7 @@ var isArray = Array.isArray || function (xs) {
     return {}.toString.call(xs) === '[object Array]';
 };
 
-},{}],5:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 (function() {
   'use strict';
 
@@ -3087,7 +2994,7 @@ var isArray = Array.isArray || function (xs) {
   self.fetch.polyfill = true
 })();
 
-},{}],6:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 'use strict';
 
 require('whatwg-fetch');
@@ -3706,7 +3613,164 @@ Formio.deregisterPlugin = function(plugin) {
 
 module.exports = Formio;
 
-},{"Q":2,"eventemitter2":3,"shallow-copy":4,"whatwg-fetch":5}],7:[function(require,module,exports){
+},{"Q":1,"eventemitter2":2,"shallow-copy":3,"whatwg-fetch":4}],6:[function(require,module,exports){
+// shim for using process in browser
+
+var process = module.exports = {};
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = setTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    clearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        setTimeout(drainQueue, 0);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+},{}],7:[function(require,module,exports){
+module.exports = {
+  /**
+   * Iterate through each component within a form.
+   * @param components
+   * @param fn
+   */
+  eachComponent: function eachComponent(components, fn) {
+    if (!components) return;
+
+    components.forEach(function(component) {
+      if (component.columns && Array.isArray(component.columns)) {
+        component.columns.forEach(function(column) {
+          eachComponent(column.components, fn);
+        });
+      }
+
+      else if (component.rows && Array.isArray(component.rows)) {
+        [].concat.apply([], component.rows).forEach(function(row) {
+          eachComponent(row.components, fn);
+        });
+      }
+
+      else if (component.components && Array.isArray(component.components)) {
+        eachComponent(component.components, fn);
+      }
+
+      else {
+        fn(component);
+      }
+    });
+  },
+
+  /**
+   * Get a component by its key
+   * @param components
+   * @param key The key of the component to get
+   * @returns The component that matches the given key, or undefined if not found.
+   */
+  getComponent: function getComponent(components, key) {
+    var result;
+    module.exports.eachComponent(components, function(component) {
+      if (component.key === key) {
+        result = component;
+      }
+    });
+    return result;
+  },
+
+  /**
+   * Flatten the form components for data manipulation.
+   * @param components
+   * @param flattened
+   * @returns {*|{}}
+   */
+  flattenComponents: function flattenComponents(components) {
+    var flattened = {};
+    module.exports.eachComponent(components, function(component) {
+      flattened[component.key] = component;
+    });
+    return flattened;
+  }
+};
+
+},{}],8:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -3776,7 +3840,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -3924,7 +3988,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -3964,7 +4028,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -3993,7 +4057,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -4051,7 +4115,7 @@ module.exports = function (app) {
   }]);
 };
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -4079,7 +4143,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -4104,7 +4168,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -4573,7 +4637,11 @@ require('./panel')(app);
 require('./table')(app);
 require('./well')(app);
 
+<<<<<<< HEAD
 },{"./address":7,"./button":8,"./checkbox":9,"./columns":10,"./components":11,"./content":12,"./custom":13,"./datagrid":14,"./datetime":15,"./email":16,"./fieldset":17,"./file":18,"./hidden":19,"./htmlelement":20,"./number":22,"./page":23,"./panel":24,"./password":25,"./phonenumber":26,"./radio":27,"./resource":28,"./select":29,"./selectboxes":30,"./signature":31,"./table":32,"./textarea":33,"./textfield":34,"./well":35}],22:[function(require,module,exports){
+=======
+},{"./address":8,"./button":9,"./checkbox":10,"./columns":11,"./components":12,"./content":13,"./custom":14,"./datetime":15,"./email":16,"./fieldset":17,"./file":18,"./hidden":19,"./htmlelement":20,"./number":22,"./page":23,"./panel":24,"./password":25,"./phonenumber":26,"./radio":27,"./resource":28,"./select":29,"./selectboxes":30,"./signature":31,"./table":32,"./textarea":33,"./textfield":34,"./well":35}],22:[function(require,module,exports){
+>>>>>>> origin/bugfix/FA-634-eachComponent-table
 "use strict";
 
 module.exports = function (app) {
@@ -6081,55 +6149,13 @@ module.exports = [
 
 },{}],44:[function(require,module,exports){
 "use strict";
+var formioUtils = require('formio-utils');
+
 module.exports = function() {
   return {
-    flattenComponents: function flatten(components, flattened) {
-      flattened = flattened || {};
-      angular.forEach(components, function(component) {
-        if (component.tree) {
-          flattened[component.key] = component;
-        }
-        else if (component.columns && (component.columns.length > 0)) {
-          angular.forEach(component.columns, function(column) {
-            flatten(column.components, flattened);
-          });
-        }
-        else if (component.components && (component.components.length > 0)) {
-          flatten(component.components, flattened);
-        }
-        else if (component.input) {
-          flattened[component.key] = component;
-        }
-      });
-      return flattened;
-    },
-    eachComponent: function eachComponent(components, fn) {
-      if (!components) {
-        return;
-      }
-      angular.forEach(components, function(component) {
-        if (component.columns) {
-          angular.forEach(component.columns, function(column) {
-            eachComponent(column.components, fn);
-          });
-        }
-        else if (component.components) {
-          eachComponent(component.components, fn);
-        }
-        else {
-          fn(component);
-        }
-      });
-    },
-    getComponent: function getComponent(components, key) {
-      var result;
-      this.eachComponent(components, function(component) {
-        if (component.key === key) {
-          result = component;
-        }
-      });
-      return result;
-    },
+    flattenComponents: formioUtils.flattenComponents,
+    eachComponent: formioUtils.eachComponent,
+    getComponent: formioUtils.getComponent,
     fieldWrap: function(input) {
       input = input + '<formio-errors></formio-errors>';
       var multiInput = input.replace('data[component.key]', 'data[component.key][$index]');
@@ -6167,7 +6193,11 @@ module.exports = function() {
   };
 };
 
+<<<<<<< HEAD
 },{}],45:[function(require,module,exports){
+=======
+},{"formio-utils":7}],45:[function(require,module,exports){
+>>>>>>> origin/bugfix/FA-634-eachComponent-table
 "use strict";
 module.exports = [
   '$q',
@@ -6460,7 +6490,11 @@ module.exports = function() {
   };
 };
 
+<<<<<<< HEAD
 },{"formiojs/src/formio.js":6}],52:[function(require,module,exports){
+=======
+},{"formiojs/src/formio.js":5}],52:[function(require,module,exports){
+>>>>>>> origin/bugfix/FA-634-eachComponent-table
 "use strict";
 
 module.exports = function() {
