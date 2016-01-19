@@ -1,0 +1,19 @@
+<div class="formio-data-grid" ng-controller="formioDataGrid" >
+  <table ng-class="{'table-striped': component.striped, 'table-bordered': component.bordered, 'table-hover': component.hover, 'table-condensed': component.condensed}" class="table">
+    <tr class="formio-data-grid-row" ng-repeat="rowData in data[component.key] track by $index">
+      <td ng-repeat="component in component.components" >
+        <formio-component component="component" data="rowData" formio="formio" read-only="readOnly"></formio-component>
+      </td>
+      <td>
+        <a ng-click="removeRow($index)" class="btn btn-danger">
+          <span class="glyphicon glyphicon-remove-circle"></span>
+        </a>
+      </td>
+    </tr>
+  </table>
+  <div>
+    <a ng-click="addRow()" class="btn btn-primary">
+      <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {{ component.addAnother || "Add Another" }}
+    </a>
+  </div>
+</div>
