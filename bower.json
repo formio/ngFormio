@@ -22,7 +22,7 @@
     "bootstrap-ui-datetime-picker": "~2.0.5",
     "angular-paginate-anything": "~4.1.2",
     "kendo-ui": "kendo-ui-core#2015.2.902+SP2",
-    "formio": "~0.7.0",
+    "formio": "~0.8.0",
     "ng-formio-plugins": "git+ssh://git@github.com/formio/ng-formio-plugins.git#develop",
     "lodash": "~3.10.1",
     "angular-truncate-2": "~0.4.2",
