@@ -492,7 +492,7 @@ module.exports = function(config) {
       var tries = 0;
 
       (function attempt() {
-        if (tries > 9) {
+        if (tries > 15) {
           return next(new Error('No formioToken found.'));
         }
 
@@ -517,7 +517,7 @@ module.exports = function(config) {
       var tries = 0;
 
       (function attempt() {
-        if (tries > 9) {
+        if (tries > 15) {
           return next(new Error('User still logged in: ' + JSON.stringify(_old)));
         }
 
@@ -577,8 +577,8 @@ module.exports = function(config) {
       text = replacements(text);
 
       var driver = this.driver;
-      driver.waitForExist('//*[*=\'' + text + '\' or text()=\'' + text + '\']', timeout)
-        .isVisible('//*[*=\'' + text + '\' or text()=\'' + text + '\']')
+      driver.waitForExist('//*[*=\'' + text + '\']', timeout)
+        .isVisible('//*[*=\'' + text + '\']')
         .then(function(visible) {
           if (!(visible instanceof Array)) {
             visible = [visible];
