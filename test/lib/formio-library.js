@@ -545,6 +545,19 @@ module.exports = function(config) {
         .getText('//div[@class=\'ui-notification\']/div[@class=\'message\']')
         .then(function(alert) {
           assert.equal(text, alert);
+          next();
+        })
+        .catch(next);
+    })
+    .then('A help block shows with the text $text', function(text, next) {
+      text = replacements(text);
+
+      var driver = this.driver;
+      driver.waitForVisible('//*[contains(@class, \'help-block\') and contains(., \'' + text + '\')]', timeout)
+        .getText('//*[contains(@class, \'help-block\') and contains(., \'' + text + '\')]')
+        .then(function(alert) {
+          assert.equal(text, alert);
+          next();
         })
         .catch(next);
     })

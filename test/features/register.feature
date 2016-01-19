@@ -54,7 +54,7 @@ Feature: Register Functionality
     And I enter ${random-password} in the .register-container #verifyPassword field
     Then the REGISTER button is disabled
     When I wait 1000 milliseconds
-    And I see Passwords must match.
+    And A help block shows with the text Passwords must match.
 
   Scenario: Username unique
     Given an account exists with the username ${random-name>register.name}, email ${random-email>register.email} and password ${random-password>register.password}
