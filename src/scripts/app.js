@@ -479,11 +479,15 @@ angular
         $scope.templates = templates;
       });
 
+      $scope.submitted = false;
       $scope.createProject = function(template) {
-        FormioProject.createProject(template).then(function(project) {
-          localStorage.setItem('showWelcome', 1);
-          $state.go('project.resource.index', {projectId: project._id});
-        });
+        if (!$scope.submitted) {
+          $scope.submitted = true;
+          FormioProject.createProject(template).then(function(project) {
+            localStorage.setItem('showWelcome', 1);
+            $state.go('project.resource.index', {projectId: project._id});
+          });
+        }
       };
 
       $scope.projects = {};
