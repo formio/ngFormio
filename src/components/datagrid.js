@@ -9,6 +9,7 @@ module.exports = function (app) {
         template: 'formio/components/datagrid.html',
         settings: {
           input: true,
+          tree: true,
           components: [],
           tableView: true,
           label: '',
