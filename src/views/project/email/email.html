@@ -1,15 +1,15 @@
-<accordion close-others="true">
-  <accordion-group heading="GMail Settings" is-open="true">
+<uib-accordion close-others="true">
+  <uib-accordion-group heading="GMail Settings" is-open="true">
     <ng-include src="'views/project/email/gmail.html'"></ng-include>
-  </accordion-group>
-  <accordion-group heading="SendGrid Settings">
+  </uib-accordion-group>
+  <uib-accordion-group heading="SendGrid Settings">
     <ng-include src="'views/project/email/sendgrid.html'"></ng-include>
-  </accordion-group>
-  <accordion-group heading="Mandrill Settings">
+  </uib-accordion-group>
+  <uib-accordion-group heading="Mandrill Settings">
     <ng-include src="'views/project/email/mandrill.html'"></ng-include>
-  </accordion-group>
-  <accordion-group heading="Mailgun Settings">
+  </uib-accordion-group>
+  <uib-accordion-group heading="Mailgun Settings">
     <ng-include src="'views/project/email/mailgun.html'"></ng-include>
-  </accordion-group>
-</accordion>
+  </uib-accordion-group>
+</uib-accordion>
 <button class="btn btn-primary" ng-click="saveProject()">Save Settings</button>

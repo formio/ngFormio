@@ -184,7 +184,8 @@
     },
     "angular-ui-notification": {
       "main": [
-        "dist/angular-ui-notification.min.js"
+        "dist/angular-ui-notification.min.js",
+        "dist/angular-ui-notification.css"
       ]
     },
     "es6-promise": {
