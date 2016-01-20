@@ -638,8 +638,10 @@ module.exports = function(config) {
     })
     .then('the $BUTTON button is disabled', function(button, next) {
       var driver = this.driver;
-      driver.waitForVisible('//button[text()=\'' + button + '\']', timeout)
-        .then(function() {
+      driver.waitForExist('//button[text()=\'' + button + '\']', timeout)
+        .isEnabled('//button[text()=\'' + button + '\']')
+        .then(function(enabled) {
+          assert(!enabled);
           next();
         })
         .catch(next);
