@@ -36,8 +36,7 @@ Feature: Project Functionality
     And I see the plaintext Description
     And I see the plaintext Select a template
     When I enter ${random-title>project2.title} in the #title field
-    Then the Create Project button is disabled
-    When I click on the Create Project button
+    And I click on the Create Project button
     And I see .alert with the text Congratulations! You have just created a working Web application using Form.io.
     And I click on the Got it! button
     Then I am on the ${project2.title} project portal
