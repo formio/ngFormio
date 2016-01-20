@@ -6398,14 +6398,15 @@ module.exports = function(app) {
       $http
     ) {
       var getDropboxToken = function() {
+        var dropboxToken;
         if ($rootScope.user && $rootScope.user.externalTokens) {
           angular.forEach($rootScope.user.externalTokens, function(token) {
             if (token.type === 'dropbox') {
-              return token.token;
+              dropboxToken = token.token;
             }
           });
         }
-        return;
+        return dropboxToken;
         //return _.result(_.find($rootScope.user.externalTokens, {type: 'dropbox'}), 'token');
       };
 
