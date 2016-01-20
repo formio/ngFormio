@@ -22,13 +22,25 @@ module.exports = function(app) {
       $window,
       $http
     ) {
+      var getDropboxToken = function() {
+        if ($rootScope.user && $rootScope.user.externalTokens) {
+          angular.forEach($rootScope.user.externalTokens, function(token) {
+            if (token.type === 'dropbox') {
+              return token.token;
+            }
+          });
+        }
+        return;
+        //return _.result(_.find($rootScope.user.externalTokens, {type: 'dropbox'}), 'token');
+      };
+
       return {
         title: 'Dropbox',
         name: 'dropbox',
         uploadFile: function(file, status, $scope) {
           var defer = $q.defer();
           var dir = $scope.component.dir || '';
-          var dropboxToken = _.result(_.find($rootScope.user.externalTokens, {type: 'dropbox'}), 'token');
+          var dropboxToken = getDropboxToken();
           if (!dropboxToken) {
             defer.reject('You must authenticate with dropbox before uploading files.');
           }
@@ -45,8 +57,8 @@ module.exports = function(app) {
 
             xhr.upload.onprogress = onProgress;
 
-            xhr.onload = function(evt) {
-              if (xhr.status == 200) {
+            xhr.onload = function() {
+              if (xhr.status === 200) {
                 defer.resolve(JSON.parse(xhr.response));
                 $scope.$apply();
               }
@@ -70,15 +82,15 @@ module.exports = function(app) {
           }
           return defer.promise;
         },
-        downloadFile: function(evt, file, $scope) {
+        downloadFile: function(evt, file) {
           evt.preventDefault();
-          var dropboxToken = _.result(_.find($rootScope.user.externalTokens, {type: 'dropbox'}), 'token');
+          var dropboxToken = getDropboxToken();
           $http({
             method: 'POST',
             url: 'https://api.dropboxapi.com/2/sharing/create_shared_link_with_settings',
             headers: {
               'Authorization': 'Bearer ' + dropboxToken,
-              'Content-Type': 'application/json',
+              'Content-Type': 'application/json'
             },
             data: {
               path: file.path_lower
@@ -93,4 +105,4 @@ module.exports = function(app) {
       };
     }
   ]);
-}
+};

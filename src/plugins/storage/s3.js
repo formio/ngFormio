@@ -27,7 +27,11 @@ module.exports = function(app) {
         name: 's3',
         uploadFile: function(file, status, $scope) {
           var defer = $q.defer();
-          Formio.request($scope.formio.formUrl + '/storage/s3', 'POST', {name: file.name, size: file.size, type: file.type})
+          Formio.request($scope.formio.formUrl + '/storage/s3', 'POST', {
+            name: file.name,
+            size: file.size,
+            type: file.type
+          })
             .then(function(response) {
               var request = {
                 url: response.url,
@@ -39,7 +43,7 @@ module.exports = function(app) {
               request.data.key += dir + file.name;
               var upload = Upload.upload(request);
               upload
-                .then(function(resp) {
+                .then(function() {
                   // Handle upload finished.
                   defer.resolve({
                     name: file.name,
@@ -55,7 +59,7 @@ module.exports = function(app) {
                   var oParser = new DOMParser();
                   var oDOM = oParser.parseFromString(resp.data, 'text/xml');
                   var message = oDOM.getElementsByTagName('Message')[0].innerHTML;
-                  defer.reject(message)
+                  defer.reject(message);
                 }, function(evt) {
                   // Progress notify
                   status.status = 'progress';
@@ -74,7 +78,8 @@ module.exports = function(app) {
                 $window.open(response.url, '_blank');
               })
               .catch(function (response) {
-                // Is alert the best way to do this? User is expecting an immediate notification due to attempting to download a file.
+                // Is alert the best way to do this?
+                // User is expecting an immediate notification due to attempting to download a file.
                 alert(response);
               });
           }

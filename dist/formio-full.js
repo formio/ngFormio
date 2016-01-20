@@ -63760,7 +63760,7 @@ module.exports = function (app) {
     'FormioUtils',
     function($templateCache, FormioUtils) {
       $templateCache.put('formio/components/datagrid.html', FormioUtils.fieldWrap(
-        "<div class=\"formio-data-grid\" ng-controller=\"formioDataGrid\" >\n  <table ng-class=\"{'table-striped': component.striped, 'table-bordered': component.bordered, 'table-hover': component.hover, 'table-condensed': component.condensed}\" class=\"table datagrid-table\">\n    <tr>\n      <th ng-repeat=\"component in component.components\">{{ component.label}}</th>\n      <th></th>\n    </tr>\n    <tr class=\"formio-data-grid-row\" ng-repeat=\"rowData in data[component.key] track by $index\">\n      <td ng-repeat=\"component in component.components\" ng-init=\"component.hideLabel = true\" >\n        <formio-component component=\"component\" data=\"rowData\" formio=\"formio\" read-only=\"readOnly\"></formio-component>\n      </td>\n      <td>\n        <a ng-click=\"removeRow($index)\" class=\"btn btn-danger\">\n          <span class=\"glyphicon glyphicon-remove-circle\"></span>\n        </a>\n      </td>\n    </tr>\n  </table>\n  <div class=\"datagrid-add\">\n    <a ng-click=\"addRow()\" class=\"btn btn-primary\">\n      <span class=\"glyphicon glyphicon-plus\" aria-hidden=\"true\"></span> {{ component.addAnother || \"Add Another\" }}\n    </a>\n  </div>\n</div>\n"
+        "<div class=\"formio-data-grid\" ng-controller=\"formioDataGrid\" >\n  <table ng-class=\"{'table-striped': component.striped, 'table-bordered': component.bordered, 'table-hover': component.hover, 'table-condensed': component.condensed}\" class=\"table datagrid-table\">\n    <tr>\n      <th ng-repeat=\"component in component.components\">{{ component.label}}</th>\n      <th></th>\n    </tr>\n    <tr class=\"formio-data-grid-row\" ng-repeat=\"rowData in data[component.key] track by $index\">\n      <td ng-repeat=\"component in component.components\" ng-init=\"component.hideLabel = true\" >\n        <formio-component component=\"component\" data=\"rowData\" formio=\"formio\" read-only=\"readOnly\"></formio-component>\n      </td>\n      <td>\n        <a ng-click=\"removeRow($index)\" class=\"btn btn-default\">\n          <span class=\"glyphicon glyphicon-remove-circle\"></span>\n        </a>\n      </td>\n    </tr>\n  </table>\n  <div class=\"datagrid-add\">\n    <a ng-click=\"addRow()\" class=\"btn btn-primary\">\n      <span class=\"glyphicon glyphicon-plus\" aria-hidden=\"true\"></span> {{ component.addAnother || \"Add Another\" }}\n    </a>\n  </div>\n</div>\n"
       ));
     }
   ]);
@@ -65728,7 +65728,7 @@ module.exports = function() {
         '</div>' +
         '<div ng-if="!component.prefix && !component.suffix">' + multiInput + '</div>' +
         '</td>' +
-        '<td><a ng-click="removeFieldValue($index)" class="btn btn-danger"><span class="glyphicon glyphicon-remove-circle"></span></a></td>' +
+        '<td><a ng-click="removeFieldValue($index)" class="btn btn-default"><span class="glyphicon glyphicon-remove-circle"></span></a></td>' +
         '</tr>' +
         '<tr>' +
         '<td colspan="2"><a ng-click="addFieldValue()" class="btn btn-primary"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {{ component.addAnother || "Add Another" }}</a></td>' +
@@ -65926,13 +65926,219 @@ app.run([
 
 require('./components');
 
-},{"./components":51,"./directives/customValidator":66,"./directives/formio":67,"./directives/formioComponent":68,"./directives/formioDelete":69,"./directives/formioElement":70,"./directives/formioErrors":71,"./directives/formioSubmissions":72,"./factories/FormioScope":73,"./factories/FormioUtils":74,"./factories/formioInterceptor":75,"./filters/flattenComponents":76,"./filters/safehtml":77,"./plugins":80,"./providers/Formio":82,"./providers/FormioPlugins":83}],80:[function(require,module,exports){
+},{"./components":51,"./directives/customValidator":66,"./directives/formio":67,"./directives/formioComponent":68,"./directives/formioDelete":69,"./directives/formioElement":70,"./directives/formioErrors":71,"./directives/formioSubmissions":72,"./factories/FormioScope":73,"./factories/FormioUtils":74,"./factories/formioInterceptor":75,"./filters/flattenComponents":76,"./filters/safehtml":77,"./plugins":80,"./providers/Formio":84,"./providers/FormioPlugins":85}],80:[function(require,module,exports){
 "use strict";
 module.exports = function(app) {
   require('./storage/url')(app);
+  require('./storage/s3')(app);
+  require('./storage/dropbox')(app);
 };
 
-},{"./storage/url":81}],81:[function(require,module,exports){
+},{"./storage/dropbox":81,"./storage/s3":82,"./storage/url":83}],81:[function(require,module,exports){
+"use strict";
+
+module.exports = function(app) {
+  app.config([
+    'FormioPluginsProvider',
+    'FormioStorageDropboxProvider',
+    function (
+      FormioPluginsProvider,
+      FormioStorageDropboxProvider
+    ) {
+      FormioPluginsProvider.register('storage', 'dropbox', FormioStorageDropboxProvider.$get());
+    }]
+  );
+
+  app.factory('FormioStorageDropbox', [
+    '$q',
+    '$rootScope',
+    '$window',
+    '$http',
+    function(
+      $q,
+      $rootScope,
+      $window,
+      $http
+    ) {
+      var getDropboxToken = function() {
+        if ($rootScope.user && $rootScope.user.externalTokens) {
+          angular.forEach($rootScope.user.externalTokens, function(token) {
+            if (token.type === 'dropbox') {
+              return token.token;
+            }
+          });
+        }
+        return;
+        //return _.result(_.find($rootScope.user.externalTokens, {type: 'dropbox'}), 'token');
+      };
+
+      return {
+        title: 'Dropbox',
+        name: 'dropbox',
+        uploadFile: function(file, status, $scope) {
+          var defer = $q.defer();
+          var dir = $scope.component.dir || '';
+          var dropboxToken = getDropboxToken();
+          if (!dropboxToken) {
+            defer.reject('You must authenticate with dropbox before uploading files.');
+          }
+          else {
+            // Both Upload and $http don't handle files as application/octet-stream which is required by dropbox.
+            var xhr = new XMLHttpRequest();
+
+            var onProgress = function(evt) {
+              status.status = 'progress';
+              status.progress = parseInt(100.0 * evt.loaded / evt.total);
+              delete status.message;
+              $scope.$apply();
+            };
+
+            xhr.upload.onprogress = onProgress;
+
+            xhr.onload = function() {
+              if (xhr.status === 200) {
+                defer.resolve(JSON.parse(xhr.response));
+                $scope.$apply();
+              }
+              else {
+                defer.reject(xhr.response || 'Unable to upload file');
+                $scope.$apply();
+              }
+            };
+
+            xhr.open('POST', 'https://content.dropboxapi.com/2/files/upload');
+            xhr.setRequestHeader('Authorization', 'Bearer ' + dropboxToken);
+            xhr.setRequestHeader('Content-Type', 'application/octet-stream');
+            xhr.setRequestHeader('Dropbox-API-Arg', JSON.stringify({
+              path: '/' + dir + file.name,
+              mode: 'add',
+              autorename: true,
+              mute: false
+            }));
+
+            xhr.send(file);
+          }
+          return defer.promise;
+        },
+        downloadFile: function(evt, file) {
+          evt.preventDefault();
+          var dropboxToken = getDropboxToken();
+          $http({
+            method: 'POST',
+            url: 'https://api.dropboxapi.com/2/sharing/create_shared_link_with_settings',
+            headers: {
+              'Authorization': 'Bearer ' + dropboxToken,
+              'Content-Type': 'application/json'
+            },
+            data: {
+              path: file.path_lower
+            },
+            disableJWT: true
+          }).then(function successCallback(response) {
+            $window.open(response.data.url, '_blank');
+          }, function errorCallback(response) {
+            alert(response.data);
+          });
+        }
+      };
+    }
+  ]);
+};
+
+},{}],82:[function(require,module,exports){
+"use strict";
+
+module.exports = function(app) {
+  app.config([
+    'FormioPluginsProvider',
+    'FormioStorageS3Provider',
+    function (
+      FormioPluginsProvider,
+      FormioStorageS3Provider
+    ) {
+      FormioPluginsProvider.register('storage', 's3', FormioStorageS3Provider.$get());
+    }
+  ]);
+
+  app.factory('FormioStorageS3', [
+    '$q',
+    '$window',
+    'Formio',
+    'Upload',
+    function(
+      $q,
+      $window,
+      Formio,
+      Upload
+    ) {
+      return {
+        title: 'S3',
+        name: 's3',
+        uploadFile: function(file, status, $scope) {
+          var defer = $q.defer();
+          Formio.request($scope.formio.formUrl + '/storage/s3', 'POST', {
+            name: file.name,
+            size: file.size,
+            type: file.type
+          })
+            .then(function(response) {
+              var request = {
+                url: response.url,
+                method: 'POST',
+                data: response.data
+              };
+              request.data.file = file;
+              var dir = $scope.component.dir || '';
+              request.data.key += dir + file.name;
+              var upload = Upload.upload(request);
+              upload
+                .then(function() {
+                  // Handle upload finished.
+                  defer.resolve({
+                    name: file.name,
+                    bucket: response.bucket,
+                    key: request.data.key,
+                    url: response.url + request.data.key,
+                    acl: request.data.acl,
+                    size: file.size,
+                    type: file.type
+                  });
+                }, function(resp) {
+                  // Handle error
+                  var oParser = new DOMParser();
+                  var oDOM = oParser.parseFromString(resp.data, 'text/xml');
+                  var message = oDOM.getElementsByTagName('Message')[0].innerHTML;
+                  defer.reject(message);
+                }, function(evt) {
+                  // Progress notify
+                  status.status = 'progress';
+                  status.progress = parseInt(100.0 * evt.loaded / evt.total);
+                  delete status.message;
+                });
+            });
+          return defer.promise;
+        },
+        downloadFile: function(evt, file, $scope) {
+          // If this is not a public file, get a signed url and open in new tab.
+          if (file.acl !== 'public-read') {
+            evt.preventDefault();
+            Formio.request($scope.form + '/storage/s3?bucket=' + file.bucket + '&key=' + file.key, 'GET')
+              .then(function (response) {
+                $window.open(response.url, '_blank');
+              })
+              .catch(function (response) {
+                // Is alert the best way to do this?
+                // User is expecting an immediate notification due to attempting to download a file.
+                alert(response);
+              });
+          }
+        }
+      };
+    }
+  ]);
+};
+
+},{}],83:[function(require,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -65976,7 +66182,7 @@ module.exports = function(app) {
             });
           return defer.promise;
         },
-        downloadFile: function(evt, file, $scope) {
+        downloadFile: function() {
           // Do nothing which will cause a normal link click to occur.
         }
       };
@@ -65984,7 +66190,7 @@ module.exports = function(app) {
   );
 };
 
-},{}],82:[function(require,module,exports){
+},{}],84:[function(require,module,exports){
 "use strict";
 module.exports = function() {
 
@@ -66049,7 +66255,7 @@ module.exports = function() {
   };
 };
 
-},{"formiojs/src/formio.js":32}],83:[function(require,module,exports){
+},{"formiojs/src/formio.js":32}],85:[function(require,module,exports){
 "use strict";
 
 module.exports = function() {

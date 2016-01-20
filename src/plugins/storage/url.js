@@ -40,7 +40,7 @@ module.exports = function(app) {
             });
           return defer.promise;
         },
-        downloadFile: function(evt, file, $scope) {
+        downloadFile: function() {
           // Do nothing which will cause a normal link click to occur.
         }
       };
