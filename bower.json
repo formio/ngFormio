@@ -53,6 +53,144 @@
         "styles/kendo.common.min.css",
         "styles/kendo.bootstrap.min.css"
       ]
+    },
+    "jquery": {
+      "main": [
+        "dist/jquery.min.js"
+      ]
+    },
+    "angular": {
+      "main": [
+        "angular.min.js"
+      ]
+    },
+    "angular-ui-router": {
+      "main": [
+        "release/angular-ui-router.min.js"
+      ]
+    },
+    "angular-sanitize": {
+      "main": [
+        "angular-sanitize.min.js"
+      ]
+    },
+    "angular-bootstrap": {
+      "main": [
+        "ui-bootstrap-tpls.min.js"
+      ]
+    },
+    "moment": {
+      "main": [
+        "min/moment.min.js"
+      ]
+    },
+    "angular-moment": {
+      "main": [
+        "angular-moment.min.js"
+      ]
+    },
+    "ng-sortable": {
+      "main": [
+        "dist/ng-sortable.min.js",
+        "dist/ng-sortable.css"
+      ]
+    },
+    "ng-file-upload": {
+      "main": [
+        "ng-file-upload.min.js"
+      ]
+    },
+    "angular-ui-select": {
+      "main": [
+        "dist/select.min.js",
+        "dist/select.css"
+      ]
+    },
+    "signature_pad": {
+      "main": [
+        "signature_pad.min.js"
+      ]
+    },
+    "angular-ui-mask": {
+      "main": [
+        "dist/mask.min.js"
+      ]
+    },
+    "ui-select": {
+      "main": [
+        "dist/select.min.js",
+        "dist/select.css"
+      ]
+    },
+    "angular-drag-and-drop-lists": {
+      "main": [
+        "angular-drag-and-drop-lists.min.js"
+      ]
+    },
+    "lodash": {
+      "main": [
+        "lodash.min.js"
+      ]
+    },
+    "ckeditor": {
+      "main": [
+        "ckeditor.min.js"
+      ]
+    },
+    "formio": {
+      "main": [
+        "dist/formio.min.js",
+        "css/formio.css"
+      ]
+    },
+    "ngFormBuilder": {
+      "main": [
+        "dist/ngFormBuilder.min.js",
+        "css/formBuilder.css"
+      ]
+    },
+    "ng-dialog": {
+      "main": [
+        "js/ngDialog.min.js",
+        "css/ngDialog.css",
+        "css/ngDialog-theme-default.css"
+      ]
+    },
+    "ng-ckeditor": {
+      "main": [
+        "ng-ckeditor.min.js",
+        "ng-ckeditor.css"
+      ]
+    },
+    "angular-base64": {
+      "main": [
+        "angular-base64.min.js"
+      ]
+    },
+    "angular-chartist.js": {
+      "main": [
+        "dist/angular-chartist.min.js"
+      ]
+    },
+    "angular-paginate-anything": {
+      "main": [
+        "dist/paginate-anything-tpls.min.js"
+      ]
+    },
+    "angular-truncate-2": {
+      "main": [
+        "dist/angular-truncate-2.min.js"
+      ]
+    },
+    "angular-ui-notification": {
+      "main": [
+        "dist/angular-ui-notification.min.js"
+      ]
+    },
+    "es6-promise": {
+      "main": [
+        "promise.min.js"
+      ]
     }
   }
 }
