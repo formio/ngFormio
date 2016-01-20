@@ -108,3 +108,15 @@ input[type="password"][draggable="true"] {
 .component-type-radio .radio-inline input[type="radio"] {
   margin-top: 4px;
 }
+
+.form-field-type-datagrid .form-group {
+  margin-bottom: 0;
+}
+
+.form-field-type-datagrid .datagrid-table {
+  margin-bottom: 0px;
+}
+
+.form-field-type-datagrid .datagrid-add {
+  margin-bottom: 20px;
+}
