@@ -481,13 +481,17 @@ angular
         $scope.templates = templates;
       });
 
+      $scope.submitted = false;
       $scope.createProject = function(template) {
-        FormioProject.createProject(template).then(function(project) {
-          localStorage.setItem('showWelcome', 1);
-          $state.go('project.resource.index', {
-            projectId: project._id
+        if (!$scope.submitted) {
+          $scope.submitted = true;
+          FormioProject.createProject(template).then(function(project) {
+            localStorage.setItem('showWelcome', 1);
+            $state.go('project.resource.index', {
+              projectId: project._id
+            });
           });
-        });
+        }
       };
 
       $scope.projects = {};
@@ -643,7 +647,7 @@ angular
         if (!project.settings || !project.settings.preview) {
           return '';
         }
-        var url = 'http://help.form.io/project';
+        var url = 'https://help.form.io/project/';
         url += '?project=' + encodeURIComponent(project.name);
         url += '&previewUrl=' + encodeURIComponent(project.settings.preview.url);
         url += '&host=' + encodeURIComponent(AppConfig.serverHost);
@@ -694,7 +698,7 @@ angular
       // Ensure they are logged.
       $rootScope.$on('$stateChangeStart', function(event, toState) {
         $rootScope.userToken = Formio.getToken();
-        $rootScope.authenticated = !! $rootScope.userToken;
+        $rootScope.authenticated = !!$rootScope.userToken;
         if (toState.name.substr(0, 4) === 'auth') {
           return;
         }
@@ -738,103 +742,99 @@ angular
       //   - Any attribute beginning with 'data-'
       //   - Any inline style
       //   - Any class name
-      CKEDITOR.config.allowedContent = '*[data-*]{*}(*)';
+      CKEDITOR.config.extraAllowedContent = '*[data-*]{*}(*)';
     }
   ])
-  .factory('GoogleAnalytics', ['$window', '$state',
-    function($window, $state) {
-      // Recursively build the whole state url
-      // This gets the url without substitutions, to send
-      // to Google Analytics
-      var getFullStateUrl = function(state) {
-        if (state.parent) {
-          return getFullStateUrl($state.get(state.parent)) + state.url;
-        }
-        return state.url;
-      };
+  .factory('GoogleAnalytics', ['$window', '$state', function($window, $state) {
+    // Recursively build the whole state url
+    // This gets the url without substitutions, to send
+    // to Google Analytics
+    var getFullStateUrl = function(state) {
+      if (state.parent) {
+        return getFullStateUrl($state.get(state.parent)) + state.url;
+      }
+      return state.url;
+    };
 
-      return {
-        sendPageView: function() {
-          $window.ga('set', 'page', getFullStateUrl($state.current));
-          $window.ga('send', 'pageview');
-        },
+    return {
+      sendPageView: function() {
+        $window.ga('set', 'page', getFullStateUrl($state.current));
+        $window.ga('send', 'pageview');
+      },
 
-        sendEvent: function(category, action, label, value) {
-          $window.ga('send', 'event', category, action, label, value);
+      sendEvent: function(category, action, label, value) {
+        $window.ga('send', 'event', category, action, label, value);
+      }
+    };
+  }])
+  .factory('ProjectPlans', ['$filter', function($filter) {
+    return {
+      plans: {
+        basic: {
+          order: 1,
+          name: 'basic',
+          title: 'Basic',
+          labelStyle: 'label-info',
+          priceDescription: 'Free'
+        },
+        independent: {
+          order: 2,
+          name: 'independent',
+          title: 'Independent',
+          labelStyle: 'label-warning',
+          priceDescription: '$15/mo'
+        },
+        team: {
+          order: 3,
+          name: 'team',
+          title: 'Team Pro',
+          labelStyle: 'label-success',
+          priceDescription: 'Starting at $100/mo'
+        },
+        commercial: {
+          order: 4,
+          name: 'commercial',
+          title: 'Commercial',
+          labelStyle: 'label-commercial',
+          priceDescription: 'Starting at $250/mo per instance'
         }
-      };
-    }
-  ])
-  .factory('ProjectPlans', ['$filter',
-    function($filter) {
-      return {
-        plans: {
-          basic: {
-            order: 1,
-            name: 'basic',
-            title: 'Basic',
-            labelStyle: 'label-info',
-            priceDescription: 'Free'
-          },
-          independent: {
-            order: 2,
-            name: 'independent',
-            title: 'Independent',
-            labelStyle: 'label-warning',
-            priceDescription: '$15/mo'
-          },
-          team: {
-            order: 3,
-            name: 'team',
-            title: 'Team Pro',
-            labelStyle: 'label-success',
-            priceDescription: 'Starting at $100/mo'
-          },
-          commercial: {
-            order: 4,
-            name: 'commercial',
-            title: 'Commercial',
-            labelStyle: 'label-commercial',
-            priceDescription: 'Starting at $250/mo per instance'
-          }
-        },
-        getPlans: function() {
-          return _(this.plans).values().sortBy('order').value();
-        },
-        getPlan: function(plan) {
-          return this.plans[plan];
-        },
-        getPlanName: function(plan) {
-          if (!this.plans[plan]) return '';
-          return this.plans[plan].title;
-        },
-        getPlanLabel: function(plan) {
-          if (!this.plans[plan]) return '';
-          return this.plans[plan].labelStyle;
-        },
-        getAPICallsLimit: function(apiCalls) {
-          if (!apiCalls || !apiCalls.limit) {
-            return '∞';
-          }
-          return $filter('number')(apiCalls.limit);
-        },
-        getAPICallsPercent: function(apiCalls) {
-          if (!apiCalls || !apiCalls.limit) {
-            return '0%';
-          }
-          var percent = apiCalls.used / apiCalls.limit * 100;
-          return (percent > 100) ? '100%' : percent + '%';
-        },
-        getProgressBarClass: function(apiCalls) {
-          if (!apiCalls || !apiCalls.limit) return 'progress-bar-success';
-          var percentUsed = apiCalls.used / apiCalls.limit;
-          if (percentUsed >= 0.9) return 'progress-bar-danger';
-          if (percentUsed >= 0.7) return 'progress-bar-warning';
-          return 'progress-bar-success';
+      },
+      getPlans: function() {
+        return _(this.plans).values().sortBy('order').value();
+      },
+      getPlan: function(plan) {
+        return this.plans[plan];
+      },
+      getPlanName: function(plan) {
+        if (!this.plans[plan]) return '';
+        return this.plans[plan].title;
+      },
+      getPlanLabel: function(plan) {
+        if (!this.plans[plan]) return '';
+        return this.plans[plan].labelStyle;
+      },
+      getAPICallsLimit: function(apiCalls) {
+        if (!apiCalls || !apiCalls.limit) {
+          return '∞';
         }
-      };
-    }
-  ])
+        return $filter('number')(apiCalls.limit);
+      },
+      getAPICallsPercent: function(apiCalls) {
+        if (!apiCalls || !apiCalls.limit) {
+          return '0%';
+        }
+        var percent = apiCalls.used / apiCalls.limit * 100;
+        return (percent > 100) ? '100%' : percent + '%';
+      },
+      getProgressBarClass: function(apiCalls) {
+        if (!apiCalls || !apiCalls.limit) return 'progress-bar-success';
+        var percentUsed = apiCalls.used / apiCalls.limit;
+        if (percentUsed >= 0.9) return 'progress-bar-danger';
+        if (percentUsed >= 0.7) return 'progress-bar-warning';
+        return 'progress-bar-success';
+      }
+    };
+  }])
   .factory('TeamPermissions', function() {
     return {
       permissions: {
