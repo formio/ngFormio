@@ -47533,10 +47533,7 @@ module.exports = {
     if (!components) return;
 
     components.forEach(function(component) {
-      if (component.tree) {
-        fn(component);
-      }
-      else if (component.columns && Array.isArray(component.columns)) {
+      if (component.columns && Array.isArray(component.columns)) {
         component.columns.forEach(function(column) {
           eachComponent(column.components, fn);
         });
@@ -47553,6 +47550,10 @@ module.exports = {
       }
 
       else {
+        fn(component);
+      }
+      // If the component is a tree, be sure to add it back in as well.
+      if (component.tree) {
         fn(component);
       }
     });
