@@ -11,8 +11,8 @@ machine:
 
 dependencies:
   pre:
-    - wget http://selenium-release.storage.googleapis.com/2.46/selenium-server-standalone-2.46.0.jar
-    - java -jar selenium-server-standalone-2.46.0.jar:
+    - wget http://selenium-release.storage.googleapis.com/2.49/selenium-server-standalone-2.49.0.jar
+    - java -jar selenium-server-standalone-2.49.0.jar:
         background: true
     - pip install awscli
     - npm install -g bower gulp mocha
@@ -25,6 +25,8 @@ test:
     - sudo bash -c "echo \"127.0.0.1 portal.localhost\" >> /etc/hosts"
     - npm start:
         background: true
+  post:
+    - mv ./test/screenshots/ $CIRCLE_ARTIFACTS/screenshots
 
 deployment:
   release:

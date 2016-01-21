@@ -9,7 +9,7 @@
     "moment": "~2.11.0",
     "angular-moment": "~0.10.3",
     "ng-sortable": "~1.3.2",
-    "ngFormBuilder": "~1.0.4",
+    "ngFormBuilder": "~1.2.1",
     "seamless": "~0.0.5",
     "font-awesome": "~4.5.0",
     "angular-base64": "~2.0.5",
@@ -22,7 +22,7 @@
     "bootstrap-ui-datetime-picker": "~2.0.5",
     "angular-paginate-anything": "~4.1.2",
     "kendo-ui": "kendo-ui-core#2015.2.902+SP2",
-    "formio": "~0.6.0",
+    "formio": "~0.8.2",
     "ng-formio-plugins": "git+ssh://git@github.com/formio/ng-formio-plugins.git#develop",
     "lodash": "~3.10.1",
     "angular-truncate-2": "~0.4.2",
@@ -52,6 +52,145 @@
         "js/kendo.angular.min.js",
         "styles/kendo.common.min.css",
         "styles/kendo.bootstrap.min.css"
+      ]
+    },
+    "jquery": {
+      "main": [
+        "dist/jquery.min.js"
+      ]
+    },
+    "angular": {
+      "main": [
+        "angular.min.js"
+      ]
+    },
+    "angular-ui-router": {
+      "main": [
+        "release/angular-ui-router.min.js"
+      ]
+    },
+    "angular-sanitize": {
+      "main": [
+        "angular-sanitize.min.js"
+      ]
+    },
+    "angular-bootstrap": {
+      "main": [
+        "ui-bootstrap-tpls.min.js"
+      ]
+    },
+    "moment": {
+      "main": [
+        "min/moment.min.js"
+      ]
+    },
+    "angular-moment": {
+      "main": [
+        "angular-moment.min.js"
+      ]
+    },
+    "ng-sortable": {
+      "main": [
+        "dist/ng-sortable.min.js",
+        "dist/ng-sortable.css"
+      ]
+    },
+    "ng-file-upload": {
+      "main": [
+        "ng-file-upload.min.js"
+      ]
+    },
+    "angular-ui-select": {
+      "main": [
+        "dist/select.min.js",
+        "dist/select.css"
+      ]
+    },
+    "signature_pad": {
+      "main": [
+        "signature_pad.min.js"
+      ]
+    },
+    "angular-ui-mask": {
+      "main": [
+        "dist/mask.min.js"
+      ]
+    },
+    "ui-select": {
+      "main": [
+        "dist/select.min.js",
+        "dist/select.css"
+      ]
+    },
+    "angular-drag-and-drop-lists": {
+      "main": [
+        "angular-drag-and-drop-lists.min.js"
+      ]
+    },
+    "lodash": {
+      "main": [
+        "lodash.min.js"
+      ]
+    },
+    "ckeditor": {
+      "main": [
+        "ckeditor.min.js"
+      ]
+    },
+    "formio": {
+      "main": [
+        "dist/formio.min.js",
+        "css/formio.css"
+      ]
+    },
+    "ngFormBuilder": {
+      "main": [
+        "dist/ngFormBuilder.min.js",
+        "css/formBuilder.css"
+      ]
+    },
+    "ng-dialog": {
+      "main": [
+        "js/ngDialog.min.js",
+        "css/ngDialog.css",
+        "css/ngDialog-theme-default.css"
+      ]
+    },
+    "ng-ckeditor": {
+      "main": [
+        "ng-ckeditor.min.js",
+        "ng-ckeditor.css"
+      ]
+    },
+    "angular-base64": {
+      "main": [
+        "angular-base64.min.js"
+      ]
+    },
+    "angular-chartist.js": {
+      "main": [
+        "dist/angular-chartist.min.js"
+      ]
+    },
+    "angular-paginate-anything": {
+      "main": [
+        "dist/paginate-anything-tpls.min.js"
+      ]
+    },
+    "angular-truncate-2": {
+      "main": [
+        "dist/angular-truncate-2.min.js"
+      ]
+    },
+    "angular-ui-notification": {
+      "main": [
+        "dist/angular-ui-notification.min.js",
+        "dist/angular-ui-notification.css"
+      ]
+    },
+    "es6-promise": {
+      "main": [
+        "promise.min.js"
       ]
     }
   }

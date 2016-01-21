@@ -1,15 +1,15 @@
-<accordion close-others="true">
-  <accordion-group heading="GitHub">
+<uib-accordion close-others="true">
+  <uib-accordion-group heading="GitHub">
     <ng-include src="'views/project/oauth/github.html'"></ng-include>
-  </accordion-group>
-  <accordion-group heading="Facebook">
+  </uib-accordion-group>
+  <uib-accordion-group heading="Facebook">
     <ng-include src="'views/project/oauth/facebook.html'"></ng-include>
-  </accordion-group>
-  <accordion-group heading="Dropbox">
+  </uib-accordion-group>
+  <uib-accordion-group heading="Dropbox">
     <ng-include src="'views/project/oauth/dropbox.html'"></ng-include>
-  </accordion-group>
-  <accordion-group heading="Office 365">
+  </uib-accordion-group>
+  <uib-accordion-group heading="Office 365">
     <ng-include src="'views/project/oauth/office365.html'"></ng-include>
-  </accordion-group>
-</accordion>
+  </uib-accordion-group>
+</uib-accordion>
 <button class="btn btn-primary" ng-click="saveProject()">Save Settings</button>

@@ -487,9 +487,7 @@ angular
           $scope.submitted = true;
           FormioProject.createProject(template).then(function(project) {
             localStorage.setItem('showWelcome', 1);
-            $state.go('project.resource.index', {
-              projectId: project._id
-            });
+            $state.go('project.resource.index', {projectId: project._id});
           });
         }
       };
@@ -644,9 +642,13 @@ angular
       };
 
       $rootScope.getPreviewURL = function(project) {
+<<<<<<< HEAD
         if (!project.settings || !project.settings.preview) {
           return '';
         }
+=======
+        if (!project.settings || !project.settings.preview) { return ''; }
+>>>>>>> develop
         var url = 'https://help.form.io/project/';
         url += '?project=' + encodeURIComponent(project.name);
         url += '&previewUrl=' + encodeURIComponent(project.settings.preview.url);
