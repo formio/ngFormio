@@ -642,13 +642,7 @@ angular
       };
 
       $rootScope.getPreviewURL = function(project) {
-<<<<<<< HEAD
-        if (!project.settings || !project.settings.preview) {
-          return '';
-        }
-=======
         if (!project.settings || !project.settings.preview) { return ''; }
->>>>>>> develop
         var url = 'https://help.form.io/project/';
         url += '?project=' + encodeURIComponent(project.name);
         url += '&previewUrl=' + encodeURIComponent(project.settings.preview.url);
