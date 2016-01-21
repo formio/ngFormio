@@ -25,8 +25,7 @@ angular
     'kendo.directives',
     'truncate',
     'ngFileUpload',
-    'ngDialog',
-    'ng-formio-plugins'
+    'ngDialog'
   ])
   .config([
     '$stateProvider',
