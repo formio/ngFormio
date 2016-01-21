@@ -63748,6 +63748,10 @@ module.exports = function (app) {
       $scope.data[$scope.component.key] = $scope.data[$scope.component.key] || [{}];
 
       $scope.addRow = function() {
+        // Ensure the object is initialized as it may be unset on a "Reset".
+        if (!$scope.data[$scope.component.key].isArray()) {
+          $scope.data[$scope.component.key] = [];
+        }
         $scope.data[$scope.component.key].push({});
       };
 
