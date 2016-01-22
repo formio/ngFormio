@@ -699,6 +699,10 @@ footer {
   a {
     color: white;
   }
+  a:hover {
+    color: white;
+    text-decoration: none;
+  }
   .section-heading {
     color: #eee;
   }
@@ -851,7 +855,7 @@ footer {
       margin-top: 0;
       a {
         font-weight: 600;
-        color: $gray-light;
+        color: $brand-primary;
       }
     }
     .project-plan,
@@ -859,7 +863,7 @@ footer {
       margin-top: 9px;
     }
     .project-url {
-      color: $brand-primary;
+      color: $gray-light;
     }
     .progress-label {
       margin-bottom: 0;
