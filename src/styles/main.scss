@@ -1051,6 +1051,7 @@ footer {
   padding: 10px 5px;
   cursor: pointer;
   transition: .15s;
+  height: 300px;
   .project-tile-icon {
     text-align: center;
     font-size: 7em;
@@ -1058,6 +1059,13 @@ footer {
     color: darken($brand-secondary, 10%);
     margin: 0;
     padding: 0;
+  }
+  .caption {
+    overflow: hidden;
+    max-height: 160px;
+    .template-card-description:after {
+      content: '...'
+    }
   }
   .caption h4 {
     text-align: center;
