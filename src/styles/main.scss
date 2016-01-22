@@ -552,7 +552,7 @@ pre code {
 }
 
 /***************************** Auth Page *****************************/
-.login-container, .register-container {
+.login-container, .register-container, .reset-container {
   color: rgba(255, 255, 255, .935);
 
   padding-top: 90px;
@@ -645,6 +645,22 @@ pre code {
 
   button[type="submit"] {
     margin-top: 87px;
+    background-color: $brand-secondary;
+  }
+}
+
+.reset-container {
+  background-color: $brand-primary;
+  min-height: inherit;
+
+  @media (min-width: $screen-md-min) {
+    margin-right: 15px;
+  }
+
+  @media (max-width: $screen-md-min) {
+    margin-bottom: 15px;
+  }
+  button[type="submit"] {
     background-color: $brand-secondary;
   }
 }
