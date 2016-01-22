@@ -254,10 +254,6 @@ angular
           controller: 'ProjectTeamDeleteController',
           templateUrl: 'views/project/teams/delete.html'
         })
-        .state('project.settings.cors', {
-          url: '/cors',
-          templateUrl: 'views/project/cors/index.html'
-        })
         .state('project.settings.office365', {
           url: '/office365',
           templateUrl: 'views/project/office365/office365.html'

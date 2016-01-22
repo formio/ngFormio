@@ -115,6 +115,11 @@
     </div>
   </div>
   <div class="form-group" ng-if="currentProject && currentProject._id">
+    <div id="form-group-cors" class="form-group">
+      <label for="cors" class="control-label">CORS - Cross Origin Resource Sharing</label>
+      <textarea class="form-control" id="cors" ng-disabled="currentProject.plan === 'basic'" ng-model="currentProject.settings.cors" placeholder="A comma separated list of domains that forms may be embedded on. Use * to allow all domains."></textarea>
+      <p ng-if="currentProject.plan === 'basic'">Upgrade your project to enable CORS.</p>
+    </div>
     <div class="panel panel-default">
       <div class="panel-heading">Export Project</div>
       <div class="panel-body">
@@ -122,8 +127,6 @@
         <a href="//api.{{ appConfig.serverHost }}/project/{{ currentProject._id }}/export?x-jwt-token={{ token }}" class="btn btn-primary">Export Project</a>
       </div>
     </div>
-  </div>
-  <div class="form-group" ng-if="currentProject && currentProject._id">
     <div class="panel panel-default">
       <div class="panel-heading">Delete Project</div>
       <div class="panel-body">
