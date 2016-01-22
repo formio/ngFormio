@@ -458,15 +458,16 @@ div.project-section-separator {
       padding: 0;
       &.form-nav {
         a {
-          background-color: $brand-secondary;
-          border: solid darken($brand-secondary, 10%) 2px;
-          color: $project-header-color;
           &:hover {
+            border: 1px solid $brand-secondary;
             background-color: darken($brand-secondary, 10%);
+            color: white;
           }
         }
         &.active a {
+          border: 1px solid $brand-primary;
           background-color: $brand-primary;
+          color: white;
         }
       }
     }
