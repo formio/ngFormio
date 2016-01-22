@@ -24,7 +24,7 @@
     "bootstrap-ui-datetime-picker": "~2.1.0",
     "signature_pad": "~1.5.2",
     "angular-ui-mask": "~1.6.8",
-    "angular-ui-select3": "ui-select#*"
+    "ui-select": "angular-ui-select#~0.13.2"
   },
   "license": "MIT",
   "ignore": [
