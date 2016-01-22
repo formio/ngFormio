@@ -7,7 +7,6 @@
     <li ng-class="{active: isActive('project.preview')}"><a ui-sref="project.preview"><i class="fa fa-laptop"></i><br/><span>Preview</span></a></li>
     <li ng-class="{active: isActive('project.api')}"><a ui-sref="project.api"><img src="images/swagger-logo.png" style="width:50%;" /><br/><span>API</span></a></li>
     <li ng-show="projectSettingsVisible()" ng-class="{active: isActive('project.settings')}"><a ui-sref="project.settings" id="nav-bar-settings-link"><i class="fa fa-cogs"></i><br/><span>Settings</span></a></li>
-    <li ng-class="{active: isActive('project.edit')}"><a ui-sref="project.edit"><i class="fa fa-eye"></i><br/><span>Summary</span></a></li>
   </ul>
 </div>
 
@@ -15,7 +14,7 @@
   <div class="row project-nav">
     <div class="col-md-8 col-sm-6">
       <ul class="list-inline project-title-section">
-        <li><div class="project-title ellipsis"><a ui-sref="project.edit" class="project-title-link">{{ currentProject.title }}</a></div></li>
+        <li><div class="project-title ellipsis"><a ui-sref="project.settings" class="project-title-link">{{ currentProject.title }}</a></div></li>
         <li class="project-swagger-item"><a ui-sref="project.api" class="label label-default project-swagger-button">https://{{ currentProject.name }}.form.io</a></li>
       </ul>
       <div class="project-description">{{ currentProject.description }}</div>
