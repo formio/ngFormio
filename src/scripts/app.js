@@ -128,10 +128,6 @@ angular
           templateUrl: 'views/project/create.html',
           controller: 'ProjectCreateController'
         })
-        .state('project.edit', {
-          url: '/edit',
-          templateUrl: 'views/project/edit.html'
-        })
         .state('project.data', {
           url: '/data',
           templateUrl: 'views/data/index.html',
@@ -254,10 +250,6 @@ angular
           controller: 'ProjectTeamDeleteController',
           templateUrl: 'views/project/teams/delete.html'
         })
-        .state('project.settings.cors', {
-          url: '/cors',
-          templateUrl: 'views/project/cors/index.html'
-        })
         .state('project.settings.office365', {
           url: '/office365',
           templateUrl: 'views/project/office365/office365.html'
@@ -265,10 +257,6 @@ angular
         .state('project.settings.hubspot', {
           url: '/hubspot',
           templateUrl: 'views/project/hubspot/hubspot.html'
-        })
-        .state('project.settings.export', {
-          url: '/export',
-          templateUrl: 'views/project/export.html'
         })
         .state('project.delete', {
           url: '/delete',

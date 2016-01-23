@@ -55,6 +55,10 @@ ul.dropdown-menu {
   }
 }
 
+li.user-dropdown a {
+  cursor: pointer;
+}
+
 .navbar-brand {
   padding: 6px 0 0 0;
 }
@@ -454,15 +458,16 @@ div.project-section-separator {
       padding: 0;
       &.form-nav {
         a {
-          background-color: $brand-secondary;
-          border: solid darken($brand-secondary, 10%) 2px;
-          color: $project-header-color;
           &:hover {
+            border: 1px solid $brand-secondary;
             background-color: darken($brand-secondary, 10%);
+            color: white;
           }
         }
         &.active a {
+          border: 1px solid $brand-primary;
           background-color: $brand-primary;
+          color: white;
         }
       }
     }
@@ -552,7 +557,7 @@ pre code {
 }
 
 /***************************** Auth Page *****************************/
-.login-container, .register-container {
+.login-container, .register-container, .reset-container {
   color: rgba(255, 255, 255, .935);
 
   padding-top: 90px;
@@ -649,6 +654,22 @@ pre code {
   }
 }
 
+.reset-container {
+  background-color: $brand-primary;
+  min-height: inherit;
+
+  @media (min-width: $screen-md-min) {
+    margin-right: 15px;
+  }
+
+  @media (max-width: $screen-md-min) {
+    margin-bottom: 15px;
+  }
+  button[type="submit"] {
+    background-color: $brand-secondary;
+  }
+}
+
 .register-container {
   background-color: $brand-secondary;
 
@@ -698,6 +719,10 @@ footer {
   width: 100%;
   a {
     color: white;
+  }
+  a:hover {
+    color: white;
+    text-decoration: none;
   }
   .section-heading {
     color: #eee;
@@ -851,7 +876,7 @@ footer {
       margin-top: 0;
       a {
         font-weight: 600;
-        color: $gray-light;
+        color: $brand-primary;
       }
     }
     .project-plan,
@@ -859,7 +884,7 @@ footer {
       margin-top: 9px;
     }
     .project-url {
-      color: $brand-primary;
+      color: $gray-light;
     }
     .progress-label {
       margin-bottom: 0;
@@ -1051,6 +1076,7 @@ footer {
   padding: 10px 5px;
   cursor: pointer;
   transition: .15s;
+  height: 300px;
   .project-tile-icon {
     text-align: center;
     font-size: 7em;
