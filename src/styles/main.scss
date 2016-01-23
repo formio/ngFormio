@@ -1085,6 +1085,13 @@ footer {
     margin: 0;
     padding: 0;
   }
+  .caption {
+    overflow: hidden;
+    max-height: 160px;
+    .template-card-description:after {
+      content: '...'
+    }
+  }
   .caption h4 {
     text-align: center;
   }
