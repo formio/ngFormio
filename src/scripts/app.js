@@ -25,7 +25,8 @@ angular
     'kendo.directives',
     'truncate',
     'ngFileUpload',
-    'ngDialog'
+    'ngDialog',
+    'swaggerUi'
   ])
   .config([
     '$stateProvider',

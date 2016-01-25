@@ -301,8 +301,7 @@ app.controller('ProjectController', [
     };
 
     $scope.getSwaggerURL = function(format) {
-      format = format || 'html';
-      return AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/spec.' + format + '?token=' + Formio.getToken();
+      return AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/spec.json';
     };
 
     $scope.getPlanName = ProjectPlans.getPlanName.bind(ProjectPlans);
