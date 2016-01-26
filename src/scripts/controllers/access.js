@@ -69,7 +69,7 @@ app.directive('permissionEditor', ['$q', function($q) {
     templateUrl: 'views/project/access/permission-editor.html',
     link: function($scope) {
       // Fill in missing permissions / enforce order
-      ($scope.waitFor || $q.when()).then(function(){
+      ($scope.waitFor || $q.when()).then(function() {
         var tempPerms = [];
         _.each(PERMISSION_TYPES, function(type) {
           var existingPerm = _.find($scope.permissions, {type: type});
@@ -78,6 +78,53 @@ app.directive('permissionEditor', ['$q', function($q) {
               roles: []
             });
         });
+        // Replace permissions with complete set of permissions
+        $scope.permissions.splice.apply($scope.permissions, [0, $scope.permissions.length].concat(tempPerms));
+      });
+
+      $scope.getPermissionsToShow = function() {
+        return $scope.permissions.filter($scope.shouldShowPermission);
+      };
+
+      $scope.shouldShowPermission = function(permission) {
+        return !!$scope.labels[permission.type];
+      };
+
+      $scope.getPermissionLabel = function(permission) {
+        return $scope.labels[permission.type].label;
+      };
+
+      $scope.getPermissionTooltip = function(permission) {
+        return $scope.labels[permission.type].tooltip;
+      };
+    }
+  };
+}]);
+
+app.directive('resourcePermissionEditor', ['$q', function($q) {
+  var PERMISSION_TYPES = ['read', 'write', 'admin'];
+
+  return {
+    scope: {
+      resources: '=',
+      permissions: '=',
+      labels: '=',
+      waitFor: '='
+    },
+    restrict: 'E',
+    templateUrl: 'views/project/access/resource-permission-editor.html',
+    link: function($scope) {
+      // Fill in missing permissions / enforce order
+      ($scope.waitFor || $q.when()).then(function() {
+        var tempPerms = [];
+        _.each(PERMISSION_TYPES, function(type) {
+          var existingPerm = _.find($scope.permissions, {type: type});
+          tempPerms.push(existingPerm || {
+              type: type,
+              resources: []
+            });
+        });
+
         // Replace permissions with complete set of permissions
         $scope.permissions.splice.apply($scope.permissions, [0, $scope.permissions.length].concat(tempPerms));
       });
