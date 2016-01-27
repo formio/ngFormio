@@ -1,0 +1,237 @@
+<div class="project-section-content">
+  <div class="project-section-inner-content">
+    <div class="row">
+      <div class="col-md-4">
+        <legend>Project Overview</legend>
+        <div class="form-list">
+          <ul class="list-group table table-striped">
+            <li class="list-group-item">
+              <div class="row">
+                <div class="col-xs-3"><h5 class="ellipsis">Title</h5></div>
+                <div class="col-xs-9">
+                  <span><h5>{{ currentProject.title }}</h5></span>
+                </div>
+              </div>
+            </li>
+            <li class="list-group-item">
+              <div class="row">
+                <div class="col-xs-3"><h5>Current Plan</h5></div>
+                <div class="col-xs-9">
+                  <h5>{{ getPlanName(currentProject.plan) }}</h5>
+                </div>
+              </div>
+            </li>
+            <li class="list-group-item">
+              <div class="row">
+                <div class="col-xs-3"><h5>API URL</h5></div>
+                <div class="col-xs-9">
+                  <a ui-sref="project.api"><h5 class="ellipsis"><samp>https://{{ currentProject.name }}.form.io</samp></h5></a>
+                </div>
+              </div>
+            </li>
+            <li class="list-group-item">
+              <div class="row">
+                <div class="col-xs-3"><h5>Description</h5></div>
+                <div class="col-xs-9">
+                  <span><h5>{{ currentProject.description }}</h5></span>
+                </div>
+              </div>
+            </li>
+            <li class="list-group-item">
+              <div class="row">
+                <div class="col-xs-3"><h5>Date Created</h5></div>
+                <div class="col-xs-9">
+                  <span><h5>{{ currentProject.created | date : 'medium' }}</h5></span>
+                </div>
+              </div>
+            </li>
+            <li class="list-group-item">
+              <div class="row">
+                <div class="col-xs-3"><h5>Last Modified</h5></div>
+                <div class="col-xs-9">
+                  <span><h5>{{ getLastModified() | date : 'medium' }}</h5></span>
+                </div>
+              </div>
+            </li>
+            <li class="list-group-item">
+              <div class="row">
+                <div class="col-xs-3"><h5>Roles</h5></div>
+                <div class="col-xs-9">
+                  <h5><a class="label label-primary" style="margin-right: 5px; display: inline-block" ng-repeat="role in currentProjectRoles" ui-sref="project.settings.roles.edit({roleId: role._id})">{{ role.title }}</a></h5>
+                </div>
+              </div>
+            </li>
+            <li class="list-group-item">
+              <div class="row">
+                <div class="col-xs-3"><h5>Resources</h5></div>
+                <div class="col-xs-9">
+                  <h5><a class="label label-primary" style="margin-right: 5px; display: inline-block" ng-repeat="resource in forms | filter : {type: 'resource'}" ui-sref="project.resource.form.view({formId: resource._id, formType: 'resource'})">{{ resource.title }}</a></h5>
+                </div>
+              </div>
+            </li>
+            <li class="list-group-item">
+              <div class="row">
+                <div class="col-xs-3"><h5>Forms</h5></div>
+                <div class="col-xs-9">
+                  <h5><a class="label label-primary" style="margin-right: 5px; display: inline-block" ng-repeat="form in forms | filter : {type: 'form'}" ui-sref="project.form.form.view({formId: form._id, formType: 'form'})">{{ form.title }}</a></h5>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <legend>Project Teams</legend>
+        <div ng-if="hasTeams()">
+          <div class="list-group">
+            <a ui-sref="team.view({teamId: team._id})" class="list-group-item" ng-repeat="team in currentProjectTeams">
+              <span class="badge"><i class="fa fa-users"></i>&nbsp;{{ team.data.members.length || 0 }}</span>
+              <h4 class="list-group-item-heading">
+                {{ team.data.name }}
+                <small ng-if="team.permission === 'team_read'">Read-only</small>
+                <small ng-if="team.permission === 'team_admin'">Admin</small>
+                </h4>
+              <span class="label label-success">{{ team.owner === user._id ? 'OWNER' : 'MEMBER'}}</span>
+            </a>
+            <a ng-if="highestRole === 'owner'" ui-sref="project.settings.teams.add" class="list-group-item"><i class="fa fa-plus"></i> Add Team</a>
+          </div>
+          <h4>
+            <span ng-if="highestRole === 'owner'">You are the project <strong>owner</strong>.</span>
+            <span ng-if="highestRole === 'team_admin'">You are a project <strong>admin</strong>.</span>
+            <span ng-if="highestRole === 'team_write'">You are a project <strong>member</strong>.</span>
+            <span ng-if="highestRole === 'team_read'">You are a <strong>read-only project member</strong>.</span>
+            You can:
+          </h4>
+          <dl class="dl-horizontal">
+            <dt ng-class="{'text-muted': !projectPermissions.read}">Read</dt>
+            <dd><i class="fa" ng-class="{'text-success fa-check': projectPermissions.read, 'text-muted fa-times': !projectPermissions.read}"></i></dd>
+            <dt ng-class="{'text-muted': !projectPermissions.write}">Write</dt>
+            <dd><i class="fa" ng-class="{'text-success fa-check': projectPermissions.write, 'text-muted fa-times': !projectPermissions.write}"></i></dd>
+            <dt ng-class="{'text-muted': !projectPermissions.admin}">Administrate</dt>
+            <dd><i class="fa" ng-class="{'text-success fa-check': projectPermissions.admin, 'text-muted fa-times': !projectPermissions.admin}"></i></dd>
+          </dl>
+        </div>
+        <div ng-if="!hasTeams()">
+          <div class="well">
+            <h4><a href="" ng-click="showUpgradeDialog(currentProject)">Upgrade Plan</a> to enable teams for this project</h4>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4 submission-activity">
+        <legend>Submission Activity</legend>
+        <div class="col-xs-12">
+          <div class="media" ng-if="currentProject.apiCalls">
+            <div class="media-left">
+              <div class="media-object">
+                <i class="fa fa-exchange text-muted media-icon-large"></i>
+              </div>
+            </div>
+            <div class="media-body">
+              <h5 class="media-heading">Submission Requests</h5>
+              <div class="progress">
+                <div class="progress-bar" role="progressbar" ng-style="{width: getAPICallsPercent(currentProject.apiCalls)}" ng-class="getProgressBarClass(currentProject.apiCalls)"></div>
+              </div>
+              <p class="text-center text-muted progress-caption"><small>{{ currentProject.apiCalls.used | number }} / {{ getAPICallsLimit(currentProject.apiCalls) }}</small></p>
+            </div>
+          </div>
+        </div>
+        <div class="col-xs-12">
+          <a class="thumbnail-chart-link" ui-sref="project.data({graphType: 'Day'})">
+            <div class="well">
+              <div class="col-xs-8 col-vertical-center">
+                <chartist class="ct-chart thumbnail-chart" chartist-data="submissionDataToday" chartist-chart-type="Line" chartist-chart-options="chartOptions"></chartist>
+              </div><!--
+              --><div class="col-xs-4 col-vertical-center">
+                <h5>Today</h5>
+                <h2>{{ submissionTotalToday }}</h2>
+              </div>
+            </div>
+          </a>
+        </div>
+        <div class="col-xs-12">
+          <a class="thumbnail-chart-link" ui-sref="project.data">
+            <div class="well">
+              <div class="col-xs-8 col-vertical-center">
+                <chartist class="ct-chart thumbnail-chart" chartist-data="submissionDataMonth" chartist-chart-type="Line" chartist-chart-options="chartOptions"></chartist>
+              </div><!--
+              --><div class="col-xs-4 col-vertical-center">
+                <h5>This Month</h5>
+                <h2>{{ submissionTotalMonth }}</h2>
+              </div>
+            </div>
+          </a>
+        </div>
+        <div class="col-xs-12">
+          <a class="thumbnail-chart-link" ui-sref="project.data({graphType: 'Year'})">
+            <div class="well">
+              <div class="col-xs-8 col-vertical-center">
+                <chartist class="ct-chart thumbnail-chart" chartist-data="submissionDataYear" chartist-chart-type="Line" chartist-chart-options="chartOptions"></chartist>
+              </div><!--
+              --><div class="col-xs-4 col-vertical-center">
+                <h5>This Year</h5>
+                <h2>{{ submissionTotalYear }}</h2>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="about-projects">
+          <legend>About Projects</legend>
+          <p>A project serves as a container for the Resources, Forms, Data, and Settings for a specific application you are building. A project can serve as the backend API platform for your application.</p>
+          <p>All of the <strong>Resources</strong> and <strong>Forms</strong> serve as the API platform as well as Form interface for your web application. Here is what you need to know to get started.</p>
+          <div class="list-group">
+            <a ui-sref="project.resource.index" class="list-group-item">
+              <div class="row">
+                <div class="col-md-3">
+                  <h2><i class="fa fa-database"></i> Resources</h2>
+                </div>
+                <div class="col-md-9"><p>Form based data structures that can serve as the backend storage and API platform for your web application. Resources can also be embedded into other Resources and Forms to create a hierarchical relationship structure.</p></div>
+              </div>
+            </a>
+            <a ui-sref="project.form.index" class="list-group-item">
+              <div class="row">
+                <div class="col-md-3"><h2><i class="fa fa-tasks"></i> Forms</h2></div>
+                <div class="col-md-9"><p>Serve as the form interfaces for your application. You can re-use Resource fields as well as use custom input components. The forms you create can range from simple surveys to complex authentication and resource management forms.</p></div>
+              </div>
+            </a>
+            <a ui-sref="project.data" class="list-group-item">
+              <div class="row">
+                <div class="col-md-3">
+                  <h2><i class="fa fa-table"></i> Data</h2>
+                </div>
+                <div class="col-md-9">
+                  <p>Where you can find and manage all the data within your appliction. Here you can view charts of analytics data on how many submissions your users are making over time. You can also access an interactive table of all submissions for your forms that you can sort, filter, and more.</p>
+                </div>
+              </div>
+            </a>
+            <a ui-sref="project.preview" class="list-group-item">
+              <div class="row">
+                <div class="col-md-3">
+                  <h2><i class="fa fa-laptop"></i> Preview</h2>
+                </div>
+                <div class="col-md-9">
+                  <p>Preview your working application live. Any changes made in your Forms and Resources will immediately be reflected in the preview application. You may also as download the preview application as a base for <strong>Local Development</strong></p>
+                </div>
+              </div>
+            </a>
+            <a ui-sref="project.api" class="list-group-item">
+              <div class="row">
+                <div class="col-md-3">
+                  <h2><i class="fa fa-code"></i> API</h2>
+                </div>
+                <div class="col-md-9">
+                  <p>Provides an interactive API documentation explorer powered by Swagger.IO.</p>
+                </div>
+              </div>
+            </a>
+          </div>
+          <p>Please refer to our <a href="https://help.form.io">help guides</a> for more information.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

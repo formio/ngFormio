@@ -345,43 +345,16 @@ $project-header-color: lighten($brand-primary, 55%);
   line-height: 1em;
 }
 
-.project-nav {
-  background-color: $gray-lighter;
-  border-bottom: 1px solid #ddd;
-  padding: 10px 0 10px 0;
-  min-height: 90px;
-  margin: 0;
-  .project-title {
-    font-weight: normal;
-    margin: 0;
-    font-size: 2em;
-    .project-title-link {
-      color: $gray;
-      &:hover, &:focus {
-        text-decoration: none;
-      }
-    }
-  }
-
-  .project-description {
-    overflow: hidden;
-    display: inline-block;
-  }
-}
-
 div.project-section-separator {
   margin-top: 10px;
   margin-bottom: 10px;
 }
 
-.project-swagger {
-  word-break: break-all;
-}
-
 .project-section-header {
   background-color: darken($brand-primary, 5%);
   color: $project-header-color;
-  padding: 20px;
+  padding-left: 20px;
+  padding-top: 20px;
   border-bottom: solid $brand-secondary 8px;
   h2 {
     a {
@@ -391,6 +364,23 @@ div.project-section-separator {
       }
     }
     margin: 0 0 10px 0;
+  }
+
+  .project-title {
+    font-weight: normal;
+    margin: 0;
+    font-size: 2em;
+    .project-title-link {
+      color: $project-header-color;
+      &:hover, &:focus {
+        text-decoration: none;
+      }
+    }
+  }
+
+  .project-description {
+    overflow: hidden;
+    display: inline-block;
   }
 }
 
@@ -423,9 +413,8 @@ div.project-section-separator {
 }
 
 .project-section-header-button {
-  float: right;
   border: solid $project-header-color 2px;
-  margin-top: 1em;
+  margin-right: 5px;
 }
 
 .project-header-block {
@@ -785,19 +774,6 @@ footer {
 
 .breadcrumb .label {
   border-radius: 20px;
-}
-
-.project-title-section {
-  margin-bottom: 0;
-  .project-swagger-item {
-    vertical-align: top;
-    font-size: 1.5em;
-    line-height: 1.5em;
-    margin-top: 2px;
-    .project-swagger-button {
-      border: solid white 2px;
-    }
-  }
 }
 
 .existing-projects-section {
@@ -1325,5 +1301,58 @@ footer {
   }
   .form-line {
     margin-top: 3px;
+  }
+}
+
+/********************* Project Dashboard *********************/
+.about-projects {
+  dl dd {
+    padding-bottom: 10px;
+  }
+  .list-group-item p {
+    padding-top: 20px;
+  }
+}
+
+.thumbnail-chart {
+  .ct-line {
+    stroke: $brand-primary;
+    stroke-width: 2px;
+    stroke-linecap: square;
+    stroke-linejoin: round;
+  }
+  .ct-area {
+    fill: $brand-primary;
+  }
+}
+
+.thumbnail-chart-link {
+  color: $text-color;
+
+  &:hover {
+    color: $text-color;
+    .well {
+      background-color:  darken($well-bg, 5%);
+    }
+  }
+
+  &:active {
+    color: $text-color;
+    .well {
+      background-color:  darken($well-bg, 10%);
+    }
+  }
+}
+
+.submission-activity {
+  .media-icon-large {
+    font-size: 48px;
+    width: 64px;
+    text-align: center;
+  }
+
+  .progress {
+    margin-top: 10px;
+    margin-bottom: 0;
   }
 }
