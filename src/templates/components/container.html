@@ -3,9 +3,9 @@
     <h3 class="panel-title">{{ component.label}}</h3>
   </div>
   <div class="panel-body">
-    <div ng-repeat="rowData in data[component.key] track by $index">
+    <div ng-repeat="containerData in data[component.key] track by $index">
       <div ng-repeat="component in component.components">
-        <formio-component component="component" data="rowData" formio="formio" read-only="readOnly"></formio-component>
+        <formio-component component="component" data="containerData" formio="formio" read-only="readOnly"></formio-component>
       </div>
     </div>
   </div>
