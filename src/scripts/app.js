@@ -26,7 +26,7 @@ angular
     'truncate',
     'ngFileUpload',
     'ngDialog',
-    'ng-formio-plugins'
+    'swaggerUi'
   ])
   .config([
     '$stateProvider',
@@ -128,10 +128,6 @@ angular
           url: '/create/project',
           templateUrl: 'views/project/create.html',
           controller: 'ProjectCreateController'
-        })
-        .state('project.edit', {
-          url: '/edit',
-          templateUrl: 'views/project/edit.html'
         })
         .state('project.data', {
           url: '/data',
@@ -255,10 +251,6 @@ angular
           controller: 'ProjectTeamDeleteController',
           templateUrl: 'views/project/teams/delete.html'
         })
-        .state('project.settings.cors', {
-          url: '/cors',
-          templateUrl: 'views/project/cors/index.html'
-        })
         .state('project.settings.office365', {
           url: '/office365',
           templateUrl: 'views/project/office365/office365.html'
@@ -266,10 +258,6 @@ angular
         .state('project.settings.hubspot', {
           url: '/hubspot',
           templateUrl: 'views/project/hubspot/hubspot.html'
-        })
-        .state('project.settings.export', {
-          url: '/export',
-          templateUrl: 'views/project/export.html'
         })
         .state('project.delete', {
           url: '/delete',
@@ -479,11 +467,15 @@ angular
         $scope.templates = templates;
       });
 
+      $scope.submitted = false;
       $scope.createProject = function(template) {
-        FormioProject.createProject(template).then(function(project) {
-          localStorage.setItem('showWelcome', 1);
-          $state.go('project.resource.index', {projectId: project._id});
-        });
+        if (!$scope.submitted) {
+          $scope.submitted = true;
+          FormioProject.createProject(template).then(function(project) {
+            localStorage.setItem('showWelcome', 1);
+            $state.go('project.resource.index', {projectId: project._id});
+          });
+        }
       };
 
       $scope.projects = {};
@@ -635,7 +627,7 @@ angular
 
       $rootScope.getPreviewURL = function(project) {
         if (!project.settings || !project.settings.preview) { return ''; }
-        var url = 'http://help.form.io/project';
+        var url = 'https://help.form.io/project/';
         url += '?project=' + encodeURIComponent(project.name);
         url += '&previewUrl=' + encodeURIComponent(project.settings.preview.url);
         url += '&host=' + encodeURIComponent(AppConfig.serverHost);
@@ -730,7 +722,7 @@ angular
       //   - Any attribute beginning with 'data-'
       //   - Any inline style
       //   - Any class name
-      CKEDITOR.config.allowedContent = '*[data-*]{*}(*)';
+      CKEDITOR.config.extraAllowedContent = '*[data-*]{*}(*)';
     }
   ])
   .factory('GoogleAnalytics', ['$window', '$state', function($window, $state) {

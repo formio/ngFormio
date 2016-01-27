@@ -1,21 +1,15 @@
-<script src="/bower_components/seamless/build/seamless.parent.min.js"></script>
 <div class="panel panel-default">
   <div class="panel-heading">
     <h4 class="panel-title">
       <span>Endpoint: <strong>{{ projectApi }}/{{ form.path }}</strong></span>
-      <a class="pull-right" href="http://help.form.io/userguide/#api" target="_blank">
+      <a class="pull-right" href="https://help.form.io/userguide/#api" target="_blank">
         <i class="glyphicon glyphicon-question-sign "></i>
       </a>
     </h4>
   </div>
   <div class="panel-body">
     <p><b>Warning: The API Explorer can change and delete your *live* Form Submission data.</b></p>
-    <iframe id="docs" ng-src="{{ getSwaggerURL() | trusted }}"></iframe>
-    <script type="text/javascript">
-      jQuery('#docs').seamless({
-        spinner: '',
-        loading: 'Loading ...'
-      });
-    </script>
+    <div ng-show="swaggerLoading">Loading...</div>
+    <div id="docs" swagger-ui url="{{ getSwaggerURL() | trusted }}" api-explorer="true" loading="swaggerLoading" validator-url="false"></div>
   </div>
 </div>

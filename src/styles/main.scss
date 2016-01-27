@@ -55,6 +55,10 @@ ul.dropdown-menu {
   }
 }
 
+li.user-dropdown a {
+  cursor: pointer;
+}
+
 .navbar-brand {
   padding: 6px 0 0 0;
 }
@@ -160,24 +164,18 @@ ul.dropdown-menu {
   border-radius: 35px;
 }
 
-/* Hide for mobile, show later */
 .sidebar {
-  display: none;
-}
-@media (min-width: $screen-sm-min) {
-  .sidebar {
-    position: fixed;
-    top: 45px;
-    bottom: 0;
-    left: 0;
-    z-index: 1000;
-    display: block;
-    padding: 20px;
-    overflow-x: hidden;
-    overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
-    background-color: #444;
-    border-right: 1px solid #eee;
-  }
+  position: fixed;
+  top: 45px;
+  bottom: 0;
+  left: 0;
+  z-index: 1000;
+  display: block;
+  padding: 20px;
+  overflow-x: hidden;
+  overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+  background-color: #444;
+  border-right: 1px solid #eee;
 }
 
 /* Sidebar navigation */
@@ -272,28 +270,31 @@ $project-header-color: lighten($brand-primary, 55%);
   border: none;
   background-color: darken($brand-primary, 25%);
   text-align: center;
-  padding-top: 0;
+  padding: 0;
   width: 6%;
-  .nav > li {
-    & > a {
-      height: 90px;
-      padding: 20px 15px;
-      color: $project-header-color;
-      &:hover {
+  .nav {
+    margin: 0;
+    li {
+      & > a {
+        height: 90px;
+        padding: 20px 0 0 0;
+        color: $project-header-color;
+        &:hover {
+          background-color: darken($brand-primary, 20%);
+        }
+        span {
+          font-size: 0.6em;
+        }
+        i {
+          font-size: 2em;
+        }
+      }
+      &.active {
         background-color: darken($brand-primary, 20%);
-      }
-      span {
-        font-size: 0.6em;
-      }
-      i {
-        font-size: 2em;
-      }
-    }
-    &.active {
-      background-color: darken($brand-primary, 20%);
-      & > a, & > a:focus {
-        background-color: darken($brand-primary, 5%);
-        border-right: solid $brand-secondary 8px;
+        & > a, & > a:focus {
+          background-color: darken($brand-primary, 5%);
+          border-right: solid $brand-secondary 8px;
+        }
       }
     }
   }
@@ -303,13 +304,6 @@ $project-header-color: lighten($brand-primary, 55%);
   margin-left: 6%;
   width: 94%;
   padding: 0;
-}
-
-@media (max-width: $screen-sm-min) {
-  .project-main {
-    margin-left: 0;
-    width: 100%;
-  }
 }
 
 .project-content {
@@ -464,15 +458,16 @@ div.project-section-separator {
       padding: 0;
       &.form-nav {
         a {
-          background-color: $brand-secondary;
-          border: solid darken($brand-secondary, 10%) 2px;
-          color: $project-header-color;
           &:hover {
+            border: 1px solid $brand-secondary;
             background-color: darken($brand-secondary, 10%);
+            color: white;
           }
         }
         &.active a {
+          border: 1px solid $brand-primary;
           background-color: $brand-primary;
+          color: white;
         }
       }
     }
@@ -562,7 +557,7 @@ pre code {
 }
 
 /***************************** Auth Page *****************************/
-.login-container, .register-container {
+.login-container, .register-container, .reset-container {
   color: rgba(255, 255, 255, .935);
 
   padding-top: 90px;
@@ -659,6 +654,22 @@ pre code {
   }
 }
 
+.reset-container {
+  background-color: $brand-primary;
+  min-height: inherit;
+
+  @media (min-width: $screen-md-min) {
+    margin-right: 15px;
+  }
+
+  @media (max-width: $screen-md-min) {
+    margin-bottom: 15px;
+  }
+  button[type="submit"] {
+    background-color: $brand-secondary;
+  }
+}
+
 .register-container {
   background-color: $brand-secondary;
 
@@ -708,6 +719,10 @@ footer {
   width: 100%;
   a {
     color: white;
+  }
+  a:hover {
+    color: white;
+    text-decoration: none;
   }
   .section-heading {
     color: #eee;
@@ -861,7 +876,7 @@ footer {
       margin-top: 0;
       a {
         font-weight: 600;
-        color: $gray-light;
+        color: $brand-primary;
       }
     }
     .project-plan,
@@ -869,7 +884,7 @@ footer {
       margin-top: 9px;
     }
     .project-url {
-      color: $brand-primary;
+      color: $gray-light;
     }
     .progress-label {
       margin-bottom: 0;
@@ -1061,6 +1076,7 @@ footer {
   padding: 10px 5px;
   cursor: pointer;
   transition: .15s;
+  height: 300px;
   .project-tile-icon {
     text-align: center;
     font-size: 7em;
@@ -1068,6 +1084,13 @@ footer {
     color: darken($brand-secondary, 10%);
     margin: 0;
     padding: 0;
+  }
+  .caption {
+    overflow: hidden;
+    max-height: 160px;
+    .template-card-description:after {
+      content: '...'
+    }
   }
   .caption h4 {
     text-align: center;
@@ -1159,6 +1182,44 @@ footer {
     margin-top: 25px;
     select {
       vertical-align: middle;
+    }
+  }
+}
+
+.form-list {
+  h5 {
+    margin: 0;
+    padding: 5px;
+    line-height: inherit;
+  }
+
+  .list-group {
+    padding: 0px;
+
+    .list-group-item {
+      padding: 10px 0 10px 0;
+      border: none;
+      &:nth-child(odd) {
+        background-color: $table-bg-accent;
+      }
+      .row {
+        margin: 0;
+      }
+
+      .form-list-buttons {
+        text-align: right;
+        @media (max-width: $screen-xs) {
+          text-align: left;
+        }
+
+        .dropdown-button-menu {
+          display: inline-block;
+          position: relative;
+          ul {
+            padding-bottom: 0;
+          }
+        }
+      }
     }
   }
 }

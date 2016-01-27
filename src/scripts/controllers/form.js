@@ -22,7 +22,7 @@ app.config([
         title: 'Forms',
         name: 'Form',
         icon: 'fa fa-tasks',
-        help: 'http://help.form.io/userguide/#forms',
+        help: 'https://help.form.io/userguide/#forms',
         description: 'Forms serve as an input interface for Resources as well as free-form user input within your Application. Example: Login Form, Contact Form, etc.'
       },
       resource: {
@@ -30,7 +30,7 @@ app.config([
         title: 'Resources',
         name: 'Resource',
         icon: 'fa fa-database',
-        help: 'http://help.form.io/userguide/#resources',
+        help: 'https://help.form.io/userguide/#resources',
         description: 'Resources are the objects within your Application. Example: User, Company, Vehicle, etc.'
       }
     };
@@ -276,8 +276,7 @@ app.controller('FormController', [
     $scope.submissionAccessLabels = SubmissionAccessLabels;
     // Get the swagger URL.
     $scope.getSwaggerURL = function(format) {
-      format = format || 'html';
-      return AppConfig.apiBase + '/project/' + $scope.projectId + '/form/' + $scope.formId + '/spec.'+format+'?token=' + Formio.getToken();
+      return AppConfig.apiBase + '/project/' + $scope.projectId + '/form/' + $scope.formId + '/spec.json';
     };
 
     // When a submission is made.
@@ -303,10 +302,13 @@ app.controller('FormController', [
           type: 'success',
           message: 'Successfully ' + method + ' form!'
         });
-        var action = $stateParams.formId ? 'update' : 'create';
-        GoogleAnalytics.sendEvent('Form', action, null, 1);
+        GoogleAnalytics.sendEvent('Form', method.substring(0, method.length - 1), null, 1);
 
-        $state.go('project.' + $scope.formInfo.type + '.form.view', {formId: form._id});
+        if(method === 'created') {
+          // Reload page to start editing as an existing form.
+          $state.go('project.' + $scope.formInfo.type + '.form.edit', {formId: form._id});
+        }
+
       }, FormioAlerts.onError.bind(FormioAlerts));
     };
 
@@ -541,6 +543,8 @@ app.factory('ActionInfoLoader', [
         if (!$stateParams.actionInfo && $stateParams.actionName) {
           return getActionInfo($stateParams.actionName).then(function(info) {
             return loadAction(info.defaults);
+          }).catch(function(error) {
+            $scope.error = error;
           });
         }
         else {

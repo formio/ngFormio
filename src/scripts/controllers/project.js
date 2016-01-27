@@ -213,15 +213,18 @@ app.controller('ProjectController', [
 
       // Load the users teams.
       $scope.userTeamsLoading = true;
-      var userTeamsPromise = $http.get(AppConfig.apiBase + '/team/all', 'GET').then(function(result) {
+      var userTeamsPromise = $http.get(AppConfig.apiBase + '/team/all').then(function(result) {
         $scope.userTeams = result.data;
         $scope.userTeamsLoading = false;
+
+        // Seperate out the teams that the current user owns, to save an api call.
+        $scope.currentProjectEligibleTeams = _.filter(result.data, {owner: $scope.user._id});
       });
 
       // Load the projects teams.
       $scope.projectTeamsLoading = true;
-      var projectTeamsPromise = $http.get(AppConfig.apiBase + '/team/project/' + $scope.currentProject._id, 'GET').then(function(result) {
-        $scope.projectTeams = result.data;
+      var projectTeamsPromise = $http.get(AppConfig.apiBase + '/team/project/' + $scope.currentProject._id).then(function(result) {
+        $scope.currentProjectTeams = result.data;
         $scope.projectTeamsLoading = false;
       });
 
@@ -244,7 +247,7 @@ app.controller('ProjectController', [
          *   If the current user has the role or not.
          */
         var hasRoles = function(type) {
-          var potential = _($scope.projectTeams)
+          var potential = _($scope.currentProjectTeams)
             .filter({permission: type})
             .pluck('_id')
             .value();
@@ -298,8 +301,7 @@ app.controller('ProjectController', [
     };
 
     $scope.getSwaggerURL = function(format) {
-      format = format || 'html';
-      return AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/spec.' + format + '?token=' + Formio.getToken();
+      return AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/spec.json';
     };
 
     $scope.getPlanName = ProjectPlans.getPlanName.bind(ProjectPlans);
@@ -307,7 +309,6 @@ app.controller('ProjectController', [
     $scope.getAPICallsLimit = ProjectPlans.getAPICallsLimit.bind(ProjectPlans);
     $scope.getAPICallsPercent = ProjectPlans.getAPICallsPercent.bind(ProjectPlans);
     $scope.getProgressBarClass = ProjectPlans.getProgressBarClass.bind(ProjectPlans);
-
     $scope.showUpgradeDialog = ProjectUpgradeDialog.show.bind(ProjectUpgradeDialog);
   }
 ]);
@@ -874,42 +875,23 @@ app.controller('ProjectSettingsController', [
   '$state',
   'GoogleAnalytics',
   'FormioAlerts',
-  'AppConfig',
-  'Formio',
   function(
     $scope,
     $rootScope,
     $state,
     GoogleAnalytics,
-    FormioAlerts,
-    AppConfig,
-    Formio
+    FormioAlerts
   ) {
     // Go to first settings section
     if($state.current.name === 'project.settings') {
       $state.go('project.settings.project', {location: 'replace'});
     }
 
-    $scope.teamsLoading = true;
     $scope.loadProjectPromise.then(function() {
       // Mask child scope's reference to currentProject with a clone
       // Parent reference gets updated when we reload after saving
       $scope.currentProject.plan = $scope.currentProject.plan || 'basic';
       $scope.currentProject = _.cloneDeep($scope.currentProject);
-
-      $scope.currentProjectTeams = []; // Get the current project teams.
-      $scope.currentProjectEligibleTeams = []; // Get the eligible teams.
-
-      Formio.request(AppConfig.apiBase + '/team/project/' + $scope.currentProject._id, 'GET')
-        .then(function(teams) {
-          $scope.teamsLoading = false;
-          $scope.currentProjectTeams = teams;
-        });
-
-      Formio.request(AppConfig.apiBase + '/team/own', 'GET')
-        .then(function(teams) {
-          $scope.currentProjectEligibleTeams = teams;
-        });
     });
 
     // Save the Project.
