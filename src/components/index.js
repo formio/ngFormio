@@ -21,11 +21,11 @@ require('./file')(app);
 require('./hidden')(app);
 require('./signature')(app);
 require('./datagrid')(app);
+require('./container')(app);
 require('./custom')(app);
 
 require('./columns')(app);
 require('./fieldset')(app);
-require('./container')(app);
 require('./page')(app);
 require('./panel')(app);
 require('./table')(app);

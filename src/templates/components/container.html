@@ -1,4 +1,7 @@
-<div style="border:2px dotted #000; padding:10px">
-  <legend ng-if="component.legend">{{ component.legend }}</legend>
-  <formio-component ng-repeat="component in component.components" component="component" data="data" formio="formio" read-only="readOnly"></formio-component>
+<div style="border:2px dashed #e8e8e8;" ng-controller="formioContainerComponent">
+  <div class="well" ng-repeat="rowData in data[component.key] track by $index">
+    <div ng-repeat="component in component.components">
+      <formio-component component="component" data="rowData" formio="formio" read-only="readOnly"></formio-component>
+    </div>
+  </div>
 </div>

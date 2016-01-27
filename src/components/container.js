@@ -1,30 +1,39 @@
 var fs = require('fs');
-module.exports = function (app) {
+module.exports = function(app) {
 
   app.config([
     'formioComponentsProvider',
-    function (formioComponentsProvider) {
+    function(formioComponentsProvider) {
       formioComponentsProvider.register('container', {
         title: 'Container',
         template: 'formio/components/container.html',
         group: 'layout',
         settings: {
-          input: false,
-          label: '',
+          input: true,
+          tree: true,
+          components: [],
           tableView: true,
-          legend: '',
-          key:'ccontainer',
-          components: []
+          label: '',
+          key: 'container',
+          protected: false,
+          persistent: true
         }
       });
     }
   ]);
+  app.controller('formioContainerComponent', [
+    '$scope',
+    function($scope) {
+      $scope.data[$scope.component.key] = $scope.data[$scope.component.key] || [{}];
+    }
+  ]);
   app.run([
     '$templateCache',
-    function ($templateCache) {
-      $templateCache.put('formio/components/container.html',
+    'FormioUtils',
+    function($templateCache, FormioUtils) {
+      $templateCache.put('formio/components/container.html', FormioUtils.fieldWrap(
         fs.readFileSync(__dirname + '/../templates/components/container.html', 'utf8')
-      );
+      ));
     }
   ]);
 };
