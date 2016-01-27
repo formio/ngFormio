@@ -276,8 +276,7 @@ app.controller('FormController', [
     $scope.submissionAccessLabels = SubmissionAccessLabels;
     // Get the swagger URL.
     $scope.getSwaggerURL = function(format) {
-      format = format || 'html';
-      return AppConfig.apiBase + '/project/' + $scope.projectId + '/form/' + $scope.formId + '/spec.'+format+'?token=' + Formio.getToken();
+      return AppConfig.apiBase + '/project/' + $scope.projectId + '/form/' + $scope.formId + '/spec.json';
     };
 
     // When a submission is made.

@@ -2,7 +2,6 @@
   <h2>API</h2>
   <p>Every Resource and Form created comes with a corresponding REST API.</p>
 </div>
-<script src="/bower_components/seamless/build/seamless.parent.min.js"></script>
 <div class="panel panel-default">
   <div class="panel-heading">
     <h4 class="panel-title">Endpoint: <strong>{{ projectApi }}</strong>
@@ -13,12 +12,7 @@
   </div>
   <div class="panel-body">
     <p><b>Warning: The API Explorer can change and delete your *live* Form Submission data.</b></p>
-    <iframe id="docs" ng-src="{{ getSwaggerURL() | trusted }}"></iframe>
-    <script type="text/javascript">
-      jQuery('#docs').seamless({
-        spinner: '',
-        loading: 'Loading ...'
-      });
-    </script>
+    <div ng-show="swaggerLoading">Loading...</div>
+    <div id="docs" swagger-ui url="getSwaggerURL()" api-explorer="true" loading="swaggerLoading" validator-url="false"></div>
   </div>
 </div>
