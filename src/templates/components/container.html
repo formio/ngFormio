@@ -1,7 +1,12 @@
-<div style="border:2px dashed #e8e8e8;" ng-controller="formioContainerComponent">
-  <div class="well" ng-repeat="rowData in data[component.key] track by $index">
-    <div ng-repeat="component in component.components">
-      <formio-component component="component" data="rowData" formio="formio" read-only="readOnly"></formio-component>
+<div class="panel panel-default" ng-controller="formioContainerComponent">
+  <div class="panel-heading" ng-init="component.hideLabel = true">
+    <h3 class="panel-title">{{ component.label}}</h3>
+  </div>
+  <div class="panel-body">
+    <div ng-repeat="rowData in data[component.key] track by $index">
+      <div ng-repeat="component in component.components">
+        <formio-component component="component" data="rowData" formio="formio" read-only="readOnly"></formio-component>
+      </div>
     </div>
   </div>
 </div>
