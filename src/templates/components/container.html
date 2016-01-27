@@ -1,0 +1,4 @@
+<div style="border:2px dotted #000; padding:10px">
+  <legend ng-if="component.legend">{{ component.legend }}</legend>
+  <formio-component ng-repeat="component in component.components" component="component" data="data" formio="formio" read-only="readOnly"></formio-component>
+</div>

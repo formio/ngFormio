@@ -25,6 +25,7 @@ require('./custom')(app);
 
 require('./columns')(app);
 require('./fieldset')(app);
+require('./container')(app);
 require('./page')(app);
 require('./panel')(app);
 require('./table')(app);
