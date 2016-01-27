@@ -41,6 +41,7 @@ module.exports = function (app) {
             $scope.refreshSubmissions();
           }
         },
+        group: 'advanced',
         settings: {
           input: true,
           tableView: true,

@@ -7,6 +7,7 @@ module.exports = function (app) {
       formioComponentsProvider.register('textfield', {
         title: 'Text Field',
         template: 'formio/components/textfield.html',
+        icon: 'fa fa-terminal',
         settings: {
           input: true,
           tableView: true,
