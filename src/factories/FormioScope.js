@@ -38,6 +38,7 @@ module.exports = [
         $scope._form = $scope.form || {};
         $scope._submission = $scope.submission || {data: {}};
         $scope._submissions = $scope.submissions || [];
+        $scope.formLoading = true;
 
         // Keep track of the elements rendered.
         var elementsRendered = 0;
@@ -97,16 +98,14 @@ module.exports = [
           return componentInfo.tableView(value, component);
         };
 
-        var spinner = $element.find('#formio-loading');
-
         $scope.updateSubmissions = function() {
-          spinner.show();
+          $scope.formLoading = true;
           var params = {};
           if ($scope.perPage) params.limit = $scope.perPage;
           if ($scope.skip) params.skip = $scope.skip;
           loader.loadSubmissions({params: params}).then(function(submissions) {
             $scope._submissions = submissions;
-            spinner.hide();
+            $scope.formLoading = false;
             $scope.$emit('submissionsLoad', submissions);
           }, self.onError($scope));
         };
@@ -114,21 +113,21 @@ module.exports = [
         if ($scope._src) {
           loader = new Formio($scope._src);
           if (options.form) {
-            spinner.show();
+            $scope.formLoading = true;
             loader.loadForm().then(function(form) {
               $scope._form = form;
-              spinner.hide();
+              $scope.formLoading = false;
               $scope.$emit('formLoad', form);
             }, this.onError($scope));
           }
           if (options.submission && loader.submissionId) {
-            spinner.show();
+            $scope.formLoading = true;
             loader.loadSubmission().then(function(submission) {
               $scope._submission = submission;
               if (!$scope._submission.data) {
                 $scope._submission.data = {};
               }
-              spinner.hide();
+              $scope.formLoading = false;
               $scope.$emit('submissionLoad', submission);
             }, this.onError($scope));
           }
@@ -139,7 +138,7 @@ module.exports = [
         else {
 
           $scope.formoLoaded = true;
-          spinner.hide();
+          $scope.formLoading = false;
 
           // Emit the events if these objects are already loaded.
           if ($scope._form) {
