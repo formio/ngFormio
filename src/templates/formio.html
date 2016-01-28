@@ -1,5 +1,5 @@
 <form role="form" name="formioForm" ng-submit="onSubmit(formioForm)" novalidate>
-  <i id="formio-loading" style="font-size: 2em;" class="glyphicon glyphicon-refresh glyphicon-spin"></i>
+  <i style="font-size: 2em;" ng-if="formLoading" class="glyphicon glyphicon-refresh glyphicon-spin"></i>
   <div ng-repeat="alert in formioAlerts" class="alert alert-{{ alert.type }}" role="alert">
     {{ alert.message }}
   </div>
