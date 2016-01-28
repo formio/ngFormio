@@ -1356,3 +1356,11 @@ footer {
     margin-bottom: 0;
   }
 }
+
+.swagger-ui {
+  .api-name,
+  .api-description,
+  .api-infos {
+     display: none;
+  }
+}
