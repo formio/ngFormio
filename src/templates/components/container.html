@@ -1,12 +1,5 @@
-<div class="panel panel-default" ng-controller="formioContainerComponent">
-  <div class="panel-heading" ng-init="component.hideLabel = true">
-    <h3 class="panel-title">{{ component.label}}</h3>
-  </div>
-  <div class="panel-body">
-    <div ng-repeat="containerData in data[component.key] track by $index">
-      <div ng-repeat="component in component.components">
-        <formio-component component="component" data="containerData" formio="formio" read-only="readOnly"></formio-component>
-      </div>
-    </div>
+<div ng-controller="formioContainerComponent" class="formio-container-component">
+  <div ng-repeat="containerData in data[component.key] track by $index">
+    <formio-component ng-repeat="component in component.components" component="component" data="containerData" formio="formio" read-only="readOnly"></formio-component>
   </div>
 </div>
