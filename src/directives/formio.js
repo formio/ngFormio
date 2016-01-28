@@ -70,6 +70,52 @@ module.exports = function() {
             }
           });
 
+          // Search the form for resource submission access defaults and build a permissions map.
+          var defaultPermissions = {};
+          _.forEach(components, function(component) {
+            if (component.type === 'resource' && component.key && component.defaultPermission) {
+              defaultPermissions[component.key] = component.defaultPermission;
+            }
+          });
+
+          _.forEach($scope._submission.data, function(data, key) {
+            var perm = _.get(defaultPermissions, key);
+            if (perm) {
+              submissionData.access = submissionData.access || [];
+
+              // Coerce data into an array for plucking.
+              if (!(data instanceof Array)) {
+                data = [data];
+              }
+
+              // Try to find and update an existing permission.
+              var found = false;
+              _.map(submissionData.access, function(permission) {
+                if (permission.type === perm) {
+                  found = true;
+                  permission.resources = permission.resources || [];
+                  permission.resources.concat(_.pluck(data, '_id'));
+                  permission.resources = _(permission.resources)
+                    .filter()
+                    .uniq()
+                    .value();
+                }
+              });
+
+              // Add a permission, because one was not found.
+              if (!found) {
+                submissionData.access.push({
+                  type: perm,
+                  resources: _(data)
+                    .pluck('_id')
+                    .filter()
+                    .uniq()
+                    .value()
+                });
+              }
+            }
+          });
+
           // Called when a submission has been made.
           var onSubmitDone = function(method, submission) {
             $scope.showAlerts({
