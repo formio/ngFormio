@@ -293,7 +293,7 @@ $project-header-color: lighten($brand-primary, 55%);
         background-color: darken($brand-primary, 20%);
         & > a, & > a:focus {
           background-color: darken($brand-primary, 5%);
-          border-right: solid $brand-secondary 8px;
+          border-right: solid lighten($brand-primary, 15%) 8px;
         }
       }
     }
