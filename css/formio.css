@@ -124,3 +124,11 @@ input[type="password"][draggable="true"] {
 .form-field-type-datagrid .datagrid-add {
   margin-bottom: 20px;
 }
+
+.form-field-type-datetime .input-group,
+.form-field-type-datetime .input-group-btn {
+  width: 100%;
+}
+.form-field-type-datetime .input-group-btn {
+  width: auto;
+}
