@@ -124,6 +124,15 @@
       <p ng-if="currentProject.plan === 'basic'">Upgrade your project to enable CORS.</p>
     </div>
     <div class="panel panel-default">
+      <div class="panel-heading">Preview</div>
+      <div class="panel-body">
+        <label for="preview-repo" class="control-label">Preview Git Repo</label>
+        <input type="text" class="form-control" id="preview-repo" ng-model="currentProject.settings.preview.repo" placeholder="The git repository for the preview app." />
+        <label for="preview-repo" class="control-label">Preview App Url</label>
+        <input type="text" class="form-control" id="preview-url" ng-model="currentProject.settings.preview.url" placeholder="The app url for the preview app." />
+      </div>
+    </div>
+    <div class="panel panel-default">
       <div class="panel-heading">Export Project</div>
       <div class="panel-body">
         <p>The following button will export your project as a JSON file that can then be used as a template for other projects.</p>

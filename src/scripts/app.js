@@ -25,7 +25,8 @@ angular
     'kendo.directives',
     'truncate',
     'ngFileUpload',
-    'ngDialog'
+    'ngDialog',
+    'swaggerUi'
   ])
   .config([
     '$stateProvider',
@@ -121,7 +122,15 @@ angular
           abstract: true,
           url: '/project/:projectId',
           controller: 'ProjectController',
-          templateUrl: 'views/project/project.html'
+          templateUrl: 'views/project/project.html',
+          params: {
+            showWelcomeModal: false
+          }
+        })
+        .state('project.home', {
+          url: '/home',
+          controller: 'ProjectHomeController',
+          templateUrl: 'views/project/home.html'
         })
         .state('createProject', {
           url: '/create/project',
@@ -131,7 +140,10 @@ angular
         .state('project.data', {
           url: '/data',
           templateUrl: 'views/data/index.html',
-          controller: 'ProjectDataController'
+          controller: 'ProjectDataController',
+          params: {
+            graphType: 'Month'
+          }
         })
         .state('project.formio', {
           url: '/formio',
@@ -150,6 +162,9 @@ angular
               $sce,
               $location
             ) {
+              $scope.currentSection.title = 'Preview';
+              $scope.currentSection.icon = 'fa fa-laptop';
+              $scope.currentSection.help = 'https://help.form.io/embedding/';
               $scope.previewUrl = '';
               $scope.repo = '';
               $scope.hasTemplate = true;
@@ -471,8 +486,7 @@ angular
         if (!$scope.submitted) {
           $scope.submitted = true;
           FormioProject.createProject(template).then(function(project) {
-            localStorage.setItem('showWelcome', 1);
-            $state.go('project.resource.index', {projectId: project._id});
+            $state.go('project.home', {projectId: project._id, showWelcomeModal: true});
           });
         }
       };
@@ -621,7 +635,7 @@ angular
       });
 
       $rootScope.goToProject = function(project) {
-        $state.go('project.resource.index', {projectId: project._id});
+        $state.go('project.home', {projectId: project._id});
       };
 
       $rootScope.getPreviewURL = function(project) {

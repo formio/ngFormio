@@ -1,34 +1,26 @@
 <div class="project-sidebar sidebar">
   <ul class="nav nav-sidebar">
+    <li ng-class="{active: isActive('project.home')}"><a ui-sref="project.home"><i class="fa fa-dashboard"></i><br/><span>Dashboard</span></a></li>
     <li ng-class="{active: isActive('project.resource') && !isActive('project.form.form.submission')}"><a ui-sref="project.resource.index"><i class="fa fa-database"></i><br/><span>Resources</span></a></li>
     <li ng-class="{active: isActive('project.form')}"><a ui-sref="project.form.index"><i class="fa fa-tasks"></i><br/><span>Forms</span></a></li>
     <li ng-class="{active: isActive('project.data')}"><a ui-sref="project.data"><i class="fa fa-table"></i><br/><span>Data</span></a></li>
     <li ng-if="currentProject._id === '553db92f72f702e714dd9778'" ng-class="{active: isActive('project.formio')}"><a ui-sref="project.formio"><i class="glyphicon glyphicon-globe"></i><br/><span>Form.io</span></a></li>
-    <li ng-class="{active: isActive('project.api')}"><a ui-sref="project.api"><img src="images/swagger-logo.png" style="width:50%;" /><br/><span>API</span></a></li>
+    <li ng-class="{active: isActive('project.api')}"><a ui-sref="project.api"><img src="images/swagger-logo.png" style="width:2em;" /><br/><span>API</span></a></li>
     <li ng-class="{active: isActive('project.preview')}"><a ui-sref="project.preview"><i class="fa fa-laptop"></i><br/><span>Preview</span></a></li>
     <li ng-show="projectSettingsVisible()" ng-class="{active: isActive('project.settings')}"><a ui-sref="project.settings" id="nav-bar-settings-link"><i class="fa fa-cogs"></i><br/><span>Settings</span></a></li>
   </ul>
 </div>
 
 <div class="project-main">
-  <div class="row project-nav">
-    <div class="col-md-8 col-sm-6">
-      <ul class="list-inline project-title-section">
-        <li><div class="project-title ellipsis"><a ui-sref="project.settings" class="project-title-link">{{ currentProject.title }}</a></div></li>
-        <li class="project-swagger-item"><a ui-sref="project.api" class="label label-default project-swagger-button">https://{{ currentProject.name }}.form.io</a></li>
-      </ul>
-      <div class="project-description">{{ currentProject.description }}</div>
-    </div>
-    <div class="col-md-2 col-sm-3 project-header-block">
-      <h5>Requests:&nbsp;&nbsp;<small>{{ currentProject.apiCalls.used | number }} / {{ getAPICallsLimit(currentProject.apiCalls) }}</small></h5>
-      <div class="progress project-requests-progress">
-        <div class="progress-bar" role="progressbar" ng-style="{width: getAPICallsPercent(currentProject.apiCalls)}" ng-class="getProgressBarClass(currentProject.apiCalls)"></div>
-      </div>
-    </div>
-    <div class="col-md-2 col-sm-3 project-header-block">
-      <h5>Current Plan:&nbsp;&nbsp;<div class="label label-primary" id="project-plan-display">{{ getPlanName(currentProject.plan) }}</div></h5>
-      <a ng-click="showUpgradeDialog(currentProject)" ng-disabled="!isProjectOwner(currentProject)" class="btn btn-default btn-block pull-right upgrade-plan-header-button">Upgrade Plan</a>
-    </div>
+  <div class="project-section-header">
+    <a class="btn btn-primary pull-right project-section-header-button" ng-href="{{ currentSection.help || 'https://help.form.io/' }}" target="_blank"><i class="fa fa-life-ring"></i> Help</a>
+    <a class="btn btn-primary pull-right project-section-header-button" href="" ng-click="showUpgradeDialog(currentProject)">Upgrade Project</a>
+    <!-- TODO: set the helpUrl -->
+    <ul class="list-inline">
+      <li><h2 class="project-title"><a ui-sref="project.home">{{ currentProject.title }}</a></h2></li>
+      <li ng-if="currentSection.title"><h2>›</h2></li>
+      <li ng-if="currentSection.title"><h2><i class="{{ currentSection.icon }}"></i> {{ currentSection.title }}</h2></li>
+    </ul>
   </div>
   <div class="project-content" ui-view></div>
 </div>
@@ -38,10 +30,9 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="projectWelcomeModalLabel">Your application is ready to go!</h4>
+        <h4 class="modal-title" id="projectWelcomeModalLabel">Congratulations! You have just created a working Web application using Form.io!</h4>
       </div>
       <div class="modal-body">
-        <div class="alert alert-info"><p>Congratulations! You have just created a working Web application using Form.io.</p></div>
         <p>All of the <strong>Resources</strong> and <strong>Forms</strong> serve as the API platform as well as Form interface for your web application. Here is what you need to know to get started.</p>
         <table class="table table-striped">
           <tbody>
@@ -62,11 +53,12 @@
               <td>Preview your working application, as well as download it for <strong>Local Development</strong></td>
             </tr>
             <tr>
-              <td><span>API</span></td>
+              <td><i class="fa fa-code"></i><br><span>API</span></td>
               <td>Provides the API documentation using Swagger.IO</td>
             </tr>
           </tbody>
         </table>
+        <p>Please refer to our <a href="https://help.form.io">help guides</a> for more information.</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Got it!</button>

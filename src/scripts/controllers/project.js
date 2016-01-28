@@ -1,5 +1,7 @@
 'use strict';
 
+/* globals NumberAbbreviate */
+
 var app = angular.module('formioApp.controllers.project', ['angular-chartist']);
 
 /*
@@ -144,8 +146,7 @@ app.controller('ProjectCreateController', [
 
     $scope.saveProject = function() {
       FormioProject.createProject($scope.currentProject).then(function(project) {
-        localStorage.setItem('showWelcome', 1);
-        $state.go('project.resource.index', {projectId: project._id});
+        $state.go('project.home', {projectId: project._id, showWelcomeModal: true});
       });
     };
   }
@@ -176,12 +177,13 @@ app.controller('ProjectController', [
     ProjectUpgradeDialog,
     $q
   ) {
-    $rootScope.activeSideBar = 'projects';
-    $rootScope.noBreadcrumb = false;
-    if (parseInt(localStorage.getItem('showWelcome'), 10)) {
-      localStorage.setItem('showWelcome', 0);
+    if ($stateParams.showWelcomeModal) {
       $('#project-welcome-modal').modal('show');
     }
+
+    $scope.currentSection = {};
+    $rootScope.activeSideBar = 'projects';
+    $rootScope.noBreadcrumb = false;
 
     $scope.token = Formio.getToken();
     $scope.resourcesLoading = true;
@@ -254,6 +256,11 @@ app.controller('ProjectController', [
           return (_.intersection(allRoles, potential).length > 0);
         };
 
+        $scope.projectPermissions = {
+          read: true,
+          write: true,
+          admin: true
+        };
         if (_.has($scope.user, '_id') && _.has($scope.currentProject, 'owner') &&  ($scope.user._id === $scope.currentProject.owner)) {
           highestRole = 'owner';
         }
@@ -262,9 +269,12 @@ app.controller('ProjectController', [
         }
         else if (hasRoles('team_write')) {
           highestRole = 'team_write';
+          $scope.projectPermissions.admin = false;
         }
         else if (hasRoles('team_read')) {
           highestRole = 'team_read';
+          $scope.projectPermissions.admin = false;
+          $scope.projectPermissions.write = false;
         }
         else {
           highestRole = 'anonymous';
@@ -301,8 +311,7 @@ app.controller('ProjectController', [
     };
 
     $scope.getSwaggerURL = function(format) {
-      format = format || 'html';
-      return AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/spec.' + format + '?token=' + Formio.getToken();
+      return AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/spec.json';
     };
 
     $scope.getPlanName = ProjectPlans.getPlanName.bind(ProjectPlans);
@@ -314,17 +323,189 @@ app.controller('ProjectController', [
   }
 ]);
 
-app.controller('ProjectDataController', [
+app.controller('ProjectHomeController', [
   '$scope',
   'AppConfig',
   'Formio',
+  'FormioAlerts',
+  'ProjectAnalytics',
   'moment',
   function(
     $scope,
     AppConfig,
     Formio,
+    FormioAlerts,
+    ProjectAnalytics,
     moment
   ) {
+    $scope.currentSection.title = 'Dashboard';
+    $scope.currentSection.icon = 'fa fa-dashboard';
+    $scope.currentSection.help = '';
+    var formio = new Formio(AppConfig.apiBase + '/project/' + $scope.currentProject._id);
+
+    formio.loadForms({
+      params: {
+        limit: Number.MAX_SAFE_INTEGER // Don't limit results
+      }
+    })
+    .then(function(forms) {
+      $scope.forms = forms;
+    })
+    .catch(FormioAlerts.onError.bind(FormioAlerts));
+
+    var abbreviator = new NumberAbbreviate();
+
+    var now = new Date();
+    now = {
+      year: now.getUTCFullYear(),
+      month: (now.getUTCMonth() + 1),
+      day: now.getUTCDate()
+    };
+
+    $scope.chartOptions = {
+      height: '130px',
+      low: 0,
+      lineSmooth: false,
+      showPoint: false,
+      showArea: true,
+      fullWidth: true,
+      axisX: {
+        showLabel: false,
+        showGrid: false
+      },
+      axisY: {
+        showLabel: false,
+        showGrid: false
+      }
+    };
+
+    ProjectAnalytics.getSubmissionAnalytics($scope.currentProject._id, now.year)
+    .then(function(data) {
+      $scope.submissionTotalYear = abbreviator.abbreviate(_(data)
+      .map('submissions')
+      .sum(), 0);
+      $scope.submissionDataYear = {
+        labels: _(data)
+          .map('month')
+          .map(function(month) { return _.add(month, 1); })
+          .value(),
+        series: [
+          _.map(data, 'submissions')
+        ]
+      };
+    });
+    ProjectAnalytics.getSubmissionAnalytics($scope.currentProject._id, now.year, now.month)
+    .then(function(data) {
+      $scope.submissionTotalMonth = abbreviator.abbreviate(_(data)
+      .map('submissions')
+      .sum(), 0);
+      $scope.submissionDataMonth = {
+        labels: _(data)
+          .map('day')
+          .map(function(day) { return _.add(day, 1); })
+          .value(),
+        series: [
+          _.map(data, 'submissions')
+        ]
+      };
+    });
+    ProjectAnalytics.getSubmissionAnalytics($scope.currentProject._id, now.year, now.month, now.day)
+    .then(function(data) {
+      $scope.submissionTotalToday = abbreviator.abbreviate(_(data)
+      .map('submissions')
+      .sum(), 0);
+      $scope.submissionDataToday = {
+        labels: _(data)
+          .map('hour')
+          .map(function(hour) { return _.add(hour, 1); })
+          .value(),
+        series: [
+          _.map(data, 'submissions')
+        ]
+      };
+    });
+
+    $scope.hasTeams = function() {
+      return $scope.currentProject.plan === 'team' || $scope.currentProject.plan === 'commercial';
+    };
+
+    $scope.getLastModified = function() {
+      return _($scope.forms || [])
+      .concat($scope.currentProjectRoles || [])
+      .concat($scope.currentProject || {})
+      .map(function(item) {
+        return new Date(item.modified);
+      })
+      .max();
+    };
+  }
+]);
+
+app.factory('ProjectAnalytics', [
+  '$http',
+  'AppConfig',
+  function(
+    $http,
+    AppConfig
+  ) {
+      return {
+        getSubmissionAnalytics: function(project, year, month, day) {
+          var url = AppConfig.apiBase + '/project/' + project + '/analytics/year/' + year;
+          if (month !== undefined && month !== null) {
+            url += '/month/' + month;
+          }
+          if (day !== undefined && day !== null) {
+            url += '/day/' + day;
+          }
+          return $http.get(url)
+          .then(function(response) {
+            if(day === undefined || day === null) {
+              return response.data;
+            }
+
+            // Convert a single day's submission data to the same format as the month and year requests
+            var submissions = response.data.submissions;
+
+            // Default each hr to have no submissions.
+            var data = _(0).range(24)
+            .map(function(hr) {
+              return {
+                hour: hr,
+                submissions: 0
+              };
+            })
+            .value();
+
+            // Go through raw timestamps and add them to the right hour entry
+            _.forEach(submissions, function(timestamp) {
+              var date = new Date(parseInt(timestamp));
+              data[date.getUTCHours()].submissions += 1;
+            });
+
+            return data;
+          });
+        }
+      };
+  }
+]);
+
+app.controller('ProjectDataController', [
+  '$scope',
+  '$stateParams',
+  'Formio',
+  'ProjectAnalytics',
+  'moment',
+  function(
+    $scope,
+    $stateParams,
+    Formio,
+    ProjectAnalytics,
+    moment
+  ) {
+    $scope.currentSection.title = 'Data';
+    $scope.currentSection.icon = 'fa fa-table';
+    $scope.currentSection.help = '';
+
     // Get the current time.
     var curr = new Date();
     $scope.viewDate = {
@@ -393,7 +574,7 @@ app.controller('ProjectDataController', [
 
       if(type === 'year') {
         $scope.analyticsLoading = true;
-        Formio.request(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/analytics/year/' + _y, 'GET')
+        ProjectAnalytics.getSubmissionAnalytics($scope.currentProject._id, _y)
           .then(function(data) {
             $scope.currentType = type;
             $scope.analytics = {
@@ -406,12 +587,11 @@ app.controller('ProjectDataController', [
             };
 
             $scope.analyticsLoading = false;
-            $scope.$apply();
           });
       }
       else if(type === 'month') {
         $scope.analyticsLoading = true;
-        Formio.request(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/analytics/year/' + _y + '/month/' + _m, 'GET')
+        ProjectAnalytics.getSubmissionAnalytics($scope.currentProject._id, _y, _m)
           .then(function(data) {
             $scope.currentType = type;
             $scope.analytics = {
@@ -424,7 +604,6 @@ app.controller('ProjectDataController', [
             };
 
             $scope.analyticsLoading = false;
-            $scope.$apply();
           });
       }
       else if(type === 'day') {
@@ -481,37 +660,23 @@ app.controller('ProjectDataController', [
           return local;
         };
 
-        Formio.request(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/analytics/year/' + _y + '/month/' + _m + '/day/' + _d, 'GET')
+        ProjectAnalytics.getSubmissionAnalytics($scope.currentProject._id, _y, _m, _d)
           .then(function(data) {
             $scope.currentType = type;
-            var utcHrs = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23];
             var displayHrs = calculateLocalTimeLabels(_y, _m, _d);
-
-            // Default each hr to have no submissions.
-            var parsedData = [];
-            _.forEach(utcHrs, function(hr) {
-              parsedData[hr] = 0;
-            });
-
-            // Convert the raw timestamps into hours that they occurred in.
-            _.forEach(data.submissions, function(_event) {
-              var temp = new Date(parseInt(_event));
-              parsedData[temp.getUTCHours()] = parsedData[temp.getUTCHours()] + 1;
-            });
 
             $scope.analytics = {
               labels: displayHrs,
-              series: [parsedData]
+              series: [_.pluck(data, 'submissions')]
             };
 
             $scope.analyticsLoading = false;
-            $scope.$apply();
           });
       }
     };
 
     // Simple ui tools to aid in switching the default view.
-    $scope.graphType = 'Month';
+    $scope.graphType = $stateParams.graphType;
     $scope.types = ['Year', 'Month', 'Day'];
     $scope.graphChange = function() {
       $scope.displayView(($scope.graphType || '').toLowerCase());
@@ -530,6 +695,9 @@ app.controller('ProjectFormioController', [
     AppConfig,
     $window
   ) {
+    $scope.currentSection.title = 'Admin Data';
+    $scope.currentSection.icon = 'glyphicon glyphicon-globe';
+    $scope.currentSection.help = '';
     $scope.views = ['Overview', 'Usage', 'Users', 'Projects'];
     $scope.view = $scope.views[0];
     $scope.showDaily = false;
@@ -883,6 +1051,9 @@ app.controller('ProjectSettingsController', [
     GoogleAnalytics,
     FormioAlerts
   ) {
+    $scope.currentSection.title = 'Settings';
+    $scope.currentSection.icon = 'fa fa-cogs';
+    $scope.currentSection.help = 'https://help.form.io/userguide/#settings-project';
     // Go to first settings section
     if($state.current.name === 'project.settings') {
       $state.go('project.settings.project', {location: 'replace'});
