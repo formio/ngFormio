@@ -5,7 +5,6 @@ var plugins = require('gulp-load-plugins')();
 plugins.source = require('vinyl-source-stream');
 plugins.browserify = require('browserify');
 plugins.watchify = require('watchify');
-plugins.combine = require('stream-combiner2');
 plugins.runSeq = require('run-sequence');
 
 gulp.task('clean', require('del').bind(null, ['dist']));
@@ -17,4 +16,4 @@ gulp.task('build', function(cb) {
   plugins.runSeq(['clean', 'eslint'], 'scripts', cb)
 });
 gulp.task('watch', require('./gulp/scripts')(gulp, plugins, true));
-gulp.task('default', ['build', 'watch']);
+gulp.task('default', ['watch']);
