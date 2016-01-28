@@ -251,27 +251,15 @@ app.controller('FormController', [
     // Load the form.
     if($scope.formId) {
       $scope.loadFormPromise = $scope.formio.loadForm().then(function(form) {
-        // Get the submission resource access information.
-        form.submissionResourceAccess = _(form.submissionResourceAccess || [])
-          .map(function(permission) {
-            if (permission.resources) {
-              permission.resources = _(permission.resources)
-                .filter()
-                .uniq()
-                .value();
-            }
-
-            return permission;
-          })
-          .value();
-
+        // Build the list of selectable resources for the submission resource access ui.
         $scope.currentFormResources = _(FormioUtils.flattenComponents(form.components))
           .filter({type: 'resource'})
           .map(function(component) {
             return {
               label: component.label || '',
-              _id: component.resource || ''
-            }
+              key: component.key || '',
+              defaultPermission: component.defaultPermission || ''
+            };
           })
           .value();
 
@@ -325,6 +313,7 @@ app.controller('FormController', [
     // Save a form.
     $scope.saveForm = function() {
       angular.element('.has-error').removeClass('has-error');
+
       $scope.formio.saveForm(angular.copy($scope.form)) // Copy to remove angular $$hashKey
       .then(function(form) {
         var method = $stateParams.formId ? 'updated' : 'created';

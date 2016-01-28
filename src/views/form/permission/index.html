@@ -28,7 +28,7 @@
       User Resource Permissions allow you to give a specific resource access to a single submission. The resource type is chosen here, and the resource itself is selected on the Submission.
     </div>
     <div ng-if="form._id">
-      <resource-permission-editor permissions="form.submissionResourceAccess" labels="resourceAccessLabels" resources="currentFormResources" wait-for="loadFormPromise"></resource-permission-editor>
+      <resource-permission-editor labels="resourceAccessLabels" resources="currentFormResources" wait-for="loadFormPromise" form="form"></resource-permission-editor>
     </div>
   </div>
 </div>

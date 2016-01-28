@@ -101,24 +101,74 @@ app.directive('permissionEditor', ['$q', function($q) {
   };
 }]);
 
-app.directive('resourcePermissionEditor', ['$q', function($q) {
+app.directive('resourcePermissionEditor', ['$q', 'FormioUtils', function($q, FormioUtils) {
   var PERMISSION_TYPES = ['read', 'write', 'admin'];
 
   return {
     scope: {
       resources: '=',
-      permissions: '=',
       labels: '=',
-      waitFor: '='
+      waitFor: '=',
+      form: '='
     },
     restrict: 'E',
     templateUrl: 'views/project/access/resource-permission-editor.html',
     link: function($scope) {
+      // Maintain a list of unique resources.
+      $scope.uniqueResources = _($scope.resources)
+        .where({defaultPermission: ''})
+        .pluck('key')
+        .uniq()
+        .value();
+      $scope.addSelected = function(change, val) {
+        _.map(FormioUtils.flattenComponents($scope.form.components), function(component) {
+          if (component.key === change.key) {
+            component.defaultPermission = val;
+          }
+        });
+
+        $scope.uniqueResources = _($scope.uniqueResources)
+          .without(change.key)
+          .uniq()
+          .value();
+      };
+      $scope.removeSelected = function(change, val) {
+        _.map(FormioUtils.flattenComponents($scope.form.components), function(component) {
+          if (component.key === change.key) {
+            component.defaultPermission = val;
+          }
+        });
+
+        $scope.uniqueResources.push(change.key);
+        $scope.uniqueResources = _($scope.uniqueResources)
+          .uniq()
+          .value();
+      };
+
+      var permissions = [];
       // Fill in missing permissions / enforce order
       ($scope.waitFor || $q.when()).then(function() {
+        // Iterate the current resources and populate the known permissions.
+        _.forEach($scope.resources, function(component) {
+          if (component.defaultPermission && component.key) {
+            var perm = _.find(permissions, {type: component.defaultPermission});
+
+            if (perm && _.has(perm, 'resources')) {
+              perm.resources.push(component.key);
+            }
+            else {
+              permissions.push({
+                type: component.defaultPermission,
+                resources: [component.key]
+              });
+            }
+          }
+        });
+
+        // Ensure all the permission fields are available.
         var tempPerms = [];
         _.each(PERMISSION_TYPES, function(type) {
-          var existingPerm = _.find($scope.permissions, {type: type});
+          var existingPerm = _.find(permissions, {type: type});
           tempPerms.push(existingPerm || {
               type: type,
               resources: []
@@ -126,11 +176,11 @@ app.directive('resourcePermissionEditor', ['$q', function($q) {
         });
 
         // Replace permissions with complete set of permissions
-        $scope.permissions.splice.apply($scope.permissions, [0, $scope.permissions.length].concat(tempPerms));
+        permissions.splice.apply(permissions, [0, permissions.length].concat(tempPerms));
       });
 
       $scope.getPermissionsToShow = function() {
-        return $scope.permissions.filter($scope.shouldShowPermission);
+        return permissions.filter($scope.shouldShowPermission);
       };
 
       $scope.shouldShowPermission = function(permission) {
