@@ -17,7 +17,7 @@
     <a class="btn btn-primary pull-right project-section-header-button" href="" ng-click="showUpgradeDialog(currentProject)">Upgrade Project</a>
     <!-- TODO: set the helpUrl -->
     <ul class="list-inline">
-      <li><h2><a ui-sref="project.home">{{ currentProject.title }}</a></h2></li>
+      <li><h2 class="project-title"><a ui-sref="project.home">{{ currentProject.title }}</a></h2></li>
       <li ng-if="currentSection.title"><h2>›</h2></li>
       <li ng-if="currentSection.title"><h2><i class="{{ currentSection.icon }}"></i> {{ currentSection.title }}</h2></li>
     </ul>
