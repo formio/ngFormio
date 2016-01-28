@@ -1,30 +1,35 @@
 var app = angular.module('formio');
 
+// Basic
 require('./components')(app);
 require('./textfield')(app);
 require('./number')(app);
 require('./password')(app);
-require('./email')(app);
-require('./phonenumber')(app);
 require('./textarea')(app);
-require('./datetime')(app);
-require('./address')(app);
 require('./checkbox')(app);
 require('./selectboxes')(app);
 require('./select')(app);
-require('./resource')(app);
 require('./radio')(app);
-require('./button')(app);
-require('./content')(app);
 require('./htmlelement')(app);
-require('./file')(app);
+require('./content')(app);
+require('./button')(app);
+
+// Special
+require('./email')(app);
+require('./phonenumber')(app);
+require('./address')(app);
+require('./datetime')(app);
 require('./hidden')(app);
+require('./resource')(app);
+require('./file')(app);
 require('./signature')(app);
-require('./datagrid')(app);
 require('./custom')(app);
 
+// Layout
 require('./columns')(app);
 require('./fieldset')(app);
+require('./container')(app);
+require('./datagrid')(app);
 require('./page')(app);
 require('./panel')(app);
 require('./table')(app);

@@ -7,6 +7,7 @@ module.exports = function (app) {
       formioComponentsProvider.register('datagrid', {
         title: 'Data Grid',
         template: 'formio/components/datagrid.html',
+        group: 'layout',
         settings: {
           input: true,
           tree: true,

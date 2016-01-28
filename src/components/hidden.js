@@ -7,6 +7,7 @@ module.exports = function (app) {
       formioComponentsProvider.register('hidden', {
         title: 'Hidden',
         template: 'formio/components/hidden.html',
+        group: 'advanced',
         settings: {
           input: true,
           tableView: true,
