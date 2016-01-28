@@ -1,5 +1,3 @@
 <div ng-controller="formioContainerComponent" class="formio-container-component">
-  <div ng-repeat="containerData in data[component.key] track by $index">
-    <formio-component ng-repeat="component in component.components" component="component" data="containerData" formio="formio" read-only="readOnly"></formio-component>
-  </div>
+  <formio-component ng-repeat="component in component.components" component="component" data="data[parentKey]" formio="formio" read-only="readOnly"></formio-component>
 </div>

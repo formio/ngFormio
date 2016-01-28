@@ -24,7 +24,8 @@ module.exports = function(app) {
   app.controller('formioContainerComponent', [
     '$scope',
     function($scope) {
-      $scope.data[$scope.component.key] = $scope.data[$scope.component.key] || [{}];
+      $scope.data[$scope.component.key] = $scope.data[$scope.component.key] || {};
+      $scope.parentKey = $scope.component.key;
     }
   ]);
   app.run([
