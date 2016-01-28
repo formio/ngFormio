@@ -15,5 +15,5 @@ gulp.task('scripts', ['scripts:formio', 'scripts:formio-full']);
 gulp.task('build', function(cb) {
   plugins.runSeq(['clean', 'eslint'], 'scripts', cb)
 });
-gulp.task('watch', require('./gulp/scripts')(gulp, plugins, true));
+gulp.task('watch', require('./gulp/watch')(gulp, plugins));
 gulp.task('default', ['watch']);
