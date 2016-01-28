@@ -38,7 +38,7 @@
 .has-feedback .form-control.ui-select-toggle {
   padding-right: 20px;
 }
-.ui-select-placeholder, .ui-select-match-text {
+.ui-select-placeholder, .ui-select-match-text, .ui-select-match-item {
   width: 100%;
   margin-right: -15px;
   overflow-x: hidden;
