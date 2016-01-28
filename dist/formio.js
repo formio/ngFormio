@@ -3812,6 +3812,7 @@ module.exports = function (app) {
         tableView: function (data) {
           return data ? data.formatted_address : '';
         },
+        group: 'advanced',
         settings: {
           input: true,
           tableView: true,
@@ -4069,7 +4070,10 @@ module.exports = function (app) {
     var components = {};
     var groups = {
       __component: {
-        title: 'Form Components'
+        title: 'Basic Components'
+      },
+      advanced: {
+        title: 'Special Components'
       },
       layout: {
         title: 'Layout Components'
@@ -4131,6 +4135,7 @@ module.exports = function(app) {
         title: 'Container',
         template: 'formio/components/container.html',
         group: 'layout',
+        icon: 'fa fa-folder-open',
         settings: {
           input: true,
           tree: true,
@@ -4201,6 +4206,7 @@ module.exports = function (app) {
       formioComponentsProvider.register('custom', {
         title: 'Custom',
         template: 'formio/components/custom.html',
+        group: 'advanced',
         settings: {}
       });
     }
@@ -4226,6 +4232,7 @@ module.exports = function (app) {
       formioComponentsProvider.register('datagrid', {
         title: 'Data Grid',
         template: 'formio/components/datagrid.html',
+        group: 'advanced',
         settings: {
           input: true,
           tree: true,
@@ -4282,6 +4289,7 @@ module.exports = function (app) {
         tableView: function(data) {
           return '<span>{{ "' + data + '" | date: "' + this.settings.format + '" }}</span>';
         },
+        group: 'advanced',
         settings: {
           input: true,
           tableView: true,
@@ -4341,6 +4349,7 @@ module.exports = function (app) {
       formioComponentsProvider.register('email', {
         title: 'Email',
         template: 'formio/components/textfield.html',
+        group: 'advanced',
         settings: {
           input: true,
           tableView: true,
@@ -4402,6 +4411,7 @@ module.exports = function (app) {
       formioComponentsProvider.register('file', {
         title: 'File',
         template: 'formio/components/file.html',
+        group: 'advanced',
         settings: {
           input: true,
           tableView: true,
@@ -4554,6 +4564,7 @@ module.exports = function (app) {
       formioComponentsProvider.register('hidden', {
         title: 'Hidden',
         template: 'formio/components/hidden.html',
+        group: 'advanced',
         settings: {
           input: true,
           tableView: true,
@@ -4659,32 +4670,36 @@ module.exports = function (app) {
 "use strict";
 var app = angular.module('formio');
 
+// Basic
 require('./components')(app);
 require('./textfield')(app);
 require('./number')(app);
 require('./password')(app);
-require('./email')(app);
-require('./phonenumber')(app);
 require('./textarea')(app);
-require('./datetime')(app);
-require('./address')(app);
 require('./checkbox')(app);
 require('./selectboxes')(app);
 require('./select')(app);
-require('./resource')(app);
 require('./radio')(app);
-require('./button')(app);
-require('./content')(app);
 require('./htmlelement')(app);
-require('./file')(app);
+require('./content')(app);
+require('./button')(app);
+
+// Special
+require('./email')(app);
+require('./phonenumber')(app);
+require('./address')(app);
+require('./datetime')(app);
 require('./hidden')(app);
-require('./signature')(app);
+require('./resource')(app);
+require('./file')(app);
 require('./datagrid')(app);
-require('./container')(app);
+require('./signature')(app);
 require('./custom')(app);
 
+// Layout
 require('./columns')(app);
 require('./fieldset')(app);
+require('./container')(app);
 require('./page')(app);
 require('./panel')(app);
 require('./table')(app);
@@ -4836,6 +4851,7 @@ module.exports = function (app) {
       formioComponentsProvider.register('phoneNumber', {
         title: 'Phone Number',
         template: 'formio/components/textfield.html',
+        group: 'advanced',
         settings: {
           input: true,
           tableView: true,
@@ -4945,6 +4961,7 @@ module.exports = function (app) {
             $scope.refreshSubmissions();
           }
         },
+        group: 'advanced',
         settings: {
           input: true,
           tableView: true,
@@ -5272,6 +5289,7 @@ module.exports = function (app) {
         tableView: function (data) {
           return data ? 'Yes' : 'No';
         },
+        group: 'advanced',
         settings: {
           input: true,
           tableView: true,
@@ -5491,6 +5509,7 @@ module.exports = function (app) {
       formioComponentsProvider.register('textfield', {
         title: 'Text Field',
         template: 'formio/components/textfield.html',
+        icon: 'fa fa-terminal',
         settings: {
           input: true,
           tableView: true,

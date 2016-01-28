@@ -8,6 +8,7 @@ module.exports = function(app) {
         title: 'Container',
         template: 'formio/components/container.html',
         group: 'layout',
+        icon: 'fa fa-folder-open',
         settings: {
           input: true,
           tree: true,

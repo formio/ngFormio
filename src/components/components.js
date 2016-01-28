@@ -4,7 +4,10 @@ module.exports = function (app) {
     var components = {};
     var groups = {
       __component: {
-        title: 'Form Components'
+        title: 'Basic Components'
+      },
+      advanced: {
+        title: 'Special Components'
       },
       layout: {
         title: 'Layout Components'

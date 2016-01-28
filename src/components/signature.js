@@ -10,6 +10,7 @@ module.exports = function (app) {
         tableView: function (data) {
           return data ? 'Yes' : 'No';
         },
+        group: 'advanced',
         settings: {
           input: true,
           tableView: true,

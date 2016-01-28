@@ -34,6 +34,7 @@ module.exports = function (app) {
         tableView: function (data) {
           return data ? data.formatted_address : '';
         },
+        group: 'advanced',
         settings: {
           input: true,
           tableView: true,

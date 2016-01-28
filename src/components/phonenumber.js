@@ -6,6 +6,7 @@ module.exports = function (app) {
       formioComponentsProvider.register('phoneNumber', {
         title: 'Phone Number',
         template: 'formio/components/textfield.html',
+        group: 'advanced',
         settings: {
           input: true,
           tableView: true,

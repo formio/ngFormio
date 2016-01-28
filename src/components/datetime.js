@@ -10,6 +10,7 @@ module.exports = function (app) {
         tableView: function(data) {
           return '<span>{{ "' + data + '" | date: "' + this.settings.format + '" }}</span>';
         },
+        group: 'advanced',
         settings: {
           input: true,
           tableView: true,

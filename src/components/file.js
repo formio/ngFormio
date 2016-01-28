@@ -7,6 +7,7 @@ module.exports = function (app) {
       formioComponentsProvider.register('file', {
         title: 'File',
         template: 'formio/components/file.html',
+        group: 'advanced',
         settings: {
           input: true,
           tableView: true,
