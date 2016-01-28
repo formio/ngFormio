@@ -24,7 +24,8 @@
     "es6-promise": "~3.0.2",
     "bootstrap-sass": "~3.3.6",
     "ng-dialog": "~0.5.6",
-    "angular-swagger-ui": "~0.2.7"
+    "angular-swagger-ui": "~0.2.7",
+    "number-abbreviate": "~1.1.0"
   },
   "resolutions": {
     "angular": "~1.4.9",

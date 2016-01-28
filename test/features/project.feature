@@ -11,10 +11,9 @@ Feature: Project Functionality
     When I enter ${random-title>project1.title} in the #title field
     And I enter ${random-description>project1.description} in the #description field
     When I click on the Create Project button
-    And I see .alert with the text Congratulations! You have just created a working Web application using Form.io.
+    And I see .modal-title with the text Congratulations! You have just created a working Web application using Form.io!
     And I click on the Got it! button
     Then I am on the ${project1.title} project portal
-    And I see .project-description with the text ${project1.description}
     And I see #project-plan-display with the text Basic
 
   Scenario: Required title
@@ -37,7 +36,7 @@ Feature: Project Functionality
     And I see the plaintext Select a template
     When I enter ${random-title>project2.title} in the #title field
     And I click on the Create Project button
-    And I see .alert with the text Congratulations! You have just created a working Web application using Form.io.
+    And I see .modal-title with the text Congratulations! You have just created a working Web application using Form.io!
     And I click on the Got it! button
     Then I am on the ${project2.title} project portal
     And I see #project-plan-display with the text Basic
@@ -64,7 +63,6 @@ Feature: Project Functionality
     When I click on the Manage button
     Then I am on the ${project3.title} project portal
     When I click on the #nav-bar-settings-link element
-    And I see .project-section-header>p with the text Each project contains its own settings for configuring 3rd Party Interfaces, Database connections, Roles & Permissions, and more.
     And I see .alert.alert-success with the text Project Settings are encrypted for your protection.
 
   Scenario: Save project settings (no changes)
@@ -126,7 +124,7 @@ Feature: Project Functionality
     Then I see the plaintext Deleting a project will make it disappear forever! This cannot be undone, so make sure you really want to delete it.
     And I see a.btn.btn-danger with the text Delete
     And I click on the Delete link
-    Then I see h2 with the text Are you sure you wish to delete the Project
+    Then I see .project-section-inner-content h2 with the text Are you sure you wish to delete the Project
     And I see button.btn.btn-danger with the text Yes
     And I click the Yes button
     Then I see div.message with the text Project was deleted!

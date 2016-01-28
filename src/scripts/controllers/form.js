@@ -52,6 +52,9 @@ app.config([
             ) {
               $scope.formInfo = $state.current.data;
               $scope.infoTemplate = 'views/form/' + $scope.formInfo.type + '-info.html';
+              $scope.currentSection.title = _.capitalize($scope.formInfo.type) + 's';
+              $scope.currentSection.icon = ($scope.formInfo.type === 'form') ? 'fa fa-tasks' : 'fa fa-database';
+              $scope.currentSection.help = $scope.formInfo.help;
             }
           ],
           data: typeInfo[type]
@@ -1315,6 +1318,9 @@ app.controller('ApiController', [
     $state,
     Formio
   ) {
+    $scope.currentSection.title = 'API Explorer';
+    $scope.currentSection.icon = 'fa fa-code';
+    $scope.currentSection.help = '';
     $scope.token = Formio.getToken();
   }
 ]);
