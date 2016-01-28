@@ -236,7 +236,7 @@ app.controller('FormController', [
     $scope.formUrl += $stateParams.formId ? ('/' + $stateParams.formId) : '';
     var formType = $stateParams.formType || 'form';
     $scope.capitalize = _.capitalize;
-    $scope.form = {title: '', type: formType, components: [], access: [], submissionAccess: [], submissionResourceAccess: []};
+    $scope.form = {title: '', type: formType, components: [], access: [], submissionAccess: []};
 
     // Match name of form to title if not customized.
     $scope.titleChange = function(oldTitle) {
