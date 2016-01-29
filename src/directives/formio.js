@@ -70,16 +70,35 @@ module.exports = function() {
             }
           });
 
+          var grabIds = function(input) {
+            if (!input) {
+              return [];
+            }
+
+            if (!(input instanceof Array)) {
+              input = [input];
+            }
+
+            var final = [];
+            input.forEach(function(element) {
+              if (element && element._id) {
+                final.push(element._id);
+              }
+            });
+
+            return final;
+          };
+
           // Search the form for resource submission access defaults and build a permissions map.
           var defaultPermissions = {};
-          _.forEach(components, function(component) {
+          angular.forEach(components, function(component) {
             if (component.type === 'resource' && component.key && component.defaultPermission) {
               defaultPermissions[component.key] = component.defaultPermission;
             }
           });
 
-          _.forEach($scope._submission.data, function(data, key) {
-            var perm = _.get(defaultPermissions, key);
+          angular.forEach($scope._submission.data, function(data, key) {
+            var perm = defaultPermissions[key];
             if (perm) {
               submissionData.access = submissionData.access || [];
 
@@ -90,15 +109,11 @@ module.exports = function() {
 
               // Try to find and update an existing permission.
               var found = false;
-              _.map(submissionData.access, function(permission) {
+              submissionData.access.forEach(function(permission) {
                 if (permission.type === perm) {
                   found = true;
                   permission.resources = permission.resources || [];
-                  permission.resources.concat(_.pluck(data, '_id'));
-                  permission.resources = _(permission.resources)
-                    .filter()
-                    .uniq()
-                    .value();
+                  permission.resources.concat(grabIds(data));
                 }
               });
 
@@ -106,11 +121,7 @@ module.exports = function() {
               if (!found) {
                 submissionData.access.push({
                   type: perm,
-                  resources: _(data)
-                    .pluck('_id')
-                    .filter()
-                    .uniq()
-                    .value()
+                  resources: grabIds(data)
                 });
               }
             }
@@ -147,7 +158,8 @@ module.exports = function() {
 
           // If they wish to submit to the default location.
           else if ($scope.formio) {
-            $scope.formio.saveSubmission(angular.copy(submissionData), $scope.formioOptions) // copy to remove angular $$hashKey
+            // copy to remove angular $$hashKey
+            $scope.formio.saveSubmission(angular.copy(submissionData), $scope.formioOptions)
               .then(function(submission) {
               onSubmitDone(submission.method, submission);
             }, FormioScope.onError($scope, $element))
