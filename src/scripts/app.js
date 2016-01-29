@@ -310,10 +310,10 @@ angular
           templateUrl: 'views/import/index.html',
           controller: 'ImportExportController'
         })
-        .state('project.settings.googlesheets', {
-          url: '/googlesheets/googlesheet',
+        .state('project.settings.google', {
+          url: '/google',
           parent: 'project.settings',
-          templateUrl: 'views/project/googlesheet/googlesheet.html'
+          templateUrl: 'views/project/google/google.html'
         })
         .state('help', {
           url: '/help',
