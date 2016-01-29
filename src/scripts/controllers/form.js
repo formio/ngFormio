@@ -213,6 +213,7 @@ app.controller('FormController', [
   'FormioUtils',
   'AppConfig',
   'SubmissionAccessLabels',
+  'ResourceAccessLabels',
   'GoogleAnalytics',
   '$q',
   function(
@@ -225,6 +226,7 @@ app.controller('FormController', [
     FormioUtils,
     AppConfig,
     SubmissionAccessLabels,
+    ResourceAccessLabels,
     GoogleAnalytics,
     $q
   ) {
@@ -252,9 +254,22 @@ app.controller('FormController', [
     // Load the form.
     if($scope.formId) {
       $scope.loadFormPromise = $scope.formio.loadForm().then(function(form) {
+        // Build the list of selectable resources for the submission resource access ui.
+        $scope.currentFormResources = _(FormioUtils.flattenComponents(form.components))
+          .filter({type: 'resource'})
+          .map(function(component) {
+            return {
+              label: component.label || '',
+              key: component.key || '',
+              defaultPermission: component.defaultPermission || ''
+            };
+          })
+          .value();
+
         $scope.form = form;
         $rootScope.currentForm = $scope.form;
       }, FormioAlerts.onError.bind(FormioAlerts));
+
       $scope.formio.loadActions().then(function(actions) {
         // Get the available actions for the form, to check if premium actions are present.
         $scope.formio.availableActions().then(function(available) {
@@ -277,6 +292,8 @@ app.controller('FormController', [
       $scope.loadFormPromise = $q.when();
     }
     $scope.submissionAccessLabels = SubmissionAccessLabels;
+    $scope.resourceAccessLabels = ResourceAccessLabels;
+
     // Get the swagger URL.
     $scope.getSwaggerURL = function(format) {
       return AppConfig.apiBase + '/project/' + $scope.projectId + '/form/' + $scope.formId + '/spec.json';
@@ -298,6 +315,7 @@ app.controller('FormController', [
     // Save a form.
     $scope.saveForm = function() {
       angular.element('.has-error').removeClass('has-error');
+
       $scope.formio.saveForm(angular.copy($scope.form)) // Copy to remove angular $$hashKey
       .then(function(form) {
         var method = $stateParams.formId ? 'updated' : 'created';
@@ -1306,6 +1324,21 @@ app.constant('SubmissionAccessLabels', {
   'delete_own': {
     label: 'Delete Own Submissions',
     tooltip: 'The Delete Own Submissions permission will allow a user, with one of the given Roles, to delete a Submission. A user can only delete a Submission if they are defined as its owner.'
+  }
+});
+
+app.constant('ResourceAccessLabels', {
+  'read': {
+    label: 'Read',
+    tooltip: 'The Read permission will allow a resource, defined in the submission, to read all of the submission data.'
+  },
+  'write': {
+    label: 'Write',
+    tooltip: 'The Write permission will allow a resource, defined in the submission, to read all of the submission data and edit all of the data except for the Submission Resource Access and Owner information.'
+  },
+  'admin': {
+    label: 'Admin',
+    tooltip: 'The Admin permission will allow a resource, defined in the submission, to read and edit all of the submission data.'
   }
 });
 

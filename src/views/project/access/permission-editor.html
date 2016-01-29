@@ -13,7 +13,7 @@
         <ui-select multiple ng-model="permission.roles" theme="bootstrap" reset-search-input="true" name="{{permission.type}}_role" id="{{permission.type}}_role">
           <ui-select-match placeholder="Select roles...">{{$item.title}}</ui-select-match>
           <ui-select-choices repeat="role._id as role in roles | filter: $select.search">
-          <div>{{ role.title }}</div>
+            <div>{{ role.title }}</div>
           </ui-select-choices>
         </ui-select>
       </td>
