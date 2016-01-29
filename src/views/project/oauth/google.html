@@ -1,0 +1,13 @@
+<div class="well">
+  <h4>Google OAuth Settings</h4>
+  <p>This allows you to use Google user accounts to authenticate. To set up Google OAuth, go to your Google account settings</a> and register a new application.</p>
+  <p>Fill in the application details. The <strong>Authorization callback URL</strong> MUST be set to the domain name of your application (ex: <code>https://mydomain.com</code>. Then save your client ID and secret below.</p>
+</div>
+<div class="form-group">
+  <label for="googleClientId">Client ID</label>
+  <input ng-model="currentProject.settings.oauth.google.clientId" type="text" class="form-control" id="googleClientId" name="googleClientId" placeholder="Enter google Application Client ID">
+</div>
+<div class="form-group">
+  <label for="googleClientSecret">Client Secret</label>
+  <input ng-model="currentProject.settings.oauth.google.clientSecret" type="text" class="form-control" id="googleClientSecret" name="googleClientSecret" placeholder="Enter google Application Client Secret">
+</div>
