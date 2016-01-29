@@ -26,7 +26,7 @@ angular
     'truncate',
     'ngFileUpload',
     'ngDialog',
-    'ng-formio-plugins'
+    'swaggerUi'
   ])
   .config([
     '$stateProvider',
@@ -122,21 +122,28 @@ angular
           abstract: true,
           url: '/project/:projectId',
           controller: 'ProjectController',
-          templateUrl: 'views/project/project.html'
+          templateUrl: 'views/project/project.html',
+          params: {
+            showWelcomeModal: false
+          }
+        })
+        .state('project.home', {
+          url: '/home',
+          controller: 'ProjectHomeController',
+          templateUrl: 'views/project/home.html'
         })
         .state('createProject', {
           url: '/create/project',
           templateUrl: 'views/project/create.html',
           controller: 'ProjectCreateController'
         })
-        .state('project.edit', {
-          url: '/edit',
-          templateUrl: 'views/project/edit.html'
-        })
         .state('project.data', {
           url: '/data',
           templateUrl: 'views/data/index.html',
-          controller: 'ProjectDataController'
+          controller: 'ProjectDataController',
+          params: {
+            graphType: 'Month'
+          }
         })
         .state('project.formio', {
           url: '/formio',
@@ -155,6 +162,9 @@ angular
               $sce,
               $location
             ) {
+              $scope.currentSection.title = 'Preview';
+              $scope.currentSection.icon = 'fa fa-laptop';
+              $scope.currentSection.help = 'https://help.form.io/embedding/';
               $scope.previewUrl = '';
               $scope.repo = '';
               $scope.hasTemplate = true;
@@ -257,10 +267,6 @@ angular
           controller: 'ProjectTeamDeleteController',
           templateUrl: 'views/project/teams/delete.html'
         })
-        .state('project.settings.cors', {
-          url: '/cors',
-          templateUrl: 'views/project/cors/index.html'
-        })
         .state('project.settings.office365', {
           url: '/office365',
           templateUrl: 'views/project/office365/office365.html'
@@ -268,10 +274,6 @@ angular
         .state('project.settings.hubspot', {
           url: '/hubspot',
           templateUrl: 'views/project/hubspot/hubspot.html'
-        })
-        .state('project.settings.export', {
-          url: '/export',
-          templateUrl: 'views/project/export.html'
         })
         .state('project.delete', {
           url: '/delete',
@@ -486,8 +488,7 @@ angular
         if (!$scope.submitted) {
           $scope.submitted = true;
           FormioProject.createProject(template).then(function(project) {
-            localStorage.setItem('showWelcome', 1);
-            $state.go('project.resource.index', {projectId: project._id});
+            $state.go('project.home', {projectId: project._id, showWelcomeModal: true});
           });
         }
       };
@@ -636,7 +637,7 @@ angular
       });
 
       $rootScope.goToProject = function(project) {
-        $state.go('project.resource.index', {
+        $state.go('project.home', {
           projectId: project._id
         });
       };

@@ -479,8 +479,8 @@ module.exports = function(config) {
       title = replacements(title);
 
       var driver = this.driver;
-      driver.waitForExist('.project-title-link')
-        .getText('.project-title-link')
+      driver.waitForExist('.project-title')
+        .getText('.project-title')
         .then(function(found) {
           assert.equal(found, title);
           next();

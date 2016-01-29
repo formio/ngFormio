@@ -55,6 +55,10 @@ ul.dropdown-menu {
   }
 }
 
+li.user-dropdown a {
+  cursor: pointer;
+}
+
 .navbar-brand {
   padding: 6px 0 0 0;
 }
@@ -289,7 +293,7 @@ $project-header-color: lighten($brand-primary, 55%);
         background-color: darken($brand-primary, 20%);
         & > a, & > a:focus {
           background-color: darken($brand-primary, 5%);
-          border-right: solid $brand-secondary 8px;
+          border-right: solid lighten($brand-primary, 15%) 8px;
         }
       }
     }
@@ -341,43 +345,16 @@ $project-header-color: lighten($brand-primary, 55%);
   line-height: 1em;
 }
 
-.project-nav {
-  background-color: $gray-lighter;
-  border-bottom: 1px solid #ddd;
-  padding: 10px 0 10px 0;
-  min-height: 90px;
-  margin: 0;
-  .project-title {
-    font-weight: normal;
-    margin: 0;
-    font-size: 2em;
-    .project-title-link {
-      color: $gray;
-      &:hover, &:focus {
-        text-decoration: none;
-      }
-    }
-  }
-
-  .project-description {
-    overflow: hidden;
-    display: inline-block;
-  }
-}
-
 div.project-section-separator {
   margin-top: 10px;
   margin-bottom: 10px;
 }
 
-.project-swagger {
-  word-break: break-all;
-}
-
 .project-section-header {
   background-color: darken($brand-primary, 5%);
   color: $project-header-color;
-  padding: 20px;
+  padding-left: 20px;
+  padding-top: 20px;
   border-bottom: solid $brand-secondary 8px;
   h2 {
     a {
@@ -387,6 +364,23 @@ div.project-section-separator {
       }
     }
     margin: 0 0 10px 0;
+  }
+
+  .project-title {
+    font-weight: normal;
+    margin: 0;
+    font-size: 2em;
+    .project-title-link {
+      color: $project-header-color;
+      &:hover, &:focus {
+        text-decoration: none;
+      }
+    }
+  }
+
+  .project-description {
+    overflow: hidden;
+    display: inline-block;
   }
 }
 
@@ -419,9 +413,8 @@ div.project-section-separator {
 }
 
 .project-section-header-button {
-  float: right;
   border: solid $project-header-color 2px;
-  margin-top: 1em;
+  margin-right: 5px;
 }
 
 .project-header-block {
@@ -454,15 +447,16 @@ div.project-section-separator {
       padding: 0;
       &.form-nav {
         a {
-          background-color: $brand-secondary;
-          border: solid darken($brand-secondary, 10%) 2px;
-          color: $project-header-color;
           &:hover {
+            border: 1px solid $brand-secondary;
             background-color: darken($brand-secondary, 10%);
+            color: white;
           }
         }
         &.active a {
+          border: 1px solid $brand-primary;
           background-color: $brand-primary;
+          color: white;
         }
       }
     }
@@ -552,7 +546,7 @@ pre code {
 }
 
 /***************************** Auth Page *****************************/
-.login-container, .register-container {
+.login-container, .register-container, .reset-container {
   color: rgba(255, 255, 255, .935);
 
   padding-top: 90px;
@@ -649,6 +643,22 @@ pre code {
   }
 }
 
+.reset-container {
+  background-color: $brand-primary;
+  min-height: inherit;
+
+  @media (min-width: $screen-md-min) {
+    margin-right: 15px;
+  }
+
+  @media (max-width: $screen-md-min) {
+    margin-bottom: 15px;
+  }
+  button[type="submit"] {
+    background-color: $brand-secondary;
+  }
+}
+
 .register-container {
   background-color: $brand-secondary;
 
@@ -698,6 +708,10 @@ footer {
   width: 100%;
   a {
     color: white;
+  }
+  a:hover {
+    color: white;
+    text-decoration: none;
   }
   .section-heading {
     color: #eee;
@@ -760,19 +774,6 @@ footer {
 
 .breadcrumb .label {
   border-radius: 20px;
-}
-
-.project-title-section {
-  margin-bottom: 0;
-  .project-swagger-item {
-    vertical-align: top;
-    font-size: 1.5em;
-    line-height: 1.5em;
-    margin-top: 2px;
-    .project-swagger-button {
-      border: solid white 2px;
-    }
-  }
 }
 
 .existing-projects-section {
@@ -851,7 +852,7 @@ footer {
       margin-top: 0;
       a {
         font-weight: 600;
-        color: $gray-light;
+        color: $brand-primary;
       }
     }
     .project-plan,
@@ -859,7 +860,7 @@ footer {
       margin-top: 9px;
     }
     .project-url {
-      color: $brand-primary;
+      color: $gray-light;
     }
     .progress-label {
       margin-bottom: 0;
@@ -1051,6 +1052,7 @@ footer {
   padding: 10px 5px;
   cursor: pointer;
   transition: .15s;
+  height: 300px;
   .project-tile-icon {
     text-align: center;
     font-size: 7em;
@@ -1058,6 +1060,13 @@ footer {
     color: darken($brand-secondary, 10%);
     margin: 0;
     padding: 0;
+  }
+  .caption {
+    overflow: hidden;
+    max-height: 160px;
+    .template-card-description:after {
+      content: '...'
+    }
   }
   .caption h4 {
     text-align: center;
@@ -1283,5 +1292,75 @@ footer {
 @media (max-width: $screen-md-max) {
   .container {
     width: 100%;
+  }
+}
+
+.form-edit {
+  .save-buttons {
+    margin-top: 25px;
+  }
+  .form-line {
+    margin-top: 3px;
+  }
+}
+
+/********************* Project Dashboard *********************/
+.about-projects {
+  dl dd {
+    padding-bottom: 10px;
+  }
+  .list-group-item p {
+    padding-top: 20px;
+  }
+}
+
+.thumbnail-chart {
+  .ct-line {
+    stroke: $brand-primary;
+    stroke-width: 2px;
+    stroke-linecap: square;
+    stroke-linejoin: round;
+  }
+  .ct-area {
+    fill: $brand-primary;
+  }
+}
+
+.thumbnail-chart-link {
+  color: $text-color;
+
+  &:hover {
+    color: $text-color;
+    .well {
+      background-color:  darken($well-bg, 5%);
+    }
+  }
+
+  &:active {
+    color: $text-color;
+    .well {
+      background-color:  darken($well-bg, 10%);
+    }
+  }
+}
+
+.submission-activity {
+  .media-icon-large {
+    font-size: 48px;
+    width: 64px;
+    text-align: center;
+  }
+
+  .progress {
+    margin-top: 10px;
+    margin-bottom: 0;
+  }
+}
+
+.swagger-ui {
+  .api-name,
+  .api-description,
+  .api-infos {
+     display: none;
   }
 }

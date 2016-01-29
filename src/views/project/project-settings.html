@@ -44,7 +44,10 @@
         <div class="row">
           <div class="col-sm-6 col-md-4" ng-repeat="template in templates | limitTo:templateLimit" ng-click="currentProject.template = template.template">
             <div class="thumbnail template-card" ng-class="{'template-card-selected': template.template == currentProject.template}">
-              <div class="project-tile-icon"><i class="fa fa-html5"></i></div>
+              <div class="project-tile-icon">
+                <img ng-if="template.thumbnail" class="project-template-img" ng-src="{{ template.thumbnail }}" />
+                <i ng-if="!template.thumbnail" class="fa fa-html5"></i>
+              </div>
               <div class="caption">
                 <input ng-hide="true" type="radio" name="{{template.name}}" value="{{template.template}}" ng-model="currentProject.template">
                 <h4>{{template.title}}</h4>
@@ -115,6 +118,20 @@
     </div>
   </div>
   <div class="form-group" ng-if="currentProject && currentProject._id">
+    <div id="form-group-cors" class="form-group">
+      <label for="cors" class="control-label">CORS - Cross Origin Resource Sharing</label>
+      <textarea class="form-control" id="cors" ng-disabled="currentProject.plan === 'basic'" ng-model="currentProject.settings.cors" placeholder="A comma separated list of domains that forms may be embedded on. Use * to allow all domains."></textarea>
+      <p ng-if="currentProject.plan === 'basic'">Upgrade your project to enable CORS.</p>
+    </div>
+    <div class="panel panel-default">
+      <div class="panel-heading">Preview</div>
+      <div class="panel-body">
+        <label for="preview-repo" class="control-label">Preview Git Repo</label>
+        <input type="text" class="form-control" id="preview-repo" ng-model="currentProject.settings.preview.repo" placeholder="The git repository for the preview app." />
+        <label for="preview-repo" class="control-label">Preview App Url</label>
+        <input type="text" class="form-control" id="preview-url" ng-model="currentProject.settings.preview.url" placeholder="The app url for the preview app." />
+      </div>
+    </div>
     <div class="panel panel-default">
       <div class="panel-heading">Export Project</div>
       <div class="panel-body">
@@ -122,8 +139,6 @@
         <a href="//api.{{ appConfig.serverHost }}/project/{{ currentProject._id }}/export?x-jwt-token={{ token }}" class="btn btn-primary">Export Project</a>
       </div>
     </div>
-  </div>
-  <div class="form-group" ng-if="currentProject && currentProject._id">
     <div class="panel panel-default">
       <div class="panel-heading">Delete Project</div>
       <div class="panel-body">
