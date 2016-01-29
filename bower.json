@@ -25,7 +25,8 @@
     "bootstrap-sass": "~3.3.6",
     "ng-dialog": "~0.5.6",
     "angular-swagger-ui": "~0.2.7",
-    "number-abbreviate": "~1.1.0"
+    "number-abbreviate": "~1.1.0",
+    "seamless": "^0.0.5"
   },
   "resolutions": {
     "angular": "~1.4.9",

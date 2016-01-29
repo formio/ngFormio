@@ -1,0 +1,44 @@
+<div class="well">
+  <h4 ng-if="!publicForm">This form is <strong class="text-danger">Private</strong> and will <strong>NOT</strong> allow anonymous submissions. <a ng-click="makePublic()" class="btn btn-success">Make Public</a></h4>
+  <h4 ng-if="publicForm">This form is <strong class="text-success">Public</strong> and will allow anonymous submissions. <a ng-click="makePrivate()" class="btn btn-danger">Make Private</a></h4>
+</div>
+<h4>The following url can be used to share this form with others.</h4>
+<span><a class="btn btn-primary" style="float:left;padding:12px 20px;" href="{{ previewUrl }}" target="_blank"><i class="fa fa-share"></i></a><pre style="font-size:1.2em;"><code>{{ previewUrl }}</code></pre></span>
+<div class="row">
+  <div class="col-sm-4">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-share-alt"></i> Share Settings</h3>
+      </div>
+      <div class="panel-body">
+        <select class="form-control" ng-model="options.theme" ng-options="item for item in themes" placeholder="Select a theme">
+          <option value="">Select a theme</option>
+        </select>
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" ng-model="options.showHeader">
+            Show Header
+          </label>
+        </div>
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" ng-model="options.showWizard">
+            Show as Wizard
+          </label><br/>
+          <small><strong>Note:</strong> Your form must contain only Panels at the root of the form to be shown as a wizard. See <a href="https://github.com/formio/formio-wizard#how-it-works" target="_blank">https://github.com/formio/formio-wizard#how-it-works</a> for an example.</small>
+        </div>
+      </div>
+      <div class="panel-footer">
+        <a href="{{ previewUrl }}" target="_blank" class="btn btn-primary btn-block" ng-disabled="!publicForm"><i class="fa fa-share"></i> Go to Form</a>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-8">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h3 class="panel-title">Preview</h3>
+      </div>
+      <div class="panel-body" id="form-preview"></div>
+    </div>
+  </div>
+</div>
