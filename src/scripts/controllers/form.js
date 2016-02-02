@@ -1,6 +1,6 @@
 'use strict';
 
-/* global _: false */
+/* global _: false, jQuery: false, document: false */
 var app = angular.module('formioApp.controllers.form', [
   'ngDialog',
   'ui.bootstrap.tabs',
@@ -87,6 +87,11 @@ app.config([
         .state(parentName + '.form.embed', {
           url: '/embed',
           templateUrl: 'views/form/form-embed.html'
+        })
+        .state(parentName + '.form.share', {
+          url: '/share',
+          templateUrl: 'views/form/form-share.html',
+          controller: 'FormShareController'
         })
         .state(parentName + '.form.delete', {
           url: '/delete',
@@ -213,6 +218,7 @@ app.controller('FormController', [
   'FormioUtils',
   'AppConfig',
   'SubmissionAccessLabels',
+  'ResourceAccessLabels',
   'GoogleAnalytics',
   '$q',
   function(
@@ -225,6 +231,7 @@ app.controller('FormController', [
     FormioUtils,
     AppConfig,
     SubmissionAccessLabels,
+    ResourceAccessLabels,
     GoogleAnalytics,
     $q
   ) {
@@ -252,9 +259,22 @@ app.controller('FormController', [
     // Load the form.
     if($scope.formId) {
       $scope.loadFormPromise = $scope.formio.loadForm().then(function(form) {
+        // Build the list of selectable resources for the submission resource access ui.
+        $scope.currentFormResources = _(FormioUtils.flattenComponents(form.components))
+          .filter({type: 'resource'})
+          .map(function(component) {
+            return {
+              label: component.label || '',
+              key: component.key || '',
+              defaultPermission: component.defaultPermission || ''
+            };
+          })
+          .value();
+
         $scope.form = form;
         $rootScope.currentForm = $scope.form;
       }, FormioAlerts.onError.bind(FormioAlerts));
+
       $scope.formio.loadActions().then(function(actions) {
         // Get the available actions for the form, to check if premium actions are present.
         $scope.formio.availableActions().then(function(available) {
@@ -277,6 +297,8 @@ app.controller('FormController', [
       $scope.loadFormPromise = $q.when();
     }
     $scope.submissionAccessLabels = SubmissionAccessLabels;
+    $scope.resourceAccessLabels = ResourceAccessLabels;
+
     // Get the swagger URL.
     $scope.getSwaggerURL = function(format) {
       return AppConfig.apiBase + '/project/' + $scope.projectId + '/form/' + $scope.formId + '/spec.json';
@@ -298,6 +320,7 @@ app.controller('FormController', [
     // Save a form.
     $scope.saveForm = function() {
       angular.element('.has-error').removeClass('has-error');
+
       $scope.formio.saveForm(angular.copy($scope.form)) // Copy to remove angular $$hashKey
       .then(function(form) {
         var method = $stateParams.formId ? 'updated' : 'created';
@@ -357,6 +380,107 @@ app.controller('FormEditController', [
     };
   }
 ]);
+
+app.controller('FormShareController', ['$scope', function($scope) {
+  $scope.publicForm = true;
+  $scope.previewUrl = '';
+  $scope.preview = '';
+  $scope.options = {
+    theme: '',
+    showHeader: true,
+    showWizard: false
+  };
+  $scope.themes = [
+    'Cerulean',
+    'Cosmo',
+    'Cyborg',
+    'Darkly',
+    'Flatly',
+    'Journal',
+    'Lumen',
+    'Paper',
+    'Readable',
+    'Sandstone',
+    'Simplex',
+    'Slate',
+    'Spacelab',
+    'Superhero',
+    'United',
+    'Yeti'
+  ];
+
+  // Method to load the preview.
+  var loadPreview = function() {
+    $scope.previewUrl = 'https://form.io/view/#/';
+    $scope.previewUrl += $scope.currentProject.name + '/' + $scope.currentForm.path + '?';
+    $scope.previewUrl += $scope.options.showHeader ? 'header=1' : 'header=0';
+    if ($scope.options.theme) {
+      $scope.previewUrl += '&theme=' + $scope.options.theme.toLowerCase();
+    }
+    if ($scope.options.showWizard) {
+      $scope.previewUrl += '&wizard=1';
+    }
+    jQuery('#form-preview').html(jQuery(document.createElement('iframe')).attr({
+      style: 'width: 100%;',
+      id: 'share-preview',
+      src: $scope.previewUrl
+    }));
+    jQuery('#share-preview').seamless({
+      spinner: '',
+      loading: 'Loading ...'
+    });
+  };
+
+  // The default role.
+  var defaultRole = null;
+
+  // Make a form public.
+  $scope.makePublic = function() {
+    angular.forEach($scope.form.submissionAccess, function(access, index) {
+      if (access.type === 'create_own') {
+        $scope.form.submissionAccess[index].roles.push(defaultRole._id);
+      }
+    });
+    $scope.publicForm = true;
+    $scope.saveForm();
+  };
+
+  // Make a form private.
+  $scope.makePrivate = function() {
+    angular.forEach($scope.form.submissionAccess, function(access, index) {
+      if (access.type === 'create_own') {
+        _.pull($scope.form.submissionAccess[index].roles, defaultRole._id);
+      }
+    });
+    $scope.publicForm = false;
+    $scope.saveForm();
+  };
+
+  $scope.loadProjectPromise.then(function() {
+    $scope.loadFormPromise.then(function() {
+      $scope.$watch('currentProjectRoles', function(roles) {
+        if (!roles) { return; }
+        angular.forEach(roles, function(role) {
+          if (role.default) {
+            defaultRole = role;
+          }
+        });
+        angular.forEach($scope.form.submissionAccess, function(access) {
+          if (
+            (access.type === 'create_own') &&
+            (_.indexOf(access.roles, defaultRole._id) === -1)
+          ) {
+            $scope.publicForm = false;
+          }
+        });
+      });
+
+      $scope.$watch('options', function() {
+        loadPreview();
+      }, true);
+    });
+  });
+}]);
 
 app.factory('FormioAlerts', [
   '$rootScope',
@@ -1306,6 +1430,21 @@ app.constant('SubmissionAccessLabels', {
   'delete_own': {
     label: 'Delete Own Submissions',
     tooltip: 'The Delete Own Submissions permission will allow a user, with one of the given Roles, to delete a Submission. A user can only delete a Submission if they are defined as its owner.'
+  }
+});
+
+app.constant('ResourceAccessLabels', {
+  'read': {
+    label: 'Read',
+    tooltip: 'The Read permission will allow a resource, defined in the submission, to read all of the submission data.'
+  },
+  'write': {
+    label: 'Write',
+    tooltip: 'The Write permission will allow a resource, defined in the submission, to read all of the submission data and edit all of the data except for the Submission Resource Access and Owner information.'
+  },
+  'admin': {
+    label: 'Admin',
+    tooltip: 'The Admin permission will allow a resource, defined in the submission, to read and edit all of the submission data.'
   }
 });
 
