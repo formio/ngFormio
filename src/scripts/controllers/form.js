@@ -822,7 +822,7 @@ app.controller('FormSubmissionsController', [
     $scope.tableView = function(component) {
       return !component.protected &&
         (!component.hasOwnProperty('persistent') || component.persistent) &&
-        (!component.hasOwnProperty('tableView') || component.tableView);
+        (component.tableView);
     };
 
     // Creates resourcejs sort query from kendo datasource read options
