@@ -58,7 +58,8 @@ module.exports = function (app) {
           persistent: true,
           validate: {
             required: false
-          }
+          },
+          defaultPermission: ''
         }
       });
     }

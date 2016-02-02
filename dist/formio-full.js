@@ -64524,7 +64524,8 @@ module.exports = function (app) {
           persistent: true,
           validate: {
             required: false
-          }
+          },
+          defaultPermission: ''
         }
       });
     }
@@ -65234,6 +65235,63 @@ module.exports = function() {
             }
           });
 
+          var grabIds = function(input) {
+            if (!input) {
+              return [];
+            }
+
+            if (!(input instanceof Array)) {
+              input = [input];
+            }
+
+            var final = [];
+            input.forEach(function(element) {
+              if (element && element._id) {
+                final.push(element._id);
+              }
+            });
+
+            return final;
+          };
+
+          // Search the form for resource submission access defaults and build a permissions map.
+          var defaultPermissions = {};
+          angular.forEach(components, function(component) {
+            if (component.type === 'resource' && component.key && component.defaultPermission) {
+              defaultPermissions[component.key] = component.defaultPermission;
+            }
+          });
+
+          angular.forEach($scope._submission.data, function(data, key) {
+            var perm = defaultPermissions[key];
+            if (perm) {
+              submissionData.access = submissionData.access || [];
+
+              // Coerce data into an array for plucking.
+              if (!(data instanceof Array)) {
+                data = [data];
+              }
+
+              // Try to find and update an existing permission.
+              var found = false;
+              submissionData.access.forEach(function(permission) {
+                if (permission.type === perm) {
+                  found = true;
+                  permission.resources = permission.resources || [];
+                  permission.resources.concat(grabIds(data));
+                }
+              });
+
+              // Add a permission, because one was not found.
+              if (!found) {
+                submissionData.access.push({
+                  type: perm,
+                  resources: grabIds(data)
+                });
+              }
+            }
+          });
+
           // Called when a submission has been made.
           var onSubmitDone = function(method, submission) {
             $scope.showAlerts({
@@ -65265,7 +65323,8 @@ module.exports = function() {
 
           // If they wish to submit to the default location.
           else if ($scope.formio) {
-            $scope.formio.saveSubmission(angular.copy(submissionData), $scope.formioOptions) // copy to remove angular $$hashKey
+            // copy to remove angular $$hashKey
+            $scope.formio.saveSubmission(angular.copy(submissionData), $scope.formioOptions)
               .then(function(submission) {
               onSubmitDone(submission.method, submission);
             }, FormioScope.onError($scope, $element))
