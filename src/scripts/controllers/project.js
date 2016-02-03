@@ -689,11 +689,13 @@ app.controller('ProjectFormioController', [
   'Formio',
   'AppConfig',
   '$window',
+  '$http',
   function(
     $scope,
     Formio,
     AppConfig,
-    $window
+    $window,
+    $http
   ) {
     $scope.currentSection.title = 'Admin Data';
     $scope.currentSection.icon = 'glyphicon glyphicon-globe';
@@ -703,6 +705,21 @@ app.controller('ProjectFormioController', [
     $scope.showDaily = false;
     $scope.showCreated = false;
     $scope.showIds = false;
+    $scope.showEmployees = false;
+    var _employees = null;
+
+    // Initialize the first graph, by loading the formio team and filtering out all bad data.
+    $scope.init = function() {
+      $http.get(AppConfig.teamForm + '/submission/56856be57535d60100ce7ee3')
+        .then(function(result) {
+          _employees = _(result.data.data.members)
+            .pluck('_id')
+            .value();
+
+          $scope.updateUsage();
+        });
+    };
+
     $scope.toggle = function(btn) {
       $scope[btn] = !$scope[btn];
 
@@ -711,6 +728,9 @@ app.controller('ProjectFormioController', [
           $scope.viewDate.day = 0;
           $scope.updateUsage();
         }
+      }
+      else if (btn === 'showEmployees') {
+        $scope.updateUsage();
       }
     };
 
@@ -799,6 +819,22 @@ app.controller('ProjectFormioController', [
     };
 
     /**
+     * Filter the formio employees from the items, listed as the owners.
+     *
+     * @param {Array} items
+     *   The list of items to be filtered.
+     * @returns {Array}
+     *   The filtered contents.
+     */
+    var filterEmployees = function(items) {
+      return _(items)
+        .reject(function(item) {
+          return !$scope.showEmployees && _employees.indexOf(item.owner) !== -1;
+        })
+        .value();
+    };
+
+    /**
      * Get the formio projects created during the configured time period, to the next logical unit of time.
      */
     var getProjectsCreated = function() {
@@ -825,7 +861,7 @@ app.controller('ProjectFormioController', [
               })
               .value();
 
-            $scope.projectsCreated = merge($scope.projectsCreated, ownerData, 'owner');
+            $scope.projectsCreated = filterEmployees(merge($scope.projectsCreated, ownerData, 'owner'));
             $scope.$apply();
           });
         });
@@ -846,6 +882,7 @@ app.controller('ProjectFormioController', [
             .sortByOrder(['created'], ['desc'])
             .value();
 
+          $scope.usersCreated = filterEmployees($scope.usersCreated);
           $scope.$apply();
         });
     };
@@ -998,13 +1035,11 @@ app.controller('ProjectFormioController', [
             .sortByOrder(['submissions'], ['desc'])
             .reject({submissions: 0})
             .value();
-          $scope.totalMonthlySubmissions = _.sum(_.pluck($scope.monthlySubmissions, 'submissions'));
 
           $scope.monthlyNonsubmissions = _($scope.monthlyUsage)
             .sortByOrder(['nonsubmissions'], ['desc'])
             .reject({nonsubmissions: 0})
             .value();
-          $scope.totalMonthlyNonsubmissions = _.sum(_.pluck($scope.monthlyNonsubmissions, 'nonsubmissions'));
 
           $scope.usageLoading = false;
           $scope.$apply();
@@ -1028,8 +1063,11 @@ app.controller('ProjectFormioController', [
                 })
                 .value();
 
-              $scope.monthlySubmissions = merge($scope.monthlySubmissions, ownerData, 'owner');
-              $scope.monthlyNonsubmissions = merge($scope.monthlyNonsubmissions, ownerData, 'owner');
+              // Merge all values and filter out the formio employees if set.
+              $scope.monthlySubmissions = filterEmployees(merge($scope.monthlySubmissions, ownerData, 'owner'));
+              $scope.totalMonthlySubmissions = _.sum(_.pluck($scope.monthlySubmissions, 'submissions'));
+              $scope.monthlyNonsubmissions = filterEmployees(merge($scope.monthlyNonsubmissions, ownerData, 'owner'));
+              $scope.totalMonthlyNonsubmissions = _.sum(_.pluck($scope.monthlyNonsubmissions, 'nonsubmissions'));
               $scope.$apply();
             });
           });
