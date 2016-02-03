@@ -1,4 +1,4 @@
-<div class="formio-data row" style="overflow: visible;" ng-init="updateUsage()">
+<div class="formio-data row" style="overflow: visible;" ng-init="init()">
   <div class="col-md-10 col-md-offset-1">
     <!-- Controls -->
     <div class="row">
@@ -19,6 +19,7 @@
           <br>
           <button class="btn btn-primary btn-xs" ng-click="toggle('showCreated')">{{showCreated ? 'Hide' : 'Show'}} Created</button>
           <button class="btn btn-primary btn-xs" ng-click="toggle('showIds')">{{showIds ? 'Hide' : 'Show'}} _id's</button>
+          <button class="btn btn-primary btn-xs" ng-click="toggle('showEmployees')">{{showEmployees ? 'Hide' : 'Show'}} Employees</button>
           <button class="btn btn-primary btn-xs" ng-click="downloadUsage()">Export CSV</button>
         </div>
       </div>
