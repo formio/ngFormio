@@ -1,9 +1,11 @@
 module.exports = [
   'Formio',
   'formioComponents',
+  '$interpolate',
   function(
     Formio,
-    formioComponents
+    formioComponents,
+    $interpolate
   ) {
     return {
       onError: function($scope, $element) {
@@ -91,11 +93,11 @@ module.exports = [
           if (component.multiple && (value.length > 0)) {
             var values = [];
             angular.forEach(value, function(arrayValue) {
-              values.push(componentInfo.tableView(arrayValue, component));
+              values.push(componentInfo.tableView(arrayValue, component, $interpolate));
             });
             return values;
           }
-          return componentInfo.tableView(value, component);
+          return componentInfo.tableView(value, component, $interpolate);
         };
 
         $scope.updateSubmissions = function() {

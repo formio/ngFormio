@@ -6,7 +6,11 @@ module.exports = function (app) {
     function (formioComponentsProvider) {
       formioComponentsProvider.register('resource', {
         title: 'Resource',
-        tableView: function (data) {
+        tableView: function (data, component, $interpolate) {
+          if ($interpolate) {
+            return $interpolate(component.template)({item: data});
+          }
+
           return data ? data._id : '';
         },
         template: function ($scope) {

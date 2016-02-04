@@ -5,6 +5,15 @@ module.exports = function() {
     flattenComponents: formioUtils.flattenComponents,
     eachComponent: formioUtils.eachComponent,
     getComponent: formioUtils.getComponent,
+    hideFields: function(form, components) {
+      this.eachComponent(form.components, function (component) {
+        for (var i in components) {
+          if (component.key === components[i]) {
+            component.type = 'hidden';
+          }
+        }
+      });
+    },
     fieldWrap: function(input) {
       input = input + '<formio-errors></formio-errors>';
       var multiInput = input.replace('data[component.key]', 'data[component.key][$index]');
