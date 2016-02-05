@@ -33,7 +33,7 @@ angular
     '$urlRouterProvider',
     'FormioProvider',
     'AppConfig',
-    function (
+    function(
       $stateProvider,
       $urlRouterProvider,
       FormioProvider,
@@ -52,7 +52,7 @@ angular
         .state('auth', {
           url: '/auth',
           views: {
-            '' : {
+            '': {
               templateUrl: 'views/user/auth.html'
             },
             'login@auth': {
@@ -169,7 +169,9 @@ angular
               $scope.repo = '';
               $scope.hasTemplate = true;
               $scope.$watch('currentProject', function(project) {
-                if (!project.settings) { return; }
+                if (!project.settings) {
+                  return;
+                }
                 if (!project.settings.preview) {
                   $scope.hasTemplate = false;
                   project.settings.preview = {
@@ -308,6 +310,11 @@ angular
           templateUrl: 'views/import/index.html',
           controller: 'ImportExportController'
         })
+        .state('project.settings.google', {
+          url: '/google',
+          parent: 'project.settings',
+          templateUrl: 'views/project/google/google.html'
+        })
         .state('help', {
           url: '/help',
           templateUrl: 'views/help/index.html',
@@ -332,28 +339,25 @@ angular
       GoogleAnalytics
     ) {
       var loaded = false;
-      var templates = [
-        {
-          "title": "Default",
-          "name": "default",
-          "description": "A default project with User and Admin resources and their respective authentication forms.",
-          template: 'default',
-          "preview": {
-            "url": "http://formio.github.io/formio-app-basic",
-            "repo": "https://github.com/formio/formio-app-basic"
-          }
-        },
-        {
-          "title": "Empty",
-          "name": "empty",
-          "description": "An empty project with no forms or resources. Create a project with a fresh start!",
-          template: 'empty',
-          "preview": {
-            "url": "http://formio.github.io/formio-app-template",
-            "repo": "https://github.com/formio/formio-app-template"
-          }
+      var templates = [{
+        "title": "Default",
+        "name": "default",
+        "description": "A default project with User and Admin resources and their respective authentication forms.",
+        template: 'default',
+        "preview": {
+          "url": "http://formio.github.io/formio-app-basic",
+          "repo": "https://github.com/formio/formio-app-basic"
         }
-      ];
+      }, {
+        "title": "Empty",
+        "name": "empty",
+        "description": "An empty project with no forms or resources. Create a project with a fresh start!",
+        template: 'empty',
+        "preview": {
+          "url": "http://formio.github.io/formio-app-template",
+          "repo": "https://github.com/formio/formio-app-template"
+        }
+      }];
 
       return {
         createProject: function(project) {
@@ -396,8 +400,7 @@ angular
 
           // Try to load the external template source.
           $http.get(
-            'https://formio.github.io/help.form.io/templates/index.json',
-            {
+            'https://formio.github.io/help.form.io/templates/index.json', {
               disableJWT: true,
               headers: {
                 Authorization: undefined,
@@ -405,7 +408,7 @@ angular
                 'Cache-Control': undefined
               }
             }
-          ).then(function (result) {
+          ).then(function(result) {
             templates = (result && result.data) ? result.data : templates;
             loaded = true;
             deferred.resolve(templates);
@@ -464,8 +467,7 @@ angular
               return ($rootScope.user && team.owner !== $rootScope.user._id) || false;
             });
           });
-        }
-        else {
+        } else {
           $scope.teamMember = _.any(results, function(team) {
             return ($rootScope.user && team.owner !== $rootScope.user._id) || false;
           });
@@ -511,7 +513,7 @@ angular
 
           // Build the projects teams list if present in the permissions.
           _.forEach(project.access, function(permission) {
-            if(_.startsWith(permission.type, 'team_')) {
+            if (_.startsWith(permission.type, 'team_')) {
               permission.roles = permission.roles || [];
               project.teams.push(permission.roles);
             }
@@ -521,7 +523,7 @@ angular
           project.teams = _.uniq(_.flattenDeep(project.teams));
           project.teams = _.map(project.teams, function(team) {
             _.forEach($scope.teams, function(loadedTeam) {
-              if(loadedTeam._id === team) {
+              if (loadedTeam._id === team) {
                 team = loadedTeam;
               }
             });
@@ -553,7 +555,7 @@ angular
   ])
   .filter('trusted', [
     '$sce',
-    function ($sce) {
+    function($sce) {
       return function(url) {
         return $sce.trustAsResourceUrl(url);
       };
@@ -635,7 +637,9 @@ angular
       });
 
       $rootScope.goToProject = function(project) {
-        $state.go('project.home', {projectId: project._id});
+        $state.go('project.home', {
+          projectId: project._id
+        });
       };
 
       $rootScope.getPreviewURL = function(project) {
@@ -664,8 +668,7 @@ angular
         $rootScope.currentForm = null;
         if ($state.is('auth')) {
           $window.location.reload();
-        }
-        else {
+        } else {
           $state.go('auth');
         }
         FormioAlerts.addAlert({
@@ -693,8 +696,10 @@ angular
       $rootScope.$on('$stateChangeStart', function(event, toState) {
         $rootScope.userToken = Formio.getToken();
         $rootScope.authenticated = !!$rootScope.userToken;
-        if (toState.name.substr(0, 4) === 'auth') { return; }
-        if(!$rootScope.authenticated) {
+        if (toState.name.substr(0, 4) === 'auth') {
+          return;
+        }
+        if (!$rootScope.authenticated) {
           event.preventDefault();
           $state.go('auth');
         }
@@ -722,10 +727,9 @@ angular
 
       // Add back functionality to the template.
       $rootScope.back = function(defaultState, defaultParams) {
-        if($rootScope.previousState) {
+        if ($rootScope.previousState) {
           $state.go($rootScope.previousState, $rootScope.previousParams);
-        }
-        else {
+        } else {
           $state.go(defaultState, defaultParams);
         }
       };
@@ -743,7 +747,7 @@ angular
     // This gets the url without substitutions, to send
     // to Google Analytics
     var getFullStateUrl = function(state) {
-      if(state.parent) {
+      if (state.parent) {
         return getFullStateUrl($state.get(state.parent)) + state.url;
       }
       return state.url;
@@ -799,31 +803,31 @@ angular
         return this.plans[plan];
       },
       getPlanName: function(plan) {
-        if(!this.plans[plan]) return '';
+        if (!this.plans[plan]) return '';
         return this.plans[plan].title;
       },
       getPlanLabel: function(plan) {
-        if(!this.plans[plan]) return '';
+        if (!this.plans[plan]) return '';
         return this.plans[plan].labelStyle;
       },
       getAPICallsLimit: function(apiCalls) {
-        if(!apiCalls || !apiCalls.limit) {
+        if (!apiCalls || !apiCalls.limit) {
           return '∞';
         }
         return $filter('number')(apiCalls.limit);
       },
       getAPICallsPercent: function(apiCalls) {
-        if(!apiCalls || !apiCalls.limit) {
+        if (!apiCalls || !apiCalls.limit) {
           return '0%';
         }
         var percent = apiCalls.used / apiCalls.limit * 100;
         return (percent > 100) ? '100%' : percent + '%';
       },
       getProgressBarClass: function(apiCalls) {
-        if(!apiCalls || !apiCalls.limit) return 'progress-bar-success';
+        if (!apiCalls || !apiCalls.limit) return 'progress-bar-success';
         var percentUsed = apiCalls.used / apiCalls.limit;
-        if(percentUsed >= 0.9) return 'progress-bar-danger';
-        if(percentUsed >= 0.7) return 'progress-bar-warning';
+        if (percentUsed >= 0.9) return 'progress-bar-danger';
+        if (percentUsed >= 0.7) return 'progress-bar-warning';
         return 'progress-bar-success';
       }
     };
@@ -842,7 +846,7 @@ angular
         }
       },
       getPermissionLabel: function(type) {
-        if(!this.permissions[type]) return '';
+        if (!this.permissions[type]) return '';
         return this.permissions[type].label;
       }
     };
