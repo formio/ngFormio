@@ -390,7 +390,7 @@ app.controller('ProjectHomeController', [
           .map(function(month) { return _.add(month, 1); })
           .value(),
         series: [
-          _.map(data, 'submissions')
+          _.map(data, 'submissions').reverse()
         ]
       };
     });
@@ -405,7 +405,7 @@ app.controller('ProjectHomeController', [
           .map(function(day) { return _.add(day, 1); })
           .value(),
         series: [
-          _.map(data, 'submissions')
+          _.map(data, 'submissions').reverse()
         ]
       };
     });
@@ -420,7 +420,7 @@ app.controller('ProjectHomeController', [
           .map(function(hour) { return _.add(hour, 1); })
           .value(),
         series: [
-          _.map(data, 'submissions')
+          _.map(data, 'submissions').reverse()
         ]
       };
     });
@@ -681,6 +681,45 @@ app.controller('ProjectDataController', [
     $scope.graphChange = function() {
       $scope.displayView(($scope.graphType || '').toLowerCase());
     };
+  }
+]);
+
+app.controller('ProjectPreviewController', [
+  '$scope',
+  '$sce',
+  '$location',
+  'AppConfig',
+  function(
+    $scope,
+    $sce,
+    $location,
+    AppConfig
+  ) {
+    $scope.currentSection.title = 'Preview';
+    $scope.currentSection.icon = 'fa fa-laptop';
+    $scope.currentSection.help = 'https://help.form.io/embedding/';
+    $scope.previewUrl = '';
+    $scope.repo = '';
+    $scope.hasTemplate = true;
+    $scope.$watch('currentProject', function(project) {
+      if (!project.settings) {
+        return;
+      }
+      if (!project.settings.preview) {
+        $scope.hasTemplate = false;
+        project.settings.preview = {
+          repo: 'https://github.com/formio/formio-app-template',
+          url: 'http://formio.github.io/formio-app-template/'
+        };
+      }
+
+      var url = project.settings.preview.url.replace('http://', $location.protocol() + '://');
+      url += '/?apiUrl=' + encodeURIComponent(AppConfig.apiBase);
+      url += '&appUrl=' + encodeURIComponent($location.protocol() + '://' + project.name + '.' + AppConfig.serverHost);
+      $scope.previewUrl = $sce.trustAsResourceUrl(url);
+      $scope.repo = project.settings.preview.repo;
+    });
+
   }
 ]);
 

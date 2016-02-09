@@ -1,0 +1,27 @@
+<div class="project-section-content">
+  <div ng-if="!hasTemplate" class="alert alert-info text-center" role="alert"><strong>This project doesn't have a pre-defined template, but you can use our Example template to help you get started.</strong></div>
+  <div class="project-section-inner-content">
+    <div class="row">
+      <div class="col-md-12">
+        <h3>Local Development</h3>
+        <p>This application can be ran locally by downloading the GitHub repo located here.</p>
+        <p><a class="btn btn-success btn-block" href="{{ repo }}" target="_blank">{{ repo }}</a></p>
+        <div ng-if="hasTemplate">
+          <p>Then change the <strong>/src/config.js</strong> to say the following.</p>
+          <p><small><pre>var APP_URL = '{{ projectApi }}';</pre></small></p>
+          <p>Then you can run the app by typing the following in your terminal within the directory of the download.</p>
+          <p><small>
+            <pre>npm install;
+      bower install;
+      gulp serve;</pre>
+          </small></p>
+        </div>
+        <div ng-if="!hasTemplate">
+          <p>Then add any form using the following syntax.</p>
+          <p><small><pre>&lt;formio src="'https://{{ currentProject.name }}.form.io/yourform'"&gt;&lt;/formio&gt;</pre></small></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

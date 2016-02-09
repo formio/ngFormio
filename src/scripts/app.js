@@ -139,7 +139,7 @@ angular
         })
         .state('project.data', {
           url: '/data',
-          templateUrl: 'views/data/index.html',
+          templateUrl: 'views/project/data.html',
           controller: 'ProjectDataController',
           params: {
             graphType: 'Month'
@@ -153,42 +153,12 @@ angular
         .state('project.preview', {
           url: '/preview',
           templateUrl: 'views/project/preview.html',
-          controller: [
-            '$scope',
-            '$sce',
-            '$location',
-            function(
-              $scope,
-              $sce,
-              $location
-            ) {
-              $scope.currentSection.title = 'Preview';
-              $scope.currentSection.icon = 'fa fa-laptop';
-              $scope.currentSection.help = 'https://help.form.io/embedding/';
-              $scope.previewUrl = '';
-              $scope.repo = '';
-              $scope.hasTemplate = true;
-              $scope.$watch('currentProject', function(project) {
-                if (!project.settings) {
-                  return;
-                }
-                if (!project.settings.preview) {
-                  $scope.hasTemplate = false;
-                  project.settings.preview = {
-                    repo: 'https://github.com/formio/formio-app-template',
-                    url: 'http://formio.github.io/formio-app-template/'
-                  };
-                }
-
-                var url = project.settings.preview.url.replace('http://', $location.protocol() + '://');
-                url += '/?apiUrl=' + encodeURIComponent(AppConfig.apiBase);
-                url += '&appUrl=' + encodeURIComponent($location.protocol() + '://' + project.name + '.' + AppConfig.serverHost);
-                $scope.previewUrl = $sce.trustAsResourceUrl(url);
-                $scope.repo = project.settings.preview.repo;
-              });
-
-            }
-          ]
+          controller: 'ProjectPreviewController'
+        })
+        .state('project.launch', {
+          url: '/launch',
+          templateUrl: 'views/project/launch.html',
+          controller: 'ProjectPreviewController'
         })
         .state('project.api', {
           url: '/api',

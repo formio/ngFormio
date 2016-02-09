@@ -33,6 +33,10 @@ body {
   display: block;
 }
 
+.btn-primary:hover {
+  border-color: white;
+}
+
 .submissions-header {
   margin-top: 10px;
 }
@@ -50,6 +54,12 @@ body {
 
 ul.dropdown-menu {
   padding-bottom: 5px;
+  li:hover {
+    background-color: #eeeeee;
+  }
+  li.no-hover:hover {
+    background-color: inherit;
+  }
   li > a {
     cursor: pointer;
   }
@@ -57,10 +67,6 @@ ul.dropdown-menu {
 
 li.user-dropdown a {
   cursor: pointer;
-}
-
-.navbar-brand {
-  padding: 6px 0 0 0;
 }
 
 .navbar-header {
@@ -317,14 +323,50 @@ $project-header-color: lighten($brand-primary, 55%);
 .navbar {
   border-radius: 0;
   margin-bottom: 0;
+  background-color: white;
 }
 
 .navbar-nav {
   margin-left: 20px;
 }
 
+.docs-dropdown {
+  width: 900px;
+  margin: 0px;
+  @media (max-width: $screen-md-min) {
+    width: 300px;
+  }
+  li {
+    &:hover {
+      background-color: #eeeeee;
+    }
+    a {
+      color: black;
+      &:hover {
+        color: black;
+        text-decoration: none;
+      }
+    }
+  }
+}
+
 .form-builder-body {
   width: 100%;
+}
+
+.formcomponents {
+  .panel-heading:hover {
+    background-color: #dddddd;
+  }
+  h4.panel-title a {
+    &:hover {
+      text-decoration: none;
+    }
+    &:focus {
+      outline: none;
+      text-decoration: none;
+    }
+  }
 }
 
 .tab-content {
@@ -351,12 +393,13 @@ div.project-section-separator {
 }
 
 .project-section-header {
-  background-color: darken($brand-primary, 5%);
-  color: $project-header-color;
+  background-color: $brand-secondary;
+  color: $brand-primary;
   padding-left: 20px;
   padding-top: 20px;
-  border-bottom: solid $brand-secondary 8px;
+  border-bottom: solid lighten($brand-primary, 10%) 8px;
   h2 {
+    color: $project-header-color;
     a {
       color: $project-header-color;
       &:hover, &:focus {
@@ -1305,15 +1348,6 @@ footer {
 }
 
 /********************* Project Dashboard *********************/
-.about-projects {
-  dl dd {
-    padding-bottom: 10px;
-  }
-  .list-group-item p {
-    padding-top: 20px;
-  }
-}
-
 .thumbnail-chart {
   .ct-line {
     stroke: $brand-primary;
@@ -1362,5 +1396,15 @@ footer {
   .api-description,
   .api-infos {
      display: none;
+  }
+  .operations {
+    display: block;
+  }
+  .endpoint-heading a {
+    color: black;
+    cursor: default;
+    &:hover {
+      text-decoration: none;
+    }
   }
 }
