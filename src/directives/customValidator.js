@@ -9,10 +9,8 @@ module.exports = function() {
       ) {
         return;
       }
-      ctrl.$validators.custom = function(modelValue, viewValue) {
+      ctrl.$validators.custom = function() {
         var valid = true;
-        var input = modelValue || viewValue;
-
         var custom = scope.component.validate.custom;
         custom = custom.replace(/({{\s+(.*)\s+}})/, function(match, $1, $2) {
           return scope.data[$2];
