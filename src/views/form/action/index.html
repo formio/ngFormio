@@ -16,7 +16,7 @@
             <tr data-ng-repeat="action in actions">
                 <td>
                     <span ng-if="!action._id">{{ action.title }}</span>
-                    <a ng-if="action._id" ui-sref="project.{{ formInfo.type }}.form.action.item.edit({actionId: action._id})">{{ action.title }}</a>
+                    <a ng-if="action._id" ui-sref="project.{{ formInfo.type }}.form.action.item.edit({actionId: action._id})"><span ng-if="action.settings.provider"> {{ action.settings.provider }} </span>{{ action.title }}</a>
                 </td>
                 <td>
                     <span ng-if="!action._id">none</span>
