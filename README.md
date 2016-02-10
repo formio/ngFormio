@@ -19,18 +19,20 @@ cases.
   - <strong>Includes:</strong> Everything including Angular.js and jQuery.
   - <strong>Usage:</strong> Use this installation if your application does not already have Angular and jQuery and you wish to display a single form on a page.
   - <strong>Installation:</strong>  Place the following within your application.
+  
     ```  
-      <link rel="stylesheet" href="https://raw.githubusercontent.com/formio/ngFormio/v1.1.0/dist/formio-full.min.css" />
-      <script src="https://raw.githubusercontent.com/formio/ngFormio/v1.1.0/dist/formio-full.min.js"></script>
+<link rel="stylesheet" href="https://raw.githubusercontent.com/formio/ngFormio/v1.1.0/dist/formio-full.min.css" />
+<script src="https://raw.githubusercontent.com/formio/ngFormio/v1.1.0/dist/formio-full.min.js"></script>
     ```
     
 **Complete Installation**
   - <strong>Includes:</strong> Everything except Angular.js and jQuery
   - <strong>Usage:</strong> Use this if you are embedding a form within an application that already has Angular.js and jQuery installed.
   - <strong>Installation:</strong> Place the following within your application.
+  
     ```
-      <link rel="stylesheet" href="https://raw.githubusercontent.com/formio/ngFormio/v1.1.0/dist/formio-full.min.css" />
-      <script src="https://raw.githubusercontent.com/formio/ngFormio/v1.1.0/dist/formio-full.min.js"></script>
+<link rel="stylesheet" href="https://raw.githubusercontent.com/formio/ngFormio/v1.1.0/dist/formio-full.min.css" />
+<script src="https://raw.githubusercontent.com/formio/ngFormio/v1.1.0/dist/formio-full.min.js"></script>
     ```
     
 **Basic Installation: (Bower Installation)**
