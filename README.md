@@ -12,20 +12,63 @@ up to the REST API generated from the same schema.
 
 Installation
 ===================
-You can install this library by typing the following command in your application.
+There are several ways to add this library to your application. Each of these installation types are for specific use
+cases.
 
-```
-bower install formio --save
-```
+**Full Installation
+  - <strong>Includes:</strong> Everything including Angular.js and jQuery.
+  - <strong>Usage:</strong> Use this installation if your application does not already have Angular and jQuery and you wish to display a single form on a page.
+  - <strong>Installation:</strong>  Place the following within your application.
+  
+    <link rel="stylesheet" href="https://raw.githubusercontent.com/formio/ngFormio/v1.1.0/dist/formio-full.min.css" />
+    <script src="https://raw.githubusercontent.com/formio/ngFormio/v1.1.0/dist/formio-full.min.js"></script>
+    
+**Complete Installation
+  - <strong>Includes:</strong> Everything except Angular.js and jQuery
+  - <strong>Usage:</strong> Use this if you are embedding a form within an application that already has Angular.js and jQuery installed.
+  - <strong>Installation:</strong> Place the following within your application.
 
-Once you have this installed, you can add this library to your application with the following ```<script>``` tag.
-
-```
-<link rel='stylesheet' href='bower_components/formio/css/formio.css' />
-<script src="bower_components/formio/dist/formio-full.min.js"></script>
-```
-
-You will now need to add this module within your Angular.js application declaration like so...
+    <link rel="stylesheet" href="https://raw.githubusercontent.com/formio/ngFormio/v1.1.0/dist/formio-full.min.css" />
+    <script src="https://raw.githubusercontent.com/formio/ngFormio/v1.1.0/dist/formio-full.min.js"></script>
+    
+**Basic Installation: (Bower Installation)
+  - <strong>Includes:</strong> Only the ngFormio renderer library with no dependencies.
+  - <strong>Usage:</strong> When you wish to explicitely include all of the dependencies like when you are using [Wiredep](https://github.com/taptapship/wiredep).
+  - <strong>Installation:</strong> We recommend using [Wiredep](https://github.com/taptapship/wiredep) for the Basic installation since it will wire up all the dependencies for you. You just need to place the following within your application.
+  
+    First install the dependency using <strong>Bower</strong>
+    
+    ```
+bower install --save ng-formio
+    ```
+    
+    Then, you can add the following to your application.
+  
+    ```
+    <html>
+    <head>
+      <!-- bower:css -->
+      <!-- endbower -->
+    </head>
+    <body>
+      <!-- bower:js -->
+      <!-- endbower -->
+    </body>
+    </html>
+    ```
+    
+    Then run Wiredep to wire it up.
+    
+    ```
+$ node
+> require('wiredep')({ src: 'index.html' });
+    ```
+    
+    We also recommend using this within a [Gulp](http://gulpjs.com/) build process using Wiredep in combination with [Gulp UseRef](https://github.com/jonkemp/gulp-useref).
+    
+Configuration
+==============
+Once you have this installed, you will now need to add this module within your Angular.js application declaration like so...
 
 ***app.js***
 ```

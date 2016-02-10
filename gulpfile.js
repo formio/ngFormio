@@ -11,10 +11,14 @@ plugins.addsrc = require('gulp-add-src');
 
 gulp.task('clean', require('del').bind(null, ['dist']));
 gulp.task('eslint', require('./gulp/eslint')(gulp, plugins));
-gulp.task('styles', require('./gulp/styles')(gulp, plugins));
-gulp.task('scripts:formio', require('./gulp/scripts')(gulp, plugins));
-gulp.task('scripts:formio-full', require('./gulp/scripts-full')(gulp, plugins));
-gulp.task('scripts', ['scripts:formio', 'scripts:formio-full']);
+gulp.task('styles:basic', require('./gulp/styles-basic')(gulp, plugins));
+gulp.task('styles:full', require('./gulp/styles-full')(gulp, plugins));
+gulp.task('styles:complete', require('./gulp/styles-complete')(gulp, plugins));
+gulp.task('styles', ['styles:basic', 'styles:complete', 'styles:full']);
+gulp.task('scripts:basic', require('./gulp/scripts-basic')(gulp, plugins));
+gulp.task('scripts:complete', require('./gulp/scripts-complete')(gulp, plugins));
+gulp.task('scripts:full', require('./gulp/scripts-full')(gulp, plugins));
+gulp.task('scripts', ['scripts:basic', 'scripts:complete', 'scripts:full']);
 gulp.task('build', function(cb) {
   plugins.runSeq(['clean', 'eslint'], 'scripts', 'styles', cb)
 });
