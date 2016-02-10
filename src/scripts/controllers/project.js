@@ -723,6 +723,32 @@ app.controller('ProjectPreviewController', [
   }
 ]);
 
+app.controller('LaunchController', [
+  '$scope',
+  '$http',
+  'AppConfig',
+  function(
+    $scope,
+    $http,
+    AppConfig
+  ) {
+    $scope.currentSection.title = 'Launch';
+    $scope.currentSection.icon = 'fa fa-rocket';
+    $scope.currentSection.help = 'https://help.form.io/embedding/';
+    $scope.forms = [];
+    $scope.formsUrl = AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/form?limit=9999999';
+    $http.get($scope.formsUrl).then(function(response) {
+      $scope.forms = response.data;
+      $scope.formsFinished = true;
+    });
+    $scope.$watch('project', function(newProject, oldProject) {
+      if (newProject.name) {
+        $scope.projectApi = AppConfig.protocol + '//' + newProject.name + '.' + AppConfig.serverHost;
+      }
+    });
+  }
+]);
+
 app.controller('ProjectFormioController', [
   '$scope',
   'Formio',

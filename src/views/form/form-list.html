@@ -1,6 +1,6 @@
 <div>
   <i id="form-loader" ng-if="!formsFinished" style="font-size: 2em;" class="fa fa-spinner fa-pulse"></i>
-  <div class="row" style="margin-bottom: 20px;">
+  <div class="row" style="margin-bottom: 20px;" ng-if="listMode !== 'launch'">
     <div class="col-md-6">
       <div class="form-inline">
         <div class="form-group">
@@ -24,6 +24,7 @@
             <i class="fa fa-tasks  type-icon type-icon-form" ng-if="form.type == 'form'"></i>
             <a ui-sref="project.{{ form.type }}.form.edit({formId: form._id})" ng-if="!listMode || listMode == 'data'"><h4 class="ellipsis">{{ form.title }}</h4></a>
             <a ui-sref="project.{{ form.type }}.form.submission.index({formId: form._id})" ng-if="listMode == 'data'"><h4 class="ellipsis">{{ form.title }}</h4></a>
+            <h4 class="ellipsis" ng-if="listMode == 'launch'">{{ form.title }}</h4>
           </div>
           <div class="col-md-8 col-sm-6 col-xs-6">
             <div class="form-list-buttons" ng-if="!listMode || (listMode == 'forms')">
@@ -47,7 +48,11 @@
               <a ui-sref="project.{{ formType }}.form.delete({formId: form._id, formType: formType})" class="btn btn-default btn-xs" ng-if="form.type === formType"><span class="glyphicon glyphicon-trash"></span></a>
             </div>
 
+            <div class="form-list-buttons" ng-if="listMode == 'launch'">
+              <a ui-sref="project.{{ form.type }}.form.share({formId: form._id})" class="btn btn-default btn-xs" ng-if="listMode === 'launch'"><span class="fa fa-rocket"></span> Launch</a>
+            </div>
             <div class="form-list-buttons" ng-if="listMode == 'data'">
+              <a ui-sref="project.{{ form.type }}.form.share({formId: form._id})" class="btn btn-default btn-xs" ng-if="listMode === 'launch'"><span class="fa fa-rocket"></span> Launch</a>
               <a ui-sref="project.{{ formType }}.form.submission.index({formId: form._id})" class="btn btn-info btn-xs"><i class="fa fa-table"></i> Data</a>
               <span class="dropdown-button-menu">
                 <button class="btn btn-default btn-xs dropdown-toggle" type="button" id="exportMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
@@ -62,9 +67,13 @@
             </div>
           </div>
         </div>
-        <div class="row" ng-if="(!listMode || listMode === 'forms') && formType == 'form'">
+        <div class="row">
           <div class="col-xs-12">
-            <div>{{projectApi }}/{{ form.path }} <a ui-sref="project.{{ form.type }}.form.embed({formId: form._id})"><i class="fa fa-question-circle"></i></a></div>
+            <div class="form-list-description" ng-if="(!listMode || listMode === 'forms') && formType == 'form'"><strong>Form Endpoint</strong> {{projectApi }}/{{ form.path }} <a ui-sref="project.{{ form.type }}.form.embed({formId: form._id})"><i class="fa fa-question-circle"></i> embed</a></div>
+            <div class="form-list-description" ng-if="(!listMode || listMode === 'forms') && formType == 'resource'">{{ componentCount(form.components) }} components on this resource.</div>
+            <div class="form-list-description" ng-if="(listMode === 'data')">{{ componentCount(form.components) }} submissions.</div>
+            <div class="form-updated" ng-if="(!listMode || listMode === 'forms')">Updated {{ form.modified | timeSince }} ago</div>
+            <div class="form-updated" ng-if="(listMode === 'data')">Last submission {{ form.modified | timeSince }} ago</div>
           </div>
         </div>
       </li>

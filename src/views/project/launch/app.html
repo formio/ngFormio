@@ -25,6 +25,11 @@ gulp serve;</pre>
     <div class="row">
       <div class="col-md-12">
         <h3>Embed Forms and Resources</h3>
+        <ul>
+          <li ng-repeat="form in forms">
+            {{ projectApi }}/{{ form.path }}
+          </li>
+        </ul>
       </div>
     </div>
     <div class="row">

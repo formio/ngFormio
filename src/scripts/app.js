@@ -156,9 +156,24 @@ angular
           controller: 'ProjectPreviewController'
         })
         .state('project.launch', {
-          url: '/launch',
-          templateUrl: 'views/project/launch.html',
-          controller: 'ProjectPreviewController'
+          url: '',
+          templateUrl: 'views/project/launch/index.html',
+          controller: 'LaunchController'
+        })
+        .state('project.launch.form', {
+          url: '/form',
+          templateUrl: 'views/project/launch/form.html',
+          controller: 'LaunchController'
+        })
+        .state('project.launch.app', {
+          url: '/app',
+          templateUrl: 'views/project/launch/app.html',
+          controller: 'LaunchController'
+        })
+        .state('project.launch.cordova', {
+          url: '/cordova',
+          templateUrl: 'views/project/launch/cordova.html',
+          controller: 'LaunchController'
         })
         .state('project.api', {
           url: '/api',
@@ -534,6 +549,35 @@ angular
   .filter('capitalize', function() {
     return function(token) {
       return token.charAt(0).toUpperCase() + token.slice(1);
+    }
+  })
+  .filter('timeSince', function() {
+    return function(token) {
+      var elapsed = (new Date().getTime() - new Date(token).getTime()) / 1000;
+      var sPerMinute = 60;
+      var sPerHour = sPerMinute * 60;
+      var sPerDay = sPerHour * 24;
+      var sPerMonth = sPerDay * 30;
+      var sPerYear = sPerDay * 365;
+
+      if (elapsed < sPerMinute) {
+        return Math.round(elapsed/1000) + ' seconds';
+      }
+      else if (elapsed < sPerHour) {
+        return Math.round(elapsed/sPerMinute) + ' minutes';
+      }
+      else if (elapsed < sPerDay ) {
+        return Math.round(elapsed/sPerHour ) + ' hours';
+      }
+      else if (elapsed < sPerMonth) {
+        return Math.round(elapsed/sPerDay) + ' days';
+      }
+      else if (elapsed < sPerYear) {
+        return Math.round(elapsed/sPerMonth) + ' months';
+      }
+      else {
+        return Math.round(elapsed/sPerYear ) + ' years';
+      }
     }
   })
   .run([

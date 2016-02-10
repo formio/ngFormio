@@ -1207,6 +1207,14 @@ footer {
     line-height: inherit;
     display: inline;
   }
+  .form-list-description {
+    color: #666;
+    font-size: 14px;
+  }
+  .form-updated {
+    margin-top: 5px;
+    color: #888;
+  }
   .form-type {
     padding: 1px 5px;
     margin-left: 10px;
@@ -1222,7 +1230,7 @@ footer {
     padding: 0px;
 
     .list-group-item {
-      padding: 25px 0;
+      padding: 30px 0;
       border-color: #eeeeee;
       border-left: none;
       border-right: none;

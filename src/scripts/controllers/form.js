@@ -191,11 +191,13 @@ app.directive('formList', function() {
       '$rootScope',
       '$http',
       'AppConfig',
+      'FormioUtils',
       function(
         $scope,
         $rootScope,
         $http,
-        AppConfig
+        AppConfig,
+        FormioUtils
       ) {
         $rootScope.activeSideBar = 'projects';
         $rootScope.noBreadcrumb = false;
@@ -215,6 +217,9 @@ app.directive('formList', function() {
         $scope.export = function(form, type) {
           window.open(AppConfig.apiBase + '/project/' + $scope.project._id + '/form/' + form._id + '/export?format=' + type + '&x-jwt-token=' + $rootScope.userToken);
         };
+        $scope.componentCount = function(components) {
+          return _(FormioUtils.flattenComponents(components)).size();
+        }
       }
     ]
   };
