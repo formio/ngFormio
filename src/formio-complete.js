@@ -1,5 +1,3 @@
-global.jQuery = require('jquery');
-require('angular');
 require('angular-ui-mask');
 require('angular-ui-select/select');
 require('angular-moment');

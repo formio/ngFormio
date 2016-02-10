@@ -26,7 +26,7 @@ module.exports = function (app) {
                 params.select = settings.selectFields;
               }
               if (settings.searchFields && input) {
-                angular.forEach(settings.searchFields, function (field, index) {
+                angular.forEach(settings.searchFields, function (field) {
                   params[field] = input;
                 });
               }
