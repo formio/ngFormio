@@ -15,25 +15,25 @@ Installation
 There are several ways to add this library to your application. Each of these installation types are for specific use
 cases.
 
-***Full Installation
+**Full Installation**
   - <strong>Includes:</strong> Everything including Angular.js and jQuery.
   - <strong>Usage:</strong> Use this installation if your application does not already have Angular and jQuery and you wish to display a single form on a page.
   - <strong>Installation:</strong>  Place the following within your application.
     ```  
-<link rel="stylesheet" href="https://raw.githubusercontent.com/formio/ngFormio/v1.1.0/dist/formio-full.min.css" />
-<script src="https://raw.githubusercontent.com/formio/ngFormio/v1.1.0/dist/formio-full.min.js"></script>
+    <link rel="stylesheet" href="https://raw.githubusercontent.com/formio/ngFormio/v1.1.0/dist/formio-full.min.css" />
+    <script src="https://raw.githubusercontent.com/formio/ngFormio/v1.1.0/dist/formio-full.min.js"></script>
     ```
     
-***Complete Installation
+**Complete Installation**
   - <strong>Includes:</strong> Everything except Angular.js and jQuery
   - <strong>Usage:</strong> Use this if you are embedding a form within an application that already has Angular.js and jQuery installed.
   - <strong>Installation:</strong> Place the following within your application.
     ```
-<link rel="stylesheet" href="https://raw.githubusercontent.com/formio/ngFormio/v1.1.0/dist/formio-full.min.css" />
-<script src="https://raw.githubusercontent.com/formio/ngFormio/v1.1.0/dist/formio-full.min.js"></script>
+    <link rel="stylesheet" href="https://raw.githubusercontent.com/formio/ngFormio/v1.1.0/dist/formio-full.min.css" />
+    <script src="https://raw.githubusercontent.com/formio/ngFormio/v1.1.0/dist/formio-full.min.js"></script>
     ```
     
-***Basic Installation: (Bower Installation)
+**Basic Installation: (Bower Installation)**
   - <strong>Includes:</strong> Only the ngFormio renderer library with no dependencies.
   - <strong>Usage:</strong> When you wish to explicitely include all of the dependencies like when you are using [Wiredep](https://github.com/taptapship/wiredep).
   - <strong>Installation:</strong> We recommend using [Wiredep](https://github.com/taptapship/wiredep) for the Basic installation since it will wire up all the dependencies for you. You just need to place the following within your application.
