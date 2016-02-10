@@ -5595,8 +5595,11 @@ module.exports = function() {
       ) {
         return;
       }
-      ctrl.$validators.custom = function() {
+      ctrl.$validators.custom = function(modelValue, viewValue) {
         var valid = true;
+        /*eslint-disable no-unused-vars */
+        var input = modelValue || viewValue;
+        /*eslint-enable no-unused-vars */
         var custom = scope.component.validate.custom;
         custom = custom.replace(/({{\s+(.*)\s+}})/, function(match, $1, $2) {
           return scope.data[$2];
