@@ -226,7 +226,7 @@ li.user-dropdown a {
 $project-header-color: lighten($brand-primary, 55%);
 
 .welcome-info-strip {
-  background-color: $brand-secondary;
+  background-color: darken($brand-primary, 25%);
   color: $gray-lighter;
   padding-bottom: 20px;
   font-size: 23px;
@@ -239,7 +239,7 @@ $project-header-color: lighten($brand-primary, 55%);
 .new-project-row {
   position:relative;
   padding: 35px 0 0 0;
-  background-color: darken($brand-primary, 25%);
+  background-color: $brand-secondary;
   color: $project-header-color;
   .new-project-header {
     position:absolute;
@@ -323,7 +323,7 @@ $project-header-color: lighten($brand-primary, 55%);
 .navbar {
   border-radius: 0;
   margin-bottom: 0;
-  background-color: white;
+  background-color: #eeeeee;
 }
 
 .navbar-nav {
@@ -791,7 +791,7 @@ footer {
 
 /***************************** Landing Page *****************************/
 .welcome-banner {
-  background-color: $brand-secondary;
+  background-color: darken($brand-primary, 25%);
   color: #eee;
   text-align: center;
   padding-top: 10px;
@@ -938,7 +938,12 @@ footer {
       hr {
         margin: 4px 0 4px 0;
       }
-      .project-team-label, .project-add-team, .project-team-upgrade {
+      .project-team-upgrade {
+        color: #cccccc;
+        font-size: 0.8em;
+        text-align: center;
+      }
+      .project-team-label, .project-add-team {
         color: white;
         margin-right: 4px;
         background-color: darken($brand-secondary, 6%);
@@ -946,7 +951,7 @@ footer {
         padding: 4px 6px;
         cursor: pointer;
       }
-      .project-add-team, .project-team-upgrade {
+      .project-add-team {
         background-color: $brand-primary;
       }
       .view-all {
@@ -1210,6 +1215,7 @@ footer {
   .form-list-description {
     color: #666;
     font-size: 14px;
+    margin-top: 5px;
   }
   .form-updated {
     margin-top: 5px;

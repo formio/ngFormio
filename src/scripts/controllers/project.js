@@ -725,16 +725,39 @@ app.controller('ProjectPreviewController', [
 
 app.controller('LaunchController', [
   '$scope',
+  '$sce',
+  '$location',
   '$http',
   'AppConfig',
   function(
     $scope,
+    $sce,
+    $location,
     $http,
     AppConfig
   ) {
     $scope.currentSection.title = 'Launch';
     $scope.currentSection.icon = 'fa fa-rocket';
     $scope.currentSection.help = 'https://help.form.io/embedding/';
+    $scope.hasTemplate = true;
+    $scope.$watch('currentProject', function(project) {
+      if (!project.settings) {
+        return;
+      }
+      if (!project.settings.preview) {
+        $scope.hasTemplate = false;
+        project.settings.preview = {
+          repo: 'https://github.com/formio/formio-app-template',
+          url: 'http://formio.github.io/formio-app-template/'
+        };
+      }
+
+      var url = project.settings.preview.url.replace('http://', $location.protocol() + '://');
+      url += '/?apiUrl=' + encodeURIComponent(AppConfig.apiBase);
+      url += '&appUrl=' + encodeURIComponent($location.protocol() + '://' + project.name + '.' + AppConfig.serverHost);
+      $scope.previewUrl = $sce.trustAsResourceUrl(url);
+      $scope.repo = project.settings.preview.repo;
+    });
     $scope.forms = [];
     $scope.formsUrl = AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/form?limit=9999999';
     $http.get($scope.formsUrl).then(function(response) {
@@ -742,7 +765,7 @@ app.controller('LaunchController', [
       $scope.formsFinished = true;
     });
     $scope.$watch('project', function(newProject, oldProject) {
-      if (newProject.name) {
+      if (newProject && newProject.name) {
         $scope.projectApi = AppConfig.protocol + '//' + newProject.name + '.' + AppConfig.serverHost;
       }
     });

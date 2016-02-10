@@ -6,46 +6,44 @@
         <div class="form-group">
           <div class="input-group">
             <div class="input-group-addon">Search</div>
-            <input id="{{ formType }}-search" type="text" class="form-control" ng-model="search.name" placeholder="Find a {{ formType }}...">
+            <input id="{{ formType }}-search" type="text" class="form-control" ng-model="search.name" placeholder="Find a {{ title | lowercase }}...">
           </div>
         </div>
       </div>
     </div>
     <div class="col-md-6 text-right">
-      <a ui-sref="project.{{ formType }}.create()" ng-if="!listMode || listMode ==='forms'" class="btn btn-success"><span class="glyphicon glyphicon-plus"></span> New {{ formType | capitalize }}</a>
+      <a ui-sref="project.{{ formType }}.create()" ng-if="listMode === formType" class="btn btn-success"><span class="glyphicon glyphicon-plus"></span> New {{ formType | capitalize }}</a>
     </div>
   </div>
   <div class="form-list">
     <ul class="list-group">
-      <li class="list-group-item" data-ng-repeat="form in forms | filter:search">
+      <li class="list-group-item" ng-repeat="form in forms | filter:search">
         <div class="row">
-          <div class="col-md-4 col-sm-6 col-xs-6">
+          <div class="col-md-7">
             <i class="fa fa-database type-icon type-icon-resource" ng-if="form.type == 'resource'"></i>
             <i class="fa fa-tasks  type-icon type-icon-form" ng-if="form.type == 'form'"></i>
-            <a ui-sref="project.{{ form.type }}.form.edit({formId: form._id})" ng-if="!listMode || listMode == 'data'"><h4 class="ellipsis">{{ form.title }}</h4></a>
-            <a ui-sref="project.{{ form.type }}.form.submission.index({formId: form._id})" ng-if="listMode == 'data'"><h4 class="ellipsis">{{ form.title }}</h4></a>
+            <a ui-sref="project.{{ form.type }}.form.edit({formId: form._id})" ng-if="listMode === 'form' || listMode === 'resource'"><h4 class="ellipsis">{{ form.title }}</h4></a>
+            <a ui-sref="project.{{ form.type }}.form.submission.index({formId: form._id})" ng-if="listMode === 'data'"><h4 class="ellipsis">{{ form.title }}</h4></a>
             <h4 class="ellipsis" ng-if="listMode == 'launch'">{{ form.title }}</h4>
+            <div class="form-list-description" ng-if="listMode === 'form'">{{projectApi }}/{{ form.path }}</div>
+            <div class="form-list-description" ng-if="listMode === 'resource'">{{ componentCount(form.components) }} components on this resource.</div>
+            <div class="form-list-description" ng-if="listMode === 'data'">{{ componentCount(form.components) }} submissions.</div>
+            <div class="form-updated" ng-if="listMode !== 'data'">Updated {{ form.modified | timeSince }} ago</div>
+            <div class="form-updated" ng-if="listMode === 'data'">Last submission {{ form.modified | timeSince }} ago</div>
           </div>
-          <div class="col-md-8 col-sm-6 col-xs-6">
-            <div class="form-list-buttons" ng-if="!listMode || (listMode == 'forms')">
-              <a ui-sref="project.{{ form.type }}.form.edit({formId: form._id})" class="btn btn-default btn-xs" ng-if="form.type === formType"><span class="glyphicon glyphicon-edit"></span> Edit</a>
-              <span class="dropdown-button-menu hidden-lg hidden-md" ng-if="form.type === formType">
-                <button class="btn btn-default btn-xs dropdown-toggle" type="button" id="otherMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                  Other
-                  <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu" aria-labelledby="otherMenu">
-                  <a ui-sref="project.{{ formType }}.form.view({formId: form._id})" class="btn btn-default btn-xs" ng-if="formType === 'form'"><i class="fa fa-eye"></i> Preview</a>
-                  <li><a ui-sref="project.{{ formType }}.form.action.index({formId: form._id})"><i class="fa fa-paper-plane"></i> Actions</a></li>
-                  <li><a ui-sref="project.{{ formType }}.form.permission({formId: form._id})"><i class="fa fa-lock"></i> Access</a></li>
-                </ul>
-              </span>
-              <span class="hidden-sm hidden-xs">
-                <a ui-sref="project.{{ formType }}.form.view({formId: form._id})" class="btn btn-default btn-xs" ng-if="formType === 'form'"><i class="fa fa-eye"></i> Preview</a>
-                <a ui-sref="project.{{ formType }}.form.action.index({formId: form._id})" class="btn btn-default btn-xs" ng-if="form.type === formType"><i class="fa fa-paper-plane"></i> Actions</a>
-                <a ui-sref="project.{{ formType }}.form.permission({formId: form._id})" class="btn btn-default btn-xs" ng-if="form.type === formType"><i class="fa fa-lock"></i> Access</a>
-              </span>
-              <a ui-sref="project.{{ formType }}.form.delete({formId: form._id, formType: formType})" class="btn btn-default btn-xs" ng-if="form.type === formType"><span class="glyphicon glyphicon-trash"></span></a>
+          <div class="col-md-5">
+            <div class="form-list-buttons" ng-if="listMode == 'form' || listMode == 'resource'">
+              <div class="" style="margin-bottom: 5px;">
+                <a ui-sref="project.{{ form.type }}.form.edit({formId: form._id})" class="btn btn-default btn-xs" ng-if="formType == listMode"><span class="glyphicon glyphicon-edit"></span> Edit</a>
+                <a ui-sref="project.{{ formType }}.form.view({formId: form._id})" class="btn btn-default btn-xs" ng-if="listMode === 'resource'"><i class="fa fa-info-circle"></i> Info</a>
+                <a ui-sref="project.{{ formType }}.form.view({formId: form._id})" class="btn btn-default btn-xs" ng-if="listMode === 'form'"><i class="fa fa-eye"></i> Preview</a>
+                <a ui-sref="project.{{ form.type }}.form.embed({formId: form._id})" class="btn btn-default btn-xs" ng-if="listMode === 'form'"><i class="fa fa-code"></i> Embed</a>
+              </div>
+              <div class="">
+                <a ui-sref="project.{{ formType }}.form.action.index({formId: form._id})" class="btn btn-default btn-xs" ng-if="formType === listMode"><i class="fa fa-paper-plane"></i> Actions</a>
+                <a ui-sref="project.{{ formType }}.form.permission({formId: form._id})" class="btn btn-default btn-xs" ng-if="formType === listMode"><i class="fa fa-lock"></i> Access</a>
+                <a ui-sref="project.{{ formType }}.form.delete({formId: form._id, formType: formType})" class="btn btn-default btn-xs" ng-if="formType === listMode"><span class="glyphicon glyphicon-trash"></span></a>
+              </div>
             </div>
 
             <div class="form-list-buttons" ng-if="listMode == 'launch'">
@@ -65,15 +63,6 @@
                 </ul>
               </span>
             </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-xs-12">
-            <div class="form-list-description" ng-if="(!listMode || listMode === 'forms') && formType == 'form'"><strong>Form Endpoint</strong> {{projectApi }}/{{ form.path }} <a ui-sref="project.{{ form.type }}.form.embed({formId: form._id})"><i class="fa fa-question-circle"></i> embed</a></div>
-            <div class="form-list-description" ng-if="(!listMode || listMode === 'forms') && formType == 'resource'">{{ componentCount(form.components) }} components on this resource.</div>
-            <div class="form-list-description" ng-if="(listMode === 'data')">{{ componentCount(form.components) }} submissions.</div>
-            <div class="form-updated" ng-if="(!listMode || listMode === 'forms')">Updated {{ form.modified | timeSince }} ago</div>
-            <div class="form-updated" ng-if="(listMode === 'data')">Last submission {{ form.modified | timeSince }} ago</div>
           </div>
         </div>
       </li>

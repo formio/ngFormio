@@ -4,11 +4,13 @@
 <div class="panel panel-primary form-list-panel">
   <div class="panel-body">
     <div class="row">
-      <div class="col-sm-8">
-        <form-list forms="forms" project="currentProject" form-type="formInfo.type" num-per-page="25"></form-list>
+      <div class="col-sm-6">
+        <h2>Forms</h2>
+        <form-list forms="forms" title="'Form'" project="currentProject" form-type="'form'" list-mode="'form'"></form-list>
       </div>
-      <div ng-class="{'col-sm-12':(forms.length === 0), 'col-sm-4': (forms.length > 0)}" class="col-sm-4">
-        <ng-include src="infoTemplate"></ng-include>
+      <div class="col-sm-6">
+        <h2>Resource Forms</h2>
+        <form-list forms="resources" title="'Resource Form'" project="currentProject" form-type="'resource'" list-mode="'form'"></form-list>
       </div>
     </div>
   </div>

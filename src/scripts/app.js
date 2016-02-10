@@ -549,36 +549,40 @@ angular
   .filter('capitalize', function() {
     return function(token) {
       return token.charAt(0).toUpperCase() + token.slice(1);
-    }
+    };
   })
   .filter('timeSince', function() {
     return function(token) {
       var elapsed = (new Date().getTime() - new Date(token).getTime()) / 1000;
-      var sPerMinute = 60;
-      var sPerHour = sPerMinute * 60;
-      var sPerDay = sPerHour * 24;
-      var sPerMonth = sPerDay * 30;
-      var sPerYear = sPerDay * 365;
 
-      if (elapsed < sPerMinute) {
-        return Math.round(elapsed/1000) + ' seconds';
+      var interval;
+      interval = Math.floor(elapsed / 31536000);
+      if (interval >= 1) {
+        return interval + " year" + (interval > 1 ? 's' : '');
       }
-      else if (elapsed < sPerHour) {
-        return Math.round(elapsed/sPerMinute) + ' minutes';
+
+      interval = Math.floor(elapsed / 2592000);
+      if (interval >= 1){
+        return interval + " month" + (interval > 1 ? 's' : '');
       }
-      else if (elapsed < sPerDay ) {
-        return Math.round(elapsed/sPerHour ) + ' hours';
+
+      interval = Math.floor(elapsed / 86400);
+      if (interval >= 1) {
+        return interval + " day" + (interval > 1 ? 's' : '');
       }
-      else if (elapsed < sPerMonth) {
-        return Math.round(elapsed/sPerDay) + ' days';
+
+      interval = Math.floor(elapsed / 3600);
+      if (interval >= 1) {
+        return interval + " hour" + (interval > 1 ? 's' : '');
       }
-      else if (elapsed < sPerYear) {
-        return Math.round(elapsed/sPerMonth) + ' months';
+
+      interval = Math.floor(elapsed / 60);
+      if (interval >= 1) {
+        return interval + " minute" + (interval > 1 ? 's' : '');
       }
-      else {
-        return Math.round(elapsed/sPerYear ) + ' years';
-      }
-    }
+
+      return Math.floor(elapsed) + " second" + (elapsed > 1 ? 's' : '');
+    };
   })
   .run([
     '$state',
