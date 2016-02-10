@@ -31,8 +31,8 @@ cases.
   - <strong>Installation:</strong> Place the following within your application.
   
     ```
-<link rel="stylesheet" href="https://raw.githubusercontent.com/formio/ngFormio/v1.1.0/dist/formio-full.min.css" />
-<script src="https://raw.githubusercontent.com/formio/ngFormio/v1.1.0/dist/formio-full.min.js"></script>
+<link rel="stylesheet" href="https://raw.githubusercontent.com/formio/ngFormio/v1.1.0/dist/formio-complete.min.css" />
+<script src="https://raw.githubusercontent.com/formio/ngFormio/v1.1.0/dist/formio-complete.min.js"></script>
     ```
     
 **Basic Installation: (Bower Installation)**
