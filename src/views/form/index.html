@@ -5,15 +5,11 @@
   <div class="panel-body">
     <div class="row">
       <div class="col-sm-8">
-        <i id="{{ formInfo.type }}-loader" style="font-size: 2em;" class="fa fa-spinner fa-pulse"></i>
         <form-list forms="forms" project="currentProject" form-type="formInfo.type" num-per-page="25"></form-list>
       </div>
       <div ng-class="{'col-sm-12':(forms.length === 0), 'col-sm-4': (forms.length > 0)}" class="col-sm-4">
         <ng-include src="infoTemplate"></ng-include>
       </div>
     </div>
-  </div>
-  <div class="panel-footer">
-    <a ui-sref="project.{{ formInfo.type }}.create()" class="btn btn-success"><span class="glyphicon glyphicon-plus"></span> New {{ formInfo.name }}</a>
   </div>
 </div>

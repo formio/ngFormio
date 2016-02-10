@@ -491,9 +491,7 @@ div.project-section-separator {
       &.form-nav {
         a {
           &:hover {
-            border: 1px solid $brand-secondary;
-            background-color: darken($brand-secondary, 10%);
-            color: white;
+            background-color: lighten($gray-base, 85%);
           }
         }
         &.active a {
@@ -940,17 +938,15 @@ footer {
       hr {
         margin: 4px 0 4px 0;
       }
-      .project-team-upgrade {
-        text-align: center;
-      }
-      .project-team-label, .project-add-team {
+      .project-team-label, .project-add-team, .project-team-upgrade {
         color: white;
         margin-right: 4px;
         background-color: darken($brand-secondary, 6%);
         display: inline-block;
         padding: 4px 6px;
+        cursor: pointer;
       }
-      .project-add-team {
+      .project-add-team, .project-team-upgrade {
         background-color: $brand-primary;
       }
       .view-all {
@@ -1206,19 +1202,31 @@ footer {
 }
 
 .form-list {
-  h5 {
+  h4 {
     margin: 0;
-    padding: 5px;
     line-height: inherit;
+    display: inline;
+  }
+  .form-type {
+    padding: 1px 5px;
+    margin-left: 10px;
+    position: relative;
+    top: -3px;
+    border: 1px solid darken($brand-primary, 10%);
+    background-color: $brand-primary;
+    border-radius: 2px;
+    color: white;
   }
 
   .list-group {
     padding: 0px;
 
     .list-group-item {
-      padding: 10px 0 10px 0;
-      border: none;
-      &:nth-child(odd) {
+      padding: 25px 0;
+      border-color: #eeeeee;
+      border-left: none;
+      border-right: none;
+      &:nth-child(even) {
         background-color: $table-bg-accent;
       }
       .row {
@@ -1241,6 +1249,34 @@ footer {
       }
     }
   }
+}
+
+.project-info {
+  .list-group {
+    padding: 0px;
+    .list-group-item {
+      padding: 10px 0;
+      border-color: #eeeeee;
+      border-left: none;
+      border-right: none;
+      &:nth-child(even) {
+        background-color: $table-bg-accent;
+      }
+    }
+  }
+}
+
+.type-icon {
+  font-size: 1.5em;
+  margin-right: 10px;
+}
+
+.type-icon-resource {
+  color: $brand-primary;
+}
+
+.type-icon-form {
+  color: $brand-secondary;
 }
 
 /********************* Project Plan Upgrade Dialog *********************/

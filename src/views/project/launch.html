@@ -3,7 +3,7 @@
   <div class="project-section-inner-content">
     <div class="row">
       <div class="col-md-12">
-        <h3>Local Development</h3>
+        <h3>Setup Local Development</h3>
         <p>This application can be ran locally by downloading the GitHub repo located here.</p>
         <p><a class="btn btn-success btn-block" href="{{ repo }}" target="_blank">{{ repo }}</a></p>
         <div ng-if="hasTemplate">
@@ -12,14 +12,34 @@
           <p>Then you can run the app by typing the following in your terminal within the directory of the download.</p>
           <p><small>
             <pre>npm install;
-      bower install;
-      gulp serve;</pre>
+bower install;
+gulp serve;</pre>
           </small></p>
         </div>
         <div ng-if="!hasTemplate">
           <p>Then add any form using the following syntax.</p>
           <p><small><pre>&lt;formio src="'https://{{ currentProject.name }}.form.io/yourform'"&gt;&lt;/formio&gt;</pre></small></p>
         </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <h3>Embed Forms and Resources</h3>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <h3>Build a Distribution</h3>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <h3>Deploy to Hosting</h3>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+
       </div>
     </div>
   </div>

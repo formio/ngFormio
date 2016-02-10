@@ -79,7 +79,7 @@
             </div>
             <div class="row project-teams">
               <h5 class="text-center project-teams-header">Teams <i class="fa fa-users"></i></h5><hr />
-              <div ng-show="!teamSupport(project)" class="project-team-upgrade"><a ui-sref="project.settings.plan({projectId: project._id})">Upgrade Plan</a> to enable teams for this project</div>
+              <span ng-show="!teamSupport(project)" class="label label-default ellipsis project-team-upgrade" ng-click="showUpgradeDialog(project);">Upgrade Plan</span>
               <div ng-show="teamSupport(project)">
                 <span ui-sref="team.view({teamId: team._id})" ng-repeat="team in project.teams track by $index" ng-if="team.data.name" class="label label-default ellipsis project-team-label">{{team.data.name}}</span>
                 <a ng-show="teamSupport(project)" ui-sref="project.settings.teams.add({projectId: project._id})"><span class="label label-default ellipsis project-add-team"><i class="fa fa-user-plus"></i> Add Team</span></a>
@@ -92,7 +92,7 @@
     <div class="col-md-3">
       <h2>Teams</h2>
       <div class="well" ng-show="!teamsLoading && !(teamsEnabled || teamMember)">
-        <span class="team-upgrade">Want to work collaboratively? <a href="https://form.io/#pricing">Upgrade</a> a project to TeamPro to enable Team functionality.</span>
+        <span class="team-upgrade">Want to work collaboratively? Upgrade a project to TeamPro to enable Team functionality.</span>
       </div>
       <div class="list-group" ng-show="!teamsLoading && (teamsEnabled || teamMember)">
         <a ui-sref="team.view({teamId: team._id})" class="list-group-item" ng-repeat="team in teams">

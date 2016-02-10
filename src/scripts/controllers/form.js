@@ -189,17 +189,29 @@ app.directive('formList', function() {
     controller: [
       '$scope',
       '$rootScope',
+      '$http',
       'AppConfig',
       function(
         $scope,
         $rootScope,
+        $http,
         AppConfig
       ) {
         $rootScope.activeSideBar = 'projects';
         $rootScope.noBreadcrumb = false;
         $rootScope.currentForm = false;
         $scope.formsPerPage = $scope.numPerPage;
-        $scope.formsUrl = AppConfig.apiBase + '/project/' + $scope.project._id + '/form?type=' + $scope.formType;
+        $scope.formsUrl = AppConfig.apiBase + '/project/' + $scope.project._id + '/form?limit=9999999';
+        if ($scope.formType == 'resource') {
+          $scope.formsUrl += '&type=' + $scope.formType;
+        }
+        $http.get($scope.formsUrl).then(function(response) {
+          $scope.forms = response.data;
+          $scope.formsFinished = true;
+        });
+        $scope.$watch('project', function(newProject, oldProject) {
+          $scope.projectApi = AppConfig.protocol + '//' + $scope.project.name + '.' + AppConfig.serverHost;
+        });
         $scope.export = function(form, type) {
           window.open(AppConfig.apiBase + '/project/' + $scope.project._id + '/form/' + form._id + '/export?format=' + type + '&x-jwt-token=' + $rootScope.userToken);
         };
