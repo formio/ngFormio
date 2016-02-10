@@ -19,7 +19,7 @@
     "ng-file-upload": "~11.2.1",
     "angular-sanitize": "~1.5.0",
     "angular-bootstrap": "~1.1.0",
-    "angular-moment": "~1.0.0-beta.3",
+    "angular-moment": "~1.0.0-beta.4",
     "bootstrap": "~3.3.6",
     "bootstrap-ui-datetime-picker": "~2.1.0",
     "signature_pad": "~1.5.2",
