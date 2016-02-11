@@ -22,7 +22,8 @@
           <div class="col-md-7">
             <i class="fa fa-database type-icon type-icon-resource" ng-if="form.type == 'resource'"></i>
             <i class="fa fa-tasks  type-icon type-icon-form" ng-if="form.type == 'form'"></i>
-            <a ui-sref="project.{{ form.type }}.form.edit({formId: form._id})" ng-if="listMode === 'form' || listMode === 'resource'"><h4 class="ellipsis">{{ form.title }}</h4></a>
+            <a ui-sref="project.{{ form.type }}.form.edit({formId: form._id})" ng-if="listMode === form.type"><h4 class="ellipsis">{{ form.title }}</h4></a>
+            <a ui-sref="project.{{ listMode }}.form.view({formId: form._id})" ng-if="listMode === 'form' && formType === 'resource'"><h4 class="ellipsis">{{ form.title }}</h4></a>
             <a ui-sref="project.{{ form.type }}.form.submission.index({formId: form._id})" ng-if="listMode === 'data'"><h4 class="ellipsis">{{ form.title }}</h4></a>
             <h4 class="ellipsis" ng-if="listMode == 'launch'">{{ form.title }}</h4>
             <div class="form-list-description" ng-if="listMode === 'form'">GET&nbsp;{{projectApi }}/{{ form.path }}</div>
@@ -36,8 +37,8 @@
               <div class="" style="margin-bottom: 5px;">
                 <a ui-sref="project.{{ form.type }}.form.edit({formId: form._id})" class="btn btn-default btn-xs" ng-if="formType == listMode"><span class="glyphicon glyphicon-edit"></span> Edit</a>
                 <a ui-sref="project.{{ formType }}.form.view({formId: form._id})" class="btn btn-default btn-xs" ng-if="listMode === 'resource'"><i class="fa fa-info-circle"></i> Info</a>
-                <a ui-sref="project.{{ formType }}.form.view({formId: form._id})" class="btn btn-default btn-xs" ng-if="listMode === 'form'"><i class="fa fa-eye"></i> Preview</a>
-                <a ui-sref="project.{{ form.type }}.form.embed({formId: form._id})" class="btn btn-default btn-xs" ng-if="listMode === 'form'"><i class="fa fa-code"></i> Embed</a>
+                <a ui-sref="project.{{ listMode }}.form.view({formId: form._id})" class="btn btn-default btn-xs" ng-if="listMode === 'form'"><i class="fa fa-eye"></i> Preview</a>
+                <a ui-sref="project.{{ listMode }}.form.embed({formId: form._id})" class="btn btn-default btn-xs" ng-if="listMode === 'form'"><i class="fa fa-code"></i> Embed</a>
               </div>
               <div class="">
                 <a ui-sref="project.{{ formType }}.form.action.index({formId: form._id})" class="btn btn-default btn-xs" ng-if="formType === listMode"><i class="fa fa-paper-plane"></i> Actions</a>
