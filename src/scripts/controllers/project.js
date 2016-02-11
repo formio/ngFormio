@@ -325,12 +325,14 @@ app.controller('ProjectController', [
 
 app.controller('ProjectHomeController', [
   '$scope',
+  '$stateParams',
   'AppConfig',
   'Formio',
   'FormioAlerts',
   'ngDialog',
   function(
     $scope,
+    $stateParams,
     AppConfig,
     Formio,
     FormioAlerts,
@@ -374,6 +376,7 @@ app.controller('ProjectHomeController', [
         className: 'ngdialog-theme-default project-info'
       });
     };
+    $scope.graphType = $stateParams.graphType;
   }
 ]);
 
@@ -425,23 +428,17 @@ app.factory('ProjectAnalytics', [
   }
 ]);
 
-app.controller('ProjectDataController', [
+app.controller('ChartController', [
   '$scope',
-  '$stateParams',
   'Formio',
   'ProjectAnalytics',
   'moment',
   function(
     $scope,
-    $stateParams,
     Formio,
     ProjectAnalytics,
     moment
   ) {
-    $scope.currentSection.title = 'Data';
-    $scope.currentSection.icon = 'fa fa-table';
-    $scope.currentSection.help = '';
-
     // Get the current time.
     var curr = new Date();
     $scope.viewDate = {
@@ -610,13 +607,25 @@ app.controller('ProjectDataController', [
           });
       }
     };
-
-    // Simple ui tools to aid in switching the default view.
-    $scope.graphType = $stateParams.graphType;
     $scope.types = ['Year', 'Month', 'Day'];
     $scope.graphChange = function() {
       $scope.displayView(($scope.graphType || '').toLowerCase());
     };
+  }
+]);
+
+app.controller('ProjectDataController', [
+  '$scope',
+  '$stateParams',
+  function(
+    $scope,
+    $stateParams
+  ) {
+    $scope.currentSection.title = 'Data';
+    $scope.currentSection.icon = 'fa fa-table';
+    $scope.currentSection.help = '';
+
+    $scope.graphType = $stateParams.graphType;
   }
 ]);
 

@@ -1,5 +1,5 @@
 <div class="project-section-content project-section-inner-content project-data">
-  <div class="row" ng-controller="ProjectDataController">
+  <div class="row" ng-controller="ChartController">
     <div class="col-sm-12">
       <h3 class="center">{{label[currentType]}}</h3>
       <h4>{{viewDate.year}} / {{viewDate.month}} / {{viewDate.day}}&nbsp;(UTC)&emsp;<select ng-init="graphChange()" ng-options="type for type in types" ng-model="graphType" ng-change="graphChange()"></select></h4>
