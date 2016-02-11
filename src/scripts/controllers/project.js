@@ -328,15 +328,13 @@ app.controller('ProjectHomeController', [
   'AppConfig',
   'Formio',
   'FormioAlerts',
-  'ProjectAnalytics',
-  'moment',
+  'ngDialog',
   function(
     $scope,
     AppConfig,
     Formio,
     FormioAlerts,
-    ProjectAnalytics,
-    moment
+    ngDialog
   ) {
     $scope.currentSection.title = 'Dashboard';
     $scope.currentSection.icon = 'fa fa-dashboard';
@@ -355,76 +353,6 @@ app.controller('ProjectHomeController', [
 
     var abbreviator = new NumberAbbreviate();
 
-    var now = new Date();
-    now = {
-      year: now.getUTCFullYear(),
-      month: (now.getUTCMonth() + 1),
-      day: now.getUTCDate()
-    };
-
-    $scope.chartOptions = {
-      height: '130px',
-      low: 0,
-      lineSmooth: false,
-      showPoint: false,
-      showArea: true,
-      fullWidth: true,
-      axisX: {
-        showLabel: false,
-        showGrid: false
-      },
-      axisY: {
-        showLabel: false,
-        showGrid: false
-      }
-    };
-
-    ProjectAnalytics.getSubmissionAnalytics($scope.currentProject._id, now.year)
-    .then(function(data) {
-      $scope.submissionTotalYear = abbreviator.abbreviate(_(data)
-      .map('submissions')
-      .sum(), 0);
-      $scope.submissionDataYear = {
-        labels: _(data)
-          .map('month')
-          .map(function(month) { return _.add(month, 1); })
-          .value(),
-        series: [
-          _.map(data, 'submissions').reverse()
-        ]
-      };
-    });
-    ProjectAnalytics.getSubmissionAnalytics($scope.currentProject._id, now.year, now.month)
-    .then(function(data) {
-      $scope.submissionTotalMonth = abbreviator.abbreviate(_(data)
-      .map('submissions')
-      .sum(), 0);
-      $scope.submissionDataMonth = {
-        labels: _(data)
-          .map('day')
-          .map(function(day) { return _.add(day, 1); })
-          .value(),
-        series: [
-          _.map(data, 'submissions').reverse()
-        ]
-      };
-    });
-    ProjectAnalytics.getSubmissionAnalytics($scope.currentProject._id, now.year, now.month, now.day)
-    .then(function(data) {
-      $scope.submissionTotalToday = abbreviator.abbreviate(_(data)
-      .map('submissions')
-      .sum(), 0);
-      $scope.submissionDataToday = {
-        labels: _(data)
-          .map('hour')
-          .map(function(hour) { return _.add(hour, 1); })
-          .value(),
-        series: [
-          _.map(data, 'submissions').reverse()
-        ]
-      };
-    });
-
     $scope.hasTeams = function() {
       return $scope.currentProject.plan === 'team' || $scope.currentProject.plan === 'commercial';
     };
@@ -437,6 +365,14 @@ app.controller('ProjectHomeController', [
         return new Date(item.modified);
       })
       .max();
+    };
+
+    $scope.projectInfo = function() {
+      ngDialog.open({
+        template: 'views/project/project-popup.html',
+        showClose: true,
+        className: 'ngdialog-theme-default project-info'
+      });
     };
   }
 ]);

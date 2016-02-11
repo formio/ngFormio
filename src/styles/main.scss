@@ -1311,6 +1311,28 @@ footer {
   }
 }
 
+.ngdialog.ngdialog-theme-default.project-info .ngdialog-content {
+  @media (max-width: $screen-sm-min) {
+    width: 100%;
+  }
+  @media (min-width: $screen-sm-min) {
+    width: 95%;
+  }
+  @media (min-width: $screen-md-min) {
+    width: $container-md - 75px;
+  }
+  @media (min-width: $screen-lg-min) {
+    width: $container-lg - 150px;
+  }
+  .row {
+    margin-left: 0;
+    margin-right: 0;
+  }
+  :focus {
+    outline: none;
+  }
+}
+
 .project-upgrade-dialog {
   @media (min-width: $screen-sm-min) {
     display: flex;
@@ -1456,5 +1478,13 @@ footer {
     &:hover {
       text-decoration: none;
     }
+  }
+}
+
+.alert-info {
+  background-color: lighten($brand-primary, 18%);
+  a {
+    color: white;
+    font-weight: bold;
   }
 }

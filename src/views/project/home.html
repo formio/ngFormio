@@ -3,7 +3,7 @@
     <div class="row">
       <div class="col-md-8">
         <legend>Project Overview</legend>
-        <p>A project serves as a container for the Resources, Forms, API, Data, and Settings for the application you are building.</p>
+        <p>A project serves as a container for the Resources, Forms, API, Data, and Settings for the application you are building. <br /><a href="" ng-click="projectInfo()">More info</a></p>
         <div class="project-info">
           <ul class="list-group table table-striped">
             <li class="list-group-item">
@@ -108,44 +108,12 @@
         <div class="col-md-12">
           <legend>Submission Activity</legend>
         </div>
-        <div class="col-md-4">
-          <a class="thumbnail-chart-link">
-            <div class="well">
-              <div class="col-xs-8 col-vertical-center">
-                <chartist class="ct-chart thumbnail-chart" chartist-data="submissionDataToday" chartist-chart-type="Line" chartist-chart-options="chartOptions"></chartist>
-              </div><!--
-              --><div class="col-xs-4 col-vertical-center">
-              <h5>Today</h5>
-              <h2>{{ submissionTotalToday }}</h2>
-            </div>
-            </div>
-          </a>
-        </div>
-        <div class="col-md-4">
-          <a class="thumbnail-chart-link">
-            <div class="well">
-              <div class="col-xs-8 col-vertical-center">
-                <chartist class="ct-chart thumbnail-chart" chartist-data="submissionDataMonth" chartist-chart-type="Line" chartist-chart-options="chartOptions"></chartist>
-              </div><!--
-              --><div class="col-xs-4 col-vertical-center">
-              <h5>This Month</h5>
-              <h2>{{ submissionTotalMonth }}</h2>
-            </div>
-            </div>
-          </a>
-        </div>
-        <div class="col-md-4">
-          <a class="thumbnail-chart-link">
-            <div class="well">
-              <div class="col-xs-8 col-vertical-center">
-                <chartist class="ct-chart thumbnail-chart" chartist-data="submissionDataYear" chartist-chart-type="Line" chartist-chart-options="chartOptions"></chartist>
-              </div><!--
-              --><div class="col-xs-4 col-vertical-center">
-              <h5>This Year</h5>
-              <h2>{{ submissionTotalYear }}</h2>
-            </div>
-            </div>
-          </a>
+        <div class="project-data" ng-controller="ProjectDataController">
+          <div class="col-sm-12">
+            <h3 class="center">{{label[currentType]}}</h3>
+            <h4>{{viewDate.year}} / {{viewDate.month}} / {{viewDate.day}}&nbsp;(UTC)&emsp;<select ng-init="graphChange()" ng-options="type for type in types" ng-model="graphType" ng-change="graphChange()"></select></h4>
+            <chartist class="ct-chart" chartist-data="analytics" chartist-chart-type="Line" chartist-chart-options="analyticsOptions" chartist-events="analyticsEvents"></chartist>
+          </div>
         </div>
       </div>
     </div>

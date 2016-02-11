@@ -1,4 +1,4 @@
-<div class="jumbotron welcome-banner" ng-if="showHeader">
+<div class="jumbotron welcome-banner" ng-if="showHeader && showWelcome()">
   <div class="container">
     <h1>Welcome to <img style="height:1em;" src="images/formio-logo-white.png"></h1>
     <ul class="list-inline">
@@ -9,7 +9,7 @@
     </ul>
   </div>
 </div>
-<div class="welcome-info-strip">
+<div class="welcome-info-strip" ng-if="showWelcome()">
   <div class="container">
     <div class="row">
       <div class="col-sm-10 col-sm-offset-1 text-center">
