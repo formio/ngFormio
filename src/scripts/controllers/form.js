@@ -296,7 +296,7 @@ app.controller('FormController', [
       $scope.formio.loadActions().then(function(actions) {
         // Get the available actions for the form, to check if premium actions are present.
         $scope.formio.availableActions().then(function(available) {
-          var premium = _.pluck(_.filter(available, function(action) {
+          var premium = _.map(_.filter(available, function(action) {
             return (action.hasOwnProperty('premium') && action.premium === true);
           }), 'name');
 
