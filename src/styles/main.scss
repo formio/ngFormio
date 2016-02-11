@@ -323,7 +323,7 @@ $project-header-color: lighten($brand-primary, 55%);
 .navbar {
   border-radius: 0;
   margin-bottom: 0;
-  background-color: #eeeeee;
+  background-color: lighten($brand-primary, 57%);
 }
 
 .navbar-nav {
@@ -1269,7 +1269,7 @@ footer {
   .list-group {
     padding: 0px;
     .list-group-item {
-      padding: 10px 0;
+      padding: 10px;
       border-color: #eeeeee;
       border-left: none;
       border-right: none;

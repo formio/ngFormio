@@ -177,7 +177,7 @@ app.directive('formList', function() {
     replace: true,
     templateUrl: 'views/form/form-list.html',
     scope: {
-      title: '=',
+      formName: '=',
       forms: '=',
       project: '=',
       formType: '=',
@@ -204,8 +204,10 @@ app.directive('formList', function() {
         $rootScope.noBreadcrumb = false;
         $rootScope.currentForm = false;
         $scope.search = {};
-        $scope.formsPerPage = $scope.numPerPage;
-        $scope.formsUrl = AppConfig.apiBase + '/project/' + $scope.project._id + '/form?limit=9999999&type=' + $scope.formType;
+        $scope.formsUrl = AppConfig.apiBase + '/project/' + $scope.project._id + '/form?limit=9999999';
+        if ($scope.formType) {
+          $scope.formsUrl += '&type=' + $scope.formType;
+        }
         $http.get($scope.formsUrl).then(function(response) {
           $scope.forms = response.data;
           $scope.formsFinished = true;
