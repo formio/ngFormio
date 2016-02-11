@@ -4,18 +4,52 @@
     <div class="row">
       <div class="col-md-12">
         <h3>Setup Local Development</h3>
-        <p>This application can be run locally by downloading the GitHub repo located here.</p>
-        <p><a href="{{ repo }}" target="_blank">{{ repo }}</a></p>
-        <div ng-if="hasTemplate">
-          <p>Then change the <strong>/src/config.js</strong> to say the following.</p>
-          <p><small><pre>var APP_URL = '{{ projectApi }}';</pre></small></p>
-          <p>Then you can run the app by typing the following in your terminal within the directory of the download.</p>
-          <p><small>
-            <pre>npm install;
-bower install;
-gulp serve;</pre>
-          </small></p>
+        <div class="alert alert-info">
+          In order to do local development you will need to have node.js and npm installed. See <a href="https://nodejs.org/" target="_blank">nodejs installation instructions</a>.
         </div>
+        <h4>Step 1 - Get the source code</h4>
+        <p>To begin development of this application you will need to set up a local development environment. Start by either downloading or cloning the github repo.</p>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                Download the repo
+              </div>
+              <div class="panel-body">
+                <p>Downloading the repo does not require git but also does not track and manage changes you make unless you set it up manually with a new git repo.</p>
+                <p>Go to <a href="{{ repo }}" target="_blank">{{ repo }}</a></p>
+                <p>Click the <strong>Download Zip</strong> button.</p>
+                <p>Unzip the file, open your terminal and change directory to the app directory.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                Clone the repo
+              </div>
+              <div class="panel-body">
+                <p>In order to clone the github repo you must have git installed on your computer. If you don't already have it, you can get it at <a href="https://git-scm.com/" target="_blank">https://git-scm.com/</a>.</p>
+                <p>Once you have git, go to your terminal and type</p>
+                <p><pre>git clone {{ repo }}.git
+cd formio-app-todo</pre></p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <h4>Step 2 - Install dependencies</h4>
+        <p>This step requires that that nodejs, npm and bower are installed. Bower can be installed after nodejs and npm by typing this in the terminal</p>
+        <p><pre>npm install -g bower</pre></p>
+        <p>Install both node and bower dependencies by typing this in your terminal from the application base directory.</p>
+            <pre>npm install
+bower install</pre>
+        <h4>Step 3 - Configure for your project</h4>
+        <p>In order for the app to use your form.io project, you need to configure the app to know where it is.</p>
+        <p>Change the first line of <strong>/src/config.js</strong> to say the following.</p>
+        <p><pre>var APP_URL = '{{ projectApi }}';</pre></p>
+        <h4>Step 4 - Running the app</h4>
+        <p>You can run a development version of the application from the command line. This will start up a server and a browser window and refresh the page any time you change the source code.</p>
+        <p><pre>gulp serve</pre></p>
         <div ng-if="!hasTemplate">
           <p>Then add any form using the following syntax.</p>
           <p><small><pre>&lt;formio src="'https://{{ currentProject.name }}.form.io/yourform'"&gt;&lt;/formio&gt;</pre></small></p>
@@ -24,10 +58,27 @@ gulp serve;</pre>
     </div>
     <div class="row">
       <div class="col-md-12">
-        <h3>Embed Forms and Resources</h3>
-        <ul>
-          <li ng-repeat="form in forms">
-            {{ projectApi }}/{{ form.path }}
+        <h3>Embed Forms</h3>
+        <p>Forms are embedded within your application by using the &lt;formio&gt; directive and referencing the form URL endpoint.</p>
+        <p>Using these embed codes you can perform full CRUD and index on your form submissions.</p>
+        <p>More information on embedding can be found at <a href="https://help.form.io/api/#angular" target="_blank">Angular Embedding Help</a></p>
+        <h4>Basic embedding</h4>
+        <p>This would embed one of your forms and allow the data to be submitted back to the API server.</p>
+        <p><pre>&lt;formio src="{{ projectApi }}/{{ forms[0].path }}"&gt;&lt;/formio&gt;</pre></p>
+        <h4>List of Submissions</h4>
+        <p>It is often useful to list the submissions already sent to a form backend. This can be done simply using the &lt;formio-submissions&gt; directive.</p>
+        <p><pre>&lt;formio-submissions src="{{ projectApi }}/{{ forms[0].path }}"&gt;&lt;/formio-submissions&gt;</pre></p>
+        <h4>Form Update</h4>
+        <p>You can also reference an existing submission in the form url and the data from that submission will be loaded along with the form. When the form is submitted, an update will happen instead of a create.</p>
+        <p><pre>&lt;formio src="{{ projectApi }}/{{ forms[0].path }}/submission/{submissionId}"&gt;&lt;/formio&gt;</pre></p>
+        <h4>Form Submission Delete</h4>
+        <p>Finally, you can allow users to delete a submission with the &lt;formio-delete&gt; directive. If the user has permission, they can delete the submission.</p>
+        <p><pre>&lt;formio-delete src="{{ projectApi }}/{{ forms[0].path }}/submission/{submissionId}"&gt;&lt;/formio-delete&gt;</pre></p>
+
+        <h4>Available forms in your project</h4>
+        <ul class="list-group">
+          <li class="list-group-item" ng-repeat="form in forms">
+            {{ form.title }} - {{ projectApi }}/{{ form.path }}
           </li>
         </ul>
       </div>
@@ -35,16 +86,18 @@ gulp serve;</pre>
     <div class="row">
       <div class="col-md-12">
         <h3>Build a Distribution</h3>
+        <p>To build your app and prepare it for hosting, you will need to compile it. If you are using one of our applications as the base, we provide a gulp task that will do this for you.</p>
+        <p><pre>gulp build</pre></p>
+        <p>This will build your entire application into the <strong>/dist</strong> directory. This will be a fully working version of your app that is ready for deployment.</p>
       </div>
     </div>
     <div class="row">
       <div class="col-md-12">
         <h3>Deploy to Hosting</h3>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-md-12">
-
+        <p>Form.io based apps can be hosted anywhere that is able to serve files over http. Since all of the logic and functionality is done on the form.io backend, there are no special requirements for hosting the app. There are many good free hosts you can use to host your app or set up your own server.</p>
+        <p>To deploy your app, make sure you have run <strong>gulp build</strong> and copy the contents of the <strong>/dist</strong> directory to your server host.</p>
+        <p>We host many of our apps using <a href="https://pages.github.com/" target="_blank">github pages</a> which is free.</p>
+        <p>Amazon s3 with cloudfront is a very good high performance alternative.</p>
       </div>
     </div>
   </div>
