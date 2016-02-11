@@ -703,12 +703,6 @@ app.controller('LaunchController', [
       $scope.previewUrl = $sce.trustAsResourceUrl(url);
       $scope.repo = project.settings.preview.repo;
     });
-    $scope.forms = [];
-    $scope.formsUrl = AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/form?limit=9999999';
-    $http.get($scope.formsUrl).then(function(response) {
-      $scope.forms = response.data;
-      $scope.formsFinished = true;
-    });
     $scope.$watch('project', function(newProject, oldProject) {
       if (newProject && newProject.name) {
         $scope.projectApi = AppConfig.protocol + '//' + newProject.name + '.' + AppConfig.serverHost;
