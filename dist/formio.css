@@ -1,0 +1,134 @@
+.field-required:after {
+  color:red;
+  content:" *";
+}
+
+.field-required-inline {
+  color:red;
+  z-index: 5;
+}
+
+.form-field-type-hidden {
+  margin: 0;
+  padding: 0;
+}
+
+.datetime-picker-dropdown div > table .btn-default {
+  border: 0;
+  background-color: #fff;
+}
+
+.datetime-picker-dropdown div > table .btn-default:hover {
+  background-color: #ccc;
+}
+
+.datetime-picker-dropdown div > table .btn-default.active {
+  background-color: #ccc;
+}
+
+.has-feedback .datetime-picker-dropdown .form-control {
+  padding: inherit;
+}
+
+.form-control.btn-default {
+  background-color: #fff;
+}
+
+/* Handle overflow of long matched placeholder/text without covering caret */
+.has-feedback .form-control.ui-select-toggle {
+  padding-right: 20px;
+}
+.ui-select-placeholder, .ui-select-match-text {
+  width: 100%;
+  margin-right: -15px;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+.ui-select-container {
+  min-width: 200px;
+}
+
+/* Fix Safari bug that prevents you from typing in draggable password fields */
+input[type="password"][draggable="true"] {
+  -webkit-user-select:text !important;
+}
+
+.glyphicon-spin {
+  -webkit-animation: spin-anim 1s infinite;
+  animation: spin-anim 1s infinite;
+}
+@-webkit-keyframes spin-anim {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(359deg);
+    transform: rotate(359deg);
+  }
+}
+@keyframes spin-anim {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(359deg);
+    transform: rotate(359deg);
+  }
+}
+
+.formio-submission:hover {
+  background-color: rgba(0, 0, 0, .025);
+}
+
+.formio-submission:active {
+  background-color: rgba(0, 0, 0, .05);
+}
+
+.form-field-type-file .fileSelector,
+.component-type-file .fileSelector {
+  padding: 15px;
+  border: 2px dashed #ddd;
+  text-align: center;
+}
+
+.form-field-type-file .fileSelector.fileDragOver,
+.component-type-file .fileSelector.fileDragOver {
+  border-color: #127abe;
+}
+
+.form-field-type-file .fileSelector .glyphicon,
+.component-type-file .fileSelector .glyphicon {
+  font-size: 20px;
+  margin-right: 5px;
+}
+
+.component-type-selectboxes .checkbox-inline input[type="checkbox"],
+.form-field-type-selectboxes .checkbox-inline input[type="checkbox"],
+.form-field-type-radio .radio-inline input[type="radio"]
+.component-type-radio .radio-inline input[type="radio"] {
+  margin-top: 4px;
+}
+
+.form-field-type-datagrid .form-group {
+  margin-bottom: 0;
+}
+
+.form-field-type-datagrid .datagrid-table {
+  margin-bottom: 0px;
+}
+
+.form-field-type-datagrid .datagrid-add {
+  margin-bottom: 20px;
+}
+
+.form-field-type-datetime .input-group,
+.form-field-type-datetime .input-group-btn {
+  width: 100%;
+}
+.form-field-type-datetime .input-group-btn {
+  width: auto;
+}

@@ -1,6 +1,4 @@
-global.jQuery = require('jquery');
-require('angular');
-require('angular-ui-mask');
+require('angular-ui-mask/dist/mask');
 require('ui-select/dist/select');
 require('angular-moment');
 require('angular-sanitize');
