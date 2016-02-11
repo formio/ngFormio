@@ -51,6 +51,7 @@ module.exports = function (app) {
           };
 
           $scope.openOAuth = function(settings) {
+            /*eslint-disable camelcase */
             var params = {
               response_type: 'code',
               client_id: settings.clientId,
@@ -58,6 +59,8 @@ module.exports = function (app) {
               state: settings.state,
               scope: settings.scope
             };
+            /*eslint-enable camelcase */
+
             // Make display optional.
             if (settings.display) {
               params.display = settings.display;

@@ -11,7 +11,7 @@ module.exports = function() {
     getBaseUrl: Formio.getBaseUrl,
     registerPlugin: Formio.registerPlugin,
     getPlugin: Formio.getPlugin,
-    setDomain: function(dom) {
+    setDomain: function() {
       // Remove this?
     },
 
