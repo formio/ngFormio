@@ -177,7 +177,7 @@ app.directive('formList', function() {
     replace: true,
     templateUrl: 'views/form/form-list.html',
     scope: {
-      title: '=',
+      formName: '=',
       forms: '=',
       project: '=',
       formType: '=',
