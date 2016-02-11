@@ -234,7 +234,7 @@ app.controller('ProjectController', [
       $q.all([userTeamsPromise, projectTeamsPromise]).then(function() {
         var roles = _.has($scope.user, 'roles') ? $scope.user.roles : [];
         var teams = _($scope.userTeams ? $scope.userTeams : [])
-          .pluck('_id')
+          .map('_id')
           .filter()
           .value();
         var allRoles = _(roles.concat(teams)).filter().value();
@@ -251,7 +251,7 @@ app.controller('ProjectController', [
         var hasRoles = function(type) {
           var potential = _($scope.currentProjectTeams)
             .filter({permission: type})
-            .pluck('_id')
+            .map('_id')
             .value();
           return (_.intersection(allRoles, potential).length > 0);
         };
@@ -514,11 +514,11 @@ app.controller('ProjectDataController', [
           .then(function(data) {
             $scope.currentType = type;
             $scope.analytics = {
-              labels: _.map(_.pluck(data, 'month'), function(month) {
+              labels: _.map(_.map(data, 'month'), function(month) {
                 return _.add(month, 1);
               }),
               series: [
-                _.pluck(data, 'submissions')
+                _.map(data, 'submissions')
               ]
             };
 
@@ -531,11 +531,11 @@ app.controller('ProjectDataController', [
           .then(function(data) {
             $scope.currentType = type;
             $scope.analytics = {
-              labels: _.map(_.pluck(data, 'day'), function(day) {
+              labels: _.map(_.map(data, 'day'), function(day) {
                 return _.add(day, 1);
               }),
               series: [
-                _.pluck(data, 'submissions')
+                _.map(data, 'submissions')
               ]
             };
 
@@ -603,7 +603,7 @@ app.controller('ProjectDataController', [
 
             $scope.analytics = {
               labels: displayHrs,
-              series: [_.pluck(data, 'submissions')]
+              series: [_.map(data, 'submissions')]
             };
 
             $scope.analyticsLoading = false;
@@ -737,7 +737,7 @@ app.controller('ProjectFormioController', [
       $http.get(AppConfig.teamForm + '/submission/56856be57535d60100ce7ee3')
         .then(function(result) {
           _employees = _(result.data.data.members)
-            .pluck('_id')
+            .map('_id')
             .value();
 
           $scope.updateUsage();
@@ -873,7 +873,7 @@ app.controller('ProjectFormioController', [
             .sortByOrder(['created'], ['desc'])
             .value();
 
-          var allOwners = _.pluck(data, 'owner');
+          var allOwners = _.map(data, 'owner');
           getOwnerData(allOwners, function(ownerData) {
             // Change the data response format for merge.
             ownerData = _(ownerData)
@@ -1040,11 +1040,11 @@ app.controller('ProjectFormioController', [
             .map(function(groups, _id) {
               var submissions = _(groups)
                 .filter({type: 's'})
-                .pluck('calls')
+                .map('calls')
                 .value();
               var nonsubmissions = _(groups)
                 .filter({type: 'ns'})
-                .pluck('calls')
+                .map('calls')
                 .value();
 
               return {
@@ -1069,13 +1069,13 @@ app.controller('ProjectFormioController', [
           $scope.$apply();
 
           // Update project data for top submissions.
-          var allProjects = _.uniq(_.pluck($scope.monthlySubmissions, '_id').concat(_.pluck($scope.monthlyNonsubmissions, '_id')));
+          var allProjects = _.uniq(_.map($scope.monthlySubmissions, '_id').concat(_.map($scope.monthlyNonsubmissions, '_id')));
           getProjectData(allProjects, function(submissionData) {
             $scope.monthlySubmissions = merge($scope.monthlySubmissions, submissionData);
             $scope.monthlyNonsubmissions = merge($scope.monthlyNonsubmissions, submissionData);
             $scope.$apply();
 
-            var allOwners = _.uniq(_.pluck($scope.monthlySubmissions, 'owner').concat(_.pluck($scope.monthlyNonsubmissions, 'owner')));
+            var allOwners = _.uniq(_.map($scope.monthlySubmissions, 'owner').concat(_.map($scope.monthlyNonsubmissions, 'owner')));
             getOwnerData(allOwners, function(ownerData) {
               // Change the data response format for merge.
               ownerData = _(ownerData)
@@ -1089,9 +1089,9 @@ app.controller('ProjectFormioController', [
 
               // Merge all values and filter out the formio employees if set.
               $scope.monthlySubmissions = filterEmployees(merge($scope.monthlySubmissions, ownerData, 'owner'));
-              $scope.totalMonthlySubmissions = _.sum(_.pluck($scope.monthlySubmissions, 'submissions'));
+              $scope.totalMonthlySubmissions = _.sum(_.map($scope.monthlySubmissions, 'submissions'));
               $scope.monthlyNonsubmissions = filterEmployees(merge($scope.monthlyNonsubmissions, ownerData, 'owner'));
-              $scope.totalMonthlyNonsubmissions = _.sum(_.pluck($scope.monthlyNonsubmissions, 'nonsubmissions'));
+              $scope.totalMonthlyNonsubmissions = _.sum(_.map($scope.monthlyNonsubmissions, 'nonsubmissions'));
               $scope.$apply();
             });
           });
@@ -1187,7 +1187,7 @@ app.controller('ProjectTeamEditController', [
     }
 
     // Only allow users to select teams that do not have permissions yet.
-    var current = _.pluck($scope.currentProjectTeams, '_id');
+    var current = _.map($scope.currentProjectTeams, '_id');
 
     // If editing a old permission, only allow the current team to be edited.
     if($scope.addTeam._id) {

@@ -451,12 +451,12 @@ angular
         if (!$rootScope.user) {
           Formio.currentUser().then(function(user) {
             $rootScope.user = user;
-            $scope.teamMember = _.any(results, function(team) {
+            $scope.teamMember = _.some(results, function(team) {
               return ($rootScope.user && team.owner !== $rootScope.user._id) || false;
             });
           });
         } else {
-          $scope.teamMember = _.any(results, function(team) {
+          $scope.teamMember = _.some(results, function(team) {
             return ($rootScope.user && team.owner !== $rootScope.user._id) || false;
           });
         }
@@ -488,7 +488,7 @@ angular
         $scope.projectsLoaded = true;
         angular.element('#projects-loader').hide();
         $scope.projects = projects;
-        $scope.teamsEnabled = _.any(projects, function(project) {
+        $scope.teamsEnabled = _.some(projects, function(project) {
           project.plan = project.plan || '';
           return (project.plan === 'team' || project.plan === 'commercial');
         });
