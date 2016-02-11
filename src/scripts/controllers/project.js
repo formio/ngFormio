@@ -328,15 +328,13 @@ app.controller('ProjectHomeController', [
   'AppConfig',
   'Formio',
   'FormioAlerts',
-  'ProjectAnalytics',
-  'moment',
+  'ngDialog',
   function(
     $scope,
     AppConfig,
     Formio,
     FormioAlerts,
-    ProjectAnalytics,
-    moment
+    ngDialog
   ) {
     $scope.currentSection.title = 'Dashboard';
     $scope.currentSection.icon = 'fa fa-dashboard';
@@ -355,76 +353,6 @@ app.controller('ProjectHomeController', [
 
     var abbreviator = new NumberAbbreviate();
 
-    var now = new Date();
-    now = {
-      year: now.getUTCFullYear(),
-      month: (now.getUTCMonth() + 1),
-      day: now.getUTCDate()
-    };
-
-    $scope.chartOptions = {
-      height: '130px',
-      low: 0,
-      lineSmooth: false,
-      showPoint: false,
-      showArea: true,
-      fullWidth: true,
-      axisX: {
-        showLabel: false,
-        showGrid: false
-      },
-      axisY: {
-        showLabel: false,
-        showGrid: false
-      }
-    };
-
-    ProjectAnalytics.getSubmissionAnalytics($scope.currentProject._id, now.year)
-    .then(function(data) {
-      $scope.submissionTotalYear = abbreviator.abbreviate(_(data)
-      .map('submissions')
-      .sum(), 0);
-      $scope.submissionDataYear = {
-        labels: _(data)
-          .map('month')
-          .map(function(month) { return _.add(month, 1); })
-          .value(),
-        series: [
-          _.map(data, 'submissions')
-        ]
-      };
-    });
-    ProjectAnalytics.getSubmissionAnalytics($scope.currentProject._id, now.year, now.month)
-    .then(function(data) {
-      $scope.submissionTotalMonth = abbreviator.abbreviate(_(data)
-      .map('submissions')
-      .sum(), 0);
-      $scope.submissionDataMonth = {
-        labels: _(data)
-          .map('day')
-          .map(function(day) { return _.add(day, 1); })
-          .value(),
-        series: [
-          _.map(data, 'submissions')
-        ]
-      };
-    });
-    ProjectAnalytics.getSubmissionAnalytics($scope.currentProject._id, now.year, now.month, now.day)
-    .then(function(data) {
-      $scope.submissionTotalToday = abbreviator.abbreviate(_(data)
-      .map('submissions')
-      .sum(), 0);
-      $scope.submissionDataToday = {
-        labels: _(data)
-          .map('hour')
-          .map(function(hour) { return _.add(hour, 1); })
-          .value(),
-        series: [
-          _.map(data, 'submissions')
-        ]
-      };
-    });
-
     $scope.hasTeams = function() {
       return $scope.currentProject.plan === 'team' || $scope.currentProject.plan === 'commercial';
     };
@@ -437,6 +365,14 @@ app.controller('ProjectHomeController', [
         return new Date(item.modified);
       })
       .max();
+    };
+
+    $scope.projectInfo = function() {
+      ngDialog.open({
+        template: 'views/project/project-popup.html',
+        showClose: true,
+        className: 'ngdialog-theme-default project-info'
+      });
     };
   }
 ]);
@@ -681,6 +617,94 @@ app.controller('ProjectDataController', [
     $scope.graphChange = function() {
       $scope.displayView(($scope.graphType || '').toLowerCase());
     };
+  }
+]);
+
+app.controller('ProjectPreviewController', [
+  '$scope',
+  '$sce',
+  '$location',
+  'AppConfig',
+  function(
+    $scope,
+    $sce,
+    $location,
+    AppConfig
+  ) {
+    $scope.currentSection.title = 'Preview';
+    $scope.currentSection.icon = 'fa fa-laptop';
+    $scope.currentSection.help = 'https://help.form.io/embedding/';
+    $scope.previewUrl = '';
+    $scope.repo = '';
+    $scope.hasTemplate = true;
+    $scope.$watch('currentProject', function(project) {
+      if (!project.settings) {
+        return;
+      }
+      if (!project.settings.preview) {
+        $scope.hasTemplate = false;
+        project.settings.preview = {
+          repo: 'https://github.com/formio/formio-app-template',
+          url: 'http://formio.github.io/formio-app-template/'
+        };
+      }
+
+      var url = project.settings.preview.url.replace('http://', $location.protocol() + '://');
+      url += '/?apiUrl=' + encodeURIComponent(AppConfig.apiBase);
+      url += '&appUrl=' + encodeURIComponent($location.protocol() + '://' + project.name + '.' + AppConfig.serverHost);
+      $scope.previewUrl = $sce.trustAsResourceUrl(url);
+      $scope.repo = project.settings.preview.repo;
+    });
+
+  }
+]);
+
+app.controller('LaunchController', [
+  '$scope',
+  '$sce',
+  '$location',
+  '$http',
+  'AppConfig',
+  function(
+    $scope,
+    $sce,
+    $location,
+    $http,
+    AppConfig
+  ) {
+    $scope.currentSection.title = 'Launch';
+    $scope.currentSection.icon = 'fa fa-rocket';
+    $scope.currentSection.help = 'https://help.form.io/embedding/';
+    $scope.hasTemplate = true;
+    $scope.$watch('currentProject', function(project) {
+      if (!project.settings) {
+        return;
+      }
+      if (!project.settings.preview) {
+        $scope.hasTemplate = false;
+        project.settings.preview = {
+          repo: 'https://github.com/formio/formio-app-template',
+          url: 'http://formio.github.io/formio-app-template/'
+        };
+      }
+
+      var url = project.settings.preview.url.replace('http://', $location.protocol() + '://');
+      url += '/?apiUrl=' + encodeURIComponent(AppConfig.apiBase);
+      url += '&appUrl=' + encodeURIComponent($location.protocol() + '://' + project.name + '.' + AppConfig.serverHost);
+      $scope.previewUrl = $sce.trustAsResourceUrl(url);
+      $scope.repo = project.settings.preview.repo;
+    });
+    $scope.forms = [];
+    $scope.formsUrl = AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/form?limit=9999999';
+    $http.get($scope.formsUrl).then(function(response) {
+      $scope.forms = response.data;
+      $scope.formsFinished = true;
+    });
+    $scope.$watch('project', function(newProject, oldProject) {
+      if (newProject && newProject.name) {
+        $scope.projectApi = AppConfig.protocol + '//' + newProject.name + '.' + AppConfig.serverHost;
+      }
+    });
   }
 ]);
 

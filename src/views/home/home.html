@@ -1,4 +1,4 @@
-<div class="jumbotron welcome-banner" ng-if="showHeader">
+<div class="jumbotron welcome-banner" ng-if="showHeader && showWelcome()">
   <div class="container">
     <h1>Welcome to <img style="height:1em;" src="images/formio-logo-white.png"></h1>
     <ul class="list-inline">
@@ -9,11 +9,10 @@
     </ul>
   </div>
 </div>
-<div class="welcome-info-strip">
+<div class="welcome-info-strip" ng-if="showWelcome()">
   <div class="container">
     <div class="row">
       <div class="col-sm-10 col-sm-offset-1 text-center">
-        <p>Form.io is a combined Form and API platform for Web applications.</p>
         <p>You can either create a New Project or start with a fully functional application template.</p>
       </div>
     </div>
@@ -54,7 +53,7 @@
 <div class="container projects">
   <div class="row">
     <div class="col-md-9 existing-projects-section">
-      <h2>Existing Projects</h2>
+      <h2><span ng-if="projectsLoaded && projects.length" ng-cloak>Existing Projects</span></h2>
       <div class="project well" ng-if="projectsLoaded && !projects.length" ng-cloak>
         <h4 class="project-title">Step 1: Create your project</h4>
         <ng-include src="'views/project/help.html'"></ng-include>
@@ -79,7 +78,7 @@
             </div>
             <div class="row project-teams">
               <h5 class="text-center project-teams-header">Teams <i class="fa fa-users"></i></h5><hr />
-              <div ng-show="!teamSupport(project)" class="project-team-upgrade"><a ui-sref="project.settings.plan({projectId: project._id})">Upgrade Plan</a> to enable teams for this project</div>
+              <span ng-show="!teamSupport(project)" class="project-team-upgrade">Plan does not support teams</span>
               <div ng-show="teamSupport(project)">
                 <span ui-sref="team.view({teamId: team._id})" ng-repeat="team in project.teams track by $index" ng-if="team.data.name" class="label label-default ellipsis project-team-label">{{team.data.name}}</span>
                 <a ng-show="teamSupport(project)" ui-sref="project.settings.teams.add({projectId: project._id})"><span class="label label-default ellipsis project-add-team"><i class="fa fa-user-plus"></i> Add Team</span></a>
@@ -92,7 +91,7 @@
     <div class="col-md-3">
       <h2>Teams</h2>
       <div class="well" ng-show="!teamsLoading && !(teamsEnabled || teamMember)">
-        <span class="team-upgrade">Want to work collaboratively? <a href="https://form.io/#pricing">Upgrade</a> a project to TeamPro to enable Team functionality.</span>
+        <span class="team-upgrade">Want to work collaboratively? Upgrade a project to TeamPro to enable Team functionality.</span>
       </div>
       <div class="list-group" ng-show="!teamsLoading && (teamsEnabled || teamMember)">
         <a ui-sref="team.view({teamId: team._id})" class="list-group-item" ng-repeat="team in teams">

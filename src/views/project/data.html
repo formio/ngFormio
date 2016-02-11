@@ -1,0 +1,19 @@
+<div class="project-section-content project-section-inner-content project-data">
+  <div class="row" ng-controller="ProjectDataController">
+    <div class="col-sm-12">
+      <h3 class="center">{{label[currentType]}}</h3>
+      <h4>{{viewDate.year}} / {{viewDate.month}} / {{viewDate.day}}&nbsp;(UTC)&emsp;<select ng-init="graphChange()" ng-options="type for type in types" ng-model="graphType" ng-change="graphChange()"></select></h4>
+      <chartist class="ct-chart" chartist-data="analytics" chartist-chart-type="Line" chartist-chart-options="analyticsOptions" chartist-events="analyticsEvents"></chartist>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2>Form Submissions</h2>
+      <form-list forms="forms" title="'Form'" list-mode="'data'" project="currentProject" form-type="'form'"></form-list>
+    </div>
+    <div class="col-md-6">
+      <h2>Resource Form Submissions</h2>
+      <form-list forms="resources" title="'Resource'" list-mode="'data'" project="currentProject" form-type="'resource'"></form-list>
+    </div>
+  </div>
+</div>

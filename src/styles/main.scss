@@ -33,6 +33,10 @@ body {
   display: block;
 }
 
+.btn-primary:hover {
+  border-color: white;
+}
+
 .submissions-header {
   margin-top: 10px;
 }
@@ -50,6 +54,12 @@ body {
 
 ul.dropdown-menu {
   padding-bottom: 5px;
+  li:hover {
+    background-color: #eeeeee;
+  }
+  li.no-hover:hover {
+    background-color: inherit;
+  }
   li > a {
     cursor: pointer;
   }
@@ -57,10 +67,6 @@ ul.dropdown-menu {
 
 li.user-dropdown a {
   cursor: pointer;
-}
-
-.navbar-brand {
-  padding: 6px 0 0 0;
 }
 
 .navbar-header {
@@ -220,7 +226,7 @@ li.user-dropdown a {
 $project-header-color: lighten($brand-primary, 55%);
 
 .welcome-info-strip {
-  background-color: $brand-secondary;
+  background-color: darken($brand-primary, 25%);
   color: $gray-lighter;
   padding-bottom: 20px;
   font-size: 23px;
@@ -233,7 +239,7 @@ $project-header-color: lighten($brand-primary, 55%);
 .new-project-row {
   position:relative;
   padding: 35px 0 0 0;
-  background-color: darken($brand-primary, 25%);
+  background-color: $brand-secondary;
   color: $project-header-color;
   .new-project-header {
     position:absolute;
@@ -317,14 +323,50 @@ $project-header-color: lighten($brand-primary, 55%);
 .navbar {
   border-radius: 0;
   margin-bottom: 0;
+  background-color: #eeeeee;
 }
 
 .navbar-nav {
   margin-left: 20px;
 }
 
+.docs-dropdown {
+  width: 900px;
+  margin: 0px;
+  @media (max-width: $screen-md-min) {
+    width: 300px;
+  }
+  li {
+    &:hover {
+      background-color: #eeeeee;
+    }
+    a {
+      color: black;
+      &:hover {
+        color: black;
+        text-decoration: none;
+      }
+    }
+  }
+}
+
 .form-builder-body {
   width: 100%;
+}
+
+.formcomponents {
+  .panel-heading:hover {
+    background-color: #dddddd;
+  }
+  h4.panel-title a {
+    &:hover {
+      text-decoration: none;
+    }
+    &:focus {
+      outline: none;
+      text-decoration: none;
+    }
+  }
 }
 
 .tab-content {
@@ -351,12 +393,13 @@ div.project-section-separator {
 }
 
 .project-section-header {
-  background-color: darken($brand-primary, 5%);
-  color: $project-header-color;
+  background-color: $brand-secondary;
+  color: $brand-primary;
   padding-left: 20px;
   padding-top: 20px;
-  border-bottom: solid $brand-secondary 8px;
+  border-bottom: solid lighten($brand-primary, 10%) 8px;
   h2 {
+    color: $project-header-color;
     a {
       color: $project-header-color;
       &:hover, &:focus {
@@ -448,9 +491,7 @@ div.project-section-separator {
       &.form-nav {
         a {
           &:hover {
-            border: 1px solid $brand-secondary;
-            background-color: darken($brand-secondary, 10%);
-            color: white;
+            background-color: lighten($gray-base, 85%);
           }
         }
         &.active a {
@@ -750,7 +791,7 @@ footer {
 
 /***************************** Landing Page *****************************/
 .welcome-banner {
-  background-color: $brand-secondary;
+  background-color: darken($brand-primary, 25%);
   color: #eee;
   text-align: center;
   padding-top: 10px;
@@ -898,6 +939,8 @@ footer {
         margin: 4px 0 4px 0;
       }
       .project-team-upgrade {
+        color: #cccccc;
+        font-size: 0.8em;
         text-align: center;
       }
       .project-team-label, .project-add-team {
@@ -906,6 +949,7 @@ footer {
         background-color: darken($brand-secondary, 6%);
         display: inline-block;
         padding: 4px 6px;
+        cursor: pointer;
       }
       .project-add-team {
         background-color: $brand-primary;
@@ -1163,19 +1207,40 @@ footer {
 }
 
 .form-list {
-  h5 {
+  h4 {
     margin: 0;
-    padding: 5px;
     line-height: inherit;
+    display: inline;
+  }
+  .form-list-description {
+    color: #666;
+    font-size: 14px;
+    margin-top: 5px;
+  }
+  .form-updated {
+    margin-top: 5px;
+    color: #888;
+  }
+  .form-type {
+    padding: 1px 5px;
+    margin-left: 10px;
+    position: relative;
+    top: -3px;
+    border: 1px solid darken($brand-primary, 10%);
+    background-color: $brand-primary;
+    border-radius: 2px;
+    color: white;
   }
 
   .list-group {
     padding: 0px;
 
     .list-group-item {
-      padding: 10px 0 10px 0;
-      border: none;
-      &:nth-child(odd) {
+      padding: 30px 0;
+      border-color: #eeeeee;
+      border-left: none;
+      border-right: none;
+      &:nth-child(even) {
         background-color: $table-bg-accent;
       }
       .row {
@@ -1200,6 +1265,34 @@ footer {
   }
 }
 
+.project-info {
+  .list-group {
+    padding: 0px;
+    .list-group-item {
+      padding: 10px 0;
+      border-color: #eeeeee;
+      border-left: none;
+      border-right: none;
+      &:nth-child(even) {
+        background-color: $table-bg-accent;
+      }
+    }
+  }
+}
+
+.type-icon {
+  font-size: 1.5em;
+  margin-right: 10px;
+}
+
+.type-icon-resource {
+  color: $brand-primary;
+}
+
+.type-icon-form {
+  color: $brand-secondary;
+}
+
 /********************* Project Plan Upgrade Dialog *********************/
 .ngdialog.ngdialog-theme-default.project-upgrade .ngdialog-content {
   padding: 0;
@@ -1215,6 +1308,28 @@ footer {
   }
   @media (min-width: $screen-lg-min) {
     width: $container-lg - 150px;
+  }
+}
+
+.ngdialog.ngdialog-theme-default.project-info .ngdialog-content {
+  @media (max-width: $screen-sm-min) {
+    width: 100%;
+  }
+  @media (min-width: $screen-sm-min) {
+    width: 95%;
+  }
+  @media (min-width: $screen-md-min) {
+    width: $container-md - 75px;
+  }
+  @media (min-width: $screen-lg-min) {
+    width: $container-lg - 150px;
+  }
+  .row {
+    margin-left: 0;
+    margin-right: 0;
+  }
+  :focus {
+    outline: none;
   }
 }
 
@@ -1305,15 +1420,6 @@ footer {
 }
 
 /********************* Project Dashboard *********************/
-.about-projects {
-  dl dd {
-    padding-bottom: 10px;
-  }
-  .list-group-item p {
-    padding-top: 20px;
-  }
-}
-
 .thumbnail-chart {
   .ct-line {
     stroke: $brand-primary;
@@ -1362,5 +1468,23 @@ footer {
   .api-description,
   .api-infos {
      display: none;
+  }
+  .operations {
+    display: block;
+  }
+  .endpoint-heading a {
+    color: black;
+    cursor: default;
+    &:hover {
+      text-decoration: none;
+    }
+  }
+}
+
+.alert-info {
+  background-color: lighten($brand-primary, 18%);
+  a {
+    color: white;
+    font-weight: bold;
   }
 }

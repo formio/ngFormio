@@ -130,7 +130,10 @@ angular
         .state('project.home', {
           url: '/home',
           controller: 'ProjectHomeController',
-          templateUrl: 'views/project/home.html'
+          templateUrl: 'views/project/home.html',
+          params: {
+            graphType: 'Month'
+          }
         })
         .state('createProject', {
           url: '/create/project',
@@ -139,7 +142,7 @@ angular
         })
         .state('project.data', {
           url: '/data',
-          templateUrl: 'views/data/index.html',
+          templateUrl: 'views/project/data.html',
           controller: 'ProjectDataController',
           params: {
             graphType: 'Month'
@@ -153,42 +156,27 @@ angular
         .state('project.preview', {
           url: '/preview',
           templateUrl: 'views/project/preview.html',
-          controller: [
-            '$scope',
-            '$sce',
-            '$location',
-            function(
-              $scope,
-              $sce,
-              $location
-            ) {
-              $scope.currentSection.title = 'Preview';
-              $scope.currentSection.icon = 'fa fa-laptop';
-              $scope.currentSection.help = 'https://help.form.io/embedding/';
-              $scope.previewUrl = '';
-              $scope.repo = '';
-              $scope.hasTemplate = true;
-              $scope.$watch('currentProject', function(project) {
-                if (!project.settings) {
-                  return;
-                }
-                if (!project.settings.preview) {
-                  $scope.hasTemplate = false;
-                  project.settings.preview = {
-                    repo: 'https://github.com/formio/formio-app-template',
-                    url: 'http://formio.github.io/formio-app-template/'
-                  };
-                }
-
-                var url = project.settings.preview.url.replace('http://', $location.protocol() + '://');
-                url += '/?apiUrl=' + encodeURIComponent(AppConfig.apiBase);
-                url += '&appUrl=' + encodeURIComponent($location.protocol() + '://' + project.name + '.' + AppConfig.serverHost);
-                $scope.previewUrl = $sce.trustAsResourceUrl(url);
-                $scope.repo = project.settings.preview.repo;
-              });
-
-            }
-          ]
+          controller: 'ProjectPreviewController'
+        })
+        .state('project.launch', {
+          url: '',
+          templateUrl: 'views/project/launch/index.html',
+          controller: 'LaunchController'
+        })
+        .state('project.launch.form', {
+          url: '/form',
+          templateUrl: 'views/project/launch/form.html',
+          controller: 'LaunchController'
+        })
+        .state('project.launch.app', {
+          url: '/app',
+          templateUrl: 'views/project/launch/app.html',
+          controller: 'LaunchController'
+        })
+        .state('project.launch.cordova', {
+          url: '/cordova',
+          templateUrl: 'views/project/launch/cordova.html',
+          controller: 'LaunchController'
         })
         .state('project.api', {
           url: '/api',
@@ -550,6 +538,14 @@ angular
       $scope.getProgressBarClass = ProjectPlans.getProgressBarClass.bind(ProjectPlans);
 
       $scope.showUpgradeDialog = ProjectUpgradeDialog.show.bind(ProjectUpgradeDialog);
+
+      $scope.showWelcome = function() {
+        // Only show welcome message for users with 0 or 1 projects or users within the last day.
+        if ($rootScope.user) {
+          return !(($scope.projectsLoaded && $scope.projects.length > 1) || ((new Date($rootScope.user.created).getTime() / 1000) + 86400 < (Date.now() / 1000)));
+        }
+        return true;
+      };
     }
 
   ])
@@ -561,6 +557,44 @@ angular
       };
     }
   ])
+  .filter('capitalize', function() {
+    return function(token) {
+      return token.charAt(0).toUpperCase() + token.slice(1);
+    };
+  })
+  .filter('timeSince', function() {
+    return function(token) {
+      var elapsed = (new Date().getTime() - new Date(token).getTime()) / 1000;
+
+      var interval;
+      interval = Math.floor(elapsed / 31536000);
+      if (interval >= 1) {
+        return interval + " year" + (interval > 1 ? 's' : '');
+      }
+
+      interval = Math.floor(elapsed / 2592000);
+      if (interval >= 1){
+        return interval + " month" + (interval > 1 ? 's' : '');
+      }
+
+      interval = Math.floor(elapsed / 86400);
+      if (interval >= 1) {
+        return interval + " day" + (interval > 1 ? 's' : '');
+      }
+
+      interval = Math.floor(elapsed / 3600);
+      if (interval >= 1) {
+        return interval + " hour" + (interval > 1 ? 's' : '');
+      }
+
+      interval = Math.floor(elapsed / 60);
+      if (interval >= 1) {
+        return interval + " minute" + (interval > 1 ? 's' : '');
+      }
+
+      return Math.floor(elapsed) + " second" + (elapsed > 1 ? 's' : '');
+    };
+  })
   .run([
     '$state',
     '$stateParams',

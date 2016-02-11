@@ -61,7 +61,7 @@ app.config([
         })
         .state(parentName + '.index', {
           url: '/',
-          templateUrl: 'views/form/index.html'
+          templateUrl: 'views/form/' + type + 's.html'
         })
         .state(parentName + '.create', {
           url: '/create/' + type,
@@ -177,6 +177,7 @@ app.directive('formList', function() {
     replace: true,
     templateUrl: 'views/form/form-list.html',
     scope: {
+      title: '=',
       forms: '=',
       project: '=',
       formType: '=',
@@ -189,19 +190,36 @@ app.directive('formList', function() {
     controller: [
       '$scope',
       '$rootScope',
+      '$http',
       'AppConfig',
+      'FormioUtils',
       function(
         $scope,
         $rootScope,
-        AppConfig
+        $http,
+        AppConfig,
+        FormioUtils
       ) {
         $rootScope.activeSideBar = 'projects';
         $rootScope.noBreadcrumb = false;
         $rootScope.currentForm = false;
+        $scope.search = {};
         $scope.formsPerPage = $scope.numPerPage;
-        $scope.formsUrl = AppConfig.apiBase + '/project/' + $scope.project._id + '/form?type=' + $scope.formType;
+        $scope.formsUrl = AppConfig.apiBase + '/project/' + $scope.project._id + '/form?limit=9999999&type=' + $scope.formType;
+        $http.get($scope.formsUrl).then(function(response) {
+          $scope.forms = response.data;
+          $scope.formsFinished = true;
+        });
+        $scope.$watch('project', function(newProject, oldProject) {
+          $scope.projectApi = AppConfig.protocol + '//' + $scope.project.name + '.' + AppConfig.serverHost;
+        });
         $scope.export = function(form, type) {
           window.open(AppConfig.apiBase + '/project/' + $scope.project._id + '/form/' + form._id + '/export?format=' + type + '&x-jwt-token=' + $rootScope.userToken);
+        };
+        $scope.componentCount = function(components) {
+          return _(FormioUtils.flattenComponents(components)).filter(function (o) {
+            return o.input === true && o.type !== 'button';
+          }).size();
         };
       }
     ]
