@@ -659,6 +659,7 @@ app.factory('ActionInfoLoader', [
         // Get the action information.
         var getActionInfo = function(name) {
           return $scope.formio.actionInfo(name).then(function(actionInfo) {
+            actionInfo = _.cloneDeep(actionInfo);
             if(actionInfo) {
               $scope.actionInfo = _.merge($scope.actionInfo, actionInfo);
               return $scope.actionInfo;
@@ -816,10 +817,14 @@ app.controller('FormActionEditController', [
         var roleComponent = FormioUtils.getComponent(formComponents, 'role');
         var resourceComponent = FormioUtils.getComponent(formComponents, 'resource');
         // Update the validation settings.
-        roleComponent.validate = roleComponent.validate || {};
-        roleComponent.validate.required = (association === 'new' ? true : false);
-        resourceComponent.validate = resourceComponent.validate || {};
-        resourceComponent.validate.required = (association === 'link' ? false : true);
+        if (roleComponent) {
+          roleComponent.validate = roleComponent.validate || {};
+          roleComponent.validate.required = (association === 'new' ? true : false);
+        }
+        if (resourceComponent) {
+          resourceComponent.validate = resourceComponent.validate || {};
+          resourceComponent.validate.required = (association === 'link' ? false : true);
+        }
       };
 
       // Auth action validation changes for new resource missing role assignment.
