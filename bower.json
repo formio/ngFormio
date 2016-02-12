@@ -26,7 +26,7 @@
     "number-abbreviate": "^1.1.0",
     "seamless": "^0.0.5",
     "ng-formio": "^1.2.1",
-    "ng-formio-builder": "^1.6.0"
+    "ng-formio-builder": "^1.7.1"
   },
   "resolutions": {
     "angular": "~1.5.0",
