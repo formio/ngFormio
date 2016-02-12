@@ -116,7 +116,7 @@ app.directive('resourcePermissionEditor', ['$q', 'FormioUtils', function($q, For
     link: function($scope) {
       // Maintain a list of unique resources.
       $scope.uniqueResources = _($scope.resources)
-        .where({defaultPermission: ''})
+        .filter({defaultPermission: ''})
         .map('key')
         .uniq()
         .value();
