@@ -1097,7 +1097,7 @@ app.controller('FormSubmissionsController', [
                   ['created', {type: 'date'}],
                   ['modified', {type: 'date'}]
                 ])
-                .zipObject()
+                .fromPairs()
                 .value()
             },
             total: function(result) {
@@ -1160,9 +1160,7 @@ app.controller('FormSubmissionsController', [
                       _.set(row, key, undefined);
                     }
                   });
-
-                })
-                .value();
+                });
                 return result;
               })
               .then(options.success)
