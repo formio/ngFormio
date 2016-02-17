@@ -319,34 +319,15 @@ angular
     'Formio',
     'FormioAlerts',
     'GoogleAnalytics',
+    'AppConfig',
     function(
       $http,
       $q,
       Formio,
       FormioAlerts,
-      GoogleAnalytics
+      GoogleAnalytics,
+      AppConfig
     ) {
-      var loaded = false;
-      var templates = [{
-        "title": "Default",
-        "name": "default",
-        "description": "A default project with User and Admin resources and their respective authentication forms.",
-        template: 'default',
-        "preview": {
-          "url": "http://formio.github.io/formio-app-basic",
-          "repo": "https://github.com/formio/formio-app-basic"
-        }
-      }, {
-        "title": "Empty",
-        "name": "empty",
-        "description": "An empty project with no forms or resources. Create a project with a fresh start!",
-        template: 'empty',
-        "preview": {
-          "url": "http://formio.github.io/formio-app-template",
-          "repo": "https://github.com/formio/formio-app-template"
-        }
-      }];
-
       return {
         createProject: function(project) {
           var deferred = $q.defer();
@@ -381,29 +362,7 @@ angular
         },
         loadTemplates: function() {
           var deferred = $q.defer();
-          if (loaded) {
-            deferred.resolve(templates);
-            return deferred.promise;
-          }
-
-          // Try to load the external template source.
-          $http.get(
-            'https://formio.github.io/help.form.io/templates/index.json', {
-              disableJWT: true,
-              headers: {
-                Authorization: undefined,
-                Pragma: undefined,
-                'Cache-Control': undefined
-              }
-            }
-          ).then(function(result) {
-            templates = (result && result.data) ? result.data : templates;
-            loaded = true;
-            deferred.resolve(templates);
-          }, function() {
-            loaded = true;
-            deferred.resolve(templates);
-          });
+          deferred.resolve(AppConfig.templates);
           return deferred.promise;
         }
       };

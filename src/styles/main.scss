@@ -52,6 +52,19 @@ body {
   padding-top: 0.5em;
 }
 
+.subgroup-accordion-container {
+  .panel-body {
+    padding: 7px;
+    .subgroup-accordion.panel-default {
+      .panel-heading {
+        background-color: #ddd;
+        border-color: #666;
+        color: black;
+      }
+    }
+  }
+}
+
 ul.dropdown-menu {
   padding-bottom: 5px;
   li:hover {
