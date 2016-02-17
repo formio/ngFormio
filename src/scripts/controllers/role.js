@@ -27,7 +27,7 @@ app.controller('RoleController', [
       $scope.formio.loadForms().then(function(result) {
         $scope.assignedForms = !result ? [] : result.filter(function(form){
           form.rolePermissions = form.submissionAccess.filter(function(perm) {
-            return _.contains(perm.roles, $state.params.roleId) && SubmissionAccessLabels[perm.type];
+            return _.includes(perm.roles, $state.params.roleId) && SubmissionAccessLabels[perm.type];
           });
           form.permissionList = _(form.rolePermissions).map(function(p){
             if(SubmissionAccessLabels[p.type]) {

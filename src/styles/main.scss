@@ -65,7 +65,7 @@ body {
   }
 }
 
-ul.dropdown-menu {
+.user-dropdown ul.dropdown-menu {
   padding-bottom: 5px;
   li:hover {
     background-color: #eeeeee;
@@ -1500,4 +1500,8 @@ footer {
     color: white;
     font-weight: bold;
   }
+}
+
+.caret {
+  border-top: 4px dashed;
 }
