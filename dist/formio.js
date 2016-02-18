@@ -5509,11 +5509,11 @@ module.exports = function (app) {
 },{}],36:[function(require,module,exports){
 "use strict";
 
-module.exports = function (app) {
 
+module.exports = function(app) {
   app.config([
     'formioComponentsProvider',
-    function (formioComponentsProvider) {
+    function(formioComponentsProvider) {
       formioComponentsProvider.register('textfield', {
         title: 'Text Field',
         template: 'formio/components/textfield.html',
@@ -5540,16 +5540,24 @@ module.exports = function (app) {
             pattern: '',
             custom: '',
             customPrivate: false
+          },
+          conditional: {
+            show: null,
+            when: null,
+            eq: ''
           }
         }
       });
     }
   ]);
+
   app.run([
     '$templateCache',
     'FormioUtils',
-    function ($templateCache,
-              FormioUtils) {
+    function(
+      $templateCache,
+      FormioUtils
+    ) {
       $templateCache.put('formio/components/textfield.html', FormioUtils.fieldWrap(
         "<input type=\"{{ component.inputType }}\"\nclass=\"form-control\"\nid=\"{{ component.key }}\"\nname=\"{{ component.key }}\"\ntabindex=\"{{ component.tabindex || 0 }}\"\nng-disabled=\"readOnly\"\nng-model=\"data[component.key]\"\nng-model-options=\"{ debounce: 500 }\"\nsafe-multiple-to-single\nng-required=\"component.validate.required\"\nng-minlength=\"component.validate.minLength\"\nng-maxlength=\"component.validate.maxLength\"\nng-pattern=\"component.validate.pattern\"\ncustom-validator=\"component.validate.custom\"\nplaceholder=\"{{ component.placeholder }}\"\nui-mask=\"{{ component.inputMask }}\"\nui-mask-placeholder=\"\" ' + // avoids regular placeholder mixing with mask placeholder\nui-options=\"uiMaskOptions\"\n>\n"
       ));
@@ -5664,6 +5672,66 @@ module.exports = function() {
           $scope._src += ($scope._src.indexOf('?') === -1) ? '?' : '&';
           $scope._src += 'live=1';
         }
+
+        // Build the display map.
+        $scope.show = {};
+        var boolean = {
+          'true': true,
+          'false': false
+        };
+
+        var submission = $scope._submission || {data: {}};
+        var updateComponents = function() {
+          // Change the visibility for the component with the given key
+          var updateVisiblity = function(key) {
+            $element
+              .find('div#form-group-' + key)
+              .removeClass('ng-show ng-hide')
+              .addClass($scope.show[key] ? 'ng-show' : 'ng-hide');
+          };
+
+          $scope._form.components = $scope._form.components || [];
+          _.forEach($scope._form.components, function(component) {
+            // Display every component by default
+            $scope.show[component.key] = ($scope.show[component.key] === undefined)
+              ? true
+              : $scope.show[component.key];
+
+            // Only change display options of all require conditional properties are present.
+            if (
+              component.conditional
+              && (component.conditional.show !== null)
+              && (component.conditional.when !== null)
+            ) {
+              // Default the conditional values.
+              component.conditional.show = boolean[component.conditional.show];
+              component.conditional.eq = component.conditional.eq || '';
+
+              // Get the conditional component.
+              var cond = FormioUtils.getComponent($scope._form.components, component.conditional.when.toString());
+              var value = submission.data[cond.key];
+
+              if (value) {
+                // Check if the conditional value is equal to the trigger value
+                if (value.toString() === component.conditional.eq.toString()) {
+                  $scope.show[component.key] = boolean[component.conditional.show];
+                }
+                else {
+                  $scope.show[component.key] = !boolean[component.conditional.show];
+                }
+              }
+            }
+
+            updateVisiblity(component.key)
+          });
+        };
+
+        // Update the components on the intitial form render and all subsequent submission data changes.
+        $scope.$on('formRender', updateComponents);
+        $scope.$on('submissionDataUpdate', function(ev, key, value) {
+          submission.data[key] = value;
+          updateComponents();
+        });
 
         // Create the formio object.
         $scope.formio = FormioScope.register($scope, $element, {
@@ -6047,9 +6115,18 @@ module.exports = [
         element.replaceWith($compile($templateCache.get(scope.template))(scope));
         scope.$emit('formElementRender', element);
       },
-      controller: function() {
-        // This is required for some reason as it will occasionally throw an error without it.
-      }
+      controller: [
+        '$scope',
+        function(
+          $scope
+        ) {
+          $scope.$watchCollection('data.' + $scope.component.key, function(_new, _old) {
+            if (_new !== _old) {
+              $scope.$emit('submissionDataUpdate', $scope.component.key, $scope.data[$scope.component.key]);
+            }
+          });
+        }
+      ]
     };
   }
 ];
