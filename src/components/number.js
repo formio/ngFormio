@@ -1,9 +1,9 @@
 var fs = require('fs');
-module.exports = function (app) {
 
+module.exports = function(app) {
   app.config([
     'formioComponentsProvider',
-    function (formioComponentsProvider) {
+    function(formioComponentsProvider) {
       formioComponentsProvider.register('number', {
         title: 'Number',
         template: 'formio/components/number.html',
@@ -32,11 +32,11 @@ module.exports = function (app) {
       });
     }
   ]);
+
   app.run([
     '$templateCache',
     'FormioUtils',
-    function ($templateCache,
-              FormioUtils) {
+    function($templateCache, FormioUtils) {
       $templateCache.put('formio/components/number.html', FormioUtils.fieldWrap(
         fs.readFileSync(__dirname + '/../templates/components/number.html', 'utf8')
       ));

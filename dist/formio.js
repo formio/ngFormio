@@ -4030,7 +4030,7 @@ module.exports = function (app) {
     'FormioUtils',
     function ($templateCache) {
       $templateCache.put('formio/components/checkbox.html',
-        "<div class=\"checkbox\">\n  <label for=\"{{ component.key }}\" ng-class=\"{'field-required': component.validate.required}\">\n    <input type=\"{{ component.inputType }}\"\n    id=\"{{ component.key }}\"\n    name=\"{{ component.key }}\"\n    value=\"{{ component.key }}\"\n    tabindex=\"{{ component.tabindex || 0 }}\"\n    ng-disabled=\"readOnly\"\n    ng-model=\"data[component.key]\"\n    ng-required=\"component.validate.required\">\n    {{ component.label }}\n  </label>\n</div>\n"
+        "<div class=\"checkbox\">\n  <label for=\"{{ component.key }}\" ng-class=\"{'field-required': component.validate.required}\">\n    <input type=\"{{ component.inputType }}\"\n    id=\"{{ component.key }}\"\n    name=\"{{ component.key }}\"\n    value=\"{{ component.key }}\"\n    ng-checked=\"data[component.key] === 'true'\"\n    tabindex=\"{{ component.tabindex || 0 }}\"\n    ng-disabled=\"readOnly\"\n    ng-model=\"data[component.key]\"\n    ng-required=\"component.validate.required\">\n    {{ component.label }}\n  </label>\n</div>\n"
       );
     }
   ]);
@@ -4711,11 +4711,11 @@ require('./well')(app);
 },{"./address":8,"./button":9,"./checkbox":10,"./columns":11,"./components":12,"./container":13,"./content":14,"./custom":15,"./datagrid":16,"./datetime":17,"./email":18,"./fieldset":19,"./file":20,"./hidden":21,"./htmlelement":22,"./number":24,"./page":25,"./panel":26,"./password":27,"./phonenumber":28,"./radio":29,"./resource":30,"./select":31,"./selectboxes":32,"./signature":33,"./table":34,"./textarea":35,"./textfield":36,"./well":37}],24:[function(require,module,exports){
 "use strict";
 
-module.exports = function (app) {
 
+module.exports = function(app) {
   app.config([
     'formioComponentsProvider',
-    function (formioComponentsProvider) {
+    function(formioComponentsProvider) {
       formioComponentsProvider.register('number', {
         title: 'Number',
         template: 'formio/components/number.html',
@@ -4744,11 +4744,11 @@ module.exports = function (app) {
       });
     }
   ]);
+
   app.run([
     '$templateCache',
     'FormioUtils',
-    function ($templateCache,
-              FormioUtils) {
+    function($templateCache, FormioUtils) {
       $templateCache.put('formio/components/number.html', FormioUtils.fieldWrap(
         "<input type=\"{{ component.inputType }}\"\nclass=\"form-control\"\nid=\"{{ component.key }}\"\nname=\"{{ component.key }}\"\ntabindex=\"{{ component.tabindex || 0 }}\"\nng-model=\"data[component.key]\"\nng-required=\"component.validate.required\"\nng-disabled=\"readOnly\"\nsafe-multiple-to-single\nmin=\"{{ component.validate.min }}\"\nmax=\"{{ component.validate.max }}\"\nstep=\"{{ component.validate.step }}\"\nplaceholder=\"{{ component.placeholder }}\"\ncustom-validator=\"component.validate.custom\"\nui-mask=\"{{ component.inputMask }}\"\nui-mask-placeholder=\"\"\nui-options=\"uiMaskOptions\"\n>\n"
       ));
@@ -4880,11 +4880,11 @@ module.exports = function (app) {
 },{}],29:[function(require,module,exports){
 "use strict";
 
-module.exports = function (app) {
 
+module.exports = function(app) {
   app.config([
     'formioComponentsProvider',
-    function (formioComponentsProvider) {
+    function(formioComponentsProvider) {
       formioComponentsProvider.register('radio', {
         title: 'Radio',
         template: 'formio/components/radio.html',
@@ -4910,8 +4910,7 @@ module.exports = function (app) {
   app.run([
     '$templateCache',
     'FormioUtils',
-    function ($templateCache,
-              FormioUtils) {
+    function($templateCache, FormioUtils) {
       $templateCache.put('formio/components/radio.html', FormioUtils.fieldWrap(
         "<div ng-class=\"component.inline ? 'radio-inline' : 'radio'\" ng-repeat=\"v in component.values track by $index\">\n  <label class=\"control-label\" for=\"{{ v.value }}\">\n    <input type=\"{{ component.inputType }}\"\n    id=\"{{ v.value }}\"\n    name=\"{{ component.key }}\"\n    value=\"{{ v.value }}\"\n    tabindex=\"{{ component.tabindex || 0 }}\"\n    ng-model=\"data[component.key]\"\n    ng-required=\"component.validate.required\"\n    ng-disabled=\"readOnly\"\n    custom-validator=\"component.validate.custom\">\n    {{ v.label }}\n  </label>\n</div>\n"
       ));
@@ -5199,8 +5198,8 @@ module.exports = function (app) {
 },{}],32:[function(require,module,exports){
 "use strict";
 
-module.exports = function (app) {
 
+module.exports = function(app) {
   app.directive('formioSelectBoxes', [function() {
     return {
       restrict: 'E',
@@ -5238,11 +5237,11 @@ module.exports = function (app) {
 
   app.config([
     'formioComponentsProvider',
-    function (formioComponentsProvider) {
+    function(formioComponentsProvider) {
       formioComponentsProvider.register('selectboxes', {
         title: 'Select Boxes',
         template: 'formio/components/selectboxes.html',
-        tableView: function (data) {
+        tableView: function(data) {
           if (!data) return '';
 
           return Object.keys(data)
@@ -5272,9 +5271,9 @@ module.exports = function (app) {
   app.run([
     '$templateCache',
     'FormioUtils',
-    function ($templateCache) {
+    function($templateCache) {
       $templateCache.put('formio/components/selectboxes-directive.html',
-        "<div class=\"select-boxes\">\n  <div ng-class=\"component.inline ? 'checkbox-inline' : 'checkbox'\" ng-repeat=\"v in component.values track by $index\">\n    <label class=\"control-label\" for=\"{{ component.key }}-{{ v.value }}\">\n      <input type=\"checkbox\"\n      id=\"{{ component.key }}-{{ v.value }}\"\n      name=\"{{ component.key }}-{{ v.value }}\"\n      value=\"{{ v.value }}\"\n      tabindex=\"{{ component.tabindex || 0 }}\"\n      ng-disabled=\"readOnly\"\n      ng-click=\"toggleCheckbox(v.value)\"\n      ng-checked=\"model[v.value]\"\n      >\n      {{ v.label }}\n    </label>\n  </div>\n</div>\n"
+        "<div class=\"select-boxes\">\n  <div ng-class=\"component.inline ? 'checkbox-inline' : 'checkbox'\" ng-repeat=\"v in component.values track by $index\">\n    <label class=\"control-label\" for=\"{{ component.key }}-{{ v.value }}\">\n      <input type=\"checkbox\"\n        id=\"{{ component.key }}-{{ v.value }}\"\n        name=\"{{ component.key }}-{{ v.value }}\"\n        value=\"{{ v.value }}\"\n        tabindex=\"{{ component.tabindex || 0 }}\"\n        ng-disabled=\"readOnly\"\n        ng-click=\"toggleCheckbox(v.value)\"\n        ng-checked=\"model[v.value]\"\n      >\n      {{ v.label }}\n    </label>\n  </div>\n</div>\n"
       );
       $templateCache.put('formio/components/selectboxes.html',
         "<label ng-if=\"component.label\" for=\"{{ component.key }}\" class=\"control-label\" ng-class=\"{'field-required': component.validate.required}\">{{ component.label }}</label>\n<formio-select-boxes\n  name=\"{{ component.key }}\"\n  ng-model=\"data[component.key]\"\n  ng-model-options=\"{allowInvalid: true}\"\n  component=\"component\"\n  read-only=\"readOnly\"\n  ng-required=\"component.validate.required\"\n  custom-validator=\"component.validate.custom\"\n  ></formio-select-boxes>\n<formio-errors></formio-errors>\n"
@@ -5559,7 +5558,7 @@ module.exports = function(app) {
       FormioUtils
     ) {
       $templateCache.put('formio/components/textfield.html', FormioUtils.fieldWrap(
-        "<input type=\"{{ component.inputType }}\"\nclass=\"form-control\"\nid=\"{{ component.key }}\"\nname=\"{{ component.key }}\"\ntabindex=\"{{ component.tabindex || 0 }}\"\nng-disabled=\"readOnly\"\nng-model=\"data[component.key]\"\nng-model-options=\"{ debounce: 500 }\"\nsafe-multiple-to-single\nng-required=\"component.validate.required\"\nng-minlength=\"component.validate.minLength\"\nng-maxlength=\"component.validate.maxLength\"\nng-pattern=\"component.validate.pattern\"\ncustom-validator=\"component.validate.custom\"\nplaceholder=\"{{ component.placeholder }}\"\nui-mask=\"{{ component.inputMask }}\"\nui-mask-placeholder=\"\" ' + // avoids regular placeholder mixing with mask placeholder\nui-options=\"uiMaskOptions\"\n>\n"
+        "<input type=\"{{ component.inputType }}\"\nclass=\"form-control\"\nid=\"{{ component.key }}\"\nname=\"{{ component.key }}\"\ntabindex=\"{{ component.tabindex || 0 }}\"\nng-disabled=\"readOnly\"\nng-model=\"data[component.key]\"\nng-model-options=\"{ debounce: 500 }\"\nsafe-multiple-to-single\nng-required=\"component.validate.required\"\nng-minlength=\"component.validate.minLength\"\nng-maxlength=\"component.validate.maxLength\"\nng-pattern=\"component.validate.pattern\"\ncustom-validator=\"component.validate.custom\"\nplaceholder=\"{{ component.placeholder }}\"\nui-mask=\"{{ component.inputMask }}\"\nui-mask-placeholder=\"\"\nui-options=\"uiMaskOptions\"\n>\n"
       ));
     }
   ]);
