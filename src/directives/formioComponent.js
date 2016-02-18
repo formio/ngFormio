@@ -30,9 +30,11 @@ module.exports = [
       controller: [
         '$scope',
         '$http',
+        '$controller',
         function(
           $scope,
-          $http
+          $http,
+          $controller
         ) {
 
           // Options to match jquery.maskedinput masks
@@ -123,7 +125,14 @@ module.exports = [
 
           // If the component has a controller.
           if (component.controller) {
-            component.controller($scope.component, $scope, $http, Formio);
+
+            // Maintain reverse compatability by executing the old method style.
+            if (typeof component.controller === 'function') {
+              component.controller($scope.component, $scope, $http, Formio);
+            }
+            else {
+              $controller(component.controller, {$scope: $scope});
+            }
           }
 
           // Establish a default for data.

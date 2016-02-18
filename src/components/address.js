@@ -10,7 +10,7 @@ module.exports = function (app) {
         template: function ($scope) {
           return $scope.component.multiple ? 'formio/components/address-multiple.html' : 'formio/components/address.html';
         },
-        controller: function (settings, $scope, $http) {
+        controller: ['$scope', '$http', function ($scope, $http) {
           $scope.address = {};
           $scope.addresses = [];
           $scope.refreshAddress = function (address) {
@@ -30,7 +30,7 @@ module.exports = function (app) {
                 $scope.addresses = response.data.results;
               });
           };
-        },
+        }],
         tableView: function (data) {
           return data ? data.formatted_address : '';
         },
