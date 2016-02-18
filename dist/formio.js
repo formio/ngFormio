@@ -5713,12 +5713,15 @@ module.exports = function() {
 
               if (value) {
                 // Check if the conditional value is equal to the trigger value
-                if (value.toString() === component.conditional.eq.toString()) {
-                  $scope.show[component.key] = boolean[component.conditional.show];
-                }
-                else {
-                  $scope.show[component.key] = !boolean[component.conditional.show];
-                }
+                $scope.show[component.key] = value.toString() === component.conditional.eq.toString()
+                  ? boolean[component.conditional.show]
+                  : !boolean[component.conditional.show];
+              }
+              // Check against the components default value, if present and the components hasnt been interacted with.
+              else if (!value && cond.defaultValue) {
+                $scope.show[component.key] = cond.defaultValue.toString() === component.conditional.eq.toString()
+                  ? boolean[component.conditional.show]
+                  : !boolean[component.conditional.show];
               }
             }
 
@@ -5726,7 +5729,7 @@ module.exports = function() {
           });
         };
 
-        // Update the components on the intitial form render and all subsequent submission data changes.
+        // Update the components on the initial form render and all subsequent submission data changes.
         $scope.$on('formRender', updateComponents);
         $scope.$on('submissionDataUpdate', function(ev, key, value) {
           submission.data[key] = value;
