@@ -32,7 +32,7 @@ module.exports = function (app) {
     };
   });
 
-// A hack to have ui-select open on focus
+  // A hack to have ui-select open on focus
   app.directive('uiSelectOpenOnFocus', ['$timeout', function ($timeout) {
     return {
       require: 'uiSelect',
@@ -58,7 +58,7 @@ module.exports = function (app) {
     };
   }]);
 
-// Configure the Select component.
+  // Configure the Select component.
   app.config([
     'formioComponentsProvider',
     function (formioComponentsProvider) {
@@ -67,7 +67,8 @@ module.exports = function (app) {
         template: function ($scope) {
           return $scope.component.multiple ? 'formio/components/select-multiple.html' : 'formio/components/select.html';
         },
-        controller: function (settings, $scope, $http, Formio) {
+        controller: ['$scope', '$http', 'Formio', function ($scope, $http, Formio) {
+          var settings = $scope.component;
           $scope.nowrap = true;
           $scope.selectItems = [];
           var valueProp = $scope.component.valueProperty;
@@ -143,7 +144,7 @@ module.exports = function (app) {
             default:
               $scope.selectItems = [];
           }
-        },
+        }],
         settings: {
           input: true,
           tableView: true,

@@ -16,7 +16,8 @@ module.exports = function (app) {
         template: function ($scope) {
           return $scope.component.multiple ? 'formio/components/resource-multiple.html' : 'formio/components/resource.html';
         },
-        controller: function (settings, $scope, $http, Formio) {
+        controller: ['$scope', 'Formio', function ($scope, Formio) {
+          var settings = $scope.component;
           $scope.selectItems = [];
           if (settings.multiple) {
             settings.defaultValue = [];
@@ -44,7 +45,7 @@ module.exports = function (app) {
 
             $scope.refreshSubmissions();
           }
-        },
+        }],
         group: 'advanced',
         settings: {
           input: true,

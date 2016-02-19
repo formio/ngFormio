@@ -20,7 +20,8 @@ module.exports = function (app) {
           disableOnInvalid: true,
           theme: 'primary'
         },
-        controller: function (settings, $scope) {
+        controller: ['$scope', function ($scope) {
+          var settings = $scope.component;
           $scope.onClick = function() {
             switch (settings.action) {
               case 'submit':
@@ -133,7 +134,7 @@ module.exports = function (app) {
             }, 100);
           };
 
-        }
+        }]
       });
     }
   ]);

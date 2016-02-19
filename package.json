@@ -1,6 +1,6 @@
 {
   "name": "ng-formio",
-  "version": "1.2.1",
+  "version": "1.2.3",
   "description": "The form redering engine behind Form.IO.",
   "main": "dist/formio.min.js",
   "scripts": {
