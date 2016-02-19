@@ -1,6 +1,6 @@
 var fs = require('fs');
-module.exports = function (app) {
 
+module.exports = function (app) {
   app.directive('formioHtmlElement', [
     '$sanitize',
     function($sanitize) {
