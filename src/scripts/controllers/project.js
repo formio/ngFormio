@@ -854,9 +854,15 @@ app.controller('ProjectFormioController', [
      *   The filtered contents.
      */
     var filterEmployees = function(items) {
+      var ignoredEmails = ['@form.io', '@example', '@test', 'test@', '@prodtest'];
       return _(items)
         .reject(function(item) {
-          return !$scope.showEmployees && _employees.indexOf(item.owner) !== -1;
+          var hasIgnoredEmail = _.some(ignoredEmails, function(value) {
+            if ($scope.showEmployees || !_.get(item, 'data.email') || _.get(item, 'data.email') === '') return false;
+            return (item.data.email.toString().indexOf(value) !== -1);
+          });
+
+          return (!$scope.showEmployees && _employees.indexOf(item.owner) !== -1) || hasIgnoredEmail;
         })
         .value();
     };
