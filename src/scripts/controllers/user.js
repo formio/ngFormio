@@ -97,12 +97,14 @@ app.controller('ProfileController', [
     $scope.userLoading = true;
     Formio.currentUser().then(function(user) {
       $rootScope.user = user;
+      Formio.setUser(user); // Update the cached user in localstorage.
       $scope.profileUrl = $rootScope.userForm + '/submission/' + $rootScope.user._id;
       $scope.userLoading = false;
     });
 
     $scope.$on('formSubmission', function(event, submission) {
       $rootScope.user = submission;
+      Formio.setUser(submission); // Update the cached user in localstorage.
     });
   }
 ]);
