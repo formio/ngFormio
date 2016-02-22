@@ -56385,7 +56385,9 @@ module.exports = function (app) {
 
           // Add a watch if they wish to refresh on selection of another field.
           if (settings.refreshOn) {
-            $scope.$watch('data.' + settings.refreshOn, $scope.refreshItems);
+            $scope.$watch('data.' + settings.refreshOn, function() {
+              $scope.refreshItems();
+            });
           }
 
           switch (settings.dataSrc) {
