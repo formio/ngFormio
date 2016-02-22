@@ -210,8 +210,8 @@ module.exports = function(config) {
       method: 'POST',
       form: {
         data: {
-          'user.email': email,
-          'user.password': password
+          'email': email,
+          'password': password
         }
       }
     }, function(err, response, body) {
@@ -237,9 +237,9 @@ module.exports = function(config) {
       method: 'POST',
       form: {
         data: {
-          'user.email': email,
-          'user.name': username,
-          'user.password': password,
+          'email': email,
+          'name': username,
+          'password': password,
           'verifyPassword': password
         }
       }
