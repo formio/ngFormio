@@ -6262,7 +6262,7 @@ module.exports = [
           if (options.submission && loader.submissionId) {
             $scope.formLoading = true;
             loader.loadSubmission().then(function(submission) {
-              $scope._submission = submission;
+              angular.merge($scope.submission, submission);
               if (!$scope._submission.data) {
                 $scope._submission.data = {};
               }
