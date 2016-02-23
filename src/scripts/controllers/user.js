@@ -103,6 +103,7 @@ app.controller('ProfileController', [
     });
 
     $scope.$on('formSubmission', function(event, submission) {
+      if (typeof submission === 'string') return; // If the form submission response wasn't an obj escape - FA-771
       $rootScope.user = submission;
       Formio.setUser(submission); // Update the cached user in localstorage.
     });
