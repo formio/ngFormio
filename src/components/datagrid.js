@@ -8,6 +8,23 @@ module.exports = function (app) {
         title: 'Data Grid',
         template: 'formio/components/datagrid.html',
         group: 'layout',
+        tableView: function(data, component) {
+          var view = '<table class="table table-striped"><thead><tr>';
+          angular.forEach(component.components, function(component) {
+            view += '<th>' + component.label + '</th>';
+          });
+          view += '</tr></thead>';
+          view += '<tbody>';
+          angular.forEach(data, function(row) {
+            view += '<tr>';
+            angular.forEach(component.components, function(component) {
+              view += '<td>' + row[component.key] + '</td>';
+            });
+            view += '</tr>';
+          });
+          view += '</tbody></table>';
+          return view;
+        },
         settings: {
           input: true,
           tree: true,

@@ -13,7 +13,7 @@
     </thead>
     <tbody>
       <tr ng-repeat="submission in _submissions" class="formio-submission" ng-click="$emit('submissionView', submission)">
-        <td ng-repeat="component in _form.components | flattenComponents" ng-if="tableView(component)">{{ fieldData(submission.data, component) }}</td>
+        <td ng-repeat="component in _form.components | flattenComponents" ng-if="tableView(component)">{{ submission.data | tableView:component }}</td>
         <td>{{ submission.created | amDateFormat:'l, h:mm:ss a' }}</td>
         <td>{{ submission.modified | amDateFormat:'l, h:mm:ss a' }}</td>
         <td>

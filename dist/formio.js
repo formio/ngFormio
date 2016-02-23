@@ -4237,6 +4237,23 @@ module.exports = function (app) {
         title: 'Data Grid',
         template: 'formio/components/datagrid.html',
         group: 'layout',
+        tableView: function(data, component) {
+          var view = '<table class="table table-striped"><thead><tr>';
+          angular.forEach(component.components, function(component) {
+            view += '<th>' + component.label + '</th>';
+          });
+          view += '</tr></thead>';
+          view += '<tbody>';
+          angular.forEach(data, function(row) {
+            view += '<tr>';
+            angular.forEach(component.components, function(component) {
+              view += '<td>' + row[component.key] + '</td>';
+            });
+            view += '</tr>';
+          });
+          view += '</tbody></table>';
+          return view;
+        },
         settings: {
           input: true,
           tree: true,
@@ -6177,11 +6194,9 @@ module.exports = function() {
 module.exports = [
   'Formio',
   'formioComponents',
-  '$interpolate',
   function(
     Formio,
-    formioComponents,
-    $interpolate
+    formioComponents
   ) {
     return {
       onError: function($scope, $element) {
@@ -6260,21 +6275,6 @@ module.exports = [
             $scope.action = action;
           }
         });
-
-        // Return the value and set the scope for the model input.
-        $scope.fieldData = function(data, component) {
-          var value = Formio.fieldData(data, component);
-          var componentInfo = formioComponents.components[component.type];
-          if (!componentInfo.tableView) return value;
-          if (component.multiple && (value.length > 0)) {
-            var values = [];
-            angular.forEach(value, function(arrayValue) {
-              values.push(componentInfo.tableView(arrayValue, component, $interpolate));
-            });
-            return values;
-          }
-          return componentInfo.tableView(value, component, $interpolate);
-        };
 
         $scope.updateSubmissions = function() {
           $scope.formLoading = true;
@@ -6465,6 +6465,36 @@ module.exports = [
 
 },{}],50:[function(require,module,exports){
 "use strict";
+module.exports = [
+  'Formio',
+  'formioComponents',
+  '$interpolate',
+  function(
+    Formio,
+    formioComponents,
+    $interpolate
+  ) {
+    return function(value, component) {
+      value = Formio.fieldData(value, component);
+      if (!value) {
+        return '';
+      }
+      var componentInfo = formioComponents.components[component.type];
+      if (!componentInfo.tableView) return value;
+      if (component.multiple && (value.length > 0)) {
+        var values = [];
+        angular.forEach(value, function(arrayValue) {
+          values.push(componentInfo.tableView(arrayValue, component, $interpolate));
+        });
+        return values;
+      }
+      return componentInfo.tableView(value, component, $interpolate);
+    };
+  }
+];
+
+},{}],51:[function(require,module,exports){
+"use strict";
 
 
 var app = angular.module('formio', [
@@ -6511,7 +6541,7 @@ app.directive('formioElement', require('./directives/formioElement'));
  * Filter to flatten form components.
  */
 app.filter('flattenComponents', require('./filters/flattenComponents'));
-
+app.filter('tableView', require('./filters/tableView'));
 app.filter('safehtml', require('./filters/safehtml'));
 
 app.config([
@@ -6546,7 +6576,7 @@ app.run([
     );
 
     $templateCache.put('formio/submissions.html',
-      "<div>\n  <div ng-repeat=\"alert in formioAlerts\" class=\"alert alert-{{ alert.type }}\" role=\"alert\">\n    {{ alert.message }}\n  </div>\n  <table class=\"table\">\n    <thead>\n      <tr>\n        <th ng-repeat=\"component in _form.components | flattenComponents\" ng-if=\"tableView(component)\">{{ component.label || component.key }}</th>\n        <th>Submitted</th>\n        <th>Updated</th>\n        <th>Operations</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr ng-repeat=\"submission in _submissions\" class=\"formio-submission\" ng-click=\"$emit('submissionView', submission)\">\n        <td ng-repeat=\"component in _form.components | flattenComponents\" ng-if=\"tableView(component)\">{{ fieldData(submission.data, component) }}</td>\n        <td>{{ submission.created | amDateFormat:'l, h:mm:ss a' }}</td>\n        <td>{{ submission.modified | amDateFormat:'l, h:mm:ss a' }}</td>\n        <td>\n          <div class=\"button-group\" style=\"display:flex;\">\n            <a ng-click=\"$emit('submissionView', submission); $event.stopPropagation();\" class=\"btn btn-primary btn-xs\"><span class=\"glyphicon glyphicon-eye-open\"></span></a>&nbsp;\n            <a ng-click=\"$emit('submissionEdit', submission); $event.stopPropagation();\" class=\"btn btn-default btn-xs\"><span class=\"glyphicon glyphicon-edit\"></span></a>&nbsp;\n            <a ng-click=\"$emit('submissionDelete', submission); $event.stopPropagation();\" class=\"btn btn-danger btn-xs\"><span class=\"glyphicon glyphicon-remove-circle\"></span></a>\n          </div>\n        </td>\n      </tr>\n    </tbody>\n  </table>\n  <pagination\n    ng-if=\"_submissions.serverCount > perPage\"\n    ng-model=\"currentPage\"\n    ng-change=\"pageChanged(currentPage)\"\n    total-items=\"_submissions.serverCount\"\n    items-per-page=\"perPage\"\n    direction-links=\"false\"\n    boundary-links=\"true\"\n    first-text=\"&laquo;\"\n    last-text=\"&raquo;\"\n    >\n  </pagination>\n</div>\n"
+      "<div>\n  <div ng-repeat=\"alert in formioAlerts\" class=\"alert alert-{{ alert.type }}\" role=\"alert\">\n    {{ alert.message }}\n  </div>\n  <table class=\"table\">\n    <thead>\n      <tr>\n        <th ng-repeat=\"component in _form.components | flattenComponents\" ng-if=\"tableView(component)\">{{ component.label || component.key }}</th>\n        <th>Submitted</th>\n        <th>Updated</th>\n        <th>Operations</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr ng-repeat=\"submission in _submissions\" class=\"formio-submission\" ng-click=\"$emit('submissionView', submission)\">\n        <td ng-repeat=\"component in _form.components | flattenComponents\" ng-if=\"tableView(component)\">{{ submission.data | tableView:component }}</td>\n        <td>{{ submission.created | amDateFormat:'l, h:mm:ss a' }}</td>\n        <td>{{ submission.modified | amDateFormat:'l, h:mm:ss a' }}</td>\n        <td>\n          <div class=\"button-group\" style=\"display:flex;\">\n            <a ng-click=\"$emit('submissionView', submission); $event.stopPropagation();\" class=\"btn btn-primary btn-xs\"><span class=\"glyphicon glyphicon-eye-open\"></span></a>&nbsp;\n            <a ng-click=\"$emit('submissionEdit', submission); $event.stopPropagation();\" class=\"btn btn-default btn-xs\"><span class=\"glyphicon glyphicon-edit\"></span></a>&nbsp;\n            <a ng-click=\"$emit('submissionDelete', submission); $event.stopPropagation();\" class=\"btn btn-danger btn-xs\"><span class=\"glyphicon glyphicon-remove-circle\"></span></a>\n          </div>\n        </td>\n      </tr>\n    </tbody>\n  </table>\n  <pagination\n    ng-if=\"_submissions.serverCount > perPage\"\n    ng-model=\"currentPage\"\n    ng-change=\"pageChanged(currentPage)\"\n    total-items=\"_submissions.serverCount\"\n    items-per-page=\"perPage\"\n    direction-links=\"false\"\n    boundary-links=\"true\"\n    first-text=\"&laquo;\"\n    last-text=\"&raquo;\"\n    >\n  </pagination>\n</div>\n"
     );
 
     // A formio component template.
@@ -6562,7 +6592,7 @@ app.run([
 
 require('./components');
 
-},{"./components":23,"./directives/customValidator":38,"./directives/formio":39,"./directives/formioComponent":40,"./directives/formioDelete":41,"./directives/formioElement":42,"./directives/formioErrors":43,"./directives/formioSubmissions":44,"./factories/FormioScope":45,"./factories/FormioUtils":46,"./factories/formioInterceptor":47,"./filters/flattenComponents":48,"./filters/safehtml":49,"./plugins":51,"./providers/Formio":55,"./providers/FormioPlugins":56}],51:[function(require,module,exports){
+},{"./components":23,"./directives/customValidator":38,"./directives/formio":39,"./directives/formioComponent":40,"./directives/formioDelete":41,"./directives/formioElement":42,"./directives/formioErrors":43,"./directives/formioSubmissions":44,"./factories/FormioScope":45,"./factories/FormioUtils":46,"./factories/formioInterceptor":47,"./filters/flattenComponents":48,"./filters/safehtml":49,"./filters/tableView":50,"./plugins":52,"./providers/Formio":56,"./providers/FormioPlugins":57}],52:[function(require,module,exports){
 "use strict";
 module.exports = function(app) {
   require('./storage/url')(app);
@@ -6570,7 +6600,7 @@ module.exports = function(app) {
   require('./storage/dropbox')(app);
 };
 
-},{"./storage/dropbox":52,"./storage/s3":53,"./storage/url":54}],52:[function(require,module,exports){
+},{"./storage/dropbox":53,"./storage/s3":54,"./storage/url":55}],53:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -6682,7 +6712,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],53:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -6775,7 +6805,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],54:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -6827,7 +6857,7 @@ module.exports = function(app) {
   );
 };
 
-},{}],55:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 "use strict";
 module.exports = function() {
 
@@ -6892,7 +6922,7 @@ module.exports = function() {
   };
 };
 
-},{"formiojs/src/formio.js":4}],56:[function(require,module,exports){
+},{"formiojs/src/formio.js":4}],57:[function(require,module,exports){
 "use strict";
 
 module.exports = function() {
@@ -6924,4 +6954,4 @@ module.exports = function() {
   };
 };
 
-},{}]},{},[50]);
+},{}]},{},[51]);
