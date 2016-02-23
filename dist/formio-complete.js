@@ -57354,6 +57354,9 @@ module.exports = [
           else if ($scope.data && !$scope.data.hasOwnProperty($scope.component.key) && $scope.component.multiple) {
             $scope.data[$scope.component.key] = [];
           }
+
+          // Allow disabled status to be set per component. This is useful in $on('formLoad')
+          $scope.readOnly = $scope.component.disabled || $scope.readOnly;
         }
       ]
     };
@@ -57647,7 +57650,7 @@ module.exports = [
           if (options.submission && loader.submissionId) {
             $scope.formLoading = true;
             loader.loadSubmission().then(function(submission) {
-              $scope._submission = submission;
+              angular.merge($scope.submission, submission);
               if (!$scope._submission.data) {
                 $scope._submission.data = {};
               }
@@ -57940,7 +57943,7 @@ app.run([
 
     // A formio component template.
     $templateCache.put('formio/component.html',
-      "<ng-form name=\"formioFieldForm\" class=\"formio-component-{{ component.key }}\">\n  <div class=\"form-group has-feedback form-field-type-{{ component.type }} {{component.customClass}}\" id=\"form-group-{{ component.key }}\" ng-class=\"{'has-error': formioFieldForm[component.key].$invalid && !formioFieldForm[component.key].$pristine }\" ng-style=\"component.style\">\n    <formio-element></formio-element>\n  </div>\n</ng-form>\n"
+      "<ng-form name=\"formioFieldForm\" class=\"formio-component-{{ component.key }}\" ng-hide=\"component.hidden\">\n  <div class=\"form-group has-feedback form-field-type-{{ component.type }} {{component.customClass}}\" id=\"form-group-{{ component.key }}\" ng-class=\"{'has-error': formioFieldForm[component.key].$invalid && !formioFieldForm[component.key].$pristine }\" ng-style=\"component.style\">\n    <formio-element></formio-element>\n  </div>\n</ng-form>\n"
     );
 
     $templateCache.put('formio/errors.html',
