@@ -647,6 +647,15 @@ angular
       };
 
       var authError = function() {
+        // Fix resource select components - FA-773.
+        if ($state.includes('project.form.form.*')) {
+          FormioAlerts.addAlert({
+            type: 'danger',
+            message: 'You are not authorized to view some data in this form.'
+          });
+          return;
+        }
+
         $rootScope.currentApp = null;
         $rootScope.currentForm = null;
         $state.go('home');
