@@ -38,6 +38,69 @@ module.exports = function() {
           $scope._src += 'live=1';
         }
 
+        // Build the display map.
+        $scope.show = {};
+        var boolean = {
+          'true': true,
+          'false': false
+        };
+
+        var submission = $scope._submission || {data: {}};
+        var updateComponents = function() {
+          // Change the visibility for the component with the given key
+          var updateVisiblity = function(key) {
+            $element
+              .find('div#form-group-' + key)
+              .removeClass('ng-show ng-hide')
+              .addClass($scope.show[key] ? 'ng-show' : 'ng-hide');
+          };
+
+          $scope._form.components = $scope._form.components || [];
+          _.forEach($scope._form.components, function(component) {
+            // Display every component by default
+            $scope.show[component.key] = ($scope.show[component.key] === undefined)
+              ? true
+              : $scope.show[component.key];
+
+            // Only change display options of all require conditional properties are present.
+            if (
+              component.conditional
+              && (component.conditional.show !== null)
+              && (component.conditional.when !== null)
+            ) {
+              // Default the conditional values.
+              component.conditional.show = boolean[component.conditional.show];
+              component.conditional.eq = component.conditional.eq || '';
+
+              // Get the conditional component.
+              var cond = FormioUtils.getComponent($scope._form.components, component.conditional.when.toString());
+              var value = submission.data[cond.key];
+
+              if (value) {
+                // Check if the conditional value is equal to the trigger value
+                $scope.show[component.key] = value.toString() === component.conditional.eq.toString()
+                  ? boolean[component.conditional.show]
+                  : !boolean[component.conditional.show];
+              }
+              // Check against the components default value, if present and the components hasnt been interacted with.
+              else if (!value && cond.defaultValue) {
+                $scope.show[component.key] = cond.defaultValue.toString() === component.conditional.eq.toString()
+                  ? boolean[component.conditional.show]
+                  : !boolean[component.conditional.show];
+              }
+            }
+
+            updateVisiblity(component.key)
+          });
+        };
+
+        // Update the components on the initial form render and all subsequent submission data changes.
+        $scope.$on('formRender', updateComponents);
+        $scope.$on('submissionDataUpdate', function(ev, key, value) {
+          submission.data[key] = value;
+          updateComponents();
+        });
+
         // Create the formio object.
         $scope.formio = FormioScope.register($scope, $element, {
           form: true,

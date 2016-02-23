@@ -2,13 +2,13 @@
   <div ng-class="component.inline ? 'checkbox-inline' : 'checkbox'" ng-repeat="v in component.values track by $index">
     <label class="control-label" for="{{ component.key }}-{{ v.value }}">
       <input type="checkbox"
-      id="{{ component.key }}-{{ v.value }}"
-      name="{{ component.key }}-{{ v.value }}"
-      value="{{ v.value }}"
-      tabindex="{{ component.tabindex || 0 }}"
-      ng-disabled="readOnly"
-      ng-click="toggleCheckbox(v.value)"
-      ng-checked="model[v.value]"
+        id="{{ component.key }}-{{ v.value }}"
+        name="{{ component.key }}-{{ v.value }}"
+        value="{{ v.value }}"
+        tabindex="{{ component.tabindex || 0 }}"
+        ng-disabled="readOnly"
+        ng-click="toggleCheckbox(v.value)"
+        ng-checked="model[v.value]"
       >
       {{ v.label }}
     </label>
