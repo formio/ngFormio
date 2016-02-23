@@ -123,7 +123,7 @@ module.exports = [
             }
             else {
               loader.loadSubmission().then(function(submission) {
-                $scope._submission = submission;
+                angular.merge($scope._submission, submission);
                 if (!$scope._submission.data) {
                   $scope._submission.data = {};
                 }

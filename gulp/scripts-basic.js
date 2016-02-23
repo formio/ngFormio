@@ -17,5 +17,4 @@ module.exports = function(gulp, plugins, bundle) {
         this.emit('end');
       });
   };
-
 };

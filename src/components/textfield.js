@@ -1,9 +1,9 @@
 var fs = require('fs');
-module.exports = function (app) {
 
+module.exports = function(app) {
   app.config([
     'formioComponentsProvider',
-    function (formioComponentsProvider) {
+    function(formioComponentsProvider) {
       formioComponentsProvider.register('textfield', {
         title: 'Text Field',
         template: 'formio/components/textfield.html',
@@ -30,16 +30,24 @@ module.exports = function (app) {
             pattern: '',
             custom: '',
             customPrivate: false
+          },
+          conditional: {
+            show: null,
+            when: null,
+            eq: ''
           }
         }
       });
     }
   ]);
+
   app.run([
     '$templateCache',
     'FormioUtils',
-    function ($templateCache,
-              FormioUtils) {
+    function(
+      $templateCache,
+      FormioUtils
+    ) {
       $templateCache.put('formio/components/textfield.html', FormioUtils.fieldWrap(
         fs.readFileSync(__dirname + '/../templates/components/textfield.html', 'utf8')
       ));
