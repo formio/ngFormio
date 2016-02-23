@@ -16,7 +16,7 @@ module.exports = function (app) {
           placeholder: '',
           prefix: '',
           suffix: '',
-          defaultValue: '',
+          defaultValue: 0,
           protected: false,
           persistent: true,
           validate: {
