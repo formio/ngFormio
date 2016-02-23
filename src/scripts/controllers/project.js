@@ -854,9 +854,15 @@ app.controller('ProjectFormioController', [
      *   The filtered contents.
      */
     var filterEmployees = function(items) {
+      var ignoredEmails = ['@form.io', '@example', '@test', 'test@', '@prodtest'];
       return _(items)
         .reject(function(item) {
-          return !$scope.showEmployees && _employees.indexOf(item.owner) !== -1;
+          var hasIgnoredEmail = _.some(ignoredEmails, function(value) {
+            if ($scope.showEmployees || !_.get(item, 'data.email') || _.get(item, 'data.email') === '') return false;
+            return (item.data.email.toString().indexOf(value) !== -1);
+          });
+
+          return (!$scope.showEmployees && _employees.indexOf(item.owner) !== -1) || hasIgnoredEmail;
         })
         .value();
     };
@@ -873,7 +879,7 @@ app.controller('ProjectFormioController', [
       Formio.request(url, 'GET')
         .then(function(data) {
           $scope.projectsCreated = _(data)
-            .sortByOrder(['created'], ['desc'])
+            .orderBy(['created'], ['desc'])
             .value();
 
           var allOwners = _.map(data, 'owner');
@@ -906,7 +912,7 @@ app.controller('ProjectFormioController', [
       Formio.request(url, 'GET')
         .then(function(data) {
           $scope.usersCreated = _(data)
-            .sortByOrder(['created'], ['desc'])
+            .orderBy(['created'], ['desc'])
             .value();
 
           $scope.usersCreated = filterEmployees($scope.usersCreated);
@@ -1059,12 +1065,12 @@ app.controller('ProjectFormioController', [
             .value();
 
           $scope.monthlySubmissions = _($scope.monthlyUsage)
-            .sortByOrder(['submissions'], ['desc'])
+            .orderBy(['submissions'], ['desc'])
             .reject({submissions: 0})
             .value();
 
           $scope.monthlyNonsubmissions = _($scope.monthlyUsage)
-            .sortByOrder(['nonsubmissions'], ['desc'])
+            .orderBy(['nonsubmissions'], ['desc'])
             .reject({nonsubmissions: 0})
             .value();
 
