@@ -1,11 +1,9 @@
 module.exports = [
   'Formio',
   'formioComponents',
-  '$interpolate',
   function(
     Formio,
-    formioComponents,
-    $interpolate
+    formioComponents
   ) {
     return {
       onError: function($scope, $element) {
@@ -84,21 +82,6 @@ module.exports = [
             $scope.action = action;
           }
         });
-
-        // Return the value and set the scope for the model input.
-        $scope.fieldData = function(data, component) {
-          var value = Formio.fieldData(data, component);
-          var componentInfo = formioComponents.components[component.type];
-          if (!componentInfo.tableView) return value;
-          if (component.multiple && (value.length > 0)) {
-            var values = [];
-            angular.forEach(value, function(arrayValue) {
-              values.push(componentInfo.tableView(arrayValue, component, $interpolate));
-            });
-            return values;
-          }
-          return componentInfo.tableView(value, component, $interpolate);
-        };
 
         $scope.updateSubmissions = function() {
           $scope.formLoading = true;

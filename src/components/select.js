@@ -67,7 +67,7 @@ module.exports = function (app) {
         template: function ($scope) {
           return $scope.component.multiple ? 'formio/components/select-multiple.html' : 'formio/components/select.html';
         },
-        controller: ['$scope', '$http', 'Formio', function ($scope, $http, Formio) {
+        controller: ['$scope', '$http', 'Formio', '$interpolate', function ($scope, $http, Formio, $interpolate) {
           var settings = $scope.component;
           $scope.nowrap = true;
           $scope.selectItems = [];
@@ -79,6 +79,17 @@ module.exports = function (app) {
             if (settings.dataSrc === 'values') {
               return item.value;
             }
+
+            // Allow dot notation in the value property.
+            if (valueProp.indexOf('.') !== -1) {
+              var parts = valueProp.split('.');
+              var prop = item;
+              for (var i in parts) {
+                prop = prop[parts[i]];
+              }
+              return prop;
+            }
+
             return valueProp ? item[valueProp] : item;
           };
 
@@ -87,6 +98,16 @@ module.exports = function (app) {
           }
 
           $scope.refreshItems = angular.noop;
+          $scope.$on('refreshList', function(event, url, input) {
+            $scope.refreshItems(input, url);
+          });
+
+          // Add a watch if they wish to refresh on selection of another field.
+          if (settings.refreshOn) {
+            $scope.$watch('data.' + settings.refreshOn, function() {
+              $scope.refreshItems();
+            });
+          }
 
           switch (settings.dataSrc) {
             case 'values':
@@ -101,14 +122,17 @@ module.exports = function (app) {
               }
               break;
             case 'url':
-              if (settings.data.url) {
-                var options = {cache: true};
-                if (settings.data.url.substr(0, 1) === '/') {
-                  settings.data.url = Formio.getBaseUrl() + settings.data.url;
+            case 'resource':
+              var url = '';
+              var options = {cache: true};
+              if (settings.dataSrc === 'url') {
+                url = settings.data.url;
+                if (url.substr(0, 1) === '/') {
+                  url = Formio.getBaseUrl() + settings.data.url;
                 }
 
                 // Disable auth for outgoing requests.
-                if (settings.data.url.indexOf(Formio.getBaseUrl()) === -1) {
+                if (url.indexOf(Formio.getBaseUrl()) === -1) {
                   options = {
                     disableJWT: true,
                     headers: {
@@ -118,24 +142,38 @@ module.exports = function (app) {
                     }
                   };
                 }
+              }
+              else {
+                url = Formio.getBaseUrl();
+                if (settings.data.project) {
+                  url += '/project/' + settings.data.project;
+                }
+                url += '/form/' + settings.data.resource + '/submission?limit=1000';
+              }
 
-                var loaded = false;
-                $scope.refreshItems = function(input) {
-                  var url = settings.data.url;
+              if (url) {
+                $scope.refreshItems = function(input, newUrl) {
+                  newUrl = newUrl || url;
+                  if (!newUrl) {
+                    return;
+                  }
 
+                  // If this is a search, then add that to the filter.
                   if (settings.searchField && input) {
-                    url += ((url.indexOf('?') === -1) ? '?' : '&') +
+                    newUrl += ((newUrl.indexOf('?') === -1) ? '?' : '&') +
                       encodeURIComponent(settings.searchField) +
                       '=' +
                       encodeURIComponent(input);
                   }
-                  else if (loaded) {
-                    return; // Skip if we've loaded before, to avoid multiple requests
+
+                  // Add the other filter.
+                  if (settings.filter) {
+                    var filter = $interpolate(settings.filter)({data: $scope.data});
+                    newUrl += ((newUrl.indexOf('?') === -1) ? '?' : '&') + filter;
                   }
-                  $http.get(url, options)
-                  .then(function (result) {
+
+                  $http.get(newUrl, options).then(function (result) {
                     $scope.selectItems = result.data;
-                    loaded = true;
                   });
                 };
                 $scope.refreshItems();
@@ -154,11 +192,14 @@ module.exports = function (app) {
           data: {
             values: [],
             json: '',
-            url: ''
+            url: '',
+            resource: ''
           },
           dataSrc: 'values',
           valueProperty: '',
           defaultValue: '',
+          refreshOn: '',
+          filter: '',
           template: '<span>{{ item.label }}</span>',
           multiple: false,
           protected: false,

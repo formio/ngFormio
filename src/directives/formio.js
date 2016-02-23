@@ -56,7 +56,7 @@ module.exports = function() {
           };
 
           $scope._form.components = $scope._form.components || [];
-          _.forEach($scope._form.components, function(component) {
+          $scope._form.components.forEach(function(component) {
             // Display every component by default
             $scope.show[component.key] = ($scope.show[component.key] === undefined)
               ? true
@@ -90,7 +90,7 @@ module.exports = function() {
               }
             }
 
-            updateVisiblity(component.key)
+            updateVisiblity(component.key);
           });
         };
 
@@ -121,18 +121,6 @@ module.exports = function() {
             submissionData._id = $scope._submission.data._id;
           }
 
-          var components = FormioUtils.flattenComponents($scope._form.components);
-          angular.forEach(components, function(component) {
-            if ($scope._submission.data.hasOwnProperty(component.key)) {
-              submissionData.data[component.key] = $scope._submission.data[component.key];
-            }
-          });
-          angular.forEach($scope._submission.data, function(value, key) {
-            if (value && !value.hasOwnProperty('_id')) {
-              submissionData.data[key] = value;
-            }
-          });
-
           var grabIds = function(input) {
             if (!input) {
               return [];
@@ -152,22 +140,35 @@ module.exports = function() {
             return final;
           };
 
-          // Search the form for resource submission access defaults and build a permissions map.
           var defaultPermissions = {};
-          angular.forEach(components, function(component) {
+          FormioUtils.eachComponent($scope._form.components, function(component) {
             if (component.type === 'resource' && component.key && component.defaultPermission) {
               defaultPermissions[component.key] = component.defaultPermission;
             }
+            if ($scope._submission.data.hasOwnProperty(component.key)) {
+              var value = $scope._submission.data[component.key];
+              if (component.type === 'number') {
+                submissionData.data[component.key] = value ? parseFloat(value) : 0;
+              }
+              else {
+                submissionData.data[component.key] = value;
+              }
+            }
           });
 
-          angular.forEach($scope._submission.data, function(data, key) {
+          angular.forEach($scope._submission.data, function(value, key) {
+            if (value && !value.hasOwnProperty('_id')) {
+              submissionData.data[key] = value;
+            }
+
+            // Setup the submission access.
             var perm = defaultPermissions[key];
             if (perm) {
               submissionData.access = submissionData.access || [];
 
-              // Coerce data into an array for plucking.
-              if (!(data instanceof Array)) {
-                data = [data];
+              // Coerce value into an array for plucking.
+              if (!(value instanceof Array)) {
+                value = [value];
               }
 
               // Try to find and update an existing permission.
@@ -176,7 +177,7 @@ module.exports = function() {
                 if (permission.type === perm) {
                   found = true;
                   permission.resources = permission.resources || [];
-                  permission.resources.concat(grabIds(data));
+                  permission.resources.concat(grabIds(value));
                 }
               });
 
@@ -184,7 +185,7 @@ module.exports = function() {
               if (!found) {
                 submissionData.access.push({
                   type: perm,
-                  resources: grabIds(data)
+                  resources: grabIds(value)
                 });
               }
             }

@@ -44,7 +44,7 @@ app.directive('formioElement', require('./directives/formioElement'));
  * Filter to flatten form components.
  */
 app.filter('flattenComponents', require('./filters/flattenComponents'));
-
+app.filter('tableView', require('./filters/tableView'));
 app.filter('safehtml', require('./filters/safehtml'));
 
 app.config([
