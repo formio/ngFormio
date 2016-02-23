@@ -7,7 +7,11 @@ module.exports = [
     formioComponents,
     $interpolate
   ) {
-    return function(value, component) {
+    return function(data, component) {
+      var value = Formio.fieldData(data, component);
+      if (!value) {
+        return '';
+      }
       var componentInfo = formioComponents.components[component.type];
       if (!componentInfo.tableView) {
         return value;
