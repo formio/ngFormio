@@ -99,22 +99,38 @@ module.exports = [
           loader = new Formio($scope._src);
           if (options.form) {
             $scope.formLoading = true;
-            loader.loadForm().then(function(form) {
-              $scope._form = form;
+
+            // If a form is already provided, then skip the load.
+            if ($scope._form && Object.keys($scope._form).length) {
               $scope.formLoading = false;
-              $scope.$emit('formLoad', form);
-            }, this.onError($scope));
+              $scope.$emit('formLoad', $scope._form);
+            }
+            else {
+              loader.loadForm().then(function(form) {
+                $scope._form = form;
+                $scope.formLoading = false;
+                $scope.$emit('formLoad', form);
+              }, this.onError($scope));
+            }
           }
           if (options.submission && loader.submissionId) {
             $scope.formLoading = true;
-            loader.loadSubmission().then(function(submission) {
-              angular.merge($scope.submission, submission);
-              if (!$scope._submission.data) {
-                $scope._submission.data = {};
-              }
+
+            // If a submission is already provided, then skip the load.
+            if ($scope._submission && Object.keys($scope._submission.data).length) {
               $scope.formLoading = false;
-              $scope.$emit('submissionLoad', submission);
-            }, this.onError($scope));
+              $scope.$emit('submissionLoad', $scope._submission);
+            }
+            else {
+              loader.loadSubmission().then(function(submission) {
+                angular.merge($scope._submission, submission);
+                if (!$scope._submission.data) {
+                  $scope._submission.data = {};
+                }
+                $scope.formLoading = false;
+                $scope.$emit('submissionLoad', submission);
+              }, this.onError($scope));
+            }
           }
           if (options.submissions) {
             $scope.updateSubmissions();
