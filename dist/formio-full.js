@@ -65416,8 +65416,8 @@ module.exports = function (app) {
       formioComponentsProvider.register('datetime', {
         title: 'Date / Time',
         template: 'formio/components/datetime.html',
-        tableView: function(data) {
-          return '<span>{{ "' + data + '" | date: "' + this.settings.format + '" }}</span>';
+        tableView: function(data, component, $interpolate) {
+          return $interpolate('<span>{{ "' + data + '" | date: "' + this.settings.format + '" }}</span>')();
         },
         group: 'advanced',
         settings: {
@@ -67681,7 +67681,11 @@ module.exports = [
     formioComponents,
     $interpolate
   ) {
-    return function(value, component) {
+    return function(data, component) {
+      var value = Formio.fieldData(data, component);
+      if (!value) {
+        return '';
+      }
       var componentInfo = formioComponents.components[component.type];
       if (!componentInfo.tableView) {
         return value;
