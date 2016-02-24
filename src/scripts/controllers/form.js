@@ -654,7 +654,7 @@ app.factory('ActionInfoLoader', [
         // Get the action information.
         $scope.actionUrl = '';
         $scope.actionInfo = $stateParams.actionInfo || {settingsForm: {}};
-        $scope.action = {data: {settings: {}}};
+        $scope.action = {data: {settings: {}, condition: {}}};
 
         // Get the action information.
         var getActionInfo = function(name) {
