@@ -205,6 +205,7 @@ module.exports = function() {
           var submitEvent = $scope.$emit('formSubmit', submissionData);
           if (submitEvent.defaultPrevented) {
             // Listener wants to cancel the form submission
+            form.submitting = false;
             return;
           }
 

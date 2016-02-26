@@ -26,6 +26,8 @@ app.factory('FormioUtils', require('./factories/FormioUtils'));
 
 app.factory('formioInterceptor', require('./factories/formioInterceptor'));
 
+app.factory('formioTableView', require('./factories/formioTableView'));
+
 app.directive('formio', require('./directives/formio'));
 
 app.directive('formioDelete', require('./directives/formioDelete'));
@@ -45,6 +47,7 @@ app.directive('formioElement', require('./directives/formioElement'));
  */
 app.filter('flattenComponents', require('./filters/flattenComponents'));
 app.filter('tableView', require('./filters/tableView'));
+app.filter('tableFieldView', require('./filters/tableFieldView'));
 app.filter('safehtml', require('./filters/safehtml'));
 
 app.config([
