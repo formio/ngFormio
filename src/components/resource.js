@@ -23,7 +23,15 @@ module.exports = function (app) {
             settings.defaultValue = [];
           }
           if (settings.resource) {
-            var formio = new Formio($scope.formio.projectUrl + '/form/' + settings.resource);
+            var url = '';
+            if (settings.project) {
+              url += '/project/' + settings.project;
+            }
+            else if ($scope.formio && $scope.formio.projectUrl) {
+              url += $scope.formio.projectUrl;
+            }
+            url += '/form/' + settings.resource;
+            var formio = new Formio(url);
             $scope.refreshSubmissions = function (input) {
               var params = settings.params || {};
               // If they wish to return only some fields.
@@ -54,6 +62,7 @@ module.exports = function (app) {
           key: 'resourceField',
           placeholder: '',
           resource: '',
+          project: '',
           defaultValue: '',
           template: '<span>{{ item.data }}</span>',
           selectFields: '',
