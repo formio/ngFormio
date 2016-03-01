@@ -5805,15 +5805,17 @@ module.exports = function() {
           updateComponents();
         });
 
-        $scope.$watch('src', function(src) {
-          if (!src) {
-            return;
-          }
-          $scope.formio = FormioScope.register($scope, $element, {
-            form: true,
-            submission: true
+        if (!$scope.src) {
+          $scope.$watch('src', function(src) {
+            if (!src) {
+              return;
+            }
+            $scope.formio = FormioScope.register($scope, $element, {
+              form: true,
+              submission: true
+            });
           });
-        });
+        }
 
         // Create the formio object.
         $scope.formio = FormioScope.register($scope, $element, {
@@ -6810,7 +6812,6 @@ module.exports = function(app) {
 
 },{"./storage/dropbox":57,"./storage/s3":58,"./storage/url":59}],57:[function(require,module,exports){
 "use strict";
-/*global Q*/
 module.exports = function(app) {
   app.config([
     'FormioPluginsProvider',
@@ -6931,7 +6932,6 @@ module.exports = function(app) {
 
 },{}],58:[function(require,module,exports){
 "use strict";
-/*global Q*/
 module.exports = function(app) {
   app.config([
     'FormioPluginsProvider',
