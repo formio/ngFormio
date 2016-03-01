@@ -1,4 +1,3 @@
-/*global Q*/
 module.exports = function(app) {
   app.config([
     'FormioPluginsProvider',
@@ -84,7 +83,7 @@ module.exports = function(app) {
           return defer.promise;
         },
         getFile: function(fileUrl, file) {
-          var deferred = Q.defer();
+          var deferred = $q.defer();
           var dropboxToken = getDropboxToken();
           $http({
             method: 'POST',

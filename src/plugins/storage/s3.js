@@ -1,4 +1,3 @@
-/*global Q*/
 module.exports = function(app) {
   app.config([
     'FormioPluginsProvider',
@@ -74,9 +73,9 @@ module.exports = function(app) {
             return Formio.request(formUrl + '/storage/s3?bucket=' + file.bucket + '&key=' + file.key, 'GET');
           }
           else {
-            return Q.fcall(function() {
-              return file;
-            });
+            var deferred = $q.defer();
+            deferred.resolve(file);
+            return deferred.promise;
           }
         },
         downloadFile: function(evt, file, $scope) {
