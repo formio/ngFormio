@@ -58081,7 +58081,7 @@ module.exports = function(app) {
 
 },{"./storage/dropbox":85,"./storage/s3":86,"./storage/url":87}],85:[function(require,module,exports){
 "use strict";
-
+/*global Q*/
 module.exports = function(app) {
   app.config([
     'FormioPluginsProvider',
@@ -58166,8 +58166,8 @@ module.exports = function(app) {
           }
           return defer.promise;
         },
-        downloadFile: function(evt, file) {
-          evt.preventDefault();
+        getFile: function(fileUrl, file) {
+          var deferred = Q.defer();
           var dropboxToken = getDropboxToken();
           $http({
             method: 'POST',
@@ -58181,9 +58181,18 @@ module.exports = function(app) {
             },
             disableJWT: true
           }).then(function successCallback(response) {
-            $window.open(response.data.url, '_blank');
+            deferred.resolve(response.data);
           }, function errorCallback(response) {
-            alert(response.data);
+            deferred.reject(response.data);
+          });
+          return deferred.promise;
+        },
+        downloadFile: function(evt, file) {
+          evt.preventDefault();
+          this.getFile(null, file).then(function(file) {
+            $window.open(file.url, '_blank');
+          }).catch(function(err) {
+            alert(err);
           });
         }
       };
@@ -58193,7 +58202,7 @@ module.exports = function(app) {
 
 },{}],86:[function(require,module,exports){
 "use strict";
-
+/*global Q*/
 module.exports = function(app) {
   app.config([
     'FormioPluginsProvider',
@@ -58264,20 +58273,25 @@ module.exports = function(app) {
             });
           return defer.promise;
         },
-        downloadFile: function(evt, file, $scope) {
-          // If this is not a public file, get a signed url and open in new tab.
+        getFile: function(formUrl, file) {
           if (file.acl !== 'public-read') {
-            evt.preventDefault();
-            Formio.request($scope.form + '/storage/s3?bucket=' + file.bucket + '&key=' + file.key, 'GET')
-              .then(function (response) {
-                $window.open(response.url, '_blank');
-              })
-              .catch(function (response) {
-                // Is alert the best way to do this?
-                // User is expecting an immediate notification due to attempting to download a file.
-                alert(response);
-              });
+            return Formio.request(formUrl + '/storage/s3?bucket=' + file.bucket + '&key=' + file.key, 'GET');
           }
+          else {
+            return Q.fcall(function() {
+              return file;
+            });
+          }
+        },
+        downloadFile: function(evt, file, $scope) {
+          evt.preventDefault();
+          this.getFile($scope.form, file).then(function(file) {
+            $window.open(file.url, '_blank');
+          }).catch(function (response) {
+            // Is alert the best way to do this?
+            // User is expecting an immediate notification due to attempting to download a file.
+            alert(response);
+          });
         }
       };
     }

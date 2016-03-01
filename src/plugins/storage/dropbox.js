@@ -1,4 +1,4 @@
-
+/*global Q*/
 module.exports = function(app) {
   app.config([
     'FormioPluginsProvider',
@@ -83,8 +83,8 @@ module.exports = function(app) {
           }
           return defer.promise;
         },
-        downloadFile: function(evt, file) {
-          evt.preventDefault();
+        getFile: function(fileUrl, file) {
+          var deferred = Q.defer();
           var dropboxToken = getDropboxToken();
           $http({
             method: 'POST',
@@ -98,9 +98,18 @@ module.exports = function(app) {
             },
             disableJWT: true
           }).then(function successCallback(response) {
-            $window.open(response.data.url, '_blank');
+            deferred.resolve(response.data);
           }, function errorCallback(response) {
-            alert(response.data);
+            deferred.reject(response.data);
+          });
+          return deferred.promise;
+        },
+        downloadFile: function(evt, file) {
+          evt.preventDefault();
+          this.getFile(null, file).then(function(file) {
+            $window.open(file.url, '_blank');
+          }).catch(function(err) {
+            alert(err);
           });
         }
       };
