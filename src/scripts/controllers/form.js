@@ -978,6 +978,7 @@ app.controller('FormSubmissionsController', [
   'formioComponents',
   'GoogleAnalytics',
   'ngDialog',
+  '$interpolate',
   function(
     $scope,
     $state,
@@ -990,7 +991,8 @@ app.controller('FormSubmissionsController', [
     FormioAlerts,
     formioComponents,
     GoogleAnalytics,
-    ngDialog
+    ngDialog,
+    $interpolate
   ) {
     // Returns true if component should appear in table
     $scope.tableView = function(component) {
@@ -1247,7 +1249,7 @@ app.controller('FormSubmissionsController', [
               if (component.multiple && (value.length > 0)) {
                 var values = [];
                 angular.forEach(value, function(arrayValue) {
-                  arrayValue = componentInfo.tableView(arrayValue, component);
+                  arrayValue = componentInfo.tableView(arrayValue, component, $interpolate);
                   if(arrayValue === undefined) {
                     return values.push('');
                   }
@@ -1255,7 +1257,7 @@ app.controller('FormSubmissionsController', [
                 });
                 return values.join(', ');
               }
-              value = componentInfo.tableView(value, component);
+              value = componentInfo.tableView(value, component, $interpolate);
               if(value === undefined) {
                 return '';
               }
