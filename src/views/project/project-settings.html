@@ -4,11 +4,11 @@
     <input type="text" class="form-control" id="title" name="title" ng-model="currentProject.title" placeholder="Project name or website." ng-maxlength="63" ng-required="true" autofocus="true">
     <p class="help-block" ng-show="projectForm.title.$error.maxlength">Project Title cannot be longer than 63 characters.</p>
   </div>
-  <div id="form-group-name" class="form-group" ng-class="{'has-error': projectForm.name.$invalid && projectForm.name.$dirty, 'has-success': projectForm.name.$valid}">
+  <div id="form-group-name" class="form-group" ng-if="showName" ng-class="{'has-error': projectForm.name.$invalid && projectForm.name.$dirty, 'has-success': projectForm.name.$valid}">
     <label for="name" class="control-label required-field">Domain Name</label>
     <div class="input-group" style="width: 300px;">
       <span class="input-group-addon">https://</span>
-      <input type="text" class="form-control" id="name" name="name" ng-disabled="currentProject.plan === 'basic'" ng-model="currentProject.name" title="{{ currentProject.name }}" placeholder="myproject" valid-subdomain unique-checker="/project/available" ng-model-options="{ debounce: { 'default': 500, 'blur': 0 } }" ng-maxlength="63" ng-required="!showName">
+      <input type="text" class="form-control" id="name" name="name" ng-model="currentProject.name" title="{{ currentProject.name }}" placeholder="myproject" valid-subdomain unique-checker="/project/available" ng-model-options="{ debounce: { 'default': 500, 'blur': 0 } }" ng-maxlength="63" ng-required="!showName">
       <i class="form-control-feedback glyphicon" ng-class="{'glyphicon-ok': projectForm.name.$valid, 'glyphicon-remove': projectForm.name.$invalid && projectForm.name.$dirty}" style="right: -36px;"></i>
       <span class="input-group-addon">.form.io</span>
     </div>
