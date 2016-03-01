@@ -8,7 +8,8 @@ var app = angular.module('formioApp.controllers.form', [
   'ui.bootstrap.accordion',
   'ngFormBuilder',
   'formio',
-  'bgf.paginateAnything'
+  'bgf.paginateAnything',
+  'ngTagsInput'
 ]);
 
 app.config([
@@ -276,6 +277,26 @@ app.controller('FormController', [
     // Load the form and submissions.
     $scope.formio = new Formio($scope.formUrl);
 
+    // Keep track of the form tags.
+    $scope.formTags = [];
+    $scope.addTag = function(tag) {
+      if (!$scope.form) {
+        return;
+      }
+      if (!$scope.form.tags) {
+        $scope.form.tags = [];
+      }
+      $scope.form.tags.push(tag.text);
+    };
+    $scope.removeTag = function(tag) {
+      if ($scope.form.tags && $scope.form.tags.length) {
+        var tagIndex = $scope.form.tags.indexOf(tag.text);
+        if (tagIndex !== -1) {
+          $scope.form.tags.splice(tagIndex, 1);
+        }
+      }
+    };
+
     // Load the form.
     if($scope.formId) {
       $scope.loadFormPromise = $scope.formio.loadForm().then(function(form) {
@@ -292,6 +313,10 @@ app.controller('FormController', [
           .value();
 
         $scope.form = form;
+        $scope.formTags = _.map(form.tags, function(tag) {
+          return {text: tag};
+        });
+
         $rootScope.currentForm = $scope.form;
       }, FormioAlerts.onError.bind(FormioAlerts));
 

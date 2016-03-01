@@ -4,5 +4,9 @@
       <label for="action" class="control-label">Custom Action URL</label>
       <input type="text" ng-model="form.action" class="form-control" id="action" placeholder="Enter the custom submission URL."/>
     </div>
+    <div id="form-group-tags" class="form-group">
+      <label class="control-label">Form Tags</label>
+      <tags-input ng-model="formTags" on-tag-added="addTag($tag)" on-tag-removed="removeTag($tag)"></tags-input>
+    </div>
   </uib-accordion-group>
 </uib-accordion>
