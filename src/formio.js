@@ -38,6 +38,8 @@ app.directive('customValidator', require('./directives/customValidator'));
 
 app.directive('formioSubmissions', require('./directives/formioSubmissions'));
 
+app.directive('formioSubmission', require('./directives/formioSubmission'));
+
 app.directive('formioComponent', require('./directives/formioComponent'));
 
 app.directive('formioElement', require('./directives/formioElement'));
@@ -46,6 +48,7 @@ app.directive('formioElement', require('./directives/formioElement'));
  * Filter to flatten form components.
  */
 app.filter('flattenComponents', require('./filters/flattenComponents'));
+app.filter('tableComponents', require('./filters/tableComponents'));
 app.filter('tableView', require('./filters/tableView'));
 app.filter('tableFieldView', require('./filters/tableFieldView'));
 app.filter('safehtml', require('./filters/safehtml'));
@@ -79,6 +82,10 @@ app.run([
 
     $templateCache.put('formio-delete.html',
       fs.readFileSync(__dirname + '/templates/formio-delete.html', 'utf8')
+    );
+
+    $templateCache.put('formio/submission.html',
+      fs.readFileSync(__dirname + '/templates/formio-submission.html', 'utf8')
     );
 
     $templateCache.put('formio/submissions.html',

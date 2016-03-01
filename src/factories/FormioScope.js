@@ -74,6 +74,23 @@ module.exports = [
           }
         });
 
+        // If they load a submission after it is passed, make the change.
+        $scope.$watch('submission', function(submission) {
+          if (!submission || !Object.keys(submission).length) {
+            return;
+          }
+          angular.merge($scope._submission, submission);
+        });
+
+        // If they provide a form, make sure to set it when it is loaded.
+        $scope.$watch('form', function(form) {
+          if (!form || !Object.keys(form).length) {
+            return;
+          }
+          angular.merge($scope._form, form);
+          $scope.formLoading = false;
+        });
+
         // Set the action if they provided it in the form.
         $scope.$watch('form.action', function(value) {
           if (!value) return;
@@ -139,7 +156,7 @@ module.exports = [
         else {
 
           $scope.formoLoaded = true;
-          $scope.formLoading = false;
+          $scope.formLoading = $scope.form;
 
           // Emit the events if these objects are already loaded.
           if ($scope._form) {

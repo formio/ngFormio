@@ -101,6 +101,18 @@ module.exports = function() {
           updateComponents();
         });
 
+        if (!$scope.src) {
+          $scope.$watch('src', function(src) {
+            if (!src) {
+              return;
+            }
+            $scope.formio = FormioScope.register($scope, $element, {
+              form: true,
+              submission: true
+            });
+          });
+        }
+
         // Create the formio object.
         $scope.formio = FormioScope.register($scope, $element, {
           form: true,

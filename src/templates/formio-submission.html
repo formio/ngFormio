@@ -1,0 +1,6 @@
+<table class="table table-striped table-responsive">
+  <tr ng-repeat="component in form.components | tableComponents">
+    <th>{{ component.label }}</th>
+    <td><div ng-bind-html="submission.data | tableView:component"></div></td>
+  </tr>
+</table>
