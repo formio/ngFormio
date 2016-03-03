@@ -858,8 +858,19 @@ app.controller('ProjectFormioController', [
       return _(items)
         .reject(function(item) {
           var hasIgnoredEmail = _.some(ignoredEmails, function(value) {
-            if ($scope.showEmployees || !_.get(item, 'data.email') || _.get(item, 'data.email') === '') return false;
-            return (item.data.email.toString().indexOf(value) !== -1);
+            if (
+              $scope.showEmployees
+              || (!_.get(item, 'data.email') && !_.get(item, 'ownerData.email'))
+              || _.get(item, 'data.email') === ''
+              || _.get(item, 'ownerData.email') === ''
+            ) {
+              return false;
+            }
+
+            // Filter the data.email or ownerData.email based on whats available.
+            return _.has(item, 'data.email')
+              ? (item.data.email.toString().indexOf(value) !== -1)
+              : (item.ownerData.email.toString().indexOf(value) !== -1);
           });
 
           return (!$scope.showEmployees && _employees.indexOf(item.owner) !== -1) || hasIgnoredEmail;
