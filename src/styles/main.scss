@@ -546,6 +546,18 @@ div.project-section-separator {
 .ui-select-match-close {
   color: #222222;
 }
+.ui-select-multiple .ui-select-match-item {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 10px;
+}
+formio-select-item > span {
+  display: inline-flex;
+  max-width: 90%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
 pre code {
   white-space: pre-line;
