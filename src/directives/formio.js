@@ -3,12 +3,12 @@ module.exports = function() {
     restrict: 'E',
     replace: true,
     scope: {
-      src: '=',
-      formAction: '=',
-      form: '=',
-      submission: '=',
-      readOnly: '=',
-      formioOptions: '='
+      src: '=?',
+      formAction: '=?',
+      form: '=?',
+      submission: '=?',
+      readOnly: '=?',
+      formioOptions: '=?'
     },
     controller: [
       '$scope',
@@ -32,10 +32,9 @@ module.exports = function() {
         };
 
         // Add the live form parameter to the url.
-        $scope._src = $scope.src;
-        if ($scope._src && ($scope._src.indexOf('live=') === -1)) {
-          $scope._src += ($scope._src.indexOf('?') === -1) ? '?' : '&';
-          $scope._src += 'live=1';
+        if ($scope.src && ($scope.src.indexOf('live=') === -1)) {
+          $scope.src += ($scope.src.indexOf('?') === -1) ? '?' : '&';
+          $scope.src += 'live=1';
         }
 
         // Build the display map.
@@ -45,7 +44,7 @@ module.exports = function() {
           'false': false
         };
 
-        var submission = $scope._submission || {data: {}};
+        var submission = $scope.submission || {data: {}};
         var updateComponents = function() {
           // Change the visibility for the component with the given key
           var updateVisiblity = function(key) {
@@ -55,8 +54,8 @@ module.exports = function() {
               .addClass($scope.show[key] ? 'ng-show' : 'ng-hide');
           };
 
-          $scope._form.components = $scope._form.components || [];
-          $scope._form.components.forEach(function(component) {
+          $scope.form.components = $scope.form.components || [];
+          $scope.form.components.forEach(function(component) {
             // Display every component by default
             $scope.show[component.key] = ($scope.show[component.key] === undefined)
               ? true
@@ -73,7 +72,7 @@ module.exports = function() {
               component.conditional.eq = component.conditional.eq || '';
 
               // Get the conditional component.
-              var cond = FormioUtils.getComponent($scope._form.components, component.conditional.when.toString());
+              var cond = FormioUtils.getComponent($scope.form.components, component.conditional.when.toString());
               var value = submission.data[cond.key];
 
               if (value) {
@@ -126,11 +125,11 @@ module.exports = function() {
 
           // Create a sanitized submission object.
           var submissionData = {data: {}};
-          if ($scope._submission._id) {
-            submissionData._id = $scope._submission._id;
+          if ($scope.submission._id) {
+            submissionData._id = $scope.submission._id;
           }
-          if ($scope._submission.data._id) {
-            submissionData._id = $scope._submission.data._id;
+          if ($scope.submission.data._id) {
+            submissionData._id = $scope.submission.data._id;
           }
 
           var grabIds = function(input) {
@@ -153,12 +152,12 @@ module.exports = function() {
           };
 
           var defaultPermissions = {};
-          FormioUtils.eachComponent($scope._form.components, function(component) {
+          FormioUtils.eachComponent($scope.form.components, function(component) {
             if (component.type === 'resource' && component.key && component.defaultPermission) {
               defaultPermissions[component.key] = component.defaultPermission;
             }
-            if ($scope._submission.data.hasOwnProperty(component.key)) {
-              var value = $scope._submission.data[component.key];
+            if ($scope.submission.data.hasOwnProperty(component.key)) {
+              var value = $scope.submission.data[component.key];
               if (component.type === 'number') {
                 submissionData.data[component.key] = value ? parseFloat(value) : 0;
               }
@@ -168,7 +167,7 @@ module.exports = function() {
             }
           });
 
-          angular.forEach($scope._submission.data, function(value, key) {
+          angular.forEach($scope.submission.data, function(value, key) {
             if (value && !value.hasOwnProperty('_id')) {
               submissionData.data[key] = value;
             }

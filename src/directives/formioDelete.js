@@ -3,11 +3,11 @@ module.exports = function() {
     restrict: 'E',
     replace: true,
     scope: {
-      form: '=',
-      submission: '=',
-      src: '=',
-      formAction: '=',
-      resourceName: '='
+      form: '=?',
+      submission: '=?',
+      src: '=?',
+      formAction: '=?',
+      resourceName: '=?'
     },
     templateUrl: 'formio-delete.html',
     controller: [
