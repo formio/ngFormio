@@ -13,9 +13,9 @@ angular.module('formioApp').config([
           $scope.resourceSelect = {
             type: 'select',
             input: true,
-            label: 'Select a resource',
+            label: settings.title ? settings.title : 'Select a resource',
             key: 'resource',
-            placeholder: '',
+            placeholder: settings.placeholder || '',
             dataSrc: 'url',
             data: {url: settings.basePath + '?type=resource'},
             valueProperty: '_id',
@@ -26,8 +26,21 @@ angular.module('formioApp').config([
             unique: false,
             persistent: true,
             validate: {
-              required: true
+              required: settings.hasOwnProperty('required') ? settings.required : true
             }
+          };
+
+          $scope.propertyField = {
+            label: 'Resource Property',
+            key: 'property',
+            inputType: 'text',
+            input: true,
+            placeholder: 'Assign this resource to the following property',
+            prefix: '',
+            suffix: '',
+            type: 'textfield',
+            defaultValue: $scope.data.property,
+            multiple: false
           };
 
           // Keep track of the available forms on the provided form.
@@ -111,6 +124,7 @@ angular.module('formioApp').config([
     function ($templateCache, FormioUtils) {
       $templateCache.put('formio/components/resourcefields.html', FormioUtils.fieldWrap(
         '<formio-component component="resourceSelect" data="selectedResource"></formio-component>' +
+        '<formio-component ng-if="data.resource" component="propertyField" data="data"></formio-component>' +
         '<fieldset ng-if="data.resource">' +
           '<legend>Resource Fields</legend>' +
           '<div class="well">Below are the fields within the selected resource. For each of these fields, select the corresponding field within this form that you wish to map to the selected Resource.</div>' +
