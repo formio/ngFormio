@@ -3196,10 +3196,10 @@ var pluginGet = function(pluginFn) {
     var plugin = plugins[index];
     if (!plugin) return Q(null);
     return Q((plugin && plugin[pluginFn] || noop).apply(plugin, [].slice.call(arguments, 2)))
-      .then(function(result) {
-        if (result !== null && result !== undefined) return result;
-        return callPlugin.apply(null, [index + 1].concat(args));
-      });
+    .then(function(result) {
+      if (result !== null && result !== undefined) return result;
+      return callPlugin.apply(null, [index + 1].concat(args));
+    });
   };
   return callPlugin.apply(null, [0].concat(args));
 };
@@ -3211,7 +3211,7 @@ var pluginGet = function(pluginFn) {
 var pluginAlter = function(pluginFn, value) {
   var args = [].slice.call(arguments, 2);
   return plugins.reduce(function(value, plugin) {
-    return (plugin[pluginFn] || identity).apply(plugin, [value].concat(args));
+      return (plugin[pluginFn] || identity).apply(plugin, [value].concat(args));
   }, value);
 };
 
@@ -3450,15 +3450,15 @@ Formio.prototype.makeRequest = function(type, url, method, data, opts) {
   };
 
   var request = pluginWait('preRequest', requestArgs)
-    .then(function() {
-      return pluginGet('request', requestArgs)
-        .then(function(result) {
-          if (result === null || result === undefined) {
-            return Formio.request(url, method, data);
-          }
-          return result;
-        });
+  .then(function() {
+    return pluginGet('request', requestArgs)
+    .then(function(result) {
+      if (result === null || result === undefined) {
+        return Formio.request(url, method, data);
+      }
+      return result;
     });
+  });
 
   return pluginAlter('wrapRequestPromise', request, requestArgs);
 };
@@ -3493,15 +3493,15 @@ Formio.makeStaticRequest = function(url, method, data) {
   };
 
   var request = pluginWait('preStaticRequest', requestArgs)
-    .then(function() {
-      return pluginGet('staticRequest', requestArgs)
-        .then(function(result) {
-          if (result === null || result === undefined) {
-            return Formio.request(url, method, data);
-          }
-          return result;
-        });
+  .then(function() {
+    return pluginGet('staticRequest', requestArgs)
+    .then(function(result) {
+      if (result === null || result === undefined) {
+        return Formio.request(url, method, data);
+      }
+      return result;
     });
+  });
 
   return pluginAlter('wrapStaticRequestPromise', request, requestArgs);
 };
@@ -3520,103 +3520,103 @@ Formio.request = function(url, method, data) {
   var cacheKey = btoa(url);
 
   return Q().then(function() {
-      // Get the cached promise to save multiple loads.
-      if (method === 'GET' && cache.hasOwnProperty(cacheKey)) {
-        return cache[cacheKey];
-      }
-      else {
-        return Q()
-          .then(function() {
-            // Set up and fetch request
-            var headers = new Headers({
-              'Accept': 'application/json',
-              'Content-type': 'application/json; charset=UTF-8'
-            });
-            var token = Formio.getToken();
-            if (token) {
-              headers.append('x-jwt-token', token);
-            }
+    // Get the cached promise to save multiple loads.
+    if (method === 'GET' && cache.hasOwnProperty(cacheKey)) {
+      return cache[cacheKey];
+    }
+    else {
+      return Q()
+      .then(function() {
+        // Set up and fetch request
+        var headers = new Headers({
+          'Accept': 'application/json',
+          'Content-type': 'application/json; charset=UTF-8'
+        });
+        var token = Formio.getToken();
+        if (token) {
+          headers.append('x-jwt-token', token);
+        }
 
-            var options = {
-              method: method,
-              headers: headers,
-              mode: 'cors'
-            };
-            if (data) {
-              options.body = JSON.stringify(data);
-            }
+        var options = {
+          method: method,
+          headers: headers,
+          mode: 'cors'
+        };
+        if (data) {
+          options.body = JSON.stringify(data);
+        }
 
-            return fetch(url, options);
-          })
-          .catch(function(err) {
-            err.message = 'Could not connect to API server (' + err.message + ')';
-            err.networkError = true;
-            throw err;
-          })
-          .then(function(response) {
-            // Handle fetch results
-            if (response.ok) {
-              var token = response.headers.get('x-jwt-token');
-              if (response.status >= 200 && response.status < 300 && token && token !== '') {
-                Formio.setToken(token);
+        return fetch(url, options);
+      })
+      .catch(function(err) {
+        err.message = 'Could not connect to API server (' + err.message + ')';
+        err.networkError = true;
+        throw err;
+      })
+      .then(function(response) {
+        // Handle fetch results
+        if (response.ok) {
+          var token = response.headers.get('x-jwt-token');
+          if (response.status >= 200 && response.status < 300 && token && token !== '') {
+            Formio.setToken(token);
+          }
+          // 204 is no content. Don't try to .json() it.
+          if (response.status === 204) {
+            return {};
+          }
+          return (response.headers.get('content-type').indexOf('application/json') !== -1 ?
+            response.json() : response.text())
+          .then(function(result) {
+            // Add some content-range metadata to the result here
+            var range = response.headers.get('content-range');
+            if (range && typeof result === 'object') {
+              range = range.split('/');
+              if(range[0] !== '*') {
+                var skipLimit = range[0].split('-');
+                result.skip = Number(skipLimit[0]);
+                result.limit = skipLimit[1] - skipLimit[0] + 1;
               }
-              // 204 is no content. Don't try to .json() it.
-              if (response.status === 204) {
-                return {};
-              }
-              return (response.headers.get('content-type').indexOf('application/json') !== -1 ?
-                response.json() : response.text())
-                .then(function(result) {
-                  // Add some content-range metadata to the result here
-                  var range = response.headers.get('content-range');
-                  if (range && typeof result === 'object') {
-                    range = range.split('/');
-                    if(range[0] !== '*') {
-                      var skipLimit = range[0].split('-');
-                      result.skip = Number(skipLimit[0]);
-                      result.limit = skipLimit[1] - skipLimit[0] + 1;
-                    }
-                    result.serverCount = range[1] === '*' ? range[1] : Number(range[1]);
-                  }
-                  return result;
-                });
+              result.serverCount = range[1] === '*' ? range[1] : Number(range[1]);
             }
-            else {
-              if (response.status === 440) {
-                Formio.setToken(null);
-              }
-              // Parse and return the error as a rejected promise to reject this promise
-              return (response.headers.get('content-type').indexOf('application/json') !== -1 ?
-                response.json() : response.text())
-                .then(function(error){
-                  throw error;
-                });
-            }
-          })
-          .catch(function(err) {
-            // Remove failed promises from cache
-            delete cache[cacheKey];
-            // Propagate error so client can handle accordingly
-            throw err;
+            return result;
           });
-      }
-    })
-    .then(function(result) {
-      // Save the cache
-      if (method === 'GET') {
-        cache[cacheKey] = Q(result);
-      }
+        }
+        else {
+          if (response.status === 440) {
+            Formio.setToken(null);
+          }
+          // Parse and return the error as a rejected promise to reject this promise
+          return (response.headers.get('content-type').indexOf('application/json') !== -1 ?
+            response.json() : response.text())
+            .then(function(error){
+              throw error;
+            });
+        }
+      })
+      .catch(function(err) {
+        // Remove failed promises from cache
+        delete cache[cacheKey];
+        // Propagate error so client can handle accordingly
+        throw err;
+      });
+    }
+  })
+  .then(function(result) {
+    // Save the cache
+    if (method === 'GET') {
+      cache[cacheKey] = Q(result);
+    }
 
-      // Shallow copy result so modifications don't end up in cache
-      if(Array.isArray(result)) {
-        var resultCopy = result.map(copy);
-        resultCopy.skip = result.skip;
-        resultCopy.limit = result.limit;
-        resultCopy.serverCount = result.serverCount;
-        return resultCopy;
-      }
-      return copy(result);
-    });
+    // Shallow copy result so modifications don't end up in cache
+    if(Array.isArray(result)) {
+      var resultCopy = result.map(copy);
+      resultCopy.skip = result.skip;
+      resultCopy.limit = result.limit;
+      resultCopy.serverCount = result.serverCount;
+      return resultCopy;
+    }
+    return copy(result);
+  });
 };
 
 Formio.setToken = function(token) {
@@ -3672,10 +3672,10 @@ Formio.currentUser = function() {
     })
   }
   return this.makeStaticRequest(url)
-    .then(function(response) {
-      Formio.setUser(response);
-      return response;
-    });
+  .then(function(response) {
+    Formio.setUser(response);
+    return response;
+  });
 };
 
 // Keep track of their logout callback.
