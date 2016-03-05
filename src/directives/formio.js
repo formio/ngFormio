@@ -56,41 +56,42 @@ module.exports = function() {
           };
 
           $scope._form.components = $scope._form.components || [];
-          $scope._form.components.forEach(function(component) {
+          FormioUtils.eachComponent($scope._form.components, function(_component) {
             // Display every component by default
-            $scope.show[component.key] = ($scope.show[component.key] === undefined)
+            $scope.show[_component.key] = ($scope.show[_component.key] === undefined)
               ? true
-              : $scope.show[component.key];
+              : $scope.show[_component.key];
 
             // Only change display options of all require conditional properties are present.
             if (
-              component.conditional
-              && (component.conditional.show !== null)
-              && (component.conditional.when !== null)
+              _component.conditional
+              && (_component.conditional.show !== null && _component.conditional.show !== '')
+              && (_component.conditional.when !== null && _component.conditional.when !== '')
             ) {
               // Default the conditional values.
-              component.conditional.show = boolean[component.conditional.show];
-              component.conditional.eq = component.conditional.eq || '';
+              _component.conditional.show = boolean[_component.conditional.show];
+              _component.conditional.eq = _component.conditional.eq || '';
 
               // Get the conditional component.
-              var cond = FormioUtils.getComponent($scope._form.components, component.conditional.when.toString());
+              var cond = FormioUtils.getComponent($scope._form.components, _component.conditional.when.toString());
               var value = submission.data[cond.key];
 
               if (value) {
                 // Check if the conditional value is equal to the trigger value
-                $scope.show[component.key] = value.toString() === component.conditional.eq.toString()
-                  ? boolean[component.conditional.show]
-                  : !boolean[component.conditional.show];
+                $scope.show[_component.key] = value.toString() === _component.conditional.eq.toString()
+                  ? boolean[_component.conditional.show]
+                  : !boolean[_component.conditional.show];
               }
               // Check against the components default value, if present and the components hasnt been interacted with.
               else if (!value && cond.defaultValue) {
-                $scope.show[component.key] = cond.defaultValue.toString() === component.conditional.eq.toString()
-                  ? boolean[component.conditional.show]
-                  : !boolean[component.conditional.show];
+                $scope.show[_component.key] = cond.defaultValue.toString() === _component.conditional.eq.toString()
+                  ? boolean[_component.conditional.show]
+                  : !boolean[_component.conditional.show];
               }
-            }
 
-            updateVisiblity(component.key);
+              // Update the visibility, if its possible a change occurred.
+              updateVisiblity(_component.key);
+            }
           });
         };
 
