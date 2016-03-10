@@ -66364,6 +66364,7 @@ module.exports = function (app) {
           protected: false,
           unique: false,
           persistent: true,
+          defaultValue: '',
           validate: {
             required: false
           }
