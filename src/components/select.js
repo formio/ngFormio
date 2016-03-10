@@ -132,7 +132,7 @@ module.exports = function (app) {
                 }
 
                 // Disable auth for outgoing requests.
-                if (url.indexOf(Formio.getBaseUrl()) === -1) {
+                if (!settings.authenticate && url.indexOf(Formio.getBaseUrl()) === -1) {
                   options = {
                     disableJWT: true,
                     headers: {
@@ -200,6 +200,7 @@ module.exports = function (app) {
           defaultValue: '',
           refreshOn: '',
           filter: '',
+          authenticate: false,
           template: '<span>{{ item.label }}</span>',
           multiple: false,
           protected: false,

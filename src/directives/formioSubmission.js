@@ -4,7 +4,8 @@ module.exports = function() {
     restrict: 'E',
     scope: {
       form: '=',
-      submission: '='
+      submission: '=',
+      ignore: '=?'
     },
     templateUrl: 'formio/submission.html'
   };
