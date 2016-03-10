@@ -5170,7 +5170,7 @@ module.exports = function (app) {
                 }
 
                 // Disable auth for outgoing requests.
-                if (url.indexOf(Formio.getBaseUrl()) === -1) {
+                if (!settings.authenticate && url.indexOf(Formio.getBaseUrl()) === -1) {
                   options = {
                     disableJWT: true,
                     headers: {
@@ -5238,6 +5238,7 @@ module.exports = function (app) {
           defaultValue: '',
           refreshOn: '',
           filter: '',
+          authenticate: false,
           template: '<span>{{ item.label }}</span>',
           multiple: false,
           protected: false,
@@ -5346,7 +5347,7 @@ module.exports = function(app) {
         "<div class=\"select-boxes\">\n  <div ng-class=\"component.inline ? 'checkbox-inline' : 'checkbox'\" ng-repeat=\"v in component.values track by $index\">\n    <label class=\"control-label\" for=\"{{ component.key }}-{{ v.value }}\">\n      <input type=\"checkbox\"\n        id=\"{{ component.key }}-{{ v.value }}\"\n        name=\"{{ component.key }}-{{ v.value }}\"\n        value=\"{{ v.value }}\"\n        tabindex=\"{{ component.tabindex || 0 }}\"\n        ng-disabled=\"readOnly\"\n        ng-click=\"toggleCheckbox(v.value)\"\n        ng-checked=\"model[v.value]\"\n      >\n      {{ v.label }}\n    </label>\n  </div>\n</div>\n"
       );
       $templateCache.put('formio/components/selectboxes.html',
-        "<label ng-if=\"component.label\" for=\"{{ component.key }}\" class=\"control-label\" ng-class=\"{'field-required': component.validate.required}\">{{ component.label }}</label>\n<formio-select-boxes\n  name=\"{{ component.key }}\"\n  ng-model=\"data[component.key]\"\n  ng-model-options=\"{allowInvalid: true}\"\n  component=\"component\"\n  read-only=\"readOnly\"\n  ng-required=\"component.validate.required\"\n  custom-validator=\"component.validate.custom\"\n  ></formio-select-boxes>\n<formio-errors></formio-errors>\n"
+        "<label ng-if=\"component.label && !component.hideLabel\" for=\"{{ component.key }}\" class=\"control-label\" ng-class=\"{'field-required': component.validate.required}\">{{ component.label }}</label>\n<formio-select-boxes\n  name=\"{{ component.key }}\"\n  ng-model=\"data[component.key]\"\n  ng-model-options=\"{allowInvalid: true}\"\n  component=\"component\"\n  read-only=\"readOnly\"\n  ng-required=\"component.validate.required\"\n  custom-validator=\"component.validate.custom\"\n  ></formio-select-boxes>\n<formio-errors></formio-errors>\n"
       );
     }
   ]);
@@ -5759,7 +5760,8 @@ module.exports = function() {
           };
 
           $scope.form.components = $scope.form.components || [];
-          $scope.form.components.forEach(function(component) {
+          FormioUtils.eachComponent($scope.form.components, function(component) {
+
             // Display every component by default
             $scope.show[component.key] = ($scope.show[component.key] === undefined)
               ? true
@@ -5768,8 +5770,8 @@ module.exports = function() {
             // Only change display options of all require conditional properties are present.
             if (
               component.conditional
-              && (component.conditional.show !== null)
-              && (component.conditional.when !== null)
+              && (component.conditional.show !== null && component.conditional.show !== '')
+              && (component.conditional.when !== null && component.conditional.when !== '')
             ) {
               // Default the conditional values.
               component.conditional.show = boolean[component.conditional.show];
@@ -5791,9 +5793,10 @@ module.exports = function() {
                   ? boolean[component.conditional.show]
                   : !boolean[component.conditional.show];
               }
-            }
 
-            updateVisiblity(component.key);
+              // Update the visibility, if its possible a change occurred.
+              updateVisiblity(component.key);
+            }
           });
         };
 
@@ -6246,7 +6249,8 @@ module.exports = function() {
     restrict: 'E',
     scope: {
       form: '=',
-      submission: '='
+      submission: '=',
+      ignore: '=?'
     },
     templateUrl: 'formio/submission.html'
   };
@@ -6766,7 +6770,7 @@ app.run([
     );
 
     $templateCache.put('formio/submission.html',
-      "<table class=\"table table-striped table-responsive\">\n  <tr ng-repeat=\"component in form.components | tableComponents\">\n    <th>{{ component.label }}</th>\n    <td><div ng-bind-html=\"submission.data | tableView:component\"></div></td>\n  </tr>\n</table>\n"
+      "<table class=\"table table-striped table-responsive\">\n  <tr ng-repeat=\"component in form.components | tableComponents\" ng-if=\"!ignore[component.key]\">\n    <th>{{ component.label }}</th>\n    <td><div ng-bind-html=\"submission.data | tableView:component\"></div></td>\n  </tr>\n</table>\n"
     );
 
     $templateCache.put('formio/submissions.html',

@@ -55,7 +55,8 @@ module.exports = function() {
           };
 
           $scope.form.components = $scope.form.components || [];
-          $scope.form.components.forEach(function(component) {
+          FormioUtils.eachComponent($scope.form.components, function(component) {
+
             // Display every component by default
             $scope.show[component.key] = ($scope.show[component.key] === undefined)
               ? true
@@ -64,8 +65,8 @@ module.exports = function() {
             // Only change display options of all require conditional properties are present.
             if (
               component.conditional
-              && (component.conditional.show !== null)
-              && (component.conditional.when !== null)
+              && (component.conditional.show !== null && component.conditional.show !== '')
+              && (component.conditional.when !== null && component.conditional.when !== '')
             ) {
               // Default the conditional values.
               component.conditional.show = boolean[component.conditional.show];
@@ -87,9 +88,10 @@ module.exports = function() {
                   ? boolean[component.conditional.show]
                   : !boolean[component.conditional.show];
               }
-            }
 
-            updateVisiblity(component.key);
+              // Update the visibility, if its possible a change occurred.
+              updateVisiblity(component.key);
+            }
           });
         };
 
