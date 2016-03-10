@@ -67186,12 +67186,12 @@ module.exports = function() {
     restrict: 'E',
     replace: true,
     scope: {
-      src: '=',
-      formAction: '=',
-      form: '=',
-      submission: '=',
-      readOnly: '=',
-      formioOptions: '='
+      src: '=?',
+      formAction: '=?',
+      form: '=?',
+      submission: '=?',
+      readOnly: '=?',
+      formioOptions: '=?'
     },
     controller: [
       '$scope',
@@ -67215,10 +67215,9 @@ module.exports = function() {
         };
 
         // Add the live form parameter to the url.
-        $scope._src = $scope.src;
-        if ($scope._src && ($scope._src.indexOf('live=') === -1)) {
-          $scope._src += ($scope._src.indexOf('?') === -1) ? '?' : '&';
-          $scope._src += 'live=1';
+        if ($scope.src && ($scope.src.indexOf('live=') === -1)) {
+          $scope.src += ($scope.src.indexOf('?') === -1) ? '?' : '&';
+          $scope.src += 'live=1';
         }
 
         // Build the display map.
@@ -67228,7 +67227,7 @@ module.exports = function() {
           'false': false
         };
 
-        var submission = $scope._submission || {data: {}};
+        var submission = $scope.submission || {data: {}};
         var updateComponents = function() {
           // Change the visibility for the component with the given key
           var updateVisiblity = function(key) {
@@ -67238,42 +67237,43 @@ module.exports = function() {
               .addClass($scope.show[key] ? 'ng-show' : 'ng-hide');
           };
 
-          $scope._form.components = $scope._form.components || [];
-          FormioUtils.eachComponent($scope._form.components, function(_component) {
+          $scope.form.components = $scope.form.components || [];
+          FormioUtils.eachComponent($scope.form.components, function(component) {
+
             // Display every component by default
-            $scope.show[_component.key] = ($scope.show[_component.key] === undefined)
+            $scope.show[component.key] = ($scope.show[component.key] === undefined)
               ? true
-              : $scope.show[_component.key];
+              : $scope.show[component.key];
 
             // Only change display options of all require conditional properties are present.
             if (
-              _component.conditional
-              && (_component.conditional.show !== null && _component.conditional.show !== '')
-              && (_component.conditional.when !== null && _component.conditional.when !== '')
+              component.conditional
+              && (component.conditional.show !== null && component.conditional.show !== '')
+              && (component.conditional.when !== null && component.conditional.when !== '')
             ) {
               // Default the conditional values.
-              _component.conditional.show = boolean[_component.conditional.show];
-              _component.conditional.eq = _component.conditional.eq || '';
+              component.conditional.show = boolean[component.conditional.show];
+              component.conditional.eq = component.conditional.eq || '';
 
               // Get the conditional component.
-              var cond = FormioUtils.getComponent($scope._form.components, _component.conditional.when.toString());
+              var cond = FormioUtils.getComponent($scope.form.components, component.conditional.when.toString());
               var value = submission.data[cond.key];
 
               if (value) {
                 // Check if the conditional value is equal to the trigger value
-                $scope.show[_component.key] = value.toString() === _component.conditional.eq.toString()
-                  ? boolean[_component.conditional.show]
-                  : !boolean[_component.conditional.show];
+                $scope.show[component.key] = value.toString() === component.conditional.eq.toString()
+                  ? boolean[component.conditional.show]
+                  : !boolean[component.conditional.show];
               }
               // Check against the components default value, if present and the components hasnt been interacted with.
               else if (!value && cond.defaultValue) {
-                $scope.show[_component.key] = cond.defaultValue.toString() === _component.conditional.eq.toString()
-                  ? boolean[_component.conditional.show]
-                  : !boolean[_component.conditional.show];
+                $scope.show[component.key] = cond.defaultValue.toString() === component.conditional.eq.toString()
+                  ? boolean[component.conditional.show]
+                  : !boolean[component.conditional.show];
               }
 
               // Update the visibility, if its possible a change occurred.
-              updateVisiblity(_component.key);
+              updateVisiblity(component.key);
             }
           });
         };
@@ -67310,11 +67310,11 @@ module.exports = function() {
 
           // Create a sanitized submission object.
           var submissionData = {data: {}};
-          if ($scope._submission._id) {
-            submissionData._id = $scope._submission._id;
+          if ($scope.submission._id) {
+            submissionData._id = $scope.submission._id;
           }
-          if ($scope._submission.data._id) {
-            submissionData._id = $scope._submission.data._id;
+          if ($scope.submission.data._id) {
+            submissionData._id = $scope.submission.data._id;
           }
 
           var grabIds = function(input) {
@@ -67337,12 +67337,12 @@ module.exports = function() {
           };
 
           var defaultPermissions = {};
-          FormioUtils.eachComponent($scope._form.components, function(component) {
+          FormioUtils.eachComponent($scope.form.components, function(component) {
             if (component.type === 'resource' && component.key && component.defaultPermission) {
               defaultPermissions[component.key] = component.defaultPermission;
             }
-            if ($scope._submission.data.hasOwnProperty(component.key)) {
-              var value = $scope._submission.data[component.key];
+            if ($scope.submission.data.hasOwnProperty(component.key)) {
+              var value = $scope.submission.data[component.key];
               if (component.type === 'number') {
                 submissionData.data[component.key] = value ? parseFloat(value) : 0;
               }
@@ -67352,7 +67352,7 @@ module.exports = function() {
             }
           });
 
-          angular.forEach($scope._submission.data, function(value, key) {
+          angular.forEach($scope.submission.data, function(value, key) {
             if (value && !value.hasOwnProperty('_id')) {
               submissionData.data[key] = value;
             }
@@ -67605,11 +67605,11 @@ module.exports = function() {
     restrict: 'E',
     replace: true,
     scope: {
-      form: '=',
-      submission: '=',
-      src: '=',
-      formAction: '=',
-      resourceName: '='
+      form: '=?',
+      submission: '=?',
+      src: '=?',
+      formAction: '=?',
+      resourceName: '=?'
     },
     templateUrl: 'formio-delete.html',
     controller: [
@@ -67741,10 +67741,10 @@ module.exports = function() {
     replace: true,
     restrict: 'E',
     scope: {
-      src: '=',
-      form: '=',
-      submissions: '=',
-      perPage: '='
+      src: '=?',
+      form: '=?',
+      submissions: '=?',
+      perPage: '=?'
     },
     templateUrl: 'formio/submissions.html',
     controller: [
@@ -67778,9 +67778,9 @@ module.exports = function() {
           return !component.hasOwnProperty('tableView') || component.tableView;
         };
 
-        $scope.$watch('_submissions', function(submissions) {
+        $scope.$watch('submissions', function(submissions) {
           if (submissions && submissions.length > 0) {
-            $scope.$emit('submissionLoad', $scope._submissions);
+            $scope.$emit('submissionLoad', $scope.submissions);
           }
         });
       }
@@ -67824,21 +67824,19 @@ module.exports = [
         };
       },
       register: function($scope, $element, options) {
-        var self = this;
         var loader = null;
-        $scope._src = $scope._src || $scope.src || '';
-        $scope._form = $scope.form || {};
-        $scope._submission = $scope.submission || {data: {}};
-        $scope._submissions = $scope.submissions || [];
         $scope.formLoading = true;
+        $scope.form = angular.isDefined($scope.form) ? $scope.form : {};
+        $scope.submission = angular.isDefined($scope.submission) ? $scope.submission : {data: {}};
+        $scope.submissions = angular.isDefined($scope.submissions) ? $scope.submissions : [];
 
         // Keep track of the elements rendered.
         var elementsRendered = 0;
         $scope.$on('formElementRender', function() {
           elementsRendered++;
-          if (elementsRendered === $scope._form.components.length) {
+          if (elementsRendered === $scope.form.components.length) {
             setTimeout(function() {
-              $scope.$emit('formRender', $scope._form);
+              $scope.$emit('formRender', $scope.form);
             }, 1);
           }
         });
@@ -67862,25 +67860,8 @@ module.exports = [
           if (!addedData.hasOwnProperty(component.settings.key)) {
             addedData[component.settings.key] = true;
             var defaultComponent = formioComponents.components[component.type];
-            $scope._form.components.push(angular.extend(defaultComponent.settings, component.settings));
+            $scope.form.components.push(angular.extend(defaultComponent.settings, component.settings));
           }
-        });
-
-        // If they load a submission after it is passed, make the change.
-        $scope.$watch('submission', function(submission) {
-          if (!submission || !Object.keys(submission).length) {
-            return;
-          }
-          angular.merge($scope._submission, submission);
-        });
-
-        // If they provide a form, make sure to set it when it is loaded.
-        $scope.$watch('form', function(form) {
-          if (!form || !Object.keys(form).length) {
-            return;
-          }
-          angular.merge($scope._form, form);
-          $scope.formLoading = false;
         });
 
         // Set the action if they provided it in the form.
@@ -67892,31 +67873,39 @@ module.exports = [
           }
         });
 
+        $scope.$watch('form', function(form) {
+          if (!form || (Object.keys(form).length === 0)) {
+            return;
+          }
+          $scope.formLoading = false;
+          $scope.$emit('formLoad', $scope.form);
+        });
+
         $scope.updateSubmissions = function() {
           $scope.formLoading = true;
           var params = {};
           if ($scope.perPage) params.limit = $scope.perPage;
           if ($scope.skip) params.skip = $scope.skip;
           loader.loadSubmissions({params: params}).then(function(submissions) {
-            $scope._submissions = submissions;
+            angular.merge($scope.submissions, angular.copy(submissions));
             $scope.formLoading = false;
             $scope.$emit('submissionsLoad', submissions);
-          }, self.onError($scope));
-        };
+          }, this.onError($scope));
+        }.bind(this);
 
-        if ($scope._src) {
-          loader = new Formio($scope._src);
+        if ($scope.src) {
+          loader = new Formio($scope.src);
           if (options.form) {
             $scope.formLoading = true;
 
             // If a form is already provided, then skip the load.
-            if ($scope._form && Object.keys($scope._form).length) {
+            if ($scope.form && Object.keys($scope.form).length) {
               $scope.formLoading = false;
-              $scope.$emit('formLoad', $scope._form);
+              $scope.$emit('formLoad', $scope.form);
             }
             else {
               loader.loadForm().then(function(form) {
-                $scope._form = form;
+                angular.merge($scope.form, angular.copy(form));
                 $scope.formLoading = false;
                 $scope.$emit('formLoad', form);
               }, this.onError($scope));
@@ -67926,16 +67915,13 @@ module.exports = [
             $scope.formLoading = true;
 
             // If a submission is already provided, then skip the load.
-            if ($scope._submission && Object.keys($scope._submission.data).length) {
+            if ($scope.submission && Object.keys($scope.submission.data).length) {
               $scope.formLoading = false;
-              $scope.$emit('submissionLoad', $scope._submission);
+              $scope.$emit('submissionLoad', $scope.submission);
             }
             else {
               loader.loadSubmission().then(function(submission) {
-                angular.merge($scope._submission, submission);
-                if (!$scope._submission.data) {
-                  $scope._submission.data = {};
-                }
+                angular.merge($scope.submission, angular.copy(submission));
                 $scope.formLoading = false;
                 $scope.$emit('submissionLoad', submission);
               }, this.onError($scope));
@@ -67946,19 +67932,18 @@ module.exports = [
           }
         }
         else {
-
           $scope.formoLoaded = true;
-          $scope.formLoading = $scope.form;
+          $scope.formLoading = $scope.form && (Object.keys($scope.form).length === 0);
 
           // Emit the events if these objects are already loaded.
-          if ($scope._form) {
-            $scope.$emit('formLoad', $scope._form);
+          if (!$scope.formLoading) {
+            $scope.$emit('formLoad', $scope.form);
           }
-          if ($scope._submission) {
-            $scope.$emit('submissionLoad', $scope._submission);
+          if ($scope.submission) {
+            $scope.$emit('submissionLoad', $scope.submission);
           }
-          if ($scope._submissions) {
-            $scope.$emit('submissionsLoad', $scope._submissions);
+          if ($scope.submissions) {
+            $scope.$emit('submissionsLoad', $scope.submissions);
           }
         }
 
@@ -68272,7 +68257,7 @@ app.run([
 
     // The template for the formio forms.
     $templateCache.put('formio.html',
-      "<form role=\"form\" name=\"formioForm\" ng-submit=\"onSubmit(formioForm)\" novalidate>\n  <i style=\"font-size: 2em;\" ng-if=\"formLoading\" class=\"glyphicon glyphicon-refresh glyphicon-spin\"></i>\n  <div ng-repeat=\"alert in formioAlerts\" class=\"alert alert-{{ alert.type }}\" role=\"alert\">\n    {{ alert.message }}\n  </div>\n  <formio-component ng-repeat=\"component in _form.components track by $index\" component=\"component\" data=\"_submission.data\" form=\"formioForm\" formio=\"formio\" read-only=\"readOnly\"></formio-component>\n</form>\n"
+      "<form role=\"form\" name=\"formioForm\" ng-submit=\"onSubmit(formioForm)\" novalidate>\n  <i style=\"font-size: 2em;\" ng-if=\"formLoading\" class=\"glyphicon glyphicon-refresh glyphicon-spin\"></i>\n  <div ng-repeat=\"alert in formioAlerts\" class=\"alert alert-{{ alert.type }}\" role=\"alert\">\n    {{ alert.message }}\n  </div>\n  <formio-component ng-repeat=\"component in form.components track by $index\" component=\"component\" data=\"submission.data\" form=\"formioForm\" formio=\"formio\" read-only=\"readOnly\"></formio-component>\n</form>\n"
     );
 
     $templateCache.put('formio-delete.html',
@@ -68284,7 +68269,7 @@ app.run([
     );
 
     $templateCache.put('formio/submissions.html',
-      "<div>\n  <div ng-repeat=\"alert in formioAlerts\" class=\"alert alert-{{ alert.type }}\" role=\"alert\">\n    {{ alert.message }}\n  </div>\n  <table class=\"table\">\n    <thead>\n      <tr>\n        <th ng-repeat=\"component in _form.components | flattenComponents\" ng-if=\"tableView(component)\">{{ component.label || component.key }}</th>\n        <th>Submitted</th>\n        <th>Updated</th>\n        <th>Operations</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr ng-repeat=\"submission in _submissions\" class=\"formio-submission\" ng-click=\"$emit('submissionView', submission)\">\n        <td ng-repeat=\"component in _form.components | flattenComponents\" ng-if=\"tableView(component)\">{{ submission.data | tableView:component }}</td>\n        <td>{{ submission.created | amDateFormat:'l, h:mm:ss a' }}</td>\n        <td>{{ submission.modified | amDateFormat:'l, h:mm:ss a' }}</td>\n        <td>\n          <div class=\"button-group\" style=\"display:flex;\">\n            <a ng-click=\"$emit('submissionView', submission); $event.stopPropagation();\" class=\"btn btn-primary btn-xs\"><span class=\"glyphicon glyphicon-eye-open\"></span></a>&nbsp;\n            <a ng-click=\"$emit('submissionEdit', submission); $event.stopPropagation();\" class=\"btn btn-default btn-xs\"><span class=\"glyphicon glyphicon-edit\"></span></a>&nbsp;\n            <a ng-click=\"$emit('submissionDelete', submission); $event.stopPropagation();\" class=\"btn btn-danger btn-xs\"><span class=\"glyphicon glyphicon-remove-circle\"></span></a>\n          </div>\n        </td>\n      </tr>\n    </tbody>\n  </table>\n  <pagination\n    ng-if=\"_submissions.serverCount > perPage\"\n    ng-model=\"currentPage\"\n    ng-change=\"pageChanged(currentPage)\"\n    total-items=\"_submissions.serverCount\"\n    items-per-page=\"perPage\"\n    direction-links=\"false\"\n    boundary-links=\"true\"\n    first-text=\"&laquo;\"\n    last-text=\"&raquo;\"\n    >\n  </pagination>\n</div>\n"
+      "<div>\n  <div ng-repeat=\"alert in formioAlerts\" class=\"alert alert-{{ alert.type }}\" role=\"alert\">\n    {{ alert.message }}\n  </div>\n  <table class=\"table\">\n    <thead>\n      <tr>\n        <th ng-repeat=\"component in form.components | flattenComponents\" ng-if=\"tableView(component)\">{{ component.label || component.key }}</th>\n        <th>Submitted</th>\n        <th>Updated</th>\n        <th>Operations</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr ng-repeat=\"submission in submissions\" class=\"formio-submission\" ng-click=\"$emit('submissionView', submission)\">\n        <td ng-repeat=\"component in form.components | flattenComponents\" ng-if=\"tableView(component)\">{{ submission.data | tableView:component }}</td>\n        <td>{{ submission.created | amDateFormat:'l, h:mm:ss a' }}</td>\n        <td>{{ submission.modified | amDateFormat:'l, h:mm:ss a' }}</td>\n        <td>\n          <div class=\"button-group\" style=\"display:flex;\">\n            <a ng-click=\"$emit('submissionView', submission); $event.stopPropagation();\" class=\"btn btn-primary btn-xs\"><span class=\"glyphicon glyphicon-eye-open\"></span></a>&nbsp;\n            <a ng-click=\"$emit('submissionEdit', submission); $event.stopPropagation();\" class=\"btn btn-default btn-xs\"><span class=\"glyphicon glyphicon-edit\"></span></a>&nbsp;\n            <a ng-click=\"$emit('submissionDelete', submission); $event.stopPropagation();\" class=\"btn btn-danger btn-xs\"><span class=\"glyphicon glyphicon-remove-circle\"></span></a>\n          </div>\n        </td>\n      </tr>\n    </tbody>\n  </table>\n  <pagination\n    ng-if=\"submissions.serverCount > perPage\"\n    ng-model=\"currentPage\"\n    ng-change=\"pageChanged(currentPage)\"\n    total-items=\"submissions.serverCount\"\n    items-per-page=\"perPage\"\n    direction-links=\"false\"\n    boundary-links=\"true\"\n    first-text=\"&laquo;\"\n    last-text=\"&raquo;\"\n    >\n  </pagination>\n</div>\n"
     );
 
     // A formio component template.

@@ -5,15 +5,15 @@
   <table class="table">
     <thead>
       <tr>
-        <th ng-repeat="component in _form.components | flattenComponents" ng-if="tableView(component)">{{ component.label || component.key }}</th>
+        <th ng-repeat="component in form.components | flattenComponents" ng-if="tableView(component)">{{ component.label || component.key }}</th>
         <th>Submitted</th>
         <th>Updated</th>
         <th>Operations</th>
       </tr>
     </thead>
     <tbody>
-      <tr ng-repeat="submission in _submissions" class="formio-submission" ng-click="$emit('submissionView', submission)">
-        <td ng-repeat="component in _form.components | flattenComponents" ng-if="tableView(component)">{{ submission.data | tableView:component }}</td>
+      <tr ng-repeat="submission in submissions" class="formio-submission" ng-click="$emit('submissionView', submission)">
+        <td ng-repeat="component in form.components | flattenComponents" ng-if="tableView(component)">{{ submission.data | tableView:component }}</td>
         <td>{{ submission.created | amDateFormat:'l, h:mm:ss a' }}</td>
         <td>{{ submission.modified | amDateFormat:'l, h:mm:ss a' }}</td>
         <td>
@@ -27,10 +27,10 @@
     </tbody>
   </table>
   <pagination
-    ng-if="_submissions.serverCount > perPage"
+    ng-if="submissions.serverCount > perPage"
     ng-model="currentPage"
     ng-change="pageChanged(currentPage)"
-    total-items="_submissions.serverCount"
+    total-items="submissions.serverCount"
     items-per-page="perPage"
     direction-links="false"
     boundary-links="true"

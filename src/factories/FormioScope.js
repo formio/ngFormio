@@ -32,21 +32,19 @@ module.exports = [
         };
       },
       register: function($scope, $element, options) {
-        var self = this;
         var loader = null;
-        $scope._src = $scope._src || $scope.src || '';
-        $scope._form = $scope.form || {};
-        $scope._submission = $scope.submission || {data: {}};
-        $scope._submissions = $scope.submissions || [];
         $scope.formLoading = true;
+        $scope.form = angular.isDefined($scope.form) ? $scope.form : {};
+        $scope.submission = angular.isDefined($scope.submission) ? $scope.submission : {data: {}};
+        $scope.submissions = angular.isDefined($scope.submissions) ? $scope.submissions : [];
 
         // Keep track of the elements rendered.
         var elementsRendered = 0;
         $scope.$on('formElementRender', function() {
           elementsRendered++;
-          if (elementsRendered === $scope._form.components.length) {
+          if (elementsRendered === $scope.form.components.length) {
             setTimeout(function() {
-              $scope.$emit('formRender', $scope._form);
+              $scope.$emit('formRender', $scope.form);
             }, 1);
           }
         });
@@ -70,25 +68,8 @@ module.exports = [
           if (!addedData.hasOwnProperty(component.settings.key)) {
             addedData[component.settings.key] = true;
             var defaultComponent = formioComponents.components[component.type];
-            $scope._form.components.push(angular.extend(defaultComponent.settings, component.settings));
+            $scope.form.components.push(angular.extend(defaultComponent.settings, component.settings));
           }
-        });
-
-        // If they load a submission after it is passed, make the change.
-        $scope.$watch('submission', function(submission) {
-          if (!submission || !Object.keys(submission).length) {
-            return;
-          }
-          angular.merge($scope._submission, submission);
-        });
-
-        // If they provide a form, make sure to set it when it is loaded.
-        $scope.$watch('form', function(form) {
-          if (!form || !Object.keys(form).length) {
-            return;
-          }
-          angular.merge($scope._form, form);
-          $scope.formLoading = false;
         });
 
         // Set the action if they provided it in the form.
@@ -100,31 +81,39 @@ module.exports = [
           }
         });
 
+        $scope.$watch('form', function(form) {
+          if (!form || (Object.keys(form).length === 0)) {
+            return;
+          }
+          $scope.formLoading = false;
+          $scope.$emit('formLoad', $scope.form);
+        });
+
         $scope.updateSubmissions = function() {
           $scope.formLoading = true;
           var params = {};
           if ($scope.perPage) params.limit = $scope.perPage;
           if ($scope.skip) params.skip = $scope.skip;
           loader.loadSubmissions({params: params}).then(function(submissions) {
-            $scope._submissions = submissions;
+            angular.merge($scope.submissions, angular.copy(submissions));
             $scope.formLoading = false;
             $scope.$emit('submissionsLoad', submissions);
-          }, self.onError($scope));
-        };
+          }, this.onError($scope));
+        }.bind(this);
 
-        if ($scope._src) {
-          loader = new Formio($scope._src);
+        if ($scope.src) {
+          loader = new Formio($scope.src);
           if (options.form) {
             $scope.formLoading = true;
 
             // If a form is already provided, then skip the load.
-            if ($scope._form && Object.keys($scope._form).length) {
+            if ($scope.form && Object.keys($scope.form).length) {
               $scope.formLoading = false;
-              $scope.$emit('formLoad', $scope._form);
+              $scope.$emit('formLoad', $scope.form);
             }
             else {
               loader.loadForm().then(function(form) {
-                $scope._form = form;
+                angular.merge($scope.form, angular.copy(form));
                 $scope.formLoading = false;
                 $scope.$emit('formLoad', form);
               }, this.onError($scope));
@@ -134,16 +123,13 @@ module.exports = [
             $scope.formLoading = true;
 
             // If a submission is already provided, then skip the load.
-            if ($scope._submission && Object.keys($scope._submission.data).length) {
+            if ($scope.submission && Object.keys($scope.submission.data).length) {
               $scope.formLoading = false;
-              $scope.$emit('submissionLoad', $scope._submission);
+              $scope.$emit('submissionLoad', $scope.submission);
             }
             else {
               loader.loadSubmission().then(function(submission) {
-                angular.merge($scope._submission, submission);
-                if (!$scope._submission.data) {
-                  $scope._submission.data = {};
-                }
+                angular.merge($scope.submission, angular.copy(submission));
                 $scope.formLoading = false;
                 $scope.$emit('submissionLoad', submission);
               }, this.onError($scope));
@@ -154,19 +140,18 @@ module.exports = [
           }
         }
         else {
-
           $scope.formoLoaded = true;
-          $scope.formLoading = $scope.form;
+          $scope.formLoading = $scope.form && (Object.keys($scope.form).length === 0);
 
           // Emit the events if these objects are already loaded.
-          if ($scope._form) {
-            $scope.$emit('formLoad', $scope._form);
+          if (!$scope.formLoading) {
+            $scope.$emit('formLoad', $scope.form);
           }
-          if ($scope._submission) {
-            $scope.$emit('submissionLoad', $scope._submission);
+          if ($scope.submission) {
+            $scope.$emit('submissionLoad', $scope.submission);
           }
-          if ($scope._submissions) {
-            $scope.$emit('submissionsLoad', $scope._submissions);
+          if ($scope.submissions) {
+            $scope.$emit('submissionsLoad', $scope.submissions);
           }
         }
 

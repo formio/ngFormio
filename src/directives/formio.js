@@ -3,12 +3,12 @@ module.exports = function() {
     restrict: 'E',
     replace: true,
     scope: {
-      src: '=',
-      formAction: '=',
-      form: '=',
-      submission: '=',
-      readOnly: '=',
-      formioOptions: '='
+      src: '=?',
+      formAction: '=?',
+      form: '=?',
+      submission: '=?',
+      readOnly: '=?',
+      formioOptions: '=?'
     },
     controller: [
       '$scope',
@@ -32,10 +32,9 @@ module.exports = function() {
         };
 
         // Add the live form parameter to the url.
-        $scope._src = $scope.src;
-        if ($scope._src && ($scope._src.indexOf('live=') === -1)) {
-          $scope._src += ($scope._src.indexOf('?') === -1) ? '?' : '&';
-          $scope._src += 'live=1';
+        if ($scope.src && ($scope.src.indexOf('live=') === -1)) {
+          $scope.src += ($scope.src.indexOf('?') === -1) ? '?' : '&';
+          $scope.src += 'live=1';
         }
 
         // Build the display map.
@@ -45,7 +44,7 @@ module.exports = function() {
           'false': false
         };
 
-        var submission = $scope._submission || {data: {}};
+        var submission = $scope.submission || {data: {}};
         var updateComponents = function() {
           // Change the visibility for the component with the given key
           var updateVisiblity = function(key) {
@@ -55,42 +54,43 @@ module.exports = function() {
               .addClass($scope.show[key] ? 'ng-show' : 'ng-hide');
           };
 
-          $scope._form.components = $scope._form.components || [];
-          FormioUtils.eachComponent($scope._form.components, function(_component) {
+          $scope.form.components = $scope.form.components || [];
+          FormioUtils.eachComponent($scope.form.components, function(component) {
+
             // Display every component by default
-            $scope.show[_component.key] = ($scope.show[_component.key] === undefined)
+            $scope.show[component.key] = ($scope.show[component.key] === undefined)
               ? true
-              : $scope.show[_component.key];
+              : $scope.show[component.key];
 
             // Only change display options of all require conditional properties are present.
             if (
-              _component.conditional
-              && (_component.conditional.show !== null && _component.conditional.show !== '')
-              && (_component.conditional.when !== null && _component.conditional.when !== '')
+              component.conditional
+              && (component.conditional.show !== null && component.conditional.show !== '')
+              && (component.conditional.when !== null && component.conditional.when !== '')
             ) {
               // Default the conditional values.
-              _component.conditional.show = boolean[_component.conditional.show];
-              _component.conditional.eq = _component.conditional.eq || '';
+              component.conditional.show = boolean[component.conditional.show];
+              component.conditional.eq = component.conditional.eq || '';
 
               // Get the conditional component.
-              var cond = FormioUtils.getComponent($scope._form.components, _component.conditional.when.toString());
+              var cond = FormioUtils.getComponent($scope.form.components, component.conditional.when.toString());
               var value = submission.data[cond.key];
 
               if (value) {
                 // Check if the conditional value is equal to the trigger value
-                $scope.show[_component.key] = value.toString() === _component.conditional.eq.toString()
-                  ? boolean[_component.conditional.show]
-                  : !boolean[_component.conditional.show];
+                $scope.show[component.key] = value.toString() === component.conditional.eq.toString()
+                  ? boolean[component.conditional.show]
+                  : !boolean[component.conditional.show];
               }
               // Check against the components default value, if present and the components hasnt been interacted with.
               else if (!value && cond.defaultValue) {
-                $scope.show[_component.key] = cond.defaultValue.toString() === _component.conditional.eq.toString()
-                  ? boolean[_component.conditional.show]
-                  : !boolean[_component.conditional.show];
+                $scope.show[component.key] = cond.defaultValue.toString() === component.conditional.eq.toString()
+                  ? boolean[component.conditional.show]
+                  : !boolean[component.conditional.show];
               }
 
               // Update the visibility, if its possible a change occurred.
-              updateVisiblity(_component.key);
+              updateVisiblity(component.key);
             }
           });
         };
@@ -127,11 +127,11 @@ module.exports = function() {
 
           // Create a sanitized submission object.
           var submissionData = {data: {}};
-          if ($scope._submission._id) {
-            submissionData._id = $scope._submission._id;
+          if ($scope.submission._id) {
+            submissionData._id = $scope.submission._id;
           }
-          if ($scope._submission.data._id) {
-            submissionData._id = $scope._submission.data._id;
+          if ($scope.submission.data._id) {
+            submissionData._id = $scope.submission.data._id;
           }
 
           var grabIds = function(input) {
@@ -154,12 +154,12 @@ module.exports = function() {
           };
 
           var defaultPermissions = {};
-          FormioUtils.eachComponent($scope._form.components, function(component) {
+          FormioUtils.eachComponent($scope.form.components, function(component) {
             if (component.type === 'resource' && component.key && component.defaultPermission) {
               defaultPermissions[component.key] = component.defaultPermission;
             }
-            if ($scope._submission.data.hasOwnProperty(component.key)) {
-              var value = $scope._submission.data[component.key];
+            if ($scope.submission.data.hasOwnProperty(component.key)) {
+              var value = $scope.submission.data[component.key];
               if (component.type === 'number') {
                 submissionData.data[component.key] = value ? parseFloat(value) : 0;
               }
@@ -169,7 +169,7 @@ module.exports = function() {
             }
           });
 
-          angular.forEach($scope._submission.data, function(value, key) {
+          angular.forEach($scope.submission.data, function(value, key) {
             if (value && !value.hasOwnProperty('_id')) {
               submissionData.data[key] = value;
             }
