@@ -68190,7 +68190,8 @@ var app = angular.module('formio', [
   'ui.select',
   'ui.mask',
   'angularMoment',
-  'ngFileUpload'
+  'ngFileUpload',
+  'ngFileSaver'
 ]);
 
 /**
@@ -68315,11 +68316,15 @@ module.exports = function(app) {
     '$rootScope',
     '$window',
     '$http',
+    'Blob',
+    'FileSaver',
     function(
       $q,
       $rootScope,
       $window,
-      $http
+      $http,
+      Blob,
+      FileSaver
     ) {
       var getDropboxToken = function() {
         var dropboxToken;
@@ -68383,30 +68388,39 @@ module.exports = function(app) {
           return defer.promise;
         },
         getFile: function(fileUrl, file) {
-          var deferred = $q.defer();
+          var defer = $q.defer();
           var dropboxToken = getDropboxToken();
-          $http({
-            method: 'POST',
-            url: 'https://api.dropboxapi.com/2/sharing/create_shared_link_with_settings',
-            headers: {
-              'Authorization': 'Bearer ' + dropboxToken,
-              'Content-Type': 'application/json'
-            },
-            data: {
+          if (!dropboxToken) {
+            defer.reject('You must authenticate with dropbox before downloading files.');
+          }
+          else {
+            var xhr = new XMLHttpRequest();
+            xhr.responseType = 'arraybuffer';
+
+            xhr.onload = function() {
+              if (xhr.status === 200) {
+                defer.resolve(xhr.response);
+              }
+              else {
+                defer.reject(xhr.response || 'Unable to download file');
+              }
+            };
+
+            xhr.open('POST', 'https://content.dropboxapi.com/2/files/download');
+            xhr.setRequestHeader('Authorization', 'Bearer ' + dropboxToken);
+            xhr.setRequestHeader('Dropbox-API-Arg', JSON.stringify({
               path: file.path_lower
-            },
-            disableJWT: true
-          }).then(function successCallback(response) {
-            deferred.resolve(response.data);
-          }, function errorCallback(response) {
-            deferred.reject(response.data);
-          });
-          return deferred.promise;
+            }));
+            xhr.send();
+          }
+          return defer.promise;
         },
         downloadFile: function(evt, file) {
+          var strMimeType = 'application/octet-stream';
           evt.preventDefault();
-          this.getFile(null, file).then(function(file) {
-            $window.open(file.url, '_blank');
+          this.getFile(null, file).then(function(data) {
+            var blob = new Blob([data], {type: strMimeType});
+            FileSaver.saveAs(blob, file.name, true);
           }).catch(function(err) {
             alert(err);
           });
@@ -68415,6 +68429,7 @@ module.exports = function(app) {
     }
   ]);
 };
+
 
 },{}],88:[function(require,module,exports){
 "use strict";
