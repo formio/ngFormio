@@ -5731,6 +5731,7 @@ module.exports = function() {
         Formio,
         FormioUtils
       ) {
+        $scope._src = $scope.src || '';
         $scope.formioAlerts = [];
         // Shows the given alerts (single or array), and dismisses old alerts
         this.showAlerts = $scope.showAlerts = function(alerts) {
@@ -5738,9 +5739,9 @@ module.exports = function() {
         };
 
         // Add the live form parameter to the url.
-        if ($scope.src && ($scope.src.indexOf('live=') === -1)) {
-          $scope.src += ($scope.src.indexOf('?') === -1) ? '?' : '&';
-          $scope.src += 'live=1';
+        if ($scope._src && ($scope._src.indexOf('live=') === -1)) {
+          $scope._src += ($scope._src.indexOf('?') === -1) ? '?' : '&';
+          $scope._src += 'live=1';
         }
 
         // Build the display map.
@@ -5813,6 +5814,7 @@ module.exports = function() {
             if (!src) {
               return;
             }
+            $scope._src = src;
             $scope.formio = FormioScope.register($scope, $element, {
               form: true,
               submission: true
@@ -6416,8 +6418,8 @@ module.exports = [
           }, this.onError($scope));
         }.bind(this);
 
-        if ($scope.src) {
-          loader = new Formio($scope.src);
+        if ($scope._src) {
+          loader = new Formio($scope._src);
           if (options.form) {
             $scope.formLoading = true;
 

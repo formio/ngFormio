@@ -101,8 +101,8 @@ module.exports = [
           }, this.onError($scope));
         }.bind(this);
 
-        if ($scope.src) {
-          loader = new Formio($scope.src);
+        if ($scope._src) {
+          loader = new Formio($scope._src);
           if (options.form) {
             $scope.formLoading = true;
 
