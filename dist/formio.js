@@ -5809,7 +5809,7 @@ module.exports = function() {
           updateComponents();
         });
 
-        if (!$scope.src) {
+        if (!$scope._src) {
           $scope.$watch('src', function(src) {
             if (!src) {
               return;
