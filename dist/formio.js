@@ -5714,6 +5714,7 @@ module.exports = function() {
       form: '=?',
       submission: '=?',
       readOnly: '=?',
+      hideComponents: '=?',
       formioOptions: '=?'
     },
     controller: [
@@ -5746,6 +5747,10 @@ module.exports = function() {
 
         // Build the display map.
         $scope.show = {};
+        $scope.hide = {};
+        angular.forEach($scope.hideComponents, function(hide) {
+          $scope.hide[hide] = true;
+        });
         var boolean = {
           'true': true,
           'false': false
@@ -5755,10 +5760,14 @@ module.exports = function() {
         var updateComponents = function() {
           // Change the visibility for the component with the given key
           var updateVisiblity = function(key) {
+            var newClass = $scope.show[key] ? 'ng-show' : 'ng-hide';
+            if ($scope.hide[key]) {
+              newClass = 'ng-hide';
+            }
             $element
               .find('div#form-group-' + key)
               .removeClass('ng-show ng-hide')
-              .addClass($scope.show[key] ? 'ng-show' : 'ng-hide');
+              .addClass(newClass);
           };
 
           $scope.form.components = $scope.form.components || [];
@@ -5797,6 +5806,10 @@ module.exports = function() {
               }
 
               // Update the visibility, if its possible a change occurred.
+              updateVisiblity(component.key);
+            }
+
+            if ($scope.hide.hasOwnProperty(component.key) && $scope.hide[component.key]) {
               updateVisiblity(component.key);
             }
           });
@@ -6150,6 +6163,7 @@ module.exports = function() {
         Formio,
         $http
       ) {
+        $scope._src = $scope.src || '';
         $scope.formioAlerts = [];
         // Shows the given alerts (single or array), and dismisses old alerts
         $scope.showAlerts = function(alerts) {
@@ -6281,6 +6295,7 @@ module.exports = function() {
         $element,
         FormioScope
       ) {
+        $scope._src = $scope.src || '';
         $scope.formioAlerts = [];
         // Shows the given alerts (single or array), and dismisses old alerts
         this.showAlerts = $scope.showAlerts = function(alerts) {
