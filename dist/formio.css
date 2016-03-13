@@ -3,6 +3,11 @@
   content:" *";
 }
 
+.ui-select-match > .btn-default {
+  color: #333;
+  border-color: #eee;
+}
+
 .field-required-inline {
   color:red;
   z-index: 5;
