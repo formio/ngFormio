@@ -1,6 +1,11 @@
 <div class="project-sidebar sidebar">
   <ul class="nav nav-sidebar">
-    <li ng-class="{active: isActive('project.home')}"><a ui-sref="project.home"><i class="fa fa-dashboard"></i><br/><span>Dashboard</span></a></li>
+    <li ng-class="{active: isActive('project.overview')}"><a ui-sref="project.overview">
+      <div class="progress-radial progress-{{ stepsPercent }}">
+        <div class="overlay">{{ stepsPercent }}%</div>
+      </div>
+      <span>Overview</span></a>
+    </li>
     <li ng-class="{active: isActive('project.resource') && !isActive('project.form.form.submission')}"><a ui-sref="project.resource.index"><i class="fa fa-database"></i><br/><span>Resources</span></a></li>
     <li ng-class="{active: isActive('project.form')}"><a ui-sref="project.form.index"><i class="fa fa-tasks"></i><br/><span>Forms</span></a></li>
     <li ng-class="{active: isActive('project.api')}"><a ui-sref="project.api"><img src="images/swagger-logo.png" style="width:2em;" /><br/><span>API</span></a></li>
@@ -16,52 +21,10 @@
     <a class="btn btn-primary pull-right project-section-header-button" ng-show="projectSettingsVisible()" ui-sref="project.settings" id="nav-bar-settings-link"><i class="fa fa-cogs"></i> Project Settings</a>
     <a class="btn btn-primary pull-right project-section-header-button" ng-show="projectSettingsVisible()" ng-click="showUpgradeDialog(currentProject)"><i class="fa fa-arrow-circle-up"></i> Upgrade Project</a>
     <ul class="list-inline">
-      <li><h2 class="project-title"><a ui-sref="project.home">{{ currentProject.title }}</a></h2></li>
+      <li><h2 class="project-title"><a ui-sref="project.overview">{{ currentProject.title }}</a></h2></li>
       <li ng-if="currentSection.title"><h2>›</h2></li>
       <li ng-if="currentSection.title"><h2><i class="{{ currentSection.icon }}"></i> {{ currentSection.title }}</h2></li>
     </ul>
   </div>
   <div class="project-content" ui-view></div>
-</div>
-
-<div class="modal fade" id="project-welcome-modal" tabindex="-1" role="dialog" aria-labelledby="projectWelcomeModalLabel">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="projectWelcomeModalLabel">Congratulations! You have just created a working Web application using Form.io!</h4>
-      </div>
-      <div class="modal-body">
-        <p>All of the <strong>Resources</strong> and <strong>Forms</strong> serve as the API platform as well as Form interface for your web application. Here is what you need to know to get started.</p>
-        <table class="table table-striped">
-          <tbody>
-            <tr>
-              <td><i class="fa fa-database"></i><br/><span>Resources</span></td>
-              <td>Form based data structures that can serve as the backend storage and API platform for your web application.</td>
-            </tr>
-            <tr>
-              <td><i class="fa fa-tasks"></i><br/><span>Forms</span></td>
-              <td>Serve as the form interfaces for your application. You can re-use Resource fields as well as use custom input components.</td>
-            </tr>
-            <tr>
-              <td><i class="fa fa-table"></i><br/><span>Data</span></td>
-              <td>Where you can find and manage all the data within your appliction.</td>
-            </tr>
-            <tr>
-              <td><i class="fa fa-laptop"></i><br/><span>Preview</span></td>
-              <td>Preview your working application, as well as download it for <strong>Local Development</strong></td>
-            </tr>
-            <tr>
-              <td><i class="fa fa-code"></i><br><span>API</span></td>
-              <td>Provides the API documentation using Swagger.IO</td>
-            </tr>
-          </tbody>
-        </table>
-        <p>Please refer to our <a href="https://help.form.io">help guides</a> for more information.</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Got it!</button>
-      </div>
-    </div>
-  </div>
 </div>

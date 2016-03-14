@@ -127,10 +127,10 @@ angular
             showWelcomeModal: false
           }
         })
-        .state('project.home', {
-          url: '/home',
-          controller: 'ProjectHomeController',
-          templateUrl: 'views/project/home.html',
+        .state('project.overview', {
+          url: '/overview',
+          controller: 'ProjectOverviewController',
+          templateUrl: 'views/project/overview.html',
           params: {
             graphType: 'Month'
           }
@@ -168,6 +168,11 @@ angular
           templateUrl: 'views/project/launch/form.html',
           controller: 'LaunchController'
         })
+        .state('project.launch.local', {
+          url: '/local',
+          templateUrl: 'views/project/launch/local.html',
+          controller: 'LaunchController'
+        })
         .state('project.launch.app', {
           url: '/app',
           templateUrl: 'views/project/launch/app.html',
@@ -203,9 +208,9 @@ angular
           templateUrl: 'views/project/storage/storage.html',
           controller: 'ProjectStorageController'
         })
-        .state('project.settings.databases', {
-          url: '/databases',
-          templateUrl: 'views/project/databases/index.html'
+        .state('project.settings.data', {
+          url: '/data',
+          templateUrl: 'views/project/data/index.html'
         })
         .state('project.settings.oauth', {
           url: '/oauth',
@@ -255,14 +260,6 @@ angular
           controller: 'ProjectTeamDeleteController',
           templateUrl: 'views/project/teams/delete.html'
         })
-        .state('project.settings.office365', {
-          url: '/office365',
-          templateUrl: 'views/project/office365/office365.html'
-        })
-        .state('project.settings.hubspot', {
-          url: '/hubspot',
-          templateUrl: 'views/project/hubspot/hubspot.html'
-        })
         .state('project.delete', {
           url: '/delete',
           templateUrl: 'views/project/delete.html',
@@ -297,11 +294,6 @@ angular
           url: '/import-export',
           templateUrl: 'views/import/index.html',
           controller: 'ImportExportController'
-        })
-        .state('project.settings.google', {
-          url: '/google',
-          parent: 'project.settings',
-          templateUrl: 'views/project/google/google.html'
         })
         .state('help', {
           url: '/help',
@@ -435,7 +427,7 @@ angular
         if (!$scope.submitted) {
           $scope.submitted = true;
           FormioProject.createProject(template).then(function(project) {
-            $state.go('project.home', {projectId: project._id, showWelcomeModal: true});
+            $state.go('project.overview', {projectId: project._id});
           });
         }
       };
@@ -561,6 +553,7 @@ angular
     'FormioAlerts',
     'Formio',
     'AppConfig',
+    'ProjectProgress',
     'GoogleAnalytics',
     '$location',
     '$window',
@@ -571,6 +564,7 @@ angular
       FormioAlerts,
       Formio,
       AppConfig,
+      ProjectProgress,
       GoogleAnalytics,
       $location,
       $window
@@ -630,7 +624,7 @@ angular
       });
 
       $rootScope.goToProject = function(project) {
-        $state.go('project.home', {
+        $state.go('project.overview', {
           projectId: project._id
         });
       };
@@ -717,6 +711,10 @@ angular
           classes.push(className + '-page');
         }
         $rootScope.mainClass = classes.join(' ');
+      });
+
+      $rootScope.$watch('currentProject', function(newProject) {
+        ProjectProgress.setProject(newProject);
       });
 
       // Set the active sidebar.
