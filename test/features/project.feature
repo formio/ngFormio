@@ -11,8 +11,6 @@ Feature: Project Functionality
     When I enter ${random-title>project1.title} in the #title field
     And I enter ${random-description>project1.description} in the #description field
     When I click on the Create Project button
-    And I see .modal-title with the text Congratulations! You have just created a working Web application using Form.io!
-    And I click on the Got it! button
     Then I am on the ${project1.title} project portal
     And I see #project-plan-display with the text Basic
 
@@ -36,8 +34,6 @@ Feature: Project Functionality
     And I see the plaintext Select a template
     When I enter ${random-title>project2.title} in the #title field
     And I click on the Create Project button
-    And I see .modal-title with the text Congratulations! You have just created a working Web application using Form.io!
-    And I click on the Got it! button
     Then I am on the ${project2.title} project portal
     And I see #project-plan-display with the text Basic
 
