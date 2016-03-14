@@ -464,7 +464,7 @@ app.provider('ProjectProgress', function() {
           project.steps.push(step);
           formio.saveProject(project);
         }
-      }
+      };
 
       var progress = {
         steps: steps,
@@ -532,7 +532,7 @@ app.provider('ProjectProgress', function() {
               defer.resolve({
                 key: step.key,
                 complete: false
-              })
+              });
             }
             promises.push(defer.promise);
           });
