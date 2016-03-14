@@ -2,12 +2,13 @@
   <div class="col-sm-12">
     <div class=""><strong>To launch your project you can either launch an individual form or the full application. Select which you would like to do.</strong><br /><br /></div>
     <div>
-      <div class="col-md-2">
-        <h1 >Launch a</h1>
-      </div>
-      <div class="col-md-10">
+      <div class="col-md-12">
+        <span style="display: inline-block; vertical-align: top;">
+          <h1 >Launch </h1>
+        </span>
         <ul  style="display: inline-block;" class="nav nav-pills">
-          <li class="well" role="presentation" ng-class="{active:($state.includes('project.launch.form'))}"><a ui-sref="project.launch.form">Single Form</a></li>
+          <li class="well" role="presentation" ng-class="{active:($state.includes('project.launch.form'))}"><a ui-sref="project.launch.form">A Single Form</a></li>
+          <li class="well" role="presentation" ng-class="{active:($state.includes('project.launch.local'))}"><a ui-sref="project.launch.local">Local App Development</a></li>
           <li class="well" role="presentation" ng-class="{active:($state.includes('project.launch.app'))}"><a ui-sref="project.launch.app">Web App</a></li>
           <li class="well" role="presentation" ng-class="{active:($state.includes('project.launch.cordova'))}"><a ui-sref="project.launch.cordova">iOS/Android App</a></li>
         </ul>

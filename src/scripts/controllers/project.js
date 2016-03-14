@@ -144,11 +144,6 @@ app.controller('ProjectCreateController', [
       $scope.hasTemplate = false;
     };
 
-    $scope.saveProject = function() {
-      FormioProject.createProject($scope.currentProject).then(function(project) {
-        $state.go('project.home', {projectId: project._id, showWelcomeModal: true});
-      });
-    };
   }
 ]);
 
@@ -177,9 +172,6 @@ app.controller('ProjectController', [
     ProjectUpgradeDialog,
     $q
   ) {
-    if ($stateParams.showWelcomeModal) {
-      $('#project-welcome-modal').modal('show');
-    }
 
     $scope.currentSection = {};
     $rootScope.activeSideBar = 'projects';
@@ -323,35 +315,293 @@ app.controller('ProjectController', [
   }
 ]);
 
-app.controller('ProjectHomeController', [
+app.directive('projectStep', function() {
+  return {
+    restrict: 'E',
+    transclude: true,
+    replace: true,
+    scope: {
+      title: '=',
+      complete: '=',
+      open: '=?'
+    },
+    template: '' +
+    '<li class="list-group-item project-step">' +
+    '  <span class="header" ng-click="toggle()">' +
+    '    <i class="fa pull-right project-icon" ng-class="complete ? \'fa-check-circle-o\' : \'fa-circle-o\'"></i>' +
+    '    <h4 class="list-group-item-heading">{{ title }}</h4>' +
+    '  </span>' +
+    '  <div class="contents" ng-if="open" ng-transclude></div>' +
+    '</li>',
+    controller: [
+      '$scope',
+      function ($scope) {
+        $scope.open = $scope.open || false;
+
+        $scope.toggle = function () {
+          $scope.open = !$scope.open;
+        };
+      }
+    ]
+  };
+});
+
+app.provider('ProjectProgress', function() {
+  // TODO: Should we make this configurable with a register function?
+  var stepDefinitions;
+  var steps = {};
+  var project;
+  var forms = [];
+  var userForms = [];
+  var states = {};
+  var formio;
+
+  this.$get = [
+    '$rootScope',
+    '$q',
+    'Formio',
+    'AppConfig',
+    function(
+      $rootScope,
+      $q,
+      Formio,
+      AppConfig
+    ) {
+      stepDefinitions = [
+        {
+          key: 'createProject',
+          complete: function(next) {
+            next(true);
+          }
+        },
+        {
+          key: 'setupUsers',
+          complete: function(next) {
+            var promises = [];
+            userForms.forEach(function(userForm) {
+              var userFormio = new Formio(AppConfig.apiBase + '/project/' + userForm.project + '/form/' + userForm._id + '/submission');
+              promises.push(userFormio.loadSubmissions());
+            });
+            $q.all(promises).then(function(results) {
+              var hasUser = true;
+              results.forEach(function(result) {
+                if (result.length === 0) {
+                  hasUser = false;
+                }
+              });
+              next(hasUser);
+            });
+          }
+        },
+        {
+          key: 'demoApp',
+          route: 'project.preview'
+        },
+        {
+          key: 'modifyForm',
+          complete: function(next) {
+            formio.loadForms({
+                params: {
+                  limit: Number.MAX_SAFE_INTEGER // Don't limit results
+                }
+              })
+              .then(function(projectForms) {
+                forms = projectForms;
+                forms.forEach(function(form) {
+                  if ((new Date(project.created).getTime() + 10000) < new Date(form.modified).getTime()) {
+                    return next(true);
+                  }
+                });
+                next(false);
+              });
+          }
+        },
+        {
+          key: 'setupProviders',
+          complete: function(next) {
+            var projectSettings = project.settings;
+            var result = (projectSettings.email || projectSettings.storage);
+            next(result);
+          }
+        },
+        {
+          key: 'cloneApp',
+          route: 'project.launch.local'
+        },
+        {
+          key: 'newForm',
+          complete: function(next) {
+            formio.loadForms({
+                params: {
+                  limit: Number.MAX_SAFE_INTEGER // Don't limit results
+                }
+              })
+              .then(function(projectForms) {
+                forms = projectForms;
+                forms.forEach(function(form) {
+                  if ((new Date(project.created).getTime() + 10000) < new Date(form.created).getTime()) {
+                    return next(true);
+                  }
+                });
+                next(false);
+              });
+          }
+        },
+        {
+          key: 'launchApp',
+          route: 'project.launch.app'
+        }
+      ];
+      // Define route based steps.
+      angular.forEach(stepDefinitions, function(step) {
+        if (step.route) {
+          states[step.route] = step.key;
+        }
+      });
+
+      var saveStep = function(step) {
+        if (project.steps.indexOf(step) === -1) {
+          project.steps.push(step);
+          formio.saveProject(project);
+        }
+      };
+
+      var progress = {
+        steps: steps,
+        userForms: userForms,
+        setProject: function(newProject) {
+          project = newProject;
+          if (project) {
+            // Initialize new projects.
+            if (!project.steps) {
+              project.steps = [];
+            }
+            formio = new Formio(AppConfig.protocol + '//' + project.name + '.' + AppConfig.serverHost);
+
+            formio.loadForms({
+                params: {
+                  limit: Number.MAX_SAFE_INTEGER // Don't limit results
+                }
+              })
+              .then(function(projectForms) {
+                forms = projectForms;
+
+                // Empty userForms without breaking prototypical inheritance.
+                userForms.length = 0;
+                angular.forEach(forms, function(form) {
+                  if (form.name === 'user' || (form.tags && form.tags.indexOf('user') !== -1)) {
+                    userForms.push(form);
+                  }
+                });
+                progress.checkComplete();
+              });
+          }
+        },
+        checkComplete: function(state) {
+          if (!project) {
+            return;
+          }
+          var promises = [];
+          // Check for state changes
+          if (state && states[state.name] && project.steps.indexOf(states[state.name]) === -1) {
+            saveStep(states[state.name]);
+          }
+
+          // Check each complete function
+          angular.forEach(stepDefinitions, function(step) {
+            var defer = $q.defer();
+            if (project.steps && project.steps.indexOf(step.key) !== -1) {
+              defer.resolve({
+                key: step.key,
+                complete: true
+              });
+            }
+            else if (typeof step.complete === 'function') {
+              step.complete(function(result) {
+                // If we evaluate to true and haven't before, save to project.
+                if (result && project && project.steps.indexOf(step.key) === -1) {
+                  saveStep(step.key);
+                }
+                defer.resolve({
+                  key: step.key,
+                  complete: result
+                });
+              });
+            }
+            else {
+              defer.resolve({
+                key: step.key,
+                complete: false
+              });
+            }
+            promises.push(defer.promise);
+          });
+
+          $q.all(promises).then(function(results) {
+            var atIncomplete = false;
+            var complete = 0;
+            angular.forEach(results, function(result) {
+              steps[result.key] = {
+                complete: result.complete,
+                open: false
+              };
+              if (steps[result.key].complete) {
+                complete++;
+              }
+              else {
+                if (!atIncomplete) {
+                  steps[result.key].open = true;
+                  atIncomplete = true;
+                }
+              }
+            });
+            $rootScope.stepsPercent = Math.round(complete / results.length * 20) * 5;
+          });
+        },
+      };
+
+      $rootScope.$on('$stateChangeSuccess', function(event, state) {
+        progress.checkComplete(state);
+      }).bind(this);
+
+      return progress;
+    }
+  ];
+});
+
+app.controller('ProjectOverviewController', [
   '$scope',
+  'ProjectProgress',
   '$stateParams',
   'AppConfig',
   'Formio',
   'FormioAlerts',
-  'ngDialog',
   function(
     $scope,
+    ProjectProgress,
     $stateParams,
     AppConfig,
     Formio,
-    FormioAlerts,
-    ngDialog
+    FormioAlerts
   ) {
-    $scope.currentSection.title = 'Dashboard';
+    $scope.currentSection.title = 'Overview';
     $scope.currentSection.icon = 'fa fa-dashboard';
     $scope.currentSection.help = '';
+
+    $scope.steps = ProjectProgress.steps;
+    $scope.userForms = ProjectProgress.userForms;
+
     var formio = new Formio(AppConfig.apiBase + '/project/' + $scope.currentProject._id);
 
     formio.loadForms({
-      params: {
-        limit: Number.MAX_SAFE_INTEGER // Don't limit results
-      }
-    })
-    .then(function(forms) {
-      $scope.forms = forms;
-    })
-    .catch(FormioAlerts.onError.bind(FormioAlerts));
+        params: {
+          limit: Number.MAX_SAFE_INTEGER // Don't limit results
+        }
+      })
+      .then(function(forms) {
+        $scope.forms = forms;
+      })
+      .catch(FormioAlerts.onError.bind(FormioAlerts));
 
     var abbreviator = new NumberAbbreviate();
 
@@ -361,21 +611,14 @@ app.controller('ProjectHomeController', [
 
     $scope.getLastModified = function() {
       return _($scope.forms || [])
-      .concat($scope.currentProjectRoles || [])
-      .concat($scope.currentProject || {})
-      .map(function(item) {
-        return new Date(item.modified);
-      })
-      .max();
+        .concat($scope.currentProjectRoles || [])
+        .concat($scope.currentProject || {})
+        .map(function(item) {
+          return new Date(item.modified);
+        })
+        .max();
     };
 
-    $scope.projectInfo = function() {
-      ngDialog.open({
-        template: 'views/project/project-popup.html',
-        showClose: true,
-        className: 'ngdialog-theme-default project-info'
-      });
-    };
     $scope.graphType = $stateParams.graphType;
   }
 ]);
@@ -673,18 +916,34 @@ app.controller('LaunchController', [
   '$sce',
   '$location',
   '$http',
+  'Formio',
+  'FormioAlerts',
   'AppConfig',
   function(
     $scope,
     $sce,
     $location,
     $http,
+    Formio,
+    FormioAlerts,
     AppConfig
   ) {
     $scope.currentSection.title = 'Launch';
     $scope.currentSection.icon = 'fa fa-rocket';
     $scope.currentSection.help = 'https://help.form.io/embedding/';
     $scope.hasTemplate = true;
+    var formio = new Formio(AppConfig.apiBase + '/project/' + $scope.currentProject._id);
+
+    formio.loadForms({
+        params: {
+          limit: Number.MAX_SAFE_INTEGER // Don't limit results
+        }
+      })
+      .then(function(forms) {
+        $scope.forms = forms;
+      })
+      .catch(FormioAlerts.onError.bind(FormioAlerts));
+
     $scope.$watch('currentProject', function(project) {
       if (!project.settings) {
         return;
