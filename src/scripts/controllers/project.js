@@ -144,6 +144,11 @@ app.controller('ProjectCreateController', [
       $scope.hasTemplate = false;
     };
 
+    $scope.saveProject = function() {
+      FormioProject.createProject($scope.currentProject).then(function(project) {
+        $state.go('project.overview', {projectId: project._id});
+      });
+    };
   }
 ]);
 
