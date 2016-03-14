@@ -1,5 +1,6 @@
 @import "variables.scss";
 @import "mixins.scss";
+@import "circle.scss";
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
   display: none !important;
 }
@@ -1491,6 +1492,23 @@ footer {
     &:hover {
       text-decoration: none;
     }
+  }
+}
+
+.project-icon {
+  font-size: 3em;
+  &.fa-check-circle-o {
+    color: $brand-secondary;
+  }
+}
+
+.project-setup .list-group-item-heading {
+  margin: 10px 0;
+}
+
+.project-step {
+  .header {
+    cursor: pointer;
   }
 }
 
