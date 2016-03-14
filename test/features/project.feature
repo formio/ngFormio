@@ -11,8 +11,6 @@ Feature: Project Functionality
     When I enter ${random-title>project1.title} in the #title field
     And I enter ${random-description>project1.description} in the #description field
     When I click on the Create Project button
-    Then I am on the ${project1.title} project portal
-    And I see #project-plan-display with the text Basic
 
   Scenario: Required title
     Given I am logged in for projuser1
@@ -34,8 +32,6 @@ Feature: Project Functionality
     And I see the plaintext Select a template
     When I enter ${random-title>project2.title} in the #title field
     And I click on the Create Project button
-    Then I am on the ${project2.title} project portal
-    And I see #project-plan-display with the text Basic
 
   Scenario: Character limits
     Given I am logged in for projuser1
