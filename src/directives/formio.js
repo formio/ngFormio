@@ -96,6 +96,10 @@ module.exports = function() {
                   ? boolean[component.conditional.show]
                   : !boolean[component.conditional.show];
               }
+              // If there is no value, we still need to process as not equal.
+              else {
+                $scope.show[component.key] = !boolean[component.conditional.show];
+              }
 
               // Update the visibility, if its possible a change occurred.
               updateVisiblity(component.key);
