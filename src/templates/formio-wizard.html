@@ -1,0 +1,23 @@
+<div>
+  <div class="row bs-wizard" style="border-bottom:0;">
+    <div ng-class="{disabled: ($index > currentPage), active: ($index == currentPage), complete: ($index < currentPage)}" class="{{ colclass }} bs-wizard-step" ng-repeat="page in pages">
+      <div class="text-center bs-wizard-stepnum">{{ page.title }}</div>
+      <div class="progress"><div class="progress-bar"></div></div>
+      <a ng-click="goto($index)" class="bs-wizard-dot"></a>
+    </div>
+  </div>
+  <style type="text/css">.bs-wizard > .bs-wizard-step:first-child { margin-left: {{ margin }}%; }</style>
+  <i ng-show="!wizardLoaded" id="formio-loading" style="font-size: 2em;" class="glyphicon glyphicon-refresh glyphicon-spin"></i>
+  <div ng-repeat="alert in formioAlerts" class="alert alert-{{ alert.type }}" role="alert">{{ alert.message }}</div>
+  <div class="formio-wizard"></div>
+  <ul ng-show="wizardLoaded" class="list-inline">
+    <li><a class="btn btn-default" ng-click="cancel()">Cancel</a></li>
+    <li ng-if="currentPage > 0"><a class="btn btn-primary" ng-click="prev()">Previous</a></li>
+    <li ng-if="currentPage < (form.components.length - 1)">
+      <button class="btn btn-primary" ng-click="next()">Next</button>
+    </li>
+    <li ng-if="currentPage >= (form.components.length - 1)">
+      <button class="btn btn-primary" ng-click="submit()">Submit Form</button>
+    </li>
+  </ul>
+</div>

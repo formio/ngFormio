@@ -67321,7 +67321,7 @@ module.exports = function() {
 
         // Called when the form is submitted.
         $scope.onSubmit = function(form) {
-          if (!$scope.formioForm.$valid || form.submitting) return;
+          if (!form.$valid || form.submitting) return;
           form.submitting = true;
 
           // Create a sanitized submission object.
@@ -67808,6 +67808,259 @@ module.exports = function() {
 
 },{}],75:[function(require,module,exports){
 "use strict";
+module.exports = function() {
+  return {
+    restrict: 'E',
+    replace: true,
+    templateUrl: 'formio-wizard.html',
+    scope: {
+      src: '=?',
+      formAction: '=?',
+      form: '=?',
+      submission: '=?',
+      readOnly: '=?',
+      hideComponents: '=?',
+      formioOptions: '=?',
+      storage: '=?'
+    },
+    link: function (scope, element) {
+      scope.wizardLoaded = false;
+      scope.wizardElement = angular.element('.formio-wizard', element);
+    },
+    controller: [
+      '$scope',
+      '$compile',
+      '$element',
+      'Formio',
+      'FormioScope',
+      'FormioUtils',
+      '$http',
+      function (
+        $scope,
+        $compile,
+        $element,
+        Formio,
+        FormioScope,
+        FormioUtils,
+        $http
+      ) {
+        var session = $scope.storage ? localStorage.getItem($scope.storage) : false;
+        if (session) {
+          session = angular.fromJson(session);
+        }
+
+        $scope.formio = null;
+        $scope.page = {};
+        $scope.form = {};
+        $scope.pages = [];
+        $scope.colclass = '';
+        if (!$scope.submission || !Object.keys($scope.submission.data).length) {
+          $scope.submission = session ? {data: session.data} : {data: {}};
+        }
+        $scope.currentPage = session ? session.page : 0;
+
+        $scope.formioAlerts = [];
+        // Shows the given alerts (single or array), and dismisses old alerts
+        this.showAlerts = $scope.showAlerts = function (alerts) {
+          $scope.formioAlerts = [].concat(alerts);
+        };
+
+        $scope.clear = function () {
+          if ($scope.storage) {
+            localStorage.setItem($scope.storage, '');
+          }
+          $scope.submission = {data: {}};
+          $scope.currentPage = 0;
+        };
+
+        // Show the current page.
+        var showPage = function () {
+
+          // If the page is past the components length, try to clear first.
+          if ($scope.currentPage >= $scope.form.components.length) {
+            $scope.clear();
+          }
+
+          $scope.wizardLoaded = false;
+          if ($scope.storage) {
+            localStorage.setItem($scope.storage, angular.toJson({
+              page: $scope.currentPage,
+              data: $scope.submission.data
+            }));
+          }
+          $scope.page.components = $scope.form.components[$scope.currentPage].components;
+          var pageElement = angular.element(document.createElement('formio'));
+          $scope.wizardElement.html($compile(pageElement.attr({
+            src: "'" + $scope.src + "'",
+            form: 'page',
+            submission: 'submission',
+            readOnly: 'readOnly',
+            hideComponents: 'hideComponents',
+            formioOptions: 'formioOptions',
+            id: 'formio-wizard-form'
+          }))($scope));
+          $scope.wizardLoaded = true;
+          $scope.formioAlerts = [];
+          $scope.$emit('wizardPage', $scope.currentPage);
+        };
+
+        // Check for errors.
+        $scope.checkErrors = function () {
+          if (!$scope.isValid()) {
+            // Change all of the fields to not be pristine.
+            angular.forEach($element.find('[name="formioFieldForm"]').children(), function (element) {
+              var elementScope = angular.element(element).scope();
+              var fieldForm = elementScope.formioFieldForm;
+              if (fieldForm[elementScope.component.key]) {
+                fieldForm[elementScope.component.key].$pristine = false;
+              }
+            });
+            $scope.formioAlerts.push({
+              type: 'danger',
+              message: 'Please fix the following errors before proceeding.'
+            });
+            return true;
+          }
+          return false;
+        };
+
+        // Submit the submission.
+        $scope.submit = function () {
+          if ($scope.checkErrors()) {
+            return;
+          }
+          var sub = angular.copy($scope.submission);
+          FormioUtils.eachComponent($scope.form.components, function(component) {
+            if (sub.data.hasOwnProperty(component.key) && (component.type === 'number')) {
+              if (sub.data[component.key]) {
+                sub.data[component.key] = parseFloat(sub.data[component.key]);
+              }
+              else {
+                sub.data[component.key] = 0;
+              }
+            }
+          });
+
+          var onDone = function(submission) {
+            if ($scope.storage) {
+              localStorage.setItem($scope.storage, '');
+            }
+            $scope.$emit('formSubmission', submission);
+          };
+
+          // Save to specified action.
+          if ($scope.action) {
+            var method = sub._id ? 'put' : 'post';
+            $http[method]($scope.action, sub).success(function (submission) {
+              Formio.clearCache();
+              onDone(submission);
+            }).error(FormioScope.onError($scope, $element));
+          }
+          else if ($scope.formio) {
+            $scope.formio.saveSubmission(sub).then(onDone).catch(FormioScope.onError($scope, $element));
+          }
+          else {
+            onDone(sub);
+          }
+        };
+
+        $scope.cancel = function () {
+          $scope.clear();
+          showPage();
+        };
+
+        // Move onto the next page.
+        $scope.next = function () {
+          if ($scope.checkErrors()) {
+            return;
+          }
+          if ($scope.currentPage >= ($scope.form.components.length - 1)) {
+            return;
+          }
+          $scope.currentPage++;
+          showPage();
+          $scope.$emit('wizardNext', $scope.currentPage);
+        };
+
+        // Move onto the previous page.
+        $scope.prev = function () {
+          if ($scope.currentPage < 1) {
+            return;
+          }
+          $scope.currentPage--;
+          showPage();
+          $scope.$emit('wizardPrev', $scope.currentPage);
+        };
+
+        $scope.goto = function (page) {
+          if (page < 0) {
+            return;
+          }
+          if (page >= $scope.form.components.length) {
+            return;
+          }
+          $scope.currentPage = page;
+          showPage();
+        };
+
+        $scope.isValid = function () {
+          var element = $element.find('#formio-wizard-form');
+          if (!element.length) {
+            return false;
+          }
+          var formioForm = element.children().scope().formioForm;
+          return formioForm.$valid;
+        };
+
+        $scope.$on('wizardGoToPage', function (event, page) {
+          $scope.goto(page);
+        });
+
+        var setForm = function(form) {
+          $scope.pages = [];
+          angular.forEach(form.components, function(component) {
+
+            // Only include panels for the pages.
+            if (component.type === 'panel') {
+              $scope.pages.push(component);
+            }
+          });
+
+          $scope.form = form;
+          $scope.form.components = $scope.pages;
+          $scope.page = angular.copy(form);
+          $scope.page.display = 'form';
+          if ($scope.pages.length > 6) {
+            $scope.margin = ((1 - ($scope.pages.length * 0.0833333333)) / 2) * 100;
+            $scope.colclass = 'col-sm-1';
+          }
+          else {
+            $scope.margin = ((1 - ($scope.pages.length * 0.1666666667)) / 2) * 100;
+            $scope.colclass = 'col-sm-2';
+          }
+
+          $scope.$emit('wizardFormLoad', form);
+          showPage();
+        };
+
+        // Load the form.
+        if ($scope.src) {
+          $scope.formio = new Formio($scope.src);
+          $scope.formio.loadForm().then(function (form) {
+            setForm(form);
+          });
+        }
+        else {
+          $scope.src = '';
+          $scope.formio = new Formio($scope.src);
+        }
+      }
+    ]
+  };
+};
+
+},{}],76:[function(require,module,exports){
+"use strict";
 module.exports = [
   'Formio',
   'formioComponents',
@@ -67972,7 +68225,7 @@ module.exports = [
   }
 ];
 
-},{}],76:[function(require,module,exports){
+},{}],77:[function(require,module,exports){
 "use strict";
 var formioUtils = require('formio-utils');
 
@@ -68027,7 +68280,7 @@ module.exports = function() {
   };
 };
 
-},{"formio-utils":26}],77:[function(require,module,exports){
+},{"formio-utils":26}],78:[function(require,module,exports){
 "use strict";
 module.exports = [
   '$q',
@@ -68076,7 +68329,7 @@ module.exports = [
   }
 ];
 
-},{}],78:[function(require,module,exports){
+},{}],79:[function(require,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -68107,7 +68360,7 @@ module.exports = [
   }
 ];
 
-},{}],79:[function(require,module,exports){
+},{}],80:[function(require,module,exports){
 "use strict";
 module.exports = [
   'FormioUtils',
@@ -68116,7 +68369,7 @@ module.exports = [
   }
 ];
 
-},{}],80:[function(require,module,exports){
+},{}],81:[function(require,module,exports){
 "use strict";
 module.exports = [
   '$sce',
@@ -68129,7 +68382,7 @@ module.exports = [
   }
 ];
 
-},{}],81:[function(require,module,exports){
+},{}],82:[function(require,module,exports){
 "use strict";
 module.exports = [
   'FormioUtils',
@@ -68149,7 +68402,7 @@ module.exports = [
   }
 ];
 
-},{}],82:[function(require,module,exports){
+},{}],83:[function(require,module,exports){
 "use strict";
 module.exports = [
   'formioTableView',
@@ -68162,7 +68415,7 @@ module.exports = [
   }
 ];
 
-},{}],83:[function(require,module,exports){
+},{}],84:[function(require,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -68177,7 +68430,7 @@ module.exports = [
   }
 ];
 
-},{}],84:[function(require,module,exports){
+},{}],85:[function(require,module,exports){
 (function (global){
 "use strict";
 global.jQuery = require('jquery');
@@ -68194,7 +68447,7 @@ require('bootstrap-ui-datetime-picker/dist/datetime-picker');
 require('./formio');
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./formio":85,"angular":10,"angular-moment":2,"angular-sanitize":4,"angular-ui-bootstrap":6,"angular-ui-mask":8,"bootstrap":12,"bootstrap-ui-datetime-picker/dist/datetime-picker":11,"jquery":28,"ng-file-upload":31,"signature_pad":34,"ui-select/dist/select":35}],85:[function(require,module,exports){
+},{"./formio":86,"angular":10,"angular-moment":2,"angular-sanitize":4,"angular-ui-bootstrap":6,"angular-ui-mask":8,"bootstrap":12,"bootstrap-ui-datetime-picker/dist/datetime-picker":11,"jquery":28,"ng-file-upload":31,"signature_pad":34,"ui-select/dist/select":35}],86:[function(require,module,exports){
 "use strict";
 
 
@@ -68243,6 +68496,8 @@ app.directive('formioComponent', require('./directives/formioComponent'));
 
 app.directive('formioElement', require('./directives/formioElement'));
 
+app.directive('formioWizard', require('./directives/formioWizard'));
+
 /**
  * Filter to flatten form components.
  */
@@ -68276,7 +68531,11 @@ app.run([
 
     // The template for the formio forms.
     $templateCache.put('formio.html',
-      "<form role=\"form\" name=\"formioForm\" ng-submit=\"onSubmit(formioForm)\" novalidate>\n  <i style=\"font-size: 2em;\" ng-if=\"formLoading\" class=\"glyphicon glyphicon-refresh glyphicon-spin\"></i>\n  <div ng-repeat=\"alert in formioAlerts\" class=\"alert alert-{{ alert.type }}\" role=\"alert\">\n    {{ alert.message }}\n  </div>\n  <formio-component ng-repeat=\"component in form.components track by $index\" component=\"component\" data=\"submission.data\" form=\"formioForm\" formio=\"formio\" read-only=\"readOnly\"></formio-component>\n</form>\n"
+      "<div>\n  <i style=\"font-size: 2em;\" ng-if=\"formLoading\" class=\"glyphicon glyphicon-refresh glyphicon-spin\"></i>\n  <formio-wizard ng-if=\"form.display === 'wizard'\" src=\"src\" form=\"form\" submission=\"submission\" form-action=\"formAction\" read-only=\"readOnly\" hide-components=\"hideComponents\" formio-options=\"formioOptions\" storage=\"form.name\"></formio-wizard>\n  <form ng-if=\"!form.display || (form.display === 'form')\" role=\"form\" name=\"formioForm\" ng-submit=\"onSubmit(formioForm)\" novalidate>\n    <i style=\"font-size: 2em;\" ng-if=\"formLoading\" class=\"glyphicon glyphicon-refresh glyphicon-spin\"></i>\n    <div ng-repeat=\"alert in formioAlerts\" class=\"alert alert-{{ alert.type }}\" role=\"alert\">\n      {{ alert.message }}\n    </div>\n    <formio-component ng-repeat=\"component in form.components track by $index\" component=\"component\" data=\"submission.data\" form=\"formioForm\" formio=\"formio\" read-only=\"readOnly\"></formio-component>\n  </form>\n</div>\n"
+    );
+
+    $templateCache.put('formio-wizard.html',
+      "<div>\n  <div class=\"row bs-wizard\" style=\"border-bottom:0;\">\n    <div ng-class=\"{disabled: ($index > currentPage), active: ($index == currentPage), complete: ($index < currentPage)}\" class=\"{{ colclass }} bs-wizard-step\" ng-repeat=\"page in pages\">\n      <div class=\"text-center bs-wizard-stepnum\">{{ page.title }}</div>\n      <div class=\"progress\"><div class=\"progress-bar\"></div></div>\n      <a ng-click=\"goto($index)\" class=\"bs-wizard-dot\"></a>\n    </div>\n  </div>\n  <style type=\"text/css\">.bs-wizard > .bs-wizard-step:first-child { margin-left: {{ margin }}%; }</style>\n  <i ng-show=\"!wizardLoaded\" id=\"formio-loading\" style=\"font-size: 2em;\" class=\"glyphicon glyphicon-refresh glyphicon-spin\"></i>\n  <div ng-repeat=\"alert in formioAlerts\" class=\"alert alert-{{ alert.type }}\" role=\"alert\">{{ alert.message }}</div>\n  <div class=\"formio-wizard\"></div>\n  <ul ng-show=\"wizardLoaded\" class=\"list-inline\">\n    <li><a class=\"btn btn-default\" ng-click=\"cancel()\">Cancel</a></li>\n    <li ng-if=\"currentPage > 0\"><a class=\"btn btn-primary\" ng-click=\"prev()\">Previous</a></li>\n    <li ng-if=\"currentPage < (form.components.length - 1)\">\n      <button class=\"btn btn-primary\" ng-click=\"next()\">Next</button>\n    </li>\n    <li ng-if=\"currentPage >= (form.components.length - 1)\">\n      <button class=\"btn btn-primary\" ng-click=\"submit()\">Submit Form</button>\n    </li>\n  </ul>\n</div>\n"
     );
 
     $templateCache.put('formio-delete.html',
@@ -68304,7 +68563,7 @@ app.run([
 
 require('./components');
 
-},{"./components":52,"./directives/customValidator":67,"./directives/formio":68,"./directives/formioComponent":69,"./directives/formioDelete":70,"./directives/formioElement":71,"./directives/formioErrors":72,"./directives/formioSubmission":73,"./directives/formioSubmissions":74,"./factories/FormioScope":75,"./factories/FormioUtils":76,"./factories/formioInterceptor":77,"./factories/formioTableView":78,"./filters/flattenComponents":79,"./filters/safehtml":80,"./filters/tableComponents":81,"./filters/tableFieldView":82,"./filters/tableView":83,"./plugins":86,"./providers/Formio":90,"./providers/FormioPlugins":91}],86:[function(require,module,exports){
+},{"./components":52,"./directives/customValidator":67,"./directives/formio":68,"./directives/formioComponent":69,"./directives/formioDelete":70,"./directives/formioElement":71,"./directives/formioErrors":72,"./directives/formioSubmission":73,"./directives/formioSubmissions":74,"./directives/formioWizard":75,"./factories/FormioScope":76,"./factories/FormioUtils":77,"./factories/formioInterceptor":78,"./factories/formioTableView":79,"./filters/flattenComponents":80,"./filters/safehtml":81,"./filters/tableComponents":82,"./filters/tableFieldView":83,"./filters/tableView":84,"./plugins":87,"./providers/Formio":91,"./providers/FormioPlugins":92}],87:[function(require,module,exports){
 "use strict";
 module.exports = function(app) {
   require('./storage/url')(app);
@@ -68312,7 +68571,7 @@ module.exports = function(app) {
   require('./storage/dropbox')(app);
 };
 
-},{"./storage/dropbox":87,"./storage/s3":88,"./storage/url":89}],87:[function(require,module,exports){
+},{"./storage/dropbox":88,"./storage/s3":89,"./storage/url":90}],88:[function(require,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -68446,7 +68705,7 @@ module.exports = function(app) {
 };
 
 
-},{}],88:[function(require,module,exports){
+},{}],89:[function(require,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -68543,7 +68802,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],89:[function(require,module,exports){
+},{}],90:[function(require,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -68595,7 +68854,7 @@ module.exports = function(app) {
   );
 };
 
-},{}],90:[function(require,module,exports){
+},{}],91:[function(require,module,exports){
 "use strict";
 module.exports = function() {
 
@@ -68660,7 +68919,7 @@ module.exports = function() {
   };
 };
 
-},{"formiojs/src/formio.js":27}],91:[function(require,module,exports){
+},{"formiojs/src/formio.js":27}],92:[function(require,module,exports){
 "use strict";
 
 module.exports = function() {
@@ -68692,4 +68951,4 @@ module.exports = function() {
   };
 };
 
-},{}]},{},[84]);
+},{}]},{},[85]);
