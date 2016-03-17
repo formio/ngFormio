@@ -8,7 +8,7 @@ module.exports = function (app) {
         title: 'Date / Time',
         template: 'formio/components/datetime.html',
         tableView: function(data, component, $interpolate) {
-          return $interpolate('<span>{{ "' + data + '" | date: "' + this.settings.format + '" }}</span>')();
+          return $interpolate('<span>{{ "' + data + '" | date: "' + component.format + '" }}</span>')();
         },
         group: 'advanced',
         settings: {
