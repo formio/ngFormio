@@ -5,6 +5,7 @@ require('ui-select/dist/select');
 require('angular-moment');
 require('angular-sanitize');
 require('signature_pad');
+require('angular-file-saver');
 require('ng-file-upload');
 require('bootstrap');
 require('angular-ui-bootstrap');

@@ -2050,7 +2050,692 @@ return Q;
 });
 
 }).call(this,require('_process'))
-},{"_process":32}],2:[function(require,module,exports){
+},{"_process":33}],2:[function(require,module,exports){
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(typeof exports === 'object' && typeof module === 'object')
+		module.exports = factory();
+	else if(typeof define === 'function' && define.amd)
+		define([], factory);
+	else if(typeof exports === 'object')
+		exports["ngFileSaver"] = factory();
+	else
+		root["ngFileSaver"] = factory();
+})(this, function() {
+return /******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId])
+/******/ 			return installedModules[moduleId].exports;
+
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			exports: {},
+/******/ 			id: moduleId,
+/******/ 			loaded: false
+/******/ 		};
+
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+
+/******/ 		// Flag the module as loaded
+/******/ 		module.loaded = true;
+
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+
+
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(0);
+/******/ })
+/************************************************************************/
+/******/ ([
+/* 0 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	/*
+	*
+	* A AngularJS module that implements the HTML5 W3C saveAs() in browsers that
+	* do not natively support it
+	*
+	* (c) 2015 Philipp Alferov
+	* License: MIT
+	*
+	*/
+
+	module.exports = 'ngFileSaver';
+
+	angular.module('ngFileSaver', [])
+	  .factory('FileSaver', ['Blob', 'SaveAs', 'FileSaverUtils', __webpack_require__(1)])
+	  .factory('FileSaverUtils', [__webpack_require__(2)])
+	  .factory('Blob', ['$window', __webpack_require__(3)])
+	  .factory('SaveAs', [__webpack_require__(5)]);
+
+
+/***/ },
+/* 1 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	module.exports = function FileSaver(Blob, SaveAs, FileSaverUtils) {
+
+	  function save(blob, filename, disableAutoBOM) {
+	    try {
+	      SaveAs(blob, filename, disableAutoBOM);
+	    } catch(err) {
+	      FileSaverUtils.handleErrors(err.message);
+	    }
+	  }
+
+	  return {
+
+	    /**
+	    * saveAs
+	    * Immediately starts saving a file, returns undefined.
+	    *
+	    * @name saveAs
+	    * @function
+	    * @param {Blob} data A Blob instance
+	    * @param {Object} filename Custom filename (extension is optional)
+	    * @param {Boolean} disableAutoBOM Disable automatically provided Unicode
+	    * text encoding hints
+	    *
+	    * @return {Undefined}
+	    */
+
+	    saveAs: function(data, filename, disableAutoBOM) {
+
+	      if (!FileSaverUtils.isBlobInstance(data)) {
+	        FileSaverUtils.handleErrors('Data argument should be a blob instance');
+	      }
+
+	      if (!FileSaverUtils.isString(filename)) {
+	        FileSaverUtils.handleErrors('Filename argument should be a string');
+	      }
+
+	      return save(data, filename, disableAutoBOM);
+	    }
+	  };
+	};
+
+
+/***/ },
+/* 2 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	module.exports = function FileSaverUtils() {
+	  return {
+	    handleErrors: function(msg) {
+	      throw new Error(msg);
+	    },
+	    isString: function(obj) {
+	      return typeof obj === 'string' || obj instanceof String;
+	    },
+	    isUndefined: function(obj) {
+	      return typeof obj === 'undefined';
+	    },
+	    isBlobInstance: function(obj) {
+	      return obj instanceof Blob;
+	    }
+	  };
+	};
+
+
+/***/ },
+/* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	__webpack_require__(4);
+
+	module.exports = function Blob($window) {
+	  return $window.Blob;
+	};
+
+
+/***/ },
+/* 4 */
+/***/ function(module, exports) {
+
+	/* Blob.js
+	 * A Blob implementation.
+	 * 2014-07-24
+	 *
+	 * By Eli Grey, http://eligrey.com
+	 * By Devin Samarin, https://github.com/dsamarin
+	 * License: X11/MIT
+	 *   See https://github.com/eligrey/Blob.js/blob/master/LICENSE.md
+	 */
+
+	/*global self, unescape */
+	/*jslint bitwise: true, regexp: true, confusion: true, es5: true, vars: true, white: true,
+	  plusplus: true */
+
+	/*! @source http://purl.eligrey.com/github/Blob.js/blob/master/Blob.js */
+
+	(function (view) {
+		"use strict";
+
+		view.URL = view.URL || view.webkitURL;
+
+		if (view.Blob && view.URL) {
+			try {
+				new Blob;
+				return;
+			} catch (e) {}
+		}
+
+		// Internally we use a BlobBuilder implementation to base Blob off of
+		// in order to support older browsers that only have BlobBuilder
+		var BlobBuilder = view.BlobBuilder || view.WebKitBlobBuilder || view.MozBlobBuilder || (function(view) {
+			var
+				  get_class = function(object) {
+					return Object.prototype.toString.call(object).match(/^\[object\s(.*)\]$/)[1];
+				}
+				, FakeBlobBuilder = function BlobBuilder() {
+					this.data = [];
+				}
+				, FakeBlob = function Blob(data, type, encoding) {
+					this.data = data;
+					this.size = data.length;
+					this.type = type;
+					this.encoding = encoding;
+				}
+				, FBB_proto = FakeBlobBuilder.prototype
+				, FB_proto = FakeBlob.prototype
+				, FileReaderSync = view.FileReaderSync
+				, FileException = function(type) {
+					this.code = this[this.name = type];
+				}
+				, file_ex_codes = (
+					  "NOT_FOUND_ERR SECURITY_ERR ABORT_ERR NOT_READABLE_ERR ENCODING_ERR "
+					+ "NO_MODIFICATION_ALLOWED_ERR INVALID_STATE_ERR SYNTAX_ERR"
+				).split(" ")
+				, file_ex_code = file_ex_codes.length
+				, real_URL = view.URL || view.webkitURL || view
+				, real_create_object_URL = real_URL.createObjectURL
+				, real_revoke_object_URL = real_URL.revokeObjectURL
+				, URL = real_URL
+				, btoa = view.btoa
+				, atob = view.atob
+
+				, ArrayBuffer = view.ArrayBuffer
+				, Uint8Array = view.Uint8Array
+
+				, origin = /^[\w-]+:\/*\[?[\w\.:-]+\]?(?::[0-9]+)?/
+			;
+			FakeBlob.fake = FB_proto.fake = true;
+			while (file_ex_code--) {
+				FileException.prototype[file_ex_codes[file_ex_code]] = file_ex_code + 1;
+			}
+			// Polyfill URL
+			if (!real_URL.createObjectURL) {
+				URL = view.URL = function(uri) {
+					var
+						  uri_info = document.createElementNS("http://www.w3.org/1999/xhtml", "a")
+						, uri_origin
+					;
+					uri_info.href = uri;
+					if (!("origin" in uri_info)) {
+						if (uri_info.protocol.toLowerCase() === "data:") {
+							uri_info.origin = null;
+						} else {
+							uri_origin = uri.match(origin);
+							uri_info.origin = uri_origin && uri_origin[1];
+						}
+					}
+					return uri_info;
+				};
+			}
+			URL.createObjectURL = function(blob) {
+				var
+					  type = blob.type
+					, data_URI_header
+				;
+				if (type === null) {
+					type = "application/octet-stream";
+				}
+				if (blob instanceof FakeBlob) {
+					data_URI_header = "data:" + type;
+					if (blob.encoding === "base64") {
+						return data_URI_header + ";base64," + blob.data;
+					} else if (blob.encoding === "URI") {
+						return data_URI_header + "," + decodeURIComponent(blob.data);
+					} if (btoa) {
+						return data_URI_header + ";base64," + btoa(blob.data);
+					} else {
+						return data_URI_header + "," + encodeURIComponent(blob.data);
+					}
+				} else if (real_create_object_URL) {
+					return real_create_object_URL.call(real_URL, blob);
+				}
+			};
+			URL.revokeObjectURL = function(object_URL) {
+				if (object_URL.substring(0, 5) !== "data:" && real_revoke_object_URL) {
+					real_revoke_object_URL.call(real_URL, object_URL);
+				}
+			};
+			FBB_proto.append = function(data/*, endings*/) {
+				var bb = this.data;
+				// decode data to a binary string
+				if (Uint8Array && (data instanceof ArrayBuffer || data instanceof Uint8Array)) {
+					var
+						  str = ""
+						, buf = new Uint8Array(data)
+						, i = 0
+						, buf_len = buf.length
+					;
+					for (; i < buf_len; i++) {
+						str += String.fromCharCode(buf[i]);
+					}
+					bb.push(str);
+				} else if (get_class(data) === "Blob" || get_class(data) === "File") {
+					if (FileReaderSync) {
+						var fr = new FileReaderSync;
+						bb.push(fr.readAsBinaryString(data));
+					} else {
+						// async FileReader won't work as BlobBuilder is sync
+						throw new FileException("NOT_READABLE_ERR");
+					}
+				} else if (data instanceof FakeBlob) {
+					if (data.encoding === "base64" && atob) {
+						bb.push(atob(data.data));
+					} else if (data.encoding === "URI") {
+						bb.push(decodeURIComponent(data.data));
+					} else if (data.encoding === "raw") {
+						bb.push(data.data);
+					}
+				} else {
+					if (typeof data !== "string") {
+						data += ""; // convert unsupported types to strings
+					}
+					// decode UTF-16 to binary string
+					bb.push(unescape(encodeURIComponent(data)));
+				}
+			};
+			FBB_proto.getBlob = function(type) {
+				if (!arguments.length) {
+					type = null;
+				}
+				return new FakeBlob(this.data.join(""), type, "raw");
+			};
+			FBB_proto.toString = function() {
+				return "[object BlobBuilder]";
+			};
+			FB_proto.slice = function(start, end, type) {
+				var args = arguments.length;
+				if (args < 3) {
+					type = null;
+				}
+				return new FakeBlob(
+					  this.data.slice(start, args > 1 ? end : this.data.length)
+					, type
+					, this.encoding
+				);
+			};
+			FB_proto.toString = function() {
+				return "[object Blob]";
+			};
+			FB_proto.close = function() {
+				this.size = 0;
+				delete this.data;
+			};
+			return FakeBlobBuilder;
+		}(view));
+
+		view.Blob = function(blobParts, options) {
+			var type = options ? (options.type || "") : "";
+			var builder = new BlobBuilder();
+			if (blobParts) {
+				for (var i = 0, len = blobParts.length; i < len; i++) {
+					if (Uint8Array && blobParts[i] instanceof Uint8Array) {
+						builder.append(blobParts[i].buffer);
+					}
+					else {
+						builder.append(blobParts[i]);
+					}
+				}
+			}
+			var blob = builder.getBlob(type);
+			if (!blob.slice && blob.webkitSlice) {
+				blob.slice = blob.webkitSlice;
+			}
+			return blob;
+		};
+
+		var getPrototypeOf = Object.getPrototypeOf || function(object) {
+			return object.__proto__;
+		};
+		view.Blob.prototype = getPrototypeOf(new view.Blob());
+	}(typeof self !== "undefined" && self || typeof window !== "undefined" && window || this.content || this));
+
+
+/***/ },
+/* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	module.exports = function SaveAs() {
+	  return __webpack_require__(6).saveAs || function() {};
+	};
+
+
+/***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* FileSaver.js
+	 * A saveAs() FileSaver implementation.
+	 * 1.1.20151003
+	 *
+	 * By Eli Grey, http://eligrey.com
+	 * License: MIT
+	 *   See https://github.com/eligrey/FileSaver.js/blob/master/LICENSE.md
+	 */
+
+	/*global self */
+	/*jslint bitwise: true, indent: 4, laxbreak: true, laxcomma: true, smarttabs: true, plusplus: true */
+
+	/*! @source http://purl.eligrey.com/github/FileSaver.js/blob/master/FileSaver.js */
+
+	var saveAs = saveAs || (function(view) {
+		"use strict";
+		// IE <10 is explicitly unsupported
+		if (typeof navigator !== "undefined" && /MSIE [1-9]\./.test(navigator.userAgent)) {
+			return;
+		}
+		var
+			  doc = view.document
+			  // only get URL when necessary in case Blob.js hasn't overridden it yet
+			, get_URL = function() {
+				return view.URL || view.webkitURL || view;
+			}
+			, save_link = doc.createElementNS("http://www.w3.org/1999/xhtml", "a")
+			, can_use_save_link = "download" in save_link
+			, click = function(node) {
+				var event = new MouseEvent("click");
+				node.dispatchEvent(event);
+			}
+			, is_safari = /Version\/[\d\.]+.*Safari/.test(navigator.userAgent)
+			, webkit_req_fs = view.webkitRequestFileSystem
+			, req_fs = view.requestFileSystem || webkit_req_fs || view.mozRequestFileSystem
+			, throw_outside = function(ex) {
+				(view.setImmediate || view.setTimeout)(function() {
+					throw ex;
+				}, 0);
+			}
+			, force_saveable_type = "application/octet-stream"
+			, fs_min_size = 0
+			// See https://code.google.com/p/chromium/issues/detail?id=375297#c7 and
+			// https://github.com/eligrey/FileSaver.js/commit/485930a#commitcomment-8768047
+			// for the reasoning behind the timeout and revocation flow
+			, arbitrary_revoke_timeout = 500 // in ms
+			, revoke = function(file) {
+				var revoker = function() {
+					if (typeof file === "string") { // file is an object URL
+						get_URL().revokeObjectURL(file);
+					} else { // file is a File
+						file.remove();
+					}
+				};
+				if (view.chrome) {
+					revoker();
+				} else {
+					setTimeout(revoker, arbitrary_revoke_timeout);
+				}
+			}
+			, dispatch = function(filesaver, event_types, event) {
+				event_types = [].concat(event_types);
+				var i = event_types.length;
+				while (i--) {
+					var listener = filesaver["on" + event_types[i]];
+					if (typeof listener === "function") {
+						try {
+							listener.call(filesaver, event || filesaver);
+						} catch (ex) {
+							throw_outside(ex);
+						}
+					}
+				}
+			}
+			, auto_bom = function(blob) {
+				// prepend BOM for UTF-8 XML and text/* types (including HTML)
+				if (/^\s*(?:text\/\S*|application\/xml|\S*\/\S*\+xml)\s*;.*charset\s*=\s*utf-8/i.test(blob.type)) {
+					return new Blob(["\ufeff", blob], {type: blob.type});
+				}
+				return blob;
+			}
+			, FileSaver = function(blob, name, no_auto_bom) {
+				if (!no_auto_bom) {
+					blob = auto_bom(blob);
+				}
+				// First try a.download, then web filesystem, then object URLs
+				var
+					  filesaver = this
+					, type = blob.type
+					, blob_changed = false
+					, object_url
+					, target_view
+					, dispatch_all = function() {
+						dispatch(filesaver, "writestart progress write writeend".split(" "));
+					}
+					// on any filesys errors revert to saving with object URLs
+					, fs_error = function() {
+						if (target_view && is_safari && typeof FileReader !== "undefined") {
+							// Safari doesn't allow downloading of blob urls
+							var reader = new FileReader();
+							reader.onloadend = function() {
+								var base64Data = reader.result;
+								target_view.location.href = "data:attachment/file" + base64Data.slice(base64Data.search(/[,;]/));
+								filesaver.readyState = filesaver.DONE;
+								dispatch_all();
+							};
+							reader.readAsDataURL(blob);
+							filesaver.readyState = filesaver.INIT;
+							return;
+						}
+						// don't create more object URLs than needed
+						if (blob_changed || !object_url) {
+							object_url = get_URL().createObjectURL(blob);
+						}
+						if (target_view) {
+							target_view.location.href = object_url;
+						} else {
+							var new_tab = view.open(object_url, "_blank");
+							if (new_tab == undefined && is_safari) {
+								//Apple do not allow window.open, see http://bit.ly/1kZffRI
+								view.location.href = object_url
+							}
+						}
+						filesaver.readyState = filesaver.DONE;
+						dispatch_all();
+						revoke(object_url);
+					}
+					, abortable = function(func) {
+						return function() {
+							if (filesaver.readyState !== filesaver.DONE) {
+								return func.apply(this, arguments);
+							}
+						};
+					}
+					, create_if_not_found = {create: true, exclusive: false}
+					, slice
+				;
+				filesaver.readyState = filesaver.INIT;
+				if (!name) {
+					name = "download";
+				}
+				if (can_use_save_link) {
+					object_url = get_URL().createObjectURL(blob);
+					save_link.href = object_url;
+					save_link.download = name;
+					setTimeout(function() {
+						click(save_link);
+						dispatch_all();
+						revoke(object_url);
+						filesaver.readyState = filesaver.DONE;
+					});
+					return;
+				}
+				// Object and web filesystem URLs have a problem saving in Google Chrome when
+				// viewed in a tab, so I force save with application/octet-stream
+				// http://code.google.com/p/chromium/issues/detail?id=91158
+				// Update: Google errantly closed 91158, I submitted it again:
+				// https://code.google.com/p/chromium/issues/detail?id=389642
+				if (view.chrome && type && type !== force_saveable_type) {
+					slice = blob.slice || blob.webkitSlice;
+					blob = slice.call(blob, 0, blob.size, force_saveable_type);
+					blob_changed = true;
+				}
+				// Since I can't be sure that the guessed media type will trigger a download
+				// in WebKit, I append .download to the filename.
+				// https://bugs.webkit.org/show_bug.cgi?id=65440
+				if (webkit_req_fs && name !== "download") {
+					name += ".download";
+				}
+				if (type === force_saveable_type || webkit_req_fs) {
+					target_view = view;
+				}
+				if (!req_fs) {
+					fs_error();
+					return;
+				}
+				fs_min_size += blob.size;
+				req_fs(view.TEMPORARY, fs_min_size, abortable(function(fs) {
+					fs.root.getDirectory("saved", create_if_not_found, abortable(function(dir) {
+						var save = function() {
+							dir.getFile(name, create_if_not_found, abortable(function(file) {
+								file.createWriter(abortable(function(writer) {
+									writer.onwriteend = function(event) {
+										target_view.location.href = file.toURL();
+										filesaver.readyState = filesaver.DONE;
+										dispatch(filesaver, "writeend", event);
+										revoke(file);
+									};
+									writer.onerror = function() {
+										var error = writer.error;
+										if (error.code !== error.ABORT_ERR) {
+											fs_error();
+										}
+									};
+									"writestart progress write abort".split(" ").forEach(function(event) {
+										writer["on" + event] = filesaver["on" + event];
+									});
+									writer.write(blob);
+									filesaver.abort = function() {
+										writer.abort();
+										filesaver.readyState = filesaver.DONE;
+									};
+									filesaver.readyState = filesaver.WRITING;
+								}), fs_error);
+							}), fs_error);
+						};
+						dir.getFile(name, {create: false}, abortable(function(file) {
+							// delete file if it already exists
+							file.remove();
+							save();
+						}), abortable(function(ex) {
+							if (ex.code === ex.NOT_FOUND_ERR) {
+								save();
+							} else {
+								fs_error();
+							}
+						}));
+					}), fs_error);
+				}), fs_error);
+			}
+			, FS_proto = FileSaver.prototype
+			, saveAs = function(blob, name, no_auto_bom) {
+				return new FileSaver(blob, name, no_auto_bom);
+			}
+		;
+		// IE 10+ (native saveAs)
+		if (typeof navigator !== "undefined" && navigator.msSaveOrOpenBlob) {
+			return function(blob, name, no_auto_bom) {
+				if (!no_auto_bom) {
+					blob = auto_bom(blob);
+				}
+				return navigator.msSaveOrOpenBlob(blob, name || "download");
+			};
+		}
+
+		FS_proto.abort = function() {
+			var filesaver = this;
+			filesaver.readyState = filesaver.DONE;
+			dispatch(filesaver, "abort");
+		};
+		FS_proto.readyState = FS_proto.INIT = 0;
+		FS_proto.WRITING = 1;
+		FS_proto.DONE = 2;
+
+		FS_proto.error =
+		FS_proto.onwritestart =
+		FS_proto.onprogress =
+		FS_proto.onwrite =
+		FS_proto.onabort =
+		FS_proto.onerror =
+		FS_proto.onwriteend =
+			null;
+
+		return saveAs;
+	}(
+		   typeof self !== "undefined" && self
+		|| typeof window !== "undefined" && window
+		|| this.content
+	));
+	// `self` is undefined in Firefox for Android content script context
+	// while `this` is nsIContentFrameMessageManager
+	// with an attribute `content` that corresponds to the window
+
+	if (typeof module !== "undefined" && module.exports) {
+	  module.exports.saveAs = saveAs;
+	} else if (("function" !== "undefined" && __webpack_require__(7) !== null) && (__webpack_require__(8) != null)) {
+	  !(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function() {
+	    return saveAs;
+	  }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	}
+
+
+/***/ },
+/* 7 */
+/***/ function(module, exports) {
+
+	module.exports = function() { throw new Error("define cannot be used indirect"); };
+
+
+/***/ },
+/* 8 */
+/***/ function(module, exports) {
+
+	/* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {module.exports = __webpack_amd_options__;
+
+	/* WEBPACK VAR INJECTION */}.call(exports, {}))
+
+/***/ }
+/******/ ])
+});
+;
+},{}],3:[function(require,module,exports){
 (function (global){
 /* angular-moment.js / v1.0.0-beta.4 / (c) 2013, 2014, 2015, 2016 Uri Shaked / MIT Licence */
 
@@ -2780,7 +3465,7 @@ return Q;
 })();
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"angular":10,"moment":29}],3:[function(require,module,exports){
+},{"angular":11,"moment":30}],4:[function(require,module,exports){
 /**
  * @license AngularJS v1.5.0
  * (c) 2010-2016 Google, Inc. http://angularjs.org
@@ -3499,11 +4184,11 @@ angular.module('ngSanitize').filter('linky', ['$sanitize', function($sanitize) {
 
 })(window, window.angular);
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 require('./angular-sanitize');
 module.exports = 'ngSanitize';
 
-},{"./angular-sanitize":3}],5:[function(require,module,exports){
+},{"./angular-sanitize":4}],6:[function(require,module,exports){
 /*
  * angular-ui-bootstrap
  * http://angular-ui.github.io/bootstrap/
@@ -10878,12 +11563,12 @@ angular.module('ui.bootstrap.datepicker').run(function() {!angular.$$csp().noInl
 angular.module('ui.bootstrap.tooltip').run(function() {!angular.$$csp().noInlineStyle && !angular.$$uibTooltipCss && angular.element(document).find('head').prepend('<style type="text/css">[uib-tooltip-popup].tooltip.top-left > .tooltip-arrow,[uib-tooltip-popup].tooltip.top-right > .tooltip-arrow,[uib-tooltip-popup].tooltip.bottom-left > .tooltip-arrow,[uib-tooltip-popup].tooltip.bottom-right > .tooltip-arrow,[uib-tooltip-popup].tooltip.left-top > .tooltip-arrow,[uib-tooltip-popup].tooltip.left-bottom > .tooltip-arrow,[uib-tooltip-popup].tooltip.right-top > .tooltip-arrow,[uib-tooltip-popup].tooltip.right-bottom > .tooltip-arrow,[uib-popover-popup].popover.top-left > .arrow,[uib-popover-popup].popover.top-right > .arrow,[uib-popover-popup].popover.bottom-left > .arrow,[uib-popover-popup].popover.bottom-right > .arrow,[uib-popover-popup].popover.left-top > .arrow,[uib-popover-popup].popover.left-bottom > .arrow,[uib-popover-popup].popover.right-top > .arrow,[uib-popover-popup].popover.right-bottom > .arrow{top:auto;bottom:auto;left:auto;right:auto;margin:0;}[uib-popover-popup].popover,[uib-popover-template-popup].popover{display:block !important;}</style>'); angular.$$uibTooltipCss = true; });
 angular.module('ui.bootstrap.timepicker').run(function() {!angular.$$csp().noInlineStyle && !angular.$$uibTimepickerCss && angular.element(document).find('head').prepend('<style type="text/css">.uib-time input{width:50px;}</style>'); angular.$$uibTimepickerCss = true; });
 angular.module('ui.bootstrap.typeahead').run(function() {!angular.$$csp().noInlineStyle && !angular.$$uibTypeaheadCss && angular.element(document).find('head').prepend('<style type="text/css">[uib-typeahead-popup].dropdown-menu{display:block;}</style>'); angular.$$uibTypeaheadCss = true; });
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 require('./dist/ui-bootstrap-tpls');
 
 module.exports = 'ui.bootstrap';
 
-},{"./dist/ui-bootstrap-tpls":5}],7:[function(require,module,exports){
+},{"./dist/ui-bootstrap-tpls":6}],8:[function(require,module,exports){
 /*!
  * angular-ui-mask
  * https://github.com/angular-ui/ui-mask
@@ -11599,7 +12284,7 @@ angular.module('ui.mask', [])
         ]);
 
 }());
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 //https://github.com/angular/angular.js/pull/10732
 
 var angular = require('angular');
@@ -11607,7 +12292,7 @@ var mask = require('./dist/mask');
 
 module.exports = 'ui.mask';
 
-},{"./dist/mask":7,"angular":10}],9:[function(require,module,exports){
+},{"./dist/mask":8,"angular":11}],10:[function(require,module,exports){
 /**
  * @license AngularJS v1.5.0
  * (c) 2010-2016 Google, Inc. http://angularjs.org
@@ -42036,11 +42721,11 @@ $provide.value("$locale", {
 })(window, document);
 
 !window.angular.$$csp().noInlineStyle && window.angular.element(document.head).prepend('<style type="text/css">@charset "UTF-8";[ng\\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide:not(.ng-hide-animate){display:none !important;}ng\\:form{display:block;}.ng-animate-shim{visibility:hidden;}.ng-anchor{position:absolute;}</style>');
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 require('./angular');
 module.exports = angular;
 
-},{"./angular":9}],11:[function(require,module,exports){
+},{"./angular":10}],12:[function(require,module,exports){
 // https://github.com/Gillardo/bootstrap-ui-datetime-picker
 // Version: 2.0.5
 // Released: 2015-12-30 
@@ -42543,7 +43228,7 @@ angular.module('ui.bootstrap.datetimepicker').run(['$templateCache', function($t
 
 }]);
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 // This file is autogenerated via the `commonjs` Grunt task. You can require() this file in a CommonJS environment.
 require('../../js/transition.js')
 require('../../js/alert.js')
@@ -42557,7 +43242,7 @@ require('../../js/popover.js')
 require('../../js/scrollspy.js')
 require('../../js/tab.js')
 require('../../js/affix.js')
-},{"../../js/affix.js":13,"../../js/alert.js":14,"../../js/button.js":15,"../../js/carousel.js":16,"../../js/collapse.js":17,"../../js/dropdown.js":18,"../../js/modal.js":19,"../../js/popover.js":20,"../../js/scrollspy.js":21,"../../js/tab.js":22,"../../js/tooltip.js":23,"../../js/transition.js":24}],13:[function(require,module,exports){
+},{"../../js/affix.js":14,"../../js/alert.js":15,"../../js/button.js":16,"../../js/carousel.js":17,"../../js/collapse.js":18,"../../js/dropdown.js":19,"../../js/modal.js":20,"../../js/popover.js":21,"../../js/scrollspy.js":22,"../../js/tab.js":23,"../../js/tooltip.js":24,"../../js/transition.js":25}],14:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: affix.js v3.3.6
  * http://getbootstrap.com/javascript/#affix
@@ -42721,7 +43406,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: alert.js v3.3.6
  * http://getbootstrap.com/javascript/#alerts
@@ -42817,7 +43502,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: button.js v3.3.6
  * http://getbootstrap.com/javascript/#buttons
@@ -42939,7 +43624,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: carousel.js v3.3.6
  * http://getbootstrap.com/javascript/#carousel
@@ -43178,7 +43863,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: collapse.js v3.3.6
  * http://getbootstrap.com/javascript/#collapse
@@ -43391,7 +44076,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: dropdown.js v3.3.6
  * http://getbootstrap.com/javascript/#dropdowns
@@ -43558,7 +44243,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: modal.js v3.3.6
  * http://getbootstrap.com/javascript/#modals
@@ -43897,7 +44582,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: popover.js v3.3.6
  * http://getbootstrap.com/javascript/#popovers
@@ -44007,7 +44692,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: scrollspy.js v3.3.6
  * http://getbootstrap.com/javascript/#scrollspy
@@ -44181,7 +44866,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: tab.js v3.3.6
  * http://getbootstrap.com/javascript/#tabs
@@ -44338,7 +45023,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: tooltip.js v3.3.6
  * http://getbootstrap.com/javascript/#tooltip
@@ -44854,7 +45539,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: transition.js v3.3.6
  * http://getbootstrap.com/javascript/#transitions
@@ -44915,7 +45600,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 /*!
  * EventEmitter2
  * https://github.com/hij1nx/EventEmitter2
@@ -45490,7 +46175,7 @@ require('../../js/affix.js')
   }
 }();
 
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 module.exports = {
   /**
    * Iterate through each component within a form.
@@ -45558,7 +46243,7 @@ module.exports = {
   }
 };
 
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 'use strict';
 
 require('whatwg-fetch');
@@ -46177,7 +46862,7 @@ Formio.deregisterPlugin = function(plugin) {
 
 module.exports = Formio;
 
-},{"Q":1,"eventemitter2":25,"shallow-copy":33,"whatwg-fetch":36}],28:[function(require,module,exports){
+},{"Q":1,"eventemitter2":26,"shallow-copy":34,"whatwg-fetch":37}],29:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v2.2.1
  * http://jquery.com/
@@ -56010,7 +56695,7 @@ if ( !noGlobal ) {
 return jQuery;
 }));
 
-},{}],29:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 //! moment.js
 //! version : 2.11.2
 //! authors : Tim Wood, Iskren Chernev, Moment.js contributors
@@ -59617,7 +60302,7 @@ return jQuery;
     return _moment;
 
 }));
-},{}],30:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 /**!
  * AngularJS file upload directives and services. Supoorts: file upload/drop/paste, resume, cancel/abort,
  * progress, resize, thumbnail, preview, validation and CORS
@@ -62352,10 +63037,10 @@ ngFileUpload.service('UploadExif', ['UploadResize', '$q', function (UploadResize
 }]);
 
 
-},{}],31:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 require('./dist/ng-file-upload-all');
 module.exports = 'ngFileUpload';
-},{"./dist/ng-file-upload-all":30}],32:[function(require,module,exports){
+},{"./dist/ng-file-upload-all":31}],33:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -62448,7 +63133,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],33:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 module.exports = function (obj) {
     if (!obj || typeof obj !== 'object') return obj;
     
@@ -62485,7 +63170,7 @@ var isArray = Array.isArray || function (xs) {
     return {}.toString.call(xs) === '[object Array]';
 };
 
-},{}],34:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 (function (root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module unless amdModuleId is set
@@ -62876,7 +63561,7 @@ return SignaturePad;
 
 }));
 
-},{}],35:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 /*!
  * ui-select
  * http://github.com/angular-ui/ui-select
@@ -64920,7 +65605,7 @@ $templateCache.put("select2/select.tpl.html","<div class=\"ui-select-container s
 $templateCache.put("selectize/choices.tpl.html","<div ng-show=\"$select.open\" class=\"ui-select-choices ui-select-dropdown selectize-dropdown single\"><div class=\"ui-select-choices-content selectize-dropdown-content\"><div class=\"ui-select-choices-group optgroup\" role=\"listbox\"><div ng-show=\"$select.isGrouped\" class=\"ui-select-choices-group-label optgroup-header\" ng-bind=\"$group.name\"></div><div role=\"option\" class=\"ui-select-choices-row\" ng-class=\"{active: $select.isActive(this), disabled: $select.isDisabled(this)}\"><div class=\"option ui-select-choices-row-inner\" data-selectable=\"\"></div></div></div></div></div>");
 $templateCache.put("selectize/match.tpl.html","<div ng-hide=\"($select.open || $select.isEmpty())\" class=\"ui-select-match\" ng-transclude=\"\"></div>");
 $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container selectize-control single\" ng-class=\"{\'open\': $select.open}\"><div class=\"selectize-input\" ng-class=\"{\'focus\': $select.open, \'disabled\': $select.disabled, \'selectize-focus\' : $select.focus}\" ng-click=\"$select.open && !$select.searchEnabled ? $select.toggle($event) : $select.activate()\"><div class=\"ui-select-match\"></div><input type=\"text\" autocomplete=\"false\" tabindex=\"-1\" class=\"ui-select-search ui-select-toggle\" ng-click=\"$select.toggle($event)\" placeholder=\"{{$select.placeholder}}\" ng-model=\"$select.search\" ng-hide=\"!$select.searchEnabled || ($select.selected && !$select.open)\" ng-disabled=\"$select.disabled\" aria-label=\"{{ $select.baseTitle }}\"></div><div class=\"ui-select-choices\"></div></div>");}]);
-},{}],36:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 (function() {
   'use strict';
 
@@ -65252,7 +65937,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
   self.fetch.polyfill = true
 })();
 
-},{}],37:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -65323,7 +66008,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],38:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -65475,7 +66160,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],39:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -65515,7 +66200,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],40:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -65544,7 +66229,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],41:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -65605,7 +66290,7 @@ module.exports = function (app) {
   }]);
 };
 
-},{}],42:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -65649,7 +66334,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],43:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -65677,7 +66362,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],44:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -65703,7 +66388,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],45:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -65774,7 +66459,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],46:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -65838,7 +66523,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],47:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -65868,7 +66553,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],48:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -65899,7 +66584,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],49:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -66052,7 +66737,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],50:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -66086,7 +66771,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],51:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 "use strict";
 
 
@@ -66165,7 +66850,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],52:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 "use strict";
 var app = angular.module('formio');
 
@@ -66204,7 +66889,7 @@ require('./panel')(app);
 require('./table')(app);
 require('./well')(app);
 
-},{"./address":37,"./button":38,"./checkbox":39,"./columns":40,"./components":41,"./container":42,"./content":43,"./custom":44,"./datagrid":45,"./datetime":46,"./email":47,"./fieldset":48,"./file":49,"./hidden":50,"./htmlelement":51,"./number":53,"./page":54,"./panel":55,"./password":56,"./phonenumber":57,"./radio":58,"./resource":59,"./select":60,"./selectboxes":61,"./signature":62,"./table":63,"./textarea":64,"./textfield":65,"./well":66}],53:[function(require,module,exports){
+},{"./address":38,"./button":39,"./checkbox":40,"./columns":41,"./components":42,"./container":43,"./content":44,"./custom":45,"./datagrid":46,"./datetime":47,"./email":48,"./fieldset":49,"./file":50,"./hidden":51,"./htmlelement":52,"./number":54,"./page":55,"./panel":56,"./password":57,"./phonenumber":58,"./radio":59,"./resource":60,"./select":61,"./selectboxes":62,"./signature":63,"./table":64,"./textarea":65,"./textfield":66,"./well":67}],54:[function(require,module,exports){
 "use strict";
 
 
@@ -66252,7 +66937,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],54:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -66279,7 +66964,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],55:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -66310,7 +66995,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],56:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -66340,7 +67025,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],57:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 "use strict";
 module.exports = function (app) {
 
@@ -66374,7 +67059,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],58:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 "use strict";
 
 
@@ -66415,7 +67100,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],59:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -66513,7 +67198,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],60:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -66745,7 +67430,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],61:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 "use strict";
 
 
@@ -66832,7 +67517,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],62:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -66967,7 +67652,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],63:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -67008,7 +67693,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],64:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -67055,7 +67740,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],65:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 "use strict";
 
 
@@ -67114,7 +67799,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],66:[function(require,module,exports){
+},{}],67:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -67143,7 +67828,7 @@ module.exports = function (app) {
   ]);
 };
 
-},{}],67:[function(require,module,exports){
+},{}],68:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -67180,7 +67865,7 @@ module.exports = function() {
   };
 };
 
-},{}],68:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -67454,7 +68139,7 @@ module.exports = function() {
   };
 };
 
-},{}],69:[function(require,module,exports){
+},{}],70:[function(require,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -67614,7 +68299,7 @@ module.exports = [
   }
 ];
 
-},{}],70:[function(require,module,exports){
+},{}],71:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -67695,7 +68380,7 @@ module.exports = function() {
   };
 };
 
-},{}],71:[function(require,module,exports){
+},{}],72:[function(require,module,exports){
 "use strict";
 module.exports = [
   '$compile',
@@ -67726,7 +68411,7 @@ module.exports = [
   }
 ];
 
-},{}],72:[function(require,module,exports){
+},{}],73:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -67736,7 +68421,7 @@ module.exports = function() {
   };
 };
 
-},{}],73:[function(require,module,exports){
+},{}],74:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -67751,7 +68436,7 @@ module.exports = function() {
   };
 };
 
-},{}],74:[function(require,module,exports){
+},{}],75:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -67806,7 +68491,7 @@ module.exports = function() {
   };
 };
 
-},{}],75:[function(require,module,exports){
+},{}],76:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -68059,7 +68744,7 @@ module.exports = function() {
   };
 };
 
-},{}],76:[function(require,module,exports){
+},{}],77:[function(require,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -68225,7 +68910,7 @@ module.exports = [
   }
 ];
 
-},{}],77:[function(require,module,exports){
+},{}],78:[function(require,module,exports){
 "use strict";
 var formioUtils = require('formio-utils');
 
@@ -68280,7 +68965,7 @@ module.exports = function() {
   };
 };
 
-},{"formio-utils":26}],78:[function(require,module,exports){
+},{"formio-utils":27}],79:[function(require,module,exports){
 "use strict";
 module.exports = [
   '$q',
@@ -68329,7 +69014,7 @@ module.exports = [
   }
 ];
 
-},{}],79:[function(require,module,exports){
+},{}],80:[function(require,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -68360,7 +69045,7 @@ module.exports = [
   }
 ];
 
-},{}],80:[function(require,module,exports){
+},{}],81:[function(require,module,exports){
 "use strict";
 module.exports = [
   'FormioUtils',
@@ -68369,7 +69054,7 @@ module.exports = [
   }
 ];
 
-},{}],81:[function(require,module,exports){
+},{}],82:[function(require,module,exports){
 "use strict";
 module.exports = [
   '$sce',
@@ -68382,7 +69067,7 @@ module.exports = [
   }
 ];
 
-},{}],82:[function(require,module,exports){
+},{}],83:[function(require,module,exports){
 "use strict";
 module.exports = [
   'FormioUtils',
@@ -68402,7 +69087,7 @@ module.exports = [
   }
 ];
 
-},{}],83:[function(require,module,exports){
+},{}],84:[function(require,module,exports){
 "use strict";
 module.exports = [
   'formioTableView',
@@ -68415,7 +69100,7 @@ module.exports = [
   }
 ];
 
-},{}],84:[function(require,module,exports){
+},{}],85:[function(require,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -68430,7 +69115,7 @@ module.exports = [
   }
 ];
 
-},{}],85:[function(require,module,exports){
+},{}],86:[function(require,module,exports){
 (function (global){
 "use strict";
 global.jQuery = require('jquery');
@@ -68440,6 +69125,7 @@ require('ui-select/dist/select');
 require('angular-moment');
 require('angular-sanitize');
 require('signature_pad');
+require('angular-file-saver');
 require('ng-file-upload');
 require('bootstrap');
 require('angular-ui-bootstrap');
@@ -68447,7 +69133,7 @@ require('bootstrap-ui-datetime-picker/dist/datetime-picker');
 require('./formio');
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./formio":86,"angular":10,"angular-moment":2,"angular-sanitize":4,"angular-ui-bootstrap":6,"angular-ui-mask":8,"bootstrap":12,"bootstrap-ui-datetime-picker/dist/datetime-picker":11,"jquery":28,"ng-file-upload":31,"signature_pad":34,"ui-select/dist/select":35}],86:[function(require,module,exports){
+},{"./formio":87,"angular":11,"angular-file-saver":2,"angular-moment":3,"angular-sanitize":5,"angular-ui-bootstrap":7,"angular-ui-mask":9,"bootstrap":13,"bootstrap-ui-datetime-picker/dist/datetime-picker":12,"jquery":29,"ng-file-upload":32,"signature_pad":35,"ui-select/dist/select":36}],87:[function(require,module,exports){
 "use strict";
 
 
@@ -68563,7 +69249,7 @@ app.run([
 
 require('./components');
 
-},{"./components":52,"./directives/customValidator":67,"./directives/formio":68,"./directives/formioComponent":69,"./directives/formioDelete":70,"./directives/formioElement":71,"./directives/formioErrors":72,"./directives/formioSubmission":73,"./directives/formioSubmissions":74,"./directives/formioWizard":75,"./factories/FormioScope":76,"./factories/FormioUtils":77,"./factories/formioInterceptor":78,"./factories/formioTableView":79,"./filters/flattenComponents":80,"./filters/safehtml":81,"./filters/tableComponents":82,"./filters/tableFieldView":83,"./filters/tableView":84,"./plugins":87,"./providers/Formio":91,"./providers/FormioPlugins":92}],87:[function(require,module,exports){
+},{"./components":53,"./directives/customValidator":68,"./directives/formio":69,"./directives/formioComponent":70,"./directives/formioDelete":71,"./directives/formioElement":72,"./directives/formioErrors":73,"./directives/formioSubmission":74,"./directives/formioSubmissions":75,"./directives/formioWizard":76,"./factories/FormioScope":77,"./factories/FormioUtils":78,"./factories/formioInterceptor":79,"./factories/formioTableView":80,"./filters/flattenComponents":81,"./filters/safehtml":82,"./filters/tableComponents":83,"./filters/tableFieldView":84,"./filters/tableView":85,"./plugins":88,"./providers/Formio":92,"./providers/FormioPlugins":93}],88:[function(require,module,exports){
 "use strict";
 module.exports = function(app) {
   require('./storage/url')(app);
@@ -68571,7 +69257,7 @@ module.exports = function(app) {
   require('./storage/dropbox')(app);
 };
 
-},{"./storage/dropbox":88,"./storage/s3":89,"./storage/url":90}],88:[function(require,module,exports){
+},{"./storage/dropbox":89,"./storage/s3":90,"./storage/url":91}],89:[function(require,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -68705,7 +69391,7 @@ module.exports = function(app) {
 };
 
 
-},{}],89:[function(require,module,exports){
+},{}],90:[function(require,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -68802,7 +69488,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],90:[function(require,module,exports){
+},{}],91:[function(require,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -68854,7 +69540,7 @@ module.exports = function(app) {
   );
 };
 
-},{}],91:[function(require,module,exports){
+},{}],92:[function(require,module,exports){
 "use strict";
 module.exports = function() {
 
@@ -68919,7 +69605,7 @@ module.exports = function() {
   };
 };
 
-},{"formiojs/src/formio.js":27}],92:[function(require,module,exports){
+},{"formiojs/src/formio.js":28}],93:[function(require,module,exports){
 "use strict";
 
 module.exports = function() {
@@ -68951,4 +69637,4 @@ module.exports = function() {
   };
 };
 
-},{}]},{},[85]);
+},{}]},{},[86]);
