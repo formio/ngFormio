@@ -263,9 +263,26 @@ app.controller('FormController', [
     $scope.formId = $stateParams.formId;
     $scope.formUrl = '/project/' + $scope.projectId + '/form';
     $scope.formUrl += $stateParams.formId ? ('/' + $stateParams.formId) : '';
+    $scope.formDisplays = [
+      {
+        name: 'form',
+        title: 'Form'
+      },
+      {
+        name: 'wizard',
+        title: 'Wizard'
+      }
+    ];
     var formType = $stateParams.formType || 'form';
     $scope.capitalize = _.capitalize;
-    $scope.form = {title: '', type: formType, components: [], access: [], submissionAccess: []};
+    $scope.form = {
+      title: '',
+      display: 'form',
+      type: formType,
+      components: [],
+      access: [],
+      submissionAccess: []
+    };
 
     // Match name of form to title if not customized.
     $scope.titleChange = function(oldTitle) {
@@ -300,6 +317,11 @@ app.controller('FormController', [
     // Load the form.
     if($scope.formId) {
       $scope.loadFormPromise = $scope.formio.loadForm().then(function(form) {
+        // Ensure the display is form.
+        if (!form.display) {
+          form.display = 'form';
+        }
+
         // Build the list of selectable resources for the submission resource access ui.
         $scope.currentFormResources = _(FormioUtils.flattenComponents(form.components))
           .filter({type: 'resource'})
@@ -315,6 +337,10 @@ app.controller('FormController', [
         $scope.form = form;
         $scope.formTags = _.map(form.tags, function(tag) {
           return {text: tag};
+        });
+
+        $scope.$watch('form.display', function(display) {
+          $scope.$broadcast('formDisplay', display);
         });
 
         $rootScope.currentForm = $scope.form;
