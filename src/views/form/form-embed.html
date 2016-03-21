@@ -11,44 +11,43 @@
 <p>Try one of these two ways to embed this form within your HTML application.</p>
 <div class="row">
   <div class="col-sm-6">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h3 class="panel-title">Easy Embed - iFrame</h3>
+      </div>
+      <div class="panel-body">
+        <p>The iframe embed allows a self contained embed of this form into your application. Use this if you are embedding this within an existing CMS such as Wordpress or Drupal.</p>
+        <p><pre><textarea style="width:100%;" rows="8" onclick="this.focus();this.select()" readonly="readonly">&lt;script type="text/javascript"&gt;(function a(u) {if (typeof jQuery === u) { return setTimeout(a, 100); }document.write('&lt;script src="https://npmcdn.com/seamless@latest"&gt;&lt;\/script&gt;');(function b($) {if (typeof $.fn.seamless === u) { return setTimeout(b, 100); }$(function() {$('#formio-form').seamless().receive(function(d, e) {window.location.href = 'https://form.io';});});})(jQuery);})();&lt;/script&gt;&lt;iframe id="formio-form" style="width:100%;border:none;" height="600px" src="https://form.io/view/#/{{ currentProject.name }}/{{ form.path }}?iframe=1&header=0"&gt;&lt;/iframe&gt;</textarea></pre></p>
+        <small>With this method, you will not have CSS access to the rendered form.</small>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-sm-6">
     <div class="panel panel-info">
       <div class="panel-heading">
         <h3 class="panel-title">HTML Embed</h3>
       </div>
       <div class="panel-body">
-        <p>It is recommended to use this method if you do not already have Angular.js installed within your web application.</p>
-        <p>First, you need to add the Form rendering library to your application within a &lt;script&gt; tag</p>
-        <p><pre><code>&lt;script type="text/javascript" src="https://cdn.rawgit.com/formio/ngFormio/develop/dist/formio-full.min.js"&gt;&lt;/script&gt;</code></pre></p>
+        <p>For HTML embedding, you can either use <strong>Bower</strong> or add the script directly.</p>
+        <ul>
+          <li>For <strong>Bower</strong> embedding
+            <p><pre><code>bower install --save ng-formio</code></pre></p>
+            <p>We recommend using a tool called <a target="_blank" href="https://github.com/taptapship/wiredep">Wiredep</a> to automatically add all the dependencies to the &lt;script&gt; section.</p>
+          </li>
+          <li>For <strong>Script Tag</strong> embedding
+            <p>Add the following along with the other scripts on your HTML page.</p>
+            <p><pre><code>&lt;script type="text/javascript" src="https://npmcdn.com/ng-formio@latest/dist/formio-complete.min.js"&gt;&lt;/script&gt;</code></pre></p>
+            <p>You will need to also include both <strong>Angular.js (1.5)</strong> and <strong>jQuery</strong> as a dependency to your application to get this working.</p>
+          </li>
+        </ul>
         <p>Next, you will need to create an angular application and add <strong>formio</strong> as an included module. Add this below the include tag.</p>
-        <p><pre><code>&lt;body ng-app="formApp"&gt;
-        ...
-        &lt;script type="text/javascript"&gt;
-        angular.module('formApp', ['formio']);
-        &lt;/script&gt;
+        <p><pre><code>&lt;script type="text/javascript"&gt;
+&nbsp;&nbsp;angular.module('formioApp', ['formio']);
+&nbsp;&nbsp;angular.bootstrap(document, ['formioApp']);
+&lt;/script&gt;
         </code></pre></p>
-        <p>You can then add the <strong>&lt;formio&gt;</strong> tag anywhere within &lt;body&gt; tag and it will render this form!</p>
-      </div>
-    </div>
-  </div>
-  <div class="col-sm-6">
-    <div class="panel panel-info">
-      <div class="panel-heading">
-        <h3 class="panel-title">Bower</h3>
-      </div>
-      <div class="panel-body">
-        <p>To add this form to your Application, use <a target="_blank" href="http://bower.io/">Bower</a> to download the Form.IO library and its dependencies.</p>
-        <p><pre><code>bower install --save formio</code></pre></p>
-        <p>Next, ensure your webpage has all of the Project dependencies added to the &lt;script&gt; tag. For a simple example, refer to the following example.</p>
-        <p><a target="_blank" href="https://github.com/formio/formio-form/blob/master/index.html">Example Simple Form Embedding</a></p>
-        <p>We recommend using a tool called <a target="_blank" href="https://github.com/taptapship/wiredep">Wiredep</a> to automatically add all the dependencies to the &lt;script&gt; section.</p>
-        <p>Then you need to add formio as a dependency to your application's Angular module</p>
-        <p><pre><code>&lt;body ng-app="formApp"&gt;
-        ...
-        &lt;script type="text/javascript"&gt;
-        angular.module('formApp', ['formio']);
-        &lt;/script&gt;
-        </code></pre></p>
-        <p>You can then add the <strong>&lt;formio&gt;</strong> tag anywhere within &lt;body&gt; tag and it will render this form!</p>
+        <p>You can then add the <strong>&lt;formio&gt;</strong> tag anywhere within your HTML document, and it will render this form. Please go to <a href="https://help.form.io/api/#angular">https://help.form.io/api/#angular</a> for more information.</p>
       </div>
     </div>
   </div>
