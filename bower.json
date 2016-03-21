@@ -25,8 +25,8 @@
     "angular-swagger-ui": "^0.2.7",
     "number-abbreviate": "^1.1.0",
     "seamless": "^0.0.5",
-    "ng-formio": "^1.4.2",
-    "ng-formio-builder": "^1.9.0",
+    "ng-formio": "^1.5.0",
+    "ng-formio-builder": "^1.10.0",
     "ng-tags-input": "^3.0.0"
   },
   "resolutions": {
