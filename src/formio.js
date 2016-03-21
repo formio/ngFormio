@@ -45,6 +45,8 @@ app.directive('formioComponent', require('./directives/formioComponent'));
 
 app.directive('formioElement', require('./directives/formioElement'));
 
+app.directive('formioWizard', require('./directives/formioWizard'));
+
 /**
  * Filter to flatten form components.
  */
@@ -79,6 +81,10 @@ app.run([
     // The template for the formio forms.
     $templateCache.put('formio.html',
       fs.readFileSync(__dirname + '/templates/formio.html', 'utf8')
+    );
+
+    $templateCache.put('formio-wizard.html',
+      fs.readFileSync(__dirname + '/templates/formio-wizard.html', 'utf8')
     );
 
     $templateCache.put('formio-delete.html',
