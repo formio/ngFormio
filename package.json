@@ -1,6 +1,6 @@
 {
   "name": "ng-formio",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "The form redering engine behind Form.IO.",
   "main": "dist/formio.min.js",
   "scripts": {
@@ -34,6 +34,7 @@
   },
   "dependencies": {
     "angular": "^1.5.0",
+    "angular-file-saver": "^1.1.0",
     "angular-moment": "^1.0.0-beta.4",
     "angular-sanitize": "^1.5.0",
     "angular-ui-bootstrap": "^1.1.2",
