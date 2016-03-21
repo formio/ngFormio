@@ -137,7 +137,7 @@ module.exports = function() {
 
         // Called when the form is submitted.
         $scope.onSubmit = function(form) {
-          if (!$scope.formioForm.$valid || form.submitting) return;
+          if (!form.$valid || form.submitting) return;
           form.submitting = true;
 
           // Create a sanitized submission object.
