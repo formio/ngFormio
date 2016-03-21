@@ -17,7 +17,13 @@
       </div>
       <div class="panel-body">
         <p>The iframe embed allows a self contained embed of this form into your application. Use this if you are embedding this within an existing CMS such as Wordpress or Drupal.</p>
-        <p><pre><textarea style="width:100%;" rows="8" onclick="this.focus();this.select()" readonly="readonly">&lt;script type="text/javascript"&gt;(function a(u) {if (typeof jQuery === u) { return setTimeout(a, 100); }document.write('&lt;script src="https://npmcdn.com/seamless@latest"&gt;&lt;\/script&gt;');(function b($) {if (typeof $.fn.seamless === u) { return setTimeout(b, 100); }$(function() {$('#formio-form').seamless().receive(function(d, e) {window.location.href = 'https://form.io';});});})(jQuery);})();&lt;/script&gt;&lt;iframe id="formio-form" style="width:100%;border:none;" height="600px" src="https://form.io/view/#/{{ currentProject.name }}/{{ form.path }}?iframe=1&header=0"&gt;&lt;/iframe&gt;</textarea></pre></p>
+        <p>
+        <div class="form-group">
+          <label for="gotoUrl">Redirect after submit</label>
+          <input type="text" class="form-control" id="gotoUrl" ng-model="gotoUrl" ng-change="setEmbedCode(gotoUrl)" placeholder="https://example.com">
+        </div>
+        </p>
+        <p><pre><textarea style="width:100%;" rows="8" onclick="this.focus();this.select()" readonly="readonly" ng-model="embedCode"></textarea></pre></p>
         <small>With this method, you will not have CSS access to the rendered form.</small>
       </div>
     </div>

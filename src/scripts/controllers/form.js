@@ -294,6 +294,17 @@ app.controller('FormController', [
     // Load the form and submissions.
     $scope.formio = new Formio($scope.formUrl);
 
+    // The url to goto for embedding.
+    $scope.embedCode = '';
+    $scope.setEmbedCode = function(gotoUrl) {
+      var embedCode = '<script type="text/javascript">';
+      embedCode += '(function a(u) {if (typeof jQuery === u) { return setTimeout(a, 100); }document.write(\'<script src="https://npmcdn.com/seamless@latest"></script>\');(function b($) {if (typeof $.fn.seamless === u) { return setTimeout(b, 100); }$(function() {$(\'#formio-form\').seamless({fallback:false}).receive(function(d, e) {';
+      embedCode += gotoUrl ? 'window.location.href = "' + gotoUrl + '";' : '';
+      embedCode += '});});})(jQuery);})();</script>';
+      embedCode += '<iframe id="formio-form" style="width:100%;border:none;" height="600px" src="https://form.io/view/#/' + $scope.currentProject.name + '/' + $scope.form.path + '?iframe=1"></iframe>';
+      $scope.embedCode = embedCode;
+    };
+
     // Keep track of the form tags.
     $scope.formTags = [];
     $scope.addTag = function(tag) {
@@ -316,6 +327,14 @@ app.controller('FormController', [
 
     $scope.$watch('form.display', function(display) {
       $scope.$broadcast('formDisplay', display);
+    });
+
+    $scope.$watch('form', function() {
+      $scope.setEmbedCode();
+    });
+
+    $scope.$watch('currentProject', function() {
+      $scope.setEmbedCode();
     });
 
     // Load the form.
