@@ -56630,7 +56630,7 @@ module.exports = function (app) {
         title: 'Date / Time',
         template: 'formio/components/datetime.html',
         tableView: function(data, component, $interpolate) {
-          return $interpolate('<span>{{ "' + data + '" | date: "' + this.settings.format + '" }}</span>')();
+          return $interpolate('<span>{{ "' + data + '" | date: "' + component.format + '" }}</span>')();
         },
         group: 'advanced',
         settings: {
@@ -57427,6 +57427,63 @@ module.exports = function (app) {
         title: 'Select',
         template: function ($scope) {
           return $scope.component.multiple ? 'formio/components/select-multiple.html' : 'formio/components/select.html';
+        },
+        tableView: function(data, component, $interpolate) {
+          var getItem = function(data) {
+            switch (component.dataSrc) {
+              case 'values':
+                component.data.values.forEach(function(item) {
+                  if (item.value === data) {
+                    data = item;
+                  }
+                });
+                return data;
+              case 'json':
+                if (component.valueProperty) {
+                  var selectItems;
+                  try {
+                    selectItems = angular.fromJson(component.data.json);
+                  }
+                  catch (error) {
+                    selectItems = [];
+                  }
+                  selectItems.forEach(function(item) {
+                    if (item[component.valueProperty] === data) {
+                      data = item;
+                    }
+                  });
+                }
+                return data;
+              // TODO: implement url and resource view.
+              case 'url':
+              case 'resource':
+              default:
+                return data;
+            }
+          };
+          if (component.multiple && Array.isArray(data)) {
+            return data.map(getItem).reduce(function(prev, item) {
+              var value;
+              if (typeof item === 'object') {
+                value = $interpolate(component.template)({item: item});
+              }
+              else {
+                value = item;
+              }
+              return (prev === '' ? '' : ', ') + value;
+            });
+          }
+          else {
+            var item = getItem(data);
+            var value;
+            if (typeof item === 'object') {
+              value = $interpolate(component.template)({item: item});
+            }
+            else {
+              value = item;
+            }
+            return value;
+          }
         },
         controller: ['$scope', '$http', 'Formio', '$interpolate', function ($scope, $http, Formio, $interpolate) {
           var settings = $scope.component;
