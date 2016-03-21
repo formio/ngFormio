@@ -314,6 +314,10 @@ app.controller('FormController', [
       }
     };
 
+    $scope.$watch('form.display', function(display) {
+      $scope.$broadcast('formDisplay', display);
+    });
+
     // Load the form.
     if($scope.formId) {
       $scope.loadFormPromise = $scope.formio.loadForm().then(function(form) {
@@ -337,10 +341,6 @@ app.controller('FormController', [
         $scope.form = form;
         $scope.formTags = _.map(form.tags, function(tag) {
           return {text: tag};
-        });
-
-        $scope.$watch('form.display', function(display) {
-          $scope.$broadcast('formDisplay', display);
         });
 
         $rootScope.currentForm = $scope.form;
