@@ -5,6 +5,6 @@
     <div ng-repeat="alert in formioAlerts" class="alert alert-{{ alert.type }}" role="alert">
       {{ alert.message }}
     </div>
-    <formio-component ng-repeat="component in form.components track by $index" component="component" data="submission.data" form="formioForm" formio="formio" read-only="readOnly"></formio-component>
+    <formio-component ng-repeat="component in form.components track by $index" component="component" data="submission.data" form="formioForm" formio="formio" read-only="readOnly || component.disabled"></formio-component>
   </form>
 </div>

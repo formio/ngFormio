@@ -147,9 +147,6 @@ module.exports = [
           else if ($scope.data && !$scope.data.hasOwnProperty($scope.component.key) && $scope.component.multiple) {
             $scope.data[$scope.component.key] = [];
           }
-
-          // Allow disabled status to be set per component. This is useful in $on('formLoad')
-          $scope.readOnly = $scope.component.disabled || $scope.readOnly;
         }
       ]
     };

@@ -58094,6 +58094,8 @@ module.exports = function() {
       submission: '=?',
       readOnly: '=?',
       hideComponents: '=?',
+      requireComponents: '=?',
+      disableComponents: '=?',
       formioOptions: '=?'
     },
     controller: [
@@ -58126,10 +58128,6 @@ module.exports = function() {
 
         // Build the display map.
         $scope.show = {};
-        $scope.hide = {};
-        angular.forEach($scope.hideComponents, function(hide) {
-          $scope.hide[hide] = true;
-        });
         var boolean = {
           'true': true,
           'false': false
@@ -58140,7 +58138,7 @@ module.exports = function() {
           // Change the visibility for the component with the given key
           var updateVisiblity = function(key) {
             var newClass = $scope.show[key] ? 'ng-show' : 'ng-hide';
-            if ($scope.hide[key]) {
+            if ($scope.hideComponents && $scope.hideComponents.indexOf(key) !== -1) {
               newClass = 'ng-hide';
             }
             $element
@@ -58183,15 +58181,30 @@ module.exports = function() {
                   ? boolean[component.conditional.show]
                   : !boolean[component.conditional.show];
               }
+              // If there is no value, we still need to process as not equal.
+              else {
+                $scope.show[component.key] = !boolean[component.conditional.show];
+              }
 
               // Update the visibility, if its possible a change occurred.
               updateVisiblity(component.key);
             }
 
-            if ($scope.hide.hasOwnProperty(component.key) && $scope.hide[component.key]) {
+            // Set hidden if specified
+            if ($scope.hideComponents && $scope.hideComponents.indexOf(component.key) !== -1) {
               updateVisiblity(component.key);
             }
-          });
+
+            // Set required if specified
+            if ($scope.requireComponents && component.hasOwnProperty('validate')) {
+              component.validate.required = $scope.requireComponents.indexOf(component.key) !== -1;
+            }
+
+            // Set disabled if specified
+            if ($scope.disableComponents) {
+              component.disabled = $scope.disableComponents.indexOf(component.key) !== -1;
+            }
+          }, true);
         };
 
         // Update the components on the initial form render and all subsequent submission data changes.
@@ -58506,9 +58519,6 @@ module.exports = [
           else if ($scope.data && !$scope.data.hasOwnProperty($scope.component.key) && $scope.component.multiple) {
             $scope.data[$scope.component.key] = [];
           }
-
-          // Allow disabled status to be set per component. This is useful in $on('formLoad')
-          $scope.readOnly = $scope.component.disabled || $scope.readOnly;
         }
       ]
     };
@@ -59429,7 +59439,7 @@ app.run([
 
     // The template for the formio forms.
     $templateCache.put('formio.html',
-      "<div>\n  <i style=\"font-size: 2em;\" ng-if=\"formLoading\" class=\"glyphicon glyphicon-refresh glyphicon-spin\"></i>\n  <formio-wizard ng-if=\"form.display === 'wizard'\" src=\"src\" form=\"form\" submission=\"submission\" form-action=\"formAction\" read-only=\"readOnly\" hide-components=\"hideComponents\" formio-options=\"formioOptions\" storage=\"form.name\"></formio-wizard>\n  <form ng-if=\"!form.display || (form.display === 'form')\" role=\"form\" name=\"formioForm\" ng-submit=\"onSubmit(formioForm)\" novalidate>\n    <div ng-repeat=\"alert in formioAlerts\" class=\"alert alert-{{ alert.type }}\" role=\"alert\">\n      {{ alert.message }}\n    </div>\n    <formio-component ng-repeat=\"component in form.components track by $index\" component=\"component\" data=\"submission.data\" form=\"formioForm\" formio=\"formio\" read-only=\"readOnly\"></formio-component>\n  </form>\n</div>\n"
+      "<div>\n  <i style=\"font-size: 2em;\" ng-if=\"formLoading\" class=\"glyphicon glyphicon-refresh glyphicon-spin\"></i>\n  <formio-wizard ng-if=\"form.display === 'wizard'\" src=\"src\" form=\"form\" submission=\"submission\" form-action=\"formAction\" read-only=\"readOnly\" hide-components=\"hideComponents\" formio-options=\"formioOptions\" storage=\"form.name\"></formio-wizard>\n  <form ng-if=\"!form.display || (form.display === 'form')\" role=\"form\" name=\"formioForm\" ng-submit=\"onSubmit(formioForm)\" novalidate>\n    <div ng-repeat=\"alert in formioAlerts\" class=\"alert alert-{{ alert.type }}\" role=\"alert\">\n      {{ alert.message }}\n    </div>\n    <formio-component ng-repeat=\"component in form.components track by $index\" component=\"component\" data=\"submission.data\" form=\"formioForm\" formio=\"formio\" read-only=\"readOnly || component.disabled\"></formio-component>\n  </form>\n</div>\n"
     );
 
     $templateCache.put('formio-wizard.html',

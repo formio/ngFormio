@@ -9,6 +9,8 @@ module.exports = function() {
       submission: '=?',
       readOnly: '=?',
       hideComponents: '=?',
+      requireComponents: '=?',
+      disableComponents: '=?',
       formioOptions: '=?'
     },
     controller: [
@@ -41,10 +43,6 @@ module.exports = function() {
 
         // Build the display map.
         $scope.show = {};
-        $scope.hide = {};
-        angular.forEach($scope.hideComponents, function(hide) {
-          $scope.hide[hide] = true;
-        });
         var boolean = {
           'true': true,
           'false': false
@@ -55,7 +53,7 @@ module.exports = function() {
           // Change the visibility for the component with the given key
           var updateVisiblity = function(key) {
             var newClass = $scope.show[key] ? 'ng-show' : 'ng-hide';
-            if ($scope.hide[key]) {
+            if ($scope.hideComponents && $scope.hideComponents.indexOf(key) !== -1) {
               newClass = 'ng-hide';
             }
             $element
@@ -98,15 +96,30 @@ module.exports = function() {
                   ? boolean[component.conditional.show]
                   : !boolean[component.conditional.show];
               }
+              // If there is no value, we still need to process as not equal.
+              else {
+                $scope.show[component.key] = !boolean[component.conditional.show];
+              }
 
               // Update the visibility, if its possible a change occurred.
               updateVisiblity(component.key);
             }
 
-            if ($scope.hide.hasOwnProperty(component.key) && $scope.hide[component.key]) {
+            // Set hidden if specified
+            if ($scope.hideComponents && $scope.hideComponents.indexOf(component.key) !== -1) {
               updateVisiblity(component.key);
             }
-          });
+
+            // Set required if specified
+            if ($scope.requireComponents && component.hasOwnProperty('validate')) {
+              component.validate.required = $scope.requireComponents.indexOf(component.key) !== -1;
+            }
+
+            // Set disabled if specified
+            if ($scope.disableComponents) {
+              component.disabled = $scope.disableComponents.indexOf(component.key) !== -1;
+            }
+          }, true);
         };
 
         // Update the components on the initial form render and all subsequent submission data changes.
