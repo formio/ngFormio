@@ -723,17 +723,17 @@ app.factory('ActionInfoLoader', [
       load: function($scope, $stateParams) {
         // Get the action information.
         $scope.actionUrl = '';
-        $scope.actionInfo = $stateParams.actionInfo || {};
+        $scope.actionInfo = $stateParams.actionInfo || {settingsForm: {}};
         $scope.action = {data: {settings: {}, condition: {}}};
 
         // Get the action information.
         var getActionInfo = function(name) {
           return $scope.formio.actionInfo(name).then(function(actionInfo) {
-            actionInfo = _.cloneDeep(actionInfo);
-            if (actionInfo) {
-              $scope.actionInfo = _.merge($scope.actionInfo, actionInfo);
+            if (!actionInfo) {
               return $scope.actionInfo;
             }
+            $scope.actionInfo = _.cloneDeep(actionInfo);
+            return $scope.actionInfo;
           });
         };
 
