@@ -45,6 +45,9 @@ module.exports = function (app) {
       $templateCache.put('formio/components/textarea.html', FormioUtils.fieldWrap(
         fs.readFileSync(__dirname + '/../templates/components/textarea.html', 'utf8')
       ));
+      $templateCache.put('formio/components/texteditor.html', FormioUtils.fieldWrap(
+        fs.readFileSync(__dirname + '/../templates/components/texteditor.html', 'utf8')
+      ));
     }
   ]);
 };
