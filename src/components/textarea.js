@@ -6,7 +6,12 @@ module.exports = function (app) {
     function (formioComponentsProvider) {
       formioComponentsProvider.register('textarea', {
         title: 'Text Area',
-        template: 'formio/components/textarea.html',
+        template: function($scope) {
+          if ($scope.component.wysiwyg) {
+            return 'formio/components/texteditor.html';
+          }
+          return 'formio/components/textarea.html';
+        },
         settings: {
           input: true,
           tableView: true,
@@ -20,6 +25,7 @@ module.exports = function (app) {
           defaultValue: '',
           protected: false,
           persistent: true,
+          wysiwyg: false,
           validate: {
             required: false,
             minLength: '',
