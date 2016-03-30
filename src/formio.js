@@ -55,6 +55,7 @@ app.filter('tableComponents', require('./filters/tableComponents'));
 app.filter('tableView', require('./filters/tableView'));
 app.filter('tableFieldView', require('./filters/tableFieldView'));
 app.filter('safehtml', require('./filters/safehtml'));
+app.filter('i18n', require('./filters/i18n'));
 
 app.config([
   '$httpProvider',
