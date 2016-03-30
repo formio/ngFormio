@@ -1,4 +1,4 @@
-module.exports = function() {
+module.exports = function($compile) {
   return {
     restrict: 'E',
     replace: true,
@@ -11,7 +11,8 @@ module.exports = function() {
       hideComponents: '=?',
       requireComponents: '=?',
       disableComponents: '=?',
-      formioOptions: '=?'
+      formioOptions: '=?',
+      i18n: '=?'
     },
     controller: [
       '$scope',
@@ -20,16 +21,21 @@ module.exports = function() {
       'FormioScope',
       'Formio',
       'FormioUtils',
+      'AppConfig',
+      '$filter',
       function(
         $scope,
         $http,
         $element,
         FormioScope,
         Formio,
-        FormioUtils
+        FormioUtils,
+        AppConfig,
+        $filter
       ) {
         $scope._src = $scope.src || '';
         $scope.formioAlerts = [];
+        $scope.i18n = 'en';
         // Shows the given alerts (single or array), and dismisses old alerts
         this.showAlerts = $scope.showAlerts = function(alerts) {
           $scope.formioAlerts = [].concat(alerts);
@@ -103,6 +109,28 @@ module.exports = function() {
 
               // Update the visibility, if its possible a change occurred.
               updateVisiblity(component.key);
+            }
+
+            //Internationalization
+            /*
+            * An external dropdown is required in html page which will list all available languages and their key values.
+            * Ex: <select ng-model="languageSelect" class="languageSelect" ng-options="key as value for (key, value) in defaultLanguage"></select> 
+            * Enable i18n multilangual property for a form. <formio i18n="languageSelect" src="userLoginForm"></formio>
+            * To support above dropdown select an constant objact has to be defined in app.js. The object element contains the name and key of supported languages.
+            * ex: 
+            * .constant('LANGUAGES', {
+                'languages': {
+                  'en': 'English',
+                  'dn': 'dansk',
+                }
+              });
+            * Finally a filter is being used to execute the rest process and convert form component labels with selected language.
+            */
+            if($scope.i18n !== undefined){
+              $scope.$watch('i18n', function(languageOption) {
+                $scope.currentLanguage = languageOption;
+                $filter('i18n')(component , languageOption) ;
+              });
             }
 
             // Set hidden if specified
