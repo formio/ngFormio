@@ -4,13 +4,13 @@
 <div ng-class="{'form-content': !formId}" class="form-edit">
   <form role="form" novalidate>
     <div class="row">
-      <div class="col-md-2">
+      <div class="col-lg-2 col-md-4 col-sm-4">
         <div id="form-group-title" class="form-group">
           <label for="title" class="control-label">Title</label>
           <input type="text" ng-model="form.title" ng-change="titleChange('{{form.title}}')" class="form-control" id="title" placeholder="Enter the form title" autofocus="!formId"/>
         </div>
       </div>
-      <div class="col-md-2">
+      <div class="col-lg-2 col-md-4 col-sm-4">
         <div id="form-group-name" class="form-group" ng-class="{'has-warning': originalForm.name && form.name !== originalForm.name && form.type === 'resource'}">
           <label for="name" class="control-label">Name</label>
           <input type="text" ng-model="form.name" class="form-control" id="name" placeholder="Enter the form machine name"/>
@@ -19,13 +19,13 @@
           </p>
         </div>
       </div>
-      <div class="col-md-2">
+      <div class="col-lg-2 col-md-4 col-sm-4">
         <div id="form-group-display" class="form-group">
           <label for="name" class="control-label">Display as</label>
           <select class="form-control" name="form-display" id="form-display" ng-options="display.name as display.title for display in formDisplays" ng-model="form.display"></select>
         </div>
       </div>
-      <div class="col-md-3">
+      <div class="col-lg-3 col-md-4 col-sm-4">
         <div id="form-group-path" class="form-group">
           <label for="path" class="control-label">API Path</label>
           <div class="input-group">
@@ -34,11 +34,11 @@
           </div>
         </div>
       </div>
-      <div class="col-md-3 save-buttons">
+      <div class="col-lg-3 col-md-4 col-sm-4 save-buttons pull-right">
         <div class="form-group pull-right">
           <a class="btn btn-default" ng-click="formId ? cancel() : $state.go('project.' + form.type + '.index')">Cancel</a>
           <input type="submit" class="btn btn-primary" ng-click="saveForm()" value="{{formId ? 'Save' : 'Create'}} {{ capitalize(form.type)  }}" />
-          </div>
+        </div>
       </div>
     </div>
     <input type="hidden" ng-model="form.type"/>
