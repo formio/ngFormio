@@ -15,17 +15,17 @@
     "form"
   ],
   "dependencies": {
-    "angular": "^1.5.0",
-    "ng-file-upload": "^12.0.1",
-    "angular-sanitize": "~1.5.0",
-    "angular-bootstrap": "^1.2.4",
-    "angular-moment": "1.0.0-beta.4",
+    "angular": "^1.5.3",
+    "ng-file-upload": "^12.0.4",
+    "angular-sanitize": "^1.5.3",
+    "angular-bootstrap": "^1.2.5",
+    "angular-moment": "1.0.0-beta.5",
     "bootstrap": "^3.3.6",
-    "bootstrap-ui-datetime-picker": "^2.2.2",
+    "bootstrap-ui-datetime-picker": "^2.2.3",
     "signature_pad": "^1.5.3",
-    "angular-ui-mask": "^1.8.1",
-    "ui-select": "angular-ui-select#^0.14.9",
-    "angular-file-saver": "^1.1.0"
+    "angular-ui-mask": "^1.8.3",
+    "angular-file-saver": "^1.1.0",
+    "ui-select": "angular-ui-select#^0.16.1"
   },
   "license": "MIT",
   "ignore": [
