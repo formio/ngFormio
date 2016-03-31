@@ -57919,7 +57919,12 @@ module.exports = function (app) {
     function (formioComponentsProvider) {
       formioComponentsProvider.register('textarea', {
         title: 'Text Area',
-        template: 'formio/components/textarea.html',
+        template: function($scope) {
+          if ($scope.component.wysiwyg) {
+            return 'formio/components/texteditor.html';
+          }
+          return 'formio/components/textarea.html';
+        },
         settings: {
           input: true,
           tableView: true,
@@ -57933,6 +57938,7 @@ module.exports = function (app) {
           defaultValue: '',
           protected: false,
           persistent: true,
+          wysiwyg: false,
           validate: {
             required: false,
             minLength: '',
@@ -57951,6 +57957,9 @@ module.exports = function (app) {
               FormioUtils) {
       $templateCache.put('formio/components/textarea.html', FormioUtils.fieldWrap(
         "<textarea\nclass=\"form-control\"\nng-model=\"data[component.key]\"\nng-disabled=\"readOnly\"\nng-required=\"component.validate.required\"\nsafe-multiple-to-single\nid=\"{{ component.key }}\"\ntabindex=\"{{ component.tabindex || 0 }}\"\nplaceholder=\"{{ component.placeholder }}\"\ncustom-validator=\"component.validate.custom\"\nrows=\"{{ component.rows }}\"></textarea>\n"
+      ));
+      $templateCache.put('formio/components/texteditor.html', FormioUtils.fieldWrap(
+        "<textarea\n  class=\"form-control\"\n  ng-model=\"data[component.key]\"\n  ng-disabled=\"readOnly\"\n  ng-required=\"component.validate.required\"\n  ckeditor=\"component.wysiwyg\"\n  safe-multiple-to-single\n  id=\"{{ component.key }}\"\n  tabindex=\"{{ component.tabindex || 0 }}\"\n  placeholder=\"{{ component.placeholder }}\"\n  custom-validator=\"component.validate.custom\"\n  rows=\"{{ component.rows }}\"></textarea>\n"
       ));
     }
   ]);
