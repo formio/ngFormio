@@ -54,11 +54,6 @@ module.exports = function (app) {
                 params: params
               }).then(function (submissions) {
                 $scope.selectItems = submissions || [];
-
-                // Ensure the item is selected.
-                if ($scope.data.hasOwnProperty($scope.component.key)) {
-                  $scope.$broadcast('uis:select', $scope.data[$scope.component.key]);
-                }
                 refreshing = false;
               });
             };
