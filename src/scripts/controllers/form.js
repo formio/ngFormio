@@ -817,11 +817,6 @@ app.controller('FormActionEditController', [
         }
       }
 
-      // Role action alert for new resource missing role assignment.
-      if(actionInfo && actionInfo.name === 'role') {
-        FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> The Role Assignment Action requires a Resource Form component with the API key, \'submission\', to modify existing Resource submissions.');
-      }
-
       // Oauth action alert for new resource missing role assignment.
       if (actionInfo && actionInfo.name === 'oauth') {
         var providers = FormioUtils.getComponent(actionInfo.settingsForm.components, 'settings[provider]');
