@@ -13,7 +13,7 @@ module.exports = function() {
       formioOptions: '=?',
       storage: '=?'
     },
-    link: function (scope, element) {
+    link: function(scope, element) {
       scope.wizardLoaded = false;
       scope.wizardElement = angular.element('.formio-wizard', element);
     },
@@ -25,7 +25,7 @@ module.exports = function() {
       'FormioScope',
       'FormioUtils',
       '$http',
-      function (
+      function(
         $scope,
         $compile,
         $element,
@@ -51,11 +51,11 @@ module.exports = function() {
 
         $scope.formioAlerts = [];
         // Shows the given alerts (single or array), and dismisses old alerts
-        this.showAlerts = $scope.showAlerts = function (alerts) {
+        this.showAlerts = $scope.showAlerts = function(alerts) {
           $scope.formioAlerts = [].concat(alerts);
         };
 
-        $scope.clear = function () {
+        $scope.clear = function() {
           if ($scope.storage) {
             localStorage.setItem($scope.storage, '');
           }
@@ -64,8 +64,7 @@ module.exports = function() {
         };
 
         // Show the current page.
-        var showPage = function () {
-
+        var showPage = function() {
           // If the page is past the components length, try to clear first.
           if ($scope.currentPage >= $scope.form.components.length) {
             $scope.clear();
@@ -95,10 +94,10 @@ module.exports = function() {
         };
 
         // Check for errors.
-        $scope.checkErrors = function () {
+        $scope.checkErrors = function() {
           if (!$scope.isValid()) {
             // Change all of the fields to not be pristine.
-            angular.forEach($element.find('[name="formioFieldForm"]').children(), function (element) {
+            angular.forEach($element.find('[name="formioFieldForm"]').children(), function(element) {
               var elementScope = angular.element(element).scope();
               var fieldForm = elementScope.formioFieldForm;
               if (fieldForm[elementScope.component.key]) {
@@ -115,7 +114,7 @@ module.exports = function() {
         };
 
         // Submit the submission.
-        $scope.submit = function () {
+        $scope.submit = function() {
           if ($scope.checkErrors()) {
             return;
           }
@@ -141,7 +140,7 @@ module.exports = function() {
           // Save to specified action.
           if ($scope.action) {
             var method = sub._id ? 'put' : 'post';
-            $http[method]($scope.action, sub).success(function (submission) {
+            $http[method]($scope.action, sub).success(function(submission) {
               Formio.clearCache();
               onDone(submission);
             }).error(FormioScope.onError($scope, $element));
@@ -154,13 +153,13 @@ module.exports = function() {
           }
         };
 
-        $scope.cancel = function () {
+        $scope.cancel = function() {
           $scope.clear();
           showPage();
         };
 
         // Move onto the next page.
-        $scope.next = function () {
+        $scope.next = function() {
           if ($scope.checkErrors()) {
             return;
           }
@@ -173,7 +172,7 @@ module.exports = function() {
         };
 
         // Move onto the previous page.
-        $scope.prev = function () {
+        $scope.prev = function() {
           if ($scope.currentPage < 1) {
             return;
           }
@@ -182,7 +181,7 @@ module.exports = function() {
           $scope.$emit('wizardPrev', $scope.currentPage);
         };
 
-        $scope.goto = function (page) {
+        $scope.goto = function(page) {
           if (page < 0) {
             return;
           }
@@ -193,7 +192,7 @@ module.exports = function() {
           showPage();
         };
 
-        $scope.isValid = function () {
+        $scope.isValid = function() {
           var element = $element.find('#formio-wizard-form');
           if (!element.length) {
             return false;
@@ -202,14 +201,13 @@ module.exports = function() {
           return formioForm.$valid;
         };
 
-        $scope.$on('wizardGoToPage', function (event, page) {
+        $scope.$on('wizardGoToPage', function(event, page) {
           $scope.goto(page);
         });
 
         var setForm = function(form) {
           $scope.pages = [];
           angular.forEach(form.components, function(component) {
-
             // Only include panels for the pages.
             if (component.type === 'panel') {
               $scope.pages.push(component);
@@ -236,7 +234,7 @@ module.exports = function() {
         // Load the form.
         if ($scope.src) {
           $scope.formio = new Formio($scope.src);
-          $scope.formio.loadForm().then(function (form) {
+          $scope.formio.loadForm().then(function(form) {
             setForm(form);
           });
         }

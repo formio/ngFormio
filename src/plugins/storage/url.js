@@ -2,7 +2,7 @@ module.exports = function(app) {
   app.config([
     'FormioPluginsProvider',
     'FormioStorageUrlProvider',
-    function (
+    function(
       FormioPluginsProvider,
       FormioStorageUrlProvider
     ) {
@@ -13,7 +13,7 @@ module.exports = function(app) {
   app.factory('FormioStorageUrl', [
     '$q',
     'Upload',
-    function (
+    function(
       $q,
       Upload
     ) {
@@ -32,7 +32,7 @@ module.exports = function(app) {
               defer.resolve(resp);
             }, function(resp) {
               defer.reject(resp.data);
-            }, function (evt) {
+            }, function(evt) {
               // Progress notify
               status.status = 'progress';
               status.progress = parseInt(100.0 * evt.loaded / evt.total);

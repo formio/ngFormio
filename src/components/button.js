@@ -1,9 +1,8 @@
 var fs = require('fs');
-module.exports = function (app) {
-
+module.exports = function(app) {
   app.config([
     'formioComponentsProvider',
-    function (formioComponentsProvider) {
+    function(formioComponentsProvider) {
       formioComponentsProvider.register('button', {
         title: 'Button',
         template: 'formio/components/button.html',
@@ -20,7 +19,7 @@ module.exports = function (app) {
           disableOnInvalid: true,
           theme: 'primary'
         },
-        controller: ['$scope', function ($scope) {
+        controller: ['$scope', function($scope) {
           var settings = $scope.component;
           $scope.onClick = function() {
             switch (settings.action) {
@@ -133,14 +132,13 @@ module.exports = function (app) {
               }
             }, 100);
           };
-
         }]
       });
     }
   ]);
   app.run([
     '$templateCache',
-    function ($templateCache) {
+    function($templateCache) {
       $templateCache.put('formio/components/button.html',
         fs.readFileSync(__dirname + '/../templates/components/button.html', 'utf8')
       );

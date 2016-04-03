@@ -2,7 +2,7 @@ module.exports = function(app) {
   app.config([
     'FormioPluginsProvider',
     'FormioStorageS3Provider',
-    function (
+    function(
       FormioPluginsProvider,
       FormioStorageS3Provider
     ) {
@@ -82,7 +82,7 @@ module.exports = function(app) {
           evt.preventDefault();
           this.getFile($scope.form, file).then(function(file) {
             $window.open(file.url, '_blank');
-          }).catch(function (response) {
+          }).catch(function(response) {
             // Is alert the best way to do this?
             // User is expecting an immediate notification due to attempting to download a file.
             alert(response);

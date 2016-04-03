@@ -1,5 +1,4 @@
 module.exports = function() {
-
   // The formio class.
   var Formio = require('formiojs/src/formio.js');
 
@@ -22,7 +21,6 @@ module.exports = function() {
         $rootScope,
         $q
       ) {
-
         var wrapQPromise = function(promise) {
           return $q.when(promise)
           .catch(function(error) {

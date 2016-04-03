@@ -1,19 +1,18 @@
 var fs = require('fs');
-module.exports = function (app) {
-
+module.exports = function(app) {
   /*jshint camelcase: false */
   app.config([
     'formioComponentsProvider',
-    function (formioComponentsProvider) {
+    function(formioComponentsProvider) {
       formioComponentsProvider.register('address', {
         title: 'Address',
-        template: function ($scope) {
+        template: function($scope) {
           return $scope.component.multiple ? 'formio/components/address-multiple.html' : 'formio/components/address.html';
         },
-        controller: ['$scope', '$http', function ($scope, $http) {
+        controller: ['$scope', '$http', function($scope, $http) {
           $scope.address = {};
           $scope.addresses = [];
-          $scope.refreshAddress = function (address) {
+          $scope.refreshAddress = function(address) {
             var params = {address: address, sensor: false};
             return $http.get(
               'https://maps.googleapis.com/maps/api/geocode/json',
@@ -26,12 +25,12 @@ module.exports = function (app) {
                   'Cache-Control': undefined
                 }
               }
-            ).then(function (response) {
+            ).then(function(response) {
                 $scope.addresses = response.data.results;
               });
           };
         }],
-        tableView: function (data) {
+        tableView: function(data) {
           return data ? data.formatted_address : '';
         },
         group: 'advanced',
@@ -54,7 +53,7 @@ module.exports = function (app) {
   ]);
   app.run([
     '$templateCache',
-    function ($templateCache) {
+    function($templateCache) {
       $templateCache.put('formio/components/address.html',
         fs.readFileSync(__dirname + '/../templates/components/address.html', 'utf8')
       );

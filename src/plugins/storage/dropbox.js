@@ -2,7 +2,7 @@ module.exports = function(app) {
   app.config([
     'FormioPluginsProvider',
     'FormioStorageDropboxProvider',
-    function (
+    function(
       FormioPluginsProvider,
       FormioStorageDropboxProvider
     ) {

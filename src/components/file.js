@@ -1,9 +1,8 @@
 var fs = require('fs');
-module.exports = function (app) {
-
+module.exports = function(app) {
   app.config([
     'formioComponentsProvider',
-    function (formioComponentsProvider) {
+    function(formioComponentsProvider) {
       formioComponentsProvider.register('file', {
         title: 'File',
         template: 'formio/components/file.html',
@@ -34,13 +33,13 @@ module.exports = function (app) {
       templateUrl: 'formio/components/formio-file-list.html',
       controller: [
         '$scope',
-        function ($scope) {
-          $scope.removeFile = function (event, index) {
+        function($scope) {
+          $scope.removeFile = function(event, index) {
             event.preventDefault();
             $scope.files.splice(index, 1);
           };
 
-          $scope.fileSize = function (a, b, c, d, e) {
+          $scope.fileSize = function(a, b, c, d, e) {
             return (b = Math, c = b.log, d = 1024, e = c(a) / c(d) | 0, a / b.pow(d, e)).toFixed(2) + ' ' + (e ? 'kMGTPEZY'[--e] + 'B' : 'Bytes');
           };
         }
@@ -60,11 +59,11 @@ module.exports = function (app) {
       controller: [
         '$scope',
         'FormioPlugins',
-        function (
+        function(
           $scope,
           FormioPlugins
         ) {
-          $scope.getFile = function (evt) {
+          $scope.getFile = function(evt) {
             var plugin = FormioPlugins('storage', $scope.file.storage);
             if (plugin) {
               plugin.downloadFile(evt, $scope.file, $scope);
@@ -134,10 +133,9 @@ module.exports = function (app) {
   ]);
   app.run([
     '$templateCache',
-    function (
+    function(
       $templateCache
     ) {
-
       $templateCache.put('formio/components/formio-file-list.html',
         fs.readFileSync(__dirname + '/../templates/components/formio-file-list.html', 'utf8')
       );

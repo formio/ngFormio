@@ -1,22 +1,21 @@
 var fs = require('fs');
-module.exports = function (app) {
-
+module.exports = function(app) {
   app.config([
     'formioComponentsProvider',
-    function (formioComponentsProvider) {
+    function(formioComponentsProvider) {
       formioComponentsProvider.register('resource', {
         title: 'Resource',
-        tableView: function (data, component, $interpolate) {
+        tableView: function(data, component, $interpolate) {
           if ($interpolate) {
             return $interpolate(component.template)({item: data});
           }
 
           return data ? data._id : '';
         },
-        template: function ($scope) {
+        template: function($scope) {
           return $scope.component.multiple ? 'formio/components/resource-multiple.html' : 'formio/components/resource.html';
         },
-        controller: ['$scope', 'Formio', function ($scope, Formio) {
+        controller: ['$scope', 'Formio', function($scope, Formio) {
           var settings = $scope.component;
           $scope.selectItems = [];
           if (settings.multiple) {
@@ -33,7 +32,7 @@ module.exports = function (app) {
             url += '/form/' + settings.resource;
             var formio = new Formio(url);
             var refreshing = false;
-            $scope.refreshSubmissions = function (input) {
+            $scope.refreshSubmissions = function(input) {
               if (refreshing) {
                 return;
               }
@@ -44,7 +43,7 @@ module.exports = function (app) {
                 params.select = settings.selectFields;
               }
               if (settings.searchFields && input) {
-                angular.forEach(settings.searchFields, function (field) {
+                angular.forEach(settings.searchFields, function(field) {
                   params[field] = input;
                 });
               }
@@ -52,7 +51,7 @@ module.exports = function (app) {
               // Load the submissions.
               formio.loadSubmissions({
                 params: params
-              }).then(function (submissions) {
+              }).then(function(submissions) {
                 $scope.selectItems = submissions || [];
                 refreshing = false;
               });
@@ -88,7 +87,7 @@ module.exports = function (app) {
 
   app.run([
     '$templateCache',
-    function ($templateCache) {
+    function($templateCache) {
       $templateCache.put('formio/components/resource.html',
         fs.readFileSync(__dirname + '/../templates/components/resource.html', 'utf8')
       );
