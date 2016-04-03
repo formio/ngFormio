@@ -32,7 +32,12 @@ module.exports = function (app) {
             }
             url += '/form/' + settings.resource;
             var formio = new Formio(url);
+            var refreshing = false;
             $scope.refreshSubmissions = function (input) {
+              if (refreshing) {
+                return;
+              }
+              refreshing = true;
               var params = settings.params || {};
               // If they wish to return only some fields.
               if (settings.selectFields) {
@@ -43,11 +48,13 @@ module.exports = function (app) {
                   params[field] = input;
                 });
               }
+
               // Load the submissions.
               formio.loadSubmissions({
                 params: params
               }).then(function (submissions) {
                 $scope.selectItems = submissions || [];
+                refreshing = false;
               });
             };
 

@@ -7,7 +7,8 @@ module.exports = function() {
       submission: '=?',
       src: '=?',
       formAction: '=?',
-      resourceName: '=?'
+      resourceName: '=?',
+      message: '=?'
     },
     templateUrl: 'formio-delete.html',
     controller: [
@@ -43,7 +44,8 @@ module.exports = function() {
         }
 
         // Set the resource name
-        $scope._resourceName = resourceName;
+        $scope._resourceName = $scope.resourceName || resourceName;
+        $scope.deleteMessage = $scope.message || 'Are you sure you wish to delete the ' + $scope._resourceName + '?';
 
         // Create delete capability.
         $scope.onDelete = function() {

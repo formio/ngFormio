@@ -250,6 +250,9 @@ module.exports = function() {
             return;
           }
 
+          // Make sure to make a copy of the submission data to remove bad characters.
+          submissionData = angular.copy(submissionData);
+
           // Allow custom action urls.
           if ($scope.action) {
             var method = submissionData._id ? 'put' : 'post';
@@ -265,7 +268,7 @@ module.exports = function() {
           // If they wish to submit to the default location.
           else if ($scope.formio) {
             // copy to remove angular $$hashKey
-            $scope.formio.saveSubmission(angular.copy(submissionData), $scope.formioOptions)
+            $scope.formio.saveSubmission(submissionData, $scope.formioOptions)
               .then(function(submission) {
               onSubmitDone(submission.method, submission);
             }, FormioScope.onError($scope, $element))

@@ -1,4 +1,82 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+module.exports = {
+  isLayoutComponent: function isLayoutComponent(component) {
+    return (
+      (component.columns && Array.isArray(component.columns)) ||
+      (component.rows && Array.isArray(component.rows)) ||
+      (component.components && Array.isArray(component.components))
+    ) ? true : false;
+  },
+
+  /**
+   * Iterate through each component within a form.
+   * @param components
+   * @param fn
+   */
+  eachComponent: function eachComponent(components, fn, includeAll) {
+    if (!components) return;
+
+    components.forEach(function(component) {
+      var hasColumns = component.columns && Array.isArray(component.columns);
+      var hasRows = component.rows && Array.isArray(component.rows);
+      var hasComps = component.components && Array.isArray(component.components);
+      var noRecurse = false;
+      if (includeAll || component.tree || (!hasColumns && !hasRows && !hasComps)) {
+        noRecurse = fn(component);
+      }
+
+      if (!noRecurse) {
+        if (hasColumns) {
+          component.columns.forEach(function(column) {
+            eachComponent(column.components, fn, includeAll);
+          });
+        }
+
+        else if (hasRows) {
+          [].concat.apply([], component.rows).forEach(function(row) {
+            eachComponent(row.components, fn, includeAll);
+          });
+        }
+
+        else if (hasComps) {
+          eachComponent(component.components, fn, includeAll);
+        }
+      }
+    });
+  },
+
+  /**
+   * Get a component by its key
+   * @param components
+   * @param key The key of the component to get
+   * @returns The component that matches the given key, or undefined if not found.
+   */
+  getComponent: function getComponent(components, key) {
+    var result;
+    module.exports.eachComponent(components, function(component) {
+      if (component.key === key) {
+        result = component;
+      }
+    });
+    return result;
+  },
+
+  /**
+   * Flatten the form components for data manipulation.
+   * @param components
+   * @param flattened
+   * @returns {*|{}}
+   */
+  flattenComponents: function flattenComponents(components) {
+    var flattened = {};
+    module.exports.eachComponent(components, function(component) {
+      flattened[component.key] = component;
+    });
+    return flattened;
+  }
+};
+
+},{}],2:[function(require,module,exports){
 (function (process){
 // vim:ts=4:sts=4:sw=4:
 /*!
@@ -2050,7 +2128,7 @@ return Q;
 });
 
 }).call(this,require('_process'))
-},{"_process":5}],2:[function(require,module,exports){
+},{"_process":7}],3:[function(require,module,exports){
 /*!
  * EventEmitter2
  * https://github.com/hij1nx/EventEmitter2
@@ -2625,75 +2703,376 @@ return Q;
   }
 }();
 
-},{}],3:[function(require,module,exports){
-module.exports = {
-  /**
-   * Iterate through each component within a form.
-   * @param components
-   * @param fn
-   */
-  eachComponent: function eachComponent(components, fn) {
-    if (!components) return;
-
-    components.forEach(function(component) {
-      if (component.columns && Array.isArray(component.columns)) {
-        component.columns.forEach(function(column) {
-          eachComponent(column.components, fn);
-        });
-      }
-
-      else if (component.rows && Array.isArray(component.rows)) {
-        [].concat.apply([], component.rows).forEach(function(row) {
-          eachComponent(row.components, fn);
-        });
-      }
-
-      else if (component.components && Array.isArray(component.components)) {
-        eachComponent(component.components, fn);
-      }
-
-      else {
-        fn(component);
-      }
-      // If the component is a tree, be sure to add it back in as well.
-      if (component.tree) {
-        fn(component);
-      }
-    });
-  },
-
-  /**
-   * Get a component by its key
-   * @param components
-   * @param key The key of the component to get
-   * @returns The component that matches the given key, or undefined if not found.
-   */
-  getComponent: function getComponent(components, key) {
-    var result;
-    module.exports.eachComponent(components, function(component) {
-      if (component.key === key) {
-        result = component;
-      }
-    });
-    return result;
-  },
-
-  /**
-   * Flatten the form components for data manipulation.
-   * @param components
-   * @param flattened
-   * @returns {*|{}}
-   */
-  flattenComponents: function flattenComponents(components) {
-    var flattened = {};
-    module.exports.eachComponent(components, function(component) {
-      flattened[component.key] = component;
-    });
-    return flattened;
-  }
+},{}],4:[function(require,module,exports){
+module.exports = function (obj) {
+    if (!obj || typeof obj !== 'object') return obj;
+    
+    var copy;
+    
+    if (isArray(obj)) {
+        var len = obj.length;
+        copy = Array(len);
+        for (var i = 0; i < len; i++) {
+            copy[i] = obj[i];
+        }
+    }
+    else {
+        var keys = objectKeys(obj);
+        copy = {};
+        
+        for (var i = 0, l = keys.length; i < l; i++) {
+            var key = keys[i];
+            copy[key] = obj[key];
+        }
+    }
+    return copy;
 };
 
-},{}],4:[function(require,module,exports){
+var objectKeys = Object.keys || function (obj) {
+    var keys = [];
+    for (var key in obj) {
+        if ({}.hasOwnProperty.call(obj, key)) keys.push(key);
+    }
+    return keys;
+};
+
+var isArray = Array.isArray || function (xs) {
+    return {}.toString.call(xs) === '[object Array]';
+};
+
+},{}],5:[function(require,module,exports){
+(function() {
+  'use strict';
+
+  if (self.fetch) {
+    return
+  }
+
+  function normalizeName(name) {
+    if (typeof name !== 'string') {
+      name = name.toString();
+    }
+    if (/[^a-z0-9\-#$%&'*+.\^_`|~]/i.test(name)) {
+      throw new TypeError('Invalid character in header field name')
+    }
+    return name.toLowerCase()
+  }
+
+  function normalizeValue(value) {
+    if (typeof value !== 'string') {
+      value = value.toString();
+    }
+    return value
+  }
+
+  function Headers(headers) {
+    this.map = {}
+
+    if (headers instanceof Headers) {
+      headers.forEach(function(value, name) {
+        this.append(name, value)
+      }, this)
+
+    } else if (headers) {
+      Object.getOwnPropertyNames(headers).forEach(function(name) {
+        this.append(name, headers[name])
+      }, this)
+    }
+  }
+
+  Headers.prototype.append = function(name, value) {
+    name = normalizeName(name)
+    value = normalizeValue(value)
+    var list = this.map[name]
+    if (!list) {
+      list = []
+      this.map[name] = list
+    }
+    list.push(value)
+  }
+
+  Headers.prototype['delete'] = function(name) {
+    delete this.map[normalizeName(name)]
+  }
+
+  Headers.prototype.get = function(name) {
+    var values = this.map[normalizeName(name)]
+    return values ? values[0] : null
+  }
+
+  Headers.prototype.getAll = function(name) {
+    return this.map[normalizeName(name)] || []
+  }
+
+  Headers.prototype.has = function(name) {
+    return this.map.hasOwnProperty(normalizeName(name))
+  }
+
+  Headers.prototype.set = function(name, value) {
+    this.map[normalizeName(name)] = [normalizeValue(value)]
+  }
+
+  Headers.prototype.forEach = function(callback, thisArg) {
+    Object.getOwnPropertyNames(this.map).forEach(function(name) {
+      this.map[name].forEach(function(value) {
+        callback.call(thisArg, value, name, this)
+      }, this)
+    }, this)
+  }
+
+  function consumed(body) {
+    if (body.bodyUsed) {
+      return Promise.reject(new TypeError('Already read'))
+    }
+    body.bodyUsed = true
+  }
+
+  function fileReaderReady(reader) {
+    return new Promise(function(resolve, reject) {
+      reader.onload = function() {
+        resolve(reader.result)
+      }
+      reader.onerror = function() {
+        reject(reader.error)
+      }
+    })
+  }
+
+  function readBlobAsArrayBuffer(blob) {
+    var reader = new FileReader()
+    reader.readAsArrayBuffer(blob)
+    return fileReaderReady(reader)
+  }
+
+  function readBlobAsText(blob) {
+    var reader = new FileReader()
+    reader.readAsText(blob)
+    return fileReaderReady(reader)
+  }
+
+  var support = {
+    blob: 'FileReader' in self && 'Blob' in self && (function() {
+      try {
+        new Blob();
+        return true
+      } catch(e) {
+        return false
+      }
+    })(),
+    formData: 'FormData' in self
+  }
+
+  function Body() {
+    this.bodyUsed = false
+
+
+    this._initBody = function(body) {
+      this._bodyInit = body
+      if (typeof body === 'string') {
+        this._bodyText = body
+      } else if (support.blob && Blob.prototype.isPrototypeOf(body)) {
+        this._bodyBlob = body
+      } else if (support.formData && FormData.prototype.isPrototypeOf(body)) {
+        this._bodyFormData = body
+      } else if (!body) {
+        this._bodyText = ''
+      } else {
+        throw new Error('unsupported BodyInit type')
+      }
+    }
+
+    if (support.blob) {
+      this.blob = function() {
+        var rejected = consumed(this)
+        if (rejected) {
+          return rejected
+        }
+
+        if (this._bodyBlob) {
+          return Promise.resolve(this._bodyBlob)
+        } else if (this._bodyFormData) {
+          throw new Error('could not read FormData body as blob')
+        } else {
+          return Promise.resolve(new Blob([this._bodyText]))
+        }
+      }
+
+      this.arrayBuffer = function() {
+        return this.blob().then(readBlobAsArrayBuffer)
+      }
+
+      this.text = function() {
+        var rejected = consumed(this)
+        if (rejected) {
+          return rejected
+        }
+
+        if (this._bodyBlob) {
+          return readBlobAsText(this._bodyBlob)
+        } else if (this._bodyFormData) {
+          throw new Error('could not read FormData body as text')
+        } else {
+          return Promise.resolve(this._bodyText)
+        }
+      }
+    } else {
+      this.text = function() {
+        var rejected = consumed(this)
+        return rejected ? rejected : Promise.resolve(this._bodyText)
+      }
+    }
+
+    if (support.formData) {
+      this.formData = function() {
+        return this.text().then(decode)
+      }
+    }
+
+    this.json = function() {
+      return this.text().then(JSON.parse)
+    }
+
+    return this
+  }
+
+  // HTTP methods whose capitalization should be normalized
+  var methods = ['DELETE', 'GET', 'HEAD', 'OPTIONS', 'POST', 'PUT']
+
+  function normalizeMethod(method) {
+    var upcased = method.toUpperCase()
+    return (methods.indexOf(upcased) > -1) ? upcased : method
+  }
+
+  function Request(url, options) {
+    options = options || {}
+    this.url = url
+
+    this.credentials = options.credentials || 'omit'
+    this.headers = new Headers(options.headers)
+    this.method = normalizeMethod(options.method || 'GET')
+    this.mode = options.mode || null
+    this.referrer = null
+
+    if ((this.method === 'GET' || this.method === 'HEAD') && options.body) {
+      throw new TypeError('Body not allowed for GET or HEAD requests')
+    }
+    this._initBody(options.body)
+  }
+
+  function decode(body) {
+    var form = new FormData()
+    body.trim().split('&').forEach(function(bytes) {
+      if (bytes) {
+        var split = bytes.split('=')
+        var name = split.shift().replace(/\+/g, ' ')
+        var value = split.join('=').replace(/\+/g, ' ')
+        form.append(decodeURIComponent(name), decodeURIComponent(value))
+      }
+    })
+    return form
+  }
+
+  function headers(xhr) {
+    var head = new Headers()
+    var pairs = xhr.getAllResponseHeaders().trim().split('\n')
+    pairs.forEach(function(header) {
+      var split = header.trim().split(':')
+      var key = split.shift().trim()
+      var value = split.join(':').trim()
+      head.append(key, value)
+    })
+    return head
+  }
+
+  Body.call(Request.prototype)
+
+  function Response(bodyInit, options) {
+    if (!options) {
+      options = {}
+    }
+
+    this._initBody(bodyInit)
+    this.type = 'default'
+    this.url = null
+    this.status = options.status
+    this.ok = this.status >= 200 && this.status < 300
+    this.statusText = options.statusText
+    this.headers = options.headers instanceof Headers ? options.headers : new Headers(options.headers)
+    this.url = options.url || ''
+  }
+
+  Body.call(Response.prototype)
+
+  self.Headers = Headers;
+  self.Request = Request;
+  self.Response = Response;
+
+  self.fetch = function(input, init) {
+    // TODO: Request constructor should accept input, init
+    var request
+    if (Request.prototype.isPrototypeOf(input) && !init) {
+      request = input
+    } else {
+      request = new Request(input, init)
+    }
+
+    return new Promise(function(resolve, reject) {
+      var xhr = new XMLHttpRequest()
+
+      function responseURL() {
+        if ('responseURL' in xhr) {
+          return xhr.responseURL
+        }
+
+        // Avoid security warnings on getResponseHeader when not allowed by CORS
+        if (/^X-Request-URL:/m.test(xhr.getAllResponseHeaders())) {
+          return xhr.getResponseHeader('X-Request-URL')
+        }
+
+        return;
+      }
+
+      xhr.onload = function() {
+        var status = (xhr.status === 1223) ? 204 : xhr.status
+        if (status < 100 || status > 599) {
+          reject(new TypeError('Network request failed'))
+          return
+        }
+        var options = {
+          status: status,
+          statusText: xhr.statusText,
+          headers: headers(xhr),
+          url: responseURL()
+        }
+        var body = 'response' in xhr ? xhr.response : xhr.responseText;
+        resolve(new Response(body, options))
+      }
+
+      xhr.onerror = function() {
+        reject(new TypeError('Network request failed'))
+      }
+
+      xhr.open(request.method, request.url, true)
+
+      if (request.credentials === 'include') {
+        xhr.withCredentials = true
+      }
+
+      if ('responseType' in xhr && support.blob) {
+        xhr.responseType = 'blob'
+      }
+
+      request.headers.forEach(function(value, name) {
+        xhr.setRequestHeader(name, value)
+      })
+
+      xhr.send(typeof request._bodyInit === 'undefined' ? null : request._bodyInit)
+    })
+  }
+  self.fetch.polyfill = true
+})();
+
+},{}],6:[function(require,module,exports){
 'use strict';
 
 require('whatwg-fetch');
@@ -3226,6 +3605,7 @@ Formio.logout = function() {
 };
 Formio.fieldData = function(data, component) {
   if (!data) { return ''; }
+  if (!component || !component.key) { return data; }
   if (component.key.indexOf('.') !== -1) {
     var value = data;
     var parts = component.key.split('.');
@@ -3312,7 +3692,7 @@ Formio.deregisterPlugin = function(plugin) {
 
 module.exports = Formio;
 
-},{"Q":1,"eventemitter2":2,"shallow-copy":6,"whatwg-fetch":7}],5:[function(require,module,exports){
+},{"Q":2,"eventemitter2":3,"shallow-copy":4,"whatwg-fetch":5}],7:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -3404,375 +3784,6 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 process.umask = function() { return 0; };
-
-},{}],6:[function(require,module,exports){
-module.exports = function (obj) {
-    if (!obj || typeof obj !== 'object') return obj;
-    
-    var copy;
-    
-    if (isArray(obj)) {
-        var len = obj.length;
-        copy = Array(len);
-        for (var i = 0; i < len; i++) {
-            copy[i] = obj[i];
-        }
-    }
-    else {
-        var keys = objectKeys(obj);
-        copy = {};
-        
-        for (var i = 0, l = keys.length; i < l; i++) {
-            var key = keys[i];
-            copy[key] = obj[key];
-        }
-    }
-    return copy;
-};
-
-var objectKeys = Object.keys || function (obj) {
-    var keys = [];
-    for (var key in obj) {
-        if ({}.hasOwnProperty.call(obj, key)) keys.push(key);
-    }
-    return keys;
-};
-
-var isArray = Array.isArray || function (xs) {
-    return {}.toString.call(xs) === '[object Array]';
-};
-
-},{}],7:[function(require,module,exports){
-(function() {
-  'use strict';
-
-  if (self.fetch) {
-    return
-  }
-
-  function normalizeName(name) {
-    if (typeof name !== 'string') {
-      name = name.toString();
-    }
-    if (/[^a-z0-9\-#$%&'*+.\^_`|~]/i.test(name)) {
-      throw new TypeError('Invalid character in header field name')
-    }
-    return name.toLowerCase()
-  }
-
-  function normalizeValue(value) {
-    if (typeof value !== 'string') {
-      value = value.toString();
-    }
-    return value
-  }
-
-  function Headers(headers) {
-    this.map = {}
-
-    if (headers instanceof Headers) {
-      headers.forEach(function(value, name) {
-        this.append(name, value)
-      }, this)
-
-    } else if (headers) {
-      Object.getOwnPropertyNames(headers).forEach(function(name) {
-        this.append(name, headers[name])
-      }, this)
-    }
-  }
-
-  Headers.prototype.append = function(name, value) {
-    name = normalizeName(name)
-    value = normalizeValue(value)
-    var list = this.map[name]
-    if (!list) {
-      list = []
-      this.map[name] = list
-    }
-    list.push(value)
-  }
-
-  Headers.prototype['delete'] = function(name) {
-    delete this.map[normalizeName(name)]
-  }
-
-  Headers.prototype.get = function(name) {
-    var values = this.map[normalizeName(name)]
-    return values ? values[0] : null
-  }
-
-  Headers.prototype.getAll = function(name) {
-    return this.map[normalizeName(name)] || []
-  }
-
-  Headers.prototype.has = function(name) {
-    return this.map.hasOwnProperty(normalizeName(name))
-  }
-
-  Headers.prototype.set = function(name, value) {
-    this.map[normalizeName(name)] = [normalizeValue(value)]
-  }
-
-  Headers.prototype.forEach = function(callback, thisArg) {
-    Object.getOwnPropertyNames(this.map).forEach(function(name) {
-      this.map[name].forEach(function(value) {
-        callback.call(thisArg, value, name, this)
-      }, this)
-    }, this)
-  }
-
-  function consumed(body) {
-    if (body.bodyUsed) {
-      return Promise.reject(new TypeError('Already read'))
-    }
-    body.bodyUsed = true
-  }
-
-  function fileReaderReady(reader) {
-    return new Promise(function(resolve, reject) {
-      reader.onload = function() {
-        resolve(reader.result)
-      }
-      reader.onerror = function() {
-        reject(reader.error)
-      }
-    })
-  }
-
-  function readBlobAsArrayBuffer(blob) {
-    var reader = new FileReader()
-    reader.readAsArrayBuffer(blob)
-    return fileReaderReady(reader)
-  }
-
-  function readBlobAsText(blob) {
-    var reader = new FileReader()
-    reader.readAsText(blob)
-    return fileReaderReady(reader)
-  }
-
-  var support = {
-    blob: 'FileReader' in self && 'Blob' in self && (function() {
-      try {
-        new Blob();
-        return true
-      } catch(e) {
-        return false
-      }
-    })(),
-    formData: 'FormData' in self
-  }
-
-  function Body() {
-    this.bodyUsed = false
-
-
-    this._initBody = function(body) {
-      this._bodyInit = body
-      if (typeof body === 'string') {
-        this._bodyText = body
-      } else if (support.blob && Blob.prototype.isPrototypeOf(body)) {
-        this._bodyBlob = body
-      } else if (support.formData && FormData.prototype.isPrototypeOf(body)) {
-        this._bodyFormData = body
-      } else if (!body) {
-        this._bodyText = ''
-      } else {
-        throw new Error('unsupported BodyInit type')
-      }
-    }
-
-    if (support.blob) {
-      this.blob = function() {
-        var rejected = consumed(this)
-        if (rejected) {
-          return rejected
-        }
-
-        if (this._bodyBlob) {
-          return Promise.resolve(this._bodyBlob)
-        } else if (this._bodyFormData) {
-          throw new Error('could not read FormData body as blob')
-        } else {
-          return Promise.resolve(new Blob([this._bodyText]))
-        }
-      }
-
-      this.arrayBuffer = function() {
-        return this.blob().then(readBlobAsArrayBuffer)
-      }
-
-      this.text = function() {
-        var rejected = consumed(this)
-        if (rejected) {
-          return rejected
-        }
-
-        if (this._bodyBlob) {
-          return readBlobAsText(this._bodyBlob)
-        } else if (this._bodyFormData) {
-          throw new Error('could not read FormData body as text')
-        } else {
-          return Promise.resolve(this._bodyText)
-        }
-      }
-    } else {
-      this.text = function() {
-        var rejected = consumed(this)
-        return rejected ? rejected : Promise.resolve(this._bodyText)
-      }
-    }
-
-    if (support.formData) {
-      this.formData = function() {
-        return this.text().then(decode)
-      }
-    }
-
-    this.json = function() {
-      return this.text().then(JSON.parse)
-    }
-
-    return this
-  }
-
-  // HTTP methods whose capitalization should be normalized
-  var methods = ['DELETE', 'GET', 'HEAD', 'OPTIONS', 'POST', 'PUT']
-
-  function normalizeMethod(method) {
-    var upcased = method.toUpperCase()
-    return (methods.indexOf(upcased) > -1) ? upcased : method
-  }
-
-  function Request(url, options) {
-    options = options || {}
-    this.url = url
-
-    this.credentials = options.credentials || 'omit'
-    this.headers = new Headers(options.headers)
-    this.method = normalizeMethod(options.method || 'GET')
-    this.mode = options.mode || null
-    this.referrer = null
-
-    if ((this.method === 'GET' || this.method === 'HEAD') && options.body) {
-      throw new TypeError('Body not allowed for GET or HEAD requests')
-    }
-    this._initBody(options.body)
-  }
-
-  function decode(body) {
-    var form = new FormData()
-    body.trim().split('&').forEach(function(bytes) {
-      if (bytes) {
-        var split = bytes.split('=')
-        var name = split.shift().replace(/\+/g, ' ')
-        var value = split.join('=').replace(/\+/g, ' ')
-        form.append(decodeURIComponent(name), decodeURIComponent(value))
-      }
-    })
-    return form
-  }
-
-  function headers(xhr) {
-    var head = new Headers()
-    var pairs = xhr.getAllResponseHeaders().trim().split('\n')
-    pairs.forEach(function(header) {
-      var split = header.trim().split(':')
-      var key = split.shift().trim()
-      var value = split.join(':').trim()
-      head.append(key, value)
-    })
-    return head
-  }
-
-  Body.call(Request.prototype)
-
-  function Response(bodyInit, options) {
-    if (!options) {
-      options = {}
-    }
-
-    this._initBody(bodyInit)
-    this.type = 'default'
-    this.url = null
-    this.status = options.status
-    this.ok = this.status >= 200 && this.status < 300
-    this.statusText = options.statusText
-    this.headers = options.headers instanceof Headers ? options.headers : new Headers(options.headers)
-    this.url = options.url || ''
-  }
-
-  Body.call(Response.prototype)
-
-  self.Headers = Headers;
-  self.Request = Request;
-  self.Response = Response;
-
-  self.fetch = function(input, init) {
-    // TODO: Request constructor should accept input, init
-    var request
-    if (Request.prototype.isPrototypeOf(input) && !init) {
-      request = input
-    } else {
-      request = new Request(input, init)
-    }
-
-    return new Promise(function(resolve, reject) {
-      var xhr = new XMLHttpRequest()
-
-      function responseURL() {
-        if ('responseURL' in xhr) {
-          return xhr.responseURL
-        }
-
-        // Avoid security warnings on getResponseHeader when not allowed by CORS
-        if (/^X-Request-URL:/m.test(xhr.getAllResponseHeaders())) {
-          return xhr.getResponseHeader('X-Request-URL')
-        }
-
-        return;
-      }
-
-      xhr.onload = function() {
-        var status = (xhr.status === 1223) ? 204 : xhr.status
-        if (status < 100 || status > 599) {
-          reject(new TypeError('Network request failed'))
-          return
-        }
-        var options = {
-          status: status,
-          statusText: xhr.statusText,
-          headers: headers(xhr),
-          url: responseURL()
-        }
-        var body = 'response' in xhr ? xhr.response : xhr.responseText;
-        resolve(new Response(body, options))
-      }
-
-      xhr.onerror = function() {
-        reject(new TypeError('Network request failed'))
-      }
-
-      xhr.open(request.method, request.url, true)
-
-      if (request.credentials === 'include') {
-        xhr.withCredentials = true
-      }
-
-      if ('responseType' in xhr && support.blob) {
-        xhr.responseType = 'blob'
-      }
-
-      request.headers.forEach(function(value, name) {
-        xhr.setRequestHeader(name, value)
-      })
-
-      xhr.send(typeof request._bodyInit === 'undefined' ? null : request._bodyInit)
-    })
-  }
-  self.fetch.polyfill = true
-})();
 
 },{}],8:[function(require,module,exports){
 "use strict";
@@ -4237,8 +4248,8 @@ module.exports = function (app) {
         title: 'Data Grid',
         template: 'formio/components/datagrid.html',
         group: 'layout',
-        tableView: function(data, component) {
-          var view = '<table class="table table-striped"><thead><tr>';
+        tableView: function(data, component, $interpolate, componentInfo) {
+          var view = '<table class="table table-striped table-bordered"><thead><tr>';
           angular.forEach(component.components, function(component) {
             view += '<th>' + component.label + '</th>';
           });
@@ -4247,7 +4258,21 @@ module.exports = function (app) {
           angular.forEach(data, function(row) {
             view += '<tr>';
             angular.forEach(component.components, function(component) {
-              view += '<td>' + row[component.key] + '</td>';
+              var info = componentInfo.components.hasOwnProperty(component.type) ? componentInfo.components[component.type] : {};
+              if (info.tableView) {
+                view += '<td>' + info.tableView(row[component.key], component, $interpolate, componentInfo) + '</td>';
+              }
+              else {
+                view += '<td>';
+                if (component.prefix) {
+                  view += component.prefix;
+                }
+                view += row[component.key];
+                if (component.suffix) {
+                  view += ' ' + component.suffix;
+                }
+                view += '</td>';
+              }
             });
             view += '</tr>';
           });
@@ -4973,7 +4998,12 @@ module.exports = function (app) {
             }
             url += '/form/' + settings.resource;
             var formio = new Formio(url);
+            var refreshing = false;
             $scope.refreshSubmissions = function (input) {
+              if (refreshing) {
+                return;
+              }
+              refreshing = true;
               var params = settings.params || {};
               // If they wish to return only some fields.
               if (settings.selectFields) {
@@ -4984,11 +5014,13 @@ module.exports = function (app) {
                   params[field] = input;
                 });
               }
+
               // Load the submissions.
               formio.loadSubmissions({
                 params: params
               }).then(function (submissions) {
                 $scope.selectItems = submissions || [];
+                refreshing = false;
               });
             };
 
@@ -6022,6 +6054,9 @@ module.exports = function() {
             return;
           }
 
+          // Make sure to make a copy of the submission data to remove bad characters.
+          submissionData = angular.copy(submissionData);
+
           // Allow custom action urls.
           if ($scope.action) {
             var method = submissionData._id ? 'put' : 'post';
@@ -6037,7 +6072,7 @@ module.exports = function() {
           // If they wish to submit to the default location.
           else if ($scope.formio) {
             // copy to remove angular $$hashKey
-            $scope.formio.saveSubmission(angular.copy(submissionData), $scope.formioOptions)
+            $scope.formio.saveSubmission(submissionData, $scope.formioOptions)
               .then(function(submission) {
               onSubmitDone(submission.method, submission);
             }, FormioScope.onError($scope, $element))
@@ -6223,7 +6258,8 @@ module.exports = function() {
       submission: '=?',
       src: '=?',
       formAction: '=?',
-      resourceName: '=?'
+      resourceName: '=?',
+      message: '=?'
     },
     templateUrl: 'formio-delete.html',
     controller: [
@@ -6259,7 +6295,8 @@ module.exports = function() {
         }
 
         // Set the resource name
-        $scope._resourceName = resourceName;
+        $scope._resourceName = $scope.resourceName || resourceName;
+        $scope.deleteMessage = $scope.message || 'Are you sure you wish to delete the ' + $scope._resourceName + '?';
 
         // Create delete capability.
         $scope.onDelete = function() {
@@ -6669,7 +6706,7 @@ module.exports = [
     return {
       onError: function($scope, $element) {
         return function(error) {
-          if (error.name === 'ValidationError') {
+          if ((error.name === 'ValidationError') && $element) {
             $element.find('#form-group-' + error.details[0].path).addClass('has-error');
             var message = 'ValidationError: ' + error.details[0].message;
             $scope.showAlerts({
@@ -6878,7 +6915,7 @@ module.exports = function() {
   };
 };
 
-},{"formio-utils":3}],49:[function(require,module,exports){
+},{"formio-utils":1}],49:[function(require,module,exports){
 "use strict";
 module.exports = [
   '$q',
@@ -6942,6 +6979,9 @@ module.exports = [
       if (!value) {
         return '';
       }
+      if (!component || !component.type) {
+        return value;
+      }
       var componentInfo = formioComponents.components[component.type];
       if (!componentInfo.tableView) {
         return value;
@@ -6949,11 +6989,11 @@ module.exports = [
       if (component.multiple && (value.length > 0)) {
         var values = [];
         angular.forEach(value, function(arrayValue) {
-          values.push(componentInfo.tableView(arrayValue, component, $interpolate));
+          values.push(componentInfo.tableView(arrayValue, component, $interpolate, formioComponents));
         });
         return values;
       }
-      return componentInfo.tableView(value, component, $interpolate);
+      return componentInfo.tableView(value, component, $interpolate, formioComponents);
     };
   }
 ];
@@ -7120,7 +7160,7 @@ app.run([
     );
 
     $templateCache.put('formio-delete.html',
-      "<form role=\"form\">\n  <div ng-repeat=\"alert in formioAlerts\" class=\"alert alert-{{ alert.type }}\" role=\"alert\">\n    {{ alert.message }}\n  </div>\n  <h3>Are you sure you wish to delete the {{ resourceName || _resourceName }}?</h3>\n  <div class=\"btn-toolbar\">\n    <button ng-click=\"onDelete()\" class=\"btn btn-danger\">Yes</button>\n    <button ng-click=\"onCancel()\" class=\"btn btn-default\">No</button>\n  </div>\n</form>\n"
+      "<form role=\"form\">\n  <div ng-repeat=\"alert in formioAlerts\" class=\"alert alert-{{ alert.type }}\" role=\"alert\">\n    {{ alert.message }}\n  </div>\n  <h3>{{ deleteMessage }}</h3>\n  <div class=\"btn-toolbar\">\n    <button ng-click=\"onDelete()\" class=\"btn btn-danger\">Yes</button>\n    <button ng-click=\"onCancel()\" class=\"btn btn-default\">No</button>\n  </div>\n</form>\n"
     );
 
     $templateCache.put('formio/submission.html',
@@ -7500,7 +7540,7 @@ module.exports = function() {
   };
 };
 
-},{"formiojs/src/formio.js":4}],62:[function(require,module,exports){
+},{"formiojs/src/formio.js":6}],62:[function(require,module,exports){
 "use strict";
 
 module.exports = function() {

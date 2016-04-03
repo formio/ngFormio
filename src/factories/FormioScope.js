@@ -8,7 +8,7 @@ module.exports = [
     return {
       onError: function($scope, $element) {
         return function(error) {
-          if (error.name === 'ValidationError') {
+          if ((error.name === 'ValidationError') && $element) {
             $element.find('#form-group-' + error.details[0].path).addClass('has-error');
             var message = 'ValidationError: ' + error.details[0].message;
             $scope.showAlerts({
