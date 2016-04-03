@@ -1,8 +1,7 @@
-module.exports = function (app) {
-
+module.exports = function(app) {
   app.config([
     'formioComponentsProvider',
-    function (formioComponentsProvider) {
+    function(formioComponentsProvider) {
       formioComponentsProvider.register('email', {
         title: 'Email',
         template: 'formio/components/textfield.html',

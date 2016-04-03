@@ -1,6 +1,6 @@
 var fs = require('fs');
 
-module.exports = function (app) {
+module.exports = function(app) {
   app.directive('formioHtmlElement', [
     '$sanitize',
     function($sanitize) {
@@ -34,7 +34,6 @@ module.exports = function (app) {
               .split('\n')[0]
               .replace('[$sanitize:badparse]', '');
             }
-
           };
 
           createElement();
@@ -46,7 +45,7 @@ module.exports = function (app) {
 
   app.config([
     'formioComponentsProvider',
-    function (formioComponentsProvider) {
+    function(formioComponentsProvider) {
       formioComponentsProvider.register('htmlelement', {
         title: 'HTML Element',
         template: 'formio/components/htmlelement.html',
@@ -63,7 +62,7 @@ module.exports = function (app) {
 
   app.run([
     '$templateCache',
-    function ($templateCache) {
+    function($templateCache) {
       $templateCache.put('formio/components/htmlelement.html',
         '<formio-html-element component="component"></div>'
       );

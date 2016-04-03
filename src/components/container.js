@@ -1,6 +1,5 @@
 var fs = require('fs');
 module.exports = function(app) {
-
   app.config([
     'formioComponentsProvider',
     function(formioComponentsProvider) {

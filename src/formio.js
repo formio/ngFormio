@@ -77,7 +77,6 @@ require('./plugins')(app);
 app.run([
   '$templateCache',
   function($templateCache) {
-
     // The template for the formio forms.
     $templateCache.put('formio.html',
       fs.readFileSync(__dirname + '/templates/formio.html', 'utf8')
