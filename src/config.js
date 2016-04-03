@@ -57,7 +57,7 @@ angular.module('formioApp').constant('AppConfig', {
       "title": "Prize Drawing",
       "name": "prizedrawingapp",
       "description": "A raffle entry project that lets participants register for a chance to win a prize! Also includes admin interface for prize drawing selection.",
-      "template": "https://cdn.rawgit.com/formio/formio-app-prizedrawing/2.0.1/src/project.json",
+      "template": "https://cdn.rawgit.com/formio/formio-app-prizedrawing/2.x/src/project.json",
       "thumbnail": "https://app.form.io/formio-app-prizedrawing/assets/images/prizedrawing-thumb.png"
     },
     {
