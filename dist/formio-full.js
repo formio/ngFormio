@@ -68534,7 +68534,6 @@ module.exports = function() {
           'false': false
         };
 
-        var submission = $scope.submission || {data: {}};
         var updateComponents = function() {
           // Change the visibility for the component with the given key
           var updateVisiblity = function(key) {
@@ -68567,7 +68566,7 @@ module.exports = function() {
 
               // Get the conditional component.
               var cond = FormioUtils.getComponent($scope.form.components, component.conditional.when.toString());
-              var value = submission.data[cond.key];
+              var value = $scope.submission.data[cond.key];
 
               if (value) {
                 // Check if the conditional value is equal to the trigger value
@@ -68609,10 +68608,7 @@ module.exports = function() {
 
         // Update the components on the initial form render and all subsequent submission data changes.
         $scope.$on('formRender', updateComponents);
-        $scope.$on('submissionDataUpdate', function(ev, key, value) {
-          submission.data[key] = value;
-          updateComponents();
-        });
+        $scope.$watchCollection('submission.data', updateComponents);
 
         if (!$scope._src) {
           $scope.$watch('src', function(src) {
@@ -68753,13 +68749,11 @@ module.exports = function() {
           // If they wish to submit to the default location.
           else if ($scope.formio) {
             // copy to remove angular $$hashKey
-            $scope.formio.saveSubmission(submissionData, $scope.formioOptions)
-              .then(function(submission) {
+            $scope.formio.saveSubmission(submissionData, $scope.formioOptions).then(function(submission) {
               onSubmitDone(submission.method, submission);
-            }, FormioScope.onError($scope, $element))
-              .finally(function() {
-                form.submitting = false;
-              });
+            }, FormioScope.onError($scope, $element)).finally(function() {
+              form.submitting = false;
+            });
           }
           else {
             $scope.$emit('formSubmission', submissionData);
@@ -68834,29 +68828,6 @@ module.exports = [
           // Initialize the data.
           if (!$scope.data) {
             $scope.resetForm();
-          }
-
-          // If this component references an object, we need to determine the
-          // value by navigating through the object.
-          if (
-            $scope.component &&
-            $scope.component.key
-          ) {
-            var root = '';
-            if ($scope.component.key.indexOf('.') !== -1) {
-              root = $scope.component.key.split('.').shift();
-            }
-            $scope.$watch('data', function(data) {
-              if (!data || angular.equals({}, data)) return;
-              if (root && (!data.hasOwnProperty(root) || angular.equals({}, data[root]))) return;
-              if (root && data[root].hasOwnProperty('_id')) {
-                $scope.data[root + '._id'] = data[root]._id;
-              }
-              var value = Formio.fieldData(data, $scope.component);
-              if (value !== undefined) {
-                $scope.data[$scope.component.key] = value;
-              }
-            });
           }
 
           // Get the settings.
@@ -69023,19 +68994,7 @@ module.exports = [
       link: function(scope, element) {
         element.replaceWith($compile($templateCache.get(scope.template))(scope));
         scope.$emit('formElementRender', element);
-      },
-      controller: [
-        '$scope',
-        function(
-          $scope
-        ) {
-          $scope.$watchCollection('data.' + $scope.component.key, function(_new, _old) {
-            if (_new !== _old) {
-              $scope.$emit('submissionDataUpdate', $scope.component.key, $scope.data[$scope.component.key]);
-            }
-          });
-        }
-      ]
+      }
     };
   }
 ];
