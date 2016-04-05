@@ -1,5 +1,5 @@
 <div class="row">
-  <div class="col-sm-6" ng-repeat="column in component.columns">
-    <formio-component ng-repeat="component in column.components" component="component" data="data" formio="formio" read-only="readOnly"></formio-component>
+  <div class="col-sm-6" ng-repeat="column in component.columns track by $index">
+    <formio-component ng-repeat="component in column.components track by $index" component="component" data="data" formio="formio" read-only="readOnly"></formio-component>
   </div>
 </div>
