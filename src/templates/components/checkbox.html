@@ -9,6 +9,6 @@
     ng-disabled="readOnly"
     ng-model="data[component.key]"
     ng-required="component.validate.required">
-    {{ component.label }}
+    {{ component.label | formioTranslate }}
   </label>
 </div>

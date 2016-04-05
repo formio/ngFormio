@@ -1,7 +1,7 @@
 <div class="formio-data-grid" ng-controller="formioDataGrid" >
   <table ng-class="{'table-striped': component.striped, 'table-bordered': component.bordered, 'table-hover': component.hover, 'table-condensed': component.condensed}" class="table datagrid-table">
     <tr>
-      <th ng-repeat="component in component.components">{{ component.label}}</th>
+      <th ng-repeat="component in component.components">{{ component.label | formioTranslate }}</th>
       <th></th>
     </tr>
     <tr class="formio-data-grid-row" ng-repeat="rowData in data[component.key] track by $index">
@@ -17,7 +17,7 @@
   </table>
   <div class="datagrid-add">
     <a ng-click="addRow()" class="btn btn-primary">
-      <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {{ component.addAnother || "Add Another" }}
+      <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {{ component.addAnother || "Add Another" | formioTranslate}}
     </a>
   </div>
 </div>
