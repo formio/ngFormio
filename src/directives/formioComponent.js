@@ -61,29 +61,6 @@ module.exports = [
             $scope.resetForm();
           }
 
-          // If this component references an object, we need to determine the
-          // value by navigating through the object.
-          if (
-            $scope.component &&
-            $scope.component.key
-          ) {
-            var root = '';
-            if ($scope.component.key.indexOf('.') !== -1) {
-              root = $scope.component.key.split('.').shift();
-            }
-            $scope.$watch('data', function(data) {
-              if (!data || angular.equals({}, data)) return;
-              if (root && (!data.hasOwnProperty(root) || angular.equals({}, data[root]))) return;
-              if (root && data[root].hasOwnProperty('_id')) {
-                $scope.data[root + '._id'] = data[root]._id;
-              }
-              var value = Formio.fieldData(data, $scope.component);
-              if (value !== undefined) {
-                $scope.data[$scope.component.key] = value;
-              }
-            });
-          }
-
           // Get the settings.
           var component = formioComponents.components[$scope.component.type] || formioComponents.components['custom'];
 

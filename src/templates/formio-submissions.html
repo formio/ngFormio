@@ -1,19 +1,19 @@
 <div>
-  <div ng-repeat="alert in formioAlerts" class="alert alert-{{ alert.type }}" role="alert">
+  <div ng-repeat="alert in formioAlerts track by $index" class="alert alert-{{ alert.type }}" role="alert">
     {{ alert.message }}
   </div>
   <table class="table">
     <thead>
       <tr>
-        <th ng-repeat="component in form.components | flattenComponents" ng-if="tableView(component)">{{ component.label || component.key }}</th>
+        <th ng-repeat="component in form.components track by $index | flattenComponents" ng-if="tableView(component)">{{ component.label || component.key }}</th>
         <th>Submitted</th>
         <th>Updated</th>
         <th>Operations</th>
       </tr>
     </thead>
     <tbody>
-      <tr ng-repeat="submission in submissions" class="formio-submission" ng-click="$emit('submissionView', submission)">
-        <td ng-repeat="component in form.components | flattenComponents" ng-if="tableView(component)">{{ submission.data | tableView:component }}</td>
+      <tr ng-repeat="submission in submissions track by $index" class="formio-submission" ng-click="$emit('submissionView', submission)">
+        <td ng-repeat="component in form.components track by $index | flattenComponents" ng-if="tableView(component)">{{ submission.data | tableView:component }}</td>
         <td>{{ submission.created | amDateFormat:'l, h:mm:ss a' }}</td>
         <td>{{ submission.modified | amDateFormat:'l, h:mm:ss a' }}</td>
         <td>
