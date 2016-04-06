@@ -1,7 +1,7 @@
 <div ng-class="component.inline ? 'radio-inline' : 'radio'" ng-repeat="v in component.values track by $index">
-  <label class="control-label" for="{{ v.value }}">
+  <label class="control-label" for="{{ component.key }}-{{ v.value }}">
     <input type="{{ component.inputType }}"
-    id="{{ v.value }}"
+    id="{{ component.key }}-{{ v.value }}"
     name="{{ component.key }}"
     value="{{ v.value }}"
     tabindex="{{ component.tabindex || 0 }}"
