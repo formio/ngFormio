@@ -1,9 +1,8 @@
 var fs = require('fs');
-module.exports = function (app) {
-
+module.exports = function(app) {
   app.config([
     'formioComponentsProvider',
-    function (formioComponentsProvider) {
+    function(formioComponentsProvider) {
       formioComponentsProvider.register('table', {
         title: 'Table',
         template: 'formio/components/table.html',
@@ -25,7 +24,7 @@ module.exports = function (app) {
   ]);
   app.run([
     '$templateCache',
-    function ($templateCache) {
+    function($templateCache) {
       var tableClasses = "{'table-striped': component.striped, ";
       tableClasses += "'table-bordered': component.bordered, ";
       tableClasses += "'table-hover': component.hover, ";

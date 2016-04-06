@@ -1,9 +1,8 @@
 var fs = require('fs');
-module.exports = function (app) {
-
+module.exports = function(app) {
   app.directive('formioSelectItem', [
     '$compile',
-    function ($compile) {
+    function($compile) {
       return {
         restrict: 'E',
         scope: {
@@ -11,7 +10,7 @@ module.exports = function (app) {
           item: '=',
           select: '='
         },
-        link: function (scope, element) {
+        link: function(scope, element) {
           if (scope.template) {
             element.html($compile(angular.element(scope.template))(scope));
           }
@@ -20,12 +19,12 @@ module.exports = function (app) {
     }
   ]);
 
-  app.directive('uiSelectRequired', function () {
+  app.directive('uiSelectRequired', function() {
     return {
       require: 'ngModel',
-      link: function (scope, element, attrs, ngModel) {
+      link: function(scope, element, attrs, ngModel) {
         var oldIsEmpty = ngModel.$isEmpty;
-        ngModel.$isEmpty = function (value) {
+        ngModel.$isEmpty = function(value) {
           return (Array.isArray(value) && value.length === 0) || oldIsEmpty(value);
         };
       }
@@ -33,14 +32,14 @@ module.exports = function (app) {
   });
 
   // A hack to have ui-select open on focus
-  app.directive('uiSelectOpenOnFocus', ['$timeout', function ($timeout) {
+  app.directive('uiSelectOpenOnFocus', ['$timeout', function($timeout) {
     return {
       require: 'uiSelect',
       restrict: 'A',
-      link: function ($scope, el, attrs, uiSelect) {
+      link: function($scope, el, attrs, uiSelect) {
         var closing = false;
 
-        angular.element(uiSelect.focusser).on('focus', function () {
+        angular.element(uiSelect.focusser).on('focus', function() {
           if (!closing) {
             uiSelect.activate();
           }
@@ -48,9 +47,9 @@ module.exports = function (app) {
 
         // Because ui-select immediately focuses the focusser after closing
         // we need to not re-activate after closing
-        $scope.$on('uis:close', function () {
+        $scope.$on('uis:close', function() {
           closing = true;
-          $timeout(function () { // I'm so sorry
+          $timeout(function() { // I'm so sorry
             closing = false;
           });
         });
@@ -61,10 +60,10 @@ module.exports = function (app) {
   // Configure the Select component.
   app.config([
     'formioComponentsProvider',
-    function (formioComponentsProvider) {
+    function(formioComponentsProvider) {
       formioComponentsProvider.register('select', {
         title: 'Select',
-        template: function ($scope) {
+        template: function($scope) {
           return $scope.component.multiple ? 'formio/components/select-multiple.html' : 'formio/components/select.html';
         },
         tableView: function(data, component, $interpolate) {
@@ -124,12 +123,12 @@ module.exports = function (app) {
             return value;
           }
         },
-        controller: ['$scope', '$http', 'Formio', '$interpolate', function ($scope, $http, Formio, $interpolate) {
+        controller: ['$scope', '$http', 'Formio', '$interpolate', function($scope, $http, Formio, $interpolate) {
           var settings = $scope.component;
           $scope.nowrap = true;
           $scope.selectItems = [];
           var valueProp = $scope.component.valueProperty;
-          $scope.getSelectItem = function (item) {
+          $scope.getSelectItem = function(item) {
             if (!item) {
               return '';
             }
@@ -229,7 +228,7 @@ module.exports = function (app) {
                     newUrl += ((newUrl.indexOf('?') === -1) ? '?' : '&') + filter;
                   }
 
-                  $http.get(newUrl, options).then(function (result) {
+                  $http.get(newUrl, options).then(function(result) {
                     $scope.selectItems = result.data;
                   });
                 };
@@ -272,7 +271,7 @@ module.exports = function (app) {
   ]);
   app.run([
     '$templateCache',
-    function ($templateCache) {
+    function($templateCache) {
       $templateCache.put('formio/components/select.html',
         fs.readFileSync(__dirname + '/../templates/components/select.html', 'utf8')
       );

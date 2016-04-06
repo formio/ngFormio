@@ -1,6 +1,5 @@
-module.exports = function (app) {
-
-  app.provider('formioComponents', function () {
+module.exports = function(app) {
+  app.provider('formioComponents', function() {
     var components = {};
     var groups = {
       __component: {
@@ -14,10 +13,10 @@ module.exports = function (app) {
       }
     };
     return {
-      addGroup: function (name, group) {
+      addGroup: function(name, group) {
         groups[name] = group;
       },
-      register: function (type, component, group) {
+      register: function(type, component, group) {
         if (!components[type]) {
           components[type] = component;
         }
@@ -31,7 +30,7 @@ module.exports = function (app) {
         }
         components[type].settings.type = type;
       },
-      $get: function () {
+      $get: function() {
         return {
           components: components,
           groups: groups
@@ -40,12 +39,12 @@ module.exports = function (app) {
     };
   });
 
-  app.directive('safeMultipleToSingle', [function () {
+  app.directive('safeMultipleToSingle', [function() {
     return {
       require: 'ngModel',
       restrict: 'A',
-      link: function ($scope, el, attrs, ngModel) {
-        ngModel.$formatters.push(function (modelValue) {
+      link: function($scope, el, attrs, ngModel) {
+        ngModel.$formatters.push(function(modelValue) {
           if (!$scope.component.multiple && Array.isArray(modelValue)) {
             return modelValue[0] || '';
           }

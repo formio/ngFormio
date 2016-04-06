@@ -1,6 +1,5 @@
 var fs = require('fs');
-module.exports = function (app) {
-
+module.exports = function(app) {
   app.config([
     'formioComponentsProvider',
     function(formioComponentsProvider) {
@@ -8,8 +7,8 @@ module.exports = function (app) {
         title: 'Data Grid',
         template: 'formio/components/datagrid.html',
         group: 'layout',
-        tableView: function(data, component) {
-          var view = '<table class="table table-striped"><thead><tr>';
+        tableView: function(data, component, $interpolate, componentInfo) {
+          var view = '<table class="table table-striped table-bordered"><thead><tr>';
           angular.forEach(component.components, function(component) {
             view += '<th>' + component.label + '</th>';
           });
@@ -18,7 +17,21 @@ module.exports = function (app) {
           angular.forEach(data, function(row) {
             view += '<tr>';
             angular.forEach(component.components, function(component) {
-              view += '<td>' + row[component.key] + '</td>';
+              var info = componentInfo.components.hasOwnProperty(component.type) ? componentInfo.components[component.type] : {};
+              if (info.tableView) {
+                view += '<td>' + info.tableView(row[component.key], component, $interpolate, componentInfo) + '</td>';
+              }
+              else {
+                view += '<td>';
+                if (component.prefix) {
+                  view += component.prefix;
+                }
+                view += row[component.key];
+                if (component.suffix) {
+                  view += ' ' + component.suffix;
+                }
+                view += '</td>';
+              }
             });
             view += '</tr>';
           });

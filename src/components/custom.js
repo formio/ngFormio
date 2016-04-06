@@ -1,9 +1,8 @@
 var fs = require('fs');
-module.exports = function (app) {
-
+module.exports = function(app) {
   app.config([
     'formioComponentsProvider',
-    function (formioComponentsProvider) {
+    function(formioComponentsProvider) {
       formioComponentsProvider.register('custom', {
         title: 'Custom',
         template: 'formio/components/custom.html',
@@ -14,7 +13,7 @@ module.exports = function (app) {
   ]);
   app.run([
     '$templateCache',
-    function ($templateCache) {
+    function($templateCache) {
       $templateCache.put('formio/components/custom.html',
         fs.readFileSync(__dirname + '/../templates/components/custom.html', 'utf8')
       );

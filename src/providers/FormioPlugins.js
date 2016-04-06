@@ -1,10 +1,7 @@
-
 module.exports = function() {
-
   var plugins = {};
 
   return {
-
     register: function(type, name, plugin) {
       if (!plugins[type]) {
         plugins[type] = {};

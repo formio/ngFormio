@@ -11,6 +11,9 @@ module.exports = [
       if (!value) {
         return '';
       }
+      if (!component || !component.type) {
+        return value;
+      }
       var componentInfo = formioComponents.components[component.type];
       if (!componentInfo.tableView) {
         return value;
@@ -18,11 +21,11 @@ module.exports = [
       if (component.multiple && (value.length > 0)) {
         var values = [];
         angular.forEach(value, function(arrayValue) {
-          values.push(componentInfo.tableView(arrayValue, component, $interpolate));
+          values.push(componentInfo.tableView(arrayValue, component, $interpolate, formioComponents));
         });
         return values;
       }
-      return componentInfo.tableView(value, component, $interpolate);
+      return componentInfo.tableView(value, component, $interpolate, formioComponents);
     };
   }
 ];

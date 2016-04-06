@@ -1,9 +1,8 @@
 var fs = require('fs');
-module.exports = function (app) {
-
+module.exports = function(app) {
   app.config([
     'formioComponentsProvider',
-    function (formioComponentsProvider) {
+    function(formioComponentsProvider) {
       formioComponentsProvider.register('hidden', {
         title: 'Hidden',
         template: 'formio/components/hidden.html',
@@ -22,7 +21,7 @@ module.exports = function (app) {
   ]);
   app.run([
     '$templateCache',
-    function ($templateCache) {
+    function($templateCache) {
       $templateCache.put('formio/components/hidden.html',
         fs.readFileSync(__dirname + '/../templates/components/hidden.html', 'utf8')
       );

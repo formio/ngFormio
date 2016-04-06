@@ -1,13 +1,12 @@
 var fs = require('fs');
-module.exports = function (app) {
-
+module.exports = function(app) {
   app.config([
     'formioComponentsProvider',
-    function (formioComponentsProvider) {
+    function(formioComponentsProvider) {
       formioComponentsProvider.register('signature', {
         title: 'Signature',
         template: 'formio/components/signature.html',
-        tableView: function (data) {
+        tableView: function(data) {
           return data ? 'Yes' : 'No';
         },
         group: 'advanced',
@@ -33,14 +32,14 @@ module.exports = function (app) {
       });
     }
   ]);
-  app.directive('signature', function () {
+  app.directive('signature', function() {
     return {
       restrict: 'A',
       scope: {
         component: '='
       },
       require: '?ngModel',
-      link: function (scope, element, attrs, ngModel) {
+      link: function(scope, element, attrs, ngModel) {
         if (!ngModel) {
           return;
         }
@@ -50,7 +49,7 @@ module.exports = function (app) {
         scope.component.hideLabel = true;
 
         // Sets the dimension of a width or height.
-        var setDimension = function (dim) {
+        var setDimension = function(dim) {
           if (scope.component[dim].slice(-1) === '%') {
             var percent = parseFloat(scope.component[dim].slice(0, -1)) / 100;
             element[0][dim] = element.parent()[dim]() * percent;
@@ -74,17 +73,17 @@ module.exports = function (app) {
           backgroundColor: scope.component.backgroundColor
         });
 
-        scope.$watch('component.penColor', function (newValue) {
+        scope.$watch('component.penColor', function(newValue) {
           signaturePad.penColor = newValue;
         });
 
-        scope.$watch('component.backgroundColor', function (newValue) {
+        scope.$watch('component.backgroundColor', function(newValue) {
           signaturePad.backgroundColor = newValue;
           signaturePad.clear();
         });
 
         // Clear the signature.
-        scope.component.clearSignature = function () {
+        scope.component.clearSignature = function() {
           signaturePad.clear();
           readSignature();
         };
@@ -105,10 +104,10 @@ module.exports = function (app) {
           }
         }
 
-        ngModel.$render = function () {
+        ngModel.$render = function() {
           signaturePad.fromDataURL(ngModel.$viewValue);
         };
-        signaturePad.onEnd = function () {
+        signaturePad.onEnd = function() {
           scope.$evalAsync(readSignature);
         };
 
@@ -122,7 +121,7 @@ module.exports = function (app) {
   app.run([
     '$templateCache',
     'FormioUtils',
-    function ($templateCache,
+    function($templateCache,
               FormioUtils) {
       $templateCache.put('formio/components/signature.html', FormioUtils.fieldWrap(
         fs.readFileSync(__dirname + '/../templates/components/signature.html', 'utf8')

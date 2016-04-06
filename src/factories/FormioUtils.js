@@ -6,7 +6,7 @@ module.exports = function() {
     eachComponent: formioUtils.eachComponent,
     getComponent: formioUtils.getComponent,
     hideFields: function(form, components) {
-      this.eachComponent(form.components, function (component) {
+      this.eachComponent(form.components, function(component) {
         for (var i in components) {
           if (component.key === components[i]) {
             component.type = 'hidden';

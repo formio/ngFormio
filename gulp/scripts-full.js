@@ -1,7 +1,8 @@
 module.exports = function(gulp, plugins) {
   return function() {
     return plugins.browserify({
-      entries: './src/formio-full.js'
+      entries: './src/formio-full.js',
+      debug: false
     })
       .bundle()
       .pipe(plugins.source('formio-full.js'))

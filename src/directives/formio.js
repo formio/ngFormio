@@ -48,7 +48,6 @@ module.exports = function() {
           'false': false
         };
 
-        var submission = $scope.submission || {data: {}};
         var updateComponents = function() {
           // Change the visibility for the component with the given key
           var updateVisiblity = function(key) {
@@ -64,7 +63,6 @@ module.exports = function() {
 
           $scope.form.components = $scope.form.components || [];
           FormioUtils.eachComponent($scope.form.components, function(component) {
-
             // Display every component by default
             $scope.show[component.key] = ($scope.show[component.key] === undefined)
               ? true
@@ -82,7 +80,7 @@ module.exports = function() {
 
               // Get the conditional component.
               var cond = FormioUtils.getComponent($scope.form.components, component.conditional.when.toString());
-              var value = submission.data[cond.key];
+              var value = $scope.submission.data[cond.key];
 
               if (value) {
                 // Check if the conditional value is equal to the trigger value
@@ -124,10 +122,7 @@ module.exports = function() {
 
         // Update the components on the initial form render and all subsequent submission data changes.
         $scope.$on('formRender', updateComponents);
-        $scope.$on('submissionDataUpdate', function(ev, key, value) {
-          submission.data[key] = value;
-          updateComponents();
-        });
+        $scope.$watchCollection('submission.data', updateComponents);
 
         if (!$scope._src) {
           $scope.$watch('src', function(src) {
@@ -250,10 +245,13 @@ module.exports = function() {
             return;
           }
 
+          // Make sure to make a copy of the submission data to remove bad characters.
+          submissionData = angular.copy(submissionData);
+
           // Allow custom action urls.
           if ($scope.action) {
             var method = submissionData._id ? 'put' : 'post';
-            $http[method]($scope.action, submissionData).success(function (submission) {
+            $http[method]($scope.action, submissionData).success(function(submission) {
               Formio.clearCache();
               onSubmitDone(method, submission);
             }).error(FormioScope.onError($scope, $element))
@@ -265,13 +263,11 @@ module.exports = function() {
           // If they wish to submit to the default location.
           else if ($scope.formio) {
             // copy to remove angular $$hashKey
-            $scope.formio.saveSubmission(angular.copy(submissionData), $scope.formioOptions)
-              .then(function(submission) {
+            $scope.formio.saveSubmission(submissionData, $scope.formioOptions).then(function(submission) {
               onSubmitDone(submission.method, submission);
-            }, FormioScope.onError($scope, $element))
-              .finally(function() {
-                form.submitting = false;
-              });
+            }, FormioScope.onError($scope, $element)).finally(function() {
+              form.submitting = false;
+            });
           }
           else {
             $scope.$emit('formSubmission', submissionData);
