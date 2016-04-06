@@ -6,7 +6,7 @@
     </tr>
     <tr class="formio-data-grid-row" ng-repeat="rowData in data[component.key] track by $index">
       <td ng-repeat="component in component.components track by $index" ng-init="component.hideLabel = true" >
-        <formio-component component="component" data="rowData" formio="formio" read-only="readOnly"></formio-component>
+        <formio-component component="component" data="rowData" formio="formio" read-only="readOnly || component.disabled"></formio-component>
       </td>
       <td>
         <a ng-click="removeRow($index)" class="btn btn-default">
