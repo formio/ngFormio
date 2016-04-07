@@ -5096,27 +5096,31 @@ module.exports = function(app) {
     };
   });
 
-  // A hack to have ui-select open on focus
+  // A directive to have ui-select open on focus
   app.directive('uiSelectOpenOnFocus', ['$timeout', function($timeout) {
     return {
       require: 'uiSelect',
       restrict: 'A',
       link: function($scope, el, attrs, uiSelect) {
-        var closing = false;
+        var autoopen = true;
 
         angular.element(uiSelect.focusser).on('focus', function() {
-          if (!closing) {
+          if (autoopen) {
             uiSelect.activate();
           }
         });
 
-        // Because ui-select immediately focuses the focusser after closing
-        // we need to not re-activate after closing
+        // Disable the auto open when this select element has been activated.
+        $scope.$on('uis:activate', function() {
+          autoopen = false;
+        });
+
+        // Re-enable the auto open after the select element has been closed
         $scope.$on('uis:close', function() {
-          closing = true;
-          $timeout(function() { // I'm so sorry
-            closing = false;
-          });
+          autoopen = false;
+          $timeout(function() {
+            autoopen = true;
+          }, 250);
         });
       }
     };
