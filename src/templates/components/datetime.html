@@ -1,6 +1,6 @@
 <div class="input-group">
   <input type="text" class="form-control"
-  ng-focus="calendarOpen = true"
+  ng-focus="calendarOpen = autoOpen"
   ng-click="calendarOpen = true"
   ng-init="calendarOpen = false"
   ng-disabled="readOnly"
@@ -10,6 +10,7 @@
   min-date="component.minDate"
   max-date="component.maxDate"
   datepicker-mode="component.datepickerMode"
+  when-closed="onClosed()"
   enable-date="component.enableDate"
   enable-time="component.enableTime"
   ng-model="data[component.key]"
