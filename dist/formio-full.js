@@ -66974,6 +66974,14 @@ module.exports = function(app) {
           return $interpolate('<span>{{ "' + data + '" | date: "' + component.format + '" }}</span>')();
         },
         group: 'advanced',
+        controller: ['$scope', function($scope) {
+          if (!$scope.component.maxDate) {
+            delete $scope.component.maxDate;
+          }
+          if (!$scope.component.minDate) {
+            delete $scope.component.minDate;
+          }
+        }],
         settings: {
           input: true,
           tableView: true,
