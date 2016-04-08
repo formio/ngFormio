@@ -42,6 +42,7 @@ module.exports = function() {
         $scope.formio = null;
         $scope.page = {};
         $scope.pages = [];
+        $scope.hasTitles = false;
         $scope.colclass = '';
         if (!$scope.submission || !Object.keys($scope.submission.data).length) {
           $scope.submission = session ? {data: session.data} : {data: {}};
@@ -210,6 +211,9 @@ module.exports = function() {
           angular.forEach(form.components, function(component) {
             // Only include panels for the pages.
             if (component.type === 'panel') {
+              if (!$scope.hasTitles && component.title) {
+                $scope.hasTitles = true;
+              }
               $scope.pages.push(component);
             }
           });
