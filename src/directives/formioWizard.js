@@ -41,7 +41,6 @@ module.exports = function() {
 
         $scope.formio = null;
         $scope.page = {};
-        $scope.form = {};
         $scope.pages = [];
         $scope.colclass = '';
         if (!$scope.submission || !Object.keys($scope.submission.data).length) {
@@ -90,6 +89,7 @@ module.exports = function() {
           }))($scope));
           $scope.wizardLoaded = true;
           $scope.formioAlerts = [];
+          window.scrollTo(0, 0);
           $scope.$emit('wizardPage', $scope.currentPage);
         };
 
@@ -214,7 +214,7 @@ module.exports = function() {
             }
           });
 
-          $scope.form = form;
+          $scope.form = angular.merge($scope.form, angular.copy(form));
           $scope.form.components = $scope.pages;
           $scope.page = angular.copy(form);
           $scope.page.display = 'form';
@@ -230,6 +230,18 @@ module.exports = function() {
           $scope.$emit('wizardFormLoad', form);
           showPage();
         };
+
+        $scope.$watch('form', function(form) {
+          if (
+            !form ||
+            !Object.keys(form).length ||
+            !form.components ||
+            !form.components.length
+          ) {
+            return;
+          }
+          setForm(form);
+        });
 
         // Load the form.
         if ($scope.src) {
