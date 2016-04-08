@@ -52,7 +52,6 @@ module.exports = [
         // Used to set the form action.
         var getAction = function(action) {
           if (!action) return '';
-          if ($scope.action) return '';
           if (action.substr(0, 1) === '/') {
             action = Formio.getBaseUrl() + action;
           }

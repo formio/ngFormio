@@ -6439,7 +6439,7 @@ module.exports = function() {
         FormioUtils,
         $http
       ) {
-        var session = $scope.storage ? localStorage.getItem($scope.storage) : false;
+        var session = ($scope.storage && !$scope.readOnly) ? localStorage.getItem($scope.storage) : false;
         if (session) {
           session = angular.fromJson(session);
         }
@@ -6461,7 +6461,7 @@ module.exports = function() {
         };
 
         $scope.clear = function() {
-          if ($scope.storage) {
+          if ($scope.storage && !$scope.readOnly) {
             localStorage.setItem($scope.storage, '');
           }
           $scope.submission = {data: {}};
@@ -6476,7 +6476,7 @@ module.exports = function() {
           }
 
           $scope.wizardLoaded = false;
-          if ($scope.storage) {
+          if ($scope.storage && !$scope.readOnly) {
             localStorage.setItem($scope.storage, angular.toJson({
               page: $scope.currentPage,
               data: $scope.submission.data
@@ -6488,9 +6488,9 @@ module.exports = function() {
             src: "'" + $scope.src + "'",
             form: 'page',
             submission: 'submission',
-            readOnly: 'readOnly',
-            hideComponents: 'hideComponents',
-            formioOptions: 'formioOptions',
+            'read-only': 'readOnly',
+            'hide-components': 'hideComponents',
+            'formio-options': 'formioOptions',
             id: 'formio-wizard-form'
           }))($scope));
           $scope.wizardLoaded = true;
@@ -6537,7 +6537,7 @@ module.exports = function() {
           });
 
           var onDone = function(submission) {
-            if ($scope.storage) {
+            if ($scope.storage && !$scope.readOnly) {
               localStorage.setItem($scope.storage, '');
             }
             $scope.$emit('formSubmission', submission);
@@ -6728,7 +6728,6 @@ module.exports = [
         // Used to set the form action.
         var getAction = function(action) {
           if (!action) return '';
-          if ($scope.action) return '';
           if (action.substr(0, 1) === '/') {
             action = Formio.getBaseUrl() + action;
           }
