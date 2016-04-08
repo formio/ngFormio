@@ -237,6 +237,7 @@ module.exports = function() {
 
         $scope.$watch('form', function(form) {
           if (
+            $scope.src ||
             !form ||
             !Object.keys(form).length ||
             !form.components ||
@@ -244,6 +245,9 @@ module.exports = function() {
           ) {
             return;
           }
+          var formUrl = form.project ? '/project/' + form.project : '';
+          formUrl += '/form/' + form._id;
+          $scope.formio = new Formio(formUrl);
           setForm(form);
         });
 
