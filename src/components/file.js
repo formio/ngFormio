@@ -74,6 +74,36 @@ module.exports = function(app) {
     };
   }]);
 
+  app.directive('formioImage', [function() {
+    return {
+      restrict: 'E',
+      replace: true,
+      scope: {
+        file: '=',
+        form: '='
+      },
+      template: '<img ng-src="{{ imageSrc }}" alt="{{ file.name }}" />',
+      controller: [
+        '$scope',
+        'FormioPlugins',
+        function(
+          $scope,
+          FormioPlugins
+        ) {
+          var plugin = FormioPlugins('storage', $scope.file.storage);
+          // Sign the file if needed.
+          if (plugin) {
+            plugin.getFile($scope.form, $scope.file)
+              .then(function(result) {
+                $scope.imageSrc = result.url;
+                $scope.$apply();
+              });
+          }
+        }
+      ]
+    };
+  }]);
+
   app.controller('formioFileUpload', [
     '$scope',
     'FormioPlugins',
