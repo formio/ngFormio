@@ -52,7 +52,6 @@ module.exports = [
         // Used to set the form action.
         var getAction = function(action) {
           if (!action) return '';
-          if ($scope.action) return '';
           if (action.substr(0, 1) === '/') {
             action = Formio.getBaseUrl() + action;
           }
@@ -82,7 +81,12 @@ module.exports = [
         });
 
         $scope.$watch('form', function(form) {
-          if (!form || (Object.keys(form).length === 0)) {
+          if (
+            !form ||
+            (Object.keys(form).length === 0) ||
+            !form.components ||
+            !form.components.length
+          ) {
             return;
           }
           $scope.formLoading = false;
@@ -115,7 +119,7 @@ module.exports = [
               loader.loadForm().then(function(form) {
                 angular.merge($scope.form, angular.copy(form));
                 $scope.formLoading = false;
-                $scope.$emit('formLoad', form);
+                $scope.$emit('formLoad', $scope.form);
               }, this.onError($scope));
             }
           }

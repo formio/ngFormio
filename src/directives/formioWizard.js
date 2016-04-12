@@ -34,15 +34,15 @@ module.exports = function() {
         FormioUtils,
         $http
       ) {
-        var session = $scope.storage ? localStorage.getItem($scope.storage) : false;
+        var session = ($scope.storage && !$scope.readOnly) ? localStorage.getItem($scope.storage) : false;
         if (session) {
           session = angular.fromJson(session);
         }
 
         $scope.formio = null;
         $scope.page = {};
-        $scope.form = {};
         $scope.pages = [];
+        $scope.hasTitles = false;
         $scope.colclass = '';
         if (!$scope.submission || !Object.keys($scope.submission.data).length) {
           $scope.submission = session ? {data: session.data} : {data: {}};
@@ -56,7 +56,7 @@ module.exports = function() {
         };
 
         $scope.clear = function() {
-          if ($scope.storage) {
+          if ($scope.storage && !$scope.readOnly) {
             localStorage.setItem($scope.storage, '');
           }
           $scope.submission = {data: {}};
@@ -71,7 +71,7 @@ module.exports = function() {
           }
 
           $scope.wizardLoaded = false;
-          if ($scope.storage) {
+          if ($scope.storage && !$scope.readOnly) {
             localStorage.setItem($scope.storage, angular.toJson({
               page: $scope.currentPage,
               data: $scope.submission.data
@@ -83,13 +83,14 @@ module.exports = function() {
             src: "'" + $scope.src + "'",
             form: 'page',
             submission: 'submission',
-            readOnly: 'readOnly',
-            hideComponents: 'hideComponents',
-            formioOptions: 'formioOptions',
+            'read-only': 'readOnly',
+            'hide-components': 'hideComponents',
+            'formio-options': 'formioOptions',
             id: 'formio-wizard-form'
           }))($scope));
           $scope.wizardLoaded = true;
           $scope.formioAlerts = [];
+          window.scrollTo(0, 0);
           $scope.$emit('wizardPage', $scope.currentPage);
         };
 
@@ -131,7 +132,7 @@ module.exports = function() {
           });
 
           var onDone = function(submission) {
-            if ($scope.storage) {
+            if ($scope.storage && !$scope.readOnly) {
               localStorage.setItem($scope.storage, '');
             }
             $scope.$emit('formSubmission', submission);
@@ -210,11 +211,14 @@ module.exports = function() {
           angular.forEach(form.components, function(component) {
             // Only include panels for the pages.
             if (component.type === 'panel') {
+              if (!$scope.hasTitles && component.title) {
+                $scope.hasTitles = true;
+              }
               $scope.pages.push(component);
             }
           });
 
-          $scope.form = form;
+          $scope.form = angular.merge($scope.form, angular.copy(form));
           $scope.form.components = $scope.pages;
           $scope.page = angular.copy(form);
           $scope.page.display = 'form';
@@ -230,6 +234,22 @@ module.exports = function() {
           $scope.$emit('wizardFormLoad', form);
           showPage();
         };
+
+        $scope.$watch('form', function(form) {
+          if (
+            $scope.src ||
+            !form ||
+            !Object.keys(form).length ||
+            !form.components ||
+            !form.components.length
+          ) {
+            return;
+          }
+          var formUrl = form.project ? '/project/' + form.project : '';
+          formUrl += '/form/' + form._id;
+          $scope.formio = new Formio(formUrl);
+          setForm(form);
+        });
 
         // Load the form.
         if ($scope.src) {

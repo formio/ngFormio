@@ -80,6 +80,9 @@ module.exports = function() {
 
               // Get the conditional component.
               var cond = FormioUtils.getComponent($scope.form.components, component.conditional.when.toString());
+              if (!cond) {
+                return;
+              }
               var value = $scope.submission.data[cond.key];
 
               if (value) {

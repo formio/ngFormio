@@ -10,8 +10,18 @@ allows you to render any form using the schemas provided by Form.io in the follo
 The following snippit of code will dynamically render the form within Form.io, as well as automatically hook that form
 up to the REST API generated from the same schema.
 
+Multi-page Forms
+-----------------
+This renderer also supports multi-page forms using the ```formio-wizard``` directive like so.
+
+```
+<formio-wizard src="'https://myapp.form.io/mywizard'"></formio-wizard>
+```
+
+This directive uses Panels within the root of the form to indicate new pages within the form.
+
 Installation
-===================
+------------------
 There are several ways to add this library to your application. Each of these installation types are for specific use
 cases.
 
@@ -71,7 +81,7 @@ $ node
     We also recommend using this within a [Gulp](http://gulpjs.com/) build process using Wiredep in combination with [Gulp UseRef](https://github.com/jonkemp/gulp-useref).
     
 Configuration
-==============
+-----------------
 Once you have this installed, you will now need to add this module within your Angular.js application declaration like so...
 
 ***app.js***
@@ -82,7 +92,7 @@ angular.module('yourApp', [
 ```
 
 Usage
-====================
+--------------
 Now that you have the library installed, you can then do the following to add a form to your application.
 
   - Create an account on https://form.io
