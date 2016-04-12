@@ -119,7 +119,7 @@ module.exports = [
               loader.loadForm().then(function(form) {
                 angular.merge($scope.form, angular.copy(form));
                 $scope.formLoading = false;
-                $scope.$emit('formLoad', form);
+                $scope.$emit('formLoad', $scope.form);
               }, this.onError($scope));
             }
           }
