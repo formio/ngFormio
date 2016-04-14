@@ -1294,7 +1294,7 @@ app.controller('FormSubmissionsController', [
               if (component.multiple && (value.length > 0)) {
                 var values = [];
                 angular.forEach(value, function(arrayValue) {
-                  arrayValue = componentInfo.tableView(arrayValue, component, $interpolate);
+                  arrayValue = componentInfo.tableView(arrayValue, component, $interpolate, formioComponents);
                   if(arrayValue === undefined) {
                     return values.push('');
                   }
@@ -1302,7 +1302,7 @@ app.controller('FormSubmissionsController', [
                 });
                 return values.join(', ');
               }
-              value = componentInfo.tableView(value, component, $interpolate);
+              value = componentInfo.tableView(value, component, $interpolate, formioComponents);
               if(value === undefined) {
                 return '';
               }
