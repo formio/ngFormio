@@ -216,7 +216,7 @@ app.controller('ProjectController', [
         $scope.userTeams = result.data;
         $scope.userTeamsLoading = false;
 
-        // Seperate out the teams that the current user owns, to save an api call.
+        // Separate out the teams that the current user owns, to save an api call.
         $scope.currentProjectEligibleTeams = _.filter(result.data, {owner: $scope.user._id});
       });
 
@@ -1452,12 +1452,16 @@ app.controller('ProjectTeamEditController', [
   'FormioAlerts',
   'GoogleAnalytics',
   '$stateParams',
+  'AppConfig',
+  '$http',
   function(
     $scope,
     $state,
     FormioAlerts,
     GoogleAnalytics,
-    $stateParams
+    $stateParams,
+    AppConfig,
+    $http
   ) {
     $scope.addTeam = {
       _id: ($stateParams.teamId !== null) ? $stateParams.teamId : null,
@@ -1476,8 +1480,16 @@ app.controller('ProjectTeamEditController', [
       $scope.uniqueEligibleTeams = _.filter($scope.currentProjectTeams, {_id: $scope.addTeam._id});
     }
     else {
-      $scope.uniqueEligibleTeams = _.filter($scope.currentProjectEligibleTeams, function(team) {
-        return (current.indexOf(team._id) === -1);
+      // Get the latest team data.
+      $http.get(AppConfig.apiBase + '/team/all').then(function(result) {
+        $scope.userTeams = result.data;
+        $scope.userTeamsLoading = false;
+
+        // Separate out the teams that the current user owns, to save an api call.
+        $scope.currentProjectEligibleTeams = _.filter(result.data, {owner: $scope.user._id});
+        $scope.uniqueEligibleTeams = _.filter($scope.currentProjectEligibleTeams, function(team) {
+          return (current.indexOf(team._id) === -1);
+        });
       });
     }
 

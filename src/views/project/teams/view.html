@@ -35,5 +35,8 @@
 </table>
 
 <div ng-if="currentProject.owner === user._id" class="text-right">
-  <a ui-sref="project.settings.teams.add()" class="btn btn-success"><span class="glyphicon glyphicon-plus"></span> Add Team</a>
+  <a ui-sref="project.settings.teams.add()" class="btn btn-success" ng-if="currentProjectEligibleTeams && currentProjectEligibleTeams.length !== 0"><span class="glyphicon glyphicon-plus"></span> Add Team</a>
+</div>
+<div class="text-center">
+  <a ui-sref="createTeam()" class="btn btn-success" ng-if="!currentProjectEligibleTeams || currentProjectEligibleTeams.length === 0">Create a Team</a>
 </div>
