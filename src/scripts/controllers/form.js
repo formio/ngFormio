@@ -722,7 +722,10 @@ app.factory('ActionInfoLoader', [
        */
       load: function($scope, $stateParams) {
         // Get the action information.
-        $scope.actionUrl = '';
+        $scope.actionUrl = $scope.formio.formUrl + '/action';
+        if ($stateParams.actionId) {
+          $scope.actionUrl += ('/' + $stateParams.actionId);
+        }
         $scope.actionInfo = $stateParams.actionInfo || {settingsForm: {}};
         $scope.action = {data: {settings: {}, condition: {}}};
 
@@ -733,6 +736,9 @@ app.factory('ActionInfoLoader', [
               return $scope.actionInfo;
             }
             $scope.actionInfo = _.cloneDeep(actionInfo);
+            if ($scope.actionUrl) {
+              $scope.actionInfo.settingsForm.action = $scope.actionUrl;
+            }
             return $scope.actionInfo;
           });
         };
@@ -743,7 +749,6 @@ app.factory('ActionInfoLoader', [
          */
         var loadAction = function(defaults) {
           if ($stateParams.actionId) {
-            $scope.actionUrl = $scope.formio.formUrl + '/action/' + $stateParams.actionId;
             var loader = new Formio($scope.actionUrl);
             return loader.loadAction().then(function(action) {
               $scope.action = _.merge($scope.action, {data: action});
