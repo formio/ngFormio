@@ -7166,7 +7166,7 @@ app.run([
   function($templateCache) {
     // The template for the formio forms.
     $templateCache.put('formio.html',
-      "<div>\n  <i style=\"font-size: 2em;\" ng-if=\"formLoading\" class=\"glyphicon glyphicon-refresh glyphicon-spin\"></i>\n  <formio-wizard ng-if=\"form.display === 'wizard'\" src=\"src\" form=\"form\" submission=\"submission\" form-action=\"formAction\" read-only=\"readOnly\" hide-components=\"hideComponents\" formio-options=\"formioOptions\" storage=\"form.name\"></formio-wizard>\n  <ng-form ng-if=\"!form.display || (form.display === 'form')\" role=\"form\" name=\"formioForm\" ng-submit=\"onSubmit(formioForm)\" novalidate>\n    <div ng-repeat=\"alert in formioAlerts track by $index\" class=\"alert alert-{{ alert.type }}\" role=\"alert\">\n      {{ alert.message }}\n    </div>\n    <!-- DO NOT PUT \"track by $index\" HERE SINCE DYNAMICALLY ADDING/REMOVING COMPONENTS WILL BREAK -->\n    <formio-component ng-repeat=\"component in form.components\" component=\"component\" data=\"submission.data\" form=\"formioForm\" formio=\"formio\" read-only=\"readOnly || component.disabled\"></formio-component>\n  </ng-form>\n</div>\n"
+      "<div>\n  <i style=\"font-size: 2em;\" ng-if=\"formLoading\" class=\"glyphicon glyphicon-refresh glyphicon-spin\"></i>\n  <formio-wizard ng-if=\"form.display === 'wizard'\" src=\"src\" form=\"form\" submission=\"submission\" form-action=\"formAction\" read-only=\"readOnly\" hide-components=\"hideComponents\" formio-options=\"formioOptions\" storage=\"form.name\"></formio-wizard>\n  <form ng-if=\"!form.display || (form.display === 'form')\" role=\"form\" name=\"formioForm\" ng-submit=\"onSubmit(formioForm)\" novalidate>\n    <div ng-repeat=\"alert in formioAlerts track by $index\" class=\"alert alert-{{ alert.type }}\" role=\"alert\">\n      {{ alert.message }}\n    </div>\n    <!-- DO NOT PUT \"track by $index\" HERE SINCE DYNAMICALLY ADDING/REMOVING COMPONENTS WILL BREAK -->\n    <formio-component ng-repeat=\"component in form.components\" component=\"component\" data=\"submission.data\" form=\"formioForm\" formio=\"formio\" read-only=\"readOnly || component.disabled\"></formio-component>\n  </form>\n</div>\n"
     );
 
     $templateCache.put('formio-wizard.html',
@@ -7187,7 +7187,7 @@ app.run([
 
     // A formio component template.
     $templateCache.put('formio/component.html',
-      "<div name=\"formioFieldForm\" class=\"formio-component-{{ component.key }}\" ng-hide=\"component.hidden\">\n  <div class=\"form-group has-feedback form-field-type-{{ component.type }} {{component.customClass}}\" id=\"form-group-{{ component.key }}\" ng-class=\"{'has-error': formioFieldForm[component.key].$invalid && !formioFieldForm[component.key].$pristine }\" ng-style=\"component.style\">\n    <formio-element></formio-element>\n  </div>\n</div>\n"
+      "<ng-form name=\"formioFieldForm\" class=\"formio-component-{{ component.key }}\" ng-hide=\"component.hidden\">\n  <div class=\"form-group has-feedback form-field-type-{{ component.type }} {{component.customClass}}\" id=\"form-group-{{ component.key }}\" ng-class=\"{'has-error': formioFieldForm[component.key].$invalid && !formioFieldForm[component.key].$pristine }\" ng-style=\"component.style\">\n    <formio-element></formio-element>\n  </div>\n</ng-form>\n"
     );
 
     $templateCache.put('formio/errors.html',
