@@ -1,6 +1,5 @@
-<table class="table table-striped table-responsive">
-  <tr ng-repeat="component in form.components | tableComponents" ng-if="!ignore[component.key]">
-    <th>{{ component.label }}</th>
-    <td><div ng-bind-html="submission.data | tableView:component"></div></td>
-  </tr>
-</table>
+<div>
+  <div ng-repeat="component in form.components track by $index" >
+    <formio-component-view component="component" data="submission.data"></formio-component-view>
+  </div>
+</div>
