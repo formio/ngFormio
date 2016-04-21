@@ -68119,7 +68119,9 @@ module.exports = function(app) {
         },
         controller: ['$scope', '$http', 'Formio', '$interpolate', function($scope, $http, Formio, $interpolate) {
           var settings = $scope.component;
+          var options = {cache: true};
           $scope.nowrap = true;
+          $scope.hasNextPage = false;
           $scope.selectItems = [];
           var valueProp = $scope.component.valueProperty;
           $scope.getSelectItem = function(item) {
@@ -68174,7 +68176,6 @@ module.exports = function(app) {
             case 'url':
             case 'resource':
               var url = '';
-              var options = {cache: true};
               if (settings.dataSrc === 'url') {
                 url = settings.data.url;
                 if (url.substr(0, 1) === '/') {
@@ -68198,11 +68199,25 @@ module.exports = function(app) {
                 if (settings.data.project) {
                   url += '/project/' + settings.data.project;
                 }
-                url += '/form/' + settings.data.resource + '/submission?limit=1000';
+                url += '/form/' + settings.data.resource + '/submission';
               }
 
+              options.params = {
+                limit: 100,
+                skip: 0
+              };
+
+              $scope.loadMoreItems = function($select, $event) {
+                $event.stopPropagation();
+                $event.preventDefault();
+                options.params.skip += options.params.limit;
+                $scope.refreshItems(null, null, true);
+              };
+
               if (url) {
-                $scope.refreshItems = function(input, newUrl) {
+                $scope.loading = false;
+                $scope.hasNextPage = true;
+                $scope.refreshItems = function(input, newUrl, append) {
                   newUrl = newUrl || url;
                   if (!newUrl) {
                     return;
@@ -68222,8 +68237,35 @@ module.exports = function(app) {
                     newUrl += ((newUrl.indexOf('?') === -1) ? '?' : '&') + filter;
                   }
 
+                  // Set the new result.
+                  var setResult = function(data) {
+                    if (data.length < options.params.limit) {
+                      $scope.hasNextPage = false;
+                    }
+                    if (append) {
+                      $scope.selectItems = $scope.selectItems.concat(data);
+                    }
+                    else {
+                      $scope.selectItems = data;
+                    }
+                  };
+
+                  $scope.loading = true;
                   $http.get(newUrl, options).then(function(result) {
-                    $scope.selectItems = result.data;
+                    var data = result.data;
+                    if (data) {
+                      if (data.hasOwnProperty('data')) {
+                        setResult(data.data);
+                      }
+                      else if (data.hasOwnProperty('items')) {
+                        setResult(data.items);
+                      }
+                      else {
+                        setResult(data);
+                      }
+                    }
+                  })['finally'](function() {
+                    $scope.loading = false;
                   });
                 };
                 $scope.refreshItems();
@@ -68267,7 +68309,7 @@ module.exports = function(app) {
     '$templateCache',
     function($templateCache) {
       $templateCache.put('formio/components/select.html',
-        "<label ng-if=\"component.label && !component.hideLabel\"  for=\"{{ component.key }}\" class=\"control-label\" ng-class=\"{'field-required': component.validate.required}\">{{ component.label }}</label>\n<span ng-if=\"!component.label && component.validate.required\" class=\"glyphicon glyphicon-asterisk form-control-feedback field-required-inline\" aria-hidden=\"true\"></span>\n<ui-select ui-select-required ui-select-open-on-focus ng-model=\"data[component.key]\" safe-multiple-to-single name=\"{{ component.key }}\" ng-disabled=\"readOnly\" ng-required=\"component.validate.required\" id=\"{{ component.key }}\" theme=\"bootstrap\" tabindex=\"{{ component.tabindex || 0 }}\">\n  <ui-select-match class=\"ui-select-match\" placeholder=\"{{ component.placeholder }}\">\n    <formio-select-item template=\"component.template\" item=\"$item || $select.selected\" select=\"$select\"></formio-select-item>\n  </ui-select-match>\n  <ui-select-choices class=\"ui-select-choices\" repeat=\"getSelectItem(item) as item in selectItems | filter: $select.search\" refresh=\"refreshItems($select.search)\" refresh-delay=\"250\">\n    <formio-select-item template=\"component.template\" item=\"item\" select=\"$select\"></formio-select-item>\n  </ui-select-choices>\n</ui-select>\n<formio-errors></formio-errors>\n"
+        "<label ng-if=\"component.label && !component.hideLabel\"  for=\"{{ component.key }}\" class=\"control-label\" ng-class=\"{'field-required': component.validate.required}\">{{ component.label }}</label>\n<span ng-if=\"!component.label && component.validate.required\" class=\"glyphicon glyphicon-asterisk form-control-feedback field-required-inline\" aria-hidden=\"true\"></span>\n<ui-select\n  ui-select-required\n  ui-select-open-on-focus\n  ng-model=\"data[component.key]\"\n  safe-multiple-to-single\n  name=\"{{ component.key }}\"\n  ng-disabled=\"readOnly\"\n  ng-required=\"component.validate.required\"\n  id=\"{{ component.key }}\"\n  theme=\"bootstrap\"\n  tabindex=\"{{ component.tabindex || 0 }}\"\n>\n  <ui-select-match class=\"ui-select-match\" placeholder=\"{{ component.placeholder }}\">\n    <formio-select-item template=\"component.template\" item=\"$item || $select.selected\" select=\"$select\"></formio-select-item>\n  </ui-select-match>\n  <ui-select-choices class=\"ui-select-choices\" repeat=\"getSelectItem(item) as item in selectItems | filter: $select.search\" refresh=\"refreshItems($select.search)\" refresh-delay=\"250\">\n    <formio-select-item template=\"component.template\" item=\"item\" select=\"$select\"></formio-select-item>\n    <button ng-if=\"hasNextPage && ($index == $select.items.length-1)\" class=\"btn btn-success btn-block\" ng-click=\"loadMoreItems($select, $event)\" ng-disabled=\"loading\">Load more...</button>\n  </ui-select-choices>\n</ui-select>\n<formio-errors></formio-errors>\n"
       );
 
       // Change the ui-select to ui-select multiple.
