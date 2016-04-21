@@ -225,11 +225,16 @@ module.exports = function(app) {
               };
 
               if (url) {
-                $scope.loading = false;
+                $scope.selectLoading = false;
                 $scope.hasNextPage = true;
                 $scope.refreshItems = function(input, newUrl, append) {
                   newUrl = newUrl || url;
                   if (!newUrl) {
+                    return;
+                  }
+
+                  // Do not want to call if it is already loading.
+                  if ($scope.selectLoading) {
                     return;
                   }
 
@@ -260,7 +265,7 @@ module.exports = function(app) {
                     }
                   };
 
-                  $scope.loading = true;
+                  $scope.selectLoading = true;
                   $http.get(newUrl, options).then(function(result) {
                     var data = result.data;
                     if (data) {
@@ -275,7 +280,7 @@ module.exports = function(app) {
                       }
                     }
                   })['finally'](function() {
-                    $scope.loading = false;
+                    $scope.selectLoading = false;
                   });
                 };
                 $scope.refreshItems();

@@ -17,7 +17,7 @@
   </ui-select-match>
   <ui-select-choices class="ui-select-choices" repeat="getSelectItem(item) as item in selectItems | filter: $select.search" refresh="refreshItems($select.search)" refresh-delay="250">
     <formio-select-item template="component.template" item="item" select="$select"></formio-select-item>
-    <button ng-if="hasNextPage && ($index == $select.items.length-1)" class="btn btn-success btn-block" ng-click="loadMoreItems($select, $event)" ng-disabled="loading">Load more...</button>
+    <button ng-if="hasNextPage && ($index == $select.items.length-1)" class="btn btn-success btn-block" ng-click="loadMoreItems($select, $event)" ng-disabled="selectLoading">Load more...</button>
   </ui-select-choices>
 </ui-select>
 <formio-errors></formio-errors>
