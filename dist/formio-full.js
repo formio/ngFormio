@@ -66845,7 +66845,7 @@ module.exports = function(app) {
     '$templateCache',
     function($templateCache) {
       $templateCache.put('formio/components/content.html',
-        "<div ng-bind-html=\"component.html | safehtml | formioTranslate\" id=\"{{ component.key }}\"></div>\n"
+        "<div ng-bind-html=\"component.html | safehtml | formioTranslate:component.key\" id=\"{{ component.key }}\"></div>\n"
       );
     }
   ]);
@@ -69699,10 +69699,20 @@ module.exports = [
   function(
     $filter
   ) {
-    return function(text) {
+    return function(text, key) {
       try {
         var translate = $filter('translate');
-        return translate(text);
+        // Allow translating by field key which helps with large blocks of html.
+        if (key) {
+          var result = translate(key);
+          if (result === key) {
+            result = translate(text);
+          }
+          return result;
+        }
+        else {
+          return translate(text);
+        }
       }
       catch (e) {
         return text;

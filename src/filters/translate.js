@@ -3,10 +3,20 @@ module.exports = [
   function(
     $filter
   ) {
-    return function(text) {
+    return function(text, key) {
       try {
         var translate = $filter('translate');
-        return translate(text);
+        // Allow translating by field key which helps with large blocks of html.
+        if (key) {
+          var result = translate(key);
+          if (result === key) {
+            result = translate(text);
+          }
+          return result;
+        }
+        else {
+          return translate(text);
+        }
       }
       catch (e) {
         return text;
