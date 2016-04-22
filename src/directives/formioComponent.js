@@ -17,12 +17,12 @@ module.exports = [
         readOnly: '='
       },
       templateUrl: 'formio/component.html',
-      link: function($scope, el, attrs, formioCtrl) {
+      link: function(scope, el, attrs, formioCtrl) {
         if (formioCtrl) {
-          $scope.showAlerts = formioCtrl.showAlerts.bind(formioCtrl);
+          scope.showAlerts = formioCtrl.showAlerts.bind(formioCtrl);
         }
         else {
-          $scope.showAlerts = function() {
+          scope.showAlerts = function() {
             throw new Error('Cannot call $scope.showAlerts unless this component is inside a formio directive.');
           };
         }
