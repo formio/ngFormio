@@ -69953,7 +69953,33 @@ module.exports = function() {
       storage: '=?'
     },
     link: function(scope, element) {
+      // From https://siongui.github.io/2013/05/12/angularjs-get-element-offset-position/
+      var offset = function(elm) {
+        try {
+          return elm.offset();
+        }
+        catch (e) {
+          // Do nothing...
+        }
+        var rawDom = elm[0];
+        var _x = 0;
+        var _y = 0;
+        var body = document.documentElement || document.body;
+        var scrollX = window.pageXOffset || body.scrollLeft;
+        var scrollY = window.pageYOffset || body.scrollTop;
+        _x = rawDom.getBoundingClientRect().left + scrollX;
+        _y = rawDom.getBoundingClientRect().top + scrollY;
+        return {
+          left: _x,
+          top: _y
+        };
+      };
+
       scope.wizardLoaded = false;
+      scope.wizardTop = offset(element).top;
+      if (scope.wizardTop > 50) {
+        scope.wizardTop -= 50;
+      }
       scope.wizardElement = angular.element('.formio-wizard', element);
     },
     controller: [
@@ -70030,7 +70056,7 @@ module.exports = function() {
           $scope.wizardLoaded = true;
           $scope.formioAlerts = [];
           if (scroll) {
-            window.scrollTo(0, 0);
+            window.scrollTo(0, $scope.wizardTop);
           }
           $scope.$emit('wizardPage', $scope.currentPage);
         };
@@ -70147,6 +70173,17 @@ module.exports = function() {
           $scope.goto(page);
         });
 
+        var updatePages = function() {
+          if ($scope.pages.length > 6) {
+            $scope.margin = ((1 - ($scope.pages.length * 0.0833333333)) / 2) * 100;
+            $scope.colclass = 'col-sm-1';
+          }
+          else {
+            $scope.margin = ((1 - ($scope.pages.length * 0.1666666667)) / 2) * 100;
+            $scope.colclass = 'col-sm-2';
+          }
+        };
+
         var setForm = function(form) {
           $scope.pages = [];
           angular.forEach(form.components, function(component) {
@@ -70163,16 +70200,8 @@ module.exports = function() {
           $scope.form.components = $scope.pages;
           $scope.page = angular.copy(form);
           $scope.page.display = 'form';
-          if ($scope.pages.length > 6) {
-            $scope.margin = ((1 - ($scope.pages.length * 0.0833333333)) / 2) * 100;
-            $scope.colclass = 'col-sm-1';
-          }
-          else {
-            $scope.margin = ((1 - ($scope.pages.length * 0.1666666667)) / 2) * 100;
-            $scope.colclass = 'col-sm-2';
-          }
-
           $scope.$emit('wizardFormLoad', form);
+          updatePages();
           showPage();
         };
 
@@ -70191,6 +70220,9 @@ module.exports = function() {
           $scope.formio = new Formio(formUrl);
           setForm(form);
         });
+
+        // When the components length changes update the pages.
+        $scope.$watch('form.components.length', updatePages);
 
         // Load the form.
         if ($scope.src) {
@@ -70692,7 +70724,7 @@ app.run([
     );
 
     $templateCache.put('formio-wizard.html',
-      "<div>\n  <div class=\"row bs-wizard\" style=\"border-bottom:0;\" ng-class=\"{hasTitles: hasTitles}\">\n    <div ng-class=\"{disabled: ($index > currentPage), active: ($index == currentPage), complete: ($index < currentPage), noTitle: !page.title}\" class=\"{{ colclass }} bs-wizard-step\" ng-repeat=\"page in pages track by $index\">\n      <div class=\"text-center bs-wizard-stepnum\" ng-if=\"page.title\">{{ page.title }}</div>\n      <div class=\"progress\"><div class=\"progress-bar progress-bar-primary\"></div></div>\n      <a ng-click=\"goto($index)\" class=\"bs-wizard-dot bg-primary\"><div class=\"bs-wizard-dot-inner bg-success\"></div></a>\n    </div>\n  </div>\n  <style type=\"text/css\">.bs-wizard > .bs-wizard-step:first-child { margin-left: {{ margin }}%; }</style>\n  <i ng-show=\"!wizardLoaded\" id=\"formio-loading\" style=\"font-size: 2em;\" class=\"glyphicon glyphicon-refresh glyphicon-spin\"></i>\n  <div ng-repeat=\"alert in formioAlerts track by $index\" class=\"alert alert-{{ alert.type }}\" role=\"alert\">{{ alert.message }}</div>\n  <div class=\"formio-wizard\"></div>\n  <ul ng-show=\"wizardLoaded\" class=\"list-inline\">\n    <li><a class=\"btn btn-default\" ng-click=\"cancel()\">Cancel</a></li>\n    <li ng-if=\"currentPage > 0\"><a class=\"btn btn-primary\" ng-click=\"prev()\">Previous</a></li>\n    <li ng-if=\"currentPage < (form.components.length - 1)\">\n      <button class=\"btn btn-primary\" ng-click=\"next()\">Next</button>\n    </li>\n    <li ng-if=\"currentPage >= (form.components.length - 1)\">\n      <button class=\"btn btn-primary\" ng-click=\"submit()\">Submit Form</button>\n    </li>\n  </ul>\n</div>\n"
+      "<div class=\"formio-wizard-wrapper\">\n  <div class=\"row bs-wizard\" style=\"border-bottom:0;\" ng-class=\"{hasTitles: hasTitles}\">\n    <div ng-class=\"{disabled: ($index > currentPage), active: ($index == currentPage), complete: ($index < currentPage), noTitle: !page.title}\" class=\"{{ colclass }} bs-wizard-step\" ng-repeat=\"page in pages track by $index\">\n      <div class=\"text-center bs-wizard-stepnum\" ng-if=\"page.title\">{{ page.title }}</div>\n      <div class=\"progress\"><div class=\"progress-bar progress-bar-primary\"></div></div>\n      <a ng-click=\"goto($index)\" class=\"bs-wizard-dot bg-primary\"><div class=\"bs-wizard-dot-inner bg-success\"></div></a>\n    </div>\n  </div>\n  <style type=\"text/css\">.bs-wizard > .bs-wizard-step:first-child { margin-left: {{ margin }}%; }</style>\n  <i ng-show=\"!wizardLoaded\" id=\"formio-loading\" style=\"font-size: 2em;\" class=\"glyphicon glyphicon-refresh glyphicon-spin\"></i>\n  <div ng-repeat=\"alert in formioAlerts track by $index\" class=\"alert alert-{{ alert.type }}\" role=\"alert\">{{ alert.message }}</div>\n  <div class=\"formio-wizard\"></div>\n  <ul ng-show=\"wizardLoaded\" class=\"list-inline\">\n    <li><a class=\"btn btn-default\" ng-click=\"cancel()\">Cancel</a></li>\n    <li ng-if=\"currentPage > 0\"><a class=\"btn btn-primary\" ng-click=\"prev()\">Previous</a></li>\n    <li ng-if=\"currentPage < (form.components.length - 1)\">\n      <a class=\"btn btn-primary\" ng-click=\"next()\">Next</a>\n    </li>\n    <li ng-if=\"currentPage >= (form.components.length - 1)\">\n      <a class=\"btn btn-primary\" ng-click=\"submit()\">Submit Form</a>\n    </li>\n  </ul>\n</div>\n"
     );
 
     $templateCache.put('formio-delete.html',

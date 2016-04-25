@@ -14,7 +14,33 @@ module.exports = function() {
       storage: '=?'
     },
     link: function(scope, element) {
+      // From https://siongui.github.io/2013/05/12/angularjs-get-element-offset-position/
+      var offset = function(elm) {
+        try {
+          return elm.offset();
+        }
+        catch (e) {
+          // Do nothing...
+        }
+        var rawDom = elm[0];
+        var _x = 0;
+        var _y = 0;
+        var body = document.documentElement || document.body;
+        var scrollX = window.pageXOffset || body.scrollLeft;
+        var scrollY = window.pageYOffset || body.scrollTop;
+        _x = rawDom.getBoundingClientRect().left + scrollX;
+        _y = rawDom.getBoundingClientRect().top + scrollY;
+        return {
+          left: _x,
+          top: _y
+        };
+      };
+
       scope.wizardLoaded = false;
+      scope.wizardTop = offset(element).top;
+      if (scope.wizardTop > 50) {
+        scope.wizardTop -= 50;
+      }
       scope.wizardElement = angular.element('.formio-wizard', element);
     },
     controller: [
@@ -91,7 +117,7 @@ module.exports = function() {
           $scope.wizardLoaded = true;
           $scope.formioAlerts = [];
           if (scroll) {
-            window.scrollTo(0, 0);
+            window.scrollTo(0, $scope.wizardTop);
           }
           $scope.$emit('wizardPage', $scope.currentPage);
         };
@@ -208,6 +234,17 @@ module.exports = function() {
           $scope.goto(page);
         });
 
+        var updatePages = function() {
+          if ($scope.pages.length > 6) {
+            $scope.margin = ((1 - ($scope.pages.length * 0.0833333333)) / 2) * 100;
+            $scope.colclass = 'col-sm-1';
+          }
+          else {
+            $scope.margin = ((1 - ($scope.pages.length * 0.1666666667)) / 2) * 100;
+            $scope.colclass = 'col-sm-2';
+          }
+        };
+
         var setForm = function(form) {
           $scope.pages = [];
           angular.forEach(form.components, function(component) {
@@ -224,16 +261,8 @@ module.exports = function() {
           $scope.form.components = $scope.pages;
           $scope.page = angular.copy(form);
           $scope.page.display = 'form';
-          if ($scope.pages.length > 6) {
-            $scope.margin = ((1 - ($scope.pages.length * 0.0833333333)) / 2) * 100;
-            $scope.colclass = 'col-sm-1';
-          }
-          else {
-            $scope.margin = ((1 - ($scope.pages.length * 0.1666666667)) / 2) * 100;
-            $scope.colclass = 'col-sm-2';
-          }
-
           $scope.$emit('wizardFormLoad', form);
+          updatePages();
           showPage();
         };
 
@@ -252,6 +281,9 @@ module.exports = function() {
           $scope.formio = new Formio(formUrl);
           setForm(form);
         });
+
+        // When the components length changes update the pages.
+        $scope.$watch('form.components.length', updatePages);
 
         // Load the form.
         if ($scope.src) {
