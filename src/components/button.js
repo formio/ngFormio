@@ -132,7 +132,8 @@ module.exports = function(app) {
               }
             }, 100);
           };
-        }]
+        }],
+        viewTemplate: 'formio/componentsView/button.html'
       });
     }
   ]);
@@ -141,6 +142,10 @@ module.exports = function(app) {
     function($templateCache) {
       $templateCache.put('formio/components/button.html',
         fs.readFileSync(__dirname + '/../templates/components/button.html', 'utf8')
+      );
+
+      $templateCache.put('formio/componentsView/button.html',
+        fs.readFileSync(__dirname + '/../templates/componentsView/button.html', 'utf8')
       );
     }
   ]);
