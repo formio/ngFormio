@@ -17,7 +17,12 @@ module.exports = function(app) {
         },
         controller: ['$scope', 'Formio', function($scope, Formio) {
           var settings = $scope.component;
+          var params = settings.params || {};
           $scope.selectItems = [];
+          $scope.hasNextPage = false;
+          $scope.resourceLoading = false;
+          params.limit = 100;
+          params.skip = 0;
           if (settings.multiple) {
             settings.defaultValue = [];
           }
@@ -31,13 +36,13 @@ module.exports = function(app) {
             }
             url += '/form/' + settings.resource;
             var formio = new Formio(url);
-            var refreshing = false;
-            $scope.refreshSubmissions = function(input) {
-              if (refreshing) {
+
+            // Refresh the items.
+            $scope.refreshSubmissions = function(input, append) {
+              if ($scope.resourceLoading) {
                 return;
               }
-              refreshing = true;
-              var params = settings.params || {};
+              $scope.resourceLoading = true;
               // If they wish to return only some fields.
               if (settings.selectFields) {
                 params.select = settings.selectFields;
@@ -52,9 +57,25 @@ module.exports = function(app) {
               formio.loadSubmissions({
                 params: params
               }).then(function(submissions) {
-                $scope.selectItems = submissions || [];
-                refreshing = false;
+                submissions = submissions || [];
+                if (append) {
+                  $scope.selectItems = $scope.selectItems.concat(submissions);
+                }
+                else {
+                  $scope.selectItems = submissions;
+                }
+                $scope.hasNextPage = (submissions.length >= params.limit) && ($scope.selectItems.length < submissions.serverCount);
+              })['finally'](function() {
+                $scope.resourceLoading = false;
               });
+            };
+
+            // Load more items.
+            $scope.loadMoreItems = function($select, $event) {
+              $event.stopPropagation();
+              $event.preventDefault();
+              params.skip += params.limit;
+              $scope.refreshSubmissions(null, true);
             };
 
             $scope.refreshSubmissions();
