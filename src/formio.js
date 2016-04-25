@@ -43,6 +43,8 @@ app.directive('formioSubmission', require('./directives/formioSubmission'));
 
 app.directive('formioComponent', require('./directives/formioComponent'));
 
+app.directive('formioComponentView', require('./directives/formioComponentView'));
+
 app.directive('formioElement', require('./directives/formioElement'));
 
 app.directive('formioWizard', require('./directives/formioWizard'));
@@ -101,6 +103,14 @@ app.run([
     // A formio component template.
     $templateCache.put('formio/component.html',
       fs.readFileSync(__dirname + '/templates/component.html', 'utf8')
+    );
+
+    $templateCache.put('formio/component-view.html',
+      fs.readFileSync(__dirname + '/templates/component-view.html', 'utf8')
+    );
+
+    $templateCache.put('formio/element-view.html',
+      fs.readFileSync(__dirname + '/templates/element-view.html', 'utf8')
     );
 
     $templateCache.put('formio/errors.html',

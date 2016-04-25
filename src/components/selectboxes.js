@@ -18,7 +18,6 @@ module.exports = function(app) {
         angular.forEach($scope.component.values, function(v) {
           model[v.value] = !!ngModel.$viewValue[v.value];
         });
-        ngModel.$setViewValue(model);
         ngModel.$setPristine(true);
 
         ngModel.$isEmpty = function(value) {
@@ -28,9 +27,9 @@ module.exports = function(app) {
         };
 
         $scope.toggleCheckbox = function(value) {
-          var model = angular.copy(ngModel.$viewValue);
-          model[value] = !model[value];
-          ngModel.$setViewValue(model);
+          var _model = angular.copy(ngModel.$viewValue);
+          _model[value] = !_model[value];
+          ngModel.$setViewValue(_model);
         };
       }
     };
@@ -71,7 +70,6 @@ module.exports = function(app) {
 
   app.run([
     '$templateCache',
-    'FormioUtils',
     function($templateCache) {
       $templateCache.put('formio/components/selectboxes-directive.html',
         fs.readFileSync(__dirname + '/../templates/components/selectboxes-directive.html', 'utf8')

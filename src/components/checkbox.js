@@ -6,6 +6,7 @@ module.exports = function(app) {
       formioComponentsProvider.register('checkbox', {
         title: 'Check Box',
         template: 'formio/components/checkbox.html',
+        controller: [function() {}], // This empty controller is required to fix a bug with checkboxes on ui view change - fa-825.
         settings: {
           input: true,
           inputType: 'checkbox',
@@ -26,7 +27,6 @@ module.exports = function(app) {
   ]);
   app.run([
     '$templateCache',
-    'FormioUtils',
     function($templateCache) {
       $templateCache.put('formio/components/checkbox.html',
         fs.readFileSync(__dirname + '/../templates/components/checkbox.html', 'utf8')

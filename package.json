@@ -34,17 +34,18 @@
     "watchify": "^3.4.0"
   },
   "dependencies": {
-    "angular": "^1.5.3",
+    "angular": "^1.5.5",
     "angular-file-saver": "^1.1.1",
     "angular-moment": "^1.0.0-beta.5",
-    "angular-sanitize": "^1.5.3",
-    "angular-ui-bootstrap": "^1.3.1",
+    "angular-sanitize": "^1.5.5",
+    "angular-ui-bootstrap": "^1.3.2",
     "angular-ui-mask": "^1.8.3",
     "bootstrap": "^3.3.6",
-    "bootstrap-ui-datetime-picker": "^2.0.5",
+    "bootstrap-ui-datetime-picker": "^2.3.1",
     "formio-utils": "^0.1.6",
     "formiojs": "^0.2.0",
-    "jquery": "^2.2.2",
+    "gulp-wrap": "^0.11.0",
+    "jquery": "^2.2.3",
     "ng-file-upload": "^12.0.4",
     "signature_pad": "^1.5.3",
     "ui-select": "^0.16.1"
