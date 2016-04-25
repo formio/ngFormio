@@ -220,7 +220,7 @@ module.exports = function() {
             }
           });
 
-          $scope.form = angular.merge($scope.form, angular.copy(form));
+          $scope.form = $scope.form ? angular.merge($scope.form, angular.copy(form)) : angular.copy(form);
           $scope.form.components = $scope.pages;
           $scope.page = angular.copy(form);
           $scope.page.display = 'form';
