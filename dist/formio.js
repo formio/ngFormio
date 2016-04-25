@@ -1,4 +1,4 @@
-/*! ng-formio v1.6.12 | https://npmcdn.com/ng-formio@1.6.12/LICENSE.txt */
+/*! ng-formio v1.6.13 | https://npmcdn.com/ng-formio@1.6.13/LICENSE.txt */
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function (process){
 // vim:ts=4:sts=4:sw=4:
@@ -6133,11 +6133,16 @@ module.exports = function() {
               }
               var value = $scope.submission.data[cond.key];
 
-              if (value) {
+              if (value && typeof value !== 'object') {
                 // Check if the conditional value is equal to the trigger value
                 $scope.show[component.key] = value.toString() === component.conditional.eq.toString()
                   ? boolean[component.conditional.show]
                   : !boolean[component.conditional.show];
+              }
+              // Special check for check boxes component.
+              else if (value && typeof value === 'object') {
+                // Check if the conditional trigger value is true.
+                $scope.show[component.key] = boolean[value[component.conditional.eq].toString()];
               }
               // Check against the components default value, if present and the components hasnt been interacted with.
               else if (!value && cond.defaultValue) {
