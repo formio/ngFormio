@@ -129,7 +129,9 @@ module.exports = function(app) {
         },
         controller: ['$scope', '$http', 'Formio', '$interpolate', function($scope, $http, Formio, $interpolate) {
           var settings = $scope.component;
+          var options = {cache: true};
           $scope.nowrap = true;
+          $scope.hasNextPage = false;
           $scope.selectItems = [];
           var valueProp = $scope.component.valueProperty;
           $scope.getSelectItem = function(item) {
@@ -184,7 +186,6 @@ module.exports = function(app) {
             case 'url':
             case 'resource':
               var url = '';
-              var options = {cache: true};
               if (settings.dataSrc === 'url') {
                 url = settings.data.url;
                 if (url.substr(0, 1) === '/') {
@@ -208,13 +209,32 @@ module.exports = function(app) {
                 if (settings.data.project) {
                   url += '/project/' + settings.data.project;
                 }
-                url += '/form/' + settings.data.resource + '/submission?limit=1000';
+                url += '/form/' + settings.data.resource + '/submission';
               }
 
+              options.params = {
+                limit: 100,
+                skip: 0
+              };
+
+              $scope.loadMoreItems = function($select, $event) {
+                $event.stopPropagation();
+                $event.preventDefault();
+                options.params.skip += options.params.limit;
+                $scope.refreshItems(null, null, true);
+              };
+
               if (url) {
-                $scope.refreshItems = function(input, newUrl) {
+                $scope.selectLoading = false;
+                $scope.hasNextPage = true;
+                $scope.refreshItems = function(input, newUrl, append) {
                   newUrl = newUrl || url;
                   if (!newUrl) {
+                    return;
+                  }
+
+                  // Do not want to call if it is already loading.
+                  if ($scope.selectLoading) {
                     return;
                   }
 
@@ -232,8 +252,35 @@ module.exports = function(app) {
                     newUrl += ((newUrl.indexOf('?') === -1) ? '?' : '&') + filter;
                   }
 
+                  // Set the new result.
+                  var setResult = function(data) {
+                    if (data.length < options.params.limit) {
+                      $scope.hasNextPage = false;
+                    }
+                    if (append) {
+                      $scope.selectItems = $scope.selectItems.concat(data);
+                    }
+                    else {
+                      $scope.selectItems = data;
+                    }
+                  };
+
+                  $scope.selectLoading = true;
                   $http.get(newUrl, options).then(function(result) {
-                    $scope.selectItems = result.data;
+                    var data = result.data;
+                    if (data) {
+                      if (data.hasOwnProperty('data')) {
+                        setResult(data.data);
+                      }
+                      else if (data.hasOwnProperty('items')) {
+                        setResult(data.items);
+                      }
+                      else {
+                        setResult(data);
+                      }
+                    }
+                  })['finally'](function() {
+                    $scope.selectLoading = false;
                   });
                 };
                 $scope.refreshItems();
