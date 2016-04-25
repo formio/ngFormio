@@ -57063,6 +57063,7 @@ module.exports = function(app) {
       formioComponentsProvider.register('checkbox', {
         title: 'Check Box',
         template: 'formio/components/checkbox.html',
+        controller: [function() {}], // This empty controller is required to fix a bug with checkboxes on ui view change - fa-825.
         settings: {
           input: true,
           inputType: 'checkbox',
@@ -57083,10 +57084,9 @@ module.exports = function(app) {
   ]);
   app.run([
     '$templateCache',
-    'FormioUtils',
     function($templateCache) {
       $templateCache.put('formio/components/checkbox.html',
-        "<div class=\"checkbox\">\n  <label for=\"{{ component.key }}\" ng-class=\"{'field-required': component.validate.required}\">\n    <input type=\"{{ component.inputType }}\"\n    id=\"{{ component.key }}\"\n    name=\"{{ component.key }}\"\n    value=\"{{ component.key }}\"\n    ng-checked=\"data[component.key] === 'true'\"\n    tabindex=\"{{ component.tabindex || 0 }}\"\n    ng-disabled=\"readOnly\"\n    ng-model=\"data[component.key]\"\n    ng-required=\"component.validate.required\">\n    {{ component.label }}\n  </label>\n</div>\n"
+        "<div class=\"checkbox\">\n  <label for=\"{{ component.key }}\" ng-class=\"{'field-required': component.validate.required}\">\n    <input type=\"{{ component.inputType }}\"\n    id=\"{{ component.key }}\"\n    name=\"{{ component.key }}\"\n    value=\"{{ component.key }}\"\n    ng-checked=\"data[component.key] || data[component.key] === 'true'\"\n    tabindex=\"{{ component.tabindex || 0 }}\"\n    ng-disabled=\"readOnly\"\n    ng-model=\"data[component.key]\"\n    ng-required=\"component.validate.required\">\n    {{ component.label }}\n  </label>\n</div>\n"
       );
     }
   ]);
@@ -58654,7 +58654,6 @@ module.exports = function(app) {
         angular.forEach($scope.component.values, function(v) {
           model[v.value] = !!ngModel.$viewValue[v.value];
         });
-        ngModel.$setViewValue(model);
         ngModel.$setPristine(true);
 
         ngModel.$isEmpty = function(value) {
@@ -58664,9 +58663,9 @@ module.exports = function(app) {
         };
 
         $scope.toggleCheckbox = function(value) {
-          var model = angular.copy(ngModel.$viewValue);
-          model[value] = !model[value];
-          ngModel.$setViewValue(model);
+          var _model = angular.copy(ngModel.$viewValue);
+          _model[value] = !_model[value];
+          ngModel.$setViewValue(_model);
         };
       }
     };
@@ -58707,7 +58706,6 @@ module.exports = function(app) {
 
   app.run([
     '$templateCache',
-    'FormioUtils',
     function($templateCache) {
       $templateCache.put('formio/components/selectboxes-directive.html',
         "<div class=\"select-boxes\">\n  <div ng-class=\"component.inline ? 'checkbox-inline' : 'checkbox'\" ng-repeat=\"v in component.values track by $index\">\n    <label class=\"control-label\" for=\"{{ component.key }}-{{ v.value }}\">\n      <input type=\"checkbox\"\n        id=\"{{ component.key }}-{{ v.value }}\"\n        name=\"{{ component.key }}-{{ v.value }}\"\n        value=\"{{ v.value }}\"\n        tabindex=\"{{ component.tabindex || 0 }}\"\n        ng-disabled=\"readOnly\"\n        ng-click=\"toggleCheckbox(v.value)\"\n        ng-checked=\"model[v.value]\"\n      >\n      {{ v.label }}\n    </label>\n  </div>\n</div>\n"
