@@ -1,4 +1,4 @@
-<div>
+<div class="formio-wizard-wrapper">
   <div class="row bs-wizard" style="border-bottom:0;" ng-class="{hasTitles: hasTitles}">
     <div ng-class="{disabled: ($index > currentPage), active: ($index == currentPage), complete: ($index < currentPage), noTitle: !page.title}" class="{{ colclass }} bs-wizard-step" ng-repeat="page in pages track by $index">
       <div class="text-center bs-wizard-stepnum" ng-if="page.title">{{ page.title }}</div>
@@ -14,10 +14,10 @@
     <li><a class="btn btn-default" ng-click="cancel()">Cancel</a></li>
     <li ng-if="currentPage > 0"><a class="btn btn-primary" ng-click="prev()">Previous</a></li>
     <li ng-if="currentPage < (form.components.length - 1)">
-      <button class="btn btn-primary" ng-click="next()">Next</button>
+      <a class="btn btn-primary" ng-click="next()">Next</a>
     </li>
     <li ng-if="currentPage >= (form.components.length - 1)">
-      <button class="btn btn-primary" ng-click="submit()">Submit Form</button>
+      <a class="btn btn-primary" ng-click="submit()">Submit Form</a>
     </li>
   </ul>
 </div>

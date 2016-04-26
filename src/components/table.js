@@ -32,6 +32,10 @@ module.exports = function(app) {
       $templateCache.put('formio/components/table.html',
         fs.readFileSync(__dirname + '/../templates/components/table.html', 'utf8')
       );
+
+      $templateCache.put('formio/componentsView/table.html',
+        fs.readFileSync(__dirname + '/../templates/componentsView/table.html', 'utf8')
+      );
     }
   ]);
 };
