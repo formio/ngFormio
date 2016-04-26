@@ -10,6 +10,10 @@ allows you to render any form using the schemas provided by Form.io in the follo
 The following snippit of code will dynamically render the form within Form.io, as well as automatically hook that form
 up to the REST API generated from the same schema.
 
+Here is a Demo
+-----------------
+https://embed.plnkr.co/OlaYjN/
+
 Multi-page Forms
 -----------------
 This renderer also supports multi-page forms using the ```formio-wizard``` directive like so.
