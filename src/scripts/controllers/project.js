@@ -1395,6 +1395,11 @@ app.controller('ProjectSettingsController', [
     GoogleAnalytics,
     FormioAlerts
   ) {
+    if ($scope.highestRole && ['team_read', 'team_write'].indexOf($scope.highestRole) !== -1) {
+      $state.go('project.overview');
+      return;
+    }
+
     $scope.currentSection.title = 'Settings';
     $scope.currentSection.icon = 'fa fa-cogs';
     $scope.currentSection.help = 'https://help.form.io/userguide/#settings-project';
