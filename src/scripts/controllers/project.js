@@ -1,6 +1,6 @@
 'use strict';
 
-/* globals NumberAbbreviate */
+/* globals NumberAbbreviate, chance */
 
 var app = angular.module('formioApp.controllers.project', ['angular-chartist']);
 
@@ -1414,6 +1414,29 @@ app.controller('ProjectSettingsController', [
       $scope.currentProject.plan = $scope.currentProject.plan || 'basic';
       $scope.currentProject = _.cloneDeep($scope.currentProject);
     });
+
+    $scope.addKey = function() {
+      if (!$scope.currentProject.settings.keys) {
+        $scope.currentProject.settings.keys = [];
+      }
+      var keyIndex = ($scope.currentProject.settings.keys.length + 1);
+      $scope.currentProject.settings.keys.forEach(function(key) {
+        if (key.name === ('Key ' + keyIndex)) {
+          keyIndex++;
+        }
+      });
+      $scope.currentProject.settings.keys.push({
+        name: 'Key ' + keyIndex,
+        key: chance.string({
+          length: 30,
+          pool: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+        })
+      });
+    };
+
+    $scope.removeKey = function($index) {
+      $scope.currentProject.settings.keys.splice($index, 1);
+    };
 
     // Save the Project.
     $scope.saveProject = function() {
