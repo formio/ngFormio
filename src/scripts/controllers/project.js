@@ -1,6 +1,6 @@
 'use strict';
 
-/* globals NumberAbbreviate */
+/* globals NumberAbbreviate, chance */
 
 var app = angular.module('formioApp.controllers.project', ['angular-chartist']);
 
