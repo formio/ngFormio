@@ -212,6 +212,10 @@ angular
           url: '/data',
           templateUrl: 'views/project/data/index.html'
         })
+        .state('project.settings.apiKeys', {
+          url: '/apiKeys',
+          templateUrl: 'views/project/apiKeys/index.html'
+        })
         .state('project.settings.oauth', {
           url: '/oauth',
           templateUrl: 'views/project/oauth/index.html'
