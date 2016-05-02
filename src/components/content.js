@@ -9,7 +9,8 @@ module.exports = function(app) {
         settings: {
           input: false,
           html: ''
-        }
+        },
+        viewTemplate: 'formio/components/content.html'
       });
     }
   ]);

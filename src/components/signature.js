@@ -28,7 +28,8 @@ module.exports = function(app) {
           validate: {
             required: false
           }
-        }
+        },
+        viewTemplate: 'formio/componentsView/signature.html'
       });
     }
   ]);
@@ -125,6 +126,10 @@ module.exports = function(app) {
               FormioUtils) {
       $templateCache.put('formio/components/signature.html', FormioUtils.fieldWrap(
         fs.readFileSync(__dirname + '/../templates/components/signature.html', 'utf8')
+      ));
+
+      $templateCache.put('formio/componentsView/signature.html', FormioUtils.fieldWrap(
+        fs.readFileSync(__dirname + '/../templates/componentsView/signature.html', 'utf8')
       ));
     }
   ]);
