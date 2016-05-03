@@ -67724,6 +67724,11 @@ module.exports = function(app) {
         },
         group: 'advanced',
         controller: ['$scope', '$timeout', function($scope, $timeout) {
+          // Ensure value is a date.
+          if ($scope.data.hasOwnProperty($scope.component.key) && !($scope.data[$scope.component.key] instanceof Date)) {
+            $scope.data[$scope.component.key] = new Date($scope.data[$scope.component.key]);
+          }
+
           if (!$scope.component.maxDate) {
             delete $scope.component.maxDate;
           }
