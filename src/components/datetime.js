@@ -11,10 +11,13 @@ module.exports = function(app) {
         },
         group: 'advanced',
         controller: ['$scope', '$timeout', function($scope, $timeout) {
-          // Ensure value is a date.
-          if ($scope.data.hasOwnProperty($scope.component.key) && !($scope.data[$scope.component.key] instanceof Date)) {
-            $scope.data[$scope.component.key] = new Date($scope.data[$scope.component.key]);
-          }
+          // Ensure the date value is always a date object when loaded, then unbind the watch.
+          var loadComplete = $scope.$watch('data.' + $scope.component.key, function() {
+            if ($scope.data && $scope.data[$scope.component.key] && !($scope.data[$scope.component.key] instanceof Date)) {
+              $scope.data[$scope.component.key] = new Date($scope.data[$scope.component.key]);
+              loadComplete();
+            }
+          });
 
           if (!$scope.component.maxDate) {
             delete $scope.component.maxDate;
