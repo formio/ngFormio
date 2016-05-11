@@ -3,7 +3,8 @@ var fs = require('fs');
 module.exports = function(app) {
   app.directive('formioHtmlElement', [
     '$sanitize',
-    function($sanitize) {
+    '$filter',
+    function($sanitize, $filter) {
       return {
         restrict: 'E',
         scope: {
@@ -16,7 +17,7 @@ module.exports = function(app) {
               '<' + $scope.component.tag + '>' + '</' + $scope.component.tag + '>'
             );
 
-            element.html($scope.component.content);
+            element.html($filter('formioTranslate')($scope.component.content));
 
             element.attr('class', $scope.component.className);
             angular.forEach($scope.component.attrs, function(attr) {

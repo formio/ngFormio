@@ -9,6 +9,6 @@
     ng-required="component.validate.required"
     ng-disabled="readOnly"
     custom-validator="component.validate.custom">
-    {{ v.label }}
+    {{ v.label | formioTranslate }}
   </label>
 </div>
