@@ -1,4 +1,4 @@
-/*! ng-formio v1.7.2 | https://npmcdn.com/ng-formio@1.7.2/LICENSE.txt */
+/*! ng-formio v1.7.3 | https://npmcdn.com/ng-formio@1.7.3/LICENSE.txt */
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -48125,9 +48125,6 @@ var currentQueue;
 var queueIndex = -1;
 
 function cleanUpNextTick() {
-    if (!draining || !currentQueue) {
-        return;
-    }
     draining = false;
     if (currentQueue.length) {
         queue = currentQueue.concat(queue);
@@ -67728,10 +67725,13 @@ module.exports = function(app) {
         },
         group: 'advanced',
         controller: ['$scope', '$timeout', function($scope, $timeout) {
-          // Ensure value is a date.
-          if ($scope.data.hasOwnProperty($scope.component.key) && !($scope.data[$scope.component.key] instanceof Date)) {
-            $scope.data[$scope.component.key] = new Date($scope.data[$scope.component.key]);
-          }
+          // Ensure the date value is always a date object when loaded, then unbind the watch.
+          var loadComplete = $scope.$watch('data.' + $scope.component.key, function() {
+            if ($scope.data && $scope.data[$scope.component.key] && !($scope.data[$scope.component.key] instanceof Date)) {
+              $scope.data[$scope.component.key] = new Date($scope.data[$scope.component.key]);
+              loadComplete();
+            }
+          });
 
           if (!$scope.component.maxDate) {
             delete $scope.component.maxDate;
