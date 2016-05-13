@@ -325,6 +325,48 @@ app.controller('FormController', [
       }
     };
 
+    // Keep track of the self access permissions.
+    $scope.selfAccessPermissions = false;
+
+    // Util function to get or set the selfAccess value;
+    var selfAccess = function(setValue) {
+      var found = false;
+      var value = false;
+      var permissions = _.get($scope.form, 'submissionAccess');
+      _.each(permissions, function(permission) {
+        if (!found && permission.type === 'self') {
+          if (typeof setValue !== 'undefined') {
+            permission.roles = [setValue];
+            found = true;
+          }
+          else {
+            value = _.any(permission.roles) || false;
+          }
+        }
+      });
+
+      if (!found && typeof setValue !== 'undefined' && _.has($scope.form, 'submissionAccess')) {
+        $scope.form.submissionAccess.push({
+          type: 'self',
+          roles: [true]
+        });
+      }
+
+      return value;
+    };
+
+    // ng-change function to help modify the value of self access permissions.
+    $scope.toggleSelfAccessPermissions = function() {
+      $scope.selfAccessPermissions = !$scope.selfAccessPermissions;
+      selfAccess($scope.selfAccessPermissions);
+    };
+
+    // Watch for the first load of the form. Used to parse self access permissions once.
+    var loaded = $scope.$watch('form.submissionAccess', function() {
+      $scope.selfAccessPermissions = selfAccess();
+      loaded();
+    });
+
     $scope.$watch('form.display', function(display) {
       $scope.$broadcast('formDisplay', display);
     });
@@ -338,7 +380,7 @@ app.controller('FormController', [
     });
 
     // Load the form.
-    if($scope.formId) {
+    if ($scope.formId) {
       $scope.loadFormPromise = $scope.formio.loadForm().then(function(form) {
         // Ensure the display is form.
         if (!form.display) {
