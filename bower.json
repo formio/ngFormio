@@ -26,7 +26,7 @@
     "number-abbreviate": "^1.1.0",
     "seamless": "^0.0.6",
     "ng-formio": "^1.7.4",
-    "ng-formio-builder": "^1.11.6",
+    "ng-formio-builder": "^1.11.7",
     "ng-tags-input": "^3.0.0",
     "chance": "^1.0.2"
   },
