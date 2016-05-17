@@ -68927,12 +68927,20 @@ module.exports = function(app) {
       formioComponentsProvider.register('selectboxes', {
         title: 'Select Boxes',
         template: 'formio/components/selectboxes.html',
-        tableView: function(data) {
+        tableView: function(data, component) {
           if (!data) return '';
 
           return Object.keys(data)
           .filter(function(key) {
             return data[key];
+          })
+          .map(function(data) {
+            component.values.forEach(function(item) {
+              if (item.value === data) {
+                data = item.label;
+              }
+            });
+            return data;
           })
           .join(', ');
         },
