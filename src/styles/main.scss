@@ -703,6 +703,13 @@ pre code {
     margin-bottom: 15px;
   }
 
+  p {
+    text-align: right;
+    font-weight: 100;
+    a {
+      color: #FFF;
+    }
+  }
 
   button[type="submit"] {
     margin-top: 87px;

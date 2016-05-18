@@ -212,6 +212,10 @@ angular
           url: '/data',
           templateUrl: 'views/project/data/index.html'
         })
+        .state('project.settings.apiKeys', {
+          url: '/apiKeys',
+          templateUrl: 'views/project/apiKeys/index.html'
+        })
         .state('project.settings.oauth', {
           url: '/oauth',
           templateUrl: 'views/project/oauth/index.html'
@@ -557,6 +561,7 @@ angular
     'GoogleAnalytics',
     '$location',
     '$window',
+    '$http',
     function(
       $state,
       $stateParams,
@@ -567,7 +572,8 @@ angular
       ProjectProgress,
       GoogleAnalytics,
       $location,
-      $window
+      $window,
+      $http
     ) {
 
       // Force SSL.
@@ -641,22 +647,28 @@ angular
       };
 
       var authError = function() {
-        // Fix resource select components - FA-773.
-        if ($state.includes('project.form.form.*')) {
-          FormioAlerts.addAlert({
-            type: 'danger',
-            message: 'You are not authorized to view some data in this form.'
+        // Attempt to confirm if the current user is denied access or logged out.
+        $http.get(AppConfig.apiBase + '/current')
+          .then(function(data) {
+            // Fix resource select components - FA-773.
+            // Fix issue with access denied for team_write users, making it impossible to use the ui - FA-837
+            if (/^20\d{1}$/.test(data.status.toString())) {
+              FormioAlerts.addAlert({
+                type: 'danger',
+                message: 'You are not authorized to view some data on this page.'
+              });
+              return;
+            }
+            else {
+              $rootScope.currentApp = null;
+              $rootScope.currentForm = null;
+              $state.go('home');
+              FormioAlerts.addAlert({
+                type: 'danger',
+                message: 'You are not authorized to perform the requested operation.'
+              });
+            }
           });
-          return;
-        }
-
-        $rootScope.currentApp = null;
-        $rootScope.currentForm = null;
-        $state.go('home');
-        FormioAlerts.addAlert({
-          type: 'danger',
-          message: 'You are not authorized to perform the requested operation.'
-        });
       };
 
       var logoutError = function() {
