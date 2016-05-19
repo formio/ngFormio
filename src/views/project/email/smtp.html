@@ -1,0 +1,24 @@
+<div class="well">
+  <h4>SMTP Settings</h4>
+  <p>SMTP is a standard protocol for sending mail on your behalf. Please provide your credentials below.</p>
+</div>
+<div class="form-group">
+  <label for="smtpSecure">SSL</label>
+  <input ng-model="currentProject.settings.email.smtp.secure" type="checkbox" id="smtpSecure" name="smtpSecure">
+</div>
+<div class="form-group">
+  <label for="smtpHost">Host</label>
+  <input ng-model="currentProject.settings.email.smtp.host" type="text" class="form-control" id="smtpHost" name="smtpHost" placeholder="smtp.example.com">
+</div>
+<div class="form-group">
+  <label for="smtpPort">Port</label>
+  <input ng-model="currentProject.settings.email.smtp.port" type="text" class="form-control" id="smtpPort" name="smtpPort" placeholder="25">
+</div>
+<div class="form-group">
+  <label for="smtpUser">Username</label>
+  <input ng-model="currentProject.settings.email.smtp.auth.user" type="text" class="form-control" id="smtpUser" name="smtpUser" placeholder="Username">
+</div>
+<div class="form-group">
+  <label for="smtpPass">Password</label>
+  <input ng-model="currentProject.settings.email.smtp.auth.pass" type="text" class="form-control" id="smtpPass" name="smtpPass" placeholder="Password">
+</div>
