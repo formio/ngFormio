@@ -19,14 +19,14 @@ module.exports = function(app) {
             angular.forEach(component.components, function(component) {
               var info = componentInfo.components.hasOwnProperty(component.type) ? componentInfo.components[component.type] : {};
               if (info.tableView) {
-                view += '<td>' + info.tableView(row[component.key], component, $interpolate, componentInfo) + '</td>';
+                view += '<td>' + info.tableView(row[component.key] || '', component, $interpolate, componentInfo) + '</td>';
               }
               else {
                 view += '<td>';
                 if (component.prefix) {
                   view += component.prefix;
                 }
-                view += row[component.key];
+                view += row[component.key] || '';
                 if (component.suffix) {
                   view += ' ' + component.suffix;
                 }

@@ -16,7 +16,8 @@ module.exports = function(app) {
           multiple: false,
           defaultValue: '',
           protected: false
-        }
+        },
+        viewTemplate: 'formio/componentsView/file.html'
       });
     }
   ]);
@@ -58,12 +59,17 @@ module.exports = function(app) {
       template: '<a href="{{ file.url }}" ng-click="getFile($event)" target="_blank">{{ file.name }}</a>',
       controller: [
         '$scope',
+        '$rootScope',
         'FormioPlugins',
         function(
           $scope,
+          $rootScope,
           FormioPlugins
         ) {
           $scope.getFile = function(evt) {
+            // In view mode there may not be a form. Need a way to override.
+            $scope.form = $scope.form || $rootScope.filePath;
+
             var plugin = FormioPlugins('storage', $scope.file.storage);
             if (plugin) {
               plugin.downloadFile(evt, $scope.file, $scope);
@@ -85,12 +91,18 @@ module.exports = function(app) {
       template: '<img ng-src="{{ imageSrc }}" alt="{{ file.name }}" />',
       controller: [
         '$scope',
+        '$rootScope',
         'FormioPlugins',
         function(
           $scope,
+          $rootScope,
           FormioPlugins
         ) {
           var plugin = FormioPlugins('storage', $scope.file.storage);
+
+          // In view mode there may not be a form. Need a way to override.
+          $scope.form = $scope.form || $rootScope.filePath;
+
           // Sign the file if needed.
           if (plugin) {
             plugin.getFile($scope.form, $scope.file)
@@ -172,6 +184,10 @@ module.exports = function(app) {
 
       $templateCache.put('formio/components/file.html',
         fs.readFileSync(__dirname + '/../templates/components/file.html', 'utf8')
+      );
+
+      $templateCache.put('formio/componentsView/file.html',
+        fs.readFileSync(__dirname + '/../templates/componentsView/file.html', 'utf8')
       );
     }
   ]);

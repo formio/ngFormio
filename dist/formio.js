@@ -1,5 +1,179 @@
 /*! ng-formio v1.7.4 | https://npmcdn.com/ng-formio@1.7.4/LICENSE.txt */
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+// shim for using process in browser
+
+var process = module.exports = {};
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = setTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    clearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        setTimeout(drainQueue, 0);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+},{}],2:[function(require,module,exports){
+module.exports = {
+  isLayoutComponent: function isLayoutComponent(component) {
+    return (
+      (component.columns && Array.isArray(component.columns)) ||
+      (component.rows && Array.isArray(component.rows)) ||
+      (component.components && Array.isArray(component.components))
+    ) ? true : false;
+  },
+
+  /**
+   * Iterate through each component within a form.
+   * @param components
+   * @param fn
+   */
+  eachComponent: function eachComponent(components, fn, includeAll) {
+    if (!components) return;
+
+    components.forEach(function(component) {
+      var hasColumns = component.columns && Array.isArray(component.columns);
+      var hasRows = component.rows && Array.isArray(component.rows);
+      var hasComps = component.components && Array.isArray(component.components);
+      var noRecurse = false;
+      if (includeAll || component.tree || (!hasColumns && !hasRows && !hasComps)) {
+        noRecurse = fn(component);
+      }
+
+      if (!noRecurse) {
+        if (hasColumns) {
+          component.columns.forEach(function(column) {
+            eachComponent(column.components, fn, includeAll);
+          });
+        }
+
+        else if (hasRows) {
+          [].concat.apply([], component.rows).forEach(function(row) {
+            eachComponent(row.components, fn, includeAll);
+          });
+        }
+
+        else if (hasComps) {
+          eachComponent(component.components, fn, includeAll);
+        }
+      }
+    });
+  },
+
+  /**
+   * Get a component by its key
+   * @param components
+   * @param key The key of the component to get
+   * @returns The component that matches the given key, or undefined if not found.
+   */
+  getComponent: function getComponent(components, key) {
+    var result;
+    module.exports.eachComponent(components, function(component) {
+      if (component.key === key) {
+        result = component;
+      }
+    });
+    return result;
+  },
+
+  /**
+   * Flatten the form components for data manipulation.
+   * @param components
+   * @param flattened
+   * @returns {*|{}}
+   */
+  flattenComponents: function flattenComponents(components) {
+    var flattened = {};
+    module.exports.eachComponent(components, function(component) {
+      flattened[component.key] = component;
+    });
+    return flattened;
+  }
+};
+
+},{}],3:[function(require,module,exports){
 (function (process){
 // vim:ts=4:sts=4:sw=4:
 /*!
@@ -2051,7 +2225,7 @@ return Q;
 });
 
 }).call(this,require('_process'))
-},{"_process":5}],2:[function(require,module,exports){
+},{"_process":1}],4:[function(require,module,exports){
 /*!
  * EventEmitter2
  * https://github.com/hij1nx/EventEmitter2
@@ -2626,85 +2800,376 @@ return Q;
   }
 }();
 
-},{}],3:[function(require,module,exports){
-module.exports = {
-  isLayoutComponent: function isLayoutComponent(component) {
-    return (
-      (component.columns && Array.isArray(component.columns)) ||
-      (component.rows && Array.isArray(component.rows)) ||
-      (component.components && Array.isArray(component.components))
-    ) ? true : false;
-  },
-
-  /**
-   * Iterate through each component within a form.
-   * @param components
-   * @param fn
-   */
-  eachComponent: function eachComponent(components, fn, includeAll) {
-    if (!components) return;
-
-    components.forEach(function(component) {
-      var hasColumns = component.columns && Array.isArray(component.columns);
-      var hasRows = component.rows && Array.isArray(component.rows);
-      var hasComps = component.components && Array.isArray(component.components);
-      var noRecurse = false;
-      if (includeAll || component.tree || (!hasColumns && !hasRows && !hasComps)) {
-        noRecurse = fn(component);
-      }
-
-      if (!noRecurse) {
-        if (hasColumns) {
-          component.columns.forEach(function(column) {
-            eachComponent(column.components, fn, includeAll);
-          });
+},{}],5:[function(require,module,exports){
+module.exports = function (obj) {
+    if (!obj || typeof obj !== 'object') return obj;
+    
+    var copy;
+    
+    if (isArray(obj)) {
+        var len = obj.length;
+        copy = Array(len);
+        for (var i = 0; i < len; i++) {
+            copy[i] = obj[i];
         }
-
-        else if (hasRows) {
-          [].concat.apply([], component.rows).forEach(function(row) {
-            eachComponent(row.components, fn, includeAll);
-          });
+    }
+    else {
+        var keys = objectKeys(obj);
+        copy = {};
+        
+        for (var i = 0, l = keys.length; i < l; i++) {
+            var key = keys[i];
+            copy[key] = obj[key];
         }
-
-        else if (hasComps) {
-          eachComponent(component.components, fn, includeAll);
-        }
-      }
-    });
-  },
-
-  /**
-   * Get a component by its key
-   * @param components
-   * @param key The key of the component to get
-   * @returns The component that matches the given key, or undefined if not found.
-   */
-  getComponent: function getComponent(components, key) {
-    var result;
-    module.exports.eachComponent(components, function(component) {
-      if (component.key === key) {
-        result = component;
-      }
-    });
-    return result;
-  },
-
-  /**
-   * Flatten the form components for data manipulation.
-   * @param components
-   * @param flattened
-   * @returns {*|{}}
-   */
-  flattenComponents: function flattenComponents(components) {
-    var flattened = {};
-    module.exports.eachComponent(components, function(component) {
-      flattened[component.key] = component;
-    });
-    return flattened;
-  }
+    }
+    return copy;
 };
 
-},{}],4:[function(require,module,exports){
+var objectKeys = Object.keys || function (obj) {
+    var keys = [];
+    for (var key in obj) {
+        if ({}.hasOwnProperty.call(obj, key)) keys.push(key);
+    }
+    return keys;
+};
+
+var isArray = Array.isArray || function (xs) {
+    return {}.toString.call(xs) === '[object Array]';
+};
+
+},{}],6:[function(require,module,exports){
+(function() {
+  'use strict';
+
+  if (self.fetch) {
+    return
+  }
+
+  function normalizeName(name) {
+    if (typeof name !== 'string') {
+      name = name.toString();
+    }
+    if (/[^a-z0-9\-#$%&'*+.\^_`|~]/i.test(name)) {
+      throw new TypeError('Invalid character in header field name')
+    }
+    return name.toLowerCase()
+  }
+
+  function normalizeValue(value) {
+    if (typeof value !== 'string') {
+      value = value.toString();
+    }
+    return value
+  }
+
+  function Headers(headers) {
+    this.map = {}
+
+    if (headers instanceof Headers) {
+      headers.forEach(function(value, name) {
+        this.append(name, value)
+      }, this)
+
+    } else if (headers) {
+      Object.getOwnPropertyNames(headers).forEach(function(name) {
+        this.append(name, headers[name])
+      }, this)
+    }
+  }
+
+  Headers.prototype.append = function(name, value) {
+    name = normalizeName(name)
+    value = normalizeValue(value)
+    var list = this.map[name]
+    if (!list) {
+      list = []
+      this.map[name] = list
+    }
+    list.push(value)
+  }
+
+  Headers.prototype['delete'] = function(name) {
+    delete this.map[normalizeName(name)]
+  }
+
+  Headers.prototype.get = function(name) {
+    var values = this.map[normalizeName(name)]
+    return values ? values[0] : null
+  }
+
+  Headers.prototype.getAll = function(name) {
+    return this.map[normalizeName(name)] || []
+  }
+
+  Headers.prototype.has = function(name) {
+    return this.map.hasOwnProperty(normalizeName(name))
+  }
+
+  Headers.prototype.set = function(name, value) {
+    this.map[normalizeName(name)] = [normalizeValue(value)]
+  }
+
+  Headers.prototype.forEach = function(callback, thisArg) {
+    Object.getOwnPropertyNames(this.map).forEach(function(name) {
+      this.map[name].forEach(function(value) {
+        callback.call(thisArg, value, name, this)
+      }, this)
+    }, this)
+  }
+
+  function consumed(body) {
+    if (body.bodyUsed) {
+      return Promise.reject(new TypeError('Already read'))
+    }
+    body.bodyUsed = true
+  }
+
+  function fileReaderReady(reader) {
+    return new Promise(function(resolve, reject) {
+      reader.onload = function() {
+        resolve(reader.result)
+      }
+      reader.onerror = function() {
+        reject(reader.error)
+      }
+    })
+  }
+
+  function readBlobAsArrayBuffer(blob) {
+    var reader = new FileReader()
+    reader.readAsArrayBuffer(blob)
+    return fileReaderReady(reader)
+  }
+
+  function readBlobAsText(blob) {
+    var reader = new FileReader()
+    reader.readAsText(blob)
+    return fileReaderReady(reader)
+  }
+
+  var support = {
+    blob: 'FileReader' in self && 'Blob' in self && (function() {
+      try {
+        new Blob();
+        return true
+      } catch(e) {
+        return false
+      }
+    })(),
+    formData: 'FormData' in self
+  }
+
+  function Body() {
+    this.bodyUsed = false
+
+
+    this._initBody = function(body) {
+      this._bodyInit = body
+      if (typeof body === 'string') {
+        this._bodyText = body
+      } else if (support.blob && Blob.prototype.isPrototypeOf(body)) {
+        this._bodyBlob = body
+      } else if (support.formData && FormData.prototype.isPrototypeOf(body)) {
+        this._bodyFormData = body
+      } else if (!body) {
+        this._bodyText = ''
+      } else {
+        throw new Error('unsupported BodyInit type')
+      }
+    }
+
+    if (support.blob) {
+      this.blob = function() {
+        var rejected = consumed(this)
+        if (rejected) {
+          return rejected
+        }
+
+        if (this._bodyBlob) {
+          return Promise.resolve(this._bodyBlob)
+        } else if (this._bodyFormData) {
+          throw new Error('could not read FormData body as blob')
+        } else {
+          return Promise.resolve(new Blob([this._bodyText]))
+        }
+      }
+
+      this.arrayBuffer = function() {
+        return this.blob().then(readBlobAsArrayBuffer)
+      }
+
+      this.text = function() {
+        var rejected = consumed(this)
+        if (rejected) {
+          return rejected
+        }
+
+        if (this._bodyBlob) {
+          return readBlobAsText(this._bodyBlob)
+        } else if (this._bodyFormData) {
+          throw new Error('could not read FormData body as text')
+        } else {
+          return Promise.resolve(this._bodyText)
+        }
+      }
+    } else {
+      this.text = function() {
+        var rejected = consumed(this)
+        return rejected ? rejected : Promise.resolve(this._bodyText)
+      }
+    }
+
+    if (support.formData) {
+      this.formData = function() {
+        return this.text().then(decode)
+      }
+    }
+
+    this.json = function() {
+      return this.text().then(JSON.parse)
+    }
+
+    return this
+  }
+
+  // HTTP methods whose capitalization should be normalized
+  var methods = ['DELETE', 'GET', 'HEAD', 'OPTIONS', 'POST', 'PUT']
+
+  function normalizeMethod(method) {
+    var upcased = method.toUpperCase()
+    return (methods.indexOf(upcased) > -1) ? upcased : method
+  }
+
+  function Request(url, options) {
+    options = options || {}
+    this.url = url
+
+    this.credentials = options.credentials || 'omit'
+    this.headers = new Headers(options.headers)
+    this.method = normalizeMethod(options.method || 'GET')
+    this.mode = options.mode || null
+    this.referrer = null
+
+    if ((this.method === 'GET' || this.method === 'HEAD') && options.body) {
+      throw new TypeError('Body not allowed for GET or HEAD requests')
+    }
+    this._initBody(options.body)
+  }
+
+  function decode(body) {
+    var form = new FormData()
+    body.trim().split('&').forEach(function(bytes) {
+      if (bytes) {
+        var split = bytes.split('=')
+        var name = split.shift().replace(/\+/g, ' ')
+        var value = split.join('=').replace(/\+/g, ' ')
+        form.append(decodeURIComponent(name), decodeURIComponent(value))
+      }
+    })
+    return form
+  }
+
+  function headers(xhr) {
+    var head = new Headers()
+    var pairs = xhr.getAllResponseHeaders().trim().split('\n')
+    pairs.forEach(function(header) {
+      var split = header.trim().split(':')
+      var key = split.shift().trim()
+      var value = split.join(':').trim()
+      head.append(key, value)
+    })
+    return head
+  }
+
+  Body.call(Request.prototype)
+
+  function Response(bodyInit, options) {
+    if (!options) {
+      options = {}
+    }
+
+    this._initBody(bodyInit)
+    this.type = 'default'
+    this.url = null
+    this.status = options.status
+    this.ok = this.status >= 200 && this.status < 300
+    this.statusText = options.statusText
+    this.headers = options.headers instanceof Headers ? options.headers : new Headers(options.headers)
+    this.url = options.url || ''
+  }
+
+  Body.call(Response.prototype)
+
+  self.Headers = Headers;
+  self.Request = Request;
+  self.Response = Response;
+
+  self.fetch = function(input, init) {
+    // TODO: Request constructor should accept input, init
+    var request
+    if (Request.prototype.isPrototypeOf(input) && !init) {
+      request = input
+    } else {
+      request = new Request(input, init)
+    }
+
+    return new Promise(function(resolve, reject) {
+      var xhr = new XMLHttpRequest()
+
+      function responseURL() {
+        if ('responseURL' in xhr) {
+          return xhr.responseURL
+        }
+
+        // Avoid security warnings on getResponseHeader when not allowed by CORS
+        if (/^X-Request-URL:/m.test(xhr.getAllResponseHeaders())) {
+          return xhr.getResponseHeader('X-Request-URL')
+        }
+
+        return;
+      }
+
+      xhr.onload = function() {
+        var status = (xhr.status === 1223) ? 204 : xhr.status
+        if (status < 100 || status > 599) {
+          reject(new TypeError('Network request failed'))
+          return
+        }
+        var options = {
+          status: status,
+          statusText: xhr.statusText,
+          headers: headers(xhr),
+          url: responseURL()
+        }
+        var body = 'response' in xhr ? xhr.response : xhr.responseText;
+        resolve(new Response(body, options))
+      }
+
+      xhr.onerror = function() {
+        reject(new TypeError('Network request failed'))
+      }
+
+      xhr.open(request.method, request.url, true)
+
+      if (request.credentials === 'include') {
+        xhr.withCredentials = true
+      }
+
+      if ('responseType' in xhr && support.blob) {
+        xhr.responseType = 'blob'
+      }
+
+      request.headers.forEach(function(value, name) {
+        xhr.setRequestHeader(name, value)
+      })
+
+      xhr.send(typeof request._bodyInit === 'undefined' ? null : request._bodyInit)
+    })
+  }
+  self.fetch.polyfill = true
+})();
+
+},{}],7:[function(require,module,exports){
 'use strict';
 
 require('whatwg-fetch');
@@ -3356,472 +3821,7 @@ Formio.deregisterPlugin = function(plugin) {
 
 module.exports = Formio;
 
-},{"Q":1,"eventemitter2":2,"shallow-copy":6,"whatwg-fetch":7}],5:[function(require,module,exports){
-// shim for using process in browser
-
-var process = module.exports = {};
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
-
-function cleanUpNextTick() {
-    if (!draining || !currentQueue) {
-        return;
-    }
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
-}
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = setTimeout(cleanUpNextTick);
-    draining = true;
-
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            if (currentQueue) {
-                currentQueue[queueIndex].run();
-            }
-        }
-        queueIndex = -1;
-        len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    clearTimeout(timeout);
-}
-
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
-        }
-    }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-        setTimeout(drainQueue, 0);
-    }
-};
-
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
-}
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
-};
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
-
-},{}],6:[function(require,module,exports){
-module.exports = function (obj) {
-    if (!obj || typeof obj !== 'object') return obj;
-    
-    var copy;
-    
-    if (isArray(obj)) {
-        var len = obj.length;
-        copy = Array(len);
-        for (var i = 0; i < len; i++) {
-            copy[i] = obj[i];
-        }
-    }
-    else {
-        var keys = objectKeys(obj);
-        copy = {};
-        
-        for (var i = 0, l = keys.length; i < l; i++) {
-            var key = keys[i];
-            copy[key] = obj[key];
-        }
-    }
-    return copy;
-};
-
-var objectKeys = Object.keys || function (obj) {
-    var keys = [];
-    for (var key in obj) {
-        if ({}.hasOwnProperty.call(obj, key)) keys.push(key);
-    }
-    return keys;
-};
-
-var isArray = Array.isArray || function (xs) {
-    return {}.toString.call(xs) === '[object Array]';
-};
-
-},{}],7:[function(require,module,exports){
-(function() {
-  'use strict';
-
-  if (self.fetch) {
-    return
-  }
-
-  function normalizeName(name) {
-    if (typeof name !== 'string') {
-      name = name.toString();
-    }
-    if (/[^a-z0-9\-#$%&'*+.\^_`|~]/i.test(name)) {
-      throw new TypeError('Invalid character in header field name')
-    }
-    return name.toLowerCase()
-  }
-
-  function normalizeValue(value) {
-    if (typeof value !== 'string') {
-      value = value.toString();
-    }
-    return value
-  }
-
-  function Headers(headers) {
-    this.map = {}
-
-    if (headers instanceof Headers) {
-      headers.forEach(function(value, name) {
-        this.append(name, value)
-      }, this)
-
-    } else if (headers) {
-      Object.getOwnPropertyNames(headers).forEach(function(name) {
-        this.append(name, headers[name])
-      }, this)
-    }
-  }
-
-  Headers.prototype.append = function(name, value) {
-    name = normalizeName(name)
-    value = normalizeValue(value)
-    var list = this.map[name]
-    if (!list) {
-      list = []
-      this.map[name] = list
-    }
-    list.push(value)
-  }
-
-  Headers.prototype['delete'] = function(name) {
-    delete this.map[normalizeName(name)]
-  }
-
-  Headers.prototype.get = function(name) {
-    var values = this.map[normalizeName(name)]
-    return values ? values[0] : null
-  }
-
-  Headers.prototype.getAll = function(name) {
-    return this.map[normalizeName(name)] || []
-  }
-
-  Headers.prototype.has = function(name) {
-    return this.map.hasOwnProperty(normalizeName(name))
-  }
-
-  Headers.prototype.set = function(name, value) {
-    this.map[normalizeName(name)] = [normalizeValue(value)]
-  }
-
-  Headers.prototype.forEach = function(callback, thisArg) {
-    Object.getOwnPropertyNames(this.map).forEach(function(name) {
-      this.map[name].forEach(function(value) {
-        callback.call(thisArg, value, name, this)
-      }, this)
-    }, this)
-  }
-
-  function consumed(body) {
-    if (body.bodyUsed) {
-      return Promise.reject(new TypeError('Already read'))
-    }
-    body.bodyUsed = true
-  }
-
-  function fileReaderReady(reader) {
-    return new Promise(function(resolve, reject) {
-      reader.onload = function() {
-        resolve(reader.result)
-      }
-      reader.onerror = function() {
-        reject(reader.error)
-      }
-    })
-  }
-
-  function readBlobAsArrayBuffer(blob) {
-    var reader = new FileReader()
-    reader.readAsArrayBuffer(blob)
-    return fileReaderReady(reader)
-  }
-
-  function readBlobAsText(blob) {
-    var reader = new FileReader()
-    reader.readAsText(blob)
-    return fileReaderReady(reader)
-  }
-
-  var support = {
-    blob: 'FileReader' in self && 'Blob' in self && (function() {
-      try {
-        new Blob();
-        return true
-      } catch(e) {
-        return false
-      }
-    })(),
-    formData: 'FormData' in self
-  }
-
-  function Body() {
-    this.bodyUsed = false
-
-
-    this._initBody = function(body) {
-      this._bodyInit = body
-      if (typeof body === 'string') {
-        this._bodyText = body
-      } else if (support.blob && Blob.prototype.isPrototypeOf(body)) {
-        this._bodyBlob = body
-      } else if (support.formData && FormData.prototype.isPrototypeOf(body)) {
-        this._bodyFormData = body
-      } else if (!body) {
-        this._bodyText = ''
-      } else {
-        throw new Error('unsupported BodyInit type')
-      }
-    }
-
-    if (support.blob) {
-      this.blob = function() {
-        var rejected = consumed(this)
-        if (rejected) {
-          return rejected
-        }
-
-        if (this._bodyBlob) {
-          return Promise.resolve(this._bodyBlob)
-        } else if (this._bodyFormData) {
-          throw new Error('could not read FormData body as blob')
-        } else {
-          return Promise.resolve(new Blob([this._bodyText]))
-        }
-      }
-
-      this.arrayBuffer = function() {
-        return this.blob().then(readBlobAsArrayBuffer)
-      }
-
-      this.text = function() {
-        var rejected = consumed(this)
-        if (rejected) {
-          return rejected
-        }
-
-        if (this._bodyBlob) {
-          return readBlobAsText(this._bodyBlob)
-        } else if (this._bodyFormData) {
-          throw new Error('could not read FormData body as text')
-        } else {
-          return Promise.resolve(this._bodyText)
-        }
-      }
-    } else {
-      this.text = function() {
-        var rejected = consumed(this)
-        return rejected ? rejected : Promise.resolve(this._bodyText)
-      }
-    }
-
-    if (support.formData) {
-      this.formData = function() {
-        return this.text().then(decode)
-      }
-    }
-
-    this.json = function() {
-      return this.text().then(JSON.parse)
-    }
-
-    return this
-  }
-
-  // HTTP methods whose capitalization should be normalized
-  var methods = ['DELETE', 'GET', 'HEAD', 'OPTIONS', 'POST', 'PUT']
-
-  function normalizeMethod(method) {
-    var upcased = method.toUpperCase()
-    return (methods.indexOf(upcased) > -1) ? upcased : method
-  }
-
-  function Request(url, options) {
-    options = options || {}
-    this.url = url
-
-    this.credentials = options.credentials || 'omit'
-    this.headers = new Headers(options.headers)
-    this.method = normalizeMethod(options.method || 'GET')
-    this.mode = options.mode || null
-    this.referrer = null
-
-    if ((this.method === 'GET' || this.method === 'HEAD') && options.body) {
-      throw new TypeError('Body not allowed for GET or HEAD requests')
-    }
-    this._initBody(options.body)
-  }
-
-  function decode(body) {
-    var form = new FormData()
-    body.trim().split('&').forEach(function(bytes) {
-      if (bytes) {
-        var split = bytes.split('=')
-        var name = split.shift().replace(/\+/g, ' ')
-        var value = split.join('=').replace(/\+/g, ' ')
-        form.append(decodeURIComponent(name), decodeURIComponent(value))
-      }
-    })
-    return form
-  }
-
-  function headers(xhr) {
-    var head = new Headers()
-    var pairs = xhr.getAllResponseHeaders().trim().split('\n')
-    pairs.forEach(function(header) {
-      var split = header.trim().split(':')
-      var key = split.shift().trim()
-      var value = split.join(':').trim()
-      head.append(key, value)
-    })
-    return head
-  }
-
-  Body.call(Request.prototype)
-
-  function Response(bodyInit, options) {
-    if (!options) {
-      options = {}
-    }
-
-    this._initBody(bodyInit)
-    this.type = 'default'
-    this.url = null
-    this.status = options.status
-    this.ok = this.status >= 200 && this.status < 300
-    this.statusText = options.statusText
-    this.headers = options.headers instanceof Headers ? options.headers : new Headers(options.headers)
-    this.url = options.url || ''
-  }
-
-  Body.call(Response.prototype)
-
-  self.Headers = Headers;
-  self.Request = Request;
-  self.Response = Response;
-
-  self.fetch = function(input, init) {
-    // TODO: Request constructor should accept input, init
-    var request
-    if (Request.prototype.isPrototypeOf(input) && !init) {
-      request = input
-    } else {
-      request = new Request(input, init)
-    }
-
-    return new Promise(function(resolve, reject) {
-      var xhr = new XMLHttpRequest()
-
-      function responseURL() {
-        if ('responseURL' in xhr) {
-          return xhr.responseURL
-        }
-
-        // Avoid security warnings on getResponseHeader when not allowed by CORS
-        if (/^X-Request-URL:/m.test(xhr.getAllResponseHeaders())) {
-          return xhr.getResponseHeader('X-Request-URL')
-        }
-
-        return;
-      }
-
-      xhr.onload = function() {
-        var status = (xhr.status === 1223) ? 204 : xhr.status
-        if (status < 100 || status > 599) {
-          reject(new TypeError('Network request failed'))
-          return
-        }
-        var options = {
-          status: status,
-          statusText: xhr.statusText,
-          headers: headers(xhr),
-          url: responseURL()
-        }
-        var body = 'response' in xhr ? xhr.response : xhr.responseText;
-        resolve(new Response(body, options))
-      }
-
-      xhr.onerror = function() {
-        reject(new TypeError('Network request failed'))
-      }
-
-      xhr.open(request.method, request.url, true)
-
-      if (request.credentials === 'include') {
-        xhr.withCredentials = true
-      }
-
-      if ('responseType' in xhr && support.blob) {
-        xhr.responseType = 'blob'
-      }
-
-      request.headers.forEach(function(value, name) {
-        xhr.setRequestHeader(name, value)
-      })
-
-      xhr.send(typeof request._bodyInit === 'undefined' ? null : request._bodyInit)
-    })
-  }
-  self.fetch.polyfill = true
-})();
-
-},{}],8:[function(require,module,exports){
+},{"Q":3,"eventemitter2":4,"shallow-copy":5,"whatwg-fetch":6}],8:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -4405,14 +4405,14 @@ module.exports = function(app) {
             angular.forEach(component.components, function(component) {
               var info = componentInfo.components.hasOwnProperty(component.type) ? componentInfo.components[component.type] : {};
               if (info.tableView) {
-                view += '<td>' + info.tableView(row[component.key], component, $interpolate, componentInfo) + '</td>';
+                view += '<td>' + info.tableView(row[component.key] || '', component, $interpolate, componentInfo) + '</td>';
               }
               else {
                 view += '<td>';
                 if (component.prefix) {
                   view += component.prefix;
                 }
-                view += row[component.key];
+                view += row[component.key] || '';
                 if (component.suffix) {
                   view += ' ' + component.suffix;
                 }
@@ -4637,7 +4637,8 @@ module.exports = function(app) {
           multiple: false,
           defaultValue: '',
           protected: false
-        }
+        },
+        viewTemplate: 'formio/componentsView/file.html'
       });
     }
   ]);
@@ -4679,12 +4680,17 @@ module.exports = function(app) {
       template: '<a href="{{ file.url }}" ng-click="getFile($event)" target="_blank">{{ file.name }}</a>',
       controller: [
         '$scope',
+        '$rootScope',
         'FormioPlugins',
         function(
           $scope,
+          $rootScope,
           FormioPlugins
         ) {
           $scope.getFile = function(evt) {
+            // In view mode there may not be a form. Need a way to override.
+            $scope.form = $scope.form || $rootScope.filePath;
+
             var plugin = FormioPlugins('storage', $scope.file.storage);
             if (plugin) {
               plugin.downloadFile(evt, $scope.file, $scope);
@@ -4706,12 +4712,18 @@ module.exports = function(app) {
       template: '<img ng-src="{{ imageSrc }}" alt="{{ file.name }}" />',
       controller: [
         '$scope',
+        '$rootScope',
         'FormioPlugins',
         function(
           $scope,
+          $rootScope,
           FormioPlugins
         ) {
           var plugin = FormioPlugins('storage', $scope.file.storage);
+
+          // In view mode there may not be a form. Need a way to override.
+          $scope.form = $scope.form || $rootScope.filePath;
+
           // Sign the file if needed.
           if (plugin) {
             plugin.getFile($scope.form, $scope.file)
@@ -4793,6 +4805,10 @@ module.exports = function(app) {
 
       $templateCache.put('formio/components/file.html',
         "<label ng-if=\"component.label && !component.hideLabel\" for=\"{{ component.key }}\" class=\"control-label\" ng-class=\"{'field-required': component.validate.required}\">{{ component.label | formioTranslate }}</label>\n<span ng-if=\"!component.label && component.validate.required\" class=\"glyphicon glyphicon-asterisk form-control-feedback field-required-inline\" aria-hidden=\"true\"></span>\n<div ng-controller=\"formioFileUpload\">\n  <formio-file-list files=\"data[component.key]\" form=\"formio.formUrl\"></formio-file-list>\n  <div ng-if=\"!readOnly && (component.multiple || (!component.multiple && !data[component.key].length))\">\n    <div ngf-drop=\"upload($files)\" class=\"fileSelector\" ngf-drag-over-class=\"'fileDragOver'\" ngf-multiple=\"component.multiple\"><span class=\"glyphicon glyphicon-cloud-upload\"></span>Drop files to attach, or <a href=\"#\" ngf-select=\"upload($files)\" tabindex=\"{{ component.tabindex || 0 }}\" ngf-multiple=\"component.multiple\">browse</a>.</div>\n    <div ng-if=\"!component.storage\" class=\"alert alert-warning\">No storage has been set for this field. File uploads are disabled until storage is set up.</div>\n    <div ngf-no-file-drop>File Drag/Drop is not supported for this browser</div>\n  </div>\n  <div ng-repeat=\"fileUpload in fileUploads track by $index\" ng-class=\"{'has-error': fileUpload.status === 'error'}\" class=\"file\">\n    <div class=\"row\">\n      <div class=\"fileName control-label col-sm-10\">{{ fileUpload.name }} <span ng-click=\"removeUpload(fileUpload.name)\" class=\"glyphicon glyphicon-remove\"></span></div>\n      <div class=\"fileSize control-label col-sm-2 text-right\">{{ fileSize(fileUpload.size) }}</div>\n    </div>\n    <div class=\"row\">\n      <div class=\"col-sm-12\">\n        <span ng-if=\"fileUpload.status === 'progress'\">\n          <div class=\"progress\">\n            <div class=\"progress-bar\" role=\"progressbar\" aria-valuenow=\"{{fileUpload.progress}}\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"width:{{fileUpload.progress}}%\">\n              <span class=\"sr-only\">{{fileUpload.progress}}% Complete</span>\n            </div>\n          </div>\n        </span>\n        <div ng-if=\"!fileUpload.status !== 'progress'\" class=\"bg-{{ fileUpload.status }} control-label\">{{ fileUpload.message }}</div>\n      </div>\n    </div>\n  </div>\n</div>\n"
+      );
+
+      $templateCache.put('formio/componentsView/file.html',
+        "<label ng-if=\"component.label && !component.hideLabel\" for=\"{{ component.key }}\" class=\"control-label\" ng-class=\"{'field-required': component.validate.required}\">{{ component.label | formioTranslate }}</label>\n{{ src }}\n<div ng-controller=\"formioFileUpload\">\n  <formio-file-list files=\"data[component.key]\" form=\"formUrl\"></formio-file-list>\n</div>\n"
       );
     }
   ]);
@@ -5680,12 +5696,20 @@ module.exports = function(app) {
       formioComponentsProvider.register('selectboxes', {
         title: 'Select Boxes',
         template: 'formio/components/selectboxes.html',
-        tableView: function(data) {
+        tableView: function(data, component) {
           if (!data) return '';
 
           return Object.keys(data)
           .filter(function(key) {
             return data[key];
+          })
+          .map(function(data) {
+            component.values.forEach(function(item) {
+              if (item.value === data) {
+                data = item.label;
+              }
+            });
+            return data;
           })
           .join(', ');
         },
@@ -7260,7 +7284,7 @@ module.exports = function() {
   };
 };
 
-},{"formio-utils":3}],51:[function(require,module,exports){
+},{"formio-utils":2}],51:[function(require,module,exports){
 "use strict";
 module.exports = [
   '$q',
@@ -7921,7 +7945,7 @@ module.exports = function() {
   };
 };
 
-},{"formiojs/src/formio.js":4}],65:[function(require,module,exports){
+},{"formiojs/src/formio.js":7}],65:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   var plugins = {};
