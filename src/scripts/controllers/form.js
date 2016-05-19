@@ -830,6 +830,20 @@ app.controller('FormActionEditController', [
         }
       }
 
+      // Google Sheets action alert for missing settings.
+      if (actionInfo && actionInfo.name === 'googlesheet') {
+        var settings = _.get($scope, 'currentProject.settings.google');
+        if (!_.has(settings, 'clientId')) {
+          FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> The Google Sheets Action requires a Client ID to be configured, before it can be used. You can add all Google Data Connection settings in your <a href="#/project/'+$scope.projectId+'/settings/oauth">Project Settings</a>.');
+        }
+        if (!_.has(settings, 'cskey')) {
+          FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> The Google Sheets Action requires a Client Secret Key to be configured, before it can be used. You can add all Google Data Connection settings in your <a href="#/project/'+$scope.projectId+'/settings/oauth">Project Settings</a>.');
+        }
+        if (!_.has(settings, 'refreshtoken')) {
+          FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> The Google Sheets Action requires a Refresh Token to be configured, before it can be used. You can add all Google Data Connection settings in your <a href="#/project/'+$scope.projectId+'/settings/oauth">Project Settings</a>.');
+        }
+      }
+
       // Hubspot action missing settings due to missing API key.
       if(actionInfo && actionInfo.name === 'hubspotContact') {
         var showFields = function(key, value) {
