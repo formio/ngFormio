@@ -119,9 +119,11 @@ module.exports = function(app) {
   app.controller('formioFileUpload', [
     '$scope',
     'FormioPlugins',
+    'FormioUtils',
     function(
       $scope,
-      FormioPlugins
+      FormioPlugins,
+      FormioUtils
     ) {
       $scope.fileUploads = {};
 
@@ -141,28 +143,30 @@ module.exports = function(app) {
         if ($scope.component.storage && files && files.length) {
           var plugin = FormioPlugins('storage', $scope.component.storage);
           angular.forEach(files, function(file) {
+            // Get a unique name for this file to keep file collisions from occurring.
+            var fileName = FormioUtils.uniqueName(file.name);
             if (plugin) {
-              $scope.fileUploads[file.name] = {
-                name: file.name,
+              $scope.fileUploads[fileName] = {
+                name: fileName,
                 size: file.size,
                 status: 'info',
                 message: 'Starting upload'
               };
-              plugin.uploadFile(file, $scope.fileUploads[file.name], $scope)
+              plugin.uploadFile(file, fileName, $scope.fileUploads[fileName], $scope)
                 .then(function(fileInfo) {
-                  delete $scope.fileUploads[file.name];
+                  delete $scope.fileUploads[fileName];
                   fileInfo.storage = $scope.component.storage;
                   $scope.data[$scope.component.key].push(fileInfo);
                 })
                 .catch(function(message) {
-                  $scope.fileUploads[file.name].status = 'error';
-                  $scope.fileUploads[file.name].message = message;
-                  delete $scope.fileUploads[file.name].progress;
+                  $scope.fileUploads[fileName].status = 'error';
+                  $scope.fileUploads[fileName].message = message;
+                  delete $scope.fileUploads[fileName].progress;
                 });
             }
             else {
-              $scope.fileUploads[file.name] = {
-                name: file.name,
+              $scope.fileUploads[fileName] = {
+                name: fileName,
                 size: file.size,
                 status: 'error',
                 message: 'Storage plugin not found'

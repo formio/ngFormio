@@ -41,7 +41,7 @@ module.exports = function(app) {
       return {
         title: 'Dropbox',
         name: 'dropbox',
-        uploadFile: function(file, status, $scope) {
+        uploadFile: function(file, fileName, status, $scope) {
           var defer = $q.defer();
           var dir = $scope.component.dir || '';
           var dropboxToken = getDropboxToken();
@@ -76,7 +76,7 @@ module.exports = function(app) {
             xhr.setRequestHeader('Authorization', 'Bearer ' + dropboxToken);
             xhr.setRequestHeader('Content-Type', 'application/octet-stream');
             xhr.setRequestHeader('Dropbox-API-Arg', JSON.stringify({
-              path: '/' + dir + file.name,
+              path: '/' + dir + fileName,
               mode: 'add',
               autorename: true,
               mute: false
