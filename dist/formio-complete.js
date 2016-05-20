@@ -1,4 +1,4 @@
-/*! ng-formio v1.7.5 | https://npmcdn.com/ng-formio@1.7.5/LICENSE.txt */
+/*! ng-formio v1.7.6 | https://npmcdn.com/ng-formio@1.7.6/LICENSE.txt */
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function (process){
 // vim:ts=4:sts=4:sw=4:
@@ -58180,9 +58180,11 @@ module.exports = function(app) {
   app.controller('formioFileUpload', [
     '$scope',
     'FormioPlugins',
+    'FormioUtils',
     function(
       $scope,
-      FormioPlugins
+      FormioPlugins,
+      FormioUtils
     ) {
       $scope.fileUploads = {};
 
@@ -58202,28 +58204,30 @@ module.exports = function(app) {
         if ($scope.component.storage && files && files.length) {
           var plugin = FormioPlugins('storage', $scope.component.storage);
           angular.forEach(files, function(file) {
+            // Get a unique name for this file to keep file collisions from occurring.
+            var fileName = FormioUtils.uniqueName(file.name);
             if (plugin) {
-              $scope.fileUploads[file.name] = {
-                name: file.name,
+              $scope.fileUploads[fileName] = {
+                name: fileName,
                 size: file.size,
                 status: 'info',
                 message: 'Starting upload'
               };
-              plugin.uploadFile(file, $scope.fileUploads[file.name], $scope)
+              plugin.uploadFile(file, fileName, $scope.fileUploads[fileName], $scope)
                 .then(function(fileInfo) {
-                  delete $scope.fileUploads[file.name];
+                  delete $scope.fileUploads[fileName];
                   fileInfo.storage = $scope.component.storage;
                   $scope.data[$scope.component.key].push(fileInfo);
                 })
                 .catch(function(message) {
-                  $scope.fileUploads[file.name].status = 'error';
-                  $scope.fileUploads[file.name].message = message;
-                  delete $scope.fileUploads[file.name].progress;
+                  $scope.fileUploads[fileName].status = 'error';
+                  $scope.fileUploads[fileName].message = message;
+                  delete $scope.fileUploads[fileName].progress;
                 });
             }
             else {
-              $scope.fileUploads[file.name] = {
-                name: file.name,
+              $scope.fileUploads[fileName] = {
+                name: fileName,
                 size: file.size,
                 status: 'error',
                 message: 'Storage plugin not found'
@@ -60695,6 +60699,21 @@ module.exports = function() {
         }
       });
     },
+    uniqueName: function(name) {
+      var parts = name.toLowerCase().replace(/[^0-9a-z\.]/g, '').split('.');
+      var fileName = parts[0];
+      var ext = '';
+      if (parts.length > 1) {
+        ext = '.' + parts[(parts.length - 1)];
+      }
+      return fileName.substr(0, 10) + '-' + this.guid() + ext;
+    },
+    guid: function() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random()*16|0, v = c === 'x' ? r : (r&0x3|0x8);
+        return v.toString(16);
+      });
+    },
     fieldWrap: function(input) {
       input = input + '<formio-errors></formio-errors>';
       var multiInput = input.replace('data[component.key]', 'data[component.key][$index]');
@@ -61106,7 +61125,7 @@ module.exports = function(app) {
       return {
         title: 'Dropbox',
         name: 'dropbox',
-        uploadFile: function(file, status, $scope) {
+        uploadFile: function(file, fileName, status, $scope) {
           var defer = $q.defer();
           var dir = $scope.component.dir || '';
           var dropboxToken = getDropboxToken();
@@ -61141,7 +61160,7 @@ module.exports = function(app) {
             xhr.setRequestHeader('Authorization', 'Bearer ' + dropboxToken);
             xhr.setRequestHeader('Content-Type', 'application/octet-stream');
             xhr.setRequestHeader('Dropbox-API-Arg', JSON.stringify({
-              path: '/' + dir + file.name,
+              path: '/' + dir + fileName,
               mode: 'add',
               autorename: true,
               mute: false
@@ -61223,10 +61242,10 @@ module.exports = function(app) {
       return {
         title: 'S3',
         name: 's3',
-        uploadFile: function(file, status, $scope) {
+        uploadFile: function(file, fileName, status, $scope) {
           var defer = $q.defer();
           Formio.request($scope.formio.formUrl + '/storage/s3', 'POST', {
-            name: file.name,
+            name: fileName,
             size: file.size,
             type: file.type
           })
@@ -61238,13 +61257,13 @@ module.exports = function(app) {
               };
               request.data.file = file;
               var dir = $scope.component.dir || '';
-              request.data.key += dir + file.name;
+              request.data.key += dir + fileName;
               var upload = Upload.upload(request);
               upload
                 .then(function() {
                   // Handle upload finished.
                   defer.resolve({
-                    name: file.name,
+                    name: fileName,
                     bucket: response.bucket,
                     key: request.data.key,
                     url: response.url + request.data.key,
@@ -61316,12 +61335,13 @@ module.exports = function(app) {
       return {
         title: 'Url',
         name: 'url',
-        uploadFile: function(file, status, $scope) {
+        uploadFile: function(file, fileName, status, $scope) {
           var defer = $q.defer();
           Upload.upload({
             url: $scope.component.url,
             data: {
-              file: file
+              file: file,
+              name: fileName
             }
           })
             .then(function(resp) {

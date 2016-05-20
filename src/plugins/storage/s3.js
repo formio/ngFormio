@@ -24,10 +24,10 @@ module.exports = function(app) {
       return {
         title: 'S3',
         name: 's3',
-        uploadFile: function(file, status, $scope) {
+        uploadFile: function(file, fileName, status, $scope) {
           var defer = $q.defer();
           Formio.request($scope.formio.formUrl + '/storage/s3', 'POST', {
-            name: file.name,
+            name: fileName,
             size: file.size,
             type: file.type
           })
@@ -39,13 +39,13 @@ module.exports = function(app) {
               };
               request.data.file = file;
               var dir = $scope.component.dir || '';
-              request.data.key += dir + file.name;
+              request.data.key += dir + fileName;
               var upload = Upload.upload(request);
               upload
                 .then(function() {
                   // Handle upload finished.
                   defer.resolve({
-                    name: file.name,
+                    name: fileName,
                     bucket: response.bucket,
                     key: request.data.key,
                     url: response.url + request.data.key,

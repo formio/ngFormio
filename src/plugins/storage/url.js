@@ -20,12 +20,13 @@ module.exports = function(app) {
       return {
         title: 'Url',
         name: 'url',
-        uploadFile: function(file, status, $scope) {
+        uploadFile: function(file, fileName, status, $scope) {
           var defer = $q.defer();
           Upload.upload({
             url: $scope.component.url,
             data: {
-              file: file
+              file: file,
+              name: fileName
             }
           })
             .then(function(resp) {
