@@ -19,7 +19,7 @@ module.exports = function() {
       var fileName = parts[0];
       var ext = '';
       if (parts.length > 1) {
-        ext = '.' + parts[1];
+        ext = '.' + parts[(parts.length - 1)];
       }
       return fileName.substr(0, 10) + '-' + this.guid() + ext;
     },
