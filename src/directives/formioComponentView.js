@@ -8,14 +8,20 @@ module.exports = [
       restrict: 'E',
       scope: {
         component: '=',
-        data: '='
+        data: '=',
+        form: '='
       },
       templateUrl: 'formio/component-view.html',
       controller: [
         '$scope',
+        'Formio',
         function(
-          $scope
+          $scope,
+          Formio
         ) {
+          // Set the form url.
+          $scope.formUrl = $scope.form ? Formio.getAppUrl() + '/form/' + $scope.form._id.toString() : '';
+
           // Get the settings.
           var component = formioComponents.components[$scope.component.type] || formioComponents.components['custom'];
 
