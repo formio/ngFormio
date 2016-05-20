@@ -8,6 +8,10 @@ module.exports = function() {
     // Expose Formio configuration functions
     setBaseUrl: Formio.setBaseUrl,
     getBaseUrl: Formio.getBaseUrl,
+    setApiUrl: Formio.setBaseUrl,
+    getApiUrl: Formio.getBaseUrl,
+    setAppUrl: Formio.setAppUrl,
+    getAppUrl: Formio.getAppUrl,
     registerPlugin: Formio.registerPlugin,
     getPlugin: Formio.getPlugin,
     setDomain: function() {
