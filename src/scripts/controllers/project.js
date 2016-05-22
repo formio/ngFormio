@@ -424,7 +424,7 @@ app.provider('ProjectProgress', function() {
         {
           key: 'setupProviders',
           complete: function(next) {
-            var projectSettings = project.settings;
+            var projectSettings = project.settings || {};
             var result = (projectSettings.email || projectSettings.storage);
             next(result);
           }
