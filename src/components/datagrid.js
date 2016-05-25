@@ -6,7 +6,7 @@ module.exports = function(app) {
       formioComponentsProvider.register('datagrid', {
         title: 'Data Grid',
         template: 'formio/components/datagrid.html',
-        group: 'layout',
+        group: 'advanced',
         tableView: function(data, component, $interpolate, componentInfo) {
           //var view = '<table class="table table-striped table-bordered">' +
           //  '<thead>' +
