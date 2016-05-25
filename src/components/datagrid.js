@@ -8,32 +8,6 @@ module.exports = function(app) {
         template: 'formio/components/datagrid.html',
         group: 'advanced',
         tableView: function(data, component, $interpolate, componentInfo) {
-          //var view = '<table class="table table-striped table-bordered">' +
-          //  '<thead>' +
-          //    '<tr>' +
-          //      '<th ng-repeat="item in component.components track by $index">' +
-          //        'item.label' +
-          //      '</th>' +
-          //    '</tr>' +
-          //  '</thead>' +
-          //  '<tbody>' +
-          //    '<tr ng-repeat="row in data track by $index">' +
-          //      '<td ng-repeat="item in component.components track by $index">' +
-          //        '<div ng-if="component.components[$index][item.type] && component.components[$index][item.type].tableView">' +
-          //          'component.components[$index][item.type].tableView' +
-          //        '</div>' +
-          //        '<div ng-if="!(component.components[$index][item.type] && component.components[$index][item.type].tableView)">' +
-          //          'component.components[$index].prefix || ""' +
-          //          'data[parent.$index][component.components[$index].key] || ""' +
-          //          'component.components[$index].suffix || ""' +
-          //        '</div>' +
-          //      '</td>' +
-          //    '</tr>' +
-          //  '</tbody>' +
-          //'</table>';
-          //return view;
-
-
           var view = '<table class="table table-striped table-bordered"><thead><tr>';
           angular.forEach(component.components, function(component) {
             view += '<th>' + component.label + '</th>';
