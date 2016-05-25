@@ -1569,6 +1569,10 @@ app.controller('FormSubmissionDeleteController', [
 ]);
 
 app.constant('SubmissionAccessLabels', {
+  'create_all': {
+    label: 'Create All Submissions',
+    tooltip: 'The Read All Submissions permission will allow a user, with one of the given Roles, to create a new Submission and assign ownership of that Submission.'
+  },
   'read_all': {
     label: 'Read All Submissions',
     tooltip: 'The Read All Submissions permission will allow a user, with one of the given Roles, to read a Submission, regardless of who owns the Submission.'
