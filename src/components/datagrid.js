@@ -80,27 +80,25 @@ module.exports = function(app) {
   app.controller('formioDataGrid', [
     '$scope',
     function($scope) {
-      // Make sure we have a data obj.
+      // Ensure each data grid has a valid data model.
       $scope.data = $scope.data || {};
       $scope.data[$scope.component.key] = $scope.data[$scope.component.key] || [{}];
 
-      // If the data is empty, add a first row.
-      if ($scope.data[$scope.component.key].length === 0) {
-        $scope.data[$scope.component.key].push({})
-      }
-
-      // Format the data for the html grid to use.
+      // Pull out the rows and cols for easy iteration.
       $scope.rows = $scope.data[$scope.component.key];
-      $scope.addRow = function(key) {
-        // Ensure the object is initialized as it may be unset on a "Reset".
-        if (!Array.isArray($scope.data[key])) {
-          $scope.data[key] = [];
+      $scope.cols = $scope.component.components;
+
+      // Add a row the to grid.
+      $scope.addRow = function() {
+        if (!Array.isArray($scope.rows)) {
+          $scope.rows = [];
         }
-        $scope.data[key].push({});
+        $scope.rows.push({});
       };
 
+      // Remove a row from the grid.
       $scope.removeRow = function(index) {
-        $scope.data[$scope.component.key].splice(index, 1);
+        $scope.rows.splice(index, 1);
       };
     }
   ]);

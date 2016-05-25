@@ -1,14 +1,16 @@
 <div class="select-boxes">
   <div ng-class="component.inline ? 'checkbox-inline' : 'checkbox'" ng-repeat="v in component.values track by $index">
-    <label class="control-label" for="{{ component.key }}-{{ v.value }}">
+    <label class="control-label" for="{{ component.key }}-{{ v.value }}{{ gridRow !== undefined ? '-' + gridRow : '' }}{{ gridCol !== undefined ? '-' + gridCol : '' }}">
       <input type="checkbox"
-        id="{{ component.key }}-{{ v.value }}"
-        name="{{ component.key }}-{{ v.value }}"
+        id="{{ component.key }}-{{ v.value }}{{ gridRow !== undefined ? '-' + gridRow : '' }}{{ gridCol !== undefined ? '-' + gridCol : '' }}"
+        name="{{ component.key }}-{{ v.value }}{{ gridRow !== undefined ? '-' + gridRow : '' }}{{ gridCol !== undefined ? '-' + gridCol : '' }}"
         value="{{ v.value }}"
         tabindex="{{ component.tabindex || 0 }}"
         ng-disabled="readOnly"
         ng-click="toggleCheckbox(v.value)"
         ng-checked="model[v.value]"
+        grid-row="gridRow"
+        grid-col="gridCol"
       >
       {{ v.label | formioTranslate }}
     </label>
