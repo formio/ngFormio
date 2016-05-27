@@ -49,18 +49,6 @@ module.exports = function() {
         };
 
         var updateComponents = function() {
-          // Change the visibility for the component with the given key
-          var updateVisiblity = function(key) {
-            var newClass = $scope.show[key] ? 'ng-show' : 'ng-hide';
-            if ($scope.hideComponents && $scope.hideComponents.indexOf(key) !== -1) {
-              newClass = 'ng-hide';
-            }
-            $element
-              .find('div#form-group-' + key)
-              .removeClass('ng-show ng-hide')
-              .addClass(newClass);
-          };
-
           $scope.form.components = $scope.form.components || [];
           FormioUtils.eachComponent($scope.form.components, function(component) {
             // Display every component by default
@@ -68,7 +56,7 @@ module.exports = function() {
               ? true
               : $scope.show[component.key];
 
-            // Only change display options of all require conditional properties are present.
+            // Only change display options if all required conditional properties are present.
             if (
               component.conditional
               && (component.conditional.show !== null && component.conditional.show !== '')
@@ -108,7 +96,7 @@ module.exports = function() {
               }
 
               // Update the visibility, if its possible a change occurred.
-              updateVisiblity(component.key);
+              component.hide = !$scope.show[component.key];
             }
 
             // Set hidden if specified
@@ -189,7 +177,7 @@ module.exports = function() {
             if (component.type === 'resource' && component.key && component.defaultPermission) {
               defaultPermissions[component.key] = component.defaultPermission;
             }
-            if ($scope.submission.data.hasOwnProperty(component.key)) {
+            if ($scope.submission.data.hasOwnProperty(component.key) && $scope.show[component.key]) {
               var value = $scope.submission.data[component.key];
               if (component.type === 'number') {
                 submissionData.data[component.key] = value ? parseFloat(value) : 0;
