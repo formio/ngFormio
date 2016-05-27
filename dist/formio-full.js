@@ -68448,7 +68448,7 @@ module.exports = function(app) {
     'FormioUtils',
     function($templateCache, FormioUtils) {
       $templateCache.put('formio/components/radio.html', FormioUtils.fieldWrap(
-        "<div ng-class=\"component.inline ? 'radio-inline' : 'radio'\" ng-repeat=\"v in component.values track by $index\">\n  <label class=\"control-label\" for=\"{{ component.key }}-{{ v.value }}{{ gridRow !== undefined ? '-' + gridRow : '' }}{{ gridCol !== undefined ? '-' + gridCol : '' }}\">\n    <input type=\"{{ component.inputType }}\"\n    id=\"{{ component.key }}-{{ v.value }}{{ gridRow !== undefined ? '-' + gridRow : '' }}{{ gridCol !== undefined ? '-' + gridCol : '' }}\"\n    name=\"{{ component.key }}{{ gridRow !== undefined ? '-' + gridRow : ''}}\"\n    value=\"{{ v.value }}\"\n    tabindex=\"{{ component.tabindex || 0 }}\"\n    ng-model=\"data[component.key]\"\n    ng-required=\"component.validate.required\"\n    ng-disabled=\"readOnly\"\n    custom-validator=\"component.validate.custom\">\n    {{ v.label | formioTranslate }}\n  </label>\n</div>\n"
+        "<div ng-class=\"component.inline ? 'radio-inline' : 'radio'\" ng-repeat=\"v in component.values track by $index\" name=\"{{ component.key }}{{ gridRow !== undefined ? '-' + gridRow : ''}}\">\n  <label class=\"control-label\" for=\"{{ component.key }}-{{ v.value }}{{ gridRow !== undefined ? '-' + gridRow : '' }}{{ gridCol !== undefined ? '-' + gridCol : '' }}\">\n    <input type=\"{{ component.inputType }}\"\n    id=\"{{ component.key }}-{{ v.value }}{{ gridRow !== undefined ? '-' + gridRow : '' }}{{ gridCol !== undefined ? '-' + gridCol : '' }}\"\n    value=\"{{ v.value }}\"\n    tabindex=\"{{ component.tabindex || 0 }}\"\n    ng-model=\"data[component.key]\"\n    ng-required=\"component.validate.required\"\n    ng-disabled=\"readOnly\"\n    custom-validator=\"component.validate.custom\">\n    {{ v.label | formioTranslate }}\n  </label>\n</div>\n"
       ));
     }
   ]);
@@ -70871,7 +70871,7 @@ app.run([
 
     // A formio component template.
     $templateCache.put('formio/component.html',
-      "<ng-form name=\"formioFieldForm\" class=\"formio-component-{{ component.key }}\" ng-hide=\"component.hidden\">\n  <div class=\"form-group has-feedback form-field-type-{{ component.type }} {{component.customClass}}\" id=\"form-group-{{ component.key }}\" ng-class=\"{'has-error': formioFieldForm[component.key].$invalid && !formioFieldForm[component.key].$pristine }\" ng-style=\"component.style\">\n    <formio-element></formio-element>\n  </div>\n</ng-form>\n"
+      "<ng-form name=\"{{ component.key }}{{ gridRow !== undefined ? '-' + gridRow : ''}}\" class=\"formio-component-{{ component.key }}\" ng-hide=\"component.hidden\">\n  <div class=\"form-group has-feedback form-field-type-{{ component.type }} {{component.customClass}}\" id=\"form-group-{{ component.key }}\" ng-class=\"{'has-error': formioFieldForm[component.key].$invalid && !formioFieldForm[component.key].$pristine }\" ng-style=\"component.style\">\n    <formio-element></formio-element>\n  </div>\n</ng-form>\n"
     );
 
     $templateCache.put('formio/component-view.html',
