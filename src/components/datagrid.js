@@ -6,7 +6,7 @@ module.exports = function(app) {
       formioComponentsProvider.register('datagrid', {
         title: 'Data Grid',
         template: 'formio/components/datagrid.html',
-        group: 'layout',
+        group: 'advanced',
         tableView: function(data, component, $interpolate, componentInfo) {
           var view = '<table class="table table-striped table-bordered"><thead><tr>';
           angular.forEach(component.components, function(component) {
@@ -54,18 +54,25 @@ module.exports = function(app) {
   app.controller('formioDataGrid', [
     '$scope',
     function($scope) {
+      // Ensure each data grid has a valid data model.
+      $scope.data = $scope.data || {};
       $scope.data[$scope.component.key] = $scope.data[$scope.component.key] || [{}];
 
+      // Pull out the rows and cols for easy iteration.
+      $scope.rows = $scope.data[$scope.component.key];
+      $scope.cols = $scope.component.components;
+
+      // Add a row the to grid.
       $scope.addRow = function() {
-        // Ensure the object is initialized as it may be unset on a "Reset".
-        if (!Array.isArray($scope.data[$scope.component.key])) {
-          $scope.data[$scope.component.key] = [];
+        if (!Array.isArray($scope.rows)) {
+          $scope.rows = [];
         }
-        $scope.data[$scope.component.key].push({});
+        $scope.rows.push({});
       };
 
+      // Remove a row from the grid.
       $scope.removeRow = function(index) {
-        $scope.data[$scope.component.key].splice(index, 1);
+        $scope.rows.splice(index, 1);
       };
     }
   ]);

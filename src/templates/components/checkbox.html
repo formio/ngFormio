@@ -1,8 +1,8 @@
 <div class="checkbox">
-  <label for="{{ component.key }}" ng-class="{'field-required': component.validate.required}">
+  <label for="{{ component.key }}{{ gridRow !== undefined ? '-' + gridRow : '' }}{{ gridCol !== undefined ? '-' + gridCol : '' }}" ng-class="{'field-required': component.validate.required}">
     <input type="{{ component.inputType }}"
-    id="{{ component.key }}"
-    name="{{ component.key }}"
+    id="{{ component.key }}{{ gridRow !== undefined ? '-' + gridRow : '' }}{{ gridCol !== undefined ? '-' + gridCol : '' }}"
+    name="{{ component.key }}{{ gridRow !== undefined ? '-' + gridRow : ''}}"
     tabindex="{{ component.tabindex || 0 }}"
     ng-disabled="readOnly"
     ng-model="data[component.key]"
