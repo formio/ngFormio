@@ -6158,7 +6158,8 @@ module.exports = function() {
       hideComponents: '=?',
       requireComponents: '=?',
       disableComponents: '=?',
-      formioOptions: '=?'
+      formioOptions: '=?',
+      options: '=?'
     },
     controller: [
       '$scope',
@@ -6382,16 +6383,38 @@ module.exports = function() {
             }
           });
 
-          // Called when a submission has been made.
-          var onSubmitDone = function(method, submission) {
+          // Show the submit message and say the form is no longer submitting.
+          var onSubmit = function(submission, message) {
             $scope.showAlerts({
               type: 'success',
-              message: 'Submission was ' + ((method === 'put') ? 'updated' : 'created') + '.'
+              message: message
             });
             form.submitting = false;
+          };
+
+          // Called when a submission has been made.
+          var onSubmitDone = function(method, submission) {
+            var message = '';
+            if ($scope.options && $scope.options.submitMessage) {
+              message = $scope.options.submitMessage;
+            }
+            else {
+              message = 'Submission was ' + ((method === 'put') ? 'updated' : 'created') + '.';
+            }
+            onSubmit(submission, message);
             // Trigger the form submission.
             $scope.$emit('formSubmission', submission);
           };
+
+          // Allow the form to be completed externally.
+          $scope.$on('submitDone', function(event, submission, message) {
+            onSubmit(submission, message);
+          });
+
+          // Allow an error to be thrown externally.
+          $scope.$on('submitError', function(event, error) {
+            FormioScope.onError($scope, $element)(error);
+          });
 
           var submitEvent = $scope.$emit('formSubmit', submissionData);
           if (submitEvent.defaultPrevented) {
