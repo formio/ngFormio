@@ -3,6 +3,6 @@
     <h3 class="panel-title">{{ component.title | formioTranslate }}</h3>
   </div>
   <div class="panel-body">
-    <formio-component ng-repeat="component in component.components track by $index" component="component" data="data" formio="formio" read-only="readOnly"></formio-component>
+    <formio-component ng-repeat="component in component.components track by $index" component="component" data="data" formio="formio" read-only="readOnly" formio-form="formioForm" grid-row="gridRow" grid-col="gridCol"></formio-component>
   </div>
 </div>

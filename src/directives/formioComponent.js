@@ -13,7 +13,7 @@ module.exports = [
         component: '=',
         data: '=',
         formio: '=',
-        form: '=',
+        formioForm: '=',
         readOnly: '=',
         gridRow: '=',
         gridCol: '='
@@ -110,6 +110,15 @@ module.exports = [
           }
           else if ($scope.data && !$scope.data.hasOwnProperty($scope.component.key) && $scope.component.multiple) {
             $scope.data[$scope.component.key] = [];
+          }
+
+          // Set the component name.
+          $scope.componentId = $scope.component.key;
+          if ($scope.gridRow) {
+            $scope.componentId += ('-' + $scope.gridRow);
+          }
+          if ($scope.gridCol) {
+            $scope.componentId += ('-' + $scope.gridCol);
           }
         }
       ]
