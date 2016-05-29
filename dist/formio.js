@@ -7660,7 +7660,7 @@ app.run([
     );
 
     $templateCache.put('formio/component-view.html',
-      "<ng-form name=\"{{ component.key }}{{ gridRow !== undefined ? '-' + gridRow : ''}}\" class=\"formio-component-{{ component.key }}\" ng-hide=\"component.hidden\">\n  <div class=\"form-group has-feedback form-field-type-{{ component.type }} {{component.customClass}}\" id=\"form-group-{{ component.key }}\" ng-style=\"component.style\">\n    <formio-element></formio-element>\n  </div>\n</ng-form>\n"
+      "<div name=\"componentId\" class=\"form-group has-feedback form-field-type-{{ component.type }} {{component.customClass}} formio-component-{{ component.key }}\" id=\"form-group-{{ componentId }}\" ng-style=\"component.style\" ng-hide=\"component.hidden\">\n  <formio-element></formio-element>\n</div>\n"
     );
 
     $templateCache.put('formio/element-view.html',
