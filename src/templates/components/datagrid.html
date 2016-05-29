@@ -5,7 +5,7 @@
     </tr>
     <tr ng-repeat="row in rows track by $index" ng-init="rowIndex = $index">
       <td ng-repeat="col in cols track by $index" ng-init="col.hideLabel = true; colIndex = $index" class="formio-data-grid-row" >
-        <formio-component component="col" data="rows[rowIndex]" formio="formio" read-only="readOnly || col.disabled" grid-row="rowIndex" grid-col="colIndex" formio-form="formioForm"></formio-component>
+        <formio-component component="col" data="rows[rowIndex]" formio="formio" read-only="readOnly || col.disabled" grid-row="rowIndex" grid-col="colIndex" formio-form="formioForm" grid-row="gridRow" grid-col="gridCol"></formio-component>
       </td>
       <td>
         <a ng-click="removeRow(rowIndex)" class="btn btn-default">
