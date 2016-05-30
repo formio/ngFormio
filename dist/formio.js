@@ -4995,18 +4995,19 @@ require('./resource')(app);
 require('./file')(app);
 require('./signature')(app);
 require('./custom')(app);
+require('./datagrid')(app);
+require('./survey')(app);
 
 // Layout
 require('./columns')(app);
 require('./fieldset')(app);
 require('./container')(app);
-require('./datagrid')(app);
 require('./page')(app);
 require('./panel')(app);
 require('./table')(app);
 require('./well')(app);
 
-},{"./address":8,"./button":9,"./checkbox":10,"./columns":11,"./components":12,"./container":13,"./content":14,"./currency":15,"./custom":16,"./datagrid":17,"./datetime":18,"./email":19,"./fieldset":20,"./file":21,"./hidden":22,"./htmlelement":23,"./number":25,"./page":26,"./panel":27,"./password":28,"./phonenumber":29,"./radio":30,"./resource":31,"./select":32,"./selectboxes":33,"./signature":34,"./table":35,"./textarea":36,"./textfield":37,"./well":38}],25:[function(require,module,exports){
+},{"./address":8,"./button":9,"./checkbox":10,"./columns":11,"./components":12,"./container":13,"./content":14,"./currency":15,"./custom":16,"./datagrid":17,"./datetime":18,"./email":19,"./fieldset":20,"./file":21,"./hidden":22,"./htmlelement":23,"./number":25,"./page":26,"./panel":27,"./password":28,"./phonenumber":29,"./radio":30,"./resource":31,"./select":32,"./selectboxes":33,"./signature":34,"./survey":35,"./table":36,"./textarea":37,"./textfield":38,"./well":39}],25:[function(require,module,exports){
 "use strict";
 
 
@@ -5928,6 +5929,63 @@ module.exports = function(app) {
 },{}],35:[function(require,module,exports){
 "use strict";
 
+
+module.exports = function(app) {
+  app.config([
+    'formioComponentsProvider',
+    function(formioComponentsProvider) {
+      formioComponentsProvider.register('survey', {
+        title: 'Survey',
+        template: 'formio/components/survey.html',
+        group: 'advanced',
+        tableView: function(data, component) {
+          var view = '<table class="table table-striped table-bordered"><thead>';
+          var values = {};
+          angular.forEach(component.values, function(v) {
+            values[v.value] = v.label;
+          });
+          angular.forEach(component.questions, function(question) {
+            view += '<tr>';
+            view += '<th>' + question.label + '</th>';
+            view += '<td>' + values[data[question.value]] + '</td>';
+            view += '</tr>';
+          });
+          view += '</tbody></table>';
+          return view;
+        },
+        settings: {
+          input: true,
+          tableView: true,
+          label: '',
+          key: 'survey',
+          questions: [],
+          values: [],
+          defaultValue: '',
+          protected: false,
+          persistent: true,
+          validate: {
+            required: false,
+            custom: '',
+            customPrivate: false
+          }
+        }
+      });
+    }
+  ]);
+  app.run([
+    '$templateCache',
+    'FormioUtils',
+    function($templateCache, FormioUtils) {
+      $templateCache.put('formio/components/survey.html', FormioUtils.fieldWrap(
+        "<table class=\"table table-striped table-bordered\">\n  <thead>\n    <tr>\n      <td></td>\n      <th ng-repeat=\"value in component.values track by $index\" style=\"text-align: center;\">{{ value.label }}</th>\n    </tr>\n  </thead>\n  <tr ng-repeat=\"question in component.questions\">\n    <td>{{ question.label }}</td>\n    <td ng-repeat=\"v in component.values\" style=\"text-align: center;\">\n      <input\n        type=\"radio\"\n        id=\"{{ componentId }}-{{ question.value }}\" name=\"{{ componentId }}-{{ question.value }}\"\n        tabindex=\"{{ component.tabindex || 0 }}\"\n        value=\"{{ v.value }}\"\n        ng-model=\"data[component.key][question.value]\"\n        ng-required=\"component.validate.required\"\n        ng-disabled=\"readOnly\"\n        custom-validator=\"component.validate.custom\"\n      >\n    </td>\n  </tr>\n</table>\n"
+      ));
+    }
+  ]);
+};
+
+},{}],36:[function(require,module,exports){
+"use strict";
+
 module.exports = function(app) {
   app.config([
     'formioComponentsProvider',
@@ -5969,7 +6027,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],36:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -6024,7 +6082,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],37:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 "use strict";
 
 
@@ -6083,7 +6141,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],38:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -6115,7 +6173,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],39:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -6152,7 +6210,7 @@ module.exports = function() {
   };
 };
 
-},{}],40:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -6466,7 +6524,7 @@ module.exports = function() {
   };
 };
 
-},{}],41:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -6596,7 +6654,7 @@ module.exports = [
   }
 ];
 
-},{}],42:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 "use strict";
 module.exports = [
   'formioComponents',
@@ -6641,7 +6699,7 @@ module.exports = [
   }
 ];
 
-},{}],43:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -6724,7 +6782,7 @@ module.exports = function() {
   };
 };
 
-},{}],44:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 "use strict";
 module.exports = [
   '$compile',
@@ -6743,7 +6801,7 @@ module.exports = [
   }
 ];
 
-},{}],45:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -6753,7 +6811,7 @@ module.exports = function() {
   };
 };
 
-},{}],46:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -6768,7 +6826,7 @@ module.exports = function() {
   };
 };
 
-},{}],47:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -6823,7 +6881,7 @@ module.exports = function() {
   };
 };
 
-},{}],48:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -7128,7 +7186,7 @@ module.exports = function() {
   };
 };
 
-},{}],49:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -7298,7 +7356,7 @@ module.exports = [
   }
 ];
 
-},{}],50:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 "use strict";
 var formioUtils = require('formio-utils');
 
@@ -7368,7 +7426,7 @@ module.exports = function() {
   };
 };
 
-},{"formio-utils":3}],51:[function(require,module,exports){
+},{"formio-utils":3}],52:[function(require,module,exports){
 "use strict";
 module.exports = [
   '$q',
@@ -7417,7 +7475,7 @@ module.exports = [
   }
 ];
 
-},{}],52:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -7451,7 +7509,7 @@ module.exports = [
   }
 ];
 
-},{}],53:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 "use strict";
 module.exports = [
   'FormioUtils',
@@ -7460,7 +7518,7 @@ module.exports = [
   }
 ];
 
-},{}],54:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 "use strict";
 module.exports = [
   '$sce',
@@ -7473,7 +7531,7 @@ module.exports = [
   }
 ];
 
-},{}],55:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 "use strict";
 module.exports = [
   function() {
@@ -7492,7 +7550,7 @@ module.exports = [
   }
 ];
 
-},{}],56:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 "use strict";
 module.exports = [
   'formioTableView',
@@ -7505,7 +7563,7 @@ module.exports = [
   }
 ];
 
-},{}],57:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -7520,7 +7578,7 @@ module.exports = [
   }
 ];
 
-},{}],58:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 "use strict";
 module.exports = [
   '$filter',
@@ -7549,7 +7607,7 @@ module.exports = [
   }
 ];
 
-},{}],59:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 "use strict";
 
 
@@ -7675,7 +7733,7 @@ app.run([
 
 require('./components');
 
-},{"./components":24,"./directives/customValidator":39,"./directives/formio":40,"./directives/formioComponent":41,"./directives/formioComponentView":42,"./directives/formioDelete":43,"./directives/formioElement":44,"./directives/formioErrors":45,"./directives/formioSubmission":46,"./directives/formioSubmissions":47,"./directives/formioWizard":48,"./factories/FormioScope":49,"./factories/FormioUtils":50,"./factories/formioInterceptor":51,"./factories/formioTableView":52,"./filters/flattenComponents":53,"./filters/safehtml":54,"./filters/tableComponents":55,"./filters/tableFieldView":56,"./filters/tableView":57,"./filters/translate":58,"./plugins":60,"./providers/Formio":64,"./providers/FormioPlugins":65}],60:[function(require,module,exports){
+},{"./components":24,"./directives/customValidator":40,"./directives/formio":41,"./directives/formioComponent":42,"./directives/formioComponentView":43,"./directives/formioDelete":44,"./directives/formioElement":45,"./directives/formioErrors":46,"./directives/formioSubmission":47,"./directives/formioSubmissions":48,"./directives/formioWizard":49,"./factories/FormioScope":50,"./factories/FormioUtils":51,"./factories/formioInterceptor":52,"./factories/formioTableView":53,"./filters/flattenComponents":54,"./filters/safehtml":55,"./filters/tableComponents":56,"./filters/tableFieldView":57,"./filters/tableView":58,"./filters/translate":59,"./plugins":61,"./providers/Formio":65,"./providers/FormioPlugins":66}],61:[function(require,module,exports){
 "use strict";
 module.exports = function(app) {
   require('./storage/url')(app);
@@ -7683,7 +7741,7 @@ module.exports = function(app) {
   require('./storage/dropbox')(app);
 };
 
-},{"./storage/dropbox":61,"./storage/s3":62,"./storage/url":63}],61:[function(require,module,exports){
+},{"./storage/dropbox":62,"./storage/s3":63,"./storage/url":64}],62:[function(require,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -7817,7 +7875,7 @@ module.exports = function(app) {
 };
 
 
-},{}],62:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -7914,7 +7972,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],63:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -7967,7 +8025,7 @@ module.exports = function(app) {
   );
 };
 
-},{}],64:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   // The formio class.
@@ -8034,7 +8092,7 @@ module.exports = function() {
   };
 };
 
-},{"formiojs/src/formio.js":4}],65:[function(require,module,exports){
+},{"formiojs/src/formio.js":4}],66:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   var plugins = {};
@@ -8063,4 +8121,4 @@ module.exports = function() {
   };
 };
 
-},{}]},{},[59]);
+},{}]},{},[60]);
