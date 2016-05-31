@@ -9,7 +9,9 @@ module.exports = function(app) {
       scope: {
         component: '=',
         readOnly: '=',
-        model: '=ngModel'
+        model: '=ngModel',
+        gridRow: '=',
+        gridCol: '='
       },
       templateUrl: 'formio/components/selectboxes-directive.html',
       link: function($scope, el, attrs, ngModel) {

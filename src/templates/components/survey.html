@@ -1,0 +1,23 @@
+<table class="table table-striped table-bordered">
+  <thead>
+    <tr>
+      <td></td>
+      <th ng-repeat="v in component.values track by $index" style="text-align: center;">{{ v.label }}</th>
+    </tr>
+  </thead>
+  <tr ng-repeat="question in component.questions">
+    <td>{{ question.label }}</td>
+    <td ng-repeat="v in component.values" style="text-align: center;">
+      <input
+        type="radio"
+        id="{{ componentId }}-{{ question.value }}-{{ v.value }}" name="{{ componentId }}-{{ question.value }}-{{ v.value }}"
+        tabindex="{{ component.tabindex || 0 }}"
+        value="{{ v.value }}"
+        ng-model="data[component.key][question.value]"
+        ng-required="component.validate.required"
+        ng-disabled="readOnly"
+        custom-validator="component.validate.custom"
+      >
+    </td>
+  </tr>
+</table>

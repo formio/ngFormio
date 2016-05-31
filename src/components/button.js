@@ -102,7 +102,7 @@ module.exports = function(app) {
                   var submission = {data: {}, oauth: {}};
                   submission.oauth[settings.provider] = params;
                   submission.oauth[settings.provider].redirectURI = window.location.origin || window.location.protocol + '//' + window.location.host;
-                  $scope.form.submitting = true;
+                  $scope.formioForm.submitting = true;
                   $scope.formio.saveSubmission(submission)
                   .then(function(submission) {
                     // Trigger the form submission.
@@ -115,7 +115,7 @@ module.exports = function(app) {
                     });
                   })
                   .finally(function() {
-                    $scope.form.submitting = false;
+                    $scope.formioForm.submitting = false;
                   });
                 }
               }

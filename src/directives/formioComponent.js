@@ -13,8 +13,10 @@ module.exports = [
         component: '=',
         data: '=',
         formio: '=',
-        form: '=',
-        readOnly: '='
+        formioForm: '=',
+        readOnly: '=',
+        gridRow: '=',
+        gridCol: '='
       },
       templateUrl: 'formio/component.html',
       link: function(scope, el, attrs, formioCtrl) {
@@ -47,19 +49,6 @@ module.exports = [
             eventsToHandle: ['input', 'keyup', 'click', 'focus'],
             silentEvents: ['click', 'focus']
           };
-
-          $scope.resetForm = function() {
-            // Manually remove each key so we don't lose a reference to original
-            // data in child scopes.
-            for (var key in $scope.data) {
-              delete $scope.data[key];
-            }
-          };
-
-          // Initialize the data.
-          if (!$scope.data) {
-            $scope.resetForm();
-          }
 
           // Get the settings.
           var component = formioComponents.components[$scope.component.type] || formioComponents.components['custom'];
@@ -121,6 +110,15 @@ module.exports = [
           }
           else if ($scope.data && !$scope.data.hasOwnProperty($scope.component.key) && $scope.component.multiple) {
             $scope.data[$scope.component.key] = [];
+          }
+
+          // Set the component name.
+          $scope.componentId = $scope.component.key;
+          if ($scope.gridRow) {
+            $scope.componentId += ('-' + $scope.gridRow);
+          }
+          if ($scope.gridCol) {
+            $scope.componentId += ('-' + $scope.gridCol);
           }
         }
       ]
