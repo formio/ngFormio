@@ -3,11 +3,10 @@
     {{ component.label }}
   </label>
   <formio-select-boxes
-    id="{{ componentId }}"
-    name="{{ componentId }}"
     ng-model="data[component.key]"
     ng-model-options="{allowInvalid: true}"
     component="component"
+    component-id="componentId"
     read-only="readOnly"
     ng-required="component.validate.required"
     custom-validator="component.validate.custom"

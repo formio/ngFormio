@@ -2,7 +2,6 @@
   <label class="control-label" for="{{ componentId }}-{{ v.value }}">
     <input type="{{ component.inputType }}"
     id="{{ componentId }}-{{ v.value }}"
-    name="{{ componentId }}-{{ v.value }}"
     value="{{ v.value }}"
     tabindex="{{ component.tabindex || 0 }}"
     ng-model="data[component.key]"

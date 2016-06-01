@@ -114,10 +114,10 @@ module.exports = [
 
           // Set the component name.
           $scope.componentId = $scope.component.key;
-          if ($scope.gridRow) {
+          if ($scope.gridRow !== undefined) {
             $scope.componentId += ('-' + $scope.gridRow);
           }
-          if ($scope.gridCol) {
+          if ($scope.gridCol !== undefined) {
             $scope.componentId += ('-' + $scope.gridCol);
           }
         }

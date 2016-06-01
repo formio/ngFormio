@@ -8,6 +8,7 @@ module.exports = function(app) {
       require: 'ngModel',
       scope: {
         component: '=',
+        componentId: '=',
         readOnly: '=',
         model: '=ngModel',
         gridRow: '=',
