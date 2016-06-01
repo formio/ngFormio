@@ -62,8 +62,9 @@ module.exports = [
 
           // Add a new field value.
           $scope.addFieldValue = function() {
+            var value = $scope.component.hasOwnProperty('defaultValue') ? $scope.component.defaultValue : '';
             $scope.data[$scope.component.key] = $scope.data[$scope.component.key] || [];
-            $scope.data[$scope.component.key].push('');
+            $scope.data[$scope.component.key].push(value);
           };
 
           // Remove a field value.
@@ -99,18 +100,22 @@ module.exports = [
             }
           }
 
-          // Establish a default for data.
-          if ($scope.data && !$scope.data.hasOwnProperty($scope.component.key) && $scope.component.hasOwnProperty('defaultValue')) {
-            if ($scope.component.multiple && !angular.isArray($scope.component.defaultValue)) {
-              $scope.data[$scope.component.key] = [$scope.component.defaultValue];
+          $scope.$watch('component.multiple', function(_new, _old) {
+            if (!_new && !_old) return;
+
+            // Establish a default for data.
+            $scope.data = $scope.data || {};
+            if ($scope.component.multiple) {
+              // Use the current data or default.
+              $scope.data[$scope.component.key] = ($scope.data[$scope.component.key] ? [$scope.data[$scope.component.key]] : false)
+                || ($scope.component.hasOwnProperty('defaultValue') ? [$scope.component.defaultValue] : []);
             }
             else {
-              $scope.data[$scope.component.key] = $scope.component.defaultValue;
+              // Use the current data or default.
+              $scope.data[$scope.component.key] = ($scope.data[$scope.component.key] ? $scope.data[$scope.component.key] : false)
+                || ($scope.component.hasOwnProperty('defaultValue') ? $scope.component.defaultValue : '');
             }
-          }
-          else if ($scope.data && !$scope.data.hasOwnProperty($scope.component.key) && $scope.component.multiple) {
-            $scope.data[$scope.component.key] = [];
-          }
+          });
 
           // Set the component name.
           $scope.componentId = $scope.component.key;
