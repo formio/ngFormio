@@ -90,7 +90,7 @@ module.exports = [
 
           // If the component has a controller.
           if (component.controller) {
-            // Maintain reverse compatability by executing the old method style.
+            // Maintain reverse compatibility by executing the old method style.
             if (typeof component.controller === 'function') {
               component.controller($scope.component, $scope, $http, Formio);
             }
