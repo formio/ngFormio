@@ -25,7 +25,8 @@
     "signature_pad": "^1.5.3",
     "angular-ui-mask": "^1.8.3",
     "angular-file-saver": "^1.1.1",
-    "ui-select": "angular-ui-select#^0.16.1"
+    "ui-select": "angular-ui-select#^0.16.1",
+    "moment-timezone": "^0.5.4"
   },
   "license": "MIT",
   "ignore": [

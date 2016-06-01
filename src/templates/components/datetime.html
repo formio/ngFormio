@@ -10,6 +10,7 @@
   min-date="component.minDate"
   max-date="component.maxDate"
   datepicker-mode="component.datepickerMode"
+  datepicker-options="tz.options"
   when-closed="onClosed()"
   enable-date="component.enableDate"
   enable-time="component.enableTime"
@@ -24,4 +25,16 @@
       <i ng-if="!component.enableDate" class="glyphicon glyphicon-time"></i>
     </button>
   </span>
+  <ui-select
+     ng-if="component.enableTimezone"
+     ng-model="tz.timezone"
+     ng-disabled="readOnly"
+  >
+    <ui-select-match class="ui-select-match" placeholder="{{ component.placeholder | formioTranslate }}">
+      {{ $select.selected }}
+    </ui-select-match>
+    <ui-select-choices class="ui-select-choices" repeat="item in tz.zones | filter: $select.search">
+      {{ item }}
+    </ui-select-choices>
+  </ui-select>
 </div>

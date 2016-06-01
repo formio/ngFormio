@@ -1,4 +1,5 @@
 var fs = require('fs');
+var moment = require('moment-timezone');
 module.exports = function(app) {
   app.config([
     'formioComponentsProvider',
@@ -24,6 +25,25 @@ module.exports = function(app) {
           }
           if (!$scope.component.minDate) {
             delete $scope.component.minDate;
+          }
+
+          $scope.tz = {}
+          $scope.tz.options = {};
+          if ($scope.component.enableTimezone) {
+            $scope.tz.timezone = moment.tz.guess();
+            $scope.tz.zones = moment.tz.names();
+
+            var updateOffset = function() {
+              if ($scope.tz.timezone && $scope.data[$scope.component.key]) {
+                $scope.options.timezone = moment($scope.data[$scope.component.key]).tz($scope.tz.timezone).format('Z').replace(':','');
+              }
+              else {
+                delete $scope.tz.options.timezone;
+              }
+            }
+
+            $scope.$watch('tz.timezone', updateOffset);
+            $scope.$watch('data.' + $scope.component.key, updateOffset);
           }
 
           $scope.autoOpen = true;
