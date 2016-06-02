@@ -1305,6 +1305,10 @@ footer {
       &:nth-child(even) {
         background-color: $table-bg-accent;
       }
+      h5 {
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
     }
   }
 }
