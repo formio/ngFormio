@@ -99,6 +99,27 @@ module.exports = function() {
               // Update the visibility, if its possible a change occurred.
               component.hide = !$scope.show[component.key];
             }
+            // Custom conditional logic.
+            else if (component.customConditional) {
+              try {
+                // Create a child block, and expose the submission data.
+                {
+                  var data = $scope.submission.data;
+                  var show = true; // show by default.
+                  // Eval the custom conditional and update the show value.
+                  show = eval('(function() { ' + component.customConditional.toString() + '; return show; })()');
+                  $scope.show[component.key] = boolean[show];
+                }
+              }
+              catch(e) {
+                console.log('Custom Conditional Error: ');
+                console.log(e);
+                $scope.show[component.key] = true;
+              }
+
+              // Update the visibility, if its possible a change occurred.
+              component.hide = !$scope.show[component.key];
+            }
 
             // Set hidden if specified
             if ($scope.hideComponents) {
