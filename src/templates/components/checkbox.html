@@ -2,7 +2,6 @@
   <label for="{{ componentId }}" ng-class="{'field-required': component.validate.required}">
     <input type="{{ component.inputType }}"
     id="{{ componentId }}"
-    name="{{ componentId }}"
     tabindex="{{ component.tabindex || 0 }}"
     ng-disabled="readOnly"
     ng-model="data[component.key]"
