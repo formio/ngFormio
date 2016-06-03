@@ -104,16 +104,14 @@ module.exports = function() {
               try {
                 // Create a child block, and expose the submission data.
                 {
-                  var data = $scope.submission.data;
+                  var data = $scope.submission.data; // eslint-disable-line no-unused-vars
                   var show = true; // show by default.
                   // Eval the custom conditional and update the show value.
                   show = eval('(function() { ' + component.customConditional.toString() + '; return show; })()');
                   $scope.show[component.key] = boolean[show];
                 }
               }
-              catch(e) {
-                console.log('Custom Conditional Error: ');
-                console.log(e);
+              catch (e) {
                 $scope.show[component.key] = true;
               }
 
