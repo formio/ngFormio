@@ -100,14 +100,12 @@ module.exports = [
             }
           }
 
-          $scope.$watch('component.multiple', function(_new, _old) {
-            if (!_new && !_old) return;
-
+          $scope.$watch('component.multiple', function() {
             // Establish a default for data.
             $scope.data = $scope.data || {};
             if ($scope.component.multiple) {
               var value = null;
-              if ($scope.data[$scope.component.key]) {
+              if ($scope.data.hasOwnProperty($scope.component.key)) {
                 // If a value is present, and its an array, assign it to the value.
                 if ($scope.data[$scope.component.key] instanceof Array) {
                   value = $scope.data[$scope.component.key];
@@ -137,8 +135,12 @@ module.exports = [
             }
             else {
               // Use the current data or default.
-              $scope.data[$scope.component.key] = ($scope.data[$scope.component.key] ? $scope.data[$scope.component.key] : false)
-                || ($scope.component.hasOwnProperty('defaultValue') ? $scope.component.defaultValue : '');
+              if ($scope.data.hasOwnProperty($scope.component.key)) {
+                $scope.data[$scope.component.key] = $scope.data[$scope.component.key];
+              }
+              else if ($scope.component.hasOwnProperty('defaultValue')) {
+                $scope.data[$scope.component.key] = $scope.component.defaultValue;
+              }
             }
           });
 
