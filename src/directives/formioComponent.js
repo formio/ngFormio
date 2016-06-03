@@ -106,9 +106,34 @@ module.exports = [
             // Establish a default for data.
             $scope.data = $scope.data || {};
             if ($scope.component.multiple) {
+              var value = null;
+              if ($scope.data[$scope.component.key]) {
+                // If a value is present, and its an array, assign it to the value.
+                if ($scope.data[$scope.component.key] instanceof Array) {
+                  value = $scope.data[$scope.component.key];
+                }
+                // If a value is present and it is not an array, wrap the value.
+                else {
+                  value = [$scope.data[$scope.component.key]];
+                }
+              }
+              else if ($scope.component.hasOwnProperty('defaultValue')) {
+                // If there is a default value and it is an array, assign it to the value.
+                if ($scope.component.defaultValue instanceof Array) {
+                  value = $scope.component.defaultValue;
+                }
+                // If there is a default value and it is not an array, wrap the value.
+                else {
+                  value = [$scope.component.defaultValue];
+                }
+              }
+              else {
+                // Couldn't safely default, make it a simple array. Possibly add a single obj or string later.
+                value = [];
+              }
+
               // Use the current data or default.
-              $scope.data[$scope.component.key] = ($scope.data[$scope.component.key] ? [$scope.data[$scope.component.key]] : false)
-                || ($scope.component.hasOwnProperty('defaultValue') ? [$scope.component.defaultValue] : []);
+              $scope.data[$scope.component.key] = value;
             }
             else {
               // Use the current data or default.
