@@ -21,7 +21,7 @@ module.exports = function(app) {
         },
         controller: ['$scope', function($scope) {
           var settings = $scope.component;
-          $scope.onClick = function() {
+          var onClick = function() {
             switch (settings.action) {
               case 'submit':
                 return;
@@ -49,6 +49,14 @@ module.exports = function(app) {
                 break;
             }
           };
+
+          $scope.$on('buttonClick', function(event, component, componentId) {
+            // Ensure the componentId's match (even though they always should).
+            if (componentId !== $scope.componentId) {
+              return;
+            }
+            onClick();
+          });
 
           $scope.openOAuth = function(settings) {
             /*eslint-disable camelcase */
