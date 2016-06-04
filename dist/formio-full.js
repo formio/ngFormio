@@ -69722,7 +69722,7 @@ module.exports = function() {
               }
 
               // Update the visibility, if its possible a change occurred.
-              component.hide = !$scope.show[component.key];
+              component.hide = component.hidden = !$scope.show[component.key];
             }
             // Custom conditional logic.
             else if (component.customConditional) {
@@ -69741,7 +69741,7 @@ module.exports = function() {
               }
 
               // Update the visibility, if its possible a change occurred.
-              component.hide = !$scope.show[component.key];
+              component.hide = component.hidden = !$scope.show[component.key];
             }
 
             // Set hidden if specified
