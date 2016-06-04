@@ -135,7 +135,7 @@ module.exports = function(app) {
       if ($scope.data && $scope.data[$scope.component.key] === '') {
         $scope.data[$scope.component.key] = [];
       }
-      if ($scope.data && $scope.data[$scope.component.key][0] === '') {
+      if ($scope.data && $scope.data[$scope.component.key] && $scope.data[$scope.component.key][0] === '') {
         $scope.data[$scope.component.key].splice(0, 1);
       }
 
