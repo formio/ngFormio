@@ -51,7 +51,7 @@ angular.module('formioApp').constant('AppConfig', {
       "name": "servicetrackerapp",
       "description": "An application to schedule, manage and track a services based company such as home or business services.",
       "template": "https://cdn.rawgit.com/formio/formio-app-servicetracker/2.1.1/src/project.json",
-      "thumbnail": "https://app.form.io/formio-app-servicetracker/src/assets/images/servicetracker-thumb.png"
+      "thumbnail": "https://app.form.io/formio-app-servicetracker/assets/images/servicetracker-thumb.png"
     },
     {
       "title": "Prize Drawing",
