@@ -494,7 +494,14 @@ angular
 
       $scope.showUpgradeDialog = ProjectUpgradeDialog.show.bind(ProjectUpgradeDialog);
 
+      $rootScope.welcomeForceClose = false;
+      $scope.closeWelcome = function() {
+        $rootScope.welcomeForceClose = true;
+      };
       $scope.showWelcome = function() {
+        if ($rootScope.welcomeForceClose) {
+          return false;
+        }
         // Only show welcome message for users with 0 or 1 projects or users within the last day.
         if ($rootScope.user) {
           return (($scope.projectsLoaded && $scope.projects.length < 2) || ((new Date($rootScope.user.created).getTime() / 1000) + 86400 > (Date.now() / 1000)));
