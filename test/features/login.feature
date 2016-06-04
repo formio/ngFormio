@@ -24,7 +24,7 @@ Feature: Login Functionality
     When I enter ${random-password} in the .login-container #password field
     And I click the LOG IN button
     Then I have been logged out
-    And I see .alert with the text Unique fields cannot be empty
+    And I see .alert with the text Missing username
 
   Scenario: Missing password
     Given I am on /#/auth
