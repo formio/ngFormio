@@ -19,18 +19,26 @@ module.exports = function(app) {
         // Initialize model
         var model = {};
         angular.forEach($scope.component.values, function(v) {
-          model[v.value] = !!ngModel.$viewValue[v.value];
+          model[v.value] = ngModel.$viewValue.hasOwnProperty(v.value)
+            ? !!ngModel.$viewValue[v.value]
+            : false;
         });
-        ngModel.$setPristine(true);
+        // FA-835 - Update the view model with our defaults.
+        ngModel.$setViewValue(model);
 
+        ngModel.$setPristine(true);
         ngModel.$isEmpty = function(value) {
+          if (typeof value === 'undefined') {
+            return true;
+          }
+
           return Object.keys(value).every(function(key) {
             return !value[key];
           });
         };
 
         $scope.toggleCheckbox = function(value) {
-          var _model = angular.copy(ngModel.$viewValue);
+          var _model = angular.copy(ngModel.$viewValue || {});
           _model[value] = !_model[value];
           ngModel.$setViewValue(_model);
         };
@@ -67,7 +75,6 @@ module.exports = function(app) {
           label: '',
           key: 'selectboxesField',
           values: [],
-          defaultValue: {},
           inline: false,
           protected: false,
           persistent: true,

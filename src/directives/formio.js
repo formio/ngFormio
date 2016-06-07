@@ -82,8 +82,9 @@ module.exports = function() {
               }
               // Special check for check boxes component.
               else if (typeof value !== 'undefined' && typeof value === 'object') {
-                // Check if the conditional trigger value is true.
-                $scope.show[component.key] = boolean[value[component.conditional.eq].toString()];
+                $scope.show[component.key] = boolean.hasOwnProperty(value[component.conditional.eq])
+                  ? boolean[value[component.conditional.eq]]
+                  : true;
               }
               // Check against the components default value, if present and the components hasnt been interacted with.
               else if (typeof value === 'undefined' && cond.hasOwnProperty('defaultValue')) {
