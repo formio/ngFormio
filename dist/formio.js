@@ -5728,18 +5728,26 @@ module.exports = function(app) {
         // Initialize model
         var model = {};
         angular.forEach($scope.component.values, function(v) {
-          model[v.value] = !!ngModel.$viewValue[v.value];
+          model[v.value] = ngModel.$viewValue.hasOwnProperty(v.value)
+            ? !!ngModel.$viewValue[v.value]
+            : false;
         });
-        ngModel.$setPristine(true);
+        // FA-835 - Update the view model with our defaults.
+        ngModel.$setViewValue(model);
 
+        ngModel.$setPristine(true);
         ngModel.$isEmpty = function(value) {
+          if (typeof value === 'undefined') {
+            return true;
+          }
+
           return Object.keys(value).every(function(key) {
             return !value[key];
           });
         };
 
         $scope.toggleCheckbox = function(value) {
-          var _model = angular.copy(ngModel.$viewValue);
+          var _model = angular.copy(ngModel.$viewValue || {});
           _model[value] = !_model[value];
           ngModel.$setViewValue(_model);
         };
@@ -5776,7 +5784,6 @@ module.exports = function(app) {
           label: '',
           key: 'selectboxesField',
           values: [],
-          defaultValue: {},
           inline: false,
           protected: false,
           persistent: true,
@@ -6302,19 +6309,20 @@ module.exports = function() {
               }
               var value = $scope.submission.data[cond.key];
 
-              if (value && typeof value !== 'object') {
+              if (typeof value !== 'undefined' && typeof value !== 'object') {
                 // Check if the conditional value is equal to the trigger value
                 $scope.show[component.key] = value.toString() === component.conditional.eq.toString()
                   ? boolean[component.conditional.show]
                   : !boolean[component.conditional.show];
               }
               // Special check for check boxes component.
-              else if (value && typeof value === 'object') {
-                // Check if the conditional trigger value is true.
-                $scope.show[component.key] = boolean[value[component.conditional.eq].toString()];
+              else if (typeof value !== 'undefined' && typeof value === 'object') {
+                $scope.show[component.key] = boolean.hasOwnProperty(value[component.conditional.eq])
+                  ? boolean[value[component.conditional.eq]]
+                  : true;
               }
               // Check against the components default value, if present and the components hasnt been interacted with.
-              else if (!value && cond.defaultValue) {
+              else if (typeof value === 'undefined' && cond.hasOwnProperty('defaultValue')) {
                 $scope.show[component.key] = cond.defaultValue.toString() === component.conditional.eq.toString()
                   ? boolean[component.conditional.show]
                   : !boolean[component.conditional.show];
@@ -6324,20 +6332,18 @@ module.exports = function() {
                 $scope.show[component.key] = !boolean[component.conditional.show];
               }
 
-              // Update the visibility, if its possible a change occurred.
+              // Update the visibility, if it's possible a change occurred.
               component.hide = component.hidden = !$scope.show[component.key];
             }
             // Custom conditional logic.
             else if (component.customConditional) {
               try {
                 // Create a child block, and expose the submission data.
-                {
-                  var data = $scope.submission.data; // eslint-disable-line no-unused-vars
-                  var show = true; // show by default.
-                  // Eval the custom conditional and update the show value.
-                  show = eval('(function() { ' + component.customConditional.toString() + '; return show; })()');
-                  $scope.show[component.key] = boolean[show];
-                }
+                var data = $scope.submission.data; // eslint-disable-line no-unused-vars
+                // Eval the custom conditional and update the show value.
+                var show = eval('(function() { ' + component.customConditional.toString() + '; return show; })()');
+                // Show by default, if an invalid type is given.
+                $scope.show[component.key] = boolean.hasOwnProperty(show.toString()) ? boolean[show] : true;
               }
               catch (e) {
                 $scope.show[component.key] = true;
@@ -6687,7 +6693,8 @@ module.exports = [
               if ($scope.data.hasOwnProperty($scope.component.key)) {
                 $scope.data[$scope.component.key] = $scope.data[$scope.component.key];
               }
-              else if ($scope.component.hasOwnProperty('defaultValue')) {
+              // FA-835 - The default values for select boxes are set in the component.
+              else if ($scope.component.hasOwnProperty('defaultValue') && $scope.component.type !== 'selectboxes') {
                 $scope.data[$scope.component.key] = $scope.component.defaultValue;
               }
             }
