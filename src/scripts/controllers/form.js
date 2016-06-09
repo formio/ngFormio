@@ -344,14 +344,14 @@ app.controller('FormController', [
           if (typeof setValue !== 'undefined' && setValue === false) {
             found = false;
             delete $scope.form.submissionAccess[a];
-            $scope.form.submissionAccess = _.uniq($scope.form.submissionAccess);
-            continue;
+            $scope.form.submissionAccess = _.filter($scope.form.submissionAccess);
+            break;
           }
           // If we're getting the value, flag it as found.
           // If we're setting the value to true when it exists, do nothing.
           else {
             found = true;
-            continue;
+            break;
           }
         }
       }

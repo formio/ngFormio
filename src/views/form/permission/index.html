@@ -8,11 +8,11 @@
   </div>
   <div class="panel-body">
     <div class="well">
-      Self Access Permissions allow Submissions of this Resource to access themselves, equivalently read_own, regardless of ownership based permissions.
+      Self Access Permissions allow Submissions of this Resource to access themselves, as the owner. You can define granular access control with the Own Submission permissions below.
     </div>
     <div ng-if="form._id" class="checkbox">
       <label>
-        <input type="checkbox" ng-model="selfAccessPermissions" ng-checked="selfAccessPermissions" ng-change="toggleSelfAccessPermissions()">
+        <input type="checkbox" ng-model="selfAccessPermissions" ng-change="toggleSelfAccessPermissions()">
         Enable
       </label>
     </div>
