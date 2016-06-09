@@ -110,33 +110,42 @@ module.exports = {
    * @param components
    * @param fn
    */
-  eachComponent: function eachComponent(components, fn, includeAll) {
+  eachComponent: function eachComponent(components, fn, includeAll, path) {
     if (!components) return;
-
+    path = path || '';
     components.forEach(function(component) {
       var hasColumns = component.columns && Array.isArray(component.columns);
       var hasRows = component.rows && Array.isArray(component.rows);
       var hasComps = component.components && Array.isArray(component.components);
       var noRecurse = false;
+      var newPath = component.key ? (path ? (path + '.' + component.key) : component.key) : '';
+
       if (includeAll || component.tree || (!hasColumns && !hasRows && !hasComps)) {
-        noRecurse = fn(component);
+        noRecurse = fn(component, newPath);
       }
+
+      var subPath = function() {
+        if (component.key && ((component.type === 'datagrid') || (component.type === 'container'))) {
+          return newPath;
+        }
+        return path;
+      };
 
       if (!noRecurse) {
         if (hasColumns) {
           component.columns.forEach(function(column) {
-            eachComponent(column.components, fn, includeAll);
+            eachComponent(column.components, fn, includeAll, subPath());
           });
         }
 
         else if (hasRows) {
           [].concat.apply([], component.rows).forEach(function(row) {
-            eachComponent(row.components, fn, includeAll);
+            eachComponent(row.components, fn, includeAll, subPath());
           });
         }
 
         else if (hasComps) {
-          eachComponent(component.components, fn, includeAll);
+          eachComponent(component.components, fn, includeAll, subPath());
         }
       }
     });
@@ -164,11 +173,11 @@ module.exports = {
    * @param flattened
    * @returns {*|{}}
    */
-  flattenComponents: function flattenComponents(components) {
+  flattenComponents: function flattenComponents(components, includeAll) {
     var flattened = {};
-    module.exports.eachComponent(components, function(component) {
-      flattened[component.key] = component;
-    });
+    module.exports.eachComponent(components, function(component, path) {
+      flattened[path] = component;
+    }, includeAll);
     return flattened;
   }
 };
@@ -6326,7 +6335,7 @@ module.exports = function() {
               }
 
               // Update the visibility, if it's possible a change occurred.
-              component.hide = component.hidden = !$scope.show[component.key];
+              component.hide = !$scope.show[component.key];
             }
             // Custom conditional logic.
             else if (component.customConditional) {
@@ -6343,7 +6352,7 @@ module.exports = function() {
               }
 
               // Update the visibility, if its possible a change occurred.
-              component.hide = component.hidden = !$scope.show[component.key];
+              component.hide = !$scope.show[component.key];
             }
 
             // Set hidden if specified
@@ -7767,7 +7776,7 @@ app.run([
 
     // A formio component template.
     $templateCache.put('formio/component.html',
-      "<div class=\"form-group has-feedback form-field-type-{{ component.type }} formio-component-{{ component.key }} {{component.customClass}}\" id=\"form-group-{{ componentId }}\" ng-class=\"{'has-error': formioForm[componentId].$invalid && !formioForm[componentId].$pristine }\" ng-style=\"component.style\" ng-hide=\"component.hidden\">\n  <formio-element></formio-element>\n</div>\n"
+      "<div class=\"form-group has-feedback form-field-type-{{ component.type }} formio-component-{{ component.key }} {{component.customClass}}\" id=\"form-group-{{ componentId }}\" ng-class=\"{'has-error': formioForm[componentId].$invalid && !formioForm[componentId].$pristine }\" ng-style=\"component.style\" ng-hide=\"component.hide || component.hidden\">\n  <formio-element></formio-element>\n</div>\n"
     );
 
     $templateCache.put('formio/component-view.html',
