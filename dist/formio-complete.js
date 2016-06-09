@@ -58086,7 +58086,7 @@ module.exports = function(app) {
     'FormioUtils',
     function($templateCache, FormioUtils) {
       $templateCache.put('formio/components/datagrid.html', FormioUtils.fieldWrap(
-        "<div class=\"formio-data-grid\" ng-controller=\"formioDataGrid\" ng-if=\"!component.hide\">\n  <table ng-class=\"{'table-striped': component.striped, 'table-bordered': component.bordered, 'table-hover': component.hover, 'table-condensed': component.condensed}\" class=\"table datagrid-table\">\n    <tr>\n      <th ng-repeat=\"col in cols track by $index\" ng-class=\"{'field-required': col.validate.required}\">{{ col.label | formioTranslate }}</th>\n    </tr>\n    <tr ng-repeat=\"row in rows track by $index\" ng-init=\"rowIndex = $index\">\n      <td ng-repeat=\"col in cols track by $index\" ng-init=\"col.hideLabel = true; colIndex = $index\" class=\"formio-data-grid-row\" >\n        <formio-component component=\"col\" data=\"rows[rowIndex]\" formio-form=\"formioForm\" formio=\"formio\" read-only=\"readOnly || col.disabled\" grid-row=\"rowIndex\" grid-col=\"colIndex\" grid-row=\"gridRow\" grid-col=\"gridCol\"></formio-component>\n      </td>\n      <td>\n        <a ng-click=\"removeRow(rowIndex)\" class=\"btn btn-default\">\n          <span class=\"glyphicon glyphicon-remove-circle\"></span>\n        </a>\n      </td>\n    </tr>\n  </table>\n  <div class=\"datagrid-add\">\n    <a ng-click=\"addRow()\" class=\"btn btn-primary\">\n      <span class=\"glyphicon glyphicon-plus\" aria-hidden=\"true\"></span> {{ component.addAnother || \"Add Another\" | formioTranslate}}\n    </a>\n  </div>\n</div>\n"
+        "<div class=\"formio-data-grid\" ng-controller=\"formioDataGrid\" ng-if=\"!component.hide\">\n  <table ng-class=\"{'table-striped': component.striped, 'table-bordered': component.bordered, 'table-hover': component.hover, 'table-condensed': component.condensed}\" class=\"table datagrid-table\">\n    <tr>\n      <th ng-repeat=\"col in cols track by $index\" ng-class=\"{'field-required': col.validate.required}\">{{ col.label | formioTranslate }}</th>\n    </tr>\n    <tr ng-repeat=\"row in rows track by $index\" ng-init=\"rowIndex = $index\">\n      <td ng-repeat=\"col in cols track by $index\" ng-init=\"col.hideLabel = true; colIndex = $index\" class=\"formio-data-grid-row\">\n        <formio-component component=\"col\" data=\"rows[rowIndex]\" formio-form=\"formioForm\" formio=\"formio\" read-only=\"readOnly || col.disabled\" grid-row=\"rowIndex\" grid-col=\"colIndex\"></formio-component>\n      </td>\n      <td>\n        <a ng-click=\"removeRow(rowIndex)\" class=\"btn btn-default\">\n          <span class=\"glyphicon glyphicon-remove-circle\"></span>\n        </a>\n      </td>\n    </tr>\n  </table>\n  <div class=\"datagrid-add\">\n    <a ng-click=\"addRow()\" class=\"btn btn-primary\">\n      <span class=\"glyphicon glyphicon-plus\" aria-hidden=\"true\"></span> {{ component.addAnother || \"Add Another\" | formioTranslate}}\n    </a>\n  </div>\n</div>\n"
       ));
     }
   ]);
@@ -61043,23 +61043,21 @@ module.exports = function() {
       var template =
         '<div ng-if="!component.multiple">' +
           inputLabel + requiredInline +
-          '<div class="input-group" ng-if="component.prefix || component.suffix">' +
+          '<div class="input-group">' +
             '<div class="input-group-addon" ng-if="!!component.prefix">{{ component.prefix }}</div>' +
             input +
             '<div class="input-group-addon" ng-if="!!component.suffix">{{ component.suffix }}</div>' +
           '</div>' +
-          '<div ng-if="!component.prefix && !component.suffix">' + input + '</div>' +
         '</div>' +
         '<div ng-if="component.multiple"><table class="table table-bordered">' +
           inputLabel +
           '<tr ng-repeat="value in data[component.key] track by $index">' +
             '<td>' + requiredInline +
-              '<div class="input-group" ng-if="component.prefix || component.suffix">' +
+              '<div class="input-group">' +
                 '<div class="input-group-addon" ng-if="!!component.prefix">{{ component.prefix }}</div>' +
                 multiInput +
                 '<div class="input-group-addon" ng-if="!!component.suffix">{{ component.suffix }}</div>' +
               '</div>' +
-              '<div ng-if="!component.prefix && !component.suffix">' + multiInput + '</div>' +
             '</td>' +
             '<td><a ng-click="removeFieldValue($index)" class="btn btn-default"><span class="glyphicon glyphicon-remove-circle"></span></a></td>' +
           '</tr>' +
@@ -61290,7 +61288,7 @@ app.provider('Formio', require('./providers/Formio'));
 app.provider('FormioPlugins', require('./providers/FormioPlugins'));
 
 /**
- * Provides a way to regsiter the Formio scope.
+ * Provides a way to register the Formio scope.
  */
 app.factory('FormioScope', require('./factories/FormioScope'));
 
