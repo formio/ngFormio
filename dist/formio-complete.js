@@ -58819,7 +58819,7 @@ module.exports = function(app) {
     'FormioUtils',
     function($templateCache, FormioUtils) {
       $templateCache.put('formio/components/radio.html', FormioUtils.fieldWrap(
-        "<div ng-class=\"component.inline ? 'radio-inline' : 'radio'\" ng-repeat=\"v in component.values track by $index\">\n  <label class=\"control-label\" for=\"{{ componentId }}-{{ v.value }}\">\n    <input type=\"{{ component.inputType }}\"\n    id=\"{{ componentId }}-{{ v.value }}\"\n    value=\"{{ v.value }}\"\n    tabindex=\"{{ component.tabindex || 0 }}\"\n    ng-model=\"data[component.key]\"\n    ng-required=\"component.validate.required\"\n    ng-disabled=\"readOnly\"\n    custom-validator=\"component.validate.custom\">\n    {{ v.label | formioTranslate }}\n  </label>\n</div>\n"
+        "<ng-form name=\"{{ componentId }}\" ng-model=\"data[component.key]\" custom-validator=\"component.validate.custom\">\n  <div ng-class=\"component.inline ? 'radio-inline' : 'radio'\" ng-repeat=\"v in component.values track by $index\">\n    <label class=\"control-label\" for=\"{{ componentId }}-{{ v.value }}\">\n      <input type=\"{{ component.inputType }}\"\n             id=\"{{ componentId }}-{{ v.value }}\"\n             value=\"{{ v.value }}\"\n             tabindex=\"{{ component.tabindex || 0 }}\"\n             ng-model=\"data[component.key]\"\n             ng-required=\"component.validate.required\"\n             ng-disabled=\"readOnly\">\n\n      {{ v.label | formioTranslate }}\n    </label>\n  </div>\n</ng-form>\n"
       ));
     }
   ]);
@@ -59919,7 +59919,7 @@ module.exports = function() {
               }
 
               // Update the visibility, if it's possible a change occurred.
-              component.hide = component.hidden = !$scope.show[component.key];
+              component.hide = !$scope.show[component.key];
             }
             // Custom conditional logic.
             else if (component.customConditional) {
@@ -59936,7 +59936,7 @@ module.exports = function() {
               }
 
               // Update the visibility, if its possible a change occurred.
-              component.hide = component.hidden = !$scope.show[component.key];
+              component.hide = !$scope.show[component.key];
             }
 
             // Set hidden if specified
@@ -61374,7 +61374,7 @@ app.run([
 
     // A formio component template.
     $templateCache.put('formio/component.html',
-      "<div class=\"form-group has-feedback form-field-type-{{ component.type }} formio-component-{{ component.key }} {{component.customClass}}\" id=\"form-group-{{ componentId }}\" ng-class=\"{'has-error': formioForm[componentId].$invalid && !formioForm[componentId].$pristine }\" ng-style=\"component.style\" ng-hide=\"component.hidden\">\n  <formio-element></formio-element>\n</div>\n"
+      "<div class=\"form-group has-feedback form-field-type-{{ component.type }} formio-component-{{ component.key }} {{component.customClass}}\" id=\"form-group-{{ componentId }}\" ng-class=\"{'has-error': formioForm[componentId].$invalid && !formioForm[componentId].$pristine }\" ng-style=\"component.style\" ng-hide=\"component.hide || component.hidden\">\n  <formio-element></formio-element>\n</div>\n"
     );
 
     $templateCache.put('formio/component-view.html',
