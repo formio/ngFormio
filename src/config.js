@@ -43,7 +43,7 @@ angular.module('formioApp').constant('AppConfig', {
       "title": "Sales Quote",
       "name": "salesquoteapp",
       "description": "A sales quoting project that lets agents login and manage their opportunities, customers, and contracts.",
-      "template": "https://cdn.rawgit.com/formio/formio-app-salesquote/2.0.1/src/project.json",
+      "template": "https://cdn.rawgit.com/formio/formio-app-salesquote/2.1.0/src/project.json",
       "thumbnail": "https://app.form.io/formio-app-salesquote/src/assets/images/salesquote-thumb.png"
     },
     {
