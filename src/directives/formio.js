@@ -49,9 +49,66 @@ module.exports = function() {
           'false': false
         };
 
+        // The list of all conditionals.
+        var _conditionals = {};
+
+        // The list of all custom conditionals, segregated because they must be run on every change to data.
+        var _customConditionals = {};
+
+        // The list of all triggers.
+        var _triggers = {};
+
+        /**
+         * Sweep all the components and build the conditionals map.
+         *
+         * @private
+         */
+        var _sweepConditionals = function() {
+          $scope.form.components = $scope.form.components || [];
+          FormioUtils.eachComponent($scope.form.components, function(component) {
+            if (!component.hasOwnProperty('key')) {
+              return;
+            }
+
+            // We only care about valid/complete conditional settings.
+            if (
+              component.conditional
+              && (component.conditional.show !== null && component.conditional.show !== '')
+              && (component.conditional.when !== null && component.conditional.when !== '')
+            ) {
+              // Default the conditional values.
+              component.conditional.show = boolean.hasOwnProperty(component.conditional.show)
+                ? boolean[component.conditional.show]
+                : true;
+              component.conditional.eq = component.conditional.eq || '';
+
+              // Keys should be unique, so don't worry about clobbering an existing duplicate.
+              _conditionals[component.key] = {
+                conditional: component.conditional
+              };
+
+              // Add this conditional trigger to the list of triggers by component.
+              _triggers[component.conditional.when] = _triggers[component.conditional.when] || [];
+              // Only add unique triggers to the list.
+              if (_triggers[component.conditional.when].indexOf(component.key) === -1) {
+                _triggers[component.conditional.when].push(component.key);
+              }
+            }
+            // Custom conditional logic.
+            else if (component.customConditional) {
+              // Add this customConditional to the conditionals list.
+              _customConditionals[component.key] = component.customConditional;
+            }
+          }, true);
+        };
+
         var updateComponents = function() {
           $scope.form.components = $scope.form.components || [];
           FormioUtils.eachComponent($scope.form.components, function(component) {
+            if (!component.hasOwnProperty('key')) {
+              return;
+            }
+
             // Display every component by default
             $scope.show[component.key] = ($scope.show[component.key] === undefined)
               ? true
