@@ -55,9 +55,6 @@ module.exports = function() {
         // The list of all custom conditionals, segregated because they must be run on every change to data.
         var _customConditionals = {};
 
-        // The list of all triggers.
-        var _triggers = {};
-
         /**
          * Sweep all the components and build the conditionals map.
          *
@@ -69,6 +66,9 @@ module.exports = function() {
             if (!component.hasOwnProperty('key')) {
               return;
             }
+
+            // Show everything by default.
+            $scope.show[component.key] = true;
 
             // We only care about valid/complete conditional settings.
             if (
@@ -83,16 +83,7 @@ module.exports = function() {
               component.conditional.eq = component.conditional.eq || '';
 
               // Keys should be unique, so don't worry about clobbering an existing duplicate.
-              _conditionals[component.key] = {
-                conditional: component.conditional
-              };
-
-              // Add this conditional trigger to the list of triggers by component.
-              _triggers[component.conditional.when] = _triggers[component.conditional.when] || [];
-              // Only add unique triggers to the list.
-              if (_triggers[component.conditional.when].indexOf(component.key) === -1) {
-                _triggers[component.conditional.when].push(component.key);
-              }
+              _conditionals[component.key] = component.conditional;
             }
             // Custom conditional logic.
             else if (component.customConditional) {
@@ -152,9 +143,6 @@ module.exports = function() {
             else {
               $scope.show[componentKey] = !boolean[cond.show];
             }
-
-            //// Update the visibility, if its possible a change occurred.
-            //component.hide = !$scope.show[component.key];
           }
         };
 
@@ -182,15 +170,11 @@ module.exports = function() {
             catch (e) {
               $scope.show[componentKey] = true;
             }
-
-            //// Update the visibility, if its possible a change occurred.
-            //component.hide = !$scope.show[component.key];
           }
         };
 
-        // Update the components on the initial form render and all subsequent submission data changes.
-        var loaded = $scope.$on('formRender', function() {
-          // Build our list of conditionals.
+        // Update the components on the initial form render.
+        var load = _.once(function() {
           _sweepConditionals();
 
           // Toggle every conditional.
@@ -203,17 +187,22 @@ module.exports = function() {
           _.forEach(allCustomConditionals || [], function(componentKey) {
             _toggleCustomConditional(componentKey);
           });
-
-          // Cancel this watcher.
-          loaded();
         });
-        $scope.$watchCollection('submission.data', function() {
+        var update = _.throttle(function() {
+          load();
+
           // Toggle every conditional.
           var allConditionals = Object.keys(_conditionals);
           _.forEach(allConditionals || [], function(componentKey) {
             _toggleConditional(componentKey);
           });
-        });
+
+          var allCustomConditionals = Object.keys(_customConditionals);
+          _.forEach(allCustomConditionals || [], function(componentKey) {
+            _toggleCustomConditional(componentKey);
+          });
+        }, 1000);
+        $scope.$watchCollection('submission.data', update);
 
         if (!$scope._src) {
           $scope.$watch('src', function(src) {
