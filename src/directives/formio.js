@@ -99,81 +99,6 @@ module.exports = function() {
               // Add this customConditional to the conditionals list.
               _customConditionals[component.key] = component.customConditional;
             }
-          }, true);
-        };
-
-        var updateComponents = function() {
-          $scope.form.components = $scope.form.components || [];
-          FormioUtils.eachComponent($scope.form.components, function(component) {
-            if (!component.hasOwnProperty('key')) {
-              return;
-            }
-
-            // Display every component by default
-            $scope.show[component.key] = ($scope.show[component.key] === undefined)
-              ? true
-              : $scope.show[component.key];
-
-            // Only change display options if all required conditional properties are present.
-            if (
-              component.conditional
-              && (component.conditional.show !== null && component.conditional.show !== '')
-              && (component.conditional.when !== null && component.conditional.when !== '')
-            ) {
-              // Default the conditional values.
-              component.conditional.show = boolean[component.conditional.show];
-              component.conditional.eq = component.conditional.eq || '';
-
-              // Get the conditional component.
-              var cond = FormioUtils.getComponent($scope.form.components, component.conditional.when.toString());
-              if (!cond) {
-                return;
-              }
-              var value = $scope.submission.data[cond.key];
-
-              if (typeof value !== 'undefined' && typeof value !== 'object') {
-                // Check if the conditional value is equal to the trigger value
-                $scope.show[component.key] = value.toString() === component.conditional.eq.toString()
-                  ? boolean[component.conditional.show]
-                  : !boolean[component.conditional.show];
-              }
-              // Special check for check boxes component.
-              else if (typeof value !== 'undefined' && typeof value === 'object') {
-                $scope.show[component.key] = boolean.hasOwnProperty(value[component.conditional.eq])
-                  ? boolean[value[component.conditional.eq]]
-                  : true;
-              }
-              // Check against the components default value, if present and the components hasnt been interacted with.
-              else if (typeof value === 'undefined' && cond.hasOwnProperty('defaultValue')) {
-                $scope.show[component.key] = cond.defaultValue.toString() === component.conditional.eq.toString()
-                  ? boolean[component.conditional.show]
-                  : !boolean[component.conditional.show];
-              }
-              // If there is no value, we still need to process as not equal.
-              else {
-                $scope.show[component.key] = !boolean[component.conditional.show];
-              }
-
-              // Update the visibility, if it's possible a change occurred.
-              component.hide = !$scope.show[component.key];
-            }
-            // Custom conditional logic.
-            else if (component.customConditional) {
-              try {
-                // Create a child block, and expose the submission data.
-                var data = $scope.submission.data; // eslint-disable-line no-unused-vars
-                // Eval the custom conditional and update the show value.
-                var show = eval('(function() { ' + component.customConditional.toString() + '; return show; })()');
-                // Show by default, if an invalid type is given.
-                $scope.show[component.key] = boolean.hasOwnProperty(show.toString()) ? boolean[show] : true;
-              }
-              catch (e) {
-                $scope.show[component.key] = true;
-              }
-
-              // Update the visibility, if its possible a change occurred.
-              component.hide = !$scope.show[component.key];
-            }
 
             // Set hidden if specified
             if ($scope.hideComponents) {
@@ -192,9 +117,103 @@ module.exports = function() {
           }, true);
         };
 
+        /**
+         * Using the conditionals map, invoke the conditionals for each component.
+         *
+         * @param {String} componentKey
+         *   The component to toggle conditional logic for.
+         *
+         * @private
+         */
+        var _toggleConditional = function(componentKey) {
+          if (_conditionals.hasOwnProperty(componentKey)) {
+            var cond = _conditionals[componentKey];
+            var value = $scope.submission.data[cond.when];
+
+            if (typeof value !== 'undefined' && typeof value !== 'object') {
+              // Check if the conditional value is equal to the trigger value
+              $scope.show[componentKey] = value.toString() === cond.eq.toString()
+                ? boolean[cond.show]
+                : !boolean[cond.show];
+            }
+            // Special check for check boxes component.
+            else if (typeof value !== 'undefined' && typeof value === 'object') {
+              $scope.show[componentKey] = boolean.hasOwnProperty(value[cond.eq])
+                ? boolean[value[cond.eq]]
+                : true;
+            }
+            // Check against the components default value, if present and the components hasnt been interacted with.
+            else if (typeof value === 'undefined' && cond.hasOwnProperty('defaultValue')) {
+              $scope.show[componentKey] = cond.defaultValue.toString() === cond.eq.toString()
+                ? boolean[cond.show]
+                : !boolean[cond.show];
+            }
+            // If there is no value, we still need to process as not equal.
+            else {
+              $scope.show[componentKey] = !boolean[cond.show];
+            }
+
+            //// Update the visibility, if its possible a change occurred.
+            //component.hide = !$scope.show[component.key];
+          }
+        };
+
+        /**
+         * Using the custom conditionals map, invoke the conditionals for each component.
+         *
+         * @param {String} componentKey
+         *   The component to toggle conditional logic for.
+         *
+         * @private
+         */
+        var _toggleCustomConditional = function(componentKey) {
+          if (_customConditionals.hasOwnProperty(componentKey)) {
+            var cond = _customConditionals[componentKey];
+            var value = $scope.submission.data[cond.when];
+
+            try {
+              // Create a child block, and expose the submission data.
+              var data = $scope.submission.data; // eslint-disable-line no-unused-vars
+              // Eval the custom conditional and update the show value.
+              var show = eval('(function() { ' + cond.toString() + '; return show; })()');
+              // Show by default, if an invalid type is given.
+              $scope.show[componentKey] = boolean.hasOwnProperty(show.toString()) ? boolean[show] : true;
+            }
+            catch (e) {
+              $scope.show[componentKey] = true;
+            }
+
+            //// Update the visibility, if its possible a change occurred.
+            //component.hide = !$scope.show[component.key];
+          }
+        };
+
         // Update the components on the initial form render and all subsequent submission data changes.
-        $scope.$on('formRender', updateComponents);
-        $scope.$watchCollection('submission.data', updateComponents);
+        var loaded = $scope.$on('formRender', function() {
+          // Build our list of conditionals.
+          _sweepConditionals();
+
+          // Toggle every conditional.
+          var allConditionals = Object.keys(_conditionals);
+          _.forEach(allConditionals || [], function(componentKey) {
+            _toggleConditional(componentKey);
+          });
+
+          var allCustomConditionals = Object.keys(_customConditionals);
+          _.forEach(allCustomConditionals || [], function(componentKey) {
+            _toggleCustomConditional(componentKey);
+          });
+
+          // Cancel this watcher.
+          loaded();
+        });
+        $scope.$watchCollection('submission.data', function() {
+          // Toggle every conditional.
+          var allConditionals = Object.keys(_conditionals);
+          _.forEach(allConditionals || [], function(componentKey) {
+            _toggleConditional(componentKey);
+          });
+        });
 
         if (!$scope._src) {
           $scope.$watch('src', function(src) {
