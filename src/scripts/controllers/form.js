@@ -298,9 +298,26 @@ app.controller('FormController', [
     $scope.embedCode = '';
     $scope.setEmbedCode = function(gotoUrl) {
       var embedCode = '<script type="text/javascript">';
-      embedCode += '(function a(u) {if (typeof jQuery === u) { return setTimeout(a, 100); }document.write(\'<script src="https://npmcdn.com/seamless@latest"><\\/script>\');(function b($) {if (typeof $.fn.seamless === u) { return setTimeout(b, 100); }$(function() {$(\'#formio-form\').seamless({fallback:false}).receive(function(d, e) {';
-      embedCode += gotoUrl ? 'window.location.href = "' + gotoUrl + '";' : '';
-      embedCode += '});});})(jQuery);})();</script>';
+      embedCode += '(function a(u) {';
+      embedCode +=   'if (typeof jQuery === u) {';
+      embedCode +=     'return setTimeout(a, 100);';
+      embedCode +=   '}';
+      embedCode +=   'document.write(';
+      embedCode +=     '$(document.createElement("script")).attr(';
+      embedCode +=       '{src: "https://npmcdn.com/seamless@latest"}';
+      embedCode +=     '));';
+      embedCode +=   ');'
+      embedCode +=   '(function b($) {';
+      embedCode +=     'if (typeof $.fn.seamless === u) {';
+      embedCode +=       'return setTimeout(b, 100);';
+      embedCode +=     '}';
+      embedCode +=     '$(function() {';
+      embedCode +=       '$(\'#formio-form\').seamless({fallback:false}).receive(function(d, e) {';
+      embedCode +=         gotoUrl ? 'window.location.href = "' + gotoUrl + '";' : '';
+      embedCode +=       '});';
+      embedCode +=     '});';
+      embedCode +=   '})(jQuery);';
+      embedCode += '})();</script>';
       embedCode += '<iframe id="formio-form" style="width:100%;border:none;" height="600px" src="https://form.io/view/#/' + $scope.currentProject.name + '/' + $scope.form.path + '?iframe=1&header=0"></iframe>';
       $scope.embedCode = embedCode;
     };
