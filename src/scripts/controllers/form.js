@@ -299,16 +299,14 @@ app.controller('FormController', [
     $scope.setEmbedCode = function(gotoUrl) {
       var embedCode = '<script type="text/javascript">';
       embedCode += '(function a(u) {';
-      embedCode +=   'if (typeof jQuery === u) {';
+      embedCode +=   'if (typeof jQuery === "undefined") {';
       embedCode +=     'return setTimeout(a, 100);';
       embedCode +=   '}';
       embedCode +=   'document.write(';
-      embedCode +=     '$(document.createElement("script")).attr(';
-      embedCode +=       '{src: "https://npmcdn.com/seamless@latest"}';
-      embedCode +=     '));';
-      embedCode +=   ');'
+      embedCode +=     'jQuery(document.createElement("script")).attr("src", "https://npmcdn.com/seamless@latest")';
+      embedCode +=   ');';
       embedCode +=   '(function b($) {';
-      embedCode +=     'if (typeof $.fn.seamless === u) {';
+      embedCode +=     'if (typeof $.fn.seamless === "undefined") {';
       embedCode +=       'return setTimeout(b, 100);';
       embedCode +=     '}';
       embedCode +=     '$(function() {';
