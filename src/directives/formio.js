@@ -145,6 +145,11 @@ module.exports = function() {
             else {
               $scope.show[componentKey] = !boolean[cond.show];
             }
+
+            // If a component is hidden, delete its value, so other conditionals are property chain reacted.
+            if (!$scope.show[componentKey]) {
+              delete $scope.submission.data[componentKey];
+            }
           }
         };
 
@@ -170,6 +175,11 @@ module.exports = function() {
             }
             catch (e) {
               $scope.show[componentKey] = true;
+            }
+
+            // If a component is hidden, delete its value, so other conditionals are property chain reacted.
+            if (!$scope.show[componentKey]) {
+              delete $scope.submission.data[componentKey];
             }
           }
         };
