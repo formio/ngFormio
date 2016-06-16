@@ -24,7 +24,8 @@ module.exports = function(app) {
             : false;
         });
         // FA-835 - Update the view model with our defaults.
-        ngModel.$setViewValue(model);
+        // FA-921 - Attempt to load a current model, if present before the defaults.
+        ngModel.$setViewValue($scope.model || model);
 
         ngModel.$setPristine(true);
         ngModel.$isEmpty = function(value) {
