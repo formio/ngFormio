@@ -1,5 +1,16 @@
 <div class="row">
   <div class="col-sm-6" ng-repeat="column in component.columns track by $index">
-    <formio-component ng-repeat="component in column.components track by $index" component="component" data="data" formio="formio" formio-form="formioForm" read-only="readOnly" grid-row="gridRow" grid-col="gridCol"></formio-component>
+    <formio-component
+      ng-repeat="component in column.components track by $index"
+      component="component"
+      data="data"
+      formio="formio"
+      formio-form="formioForm"
+      read-only="readOnly"
+      grid-row="gridRow"
+      grid-col="gridCol"
+      ng-if="show[column.key || ''] && show[component.key || '']"
+      show="show"
+    ></formio-component>
   </div>
 </div>
