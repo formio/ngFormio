@@ -1294,6 +1294,7 @@ app.controller('ProjectFormioController', [
       // Load the number of users created during this reference time.
       getUsersCreated();
 
+      var BSON = new RegExp('^[0-9a-fA-F]{24}$');
       var url = AppConfig.apiBase + '/analytics/project/year/' + $scope.viewDate.year + '/month/' + $scope.viewDate.month;
       if ($scope.showDaily) {
         url += '/day/' + $scope.viewDate.day;
@@ -1312,6 +1313,13 @@ app.controller('ProjectFormioController', [
               var type = key[4];
 
               return {_id: project, calls: calls, type: type, year: _y, month: _m, day: _d};
+            })
+            .filter(function(item) {
+              if (_.isString(item._id) && BSON.test(item._id)) {
+                return true;
+              }
+
+              return false;
             })
             .value();
 
