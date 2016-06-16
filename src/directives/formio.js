@@ -61,9 +61,11 @@ module.exports = function() {
          * @private
          */
         var _sweepConditionals = function() {
+          $scope.form = $scope.form || {};
           $scope.form.components = $scope.form.components || [];
           FormioUtils.eachComponent($scope.form.components, function(component) {
             if (!component.hasOwnProperty('key')) {
+              $scope.show[''] = true;
               return;
             }
 
@@ -157,7 +159,6 @@ module.exports = function() {
         var _toggleCustomConditional = function(componentKey) {
           if (_customConditionals.hasOwnProperty(componentKey)) {
             var cond = _customConditionals[componentKey];
-            var value = $scope.submission.data[cond.when];
 
             try {
               // Create a child block, and expose the submission data.
@@ -173,10 +174,8 @@ module.exports = function() {
           }
         };
 
-        // Update the components on the initial form render.
-        var load = _.once(function() {
-          _sweepConditionals();
-
+        // On every change to data, trigger the conditionals.
+        $scope.$watchCollection('submission.data', function() {
           // Toggle every conditional.
           var allConditionals = Object.keys(_conditionals);
           _.forEach(allConditionals || [], function(componentKey) {
@@ -188,21 +187,12 @@ module.exports = function() {
             _toggleCustomConditional(componentKey);
           });
         });
-        var update = _.throttle(function() {
+
+        var load = _.once(_sweepConditionals);
+        var cancelFormLoadEvent = $scope.$on('formLoad', function() {
           load();
-
-          // Toggle every conditional.
-          var allConditionals = Object.keys(_conditionals);
-          _.forEach(allConditionals || [], function(componentKey) {
-            _toggleConditional(componentKey);
-          });
-
-          var allCustomConditionals = Object.keys(_customConditionals);
-          _.forEach(allCustomConditionals || [], function(componentKey) {
-            _toggleCustomConditional(componentKey);
-          });
-        }, 1000);
-        $scope.$watchCollection('submission.data', update);
+          cancelFormLoadEvent();
+        });
 
         if (!$scope._src) {
           $scope.$watch('src', function(src) {

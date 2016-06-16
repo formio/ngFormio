@@ -6,6 +6,6 @@
       {{ alert.message }}
     </div>
     <!-- DO NOT PUT "track by $index" HERE SINCE DYNAMICALLY ADDING/REMOVING COMPONENTS WILL BREAK -->
-    <formio-component ng-repeat="component in form.components" component="component" data="submission.data" formio-form="formioForm" formio="formio" read-only="readOnly || component.disabled" ng-if="show[component.key]"></formio-component>
+    <formio-component ng-repeat="component in form.components" component="component" data="submission.data" formio-form="formioForm" formio="formio" read-only="readOnly || component.disabled" ng-if="component.key && component.key !== '' ? show[component.key] : show['']"></formio-component>
   </form>
 </div>
