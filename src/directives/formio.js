@@ -55,9 +55,6 @@ module.exports = function() {
         // The list of all custom conditionals, segregated because they must be run on every change to data.
         var _customConditionals = {};
 
-        // A list of all of the data grids.
-        var _datagrids = {};
-
         /**
          * Sweep all the components and build the conditionals map.
          *
@@ -67,16 +64,6 @@ module.exports = function() {
           $scope.form = $scope.form || {};
           $scope.form.components = $scope.form.components || [];
           FormioUtils.eachComponent($scope.form.components, function(component) {
-            if (component.type === 'datagrid' && component.hasOwnProperty('key')) {
-              _datagrids[component.key] = {};
-
-              FormioUtils.eachComponent(component.components || [], function(_component) {
-                if (_component.hasOwnProperty('key') && _component.hasOwnProperty('conditional')) {
-                  _datagrids[component.key][_component.key] = _component.conditional;
-                }
-              });
-            }
-
             if (!component.hasOwnProperty('key')) {
               $scope.show[''] = true;
               return;
@@ -84,11 +71,6 @@ module.exports = function() {
 
             // Show everything by default.
             $scope.show[component.key] = true;
-
-            // Skip calculating the conditionals for datagrid components.
-            if (_datagrids.hasOwnProperty(component.key)) {
-              return;
-            }
 
             // We only care about valid/complete conditional settings.
             if (
@@ -202,12 +184,6 @@ module.exports = function() {
           }
         };
 
-        var _toggleDatagridConditional = function(componentKey) {
-          if (_datagrids.hasOwnProperty(componentKey)) {
-            console.log(_datagrids[componentKey])
-          }
-        };
-
         // On every change to data, trigger the conditionals.
         $scope.$watchCollection('submission.data', function() {
           // Toggle every conditional.
@@ -219,11 +195,6 @@ module.exports = function() {
           var allCustomConditionals = Object.keys(_customConditionals);
           _.forEach(allCustomConditionals || [], function(componentKey) {
             _toggleCustomConditional(componentKey);
-          });
-
-          var allDatagridConditionals = Object.keys(_datagrids);
-          _.forEach(allDatagridConditionals || [], function(componentKey) {
-            _toggleDatagridConditional(componentKey);
           });
         });
 
