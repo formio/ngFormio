@@ -60,7 +60,15 @@ module.exports = function() {
          *
          * @private
          */
+        var _sweepConditionalsCalled = false;
         var _sweepConditionals = function() {
+          if (_sweepConditionalsCalled) {
+            return;
+          }
+          else {
+            _sweepConditionalsCalled = true;
+          }
+
           $scope.form = $scope.form || {};
           $scope.form.components = $scope.form.components || [];
           FormioUtils.eachComponent($scope.form.components, function(component) {
@@ -188,19 +196,18 @@ module.exports = function() {
         $scope.$watchCollection('submission.data', function() {
           // Toggle every conditional.
           var allConditionals = Object.keys(_conditionals);
-          _.forEach(allConditionals || [], function(componentKey) {
+          (allConditionals || []).forEach(function(componentKey) {
             _toggleConditional(componentKey);
           });
 
           var allCustomConditionals = Object.keys(_customConditionals);
-          _.forEach(allCustomConditionals || [], function(componentKey) {
+          (allCustomConditionals || []).forEach(function(componentKey) {
             _toggleCustomConditional(componentKey);
           });
         });
 
-        var load = _.once(_sweepConditionals);
         var cancelFormLoadEvent = $scope.$on('formLoad', function() {
-          load();
+          _sweepConditionals();
           cancelFormLoadEvent();
         });
 
