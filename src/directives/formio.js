@@ -49,6 +49,86 @@ module.exports = function() {
           'false': false
         };
 
+        /**
+         * Sweep the current submission, to identify and remove data that has been conditionally hidden.
+         *
+         * This will iterate over every key in the submission data obj, regardless of the structure.
+         */
+        var sweepSubmission = function() {
+          var show = $scope.show || {};
+          var submission = $scope.submission.data || {};
+
+          /**
+           * Sweep the given component keys and remove any data for the given keys which are being conditionally hidden.
+           *
+           * @param {Object} components
+           *   The list of components to sweep.
+           * @param {Boolean} ret
+           *   Whether or not you want to know if a modification needs to be made.
+           */
+          var sweep = function sweep(components, ret) {
+            // Skip our unwanted types.
+            if (components === null || typeof components === 'undefined') {
+              if (ret) {
+                return false;
+              }
+              return;
+            }
+
+            // If given a string, then we are looking at the api key of a component.
+            if (typeof components === 'string') {
+              if (!show[components]) {
+                if (ret) {
+                  return true;
+                }
+                return;
+              }
+            }
+            // If given an array, iterate over each element, assuming its not a string itself.
+            // If each element is a string, then we aren't looking at a component, but data itself.
+            else if (components instanceof Array) {
+              var filtered = [];
+
+              components.forEach(function(component) {
+                if (typeof component === 'string') {
+                  filtered.push(component);
+                  return;
+                }
+
+                // Recurse into the components of this component.
+                var modified = sweep(component, true);
+                if (!modified) {
+                  filtered.push(component);
+                }
+              });
+
+              components = filtered;
+              return;
+            }
+            // If given an object, iterate the properties as component keys.
+            else if (typeof components === 'object') {
+              Object.keys(components).forEach(function(key) {
+                // If the key is deleted, delete the whole obj.
+                var modifiedKey = sweep(key, true);
+                if (modifiedKey) {
+                  delete components[key];
+                }
+                else {
+                  // If a child leaf is modified (non key) delete its whole subtree.
+                  if (components[key] instanceof Array || typeof components[key] === 'object') {
+                    // If the component can have sub-components, recurse.
+                    sweep(components[key]);
+                  }
+                }
+              });
+              return;
+            }
+
+            return;
+          };
+          return sweep(submission);
+        };
+
         // The list of all conditionals.
         var _conditionals = {};
 
@@ -143,7 +223,7 @@ module.exports = function() {
                 ? boolean[value[cond.eq]]
                 : true;
             }
-            // Check against the components default value, if present and the components hasnt been interacted with.
+            // Check against the components default value, if present and the components hasn't been interacted with.
             else if (typeof value === 'undefined' && cond.hasOwnProperty('defaultValue')) {
               $scope.show[componentKey] = cond.defaultValue.toString() === cond.eq.toString()
                 ? boolean[cond.show]
@@ -156,7 +236,7 @@ module.exports = function() {
 
             // If a component is hidden, delete its value, so other conditionals are property chain reacted.
             if (!$scope.show[componentKey]) {
-              delete $scope.submission.data[componentKey];
+              return sweepSubmission();
             }
           }
         };
@@ -187,7 +267,7 @@ module.exports = function() {
 
             // If a component is hidden, delete its value, so other conditionals are property chain reacted.
             if (!$scope.show[componentKey]) {
-              delete $scope.submission.data[componentKey];
+              return sweepSubmission();
             }
           }
         };
@@ -204,7 +284,7 @@ module.exports = function() {
           (allCustomConditionals || []).forEach(function(componentKey) {
             _toggleCustomConditional(componentKey);
           });
-        });
+        }, true);
 
         var cancelFormLoadEvent = $scope.$on('formLoad', function() {
           _sweepConditionals();
@@ -234,6 +314,8 @@ module.exports = function() {
         $scope.onSubmit = function(form) {
           if (!form.$valid || form.submitting) return;
           form.submitting = true;
+
+          sweepSubmission();
 
           // Create a sanitized submission object.
           var submissionData = {data: {}};
@@ -277,7 +359,7 @@ module.exports = function() {
                 submissionData.data[component.key] = value;
               }
             }
-          });
+          }, true);
 
           angular.forEach($scope.submission.data, function(value, key) {
             if (value && !value.hasOwnProperty('_id')) {
