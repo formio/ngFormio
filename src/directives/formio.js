@@ -174,6 +174,11 @@ module.exports = function() {
 
               // Keys should be unique, so don't worry about clobbering an existing duplicate.
               _conditionals[component.key] = component.conditional;
+
+              // Store the components default value for conditional logic, if present.
+              if (component.hasOwnProperty('defaultValue')) {
+                component.conditional.defaultValue = component.defaultValue;
+              }
             }
             // Custom conditional logic.
             else if (component.customConditional) {
@@ -209,7 +214,7 @@ module.exports = function() {
         var _toggleConditional = function(componentKey) {
           if (_conditionals.hasOwnProperty(componentKey)) {
             var cond = _conditionals[componentKey];
-            var value = $scope.submission.data[cond.when];
+            var value = FormioUtils.getValue($scope.submission, cond.when);
 
             if (typeof value !== 'undefined' && typeof value !== 'object') {
               // Check if the conditional value is equal to the trigger value
@@ -273,7 +278,11 @@ module.exports = function() {
         };
 
         // On every change to data, trigger the conditionals.
-        $scope.$watchCollection('submission.data', function() {
+        $scope.$watch(function() {
+          return $scope.submission && $scope.submission.data
+            ? $scope.submission.data
+            : {};
+        }, function() {
           // Toggle every conditional.
           var allConditionals = Object.keys(_conditionals);
           (allConditionals || []).forEach(function(componentKey) {
