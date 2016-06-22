@@ -5,6 +5,7 @@ module.exports = function() {
     flattenComponents: formioUtils.flattenComponents,
     eachComponent: formioUtils.eachComponent,
     getComponent: formioUtils.getComponent,
+    getValue: formioUtils.getValue,
     hideFields: function(form, components) {
       this.eachComponent(form.components, function(component) {
         for (var i in components) {
