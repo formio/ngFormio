@@ -223,10 +223,16 @@ module.exports = function() {
                 : !boolean[cond.show];
             }
             // Special check for check boxes component.
-            else if (typeof value !== 'undefined' && typeof value === 'object' && Object.keys(value).length !== 0) {
-              $scope.show[componentKey] = boolean.hasOwnProperty(value[cond.eq])
-                ? boolean[value[cond.eq]]
-                : true;
+            else if (typeof value !== 'undefined' && typeof value === 'object') {
+              // Only update the visibility is present, otherwise hide, because it was deleted by the submission sweep.
+              if (value.hasOwnProperty(cond.eq)) {
+                $scope.show[componentKey] = boolean.hasOwnProperty(value[cond.eq])
+                  ? boolean[value[cond.eq]]
+                  : true;
+              }
+              else {
+                $scope.show[componentKey] = false;
+              }
             }
             // Check against the components default value, if present and the components hasn't been interacted with.
             else if (typeof value === 'undefined' && cond.hasOwnProperty('defaultValue')) {
@@ -237,11 +243,6 @@ module.exports = function() {
             // If there is no value, we still need to process as not equal.
             else {
               $scope.show[componentKey] = !boolean[cond.show];
-            }
-
-            // If a component is hidden, delete its value, so other conditionals are property chain reacted.
-            if (!$scope.show[componentKey]) {
-              return sweepSubmission();
             }
           }
         };
@@ -269,11 +270,6 @@ module.exports = function() {
             catch (e) {
               $scope.show[componentKey] = true;
             }
-
-            // If a component is hidden, delete its value, so other conditionals are property chain reacted.
-            if (!$scope.show[componentKey]) {
-              return sweepSubmission();
-            }
           }
         };
 
@@ -293,6 +289,14 @@ module.exports = function() {
           (allCustomConditionals || []).forEach(function(componentKey) {
             _toggleCustomConditional(componentKey);
           });
+
+          var allHidden = Object.keys($scope.show);
+          (allHidden || []).forEach(function(componentKey) {
+            // If a component is hidden, delete its value, so other conditionals are property chain reacted.
+            if (!$scope.show[componentKey]) {
+              return sweepSubmission();
+            }
+          })
         }, true);
 
         var cancelFormLoadEvent = $scope.$on('formLoad', function() {
