@@ -296,7 +296,7 @@ module.exports = function() {
             if (!$scope.show[componentKey]) {
               return sweepSubmission();
             }
-          })
+          });
         }, true);
 
         var cancelFormLoadEvent = $scope.$on('formLoad', function() {
