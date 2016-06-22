@@ -12,7 +12,7 @@ up to the REST API generated from the same schema.
 
 Here is a Demo
 -----------------
-https://embed.plnkr.co/OlaYjN/
+http://codepen.io/travist/full/xVyMjo/
 
 Multi-page Forms
 -----------------
