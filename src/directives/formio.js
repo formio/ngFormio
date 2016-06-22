@@ -177,7 +177,7 @@ module.exports = function() {
 
               // Store the components default value for conditional logic, if present.
               if (component.hasOwnProperty('defaultValue')) {
-                component.conditional.defaultValue = component.defaultValue;
+                _conditionals[component.key].defaultValue = component.defaultValue;
               }
             }
             // Custom conditional logic.
@@ -223,7 +223,7 @@ module.exports = function() {
                 : !boolean[cond.show];
             }
             // Special check for check boxes component.
-            else if (typeof value !== 'undefined' && typeof value === 'object') {
+            else if (typeof value !== 'undefined' && typeof value === 'object' && Object.keys(value).length !== 0) {
               $scope.show[componentKey] = boolean.hasOwnProperty(value[cond.eq])
                 ? boolean[value[cond.eq]]
                 : true;
