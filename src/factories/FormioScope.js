@@ -80,13 +80,9 @@ module.exports = [
           }
         });
 
-        $scope.$watch('form', function(form) {
-          if (
-            !form ||
-            (Object.keys(form).length === 0) ||
-            !form.components ||
-            !form.components.length
-          ) {
+        // Trigger a form load event when the components length is more than 0.
+        $scope.$watch('form.components.length', function() {
+          if (!$scope.form.components.length) {
             return;
           }
           $scope.formLoading = false;
