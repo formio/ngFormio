@@ -1118,7 +1118,7 @@ app.controller('ProjectFormioController', [
      *   The filtered contents.
      */
     var filterEmployees = function(items) {
-      var ignoredEmails = ['@form.io', '@example', '@test', 'test@', '@prodtest'];
+      var ignoredEmails = ['@form.io', '@example', '@test', 'test@', '@prodtest', '@delaplex.in', '@tudip.nl'];
       return _(items)
         .reject(function(item) {
           var hasIgnoredEmail = _.some(ignoredEmails, function(value) {
