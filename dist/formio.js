@@ -575,7 +575,18 @@
 }();
 
 },{}],2:[function(require,module,exports){
+'use strict';
+
 module.exports = {
+  /**
+   * Determine if a component is a layout component or not.
+   *
+   * @param {Object} component
+   *   The component to check.
+   *
+   * @returns {Boolean}
+   *   Whether or not the component is a layout component.
+   */
   isLayoutComponent: function isLayoutComponent(component) {
     return (
       (component.columns && Array.isArray(component.columns)) ||
@@ -586,8 +597,15 @@ module.exports = {
 
   /**
    * Iterate through each component within a form.
-   * @param components
-   * @param fn
+   *
+   * @param {Object} components
+   *   The components to iterate.
+   * @param {Function} fn
+   *   The iteration function to invoke for each component.
+   * @param {Boolean} includeAll
+   *   Whether or not to include layout components.
+   * @param {String} path
+   *   The current data path of the element. Example: data.user.firstName
    */
   eachComponent: function eachComponent(components, fn, includeAll, path) {
     if (!components) return;
@@ -632,9 +650,14 @@ module.exports = {
 
   /**
    * Get a component by its key
-   * @param components
-   * @param key The key of the component to get
-   * @returns The component that matches the given key, or undefined if not found.
+   *
+   * @param {Object} components
+   *   The components to iterate.
+   * @param {String} key
+   *   The key of the component to get.
+   *
+   * @returns {Object}
+   *   The component that matches the given key, or undefined if not found.
    */
   getComponent: function getComponent(components, key) {
     var result;
@@ -648,9 +671,14 @@ module.exports = {
 
   /**
    * Flatten the form components for data manipulation.
-   * @param components
-   * @param flattened
-   * @returns {*|{}}
+   *
+   * @param {Object} components
+   *   The components to iterate.
+   * @param {Boolean} includeAll
+   *   Whether or not to include layout components.
+   *
+   * @returns {Object}
+   *   The flattened components map.
    */
   flattenComponents: function flattenComponents(components, includeAll) {
     var flattened = {};
@@ -658,6 +686,53 @@ module.exports = {
       flattened[path] = component;
     }, includeAll);
     return flattened;
+  },
+
+  /**
+   * Get the value for a component key, in the given submission.
+   *
+   * @param {Object} submission
+   *   A submission object to search.
+   * @param {String} key
+   *   A for components API key to search for.
+   */
+  getValue: function getValue(submission, key) {
+    var data = submission.data || {};
+
+    var search = function search(data) {
+      var i;
+      var value;
+
+      if (data instanceof Array) {
+        for (i = 0; i < data.length; i++) {
+          if (typeof data[i] === 'object') {
+            value = search(data[i]);
+          }
+
+          if (value) {
+            return value;
+          }
+        }
+      }
+      else if (typeof data === 'object') {
+        if (data.hasOwnProperty(key)) {
+          return data[key];
+        }
+
+        var keys = Object.keys(data);
+        for (i = 0; i < keys.length; i++) {
+          if (typeof data[keys[i]] === 'object') {
+            value = search(data[keys[i]]);
+          }
+
+          if (value) {
+            return value;
+          }
+        }
+      }
+    };
+
+    return search(data);
   }
 };
 
@@ -7548,7 +7623,11 @@ module.exports = [
 
         // Trigger a form load event when the components length is more than 0.
         $scope.$watch('form.components.length', function() {
-          if (!$scope.form.components.length) {
+          if (
+            !$scope.form ||
+            !$scope.form.components ||
+            !$scope.form.components.length
+          ) {
             return;
           }
           $scope.formLoading = false;

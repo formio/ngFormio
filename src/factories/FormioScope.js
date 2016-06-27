@@ -82,7 +82,11 @@ module.exports = [
 
         // Trigger a form load event when the components length is more than 0.
         $scope.$watch('form.components.length', function() {
-          if (!$scope.form.components.length) {
+          if (
+            !$scope.form ||
+            !$scope.form.components ||
+            !$scope.form.components.length
+          ) {
             return;
           }
           $scope.formLoading = false;
