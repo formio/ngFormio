@@ -1,4 +1,4 @@
-<div class="table-responsive" id="{{ component.key }}" ng-if="!component.hide">
+<div class="table-responsive" id="{{ component.key }}">
   <table ng-class="{'table-striped': component.striped, 'table-bordered': component.bordered, 'table-hover': component.hover, 'table-condensed': component.condensed}" class="table">
     <thead ng-if="component.header.length">
       <th ng-repeat="header in component.header track by $index">{{ header | formioTranslate }}</th>
@@ -6,7 +6,17 @@
     <tbody>
       <tr ng-repeat="row in component.rows track by $index">
         <td ng-repeat="column in row track by $index">
-          <formio-component ng-repeat="component in column.components track by $index" component="component" data="data" formio="formio" formio-form="formioForm" grid-row="gridRow" grid-col="gridCol"></formio-component>
+          <formio-component
+            ng-repeat="component in column.components track by $index"
+            component="component"
+            data="data"
+            formio="formio"
+            formio-form="formioForm"
+            grid-row="gridRow"
+            grid-col="gridCol"
+            ng-if="show[column.key || ''] && show[component.key || '']"
+            show="show"
+          ></formio-component>
         </td>
       </tr>
     </tbody>
