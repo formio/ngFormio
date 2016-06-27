@@ -174,7 +174,7 @@ module.exports = function() {
                   component.key = key;
                 }
               }
-              catch(e) {
+              catch (e) {
                 $scope.show[component.key] = true;
               }
             }
