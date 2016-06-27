@@ -1,1 +1,6 @@
-<img ng-attr-src="{{data[component.key]}}" src="" />
+<div ng-if="data[component.key] === 'YES'">
+  [ Signature is hidden ]
+</div>
+<div ng-if="data[component.key] !== 'YES'">
+  <img class="signature" ng-attr-src="{{data[component.key]}}" src="" />
+</div>
