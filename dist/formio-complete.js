@@ -1,4 +1,4 @@
-/*! ng-formio v1.8.12 | https://npmcdn.com/ng-formio@1.8.12/LICENSE.txt */
+/*! ng-formio v1.8.13 | https://npmcdn.com/ng-formio@1.8.13/LICENSE.txt */
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -48939,7 +48939,18 @@ process.chdir = function (dir) {
 process.umask = function() { return 0; };
 
 },{}],26:[function(require,module,exports){
+'use strict';
+
 module.exports = {
+  /**
+   * Determine if a component is a layout component or not.
+   *
+   * @param {Object} component
+   *   The component to check.
+   *
+   * @returns {Boolean}
+   *   Whether or not the component is a layout component.
+   */
   isLayoutComponent: function isLayoutComponent(component) {
     return (
       (component.columns && Array.isArray(component.columns)) ||
@@ -48950,8 +48961,15 @@ module.exports = {
 
   /**
    * Iterate through each component within a form.
-   * @param components
-   * @param fn
+   *
+   * @param {Object} components
+   *   The components to iterate.
+   * @param {Function} fn
+   *   The iteration function to invoke for each component.
+   * @param {Boolean} includeAll
+   *   Whether or not to include layout components.
+   * @param {String} path
+   *   The current data path of the element. Example: data.user.firstName
    */
   eachComponent: function eachComponent(components, fn, includeAll, path) {
     if (!components) return;
@@ -48996,9 +49014,14 @@ module.exports = {
 
   /**
    * Get a component by its key
-   * @param components
-   * @param key The key of the component to get
-   * @returns The component that matches the given key, or undefined if not found.
+   *
+   * @param {Object} components
+   *   The components to iterate.
+   * @param {String} key
+   *   The key of the component to get.
+   *
+   * @returns {Object}
+   *   The component that matches the given key, or undefined if not found.
    */
   getComponent: function getComponent(components, key) {
     var result;
@@ -49012,9 +49035,14 @@ module.exports = {
 
   /**
    * Flatten the form components for data manipulation.
-   * @param components
-   * @param flattened
-   * @returns {*|{}}
+   *
+   * @param {Object} components
+   *   The components to iterate.
+   * @param {Boolean} includeAll
+   *   Whether or not to include layout components.
+   *
+   * @returns {Object}
+   *   The flattened components map.
    */
   flattenComponents: function flattenComponents(components, includeAll) {
     var flattened = {};
@@ -49022,6 +49050,53 @@ module.exports = {
       flattened[path] = component;
     }, includeAll);
     return flattened;
+  },
+
+  /**
+   * Get the value for a component key, in the given submission.
+   *
+   * @param {Object} submission
+   *   A submission object to search.
+   * @param {String} key
+   *   A for components API key to search for.
+   */
+  getValue: function getValue(submission, key) {
+    var data = submission.data || {};
+
+    var search = function search(data) {
+      var i;
+      var value;
+
+      if (data instanceof Array) {
+        for (i = 0; i < data.length; i++) {
+          if (typeof data[i] === 'object') {
+            value = search(data[i]);
+          }
+
+          if (value) {
+            return value;
+          }
+        }
+      }
+      else if (typeof data === 'object') {
+        if (data.hasOwnProperty(key)) {
+          return data[key];
+        }
+
+        var keys = Object.keys(data);
+        for (i = 0; i < keys.length; i++) {
+          if (typeof data[keys[i]] === 'object') {
+            value = search(data[keys[i]]);
+          }
+
+          if (value) {
+            return value;
+          }
+        }
+      }
+    };
+
+    return search(data);
   }
 };
 
@@ -60420,7 +60495,11 @@ module.exports = function() {
         }
 
         // Build the display map.
-        $scope.show = {};
+        $scope.show = {
+          '': true,
+          'undefined': true,
+          'null': true
+        };
         var boolean = {
           'true': true,
           'false': false
@@ -60432,7 +60511,11 @@ module.exports = function() {
          * This will iterate over every key in the submission data obj, regardless of the structure.
          */
         var sweepSubmission = function() {
-          var show = $scope.show || {};
+          var show = $scope.show || {
+              '': true,
+              'undefined': true,
+              'null': true
+            };
           var submission = $scope.submission.data || {};
 
           /**
@@ -60512,6 +60595,9 @@ module.exports = function() {
         // The list of all custom conditionals, segregated because they must be run on every change to data.
         var _customConditionals = {};
 
+        // Regex for getting component subkeys.
+        var subkey = /^.+\[(.+)\]$/;
+
         /**
          * Sweep all the components and build the conditionals map.
          *
@@ -60530,10 +60616,20 @@ module.exports = function() {
           $scope.form.components = $scope.form.components || [];
           FormioUtils.eachComponent($scope.form.components, function(component) {
             if (!component.hasOwnProperty('key')) {
-              $scope.show[''] = true;
               return;
             }
-
+            // Get key inside: something[key]
+            if (subkey.test(component.key)) {
+              try {
+                var key = subkey.exec(component.key)[1];
+                if (key) {
+                  component.key = key;
+                }
+              }
+              catch (e) {
+                $scope.show[component.key] = true;
+              }
+            }
             // Show everything by default.
             $scope.show[component.key] = true;
 
