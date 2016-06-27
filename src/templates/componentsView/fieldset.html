@@ -1,4 +1,4 @@
 <fieldset id="{{ component.key }}">
   <legend ng-if="component.legend">{{ component.legend }}</legend>
-  <formio-component-view ng-repeat="component in component.components track by $index" component="component" data="data" form="form"></formio-component-view>
+  <formio-component-view ng-repeat="component in component.components track by $index" component="component" data="data" form="form" ignore="ignore"></formio-component-view>
 </fieldset>
