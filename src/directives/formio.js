@@ -43,7 +43,11 @@ module.exports = function() {
         }
 
         // Build the display map.
-        $scope.show = {};
+        $scope.show = {
+          '': true,
+          'undefined': true,
+          'null': true
+        };
         var boolean = {
           'true': true,
           'false': false
@@ -55,7 +59,11 @@ module.exports = function() {
          * This will iterate over every key in the submission data obj, regardless of the structure.
          */
         var sweepSubmission = function() {
-          var show = $scope.show || {};
+          var show = $scope.show || {
+              '': true,
+              'undefined': true,
+              'null': true
+            };
           var submission = $scope.submission.data || {};
 
           /**
@@ -135,6 +143,9 @@ module.exports = function() {
         // The list of all custom conditionals, segregated because they must be run on every change to data.
         var _customConditionals = {};
 
+        // Regex for getting component subkeys.
+        var subkey = /^.+\[(.+)\]$/;
+
         /**
          * Sweep all the components and build the conditionals map.
          *
@@ -153,10 +164,20 @@ module.exports = function() {
           $scope.form.components = $scope.form.components || [];
           FormioUtils.eachComponent($scope.form.components, function(component) {
             if (!component.hasOwnProperty('key')) {
-              $scope.show[''] = true;
               return;
             }
-
+            // Get key inside: something[key]
+            if (subkey.test(component.key)) {
+              try {
+                var key = subkey.exec(component.key)[1];
+                if (key) {
+                  component.key = key;
+                }
+              }
+              catch (e) {
+                $scope.show[component.key] = true;
+              }
+            }
             // Show everything by default.
             $scope.show[component.key] = true;
 
