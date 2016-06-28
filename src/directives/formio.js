@@ -85,7 +85,7 @@ module.exports = function() {
 
             // If given a string, then we are looking at the api key of a component.
             if (typeof components === 'string') {
-              if (!show[components]) {
+              if (show.hasOwnProperty(components) && show[components] === false) {
                 if (ret) {
                   return true;
                 }
