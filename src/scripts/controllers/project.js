@@ -1792,9 +1792,7 @@ app.factory('ProjectUpgradeDialog', [
               };
 
               // Default to the team plan for upgrades, unless they are already team pro, then show commercial.
-              $scope.selectedPlan = ($scope.getPlan(project.plan).order < ProjectPlans.plans.team.order)
-                ? _.find($scope.plans, {order: ProjectPlans.plans.team.order})
-                : _.find($scope.plans, {order: ProjectPlans.plans.commercial.order});
+              $scope.selectedPlan = ($scope.getPlan(project.plan).order < ProjectPlans.plans.team.order) ? _.find($scope.plans, {order: ProjectPlans.plans.team.order}) : _.find($scope.plans, {order: ProjectPlans.plans.commercial.order});
 
               // Display the selected plan, by name.
               if ($scope.selectedPlan) {
