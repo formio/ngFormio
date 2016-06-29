@@ -310,16 +310,25 @@
       </div>
     </div>
     <div ng-if="!paymentInfoLoading && paymentInfo && selectedPlan === 'commercial'">
-      <div ng-if="!commercialContactFormSubmitted">
-        <h5 class="text-muted">Make sure your contact info below is correct. We'll answer your upgrade request as soon as possible.</h5>
-        <formio src="commercialContactForm" submission="commercialContactSubmission"></formio>
-      </div>
-      <div ng-if="commercialContactFormSubmitted">
-        <h4>Your Commercial Plan upgrade request has been sent!</h4>
-        <h5 class="text-muted">We'll get back to you as soon as possible!</h5>
-        <div class="form-group pull-right">
-          <a class="btn btn-default" ng-click="closeThisDialog(false)">Back</a>
+      <div ng-if="(currentProject.plan !== 'commercial')">
+        <div ng-if="!commercialContactFormSubmitted">
+          <h5 class="text-muted">Make sure your contact info below is correct. We'll answer your upgrade request as soon as possible.</h5>
+          <formio src="commercialContactForm" submission="commercialContactSubmission"></formio>
         </div>
+        <div ng-if="commercialContactFormSubmitted">
+          <h4>Your Commercial Plan upgrade request has been sent!</h4>
+          <h5 class="text-muted">We'll get back to you as soon as possible!</h5>
+          <div class="form-group pull-right">
+            <a class="btn btn-default" ng-click="closeThisDialog(false)">Back</a>
+          </div>
+        </div>
+      </div>
+      <div ng-if="(currentProject.plan === 'commercial')">
+        <h5>Payments at the end of billing cycles will be charged to:</h5>
+        <h5 class="payment-info"><strong>{{capitalize(paymentInfo.cardType)}} ending in {{paymentInfo.ccNumber.substr(-4)}}</strong></h5>
+        <h5 class="text-muted payment-info">Expires on {{paymentInfo.ccExpiryMonth}}/{{paymentInfo.ccExpiryYear}}</h5>
+        <h5 class="text-muted payment-info">Name on Card: {{paymentInfo.cardholderName}}</h5>
+        <p><small><a class="btn btn-sm btn-default" ng-click="changePaymentInfo()">Change my credit card</a></small></p>
       </div>
     </div>
   </div>
