@@ -571,8 +571,8 @@ pre code {
 }
 
 .required-field:after {
-  color:red;
-  content:" *";
+  color: red;
+  content: " *";
 }
 
 .panel-default .panel-title .text-muted {
@@ -640,7 +640,7 @@ pre code {
   }
 
   input {
-    border-radius: 5px;
+    border-radius: 5px !important;
     border: none;
 
     &::-webkit-input-placeholder {
@@ -742,11 +742,6 @@ pre code {
 
   button[type="submit"] {
     background-color: $brand-primary;
-  }
-
-  // Hide required asterisks, required is implied
-  .field-required-inline {
-    display: none;
   }
 }
 
