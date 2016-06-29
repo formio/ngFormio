@@ -287,14 +287,16 @@
 
   </div>
   <div class="col-sm-8 form-column">
-    <h3><i class="fa fa-credit-card"></i> {{selectedPlan === 'commercial' ? 'Request Upgrade to Commerical Plan' : 'Upgrade Project'}}</h3>
+    <h3><i class="fa fa-credit-card"></i> {{ currentProject.plan === selectedPlan ? 'Current Plan' : (selectedPlan === 'commercial' ? 'Request Upgrade to Commerical Plan' : 'Upgrade Project')}}</h3>
     <div ng-if="!paymentInfoLoading && !paymentInfo">
       <h5 class="text-muted">First, you'll need to enter your credit card info.<br>Don't worry, you won't be charged until the end of the billing cycle.</h5>
       <formio src="paymentForm" form-action="'/payeezy'"></formio>
     </div>
     <div ng-if="!paymentInfoLoading && paymentInfo && selectedPlan !== 'commercial'">
-      <h4>Are you sure you want to change your project plan to <strong>{{getPlan(selectedPlan).title}}</strong>?</h4>
-      <h5 class="text-muted">You can still change the project plan on the left.</h5>
+      <div ng-if="(currentProject.plan !== selectedPlan)">
+        <h4>Are you sure you want to change your project plan to <strong>{{getPlan(selectedPlan).title}}</strong>?</h4>
+        <h5 class="text-muted">You can still change the project plan on the left.</h5>
+      </div>
       <br>
       <h5>Payments at the end of billing cycles will be charged to:</h5>
       <h5 class="payment-info"><strong>{{capitalize(paymentInfo.cardType)}} ending in {{paymentInfo.ccNumber.substr(-4)}}</strong></h5>
@@ -302,7 +304,7 @@
       <h5 class="text-muted payment-info">Name on Card: {{paymentInfo.cardholderName}}</h5>
       <p><small><a class="btn btn-sm btn-default" ng-click="changePaymentInfo()">Change my credit card</a></small></p>
       <br>
-      <div class="form-group pull-right">
+      <div class="form-group pull-right" ng-if="(currentProject.plan !== selectedPlan)">
         <a class="btn btn-default" ng-click="closeThisDialog(false)">Cancel</a>
         <button class="btn btn-primary" ng-click="upgradeProject(selectedPlan)">Upgrade Project to {{getPlan(selectedPlan).title}}</button>
       </div>
