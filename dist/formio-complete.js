@@ -60603,9 +60603,6 @@ module.exports = function() {
         // The list of all custom conditionals, segregated because they must be run on every change to data.
         var _customConditionals = {};
 
-        // Regex for getting component subkeys.
-        var subkey = /^.+\[(.+)\]$/;
-
         /**
          * Sweep all the components and build the conditionals map.
          *
@@ -60626,18 +60623,7 @@ module.exports = function() {
             if (!component.hasOwnProperty('key')) {
               return;
             }
-            // Get key inside: something[key]
-            if (subkey.test(component.key)) {
-              try {
-                var key = subkey.exec(component.key)[1];
-                if (key) {
-                  component.key = key;
-                }
-              }
-              catch (e) {
-                $scope.show[component.key] = true;
-              }
-            }
+
             // Show everything by default.
             $scope.show[component.key] = true;
 
@@ -60844,7 +60830,7 @@ module.exports = function() {
             if (component.type === 'resource' && component.key && component.defaultPermission) {
               defaultPermissions[component.key] = component.defaultPermission;
             }
-            if ($scope.submission.data.hasOwnProperty(component.key) && $scope.show[component.key]) {
+            if ($scope.submission.data.hasOwnProperty(component.key) && $scope.show[component.key] === true) {
               var value = $scope.submission.data[component.key];
               if (component.type === 'number') {
                 submissionData.data[component.key] = value ? parseFloat(value) : 0;
