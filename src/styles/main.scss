@@ -1107,6 +1107,11 @@ footer {
   white-space: nowrap;
 }
 
+.wrap-table-cell {
+  word-break: break-all;
+  word-wrap: break-word;
+}
+
 .col-code {
   width: 100%;
 }

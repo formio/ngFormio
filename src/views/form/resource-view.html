@@ -9,7 +9,7 @@
           <tbody>
             <tr>
               <th>Resource Endpoint</th>
-              <td><a ui-sref="project.api">{{ projectApi }}/{{ form.path }}</a></td>
+              <td class="wrap-table-cell"><a ui-sref="project.api">{{ projectApi }}/{{ form.path }}</a></td>
             </tr>
           </tbody>
         </table>
@@ -25,8 +25,8 @@
           </thead>
           <tbody>
             <tr ng-repeat="component in form.components | flattenComponents">
-              <td>{{ component.label }}</td>
-              <td>{{ component.key }}</td>
+              <td class="wrap-table-cell">{{ component.label }}</td>
+              <td class="wrap-table-cell">{{ component.key }}</td>
               <td>{{ component.type }}</td>
               <td>{{ component.persistent }}</td>
             </tr>
