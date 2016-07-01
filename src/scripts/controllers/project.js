@@ -1745,8 +1745,7 @@ app.factory('ProjectUpgradeDialog', [
                 if(!$scope.paymentInfoLoading && !$scope.paymentInfo) {
                   return $scope.paymentForm;
                 }
-                if(!$scope.paymentInfoLoading && $scope.paymentInfo &&
-                  $scope.selectedPlan === 'commercial') {
+                if(!$scope.paymentInfoLoading && $scope.paymentInfo && $scope.selectedPlan === 'commercial') {
                   return $scope.commercialContactForm;
                 }
               };
@@ -1791,11 +1790,16 @@ app.factory('ProjectUpgradeDialog', [
                   contactEmail: $rootScope.user.data.email
                 }
               };
-              $scope.selectedPlan = _.find($scope.plans, {order: $scope.getPlan(project.plan).order + 1});
-              if($scope.selectedPlan) {
+
+              // Default to the team plan for upgrades, unless they are already team pro, then show commercial.
+              $scope.selectedPlan = ($scope.getPlan(project.plan).order < ProjectPlans.plans.team.order) ? _.find($scope.plans, {order: ProjectPlans.plans.team.order}) : _.find($scope.plans, {order: ProjectPlans.plans.commercial.order});
+
+              // Display the selected plan, by name.
+              if ($scope.selectedPlan) {
                 $scope.selectedPlan = $scope.selectedPlan.name;
               }
-              if($scope.selectedPlan === undefined || $scope.selectedPlan === 'commercial') {
+              // When the plan is unknown, default to team pro.
+              if ($scope.selectedPlan === undefined) {
                 $scope.selectedPlan = 'team';
               }
 
