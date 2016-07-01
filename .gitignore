@@ -9,3 +9,5 @@ test/bower_components
 dist
 test/screenshots/*.png
 *~
+npm-debug.log
+
