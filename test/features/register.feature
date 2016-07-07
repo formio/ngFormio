@@ -42,6 +42,7 @@ Feature: Register Functionality
     Given I am on /#/auth
     And I am logged out
     When I enter bad-email in the .register-container #email field
+    Then I wait 100 milliseconds
     Then the REGISTER button is disabled
     And I see Email must be a valid email.
 
