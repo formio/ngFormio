@@ -43,21 +43,21 @@ angular.module('formioApp').constant('AppConfig', {
       "title": "Sales Quote",
       "name": "salesquoteapp",
       "description": "A sales quoting project that lets agents login and manage their opportunities, customers, and contracts.",
-      "template": "https://cdn.rawgit.com/formio/formio-app-salesquote/2.1.1/src/project.json",
+      "template": "https://cdn.rawgit.com/formio/formio-app-salesquote/2.1.2/src/project.json",
       "thumbnail": "https://app.form.io/formio-app-salesquote/src/assets/images/salesquote-thumb.png"
     },
     {
       "title": "Service Tracker",
       "name": "servicetrackerapp",
       "description": "An application to schedule, manage and track a services based company such as home or business services.",
-      "template": "https://cdn.rawgit.com/formio/formio-app-servicetracker/2.1.1/src/project.json",
+      "template": "https://cdn.rawgit.com/formio/formio-app-servicetracker/2.1.2/src/project.json",
       "thumbnail": "https://app.form.io/formio-app-servicetracker/assets/images/servicetracker-thumb.png"
     },
     {
       "title": "Prize Drawing",
       "name": "prizedrawingapp",
       "description": "A raffle entry project that lets participants register for a chance to win a prize! Also includes admin interface for prize drawing selection.",
-      "template": "https://cdn.rawgit.com/formio/formio-app-prizedrawing/2.1.0/src/project.json",
+      "template": "https://cdn.rawgit.com/formio/formio-app-prizedrawing/2.1.1/src/project.json",
       "thumbnail": "https://app.form.io/formio-app-prizedrawing/assets/images/prizedrawing-thumb.png"
     },
     {

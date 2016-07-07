@@ -441,7 +441,7 @@ app.controller('FormController', [
 
         $scope.actions = actions;
         $scope.hasAuthAction = actions.some(function(action) {
-          return action.name === 'auth' || action.name === 'oauth';
+          return action.name === 'login' || action.name === 'oauth';
         });
       }, FormioAlerts.onError.bind(FormioAlerts));
     }
