@@ -44,7 +44,7 @@ Feature: Register Functionality
     When I enter bad-email in the .register-container #email field
     Then the REGISTER button is disabled
     When I wait 100 milliseconds
-    And I see Email must be a valid email.
+    And I see email must be a valid email.
 
   Scenario: Mismatched passwords
     Given I am on /#/auth
