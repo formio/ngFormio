@@ -6,10 +6,13 @@ angular.module('formioApp').config([
       formioComponentsProvider.register('resourcefields', {
         title: 'Resource Fields',
         template: 'formio/components/resourcefields.html',
-        controller: ['$scope', '$http', 'FormioUtils', function ($scope, $http, FormioUtils) {
+        controller: ['$scope', '$rootScope', '$http', 'FormioUtils', function ($scope, $rootScope, $http, FormioUtils) {
           var settings = $scope.component;
+          var resourceExclude = '';
           $scope.resourceComponents = [];
-          $scope.selectedResource = {};
+          if ($rootScope.currentForm && $rootScope.currentForm._id) {
+            resourceExclude = '&_id__ne=' + $rootScope.currentForm._id;
+          }
           $scope.resourceSelect = {
             type: 'select',
             input: true,
@@ -17,7 +20,7 @@ angular.module('formioApp').config([
             key: 'resource',
             placeholder: settings.placeholder || '',
             dataSrc: 'url',
-            data: {url: settings.basePath + '?type=resource'},
+            data: {url: settings.basePath + '?type=resource' + resourceExclude},
             valueProperty: '_id',
             defaultValue: $scope.data.resource,
             template: '<span>{{ item.title }}</span>',
@@ -59,11 +62,11 @@ angular.module('formioApp').config([
           });
 
           // Watch the selection of a new resource and set the resource field information.
-          $scope.$watch('selectedResource.resource', function(data) {
+          $scope.$watch('data.resource', function(data) {
             if (!data) { return; }
+            $scope.data.fields = $scope.data.fields || {};
             if (data !== $scope.data.resource) {
               $scope.data.resource = data;
-              $scope.data.fields = {};
             }
             $scope.resourceComponents = [];
             $http.get(AppConfig.apiBase + settings.basePath + '/' + data).then(function(results) {
@@ -85,11 +88,6 @@ angular.module('formioApp').config([
               });
             });
           });
-
-          // If a resource is already provided, then load the fields.
-          if ($scope.data.resource) {
-            $scope.selectedResource.resource = $scope.data.resource;
-          }
         }],
         settings: {
           input: true,
@@ -123,7 +121,7 @@ angular.module('formioApp').config([
     'FormioUtils',
     function ($templateCache, FormioUtils) {
       $templateCache.put('formio/components/resourcefields.html', FormioUtils.fieldWrap(
-        '<formio-component component="resourceSelect" data="selectedResource"></formio-component>' +
+        '<formio-component component="resourceSelect" data="data"></formio-component>' +
         '<formio-component ng-if="data.resource" component="propertyField" data="data"></formio-component>' +
         '<fieldset ng-if="data.resource">' +
           '<legend>Resource Fields</legend>' +
