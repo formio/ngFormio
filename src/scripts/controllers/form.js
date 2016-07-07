@@ -880,7 +880,7 @@ app.controller('FormActionEditController', [
     ActionInfoLoader.load($scope, $stateParams).then(function(actionInfo) {
       // SQL Action missing sql server warning
       if(actionInfo && actionInfo.name === 'sql') {
-        var typeComponent = FormioUtils.getComponent(actionInfo.settingsForm.components, 'settings[type]');
+        var typeComponent = FormioUtils.getComponent(actionInfo.settingsForm.components, 'type');
         if(JSON.parse(typeComponent.data.json).length === 0) {
           FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> You do not have any SQL servers configured. You can add a SQL server in your <a href="#/project/'+$scope.projectId+'/settings/databases">Project Settings</a>.');
         }
@@ -888,7 +888,7 @@ app.controller('FormActionEditController', [
 
       // Email action missing transports (other than the default one).
       if(actionInfo && actionInfo.name === 'email') {
-        var transportComponent = FormioUtils.getComponent(actionInfo.settingsForm.components, 'settings[transport]');
+        var transportComponent = FormioUtils.getComponent(actionInfo.settingsForm.components, 'transport');
         if(JSON.parse(transportComponent.data.json).length <= 1) {
           FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> You do not have any email transports configured. You can add an email transport in your <a href="#/project/'+$scope.projectId+'/settings/email">Project Settings</a>, or you can use the default transport (charges may apply).');
         }
@@ -896,7 +896,7 @@ app.controller('FormActionEditController', [
 
       // Oauth action alert for new resource missing role assignment.
       if (actionInfo && actionInfo.name === 'oauth') {
-        var providers = FormioUtils.getComponent(actionInfo.settingsForm.components, 'settings[provider]');
+        var providers = FormioUtils.getComponent(actionInfo.settingsForm.components, 'provider');
         if (providers.data && providers.data.json && providers.data.json === '[]') {
           FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> The OAuth Action requires a provider to be configured, before it can be used. You can add an OAuth provider in your <a href="#/project/'+$scope.projectId+'/settings/oauth">Project Settings</a>.');
         }
@@ -942,12 +942,16 @@ app.controller('FormActionEditController', [
           $scope.formDisabled = true;
         }
         FormioUtils.eachComponent(actionInfo.settingsForm.components, function(component) {
-          var result = component.key.match(/settings\[(.*)_action\]/);
+          if (!component.key) {
+            return;
+          }
+
+          var result = component.key.match(/(.*)_action/);
           if (result) {
             $timeout(function() {
-              showFields(result[1], $scope.action.data.settings[result[1] + '_action']);
+              showFields(result[1], $scope.action.data.settings[result[0]]);
             });
-            $scope.$watch('action.data.settings.' + result[1] + '_action', function(current, old) {
+            $scope.$watch('action.data.settings.' + result[0], function(current) {
               showFields(result[1], current);
             });
           }
@@ -1014,7 +1018,7 @@ app.controller('FormActionEditController', [
 
       if(actionInfo && actionInfo.name === 'oauth') {
         // Show warning if button component has no options
-        var buttonComponent = FormioUtils.getComponent(actionInfo.settingsForm.components, 'settings[button]');
+        var buttonComponent = FormioUtils.getComponent(actionInfo.settingsForm.components, 'button');
         if(JSON.parse(buttonComponent.data.json).length === 0) {
           FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> You do not have any Button components with the `oauth` action on this form, which is required to use this action. You can add a Button component on the <a href="#/project/'+$scope.projectId+'/form/'+$scope.formId+'/edit">form edit page</a>.');
         }
