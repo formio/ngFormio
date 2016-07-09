@@ -143,20 +143,11 @@ module.exports = function() {
         // The list of all custom conditionals, segregated because they must be run on every change to data.
         var _customConditionals = {};
 
-        /**
-         * Sweep all the components and build the conditionals map.
+        /** Sweep all the components and build the conditionals map.
          *
          * @private
          */
-        var _sweepConditionalsCalled = false;
         var _sweepConditionals = function() {
-          if (_sweepConditionalsCalled) {
-            return;
-          }
-          else {
-            _sweepConditionalsCalled = true;
-          }
-
           $scope.form = $scope.form || {};
           $scope.form.components = $scope.form.components || [];
           FormioUtils.eachComponent($scope.form.components, function(component) {
@@ -310,6 +301,12 @@ module.exports = function() {
           _sweepConditionals();
           cancelFormLoadEvent();
         });
+
+        if ($scope.options && $scope.options.watchData) {
+          $scope.$watch('submission.data', function() {
+            _sweepConditionals();
+          }, true);
+        }
 
         if (!$scope._src) {
           $scope.$watch('src', function(src) {
