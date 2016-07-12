@@ -1,213 +1,5 @@
 /*! ng-formio v1.8.12 | https://npmcdn.com/ng-formio@1.8.12/LICENSE.txt */
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-// shim for using process in browser
-
-var process = module.exports = {};
-
-// cached from whatever global is present so that test runners that stub it
-// don't break things.  But we need to wrap it in a try catch in case it is
-// wrapped in strict mode code which doesn't define any globals.  It's inside a
-// function because try/catches deoptimize in certain engines.
-
-var cachedSetTimeout;
-var cachedClearTimeout;
-
-(function () {
-  try {
-    cachedSetTimeout = setTimeout;
-  } catch (e) {
-    cachedSetTimeout = function () {
-      throw new Error('setTimeout is not defined');
-    }
-  }
-  try {
-    cachedClearTimeout = clearTimeout;
-  } catch (e) {
-    cachedClearTimeout = function () {
-      throw new Error('clearTimeout is not defined');
-    }
-  }
-} ())
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
-
-function cleanUpNextTick() {
-    if (!draining || !currentQueue) {
-        return;
-    }
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
-}
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = cachedSetTimeout(cleanUpNextTick);
-    draining = true;
-
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            if (currentQueue) {
-                currentQueue[queueIndex].run();
-            }
-        }
-        queueIndex = -1;
-        len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    cachedClearTimeout(timeout);
-}
-
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
-        }
-    }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-        cachedSetTimeout(drainQueue, 0);
-    }
-};
-
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
-}
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
-};
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
-
-},{}],2:[function(require,module,exports){
-module.exports = {
-  isLayoutComponent: function isLayoutComponent(component) {
-    return (
-      (component.columns && Array.isArray(component.columns)) ||
-      (component.rows && Array.isArray(component.rows)) ||
-      (component.components && Array.isArray(component.components))
-    ) ? true : false;
-  },
-
-  /**
-   * Iterate through each component within a form.
-   * @param components
-   * @param fn
-   */
-  eachComponent: function eachComponent(components, fn, includeAll, path) {
-    if (!components) return;
-    path = path || '';
-    components.forEach(function(component) {
-      var hasColumns = component.columns && Array.isArray(component.columns);
-      var hasRows = component.rows && Array.isArray(component.rows);
-      var hasComps = component.components && Array.isArray(component.components);
-      var noRecurse = false;
-      var newPath = component.key ? (path ? (path + '.' + component.key) : component.key) : '';
-
-      if (includeAll || component.tree || (!hasColumns && !hasRows && !hasComps)) {
-        noRecurse = fn(component, newPath);
-      }
-
-      var subPath = function() {
-        if (component.key && ((component.type === 'datagrid') || (component.type === 'container'))) {
-          return newPath;
-        }
-        return path;
-      };
-
-      if (!noRecurse) {
-        if (hasColumns) {
-          component.columns.forEach(function(column) {
-            eachComponent(column.components, fn, includeAll, subPath());
-          });
-        }
-
-        else if (hasRows) {
-          [].concat.apply([], component.rows).forEach(function(row) {
-            eachComponent(row.components, fn, includeAll, subPath());
-          });
-        }
-
-        else if (hasComps) {
-          eachComponent(component.components, fn, includeAll, subPath());
-        }
-      }
-    });
-  },
-
-  /**
-   * Get a component by its key
-   * @param components
-   * @param key The key of the component to get
-   * @returns The component that matches the given key, or undefined if not found.
-   */
-  getComponent: function getComponent(components, key) {
-    var result;
-    module.exports.eachComponent(components, function(component) {
-      if (component.key === key) {
-        result = component;
-      }
-    });
-    return result;
-  },
-
-  /**
-   * Flatten the form components for data manipulation.
-   * @param components
-   * @param flattened
-   * @returns {*|{}}
-   */
-  flattenComponents: function flattenComponents(components, includeAll) {
-    var flattened = {};
-    module.exports.eachComponent(components, function(component, path) {
-      flattened[path] = component;
-    }, includeAll);
-    return flattened;
-  }
-};
-
-},{}],3:[function(require,module,exports){
 (function (process){
 // vim:ts=4:sts=4:sw=4:
 /*!
@@ -2259,7 +2051,7 @@ return Q;
 });
 
 }).call(this,require('_process'))
-},{"_process":1}],4:[function(require,module,exports){
+},{"_process":6}],2:[function(require,module,exports){
 /*!
  * EventEmitter2
  * https://github.com/hij1nx/EventEmitter2
@@ -2834,7 +2626,7 @@ return Q;
   }
 }();
 
-},{}],5:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 module.exports = function (obj) {
     if (!obj || typeof obj !== 'object') return obj;
     
@@ -2871,7 +2663,7 @@ var isArray = Array.isArray || function (xs) {
     return {}.toString.call(xs) === '[object Array]';
 };
 
-},{}],6:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 (function() {
   'use strict';
 
@@ -3203,7 +2995,7 @@ var isArray = Array.isArray || function (xs) {
   self.fetch.polyfill = true
 })();
 
-},{}],7:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 'use strict';
 
 require('whatwg-fetch');
@@ -3545,6 +3337,14 @@ Formio.prototype.loadActions = _index('actions');
 Formio.prototype.availableActions = function() { return this.makeRequest('availableActions', this.formUrl + '/actions'); };
 Formio.prototype.actionInfo = function(name) { return this.makeRequest('actionInfo', this.formUrl + '/actions/' + name); };
 
+Formio.prototype.uploadFile = function(storage, file, fileName, progressCallback) {
+  console.log('uploadFile!');
+}
+
+Formio.prototype.downloadFile = function(storage, file) {
+  console.log('downloadFile!');
+}
+
 Formio.makeStaticRequest = function(url, method, data) {
   var self = this;
   method = (method || 'GET').toUpperCase();
@@ -3647,6 +3447,10 @@ Formio.request = function(url, method, data) {
         else {
           if (response.status === 440) {
             Formio.setToken(null);
+            Formio.events.emit('formio.sessionExpired', response.body);
+          }
+          else if (response.status === 401) {
+            Formio.events.emit('formio.unauthorized', response.body);
           }
           // Parse and return the error as a rejected promise to reject this promise
           return (response.headers.get('content-type').indexOf('application/json') !== -1 ?
@@ -3657,6 +3461,10 @@ Formio.request = function(url, method, data) {
         }
       })
       .catch(function(err) {
+        if (err === 'Bad Token') {
+          Formio.setToken(null);
+          Formio.events.emit('formio.badToken', err);
+        }
         // Remove failed promises from cache
         delete cache[cacheKey];
         // Propagate error so client can handle accordingly
@@ -3872,7 +3680,215 @@ Formio.deregisterPlugin = function(plugin) {
 
 module.exports = Formio;
 
-},{"Q":3,"eventemitter2":4,"shallow-copy":5,"whatwg-fetch":6}],8:[function(require,module,exports){
+},{"Q":1,"eventemitter2":2,"shallow-copy":3,"whatwg-fetch":4}],6:[function(require,module,exports){
+// shim for using process in browser
+
+var process = module.exports = {};
+
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+
+var cachedSetTimeout;
+var cachedClearTimeout;
+
+(function () {
+  try {
+    cachedSetTimeout = setTimeout;
+  } catch (e) {
+    cachedSetTimeout = function () {
+      throw new Error('setTimeout is not defined');
+    }
+  }
+  try {
+    cachedClearTimeout = clearTimeout;
+  } catch (e) {
+    cachedClearTimeout = function () {
+      throw new Error('clearTimeout is not defined');
+    }
+  }
+} ())
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = cachedSetTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    cachedClearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        cachedSetTimeout(drainQueue, 0);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+},{}],7:[function(require,module,exports){
+module.exports = {
+  isLayoutComponent: function isLayoutComponent(component) {
+    return (
+      (component.columns && Array.isArray(component.columns)) ||
+      (component.rows && Array.isArray(component.rows)) ||
+      (component.components && Array.isArray(component.components))
+    ) ? true : false;
+  },
+
+  /**
+   * Iterate through each component within a form.
+   * @param components
+   * @param fn
+   */
+  eachComponent: function eachComponent(components, fn, includeAll, path) {
+    if (!components) return;
+    path = path || '';
+    components.forEach(function(component) {
+      var hasColumns = component.columns && Array.isArray(component.columns);
+      var hasRows = component.rows && Array.isArray(component.rows);
+      var hasComps = component.components && Array.isArray(component.components);
+      var noRecurse = false;
+      var newPath = component.key ? (path ? (path + '.' + component.key) : component.key) : '';
+
+      if (includeAll || component.tree || (!hasColumns && !hasRows && !hasComps)) {
+        noRecurse = fn(component, newPath);
+      }
+
+      var subPath = function() {
+        if (component.key && ((component.type === 'datagrid') || (component.type === 'container'))) {
+          return newPath;
+        }
+        return path;
+      };
+
+      if (!noRecurse) {
+        if (hasColumns) {
+          component.columns.forEach(function(column) {
+            eachComponent(column.components, fn, includeAll, subPath());
+          });
+        }
+
+        else if (hasRows) {
+          [].concat.apply([], component.rows).forEach(function(row) {
+            eachComponent(row.components, fn, includeAll, subPath());
+          });
+        }
+
+        else if (hasComps) {
+          eachComponent(component.components, fn, includeAll, subPath());
+        }
+      }
+    });
+  },
+
+  /**
+   * Get a component by its key
+   * @param components
+   * @param key The key of the component to get
+   * @returns The component that matches the given key, or undefined if not found.
+   */
+  getComponent: function getComponent(components, key) {
+    var result;
+    module.exports.eachComponent(components, function(component) {
+      if (component.key === key) {
+        result = component;
+      }
+    });
+    return result;
+  },
+
+  /**
+   * Flatten the form components for data manipulation.
+   * @param components
+   * @param flattened
+   * @returns {*|{}}
+   */
+  flattenComponents: function flattenComponents(components, includeAll) {
+    var flattened = {};
+    module.exports.eachComponent(components, function(component, path) {
+      flattened[path] = component;
+    }, includeAll);
+    return flattened;
+  }
+};
+
+},{}],8:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -4755,22 +4771,25 @@ module.exports = function(app) {
       },
       template: '<a href="{{ file.url }}" ng-click="getFile($event)" target="_blank">{{ file.name }}</a>',
       controller: [
+        '$window',
         '$scope',
-        '$rootScope',
-        'FormioPlugins',
         function(
-          $scope,
-          $rootScope,
-          FormioPlugins
+          $window,
+          $scope
         ) {
           $scope.getFile = function(evt) {
-            // In view mode there may not be a form. Need a way to override.
-            $scope.form = $scope.form || $rootScope.filePath;
-
-            var plugin = FormioPlugins('storage', $scope.file.storage);
-            if (plugin) {
-              plugin.downloadFile(evt, $scope.file, $scope);
-            }
+            $scope.formio
+              .downloadFile($scope.component.storage, $scope.file).then(function(file) {
+                if (file) {
+                  evt.preventDefault();
+                  $window.open(file.url, '_blank');
+                }
+              })
+              .catch(function(response) {
+                // Is alert the best way to do this?
+                // User is expecting an immediate notification due to attempting to download a file.
+                alert(response);
+              });
           };
         }
       ]
@@ -4788,26 +4807,14 @@ module.exports = function(app) {
       template: '<img ng-src="{{ imageSrc }}" alt="{{ file.name }}" />',
       controller: [
         '$scope',
-        '$rootScope',
-        'FormioPlugins',
         function(
-          $scope,
-          $rootScope,
-          FormioPlugins
+          $scope
         ) {
-          var plugin = FormioPlugins('storage', $scope.file.storage);
-
-          // In view mode there may not be a form. Need a way to override.
-          $scope.form = $scope.form || $rootScope.filePath;
-
-          // Sign the file if needed.
-          if (plugin) {
-            plugin.getFile($scope.form, $scope.file)
-              .then(function(result) {
-                $scope.imageSrc = result.url;
-                $scope.$apply();
-              });
-          }
+          $scope.formio.downloadFile($scope.component.storage, $scope.file)
+            .then(function(result) {
+              $scope.imageSrc = result.url;
+              $scope.$apply();
+            });
         }
       ]
     };
@@ -4815,11 +4822,9 @@ module.exports = function(app) {
 
   app.controller('formioFileUpload', [
     '$scope',
-    'FormioPlugins',
     'FormioUtils',
     function(
       $scope,
-      FormioPlugins,
       FormioUtils
     ) {
       $scope.fileUploads = {};
@@ -4838,44 +4843,37 @@ module.exports = function(app) {
 
       $scope.upload = function(files) {
         if ($scope.component.storage && files && files.length) {
-          var plugin = FormioPlugins('storage', $scope.component.storage);
           angular.forEach(files, function(file) {
             // Get a unique name for this file to keep file collisions from occurring.
             var fileName = FormioUtils.uniqueName(file.name);
-            if (plugin) {
-              $scope.fileUploads[fileName] = {
-                name: fileName,
-                size: file.size,
-                status: 'info',
-                message: 'Starting upload'
-              };
-              plugin.uploadFile(file, fileName, $scope.fileUploads[fileName], $scope)
-                .then(function(fileInfo) {
-                  delete $scope.fileUploads[fileName];
-                  fileInfo.storage = $scope.component.storage;
-                  // Ensure that the file component is an array.
-                  if (
-                    !$scope.data[$scope.component.key] ||
-                    !($scope.data[$scope.component.key] instanceof Array)
-                  ) {
-                    $scope.data[$scope.component.key] = [];
-                  }
-                  $scope.data[$scope.component.key].push(fileInfo);
-                })
-                .catch(function(message) {
-                  $scope.fileUploads[fileName].status = 'error';
-                  $scope.fileUploads[fileName].message = message;
-                  delete $scope.fileUploads[fileName].progress;
-                });
-            }
-            else {
-              $scope.fileUploads[fileName] = {
-                name: fileName,
-                size: file.size,
-                status: 'error',
-                message: 'Storage plugin not found'
-              };
-            }
+            $scope.fileUploads[fileName] = {
+              name: fileName,
+              size: file.size,
+              status: 'info',
+              message: 'Starting upload'
+            };
+            $scope.formio.uploadFile($scope.component.storage, file, fileName, function processNotify(evt) {
+              $scope.fileUploads[fileName].status = 'progress';
+              $scope.fileUploads[fileName].progress = parseInt(100.0 * evt.loaded / evt.total);
+              delete $scope.fileUploads[fileName].message;
+            })
+              .then(function(fileInfo) {
+                delete $scope.fileUploads[fileName];
+                fileInfo.storage = $scope.component.storage;
+                // Ensure that the file component is an array.
+                if (
+                  !$scope.data[$scope.component.key] ||
+                  !($scope.data[$scope.component.key] instanceof Array)
+                ) {
+                  $scope.data[$scope.component.key] = [];
+                }
+                $scope.data[$scope.component.key].push(fileInfo);
+              })
+              .catch(function(message) {
+                $scope.fileUploads[fileName].status = 'error';
+                $scope.fileUploads[fileName].message = message;
+                delete $scope.fileUploads[fileName].progress;
+              });
           });
         }
       };
@@ -7518,7 +7516,7 @@ module.exports = function() {
   };
 };
 
-},{"formio-utils":2}],52:[function(require,module,exports){
+},{"formio-utils":7}],52:[function(require,module,exports){
 "use strict";
 module.exports = [
   '$q',
@@ -7719,8 +7717,6 @@ var app = angular.module('formio', [
  */
 app.provider('Formio', require('./providers/Formio'));
 
-app.provider('FormioPlugins', require('./providers/FormioPlugins'));
-
 /**
  * Provides a way to register the Formio scope.
  */
@@ -7778,8 +7774,6 @@ app.config([
   }
 ]);
 
-require('./plugins')(app);
-
 app.run([
   '$templateCache',
   function($templateCache) {
@@ -7825,299 +7819,7 @@ app.run([
 
 require('./components');
 
-},{"./components":24,"./directives/customValidator":40,"./directives/formio":41,"./directives/formioComponent":42,"./directives/formioComponentView":43,"./directives/formioDelete":44,"./directives/formioElement":45,"./directives/formioErrors":46,"./directives/formioSubmission":47,"./directives/formioSubmissions":48,"./directives/formioWizard":49,"./factories/FormioScope":50,"./factories/FormioUtils":51,"./factories/formioInterceptor":52,"./factories/formioTableView":53,"./filters/flattenComponents":54,"./filters/safehtml":55,"./filters/tableComponents":56,"./filters/tableFieldView":57,"./filters/tableView":58,"./filters/translate":59,"./plugins":61,"./providers/Formio":65,"./providers/FormioPlugins":66}],61:[function(require,module,exports){
-"use strict";
-module.exports = function(app) {
-  require('./storage/url')(app);
-  require('./storage/s3')(app);
-  require('./storage/dropbox')(app);
-};
-
-},{"./storage/dropbox":62,"./storage/s3":63,"./storage/url":64}],62:[function(require,module,exports){
-"use strict";
-module.exports = function(app) {
-  app.config([
-    'FormioPluginsProvider',
-    'FormioStorageDropboxProvider',
-    function(
-      FormioPluginsProvider,
-      FormioStorageDropboxProvider
-    ) {
-      FormioPluginsProvider.register('storage', 'dropbox', FormioStorageDropboxProvider.$get());
-    }]
-  );
-
-  app.factory('FormioStorageDropbox', [
-    '$q',
-    '$rootScope',
-    '$window',
-    '$http',
-    'Blob',
-    'FileSaver',
-    function(
-      $q,
-      $rootScope,
-      $window,
-      $http,
-      Blob,
-      FileSaver
-    ) {
-      var getDropboxToken = function() {
-        var dropboxToken;
-        if ($rootScope.user && $rootScope.user.externalTokens) {
-          angular.forEach($rootScope.user.externalTokens, function(token) {
-            if (token.type === 'dropbox') {
-              dropboxToken = token.token;
-            }
-          });
-        }
-        return dropboxToken;
-        //return _.result(_.find($rootScope.user.externalTokens, {type: 'dropbox'}), 'token');
-      };
-
-      return {
-        title: 'Dropbox',
-        name: 'dropbox',
-        uploadFile: function(file, fileName, status, $scope) {
-          var defer = $q.defer();
-          var dir = $scope.component.dir || '';
-          var dropboxToken = getDropboxToken();
-          if (!dropboxToken) {
-            defer.reject('You must authenticate with dropbox before uploading files.');
-          }
-          else {
-            // Both Upload and $http don't handle files as application/octet-stream which is required by dropbox.
-            var xhr = new XMLHttpRequest();
-
-            var onProgress = function(evt) {
-              status.status = 'progress';
-              status.progress = parseInt(100.0 * evt.loaded / evt.total);
-              delete status.message;
-              $scope.$apply();
-            };
-
-            xhr.upload.onprogress = onProgress;
-
-            xhr.onload = function() {
-              if (xhr.status === 200) {
-                defer.resolve(JSON.parse(xhr.response));
-                $scope.$apply();
-              }
-              else {
-                defer.reject(xhr.response || 'Unable to upload file');
-                $scope.$apply();
-              }
-            };
-
-            xhr.open('POST', 'https://content.dropboxapi.com/2/files/upload');
-            xhr.setRequestHeader('Authorization', 'Bearer ' + dropboxToken);
-            xhr.setRequestHeader('Content-Type', 'application/octet-stream');
-            xhr.setRequestHeader('Dropbox-API-Arg', JSON.stringify({
-              path: '/' + dir + fileName,
-              mode: 'add',
-              autorename: true,
-              mute: false
-            }));
-
-            xhr.send(file);
-          }
-          return defer.promise;
-        },
-        getFile: function(fileUrl, file) {
-          var defer = $q.defer();
-          var dropboxToken = getDropboxToken();
-          if (!dropboxToken) {
-            defer.reject('You must authenticate with dropbox before downloading files.');
-          }
-          else {
-            var xhr = new XMLHttpRequest();
-            xhr.responseType = 'arraybuffer';
-
-            xhr.onload = function() {
-              if (xhr.status === 200) {
-                defer.resolve(xhr.response);
-              }
-              else {
-                defer.reject(xhr.response || 'Unable to download file');
-              }
-            };
-
-            xhr.open('POST', 'https://content.dropboxapi.com/2/files/download');
-            xhr.setRequestHeader('Authorization', 'Bearer ' + dropboxToken);
-            xhr.setRequestHeader('Dropbox-API-Arg', JSON.stringify({
-              path: file.path_lower
-            }));
-            xhr.send();
-          }
-          return defer.promise;
-        },
-        downloadFile: function(evt, file) {
-          var strMimeType = 'application/octet-stream';
-          evt.preventDefault();
-          this.getFile(null, file).then(function(data) {
-            var blob = new Blob([data], {type: strMimeType});
-            FileSaver.saveAs(blob, file.name, true);
-          }).catch(function(err) {
-            alert(err);
-          });
-        }
-      };
-    }
-  ]);
-};
-
-
-},{}],63:[function(require,module,exports){
-"use strict";
-module.exports = function(app) {
-  app.config([
-    'FormioPluginsProvider',
-    'FormioStorageS3Provider',
-    function(
-      FormioPluginsProvider,
-      FormioStorageS3Provider
-    ) {
-      FormioPluginsProvider.register('storage', 's3', FormioStorageS3Provider.$get());
-    }
-  ]);
-
-  app.factory('FormioStorageS3', [
-    '$q',
-    '$window',
-    'Formio',
-    'Upload',
-    function(
-      $q,
-      $window,
-      Formio,
-      Upload
-    ) {
-      return {
-        title: 'S3',
-        name: 's3',
-        uploadFile: function(file, fileName, status, $scope) {
-          var defer = $q.defer();
-          Formio.request($scope.formio.formUrl + '/storage/s3', 'POST', {
-            name: fileName,
-            size: file.size,
-            type: file.type
-          })
-            .then(function(response) {
-              var request = {
-                url: response.url,
-                method: 'POST',
-                data: response.data
-              };
-              request.data.file = file;
-              var dir = $scope.component.dir || '';
-              request.data.key += dir + fileName;
-              var upload = Upload.upload(request);
-              upload
-                .then(function() {
-                  // Handle upload finished.
-                  defer.resolve({
-                    name: fileName,
-                    bucket: response.bucket,
-                    key: request.data.key,
-                    url: response.url + request.data.key,
-                    acl: request.data.acl,
-                    size: file.size,
-                    type: file.type
-                  });
-                }, function(resp) {
-                  // Handle error
-                  var oParser = new DOMParser();
-                  var oDOM = oParser.parseFromString(resp.data, 'text/xml');
-                  var message = oDOM.getElementsByTagName('Message')[0].innerHTML;
-                  defer.reject(message);
-                }, function(evt) {
-                  // Progress notify
-                  status.status = 'progress';
-                  status.progress = parseInt(100.0 * evt.loaded / evt.total);
-                  delete status.message;
-                });
-            });
-          return defer.promise;
-        },
-        getFile: function(formUrl, file) {
-          if (file.acl !== 'public-read') {
-            return Formio.request(formUrl + '/storage/s3?bucket=' + file.bucket + '&key=' + file.key, 'GET');
-          }
-          else {
-            var deferred = $q.defer();
-            deferred.resolve(file);
-            return deferred.promise;
-          }
-        },
-        downloadFile: function(evt, file, $scope) {
-          evt.preventDefault();
-          this.getFile($scope.form, file).then(function(file) {
-            $window.open(file.url, '_blank');
-          }).catch(function(response) {
-            // Is alert the best way to do this?
-            // User is expecting an immediate notification due to attempting to download a file.
-            alert(response);
-          });
-        }
-      };
-    }
-  ]);
-};
-
-},{}],64:[function(require,module,exports){
-"use strict";
-module.exports = function(app) {
-  app.config([
-    'FormioPluginsProvider',
-    'FormioStorageUrlProvider',
-    function(
-      FormioPluginsProvider,
-      FormioStorageUrlProvider
-    ) {
-      FormioPluginsProvider.register('storage', 'url', FormioStorageUrlProvider.$get());
-    }
-  ]);
-
-  app.factory('FormioStorageUrl', [
-    '$q',
-    'Upload',
-    function(
-      $q,
-      Upload
-    ) {
-      return {
-        title: 'Url',
-        name: 'url',
-        uploadFile: function(file, fileName, status, $scope) {
-          var defer = $q.defer();
-          Upload.upload({
-            url: $scope.component.url,
-            data: {
-              file: file,
-              name: fileName
-            }
-          })
-            .then(function(resp) {
-              defer.resolve(resp);
-            }, function(resp) {
-              defer.reject(resp.data);
-            }, function(evt) {
-              // Progress notify
-              status.status = 'progress';
-              status.progress = parseInt(100.0 * evt.loaded / evt.total);
-              delete status.message;
-            });
-          return defer.promise;
-        },
-        downloadFile: function() {
-          // Do nothing which will cause a normal link click to occur.
-        }
-      };
-    }]
-  );
-};
-
-},{}],65:[function(require,module,exports){
+},{"./components":24,"./directives/customValidator":40,"./directives/formio":41,"./directives/formioComponent":42,"./directives/formioComponentView":43,"./directives/formioDelete":44,"./directives/formioElement":45,"./directives/formioErrors":46,"./directives/formioSubmission":47,"./directives/formioSubmissions":48,"./directives/formioWizard":49,"./factories/FormioScope":50,"./factories/FormioUtils":51,"./factories/formioInterceptor":52,"./factories/formioTableView":53,"./filters/flattenComponents":54,"./filters/safehtml":55,"./filters/tableComponents":56,"./filters/tableFieldView":57,"./filters/tableView":58,"./filters/translate":59,"./providers/Formio":61}],61:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   // The formio class.
@@ -8184,33 +7886,4 @@ module.exports = function() {
   };
 };
 
-},{"formiojs/src/formio.js":7}],66:[function(require,module,exports){
-"use strict";
-module.exports = function() {
-  var plugins = {};
-
-  return {
-    register: function(type, name, plugin) {
-      if (!plugins[type]) {
-        plugins[type] = {};
-      }
-      plugins[type][name] = plugin;
-    },
-
-    $get: [
-      function() {
-        return function(type, name) {
-          if (type) {
-            if (name) {
-              return plugins[type][name] || false;
-            }
-            return plugins[type] || false;
-          }
-          return plugins;
-        };
-      }
-    ]
-  };
-};
-
-},{}]},{},[60]);
+},{"formiojs/src/formio.js":5}]},{},[60]);
