@@ -1,3 +1,14 @@
-<div ng-controller="formioContainerComponent" class="formio-container-component" ng-if="!component.hide">
-  <formio-component ng-repeat="component in component.components track by $index" component="component" data="data[parentKey]" formio="formio" formio-form="formioForm" read-only="readOnly" grid-row="gridRow" grid-col="gridCol"></formio-component>
+<div ng-controller="formioContainerComponent" class="formio-container-component">
+  <formio-component
+    ng-repeat="_component in component.components track by $index"
+    component="_component"
+    data="data[parentKey]"
+    formio="formio"
+    formio-form="formioForm"
+    read-only="readOnly"
+    grid-row="gridRow"
+    grid-col="gridCol"
+    ng-if="show[component.key || ''] && show[_component.key || '']"
+    show="show"
+  ></formio-component>
 </div>

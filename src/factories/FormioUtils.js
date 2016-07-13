@@ -5,6 +5,7 @@ module.exports = function() {
     flattenComponents: formioUtils.flattenComponents,
     eachComponent: formioUtils.eachComponent,
     getComponent: formioUtils.getComponent,
+    getValue: formioUtils.getValue,
     hideFields: function(form, components) {
       this.eachComponent(form.components, function(component) {
         for (var i in components) {
@@ -33,23 +34,25 @@ module.exports = function() {
       input = input + '<formio-errors></formio-errors>';
       var multiInput = input.replace('data[component.key]', 'data[component.key][$index]');
       var inputLabel = '<label ng-if="component.label && !component.hideLabel" for="{{ component.key }}" class="control-label" ng-class="{\'field-required\': component.validate.required}">{{ component.label | formioTranslate }}</label>';
-      var requiredInline = '<span ng-if="!component.label && component.validate.required" class="glyphicon glyphicon-asterisk form-control-feedback field-required-inline" aria-hidden="true"></span>';
+      var requiredInline = '<span ng-if="(component.hideLabel === true || component.label === \'\' || !component.label) && component.validate.required" class="glyphicon glyphicon-asterisk form-control-feedback field-required-inline" aria-hidden="true"></span>';
       var template =
         '<div ng-if="!component.multiple">' +
-          inputLabel + requiredInline +
+          inputLabel +
           '<div class="input-group">' +
             '<div class="input-group-addon" ng-if="!!component.prefix">{{ component.prefix }}</div>' +
             input +
+            requiredInline +
             '<div class="input-group-addon" ng-if="!!component.suffix">{{ component.suffix }}</div>' +
           '</div>' +
         '</div>' +
         '<div ng-if="component.multiple"><table class="table table-bordered">' +
           inputLabel +
           '<tr ng-repeat="value in data[component.key] track by $index">' +
-            '<td>' + requiredInline +
+            '<td>' +
               '<div class="input-group">' +
                 '<div class="input-group-addon" ng-if="!!component.prefix">{{ component.prefix }}</div>' +
-                multiInput +
+                  multiInput +
+                  requiredInline +
                 '<div class="input-group-addon" ng-if="!!component.suffix">{{ component.suffix }}</div>' +
               '</div>' +
             '</td>' +

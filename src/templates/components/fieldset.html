@@ -1,4 +1,15 @@
-<fieldset id="{{ component.key }}" ng-if="!component.hide">
+<fieldset id="{{ component.key }}">
   <legend ng-if="component.legend">{{ component.legend | formioTranslate }}</legend>
-  <formio-component ng-repeat="component in component.components track by $index" component="component" data="data" formio="formio" read-only="readOnly" formio-form="formioForm" grid-row="gridRow" grid-col="gridCol"></formio-component>
+  <formio-component
+    ng-repeat="_component in component.components track by $index"
+    component="_component"
+    data="data"
+    formio="formio"
+    read-only="readOnly"
+    formio-form="formioForm"
+    grid-row="gridRow"
+    grid-col="gridCol"
+    ng-if="show[component.key || ''] && show[_component.key || '']"
+    show="show"
+  ></formio-component>
 </fieldset>

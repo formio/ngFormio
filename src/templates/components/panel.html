@@ -1,8 +1,19 @@
-<div class="panel panel-{{ component.theme }}" id="{{ component.key }}" ng-if="!component.hide">
+<div class="panel panel-{{ component.theme }}" id="{{ component.key }}">
   <div ng-if="component.title" class="panel-heading">
     <h3 class="panel-title">{{ component.title | formioTranslate }}</h3>
   </div>
   <div class="panel-body">
-    <formio-component ng-repeat="component in component.components track by $index" component="component" data="data" formio="formio" read-only="readOnly" formio-form="formioForm" grid-row="gridRow" grid-col="gridCol"></formio-component>
+    <formio-component
+      ng-repeat="_component in component.components track by $index"
+      component="_component"
+      data="data"
+      formio="formio"
+      read-only="readOnly"
+      formio-form="formioForm"
+      grid-row="gridRow"
+      grid-col="gridCol"
+      ng-if="show[component.key || ''] && show[_component.key || '']"
+      show="show"
+    ></formio-component>
   </div>
 </div>
