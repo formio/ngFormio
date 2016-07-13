@@ -2051,7 +2051,7 @@ return Q;
 });
 
 }).call(this,require('_process'))
-},{"_process":31}],2:[function(require,module,exports){
+},{"_process":36}],2:[function(require,module,exports){
 /*!
  * EventEmitter2
  * https://github.com/hij1nx/EventEmitter2
@@ -3002,6 +3002,7 @@ require('whatwg-fetch');
 var Q = require('Q');
 var EventEmitter = require('eventemitter2').EventEmitter2;
 var copy = require('shallow-copy');
+var providers = require('./providers');
 
 // The default base url.
 var baseUrl = 'https://api.form.io';
@@ -3337,12 +3338,28 @@ Formio.prototype.loadActions = _index('actions');
 Formio.prototype.availableActions = function() { return this.makeRequest('availableActions', this.formUrl + '/actions'); };
 Formio.prototype.actionInfo = function(name) { return this.makeRequest('actionInfo', this.formUrl + '/actions/' + name); };
 
-Formio.prototype.uploadFile = function(storage, file, fileName, progressCallback) {
-  console.log('uploadFile!');
+Formio.prototype.uploadFile = function(storage, file, fileName, dir, progressCallback) {
+  if (providers.storage.hasOwnProperty(storage)) {
+    var provider = new providers.storage[storage](this);
+    return provider.uploadFile(file, fileName, dir, progressCallback);
+  }
+  else {
+    var deferred = Q.defer();
+    deferred.reject('Storage provider not found');
+    return deferred.promise;
+  }
 }
 
 Formio.prototype.downloadFile = function(storage, file) {
-  console.log('downloadFile!');
+  if (providers.storage.hasOwnProperty(storage)) {
+    var provider = new providers.storage[storage](this);
+    return provider.downloadFile(file);
+  }
+  else {
+    var deferred = Q.defer();
+    deferred.reject('Storage provider not found');
+    return deferred.promise;
+  }
 }
 
 Formio.makeStaticRequest = function(url, method, data) {
@@ -3680,7 +3697,234 @@ Formio.deregisterPlugin = function(plugin) {
 
 module.exports = Formio;
 
-},{"Q":1,"eventemitter2":2,"shallow-copy":3,"whatwg-fetch":4}],6:[function(require,module,exports){
+},{"./providers":6,"Q":1,"eventemitter2":2,"shallow-copy":3,"whatwg-fetch":4}],6:[function(require,module,exports){
+module.exports = {
+  storage: require('./storage')
+};
+
+},{"./storage":8}],7:[function(require,module,exports){
+module.exports = function(formio) {
+  var getDropboxToken = function() {
+    var dropboxToken;
+    if ($rootScope.user && $rootScope.user.externalTokens) {
+      angular.forEach($rootScope.user.externalTokens, function(token) {
+        if (token.type === 'dropbox') {
+          dropboxToken = token.token;
+        }
+      });
+    }
+    return dropboxToken;
+    //return _.result(_.find($rootScope.user.externalTokens, {type: 'dropbox'}), 'token');
+  };
+
+  return {
+    title: 'Dropbox',
+    name: 'dropbox',
+    uploadFile: function(file, fileName, status, $scope) {
+      var defer = $q.defer();
+      var dir = $scope.component.dir || '';
+      var dropboxToken = getDropboxToken();
+      if (!dropboxToken) {
+        defer.reject('You must authenticate with dropbox before uploading files.');
+      }
+      else {
+        // Both Upload and $http don't handle files as application/octet-stream which is required by dropbox.
+        var xhr = new XMLHttpRequest();
+
+        var onProgress = function(evt) {
+          status.status = 'progress';
+          status.progress = parseInt(100.0 * evt.loaded / evt.total);
+          delete status.message;
+          $scope.$apply();
+        };
+
+        xhr.upload.onprogress = onProgress;
+
+        xhr.onload = function() {
+          if (xhr.status === 200) {
+            defer.resolve(JSON.parse(xhr.response));
+            $scope.$apply();
+          }
+          else {
+            defer.reject(xhr.response || 'Unable to upload file');
+            $scope.$apply();
+          }
+        };
+
+        xhr.open('POST', 'https://content.dropboxapi.com/2/files/upload');
+        xhr.setRequestHeader('Authorization', 'Bearer ' + dropboxToken);
+        xhr.setRequestHeader('Content-Type', 'application/octet-stream');
+        xhr.setRequestHeader('Dropbox-API-Arg', JSON.stringify({
+          path: '/' + dir + fileName,
+          mode: 'add',
+          autorename: true,
+          mute: false
+        }));
+
+        xhr.send(file);
+      }
+      return defer.promise;
+    },
+    getFile: function(fileUrl, file) {
+      var defer = $q.defer();
+      var dropboxToken = getDropboxToken();
+      if (!dropboxToken) {
+        defer.reject('You must authenticate with dropbox before downloading files.');
+      }
+      else {
+        var xhr = new XMLHttpRequest();
+        xhr.responseType = 'arraybuffer';
+
+        xhr.onload = function() {
+          if (xhr.status === 200) {
+            defer.resolve(xhr.response);
+          }
+          else {
+            defer.reject(xhr.response || 'Unable to download file');
+          }
+        };
+
+        xhr.open('POST', 'https://content.dropboxapi.com/2/files/download');
+        xhr.setRequestHeader('Authorization', 'Bearer ' + dropboxToken);
+        xhr.setRequestHeader('Dropbox-API-Arg', JSON.stringify({
+          path: file.path_lower
+        }));
+        xhr.send();
+      }
+      return defer.promise;
+    },
+    downloadFile: function(evt, file) {
+      var strMimeType = 'application/octet-stream';
+      evt.preventDefault();
+      this.getFile(null, file).then(function(data) {
+        var blob = new Blob([data], {type: strMimeType});
+        FileSaver.saveAs(blob, file.name, true);
+      }).catch(function(err) {
+        alert(err);
+      });
+    }
+  };
+};
+
+
+},{}],8:[function(require,module,exports){
+module.exports = {
+  dropbox: require('./dropbox.js'),
+  s3: require('./s3.js'),
+  url: require('./url.js'),
+};
+
+},{"./dropbox.js":7,"./s3.js":9,"./url.js":10}],9:[function(require,module,exports){
+var Q = require('Q')
+
+module.exports = function(formio) {
+  return {
+    title: 'S3',
+    name: 's3',
+    uploadFile: function(file, fileName, dir, progressCallback) {
+      var defer = Q.defer();
+      // Sign the request
+      formio.makeRequest('s3sign', formio.formUrl + '/storage/s3', 'POST', {
+        name: fileName,
+        size: file.size,
+        type: file.type
+      })
+        .then(function(response) {
+          // Send the file with data.
+          var xhr = new XMLHttpRequest();
+
+          if (typeof progressCallback === 'function') {
+            xhr.upload.onprogress = progressCallback;
+          }
+
+          response.data.fileName = fileName;
+          response.data.key += dir + fileName;
+
+          fd = new FormData();
+          for(var key in response.data) {
+            fd.append(key, response.data[key]);
+          }
+          fd.append('file', file);
+
+          xhr.onload = function() {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              defer.resolve({
+                name: fileName,
+                bucket: response.bucket,
+                key: response.data.key,
+                url: response.url + response.data.key,
+                acl: response.data.acl,
+                size: file.size,
+                type: file.type
+              });
+            }
+            else {
+              defer.reject(xhr.response || 'Unable to upload file');
+            }
+          };
+
+          // Fire on network error.
+          xhr.onerror = function() {
+            defer.reject(xhr);
+          }
+
+          xhr.onabort = function() {
+            defer.reject(xhr);
+          }
+
+          xhr.open('POST', response.url);
+
+          xhr.send(fd);
+        })
+        .catch(function(response) {
+          defer.reject(response);
+        });
+      return defer.promise;
+    },
+    downloadFile: function(file) {
+      if (file.acl !== 'public-read') {
+        return formio.makeRequest('s3file', formio.formUrl + '/storage/s3?bucket=' + file.bucket + '&key=' + file.key, 'GET');
+      }
+      else {
+        return Q.when(file);
+      }
+    }
+  };
+};
+
+},{"Q":1}],10:[function(require,module,exports){
+module.exports = function(formio) {
+  return {
+    title: 'Url',
+    name: 'url',
+    uploadFile: function(file, fileName, status, $scope) {
+      var defer = $q.defer();
+      Upload.upload({
+        url: $scope.component.url,
+        data: {
+          file: file,
+          name: fileName
+        }
+      })
+        .then(function(resp) {
+          defer.resolve(resp);
+        }, function(resp) {
+          defer.reject(resp.data);
+        }, function(evt) {
+          // Progress notify
+          status.status = 'progress';
+          status.progress = parseInt(100.0 * evt.loaded / evt.total);
+          delete status.message;
+        });
+      return defer.promise;
+    },
+    downloadFile: function() {
+      // Do nothing which will cause a normal link click to occur.
+    }
+  };
+};
+
+},{}],11:[function(require,module,exports){
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -4375,7 +4619,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ ])
 });
 ;
-},{}],7:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 (function (global){
 /* angular-moment.js / v1.0.0-beta.6 / (c) 2013, 2014, 2015, 2016 Uri Shaked / MIT Licence */
 
@@ -5114,7 +5358,7 @@ return /******/ (function(modules) { // webpackBootstrap
 })();
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"angular":16,"moment":8}],8:[function(require,module,exports){
+},{"angular":21,"moment":13}],13:[function(require,module,exports){
 //! moment.js
 //! version : 2.13.0
 //! authors : Tim Wood, Iskren Chernev, Moment.js contributors
@@ -9155,7 +9399,7 @@ return /******/ (function(modules) { // webpackBootstrap
     return _moment;
 
 }));
-},{}],9:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 /**
  * @license AngularJS v1.5.6
  * (c) 2010-2016 Google, Inc. http://angularjs.org
@@ -9874,11 +10118,11 @@ angular.module('ngSanitize').filter('linky', ['$sanitize', function($sanitize) {
 
 })(window, window.angular);
 
-},{}],10:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 require('./angular-sanitize');
 module.exports = 'ngSanitize';
 
-},{"./angular-sanitize":9}],11:[function(require,module,exports){
+},{"./angular-sanitize":14}],16:[function(require,module,exports){
 /*
  * angular-ui-bootstrap
  * http://angular-ui.github.io/bootstrap/
@@ -17226,12 +17470,12 @@ angular.module('ui.bootstrap.datepickerPopup').run(function() {!angular.$$csp().
 angular.module('ui.bootstrap.tooltip').run(function() {!angular.$$csp().noInlineStyle && !angular.$$uibTooltipCss && angular.element(document).find('head').prepend('<style type="text/css">[uib-tooltip-popup].tooltip.top-left > .tooltip-arrow,[uib-tooltip-popup].tooltip.top-right > .tooltip-arrow,[uib-tooltip-popup].tooltip.bottom-left > .tooltip-arrow,[uib-tooltip-popup].tooltip.bottom-right > .tooltip-arrow,[uib-tooltip-popup].tooltip.left-top > .tooltip-arrow,[uib-tooltip-popup].tooltip.left-bottom > .tooltip-arrow,[uib-tooltip-popup].tooltip.right-top > .tooltip-arrow,[uib-tooltip-popup].tooltip.right-bottom > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.top-left > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.top-right > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.bottom-left > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.bottom-right > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.left-top > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.left-bottom > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.right-top > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.right-bottom > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.top-left > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.top-right > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.bottom-left > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.bottom-right > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.left-top > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.left-bottom > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.right-top > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.right-bottom > .tooltip-arrow,[uib-popover-popup].popover.top-left > .arrow,[uib-popover-popup].popover.top-right > .arrow,[uib-popover-popup].popover.bottom-left > .arrow,[uib-popover-popup].popover.bottom-right > .arrow,[uib-popover-popup].popover.left-top > .arrow,[uib-popover-popup].popover.left-bottom > .arrow,[uib-popover-popup].popover.right-top > .arrow,[uib-popover-popup].popover.right-bottom > .arrow,[uib-popover-html-popup].popover.top-left > .arrow,[uib-popover-html-popup].popover.top-right > .arrow,[uib-popover-html-popup].popover.bottom-left > .arrow,[uib-popover-html-popup].popover.bottom-right > .arrow,[uib-popover-html-popup].popover.left-top > .arrow,[uib-popover-html-popup].popover.left-bottom > .arrow,[uib-popover-html-popup].popover.right-top > .arrow,[uib-popover-html-popup].popover.right-bottom > .arrow,[uib-popover-template-popup].popover.top-left > .arrow,[uib-popover-template-popup].popover.top-right > .arrow,[uib-popover-template-popup].popover.bottom-left > .arrow,[uib-popover-template-popup].popover.bottom-right > .arrow,[uib-popover-template-popup].popover.left-top > .arrow,[uib-popover-template-popup].popover.left-bottom > .arrow,[uib-popover-template-popup].popover.right-top > .arrow,[uib-popover-template-popup].popover.right-bottom > .arrow{top:auto;bottom:auto;left:auto;right:auto;margin:0;}[uib-popover-popup].popover,[uib-popover-html-popup].popover,[uib-popover-template-popup].popover{display:block !important;}</style>'); angular.$$uibTooltipCss = true; });
 angular.module('ui.bootstrap.timepicker').run(function() {!angular.$$csp().noInlineStyle && !angular.$$uibTimepickerCss && angular.element(document).find('head').prepend('<style type="text/css">.uib-time input{width:50px;}</style>'); angular.$$uibTimepickerCss = true; });
 angular.module('ui.bootstrap.typeahead').run(function() {!angular.$$csp().noInlineStyle && !angular.$$uibTypeaheadCss && angular.element(document).find('head').prepend('<style type="text/css">[uib-typeahead-popup].dropdown-menu{display:block;}</style>'); angular.$$uibTypeaheadCss = true; });
-},{}],12:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 require('./dist/ui-bootstrap-tpls');
 
 module.exports = 'ui.bootstrap';
 
-},{"./dist/ui-bootstrap-tpls":11}],13:[function(require,module,exports){
+},{"./dist/ui-bootstrap-tpls":16}],18:[function(require,module,exports){
 /*!
  * angular-ui-mask
  * https://github.com/angular-ui/ui-mask
@@ -17984,7 +18228,7 @@ angular.module('ui.mask', [])
         ]);
 
 }());
-},{}],14:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 //https://github.com/angular/angular.js/pull/10732
 
 var angular = require('angular');
@@ -17992,7 +18236,7 @@ var mask = require('./dist/mask');
 
 module.exports = 'ui.mask';
 
-},{"./dist/mask":13,"angular":16}],15:[function(require,module,exports){
+},{"./dist/mask":18,"angular":21}],20:[function(require,module,exports){
 /**
  * @license AngularJS v1.5.6
  * (c) 2010-2016 Google, Inc. http://angularjs.org
@@ -49016,11 +49260,11 @@ $provide.value("$locale", {
 })(window);
 
 !window.angular.$$csp().noInlineStyle && window.angular.element(document.head).prepend('<style type="text/css">@charset "UTF-8";[ng\\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide:not(.ng-hide-animate){display:none !important;}ng\\:form{display:block;}.ng-animate-shim{visibility:hidden;}.ng-anchor{position:absolute;}</style>');
-},{}],16:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 require('./angular');
 module.exports = angular;
 
-},{"./angular":15}],17:[function(require,module,exports){
+},{"./angular":20}],22:[function(require,module,exports){
 // https://github.com/Gillardo/bootstrap-ui-datetime-picker
 // Version: 2.4.0
 // Released: 2016-06-03 
@@ -49661,7 +49905,7 @@ angular.module('ui.bootstrap.datetimepicker').run(['$templateCache', function($t
 
 }]);
 
-},{}],18:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 // This file is autogenerated via the `commonjs` Grunt task. You can require() this file in a CommonJS environment.
 require('../../js/transition.js')
 require('../../js/alert.js')
@@ -49675,7 +49919,7 @@ require('../../js/popover.js')
 require('../../js/scrollspy.js')
 require('../../js/tab.js')
 require('../../js/affix.js')
-},{"../../js/affix.js":19,"../../js/alert.js":20,"../../js/button.js":21,"../../js/carousel.js":22,"../../js/collapse.js":23,"../../js/dropdown.js":24,"../../js/modal.js":25,"../../js/popover.js":26,"../../js/scrollspy.js":27,"../../js/tab.js":28,"../../js/tooltip.js":29,"../../js/transition.js":30}],19:[function(require,module,exports){
+},{"../../js/affix.js":24,"../../js/alert.js":25,"../../js/button.js":26,"../../js/carousel.js":27,"../../js/collapse.js":28,"../../js/dropdown.js":29,"../../js/modal.js":30,"../../js/popover.js":31,"../../js/scrollspy.js":32,"../../js/tab.js":33,"../../js/tooltip.js":34,"../../js/transition.js":35}],24:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: affix.js v3.3.6
  * http://getbootstrap.com/javascript/#affix
@@ -49839,7 +50083,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],20:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: alert.js v3.3.6
  * http://getbootstrap.com/javascript/#alerts
@@ -49935,7 +50179,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],21:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: button.js v3.3.6
  * http://getbootstrap.com/javascript/#buttons
@@ -50057,7 +50301,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],22:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: carousel.js v3.3.6
  * http://getbootstrap.com/javascript/#carousel
@@ -50296,7 +50540,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],23:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: collapse.js v3.3.6
  * http://getbootstrap.com/javascript/#collapse
@@ -50509,7 +50753,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],24:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: dropdown.js v3.3.6
  * http://getbootstrap.com/javascript/#dropdowns
@@ -50676,7 +50920,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],25:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: modal.js v3.3.6
  * http://getbootstrap.com/javascript/#modals
@@ -51015,7 +51259,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],26:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: popover.js v3.3.6
  * http://getbootstrap.com/javascript/#popovers
@@ -51125,7 +51369,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],27:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: scrollspy.js v3.3.6
  * http://getbootstrap.com/javascript/#scrollspy
@@ -51299,7 +51543,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],28:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: tab.js v3.3.6
  * http://getbootstrap.com/javascript/#tabs
@@ -51456,7 +51700,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],29:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: tooltip.js v3.3.6
  * http://getbootstrap.com/javascript/#tooltip
@@ -51972,7 +52216,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],30:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: transition.js v3.3.6
  * http://getbootstrap.com/javascript/#transitions
@@ -52033,7 +52277,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],31:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -52154,7 +52398,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],32:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 module.exports = {
   isLayoutComponent: function isLayoutComponent(component) {
     return (
@@ -52241,7 +52485,7 @@ module.exports = {
   }
 };
 
-},{}],33:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v2.2.4
  * http://jquery.com/
@@ -62057,7 +62301,7 @@ if ( !noGlobal ) {
 return jQuery;
 }));
 
-},{}],34:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 /**!
  * AngularJS file upload directives and services. Supoorts: file upload/drop/paste, resume, cancel/abort,
  * progress, resize, thumbnail, preview, validation and CORS
@@ -64860,10 +65104,10 @@ ngFileUpload.service('UploadExif', ['UploadResize', '$q', function (UploadResize
 }]);
 
 
-},{}],35:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 require('./dist/ng-file-upload-all');
 module.exports = 'ngFileUpload';
-},{"./dist/ng-file-upload-all":34}],36:[function(require,module,exports){
+},{"./dist/ng-file-upload-all":39}],41:[function(require,module,exports){
 (function (root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module unless amdModuleId is set
@@ -65254,7 +65498,7 @@ return SignaturePad;
 
 }));
 
-},{}],37:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 /*!
  * ui-select
  * http://github.com/angular-ui/ui-select
@@ -67344,7 +67588,7 @@ $templateCache.put("select2/select.tpl.html","<div class=\"ui-select-container s
 $templateCache.put("selectize/choices.tpl.html","<div ng-show=\"$select.open\" class=\"ui-select-choices ui-select-dropdown selectize-dropdown single\"><div class=\"ui-select-choices-content selectize-dropdown-content\"><div class=\"ui-select-choices-group optgroup\" role=\"listbox\"><div ng-show=\"$select.isGrouped\" class=\"ui-select-choices-group-label optgroup-header\" ng-bind=\"$group.name\"></div><div role=\"option\" class=\"ui-select-choices-row\" ng-class=\"{active: $select.isActive(this), disabled: $select.isDisabled(this)}\"><div class=\"option ui-select-choices-row-inner\" data-selectable=\"\"></div></div></div></div></div>");
 $templateCache.put("selectize/match.tpl.html","<div ng-hide=\"($select.open || $select.isEmpty())\" class=\"ui-select-match\" ng-transclude=\"\"></div>");
 $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container selectize-control single\" ng-class=\"{\'open\': $select.open}\"><div class=\"selectize-input\" ng-class=\"{\'focus\': $select.open, \'disabled\': $select.disabled, \'selectize-focus\' : $select.focus}\" ng-click=\"$select.open && !$select.searchEnabled ? $select.toggle($event) : $select.activate()\"><div class=\"ui-select-match\"></div><input type=\"text\" autocomplete=\"off\" tabindex=\"-1\" class=\"ui-select-search ui-select-toggle\" ng-click=\"$select.toggle($event)\" placeholder=\"{{$select.placeholder}}\" ng-model=\"$select.search\" ng-hide=\"!$select.searchEnabled || ($select.selected && !$select.open)\" ng-disabled=\"$select.disabled\" aria-label=\"{{ $select.baseTitle }}\"></div><div class=\"ui-select-choices\"></div></div>");}]);
-},{}],38:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -67414,7 +67658,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],39:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -67575,7 +67819,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],40:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -67626,7 +67870,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],41:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -67659,7 +67903,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],42:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 "use strict";
 module.exports = function(app) {
   app.provider('formioComponents', function() {
@@ -67719,7 +67963,7 @@ module.exports = function(app) {
   }]);
 };
 
-},{}],43:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -67762,7 +68006,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],44:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -67790,7 +68034,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],45:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 "use strict";
 
 
@@ -67898,7 +68142,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],46:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -67923,7 +68167,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],47:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -68014,7 +68258,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],48:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -68101,7 +68345,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],49:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -68130,7 +68374,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],50:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -68165,7 +68409,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],51:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -68228,16 +68472,22 @@ module.exports = function(app) {
       template: '<a href="{{ file.url }}" ng-click="getFile($event)" target="_blank">{{ file.name }}</a>',
       controller: [
         '$window',
+        '$rootScope',
         '$scope',
+        'Formio',
         function(
           $window,
-          $scope
+          $rootScope,
+          $scope,
+          Formio
         ) {
           $scope.getFile = function(evt) {
-            $scope.formio
-              .downloadFile($scope.component.storage, $scope.file).then(function(file) {
+            evt.preventDefault();
+            $scope.form = $scope.form || $rootScope.filePath;
+            var formio = new Formio($scope.form);
+            formio
+              .downloadFile($scope.file.storage, $scope.file).then(function(file) {
                 if (file) {
-                  evt.preventDefault();
                   $window.open(file.url, '_blank');
                 }
               })
@@ -68262,11 +68512,18 @@ module.exports = function(app) {
       },
       template: '<img ng-src="{{ imageSrc }}" alt="{{ file.name }}" />',
       controller: [
+        '$rootScope',
         '$scope',
+        'Formio',
         function(
-          $scope
+          $rootScope,
+          $scope,
+          Formio
         ) {
-          $scope.formio.downloadFile($scope.component.storage, $scope.file)
+          $scope.form = $scope.form || $rootScope.filePath;
+          var formio = new Formio($scope.form);
+
+          formio.downloadFile($scope.file.storage, $scope.file)
             .then(function(result) {
               $scope.imageSrc = result.url;
               $scope.$apply();
@@ -68308,10 +68565,12 @@ module.exports = function(app) {
               status: 'info',
               message: 'Starting upload'
             };
-            $scope.formio.uploadFile($scope.component.storage, file, fileName, function processNotify(evt) {
+            var dir = $scope.component.dir || '';
+            $scope.formio.uploadFile($scope.component.storage, file, fileName, dir, function processNotify(evt) {
               $scope.fileUploads[fileName].status = 'progress';
               $scope.fileUploads[fileName].progress = parseInt(100.0 * evt.loaded / evt.total);
               delete $scope.fileUploads[fileName].message;
+              $scope.$apply();
             })
               .then(function(fileInfo) {
                 delete $scope.fileUploads[fileName];
@@ -68324,11 +68583,18 @@ module.exports = function(app) {
                   $scope.data[$scope.component.key] = [];
                 }
                 $scope.data[$scope.component.key].push(fileInfo);
+                $scope.$apply();
               })
-              .catch(function(message) {
+              .catch(function(response) {
+                // Handle error
+                var oParser = new DOMParser();
+                var oDOM = oParser.parseFromString(response.data, 'text/xml');
+                var message = oDOM.getElementsByTagName('Message')[0].innerHTML;
+
                 $scope.fileUploads[fileName].status = 'error';
                 $scope.fileUploads[fileName].message = message;
                 delete $scope.fileUploads[fileName].progress;
+                $scope.$apply();
               });
           });
         }
@@ -68355,7 +68621,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],52:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -68388,7 +68654,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],53:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 "use strict";
 
 
@@ -68467,7 +68733,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],54:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 "use strict";
 var app = angular.module('formio');
 
@@ -68508,7 +68774,7 @@ require('./panel')(app);
 require('./table')(app);
 require('./well')(app);
 
-},{"./address":38,"./button":39,"./checkbox":40,"./columns":41,"./components":42,"./container":43,"./content":44,"./currency":45,"./custom":46,"./datagrid":47,"./datetime":48,"./email":49,"./fieldset":50,"./file":51,"./hidden":52,"./htmlelement":53,"./number":55,"./page":56,"./panel":57,"./password":58,"./phonenumber":59,"./radio":60,"./resource":61,"./select":62,"./selectboxes":63,"./signature":64,"./survey":65,"./table":66,"./textarea":67,"./textfield":68,"./well":69}],55:[function(require,module,exports){
+},{"./address":43,"./button":44,"./checkbox":45,"./columns":46,"./components":47,"./container":48,"./content":49,"./currency":50,"./custom":51,"./datagrid":52,"./datetime":53,"./email":54,"./fieldset":55,"./file":56,"./hidden":57,"./htmlelement":58,"./number":60,"./page":61,"./panel":62,"./password":63,"./phonenumber":64,"./radio":65,"./resource":66,"./select":67,"./selectboxes":68,"./signature":69,"./survey":70,"./table":71,"./textarea":72,"./textfield":73,"./well":74}],60:[function(require,module,exports){
 "use strict";
 
 
@@ -68565,7 +68831,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],56:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -68591,7 +68857,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],57:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -68626,7 +68892,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],58:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -68655,7 +68921,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],59:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -68688,7 +68954,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],60:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 "use strict";
 
 
@@ -68729,7 +68995,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],61:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -68854,7 +69120,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],62:[function(require,module,exports){
+},{}],67:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -69193,7 +69459,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],63:[function(require,module,exports){
+},{}],68:[function(require,module,exports){
 "use strict";
 
 
@@ -69296,7 +69562,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],64:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 (function (SignaturePad){
 "use strict";
 
@@ -69437,7 +69703,7 @@ module.exports = function(app) {
 };
 
 }).call(this,require("signature_pad"))
-},{"signature_pad":36}],65:[function(require,module,exports){
+},{"signature_pad":41}],70:[function(require,module,exports){
 "use strict";
 
 
@@ -69494,7 +69760,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],66:[function(require,module,exports){
+},{}],71:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -69538,7 +69804,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],67:[function(require,module,exports){
+},{}],72:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -69593,7 +69859,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],68:[function(require,module,exports){
+},{}],73:[function(require,module,exports){
 "use strict";
 
 
@@ -69652,7 +69918,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],69:[function(require,module,exports){
+},{}],74:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -69684,7 +69950,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],70:[function(require,module,exports){
+},{}],75:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -69721,7 +69987,7 @@ module.exports = function() {
   };
 };
 
-},{}],71:[function(require,module,exports){
+},{}],76:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -70041,7 +70307,7 @@ module.exports = function() {
   };
 };
 
-},{}],72:[function(require,module,exports){
+},{}],77:[function(require,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -70204,7 +70470,7 @@ module.exports = [
   }
 ];
 
-},{}],73:[function(require,module,exports){
+},{}],78:[function(require,module,exports){
 "use strict";
 module.exports = [
   'formioComponents',
@@ -70249,7 +70515,7 @@ module.exports = [
   }
 ];
 
-},{}],74:[function(require,module,exports){
+},{}],79:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -70332,7 +70598,7 @@ module.exports = function() {
   };
 };
 
-},{}],75:[function(require,module,exports){
+},{}],80:[function(require,module,exports){
 "use strict";
 module.exports = [
   '$compile',
@@ -70351,7 +70617,7 @@ module.exports = [
   }
 ];
 
-},{}],76:[function(require,module,exports){
+},{}],81:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -70361,7 +70627,7 @@ module.exports = function() {
   };
 };
 
-},{}],77:[function(require,module,exports){
+},{}],82:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -70376,7 +70642,7 @@ module.exports = function() {
   };
 };
 
-},{}],78:[function(require,module,exports){
+},{}],83:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -70431,7 +70697,7 @@ module.exports = function() {
   };
 };
 
-},{}],79:[function(require,module,exports){
+},{}],84:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -70736,7 +71002,7 @@ module.exports = function() {
   };
 };
 
-},{}],80:[function(require,module,exports){
+},{}],85:[function(require,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -70906,7 +71172,7 @@ module.exports = [
   }
 ];
 
-},{}],81:[function(require,module,exports){
+},{}],86:[function(require,module,exports){
 "use strict";
 var formioUtils = require('formio-utils');
 
@@ -70974,7 +71240,7 @@ module.exports = function() {
   };
 };
 
-},{"formio-utils":32}],82:[function(require,module,exports){
+},{"formio-utils":37}],87:[function(require,module,exports){
 "use strict";
 module.exports = [
   '$q',
@@ -71023,7 +71289,7 @@ module.exports = [
   }
 ];
 
-},{}],83:[function(require,module,exports){
+},{}],88:[function(require,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -71057,7 +71323,7 @@ module.exports = [
   }
 ];
 
-},{}],84:[function(require,module,exports){
+},{}],89:[function(require,module,exports){
 "use strict";
 module.exports = [
   'FormioUtils',
@@ -71066,7 +71332,7 @@ module.exports = [
   }
 ];
 
-},{}],85:[function(require,module,exports){
+},{}],90:[function(require,module,exports){
 "use strict";
 module.exports = [
   '$sce',
@@ -71079,7 +71345,7 @@ module.exports = [
   }
 ];
 
-},{}],86:[function(require,module,exports){
+},{}],91:[function(require,module,exports){
 "use strict";
 module.exports = [
   function() {
@@ -71098,7 +71364,7 @@ module.exports = [
   }
 ];
 
-},{}],87:[function(require,module,exports){
+},{}],92:[function(require,module,exports){
 "use strict";
 module.exports = [
   'formioTableView',
@@ -71111,7 +71377,7 @@ module.exports = [
   }
 ];
 
-},{}],88:[function(require,module,exports){
+},{}],93:[function(require,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -71126,7 +71392,7 @@ module.exports = [
   }
 ];
 
-},{}],89:[function(require,module,exports){
+},{}],94:[function(require,module,exports){
 "use strict";
 module.exports = [
   '$filter',
@@ -71155,7 +71421,7 @@ module.exports = [
   }
 ];
 
-},{}],90:[function(require,module,exports){
+},{}],95:[function(require,module,exports){
 (function (global){
 "use strict";
 global.jQuery = require('jquery');
@@ -71173,7 +71439,7 @@ require('bootstrap-ui-datetime-picker/dist/datetime-picker');
 require('./formio');
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./formio":91,"angular":16,"angular-file-saver":6,"angular-moment":7,"angular-sanitize":10,"angular-ui-bootstrap":12,"angular-ui-mask":14,"bootstrap":18,"bootstrap-ui-datetime-picker/dist/datetime-picker":17,"jquery":33,"ng-file-upload":35,"signature_pad":36,"ui-select/dist/select":37}],91:[function(require,module,exports){
+},{"./formio":96,"angular":21,"angular-file-saver":11,"angular-moment":12,"angular-sanitize":15,"angular-ui-bootstrap":17,"angular-ui-mask":19,"bootstrap":23,"bootstrap-ui-datetime-picker/dist/datetime-picker":22,"jquery":38,"ng-file-upload":40,"signature_pad":41,"ui-select/dist/select":42}],96:[function(require,module,exports){
 "use strict";
 
 
@@ -71295,7 +71561,7 @@ app.run([
 
 require('./components');
 
-},{"./components":54,"./directives/customValidator":70,"./directives/formio":71,"./directives/formioComponent":72,"./directives/formioComponentView":73,"./directives/formioDelete":74,"./directives/formioElement":75,"./directives/formioErrors":76,"./directives/formioSubmission":77,"./directives/formioSubmissions":78,"./directives/formioWizard":79,"./factories/FormioScope":80,"./factories/FormioUtils":81,"./factories/formioInterceptor":82,"./factories/formioTableView":83,"./filters/flattenComponents":84,"./filters/safehtml":85,"./filters/tableComponents":86,"./filters/tableFieldView":87,"./filters/tableView":88,"./filters/translate":89,"./providers/Formio":92}],92:[function(require,module,exports){
+},{"./components":59,"./directives/customValidator":75,"./directives/formio":76,"./directives/formioComponent":77,"./directives/formioComponentView":78,"./directives/formioDelete":79,"./directives/formioElement":80,"./directives/formioErrors":81,"./directives/formioSubmission":82,"./directives/formioSubmissions":83,"./directives/formioWizard":84,"./factories/FormioScope":85,"./factories/FormioUtils":86,"./factories/formioInterceptor":87,"./factories/formioTableView":88,"./filters/flattenComponents":89,"./filters/safehtml":90,"./filters/tableComponents":91,"./filters/tableFieldView":92,"./filters/tableView":93,"./filters/translate":94,"./providers/Formio":97}],97:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   // The formio class.
@@ -71362,4 +71628,4 @@ module.exports = function() {
   };
 };
 
-},{"formiojs/src/formio.js":5}]},{},[90]);
+},{"formiojs/src/formio.js":5}]},{},[95]);

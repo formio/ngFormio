@@ -59,16 +59,22 @@ module.exports = function(app) {
       template: '<a href="{{ file.url }}" ng-click="getFile($event)" target="_blank">{{ file.name }}</a>',
       controller: [
         '$window',
+        '$rootScope',
         '$scope',
+        'Formio',
         function(
           $window,
-          $scope
+          $rootScope,
+          $scope,
+          Formio
         ) {
           $scope.getFile = function(evt) {
-            $scope.formio
-              .downloadFile($scope.component.storage, $scope.file).then(function(file) {
+            evt.preventDefault();
+            $scope.form = $scope.form || $rootScope.filePath;
+            var formio = new Formio($scope.form);
+            formio
+              .downloadFile($scope.file.storage, $scope.file).then(function(file) {
                 if (file) {
-                  evt.preventDefault();
                   $window.open(file.url, '_blank');
                 }
               })
@@ -93,11 +99,18 @@ module.exports = function(app) {
       },
       template: '<img ng-src="{{ imageSrc }}" alt="{{ file.name }}" />',
       controller: [
+        '$rootScope',
         '$scope',
+        'Formio',
         function(
-          $scope
+          $rootScope,
+          $scope,
+          Formio
         ) {
-          $scope.formio.downloadFile($scope.component.storage, $scope.file)
+          $scope.form = $scope.form || $rootScope.filePath;
+          var formio = new Formio($scope.form);
+
+          formio.downloadFile($scope.file.storage, $scope.file)
             .then(function(result) {
               $scope.imageSrc = result.url;
               $scope.$apply();
@@ -139,10 +152,12 @@ module.exports = function(app) {
               status: 'info',
               message: 'Starting upload'
             };
-            $scope.formio.uploadFile($scope.component.storage, file, fileName, function processNotify(evt) {
+            var dir = $scope.component.dir || '';
+            $scope.formio.uploadFile($scope.component.storage, file, fileName, dir, function processNotify(evt) {
               $scope.fileUploads[fileName].status = 'progress';
               $scope.fileUploads[fileName].progress = parseInt(100.0 * evt.loaded / evt.total);
               delete $scope.fileUploads[fileName].message;
+              $scope.$apply();
             })
               .then(function(fileInfo) {
                 delete $scope.fileUploads[fileName];
@@ -155,11 +170,18 @@ module.exports = function(app) {
                   $scope.data[$scope.component.key] = [];
                 }
                 $scope.data[$scope.component.key].push(fileInfo);
+                $scope.$apply();
               })
-              .catch(function(message) {
+              .catch(function(response) {
+                // Handle error
+                var oParser = new DOMParser();
+                var oDOM = oParser.parseFromString(response.data, 'text/xml');
+                var message = oDOM.getElementsByTagName('Message')[0].innerHTML;
+
                 $scope.fileUploads[fileName].status = 'error';
                 $scope.fileUploads[fileName].message = message;
                 delete $scope.fileUploads[fileName].progress;
+                $scope.$apply();
               });
           });
         }
