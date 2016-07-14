@@ -73,7 +73,7 @@ module.exports = function(app) {
             $scope.form = $scope.form || $rootScope.filePath;
             var formio = new Formio($scope.form);
             formio
-              .downloadFile($scope.file.storage, $scope.file).then(function(file) {
+              .downloadFile($scope.file).then(function(file) {
                 if (file) {
                   $window.open(file.url, '_blank');
                 }
@@ -110,7 +110,7 @@ module.exports = function(app) {
           $scope.form = $scope.form || $rootScope.filePath;
           var formio = new Formio($scope.form);
 
-          formio.downloadFile($scope.file.storage, $scope.file)
+          formio.downloadFile($scope.file)
             .then(function(result) {
               $scope.imageSrc = result.url;
               $scope.$apply();
@@ -161,7 +161,6 @@ module.exports = function(app) {
             })
               .then(function(fileInfo) {
                 delete $scope.fileUploads[fileName];
-                fileInfo.storage = $scope.component.storage;
                 // Ensure that the file component is an array.
                 if (
                   !$scope.data[$scope.component.key] ||
