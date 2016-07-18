@@ -190,7 +190,7 @@ module.exports = function() {
             }
 
             // Set required if specified
-            if ($scope.requireComponents && component.hasOwnProperty('validate')) {
+            if ($scope.requireComponents && component.hasOwnProperty('validate') && $scope.requireComponents.indexOf(component.key) !== -1) {
               component.validate.required = $scope.requireComponents.indexOf(component.key) !== -1;
             }
 

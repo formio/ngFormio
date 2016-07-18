@@ -2051,7 +2051,1831 @@ return Q;
 });
 
 }).call(this,require('_process'))
-},{"_process":26}],2:[function(require,module,exports){
+},{"_process":34}],2:[function(require,module,exports){
+/*!
+ * EventEmitter2
+ * https://github.com/hij1nx/EventEmitter2
+ *
+ * Copyright (c) 2013 hij1nx
+ * Licensed under the MIT license.
+ */
+;!function(undefined) {
+
+  var isArray = Array.isArray ? Array.isArray : function _isArray(obj) {
+    return Object.prototype.toString.call(obj) === "[object Array]";
+  };
+  var defaultMaxListeners = 10;
+
+  function init() {
+    this._events = {};
+    if (this._conf) {
+      configure.call(this, this._conf);
+    }
+  }
+
+  function configure(conf) {
+    if (conf) {
+
+      this._conf = conf;
+
+      conf.delimiter && (this.delimiter = conf.delimiter);
+      conf.maxListeners && (this._events.maxListeners = conf.maxListeners);
+      conf.wildcard && (this.wildcard = conf.wildcard);
+      conf.newListener && (this.newListener = conf.newListener);
+
+      if (this.wildcard) {
+        this.listenerTree = {};
+      }
+    }
+  }
+
+  function EventEmitter(conf) {
+    this._events = {};
+    this.newListener = false;
+    configure.call(this, conf);
+  }
+
+  //
+  // Attention, function return type now is array, always !
+  // It has zero elements if no any matches found and one or more
+  // elements (leafs) if there are matches
+  //
+  function searchListenerTree(handlers, type, tree, i) {
+    if (!tree) {
+      return [];
+    }
+    var listeners=[], leaf, len, branch, xTree, xxTree, isolatedBranch, endReached,
+        typeLength = type.length, currentType = type[i], nextType = type[i+1];
+    if (i === typeLength && tree._listeners) {
+      //
+      // If at the end of the event(s) list and the tree has listeners
+      // invoke those listeners.
+      //
+      if (typeof tree._listeners === 'function') {
+        handlers && handlers.push(tree._listeners);
+        return [tree];
+      } else {
+        for (leaf = 0, len = tree._listeners.length; leaf < len; leaf++) {
+          handlers && handlers.push(tree._listeners[leaf]);
+        }
+        return [tree];
+      }
+    }
+
+    if ((currentType === '*' || currentType === '**') || tree[currentType]) {
+      //
+      // If the event emitted is '*' at this part
+      // or there is a concrete match at this patch
+      //
+      if (currentType === '*') {
+        for (branch in tree) {
+          if (branch !== '_listeners' && tree.hasOwnProperty(branch)) {
+            listeners = listeners.concat(searchListenerTree(handlers, type, tree[branch], i+1));
+          }
+        }
+        return listeners;
+      } else if(currentType === '**') {
+        endReached = (i+1 === typeLength || (i+2 === typeLength && nextType === '*'));
+        if(endReached && tree._listeners) {
+          // The next element has a _listeners, add it to the handlers.
+          listeners = listeners.concat(searchListenerTree(handlers, type, tree, typeLength));
+        }
+
+        for (branch in tree) {
+          if (branch !== '_listeners' && tree.hasOwnProperty(branch)) {
+            if(branch === '*' || branch === '**') {
+              if(tree[branch]._listeners && !endReached) {
+                listeners = listeners.concat(searchListenerTree(handlers, type, tree[branch], typeLength));
+              }
+              listeners = listeners.concat(searchListenerTree(handlers, type, tree[branch], i));
+            } else if(branch === nextType) {
+              listeners = listeners.concat(searchListenerTree(handlers, type, tree[branch], i+2));
+            } else {
+              // No match on this one, shift into the tree but not in the type array.
+              listeners = listeners.concat(searchListenerTree(handlers, type, tree[branch], i));
+            }
+          }
+        }
+        return listeners;
+      }
+
+      listeners = listeners.concat(searchListenerTree(handlers, type, tree[currentType], i+1));
+    }
+
+    xTree = tree['*'];
+    if (xTree) {
+      //
+      // If the listener tree will allow any match for this part,
+      // then recursively explore all branches of the tree
+      //
+      searchListenerTree(handlers, type, xTree, i+1);
+    }
+
+    xxTree = tree['**'];
+    if(xxTree) {
+      if(i < typeLength) {
+        if(xxTree._listeners) {
+          // If we have a listener on a '**', it will catch all, so add its handler.
+          searchListenerTree(handlers, type, xxTree, typeLength);
+        }
+
+        // Build arrays of matching next branches and others.
+        for(branch in xxTree) {
+          if(branch !== '_listeners' && xxTree.hasOwnProperty(branch)) {
+            if(branch === nextType) {
+              // We know the next element will match, so jump twice.
+              searchListenerTree(handlers, type, xxTree[branch], i+2);
+            } else if(branch === currentType) {
+              // Current node matches, move into the tree.
+              searchListenerTree(handlers, type, xxTree[branch], i+1);
+            } else {
+              isolatedBranch = {};
+              isolatedBranch[branch] = xxTree[branch];
+              searchListenerTree(handlers, type, { '**': isolatedBranch }, i+1);
+            }
+          }
+        }
+      } else if(xxTree._listeners) {
+        // We have reached the end and still on a '**'
+        searchListenerTree(handlers, type, xxTree, typeLength);
+      } else if(xxTree['*'] && xxTree['*']._listeners) {
+        searchListenerTree(handlers, type, xxTree['*'], typeLength);
+      }
+    }
+
+    return listeners;
+  }
+
+  function growListenerTree(type, listener) {
+
+    type = typeof type === 'string' ? type.split(this.delimiter) : type.slice();
+
+    //
+    // Looks for two consecutive '**', if so, don't add the event at all.
+    //
+    for(var i = 0, len = type.length; i+1 < len; i++) {
+      if(type[i] === '**' && type[i+1] === '**') {
+        return;
+      }
+    }
+
+    var tree = this.listenerTree;
+    var name = type.shift();
+
+    while (name) {
+
+      if (!tree[name]) {
+        tree[name] = {};
+      }
+
+      tree = tree[name];
+
+      if (type.length === 0) {
+
+        if (!tree._listeners) {
+          tree._listeners = listener;
+        }
+        else if(typeof tree._listeners === 'function') {
+          tree._listeners = [tree._listeners, listener];
+        }
+        else if (isArray(tree._listeners)) {
+
+          tree._listeners.push(listener);
+
+          if (!tree._listeners.warned) {
+
+            var m = defaultMaxListeners;
+
+            if (typeof this._events.maxListeners !== 'undefined') {
+              m = this._events.maxListeners;
+            }
+
+            if (m > 0 && tree._listeners.length > m) {
+
+              tree._listeners.warned = true;
+              console.error('(node) warning: possible EventEmitter memory ' +
+                            'leak detected. %d listeners added. ' +
+                            'Use emitter.setMaxListeners() to increase limit.',
+                            tree._listeners.length);
+              console.trace();
+            }
+          }
+        }
+        return true;
+      }
+      name = type.shift();
+    }
+    return true;
+  }
+
+  // By default EventEmitters will print a warning if more than
+  // 10 listeners are added to it. This is a useful default which
+  // helps finding memory leaks.
+  //
+  // Obviously not all Emitters should be limited to 10. This function allows
+  // that to be increased. Set to zero for unlimited.
+
+  EventEmitter.prototype.delimiter = '.';
+
+  EventEmitter.prototype.setMaxListeners = function(n) {
+    this._events || init.call(this);
+    this._events.maxListeners = n;
+    if (!this._conf) this._conf = {};
+    this._conf.maxListeners = n;
+  };
+
+  EventEmitter.prototype.event = '';
+
+  EventEmitter.prototype.once = function(event, fn) {
+    this.many(event, 1, fn);
+    return this;
+  };
+
+  EventEmitter.prototype.many = function(event, ttl, fn) {
+    var self = this;
+
+    if (typeof fn !== 'function') {
+      throw new Error('many only accepts instances of Function');
+    }
+
+    function listener() {
+      if (--ttl === 0) {
+        self.off(event, listener);
+      }
+      fn.apply(this, arguments);
+    }
+
+    listener._origin = fn;
+
+    this.on(event, listener);
+
+    return self;
+  };
+
+  EventEmitter.prototype.emit = function() {
+
+    this._events || init.call(this);
+
+    var type = arguments[0];
+
+    if (type === 'newListener' && !this.newListener) {
+      if (!this._events.newListener) { return false; }
+    }
+
+    // Loop through the *_all* functions and invoke them.
+    if (this._all) {
+      var l = arguments.length;
+      var args = new Array(l - 1);
+      for (var i = 1; i < l; i++) args[i - 1] = arguments[i];
+      for (i = 0, l = this._all.length; i < l; i++) {
+        this.event = type;
+        this._all[i].apply(this, args);
+      }
+    }
+
+    // If there is no 'error' event listener then throw.
+    if (type === 'error') {
+
+      if (!this._all &&
+        !this._events.error &&
+        !(this.wildcard && this.listenerTree.error)) {
+
+        if (arguments[1] instanceof Error) {
+          throw arguments[1]; // Unhandled 'error' event
+        } else {
+          throw new Error("Uncaught, unspecified 'error' event.");
+        }
+        return false;
+      }
+    }
+
+    var handler;
+
+    if(this.wildcard) {
+      handler = [];
+      var ns = typeof type === 'string' ? type.split(this.delimiter) : type.slice();
+      searchListenerTree.call(this, handler, ns, this.listenerTree, 0);
+    }
+    else {
+      handler = this._events[type];
+    }
+
+    if (typeof handler === 'function') {
+      this.event = type;
+      if (arguments.length === 1) {
+        handler.call(this);
+      }
+      else if (arguments.length > 1)
+        switch (arguments.length) {
+          case 2:
+            handler.call(this, arguments[1]);
+            break;
+          case 3:
+            handler.call(this, arguments[1], arguments[2]);
+            break;
+          // slower
+          default:
+            var l = arguments.length;
+            var args = new Array(l - 1);
+            for (var i = 1; i < l; i++) args[i - 1] = arguments[i];
+            handler.apply(this, args);
+        }
+      return true;
+    }
+    else if (handler) {
+      var l = arguments.length;
+      var args = new Array(l - 1);
+      for (var i = 1; i < l; i++) args[i - 1] = arguments[i];
+
+      var listeners = handler.slice();
+      for (var i = 0, l = listeners.length; i < l; i++) {
+        this.event = type;
+        listeners[i].apply(this, args);
+      }
+      return (listeners.length > 0) || !!this._all;
+    }
+    else {
+      return !!this._all;
+    }
+
+  };
+
+  EventEmitter.prototype.on = function(type, listener) {
+
+    if (typeof type === 'function') {
+      this.onAny(type);
+      return this;
+    }
+
+    if (typeof listener !== 'function') {
+      throw new Error('on only accepts instances of Function');
+    }
+    this._events || init.call(this);
+
+    // To avoid recursion in the case that type == "newListeners"! Before
+    // adding it to the listeners, first emit "newListeners".
+    this.emit('newListener', type, listener);
+
+    if(this.wildcard) {
+      growListenerTree.call(this, type, listener);
+      return this;
+    }
+
+    if (!this._events[type]) {
+      // Optimize the case of one listener. Don't need the extra array object.
+      this._events[type] = listener;
+    }
+    else if(typeof this._events[type] === 'function') {
+      // Adding the second element, need to change to array.
+      this._events[type] = [this._events[type], listener];
+    }
+    else if (isArray(this._events[type])) {
+      // If we've already got an array, just append.
+      this._events[type].push(listener);
+
+      // Check for listener leak
+      if (!this._events[type].warned) {
+
+        var m = defaultMaxListeners;
+
+        if (typeof this._events.maxListeners !== 'undefined') {
+          m = this._events.maxListeners;
+        }
+
+        if (m > 0 && this._events[type].length > m) {
+
+          this._events[type].warned = true;
+          console.error('(node) warning: possible EventEmitter memory ' +
+                        'leak detected. %d listeners added. ' +
+                        'Use emitter.setMaxListeners() to increase limit.',
+                        this._events[type].length);
+          console.trace();
+        }
+      }
+    }
+    return this;
+  };
+
+  EventEmitter.prototype.onAny = function(fn) {
+
+    if (typeof fn !== 'function') {
+      throw new Error('onAny only accepts instances of Function');
+    }
+
+    if(!this._all) {
+      this._all = [];
+    }
+
+    // Add the function to the event listener collection.
+    this._all.push(fn);
+    return this;
+  };
+
+  EventEmitter.prototype.addListener = EventEmitter.prototype.on;
+
+  EventEmitter.prototype.off = function(type, listener) {
+    if (typeof listener !== 'function') {
+      throw new Error('removeListener only takes instances of Function');
+    }
+
+    var handlers,leafs=[];
+
+    if(this.wildcard) {
+      var ns = typeof type === 'string' ? type.split(this.delimiter) : type.slice();
+      leafs = searchListenerTree.call(this, null, ns, this.listenerTree, 0);
+    }
+    else {
+      // does not use listeners(), so no side effect of creating _events[type]
+      if (!this._events[type]) return this;
+      handlers = this._events[type];
+      leafs.push({_listeners:handlers});
+    }
+
+    for (var iLeaf=0; iLeaf<leafs.length; iLeaf++) {
+      var leaf = leafs[iLeaf];
+      handlers = leaf._listeners;
+      if (isArray(handlers)) {
+
+        var position = -1;
+
+        for (var i = 0, length = handlers.length; i < length; i++) {
+          if (handlers[i] === listener ||
+            (handlers[i].listener && handlers[i].listener === listener) ||
+            (handlers[i]._origin && handlers[i]._origin === listener)) {
+            position = i;
+            break;
+          }
+        }
+
+        if (position < 0) {
+          continue;
+        }
+
+        if(this.wildcard) {
+          leaf._listeners.splice(position, 1);
+        }
+        else {
+          this._events[type].splice(position, 1);
+        }
+
+        if (handlers.length === 0) {
+          if(this.wildcard) {
+            delete leaf._listeners;
+          }
+          else {
+            delete this._events[type];
+          }
+        }
+        return this;
+      }
+      else if (handlers === listener ||
+        (handlers.listener && handlers.listener === listener) ||
+        (handlers._origin && handlers._origin === listener)) {
+        if(this.wildcard) {
+          delete leaf._listeners;
+        }
+        else {
+          delete this._events[type];
+        }
+      }
+    }
+
+    return this;
+  };
+
+  EventEmitter.prototype.offAny = function(fn) {
+    var i = 0, l = 0, fns;
+    if (fn && this._all && this._all.length > 0) {
+      fns = this._all;
+      for(i = 0, l = fns.length; i < l; i++) {
+        if(fn === fns[i]) {
+          fns.splice(i, 1);
+          return this;
+        }
+      }
+    } else {
+      this._all = [];
+    }
+    return this;
+  };
+
+  EventEmitter.prototype.removeListener = EventEmitter.prototype.off;
+
+  EventEmitter.prototype.removeAllListeners = function(type) {
+    if (arguments.length === 0) {
+      !this._events || init.call(this);
+      return this;
+    }
+
+    if(this.wildcard) {
+      var ns = typeof type === 'string' ? type.split(this.delimiter) : type.slice();
+      var leafs = searchListenerTree.call(this, null, ns, this.listenerTree, 0);
+
+      for (var iLeaf=0; iLeaf<leafs.length; iLeaf++) {
+        var leaf = leafs[iLeaf];
+        leaf._listeners = null;
+      }
+    }
+    else {
+      if (!this._events[type]) return this;
+      this._events[type] = null;
+    }
+    return this;
+  };
+
+  EventEmitter.prototype.listeners = function(type) {
+    if(this.wildcard) {
+      var handlers = [];
+      var ns = typeof type === 'string' ? type.split(this.delimiter) : type.slice();
+      searchListenerTree.call(this, handlers, ns, this.listenerTree, 0);
+      return handlers;
+    }
+
+    this._events || init.call(this);
+
+    if (!this._events[type]) this._events[type] = [];
+    if (!isArray(this._events[type])) {
+      this._events[type] = [this._events[type]];
+    }
+    return this._events[type];
+  };
+
+  EventEmitter.prototype.listenersAny = function() {
+
+    if(this._all) {
+      return this._all;
+    }
+    else {
+      return [];
+    }
+
+  };
+
+  if (typeof define === 'function' && define.amd) {
+     // AMD. Register as an anonymous module.
+    define(function() {
+      return EventEmitter;
+    });
+  } else if (typeof exports === 'object') {
+    // CommonJS
+    exports.EventEmitter2 = EventEmitter;
+  }
+  else {
+    // Browser global.
+    window.EventEmitter2 = EventEmitter;
+  }
+}();
+
+},{}],3:[function(require,module,exports){
+module.exports = function (obj) {
+    if (!obj || typeof obj !== 'object') return obj;
+    
+    var copy;
+    
+    if (isArray(obj)) {
+        var len = obj.length;
+        copy = Array(len);
+        for (var i = 0; i < len; i++) {
+            copy[i] = obj[i];
+        }
+    }
+    else {
+        var keys = objectKeys(obj);
+        copy = {};
+        
+        for (var i = 0, l = keys.length; i < l; i++) {
+            var key = keys[i];
+            copy[key] = obj[key];
+        }
+    }
+    return copy;
+};
+
+var objectKeys = Object.keys || function (obj) {
+    var keys = [];
+    for (var key in obj) {
+        if ({}.hasOwnProperty.call(obj, key)) keys.push(key);
+    }
+    return keys;
+};
+
+var isArray = Array.isArray || function (xs) {
+    return {}.toString.call(xs) === '[object Array]';
+};
+
+},{}],4:[function(require,module,exports){
+(function() {
+  'use strict';
+
+  if (self.fetch) {
+    return
+  }
+
+  function normalizeName(name) {
+    if (typeof name !== 'string') {
+      name = name.toString();
+    }
+    if (/[^a-z0-9\-#$%&'*+.\^_`|~]/i.test(name)) {
+      throw new TypeError('Invalid character in header field name')
+    }
+    return name.toLowerCase()
+  }
+
+  function normalizeValue(value) {
+    if (typeof value !== 'string') {
+      value = value.toString();
+    }
+    return value
+  }
+
+  function Headers(headers) {
+    this.map = {}
+
+    if (headers instanceof Headers) {
+      headers.forEach(function(value, name) {
+        this.append(name, value)
+      }, this)
+
+    } else if (headers) {
+      Object.getOwnPropertyNames(headers).forEach(function(name) {
+        this.append(name, headers[name])
+      }, this)
+    }
+  }
+
+  Headers.prototype.append = function(name, value) {
+    name = normalizeName(name)
+    value = normalizeValue(value)
+    var list = this.map[name]
+    if (!list) {
+      list = []
+      this.map[name] = list
+    }
+    list.push(value)
+  }
+
+  Headers.prototype['delete'] = function(name) {
+    delete this.map[normalizeName(name)]
+  }
+
+  Headers.prototype.get = function(name) {
+    var values = this.map[normalizeName(name)]
+    return values ? values[0] : null
+  }
+
+  Headers.prototype.getAll = function(name) {
+    return this.map[normalizeName(name)] || []
+  }
+
+  Headers.prototype.has = function(name) {
+    return this.map.hasOwnProperty(normalizeName(name))
+  }
+
+  Headers.prototype.set = function(name, value) {
+    this.map[normalizeName(name)] = [normalizeValue(value)]
+  }
+
+  Headers.prototype.forEach = function(callback, thisArg) {
+    Object.getOwnPropertyNames(this.map).forEach(function(name) {
+      this.map[name].forEach(function(value) {
+        callback.call(thisArg, value, name, this)
+      }, this)
+    }, this)
+  }
+
+  function consumed(body) {
+    if (body.bodyUsed) {
+      return Promise.reject(new TypeError('Already read'))
+    }
+    body.bodyUsed = true
+  }
+
+  function fileReaderReady(reader) {
+    return new Promise(function(resolve, reject) {
+      reader.onload = function() {
+        resolve(reader.result)
+      }
+      reader.onerror = function() {
+        reject(reader.error)
+      }
+    })
+  }
+
+  function readBlobAsArrayBuffer(blob) {
+    var reader = new FileReader()
+    reader.readAsArrayBuffer(blob)
+    return fileReaderReady(reader)
+  }
+
+  function readBlobAsText(blob) {
+    var reader = new FileReader()
+    reader.readAsText(blob)
+    return fileReaderReady(reader)
+  }
+
+  var support = {
+    blob: 'FileReader' in self && 'Blob' in self && (function() {
+      try {
+        new Blob();
+        return true
+      } catch(e) {
+        return false
+      }
+    })(),
+    formData: 'FormData' in self
+  }
+
+  function Body() {
+    this.bodyUsed = false
+
+
+    this._initBody = function(body) {
+      this._bodyInit = body
+      if (typeof body === 'string') {
+        this._bodyText = body
+      } else if (support.blob && Blob.prototype.isPrototypeOf(body)) {
+        this._bodyBlob = body
+      } else if (support.formData && FormData.prototype.isPrototypeOf(body)) {
+        this._bodyFormData = body
+      } else if (!body) {
+        this._bodyText = ''
+      } else {
+        throw new Error('unsupported BodyInit type')
+      }
+    }
+
+    if (support.blob) {
+      this.blob = function() {
+        var rejected = consumed(this)
+        if (rejected) {
+          return rejected
+        }
+
+        if (this._bodyBlob) {
+          return Promise.resolve(this._bodyBlob)
+        } else if (this._bodyFormData) {
+          throw new Error('could not read FormData body as blob')
+        } else {
+          return Promise.resolve(new Blob([this._bodyText]))
+        }
+      }
+
+      this.arrayBuffer = function() {
+        return this.blob().then(readBlobAsArrayBuffer)
+      }
+
+      this.text = function() {
+        var rejected = consumed(this)
+        if (rejected) {
+          return rejected
+        }
+
+        if (this._bodyBlob) {
+          return readBlobAsText(this._bodyBlob)
+        } else if (this._bodyFormData) {
+          throw new Error('could not read FormData body as text')
+        } else {
+          return Promise.resolve(this._bodyText)
+        }
+      }
+    } else {
+      this.text = function() {
+        var rejected = consumed(this)
+        return rejected ? rejected : Promise.resolve(this._bodyText)
+      }
+    }
+
+    if (support.formData) {
+      this.formData = function() {
+        return this.text().then(decode)
+      }
+    }
+
+    this.json = function() {
+      return this.text().then(JSON.parse)
+    }
+
+    return this
+  }
+
+  // HTTP methods whose capitalization should be normalized
+  var methods = ['DELETE', 'GET', 'HEAD', 'OPTIONS', 'POST', 'PUT']
+
+  function normalizeMethod(method) {
+    var upcased = method.toUpperCase()
+    return (methods.indexOf(upcased) > -1) ? upcased : method
+  }
+
+  function Request(url, options) {
+    options = options || {}
+    this.url = url
+
+    this.credentials = options.credentials || 'omit'
+    this.headers = new Headers(options.headers)
+    this.method = normalizeMethod(options.method || 'GET')
+    this.mode = options.mode || null
+    this.referrer = null
+
+    if ((this.method === 'GET' || this.method === 'HEAD') && options.body) {
+      throw new TypeError('Body not allowed for GET or HEAD requests')
+    }
+    this._initBody(options.body)
+  }
+
+  function decode(body) {
+    var form = new FormData()
+    body.trim().split('&').forEach(function(bytes) {
+      if (bytes) {
+        var split = bytes.split('=')
+        var name = split.shift().replace(/\+/g, ' ')
+        var value = split.join('=').replace(/\+/g, ' ')
+        form.append(decodeURIComponent(name), decodeURIComponent(value))
+      }
+    })
+    return form
+  }
+
+  function headers(xhr) {
+    var head = new Headers()
+    var pairs = xhr.getAllResponseHeaders().trim().split('\n')
+    pairs.forEach(function(header) {
+      var split = header.trim().split(':')
+      var key = split.shift().trim()
+      var value = split.join(':').trim()
+      head.append(key, value)
+    })
+    return head
+  }
+
+  Body.call(Request.prototype)
+
+  function Response(bodyInit, options) {
+    if (!options) {
+      options = {}
+    }
+
+    this._initBody(bodyInit)
+    this.type = 'default'
+    this.url = null
+    this.status = options.status
+    this.ok = this.status >= 200 && this.status < 300
+    this.statusText = options.statusText
+    this.headers = options.headers instanceof Headers ? options.headers : new Headers(options.headers)
+    this.url = options.url || ''
+  }
+
+  Body.call(Response.prototype)
+
+  self.Headers = Headers;
+  self.Request = Request;
+  self.Response = Response;
+
+  self.fetch = function(input, init) {
+    // TODO: Request constructor should accept input, init
+    var request
+    if (Request.prototype.isPrototypeOf(input) && !init) {
+      request = input
+    } else {
+      request = new Request(input, init)
+    }
+
+    return new Promise(function(resolve, reject) {
+      var xhr = new XMLHttpRequest()
+
+      function responseURL() {
+        if ('responseURL' in xhr) {
+          return xhr.responseURL
+        }
+
+        // Avoid security warnings on getResponseHeader when not allowed by CORS
+        if (/^X-Request-URL:/m.test(xhr.getAllResponseHeaders())) {
+          return xhr.getResponseHeader('X-Request-URL')
+        }
+
+        return;
+      }
+
+      xhr.onload = function() {
+        var status = (xhr.status === 1223) ? 204 : xhr.status
+        if (status < 100 || status > 599) {
+          reject(new TypeError('Network request failed'))
+          return
+        }
+        var options = {
+          status: status,
+          statusText: xhr.statusText,
+          headers: headers(xhr),
+          url: responseURL()
+        }
+        var body = 'response' in xhr ? xhr.response : xhr.responseText;
+        resolve(new Response(body, options))
+      }
+
+      xhr.onerror = function() {
+        reject(new TypeError('Network request failed'))
+      }
+
+      xhr.open(request.method, request.url, true)
+
+      if (request.credentials === 'include') {
+        xhr.withCredentials = true
+      }
+
+      if ('responseType' in xhr && support.blob) {
+        xhr.responseType = 'blob'
+      }
+
+      request.headers.forEach(function(value, name) {
+        xhr.setRequestHeader(name, value)
+      })
+
+      xhr.send(typeof request._bodyInit === 'undefined' ? null : request._bodyInit)
+    })
+  }
+  self.fetch.polyfill = true
+})();
+
+},{}],5:[function(require,module,exports){
+'use strict';
+
+require('whatwg-fetch');
+var Q = require('Q');
+var EventEmitter = require('eventemitter2').EventEmitter2;
+var copy = require('shallow-copy');
+var providers = require('./providers');
+
+// The default base url.
+var baseUrl = 'https://api.form.io';
+var appUrl = baseUrl;
+var appUrlSet = false;
+
+var plugins = [];
+
+// The temporary GET request cache storage
+var cache = {};
+
+var noop = function(){};
+var identity = function(value) { return value; };
+
+// Will invoke a function on all plugins.
+// Returns a promise that resolves when all promises
+// returned by the plugins have resolved.
+// Should be used when you want plugins to prepare for an event
+// but don't want any data returned.
+var pluginWait = function(pluginFn) {
+  var args = [].slice.call(arguments, 1);
+  return Q.all(plugins.map(function(plugin) {
+    return (plugin[pluginFn] || noop).apply(plugin, args);
+  }));
+};
+
+// Will invoke a function on plugins from highest priority
+// to lowest until one returns a value. Returns null if no
+// plugins return a value.
+// Should be used when you want just one plugin to handle things.
+var pluginGet = function(pluginFn) {
+  var args = [].slice.call(arguments, 0);
+  var callPlugin = function(index, pluginFn) {
+    var plugin = plugins[index];
+    if (!plugin) return Q(null);
+    return Q((plugin && plugin[pluginFn] || noop).apply(plugin, [].slice.call(arguments, 2)))
+    .then(function(result) {
+      if (result !== null && result !== undefined) return result;
+      return callPlugin.apply(null, [index + 1].concat(args));
+    });
+  };
+  return callPlugin.apply(null, [0].concat(args));
+};
+
+// Will invoke a function on plugins from highest priority to
+// lowest, building a promise chain from their return values
+// Should be used when all plugins need to process a promise's
+// success or failure
+var pluginAlter = function(pluginFn, value) {
+  var args = [].slice.call(arguments, 2);
+  return plugins.reduce(function(value, plugin) {
+      return (plugin[pluginFn] || identity).apply(plugin, [value].concat(args));
+  }, value);
+};
+
+
+/**
+ * Returns parts of the URL that are important.
+ * Indexes
+ *  - 0: The full url
+ *  - 1: The protocol
+ *  - 2: The hostname
+ *  - 3: The rest
+ *
+ * @param url
+ * @returns {*}
+ */
+var getUrlParts = function(url) {
+  var regex = '^(http[s]?:\\/\\/)';
+  if (baseUrl && url.indexOf(baseUrl) === 0) {
+    regex += '(' + baseUrl.replace(/^http[s]?:\/\//, '') + ')';
+  }
+  else {
+    regex += '([^/]+)';
+  }
+  regex += '($|\\/.*)';
+  return url.match(new RegExp(regex));
+};
+
+var serialize = function(obj) {
+  var str = [];
+  for(var p in obj)
+    if (obj.hasOwnProperty(p)) {
+      str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+    }
+  return str.join("&");
+};
+
+// The formio class.
+var Formio = function(path) {
+
+  // Ensure we have an instance of Formio.
+  if (!(this instanceof Formio)) { return new Formio(path); }
+  if (!path) {
+    // Allow user to create new projects if this was instantiated without
+    // a url
+    this.projectUrl = baseUrl + '/project';
+    this.projectsUrl = baseUrl + '/project';
+    this.projectId = false;
+    this.query = '';
+    return;
+  }
+
+  // Initialize our variables.
+  this.projectsUrl = '';
+  this.projectUrl = '';
+  this.projectId = '';
+  this.formUrl = '';
+  this.formsUrl = '';
+  this.formId = '';
+  this.submissionsUrl = '';
+  this.submissionUrl = '';
+  this.submissionId = '';
+  this.actionsUrl = '';
+  this.actionId = '';
+  this.actionUrl = '';
+  this.query = '';
+
+  // Normalize to an absolute path.
+  if ((path.indexOf('http') !== 0) && (path.indexOf('//') !== 0)) {
+    baseUrl = baseUrl ? baseUrl : window.location.href.match(/http[s]?:\/\/api./)[0];
+    path = baseUrl + path;
+  }
+
+  var hostparts = getUrlParts(path);
+  var parts = [];
+  var hostName = hostparts[1] + hostparts[2];
+  path = hostparts.length > 3 ? hostparts[3] : '';
+  var queryparts = path.split('?');
+  if (queryparts.length > 1) {
+    path = queryparts[0];
+    this.query = '?' + queryparts[1];
+  }
+
+  // See if this is a form path.
+  if ((path.search(/(^|\/)(form|project)($|\/)/) !== -1)) {
+
+    // Register a specific path.
+    var registerPath = function(name, base) {
+      this[name + 'sUrl'] = base + '/' + name;
+      var regex = new RegExp('\/' + name + '\/([^/]+)');
+      if (path.search(regex) !== -1) {
+        parts = path.match(regex);
+        this[name + 'Url'] = parts ? (base + parts[0]) : '';
+        this[name + 'Id'] = (parts.length > 1) ? parts[1] : '';
+        base += parts[0];
+      }
+      return base;
+    }.bind(this);
+
+    // Register an array of items.
+    var registerItems = function(items, base, staticBase) {
+      for (var i in items) {
+        if (items.hasOwnProperty(i)) {
+          var item = items[i];
+          if (item instanceof Array) {
+            registerItems(item, base, true);
+          }
+          else {
+            var newBase = registerPath(item, base);
+            base = staticBase ? base : newBase;
+          }
+        }
+      }
+    };
+
+    registerItems(['project', 'form', ['submission', 'action']], hostName);
+
+    if (!this.projectId) {
+      if (hostparts.length > 2 && hostparts[2].split('.').length > 2) {
+        this.projectUrl = hostName;
+        this.projectId = hostparts[2].split('.')[0];
+      }
+    }
+  }
+  else {
+
+    // This is an aliased url.
+    this.projectUrl = hostName;
+    this.projectId = (hostparts.length > 2) ? hostparts[2].split('.')[0] : '';
+    var subRegEx = new RegExp('\/(submission|action)($|\/.*)');
+    var subs = path.match(subRegEx);
+    this.pathType = (subs && (subs.length > 1)) ? subs[1] : '';
+    path = path.replace(subRegEx, '');
+    path = path.replace(/\/$/, '');
+    this.formsUrl = hostName + '/form';
+    this.formUrl = hostName + path;
+    this.formId = path.replace(/^\/+|\/+$/g, '');
+    var items = ['submission', 'action'];
+    for (var i in items) {
+      if (items.hasOwnProperty(i)) {
+        var item = items[i];
+        this[item + 'sUrl'] = hostName + path + '/' + item;
+        if ((this.pathType === item) && (subs.length > 2) && subs[2]) {
+          this[item + 'Id'] = subs[2].replace(/^\/+|\/+$/g, '');
+          this[item + 'Url'] = hostName + path + subs[0];
+        }
+      }
+    }
+  }
+
+  // Set the app url if it is not set.
+  if (!appUrlSet) {
+    appUrl = this.projectUrl;
+  }
+};
+
+/**
+ * Load a resource.
+ *
+ * @param type
+ * @returns {Function}
+ * @private
+ */
+var _load = function(type) {
+  var _id = type + 'Id';
+  var _url = type + 'Url';
+  return function(query, opts) {
+    if (query && typeof query === 'object') {
+      query = serialize(query.params);
+    }
+    if (query) {
+      query = this.query ? (this.query + '&' + query) : ('?' + query);
+    }
+    else {
+      query = this.query;
+    }
+    if (!this[_id]) { return Q.reject('Missing ' + _id); }
+    return this.makeRequest(type, this[_url] + query, 'get', null, opts);
+  };
+};
+
+/**
+ * Save a resource.
+ *
+ * @param type
+ * @returns {Function}
+ * @private
+ */
+var _save = function(type) {
+  var _id = type + 'Id';
+  var _url = type + 'Url';
+  return function(data, opts) {
+    var method = this[_id] ? 'put' : 'post';
+    var reqUrl = this[_id] ? this[_url] : this[type + 'sUrl'];
+    cache = {};
+    return this.makeRequest(type, reqUrl + this.query, method, data, opts);
+  };
+};
+
+/**
+ * Delete a resource.
+ *
+ * @param type
+ * @returns {Function}
+ * @private
+ */
+var _delete = function(type) {
+  var _id = type + 'Id';
+  var _url = type + 'Url';
+  return function(opts) {
+    if (!this[_id]) { Q.reject('Nothing to delete'); }
+    cache = {};
+    return this.makeRequest(type, this[_url], 'delete', null, opts);
+  };
+};
+
+/**
+ * Resource index method.
+ *
+ * @param type
+ * @returns {Function}
+ * @private
+ */
+var _index = function(type) {
+  var _url = type + 'Url';
+  return function(query, opts) {
+    query = query || '';
+    if (query && typeof query === 'object') {
+      query = '?' + serialize(query.params);
+    }
+    return this.makeRequest(type, this[_url] + query, 'get', null, opts);
+  };
+};
+
+// Activates plugin hooks, makes Formio.request if no plugin provides a request
+Formio.prototype.makeRequest = function(type, url, method, data, opts) {
+  var self = this;
+  method = (method || 'GET').toUpperCase();
+  if(!opts || typeof opts !== 'object') {
+    opts = {};
+  }
+
+  var requestArgs = {
+    formio: self,
+    type: type,
+    url: url,
+    method: method,
+    data: data,
+    opts: opts
+  };
+
+  var request = pluginWait('preRequest', requestArgs)
+  .then(function() {
+    return pluginGet('request', requestArgs)
+    .then(function(result) {
+      if (result === null || result === undefined) {
+        return Formio.request(url, method, data);
+      }
+      return result;
+    });
+  });
+
+  return pluginAlter('wrapRequestPromise', request, requestArgs);
+};
+
+// Define specific CRUD methods.
+Formio.prototype.loadProject = _load('project');
+Formio.prototype.saveProject = _save('project');
+Formio.prototype.deleteProject = _delete('project');
+Formio.prototype.loadForm = _load('form');
+Formio.prototype.saveForm = _save('form');
+Formio.prototype.deleteForm = _delete('form');
+Formio.prototype.loadForms = _index('forms');
+Formio.prototype.loadSubmission = _load('submission');
+Formio.prototype.saveSubmission = _save('submission');
+Formio.prototype.deleteSubmission = _delete('submission');
+Formio.prototype.loadSubmissions = _index('submissions');
+Formio.prototype.loadAction = _load('action');
+Formio.prototype.saveAction = _save('action');
+Formio.prototype.deleteAction = _delete('action');
+Formio.prototype.loadActions = _index('actions');
+Formio.prototype.availableActions = function() { return this.makeRequest('availableActions', this.formUrl + '/actions'); };
+Formio.prototype.actionInfo = function(name) { return this.makeRequest('actionInfo', this.formUrl + '/actions/' + name); };
+
+Formio.prototype.uploadFile = function(storage, file, fileName, dir, progressCallback) {
+  var requestArgs = {
+    provider: storage,
+    method: 'upload',
+    file: file,
+    fileName: fileName,
+    dir: dir
+  }
+  var request = pluginWait('preRequest', requestArgs)
+    .then(function() {
+      if (providers.storage.hasOwnProperty(storage)) {
+        var provider = new providers.storage[storage](this);
+        return provider.uploadFile(file, fileName, dir, progressCallback);
+      }
+      else {
+        throw('Storage provider not found');
+      }
+    }.bind(this));
+  return pluginAlter('wrapFileRequestPromise', request, requestArgs);
+}
+
+Formio.prototype.downloadFile = function(file) {
+  var requestArgs = {
+    method: 'download',
+    file: file
+  };
+
+  var request = pluginWait('preRequest', requestArgs)
+    .then(function() {
+      return pluginGet('fileRequest', requestArgs)
+        .then(function(result) {
+          if (result === null || result === undefined) {
+            if (providers.storage.hasOwnProperty(file.storage)) {
+              var provider = new providers.storage[file.storage](this);
+              return provider.downloadFile(file);
+            }
+            else {
+              throw('Storage provider not found');
+            }
+          }
+          return result;
+        }.bind(this));
+    }.bind(this));
+
+  return pluginAlter('wrapFileRequestPromise', request, requestArgs);
+}
+
+Formio.makeStaticRequest = function(url, method, data) {
+  method = (method || 'GET').toUpperCase();
+
+  var requestArgs = {
+    url: url,
+    method: method,
+    data: data
+  };
+
+  var request = pluginWait('preRequest', requestArgs)
+  .then(function() {
+    return pluginGet('staticRequest', requestArgs)
+    .then(function(result) {
+      if (result === null || result === undefined) {
+        return Formio.request(url, method, data);
+      }
+      return result;
+    });
+  });
+
+  return pluginAlter('wrapStaticRequestPromise', request, requestArgs);
+};
+
+// Static methods.
+Formio.loadProjects = function(query) {
+  query = query || '';
+  if (typeof query === 'object') {
+    query = '?' + serialize(query.params);
+  }
+  return this.makeStaticRequest(baseUrl + '/project' + query);
+};
+Formio.request = function(url, method, data) {
+  if (!url) { return Q.reject('No url provided'); }
+  method = (method || 'GET').toUpperCase();
+  var cacheKey = btoa(url);
+
+  return Q().then(function() {
+    // Get the cached promise to save multiple loads.
+    if (method === 'GET' && cache.hasOwnProperty(cacheKey)) {
+      return cache[cacheKey];
+    }
+    else {
+      return Q()
+      .then(function() {
+        // Set up and fetch request
+        var headers = new Headers({
+          'Accept': 'application/json',
+          'Content-type': 'application/json; charset=UTF-8'
+        });
+        var token = Formio.getToken();
+        if (token) {
+          headers.append('x-jwt-token', token);
+        }
+
+        var options = {
+          method: method,
+          headers: headers,
+          mode: 'cors'
+        };
+        if (data) {
+          options.body = JSON.stringify(data);
+        }
+
+        return fetch(url, options);
+      })
+      .catch(function(err) {
+        err.message = 'Could not connect to API server (' + err.message + ')';
+        err.networkError = true;
+        throw err;
+      })
+      .then(function(response) {
+        // Handle fetch results
+        if (response.ok) {
+          var token = response.headers.get('x-jwt-token');
+          if (response.status >= 200 && response.status < 300 && token && token !== '') {
+            Formio.setToken(token);
+          }
+          // 204 is no content. Don't try to .json() it.
+          if (response.status === 204) {
+            return {};
+          }
+          return (response.headers.get('content-type').indexOf('application/json') !== -1 ?
+            response.json() : response.text())
+          .then(function(result) {
+            // Add some content-range metadata to the result here
+            var range = response.headers.get('content-range');
+            if (range && typeof result === 'object') {
+              range = range.split('/');
+              if(range[0] !== '*') {
+                var skipLimit = range[0].split('-');
+                result.skip = Number(skipLimit[0]);
+                result.limit = skipLimit[1] - skipLimit[0] + 1;
+              }
+              result.serverCount = range[1] === '*' ? range[1] : Number(range[1]);
+            }
+            return result;
+          });
+        }
+        else {
+          if (response.status === 440) {
+            Formio.setToken(null);
+            Formio.events.emit('formio.sessionExpired', response.body);
+          }
+          else if (response.status === 401) {
+            Formio.events.emit('formio.unauthorized', response.body);
+          }
+          // Parse and return the error as a rejected promise to reject this promise
+          return (response.headers.get('content-type').indexOf('application/json') !== -1 ?
+            response.json() : response.text())
+            .then(function(error){
+              throw error;
+            });
+        }
+      })
+      .catch(function(err) {
+        if (err === 'Bad Token') {
+          Formio.setToken(null);
+          Formio.events.emit('formio.badToken', err);
+        }
+        // Remove failed promises from cache
+        delete cache[cacheKey];
+        // Propagate error so client can handle accordingly
+        throw err;
+      });
+    }
+  })
+  .then(function(result) {
+    // Save the cache
+    if (method === 'GET') {
+      cache[cacheKey] = Q(result);
+    }
+
+    // Shallow copy result so modifications don't end up in cache
+    if(Array.isArray(result)) {
+      var resultCopy = result.map(copy);
+      resultCopy.skip = result.skip;
+      resultCopy.limit = result.limit;
+      resultCopy.serverCount = result.serverCount;
+      return resultCopy;
+    }
+    return copy(result);
+  });
+};
+
+Formio.setToken = function(token) {
+  token = token || '';
+  if (token === this.token) { return; }
+  this.token = token;
+  if (!token) {
+    Formio.setUser(null);
+    // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
+    try {
+      return localStorage.removeItem('formioToken');
+    }
+    catch(err) {
+      return;
+    }
+  }
+  // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
+  try {
+    localStorage.setItem('formioToken', token);
+  }
+  catch(err) {
+    // Do nothing.
+  }
+  Formio.currentUser(); // Run this so user is updated if null
+};
+Formio.getToken = function() {
+  if (this.token) { return this.token; }
+  var token = localStorage.getItem('formioToken') || '';
+  this.token = token;
+  return token;
+};
+Formio.setUser = function(user) {
+  if (!user) {
+    this.setToken(null);
+    // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
+    try {
+      return localStorage.removeItem('formioUser');
+    }
+    catch(err) {
+      return;
+    }
+  }
+  // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
+  try {
+    localStorage.setItem('formioUser', JSON.stringify(user));
+  }
+  catch(err) {
+    // Do nothing.
+  }
+};
+Formio.getUser = function() {
+  return JSON.parse(localStorage.getItem('formioUser') || null);
+};
+
+Formio.setBaseUrl = function(url) {
+  baseUrl = url;
+  if (!appUrlSet) {
+    appUrl = url;
+  }
+};
+Formio.getBaseUrl = function() {
+  return baseUrl;
+};
+Formio.setAppUrl = function(url) {
+  appUrl = url;
+  appUrlSet = true;
+};
+Formio.getAppUrl = function() {
+  return appUrl;
+};
+Formio.clearCache = function() { cache = {}; };
+
+Formio.currentUser = function() {
+  var url = baseUrl + '/current';
+  var user = this.getUser();
+  if (user) {
+    return pluginAlter('wrapStaticRequestPromise', Q(user), {
+      url: url,
+      method: 'GET'
+    })
+  }
+  var token = this.getToken();
+  if (!token) {
+    return pluginAlter('wrapStaticRequestPromise', Q(null), {
+      url: url,
+      method: 'GET'
+    })
+  }
+  return this.makeStaticRequest(url)
+  .then(function(response) {
+    Formio.setUser(response);
+    return response;
+  });
+};
+
+// Keep track of their logout callback.
+Formio.logout = function() {
+  return this.makeStaticRequest(baseUrl + '/logout').finally(function() {
+    this.setToken(null);
+    this.setUser(null);
+    Formio.clearCache();
+  }.bind(this));
+};
+Formio.fieldData = function(data, component) {
+  if (!data) { return ''; }
+  if (!component || !component.key) { return data; }
+  if (component.key.indexOf('.') !== -1) {
+    var value = data;
+    var parts = component.key.split('.');
+    var key = '';
+    for (var i = 0; i < parts.length; i++) {
+      key = parts[i];
+
+      // Handle nested resources
+      if (value.hasOwnProperty('_id')) {
+        value = value.data;
+      }
+
+      // Return if the key is not found on the value.
+      if (!value.hasOwnProperty(key)) {
+        return;
+      }
+
+      // Convert old single field data in submissions to multiple
+      if (key === parts[parts.length - 1] && component.multiple && !Array.isArray(value[key])) {
+        value[key] = [value[key]];
+      }
+
+      // Set the value of this key.
+      value = value[key];
+    }
+    return value;
+  }
+  else {
+    // Convert old single field data in submissions to multiple
+    if (component.multiple && !Array.isArray(data[component.key])) {
+      data[component.key] = [data[component.key]];
+    }
+    return data[component.key];
+  }
+};
+
+/**
+ * EventEmitter for Formio events.
+ * See Node.js documentation for API documentation: https://nodejs.org/api/events.html
+ */
+Formio.events = new EventEmitter({
+  wildcard: false,
+  maxListeners: 0
+});
+
+/**
+ * Register a plugin with Formio.js
+ * @param plugin The plugin to register. See plugin documentation.
+ * @param name   Optional name to later retrieve plugin with.
+ */
+Formio.registerPlugin = function(plugin, name) {
+  plugins.push(plugin);
+  plugins.sort(function(a, b) {
+    return (b.priority || 0) - (a.priority || 0);
+  });
+  plugin.__name = name;
+  (plugin.init || noop).call(plugin, Formio);
+};
+
+/**
+ * Returns the plugin registered with the given name.
+ */
+Formio.getPlugin = function(name) {
+  return plugins.reduce(function(result, plugin) {
+    if (result) return result;
+    if (plugin.__name === name) return plugin;
+  }, null);
+};
+
+/**
+ * Deregisters a plugin with Formio.js.
+ * @param  plugin The instance or name of the plugin
+ * @return true if deregistered, false otherwise
+ */
+Formio.deregisterPlugin = function(plugin) {
+  var beforeLength = plugins.length;
+  plugins = plugins.filter(function(p) {
+    if(p !== plugin && p.__name !== plugin) return true;
+    (p.deregister || noop).call(p, Formio);
+    return false;
+  });
+  return beforeLength !== plugins.length;
+};
+
+module.exports = Formio;
+
+},{"./providers":6,"Q":1,"eventemitter2":2,"shallow-copy":3,"whatwg-fetch":4}],6:[function(require,module,exports){
+module.exports = {
+  storage: require('./storage')
+};
+
+},{"./storage":7}],7:[function(require,module,exports){
+module.exports = {
+  //dropbox: require('./dropbox.js'),
+  s3: require('./s3.js'),
+  url: require('./url.js'),
+};
+
+},{"./s3.js":8,"./url.js":9}],8:[function(require,module,exports){
+var Q = require('Q')
+
+module.exports = function(formio) {
+  return {
+    title: 'S3',
+    name: 's3',
+    uploadFile: function(file, fileName, dir, progressCallback) {
+      var defer = Q.defer();
+      // Sign the request
+      formio.makeRequest('file', formio.formUrl + '/storage/s3', 'POST', {
+        name: fileName,
+        size: file.size,
+        type: file.type
+      })
+        .then(function(response) {
+          // Send the file with data.
+          var xhr = new XMLHttpRequest();
+
+          if (typeof progressCallback === 'function') {
+            xhr.upload.onprogress = progressCallback;
+          }
+
+          response.data.fileName = fileName;
+          response.data.key += dir + fileName;
+
+          fd = new FormData();
+          for(var key in response.data) {
+            fd.append(key, response.data[key]);
+          }
+          fd.append('file', file);
+
+          xhr.onload = function() {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              defer.resolve({
+                storage: 's3',
+                name: fileName,
+                bucket: response.bucket,
+                key: response.data.key,
+                url: response.url + response.data.key,
+                acl: response.data.acl,
+                size: file.size,
+                type: file.type
+              });
+            }
+            else {
+              defer.reject(xhr.response || 'Unable to upload file');
+            }
+          };
+
+          // Fire on network error.
+          xhr.onerror = function() {
+            defer.reject(xhr);
+          }
+
+          xhr.onabort = function() {
+            defer.reject(xhr);
+          }
+
+          xhr.open('POST', response.url);
+
+          xhr.send(fd);
+        })
+        .catch(function(response) {
+          defer.reject(response);
+        });
+      return defer.promise;
+    },
+    downloadFile: function(file) {
+      if (file.acl !== 'public-read') {
+        return formio.makeRequest('file', formio.formUrl + '/storage/s3?bucket=' + file.bucket + '&key=' + file.key, 'GET');
+      }
+      else {
+        return Q(file);
+      }
+    }
+  };
+};
+
+},{"Q":1}],9:[function(require,module,exports){
+var Q = require('Q')
+
+module.exports = function(formio) {
+  return {
+    title: 'Url',
+    name: 'url',
+    uploadFile: function(file, fileName, dir, progressCallback) {
+      var defer = Q.defer();
+
+      var data = {
+        dir: dir,
+        name: fileName,
+        file: file
+      };
+
+      // Send the file with data.
+      var xhr = new XMLHttpRequest();
+
+      if (typeof progressCallback === 'function') {
+        xhr.upload.onprogress = progressCallback;
+      }
+
+      fd = new FormData();
+      for(var key in data) {
+        fd.append(key, data[key]);
+      }
+
+      xhr.onload = function() {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          // Need to test if xhr.response is decoded or not.
+          defer.resolve({
+            storage: 'url',
+            name: fileName,
+            url: xhr.response.url,
+            size: file.size,
+            type: file.type
+          });
+        }
+        else {
+          defer.reject(xhr.response || 'Unable to upload file');
+        }
+      };
+
+      // Fire on network error.
+      xhr.onerror = function() {
+        defer.reject(xhr);
+      }
+
+      xhr.onabort = function() {
+        defer.reject(xhr);
+      }
+
+      xhr.open('POST', response.url);
+
+      xhr.send(fd);
+      return defer.promise;
+    },
+    downloadFile: function(file) {
+      // Return the original as there is nothing to do.
+      Q(file);
+    }
+  };
+};
+
+},{"Q":1}],10:[function(require,module,exports){
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -2746,7 +4570,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ ])
 });
 ;
-},{}],3:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 (function (global){
 /* angular-moment.js / v1.0.0-beta.6 / (c) 2013, 2014, 2015, 2016 Uri Shaked / MIT Licence */
 
@@ -3485,7 +5309,7 @@ return /******/ (function(modules) { // webpackBootstrap
 })();
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"angular":11,"moment":4}],4:[function(require,module,exports){
+},{"angular":19,"moment":12}],12:[function(require,module,exports){
 //! moment.js
 //! version : 2.13.0
 //! authors : Tim Wood, Iskren Chernev, Moment.js contributors
@@ -7526,7 +9350,7 @@ return /******/ (function(modules) { // webpackBootstrap
     return _moment;
 
 }));
-},{}],5:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 /**
  * @license AngularJS v1.5.6
  * (c) 2010-2016 Google, Inc. http://angularjs.org
@@ -8245,11 +10069,11 @@ angular.module('ngSanitize').filter('linky', ['$sanitize', function($sanitize) {
 
 })(window, window.angular);
 
-},{}],6:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 require('./angular-sanitize');
 module.exports = 'ngSanitize';
 
-},{"./angular-sanitize":5}],7:[function(require,module,exports){
+},{"./angular-sanitize":13}],15:[function(require,module,exports){
 /*
  * angular-ui-bootstrap
  * http://angular-ui.github.io/bootstrap/
@@ -15597,12 +17421,12 @@ angular.module('ui.bootstrap.datepickerPopup').run(function() {!angular.$$csp().
 angular.module('ui.bootstrap.tooltip').run(function() {!angular.$$csp().noInlineStyle && !angular.$$uibTooltipCss && angular.element(document).find('head').prepend('<style type="text/css">[uib-tooltip-popup].tooltip.top-left > .tooltip-arrow,[uib-tooltip-popup].tooltip.top-right > .tooltip-arrow,[uib-tooltip-popup].tooltip.bottom-left > .tooltip-arrow,[uib-tooltip-popup].tooltip.bottom-right > .tooltip-arrow,[uib-tooltip-popup].tooltip.left-top > .tooltip-arrow,[uib-tooltip-popup].tooltip.left-bottom > .tooltip-arrow,[uib-tooltip-popup].tooltip.right-top > .tooltip-arrow,[uib-tooltip-popup].tooltip.right-bottom > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.top-left > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.top-right > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.bottom-left > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.bottom-right > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.left-top > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.left-bottom > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.right-top > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.right-bottom > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.top-left > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.top-right > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.bottom-left > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.bottom-right > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.left-top > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.left-bottom > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.right-top > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.right-bottom > .tooltip-arrow,[uib-popover-popup].popover.top-left > .arrow,[uib-popover-popup].popover.top-right > .arrow,[uib-popover-popup].popover.bottom-left > .arrow,[uib-popover-popup].popover.bottom-right > .arrow,[uib-popover-popup].popover.left-top > .arrow,[uib-popover-popup].popover.left-bottom > .arrow,[uib-popover-popup].popover.right-top > .arrow,[uib-popover-popup].popover.right-bottom > .arrow,[uib-popover-html-popup].popover.top-left > .arrow,[uib-popover-html-popup].popover.top-right > .arrow,[uib-popover-html-popup].popover.bottom-left > .arrow,[uib-popover-html-popup].popover.bottom-right > .arrow,[uib-popover-html-popup].popover.left-top > .arrow,[uib-popover-html-popup].popover.left-bottom > .arrow,[uib-popover-html-popup].popover.right-top > .arrow,[uib-popover-html-popup].popover.right-bottom > .arrow,[uib-popover-template-popup].popover.top-left > .arrow,[uib-popover-template-popup].popover.top-right > .arrow,[uib-popover-template-popup].popover.bottom-left > .arrow,[uib-popover-template-popup].popover.bottom-right > .arrow,[uib-popover-template-popup].popover.left-top > .arrow,[uib-popover-template-popup].popover.left-bottom > .arrow,[uib-popover-template-popup].popover.right-top > .arrow,[uib-popover-template-popup].popover.right-bottom > .arrow{top:auto;bottom:auto;left:auto;right:auto;margin:0;}[uib-popover-popup].popover,[uib-popover-html-popup].popover,[uib-popover-template-popup].popover{display:block !important;}</style>'); angular.$$uibTooltipCss = true; });
 angular.module('ui.bootstrap.timepicker').run(function() {!angular.$$csp().noInlineStyle && !angular.$$uibTimepickerCss && angular.element(document).find('head').prepend('<style type="text/css">.uib-time input{width:50px;}</style>'); angular.$$uibTimepickerCss = true; });
 angular.module('ui.bootstrap.typeahead').run(function() {!angular.$$csp().noInlineStyle && !angular.$$uibTypeaheadCss && angular.element(document).find('head').prepend('<style type="text/css">[uib-typeahead-popup].dropdown-menu{display:block;}</style>'); angular.$$uibTypeaheadCss = true; });
-},{}],8:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 require('./dist/ui-bootstrap-tpls');
 
 module.exports = 'ui.bootstrap';
 
-},{"./dist/ui-bootstrap-tpls":7}],9:[function(require,module,exports){
+},{"./dist/ui-bootstrap-tpls":15}],17:[function(require,module,exports){
 /*!
  * angular-ui-mask
  * https://github.com/angular-ui/ui-mask
@@ -16355,7 +18179,7 @@ angular.module('ui.mask', [])
         ]);
 
 }());
-},{}],10:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 /**
  * @license AngularJS v1.5.6
  * (c) 2010-2016 Google, Inc. http://angularjs.org
@@ -47379,11 +49203,11 @@ $provide.value("$locale", {
 })(window);
 
 !window.angular.$$csp().noInlineStyle && window.angular.element(document.head).prepend('<style type="text/css">@charset "UTF-8";[ng\\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide:not(.ng-hide-animate){display:none !important;}ng\\:form{display:block;}.ng-animate-shim{visibility:hidden;}.ng-anchor{position:absolute;}</style>');
-},{}],11:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 require('./angular');
 module.exports = angular;
 
-},{"./angular":10}],12:[function(require,module,exports){
+},{"./angular":18}],20:[function(require,module,exports){
 // https://github.com/Gillardo/bootstrap-ui-datetime-picker
 // Version: 2.4.0
 // Released: 2016-06-03 
@@ -48024,7 +49848,7 @@ angular.module('ui.bootstrap.datetimepicker').run(['$templateCache', function($t
 
 }]);
 
-},{}],13:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 // This file is autogenerated via the `commonjs` Grunt task. You can require() this file in a CommonJS environment.
 require('../../js/transition.js')
 require('../../js/alert.js')
@@ -48038,7 +49862,7 @@ require('../../js/popover.js')
 require('../../js/scrollspy.js')
 require('../../js/tab.js')
 require('../../js/affix.js')
-},{"../../js/affix.js":14,"../../js/alert.js":15,"../../js/button.js":16,"../../js/carousel.js":17,"../../js/collapse.js":18,"../../js/dropdown.js":19,"../../js/modal.js":20,"../../js/popover.js":21,"../../js/scrollspy.js":22,"../../js/tab.js":23,"../../js/tooltip.js":24,"../../js/transition.js":25}],14:[function(require,module,exports){
+},{"../../js/affix.js":22,"../../js/alert.js":23,"../../js/button.js":24,"../../js/carousel.js":25,"../../js/collapse.js":26,"../../js/dropdown.js":27,"../../js/modal.js":28,"../../js/popover.js":29,"../../js/scrollspy.js":30,"../../js/tab.js":31,"../../js/tooltip.js":32,"../../js/transition.js":33}],22:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: affix.js v3.3.6
  * http://getbootstrap.com/javascript/#affix
@@ -48202,7 +50026,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],15:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: alert.js v3.3.6
  * http://getbootstrap.com/javascript/#alerts
@@ -48298,7 +50122,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],16:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: button.js v3.3.6
  * http://getbootstrap.com/javascript/#buttons
@@ -48420,7 +50244,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],17:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: carousel.js v3.3.6
  * http://getbootstrap.com/javascript/#carousel
@@ -48659,7 +50483,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],18:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: collapse.js v3.3.6
  * http://getbootstrap.com/javascript/#collapse
@@ -48872,7 +50696,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],19:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: dropdown.js v3.3.6
  * http://getbootstrap.com/javascript/#dropdowns
@@ -49039,7 +50863,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],20:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: modal.js v3.3.6
  * http://getbootstrap.com/javascript/#modals
@@ -49378,7 +51202,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],21:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: popover.js v3.3.6
  * http://getbootstrap.com/javascript/#popovers
@@ -49488,7 +51312,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],22:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: scrollspy.js v3.3.6
  * http://getbootstrap.com/javascript/#scrollspy
@@ -49662,7 +51486,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],23:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: tab.js v3.3.6
  * http://getbootstrap.com/javascript/#tabs
@@ -49819,7 +51643,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],24:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: tooltip.js v3.3.6
  * http://getbootstrap.com/javascript/#tooltip
@@ -50335,7 +52159,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],25:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: transition.js v3.3.6
  * http://getbootstrap.com/javascript/#transitions
@@ -50396,7 +52220,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],26:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -50517,582 +52341,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],27:[function(require,module,exports){
-/*!
- * EventEmitter2
- * https://github.com/hij1nx/EventEmitter2
- *
- * Copyright (c) 2013 hij1nx
- * Licensed under the MIT license.
- */
-;!function(undefined) {
-
-  var isArray = Array.isArray ? Array.isArray : function _isArray(obj) {
-    return Object.prototype.toString.call(obj) === "[object Array]";
-  };
-  var defaultMaxListeners = 10;
-
-  function init() {
-    this._events = {};
-    if (this._conf) {
-      configure.call(this, this._conf);
-    }
-  }
-
-  function configure(conf) {
-    if (conf) {
-
-      this._conf = conf;
-
-      conf.delimiter && (this.delimiter = conf.delimiter);
-      conf.maxListeners && (this._events.maxListeners = conf.maxListeners);
-      conf.wildcard && (this.wildcard = conf.wildcard);
-      conf.newListener && (this.newListener = conf.newListener);
-
-      if (this.wildcard) {
-        this.listenerTree = {};
-      }
-    }
-  }
-
-  function EventEmitter(conf) {
-    this._events = {};
-    this.newListener = false;
-    configure.call(this, conf);
-  }
-
-  //
-  // Attention, function return type now is array, always !
-  // It has zero elements if no any matches found and one or more
-  // elements (leafs) if there are matches
-  //
-  function searchListenerTree(handlers, type, tree, i) {
-    if (!tree) {
-      return [];
-    }
-    var listeners=[], leaf, len, branch, xTree, xxTree, isolatedBranch, endReached,
-        typeLength = type.length, currentType = type[i], nextType = type[i+1];
-    if (i === typeLength && tree._listeners) {
-      //
-      // If at the end of the event(s) list and the tree has listeners
-      // invoke those listeners.
-      //
-      if (typeof tree._listeners === 'function') {
-        handlers && handlers.push(tree._listeners);
-        return [tree];
-      } else {
-        for (leaf = 0, len = tree._listeners.length; leaf < len; leaf++) {
-          handlers && handlers.push(tree._listeners[leaf]);
-        }
-        return [tree];
-      }
-    }
-
-    if ((currentType === '*' || currentType === '**') || tree[currentType]) {
-      //
-      // If the event emitted is '*' at this part
-      // or there is a concrete match at this patch
-      //
-      if (currentType === '*') {
-        for (branch in tree) {
-          if (branch !== '_listeners' && tree.hasOwnProperty(branch)) {
-            listeners = listeners.concat(searchListenerTree(handlers, type, tree[branch], i+1));
-          }
-        }
-        return listeners;
-      } else if(currentType === '**') {
-        endReached = (i+1 === typeLength || (i+2 === typeLength && nextType === '*'));
-        if(endReached && tree._listeners) {
-          // The next element has a _listeners, add it to the handlers.
-          listeners = listeners.concat(searchListenerTree(handlers, type, tree, typeLength));
-        }
-
-        for (branch in tree) {
-          if (branch !== '_listeners' && tree.hasOwnProperty(branch)) {
-            if(branch === '*' || branch === '**') {
-              if(tree[branch]._listeners && !endReached) {
-                listeners = listeners.concat(searchListenerTree(handlers, type, tree[branch], typeLength));
-              }
-              listeners = listeners.concat(searchListenerTree(handlers, type, tree[branch], i));
-            } else if(branch === nextType) {
-              listeners = listeners.concat(searchListenerTree(handlers, type, tree[branch], i+2));
-            } else {
-              // No match on this one, shift into the tree but not in the type array.
-              listeners = listeners.concat(searchListenerTree(handlers, type, tree[branch], i));
-            }
-          }
-        }
-        return listeners;
-      }
-
-      listeners = listeners.concat(searchListenerTree(handlers, type, tree[currentType], i+1));
-    }
-
-    xTree = tree['*'];
-    if (xTree) {
-      //
-      // If the listener tree will allow any match for this part,
-      // then recursively explore all branches of the tree
-      //
-      searchListenerTree(handlers, type, xTree, i+1);
-    }
-
-    xxTree = tree['**'];
-    if(xxTree) {
-      if(i < typeLength) {
-        if(xxTree._listeners) {
-          // If we have a listener on a '**', it will catch all, so add its handler.
-          searchListenerTree(handlers, type, xxTree, typeLength);
-        }
-
-        // Build arrays of matching next branches and others.
-        for(branch in xxTree) {
-          if(branch !== '_listeners' && xxTree.hasOwnProperty(branch)) {
-            if(branch === nextType) {
-              // We know the next element will match, so jump twice.
-              searchListenerTree(handlers, type, xxTree[branch], i+2);
-            } else if(branch === currentType) {
-              // Current node matches, move into the tree.
-              searchListenerTree(handlers, type, xxTree[branch], i+1);
-            } else {
-              isolatedBranch = {};
-              isolatedBranch[branch] = xxTree[branch];
-              searchListenerTree(handlers, type, { '**': isolatedBranch }, i+1);
-            }
-          }
-        }
-      } else if(xxTree._listeners) {
-        // We have reached the end and still on a '**'
-        searchListenerTree(handlers, type, xxTree, typeLength);
-      } else if(xxTree['*'] && xxTree['*']._listeners) {
-        searchListenerTree(handlers, type, xxTree['*'], typeLength);
-      }
-    }
-
-    return listeners;
-  }
-
-  function growListenerTree(type, listener) {
-
-    type = typeof type === 'string' ? type.split(this.delimiter) : type.slice();
-
-    //
-    // Looks for two consecutive '**', if so, don't add the event at all.
-    //
-    for(var i = 0, len = type.length; i+1 < len; i++) {
-      if(type[i] === '**' && type[i+1] === '**') {
-        return;
-      }
-    }
-
-    var tree = this.listenerTree;
-    var name = type.shift();
-
-    while (name) {
-
-      if (!tree[name]) {
-        tree[name] = {};
-      }
-
-      tree = tree[name];
-
-      if (type.length === 0) {
-
-        if (!tree._listeners) {
-          tree._listeners = listener;
-        }
-        else if(typeof tree._listeners === 'function') {
-          tree._listeners = [tree._listeners, listener];
-        }
-        else if (isArray(tree._listeners)) {
-
-          tree._listeners.push(listener);
-
-          if (!tree._listeners.warned) {
-
-            var m = defaultMaxListeners;
-
-            if (typeof this._events.maxListeners !== 'undefined') {
-              m = this._events.maxListeners;
-            }
-
-            if (m > 0 && tree._listeners.length > m) {
-
-              tree._listeners.warned = true;
-              console.error('(node) warning: possible EventEmitter memory ' +
-                            'leak detected. %d listeners added. ' +
-                            'Use emitter.setMaxListeners() to increase limit.',
-                            tree._listeners.length);
-              console.trace();
-            }
-          }
-        }
-        return true;
-      }
-      name = type.shift();
-    }
-    return true;
-  }
-
-  // By default EventEmitters will print a warning if more than
-  // 10 listeners are added to it. This is a useful default which
-  // helps finding memory leaks.
-  //
-  // Obviously not all Emitters should be limited to 10. This function allows
-  // that to be increased. Set to zero for unlimited.
-
-  EventEmitter.prototype.delimiter = '.';
-
-  EventEmitter.prototype.setMaxListeners = function(n) {
-    this._events || init.call(this);
-    this._events.maxListeners = n;
-    if (!this._conf) this._conf = {};
-    this._conf.maxListeners = n;
-  };
-
-  EventEmitter.prototype.event = '';
-
-  EventEmitter.prototype.once = function(event, fn) {
-    this.many(event, 1, fn);
-    return this;
-  };
-
-  EventEmitter.prototype.many = function(event, ttl, fn) {
-    var self = this;
-
-    if (typeof fn !== 'function') {
-      throw new Error('many only accepts instances of Function');
-    }
-
-    function listener() {
-      if (--ttl === 0) {
-        self.off(event, listener);
-      }
-      fn.apply(this, arguments);
-    }
-
-    listener._origin = fn;
-
-    this.on(event, listener);
-
-    return self;
-  };
-
-  EventEmitter.prototype.emit = function() {
-
-    this._events || init.call(this);
-
-    var type = arguments[0];
-
-    if (type === 'newListener' && !this.newListener) {
-      if (!this._events.newListener) { return false; }
-    }
-
-    // Loop through the *_all* functions and invoke them.
-    if (this._all) {
-      var l = arguments.length;
-      var args = new Array(l - 1);
-      for (var i = 1; i < l; i++) args[i - 1] = arguments[i];
-      for (i = 0, l = this._all.length; i < l; i++) {
-        this.event = type;
-        this._all[i].apply(this, args);
-      }
-    }
-
-    // If there is no 'error' event listener then throw.
-    if (type === 'error') {
-
-      if (!this._all &&
-        !this._events.error &&
-        !(this.wildcard && this.listenerTree.error)) {
-
-        if (arguments[1] instanceof Error) {
-          throw arguments[1]; // Unhandled 'error' event
-        } else {
-          throw new Error("Uncaught, unspecified 'error' event.");
-        }
-        return false;
-      }
-    }
-
-    var handler;
-
-    if(this.wildcard) {
-      handler = [];
-      var ns = typeof type === 'string' ? type.split(this.delimiter) : type.slice();
-      searchListenerTree.call(this, handler, ns, this.listenerTree, 0);
-    }
-    else {
-      handler = this._events[type];
-    }
-
-    if (typeof handler === 'function') {
-      this.event = type;
-      if (arguments.length === 1) {
-        handler.call(this);
-      }
-      else if (arguments.length > 1)
-        switch (arguments.length) {
-          case 2:
-            handler.call(this, arguments[1]);
-            break;
-          case 3:
-            handler.call(this, arguments[1], arguments[2]);
-            break;
-          // slower
-          default:
-            var l = arguments.length;
-            var args = new Array(l - 1);
-            for (var i = 1; i < l; i++) args[i - 1] = arguments[i];
-            handler.apply(this, args);
-        }
-      return true;
-    }
-    else if (handler) {
-      var l = arguments.length;
-      var args = new Array(l - 1);
-      for (var i = 1; i < l; i++) args[i - 1] = arguments[i];
-
-      var listeners = handler.slice();
-      for (var i = 0, l = listeners.length; i < l; i++) {
-        this.event = type;
-        listeners[i].apply(this, args);
-      }
-      return (listeners.length > 0) || !!this._all;
-    }
-    else {
-      return !!this._all;
-    }
-
-  };
-
-  EventEmitter.prototype.on = function(type, listener) {
-
-    if (typeof type === 'function') {
-      this.onAny(type);
-      return this;
-    }
-
-    if (typeof listener !== 'function') {
-      throw new Error('on only accepts instances of Function');
-    }
-    this._events || init.call(this);
-
-    // To avoid recursion in the case that type == "newListeners"! Before
-    // adding it to the listeners, first emit "newListeners".
-    this.emit('newListener', type, listener);
-
-    if(this.wildcard) {
-      growListenerTree.call(this, type, listener);
-      return this;
-    }
-
-    if (!this._events[type]) {
-      // Optimize the case of one listener. Don't need the extra array object.
-      this._events[type] = listener;
-    }
-    else if(typeof this._events[type] === 'function') {
-      // Adding the second element, need to change to array.
-      this._events[type] = [this._events[type], listener];
-    }
-    else if (isArray(this._events[type])) {
-      // If we've already got an array, just append.
-      this._events[type].push(listener);
-
-      // Check for listener leak
-      if (!this._events[type].warned) {
-
-        var m = defaultMaxListeners;
-
-        if (typeof this._events.maxListeners !== 'undefined') {
-          m = this._events.maxListeners;
-        }
-
-        if (m > 0 && this._events[type].length > m) {
-
-          this._events[type].warned = true;
-          console.error('(node) warning: possible EventEmitter memory ' +
-                        'leak detected. %d listeners added. ' +
-                        'Use emitter.setMaxListeners() to increase limit.',
-                        this._events[type].length);
-          console.trace();
-        }
-      }
-    }
-    return this;
-  };
-
-  EventEmitter.prototype.onAny = function(fn) {
-
-    if (typeof fn !== 'function') {
-      throw new Error('onAny only accepts instances of Function');
-    }
-
-    if(!this._all) {
-      this._all = [];
-    }
-
-    // Add the function to the event listener collection.
-    this._all.push(fn);
-    return this;
-  };
-
-  EventEmitter.prototype.addListener = EventEmitter.prototype.on;
-
-  EventEmitter.prototype.off = function(type, listener) {
-    if (typeof listener !== 'function') {
-      throw new Error('removeListener only takes instances of Function');
-    }
-
-    var handlers,leafs=[];
-
-    if(this.wildcard) {
-      var ns = typeof type === 'string' ? type.split(this.delimiter) : type.slice();
-      leafs = searchListenerTree.call(this, null, ns, this.listenerTree, 0);
-    }
-    else {
-      // does not use listeners(), so no side effect of creating _events[type]
-      if (!this._events[type]) return this;
-      handlers = this._events[type];
-      leafs.push({_listeners:handlers});
-    }
-
-    for (var iLeaf=0; iLeaf<leafs.length; iLeaf++) {
-      var leaf = leafs[iLeaf];
-      handlers = leaf._listeners;
-      if (isArray(handlers)) {
-
-        var position = -1;
-
-        for (var i = 0, length = handlers.length; i < length; i++) {
-          if (handlers[i] === listener ||
-            (handlers[i].listener && handlers[i].listener === listener) ||
-            (handlers[i]._origin && handlers[i]._origin === listener)) {
-            position = i;
-            break;
-          }
-        }
-
-        if (position < 0) {
-          continue;
-        }
-
-        if(this.wildcard) {
-          leaf._listeners.splice(position, 1);
-        }
-        else {
-          this._events[type].splice(position, 1);
-        }
-
-        if (handlers.length === 0) {
-          if(this.wildcard) {
-            delete leaf._listeners;
-          }
-          else {
-            delete this._events[type];
-          }
-        }
-        return this;
-      }
-      else if (handlers === listener ||
-        (handlers.listener && handlers.listener === listener) ||
-        (handlers._origin && handlers._origin === listener)) {
-        if(this.wildcard) {
-          delete leaf._listeners;
-        }
-        else {
-          delete this._events[type];
-        }
-      }
-    }
-
-    return this;
-  };
-
-  EventEmitter.prototype.offAny = function(fn) {
-    var i = 0, l = 0, fns;
-    if (fn && this._all && this._all.length > 0) {
-      fns = this._all;
-      for(i = 0, l = fns.length; i < l; i++) {
-        if(fn === fns[i]) {
-          fns.splice(i, 1);
-          return this;
-        }
-      }
-    } else {
-      this._all = [];
-    }
-    return this;
-  };
-
-  EventEmitter.prototype.removeListener = EventEmitter.prototype.off;
-
-  EventEmitter.prototype.removeAllListeners = function(type) {
-    if (arguments.length === 0) {
-      !this._events || init.call(this);
-      return this;
-    }
-
-    if(this.wildcard) {
-      var ns = typeof type === 'string' ? type.split(this.delimiter) : type.slice();
-      var leafs = searchListenerTree.call(this, null, ns, this.listenerTree, 0);
-
-      for (var iLeaf=0; iLeaf<leafs.length; iLeaf++) {
-        var leaf = leafs[iLeaf];
-        leaf._listeners = null;
-      }
-    }
-    else {
-      if (!this._events[type]) return this;
-      this._events[type] = null;
-    }
-    return this;
-  };
-
-  EventEmitter.prototype.listeners = function(type) {
-    if(this.wildcard) {
-      var handlers = [];
-      var ns = typeof type === 'string' ? type.split(this.delimiter) : type.slice();
-      searchListenerTree.call(this, handlers, ns, this.listenerTree, 0);
-      return handlers;
-    }
-
-    this._events || init.call(this);
-
-    if (!this._events[type]) this._events[type] = [];
-    if (!isArray(this._events[type])) {
-      this._events[type] = [this._events[type]];
-    }
-    return this._events[type];
-  };
-
-  EventEmitter.prototype.listenersAny = function() {
-
-    if(this._all) {
-      return this._all;
-    }
-    else {
-      return [];
-    }
-
-  };
-
-  if (typeof define === 'function' && define.amd) {
-     // AMD. Register as an anonymous module.
-    define(function() {
-      return EventEmitter;
-    });
-  } else if (typeof exports === 'object') {
-    // CommonJS
-    exports.EventEmitter2 = EventEmitter;
-  }
-  else {
-    // Browser global.
-    window.EventEmitter2 = EventEmitter;
-  }
-}();
-
-},{}],28:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -51254,684 +52503,7 @@ module.exports = {
   }
 };
 
-},{}],29:[function(require,module,exports){
-'use strict';
-
-require('whatwg-fetch');
-var Q = require('Q');
-var EventEmitter = require('eventemitter2').EventEmitter2;
-var copy = require('shallow-copy');
-
-// The default base url.
-var baseUrl = 'https://api.form.io';
-var appUrl = baseUrl;
-var appUrlSet = false;
-
-var plugins = [];
-
-// The temporary GET request cache storage
-var cache = {};
-
-var noop = function(){};
-var identity = function(value) { return value; };
-
-// Will invoke a function on all plugins.
-// Returns a promise that resolves when all promises
-// returned by the plugins have resolved.
-// Should be used when you want plugins to prepare for an event
-// but don't want any data returned.
-var pluginWait = function(pluginFn) {
-  var args = [].slice.call(arguments, 1);
-  return Q.all(plugins.map(function(plugin) {
-    return (plugin[pluginFn] || noop).apply(plugin, args);
-  }));
-};
-
-// Will invoke a function on plugins from highest priority
-// to lowest until one returns a value. Returns null if no
-// plugins return a value.
-// Should be used when you want just one plugin to handle things.
-var pluginGet = function(pluginFn) {
-  var args = [].slice.call(arguments, 0);
-  var callPlugin = function(index, pluginFn) {
-    var plugin = plugins[index];
-    if (!plugin) return Q(null);
-    return Q((plugin && plugin[pluginFn] || noop).apply(plugin, [].slice.call(arguments, 2)))
-    .then(function(result) {
-      if (result !== null && result !== undefined) return result;
-      return callPlugin.apply(null, [index + 1].concat(args));
-    });
-  };
-  return callPlugin.apply(null, [0].concat(args));
-};
-
-// Will invoke a function on plugins from highest priority to
-// lowest, building a promise chain from their return values
-// Should be used when all plugins need to process a promise's
-// success or failure
-var pluginAlter = function(pluginFn, value) {
-  var args = [].slice.call(arguments, 2);
-  return plugins.reduce(function(value, plugin) {
-      return (plugin[pluginFn] || identity).apply(plugin, [value].concat(args));
-  }, value);
-};
-
-
-/**
- * Returns parts of the URL that are important.
- * Indexes
- *  - 0: The full url
- *  - 1: The protocol
- *  - 2: The hostname
- *  - 3: The rest
- *
- * @param url
- * @returns {*}
- */
-var getUrlParts = function(url) {
-  var regex = '^(http[s]?:\\/\\/)';
-  if (baseUrl && url.indexOf(baseUrl) === 0) {
-    regex += '(' + baseUrl.replace(/^http[s]?:\/\//, '') + ')';
-  }
-  else {
-    regex += '([^/]+)';
-  }
-  regex += '($|\\/.*)';
-  return url.match(new RegExp(regex));
-};
-
-var serialize = function(obj) {
-  var str = [];
-  for(var p in obj)
-    if (obj.hasOwnProperty(p)) {
-      str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
-    }
-  return str.join("&");
-};
-
-// The formio class.
-var Formio = function(path) {
-
-  // Ensure we have an instance of Formio.
-  if (!(this instanceof Formio)) { return new Formio(path); }
-  if (!path) {
-    // Allow user to create new projects if this was instantiated without
-    // a url
-    this.projectUrl = baseUrl + '/project';
-    this.projectsUrl = baseUrl + '/project';
-    this.projectId = false;
-    this.query = '';
-    return;
-  }
-
-  // Initialize our variables.
-  this.projectsUrl = '';
-  this.projectUrl = '';
-  this.projectId = '';
-  this.formUrl = '';
-  this.formsUrl = '';
-  this.formId = '';
-  this.submissionsUrl = '';
-  this.submissionUrl = '';
-  this.submissionId = '';
-  this.actionsUrl = '';
-  this.actionId = '';
-  this.actionUrl = '';
-  this.query = '';
-
-  // Normalize to an absolute path.
-  if ((path.indexOf('http') !== 0) && (path.indexOf('//') !== 0)) {
-    baseUrl = baseUrl ? baseUrl : window.location.href.match(/http[s]?:\/\/api./)[0];
-    path = baseUrl + path;
-  }
-
-  var hostparts = getUrlParts(path);
-  var parts = [];
-  var hostName = hostparts[1] + hostparts[2];
-  path = hostparts.length > 3 ? hostparts[3] : '';
-  var queryparts = path.split('?');
-  if (queryparts.length > 1) {
-    path = queryparts[0];
-    this.query = '?' + queryparts[1];
-  }
-
-  // See if this is a form path.
-  if ((path.search(/(^|\/)(form|project)($|\/)/) !== -1)) {
-
-    // Register a specific path.
-    var registerPath = function(name, base) {
-      this[name + 'sUrl'] = base + '/' + name;
-      var regex = new RegExp('\/' + name + '\/([^/]+)');
-      if (path.search(regex) !== -1) {
-        parts = path.match(regex);
-        this[name + 'Url'] = parts ? (base + parts[0]) : '';
-        this[name + 'Id'] = (parts.length > 1) ? parts[1] : '';
-        base += parts[0];
-      }
-      return base;
-    }.bind(this);
-
-    // Register an array of items.
-    var registerItems = function(items, base, staticBase) {
-      for (var i in items) {
-        if (items.hasOwnProperty(i)) {
-          var item = items[i];
-          if (item instanceof Array) {
-            registerItems(item, base, true);
-          }
-          else {
-            var newBase = registerPath(item, base);
-            base = staticBase ? base : newBase;
-          }
-        }
-      }
-    };
-
-    registerItems(['project', 'form', ['submission', 'action']], hostName);
-
-    if (!this.projectId) {
-      if (hostparts.length > 2 && hostparts[2].split('.').length > 2) {
-        this.projectUrl = hostName;
-        this.projectId = hostparts[2].split('.')[0];
-      }
-    }
-  }
-  else {
-
-    // This is an aliased url.
-    this.projectUrl = hostName;
-    this.projectId = (hostparts.length > 2) ? hostparts[2].split('.')[0] : '';
-    var subRegEx = new RegExp('\/(submission|action)($|\/.*)');
-    var subs = path.match(subRegEx);
-    this.pathType = (subs && (subs.length > 1)) ? subs[1] : '';
-    path = path.replace(subRegEx, '');
-    path = path.replace(/\/$/, '');
-    this.formsUrl = hostName + '/form';
-    this.formUrl = hostName + path;
-    this.formId = path.replace(/^\/+|\/+$/g, '');
-    var items = ['submission', 'action'];
-    for (var i in items) {
-      if (items.hasOwnProperty(i)) {
-        var item = items[i];
-        this[item + 'sUrl'] = hostName + path + '/' + item;
-        if ((this.pathType === item) && (subs.length > 2) && subs[2]) {
-          this[item + 'Id'] = subs[2].replace(/^\/+|\/+$/g, '');
-          this[item + 'Url'] = hostName + path + subs[0];
-        }
-      }
-    }
-  }
-
-  // Set the app url if it is not set.
-  if (!appUrlSet) {
-    appUrl = this.projectUrl;
-  }
-};
-
-/**
- * Load a resource.
- *
- * @param type
- * @returns {Function}
- * @private
- */
-var _load = function(type) {
-  var _id = type + 'Id';
-  var _url = type + 'Url';
-  return function(query, opts) {
-    if (query && typeof query === 'object') {
-      query = serialize(query.params);
-    }
-    if (query) {
-      query = this.query ? (this.query + '&' + query) : ('?' + query);
-    }
-    else {
-      query = this.query;
-    }
-    if (!this[_id]) { return Q.reject('Missing ' + _id); }
-    return this.makeRequest(type, this[_url] + query, 'get', null, opts);
-  };
-};
-
-/**
- * Save a resource.
- *
- * @param type
- * @returns {Function}
- * @private
- */
-var _save = function(type) {
-  var _id = type + 'Id';
-  var _url = type + 'Url';
-  return function(data, opts) {
-    var method = this[_id] ? 'put' : 'post';
-    var reqUrl = this[_id] ? this[_url] : this[type + 'sUrl'];
-    cache = {};
-    return this.makeRequest(type, reqUrl + this.query, method, data, opts);
-  };
-};
-
-/**
- * Delete a resource.
- *
- * @param type
- * @returns {Function}
- * @private
- */
-var _delete = function(type) {
-  var _id = type + 'Id';
-  var _url = type + 'Url';
-  return function(opts) {
-    if (!this[_id]) { Q.reject('Nothing to delete'); }
-    cache = {};
-    return this.makeRequest(type, this[_url], 'delete', null, opts);
-  };
-};
-
-/**
- * Resource index method.
- *
- * @param type
- * @returns {Function}
- * @private
- */
-var _index = function(type) {
-  var _url = type + 'Url';
-  return function(query, opts) {
-    query = query || '';
-    if (query && typeof query === 'object') {
-      query = '?' + serialize(query.params);
-    }
-    return this.makeRequest(type, this[_url] + query, 'get', null, opts);
-  };
-};
-
-// Activates plugin hooks, makes Formio.request if no plugin provides a request
-Formio.prototype.makeRequest = function(type, url, method, data, opts) {
-  var self = this;
-  method = (method || 'GET').toUpperCase();
-  if(!opts || typeof opts !== 'object') {
-    opts = {};
-  }
-
-  var requestArgs = {
-    formio: self,
-    type: type,
-    url: url,
-    method: method,
-    data: data,
-    opts: opts
-  };
-
-  var request = pluginWait('preRequest', requestArgs)
-  .then(function() {
-    return pluginGet('request', requestArgs)
-    .then(function(result) {
-      if (result === null || result === undefined) {
-        return Formio.request(url, method, data);
-      }
-      return result;
-    });
-  });
-
-  return pluginAlter('wrapRequestPromise', request, requestArgs);
-};
-
-// Define specific CRUD methods.
-Formio.prototype.loadProject = _load('project');
-Formio.prototype.saveProject = _save('project');
-Formio.prototype.deleteProject = _delete('project');
-Formio.prototype.loadForm = _load('form');
-Formio.prototype.saveForm = _save('form');
-Formio.prototype.deleteForm = _delete('form');
-Formio.prototype.loadForms = _index('forms');
-Formio.prototype.loadSubmission = _load('submission');
-Formio.prototype.saveSubmission = _save('submission');
-Formio.prototype.deleteSubmission = _delete('submission');
-Formio.prototype.loadSubmissions = _index('submissions');
-Formio.prototype.loadAction = _load('action');
-Formio.prototype.saveAction = _save('action');
-Formio.prototype.deleteAction = _delete('action');
-Formio.prototype.loadActions = _index('actions');
-Formio.prototype.availableActions = function() { return this.makeRequest('availableActions', this.formUrl + '/actions'); };
-Formio.prototype.actionInfo = function(name) { return this.makeRequest('actionInfo', this.formUrl + '/actions/' + name); };
-
-Formio.makeStaticRequest = function(url, method, data) {
-  var self = this;
-  method = (method || 'GET').toUpperCase();
-
-  var requestArgs = {
-    url: url,
-    method: method,
-    data: data
-  };
-
-  var request = pluginWait('preStaticRequest', requestArgs)
-  .then(function() {
-    return pluginGet('staticRequest', requestArgs)
-    .then(function(result) {
-      if (result === null || result === undefined) {
-        return Formio.request(url, method, data);
-      }
-      return result;
-    });
-  });
-
-  return pluginAlter('wrapStaticRequestPromise', request, requestArgs);
-};
-
-// Static methods.
-Formio.loadProjects = function(query) {
-  query = query || '';
-  if (typeof query === 'object') {
-    query = '?' + serialize(query.params);
-  }
-  return this.makeStaticRequest(baseUrl + '/project' + query);
-};
-Formio.request = function(url, method, data) {
-  if (!url) { return Q.reject('No url provided'); }
-  method = (method || 'GET').toUpperCase();
-  var cacheKey = btoa(url);
-
-  return Q().then(function() {
-    // Get the cached promise to save multiple loads.
-    if (method === 'GET' && cache.hasOwnProperty(cacheKey)) {
-      return cache[cacheKey];
-    }
-    else {
-      return Q()
-      .then(function() {
-        // Set up and fetch request
-        var headers = new Headers({
-          'Accept': 'application/json',
-          'Content-type': 'application/json; charset=UTF-8'
-        });
-        var token = Formio.getToken();
-        if (token) {
-          headers.append('x-jwt-token', token);
-        }
-
-        var options = {
-          method: method,
-          headers: headers,
-          mode: 'cors'
-        };
-        if (data) {
-          options.body = JSON.stringify(data);
-        }
-
-        return fetch(url, options);
-      })
-      .catch(function(err) {
-        err.message = 'Could not connect to API server (' + err.message + ')';
-        err.networkError = true;
-        throw err;
-      })
-      .then(function(response) {
-        // Handle fetch results
-        if (response.ok) {
-          var token = response.headers.get('x-jwt-token');
-          if (response.status >= 200 && response.status < 300 && token && token !== '') {
-            Formio.setToken(token);
-          }
-          // 204 is no content. Don't try to .json() it.
-          if (response.status === 204) {
-            return {};
-          }
-          return (response.headers.get('content-type').indexOf('application/json') !== -1 ?
-            response.json() : response.text())
-          .then(function(result) {
-            // Add some content-range metadata to the result here
-            var range = response.headers.get('content-range');
-            if (range && typeof result === 'object') {
-              range = range.split('/');
-              if(range[0] !== '*') {
-                var skipLimit = range[0].split('-');
-                result.skip = Number(skipLimit[0]);
-                result.limit = skipLimit[1] - skipLimit[0] + 1;
-              }
-              result.serverCount = range[1] === '*' ? range[1] : Number(range[1]);
-            }
-            return result;
-          });
-        }
-        else {
-          if (response.status === 440) {
-            Formio.setToken(null);
-            Formio.events.emit('formio.sessionExpired', response.body);
-          }
-          else if (response.status === 401) {
-            Formio.events.emit('formio.unauthorized', response.body);
-          }
-          // Parse and return the error as a rejected promise to reject this promise
-          return (response.headers.get('content-type').indexOf('application/json') !== -1 ?
-            response.json() : response.text())
-            .then(function(error){
-              throw error;
-            });
-        }
-      })
-      .catch(function(err) {
-        if (err === 'Bad Token') {
-          Formio.setToken(null);
-          Formio.events.emit('formio.badToken', err);
-        }
-        // Remove failed promises from cache
-        delete cache[cacheKey];
-        // Propagate error so client can handle accordingly
-        throw err;
-      });
-    }
-  })
-  .then(function(result) {
-    // Save the cache
-    if (method === 'GET') {
-      cache[cacheKey] = Q(result);
-    }
-
-    // Shallow copy result so modifications don't end up in cache
-    if(Array.isArray(result)) {
-      var resultCopy = result.map(copy);
-      resultCopy.skip = result.skip;
-      resultCopy.limit = result.limit;
-      resultCopy.serverCount = result.serverCount;
-      return resultCopy;
-    }
-    return copy(result);
-  });
-};
-
-Formio.setToken = function(token) {
-  token = token || '';
-  if (token === this.token) { return; }
-  this.token = token;
-  if (!token) {
-    Formio.setUser(null);
-    // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
-    try {
-      return localStorage.removeItem('formioToken');
-    }
-    catch(err) {
-      return;
-    }
-  }
-  // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
-  try {
-    localStorage.setItem('formioToken', token);
-  }
-  catch(err) {
-    // Do nothing.
-  }
-  Formio.currentUser(); // Run this so user is updated if null
-};
-Formio.getToken = function() {
-  if (this.token) { return this.token; }
-  var token = localStorage.getItem('formioToken') || '';
-  this.token = token;
-  return token;
-};
-Formio.setUser = function(user) {
-  if (!user) {
-    this.setToken(null);
-    // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
-    try {
-      return localStorage.removeItem('formioUser');
-    }
-    catch(err) {
-      return;
-    }
-  }
-  // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
-  try {
-    localStorage.setItem('formioUser', JSON.stringify(user));
-  }
-  catch(err) {
-    // Do nothing.
-  }
-};
-Formio.getUser = function() {
-  return JSON.parse(localStorage.getItem('formioUser') || null);
-};
-
-Formio.setBaseUrl = function(url) {
-  baseUrl = url;
-  if (!appUrlSet) {
-    appUrl = url;
-  }
-};
-Formio.getBaseUrl = function() {
-  return baseUrl;
-};
-Formio.setAppUrl = function(url) {
-  appUrl = url;
-  appUrlSet = true;
-};
-Formio.getAppUrl = function() {
-  return appUrl;
-};
-Formio.clearCache = function() { cache = {}; };
-
-Formio.currentUser = function() {
-  var url = baseUrl + '/current';
-  var user = this.getUser();
-  if (user) {
-    return pluginAlter('wrapStaticRequestPromise', Q(user), {
-      url: url,
-      method: 'GET'
-    })
-  }
-  var token = this.getToken();
-  if (!token) {
-    return pluginAlter('wrapStaticRequestPromise', Q(null), {
-      url: url,
-      method: 'GET'
-    })
-  }
-  return this.makeStaticRequest(url)
-  .then(function(response) {
-    Formio.setUser(response);
-    return response;
-  });
-};
-
-// Keep track of their logout callback.
-Formio.logout = function() {
-  return this.makeStaticRequest(baseUrl + '/logout').finally(function() {
-    this.setToken(null);
-    this.setUser(null);
-    Formio.clearCache();
-  }.bind(this));
-};
-Formio.fieldData = function(data, component) {
-  if (!data) { return ''; }
-  if (!component || !component.key) { return data; }
-  if (component.key.indexOf('.') !== -1) {
-    var value = data;
-    var parts = component.key.split('.');
-    var key = '';
-    for (var i = 0; i < parts.length; i++) {
-      key = parts[i];
-
-      // Handle nested resources
-      if (value.hasOwnProperty('_id')) {
-        value = value.data;
-      }
-
-      // Return if the key is not found on the value.
-      if (!value.hasOwnProperty(key)) {
-        return;
-      }
-
-      // Convert old single field data in submissions to multiple
-      if (key === parts[parts.length - 1] && component.multiple && !Array.isArray(value[key])) {
-        value[key] = [value[key]];
-      }
-
-      // Set the value of this key.
-      value = value[key];
-    }
-    return value;
-  }
-  else {
-    // Convert old single field data in submissions to multiple
-    if (component.multiple && !Array.isArray(data[component.key])) {
-      data[component.key] = [data[component.key]];
-    }
-    return data[component.key];
-  }
-};
-
-/**
- * EventEmitter for Formio events.
- * See Node.js documentation for API documentation: https://nodejs.org/api/events.html
- */
-Formio.events = new EventEmitter({
-  wildcard: false,
-  maxListeners: 0
-});
-
-/**
- * Register a plugin with Formio.js
- * @param plugin The plugin to register. See plugin documentation.
- * @param name   Optional name to later retrieve plugin with.
- */
-Formio.registerPlugin = function(plugin, name) {
-  plugins.push(plugin);
-  plugins.sort(function(a, b) {
-    return (b.priority || 0) - (a.priority || 0);
-  });
-  plugin.__name = name;
-  (plugin.init || noop).call(plugin, Formio);
-};
-
-/**
- * Returns the plugin registered with the given name.
- */
-Formio.getPlugin = function(name) {
-  return plugins.reduce(function(result, plugin) {
-    if (result) return result;
-    if (plugin.__name === name) return plugin;
-  }, null);
-};
-
-/**
- * Deregisters a plugin with Formio.js.
- * @param  plugin The instance or name of the plugin
- * @return true if deregistered, false otherwise
- */
-Formio.deregisterPlugin = function(plugin) {
-  var beforeLength = plugins.length;
-  plugins = plugins.filter(function(p) {
-    if(p !== plugin && p.__name !== plugin) return true;
-    (p.deregister || noop).call(p, Formio);
-    return false;
-  });
-  return beforeLength !== plugins.length;
-};
-
-module.exports = Formio;
-
-},{"Q":1,"eventemitter2":27,"shallow-copy":32,"whatwg-fetch":35}],30:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 /**!
  * AngularJS file upload directives and services. Supoorts: file upload/drop/paste, resume, cancel/abort,
  * progress, resize, thumbnail, preview, validation and CORS
@@ -54734,47 +55306,10 @@ ngFileUpload.service('UploadExif', ['UploadResize', '$q', function (UploadResize
 }]);
 
 
-},{}],31:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 require('./dist/ng-file-upload-all');
 module.exports = 'ngFileUpload';
-},{"./dist/ng-file-upload-all":30}],32:[function(require,module,exports){
-module.exports = function (obj) {
-    if (!obj || typeof obj !== 'object') return obj;
-    
-    var copy;
-    
-    if (isArray(obj)) {
-        var len = obj.length;
-        copy = Array(len);
-        for (var i = 0; i < len; i++) {
-            copy[i] = obj[i];
-        }
-    }
-    else {
-        var keys = objectKeys(obj);
-        copy = {};
-        
-        for (var i = 0, l = keys.length; i < l; i++) {
-            var key = keys[i];
-            copy[key] = obj[key];
-        }
-    }
-    return copy;
-};
-
-var objectKeys = Object.keys || function (obj) {
-    var keys = [];
-    for (var key in obj) {
-        if ({}.hasOwnProperty.call(obj, key)) keys.push(key);
-    }
-    return keys;
-};
-
-var isArray = Array.isArray || function (xs) {
-    return {}.toString.call(xs) === '[object Array]';
-};
-
-},{}],33:[function(require,module,exports){
+},{"./dist/ng-file-upload-all":36}],38:[function(require,module,exports){
 (function (root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module unless amdModuleId is set
@@ -55165,7 +55700,7 @@ return SignaturePad;
 
 }));
 
-},{}],34:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 /*!
  * ui-select
  * http://github.com/angular-ui/ui-select
@@ -57255,339 +57790,7 @@ $templateCache.put("select2/select.tpl.html","<div class=\"ui-select-container s
 $templateCache.put("selectize/choices.tpl.html","<div ng-show=\"$select.open\" class=\"ui-select-choices ui-select-dropdown selectize-dropdown single\"><div class=\"ui-select-choices-content selectize-dropdown-content\"><div class=\"ui-select-choices-group optgroup\" role=\"listbox\"><div ng-show=\"$select.isGrouped\" class=\"ui-select-choices-group-label optgroup-header\" ng-bind=\"$group.name\"></div><div role=\"option\" class=\"ui-select-choices-row\" ng-class=\"{active: $select.isActive(this), disabled: $select.isDisabled(this)}\"><div class=\"option ui-select-choices-row-inner\" data-selectable=\"\"></div></div></div></div></div>");
 $templateCache.put("selectize/match.tpl.html","<div ng-hide=\"($select.open || $select.isEmpty())\" class=\"ui-select-match\" ng-transclude=\"\"></div>");
 $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container selectize-control single\" ng-class=\"{\'open\': $select.open}\"><div class=\"selectize-input\" ng-class=\"{\'focus\': $select.open, \'disabled\': $select.disabled, \'selectize-focus\' : $select.focus}\" ng-click=\"$select.open && !$select.searchEnabled ? $select.toggle($event) : $select.activate()\"><div class=\"ui-select-match\"></div><input type=\"text\" autocomplete=\"off\" tabindex=\"-1\" class=\"ui-select-search ui-select-toggle\" ng-click=\"$select.toggle($event)\" placeholder=\"{{$select.placeholder}}\" ng-model=\"$select.search\" ng-hide=\"!$select.searchEnabled || ($select.selected && !$select.open)\" ng-disabled=\"$select.disabled\" aria-label=\"{{ $select.baseTitle }}\"></div><div class=\"ui-select-choices\"></div></div>");}]);
-},{}],35:[function(require,module,exports){
-(function() {
-  'use strict';
-
-  if (self.fetch) {
-    return
-  }
-
-  function normalizeName(name) {
-    if (typeof name !== 'string') {
-      name = name.toString();
-    }
-    if (/[^a-z0-9\-#$%&'*+.\^_`|~]/i.test(name)) {
-      throw new TypeError('Invalid character in header field name')
-    }
-    return name.toLowerCase()
-  }
-
-  function normalizeValue(value) {
-    if (typeof value !== 'string') {
-      value = value.toString();
-    }
-    return value
-  }
-
-  function Headers(headers) {
-    this.map = {}
-
-    if (headers instanceof Headers) {
-      headers.forEach(function(value, name) {
-        this.append(name, value)
-      }, this)
-
-    } else if (headers) {
-      Object.getOwnPropertyNames(headers).forEach(function(name) {
-        this.append(name, headers[name])
-      }, this)
-    }
-  }
-
-  Headers.prototype.append = function(name, value) {
-    name = normalizeName(name)
-    value = normalizeValue(value)
-    var list = this.map[name]
-    if (!list) {
-      list = []
-      this.map[name] = list
-    }
-    list.push(value)
-  }
-
-  Headers.prototype['delete'] = function(name) {
-    delete this.map[normalizeName(name)]
-  }
-
-  Headers.prototype.get = function(name) {
-    var values = this.map[normalizeName(name)]
-    return values ? values[0] : null
-  }
-
-  Headers.prototype.getAll = function(name) {
-    return this.map[normalizeName(name)] || []
-  }
-
-  Headers.prototype.has = function(name) {
-    return this.map.hasOwnProperty(normalizeName(name))
-  }
-
-  Headers.prototype.set = function(name, value) {
-    this.map[normalizeName(name)] = [normalizeValue(value)]
-  }
-
-  Headers.prototype.forEach = function(callback, thisArg) {
-    Object.getOwnPropertyNames(this.map).forEach(function(name) {
-      this.map[name].forEach(function(value) {
-        callback.call(thisArg, value, name, this)
-      }, this)
-    }, this)
-  }
-
-  function consumed(body) {
-    if (body.bodyUsed) {
-      return Promise.reject(new TypeError('Already read'))
-    }
-    body.bodyUsed = true
-  }
-
-  function fileReaderReady(reader) {
-    return new Promise(function(resolve, reject) {
-      reader.onload = function() {
-        resolve(reader.result)
-      }
-      reader.onerror = function() {
-        reject(reader.error)
-      }
-    })
-  }
-
-  function readBlobAsArrayBuffer(blob) {
-    var reader = new FileReader()
-    reader.readAsArrayBuffer(blob)
-    return fileReaderReady(reader)
-  }
-
-  function readBlobAsText(blob) {
-    var reader = new FileReader()
-    reader.readAsText(blob)
-    return fileReaderReady(reader)
-  }
-
-  var support = {
-    blob: 'FileReader' in self && 'Blob' in self && (function() {
-      try {
-        new Blob();
-        return true
-      } catch(e) {
-        return false
-      }
-    })(),
-    formData: 'FormData' in self
-  }
-
-  function Body() {
-    this.bodyUsed = false
-
-
-    this._initBody = function(body) {
-      this._bodyInit = body
-      if (typeof body === 'string') {
-        this._bodyText = body
-      } else if (support.blob && Blob.prototype.isPrototypeOf(body)) {
-        this._bodyBlob = body
-      } else if (support.formData && FormData.prototype.isPrototypeOf(body)) {
-        this._bodyFormData = body
-      } else if (!body) {
-        this._bodyText = ''
-      } else {
-        throw new Error('unsupported BodyInit type')
-      }
-    }
-
-    if (support.blob) {
-      this.blob = function() {
-        var rejected = consumed(this)
-        if (rejected) {
-          return rejected
-        }
-
-        if (this._bodyBlob) {
-          return Promise.resolve(this._bodyBlob)
-        } else if (this._bodyFormData) {
-          throw new Error('could not read FormData body as blob')
-        } else {
-          return Promise.resolve(new Blob([this._bodyText]))
-        }
-      }
-
-      this.arrayBuffer = function() {
-        return this.blob().then(readBlobAsArrayBuffer)
-      }
-
-      this.text = function() {
-        var rejected = consumed(this)
-        if (rejected) {
-          return rejected
-        }
-
-        if (this._bodyBlob) {
-          return readBlobAsText(this._bodyBlob)
-        } else if (this._bodyFormData) {
-          throw new Error('could not read FormData body as text')
-        } else {
-          return Promise.resolve(this._bodyText)
-        }
-      }
-    } else {
-      this.text = function() {
-        var rejected = consumed(this)
-        return rejected ? rejected : Promise.resolve(this._bodyText)
-      }
-    }
-
-    if (support.formData) {
-      this.formData = function() {
-        return this.text().then(decode)
-      }
-    }
-
-    this.json = function() {
-      return this.text().then(JSON.parse)
-    }
-
-    return this
-  }
-
-  // HTTP methods whose capitalization should be normalized
-  var methods = ['DELETE', 'GET', 'HEAD', 'OPTIONS', 'POST', 'PUT']
-
-  function normalizeMethod(method) {
-    var upcased = method.toUpperCase()
-    return (methods.indexOf(upcased) > -1) ? upcased : method
-  }
-
-  function Request(url, options) {
-    options = options || {}
-    this.url = url
-
-    this.credentials = options.credentials || 'omit'
-    this.headers = new Headers(options.headers)
-    this.method = normalizeMethod(options.method || 'GET')
-    this.mode = options.mode || null
-    this.referrer = null
-
-    if ((this.method === 'GET' || this.method === 'HEAD') && options.body) {
-      throw new TypeError('Body not allowed for GET or HEAD requests')
-    }
-    this._initBody(options.body)
-  }
-
-  function decode(body) {
-    var form = new FormData()
-    body.trim().split('&').forEach(function(bytes) {
-      if (bytes) {
-        var split = bytes.split('=')
-        var name = split.shift().replace(/\+/g, ' ')
-        var value = split.join('=').replace(/\+/g, ' ')
-        form.append(decodeURIComponent(name), decodeURIComponent(value))
-      }
-    })
-    return form
-  }
-
-  function headers(xhr) {
-    var head = new Headers()
-    var pairs = xhr.getAllResponseHeaders().trim().split('\n')
-    pairs.forEach(function(header) {
-      var split = header.trim().split(':')
-      var key = split.shift().trim()
-      var value = split.join(':').trim()
-      head.append(key, value)
-    })
-    return head
-  }
-
-  Body.call(Request.prototype)
-
-  function Response(bodyInit, options) {
-    if (!options) {
-      options = {}
-    }
-
-    this._initBody(bodyInit)
-    this.type = 'default'
-    this.url = null
-    this.status = options.status
-    this.ok = this.status >= 200 && this.status < 300
-    this.statusText = options.statusText
-    this.headers = options.headers instanceof Headers ? options.headers : new Headers(options.headers)
-    this.url = options.url || ''
-  }
-
-  Body.call(Response.prototype)
-
-  self.Headers = Headers;
-  self.Request = Request;
-  self.Response = Response;
-
-  self.fetch = function(input, init) {
-    // TODO: Request constructor should accept input, init
-    var request
-    if (Request.prototype.isPrototypeOf(input) && !init) {
-      request = input
-    } else {
-      request = new Request(input, init)
-    }
-
-    return new Promise(function(resolve, reject) {
-      var xhr = new XMLHttpRequest()
-
-      function responseURL() {
-        if ('responseURL' in xhr) {
-          return xhr.responseURL
-        }
-
-        // Avoid security warnings on getResponseHeader when not allowed by CORS
-        if (/^X-Request-URL:/m.test(xhr.getAllResponseHeaders())) {
-          return xhr.getResponseHeader('X-Request-URL')
-        }
-
-        return;
-      }
-
-      xhr.onload = function() {
-        var status = (xhr.status === 1223) ? 204 : xhr.status
-        if (status < 100 || status > 599) {
-          reject(new TypeError('Network request failed'))
-          return
-        }
-        var options = {
-          status: status,
-          statusText: xhr.statusText,
-          headers: headers(xhr),
-          url: responseURL()
-        }
-        var body = 'response' in xhr ? xhr.response : xhr.responseText;
-        resolve(new Response(body, options))
-      }
-
-      xhr.onerror = function() {
-        reject(new TypeError('Network request failed'))
-      }
-
-      xhr.open(request.method, request.url, true)
-
-      if (request.credentials === 'include') {
-        xhr.withCredentials = true
-      }
-
-      if ('responseType' in xhr && support.blob) {
-        xhr.responseType = 'blob'
-      }
-
-      request.headers.forEach(function(value, name) {
-        xhr.setRequestHeader(name, value)
-      })
-
-      xhr.send(typeof request._bodyInit === 'undefined' ? null : request._bodyInit)
-    })
-  }
-  self.fetch.polyfill = true
-})();
-
-},{}],36:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -57657,7 +57860,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],37:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -57818,7 +58021,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],38:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -57869,7 +58072,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],39:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -57902,7 +58105,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],40:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 "use strict";
 module.exports = function(app) {
   app.provider('formioComponents', function() {
@@ -57962,7 +58165,7 @@ module.exports = function(app) {
   }]);
 };
 
-},{}],41:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -58005,7 +58208,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],42:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -58033,7 +58236,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],43:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 "use strict";
 
 
@@ -58141,7 +58344,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],44:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -58166,7 +58369,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],45:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -58257,7 +58460,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],46:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -58344,7 +58547,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],47:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -58373,7 +58576,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],48:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -58408,7 +58611,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],49:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -58616,7 +58819,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],50:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -58649,7 +58852,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],51:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 "use strict";
 
 
@@ -58728,7 +58931,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],52:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 "use strict";
 var app = angular.module('formio');
 
@@ -58769,7 +58972,7 @@ require('./panel')(app);
 require('./table')(app);
 require('./well')(app);
 
-},{"./address":36,"./button":37,"./checkbox":38,"./columns":39,"./components":40,"./container":41,"./content":42,"./currency":43,"./custom":44,"./datagrid":45,"./datetime":46,"./email":47,"./fieldset":48,"./file":49,"./hidden":50,"./htmlelement":51,"./number":53,"./page":54,"./panel":55,"./password":56,"./phonenumber":57,"./radio":58,"./resource":59,"./select":60,"./selectboxes":61,"./signature":62,"./survey":63,"./table":64,"./textarea":65,"./textfield":66,"./well":67}],53:[function(require,module,exports){
+},{"./address":40,"./button":41,"./checkbox":42,"./columns":43,"./components":44,"./container":45,"./content":46,"./currency":47,"./custom":48,"./datagrid":49,"./datetime":50,"./email":51,"./fieldset":52,"./file":53,"./hidden":54,"./htmlelement":55,"./number":57,"./page":58,"./panel":59,"./password":60,"./phonenumber":61,"./radio":62,"./resource":63,"./select":64,"./selectboxes":65,"./signature":66,"./survey":67,"./table":68,"./textarea":69,"./textfield":70,"./well":71}],57:[function(require,module,exports){
 "use strict";
 
 
@@ -58826,7 +59029,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],54:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -58852,7 +59055,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],55:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -58887,7 +59090,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],56:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -58916,7 +59119,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],57:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -58949,7 +59152,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],58:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 "use strict";
 
 
@@ -58990,7 +59193,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],59:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -59115,7 +59318,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],60:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -59454,7 +59657,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],61:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 "use strict";
 
 
@@ -59558,7 +59761,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],62:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 (function (SignaturePad){
 "use strict";
 
@@ -59702,7 +59905,7 @@ module.exports = function(app) {
 };
 
 }).call(this,require("signature_pad"))
-},{"signature_pad":33}],63:[function(require,module,exports){
+},{"signature_pad":38}],67:[function(require,module,exports){
 "use strict";
 
 
@@ -59759,7 +59962,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],64:[function(require,module,exports){
+},{}],68:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -59803,7 +60006,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],65:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -59858,7 +60061,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],66:[function(require,module,exports){
+},{}],70:[function(require,module,exports){
 "use strict";
 
 
@@ -59917,7 +60120,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],67:[function(require,module,exports){
+},{}],71:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -59949,7 +60152,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],68:[function(require,module,exports){
+},{}],72:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -59986,7 +60189,7 @@ module.exports = function() {
   };
 };
 
-},{}],69:[function(require,module,exports){
+},{}],73:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -60180,7 +60383,7 @@ module.exports = function() {
             }
 
             // Set required if specified
-            if ($scope.requireComponents && component.hasOwnProperty('validate')) {
+            if ($scope.requireComponents && component.hasOwnProperty('validate') && $scope.requireComponents.indexOf(component.key) !== -1) {
               component.validate.required = $scope.requireComponents.indexOf(component.key) !== -1;
             }
 
@@ -60477,7 +60680,7 @@ module.exports = function() {
   };
 };
 
-},{}],70:[function(require,module,exports){
+},{}],74:[function(require,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -60641,7 +60844,7 @@ module.exports = [
   }
 ];
 
-},{}],71:[function(require,module,exports){
+},{}],75:[function(require,module,exports){
 "use strict";
 module.exports = [
   'formioComponents',
@@ -60699,7 +60902,7 @@ module.exports = [
   }
 ];
 
-},{}],72:[function(require,module,exports){
+},{}],76:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -60782,7 +60985,7 @@ module.exports = function() {
   };
 };
 
-},{}],73:[function(require,module,exports){
+},{}],77:[function(require,module,exports){
 "use strict";
 module.exports = [
   '$compile',
@@ -60801,7 +61004,7 @@ module.exports = [
   }
 ];
 
-},{}],74:[function(require,module,exports){
+},{}],78:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -60811,7 +61014,7 @@ module.exports = function() {
   };
 };
 
-},{}],75:[function(require,module,exports){
+},{}],79:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -60826,7 +61029,7 @@ module.exports = function() {
   };
 };
 
-},{}],76:[function(require,module,exports){
+},{}],80:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -60881,7 +61084,7 @@ module.exports = function() {
   };
 };
 
-},{}],77:[function(require,module,exports){
+},{}],81:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -61186,7 +61389,7 @@ module.exports = function() {
   };
 };
 
-},{}],78:[function(require,module,exports){
+},{}],82:[function(require,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -61356,7 +61559,7 @@ module.exports = [
   }
 ];
 
-},{}],79:[function(require,module,exports){
+},{}],83:[function(require,module,exports){
 "use strict";
 var formioUtils = require('formio-utils');
 
@@ -61427,7 +61630,7 @@ module.exports = function() {
   };
 };
 
-},{"formio-utils":28}],80:[function(require,module,exports){
+},{"formio-utils":35}],84:[function(require,module,exports){
 "use strict";
 module.exports = [
   '$q',
@@ -61476,7 +61679,7 @@ module.exports = [
   }
 ];
 
-},{}],81:[function(require,module,exports){
+},{}],85:[function(require,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -61510,7 +61713,7 @@ module.exports = [
   }
 ];
 
-},{}],82:[function(require,module,exports){
+},{}],86:[function(require,module,exports){
 "use strict";
 module.exports = [
   'FormioUtils',
@@ -61519,7 +61722,7 @@ module.exports = [
   }
 ];
 
-},{}],83:[function(require,module,exports){
+},{}],87:[function(require,module,exports){
 "use strict";
 module.exports = [
   '$sce',
@@ -61532,7 +61735,7 @@ module.exports = [
   }
 ];
 
-},{}],84:[function(require,module,exports){
+},{}],88:[function(require,module,exports){
 "use strict";
 module.exports = [
   function() {
@@ -61551,7 +61754,7 @@ module.exports = [
   }
 ];
 
-},{}],85:[function(require,module,exports){
+},{}],89:[function(require,module,exports){
 "use strict";
 module.exports = [
   'formioTableView',
@@ -61564,7 +61767,7 @@ module.exports = [
   }
 ];
 
-},{}],86:[function(require,module,exports){
+},{}],90:[function(require,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -61579,7 +61782,7 @@ module.exports = [
   }
 ];
 
-},{}],87:[function(require,module,exports){
+},{}],91:[function(require,module,exports){
 "use strict";
 module.exports = [
   '$filter',
@@ -61608,7 +61811,7 @@ module.exports = [
   }
 ];
 
-},{}],88:[function(require,module,exports){
+},{}],92:[function(require,module,exports){
 "use strict";
 require('angular-ui-mask/dist/mask');
 require('ui-select/dist/select');
@@ -61622,7 +61825,7 @@ require('angular-ui-bootstrap');
 require('bootstrap-ui-datetime-picker/dist/datetime-picker');
 require('./formio');
 
-},{"./formio":89,"angular-file-saver":2,"angular-moment":3,"angular-sanitize":6,"angular-ui-bootstrap":8,"angular-ui-mask/dist/mask":9,"bootstrap":13,"bootstrap-ui-datetime-picker/dist/datetime-picker":12,"ng-file-upload":31,"signature_pad":33,"ui-select/dist/select":34}],89:[function(require,module,exports){
+},{"./formio":93,"angular-file-saver":10,"angular-moment":11,"angular-sanitize":14,"angular-ui-bootstrap":16,"angular-ui-mask/dist/mask":17,"bootstrap":21,"bootstrap-ui-datetime-picker/dist/datetime-picker":20,"ng-file-upload":37,"signature_pad":38,"ui-select/dist/select":39}],93:[function(require,module,exports){
 "use strict";
 
 
@@ -61748,7 +61951,7 @@ app.run([
 
 require('./components');
 
-},{"./components":52,"./directives/customValidator":68,"./directives/formio":69,"./directives/formioComponent":70,"./directives/formioComponentView":71,"./directives/formioDelete":72,"./directives/formioElement":73,"./directives/formioErrors":74,"./directives/formioSubmission":75,"./directives/formioSubmissions":76,"./directives/formioWizard":77,"./factories/FormioScope":78,"./factories/FormioUtils":79,"./factories/formioInterceptor":80,"./factories/formioTableView":81,"./filters/flattenComponents":82,"./filters/safehtml":83,"./filters/tableComponents":84,"./filters/tableFieldView":85,"./filters/tableView":86,"./filters/translate":87,"./plugins":90,"./providers/Formio":94,"./providers/FormioPlugins":95}],90:[function(require,module,exports){
+},{"./components":56,"./directives/customValidator":72,"./directives/formio":73,"./directives/formioComponent":74,"./directives/formioComponentView":75,"./directives/formioDelete":76,"./directives/formioElement":77,"./directives/formioErrors":78,"./directives/formioSubmission":79,"./directives/formioSubmissions":80,"./directives/formioWizard":81,"./factories/FormioScope":82,"./factories/FormioUtils":83,"./factories/formioInterceptor":84,"./factories/formioTableView":85,"./filters/flattenComponents":86,"./filters/safehtml":87,"./filters/tableComponents":88,"./filters/tableFieldView":89,"./filters/tableView":90,"./filters/translate":91,"./plugins":94,"./providers/Formio":98,"./providers/FormioPlugins":99}],94:[function(require,module,exports){
 "use strict";
 module.exports = function(app) {
   require('./storage/url')(app);
@@ -61756,7 +61959,7 @@ module.exports = function(app) {
   require('./storage/dropbox')(app);
 };
 
-},{"./storage/dropbox":91,"./storage/s3":92,"./storage/url":93}],91:[function(require,module,exports){
+},{"./storage/dropbox":95,"./storage/s3":96,"./storage/url":97}],95:[function(require,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -61890,7 +62093,7 @@ module.exports = function(app) {
 };
 
 
-},{}],92:[function(require,module,exports){
+},{}],96:[function(require,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -61987,7 +62190,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],93:[function(require,module,exports){
+},{}],97:[function(require,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -62040,7 +62243,7 @@ module.exports = function(app) {
   );
 };
 
-},{}],94:[function(require,module,exports){
+},{}],98:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   // The formio class.
@@ -62107,7 +62310,7 @@ module.exports = function() {
   };
 };
 
-},{"formiojs/src/formio.js":29}],95:[function(require,module,exports){
+},{"formiojs/src/formio.js":5}],99:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   var plugins = {};
@@ -62136,4 +62339,4 @@ module.exports = function() {
   };
 };
 
-},{}]},{},[88]);
+},{}]},{},[92]);

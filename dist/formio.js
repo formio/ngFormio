@@ -2051,128 +2051,7 @@ return Q;
 });
 
 }).call(this,require('_process'))
-},{"_process":2}],2:[function(require,module,exports){
-// shim for using process in browser
-
-var process = module.exports = {};
-
-// cached from whatever global is present so that test runners that stub it
-// don't break things.  But we need to wrap it in a try catch in case it is
-// wrapped in strict mode code which doesn't define any globals.  It's inside a
-// function because try/catches deoptimize in certain engines.
-
-var cachedSetTimeout;
-var cachedClearTimeout;
-
-(function () {
-  try {
-    cachedSetTimeout = setTimeout;
-  } catch (e) {
-    cachedSetTimeout = function () {
-      throw new Error('setTimeout is not defined');
-    }
-  }
-  try {
-    cachedClearTimeout = clearTimeout;
-  } catch (e) {
-    cachedClearTimeout = function () {
-      throw new Error('clearTimeout is not defined');
-    }
-  }
-} ())
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
-
-function cleanUpNextTick() {
-    if (!draining || !currentQueue) {
-        return;
-    }
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
-}
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = cachedSetTimeout(cleanUpNextTick);
-    draining = true;
-
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            if (currentQueue) {
-                currentQueue[queueIndex].run();
-            }
-        }
-        queueIndex = -1;
-        len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    cachedClearTimeout(timeout);
-}
-
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
-        }
-    }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-        cachedSetTimeout(drainQueue, 0);
-    }
-};
-
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
-}
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
-};
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
-
-},{}],3:[function(require,module,exports){
+},{"_process":10}],2:[function(require,module,exports){
 /*!
  * EventEmitter2
  * https://github.com/hij1nx/EventEmitter2
@@ -2747,167 +2626,374 @@ process.umask = function() { return 0; };
   }
 }();
 
-},{}],4:[function(require,module,exports){
-'use strict';
-
-module.exports = {
-  /**
-   * Determine if a component is a layout component or not.
-   *
-   * @param {Object} component
-   *   The component to check.
-   *
-   * @returns {Boolean}
-   *   Whether or not the component is a layout component.
-   */
-  isLayoutComponent: function isLayoutComponent(component) {
-    return (
-      (component.columns && Array.isArray(component.columns)) ||
-      (component.rows && Array.isArray(component.rows)) ||
-      (component.components && Array.isArray(component.components))
-    ) ? true : false;
-  },
-
-  /**
-   * Iterate through each component within a form.
-   *
-   * @param {Object} components
-   *   The components to iterate.
-   * @param {Function} fn
-   *   The iteration function to invoke for each component.
-   * @param {Boolean} includeAll
-   *   Whether or not to include layout components.
-   * @param {String} path
-   *   The current data path of the element. Example: data.user.firstName
-   */
-  eachComponent: function eachComponent(components, fn, includeAll, path) {
-    if (!components) return;
-    path = path || '';
-    components.forEach(function(component) {
-      var hasColumns = component.columns && Array.isArray(component.columns);
-      var hasRows = component.rows && Array.isArray(component.rows);
-      var hasComps = component.components && Array.isArray(component.components);
-      var noRecurse = false;
-      var newPath = component.key ? (path ? (path + '.' + component.key) : component.key) : '';
-
-      if (includeAll || component.tree || (!hasColumns && !hasRows && !hasComps)) {
-        noRecurse = fn(component, newPath);
-      }
-
-      var subPath = function() {
-        if (component.key && ((component.type === 'datagrid') || (component.type === 'container'))) {
-          return newPath;
+},{}],3:[function(require,module,exports){
+module.exports = function (obj) {
+    if (!obj || typeof obj !== 'object') return obj;
+    
+    var copy;
+    
+    if (isArray(obj)) {
+        var len = obj.length;
+        copy = Array(len);
+        for (var i = 0; i < len; i++) {
+            copy[i] = obj[i];
         }
-        return path;
-      };
-
-      if (!noRecurse) {
-        if (hasColumns) {
-          component.columns.forEach(function(column) {
-            eachComponent(column.components, fn, includeAll, subPath());
-          });
+    }
+    else {
+        var keys = objectKeys(obj);
+        copy = {};
+        
+        for (var i = 0, l = keys.length; i < l; i++) {
+            var key = keys[i];
+            copy[key] = obj[key];
         }
-
-        else if (hasRows) {
-          [].concat.apply([], component.rows).forEach(function(row) {
-            eachComponent(row.components, fn, includeAll, subPath());
-          });
-        }
-
-        else if (hasComps) {
-          eachComponent(component.components, fn, includeAll, subPath());
-        }
-      }
-    });
-  },
-
-  /**
-   * Get a component by its key
-   *
-   * @param {Object} components
-   *   The components to iterate.
-   * @param {String} key
-   *   The key of the component to get.
-   *
-   * @returns {Object}
-   *   The component that matches the given key, or undefined if not found.
-   */
-  getComponent: function getComponent(components, key) {
-    var result;
-    module.exports.eachComponent(components, function(component) {
-      if (component.key === key) {
-        result = component;
-      }
-    });
-    return result;
-  },
-
-  /**
-   * Flatten the form components for data manipulation.
-   *
-   * @param {Object} components
-   *   The components to iterate.
-   * @param {Boolean} includeAll
-   *   Whether or not to include layout components.
-   *
-   * @returns {Object}
-   *   The flattened components map.
-   */
-  flattenComponents: function flattenComponents(components, includeAll) {
-    var flattened = {};
-    module.exports.eachComponent(components, function(component, path) {
-      flattened[path] = component;
-    }, includeAll);
-    return flattened;
-  },
-
-  /**
-   * Get the value for a component key, in the given submission.
-   *
-   * @param {Object} submission
-   *   A submission object to search.
-   * @param {String} key
-   *   A for components API key to search for.
-   */
-  getValue: function getValue(submission, key) {
-    var data = submission.data || {};
-
-    var search = function search(data) {
-      var i;
-      var value;
-
-      if (data instanceof Array) {
-        for (i = 0; i < data.length; i++) {
-          if (typeof data[i] === 'object') {
-            value = search(data[i]);
-          }
-
-          if (value) {
-            return value;
-          }
-        }
-      }
-      else if (typeof data === 'object') {
-        if (data.hasOwnProperty(key)) {
-          return data[key];
-        }
-
-        var keys = Object.keys(data);
-        for (i = 0; i < keys.length; i++) {
-          if (typeof data[keys[i]] === 'object') {
-            value = search(data[keys[i]]);
-          }
-
-          if (value) {
-            return value;
-          }
-        }
-      }
-    };
-
-    return search(data);
-  }
+    }
+    return copy;
 };
+
+var objectKeys = Object.keys || function (obj) {
+    var keys = [];
+    for (var key in obj) {
+        if ({}.hasOwnProperty.call(obj, key)) keys.push(key);
+    }
+    return keys;
+};
+
+var isArray = Array.isArray || function (xs) {
+    return {}.toString.call(xs) === '[object Array]';
+};
+
+},{}],4:[function(require,module,exports){
+(function() {
+  'use strict';
+
+  if (self.fetch) {
+    return
+  }
+
+  function normalizeName(name) {
+    if (typeof name !== 'string') {
+      name = name.toString();
+    }
+    if (/[^a-z0-9\-#$%&'*+.\^_`|~]/i.test(name)) {
+      throw new TypeError('Invalid character in header field name')
+    }
+    return name.toLowerCase()
+  }
+
+  function normalizeValue(value) {
+    if (typeof value !== 'string') {
+      value = value.toString();
+    }
+    return value
+  }
+
+  function Headers(headers) {
+    this.map = {}
+
+    if (headers instanceof Headers) {
+      headers.forEach(function(value, name) {
+        this.append(name, value)
+      }, this)
+
+    } else if (headers) {
+      Object.getOwnPropertyNames(headers).forEach(function(name) {
+        this.append(name, headers[name])
+      }, this)
+    }
+  }
+
+  Headers.prototype.append = function(name, value) {
+    name = normalizeName(name)
+    value = normalizeValue(value)
+    var list = this.map[name]
+    if (!list) {
+      list = []
+      this.map[name] = list
+    }
+    list.push(value)
+  }
+
+  Headers.prototype['delete'] = function(name) {
+    delete this.map[normalizeName(name)]
+  }
+
+  Headers.prototype.get = function(name) {
+    var values = this.map[normalizeName(name)]
+    return values ? values[0] : null
+  }
+
+  Headers.prototype.getAll = function(name) {
+    return this.map[normalizeName(name)] || []
+  }
+
+  Headers.prototype.has = function(name) {
+    return this.map.hasOwnProperty(normalizeName(name))
+  }
+
+  Headers.prototype.set = function(name, value) {
+    this.map[normalizeName(name)] = [normalizeValue(value)]
+  }
+
+  Headers.prototype.forEach = function(callback, thisArg) {
+    Object.getOwnPropertyNames(this.map).forEach(function(name) {
+      this.map[name].forEach(function(value) {
+        callback.call(thisArg, value, name, this)
+      }, this)
+    }, this)
+  }
+
+  function consumed(body) {
+    if (body.bodyUsed) {
+      return Promise.reject(new TypeError('Already read'))
+    }
+    body.bodyUsed = true
+  }
+
+  function fileReaderReady(reader) {
+    return new Promise(function(resolve, reject) {
+      reader.onload = function() {
+        resolve(reader.result)
+      }
+      reader.onerror = function() {
+        reject(reader.error)
+      }
+    })
+  }
+
+  function readBlobAsArrayBuffer(blob) {
+    var reader = new FileReader()
+    reader.readAsArrayBuffer(blob)
+    return fileReaderReady(reader)
+  }
+
+  function readBlobAsText(blob) {
+    var reader = new FileReader()
+    reader.readAsText(blob)
+    return fileReaderReady(reader)
+  }
+
+  var support = {
+    blob: 'FileReader' in self && 'Blob' in self && (function() {
+      try {
+        new Blob();
+        return true
+      } catch(e) {
+        return false
+      }
+    })(),
+    formData: 'FormData' in self
+  }
+
+  function Body() {
+    this.bodyUsed = false
+
+
+    this._initBody = function(body) {
+      this._bodyInit = body
+      if (typeof body === 'string') {
+        this._bodyText = body
+      } else if (support.blob && Blob.prototype.isPrototypeOf(body)) {
+        this._bodyBlob = body
+      } else if (support.formData && FormData.prototype.isPrototypeOf(body)) {
+        this._bodyFormData = body
+      } else if (!body) {
+        this._bodyText = ''
+      } else {
+        throw new Error('unsupported BodyInit type')
+      }
+    }
+
+    if (support.blob) {
+      this.blob = function() {
+        var rejected = consumed(this)
+        if (rejected) {
+          return rejected
+        }
+
+        if (this._bodyBlob) {
+          return Promise.resolve(this._bodyBlob)
+        } else if (this._bodyFormData) {
+          throw new Error('could not read FormData body as blob')
+        } else {
+          return Promise.resolve(new Blob([this._bodyText]))
+        }
+      }
+
+      this.arrayBuffer = function() {
+        return this.blob().then(readBlobAsArrayBuffer)
+      }
+
+      this.text = function() {
+        var rejected = consumed(this)
+        if (rejected) {
+          return rejected
+        }
+
+        if (this._bodyBlob) {
+          return readBlobAsText(this._bodyBlob)
+        } else if (this._bodyFormData) {
+          throw new Error('could not read FormData body as text')
+        } else {
+          return Promise.resolve(this._bodyText)
+        }
+      }
+    } else {
+      this.text = function() {
+        var rejected = consumed(this)
+        return rejected ? rejected : Promise.resolve(this._bodyText)
+      }
+    }
+
+    if (support.formData) {
+      this.formData = function() {
+        return this.text().then(decode)
+      }
+    }
+
+    this.json = function() {
+      return this.text().then(JSON.parse)
+    }
+
+    return this
+  }
+
+  // HTTP methods whose capitalization should be normalized
+  var methods = ['DELETE', 'GET', 'HEAD', 'OPTIONS', 'POST', 'PUT']
+
+  function normalizeMethod(method) {
+    var upcased = method.toUpperCase()
+    return (methods.indexOf(upcased) > -1) ? upcased : method
+  }
+
+  function Request(url, options) {
+    options = options || {}
+    this.url = url
+
+    this.credentials = options.credentials || 'omit'
+    this.headers = new Headers(options.headers)
+    this.method = normalizeMethod(options.method || 'GET')
+    this.mode = options.mode || null
+    this.referrer = null
+
+    if ((this.method === 'GET' || this.method === 'HEAD') && options.body) {
+      throw new TypeError('Body not allowed for GET or HEAD requests')
+    }
+    this._initBody(options.body)
+  }
+
+  function decode(body) {
+    var form = new FormData()
+    body.trim().split('&').forEach(function(bytes) {
+      if (bytes) {
+        var split = bytes.split('=')
+        var name = split.shift().replace(/\+/g, ' ')
+        var value = split.join('=').replace(/\+/g, ' ')
+        form.append(decodeURIComponent(name), decodeURIComponent(value))
+      }
+    })
+    return form
+  }
+
+  function headers(xhr) {
+    var head = new Headers()
+    var pairs = xhr.getAllResponseHeaders().trim().split('\n')
+    pairs.forEach(function(header) {
+      var split = header.trim().split(':')
+      var key = split.shift().trim()
+      var value = split.join(':').trim()
+      head.append(key, value)
+    })
+    return head
+  }
+
+  Body.call(Request.prototype)
+
+  function Response(bodyInit, options) {
+    if (!options) {
+      options = {}
+    }
+
+    this._initBody(bodyInit)
+    this.type = 'default'
+    this.url = null
+    this.status = options.status
+    this.ok = this.status >= 200 && this.status < 300
+    this.statusText = options.statusText
+    this.headers = options.headers instanceof Headers ? options.headers : new Headers(options.headers)
+    this.url = options.url || ''
+  }
+
+  Body.call(Response.prototype)
+
+  self.Headers = Headers;
+  self.Request = Request;
+  self.Response = Response;
+
+  self.fetch = function(input, init) {
+    // TODO: Request constructor should accept input, init
+    var request
+    if (Request.prototype.isPrototypeOf(input) && !init) {
+      request = input
+    } else {
+      request = new Request(input, init)
+    }
+
+    return new Promise(function(resolve, reject) {
+      var xhr = new XMLHttpRequest()
+
+      function responseURL() {
+        if ('responseURL' in xhr) {
+          return xhr.responseURL
+        }
+
+        // Avoid security warnings on getResponseHeader when not allowed by CORS
+        if (/^X-Request-URL:/m.test(xhr.getAllResponseHeaders())) {
+          return xhr.getResponseHeader('X-Request-URL')
+        }
+
+        return;
+      }
+
+      xhr.onload = function() {
+        var status = (xhr.status === 1223) ? 204 : xhr.status
+        if (status < 100 || status > 599) {
+          reject(new TypeError('Network request failed'))
+          return
+        }
+        var options = {
+          status: status,
+          statusText: xhr.statusText,
+          headers: headers(xhr),
+          url: responseURL()
+        }
+        var body = 'response' in xhr ? xhr.response : xhr.responseText;
+        resolve(new Response(body, options))
+      }
+
+      xhr.onerror = function() {
+        reject(new TypeError('Network request failed'))
+      }
+
+      xhr.open(request.method, request.url, true)
+
+      if (request.credentials === 'include') {
+        xhr.withCredentials = true
+      }
+
+      if ('responseType' in xhr && support.blob) {
+        xhr.responseType = 'blob'
+      }
+
+      request.headers.forEach(function(value, name) {
+        xhr.setRequestHeader(name, value)
+      })
+
+      xhr.send(typeof request._bodyInit === 'undefined' ? null : request._bodyInit)
+    })
+  }
+  self.fetch.polyfill = true
+})();
 
 },{}],5:[function(require,module,exports){
 'use strict';
@@ -2916,6 +3002,7 @@ require('whatwg-fetch');
 var Q = require('Q');
 var EventEmitter = require('eventemitter2').EventEmitter2;
 var copy = require('shallow-copy');
+var providers = require('./providers');
 
 // The default base url.
 var baseUrl = 'https://api.form.io';
@@ -3251,8 +3338,54 @@ Formio.prototype.loadActions = _index('actions');
 Formio.prototype.availableActions = function() { return this.makeRequest('availableActions', this.formUrl + '/actions'); };
 Formio.prototype.actionInfo = function(name) { return this.makeRequest('actionInfo', this.formUrl + '/actions/' + name); };
 
+Formio.prototype.uploadFile = function(storage, file, fileName, dir, progressCallback) {
+  var requestArgs = {
+    provider: storage,
+    method: 'upload',
+    file: file,
+    fileName: fileName,
+    dir: dir
+  }
+  var request = pluginWait('preRequest', requestArgs)
+    .then(function() {
+      if (providers.storage.hasOwnProperty(storage)) {
+        var provider = new providers.storage[storage](this);
+        return provider.uploadFile(file, fileName, dir, progressCallback);
+      }
+      else {
+        throw('Storage provider not found');
+      }
+    }.bind(this));
+  return pluginAlter('wrapFileRequestPromise', request, requestArgs);
+}
+
+Formio.prototype.downloadFile = function(file) {
+  var requestArgs = {
+    method: 'download',
+    file: file
+  };
+
+  var request = pluginWait('preRequest', requestArgs)
+    .then(function() {
+      return pluginGet('fileRequest', requestArgs)
+        .then(function(result) {
+          if (result === null || result === undefined) {
+            if (providers.storage.hasOwnProperty(file.storage)) {
+              var provider = new providers.storage[file.storage](this);
+              return provider.downloadFile(file);
+            }
+            else {
+              throw('Storage provider not found');
+            }
+          }
+          return result;
+        }.bind(this));
+    }.bind(this));
+
+  return pluginAlter('wrapFileRequestPromise', request, requestArgs);
+}
+
 Formio.makeStaticRequest = function(url, method, data) {
-  var self = this;
   method = (method || 'GET').toUpperCase();
 
   var requestArgs = {
@@ -3261,7 +3394,7 @@ Formio.makeStaticRequest = function(url, method, data) {
     data: data
   };
 
-  var request = pluginWait('preStaticRequest', requestArgs)
+  var request = pluginWait('preRequest', requestArgs)
   .then(function() {
     return pluginGet('staticRequest', requestArgs)
     .then(function(result) {
@@ -3586,376 +3719,446 @@ Formio.deregisterPlugin = function(plugin) {
 
 module.exports = Formio;
 
-},{"Q":1,"eventemitter2":3,"shallow-copy":6,"whatwg-fetch":7}],6:[function(require,module,exports){
-module.exports = function (obj) {
-    if (!obj || typeof obj !== 'object') return obj;
-    
-    var copy;
-    
-    if (isArray(obj)) {
-        var len = obj.length;
-        copy = Array(len);
-        for (var i = 0; i < len; i++) {
-            copy[i] = obj[i];
-        }
-    }
-    else {
-        var keys = objectKeys(obj);
-        copy = {};
-        
-        for (var i = 0, l = keys.length; i < l; i++) {
-            var key = keys[i];
-            copy[key] = obj[key];
-        }
-    }
-    return copy;
+},{"./providers":6,"Q":1,"eventemitter2":2,"shallow-copy":3,"whatwg-fetch":4}],6:[function(require,module,exports){
+module.exports = {
+  storage: require('./storage')
 };
 
-var objectKeys = Object.keys || function (obj) {
-    var keys = [];
-    for (var key in obj) {
-        if ({}.hasOwnProperty.call(obj, key)) keys.push(key);
-    }
-    return keys;
+},{"./storage":7}],7:[function(require,module,exports){
+module.exports = {
+  //dropbox: require('./dropbox.js'),
+  s3: require('./s3.js'),
+  url: require('./url.js'),
 };
 
-var isArray = Array.isArray || function (xs) {
-    return {}.toString.call(xs) === '[object Array]';
+},{"./s3.js":8,"./url.js":9}],8:[function(require,module,exports){
+var Q = require('Q')
+
+module.exports = function(formio) {
+  return {
+    title: 'S3',
+    name: 's3',
+    uploadFile: function(file, fileName, dir, progressCallback) {
+      var defer = Q.defer();
+      // Sign the request
+      formio.makeRequest('file', formio.formUrl + '/storage/s3', 'POST', {
+        name: fileName,
+        size: file.size,
+        type: file.type
+      })
+        .then(function(response) {
+          // Send the file with data.
+          var xhr = new XMLHttpRequest();
+
+          if (typeof progressCallback === 'function') {
+            xhr.upload.onprogress = progressCallback;
+          }
+
+          response.data.fileName = fileName;
+          response.data.key += dir + fileName;
+
+          fd = new FormData();
+          for(var key in response.data) {
+            fd.append(key, response.data[key]);
+          }
+          fd.append('file', file);
+
+          xhr.onload = function() {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              defer.resolve({
+                storage: 's3',
+                name: fileName,
+                bucket: response.bucket,
+                key: response.data.key,
+                url: response.url + response.data.key,
+                acl: response.data.acl,
+                size: file.size,
+                type: file.type
+              });
+            }
+            else {
+              defer.reject(xhr.response || 'Unable to upload file');
+            }
+          };
+
+          // Fire on network error.
+          xhr.onerror = function() {
+            defer.reject(xhr);
+          }
+
+          xhr.onabort = function() {
+            defer.reject(xhr);
+          }
+
+          xhr.open('POST', response.url);
+
+          xhr.send(fd);
+        })
+        .catch(function(response) {
+          defer.reject(response);
+        });
+      return defer.promise;
+    },
+    downloadFile: function(file) {
+      if (file.acl !== 'public-read') {
+        return formio.makeRequest('file', formio.formUrl + '/storage/s3?bucket=' + file.bucket + '&key=' + file.key, 'GET');
+      }
+      else {
+        return Q(file);
+      }
+    }
+  };
 };
 
-},{}],7:[function(require,module,exports){
-(function() {
-  'use strict';
+},{"Q":1}],9:[function(require,module,exports){
+var Q = require('Q')
 
-  if (self.fetch) {
-    return
-  }
+module.exports = function(formio) {
+  return {
+    title: 'Url',
+    name: 'url',
+    uploadFile: function(file, fileName, dir, progressCallback) {
+      var defer = Q.defer();
 
-  function normalizeName(name) {
-    if (typeof name !== 'string') {
-      name = name.toString();
-    }
-    if (/[^a-z0-9\-#$%&'*+.\^_`|~]/i.test(name)) {
-      throw new TypeError('Invalid character in header field name')
-    }
-    return name.toLowerCase()
-  }
+      var data = {
+        dir: dir,
+        name: fileName,
+        file: file
+      };
 
-  function normalizeValue(value) {
-    if (typeof value !== 'string') {
-      value = value.toString();
-    }
-    return value
-  }
+      // Send the file with data.
+      var xhr = new XMLHttpRequest();
 
-  function Headers(headers) {
-    this.map = {}
-
-    if (headers instanceof Headers) {
-      headers.forEach(function(value, name) {
-        this.append(name, value)
-      }, this)
-
-    } else if (headers) {
-      Object.getOwnPropertyNames(headers).forEach(function(name) {
-        this.append(name, headers[name])
-      }, this)
-    }
-  }
-
-  Headers.prototype.append = function(name, value) {
-    name = normalizeName(name)
-    value = normalizeValue(value)
-    var list = this.map[name]
-    if (!list) {
-      list = []
-      this.map[name] = list
-    }
-    list.push(value)
-  }
-
-  Headers.prototype['delete'] = function(name) {
-    delete this.map[normalizeName(name)]
-  }
-
-  Headers.prototype.get = function(name) {
-    var values = this.map[normalizeName(name)]
-    return values ? values[0] : null
-  }
-
-  Headers.prototype.getAll = function(name) {
-    return this.map[normalizeName(name)] || []
-  }
-
-  Headers.prototype.has = function(name) {
-    return this.map.hasOwnProperty(normalizeName(name))
-  }
-
-  Headers.prototype.set = function(name, value) {
-    this.map[normalizeName(name)] = [normalizeValue(value)]
-  }
-
-  Headers.prototype.forEach = function(callback, thisArg) {
-    Object.getOwnPropertyNames(this.map).forEach(function(name) {
-      this.map[name].forEach(function(value) {
-        callback.call(thisArg, value, name, this)
-      }, this)
-    }, this)
-  }
-
-  function consumed(body) {
-    if (body.bodyUsed) {
-      return Promise.reject(new TypeError('Already read'))
-    }
-    body.bodyUsed = true
-  }
-
-  function fileReaderReady(reader) {
-    return new Promise(function(resolve, reject) {
-      reader.onload = function() {
-        resolve(reader.result)
-      }
-      reader.onerror = function() {
-        reject(reader.error)
-      }
-    })
-  }
-
-  function readBlobAsArrayBuffer(blob) {
-    var reader = new FileReader()
-    reader.readAsArrayBuffer(blob)
-    return fileReaderReady(reader)
-  }
-
-  function readBlobAsText(blob) {
-    var reader = new FileReader()
-    reader.readAsText(blob)
-    return fileReaderReady(reader)
-  }
-
-  var support = {
-    blob: 'FileReader' in self && 'Blob' in self && (function() {
-      try {
-        new Blob();
-        return true
-      } catch(e) {
-        return false
-      }
-    })(),
-    formData: 'FormData' in self
-  }
-
-  function Body() {
-    this.bodyUsed = false
-
-
-    this._initBody = function(body) {
-      this._bodyInit = body
-      if (typeof body === 'string') {
-        this._bodyText = body
-      } else if (support.blob && Blob.prototype.isPrototypeOf(body)) {
-        this._bodyBlob = body
-      } else if (support.formData && FormData.prototype.isPrototypeOf(body)) {
-        this._bodyFormData = body
-      } else if (!body) {
-        this._bodyText = ''
-      } else {
-        throw new Error('unsupported BodyInit type')
-      }
-    }
-
-    if (support.blob) {
-      this.blob = function() {
-        var rejected = consumed(this)
-        if (rejected) {
-          return rejected
-        }
-
-        if (this._bodyBlob) {
-          return Promise.resolve(this._bodyBlob)
-        } else if (this._bodyFormData) {
-          throw new Error('could not read FormData body as blob')
-        } else {
-          return Promise.resolve(new Blob([this._bodyText]))
-        }
+      if (typeof progressCallback === 'function') {
+        xhr.upload.onprogress = progressCallback;
       }
 
-      this.arrayBuffer = function() {
-        return this.blob().then(readBlobAsArrayBuffer)
-      }
-
-      this.text = function() {
-        var rejected = consumed(this)
-        if (rejected) {
-          return rejected
-        }
-
-        if (this._bodyBlob) {
-          return readBlobAsText(this._bodyBlob)
-        } else if (this._bodyFormData) {
-          throw new Error('could not read FormData body as text')
-        } else {
-          return Promise.resolve(this._bodyText)
-        }
-      }
-    } else {
-      this.text = function() {
-        var rejected = consumed(this)
-        return rejected ? rejected : Promise.resolve(this._bodyText)
-      }
-    }
-
-    if (support.formData) {
-      this.formData = function() {
-        return this.text().then(decode)
-      }
-    }
-
-    this.json = function() {
-      return this.text().then(JSON.parse)
-    }
-
-    return this
-  }
-
-  // HTTP methods whose capitalization should be normalized
-  var methods = ['DELETE', 'GET', 'HEAD', 'OPTIONS', 'POST', 'PUT']
-
-  function normalizeMethod(method) {
-    var upcased = method.toUpperCase()
-    return (methods.indexOf(upcased) > -1) ? upcased : method
-  }
-
-  function Request(url, options) {
-    options = options || {}
-    this.url = url
-
-    this.credentials = options.credentials || 'omit'
-    this.headers = new Headers(options.headers)
-    this.method = normalizeMethod(options.method || 'GET')
-    this.mode = options.mode || null
-    this.referrer = null
-
-    if ((this.method === 'GET' || this.method === 'HEAD') && options.body) {
-      throw new TypeError('Body not allowed for GET or HEAD requests')
-    }
-    this._initBody(options.body)
-  }
-
-  function decode(body) {
-    var form = new FormData()
-    body.trim().split('&').forEach(function(bytes) {
-      if (bytes) {
-        var split = bytes.split('=')
-        var name = split.shift().replace(/\+/g, ' ')
-        var value = split.join('=').replace(/\+/g, ' ')
-        form.append(decodeURIComponent(name), decodeURIComponent(value))
-      }
-    })
-    return form
-  }
-
-  function headers(xhr) {
-    var head = new Headers()
-    var pairs = xhr.getAllResponseHeaders().trim().split('\n')
-    pairs.forEach(function(header) {
-      var split = header.trim().split(':')
-      var key = split.shift().trim()
-      var value = split.join(':').trim()
-      head.append(key, value)
-    })
-    return head
-  }
-
-  Body.call(Request.prototype)
-
-  function Response(bodyInit, options) {
-    if (!options) {
-      options = {}
-    }
-
-    this._initBody(bodyInit)
-    this.type = 'default'
-    this.url = null
-    this.status = options.status
-    this.ok = this.status >= 200 && this.status < 300
-    this.statusText = options.statusText
-    this.headers = options.headers instanceof Headers ? options.headers : new Headers(options.headers)
-    this.url = options.url || ''
-  }
-
-  Body.call(Response.prototype)
-
-  self.Headers = Headers;
-  self.Request = Request;
-  self.Response = Response;
-
-  self.fetch = function(input, init) {
-    // TODO: Request constructor should accept input, init
-    var request
-    if (Request.prototype.isPrototypeOf(input) && !init) {
-      request = input
-    } else {
-      request = new Request(input, init)
-    }
-
-    return new Promise(function(resolve, reject) {
-      var xhr = new XMLHttpRequest()
-
-      function responseURL() {
-        if ('responseURL' in xhr) {
-          return xhr.responseURL
-        }
-
-        // Avoid security warnings on getResponseHeader when not allowed by CORS
-        if (/^X-Request-URL:/m.test(xhr.getAllResponseHeaders())) {
-          return xhr.getResponseHeader('X-Request-URL')
-        }
-
-        return;
+      fd = new FormData();
+      for(var key in data) {
+        fd.append(key, data[key]);
       }
 
       xhr.onload = function() {
-        var status = (xhr.status === 1223) ? 204 : xhr.status
-        if (status < 100 || status > 599) {
-          reject(new TypeError('Network request failed'))
-          return
+        if (xhr.status >= 200 && xhr.status < 300) {
+          // Need to test if xhr.response is decoded or not.
+          defer.resolve({
+            storage: 'url',
+            name: fileName,
+            url: xhr.response.url,
+            size: file.size,
+            type: file.type
+          });
         }
-        var options = {
-          status: status,
-          statusText: xhr.statusText,
-          headers: headers(xhr),
-          url: responseURL()
+        else {
+          defer.reject(xhr.response || 'Unable to upload file');
         }
-        var body = 'response' in xhr ? xhr.response : xhr.responseText;
-        resolve(new Response(body, options))
-      }
+      };
 
+      // Fire on network error.
       xhr.onerror = function() {
-        reject(new TypeError('Network request failed'))
+        defer.reject(xhr);
       }
 
-      xhr.open(request.method, request.url, true)
-
-      if (request.credentials === 'include') {
-        xhr.withCredentials = true
+      xhr.onabort = function() {
+        defer.reject(xhr);
       }
 
-      if ('responseType' in xhr && support.blob) {
-        xhr.responseType = 'blob'
-      }
+      xhr.open('POST', response.url);
 
-      request.headers.forEach(function(value, name) {
-        xhr.setRequestHeader(name, value)
-      })
+      xhr.send(fd);
+      return defer.promise;
+    },
+    downloadFile: function(file) {
+      // Return the original as there is nothing to do.
+      Q(file);
+    }
+  };
+};
 
-      xhr.send(typeof request._bodyInit === 'undefined' ? null : request._bodyInit)
-    })
+},{"Q":1}],10:[function(require,module,exports){
+// shim for using process in browser
+
+var process = module.exports = {};
+
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+
+var cachedSetTimeout;
+var cachedClearTimeout;
+
+(function () {
+  try {
+    cachedSetTimeout = setTimeout;
+  } catch (e) {
+    cachedSetTimeout = function () {
+      throw new Error('setTimeout is not defined');
+    }
   }
-  self.fetch.polyfill = true
-})();
+  try {
+    cachedClearTimeout = clearTimeout;
+  } catch (e) {
+    cachedClearTimeout = function () {
+      throw new Error('clearTimeout is not defined');
+    }
+  }
+} ())
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
 
-},{}],8:[function(require,module,exports){
+function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = cachedSetTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    cachedClearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        cachedSetTimeout(drainQueue, 0);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+},{}],11:[function(require,module,exports){
+'use strict';
+
+module.exports = {
+  /**
+   * Determine if a component is a layout component or not.
+   *
+   * @param {Object} component
+   *   The component to check.
+   *
+   * @returns {Boolean}
+   *   Whether or not the component is a layout component.
+   */
+  isLayoutComponent: function isLayoutComponent(component) {
+    return (
+      (component.columns && Array.isArray(component.columns)) ||
+      (component.rows && Array.isArray(component.rows)) ||
+      (component.components && Array.isArray(component.components))
+    ) ? true : false;
+  },
+
+  /**
+   * Iterate through each component within a form.
+   *
+   * @param {Object} components
+   *   The components to iterate.
+   * @param {Function} fn
+   *   The iteration function to invoke for each component.
+   * @param {Boolean} includeAll
+   *   Whether or not to include layout components.
+   * @param {String} path
+   *   The current data path of the element. Example: data.user.firstName
+   */
+  eachComponent: function eachComponent(components, fn, includeAll, path) {
+    if (!components) return;
+    path = path || '';
+    components.forEach(function(component) {
+      var hasColumns = component.columns && Array.isArray(component.columns);
+      var hasRows = component.rows && Array.isArray(component.rows);
+      var hasComps = component.components && Array.isArray(component.components);
+      var noRecurse = false;
+      var newPath = component.key ? (path ? (path + '.' + component.key) : component.key) : '';
+
+      if (includeAll || component.tree || (!hasColumns && !hasRows && !hasComps)) {
+        noRecurse = fn(component, newPath);
+      }
+
+      var subPath = function() {
+        if (component.key && ((component.type === 'datagrid') || (component.type === 'container'))) {
+          return newPath;
+        }
+        return path;
+      };
+
+      if (!noRecurse) {
+        if (hasColumns) {
+          component.columns.forEach(function(column) {
+            eachComponent(column.components, fn, includeAll, subPath());
+          });
+        }
+
+        else if (hasRows) {
+          [].concat.apply([], component.rows).forEach(function(row) {
+            eachComponent(row.components, fn, includeAll, subPath());
+          });
+        }
+
+        else if (hasComps) {
+          eachComponent(component.components, fn, includeAll, subPath());
+        }
+      }
+    });
+  },
+
+  /**
+   * Get a component by its key
+   *
+   * @param {Object} components
+   *   The components to iterate.
+   * @param {String} key
+   *   The key of the component to get.
+   *
+   * @returns {Object}
+   *   The component that matches the given key, or undefined if not found.
+   */
+  getComponent: function getComponent(components, key) {
+    var result;
+    module.exports.eachComponent(components, function(component) {
+      if (component.key === key) {
+        result = component;
+      }
+    });
+    return result;
+  },
+
+  /**
+   * Flatten the form components for data manipulation.
+   *
+   * @param {Object} components
+   *   The components to iterate.
+   * @param {Boolean} includeAll
+   *   Whether or not to include layout components.
+   *
+   * @returns {Object}
+   *   The flattened components map.
+   */
+  flattenComponents: function flattenComponents(components, includeAll) {
+    var flattened = {};
+    module.exports.eachComponent(components, function(component, path) {
+      flattened[path] = component;
+    }, includeAll);
+    return flattened;
+  },
+
+  /**
+   * Get the value for a component key, in the given submission.
+   *
+   * @param {Object} submission
+   *   A submission object to search.
+   * @param {String} key
+   *   A for components API key to search for.
+   */
+  getValue: function getValue(submission, key) {
+    var data = submission.data || {};
+
+    var search = function search(data) {
+      var i;
+      var value;
+
+      if (data instanceof Array) {
+        for (i = 0; i < data.length; i++) {
+          if (typeof data[i] === 'object') {
+            value = search(data[i]);
+          }
+
+          if (value) {
+            return value;
+          }
+        }
+      }
+      else if (typeof data === 'object') {
+        if (data.hasOwnProperty(key)) {
+          return data[key];
+        }
+
+        var keys = Object.keys(data);
+        for (i = 0; i < keys.length; i++) {
+          if (typeof data[keys[i]] === 'object') {
+            value = search(data[keys[i]]);
+          }
+
+          if (value) {
+            return value;
+          }
+        }
+      }
+    };
+
+    return search(data);
+  }
+};
+
+},{}],12:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -4025,7 +4228,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],9:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -4186,7 +4389,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],10:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -4237,7 +4440,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],11:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -4270,7 +4473,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],12:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 "use strict";
 module.exports = function(app) {
   app.provider('formioComponents', function() {
@@ -4330,7 +4533,7 @@ module.exports = function(app) {
   }]);
 };
 
-},{}],13:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -4373,7 +4576,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],14:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -4401,7 +4604,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],15:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 "use strict";
 
 
@@ -4509,7 +4712,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],16:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -4534,7 +4737,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],17:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -4625,7 +4828,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],18:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -4712,7 +4915,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],19:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -4741,7 +4944,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],20:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -4776,7 +4979,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],21:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -4984,7 +5187,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],22:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -5017,7 +5220,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],23:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 "use strict";
 
 
@@ -5096,7 +5299,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],24:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 "use strict";
 var app = angular.module('formio');
 
@@ -5137,7 +5340,7 @@ require('./panel')(app);
 require('./table')(app);
 require('./well')(app);
 
-},{"./address":8,"./button":9,"./checkbox":10,"./columns":11,"./components":12,"./container":13,"./content":14,"./currency":15,"./custom":16,"./datagrid":17,"./datetime":18,"./email":19,"./fieldset":20,"./file":21,"./hidden":22,"./htmlelement":23,"./number":25,"./page":26,"./panel":27,"./password":28,"./phonenumber":29,"./radio":30,"./resource":31,"./select":32,"./selectboxes":33,"./signature":34,"./survey":35,"./table":36,"./textarea":37,"./textfield":38,"./well":39}],25:[function(require,module,exports){
+},{"./address":12,"./button":13,"./checkbox":14,"./columns":15,"./components":16,"./container":17,"./content":18,"./currency":19,"./custom":20,"./datagrid":21,"./datetime":22,"./email":23,"./fieldset":24,"./file":25,"./hidden":26,"./htmlelement":27,"./number":29,"./page":30,"./panel":31,"./password":32,"./phonenumber":33,"./radio":34,"./resource":35,"./select":36,"./selectboxes":37,"./signature":38,"./survey":39,"./table":40,"./textarea":41,"./textfield":42,"./well":43}],29:[function(require,module,exports){
 "use strict";
 
 
@@ -5194,7 +5397,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],26:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -5220,7 +5423,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],27:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -5255,7 +5458,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],28:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -5284,7 +5487,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],29:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -5317,7 +5520,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],30:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 "use strict";
 
 
@@ -5358,7 +5561,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],31:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -5483,7 +5686,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],32:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -5822,7 +6025,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],33:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 "use strict";
 
 
@@ -5926,7 +6129,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],34:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -6068,7 +6271,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],35:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 "use strict";
 
 
@@ -6125,7 +6328,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],36:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -6169,7 +6372,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],37:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -6224,7 +6427,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],38:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 "use strict";
 
 
@@ -6283,7 +6486,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],39:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -6315,7 +6518,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],40:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -6352,7 +6555,7 @@ module.exports = function() {
   };
 };
 
-},{}],41:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -6546,7 +6749,7 @@ module.exports = function() {
             }
 
             // Set required if specified
-            if ($scope.requireComponents && component.hasOwnProperty('validate')) {
+            if ($scope.requireComponents && component.hasOwnProperty('validate') && $scope.requireComponents.indexOf(component.key) !== -1) {
               component.validate.required = $scope.requireComponents.indexOf(component.key) !== -1;
             }
 
@@ -6843,7 +7046,7 @@ module.exports = function() {
   };
 };
 
-},{}],42:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -7007,7 +7210,7 @@ module.exports = [
   }
 ];
 
-},{}],43:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 "use strict";
 module.exports = [
   'formioComponents',
@@ -7065,7 +7268,7 @@ module.exports = [
   }
 ];
 
-},{}],44:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -7148,7 +7351,7 @@ module.exports = function() {
   };
 };
 
-},{}],45:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 "use strict";
 module.exports = [
   '$compile',
@@ -7167,7 +7370,7 @@ module.exports = [
   }
 ];
 
-},{}],46:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -7177,7 +7380,7 @@ module.exports = function() {
   };
 };
 
-},{}],47:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -7192,7 +7395,7 @@ module.exports = function() {
   };
 };
 
-},{}],48:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -7247,7 +7450,7 @@ module.exports = function() {
   };
 };
 
-},{}],49:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -7552,7 +7755,7 @@ module.exports = function() {
   };
 };
 
-},{}],50:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -7722,7 +7925,7 @@ module.exports = [
   }
 ];
 
-},{}],51:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 "use strict";
 var formioUtils = require('formio-utils');
 
@@ -7793,7 +7996,7 @@ module.exports = function() {
   };
 };
 
-},{"formio-utils":4}],52:[function(require,module,exports){
+},{"formio-utils":11}],56:[function(require,module,exports){
 "use strict";
 module.exports = [
   '$q',
@@ -7842,7 +8045,7 @@ module.exports = [
   }
 ];
 
-},{}],53:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -7876,7 +8079,7 @@ module.exports = [
   }
 ];
 
-},{}],54:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 "use strict";
 module.exports = [
   'FormioUtils',
@@ -7885,7 +8088,7 @@ module.exports = [
   }
 ];
 
-},{}],55:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 "use strict";
 module.exports = [
   '$sce',
@@ -7898,7 +8101,7 @@ module.exports = [
   }
 ];
 
-},{}],56:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 "use strict";
 module.exports = [
   function() {
@@ -7917,7 +8120,7 @@ module.exports = [
   }
 ];
 
-},{}],57:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 "use strict";
 module.exports = [
   'formioTableView',
@@ -7930,7 +8133,7 @@ module.exports = [
   }
 ];
 
-},{}],58:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -7945,7 +8148,7 @@ module.exports = [
   }
 ];
 
-},{}],59:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 "use strict";
 module.exports = [
   '$filter',
@@ -7974,7 +8177,7 @@ module.exports = [
   }
 ];
 
-},{}],60:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 "use strict";
 
 
@@ -8100,7 +8303,7 @@ app.run([
 
 require('./components');
 
-},{"./components":24,"./directives/customValidator":40,"./directives/formio":41,"./directives/formioComponent":42,"./directives/formioComponentView":43,"./directives/formioDelete":44,"./directives/formioElement":45,"./directives/formioErrors":46,"./directives/formioSubmission":47,"./directives/formioSubmissions":48,"./directives/formioWizard":49,"./factories/FormioScope":50,"./factories/FormioUtils":51,"./factories/formioInterceptor":52,"./factories/formioTableView":53,"./filters/flattenComponents":54,"./filters/safehtml":55,"./filters/tableComponents":56,"./filters/tableFieldView":57,"./filters/tableView":58,"./filters/translate":59,"./plugins":61,"./providers/Formio":65,"./providers/FormioPlugins":66}],61:[function(require,module,exports){
+},{"./components":28,"./directives/customValidator":44,"./directives/formio":45,"./directives/formioComponent":46,"./directives/formioComponentView":47,"./directives/formioDelete":48,"./directives/formioElement":49,"./directives/formioErrors":50,"./directives/formioSubmission":51,"./directives/formioSubmissions":52,"./directives/formioWizard":53,"./factories/FormioScope":54,"./factories/FormioUtils":55,"./factories/formioInterceptor":56,"./factories/formioTableView":57,"./filters/flattenComponents":58,"./filters/safehtml":59,"./filters/tableComponents":60,"./filters/tableFieldView":61,"./filters/tableView":62,"./filters/translate":63,"./plugins":65,"./providers/Formio":69,"./providers/FormioPlugins":70}],65:[function(require,module,exports){
 "use strict";
 module.exports = function(app) {
   require('./storage/url')(app);
@@ -8108,7 +8311,7 @@ module.exports = function(app) {
   require('./storage/dropbox')(app);
 };
 
-},{"./storage/dropbox":62,"./storage/s3":63,"./storage/url":64}],62:[function(require,module,exports){
+},{"./storage/dropbox":66,"./storage/s3":67,"./storage/url":68}],66:[function(require,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -8242,7 +8445,7 @@ module.exports = function(app) {
 };
 
 
-},{}],63:[function(require,module,exports){
+},{}],67:[function(require,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -8339,7 +8542,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],64:[function(require,module,exports){
+},{}],68:[function(require,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -8392,7 +8595,7 @@ module.exports = function(app) {
   );
 };
 
-},{}],65:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   // The formio class.
@@ -8459,7 +8662,7 @@ module.exports = function() {
   };
 };
 
-},{"formiojs/src/formio.js":5}],66:[function(require,module,exports){
+},{"formiojs/src/formio.js":5}],70:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   var plugins = {};
@@ -8488,4 +8691,4 @@ module.exports = function() {
   };
 };
 
-},{}]},{},[60]);
+},{}]},{},[64]);
