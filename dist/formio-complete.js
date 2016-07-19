@@ -3406,7 +3406,10 @@ Formio.makeStaticRequest = function(url, method, data) {
     });
   });
 
-  return pluginAlter('wrapStaticRequestPromise', request, requestArgs);
+  return pluginWait('preRequest', requestArgs)
+    .then(function() {
+      return pluginAlter('wrapStaticRequestPromise', request, requestArgs);
+    });
 };
 
 // Static methods.
@@ -3741,13 +3744,29 @@ module.exports = function(formio) {
     name: 's3',
     uploadFile: function(file, fileName, dir, progressCallback) {
       var defer = Q.defer();
-      // Sign the request
-      formio.makeRequest('file', formio.formUrl + '/storage/s3', 'POST', {
-        name: fileName,
-        size: file.size,
-        type: file.type
-      })
-        .then(function(response) {
+
+      // Send the pre response to sign the upload.
+      var pre = new XMLHttpRequest();
+
+      var prefd = new FormData();
+      prefd.append('name', fileName);
+      prefd.append('size', file.size);
+      prefd.append('type', file.type);
+
+      // This only fires on a network error.
+      pre.onerror = function(err) {
+        err.networkError = true;
+        defer.reject(err);
+      }
+
+      pre.onabort = function(err) {
+        defer.reject(err);
+      }
+
+      pre.onload = function() {
+        if (pre.status >= 200 && pre.status < 300) {
+          var response = JSON.parse(pre.response);
+
           // Send the file with data.
           var xhr = new XMLHttpRequest();
 
@@ -3758,11 +3777,17 @@ module.exports = function(formio) {
           response.data.fileName = fileName;
           response.data.key += dir + fileName;
 
-          fd = new FormData();
+          var fd = new FormData();
           for(var key in response.data) {
             fd.append(key, response.data[key]);
           }
           fd.append('file', file);
+
+          // Fire on network error.
+          xhr.onerror = function(err) {
+            err.networkError = true;
+            defer.reject(err);
+          }
 
           xhr.onload = function() {
             if (xhr.status >= 200 && xhr.status < 300) {
@@ -3782,22 +3807,31 @@ module.exports = function(formio) {
             }
           };
 
-          // Fire on network error.
-          xhr.onerror = function() {
-            defer.reject(xhr);
-          }
-
-          xhr.onabort = function() {
-            defer.reject(xhr);
+          xhr.onabort = function(err) {
+            defer.reject(err);
           }
 
           xhr.open('POST', response.url);
 
           xhr.send(fd);
-        })
-        .catch(function(response) {
-          defer.reject(response);
-        });
+        }
+        else {
+          defer.reject(pre.response || 'Unable to sign file');
+        }
+      };
+
+      pre.open('POST', formio.formUrl + '/storage/s3');
+
+      pre.setRequestHeader('Accept', 'application/json');
+      pre.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+      pre.setRequestHeader('x-jwt-token', localStorage.getItem('formioToken'));
+
+      pre.send(JSON.stringify({
+        name: fileName,
+        size: file.size,
+        type: file.type
+      }));
+
       return defer.promise;
     },
     downloadFile: function(file) {
@@ -52343,7 +52377,18 @@ process.chdir = function (dir) {
 process.umask = function() { return 0; };
 
 },{}],35:[function(require,module,exports){
+'use strict';
+
 module.exports = {
+  /**
+   * Determine if a component is a layout component or not.
+   *
+   * @param {Object} component
+   *   The component to check.
+   *
+   * @returns {Boolean}
+   *   Whether or not the component is a layout component.
+   */
   isLayoutComponent: function isLayoutComponent(component) {
     return (
       (component.columns && Array.isArray(component.columns)) ||
@@ -52354,8 +52399,15 @@ module.exports = {
 
   /**
    * Iterate through each component within a form.
-   * @param components
-   * @param fn
+   *
+   * @param {Object} components
+   *   The components to iterate.
+   * @param {Function} fn
+   *   The iteration function to invoke for each component.
+   * @param {Boolean} includeAll
+   *   Whether or not to include layout components.
+   * @param {String} path
+   *   The current data path of the element. Example: data.user.firstName
    */
   eachComponent: function eachComponent(components, fn, includeAll, path) {
     if (!components) return;
@@ -52400,9 +52452,14 @@ module.exports = {
 
   /**
    * Get a component by its key
-   * @param components
-   * @param key The key of the component to get
-   * @returns The component that matches the given key, or undefined if not found.
+   *
+   * @param {Object} components
+   *   The components to iterate.
+   * @param {String} key
+   *   The key of the component to get.
+   *
+   * @returns {Object}
+   *   The component that matches the given key, or undefined if not found.
    */
   getComponent: function getComponent(components, key) {
     var result;
@@ -52416,9 +52473,14 @@ module.exports = {
 
   /**
    * Flatten the form components for data manipulation.
-   * @param components
-   * @param flattened
-   * @returns {*|{}}
+   *
+   * @param {Object} components
+   *   The components to iterate.
+   * @param {Boolean} includeAll
+   *   Whether or not to include layout components.
+   *
+   * @returns {Object}
+   *   The flattened components map.
    */
   flattenComponents: function flattenComponents(components, includeAll) {
     var flattened = {};
@@ -52426,6 +52488,53 @@ module.exports = {
       flattened[path] = component;
     }, includeAll);
     return flattened;
+  },
+
+  /**
+   * Get the value for a component key, in the given submission.
+   *
+   * @param {Object} submission
+   *   A submission object to search.
+   * @param {String} key
+   *   A for components API key to search for.
+   */
+  getValue: function getValue(submission, key) {
+    var data = submission.data || {};
+
+    var search = function search(data) {
+      var i;
+      var value;
+
+      if (data instanceof Array) {
+        for (i = 0; i < data.length; i++) {
+          if (typeof data[i] === 'object') {
+            value = search(data[i]);
+          }
+
+          if (value) {
+            return value;
+          }
+        }
+      }
+      else if (typeof data === 'object') {
+        if (data.hasOwnProperty(key)) {
+          return data[key];
+        }
+
+        var keys = Object.keys(data);
+        for (i = 0; i < keys.length; i++) {
+          if (typeof data[keys[i]] === 'object') {
+            value = search(data[keys[i]]);
+          }
+
+          if (value) {
+            return value;
+          }
+        }
+      }
+    };
+
+    return search(data);
   }
 };
 
