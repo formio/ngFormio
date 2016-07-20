@@ -1653,8 +1653,9 @@ app.controller('ProjectSendgridEmailController', [
 app.controller('ProjectStorageController', [
   '$scope',
   '$http',
+  '$interval',
   'AppConfig',
-  function($scope, $http, AppConfig) {
+  function($scope, $http, $interval, AppConfig) {
     $scope.$watch('currentProject.settings.storage.s3.bucket', function(current, old) {
       if ($scope.currentProject.settings && $scope.currentProject.settings.storage && $scope.currentProject.settings.storage.s3) {
         // If bucket isn't valid, remove the bucketUrl as well.
@@ -1684,7 +1685,7 @@ app.controller('ProjectStorageController', [
       var url = 'https://www.dropbox.com/1/oauth2/authorize' + '?' + params;
 
       var popup = window.open(url, 'Dropbox', 'width=800,height=618');
-      var interval = setInterval(function() {
+      var interval = $interval(function() {
         try {
           var popupHost = popup.location.host;
           var currentHost = window.location.host;
@@ -1730,11 +1731,11 @@ app.controller('ProjectStorageController', [
           //}
         }
         if (!popup || popup.closed || popup.closed === undefined) {
-          clearInterval(interval);
+          $interval.cancel(interval);
         }
       }, 100);
 
-    }
+    };
 
     $scope.dropboxDisconnect = function() {
       $http.post(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/dropbox/auth', {})
@@ -1743,7 +1744,7 @@ app.controller('ProjectStorageController', [
           $scope.currentProject.settings.storage = $scope.currentProject.settings.storage || {};
           $scope.currentProject.settings.storage.dropbox = response.data;
         });
-    }
+    };
   }
 ]);
 
