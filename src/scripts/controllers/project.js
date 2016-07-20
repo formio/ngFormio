@@ -1652,7 +1652,9 @@ app.controller('ProjectSendgridEmailController', [
 
 app.controller('ProjectStorageController', [
   '$scope',
-  function($scope) {
+  '$http',
+  'AppConfig',
+  function($scope, $http, AppConfig) {
     $scope.$watch('currentProject.settings.storage.s3.bucket', function(current, old) {
       if ($scope.currentProject.settings && $scope.currentProject.settings.storage && $scope.currentProject.settings.storage.s3) {
         // If bucket isn't valid, remove the bucketUrl as well.
@@ -1665,6 +1667,83 @@ app.controller('ProjectStorageController', [
         }
       }
     });
+
+    $http.get(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/dropbox/auth')
+      .then(function(response) {
+        $scope.dropboxSettings = response.data;
+      });
+
+    $scope.dropboxOauth = function(settings) {
+      settings.redirect_uri = window.location.origin || window.location.protocol + '//' + window.location.host;
+
+      /*eslint-enable camelcase */
+      var params = Object.keys(settings).map(function(key) {
+        return key + '=' + encodeURIComponent(settings[key]);
+      }).join('&');
+
+      var url = 'https://www.dropbox.com/1/oauth2/authorize' + '?' + params;
+
+      var popup = window.open(url, 'Dropbox', 'width=800,height=618');
+      var interval = setInterval(function() {
+        try {
+          var popupHost = popup.location.host;
+          var currentHost = window.location.host;
+          if (popup && !popup.closed && popupHost === currentHost && popup.location.search) {
+            popup.close();
+            var params = popup.location.search.substr(1).split('&').reduce(function(params, param) {
+              var split = param.split('=');
+              params[split[0]] = split[1];
+              return params;
+            }, {});
+            if (params.error) {
+              $scope.showAlerts({
+                type: 'danger',
+                message: params.error_description || params.error
+              });
+              return;
+            }
+            // TODO: check for error response here
+            if (settings.state !== params.state) {
+              //$scope.showAlerts({
+              //  type: 'danger',
+              //  message: 'OAuth state does not match. Please try logging in again.'
+              //});
+              return;
+            }
+            // Post the code to the server so that we can convert it to an auth token.
+            params.redirect_uri = settings.redirect_uri;
+            $http.post(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/dropbox/auth', params)
+              .then(function(response) {
+                // Store the token so any subsequent saves will contain it. We also set it server side in case they
+                // don't press save after connecting to dropbox.
+                $scope.currentProject.settings.storage = $scope.currentProject.settings.storage || {};
+                $scope.currentProject.settings.storage.dropbox = response.data;
+              });
+          }
+        }
+        catch (error) {
+          //if (error.name !== 'SecurityError') {
+          //  $scope.showAlerts({
+          //    type: 'danger',
+          //    message: error.message || error
+          //  });
+          //}
+        }
+        if (!popup || popup.closed || popup.closed === undefined) {
+          clearInterval(interval);
+        }
+      }, 100);
+
+    }
+
+    $scope.dropboxDisconnect = function() {
+      $http.post(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/dropbox/auth', {})
+        .then(function(response) {
+          // Remove dropbox settings and persist.
+          $scope.currentProject.settings.storage = $scope.currentProject.settings.storage || {};
+          $scope.currentProject.settings.storage.dropbox = response.data;
+        });
+    }
   }
 ]);
 
