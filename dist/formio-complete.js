@@ -60818,6 +60818,14 @@ module.exports = function(app) {
           }
         };
 
+        // Reset size if element changes visibility.
+        scope.$watch('component.display', function(newDisplay) {
+          if (newDisplay) {
+            setDimension('width');
+            setDimension('height');
+          }
+        });
+
         // Set the width and height of the canvas.
         setDimension('width');
         setDimension('height');
@@ -60868,11 +60876,6 @@ module.exports = function(app) {
         signaturePad.onEnd = function() {
           scope.$evalAsync(readSignature);
         };
-
-        // Read initial empty canvas, unless signature is required, then keep it pristine
-        if (!scope.component.validate.required) {
-          readSignature();
-        }
       }
     };
   });
@@ -61324,20 +61327,11 @@ module.exports = function() {
         // The list of all custom conditionals, segregated because they must be run on every change to data.
         var _customConditionals = {};
 
-        /**
-         * Sweep all the components and build the conditionals map.
+        /** Sweep all the components and build the conditionals map.
          *
          * @private
          */
-        var _sweepConditionalsCalled = false;
         var _sweepConditionals = function() {
-          if (_sweepConditionalsCalled) {
-            return;
-          }
-          else {
-            _sweepConditionalsCalled = true;
-          }
-
           $scope.form = $scope.form || {};
           $scope.form.components = $scope.form.components || [];
           FormioUtils.eachComponent($scope.form.components, function(component) {
@@ -61380,7 +61374,7 @@ module.exports = function() {
             }
 
             // Set required if specified
-            if ($scope.requireComponents && component.hasOwnProperty('validate')) {
+            if ($scope.requireComponents && component.hasOwnProperty('validate') && $scope.requireComponents.indexOf(component.key) !== -1) {
               component.validate.required = $scope.requireComponents.indexOf(component.key) !== -1;
             }
 
@@ -61491,6 +61485,12 @@ module.exports = function() {
           _sweepConditionals();
           cancelFormLoadEvent();
         });
+
+        if ($scope.options && $scope.options.watchData) {
+          $scope.$watch('submission.data', function() {
+            _sweepConditionals();
+          }, true);
+        }
 
         if (!$scope._src) {
           $scope.$watch('src', function(src) {
