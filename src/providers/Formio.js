@@ -1,6 +1,6 @@
 module.exports = function() {
   // The formio class.
-  var Formio = require('formiojs/src/formio.js');
+  var Formio = require('formiojs');
 
   // Return the provider interface.
   return {
@@ -14,6 +14,7 @@ module.exports = function() {
     getAppUrl: Formio.getAppUrl,
     registerPlugin: Formio.registerPlugin,
     getPlugin: Formio.getPlugin,
+    providers: Formio.providers,
     setDomain: function() {
       // Remove this?
     },
