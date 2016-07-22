@@ -61,6 +61,14 @@ module.exports = function(app) {
           }
         };
 
+        // Reset size if element changes visibility.
+        scope.$watch('component.display', function(newDisplay) {
+          if (newDisplay) {
+            setDimension('width');
+            setDimension('height');
+          }
+        });
+
         // Set the width and height of the canvas.
         setDimension('width');
         setDimension('height');
@@ -111,11 +119,6 @@ module.exports = function(app) {
         signaturePad.onEnd = function() {
           scope.$evalAsync(readSignature);
         };
-
-        // Read initial empty canvas, unless signature is required, then keep it pristine
-        if (!scope.component.validate.required) {
-          readSignature();
-        }
       }
     };
   });
