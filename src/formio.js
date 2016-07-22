@@ -16,8 +16,6 @@ var app = angular.module('formio', [
  */
 app.provider('Formio', require('./providers/Formio'));
 
-app.provider('FormioPlugins', require('./providers/FormioPlugins'));
-
 /**
  * Provides a way to register the Formio scope.
  */
@@ -74,8 +72,6 @@ app.config([
     $httpProvider.interceptors.push('formioInterceptor');
   }
 ]);
-
-require('./plugins')(app);
 
 app.run([
   '$templateCache',

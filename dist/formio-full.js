@@ -69505,22 +69505,31 @@ module.exports = function(app) {
       },
       template: '<a href="{{ file.url }}" ng-click="getFile($event)" target="_blank">{{ file.name }}</a>',
       controller: [
-        '$scope',
+        '$window',
         '$rootScope',
-        'FormioPlugins',
+        '$scope',
+        'Formio',
         function(
-          $scope,
+          $window,
           $rootScope,
-          FormioPlugins
+          $scope,
+          Formio
         ) {
           $scope.getFile = function(evt) {
-            // In view mode there may not be a form. Need a way to override.
+            evt.preventDefault();
             $scope.form = $scope.form || $rootScope.filePath;
-
-            var plugin = FormioPlugins('storage', $scope.file.storage);
-            if (plugin) {
-              plugin.downloadFile(evt, $scope.file, $scope);
-            }
+            var formio = new Formio($scope.form);
+            formio
+              .downloadFile($scope.file).then(function(file) {
+                if (file) {
+                  $window.open(file.url, '_blank');
+                }
+              })
+              .catch(function(response) {
+                // Is alert the best way to do this?
+                // User is expecting an immediate notification due to attempting to download a file.
+                alert(response);
+              });
           };
         }
       ]
@@ -69537,27 +69546,22 @@ module.exports = function(app) {
       },
       template: '<img ng-src="{{ imageSrc }}" alt="{{ file.name }}" />',
       controller: [
-        '$scope',
         '$rootScope',
-        'FormioPlugins',
+        '$scope',
+        'Formio',
         function(
-          $scope,
           $rootScope,
-          FormioPlugins
+          $scope,
+          Formio
         ) {
-          var plugin = FormioPlugins('storage', $scope.file.storage);
-
-          // In view mode there may not be a form. Need a way to override.
           $scope.form = $scope.form || $rootScope.filePath;
+          var formio = new Formio($scope.form);
 
-          // Sign the file if needed.
-          if (plugin) {
-            plugin.getFile($scope.form, $scope.file)
-              .then(function(result) {
-                $scope.imageSrc = result.url;
-                $scope.$apply();
-              });
-          }
+          formio.downloadFile($scope.file)
+            .then(function(result) {
+              $scope.imageSrc = result.url;
+              $scope.$apply();
+            });
         }
       ]
     };
@@ -69565,11 +69569,9 @@ module.exports = function(app) {
 
   app.controller('formioFileUpload', [
     '$scope',
-    'FormioPlugins',
     'FormioUtils',
     function(
       $scope,
-      FormioPlugins,
       FormioUtils
     ) {
       $scope.fileUploads = {};
@@ -69588,44 +69590,45 @@ module.exports = function(app) {
 
       $scope.upload = function(files) {
         if ($scope.component.storage && files && files.length) {
-          var plugin = FormioPlugins('storage', $scope.component.storage);
           angular.forEach(files, function(file) {
             // Get a unique name for this file to keep file collisions from occurring.
             var fileName = FormioUtils.uniqueName(file.name);
-            if (plugin) {
-              $scope.fileUploads[fileName] = {
-                name: fileName,
-                size: file.size,
-                status: 'info',
-                message: 'Starting upload'
-              };
-              plugin.uploadFile(file, fileName, $scope.fileUploads[fileName], $scope)
-                .then(function(fileInfo) {
-                  delete $scope.fileUploads[fileName];
-                  fileInfo.storage = $scope.component.storage;
-                  // Ensure that the file component is an array.
-                  if (
-                    !$scope.data[$scope.component.key] ||
-                    !($scope.data[$scope.component.key] instanceof Array)
-                  ) {
-                    $scope.data[$scope.component.key] = [];
-                  }
-                  $scope.data[$scope.component.key].push(fileInfo);
-                })
-                .catch(function(message) {
-                  $scope.fileUploads[fileName].status = 'error';
-                  $scope.fileUploads[fileName].message = message;
-                  delete $scope.fileUploads[fileName].progress;
-                });
-            }
-            else {
-              $scope.fileUploads[fileName] = {
-                name: fileName,
-                size: file.size,
-                status: 'error',
-                message: 'Storage plugin not found'
-              };
-            }
+            $scope.fileUploads[fileName] = {
+              name: fileName,
+              size: file.size,
+              status: 'info',
+              message: 'Starting upload'
+            };
+            var dir = $scope.component.dir || '';
+            $scope.formio.uploadFile($scope.component.storage, file, fileName, dir, function processNotify(evt) {
+              $scope.fileUploads[fileName].status = 'progress';
+              $scope.fileUploads[fileName].progress = parseInt(100.0 * evt.loaded / evt.total);
+              delete $scope.fileUploads[fileName].message;
+              $scope.$apply();
+            })
+              .then(function(fileInfo) {
+                delete $scope.fileUploads[fileName];
+                // Ensure that the file component is an array.
+                if (
+                  !$scope.data[$scope.component.key] ||
+                  !($scope.data[$scope.component.key] instanceof Array)
+                ) {
+                  $scope.data[$scope.component.key] = [];
+                }
+                $scope.data[$scope.component.key].push(fileInfo);
+                $scope.$apply();
+              })
+              .catch(function(response) {
+                // Handle error
+                var oParser = new DOMParser();
+                var oDOM = oParser.parseFromString(response.data, 'text/xml');
+                var message = oDOM.getElementsByTagName('Message')[0].innerHTML;
+
+                $scope.fileUploads[fileName].status = 'error';
+                $scope.fileUploads[fileName].message = message;
+                delete $scope.fileUploads[fileName].progress;
+                $scope.$apply();
+              });
           });
         }
       };
@@ -72689,8 +72692,6 @@ var app = angular.module('formio', [
  */
 app.provider('Formio', require('./providers/Formio'));
 
-app.provider('FormioPlugins', require('./providers/FormioPlugins'));
-
 /**
  * Provides a way to register the Formio scope.
  */
@@ -72748,8 +72749,6 @@ app.config([
   }
 ]);
 
-require('./plugins')(app);
-
 app.run([
   '$templateCache',
   function($templateCache) {
@@ -72795,299 +72794,7 @@ app.run([
 
 require('./components');
 
-},{"./components":59,"./directives/customValidator":75,"./directives/formio":76,"./directives/formioComponent":77,"./directives/formioComponentView":78,"./directives/formioDelete":79,"./directives/formioElement":80,"./directives/formioErrors":81,"./directives/formioSubmission":82,"./directives/formioSubmissions":83,"./directives/formioWizard":84,"./factories/FormioScope":85,"./factories/FormioUtils":86,"./factories/formioInterceptor":87,"./factories/formioTableView":88,"./filters/flattenComponents":89,"./filters/safehtml":90,"./filters/tableComponents":91,"./filters/tableFieldView":92,"./filters/tableView":93,"./filters/translate":94,"./plugins":97,"./providers/Formio":101,"./providers/FormioPlugins":102}],97:[function(require,module,exports){
-"use strict";
-module.exports = function(app) {
-  require('./storage/url')(app);
-  require('./storage/s3')(app);
-  require('./storage/dropbox')(app);
-};
-
-},{"./storage/dropbox":98,"./storage/s3":99,"./storage/url":100}],98:[function(require,module,exports){
-"use strict";
-module.exports = function(app) {
-  app.config([
-    'FormioPluginsProvider',
-    'FormioStorageDropboxProvider',
-    function(
-      FormioPluginsProvider,
-      FormioStorageDropboxProvider
-    ) {
-      FormioPluginsProvider.register('storage', 'dropbox', FormioStorageDropboxProvider.$get());
-    }]
-  );
-
-  app.factory('FormioStorageDropbox', [
-    '$q',
-    '$rootScope',
-    '$window',
-    '$http',
-    'Blob',
-    'FileSaver',
-    function(
-      $q,
-      $rootScope,
-      $window,
-      $http,
-      Blob,
-      FileSaver
-    ) {
-      var getDropboxToken = function() {
-        var dropboxToken;
-        if ($rootScope.user && $rootScope.user.externalTokens) {
-          angular.forEach($rootScope.user.externalTokens, function(token) {
-            if (token.type === 'dropbox') {
-              dropboxToken = token.token;
-            }
-          });
-        }
-        return dropboxToken;
-        //return _.result(_.find($rootScope.user.externalTokens, {type: 'dropbox'}), 'token');
-      };
-
-      return {
-        title: 'Dropbox',
-        name: 'dropbox',
-        uploadFile: function(file, fileName, status, $scope) {
-          var defer = $q.defer();
-          var dir = $scope.component.dir || '';
-          var dropboxToken = getDropboxToken();
-          if (!dropboxToken) {
-            defer.reject('You must authenticate with dropbox before uploading files.');
-          }
-          else {
-            // Both Upload and $http don't handle files as application/octet-stream which is required by dropbox.
-            var xhr = new XMLHttpRequest();
-
-            var onProgress = function(evt) {
-              status.status = 'progress';
-              status.progress = parseInt(100.0 * evt.loaded / evt.total);
-              delete status.message;
-              $scope.$apply();
-            };
-
-            xhr.upload.onprogress = onProgress;
-
-            xhr.onload = function() {
-              if (xhr.status === 200) {
-                defer.resolve(JSON.parse(xhr.response));
-                $scope.$apply();
-              }
-              else {
-                defer.reject(xhr.response || 'Unable to upload file');
-                $scope.$apply();
-              }
-            };
-
-            xhr.open('POST', 'https://content.dropboxapi.com/2/files/upload');
-            xhr.setRequestHeader('Authorization', 'Bearer ' + dropboxToken);
-            xhr.setRequestHeader('Content-Type', 'application/octet-stream');
-            xhr.setRequestHeader('Dropbox-API-Arg', JSON.stringify({
-              path: '/' + dir + fileName,
-              mode: 'add',
-              autorename: true,
-              mute: false
-            }));
-
-            xhr.send(file);
-          }
-          return defer.promise;
-        },
-        getFile: function(fileUrl, file) {
-          var defer = $q.defer();
-          var dropboxToken = getDropboxToken();
-          if (!dropboxToken) {
-            defer.reject('You must authenticate with dropbox before downloading files.');
-          }
-          else {
-            var xhr = new XMLHttpRequest();
-            xhr.responseType = 'arraybuffer';
-
-            xhr.onload = function() {
-              if (xhr.status === 200) {
-                defer.resolve(xhr.response);
-              }
-              else {
-                defer.reject(xhr.response || 'Unable to download file');
-              }
-            };
-
-            xhr.open('POST', 'https://content.dropboxapi.com/2/files/download');
-            xhr.setRequestHeader('Authorization', 'Bearer ' + dropboxToken);
-            xhr.setRequestHeader('Dropbox-API-Arg', JSON.stringify({
-              path: file.path_lower
-            }));
-            xhr.send();
-          }
-          return defer.promise;
-        },
-        downloadFile: function(evt, file) {
-          var strMimeType = 'application/octet-stream';
-          evt.preventDefault();
-          this.getFile(null, file).then(function(data) {
-            var blob = new Blob([data], {type: strMimeType});
-            FileSaver.saveAs(blob, file.name, true);
-          }).catch(function(err) {
-            alert(err);
-          });
-        }
-      };
-    }
-  ]);
-};
-
-
-},{}],99:[function(require,module,exports){
-"use strict";
-module.exports = function(app) {
-  app.config([
-    'FormioPluginsProvider',
-    'FormioStorageS3Provider',
-    function(
-      FormioPluginsProvider,
-      FormioStorageS3Provider
-    ) {
-      FormioPluginsProvider.register('storage', 's3', FormioStorageS3Provider.$get());
-    }
-  ]);
-
-  app.factory('FormioStorageS3', [
-    '$q',
-    '$window',
-    'Formio',
-    'Upload',
-    function(
-      $q,
-      $window,
-      Formio,
-      Upload
-    ) {
-      return {
-        title: 'S3',
-        name: 's3',
-        uploadFile: function(file, fileName, status, $scope) {
-          var defer = $q.defer();
-          Formio.request($scope.formio.formUrl + '/storage/s3', 'POST', {
-            name: fileName,
-            size: file.size,
-            type: file.type
-          })
-            .then(function(response) {
-              var request = {
-                url: response.url,
-                method: 'POST',
-                data: response.data
-              };
-              request.data.file = file;
-              var dir = $scope.component.dir || '';
-              request.data.key += dir + fileName;
-              var upload = Upload.upload(request);
-              upload
-                .then(function() {
-                  // Handle upload finished.
-                  defer.resolve({
-                    name: fileName,
-                    bucket: response.bucket,
-                    key: request.data.key,
-                    url: response.url + request.data.key,
-                    acl: request.data.acl,
-                    size: file.size,
-                    type: file.type
-                  });
-                }, function(resp) {
-                  // Handle error
-                  var oParser = new DOMParser();
-                  var oDOM = oParser.parseFromString(resp.data, 'text/xml');
-                  var message = oDOM.getElementsByTagName('Message')[0].innerHTML;
-                  defer.reject(message);
-                }, function(evt) {
-                  // Progress notify
-                  status.status = 'progress';
-                  status.progress = parseInt(100.0 * evt.loaded / evt.total);
-                  delete status.message;
-                });
-            });
-          return defer.promise;
-        },
-        getFile: function(formUrl, file) {
-          if (file.acl !== 'public-read') {
-            return Formio.request(formUrl + '/storage/s3?bucket=' + file.bucket + '&key=' + file.key, 'GET');
-          }
-          else {
-            var deferred = $q.defer();
-            deferred.resolve(file);
-            return deferred.promise;
-          }
-        },
-        downloadFile: function(evt, file, $scope) {
-          evt.preventDefault();
-          this.getFile($scope.form, file).then(function(file) {
-            $window.open(file.url, '_blank');
-          }).catch(function(response) {
-            // Is alert the best way to do this?
-            // User is expecting an immediate notification due to attempting to download a file.
-            alert(response);
-          });
-        }
-      };
-    }
-  ]);
-};
-
-},{}],100:[function(require,module,exports){
-"use strict";
-module.exports = function(app) {
-  app.config([
-    'FormioPluginsProvider',
-    'FormioStorageUrlProvider',
-    function(
-      FormioPluginsProvider,
-      FormioStorageUrlProvider
-    ) {
-      FormioPluginsProvider.register('storage', 'url', FormioStorageUrlProvider.$get());
-    }
-  ]);
-
-  app.factory('FormioStorageUrl', [
-    '$q',
-    'Upload',
-    function(
-      $q,
-      Upload
-    ) {
-      return {
-        title: 'Url',
-        name: 'url',
-        uploadFile: function(file, fileName, status, $scope) {
-          var defer = $q.defer();
-          Upload.upload({
-            url: $scope.component.url,
-            data: {
-              file: file,
-              name: fileName
-            }
-          })
-            .then(function(resp) {
-              defer.resolve(resp);
-            }, function(resp) {
-              defer.reject(resp.data);
-            }, function(evt) {
-              // Progress notify
-              status.status = 'progress';
-              status.progress = parseInt(100.0 * evt.loaded / evt.total);
-              delete status.message;
-            });
-          return defer.promise;
-        },
-        downloadFile: function() {
-          // Do nothing which will cause a normal link click to occur.
-        }
-      };
-    }]
-  );
-};
-
-},{}],101:[function(require,module,exports){
+},{"./components":59,"./directives/customValidator":75,"./directives/formio":76,"./directives/formioComponent":77,"./directives/formioComponentView":78,"./directives/formioDelete":79,"./directives/formioElement":80,"./directives/formioErrors":81,"./directives/formioSubmission":82,"./directives/formioSubmissions":83,"./directives/formioWizard":84,"./factories/FormioScope":85,"./factories/FormioUtils":86,"./factories/formioInterceptor":87,"./factories/formioTableView":88,"./filters/flattenComponents":89,"./filters/safehtml":90,"./filters/tableComponents":91,"./filters/tableFieldView":92,"./filters/tableView":93,"./filters/translate":94,"./providers/Formio":97}],97:[function(require,module,exports){
 "use strict";
 module.exports = function() {
   // The formio class.
@@ -73105,6 +72812,7 @@ module.exports = function() {
     getAppUrl: Formio.getAppUrl,
     registerPlugin: Formio.registerPlugin,
     getPlugin: Formio.getPlugin,
+    providers: Formio.providers,
     setDomain: function() {
       // Remove this?
     },
@@ -73154,33 +72862,4 @@ module.exports = function() {
   };
 };
 
-},{"formiojs":28}],102:[function(require,module,exports){
-"use strict";
-module.exports = function() {
-  var plugins = {};
-
-  return {
-    register: function(type, name, plugin) {
-      if (!plugins[type]) {
-        plugins[type] = {};
-      }
-      plugins[type][name] = plugin;
-    },
-
-    $get: [
-      function() {
-        return function(type, name) {
-          if (type) {
-            if (name) {
-              return plugins[type][name] || false;
-            }
-            return plugins[type] || false;
-          }
-          return plugins;
-        };
-      }
-    ]
-  };
-};
-
-},{}]},{},[95]);
+},{"formiojs":28}]},{},[95]);

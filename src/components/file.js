@@ -58,22 +58,31 @@ module.exports = function(app) {
       },
       template: '<a href="{{ file.url }}" ng-click="getFile($event)" target="_blank">{{ file.name }}</a>',
       controller: [
-        '$scope',
+        '$window',
         '$rootScope',
-        'FormioPlugins',
+        '$scope',
+        'Formio',
         function(
-          $scope,
+          $window,
           $rootScope,
-          FormioPlugins
+          $scope,
+          Formio
         ) {
           $scope.getFile = function(evt) {
-            // In view mode there may not be a form. Need a way to override.
+            evt.preventDefault();
             $scope.form = $scope.form || $rootScope.filePath;
-
-            var plugin = FormioPlugins('storage', $scope.file.storage);
-            if (plugin) {
-              plugin.downloadFile(evt, $scope.file, $scope);
-            }
+            var formio = new Formio($scope.form);
+            formio
+              .downloadFile($scope.file).then(function(file) {
+                if (file) {
+                  $window.open(file.url, '_blank');
+                }
+              })
+              .catch(function(response) {
+                // Is alert the best way to do this?
+                // User is expecting an immediate notification due to attempting to download a file.
+                alert(response);
+              });
           };
         }
       ]
@@ -90,27 +99,22 @@ module.exports = function(app) {
       },
       template: '<img ng-src="{{ imageSrc }}" alt="{{ file.name }}" />',
       controller: [
-        '$scope',
         '$rootScope',
-        'FormioPlugins',
+        '$scope',
+        'Formio',
         function(
-          $scope,
           $rootScope,
-          FormioPlugins
+          $scope,
+          Formio
         ) {
-          var plugin = FormioPlugins('storage', $scope.file.storage);
-
-          // In view mode there may not be a form. Need a way to override.
           $scope.form = $scope.form || $rootScope.filePath;
+          var formio = new Formio($scope.form);
 
-          // Sign the file if needed.
-          if (plugin) {
-            plugin.getFile($scope.form, $scope.file)
-              .then(function(result) {
-                $scope.imageSrc = result.url;
-                $scope.$apply();
-              });
-          }
+          formio.downloadFile($scope.file)
+            .then(function(result) {
+              $scope.imageSrc = result.url;
+              $scope.$apply();
+            });
         }
       ]
     };
@@ -118,11 +122,9 @@ module.exports = function(app) {
 
   app.controller('formioFileUpload', [
     '$scope',
-    'FormioPlugins',
     'FormioUtils',
     function(
       $scope,
-      FormioPlugins,
       FormioUtils
     ) {
       $scope.fileUploads = {};
@@ -141,44 +143,45 @@ module.exports = function(app) {
 
       $scope.upload = function(files) {
         if ($scope.component.storage && files && files.length) {
-          var plugin = FormioPlugins('storage', $scope.component.storage);
           angular.forEach(files, function(file) {
             // Get a unique name for this file to keep file collisions from occurring.
             var fileName = FormioUtils.uniqueName(file.name);
-            if (plugin) {
-              $scope.fileUploads[fileName] = {
-                name: fileName,
-                size: file.size,
-                status: 'info',
-                message: 'Starting upload'
-              };
-              plugin.uploadFile(file, fileName, $scope.fileUploads[fileName], $scope)
-                .then(function(fileInfo) {
-                  delete $scope.fileUploads[fileName];
-                  fileInfo.storage = $scope.component.storage;
-                  // Ensure that the file component is an array.
-                  if (
-                    !$scope.data[$scope.component.key] ||
-                    !($scope.data[$scope.component.key] instanceof Array)
-                  ) {
-                    $scope.data[$scope.component.key] = [];
-                  }
-                  $scope.data[$scope.component.key].push(fileInfo);
-                })
-                .catch(function(message) {
-                  $scope.fileUploads[fileName].status = 'error';
-                  $scope.fileUploads[fileName].message = message;
-                  delete $scope.fileUploads[fileName].progress;
-                });
-            }
-            else {
-              $scope.fileUploads[fileName] = {
-                name: fileName,
-                size: file.size,
-                status: 'error',
-                message: 'Storage plugin not found'
-              };
-            }
+            $scope.fileUploads[fileName] = {
+              name: fileName,
+              size: file.size,
+              status: 'info',
+              message: 'Starting upload'
+            };
+            var dir = $scope.component.dir || '';
+            $scope.formio.uploadFile($scope.component.storage, file, fileName, dir, function processNotify(evt) {
+              $scope.fileUploads[fileName].status = 'progress';
+              $scope.fileUploads[fileName].progress = parseInt(100.0 * evt.loaded / evt.total);
+              delete $scope.fileUploads[fileName].message;
+              $scope.$apply();
+            })
+              .then(function(fileInfo) {
+                delete $scope.fileUploads[fileName];
+                // Ensure that the file component is an array.
+                if (
+                  !$scope.data[$scope.component.key] ||
+                  !($scope.data[$scope.component.key] instanceof Array)
+                ) {
+                  $scope.data[$scope.component.key] = [];
+                }
+                $scope.data[$scope.component.key].push(fileInfo);
+                $scope.$apply();
+              })
+              .catch(function(response) {
+                // Handle error
+                var oParser = new DOMParser();
+                var oDOM = oParser.parseFromString(response.data, 'text/xml');
+                var message = oDOM.getElementsByTagName('Message')[0].innerHTML;
+
+                $scope.fileUploads[fileName].status = 'error';
+                $scope.fileUploads[fileName].message = message;
+                delete $scope.fileUploads[fileName].progress;
+                $scope.$apply();
+              });
           });
         }
       };
