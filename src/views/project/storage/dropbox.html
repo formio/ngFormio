@@ -1,4 +1,11 @@
 <div class="well">
   <h4>Dropbox</h4>
-  <p>Dropbox does not have custom settings. Access is managed through Dropbox oauth. Set up Dropbox as an oauth provider to use as a file storage.</p>
+  <div class="form-group" ng-if="!currentProject.settings.storage.dropbox.access_token">
+    <p>Use this button to connect this project to a Dropbox account and store uploaded files within that account.</p>
+    <button class="btn btn-success" ng-click="dropboxOauth(dropboxSettings)">Connect to Dropbox</button>
+  </div>
+  <div class="form-group" ng-if="currentProject.settings.storage.dropbox.access_token">
+    <p>Your project is connected to a Dropbox account.</p>
+    <button class="btn btn-warning" ng-click="dropboxDisconnect()">Disconnect from Dropbox</button>
+  </div>
 </div>
