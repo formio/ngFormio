@@ -7,6 +7,7 @@ module.exports = function(app) {
         title: 'Text Area',
         template: function($scope) {
           if ($scope.component.wysiwyg) {
+            $scope.wysiwyg = $scope.component.wysiwyg;
             return 'formio/components/texteditor.html';
           }
           return 'formio/components/textarea.html';
