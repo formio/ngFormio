@@ -11,7 +11,7 @@ module.exports = [
       if (!value) {
         return '';
       }
-      if (!component || !component.type) {
+      if (!component || !component.input|| !component.type) {
         return value;
       }
       var componentInfo = formioComponents.components[component.type];

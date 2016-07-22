@@ -6,6 +6,9 @@ module.exports = function(app) {
       formioComponentsProvider.register('checkbox', {
         title: 'Check Box',
         template: 'formio/components/checkbox.html',
+        tableView: function(data) {
+          return data ? 'Yes' : 'No';
+        },
         controller: ['$scope', function($scope) {
           // FA-850 - Ensure the checked value is always a boolen object when loaded, then unbind the watch.
           var loadComplete = $scope.$watch('data.' + $scope.component.key, function() {

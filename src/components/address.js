@@ -13,7 +13,19 @@ module.exports = function(app) {
           $scope.address = {};
           $scope.addresses = [];
           $scope.refreshAddress = function(address) {
-            var params = {address: address, sensor: false};
+            var params = {
+              address: address,
+              sensor: false
+            };
+            if (!address) {
+              return;
+            }
+            if ($scope.component.map && $scope.component.map.region) {
+              params.region = $scope.component.map.region;
+            }
+            if ($scope.component.map && $scope.component.map.key) {
+              params.key = $scope.component.map.key;
+            }
             return $http.get(
               'https://maps.googleapis.com/maps/api/geocode/json',
               {
@@ -26,8 +38,8 @@ module.exports = function(app) {
                 }
               }
             ).then(function(response) {
-                $scope.addresses = response.data.results;
-              });
+              $scope.addresses = response.data.results;
+            });
           };
         }],
         tableView: function(data) {
@@ -44,6 +56,10 @@ module.exports = function(app) {
           protected: false,
           unique: false,
           persistent: true,
+          map: {
+            region: '',
+            key: ''
+          },
           validate: {
             required: false
           }

@@ -58795,7 +58795,19 @@ module.exports = function(app) {
           $scope.address = {};
           $scope.addresses = [];
           $scope.refreshAddress = function(address) {
-            var params = {address: address, sensor: false};
+            var params = {
+              address: address,
+              sensor: false
+            };
+            if (!address) {
+              return;
+            }
+            if ($scope.component.map && $scope.component.map.region) {
+              params.region = $scope.component.map.region;
+            }
+            if ($scope.component.map && $scope.component.map.key) {
+              params.key = $scope.component.map.key;
+            }
             return $http.get(
               'https://maps.googleapis.com/maps/api/geocode/json',
               {
@@ -58808,8 +58820,8 @@ module.exports = function(app) {
                 }
               }
             ).then(function(response) {
-                $scope.addresses = response.data.results;
-              });
+              $scope.addresses = response.data.results;
+            });
           };
         }],
         tableView: function(data) {
@@ -58826,6 +58838,10 @@ module.exports = function(app) {
           protected: false,
           unique: false,
           persistent: true,
+          map: {
+            region: '',
+            key: ''
+          },
           validate: {
             required: false
           }
@@ -59019,6 +59035,9 @@ module.exports = function(app) {
       formioComponentsProvider.register('checkbox', {
         title: 'Check Box',
         template: 'formio/components/checkbox.html',
+        tableView: function(data) {
+          return data ? 'Yes' : 'No';
+        },
         controller: ['$scope', function($scope) {
           // FA-850 - Ensure the checked value is always a boolen object when loaded, then unbind the watch.
           var loadComplete = $scope.$watch('data.' + $scope.component.key, function() {
@@ -59163,6 +59182,7 @@ module.exports = function(app) {
       formioComponentsProvider.register('container', {
         title: 'Container',
         template: 'formio/components/container.html',
+        viewTemplate: 'formio/componentsView/container.html',
         group: 'layout',
         icon: 'fa fa-folder-open',
         settings: {
@@ -60154,6 +60174,14 @@ module.exports = function(app) {
       formioComponentsProvider.register('radio', {
         title: 'Radio',
         template: 'formio/components/radio.html',
+        tableView: function(data, component) {
+          for (var i in component.values) {
+            if (component.values[i].value === data) {
+              return component.values[i].label;
+            }
+          }
+          return data;
+        },
         settings: {
           input: true,
           tableView: true,
@@ -62685,7 +62713,7 @@ module.exports = [
       if (!value) {
         return '';
       }
-      if (!component || !component.type) {
+      if (!component || !component.input|| !component.type) {
         return value;
       }
       var componentInfo = formioComponents.components[component.type];
@@ -62910,7 +62938,7 @@ app.run([
     );
 
     $templateCache.put('formio/submission.html',
-      "<div>\n  <div ng-repeat=\"component in form.components track by $index\" >\n    <formio-component-view form=\"form\" component=\"component\" data=\"submission.data\" ignore=\"ignore\"></formio-component-view>\n  </div>\n</div>\n"
+      "<div>\n  <div ng-repeat=\"component in form.components track by $index\">\n    <formio-component-view form=\"form\" component=\"component\" data=\"submission.data\" ignore=\"ignore\"></formio-component-view>\n  </div>\n</div>\n"
     );
 
     $templateCache.put('formio/submissions.html',

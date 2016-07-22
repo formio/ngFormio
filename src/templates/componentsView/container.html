@@ -1,0 +1,8 @@
+<div class="table-responsive" id="{{ component.key }}">
+  <table class="table table-bordered table-striped">
+    <tr ng-repeat="item in component.components track by $index">
+      <th>{{ item.label }}</th>
+      <td><div ng-bind-html="data | tableView:item"></div></td>
+    </tr>
+  </table>
+</div>

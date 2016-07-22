@@ -6,6 +6,7 @@ module.exports = function(app) {
       formioComponentsProvider.register('container', {
         title: 'Container',
         template: 'formio/components/container.html',
+        viewTemplate: 'formio/componentsView/container.html',
         group: 'layout',
         icon: 'fa fa-folder-open',
         settings: {
