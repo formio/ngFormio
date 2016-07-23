@@ -49,6 +49,16 @@ module.exports = [
           }
         });
 
+        $scope.setLoading = function(_loading) {
+          $scope.formLoading = _loading;
+          if (_loading) {
+            $element.find('.formio-loading').show();
+          }
+          else {
+            $element.find('.formio-loading').hide();
+          }
+        };
+
         // Used to set the form action.
         var getAction = function(action) {
           if (!action) return '';
@@ -89,18 +99,18 @@ module.exports = [
           ) {
             return;
           }
-          $scope.formLoading = false;
+          $scope.setLoading(false);
           $scope.$emit('formLoad', $scope.form);
         });
 
         $scope.updateSubmissions = function() {
-          $scope.formLoading = true;
+          $scope.setLoading(true);
           var params = {};
           if ($scope.perPage) params.limit = $scope.perPage;
           if ($scope.skip) params.skip = $scope.skip;
           loader.loadSubmissions({params: params}).then(function(submissions) {
             angular.merge($scope.submissions, angular.copy(submissions));
-            $scope.formLoading = false;
+            $scope.setLoading(false);
             $scope.$emit('submissionsLoad', submissions);
           }, this.onError($scope));
         }.bind(this);
@@ -108,33 +118,33 @@ module.exports = [
         if ($scope._src) {
           loader = new Formio($scope._src);
           if (options.form) {
-            $scope.formLoading = true;
+            $scope.setLoading(true);
 
             // If a form is already provided, then skip the load.
             if ($scope.form && Object.keys($scope.form).length) {
-              $scope.formLoading = false;
+              $scope.setLoading(false);
               $scope.$emit('formLoad', $scope.form);
             }
             else {
               loader.loadForm().then(function(form) {
                 angular.merge($scope.form, angular.copy(form));
-                $scope.formLoading = false;
+                $scope.setLoading(false);
                 $scope.$emit('formLoad', $scope.form);
               }, this.onError($scope));
             }
           }
           if (options.submission && loader.submissionId) {
-            $scope.formLoading = true;
+            $scope.setLoading(true);
 
             // If a submission is already provided, then skip the load.
             if ($scope.submission && Object.keys($scope.submission.data).length) {
-              $scope.formLoading = false;
+              $scope.setLoading(false);
               $scope.$emit('submissionLoad', $scope.submission);
             }
             else {
               loader.loadSubmission().then(function(submission) {
                 angular.merge($scope.submission, angular.copy(submission));
-                $scope.formLoading = false;
+                $scope.setLoading(false);
                 $scope.$emit('submissionLoad', submission);
               }, this.onError($scope));
             }
@@ -146,6 +156,7 @@ module.exports = [
         else {
           $scope.formoLoaded = true;
           $scope.formLoading = !$scope.form || (Object.keys($scope.form).length === 0) || !$scope.form.components.length;
+          $scope.setLoading($scope.formLoading);
 
           // Emit the events if these objects are already loaded.
           if (!$scope.formLoading) {
