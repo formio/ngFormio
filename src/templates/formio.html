@@ -1,5 +1,5 @@
 <div>
-  <i style="font-size: 2em;" ng-if="formLoading" class="glyphicon glyphicon-refresh glyphicon-spin"></i>
+  <i style="font-size: 2em;" ng-if="formLoading" class="formio-loading glyphicon glyphicon-refresh glyphicon-spin"></i>
   <formio-wizard ng-if="form.display === 'wizard'" src="src" form="form" submission="submission" form-action="formAction" read-only="readOnly" hide-components="hideComponents" formio-options="formioOptions" storage="form.name"></formio-wizard>
   <form ng-if="!form.display || (form.display === 'form')" role="form" name="formioForm" ng-submit="onSubmit(formioForm)" novalidate>
     <div ng-repeat="alert in formioAlerts track by $index" class="alert alert-{{ alert.type }}" role="alert">
