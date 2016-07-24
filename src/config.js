@@ -3,14 +3,15 @@
  */
 var host = window.location.host;
 var environment = JSON.parse(localStorage.getItem('currentEnvironment'));
-var protocol, serverHost
+var protocol = window.location.protocol;
+var serverHost, apiProtocol;
 if (environment) {
   var parts = environment.url.split('://');
-  protocol = parts[0];
+  apiProtocol = parts[0] + ':';
   serverHost = parts[1];
 }
 else {
-  protocol = window.location.protocol;
+  apiProtocol = (serverHost.split(':')[0] !== 'localhost') ? 'https:' : protocol;
   serverHost = host;
   var parts = serverHost.split('.');
   if (parts[0] === 'portal') {
@@ -18,7 +19,6 @@ else {
     serverHost = parts.join('.');
   }
 }
-var apiProtocol = (serverHost.split(':')[0] !== 'localhost') ? 'https:' : protocol;
 var appBase = protocol + '//' + host;
 var apiBase = apiProtocol + '//api.' + serverHost;
 var formioBase = apiProtocol + '//formio.' + serverHost;

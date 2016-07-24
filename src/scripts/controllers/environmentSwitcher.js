@@ -37,7 +37,9 @@ angular.module('formioApp')
     '$rootScope',
     'Environments',
     function($rootScope, Environments) {
-      // Calculate if we are on a non-main environment and set variable so we can hide parts of site.
+      if (Environments.currentEnvironment) {
+        $rootScope.onPrem = true;
+      }
     }
   ])
   .controller('environmentSwitcher', [
