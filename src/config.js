@@ -13,6 +13,7 @@ if (environment) {
 else {
   serverHost = host;
   apiProtocol = (serverHost.split(':')[0] !== 'localhost') ? 'https:' : protocol;
+  //apiProtocol = protocol;
   var parts = serverHost.split('.');
   if (parts[0] === 'portal') {
     parts.shift();
