@@ -45,10 +45,11 @@ angular.module('formioApp')
   .controller('environmentSwitcher', [
     '$scope',
     '$window',
+    '$document',
     '$state',
     'Environments',
     'Formio',
-    function ($scope, $window, $state, Environments, Formio) {
+    function ($scope, $window, $document, $state, Environments, Formio) {
       $scope.environments = Environments.environments;
       $scope.currentEnvironment = Environments.currentEnvironment;
       $scope.switchEnvironment = function(environment) {
@@ -85,7 +86,7 @@ angular.module('formioApp')
           else if (!(parts[0] === 'https' || parts[0] === 'http')) {
             $scope.errors.urlInvalid = true;
           }
-          var parser = document.createElement('a');
+          var parser = $document.createElement('a');
           parser.href = $scope.environment.url;
           if (parser.hostname === 'localhost') {
             $scope.errors.localhost = true;
@@ -99,10 +100,10 @@ angular.module('formioApp')
           Environments.addEnvironment($scope.environment);
           $scope.addingEnvironment = false;
         }
-      }
+      };
       $scope.cancelEnvironment = function() {
         $scope.addingEnvironment = false;
-      }
+      };
     }
   ]);
 
