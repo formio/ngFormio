@@ -45,13 +45,17 @@ angular.module('formioApp')
   .controller('environmentSwitcher', [
     '$scope',
     '$window',
+    '$state',
     'Environments',
-    function ($scope, $window, Environments) {
+    'Formio',
+    function ($scope, $window, $state, Environments, Formio) {
       $scope.environments = Environments.environments;
       $scope.currentEnvironment = Environments.currentEnvironment;
       $scope.switchEnvironment = function(environment) {
         if($window.confirm('Changing environments will switch backend servers and log you out. Are you sure?')) {
           Environments.setCurrentEnvironment(environment);
+          Formio.logout();
+          $state.go('home');
           $window.location.reload();
         }
       };
