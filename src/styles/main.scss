@@ -5,6 +5,12 @@
   display: none !important;
 }
 
+[ng-click],
+[data-ng-click],
+[x-ng-click] {
+  cursor: pointer;
+}
+
 body {
   padding-top: 45px;
 }
@@ -1542,4 +1548,11 @@ footer {
 
 .caret {
   border-top: 4px dashed;
+}
+
+.environment-errors {
+  padding: 10px;
+  p.help-block {
+    color: red;
+  }
 }

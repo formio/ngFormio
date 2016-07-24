@@ -1,13 +1,22 @@
 /**
  * This config assumes the app and server are running on the same domain.
  */
-var protocol = window.location.protocol;
 var host = window.location.host;
-var serverHost = host;
-var parts = serverHost.split('.');
-if (parts[0] === 'portal') {
-  parts.shift();
-  serverHost = parts.join('.');
+var environment = JSON.parse(localStorage.getItem('currentEnvironment'));
+var protocol, serverHost
+if (environment) {
+  var parts = environment.url.split('://');
+  protocol = parts[0];
+  serverHost = parts[1];
+}
+else {
+  protocol = window.location.protocol;
+  serverHost = host;
+  var parts = serverHost.split('.');
+  if (parts[0] === 'portal') {
+    parts.shift();
+    serverHost = parts.join('.');
+  }
 }
 var apiProtocol = (serverHost.split(':')[0] !== 'localhost') ? 'https:' : protocol;
 var appBase = protocol + '//' + host;
