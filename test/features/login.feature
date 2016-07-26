@@ -3,7 +3,7 @@ Feature: Login Functionality
   Scenario: Empty login
     Given I am on /#/auth
     And I am logged out
-    When I wait 300 milliseconds
+    When I wait 200 milliseconds
     When I enter test@test.com in the .login-container #email field
     When I click the LOG IN button
     Then I have been logged out
