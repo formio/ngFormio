@@ -11,7 +11,7 @@ module.exports = function(gulp, plugins) {
       .pipe(gulp.dest('dist')));
 
     stream.add(gulp.src('src/config.js')
-      .pipe(plugins.replace('var serverHost = host;', 'var serverHost = \'localhost:3000\';'))
+      .pipe(plugins.replace('serverHost = host;', 'serverHost = \'localhost:3000\';'))
       .pipe(gulp.dest('.tmp')));
 
     return stream;

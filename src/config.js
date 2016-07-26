@@ -1,15 +1,25 @@
 /**
  * This config assumes the app and server are running on the same domain.
  */
-var protocol = window.location.protocol;
 var host = window.location.host;
-var serverHost = host;
-var parts = serverHost.split('.');
-if (parts[0] === 'portal') {
-  parts.shift();
-  serverHost = parts.join('.');
+var environment = JSON.parse(localStorage.getItem('currentEnvironment'));
+var protocol = window.location.protocol;
+var serverHost, apiProtocol;
+if (environment) {
+  var parts = environment.url.split('://');
+  apiProtocol = parts[0] + ':';
+  serverHost = parts[1];
 }
-var apiProtocol = (serverHost.split(':')[0] !== 'localhost') ? 'https:' : protocol;
+else {
+  serverHost = host;
+  apiProtocol = (serverHost.split(':')[0] !== 'localhost') ? 'https:' : protocol;
+  //apiProtocol = protocol;
+  var parts = serverHost.split('.');
+  if (parts[0] === 'portal') {
+    parts.shift();
+    serverHost = parts.join('.');
+  }
+}
 var appBase = protocol + '//' + host;
 var apiBase = apiProtocol + '//api.' + serverHost;
 var formioBase = apiProtocol + '//formio.' + serverHost;

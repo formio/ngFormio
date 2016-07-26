@@ -153,7 +153,7 @@
             <dd><i class="fa" ng-class="{'text-success fa-check': projectPermissions.admin, 'text-muted fa-times': !projectPermissions.admin}"></i></dd>
           </dl>
         </div>
-        <div ng-if="!hasTeams()">
+        <div ng-if="!hasTeams() && !onPrem">
           <div class="well">
             <h4><a href="" ng-click="showUpgradeDialog(currentProject)">Upgrade Plan</a> to enable teams for this project</h4>
           </div>
