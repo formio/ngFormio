@@ -1,4 +1,29 @@
-<div>
-  <p>More info on how to build a iOS and Android apps is coming soon.</p>
-  <p>The basic overview is to follow the steps in building a Web App and use the contents of the <strong>/dist</strong> directory to build an <a href="https://cordova.apache.org/" target="_blank">Apache Cordova application.</a> </p>
+<div class="project-section-content">
+  <div ng-if="!hasTemplate" class="alert alert-info text-center" role="alert"><strong>This project doesn't have a pre-defined template, but you can use our Example template to help you get started.</strong></div>
+  <div class="project-section-inner-content">
+    <div class="row">
+      <div class="col-md-12">
+        <h3>Local Development</h3>
+        <div class="alert alert-info">
+          In order to deploy your app in cordova, you first need to set it up locally. See <a href="#" ui-sref="project.launch.local">Launch Local App Development</a>.
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <h3>Build a Distribution</h3>
+        <p>To build your app and prepare it for cordova, you will need to compile it. If you are using one of our applications as the base, we provide a gulp task that will do this for you.</p>
+        <p><pre>gulp build</pre></p>
+        <p>This will build your entire application into the <strong>/dist</strong> directory. This will be a fully working version of your app that is ready for deployment.</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <h3>Adding to Cordova</h3>
+        <p>Adding the built files to your cordova project is as easy as copying the /dist files into the www directory within your cordova project.</p>
+        <p>Setting up your cordova project and compiling it is covered in more details at <a href="https://help.form.io/developer/info/#cordova">Apache Cordova with Form.io</a>.</p>
+      </div>
+    </div>
+  </div>
 </div>
+
