@@ -1,0 +1,21 @@
+<div class="well">
+  <h4>Atlassian</h4>
+  <p>Enter the following information for your Atlassian account.</p>
+</div>
+
+<div class="form-group">
+  <label for="url" class="control-label">Atlassian URL</label>
+  <input ng-model="currentProject.settings.atlassian.url" type="text" class="form-control" id="url" placeholder="myproject.atlassian.net">
+</div>
+
+<div class="form-group">
+  <label for="username" class="control-label">Username</label>
+  <input ng-model="currentProject.settings.atlassian.username" type="text" class="form-control" id="username" placeholder="me@example.com">
+</div>
+
+<div class="form-group">
+  <label for="password" class="control-label">Password</label>
+  <input type="password" class="form-control" ng-model="currentProject.settings.atlassian.password" id="password" />
+</div>
+
+<button class="btn btn-primary" ng-click="saveProject()">Save Settings</button>
