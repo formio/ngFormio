@@ -133,10 +133,10 @@ module.exports = function() {
                 fieldForm[elementScope.component.key].$pristine = false;
               }
             });
-            $scope.formioAlerts.push({
+            $scope.formioAlerts = [{
               type: 'danger',
               message: 'Please fix the following errors before proceeding.'
-            });
+            }];
             return true;
           }
           return false;

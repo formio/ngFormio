@@ -16,7 +16,7 @@ module.exports = function(app) {
           rightIcon: '',
           block: false,
           action: 'submit',
-          disableOnInvalid: true,
+          disableOnInvalid: false,
           theme: 'primary'
         },
         controller: ['$scope', function($scope) {

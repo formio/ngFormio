@@ -327,9 +327,30 @@ module.exports = function() {
           submission: true
         });
 
+        $scope.checkErrors = function(form) {
+          if (form.submitting) {
+            return true;
+          }
+          form.$pristine = false;
+          for (var key in form) {
+            if (form[key] && form[key].hasOwnProperty('$pristine')) {
+              form[key].$pristine = false;
+            }
+          }
+          return !form.$valid;
+        };
+
         // Called when the form is submitted.
         $scope.onSubmit = function(form) {
-          if (!form.$valid || form.submitting) return;
+          $scope.formioAlerts = [];
+          if ($scope.checkErrors(form)) {
+            $scope.formioAlerts.push({
+              type: 'danger',
+              message: 'Please fix the following errors before submitting.'
+            });
+            return;
+          }
+
           form.submitting = true;
 
           sweepSubmission();
