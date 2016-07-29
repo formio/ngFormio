@@ -12,28 +12,35 @@ module.exports = function(app) {
         title: 'Layout Components'
       }
     };
-    return {
-      addGroup: function(name, group) {
-        groups[name] = group;
-      },
-      register: function(type, component, group) {
-        if (!components[type]) {
-          components[type] = component;
-        }
-        else {
-          angular.extend(components[type], component);
-        }
 
-        // Set the type for this component.
-        if (!components[type].group) {
-          components[type].group = group || '__component';
-        }
-        components[type].settings.type = type;
-      },
+    function mergeComponents(type, component, group) {
+      if (!components[type]) {
+        components[type] = component;
+      }
+      else {
+        angular.extend(components[type], component);
+      }
+
+      // Set the type for this component.
+      if (!components[type].group) {
+        components[type].group = group || '__component';
+      }
+      components[type].settings.type = type;
+    }
+
+    function addGroup(name, group) {
+      groups[name] = group;
+    }
+
+    return {
+      addGroup: addGroup,
+      register: mergeComponents,
       $get: function() {
         return {
           components: components,
-          groups: groups
+          groups: groups,
+          update: mergeComponents,
+          addGroup: addGroup
         };
       }
     };
