@@ -1396,12 +1396,18 @@ app.controller('ProjectSettingsController', [
   '$state',
   'GoogleAnalytics',
   'FormioAlerts',
+  '$http',
+  'AppConfig',
+  '$interval',
   function(
     $scope,
     $rootScope,
     $state,
     GoogleAnalytics,
-    FormioAlerts
+    FormioAlerts,
+    $http,
+    AppConfig,
+    $interval
   ) {
     if ($scope.highestRole && ['team_read', 'team_write'].indexOf($scope.highestRole) !== -1) {
       $state.go('project.overview');
@@ -1468,6 +1474,25 @@ app.controller('ProjectSettingsController', [
         FormioAlerts.onError(error);
       });
     };
+
+    $scope.authenticatedWithOAuth = false;
+
+    // Oauth verification for atlassian
+    $scope.loginWithOAuth = function() {
+      $http.post(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/atlassian/oauth/authorize')
+        .then(function(result) {
+          $scope.authenticatedWithOAuth = true;
+          var data = result.data;
+          var url = data.url;
+
+          window.open(url, 'OAuth', 'width=800,height=618');
+          console.log(result);
+        });
+    };
+
+    $scope.verifyOAuth = function() {
+
+    }
   }
 ]);
 
