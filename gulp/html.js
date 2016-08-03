@@ -5,9 +5,6 @@ module.exports = function(gulp, plugins) {
     stream.add(gulp.src('src/*.html')
       .pipe(plugins.useref({searchPath: ['.tmp', 'src', '.']}))
       .pipe(plugins.debug({title: 'html:'}))
-      .pipe(plugins.if('**/app.js', plugins.uglify()))
-      .pipe(plugins.if('**/plugins.js', plugins.uglify()))
-      .pipe(plugins.if('*.css', plugins.csso()))
       .pipe(plugins.if('*.html', plugins.minifyHtml({conditionals: true, loose: true})))
       .pipe(gulp.dest('dist')));
 
