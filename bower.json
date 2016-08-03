@@ -119,16 +119,16 @@
         "dist/lodash.min.js"
       ]
     },
-    "formio": {
+    "ng-formio": {
       "main": [
         "dist/formio.min.js",
-        "css/formio.css"
+        "dist/formio.min.css"
       ]
     },
-    "ngFormBuilder": {
+    "ng-formio-builder": {
       "main": [
         "dist/ngFormBuilder.min.js",
-        "css/formBuilder.css"
+        "dist/ngFormBuilder.min.css"
       ]
     },
     "ng-dialog": {

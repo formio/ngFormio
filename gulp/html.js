@@ -7,6 +7,12 @@ module.exports = function(gulp, plugins) {
       .pipe(plugins.useref({searchPath: ['.tmp', 'src', '.']}))
       .pipe(plugins.debug({title: 'html:'}))
       .pipe(ternaryStream(function(file) {
+        return !!file.path.match(/\/app\.js$|\/plugins\.js$/);
+      }, plugins.uglify()))
+      .pipe(ternaryStream(function(file) {
+        return !!file.path.match(/\.css$/);
+      }, plugins.csso()))
+      .pipe(ternaryStream(function(file) {
         return !!file.path.match(/\.html$/);
       }, plugins.minifyHtml({conditionals: true, loose: true})))
       .pipe(gulp.dest('dist')));
