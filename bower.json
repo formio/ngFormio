@@ -117,11 +117,6 @@
         "dist/lodash.min.js"
       ]
     },
-    "ckeditor": {
-      "main": [
-        "ckeditor.min.js"
-      ]
-    },
     "formio": {
       "main": [
         "dist/formio.min.js",
