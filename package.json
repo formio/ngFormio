@@ -39,6 +39,7 @@
     "merge-stream": "^1.0.0",
     "opn": "^1.0.0",
     "require-dir": "^0.3.0",
+    "ternary-stream": "^2.0.0",
     "vinyl-paths": "^1.0.0",
     "wiredep": "^2.0.0",
     "yargs": "^3.8.0"
