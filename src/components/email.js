@@ -18,7 +18,10 @@ module.exports = function(app) {
           defaultValue: '',
           protected: false,
           unique: false,
-          persistent: true
+          persistent: true,
+          kickbox: {
+            enabled: false
+          }
         }
       });
     }
