@@ -1,4 +1,4 @@
-/*! ng-formio v2.1.2 | https://npmcdn.com/ng-formio@2.1.2/LICENSE.txt */
+/*! ng-formio v2.1.3 | https://npmcdn.com/ng-formio@2.1.3/LICENSE.txt */
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -46728,12 +46728,15 @@ var dropbox = function(formio) {
         }
 
         xhr.open('POST', formio.formUrl + '/storage/dropbox');
-        xhr.setRequestHeader('x-jwt-token', localStorage.getItem('formioToken'));
+        var token = localStorage.getItem('formioToken');
+        if (token) {
+          xhr.setRequestHeader('x-jwt-token', token);
+        }
         xhr.send(fd);
       });
     },
     downloadFile: function(file) {
-      file.url = formio.formUrl + '/storage/dropbox?path_lower=' + file.path_lower + '&x-jwt-token=' + localStorage.getItem('formioToken');
+      file.url = formio.formUrl + '/storage/dropbox?path_lower=' + file.path_lower + (token ? '&x-jwt-token=' + token : '');
       return Promise.resolve(file);
     }
   };
@@ -46837,7 +46840,10 @@ var s3 = function(formio) {
 
         pre.setRequestHeader('Accept', 'application/json');
         pre.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-        pre.setRequestHeader('x-jwt-token', localStorage.getItem('formioToken'));
+        var token = localStorage.getItem('formioToken');
+        if (token) {
+          pre.setRequestHeader('x-jwt-token', token);
+        }
 
         pre.send(JSON.stringify({
           name: fileName,
