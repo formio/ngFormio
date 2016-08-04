@@ -109,11 +109,6 @@
         "dist/select.css"
       ]
     },
-    "angular-drag-and-drop-lists": {
-      "main": [
-        "angular-drag-and-drop-lists.min.js"
-      ]
-    },
     "lodash": {
       "main": [
         "dist/lodash.min.js"

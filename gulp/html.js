@@ -14,7 +14,7 @@ module.exports = function(gulp, plugins) {
       }, plugins.csso()))
       .pipe(ternaryStream(function(file) {
         return !!file.path.match(/\.html$/);
-      }, plugins.minifyHtml({conditionals: true, loose: true})))
+      }, plugins.htmlmin({collapseWhitespace: true})))
       .pipe(gulp.dest('dist')));
 
     stream.add(gulp.src('src/config.js')
