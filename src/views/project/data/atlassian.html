@@ -42,11 +42,11 @@
           ng-if="currentProject.settings.atlassian.oauth.private_key && currentProject.settings.atlassian.oauth.consumer_key && !authenticatedWithOAuth"
           ng-click="loginWithOAuth()"
         >
-          Login with OAuth
+          {{ currentProject.settings.atlassian.oauth.oauth_verifier ? 'Update OAuth Connection' : 'Login with OAuth' }}
         </button>
       </div>
 
-      <div class="form-group" ng-if="currentProject.settings.atlassian.oauth.oauth_verifier || (!currentProject.settings.atlassian.oauth.oauth_verifier && authenticatedWithOAuth)">
+      <div class="form-group" ng-if="(currentProject.settings.atlassian.oauth.oauth_verifier && authenticatedWithOAuth && !verifiedOAuth) || (!currentProject.settings.atlassian.oauth.oauth_verifier && authenticatedWithOAuth)">
         <label for="oauth_verifier" class="control-label">Verification Code</label>
         <input type="text" class="form-control" ng-model="currentProject.settings.atlassian.oauth.oauth_verifier" id="oauth_verifier">
       </div>
@@ -54,8 +54,8 @@
 
     <div>
       <button
-        class="btn btn-primary btn-sm"
-        ng-if="currentProject.settings.atlassian.oauth.private_key && currentProject.settings.atlassian.oauth.consumer_key && !authenticatedWithOAuth"
+        class="btn btn-success btn-sm"
+        ng-if="currentProject.settings.atlassian.oauth.oauth_verifier && authenticatedWithOAuth && !verifiedOAuth"
         ng-click="verifyOAuth()"
       >
         Verify OAuth Connection

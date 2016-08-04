@@ -1476,6 +1476,7 @@ app.controller('ProjectSettingsController', [
     };
 
     $scope.authenticatedWithOAuth = false;
+    $scope.verifiedOAuth = false;
 
     // Oauth verification for atlassian
     $scope.loginWithOAuth = function() {
@@ -1484,15 +1485,30 @@ app.controller('ProjectSettingsController', [
           $scope.authenticatedWithOAuth = true;
           var data = result.data;
           var url = data.url;
-
           window.open(url, 'OAuth', 'width=800,height=618');
-          console.log(result);
+          $scope.currentProject = $scope.currentProject || {};
+          $scope.currentProject.settings = $scope.currentProject.settings || {};
+          $scope.currentProject.settings.atlassian = $scope.currentProject.settings.atlassian || {};
+          $scope.currentProject.settings.atlassian.oauth = $scope.currentProject.settings.atlassian.oauth || {};
+          $scope.currentProject.settings.atlassian.oauth.token = data.token;
+          $scope.currentProject.settings.atlassian.oauth.token_secret = data.token_secret;
+
+          // Remove existing verifier
+          $scope.currentProject.settings.atlassian.oauth.oauth_verifier = '';
         });
     };
 
     $scope.verifyOAuth = function() {
-
-    }
+      $http.post(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/atlassian/oauth/finalize', {
+        oauth_verifier: $scope.currentProject.settings.atlassian.oauth.oauth_verifier
+      })
+      .then(function(result) {
+        $scope.verifiedOAuth = true;
+        var data = result.data;
+        $scope.currentProject.settings.atlassian.oauth.token = data.access_token;
+        $scope.saveProject();
+      });
+    };
   }
 ]);
 
