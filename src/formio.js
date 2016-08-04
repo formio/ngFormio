@@ -7,6 +7,7 @@ var app = angular.module('formio', [
   'ui.select',
   'ui.mask',
   'angularMoment',
+  'ngFileUpload',
   'ngFileSaver'
 ]);
 
