@@ -1,6 +1,7 @@
 module.exports = function(gulp, plugins) {
   return function () {
     return gulp.src('src/scripts/**/*.js')
+      .pipe(plugins.debug({title: 'jshint:'}))
       .pipe(plugins.browserSync.reload({stream: true, once: true}))
       .pipe(plugins.jshint({
         predef: ['angular', '_', 'window', 'console', 'FileReader', 'kendo', 'moment', '$', 'localStorage', 'CKEDITOR', 'document'],
