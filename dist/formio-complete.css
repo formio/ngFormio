@@ -335,6 +335,10 @@ body > .ui-select-bootstrap.open {
   min-width: 200px;
 }
 
+.ui-select-bootstrap>.ui-select-choices, .ui-select-bootstrap>.ui-select-no-choice {
+  margin-top: 40px;
+}
+
 /* Fix Safari bug that prevents you from typing in draggable password fields */
 input[type="password"][draggable="true"] {
   -webkit-user-select:text !important;
