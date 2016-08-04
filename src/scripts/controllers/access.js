@@ -63,7 +63,8 @@ app.directive('permissionEditor', ['$q', function($q) {
       roles: '=',
       permissions: '=',
       labels: '=',
-      waitFor: '='
+      waitFor: '=',
+      permissionFilter: '=?'
     },
     restrict: 'E',
     templateUrl: 'views/project/access/permission-editor.html',
@@ -73,10 +74,12 @@ app.directive('permissionEditor', ['$q', function($q) {
         var tempPerms = [];
         _.each(PERMISSION_TYPES, function(type) {
           var existingPerm = _.find($scope.permissions, {type: type});
-          tempPerms.push(existingPerm || {
-              type: type,
-              roles: []
-            });
+          if (!$scope.permissionFilter || type.indexOf($scope.permissionFilter) !== -1) {
+            tempPerms.push(existingPerm || {
+                type: type,
+                roles: []
+              });
+          }
         });
         // Replace permissions with complete set of permissions
         $scope.permissions.splice.apply($scope.permissions, [0, $scope.permissions.length].concat(tempPerms));
