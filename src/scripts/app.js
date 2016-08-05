@@ -197,6 +197,12 @@ angular
           url: '/project',
           templateUrl: 'views/project/project-settings.html'
         })
+        .state('project.settings.access', {
+          url: '/access',
+          parent: 'project.settings',
+          templateUrl: 'views/project/access/access.html',
+          controller: 'AccessController'
+        })
         .state('project.settings.email', {
           url: '/email',
           parent: 'project.settings',

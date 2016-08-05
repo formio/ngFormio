@@ -9,6 +9,10 @@ if (environment) {
   var parts = environment.url.split('://');
   apiProtocol = parts[0] + ':';
   serverHost = parts[1];
+  // Force portal and server to match protocols.
+  if (apiProtocol !== protocol) {
+    window.location.href = apiProtocol + window.location.href.substring(window.location.protocol.length);
+  }
 }
 else {
   serverHost = host;

@@ -4,6 +4,7 @@ module.exports = function(gulp, plugins) {
       './bower_components/bootstrap/fonts/*.*',
       './bower_components/font-awesome/fonts/*.*'
     ])
+    .pipe(plugins.debug({title: 'fonts:'}))
     .pipe(gulp.dest('.tmp/fonts'))
     .pipe(gulp.dest('dist/fonts'));
   };

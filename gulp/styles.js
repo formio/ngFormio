@@ -1,6 +1,7 @@
 module.exports = function(gulp, plugins) {
   return function () {
     return gulp.src('src/styles/**/*.scss')
+      .pipe(plugins.debug({title: 'styles:'}))
       .pipe(plugins.sourcemaps.init())
       .pipe(plugins.sass({
         outputStyle: 'nested', // libsass doesn't support expanded yet
