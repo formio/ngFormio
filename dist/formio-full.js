@@ -1,4 +1,4 @@
-/*! ng-formio v2.1.3 | https://npmcdn.com/ng-formio@2.1.3/LICENSE.txt */
+/*! ng-formio v2.1.5 | https://npmcdn.com/ng-formio@2.1.5/LICENSE.txt */
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -46366,18 +46366,19 @@ Formio.loadProjects = function(query) {
 };
 
 Formio.request = function(url, method, data) {
-  if (!url) { return Promise.reject('No url provided'); }
+  if (!url) {
+    return Promise.reject('No url provided');
+  }
   method = (method || 'GET').toUpperCase();
   var cacheKey = btoa(url);
 
-  return Promise.resolve().then(function() {
+  return new Promise(function(resolve, reject) {
     // Get the cached promise to save multiple loads.
     if (method === 'GET' && cache.hasOwnProperty(cacheKey)) {
-      return cache[cacheKey];
+      resolve(cache[cacheKey]);
     }
     else {
-      return Promise.resolve()
-      .then(function() {
+      resolve(new Promise(function(resolve, reject) {
         // Set up and fetch request
         var headers = new Headers({
           'Accept': 'application/json',
@@ -46397,12 +46398,12 @@ Formio.request = function(url, method, data) {
           options.body = JSON.stringify(data);
         }
 
-        return fetch(url, options);
+        resolve(fetch(url, options));
       })
       .catch(function(err) {
         err.message = 'Could not connect to API server (' + err.message + ')';
         err.networkError = true;
-        throw err;
+        reject(err);
       })
       .then(function(response) {
         // Handle fetch results
@@ -46457,7 +46458,7 @@ Formio.request = function(url, method, data) {
         delete cache[cacheKey];
         // Propagate error so client can handle accordingly
         throw err;
-      });
+      }));
     }
   })
   .then(function(result) {
