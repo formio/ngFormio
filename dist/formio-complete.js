@@ -57489,6 +57489,7 @@ module.exports = function(app) {
         group: 'layout',
         settings: {
           input: false,
+          key: 'column',
           columns: [{components: []}, {components: []}]
         },
         viewTemplate: 'formio/componentsView/columns.html'
@@ -57999,6 +58000,7 @@ module.exports = function(app) {
           input: false,
           tableView: true,
           legend: '',
+          key: 'fieldset',
           components: []
         },
         viewTemplate: 'formio/componentsView/fieldset.html'
@@ -58451,6 +58453,7 @@ module.exports = function(app) {
         template: 'formio/components/page.html',
         settings: {
           input: false,
+          key: 'page',
           components: []
         }
       });
@@ -58480,6 +58483,7 @@ module.exports = function(app) {
         settings: {
           input: false,
           title: '',
+          key: 'panel',
           theme: 'default',
           components: []
         },
@@ -59402,7 +59406,8 @@ module.exports = function(app) {
           striped: false,
           bordered: false,
           hover: false,
-          condensed: false
+          condensed: false,
+          key: 'table'
         }
       });
     }
@@ -59553,6 +59558,7 @@ module.exports = function(app) {
         group: 'layout',
         settings: {
           input: false,
+          key: 'well',
           components: []
         },
         viewTemplate: 'formio/componentsView/well.html'

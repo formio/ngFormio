@@ -9,6 +9,7 @@ module.exports = function(app) {
         group: 'layout',
         settings: {
           input: false,
+          key: 'column',
           columns: [{components: []}, {components: []}]
         },
         viewTemplate: 'formio/componentsView/columns.html'
