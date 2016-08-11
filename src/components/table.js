@@ -17,7 +17,8 @@ module.exports = function(app) {
           striped: false,
           bordered: false,
           hover: false,
-          condensed: false
+          condensed: false,
+          key: 'table'
         }
       });
     }

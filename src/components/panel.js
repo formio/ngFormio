@@ -10,6 +10,7 @@ module.exports = function(app) {
         settings: {
           input: false,
           title: '',
+          key: 'panel',
           theme: 'default',
           components: []
         },
