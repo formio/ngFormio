@@ -49,7 +49,7 @@
     "jquery": "^2.2.4",
     "ng-file-upload": "^12.0.4",
     "signature_pad": "^1.5.3",
-    "ui-select": "^0.16.1"
+    "ui-select": "^0.19.1"
   },
   "browserify": {
     "transform": [
