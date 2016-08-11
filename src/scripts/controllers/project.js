@@ -1495,6 +1495,11 @@ app.controller('ProjectSettingsController', [
 
           // Remove existing verifier
           $scope.currentProject.settings.atlassian.oauth.oauth_verifier = '';
+        })
+        .catch(function(error) {
+          FormioAlerts.onError({
+            message: error.data
+          });
         });
     };
 
@@ -1507,6 +1512,11 @@ app.controller('ProjectSettingsController', [
         var data = result.data;
         $scope.currentProject.settings.atlassian.oauth.token = data.access_token;
         $scope.saveProject();
+      })
+      .catch(function(error) {
+        FormioAlerts.onError({
+          message: error.data
+        });
       });
     };
   }
