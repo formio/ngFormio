@@ -11,7 +11,6 @@ module.exports = function(app) {
           input: false,
           tableView: true,
           legend: '',
-          key: 'fieldset',
           components: []
         },
         viewTemplate: 'formio/componentsView/fieldset.html'

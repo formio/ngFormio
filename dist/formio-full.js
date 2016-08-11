@@ -1,4 +1,4 @@
-/*! ng-formio v2.1.7 | https://npmcdn.com/ng-formio@2.1.7/LICENSE.txt */
+/*! ng-formio v2.1.8 | https://npmcdn.com/ng-formio@2.1.8/LICENSE.txt */
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -67581,7 +67581,6 @@ module.exports = function(app) {
         group: 'layout',
         settings: {
           input: false,
-          key: 'column',
           columns: [{components: []}, {components: []}]
         },
         viewTemplate: 'formio/componentsView/columns.html'
@@ -68092,7 +68091,6 @@ module.exports = function(app) {
           input: false,
           tableView: true,
           legend: '',
-          key: 'fieldset',
           components: []
         },
         viewTemplate: 'formio/componentsView/fieldset.html'
@@ -68545,7 +68543,6 @@ module.exports = function(app) {
         template: 'formio/components/page.html',
         settings: {
           input: false,
-          key: 'page',
           components: []
         }
       });
@@ -68575,7 +68572,6 @@ module.exports = function(app) {
         settings: {
           input: false,
           title: '',
-          key: 'panel',
           theme: 'default',
           components: []
         },
@@ -69498,8 +69494,7 @@ module.exports = function(app) {
           striped: false,
           bordered: false,
           hover: false,
-          condensed: false,
-          key: 'table'
+          condensed: false
         }
       });
     }
@@ -69650,7 +69645,6 @@ module.exports = function(app) {
         group: 'layout',
         settings: {
           input: false,
-          key: 'well',
           components: []
         },
         viewTemplate: 'formio/componentsView/well.html'

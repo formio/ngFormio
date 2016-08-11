@@ -7,7 +7,6 @@ module.exports = function(app) {
         template: 'formio/components/page.html',
         settings: {
           input: false,
-          key: 'page',
           components: []
         }
       });

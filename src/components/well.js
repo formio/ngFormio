@@ -9,7 +9,6 @@ module.exports = function(app) {
         group: 'layout',
         settings: {
           input: false,
-          key: 'well',
           components: []
         },
         viewTemplate: 'formio/componentsView/well.html'
