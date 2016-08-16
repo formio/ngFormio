@@ -350,6 +350,23 @@ $project-header-color: lighten($brand-primary, 55%);
   margin-left: 20px;
 }
 
+.navbar-home {
+  margin-left: 0;
+  width: 6%;
+  text-align: center;
+  background-color: lighten($brand-primary, 10%);
+  li {
+    width: 100%;
+    a {
+      color: white;
+    }
+  }
+}
+
+.navbar-menu {
+  margin-right: 20px;
+}
+
 .docs-dropdown {
   width: 900px;
   margin: 0px;
