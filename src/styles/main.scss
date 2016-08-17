@@ -354,12 +354,27 @@ $project-header-color: lighten($brand-primary, 55%);
   margin-left: 0;
   width: 6%;
   text-align: center;
-  background-color: lighten($brand-primary, 10%);
+  background-color: darken($brand-primary, 25%);
   li {
     width: 100%;
     a {
+      &:hover {
+        background-color: darken($brand-primary, 20%);
+      }
+      &:focus {
+        background-color: darken($brand-primary, 20%);
+      }
       color: white;
+      i {
+        font-size: 2em;
+      }
     }
+  }
+}
+
+@media (max-width: $screen-md-min) {
+  .navbar-home {
+    display: none;
   }
 }
 
