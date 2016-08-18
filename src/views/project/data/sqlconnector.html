@@ -8,7 +8,11 @@
 </div>
 <div class="form-group">
   <label for="connectorType">Type</label>
-  <input ng-model="currentProject.settings.sqlconnector.type" type="text" class="form-control" id="connectorType" name="connectorPort" placeholder="Select the SQL Type">
+  <select class="form-control" ng-model="currentProject.settings.sqlconnector.type" id="connectorType" name="connectorType" ng-required="true">
+    <option value="" ng-disabled="true" selected="true">Select the SQL Type</option>
+    <option value="mysql">MySQL</option>
+    <option value="mssql">Microsoft SQL</option>
+  </select>
 </div>
 <div class="form-group">
   <label for="connectorDatabase">Database Name</label>
