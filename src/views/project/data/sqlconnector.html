@@ -1,28 +1,16 @@
 <div class="well">
   <h4>SQL Connector Settings</h4>
-  <p>This allows you to connect to an external SQL database via Resquel.</p>
+  <p>This allows you to connect to an external SQL database via the Form.io SQL Connector.</p>
 </div>
 <div class="form-group">
-  <label for="connectorHost">Host</label>
-  <input ng-model="currentProject.settings.sqlconnector.host" type="text" class="form-control" id="connectorHost" name="connectorHost" placeholder="Enter the SQL Server Host">
+  <label for="connectorHost">SQL Connector Host URL</label>
+  <input ng-model="currentProject.settings.sqlconnector.host" type="text" class="form-control" id="connectorHost" name="connectorHost" placeholder="sqlconnector.example.com:8080">
 </div>
 <div class="form-group">
-  <label for="connectorType">Type</label>
-  <select class="form-control" ng-model="currentProject.settings.sqlconnector.type" id="connectorType" name="connectorType" ng-required="true">
-    <option value="" ng-disabled="true" selected="true">Select the SQL Type</option>
-    <option value="mysql">MySQL</option>
-    <option value="mssql">Microsoft SQL</option>
-  </select>
+  <label for="connectorUser">SQL Connector Username</label>
+  <input ng-model="currentProject.settings.sqlconnector.user" type="text" class="form-control" id="connectorUser" name="connectorUser" placeholder="Enter the SQL Connector Username">
 </div>
 <div class="form-group">
-  <label for="connectorDatabase">Database Name</label>
-  <input ng-model="currentProject.settings.sqlconnector.database" type="text" class="form-control" id="connectorDatabase" name="connectorDatabase" placeholder="Enter the database Name">
-</div>
-<div class="form-group">
-  <label for="connectorUser">Resquel Username</label>
-  <input ng-model="currentProject.settings.sqlconnector.user" type="text" class="form-control" id="connectorUser" name="connectorUser" placeholder="Enter the Resquel Username">
-</div>
-<div class="form-group">
-  <label for="connectorPassword">Resquel Password</label>
-  <input ng-model="currentProject.settings.sqlconnector.password" type="password" class="form-control" id="connectorPassword" name="connectorPassword" placeholder="Enter the Resquel Password">
+  <label for="connectorPassword">SQL Connector Password</label>
+  <input ng-model="currentProject.settings.sqlconnector.password" type="password" class="form-control" id="connectorPassword" name="connectorPassword" placeholder="Enter the SQL Connector Password">
 </div>
