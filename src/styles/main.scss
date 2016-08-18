@@ -350,6 +350,40 @@ $project-header-color: lighten($brand-primary, 55%);
   margin-left: 20px;
 }
 
+.navbar-home {
+  margin-left: 0;
+  width: 6%;
+  text-align: center;
+  background-color: darken($brand-primary, 25%);
+  li {
+    width: 100%;
+    a {
+      &:hover {
+        background-color: darken($brand-primary, 20%);
+      }
+      &:focus {
+        background-color: darken($brand-primary, 20%);
+      }
+      color: white;
+      padding-bottom: 8px;
+      padding-top: 9px;
+      i {
+        font-size: 2em;
+      }
+    }
+  }
+}
+
+@media (max-width: $screen-md-min) {
+  .navbar-home {
+    display: none;
+  }
+}
+
+.navbar-menu {
+  margin-right: 20px;
+}
+
 .docs-dropdown {
   width: 900px;
   margin: 0px;
