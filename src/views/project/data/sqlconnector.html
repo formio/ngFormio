@@ -7,6 +7,14 @@
   <input ng-model="currentProject.settings.sqlconnector.host" type="text" class="form-control" id="connectorHost" name="connectorHost" placeholder="sqlconnector.example.com:8080">
 </div>
 <div class="form-group">
+  <label for="connectorType">Type</label>
+  <select class="form-control" ng-model="currentProject.settings.sqlconnector.type" id="connectorType" name="connectorType" ng-required="true">
+    <option value="" ng-disabled="true" selected="true">Select the SQL Type</option>
+    <option value="mysql">MySQL</option>
+    <option value="mssql">Microsoft SQL</option>
+  </select>
+</div>
+<div class="form-group">
   <label for="connectorUser">SQL Connector Username</label>
   <input ng-model="currentProject.settings.sqlconnector.user" type="text" class="form-control" id="connectorUser" name="connectorUser" placeholder="Enter the SQL Connector Username">
 </div>
