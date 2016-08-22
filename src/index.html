@@ -61,7 +61,7 @@
     <div id="content">
       <nav class="navbar navbar-fixed-top">
         <ul id="home-button" class="nav navbar-nav navbar-left navbar-home" ng-if="isActive('project')" ng-cloak>
-          <li><a ui-sref="home"><i class="fa fa-home"></i></a></li>
+          <li><a ui-sref="home" alt="Home"><i class="fa fa-home"></i></a></li>
         </ul>
         <div ng-class="{container: !isActive('project')}" ng-cloak>
           <div class="navbar-header">
@@ -71,7 +71,7 @@
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
             </button>
-            <a href="https://form.io" class="navbar-brand">
+            <a ui-sref="home" class="navbar-brand">
               <img height="25px;" src="images/formio-logo.png" />
             </a>
           </div>
