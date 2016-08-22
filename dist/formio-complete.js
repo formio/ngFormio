@@ -60861,6 +60861,14 @@ module.exports = function() {
           session = angular.fromJson(session);
         }
 
+        var getForm = function() {
+          var element = $element.find('#formio-wizard-form');
+          if (!element.length) {
+            return {};
+          }
+          return element.children().scope().formioForm;
+        };
+
         $scope.formio = null;
         $scope.page = {};
         $scope.pages = [];
@@ -60959,6 +60967,10 @@ module.exports = function() {
             if ($scope.storage && !$scope.readOnly) {
               localStorage.setItem($scope.storage, '');
             }
+            $scope.showAlerts({
+              type: 'success',
+              message: 'Submission Complete!'
+            });
             $scope.$emit('formSubmission', submission);
           };
 
@@ -61018,12 +61030,7 @@ module.exports = function() {
         };
 
         $scope.isValid = function() {
-          var element = $element.find('#formio-wizard-form');
-          if (!element.length) {
-            return false;
-          }
-          var formioForm = element.children().scope().formioForm;
-          return formioForm.$valid;
+          return getForm().$valid;
         };
 
         $scope.$on('wizardGoToPage', function(event, page) {
