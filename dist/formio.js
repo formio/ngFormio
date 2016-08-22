@@ -1,5 +1,167 @@
 /*! ng-formio v2.1.10 | https://npmcdn.com/ng-formio@2.1.10/LICENSE.txt */
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+'use strict';
+
+module.exports = {
+  /**
+   * Determine if a component is a layout component or not.
+   *
+   * @param {Object} component
+   *   The component to check.
+   *
+   * @returns {Boolean}
+   *   Whether or not the component is a layout component.
+   */
+  isLayoutComponent: function isLayoutComponent(component) {
+    return (
+      (component.columns && Array.isArray(component.columns)) ||
+      (component.rows && Array.isArray(component.rows)) ||
+      (component.components && Array.isArray(component.components))
+    ) ? true : false;
+  },
+
+  /**
+   * Iterate through each component within a form.
+   *
+   * @param {Object} components
+   *   The components to iterate.
+   * @param {Function} fn
+   *   The iteration function to invoke for each component.
+   * @param {Boolean} includeAll
+   *   Whether or not to include layout components.
+   * @param {String} path
+   *   The current data path of the element. Example: data.user.firstName
+   */
+  eachComponent: function eachComponent(components, fn, includeAll, path) {
+    if (!components) return;
+    path = path || '';
+    components.forEach(function(component) {
+      var hasColumns = component.columns && Array.isArray(component.columns);
+      var hasRows = component.rows && Array.isArray(component.rows);
+      var hasComps = component.components && Array.isArray(component.components);
+      var noRecurse = false;
+      var newPath = component.key ? (path ? (path + '.' + component.key) : component.key) : '';
+
+      if (includeAll || component.tree || (!hasColumns && !hasRows && !hasComps)) {
+        noRecurse = fn(component, newPath);
+      }
+
+      var subPath = function() {
+        if (component.key && ((component.type === 'datagrid') || (component.type === 'container'))) {
+          return newPath;
+        }
+        return path;
+      };
+
+      if (!noRecurse) {
+        if (hasColumns) {
+          component.columns.forEach(function(column) {
+            eachComponent(column.components, fn, includeAll, subPath());
+          });
+        }
+
+        else if (hasRows) {
+          [].concat.apply([], component.rows).forEach(function(row) {
+            eachComponent(row.components, fn, includeAll, subPath());
+          });
+        }
+
+        else if (hasComps) {
+          eachComponent(component.components, fn, includeAll, subPath());
+        }
+      }
+    });
+  },
+
+  /**
+   * Get a component by its key
+   *
+   * @param {Object} components
+   *   The components to iterate.
+   * @param {String} key
+   *   The key of the component to get.
+   *
+   * @returns {Object}
+   *   The component that matches the given key, or undefined if not found.
+   */
+  getComponent: function getComponent(components, key) {
+    var result;
+    module.exports.eachComponent(components, function(component) {
+      if (component.key === key) {
+        result = component;
+      }
+    });
+    return result;
+  },
+
+  /**
+   * Flatten the form components for data manipulation.
+   *
+   * @param {Object} components
+   *   The components to iterate.
+   * @param {Boolean} includeAll
+   *   Whether or not to include layout components.
+   *
+   * @returns {Object}
+   *   The flattened components map.
+   */
+  flattenComponents: function flattenComponents(components, includeAll) {
+    var flattened = {};
+    module.exports.eachComponent(components, function(component, path) {
+      flattened[path] = component;
+    }, includeAll);
+    return flattened;
+  },
+
+  /**
+   * Get the value for a component key, in the given submission.
+   *
+   * @param {Object} submission
+   *   A submission object to search.
+   * @param {String} key
+   *   A for components API key to search for.
+   */
+  getValue: function getValue(submission, key) {
+    var data = submission.data || {};
+
+    var search = function search(data) {
+      var i;
+      var value;
+
+      if (data instanceof Array) {
+        for (i = 0; i < data.length; i++) {
+          if (typeof data[i] === 'object') {
+            value = search(data[i]);
+          }
+
+          if (value) {
+            return value;
+          }
+        }
+      }
+      else if (typeof data === 'object') {
+        if (data.hasOwnProperty(key)) {
+          return data[key];
+        }
+
+        var keys = Object.keys(data);
+        for (i = 0; i < keys.length; i++) {
+          if (typeof data[keys[i]] === 'object') {
+            value = search(data[keys[i]]);
+          }
+
+          if (value) {
+            return value;
+          }
+        }
+      }
+    };
+
+    return search(data);
+  }
+};
+
+},{}],2:[function(require,module,exports){
 /*!
  * EventEmitter2
  * https://github.com/hij1nx/EventEmitter2
@@ -726,7 +888,1030 @@
   }
 }();
 
-},{}],2:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
+'use strict';
+
+// Intentionally use native-promise-only here... Other promise libraries (es6-promise)
+// duck-punch the global Promise definition which messes up Angular 2 since it
+// also duck-punches the global Promise definition. For now, keep native-promise-only.
+var Promise = require("native-promise-only");
+
+// Require other libraries.
+require('whatwg-fetch');
+var EventEmitter = require('eventemitter2').EventEmitter2;
+var copy = require('shallow-copy');
+var providers = require('./providers');
+
+// The default base url.
+var baseUrl = 'https://api.form.io';
+var appUrl = baseUrl;
+var appUrlSet = false;
+
+var plugins = [];
+
+// The temporary GET request cache storage
+var cache = {};
+
+var noop = function(){};
+var identity = function(value) { return value; };
+
+// Will invoke a function on all plugins.
+// Returns a promise that resolves when all promises
+// returned by the plugins have resolved.
+// Should be used when you want plugins to prepare for an event
+// but don't want any data returned.
+var pluginWait = function(pluginFn) {
+  var args = [].slice.call(arguments, 1);
+  return Promise.all(plugins.map(function(plugin) {
+    return (plugin[pluginFn] || noop).apply(plugin, args);
+  }));
+};
+
+// Will invoke a function on plugins from highest priority
+// to lowest until one returns a value. Returns null if no
+// plugins return a value.
+// Should be used when you want just one plugin to handle things.
+var pluginGet = function(pluginFn) {
+  var args = [].slice.call(arguments, 0);
+  var callPlugin = function(index, pluginFn) {
+    var plugin = plugins[index];
+    if (!plugin) return Promise.resolve(null);
+    return Promise.resolve((plugin && plugin[pluginFn] || noop).apply(plugin, [].slice.call(arguments, 2)))
+    .then(function(result) {
+      if (result !== null && result !== undefined) return result;
+      return callPlugin.apply(null, [index + 1].concat(args));
+    });
+  };
+  return callPlugin.apply(null, [0].concat(args));
+};
+
+// Will invoke a function on plugins from highest priority to
+// lowest, building a promise chain from their return values
+// Should be used when all plugins need to process a promise's
+// success or failure
+var pluginAlter = function(pluginFn, value) {
+  var args = [].slice.call(arguments, 2);
+  return plugins.reduce(function(value, plugin) {
+      return (plugin[pluginFn] || identity).apply(plugin, [value].concat(args));
+  }, value);
+};
+
+
+/**
+ * Returns parts of the URL that are important.
+ * Indexes
+ *  - 0: The full url
+ *  - 1: The protocol
+ *  - 2: The hostname
+ *  - 3: The rest
+ *
+ * @param url
+ * @returns {*}
+ */
+var getUrlParts = function(url) {
+  var regex = '^(http[s]?:\\/\\/)';
+  if (baseUrl && url.indexOf(baseUrl) === 0) {
+    regex += '(' + baseUrl.replace(/^http[s]?:\/\//, '') + ')';
+  }
+  else {
+    regex += '([^/]+)';
+  }
+  regex += '($|\\/.*)';
+  return url.match(new RegExp(regex));
+};
+
+var serialize = function(obj) {
+  var str = [];
+  for(var p in obj)
+    if (obj.hasOwnProperty(p)) {
+      str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+    }
+  return str.join("&");
+};
+
+// The formio class.
+var Formio = function(path) {
+
+  // Ensure we have an instance of Formio.
+  if (!(this instanceof Formio)) { return new Formio(path); }
+  if (!path) {
+    // Allow user to create new projects if this was instantiated without
+    // a url
+    this.projectUrl = baseUrl + '/project';
+    this.projectsUrl = baseUrl + '/project';
+    this.projectId = false;
+    this.query = '';
+    return;
+  }
+
+  // Initialize our variables.
+  this.projectsUrl = '';
+  this.projectUrl = '';
+  this.projectId = '';
+  this.formUrl = '';
+  this.formsUrl = '';
+  this.formId = '';
+  this.submissionsUrl = '';
+  this.submissionUrl = '';
+  this.submissionId = '';
+  this.actionsUrl = '';
+  this.actionId = '';
+  this.actionUrl = '';
+  this.query = '';
+
+  // Normalize to an absolute path.
+  if ((path.indexOf('http') !== 0) && (path.indexOf('//') !== 0)) {
+    baseUrl = baseUrl ? baseUrl : window.location.href.match(/http[s]?:\/\/api./)[0];
+    path = baseUrl + path;
+  }
+
+  var hostparts = getUrlParts(path);
+  var parts = [];
+  var hostName = hostparts[1] + hostparts[2];
+  path = hostparts.length > 3 ? hostparts[3] : '';
+  var queryparts = path.split('?');
+  if (queryparts.length > 1) {
+    path = queryparts[0];
+    this.query = '?' + queryparts[1];
+  }
+
+  // See if this is a form path.
+  if ((path.search(/(^|\/)(form|project)($|\/)/) !== -1)) {
+
+    // Register a specific path.
+    var registerPath = function(name, base) {
+      this[name + 'sUrl'] = base + '/' + name;
+      var regex = new RegExp('\/' + name + '\/([^/]+)');
+      if (path.search(regex) !== -1) {
+        parts = path.match(regex);
+        this[name + 'Url'] = parts ? (base + parts[0]) : '';
+        this[name + 'Id'] = (parts.length > 1) ? parts[1] : '';
+        base += parts[0];
+      }
+      return base;
+    }.bind(this);
+
+    // Register an array of items.
+    var registerItems = function(items, base, staticBase) {
+      for (var i in items) {
+        if (items.hasOwnProperty(i)) {
+          var item = items[i];
+          if (item instanceof Array) {
+            registerItems(item, base, true);
+          }
+          else {
+            var newBase = registerPath(item, base);
+            base = staticBase ? base : newBase;
+          }
+        }
+      }
+    };
+
+    registerItems(['project', 'form', ['submission', 'action']], hostName);
+
+    if (!this.projectId) {
+      if (hostparts.length > 2 && hostparts[2].split('.').length > 2) {
+        this.projectUrl = hostName;
+        this.projectId = hostparts[2].split('.')[0];
+      }
+    }
+  }
+  else {
+
+    // This is an aliased url.
+    this.projectUrl = hostName;
+    this.projectId = (hostparts.length > 2) ? hostparts[2].split('.')[0] : '';
+    var subRegEx = new RegExp('\/(submission|action)($|\/.*)');
+    var subs = path.match(subRegEx);
+    this.pathType = (subs && (subs.length > 1)) ? subs[1] : '';
+    path = path.replace(subRegEx, '');
+    path = path.replace(/\/$/, '');
+    this.formsUrl = hostName + '/form';
+    this.formUrl = hostName + path;
+    this.formId = path.replace(/^\/+|\/+$/g, '');
+    var items = ['submission', 'action'];
+    for (var i in items) {
+      if (items.hasOwnProperty(i)) {
+        var item = items[i];
+        this[item + 'sUrl'] = hostName + path + '/' + item;
+        if ((this.pathType === item) && (subs.length > 2) && subs[2]) {
+          this[item + 'Id'] = subs[2].replace(/^\/+|\/+$/g, '');
+          this[item + 'Url'] = hostName + path + subs[0];
+        }
+      }
+    }
+  }
+
+  // Set the app url if it is not set.
+  if (!appUrlSet) {
+    appUrl = this.projectUrl;
+  }
+};
+
+/**
+ * Load a resource.
+ *
+ * @param type
+ * @returns {Function}
+ * @private
+ */
+var _load = function(type) {
+  var _id = type + 'Id';
+  var _url = type + 'Url';
+  return function(query, opts) {
+    if (query && typeof query === 'object') {
+      query = serialize(query.params);
+    }
+    if (query) {
+      query = this.query ? (this.query + '&' + query) : ('?' + query);
+    }
+    else {
+      query = this.query;
+    }
+    if (!this[_id]) { return Promise.reject('Missing ' + _id); }
+    return this.makeRequest(type, this[_url] + query, 'get', null, opts);
+  };
+};
+
+/**
+ * Save a resource.
+ *
+ * @param type
+ * @returns {Function}
+ * @private
+ */
+var _save = function(type) {
+  var _id = type + 'Id';
+  var _url = type + 'Url';
+  return function(data, opts) {
+    var method = this[_id] ? 'put' : 'post';
+    var reqUrl = this[_id] ? this[_url] : this[type + 'sUrl'];
+    cache = {};
+    return this.makeRequest(type, reqUrl + this.query, method, data, opts);
+  };
+};
+
+/**
+ * Delete a resource.
+ *
+ * @param type
+ * @returns {Function}
+ * @private
+ */
+var _delete = function(type) {
+  var _id = type + 'Id';
+  var _url = type + 'Url';
+  return function(opts) {
+    if (!this[_id]) { Promise.reject('Nothing to delete'); }
+    cache = {};
+    return this.makeRequest(type, this[_url], 'delete', null, opts);
+  };
+};
+
+/**
+ * Resource index method.
+ *
+ * @param type
+ * @returns {Function}
+ * @private
+ */
+var _index = function(type) {
+  var _url = type + 'Url';
+  return function(query, opts) {
+    query = query || '';
+    if (query && typeof query === 'object') {
+      query = '?' + serialize(query.params);
+    }
+    return this.makeRequest(type, this[_url] + query, 'get', null, opts);
+  };
+};
+
+// Activates plugin hooks, makes Formio.request if no plugin provides a request
+Formio.prototype.makeRequest = function(type, url, method, data, opts) {
+  var self = this;
+  method = (method || 'GET').toUpperCase();
+  if(!opts || typeof opts !== 'object') {
+    opts = {};
+  }
+
+  var requestArgs = {
+    formio: self,
+    type: type,
+    url: url,
+    method: method,
+    data: data,
+    opts: opts
+  };
+
+  var request = pluginWait('preRequest', requestArgs)
+  .then(function() {
+    return pluginGet('request', requestArgs)
+    .then(function(result) {
+      if (result === null || result === undefined) {
+        return Formio.request(url, method, data);
+      }
+      return result;
+    });
+  });
+
+  return pluginAlter('wrapRequestPromise', request, requestArgs);
+};
+
+// Define specific CRUD methods.
+Formio.prototype.loadProject = _load('project');
+Formio.prototype.saveProject = _save('project');
+Formio.prototype.deleteProject = _delete('project');
+Formio.prototype.loadForm = _load('form');
+Formio.prototype.saveForm = _save('form');
+Formio.prototype.deleteForm = _delete('form');
+Formio.prototype.loadForms = _index('forms');
+Formio.prototype.loadSubmission = _load('submission');
+Formio.prototype.saveSubmission = _save('submission');
+Formio.prototype.deleteSubmission = _delete('submission');
+Formio.prototype.loadSubmissions = _index('submissions');
+Formio.prototype.loadAction = _load('action');
+Formio.prototype.saveAction = _save('action');
+Formio.prototype.deleteAction = _delete('action');
+Formio.prototype.loadActions = _index('actions');
+Formio.prototype.availableActions = function() { return this.makeRequest('availableActions', this.formUrl + '/actions'); };
+Formio.prototype.actionInfo = function(name) { return this.makeRequest('actionInfo', this.formUrl + '/actions/' + name); };
+
+Formio.prototype.uploadFile = function(storage, file, fileName, dir, progressCallback) {
+  var requestArgs = {
+    provider: storage,
+    method: 'upload',
+    file: file,
+    fileName: fileName,
+    dir: dir
+  }
+  var request = pluginWait('preRequest', requestArgs)
+    .then(function() {
+      return pluginGet('fileRequest', requestArgs)
+        .then(function(result) {
+          if (result === null || result === undefined) {
+            if (providers.storage.hasOwnProperty(storage)) {
+              var provider = new providers.storage[storage](this);
+              return provider.uploadFile(file, fileName, dir, progressCallback);
+            }
+            else {
+              throw('Storage provider not found');
+            }
+          }
+          return result;
+        }.bind(this));
+    }.bind(this));
+
+  return pluginAlter('wrapFileRequestPromise', request, requestArgs);
+}
+
+Formio.prototype.downloadFile = function(file) {
+  var requestArgs = {
+    method: 'download',
+    file: file
+  };
+
+  var request = pluginWait('preRequest', requestArgs)
+    .then(function() {
+      return pluginGet('fileRequest', requestArgs)
+        .then(function(result) {
+          if (result === null || result === undefined) {
+            if (providers.storage.hasOwnProperty(file.storage)) {
+              var provider = new providers.storage[file.storage](this);
+              return provider.downloadFile(file);
+            }
+            else {
+              throw('Storage provider not found');
+            }
+          }
+          return result;
+        }.bind(this));
+    }.bind(this));
+
+  return pluginAlter('wrapFileRequestPromise', request, requestArgs);
+}
+
+Formio.makeStaticRequest = function(url, method, data) {
+  method = (method || 'GET').toUpperCase();
+
+  var requestArgs = {
+    url: url,
+    method: method,
+    data: data
+  };
+
+  var request = pluginWait('preRequest', requestArgs)
+  .then(function() {
+    return pluginGet('staticRequest', requestArgs)
+    .then(function(result) {
+      if (result === null || result === undefined) {
+        return Formio.request(url, method, data);
+      }
+      return result;
+    });
+  });
+
+  return pluginAlter('wrapStaticRequestPromise', request, requestArgs);
+};
+
+// Static methods.
+Formio.loadProjects = function(query) {
+  query = query || '';
+  if (typeof query === 'object') {
+    query = '?' + serialize(query.params);
+  }
+  return this.makeStaticRequest(baseUrl + '/project' + query);
+};
+
+Formio.request = function(url, method, data) {
+  if (!url) {
+    return Promise.reject('No url provided');
+  }
+  method = (method || 'GET').toUpperCase();
+  var cacheKey = btoa(url);
+
+  return new Promise(function(resolve, reject) {
+    // Get the cached promise to save multiple loads.
+    if (method === 'GET' && cache.hasOwnProperty(cacheKey)) {
+      resolve(cache[cacheKey]);
+    }
+    else {
+      resolve(new Promise(function(resolve, reject) {
+        // Set up and fetch request
+        var headers = new Headers({
+          'Accept': 'application/json',
+          'Content-type': 'application/json; charset=UTF-8'
+        });
+        var token = Formio.getToken();
+        if (token) {
+          headers.append('x-jwt-token', token);
+        }
+
+        var options = {
+          method: method,
+          headers: headers,
+          mode: 'cors'
+        };
+        if (data) {
+          options.body = JSON.stringify(data);
+        }
+
+        resolve(fetch(url, options));
+      })
+      .catch(function(err) {
+        err.message = 'Could not connect to API server (' + err.message + ')';
+        err.networkError = true;
+        reject(err);
+      })
+      .then(function(response) {
+        // Handle fetch results
+        if (response.ok) {
+          var token = response.headers.get('x-jwt-token');
+          if (response.status >= 200 && response.status < 300 && token && token !== '') {
+            Formio.setToken(token);
+          }
+          // 204 is no content. Don't try to .json() it.
+          if (response.status === 204) {
+            return {};
+          }
+          return (response.headers.get('content-type').indexOf('application/json') !== -1 ?
+            response.json() : response.text())
+          .then(function(result) {
+            // Add some content-range metadata to the result here
+            var range = response.headers.get('content-range');
+            if (range && typeof result === 'object') {
+              range = range.split('/');
+              if(range[0] !== '*') {
+                var skipLimit = range[0].split('-');
+                result.skip = Number(skipLimit[0]);
+                result.limit = skipLimit[1] - skipLimit[0] + 1;
+              }
+              result.serverCount = range[1] === '*' ? range[1] : Number(range[1]);
+            }
+            return result;
+          });
+        }
+        else {
+          if (response.status === 440) {
+            Formio.setToken(null);
+            Formio.events.emit('formio.sessionExpired', response.body);
+          }
+          else if (response.status === 401) {
+            Formio.events.emit('formio.unauthorized', response.body);
+          }
+          // Parse and return the error as a rejected promise to reject this promise
+          return (response.headers.get('content-type').indexOf('application/json') !== -1 ?
+            response.json() : response.text())
+            .then(function(error){
+              throw error;
+            });
+        }
+      })
+      .catch(function(err) {
+        if (err === 'Bad Token') {
+          Formio.setToken(null);
+          Formio.events.emit('formio.badToken', err);
+        }
+        // Remove failed promises from cache
+        delete cache[cacheKey];
+        // Propagate error so client can handle accordingly
+        throw err;
+      }));
+    }
+  })
+  .then(function(result) {
+    // Save the cache
+    if (method === 'GET') {
+      cache[cacheKey] = Promise.resolve(result);
+    }
+
+    // Shallow copy result so modifications don't end up in cache
+    if(Array.isArray(result)) {
+      var resultCopy = result.map(copy);
+      resultCopy.skip = result.skip;
+      resultCopy.limit = result.limit;
+      resultCopy.serverCount = result.serverCount;
+      return resultCopy;
+    }
+    return copy(result);
+  });
+};
+
+Formio.setToken = function(token) {
+  token = token || '';
+  if (token === this.token) { return; }
+  this.token = token;
+  if (!token) {
+    Formio.setUser(null);
+    // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
+    try {
+      return localStorage.removeItem('formioToken');
+    }
+    catch(err) {
+      return;
+    }
+  }
+  // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
+  try {
+    localStorage.setItem('formioToken', token);
+  }
+  catch(err) {
+    // Do nothing.
+  }
+  Formio.currentUser(); // Run this so user is updated if null
+};
+
+Formio.getToken = function() {
+  if (this.token) { return this.token; }
+  try {
+    var token = localStorage.getItem('formioToken') || '';
+    this.token = token;
+    return token;
+  }
+  catch (e) {
+    return '';
+  }
+};
+
+Formio.setUser = function(user) {
+  if (!user) {
+    this.setToken(null);
+    // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
+    try {
+      return localStorage.removeItem('formioUser');
+    }
+    catch(err) {
+      return;
+    }
+  }
+  // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
+  try {
+    localStorage.setItem('formioUser', JSON.stringify(user));
+  }
+  catch(err) {
+    // Do nothing.
+  }
+};
+
+Formio.getUser = function() {
+  try {
+    return JSON.parse(localStorage.getItem('formioUser') || null);
+  }
+  catch (e) {
+    return;
+  }
+};
+
+Formio.setBaseUrl = function(url) {
+  baseUrl = url;
+  if (!appUrlSet) {
+    appUrl = url;
+  }
+};
+
+Formio.getBaseUrl = function() {
+  return baseUrl;
+};
+
+Formio.setAppUrl = function(url) {
+  appUrl = url;
+  appUrlSet = true;
+};
+
+Formio.getAppUrl = function() {
+  return appUrl;
+};
+
+Formio.clearCache = function() { cache = {}; };
+
+Formio.currentUser = function() {
+  var url = baseUrl + '/current';
+  var user = this.getUser();
+  if (user) {
+    return pluginAlter('wrapStaticRequestPromise', Promise.resolve(user), {
+      url: url,
+      method: 'GET'
+    })
+  }
+  var token = this.getToken();
+  if (!token) {
+    return pluginAlter('wrapStaticRequestPromise', Promise.resolve(null), {
+      url: url,
+      method: 'GET'
+    })
+  }
+  return this.makeStaticRequest(url)
+  .then(function(response) {
+    Formio.setUser(response);
+    return response;
+  });
+};
+
+// Keep track of their logout callback.
+Formio.logout = function() {
+  var onLogout = function(result) {
+    this.setToken(null);
+    this.setUser(null);
+    Formio.clearCache();
+    return result;
+  }.bind(this);
+  return this.makeStaticRequest(baseUrl + '/logout').then(onLogout).catch(onLogout);
+};
+
+Formio.fieldData = function(data, component) {
+  if (!data) { return ''; }
+  if (!component || !component.key) { return data; }
+  if (component.key.indexOf('.') !== -1) {
+    var value = data;
+    var parts = component.key.split('.');
+    var key = '';
+    for (var i = 0; i < parts.length; i++) {
+      key = parts[i];
+
+      // Handle nested resources
+      if (value.hasOwnProperty('_id')) {
+        value = value.data;
+      }
+
+      // Return if the key is not found on the value.
+      if (!value.hasOwnProperty(key)) {
+        return;
+      }
+
+      // Convert old single field data in submissions to multiple
+      if (key === parts[parts.length - 1] && component.multiple && !Array.isArray(value[key])) {
+        value[key] = [value[key]];
+      }
+
+      // Set the value of this key.
+      value = value[key];
+    }
+    return value;
+  }
+  else {
+    // Convert old single field data in submissions to multiple
+    if (component.multiple && !Array.isArray(data[component.key])) {
+      data[component.key] = [data[component.key]];
+    }
+    return data[component.key];
+  }
+};
+
+Formio.providers = providers;
+
+/**
+ * EventEmitter for Formio events.
+ * See Node.js documentation for API documentation: https://nodejs.org/api/events.html
+ */
+Formio.events = new EventEmitter({
+  wildcard: false,
+  maxListeners: 0
+});
+
+/**
+ * Register a plugin with Formio.js
+ * @param plugin The plugin to register. See plugin documentation.
+ * @param name   Optional name to later retrieve plugin with.
+ */
+Formio.registerPlugin = function(plugin, name) {
+  plugins.push(plugin);
+  plugins.sort(function(a, b) {
+    return (b.priority || 0) - (a.priority || 0);
+  });
+  plugin.__name = name;
+  (plugin.init || noop).call(plugin, Formio);
+};
+
+/**
+ * Returns the plugin registered with the given name.
+ */
+Formio.getPlugin = function(name) {
+  return plugins.reduce(function(result, plugin) {
+    if (result) return result;
+    if (plugin.__name === name) return plugin;
+  }, null);
+};
+
+/**
+ * Deregisters a plugin with Formio.js.
+ * @param  plugin The instance or name of the plugin
+ * @return true if deregistered, false otherwise
+ */
+Formio.deregisterPlugin = function(plugin) {
+  var beforeLength = plugins.length;
+  plugins = plugins.filter(function(p) {
+    if(p !== plugin && p.__name !== plugin) return true;
+    (p.deregister || noop).call(p, Formio);
+    return false;
+  });
+  return beforeLength !== plugins.length;
+};
+
+module.exports = Formio;
+
+},{"./providers":4,"eventemitter2":2,"native-promise-only":9,"shallow-copy":10,"whatwg-fetch":11}],4:[function(require,module,exports){
+module.exports = {
+  storage: require('./storage')
+};
+
+},{"./storage":6}],5:[function(require,module,exports){
+var Promise = require("native-promise-only");
+var dropbox = function(formio) {
+  return {
+    uploadFile: function(file, fileName, dir, progressCallback) {
+      return new Promise(function(resolve, reject) {
+        // Send the file with data.
+        var xhr = new XMLHttpRequest();
+
+        if (typeof progressCallback === 'function') {
+          xhr.upload.onprogress = progressCallback;
+        }
+
+        var fd = new FormData();
+        fd.append('name', fileName);
+        fd.append('dir', dir);
+        fd.append('file', file);
+
+        // Fire on network error.
+        xhr.onerror = function(err) {
+          err.networkError = true;
+          reject(err);
+        }
+
+        xhr.onload = function() {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            var response = JSON.parse(xhr.response);
+            response.storage = 'dropbox';
+            response.size = file.size;
+            response.type = file.type;
+            response.url = response.path_lower;
+            resolve(response);
+          }
+          else {
+            reject(xhr.response || 'Unable to upload file');
+          }
+        };
+
+        xhr.onabort = function(err) {
+          reject(err);
+        }
+
+        xhr.open('POST', formio.formUrl + '/storage/dropbox');
+        try {
+          var token = localStorage.getItem('formioToken');
+        }
+        catch (e) {
+          // Swallow error.
+        }
+        if (token) {
+          xhr.setRequestHeader('x-jwt-token', token);
+        }
+        xhr.send(fd);
+      });
+    },
+    downloadFile: function(file) {
+      file.url = formio.formUrl + '/storage/dropbox?path_lower=' + file.path_lower + (token ? '&x-jwt-token=' + token : '');
+      return Promise.resolve(file);
+    }
+  };
+};
+
+dropbox.title = 'Dropbox';
+dropbox.name = 'dropbox';
+module.exports = dropbox;
+
+
+
+},{"native-promise-only":9}],6:[function(require,module,exports){
+module.exports = {
+  dropbox: require('./dropbox.js'),
+  s3: require('./s3.js'),
+  url: require('./url.js'),
+};
+
+},{"./dropbox.js":5,"./s3.js":7,"./url.js":8}],7:[function(require,module,exports){
+var Promise = require("native-promise-only");
+var s3 = function(formio) {
+  return {
+    uploadFile: function(file, fileName, dir, progressCallback) {
+      return new Promise(function(resolve, reject) {
+        // Send the pre response to sign the upload.
+        var pre = new XMLHttpRequest();
+
+        var prefd = new FormData();
+        prefd.append('name', fileName);
+        prefd.append('size', file.size);
+        prefd.append('type', file.type);
+
+        // This only fires on a network error.
+        pre.onerror = function(err) {
+          err.networkError = true;
+          reject(err);
+        }
+
+        pre.onabort = function(err) {
+          reject(err);
+        }
+
+        pre.onload = function() {
+          if (pre.status >= 200 && pre.status < 300) {
+            var response = JSON.parse(pre.response);
+
+            // Send the file with data.
+            var xhr = new XMLHttpRequest();
+
+            if (typeof progressCallback === 'function') {
+              xhr.upload.onprogress = progressCallback;
+            }
+
+            response.data.fileName = fileName;
+            response.data.key += dir + fileName;
+
+            var fd = new FormData();
+            for(var key in response.data) {
+              fd.append(key, response.data[key]);
+            }
+            fd.append('file', file);
+
+            // Fire on network error.
+            xhr.onerror = function(err) {
+              err.networkError = true;
+              reject(err);
+            }
+
+            xhr.onload = function() {
+              if (xhr.status >= 200 && xhr.status < 300) {
+                resolve({
+                  storage: 's3',
+                  name: fileName,
+                  bucket: response.bucket,
+                  key: response.data.key,
+                  url: response.url + response.data.key,
+                  acl: response.data.acl,
+                  size: file.size,
+                  type: file.type
+                });
+              }
+              else {
+                reject(xhr.response || 'Unable to upload file');
+              }
+            };
+
+            xhr.onabort = function(err) {
+              reject(err);
+            }
+
+            xhr.open('POST', response.url);
+
+            xhr.send(fd);
+          }
+          else {
+            reject(pre.response || 'Unable to sign file');
+          }
+        };
+
+        pre.open('POST', formio.formUrl + '/storage/s3');
+
+        pre.setRequestHeader('Accept', 'application/json');
+        pre.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+        try {
+          var token = localStorage.getItem('formioToken');
+        }
+        catch (e) {
+          // swallow error.
+        }
+        if (token) {
+          pre.setRequestHeader('x-jwt-token', token);
+        }
+
+        pre.send(JSON.stringify({
+          name: fileName,
+          size: file.size,
+          type: file.type
+        }));
+      });
+    },
+    downloadFile: function(file) {
+      if (file.acl !== 'public-read') {
+        return formio.makeRequest('file', formio.formUrl + '/storage/s3?bucket=' + file.bucket + '&key=' + file.key, 'GET');
+      }
+      else {
+        return Promise.resolve(file);
+      }
+    }
+  };
+};
+
+s3.title = 'S3';
+s3.name = 's3';
+module.exports = s3;
+
+},{"native-promise-only":9}],8:[function(require,module,exports){
+var Promise = require("native-promise-only");
+var url = function(formio) {
+  return {
+    title: 'Url',
+    name: 'url',
+    uploadFile: function(file, fileName, dir, progressCallback) {
+      return new Promise(function(resolve, reject) {
+        var data = {
+          dir: dir,
+          name: fileName,
+          file: file
+        };
+
+        // Send the file with data.
+        var xhr = new XMLHttpRequest();
+
+        if (typeof progressCallback === 'function') {
+          xhr.upload.onprogress = progressCallback;
+        }
+
+        fd = new FormData();
+        for(var key in data) {
+          fd.append(key, data[key]);
+        }
+
+        xhr.onload = function() {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            // Need to test if xhr.response is decoded or not.
+            resolve({
+              storage: 'url',
+              name: fileName,
+              url: xhr.response.url,
+              size: file.size,
+              type: file.type
+            });
+          }
+          else {
+            reject(xhr.response || 'Unable to upload file');
+          }
+        };
+
+        // Fire on network error.
+        xhr.onerror = function() {
+          reject(xhr);
+        }
+
+        xhr.onabort = function() {
+          reject(xhr);
+        }
+
+        xhr.open('POST', response.url);
+        xhr.send(fd);
+      });
+    },
+    downloadFile: function(file) {
+      // Return the original as there is nothing to do.
+      return Promise.resolve(file);
+    }
+  };
+};
+
+url.name = 'url';
+url.title = 'Url';
+module.exports = url;
+
+},{"native-promise-only":9}],9:[function(require,module,exports){
 (function (global){
 /*! Native Promise Only
     v0.8.1 (c) Kyle Simpson
@@ -1103,7 +2288,7 @@
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],3:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 module.exports = function (obj) {
     if (!obj || typeof obj !== 'object') return obj;
     
@@ -1140,8 +2325,8 @@ var isArray = Array.isArray || function (xs) {
     return {}.toString.call(xs) === '[object Array]';
 };
 
-},{}],4:[function(require,module,exports){
-(function(self) {
+},{}],11:[function(require,module,exports){
+(function() {
   'use strict';
 
   if (self.fetch) {
@@ -1150,7 +2335,7 @@ var isArray = Array.isArray || function (xs) {
 
   function normalizeName(name) {
     if (typeof name !== 'string') {
-      name = String(name)
+      name = name.toString();
     }
     if (/[^a-z0-9\-#$%&'*+.\^_`|~]/i.test(name)) {
       throw new TypeError('Invalid character in header field name')
@@ -1160,7 +2345,7 @@ var isArray = Array.isArray || function (xs) {
 
   function normalizeValue(value) {
     if (typeof value !== 'string') {
-      value = String(value)
+      value = value.toString();
     }
     return value
   }
@@ -1253,14 +2438,13 @@ var isArray = Array.isArray || function (xs) {
   var support = {
     blob: 'FileReader' in self && 'Blob' in self && (function() {
       try {
-        new Blob()
+        new Blob();
         return true
       } catch(e) {
         return false
       }
     })(),
-    formData: 'FormData' in self,
-    arrayBuffer: 'ArrayBuffer' in self
+    formData: 'FormData' in self
   }
 
   function Body() {
@@ -1277,19 +2461,8 @@ var isArray = Array.isArray || function (xs) {
         this._bodyFormData = body
       } else if (!body) {
         this._bodyText = ''
-      } else if (support.arrayBuffer && ArrayBuffer.prototype.isPrototypeOf(body)) {
-        // Only support ArrayBuffers for POST method.
-        // Receiving ArrayBuffers happens via Blobs, instead.
       } else {
         throw new Error('unsupported BodyInit type')
-      }
-
-      if (!this.headers.get('content-type')) {
-        if (typeof body === 'string') {
-          this.headers.set('content-type', 'text/plain;charset=UTF-8')
-        } else if (this._bodyBlob && this._bodyBlob.type) {
-          this.headers.set('content-type', this._bodyBlob.type)
-        }
       }
     }
 
@@ -1355,44 +2528,20 @@ var isArray = Array.isArray || function (xs) {
     return (methods.indexOf(upcased) > -1) ? upcased : method
   }
 
-  function Request(input, options) {
+  function Request(url, options) {
     options = options || {}
-    var body = options.body
-    if (Request.prototype.isPrototypeOf(input)) {
-      if (input.bodyUsed) {
-        throw new TypeError('Already read')
-      }
-      this.url = input.url
-      this.credentials = input.credentials
-      if (!options.headers) {
-        this.headers = new Headers(input.headers)
-      }
-      this.method = input.method
-      this.mode = input.mode
-      if (!body) {
-        body = input._bodyInit
-        input.bodyUsed = true
-      }
-    } else {
-      this.url = input
-    }
+    this.url = url
 
-    this.credentials = options.credentials || this.credentials || 'omit'
-    if (options.headers || !this.headers) {
-      this.headers = new Headers(options.headers)
-    }
-    this.method = normalizeMethod(options.method || this.method || 'GET')
-    this.mode = options.mode || this.mode || null
+    this.credentials = options.credentials || 'omit'
+    this.headers = new Headers(options.headers)
+    this.method = normalizeMethod(options.method || 'GET')
+    this.mode = options.mode || null
     this.referrer = null
 
-    if ((this.method === 'GET' || this.method === 'HEAD') && body) {
+    if ((this.method === 'GET' || this.method === 'HEAD') && options.body) {
       throw new TypeError('Body not allowed for GET or HEAD requests')
     }
-    this._initBody(body)
-  }
-
-  Request.prototype.clone = function() {
-    return new Request(this)
+    this._initBody(options.body)
   }
 
   function decode(body) {
@@ -1410,7 +2559,7 @@ var isArray = Array.isArray || function (xs) {
 
   function headers(xhr) {
     var head = new Headers()
-    var pairs = (xhr.getAllResponseHeaders() || '').trim().split('\n')
+    var pairs = xhr.getAllResponseHeaders().trim().split('\n')
     pairs.forEach(function(header) {
       var split = header.trim().split(':')
       var key = split.shift().trim()
@@ -1427,55 +2576,32 @@ var isArray = Array.isArray || function (xs) {
       options = {}
     }
 
+    this._initBody(bodyInit)
     this.type = 'default'
+    this.url = null
     this.status = options.status
     this.ok = this.status >= 200 && this.status < 300
     this.statusText = options.statusText
     this.headers = options.headers instanceof Headers ? options.headers : new Headers(options.headers)
     this.url = options.url || ''
-    this._initBody(bodyInit)
   }
 
   Body.call(Response.prototype)
 
-  Response.prototype.clone = function() {
-    return new Response(this._bodyInit, {
-      status: this.status,
-      statusText: this.statusText,
-      headers: new Headers(this.headers),
-      url: this.url
-    })
-  }
-
-  Response.error = function() {
-    var response = new Response(null, {status: 0, statusText: ''})
-    response.type = 'error'
-    return response
-  }
-
-  var redirectStatuses = [301, 302, 303, 307, 308]
-
-  Response.redirect = function(url, status) {
-    if (redirectStatuses.indexOf(status) === -1) {
-      throw new RangeError('Invalid status code')
-    }
-
-    return new Response(null, {status: status, headers: {location: url}})
-  }
-
-  self.Headers = Headers
-  self.Request = Request
-  self.Response = Response
+  self.Headers = Headers;
+  self.Request = Request;
+  self.Response = Response;
 
   self.fetch = function(input, init) {
-    return new Promise(function(resolve, reject) {
-      var request
-      if (Request.prototype.isPrototypeOf(input) && !init) {
-        request = input
-      } else {
-        request = new Request(input, init)
-      }
+    // TODO: Request constructor should accept input, init
+    var request
+    if (Request.prototype.isPrototypeOf(input) && !init) {
+      request = input
+    } else {
+      request = new Request(input, init)
+    }
 
+    return new Promise(function(resolve, reject) {
       var xhr = new XMLHttpRequest()
 
       function responseURL() {
@@ -1488,7 +2614,7 @@ var isArray = Array.isArray || function (xs) {
           return xhr.getResponseHeader('X-Request-URL')
         }
 
-        return
+        return;
       }
 
       xhr.onload = function() {
@@ -1503,15 +2629,11 @@ var isArray = Array.isArray || function (xs) {
           headers: headers(xhr),
           url: responseURL()
         }
-        var body = 'response' in xhr ? xhr.response : xhr.responseText
+        var body = 'response' in xhr ? xhr.response : xhr.responseText;
         resolve(new Response(body, options))
       }
 
       xhr.onerror = function() {
-        reject(new TypeError('Network request failed'))
-      }
-
-      xhr.ontimeout = function() {
         reject(new TypeError('Network request failed'))
       }
 
@@ -1533,1192 +2655,7 @@ var isArray = Array.isArray || function (xs) {
     })
   }
   self.fetch.polyfill = true
-})(typeof self !== 'undefined' ? self : this);
-
-},{}],5:[function(require,module,exports){
-'use strict';
-
-// Intentionally use native-promise-only here... Other promise libraries (es6-promise)
-// duck-punch the global Promise definition which messes up Angular 2 since it
-// also duck-punches the global Promise definition. For now, keep native-promise-only.
-var Promise = require("native-promise-only");
-
-// Require other libraries.
-require('whatwg-fetch');
-var EventEmitter = require('eventemitter2').EventEmitter2;
-var copy = require('shallow-copy');
-var providers = require('./providers');
-
-// The default base url.
-var baseUrl = 'https://api.form.io';
-var appUrl = baseUrl;
-var appUrlSet = false;
-
-var plugins = [];
-
-// The temporary GET request cache storage
-var cache = {};
-
-var noop = function(){};
-var identity = function(value) { return value; };
-
-// Will invoke a function on all plugins.
-// Returns a promise that resolves when all promises
-// returned by the plugins have resolved.
-// Should be used when you want plugins to prepare for an event
-// but don't want any data returned.
-var pluginWait = function(pluginFn) {
-  var args = [].slice.call(arguments, 1);
-  return Promise.all(plugins.map(function(plugin) {
-    return (plugin[pluginFn] || noop).apply(plugin, args);
-  }));
-};
-
-// Will invoke a function on plugins from highest priority
-// to lowest until one returns a value. Returns null if no
-// plugins return a value.
-// Should be used when you want just one plugin to handle things.
-var pluginGet = function(pluginFn) {
-  var args = [].slice.call(arguments, 0);
-  var callPlugin = function(index, pluginFn) {
-    var plugin = plugins[index];
-    if (!plugin) return Promise.resolve(null);
-    return Promise.resolve((plugin && plugin[pluginFn] || noop).apply(plugin, [].slice.call(arguments, 2)))
-    .then(function(result) {
-      if (result !== null && result !== undefined) return result;
-      return callPlugin.apply(null, [index + 1].concat(args));
-    });
-  };
-  return callPlugin.apply(null, [0].concat(args));
-};
-
-// Will invoke a function on plugins from highest priority to
-// lowest, building a promise chain from their return values
-// Should be used when all plugins need to process a promise's
-// success or failure
-var pluginAlter = function(pluginFn, value) {
-  var args = [].slice.call(arguments, 2);
-  return plugins.reduce(function(value, plugin) {
-      return (plugin[pluginFn] || identity).apply(plugin, [value].concat(args));
-  }, value);
-};
-
-
-/**
- * Returns parts of the URL that are important.
- * Indexes
- *  - 0: The full url
- *  - 1: The protocol
- *  - 2: The hostname
- *  - 3: The rest
- *
- * @param url
- * @returns {*}
- */
-var getUrlParts = function(url) {
-  var regex = '^(http[s]?:\\/\\/)';
-  if (baseUrl && url.indexOf(baseUrl) === 0) {
-    regex += '(' + baseUrl.replace(/^http[s]?:\/\//, '') + ')';
-  }
-  else {
-    regex += '([^/]+)';
-  }
-  regex += '($|\\/.*)';
-  return url.match(new RegExp(regex));
-};
-
-var serialize = function(obj) {
-  var str = [];
-  for(var p in obj)
-    if (obj.hasOwnProperty(p)) {
-      str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
-    }
-  return str.join("&");
-};
-
-// The formio class.
-var Formio = function(path) {
-
-  // Ensure we have an instance of Formio.
-  if (!(this instanceof Formio)) { return new Formio(path); }
-  if (!path) {
-    // Allow user to create new projects if this was instantiated without
-    // a url
-    this.projectUrl = baseUrl + '/project';
-    this.projectsUrl = baseUrl + '/project';
-    this.projectId = false;
-    this.query = '';
-    return;
-  }
-
-  // Initialize our variables.
-  this.projectsUrl = '';
-  this.projectUrl = '';
-  this.projectId = '';
-  this.formUrl = '';
-  this.formsUrl = '';
-  this.formId = '';
-  this.submissionsUrl = '';
-  this.submissionUrl = '';
-  this.submissionId = '';
-  this.actionsUrl = '';
-  this.actionId = '';
-  this.actionUrl = '';
-  this.query = '';
-
-  // Normalize to an absolute path.
-  if ((path.indexOf('http') !== 0) && (path.indexOf('//') !== 0)) {
-    baseUrl = baseUrl ? baseUrl : window.location.href.match(/http[s]?:\/\/api./)[0];
-    path = baseUrl + path;
-  }
-
-  var hostparts = getUrlParts(path);
-  var parts = [];
-  var hostName = hostparts[1] + hostparts[2];
-  path = hostparts.length > 3 ? hostparts[3] : '';
-  var queryparts = path.split('?');
-  if (queryparts.length > 1) {
-    path = queryparts[0];
-    this.query = '?' + queryparts[1];
-  }
-
-  // See if this is a form path.
-  if ((path.search(/(^|\/)(form|project)($|\/)/) !== -1)) {
-
-    // Register a specific path.
-    var registerPath = function(name, base) {
-      this[name + 'sUrl'] = base + '/' + name;
-      var regex = new RegExp('\/' + name + '\/([^/]+)');
-      if (path.search(regex) !== -1) {
-        parts = path.match(regex);
-        this[name + 'Url'] = parts ? (base + parts[0]) : '';
-        this[name + 'Id'] = (parts.length > 1) ? parts[1] : '';
-        base += parts[0];
-      }
-      return base;
-    }.bind(this);
-
-    // Register an array of items.
-    var registerItems = function(items, base, staticBase) {
-      for (var i in items) {
-        if (items.hasOwnProperty(i)) {
-          var item = items[i];
-          if (item instanceof Array) {
-            registerItems(item, base, true);
-          }
-          else {
-            var newBase = registerPath(item, base);
-            base = staticBase ? base : newBase;
-          }
-        }
-      }
-    };
-
-    registerItems(['project', 'form', ['submission', 'action']], hostName);
-
-    if (!this.projectId) {
-      if (hostparts.length > 2 && hostparts[2].split('.').length > 2) {
-        this.projectUrl = hostName;
-        this.projectId = hostparts[2].split('.')[0];
-      }
-    }
-  }
-  else {
-
-    // This is an aliased url.
-    this.projectUrl = hostName;
-    this.projectId = (hostparts.length > 2) ? hostparts[2].split('.')[0] : '';
-    var subRegEx = new RegExp('\/(submission|action)($|\/.*)');
-    var subs = path.match(subRegEx);
-    this.pathType = (subs && (subs.length > 1)) ? subs[1] : '';
-    path = path.replace(subRegEx, '');
-    path = path.replace(/\/$/, '');
-    this.formsUrl = hostName + '/form';
-    this.formUrl = hostName + path;
-    this.formId = path.replace(/^\/+|\/+$/g, '');
-    var items = ['submission', 'action'];
-    for (var i in items) {
-      if (items.hasOwnProperty(i)) {
-        var item = items[i];
-        this[item + 'sUrl'] = hostName + path + '/' + item;
-        if ((this.pathType === item) && (subs.length > 2) && subs[2]) {
-          this[item + 'Id'] = subs[2].replace(/^\/+|\/+$/g, '');
-          this[item + 'Url'] = hostName + path + subs[0];
-        }
-      }
-    }
-  }
-
-  // Set the app url if it is not set.
-  if (!appUrlSet) {
-    appUrl = this.projectUrl;
-  }
-};
-
-/**
- * Load a resource.
- *
- * @param type
- * @returns {Function}
- * @private
- */
-var _load = function(type) {
-  var _id = type + 'Id';
-  var _url = type + 'Url';
-  return function(query, opts) {
-    if (query && typeof query === 'object') {
-      query = serialize(query.params);
-    }
-    if (query) {
-      query = this.query ? (this.query + '&' + query) : ('?' + query);
-    }
-    else {
-      query = this.query;
-    }
-    if (!this[_id]) { return Promise.reject('Missing ' + _id); }
-    return this.makeRequest(type, this[_url] + query, 'get', null, opts);
-  };
-};
-
-/**
- * Save a resource.
- *
- * @param type
- * @returns {Function}
- * @private
- */
-var _save = function(type) {
-  var _id = type + 'Id';
-  var _url = type + 'Url';
-  return function(data, opts) {
-    var method = this[_id] ? 'put' : 'post';
-    var reqUrl = this[_id] ? this[_url] : this[type + 'sUrl'];
-    cache = {};
-    return this.makeRequest(type, reqUrl + this.query, method, data, opts);
-  };
-};
-
-/**
- * Delete a resource.
- *
- * @param type
- * @returns {Function}
- * @private
- */
-var _delete = function(type) {
-  var _id = type + 'Id';
-  var _url = type + 'Url';
-  return function(opts) {
-    if (!this[_id]) { Promise.reject('Nothing to delete'); }
-    cache = {};
-    return this.makeRequest(type, this[_url], 'delete', null, opts);
-  };
-};
-
-/**
- * Resource index method.
- *
- * @param type
- * @returns {Function}
- * @private
- */
-var _index = function(type) {
-  var _url = type + 'Url';
-  return function(query, opts) {
-    query = query || '';
-    if (query && typeof query === 'object') {
-      query = '?' + serialize(query.params);
-    }
-    return this.makeRequest(type, this[_url] + query, 'get', null, opts);
-  };
-};
-
-// Activates plugin hooks, makes Formio.request if no plugin provides a request
-Formio.prototype.makeRequest = function(type, url, method, data, opts) {
-  var self = this;
-  method = (method || 'GET').toUpperCase();
-  if(!opts || typeof opts !== 'object') {
-    opts = {};
-  }
-
-  var requestArgs = {
-    formio: self,
-    type: type,
-    url: url,
-    method: method,
-    data: data,
-    opts: opts
-  };
-
-  var request = pluginWait('preRequest', requestArgs)
-  .then(function() {
-    return pluginGet('request', requestArgs)
-    .then(function(result) {
-      if (result === null || result === undefined) {
-        return Formio.request(url, method, data);
-      }
-      return result;
-    });
-  });
-
-  return pluginAlter('wrapRequestPromise', request, requestArgs);
-};
-
-// Define specific CRUD methods.
-Formio.prototype.loadProject = _load('project');
-Formio.prototype.saveProject = _save('project');
-Formio.prototype.deleteProject = _delete('project');
-Formio.prototype.loadForm = _load('form');
-Formio.prototype.saveForm = _save('form');
-Formio.prototype.deleteForm = _delete('form');
-Formio.prototype.loadForms = _index('forms');
-Formio.prototype.loadSubmission = _load('submission');
-Formio.prototype.saveSubmission = _save('submission');
-Formio.prototype.deleteSubmission = _delete('submission');
-Formio.prototype.loadSubmissions = _index('submissions');
-Formio.prototype.loadAction = _load('action');
-Formio.prototype.saveAction = _save('action');
-Formio.prototype.deleteAction = _delete('action');
-Formio.prototype.loadActions = _index('actions');
-Formio.prototype.availableActions = function() { return this.makeRequest('availableActions', this.formUrl + '/actions'); };
-Formio.prototype.actionInfo = function(name) { return this.makeRequest('actionInfo', this.formUrl + '/actions/' + name); };
-
-Formio.prototype.uploadFile = function(storage, file, fileName, dir, progressCallback) {
-  var requestArgs = {
-    provider: storage,
-    method: 'upload',
-    file: file,
-    fileName: fileName,
-    dir: dir
-  }
-  var request = pluginWait('preRequest', requestArgs)
-    .then(function() {
-      return pluginGet('fileRequest', requestArgs)
-        .then(function(result) {
-          if (storage && (result === null || result === undefined)) {
-            if (providers.storage.hasOwnProperty(storage)) {
-              var provider = new providers.storage[storage](this);
-              return provider.uploadFile(file, fileName, dir, progressCallback);
-            }
-            else {
-              throw('Storage provider not found');
-            }
-          }
-          return result || {url: ''};
-        }.bind(this));
-    }.bind(this));
-
-  return pluginAlter('wrapFileRequestPromise', request, requestArgs);
-}
-
-Formio.prototype.downloadFile = function(file) {
-  var requestArgs = {
-    method: 'download',
-    file: file
-  };
-
-  var request = pluginWait('preRequest', requestArgs)
-    .then(function() {
-      return pluginGet('fileRequest', requestArgs)
-        .then(function(result) {
-          if (file.storage && (result === null || result === undefined)) {
-            if (providers.storage.hasOwnProperty(file.storage)) {
-              var provider = new providers.storage[file.storage](this);
-              return provider.downloadFile(file);
-            }
-            else {
-              throw('Storage provider not found');
-            }
-          }
-          return result || {url: ''};
-        }.bind(this));
-    }.bind(this));
-
-  return pluginAlter('wrapFileRequestPromise', request, requestArgs);
-}
-
-Formio.makeStaticRequest = function(url, method, data) {
-  method = (method || 'GET').toUpperCase();
-
-  var requestArgs = {
-    url: url,
-    method: method,
-    data: data
-  };
-
-  var request = pluginWait('preRequest', requestArgs)
-  .then(function() {
-    return pluginGet('staticRequest', requestArgs)
-    .then(function(result) {
-      if (result === null || result === undefined) {
-        return Formio.request(url, method, data);
-      }
-      return result;
-    });
-  });
-
-  return pluginAlter('wrapStaticRequestPromise', request, requestArgs);
-};
-
-// Static methods.
-Formio.loadProjects = function(query) {
-  query = query || '';
-  if (typeof query === 'object') {
-    query = '?' + serialize(query.params);
-  }
-  return this.makeStaticRequest(baseUrl + '/project' + query);
-};
-
-Formio.request = function(url, method, data) {
-  if (!url) {
-    return Promise.reject('No url provided');
-  }
-  method = (method || 'GET').toUpperCase();
-  var cacheKey = btoa(url);
-
-  return new Promise(function(resolve, reject) {
-    // Get the cached promise to save multiple loads.
-    if (method === 'GET' && cache.hasOwnProperty(cacheKey)) {
-      resolve(cache[cacheKey]);
-    }
-    else {
-      resolve(new Promise(function(resolve, reject) {
-        // Set up and fetch request
-        var headers = new Headers({
-          'Accept': 'application/json',
-          'Content-type': 'application/json; charset=UTF-8'
-        });
-        var token = Formio.getToken();
-        if (token) {
-          headers.append('x-jwt-token', token);
-        }
-
-        var options = {
-          method: method,
-          headers: headers,
-          mode: 'cors'
-        };
-        if (data) {
-          options.body = JSON.stringify(data);
-        }
-
-        resolve(fetch(url, options));
-      })
-      .catch(function(err) {
-        err.message = 'Could not connect to API server (' + err.message + ')';
-        err.networkError = true;
-        reject(err);
-      })
-      .then(function(response) {
-        // Handle fetch results
-        if (response.ok) {
-          var token = response.headers.get('x-jwt-token');
-          if (response.status >= 200 && response.status < 300 && token && token !== '') {
-            Formio.setToken(token);
-          }
-          // 204 is no content. Don't try to .json() it.
-          if (response.status === 204) {
-            return {};
-          }
-          return (response.headers.get('content-type').indexOf('application/json') !== -1 ?
-            response.json() : response.text())
-          .then(function(result) {
-            // Add some content-range metadata to the result here
-            var range = response.headers.get('content-range');
-            if (range && typeof result === 'object') {
-              range = range.split('/');
-              if(range[0] !== '*') {
-                var skipLimit = range[0].split('-');
-                result.skip = Number(skipLimit[0]);
-                result.limit = skipLimit[1] - skipLimit[0] + 1;
-              }
-              result.serverCount = range[1] === '*' ? range[1] : Number(range[1]);
-            }
-            return result;
-          });
-        }
-        else {
-          if (response.status === 440) {
-            Formio.setToken(null);
-            Formio.events.emit('formio.sessionExpired', response.body);
-          }
-          else if (response.status === 401) {
-            Formio.events.emit('formio.unauthorized', response.body);
-          }
-          // Parse and return the error as a rejected promise to reject this promise
-          return (response.headers.get('content-type').indexOf('application/json') !== -1 ?
-            response.json() : response.text())
-            .then(function(error){
-              throw error;
-            });
-        }
-      })
-      .catch(function(err) {
-        if (err === 'Bad Token') {
-          Formio.setToken(null);
-          Formio.events.emit('formio.badToken', err);
-        }
-        // Remove failed promises from cache
-        delete cache[cacheKey];
-        // Propagate error so client can handle accordingly
-        throw err;
-      }));
-    }
-  })
-  .then(function(result) {
-    // Save the cache
-    if (method === 'GET') {
-      cache[cacheKey] = Promise.resolve(result);
-    }
-
-    // Shallow copy result so modifications don't end up in cache
-    if(Array.isArray(result)) {
-      var resultCopy = result.map(copy);
-      resultCopy.skip = result.skip;
-      resultCopy.limit = result.limit;
-      resultCopy.serverCount = result.serverCount;
-      return resultCopy;
-    }
-    return copy(result);
-  });
-};
-
-Formio.setToken = function(token) {
-  token = token || '';
-  if (token === this.token) { return; }
-  this.token = token;
-  if (!token) {
-    Formio.setUser(null);
-    // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
-    try {
-      return localStorage.removeItem('formioToken');
-    }
-    catch(err) {
-      return;
-    }
-  }
-  // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
-  try {
-    localStorage.setItem('formioToken', token);
-  }
-  catch(err) {
-    // Do nothing.
-  }
-  Formio.currentUser(); // Run this so user is updated if null
-};
-
-Formio.getToken = function() {
-  if (this.token) { return this.token; }
-  try {
-    var token = localStorage.getItem('formioToken') || '';
-    this.token = token;
-    return token;
-  }
-  catch (e) {
-    return '';
-  }
-};
-
-Formio.setUser = function(user) {
-  if (!user) {
-    this.setToken(null);
-    // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
-    try {
-      return localStorage.removeItem('formioUser');
-    }
-    catch(err) {
-      return;
-    }
-  }
-  // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
-  try {
-    localStorage.setItem('formioUser', JSON.stringify(user));
-  }
-  catch(err) {
-    // Do nothing.
-  }
-};
-
-Formio.getUser = function() {
-  try {
-    return JSON.parse(localStorage.getItem('formioUser') || null);
-  }
-  catch (e) {
-    return;
-  }
-};
-
-Formio.setBaseUrl = function(url) {
-  baseUrl = url;
-  if (!appUrlSet) {
-    appUrl = url;
-  }
-};
-
-Formio.getBaseUrl = function() {
-  return baseUrl;
-};
-
-Formio.setAppUrl = function(url) {
-  appUrl = url;
-  appUrlSet = true;
-};
-
-Formio.getAppUrl = function() {
-  return appUrl;
-};
-
-Formio.clearCache = function() { cache = {}; };
-
-Formio.currentUser = function() {
-  var url = baseUrl + '/current';
-  var user = this.getUser();
-  if (user) {
-    return pluginAlter('wrapStaticRequestPromise', Promise.resolve(user), {
-      url: url,
-      method: 'GET'
-    })
-  }
-  var token = this.getToken();
-  if (!token) {
-    return pluginAlter('wrapStaticRequestPromise', Promise.resolve(null), {
-      url: url,
-      method: 'GET'
-    })
-  }
-  return this.makeStaticRequest(url)
-  .then(function(response) {
-    Formio.setUser(response);
-    return response;
-  });
-};
-
-// Keep track of their logout callback.
-Formio.logout = function() {
-  var onLogout = function(result) {
-    this.setToken(null);
-    this.setUser(null);
-    Formio.clearCache();
-    return result;
-  }.bind(this);
-  return this.makeStaticRequest(baseUrl + '/logout').then(onLogout).catch(onLogout);
-};
-
-Formio.fieldData = function(data, component) {
-  if (!data) { return ''; }
-  if (!component || !component.key) { return data; }
-  if (component.key.indexOf('.') !== -1) {
-    var value = data;
-    var parts = component.key.split('.');
-    var key = '';
-    for (var i = 0; i < parts.length; i++) {
-      key = parts[i];
-
-      // Handle nested resources
-      if (value.hasOwnProperty('_id')) {
-        value = value.data;
-      }
-
-      // Return if the key is not found on the value.
-      if (!value.hasOwnProperty(key)) {
-        return;
-      }
-
-      // Convert old single field data in submissions to multiple
-      if (key === parts[parts.length - 1] && component.multiple && !Array.isArray(value[key])) {
-        value[key] = [value[key]];
-      }
-
-      // Set the value of this key.
-      value = value[key];
-    }
-    return value;
-  }
-  else {
-    // Convert old single field data in submissions to multiple
-    if (component.multiple && !Array.isArray(data[component.key])) {
-      data[component.key] = [data[component.key]];
-    }
-    return data[component.key];
-  }
-};
-
-Formio.providers = providers;
-
-/**
- * EventEmitter for Formio events.
- * See Node.js documentation for API documentation: https://nodejs.org/api/events.html
- */
-Formio.events = new EventEmitter({
-  wildcard: false,
-  maxListeners: 0
-});
-
-/**
- * Register a plugin with Formio.js
- * @param plugin The plugin to register. See plugin documentation.
- * @param name   Optional name to later retrieve plugin with.
- */
-Formio.registerPlugin = function(plugin, name) {
-  plugins.push(plugin);
-  plugins.sort(function(a, b) {
-    return (b.priority || 0) - (a.priority || 0);
-  });
-  plugin.__name = name;
-  (plugin.init || noop).call(plugin, Formio);
-};
-
-/**
- * Returns the plugin registered with the given name.
- */
-Formio.getPlugin = function(name) {
-  return plugins.reduce(function(result, plugin) {
-    if (result) return result;
-    if (plugin.__name === name) return plugin;
-  }, null);
-};
-
-/**
- * Deregisters a plugin with Formio.js.
- * @param  plugin The instance or name of the plugin
- * @return true if deregistered, false otherwise
- */
-Formio.deregisterPlugin = function(plugin) {
-  var beforeLength = plugins.length;
-  plugins = plugins.filter(function(p) {
-    if(p !== plugin && p.__name !== plugin) return true;
-    (p.deregister || noop).call(p, Formio);
-    return false;
-  });
-  return beforeLength !== plugins.length;
-};
-
-module.exports = Formio;
-
-},{"./providers":6,"eventemitter2":1,"native-promise-only":2,"shallow-copy":3,"whatwg-fetch":4}],6:[function(require,module,exports){
-module.exports = {
-  storage: require('./storage')
-};
-
-},{"./storage":8}],7:[function(require,module,exports){
-var Promise = require("native-promise-only");
-var dropbox = function(formio) {
-  return {
-    uploadFile: function(file, fileName, dir, progressCallback) {
-      return new Promise(function(resolve, reject) {
-        // Send the file with data.
-        var xhr = new XMLHttpRequest();
-
-        if (typeof progressCallback === 'function') {
-          xhr.upload.onprogress = progressCallback;
-        }
-
-        var fd = new FormData();
-        fd.append('name', fileName);
-        fd.append('dir', dir);
-        fd.append('file', file);
-
-        // Fire on network error.
-        xhr.onerror = function(err) {
-          err.networkError = true;
-          reject(err);
-        }
-
-        xhr.onload = function() {
-          if (xhr.status >= 200 && xhr.status < 300) {
-            var response = JSON.parse(xhr.response);
-            response.storage = 'dropbox';
-            response.size = file.size;
-            response.type = file.type;
-            response.url = response.path_lower;
-            resolve(response);
-          }
-          else {
-            reject(xhr.response || 'Unable to upload file');
-          }
-        };
-
-        xhr.onabort = function(err) {
-          reject(err);
-        }
-
-        xhr.open('POST', formio.formUrl + '/storage/dropbox');
-        try {
-          var token = localStorage.getItem('formioToken');
-        }
-        catch (e) {
-          // Swallow error.
-        }
-        if (token) {
-          xhr.setRequestHeader('x-jwt-token', token);
-        }
-        xhr.send(fd);
-      });
-    },
-    downloadFile: function(file) {
-      file.url = formio.formUrl + '/storage/dropbox?path_lower=' + file.path_lower + (token ? '&x-jwt-token=' + token : '');
-      return Promise.resolve(file);
-    }
-  };
-};
-
-dropbox.title = 'Dropbox';
-dropbox.name = 'dropbox';
-module.exports = dropbox;
-
-
-
-},{"native-promise-only":2}],8:[function(require,module,exports){
-module.exports = {
-  dropbox: require('./dropbox.js'),
-  s3: require('./s3.js'),
-  url: require('./url.js'),
-};
-
-},{"./dropbox.js":7,"./s3.js":9,"./url.js":10}],9:[function(require,module,exports){
-var Promise = require("native-promise-only");
-var s3 = function(formio) {
-  return {
-    uploadFile: function(file, fileName, dir, progressCallback) {
-      return new Promise(function(resolve, reject) {
-        // Send the pre response to sign the upload.
-        var pre = new XMLHttpRequest();
-
-        var prefd = new FormData();
-        prefd.append('name', fileName);
-        prefd.append('size', file.size);
-        prefd.append('type', file.type);
-
-        // This only fires on a network error.
-        pre.onerror = function(err) {
-          err.networkError = true;
-          reject(err);
-        }
-
-        pre.onabort = function(err) {
-          reject(err);
-        }
-
-        pre.onload = function() {
-          if (pre.status >= 200 && pre.status < 300) {
-            var response = JSON.parse(pre.response);
-
-            // Send the file with data.
-            var xhr = new XMLHttpRequest();
-
-            if (typeof progressCallback === 'function') {
-              xhr.upload.onprogress = progressCallback;
-            }
-
-            response.data.fileName = fileName;
-            response.data.key += dir + fileName;
-
-            var fd = new FormData();
-            for(var key in response.data) {
-              fd.append(key, response.data[key]);
-            }
-            fd.append('file', file);
-
-            // Fire on network error.
-            xhr.onerror = function(err) {
-              err.networkError = true;
-              reject(err);
-            }
-
-            xhr.onload = function() {
-              if (xhr.status >= 200 && xhr.status < 300) {
-                resolve({
-                  storage: 's3',
-                  name: fileName,
-                  bucket: response.bucket,
-                  key: response.data.key,
-                  url: response.url + response.data.key,
-                  acl: response.data.acl,
-                  size: file.size,
-                  type: file.type
-                });
-              }
-              else {
-                reject(xhr.response || 'Unable to upload file');
-              }
-            };
-
-            xhr.onabort = function(err) {
-              reject(err);
-            }
-
-            xhr.open('POST', response.url);
-
-            xhr.send(fd);
-          }
-          else {
-            reject(pre.response || 'Unable to sign file');
-          }
-        };
-
-        pre.open('POST', formio.formUrl + '/storage/s3');
-
-        pre.setRequestHeader('Accept', 'application/json');
-        pre.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-        try {
-          var token = localStorage.getItem('formioToken');
-        }
-        catch (e) {
-          // swallow error.
-        }
-        if (token) {
-          pre.setRequestHeader('x-jwt-token', token);
-        }
-
-        pre.send(JSON.stringify({
-          name: fileName,
-          size: file.size,
-          type: file.type
-        }));
-      });
-    },
-    downloadFile: function(file) {
-      if (file.acl !== 'public-read') {
-        return formio.makeRequest('file', formio.formUrl + '/storage/s3?bucket=' + file.bucket + '&key=' + file.key, 'GET');
-      }
-      else {
-        return Promise.resolve(file);
-      }
-    }
-  };
-};
-
-s3.title = 'S3';
-s3.name = 's3';
-module.exports = s3;
-
-},{"native-promise-only":2}],10:[function(require,module,exports){
-var Promise = require("native-promise-only");
-var url = function(formio) {
-  return {
-    title: 'Url',
-    name: 'url',
-    uploadFile: function(file, fileName, dir, progressCallback) {
-      return new Promise(function(resolve, reject) {
-        var data = {
-          dir: dir,
-          name: fileName,
-          file: file
-        };
-
-        // Send the file with data.
-        var xhr = new XMLHttpRequest();
-
-        if (typeof progressCallback === 'function') {
-          xhr.upload.onprogress = progressCallback;
-        }
-
-        fd = new FormData();
-        for(var key in data) {
-          fd.append(key, data[key]);
-        }
-
-        xhr.onload = function() {
-          if (xhr.status >= 200 && xhr.status < 300) {
-            // Need to test if xhr.response is decoded or not.
-            resolve({
-              storage: 'url',
-              name: fileName,
-              url: xhr.response.url,
-              size: file.size,
-              type: file.type
-            });
-          }
-          else {
-            reject(xhr.response || 'Unable to upload file');
-          }
-        };
-
-        // Fire on network error.
-        xhr.onerror = function() {
-          reject(xhr);
-        }
-
-        xhr.onabort = function() {
-          reject(xhr);
-        }
-
-        xhr.open('POST', response.url);
-        xhr.send(fd);
-      });
-    },
-    downloadFile: function(file) {
-      // Return the original as there is nothing to do.
-      return Promise.resolve(file);
-    }
-  };
-};
-
-url.name = 'url';
-url.title = 'Url';
-module.exports = url;
-
-},{"native-promise-only":2}],11:[function(require,module,exports){
-'use strict';
-
-module.exports = {
-  /**
-   * Determine if a component is a layout component or not.
-   *
-   * @param {Object} component
-   *   The component to check.
-   *
-   * @returns {Boolean}
-   *   Whether or not the component is a layout component.
-   */
-  isLayoutComponent: function isLayoutComponent(component) {
-    return (
-      (component.columns && Array.isArray(component.columns)) ||
-      (component.rows && Array.isArray(component.rows)) ||
-      (component.components && Array.isArray(component.components))
-    ) ? true : false;
-  },
-
-  /**
-   * Iterate through each component within a form.
-   *
-   * @param {Object} components
-   *   The components to iterate.
-   * @param {Function} fn
-   *   The iteration function to invoke for each component.
-   * @param {Boolean} includeAll
-   *   Whether or not to include layout components.
-   * @param {String} path
-   *   The current data path of the element. Example: data.user.firstName
-   */
-  eachComponent: function eachComponent(components, fn, includeAll, path) {
-    if (!components) return;
-    path = path || '';
-    components.forEach(function(component) {
-      var hasColumns = component.columns && Array.isArray(component.columns);
-      var hasRows = component.rows && Array.isArray(component.rows);
-      var hasComps = component.components && Array.isArray(component.components);
-      var noRecurse = false;
-      var newPath = component.key ? (path ? (path + '.' + component.key) : component.key) : '';
-
-      if (includeAll || component.tree || (!hasColumns && !hasRows && !hasComps)) {
-        noRecurse = fn(component, newPath);
-      }
-
-      var subPath = function() {
-        if (component.key && ((component.type === 'datagrid') || (component.type === 'container'))) {
-          return newPath;
-        }
-        return path;
-      };
-
-      if (!noRecurse) {
-        if (hasColumns) {
-          component.columns.forEach(function(column) {
-            eachComponent(column.components, fn, includeAll, subPath());
-          });
-        }
-
-        else if (hasRows) {
-          [].concat.apply([], component.rows).forEach(function(row) {
-            eachComponent(row.components, fn, includeAll, subPath());
-          });
-        }
-
-        else if (hasComps) {
-          eachComponent(component.components, fn, includeAll, subPath());
-        }
-      }
-    });
-  },
-
-  /**
-   * Get a component by its key
-   *
-   * @param {Object} components
-   *   The components to iterate.
-   * @param {String} key
-   *   The key of the component to get.
-   *
-   * @returns {Object}
-   *   The component that matches the given key, or undefined if not found.
-   */
-  getComponent: function getComponent(components, key) {
-    var result;
-    module.exports.eachComponent(components, function(component) {
-      if (component.key === key) {
-        result = component;
-      }
-    });
-    return result;
-  },
-
-  /**
-   * Flatten the form components for data manipulation.
-   *
-   * @param {Object} components
-   *   The components to iterate.
-   * @param {Boolean} includeAll
-   *   Whether or not to include layout components.
-   *
-   * @returns {Object}
-   *   The flattened components map.
-   */
-  flattenComponents: function flattenComponents(components, includeAll) {
-    var flattened = {};
-    module.exports.eachComponent(components, function(component, path) {
-      flattened[path] = component;
-    }, includeAll);
-    return flattened;
-  },
-
-  /**
-   * Get the value for a component key, in the given submission.
-   *
-   * @param {Object} submission
-   *   A submission object to search.
-   * @param {String} key
-   *   A for components API key to search for.
-   */
-  getValue: function getValue(submission, key) {
-    var data = submission.data || {};
-
-    var search = function search(data) {
-      var i;
-      var value;
-
-      if (data instanceof Array) {
-        for (i = 0; i < data.length; i++) {
-          if (typeof data[i] === 'object') {
-            value = search(data[i]);
-          }
-
-          if (value) {
-            return value;
-          }
-        }
-      }
-      else if (typeof data === 'object') {
-        if (data.hasOwnProperty(key)) {
-          return data[key];
-        }
-
-        var keys = Object.keys(data);
-        for (i = 0; i < keys.length; i++) {
-          if (typeof data[keys[i]] === 'object') {
-            value = search(data[keys[i]]);
-          }
-
-          if (value) {
-            return value;
-          }
-        }
-      }
-    };
-
-    return search(data);
-  }
-};
+})();
 
 },{}],12:[function(require,module,exports){
 "use strict";
@@ -6133,6 +6070,14 @@ module.exports = function() {
           session = angular.fromJson(session);
         }
 
+        var getForm = function() {
+          var element = $element.find('#formio-wizard-form');
+          if (!element.length) {
+            return {};
+          }
+          return element.children().scope().formioForm;
+        };
+
         $scope.formio = null;
         $scope.page = {};
         $scope.pages = [];
@@ -6231,6 +6176,10 @@ module.exports = function() {
             if ($scope.storage && !$scope.readOnly) {
               localStorage.setItem($scope.storage, '');
             }
+            $scope.showAlerts({
+              type: 'success',
+              message: 'Submission Complete!'
+            });
             $scope.$emit('formSubmission', submission);
           };
 
@@ -6290,12 +6239,7 @@ module.exports = function() {
         };
 
         $scope.isValid = function() {
-          var element = $element.find('#formio-wizard-form');
-          if (!element.length) {
-            return false;
-          }
-          var formioForm = element.children().scope().formioForm;
-          return formioForm.$valid;
+          return getForm().$valid;
         };
 
         $scope.$on('wizardGoToPage', function(event, page) {
@@ -6621,7 +6565,7 @@ module.exports = function() {
   };
 };
 
-},{"formio-utils":11}],56:[function(require,module,exports){
+},{"formio-utils":1}],56:[function(require,module,exports){
 "use strict";
 module.exports = [
   '$q',
@@ -6992,4 +6936,4 @@ module.exports = function() {
   };
 };
 
-},{"formiojs":5}]},{},[64]);
+},{"formiojs":3}]},{},[64]);
