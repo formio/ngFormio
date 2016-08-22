@@ -3520,7 +3520,8 @@ module.exports = function(app) {
           placeholder: '',
           multiple: false,
           defaultValue: '',
-          protected: false
+          protected: false,
+          persistent: true
         },
         viewTemplate: 'formio/componentsView/file.html'
       });
@@ -3677,13 +3678,8 @@ module.exports = function(app) {
                 $scope.$apply();
               })
               .catch(function(response) {
-                // Handle error
-                var oParser = new DOMParser();
-                var oDOM = oParser.parseFromString(response.data, 'text/xml');
-                var message = oDOM.getElementsByTagName('Message')[0].innerHTML;
-
                 $scope.fileUploads[fileName].status = 'error';
-                $scope.fileUploads[fileName].message = message;
+                $scope.fileUploads[fileName].message = response.data;
                 delete $scope.fileUploads[fileName].progress;
                 $scope.$apply();
               });
