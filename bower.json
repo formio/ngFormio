@@ -30,7 +30,8 @@
     "chance": "^1.0.3",
     "ng-file-upload": "^12.0.4",
     "ckeditor": "^4.5.10",
-    "jquery": "2.2.4"
+    "jquery": "2.2.4",
+    "qs": "https://github.com/ljharb/qs.git#^6.2.1"
   },
   "overrides": {
     "kendo-ui": {
