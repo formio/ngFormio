@@ -1248,7 +1248,7 @@ Formio.prototype.uploadFile = function(storage, file, fileName, dir, progressCal
     .then(function() {
       return pluginGet('fileRequest', requestArgs)
         .then(function(result) {
-          if (result === null || result === undefined) {
+          if (storage && (result === null || result === undefined)) {
             if (providers.storage.hasOwnProperty(storage)) {
               var provider = new providers.storage[storage](this);
               return provider.uploadFile(file, fileName, dir, progressCallback);
@@ -1257,7 +1257,7 @@ Formio.prototype.uploadFile = function(storage, file, fileName, dir, progressCal
               throw('Storage provider not found');
             }
           }
-          return result;
+          return result || {url: ''};
         }.bind(this));
     }.bind(this));
 
@@ -1274,7 +1274,7 @@ Formio.prototype.downloadFile = function(file) {
     .then(function() {
       return pluginGet('fileRequest', requestArgs)
         .then(function(result) {
-          if (result === null || result === undefined) {
+          if (file.storage && (result === null || result === undefined)) {
             if (providers.storage.hasOwnProperty(file.storage)) {
               var provider = new providers.storage[file.storage](this);
               return provider.downloadFile(file);
@@ -1283,7 +1283,7 @@ Formio.prototype.downloadFile = function(file) {
               throw('Storage provider not found');
             }
           }
-          return result;
+          return result || {url: ''};
         }.bind(this));
     }.bind(this));
 
@@ -1360,7 +1360,7 @@ Formio.request = function(url, method, data) {
       .catch(function(err) {
         err.message = 'Could not connect to API server (' + err.message + ')';
         err.networkError = true;
-        reject(err);
+        throw err;
       })
       .then(function(response) {
         // Handle fetch results
@@ -2326,7 +2326,7 @@ var isArray = Array.isArray || function (xs) {
 };
 
 },{}],11:[function(require,module,exports){
-(function() {
+(function(self) {
   'use strict';
 
   if (self.fetch) {
@@ -2335,7 +2335,7 @@ var isArray = Array.isArray || function (xs) {
 
   function normalizeName(name) {
     if (typeof name !== 'string') {
-      name = name.toString();
+      name = String(name)
     }
     if (/[^a-z0-9\-#$%&'*+.\^_`|~]/i.test(name)) {
       throw new TypeError('Invalid character in header field name')
@@ -2345,7 +2345,7 @@ var isArray = Array.isArray || function (xs) {
 
   function normalizeValue(value) {
     if (typeof value !== 'string') {
-      value = value.toString();
+      value = String(value)
     }
     return value
   }
@@ -2438,13 +2438,14 @@ var isArray = Array.isArray || function (xs) {
   var support = {
     blob: 'FileReader' in self && 'Blob' in self && (function() {
       try {
-        new Blob();
+        new Blob()
         return true
       } catch(e) {
         return false
       }
     })(),
-    formData: 'FormData' in self
+    formData: 'FormData' in self,
+    arrayBuffer: 'ArrayBuffer' in self
   }
 
   function Body() {
@@ -2461,8 +2462,19 @@ var isArray = Array.isArray || function (xs) {
         this._bodyFormData = body
       } else if (!body) {
         this._bodyText = ''
+      } else if (support.arrayBuffer && ArrayBuffer.prototype.isPrototypeOf(body)) {
+        // Only support ArrayBuffers for POST method.
+        // Receiving ArrayBuffers happens via Blobs, instead.
       } else {
         throw new Error('unsupported BodyInit type')
+      }
+
+      if (!this.headers.get('content-type')) {
+        if (typeof body === 'string') {
+          this.headers.set('content-type', 'text/plain;charset=UTF-8')
+        } else if (this._bodyBlob && this._bodyBlob.type) {
+          this.headers.set('content-type', this._bodyBlob.type)
+        }
       }
     }
 
@@ -2528,20 +2540,44 @@ var isArray = Array.isArray || function (xs) {
     return (methods.indexOf(upcased) > -1) ? upcased : method
   }
 
-  function Request(url, options) {
+  function Request(input, options) {
     options = options || {}
-    this.url = url
+    var body = options.body
+    if (Request.prototype.isPrototypeOf(input)) {
+      if (input.bodyUsed) {
+        throw new TypeError('Already read')
+      }
+      this.url = input.url
+      this.credentials = input.credentials
+      if (!options.headers) {
+        this.headers = new Headers(input.headers)
+      }
+      this.method = input.method
+      this.mode = input.mode
+      if (!body) {
+        body = input._bodyInit
+        input.bodyUsed = true
+      }
+    } else {
+      this.url = input
+    }
 
-    this.credentials = options.credentials || 'omit'
-    this.headers = new Headers(options.headers)
-    this.method = normalizeMethod(options.method || 'GET')
-    this.mode = options.mode || null
+    this.credentials = options.credentials || this.credentials || 'omit'
+    if (options.headers || !this.headers) {
+      this.headers = new Headers(options.headers)
+    }
+    this.method = normalizeMethod(options.method || this.method || 'GET')
+    this.mode = options.mode || this.mode || null
     this.referrer = null
 
-    if ((this.method === 'GET' || this.method === 'HEAD') && options.body) {
+    if ((this.method === 'GET' || this.method === 'HEAD') && body) {
       throw new TypeError('Body not allowed for GET or HEAD requests')
     }
-    this._initBody(options.body)
+    this._initBody(body)
+  }
+
+  Request.prototype.clone = function() {
+    return new Request(this)
   }
 
   function decode(body) {
@@ -2559,7 +2595,7 @@ var isArray = Array.isArray || function (xs) {
 
   function headers(xhr) {
     var head = new Headers()
-    var pairs = xhr.getAllResponseHeaders().trim().split('\n')
+    var pairs = (xhr.getAllResponseHeaders() || '').trim().split('\n')
     pairs.forEach(function(header) {
       var split = header.trim().split(':')
       var key = split.shift().trim()
@@ -2576,32 +2612,55 @@ var isArray = Array.isArray || function (xs) {
       options = {}
     }
 
-    this._initBody(bodyInit)
     this.type = 'default'
-    this.url = null
     this.status = options.status
     this.ok = this.status >= 200 && this.status < 300
     this.statusText = options.statusText
     this.headers = options.headers instanceof Headers ? options.headers : new Headers(options.headers)
     this.url = options.url || ''
+    this._initBody(bodyInit)
   }
 
   Body.call(Response.prototype)
 
-  self.Headers = Headers;
-  self.Request = Request;
-  self.Response = Response;
+  Response.prototype.clone = function() {
+    return new Response(this._bodyInit, {
+      status: this.status,
+      statusText: this.statusText,
+      headers: new Headers(this.headers),
+      url: this.url
+    })
+  }
 
-  self.fetch = function(input, init) {
-    // TODO: Request constructor should accept input, init
-    var request
-    if (Request.prototype.isPrototypeOf(input) && !init) {
-      request = input
-    } else {
-      request = new Request(input, init)
+  Response.error = function() {
+    var response = new Response(null, {status: 0, statusText: ''})
+    response.type = 'error'
+    return response
+  }
+
+  var redirectStatuses = [301, 302, 303, 307, 308]
+
+  Response.redirect = function(url, status) {
+    if (redirectStatuses.indexOf(status) === -1) {
+      throw new RangeError('Invalid status code')
     }
 
+    return new Response(null, {status: status, headers: {location: url}})
+  }
+
+  self.Headers = Headers
+  self.Request = Request
+  self.Response = Response
+
+  self.fetch = function(input, init) {
     return new Promise(function(resolve, reject) {
+      var request
+      if (Request.prototype.isPrototypeOf(input) && !init) {
+        request = input
+      } else {
+        request = new Request(input, init)
+      }
+
       var xhr = new XMLHttpRequest()
 
       function responseURL() {
@@ -2614,7 +2673,7 @@ var isArray = Array.isArray || function (xs) {
           return xhr.getResponseHeader('X-Request-URL')
         }
 
-        return;
+        return
       }
 
       xhr.onload = function() {
@@ -2629,11 +2688,15 @@ var isArray = Array.isArray || function (xs) {
           headers: headers(xhr),
           url: responseURL()
         }
-        var body = 'response' in xhr ? xhr.response : xhr.responseText;
+        var body = 'response' in xhr ? xhr.response : xhr.responseText
         resolve(new Response(body, options))
       }
 
       xhr.onerror = function() {
+        reject(new TypeError('Network request failed'))
+      }
+
+      xhr.ontimeout = function() {
         reject(new TypeError('Network request failed'))
       }
 
@@ -2655,7 +2718,7 @@ var isArray = Array.isArray || function (xs) {
     })
   }
   self.fetch.polyfill = true
-})();
+})(typeof self !== 'undefined' ? self : this);
 
 },{}],12:[function(require,module,exports){
 "use strict";
