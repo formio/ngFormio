@@ -38,7 +38,7 @@ else {
   }
 }
 // Force portal and server to match protocols if not on localhost.
-if (apiProtocol !== protocol && ['localhost', 'lvh.me', 'portal.lvh.me'].indexOf(window.location.hostname) === -1) {
+if (apiProtocol !== protocol && ['localhost', 'portal.localhost', 'lvh.me', 'portal.lvh.me'].indexOf(window.location.hostname) === -1) {
   var url = apiProtocol
     + "//"
     + window.location.host
