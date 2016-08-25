@@ -53,7 +53,8 @@ angular
           url: '/auth',
           views: {
             '': {
-              templateUrl: 'views/user/auth.html'
+              templateUrl: 'views/user/auth.html',
+              controller: 'UserAuthController'
             },
             'login@auth': {
               templateUrl: 'views/user/login.html',
