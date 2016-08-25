@@ -26,19 +26,6 @@ if (environment) {
   var parts = environment.url.split('://');
   apiProtocol = parts[0] + ':';
   serverHost = parts[1];
-  // Force portal and server to match protocols if not on localhost.
-  if (apiProtocol !== protocol && ['localhost', 'lvh.me', 'portal.lvh.me'].indexOf(window.location.hostname) === -1) {
-    var url = apiProtocol
-      + "//"
-      + window.location.host
-      + window.location.pathname
-      + '?' + Qs.stringify({
-        environments: JSON.parse(localStorage.getItem('environments')),
-        currentEnvironment: JSON.parse(localStorage.getItem('currentEnvironment'))
-      })
-      + window.location.hash;
-    window.location.href = url;
-  }
 }
 else {
   serverHost = host;
@@ -49,6 +36,19 @@ else {
     parts.shift();
     serverHost = parts.join('.');
   }
+}
+// Force portal and server to match protocols if not on localhost.
+if (apiProtocol !== protocol && ['localhost', 'lvh.me', 'portal.lvh.me'].indexOf(window.location.hostname) === -1) {
+  var url = apiProtocol
+    + "//"
+    + window.location.host
+    + window.location.pathname
+    + '?' + Qs.stringify({
+      environments: JSON.parse(localStorage.getItem('environments')),
+      currentEnvironment: JSON.parse(localStorage.getItem('currentEnvironment'))
+    })
+    + window.location.hash;
+  window.location.href = url;
 }
 var appBase = protocol + '//' + host;
 var apiBase = apiProtocol + '//api.' + serverHost;
