@@ -2,9 +2,10 @@
 var query = Qs.parse(window.location.search.substr(1));
 if (query.hasOwnProperty('environments') && query.hasOwnProperty('currentEnvironment')) {
   localStorage.setItem('environments', JSON.stringify(query.environments));
-  delete query.environments;
   localStorage.setItem('currentEnvironment', JSON.stringify(query.currentEnvironment));
-  delete query.currentEnvironment;
+  // Ensure they are logged out since we are switching environments
+  localStorage.removeItem('formioToken');
+  localStorage.removeItem('formioUser');
   // Rebuild the window url and replace without the environment querystrings.
   if (history.replaceState) {
     var url = window.location.protocol
