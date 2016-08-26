@@ -11,6 +11,7 @@ module.exports = function(config) {
   // Global timeout for wait* commands.
   var timeout = 10000;
   var state = {};
+  var projects = {};
 
   /**
    * Wrap the string function for usernames.
@@ -305,11 +306,28 @@ module.exports = function(config) {
           'x-jwt-token': res.value
         }
       }, function(err, response, body) {
-        handleResponse(driver, err, response, body, next);
+        handleResponse(driver, err, response, body, function(err, result) {
+          if (err) {
+            next(err);
+          }
+          // Save the project
+          projects[title] = result;
+          next(null, result);
+        });
       });
     })
     .catch(next);
   };
+
+  /**
+   * Get a project from the temporary cache.
+   */
+  var getProject = function(title, next) {
+    if (!projects[title]) {
+      next('Project not found');
+    }
+    next(null, projects[title]);
+  }
 
   var library = English.library()
     .given('I am (?:on|at) (?:the )?(.+?)(?: page)?$', function(url, next) {
@@ -321,6 +339,18 @@ module.exports = function(config) {
           next();
         })
         .catch(next);
+    })
+    .given('I am (?:on|at) (?:the )?$TITLE project overview page', function(title, next) {
+      title = replacements(title);
+      var driver = this.driver;
+      getProject(title, function(err, project) {
+        var path = config.baseUrl + '/#/project/' + project._id + '/overview';
+        driver.url(path)
+          .then(function() {
+            next();
+          })
+          .catch(next);
+      });
     })
     .given('an account exists with the username $USERNAME, email $EMAIL and password $PASSWORD', function(username, email, password, next) {
       username = replacements(username);
@@ -428,6 +458,17 @@ module.exports = function(config) {
         .waitForVisible(element, timeout)
         .click(element)
         .then(next)
+        .catch(next);
+    })
+    .when('I select $text in $element', function(text, element, next){
+      var driver = this.driver;
+      driver.waitForExist(element)
+        .click(element)
+        .click('*=' + text)
+        .then(function() {
+          //driver.selectByVisibleText(element, text);
+          next();
+        })
         .catch(next);
     })
     .when('I enter $TEXT in the $FIELD field', function(text, field, next) {
@@ -707,9 +748,9 @@ module.exports = function(config) {
         next(null, res);
       });
     })
-    .then('I see the application creation modal', function(next) {
+    .then('I see the $element modal', function(element, next) {
       var driver = this.driver;
-      driver.waitForVisible('//div[@id="project-welcome-modal"]', timeout)
+      driver.waitForVisible(element, timeout)
         .then(function() {
           return next();
         })
