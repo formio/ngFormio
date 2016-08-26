@@ -179,6 +179,21 @@ module.exports = function(app) {
             case 'json':
               try {
                 $scope.selectItems = angular.fromJson(settings.data.json);
+
+                if (selectValues) {
+                  // Allow dot notation in the selectValue property.
+                  if (selectValues.indexOf('.') !== -1) {
+                    var parts = selectValues.split('.');
+                    var select = $scope.selectItems;
+                    for (var i in parts) {
+                      select = select[parts[i]];
+                    }
+                    $scope.selectItems = select;
+                  }
+                  else {
+                    $scope.selectItems = $scope.selectItems[selectValues];
+                  }
+                }
               }
               catch (error) {
                 $scope.selectItems = [];
