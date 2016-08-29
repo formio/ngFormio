@@ -20,6 +20,11 @@ body {
   text-overflow: ellipsis;
 }
 
+.btn-light {
+  background-color: #fff;
+  border-color: #ddd;
+}
+
 .btn-file {
   position: relative;
   overflow: hidden;
@@ -243,7 +248,7 @@ li.user-dropdown a {
   margin-top: 0;
 }
 
-$project-header-color: lighten($brand-primary, 55%);
+$project-header-color: #eee;
 
 .welcome-info-strip {
   background-color: darken($brand-primary, 25%);
@@ -270,6 +275,10 @@ $project-header-color: lighten($brand-primary, 55%);
     float: left;
     margin-right: 10px;
   }
+}
+
+.new-project-row-min {
+  background-color: darken($brand-primary, 15%);
 }
 
 .project-template-item {
@@ -343,7 +352,7 @@ $project-header-color: lighten($brand-primary, 55%);
 .navbar {
   border-radius: 0;
   margin-bottom: 0;
-  background-color: lighten($brand-primary, 57%);
+  background-color: #eee;
 }
 
 .navbar-nav {
@@ -354,17 +363,9 @@ $project-header-color: lighten($brand-primary, 55%);
   margin-left: 0;
   width: 6%;
   text-align: center;
-  background-color: darken($brand-primary, 25%);
   li {
     width: 100%;
     a {
-      &:hover {
-        background-color: darken($brand-primary, 20%);
-      }
-      &:focus {
-        background-color: darken($brand-primary, 20%);
-      }
-      color: white;
       padding-bottom: 8px;
       padding-top: 9px;
       i {
@@ -523,13 +524,23 @@ div.project-section-separator {
   height: 31px;
 }
 
+.formio-settings-info {
+  color: #8a6d3b;
+  background-color: #fcf8e3;
+  border-color: #faebcc;
+  h4 {
+    color: #66512c;
+    font-weight: 400;
+  }
+}
+
 .upgrade-plan-header-button {
   padding: 4px 8px;
 }
 
 .form-title {
   margin-left: 0px;
-  margin-top: 0px;
+  margin-top: 8px;
   margin-bottom: 4px;
   font-size: 2em;
 }
@@ -715,6 +726,10 @@ pre code {
     a {
       color: #FFF;
     }
+  }
+
+  form .has-error p {
+     text-align: center;
   }
 
   // Turn error message into box
