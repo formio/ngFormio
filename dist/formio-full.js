@@ -71112,11 +71112,10 @@ module.exports = [
 
         $scope.setLoading = function(_loading) {
           $scope.formLoading = _loading;
-          if (_loading) {
-            angular.element($element.eq(0)[0].querySelector('.formio-loading')).attr('display', 'inherit');
-          }
-          else {
-            angular.element($element.eq(0)[0].querySelector('.formio-loading')).attr('display', 'none');
+          var loadingElement = $element.eq(0);
+          if (loadingElement && loadingElement.length > 0) {
+            loadingElement = angular.element($element.eq(0)[0].querySelector('.formio-loading'));
+            loadingElement.attr('display', _loading ? 'inherit' : 'none');
           }
         };
 
