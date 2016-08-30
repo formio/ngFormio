@@ -1,3 +1,4 @@
+/*eslint max-depth: ["error", 6]*/
 var fs = require('fs');
 module.exports = function(app) {
   app.directive('formioSelectItem', [
