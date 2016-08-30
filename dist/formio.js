@@ -1,5 +1,5 @@
-/*! ng-formio v2.1.12 | https://npmcdn.com/ng-formio@2.1.12/LICENSE.txt */
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+/*! ng-formio v2.1.13 | https://npmcdn.com/ng-formio@2.1.13/LICENSE.txt */
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = {
@@ -161,7 +161,7 @@ module.exports = {
   }
 };
 
-},{}],2:[function(require,module,exports){
+},{}],2:[function(_dereq_,module,exports){
 /*!
  * EventEmitter2
  * https://github.com/hij1nx/EventEmitter2
@@ -888,19 +888,19 @@ module.exports = {
   }
 }();
 
-},{}],3:[function(require,module,exports){
+},{}],3:[function(_dereq_,module,exports){
 'use strict';
 
 // Intentionally use native-promise-only here... Other promise libraries (es6-promise)
 // duck-punch the global Promise definition which messes up Angular 2 since it
 // also duck-punches the global Promise definition. For now, keep native-promise-only.
-var Promise = require("native-promise-only");
+var Promise = _dereq_("native-promise-only");
 
 // Require other libraries.
-require('whatwg-fetch');
-var EventEmitter = require('eventemitter2').EventEmitter2;
-var copy = require('shallow-copy');
-var providers = require('./providers');
+_dereq_('whatwg-fetch');
+var EventEmitter = _dereq_('eventemitter2').EventEmitter2;
+var copy = _dereq_('shallow-copy');
+var providers = _dereq_('./providers');
 
 // The default base url.
 var baseUrl = 'https://api.form.io';
@@ -1648,13 +1648,13 @@ Formio.deregisterPlugin = function(plugin) {
 
 module.exports = Formio;
 
-},{"./providers":4,"eventemitter2":2,"native-promise-only":9,"shallow-copy":10,"whatwg-fetch":11}],4:[function(require,module,exports){
+},{"./providers":4,"eventemitter2":2,"native-promise-only":9,"shallow-copy":10,"whatwg-fetch":11}],4:[function(_dereq_,module,exports){
 module.exports = {
-  storage: require('./storage')
+  storage: _dereq_('./storage')
 };
 
-},{"./storage":6}],5:[function(require,module,exports){
-var Promise = require("native-promise-only");
+},{"./storage":6}],5:[function(_dereq_,module,exports){
+var Promise = _dereq_("native-promise-only");
 var dropbox = function(formio) {
   return {
     uploadFile: function(file, fileName, dir, progressCallback) {
@@ -1721,15 +1721,15 @@ module.exports = dropbox;
 
 
 
-},{"native-promise-only":9}],6:[function(require,module,exports){
+},{"native-promise-only":9}],6:[function(_dereq_,module,exports){
 module.exports = {
-  dropbox: require('./dropbox.js'),
-  s3: require('./s3.js'),
-  url: require('./url.js'),
+  dropbox: _dereq_('./dropbox.js'),
+  s3: _dereq_('./s3.js'),
+  url: _dereq_('./url.js'),
 };
 
-},{"./dropbox.js":5,"./s3.js":7,"./url.js":8}],7:[function(require,module,exports){
-var Promise = require("native-promise-only");
+},{"./dropbox.js":5,"./s3.js":7,"./url.js":8}],7:[function(_dereq_,module,exports){
+var Promise = _dereq_("native-promise-only");
 var s3 = function(formio) {
   return {
     uploadFile: function(file, fileName, dir, progressCallback) {
@@ -1845,8 +1845,8 @@ s3.title = 'S3';
 s3.name = 's3';
 module.exports = s3;
 
-},{"native-promise-only":9}],8:[function(require,module,exports){
-var Promise = require("native-promise-only");
+},{"native-promise-only":9}],8:[function(_dereq_,module,exports){
+var Promise = _dereq_("native-promise-only");
 var url = function(formio) {
   return {
     title: 'Url',
@@ -1911,7 +1911,7 @@ url.name = 'url';
 url.title = 'Url';
 module.exports = url;
 
-},{"native-promise-only":9}],9:[function(require,module,exports){
+},{"native-promise-only":9}],9:[function(_dereq_,module,exports){
 (function (global){
 /*! Native Promise Only
     v0.8.1 (c) Kyle Simpson
@@ -2288,7 +2288,7 @@ module.exports = url;
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],10:[function(require,module,exports){
+},{}],10:[function(_dereq_,module,exports){
 module.exports = function (obj) {
     if (!obj || typeof obj !== 'object') return obj;
     
@@ -2325,7 +2325,7 @@ var isArray = Array.isArray || function (xs) {
     return {}.toString.call(xs) === '[object Array]';
 };
 
-},{}],11:[function(require,module,exports){
+},{}],11:[function(_dereq_,module,exports){
 (function(self) {
   'use strict';
 
@@ -2720,7 +2720,7 @@ var isArray = Array.isArray || function (xs) {
   self.fetch.polyfill = true
 })(typeof self !== 'undefined' ? self : this);
 
-},{}],12:[function(require,module,exports){
+},{}],12:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -2806,7 +2806,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],13:[function(require,module,exports){
+},{}],13:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -2967,7 +2967,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],14:[function(require,module,exports){
+},{}],14:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -3021,7 +3021,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],15:[function(require,module,exports){
+},{}],15:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -3054,7 +3054,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],16:[function(require,module,exports){
+},{}],16:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.provider('formioComponents', function() {
@@ -3114,7 +3114,7 @@ module.exports = function(app) {
   }]);
 };
 
-},{}],17:[function(require,module,exports){
+},{}],17:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -3158,7 +3158,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],18:[function(require,module,exports){
+},{}],18:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -3186,7 +3186,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],19:[function(require,module,exports){
+},{}],19:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -3294,7 +3294,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],20:[function(require,module,exports){
+},{}],20:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -3319,7 +3319,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],21:[function(require,module,exports){
+},{}],21:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -3410,7 +3410,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],22:[function(require,module,exports){
+},{}],22:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -3497,7 +3497,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],23:[function(require,module,exports){
+},{}],23:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -3529,7 +3529,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],24:[function(require,module,exports){
+},{}],24:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -3564,7 +3564,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],25:[function(require,module,exports){
+},{}],25:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -3771,7 +3771,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],26:[function(require,module,exports){
+},{}],26:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -3804,7 +3804,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],27:[function(require,module,exports){
+},{}],27:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -3883,48 +3883,48 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],28:[function(require,module,exports){
+},{}],28:[function(_dereq_,module,exports){
 "use strict";
 var app = angular.module('formio');
 
 // Basic
-require('./components')(app);
-require('./textfield')(app);
-require('./number')(app);
-require('./password')(app);
-require('./textarea')(app);
-require('./checkbox')(app);
-require('./selectboxes')(app);
-require('./select')(app);
-require('./radio')(app);
-require('./htmlelement')(app);
-require('./content')(app);
-require('./button')(app);
+_dereq_('./components')(app);
+_dereq_('./textfield')(app);
+_dereq_('./number')(app);
+_dereq_('./password')(app);
+_dereq_('./textarea')(app);
+_dereq_('./checkbox')(app);
+_dereq_('./selectboxes')(app);
+_dereq_('./select')(app);
+_dereq_('./radio')(app);
+_dereq_('./htmlelement')(app);
+_dereq_('./content')(app);
+_dereq_('./button')(app);
 
 // Special
-require('./email')(app);
-require('./phonenumber')(app);
-require('./address')(app);
-require('./datetime')(app);
-require('./currency')(app);
-require('./hidden')(app);
-require('./resource')(app);
-require('./file')(app);
-require('./signature')(app);
-require('./custom')(app);
-require('./datagrid')(app);
-require('./survey')(app);
+_dereq_('./email')(app);
+_dereq_('./phonenumber')(app);
+_dereq_('./address')(app);
+_dereq_('./datetime')(app);
+_dereq_('./currency')(app);
+_dereq_('./hidden')(app);
+_dereq_('./resource')(app);
+_dereq_('./file')(app);
+_dereq_('./signature')(app);
+_dereq_('./custom')(app);
+_dereq_('./datagrid')(app);
+_dereq_('./survey')(app);
 
 // Layout
-require('./columns')(app);
-require('./fieldset')(app);
-require('./container')(app);
-require('./page')(app);
-require('./panel')(app);
-require('./table')(app);
-require('./well')(app);
+_dereq_('./columns')(app);
+_dereq_('./fieldset')(app);
+_dereq_('./container')(app);
+_dereq_('./page')(app);
+_dereq_('./panel')(app);
+_dereq_('./table')(app);
+_dereq_('./well')(app);
 
-},{"./address":12,"./button":13,"./checkbox":14,"./columns":15,"./components":16,"./container":17,"./content":18,"./currency":19,"./custom":20,"./datagrid":21,"./datetime":22,"./email":23,"./fieldset":24,"./file":25,"./hidden":26,"./htmlelement":27,"./number":29,"./page":30,"./panel":31,"./password":32,"./phonenumber":33,"./radio":34,"./resource":35,"./select":36,"./selectboxes":37,"./signature":38,"./survey":39,"./table":40,"./textarea":41,"./textfield":42,"./well":43}],29:[function(require,module,exports){
+},{"./address":12,"./button":13,"./checkbox":14,"./columns":15,"./components":16,"./container":17,"./content":18,"./currency":19,"./custom":20,"./datagrid":21,"./datetime":22,"./email":23,"./fieldset":24,"./file":25,"./hidden":26,"./htmlelement":27,"./number":29,"./page":30,"./panel":31,"./password":32,"./phonenumber":33,"./radio":34,"./resource":35,"./select":36,"./selectboxes":37,"./signature":38,"./survey":39,"./table":40,"./textarea":41,"./textfield":42,"./well":43}],29:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -3981,7 +3981,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],30:[function(require,module,exports){
+},{}],30:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -4007,7 +4007,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],31:[function(require,module,exports){
+},{}],31:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -4042,7 +4042,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],32:[function(require,module,exports){
+},{}],32:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -4071,7 +4071,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],33:[function(require,module,exports){
+},{}],33:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -4104,7 +4104,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],34:[function(require,module,exports){
+},{}],34:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -4153,7 +4153,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],35:[function(require,module,exports){
+},{}],35:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -4278,8 +4278,9 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],36:[function(require,module,exports){
+},{}],36:[function(_dereq_,module,exports){
 "use strict";
+/*eslint max-depth: ["error", 6]*/
 
 module.exports = function(app) {
   app.directive('formioSelectItem', [
@@ -4415,6 +4416,7 @@ module.exports = function(app) {
           $scope.nowrap = true;
           $scope.hasNextPage = false;
           $scope.selectItems = [];
+          var selectValues = $scope.component.selectValues;
           var valueProp = $scope.component.valueProperty;
           $scope.getSelectItem = function(item) {
             if (!item) {
@@ -4460,6 +4462,21 @@ module.exports = function(app) {
             case 'json':
               try {
                 $scope.selectItems = angular.fromJson(settings.data.json);
+
+                if (selectValues) {
+                  // Allow dot notation in the selectValue property.
+                  if (selectValues.indexOf('.') !== -1) {
+                    var parts = selectValues.split('.');
+                    var select = $scope.selectItems;
+                    for (var i in parts) {
+                      select = select[parts[i]];
+                    }
+                    $scope.selectItems = select;
+                  }
+                  else {
+                    $scope.selectItems = $scope.selectItems[selectValues];
+                  }
+                }
               }
               catch (error) {
                 $scope.selectItems = [];
@@ -4536,6 +4553,11 @@ module.exports = function(app) {
 
                   // Set the new result.
                   var setResult = function(data) {
+                    // coerce the data into an array.
+                    if (!(data instanceof Array)) {
+                      data = [data];
+                    }
+
                     if (data.length < options.params.limit) {
                       $scope.hasNextPage = false;
                     }
@@ -4551,12 +4573,18 @@ module.exports = function(app) {
                   $http.get(newUrl, options).then(function(result) {
                     var data = result.data;
                     if (data) {
-                      if (data.hasOwnProperty('data')) {
+                      // If the selectValue prop is defined, use it.
+                      if (selectValues && data.hasOwnProperty(selectValues)) {
+                        setResult(data[selectValues]);
+                      }
+                      // Attempt to default to the formio settings for a resource.
+                      else if (data.hasOwnProperty('data')) {
                         setResult(data.data);
                       }
                       else if (data.hasOwnProperty('items')) {
                         setResult(data.items);
                       }
+                      // Use the data itself.
                       else {
                         setResult(data);
                       }
@@ -4617,7 +4645,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],37:[function(require,module,exports){
+},{}],37:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -4721,7 +4749,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],38:[function(require,module,exports){
+},{}],38:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -4776,9 +4804,10 @@ module.exports = function(app) {
 
         // Sets the dimension of a width or height.
         var setDimension = function(dim) {
+          var param = (dim === 'width') ? 'clientWidth' : 'clientHeight';
           if (scope.component[dim].slice(-1) === '%') {
             var percent = parseFloat(scope.component[dim].slice(0, -1)) / 100;
-            element[0][dim] = element.parent()[dim]() * percent;
+            element[0][dim] = element.parent().eq(0)[0][param] * percent;
           }
           else {
             element[0][dim] = parseInt(scope.component[dim], 10);
@@ -4863,7 +4892,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],39:[function(require,module,exports){
+},{}],39:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -4920,7 +4949,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],40:[function(require,module,exports){
+},{}],40:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -4964,7 +4993,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],41:[function(require,module,exports){
+},{}],41:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -5020,7 +5049,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],42:[function(require,module,exports){
+},{}],42:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -5079,7 +5108,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],43:[function(require,module,exports){
+},{}],43:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -5111,7 +5140,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],44:[function(require,module,exports){
+},{}],44:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -5148,7 +5177,7 @@ module.exports = function() {
   };
 };
 
-},{}],45:[function(require,module,exports){
+},{}],45:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -5660,7 +5689,7 @@ module.exports = function() {
   };
 };
 
-},{}],46:[function(require,module,exports){
+},{}],46:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -5824,7 +5853,7 @@ module.exports = [
   }
 ];
 
-},{}],47:[function(require,module,exports){
+},{}],47:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'formioComponents',
@@ -5882,7 +5911,7 @@ module.exports = [
   }
 ];
 
-},{}],48:[function(require,module,exports){
+},{}],48:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -5965,7 +5994,7 @@ module.exports = function() {
   };
 };
 
-},{}],49:[function(require,module,exports){
+},{}],49:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$compile',
@@ -5984,7 +6013,7 @@ module.exports = [
   }
 ];
 
-},{}],50:[function(require,module,exports){
+},{}],50:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -5994,7 +6023,7 @@ module.exports = function() {
   };
 };
 
-},{}],51:[function(require,module,exports){
+},{}],51:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -6009,7 +6038,7 @@ module.exports = function() {
   };
 };
 
-},{}],52:[function(require,module,exports){
+},{}],52:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -6064,7 +6093,7 @@ module.exports = function() {
   };
 };
 
-},{}],53:[function(require,module,exports){
+},{}],53:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -6376,7 +6405,7 @@ module.exports = function() {
   };
 };
 
-},{}],54:[function(require,module,exports){
+},{}],54:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -6431,11 +6460,10 @@ module.exports = [
 
         $scope.setLoading = function(_loading) {
           $scope.formLoading = _loading;
-          if (_loading) {
-            $element.find('.formio-loading').show();
-          }
-          else {
-            $element.find('.formio-loading').hide();
+          var loadingElement = $element.eq(0);
+          if (loadingElement && loadingElement.length > 0) {
+            loadingElement = angular.element($element.eq(0)[0].querySelector('.formio-loading'));
+            loadingElement.attr('display', _loading ? 'inherit' : 'none');
           }
         };
 
@@ -6557,9 +6585,9 @@ module.exports = [
   }
 ];
 
-},{}],55:[function(require,module,exports){
+},{}],55:[function(_dereq_,module,exports){
 "use strict";
-var formioUtils = require('formio-utils');
+var formioUtils = _dereq_('formio-utils');
 
 module.exports = function() {
   return {
@@ -6628,7 +6656,7 @@ module.exports = function() {
   };
 };
 
-},{"formio-utils":1}],56:[function(require,module,exports){
+},{"formio-utils":1}],56:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$q',
@@ -6677,7 +6705,7 @@ module.exports = [
   }
 ];
 
-},{}],57:[function(require,module,exports){
+},{}],57:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -6711,7 +6739,7 @@ module.exports = [
   }
 ];
 
-},{}],58:[function(require,module,exports){
+},{}],58:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'FormioUtils',
@@ -6720,7 +6748,7 @@ module.exports = [
   }
 ];
 
-},{}],59:[function(require,module,exports){
+},{}],59:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$sce',
@@ -6733,7 +6761,7 @@ module.exports = [
   }
 ];
 
-},{}],60:[function(require,module,exports){
+},{}],60:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   function() {
@@ -6752,7 +6780,7 @@ module.exports = [
   }
 ];
 
-},{}],61:[function(require,module,exports){
+},{}],61:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'formioTableView',
@@ -6765,7 +6793,7 @@ module.exports = [
   }
 ];
 
-},{}],62:[function(require,module,exports){
+},{}],62:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -6780,7 +6808,7 @@ module.exports = [
   }
 ];
 
-},{}],63:[function(require,module,exports){
+},{}],63:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$filter',
@@ -6809,7 +6837,7 @@ module.exports = [
   }
 ];
 
-},{}],64:[function(require,module,exports){
+},{}],64:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -6827,48 +6855,48 @@ var app = angular.module('formio', [
 /**
  * Create the formio providers.
  */
-app.provider('Formio', require('./providers/Formio'));
+app.provider('Formio', _dereq_('./providers/Formio'));
 
 /**
  * Provides a way to register the Formio scope.
  */
-app.factory('FormioScope', require('./factories/FormioScope'));
+app.factory('FormioScope', _dereq_('./factories/FormioScope'));
 
-app.factory('FormioUtils', require('./factories/FormioUtils'));
+app.factory('FormioUtils', _dereq_('./factories/FormioUtils'));
 
-app.factory('formioInterceptor', require('./factories/formioInterceptor'));
+app.factory('formioInterceptor', _dereq_('./factories/formioInterceptor'));
 
-app.factory('formioTableView', require('./factories/formioTableView'));
+app.factory('formioTableView', _dereq_('./factories/formioTableView'));
 
-app.directive('formio', require('./directives/formio'));
+app.directive('formio', _dereq_('./directives/formio'));
 
-app.directive('formioDelete', require('./directives/formioDelete'));
+app.directive('formioDelete', _dereq_('./directives/formioDelete'));
 
-app.directive('formioErrors', require('./directives/formioErrors'));
+app.directive('formioErrors', _dereq_('./directives/formioErrors'));
 
-app.directive('customValidator', require('./directives/customValidator'));
+app.directive('customValidator', _dereq_('./directives/customValidator'));
 
-app.directive('formioSubmissions', require('./directives/formioSubmissions'));
+app.directive('formioSubmissions', _dereq_('./directives/formioSubmissions'));
 
-app.directive('formioSubmission', require('./directives/formioSubmission'));
+app.directive('formioSubmission', _dereq_('./directives/formioSubmission'));
 
-app.directive('formioComponent', require('./directives/formioComponent'));
+app.directive('formioComponent', _dereq_('./directives/formioComponent'));
 
-app.directive('formioComponentView', require('./directives/formioComponentView'));
+app.directive('formioComponentView', _dereq_('./directives/formioComponentView'));
 
-app.directive('formioElement', require('./directives/formioElement'));
+app.directive('formioElement', _dereq_('./directives/formioElement'));
 
-app.directive('formioWizard', require('./directives/formioWizard'));
+app.directive('formioWizard', _dereq_('./directives/formioWizard'));
 
 /**
  * Filter to flatten form components.
  */
-app.filter('flattenComponents', require('./filters/flattenComponents'));
-app.filter('tableComponents', require('./filters/tableComponents'));
-app.filter('tableView', require('./filters/tableView'));
-app.filter('tableFieldView', require('./filters/tableFieldView'));
-app.filter('safehtml', require('./filters/safehtml'));
-app.filter('formioTranslate', require('./filters/translate'));
+app.filter('flattenComponents', _dereq_('./filters/flattenComponents'));
+app.filter('tableComponents', _dereq_('./filters/tableComponents'));
+app.filter('tableView', _dereq_('./filters/tableView'));
+app.filter('tableFieldView', _dereq_('./filters/tableFieldView'));
+app.filter('safehtml', _dereq_('./filters/safehtml'));
+app.filter('formioTranslate', _dereq_('./filters/translate'));
 
 app.config([
   '$httpProvider',
@@ -6929,13 +6957,13 @@ app.run([
   }
 ]);
 
-require('./components');
+_dereq_('./components');
 
-},{"./components":28,"./directives/customValidator":44,"./directives/formio":45,"./directives/formioComponent":46,"./directives/formioComponentView":47,"./directives/formioDelete":48,"./directives/formioElement":49,"./directives/formioErrors":50,"./directives/formioSubmission":51,"./directives/formioSubmissions":52,"./directives/formioWizard":53,"./factories/FormioScope":54,"./factories/FormioUtils":55,"./factories/formioInterceptor":56,"./factories/formioTableView":57,"./filters/flattenComponents":58,"./filters/safehtml":59,"./filters/tableComponents":60,"./filters/tableFieldView":61,"./filters/tableView":62,"./filters/translate":63,"./providers/Formio":65}],65:[function(require,module,exports){
+},{"./components":28,"./directives/customValidator":44,"./directives/formio":45,"./directives/formioComponent":46,"./directives/formioComponentView":47,"./directives/formioDelete":48,"./directives/formioElement":49,"./directives/formioErrors":50,"./directives/formioSubmission":51,"./directives/formioSubmissions":52,"./directives/formioWizard":53,"./factories/FormioScope":54,"./factories/FormioUtils":55,"./factories/formioInterceptor":56,"./factories/formioTableView":57,"./filters/flattenComponents":58,"./filters/safehtml":59,"./filters/tableComponents":60,"./filters/tableFieldView":61,"./filters/tableView":62,"./filters/translate":63,"./providers/Formio":65}],65:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   // The formio class.
-  var Formio = require('formiojs');
+  var Formio = _dereq_('formiojs');
 
   // Return the provider interface.
   return {
@@ -6999,4 +7027,5 @@ module.exports = function() {
   };
 };
 
-},{"formiojs":3}]},{},[64]);
+},{"formiojs":3}]},{},[64])(64)
+});

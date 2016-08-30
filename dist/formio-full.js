@@ -1,5 +1,5 @@
-/*! ng-formio v2.1.12 | https://npmcdn.com/ng-formio@2.1.12/LICENSE.txt */
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+/*! ng-formio v2.1.13 | https://npmcdn.com/ng-formio@2.1.13/LICENSE.txt */
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -602,7 +602,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ ])
 });
 ;
-},{}],2:[function(require,module,exports){
+},{}],2:[function(_dereq_,module,exports){
 (function (global){
 /* angular-moment.js / v1.0.0-beta.6 / (c) 2013, 2014, 2015, 2016 Uri Shaked / MIT Licence */
 
@@ -618,7 +618,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function requireMoment() {
 		try {
-			return require('moment'); // Using nw.js or browserify?
+			return _dereq_('moment'); // Using nw.js or browserify?
 		} catch (e) {
 			throw new Error('Please install moment via npm. Please reference to: https://github.com/urish/angular-moment'); // Add wiki/troubleshooting section?
 		}
@@ -627,7 +627,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	function angularMoment(angular, moment) {
 
 		if(typeof moment === 'undefined') {
-			if(typeof require === 'function') {
+			if(typeof _dereq_ === 'function') {
 				moment = requireMoment();
 			}else{
 				throw new Error('Moment cannot be found by angular-moment! Please reference to: https://github.com/urish/angular-moment'); // Add wiki/troubleshooting section?
@@ -1333,7 +1333,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	if (typeof define === 'function' && define.amd) {
 		define(['angular', 'moment'], angularMoment);
 	} else if (typeof module !== 'undefined' && module && module.exports) {
-		angularMoment(require('angular'), require('moment'));
+		angularMoment(_dereq_('angular'), _dereq_('moment'));
 		module.exports = 'angularMoment';
 	} else {
 		angularMoment(angular, (typeof global !== 'undefined' ? global : window).moment);
@@ -1341,7 +1341,7 @@ return /******/ (function(modules) { // webpackBootstrap
 })();
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"angular":10,"moment":34}],3:[function(require,module,exports){
+},{"angular":10,"moment":34}],3:[function(_dereq_,module,exports){
 /**
  * @license AngularJS v1.5.8
  * (c) 2010-2016 Google, Inc. http://angularjs.org
@@ -2081,11 +2081,11 @@ angular.module('ngSanitize').filter('linky', ['$sanitize', function($sanitize) {
 
 })(window, window.angular);
 
-},{}],4:[function(require,module,exports){
-require('./angular-sanitize');
+},{}],4:[function(_dereq_,module,exports){
+_dereq_('./angular-sanitize');
 module.exports = 'ngSanitize';
 
-},{"./angular-sanitize":3}],5:[function(require,module,exports){
+},{"./angular-sanitize":3}],5:[function(_dereq_,module,exports){
 /*
  * angular-ui-bootstrap
  * http://angular-ui.github.io/bootstrap/
@@ -9433,12 +9433,12 @@ angular.module('ui.bootstrap.datepickerPopup').run(function() {!angular.$$csp().
 angular.module('ui.bootstrap.tooltip').run(function() {!angular.$$csp().noInlineStyle && !angular.$$uibTooltipCss && angular.element(document).find('head').prepend('<style type="text/css">[uib-tooltip-popup].tooltip.top-left > .tooltip-arrow,[uib-tooltip-popup].tooltip.top-right > .tooltip-arrow,[uib-tooltip-popup].tooltip.bottom-left > .tooltip-arrow,[uib-tooltip-popup].tooltip.bottom-right > .tooltip-arrow,[uib-tooltip-popup].tooltip.left-top > .tooltip-arrow,[uib-tooltip-popup].tooltip.left-bottom > .tooltip-arrow,[uib-tooltip-popup].tooltip.right-top > .tooltip-arrow,[uib-tooltip-popup].tooltip.right-bottom > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.top-left > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.top-right > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.bottom-left > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.bottom-right > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.left-top > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.left-bottom > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.right-top > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.right-bottom > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.top-left > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.top-right > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.bottom-left > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.bottom-right > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.left-top > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.left-bottom > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.right-top > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.right-bottom > .tooltip-arrow,[uib-popover-popup].popover.top-left > .arrow,[uib-popover-popup].popover.top-right > .arrow,[uib-popover-popup].popover.bottom-left > .arrow,[uib-popover-popup].popover.bottom-right > .arrow,[uib-popover-popup].popover.left-top > .arrow,[uib-popover-popup].popover.left-bottom > .arrow,[uib-popover-popup].popover.right-top > .arrow,[uib-popover-popup].popover.right-bottom > .arrow,[uib-popover-html-popup].popover.top-left > .arrow,[uib-popover-html-popup].popover.top-right > .arrow,[uib-popover-html-popup].popover.bottom-left > .arrow,[uib-popover-html-popup].popover.bottom-right > .arrow,[uib-popover-html-popup].popover.left-top > .arrow,[uib-popover-html-popup].popover.left-bottom > .arrow,[uib-popover-html-popup].popover.right-top > .arrow,[uib-popover-html-popup].popover.right-bottom > .arrow,[uib-popover-template-popup].popover.top-left > .arrow,[uib-popover-template-popup].popover.top-right > .arrow,[uib-popover-template-popup].popover.bottom-left > .arrow,[uib-popover-template-popup].popover.bottom-right > .arrow,[uib-popover-template-popup].popover.left-top > .arrow,[uib-popover-template-popup].popover.left-bottom > .arrow,[uib-popover-template-popup].popover.right-top > .arrow,[uib-popover-template-popup].popover.right-bottom > .arrow{top:auto;bottom:auto;left:auto;right:auto;margin:0;}[uib-popover-popup].popover,[uib-popover-html-popup].popover,[uib-popover-template-popup].popover{display:block !important;}</style>'); angular.$$uibTooltipCss = true; });
 angular.module('ui.bootstrap.timepicker').run(function() {!angular.$$csp().noInlineStyle && !angular.$$uibTimepickerCss && angular.element(document).find('head').prepend('<style type="text/css">.uib-time input{width:50px;}</style>'); angular.$$uibTimepickerCss = true; });
 angular.module('ui.bootstrap.typeahead').run(function() {!angular.$$csp().noInlineStyle && !angular.$$uibTypeaheadCss && angular.element(document).find('head').prepend('<style type="text/css">[uib-typeahead-popup].dropdown-menu{display:block;}</style>'); angular.$$uibTypeaheadCss = true; });
-},{}],6:[function(require,module,exports){
-require('./dist/ui-bootstrap-tpls');
+},{}],6:[function(_dereq_,module,exports){
+_dereq_('./dist/ui-bootstrap-tpls');
 
 module.exports = 'ui.bootstrap';
 
-},{"./dist/ui-bootstrap-tpls":5}],7:[function(require,module,exports){
+},{"./dist/ui-bootstrap-tpls":5}],7:[function(_dereq_,module,exports){
 /*!
  * angular-ui-mask
  * https://github.com/angular-ui/ui-mask
@@ -10214,15 +10214,15 @@ angular.module('ui.mask', [])
         ]);
 
 }());
-},{}],8:[function(require,module,exports){
+},{}],8:[function(_dereq_,module,exports){
 //https://github.com/angular/angular.js/pull/10732
 
-var angular = require('angular');
-var mask = require('./dist/mask');
+var angular = _dereq_('angular');
+var mask = _dereq_('./dist/mask');
 
 module.exports = 'ui.mask';
 
-},{"./dist/mask":7,"angular":10}],9:[function(require,module,exports){
+},{"./dist/mask":7,"angular":10}],9:[function(_dereq_,module,exports){
 /**
  * @license AngularJS v1.5.8
  * (c) 2010-2016 Google, Inc. http://angularjs.org
@@ -17960,17 +17960,17 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
   }
 
   function getDirectiveRequire(directive) {
-    var require = directive.require || (directive.controller && directive.name);
+    var _dereq_ = directive.require || (directive.controller && directive.name);
 
-    if (!isArray(require) && isObject(require)) {
-      forEach(require, function(value, key) {
+    if (!isArray(_dereq_) && isObject(_dereq_)) {
+      forEach(_dereq_, function(value, key) {
         var match = value.match(REQUIRE_PREFIX_REGEXP);
         var name = value.substring(match[0].length);
-        if (!name) require[key] = match[0] + key;
+        if (!name) _dereq_[key] = match[0] + key;
       });
     }
 
-    return require;
+    return _dereq_;
   }
 
   /**
@@ -19499,9 +19499,9 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
 
         // Bind the required controllers to the controller, if `require` is an object and `bindToController` is truthy
         forEach(controllerDirectives, function(controllerDirective, name) {
-          var require = controllerDirective.require;
-          if (controllerDirective.bindToController && !isArray(require) && isObject(require)) {
-            extend(elementControllers[name].instance, getControllers(name, require, $element, elementControllers));
+          var _dereq_ = controllerDirective.require;
+          if (controllerDirective.bindToController && !isArray(_dereq_) && isObject(_dereq_)) {
+            extend(elementControllers[name].instance, getControllers(name, _dereq_, $element, elementControllers));
           }
         });
 
@@ -19613,12 +19613,12 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
       }
     }
 
-    function getControllers(directiveName, require, $element, elementControllers) {
+    function getControllers(directiveName, _dereq_, $element, elementControllers) {
       var value;
 
-      if (isString(require)) {
-        var match = require.match(REQUIRE_PREFIX_REGEXP);
-        var name = require.substring(match[0].length);
+      if (isString(_dereq_)) {
+        var match = _dereq_.match(REQUIRE_PREFIX_REGEXP);
+        var name = _dereq_.substring(match[0].length);
         var inheritType = match[1] || match[3];
         var optional = match[2] === '?';
 
@@ -19642,14 +19642,14 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
               "Controller '{0}', required by directive '{1}', can't be found!",
               name, directiveName);
         }
-      } else if (isArray(require)) {
+      } else if (isArray(_dereq_)) {
         value = [];
-        for (var i = 0, ii = require.length; i < ii; i++) {
-          value[i] = getControllers(directiveName, require[i], $element, elementControllers);
+        for (var i = 0, ii = _dereq_.length; i < ii; i++) {
+          value[i] = getControllers(directiveName, _dereq_[i], $element, elementControllers);
         }
-      } else if (isObject(require)) {
+      } else if (isObject(_dereq_)) {
         value = {};
-        forEach(require, function(controller, property) {
+        forEach(_dereq_, function(controller, property) {
           value[property] = getControllers(directiveName, controller, $element, elementControllers);
         });
       }
@@ -41991,11 +41991,11 @@ $provide.value("$locale", {
 })(window);
 
 !window.angular.$$csp().noInlineStyle && window.angular.element(document.head).prepend('<style type="text/css">@charset "UTF-8";[ng\\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide:not(.ng-hide-animate){display:none !important;}ng\\:form{display:block;}.ng-animate-shim{visibility:hidden;}.ng-anchor{position:absolute;}</style>');
-},{}],10:[function(require,module,exports){
-require('./angular');
+},{}],10:[function(_dereq_,module,exports){
+_dereq_('./angular');
 module.exports = angular;
 
-},{"./angular":9}],11:[function(require,module,exports){
+},{"./angular":9}],11:[function(_dereq_,module,exports){
 // https://github.com/Gillardo/bootstrap-ui-datetime-picker
 // Version: 2.4.3
 // Released: 2016-07-14 
@@ -42656,21 +42656,21 @@ angular.module('ui.bootstrap.datetimepicker').run(['$templateCache', function($t
 
 }]);
 
-},{}],12:[function(require,module,exports){
+},{}],12:[function(_dereq_,module,exports){
 // This file is autogenerated via the `commonjs` Grunt task. You can require() this file in a CommonJS environment.
-require('../../js/transition.js')
-require('../../js/alert.js')
-require('../../js/button.js')
-require('../../js/carousel.js')
-require('../../js/collapse.js')
-require('../../js/dropdown.js')
-require('../../js/modal.js')
-require('../../js/tooltip.js')
-require('../../js/popover.js')
-require('../../js/scrollspy.js')
-require('../../js/tab.js')
-require('../../js/affix.js')
-},{"../../js/affix.js":13,"../../js/alert.js":14,"../../js/button.js":15,"../../js/carousel.js":16,"../../js/collapse.js":17,"../../js/dropdown.js":18,"../../js/modal.js":19,"../../js/popover.js":20,"../../js/scrollspy.js":21,"../../js/tab.js":22,"../../js/tooltip.js":23,"../../js/transition.js":24}],13:[function(require,module,exports){
+_dereq_('../../js/transition.js')
+_dereq_('../../js/alert.js')
+_dereq_('../../js/button.js')
+_dereq_('../../js/carousel.js')
+_dereq_('../../js/collapse.js')
+_dereq_('../../js/dropdown.js')
+_dereq_('../../js/modal.js')
+_dereq_('../../js/tooltip.js')
+_dereq_('../../js/popover.js')
+_dereq_('../../js/scrollspy.js')
+_dereq_('../../js/tab.js')
+_dereq_('../../js/affix.js')
+},{"../../js/affix.js":13,"../../js/alert.js":14,"../../js/button.js":15,"../../js/carousel.js":16,"../../js/collapse.js":17,"../../js/dropdown.js":18,"../../js/modal.js":19,"../../js/popover.js":20,"../../js/scrollspy.js":21,"../../js/tab.js":22,"../../js/tooltip.js":23,"../../js/transition.js":24}],13:[function(_dereq_,module,exports){
 /* ========================================================================
  * Bootstrap: affix.js v3.3.7
  * http://getbootstrap.com/javascript/#affix
@@ -42834,7 +42834,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],14:[function(require,module,exports){
+},{}],14:[function(_dereq_,module,exports){
 /* ========================================================================
  * Bootstrap: alert.js v3.3.7
  * http://getbootstrap.com/javascript/#alerts
@@ -42930,7 +42930,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],15:[function(require,module,exports){
+},{}],15:[function(_dereq_,module,exports){
 /* ========================================================================
  * Bootstrap: button.js v3.3.7
  * http://getbootstrap.com/javascript/#buttons
@@ -43057,7 +43057,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],16:[function(require,module,exports){
+},{}],16:[function(_dereq_,module,exports){
 /* ========================================================================
  * Bootstrap: carousel.js v3.3.7
  * http://getbootstrap.com/javascript/#carousel
@@ -43296,7 +43296,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],17:[function(require,module,exports){
+},{}],17:[function(_dereq_,module,exports){
 /* ========================================================================
  * Bootstrap: collapse.js v3.3.7
  * http://getbootstrap.com/javascript/#collapse
@@ -43510,7 +43510,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],18:[function(require,module,exports){
+},{}],18:[function(_dereq_,module,exports){
 /* ========================================================================
  * Bootstrap: dropdown.js v3.3.7
  * http://getbootstrap.com/javascript/#dropdowns
@@ -43677,7 +43677,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],19:[function(require,module,exports){
+},{}],19:[function(_dereq_,module,exports){
 /* ========================================================================
  * Bootstrap: modal.js v3.3.7
  * http://getbootstrap.com/javascript/#modals
@@ -44018,7 +44018,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],20:[function(require,module,exports){
+},{}],20:[function(_dereq_,module,exports){
 /* ========================================================================
  * Bootstrap: popover.js v3.3.7
  * http://getbootstrap.com/javascript/#popovers
@@ -44128,7 +44128,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],21:[function(require,module,exports){
+},{}],21:[function(_dereq_,module,exports){
 /* ========================================================================
  * Bootstrap: scrollspy.js v3.3.7
  * http://getbootstrap.com/javascript/#scrollspy
@@ -44302,7 +44302,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],22:[function(require,module,exports){
+},{}],22:[function(_dereq_,module,exports){
 /* ========================================================================
  * Bootstrap: tab.js v3.3.7
  * http://getbootstrap.com/javascript/#tabs
@@ -44459,7 +44459,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],23:[function(require,module,exports){
+},{}],23:[function(_dereq_,module,exports){
 /* ========================================================================
  * Bootstrap: tooltip.js v3.3.7
  * http://getbootstrap.com/javascript/#tooltip
@@ -44981,7 +44981,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],24:[function(require,module,exports){
+},{}],24:[function(_dereq_,module,exports){
 /* ========================================================================
  * Bootstrap: transition.js v3.3.7
  * http://getbootstrap.com/javascript/#transitions
@@ -45042,7 +45042,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],25:[function(require,module,exports){
+},{}],25:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = {
@@ -45204,7 +45204,7 @@ module.exports = {
   }
 };
 
-},{}],26:[function(require,module,exports){
+},{}],26:[function(_dereq_,module,exports){
 /*!
  * EventEmitter2
  * https://github.com/hij1nx/EventEmitter2
@@ -45931,19 +45931,19 @@ module.exports = {
   }
 }();
 
-},{}],27:[function(require,module,exports){
+},{}],27:[function(_dereq_,module,exports){
 'use strict';
 
 // Intentionally use native-promise-only here... Other promise libraries (es6-promise)
 // duck-punch the global Promise definition which messes up Angular 2 since it
 // also duck-punches the global Promise definition. For now, keep native-promise-only.
-var Promise = require("native-promise-only");
+var Promise = _dereq_("native-promise-only");
 
 // Require other libraries.
-require('whatwg-fetch');
-var EventEmitter = require('eventemitter2').EventEmitter2;
-var copy = require('shallow-copy');
-var providers = require('./providers');
+_dereq_('whatwg-fetch');
+var EventEmitter = _dereq_('eventemitter2').EventEmitter2;
+var copy = _dereq_('shallow-copy');
+var providers = _dereq_('./providers');
 
 // The default base url.
 var baseUrl = 'https://api.form.io';
@@ -46691,13 +46691,13 @@ Formio.deregisterPlugin = function(plugin) {
 
 module.exports = Formio;
 
-},{"./providers":28,"eventemitter2":26,"native-promise-only":35,"shallow-copy":38,"whatwg-fetch":41}],28:[function(require,module,exports){
+},{"./providers":28,"eventemitter2":26,"native-promise-only":35,"shallow-copy":38,"whatwg-fetch":41}],28:[function(_dereq_,module,exports){
 module.exports = {
-  storage: require('./storage')
+  storage: _dereq_('./storage')
 };
 
-},{"./storage":30}],29:[function(require,module,exports){
-var Promise = require("native-promise-only");
+},{"./storage":30}],29:[function(_dereq_,module,exports){
+var Promise = _dereq_("native-promise-only");
 var dropbox = function(formio) {
   return {
     uploadFile: function(file, fileName, dir, progressCallback) {
@@ -46764,15 +46764,15 @@ module.exports = dropbox;
 
 
 
-},{"native-promise-only":35}],30:[function(require,module,exports){
+},{"native-promise-only":35}],30:[function(_dereq_,module,exports){
 module.exports = {
-  dropbox: require('./dropbox.js'),
-  s3: require('./s3.js'),
-  url: require('./url.js'),
+  dropbox: _dereq_('./dropbox.js'),
+  s3: _dereq_('./s3.js'),
+  url: _dereq_('./url.js'),
 };
 
-},{"./dropbox.js":29,"./s3.js":31,"./url.js":32}],31:[function(require,module,exports){
-var Promise = require("native-promise-only");
+},{"./dropbox.js":29,"./s3.js":31,"./url.js":32}],31:[function(_dereq_,module,exports){
+var Promise = _dereq_("native-promise-only");
 var s3 = function(formio) {
   return {
     uploadFile: function(file, fileName, dir, progressCallback) {
@@ -46888,8 +46888,8 @@ s3.title = 'S3';
 s3.name = 's3';
 module.exports = s3;
 
-},{"native-promise-only":35}],32:[function(require,module,exports){
-var Promise = require("native-promise-only");
+},{"native-promise-only":35}],32:[function(_dereq_,module,exports){
+var Promise = _dereq_("native-promise-only");
 var url = function(formio) {
   return {
     title: 'Url',
@@ -46954,7 +46954,7 @@ url.name = 'url';
 url.title = 'Url';
 module.exports = url;
 
-},{"native-promise-only":35}],33:[function(require,module,exports){
+},{"native-promise-only":35}],33:[function(_dereq_,module,exports){
 /*!
  * jQuery JavaScript Library v2.2.4
  * http://jquery.com/
@@ -56770,7 +56770,7 @@ if ( !noGlobal ) {
 return jQuery;
 }));
 
-},{}],34:[function(require,module,exports){
+},{}],34:[function(_dereq_,module,exports){
 //! moment.js
 //! version : 2.14.1
 //! authors : Tim Wood, Iskren Chernev, Moment.js contributors
@@ -58534,7 +58534,7 @@ return jQuery;
                 module && module.exports) {
             try {
                 oldLocale = globalLocale._abbr;
-                require('./locale/' + name);
+                _dereq_('./locale/' + name);
                 // because defineLocale currently also sets the global locale, we
                 // want to undo that for lazy loaded locales
                 locale_locales__getSetGlobalLocale(oldLocale);
@@ -60966,7 +60966,7 @@ return jQuery;
     return _moment;
 
 }));
-},{}],35:[function(require,module,exports){
+},{}],35:[function(_dereq_,module,exports){
 (function (global){
 /*! Native Promise Only
     v0.8.1 (c) Kyle Simpson
@@ -61343,7 +61343,7 @@ return jQuery;
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],36:[function(require,module,exports){
+},{}],36:[function(_dereq_,module,exports){
 /**!
  * AngularJS file upload directives and services. Supports: file upload/drop/paste, resume, cancel/abort,
  * progress, resize, thumbnail, preview, validation and CORS
@@ -64215,10 +64215,10 @@ ngFileUpload.service('UploadExif', ['UploadResize', '$q', function (UploadResize
 }]);
 
 
-},{}],37:[function(require,module,exports){
-require('./dist/ng-file-upload-all');
+},{}],37:[function(_dereq_,module,exports){
+_dereq_('./dist/ng-file-upload-all');
 module.exports = 'ngFileUpload';
-},{"./dist/ng-file-upload-all":36}],38:[function(require,module,exports){
+},{"./dist/ng-file-upload-all":36}],38:[function(_dereq_,module,exports){
 module.exports = function (obj) {
     if (!obj || typeof obj !== 'object') return obj;
     
@@ -64255,7 +64255,7 @@ var isArray = Array.isArray || function (xs) {
     return {}.toString.call(xs) === '[object Array]';
 };
 
-},{}],39:[function(require,module,exports){
+},{}],39:[function(_dereq_,module,exports){
 (function (root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module unless amdModuleId is set
@@ -64646,7 +64646,7 @@ return SignaturePad;
 
 }));
 
-},{}],40:[function(require,module,exports){
+},{}],40:[function(_dereq_,module,exports){
 /*!
  * ui-select
  * http://github.com/angular-ui/ui-select
@@ -67003,7 +67003,7 @@ $templateCache.put("selectize/choices.tpl.html","<div ng-show=\"$select.open\" c
 $templateCache.put("selectize/match.tpl.html","<div ng-hide=\"$select.searchEnabled && ($select.open || $select.isEmpty())\" class=\"ui-select-match\"><span ng-show=\"!$select.searchEnabled && ($select.isEmpty() || $select.open)\" class=\"ui-select-placeholder text-muted\">{{$select.placeholder}}</span> <span ng-hide=\"$select.isEmpty() || $select.open\" ng-transclude=\"\"></span></div>");
 $templateCache.put("selectize/no-choice.tpl.html","<div class=\"ui-select-no-choice selectize-dropdown\" ng-show=\"$select.items.length == 0\"><div class=\"selectize-dropdown-content\"><div data-selectable=\"\" ng-transclude=\"\"></div></div></div>");
 $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container selectize-control single\" ng-class=\"{\'open\': $select.open}\"><div class=\"selectize-input\" ng-class=\"{\'focus\': $select.open, \'disabled\': $select.disabled, \'selectize-focus\' : $select.focus}\" ng-click=\"$select.open && !$select.searchEnabled ? $select.toggle($event) : $select.activate()\"><div class=\"ui-select-match\"></div><input type=\"search\" autocomplete=\"off\" tabindex=\"-1\" class=\"ui-select-search ui-select-toggle\" ng-class=\"{\'ui-select-search-hidden\':!$select.searchEnabled}\" ng-click=\"$select.toggle($event)\" placeholder=\"{{$select.placeholder}}\" ng-model=\"$select.search\" ng-hide=\"!$select.isEmpty() && !$select.open\" ng-disabled=\"$select.disabled\" aria-label=\"{{ $select.baseTitle }}\"></div><div class=\"ui-select-choices\"></div><div class=\"ui-select-no-choice\"></div></div>");}]);
-},{}],41:[function(require,module,exports){
+},{}],41:[function(_dereq_,module,exports){
 (function(self) {
   'use strict';
 
@@ -67398,7 +67398,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
   self.fetch.polyfill = true
 })(typeof self !== 'undefined' ? self : this);
 
-},{}],42:[function(require,module,exports){
+},{}],42:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -67484,7 +67484,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],43:[function(require,module,exports){
+},{}],43:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -67645,7 +67645,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],44:[function(require,module,exports){
+},{}],44:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -67699,7 +67699,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],45:[function(require,module,exports){
+},{}],45:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -67732,7 +67732,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],46:[function(require,module,exports){
+},{}],46:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.provider('formioComponents', function() {
@@ -67792,7 +67792,7 @@ module.exports = function(app) {
   }]);
 };
 
-},{}],47:[function(require,module,exports){
+},{}],47:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -67836,7 +67836,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],48:[function(require,module,exports){
+},{}],48:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -67864,7 +67864,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],49:[function(require,module,exports){
+},{}],49:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -67972,7 +67972,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],50:[function(require,module,exports){
+},{}],50:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -67997,7 +67997,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],51:[function(require,module,exports){
+},{}],51:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -68088,7 +68088,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],52:[function(require,module,exports){
+},{}],52:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -68175,7 +68175,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],53:[function(require,module,exports){
+},{}],53:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -68207,7 +68207,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],54:[function(require,module,exports){
+},{}],54:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -68242,7 +68242,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],55:[function(require,module,exports){
+},{}],55:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -68449,7 +68449,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],56:[function(require,module,exports){
+},{}],56:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -68482,7 +68482,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],57:[function(require,module,exports){
+},{}],57:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -68561,48 +68561,48 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],58:[function(require,module,exports){
+},{}],58:[function(_dereq_,module,exports){
 "use strict";
 var app = angular.module('formio');
 
 // Basic
-require('./components')(app);
-require('./textfield')(app);
-require('./number')(app);
-require('./password')(app);
-require('./textarea')(app);
-require('./checkbox')(app);
-require('./selectboxes')(app);
-require('./select')(app);
-require('./radio')(app);
-require('./htmlelement')(app);
-require('./content')(app);
-require('./button')(app);
+_dereq_('./components')(app);
+_dereq_('./textfield')(app);
+_dereq_('./number')(app);
+_dereq_('./password')(app);
+_dereq_('./textarea')(app);
+_dereq_('./checkbox')(app);
+_dereq_('./selectboxes')(app);
+_dereq_('./select')(app);
+_dereq_('./radio')(app);
+_dereq_('./htmlelement')(app);
+_dereq_('./content')(app);
+_dereq_('./button')(app);
 
 // Special
-require('./email')(app);
-require('./phonenumber')(app);
-require('./address')(app);
-require('./datetime')(app);
-require('./currency')(app);
-require('./hidden')(app);
-require('./resource')(app);
-require('./file')(app);
-require('./signature')(app);
-require('./custom')(app);
-require('./datagrid')(app);
-require('./survey')(app);
+_dereq_('./email')(app);
+_dereq_('./phonenumber')(app);
+_dereq_('./address')(app);
+_dereq_('./datetime')(app);
+_dereq_('./currency')(app);
+_dereq_('./hidden')(app);
+_dereq_('./resource')(app);
+_dereq_('./file')(app);
+_dereq_('./signature')(app);
+_dereq_('./custom')(app);
+_dereq_('./datagrid')(app);
+_dereq_('./survey')(app);
 
 // Layout
-require('./columns')(app);
-require('./fieldset')(app);
-require('./container')(app);
-require('./page')(app);
-require('./panel')(app);
-require('./table')(app);
-require('./well')(app);
+_dereq_('./columns')(app);
+_dereq_('./fieldset')(app);
+_dereq_('./container')(app);
+_dereq_('./page')(app);
+_dereq_('./panel')(app);
+_dereq_('./table')(app);
+_dereq_('./well')(app);
 
-},{"./address":42,"./button":43,"./checkbox":44,"./columns":45,"./components":46,"./container":47,"./content":48,"./currency":49,"./custom":50,"./datagrid":51,"./datetime":52,"./email":53,"./fieldset":54,"./file":55,"./hidden":56,"./htmlelement":57,"./number":59,"./page":60,"./panel":61,"./password":62,"./phonenumber":63,"./radio":64,"./resource":65,"./select":66,"./selectboxes":67,"./signature":68,"./survey":69,"./table":70,"./textarea":71,"./textfield":72,"./well":73}],59:[function(require,module,exports){
+},{"./address":42,"./button":43,"./checkbox":44,"./columns":45,"./components":46,"./container":47,"./content":48,"./currency":49,"./custom":50,"./datagrid":51,"./datetime":52,"./email":53,"./fieldset":54,"./file":55,"./hidden":56,"./htmlelement":57,"./number":59,"./page":60,"./panel":61,"./password":62,"./phonenumber":63,"./radio":64,"./resource":65,"./select":66,"./selectboxes":67,"./signature":68,"./survey":69,"./table":70,"./textarea":71,"./textfield":72,"./well":73}],59:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -68659,7 +68659,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],60:[function(require,module,exports){
+},{}],60:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -68685,7 +68685,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],61:[function(require,module,exports){
+},{}],61:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -68720,7 +68720,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],62:[function(require,module,exports){
+},{}],62:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -68749,7 +68749,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],63:[function(require,module,exports){
+},{}],63:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -68782,7 +68782,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],64:[function(require,module,exports){
+},{}],64:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -68831,7 +68831,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],65:[function(require,module,exports){
+},{}],65:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -68956,8 +68956,9 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],66:[function(require,module,exports){
+},{}],66:[function(_dereq_,module,exports){
 "use strict";
+/*eslint max-depth: ["error", 6]*/
 
 module.exports = function(app) {
   app.directive('formioSelectItem', [
@@ -69093,6 +69094,7 @@ module.exports = function(app) {
           $scope.nowrap = true;
           $scope.hasNextPage = false;
           $scope.selectItems = [];
+          var selectValues = $scope.component.selectValues;
           var valueProp = $scope.component.valueProperty;
           $scope.getSelectItem = function(item) {
             if (!item) {
@@ -69138,6 +69140,21 @@ module.exports = function(app) {
             case 'json':
               try {
                 $scope.selectItems = angular.fromJson(settings.data.json);
+
+                if (selectValues) {
+                  // Allow dot notation in the selectValue property.
+                  if (selectValues.indexOf('.') !== -1) {
+                    var parts = selectValues.split('.');
+                    var select = $scope.selectItems;
+                    for (var i in parts) {
+                      select = select[parts[i]];
+                    }
+                    $scope.selectItems = select;
+                  }
+                  else {
+                    $scope.selectItems = $scope.selectItems[selectValues];
+                  }
+                }
               }
               catch (error) {
                 $scope.selectItems = [];
@@ -69214,6 +69231,11 @@ module.exports = function(app) {
 
                   // Set the new result.
                   var setResult = function(data) {
+                    // coerce the data into an array.
+                    if (!(data instanceof Array)) {
+                      data = [data];
+                    }
+
                     if (data.length < options.params.limit) {
                       $scope.hasNextPage = false;
                     }
@@ -69229,12 +69251,18 @@ module.exports = function(app) {
                   $http.get(newUrl, options).then(function(result) {
                     var data = result.data;
                     if (data) {
-                      if (data.hasOwnProperty('data')) {
+                      // If the selectValue prop is defined, use it.
+                      if (selectValues && data.hasOwnProperty(selectValues)) {
+                        setResult(data[selectValues]);
+                      }
+                      // Attempt to default to the formio settings for a resource.
+                      else if (data.hasOwnProperty('data')) {
                         setResult(data.data);
                       }
                       else if (data.hasOwnProperty('items')) {
                         setResult(data.items);
                       }
+                      // Use the data itself.
                       else {
                         setResult(data);
                       }
@@ -69295,7 +69323,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],67:[function(require,module,exports){
+},{}],67:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -69399,7 +69427,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],68:[function(require,module,exports){
+},{}],68:[function(_dereq_,module,exports){
 (function (SignaturePad){
 "use strict";
 
@@ -69455,9 +69483,10 @@ module.exports = function(app) {
 
         // Sets the dimension of a width or height.
         var setDimension = function(dim) {
+          var param = (dim === 'width') ? 'clientWidth' : 'clientHeight';
           if (scope.component[dim].slice(-1) === '%') {
             var percent = parseFloat(scope.component[dim].slice(0, -1)) / 100;
-            element[0][dim] = element.parent()[dim]() * percent;
+            element[0][dim] = element.parent().eq(0)[0][param] * percent;
           }
           else {
             element[0][dim] = parseInt(scope.component[dim], 10);
@@ -69542,8 +69571,8 @@ module.exports = function(app) {
   ]);
 };
 
-}).call(this,require("signature_pad"))
-},{"signature_pad":39}],69:[function(require,module,exports){
+}).call(this,_dereq_("signature_pad"))
+},{"signature_pad":39}],69:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -69600,7 +69629,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],70:[function(require,module,exports){
+},{}],70:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -69644,7 +69673,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],71:[function(require,module,exports){
+},{}],71:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -69700,7 +69729,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],72:[function(require,module,exports){
+},{}],72:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -69759,7 +69788,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],73:[function(require,module,exports){
+},{}],73:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -69791,7 +69820,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],74:[function(require,module,exports){
+},{}],74:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -69828,7 +69857,7 @@ module.exports = function() {
   };
 };
 
-},{}],75:[function(require,module,exports){
+},{}],75:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -70340,7 +70369,7 @@ module.exports = function() {
   };
 };
 
-},{}],76:[function(require,module,exports){
+},{}],76:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -70504,7 +70533,7 @@ module.exports = [
   }
 ];
 
-},{}],77:[function(require,module,exports){
+},{}],77:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'formioComponents',
@@ -70562,7 +70591,7 @@ module.exports = [
   }
 ];
 
-},{}],78:[function(require,module,exports){
+},{}],78:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -70645,7 +70674,7 @@ module.exports = function() {
   };
 };
 
-},{}],79:[function(require,module,exports){
+},{}],79:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$compile',
@@ -70664,7 +70693,7 @@ module.exports = [
   }
 ];
 
-},{}],80:[function(require,module,exports){
+},{}],80:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -70674,7 +70703,7 @@ module.exports = function() {
   };
 };
 
-},{}],81:[function(require,module,exports){
+},{}],81:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -70689,7 +70718,7 @@ module.exports = function() {
   };
 };
 
-},{}],82:[function(require,module,exports){
+},{}],82:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -70744,7 +70773,7 @@ module.exports = function() {
   };
 };
 
-},{}],83:[function(require,module,exports){
+},{}],83:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -71056,7 +71085,7 @@ module.exports = function() {
   };
 };
 
-},{}],84:[function(require,module,exports){
+},{}],84:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -71111,11 +71140,10 @@ module.exports = [
 
         $scope.setLoading = function(_loading) {
           $scope.formLoading = _loading;
-          if (_loading) {
-            $element.find('.formio-loading').show();
-          }
-          else {
-            $element.find('.formio-loading').hide();
+          var loadingElement = $element.eq(0);
+          if (loadingElement && loadingElement.length > 0) {
+            loadingElement = angular.element($element.eq(0)[0].querySelector('.formio-loading'));
+            loadingElement.attr('display', _loading ? 'inherit' : 'none');
           }
         };
 
@@ -71237,9 +71265,9 @@ module.exports = [
   }
 ];
 
-},{}],85:[function(require,module,exports){
+},{}],85:[function(_dereq_,module,exports){
 "use strict";
-var formioUtils = require('formio-utils');
+var formioUtils = _dereq_('formio-utils');
 
 module.exports = function() {
   return {
@@ -71308,7 +71336,7 @@ module.exports = function() {
   };
 };
 
-},{"formio-utils":25}],86:[function(require,module,exports){
+},{"formio-utils":25}],86:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$q',
@@ -71357,7 +71385,7 @@ module.exports = [
   }
 ];
 
-},{}],87:[function(require,module,exports){
+},{}],87:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -71391,7 +71419,7 @@ module.exports = [
   }
 ];
 
-},{}],88:[function(require,module,exports){
+},{}],88:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'FormioUtils',
@@ -71400,7 +71428,7 @@ module.exports = [
   }
 ];
 
-},{}],89:[function(require,module,exports){
+},{}],89:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$sce',
@@ -71413,7 +71441,7 @@ module.exports = [
   }
 ];
 
-},{}],90:[function(require,module,exports){
+},{}],90:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   function() {
@@ -71432,7 +71460,7 @@ module.exports = [
   }
 ];
 
-},{}],91:[function(require,module,exports){
+},{}],91:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'formioTableView',
@@ -71445,7 +71473,7 @@ module.exports = [
   }
 ];
 
-},{}],92:[function(require,module,exports){
+},{}],92:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -71460,7 +71488,7 @@ module.exports = [
   }
 ];
 
-},{}],93:[function(require,module,exports){
+},{}],93:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$filter',
@@ -71489,25 +71517,25 @@ module.exports = [
   }
 ];
 
-},{}],94:[function(require,module,exports){
+},{}],94:[function(_dereq_,module,exports){
 (function (global){
 "use strict";
-global.jQuery = require('jquery');
-require('angular');
-require('angular-ui-mask');
-require('ui-select/dist/select');
-require('angular-moment');
-require('angular-sanitize');
-require('signature_pad');
-require('angular-file-saver');
-require('ng-file-upload');
-require('bootstrap');
-require('angular-ui-bootstrap');
-require('bootstrap-ui-datetime-picker/dist/datetime-picker');
-require('./formio');
+global.jQuery = _dereq_('jquery');
+_dereq_('angular');
+_dereq_('angular-ui-mask');
+_dereq_('ui-select/dist/select');
+_dereq_('angular-moment');
+_dereq_('angular-sanitize');
+_dereq_('signature_pad');
+_dereq_('angular-file-saver');
+_dereq_('ng-file-upload');
+_dereq_('bootstrap');
+_dereq_('angular-ui-bootstrap');
+_dereq_('bootstrap-ui-datetime-picker/dist/datetime-picker');
+_dereq_('./formio');
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./formio":95,"angular":10,"angular-file-saver":1,"angular-moment":2,"angular-sanitize":4,"angular-ui-bootstrap":6,"angular-ui-mask":8,"bootstrap":12,"bootstrap-ui-datetime-picker/dist/datetime-picker":11,"jquery":33,"ng-file-upload":37,"signature_pad":39,"ui-select/dist/select":40}],95:[function(require,module,exports){
+},{"./formio":95,"angular":10,"angular-file-saver":1,"angular-moment":2,"angular-sanitize":4,"angular-ui-bootstrap":6,"angular-ui-mask":8,"bootstrap":12,"bootstrap-ui-datetime-picker/dist/datetime-picker":11,"jquery":33,"ng-file-upload":37,"signature_pad":39,"ui-select/dist/select":40}],95:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -71525,48 +71553,48 @@ var app = angular.module('formio', [
 /**
  * Create the formio providers.
  */
-app.provider('Formio', require('./providers/Formio'));
+app.provider('Formio', _dereq_('./providers/Formio'));
 
 /**
  * Provides a way to register the Formio scope.
  */
-app.factory('FormioScope', require('./factories/FormioScope'));
+app.factory('FormioScope', _dereq_('./factories/FormioScope'));
 
-app.factory('FormioUtils', require('./factories/FormioUtils'));
+app.factory('FormioUtils', _dereq_('./factories/FormioUtils'));
 
-app.factory('formioInterceptor', require('./factories/formioInterceptor'));
+app.factory('formioInterceptor', _dereq_('./factories/formioInterceptor'));
 
-app.factory('formioTableView', require('./factories/formioTableView'));
+app.factory('formioTableView', _dereq_('./factories/formioTableView'));
 
-app.directive('formio', require('./directives/formio'));
+app.directive('formio', _dereq_('./directives/formio'));
 
-app.directive('formioDelete', require('./directives/formioDelete'));
+app.directive('formioDelete', _dereq_('./directives/formioDelete'));
 
-app.directive('formioErrors', require('./directives/formioErrors'));
+app.directive('formioErrors', _dereq_('./directives/formioErrors'));
 
-app.directive('customValidator', require('./directives/customValidator'));
+app.directive('customValidator', _dereq_('./directives/customValidator'));
 
-app.directive('formioSubmissions', require('./directives/formioSubmissions'));
+app.directive('formioSubmissions', _dereq_('./directives/formioSubmissions'));
 
-app.directive('formioSubmission', require('./directives/formioSubmission'));
+app.directive('formioSubmission', _dereq_('./directives/formioSubmission'));
 
-app.directive('formioComponent', require('./directives/formioComponent'));
+app.directive('formioComponent', _dereq_('./directives/formioComponent'));
 
-app.directive('formioComponentView', require('./directives/formioComponentView'));
+app.directive('formioComponentView', _dereq_('./directives/formioComponentView'));
 
-app.directive('formioElement', require('./directives/formioElement'));
+app.directive('formioElement', _dereq_('./directives/formioElement'));
 
-app.directive('formioWizard', require('./directives/formioWizard'));
+app.directive('formioWizard', _dereq_('./directives/formioWizard'));
 
 /**
  * Filter to flatten form components.
  */
-app.filter('flattenComponents', require('./filters/flattenComponents'));
-app.filter('tableComponents', require('./filters/tableComponents'));
-app.filter('tableView', require('./filters/tableView'));
-app.filter('tableFieldView', require('./filters/tableFieldView'));
-app.filter('safehtml', require('./filters/safehtml'));
-app.filter('formioTranslate', require('./filters/translate'));
+app.filter('flattenComponents', _dereq_('./filters/flattenComponents'));
+app.filter('tableComponents', _dereq_('./filters/tableComponents'));
+app.filter('tableView', _dereq_('./filters/tableView'));
+app.filter('tableFieldView', _dereq_('./filters/tableFieldView'));
+app.filter('safehtml', _dereq_('./filters/safehtml'));
+app.filter('formioTranslate', _dereq_('./filters/translate'));
 
 app.config([
   '$httpProvider',
@@ -71627,13 +71655,13 @@ app.run([
   }
 ]);
 
-require('./components');
+_dereq_('./components');
 
-},{"./components":58,"./directives/customValidator":74,"./directives/formio":75,"./directives/formioComponent":76,"./directives/formioComponentView":77,"./directives/formioDelete":78,"./directives/formioElement":79,"./directives/formioErrors":80,"./directives/formioSubmission":81,"./directives/formioSubmissions":82,"./directives/formioWizard":83,"./factories/FormioScope":84,"./factories/FormioUtils":85,"./factories/formioInterceptor":86,"./factories/formioTableView":87,"./filters/flattenComponents":88,"./filters/safehtml":89,"./filters/tableComponents":90,"./filters/tableFieldView":91,"./filters/tableView":92,"./filters/translate":93,"./providers/Formio":96}],96:[function(require,module,exports){
+},{"./components":58,"./directives/customValidator":74,"./directives/formio":75,"./directives/formioComponent":76,"./directives/formioComponentView":77,"./directives/formioDelete":78,"./directives/formioElement":79,"./directives/formioErrors":80,"./directives/formioSubmission":81,"./directives/formioSubmissions":82,"./directives/formioWizard":83,"./factories/FormioScope":84,"./factories/FormioUtils":85,"./factories/formioInterceptor":86,"./factories/formioTableView":87,"./filters/flattenComponents":88,"./filters/safehtml":89,"./filters/tableComponents":90,"./filters/tableFieldView":91,"./filters/tableView":92,"./filters/translate":93,"./providers/Formio":96}],96:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   // The formio class.
-  var Formio = require('formiojs');
+  var Formio = _dereq_('formiojs');
 
   // Return the provider interface.
   return {
@@ -71697,4 +71725,5 @@ module.exports = function() {
   };
 };
 
-},{"formiojs":27}]},{},[94]);
+},{"formiojs":27}]},{},[94])(94)
+});

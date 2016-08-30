@@ -1,6 +1,6 @@
 {
   "name": "ng-formio",
-  "version": "2.1.12",
+  "version": "2.1.13",
   "description": "The form redering engine behind Form.IO.",
   "main": "dist/formio.min.js",
   "scripts": {
@@ -19,6 +19,7 @@
     "gulp-concat": "^2.6.0",
     "gulp-cssnano": "^2.1.2",
     "gulp-debug": "^2.1.2",
+    "gulp-derequire": "^2.1.0",
     "gulp-eslint": "^2.0.0",
     "gulp-filter": "^4.0.0",
     "gulp-load-plugins": "^1.2.0",
