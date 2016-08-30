@@ -1,4 +1,4 @@
-/*! ng-formio v2.1.11 | https://npmcdn.com/ng-formio@2.1.11/LICENSE.txt */
+/*! ng-formio v2.1.12 | https://npmcdn.com/ng-formio@2.1.12/LICENSE.txt */
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
@@ -4776,9 +4776,10 @@ module.exports = function(app) {
 
         // Sets the dimension of a width or height.
         var setDimension = function(dim) {
+          var param = (dim === 'width') ? 'clientWidth' : 'clientHeight';
           if (scope.component[dim].slice(-1) === '%') {
             var percent = parseFloat(scope.component[dim].slice(0, -1)) / 100;
-            element[0][dim] = element.parent()[dim]() * percent;
+            element[0][dim] = element.parent().eq(0)[0][param] * percent;
           }
           else {
             element[0][dim] = parseInt(scope.component[dim], 10);
@@ -6432,10 +6433,10 @@ module.exports = [
         $scope.setLoading = function(_loading) {
           $scope.formLoading = _loading;
           if (_loading) {
-            $element.find('.formio-loading').show();
+            angular.element($element.eq(0)[0].querySelector('.formio-loading')).attr('display', 'inherit');
           }
           else {
-            $element.find('.formio-loading').hide();
+            angular.element($element.eq(0)[0].querySelector('.formio-loading')).attr('display', 'none');
           }
         };
 

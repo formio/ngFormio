@@ -52,10 +52,10 @@ module.exports = [
         $scope.setLoading = function(_loading) {
           $scope.formLoading = _loading;
           if (_loading) {
-            $element.find('.formio-loading').show();
+            angular.element($element.eq(0)[0].querySelector('.formio-loading')).attr('display', 'inherit');
           }
           else {
-            $element.find('.formio-loading').hide();
+            angular.element($element.eq(0)[0].querySelector('.formio-loading')).attr('display', 'none');
           }
         };
 

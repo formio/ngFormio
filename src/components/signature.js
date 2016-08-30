@@ -51,9 +51,10 @@ module.exports = function(app) {
 
         // Sets the dimension of a width or height.
         var setDimension = function(dim) {
+          var param = (dim === 'width') ? 'clientWidth' : 'clientHeight';
           if (scope.component[dim].slice(-1) === '%') {
             var percent = parseFloat(scope.component[dim].slice(0, -1)) / 100;
-            element[0][dim] = element.parent()[dim]() * percent;
+            element[0][dim] = element.parent().eq(0)[0][param] * percent;
           }
           else {
             element[0][dim] = parseInt(scope.component[dim], 10);
