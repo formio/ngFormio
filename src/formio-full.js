@@ -1,3 +1,4 @@
+global.jQuery = require('jquery');
 require('angular');
 require('angular-ui-mask');
 require('ui-select/dist/select');

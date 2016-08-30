@@ -3,6 +3,7 @@ module.exports = function(gulp, plugins) {
     return plugins.browserify({
       entries: './src/formio-complete.js',
       debug: false,
+      standalone: 'formio',
       insertGlobalVars: {
         SignaturePad: function() {
           return 'require("signature_pad")';
@@ -12,6 +13,7 @@ module.exports = function(gulp, plugins) {
       .bundle()
       .pipe(plugins.source('formio-complete.js'))
       .pipe(plugins.wrap(plugins.template, {version: plugins.packageJson.version}, {variable: 'data'}))
+      .pipe(plugins.derequire())
       .pipe(gulp.dest('dist/'))
       .pipe(plugins.rename('formio-complete.min.js'))
       .pipe(plugins.streamify(plugins.uglify({preserveComments: 'license'})))
