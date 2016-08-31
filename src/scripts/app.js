@@ -378,6 +378,7 @@ angular
     'Formio',
     'FormioAlerts',
     'FormioProject',
+    'AppConfig',
     'ProjectPlans',
     'ProjectUpgradeDialog',
     '$timeout',
@@ -389,6 +390,7 @@ angular
       Formio,
       FormioAlerts,
       FormioProject,
+      AppConfig,
       ProjectPlans,
       ProjectUpgradeDialog,
       $timeout,
@@ -398,6 +400,7 @@ angular
       $rootScope.activeSideBar = 'home';
       $rootScope.currentProject = null;
       $rootScope.currentForm = null;
+      $rootScope.apiBase = AppConfig.apiBase;
 
       // Determine if the current users can make teams or is a team member.
       $scope.teamsEnabled = false;
