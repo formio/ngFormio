@@ -51,11 +51,6 @@ module.exports = [
 
         $scope.setLoading = function(_loading) {
           $scope.formLoading = _loading;
-          var loadingElement = $element.eq(0);
-          if (loadingElement && loadingElement.length > 0) {
-            loadingElement = angular.element($element.eq(0)[0].querySelector('.formio-loading'));
-            loadingElement.attr('display', _loading ? 'inherit' : 'none');
-          }
         };
 
         // Used to set the form action.
