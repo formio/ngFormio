@@ -4410,7 +4410,7 @@ module.exports = function(app) {
             return value;
           }
         },
-        controller: ['$scope', '$http', 'Formio', '$interpolate', function($scope, $http, Formio, $interpolate) {
+        controller: ['$rootScope', '$scope', '$http', 'Formio', '$interpolate', function($rootScope, $scope, $http, Formio, $interpolate) {
           var settings = $scope.component;
           var options = {cache: true};
           $scope.nowrap = true;
@@ -4528,6 +4528,10 @@ module.exports = function(app) {
                 $scope.hasNextPage = true;
                 $scope.refreshItems = function(input, newUrl, append) {
                   newUrl = newUrl || url;
+                  newUrl = $interpolate(newUrl)({
+                    data: $scope.data,
+                    formioBase: $rootScope.apiBase || 'https://api.form.io'
+                  });
                   if (!newUrl) {
                     return;
                   }
