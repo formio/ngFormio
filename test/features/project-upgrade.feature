@@ -9,7 +9,7 @@ Feature: Project Upgrade Functionality
     And the Submit button is disabled
     When I enter Test Person in the #cardholderName field
     And I enter 4111111111111111 in the #ccNumber field
-    And I select 01 in #ccExpiryMonth
+    And I select 02 in #ccExpiryMonth
     And I select 25 in #ccExpiryYear
     And I enter 123 in the #securityCode field
     When I click the Submit button
