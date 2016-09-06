@@ -464,7 +464,7 @@ module.exports = function(config) {
       var driver = this.driver;
       driver.waitForExist(element)
         .click(element)
-        .pause(50)
+        .waitForExist('*=' + text)
         .click('*=' + text)
         .then(function() {
           //driver.selectByVisibleText(element, text);
