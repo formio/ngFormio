@@ -464,9 +464,8 @@ module.exports = function(config) {
       var driver = this.driver;
       driver.waitForExist(element)
         .click(element)
-        .waitForExist('*=' + text)
-        .pause(500)
-        .click('*=' + text)
+        .waitForExist('=' + text)
+        .click('=' + text)
         .then(next)
         .catch(next);
     })
