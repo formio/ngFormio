@@ -465,11 +465,9 @@ module.exports = function(config) {
       driver.waitForExist(element)
         .click(element)
         .waitForExist('*=' + text)
+        .pause(500)
         .click('*=' + text)
-        .then(function() {
-          //driver.selectByVisibleText(element, text);
-          next();
-        })
+        .then(next)
         .catch(next);
     })
     .when('I enter $TEXT in the $FIELD field', function(text, field, next) {
