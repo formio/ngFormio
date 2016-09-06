@@ -116,7 +116,20 @@ angular.module('formioApp').config([
         }
       });
     }
-  ]).run([
+  ])
+  .directive('formioSettingsInfo', function() {
+    return {
+      restrict: 'E',
+      replace: true,
+      scope: {
+        component: '=',
+        formio: '=',
+        data: '='
+      },
+      templateUrl: 'views/form/formio-settings-info.html'
+    };
+  })
+  .run([
     '$templateCache',
     'FormioUtils',
     function ($templateCache, FormioUtils) {

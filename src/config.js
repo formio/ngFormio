@@ -1,6 +1,24 @@
-/**
- * This config assumes the app and server are running on the same domain.
- */
+// If environment configurations are passed in the querystring, first override existing configurations.
+var query = Qs.parse(window.location.search.substr(1));
+if (query.hasOwnProperty('environments') && query.hasOwnProperty('currentEnvironment')) {
+  localStorage.setItem('environments', JSON.stringify(query.environments));
+  localStorage.setItem('currentEnvironment', JSON.stringify(query.currentEnvironment));
+  // Ensure they are logged out since we are switching environments
+  localStorage.removeItem('formioToken');
+  localStorage.removeItem('formioUser');
+  // Rebuild the window url and replace without the environment querystrings.
+  if (history.replaceState) {
+    var url = window.location.protocol
+      + "//"
+      + window.location.host
+      + window.location.pathname
+      + window.location.hash;
+
+    history.replaceState({page: url}, document.getElementsByTagName('title')[0].innerHTML, url);
+  }
+}
+
+// Finally, get around to configuring the site.
 var host = window.location.host;
 var environment = JSON.parse(localStorage.getItem('currentEnvironment'));
 var protocol = window.location.protocol;
@@ -9,10 +27,6 @@ if (environment) {
   var parts = environment.url.split('://');
   apiProtocol = parts[0] + ':';
   serverHost = parts[1];
-  // Force portal and server to match protocols.
-  if (apiProtocol !== protocol) {
-    window.location.href = apiProtocol + window.location.href.substring(window.location.protocol.length);
-  }
 }
 else {
   serverHost = host;
@@ -23,6 +37,19 @@ else {
     parts.shift();
     serverHost = parts.join('.');
   }
+}
+// Force portal and server to match protocols if not on localhost.
+if (apiProtocol !== protocol && ['localhost', 'portal.localhost', 'lvh.me', 'portal.lvh.me'].indexOf(window.location.hostname) === -1) {
+  var url = apiProtocol
+    + "//"
+    + window.location.host
+    + window.location.pathname
+    + '?' + Qs.stringify({
+      environments: JSON.parse(localStorage.getItem('environments')),
+      currentEnvironment: JSON.parse(localStorage.getItem('currentEnvironment'))
+    })
+    + window.location.hash;
+  window.location.href = url;
 }
 var appBase = protocol + '//' + host;
 var apiBase = apiProtocol + '//api.' + serverHost;

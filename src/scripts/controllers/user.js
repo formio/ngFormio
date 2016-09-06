@@ -2,6 +2,18 @@
 
 var app = angular.module('formioApp.controllers.user', []);
 
+app.controller('UserAuthController', [
+  '$scope',
+  'AppConfig',
+  function(
+    $scope,
+    AppConfig
+  ) {
+    $scope.isFormio = ['form.io', 'test-form.io'].indexOf(AppConfig.serverHost) !== -1;
+    $scope.serverHost = AppConfig.serverHost;
+  }
+]);
+
 app.controller('UserLoginController', [
   '$scope',
   '$state',

@@ -21,8 +21,8 @@
     <link rel="stylesheet" href="/bower_components/angular-ui-select/dist/select.css" />
     <link rel="stylesheet" href="/bower_components/ng-formio/dist/formio.min.css" />
     <link rel="stylesheet" href="/bower_components/ng-ckeditor/ng-ckeditor.css" />
-    <link rel="stylesheet" href="/bower_components/ng-formio-builder/dist/ngFormBuilder.min.css" />
     <link rel="stylesheet" href="/bower_components/ng-tags-input/ng-tags-input.css" />
+    <link rel="stylesheet" href="/bower_components/ng-formio-builder/dist/ngFormBuilder.min.css" />
     <!-- endbower -->
     <!-- endbuild -->
 
@@ -61,7 +61,7 @@
     <div id="content">
       <nav class="navbar navbar-fixed-top">
         <ul id="home-button" class="nav navbar-nav navbar-left navbar-home" ng-if="isActive('project')" ng-cloak>
-          <li><a ui-sref="home"><i class="fa fa-home"></i></a></li>
+          <li><a ui-sref="home" title="Home"><i class="fa fa-home"></i></a></li>
         </ul>
         <div ng-class="{container: !isActive('project')}" ng-cloak>
           <div class="navbar-header">
@@ -71,7 +71,7 @@
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
             </button>
-            <a href="https://form.io" class="navbar-brand">
+            <a ui-sref="home" title="Home" class="navbar-brand">
               <img height="25px;" src="images/formio-logo.png" />
             </a>
           </div>
@@ -255,9 +255,10 @@
     <script src="/bower_components/angular-drag-and-drop-lists/angular-drag-and-drop-lists.js"></script>
     <script src="/bower_components/ckeditor/ckeditor.js"></script>
     <script src="/bower_components/ng-ckeditor/ng-ckeditor.min.js"></script>
-    <script src="/bower_components/ng-formio-builder/dist/ngFormBuilder.min.js"></script>
     <script src="/bower_components/ng-tags-input/ng-tags-input.js"></script>
+    <script src="/bower_components/ng-formio-builder/dist/ngFormBuilder.min.js"></script>
     <script src="/bower_components/chance/chance.js"></script>
+    <script src="/bower_components/qs/dist/qs.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 
@@ -289,7 +290,6 @@
     <!-- inject:js -->
     <script src="scripts/app.js"></script>
     <script src="scripts/components/resourcefields.js"></script>
-    <script src="scripts/utils/utils.js"></script>
     <script src="scripts/controllers/access.js"></script>
     <script src="scripts/controllers/controllers.js"></script>
     <script src="scripts/controllers/environmentSwitcher.js"></script>
@@ -301,6 +301,7 @@
     <script src="scripts/controllers/role.js"></script>
     <script src="scripts/controllers/team.js"></script>
     <script src="scripts/controllers/user.js"></script>
+    <script src="scripts/utils/utils.js"></script>
     <!-- endinject -->
     <!-- endbuild -->
 
