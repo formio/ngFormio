@@ -27,6 +27,7 @@ Feature: Project Upgrade Functionality
     When I click the Upgrade Project link
     And I update the project to the Independent Plan
     And I click the Change plan to Independent button
+    And I am on the ${upgradeProject.title} project overview page
     Then I see #project-plan-display with the text Independent
 
   Scenario: Upgrades to Team Pro
@@ -35,6 +36,7 @@ Feature: Project Upgrade Functionality
     When I click the Upgrade Project link
     And I update the project to the Team Pro Plan
     And I click the Change plan to Team Pro button
+    And I am on the ${upgradeProject.title} project overview page
     Then I see #project-plan-display with the text Team Pro
 
   Scenario: Upgrades to Commercial
@@ -43,6 +45,7 @@ Feature: Project Upgrade Functionality
     When I click the Upgrade Project link
     And I update the project to the Commercial Plan
     And I click the Change plan to Commercial button
+    And I am on the ${upgradeProject.title} project overview page
     Then I see #project-plan-display with the text Commercial
 
   Scenario: Downgrades to Team Pro
@@ -51,6 +54,7 @@ Feature: Project Upgrade Functionality
     When I click the Upgrade Project link
     And I update the project to the Team Pro Plan
     And I click the Change plan to Team Pro button
+    And I am on the ${upgradeProject.title} project overview page
     Then I see #project-plan-display with the text Team Pro
 
   Scenario: Downgrades to Independent
@@ -59,6 +63,7 @@ Feature: Project Upgrade Functionality
     When I click the Upgrade Project link
     And I update the project to the Independent Plan
     And I click the Change plan to Independent button
+    And I am on the ${upgradeProject.title} project overview page
     Then I see #project-plan-display with the text Independent
 
   Scenario: Downgrades to Basic
@@ -67,4 +72,5 @@ Feature: Project Upgrade Functionality
     When I click the Upgrade Project link
     And I update the project to the Basic Plan
     And I click the Change plan to Basic button
+    And I am on the ${upgradeProject.title} project overview page
     Then I see #project-plan-display with the text Basic
