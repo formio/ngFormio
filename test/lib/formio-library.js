@@ -460,11 +460,27 @@ module.exports = function(config) {
         .then(next)
         .catch(next);
     })
-    .when('I select $text in $element', function(text, element, next){
+    .when('I update the project to the $plan', function(plan, next) {
       var driver = this.driver;
-      driver.waitForExist(element)
-        .click(element)
-        .click('*=' + text)
+      driver.waitForExist('//*[contains(@class, "selected-plan")]//h3', timeout)
+        .waitForVisible('//*[contains(@class, "selected-plan")]//h3', timeout)
+        .click('//*[contains(@class, "selected-plan")]//h3')
+        .waitForVisible('//*[contains(@class, "plan-menu")]//*[text()="' + plan + '"]', timeout)
+        .click('//*[contains(@class, "plan-menu")]//*[text()="' + plan + '"]')
+        .then(next)
+        .catch(next);
+    })
+    .when('I select $text in $element', function(text, element, next) {
+      var xpath = element.indexOf('#') !== -1
+        ? '//*[@id="' + (element.split('#'))[1] + '"]'
+        : '//*[contains(@class, "' + element + '")]';
+
+      var driver = this.driver;
+      driver.waitForExist(element, timeout)
+        .waitForVisible(xpath, timeout)
+        .click(xpath)
+        .waitForVisible(xpath + '//*[text()="' + text + '"]', timeout)
+        .click(xpath + '//*[text()="' + text + '"]')
         .then(next)
         .catch(next);
     })

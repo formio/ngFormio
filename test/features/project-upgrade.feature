@@ -25,7 +25,7 @@ Feature: Project Upgrade Functionality
     Given I am logged in for upgradeUser
     And I am on the ${upgradeProject.title} project overview page
     When I click the Upgrade Project link
-    And I select Independent Plan in #ngdialog1-aria-labelledby
+    And I update the project to the Independent Plan
     And I click the Change plan to Independent button
     Then I see #project-plan-display with the text Independent
 
@@ -33,7 +33,7 @@ Feature: Project Upgrade Functionality
     Given I am logged in for upgradeUser
     And I am on the ${upgradeProject.title} project overview page
     When I click the Upgrade Project link
-    And I select Team Pro Plan in #ngdialog1-aria-labelledby
+    And I update the project to the Team Pro Plan
     And I click the Change plan to Team Pro button
     Then I see #project-plan-display with the text Team Pro
 
@@ -41,7 +41,7 @@ Feature: Project Upgrade Functionality
     Given I am logged in for upgradeUser
     And I am on the ${upgradeProject.title} project overview page
     When I click the Upgrade Project link
-    And I select Commercial Plan in #ngdialog1-aria-labelledby
+    And I update the project to the Commercial Plan
     And I click the Change plan to Commercial button
     Then I see #project-plan-display with the text Commercial
 
@@ -49,7 +49,7 @@ Feature: Project Upgrade Functionality
     Given I am logged in for upgradeUser
     And I am on the ${upgradeProject.title} project overview page
     When I click the Upgrade Project link
-    And I select Team Pro Plan in #ngdialog1-aria-labelledby
+    And I update the project to the Team Pro Plan
     And I click the Change plan to Team Pro button
     Then I see #project-plan-display with the text Team Pro
 
@@ -57,7 +57,7 @@ Feature: Project Upgrade Functionality
     Given I am logged in for upgradeUser
     And I am on the ${upgradeProject.title} project overview page
     When I click the Upgrade Project link
-    And I select Independent Plan in #ngdialog1-aria-labelledby
+    And I update the project to the Independent Plan
     And I click the Change plan to Independent button
     Then I see #project-plan-display with the text Independent
 
@@ -65,6 +65,6 @@ Feature: Project Upgrade Functionality
     Given I am logged in for upgradeUser
     And I am on the ${upgradeProject.title} project overview page
     When I click the Upgrade Project link
-    And I select Basic Plan in #ngdialog1-aria-labelledby
+    And I update the project to the Basic Plan
     And I click the Change plan to Basic button
     Then I see #project-plan-display with the text Basic
