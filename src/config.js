@@ -43,13 +43,18 @@ if (apiProtocol !== protocol && ['localhost', 'portal.localhost', 'lvh.me', 'por
   var url = apiProtocol
     + "//"
     + window.location.host
-    + window.location.pathname
-    + '?' + Qs.stringify({
-      environments: JSON.parse(localStorage.getItem('environments')),
-      currentEnvironment: JSON.parse(localStorage.getItem('currentEnvironment'))
-    })
-    + window.location.hash;
-  window.location.href = url;
+    + window.location.pathname;
+
+  // Add environment information if set.
+  if (localStorage.getItem('environments') && localStorage.getItem('currentEnvironment')) {
+    url += '?' + Qs.stringify({
+        environments: JSON.parse(localStorage.getItem('environments')),
+        currentEnvironment: JSON.parse(localStorage.getItem('currentEnvironment'))
+      });
+  }
+  url += window.location.hash;
+
+  window.location.replace(url);
 }
 var appBase = protocol + '//' + host;
 var apiBase = apiProtocol + '//api.' + serverHost;
