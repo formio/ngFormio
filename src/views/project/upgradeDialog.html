@@ -2,9 +2,7 @@
   <div class="col-sm-4 plan-column" ng-class="'plan-column-' + selectedPlan">
     <div class="dropdown">
     <div class="dropdown-toggle selected-plan" data-toggle="dropdown">
-      <h3>
-        {{getPlan(selectedPlan).title}} Plan <i class="fa fa-caret-down"></i>
-      </h3>
+      <h3>{{getPlan(selectedPlan).title}} Plan <i class="fa fa-caret-down"></i></h3>
       <p class="text-muted price-description"><small>{{getPlan(selectedPlan).priceDescription}}</small></p>
     </div>
 
@@ -75,7 +73,7 @@
         </tr>
         <tr>
           <td># of Requests</td>
-          <td class="text-right"><strong>1,000<strong></td>
+          <td class="text-right"><strong>1,000</strong></td>
         </tr>
       </table>
 
@@ -287,48 +285,31 @@
 
   </div>
   <div class="col-sm-8 form-column">
-    <h3><i class="fa fa-credit-card"></i> {{ currentProject.plan === selectedPlan ? 'Current Plan' : (selectedPlan === 'commercial' ? 'Request Upgrade to Commerical Plan' : 'Upgrade Project')}}</h3>
+    <h3><i class="fa fa-credit-card"></i> {{ currentProject.plan === selectedPlan ? 'Keep Current Plan' : 'Change Plan' }}</h3>
     <div ng-if="!paymentInfoLoading && !paymentInfo">
-      <h5 class="text-muted">First, you'll need to enter your credit card info.<br>Don't worry, you won't be charged until the end of the billing cycle.</h5>
+      <h5 class="text-muted">First, you'll need to enter your credit card info.<br>Your first month will be billed on a prorated basis.</h5>
       <formio src="paymentForm" form-action="'/payeezy'"></formio>
     </div>
-    <div ng-if="!paymentInfoLoading && paymentInfo && selectedPlan !== 'commercial'">
+    <div ng-if="!paymentInfoLoading && paymentInfo">
       <div ng-if="(currentProject.plan !== selectedPlan)">
         <h4>Are you sure you want to change your project plan to <strong>{{getPlan(selectedPlan).title}}</strong>?</h4>
         <h5 class="text-muted">You can still change the project plan on the left.</h5>
       </div>
       <br>
-      <h5>Payments at the end of billing cycles will be charged to:</h5>
-      <h5 class="payment-info"><strong>{{capitalize(paymentInfo.cardType)}} ending in {{paymentInfo.ccNumber.substr(-4)}}</strong></h5>
-      <h5 class="text-muted payment-info">Expires on {{paymentInfo.ccExpiryMonth}}/{{paymentInfo.ccExpiryYear}}</h5>
-      <h5 class="text-muted payment-info">Name on Card: {{paymentInfo.cardholderName}}</h5>
-      <p><small><a class="btn btn-sm btn-default" ng-click="changePaymentInfo()">Change my credit card</a></small></p>
-      <br>
-      <div class="form-group pull-right" ng-if="(currentProject.plan !== selectedPlan)">
-        <a class="btn btn-default" ng-click="closeThisDialog(false)">Cancel</a>
-        <button class="btn btn-primary" ng-click="upgradeProject(selectedPlan)">Upgrade Project to {{getPlan(selectedPlan).title}}</button>
-      </div>
-    </div>
-    <div ng-if="!paymentInfoLoading && paymentInfo && selectedPlan === 'commercial'">
-      <div ng-if="(currentProject.plan !== 'commercial')">
-        <div ng-if="!commercialContactFormSubmitted">
-          <h5 class="text-muted">Make sure your contact info below is correct. We'll answer your upgrade request as soon as possible.</h5>
-          <formio src="commercialContactForm" submission="commercialContactSubmission"></formio>
-        </div>
-        <div ng-if="commercialContactFormSubmitted">
-          <h4>Your Commercial Plan upgrade request has been sent!</h4>
-          <h5 class="text-muted">We'll get back to you as soon as possible!</h5>
-          <div class="form-group pull-right">
-            <a class="btn btn-default" ng-click="closeThisDialog(false)">Back</a>
-          </div>
-        </div>
-      </div>
-      <div ng-if="(currentProject.plan === 'commercial')">
-        <h5>Payments at the end of billing cycles will be charged to:</h5>
+      <div ng-if="selectedPlan !== 'basic'">
+        <h5>Payments will be charged to:</h5>
         <h5 class="payment-info"><strong>{{capitalize(paymentInfo.cardType)}} ending in {{paymentInfo.ccNumber.substr(-4)}}</strong></h5>
         <h5 class="text-muted payment-info">Expires on {{paymentInfo.ccExpiryMonth}}/{{paymentInfo.ccExpiryYear}}</h5>
         <h5 class="text-muted payment-info">Name on Card: {{paymentInfo.cardholderName}}</h5>
         <p><small><a class="btn btn-sm btn-default" ng-click="changePaymentInfo()">Change my credit card</a></small></p>
+        <br>
+      </div>
+      <div ng-if="selectedPlan === 'basic'">
+        <h5>No payment required for Basic plan</h5>
+      </div>
+      <div class="form-group pull-right" ng-if="(currentProject.plan !== selectedPlan)">
+        <a class="btn btn-default" ng-click="closeThisDialog(false)">Cancel</a>
+        <button class="btn btn-primary" ng-click="upgradeProject(selectedPlan)">Change plan to {{getPlan(selectedPlan).title}}</button>
       </div>
     </div>
   </div>
