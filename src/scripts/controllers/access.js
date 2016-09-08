@@ -35,6 +35,18 @@ app.controller('AccessController', ['$scope', function($scope) {
     'delete_own': {
       label: 'Delete Own',
       tooltip: 'The Delete Own permission will allow a user, with one of the given Roles, to delete an Project level entity. A user can only delete an entity if they are defined as its owner. E.g. Forms or Roles.'
+    },
+    'team_read': {
+      label: 'Team Read',
+      tooltip: 'The Team Read permission will allow a user, on one of the given Teams, the ability to read form definitions.'
+    },
+    'team_write': {
+      label: 'Team Write',
+      tooltip: 'The Team Write permission will allow a user, on one of the given Teams, the ability to read and edit form definitions.'
+    },
+    'team_admin': {
+      label: 'Team Admin',
+      tooltip: 'The Team Admin permission will allow a user, on one of the given Teams, the ability to read and edit form definitions, project settings, and submission data.'
     }
   };
 }]);
@@ -55,7 +67,10 @@ app.directive('permissionEditor', ['$q', function($q) {
     'create_own',
     'read_own',
     'update_own',
-    'delete_own'
+    'delete_own',
+    'team_read',
+    'team_write',
+    'team_admin'
   ];
 
   return {
@@ -74,12 +89,10 @@ app.directive('permissionEditor', ['$q', function($q) {
         var tempPerms = [];
         _.each(PERMISSION_TYPES, function(type) {
           var existingPerm = _.find($scope.permissions, {type: type});
-          if (!$scope.permissionFilter || type.indexOf($scope.permissionFilter) !== -1) {
-            tempPerms.push(existingPerm || {
-                type: type,
-                roles: []
-              });
-          }
+          tempPerms.push(existingPerm || {
+              type: type,
+              roles: []
+            });
         });
         // Replace permissions with complete set of permissions
         $scope.permissions.splice.apply($scope.permissions, [0, $scope.permissions.length].concat(tempPerms));
@@ -90,7 +103,19 @@ app.directive('permissionEditor', ['$q', function($q) {
       };
 
       $scope.shouldShowPermission = function(permission) {
-        return !!$scope.labels[permission.type];
+        if (!$scope.permissionFilter) {
+          return !!$scope.labels[permission.type];
+        }
+
+        var found = false;
+        var filters = $scope.permissionFilter.split(',');
+        filters.forEach(function(item) {
+          if (permission.type.indexOf(item) !== -1) {
+            found = true;
+          }
+        });
+
+        return (found && !!$scope.labels[permission.type]);
       };
 
       $scope.getPermissionLabel = function(permission) {
