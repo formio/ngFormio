@@ -1,0 +1,142 @@
+<div class="row">
+  <div class="col-sm-6">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">API Information</h3>
+      </div>
+      <div class="panel-body">
+        <p><a href="https://help.form.io/developer/api/" class="btn btn-default btn-block" target="_blank"><i class="fa fa-book"></i> Read full API Documentation</a></p>
+        <table class="table table-bordered table-striped">
+          <tbody>
+          <tr>
+            <th>Form Endpoint</th>
+            <td class="wrap-table-cell"><a ui-sref="project.api">{{ projectApi }}/{{ form.path }}</a></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>
+              <table class="table table-bordered table-striped">
+                <tr>
+                  <th>Method</th>
+                  <th>Description</th>
+                  <th>More</th>
+                </tr>
+                <tr>
+                  <td>GET</td>
+                  <td>Retrieve the form JSON schema</td>
+                  <td style="text-align:center;"><a href="https://documenter.getpostman.com/view/684631/formio-api/2Jvuks#bacdc-2e3d-b76a-f00e-e67a5755ee0c" target="_blank"><i class="fa fa-info-circle"></i></a></td>
+                </tr>
+                <tr>
+                  <td>PUT</td>
+                  <td>Update a form schema</td>
+                  <td style="text-align:center;"><a href="https://documenter.getpostman.com/view/684631/formio-api/2Jvuks#ccda63-404f-4523-0679-96bf8dbbc2b6" target="_blank"><i class="fa fa-info-circle"></i></a></td>
+                </tr>
+                <tr>
+                  <td>DELETE</td>
+                  <td>Delete the form</td>
+                  <td style="text-align:center;"><a href="https://documenter.getpostman.com/view/684631/formio-api/2Jvuks#b58d8fb-7578-497c-48d0-9b250d7998b6" target="_blank"><i class="fa fa-info-circle"></i></a></td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <th>Submissions Endpoint</th>
+            <td class="wrap-table-cell"><a ui-sref="project.api">{{ projectApi }}/{{ form.path }}/submission</a></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>
+              <table class="table table-bordered table-striped">
+                <tr>
+                  <th>Method</th>
+                  <th>Description</th>
+                  <th>More</th>
+                </tr>
+                <tr>
+                  <td>POST</td>
+                  <td>Create a new submission</td>
+                  <td style="text-align:center;"><a href="https://documenter.getpostman.com/view/684631/formio-api/2Jvuks#fee1c46-ec0b-9141-fa11-db6e165fdcbd" target="_blank"><i class="fa fa-info-circle"></i></a></td>
+                </tr>
+                <tr>
+                  <td>INDEX</td>
+                  <td>Report and search submissions</td>
+                  <td style="text-align:center;"><a href="https://documenter.getpostman.com/view/684631/formio-api/2Jvuks#f207caa-9d04-3e81-2973-e4bf82ee5190" target="_blank"><i class="fa fa-info-circle"></i></a></td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <th>Submission Endpoint</th>
+            <td class="wrap-table-cell"><a ui-sref="project.api">{{ projectApi }}/{{ form.path }}/submission/:submissionId</a></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>
+              <table class="table table-bordered table-striped">
+                <tr>
+                  <th>Method</th>
+                  <th>Description</th>
+                  <th>More</th>
+                </tr>
+                <tr>
+                  <td>GET</td>
+                  <td>Retrieve a single submission</td>
+                  <td style="text-align:center;"><a href="https://documenter.getpostman.com/view/684631/formio-api/2Jvuks#bcaaf65-ee01-9c85-005f-ac7b433612d8" target="_blank"><i class="fa fa-info-circle"></i></a></td>
+                </tr>
+                <tr>
+                  <td>PUT</td>
+                  <td>Update a submission</td>
+                  <td style="text-align:center;"><a href="https://documenter.getpostman.com/view/684631/formio-api/2Jvuks#fabff1-1047-a504-d3831576df00" target="_blank"><i class="fa fa-info-circle"></i></a></td>
+                </tr>
+                <tr>
+                  <td>DELETE</td>
+                  <td>Delete a submission</td>
+                  <td style="text-align:center;"><a href="https://documenter.getpostman.com/view/684631/formio-api/2Jvuks#fb86-af9a-e2b2-5c1d-2ecbbb8e4c2e" target="_blank"><i class="fa fa-info-circle"></i></a></td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Resource Fields</h3>
+      </div>
+      <div class="well" style="margin-bottom: 0;">
+        <table class="table table-bordered table-striped">
+          <thead>
+          <tr>
+            <th>Field</th>
+            <th>Key</th>
+            <th>Type</th>
+            <th>Persistent</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr ng-repeat="component in form.components | flattenComponents">
+            <td class="wrap-table-cell">{{ component.label }}</td>
+            <td class="wrap-table-cell">{{ component.key }}</td>
+            <td>{{ component.type }}</td>
+            <td>{{ component.persistent }}</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-info-circle"></i> About Resources</h3>
+      </div>
+      <div class="well" style="margin-bottom: 0;">
+        <p>Resources are objects that can be used to create complex data structures within your application. The fields within a resource can be reused within other forms, as well as linked together to create complex nested resource relationships.</p>
+        <p>Form.io utilizes a <strong>form builder interface</strong> to create new resources, which not only creates the data model, but also automatically reflects that model onto a RESTful interface. Each Resource has an associated Resource Form that can be embedded in your application.</p>
+      </div>
+    </div>
+  </div>
+</div>

@@ -78,7 +78,7 @@ app.config([
         })
         .state(parentName + '.form.view', {
           url: '/',
-          templateUrl: 'views/form/' + type + '-view.html'
+          templateUrl: 'views/form/form-view.html'
         })
         .state(parentName + '.form.edit', {
           url: '/edit',
@@ -105,7 +105,7 @@ app.config([
         })
         .state(parentName + '.form.api', {
           url: '/api',
-          templateUrl: 'views/form/api/index.html',
+          templateUrl: 'views/form/form-api.html',
           controller: 'ApiController'
         });
 
