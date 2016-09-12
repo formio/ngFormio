@@ -1876,17 +1876,11 @@ app.factory('ProjectUpgradeDialog', [
                 if(!$scope.paymentInfoLoading && !$scope.paymentInfo) {
                   return $scope.paymentForm;
                 }
-                if(!$scope.paymentInfoLoading && $scope.paymentInfo && $scope.selectedPlan === 'commercial') {
-                  return $scope.commercialContactForm;
-                }
               };
 
               $scope.$on('formSubmission', function() {
                 if(getActiveForm() === $scope.paymentForm) {
                   loadPaymentInfo();
-                }
-                else if(getActiveForm() === $scope.commercialContactForm) {
-                  $scope.commercialContactFormSubmitted = true;
                 }
               });
 

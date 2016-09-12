@@ -10,7 +10,7 @@ Feature: Project Functionality
     And I see the plaintext Select a template
     When I enter ${random-title>project1.title} in the #title field
     And I enter ${random-description>project1.description} in the #description field
-    When I click on the Create Project button
+    And I click on the Create Project button
 
   Scenario: Required title
     Given I am logged in for projuser1
