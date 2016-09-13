@@ -19,6 +19,23 @@ module.exports = function(app) {
             }
           });
 
+          if($scope.component.defaultValue.length === 0) $scope.component.defaultValue = new Date();
+          else {
+            var dateVal = new Date($scope.component.defaultValue);
+
+            if(isNaN(dateVal.getDate())) {
+              try {
+                var Moment = moment();
+                dateVal = new Date(eval($scope.component.defaultValue));
+              } catch(e) { dateVal = new Date('') }
+            }
+
+            if(isNaN(dateVal.getDate())) dateVal = new Date();
+
+            $scope.component.defaultValue = dateVal;
+            $scope.data[$scope.component.key] = dateVal;
+          }
+
           if (!$scope.component.maxDate) {
             delete $scope.component.maxDate;
           }
@@ -43,6 +60,7 @@ module.exports = function(app) {
           format: 'yyyy-MM-dd HH:mm',
           enableDate: true,
           enableTime: true,
+          defaultValue: '',
           minDate: null,
           maxDate: null,
           datepickerMode: 'day',
