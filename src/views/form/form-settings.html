@@ -1,5 +1,5 @@
 <uib-accordion close-others="true">
-  <uib-accordion-group heading="Advanced Settings">
+  <div uib-accordion-group class="panel panel-default" heading="Advanced Settings">
     <div id="form-group-action" class="form-group">
       <label for="action" class="control-label">Custom Action URL</label>
       <input type="text" ng-model="form.action" class="form-control" id="action" placeholder="Enter the custom submission URL."/>
@@ -8,5 +8,5 @@
       <label class="control-label">Form Tags</label>
       <tags-input ng-model="formTags" on-tag-added="addTag($tag)" on-tag-removed="removeTag($tag)"></tags-input>
     </div>
-  </uib-accordion-group>
+  </div>
 </uib-accordion>

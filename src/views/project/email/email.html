@@ -1,21 +1,21 @@
 <uib-accordion close-others="true">
-  <uib-accordion-group heading="GMail Settings" is-open="true">
+  <div uib-accordion-group class="panel panel-default" heading="GMail Settings" is-open="true">
     <ng-include src="'views/project/email/gmail.html'"></ng-include>
-  </uib-accordion-group>
-  <uib-accordion-group heading="Custom Email Server">
+  </div>
+  <div uib-accordion-group class="panel panel-default" heading="Custom Email Server">
     <ng-include src="'views/project/email/custom.html'"></ng-include>
-  </uib-accordion-group>
-  <uib-accordion-group heading="SendGrid Settings">
+  </div>
+  <div uib-accordion-group class="panel panel-default" heading="SendGrid Settings">
     <ng-include src="'views/project/email/sendgrid.html'"></ng-include>
-  </uib-accordion-group>
-  <uib-accordion-group heading="SMTP Settings">
+  </div>
+  <div uib-accordion-group class="panel panel-default" heading="SMTP Settings">
     <ng-include src="'views/project/email/smtp.html'"></ng-include>
-  </uib-accordion-group>
-  <uib-accordion-group heading="Mandrill Settings">
+  </div>
+  <div uib-accordion-group class="panel panel-default" heading="Mandrill Settings">
     <ng-include src="'views/project/email/mandrill.html'"></ng-include>
-  </uib-accordion-group>
-  <uib-accordion-group heading="Mailgun Settings">
+  </div>
+  <div uib-accordion-group class="panel panel-default" heading="Mailgun Settings">
     <ng-include src="'views/project/email/mailgun.html'"></ng-include>
-  </uib-accordion-group>
+  </div>
 </uib-accordion>
 <button class="btn btn-primary" ng-click="saveProject()">Save Settings</button>
