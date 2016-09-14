@@ -29,7 +29,7 @@
         <div id="form-group-path" class="form-group">
           <label for="path" class="control-label">API Path</label>
           <div class="input-group">
-            <span class="input-group-addon" style="font-size:0.7em;">https://{{ currentProject.name }}.form.io/</span>
+            <span class="input-group-addon" style="font-size:0.7em;">{{ apiProtocol }}://{{ currentProject.name }}.{{ apiServer }}/</span>
             <input type="text" class="form-control" id="path" ng-model="form.path" placeholder="example" style="text-transform: lowercase; width:120px;">
           </div>
         </div>

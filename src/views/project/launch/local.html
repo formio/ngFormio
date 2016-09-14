@@ -52,7 +52,7 @@ bower install</pre>
         <p><pre>gulp serve</pre></p>
         <div ng-if="!hasTemplate">
           <p>Then add any form using the following syntax.</p>
-          <p><small><pre>&lt;formio src="'https://{{ currentProject.name }}.form.io/yourform'"&gt;&lt;/formio&gt;</pre></small></p>
+          <p><small><pre>&lt;formio src="'{{ apiProtocol }}://{{ currentProject.name }}.{{ apiServer }}/yourform'"&gt;&lt;/formio&gt;</pre></small></p>
         </div>
       </div>
     </div>

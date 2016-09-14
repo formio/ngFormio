@@ -7,10 +7,10 @@
   <div id="form-group-name" class="form-group" ng-if="showName" ng-class="{'has-error': projectForm.name.$invalid && projectForm.name.$dirty, 'has-success': projectForm.name.$valid}">
     <label for="name" class="control-label required-field">Domain Name</label>
     <div class="input-group" style="width: 300px;">
-      <span class="input-group-addon">https://</span>
+      <span class="input-group-addon">{{ apiProtocol }}://</span>
       <input type="text" class="form-control" id="name" name="name" ng-model="currentProject.name" title="{{ currentProject.name }}" placeholder="myproject" valid-subdomain unique-checker="/project/available" ng-model-options="{ debounce: { 'default': 500, 'blur': 0 } }" ng-maxlength="63" ng-required="!showName">
       <i class="form-control-feedback glyphicon" ng-class="{'glyphicon-ok': projectForm.name.$valid, 'glyphicon-remove': projectForm.name.$invalid && projectForm.name.$dirty}" style="right: -36px;"></i>
-      <span class="input-group-addon">.form.io</span>
+      <span class="input-group-addon">.{{ apiServer }}</span>
     </div>
     <p class="help-block" ng-show="projectForm.name.$error.maxlength">Domain Name cannot be longer than 63 characters.</p>
     <p class="help-block" ng-show="projectForm.name.$error.unique && projectForm.name.$dirty">This domain is unavailable. Please pick a different domain.</p>
@@ -20,9 +20,9 @@
   <!-- <div class="form-group" ng-if="!showName">
     <label for="name" class="control-label">Domain Name</label>
     <div class="input-group" style="width: 300px;">
-      <span class="input-group-addon">https://</span>
+      <span class="input-group-addon">{{ apiProtocol }}://</span>
       <input type="text" class="form-control" name="name" disabled="true" ng-model="currentProject.name" title="{{ currentProject.name }}" placeholder="myproject">
-      <span class="input-group-addon">.form.io</span>
+      <span class="input-group-addon">.{{ apiServer }}</span>
     </div>
     <p class="help-block">Upgrade your <a ui-sref="project.settings.plan">project plan</a> for access to a custom domain.</p>
   </div> -->
