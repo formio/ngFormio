@@ -10,7 +10,7 @@
 </div>
 
 <uib-accordion close-others="true">
-  <uib-accordion-group heading="Basic Authentication">
+  <div uib-accordion-group class="panel panel-default" heading="Basic Authentication">
     <div is-open="true">
       <div class="form-group">
         <label for="username" class="control-label">Username</label>
@@ -22,8 +22,8 @@
         <input type="password" class="form-control" ng-model="currentProject.settings.atlassian.password" id="password" />
       </div>
     </div>
-  </uib-accordion-group>
-  <uib-accordion-group heading="OAuth">
+  </div>
+  <div uib-accordion-group class="panel panel-default" heading="OAuth">
     <div>
       <div class="form-group">
         <label for="private_key" class="control-label">RSA Private Key</label>
@@ -61,7 +61,7 @@
         Verify OAuth Connection
       </button>
     </div>
-  </uib-accordion-group>
+  </div>
 </uib-accordion>
 
 <button class="btn btn-primary" ng-click="saveProject()">Save Settings</button>
