@@ -400,7 +400,6 @@ angular
       $rootScope.activeSideBar = 'home';
       $rootScope.currentProject = null;
       $rootScope.currentForm = null;
-      $rootScope.apiBase = AppConfig.apiBase;
 
       // Determine if the current users can make teams or is a team member.
       $scope.teamsEnabled = false;
@@ -610,6 +609,9 @@ angular
       $rootScope.feedbackForm = AppConfig.feedbackForm;
       $rootScope.resetPassForm = AppConfig.resetPassForm;
       $rootScope.planForm = AppConfig.planForm;
+      $rootScope.apiBase = AppConfig.apiBase;
+      $rootScope.apiProtocol = AppConfig.apiProtocol;
+      $rootScope.apiServer = AppConfig.apiServer;
 
       // Start the tutorial.
       $rootScope.startTutorial = function() {

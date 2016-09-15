@@ -2,7 +2,7 @@
   <formio src="profileUrl"></formio>
 </div>
 
-<fieldset>
+<fieldset ng-if="!onPrem">
   <legend>Link with GitHub</legend>
   <div ng-if="isLinked()">
     <p>Your account is linked with GitHub!</p>

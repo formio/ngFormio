@@ -61,12 +61,13 @@ var apiBase = apiProtocol + '//api.' + serverHost;
 var formioBase = apiProtocol + '//formio.' + serverHost;
 angular.module('formioApp').constant('AppConfig', {
   forceSSL: false,
-//  domain: host,
   appBase: appBase,
+  apiBase: apiBase,
+  apiProtocol: apiProtocol,
+  apiServer: serverHost,
   serverHost: serverHost,
   protocol: apiProtocol,
   tutorial: 'https://help.form.io/start/',
-  apiBase: apiBase,
   userForm: formioBase + '/user',
   userLoginForm: formioBase + '/user/login',
   userRegisterForm: formioBase + '/user/register',

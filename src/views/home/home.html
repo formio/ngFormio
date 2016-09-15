@@ -71,7 +71,7 @@
           <div class="project well" ng-click="goToProject(project)" title="{{ project.title }}">
             <span class="label project-plan-label" ng-class="getPlanLabel(project.plan)">{{ getPlanName(project.plan) | uppercase }}</span>
             <h4 class="project-title ellipsis"><a ui-sref="project.overview({projectId: project._id})">{{ project.title }}</a></h4>
-            <p class="project-url ellipsis" ui-sref="project.overview({projectId: project._id})"><strong>{{ project.name }}</strong>.form.io</p>
+            <p class="project-url ellipsis" ui-sref="project.overview({projectId: project._id})"><strong>{{ project.name }}</strong>.{{ apiServer}}</p>
             <p class="project-description">{{ project.description | characters: 50 }}</p>
             <div class="project-section-separator"></div>
             <p class="progress-label text-center"><small>Monthly API Calls</small></p>
@@ -97,17 +97,17 @@
     </div>
     <div class="col-md-3">
       <h2>Teams</h2>
-      <div class="well" ng-show="!teamsLoading && !(teamsEnabled || teamMember)">
+      <div class="well" ng-show="!teamsLoading && !(teamsEnabled || teamMember) && !onPrem">
         <span class="team-upgrade">Want to work collaboratively? Upgrade a project to TeamPro to enable Team functionality.</span>
       </div>
-      <div class="list-group" ng-show="!teamsLoading && (teamsEnabled || teamMember)">
+      <div class="list-group" ng-show="!teamsLoading && (teamsEnabled || teamMember || onPrem)">
         <a ui-sref="team.view({teamId: team._id})" class="list-group-item" ng-repeat="team in teams">
           <span class="badge"><i class="fa fa-users"></i>&nbsp;{{ team.data.members.length || 0 }}</span>
           <h4 class="list-group-item-heading">{{ team.data.name }}</h4>
           <span class="label label-success">{{ team.owner === user._id ? 'OWNER' : 'MEMBER'}}</span>
         </a>
       </div>
-      <div class="list-group" ng-show="teamsEnabled">
+      <div class="list-group" ng-show="teamsEnabled || onPrem">
         <a ui-sref="createTeam()" class="btn btn-primary btn-block"><span class="glyphicon glyphicon-plus circle"></span> Create Team</a>
       </div>
     </div>
