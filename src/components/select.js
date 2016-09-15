@@ -114,7 +114,7 @@ module.exports = function(app) {
                 value = item;
               }
               return (prev === '' ? '' : ', ') + value;
-            });
+            }, '');
           }
           else {
             var item = getItem(data);
