@@ -273,6 +273,11 @@ module.exports = function(app) {
                     newUrl += ((newUrl.indexOf('?') === -1) ? '?' : '&') + filter;
                   }
 
+                  // If they wish to return only some fields.
+                  if (settings.selectFields) {
+                    options.params.select = settings.selectFields;
+                  }
+
                   // Set the new result.
                   var setResult = function(data) {
                     // coerce the data into an array.
@@ -296,8 +301,8 @@ module.exports = function(app) {
                     var data = result.data;
                     if (data) {
                       // If the selectValue prop is defined, use it.
-                      if (selectValues && data.hasOwnProperty(selectValues)) {
-                        setResult(data[selectValues]);
+                      if (selectValues) {
+                        setResult(_.get(data, selectValues, []));
                       }
                       // Attempt to default to the formio settings for a resource.
                       else if (data.hasOwnProperty('data')) {
