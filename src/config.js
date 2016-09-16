@@ -24,8 +24,8 @@ var environment = JSON.parse(localStorage.getItem('currentEnvironment'));
 var protocol = window.location.protocol;
 var serverHost, apiProtocol;
 if (environment) {
-  var parts = environment.url.split('://');
-  apiProtocol = parts[0] + ':';
+  var parts = environment.url.split('//');
+  apiProtocol = parts[0];
   serverHost = parts[1];
 }
 else {
