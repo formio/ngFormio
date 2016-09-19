@@ -25,8 +25,8 @@ module.exports = function(app) {
 
             if(isNaN(dateVal.getDate())) {
               try {
-                var Moment = moment();
-                dateVal = new Date(eval($scope.component.defaultValue));
+                const Moment = moment();
+                dateVal = new Date(eval($scope.component.defaultValue.toLowerCase().replace(/moment\(\)/i, "Moment")));
               } catch(e) { dateVal = new Date('') }
             }
 
