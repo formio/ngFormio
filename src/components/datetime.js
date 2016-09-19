@@ -10,7 +10,7 @@ module.exports = function(app) {
           return $interpolate('<span>{{ "' + data + '" | date: "' + component.format + '" }}</span>')();
         },
         group: 'advanced',
-        controller: ['$scope', '$timeout', function($scope, $timeout) {
+        controller: ['$scope', '$timeout', 'amMoment', function($scope, $timeout, amMoment) {
           // Ensure the date value is always a date object when loaded, then unbind the watch.
           var loadComplete = $scope.$watch('data.' + $scope.component.key, function() {
             if ($scope.data && $scope.data[$scope.component.key] && !($scope.data[$scope.component.key] instanceof Date)) {
@@ -25,8 +25,8 @@ module.exports = function(app) {
 
             if(isNaN(dateVal.getDate())) {
               try {
-                const Moment = moment();
-                dateVal = new Date(eval($scope.component.defaultValue.toLowerCase().replace(/moment\(\)/i, "Moment")));
+                const moment = amMoment;
+                dateVal = new Date(eval($scope.component.defaultValue));
               } catch(e) { dateVal = new Date('') }
             }
 
