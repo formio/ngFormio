@@ -497,7 +497,13 @@ app.controller('FormController', [
           $state.go('project.' + $scope.formInfo.type + '.form.edit', {formId: form._id});
         }
 
-      }, FormioAlerts.onError.bind(FormioAlerts));
+      })
+      .catch(function(error) {
+        FormioAlerts.addAlert({
+          type: 'danger',
+          message: error
+        });
+      });
     };
 
     // Delete a form.
