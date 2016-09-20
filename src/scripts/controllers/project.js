@@ -605,7 +605,7 @@ app.controller('ProjectOverviewController', [
       })
       .then(function(forms) {
         $scope.forms = forms;
-      })
+      }, FormioAlerts.onError.bind(FormioAlerts))
       .catch(FormioAlerts.onError.bind(FormioAlerts));
 
     var abbreviator = new NumberAbbreviate();
@@ -946,7 +946,7 @@ app.controller('LaunchController', [
       })
       .then(function(forms) {
         $scope.forms = forms;
-      })
+      }, FormioAlerts.onError.bind(FormioAlerts))
       .catch(FormioAlerts.onError.bind(FormioAlerts));
 
     $scope.$watch('currentProject', function(project) {
@@ -1471,7 +1471,7 @@ app.controller('ProjectSettingsController', [
           $state.go($state.current.name, {
             projectId: project._id
           }, {reload: true});
-        })
+        }, FormioAlerts.onError.bind(FormioAlerts))
         .catch(FormioAlerts.onError.bind(FormioAlerts));
     };
 
@@ -1622,7 +1622,7 @@ app.controller('ProjectTeamEditController', [
           GoogleAnalytics.sendEvent('Project', 'update', null, 1);
           // Reload state so alerts display and project updates.
           $state.go('project.settings.teams.view', null, {reload: true});
-        })
+        }, FormioAlerts.onError.bind(FormioAlerts))
         .catch(FormioAlerts.onError.bind(FormioAlerts));
     };
   }
@@ -1666,7 +1666,7 @@ app.controller('ProjectTeamDeleteController', [
           GoogleAnalytics.sendEvent('Project', 'update', null, 1);
           // Reload state so alerts display and project updates.
           $state.go('project.settings.teams.view', null, {reload: true});
-        })
+        }, FormioAlerts.onError.bind(FormioAlerts))
         .catch(FormioAlerts.onError.bind(FormioAlerts));
     };
   }
@@ -1820,7 +1820,7 @@ app.controller('ProjectDeleteController', [
           });
           GoogleAnalytics.sendEvent('Project', 'delete', null, 1);
           $state.go('home');
-        })
+        }, FormioAlerts.onError.bind(FormioAlerts))
         .catch(FormioAlerts.onError.bind(FormioAlerts));
     };
   }
@@ -1868,7 +1868,7 @@ app.factory('ProjectUpgradeDialog', [
                 .then(function(paymentInfo) {
                   $scope.paymentInfo = paymentInfo;
                   $scope.paymentInfoLoading = false;
-                })
+                }, FormioAlerts.onError.bind(FormioAlerts))
                 .catch(FormioAlerts.onError.bind(FormioAlerts));
               };
 
@@ -1901,7 +1901,7 @@ app.factory('ProjectUpgradeDialog', [
                   $scope.closeThisDialog(true);
                   Formio.clearCache();
                   $state.reload();
-                })
+                }, FormioAlerts.onError.bind(FormioAlerts))
                 .catch(FormioAlerts.onError.bind(FormioAlerts));
               };
 
