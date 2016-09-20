@@ -401,49 +401,53 @@ app.controller('FormController', [
 
     // Load the form.
     if ($scope.formId) {
-      $scope.loadFormPromise = $scope.formio.loadForm().then(function(form) {
-        // Ensure the display is form.
-        if (!form.display) {
-          form.display = 'form';
-        }
+      $scope.loadFormPromise = $scope.formio.loadForm()
+        .then(function(form) {
+          // Ensure the display is form.
+          if (!form.display) {
+            form.display = 'form';
+          }
 
-        // Build the list of selectable resources for the submission resource access ui.
-        $scope.currentFormResources = _(FormioUtils.flattenComponents(form.components))
-          .filter({type: 'resource'})
-          .map(function(component) {
-            return {
-              label: component.label || '',
-              key: component.key || '',
-              defaultPermission: component.defaultPermission || ''
-            };
-          })
-          .value();
+          // Build the list of selectable resources for the submission resource access ui.
+          $scope.currentFormResources = _(FormioUtils.flattenComponents(form.components))
+            .filter({type: 'resource'})
+            .map(function(component) {
+              return {
+                label: component.label || '',
+                key: component.key || '',
+                defaultPermission: component.defaultPermission || ''
+              };
+            })
+            .value();
 
-        $scope.form = form;
-        $scope.formTags = _.map(form.tags, function(tag) {
-          return {text: tag};
-        });
-
-        $rootScope.currentForm = $scope.form;
-      }, FormioAlerts.onError.bind(FormioAlerts));
-
-      $scope.formio.loadActions().then(function(actions) {
-        // Get the available actions for the form, to check if premium actions are present.
-        $scope.formio.availableActions().then(function(available) {
-          var premium = _.map(_.filter(available, function(action) {
-            return (action.hasOwnProperty('premium') && action.premium === true);
-          }), 'name');
-
-          $scope.hasPremAction = _.some(actions, function(action) {
-            return (action.hasOwnProperty('name') && action.name && premium.indexOf(action.name) !== -1);
+          $scope.form = form;
+          $scope.formTags = _.map(form.tags, function(tag) {
+            return {text: tag};
           });
-        });
 
-        $scope.actions = actions;
-        $scope.hasAuthAction = actions.some(function(action) {
-          return action.name === 'login' || action.name === 'oauth';
-        });
-      }, FormioAlerts.onError.bind(FormioAlerts));
+          $rootScope.currentForm = $scope.form;
+        })
+        .catch(FormioAlerts.onError.bind(FormioAlerts));
+
+      $scope.formio.loadActions()
+        .then(function(actions) {
+          // Get the available actions for the form, to check if premium actions are present.
+          $scope.formio.availableActions().then(function(available) {
+            var premium = _.map(_.filter(available, function(action) {
+              return (action.hasOwnProperty('premium') && action.premium === true);
+            }), 'name');
+
+            $scope.hasPremAction = _.some(actions, function(action) {
+              return (action.hasOwnProperty('name') && action.name && premium.indexOf(action.name) !== -1);
+            });
+          });
+
+          $scope.actions = actions;
+          $scope.hasAuthAction = actions.some(function(action) {
+            return action.name === 'login' || action.name === 'oauth';
+          });
+        })
+        .catch(FormioAlerts.onError.bind(FormioAlerts));
     }
     else {
       $scope.loadFormPromise = $q.when();
@@ -509,13 +513,15 @@ app.controller('FormController', [
     // Delete a form.
     $scope.deleteForm = function() {
       var type = $scope.form.type;
-      $scope.formio.deleteForm().then(function() {
-        FormioAlerts.addAlert({
-          type: 'success',
-          message: 'Delete successful'
-        });
-        $state.go('project.' + type + '.form.index');
-      }, FormioAlerts.onError.bind(FormioAlerts));
+      $scope.formio.deleteForm()
+        .then(function() {
+          FormioAlerts.addAlert({
+            type: 'success',
+            message: 'Delete successful'
+          });
+          $state.go('project.' + type + '.form.index');
+        })
+        .catch(FormioAlerts.onError.bind(FormioAlerts));
     };
 
     // Called when the form is updated.
@@ -771,9 +777,11 @@ app.controller('FormActionIndexController', [
         });
       }
     };
-    $scope.formio.loadActions().then(function(actions) {
-      $scope.actions = actions;
-    }, FormioAlerts.onError.bind(FormioAlerts));
+    $scope.formio.loadActions()
+      .then(function(actions) {
+        $scope.actions = actions;
+      })
+      .catch(FormioAlerts.onError.bind(FormioAlerts));
     $scope.formio.availableActions().then(function(available) {
       if (!available[0].name) {
         available.shift();

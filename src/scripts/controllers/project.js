@@ -1460,19 +1460,19 @@ app.controller('ProjectSettingsController', [
       }
 
       if (!$scope.currentProject._id) { return FormioAlerts.onError(new Error('No Project found.')); }
-      $scope.formio.saveProject($scope.currentProject).then(function(project) {
-        FormioAlerts.addAlert({
-          type: 'success',
-          message: 'Project saved.'
-        });
-        GoogleAnalytics.sendEvent('Project', 'update', null, 1);
-        // Reload state so alerts display and project updates.
-        $state.go($state.current.name, {
-          projectId: project._id
-        }, {reload: true});
-      }, function(error) {
-        FormioAlerts.onError(error);
-      });
+      $scope.formio.saveProject($scope.currentProject)
+        .then(function(project) {
+          FormioAlerts.addAlert({
+            type: 'success',
+            message: 'Project saved.'
+          });
+          GoogleAnalytics.sendEvent('Project', 'update', null, 1);
+          // Reload state so alerts display and project updates.
+          $state.go($state.current.name, {
+            projectId: project._id
+          }, {reload: true});
+        })
+        .catch(FormioAlerts.onError.bind(FormioAlerts));
     };
 
     $scope.authenticatedWithOAuth = false;
@@ -1613,17 +1613,17 @@ app.controller('ProjectTeamEditController', [
 
       // Use the formio service to save the current project.
       if (!$scope.currentProject._id) { return FormioAlerts.onError(new Error('No Project found.')); }
-      $scope.formio.saveProject($scope.currentProject).then(function(project) {
-        FormioAlerts.addAlert({
-          type: 'success',
-          message: 'Team saved.'
-        });
-        GoogleAnalytics.sendEvent('Project', 'update', null, 1);
-        // Reload state so alerts display and project updates.
-        $state.go('project.settings.teams.view', null, {reload: true});
-      }, function(error) {
-        FormioAlerts.onError(error);
-      });
+      $scope.formio.saveProject($scope.currentProject)
+        .then(function(project) {
+          FormioAlerts.addAlert({
+            type: 'success',
+            message: 'Team saved.'
+          });
+          GoogleAnalytics.sendEvent('Project', 'update', null, 1);
+          // Reload state so alerts display and project updates.
+          $state.go('project.settings.teams.view', null, {reload: true});
+        })
+        .catch(FormioAlerts.onError.bind(FormioAlerts));
     };
   }
 ]);
@@ -1657,17 +1657,17 @@ app.controller('ProjectTeamDeleteController', [
 
       // Use the formio service to save the current project.
       if (!$scope.currentProject._id) { return FormioAlerts.onError(new Error('No Project found.')); }
-      $scope.formio.saveProject($scope.currentProject).then(function(project) {
-        FormioAlerts.addAlert({
-          type: 'success',
-          message: 'Team removed.'
-        });
-        GoogleAnalytics.sendEvent('Project', 'update', null, 1);
-        // Reload state so alerts display and project updates.
-        $state.go('project.settings.teams.view', null, {reload: true});
-      }, function(error) {
-        FormioAlerts.onError(error);
-      });
+      $scope.formio.saveProject($scope.currentProject)
+        .then(function(project) {
+          FormioAlerts.addAlert({
+            type: 'success',
+            message: 'Team removed.'
+          });
+          GoogleAnalytics.sendEvent('Project', 'update', null, 1);
+          // Reload state so alerts display and project updates.
+          $state.go('project.settings.teams.view', null, {reload: true});
+        })
+        .catch(FormioAlerts.onError.bind(FormioAlerts));
     };
   }
 ]);
@@ -1812,14 +1812,16 @@ app.controller('ProjectDeleteController', [
   ) {
     $scope.deleteProject = function() {
       if (!$scope.currentProject || !$scope.currentProject._id) { return; }
-      $scope.formio.deleteProject().then(function() {
-        FormioAlerts.addAlert({
-          type: 'success',
-          message: 'Project was deleted!'
-        });
-        GoogleAnalytics.sendEvent('Project', 'delete', null, 1);
-        $state.go('home');
-      }, FormioAlerts.onError.bind(FormioAlerts));
+      $scope.formio.deleteProject()
+        .then(function() {
+          FormioAlerts.addAlert({
+            type: 'success',
+            message: 'Project was deleted!'
+          });
+          GoogleAnalytics.sendEvent('Project', 'delete', null, 1);
+          $state.go('home');
+        })
+        .catch(FormioAlerts.onError.bind(FormioAlerts));
     };
   }
 ]);
