@@ -5,7 +5,7 @@
   <table class="table">
     <thead>
       <tr>
-        <th ng-repeat="component in form.components track by $index | flattenComponents" ng-if="tableView(component)">{{ component.label || component.key }}</th>
+        <th ng-repeat="component in form.components | flattenComponents track by $index" ng-if="tableView(component)">{{ component.label || component.key }}</th>
         <th>Submitted</th>
         <th>Updated</th>
         <th>Operations</th>
@@ -13,7 +13,7 @@
     </thead>
     <tbody>
       <tr ng-repeat="submission in submissions track by $index" class="formio-submission" ng-click="$emit('submissionView', submission)">
-        <td ng-repeat="component in form.components track by $index | flattenComponents" ng-if="tableView(component)">{{ submission.data | tableView:component }}</td>
+        <td ng-repeat="component in form.components | flattenComponents track by $index" ng-if="tableView(component)">{{ submission.data | tableView:component }}</td>
         <td>{{ submission.created | amDateFormat:'l, h:mm:ss a' }}</td>
         <td>{{ submission.modified | amDateFormat:'l, h:mm:ss a' }}</td>
         <td>
