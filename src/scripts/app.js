@@ -448,15 +448,17 @@ angular
       $scope.projects = {};
       $scope.projectsLoaded = false;
       // TODO: query for unlimited projects instead of this limit
-      var _projectsPromise = Formio.loadProjects('?limit=9007199254740991&sort=-modified').then(function(projects) {
-        $scope.projectsLoaded = true;
-        angular.element('#projects-loader').hide();
-        $scope.projects = projects;
-        $scope.teamsEnabled = _.some(projects, function(project) {
-          project.plan = project.plan || '';
-          return (project.plan === 'team' || project.plan === 'commercial');
-        });
-      }).catch(FormioAlerts.onError.bind(FormioAlerts));
+      var _projectsPromise = Formio.loadProjects('?limit=9007199254740991&sort=-modified')
+        .then(function(projects) {
+          $scope.projectsLoaded = true;
+          angular.element('#projects-loader').hide();
+          $scope.projects = projects;
+          $scope.teamsEnabled = _.some(projects, function(project) {
+            project.plan = project.plan || '';
+            return (project.plan === 'team' || project.plan === 'commercial');
+          });
+        })
+        .catch(FormioAlerts.onError.bind(FormioAlerts));
 
       // Inject the projects teams into the model if available
       $q.all([_teamsPromise, _projectsPromise]).then(function() {

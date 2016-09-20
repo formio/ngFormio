@@ -56,22 +56,23 @@ app.controller('RoleController', [
         url += '/' + $scope.role._id;
       }
       return $http[method](url, $scope.role)
-      .then(function(result) {
-        if(!$scope.role._id) {
-          $scope.currentProjectRoles.push(result.data);
-        }
-        else {
-          var index = _.findIndex($scope.currentProjectRoles, {_id: $scope.role._id});
-          $scope.currentProjectRoles.splice(index, 1, result.data);
-        }
+        .then(function(result) {
+          if(!$scope.role._id) {
+            $scope.currentProjectRoles.push(result.data);
+          }
+          else {
+            var index = _.findIndex($scope.currentProjectRoles, {_id: $scope.role._id});
+            $scope.currentProjectRoles.splice(index, 1, result.data);
+          }
 
-        FormioAlerts.addAlert({
-          type: 'success',
-          message: 'Role successfully ' + ($scope.role._id ? 'saved' : 'created') + '.'
-        });
+          FormioAlerts.addAlert({
+            type: 'success',
+            message: 'Role successfully ' + ($scope.role._id ? 'saved' : 'created') + '.'
+          });
 
-        $scope.back('project.settings.roles.view');
-      }).catch(FormioAlerts.onError.bind(FormioAlerts));
+          $scope.back('project.settings.roles.view');
+        })
+        .catch(FormioAlerts.onError.bind(FormioAlerts));
     };
 
     $scope.deleteRole = function() {
