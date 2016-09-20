@@ -488,26 +488,21 @@ app.controller('FormController', [
       angular.element('.has-error').removeClass('has-error');
 
       $scope.formio.saveForm(angular.copy($scope.form)) // Copy to remove angular $$hashKey
-      .then(function(form) {
-        var method = $stateParams.formId ? 'updated' : 'created';
-        FormioAlerts.addAlert({
-          type: 'success',
-          message: 'Successfully ' + method + ' form!'
-        });
-        GoogleAnalytics.sendEvent('Form', method.substring(0, method.length - 1), null, 1);
+        .then(function(form) {
+          var method = $stateParams.formId ? 'updated' : 'created';
+          FormioAlerts.addAlert({
+            type: 'success',
+            message: 'Successfully ' + method + ' form!'
+          });
+          GoogleAnalytics.sendEvent('Form', method.substring(0, method.length - 1), null, 1);
 
-        if(method === 'created') {
-          // Reload page to start editing as an existing form.
-          $state.go('project.' + $scope.formInfo.type + '.form.edit', {formId: form._id});
-        }
+          if(method === 'created') {
+            // Reload page to start editing as an existing form.
+            $state.go('project.' + $scope.formInfo.type + '.form.edit', {formId: form._id});
+          }
 
-      })
-      .catch(function(error) {
-        FormioAlerts.addAlert({
-          type: 'danger',
-          message: error
-        });
-      });
+        }, FormioAlerts.onError.bind(FormioAlerts))
+        .catch(FormioAlerts.onError.bind(FormioAlerts));
     };
 
     // Delete a form.
@@ -694,6 +689,7 @@ app.factory('FormioAlerts', [
         });
       },
       onError: function (error) {
+        console.log(error);
         var errors = error.hasOwnProperty('errors') ? error.errors : error.data && error.data.errors;
         if(errors && (Object.keys(errors).length || errors.length) > 0) {
           _.each(errors, (function(e) {
