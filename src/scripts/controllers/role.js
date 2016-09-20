@@ -71,7 +71,7 @@ app.controller('RoleController', [
           });
 
           $scope.back('project.settings.roles.view');
-        })
+        }, FormioAlerts.onError.bind(FormioAlerts))
         .catch(FormioAlerts.onError.bind(FormioAlerts));
     };
 

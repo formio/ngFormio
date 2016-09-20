@@ -426,7 +426,7 @@ app.controller('FormController', [
           });
 
           $rootScope.currentForm = $scope.form;
-        })
+        }, FormioAlerts.onError.bind(FormioAlerts))
         .catch(FormioAlerts.onError.bind(FormioAlerts));
 
       $scope.formio.loadActions()
@@ -446,7 +446,7 @@ app.controller('FormController', [
           $scope.hasAuthAction = actions.some(function(action) {
             return action.name === 'login' || action.name === 'oauth';
           });
-        })
+        }, FormioAlerts.onError.bind(FormioAlerts))
         .catch(FormioAlerts.onError.bind(FormioAlerts));
     }
     else {
@@ -520,7 +520,7 @@ app.controller('FormController', [
             message: 'Delete successful'
           });
           $state.go('project.' + type + '.form.index');
-        })
+        }, FormioAlerts.onError.bind(FormioAlerts))
         .catch(FormioAlerts.onError.bind(FormioAlerts));
     };
 
@@ -780,7 +780,7 @@ app.controller('FormActionIndexController', [
     $scope.formio.loadActions()
       .then(function(actions) {
         $scope.actions = actions;
-      })
+      }, FormioAlerts.onError.bind(FormioAlerts))
       .catch(FormioAlerts.onError.bind(FormioAlerts));
     $scope.formio.availableActions().then(function(available) {
       if (!available[0].name) {
