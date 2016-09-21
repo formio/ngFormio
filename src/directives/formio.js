@@ -275,11 +275,11 @@ module.exports = function() {
         };
 
         $scope.checkConditional = function(componentKey, subData) {
-          var conditional = _toggleConditional(componentKey, subData);
+          _toggleConditional(componentKey, subData);
           var customConditional = _toggleCustomConditional(componentKey, subData);
           // customConditional will be true if either are true since the value persists in $scope.show.
           return customConditional;
-        }
+        };
 
         // On every change to data, trigger the conditionals.
         $scope.$watch(function() {
