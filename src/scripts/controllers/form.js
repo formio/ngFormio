@@ -1251,6 +1251,10 @@ app.controller('FormSubmissionsController', [
             model: {
               id: '_id',
               fields: _(FormioUtils.flattenComponents($scope.form.components))
+                .filter(function(component, path) {
+                  // Don't include fields that are nested.
+                  return path.indexOf('.') === -1;
+                })
                 .filter($scope.tableView)
                 .map(function(component) {
                   var type;
