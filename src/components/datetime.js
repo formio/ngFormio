@@ -10,7 +10,7 @@ module.exports = function(app) {
           return $interpolate('<span>{{ "' + data + '" | date: "' + component.format + '" }}</span>')();
         },
         group: 'advanced',
-        controller: ['$scope', '$timeout', function($scope, $timeout) {
+        controller: ['$scope', '$timeout', 'moment', function($scope, $timeout, moment) {
           // Ensure the date value is always a date object when loaded, then unbind the watch.
           var loadComplete = $scope.$watch('data.' + $scope.component.key, function() {
             if ($scope.data && $scope.data[$scope.component.key] && !($scope.data[$scope.component.key] instanceof Date)) {
@@ -19,20 +19,19 @@ module.exports = function(app) {
             }
           });
 
-          if($scope.component.defaultValue.length === 0) $scope.component.defaultValue = new Date();
+          if($scope.component.defaultValueMoment.length === 0) $scope.component.defaultValueMoment = '';
           else {
-            var dateVal = new Date($scope.component.defaultValue);
+            var dateVal = new Date($scope.component.defaultValueMoment);
 
             if(isNaN(dateVal.getDate())) {
               try {
-                const Moment = moment();
-                dateVal = new Date(eval($scope.component.defaultValue.toLowerCase().replace(/moment\(\)/i, "Moment")));
-              } catch(e) { dateVal = new Date('') }
+                dateVal = new Date(eval($scope.component.defaultValueMoment));
+              } catch(e) { dateVal = '' }
             }
 
-            if(isNaN(dateVal.getDate())) dateVal = new Date();
+            if(isNaN(dateVal)) dateVal = '';
 
-            $scope.component.defaultValue = dateVal;
+            $scope.component.defaultValueMoment = dateVal;
             $scope.data[$scope.component.key] = dateVal;
           }
 
@@ -60,7 +59,7 @@ module.exports = function(app) {
           format: 'yyyy-MM-dd HH:mm',
           enableDate: true,
           enableTime: true,
-          defaultValue: '',
+          defaultValueMoment: '',
           minDate: null,
           maxDate: null,
           datepickerMode: 'day',
