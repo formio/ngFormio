@@ -209,10 +209,11 @@ module.exports = function() {
          *
          * @private
          */
-        var _toggleConditional = function(componentKey) {
+        var _toggleConditional = function(componentKey, subData) {
           if (_conditionals.hasOwnProperty(componentKey)) {
+            var data = Object.assign({}, $scope.submission.data, subData);
             var cond = _conditionals[componentKey];
-            var value = FormioUtils.getValue($scope.submission, cond.when);
+            var value = FormioUtils.getValue({data: data}, cond.when);
 
             if (typeof value !== 'undefined' && typeof value !== 'object') {
               // Check if the conditional value is equal to the trigger value
@@ -243,6 +244,7 @@ module.exports = function() {
               $scope.show[componentKey] = !boolean[cond.show];
             }
           }
+          return $scope.show.hasOwnProperty(componentKey) ? $scope.show[componentKey] : null;
         };
 
         /**
@@ -253,13 +255,13 @@ module.exports = function() {
          *
          * @private
          */
-        var _toggleCustomConditional = function(componentKey) {
+        var _toggleCustomConditional = function(componentKey, subData) {
           if (_customConditionals.hasOwnProperty(componentKey)) {
             var cond = _customConditionals[componentKey];
 
             try {
               // Create a child block, and expose the submission data.
-              var data = $scope.submission.data; // eslint-disable-line no-unused-vars
+              var data = Object.assign({}, $scope.submission.data, subData); // eslint-disable-line no-unused-vars
               // Eval the custom conditional and update the show value.
               var show = eval('(function() { ' + cond.toString() + '; return show; })()');
               // Show by default, if an invalid type is given.
@@ -269,7 +271,15 @@ module.exports = function() {
               $scope.show[componentKey] = true;
             }
           }
+          return $scope.show.hasOwnProperty(componentKey) ? $scope.show[componentKey] : null;
         };
+
+        $scope.checkConditional = function(componentKey, subData) {
+          var conditional = _toggleConditional(componentKey, subData);
+          var customConditional = _toggleCustomConditional(componentKey, subData);
+          // customConditional will be true if either are true since the value persists in $scope.show.
+          return customConditional;
+        }
 
         // On every change to data, trigger the conditionals.
         $scope.$watch(function() {
