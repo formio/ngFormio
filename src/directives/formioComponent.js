@@ -51,6 +51,9 @@ module.exports = [
             silentEvents: ['click', 'focus']
           };
 
+          // Pass through checkConditional since this is an isolate scope.
+          $scope.checkConditional = $scope.$parent.checkConditional;
+
           // Get the settings.
           var component = formioComponents.components[$scope.component.type] || formioComponents.components['custom'];
 

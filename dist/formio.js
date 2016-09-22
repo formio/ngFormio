@@ -1,4 +1,4 @@
-/*! ng-formio v2.2.5 | https://npmcdn.com/ng-formio@2.2.5/LICENSE.txt */
+/*! ng-formio v2.2.7 | https://unpkg.com/ng-formio@2.2.7/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 /*!
  * EventEmitter2
@@ -1225,7 +1225,7 @@ Formio.prototype.loadActions = _index('actions');
 Formio.prototype.availableActions = function() { return this.makeRequest('availableActions', this.formUrl + '/actions'); };
 Formio.prototype.actionInfo = function(name) { return this.makeRequest('actionInfo', this.formUrl + '/actions/' + name); };
 
-Formio.prototype.uploadFile = function(storage, file, fileName, dir, progressCallback) {
+Formio.prototype.uploadFile = function(storage, file, fileName, dir, progressCallback, url) {
   var requestArgs = {
     provider: storage,
     method: 'upload',
@@ -1240,7 +1240,7 @@ Formio.prototype.uploadFile = function(storage, file, fileName, dir, progressCal
           if (storage && (result === null || result === undefined)) {
             if (providers.storage.hasOwnProperty(storage)) {
               var provider = new providers.storage[storage](this);
-              return provider.uploadFile(file, fileName, dir, progressCallback);
+              return provider.uploadFile(file, fileName, dir, progressCallback, url);
             }
             else {
               throw('Storage provider not found');
@@ -1311,7 +1311,7 @@ Formio.loadProjects = function(query) {
   return this.makeStaticRequest(baseUrl + '/project' + query);
 };
 
-Formio.request = function(url, method, data) {
+Formio.request = function(url, method, data, header) {
   if (!url) {
     return Promise.reject('No url provided');
   }
@@ -1326,7 +1326,7 @@ Formio.request = function(url, method, data) {
     else {
       resolve(new Promise(function(resolve, reject) {
         // Set up and fetch request
-        var headers = new Headers({
+        var headers = header || new Headers({
           'Accept': 'application/json',
           'Content-type': 'application/json; charset=UTF-8'
         });
@@ -1840,7 +1840,7 @@ var url = function(formio) {
   return {
     title: 'Url',
     name: 'url',
-    uploadFile: function(file, fileName, dir, progressCallback) {
+    uploadFile: function(file, fileName, dir, progressCallback, url) {
       return new Promise(function(resolve, reject) {
         var data = {
           dir: dir,
@@ -1885,7 +1885,7 @@ var url = function(formio) {
           reject(xhr);
         }
 
-        xhr.open('POST', response.url);
+        xhr.open('POST', url);
         xhr.send(fd);
       });
     },
@@ -3373,6 +3373,9 @@ module.exports = function(app) {
       // Pull out the rows and cols for easy iteration.
       $scope.rows = $scope.data[$scope.component.key];
       $scope.cols = $scope.component.components;
+      $scope.localKeys = $scope.component.components.map(function(component) {
+        return component.key;
+      });
 
       // Add a row the to grid.
       $scope.addRow = function() {
@@ -3393,7 +3396,7 @@ module.exports = function(app) {
     'FormioUtils',
     function($templateCache, FormioUtils) {
       $templateCache.put('formio/components/datagrid.html', FormioUtils.fieldWrap(
-        "<div class=\"formio-data-grid\" ng-controller=\"formioDataGrid\">\n  <table ng-class=\"{'table-striped': component.striped, 'table-bordered': component.bordered, 'table-hover': component.hover, 'table-condensed': component.condensed}\" class=\"table datagrid-table\">\n    <tr>\n      <th ng-repeat=\"col in cols track by $index\" ng-if=\"show[component.key || ''] && show[col.key || '']\" ng-class=\"{'field-required': col.validate.required}\">{{ col.label | formioTranslate }}</th>\n    </tr>\n    <tr ng-repeat=\"row in rows track by $index\" ng-init=\"rowIndex = $index\">\n      <td ng-repeat=\"col in cols track by $index\" ng-if=\"show[component.key || ''] && show[col.key || '']\" ng-init=\"col.hideLabel = true; colIndex = $index\" class=\"formio-data-grid-row\">\n        <formio-component\n          component=\"col\"\n          data=\"rows[rowIndex]\"\n          formio-form=\"formioForm\"\n          formio=\"formio\"\n          read-only=\"readOnly || col.disabled\"\n          grid-row=\"rowIndex\"\n          grid-col=\"colIndex\"\n          show=\"show\"\n        ></formio-component>\n      </td>\n      <td>\n        <a ng-click=\"removeRow(rowIndex)\" class=\"btn btn-default\">\n          <span class=\"glyphicon glyphicon-remove-circle\"></span>\n        </a>\n      </td>\n    </tr>\n  </table>\n  <div class=\"datagrid-add\">\n    <a ng-click=\"addRow()\" class=\"btn btn-primary\">\n      <span class=\"glyphicon glyphicon-plus\" aria-hidden=\"true\"></span> {{ component.addAnother || \"Add Another\" | formioTranslate}}\n    </a>\n  </div>\n</div>\n"
+        "<div class=\"formio-data-grid\" ng-controller=\"formioDataGrid\" ng-if=\"show[component.key || '']\">\n  <table ng-class=\"{'table-striped': component.striped, 'table-bordered': component.bordered, 'table-hover': component.hover, 'table-condensed': component.condensed}\" class=\"table datagrid-table\">\n    <tr>\n      <th ng-repeat=\"col in cols track by $index\" ng-if=\"show[col.key || ''] || localKeys.indexOf(col.conditional.when) !== -1\" ng-class=\"{'field-required': col.validate.required}\">{{ col.label | formioTranslate }}</th>\n    </tr>\n    <tr ng-repeat=\"row in rows track by $index\" ng-init=\"rowIndex = $index\">\n      <td ng-repeat=\"col in cols track by $index\" ng-init=\"col.hideLabel = true; colIndex = $index\" class=\"formio-data-grid-row\">\n        <formio-component\n          ng-if=\"(localKeys.indexOf(col.conditional.when) === -1 && show[col.key || '']) || checkConditional(col.key, row)\"\n          component=\"col\"\n          data=\"rows[rowIndex]\"\n          formio-form=\"formioForm\"\n          formio=\"formio\"\n          read-only=\"readOnly || col.disabled\"\n          grid-row=\"rowIndex\"\n          grid-col=\"colIndex\"\n          show=\"show\"\n        ></formio-component>\n      </td>\n      <td>\n        <a ng-click=\"removeRow(rowIndex)\" class=\"btn btn-default\">\n          <span class=\"glyphicon glyphicon-remove-circle\"></span>\n        </a>\n      </td>\n    </tr>\n  </table>\n  <div class=\"datagrid-add\">\n    <a ng-click=\"addRow()\" class=\"btn btn-primary\">\n      <span class=\"glyphicon glyphicon-plus\" aria-hidden=\"true\"></span> {{ component.addAnother || \"Add Another\" | formioTranslate}}\n    </a>\n  </div>\n</div>\n"
       ));
     }
   ]);
@@ -3422,6 +3425,28 @@ module.exports = function(app) {
             }
           });
 
+          if ($scope.component.defaultDate.length === 0) {
+            $scope.component.defaultDate = '';
+          }
+          else {
+            var dateVal = new Date($scope.component.defaultDate);
+            if (isNaN(dateVal.getDate())) {
+              try {
+                dateVal = new Date(eval($scope.component.defaultDate));
+              }
+              catch (e) {
+                dateVal = '';
+              }
+            }
+
+            if (isNaN(dateVal)) {
+              dateVal = '';
+            }
+
+            $scope.component.defaultDate = dateVal;
+            $scope.data[$scope.component.key] = dateVal;
+          }
+
           if (!$scope.component.maxDate) {
             delete $scope.component.maxDate;
           }
@@ -3446,6 +3471,7 @@ module.exports = function(app) {
           format: 'yyyy-MM-dd HH:mm',
           enableDate: true,
           enableTime: true,
+          defaultDate: '',
           minDate: null,
           maxDate: null,
           datepickerMode: 'day',
@@ -3716,7 +3742,7 @@ module.exports = function(app) {
               $scope.fileUploads[fileName].progress = parseInt(100.0 * evt.loaded / evt.total);
               delete $scope.fileUploads[fileName].message;
               $scope.$apply();
-            })
+            }, $scope.component.url)
               .then(function(fileInfo) {
                 delete $scope.fileUploads[fileName];
                 // Ensure that the file component is an array.
@@ -5388,10 +5414,11 @@ module.exports = function() {
          *
          * @private
          */
-        var _toggleConditional = function(componentKey) {
+        var _toggleConditional = function(componentKey, subData) {
           if (_conditionals.hasOwnProperty(componentKey)) {
+            var data = Object.assign({}, $scope.submission.data, subData);
             var cond = _conditionals[componentKey];
-            var value = FormioUtils.getValue($scope.submission, cond.when);
+            var value = FormioUtils.getValue({data: data}, cond.when);
 
             if (typeof value !== 'undefined' && typeof value !== 'object') {
               // Check if the conditional value is equal to the trigger value
@@ -5422,6 +5449,7 @@ module.exports = function() {
               $scope.show[componentKey] = !boolean[cond.show];
             }
           }
+          return $scope.show.hasOwnProperty(componentKey) ? $scope.show[componentKey] : null;
         };
 
         /**
@@ -5432,13 +5460,13 @@ module.exports = function() {
          *
          * @private
          */
-        var _toggleCustomConditional = function(componentKey) {
+        var _toggleCustomConditional = function(componentKey, subData) {
           if (_customConditionals.hasOwnProperty(componentKey)) {
             var cond = _customConditionals[componentKey];
 
             try {
               // Create a child block, and expose the submission data.
-              var data = $scope.submission.data; // eslint-disable-line no-unused-vars
+              var data = Object.assign({}, $scope.submission.data, subData); // eslint-disable-line no-unused-vars
               // Eval the custom conditional and update the show value.
               var show = eval('(function() { ' + cond.toString() + '; return show; })()');
               // Show by default, if an invalid type is given.
@@ -5448,6 +5476,14 @@ module.exports = function() {
               $scope.show[componentKey] = true;
             }
           }
+          return $scope.show.hasOwnProperty(componentKey) ? $scope.show[componentKey] : null;
+        };
+
+        $scope.checkConditional = function(componentKey, subData) {
+          _toggleConditional(componentKey, subData);
+          var customConditional = _toggleCustomConditional(componentKey, subData);
+          // customConditional will be true if either are true since the value persists in $scope.show.
+          return customConditional;
         };
 
         // On every change to data, trigger the conditionals.
@@ -5741,6 +5777,9 @@ module.exports = [
             eventsToHandle: ['input', 'keyup', 'click', 'focus'],
             silentEvents: ['click', 'focus']
           };
+
+          // Pass through checkConditional since this is an isolate scope.
+          $scope.checkConditional = $scope.$parent.checkConditional;
 
           // Get the settings.
           var component = formioComponents.components[$scope.component.type] || formioComponents.components['custom'];
@@ -6261,6 +6300,12 @@ module.exports = function() {
               }
             }
           });
+
+          var submitEvent = $scope.$emit('formSubmit', sub);
+          if (submitEvent.defaultPrevented) {
+              // Listener wants to cancel the form submission
+              return;
+          }
 
           var onDone = function(submission) {
             if ($scope.storage && !$scope.readOnly) {

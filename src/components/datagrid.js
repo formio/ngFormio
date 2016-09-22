@@ -61,6 +61,9 @@ module.exports = function(app) {
       // Pull out the rows and cols for easy iteration.
       $scope.rows = $scope.data[$scope.component.key];
       $scope.cols = $scope.component.components;
+      $scope.localKeys = $scope.component.components.map(function(component) {
+        return component.key;
+      });
 
       // Add a row the to grid.
       $scope.addRow = function() {
