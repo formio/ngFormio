@@ -159,7 +159,7 @@ module.exports = function(app) {
               $scope.fileUploads[fileName].progress = parseInt(100.0 * evt.loaded / evt.total);
               delete $scope.fileUploads[fileName].message;
               $scope.$apply();
-            })
+            }, $scope.component.url)
               .then(function(fileInfo) {
                 delete $scope.fileUploads[fileName];
                 // Ensure that the file component is an array.
