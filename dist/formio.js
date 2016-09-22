@@ -6301,6 +6301,12 @@ module.exports = function() {
             }
           });
 
+          var submitEvent = $scope.$emit('formSubmit', sub);
+          if (submitEvent.defaultPrevented) {
+              // Listener wants to cancel the form submission
+              return;
+          }
+
           var onDone = function(submission) {
             if ($scope.storage && !$scope.readOnly) {
               localStorage.setItem($scope.storage, '');
