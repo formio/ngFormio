@@ -10,7 +10,7 @@ module.exports = function(app) {
           return $interpolate('<span>{{ "' + data + '" | date: "' + component.format + '" }}</span>')();
         },
         group: 'advanced',
-        controller: ['$scope', '$timeout', 'moment', function($scope, $timeout, moment) {
+        controller: ['$scope', '$timeout', function($scope, $timeout) {
           // Ensure the date value is always a date object when loaded, then unbind the watch.
           var loadComplete = $scope.$watch('data.' + $scope.component.key, function() {
             if ($scope.data && $scope.data[$scope.component.key] && !($scope.data[$scope.component.key] instanceof Date)) {
@@ -19,19 +19,19 @@ module.exports = function(app) {
             }
           });
 
-          if($scope.component.defaultValueMoment.length === 0) $scope.component.defaultValueMoment = '';
+          if($scope.component.defaultDate.length === 0) $scope.component.defaultDate = '';
           else {
-            var dateVal = new Date($scope.component.defaultValueMoment);
+            var dateVal = new Date($scope.component.defaultDate);
 
             if(isNaN(dateVal.getDate())) {
               try {
-                dateVal = new Date(eval($scope.component.defaultValueMoment));
+                dateVal = new Date(eval($scope.component.defaultDate));
               } catch(e) { dateVal = '' }
             }
 
             if(isNaN(dateVal)) dateVal = '';
 
-            $scope.component.defaultValueMoment = dateVal;
+            $scope.component.defaultDate = dateVal;
             $scope.data[$scope.component.key] = dateVal;
           }
 
@@ -59,7 +59,7 @@ module.exports = function(app) {
           format: 'yyyy-MM-dd HH:mm',
           enableDate: true,
           enableTime: true,
-          defaultValueMoment: '',
+          defaultDate: '',
           minDate: null,
           maxDate: null,
           datepickerMode: 'day',
