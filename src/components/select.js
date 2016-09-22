@@ -13,7 +13,7 @@ module.exports = function(app) {
         },
         link: function(scope, element) {
           if (scope.template) {
-            element.html($compile(angular.element(scope.template))(scope));
+            element.append($compile(angular.element(scope.template))(scope));
           }
         }
       };
