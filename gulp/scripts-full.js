@@ -12,7 +12,7 @@ module.exports = function(gulp, plugins) {
     })
       .bundle()
       .pipe(plugins.source('formio-full.js'))
-      .pipe(plugins.wrap(plugins.template, {version: plugins.packageJson.version}, {variable: 'data'}))
+      .pipe(plugins.wrap(plugins.template, {version: plugins.packageJson.version}))
       .pipe(plugins.derequire())
       .pipe(gulp.dest('dist/'))
       .pipe(plugins.rename('formio-full.min.js'))
