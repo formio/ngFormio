@@ -22,14 +22,14 @@
                     <span ng-if="!action._id">none</span>
                     <div class="button-group" style="display:flex;" ng-if="action._id">
                         <a ui-sref="project.{{ formInfo.type }}.form.action.item.edit({actionId: action._id})" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-edit"></span></a>&nbsp;
-                        <a ui-sref="project.{{ formInfo.type }}.form.action.item.delete({actionId: action._id})" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove-circle"></span></a>
+                        <a ng-if="highestRole !== 'team_read'" ui-sref="project.{{ formInfo.type }}.form.action.item.delete({actionId: action._id})" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove-circle"></span></a>
                     </div>
                 </td>
             </tr>
             </tbody>
         </table>
     </div>
-    <div class="panel-footer">
+    <div class="panel-footer" ng-if="highestRole !== 'team_read'">
         <form class="form-inline">
             <div class="form-group">
                 <select id="action-select" name="action-select" ng-model="newAction" class="form-control" ng-options="action as action.title for action in availableActions"></select>
