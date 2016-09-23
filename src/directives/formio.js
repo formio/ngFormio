@@ -4,6 +4,7 @@ module.exports = function() {
     replace: true,
     scope: {
       src: '=?',
+      url: '=?',
       formAction: '=?',
       form: '=?',
       submission: '=?',
@@ -500,7 +501,7 @@ module.exports = function() {
           }
 
           // If they wish to submit to the default location.
-          else if ($scope.formio) {
+          else if ($scope.formio && !$scope.formio.noSubmit) {
             // copy to remove angular $$hashKey
             $scope.formio.saveSubmission(submissionData, $scope.formioOptions).then(function(submission) {
               onSubmitDone(submission.method, submission);

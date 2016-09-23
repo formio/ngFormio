@@ -148,6 +148,12 @@ module.exports = [
           }
         }
         else {
+          // If they provide a url to the form, we still need to create it but tell it to not submit.
+          if ($scope.url) {
+            loader = new Formio($scope.url);
+            loader.noSubmit = true;
+          }
+
           $scope.formoLoaded = true;
           $scope.formLoading = !$scope.form || (Object.keys($scope.form).length === 0) || !$scope.form.components.length;
           $scope.setLoading($scope.formLoading);
