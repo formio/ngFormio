@@ -501,8 +501,24 @@ app.controller('FormController', [
             $state.go('project.' + $scope.formInfo.type + '.form.edit', {formId: form._id});
           }
 
-        }, FormioAlerts.onError.bind(FormioAlerts))
-        .catch(FormioAlerts.onError.bind(FormioAlerts));
+        })
+        .catch(function(err) {
+          if (err) {
+            FormioAlerts.onError.call(FormioAlerts, err);
+          }
+
+          // FOR-128 - if we're editing a form, make note of the components with issues.
+          try {
+            var issues = (/Component keys must be unique: (.*)/.exec(_.get(err, 'errors.components.message'))).slice(1);
+            if ($state.includes('project.form.form.edit') && (issues.length > 0)) {
+              issues = (issues.shift()).toString().split(', ');
+              issues.forEach(function(issue) {
+                angular.element('div.dropzone #' + issue).parent().addClass('has-error');
+              });
+            }
+          }
+          catch (e) {}
+        });
     };
 
     // Delete a form.
