@@ -383,6 +383,10 @@ body > .ui-select-bootstrap.open {
   min-width: 200px;
 }
 
+/* FOR-109 */
+.input-group .form-control {
+  z-index: inherit;
+}
 .input-group .form-control.ui-select-search {
   float: none;
 }
