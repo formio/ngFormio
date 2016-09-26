@@ -154,30 +154,41 @@ module.exports = function(app) {
               message: 'Starting upload'
             };
             var dir = $scope.component.dir || '';
-            $scope.formio.uploadFile($scope.component.storage, file, fileName, dir, function processNotify(evt) {
-              $scope.fileUploads[fileName].status = 'progress';
-              $scope.fileUploads[fileName].progress = parseInt(100.0 * evt.loaded / evt.total);
-              delete $scope.fileUploads[fileName].message;
-              $scope.$apply();
-            }, $scope.component.url)
-              .then(function(fileInfo) {
-                delete $scope.fileUploads[fileName];
-                // Ensure that the file component is an array.
-                if (
-                  !$scope.data[$scope.component.key] ||
-                  !($scope.data[$scope.component.key] instanceof Array)
-                ) {
-                  $scope.data[$scope.component.key] = [];
-                }
-                $scope.data[$scope.component.key].push(fileInfo);
+            var formio = null;
+            if ($scope.formio) {
+              formio = $scope.formio;
+            }
+            else {
+              $scope.fileUploads[fileName].status = 'error';
+              $scope.fileUploads[fileName].message = 'File Upload URL not provided.';
+            }
+
+            if (formio) {
+              formio.uploadFile($scope.component.storage, file, fileName, dir, function processNotify(evt) {
+                $scope.fileUploads[fileName].status = 'progress';
+                $scope.fileUploads[fileName].progress = parseInt(100.0 * evt.loaded / evt.total);
+                delete $scope.fileUploads[fileName].message;
                 $scope.$apply();
-              })
-              .catch(function(response) {
-                $scope.fileUploads[fileName].status = 'error';
-                $scope.fileUploads[fileName].message = response.data;
-                delete $scope.fileUploads[fileName].progress;
-                $scope.$apply();
-              });
+              }, $scope.component.url)
+                .then(function(fileInfo) {
+                  delete $scope.fileUploads[fileName];
+                  // Ensure that the file component is an array.
+                  if (
+                    !$scope.data[$scope.component.key] ||
+                    !($scope.data[$scope.component.key] instanceof Array)
+                  ) {
+                    $scope.data[$scope.component.key] = [];
+                  }
+                  $scope.data[$scope.component.key].push(fileInfo);
+                  $scope.$apply();
+                })
+                .catch(function(response) {
+                  $scope.fileUploads[fileName].status = 'error';
+                  $scope.fileUploads[fileName].message = response.data;
+                  delete $scope.fileUploads[fileName].progress;
+                  $scope.$apply();
+                });
+            }
           });
         }
       };
