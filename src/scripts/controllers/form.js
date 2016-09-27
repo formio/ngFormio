@@ -567,7 +567,7 @@ app.controller('FormEditController', [
 ]);
 
 app.controller('FormShareController', ['$scope', function($scope) {
-  $scope.publicForm = true;
+  $scope.publicForm = null;
   $scope.previewUrl = '';
   $scope.preview = '';
   $scope.options = {
@@ -633,7 +633,7 @@ app.controller('FormShareController', ['$scope', function($scope) {
   // Make a form private.
   $scope.makePrivate = function() {
     angular.forEach($scope.form.submissionAccess, function(access, index) {
-      if (access.type === 'create_own') {
+      if (access.type === 'create_own' || access.type === 'create_all') {
         _.pull($scope.form.submissionAccess[index].roles, defaultRole._id);
       }
     });
@@ -650,14 +650,18 @@ app.controller('FormShareController', ['$scope', function($scope) {
             defaultRole = role;
           }
         });
-        angular.forEach($scope.form.submissionAccess, function(access) {
-          if (
-            (access.type === 'create_own') &&
-            (_.indexOf(access.roles, defaultRole._id) === -1)
-          ) {
-            $scope.publicForm = false;
-          }
-        });
+
+        if (defaultRole !== null) {
+          $scope.publicForm = false;
+          angular.forEach($scope.form.submissionAccess, function(access) {
+            if (
+              (access.type === 'create_own' || access.type === 'create_all') &&
+              (_.indexOf(access.roles, defaultRole._id) !== -1)
+            ) {
+              $scope.publicForm = true;
+            }
+          });
+        }
       });
 
       $scope.$watch('options', function() {

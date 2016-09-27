@@ -1,6 +1,6 @@
-<div class="well">
-  <h4 ng-if="!publicForm">This form is <strong class="text-danger">Private</strong> and will <strong>NOT</strong> allow anonymous submissions. <a ng-click="makePublic()" class="btn btn-success">Make Public</a></h4>
-  <h4 ng-if="publicForm">This form is <strong class="text-success">Public</strong> and will allow anonymous submissions. <a ng-click="makePrivate()" class="btn btn-danger">Make Private</a></h4>
+<div class="well well-sm center-block" ng-if="publicForm !== null">
+  <span class="h3 center-block launch-warn" ng-if="publicForm === false">This form is <strong class="text-danger">Private</strong> and will <strong>NOT</strong> allow anonymous submissions. <a ng-click="makePublic()" class="btn btn-xs btn-success pull-right">Make Public</a></span>
+  <span class="h3 center-block launch-warn" ng-if="publicForm === true">This form is <strong class="text-success">Public</strong> and will allow anonymous submissions. <a ng-click="makePrivate()" class="btn btn-xs btn-danger pull-right">Make Private</a></span>
 </div>
 <h4>The following url can be used to share this form with others.</h4>
 <span><a class="btn btn-primary" style="float:left;padding:12px 20px;" href="{{ previewUrl }}" target="_blank"><i class="fa fa-share"></i></a><pre style="font-size:1.2em;"><code>{{ previewUrl }}</code></pre></span>
