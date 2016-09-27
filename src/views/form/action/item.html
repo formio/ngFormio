@@ -1,5 +1,12 @@
+<div class="row">
+  <div class="col-md-12">
+    <div ng-if="highestRole === 'team_read'" class="alert alert-warning">
+      Your highest role is Team Read, so you may view existing actions, but not edit them.
+    </div>
+  </div>
+</div>
 <ul class="nav nav-tabs action-nav">
     <li role="presentation" ng-class="{active:isActive('project.{{ formInfo.type }}.form.action.item.edit')}"><a ui-sref="project.{{ formInfo.type }}.form.action.item.edit()">Edit</a></li>
-    <li role="presentation" ng-class="{active:isActive('project.{{ formInfo.type }}.form.action.item.delete')}"><a ui-sref="project.{{ formInfo.type }}.form.action.item.delete()">Delete</a></li>
+    <li ng-if="highestRole !== 'team_read'" role="presentation" ng-class="{active:isActive('project.{{ formInfo.type }}.form.action.item.delete')}"><a ui-sref="project.{{ formInfo.type }}.form.action.item.delete()">Delete</a></li>
 </ul>
 <div ui-view></div>
