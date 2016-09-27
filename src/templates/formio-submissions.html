@@ -1,6 +1,6 @@
 <div>
   <div ng-repeat="alert in formioAlerts track by $index" class="alert alert-{{ alert.type }}" role="alert">
-    {{ alert.message }}
+    {{ alert.message | formioTranslate }}
   </div>
   <table class="table">
     <thead>
