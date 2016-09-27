@@ -168,9 +168,22 @@ module.exports = function(app) {
 
           // Add a watch if they wish to refresh on selection of another field.
           if (settings.refreshOn) {
-            $scope.$watch('data.' + settings.refreshOn, function() {
-              $scope.refreshItems();
-            });
+            if (settings.refreshOn === 'data') {
+              $scope.$watch('data', function() {
+                $scope.refreshItems();
+                if (settings.clearOnRefresh) {
+                  $scope.data[settings.key] = settings.multiple ? [] : '';
+                }
+              }, true);
+            }
+            else {
+              $scope.$watch('data.' + settings.refreshOn, function() {
+                $scope.refreshItems();
+                if (settings.clearOnRefresh) {
+                  $scope.data[settings.key] = settings.multiple ? [] : '';
+                }
+              });
+            }
           }
 
           switch (settings.dataSrc) {
@@ -199,6 +212,20 @@ module.exports = function(app) {
               catch (error) {
                 $scope.selectItems = [];
               }
+              break;
+            case 'custom':
+              $scope.refreshItems = function() {
+                try {
+                  /* eslint-disable no-unused-vars */
+                  var data = _.cloneDeep($scope.data);
+                  /* eslint-enable no-unused-vars */
+                  $scope.selectItems = eval('(function(data) { var values = [];' + settings.data.custom.toString() + '; return values; })(data)');
+                }
+                catch (error) {
+                  $scope.selectItems = [];
+                }
+              };
+              $scope.refreshItems();
               break;
             case 'url':
             case 'resource':
@@ -337,7 +364,8 @@ module.exports = function(app) {
             values: [],
             json: '',
             url: '',
-            resource: ''
+            resource: '',
+            custom: ''
           },
           dataSrc: 'values',
           valueProperty: '',
