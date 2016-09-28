@@ -729,6 +729,12 @@ app.factory('FormioAlerts', [
             element: error.path
           });
         }
+        else {
+          this.addAlert({
+            type: 'danger',
+            message: error
+          });
+        }
       }
     };
   }
