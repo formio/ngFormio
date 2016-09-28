@@ -510,7 +510,7 @@ app.controller('FormController', [
           // FOR-128 - if we're editing a form, make note of the components with issues.
           try {
             var issues = (/Component keys must be unique: (.*)/.exec(_.get(err, 'errors.components.message'))).slice(1);
-            if ($state.includes('project.form.form.edit') && (issues.length > 0)) {
+            if (($state.includes('project.form.form.edit') || $state.includes('project.form.create')) && (issues.length > 0)) {
               issues = (issues.shift()).toString().split(', ');
               issues.forEach(function(issue) {
                 angular.element('div.dropzone #' + issue).parent().addClass('has-error');
