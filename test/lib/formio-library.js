@@ -25,7 +25,7 @@ module.exports = function(config) {
       length: chance.natural({min: 5, max: 20}),
       pool: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
     });
-    return this.string(options);
+    return this.string(options).toLowerCase();
   };
 
   /**
@@ -52,7 +52,7 @@ module.exports = function(config) {
         return chance.name();
       case 'name':
       case 'username':
-        return chance.username();
+        return chance.username().toLowerCase();
       case 'email':
         return chance.email();
       case 'password':
