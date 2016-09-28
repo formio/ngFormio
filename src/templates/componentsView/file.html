@@ -1,4 +1,5 @@
 <label ng-if="component.label && !component.hideLabel" for="{{ component.key }}" class="control-label" ng-class="{'field-required': component.validate.required}">{{ component.label | formioTranslate }}</label>
 <div ng-controller="formioFileUpload">
-  <formio-file-list files="data[component.key]" form="formUrl" read-only="true"></formio-file-list>
+  <formio-file-list files="data[component.key]" form="formUrl" read-only="true" ng-if="!component.image"></formio-file-list>
+  <formio-image-list files="data[component.key]" form="formUrl" read-only="true" width="component.imageSize" ng-if="component.image"></formio-image-list>
 </div>
