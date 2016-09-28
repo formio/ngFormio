@@ -12,6 +12,8 @@ module.exports = function(app) {
           tableView: true,
           label: '',
           key: 'file',
+          image: false,
+          imageSize: '200',
           placeholder: '',
           multiple: false,
           defaultValue: '',
@@ -43,6 +45,29 @@ module.exports = function(app) {
 
           $scope.fileSize = function(a, b, c, d, e) {
             return (b = Math, c = b.log, d = 1024, e = c(a) / c(d) | 0, a / b.pow(d, e)).toFixed(2) + ' ' + (e ? 'kMGTPEZY'[--e] + 'B' : 'Bytes');
+          };
+        }
+      ]
+    };
+  }]);
+
+  app.directive('formioImageList', [function() {
+    return {
+      restrict: 'E',
+      replace: true,
+      scope: {
+        files: '=',
+        form: '=',
+        width: '=',
+        readOnly: '='
+      },
+      templateUrl: 'formio/components/formio-image-list.html',
+      controller: [
+        '$scope',
+        function($scope) {
+          $scope.removeFile = function(event, index) {
+            event.preventDefault();
+            $scope.files.splice(index, 1);
           };
         }
       ]
@@ -96,9 +121,10 @@ module.exports = function(app) {
       replace: true,
       scope: {
         file: '=',
-        form: '='
+        form: '=',
+        width: '='
       },
-      template: '<img ng-src="{{ imageSrc }}" alt="{{ file.name }}" />',
+      template: '<img ng-src="{{ imageSrc }}" alt="{{ file.name }}" ng-style="{width: width}" />',
       controller: [
         '$rootScope',
         '$scope',
@@ -199,6 +225,10 @@ module.exports = function(app) {
     function(
       $templateCache
     ) {
+      $templateCache.put('formio/components/formio-image-list.html',
+        fs.readFileSync(__dirname + '/../templates/components/formio-image-list.html', 'utf8')
+      );
+
       $templateCache.put('formio/components/formio-file-list.html',
         fs.readFileSync(__dirname + '/../templates/components/formio-file-list.html', 'utf8')
       );
