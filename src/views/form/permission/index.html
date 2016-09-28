@@ -61,5 +61,5 @@
 </div>
 <div class="form-group pull-right">
   <a class="btn btn-default" ng-click="back('project.{{ formInfo.type }}.form.view')">Cancel</a>
-  <input ng-if="highestRole !== 'team_read'" type="submit" class="btn btn-primary" ng-click="saveForm()" value="Save Changes" />
+  <input ng-hide="highestRole === 'team_read'" type="submit" class="btn btn-primary" ng-click="saveForm()" value="Save Changes" />
 </div>
