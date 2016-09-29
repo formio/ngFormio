@@ -8,7 +8,7 @@
   </div>
   <style type="text/css">.bs-wizard > .bs-wizard-step:first-child { margin-left: {{ margin }}%; }</style>
   <i ng-show="!wizardLoaded" id="formio-loading" style="font-size: 2em;" class="glyphicon glyphicon-refresh glyphicon-spin"></i>
-  <div ng-repeat="alert in formioAlerts track by $index" class="alert alert-{{ alert.type }}" role="alert">{{ alert.message }}</div>
+  <div ng-repeat="alert in formioAlerts track by $index" class="alert alert-{{ alert.type }}" role="alert">{{ alert.message | formioTranslate }}</div>
   <div class="formio-wizard"></div>
   <ul ng-show="wizardLoaded" class="list-inline">
     <li><a class="btn btn-default" ng-click="cancel()">Cancel</a></li>
