@@ -73,6 +73,9 @@ module.exports = [
 
           // Remove a field value.
           $scope.removeFieldValue = function(index) {
+            if (!Array.isArray($scope.data[$scope.component.key])) {
+              $scope.data[$scope.component.key] = [];
+            }
             $scope.data[$scope.component.key].splice(index, 1);
           };
 
