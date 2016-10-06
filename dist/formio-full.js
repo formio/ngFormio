@@ -61566,7 +61566,7 @@ return jQuery;
  * progress, resize, thumbnail, preview, validation and CORS
  * FileAPI Flash shim for old browsers not supporting FormData
  * @author  Danial  <danial.farid@gmail.com>
- * @version 12.2.12
+ * @version 12.2.11
  */
 
 (function () {
@@ -61987,7 +61987,7 @@ if (!window.FileReader) {
  * AngularJS file upload directives and services. Supoorts: file upload/drop/paste, resume, cancel/abort,
  * progress, resize, thumbnail, preview, validation and CORS
  * @author  Danial  <danial.farid@gmail.com>
- * @version 12.2.12
+ * @version 12.2.11
  */
 
 if (window.XMLHttpRequest && !(window.FileAPI && FileAPI.shouldLoad)) {
@@ -62008,7 +62008,7 @@ if (window.XMLHttpRequest && !(window.FileAPI && FileAPI.shouldLoad)) {
 
 var ngFileUpload = angular.module('ngFileUpload', []);
 
-ngFileUpload.version = '12.2.12';
+ngFileUpload.version = '12.2.11';
 
 ngFileUpload.service('UploadBase', ['$http', '$q', '$timeout', function ($http, $q, $timeout) {
   var upload = this;
@@ -62465,13 +62465,13 @@ ngFileUpload.service('Upload', ['$parse', '$timeout', '$compile', '$q', 'UploadE
     return $q.all(promises);
   }
 
-  function resizeFile(files, attr, scope, ngModel) {
+  function resize(files, attr, scope) {
     var resizeVal = upload.attrGetter('ngfResize', attr, scope);
     if (!resizeVal || !upload.isResizeSupported() || !files.length) return upload.emptyPromise();
     if (resizeVal instanceof Function) {
       var defer = $q.defer();
       return resizeVal(files).then(function (p) {
-        resizeWithParams(p, files, attr, scope, ngModel).then(function (r) {
+        resizeWithParams(p, files, attr, scope).then(function (r) {
           defer.resolve(r);
         }, function (e) {
           defer.reject(e);
@@ -62480,11 +62480,11 @@ ngFileUpload.service('Upload', ['$parse', '$timeout', '$compile', '$q', 'UploadE
         defer.reject(e);
       });
     } else {
-      return resizeWithParams(resizeVal, files, attr, scope, ngModel);
+      return resizeWithParams(resizeVal, files, attr, scope);
     }
   }
 
-  function resizeWithParams(params, files, attr, scope, ngModel) {
+  function resizeWithParams(params, files, attr, scope) {
     var promises = [upload.emptyPromise()];
 
     function handleFile(f, i) {
@@ -62500,10 +62500,7 @@ ngFileUpload.service('Upload', ['$parse', '$timeout', '$compile', '$q', 'UploadE
           files.splice(i, 1, resizedFile);
         }, function (e) {
           f.$error = 'resize';
-          (f.$errorMessages = (f.$errorMessages || {})).resize = true;
           f.$errorParam = (e ? (e.message ? e.message : e) + ': ' : '') + (f && f.name);
-          ngModel.$ngfValidations.push({name: 'resize', valid: false});
-          upload.applyModelValidation(ngModel, files);
         });
       }
     }
@@ -62599,8 +62596,7 @@ ngFileUpload.service('Upload', ['$parse', '$timeout', '$compile', '$q', 'UploadE
         }, options && options.debounce ? options.debounce.change || options.debounce : 0);
       }
 
-      var resizingFiles = validateAfterResize ? allNewFiles : valids;
-      resizeFile(resizingFiles, attr, scope, ngModel).then(function () {
+      resize(validateAfterResize ? allNewFiles : valids, attr, scope).then(function () {
         if (validateAfterResize) {
           upload.validate(allNewFiles, keep ? prevValidFiles.length : 0, ngModel, attr, scope)
             .then(function (validationResult) {
@@ -62611,18 +62607,8 @@ ngFileUpload.service('Upload', ['$parse', '$timeout', '$compile', '$q', 'UploadE
         } else {
           updateModel();
         }
-      }, function () {
-        for (var i = 0; i < resizingFiles.length; i++) {
-          var f = resizingFiles[i];
-          if (f.$error === 'resize') {
-            var index = valids.indexOf(f);
-            if (index > -1) {
-              valids.splice(index, 1);
-              invalids.push(f);
-            }
-            updateModel();
-          }
-        }
+      }, function (e) {
+        throw 'Could not resize files ' + e;
       });
     }
 
@@ -62745,25 +62731,21 @@ ngFileUpload.directive('ngfSelect', ['$parse', '$timeout', '$compile', 'Upload',
         fileElem.attr('accept', attrGetter('ngfAccept', scope));
       }));
     }
-    unwatches.push(attr.$observe('accept', function () {
+    attr.$observe('accept', function () {
       fileElem.attr('accept', attrGetter('accept'));
-    }));
-    function bindAttrToFileInput(fileElem, label) {
-      function updateId(val) {
-        fileElem.attr('id', 'ngf-' + val);
-        label.attr('id', 'ngf-label-' + val);
-      }
-
+    });
+    unwatches.push(function () {
+      if (attr.$$observers) delete attr.$$observers.accept;
+    });
+    function bindAttrToFileInput(fileElem) {
       for (var i = 0; i < elem[0].attributes.length; i++) {
         var attribute = elem[0].attributes[i];
         if (attribute.name !== 'type' && attribute.name !== 'class' && attribute.name !== 'style') {
-          if (attribute.name === 'id') {
-            updateId(attribute.value);
-            unwatches.push(attr.$observe('id', updateId));
-          } else {
-            fileElem.attr(attribute.name, (!attribute.value && (attribute.name === 'required' ||
-            attribute.name === 'multiple')) ? attribute.name : attribute.value);
+          if (attribute.value == null || attribute.value === '') {
+            if (attribute.name === 'required') attribute.value = 'required';
+            if (attribute.name === 'multiple') attribute.value = 'multiple';
           }
+          fileElem.attr(attribute.name, attribute.name === 'id' ? 'ngf-' + attribute.value : attribute.value);
         }
       }
     }
@@ -62775,12 +62757,15 @@ ngFileUpload.directive('ngfSelect', ['$parse', '$timeout', '$compile', 'Upload',
 
       var fileElem = angular.element('<input type="file">');
 
+      bindAttrToFileInput(fileElem);
+
       var label = angular.element('<label>upload</label>');
       label.css('visibility', 'hidden').css('position', 'absolute').css('overflow', 'hidden')
         .css('width', '0px').css('height', '0px').css('border', 'none')
         .css('margin', '0px').css('padding', '0px').attr('tabindex', '-1');
-      bindAttrToFileInput(fileElem, label);
-
+      if (elem.attr('id')) {
+        label.attr('id', 'ngf-label-' + elem.attr('id'));
+      }
       generatedElems.push({el: elem, ref: label});
 
       document.body.appendChild(label.append(fileElem)[0]);
@@ -62805,8 +62790,7 @@ ngFileUpload.directive('ngfSelect', ['$parse', '$timeout', '$compile', 'Upload',
           document.body.appendChild(fileElem.parent()[0]);
           fileElem.bind('change', changeFn);
         }
-      } catch (e) {/*ignore*/
-      }
+      } catch(e){/*ignore*/}
 
       if (isDelayedClickSupported(navigator.userAgent)) {
         setTimeout(function () {
@@ -62836,7 +62820,7 @@ ngFileUpload.directive('ngfSelect', ['$parse', '$timeout', '$compile', 'Upload',
             var currentX = touches[0].clientX;
             var currentY = touches[0].clientY;
             if ((Math.abs(currentX - initialTouchStartX) > 20) ||
-              (Math.abs(currentY - initialTouchStartY) > 20)) {
+            (Math.abs(currentY - initialTouchStartY) > 20)) {
               evt.stopPropagation();
               evt.preventDefault();
               return false;
@@ -71304,19 +71288,89 @@ module.exports = function() {
           if ($scope.checkErrors()) {
             return;
           }
-          var sub = angular.copy($scope.submission);
+
+          // Create a sanitized submission object.
+          var submissionData = {data: {}};
+          if ($scope.submission._id) {
+            submissionData._id = $scope.submission._id;
+          }
+          if ($scope.submission.data._id) {
+            submissionData._id = $scope.submission.data._id;
+          }
+
+          var grabIds = function(input) {
+            if (!input) {
+              return [];
+            }
+
+            if (!(input instanceof Array)) {
+              input = [input];
+            }
+
+            var final = [];
+            input.forEach(function(element) {
+              if (element && element._id) {
+                final.push(element._id);
+              }
+            });
+
+            return final;
+          };
+
+          var defaultPermissions = {};
           FormioUtils.eachComponent($scope.form.components, function(component) {
-            if (sub.data.hasOwnProperty(component.key) && (component.type === 'number')) {
-              if (sub.data[component.key]) {
-                sub.data[component.key] = parseFloat(sub.data[component.key]);
+            if (component.type === 'resource' && component.key && component.defaultPermission) {
+              defaultPermissions[component.key] = component.defaultPermission;
+            }
+            if (submissionData.data.hasOwnProperty(component.key) && (component.type === 'number')) {
+              var value = $scope.submission.data[component.key];
+              if (component.type === 'number') {
+                submissionData.data[component.key] = value ? parseFloat(value) : 0;
               }
               else {
-                sub.data[component.key] = 0;
+                submissionData.data[component.key] = value;
+              }
+            }
+          }, true);
+
+          angular.forEach($scope.submission.data, function(value, key) {
+            if (value && !value.hasOwnProperty('_id')) {
+              submissionData.data[key] = value;
+            }
+
+            // Setup the submission access.
+            var perm = defaultPermissions[key];
+            if (perm) {
+              submissionData.access = submissionData.access || [];
+
+              // Coerce value into an array for plucking.
+              if (!(value instanceof Array)) {
+                value = [value];
+              }
+
+              // Try to find and update an existing permission.
+              var found = false;
+              submissionData.access.forEach(function(permission) {
+                if (permission.type === perm) {
+                  found = true;
+                  permission.resources = permission.resources || [];
+                  permission.resources.concat(grabIds(value));
+                }
+              });
+
+              // Add a permission, because one was not found.
+              if (!found) {
+                submissionData.access.push({
+                  type: perm,
+                  resources: grabIds(value)
+                });
               }
             }
           });
+          // Strip out any angular keys.
+          submissionData = angular.copy(submissionData);
 
-          var submitEvent = $scope.$emit('formSubmit', sub);
+          var submitEvent = $scope.$emit('formSubmit', submissionData);
           if (submitEvent.defaultPrevented) {
               // Listener wants to cancel the form submission
               return;
@@ -71335,17 +71389,17 @@ module.exports = function() {
 
           // Save to specified action.
           if ($scope.action) {
-            var method = sub._id ? 'put' : 'post';
-            $http[method]($scope.action, sub).success(function(submission) {
+            var method = submissionData._id ? 'put' : 'post';
+            $http[method]($scope.action, submissionData).success(function(submission) {
               Formio.clearCache();
               onDone(submission);
             }).error(FormioScope.onError($scope, $element));
           }
           else if ($scope.formio && !$scope.formio.noSubmit) {
-            $scope.formio.saveSubmission(sub).then(onDone).catch(FormioScope.onError($scope, $element));
+            $scope.formio.saveSubmission(submissionData).then(onDone).catch(FormioScope.onError($scope, $element));
           }
           else {
-            onDone(sub);
+            onDone(submissionData);
           }
         };
 
