@@ -203,6 +203,7 @@ module.exports = function() {
         $scope.cancel = function() {
           $scope.clear();
           showPage(true);
+          $scope.$emit('cancel');
         };
 
         // Move onto the next page.
