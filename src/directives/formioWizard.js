@@ -78,7 +78,7 @@ module.exports = function() {
         $scope.pages = [];
         $scope.hasTitles = false;
         $scope.colclass = '';
-        if (!$scope.submission || !Object.keys($scope.submission.data).length) {
+        if (!$scope.submission || !Object.keys($scope.submission).length) {
           $scope.submission = session ? {data: session.data} : {data: {}};
         }
         $scope.currentPage = session ? session.page : 0;
