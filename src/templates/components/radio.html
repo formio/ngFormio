@@ -7,6 +7,7 @@
              tabindex="{{ component.tabindex || 0 }}"
              ng-model="data[component.key]"
              ng-required="component.validate.required"
+             custom-validator="component.validate.custom"
              ng-disabled="readOnly">
 
       {{ v.label | formioTranslate }}
