@@ -10,6 +10,7 @@
   ng-required="component.validate.required"
   id="{{ componentId }}"
   theme="bootstrap"
+  custom-validator="component.validate.custom"
   tabindex="{{ component.tabindex || 0 }}"
 >
   <ui-select-match class="ui-select-match" placeholder="{{ component.placeholder | formioTranslate }}">
