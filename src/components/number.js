@@ -19,7 +19,7 @@ module.exports = function(app) {
           placeholder: '',
           prefix: '',
           suffix: '',
-          defaultValue: 0,
+          defaultValue: '',
           protected: false,
           persistent: true,
           validate: {

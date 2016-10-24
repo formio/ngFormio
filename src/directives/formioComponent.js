@@ -139,15 +139,20 @@ module.exports = [
 
               // Use the current data or default.
               $scope.data[$scope.component.key] = value;
+              return;
             }
-            else {
-              // Use the current data or default.
-              if ($scope.data.hasOwnProperty($scope.component.key)) {
-                $scope.data[$scope.component.key] = $scope.data[$scope.component.key];
-              }
-              // FA-835 - The default values for select boxes are set in the component.
-              else if ($scope.component.hasOwnProperty('defaultValue') && $scope.component.type !== 'selectboxes') {
-                $scope.data[$scope.component.key] = $scope.component.defaultValue;
+
+            // Use the current data or default.
+            if ($scope.data.hasOwnProperty($scope.component.key)) {
+              $scope.data[$scope.component.key] = $scope.data[$scope.component.key];
+            }
+            // FA-835 - The default values for select boxes are set in the component.
+            else if ($scope.component.hasOwnProperty('defaultValue') && $scope.component.type !== 'selectboxes') {
+              $scope.data[$scope.component.key] = $scope.component.defaultValue;
+
+              // FOR-193 - Fix default value for the number component.
+              if ($scope.component.type === 'number') {
+                $scope.data[$scope.component.key] = parseInt($scope.data[$scope.component.key]);
               }
             }
           });
