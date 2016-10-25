@@ -1409,7 +1409,7 @@ app.controller('ProjectSettingsController', [
     AppConfig,
     $interval
   ) {
-    if ($scope.highestRole && ['team_read', 'team_write'].indexOf($scope.highestRole) !== -1) {
+    if (!$scope.highestRole || ($scope.highestRole && ['team_read', 'team_write'].indexOf($scope.highestRole) !== -1)) {
       $state.go('project.overview');
       return;
     }
