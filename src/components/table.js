@@ -9,6 +9,7 @@ module.exports = function(app) {
         group: 'layout',
         settings: {
           input: false,
+          key: 'table',
           numRows: 3,
           numCols: 3,
           rows: [[{components: []}, {components: []}, {components: []}], [{components: []}, {components: []}, {components: []}], [{components: []}, {components: []}, {components: []}]],

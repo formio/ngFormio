@@ -51,6 +51,7 @@ module.exports = function(app) {
         title: 'HTML Element',
         template: 'formio/components/htmlelement.html',
         settings: {
+          key: 'html',
           input: false,
           tag: 'p',
           attrs: [],
