@@ -71439,9 +71439,7 @@ module.exports = function() {
           }, true);
 
           angular.forEach($scope.submission.data, function(value, key) {
-            if (value && !value.hasOwnProperty('_id')) {
-              submissionData.data[key] = value;
-            }
+            submissionData.data[key] = value;
 
             // Setup the submission access.
             var perm = defaultPermissions[key];
