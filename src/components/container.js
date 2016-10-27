@@ -7,7 +7,7 @@ module.exports = function(app) {
         title: 'Container',
         template: 'formio/components/container.html',
         viewTemplate: 'formio/componentsView/container.html',
-        group: 'layout',
+        group: 'advanced',
         icon: 'fa fa-folder-open',
         settings: {
           input: true,
