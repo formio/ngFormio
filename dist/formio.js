@@ -1512,6 +1512,83 @@ Formio.getAppUrl = function() {
 
 Formio.clearCache = function() { cache = {}; };
 
+/**
+ * Attach an HTML form to Form.io.
+ *
+ * @param form
+ */
+Formio.form = function(form, options, done) {
+  // Fix the parameters.
+  if (!done && typeof options === 'function') {
+    done = options;
+    options = {};
+  }
+
+  done = done || (function() { console.log(arguments); });
+  options = options || {};
+
+  // IF they provide a jquery object, then select the element.
+  if (form.jquery) { form = form[0]; }
+  if (!form) {
+    return done('Invalid Form');
+  }
+
+  /**
+   * Returns the current submission object.
+   * @returns {{data: {}}}
+   */
+  var getSubmission = function() {
+    var submission = {data: {}};
+    var action = options.form || form.getAttribute('action');
+    var setValue = function(path, value) {
+      var paths = path.replace(/\[|\]\[/g, '.').replace(/\]$/g, '').split('.');
+      var current = submission;
+      while (path = paths.shift()) {
+        if (!paths.length) {
+          current[path] = value;
+        }
+        else {
+          if (!current[path]) {
+            current[path] = {};
+          }
+          current = current[path];
+        }
+      }
+    };
+
+    // Get the form data from this form.
+    var formData = new FormData(form);
+    var entries = formData.entries();
+    var entry = null;
+    while (entry = entries.next().value) {
+      setValue(entry[0], entry[1]);
+    }
+    return submission;
+  };
+
+  // Submits the form.
+  var submit = function(event) {
+    if (event) {
+      event.preventDefault();
+    }
+    (new Formio(action)).saveSubmission(getSubmission()).then(function(sub) {
+      done(null, sub);
+    }, done);
+  };
+
+  // Attach formio to the provided form.
+  if (form.attachEvent) {
+    form.attachEvent('submit', submit);
+  } else {
+    form.addEventListener('submit', submit);
+  }
+
+  return {
+    submit: submit,
+    getSubmission: getSubmission
+  };
+};
+
 Formio.currentUser = function() {
   var url = baseUrl + '/current';
   var user = this.getUser();
@@ -3023,6 +3100,7 @@ module.exports = function(app) {
         group: 'layout',
         settings: {
           input: false,
+          key: 'columns',
           columns: [{components: []}, {components: []}]
         },
         viewTemplate: 'formio/componentsView/columns.html'
@@ -3158,6 +3236,7 @@ module.exports = function(app) {
         title: 'Content',
         template: 'formio/components/content.html',
         settings: {
+          key: 'content',
           input: false,
           html: ''
         },
@@ -3556,6 +3635,7 @@ module.exports = function(app) {
         template: 'formio/components/fieldset.html',
         group: 'layout',
         settings: {
+          key: 'fieldset',
           input: false,
           tableView: true,
           legend: '',
@@ -3915,6 +3995,7 @@ module.exports = function(app) {
         title: 'HTML Element',
         template: 'formio/components/htmlelement.html',
         settings: {
+          key: 'html',
           input: false,
           tag: 'p',
           attrs: [],
@@ -4003,7 +4084,7 @@ module.exports = function(app) {
           placeholder: '',
           prefix: '',
           suffix: '',
-          defaultValue: 0,
+          defaultValue: '',
           protected: false,
           persistent: true,
           validate: {
@@ -4047,6 +4128,7 @@ module.exports = function(app) {
       formioComponentsProvider.register('page', {
         template: 'formio/components/page.html',
         settings: {
+          key: 'page',
           input: false,
           components: []
         }
@@ -4075,6 +4157,7 @@ module.exports = function(app) {
         template: 'formio/components/panel.html',
         group: 'layout',
         settings: {
+          key: 'panel',
           input: false,
           title: '',
           theme: 'default',
@@ -5055,6 +5138,7 @@ module.exports = function(app) {
         group: 'layout',
         settings: {
           input: false,
+          key: 'table',
           numRows: 3,
           numCols: 3,
           rows: [[{components: []}, {components: []}, {components: []}], [{components: []}, {components: []}, {components: []}], [{components: []}, {components: []}, {components: []}]],
@@ -5213,6 +5297,7 @@ module.exports = function(app) {
         template: 'formio/components/well.html',
         group: 'layout',
         settings: {
+          key: 'well',
           input: false,
           components: []
         },
@@ -5936,15 +6021,20 @@ module.exports = [
 
               // Use the current data or default.
               $scope.data[$scope.component.key] = value;
+              return;
             }
-            else {
-              // Use the current data or default.
-              if ($scope.data.hasOwnProperty($scope.component.key)) {
-                $scope.data[$scope.component.key] = $scope.data[$scope.component.key];
-              }
-              // FA-835 - The default values for select boxes are set in the component.
-              else if ($scope.component.hasOwnProperty('defaultValue') && $scope.component.type !== 'selectboxes') {
-                $scope.data[$scope.component.key] = $scope.component.defaultValue;
+
+            // Use the current data or default.
+            if ($scope.data.hasOwnProperty($scope.component.key)) {
+              $scope.data[$scope.component.key] = $scope.data[$scope.component.key];
+            }
+            // FA-835 - The default values for select boxes are set in the component.
+            else if ($scope.component.hasOwnProperty('defaultValue') && $scope.component.type !== 'selectboxes') {
+              $scope.data[$scope.component.key] = $scope.component.defaultValue;
+
+              // FOR-193 - Fix default value for the number component.
+              if ($scope.component.type === 'number') {
+                $scope.data[$scope.component.key] = parseInt($scope.data[$scope.component.key]);
               }
             }
           });
