@@ -6,6 +6,7 @@ module.exports = function(app) {
       formioComponentsProvider.register('page', {
         template: 'formio/components/page.html',
         settings: {
+          key: 'page',
           input: false,
           components: []
         }

@@ -8,6 +8,7 @@ module.exports = function(app) {
         template: 'formio/components/well.html',
         group: 'layout',
         settings: {
+          key: 'well',
           input: false,
           components: []
         },

@@ -8,6 +8,7 @@ module.exports = function(app) {
         template: 'formio/components/fieldset.html',
         group: 'layout',
         settings: {
+          key: 'fieldset',
           input: false,
           tableView: true,
           legend: '',

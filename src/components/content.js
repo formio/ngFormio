@@ -7,6 +7,7 @@ module.exports = function(app) {
         title: 'Content',
         template: 'formio/components/content.html',
         settings: {
+          key: 'content',
           input: false,
           html: ''
         },
