@@ -1,3 +1,4 @@
+require('./polyfills/polyfills');
 var fs = require('fs');
 
 var app = angular.module('formio', [
