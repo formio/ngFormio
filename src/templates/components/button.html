@@ -1,4 +1,4 @@
-<button type="{{component.action == 'submit' || component.action == 'reset' ? component.action : 'button'}}"
+<button type="{{ getButtonType() }}"
   id="{{ componentId }}"
   name="{{ componentId }}"
   ng-class="{'btn-block': component.block}"
