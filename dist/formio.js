@@ -1,4 +1,4 @@
-/*! ng-formio v2.3.1 | https://unpkg.com/ng-formio@2.3.1/LICENSE.txt */
+/*! ng-formio v2.3.2 | https://unpkg.com/ng-formio@2.3.2/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 /*!
  * EventEmitter2
@@ -4919,7 +4919,7 @@ module.exports = function(app) {
         "<div class=\"select-boxes\">\n  <div ng-class=\"component.inline ? 'checkbox-inline' : 'checkbox'\" ng-repeat=\"v in component.values track by $index\">\n    <label class=\"control-label\" for=\"{{ componentId }}-{{ v.value }}\">\n      <input type=\"checkbox\"\n        id=\"{{ componentId }}-{{ v.value }}\"\n        name=\"{{ componentId }}-{{ v.value }}\"\n        value=\"{{ v.value }}\"\n        tabindex=\"{{ component.tabindex || 0 }}\"\n        ng-disabled=\"readOnly\"\n        ng-click=\"toggleCheckbox(v.value)\"\n        ng-checked=\"model[v.value]\"\n        grid-row=\"gridRow\"\n        grid-col=\"gridCol\"\n      >\n      {{ v.label | formioTranslate }}\n    </label>\n  </div>\n</div>\n"
       );
       $templateCache.put('formio/components/selectboxes.html',
-        "<div class=\"select-boxes\">\n  <label ng-if=\"component.label && !component.hideLabel\" for=\"{{ componentId }}\" class=\"control-label\" ng-class=\"{'field-required': component.validate.required}\">\n    {{ component.label }}\n  </label>\n  <formio-select-boxes\n    ng-model=\"data[component.key]\"\n    ng-model-options=\"{allowInvalid: true}\"\n    component=\"component\"\n    component-id=\"componentId\"\n    read-only=\"readOnly\"\n    ng-required=\"component.validate.required\"\n    custom-validator=\"component.validate.custom\"\n    grid-row=\"gridRow\"\n    grid-col=\"gridCol\"\n  ></formio-select-boxes>\n  <formio-errors></formio-errors>\n</div>\n"
+        "<div class=\"select-boxes\">\n  <label ng-if=\"component.label && !component.hideLabel\" for=\"{{ componentId }}\" class=\"control-label\" ng-class=\"{'field-required': component.validate.required}\">\n    {{ component.label }}\n  </label>\n  <formio-select-boxes\n    name=\"{{componentId}}\"\n    ng-model=\"data[component.key]\"\n    ng-model-options=\"{allowInvalid: true}\"\n    component=\"component\"\n    component-id=\"componentId\"\n    read-only=\"readOnly\"\n    ng-required=\"component.validate.required\"\n    custom-validator=\"component.validate.custom\"\n    grid-row=\"gridRow\"\n    grid-col=\"gridCol\"\n  ></formio-select-boxes>\n  <formio-errors></formio-errors>\n</div>\n"
       );
     }
   ]);
@@ -5570,6 +5570,7 @@ module.exports = function() {
          * @private
          */
         var _toggleConditional = function(componentKey, subData) {
+          var result;
           if (_conditionals.hasOwnProperty(componentKey)) {
             var data = Object.assign({}, $scope.submission.data, subData);
             var cond = _conditionals[componentKey];
@@ -5577,7 +5578,7 @@ module.exports = function() {
 
             if (typeof value !== 'undefined' && typeof value !== 'object') {
               // Check if the conditional value is equal to the trigger value
-              $scope.show[componentKey] = value.toString() === cond.eq.toString()
+              result = value.toString() === cond.eq.toString()
                 ? boolean[cond.show]
                 : !boolean[cond.show];
             }
@@ -5585,26 +5586,26 @@ module.exports = function() {
             else if (typeof value !== 'undefined' && typeof value === 'object') {
               // Only update the visibility is present, otherwise hide, because it was deleted by the submission sweep.
               if (value.hasOwnProperty(cond.eq)) {
-                $scope.show[componentKey] = boolean.hasOwnProperty(value[cond.eq])
+                result = boolean.hasOwnProperty(value[cond.eq])
                   ? boolean[value[cond.eq]]
                   : true;
               }
               else {
-                $scope.show[componentKey] = false;
+                result = false;
               }
             }
             // Check against the components default value, if present and the components hasn't been interacted with.
             else if (typeof value === 'undefined' && cond.hasOwnProperty('defaultValue')) {
-              $scope.show[componentKey] = cond.defaultValue.toString() === cond.eq.toString()
+              result = cond.defaultValue.toString() === cond.eq.toString()
                 ? boolean[cond.show]
                 : !boolean[cond.show];
             }
             // If there is no value, we still need to process as not equal.
             else {
-              $scope.show[componentKey] = !boolean[cond.show];
+              result = !boolean[cond.show];
             }
           }
-          return $scope.show.hasOwnProperty(componentKey) ? $scope.show[componentKey] : null;
+          return result;
         };
 
         /**
@@ -5616,6 +5617,7 @@ module.exports = function() {
          * @private
          */
         var _toggleCustomConditional = function(componentKey, subData) {
+          var result;
           if (_customConditionals.hasOwnProperty(componentKey)) {
             var cond = _customConditionals[componentKey];
 
@@ -5625,20 +5627,20 @@ module.exports = function() {
               // Eval the custom conditional and update the show value.
               var show = eval('(function() { ' + cond.toString() + '; return show; })()');
               // Show by default, if an invalid type is given.
-              $scope.show[componentKey] = boolean.hasOwnProperty(show.toString()) ? boolean[show] : true;
+              result = boolean.hasOwnProperty(show.toString()) ? boolean[show] : true;
             }
             catch (e) {
-              $scope.show[componentKey] = true;
+              result = true;
             }
           }
-          return $scope.show.hasOwnProperty(componentKey) ? $scope.show[componentKey] : null;
+          return result;
         };
 
         $scope.checkConditional = function(componentKey, subData) {
-          _toggleConditional(componentKey, subData);
+          var conditional = _toggleConditional(componentKey, subData);
           var customConditional = _toggleCustomConditional(componentKey, subData);
           // customConditional will be true if either are true since the value persists in $scope.show.
-          return customConditional;
+          return conditional || customConditional;
         };
 
         // On every change to data, trigger the conditionals.
@@ -5650,12 +5652,12 @@ module.exports = function() {
           // Toggle every conditional.
           var allConditionals = Object.keys(_conditionals);
           (allConditionals || []).forEach(function(componentKey) {
-            _toggleConditional(componentKey);
+            $scope.show[componentKey] = _toggleConditional(componentKey);
           });
 
           var allCustomConditionals = Object.keys(_customConditionals);
           (allCustomConditionals || []).forEach(function(componentKey) {
-            _toggleCustomConditional(componentKey);
+            $scope.show[componentKey] = _toggleCustomConditional(componentKey);
           });
 
           var allHidden = Object.keys($scope.show);
