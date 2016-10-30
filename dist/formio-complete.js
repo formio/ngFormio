@@ -58139,6 +58139,18 @@ module.exports = function(app) {
         },
         controller: ['$scope', function($scope) {
           var settings = $scope.component;
+          $scope.getButtonType = function() {
+            switch (settings.action) {
+              case 'submit':
+                return 'submit';
+              case 'reset':
+                return 'reset';
+              case 'oauth':
+              default:
+                return 'button';
+            }
+          };
+
           var onClick = function() {
             switch (settings.action) {
               case 'submit':
@@ -58265,7 +58277,7 @@ module.exports = function(app) {
     '$templateCache',
     function($templateCache) {
       $templateCache.put('formio/components/button.html',
-        "<button type=\"{{component.action == 'submit' || component.action == 'reset' ? component.action : 'button'}}\"\n  id=\"{{ componentId }}\"\n  name=\"{{ componentId }}\"\n  ng-class=\"{'btn-block': component.block}\"\n  class=\"btn btn-{{ component.theme }} btn-{{ component.size }}\"\n  ng-disabled=\"readOnly || formioForm.submitting || (component.disableOnInvalid && formioForm.$invalid)\"\n  tabindex=\"{{ component.tabindex || 0 }}\"\n  ng-click=\"$emit('buttonClick', component, componentId)\">\n  <span ng-if=\"component.leftIcon\" class=\"{{ component.leftIcon }}\" aria-hidden=\"true\"></span>\n  <span ng-if=\"component.leftIcon && component.label\">&nbsp;</span>{{ component.label | formioTranslate }}<span ng-if=\"component.rightIcon && component.label\">&nbsp;</span>\n  <span ng-if=\"component.rightIcon\" class=\"{{ component.rightIcon }}\" aria-hidden=\"true\"></span>\n   <i ng-if=\"component.action == 'submit' && formioForm.submitting\" class=\"glyphicon glyphicon-refresh glyphicon-spin\"></i>\n</button>\n"
+        "<button type=\"{{ getButtonType() }}\"\n  id=\"{{ componentId }}\"\n  name=\"{{ componentId }}\"\n  ng-class=\"{'btn-block': component.block}\"\n  class=\"btn btn-{{ component.theme }} btn-{{ component.size }}\"\n  ng-disabled=\"readOnly || formioForm.submitting || (component.disableOnInvalid && formioForm.$invalid)\"\n  tabindex=\"{{ component.tabindex || 0 }}\"\n  ng-click=\"$emit('buttonClick', component, componentId)\">\n  <span ng-if=\"component.leftIcon\" class=\"{{ component.leftIcon }}\" aria-hidden=\"true\"></span>\n  <span ng-if=\"component.leftIcon && component.label\">&nbsp;</span>{{ component.label | formioTranslate }}<span ng-if=\"component.rightIcon && component.label\">&nbsp;</span>\n  <span ng-if=\"component.rightIcon\" class=\"{{ component.rightIcon }}\" aria-hidden=\"true\"></span>\n   <i ng-if=\"component.action == 'submit' && formioForm.submitting\" class=\"glyphicon glyphicon-refresh glyphicon-spin\"></i>\n</button>\n"
       );
 
       $templateCache.put('formio/componentsView/button.html',
@@ -58434,7 +58446,7 @@ module.exports = function(app) {
         title: 'Container',
         template: 'formio/components/container.html',
         viewTemplate: 'formio/componentsView/container.html',
-        group: 'layout',
+        group: 'advanced',
         icon: 'fa fa-folder-open',
         settings: {
           input: true,
@@ -59291,13 +59303,13 @@ _dereq_('./resource')(app);
 _dereq_('./file')(app);
 _dereq_('./signature')(app);
 _dereq_('./custom')(app);
+_dereq_('./container')(app);
 _dereq_('./datagrid')(app);
 _dereq_('./survey')(app);
 
 // Layout
 _dereq_('./columns')(app);
 _dereq_('./fieldset')(app);
-_dereq_('./container')(app);
 _dereq_('./page')(app);
 _dereq_('./panel')(app);
 _dereq_('./table')(app);
@@ -62375,6 +62387,7 @@ _dereq_('./formio');
 
 },{"./formio":93,"angular-file-saver":1,"angular-moment":2,"angular-sanitize":4,"angular-ui-bootstrap":6,"angular-ui-mask/dist/mask":7,"bootstrap":11,"bootstrap-ui-datetime-picker/dist/datetime-picker":10,"ng-file-upload":35,"signature_pad":37,"ui-select/dist/select":38}],93:[function(_dereq_,module,exports){
 "use strict";
+_dereq_('./polyfills/polyfills');
 
 
 var app = angular.module('formio', [
@@ -62495,7 +62508,42 @@ app.run([
 
 _dereq_('./components');
 
-},{"./components":56,"./directives/customValidator":72,"./directives/formio":73,"./directives/formioComponent":74,"./directives/formioComponentView":75,"./directives/formioDelete":76,"./directives/formioElement":77,"./directives/formioErrors":78,"./directives/formioSubmission":79,"./directives/formioSubmissions":80,"./directives/formioWizard":81,"./factories/FormioScope":82,"./factories/FormioUtils":83,"./factories/formioInterceptor":84,"./factories/formioTableView":85,"./filters/flattenComponents":86,"./filters/safehtml":87,"./filters/tableComponents":88,"./filters/tableFieldView":89,"./filters/tableView":90,"./filters/translate":91,"./providers/Formio":94}],94:[function(_dereq_,module,exports){
+},{"./components":56,"./directives/customValidator":72,"./directives/formio":73,"./directives/formioComponent":74,"./directives/formioComponentView":75,"./directives/formioDelete":76,"./directives/formioElement":77,"./directives/formioErrors":78,"./directives/formioSubmission":79,"./directives/formioSubmissions":80,"./directives/formioWizard":81,"./factories/FormioScope":82,"./factories/FormioUtils":83,"./factories/formioInterceptor":84,"./factories/formioTableView":85,"./filters/flattenComponents":86,"./filters/safehtml":87,"./filters/tableComponents":88,"./filters/tableFieldView":89,"./filters/tableView":90,"./filters/translate":91,"./polyfills/polyfills":95,"./providers/Formio":96}],94:[function(_dereq_,module,exports){
+"use strict";
+'use strict';
+
+if (typeof Object.assign != 'function') {
+  (function() {
+    Object.assign = function(target) {
+      'use strict';
+      // We must check against these specific cases.
+      if (target === undefined || target === null) {
+        throw new TypeError('Cannot convert undefined or null to object');
+      }
+
+      var output = Object(target);
+      for (var index = 1; index < arguments.length; index++) {
+        var source = arguments[index];
+        if (source !== undefined && source !== null) {
+          for (var nextKey in source) {
+            if (source.hasOwnProperty(nextKey)) {
+              output[nextKey] = source[nextKey];
+            }
+          }
+        }
+      }
+      return output;
+    };
+  })();
+}
+
+},{}],95:[function(_dereq_,module,exports){
+"use strict";
+'use strict';
+
+_dereq_('./Object.assign');
+
+},{"./Object.assign":94}],96:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   // The formio class.
