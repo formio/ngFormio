@@ -11,7 +11,7 @@ machine:
 
 dependencies:
   pre:
-    - npm install -g selenium-standalone phantomjs
+    - npm install selenium-standalone@latest phantomjs -g
     - selenium-standalone install
     - selenium-standalone start:
         background: true
