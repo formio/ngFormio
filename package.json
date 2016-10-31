@@ -5,7 +5,7 @@
   },
   "scripts": {
     "start": "node app.js",
-    "test": "BROWSER=phantomjs APPPROTOCOL=http APPDOMAIN=portal.localhost APPPORT=$PORT mocha --timeout 60000 --reporter spec test/test.js"
+    "test": "APPPROTOCOL=http APPDOMAIN=portal.localhost APPPORT=$PORT mocha --timeout 60000 --reporter spec test/test.js"
   },
   "main": "./index.js",
   "devDependencies": {

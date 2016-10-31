@@ -11,9 +11,8 @@ machine:
 
 dependencies:
   pre:
-    - npm install selenium-standalone@latest phantomjs-prebuilt chromedriver -g
-    - selenium-standalone install
-    - selenium-standalone start:
+    - wget http://selenium-release.storage.googleapis.com/2.53/selenium-server-standalone-2.53.1.jar
+    - java -jar selenium-server-standalone-2.53.1.jar:
         background: true
     - pip install awscli
     - npm install -g bower gulp mocha
