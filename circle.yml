@@ -11,8 +11,9 @@ machine:
 
 dependencies:
   pre:
-    - wget http://selenium-release.storage.googleapis.com/2.53/selenium-server-standalone-2.53.0.jar
-    - java -jar selenium-server-standalone-2.53.0.jar:
+    - npm install -g selenium-standalone phantomjs
+    - selenium-standalone install
+    - selenium-standalone start
         background: true
     - pip install awscli
     - npm install -g bower gulp mocha
