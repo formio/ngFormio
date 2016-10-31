@@ -13,7 +13,7 @@ dependencies:
   pre:
     - npm install -g selenium-standalone phantomjs
     - selenium-standalone install
-    - selenium-standalone start
+    - selenium-standalone start:
         background: true
     - pip install awscli
     - npm install -g bower gulp mocha
