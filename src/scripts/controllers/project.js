@@ -119,7 +119,8 @@ app.controller('ProjectCreateController', [
       }
       var template = input.files[0];
 
-      if (typeof window.FileReader !== 'function') {
+      // FOR-107 - Fix for safari where FileReader isnt a function.
+      if (typeof window.FileReader !== 'function' && typeof window.FileReader !== 'object') {
         return;
       }
 
