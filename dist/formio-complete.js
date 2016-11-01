@@ -1,4 +1,4 @@
-/*! ng-formio v2.3.2 | https://unpkg.com/ng-formio@2.3.2/LICENSE.txt */
+/*! ng-formio v2.3.4 | https://unpkg.com/ng-formio@2.3.4/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -46157,6 +46157,10 @@ module.exports = {
       var i;
       var value;
 
+      if (!data) {
+        return null;
+      }
+
       if (data instanceof Array) {
         for (i = 0; i < data.length; i++) {
           if (typeof data[i] === 'object') {
@@ -61198,8 +61202,9 @@ module.exports = [
           var component = formioComponents.components[$scope.component.type] || formioComponents.components['custom'];
 
           // Set the component with the defaults from the component settings.
+          // Dont add the default key, so that components without keys will remain visible by default.
           angular.forEach(component.settings, function(value, key) {
-            if (!$scope.component.hasOwnProperty(key)) {
+            if (!$scope.component.hasOwnProperty(key) && key !== 'key') {
               $scope.component[key] = angular.copy(value);
             }
           });
@@ -62522,6 +62527,7 @@ if (typeof Object.assign != 'function') {
       }
 
       var output = Object(target);
+      /* eslint-disable max-depth */
       for (var index = 1; index < arguments.length; index++) {
         var source = arguments[index];
         if (source !== undefined && source !== null) {
@@ -62532,6 +62538,7 @@ if (typeof Object.assign != 'function') {
           }
         }
       }
+      /* eslint-enable max-depth */
       return output;
     };
   })();

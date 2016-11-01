@@ -1,6 +1,6 @@
 {
   "name": "ng-formio",
-  "version": "2.3.3",
+  "version": "2.3.4",
   "authors": [
     "Travis Tidwell <travis@form.io>"
   ],
@@ -24,7 +24,7 @@
     "signature_pad": "^1.5.3",
     "angular-ui-mask": "^1.8.7",
     "angular-file-saver": "^1.1.2",
-    "angular-ui-select": "^0.19.4",
+    "angular-ui-select": "^0.19.6",
     "angular-bootstrap": "^2.2.0"
   },
   "license": "MIT",

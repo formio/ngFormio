@@ -10,6 +10,7 @@ if (typeof Object.assign != 'function') {
       }
 
       var output = Object(target);
+      /* eslint-disable max-depth */
       for (var index = 1; index < arguments.length; index++) {
         var source = arguments[index];
         if (source !== undefined && source !== null) {
@@ -20,6 +21,7 @@ if (typeof Object.assign != 'function') {
           }
         }
       }
+      /* eslint-enable max-depth */
       return output;
     };
   })();
