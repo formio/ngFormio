@@ -1,20 +1,23 @@
+<div class="alert alert-warning" role="alert" ng-if="['basic'].indexOf(currentProject.plan) !== -1 && projectSettingsVisible() && !onPrem">
+  Basic Email providers are available for free. Please <a ng-click="showUpgradeDialog(currentProject)">Upgrade</a> this project to access the Premium Providers.
+</div>
 <uib-accordion close-others="true">
-  <div uib-accordion-group class="panel panel-default" heading="GMail Settings" is-open="true">
-    <ng-include src="'views/project/email/gmail.html'"></ng-include>
-  </div>
   <div uib-accordion-group class="panel panel-default" heading="Custom Email Server">
     <ng-include src="'views/project/email/custom.html'"></ng-include>
-  </div>
-  <div uib-accordion-group class="panel panel-default" heading="SendGrid Settings">
-    <ng-include src="'views/project/email/sendgrid.html'"></ng-include>
   </div>
   <div uib-accordion-group class="panel panel-default" heading="SMTP Settings">
     <ng-include src="'views/project/email/smtp.html'"></ng-include>
   </div>
-  <div uib-accordion-group class="panel panel-default" heading="Mandrill Settings">
+  <div uib-accordion-group class="panel panel-default" heading="GMail Settings" is-disabled="['basic'].indexOf(currentProject.plan) !== -1 && projectSettingsVisible() && !onPrem">
+    <ng-include src="'views/project/email/gmail.html'"></ng-include>
+  </div>
+  <div uib-accordion-group class="panel panel-default" heading="SendGrid Settings" is-disabled="['basic'].indexOf(currentProject.plan) !== -1 && projectSettingsVisible() && !onPrem">
+    <ng-include src="'views/project/email/sendgrid.html'"></ng-include>
+  </div>
+  <div uib-accordion-group class="panel panel-default" heading="Mandrill Settings" is-disabled="['basic'].indexOf(currentProject.plan) !== -1 && projectSettingsVisible() && !onPrem">
     <ng-include src="'views/project/email/mandrill.html'"></ng-include>
   </div>
-  <div uib-accordion-group class="panel panel-default" heading="Mailgun Settings">
+  <div uib-accordion-group class="panel panel-default" heading="Mailgun Settings" is-disabled="['basic'].indexOf(currentProject.plan) !== -1 && projectSettingsVisible() && !onPrem">
     <ng-include src="'views/project/email/mailgun.html'"></ng-include>
   </div>
 </uib-accordion>
