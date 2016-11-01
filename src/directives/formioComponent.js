@@ -58,8 +58,9 @@ module.exports = [
           var component = formioComponents.components[$scope.component.type] || formioComponents.components['custom'];
 
           // Set the component with the defaults from the component settings.
+          // Dont add the default key, so that components without keys will remain visible by default.
           angular.forEach(component.settings, function(value, key) {
-            if (!$scope.component.hasOwnProperty(key)) {
+            if (!$scope.component.hasOwnProperty(key) && key !== 'key') {
               $scope.component[key] = angular.copy(value);
             }
           });
