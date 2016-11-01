@@ -120,8 +120,8 @@
   <div class="form-group" ng-if="currentProject && currentProject._id">
     <div id="form-group-cors" class="form-group">
       <label for="cors" class="control-label">CORS - Cross Origin Resource Sharing</label>
-      <textarea class="form-control" id="cors" ng-disabled="currentProject.plan === 'basic'" ng-model="currentProject.settings.cors" placeholder="A comma separated list of domains that forms may be embedded on. Use * to allow all domains."></textarea>
-      <p ng-if="currentProject.plan === 'basic'">Upgrade your project to enable CORS.</p>
+      <textarea class="form-control" id="cors" ng-disabled="['basic', 'independent'].indexOf(currentProject.plan) !== -1" ng-model="currentProject.settings.cors" placeholder="A comma separated list of domains that forms may be embedded on. Use * to allow all domains."></textarea>
+      <p ng-if="['basic', 'independent'].indexOf(currentProject.plan) !== -1 && projectSettingsVisible() && !onPrem" class="text-danger"><em><a ng-click="showUpgradeDialog(currentProject)">Upgrade</a> your project to enable CORS.</em></p>
     </div>
     <div class="panel panel-default">
       <div class="panel-heading">Preview</div>
