@@ -61068,10 +61068,12 @@ module.exports = function() {
 
           // Show the submit message and say the form is no longer submitting.
           var onSubmit = function(submission, message) {
-            $scope.showAlerts({
-              type: 'success',
-              message: message
-            });
+            if (message) {
+              $scope.showAlerts({
+                type: 'success',
+                message: message
+              });
+            }
             form.submitting = false;
           };
 
