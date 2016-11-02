@@ -95,7 +95,6 @@ app.controller('ProjectCreateController', [
     $rootScope.noBreadcrumb = false;
     $scope.currentProject = {template: 'default'};
     $scope.hasTemplate = false;
-    $scope.showName = false;
     $scope.templateLimit = 3;
 
     $scope.templates = [];
@@ -201,7 +200,6 @@ app.controller('ProjectController', [
       $scope.currentProject = result;
       $scope.projectApi = AppConfig.protocol + '//' + result.name + '.' + AppConfig.serverHost;
       $rootScope.currentProject = result;
-      $scope.showName = !(result.plan && result.plan === 'basic');
       $scope.projectsLoaded = true;
 
       $scope.rolesLoading = true;
