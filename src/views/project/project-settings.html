@@ -4,7 +4,7 @@
     <input type="text" class="form-control" id="title" name="title" ng-model="currentProject.title" placeholder="Project name or website." ng-maxlength="63" ng-required="true" autofocus="true">
     <p class="help-block" ng-show="projectForm.title.$error.maxlength">Project Title cannot be longer than 63 characters.</p>
   </div>
-  <div id="form-group-name" class="form-group" ng-class="{'has-error': projectForm.name.$invalid && projectForm.name.$dirty, 'has-success': projectForm.name.$valid}">
+  <div id="form-group-name" class="form-group" ng-class="{'has-error': projectForm.name.$invalid && projectForm.name.$dirty, 'has-success': projectForm.name.$valid}" ng-if="currentProject && currentProject.plan">
     <label for="name" class="control-label required-field">Domain Name</label>
     <div class="input-group" style="width: 300px;">
       <span class="input-group-addon">{{ apiProtocol }}//</span>
