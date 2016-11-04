@@ -177,9 +177,9 @@ module.exports = function(app) {
               }, true);
             }
             else {
-              $scope.$watch('data.' + settings.refreshOn, function() {
+              $scope.$watch('data.' + settings.refreshOn, function(newValue, oldValue) {
                 $scope.refreshItems();
-                if (settings.clearOnRefresh) {
+				if (settings.clearOnRefresh && newValue!=oldValue) { 
                   $scope.data[settings.key] = settings.multiple ? [] : '';
                 }
               });
