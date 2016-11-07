@@ -239,6 +239,7 @@ app.controller('FormController', [
   'FormioUtils',
   'AppConfig',
   'SubmissionAccessLabels',
+  'AccessLabels',
   'ResourceAccessLabels',
   'GoogleAnalytics',
   '$q',
@@ -252,6 +253,7 @@ app.controller('FormController', [
     FormioUtils,
     AppConfig,
     SubmissionAccessLabels,
+    AccessLabels,
     ResourceAccessLabels,
     GoogleAnalytics,
     $q
@@ -464,6 +466,7 @@ app.controller('FormController', [
 
     $scope.submissionAccessLabels = SubmissionAccessLabels;
     $scope.resourceAccessLabels = ResourceAccessLabels;
+    $scope.accessLabels = AccessLabels
 
     // Get the swagger URL.
     $scope.getSwaggerURL = function(format) {
@@ -625,6 +628,9 @@ app.controller('FormShareController', ['$scope', function($scope) {
       if (access.type === 'create_own') {
         $scope.form.submissionAccess[index].roles.push(defaultRole._id);
       }
+      if(access.type === 'read_all') {
+        $scope.form.access[index].roles.push(defaultRole._id);
+      }
     });
     $scope.publicForm = true;
     $scope.saveForm();
@@ -635,6 +641,9 @@ app.controller('FormShareController', ['$scope', function($scope) {
     angular.forEach($scope.form.submissionAccess, function(access, index) {
       if (access.type === 'create_own' || access.type === 'create_all') {
         _.pull($scope.form.submissionAccess[index].roles, defaultRole._id);
+      }
+      if (access.type === 'read_all') {
+        _.pull($scope.form.access[index].roles, defaultRole._id);
       }
     });
     $scope.publicForm = false;
@@ -1674,6 +1683,33 @@ app.constant('ResourceAccessLabels', {
   'admin': {
     label: 'Admin',
     tooltip: 'The Admin permission will allow a resource, defined in the submission, to read and edit all of the submission data.'
+  }
+});
+
+app.constant('AccessLabels', {
+  'read_all': {
+  label: 'Read Form Definition',
+  tooltip: 'The Read permission will allow a user to read the form definition.'
+  },
+  'update_all': {
+  label: 'Update Form Definition',
+  tooltip: 'The Update permission will allow a user to read the form and edit the form except for the Submission Resource Access and Owner information.'
+  },
+  'delete_all': {
+  label: 'Delete Form Definition',
+  tooltip: 'The Admin permission will allow a user to read and edit all of the submission data.'
+  },
+  'read_own': {
+  label: 'Read Form Definition (Restricted to owners)',
+  tooltip: 'The Admin permission will allow a user to read and edit all of the submission data.'
+  },
+  'update_own': {
+  label: 'Update Form Definition (Restricted to owners)',
+  tooltip: 'The Admin permission will allow a user to read and edit all of the submission data.'
+  },
+  'delete_own': {
+  label: 'Delete Form Definition (Restricted to owners)',
+  tooltip: 'The Admin permission will allow a user to read and edit all of the submission data.'
   }
 });
 
