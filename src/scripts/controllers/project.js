@@ -176,7 +176,6 @@ app.controller('ProjectController', [
     ProjectUpgradeDialog,
     $q
   ) {
-
     $scope.currentSection = {};
     $rootScope.activeSideBar = 'projects';
     $rootScope.noBreadcrumb = false;
@@ -201,6 +200,13 @@ app.controller('ProjectController', [
       $scope.projectApi = AppConfig.protocol + '//' + result.name + '.' + AppConfig.serverHost;
       $rootScope.currentProject = result;
       $scope.projectsLoaded = true;
+
+      var currTime = (new Date()).getTime();
+      var projTime = (new Date(result.created.toString())).getTime();
+      var delta = Math.ceil(parseInt((currTime - projTime) / 1000));
+      var day = 86400;
+      var remaining = 30 - parseInt(delta / day);
+      $scope.trialDaysRemaining = remaining > 0 ? remaining : 0;
 
       $scope.rolesLoading = true;
       $http.get($scope.formio.projectUrl + '/role').then(function(result) {
@@ -1877,6 +1883,13 @@ app.factory('ProjectUpgradeDialog', [
                   return $scope.paymentForm;
                 }
               };
+
+              var currTime = (new Date()).getTime();
+              var projTime = (new Date(project.created.toString())).getTime();
+              var delta = Math.ceil(parseInt((currTime - projTime) / 1000));
+              var day = 86400;
+              var remaining = 30 - parseInt(delta / day);
+              $scope.trialDaysRemaining = remaining > 0 ? remaining : 0;
 
               $scope.$on('formSubmission', function() {
                 if(getActiveForm() === $scope.paymentForm) {

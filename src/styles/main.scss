@@ -1478,6 +1478,10 @@ footer {
       background-color: darken($price-panel-commercial, 10%);
     }
 
+    &.plan-column-trial {
+      background-color: darken($price-panel-trial, 10%);
+    }
+
     .table {
       &.feature-table > tbody > tr > td {
         border-top: 1px solid transparentize(#FFF, .85);

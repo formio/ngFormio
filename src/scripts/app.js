@@ -827,6 +827,13 @@ angular
           title: 'Commercial',
           labelStyle: 'label-commercial',
           priceDescription: 'Starting at $250/mo per instance'
+        },
+        trial: {
+          order: 5,
+          name: 'trial',
+          title: 'Trial',
+          labelStyle: 'label-danger',
+          priceDescription: 'Free 30 day trial'
         }
       },
       getPlans: function() {
