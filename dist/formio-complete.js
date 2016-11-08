@@ -60358,6 +60358,22 @@ module.exports = function(app) {
           view += '</tbody></table>';
           return view;
         },
+        controller: ['$scope', '$timeout', function($scope, $timeout) {
+          // @todo: Figure out why the survey values are not defaulting correctly.
+          var reset = false;
+          $scope.$watch('data.' + $scope.component.key, function(value) {
+            if (value && !reset) {
+              reset = true;
+              $scope.data[$scope.component.key] = {};
+              $timeout((function(value) {
+                return function() {
+                  $scope.data[$scope.component.key] = value;
+                  $timeout($scope.$apply.bind($scope));
+                };
+              })(value));
+            }
+          });
+        }],
         settings: {
           input: true,
           tableView: true,
@@ -60382,7 +60398,7 @@ module.exports = function(app) {
     'FormioUtils',
     function($templateCache, FormioUtils) {
       $templateCache.put('formio/components/survey.html', FormioUtils.fieldWrap(
-        "<table class=\"table table-striped table-bordered\">\n  <thead>\n    <tr>\n      <td></td>\n      <th ng-repeat=\"v in component.values track by $index\" style=\"text-align: center;\">{{ v.label }}</th>\n    </tr>\n  </thead>\n  <tr ng-repeat=\"question in component.questions\">\n    <td>{{ question.label }}</td>\n    <td ng-repeat=\"v in component.values\" style=\"text-align: center;\">\n      <input\n        type=\"radio\"\n        id=\"{{ componentId }}-{{ question.value }}-{{ v.value }}\" name=\"{{ componentId }}-{{ question.value }}-{{ v.value }}\"\n        tabindex=\"{{ component.tabindex || 0 }}\"\n        value=\"{{ v.value }}\"\n        ng-model=\"data[component.key][question.value]\"\n        ng-required=\"component.validate.required\"\n        ng-disabled=\"readOnly\"\n        custom-validator=\"component.validate.custom\"\n      >\n    </td>\n  </tr>\n</table>\n"
+        "<table class=\"table table-striped table-bordered\">\n  <thead>\n    <tr>\n      <td></td>\n      <th ng-repeat=\"v in component.values track by $index\" style=\"text-align: center;\">{{ v.label }}</th>\n    </tr>\n  </thead>\n  <tr ng-repeat=\"question in component.questions\">\n    <td>{{ question.label }}</td>\n    <td ng-repeat=\"v in component.values\" style=\"text-align: center;\">\n      <input\n        type=\"radio\"\n        id=\"{{ componentId }}-{{ question.value }}-{{ v.value }}\" name=\"{{ componentId }}-{{ question.value }}\"\n        tabindex=\"{{ component.tabindex || 0 }}\"\n        value=\"{{ v.value }}\"\n        ng-model=\"data[component.key][question.value]\"\n        ng-required=\"component.validate.required\"\n        ng-disabled=\"readOnly\"\n        custom-validator=\"component.validate.custom\"\n      >\n    </td>\n  </tr>\n</table>\n"
       ));
     }
   ]);
@@ -60777,7 +60793,7 @@ module.exports = function() {
         var _sweepConditionals = function() {
           $scope.form = $scope.form || {};
           $scope.form.components = $scope.form.components || [];
-          FormioUtils.eachComponent($scope.form.components, function(component, path) {
+          FormioUtils.eachComponent($scope.form.components, function(component) {
             if (!component.hasOwnProperty('key')) {
               return;
             }

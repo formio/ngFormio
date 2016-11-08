@@ -151,7 +151,7 @@ module.exports = function() {
         var _sweepConditionals = function() {
           $scope.form = $scope.form || {};
           $scope.form.components = $scope.form.components || [];
-          FormioUtils.eachComponent($scope.form.components, function(component, path) {
+          FormioUtils.eachComponent($scope.form.components, function(component) {
             if (!component.hasOwnProperty('key')) {
               return;
             }
