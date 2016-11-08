@@ -800,6 +800,13 @@ angular
   .factory('ProjectPlans', ['$filter', function($filter) {
     return {
       plans: {
+        trial: {
+          order: 0,
+          name: 'trial',
+          title: 'Trial',
+          labelStyle: 'label-danger',
+          priceDescription: 'Free 30 day trial'
+        },
         basic: {
           order: 1,
           name: 'basic',
@@ -827,13 +834,6 @@ angular
           title: 'Commercial',
           labelStyle: 'label-commercial',
           priceDescription: 'Starting at $250/mo per instance'
-        },
-        trial: {
-          order: 5,
-          name: 'trial',
-          title: 'Trial',
-          labelStyle: 'label-danger',
-          priceDescription: 'Free 30 day trial'
         }
       },
       getPlans: function() {

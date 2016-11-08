@@ -6,7 +6,7 @@
       <li role="presentation" ng-class="{active:($state.includes('project.settings.roles'))}"><a ui-sref="project.settings.roles.view">Roles</a></li>
       <li role="presentation" ng-class="{active:($state.includes('project.settings.access'))}"><a ui-sref="project.settings.access">Access</a></li>
       <li role="presentation" ng-class="{active:($state.includes('project.settings.oauth'))}"><a ui-sref="project.settings.oauth">OAuth</a></li>
-      <li role="presentation" ng-if="user._id === currentProject.owner && (currentProject.plan === 'team' || currentProject.plan === 'commercial')" ng-class="{active:($state.includes('project.settings.teams'))}"><a ui-sref="project.settings.teams.view">Teams</a></li>
+      <li role="presentation" ng-if="user._id === currentProject.owner && ['team', 'commercial'].indexOf(currentProject.plan) !== -1" ng-class="{active:($state.includes('project.settings.teams'))}"><a ui-sref="project.settings.teams.view">Teams</a></li>
       <li role="presentation" ng-class="{active:($state.includes('project.settings.email'))}"><a ui-sref="project.settings.email">Email Providers</a></li>
       <li role="presentation" ng-class="{active:($state.includes('project.settings.storage'))}"><a ui-sref="project.settings.storage">File Storage</a></li>
       <li role="presentation" ng-class="{active:($state.includes('project.settings.data'))}"><a ui-sref="project.settings.data">Data Connections</a></li>

@@ -342,8 +342,17 @@
   <div class="col-sm-8 form-column">
     <h3><i class="fa fa-credit-card"></i> {{ currentProject.plan === selectedPlan ? 'Keep Current Plan' : 'Change Plan' }}</h3>
     <div ng-if="!paymentInfoLoading && !paymentInfo">
-      <h5 class="text-muted">First, you'll need to enter your credit card info.<br>Your first month will be billed on a prorated basis.</h5>
-      <formio src="paymentForm" form-action="'/payeezy'"></formio>
+      <div ng-if="['basic', 'trial'].indexOf(selectedPlan) === -1">
+        <h5 class="text-muted">First, you'll need to enter your credit card info.<br>Your first month will be billed on a prorated basis.</h5>
+        <formio src="paymentForm" form-action="'/payeezy'"></formio>
+      </div>
+      <div ng-if="['basic', 'trial'].indexOf(selectedPlan) !== -1">
+        <h5>No payment required for the {{getPlan(selectedPlan).title}} plan</h5>
+        <div class="form-group pull-right" ng-if="(currentProject.plan !== selectedPlan)">
+          <a class="btn btn-default" ng-click="closeThisDialog(false)">Cancel</a>
+          <button class="btn btn-primary" ng-click="upgradeProject(selectedPlan)">Change plan to {{getPlan(selectedPlan).title}}</button>
+        </div>
+      </div>
     </div>
     <div ng-if="!paymentInfoLoading && paymentInfo">
       <div ng-if="(currentProject.plan !== selectedPlan)">

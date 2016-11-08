@@ -417,7 +417,7 @@ app.provider('ProjectProgress', function() {
               .then(function(projectForms) {
                 forms = projectForms;
                 forms.forEach(function(form) {
-                  if ((new Date(project.created).getTime() + 10000) < new Date(form.modified).getTime()) {
+                  if (project && ((new Date(project.created).getTime() + 10000) < new Date(form.modified).getTime())) {
                     return next(true);
                   }
                 });
@@ -448,7 +448,7 @@ app.provider('ProjectProgress', function() {
               .then(function(projectForms) {
                 forms = projectForms;
                 forms.forEach(function(form) {
-                  if ((new Date(project.created).getTime() + 10000) < new Date(form.created).getTime()) {
+                  if (project && ((new Date(project.created).getTime() + 10000) < new Date(form.created).getTime())) {
                     return next(true);
                   }
                 });
@@ -615,7 +615,7 @@ app.controller('ProjectOverviewController', [
     var abbreviator = new NumberAbbreviate();
 
     $scope.hasTeams = function() {
-      return $scope.currentProject.plan === 'team' || $scope.currentProject.plan === 'commercial';
+      return ['trial', 'team', 'commercial'].indexOf($scope.currentProject.plan) !== -1;
     };
 
     $scope.getLastModified = function() {
@@ -1930,7 +1930,9 @@ app.factory('ProjectUpgradeDialog', [
               };
 
               // Default to the team plan for upgrades, unless they are already team pro, then show commercial.
-              $scope.selectedPlan = ($scope.getPlan(project.plan).order < ProjectPlans.plans.team.order) ? _.find($scope.plans, {order: ProjectPlans.plans.team.order}) : _.find($scope.plans, {order: ProjectPlans.plans.commercial.order});
+              $scope.selectedPlan = ($scope.getPlan(project.plan).order < ProjectPlans.plans.team.order)
+                ? _.find($scope.plans, {order: ProjectPlans.plans.team.order})
+                : _.find($scope.plans, {order: ProjectPlans.plans.commercial.order});
 
               // Display the selected plan, by name.
               if ($scope.selectedPlan) {
@@ -1940,7 +1942,6 @@ app.factory('ProjectUpgradeDialog', [
               if ($scope.selectedPlan === undefined) {
                 $scope.selectedPlan = 'team';
               }
-
             }
           ]
         });
