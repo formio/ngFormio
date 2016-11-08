@@ -62481,12 +62481,22 @@ app.filter('formioTranslate', _dereq_('./filters/translate'));
 
 app.config([
   '$httpProvider',
+  '$injector',
   function(
-    $httpProvider
+    $httpProvider,
+    $injector
   ) {
     if (!$httpProvider.defaults.headers.get) {
       $httpProvider.defaults.headers.get = {};
     }
+
+    // Make sure that ngAnimate doesn't mess up loader.
+    try {
+      $injector.get('$animateProvider').classNameFilter(/^((?!(fa-spinner|glyphicon-spin)).)*$/);
+    }
+    /* eslint-disable no-empty */
+    catch (err) {}
+    /* eslint-enable no-empty */
 
     // Disable IE caching for GET requests.
     $httpProvider.defaults.headers.get['Cache-Control'] = 'no-cache';
