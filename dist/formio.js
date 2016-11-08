@@ -5366,14 +5366,18 @@ module.exports = function() {
           return scope.data[$2];
         });
 
-        /* jshint evil: true */
-        eval(custom);
+        try {
+          /* jshint evil: true */
+          eval(custom);
+        }
+        catch (err) {
+          valid = err.message;
+        }
 
         if (valid !== true) {
           scope.component.customError = valid;
           return false;
         }
-
         return true;
       };
     }
@@ -5535,7 +5539,7 @@ module.exports = function() {
         var _sweepConditionals = function() {
           $scope.form = $scope.form || {};
           $scope.form.components = $scope.form.components || [];
-          FormioUtils.eachComponent($scope.form.components, function(component) {
+          FormioUtils.eachComponent($scope.form.components, function(component, path) {
             if (!component.hasOwnProperty('key')) {
               return;
             }
@@ -5645,6 +5649,9 @@ module.exports = function() {
           var result;
           if (_customConditionals.hasOwnProperty(componentKey)) {
             var cond = _customConditionals[componentKey];
+            if (!cond) {
+              return true;
+            }
 
             try {
               // Create a child block, and expose the submission data.
