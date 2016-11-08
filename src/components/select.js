@@ -179,8 +179,8 @@ module.exports = function(app) {
             else {
               $scope.$watch('data.' + settings.refreshOn, function(newValue, oldValue) {
                 $scope.refreshItems();
-				if (settings.clearOnRefresh && newValue!=oldValue) { 
-                  $scope.data[settings.key] = settings.multiple ? [] : '';
+				if (settings.clearOnRefresh && newValue !== oldValue) {
+					$scope.data[settings.key] = settings.multiple ? [] : '';
                 }
               });
             }
