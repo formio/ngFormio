@@ -629,7 +629,9 @@ app.controller('FormShareController', ['$scope', function($scope) {
         $scope.form.submissionAccess[index].roles.push(defaultRole._id);
       }
       if(access.type === 'read_all') {
-        $scope.form.access[index].roles.push(defaultRole._id);
+        if($scope.form.access[index].roles !=  '57ebec292e78650067decec9') {
+          $scope.form.access[index].roles.push(defaultRole._id);
+        }
       }
     });
     $scope.publicForm = true;
@@ -670,6 +672,12 @@ app.controller('FormShareController', ['$scope', function($scope) {
               $scope.publicForm = true;
             }
           });
+          angular.forEach($scope.form.access, function(access) {
+            if ((access.type === 'read_all') &&
+            (_.indexOf(access.roles, defaultRole._id) !== -1)) {
+              $scope.publicForm = true;
+            }
+          })
         }
       });
 
