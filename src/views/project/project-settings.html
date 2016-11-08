@@ -133,6 +133,17 @@
       </div>
     </div>
     <div class="panel panel-default">
+      <div class="panel-heading">Custom CSS and Javascript</div>
+      <div class="panel-body">
+        <label for="preview-repo" class="control-label">Custom CSS</label>
+        <input type="text" class="form-control" id="custom-css" ng-model="currentProject.settings.custom.css" placeholder="The url of a custom css file." />
+        <p>It is recommended to wrap all CSS classes with a custom class specific to a project. Otherwise theses styles will apply to all projects once loaded. You can use the <strong>.{{ currentProject.name}}Form</strong> class to target only forms in this project.</p>
+        <label for="preview-repo" class="control-label">Custom Javascript</label>
+        <input type="text" class="form-control" id="custom-js" ng-model="currentProject.settings.custom.js" placeholder="The url of a custom js file." />
+        <p>Custom Javascript is useful for adding custom components to a project.</p>
+      </div>
+    </div>
+    <div class="panel panel-default">
       <div class="panel-heading">Export Project</div>
       <div class="panel-body">
         <p>The following button will export your project as a JSON file that can then be used as a template for other projects.</p>
