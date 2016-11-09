@@ -1,6 +1,6 @@
 machine:
   node:
-    version: 4.2.3
+    version: 4.6.1
   environment:
     SHORT_SHA: $(echo $CIRCLE_SHA1 | cut -b1-7)
     TAG: ${CIRCLE_BRANCH:-$(echo $CIRCLE_TAG)}
@@ -11,8 +11,8 @@ machine:
 
 dependencies:
   pre:
-    - wget http://selenium-release.storage.googleapis.com/2.53/selenium-server-standalone-2.53.0.jar
-    - java -jar selenium-server-standalone-2.53.0.jar:
+    - wget http://selenium-release.storage.googleapis.com/2.53/selenium-server-standalone-2.53.1.jar
+    - java -jar selenium-server-standalone-2.53.1.jar:
         background: true
     - pip install awscli
     - npm install -g bower gulp mocha

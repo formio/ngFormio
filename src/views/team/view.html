@@ -19,23 +19,25 @@
   </tbody>
 </table>
 <br>
-<h3>Team Permissions</h3>
-<table class="table table-striped">
-  <thead>
-  <tr>
-    <th class="col-sm-6">Project</th>
-    <th class="col-sm-6">Permission</th>
-  </tr>
-  </thead>
-  <tbody>
-  <tr ng-repeat="project in teamPermissions">
-    <td class="col-sm-6 ellipsis">{{project.title}}</td>
-    <td class="col-sm-5">{{ getPermissionLabel(project.permission) }}</td>
-    <td class="col-sm-1">
-      <button ui-sref="project.settings.teams.edit({teamId: team._id, projectId: project._id})" class="btn btn-default btn-xs">
-        <span class="glyphicon glyphicon-edit"></span>&nbsp;Edit
-      </button>
-    </td>
-  </tr>
-  </tbody>
-</table>
+<div ng-if="team.owner === user._id">
+  <h3>Team Permissions</h3>
+  <table class="table table-striped">
+    <thead>
+    <tr>
+      <th class="col-sm-6">Project</th>
+      <th class="col-sm-6">Permission</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="project in teamPermissions">
+      <td class="col-sm-6 ellipsis">{{project.title}}</td>
+      <td class="col-sm-5">{{ getPermissionLabel(project.permission) }}</td>
+      <td class="col-sm-1">
+        <button ui-sref="project.settings.teams.edit({teamId: team._id, projectId: project._id})" class="btn btn-default btn-xs">
+          <span class="glyphicon glyphicon-edit"></span>&nbsp;Edit
+        </button>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>

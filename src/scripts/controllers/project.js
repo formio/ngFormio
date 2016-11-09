@@ -118,7 +118,8 @@ app.controller('ProjectCreateController', [
       }
       var template = input.files[0];
 
-      if (typeof window.FileReader !== 'function') {
+      // FOR-107 - Fix for safari where FileReader isnt a function.
+      if (typeof window.FileReader !== 'function' && typeof window.FileReader !== 'object') {
         return;
       }
 
@@ -713,6 +714,15 @@ app.controller('ChartController', [
     };
     $scope.analyticsEvents = {
       draw: function(data) {
+        // FOR-163 - ie hack for charts not supporting foreignObject; translate the svg text labels.
+        if (data.type === 'label') {
+          if (typeof SVGForeignObjectElement !== 'function') {
+            data.element.attr({
+              transform: 'rotate(30 ' + data.x + ' ' + data.y + ')'
+            });
+          }
+        }
+
         // Intercept each chart point and register a click event.
         if(data.type === 'point') {
           // Register a click event to modify the graph based on the current view and click location.
@@ -1413,7 +1423,7 @@ app.controller('ProjectSettingsController', [
     AppConfig,
     $interval
   ) {
-    if ($scope.highestRole && ['team_read', 'team_write'].indexOf($scope.highestRole) !== -1) {
+    if (!$scope.highestRole || ($scope.highestRole && ['team_read', 'team_write'].indexOf($scope.highestRole) !== -1)) {
       $state.go('project.overview');
       return;
     }

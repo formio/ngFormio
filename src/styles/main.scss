@@ -771,7 +771,8 @@ pre code {
     }
   }
 
-  button[type="submit"] {
+  // FOR-124 - ie does defaults to submit type, and does not allow you to change it.
+  button[type="submit"]#login {
     margin-top: 87px;
     background-color: $brand-secondary;
   }
@@ -1249,6 +1250,10 @@ footer {
   chartist {
     height: 375px !important;
     display: block;
+
+    svg {
+      overflow: visible;
+    }
   }
   h3, h4 {
     text-align: center;
