@@ -261,6 +261,9 @@ module.exports = function() {
           var result;
           if (_customConditionals.hasOwnProperty(componentKey)) {
             var cond = _customConditionals[componentKey];
+            if (!cond) {
+              return true;
+            }
 
             try {
               // Create a child block, and expose the submission data.

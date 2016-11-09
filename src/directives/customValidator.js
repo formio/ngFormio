@@ -19,14 +19,18 @@ module.exports = function() {
           return scope.data[$2];
         });
 
-        /* jshint evil: true */
-        eval(custom);
+        try {
+          /* jshint evil: true */
+          eval(custom);
+        }
+        catch (err) {
+          valid = err.message;
+        }
 
         if (valid !== true) {
           scope.component.customError = valid;
           return false;
         }
-
         return true;
       };
     }
