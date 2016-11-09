@@ -70676,43 +70676,11 @@ module.exports = function() {
          *
          * @private
          */
-        var _toggleConditional = function(componentKey, subData) {
-          var result;
-          if (_conditionals.hasOwnProperty(componentKey)) {
-            var data = Object.assign({}, $scope.submission.data, subData);
-            var cond = _conditionals[componentKey];
-            var value = FormioUtils.getValue({data: data}, cond.when);
-
-            if (typeof value !== 'undefined' && typeof value !== 'object') {
-              // Check if the conditional value is equal to the trigger value
-              result = value.toString() === cond.eq.toString()
-                ? boolean[cond.show]
-                : !boolean[cond.show];
-            }
-            // Special check for check boxes component.
-            else if (typeof value !== 'undefined' && typeof value === 'object') {
-              // Only update the visibility is present, otherwise hide, because it was deleted by the submission sweep.
-              if (value.hasOwnProperty(cond.eq)) {
-                result = boolean.hasOwnProperty(value[cond.eq])
-                  ? boolean[value[cond.eq]]
-                  : true;
-              }
-              else {
-                result = false;
-              }
-            }
-            // Check against the components default value, if present and the components hasn't been interacted with.
-            else if (typeof value === 'undefined' && cond.hasOwnProperty('defaultValue')) {
-              result = cond.defaultValue.toString() === cond.eq.toString()
-                ? boolean[cond.show]
-                : !boolean[cond.show];
-            }
-            // If there is no value, we still need to process as not equal.
-            else {
-              result = !boolean[cond.show];
-            }
+        var _toggleConditional = function(componentKey, data) {
+          if (!_conditionals.hasOwnProperty(componentKey)) {
+            return true;
           }
-          return result;
+          return FormioUtils.checkConditions(_conditionals[componentKey], data);
         };
 
         /**
@@ -70723,32 +70691,17 @@ module.exports = function() {
          *
          * @private
          */
-        var _toggleCustomConditional = function(componentKey, subData) {
-          var result;
-          if (_customConditionals.hasOwnProperty(componentKey)) {
-            var cond = _customConditionals[componentKey];
-            if (!cond) {
-              return true;
-            }
-
-            try {
-              // Create a child block, and expose the submission data.
-              var data = Object.assign({}, $scope.submission.data, subData); // eslint-disable-line no-unused-vars
-              // Eval the custom conditional and update the show value.
-              var show = eval('(function() { ' + cond.toString() + '; return show; })()');
-              // Show by default, if an invalid type is given.
-              result = boolean.hasOwnProperty(show.toString()) ? boolean[show] : true;
-            }
-            catch (e) {
-              result = true;
-            }
+        var _toggleCustomConditional = function(componentKey, data) {
+          if (!_customConditionals.hasOwnProperty(componentKey)) {
+            return true;
           }
-          return result;
+          return FormioUtils.checkCustomConditions(_customConditionals[componentKey], data);
         };
 
         $scope.checkConditional = function(componentKey, subData) {
-          var conditional = _toggleConditional(componentKey, subData);
-          var customConditional = _toggleCustomConditional(componentKey, subData);
+          var submissionData = Object.assign({}, $scope.submission.data, subData);
+          var conditional = _toggleConditional(componentKey, submissionData);
+          var customConditional = _toggleCustomConditional(componentKey, submissionData);
           // customConditional will be true if either are true since the value persists in $scope.show.
           return conditional || customConditional;
         };
@@ -70762,12 +70715,12 @@ module.exports = function() {
           // Toggle every conditional.
           var allConditionals = Object.keys(_conditionals);
           (allConditionals || []).forEach(function(componentKey) {
-            $scope.show[componentKey] = _toggleConditional(componentKey);
+            $scope.show[componentKey] = _toggleConditional(componentKey, $scope.submission.data);
           });
 
           var allCustomConditionals = Object.keys(_customConditionals);
           (allCustomConditionals || []).forEach(function(componentKey) {
-            $scope.show[componentKey] = _toggleCustomConditional(componentKey);
+            $scope.show[componentKey] = _toggleCustomConditional(componentKey, $scope.submission.data);
           });
 
           var allHidden = Object.keys($scope.show);
@@ -71512,7 +71465,7 @@ module.exports = function() {
         // Show the current page.
         var showPage = function(scroll) {
           // If the page is past the components length, try to clear first.
-          if ($scope.currentPage >= $scope.form.components.length) {
+          if ($scope.currentPage >= $scope.pages.length) {
             $scope.clear();
           }
 
@@ -71523,7 +71476,7 @@ module.exports = function() {
               data: $scope.submission.data
             }));
           }
-          $scope.page.components = $scope.form.components[$scope.currentPage].components;
+          $scope.page.components = $scope.pages[$scope.currentPage].components;
           var pageElement = angular.element(document.createElement('formio'));
           $scope.wizardElement.html($compile(pageElement.attr({
             src: "'" + $scope.src + "'",
@@ -71691,7 +71644,7 @@ module.exports = function() {
           if ($scope.checkErrors()) {
             return;
           }
-          if ($scope.currentPage >= ($scope.form.components.length - 1)) {
+          if ($scope.currentPage >= ($scope.pages.length - 1)) {
             return;
           }
           $scope.currentPage++;
@@ -71713,7 +71666,7 @@ module.exports = function() {
           if (page < 0) {
             return;
           }
-          if (page >= $scope.form.components.length) {
+          if (page >= $scope.pages.length) {
             return;
           }
           $scope.currentPage = page;
@@ -71739,6 +71692,8 @@ module.exports = function() {
           }
         };
 
+        var allPages = [];
+        var hasConditionalPages = false;
         var setForm = function(form) {
           $scope.pages = [];
           angular.forEach(form.components, function(component) {
@@ -71747,12 +71702,46 @@ module.exports = function() {
               if (!$scope.hasTitles && component.title) {
                 $scope.hasTitles = true;
               }
+              if (component.customConditional) {
+                hasConditionalPages = true;
+                component.__conditional = {
+                  page: component.key,
+                  condition: component.customConditional,
+                  check: FormioUtils.checkCustomConditions.bind(FormioUtils)
+                };
+              }
+              else if (component.conditional && component.conditional.when) {
+                hasConditionalPages = true;
+                component.__conditional = {
+                  page: component.key,
+                  condition: component.conditional,
+                  check: FormioUtils.checkConditions.bind(FormioUtils)
+                };
+              }
+              allPages.push(component);
               $scope.pages.push(component);
             }
           });
 
+          if (hasConditionalPages) {
+            $scope.$watch('submission.data', function(data) {
+              var newPages = [];
+              angular.forEach(allPages, function(page) {
+                if (page.__conditional) {
+                  if (page.__conditional.check(page.__conditional.condition, data)) {
+                    newPages.push(page);
+                  }
+                }
+                else {
+                  newPages.push(page);
+                }
+              });
+              $scope.pages = newPages;
+              setTimeout($scope.$apply.bind($scope), 10);
+            }, true);
+          }
+
           $scope.form = $scope.form ? angular.merge($scope.form, angular.copy(form)) : angular.copy(form);
-          $scope.form.components = $scope.pages;
           $scope.page = angular.copy(form);
           $scope.page.display = 'form';
           $scope.$emit('wizardFormLoad', form);
@@ -71981,7 +71970,62 @@ module.exports = [
 var formioUtils = _dereq_('formio-utils');
 
 module.exports = function() {
+  var boolean = {
+    'true': true,
+    'false': false
+  };
   return {
+    /* eslint-disable no-unused-vars */
+    checkConditions: function(cond, data) {
+    /* eslint-enable no-unused-vars */
+      var result = true;
+      var value = this.getValue({data: data}, cond.when);
+      if (typeof value !== 'undefined' && typeof value !== 'object') {
+        // Check if the conditional value is equal to the trigger value
+        result = value.toString() === cond.eq.toString()
+          ? boolean[cond.show]
+          : !boolean[cond.show];
+      }
+      // Special check for check boxes component.
+      else if (typeof value !== 'undefined' && typeof value === 'object') {
+        // Only update the visibility is present, otherwise hide, because it was deleted by the submission sweep.
+        if (value.hasOwnProperty(cond.eq)) {
+          result = boolean.hasOwnProperty(value[cond.eq])
+            ? boolean[value[cond.eq]]
+            : true;
+        }
+        else {
+          result = false;
+        }
+      }
+      // Check against the components default value, if present and the components hasn't been interacted with.
+      else if (typeof value === 'undefined' && cond.hasOwnProperty('defaultValue')) {
+        result = cond.defaultValue.toString() === cond.eq.toString()
+          ? boolean[cond.show]
+          : !boolean[cond.show];
+      }
+      // If there is no value, we still need to process as not equal.
+      else {
+        result = !boolean[cond.show];
+      }
+      return result;
+    },
+    /* eslint-disable no-unused-vars */
+    checkCustomConditions: function(conditional, data) {
+    /* eslint-enable no-unused-vars */
+      if (!conditional) {
+        return true;
+      }
+      var result = true;
+      try {
+        var show = eval('(function() { ' + conditional.toString() + '; return show; })()');
+        result = boolean.hasOwnProperty(show.toString()) ? boolean[show] : true;
+      }
+      catch (e) {
+        result = true;
+      }
+      return result;
+    },
     flattenComponents: formioUtils.flattenComponents,
     eachComponent: formioUtils.eachComponent,
     getComponent: formioUtils.getComponent,

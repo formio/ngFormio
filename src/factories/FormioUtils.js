@@ -1,7 +1,62 @@
 var formioUtils = require('formio-utils');
 
 module.exports = function() {
+  var boolean = {
+    'true': true,
+    'false': false
+  };
   return {
+    /* eslint-disable no-unused-vars */
+    checkConditions: function(cond, data) {
+    /* eslint-enable no-unused-vars */
+      var result = true;
+      var value = this.getValue({data: data}, cond.when);
+      if (typeof value !== 'undefined' && typeof value !== 'object') {
+        // Check if the conditional value is equal to the trigger value
+        result = value.toString() === cond.eq.toString()
+          ? boolean[cond.show]
+          : !boolean[cond.show];
+      }
+      // Special check for check boxes component.
+      else if (typeof value !== 'undefined' && typeof value === 'object') {
+        // Only update the visibility is present, otherwise hide, because it was deleted by the submission sweep.
+        if (value.hasOwnProperty(cond.eq)) {
+          result = boolean.hasOwnProperty(value[cond.eq])
+            ? boolean[value[cond.eq]]
+            : true;
+        }
+        else {
+          result = false;
+        }
+      }
+      // Check against the components default value, if present and the components hasn't been interacted with.
+      else if (typeof value === 'undefined' && cond.hasOwnProperty('defaultValue')) {
+        result = cond.defaultValue.toString() === cond.eq.toString()
+          ? boolean[cond.show]
+          : !boolean[cond.show];
+      }
+      // If there is no value, we still need to process as not equal.
+      else {
+        result = !boolean[cond.show];
+      }
+      return result;
+    },
+    /* eslint-disable no-unused-vars */
+    checkCustomConditions: function(conditional, data) {
+    /* eslint-enable no-unused-vars */
+      if (!conditional) {
+        return true;
+      }
+      var result = true;
+      try {
+        var show = eval('(function() { ' + conditional.toString() + '; return show; })()');
+        result = boolean.hasOwnProperty(show.toString()) ? boolean[show] : true;
+      }
+      catch (e) {
+        result = true;
+      }
+      return result;
+    },
     flattenComponents: formioUtils.flattenComponents,
     eachComponent: formioUtils.eachComponent,
     getComponent: formioUtils.getComponent,

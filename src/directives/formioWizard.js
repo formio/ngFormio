@@ -100,7 +100,7 @@ module.exports = function() {
         // Show the current page.
         var showPage = function(scroll) {
           // If the page is past the components length, try to clear first.
-          if ($scope.currentPage >= $scope.form.components.length) {
+          if ($scope.currentPage >= $scope.pages.length) {
             $scope.clear();
           }
 
@@ -111,7 +111,7 @@ module.exports = function() {
               data: $scope.submission.data
             }));
           }
-          $scope.page.components = $scope.form.components[$scope.currentPage].components;
+          $scope.page.components = $scope.pages[$scope.currentPage].components;
           var pageElement = angular.element(document.createElement('formio'));
           $scope.wizardElement.html($compile(pageElement.attr({
             src: "'" + $scope.src + "'",
@@ -279,7 +279,7 @@ module.exports = function() {
           if ($scope.checkErrors()) {
             return;
           }
-          if ($scope.currentPage >= ($scope.form.components.length - 1)) {
+          if ($scope.currentPage >= ($scope.pages.length - 1)) {
             return;
           }
           $scope.currentPage++;
@@ -301,7 +301,7 @@ module.exports = function() {
           if (page < 0) {
             return;
           }
-          if (page >= $scope.form.components.length) {
+          if (page >= $scope.pages.length) {
             return;
           }
           $scope.currentPage = page;
@@ -327,6 +327,8 @@ module.exports = function() {
           }
         };
 
+        var allPages = [];
+        var hasConditionalPages = false;
         var setForm = function(form) {
           $scope.pages = [];
           angular.forEach(form.components, function(component) {
@@ -335,12 +337,46 @@ module.exports = function() {
               if (!$scope.hasTitles && component.title) {
                 $scope.hasTitles = true;
               }
+              if (component.customConditional) {
+                hasConditionalPages = true;
+                component.__conditional = {
+                  page: component.key,
+                  condition: component.customConditional,
+                  check: FormioUtils.checkCustomConditions.bind(FormioUtils)
+                };
+              }
+              else if (component.conditional && component.conditional.when) {
+                hasConditionalPages = true;
+                component.__conditional = {
+                  page: component.key,
+                  condition: component.conditional,
+                  check: FormioUtils.checkConditions.bind(FormioUtils)
+                };
+              }
+              allPages.push(component);
               $scope.pages.push(component);
             }
           });
 
+          if (hasConditionalPages) {
+            $scope.$watch('submission.data', function(data) {
+              var newPages = [];
+              angular.forEach(allPages, function(page) {
+                if (page.__conditional) {
+                  if (page.__conditional.check(page.__conditional.condition, data)) {
+                    newPages.push(page);
+                  }
+                }
+                else {
+                  newPages.push(page);
+                }
+              });
+              $scope.pages = newPages;
+              setTimeout($scope.$apply.bind($scope), 10);
+            }, true);
+          }
+
           $scope.form = $scope.form ? angular.merge($scope.form, angular.copy(form)) : angular.copy(form);
-          $scope.form.components = $scope.pages;
           $scope.page = angular.copy(form);
           $scope.page.display = 'form';
           $scope.$emit('wizardFormLoad', form);
