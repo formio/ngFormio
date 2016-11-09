@@ -8,4 +8,5 @@
   <p class="help-block" ng-show="formioForm[componentId].$error.max">{{ component.label || component.placeholder || component.key }} {{'must be lower than' | formioTranslate}} {{ component.validate.max + 1 }}.</p>
   <p class="help-block" ng-show="formioForm[componentId].$error.custom">{{ component.customError | formioTranslate }}</p>
   <p class="help-block" ng-show="formioForm[componentId].$error.pattern">{{ component.label || component.placeholder || component.key }} {{'does not match the pattern' | formioTranslate}} {{ component.validate.pattern }}</p>
+  <p class="help-block" ng-show="formioForm[componentId].$error.day">{{ component.label || component.placeholder || component.key }} {{'must be a valid day' | formioTranslate}}.</p>
 </div>

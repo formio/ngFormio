@@ -1,6 +1,40 @@
 var fs = require('fs');
 module.exports = function(app) {
-  app.directive('datePartInput', function() {
+  app.directive('dayPart', function() {
+    return {
+      restrict: 'A',
+      replace: true,
+      require: 'ngModel',
+      link: function(scope, elem, attrs, ngModel) {
+        var limitLength = attrs.characters || 2;
+        scope.$watch(attrs.ngModel, function() {
+          if (!ngModel.$viewValue) {
+            return;
+          }
+          var render = false;
+          if (ngModel.$viewValue.length > limitLength) {
+            ngModel.$setViewValue(ngModel.$viewValue.substring(0, limitLength));
+            render = true;
+          }
+          if (isNaN(ngModel.$viewValue)) {
+            ngModel.$setViewValue('');
+            render = true;
+          }
+          if (
+            parseInt(ngModel.$viewValue) < parseInt(attrs.min) ||
+            parseInt(ngModel.$viewValue) > parseInt(attrs.max)
+          ) {
+            ngModel.$setViewValue(ngModel.$viewValue.substring(0, limitLength - 1));
+            render = true;
+          }
+          if (render) {
+            ngModel.$render();
+          }
+        });
+      }
+    };
+  });
+  app.directive('dayInput', function() {
     return {
       restrict: 'E',
       replace: true,
@@ -9,38 +43,41 @@ module.exports = function(app) {
         component: '=',
         componentId: '=',
         readOnly: '=',
-        model: '=ngModel',
+        ngModel: '=',
         gridRow: '=',
         gridCol: '='
       },
-      template: '' +
-      '<div class="dateSelect form">' +
-      '  <div class="form-group col-xs-3" ng-if="component.dayFirst">' +
-      '   <label for="{{componentId}}-day">{{ "Day" | formioTranslate }}</label>' +
-      '   <input class="form-control" type="text" id="{{componentId}}-day" style="padding-right: 10px;" placeholder="{{component.fields.day.placeholder}}" />' +
-      '  </div>' +
-      '  <div class="form-group col-xs-4">' +
-      '   <label for="{{componentId}}-month">{{ "Month" | formioTranslate }}</label>' +
-      '   <select class="form-control" type="text" id="{{componentId}}-month">' +
-      '     <option ng-repeat="month in months" value="$index">{{ month }}</option>' +
-      '   </select>' +
-      '  </div>' +
-      '  <div class="form-group col-xs-3" ng-if="!component.dayFirst">' +
-      '   <label for="{{componentId}}-day">{{ "Day" | formioTranslate }}</label>' +
-      '   <input class="form-control" type="text" id="{{componentId}}-day" style="padding-right: 10px;" placeholder="{{component.fields.day.placeholder}}" />' +
-      '  </div>' +
-      '  <div class="form-group col-xs-5">' +
-      '   <label for="{{componentId}}-year">{{ "Year" | formioTranslate }}</label>' +
-      '   <input class="form-control" type="text" id="{{componentId}}-year" style="padding-right: 10px;" placeholder="{{component.fields.year.placeholder}}" />' +
-      '  </div>' +
-      '</div>',
+      templateUrl: 'formio/components/day-input.html' +
       controller: ['$scope', function($scope) {
-        //console.log();
         $scope.months = [$scope.component.fields.month.placeholder, 'January', 'February', 'March', 'April', 'May', 'June',
           'July', 'August', 'September', 'October', 'November', 'December'];
+
+        $scope.day = '';
+        $scope.month = '';
+        $scope.year = '';
+
+        $scope.onChange = function() {
+
+        };
       }],
       link: function(scope, elem, attrs, ngModel) {
-        //console.log('link');
+        // Set the scope values based on the current model.
+        var value = ngModel.$modelValue || ngModel.$viewValue;
+        if (value) {
+          var parts = value.split('/');
+          scope.day = parts[(scope.component.dayFirst ? 0 : 1)];
+          scope.month = parts[(scope.component.dayFirst ? 1 : 0)];
+          scope.year = parts[2];
+        }
+
+        ngModel.$validators.day = function(modelValue, viewValue) {
+          var value = modelValue || viewValue;
+
+          //console.log('validate ', value);
+          // Do validation
+          return true;
+        };
+        //console.log(scope, elem, attrs, ngModel);
       }
     };
   });
@@ -92,6 +129,9 @@ module.exports = function(app) {
       $templateCache.put('formio/components/day.html', FormioUtils.fieldWrap(
         fs.readFileSync(__dirname + '/../templates/components/day.html', 'utf8')
       ));
+      $templateCache.put('formio/components/day-input.html',
+        fs.readFileSync(__dirname + '/../templates/components/dayinput.html', 'utf8')
+      );
     }
   ]);
 };

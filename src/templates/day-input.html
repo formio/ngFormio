@@ -1,0 +1,64 @@
+<div class="daySelect form">
+  <div class="form-group col-xs-3" ng-if="component.dayFirst">
+    <label for="{{componentId}}-day">{{ "Day" | formioTranslate }}</label>
+    <input
+      class="form-control"
+      type="text"
+      id="{{componentId}}-day"
+      ng-model="day"
+      ng-change="onChange()"
+      style="padding-right: 10px;"
+      placeholder="{{component.fields.day.placeholder}}"
+      date-part
+      characters="2"
+      min="0"
+      max="31"
+      ng-disabled="readOnly"
+    />
+  </div>
+  <div class="form-group col-xs-4">
+    <label for="{{componentId}}-month">{{ "Month" | formioTranslate }}</label>
+    <select class="form-control"
+            type="text"
+            id="{{componentId}}-month"
+            ng-model="month"
+            ng-change="onChange(day)"
+            ng-disabled="readOnly">
+      <option ng-repeat="month in months" value="$index">{{ month }}</option>
+    </select>
+  </div>
+  <div class="form-group col-xs-3" ng-if="!component.dayFirst">
+    <label for="{{componentId}}-day">{{ "Day" | formioTranslate }}</label>
+    <input
+      class="form-control"
+      type="text"
+      id="{{componentId}}-day"
+      ng-model="day"
+      ng-change="onChange()"
+      style="padding-right: 10px;"
+      placeholder="{{component.fields.day.placeholder}}"
+      date-part
+      characters="2"
+      min="0"
+      max="31"
+      ng-disabled="readOnly"
+    />
+  </div>
+  <div class="form-group col-xs-5">
+    <label for="{{componentId}}-year">{{ "Year" | formioTranslate }}</label>
+    <input
+      class="form-control"
+      type="text"
+      id="{{componentId}}-year"
+      ng-model="year"
+      ng-change="onChange()"
+      style="padding-right: 10px;"
+      placeholder="{{component.fields.year.placeholder}}"
+      date-part
+      characters="4"
+      min="0"
+      max="2100"
+      ng-disabled="readOnly"
+    />
+  </div>
+</div>
