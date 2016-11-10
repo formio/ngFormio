@@ -29,7 +29,7 @@
     <div class="row" ng-if="view === 'Overview'">
       <div class="panel panel-default control-panel">
         <div class="panel-heading">
-          Projects
+          Projects<i class="pull-right glyphicon glyphicon-refresh" ng-click="getProjectsCreated(); getProjectUpgrades()"></i>
         </div>
         <div class="panel-body">
           <div class="row">
@@ -50,7 +50,7 @@
 
       <div class="panel panel-default control-panel">
         <div class="panel-heading">
-          Users
+          Users<i class="pull-right glyphicon glyphicon-refresh" ng-click="getUsersCreated()"></i>
         </div>
         <div class="panel-body">
           <div class="row">
@@ -63,7 +63,7 @@
 
       <div class="panel panel-default control-panel">
         <div class="panel-heading">
-          Usage
+          Usage<i class="pull-right glyphicon glyphicon-refresh" ng-click="getAPIUsage()"></i>
         </div>
         <div class="panel-body">
           <div class="row">
