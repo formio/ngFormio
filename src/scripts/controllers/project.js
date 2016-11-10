@@ -1232,6 +1232,28 @@ app.controller('ProjectFormioController', [
       });
     };
 
+    $scope.getTotalProjects = function() {
+      var url = AppConfig.apiBase + '/analytics/total/projects/year/' + $scope.viewDate.year + '/month/' + $scope.viewDate.month;
+      if ($scope.showDaily) {
+        url += '/day/' + $scope.viewDate.day;
+      }
+
+      Formio.request(url, 'GET', undefined, undefined, true).then(function(data) {
+        $scope.totalProjects = _(data)
+          .orderBy(['created'], ['desc'])
+          .value();
+        $scope.totalProjects = filterEmployees($scope.totalProjects, 'owner.data.email');
+
+        $scope.totalProjectsNotDeleted = _($scope.totalProjects)
+          .filter(function(item) {
+            return item.deleted === null
+          })
+          .value();
+
+        $scope.$apply();
+      });
+    };
+
     /**
      * Get the list of api usage during the configured time period.
      */
@@ -1460,6 +1482,7 @@ app.controller('ProjectFormioController', [
       $scope.getProjectUpgrades();
 
       $scope.getAPIUsage();
+      $scope.getTotalProjects();
     };
   }
 ]);
