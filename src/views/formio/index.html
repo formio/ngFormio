@@ -24,24 +24,56 @@
         </div>
       </div>
     </div>
-    <br>
 
     <!-- The Overview display -->
     <div class="row" ng-if="view === 'Overview'">
-      <div class="row">
-        <div class="col-md-6">
-          <h3>Projects Created: {{projectsCreated.length || 0}}</h3>
+      <div class="panel panel-default control-panel">
+        <div class="panel-heading">
+          Projects
         </div>
-        <div class="col-md-6">
-          <h3>Users Created: {{usersCreated.length || 0}}</h3>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-6">
+              <h3>Projects Created: {{projectsCreated.length || 0}}</h3>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <h3>Monthly Upgrades: {{monthlyUpgrades || 0}}</h3>
+            </div>
+            <div class="col-md-6">
+              <h3>Monthly Downgrades: {{monthlyDowngrades || 0}}</h3>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="row">
-        <div class="col-md-6">
-          <h3>Total Submissions: {{totalMonthlySubmissions || 0}}</h3>
+
+      <div class="panel panel-default control-panel">
+        <div class="panel-heading">
+          Users
         </div>
-        <div class="col-md-6">
-          <h3>Total Non-Submissions: {{totalMonthlyNonsubmissions || 0}}</h3>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-6">
+              <h3>Users Created: {{usersCreated.length || 0}}</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel panel-default control-panel">
+        <div class="panel-heading">
+          Usage
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-6">
+              <h3>Total Submissions: {{totalMonthlySubmissions || 0}}</h3>
+            </div>
+            <div class="col-md-6">
+              <h3>Total Non-Submissions: {{totalMonthlyNonsubmissions || 0}}</h3>
+            </div>
+          </div>
         </div>
       </div>
     </div>

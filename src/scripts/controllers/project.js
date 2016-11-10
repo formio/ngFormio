@@ -1445,6 +1445,14 @@ app.controller('ProjectFormioController', [
             $scope.totalMonthlySubmissions = _.sum(_.map($scope.monthlySubmissions, 'submissions'));
             $scope.monthlyNonsubmissions = filterEmployees(merge($scope.monthlyNonsubmissions, ownerData, 'owner'));
             $scope.totalMonthlyNonsubmissions = _.sum(_.map($scope.monthlyNonsubmissions, 'nonsubmissions'));
+
+            $scope.monthlyUpgrades = _($scope.projectUpgrades)
+              .filter(function(item) {
+                return item.plan == 'success';
+              })
+              .value().length;
+            $scope.monthlyDowngrades = $scope.projectUpgrades.length - $scope.monthlyUpgrades;
+
             $scope.$apply();
           });
         });
