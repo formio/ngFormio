@@ -1,15 +1,15 @@
-<div class="daySelect form">
+<div class="daySelect form row">
   <div class="form-group col-xs-3" ng-if="component.dayFirst">
-    <label for="{{componentId}}-day">{{ "Day" | formioTranslate }}</label>
+    <label for="{{componentId}}-day" ng-class="{'field-required': component.fields.day.required}">{{ "Day" | formioTranslate }}</label>
     <input
       class="form-control"
       type="text"
       id="{{componentId}}-day"
-      ng-model="day"
+      ng-model="date.day"
       ng-change="onChange()"
       style="padding-right: 10px;"
       placeholder="{{component.fields.day.placeholder}}"
-      date-part
+      day-part
       characters="2"
       min="0"
       max="31"
@@ -17,27 +17,27 @@
     />
   </div>
   <div class="form-group col-xs-4">
-    <label for="{{componentId}}-month">{{ "Month" | formioTranslate }}</label>
+    <label for="{{componentId}}-month" ng-class="{'field-required': component.fields.month.required}">{{ "Month" | formioTranslate }}</label>
     <select class="form-control"
             type="text"
             id="{{componentId}}-month"
-            ng-model="month"
-            ng-change="onChange(day)"
+            ng-model="date.month"
+            ng-change="onChange()"
             ng-disabled="readOnly">
-      <option ng-repeat="month in months" value="$index">{{ month }}</option>
+      <option ng-repeat="month in months" value="{{$index}}">{{ month }}</option>
     </select>
   </div>
   <div class="form-group col-xs-3" ng-if="!component.dayFirst">
-    <label for="{{componentId}}-day">{{ "Day" | formioTranslate }}</label>
+    <label for="{{componentId}}-day" ng-class="{'field-required': component.fields.day.required}">{{ "Day" | formioTranslate }}</label>
     <input
       class="form-control"
       type="text"
-      id="{{componentId}}-day"
-      ng-model="day"
+      id="{{componentId}}-day1"
+      ng-model="date.day"
       ng-change="onChange()"
       style="padding-right: 10px;"
       placeholder="{{component.fields.day.placeholder}}"
-      date-part
+      day-part
       characters="2"
       min="0"
       max="31"
@@ -45,16 +45,16 @@
     />
   </div>
   <div class="form-group col-xs-5">
-    <label for="{{componentId}}-year">{{ "Year" | formioTranslate }}</label>
+    <label for="{{componentId}}-year" ng-class="{'field-required': component.fields.year.required}">{{ "Year" | formioTranslate }}</label>
     <input
       class="form-control"
       type="text"
       id="{{componentId}}-year"
-      ng-model="year"
+      ng-model="date.year"
       ng-change="onChange()"
       style="padding-right: 10px;"
       placeholder="{{component.fields.year.placeholder}}"
-      date-part
+      day-part
       characters="4"
       min="0"
       max="2100"

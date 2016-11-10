@@ -47,37 +47,67 @@ module.exports = function(app) {
         gridRow: '=',
         gridCol: '='
       },
-      templateUrl: 'formio/components/day-input.html' +
+      templateUrl: 'formio/components/day-input.html',
       controller: ['$scope', function($scope) {
         $scope.months = [$scope.component.fields.month.placeholder, 'January', 'February', 'March', 'April', 'May', 'June',
           'July', 'August', 'September', 'October', 'November', 'December'];
 
-        $scope.day = '';
-        $scope.month = '';
-        $scope.year = '';
-
-        $scope.onChange = function() {
-
+        $scope.date = {
+          day: '',
+          month: '',
+          year: ''
         };
       }],
       link: function(scope, elem, attrs, ngModel) {
         // Set the scope values based on the current model.
-        var value = ngModel.$modelValue || ngModel.$viewValue;
-        if (value) {
-          var parts = value.split('/');
-          scope.day = parts[(scope.component.dayFirst ? 0 : 1)];
-          scope.month = parts[(scope.component.dayFirst ? 1 : 0)];
-          scope.year = parts[2];
-        }
+        scope.$watch('ngModel', function() {
+          if (ngModel.$viewValue) {
+            // Only update on load.
+            if (!ngModel.$dirty) {
+              var parts = ngModel.$viewValue.split('/');
+              scope.date.day = parts[(scope.component.dayFirst ? 0 : 1)];
+              scope.date.month = parseInt(parts[(scope.component.dayFirst ? 1 : 0)]).toString();
+              scope.date.year = parts[2];
+            }
+          }
+        });
+
+        var padLeft = function padLeft(nr, n, str) {
+          return Array(n - String(nr.toString()).length + 1).join(str || '0') + nr.toString();
+        };
+
+        scope.onChange = function() {
+          ngModel.$setViewValue(padLeft(scope.date.day, 2) + '/' + padLeft(scope.date.month, 2) + '/' + padLeft(scope.date.year, 4));
+        };
 
         ngModel.$validators.day = function(modelValue, viewValue) {
           var value = modelValue || viewValue;
+          var required = scope.component.fields.day.required || scope.component.fields.month.required || scope.component.fields.year.required;
 
-          //console.log('validate ', value);
-          // Do validation
+          if (!required) {
+            return true;
+          }
+          if (!value && required) {
+            return false;
+          }
+          var parts = value.split('/');
+          if (scope.component.fields.day.required) {
+            if (parts[(scope.component.dayFirst ? 0 : 1)] === '00') {
+              return false;
+            }
+          }
+          if (scope.component.fields.month.required) {
+            if (parts[(scope.component.dayFirst ? 1 : 0)] === '00') {
+              return false;
+            }
+          }
+          if (scope.component.fields.year.required) {
+            if (parts[2] === '0000') {
+              return false;
+            }
+          }
           return true;
         };
-        //console.log(scope, elem, attrs, ngModel);
       }
     };
   });
@@ -130,7 +160,7 @@ module.exports = function(app) {
         fs.readFileSync(__dirname + '/../templates/components/day.html', 'utf8')
       ));
       $templateCache.put('formio/components/day-input.html',
-        fs.readFileSync(__dirname + '/../templates/components/dayinput.html', 'utf8')
+        fs.readFileSync(__dirname + '/../templates/components/day-input.html', 'utf8')
       );
     }
   ]);
