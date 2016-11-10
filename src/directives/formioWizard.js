@@ -372,6 +372,7 @@ module.exports = function() {
                 }
               });
               $scope.pages = newPages;
+              updatePages();
               setTimeout($scope.$apply.bind($scope), 10);
             }, true);
           }
