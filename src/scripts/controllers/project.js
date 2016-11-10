@@ -1246,6 +1246,7 @@ app.controller('ProjectFormioController', [
     $scope.getTotalProjects = function() {
       $scope.totalProjects = null;
       $scope.totalProjectsNotDeleted = null;
+      $scope.totalProjectsDeleted = null;
       var url = AppConfig.apiBase + '/analytics/total/projects/year/' + $scope.viewDate.year + '/month/' + $scope.viewDate.month;
       if ($scope.showDaily) {
         url += '/day/' + $scope.viewDate.day;
@@ -1257,11 +1258,17 @@ app.controller('ProjectFormioController', [
           .value();
         $scope.totalProjects = filterEmployees($scope.totalProjects, 'owner.data.email');
 
-        $scope.totalProjectsNotDeleted = _($scope.totalProjects)
-          .filter(function(item) {
-            return item.deleted === null
-          })
-          .value();
+        $scope.totalProjectsNotDeleted = [];
+        $scope.totalProjectsDeleted = [];
+        _($scope.totalProjects)
+          .each(function(item) {
+            if (item.deleted === null) {
+              $scope.totalProjectsNotDeleted.push(item)
+            }
+            else if (item.deleted !== null) {
+              $scope.totalProjectsDeleted.push(item)
+            }
+          });
 
         $scope.$apply();
       });
@@ -1270,6 +1277,7 @@ app.controller('ProjectFormioController', [
     $scope.getTotalUsers = function() {
       $scope.totalUsers = null;
       $scope.totalUsersNotDeleted = null;
+      $scope.totalUsersDeleted = null;
       var url = AppConfig.apiBase + '/analytics/total/users/year/' + $scope.viewDate.year + '/month/' + $scope.viewDate.month;
       if ($scope.showDaily) {
         url += '/day/' + $scope.viewDate.day;
@@ -1281,11 +1289,17 @@ app.controller('ProjectFormioController', [
           .value();
         $scope.totalUsers = filterEmployees($scope.totalUsers, 'data.email');
 
-        $scope.totalUsersNotDeleted = _($scope.totalUsers)
-          .filter(function(item) {
-            return item.deleted === null
-          })
-          .value();
+        $scope.totalUsersNotDeleted = [];
+        $scope.totalUsersDeleted = [];
+        _($scope.totalUsers)
+          .each(function(item) {
+            if (item.deleted === null) {
+              $scope.totalUsersNotDeleted.push(item)
+            }
+            else if (item.deleted !== null) {
+              $scope.totalUsersDeleted.push(item)
+            }
+          });
 
         $scope.$apply();
       });

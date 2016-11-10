@@ -180,15 +180,15 @@
     <div class="row" ng-if="view === 'Users'">
       <div class="panel panel-default control-panel">
         <div class="panel-heading">
-          Total Users<i class="pull-right glyphicon glyphicon-refresh" ng-click="getTotalUsers()"></i>
+          Users as of {{viewDate.month + ' / ' + (showDaily ? viewDate.month + ' / ' : '') + viewDate.year}}<i class="pull-right glyphicon glyphicon-refresh" ng-click="getTotalUsers()"></i>
         </div>
         <div class="panel-body">
           <div class="row">
             <div class="col-md-12">
-              <h3>
-                Total Users as of
-                {{viewDate.month + ' / ' + (showDaily ? viewDate.month + ' / ' : '') + viewDate.year}}: {{totalUsersNotDeleted.length}}
-              </h3>
+              <div class="row">
+                <div class="col-md-6"><h3>Active Users: {{totalUsersNotDeleted !== null ? totalUsersNotDeleted.length : '---'}}</h3></div>
+                <div class="col-md-6"><h3>Deleted Users: {{totalUsersDeleted !== null ? totalUsersDeleted.length : '---'}}</h3></div>
+              </div>
             </div>
           </div>
         </div>
@@ -241,15 +241,15 @@
     <div class="row" ng-if="view === 'Projects'">
       <div class="panel panel-default control-panel">
         <div class="panel-heading">
-          Total Projects<i class="pull-right glyphicon glyphicon-refresh" ng-click="getTotalProjects()"></i>
+          Projects as of {{viewDate.month + ' / ' + (showDaily ? viewDate.month + ' / ' : '') + viewDate.year}}<i class="pull-right glyphicon glyphicon-refresh" ng-click="getTotalProjects()"></i>
         </div>
         <div class="panel-body">
           <div class="row">
             <div class="col-md-12">
-              <h3>
-                Total Projects as of
-                {{viewDate.month + ' / ' + (showDaily ? viewDate.month + ' / ' : '') + viewDate.year}}: {{totalProjectsNotDeleted.length}}
-              </h3>
+              <div class="row">
+                <div class="col-md-6"><h3>Active Projects: {{totalProjectsNotDeleted !== null ? totalProjectsNotDeleted.length : '---'}}</h3></div>
+                <div class="col-md-6"><h3>Deleted Projects: {{totalProjectsDeleted !== null ? totalProjectsDeleted.length : '---'}}</h3></div>
+              </div>
             </div>
           </div>
         </div>
