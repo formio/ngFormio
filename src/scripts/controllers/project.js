@@ -1258,6 +1258,8 @@ app.controller('ProjectFormioController', [
       // Add the overview data.
       csv += 'Overview\n';
       csv += 'Projects Created,' + ($scope.projectsCreated.length || 0) + '\n';
+      csv += 'Project Plan Upgrades,' + ($scope.monthlyUpgrades || 0) + '\n';
+      csv += 'Project Plan Downgrades,' + ($scope.monthlyDowngrades || 0) + '\n';
       csv += 'Users Created,' + ($scope.usersCreated.length || 0) + '\n';
       csv += 'Submissions,' + $scope.totalMonthlySubmissions + '\n';
       csv += 'Non-Submissions,' + $scope.totalMonthlyNonsubmissions + '\n';
@@ -1326,7 +1328,7 @@ app.controller('ProjectFormioController', [
       csv += 'Event Date,Project _id,Project Name,Project Title,Old Plan,New Plan,Created,Owner _id,Owner Name,Owner Email\n';
       _.forEach($scope.projectUpgrades, function(element) {
         csv +=
-          _.get(element, 'data.created', '') + ',' +
+          _.get(element, 'created', '') + ',' +
           _.get(element, 'data.project._id', '') + ',' +
           _.get(element, 'data.project.name', '') + ',' +
           _.get(element, 'data.project.title', '') + ',' +
