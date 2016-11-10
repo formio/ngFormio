@@ -1211,6 +1211,13 @@ app.controller('ProjectFormioController', [
      * Get the list of upgraded/downgraded projects during the configured time period.
      */
     var getProjectUpgrades = function() {
+      var plans = {
+        trial: 0,
+        basic: 1,
+        independent: 2,
+        team: 3,
+        commercial: 4
+      };
       var url = AppConfig.apiBase + '/analytics/upgrades/projects/year/' + $scope.viewDate.year + '/month/' + $scope.viewDate.month;
       if ($scope.showDaily) {
         url += '/day/' + $scope.viewDate.day;
@@ -1220,6 +1227,10 @@ app.controller('ProjectFormioController', [
         .then(function(data) {
           $scope.projectUpgrades = _(data)
             .orderBy(['created'], ['desc'])
+            .map(function(item) {
+              item.plan = plans[item.data.oldPlan] < plans[item.data.newPlan] ? 'success' : 'danger';
+              return item;
+            })
             .value();
 
           $scope.projectUpgrades = filterEmployees($scope.projectUpgrades, 'data.project.owner.data.email');
@@ -1311,10 +1322,11 @@ app.controller('ProjectFormioController', [
           (element.ownerData && element.ownerData.email ? element.ownerData.email : '') + '\n';
       });
 
-      csv += '\nProject Upgrades\n';
-      csv += 'Project _id,Project Name,Project Title,Old Plan,New Plan,Created,Owner _id,Owner Name,Owner Email\n';
+      csv += '\nProject Plan Status Changes\n';
+      csv += 'Event Date,Project _id,Project Name,Project Title,Old Plan,New Plan,Created,Owner _id,Owner Name,Owner Email\n';
       _.forEach($scope.projectUpgrades, function(element) {
         csv +=
+          _.get(element, 'data.created', '') + ',' +
           _.get(element, 'data.project._id', '') + ',' +
           _.get(element, 'data.project.name', '') + ',' +
           _.get(element, 'data.project.title', '') + ',' +

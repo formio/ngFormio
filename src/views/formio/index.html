@@ -216,7 +216,7 @@
       <div class="row">
         <div class="col-md-12">
           <h3>
-            Project Upgrades by
+            Project Plan Status Changes by
             {{showDaily ? 'Day' : 'Month'}}
             for
             {{viewDate.month + ' / ' + (showDaily ? viewDate.month + ' / ' : '') + viewDate.year}}
@@ -225,6 +225,7 @@
             <thead>
             <tr>
               <td>#</td>
+              <td ng-if="showCreated">Event Date</td>
               <td ng-if="showIds">Project _id</td>
               <td>Project Name</td>
               <td>Project Title</td>
@@ -234,11 +235,13 @@
               <td ng-if="showIds">Owner _id</td>
               <td>Owner Name</td>
               <td>Owner Email</td>
+              <td ng-if="showCreated">Owner Created</td>
             </tr>
             </thead>
             <tbody>
-            <tr ng-repeat="element in projectUpgrades track by $index">
+            <tr ng-repeat="element in projectUpgrades track by $index" class="{{element.plan}}">
               <td>{{$index + 1}}</td>
+              <td ng-if="showCreated">{{element.created}}</td>
               <td ng-if="showIds">{{element._id}}</td>
               <td>{{element.data.project.name}}</td>
               <td>{{element.data.project.title}}</td>
@@ -248,6 +251,7 @@
               <td ng-if="showIds">{{element.data.project.owner._id}}</td>
               <td>{{element.data.project.owner.data.name}}</td>
               <td>{{element.data.project.owner.data.email}}</td>
+              <td ng-if="showCreated">{{element.data.project.owner.created}}</td>
             </tr>
             </tbody>
           </table>
