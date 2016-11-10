@@ -1155,6 +1155,7 @@ app.controller('ProjectFormioController', [
      * Get the formio projects created during the configured time period, to the next logical unit of time.
      */
     $scope.getProjectsCreated = function() {
+      $scope.projectsCreated = null;
       var url = AppConfig.apiBase + '/analytics/created/projects/year/' + $scope.viewDate.year + '/month/' + $scope.viewDate.month;
       if ($scope.showDaily) {
         url += '/day/' + $scope.viewDate.day;
@@ -1187,6 +1188,7 @@ app.controller('ProjectFormioController', [
      * Get the formio users created during the configured time period, to the next logical unit of time.
      */
     $scope.getUsersCreated = function() {
+      $scope.usersCreated = null;
       var url = AppConfig.apiBase + '/analytics/created/users/year/' + $scope.viewDate.year + '/month/' + $scope.viewDate.month;
       if ($scope.showDaily) {
         url += '/day/' + $scope.viewDate.day;
@@ -1206,6 +1208,9 @@ app.controller('ProjectFormioController', [
      * Get the list of upgraded/downgraded projects during the configured time period.
      */
     $scope.getProjectUpgrades = function() {
+      $scope.projectUpgrades = null;
+      $scope.monthlyUpgrades = null;
+      $scope.monthlyDowngrades = null;
       var plans = {
         trial: 0,
         basic: 1,
@@ -1228,11 +1233,19 @@ app.controller('ProjectFormioController', [
           .value();
 
         $scope.projectUpgrades = filterEmployees($scope.projectUpgrades, 'data.project.owner.data.email');
+        $scope.monthlyUpgrades = _($scope.projectUpgrades)
+          .filter(function(item) {
+            return item.plan == 'success';
+          })
+          .value().length;
+        $scope.monthlyDowngrades = (($scope.projectUpgrades.length || 0) - ($scope.monthlyUpgrades || 0)) || 0;
         $scope.$apply();
       });
     };
 
     $scope.getTotalProjects = function() {
+      $scope.totalProjects = null;
+      $scope.totalProjectsNotDeleted = null;
       var url = AppConfig.apiBase + '/analytics/total/projects/year/' + $scope.viewDate.year + '/month/' + $scope.viewDate.month;
       if ($scope.showDaily) {
         url += '/day/' + $scope.viewDate.day;
@@ -1255,6 +1268,8 @@ app.controller('ProjectFormioController', [
     };
 
     $scope.getTotalUsers = function() {
+      $scope.totalUsers = null;
+      $scope.totalUsersNotDeleted = null;
       var url = AppConfig.apiBase + '/analytics/total/users/year/' + $scope.viewDate.year + '/month/' + $scope.viewDate.month;
       if ($scope.showDaily) {
         url += '/day/' + $scope.viewDate.day;
@@ -1280,6 +1295,12 @@ app.controller('ProjectFormioController', [
      * Get the list of api usage during the configured time period.
      */
     $scope.getAPIUsage = function() {
+      $scope.monthlyUsage = null;
+      $scope.monthlySubmissions = null;
+      $scope.monthlyNonsubmissions = null;
+      $scope.totalMonthlySubmissions = null;
+      $scope.totalMonthlyNonsubmissions = null;
+
       var BSON = new RegExp('^[0-9a-fA-F]{24}$');
       var url = AppConfig.apiBase + '/analytics/project/year/' + $scope.viewDate.year + '/month/' + $scope.viewDate.month;
       if ($scope.showDaily) {
@@ -1367,14 +1388,6 @@ app.controller('ProjectFormioController', [
             $scope.totalMonthlySubmissions = _.sum(_.map($scope.monthlySubmissions, 'submissions'));
             $scope.monthlyNonsubmissions = filterEmployees(merge($scope.monthlyNonsubmissions, ownerData, 'owner'));
             $scope.totalMonthlyNonsubmissions = _.sum(_.map($scope.monthlyNonsubmissions, 'nonsubmissions'));
-
-            $scope.monthlyUpgrades = _($scope.projectUpgrades)
-              .filter(function(item) {
-                return item.plan == 'success';
-              })
-              .value().length;
-            $scope.monthlyDowngrades = $scope.projectUpgrades.length - $scope.monthlyUpgrades;
-
             $scope.$apply();
           });
         });

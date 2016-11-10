@@ -34,18 +34,18 @@
         <div class="panel-body">
           <div class="row">
             <div class="col-md-6">
-              <h3>New Projects: {{projectsCreated.length || 0}}</h3>
+              <h3>New Projects: {{projectsCreated !== null ? projectsCreated.length : '---'}}</h3>
             </div>
             <div class="col-md-6">
-              <h3>Total Projects: {{totalProjectsNotDeleted.length || 0}}</h3>
+              <h3>Total Projects: {{totalProjectsNotDeleted !== null ? totalProjectsNotDeleted.length : '---'}}</h3>
             </div>
           </div>
           <div class="row">
             <div class="col-md-6">
-              <h3>Monthly Upgrades: {{monthlyUpgrades || 0}}</h3>
+              <h3>Monthly Upgrades: {{monthlyUpgrades !== null ? monthlyUpgrades : '---'}}</h3>
             </div>
             <div class="col-md-6">
-              <h3>Monthly Downgrades: {{monthlyDowngrades || 0}}</h3>
+              <h3>Monthly Downgrades: {{monthlyDowngrades !== null ? monthlyDowngrades : '---'}}</h3>
             </div>
           </div>
         </div>
@@ -58,10 +58,10 @@
         <div class="panel-body">
           <div class="row">
             <div class="col-md-6">
-              <h3>New Users: {{usersCreated.length || 0}}</h3>
+              <h3>New Users: {{usersCreated !== null ? usersCreated.length : '---'}}</h3>
             </div>
             <div class="col-md-6">
-              <h3>Total Users: {{totalUsersNotDeleted.length || 0}}</h3>
+              <h3>Total Users: {{totalUsersNotDeleted !== null ? totalUsersNotDeleted.length : '---'}}</h3>
             </div>
           </div>
         </div>
@@ -74,10 +74,10 @@
         <div class="panel-body">
           <div class="row">
             <div class="col-md-6">
-              <h3>Total Submissions: {{totalMonthlySubmissions || 0}}</h3>
+              <h3>Total Submissions: {{totalMonthlySubmissions !== null ? totalMonthlySubmissions : '---'}}</h3>
             </div>
             <div class="col-md-6">
-              <h3>Total Non-Submissions: {{totalMonthlyNonsubmissions || 0}}</h3>
+              <h3>Total Non-Submissions: {{totalMonthlyNonsubmissions !== null ? totalMonthlyNonsubmissions : '---'}}</h3>
             </div>
           </div>
         </div>
