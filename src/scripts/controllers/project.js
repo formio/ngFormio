@@ -1247,6 +1247,10 @@ app.controller('ProjectFormioController', [
       $scope.totalProjects = null;
       $scope.totalProjectsNotDeleted = null;
       $scope.totalProjectsDeleted = null;
+      $scope.totalProjectsCommercial = null;
+      $scope.totalProjectsTeam = null;
+      $scope.totalProjectsIndependent = null;
+
       var url = AppConfig.apiBase + '/analytics/total/projects/year/' + $scope.viewDate.year + '/month/' + $scope.viewDate.month;
       if ($scope.showDaily) {
         url += '/day/' + $scope.viewDate.day;
@@ -1260,13 +1264,28 @@ app.controller('ProjectFormioController', [
 
         $scope.totalProjectsNotDeleted = [];
         $scope.totalProjectsDeleted = [];
+        $scope.totalProjectsCommercial = [];
+        $scope.totalProjectsTeam = [];
+        $scope.totalProjectsIndependent = [];
         _($scope.totalProjects)
           .each(function(item) {
+            // Build the project count lists.
             if (item.deleted === null) {
               $scope.totalProjectsNotDeleted.push(item)
             }
             else if (item.deleted !== null) {
               $scope.totalProjectsDeleted.push(item)
+            }
+
+            // Build the premium project count lists.
+            if (item.plan === 'commercial') {
+              $scope.totalProjectsCommercial.push(item)
+            }
+            else if (item.plan === 'team') {
+              $scope.totalProjectsTeam.push(item)
+            }
+            else if (item.plan === 'independent') {
+              $scope.totalProjectsIndependent.push(item)
             }
           });
 

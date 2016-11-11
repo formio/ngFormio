@@ -48,6 +48,13 @@
               <h3>Monthly Downgrades: {{monthlyDowngrades !== null ? monthlyDowngrades : '---'}}</h3>
             </div>
           </div>
+          <div class="row">
+            <div class="col-md-6"><h3>Commercial Projects: {{totalProjectsCommercial !== null ? totalProjectsCommercial.length : '---'}}</h3></div>
+            <div class="col-md-6"><h3>Team Projects: {{totalProjectsTeam !== null ? totalProjectsTeam.length : '---'}}</h3></div>
+          </div>
+          <div class="row">
+            <div class="col-md-6"><h3>Independent Projects: {{totalProjectsIndependent !== null ? totalProjectsIndependent.length : '---'}}</h3></div>
+          </div>
         </div>
       </div>
 
@@ -249,6 +256,25 @@
               <div class="row">
                 <div class="col-md-6"><h3>Active Projects: {{totalProjectsNotDeleted !== null ? totalProjectsNotDeleted.length : '---'}}</h3></div>
                 <div class="col-md-6"><h3>Deleted Projects: {{totalProjectsDeleted !== null ? totalProjectsDeleted.length : '---'}}</h3></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel panel-default control-panel">
+        <div class="panel-heading">
+          Current Premium Projects<i class="pull-right glyphicon glyphicon-refresh" ng-click="getTotalProjects()"></i>
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="row">
+                <div class="col-md-6"><h3>Commercial Projects: {{totalProjectsCommercial !== null ? totalProjectsCommercial.length : '---'}}</h3></div>
+                <div class="col-md-6"><h3>Team Projects: {{totalProjectsTeam !== null ? totalProjectsTeam.length : '---'}}</h3></div>
+              </div>
+              <div class="row">
+                <div class="col-md-6"><h3>Independent Projects: {{totalProjectsIndependent !== null ? totalProjectsIndependent.length : '---'}}</h3></div>
               </div>
             </div>
           </div>
