@@ -629,7 +629,7 @@ app.controller('FormShareController', ['$scope', function($scope) {
         $scope.form.submissionAccess[index].roles.push(defaultRole._id);
       }
       if(access.type === 'read_all') {
-        if($scope.form.access[index].roles !=  '57ebec292e78650067decec9') {
+        if($scope.form.access[index].roles !=  defaultRole._id) {
           $scope.form.access[index].roles.push(defaultRole._id);
         }
       }
@@ -1697,27 +1697,27 @@ app.constant('ResourceAccessLabels', {
 app.constant('AccessLabels', {
   'read_all': {
   label: 'Read Form Definition',
-  tooltip: 'The Read permission will allow a user to read the form definition.'
+  tooltip: 'The Read permission will allow a user, with one of the given Roles, to read the form.'
   },
   'update_all': {
   label: 'Update Form Definition',
-  tooltip: 'The Update permission will allow a user to read the form and edit the form except for the Submission Resource Access and Owner information.'
+  tooltip: 'The Update permission will allow a user, with one of the given Roles, to read and edit the form.'
   },
   'delete_all': {
   label: 'Delete Form Definition',
-  tooltip: 'The Admin permission will allow a user to read and edit all of the submission data.'
+  tooltip: 'The Delete permission will allow a user, with one of the given Roles, to delete the form.'
   },
   'read_own': {
   label: 'Read Form Definition (Restricted to owners)',
-  tooltip: 'The Admin permission will allow a user to read and edit all of the submission data.'
+  tooltip: 'The Read Own permission will allow a user, with one of the given Roles, to read a form. A user can only read a form if they are defined as its owner.'
   },
   'update_own': {
   label: 'Update Form Definition (Restricted to owners)',
-  tooltip: 'The Admin permission will allow a user to read and edit all of the submission data.'
+  tooltip: 'The Update Own permission will allow a user, with one of the given Roles, to update a form. A user can only update a form if they are defined as its owner.'
   },
   'delete_own': {
   label: 'Delete Form Definition (Restricted to owners)',
-  tooltip: 'The Admin permission will allow a user to read and edit all of the submission data.'
+  tooltip: 'The Delete Own permission will allow a user, with one of the given Roles, to delete a form. A user can only delete a form if they are defined as its owner.'
   }
 });
 
