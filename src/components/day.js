@@ -17,7 +17,7 @@ module.exports = function(app) {
             render = true;
           }
           if (isNaN(ngModel.$viewValue)) {
-            ngModel.$setViewValue('');
+            ngModel.$setViewValue(ngModel.$viewValue.replace(/\D/g,''));
             render = true;
           }
           if (
@@ -65,9 +65,11 @@ module.exports = function(app) {
             // Only update on load.
             if (!ngModel.$dirty) {
               var parts = ngModel.$viewValue.split('/');
-              scope.date.day = parts[(scope.component.dayFirst ? 0 : 1)];
-              scope.date.month = parseInt(parts[(scope.component.dayFirst ? 1 : 0)]).toString();
-              scope.date.year = parts[2];
+              if (parts.length === 3) {
+                scope.date.day = parts[(scope.component.dayFirst ? 0 : 1)];
+                scope.date.month = parseInt(parts[(scope.component.dayFirst ? 1 : 0)]).toString();
+                scope.date.year = parts[2];
+              }
             }
           }
         });
