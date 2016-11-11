@@ -1001,7 +1001,7 @@ app.controller('ProjectFormioController', [
     $scope.currentSection.title = 'Admin Data';
     $scope.currentSection.icon = 'glyphicon glyphicon-globe';
     $scope.currentSection.help = '';
-    $scope.views = ['Overview', 'Usage', 'Users', 'Projects', 'Upgrades'];
+    $scope.views = ['Overview', 'Current', 'Usage', 'Users', 'Projects', 'Upgrades'];
     $scope.view = $scope.views[0];
     $scope.showDaily = false;
     $scope.showCreated = false;

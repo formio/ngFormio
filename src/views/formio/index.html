@@ -29,6 +29,25 @@
     <div class="row" ng-if="view === 'Overview'">
       <div class="panel panel-default control-panel">
         <div class="panel-heading">
+          Current<i class="pull-right glyphicon glyphicon-refresh" ng-click="getTotalProjects()"></i>
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="row">
+                <div class="col-md-6"><h3>Commercial Projects: {{totalProjectsCommercial !== null ? totalProjectsCommercial.length : '---'}}</h3></div>
+                <div class="col-md-6"><h3>Team Projects: {{totalProjectsTeam !== null ? totalProjectsTeam.length : '---'}}</h3></div>
+              </div>
+              <div class="row">
+                <div class="col-md-6"><h3>Independent Projects: {{totalProjectsIndependent !== null ? totalProjectsIndependent.length : '---'}}</h3></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel panel-default control-panel">
+        <div class="panel-heading">
           Projects<i class="pull-right glyphicon glyphicon-refresh" ng-click="getProjectsCreated(); getProjectUpgrades(); getTotalProjects()"></i>
         </div>
         <div class="panel-body">
@@ -47,13 +66,6 @@
             <div class="col-md-6">
               <h3>Monthly Downgrades: {{monthlyDowngrades !== null ? monthlyDowngrades : '---'}}</h3>
             </div>
-          </div>
-          <div class="row">
-            <div class="col-md-6"><h3>Commercial Projects: {{totalProjectsCommercial !== null ? totalProjectsCommercial.length : '---'}}</h3></div>
-            <div class="col-md-6"><h3>Team Projects: {{totalProjectsTeam !== null ? totalProjectsTeam.length : '---'}}</h3></div>
-          </div>
-          <div class="row">
-            <div class="col-md-6"><h3>Independent Projects: {{totalProjectsIndependent !== null ? totalProjectsIndependent.length : '---'}}</h3></div>
           </div>
         </div>
       </div>
@@ -85,6 +97,147 @@
             </div>
             <div class="col-md-6">
               <h3>Total Non-Submissions: {{totalMonthlyNonsubmissions !== null ? totalMonthlyNonsubmissions : '---'}}</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row" ng-if="view === 'Current'">
+      <div class="panel panel-default control-panel">
+        <div class="panel-heading">
+          Premium Projects<i class="pull-right glyphicon glyphicon-refresh" ng-click="getTotalProjects()"></i>
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="panel panel-default control-panel">
+                <div class="panel-heading">
+                  Commercial Projects ({{totalProjectsCommercial !== null ? totalProjectsCommercial.length : '---'}})<i class="pull-right glyphicon glyphicon-refresh" ng-click="getTotalProjects()"></i>
+                </div>
+                <div class="panel-body">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <table class="table table-striped">
+                        <thead>
+                        <tr>
+                          <td>#</td>
+                          <td ng-if="showIds">Project _id</td>
+                          <td>Project Name</td>
+                          <td>Project Title</td>
+                          <td>Project Plan</td>
+                          <td ng-if="showCreated">Project Created</td>
+                          <td ng-if="showIds">Owner _id</td>
+                          <td>Owner Name</td>
+                          <td>Owner Email</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="element in totalProjectsCommercial track by $index">
+                          <td>{{$index + 1}}</td>
+                          <td ng-if="showIds">{{element._id}}</td>
+                          <td>{{element.name}}</td>
+                          <td>{{element.title}}</td>
+                          <td>{{element.plan}}</td>
+                          <td ng-if="showCreated">{{element.created}}</td>
+                          <td ng-if="showIds">{{element.owner._id}}</td>
+                          <td>{{element.owner.data.name}}</td>
+                          <td>{{element.owner.data.email}}</td>
+                        </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12">
+              <div class="panel panel-default control-panel">
+                <div class="panel-heading">
+                  Team Projects ({{totalProjectsTeam !== null ? totalProjectsTeam.length : '---'}})<i class="pull-right glyphicon glyphicon-refresh" ng-click="getTotalProjects()"></i>
+                </div>
+                <div class="panel-body">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <table class="table table-striped">
+                        <thead>
+                        <tr>
+                          <td>#</td>
+                          <td ng-if="showIds">Project _id</td>
+                          <td>Project Name</td>
+                          <td>Project Title</td>
+                          <td>Project Plan</td>
+                          <td ng-if="showCreated">Project Created</td>
+                          <td ng-if="showIds">Owner _id</td>
+                          <td>Owner Name</td>
+                          <td>Owner Email</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="element in totalProjectsTeam track by $index">
+                          <td>{{$index + 1}}</td>
+                          <td ng-if="showIds">{{element._id}}</td>
+                          <td>{{element.name}}</td>
+                          <td>{{element.title}}</td>
+                          <td>{{element.plan}}</td>
+                          <td ng-if="showCreated">{{element.created}}</td>
+                          <td ng-if="showIds">{{element.owner._id}}</td>
+                          <td>{{element.owner.data.name}}</td>
+                          <td>{{element.owner.data.email}}</td>
+                        </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12">
+              <div class="panel panel-default control-panel">
+                <div class="panel-heading">
+                  Independent Projects ({{totalProjectsIndependent !== null ? totalProjectsIndependent.length : '---'}})<i class="pull-right glyphicon glyphicon-refresh" ng-click="getTotalProjects()"></i>
+                </div>
+                <div class="panel-body">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <table class="table table-striped">
+                        <thead>
+                        <tr>
+                          <td>#</td>
+                          <td ng-if="showIds">Project _id</td>
+                          <td>Project Name</td>
+                          <td>Project Title</td>
+                          <td>Project Plan</td>
+                          <td ng-if="showCreated">Project Created</td>
+                          <td ng-if="showIds">Owner _id</td>
+                          <td>Owner Name</td>
+                          <td>Owner Email</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="element in totalProjectsIndependent track by $index">
+                          <td>{{$index + 1}}</td>
+                          <td ng-if="showIds">{{element._id}}</td>
+                          <td>{{element.name}}</td>
+                          <td>{{element.title}}</td>
+                          <td>{{element.plan}}</td>
+                          <td ng-if="showCreated">{{element.created}}</td>
+                          <td ng-if="showIds">{{element.owner._id}}</td>
+                          <td>{{element.owner.data.name}}</td>
+                          <td>{{element.owner.data.email}}</td>
+                        </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -256,25 +409,6 @@
               <div class="row">
                 <div class="col-md-6"><h3>Active Projects: {{totalProjectsNotDeleted !== null ? totalProjectsNotDeleted.length : '---'}}</h3></div>
                 <div class="col-md-6"><h3>Deleted Projects: {{totalProjectsDeleted !== null ? totalProjectsDeleted.length : '---'}}</h3></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="panel panel-default control-panel">
-        <div class="panel-heading">
-          Current Premium Projects<i class="pull-right glyphicon glyphicon-refresh" ng-click="getTotalProjects()"></i>
-        </div>
-        <div class="panel-body">
-          <div class="row">
-            <div class="col-md-12">
-              <div class="row">
-                <div class="col-md-6"><h3>Commercial Projects: {{totalProjectsCommercial !== null ? totalProjectsCommercial.length : '---'}}</h3></div>
-                <div class="col-md-6"><h3>Team Projects: {{totalProjectsTeam !== null ? totalProjectsTeam.length : '---'}}</h3></div>
-              </div>
-              <div class="row">
-                <div class="col-md-6"><h3>Independent Projects: {{totalProjectsIndependent !== null ? totalProjectsIndependent.length : '---'}}</h3></div>
               </div>
             </div>
           </div>
