@@ -106,6 +106,25 @@
     <div class="row" ng-if="view === 'Current'">
       <div class="panel panel-default control-panel">
         <div class="panel-heading">
+          Upgrade Project
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-6">
+              <input type="text" class="form-control" ng-model="input.project" placeholder="Project _id to upgrade" ng-required="true">
+            </div>
+            <div class="col-md-4">
+              <select class="form-control" ng-model="input.plan" ng-options="plan for plan in plans"></select>
+            </div>
+            <div class="col-md-2">
+              <button class="btn btn-primary btn-block" ng-click="updateProject()">Update</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel panel-default control-panel">
+        <div class="panel-heading">
           Premium Projects<i class="pull-right glyphicon glyphicon-refresh" ng-click="getTotalProjects()"></i>
         </div>
         <div class="panel-body">

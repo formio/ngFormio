@@ -991,12 +991,14 @@ app.controller('ProjectFormioController', [
   'AppConfig',
   '$window',
   '$http',
+  'FormioAlerts',
   function(
     $scope,
     Formio,
     AppConfig,
     $window,
-    $http
+    $http,
+    FormioAlerts
   ) {
     $scope.currentSection.title = 'Admin Data';
     $scope.currentSection.icon = 'glyphicon glyphicon-globe';
@@ -1290,6 +1292,35 @@ app.controller('ProjectFormioController', [
           });
 
         $scope.$apply();
+      });
+    };
+
+    $scope.plans = ['basic', 'independent', 'team', 'commercial'];
+    $scope.input = {
+      project: '',
+      plan: $scope.plans[0]
+    };
+    $scope.updateProject = function() {
+      Formio.request(AppConfig.apiBase + '/analytics/upgrade', 'PUT', {
+        project: $scope.input.project,
+        plan: $scope.input.plan
+      })
+      .then(function(data) {
+        FormioAlerts.addAlert({
+          type: 'success',
+          message: data
+        });
+        if (data === 'OK') {
+          $scope.input.project = '';
+          $scope.input.plan = $scope.plans[0];
+          $scope.getTotalProjects();
+        }
+      })
+      .catch(function(err) {
+        FormioAlerts.addAlert({
+          type: 'danger',
+          message: err.message || err
+        });
       });
     };
 
