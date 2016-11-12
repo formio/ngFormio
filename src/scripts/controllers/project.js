@@ -1324,6 +1324,24 @@ app.controller('ProjectFormioController', [
       });
     };
 
+    $scope.inputUser = {deleted: null};
+    $scope.searchUser = {
+      data: null,
+      projects: null
+    };
+    $scope.findUser = function() {
+      $scope.searchUser.data = _.first(_($scope.totalUsers)
+        .filter($scope.inputUser)
+        .value());
+
+      $scope.searchUser.projects = _($scope.totalProjects)
+        .filter({owner: {_id: $scope.searchUser.data._id}, deleted: null})
+        .value();
+
+      // Reset the search fields
+      $scope.inputUser = {deleted: null};
+    };
+
     $scope.getTotalUsers = function() {
       $scope.totalUsers = null;
       $scope.totalUsersNotDeleted = null;
@@ -1583,6 +1601,11 @@ app.controller('ProjectFormioController', [
       $scope.getAPIUsage();
       $scope.getTotalProjects();
       $scope.getTotalUsers();
+
+      $scope.searchUser = {
+        data: null,
+        projects: null
+      };
     };
   }
 ]);

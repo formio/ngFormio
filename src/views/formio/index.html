@@ -111,13 +111,113 @@
         <div class="panel-body">
           <div class="row">
             <div class="col-md-6">
-              <input type="text" class="form-control" ng-model="input.project" placeholder="Project _id to upgrade" ng-required="true">
+              <input type="text" class="form-control" ng-model="input.project" placeholder="Project _id to upgrade">
             </div>
             <div class="col-md-4">
               <select class="form-control" ng-model="input.plan" ng-options="plan for plan in plans"></select>
             </div>
             <div class="col-md-2">
               <button class="btn btn-primary btn-block" ng-click="updateProject()">Update</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel panel-default control-panel">
+        <div class="panel-heading">
+          Find User
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-6">
+              <input type="text" class="form-control" ng-model="inputUser._id" placeholder="User _id">
+            </div>
+            <div class="col-md-6">
+              <input type="text" class="form-control" ng-model="inputUser.data.email" placeholder="User Email Address">
+            </div>
+          </div><br>
+          <div class="row">
+            <div class="col-md-6">
+              <input type="text" class="form-control" ng-model="inputUser.data.name" placeholder="User Form.io Username">
+            </div>
+            <div class="col-md-6">
+              <button class="btn btn-primary btn-block" ng-click="findUser()">Find User</button>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12">
+
+              <div class="panel panel-default control-panel" ng-if="searchUser.data">
+                <div class="panel-heading">
+                  User
+                </div>
+                <div class="panel-body">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <table class="table table-striped">
+                        <thead>
+                          <tr>
+                            <td ng-if="showIds">User _id</td>
+                            <td>Full Name</td>
+                            <td>Username</td>
+                            <td>Email</td>
+                            <td ng-if="showCreated">Created Date</td>
+                            <td>Deleted</td>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td ng-if="showIds">{{searchUser.data._id}}</td>
+                            <td>{{searchUser.data.data.fullName}}</td>
+                            <td>{{searchUser.data.data.name}}</td>
+                            <td>{{searchUser.data.data.email}}</td>
+                            <td ng-if="showCreated">{{searchUser.data.created}}</td>
+                            <td>{{searchUser.data.deleted._id}}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="panel panel-default control-panel" ng-if="searchUser.projects">
+                <div class="panel-heading">
+                  Projects
+                </div>
+                <div class="panel-body">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <table class="table table-striped">
+                        <thead>
+                        <tr>
+                          <td>#</td>
+                          <td ng-if="showIds">Project _id</td>
+                          <td>Project Name</td>
+                          <td>Project Title</td>
+                          <td>Project Plan</td>
+                          <td ng-if="showCreated">Project Created</td>
+                          <td ng-if="showIds">Owner _id</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="element in searchUser.projects track by $index">
+                          <td>{{$index + 1}}</td>
+                          <td ng-if="showIds">{{element._id}}</td>
+                          <td>{{element.name}}</td>
+                          <td>{{element.title}}</td>
+                          <td>{{element.plan}}</td>
+                          <td ng-if="showCreated">{{element.created}}</td>
+                          <td ng-if="showIds">{{element.owner._id}}</td>
+                        </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
