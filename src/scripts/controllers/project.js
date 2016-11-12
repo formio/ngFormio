@@ -1143,9 +1143,7 @@ app.controller('ProjectFormioController', [
             }
 
             // Filter the data.email or ownerData.email based on whats available.
-            return _.has(item, path)
-              ? (_.get(item, path).toString().indexOf(value) !== -1)
-              : false;
+            return _.has(item, path) ? (_.get(item, path).toString().indexOf(value) !== -1) : false;
           });
 
           return (!$scope.showEmployees && _employees.indexOf(item.owner) !== -1) || hasIgnoredEmail;
@@ -1273,21 +1271,21 @@ app.controller('ProjectFormioController', [
           .each(function(item) {
             // Build the project count lists.
             if (item.deleted === null) {
-              $scope.totalProjectsNotDeleted.push(item)
+              $scope.totalProjectsNotDeleted.push(item);
             }
             else if (item.deleted !== null) {
-              $scope.totalProjectsDeleted.push(item)
+              $scope.totalProjectsDeleted.push(item);
             }
 
             // Build the premium project count lists.
             if (item.plan === 'commercial') {
-              $scope.totalProjectsCommercial.push(item)
+              $scope.totalProjectsCommercial.push(item);
             }
             else if (item.plan === 'team') {
-              $scope.totalProjectsTeam.push(item)
+              $scope.totalProjectsTeam.push(item);
             }
             else if (item.plan === 'independent') {
-              $scope.totalProjectsIndependent.push(item)
+              $scope.totalProjectsIndependent.push(item);
             }
           });
 
@@ -1362,10 +1360,10 @@ app.controller('ProjectFormioController', [
         _($scope.totalUsers)
           .each(function(item) {
             if (item.deleted === null) {
-              $scope.totalUsersNotDeleted.push(item)
+              $scope.totalUsersNotDeleted.push(item);
             }
             else if (item.deleted !== null) {
-              $scope.totalUsersDeleted.push(item)
+              $scope.totalUsersDeleted.push(item);
             }
           });
 
