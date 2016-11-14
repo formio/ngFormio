@@ -1,0 +1,12 @@
+<div class="day-input">
+  <day-input
+  name="{{componentId}}"
+  component-id="componentId"
+  read-only="readOnly"
+  component="component"
+  ng-required="component.validate.required"
+  custom-validator="component.validate.custom"
+  ng-model="data[component.key]"
+  tabindex="{{ component.tabindex || 0 }}"
+  />
+</div>
