@@ -10,11 +10,10 @@
       ng-repeat="component in form.components"
       component="component"
       data="submission.data"
+      submission="submission"
       formio-form="formioForm"
       formio="formio"
       read-only="readOnly || component.disabled"
-      ng-if="show[component.key || '']"
-      show="show"
     ></formio-component>
   </form>
 </div>

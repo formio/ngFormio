@@ -13,11 +13,11 @@ module.exports = [
         component: '=',
         data: '=',
         formio: '=',
+        submission: '=',
         formioForm: '=',
         readOnly: '=',
         gridRow: '=',
-        gridCol: '=',
-        show: '='
+        gridCol: '='
       },
       templateUrl: 'formio/component.html',
       link: function(scope, el, attrs, formioCtrl) {
@@ -34,10 +34,12 @@ module.exports = [
         '$scope',
         '$http',
         '$controller',
+        'FormioUtils',
         function(
           $scope,
           $http,
-          $controller
+          $controller,
+          FormioUtils
         ) {
           // Options to match jquery.maskedinput masks
           $scope.uiMaskOptions = {
@@ -157,6 +159,28 @@ module.exports = [
               }
             }
           });
+
+          /**
+           * Determine if a component should be hidden.
+           *
+           * @returns {boolean}
+           */
+          $scope.isHidden = function() {
+            var shown = true;
+            var subData = Object.assign({}, $scope.submission.data, $scope.data);
+            if ($scope.component.customConditional) {
+              shown = FormioUtils.checkCustomConditions($scope.component.customConditional, subData);
+            }
+            else if ($scope.component.conditional && $scope.component.conditional.when) {
+              shown = FormioUtils.checkConditions($scope.component.conditional, subData);
+            }
+
+            // Make sure to delete the data for invisible fields.
+            if (!shown && $scope.data.hasOwnProperty($scope.component.key)) {
+              delete $scope.data[$scope.component.key];
+            }
+            return !shown;
+          };
 
           // Set the component name.
           $scope.componentId = $scope.component.key;
