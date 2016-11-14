@@ -210,43 +210,11 @@ module.exports = function() {
          *
          * @private
          */
-        var _toggleConditional = function(componentKey, subData) {
-          var result;
-          if (_conditionals.hasOwnProperty(componentKey)) {
-            var data = Object.assign({}, $scope.submission.data, subData);
-            var cond = _conditionals[componentKey];
-            var value = FormioUtils.getValue({data: data}, cond.when);
-
-            if (typeof value !== 'undefined' && typeof value !== 'object') {
-              // Check if the conditional value is equal to the trigger value
-              result = value.toString() === cond.eq.toString()
-                ? boolean[cond.show]
-                : !boolean[cond.show];
-            }
-            // Special check for check boxes component.
-            else if (typeof value !== 'undefined' && typeof value === 'object') {
-              // Only update the visibility is present, otherwise hide, because it was deleted by the submission sweep.
-              if (value.hasOwnProperty(cond.eq)) {
-                result = boolean.hasOwnProperty(value[cond.eq])
-                  ? boolean[value[cond.eq]]
-                  : true;
-              }
-              else {
-                result = false;
-              }
-            }
-            // Check against the components default value, if present and the components hasn't been interacted with.
-            else if (typeof value === 'undefined' && cond.hasOwnProperty('defaultValue')) {
-              result = cond.defaultValue.toString() === cond.eq.toString()
-                ? boolean[cond.show]
-                : !boolean[cond.show];
-            }
-            // If there is no value, we still need to process as not equal.
-            else {
-              result = !boolean[cond.show];
-            }
+        var _toggleConditional = function(componentKey, data) {
+          if (!_conditionals.hasOwnProperty(componentKey)) {
+            return true;
           }
-          return result;
+          return FormioUtils.checkConditions(_conditionals[componentKey], data);
         };
 
         /**
@@ -257,32 +225,17 @@ module.exports = function() {
          *
          * @private
          */
-        var _toggleCustomConditional = function(componentKey, subData) {
-          var result;
-          if (_customConditionals.hasOwnProperty(componentKey)) {
-            var cond = _customConditionals[componentKey];
-            if (!cond) {
-              return true;
-            }
-
-            try {
-              // Create a child block, and expose the submission data.
-              var data = Object.assign({}, $scope.submission.data, subData); // eslint-disable-line no-unused-vars
-              // Eval the custom conditional and update the show value.
-              var show = eval('(function() { ' + cond.toString() + '; return show; })()');
-              // Show by default, if an invalid type is given.
-              result = boolean.hasOwnProperty(show.toString()) ? boolean[show] : true;
-            }
-            catch (e) {
-              result = true;
-            }
+        var _toggleCustomConditional = function(componentKey, data) {
+          if (!_customConditionals.hasOwnProperty(componentKey)) {
+            return true;
           }
-          return result;
+          return FormioUtils.checkCustomConditions(_customConditionals[componentKey], data);
         };
 
         $scope.checkConditional = function(componentKey, subData) {
-          var conditional = _toggleConditional(componentKey, subData);
-          var customConditional = _toggleCustomConditional(componentKey, subData);
+          var submissionData = Object.assign({}, $scope.submission.data, subData);
+          var conditional = _toggleConditional(componentKey, submissionData);
+          var customConditional = _toggleCustomConditional(componentKey, submissionData);
           // customConditional will be true if either are true since the value persists in $scope.show.
           return conditional || customConditional;
         };
@@ -296,12 +249,12 @@ module.exports = function() {
           // Toggle every conditional.
           var allConditionals = Object.keys(_conditionals);
           (allConditionals || []).forEach(function(componentKey) {
-            $scope.show[componentKey] = _toggleConditional(componentKey);
+            $scope.show[componentKey] = _toggleConditional(componentKey, $scope.submission.data);
           });
 
           var allCustomConditionals = Object.keys(_customConditionals);
           (allCustomConditionals || []).forEach(function(componentKey) {
-            $scope.show[componentKey] = _toggleCustomConditional(componentKey);
+            $scope.show[componentKey] = _toggleCustomConditional(componentKey, $scope.submission.data);
           });
 
           var allHidden = Object.keys($scope.show);
