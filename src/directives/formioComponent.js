@@ -167,6 +167,15 @@ module.exports = [
            */
           $scope.isHidden = function() {
             var shown = true;
+
+            // If the component is in the hideComponents array, then hide it by default.
+            if (
+              $scope.formio.hideComponents &&
+              ($scope.formio.hideComponents.indexOf($scope.component.key) !== -1)
+            ) {
+              return true;
+            }
+
             var subData = Object.assign({}, $scope.submission.data, $scope.data);
             if ($scope.component.customConditional) {
               shown = FormioUtils.checkCustomConditions($scope.component.customConditional, subData);
