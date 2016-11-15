@@ -57,6 +57,29 @@ module.exports = function() {
       }
       return result;
     },
+    isVisible: function(component, data, submission, hide) {
+      var shown = true;
+
+      // If the component is in the hideComponents array, then hide it by default.
+      if (hide && (hide.indexOf(component.key) !== -1)) {
+        return false;
+      }
+
+      var subData = submission ? submission.data : {};
+      var compData = Object.assign({}, subData, data);
+      if (component.customConditional) {
+        shown = this.checkCustomConditions(component.customConditional, compData);
+      }
+      else if (component.conditional && component.conditional.when) {
+        shown = this.checkConditions(component.conditional, compData);
+      }
+
+      // Make sure to delete the data for invisible fields.
+      if (!shown && data.hasOwnProperty(component.key)) {
+        delete data[component.key];
+      }
+      return shown;
+    },
     flattenComponents: formioUtils.flattenComponents,
     eachComponent: formioUtils.eachComponent,
     getComponent: formioUtils.getComponent,

@@ -12,12 +12,13 @@ module.exports = [
       scope: {
         component: '=',
         data: '=',
+        submission: '=',
+        hideComponents: '=',
         formio: '=',
         formioForm: '=',
         readOnly: '=',
         gridRow: '=',
-        gridCol: '=',
-        show: '='
+        gridCol: '='
       },
       templateUrl: 'formio/component.html',
       link: function(scope, el, attrs, formioCtrl) {
@@ -34,10 +35,12 @@ module.exports = [
         '$scope',
         '$http',
         '$controller',
+        'FormioUtils',
         function(
           $scope,
           $http,
-          $controller
+          $controller,
+          FormioUtils
         ) {
           // Options to match jquery.maskedinput masks
           $scope.uiMaskOptions = {
@@ -49,6 +52,16 @@ module.exports = [
             clearOnBlur: false,
             eventsToHandle: ['input', 'keyup', 'click', 'focus'],
             silentEvents: ['click', 'focus']
+          };
+
+          // See if this component is visible or not.
+          $scope.isVisible = function(component, data) {
+            return FormioUtils.isVisible(
+              component,
+              data,
+              $scope.submission,
+              $scope.hideComponents
+            );
           };
 
           // Pass through checkConditional since this is an isolate scope.
