@@ -9,10 +9,12 @@
     <formio-component
       ng-repeat="component in form.components"
       component="component"
+      ng-if="isVisible(component, submission.data)"
       data="submission.data"
-      submission="submission"
       formio-form="formioForm"
       formio="formio"
+      submission="submission"
+      hide-components="hideComponents"
       read-only="readOnly || component.disabled"
     ></formio-component>
   </form>

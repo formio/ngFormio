@@ -10,18 +10,29 @@ module.exports = [
         component: '=',
         data: '=',
         form: '=',
+        submission: '=',
         ignore: '=?'
       },
       templateUrl: 'formio/component-view.html',
       controller: [
         '$scope',
         'Formio',
+        'FormioUtils',
         function(
           $scope,
-          Formio
+          Formio,
+          FormioUtils
         ) {
           // Set the form url.
           $scope.formUrl = $scope.form ? Formio.getAppUrl() + '/form/' + $scope.form._id.toString() : '';
+          $scope.isVisible = function(component, data) {
+            return FormioUtils.isVisible(
+              component,
+              data,
+              $scope.submission,
+              $scope.hideComponents
+            );
+          };
 
           // Get the settings.
           var component = formioComponents.components[$scope.component.type] || formioComponents.components['custom'];
@@ -45,9 +56,6 @@ module.exports = [
           if ($scope.gridCol !== undefined) {
             $scope.componentId += ('-' + $scope.gridCol);
           }
-
-          // See if we should show this component.
-          $scope.shouldShow = !$scope.ignore || ($scope.ignore.indexOf($scope.componentId) === -1);
         }
       ]
     };

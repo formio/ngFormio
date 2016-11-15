@@ -1,3 +1,11 @@
 <div class="well" id="{{ component.key }}">
-  <formio-component-view ng-repeat="component in component.components track by $index" component="component" data="data" form="form" submission="submission" ignore="ignore"></formio-component-view>
+  <formio-component-view
+    ng-repeat="_component in component.components track by $index"
+    component="_component"
+    data="data"
+    form="form"
+    submission="submission"
+    ignore="ignore"
+    ng-if="isVisible(_component, data)"
+  ></formio-component-view>
 </div>

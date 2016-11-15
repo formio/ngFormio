@@ -1,4 +1,12 @@
 <fieldset id="{{ component.key }}">
   <legend ng-if="component.legend">{{ component.legend }}</legend>
-  <formio-component-view ng-repeat="component in component.components track by $index" component="component" data="data" submission="submission" form="form" ignore="ignore"></formio-component-view>
+  <formio-component-view
+    ng-repeat="_component in component.components track by $index"
+    component="_component"
+    data="data"
+    submission="submission"
+    form="form"
+    ignore="ignore"
+    ng-if="isVisible(_component, data)"
+  ></formio-component-view>
 </fieldset>

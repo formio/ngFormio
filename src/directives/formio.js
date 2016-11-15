@@ -79,6 +79,15 @@ module.exports = function() {
           return !form.$valid;
         };
 
+        $scope.isVisible = function(component, data) {
+          return FormioUtils.isVisible(
+            component,
+            data,
+            $scope.submission,
+            $scope.hideComponents
+          );
+        };
+
         // Called when the form is submitted.
         $scope.onSubmit = function(form) {
           $scope.formioAlerts = [];

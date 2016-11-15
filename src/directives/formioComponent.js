@@ -12,8 +12,9 @@ module.exports = [
       scope: {
         component: '=',
         data: '=',
-        formio: '=',
         submission: '=',
+        hideComponents: '=',
+        formio: '=',
         formioForm: '=',
         readOnly: '=',
         gridRow: '=',
@@ -51,6 +52,16 @@ module.exports = [
             clearOnBlur: false,
             eventsToHandle: ['input', 'keyup', 'click', 'focus'],
             silentEvents: ['click', 'focus']
+          };
+
+          // See if this component is visible or not.
+          $scope.isVisible = function(component, data) {
+            return FormioUtils.isVisible(
+              component,
+              data,
+              $scope.submission,
+              $scope.hideComponents
+            );
           };
 
           // Pass through checkConditional since this is an isolate scope.
@@ -159,37 +170,6 @@ module.exports = [
               }
             }
           });
-
-          /**
-           * Determine if a component should be hidden.
-           *
-           * @returns {boolean}
-           */
-          $scope.isHidden = function() {
-            var shown = true;
-
-            // If the component is in the hideComponents array, then hide it by default.
-            if (
-              $scope.formio.hideComponents &&
-              ($scope.formio.hideComponents.indexOf($scope.component.key) !== -1)
-            ) {
-              return true;
-            }
-
-            var subData = Object.assign({}, $scope.submission.data, $scope.data);
-            if ($scope.component.customConditional) {
-              shown = FormioUtils.checkCustomConditions($scope.component.customConditional, subData);
-            }
-            else if ($scope.component.conditional && $scope.component.conditional.when) {
-              shown = FormioUtils.checkConditions($scope.component.conditional, subData);
-            }
-
-            // Make sure to delete the data for invisible fields.
-            if (!shown && $scope.data.hasOwnProperty($scope.component.key)) {
-              delete $scope.data[$scope.component.key];
-            }
-            return !shown;
-          };
 
           // Set the component name.
           $scope.componentId = $scope.component.key;

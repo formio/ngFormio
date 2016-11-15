@@ -7,6 +7,23 @@ module.exports = function() {
       submission: '=',
       ignore: '=?'
     },
-    templateUrl: 'formio/submission.html'
+    templateUrl: 'formio/submission.html',
+    controller: [
+      '$scope',
+      'FormioUtils',
+      function(
+        $scope,
+        FormioUtils
+      ) {
+        $scope.isVisible = function(component, data) {
+          return FormioUtils.isVisible(
+            component,
+            data,
+            $scope.submission,
+            $scope.ignore
+          );
+        };
+      }
+    ]
   };
 };

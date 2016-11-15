@@ -3,6 +3,14 @@
     <h3 class="panel-title">{{ component.title }}</h3>
   </div>
   <div class="panel-body">
-    <formio-component-view ng-repeat="component in component.components track by $index" component="component" data="data" submission="submission" form="form" ignore="ignore"></formio-component-view>
+    <formio-component-view
+      ng-repeat="_component in component.components track by $index"
+      component="_component"
+      data="data"
+      submission="submission"
+      form="form"
+      ignore="ignore"
+      ng-if="isVisible(_component, data)"
+    ></formio-component-view>
   </div>
 </div>

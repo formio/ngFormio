@@ -170,11 +170,6 @@ module.exports = [
           }
         }
 
-        // Pass along the hidden components to the loader.
-        if ($scope.hideComponents) {
-          loader.hideComponents = $scope.hideComponents;
-        }
-
         // Return the loader.
         return loader;
       }
