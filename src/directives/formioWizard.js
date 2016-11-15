@@ -339,19 +339,9 @@ module.exports = function() {
               }
               if (component.customConditional) {
                 hasConditionalPages = true;
-                component.__conditional = {
-                  page: component.key,
-                  condition: component.customConditional,
-                  check: FormioUtils.checkCustomConditions.bind(FormioUtils)
-                };
               }
               else if (component.conditional && component.conditional.when) {
                 hasConditionalPages = true;
-                component.__conditional = {
-                  page: component.key,
-                  condition: component.conditional,
-                  check: FormioUtils.checkConditions.bind(FormioUtils)
-                };
               }
               allPages.push(component);
               $scope.pages.push(component);
@@ -362,12 +352,7 @@ module.exports = function() {
             $scope.$watch('submission.data', function(data) {
               var newPages = [];
               angular.forEach(allPages, function(page) {
-                if (page.__conditional) {
-                  if (page.__conditional.check(page.__conditional.condition, data)) {
-                    newPages.push(page);
-                  }
-                }
-                else {
+                if (FormioUtils.isVisible(page, data)) {
                   newPages.push(page);
                 }
               });

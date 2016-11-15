@@ -1,65 +1,8 @@
 var formioUtils = require('formio-utils');
 
 module.exports = function() {
-  var boolean = {
-    'true': true,
-    'false': false
-  };
   return {
-    /* eslint-disable no-unused-vars */
-    checkConditions: function(cond, data) {
-    /* eslint-enable no-unused-vars */
-      var result = true;
-      var value = this.getValue({data: data}, cond.when);
-      if (typeof value !== 'undefined' && typeof value !== 'object') {
-        // Check if the conditional value is equal to the trigger value
-        result = value.toString() === cond.eq.toString()
-          ? boolean[cond.show]
-          : !boolean[cond.show];
-      }
-      // Special check for check boxes component.
-      else if (typeof value !== 'undefined' && typeof value === 'object') {
-        // Only update the visibility is present, otherwise hide, because it was deleted by the submission sweep.
-        if (value.hasOwnProperty(cond.eq)) {
-          result = boolean.hasOwnProperty(value[cond.eq])
-            ? boolean[value[cond.eq]]
-            : true;
-        }
-        else {
-          result = false;
-        }
-      }
-      // Check against the components default value, if present and the components hasn't been interacted with.
-      else if (typeof value === 'undefined' && cond.hasOwnProperty('defaultValue')) {
-        result = cond.defaultValue.toString() === cond.eq.toString()
-          ? boolean[cond.show]
-          : !boolean[cond.show];
-      }
-      // If there is no value, we still need to process as not equal.
-      else {
-        result = !boolean[cond.show];
-      }
-      return result;
-    },
-    /* eslint-disable no-unused-vars */
-    checkCustomConditions: function(conditional, data) {
-    /* eslint-enable no-unused-vars */
-      if (!conditional) {
-        return true;
-      }
-      var result = true;
-      try {
-        var show = eval('(function() { ' + conditional.toString() + '; return show; })()');
-        result = boolean.hasOwnProperty(show.toString()) ? boolean[show] : true;
-      }
-      catch (e) {
-        result = true;
-      }
-      return result;
-    },
     isVisible: function(component, data, submission, hide) {
-      var shown = true;
-
       // If the component is in the hideComponents array, then hide it by default.
       if (hide && (hide.indexOf(component.key) !== -1)) {
         return false;
@@ -67,17 +10,15 @@ module.exports = function() {
 
       var subData = submission ? submission.data : {};
       var compData = Object.assign({}, subData, data);
-      if (component.customConditional) {
-        shown = this.checkCustomConditions(component.customConditional, compData);
-      }
-      else if (component.conditional && component.conditional.when) {
-        shown = this.checkConditions(component.conditional, compData);
-      }
+
+      // See if this should be shown.
+      var shown = formioUtils.checkCondition(component, compData);
 
       // Make sure to delete the data for invisible fields.
       if (!shown && data.hasOwnProperty(component.key)) {
         delete data[component.key];
       }
+
       return shown;
     },
     flattenComponents: formioUtils.flattenComponents,

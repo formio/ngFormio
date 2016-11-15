@@ -1,5 +1,207 @@
 /*! ng-formio v2.4.0-beta.1 | https://unpkg.com/ng-formio@2.4.0-beta.1/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
+'use strict';
+module.exports = {
+  /**
+   * Determine if a component is a layout component or not.
+   *
+   * @param {Object} component
+   *   The component to check.
+   *
+   * @returns {Boolean}
+   *   Whether or not the component is a layout component.
+   */
+  isLayoutComponent: function isLayoutComponent(component) {
+    return (
+      (component.columns && Array.isArray(component.columns)) ||
+      (component.rows && Array.isArray(component.rows)) ||
+      (component.components && Array.isArray(component.components))
+    ) ? true : false;
+  },
+
+  /**
+   * Iterate through each component within a form.
+   *
+   * @param {Object} components
+   *   The components to iterate.
+   * @param {Function} fn
+   *   The iteration function to invoke for each component.
+   * @param {Boolean} includeAll
+   *   Whether or not to include layout components.
+   * @param {String} path
+   *   The current data path of the element. Example: data.user.firstName
+   */
+  eachComponent: function eachComponent(components, fn, includeAll, path) {
+    if (!components) return;
+    path = path || '';
+    components.forEach(function(component) {
+      var hasColumns = component.columns && Array.isArray(component.columns);
+      var hasRows = component.rows && Array.isArray(component.rows);
+      var hasComps = component.components && Array.isArray(component.components);
+      var noRecurse = false;
+      var newPath = component.key ? (path ? (path + '.' + component.key) : component.key) : '';
+
+      if (includeAll || component.tree || (!hasColumns && !hasRows && !hasComps)) {
+        noRecurse = fn(component, newPath);
+      }
+
+      var subPath = function() {
+        if (component.key && ((component.type === 'datagrid') || (component.type === 'container'))) {
+          return newPath;
+        }
+        return path;
+      };
+
+      if (!noRecurse) {
+        if (hasColumns) {
+          component.columns.forEach(function(column) {
+            eachComponent(column.components, fn, includeAll, subPath());
+          });
+        }
+
+        else if (hasRows) {
+          [].concat.apply([], component.rows).forEach(function(row) {
+            eachComponent(row.components, fn, includeAll, subPath());
+          });
+        }
+
+        else if (hasComps) {
+          eachComponent(component.components, fn, includeAll, subPath());
+        }
+      }
+    });
+  },
+
+  /**
+   * Get a component by its key
+   *
+   * @param {Object} components
+   *   The components to iterate.
+   * @param {String} key
+   *   The key of the component to get.
+   *
+   * @returns {Object}
+   *   The component that matches the given key, or undefined if not found.
+   */
+  getComponent: function getComponent(components, key) {
+    var result;
+    module.exports.eachComponent(components, function(component) {
+      if (component.key === key) {
+        result = component;
+      }
+    });
+    return result;
+  },
+
+  /**
+   * Flatten the form components for data manipulation.
+   *
+   * @param {Object} components
+   *   The components to iterate.
+   * @param {Boolean} includeAll
+   *   Whether or not to include layout components.
+   *
+   * @returns {Object}
+   *   The flattened components map.
+   */
+  flattenComponents: function flattenComponents(components, includeAll) {
+    var flattened = {};
+    module.exports.eachComponent(components, function(component, path) {
+      flattened[path] = component;
+    }, includeAll);
+    return flattened;
+  },
+
+  /**
+   * Checks the conditions for a provided component and data.
+   *
+   * @param component
+   *   The component to check for the condition.
+   * @param compData
+   *   The data for this conditional check.
+   * @returns {boolean}
+   */
+  checkCondition: function(component, data) {
+    if (component.hasOwnProperty('customConditional') && component.customConditional) {
+      try {
+        var script = '(function() { var show = true;';
+        script += component.customConditional.toString();
+        script += '; return show; })()';
+        var result = eval(script);
+        return result.toString() === 'true';
+      }
+      catch (e) {
+        console.warn('An error occurred in a custom conditional statement for component ' + component.key, e);
+        return true;
+      }
+    }
+    else if (component.hasOwnProperty('conditional') && component.conditional && component.conditional.when) {
+      var cond = component.conditional;
+      var value = this.getValue({data: data}, cond.when) || (component.hasOwnProperty('defaultValue') ? component.defaultValue : '');
+      // Special check for selectboxes component.
+      if (typeof value === 'object' && value.hasOwnProperty(cond.eq)) {
+        return value[cond.eq].toString() === cond.show.toString();
+      }
+      return (value.toString() === cond.eq.toString()) === (cond.show.toString() === 'true');
+    }
+
+    // Default to show.
+    return true;
+  },
+
+  /**
+   * Get the value for a component key, in the given submission.
+   *
+   * @param {Object} submission
+   *   A submission object to search.
+   * @param {String} key
+   *   A for components API key to search for.
+   */
+  getValue: function getValue(submission, key) {
+    var data = submission.data || {};
+
+    var search = function search(data) {
+      var i;
+      var value;
+
+      if (!data) {
+        return null;
+      }
+
+      if (data instanceof Array) {
+        for (i = 0; i < data.length; i++) {
+          if (typeof data[i] === 'object') {
+            value = search(data[i]);
+          }
+
+          if (value) {
+            return value;
+          }
+        }
+      }
+      else if (typeof data === 'object') {
+        if (data.hasOwnProperty(key)) {
+          return data[key];
+        }
+
+        var keys = Object.keys(data);
+        for (i = 0; i < keys.length; i++) {
+          if (typeof data[keys[i]] === 'object') {
+            value = search(data[keys[i]]);
+          }
+
+          if (value) {
+            return value;
+          }
+        }
+      }
+    };
+
+    return search(data);
+  }
+};
+
+},{}],2:[function(_dereq_,module,exports){
 /*!
  * EventEmitter2
  * https://github.com/hij1nx/EventEmitter2
@@ -722,172 +924,6 @@
     window.EventEmitter2 = EventEmitter;
   }
 }();
-
-},{}],2:[function(_dereq_,module,exports){
-'use strict';
-
-module.exports = {
-  /**
-   * Determine if a component is a layout component or not.
-   *
-   * @param {Object} component
-   *   The component to check.
-   *
-   * @returns {Boolean}
-   *   Whether or not the component is a layout component.
-   */
-  isLayoutComponent: function isLayoutComponent(component) {
-    return (
-      (component.columns && Array.isArray(component.columns)) ||
-      (component.rows && Array.isArray(component.rows)) ||
-      (component.components && Array.isArray(component.components))
-    ) ? true : false;
-  },
-
-  /**
-   * Iterate through each component within a form.
-   *
-   * @param {Object} components
-   *   The components to iterate.
-   * @param {Function} fn
-   *   The iteration function to invoke for each component.
-   * @param {Boolean} includeAll
-   *   Whether or not to include layout components.
-   * @param {String} path
-   *   The current data path of the element. Example: data.user.firstName
-   */
-  eachComponent: function eachComponent(components, fn, includeAll, path) {
-    if (!components) return;
-    path = path || '';
-    components.forEach(function(component) {
-      var hasColumns = component.columns && Array.isArray(component.columns);
-      var hasRows = component.rows && Array.isArray(component.rows);
-      var hasComps = component.components && Array.isArray(component.components);
-      var noRecurse = false;
-      var newPath = component.key ? (path ? (path + '.' + component.key) : component.key) : '';
-
-      if (includeAll || component.tree || (!hasColumns && !hasRows && !hasComps)) {
-        noRecurse = fn(component, newPath);
-      }
-
-      var subPath = function() {
-        if (component.key && ((component.type === 'datagrid') || (component.type === 'container'))) {
-          return newPath;
-        }
-        return path;
-      };
-
-      if (!noRecurse) {
-        if (hasColumns) {
-          component.columns.forEach(function(column) {
-            eachComponent(column.components, fn, includeAll, subPath());
-          });
-        }
-
-        else if (hasRows) {
-          [].concat.apply([], component.rows).forEach(function(row) {
-            eachComponent(row.components, fn, includeAll, subPath());
-          });
-        }
-
-        else if (hasComps) {
-          eachComponent(component.components, fn, includeAll, subPath());
-        }
-      }
-    });
-  },
-
-  /**
-   * Get a component by its key
-   *
-   * @param {Object} components
-   *   The components to iterate.
-   * @param {String} key
-   *   The key of the component to get.
-   *
-   * @returns {Object}
-   *   The component that matches the given key, or undefined if not found.
-   */
-  getComponent: function getComponent(components, key) {
-    var result;
-    module.exports.eachComponent(components, function(component) {
-      if (component.key === key) {
-        result = component;
-      }
-    });
-    return result;
-  },
-
-  /**
-   * Flatten the form components for data manipulation.
-   *
-   * @param {Object} components
-   *   The components to iterate.
-   * @param {Boolean} includeAll
-   *   Whether or not to include layout components.
-   *
-   * @returns {Object}
-   *   The flattened components map.
-   */
-  flattenComponents: function flattenComponents(components, includeAll) {
-    var flattened = {};
-    module.exports.eachComponent(components, function(component, path) {
-      flattened[path] = component;
-    }, includeAll);
-    return flattened;
-  },
-
-  /**
-   * Get the value for a component key, in the given submission.
-   *
-   * @param {Object} submission
-   *   A submission object to search.
-   * @param {String} key
-   *   A for components API key to search for.
-   */
-  getValue: function getValue(submission, key) {
-    var data = submission.data || {};
-
-    var search = function search(data) {
-      var i;
-      var value;
-
-      if (!data) {
-        return null;
-      }
-
-      if (data instanceof Array) {
-        for (i = 0; i < data.length; i++) {
-          if (typeof data[i] === 'object') {
-            value = search(data[i]);
-          }
-
-          if (value) {
-            return value;
-          }
-        }
-      }
-      else if (typeof data === 'object') {
-        if (data.hasOwnProperty(key)) {
-          return data[key];
-        }
-
-        var keys = Object.keys(data);
-        for (i = 0; i < keys.length; i++) {
-          if (typeof data[keys[i]] === 'object') {
-            value = search(data[keys[i]]);
-          }
-
-          if (value) {
-            return value;
-          }
-        }
-      }
-    };
-
-    return search(data);
-  }
-};
 
 },{}],3:[function(_dereq_,module,exports){
 'use strict';
@@ -1726,7 +1762,7 @@ Formio.deregisterPlugin = function(plugin) {
 
 module.exports = Formio;
 
-},{"./providers":4,"eventemitter2":1,"native-promise-only":9,"shallow-copy":10,"whatwg-fetch":11}],4:[function(_dereq_,module,exports){
+},{"./providers":4,"eventemitter2":2,"native-promise-only":9,"shallow-copy":10,"whatwg-fetch":11}],4:[function(_dereq_,module,exports){
 module.exports = {
   storage: _dereq_('./storage')
 };
@@ -6649,19 +6685,9 @@ module.exports = function() {
               }
               if (component.customConditional) {
                 hasConditionalPages = true;
-                component.__conditional = {
-                  page: component.key,
-                  condition: component.customConditional,
-                  check: FormioUtils.checkCustomConditions.bind(FormioUtils)
-                };
               }
               else if (component.conditional && component.conditional.when) {
                 hasConditionalPages = true;
-                component.__conditional = {
-                  page: component.key,
-                  condition: component.conditional,
-                  check: FormioUtils.checkConditions.bind(FormioUtils)
-                };
               }
               allPages.push(component);
               $scope.pages.push(component);
@@ -6672,12 +6698,7 @@ module.exports = function() {
             $scope.$watch('submission.data', function(data) {
               var newPages = [];
               angular.forEach(allPages, function(page) {
-                if (page.__conditional) {
-                  if (page.__conditional.check(page.__conditional.condition, data)) {
-                    newPages.push(page);
-                  }
-                }
-                else {
+                if (FormioUtils.isVisible(page, data)) {
                   newPages.push(page);
                 }
               });
@@ -6916,65 +6937,8 @@ module.exports = [
 var formioUtils = _dereq_('formio-utils');
 
 module.exports = function() {
-  var boolean = {
-    'true': true,
-    'false': false
-  };
   return {
-    /* eslint-disable no-unused-vars */
-    checkConditions: function(cond, data) {
-    /* eslint-enable no-unused-vars */
-      var result = true;
-      var value = this.getValue({data: data}, cond.when);
-      if (typeof value !== 'undefined' && typeof value !== 'object') {
-        // Check if the conditional value is equal to the trigger value
-        result = value.toString() === cond.eq.toString()
-          ? boolean[cond.show]
-          : !boolean[cond.show];
-      }
-      // Special check for check boxes component.
-      else if (typeof value !== 'undefined' && typeof value === 'object') {
-        // Only update the visibility is present, otherwise hide, because it was deleted by the submission sweep.
-        if (value.hasOwnProperty(cond.eq)) {
-          result = boolean.hasOwnProperty(value[cond.eq])
-            ? boolean[value[cond.eq]]
-            : true;
-        }
-        else {
-          result = false;
-        }
-      }
-      // Check against the components default value, if present and the components hasn't been interacted with.
-      else if (typeof value === 'undefined' && cond.hasOwnProperty('defaultValue')) {
-        result = cond.defaultValue.toString() === cond.eq.toString()
-          ? boolean[cond.show]
-          : !boolean[cond.show];
-      }
-      // If there is no value, we still need to process as not equal.
-      else {
-        result = !boolean[cond.show];
-      }
-      return result;
-    },
-    /* eslint-disable no-unused-vars */
-    checkCustomConditions: function(conditional, data) {
-    /* eslint-enable no-unused-vars */
-      if (!conditional) {
-        return true;
-      }
-      var result = true;
-      try {
-        var show = eval('(function() { ' + conditional.toString() + '; return show; })()');
-        result = boolean.hasOwnProperty(show.toString()) ? boolean[show] : true;
-      }
-      catch (e) {
-        result = true;
-      }
-      return result;
-    },
     isVisible: function(component, data, submission, hide) {
-      var shown = true;
-
       // If the component is in the hideComponents array, then hide it by default.
       if (hide && (hide.indexOf(component.key) !== -1)) {
         return false;
@@ -6982,17 +6946,15 @@ module.exports = function() {
 
       var subData = submission ? submission.data : {};
       var compData = Object.assign({}, subData, data);
-      if (component.customConditional) {
-        shown = this.checkCustomConditions(component.customConditional, compData);
-      }
-      else if (component.conditional && component.conditional.when) {
-        shown = this.checkConditions(component.conditional, compData);
-      }
+
+      // See if this should be shown.
+      var shown = formioUtils.checkCondition(component, compData);
 
       // Make sure to delete the data for invisible fields.
       if (!shown && data.hasOwnProperty(component.key)) {
         delete data[component.key];
       }
+
       return shown;
     },
     flattenComponents: formioUtils.flattenComponents,
@@ -7060,7 +7022,7 @@ module.exports = function() {
   };
 };
 
-},{"formio-utils":2}],57:[function(_dereq_,module,exports){
+},{"formio-utils":1}],57:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$q',
