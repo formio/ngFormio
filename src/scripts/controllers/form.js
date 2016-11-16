@@ -466,7 +466,7 @@ app.controller('FormController', [
 
     $scope.submissionAccessLabels = SubmissionAccessLabels;
     $scope.resourceAccessLabels = ResourceAccessLabels;
-    $scope.accessLabels = AccessLabels
+    $scope.accessLabels = AccessLabels;
 
     // Get the swagger URL.
     $scope.getSwaggerURL = function(format) {
@@ -677,7 +677,7 @@ app.controller('FormShareController', ['$scope', function($scope) {
             (_.indexOf(access.roles, defaultRole._id) !== -1)) {
               $scope.publicForm = true;
             }
-          })
+          });
         }
       });
 
