@@ -207,9 +207,10 @@ app.controller('ProjectController', [
       $rootScope.currentProject = result;
       $scope.showName = !(result.plan && result.plan === 'basic');
       $scope.projectsLoaded = true;
+      var allowedFiles, allow, custom;
 
       try {
-        var allowedFiles = JSON.parse(localStorage.getItem('allowedFiles')) || {};
+        allowedFiles = JSON.parse(localStorage.getItem('allowedFiles')) || {};
       }
       catch(err) {
         // iOS in private mode will throw errors.
@@ -217,7 +218,7 @@ app.controller('ProjectController', [
       // Dynamically load JS files.
       if ($scope.currentProject.settings.custom && $scope.currentProject.settings.custom.js && loadedFiles.indexOf($scope.currentProject.settings.custom.js) === -1) {
         try {
-          var allow = allowedFiles.hasOwnProperty($scope.currentProject.settings.custom.js) ? allowedFiles[$scope.currentProject.settings.custom.js] : null;
+          allow = allowedFiles.hasOwnProperty($scope.currentProject.settings.custom.js) ? allowedFiles[$scope.currentProject.settings.custom.js] : null;
           if (allow === null) {
             allowedFiles[$scope.currentProject.settings.custom.js] = allow = confirm('This project contains custom javascript. Would you like to load it? Be sure you trust the source as loading custom javascript can be a security concern.');
             localStorage.setItem('allowedFiles', JSON.stringify(allowedFiles));
@@ -225,7 +226,7 @@ app.controller('ProjectController', [
 
           if(allow) {
             loadedFiles.push($scope.currentProject.settings.custom.js);
-            var custom = document.createElement('script');
+            custom = document.createElement('script');
             custom.setAttribute('type','text/javascript');
             custom.setAttribute('src', $scope.currentProject.settings.custom.js);
             document.head.appendChild(custom);
@@ -239,15 +240,15 @@ app.controller('ProjectController', [
       // Dynamically load CSS files.
       if ($scope.currentProject.settings.custom && $scope.currentProject.settings.custom.css && loadedFiles.indexOf($scope.currentProject.settings.custom.css) === -1) {
         try {
-          var allow = allowedFiles.hasOwnProperty($scope.currentProject.settings.custom.css) ? allowedFiles[$scope.currentProject.settings.custom.css] : null;
+          allow = allowedFiles.hasOwnProperty($scope.currentProject.settings.custom.css) ? allowedFiles[$scope.currentProject.settings.custom.css] : null;
           if (allow === null) {
-            allowedFiles[$scope.currentProject.settings.custom.css] = allow = confirm('This project contains custom styles. Would you like to load it? Be sure you trust the source as loading custom styles can be a security concern.');
+            allowedFiles[$scope.currentProject.settings.custom.css] = allow = window.confirm('This project contains custom styles. Would you like to load it? Be sure you trust the source as loading custom styles can be a security concern.');
             localStorage.setItem('allowedFiles', JSON.stringify(allowedFiles));
           }
 
           if(allow) {
             loadedFiles.push($scope.currentProject.settings.custom.css);
-            var custom = document.createElement("link");
+            custom = document.createElement("link");
             custom.setAttribute("rel", "stylesheet");
             custom.setAttribute("type", "text/css");
             custom.setAttribute("href", $scope.currentProject.settings.custom.css);
