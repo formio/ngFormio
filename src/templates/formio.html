@@ -15,7 +15,7 @@
       formio="formio"
       submission="submission"
       hide-components="hideComponents"
-      read-only="readOnly || component.disabled"
+      read-only="isDisabled(component, submission.data)"
     ></formio-component>
   </form>
 </div>

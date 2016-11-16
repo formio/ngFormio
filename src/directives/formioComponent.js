@@ -64,6 +64,8 @@ module.exports = [
             );
           };
 
+          $scope.isDisabled = $scope.$parent.isDisabled;
+
           // Pass through checkConditional since this is an isolate scope.
           $scope.checkConditional = $scope.$parent.checkConditional;
 

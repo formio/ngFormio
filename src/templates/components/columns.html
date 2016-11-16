@@ -9,7 +9,7 @@
       hide-components="hideComponents"
       ng-if="isVisible(_component, data)"
       formio-form="formioForm"
-      read-only="readOnly"
+      read-only="isDisabled(_component, data)"
       grid-row="gridRow"
       grid-col="gridCol"
     ></formio-component>
