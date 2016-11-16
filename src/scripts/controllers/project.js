@@ -2,6 +2,9 @@
 
 /* globals NumberAbbreviate, chance */
 
+// loadedFiles is used to prevent double loading files on each session.
+var loadedFiles = [];
+
 var app = angular.module('formioApp.controllers.project', ['angular-chartist']);
 
 /*
@@ -204,6 +207,61 @@ app.controller('ProjectController', [
       $rootScope.currentProject = result;
       $scope.showName = !(result.plan && result.plan === 'basic');
       $scope.projectsLoaded = true;
+      var allowedFiles;
+      var custom;
+      var allow;
+
+      try {
+        allowedFiles = JSON.parse(localStorage.getItem('allowedFiles')) || {};
+      }
+      catch(err) {
+        // iOS in private mode will throw errors.
+      }
+      // Dynamically load JS files.
+      if ($scope.currentProject.settings && $scope.currentProject.settings.custom && $scope.currentProject.settings.custom.js && loadedFiles.indexOf($scope.currentProject.settings.custom.js) === -1) {
+        try {
+          allow = allowedFiles.hasOwnProperty($scope.currentProject.settings.custom.js) ? allowedFiles[$scope.currentProject.settings.custom.js] : null;
+          if (allow === null) {
+            allowedFiles[$scope.currentProject.settings.custom.js] = allow = confirm('This project contains custom javascript. Would you like to load it? Be sure you trust the source as loading custom javascript can be a security concern.');
+            localStorage.setItem('allowedFiles', JSON.stringify(allowedFiles));
+          }
+
+          if(allow) {
+            loadedFiles.push($scope.currentProject.settings.custom.js);
+            custom = document.createElement('script');
+            custom.setAttribute('type','text/javascript');
+            custom.setAttribute('src', $scope.currentProject.settings.custom.js);
+            document.head.appendChild(custom);
+          }
+        }
+        catch(err) {
+          console.log(err);
+        }
+      }
+
+      // Dynamically load CSS files.
+      if ($scope.currentProject.settings && $scope.currentProject.settings.custom && $scope.currentProject.settings.custom.css && loadedFiles.indexOf($scope.currentProject.settings.custom.css) === -1) {
+        try {
+          allow = allowedFiles.hasOwnProperty($scope.currentProject.settings.custom.css) ? allowedFiles[$scope.currentProject.settings.custom.css] : null;
+          if (allow === null) {
+            allowedFiles[$scope.currentProject.settings.custom.css] = allow = confirm('This project contains custom styles. Would you like to load it? Be sure you trust the source as loading custom styles can be a security concern.');
+            localStorage.setItem('allowedFiles', JSON.stringify(allowedFiles));
+          }
+
+          if(allow) {
+            loadedFiles.push($scope.currentProject.settings.custom.css);
+            custom = document.createElement("link");
+            custom.setAttribute("rel", "stylesheet");
+            custom.setAttribute("type", "text/css");
+            custom.setAttribute("href", $scope.currentProject.settings.custom.css);
+            document.head.appendChild(custom);
+            localStorage.setItem('loadedFiles', loadedFiles);
+          }
+        }
+        catch(err) {
+          console.log(err);
+        }
+      }
 
       $scope.rolesLoading = true;
       $http.get($scope.formio.projectUrl + '/role').then(function(result) {

@@ -4,7 +4,7 @@ module.exports = function(gulp, plugins) {
       .pipe(plugins.debug({title: 'jshint:'}))
       .pipe(plugins.browserSync.reload({stream: true, once: true}))
       .pipe(plugins.jshint({
-        predef: ['angular', '_', 'window', 'console', 'FileReader', 'kendo', 'moment', '$', 'localStorage', 'CKEDITOR', 'document'],
+        predef: ['angular', '_', 'window', 'console', 'FileReader', 'kendo', 'moment', '$', 'localStorage', 'CKEDITOR', 'document', 'confirm'],
         globalstrict: true
       }))
       .pipe(plugins.jshint.reporter('jshint-stylish'))
