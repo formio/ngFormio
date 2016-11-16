@@ -220,7 +220,7 @@ app.controller('ProjectController', [
         try {
           allow = allowedFiles.hasOwnProperty($scope.currentProject.settings.custom.js) ? allowedFiles[$scope.currentProject.settings.custom.js] : null;
           if (allow === null) {
-            allowedFiles[$scope.currentProject.settings.custom.js] = allow = confirm('This project contains custom javascript. Would you like to load it? Be sure you trust the source as loading custom javascript can be a security concern.');
+            allowedFiles[$scope.currentProject.settings.custom.js] = allow = window.confirm('This project contains custom javascript. Would you like to load it? Be sure you trust the source as loading custom javascript can be a security concern.');
             localStorage.setItem('allowedFiles', JSON.stringify(allowedFiles));
           }
 
