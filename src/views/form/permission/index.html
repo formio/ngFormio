@@ -27,7 +27,7 @@
 </div>
 <div class="panel panel-info">
   <div class="panel-heading">
-    <h3 class="panel-title">User Permissions
+    <h3 class="panel-title">Submission Permissions
       <a class="pull-right" href="https://help.form.io/userguide/#permissions" target="_blank">
         <i class="glyphicon glyphicon-question-sign"></i>
       </a>
@@ -59,6 +59,30 @@
     </div>
   </div>
 </div>
+
+
+
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Form Definition Access
+      <a class="pull-right" href="https://help.form.io/userguide/#permissions" target="_blank">
+        <i class="glyphicon glyphicon-question-sign"></i>
+      </a>
+    </h3>
+  </div>
+  <div class="panel-body">
+    <div class="well">
+      These permissions allow you to give a specific access to a single form.
+    </div>
+    <div ng-if="form._id">
+      <permission-editor permissions="form.access" labels="accessLabels" permission-filter="'read_all,read_form,update_all,delete_all,read_own,update_own,delete_own'" roles="currentProjectRoles" wait-for="loadFormPromise" form="form"></permission-editor>
+    </div>
+  </div>
+</div>
+
+
+
+
 <div class="form-group pull-right">
   <a class="btn btn-default" ng-click="back('project.{{ formInfo.type }}.form.view')">Cancel</a>
   <input ng-hide="highestRole === 'team_read'" type="submit" class="btn btn-primary" ng-click="saveForm()" value="Save Changes" />
