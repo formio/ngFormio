@@ -17,7 +17,7 @@
           submission="submission"
           hide-components="hideComponents"
           ng-if="isVisible(col, rows[rowIndex])"
-          read-only="readOnly || col.disabled"
+          read-only="isDisabled(_component, data) || col.disabled"
           grid-row="rowIndex"
           grid-col="colIndex"
         ></formio-component>

@@ -88,6 +88,10 @@ module.exports = function() {
           );
         };
 
+        $scope.isDisabled = function(component, data) {
+          return $scope.readOnly || (Array.isArray($scope.disableComponents) && $scope.disableComponents.indexOf(component.key) !== -1);
+        };
+
         // Called when the form is submitted.
         $scope.onSubmit = function(form) {
           $scope.formioAlerts = [];
