@@ -207,9 +207,7 @@ app.controller('ProjectController', [
       $rootScope.currentProject = result;
       $scope.showName = !(result.plan && result.plan === 'basic');
       $scope.projectsLoaded = true;
-      var allowedFiles;
-      var custom;
-      var allow;
+      var allowedFiles, allow, custom;
 
       try {
         allowedFiles = JSON.parse(localStorage.getItem('allowedFiles')) || {};
@@ -222,7 +220,7 @@ app.controller('ProjectController', [
         try {
           allow = allowedFiles.hasOwnProperty($scope.currentProject.settings.custom.js) ? allowedFiles[$scope.currentProject.settings.custom.js] : null;
           if (allow === null) {
-            allowedFiles[$scope.currentProject.settings.custom.js] = allow = confirm('This project contains custom javascript. Would you like to load it? Be sure you trust the source as loading custom javascript can be a security concern.');
+            allowedFiles[$scope.currentProject.settings.custom.js] = allow = window.confirm('This project contains custom javascript. Would you like to load it? Be sure you trust the source as loading custom javascript can be a security concern.');
             localStorage.setItem('allowedFiles', JSON.stringify(allowedFiles));
           }
 
@@ -244,7 +242,7 @@ app.controller('ProjectController', [
         try {
           allow = allowedFiles.hasOwnProperty($scope.currentProject.settings.custom.css) ? allowedFiles[$scope.currentProject.settings.custom.css] : null;
           if (allow === null) {
-            allowedFiles[$scope.currentProject.settings.custom.css] = allow = confirm('This project contains custom styles. Would you like to load it? Be sure you trust the source as loading custom styles can be a security concern.');
+            allowedFiles[$scope.currentProject.settings.custom.css] = allow = window.confirm('This project contains custom styles. Would you like to load it? Be sure you trust the source as loading custom styles can be a security concern.');
             localStorage.setItem('allowedFiles', JSON.stringify(allowedFiles));
           }
 
