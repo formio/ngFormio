@@ -223,6 +223,10 @@ angular
           url: '/apiKeys',
           templateUrl: 'views/project/apiKeys/index.html'
         })
+        .state('project.settings.customjscss', {
+          url: '/customjscss',
+          templateUrl: 'views/project/customjscss/index.html'
+        })
         .state('project.settings.oauth', {
           url: '/oauth',
           templateUrl: 'views/project/oauth/index.html'
