@@ -89,7 +89,7 @@ module.exports = function() {
         };
 
         $scope.isDisabled = function(component, data) {
-          return $scope.readOnly || (Array.isArray($scope.disableComponents) && $scope.disableComponents.indexOf(component.key) !== -1);
+          return $scope.readOnly || component.disabled || (Array.isArray($scope.disableComponents) && $scope.disableComponents.indexOf(component.key) !== -1);
         };
 
         // Called when the form is submitted.
