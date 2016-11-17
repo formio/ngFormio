@@ -10,6 +10,7 @@ module.exports = function() {
       submission: '=?',
       readOnly: '=?',
       hideComponents: '=?',
+      disableComponents: '=?',
       formioOptions: '=?',
       storage: '=?'
     },
@@ -119,6 +120,7 @@ module.exports = function() {
             submission: 'submission',
             'read-only': 'readOnly',
             'hide-components': 'hideComponents',
+            'disable-components': 'disableComponents',
             'formio-options': 'formioOptions',
             id: 'formio-wizard-form'
           }))($scope));

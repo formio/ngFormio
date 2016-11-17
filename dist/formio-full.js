@@ -48092,11 +48092,16 @@ module.exports = {
     }
     else if (component.hasOwnProperty('conditional') && component.conditional && component.conditional.when) {
       var cond = component.conditional;
-      var value = this.getValue({data: data}, cond.when) || (component.hasOwnProperty('defaultValue') ? component.defaultValue : '');
+      var value = this.getValue({data: data}, cond.when);
+      // Will return null if not found.
+      if (value === null || typeof value === 'undefined') {
+        value = component.hasOwnProperty('defaultValue') ? component.defaultValue : '';
+      }
       // Special check for selectboxes component.
       if (typeof value === 'object' && value.hasOwnProperty(cond.eq)) {
         return value[cond.eq].toString() === cond.show.toString();
       }
+      //console.log(component, value);
       return (value.toString() === cond.eq.toString()) === (cond.show.toString() === 'true');
     }
 
@@ -70775,7 +70780,7 @@ module.exports = function() {
         };
 
         $scope.isDisabled = function(component, data) {
-          return $scope.readOnly || (Array.isArray($scope.disableComponents) && $scope.disableComponents.indexOf(component.key) !== -1);
+          return $scope.readOnly || component.disabled || (Array.isArray($scope.disableComponents) && $scope.disableComponents.indexOf(component.key) !== -1);
         };
 
         // Called when the form is submitted.
@@ -71019,6 +71024,20 @@ module.exports = [
           // Pass through checkConditional since this is an isolate scope.
           $scope.checkConditional = $scope.$parent.checkConditional;
 
+          // Calculate value when data changes.
+          if ($scope.component.calculateValue) {
+            $scope.$watch('data', function() {
+              try {
+                $scope.data[$scope.component.key] = eval('(function(data) { var value = [];' + $scope.component.calculateValue.toString() + '; return value; })($scope.data)');
+              }
+              catch (e) {
+                /* eslint-disable no-console */
+                console.warn('An error occurred calculating a value for ' + $scope.component.key, e);
+                /* eslint-enable no-console */
+              }
+            }, true);
+          }
+
           // Get the settings.
           var component = formioComponents.components[$scope.component.type] || formioComponents.components['custom'];
 
@@ -71032,7 +71051,24 @@ module.exports = [
 
           // Add a new field value.
           $scope.addFieldValue = function() {
-            var value = $scope.component.hasOwnProperty('defaultValue') ? $scope.component.defaultValue : '';
+            var value = '';
+            if ($scope.component.hasOwnProperty('customDefaultValue')) {
+              try {
+                /* eslint-disable no-unused-vars */
+                var data = _.cloneDeep($scope.data);
+                /* eslint-enable no-unused-vars */
+                value = eval('(function(data) { var value = "";' + $scope.component.customDefaultValue.toString() + '; return value; })(data)');
+              }
+              catch (e) {
+                /* eslint-disable no-console */
+                console.warn('An error occurrend in a custom default value in ' + $scope.component.key, e);
+                /* eslint-enable no-console */
+                value = '';
+              }
+            }
+            else if ($scope.component.hasOwnProperty('defaultValue')) {
+              value = $scope.component.defaultValue;
+            }
             $scope.data[$scope.component.key] = $scope.data[$scope.component.key] || [];
             $scope.data[$scope.component.key].push(value);
           };
@@ -71074,10 +71110,10 @@ module.exports = [
           }
 
           $scope.$watch('component.multiple', function() {
+            var value = null;
             // Establish a default for data.
             $scope.data = $scope.data || {};
             if ($scope.component.multiple) {
-              var value = null;
               if ($scope.data.hasOwnProperty($scope.component.key)) {
                 // If a value is present, and its an array, assign it to the value.
                 if ($scope.data[$scope.component.key] instanceof Array) {
@@ -71086,6 +71122,17 @@ module.exports = [
                 // If a value is present and it is not an array, wrap the value.
                 else {
                   value = [$scope.data[$scope.component.key]];
+                }
+              }
+              else if ($scope.component.hasOwnProperty('customDefaultValue')) {
+                try {
+                  value = eval('(function(data) { var value = "";' + $scope.component.customDefaultValue.toString() + '; return value; })($scope.data)');
+                }
+                catch (e) {
+                  /* eslint-disable no-console */
+                  console.warn('An error occurrend in a custom default value in ' + $scope.component.key, e);
+                  /* eslint-enable no-console */
+                  value = '';
                 }
               }
               else if ($scope.component.hasOwnProperty('defaultValue')) {
@@ -71111,6 +71158,18 @@ module.exports = [
             // Use the current data or default.
             if ($scope.data.hasOwnProperty($scope.component.key)) {
               $scope.data[$scope.component.key] = $scope.data[$scope.component.key];
+            }
+            else if ($scope.component.hasOwnProperty('customDefaultValue')) {
+              try {
+                value = eval('(function(data) { var value = "";' + $scope.component.customDefaultValue.toString() + '; return value; })($scope.data)');
+              }
+              catch (e) {
+                /* eslint-disable no-console */
+                console.warn('An error occurrend in a custom default value in ' + $scope.component.key, e);
+                /* eslint-enable no-console */
+                value = '';
+              }
+              $scope.data[$scope.component.key] = value;
             }
             // FA-835 - The default values for select boxes are set in the component.
             else if ($scope.component.hasOwnProperty('defaultValue') && $scope.component.type !== 'selectboxes') {
@@ -71416,6 +71475,7 @@ module.exports = function() {
       submission: '=?',
       readOnly: '=?',
       hideComponents: '=?',
+      disableComponents: '=?',
       formioOptions: '=?',
       storage: '=?'
     },
@@ -71525,6 +71585,7 @@ module.exports = function() {
             submission: 'submission',
             'read-only': 'readOnly',
             'hide-components': 'hideComponents',
+            'disable-components': 'disableComponents',
             'formio-options': 'formioOptions',
             id: 'formio-wizard-form'
           }))($scope));
@@ -72377,7 +72438,7 @@ app.run([
   function($templateCache) {
     // The template for the formio forms.
     $templateCache.put('formio.html',
-      "<div>\n  <i style=\"font-size: 2em;\" ng-if=\"formLoading\" ng-class=\"{'formio-hidden': !formLoading}\" class=\"formio-loading glyphicon glyphicon-refresh glyphicon-spin\"></i>\n  <formio-wizard ng-if=\"form.display === 'wizard'\" src=\"src\" form=\"form\" submission=\"submission\" form-action=\"formAction\" read-only=\"readOnly\" hide-components=\"hideComponents\" formio-options=\"formioOptions\" storage=\"form.name\"></formio-wizard>\n  <form ng-if=\"!form.display || (form.display === 'form')\" role=\"form\" name=\"formioForm\" ng-submit=\"onSubmit(formioForm)\" novalidate>\n    <div ng-repeat=\"alert in formioAlerts track by $index\" class=\"alert alert-{{ alert.type }}\" role=\"alert\">\n      {{ alert.message | formioTranslate }}\n    </div>\n    <!-- DO NOT PUT \"track by $index\" HERE SINCE DYNAMICALLY ADDING/REMOVING COMPONENTS WILL BREAK -->\n    <formio-component\n      ng-repeat=\"component in form.components track by $index\"\n      component=\"component\"\n      ng-if=\"isVisible(component)\"\n      data=\"submission.data\"\n      formio-form=\"formioForm\"\n      formio=\"formio\"\n      submission=\"submission\"\n      hide-components=\"hideComponents\"\n      read-only=\"isDisabled(component, submission.data)\"\n    ></formio-component>\n  </form>\n</div>\n"
+      "<div>\n  <i style=\"font-size: 2em;\" ng-if=\"formLoading\" ng-class=\"{'formio-hidden': !formLoading}\" class=\"formio-loading glyphicon glyphicon-refresh glyphicon-spin\"></i>\n  <formio-wizard ng-if=\"form.display === 'wizard'\" src=\"src\" form=\"form\" submission=\"submission\" form-action=\"formAction\" read-only=\"readOnly\" hide-components=\"hideComponents\" disable-components=\"disableComponents\" formio-options=\"formioOptions\" storage=\"form.name\"></formio-wizard>\n  <form ng-if=\"!form.display || (form.display === 'form')\" role=\"form\" name=\"formioForm\" ng-submit=\"onSubmit(formioForm)\" novalidate>\n    <div ng-repeat=\"alert in formioAlerts track by $index\" class=\"alert alert-{{ alert.type }}\" role=\"alert\">\n      {{ alert.message | formioTranslate }}\n    </div>\n    <!-- DO NOT PUT \"track by $index\" HERE SINCE DYNAMICALLY ADDING/REMOVING COMPONENTS WILL BREAK -->\n    <formio-component\n      ng-repeat=\"component in form.components track by $index\"\n      component=\"component\"\n      ng-if=\"isVisible(component)\"\n      data=\"submission.data\"\n      formio-form=\"formioForm\"\n      formio=\"formio\"\n      submission=\"submission\"\n      hide-components=\"hideComponents\"\n      read-only=\"isDisabled(component, submission.data)\"\n    ></formio-component>\n  </form>\n</div>\n"
     );
 
     $templateCache.put('formio-wizard.html',
