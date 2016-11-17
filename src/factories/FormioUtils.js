@@ -2,17 +2,20 @@ var formioUtils = require('formio-utils');
 
 module.exports = function() {
   return {
-    isVisible: function(component, data, submission, hide) {
+    isVisible: function(component, subData, data, hide) {
       // If the component is in the hideComponents array, then hide it by default.
-      if (hide && (hide.indexOf(component.key) !== -1)) {
+      if (Array.isArray(hide) && (hide.indexOf(component.key) !== -1)) {
         return false;
       }
 
-      var subData = submission ? submission.data : {};
-      var compData = Object.assign({}, subData, data);
-
-      // See if this should be shown.
-      var shown = formioUtils.checkCondition(component, compData);
+      var allData;
+      if (subData) {
+        allData = Object.assign({}, data, subData);
+      }
+      else {
+        allData = data;
+      }
+      var shown = formioUtils.checkCondition(component, allData);
 
       // Make sure to delete the data for invisible fields.
       if (!shown && data.hasOwnProperty(component.key)) {
