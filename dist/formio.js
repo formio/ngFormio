@@ -1,4 +1,4 @@
-/*! ng-formio v2.4.0-beta.2 | https://unpkg.com/ng-formio@2.4.0-beta.2/LICENSE.txt */
+/*! ng-formio v2.4.0 | https://unpkg.com/ng-formio@2.4.0/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 /*!
  * EventEmitter2
@@ -5713,7 +5713,7 @@ module.exports = function() {
         };
 
         $scope.isDisabled = function(component, data) {
-          return $scope.readOnly || (Array.isArray($scope.disableComponents) && $scope.disableComponents.indexOf(component.key) !== -1);
+          return $scope.readOnly || component.disabled || (Array.isArray($scope.disableComponents) && $scope.disableComponents.indexOf(component.key) !== -1);
         };
 
         // Called when the form is submitted.
@@ -5957,6 +5957,20 @@ module.exports = [
           // Pass through checkConditional since this is an isolate scope.
           $scope.checkConditional = $scope.$parent.checkConditional;
 
+          // Calculate value when data changes.
+          if ($scope.component.calculateValue) {
+            $scope.$watch('data', function() {
+              try {
+                $scope.data[$scope.component.key] = eval('(function(data) { var value = [];' + $scope.component.calculateValue.toString() + '; return value; })($scope.data)');
+              }
+              catch (e) {
+                /* eslint-disable no-console */
+                console.warn('An error occurred calculating a value for ' + $scope.component.key, e);
+                /* eslint-enable no-console */
+              }
+            }, true);
+          }
+
           // Get the settings.
           var component = formioComponents.components[$scope.component.type] || formioComponents.components['custom'];
 
@@ -5970,7 +5984,24 @@ module.exports = [
 
           // Add a new field value.
           $scope.addFieldValue = function() {
-            var value = $scope.component.hasOwnProperty('defaultValue') ? $scope.component.defaultValue : '';
+            var value = '';
+            if ($scope.component.hasOwnProperty('customDefaultValue')) {
+              try {
+                /* eslint-disable no-unused-vars */
+                var data = _.cloneDeep($scope.data);
+                /* eslint-enable no-unused-vars */
+                value = eval('(function(data) { var value = "";' + $scope.component.customDefaultValue.toString() + '; return value; })(data)');
+              }
+              catch (e) {
+                /* eslint-disable no-console */
+                console.warn('An error occurrend in a custom default value in ' + $scope.component.key, e);
+                /* eslint-enable no-console */
+                value = '';
+              }
+            }
+            else if ($scope.component.hasOwnProperty('defaultValue')) {
+              value = $scope.component.defaultValue;
+            }
             $scope.data[$scope.component.key] = $scope.data[$scope.component.key] || [];
             $scope.data[$scope.component.key].push(value);
           };
@@ -6012,10 +6043,10 @@ module.exports = [
           }
 
           $scope.$watch('component.multiple', function() {
+            var value = null;
             // Establish a default for data.
             $scope.data = $scope.data || {};
             if ($scope.component.multiple) {
-              var value = null;
               if ($scope.data.hasOwnProperty($scope.component.key)) {
                 // If a value is present, and its an array, assign it to the value.
                 if ($scope.data[$scope.component.key] instanceof Array) {
@@ -6024,6 +6055,17 @@ module.exports = [
                 // If a value is present and it is not an array, wrap the value.
                 else {
                   value = [$scope.data[$scope.component.key]];
+                }
+              }
+              else if ($scope.component.hasOwnProperty('customDefaultValue')) {
+                try {
+                  value = eval('(function(data) { var value = "";' + $scope.component.customDefaultValue.toString() + '; return value; })($scope.data)');
+                }
+                catch (e) {
+                  /* eslint-disable no-console */
+                  console.warn('An error occurrend in a custom default value in ' + $scope.component.key, e);
+                  /* eslint-enable no-console */
+                  value = '';
                 }
               }
               else if ($scope.component.hasOwnProperty('defaultValue')) {
@@ -6049,6 +6091,18 @@ module.exports = [
             // Use the current data or default.
             if ($scope.data.hasOwnProperty($scope.component.key)) {
               $scope.data[$scope.component.key] = $scope.data[$scope.component.key];
+            }
+            else if ($scope.component.hasOwnProperty('customDefaultValue')) {
+              try {
+                value = eval('(function(data) { var value = "";' + $scope.component.customDefaultValue.toString() + '; return value; })($scope.data)');
+              }
+              catch (e) {
+                /* eslint-disable no-console */
+                console.warn('An error occurrend in a custom default value in ' + $scope.component.key, e);
+                /* eslint-enable no-console */
+                value = '';
+              }
+              $scope.data[$scope.component.key] = value;
             }
             // FA-835 - The default values for select boxes are set in the component.
             else if ($scope.component.hasOwnProperty('defaultValue') && $scope.component.type !== 'selectboxes') {

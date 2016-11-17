@@ -69,6 +69,20 @@ module.exports = [
           // Pass through checkConditional since this is an isolate scope.
           $scope.checkConditional = $scope.$parent.checkConditional;
 
+          // Calculate value when data changes.
+          if ($scope.component.calculateValue) {
+            $scope.$watch('data', function() {
+              try {
+                $scope.data[$scope.component.key] = eval('(function(data) { var value = [];' + $scope.component.calculateValue.toString() + '; return value; })($scope.data)');
+              }
+              catch (e) {
+                /* eslint-disable no-console */
+                console.warn('An error occurred calculating a value for ' + $scope.component.key, e);
+                /* eslint-enable no-console */
+              }
+            }, true);
+          }
+
           // Get the settings.
           var component = formioComponents.components[$scope.component.type] || formioComponents.components['custom'];
 
@@ -141,10 +155,10 @@ module.exports = [
           }
 
           $scope.$watch('component.multiple', function() {
+            var value = null;
             // Establish a default for data.
             $scope.data = $scope.data || {};
             if ($scope.component.multiple) {
-              var value = null;
               if ($scope.data.hasOwnProperty($scope.component.key)) {
                 // If a value is present, and its an array, assign it to the value.
                 if ($scope.data[$scope.component.key] instanceof Array) {
@@ -157,10 +171,7 @@ module.exports = [
               }
               else if ($scope.component.hasOwnProperty('customDefaultValue')) {
                 try {
-                  /* eslint-disable no-unused-vars */
-                  var data = _.cloneDeep($scope.data);
-                  /* eslint-enable no-unused-vars */
-                  value = eval('(function(data) { var value = "";' + $scope.component.customDefaultValue.toString() + '; return value; })(data)');
+                  value = eval('(function(data) { var value = "";' + $scope.component.customDefaultValue.toString() + '; return value; })($scope.data)');
                 }
                 catch (e) {
                   /* eslint-disable no-console */
@@ -194,12 +205,8 @@ module.exports = [
               $scope.data[$scope.component.key] = $scope.data[$scope.component.key];
             }
             else if ($scope.component.hasOwnProperty('customDefaultValue')) {
-              console.log('in');
               try {
-                /* eslint-disable no-unused-vars */
-                var data = _.cloneDeep($scope.data);
-                /* eslint-enable no-unused-vars */
-                value = eval('(function(data) { var value = "";' + $scope.component.customDefaultValue.toString() + '; return value; })(data)');
+                value = eval('(function(data) { var value = "";' + $scope.component.customDefaultValue.toString() + '; return value; })($scope.data)');
               }
               catch (e) {
                 /* eslint-disable no-console */
