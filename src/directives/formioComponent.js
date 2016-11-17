@@ -82,7 +82,24 @@ module.exports = [
 
           // Add a new field value.
           $scope.addFieldValue = function() {
-            var value = $scope.component.hasOwnProperty('defaultValue') ? $scope.component.defaultValue : '';
+            var value = '';
+            if ($scope.component.hasOwnProperty('customDefaultValue')) {
+              try {
+                /* eslint-disable no-unused-vars */
+                var data = _.cloneDeep($scope.data);
+                /* eslint-enable no-unused-vars */
+                value = eval('(function(data) { var value = "";' + $scope.component.customDefaultValue.toString() + '; return value; })(data)');
+              }
+              catch (e) {
+                /* eslint-disable no-console */
+                console.warn('An error occurrend in a custom default value in ' + $scope.component.key, e);
+                /* eslint-enable no-console */
+                value = '';
+              }
+            }
+            else if ($scope.component.hasOwnProperty('defaultValue')) {
+              value = $scope.component.defaultValue;
+            }
             $scope.data[$scope.component.key] = $scope.data[$scope.component.key] || [];
             $scope.data[$scope.component.key].push(value);
           };
@@ -138,6 +155,20 @@ module.exports = [
                   value = [$scope.data[$scope.component.key]];
                 }
               }
+              else if ($scope.component.hasOwnProperty('customDefaultValue')) {
+                try {
+                  /* eslint-disable no-unused-vars */
+                  var data = _.cloneDeep($scope.data);
+                  /* eslint-enable no-unused-vars */
+                  value = eval('(function(data) { var value = "";' + $scope.component.customDefaultValue.toString() + '; return value; })(data)');
+                }
+                catch (e) {
+                  /* eslint-disable no-console */
+                  console.warn('An error occurrend in a custom default value in ' + $scope.component.key, e);
+                  /* eslint-enable no-console */
+                  value = '';
+                }
+              }
               else if ($scope.component.hasOwnProperty('defaultValue')) {
                 // If there is a default value and it is an array, assign it to the value.
                 if ($scope.component.defaultValue instanceof Array) {
@@ -161,6 +192,22 @@ module.exports = [
             // Use the current data or default.
             if ($scope.data.hasOwnProperty($scope.component.key)) {
               $scope.data[$scope.component.key] = $scope.data[$scope.component.key];
+            }
+            else if ($scope.component.hasOwnProperty('customDefaultValue')) {
+              console.log('in');
+              try {
+                /* eslint-disable no-unused-vars */
+                var data = _.cloneDeep($scope.data);
+                /* eslint-enable no-unused-vars */
+                value = eval('(function(data) { var value = "";' + $scope.component.customDefaultValue.toString() + '; return value; })(data)');
+              }
+              catch (e) {
+                /* eslint-disable no-console */
+                console.warn('An error occurrend in a custom default value in ' + $scope.component.key, e);
+                /* eslint-enable no-console */
+                value = '';
+              }
+              $scope.data[$scope.component.key] = value;
             }
             // FA-835 - The default values for select boxes are set in the component.
             else if ($scope.component.hasOwnProperty('defaultValue') && $scope.component.type !== 'selectboxes') {
