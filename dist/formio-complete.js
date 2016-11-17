@@ -48093,7 +48093,6 @@ module.exports = {
       if (typeof value === 'object' && value.hasOwnProperty(cond.eq)) {
         return value[cond.eq].toString() === cond.show.toString();
       }
-      //console.log(component, value);
       return (value.toString() === cond.eq.toString()) === (cond.show.toString() === 'true');
     }
 
