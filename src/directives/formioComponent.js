@@ -59,7 +59,7 @@ module.exports = [
             return FormioUtils.isVisible(
               component,
               data,
-              $scope.submission,
+              $scope.submission.data,
               $scope.hideComponents
             );
           };

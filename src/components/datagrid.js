@@ -64,7 +64,7 @@ module.exports = function(app) {
         var data = $scope.data[$scope.component.key];
         var visible = false;
         angular.forEach(data, function(rowData) {
-          visible = (visible || FormioUtils.isVisible(component, rowData, $scope.submission, $scope.hideComponents));
+          visible = (visible || FormioUtils.isVisible(component, rowData));
         });
         return visible;
       };

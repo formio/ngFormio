@@ -354,7 +354,7 @@ module.exports = function() {
             $scope.$watch('submission.data', function(data) {
               var newPages = [];
               angular.forEach(allPages, function(page) {
-                if (FormioUtils.isVisible(page, data)) {
+                if (FormioUtils.isVisible(page)) {
                   newPages.push(page);
                 }
               });

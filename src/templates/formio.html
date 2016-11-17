@@ -7,9 +7,9 @@
     </div>
     <!-- DO NOT PUT "track by $index" HERE SINCE DYNAMICALLY ADDING/REMOVING COMPONENTS WILL BREAK -->
     <formio-component
-      ng-repeat="component in form.components"
+      ng-repeat="component in form.components track by $index"
       component="component"
-      ng-if="isVisible(component, submission.data)"
+      ng-if="isVisible(component)"
       data="submission.data"
       formio-form="formioForm"
       formio="formio"
