@@ -19,16 +19,21 @@ module.exports = function() {
       var timestamp = Date.now();
 
       // Break infinite loops when components show each other.
+      component.count = component.count || 0;
       var diff = timestamp - (component.lastChanged || 0);
-      if (component.hasOwnProperty('visible') && (diff < 100)) {
+      if (component.hasOwnProperty('visible') && component.count >= 3 && (diff < 100)) {
         return component.visible;
+      }
+      else {
+        component.count = 0;
       }
 
       component.visible = shown;
       component.lastChanged = timestamp;
+      component.count++;
 
       // Make sure to delete the data for invisible fields.
-      if (!shown && data.hasOwnProperty(component.key)) {
+      if (!shown && data && data.hasOwnProperty(component.key)) {
         delete data[component.key];
       }
 
