@@ -15,6 +15,7 @@ module.exports = function() {
       else {
         allData = data;
       }
+
       var shown = formioUtils.checkCondition(component, allData);
       var timestamp = Date.now();
 
