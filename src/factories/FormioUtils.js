@@ -16,6 +16,16 @@ module.exports = function() {
         allData = data;
       }
       var shown = formioUtils.checkCondition(component, allData);
+      var timestamp = Date.now();
+
+      // Break infinite loops when components show each other.
+      var diff = timestamp - (component.lastChanged || 0);
+      if (component.hasOwnProperty('visible') && (diff < 100)) {
+        return component.visible;
+      }
+
+      component.visible = shown;
+      component.lastChanged = timestamp;
 
       // Make sure to delete the data for invisible fields.
       if (!shown && data.hasOwnProperty(component.key)) {
