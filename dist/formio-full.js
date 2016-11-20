@@ -1,5 +1,213 @@
 /*! ng-formio v2.4.6 | https://unpkg.com/ng-formio@2.4.6/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
+'use strict';
+module.exports = {
+  /**
+   * Determine if a component is a layout component or not.
+   *
+   * @param {Object} component
+   *   The component to check.
+   *
+   * @returns {Boolean}
+   *   Whether or not the component is a layout component.
+   */
+  isLayoutComponent: function isLayoutComponent(component) {
+    return (
+      (component.columns && Array.isArray(component.columns)) ||
+      (component.rows && Array.isArray(component.rows)) ||
+      (component.components && Array.isArray(component.components))
+    ) ? true : false;
+  },
+
+  /**
+   * Iterate through each component within a form.
+   *
+   * @param {Object} components
+   *   The components to iterate.
+   * @param {Function} fn
+   *   The iteration function to invoke for each component.
+   * @param {Boolean} includeAll
+   *   Whether or not to include layout components.
+   * @param {String} path
+   *   The current data path of the element. Example: data.user.firstName
+   */
+  eachComponent: function eachComponent(components, fn, includeAll, path) {
+    if (!components) return;
+    path = path || '';
+    components.forEach(function(component) {
+      var hasColumns = component.columns && Array.isArray(component.columns);
+      var hasRows = component.rows && Array.isArray(component.rows);
+      var hasComps = component.components && Array.isArray(component.components);
+      var noRecurse = false;
+      var newPath = component.key ? (path ? (path + '.' + component.key) : component.key) : '';
+
+      if (includeAll || component.tree || (!hasColumns && !hasRows && !hasComps)) {
+        noRecurse = fn(component, newPath);
+      }
+
+      var subPath = function() {
+        if (component.key && ((component.type === 'datagrid') || (component.type === 'container'))) {
+          return newPath;
+        }
+        return path;
+      };
+
+      if (!noRecurse) {
+        if (hasColumns) {
+          component.columns.forEach(function(column) {
+            eachComponent(column.components, fn, includeAll, subPath());
+          });
+        }
+
+        else if (hasRows) {
+          [].concat.apply([], component.rows).forEach(function(row) {
+            eachComponent(row.components, fn, includeAll, subPath());
+          });
+        }
+
+        else if (hasComps) {
+          eachComponent(component.components, fn, includeAll, subPath());
+        }
+      }
+    });
+  },
+
+  /**
+   * Get a component by its key
+   *
+   * @param {Object} components
+   *   The components to iterate.
+   * @param {String} key
+   *   The key of the component to get.
+   *
+   * @returns {Object}
+   *   The component that matches the given key, or undefined if not found.
+   */
+  getComponent: function getComponent(components, key) {
+    var result;
+    module.exports.eachComponent(components, function(component) {
+      if (component.key === key) {
+        result = component;
+      }
+    });
+    return result;
+  },
+
+  /**
+   * Flatten the form components for data manipulation.
+   *
+   * @param {Object} components
+   *   The components to iterate.
+   * @param {Boolean} includeAll
+   *   Whether or not to include layout components.
+   *
+   * @returns {Object}
+   *   The flattened components map.
+   */
+  flattenComponents: function flattenComponents(components, includeAll) {
+    var flattened = {};
+    module.exports.eachComponent(components, function(component, path) {
+      flattened[path] = component;
+    }, includeAll);
+    return flattened;
+  },
+
+  /**
+   * Checks the conditions for a provided component and data.
+   *
+   * @param component
+   *   The component to check for the condition.
+   * @param compData
+   *   The data for this conditional check.
+   * @returns {boolean}
+   */
+  checkCondition: function(component, data, submission) {
+    if (component.hasOwnProperty('customConditional') && component.customConditional) {
+      try {
+        var script = '(function() { var show = true;';
+        script += component.customConditional.toString();
+        script += '; return show; })()';
+        var result = eval(script);
+        return result.toString() === 'true';
+      }
+      catch (e) {
+        console.warn('An error occurred in a custom conditional statement for component ' + component.key, e);
+        return true;
+      }
+    }
+    else if (component.hasOwnProperty('conditional') && component.conditional && component.conditional.when) {
+      var cond = component.conditional;
+      var value = this.getValue({data: data}, cond.when);
+      if (submission && (value === null || typeof value === 'undefined')) {
+        value = this.getValue(submission, cond.when);
+      }
+      if (value === null || typeof value === 'undefined') {
+        value = component.hasOwnProperty('defaultValue') ? component.defaultValue : '';
+      }
+      // Special check for selectboxes component.
+      if (typeof value === 'object' && value.hasOwnProperty(cond.eq)) {
+        return value[cond.eq].toString() === cond.show.toString();
+      }
+      return (value.toString() === cond.eq.toString()) === (cond.show.toString() === 'true');
+    }
+
+    // Default to show.
+    return true;
+  },
+
+  /**
+   * Get the value for a component key, in the given submission.
+   *
+   * @param {Object} submission
+   *   A submission object to search.
+   * @param {String} key
+   *   A for components API key to search for.
+   */
+  getValue: function getValue(submission, key) {
+    var data = submission.data || {};
+
+    var search = function search(data) {
+      var i;
+      var value;
+
+      if (!data) {
+        return null;
+      }
+
+      if (data instanceof Array) {
+        for (i = 0; i < data.length; i++) {
+          if (typeof data[i] === 'object') {
+            value = search(data[i]);
+          }
+
+          if (value) {
+            return value;
+          }
+        }
+      }
+      else if (typeof data === 'object') {
+        if (data.hasOwnProperty(key)) {
+          return data[key];
+        }
+
+        var keys = Object.keys(data);
+        for (i = 0; i < keys.length; i++) {
+          if (typeof data[keys[i]] === 'object') {
+            value = search(data[keys[i]]);
+          }
+
+          if (value) {
+            return value;
+          }
+        }
+      }
+    };
+
+    return search(data);
+  }
+};
+
+},{}],2:[function(_dereq_,module,exports){
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -602,7 +810,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ ])
 });
 ;
-},{}],2:[function(_dereq_,module,exports){
+},{}],3:[function(_dereq_,module,exports){
 (function (global){
 /* angular-moment.js / v1.0.0 / (c) 2013, 2014, 2015, 2016 Uri Shaked / MIT Licence */
 
@@ -1342,7 +1550,7 @@ return /******/ (function(modules) { // webpackBootstrap
 })();
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"angular":10,"moment":34}],3:[function(_dereq_,module,exports){
+},{"angular":11,"moment":34}],4:[function(_dereq_,module,exports){
 /**
  * @license AngularJS v1.5.8
  * (c) 2010-2016 Google, Inc. http://angularjs.org
@@ -2082,11 +2290,11 @@ angular.module('ngSanitize').filter('linky', ['$sanitize', function($sanitize) {
 
 })(window, window.angular);
 
-},{}],4:[function(_dereq_,module,exports){
+},{}],5:[function(_dereq_,module,exports){
 _dereq_('./angular-sanitize');
 module.exports = 'ngSanitize';
 
-},{"./angular-sanitize":3}],5:[function(_dereq_,module,exports){
+},{"./angular-sanitize":4}],6:[function(_dereq_,module,exports){
 /*
  * angular-ui-bootstrap
  * http://angular-ui.github.io/bootstrap/
@@ -9711,12 +9919,12 @@ angular.module('ui.bootstrap.datepickerPopup').run(function() {!angular.$$csp().
 angular.module('ui.bootstrap.tooltip').run(function() {!angular.$$csp().noInlineStyle && !angular.$$uibTooltipCss && angular.element(document).find('head').prepend('<style type="text/css">[uib-tooltip-popup].tooltip.top-left > .tooltip-arrow,[uib-tooltip-popup].tooltip.top-right > .tooltip-arrow,[uib-tooltip-popup].tooltip.bottom-left > .tooltip-arrow,[uib-tooltip-popup].tooltip.bottom-right > .tooltip-arrow,[uib-tooltip-popup].tooltip.left-top > .tooltip-arrow,[uib-tooltip-popup].tooltip.left-bottom > .tooltip-arrow,[uib-tooltip-popup].tooltip.right-top > .tooltip-arrow,[uib-tooltip-popup].tooltip.right-bottom > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.top-left > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.top-right > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.bottom-left > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.bottom-right > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.left-top > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.left-bottom > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.right-top > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.right-bottom > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.top-left > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.top-right > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.bottom-left > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.bottom-right > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.left-top > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.left-bottom > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.right-top > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.right-bottom > .tooltip-arrow,[uib-popover-popup].popover.top-left > .arrow,[uib-popover-popup].popover.top-right > .arrow,[uib-popover-popup].popover.bottom-left > .arrow,[uib-popover-popup].popover.bottom-right > .arrow,[uib-popover-popup].popover.left-top > .arrow,[uib-popover-popup].popover.left-bottom > .arrow,[uib-popover-popup].popover.right-top > .arrow,[uib-popover-popup].popover.right-bottom > .arrow,[uib-popover-html-popup].popover.top-left > .arrow,[uib-popover-html-popup].popover.top-right > .arrow,[uib-popover-html-popup].popover.bottom-left > .arrow,[uib-popover-html-popup].popover.bottom-right > .arrow,[uib-popover-html-popup].popover.left-top > .arrow,[uib-popover-html-popup].popover.left-bottom > .arrow,[uib-popover-html-popup].popover.right-top > .arrow,[uib-popover-html-popup].popover.right-bottom > .arrow,[uib-popover-template-popup].popover.top-left > .arrow,[uib-popover-template-popup].popover.top-right > .arrow,[uib-popover-template-popup].popover.bottom-left > .arrow,[uib-popover-template-popup].popover.bottom-right > .arrow,[uib-popover-template-popup].popover.left-top > .arrow,[uib-popover-template-popup].popover.left-bottom > .arrow,[uib-popover-template-popup].popover.right-top > .arrow,[uib-popover-template-popup].popover.right-bottom > .arrow{top:auto;bottom:auto;left:auto;right:auto;margin:0;}[uib-popover-popup].popover,[uib-popover-html-popup].popover,[uib-popover-template-popup].popover{display:block !important;}</style>'); angular.$$uibTooltipCss = true; });
 angular.module('ui.bootstrap.timepicker').run(function() {!angular.$$csp().noInlineStyle && !angular.$$uibTimepickerCss && angular.element(document).find('head').prepend('<style type="text/css">.uib-time input{width:50px;}</style>'); angular.$$uibTimepickerCss = true; });
 angular.module('ui.bootstrap.typeahead').run(function() {!angular.$$csp().noInlineStyle && !angular.$$uibTypeaheadCss && angular.element(document).find('head').prepend('<style type="text/css">[uib-typeahead-popup].dropdown-menu{display:block;}</style>'); angular.$$uibTypeaheadCss = true; });
-},{}],6:[function(_dereq_,module,exports){
+},{}],7:[function(_dereq_,module,exports){
 _dereq_('./dist/ui-bootstrap-tpls');
 
 module.exports = 'ui.bootstrap';
 
-},{"./dist/ui-bootstrap-tpls":5}],7:[function(_dereq_,module,exports){
+},{"./dist/ui-bootstrap-tpls":6}],8:[function(_dereq_,module,exports){
 /*!
  * angular-ui-mask
  * https://github.com/angular-ui/ui-mask
@@ -10492,7 +10700,7 @@ angular.module('ui.mask', [])
         ]);
 
 }());
-},{}],8:[function(_dereq_,module,exports){
+},{}],9:[function(_dereq_,module,exports){
 //https://github.com/angular/angular.js/pull/10732
 
 var angular = _dereq_('angular');
@@ -10500,7 +10708,7 @@ var mask = _dereq_('./dist/mask');
 
 module.exports = 'ui.mask';
 
-},{"./dist/mask":7,"angular":10}],9:[function(_dereq_,module,exports){
+},{"./dist/mask":8,"angular":11}],10:[function(_dereq_,module,exports){
 /**
  * @license AngularJS v1.5.8
  * (c) 2010-2016 Google, Inc. http://angularjs.org
@@ -42269,11 +42477,11 @@ $provide.value("$locale", {
 })(window);
 
 !window.angular.$$csp().noInlineStyle && window.angular.element(document.head).prepend('<style type="text/css">@charset "UTF-8";[ng\\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide:not(.ng-hide-animate){display:none !important;}ng\\:form{display:block;}.ng-animate-shim{visibility:hidden;}.ng-anchor{position:absolute;}</style>');
-},{}],10:[function(_dereq_,module,exports){
+},{}],11:[function(_dereq_,module,exports){
 _dereq_('./angular');
 module.exports = angular;
 
-},{"./angular":9}],11:[function(_dereq_,module,exports){
+},{"./angular":10}],12:[function(_dereq_,module,exports){
 // https://github.com/Gillardo/bootstrap-ui-datetime-picker
 // Version: 2.4.4
 // Released: 2016-09-19 
@@ -42934,7 +43142,7 @@ angular.module('ui.bootstrap.datetimepicker').run(['$templateCache', function($t
 
 }]);
 
-},{}],12:[function(_dereq_,module,exports){
+},{}],13:[function(_dereq_,module,exports){
 // This file is autogenerated via the `commonjs` Grunt task. You can require() this file in a CommonJS environment.
 _dereq_('../../js/transition.js')
 _dereq_('../../js/alert.js')
@@ -42948,7 +43156,7 @@ _dereq_('../../js/popover.js')
 _dereq_('../../js/scrollspy.js')
 _dereq_('../../js/tab.js')
 _dereq_('../../js/affix.js')
-},{"../../js/affix.js":13,"../../js/alert.js":14,"../../js/button.js":15,"../../js/carousel.js":16,"../../js/collapse.js":17,"../../js/dropdown.js":18,"../../js/modal.js":19,"../../js/popover.js":20,"../../js/scrollspy.js":21,"../../js/tab.js":22,"../../js/tooltip.js":23,"../../js/transition.js":24}],13:[function(_dereq_,module,exports){
+},{"../../js/affix.js":14,"../../js/alert.js":15,"../../js/button.js":16,"../../js/carousel.js":17,"../../js/collapse.js":18,"../../js/dropdown.js":19,"../../js/modal.js":20,"../../js/popover.js":21,"../../js/scrollspy.js":22,"../../js/tab.js":23,"../../js/tooltip.js":24,"../../js/transition.js":25}],14:[function(_dereq_,module,exports){
 /* ========================================================================
  * Bootstrap: affix.js v3.3.7
  * http://getbootstrap.com/javascript/#affix
@@ -43112,7 +43320,7 @@ _dereq_('../../js/affix.js')
 
 }(jQuery);
 
-},{}],14:[function(_dereq_,module,exports){
+},{}],15:[function(_dereq_,module,exports){
 /* ========================================================================
  * Bootstrap: alert.js v3.3.7
  * http://getbootstrap.com/javascript/#alerts
@@ -43208,7 +43416,7 @@ _dereq_('../../js/affix.js')
 
 }(jQuery);
 
-},{}],15:[function(_dereq_,module,exports){
+},{}],16:[function(_dereq_,module,exports){
 /* ========================================================================
  * Bootstrap: button.js v3.3.7
  * http://getbootstrap.com/javascript/#buttons
@@ -43335,7 +43543,7 @@ _dereq_('../../js/affix.js')
 
 }(jQuery);
 
-},{}],16:[function(_dereq_,module,exports){
+},{}],17:[function(_dereq_,module,exports){
 /* ========================================================================
  * Bootstrap: carousel.js v3.3.7
  * http://getbootstrap.com/javascript/#carousel
@@ -43574,7 +43782,7 @@ _dereq_('../../js/affix.js')
 
 }(jQuery);
 
-},{}],17:[function(_dereq_,module,exports){
+},{}],18:[function(_dereq_,module,exports){
 /* ========================================================================
  * Bootstrap: collapse.js v3.3.7
  * http://getbootstrap.com/javascript/#collapse
@@ -43788,7 +43996,7 @@ _dereq_('../../js/affix.js')
 
 }(jQuery);
 
-},{}],18:[function(_dereq_,module,exports){
+},{}],19:[function(_dereq_,module,exports){
 /* ========================================================================
  * Bootstrap: dropdown.js v3.3.7
  * http://getbootstrap.com/javascript/#dropdowns
@@ -43955,7 +44163,7 @@ _dereq_('../../js/affix.js')
 
 }(jQuery);
 
-},{}],19:[function(_dereq_,module,exports){
+},{}],20:[function(_dereq_,module,exports){
 /* ========================================================================
  * Bootstrap: modal.js v3.3.7
  * http://getbootstrap.com/javascript/#modals
@@ -44296,7 +44504,7 @@ _dereq_('../../js/affix.js')
 
 }(jQuery);
 
-},{}],20:[function(_dereq_,module,exports){
+},{}],21:[function(_dereq_,module,exports){
 /* ========================================================================
  * Bootstrap: popover.js v3.3.7
  * http://getbootstrap.com/javascript/#popovers
@@ -44406,7 +44614,7 @@ _dereq_('../../js/affix.js')
 
 }(jQuery);
 
-},{}],21:[function(_dereq_,module,exports){
+},{}],22:[function(_dereq_,module,exports){
 /* ========================================================================
  * Bootstrap: scrollspy.js v3.3.7
  * http://getbootstrap.com/javascript/#scrollspy
@@ -44580,7 +44788,7 @@ _dereq_('../../js/affix.js')
 
 }(jQuery);
 
-},{}],22:[function(_dereq_,module,exports){
+},{}],23:[function(_dereq_,module,exports){
 /* ========================================================================
  * Bootstrap: tab.js v3.3.7
  * http://getbootstrap.com/javascript/#tabs
@@ -44737,7 +44945,7 @@ _dereq_('../../js/affix.js')
 
 }(jQuery);
 
-},{}],23:[function(_dereq_,module,exports){
+},{}],24:[function(_dereq_,module,exports){
 /* ========================================================================
  * Bootstrap: tooltip.js v3.3.7
  * http://getbootstrap.com/javascript/#tooltip
@@ -45259,7 +45467,7 @@ _dereq_('../../js/affix.js')
 
 }(jQuery);
 
-},{}],24:[function(_dereq_,module,exports){
+},{}],25:[function(_dereq_,module,exports){
 /* ========================================================================
  * Bootstrap: transition.js v3.3.7
  * http://getbootstrap.com/javascript/#transitions
@@ -45320,7 +45528,7 @@ _dereq_('../../js/affix.js')
 
 }(jQuery);
 
-},{}],25:[function(_dereq_,module,exports){
+},{}],26:[function(_dereq_,module,exports){
 /*!
  * EventEmitter2
  * https://github.com/hij1nx/EventEmitter2
@@ -46043,212 +46251,6 @@ _dereq_('../../js/affix.js')
     window.EventEmitter2 = EventEmitter;
   }
 }();
-
-},{}],26:[function(_dereq_,module,exports){
-'use strict';
-module.exports = {
-  /**
-   * Determine if a component is a layout component or not.
-   *
-   * @param {Object} component
-   *   The component to check.
-   *
-   * @returns {Boolean}
-   *   Whether or not the component is a layout component.
-   */
-  isLayoutComponent: function isLayoutComponent(component) {
-    return (
-      (component.columns && Array.isArray(component.columns)) ||
-      (component.rows && Array.isArray(component.rows)) ||
-      (component.components && Array.isArray(component.components))
-    ) ? true : false;
-  },
-
-  /**
-   * Iterate through each component within a form.
-   *
-   * @param {Object} components
-   *   The components to iterate.
-   * @param {Function} fn
-   *   The iteration function to invoke for each component.
-   * @param {Boolean} includeAll
-   *   Whether or not to include layout components.
-   * @param {String} path
-   *   The current data path of the element. Example: data.user.firstName
-   */
-  eachComponent: function eachComponent(components, fn, includeAll, path) {
-    if (!components) return;
-    path = path || '';
-    components.forEach(function(component) {
-      var hasColumns = component.columns && Array.isArray(component.columns);
-      var hasRows = component.rows && Array.isArray(component.rows);
-      var hasComps = component.components && Array.isArray(component.components);
-      var noRecurse = false;
-      var newPath = component.key ? (path ? (path + '.' + component.key) : component.key) : '';
-
-      if (includeAll || component.tree || (!hasColumns && !hasRows && !hasComps)) {
-        noRecurse = fn(component, newPath);
-      }
-
-      var subPath = function() {
-        if (component.key && ((component.type === 'datagrid') || (component.type === 'container'))) {
-          return newPath;
-        }
-        return path;
-      };
-
-      if (!noRecurse) {
-        if (hasColumns) {
-          component.columns.forEach(function(column) {
-            eachComponent(column.components, fn, includeAll, subPath());
-          });
-        }
-
-        else if (hasRows) {
-          [].concat.apply([], component.rows).forEach(function(row) {
-            eachComponent(row.components, fn, includeAll, subPath());
-          });
-        }
-
-        else if (hasComps) {
-          eachComponent(component.components, fn, includeAll, subPath());
-        }
-      }
-    });
-  },
-
-  /**
-   * Get a component by its key
-   *
-   * @param {Object} components
-   *   The components to iterate.
-   * @param {String} key
-   *   The key of the component to get.
-   *
-   * @returns {Object}
-   *   The component that matches the given key, or undefined if not found.
-   */
-  getComponent: function getComponent(components, key) {
-    var result;
-    module.exports.eachComponent(components, function(component) {
-      if (component.key === key) {
-        result = component;
-      }
-    });
-    return result;
-  },
-
-  /**
-   * Flatten the form components for data manipulation.
-   *
-   * @param {Object} components
-   *   The components to iterate.
-   * @param {Boolean} includeAll
-   *   Whether or not to include layout components.
-   *
-   * @returns {Object}
-   *   The flattened components map.
-   */
-  flattenComponents: function flattenComponents(components, includeAll) {
-    var flattened = {};
-    module.exports.eachComponent(components, function(component, path) {
-      flattened[path] = component;
-    }, includeAll);
-    return flattened;
-  },
-
-  /**
-   * Checks the conditions for a provided component and data.
-   *
-   * @param component
-   *   The component to check for the condition.
-   * @param compData
-   *   The data for this conditional check.
-   * @returns {boolean}
-   */
-  checkCondition: function(component, data) {
-    if (component.hasOwnProperty('customConditional') && component.customConditional) {
-      try {
-        var script = '(function() { var show = true;';
-        script += component.customConditional.toString();
-        script += '; return show; })()';
-        var result = eval(script);
-        return result.toString() === 'true';
-      }
-      catch (e) {
-        console.warn('An error occurred in a custom conditional statement for component ' + component.key, e);
-        return true;
-      }
-    }
-    else if (component.hasOwnProperty('conditional') && component.conditional && component.conditional.when) {
-      var cond = component.conditional;
-      var value = this.getValue({data: data}, cond.when);
-      // Will return null if not found.
-      if (value === null || typeof value === 'undefined') {
-        value = component.hasOwnProperty('defaultValue') ? component.defaultValue : '';
-      }
-      // Special check for selectboxes component.
-      if (typeof value === 'object' && value.hasOwnProperty(cond.eq)) {
-        return value[cond.eq].toString() === cond.show.toString();
-      }
-      return (value.toString() === cond.eq.toString()) === (cond.show.toString() === 'true');
-    }
-
-    // Default to show.
-    return true;
-  },
-
-  /**
-   * Get the value for a component key, in the given submission.
-   *
-   * @param {Object} submission
-   *   A submission object to search.
-   * @param {String} key
-   *   A for components API key to search for.
-   */
-  getValue: function getValue(submission, key) {
-    var data = submission.data || {};
-
-    var search = function search(data) {
-      var i;
-      var value;
-
-      if (!data) {
-        return null;
-      }
-
-      if (data instanceof Array) {
-        for (i = 0; i < data.length; i++) {
-          if (typeof data[i] === 'object') {
-            value = search(data[i]);
-          }
-
-          if (value) {
-            return value;
-          }
-        }
-      }
-      else if (typeof data === 'object') {
-        if (data.hasOwnProperty(key)) {
-          return data[key];
-        }
-
-        var keys = Object.keys(data);
-        for (i = 0; i < keys.length; i++) {
-          if (typeof data[keys[i]] === 'object') {
-            value = search(data[keys[i]]);
-          }
-
-          if (value) {
-            return value;
-          }
-        }
-      }
-    };
-
-    return search(data);
-  }
-};
 
 },{}],27:[function(_dereq_,module,exports){
 'use strict';
@@ -47105,7 +47107,7 @@ Formio.deregisterPlugin = function(plugin) {
 
 module.exports = Formio;
 
-},{"./providers":28,"eventemitter2":25,"native-promise-only":35,"shallow-copy":38,"whatwg-fetch":41}],28:[function(_dereq_,module,exports){
+},{"./providers":28,"eventemitter2":26,"native-promise-only":35,"shallow-copy":38,"whatwg-fetch":41}],28:[function(_dereq_,module,exports){
 module.exports = {
   storage: _dereq_('./storage')
 };
@@ -72153,8 +72155,8 @@ var formioUtils = _dereq_('formio-utils');
 
 module.exports = function() {
   return {
-    checkVisible: function(component, data) {
-      if (data && !formioUtils.checkCondition(component, data)) {
+    checkVisible: function(component, data, submission) {
+      if (data && !formioUtils.checkCondition(component, data, submission)) {
         if (data.hasOwnProperty(component.key)) {
           delete data[component.key];
         }
@@ -72162,23 +72164,13 @@ module.exports = function() {
       }
       return true;
     },
-    isVisible: function(component, subData, data, hide) {
+    isVisible: function(component, data, submission, hide) {
       // If the component is in the hideComponents array, then hide it by default.
       if (Array.isArray(hide) && (hide.indexOf(component.key) !== -1)) {
         return false;
       }
 
-      // First check local data.
-      if (!this.checkVisible(component, subData)) {
-        return false;
-      }
-
-      // Now check global data.
-      if (!this.checkVisible(component, data)) {
-        return false;
-      }
-
-      return true;
+      return this.checkVisible(component, data, submission);
     },
     flattenComponents: formioUtils.flattenComponents,
     eachComponent: formioUtils.eachComponent,
@@ -72245,7 +72237,7 @@ module.exports = function() {
   };
 };
 
-},{"formio-utils":26}],87:[function(_dereq_,module,exports){
+},{"formio-utils":1}],87:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$q',
@@ -72444,7 +72436,7 @@ _dereq_('bootstrap-ui-datetime-picker/dist/datetime-picker');
 _dereq_('./formio');
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./formio":96,"angular":10,"angular-file-saver":1,"angular-moment":2,"angular-sanitize":4,"angular-ui-bootstrap":6,"angular-ui-mask":8,"bootstrap":12,"bootstrap-ui-datetime-picker/dist/datetime-picker":11,"jquery":33,"ng-file-upload":37,"signature_pad":39,"ui-select/dist/select":40}],96:[function(_dereq_,module,exports){
+},{"./formio":96,"angular":11,"angular-file-saver":2,"angular-moment":3,"angular-sanitize":5,"angular-ui-bootstrap":7,"angular-ui-mask":9,"bootstrap":13,"bootstrap-ui-datetime-picker/dist/datetime-picker":12,"jquery":33,"ng-file-upload":37,"signature_pad":39,"ui-select/dist/select":40}],96:[function(_dereq_,module,exports){
 "use strict";
 _dereq_('./polyfills/polyfills');
 

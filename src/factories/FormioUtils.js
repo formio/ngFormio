@@ -2,8 +2,8 @@ var formioUtils = require('formio-utils');
 
 module.exports = function() {
   return {
-    checkVisible: function(component, data) {
-      if (data && !formioUtils.checkCondition(component, data)) {
+    checkVisible: function(component, data, submission) {
+      if (data && !formioUtils.checkCondition(component, data, submission)) {
         if (data.hasOwnProperty(component.key)) {
           delete data[component.key];
         }
@@ -11,23 +11,13 @@ module.exports = function() {
       }
       return true;
     },
-    isVisible: function(component, subData, data, hide) {
+    isVisible: function(component, data, submission, hide) {
       // If the component is in the hideComponents array, then hide it by default.
       if (Array.isArray(hide) && (hide.indexOf(component.key) !== -1)) {
         return false;
       }
 
-      // First check local data.
-      if (!this.checkVisible(component, subData)) {
-        return false;
-      }
-
-      // Now check global data.
-      if (!this.checkVisible(component, data)) {
-        return false;
-      }
-
-      return true;
+      return this.checkVisible(component, data, submission);
     },
     flattenComponents: formioUtils.flattenComponents,
     eachComponent: formioUtils.eachComponent,
