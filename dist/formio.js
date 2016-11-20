@@ -7028,14 +7028,6 @@ module.exports = function() {
         return false;
       }
 
-      var allData;
-      if (subData) {
-        allData = Object.assign({}, data, subData);
-      }
-      else {
-        allData = data;
-      }
-
       // Show by default.
       var shown = true;
 
