@@ -2,22 +2,25 @@ var formioUtils = require('formio-utils');
 
 module.exports = function() {
   return {
-    checkVisible: function(component, data, submission) {
-      if (data && !formioUtils.checkCondition(component, data, submission)) {
-        if (data.hasOwnProperty(component.key)) {
+    checkVisible: function(component, row, data) {
+      if (!formioUtils.checkCondition(component, row, data)) {
+        if (row && row.hasOwnProperty(component.key)) {
+          delete row[component.key];
+        }
+        if (data && data.hasOwnProperty(component.key)) {
           delete data[component.key];
         }
         return false;
       }
       return true;
     },
-    isVisible: function(component, data, submission, hide) {
+    isVisible: function(component, row, data, hide) {
       // If the component is in the hideComponents array, then hide it by default.
-      if (Array.isArray(hide) && (hide.indexOf(component.key) !== -1)) {
+      if (hide && Array.isArray(hide) && (hide.indexOf(component.key) !== -1)) {
         return false;
       }
 
-      return this.checkVisible(component, data, submission);
+      return this.checkVisible(component, row, data);
     },
     flattenComponents: formioUtils.flattenComponents,
     eachComponent: formioUtils.eachComponent,

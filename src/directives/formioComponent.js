@@ -55,10 +55,10 @@ module.exports = [
           };
 
           // See if this component is visible or not.
-          $scope.isVisible = function(component, data) {
+          $scope.isVisible = function(component, row) {
             return FormioUtils.isVisible(
               component,
-              data,
+              row,
               $scope.submission.data,
               $scope.hideComponents
             );

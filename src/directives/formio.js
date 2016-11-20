@@ -79,16 +79,16 @@ module.exports = function() {
           return !form.$valid;
         };
 
-        $scope.isVisible = function(component, data) {
+        $scope.isVisible = function(component, row) {
           return FormioUtils.isVisible(
             component,
-            data,
+            row,
             $scope.submission.data,
             $scope.hideComponents
           );
         };
 
-        $scope.isDisabled = function(component, data) {
+        $scope.isDisabled = function(component) {
           return $scope.readOnly || component.disabled || (Array.isArray($scope.disableComponents) && $scope.disableComponents.indexOf(component.key) !== -1);
         };
 
