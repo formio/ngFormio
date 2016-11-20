@@ -1,4 +1,4 @@
-/*! ng-formio v2.4.5 | https://unpkg.com/ng-formio@2.4.5/LICENSE.txt */
+/*! ng-formio v2.4.6 | https://unpkg.com/ng-formio@2.4.6/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 /*!
  * EventEmitter2
@@ -2982,6 +2982,7 @@ module.exports = function(app) {
                 return 'submit';
               case 'reset':
                 return 'reset';
+              case 'event':
               case 'oauth':
               default:
                 return 'button';
@@ -2992,6 +2993,9 @@ module.exports = function(app) {
             switch (settings.action) {
               case 'submit':
                 return;
+              case 'event':
+                $scope.$emit($scope.component.event, $scope.data);
+                break;
               case 'reset':
                 $scope.resetForm();
                 break;
@@ -7022,47 +7026,32 @@ var formioUtils = _dereq_('formio-utils');
 
 module.exports = function() {
   return {
+    checkVisible: function(component, data) {
+      if (data && !formioUtils.checkCondition(component, data)) {
+        if (data.hasOwnProperty(component.key)) {
+          delete data[component.key];
+        }
+        return false;
+      }
+      return true;
+    },
     isVisible: function(component, subData, data, hide) {
       // If the component is in the hideComponents array, then hide it by default.
       if (Array.isArray(hide) && (hide.indexOf(component.key) !== -1)) {
         return false;
       }
 
-      // Show by default.
-      var shown = true;
-
-      // Check local submission first.
-      if (subData) {
-        shown &= formioUtils.checkCondition(component, subData);
+      // First check local data.
+      if (!this.checkVisible(component, subData)) {
+        return false;
       }
 
-      // Check global data.
-      if (shown && data) {
-        shown &= formioUtils.checkCondition(component, data);
+      // Now check global data.
+      if (!this.checkVisible(component, data)) {
+        return false;
       }
 
-      var timestamp = Date.now();
-
-      // Break infinite loops when components show each other.
-      component.count = component.count || 0;
-      var diff = timestamp - (component.lastChanged || 0);
-      if (component.hasOwnProperty('visible') && component.count >= 3 && (diff < 100)) {
-        return component.visible;
-      }
-      else {
-        component.count = 0;
-      }
-
-      component.visible = shown;
-      component.lastChanged = timestamp;
-      component.count++;
-
-      // Make sure to delete the data for invisible fields.
-      if (!shown && data && data.hasOwnProperty(component.key)) {
-        delete data[component.key];
-      }
-
-      return shown;
+      return true;
     },
     flattenComponents: formioUtils.flattenComponents,
     eachComponent: formioUtils.eachComponent,
