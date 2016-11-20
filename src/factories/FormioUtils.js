@@ -8,15 +8,19 @@ module.exports = function() {
         return false;
       }
 
-      var allData;
+      // Show by default.
+      var shown = true;
+
+      // Check local submission first.
       if (subData) {
-        allData = Object.assign({}, data, subData);
-      }
-      else {
-        allData = data;
+        shown &= formioUtils.checkCondition(component, subData);
       }
 
-      var shown = formioUtils.checkCondition(component, allData);
+      // Check global data.
+      if (shown && data) {
+        shown &= formioUtils.checkCondition(component, data);
+      }
+
       var timestamp = Date.now();
 
       // Break infinite loops when components show each other.
