@@ -27,6 +27,7 @@ module.exports = function(app) {
                 return 'submit';
               case 'reset':
                 return 'reset';
+              case 'event':
               case 'oauth':
               default:
                 return 'button';
@@ -37,6 +38,9 @@ module.exports = function(app) {
             switch (settings.action) {
               case 'submit':
                 return;
+              case 'event':
+                $scope.$emit($scope.component.event, $scope.data);
+                break;
               case 'reset':
                 $scope.resetForm();
                 break;
