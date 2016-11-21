@@ -52,6 +52,7 @@ module.exports = function() {
       'FormioScope',
       'FormioUtils',
       '$http',
+      '$timeout',
       function(
         $scope,
         $compile,
@@ -59,7 +60,8 @@ module.exports = function() {
         Formio,
         FormioScope,
         FormioUtils,
-        $http
+        $http,
+        $timeout
       ) {
         var session = ($scope.storage && !$scope.readOnly) ? localStorage.getItem($scope.storage) : false;
         if (session) {
@@ -90,7 +92,7 @@ module.exports = function() {
           $scope.wizardLoaded = false;
           $scope.page.components = [];
           $scope.page.components.length = 0;
-          setTimeout(function() {
+          $timeout(function() {
             // If the page is past the components length, try to clear first.
             if ($scope.currentPage >= $scope.pages.length) {
               $scope.clear();
@@ -110,8 +112,8 @@ module.exports = function() {
             }
             $scope.wizardLoaded = true;
             $scope.$emit('wizardPage', $scope.currentPage);
-            setTimeout($scope.$apply.bind($scope), 10);
-          }, 1);
+            $timeout($scope.$apply.bind($scope));
+          });
         };
 
         if (!$scope.form && $scope.src) {
