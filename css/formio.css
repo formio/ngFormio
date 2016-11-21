@@ -138,6 +138,10 @@ input[type="password"][draggable="true"] {
   margin-top: 4px;
 }
 
+.form-field-type-table .form-group {
+  margin-bottom: 0px;
+}
+
 /* FA-877 - Fix component widths in the data grid with prefix/sufix. */
 .input-group {
   width: 100%;
