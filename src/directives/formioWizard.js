@@ -66,14 +66,6 @@ module.exports = function() {
           session = angular.fromJson(session);
         }
 
-        var getForm = function() {
-          var element = $element.find('#formio-wizard-form');
-          if (!element.length) {
-            return {};
-          }
-          return element.children().scope().formioForm;
-        };
-
         $scope.formio = null;
         $scope.page = {};
         $scope.pages = [];
@@ -83,19 +75,14 @@ module.exports = function() {
           $scope.submission = session ? {data: session.data} : {data: {}};
         }
         $scope.currentPage = session ? session.page : 0;
-
         $scope.formioAlerts = [];
-        // Shows the given alerts (single or array), and dismisses old alerts
-        this.showAlerts = $scope.showAlerts = function(alerts) {
-          $scope.formioAlerts = [].concat(alerts);
-        };
 
-        $scope.clear = function() {
-          if ($scope.storage && !$scope.readOnly) {
-            localStorage.setItem($scope.storage, '');
+        var getForm = function() {
+          var element = $element.find('#formio-wizard-form');
+          if (!element.length) {
+            return {};
           }
-          $scope.submission = {data: {}};
-          $scope.currentPage = 0;
+          return element.children().scope().formioForm;
         };
 
         // Show the current page.
@@ -113,23 +100,34 @@ module.exports = function() {
             }));
           }
           $scope.page.components = $scope.pages[$scope.currentPage].components;
-          var pageElement = angular.element(document.createElement('formio'));
-          $scope.wizardElement.html($compile(pageElement.attr({
-            src: "'" + $scope.src + "'",
-            form: 'page',
-            submission: 'submission',
-            'read-only': 'readOnly',
-            'hide-components': 'hideComponents',
-            'disable-components': 'disableComponents',
-            'formio-options': 'formioOptions',
-            id: 'formio-wizard-form'
-          }))($scope));
           $scope.wizardLoaded = true;
           $scope.formioAlerts = [];
           if (scroll) {
             window.scrollTo(0, $scope.wizardTop);
           }
           $scope.$emit('wizardPage', $scope.currentPage);
+        };
+
+        if (!$scope.form && $scope.src) {
+          (new Formio($scope.src)).loadForm().then(function(form) {
+            $scope.form = form;
+            if (!$scope.wizardLoaded) {
+              showPage();
+            }
+          });
+        }
+
+        // Shows the given alerts (single or array), and dismisses old alerts
+        this.showAlerts = $scope.showAlerts = function(alerts) {
+          $scope.formioAlerts = [].concat(alerts);
+        };
+
+        $scope.clear = function() {
+          if ($scope.storage && !$scope.readOnly) {
+            localStorage.setItem($scope.storage, '');
+          }
+          $scope.submission = {data: {}};
+          $scope.currentPage = 0;
         };
 
         // Check for errors.

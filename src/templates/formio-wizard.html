@@ -1,7 +1,9 @@
 <div class="formio-wizard-wrapper">
   <div class="row bs-wizard" style="border-bottom:0;" ng-class="{hasTitles: hasTitles}">
     <div ng-class="{disabled: ($index > currentPage), active: ($index == currentPage), complete: ($index < currentPage), noTitle: !page.title}" class="{{ colclass }} bs-wizard-step" ng-repeat="page in pages track by $index">
-      <div class="text-center bs-wizard-stepnum" ng-if="page.title">{{ page.title }}</div>
+      <div class="bs-wizard-stepnum-wrapper">
+        <div class="text-center bs-wizard-stepnum" ng-if="page.title">{{ page.title }}</div>
+      </div>
       <div class="progress"><div class="progress-bar progress-bar-primary"></div></div>
       <a ng-click="goto($index)" class="bs-wizard-dot bg-primary"><div class="bs-wizard-dot-inner bg-success"></div></a>
     </div>
@@ -9,7 +11,18 @@
   <style type="text/css">.bs-wizard > .bs-wizard-step:first-child { margin-left: {{ margin }}%; }</style>
   <i ng-show="!wizardLoaded" id="formio-loading" style="font-size: 2em;" class="glyphicon glyphicon-refresh glyphicon-spin"></i>
   <div ng-repeat="alert in formioAlerts track by $index" class="alert alert-{{ alert.type }}" role="alert">{{ alert.message | formioTranslate }}</div>
-  <div class="formio-wizard"></div>
+  <div class="formio-wizard">
+    <formio
+      ng-if="page.components"
+      submission="submission"
+      form="page"
+      read-only="readOnly"
+      hide-components="hideComponents"
+      disable-components="disableComponents"
+      formio-options="formioOptions"
+      id="formio-wizard-form"
+    ></formio>
+  </div>
   <ul ng-show="wizardLoaded" class="list-inline">
     <li><a class="btn btn-default" ng-click="cancel()">Cancel</a></li>
     <li ng-if="currentPage > 0"><a class="btn btn-primary" ng-click="prev()">Previous</a></li>
