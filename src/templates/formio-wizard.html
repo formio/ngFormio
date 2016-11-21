@@ -13,7 +13,7 @@
   <div ng-repeat="alert in formioAlerts track by $index" class="alert alert-{{ alert.type }}" role="alert">{{ alert.message | formioTranslate }}</div>
   <div class="formio-wizard">
     <formio
-      ng-if="page.components"
+      ng-if="wizardLoaded"
       submission="submission"
       form="page"
       read-only="readOnly"

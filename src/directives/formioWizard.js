@@ -87,25 +87,31 @@ module.exports = function() {
 
         // Show the current page.
         var showPage = function(scroll) {
-          // If the page is past the components length, try to clear first.
-          if ($scope.currentPage >= $scope.pages.length) {
-            $scope.clear();
-          }
-
           $scope.wizardLoaded = false;
-          if ($scope.storage && !$scope.readOnly) {
-            localStorage.setItem($scope.storage, angular.toJson({
-              page: $scope.currentPage,
-              data: $scope.submission.data
-            }));
-          }
-          $scope.page.components = $scope.pages[$scope.currentPage].components;
-          $scope.wizardLoaded = true;
-          $scope.formioAlerts = [];
-          if (scroll) {
-            window.scrollTo(0, $scope.wizardTop);
-          }
-          $scope.$emit('wizardPage', $scope.currentPage);
+          $scope.page.components = [];
+          $scope.page.components.length = 0;
+          setTimeout(function() {
+            // If the page is past the components length, try to clear first.
+            if ($scope.currentPage >= $scope.pages.length) {
+              $scope.clear();
+            }
+
+            if ($scope.storage && !$scope.readOnly) {
+              localStorage.setItem($scope.storage, angular.toJson({
+                page: $scope.currentPage,
+                data: $scope.submission.data
+              }));
+            }
+
+            $scope.page.components = $scope.pages[$scope.currentPage].components;
+            $scope.formioAlerts = [];
+            if (scroll) {
+              window.scrollTo(0, $scope.wizardTop);
+            }
+            $scope.wizardLoaded = true;
+            $scope.$emit('wizardPage', $scope.currentPage);
+            setTimeout($scope.$apply.bind($scope), 10);
+          }, 1);
         };
 
         if (!$scope.form && $scope.src) {
