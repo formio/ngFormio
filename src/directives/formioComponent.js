@@ -56,6 +56,10 @@ module.exports = [
 
           // See if this component is visible or not.
           $scope.isVisible = function(component, row) {
+            if ($scope.builder) {
+              return true;
+            }
+
             return FormioUtils.isVisible(
               component,
               row,
@@ -71,7 +75,7 @@ module.exports = [
 
           // Calculate value when data changes.
           if ($scope.component.calculateValue) {
-            $scope.$watch('data', function() {
+            var watchComponentCalculate = $scope.$watch('data', function() {
               try {
                 $scope.data[$scope.component.key] = eval('(function(data) { var value = [];' + $scope.component.calculateValue.toString() + '; return value; })($scope.data)');
               }
@@ -81,6 +85,11 @@ module.exports = [
                 /* eslint-enable no-console */
               }
             }, true);
+            // FOR-71
+            if ($scope.builder) {
+              console.log('Cancel watchComponentCalculate');
+              watchComponentCalculate();
+            }
           }
 
           // Get the settings.
@@ -154,7 +163,7 @@ module.exports = [
             }
           }
 
-          $scope.$watch('component.multiple', function() {
+          var watchComponentMultiple = $scope.$watch('component.multiple', function() {
             var value = null;
             // Establish a default for data.
             $scope.data = $scope.data || {};
@@ -226,6 +235,11 @@ module.exports = [
               }
             }
           });
+          // FOR-71
+          if ($scope.builder) {
+            console.log('Cancel watchComponentMultiple');
+            watchComponentMultiple()
+          }
 
           // Set the component name.
           $scope.componentId = $scope.component.key;
