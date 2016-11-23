@@ -9,7 +9,7 @@
     <formio-component
       ng-repeat="component in form.components track by $index"
       component="component"
-      ng-if="isVisible(component)"
+      ng-if="builder ? '::true' : isVisible(component)"
       data="submission.data"
       formio-form="formioForm"
       formio="formio"
