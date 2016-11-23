@@ -48,7 +48,7 @@ module.exports = function() {
         });
 
         if (!$scope._src) {
-          $scope.$watch('src', function(src) {
+          var watchSrc = $scope.$watch('src', function(src) {
             if (!src) {
               return;
             }
@@ -58,6 +58,11 @@ module.exports = function() {
               submission: true
             });
           });
+
+          // FOR-71
+          if ($scope.builder) {
+            watchSrc();
+          }
         }
 
         // Create the formio object.

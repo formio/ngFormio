@@ -10,7 +10,7 @@ module.exports = function(app) {
           return data ? 'Yes' : 'No';
         },
         controller: ['$scope', function($scope) {
-          // FA-850 - Ensure the checked value is always a boolen object when loaded, then unbind the watch.
+          // FA-850 - Ensure the checked value is always a boolean object when loaded, then unbind the watch.
           var loadComplete = $scope.$watch('data.' + $scope.component.key, function() {
             var boolean = {
               true: true,

@@ -357,7 +357,7 @@ module.exports = function() {
           });
 
           if (hasConditionalPages) {
-            $scope.$watch('submission.data', function(data) {
+            var watchData = $scope.$watch('submission.data', function(data) {
               var newPages = [];
               angular.forEach(allPages, function(page) {
                 if (FormioUtils.isVisible(page, null, data)) {
@@ -368,6 +368,11 @@ module.exports = function() {
               updatePages();
               setTimeout($scope.$apply.bind($scope), 10);
             }, true);
+
+            // FOR-71
+            if ($scope.builder) {
+              watchData();
+            }
           }
 
           $scope.form = $scope.form ? angular.merge($scope.form, angular.copy(form)) : angular.copy(form);
@@ -378,7 +383,7 @@ module.exports = function() {
           showPage();
         };
 
-        $scope.$watch('form', function(form) {
+        var watchForm = $scope.$watch('form', function(form) {
           if (
             $scope.src ||
             !form ||
@@ -393,6 +398,11 @@ module.exports = function() {
           $scope.formio = new Formio(formUrl);
           setForm(form);
         });
+
+        // FOR-71
+        if ($scope.builder) {
+          watchForm();
+        }
 
         // When the components length changes update the pages.
         $scope.$watch('form.components.length', updatePages);
