@@ -1,6 +1,6 @@
 <div class="panel panel-{{ component.theme }}" id="{{ component.key }}">
-  <div ng-if="component.title" class="panel-heading">
-    <h3 class="panel-title">{{ component.title }}</h3>
+  <div ng-if="::component.title" class="panel-heading">
+    <h3 class="panel-title">{{ ::component.title }}</h3>
   </div>
   <div class="panel-body">
     <formio-component-view
@@ -10,7 +10,7 @@
       submission="submission"
       form="form"
       ignore="ignore"
-      ng-if="isVisible(_component, data)"
+      ng-if="builder ? '::true' : isVisible(_component, data)"
     ></formio-component-view>
   </div>
 </div>
