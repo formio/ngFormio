@@ -18,7 +18,8 @@ module.exports = [
         formioForm: '=',
         readOnly: '=',
         gridRow: '=',
-        gridCol: '='
+        gridCol: '=',
+        builder: '=?'
       },
       templateUrl: 'formio/component.html',
       link: function(scope, el, attrs, formioCtrl) {
