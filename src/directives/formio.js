@@ -72,6 +72,7 @@ module.exports = function() {
         });
 
         $scope.checkErrors = function(form) {
+          console.log('checkErrors');
           if (form.submitting) {
             return true;
           }
@@ -85,6 +86,7 @@ module.exports = function() {
         };
 
         $scope.isVisible = function(component, row) {
+          console.log('isVisible');
           return FormioUtils.isVisible(
             component,
             row,
@@ -94,6 +96,7 @@ module.exports = function() {
         };
 
         $scope.isDisabled = function(component) {
+          console.log('isDisabled');
           return $scope.readOnly || component.disabled || (Array.isArray($scope.disableComponents) && $scope.disableComponents.indexOf(component.key) !== -1);
         };
 
