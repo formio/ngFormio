@@ -614,10 +614,13 @@ angular
       $rootScope.teamForm = AppConfig.teamForm;
       $rootScope.feedbackForm = AppConfig.feedbackForm;
       $rootScope.resetPassForm = AppConfig.resetPassForm;
+      $rootScope.pdfUploadForm = AppConfig.pdfUploadForm;
       $rootScope.planForm = AppConfig.planForm;
       $rootScope.apiBase = AppConfig.apiBase;
       $rootScope.apiProtocol = AppConfig.apiProtocol;
       $rootScope.apiServer = AppConfig.apiServer;
+
+      console.log(AppConfig.pdfUploadForm);
 
       // Start the tutorial.
       $rootScope.startTutorial = function() {

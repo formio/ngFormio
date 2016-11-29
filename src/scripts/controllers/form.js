@@ -228,7 +228,15 @@ app.directive('formList', function() {
     ]
   };
 });
-
+app.directive('customOnChange', function() {
+  return {
+    restrict: 'A',
+    link: function (scope, element, attrs) {
+      var onChangeHandler = scope.$eval(attrs.customOnChange);
+      element.bind('change', onChangeHandler);
+    }
+  };
+});
 app.controller('FormController', [
   '$scope',
   '$state',
@@ -243,6 +251,8 @@ app.controller('FormController', [
   'ResourceAccessLabels',
   'GoogleAnalytics',
   '$q',
+  'ngDialog',
+  'Upload',
   function(
     $scope,
     $state,
@@ -256,12 +266,39 @@ app.controller('FormController', [
     AccessLabels,
     ResourceAccessLabels,
     GoogleAnalytics,
-    $q
+    $q,
+    ngDialog,
+    Upload
   ) {
     // Project information.
     $scope.projectId = $stateParams.projectId;
+    $scope.upload = function (file) {
+      $scope.uploading = true;
+      var fileName = $stateParams.formId || FormioUtils.uniqueName(file.name);
+      var filePath = '/pdf/' + $scope.projectId + '/' + fileName;
+      Upload.upload({
+        url: AppConfig.pdfServer + filePath,
+        data: {file: file},
+        headers: {'x-jwt-token': Formio.getToken()}
+      }).then(function () {
+        $scope.uploading = false;
+        if (!$scope.form.settings) {
+          $scope.form.settings = {};
+        }
+        $scope.form.settings.pdf = AppConfig.pdfHost + filePath.replace(/\.pdf$/, '') + '.html';
+        ngDialog.close();
+      }, function (resp) {
+        console.warn(resp.status);
+        $scope.uploading = false;
+        ngDialog.close();
+      }, function (evt) {
+        $scope.uploadProgress = parseInt(100.0 * evt.loaded / evt.total);
+      });
+    };
 
     // Resource information.
+    $scope.uploading = false;
+    $scope.uploadProgress = 0;
     $scope.formId = $stateParams.formId;
     $scope.formUrl = '/project/' + $scope.projectId + '/form';
     $scope.formUrl += $stateParams.formId ? ('/' + $stateParams.formId) : '';
@@ -273,8 +310,19 @@ app.controller('FormController', [
       {
         name: 'wizard',
         title: 'Wizard'
+      },
+      {
+        name: 'pdf',
+        title: 'PDF'
       }
     ];
+
+    $scope.uploadPDF = function() {
+      ngDialog.open({
+        template: 'pdfupload.html',
+        scope: $scope
+      });
+    };
     var formType = $stateParams.formType || 'form';
     $scope.capitalize = _.capitalize;
     $scope.form = {
@@ -283,7 +331,8 @@ app.controller('FormController', [
       type: formType,
       components: [],
       access: [],
-      submissionAccess: []
+      submissionAccess: [],
+      settings: {}
     };
 
     // Match name of form to title if not customized.

@@ -22,7 +22,10 @@
       <div class="col-lg-2 col-md-4 col-sm-4">
         <div id="form-group-display" class="form-group">
           <label for="name" class="control-label">Display as</label>
-          <select class="form-control" name="form-display" id="form-display" ng-options="display.name as display.title for display in formDisplays" ng-model="form.display"></select>
+          <div class="input-group">
+            <select class="form-control" name="form-display" id="form-display" ng-options="display.name as display.title for display in formDisplays" ng-model="form.display"></select>
+            <span class="btn btn-primary input-group-addon" ng-click="uploadPDF()" ng-if="form.display === 'pdf'"><i class="fa fa-upload"></i></span>
+          </div>
         </div>
       </div>
       <div class="col-lg-3 col-md-4 col-sm-4">
@@ -58,3 +61,14 @@
     </div>
   </form>
 </div>
+<script type="text/ng-template" id="pdfupload.html">
+  <h3>PDF Upload</h3>
+  <label class="btn btn-default btn-file btn-block">
+    <div class="button" ngf-select="upload($file)" ngf-pattern="'application/pdf'" accept="application/pdf" ngf-max-size="20MB"><i class="fa fa-upload"></i> Upload PDF</div>
+  </label>
+  <div class="progress" ng-if="uploading">
+    <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar" aria-valuenow="{{ uploadProgress }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ uploadProgress }}%">
+      <span class="sr-only">{{ uploadProgress }}% Complete</span>
+    </div>
+  </div>
+</script>
