@@ -1,5 +1,5 @@
 <fieldset id="{{ component.key }}">
-  <legend ng-if="component.legend">{{ component.legend | formioTranslate }}</legend>
+  <legend ng-if="component.legend">{{ component.legend | formioTranslate:null:builder }}</legend>
   <formio-component
     ng-repeat="_component in component.components track by $index"
     component="_component"
