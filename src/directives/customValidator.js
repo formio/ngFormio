@@ -3,6 +3,8 @@ module.exports = function() {
     restrict: 'A',
     require: 'ngModel',
     link: function(scope, ele, attrs, ctrl) {
+      console.log('customValidator');
+
       if (
         !scope.component.validate ||
         !scope.component.validate.custom
