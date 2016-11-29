@@ -51,7 +51,7 @@ module.exports = function() {
       });
     },
     fieldWrap: function(input) {
-      input = input + '<formio-errors></formio-errors>';
+      input = input + '<formio-errors ng-if="::!builder"></formio-errors>';
       var multiInput = input.replace('data[component.key]', 'data[component.key][$index]');
       var inputLabel = '<label ng-if="component.label && !component.hideLabel" for="{{ component.key }}" class="control-label" ng-class="{\'field-required\': component.validate.required}">{{ component.label | formioTranslate }}</label>';
       var requiredInline = '<span ng-if="(component.hideLabel === true || component.label === \'\' || !component.label) && component.validate.required" class="glyphicon glyphicon-asterisk form-control-feedback field-required-inline" aria-hidden="true"></span>';

@@ -1,4 +1,4 @@
-<div ng-show="formioForm[componentId].$error && !formioForm[componentId].$pristine" ng-if="::!builder">
+<div ng-show="formioForm[componentId].$error && !formioForm[componentId].$pristine">
   <p class="help-block" ng-show="formioForm[componentId].$error.email">{{ component.label || component.placeholder || component.key }} {{'must be a valid email' | formioTranslate}}.</p>
   <p class="help-block" ng-show="formioForm[componentId].$error.required">{{ component.label || component.placeholder || component.key }} {{'is required' | formioTranslate}}.</p>
   <p class="help-block" ng-show="formioForm[componentId].$error.number">{{ component.label || component.placeholder || component.key }} {{'must be a number' | formioTranslate}}.</p>
