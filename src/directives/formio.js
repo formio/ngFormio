@@ -47,8 +47,9 @@ module.exports = function() {
           cancelFormLoadEvent();
         });
 
-        if (!$scope._src) {
-          var watchSrc = $scope.$watch('src', function(src) {
+        // FOR-71
+        if (!$scope._src && !$scope.builder) {
+          $scope.$watch('src', function(src) {
             if (!src) {
               return;
             }
@@ -58,11 +59,6 @@ module.exports = function() {
               submission: true
             });
           });
-
-          // FOR-71
-          if ($scope.builder) {
-            watchSrc();
-          }
         }
 
         // Create the formio object.
@@ -72,7 +68,6 @@ module.exports = function() {
         });
 
         $scope.checkErrors = function(form) {
-          console.log('checkErrors');
           if (form.submitting) {
             return true;
           }
@@ -86,7 +81,6 @@ module.exports = function() {
         };
 
         $scope.isVisible = function(component, row) {
-          console.log('isVisible');
           return FormioUtils.isVisible(
             component,
             row,
@@ -96,7 +90,6 @@ module.exports = function() {
         };
 
         $scope.isDisabled = function(component) {
-          console.log('isDisabled');
           return $scope.readOnly || component.disabled || (Array.isArray($scope.disableComponents) && $scope.disableComponents.indexOf(component.key) !== -1);
         };
 

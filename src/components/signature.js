@@ -63,17 +63,12 @@ module.exports = function(app) {
           }
         };
 
-        // Reset size if element changes visibility.
-        scope.$watch('component.display', function(newDisplay) {
-          if (newDisplay) {
-            setDimension('width');
-            setDimension('height');
-          }
-        });
-
         // Set the width and height of the canvas.
-        setDimension('width');
-        setDimension('height');
+        // Reset size if element changes visibility.
+        scope.$watch('component.display', function() {
+          setDimension('width');
+          setDimension('height');
+        });
 
         // Create the signature pad.
         /* global SignaturePad:false */

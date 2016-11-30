@@ -172,23 +172,27 @@ module.exports = function(app) {
           });
 
           // Add a watch if they wish to refresh on selection of another field.
+          var refreshWatch;
           if (settings.refreshOn) {
+            // Remove the old watch.
+            if (refreshWatch) refreshWatch();
             if (settings.refreshOn === 'data') {
-              $scope.$watch('data', function() {
+              refreshWatch = $scope.$watch('data', function() {
                 $scope.refreshItems();
                 if (settings.clearOnRefresh) {
                   $scope.data[settings.key] = settings.multiple ? [] : '';
                 }
               }, true);
+
+              return;
             }
-            else {
-              $scope.$watch('data.' + settings.refreshOn, function(newValue, oldValue) {
-                $scope.refreshItems();
-                if (settings.clearOnRefresh && (newValue !== oldValue)) {
-                  $scope.data[settings.key] = settings.multiple ? [] : '';
-                }
-              });
-            }
+
+            refreshWatch = $scope.$watch('data.' + settings.refreshOn, function(newValue, oldValue) {
+              $scope.refreshItems();
+              if (settings.clearOnRefresh && (newValue !== oldValue)) {
+                $scope.data[settings.key] = settings.multiple ? [] : '';
+              }
+            });
           }
 
           switch (settings.dataSrc) {

@@ -356,8 +356,9 @@ module.exports = function() {
             }
           });
 
-          if (hasConditionalPages) {
-            var watchData = $scope.$watch('submission.data', function(data) {
+          // FOR-71
+          if (!$scope.builder && hasConditionalPages) {
+            $scope.$watch('submission.data', function(data) {
               var newPages = [];
               angular.forEach(allPages, function(page) {
                 if (FormioUtils.isVisible(page, null, data)) {
@@ -368,11 +369,6 @@ module.exports = function() {
               updatePages();
               setTimeout($scope.$apply.bind($scope), 10);
             }, true);
-
-            // FOR-71
-            if ($scope.builder) {
-              watchData();
-            }
           }
 
           $scope.form = $scope.form ? angular.merge($scope.form, angular.copy(form)) : angular.copy(form);
@@ -383,25 +379,23 @@ module.exports = function() {
           showPage();
         };
 
-        var watchForm = $scope.$watch('form', function(form) {
-          if (
-            $scope.src ||
-            !form ||
-            !Object.keys(form).length ||
-            !form.components ||
-            !form.components.length
-          ) {
-            return;
-          }
-          var formUrl = form.project ? '/project/' + form.project : '';
-          formUrl += '/form/' + form._id;
-          $scope.formio = new Formio(formUrl);
-          setForm(form);
-        });
-
         // FOR-71
-        if ($scope.builder) {
-          watchForm();
+        if (!$scope.builder) {
+          $scope.$watch('form', function(form) {
+            if (
+              $scope.src ||
+              !form ||
+              !Object.keys(form).length ||
+              !form.components ||
+              !form.components.length
+            ) {
+              return;
+            }
+            var formUrl = form.project ? '/project/' + form.project : '';
+            formUrl += '/form/' + form._id;
+            $scope.formio = new Formio(formUrl);
+            setForm(form);
+          });
         }
 
         // When the components length changes update the pages.
