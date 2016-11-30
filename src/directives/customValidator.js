@@ -4,8 +4,6 @@ module.exports = function() {
     require: 'ngModel',
     link: function(scope, ele, attrs, ctrl) {
       if (scope.builder) return;
-      console.log('customValidator');
-
       if (
         !scope.component.validate ||
         !scope.component.validate.custom

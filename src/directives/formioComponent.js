@@ -58,8 +58,6 @@ module.exports = [
           // See if this component is visible or not.
           $scope.isVisible = function(component, row) {
             if ($scope.builder) return true;
-
-            console.log('isVisible');
             return FormioUtils.isVisible(
               component,
               row,

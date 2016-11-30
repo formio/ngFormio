@@ -5,8 +5,6 @@ module.exports = [
   ) {
     return function(text, key, builder) {
       if (builder) return text;
-      console.log('translate')
-
       try {
         var translate = $filter('translate');
         // Allow translating by field key which helps with large blocks of html.
