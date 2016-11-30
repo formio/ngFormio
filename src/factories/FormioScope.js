@@ -1,9 +1,11 @@
 module.exports = [
   'Formio',
   'formioComponents',
+  '$timeout',
   function(
     Formio,
-    formioComponents
+    formioComponents,
+    $timeout
   ) {
     return {
       onError: function($scope, $element) {
@@ -43,9 +45,9 @@ module.exports = [
         $scope.$on('formElementRender', function() {
           elementsRendered++;
           if (elementsRendered === $scope.form.components.length) {
-            setTimeout(function() {
+            $timeout(function() {
               $scope.$emit('formRender', $scope.form);
-            }, 1);
+            });
           }
         });
 
