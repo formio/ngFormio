@@ -26,7 +26,7 @@
       ng-change="onChange()"
       ng-disabled="readOnly"
     >
-      <option ng-repeat="month in ::months" value="{{$index}}">{{ ::month }}</option>
+      <option ng-repeat="month in months" value="{{$index}}">{{ month }}</option>
     </select>
   </div>
   <div class="form-group col-xs-3" ng-if="!component.dayFirst">
