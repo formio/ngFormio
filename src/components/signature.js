@@ -41,6 +41,7 @@ module.exports = function(app) {
       },
       require: '?ngModel',
       link: function(scope, element, attrs, ngModel) {
+        if (scope.builder) return;
         if (!ngModel) {
           return;
         }

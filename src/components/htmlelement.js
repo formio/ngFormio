@@ -12,6 +12,7 @@ module.exports = function(app) {
         },
         templateUrl: 'formio/components/htmlelement-directive.html',
         link: function($scope) {
+          if ($scope.builder) return;
           var builder = $scope.builder || $scope.$root.builder;
 
           $scope.$watch('component', function() {
@@ -33,7 +34,7 @@ module.exports = function(app) {
                 .split('\n')[0]
                 .replace('[$sanitize:badparse]', '');
             }
-          }, true);
+          });
         }
       };
   }]);

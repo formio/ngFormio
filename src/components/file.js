@@ -38,6 +38,7 @@ module.exports = function(app) {
       controller: [
         '$scope',
         function($scope) {
+          if ($scope.builder) return;
           $scope.removeFile = function(event, index) {
             event.preventDefault();
             $scope.files.splice(index, 1);
@@ -65,6 +66,7 @@ module.exports = function(app) {
       controller: [
         '$scope',
         function($scope) {
+          if ($scope.builder) return;
           $scope.removeFile = function(event, index) {
             event.preventDefault();
             $scope.files.splice(index, 1);
@@ -94,6 +96,7 @@ module.exports = function(app) {
           $scope,
           Formio
         ) {
+          if ($scope.builder) return;
           $scope.getFile = function(evt) {
             evt.preventDefault();
             $scope.form = $scope.form || $rootScope.filePath;
@@ -134,9 +137,9 @@ module.exports = function(app) {
           $scope,
           Formio
         ) {
+          if ($scope.builder) return;
           $scope.form = $scope.form || $rootScope.filePath;
           var formio = new Formio($scope.form);
-
           formio.downloadFile($scope.file)
             .then(function(result) {
               $scope.imageSrc = result.url;
@@ -154,8 +157,8 @@ module.exports = function(app) {
       $scope,
       FormioUtils
     ) {
+      if ($scope.builder) return;
       $scope.fileUploads = {};
-
       $scope.removeUpload = function(index) {
         delete $scope.fileUploads[index];
       };

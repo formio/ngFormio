@@ -6,6 +6,7 @@ module.exports = function(app) {
       replace: true,
       require: 'ngModel',
       link: function(scope, elem, attrs, ngModel) {
+        if (scope.builder) return;
         var limitLength = attrs.characters || 2;
         scope.$watch(attrs.ngModel, function() {
           if (!ngModel.$viewValue) {
@@ -50,6 +51,7 @@ module.exports = function(app) {
       },
       templateUrl: 'formio/components/day-input.html',
       controller: ['$scope', function($scope) {
+        if ($scope.builder) return;
         $scope.months = [$scope.component.fields.month.placeholder, 'January', 'February', 'March', 'April', 'May', 'June',
           'July', 'August', 'September', 'October', 'November', 'December'];
 
@@ -60,6 +62,7 @@ module.exports = function(app) {
         };
       }],
       link: function(scope, elem, attrs, ngModel) {
+        if (scope.builder) return;
         // Set the scope values based on the current model.
         scope.$watch('ngModel', function() {
           // Only update on load.

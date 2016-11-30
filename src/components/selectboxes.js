@@ -17,6 +17,7 @@ module.exports = function(app) {
       },
       templateUrl: 'formio/components/selectboxes-directive.html',
       link: function($scope, el, attrs, ngModel) {
+        if ($scope.builder) return;
         // Initialize model
         var model = {};
         angular.forEach($scope.component.values, function(v) {
