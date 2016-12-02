@@ -412,7 +412,16 @@ app.controller('FormController', [
 
           // Build the list of selectable resources for the submission resource access ui.
           $scope.currentFormResources = _(FormioUtils.flattenComponents(form.components))
-            .filter({type: 'resource'})
+            .filter(function(component) {
+              if (component.type === 'resource') {
+                return true;
+              }
+              if (component.type === 'select' && component.dataSrc === 'resource') {
+                return true;
+              }
+
+              return false;
+            })
             .map(function(component) {
               return {
                 label: component.label || '',
@@ -503,7 +512,6 @@ app.controller('FormController', [
             // Reload page to start editing as an existing form.
             $state.go('project.' + $scope.formInfo.type + '.form.edit', {formId: form._id});
           }
-
         })
         .catch(function(err) {
           if (err) {
