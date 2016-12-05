@@ -64,6 +64,15 @@ module.exports = [
             );
           };
 
+          // FOR-245 - Fix reset buttons.
+          $scope.resetForm = function() {
+            // Manually remove each key so we don't lose a reference to original
+            // data in child scopes.
+            for(var key in $scope.data) {
+              delete $scope.data[key];
+            }
+          };
+
           $scope.isDisabled = $scope.$parent.isDisabled;
 
           // Pass through checkConditional since this is an isolate scope.
