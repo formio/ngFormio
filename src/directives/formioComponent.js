@@ -70,7 +70,7 @@ module.exports = [
           $scope.resetForm = function() {
             // Manually remove each key so we don't lose a reference to original
             // data in child scopes.
-            for(var key in $scope.data) {
+            for (var key in $scope.data) {
               delete $scope.data[key];
             }
           };
