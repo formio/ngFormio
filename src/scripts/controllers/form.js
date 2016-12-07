@@ -253,6 +253,7 @@ app.controller('FormController', [
   '$q',
   'ngDialog',
   'Upload',
+  '$timeout',
   function(
     $scope,
     $state,
@@ -268,12 +269,15 @@ app.controller('FormController', [
     GoogleAnalytics,
     $q,
     ngDialog,
-    Upload
+    Upload,
+    $timeout
   ) {
     // Project information.
+    $scope.formReady = true;
     $scope.projectId = $stateParams.projectId;
     $scope.upload = function (file) {
       $scope.uploading = true;
+      $scope.formReady = false;
       var fileName = $stateParams.formId || FormioUtils.uniqueName(file.name);
       var filePath = '/pdf/' + $scope.projectId + '/' + fileName;
       Upload.upload({
@@ -281,6 +285,7 @@ app.controller('FormController', [
         data: {file: file},
         headers: {'x-jwt-token': Formio.getToken()}
       }).then(function () {
+        $scope.formReady = true;
         $scope.uploading = false;
         if (!$scope.form.settings) {
           $scope.form.settings = {};
@@ -472,6 +477,7 @@ app.controller('FormController', [
             .value();
 
           $scope.form = form;
+          $scope.form.page = 0;
           $scope.formTags = _.map(form.tags, function(tag) {
             return {text: tag};
           });
