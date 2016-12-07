@@ -18,7 +18,8 @@ module.exports = [
         formioForm: '=',
         readOnly: '=',
         gridRow: '=',
-        gridCol: '='
+        gridCol: '=',
+        builder: '=?'
       },
       templateUrl: 'formio/component.html',
       link: function(scope, el, attrs, formioCtrl) {
@@ -56,6 +57,7 @@ module.exports = [
 
           // See if this component is visible or not.
           $scope.isVisible = function(component, row) {
+            if ($scope.builder) return true;
             return FormioUtils.isVisible(
               component,
               row,
@@ -69,8 +71,9 @@ module.exports = [
           // Pass through checkConditional since this is an isolate scope.
           $scope.checkConditional = $scope.$parent.checkConditional;
 
+          // FOR-71 - Dont watch in the builder view.
           // Calculate value when data changes.
-          if ($scope.component.calculateValue) {
+          if (!$scope.builder && $scope.component.calculateValue) {
             $scope.$watch('data', function() {
               try {
                 $scope.data[$scope.component.key] = eval('(function(data) { var value = [];' + $scope.component.calculateValue.toString() + '; return value; })($scope.data)');
@@ -154,20 +157,57 @@ module.exports = [
             }
           }
 
-          $scope.$watch('component.multiple', function() {
-            var value = null;
-            // Establish a default for data.
-            $scope.data = $scope.data || {};
-            if ($scope.component.multiple) {
-              if ($scope.data.hasOwnProperty($scope.component.key)) {
-                // If a value is present, and its an array, assign it to the value.
-                if ($scope.data[$scope.component.key] instanceof Array) {
-                  value = $scope.data[$scope.component.key];
+          // FOR-71 - Dont watch in the builder view.
+          if (!$scope.builder) {
+            $scope.$watch('component.multiple', function() {
+              var value = null;
+              // Establish a default for data.
+              $scope.data = $scope.data || {};
+              if ($scope.component.multiple) {
+                if ($scope.data.hasOwnProperty($scope.component.key)) {
+                  // If a value is present, and its an array, assign it to the value.
+                  if ($scope.data[$scope.component.key] instanceof Array) {
+                    value = $scope.data[$scope.component.key];
+                  }
+                  // If a value is present and it is not an array, wrap the value.
+                  else {
+                    value = [$scope.data[$scope.component.key]];
+                  }
                 }
-                // If a value is present and it is not an array, wrap the value.
+                else if ($scope.component.hasOwnProperty('customDefaultValue')) {
+                  try {
+                    value = eval('(function(data) { var value = "";' + $scope.component.customDefaultValue.toString() + '; return value; })($scope.data)');
+                  }
+                  catch (e) {
+                    /* eslint-disable no-console */
+                    console.warn('An error occurrend in a custom default value in ' + $scope.component.key, e);
+                    /* eslint-enable no-console */
+                    value = '';
+                  }
+                }
+                else if ($scope.component.hasOwnProperty('defaultValue')) {
+                  // If there is a default value and it is an array, assign it to the value.
+                  if ($scope.component.defaultValue instanceof Array) {
+                    value = $scope.component.defaultValue;
+                  }
+                  // If there is a default value and it is not an array, wrap the value.
+                  else {
+                    value = [$scope.component.defaultValue];
+                  }
+                }
                 else {
-                  value = [$scope.data[$scope.component.key]];
+                  // Couldn't safely default, make it a simple array. Possibly add a single obj or string later.
+                  value = [];
                 }
+
+                // Use the current data or default.
+                $scope.data[$scope.component.key] = value;
+                return;
+              }
+
+              // Use the current data or default.
+              if ($scope.data.hasOwnProperty($scope.component.key)) {
+                $scope.data[$scope.component.key] = $scope.data[$scope.component.key];
               }
               else if ($scope.component.hasOwnProperty('customDefaultValue')) {
                 try {
@@ -179,53 +219,19 @@ module.exports = [
                   /* eslint-enable no-console */
                   value = '';
                 }
+                $scope.data[$scope.component.key] = value;
               }
-              else if ($scope.component.hasOwnProperty('defaultValue')) {
-                // If there is a default value and it is an array, assign it to the value.
-                if ($scope.component.defaultValue instanceof Array) {
-                  value = $scope.component.defaultValue;
+              // FA-835 - The default values for select boxes are set in the component.
+              else if ($scope.component.hasOwnProperty('defaultValue') && $scope.component.type !== 'selectboxes') {
+                $scope.data[$scope.component.key] = $scope.component.defaultValue;
+
+                // FOR-193 - Fix default value for the number component.
+                if ($scope.component.type === 'number') {
+                  $scope.data[$scope.component.key] = parseInt($scope.data[$scope.component.key]);
                 }
-                // If there is a default value and it is not an array, wrap the value.
-                else {
-                  value = [$scope.component.defaultValue];
-                }
               }
-              else {
-                // Couldn't safely default, make it a simple array. Possibly add a single obj or string later.
-                value = [];
-              }
-
-              // Use the current data or default.
-              $scope.data[$scope.component.key] = value;
-              return;
-            }
-
-            // Use the current data or default.
-            if ($scope.data.hasOwnProperty($scope.component.key)) {
-              $scope.data[$scope.component.key] = $scope.data[$scope.component.key];
-            }
-            else if ($scope.component.hasOwnProperty('customDefaultValue')) {
-              try {
-                value = eval('(function(data) { var value = "";' + $scope.component.customDefaultValue.toString() + '; return value; })($scope.data)');
-              }
-              catch (e) {
-                /* eslint-disable no-console */
-                console.warn('An error occurrend in a custom default value in ' + $scope.component.key, e);
-                /* eslint-enable no-console */
-                value = '';
-              }
-              $scope.data[$scope.component.key] = value;
-            }
-            // FA-835 - The default values for select boxes are set in the component.
-            else if ($scope.component.hasOwnProperty('defaultValue') && $scope.component.type !== 'selectboxes') {
-              $scope.data[$scope.component.key] = $scope.component.defaultValue;
-
-              // FOR-193 - Fix default value for the number component.
-              if ($scope.component.type === 'number') {
-                $scope.data[$scope.component.key] = parseInt($scope.data[$scope.component.key]);
-              }
-            }
-          });
+            });
+          }
 
           // Set the component name.
           $scope.componentId = $scope.component.key;

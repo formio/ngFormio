@@ -12,6 +12,7 @@ module.exports = function(app) {
           select: '='
         },
         link: function(scope, element) {
+          if (scope.builder) return;
           if (scope.template) {
             element.append($compile(angular.element(scope.template))(scope));
           }
@@ -24,6 +25,7 @@ module.exports = function(app) {
     return {
       require: 'ngModel',
       link: function(scope, element, attrs, ngModel) {
+        if (scope.builder) return;
         var oldIsEmpty = ngModel.$isEmpty;
         ngModel.$isEmpty = function(value) {
           return (Array.isArray(value) && value.length === 0) || oldIsEmpty(value);
@@ -38,6 +40,7 @@ module.exports = function(app) {
       require: 'uiSelect',
       restrict: 'A',
       link: function($scope, el, attrs, uiSelect) {
+        if ($scope.builder) return;
         var autoopen = true;
 
         angular.element(uiSelect.focusser).on('focus', function() {
@@ -129,6 +132,8 @@ module.exports = function(app) {
           }
         },
         controller: ['$rootScope', '$scope', '$http', 'Formio', '$interpolate', function($rootScope, $scope, $http, Formio, $interpolate) {
+          // FOR-71 - Skip functionality in the builder view.
+          if ($scope.builder) return;
           var settings = $scope.component;
           var options = {cache: true};
           $scope.nowrap = true;
@@ -167,23 +172,27 @@ module.exports = function(app) {
           });
 
           // Add a watch if they wish to refresh on selection of another field.
+          var refreshWatch;
           if (settings.refreshOn) {
+            // Remove the old watch.
+            if (refreshWatch) refreshWatch();
             if (settings.refreshOn === 'data') {
-              $scope.$watch('data', function() {
+              refreshWatch = $scope.$watch('data', function() {
                 $scope.refreshItems();
                 if (settings.clearOnRefresh) {
                   $scope.data[settings.key] = settings.multiple ? [] : '';
                 }
               }, true);
+
+              return;
             }
-            else {
-              $scope.$watch('data.' + settings.refreshOn, function(newValue, oldValue) {
-                $scope.refreshItems();
-                if (settings.clearOnRefresh && (newValue !== oldValue)) {
-                  $scope.data[settings.key] = settings.multiple ? [] : '';
-                }
-              });
-            }
+
+            refreshWatch = $scope.$watch('data.' + settings.refreshOn, function(newValue, oldValue) {
+              $scope.refreshItems();
+              if (settings.clearOnRefresh && (newValue !== oldValue)) {
+                $scope.data[settings.key] = settings.multiple ? [] : '';
+              }
+            });
           }
 
           switch (settings.dataSrc) {

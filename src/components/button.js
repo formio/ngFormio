@@ -20,6 +20,7 @@ module.exports = function(app) {
           theme: 'primary'
         },
         controller: ['$scope', function($scope) {
+          if ($scope.builder) return;
           var settings = $scope.component;
           $scope.getButtonType = function() {
             switch (settings.action) {

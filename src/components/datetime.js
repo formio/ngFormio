@@ -11,6 +11,7 @@ module.exports = function(app) {
         },
         group: 'advanced',
         controller: ['$scope', '$timeout', function($scope, $timeout) {
+          if ($scope.builder) return;
           // Ensure the date value is always a date object when loaded, then unbind the watch.
           var loadComplete = $scope.$watch('data.' + $scope.component.key, function() {
             if ($scope.data && $scope.data[$scope.component.key] && !($scope.data[$scope.component.key] instanceof Date)) {

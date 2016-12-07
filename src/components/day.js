@@ -6,6 +6,7 @@ module.exports = function(app) {
       replace: true,
       require: 'ngModel',
       link: function(scope, elem, attrs, ngModel) {
+        if (scope.builder) return;
         var limitLength = attrs.characters || 2;
         scope.$watch(attrs.ngModel, function() {
           if (!ngModel.$viewValue) {
@@ -45,10 +46,12 @@ module.exports = function(app) {
         readOnly: '=',
         ngModel: '=',
         gridRow: '=',
-        gridCol: '='
+        gridCol: '=',
+        builder: '=?'
       },
       templateUrl: 'formio/components/day-input.html',
       controller: ['$scope', function($scope) {
+        if ($scope.builder) return;
         $scope.months = [$scope.component.fields.month.placeholder, 'January', 'February', 'March', 'April', 'May', 'June',
           'July', 'August', 'September', 'October', 'November', 'December'];
 
@@ -59,17 +62,16 @@ module.exports = function(app) {
         };
       }],
       link: function(scope, elem, attrs, ngModel) {
+        if (scope.builder) return;
         // Set the scope values based on the current model.
         scope.$watch('ngModel', function() {
-          if (ngModel.$viewValue) {
-            // Only update on load.
-            if (!ngModel.$dirty) {
-              var parts = ngModel.$viewValue.split('/');
-              if (parts.length === 3) {
-                scope.date.day = parts[(scope.component.dayFirst ? 0 : 1)];
-                scope.date.month = parseInt(parts[(scope.component.dayFirst ? 1 : 0)]).toString();
-                scope.date.year = parts[2];
-              }
+          // Only update on load.
+          if (ngModel.$viewValue && !ngModel.$dirty) {
+            var parts = ngModel.$viewValue.split('/');
+            if (parts.length === 3) {
+              scope.date.day = parts[(scope.component.dayFirst ? 0 : 1)];
+              scope.date.month = parseInt(parts[(scope.component.dayFirst ? 1 : 0)]).toString();
+              scope.date.year = parts[2];
             }
           }
         });
@@ -120,8 +122,6 @@ module.exports = function(app) {
         title: 'Day',
         template: 'formio/components/day.html',
         group: 'advanced',
-        //controller: ['$scope', function($scope) {
-        //}],
         settings: {
           input: true,
           tableView: true,

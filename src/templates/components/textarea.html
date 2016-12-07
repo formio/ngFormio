@@ -1,12 +1,13 @@
 <textarea
-class="form-control"
-ng-model="data[component.key]"
-ng-disabled="readOnly"
-ng-required="component.validate.required"
-safe-multiple-to-single
-id="{{ componentId }}"
-name="{{ componentId }}"
-tabindex="{{ component.tabindex || 0 }}"
-placeholder="{{ component.placeholder | formioTranslate }}"
-custom-validator="component.validate.custom"
-rows="{{ component.rows }}"></textarea>
+  class="form-control"
+  ng-model="data[component.key]"
+  ng-disabled="readOnly"
+  ng-required="component.validate.required"
+  safe-multiple-to-single
+  id="{{ componentId }}"
+  name="{{ componentId }}"
+  tabindex="{{ component.tabindex || 0 }}"
+  placeholder="{{ component.placeholder | formioTranslate:null:builder }}"
+  custom-validator="component.validate.custom"
+  rows="{{ component.rows }}"
+></textarea>

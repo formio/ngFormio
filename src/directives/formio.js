@@ -47,7 +47,8 @@ module.exports = function() {
           cancelFormLoadEvent();
         });
 
-        if (!$scope._src) {
+        // FOR-71
+        if (!$scope._src && !$scope.builder) {
           $scope.$watch('src', function(src) {
             if (!src) {
               return;

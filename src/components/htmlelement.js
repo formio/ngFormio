@@ -12,13 +12,12 @@ module.exports = function(app) {
         },
         templateUrl: 'formio/components/htmlelement-directive.html',
         link: function($scope) {
-          var createElement = function() {
-            var element = angular.element(
-              '<' + $scope.component.tag + '>' + '</' + $scope.component.tag + '>'
-            );
+          if ($scope.builder) return;
+          var builder = $scope.builder || $scope.$root.builder;
 
-            element.html($filter('formioTranslate')($scope.component.content));
-
+          $scope.$watch('component', function() {
+            var element = angular.element('<' + $scope.component.tag + '>' + '</' + $scope.component.tag + '>');
+            element.html($filter('formioTranslate')($scope.component.content, null, builder));
             element.attr('class', $scope.component.className);
             angular.forEach($scope.component.attrs, function(attr) {
               if (!attr.attr) return;
@@ -32,14 +31,10 @@ module.exports = function(app) {
             catch (err) {
               // Isolate the message and store it.
               $scope.parseError = err.message
-              .split('\n')[0]
-              .replace('[$sanitize:badparse]', '');
+                .split('\n')[0]
+                .replace('[$sanitize:badparse]', '');
             }
-          };
-
-          createElement();
-
-          $scope.$watch('component', createElement, true);
+          });
         }
       };
   }]);

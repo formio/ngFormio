@@ -1,4 +1,5 @@
-<input type="{{ component.inputType }}"
+<input
+  type="{{ component.inputType }}"
   class="form-control"
   id="{{ componentId }}"
   name="{{ componentId }}"
@@ -12,7 +13,7 @@
   ng-maxlength="component.validate.maxLength"
   ng-pattern="component.validate.pattern"
   custom-validator="component.validate.custom"
-  placeholder="{{ component.placeholder | formioTranslate }}"
+  placeholder="{{ component.placeholder | formioTranslate:null:builder }}"
   ui-mask="{{ component.inputMask }}"
   ui-mask-placeholder=""
   ui-options="uiMaskOptions"

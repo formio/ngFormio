@@ -9,6 +9,7 @@ module.exports = function(app) {
     return {
       restrict: 'A',
       link: function(scope, element) {
+        if (scope.builder) return;
         element.bind('keyup', function() {
           var data = scope.data[scope.component.key];
 

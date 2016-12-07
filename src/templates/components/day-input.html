@@ -1,6 +1,6 @@
 <div class="daySelect form row">
   <div class="form-group col-xs-3" ng-if="component.dayFirst">
-    <label for="{{componentId}}-day" ng-class="{'field-required': component.fields.day.required}">{{ "Day" | formioTranslate }}</label>
+    <label for="{{componentId}}-day" ng-class="{'field-required': component.fields.day.required}">{{ "Day" | formioTranslate:null:builder }}</label>
     <input
       class="form-control"
       type="text"
@@ -17,18 +17,20 @@
     />
   </div>
   <div class="form-group col-xs-4">
-    <label for="{{componentId}}-month" ng-class="{'field-required': component.fields.month.required}">{{ "Month" | formioTranslate }}</label>
-    <select class="form-control"
-            type="text"
-            id="{{componentId}}-month"
-            ng-model="date.month"
-            ng-change="onChange()"
-            ng-disabled="readOnly">
+    <label for="{{componentId}}-month" ng-class="{'field-required': component.fields.month.required}">{{ "Month" | formioTranslate:null:builder }}</label>
+    <select
+      class="form-control"
+      type="text"
+      id="{{componentId}}-month"
+      ng-model="date.month"
+      ng-change="onChange()"
+      ng-disabled="readOnly"
+    >
       <option ng-repeat="month in months" value="{{$index}}">{{ month }}</option>
     </select>
   </div>
   <div class="form-group col-xs-3" ng-if="!component.dayFirst">
-    <label for="{{componentId}}-day" ng-class="{'field-required': component.fields.day.required}">{{ "Day" | formioTranslate }}</label>
+    <label for="{{componentId}}-day" ng-class="{'field-required': component.fields.day.required}">{{ "Day" | formioTranslate:null:builder }}</label>
     <input
       class="form-control"
       type="text"
@@ -45,7 +47,7 @@
     />
   </div>
   <div class="form-group col-xs-5">
-    <label for="{{componentId}}-year" ng-class="{'field-required': component.fields.year.required}">{{ "Year" | formioTranslate }}</label>
+    <label for="{{componentId}}-year" ng-class="{'field-required': component.fields.year.required}">{{ "Year" | formioTranslate:null:builder }}</label>
     <input
       class="form-control"
       type="text"

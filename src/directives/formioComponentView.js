@@ -11,7 +11,8 @@ module.exports = [
         data: '=',
         form: '=',
         submission: '=',
-        ignore: '=?'
+        ignore: '=?',
+        builder: '=?'
       },
       templateUrl: 'formio/component-view.html',
       controller: [

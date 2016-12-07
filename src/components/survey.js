@@ -24,6 +24,8 @@ module.exports = function(app) {
           return view;
         },
         controller: ['$scope', '$timeout', function($scope, $timeout) {
+          // FOR-71
+          if ($scope.builder) return;
           // @todo: Figure out why the survey values are not defaulting correctly.
           var reset = false;
           $scope.$watch('data.' + $scope.component.key, function(value) {
