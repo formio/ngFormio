@@ -401,6 +401,29 @@ app.controller('FormController', [
       $scope.setEmbedCode();
     });
 
+    $scope.updateCurrentFormResources = function(form) {
+      // Build the list of selectable resources for the submission resource access ui.
+      $scope.currentFormResources = _(FormioUtils.flattenComponents(form.components))
+        .filter(function(component) {
+          if (component.type === 'resource') {
+            return true;
+          }
+          if (component.type === 'select' && component.dataSrc === 'resource') {
+            return true;
+          }
+
+          return false;
+        })
+        .map(function(component) {
+          return {
+            label: component.label || '',
+            key: component.key || '',
+            defaultPermission: component.defaultPermission || ''
+          };
+        })
+        .value();
+    };
+
     // Load the form.
     if ($scope.formId) {
       $scope.loadFormPromise = $scope.formio.loadForm()
@@ -410,17 +433,7 @@ app.controller('FormController', [
             form.display = 'form';
           }
 
-          // Build the list of selectable resources for the submission resource access ui.
-          $scope.currentFormResources = _(FormioUtils.flattenComponents(form.components))
-            .filter({type: 'resource'})
-            .map(function(component) {
-              return {
-                label: component.label || '',
-                key: component.key || '',
-                defaultPermission: component.defaultPermission || ''
-              };
-            })
-            .value();
+          $scope.updateCurrentFormResources(form);
 
           $scope.form = form;
           $scope.formTags = _.map(form.tags, function(tag) {
@@ -503,7 +516,6 @@ app.controller('FormController', [
             // Reload page to start editing as an existing form.
             $state.go('project.' + $scope.formInfo.type + '.form.edit', {formId: form._id});
           }
-
         })
         .catch(function(err) {
           if (err) {
@@ -541,6 +553,7 @@ app.controller('FormController', [
     // Called when the form is updated.
     $scope.$on('formUpdate', function(event, form) {
       event.stopPropagation();
+      $scope.updateCurrentFormResources(form);
       $scope.form.components = form.components;
     });
 
