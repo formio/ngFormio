@@ -3,7 +3,8 @@ module.exports = [
   function(
     $filter
   ) {
-    return function(text, key) {
+    return function(text, key, builder) {
+      if (builder) return text;
       try {
         var translate = $filter('translate');
         // Allow translating by field key which helps with large blocks of html.
@@ -14,9 +15,8 @@ module.exports = [
           }
           return result;
         }
-        else {
-          return translate(text);
-        }
+
+        return translate(text);
       }
       catch (e) {
         return text;

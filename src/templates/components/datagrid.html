@@ -4,11 +4,11 @@
       <th
         ng-repeat="col in cols track by $index"
         ng-class="{'field-required': col.validate.required}"
-        ng-if="anyVisible(col)"
-      >{{ col.label | formioTranslate }}</th>
+        ng-if="builder ? '::true' : anyVisible(col)"
+      >{{ col.label | formioTranslate:null:builder }}</th>
     </tr>
     <tr ng-repeat="row in rows track by $index" ng-init="rowIndex = $index">
-      <td ng-repeat="col in cols track by $index" ng-init="col.hideLabel = true; colIndex = $index" class="formio-data-grid-row" ng-if="anyVisible(col)">
+      <td ng-repeat="col in cols track by $index" ng-init="col.hideLabel = true; colIndex = $index" class="formio-data-grid-row" ng-if="builder ? '::true' : anyVisible(col)">
         <formio-component
           component="col"
           data="rows[rowIndex]"
@@ -16,10 +16,11 @@
           formio="formio"
           submission="submission"
           hide-components="hideComponents"
-          ng-if="isVisible(col, row)"
+          ng-if="builder ? '::true' : isVisible(col, row)"
           read-only="isDisabled(col, row)"
           grid-row="rowIndex"
           grid-col="colIndex"
+          builder="builder"
         ></formio-component>
       </td>
       <td>
@@ -31,7 +32,7 @@
   </table>
   <div class="datagrid-add">
     <a ng-click="addRow()" class="btn btn-primary">
-      <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {{ component.addAnother || "Add Another" | formioTranslate}}
+      <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {{ component.addAnother || "Add Another" | formioTranslate:null:builder }}
     </a>
   </div>
 </div>

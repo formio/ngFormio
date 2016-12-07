@@ -33,6 +33,8 @@ module.exports = function(app) {
           }
         },
         controller: ['$scope', function($scope) {
+          if ($scope.builder) return; // FOR-71 - Skip parsing input data.
+
           // Ensure that values are numbers.
           if ($scope.data.hasOwnProperty($scope.component.key) && isNumeric($scope.data[$scope.component.key])) {
             $scope.data[$scope.component.key] = parseFloat($scope.data[$scope.component.key]);
