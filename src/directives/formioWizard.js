@@ -263,10 +263,10 @@ module.exports = function() {
           // Save to specified action.
           if ($scope.action) {
             var method = submissionData._id ? 'put' : 'post';
-            $http[method]($scope.action, submissionData).success(function(submission) {
+            $http[method]($scope.action, submissionData).then(function(submission) {
               Formio.clearCache();
               onDone(submission);
-            }).error(FormioScope.onError($scope, $element));
+            }, FormioScope.onError($scope, $element));
           }
           else if ($scope.formio && !$scope.formio.noSubmit) {
             $scope.formio.saveSubmission(submissionData).then(onDone).catch(FormioScope.onError($scope, $element));
