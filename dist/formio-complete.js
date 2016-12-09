@@ -61863,10 +61863,10 @@ module.exports = function() {
           // Allow custom action urls.
           if ($scope.action) {
             var method = submissionData._id ? 'put' : 'post';
-            $http[method]($scope.action, submissionData).success(function(submission) {
+            $http[method]($scope.action, submissionData).then(function(submission) {
               Formio.clearCache();
               onSubmitDone(method, submission);
-            }).error(FormioScope.onError($scope, $element))
+            }, FormioScope.onError($scope, $element))
               .finally(function() {
                 form.submitting = false;
               });
@@ -62285,7 +62285,7 @@ module.exports = function() {
           };
 
           if ($scope.action) {
-            $http.delete($scope.action).success(onDeleteDone).error(FormioScope.onError($scope, $element));
+            $http.delete($scope.action).then(onDeleteDone, FormioScope.onError($scope, $element));
           }
           else if (loader) {
             if (!methodName) return;
@@ -62684,10 +62684,10 @@ module.exports = function() {
           // Save to specified action.
           if ($scope.action) {
             var method = submissionData._id ? 'put' : 'post';
-            $http[method]($scope.action, submissionData).success(function(submission) {
+            $http[method]($scope.action, submissionData).then(function(submission) {
               Formio.clearCache();
               onDone(submission);
-            }).error(FormioScope.onError($scope, $element));
+            }, FormioScope.onError($scope, $element));
           }
           else if ($scope.formio && !$scope.formio.noSubmit) {
             $scope.formio.saveSubmission(submissionData).then(onDone).catch(FormioScope.onError($scope, $element));
