@@ -1,6 +1,6 @@
 {
   "name": "ng-formio",
-  "version": "2.5.1",
+  "version": "2.5.2",
   "description": "The form redering engine behind Form.IO.",
   "main": "dist/formio.min.js",
   "scripts": {
@@ -37,12 +37,12 @@
     "watchify": "^3.4.0"
   },
   "dependencies": {
-    "angular": "^1.5.9",
+    "angular": "^1.6.0",
     "angular-file-saver": "^1.1.2",
     "angular-moment": "^1.0.1",
-    "angular-sanitize": "^1.5.9",
-    "angular-ui-bootstrap": "^2.3.0",
-    "angular-ui-mask": "^1.8.7",
+    "angular-sanitize": "^1.6.0",
+    "angular-ui-bootstrap": "^2.3.1",
+    "angular-ui-mask": "formio/ui-mask#1.8.8-beta.1",
     "bootstrap": "^3.3.7",
     "bootstrap-ui-datetime-picker": "^2.4.4",
     "formio-utils": "^0.2.3",
