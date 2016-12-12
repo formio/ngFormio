@@ -372,6 +372,10 @@ module.exports = function(config) {
       var driver = this.driver;
       driver.localStorage('DELETE', 'formioToken')
         .then(function() {
+          return driver.localStorage('DELETE', 'formioUser');
+        })
+        .then(driver.refresh)
+        .then(function() {
           next();
         })
         .catch(next);
