@@ -17,7 +17,6 @@ angular
     'ui.bootstrap.tpls',
     'ui.select',
     'ui.bootstrap.datetimepicker',
-    'ui-notification',
     'angularMoment',
     'ngCkeditor',
     'formioApp.controllers',
@@ -26,7 +25,8 @@ angular
     'truncate',
     'ngFileUpload',
     'ngDialog',
-    'swaggerUi'
+    'swaggerUi',
+    'toastr'
   ])
   .config([
     '$stateProvider',
