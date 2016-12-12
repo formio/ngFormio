@@ -17,7 +17,6 @@ angular
     'ui.bootstrap.tpls',
     'ui.select',
     'ui.bootstrap.datetimepicker',
-    'ui-notification',
     'angularMoment',
     'ngCkeditor',
     'formioApp.controllers',
@@ -26,19 +25,24 @@ angular
     'truncate',
     'ngFileUpload',
     'ngDialog',
-    'swaggerUi'
+    'swaggerUi',
+    'toastr'
   ])
   .config([
     '$stateProvider',
     '$urlRouterProvider',
+    '$locationProvider',
     'FormioProvider',
     'AppConfig',
     function(
       $stateProvider,
       $urlRouterProvider,
+      $locationProvider,
       FormioProvider,
       AppConfig
     ) {
+      $locationProvider.hashPrefix('');
+
       // Set the base URL for our API.
       FormioProvider.setBaseUrl(AppConfig.apiBase);
       FormioProvider.setDomain(AppConfig.domain);

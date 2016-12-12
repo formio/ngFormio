@@ -703,25 +703,25 @@ app.controller('FormShareController', ['$scope', function($scope) {
 
 app.factory('FormioAlerts', [
   '$rootScope',
-  'Notification',
+  'toastr',
   function (
     $rootScope,
-    Notification
+    toastr
   ) {
     return {
       addAlert: function (alert) {
         switch (alert.type) {
           case 'danger':
-            Notification.error({message: alert.message});
+            toastr.error(alert.message);
             break;
           case 'info':
-            Notification.info({message: alert.message});
+            toastr.info(alert.message);
             break;
           case 'success':
-            Notification.success({message: alert.message});
+            toastr.success(alert.message);
             break;
           case 'warning':
-            Notification.warning({message: alert.message});
+            toastr.warning(alert.message);
             break;
         }
 

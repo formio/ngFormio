@@ -2,10 +2,10 @@
   "name": "formio-app",
   "private": true,
   "dependencies": {
-    "angular": "^1.5.9",
-    "angular-ui-router": "^0.3.1",
-    "angular-sanitize": "^1.5.9",
-    "angular-bootstrap": "^2.3.0",
+    "angular": "^1.6.0",
+    "angular-ui-router": "^0.3.2",
+    "angular-sanitize": "^1.6.0",
+    "angular-bootstrap": "^2.3.1",
     "moment": "^2.17.1",
     "angular-moment": "^1.0.1",
     "ng-sortable": "^1.3.7",
@@ -18,20 +18,20 @@
     "kendo-ui": "kendo-ui-core#2016.3.914+Official",
     "lodash": "^4.17.2",
     "angular-truncate-2": "^0.4.2",
-    "angular-ui-notification": "^0.2.0",
     "bootstrap-sass": "^3.3.7",
     "ng-dialog": "^0.6.4",
     "angular-swagger-ui": "^0.3.3",
     "number-abbreviate": "^1.2.1",
     "seamless": "^0.0.6",
-    "ng-formio": "^2.5.0",
-    "ng-formio-builder": "^2.5.0",
+    "ng-formio": "^2.5.2",
+    "ng-formio-builder": "^2.5.2",
     "ng-tags-input": "^3.1.1",
     "chance": "^1.0.3",
     "ng-file-upload": "^12.0.4",
     "ckeditor": "^4.5.10",
     "jquery": "2.2.4",
-    "qs": "https://github.com/ljharb/qs.git#^6.2.1"
+    "qs": "https://github.com/ljharb/qs.git#^6.2.1",
+    "angular-toastr": "^2.1.1"
   },
   "overrides": {
     "kendo-ui": {
@@ -65,6 +65,12 @@
     "angular-bootstrap": {
       "main": [
         "ui-bootstrap-tpls.min.js"
+      ]
+    },
+    "angular-toastr": {
+      "main": [
+        "./dist/angular-toastr.tpls.min.js",
+        "./dist/angular-toastr.min.css"
       ]
     },
     "moment": {
@@ -158,12 +164,6 @@
     "angular-truncate-2": {
       "main": [
         "dist/angular-truncate-2.min.js"
-      ]
-    },
-    "angular-ui-notification": {
-      "main": [
-        "dist/angular-ui-notification.min.js",
-        "dist/angular-ui-notification.css"
       ]
     },
     "bootstrap-ui-datetime-picker": {
