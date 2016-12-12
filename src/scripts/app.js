@@ -31,14 +31,18 @@ angular
   .config([
     '$stateProvider',
     '$urlRouterProvider',
+    '$locationProvider',
     'FormioProvider',
     'AppConfig',
     function(
       $stateProvider,
       $urlRouterProvider,
+      $locationProvider,
       FormioProvider,
       AppConfig
     ) {
+      $locationProvider.hashPrefix('');
+
       // Set the base URL for our API.
       FormioProvider.setBaseUrl(AppConfig.apiBase);
       FormioProvider.setDomain(AppConfig.domain);
