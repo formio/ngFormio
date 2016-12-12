@@ -41,7 +41,7 @@ new Yadda.FeatureFileSearch('./test/features').each(function(file) {
       driver = webdriver
         .remote(options)
         .init()
-        .setViewportSize({width: 1080, height: 1920})
+        .setViewportSize({width: 1280, height: 720})
         .url(options.baseUrl, done);
     });
 
