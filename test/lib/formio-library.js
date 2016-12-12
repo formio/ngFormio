@@ -599,7 +599,7 @@ module.exports = function(config) {
       text = replacements(text);
 
       var driver = this.driver;
-      driver.waitForVisible('//div[@class=\'toast-message\']', timeout)
+      driver.waitForExist('//div[@class=\'toast-message\']', timeout)
         .getText('//div[@class=\'toast-message\']')
         .then(function(alert) {
           assert.equal(text, alert);
