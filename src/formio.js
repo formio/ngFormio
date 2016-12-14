@@ -24,6 +24,8 @@ app.factory('FormioScope', require('./factories/FormioScope'));
 
 app.factory('FormioUtils', require('./factories/FormioUtils'));
 
+app.factory('Lodash', require('./factories/Lodash'));
+
 app.factory('formioInterceptor', require('./factories/formioInterceptor'));
 
 app.factory('formioTableView', require('./factories/formioTableView'));

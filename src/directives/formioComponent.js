@@ -1,9 +1,11 @@
 module.exports = [
   'Formio',
   'formioComponents',
+  'Lodash',
   function(
     Formio,
-    formioComponents
+    formioComponents,
+    _
   ) {
     return {
       replace: true,
@@ -124,7 +126,48 @@ module.exports = [
               }
             }
             else if ($scope.component.hasOwnProperty('defaultValue')) {
-              value = $scope.component.defaultValue;
+              // Fix for select components
+              if ($scope.component.type === 'select') {
+                try {
+                  // Allow a key:value search
+                  var parts = $scope.component.defaultValue.split(':');
+                  // If only one part was specified, search by value
+                  if (parts.length === 1) {
+                    var results = _.filter($scope.selectItems, {value: parts});
+
+                    // Trim results based on multiple
+                    if (!$scope.component.multiple) {
+                      value = results.shift();
+                    }
+                    else {
+                      value = results;
+                    }
+                  }
+                  // If two parts were specified, allow for key and value customization.
+                  else if (parts.length === 2) {
+                    var search = {};
+                    search[parts[0]] = parts[1];
+
+                    var results = _.filter($scope.selectItems, search);
+
+                    // Trim results based on multiple
+                    if (!$scope.component.multiple) {
+                      value = results.shift();
+                    }
+                    else {
+                      value = results;
+                    }
+                  }
+                }
+                catch (e) {
+                  console.log('An issue occurred with the select defaultValue for: ' + $scope.component.key);
+                  console.log('Could not find defaultValue (' + $scope.defaultValue + ') in the selectItems');
+                  console.log($scope.selectItems);
+                }
+              }
+              else {
+                value = $scope.component.defaultValue;
+              }
             }
             $scope.data[$scope.component.key] = $scope.data[$scope.component.key] || [];
             $scope.data[$scope.component.key].push(value);
