@@ -292,33 +292,34 @@ module.exports = [
               }
               else if ($scope.component.hasOwnProperty('defaultValue')) {
                 // FA-835 - The default values for select boxes are set in the component.
-                if ($scope.component.type !== 'selectboxes') {
-                  return;
-                }
-
-                if (!mult) {
-                  $scope.data[$scope.component.key] = $scope.component.defaultValue;
-
-                  // FOR-193 - Fix default value for the number component.
-                  if ($scope.component.type === 'number') {
-                    $scope.data[$scope.component.key] = parseInt($scope.data[$scope.component.key]);
-                  }
-                  return;
-                }
-
-                // If there is a default value and it is an array, assign it to the value.
-                if ($scope.component.defaultValue instanceof Array) {
-                  $scope.data[$scope.component.key] = $scope.component.defaultValue;
+                if ($scope.component.type === 'selectboxes') {
                   return;
                 }
 
                 // If there is a default value and it is not an array, wrap the value.
                 value = $scope.component.defaultValue.split(',');
 
+                // FOR-193 - Fix default value for the number component.
+                // FOR-262 - Fix multiple default value for the number component.
+                if ($scope.component.type === 'number') {
+                  if (!mult) {
+                    $scope.data[$scope.component.key] = parseInt($scope.component.defaultValue);
+                    return;
+                  }
+
+                  var temp = $scope.component.defaultValue.split(',');
+                  $scope.data[$scope.component.key] = temp.map(function(item) {
+                    try {
+                      return parseInt(item);
+                    }
+                    catch (e) {
+                      return 0;
+                    }
+                  });
+                  return;
+                }
                 // FOR-135 - Add default values for select components.
-                if ($scope.component.type === 'select') {
-
-
+                else if ($scope.component.type === 'select') {
                   // If using the values input, split the default values, and search the options for each value in the list.
                   if ($scope.component.dataSrc === 'values') {
                     var temp = [];
@@ -347,7 +348,6 @@ module.exports = [
 
                     value = pluckItems(value, $scope.component.data.json);
                   }
-
                   else if ($scope.component.dataSrc === 'url' || $scope.component.dataSrc === 'resource') {
                     // Wait until loading is done.
                     var watching = $scope.$watch('selectLoading', function(loading) {
@@ -360,6 +360,22 @@ module.exports = [
                       }
                     });
                   }
+                }
+                else {
+                  if (!mult) {
+                    $scope.data[$scope.component.key] = $scope.component.defaultValue;
+                    return;
+                  }
+
+                  // If there is a default value and it is an array, assign it to the value.
+                  if ($scope.component.defaultValue instanceof Array) {
+                    $scope.data[$scope.component.key] = $scope.component.defaultValue;
+                    return;
+                  }
+
+                  // Make the defaultValue a single element array because were multi.
+                  $scope.data[$scope.component.key] = [$scope.component.defaultValue];
+                  return;
                 }
               }
               else {
