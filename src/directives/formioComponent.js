@@ -277,6 +277,35 @@ module.exports = [
 
                   // FOR-135 - Add default values for select components.
                   if ($scope.component.type === 'select') {
+                    /**
+                     * Using the list of default options, split them with the identifier, and use filter to get each item.
+                     *
+                     * @param defaultItems
+                     * @param searchItems
+                     * @returns {Array}
+                     */
+                    var pluckItems = function(defaultItems, searchItems) {
+                      var temp = [];
+
+                      defaultItems.forEach(function(item) {
+                        var parts = item.split(':');
+                        if (parts.length === 2) {
+                          var result = _.filter(searchItems, function(potential) {
+                            if (_.get(potential, parts[0]) === parts[1]) {
+                              return true;
+                            }
+                          });
+
+                          if (result) {
+                            temp = temp.concat(result);
+                          }
+                        }
+                      });
+
+                      return temp;
+                    };
+
+                    // If using the values input, split the default values, and search the options for each value in the list.
                     if ($scope.component.dataSrc === 'values') {
                       var temp = [];
 
@@ -287,6 +316,35 @@ module.exports = [
                       });
 
                       value = temp;
+                    }
+                    // If using json input, split the values and search each key path for the item
+                    else if ($scope.component.dataSrc === 'json') {
+                      if (typeof $scope.component.data.json === 'string') {
+                        try {
+                          $scope.component.data.json = JSON.parse($scope.component.data.json);
+                        }
+                        catch (e) {
+                          console.log(e);
+                          console.log('Could not parse the given JSON for the select component: ' + $scope.component.key);
+                          console.log($scope.component.data.json);
+                          $scope.component.data.json = [];
+                        }
+                      }
+
+                      value = pluckItems(value, $scope.component.data.json);
+                    }
+
+                    else if ($scope.component.dataSrc === 'url' || $scope.component.dataSrc === 'resource') {
+                      // Wait until loading is done.
+                      var watching = $scope.$watch('selectLoading', function(loading) {
+                        if (!loading) {
+                          // Stop the watch and filter the default items.
+                          watching();
+
+                          // Update scope directly, since this is async.
+                          $scope.data[$scope.component.key] = pluckItems(value, $scope.selectItems);
+                        }
+                      });
                     }
                   }
                 }
