@@ -19,6 +19,7 @@ dependencies:
   override:
     - ./appSetup.sh
     - echo $TAG > dist/version.txt
+    - sed -i '' "s/APP_VERSION/${TAG}/g" dist/config.js
 
 test:
   pre:
