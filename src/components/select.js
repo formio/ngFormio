@@ -162,10 +162,6 @@ module.exports = function(app) {
             return valueProp ? item[valueProp] : item;
           };
 
-          if (settings.multiple) {
-            settings.defaultValue = [];
-          }
-
           $scope.refreshItems = angular.noop;
           $scope.$on('refreshList', function(event, url, input) {
             $scope.refreshItems(input, url);
