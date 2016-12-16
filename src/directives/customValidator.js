@@ -14,10 +14,12 @@ module.exports = function() {
         var valid = true;
         /*eslint-disable no-unused-vars */
         var input = modelValue || viewValue;
+        var data = scope.data;
         /*eslint-enable no-unused-vars */
+
         var custom = scope.component.validate.custom;
-        custom = custom.replace(/({{\s+(.*)\s+}})/, function(match, $1, $2) {
-          return scope.data[$2];
+        custom = custom.replace(/({{\s{0,}(.*[^\s]){1}\s{0,}}})/, function(match, $1, $2) {
+          return 'scope.data.' + $2;
         });
 
         try {
