@@ -18,7 +18,7 @@ module.exports = function() {
         /*eslint-enable no-unused-vars */
 
         var custom = scope.component.validate.custom;
-        custom = custom.replace(/({{\s{0,}(.*[^\s]){1}\s{0,}}})/, function(match, $1, $2) {
+        custom = custom.replace(/({{\s{0,}(.*[^\s]){1}\s{0,}}})/g, function(match, $1, $2) {
           return 'scope.data.' + $2;
         });
 
