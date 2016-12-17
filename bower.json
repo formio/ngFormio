@@ -15,14 +15,12 @@
     "angular-chartist.js": "3.3.13",
     "bootswatch": "^3.3.7",
     "angular-paginate-anything": "^4.1.3",
-    "kendo-ui": "kendo-ui-core#2016.3.914+Official",
     "lodash": "^4.17.2",
     "angular-truncate-2": "^0.4.2",
     "bootstrap-sass": "^3.3.7",
     "ng-dialog": "^0.6.4",
     "angular-swagger-ui": "git@github.com:randallknutson/angular-swagger-ui.git#master",
     "number-abbreviate": "^1.2.1",
-    "seamless": "^0.0.6",
     "ng-formio": "^2.5.2",
     "ng-formio-builder": "^2.5.2",
     "ng-tags-input": "^3.1.1",
@@ -31,7 +29,8 @@
     "ckeditor": "^4.5.10",
     "jquery": "2.2.4",
     "qs": "https://github.com/ljharb/qs.git#^6.2.1",
-    "angular-toastr": "^2.1.1"
+    "angular-toastr": "^2.1.1",
+    "seamless": "v1.0.0.beta.1"
   },
   "overrides": {
     "kendo-ui": {
