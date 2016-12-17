@@ -1032,6 +1032,8 @@ app.controller('LaunchController', [
       url += '&appUrl=' + encodeURIComponent($location.protocol() + '://' + project.name + '.' + AppConfig.serverHost);
       $scope.previewUrl = $sce.trustAsResourceUrl(url);
       $scope.repo = project.settings.preview.repo;
+      var parts = $scope.repo.split('/');
+      $scope.appFolder = parts[parts.length - 1];
     });
     $scope.$watch('project', function(newProject, oldProject) {
       if (newProject && newProject.name) {
