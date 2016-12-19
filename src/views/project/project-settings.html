@@ -136,7 +136,7 @@
       <div class="panel-heading">Export Project</div>
       <div class="panel-body">
         <p>The following button will export your project as a JSON file that can then be used as a template for other projects.</p>
-        <a href="//api.{{ appConfig.serverHost }}/project/{{ currentProject._id }}/export?x-jwt-token={{ token }}" class="btn btn-primary">Export Project</a>
+        <a href="//api.{{ appConfig.serverHost }}/project/{{ currentProject._id }}/export?x-jwt-token={{ token }}" class="btn btn-success">Export Project</a>
       </div>
     </div>
     <div class="panel panel-default">
@@ -147,8 +147,6 @@
       </div>
     </div>
   </div>
-  <div class="pull-right">
-    <a ng-if="!currentProject._id" ui-sref="home()" class="btn btn-default">Cancel</a>
-    <button type="submit" class="btn btn-primary" ng-disabled="projectForm.$invalid">{{currentProject._id ? 'Save' : 'Create Project'}}</button>
-  </div>
+  <a ng-if="!currentProject._id" ui-sref="home()" class="btn btn-default">Cancel</a>
+  <button type="submit" class="btn btn-primary" ng-disabled="projectForm.$invalid">{{currentProject._id ? 'Save Project' : 'Create Project'}}</button>
 </form>

@@ -354,25 +354,24 @@ app.controller('FormController', [
     $scope.embedCode = '';
     $scope.setEmbedCode = function(gotoUrl) {
       var embedCode = '<script type="text/javascript">';
-      embedCode += '(function a(u) {';
-      embedCode +=   'if (typeof jQuery === "undefined") {';
-      embedCode +=     'return setTimeout(a, 100);';
-      embedCode +=   '}';
-      embedCode +=   'document.write(';
-      embedCode +=     'jQuery(document.createElement("script")).attr("src", "https://npmcdn.com/seamless@latest")';
-      embedCode +=   ');';
-      embedCode +=   '(function b($) {';
-      embedCode +=     'if (typeof $.fn.seamless === "undefined") {';
-      embedCode +=       'return setTimeout(b, 100);';
-      embedCode +=     '}';
-      embedCode +=     '$(function() {';
-      embedCode +=       '$(\'#formio-form\').seamless({fallback:false}).receive(function(d, e) {';
-      embedCode +=         gotoUrl ? 'window.location.href = "' + gotoUrl + '";' : '';
-      embedCode +=       '});';
-      embedCode +=     '});';
-      embedCode +=   '})(jQuery);';
-      embedCode += '})();</script>';
-      embedCode += '<iframe id="formio-form" style="width:100%;border:none;" height="600px" src="https://form.io/view/#/' + $scope.currentProject.name + '/' + $scope.form.path + '?iframe=1&header=0"></iframe>';
+      embedCode += '(function a(d, w, u) {';
+      embedCode +=    'var h = d.getElementsByTagName("head")[0];';
+      embedCode +=    'var s = d.createElement("script");';
+      embedCode +=    's.type = "text/javascript";';
+      embedCode +=    's.src = "' + AppConfig.appBase + '/lib/seamless/seamless.parent.min.js";';
+      embedCode +=    's.onload = function b() {';
+      embedCode +=        'var f = d.getElementById("formio-form-' + $scope.form._id + '");';
+      embedCode +=        'if (!f || (typeof w.seamless === u)) {';
+      embedCode +=            'return setTimeout(b, 100);';
+      embedCode +=        '}';
+      embedCode +=        'w.seamless(f, {fallback:false}).receive(function(d, e) {';
+      embedCode +=            gotoUrl ? 'window.location.href = "' + gotoUrl + '";' : '';
+      embedCode +=        '});';
+      embedCode +=    '};';
+      embedCode +=    'h.appendChild(s);';
+      embedCode += '})(document, window);';
+      embedCode += '</script>';
+      embedCode += '<iframe id="formio-form-' + $scope.form._id + '" style="width:100%;border:none;" height="600px" src="https://formview.io/#/' + $scope.currentProject.name + '/' + $scope.form.path + '?iframe=1&header=0"></iframe>';
       $scope.embedCode = embedCode;
     };
 
@@ -455,6 +454,29 @@ app.controller('FormController', [
       $scope.setEmbedCode();
     });
 
+    $scope.updateCurrentFormResources = function(form) {
+      // Build the list of selectable resources for the submission resource access ui.
+      $scope.currentFormResources = _(FormioUtils.flattenComponents(form.components))
+        .filter(function(component) {
+          if (component.type === 'resource') {
+            return true;
+          }
+          if (component.type === 'select' && component.dataSrc === 'resource') {
+            return true;
+          }
+
+          return false;
+        })
+        .map(function(component) {
+          return {
+            label: component.label || '',
+            key: component.key || '',
+            defaultPermission: component.defaultPermission || ''
+          };
+        })
+        .value();
+    };
+
     // Load the form.
     if ($scope.formId) {
       $scope.loadFormPromise = $scope.formio.loadForm()
@@ -464,17 +486,7 @@ app.controller('FormController', [
             form.display = 'form';
           }
 
-          // Build the list of selectable resources for the submission resource access ui.
-          $scope.currentFormResources = _(FormioUtils.flattenComponents(form.components))
-            .filter({type: 'resource'})
-            .map(function(component) {
-              return {
-                label: component.label || '',
-                key: component.key || '',
-                defaultPermission: component.defaultPermission || ''
-              };
-            })
-            .value();
+          $scope.updateCurrentFormResources(form);
 
           $scope.form = form;
           $scope.form.page = 0;
@@ -558,7 +570,6 @@ app.controller('FormController', [
             // Reload page to start editing as an existing form.
             $state.go('project.' + $scope.formInfo.type + '.form.edit', {formId: form._id});
           }
-
         })
         .catch(function(err) {
           if (err) {
@@ -596,6 +607,7 @@ app.controller('FormController', [
     // Called when the form is updated.
     $scope.$on('formUpdate', function(event, form) {
       event.stopPropagation();
+      $scope.updateCurrentFormResources(form);
       $scope.form.components = form.components;
     });
 
@@ -654,7 +666,7 @@ app.controller('FormShareController', ['$scope', function($scope) {
 
   // Method to load the preview.
   var loadPreview = function() {
-    $scope.previewUrl = 'https://form.io/view/#/';
+    $scope.previewUrl = 'https://formview.io/#/';
     $scope.previewUrl += $scope.currentProject.name + '/' + $scope.currentForm.path + '?';
     $scope.previewUrl += $scope.options.showHeader ? 'header=1' : 'header=0';
     if ($scope.options.theme) {
@@ -745,25 +757,25 @@ app.controller('FormShareController', ['$scope', function($scope) {
 
 app.factory('FormioAlerts', [
   '$rootScope',
-  'Notification',
+  'toastr',
   function (
     $rootScope,
-    Notification
+    toastr
   ) {
     return {
       addAlert: function (alert) {
         switch (alert.type) {
           case 'danger':
-            Notification.error({message: alert.message});
+            toastr.error(alert.message);
             break;
           case 'info':
-            Notification.info({message: alert.message});
+            toastr.info(alert.message);
             break;
           case 'success':
-            Notification.success({message: alert.message});
+            toastr.success(alert.message);
             break;
           case 'warning':
-            Notification.warning({message: alert.message});
+            toastr.warning(alert.message);
             break;
         }
 

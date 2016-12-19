@@ -12,9 +12,6 @@
     <!-- bower:css -->
     <link rel="stylesheet" href="/bower_components/ng-sortable/dist/ng-sortable.css" />
     <link rel="stylesheet" href="/bower_components/chartist/dist/chartist.min.css" />
-    <link rel="stylesheet" href="/bower_components/kendo-ui/styles/kendo.common.min.css" />
-    <link rel="stylesheet" href="/bower_components/kendo-ui/styles/kendo.bootstrap.min.css" />
-    <link rel="stylesheet" href="/bower_components/angular-ui-notification/dist/angular-ui-notification.css" />
     <link rel="stylesheet" href="/bower_components/ng-dialog/css/ngDialog.css" />
     <link rel="stylesheet" href="/bower_components/ng-dialog/css/ngDialog-theme-default.css" />
     <link rel="stylesheet" href="/bower_components/angular-swagger-ui/dist/css/swagger-ui.min.css" />
@@ -23,6 +20,7 @@
     <link rel="stylesheet" href="/bower_components/ng-ckeditor/ng-ckeditor.css" />
     <link rel="stylesheet" href="/bower_components/ng-tags-input/ng-tags-input.css" />
     <link rel="stylesheet" href="/bower_components/ng-formio-builder/css/ngFormBuilder.css" />
+    <link rel="stylesheet" href="/bower_components/angular-toastr/dist/angular-toastr.min.css" />
     <!-- endbower -->
     <!-- endbuild -->
 
@@ -32,6 +30,8 @@
     <!-- endinject -->
     <!-- endbuild -->
 
+    <link rel="stylesheet" href="/lib/kendo-ui/styles/kendo.common.min.css" />
+    <link rel="stylesheet" href="/lib/kendo-ui/styles/kendo.bootstrap.min.css" />
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,700' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Comfortaa:400,700' rel='stylesheet' type='text/css'>
     <script src="lib/ckeditor/ckeditor.js" type="text/javascript"></script>
@@ -199,7 +199,7 @@
           </div>
         </div>
         <div class="row">
-          <span class="copyright">Made with <i class="fa fa-heart"></i> in Dallas, TX - &copy; Form.io LLC 2015. All rights reserved</span>
+          <span class="copyright">Made with <i class="fa fa-heart"></i> in Dallas, TX - &copy; Form.io LLC 2015. All rights reserved</span> - <span>{{ appConfig.appVersion }}</span>
         </div>
       </div>
     </footer>
@@ -235,15 +235,11 @@
     <script src="/bower_components/chartist/dist/chartist.min.js"></script>
     <script src="/bower_components/angular-chartist.js/dist/angular-chartist.min.js"></script>
     <script src="/bower_components/angular-paginate-anything/dist/paginate-anything-tpls.min.js"></script>
-    <script src="/bower_components/kendo-ui/js/kendo.ui.core.min.js"></script>
-    <script src="/bower_components/kendo-ui/js/kendo.angular.min.js"></script>
     <script src="/bower_components/lodash/dist/lodash.min.js"></script>
     <script src="/bower_components/angular-truncate-2/dist/angular-truncate-2.min.js"></script>
-    <script src="/bower_components/angular-ui-notification/dist/angular-ui-notification.min.js"></script>
     <script src="/bower_components/ng-dialog/js/ngDialog.min.js"></script>
     <script src="/bower_components/angular-swagger-ui/dist/scripts/swagger-ui.min.js"></script>
     <script src="/bower_components/number-abbreviate/index.js"></script>
-    <script src="/bower_components/seamless/build/seamless.parent.min.js"></script>
     <script src="/bower_components/ng-file-upload/ng-file-upload.min.js"></script>
     <script src="/bower_components/bootstrap-ui-datetime-picker/dist/datetime-picker.min.js"></script>
     <script src="/bower_components/signature_pad/signature_pad.min.js"></script>
@@ -260,6 +256,8 @@
     <script src="/bower_components/ng-formio-builder/dist/ngFormBuilder.js"></script>
     <script src="/bower_components/chance/chance.js"></script>
     <script src="/bower_components/qs/dist/qs.js"></script>
+    <script src="/bower_components/angular-toastr/dist/angular-toastr.tpls.min.js"></script>
+    <script src="/bower_components/seamless/build/seamless.parent.min.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 
@@ -279,12 +277,13 @@
     <!-- endbuild -->
 
     <!-- build:js scripts/kendo.js -->
-    <script src="lib/kendo-ui-trial/js/kendo.grid.min.js" type="text/javascript"></script>
-    <script src="lib/kendo-ui-trial/js/kendo.columnsorter.min.js" type="text/javascript"></script>
-    <script src="lib/kendo-ui-trial/js/kendo.columnmenu.min.js" type="text/javascript"></script>
-    <script src="lib/kendo-ui-trial/js/kendo.reorderable.min.js" type="text/javascript"></script>
-    <script src="lib/kendo-ui-trial/js/kendo.groupable.min.js" type="text/javascript"></script>
-    <script src="lib/kendo-ui-trial/js/kendo.filtermenu.min.js" type="text/javascript"></script>
+    <script src="/lib/kendo-ui/js/kendo.web.min.js" type="text/javascript"></script>
+    <script src="/lib/kendo-ui/js/kendo.core.min.js" type="text/javascript"></script>
+    <script src="/lib/kendo-ui/js/kendo.data.min.js" type="text/javascript"></script>
+    <script src="/lib/kendo-ui/js/kendo.dropdownlist.min.js" type="text/javascript"></script>
+    <script src="/lib/kendo-ui/js/kendo.filtermenu.min.js" type="text/javascript"></script>
+    <script src="/lib/kendo-ui/js/kendo.grid.min.js" type="text/javascript"></script>
+    <script src="/lib/kendo-ui/js/kendo.angular.min.js" type="text/javascript"></script>
     <!-- endbuild -->
 
     <!-- build:js scripts/app.js -->

@@ -65,8 +65,8 @@ Feature: Project Functionality
     When I click on the Manage button
     Then I am on the ${project4.title} project portal
     When I click on the #nav-bar-settings-link element
-    And I click on the Save button
-    Then I see div.message with the text Project saved.
+    And I click on the Save Project button
+    Then I see a notification with the text Project saved.
 
   Scenario: Cant save project after removing its title
     Given I am logged in for projuser4
@@ -77,7 +77,7 @@ Feature: Project Functionality
     Then I am on the ${project5.title} project portal
     When I click on the #nav-bar-settings-link element
     And I enter ${empty} in the input#title field
-    Then the Save button is disabled
+    Then the Save Project button is disabled
 
   Scenario: Cant save project with a long title or long description
     Given I am logged in for projuser4
@@ -91,7 +91,7 @@ Feature: Project Functionality
     And I see the plaintext Project Title cannot be longer than 63 characters.
     When I enter 123456789012345678901234567890123456789012345678901234567890123412345678901234567890123456789012345678901234567890123456789012341234567890123456789012345678901234567890123456789012345678901234123456789012345678901234567890123456789012345678901234567890123412345678901234567890123456789012345678901234567890123456789012341234567890123456789012345678901234567890123456789012345678901234123456789012345678901234567890123456789012345678901234567890123412345678901234567890123456789012345678901234567890123456789012345 in the input#description field
     And I see the plaintext Description cannot be longer than 512 characters.
-    Then the Save button is disabled
+    Then the Save Project button is disabled
 
   Scenario: Can save project after removing its description
     Given I am logged in for projuser5
@@ -102,8 +102,8 @@ Feature: Project Functionality
     Then I am on the ${project6.title} project portal
     When I click on the #nav-bar-settings-link element
     And I enter ${empty} in the input#description field
-    And I click on the Save button
-    Then I see div.message with the text Project saved.
+    And I click on the Save Project button
+    Then I see a notification with the text Project saved.
 
   Scenario: Deleting a project warnings
     Given I am logged in for projuser6
@@ -119,4 +119,4 @@ Feature: Project Functionality
     Then I see .project-section-inner-content h2 with the text Are you sure you wish to delete the Project
     And I see button.btn.btn-danger with the text Yes
     And I click the Yes button
-    Then I see div.message with the text Project was deleted!
+    Then I see a notification with the text Project was deleted!
