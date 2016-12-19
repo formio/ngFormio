@@ -14,7 +14,10 @@ module.exports = function() {
         var valid = true;
         /*eslint-disable no-unused-vars */
         var input = modelValue || viewValue;
-        var data = scope.data;
+
+        // FOR-255 - Enable row data and form data to be visible in the validator.
+        var data = scope.data = scope.submission.data;
+        var row = scope.row = scope.data;
         /*eslint-enable no-unused-vars */
 
         var custom = scope.component.validate.custom;
