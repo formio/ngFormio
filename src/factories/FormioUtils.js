@@ -51,7 +51,6 @@ module.exports = function() {
       });
     },
     fieldWrap: function(input) {
-      input = input + '<formio-errors ng-if="::!builder"></formio-errors>';
       var multiInput = input.replace('data[component.key]', 'data[component.key][$index]');
       var inputLabel = '<label ng-if="component.label && !component.hideLabel" for="{{ component.key }}" class="control-label" ng-class="{\'field-required\': component.validate.required}">{{ component.label | formioTranslate:null:builder }}</label>';
       var requiredInline = '<span ng-if="(component.hideLabel === true || component.label === \'\' || !component.label) && component.validate.required" class="glyphicon glyphicon-asterisk form-control-feedback field-required-inline" aria-hidden="true"></span>';
@@ -64,6 +63,9 @@ module.exports = function() {
             requiredInline +
             '<div class="input-group-addon" ng-if="!!component.suffix">{{ component.suffix }}</div>' +
           '</div>' +
+          '<div class="formio-errors">' +
+            '<formio-errors ng-if="::!builder"></formio-errors>' +
+          '</div>' +
         '</div>' +
         '<div ng-if="component.multiple"><table class="table table-bordered">' +
           inputLabel +
@@ -74,6 +76,9 @@ module.exports = function() {
                   multiInput +
                   requiredInline +
                 '<div class="input-group-addon" ng-if="!!component.suffix">{{ component.suffix }}</div>' +
+              '</div>' +
+              '<div class="formio-errors">' +
+                '<formio-errors ng-if="::!builder"></formio-errors>' +
               '</div>' +
             '</td>' +
             '<td><a ng-click="removeFieldValue($index)" class="btn btn-default"><span class="glyphicon glyphicon-remove-circle"></span></a></td>' +
