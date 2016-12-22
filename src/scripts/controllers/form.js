@@ -508,16 +508,18 @@ app.controller('FormController', [
           var form = response.form;
           var headers = response.headers;
           var method = $stateParams.formId ? 'updated' : 'created';
-          FormioAlerts.addAlert({
-            type: 'success',
-            message: 'Successfully ' + method + ' form!'
-          });
           GoogleAnalytics.sendEvent('Form', method.substring(0, method.length - 1), null, 1);
 
           if (headers.hasOwnProperty('x-form-merge')) {
             FormioAlerts.addAlert({
               type: 'warning',
-              message: 'This form has been modified by another person. All form changes have been merged.'
+              message: 'This form has been modified by another user. All form changes have been merged and saved.'
+            });
+          }
+          else {
+            FormioAlerts.addAlert({
+              type: 'success',
+              message: 'Successfully ' + method + ' form!'
             });
           }
 
