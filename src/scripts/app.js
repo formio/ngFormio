@@ -34,14 +34,20 @@ angular
     '$locationProvider',
     'FormioProvider',
     'AppConfig',
+    'toastrConfig',
     function(
       $stateProvider,
       $urlRouterProvider,
       $locationProvider,
       FormioProvider,
-      AppConfig
+      AppConfig,
+      toastrConfig
     ) {
+      // Reset the hashPrefix to remove the "!".
       $locationProvider.hashPrefix('');
+
+      // Allow HTML in the notifications.
+      toastrConfig.allowHtml = true;
 
       // Set the base URL for our API.
       FormioProvider.setBaseUrl(AppConfig.apiBase);

@@ -300,25 +300,24 @@ app.controller('FormController', [
     $scope.embedCode = '';
     $scope.setEmbedCode = function(gotoUrl) {
       var embedCode = '<script type="text/javascript">';
-      embedCode += '(function a(u) {';
-      embedCode +=   'if (typeof jQuery === "undefined") {';
-      embedCode +=     'return setTimeout(a, 100);';
-      embedCode +=   '}';
-      embedCode +=   'document.write(';
-      embedCode +=     'jQuery(document.createElement("script")).attr("src", "https://npmcdn.com/seamless@latest")';
-      embedCode +=   ');';
-      embedCode +=   '(function b($) {';
-      embedCode +=     'if (typeof $.fn.seamless === "undefined") {';
-      embedCode +=       'return setTimeout(b, 100);';
-      embedCode +=     '}';
-      embedCode +=     '$(function() {';
-      embedCode +=       '$(\'#formio-form\').seamless({fallback:false}).receive(function(d, e) {';
-      embedCode +=         gotoUrl ? 'window.location.href = "' + gotoUrl + '";' : '';
-      embedCode +=       '});';
-      embedCode +=     '});';
-      embedCode +=   '})(jQuery);';
-      embedCode += '})();</script>';
-      embedCode += '<iframe id="formio-form" style="width:100%;border:none;" height="600px" src="https://form.io/view/#/' + $scope.currentProject.name + '/' + $scope.form.path + '?iframe=1&header=0"></iframe>';
+      embedCode += '(function a(d, w, u) {';
+      embedCode +=    'var h = d.getElementsByTagName("head")[0];';
+      embedCode +=    'var s = d.createElement("script");';
+      embedCode +=    's.type = "text/javascript";';
+      embedCode +=    's.src = "' + AppConfig.appBase + '/lib/seamless/seamless.parent.min.js";';
+      embedCode +=    's.onload = function b() {';
+      embedCode +=        'var f = d.getElementById("formio-form-' + $scope.form._id + '");';
+      embedCode +=        'if (!f || (typeof w.seamless === u)) {';
+      embedCode +=            'return setTimeout(b, 100);';
+      embedCode +=        '}';
+      embedCode +=        'w.seamless(f, {fallback:false}).receive(function(d, e) {';
+      embedCode +=            gotoUrl ? 'window.location.href = "' + gotoUrl + '";' : '';
+      embedCode +=        '});';
+      embedCode +=    '};';
+      embedCode +=    'h.appendChild(s);';
+      embedCode += '})(document, window);';
+      embedCode += '</script>';
+      embedCode += '<iframe id="formio-form-' + $scope.form._id + '" style="width:100%;border:none;" height="600px" src="https://formview.io/#/' + $scope.currentProject.name + '/' + $scope.form.path + '?iframe=1&header=0"></iframe>';
       $scope.embedCode = embedCode;
     };
 
@@ -623,7 +622,7 @@ app.controller('FormShareController', ['$scope', function($scope) {
 
   // Method to load the preview.
   var loadPreview = function() {
-    $scope.previewUrl = 'https://form.io/view/#/';
+    $scope.previewUrl = 'https://formview.io/#/';
     $scope.previewUrl += $scope.currentProject.name + '/' + $scope.currentForm.path + '?';
     $scope.previewUrl += $scope.options.showHeader ? 'header=1' : 'header=0';
     if ($scope.options.theme) {
