@@ -126,7 +126,7 @@ module.exports = [
                 value = '';
               }
             }
-            else if ($scope.component.hasOwnProperty('defaultValue') && $scope.component.defaultValue) {
+            else if ($scope.component.hasOwnProperty('defaultValue')) {
               // Fix for select components
               if ($scope.component.type === 'select') {
                 try {
@@ -244,7 +244,11 @@ module.exports = [
               return temp;
             };
 
-            $scope.$watch('component.multiple', function(mult) {
+            $scope.$watch('component.multiple', function(mult, old) {
+              if (mult === undefined && old === undefined) {
+                return;
+              }
+
               // Establish a default for data.
               $scope.data = $scope.data || {};
               var value = null;
@@ -295,15 +299,16 @@ module.exports = [
                 $scope.data[$scope.component.key] = value;
                 return;
               }
-              else if ($scope.component.hasOwnProperty('defaultValue') && $scope.component.defaultValue) {
+              else if ($scope.component.hasOwnProperty('defaultValue')) {
                 // FA-835 - The default values for select boxes are set in the component.
                 if ($scope.component.type === 'selectboxes') {
                   return;
                 }
 
                 // If there is a default value and it is not an array, wrap the value.
-                value = $scope.component.defaultValue.split(',');
-                var temp;
+                if (mult && typeof $scope.component.defaultValue === 'string') {
+                  value = $scope.component.defaultValue.split(',');
+                }
 
                 // FOR-193 - Fix default value for the number component.
                 // FOR-262 - Fix multiple default value for the number component.
@@ -313,8 +318,7 @@ module.exports = [
                     return;
                   }
 
-                  temp = $scope.component.defaultValue.split(',');
-                  $scope.data[$scope.component.key] = temp.map(function(item) {
+                  $scope.data[$scope.component.key] = value.map(function(item) {
                     try {
                       return parseInt(item);
                     }
@@ -328,10 +332,10 @@ module.exports = [
                 else if ($scope.component.type === 'select') {
                   // If using the values input, split the default values, and search the options for each value in the list.
                   if ($scope.component.dataSrc === 'values') {
-                    temp = [];
+                    var temp = [];
 
                     $scope.component.data.values.forEach(function(item) {
-                      if (value.indexOf(item.value) !== -1) {
+                      if (value && value.indexOf(item.value) !== -1) {
                         temp.push(item);
                       }
                     });
