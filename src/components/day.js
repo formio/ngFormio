@@ -67,8 +67,10 @@ module.exports = function(app) {
         scope.$watch('ngModel', function() {
           // Only update on load.
           if (ngModel.$viewValue && !ngModel.$dirty) {
-            var parts = ngModel.$viewValue.split('/');
-            if (parts.length === 3) {
+            var parts = typeof ngModel.$viewValue === 'string'
+              ? ngModel.$viewValue.split('/')
+              : ngModel.$viewValue;
+            if ((parts instanceof Array) && parts.length === 3) {
               scope.date.day = parts[(scope.component.dayFirst ? 0 : 1)];
               scope.date.month = parseInt(parts[(scope.component.dayFirst ? 1 : 0)]).toString();
               scope.date.year = parts[2];
