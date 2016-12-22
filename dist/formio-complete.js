@@ -1,4 +1,4 @@
-/*! ng-formio v2.6.1 | https://unpkg.com/ng-formio@2.6.1/LICENSE.txt */
+/*! ng-formio v2.6.2 | https://unpkg.com/ng-formio@2.6.2/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -63602,8 +63602,10 @@ module.exports = function(app) {
         scope.$watch('ngModel', function() {
           // Only update on load.
           if (ngModel.$viewValue && !ngModel.$dirty) {
-            var parts = ngModel.$viewValue.split('/');
-            if (parts.length === 3) {
+            var parts = typeof ngModel.$viewValue === 'string'
+              ? ngModel.$viewValue.split('/')
+              : ngModel.$viewValue;
+            if ((parts instanceof Array) && parts.length === 3) {
               scope.date.day = parts[(scope.component.dayFirst ? 0 : 1)];
               scope.date.month = parseInt(parts[(scope.component.dayFirst ? 1 : 0)]).toString();
               scope.date.year = parts[2];
@@ -65913,7 +65915,7 @@ module.exports = [
                 value = '';
               }
             }
-            else if ($scope.component.hasOwnProperty('defaultValue') && $scope.component.defaultValue) {
+            else if ($scope.component.hasOwnProperty('defaultValue')) {
               // Fix for select components
               if ($scope.component.type === 'select') {
                 try {
@@ -66031,7 +66033,11 @@ module.exports = [
               return temp;
             };
 
-            $scope.$watch('component.multiple', function(mult) {
+            $scope.$watch('component.multiple', function(mult, old) {
+              if (mult === undefined && old === undefined) {
+                return;
+              }
+
               // Establish a default for data.
               $scope.data = $scope.data || {};
               var value = null;
@@ -66082,15 +66088,16 @@ module.exports = [
                 $scope.data[$scope.component.key] = value;
                 return;
               }
-              else if ($scope.component.hasOwnProperty('defaultValue') && $scope.component.defaultValue) {
+              else if ($scope.component.hasOwnProperty('defaultValue')) {
                 // FA-835 - The default values for select boxes are set in the component.
                 if ($scope.component.type === 'selectboxes') {
                   return;
                 }
 
                 // If there is a default value and it is not an array, wrap the value.
-                value = $scope.component.defaultValue.split(',');
-                var temp;
+                if (mult && typeof $scope.component.defaultValue === 'string') {
+                  value = $scope.component.defaultValue.split(',');
+                }
 
                 // FOR-193 - Fix default value for the number component.
                 // FOR-262 - Fix multiple default value for the number component.
@@ -66100,8 +66107,7 @@ module.exports = [
                     return;
                   }
 
-                  temp = $scope.component.defaultValue.split(',');
-                  $scope.data[$scope.component.key] = temp.map(function(item) {
+                  $scope.data[$scope.component.key] = value.map(function(item) {
                     try {
                       return parseInt(item);
                     }
@@ -66115,10 +66121,10 @@ module.exports = [
                 else if ($scope.component.type === 'select') {
                   // If using the values input, split the default values, and search the options for each value in the list.
                   if ($scope.component.dataSrc === 'values') {
-                    temp = [];
+                    var temp = [];
 
                     $scope.component.data.values.forEach(function(item) {
-                      if (value.indexOf(item.value) !== -1) {
+                      if (value && value.indexOf(item.value) !== -1) {
                         temp.push(item);
                       }
                     });
