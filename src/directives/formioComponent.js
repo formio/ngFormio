@@ -126,7 +126,7 @@ module.exports = [
                 value = '';
               }
             }
-            else if ($scope.component.hasOwnProperty('defaultValue')) {
+            else if ($scope.component.hasOwnProperty('defaultValue') && $scope.component.defaultValue) {
               // Fix for select components
               if ($scope.component.type === 'select') {
                 try {
@@ -295,7 +295,7 @@ module.exports = [
                 $scope.data[$scope.component.key] = value;
                 return;
               }
-              else if ($scope.component.hasOwnProperty('defaultValue')) {
+              else if ($scope.component.hasOwnProperty('defaultValue') && $scope.component.defaultValue) {
                 // FA-835 - The default values for select boxes are set in the component.
                 if ($scope.component.type === 'selectboxes') {
                   return;
