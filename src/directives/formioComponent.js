@@ -132,9 +132,11 @@ module.exports = [
                 try {
                   // Allow a key:value search
                   var parts = $scope.component.defaultValue.split(':');
+                  var results;
                   // If only one part was specified, search by value
+                  /* eslint-disable max-depth */
                   if (parts.length === 1) {
-                    var results = _.filter($scope.selectItems, {value: parts[0]});
+                    results = _.filter($scope.selectItems, {value: parts[0]});
 
                     // Trim results based on multiple
                     if (!$scope.component.multiple) {
@@ -149,7 +151,7 @@ module.exports = [
                     var search = {};
                     search[parts[0]] = parts[1];
 
-                    var results = _.filter($scope.selectItems, search);
+                    results = _.filter($scope.selectItems, search);
 
                     // Trim results based on multiple
                     if (!$scope.component.multiple) {
@@ -161,9 +163,11 @@ module.exports = [
                   }
                 }
                 catch (e) {
+                  /* eslint-disable no-console */
                   console.log('An issue occurred with the select defaultValue for: ' + $scope.component.key);
                   console.log('Could not find defaultValue (' + $scope.defaultValue + ') in the selectItems');
                   console.log($scope.selectItems);
+                  /* eslint-enable no-console */
                 }
               }
               else {
@@ -299,6 +303,7 @@ module.exports = [
 
                 // If there is a default value and it is not an array, wrap the value.
                 value = $scope.component.defaultValue.split(',');
+                var temp;
 
                 // FOR-193 - Fix default value for the number component.
                 // FOR-262 - Fix multiple default value for the number component.
@@ -308,7 +313,7 @@ module.exports = [
                     return;
                   }
 
-                  var temp = $scope.component.defaultValue.split(',');
+                  temp = $scope.component.defaultValue.split(',');
                   $scope.data[$scope.component.key] = temp.map(function(item) {
                     try {
                       return parseInt(item);
@@ -323,7 +328,7 @@ module.exports = [
                 else if ($scope.component.type === 'select') {
                   // If using the values input, split the default values, and search the options for each value in the list.
                   if ($scope.component.dataSrc === 'values') {
-                    var temp = [];
+                    temp = [];
 
                     $scope.component.data.values.forEach(function(item) {
                       if (value.indexOf(item.value) !== -1) {
@@ -340,9 +345,11 @@ module.exports = [
                         $scope.component.data.json = JSON.parse($scope.component.data.json);
                       }
                       catch (e) {
+                        /* eslint-disable no-console */
                         console.log(e);
                         console.log('Could not parse the given JSON for the select component: ' + $scope.component.key);
                         console.log($scope.component.data.json);
+                        /* eslint-enable no-console */
                         $scope.component.data.json = [];
                       }
                     }
