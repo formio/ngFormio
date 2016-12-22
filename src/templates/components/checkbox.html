@@ -8,6 +8,6 @@
       ng-model="data[component.key]"
       ng-required="component.validate.required"
     >
-    {{ component.label | formioTranslate:null:builder }}
+    <span ng-if="!(component.hideLabel && component.datagridLabel === false)">{{ component.label | formioTranslate:null:builder }}</span>
   </label>
 </div>

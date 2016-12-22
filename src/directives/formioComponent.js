@@ -1,9 +1,11 @@
 module.exports = [
   'Formio',
   'formioComponents',
+  'Lodash',
   function(
     Formio,
-    formioComponents
+    formioComponents,
+    _
   ) {
     return {
       replace: true,
@@ -43,6 +45,7 @@ module.exports = [
           $controller,
           FormioUtils
         ) {
+          $scope.builder = $scope.builder || false;
           // Options to match jquery.maskedinput masks
           $scope.uiMaskOptions = {
             maskDefinitions: {
@@ -123,8 +126,53 @@ module.exports = [
                 value = '';
               }
             }
-            else if ($scope.component.hasOwnProperty('defaultValue')) {
-              value = $scope.component.defaultValue;
+            else if ($scope.component.hasOwnProperty('defaultValue') && $scope.component.defaultValue) {
+              // Fix for select components
+              if ($scope.component.type === 'select') {
+                try {
+                  // Allow a key:value search
+                  var parts = $scope.component.defaultValue.split(':');
+                  var results;
+                  // If only one part was specified, search by value
+                  /* eslint-disable max-depth */
+                  if (parts.length === 1) {
+                    results = _.filter($scope.selectItems, {value: parts[0]});
+
+                    // Trim results based on multiple
+                    if (!$scope.component.multiple) {
+                      value = results.shift();
+                    }
+                    else {
+                      value = results;
+                    }
+                  }
+                  // If two parts were specified, allow for key and value customization.
+                  else if (parts.length === 2) {
+                    var search = {};
+                    search[parts[0]] = parts[1];
+
+                    results = _.filter($scope.selectItems, search);
+
+                    // Trim results based on multiple
+                    if (!$scope.component.multiple) {
+                      value = results.shift();
+                    }
+                    else {
+                      value = results;
+                    }
+                  }
+                }
+                catch (e) {
+                  /* eslint-disable no-console */
+                  console.log('An issue occurred with the select defaultValue for: ' + $scope.component.key);
+                  console.log('Could not find defaultValue (' + $scope.defaultValue + ') in the selectItems');
+                  console.log($scope.selectItems);
+                  /* eslint-enable no-console */
+                }
+              }
+              else {
+                value = $scope.component.defaultValue;
+              }
             }
             $scope.data[$scope.component.key] = $scope.data[$scope.component.key] || [];
             $scope.data[$scope.component.key].push(value);
@@ -168,22 +216,60 @@ module.exports = [
 
           // FOR-71 - Dont watch in the builder view.
           if (!$scope.builder) {
-            $scope.$watch('component.multiple', function() {
-              var value = null;
-              // Establish a default for data.
-              $scope.data = $scope.data || {};
-              if ($scope.component.multiple) {
-                if ($scope.data.hasOwnProperty($scope.component.key)) {
-                  // If a value is present, and its an array, assign it to the value.
-                  if ($scope.data[$scope.component.key] instanceof Array) {
-                    value = $scope.data[$scope.component.key];
-                  }
-                  // If a value is present and it is not an array, wrap the value.
-                  else {
-                    value = [$scope.data[$scope.component.key]];
+            /**
+             * Using the list of default options, split them with the identifier, and use filter to get each item.
+             *
+             * @param defaultItems
+             * @param searchItems
+             * @returns {Array}
+             */
+            var pluckItems = function(defaultItems, searchItems) {
+              var temp = [];
+
+              defaultItems.forEach(function(item) {
+                var parts = item.split(':');
+                if (parts.length === 2) {
+                  var result = _.filter(searchItems, function(potential) {
+                    if (_.get(potential, parts[0]) === parts[1]) {
+                      return true;
+                    }
+                  });
+
+                  if (result) {
+                    temp = temp.concat(result);
                   }
                 }
-                else if ($scope.component.hasOwnProperty('customDefaultValue')) {
+              });
+
+              return temp;
+            };
+
+            $scope.$watch('component.multiple', function(mult) {
+              // Establish a default for data.
+              $scope.data = $scope.data || {};
+              var value = null;
+
+              // Use the current data or default.
+              if ($scope.data.hasOwnProperty($scope.component.key)) {
+                if (!mult) {
+                  $scope.data[$scope.component.key] = $scope.data[$scope.component.key];
+                  return;
+                }
+
+                // If a value is present, and its an array, assign it to the value.
+                if ($scope.data[$scope.component.key] instanceof Array) {
+                  value = $scope.data[$scope.component.key];
+                }
+                // If a value is present and it is not an array, wrap the value.
+                else {
+                  value = $scope.data[$scope.component.key].split(',');
+                }
+
+                $scope.data[$scope.component.key] = value;
+                return;
+              }
+              else if ($scope.component.hasOwnProperty('customDefaultValue')) {
+                if (!mult) {
                   try {
                     value = eval('(function(data) { var value = "";' + $scope.component.customDefaultValue.toString() + '; return value; })($scope.data)');
                   }
@@ -193,32 +279,10 @@ module.exports = [
                     /* eslint-enable no-console */
                     value = '';
                   }
-                }
-                else if ($scope.component.hasOwnProperty('defaultValue')) {
-                  // If there is a default value and it is an array, assign it to the value.
-                  if ($scope.component.defaultValue instanceof Array) {
-                    value = $scope.component.defaultValue;
-                  }
-                  // If there is a default value and it is not an array, wrap the value.
-                  else {
-                    value = [$scope.component.defaultValue];
-                  }
-                }
-                else {
-                  // Couldn't safely default, make it a simple array. Possibly add a single obj or string later.
-                  value = [];
+                  $scope.data[$scope.component.key] = value;
+                  return;
                 }
 
-                // Use the current data or default.
-                $scope.data[$scope.component.key] = value;
-                return;
-              }
-
-              // Use the current data or default.
-              if ($scope.data.hasOwnProperty($scope.component.key)) {
-                $scope.data[$scope.component.key] = $scope.data[$scope.component.key];
-              }
-              else if ($scope.component.hasOwnProperty('customDefaultValue')) {
                 try {
                   value = eval('(function(data) { var value = "";' + $scope.component.customDefaultValue.toString() + '; return value; })($scope.data)');
                 }
@@ -229,16 +293,107 @@ module.exports = [
                   value = '';
                 }
                 $scope.data[$scope.component.key] = value;
+                return;
               }
-              // FA-835 - The default values for select boxes are set in the component.
-              else if ($scope.component.hasOwnProperty('defaultValue') && $scope.component.type !== 'selectboxes') {
-                $scope.data[$scope.component.key] = $scope.component.defaultValue;
+              else if ($scope.component.hasOwnProperty('defaultValue') && $scope.component.defaultValue) {
+                // FA-835 - The default values for select boxes are set in the component.
+                if ($scope.component.type === 'selectboxes') {
+                  return;
+                }
+
+                // If there is a default value and it is not an array, wrap the value.
+                value = $scope.component.defaultValue.split(',');
+                var temp;
 
                 // FOR-193 - Fix default value for the number component.
+                // FOR-262 - Fix multiple default value for the number component.
                 if ($scope.component.type === 'number') {
-                  $scope.data[$scope.component.key] = parseInt($scope.data[$scope.component.key]);
+                  if (!mult) {
+                    $scope.data[$scope.component.key] = parseInt($scope.component.defaultValue);
+                    return;
+                  }
+
+                  temp = $scope.component.defaultValue.split(',');
+                  $scope.data[$scope.component.key] = temp.map(function(item) {
+                    try {
+                      return parseInt(item);
+                    }
+                    catch (e) {
+                      return 0;
+                    }
+                  });
+                  return;
+                }
+                // FOR-135 - Add default values for select components.
+                else if ($scope.component.type === 'select') {
+                  // If using the values input, split the default values, and search the options for each value in the list.
+                  if ($scope.component.dataSrc === 'values') {
+                    temp = [];
+
+                    $scope.component.data.values.forEach(function(item) {
+                      if (value.indexOf(item.value) !== -1) {
+                        temp.push(item);
+                      }
+                    });
+
+                    value = temp;
+                  }
+                  // If using json input, split the values and search each key path for the item
+                  else if ($scope.component.dataSrc === 'json') {
+                    if (typeof $scope.component.data.json === 'string') {
+                      try {
+                        $scope.component.data.json = JSON.parse($scope.component.data.json);
+                      }
+                      catch (e) {
+                        /* eslint-disable no-console */
+                        console.log(e);
+                        console.log('Could not parse the given JSON for the select component: ' + $scope.component.key);
+                        console.log($scope.component.data.json);
+                        /* eslint-enable no-console */
+                        $scope.component.data.json = [];
+                      }
+                    }
+
+                    value = pluckItems(value, $scope.component.data.json);
+                  }
+                  else if ($scope.component.dataSrc === 'url' || $scope.component.dataSrc === 'resource') {
+                    // Wait until loading is done.
+                    var watching = $scope.$watch('selectLoading', function(loading) {
+                      if (!loading) {
+                        // Stop the watch and filter the default items.
+                        watching();
+
+                        // Update scope directly, since this is async.
+                        $scope.data[$scope.component.key] = pluckItems(value, $scope.selectItems);
+                      }
+                    });
+                  }
+                }
+                else {
+                  if (!mult) {
+                    $scope.data[$scope.component.key] = $scope.component.defaultValue;
+                    return;
+                  }
+
+                  // If there is a default value and it is an array, assign it to the value.
+                  if ($scope.component.defaultValue instanceof Array) {
+                    $scope.data[$scope.component.key] = $scope.component.defaultValue;
+                    return;
+                  }
+
+                  // Make the defaultValue a single element array because were multi.
+                  $scope.data[$scope.component.key] = [$scope.component.defaultValue];
+                  return;
                 }
               }
+              else {
+                // Couldn't safely default, make it a simple array. Possibly add a single obj or string later.
+                value = [];
+              }
+
+              // Use the current data or default.
+              $scope.data[$scope.component.key] = value;
+              return;
             });
           }
 
