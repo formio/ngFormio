@@ -43,6 +43,7 @@ module.exports = [
           $controller,
           FormioUtils
         ) {
+          $scope.builder = $scope.builder || false;
           // Options to match jquery.maskedinput masks
           $scope.uiMaskOptions = {
             maskDefinitions: {
