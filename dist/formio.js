@@ -8973,10 +8973,15 @@ module.exports = function() {
         var valid = true;
         /*eslint-disable no-unused-vars */
         var input = modelValue || viewValue;
+
+        // FOR-255 - Enable row data and form data to be visible in the validator.
+        var data = scope.submission.data;
+        var row = scope.data;
         /*eslint-enable no-unused-vars */
+
         var custom = scope.component.validate.custom;
-        custom = custom.replace(/({{\s+(.*)\s+}})/, function(match, $1, $2) {
-          return scope.data[$2];
+        custom = custom.replace(/({{\s{0,}(.*[^\s]){1}\s{0,}}})/g, function(match, $1, $2) {
+          return 'scope.submission.data.' + $2;
         });
 
         try {
@@ -10602,7 +10607,6 @@ module.exports = function() {
       });
     },
     fieldWrap: function(input) {
-      input = input + '<formio-errors ng-if="::!builder"></formio-errors>';
       var multiInput = input.replace('data[component.key]', 'data[component.key][$index]');
       var inputLabel = '<label ng-if="component.label && !component.hideLabel" for="{{ component.key }}" class="control-label" ng-class="{\'field-required\': component.validate.required}">{{ component.label | formioTranslate:null:builder }}</label>';
       var requiredInline = '<span ng-if="(component.hideLabel === true || component.label === \'\' || !component.label) && component.validate.required" class="glyphicon glyphicon-asterisk form-control-feedback field-required-inline" aria-hidden="true"></span>';
@@ -10615,6 +10619,9 @@ module.exports = function() {
             requiredInline +
             '<div class="input-group-addon" ng-if="!!component.suffix">{{ component.suffix }}</div>' +
           '</div>' +
+          '<div class="formio-errors">' +
+            '<formio-errors ng-if="::!builder"></formio-errors>' +
+          '</div>' +
         '</div>' +
         '<div ng-if="component.multiple"><table class="table table-bordered">' +
           inputLabel +
@@ -10625,6 +10632,9 @@ module.exports = function() {
                   multiInput +
                   requiredInline +
                 '<div class="input-group-addon" ng-if="!!component.suffix">{{ component.suffix }}</div>' +
+              '</div>' +
+              '<div class="formio-errors">' +
+                '<formio-errors ng-if="::!builder"></formio-errors>' +
               '</div>' +
             '</td>' +
             '<td><a ng-click="removeFieldValue($index)" class="btn btn-default"><span class="glyphicon glyphicon-remove-circle"></span></a></td>' +
