@@ -14,10 +14,15 @@ module.exports = function() {
         var valid = true;
         /*eslint-disable no-unused-vars */
         var input = modelValue || viewValue;
+
+        // FOR-255 - Enable row data and form data to be visible in the validator.
+        var data = scope.submission.data;
+        var row = scope.data;
         /*eslint-enable no-unused-vars */
+
         var custom = scope.component.validate.custom;
-        custom = custom.replace(/({{\s+(.*)\s+}})/, function(match, $1, $2) {
-          return scope.data[$2];
+        custom = custom.replace(/({{\s{0,}(.*[^\s]){1}\s{0,}}})/g, function(match, $1, $2) {
+          return 'scope.submission.data.' + $2;
         });
 
         try {
