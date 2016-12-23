@@ -1,4 +1,4 @@
-/*! ng-formio v2.6.1 | https://unpkg.com/ng-formio@2.6.1/LICENSE.txt */
+/*! ng-formio v2.6.4 | https://unpkg.com/ng-formio@2.6.4/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 /*!
  * EventEmitter2
@@ -1257,7 +1257,7 @@ Formio.prototype.makeRequest = function(type, url, method, data, opts) {
     return pluginGet('request', requestArgs)
     .then(function(result) {
       if (result === null || result === undefined) {
-        return Formio.request(url, method, data);
+        return Formio.request(url, method, data, opts.header, opts);
       }
       return result;
     });
@@ -1311,7 +1311,7 @@ Formio.prototype.uploadFile = function(storage, file, fileName, dir, progressCal
     }.bind(this));
 
   return pluginAlter('wrapFileRequestPromise', request, requestArgs);
-}
+};
 
 Formio.prototype.downloadFile = function(file) {
   var requestArgs = {
@@ -1337,11 +1337,13 @@ Formio.prototype.downloadFile = function(file) {
     }.bind(this));
 
   return pluginAlter('wrapFileRequestPromise', request, requestArgs);
-}
+};
 
-Formio.makeStaticRequest = function(url, method, data) {
+Formio.makeStaticRequest = function(url, method, data, opts) {
   method = (method || 'GET').toUpperCase();
-
+  if(!opts || typeof opts !== 'object') {
+    opts = {};
+  }
   var requestArgs = {
     url: url,
     method: method,
@@ -1353,7 +1355,7 @@ Formio.makeStaticRequest = function(url, method, data) {
     return pluginGet('staticRequest', requestArgs)
     .then(function(result) {
       if (result === null || result === undefined) {
-        return Formio.request(url, method, data);
+        return Formio.request(url, method, data, opts.header, opts);
       }
       return result;
     });
@@ -1382,16 +1384,26 @@ Formio.loadProjects = function(query) {
  *   Whether or not to use the cache.
  * @returns {*}
  */
-Formio.request = function(url, method, data, header, ignoreCache) {
+Formio.request = function(url, method, data, header, opts) {
   if (!url) {
     return Promise.reject('No url provided');
   }
   method = (method || 'GET').toUpperCase();
+
+  // For reverse compatibility, if they provided the ignoreCache parameter,
+  // then change it back to the options format where that is a parameter.
+  if (typeof opts === 'boolean') {
+    opts = {ignoreCache: opts};
+  }
+  if(!opts || typeof opts !== 'object') {
+    opts = {};
+  }
+
   var cacheKey = btoa(url);
 
   return new Promise(function(resolve, reject) {
     // Get the cached promise to save multiple loads.
-    if (!ignoreCache && method === 'GET' && cache.hasOwnProperty(cacheKey)) {
+    if (!opts.ignoreCache && method === 'GET' && cache.hasOwnProperty(cacheKey)) {
       return resolve(cache[cacheKey]);
     }
 
@@ -1423,34 +1435,7 @@ Formio.request = function(url, method, data, header, ignoreCache) {
       throw err;
     })
     .then(function(response) {
-      // Handle fetch results
-      if (response.ok) {
-        var token = response.headers.get('x-jwt-token');
-        if (response.status >= 200 && response.status < 300 && token && token !== '') {
-          Formio.setToken(token);
-        }
-        // 204 is no content. Don't try to .json() it.
-        if (response.status === 204) {
-          return {};
-        }
-        return (response.headers.get('content-type').indexOf('application/json') !== -1 ?
-          response.json() : response.text())
-          .then(function(result) {
-            // Add some content-range metadata to the result here
-            var range = response.headers.get('content-range');
-            if (range && typeof result === 'object') {
-              range = range.split('/');
-              if(range[0] !== '*') {
-                var skipLimit = range[0].split('-');
-                result.skip = Number(skipLimit[0]);
-                result.limit = skipLimit[1] - skipLimit[0] + 1;
-              }
-              result.serverCount = range[1] === '*' ? range[1] : Number(range[1]);
-            }
-            return result;
-          });
-      }
-      else {
+      if (!response.ok) {
         if (response.status === 440) {
           Formio.setToken(null);
           Formio.events.emit('formio.sessionExpired', response.body);
@@ -1465,6 +1450,45 @@ Formio.request = function(url, method, data, header, ignoreCache) {
             throw error;
           });
       }
+
+      // Handle fetch results
+      var token = response.headers.get('x-jwt-token');
+      if (response.status >= 200 && response.status < 300 && token && token !== '') {
+        Formio.setToken(token);
+      }
+      // 204 is no content. Don't try to .json() it.
+      if (response.status === 204) {
+        return {};
+      }
+      return (response.headers.get('content-type').indexOf('application/json') !== -1
+        ? response.json()
+        : response.text()
+      ).then(function(result) {
+        // Add some content-range metadata to the result here
+        var range = response.headers.get('content-range');
+        if (range && typeof result === 'object') {
+          range = range.split('/');
+          if(range[0] !== '*') {
+            var skipLimit = range[0].split('-');
+            result.skip = Number(skipLimit[0]);
+            result.limit = skipLimit[1] - skipLimit[0] + 1;
+          }
+          result.serverCount = range[1] === '*' ? range[1] : Number(range[1]);
+        }
+
+        if (!opts.getHeaders) {
+          return result;
+        }
+
+        var headers = {};
+        response.headers.forEach(function(item, key) {
+          headers[key] = item;
+        });
+
+        return new Promise(function(resolve, reject) {
+          resolve({result: result, headers: headers});
+        });
+      });
     })
     .catch(function(err) {
       if (err === 'Bad Token') {
@@ -7088,8 +7112,10 @@ module.exports = function(app) {
         scope.$watch('ngModel', function() {
           // Only update on load.
           if (ngModel.$viewValue && !ngModel.$dirty) {
-            var parts = ngModel.$viewValue.split('/');
-            if (parts.length === 3) {
+            var parts = typeof ngModel.$viewValue === 'string'
+              ? ngModel.$viewValue.split('/')
+              : ngModel.$viewValue;
+            if ((parts instanceof Array) && parts.length === 3) {
               scope.date.day = parts[(scope.component.dayFirst ? 0 : 1)];
               scope.date.month = parseInt(parts[(scope.component.dayFirst ? 1 : 0)]).toString();
               scope.date.year = parts[2];
@@ -9397,7 +9423,7 @@ module.exports = [
                 value = '';
               }
             }
-            else if ($scope.component.hasOwnProperty('defaultValue') && $scope.component.defaultValue) {
+            else if ($scope.component.hasOwnProperty('defaultValue')) {
               // Fix for select components
               if ($scope.component.type === 'select') {
                 try {
@@ -9515,7 +9541,11 @@ module.exports = [
               return temp;
             };
 
-            $scope.$watch('component.multiple', function(mult) {
+            $scope.$watch('component.multiple', function(mult, old) {
+              if (mult === undefined && old === undefined) {
+                return;
+              }
+
               // Establish a default for data.
               $scope.data = $scope.data || {};
               var value = null;
@@ -9566,15 +9596,16 @@ module.exports = [
                 $scope.data[$scope.component.key] = value;
                 return;
               }
-              else if ($scope.component.hasOwnProperty('defaultValue') && $scope.component.defaultValue) {
+              else if ($scope.component.hasOwnProperty('defaultValue')) {
                 // FA-835 - The default values for select boxes are set in the component.
                 if ($scope.component.type === 'selectboxes') {
                   return;
                 }
 
                 // If there is a default value and it is not an array, wrap the value.
-                value = $scope.component.defaultValue.split(',');
-                var temp;
+                if (mult && typeof $scope.component.defaultValue === 'string') {
+                  value = $scope.component.defaultValue.split(',');
+                }
 
                 // FOR-193 - Fix default value for the number component.
                 // FOR-262 - Fix multiple default value for the number component.
@@ -9584,8 +9615,7 @@ module.exports = [
                     return;
                   }
 
-                  temp = $scope.component.defaultValue.split(',');
-                  $scope.data[$scope.component.key] = temp.map(function(item) {
+                  $scope.data[$scope.component.key] = value.map(function(item) {
                     try {
                       return parseInt(item);
                     }
@@ -9599,10 +9629,10 @@ module.exports = [
                 else if ($scope.component.type === 'select') {
                   // If using the values input, split the default values, and search the options for each value in the list.
                   if ($scope.component.dataSrc === 'values') {
-                    temp = [];
+                    var temp = [];
 
                     $scope.component.data.values.forEach(function(item) {
-                      if (value.indexOf(item.value) !== -1) {
+                      if (value && value.indexOf(item.value) !== -1) {
                         temp.push(item);
                       }
                     });
