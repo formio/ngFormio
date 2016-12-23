@@ -1,4 +1,4 @@
-/*! ng-formio v2.6.4 | https://unpkg.com/ng-formio@2.6.4/LICENSE.txt */
+/*! ng-formio v2.6.6 | https://unpkg.com/ng-formio@2.6.6/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 /*!
  * EventEmitter2
@@ -1257,7 +1257,7 @@ Formio.prototype.makeRequest = function(type, url, method, data, opts) {
     return pluginGet('request', requestArgs)
     .then(function(result) {
       if (result === null || result === undefined) {
-        return Formio.request(url, method, data);
+        return Formio.request(url, method, data, opts.header, opts);
       }
       return result;
     });
@@ -1311,7 +1311,7 @@ Formio.prototype.uploadFile = function(storage, file, fileName, dir, progressCal
     }.bind(this));
 
   return pluginAlter('wrapFileRequestPromise', request, requestArgs);
-}
+};
 
 Formio.prototype.downloadFile = function(file) {
   var requestArgs = {
@@ -1337,11 +1337,13 @@ Formio.prototype.downloadFile = function(file) {
     }.bind(this));
 
   return pluginAlter('wrapFileRequestPromise', request, requestArgs);
-}
+};
 
-Formio.makeStaticRequest = function(url, method, data) {
+Formio.makeStaticRequest = function(url, method, data, opts) {
   method = (method || 'GET').toUpperCase();
-
+  if(!opts || typeof opts !== 'object') {
+    opts = {};
+  }
   var requestArgs = {
     url: url,
     method: method,
@@ -1353,7 +1355,7 @@ Formio.makeStaticRequest = function(url, method, data) {
     return pluginGet('staticRequest', requestArgs)
     .then(function(result) {
       if (result === null || result === undefined) {
-        return Formio.request(url, method, data);
+        return Formio.request(url, method, data, opts.header, opts);
       }
       return result;
     });
@@ -1382,16 +1384,26 @@ Formio.loadProjects = function(query) {
  *   Whether or not to use the cache.
  * @returns {*}
  */
-Formio.request = function(url, method, data, header, ignoreCache) {
+Formio.request = function(url, method, data, header, opts) {
   if (!url) {
     return Promise.reject('No url provided');
   }
   method = (method || 'GET').toUpperCase();
+
+  // For reverse compatibility, if they provided the ignoreCache parameter,
+  // then change it back to the options format where that is a parameter.
+  if (typeof opts === 'boolean') {
+    opts = {ignoreCache: opts};
+  }
+  if(!opts || typeof opts !== 'object') {
+    opts = {};
+  }
+
   var cacheKey = btoa(url);
 
   return new Promise(function(resolve, reject) {
     // Get the cached promise to save multiple loads.
-    if (!ignoreCache && method === 'GET' && cache.hasOwnProperty(cacheKey)) {
+    if (!opts.ignoreCache && method === 'GET' && cache.hasOwnProperty(cacheKey)) {
       return resolve(cache[cacheKey]);
     }
 
@@ -1423,34 +1435,7 @@ Formio.request = function(url, method, data, header, ignoreCache) {
       throw err;
     })
     .then(function(response) {
-      // Handle fetch results
-      if (response.ok) {
-        var token = response.headers.get('x-jwt-token');
-        if (response.status >= 200 && response.status < 300 && token && token !== '') {
-          Formio.setToken(token);
-        }
-        // 204 is no content. Don't try to .json() it.
-        if (response.status === 204) {
-          return {};
-        }
-        return (response.headers.get('content-type').indexOf('application/json') !== -1 ?
-          response.json() : response.text())
-          .then(function(result) {
-            // Add some content-range metadata to the result here
-            var range = response.headers.get('content-range');
-            if (range && typeof result === 'object') {
-              range = range.split('/');
-              if(range[0] !== '*') {
-                var skipLimit = range[0].split('-');
-                result.skip = Number(skipLimit[0]);
-                result.limit = skipLimit[1] - skipLimit[0] + 1;
-              }
-              result.serverCount = range[1] === '*' ? range[1] : Number(range[1]);
-            }
-            return result;
-          });
-      }
-      else {
+      if (!response.ok) {
         if (response.status === 440) {
           Formio.setToken(null);
           Formio.events.emit('formio.sessionExpired', response.body);
@@ -1465,6 +1450,45 @@ Formio.request = function(url, method, data, header, ignoreCache) {
             throw error;
           });
       }
+
+      // Handle fetch results
+      var token = response.headers.get('x-jwt-token');
+      if (response.status >= 200 && response.status < 300 && token && token !== '') {
+        Formio.setToken(token);
+      }
+      // 204 is no content. Don't try to .json() it.
+      if (response.status === 204) {
+        return {};
+      }
+      return (response.headers.get('content-type').indexOf('application/json') !== -1
+        ? response.json()
+        : response.text()
+      ).then(function(result) {
+        // Add some content-range metadata to the result here
+        var range = response.headers.get('content-range');
+        if (range && typeof result === 'object') {
+          range = range.split('/');
+          if(range[0] !== '*') {
+            var skipLimit = range[0].split('-');
+            result.skip = Number(skipLimit[0]);
+            result.limit = skipLimit[1] - skipLimit[0] + 1;
+          }
+          result.serverCount = range[1] === '*' ? range[1] : Number(range[1]);
+        }
+
+        if (!opts.getHeaders) {
+          return result;
+        }
+
+        var headers = {};
+        response.headers.forEach(function(item, key) {
+          headers[key] = item;
+        });
+
+        return new Promise(function(resolve, reject) {
+          resolve({result: result, headers: headers});
+        });
+      });
     })
     .catch(function(err) {
       if (err === 'Bad Token') {
