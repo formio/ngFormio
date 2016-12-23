@@ -502,7 +502,9 @@ app.controller('FormController', [
     $scope.saveForm = function() {
       angular.element('.has-error').removeClass('has-error');
 
-      $scope.formio.saveForm(angular.copy($scope.form), undefined, true) // Copy to remove angular $$hashKey
+      $scope.formio.saveForm(angular.copy($scope.form), {
+        getHeaders: true
+      }) // Copy to remove angular $$hashKey
         .then(function(response) {
           var form = response.form;
           var headers = response.headers;
