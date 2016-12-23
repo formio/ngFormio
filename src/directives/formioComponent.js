@@ -244,11 +244,7 @@ module.exports = [
               return temp;
             };
 
-            $scope.$watch('component.multiple', function(mult, old) {
-              if (mult === undefined && old === undefined) {
-                return;
-              }
-
+            $scope.$watch('component.multiple', function(mult) {
               // Establish a default for data.
               $scope.data = $scope.data || {};
               var value = null;
@@ -340,7 +336,8 @@ module.exports = [
                       }
                     });
 
-                    value = temp;
+                    $scope.data[$scope.component.key] = temp;
+                    return;
                   }
                   // If using json input, split the values and search each key path for the item
                   else if ($scope.component.dataSrc === 'json') {
@@ -358,7 +355,8 @@ module.exports = [
                       }
                     }
 
-                    value = pluckItems(value, $scope.component.data.json);
+                    $scope.data[$scope.component.key] = pluckItems(value, $scope.component.data.json);
+                    return;
                   }
                   else if ($scope.component.dataSrc === 'url' || $scope.component.dataSrc === 'resource') {
                     // Wait until loading is done.
@@ -390,13 +388,8 @@ module.exports = [
                   return;
                 }
               }
-              else {
-                // Couldn't safely default, make it a simple array. Possibly add a single obj or string later.
-                value = [];
-              }
 
-              // Use the current data or default.
-              $scope.data[$scope.component.key] = value;
+              // Couldn't safely default, don't add a garbage value.
               return;
             });
           }
