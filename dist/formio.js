@@ -1257,7 +1257,7 @@ Formio.prototype.makeRequest = function(type, url, method, data, opts) {
     return pluginGet('request', requestArgs)
     .then(function(result) {
       if (result === null || result === undefined) {
-        return Formio.request(url, method, data, opts.header, opts);
+        return Formio.request(url, method, data);
       }
       return result;
     });
@@ -1311,7 +1311,7 @@ Formio.prototype.uploadFile = function(storage, file, fileName, dir, progressCal
     }.bind(this));
 
   return pluginAlter('wrapFileRequestPromise', request, requestArgs);
-};
+}
 
 Formio.prototype.downloadFile = function(file) {
   var requestArgs = {
@@ -1337,13 +1337,11 @@ Formio.prototype.downloadFile = function(file) {
     }.bind(this));
 
   return pluginAlter('wrapFileRequestPromise', request, requestArgs);
-};
+}
 
-Formio.makeStaticRequest = function(url, method, data, opts) {
+Formio.makeStaticRequest = function(url, method, data) {
   method = (method || 'GET').toUpperCase();
-  if(!opts || typeof opts !== 'object') {
-    opts = {};
-  }
+
   var requestArgs = {
     url: url,
     method: method,
@@ -1355,7 +1353,7 @@ Formio.makeStaticRequest = function(url, method, data, opts) {
     return pluginGet('staticRequest', requestArgs)
     .then(function(result) {
       if (result === null || result === undefined) {
-        return Formio.request(url, method, data, opts.header, opts);
+        return Formio.request(url, method, data);
       }
       return result;
     });
@@ -1384,26 +1382,16 @@ Formio.loadProjects = function(query) {
  *   Whether or not to use the cache.
  * @returns {*}
  */
-Formio.request = function(url, method, data, header, opts) {
+Formio.request = function(url, method, data, header, ignoreCache) {
   if (!url) {
     return Promise.reject('No url provided');
   }
   method = (method || 'GET').toUpperCase();
-
-  // For reverse compatibility, if they provided the ignoreCache parameter,
-  // then change it back to the options format where that is a parameter.
-  if (typeof opts === 'boolean') {
-    opts = {ignoreCache: opts};
-  }
-  if(!opts || typeof opts !== 'object') {
-    opts = {};
-  }
-
   var cacheKey = btoa(url);
 
   return new Promise(function(resolve, reject) {
     // Get the cached promise to save multiple loads.
-    if (!opts.ignoreCache && method === 'GET' && cache.hasOwnProperty(cacheKey)) {
+    if (!ignoreCache && method === 'GET' && cache.hasOwnProperty(cacheKey)) {
       return resolve(cache[cacheKey]);
     }
 
@@ -1435,7 +1423,34 @@ Formio.request = function(url, method, data, header, opts) {
       throw err;
     })
     .then(function(response) {
-      if (!response.ok) {
+      // Handle fetch results
+      if (response.ok) {
+        var token = response.headers.get('x-jwt-token');
+        if (response.status >= 200 && response.status < 300 && token && token !== '') {
+          Formio.setToken(token);
+        }
+        // 204 is no content. Don't try to .json() it.
+        if (response.status === 204) {
+          return {};
+        }
+        return (response.headers.get('content-type').indexOf('application/json') !== -1 ?
+          response.json() : response.text())
+          .then(function(result) {
+            // Add some content-range metadata to the result here
+            var range = response.headers.get('content-range');
+            if (range && typeof result === 'object') {
+              range = range.split('/');
+              if(range[0] !== '*') {
+                var skipLimit = range[0].split('-');
+                result.skip = Number(skipLimit[0]);
+                result.limit = skipLimit[1] - skipLimit[0] + 1;
+              }
+              result.serverCount = range[1] === '*' ? range[1] : Number(range[1]);
+            }
+            return result;
+          });
+      }
+      else {
         if (response.status === 440) {
           Formio.setToken(null);
           Formio.events.emit('formio.sessionExpired', response.body);
@@ -1450,45 +1465,6 @@ Formio.request = function(url, method, data, header, opts) {
             throw error;
           });
       }
-
-      // Handle fetch results
-      var token = response.headers.get('x-jwt-token');
-      if (response.status >= 200 && response.status < 300 && token && token !== '') {
-        Formio.setToken(token);
-      }
-      // 204 is no content. Don't try to .json() it.
-      if (response.status === 204) {
-        return {};
-      }
-      return (response.headers.get('content-type').indexOf('application/json') !== -1
-        ? response.json()
-        : response.text()
-      ).then(function(result) {
-        // Add some content-range metadata to the result here
-        var range = response.headers.get('content-range');
-        if (range && typeof result === 'object') {
-          range = range.split('/');
-          if(range[0] !== '*') {
-            var skipLimit = range[0].split('-');
-            result.skip = Number(skipLimit[0]);
-            result.limit = skipLimit[1] - skipLimit[0] + 1;
-          }
-          result.serverCount = range[1] === '*' ? range[1] : Number(range[1]);
-        }
-
-        if (!opts.getHeaders) {
-          return result;
-        }
-
-        var headers = {};
-        response.headers.forEach(function(item, key) {
-          headers[key] = item;
-        });
-
-        return new Promise(function(resolve, reject) {
-          resolve({result: result, headers: headers});
-        });
-      });
     })
     .catch(function(err) {
       if (err === 'Bad Token') {
@@ -9541,11 +9517,7 @@ module.exports = [
               return temp;
             };
 
-            $scope.$watch('component.multiple', function(mult, old) {
-              if (mult === undefined && old === undefined) {
-                return;
-              }
-
+            $scope.$watch('component.multiple', function(mult) {
               // Establish a default for data.
               $scope.data = $scope.data || {};
               var value = null;
@@ -9637,7 +9609,8 @@ module.exports = [
                       }
                     });
 
-                    value = temp;
+                    $scope.data[$scope.component.key] = temp;
+                    return;
                   }
                   // If using json input, split the values and search each key path for the item
                   else if ($scope.component.dataSrc === 'json') {
@@ -9655,7 +9628,8 @@ module.exports = [
                       }
                     }
 
-                    value = pluckItems(value, $scope.component.data.json);
+                    $scope.data[$scope.component.key] = pluckItems(value, $scope.component.data.json);
+                    return;
                   }
                   else if ($scope.component.dataSrc === 'url' || $scope.component.dataSrc === 'resource') {
                     // Wait until loading is done.
@@ -9687,13 +9661,8 @@ module.exports = [
                   return;
                 }
               }
-              else {
-                // Couldn't safely default, make it a simple array. Possibly add a single obj or string later.
-                value = [];
-              }
 
-              // Use the current data or default.
-              $scope.data[$scope.component.key] = value;
+              // Couldn't safely default, don't add a garbage value.
               return;
             });
           }

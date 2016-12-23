@@ -1345,7 +1345,7 @@ return /******/ (function(modules) { // webpackBootstrap
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"angular":10,"moment":36}],3:[function(_dereq_,module,exports){
 /**
- * @license AngularJS v1.6.1
+ * @license AngularJS v1.6.0
  * (c) 2010-2016 Google, Inc. http://angularjs.org
  * License: MIT
  */
@@ -10585,7 +10585,7 @@ module.exports = 'ui.mask';
 
 },{"./dist/mask":7,"angular":10}],9:[function(_dereq_,module,exports){
 /**
- * @license AngularJS v1.6.1
+ * @license AngularJS v1.6.0
  * (c) 2010-2016 Google, Inc. http://angularjs.org
  * License: MIT
  */
@@ -10643,7 +10643,7 @@ function minErr(module, ErrorConstructor) {
       return match;
     });
 
-    message += '\nhttp://errors.angularjs.org/1.6.1/' +
+    message += '\nhttp://errors.angularjs.org/1.6.0/' +
       (module ? module + '/' : '') + code;
 
     for (i = SKIP_INDEXES, paramPrefix = '?'; i < templateArgs.length; i++, paramPrefix = '&') {
@@ -13209,11 +13209,11 @@ function toDebugString(obj) {
 var version = {
   // These placeholder strings will be replaced by grunt's `build` task.
   // They need to be double- or single-quoted.
-  full: '1.6.1',
+  full: '1.6.0',
   major: 1,
   minor: 6,
-  dot: 1,
-  codeName: 'promise-rectification'
+  dot: 0,
+  codeName: 'rainbow-tsunami'
 };
 
 
@@ -14339,15 +14339,12 @@ forEach({
 
   after: function(element, newElement) {
     var index = element, parent = element.parentNode;
+    newElement = new JQLite(newElement);
 
-    if (parent) {
-      newElement = new JQLite(newElement);
-
-      for (var i = 0, ii = newElement.length; i < ii; i++) {
-        var node = newElement[i];
-        parent.insertBefore(node, index.nextSibling);
-        index = node;
-      }
+    for (var i = 0, ii = newElement.length; i < ii; i++) {
+      var node = newElement[i];
+      parent.insertBefore(node, index.nextSibling);
+      index = node;
     }
   },
 
@@ -23482,8 +23479,7 @@ function $IntervalProvider() {
       * appropriate moment.  See the example below for more details on how and when to do this.
       * </div>
       *
-      * @param {function()} fn A function that should be called repeatedly. If no additional arguments
-      *   are passed (see below), the function is called with the current iteration count.
+      * @param {function()} fn A function that should be called repeatedly.
       * @param {number} delay Number of milliseconds between each function call.
       * @param {number=} [count=0] Number of times to repeat. If not set, or 0, will repeat
       *   indefinitely.
@@ -27114,7 +27110,6 @@ function $QProvider() {
    *
    * @description
    * Retrieves or overrides whether to generate an error when a rejected promise is not handled.
-   * This feature is enabled by default.
    *
    * @param {boolean=} value Whether to generate an error when a rejected promise is not handled.
    * @returns {boolean|ng.$qProvider} Current value when called without a new value or self for
@@ -27256,11 +27251,7 @@ function qFactory(nextTick, exceptionHandler, errorOnUnhandledRejections) {
       if (!toCheck.pur) {
         toCheck.pur = true;
         var errorMessage = 'Possibly unhandled rejection: ' + toDebugString(toCheck.value);
-        if (toCheck.value instanceof Error) {
-          exceptionHandler(toCheck.value, errorMessage);
-        } else {
-          exceptionHandler(errorMessage);
-        }
+        exceptionHandler(errorMessage);
       }
     }
   }
@@ -27994,21 +27985,15 @@ function $RootScopeProvider() {
 
         if (!array) {
           array = scope.$$watchers = [];
-          array.$$digestWatchIndex = -1;
         }
         // we use unshift since we use a while loop in $digest for speed.
         // the while loop reads in reverse order.
         array.unshift(watcher);
-        array.$$digestWatchIndex++;
         incrementWatchersCount(this, 1);
 
         return function deregisterWatch() {
-          var index = arrayRemove(array, watcher);
-          if (index >= 0) {
+          if (arrayRemove(array, watcher) >= 0) {
             incrementWatchersCount(scope, -1);
-            if (index < array.$$digestWatchIndex) {
-              array.$$digestWatchIndex--;
-            }
           }
           lastDirtyWatch = null;
         };
@@ -28341,6 +28326,7 @@ function $RootScopeProvider() {
       $digest: function() {
         var watch, value, last, fn, get,
             watchers,
+            length,
             dirty, ttl = TTL,
             next, current, target = this,
             watchLog = [],
@@ -28381,10 +28367,10 @@ function $RootScopeProvider() {
           do { // "traverse the scopes" loop
             if ((watchers = current.$$watchers)) {
               // process our watches
-              watchers.$$digestWatchIndex = watchers.length;
-              while (watchers.$$digestWatchIndex--) {
+              length = watchers.length;
+              while (length--) {
                 try {
-                  watch = watchers[watchers.$$digestWatchIndex];
+                  watch = watchers[length];
                   // Most common watches are on primitives, in which case we can short
                   // circuit it with === operator, only when === fails do we use .equals
                   if (watch) {
@@ -30701,14 +30687,6 @@ function $$CookieReader($document) {
   var lastCookies = {};
   var lastCookieString = '';
 
-  function safeGetCookie(rawDocument) {
-    try {
-      return rawDocument.cookie || '';
-    } catch (e) {
-      return '';
-    }
-  }
-
   function safeDecodeURIComponent(str) {
     try {
       return decodeURIComponent(str);
@@ -30719,7 +30697,7 @@ function $$CookieReader($document) {
 
   return function() {
     var cookieArray, cookie, i, index, name;
-    var currentCookieString = safeGetCookie(rawDocument);
+    var currentCookieString = rawDocument.cookie || '';
 
     if (currentCookieString !== lastCookieString) {
       lastCookieString = currentCookieString;
@@ -36307,71 +36285,51 @@ var ngChangeDirective = valueFn({
 
 function classDirective(name, selector) {
   name = 'ngClass' + name;
-  var indexWatchExpression;
-
-  return ['$parse', function($parse) {
+  return ['$animate', function($animate) {
     return {
       restrict: 'AC',
       link: function(scope, element, attr) {
-        var expression = attr[name].trim();
-        var isOneTime = (expression.charAt(0) === ':') && (expression.charAt(1) === ':');
+        var oldVal;
 
-        var watchInterceptor = isOneTime ? toFlatValue : toClassString;
-        var watchExpression = $parse(expression, watchInterceptor);
-        var watchAction = isOneTime ? ngClassOneTimeWatchAction : ngClassWatchAction;
+        scope.$watch(attr[name], ngClassWatchAction, true);
 
-        var classCounts = element.data('$classCounts');
-        var oldModulo = true;
-        var oldClassString;
+        attr.$observe('class', function(value) {
+          ngClassWatchAction(scope.$eval(attr[name]));
+        });
 
-        if (!classCounts) {
-          // Use createMap() to prevent class assumptions involving property
-          // names in Object.prototype
-          classCounts = createMap();
-          element.data('$classCounts', classCounts);
-        }
 
         if (name !== 'ngClass') {
-          if (!indexWatchExpression) {
-            indexWatchExpression = $parse('$index', function moduloTwo($index) {
-              // eslint-disable-next-line no-bitwise
-              return $index & 1;
-            });
-          }
-
-          scope.$watch(indexWatchExpression, ngClassIndexWatchAction);
+          scope.$watch('$index', function($index, old$index) {
+            /* eslint-disable no-bitwise */
+            var mod = $index & 1;
+            if (mod !== (old$index & 1)) {
+              var classes = arrayClasses(scope.$eval(attr[name]));
+              if (mod === selector) {
+                addClasses(classes);
+              } else {
+                removeClasses(classes);
+              }
+            }
+            /* eslint-enable */
+          });
         }
 
-        scope.$watch(watchExpression, watchAction, isOneTime);
-
-        function addClasses(classString) {
-          classString = digestClassCounts(split(classString), 1);
-          attr.$addClass(classString);
+        function addClasses(classes) {
+          var newClasses = digestClassCounts(classes, 1);
+          attr.$addClass(newClasses);
         }
 
-        function removeClasses(classString) {
-          classString = digestClassCounts(split(classString), -1);
-          attr.$removeClass(classString);
+        function removeClasses(classes) {
+          var newClasses = digestClassCounts(classes, -1);
+          attr.$removeClass(newClasses);
         }
 
-        function updateClasses(oldClassString, newClassString) {
-          var oldClassArray = split(oldClassString);
-          var newClassArray = split(newClassString);
-
-          var toRemoveArray = arrayDifference(oldClassArray, newClassArray);
-          var toAddArray = arrayDifference(newClassArray, oldClassArray);
-
-          var toRemoveString = digestClassCounts(toRemoveArray, -1);
-          var toAddString = digestClassCounts(toAddArray, 1);
-
-          attr.$addClass(toAddString);
-          attr.$removeClass(toRemoveString);
-        }
-
-        function digestClassCounts(classArray, count) {
+        function digestClassCounts(classes, count) {
+          // Use createMap() to prevent class assumptions involving property
+          // names in Object.prototype
+          var classCounts = element.data('$classCounts') || createMap();
           var classesToUpdate = [];
-
-          forEach(classArray, function(className) {
+          forEach(classes, function(className) {
             if (count > 0 || classCounts[className]) {
               classCounts[className] = (classCounts[className] || 0) + count;
               if (classCounts[className] === +(count > 0)) {
@@ -36379,106 +36337,77 @@ function classDirective(name, selector) {
               }
             }
           });
-
+          element.data('$classCounts', classCounts);
           return classesToUpdate.join(' ');
         }
 
-        function ngClassIndexWatchAction(newModulo) {
-          // This watch-action should run before the `ngClass[OneTime]WatchAction()`, thus it
-          // adds/removes `oldClassString`. If the `ngClass` expression has changed as well, the
-          // `ngClass[OneTime]WatchAction()` will update the classes.
-          if (newModulo === selector) {
-            addClasses(oldClassString);
+        function updateClasses(oldClasses, newClasses) {
+          var toAdd = arrayDifference(newClasses, oldClasses);
+          var toRemove = arrayDifference(oldClasses, newClasses);
+          toAdd = digestClassCounts(toAdd, 1);
+          toRemove = digestClassCounts(toRemove, -1);
+          if (toAdd && toAdd.length) {
+            $animate.addClass(element, toAdd);
+          }
+          if (toRemove && toRemove.length) {
+            $animate.removeClass(element, toRemove);
+          }
+        }
+
+        function ngClassWatchAction(newVal) {
+          // eslint-disable-next-line no-bitwise
+          if (selector === true || (scope.$index & 1) === selector) {
+            var newClasses = arrayClasses(newVal || []);
+            if (!oldVal) {
+              addClasses(newClasses);
+            } else if (!equals(newVal,oldVal)) {
+              var oldClasses = arrayClasses(oldVal);
+              updateClasses(oldClasses, newClasses);
+            }
+          }
+          if (isArray(newVal)) {
+            oldVal = newVal.map(function(v) { return shallowCopy(v); });
           } else {
-            removeClasses(oldClassString);
+            oldVal = shallowCopy(newVal);
           }
-
-          oldModulo = newModulo;
-        }
-
-        function ngClassOneTimeWatchAction(newClassValue) {
-          var newClassString = toClassString(newClassValue);
-
-          if (newClassString !== oldClassString) {
-            ngClassWatchAction(newClassString);
-          }
-        }
-
-        function ngClassWatchAction(newClassString) {
-          if (oldModulo === selector) {
-            updateClasses(oldClassString, newClassString);
-          }
-
-          oldClassString = newClassString;
         }
       }
     };
-  }];
 
-  // Helpers
-  function arrayDifference(tokens1, tokens2) {
-    if (!tokens1 || !tokens1.length) return [];
-    if (!tokens2 || !tokens2.length) return tokens1;
+    function arrayDifference(tokens1, tokens2) {
+      var values = [];
 
-    var values = [];
-
-    outer:
-    for (var i = 0; i < tokens1.length; i++) {
-      var token = tokens1[i];
-      for (var j = 0; j < tokens2.length; j++) {
-        if (token === tokens2[j]) continue outer;
-      }
-      values.push(token);
-    }
-
-    return values;
-  }
-
-  function split(classString) {
-    return classString && classString.split(' ');
-  }
-
-  function toClassString(classValue) {
-    var classString = classValue;
-
-    if (isArray(classValue)) {
-      classString = classValue.map(toClassString).join(' ');
-    } else if (isObject(classValue)) {
-      classString = Object.keys(classValue).
-        filter(function(key) { return classValue[key]; }).
-        join(' ');
-    }
-
-    return classString;
-  }
-
-  function toFlatValue(classValue) {
-    var flatValue = classValue;
-
-    if (isArray(classValue)) {
-      flatValue = classValue.map(toFlatValue);
-    } else if (isObject(classValue)) {
-      var hasUndefined = false;
-
-      flatValue = Object.keys(classValue).filter(function(key) {
-        var value = classValue[key];
-
-        if (!hasUndefined && isUndefined(value)) {
-          hasUndefined = true;
+      outer:
+      for (var i = 0; i < tokens1.length; i++) {
+        var token = tokens1[i];
+        for (var j = 0; j < tokens2.length; j++) {
+          if (token === tokens2[j]) continue outer;
         }
-
-        return value;
-      });
-
-      if (hasUndefined) {
-        // Prevent the `oneTimeLiteralWatchInterceptor` from unregistering
-        // the watcher, by including at least one `undefined` value.
-        flatValue.push(undefined);
+        values.push(token);
       }
+      return values;
     }
 
-    return flatValue;
-  }
+    function arrayClasses(classVal) {
+      var classes = [];
+      if (isArray(classVal)) {
+        forEach(classVal, function(v) {
+          classes = classes.concat(arrayClasses(v));
+        });
+        return classes;
+      } else if (isString(classVal)) {
+        return classVal.split(' ');
+      } else if (isObject(classVal)) {
+        forEach(classVal, function(v, k) {
+          if (v) {
+            classes = classes.concat(k.split(' '));
+          }
+        });
+        return classes;
+      }
+      return classVal;
+    }
+  }];
 }
 
 /**
@@ -39868,27 +39797,19 @@ defaultModelOptions = new ModelOptions({
  *
  */
 var ngModelOptionsDirective = function() {
-  NgModelOptionsController.$inject = ['$attrs', '$scope'];
-  function NgModelOptionsController($attrs, $scope) {
-    this.$$attrs = $attrs;
-    this.$$scope = $scope;
-  }
-  NgModelOptionsController.prototype = {
-    $onInit: function() {
-      var parentOptions = this.parentCtrl ? this.parentCtrl.$options : defaultModelOptions;
-      var modelOptionsDefinition = this.$$scope.$eval(this.$$attrs.ngModelOptions);
-
-      this.$options = parentOptions.createChild(modelOptionsDefinition);
-    }
-  };
-
   return {
     restrict: 'A',
     // ngModelOptions needs to run before ngModel and input directives
     priority: 10,
-    require: {parentCtrl: '?^^ngModelOptions'},
-    bindToController: true,
-    controller: NgModelOptionsController
+    require: ['ngModelOptions', '?^^ngModelOptions'],
+    controller: function NgModelOptionsController() {},
+    link: {
+      pre: function ngModelOptionsPreLinkFn(scope, element, attrs, ctrls) {
+        var optionsCtrl = ctrls[0];
+        var parentOptions = ctrls[1] ? ctrls[1].$options : defaultModelOptions;
+        optionsCtrl.$options = parentOptions.createChild(scope.$eval(attrs.ngModelOptions));
+      }
+    }
   };
 };
 
@@ -40441,17 +40362,17 @@ var ngOptionsDirective = ['$compile', '$document', '$parse', function($compile, 
 
       } else {
 
-        selectCtrl.writeValue = function writeNgOptionsMultiple(values) {
-          // Only set `<option>.selected` if necessary, in order to prevent some browsers from
-          // scrolling to `<option>` elements that are outside the `<select>` element's viewport.
-
-          var selectedOptions = values && values.map(getAndUpdateSelectedOption) || [];
-
+        selectCtrl.writeValue = function writeNgOptionsMultiple(value) {
           options.items.forEach(function(option) {
-            if (option.element.selected && !includes(selectedOptions, option)) {
-              option.element.selected = false;
-            }
+            option.element.selected = false;
           });
+
+          if (value) {
+            value.forEach(function(item) {
+              var option = options.getOptionFromViewValue(item);
+              if (option) option.element.selected = true;
+            });
+          }
         };
 
 
@@ -40541,14 +40462,6 @@ var ngOptionsDirective = ['$compile', '$document', '$parse', function($compile, 
         updateOptionElement(option, optionElement);
       }
 
-      function getAndUpdateSelectedOption(viewValue) {
-        var option = options.getOptionFromViewValue(viewValue);
-        var element = option && option.element;
-
-        if (element && !element.selected) element.selected = true;
-
-        return option;
-      }
 
       function updateOptionElement(option, element) {
         option.element = element;
@@ -47875,7 +47788,7 @@ Formio.prototype.makeRequest = function(type, url, method, data, opts) {
     return pluginGet('request', requestArgs)
     .then(function(result) {
       if (result === null || result === undefined) {
-        return Formio.request(url, method, data, opts.header, opts);
+        return Formio.request(url, method, data);
       }
       return result;
     });
@@ -47929,7 +47842,7 @@ Formio.prototype.uploadFile = function(storage, file, fileName, dir, progressCal
     }.bind(this));
 
   return pluginAlter('wrapFileRequestPromise', request, requestArgs);
-};
+}
 
 Formio.prototype.downloadFile = function(file) {
   var requestArgs = {
@@ -47955,13 +47868,11 @@ Formio.prototype.downloadFile = function(file) {
     }.bind(this));
 
   return pluginAlter('wrapFileRequestPromise', request, requestArgs);
-};
+}
 
-Formio.makeStaticRequest = function(url, method, data, opts) {
+Formio.makeStaticRequest = function(url, method, data) {
   method = (method || 'GET').toUpperCase();
-  if(!opts || typeof opts !== 'object') {
-    opts = {};
-  }
+
   var requestArgs = {
     url: url,
     method: method,
@@ -47973,7 +47884,7 @@ Formio.makeStaticRequest = function(url, method, data, opts) {
     return pluginGet('staticRequest', requestArgs)
     .then(function(result) {
       if (result === null || result === undefined) {
-        return Formio.request(url, method, data, opts.header, opts);
+        return Formio.request(url, method, data);
       }
       return result;
     });
@@ -48002,26 +47913,16 @@ Formio.loadProjects = function(query) {
  *   Whether or not to use the cache.
  * @returns {*}
  */
-Formio.request = function(url, method, data, header, opts) {
+Formio.request = function(url, method, data, header, ignoreCache) {
   if (!url) {
     return Promise.reject('No url provided');
   }
   method = (method || 'GET').toUpperCase();
-
-  // For reverse compatibility, if they provided the ignoreCache parameter,
-  // then change it back to the options format where that is a parameter.
-  if (typeof opts === 'boolean') {
-    opts = {ignoreCache: opts};
-  }
-  if(!opts || typeof opts !== 'object') {
-    opts = {};
-  }
-
   var cacheKey = btoa(url);
 
   return new Promise(function(resolve, reject) {
     // Get the cached promise to save multiple loads.
-    if (!opts.ignoreCache && method === 'GET' && cache.hasOwnProperty(cacheKey)) {
+    if (!ignoreCache && method === 'GET' && cache.hasOwnProperty(cacheKey)) {
       return resolve(cache[cacheKey]);
     }
 
@@ -48053,7 +47954,34 @@ Formio.request = function(url, method, data, header, opts) {
       throw err;
     })
     .then(function(response) {
-      if (!response.ok) {
+      // Handle fetch results
+      if (response.ok) {
+        var token = response.headers.get('x-jwt-token');
+        if (response.status >= 200 && response.status < 300 && token && token !== '') {
+          Formio.setToken(token);
+        }
+        // 204 is no content. Don't try to .json() it.
+        if (response.status === 204) {
+          return {};
+        }
+        return (response.headers.get('content-type').indexOf('application/json') !== -1 ?
+          response.json() : response.text())
+          .then(function(result) {
+            // Add some content-range metadata to the result here
+            var range = response.headers.get('content-range');
+            if (range && typeof result === 'object') {
+              range = range.split('/');
+              if(range[0] !== '*') {
+                var skipLimit = range[0].split('-');
+                result.skip = Number(skipLimit[0]);
+                result.limit = skipLimit[1] - skipLimit[0] + 1;
+              }
+              result.serverCount = range[1] === '*' ? range[1] : Number(range[1]);
+            }
+            return result;
+          });
+      }
+      else {
         if (response.status === 440) {
           Formio.setToken(null);
           Formio.events.emit('formio.sessionExpired', response.body);
@@ -48068,45 +47996,6 @@ Formio.request = function(url, method, data, header, opts) {
             throw error;
           });
       }
-
-      // Handle fetch results
-      var token = response.headers.get('x-jwt-token');
-      if (response.status >= 200 && response.status < 300 && token && token !== '') {
-        Formio.setToken(token);
-      }
-      // 204 is no content. Don't try to .json() it.
-      if (response.status === 204) {
-        return {};
-      }
-      return (response.headers.get('content-type').indexOf('application/json') !== -1
-        ? response.json()
-        : response.text()
-      ).then(function(result) {
-        // Add some content-range metadata to the result here
-        var range = response.headers.get('content-range');
-        if (range && typeof result === 'object') {
-          range = range.split('/');
-          if(range[0] !== '*') {
-            var skipLimit = range[0].split('-');
-            result.skip = Number(skipLimit[0]);
-            result.limit = skipLimit[1] - skipLimit[0] + 1;
-          }
-          result.serverCount = range[1] === '*' ? range[1] : Number(range[1]);
-        }
-
-        if (!opts.getHeaders) {
-          return result;
-        }
-
-        var headers = {};
-        response.headers.forEach(function(item, key) {
-          headers[key] = item;
-        });
-
-        return new Promise(function(resolve, reject) {
-          resolve({result: result, headers: headers});
-        });
-      });
     })
     .catch(function(err) {
       if (err === 'Bad Token') {
@@ -75968,11 +75857,7 @@ module.exports = [
               return temp;
             };
 
-            $scope.$watch('component.multiple', function(mult, old) {
-              if (mult === undefined && old === undefined) {
-                return;
-              }
-
+            $scope.$watch('component.multiple', function(mult) {
               // Establish a default for data.
               $scope.data = $scope.data || {};
               var value = null;
@@ -76064,7 +75949,8 @@ module.exports = [
                       }
                     });
 
-                    value = temp;
+                    $scope.data[$scope.component.key] = temp;
+                    return;
                   }
                   // If using json input, split the values and search each key path for the item
                   else if ($scope.component.dataSrc === 'json') {
@@ -76082,7 +75968,8 @@ module.exports = [
                       }
                     }
 
-                    value = pluckItems(value, $scope.component.data.json);
+                    $scope.data[$scope.component.key] = pluckItems(value, $scope.component.data.json);
+                    return;
                   }
                   else if ($scope.component.dataSrc === 'url' || $scope.component.dataSrc === 'resource') {
                     // Wait until loading is done.
@@ -76114,13 +76001,8 @@ module.exports = [
                   return;
                 }
               }
-              else {
-                // Couldn't safely default, make it a simple array. Possibly add a single obj or string later.
-                value = [];
-              }
 
-              // Use the current data or default.
-              $scope.data[$scope.component.key] = value;
+              // Couldn't safely default, don't add a garbage value.
               return;
             });
           }
