@@ -21,7 +21,7 @@ module.exports = function() {
 
         // If the path is a string, turn it into an array.
         if (typeof path === 'string') {
-          path = path.split('.')
+          path = path.split('.');
         }
         // If the path is an array, take the first element, and recurse its path
         if (path instanceof Array) {
