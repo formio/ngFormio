@@ -506,7 +506,7 @@ app.controller('FormController', [
         getHeaders: true
       }) // Copy to remove angular $$hashKey
         .then(function(response) {
-          var form = response.form;
+          var form = response.result;
           var headers = response.headers;
           var method = $stateParams.formId ? 'updated' : 'created';
           GoogleAnalytics.sendEvent('Form', method.substring(0, method.length - 1), null, 1);
