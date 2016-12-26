@@ -506,7 +506,7 @@ app.controller('FormController', [
         getHeaders: true
       }) // Copy to remove angular $$hashKey
         .then(function(response) {
-          var form = response.result;
+          $scope.form = response.result;
           var headers = response.headers;
           var method = $stateParams.formId ? 'updated' : 'created';
           GoogleAnalytics.sendEvent('Form', method.substring(0, method.length - 1), null, 1);
@@ -526,7 +526,7 @@ app.controller('FormController', [
 
           if (method === 'created') {
             // Reload page to start editing as an existing form.
-            $state.go('project.' + $scope.formInfo.type + '.form.edit', {formId: form._id});
+            $state.go('project.' + $scope.formInfo.type + '.form.edit', {formId: $scope.form._id});
           }
         })
         .catch(function(err) {
