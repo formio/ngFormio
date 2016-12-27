@@ -8285,7 +8285,7 @@ module.exports = function(app) {
               $scope.refreshItems = function() {
                 try {
                   /* eslint-disable no-unused-vars */
-                  var data = _.cloneDeep($scope.data);
+                  var data = _.cloneDeep($scope.submission.data);
                   /* eslint-enable no-unused-vars */
                   $scope.selectItems = eval('(function(data) { var values = [];' + settings.data.custom.toString() + '; return values; })(data)');
                 }
