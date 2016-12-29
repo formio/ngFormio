@@ -189,6 +189,12 @@ module.exports = function(app) {
                 $scope.data[settings.key] = settings.multiple ? [] : '';
               }
             });
+            refreshWatch = $scope.$watch('submission.data.' + settings.refreshOn, function(newValue, oldValue) {
+              $scope.refreshItems();
+              if (settings.clearOnRefresh && (newValue !== oldValue)) {
+                $scope.data[settings.key] = settings.multiple ? [] : '';
+              }
+            });
           }
 
           switch (settings.dataSrc) {
@@ -223,8 +229,9 @@ module.exports = function(app) {
                 try {
                   /* eslint-disable no-unused-vars */
                   var data = _.cloneDeep($scope.submission.data);
+                  var row = _.cloneDeep($scope.data);
                   /* eslint-enable no-unused-vars */
-                  $scope.selectItems = eval('(function(data) { var values = [];' + settings.data.custom.toString() + '; return values; })(data)');
+                  $scope.selectItems = eval('(function(data, row) { var values = [];' + settings.data.custom.toString() + '; return values; })(data, row)');
                 }
                 catch (error) {
                   $scope.selectItems = [];
