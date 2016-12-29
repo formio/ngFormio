@@ -225,6 +225,9 @@ module.exports = [
              */
             var pluckItems = function(defaultItems, searchItems) {
               var temp = [];
+              if (!defaultItems || !defaultItems.length) {
+                return temp;
+              }
 
               defaultItems.forEach(function(item) {
                 var parts = item.split(':');
