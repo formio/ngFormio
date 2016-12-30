@@ -168,10 +168,11 @@ module.exports = function(app) {
           });
 
           // Add a watch if they wish to refresh on selection of another field.
-          var refreshWatch;
+          var refreshWatch, refreshWatchRow;
           if (settings.refreshOn) {
             // Remove the old watch.
             if (refreshWatch) refreshWatch();
+            if (refreshWatchRow) refreshWatchRow();
             if (settings.refreshOn === 'data') {
               refreshWatch = $scope.$watch('data', function() {
                 $scope.refreshItems();
@@ -183,7 +184,13 @@ module.exports = function(app) {
               return;
             }
 
-            refreshWatch = $scope.$watch('data.' + settings.refreshOn, function(newValue, oldValue) {
+            refreshWatchRow = $scope.$watch('data.' + settings.refreshOn, function(newValue, oldValue) {
+              $scope.refreshItems();
+              if (settings.clearOnRefresh && (newValue !== oldValue)) {
+                $scope.data[settings.key] = settings.multiple ? [] : '';
+              }
+            });
+            refreshWatch = $scope.$watch('submission.data.' + settings.refreshOn, function(newValue, oldValue) {
               $scope.refreshItems();
               if (settings.clearOnRefresh && (newValue !== oldValue)) {
                 $scope.data[settings.key] = settings.multiple ? [] : '';
@@ -223,8 +230,9 @@ module.exports = function(app) {
                 try {
                   /* eslint-disable no-unused-vars */
                   var data = _.cloneDeep($scope.submission.data);
+                  var row = _.cloneDeep($scope.data);
                   /* eslint-enable no-unused-vars */
-                  $scope.selectItems = eval('(function(data) { var values = [];' + settings.data.custom.toString() + '; return values; })(data)');
+                  $scope.selectItems = eval('(function(data, row) { var values = [];' + settings.data.custom.toString() + '; return values; })(data, row)');
                 }
                 catch (error) {
                   $scope.selectItems = [];
