@@ -351,6 +351,14 @@ module.exports = function() {
               else if (component.conditional && component.conditional.when) {
                 hasConditionalPages = true;
               }
+              // Make sure this page is not in the hide compoenents array.
+              if (
+                ($scope.hideComponents) &&
+                (component.key) &&
+                ($scope.hideComponents.indexOf(component.key) !== -1)
+              ) {
+                return;
+              }
               allPages.push(component);
               $scope.pages.push(component);
             }
