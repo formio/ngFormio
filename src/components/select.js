@@ -150,10 +150,10 @@ module.exports = function(app) {
             if ($scope.builder) return;
             var settings = $scope.component;
             var options = {cache: true};
-            var initialized = $q.defer();
             $scope.nowrap = true;
             $scope.hasNextPage = false;
             $scope.selectItems = [];
+            var initialized = $q.defer();
             var selectValues = $scope.component.selectValues;
             var valueProp = $scope.component.valueProperty;
             $scope.getSelectItem = function(item) {
@@ -185,33 +185,48 @@ module.exports = function(app) {
             });
 
             // Add a watch if they wish to refresh on selection of another field.
-            var refreshWatch;
+            var refreshWatch, refreshWatchRow;
             if (settings.refreshOn) {
               // Remove the old watch.
+              var refreshing = false;
               if (refreshWatch) refreshWatch();
-              var refreshKey = (settings.refreshOn === 'data') ? 'data' : 'data.' + settings.refreshOn;
+              if (refreshWatchRow) refreshWatchRow();
+
+              // Refresh the data.
               var refreshValue = function() {
-                var data = $scope.data[settings.key];
+                if (refreshing) {
+                  return;
+                }
+                refreshing = true;
+                var tempData = $scope.data[settings.key];
                 $scope.data[settings.key] = settings.multiple ? [] : '';
                 if (!settings.clearOnRefresh) {
                   setTimeout(function() {
-                    $scope.data[settings.key] = data;
+                    $scope.data[settings.key] = tempData;
+                    refreshing = false;
                   }, 10);
                 }
               };
-              refreshWatch = $scope.$watch(refreshKey, function() {
+
+              // Refresh the value.
+              var refreshValueWhenReady = function() {
                 initialized.promise.then(function() {
                   var refreshPromise = $scope.refreshItems();
                   if (refreshPromise) {
-                    refreshPromise.then(function() {
-                      refreshValue();
-                    });
+                    refreshPromise.then(refreshValue);
                   }
                   else {
                     refreshValue();
                   }
                 });
-              });
+              };
+              if (settings.refreshOn === 'data') {
+                refreshWatch = $scope.$watch('data', refreshValueWhenReady, true);
+                return;
+              }
+
+              refreshWatchRow = $scope.$watch('data.' + settings.refreshOn, refreshValueWhenReady);
+              refreshWatch = $scope.$watch('submission.data.' + settings.refreshOn, refreshValueWhenReady);
             }
 
             switch (settings.dataSrc) {
@@ -248,8 +263,9 @@ module.exports = function(app) {
                   try {
                     /* eslint-disable no-unused-vars */
                     var data = _.cloneDeep($scope.submission.data);
+                    var row = _.cloneDeep($scope.data);
                     /* eslint-enable no-unused-vars */
-                    $scope.selectItems = eval('(function(data) { var values = [];' + settings.data.custom.toString() + '; return values; })(data)');
+                    $scope.selectItems = eval('(function(data, row) { var values = [];' + settings.data.custom.toString() + '; return values; })(data, row)');
                   }
                   catch (error) {
                     $scope.selectItems = [];
