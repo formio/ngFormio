@@ -17,35 +17,6 @@ app.controller('RoleController', [
     SubmissionAccessLabels,
     $http
   ) {
-    if($state.params.roleId) {
-      $scope.originalRole = $scope.getRole($state.params.roleId);
-      if(!$scope.originalRole) {
-        return FormioAlerts.onError(new Error('No role found.'));
-      }
-      $scope.role = _.cloneDeep($scope.originalRole);
-      // Load forms that assign this role permissions
-      $scope.formio.loadForms().then(function(result) {
-        $scope.assignedForms = !result ? [] : result.filter(function(form){
-          form.rolePermissions = form.submissionAccess.filter(function(perm) {
-            return _.includes(perm.roles, $state.params.roleId) && SubmissionAccessLabels[perm.type];
-          });
-          form.permissionList = _(form.rolePermissions).map(function(p){
-            if(SubmissionAccessLabels[p.type]) {
-              return SubmissionAccessLabels[p.type].label;
-            }
-          }).compact().value().join(', ');
-          return form.rolePermissions.length;
-        });
-      });
-    }
-    else {
-      $scope.role = {
-        title: '',
-        description: '',
-        project: $scope.currentProject._id
-      };
-    }
-
     $scope.saveRole = function() {
       if($scope.roleForm.$invalid) {
         return;
@@ -102,5 +73,47 @@ app.controller('RoleController', [
         FormioAlerts.onError(error);
       });
     };
+
+    // If no roleId is available in ui-router, default to creating a new role.
+    if (!$state.params.roleId) {
+      $scope.role = {
+        title: '',
+        description: '',
+        project: $scope.currentProject._id
+      };
+      return;
+    }
+
+    // Get the current roles before trying to check the forms in which they have access.
+    $scope.loadRoles().then(function() {
+      $scope.originalRole = $scope.getRole($state.params.roleId);
+      if (!$scope.originalRole) {
+        return FormioAlerts.onError(new Error('No role found.'));
+      }
+
+      $scope.role = _.cloneDeep($scope.originalRole);
+      // Load forms that assign this role permissions
+      $scope.formio.loadForms().then(function(result) {
+        if (!result) {
+          $scope.assignedForms = [];
+          return;
+        }
+
+        // Check all the forms for the current roleId.
+        $scope.assignedForms = result.filter(function(form) {
+          form.rolePermissions = form.submissionAccess.filter(function(perm) {
+            return _.includes(perm.roles, $state.params.roleId) && SubmissionAccessLabels[perm.type];
+          });
+
+          form.permissionList = _(form.rolePermissions).map(function(p){
+            if(SubmissionAccessLabels[p.type]) {
+              return SubmissionAccessLabels[p.type].label;
+            }
+          }).compact().value().join(', ');
+
+          return form.rolePermissions.length;
+        });
+      });
+    });
   }
 ]);

@@ -557,50 +557,51 @@ app.controller('FormController', [
     $scope.saveForm = function() {
       angular.element('.has-error').removeClass('has-error');
 
+      // Copy to remove angular $$hashKey
       $scope.formio.saveForm(angular.copy($scope.form), {
         getHeaders: true
-      }) // Copy to remove angular $$hashKey
-        .then(function(response) {
-          $scope.form = response.result;
-          var headers = response.headers;
-          var method = $stateParams.formId ? 'updated' : 'created';
-          GoogleAnalytics.sendEvent('Form', method.substring(0, method.length - 1), null, 1);
+      })
+      .then(function(response) {
+        $scope.form = response.result;
+        var headers = response.headers;
+        var method = $stateParams.formId ? 'updated' : 'created';
+        GoogleAnalytics.sendEvent('Form', method.substring(0, method.length - 1), null, 1);
 
-          if (headers.hasOwnProperty('x-form-merge')) {
-            FormioAlerts.addAlert({
-              type: 'warning',
-              message: 'This form has been modified by another user. All form changes have been merged and saved.'
+        if (headers.hasOwnProperty('x-form-merge')) {
+          FormioAlerts.addAlert({
+            type: 'warning',
+            message: 'This form has been modified by another user. All form changes have been merged and saved.'
+          });
+        }
+        else {
+          FormioAlerts.addAlert({
+            type: 'success',
+            message: 'Successfully ' + method + ' form!'
+          });
+        }
+
+        // Reload page when a form is created or merged.
+        if (method === 'created' || headers.hasOwnProperty('x-form-merge')) {
+          $state.go('project.' + $scope.formInfo.type + '.form.edit', {formId: $scope.form._id}, {reload: true});
+        }
+      })
+      .catch(function(err) {
+        if (err) {
+          FormioAlerts.onError.call(FormioAlerts, err);
+        }
+
+        // FOR-128 - if we're editing a form, make note of the components with issues.
+        try {
+          var issues = (/Component keys must be unique: (.*)/.exec(_.get(err, 'errors.components.message'))).slice(1);
+          if (($state.includes('project.form.form.edit') || $state.includes('project.form.create')) && (issues.length > 0)) {
+            issues = (issues.shift()).toString().split(', ');
+            issues.forEach(function(issue) {
+              angular.element('div.dropzone #' + issue).parent().addClass('has-error');
             });
           }
-          else {
-            FormioAlerts.addAlert({
-              type: 'success',
-              message: 'Successfully ' + method + ' form!'
-            });
-          }
-
-          if (method === 'created') {
-            // Reload page to start editing as an existing form.
-            $state.go('project.' + $scope.formInfo.type + '.form.edit', {formId: $scope.form._id});
-          }
-        })
-        .catch(function(err) {
-          if (err) {
-            FormioAlerts.onError.call(FormioAlerts, err);
-          }
-
-          // FOR-128 - if we're editing a form, make note of the components with issues.
-          try {
-            var issues = (/Component keys must be unique: (.*)/.exec(_.get(err, 'errors.components.message'))).slice(1);
-            if (($state.includes('project.form.form.edit') || $state.includes('project.form.create')) && (issues.length > 0)) {
-              issues = (issues.shift()).toString().split(', ');
-              issues.forEach(function(issue) {
-                angular.element('div.dropzone #' + issue).parent().addClass('has-error');
-              });
-            }
-          }
-          catch (e) {}
-        });
+        }
+        catch (e) {}
+      });
     };
 
     // Delete a form.
