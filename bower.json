@@ -21,8 +21,8 @@
     "ng-dialog": "^0.6.4",
     "angular-swagger-ui": "git@github.com:randallknutson/angular-swagger-ui.git#master",
     "number-abbreviate": "^1.2.1",
-    "ng-formio": "^2.6.9",
-    "ng-formio-builder": "^2.6.9",
+    "ng-formio": "^2.7.0",
+    "ng-formio-builder": "^2.7.0",
     "ng-tags-input": "^3.1.1",
     "chance": "^1.0.3",
     "ng-file-upload": "^12.0.4",
@@ -30,7 +30,7 @@
     "jquery": "2.2.4",
     "qs": "https://github.com/ljharb/qs.git#^6.2.1",
     "angular-toastr": "^2.1.1",
-    "seamless": "^1.0.0-beta.3"
+    "seamless": "^1.0.0"
   },
   "overrides": {
     "kendo-ui": {
