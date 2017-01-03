@@ -181,7 +181,6 @@ app.controller('ProjectController', [
     ProjectUpgradeDialog,
     $q
   ) {
-
     $scope.currentSection = {};
     $rootScope.activeSideBar = 'projects';
     $rootScope.noBreadcrumb = false;
@@ -200,6 +199,17 @@ app.controller('ProjectController', [
     $scope.formio = new Formio('/project/' + $stateParams.projectId);
     $scope.currentProject = {_id: $stateParams.projectId, access: []};
     $scope.projectApi = '';
+
+    $scope.rolesLoading = true;
+    $scope.loadRoles = function() {
+      return $http.get($scope.formio.projectUrl + '/role').then(function(result) {
+        $scope.currentProjectRoles = result.data;
+        $scope.rolesLoading = false;
+
+        return $scope.currentProjectRoles;
+      });
+    };
+    $scope.loadRoles();
 
     $scope.loadProjectPromise = $scope.formio.loadProject().then(function(result) {
       $scope.currentProject = result;
@@ -260,12 +270,6 @@ app.controller('ProjectController', [
           console.log(err);
         }
       }
-
-      $scope.rolesLoading = true;
-      $http.get($scope.formio.projectUrl + '/role').then(function(result) {
-        $scope.currentProjectRoles = result.data;
-        $scope.rolesLoading = false;
-      });
 
       // Load the users teams.
       $scope.userTeamsLoading = true;
