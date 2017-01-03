@@ -154,6 +154,10 @@ module.exports = function(app) {
             $scope.hasNextPage = false;
             $scope.selectItems = [];
             var initialized = $q.defer();
+            initialized.promise.then(function() {
+              $scope.$emit('selectLoaded', $scope.component);
+            });
+
             var selectValues = $scope.component.selectValues;
             var valueProp = $scope.component.valueProperty;
             $scope.getSelectItem = function(item) {
@@ -204,7 +208,12 @@ module.exports = function(app) {
                   setTimeout(function() {
                     $scope.data[settings.key] = tempData;
                     refreshing = false;
+                    $scope.$emit('selectLoaded', $scope.component);
                   }, 10);
+                }
+                else {
+                  refreshing = false;
+                  $scope.$emit('selectLoaded', $scope.component);
                 }
               };
 
