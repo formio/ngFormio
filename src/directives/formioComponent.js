@@ -228,6 +228,9 @@ module.exports = [
               if (!defaultItems || !defaultItems.length) {
                 return temp;
               }
+              if (typeof defaultItems === 'string') {
+                defaultItems = [defaultItems];
+              }
 
               defaultItems.forEach(function(item) {
                 var parts = item.split(':');
@@ -308,6 +311,9 @@ module.exports = [
                 if (mult && typeof $scope.component.defaultValue === 'string') {
                   value = $scope.component.defaultValue.split(',');
                 }
+                else {
+                  value = $scope.component.defaultValue;
+                }
 
                 // FOR-193 - Fix default value for the number component.
                 // FOR-262 - Fix multiple default value for the number component.
@@ -363,14 +369,8 @@ module.exports = [
                   }
                   else if ($scope.component.dataSrc === 'url' || $scope.component.dataSrc === 'resource') {
                     // Wait until loading is done.
-                    var watching = $scope.$watch('selectLoading', function(loading) {
-                      if (!loading) {
-                        // Stop the watch and filter the default items.
-                        watching();
-
-                        // Update scope directly, since this is async.
-                        $scope.data[$scope.component.key] = pluckItems(value, $scope.selectItems);
-                      }
+                    $scope.$on('selectLoaded', function() {
+                      $scope.data[$scope.component.key] = pluckItems(value, $scope.selectItems);
                     });
                   }
                 }
