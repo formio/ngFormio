@@ -557,18 +557,31 @@ app.controller('FormController', [
     $scope.saveForm = function() {
       angular.element('.has-error').removeClass('has-error');
 
-      $scope.formio.saveForm(angular.copy($scope.form)) // Copy to remove angular $$hashKey
-        .then(function(form) {
+      $scope.formio.saveForm(angular.copy($scope.form), {
+        getHeaders: true
+      }) // Copy to remove angular $$hashKey
+        .then(function(response) {
+          $scope.form = response.result;
+          var headers = response.headers;
           var method = $stateParams.formId ? 'updated' : 'created';
-          FormioAlerts.addAlert({
-            type: 'success',
-            message: 'Successfully ' + method + ' form!'
-          });
           GoogleAnalytics.sendEvent('Form', method.substring(0, method.length - 1), null, 1);
 
-          if(method === 'created') {
+          if (headers.hasOwnProperty('x-form-merge')) {
+            FormioAlerts.addAlert({
+              type: 'warning',
+              message: 'This form has been modified by another user. All form changes have been merged and saved.'
+            });
+          }
+          else {
+            FormioAlerts.addAlert({
+              type: 'success',
+              message: 'Successfully ' + method + ' form!'
+            });
+          }
+
+          if (method === 'created') {
             // Reload page to start editing as an existing form.
-            $state.go('project.' + $scope.formInfo.type + '.form.edit', {formId: form._id});
+            $state.go('project.' + $scope.formInfo.type + '.form.edit', {formId: $scope.form._id});
           }
         })
         .catch(function(err) {
