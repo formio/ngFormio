@@ -683,7 +683,12 @@ angular
         return url;
       };
 
+      var authErrorCount = 0;
       var authError = _.throttle(function() {
+        if (authErrorCount >= 3) {
+          return;
+        }
+
         // Attempt to confirm if the current user is denied access or logged out.
         $http.get(AppConfig.apiBase + '/current')
           .then(function(data) {
@@ -704,6 +709,9 @@ angular
               type: 'danger',
               message: 'You are not authorized to perform the requested operation.'
             });
+          })
+          .catch(function(e) {
+            authErrorCount += 1;
           });
       }, 1000);
 
@@ -711,10 +719,20 @@ angular
         $rootScope.currentProject = null;
         $rootScope.currentForm = null;
         if ($state.is('auth')) {
+          var reloads = localStorage.getItem('reloads');
+          if (reloads >= 3) {
+            return;
+          }
+          reloads = reloads || 0;
+          reloads += 1;
+          localStorage.setItem('reloads', reloads);
+
           $timeout(function() {
             $window.location.reload();
           });
         } else {
+          // Clear reloads and attempt to reload the page.
+          localStorage.removeItem('reloads');
           $state.go('auth');
         }
         FormioAlerts.addAlert({
