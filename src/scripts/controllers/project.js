@@ -381,6 +381,29 @@ app.controller('ProjectController', [
   }
 ]);
 
+app.controller('ProjectBuildController', [
+  '$scope',
+  '$http',
+  function($scope, $http) {
+    // This is restricted to form.io domains.
+    var key = 'AIzaSyDms9ureQ45lp6BT6LuZtoANB_GcR2jZmE';
+
+    $scope.angular1 = [];
+    $scope.angular2 = [];
+    $scope.react = [];
+
+    $http.get('https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails,id,snippet,status&maxResults=50&playlistId=PLL9kNSjqyfJ70DiT2Yn_8cCXGpEs_ReRb&key=' + key).then(function(result) {
+      $scope.angular1 = result.data.items;
+    });
+    $http.get('https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails,id,snippet,status&maxResults=50&playlistId=PLL9kNSjqyfJ5Mj5FvZ7gL4MZj5o4yN5Sg&key=' + key).then(function(result) {
+      $scope.react = result.data.items;
+    });
+    $http.get('https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails,id,snippet,status&maxResults=50&playlistId=PLL9kNSjqyfJ51N9rw0Wnqu6Yl8OMZdE-Q&key=' + key).then(function(result) {
+      $scope.angular2 = result.data.items;
+    });
+  }
+]);
+
 app.directive('projectStep', function() {
   return {
     restrict: 'E',
@@ -458,10 +481,6 @@ app.provider('ProjectProgress', function() {
               next(hasUser);
             });
           }
-        },
-        {
-          key: 'demoApp',
-          route: 'project.preview'
         },
         {
           key: 'modifyForm',

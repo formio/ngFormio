@@ -1,0 +1,92 @@
+<div class="project-section-content">
+  <div class="project-section-inner-content">
+    <h1>Building Applications with Form.io</h1>
+    <div class="row">
+      <div class="col-md-12 text-center">
+        <h2>1. Exploring the Form.io Portal</h2>
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/FNb2Oixo3dQ" frameborder="0" allowfullscreen></iframe>
+      </div>
+    </div>
+    <br />
+    <div class="row">
+      <div class="col-md-4">
+        <div class="panel panel-success">
+          <div class="panel-heading">
+            <h3 class="panel-title">Angular 1.x</h3>
+          </div>
+          <div class="panel-body">
+            <p>This playlist shows how to use <a href="https://github.com/formio/ng-app-starterkit" target="_blank">ng-app-starterkit</a> to build an Angular 1.x app.</p>
+            <ul class="media-list" ng-if="angular1.length > 1">
+              <li class="media" ng-repeat="video in angular1 track by $index" ng-if="$index !== 0">
+                <div class="media-left">
+                  <a href="https://www.youtube.com/watch?v={{ video.snippet.resourceId.videoId }}" target="_blank">
+                    <img class="media-object" src="{{ video.snippet.thumbnails.default.url }}" alt="{{ video.snippet.description }}">
+                  </a>
+                </div>
+                <div class="media-body">
+                  <h4 class="media-heading"><a href="https://www.youtube.com/watch?v={{ video.snippet.resourceId.videoId }}" target="_blank">{{ video.snippet.title}}</a></h4>
+                  {{ video.snippet.description }}
+                </div>
+              </li>
+            </ul>
+            <div ng-if="angular1.length <= 1">
+              <div class="well well-lg">Coming soon...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="panel panel-primary">
+          <div class="panel-heading">
+            <h3 class="panel-title">React</h3>
+          </div>
+          <div class="panel-body">
+            <p>This playlist shows how to use <a href="https://github.com/formio/react-app-starterkit" target="_blank">react-app-starterkit</a> to build an Angular 1.x app.</p>
+            <ul class="media-list" ng-if="react.length > 1">
+              <li class="media" ng-repeat="video in react track by $index" ng-if="$index !== 0">
+                <div class="media-left">
+                  <a href="https://www.youtube.com/watch?v={{ video.snippet.resourceId.videoId }}" target="_blank">
+                    <img class="media-object" src="{{ video.snippet.thumbnails.default.url }}" alt="{{ video.snippet.description }}">
+                  </a>
+                </div>
+                <div class="media-body">
+                  <h4 class="media-heading"><a href="https://www.youtube.com/watch?v={{ video.snippet.resourceId.videoId }}" target="_blank">{{ video.snippet.title}}</a></h4>
+                  {{ video.snippet.description }}
+                </div>
+              </li>
+            </ul>
+            <div ng-if="react.length <= 1">
+              <div class="well well-lg">Coming soon...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="panel panel-info">
+          <div class="panel-heading">
+            <h3 class="panel-title">Angular 2.x</h3>
+          </div>
+          <div class="panel-body">
+            <p>This playlist shows how to use <a href="https://github.com/formio/ng2-app-starterkit" target="_blank">ng2-app-starterkit</a> to build an Angular 2.x app.</p>
+            <ul class="media-list" ng-if="angular2.length > 1">
+              <li class="media" ng-repeat="video in angular2 track by $index" ng-if="$index !== 0">
+                <div class="media-left">
+                  <a href="https://www.youtube.com/watch?v={{ video.snippet.resourceId.videoId }}" target="_blank">
+                    <img class="media-object" src="{{ video.snippet.thumbnails.default.url }}" alt="{{ video.snippet.description }}">
+                  </a>
+                </div>
+                <div class="media-body">
+                  <h4 class="media-heading"><a href="https://www.youtube.com/watch?v={{ video.snippet.resourceId.videoId }}" target="_blank">{{ video.snippet.title}}</a></h4>
+                  {{ video.snippet.description }}
+                </div>
+              </li>
+            </ul>
+            <div ng-if="angular2.length <= 1">
+              <div class="well well-lg">Coming soon...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -169,6 +169,11 @@ angular
           templateUrl: 'views/project/preview.html',
           controller: 'ProjectPreviewController'
         })
+        .state('project.build', {
+          url: '/build',
+          templateUrl: 'views/project/build.html',
+          controller: 'ProjectBuildController'
+        })
         .state('project.launch', {
           url: '',
           templateUrl: 'views/project/launch/index.html',
