@@ -1,5 +1,219 @@
 /*! ng-formio v2.7.1 | https://unpkg.com/ng-formio@2.7.1/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
+'use strict';
+module.exports = {
+  /**
+   * Determine if a component is a layout component or not.
+   *
+   * @param {Object} component
+   *   The component to check.
+   *
+   * @returns {Boolean}
+   *   Whether or not the component is a layout component.
+   */
+  isLayoutComponent: function isLayoutComponent(component) {
+    return (
+      (component.columns && Array.isArray(component.columns)) ||
+      (component.rows && Array.isArray(component.rows)) ||
+      (component.components && Array.isArray(component.components))
+    ) ? true : false;
+  },
+
+  /**
+   * Iterate through each component within a form.
+   *
+   * @param {Object} components
+   *   The components to iterate.
+   * @param {Function} fn
+   *   The iteration function to invoke for each component.
+   * @param {Boolean} includeAll
+   *   Whether or not to include layout components.
+   * @param {String} path
+   *   The current data path of the element. Example: data.user.firstName
+   */
+  eachComponent: function eachComponent(components, fn, includeAll, path) {
+    if (!components) return;
+    path = path || '';
+    components.forEach(function(component) {
+      var hasColumns = component.columns && Array.isArray(component.columns);
+      var hasRows = component.rows && Array.isArray(component.rows);
+      var hasComps = component.components && Array.isArray(component.components);
+      var noRecurse = false;
+      var newPath = component.key ? (path ? (path + '.' + component.key) : component.key) : '';
+
+      if (includeAll || component.tree || (!hasColumns && !hasRows && !hasComps)) {
+        noRecurse = fn(component, newPath);
+      }
+
+      var subPath = function() {
+        if (component.key && ((component.type === 'datagrid') || (component.type === 'container'))) {
+          return newPath;
+        }
+        return path;
+      };
+
+      if (!noRecurse) {
+        if (hasColumns) {
+          component.columns.forEach(function(column) {
+            eachComponent(column.components, fn, includeAll, subPath());
+          });
+        }
+
+        else if (hasRows) {
+          [].concat.apply([], component.rows).forEach(function(row) {
+            eachComponent(row.components, fn, includeAll, subPath());
+          });
+        }
+
+        else if (hasComps) {
+          eachComponent(component.components, fn, includeAll, subPath());
+        }
+      }
+    });
+  },
+
+  /**
+   * Get a component by its key
+   *
+   * @param {Object} components
+   *   The components to iterate.
+   * @param {String} key
+   *   The key of the component to get.
+   *
+   * @returns {Object}
+   *   The component that matches the given key, or undefined if not found.
+   */
+  getComponent: function getComponent(components, key) {
+    var result;
+    module.exports.eachComponent(components, function(component) {
+      if (component.key === key) {
+        result = component;
+      }
+    });
+    return result;
+  },
+
+  /**
+   * Flatten the form components for data manipulation.
+   *
+   * @param {Object} components
+   *   The components to iterate.
+   * @param {Boolean} includeAll
+   *   Whether or not to include layout components.
+   *
+   * @returns {Object}
+   *   The flattened components map.
+   */
+  flattenComponents: function flattenComponents(components, includeAll) {
+    var flattened = {};
+    module.exports.eachComponent(components, function(component, path) {
+      flattened[path] = component;
+    }, includeAll);
+    return flattened;
+  },
+
+  /**
+   * Checks the conditions for a provided component and data.
+   *
+   * @param component
+   *   The component to check for the condition.
+   * @param row
+   *   The data within a row
+   * @param data
+   *   The full submission data.
+   *
+   * @returns {boolean}
+   */
+  checkCondition: function(component, row, data) {
+    if (component.hasOwnProperty('customConditional') && component.customConditional) {
+      try {
+        var script = '(function() { var show = true;';
+        script += component.customConditional.toString();
+        script += '; return show; })()';
+        var result = eval(script);
+        return result.toString() === 'true';
+      }
+      catch (e) {
+        console.warn('An error occurred in a custom conditional statement for component ' + component.key, e);
+        return true;
+      }
+    }
+    else if (component.hasOwnProperty('conditional') && component.conditional && component.conditional.when) {
+      var cond = component.conditional;
+      var value = null;
+      if (row) {
+        value = this.getValue({data: row}, cond.when);
+      }
+      if (data && (value === null || typeof value === 'undefined')) {
+        value = this.getValue({data: data}, cond.when);
+      }
+      if (value === null || typeof value === 'undefined') {
+        value = component.hasOwnProperty('defaultValue') ? component.defaultValue : '';
+      }
+      // Special check for selectboxes component.
+      if (typeof value === 'object' && value.hasOwnProperty(cond.eq)) {
+        return value[cond.eq].toString() === cond.show.toString();
+      }
+      return (value.toString() === cond.eq.toString()) === (cond.show.toString() === 'true');
+    }
+
+    // Default to show.
+    return true;
+  },
+
+  /**
+   * Get the value for a component key, in the given submission.
+   *
+   * @param {Object} submission
+   *   A submission object to search.
+   * @param {String} key
+   *   A for components API key to search for.
+   */
+  getValue: function getValue(submission, key) {
+    var data = submission.data || {};
+
+    var search = function search(data) {
+      var i;
+      var value;
+
+      if (!data) {
+        return null;
+      }
+
+      if (data instanceof Array) {
+        for (i = 0; i < data.length; i++) {
+          if (typeof data[i] === 'object') {
+            value = search(data[i]);
+          }
+
+          if (value) {
+            return value;
+          }
+        }
+      }
+      else if (typeof data === 'object') {
+        if (data.hasOwnProperty(key)) {
+          return data[key];
+        }
+
+        var keys = Object.keys(data);
+        for (i = 0; i < keys.length; i++) {
+          if (typeof data[keys[i]] === 'object') {
+            value = search(data[keys[i]]);
+          }
+
+          if (value) {
+            return value;
+          }
+        }
+      }
+    };
+
+    return search(data);
+  }
+};
+
+},{}],2:[function(_dereq_,module,exports){
 /*!
  * EventEmitter2
  * https://github.com/hij1nx/EventEmitter2
@@ -723,221 +937,816 @@
   }
 }();
 
-},{}],2:[function(_dereq_,module,exports){
-'use strict';
-module.exports = {
-  /**
-   * Determine if a component is a layout component or not.
-   *
-   * @param {Object} component
-   *   The component to check.
-   *
-   * @returns {Boolean}
-   *   Whether or not the component is a layout component.
-   */
-  isLayoutComponent: function isLayoutComponent(component) {
-    return (
-      (component.columns && Array.isArray(component.columns)) ||
-      (component.rows && Array.isArray(component.rows)) ||
-      (component.components && Array.isArray(component.components))
-    ) ? true : false;
-  },
+},{}],3:[function(_dereq_,module,exports){
+(function (global){
+/*! Native Promise Only
+    v0.8.1 (c) Kyle Simpson
+    MIT License: http://getify.mit-license.org
+*/
 
-  /**
-   * Iterate through each component within a form.
-   *
-   * @param {Object} components
-   *   The components to iterate.
-   * @param {Function} fn
-   *   The iteration function to invoke for each component.
-   * @param {Boolean} includeAll
-   *   Whether or not to include layout components.
-   * @param {String} path
-   *   The current data path of the element. Example: data.user.firstName
-   */
-  eachComponent: function eachComponent(components, fn, includeAll, path) {
-    if (!components) return;
-    path = path || '';
-    components.forEach(function(component) {
-      var hasColumns = component.columns && Array.isArray(component.columns);
-      var hasRows = component.rows && Array.isArray(component.rows);
-      var hasComps = component.components && Array.isArray(component.components);
-      var noRecurse = false;
-      var newPath = component.key ? (path ? (path + '.' + component.key) : component.key) : '';
+(function UMD(name,context,definition){
+	// special form of UMD for polyfilling across evironments
+	context[name] = context[name] || definition();
+	if (typeof module != "undefined" && module.exports) { module.exports = context[name]; }
+	else if (typeof define == "function" && define.amd) { define(function $AMD$(){ return context[name]; }); }
+})("Promise",typeof global != "undefined" ? global : this,function DEF(){
+	/*jshint validthis:true */
+	"use strict";
 
-      if (includeAll || component.tree || (!hasColumns && !hasRows && !hasComps)) {
-        noRecurse = fn(component, newPath);
-      }
+	var builtInProp, cycle, scheduling_queue,
+		ToString = Object.prototype.toString,
+		timer = (typeof setImmediate != "undefined") ?
+			function timer(fn) { return setImmediate(fn); } :
+			setTimeout
+	;
 
-      var subPath = function() {
-        if (component.key && ((component.type === 'datagrid') || (component.type === 'container'))) {
-          return newPath;
+	// dammit, IE8.
+	try {
+		Object.defineProperty({},"x",{});
+		builtInProp = function builtInProp(obj,name,val,config) {
+			return Object.defineProperty(obj,name,{
+				value: val,
+				writable: true,
+				configurable: config !== false
+			});
+		};
+	}
+	catch (err) {
+		builtInProp = function builtInProp(obj,name,val) {
+			obj[name] = val;
+			return obj;
+		};
+	}
+
+	// Note: using a queue instead of array for efficiency
+	scheduling_queue = (function Queue() {
+		var first, last, item;
+
+		function Item(fn,self) {
+			this.fn = fn;
+			this.self = self;
+			this.next = void 0;
+		}
+
+		return {
+			add: function add(fn,self) {
+				item = new Item(fn,self);
+				if (last) {
+					last.next = item;
+				}
+				else {
+					first = item;
+				}
+				last = item;
+				item = void 0;
+			},
+			drain: function drain() {
+				var f = first;
+				first = last = cycle = void 0;
+
+				while (f) {
+					f.fn.call(f.self);
+					f = f.next;
+				}
+			}
+		};
+	})();
+
+	function schedule(fn,self) {
+		scheduling_queue.add(fn,self);
+		if (!cycle) {
+			cycle = timer(scheduling_queue.drain);
+		}
+	}
+
+	// promise duck typing
+	function isThenable(o) {
+		var _then, o_type = typeof o;
+
+		if (o != null &&
+			(
+				o_type == "object" || o_type == "function"
+			)
+		) {
+			_then = o.then;
+		}
+		return typeof _then == "function" ? _then : false;
+	}
+
+	function notify() {
+		for (var i=0; i<this.chain.length; i++) {
+			notifyIsolated(
+				this,
+				(this.state === 1) ? this.chain[i].success : this.chain[i].failure,
+				this.chain[i]
+			);
+		}
+		this.chain.length = 0;
+	}
+
+	// NOTE: This is a separate function to isolate
+	// the `try..catch` so that other code can be
+	// optimized better
+	function notifyIsolated(self,cb,chain) {
+		var ret, _then;
+		try {
+			if (cb === false) {
+				chain.reject(self.msg);
+			}
+			else {
+				if (cb === true) {
+					ret = self.msg;
+				}
+				else {
+					ret = cb.call(void 0,self.msg);
+				}
+
+				if (ret === chain.promise) {
+					chain.reject(TypeError("Promise-chain cycle"));
+				}
+				else if (_then = isThenable(ret)) {
+					_then.call(ret,chain.resolve,chain.reject);
+				}
+				else {
+					chain.resolve(ret);
+				}
+			}
+		}
+		catch (err) {
+			chain.reject(err);
+		}
+	}
+
+	function resolve(msg) {
+		var _then, self = this;
+
+		// already triggered?
+		if (self.triggered) { return; }
+
+		self.triggered = true;
+
+		// unwrap
+		if (self.def) {
+			self = self.def;
+		}
+
+		try {
+			if (_then = isThenable(msg)) {
+				schedule(function(){
+					var def_wrapper = new MakeDefWrapper(self);
+					try {
+						_then.call(msg,
+							function $resolve$(){ resolve.apply(def_wrapper,arguments); },
+							function $reject$(){ reject.apply(def_wrapper,arguments); }
+						);
+					}
+					catch (err) {
+						reject.call(def_wrapper,err);
+					}
+				})
+			}
+			else {
+				self.msg = msg;
+				self.state = 1;
+				if (self.chain.length > 0) {
+					schedule(notify,self);
+				}
+			}
+		}
+		catch (err) {
+			reject.call(new MakeDefWrapper(self),err);
+		}
+	}
+
+	function reject(msg) {
+		var self = this;
+
+		// already triggered?
+		if (self.triggered) { return; }
+
+		self.triggered = true;
+
+		// unwrap
+		if (self.def) {
+			self = self.def;
+		}
+
+		self.msg = msg;
+		self.state = 2;
+		if (self.chain.length > 0) {
+			schedule(notify,self);
+		}
+	}
+
+	function iteratePromises(Constructor,arr,resolver,rejecter) {
+		for (var idx=0; idx<arr.length; idx++) {
+			(function IIFE(idx){
+				Constructor.resolve(arr[idx])
+				.then(
+					function $resolver$(msg){
+						resolver(idx,msg);
+					},
+					rejecter
+				);
+			})(idx);
+		}
+	}
+
+	function MakeDefWrapper(self) {
+		this.def = self;
+		this.triggered = false;
+	}
+
+	function MakeDef(self) {
+		this.promise = self;
+		this.state = 0;
+		this.triggered = false;
+		this.chain = [];
+		this.msg = void 0;
+	}
+
+	function Promise(executor) {
+		if (typeof executor != "function") {
+			throw TypeError("Not a function");
+		}
+
+		if (this.__NPO__ !== 0) {
+			throw TypeError("Not a promise");
+		}
+
+		// instance shadowing the inherited "brand"
+		// to signal an already "initialized" promise
+		this.__NPO__ = 1;
+
+		var def = new MakeDef(this);
+
+		this["then"] = function then(success,failure) {
+			var o = {
+				success: typeof success == "function" ? success : true,
+				failure: typeof failure == "function" ? failure : false
+			};
+			// Note: `then(..)` itself can be borrowed to be used against
+			// a different promise constructor for making the chained promise,
+			// by substituting a different `this` binding.
+			o.promise = new this.constructor(function extractChain(resolve,reject) {
+				if (typeof resolve != "function" || typeof reject != "function") {
+					throw TypeError("Not a function");
+				}
+
+				o.resolve = resolve;
+				o.reject = reject;
+			});
+			def.chain.push(o);
+
+			if (def.state !== 0) {
+				schedule(notify,def);
+			}
+
+			return o.promise;
+		};
+		this["catch"] = function $catch$(failure) {
+			return this.then(void 0,failure);
+		};
+
+		try {
+			executor.call(
+				void 0,
+				function publicResolve(msg){
+					resolve.call(def,msg);
+				},
+				function publicReject(msg) {
+					reject.call(def,msg);
+				}
+			);
+		}
+		catch (err) {
+			reject.call(def,err);
+		}
+	}
+
+	var PromisePrototype = builtInProp({},"constructor",Promise,
+		/*configurable=*/false
+	);
+
+	// Note: Android 4 cannot use `Object.defineProperty(..)` here
+	Promise.prototype = PromisePrototype;
+
+	// built-in "brand" to signal an "uninitialized" promise
+	builtInProp(PromisePrototype,"__NPO__",0,
+		/*configurable=*/false
+	);
+
+	builtInProp(Promise,"resolve",function Promise$resolve(msg) {
+		var Constructor = this;
+
+		// spec mandated checks
+		// note: best "isPromise" check that's practical for now
+		if (msg && typeof msg == "object" && msg.__NPO__ === 1) {
+			return msg;
+		}
+
+		return new Constructor(function executor(resolve,reject){
+			if (typeof resolve != "function" || typeof reject != "function") {
+				throw TypeError("Not a function");
+			}
+
+			resolve(msg);
+		});
+	});
+
+	builtInProp(Promise,"reject",function Promise$reject(msg) {
+		return new this(function executor(resolve,reject){
+			if (typeof resolve != "function" || typeof reject != "function") {
+				throw TypeError("Not a function");
+			}
+
+			reject(msg);
+		});
+	});
+
+	builtInProp(Promise,"all",function Promise$all(arr) {
+		var Constructor = this;
+
+		// spec mandated checks
+		if (ToString.call(arr) != "[object Array]") {
+			return Constructor.reject(TypeError("Not an array"));
+		}
+		if (arr.length === 0) {
+			return Constructor.resolve([]);
+		}
+
+		return new Constructor(function executor(resolve,reject){
+			if (typeof resolve != "function" || typeof reject != "function") {
+				throw TypeError("Not a function");
+			}
+
+			var len = arr.length, msgs = Array(len), count = 0;
+
+			iteratePromises(Constructor,arr,function resolver(idx,msg) {
+				msgs[idx] = msg;
+				if (++count === len) {
+					resolve(msgs);
+				}
+			},reject);
+		});
+	});
+
+	builtInProp(Promise,"race",function Promise$race(arr) {
+		var Constructor = this;
+
+		// spec mandated checks
+		if (ToString.call(arr) != "[object Array]") {
+			return Constructor.reject(TypeError("Not an array"));
+		}
+
+		return new Constructor(function executor(resolve,reject){
+			if (typeof resolve != "function" || typeof reject != "function") {
+				throw TypeError("Not a function");
+			}
+
+			iteratePromises(Constructor,arr,function resolver(idx,msg){
+				resolve(msg);
+			},reject);
+		});
+	});
+
+	return Promise;
+});
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],4:[function(_dereq_,module,exports){
+module.exports = function (obj) {
+    if (!obj || typeof obj !== 'object') return obj;
+    
+    var copy;
+    
+    if (isArray(obj)) {
+        var len = obj.length;
+        copy = Array(len);
+        for (var i = 0; i < len; i++) {
+            copy[i] = obj[i];
         }
-        return path;
-      };
-
-      if (!noRecurse) {
-        if (hasColumns) {
-          component.columns.forEach(function(column) {
-            eachComponent(column.components, fn, includeAll, subPath());
-          });
-        }
-
-        else if (hasRows) {
-          [].concat.apply([], component.rows).forEach(function(row) {
-            eachComponent(row.components, fn, includeAll, subPath());
-          });
-        }
-
-        else if (hasComps) {
-          eachComponent(component.components, fn, includeAll, subPath());
-        }
-      }
-    });
-  },
-
-  /**
-   * Get a component by its key
-   *
-   * @param {Object} components
-   *   The components to iterate.
-   * @param {String} key
-   *   The key of the component to get.
-   *
-   * @returns {Object}
-   *   The component that matches the given key, or undefined if not found.
-   */
-  getComponent: function getComponent(components, key) {
-    var result;
-    module.exports.eachComponent(components, function(component) {
-      if (component.key === key) {
-        result = component;
-      }
-    });
-    return result;
-  },
-
-  /**
-   * Flatten the form components for data manipulation.
-   *
-   * @param {Object} components
-   *   The components to iterate.
-   * @param {Boolean} includeAll
-   *   Whether or not to include layout components.
-   *
-   * @returns {Object}
-   *   The flattened components map.
-   */
-  flattenComponents: function flattenComponents(components, includeAll) {
-    var flattened = {};
-    module.exports.eachComponent(components, function(component, path) {
-      flattened[path] = component;
-    }, includeAll);
-    return flattened;
-  },
-
-  /**
-   * Checks the conditions for a provided component and data.
-   *
-   * @param component
-   *   The component to check for the condition.
-   * @param row
-   *   The data within a row
-   * @param data
-   *   The full submission data.
-   *
-   * @returns {boolean}
-   */
-  checkCondition: function(component, row, data) {
-    if (component.hasOwnProperty('customConditional') && component.customConditional) {
-      try {
-        var script = '(function() { var show = true;';
-        script += component.customConditional.toString();
-        script += '; return show; })()';
-        var result = eval(script);
-        return result.toString() === 'true';
-      }
-      catch (e) {
-        console.warn('An error occurred in a custom conditional statement for component ' + component.key, e);
-        return true;
-      }
     }
-    else if (component.hasOwnProperty('conditional') && component.conditional && component.conditional.when) {
-      var cond = component.conditional;
-      var value = null;
-      if (row) {
-        value = this.getValue({data: row}, cond.when);
-      }
-      if (data && (value === null || typeof value === 'undefined')) {
-        value = this.getValue({data: data}, cond.when);
-      }
-      if (value === null || typeof value === 'undefined') {
-        value = component.hasOwnProperty('defaultValue') ? component.defaultValue : '';
-      }
-      // Special check for selectboxes component.
-      if (typeof value === 'object' && value.hasOwnProperty(cond.eq)) {
-        return value[cond.eq].toString() === cond.show.toString();
-      }
-      return (value.toString() === cond.eq.toString()) === (cond.show.toString() === 'true');
+    else {
+        var keys = objectKeys(obj);
+        copy = {};
+        
+        for (var i = 0, l = keys.length; i < l; i++) {
+            var key = keys[i];
+            copy[key] = obj[key];
+        }
     }
-
-    // Default to show.
-    return true;
-  },
-
-  /**
-   * Get the value for a component key, in the given submission.
-   *
-   * @param {Object} submission
-   *   A submission object to search.
-   * @param {String} key
-   *   A for components API key to search for.
-   */
-  getValue: function getValue(submission, key) {
-    var data = submission.data || {};
-
-    var search = function search(data) {
-      var i;
-      var value;
-
-      if (!data) {
-        return null;
-      }
-
-      if (data instanceof Array) {
-        for (i = 0; i < data.length; i++) {
-          if (typeof data[i] === 'object') {
-            value = search(data[i]);
-          }
-
-          if (value) {
-            return value;
-          }
-        }
-      }
-      else if (typeof data === 'object') {
-        if (data.hasOwnProperty(key)) {
-          return data[key];
-        }
-
-        var keys = Object.keys(data);
-        for (i = 0; i < keys.length; i++) {
-          if (typeof data[keys[i]] === 'object') {
-            value = search(data[keys[i]]);
-          }
-
-          if (value) {
-            return value;
-          }
-        }
-      }
-    };
-
-    return search(data);
-  }
+    return copy;
 };
 
-},{}],3:[function(_dereq_,module,exports){
+var objectKeys = Object.keys || function (obj) {
+    var keys = [];
+    for (var key in obj) {
+        if ({}.hasOwnProperty.call(obj, key)) keys.push(key);
+    }
+    return keys;
+};
+
+var isArray = Array.isArray || function (xs) {
+    return {}.toString.call(xs) === '[object Array]';
+};
+
+},{}],5:[function(_dereq_,module,exports){
+(function(self) {
+  'use strict';
+
+  if (self.fetch) {
+    return
+  }
+
+  function normalizeName(name) {
+    if (typeof name !== 'string') {
+      name = String(name)
+    }
+    if (/[^a-z0-9\-#$%&'*+.\^_`|~]/i.test(name)) {
+      throw new TypeError('Invalid character in header field name')
+    }
+    return name.toLowerCase()
+  }
+
+  function normalizeValue(value) {
+    if (typeof value !== 'string') {
+      value = String(value)
+    }
+    return value
+  }
+
+  function Headers(headers) {
+    this.map = {}
+
+    if (headers instanceof Headers) {
+      headers.forEach(function(value, name) {
+        this.append(name, value)
+      }, this)
+
+    } else if (headers) {
+      Object.getOwnPropertyNames(headers).forEach(function(name) {
+        this.append(name, headers[name])
+      }, this)
+    }
+  }
+
+  Headers.prototype.append = function(name, value) {
+    name = normalizeName(name)
+    value = normalizeValue(value)
+    var list = this.map[name]
+    if (!list) {
+      list = []
+      this.map[name] = list
+    }
+    list.push(value)
+  }
+
+  Headers.prototype['delete'] = function(name) {
+    delete this.map[normalizeName(name)]
+  }
+
+  Headers.prototype.get = function(name) {
+    var values = this.map[normalizeName(name)]
+    return values ? values[0] : null
+  }
+
+  Headers.prototype.getAll = function(name) {
+    return this.map[normalizeName(name)] || []
+  }
+
+  Headers.prototype.has = function(name) {
+    return this.map.hasOwnProperty(normalizeName(name))
+  }
+
+  Headers.prototype.set = function(name, value) {
+    this.map[normalizeName(name)] = [normalizeValue(value)]
+  }
+
+  Headers.prototype.forEach = function(callback, thisArg) {
+    Object.getOwnPropertyNames(this.map).forEach(function(name) {
+      this.map[name].forEach(function(value) {
+        callback.call(thisArg, value, name, this)
+      }, this)
+    }, this)
+  }
+
+  function consumed(body) {
+    if (body.bodyUsed) {
+      return Promise.reject(new TypeError('Already read'))
+    }
+    body.bodyUsed = true
+  }
+
+  function fileReaderReady(reader) {
+    return new Promise(function(resolve, reject) {
+      reader.onload = function() {
+        resolve(reader.result)
+      }
+      reader.onerror = function() {
+        reject(reader.error)
+      }
+    })
+  }
+
+  function readBlobAsArrayBuffer(blob) {
+    var reader = new FileReader()
+    reader.readAsArrayBuffer(blob)
+    return fileReaderReady(reader)
+  }
+
+  function readBlobAsText(blob) {
+    var reader = new FileReader()
+    reader.readAsText(blob)
+    return fileReaderReady(reader)
+  }
+
+  var support = {
+    blob: 'FileReader' in self && 'Blob' in self && (function() {
+      try {
+        new Blob()
+        return true
+      } catch(e) {
+        return false
+      }
+    })(),
+    formData: 'FormData' in self,
+    arrayBuffer: 'ArrayBuffer' in self
+  }
+
+  function Body() {
+    this.bodyUsed = false
+
+
+    this._initBody = function(body) {
+      this._bodyInit = body
+      if (typeof body === 'string') {
+        this._bodyText = body
+      } else if (support.blob && Blob.prototype.isPrototypeOf(body)) {
+        this._bodyBlob = body
+      } else if (support.formData && FormData.prototype.isPrototypeOf(body)) {
+        this._bodyFormData = body
+      } else if (!body) {
+        this._bodyText = ''
+      } else if (support.arrayBuffer && ArrayBuffer.prototype.isPrototypeOf(body)) {
+        // Only support ArrayBuffers for POST method.
+        // Receiving ArrayBuffers happens via Blobs, instead.
+      } else {
+        throw new Error('unsupported BodyInit type')
+      }
+
+      if (!this.headers.get('content-type')) {
+        if (typeof body === 'string') {
+          this.headers.set('content-type', 'text/plain;charset=UTF-8')
+        } else if (this._bodyBlob && this._bodyBlob.type) {
+          this.headers.set('content-type', this._bodyBlob.type)
+        }
+      }
+    }
+
+    if (support.blob) {
+      this.blob = function() {
+        var rejected = consumed(this)
+        if (rejected) {
+          return rejected
+        }
+
+        if (this._bodyBlob) {
+          return Promise.resolve(this._bodyBlob)
+        } else if (this._bodyFormData) {
+          throw new Error('could not read FormData body as blob')
+        } else {
+          return Promise.resolve(new Blob([this._bodyText]))
+        }
+      }
+
+      this.arrayBuffer = function() {
+        return this.blob().then(readBlobAsArrayBuffer)
+      }
+
+      this.text = function() {
+        var rejected = consumed(this)
+        if (rejected) {
+          return rejected
+        }
+
+        if (this._bodyBlob) {
+          return readBlobAsText(this._bodyBlob)
+        } else if (this._bodyFormData) {
+          throw new Error('could not read FormData body as text')
+        } else {
+          return Promise.resolve(this._bodyText)
+        }
+      }
+    } else {
+      this.text = function() {
+        var rejected = consumed(this)
+        return rejected ? rejected : Promise.resolve(this._bodyText)
+      }
+    }
+
+    if (support.formData) {
+      this.formData = function() {
+        return this.text().then(decode)
+      }
+    }
+
+    this.json = function() {
+      return this.text().then(JSON.parse)
+    }
+
+    return this
+  }
+
+  // HTTP methods whose capitalization should be normalized
+  var methods = ['DELETE', 'GET', 'HEAD', 'OPTIONS', 'POST', 'PUT']
+
+  function normalizeMethod(method) {
+    var upcased = method.toUpperCase()
+    return (methods.indexOf(upcased) > -1) ? upcased : method
+  }
+
+  function Request(input, options) {
+    options = options || {}
+    var body = options.body
+    if (Request.prototype.isPrototypeOf(input)) {
+      if (input.bodyUsed) {
+        throw new TypeError('Already read')
+      }
+      this.url = input.url
+      this.credentials = input.credentials
+      if (!options.headers) {
+        this.headers = new Headers(input.headers)
+      }
+      this.method = input.method
+      this.mode = input.mode
+      if (!body) {
+        body = input._bodyInit
+        input.bodyUsed = true
+      }
+    } else {
+      this.url = input
+    }
+
+    this.credentials = options.credentials || this.credentials || 'omit'
+    if (options.headers || !this.headers) {
+      this.headers = new Headers(options.headers)
+    }
+    this.method = normalizeMethod(options.method || this.method || 'GET')
+    this.mode = options.mode || this.mode || null
+    this.referrer = null
+
+    if ((this.method === 'GET' || this.method === 'HEAD') && body) {
+      throw new TypeError('Body not allowed for GET or HEAD requests')
+    }
+    this._initBody(body)
+  }
+
+  Request.prototype.clone = function() {
+    return new Request(this)
+  }
+
+  function decode(body) {
+    var form = new FormData()
+    body.trim().split('&').forEach(function(bytes) {
+      if (bytes) {
+        var split = bytes.split('=')
+        var name = split.shift().replace(/\+/g, ' ')
+        var value = split.join('=').replace(/\+/g, ' ')
+        form.append(decodeURIComponent(name), decodeURIComponent(value))
+      }
+    })
+    return form
+  }
+
+  function headers(xhr) {
+    var head = new Headers()
+    var pairs = (xhr.getAllResponseHeaders() || '').trim().split('\n')
+    pairs.forEach(function(header) {
+      var split = header.trim().split(':')
+      var key = split.shift().trim()
+      var value = split.join(':').trim()
+      head.append(key, value)
+    })
+    return head
+  }
+
+  Body.call(Request.prototype)
+
+  function Response(bodyInit, options) {
+    if (!options) {
+      options = {}
+    }
+
+    this.type = 'default'
+    this.status = options.status
+    this.ok = this.status >= 200 && this.status < 300
+    this.statusText = options.statusText
+    this.headers = options.headers instanceof Headers ? options.headers : new Headers(options.headers)
+    this.url = options.url || ''
+    this._initBody(bodyInit)
+  }
+
+  Body.call(Response.prototype)
+
+  Response.prototype.clone = function() {
+    return new Response(this._bodyInit, {
+      status: this.status,
+      statusText: this.statusText,
+      headers: new Headers(this.headers),
+      url: this.url
+    })
+  }
+
+  Response.error = function() {
+    var response = new Response(null, {status: 0, statusText: ''})
+    response.type = 'error'
+    return response
+  }
+
+  var redirectStatuses = [301, 302, 303, 307, 308]
+
+  Response.redirect = function(url, status) {
+    if (redirectStatuses.indexOf(status) === -1) {
+      throw new RangeError('Invalid status code')
+    }
+
+    return new Response(null, {status: status, headers: {location: url}})
+  }
+
+  self.Headers = Headers
+  self.Request = Request
+  self.Response = Response
+
+  self.fetch = function(input, init) {
+    return new Promise(function(resolve, reject) {
+      var request
+      if (Request.prototype.isPrototypeOf(input) && !init) {
+        request = input
+      } else {
+        request = new Request(input, init)
+      }
+
+      var xhr = new XMLHttpRequest()
+
+      function responseURL() {
+        if ('responseURL' in xhr) {
+          return xhr.responseURL
+        }
+
+        // Avoid security warnings on getResponseHeader when not allowed by CORS
+        if (/^X-Request-URL:/m.test(xhr.getAllResponseHeaders())) {
+          return xhr.getResponseHeader('X-Request-URL')
+        }
+
+        return
+      }
+
+      xhr.onload = function() {
+        var status = (xhr.status === 1223) ? 204 : xhr.status
+        if (status < 100 || status > 599) {
+          reject(new TypeError('Network request failed'))
+          return
+        }
+        var options = {
+          status: status,
+          statusText: xhr.statusText,
+          headers: headers(xhr),
+          url: responseURL()
+        }
+        var body = 'response' in xhr ? xhr.response : xhr.responseText
+        resolve(new Response(body, options))
+      }
+
+      xhr.onerror = function() {
+        reject(new TypeError('Network request failed'))
+      }
+
+      xhr.ontimeout = function() {
+        reject(new TypeError('Network request failed'))
+      }
+
+      xhr.open(request.method, request.url, true)
+
+      if (request.credentials === 'include') {
+        xhr.withCredentials = true
+      }
+
+      if ('responseType' in xhr && support.blob) {
+        xhr.responseType = 'blob'
+      }
+
+      request.headers.forEach(function(value, name) {
+        xhr.setRequestHeader(name, value)
+      })
+
+      xhr.send(typeof request._bodyInit === 'undefined' ? null : request._bodyInit)
+    })
+  }
+  self.fetch.polyfill = true
+})(typeof self !== 'undefined' ? self : this);
+
+},{}],6:[function(_dereq_,module,exports){
 'use strict';
 
 // Intentionally use native-promise-only here... Other promise libraries (es6-promise)
@@ -1816,12 +2625,12 @@ Formio.deregisterPlugin = function(plugin) {
 
 module.exports = Formio;
 
-},{"./providers":4,"eventemitter2":1,"native-promise-only":11,"shallow-copy":12,"whatwg-fetch":13}],4:[function(_dereq_,module,exports){
+},{"./providers":7,"eventemitter2":2,"native-promise-only":3,"shallow-copy":4,"whatwg-fetch":5}],7:[function(_dereq_,module,exports){
 module.exports = {
   storage: _dereq_('./storage')
 };
 
-},{"./storage":6}],5:[function(_dereq_,module,exports){
+},{"./storage":9}],8:[function(_dereq_,module,exports){
 var Promise = _dereq_("native-promise-only");
 var dropbox = function(formio) {
   return {
@@ -1897,14 +2706,14 @@ module.exports = dropbox;
 
 
 
-},{"native-promise-only":11}],6:[function(_dereq_,module,exports){
+},{"native-promise-only":3}],9:[function(_dereq_,module,exports){
 module.exports = {
   dropbox: _dereq_('./dropbox.js'),
   s3: _dereq_('./s3.js'),
   url: _dereq_('./url.js'),
 };
 
-},{"./dropbox.js":5,"./s3.js":7,"./url.js":8}],7:[function(_dereq_,module,exports){
+},{"./dropbox.js":8,"./s3.js":10,"./url.js":11}],10:[function(_dereq_,module,exports){
 var Promise = _dereq_("native-promise-only");
 var s3 = function(formio) {
   return {
@@ -2022,7 +2831,7 @@ s3.title = 'S3';
 s3.name = 's3';
 module.exports = s3;
 
-},{"native-promise-only":11}],8:[function(_dereq_,module,exports){
+},{"native-promise-only":3}],11:[function(_dereq_,module,exports){
 var Promise = _dereq_("native-promise-only");
 var url = function(formio) {
   return {
@@ -2088,7 +2897,7 @@ url.name = 'url';
 url.title = 'Url';
 module.exports = url;
 
-},{"native-promise-only":11}],9:[function(_dereq_,module,exports){
+},{"native-promise-only":3}],12:[function(_dereq_,module,exports){
 (function (global){
 /**
  * lodash (Custom Build) <https://lodash.com/>
@@ -4458,7 +5267,7 @@ function property(path) {
 module.exports = filter;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],10:[function(_dereq_,module,exports){
+},{}],13:[function(_dereq_,module,exports){
 (function (global){
 /**
  * lodash (Custom Build) <https://lodash.com/>
@@ -5393,815 +6202,6 @@ function get(object, path, defaultValue) {
 module.exports = get;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],11:[function(_dereq_,module,exports){
-(function (global){
-/*! Native Promise Only
-    v0.8.1 (c) Kyle Simpson
-    MIT License: http://getify.mit-license.org
-*/
-
-(function UMD(name,context,definition){
-	// special form of UMD for polyfilling across evironments
-	context[name] = context[name] || definition();
-	if (typeof module != "undefined" && module.exports) { module.exports = context[name]; }
-	else if (typeof define == "function" && define.amd) { define(function $AMD$(){ return context[name]; }); }
-})("Promise",typeof global != "undefined" ? global : this,function DEF(){
-	/*jshint validthis:true */
-	"use strict";
-
-	var builtInProp, cycle, scheduling_queue,
-		ToString = Object.prototype.toString,
-		timer = (typeof setImmediate != "undefined") ?
-			function timer(fn) { return setImmediate(fn); } :
-			setTimeout
-	;
-
-	// dammit, IE8.
-	try {
-		Object.defineProperty({},"x",{});
-		builtInProp = function builtInProp(obj,name,val,config) {
-			return Object.defineProperty(obj,name,{
-				value: val,
-				writable: true,
-				configurable: config !== false
-			});
-		};
-	}
-	catch (err) {
-		builtInProp = function builtInProp(obj,name,val) {
-			obj[name] = val;
-			return obj;
-		};
-	}
-
-	// Note: using a queue instead of array for efficiency
-	scheduling_queue = (function Queue() {
-		var first, last, item;
-
-		function Item(fn,self) {
-			this.fn = fn;
-			this.self = self;
-			this.next = void 0;
-		}
-
-		return {
-			add: function add(fn,self) {
-				item = new Item(fn,self);
-				if (last) {
-					last.next = item;
-				}
-				else {
-					first = item;
-				}
-				last = item;
-				item = void 0;
-			},
-			drain: function drain() {
-				var f = first;
-				first = last = cycle = void 0;
-
-				while (f) {
-					f.fn.call(f.self);
-					f = f.next;
-				}
-			}
-		};
-	})();
-
-	function schedule(fn,self) {
-		scheduling_queue.add(fn,self);
-		if (!cycle) {
-			cycle = timer(scheduling_queue.drain);
-		}
-	}
-
-	// promise duck typing
-	function isThenable(o) {
-		var _then, o_type = typeof o;
-
-		if (o != null &&
-			(
-				o_type == "object" || o_type == "function"
-			)
-		) {
-			_then = o.then;
-		}
-		return typeof _then == "function" ? _then : false;
-	}
-
-	function notify() {
-		for (var i=0; i<this.chain.length; i++) {
-			notifyIsolated(
-				this,
-				(this.state === 1) ? this.chain[i].success : this.chain[i].failure,
-				this.chain[i]
-			);
-		}
-		this.chain.length = 0;
-	}
-
-	// NOTE: This is a separate function to isolate
-	// the `try..catch` so that other code can be
-	// optimized better
-	function notifyIsolated(self,cb,chain) {
-		var ret, _then;
-		try {
-			if (cb === false) {
-				chain.reject(self.msg);
-			}
-			else {
-				if (cb === true) {
-					ret = self.msg;
-				}
-				else {
-					ret = cb.call(void 0,self.msg);
-				}
-
-				if (ret === chain.promise) {
-					chain.reject(TypeError("Promise-chain cycle"));
-				}
-				else if (_then = isThenable(ret)) {
-					_then.call(ret,chain.resolve,chain.reject);
-				}
-				else {
-					chain.resolve(ret);
-				}
-			}
-		}
-		catch (err) {
-			chain.reject(err);
-		}
-	}
-
-	function resolve(msg) {
-		var _then, self = this;
-
-		// already triggered?
-		if (self.triggered) { return; }
-
-		self.triggered = true;
-
-		// unwrap
-		if (self.def) {
-			self = self.def;
-		}
-
-		try {
-			if (_then = isThenable(msg)) {
-				schedule(function(){
-					var def_wrapper = new MakeDefWrapper(self);
-					try {
-						_then.call(msg,
-							function $resolve$(){ resolve.apply(def_wrapper,arguments); },
-							function $reject$(){ reject.apply(def_wrapper,arguments); }
-						);
-					}
-					catch (err) {
-						reject.call(def_wrapper,err);
-					}
-				})
-			}
-			else {
-				self.msg = msg;
-				self.state = 1;
-				if (self.chain.length > 0) {
-					schedule(notify,self);
-				}
-			}
-		}
-		catch (err) {
-			reject.call(new MakeDefWrapper(self),err);
-		}
-	}
-
-	function reject(msg) {
-		var self = this;
-
-		// already triggered?
-		if (self.triggered) { return; }
-
-		self.triggered = true;
-
-		// unwrap
-		if (self.def) {
-			self = self.def;
-		}
-
-		self.msg = msg;
-		self.state = 2;
-		if (self.chain.length > 0) {
-			schedule(notify,self);
-		}
-	}
-
-	function iteratePromises(Constructor,arr,resolver,rejecter) {
-		for (var idx=0; idx<arr.length; idx++) {
-			(function IIFE(idx){
-				Constructor.resolve(arr[idx])
-				.then(
-					function $resolver$(msg){
-						resolver(idx,msg);
-					},
-					rejecter
-				);
-			})(idx);
-		}
-	}
-
-	function MakeDefWrapper(self) {
-		this.def = self;
-		this.triggered = false;
-	}
-
-	function MakeDef(self) {
-		this.promise = self;
-		this.state = 0;
-		this.triggered = false;
-		this.chain = [];
-		this.msg = void 0;
-	}
-
-	function Promise(executor) {
-		if (typeof executor != "function") {
-			throw TypeError("Not a function");
-		}
-
-		if (this.__NPO__ !== 0) {
-			throw TypeError("Not a promise");
-		}
-
-		// instance shadowing the inherited "brand"
-		// to signal an already "initialized" promise
-		this.__NPO__ = 1;
-
-		var def = new MakeDef(this);
-
-		this["then"] = function then(success,failure) {
-			var o = {
-				success: typeof success == "function" ? success : true,
-				failure: typeof failure == "function" ? failure : false
-			};
-			// Note: `then(..)` itself can be borrowed to be used against
-			// a different promise constructor for making the chained promise,
-			// by substituting a different `this` binding.
-			o.promise = new this.constructor(function extractChain(resolve,reject) {
-				if (typeof resolve != "function" || typeof reject != "function") {
-					throw TypeError("Not a function");
-				}
-
-				o.resolve = resolve;
-				o.reject = reject;
-			});
-			def.chain.push(o);
-
-			if (def.state !== 0) {
-				schedule(notify,def);
-			}
-
-			return o.promise;
-		};
-		this["catch"] = function $catch$(failure) {
-			return this.then(void 0,failure);
-		};
-
-		try {
-			executor.call(
-				void 0,
-				function publicResolve(msg){
-					resolve.call(def,msg);
-				},
-				function publicReject(msg) {
-					reject.call(def,msg);
-				}
-			);
-		}
-		catch (err) {
-			reject.call(def,err);
-		}
-	}
-
-	var PromisePrototype = builtInProp({},"constructor",Promise,
-		/*configurable=*/false
-	);
-
-	// Note: Android 4 cannot use `Object.defineProperty(..)` here
-	Promise.prototype = PromisePrototype;
-
-	// built-in "brand" to signal an "uninitialized" promise
-	builtInProp(PromisePrototype,"__NPO__",0,
-		/*configurable=*/false
-	);
-
-	builtInProp(Promise,"resolve",function Promise$resolve(msg) {
-		var Constructor = this;
-
-		// spec mandated checks
-		// note: best "isPromise" check that's practical for now
-		if (msg && typeof msg == "object" && msg.__NPO__ === 1) {
-			return msg;
-		}
-
-		return new Constructor(function executor(resolve,reject){
-			if (typeof resolve != "function" || typeof reject != "function") {
-				throw TypeError("Not a function");
-			}
-
-			resolve(msg);
-		});
-	});
-
-	builtInProp(Promise,"reject",function Promise$reject(msg) {
-		return new this(function executor(resolve,reject){
-			if (typeof resolve != "function" || typeof reject != "function") {
-				throw TypeError("Not a function");
-			}
-
-			reject(msg);
-		});
-	});
-
-	builtInProp(Promise,"all",function Promise$all(arr) {
-		var Constructor = this;
-
-		// spec mandated checks
-		if (ToString.call(arr) != "[object Array]") {
-			return Constructor.reject(TypeError("Not an array"));
-		}
-		if (arr.length === 0) {
-			return Constructor.resolve([]);
-		}
-
-		return new Constructor(function executor(resolve,reject){
-			if (typeof resolve != "function" || typeof reject != "function") {
-				throw TypeError("Not a function");
-			}
-
-			var len = arr.length, msgs = Array(len), count = 0;
-
-			iteratePromises(Constructor,arr,function resolver(idx,msg) {
-				msgs[idx] = msg;
-				if (++count === len) {
-					resolve(msgs);
-				}
-			},reject);
-		});
-	});
-
-	builtInProp(Promise,"race",function Promise$race(arr) {
-		var Constructor = this;
-
-		// spec mandated checks
-		if (ToString.call(arr) != "[object Array]") {
-			return Constructor.reject(TypeError("Not an array"));
-		}
-
-		return new Constructor(function executor(resolve,reject){
-			if (typeof resolve != "function" || typeof reject != "function") {
-				throw TypeError("Not a function");
-			}
-
-			iteratePromises(Constructor,arr,function resolver(idx,msg){
-				resolve(msg);
-			},reject);
-		});
-	});
-
-	return Promise;
-});
-
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],12:[function(_dereq_,module,exports){
-module.exports = function (obj) {
-    if (!obj || typeof obj !== 'object') return obj;
-    
-    var copy;
-    
-    if (isArray(obj)) {
-        var len = obj.length;
-        copy = Array(len);
-        for (var i = 0; i < len; i++) {
-            copy[i] = obj[i];
-        }
-    }
-    else {
-        var keys = objectKeys(obj);
-        copy = {};
-        
-        for (var i = 0, l = keys.length; i < l; i++) {
-            var key = keys[i];
-            copy[key] = obj[key];
-        }
-    }
-    return copy;
-};
-
-var objectKeys = Object.keys || function (obj) {
-    var keys = [];
-    for (var key in obj) {
-        if ({}.hasOwnProperty.call(obj, key)) keys.push(key);
-    }
-    return keys;
-};
-
-var isArray = Array.isArray || function (xs) {
-    return {}.toString.call(xs) === '[object Array]';
-};
-
-},{}],13:[function(_dereq_,module,exports){
-(function(self) {
-  'use strict';
-
-  if (self.fetch) {
-    return
-  }
-
-  function normalizeName(name) {
-    if (typeof name !== 'string') {
-      name = String(name)
-    }
-    if (/[^a-z0-9\-#$%&'*+.\^_`|~]/i.test(name)) {
-      throw new TypeError('Invalid character in header field name')
-    }
-    return name.toLowerCase()
-  }
-
-  function normalizeValue(value) {
-    if (typeof value !== 'string') {
-      value = String(value)
-    }
-    return value
-  }
-
-  function Headers(headers) {
-    this.map = {}
-
-    if (headers instanceof Headers) {
-      headers.forEach(function(value, name) {
-        this.append(name, value)
-      }, this)
-
-    } else if (headers) {
-      Object.getOwnPropertyNames(headers).forEach(function(name) {
-        this.append(name, headers[name])
-      }, this)
-    }
-  }
-
-  Headers.prototype.append = function(name, value) {
-    name = normalizeName(name)
-    value = normalizeValue(value)
-    var list = this.map[name]
-    if (!list) {
-      list = []
-      this.map[name] = list
-    }
-    list.push(value)
-  }
-
-  Headers.prototype['delete'] = function(name) {
-    delete this.map[normalizeName(name)]
-  }
-
-  Headers.prototype.get = function(name) {
-    var values = this.map[normalizeName(name)]
-    return values ? values[0] : null
-  }
-
-  Headers.prototype.getAll = function(name) {
-    return this.map[normalizeName(name)] || []
-  }
-
-  Headers.prototype.has = function(name) {
-    return this.map.hasOwnProperty(normalizeName(name))
-  }
-
-  Headers.prototype.set = function(name, value) {
-    this.map[normalizeName(name)] = [normalizeValue(value)]
-  }
-
-  Headers.prototype.forEach = function(callback, thisArg) {
-    Object.getOwnPropertyNames(this.map).forEach(function(name) {
-      this.map[name].forEach(function(value) {
-        callback.call(thisArg, value, name, this)
-      }, this)
-    }, this)
-  }
-
-  function consumed(body) {
-    if (body.bodyUsed) {
-      return Promise.reject(new TypeError('Already read'))
-    }
-    body.bodyUsed = true
-  }
-
-  function fileReaderReady(reader) {
-    return new Promise(function(resolve, reject) {
-      reader.onload = function() {
-        resolve(reader.result)
-      }
-      reader.onerror = function() {
-        reject(reader.error)
-      }
-    })
-  }
-
-  function readBlobAsArrayBuffer(blob) {
-    var reader = new FileReader()
-    reader.readAsArrayBuffer(blob)
-    return fileReaderReady(reader)
-  }
-
-  function readBlobAsText(blob) {
-    var reader = new FileReader()
-    reader.readAsText(blob)
-    return fileReaderReady(reader)
-  }
-
-  var support = {
-    blob: 'FileReader' in self && 'Blob' in self && (function() {
-      try {
-        new Blob()
-        return true
-      } catch(e) {
-        return false
-      }
-    })(),
-    formData: 'FormData' in self,
-    arrayBuffer: 'ArrayBuffer' in self
-  }
-
-  function Body() {
-    this.bodyUsed = false
-
-
-    this._initBody = function(body) {
-      this._bodyInit = body
-      if (typeof body === 'string') {
-        this._bodyText = body
-      } else if (support.blob && Blob.prototype.isPrototypeOf(body)) {
-        this._bodyBlob = body
-      } else if (support.formData && FormData.prototype.isPrototypeOf(body)) {
-        this._bodyFormData = body
-      } else if (!body) {
-        this._bodyText = ''
-      } else if (support.arrayBuffer && ArrayBuffer.prototype.isPrototypeOf(body)) {
-        // Only support ArrayBuffers for POST method.
-        // Receiving ArrayBuffers happens via Blobs, instead.
-      } else {
-        throw new Error('unsupported BodyInit type')
-      }
-
-      if (!this.headers.get('content-type')) {
-        if (typeof body === 'string') {
-          this.headers.set('content-type', 'text/plain;charset=UTF-8')
-        } else if (this._bodyBlob && this._bodyBlob.type) {
-          this.headers.set('content-type', this._bodyBlob.type)
-        }
-      }
-    }
-
-    if (support.blob) {
-      this.blob = function() {
-        var rejected = consumed(this)
-        if (rejected) {
-          return rejected
-        }
-
-        if (this._bodyBlob) {
-          return Promise.resolve(this._bodyBlob)
-        } else if (this._bodyFormData) {
-          throw new Error('could not read FormData body as blob')
-        } else {
-          return Promise.resolve(new Blob([this._bodyText]))
-        }
-      }
-
-      this.arrayBuffer = function() {
-        return this.blob().then(readBlobAsArrayBuffer)
-      }
-
-      this.text = function() {
-        var rejected = consumed(this)
-        if (rejected) {
-          return rejected
-        }
-
-        if (this._bodyBlob) {
-          return readBlobAsText(this._bodyBlob)
-        } else if (this._bodyFormData) {
-          throw new Error('could not read FormData body as text')
-        } else {
-          return Promise.resolve(this._bodyText)
-        }
-      }
-    } else {
-      this.text = function() {
-        var rejected = consumed(this)
-        return rejected ? rejected : Promise.resolve(this._bodyText)
-      }
-    }
-
-    if (support.formData) {
-      this.formData = function() {
-        return this.text().then(decode)
-      }
-    }
-
-    this.json = function() {
-      return this.text().then(JSON.parse)
-    }
-
-    return this
-  }
-
-  // HTTP methods whose capitalization should be normalized
-  var methods = ['DELETE', 'GET', 'HEAD', 'OPTIONS', 'POST', 'PUT']
-
-  function normalizeMethod(method) {
-    var upcased = method.toUpperCase()
-    return (methods.indexOf(upcased) > -1) ? upcased : method
-  }
-
-  function Request(input, options) {
-    options = options || {}
-    var body = options.body
-    if (Request.prototype.isPrototypeOf(input)) {
-      if (input.bodyUsed) {
-        throw new TypeError('Already read')
-      }
-      this.url = input.url
-      this.credentials = input.credentials
-      if (!options.headers) {
-        this.headers = new Headers(input.headers)
-      }
-      this.method = input.method
-      this.mode = input.mode
-      if (!body) {
-        body = input._bodyInit
-        input.bodyUsed = true
-      }
-    } else {
-      this.url = input
-    }
-
-    this.credentials = options.credentials || this.credentials || 'omit'
-    if (options.headers || !this.headers) {
-      this.headers = new Headers(options.headers)
-    }
-    this.method = normalizeMethod(options.method || this.method || 'GET')
-    this.mode = options.mode || this.mode || null
-    this.referrer = null
-
-    if ((this.method === 'GET' || this.method === 'HEAD') && body) {
-      throw new TypeError('Body not allowed for GET or HEAD requests')
-    }
-    this._initBody(body)
-  }
-
-  Request.prototype.clone = function() {
-    return new Request(this)
-  }
-
-  function decode(body) {
-    var form = new FormData()
-    body.trim().split('&').forEach(function(bytes) {
-      if (bytes) {
-        var split = bytes.split('=')
-        var name = split.shift().replace(/\+/g, ' ')
-        var value = split.join('=').replace(/\+/g, ' ')
-        form.append(decodeURIComponent(name), decodeURIComponent(value))
-      }
-    })
-    return form
-  }
-
-  function headers(xhr) {
-    var head = new Headers()
-    var pairs = (xhr.getAllResponseHeaders() || '').trim().split('\n')
-    pairs.forEach(function(header) {
-      var split = header.trim().split(':')
-      var key = split.shift().trim()
-      var value = split.join(':').trim()
-      head.append(key, value)
-    })
-    return head
-  }
-
-  Body.call(Request.prototype)
-
-  function Response(bodyInit, options) {
-    if (!options) {
-      options = {}
-    }
-
-    this.type = 'default'
-    this.status = options.status
-    this.ok = this.status >= 200 && this.status < 300
-    this.statusText = options.statusText
-    this.headers = options.headers instanceof Headers ? options.headers : new Headers(options.headers)
-    this.url = options.url || ''
-    this._initBody(bodyInit)
-  }
-
-  Body.call(Response.prototype)
-
-  Response.prototype.clone = function() {
-    return new Response(this._bodyInit, {
-      status: this.status,
-      statusText: this.statusText,
-      headers: new Headers(this.headers),
-      url: this.url
-    })
-  }
-
-  Response.error = function() {
-    var response = new Response(null, {status: 0, statusText: ''})
-    response.type = 'error'
-    return response
-  }
-
-  var redirectStatuses = [301, 302, 303, 307, 308]
-
-  Response.redirect = function(url, status) {
-    if (redirectStatuses.indexOf(status) === -1) {
-      throw new RangeError('Invalid status code')
-    }
-
-    return new Response(null, {status: status, headers: {location: url}})
-  }
-
-  self.Headers = Headers
-  self.Request = Request
-  self.Response = Response
-
-  self.fetch = function(input, init) {
-    return new Promise(function(resolve, reject) {
-      var request
-      if (Request.prototype.isPrototypeOf(input) && !init) {
-        request = input
-      } else {
-        request = new Request(input, init)
-      }
-
-      var xhr = new XMLHttpRequest()
-
-      function responseURL() {
-        if ('responseURL' in xhr) {
-          return xhr.responseURL
-        }
-
-        // Avoid security warnings on getResponseHeader when not allowed by CORS
-        if (/^X-Request-URL:/m.test(xhr.getAllResponseHeaders())) {
-          return xhr.getResponseHeader('X-Request-URL')
-        }
-
-        return
-      }
-
-      xhr.onload = function() {
-        var status = (xhr.status === 1223) ? 204 : xhr.status
-        if (status < 100 || status > 599) {
-          reject(new TypeError('Network request failed'))
-          return
-        }
-        var options = {
-          status: status,
-          statusText: xhr.statusText,
-          headers: headers(xhr),
-          url: responseURL()
-        }
-        var body = 'response' in xhr ? xhr.response : xhr.responseText
-        resolve(new Response(body, options))
-      }
-
-      xhr.onerror = function() {
-        reject(new TypeError('Network request failed'))
-      }
-
-      xhr.ontimeout = function() {
-        reject(new TypeError('Network request failed'))
-      }
-
-      xhr.open(request.method, request.url, true)
-
-      if (request.credentials === 'include') {
-        xhr.withCredentials = true
-      }
-
-      if ('responseType' in xhr && support.blob) {
-        xhr.responseType = 'blob'
-      }
-
-      request.headers.forEach(function(value, name) {
-        xhr.setRequestHeader(name, value)
-      })
-
-      xhr.send(typeof request._bodyInit === 'undefined' ? null : request._bodyInit)
-    })
-  }
-  self.fetch.polyfill = true
-})(typeof self !== 'undefined' ? self : this);
-
 },{}],14:[function(_dereq_,module,exports){
 "use strict";
 
@@ -10742,6 +10742,9 @@ module.exports = function() {
             '<formio-errors ng-if="::!builder"></formio-errors>' +
           '</div>' +
         '</div>' +
+        '<div ng-if="!!component.description" class="input-description">' +
+          '<span>{{ component.description }}</span>' +
+        '</div>' +
         '<div ng-if="component.multiple"><table class="table table-bordered">' +
           inputLabel +
           '<tr ng-repeat="value in data[component.key] track by $index">' +
@@ -10767,7 +10770,7 @@ module.exports = function() {
   };
 };
 
-},{"formio-utils":2}],59:[function(_dereq_,module,exports){
+},{"formio-utils":1}],59:[function(_dereq_,module,exports){
 "use strict";
 var _filter = _dereq_('lodash.filter');
 var _get = _dereq_('lodash.get');
@@ -10779,7 +10782,7 @@ module.exports = function() {
   };
 };
 
-},{"lodash.filter":9,"lodash.get":10}],60:[function(_dereq_,module,exports){
+},{"lodash.filter":12,"lodash.get":13}],60:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$q',
@@ -11200,5 +11203,5 @@ module.exports = function() {
   };
 };
 
-},{"formiojs":3}]},{},[68])(68)
+},{"formiojs":6}]},{},[68])(68)
 });
