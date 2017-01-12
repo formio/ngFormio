@@ -319,12 +319,23 @@ module.exports = [
                 // FOR-262 - Fix multiple default value for the number component.
                 if ($scope.component.type === 'number') {
                   if (!mult) {
+                    // FOR-290 - Fix default values for number components, to allow decimal numbers.
+                    if ($scope.component.defaultValue.indexOf('.') !== -1) {
+                      $scope.data[$scope.component.key] = parseFloat($scope.component.defaultValue);
+                      return;
+                    }
+
                     $scope.data[$scope.component.key] = parseInt($scope.component.defaultValue);
                     return;
                   }
 
                   $scope.data[$scope.component.key] = value.map(function(item) {
                     try {
+                      // FOR-290 - Fix default values for number components, to allow decimal numbers.
+                      if (item.indexOf('.') !== -1) {
+                        return parseFloat(item);
+                      }
+
                       return parseInt(item);
                     }
                     catch (e) {
