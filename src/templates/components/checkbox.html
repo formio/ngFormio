@@ -11,3 +11,6 @@
     <span ng-if="!(component.hideLabel && component.datagridLabel === false)">{{ component.label | formioTranslate:null:builder }}</span>
   </label>
 </div>
+<div ng-if="!!component.description" class="input-description">
+  <span>{{ component.description }}</span>
+</div>
