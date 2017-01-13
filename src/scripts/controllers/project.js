@@ -1530,6 +1530,60 @@ app.controller('ProjectFormioController', [
             $scope.totalMonthlySubmissions = _.sum(_.map($scope.monthlySubmissions, 'submissions'));
             $scope.monthlyNonsubmissions = filterEmployees(merge($scope.monthlyNonsubmissions, ownerData, 'owner'));
             $scope.totalMonthlyNonsubmissions = _.sum(_.map($scope.monthlyNonsubmissions, 'nonsubmissions'));
+
+            // Grab the top 5 submission users, and compare them, with the overall.
+            var quantity = 5;
+            var top = _($scope.monthlySubmissions)
+              .take(quantity)
+              .map(function(item) {
+                return item._id;
+              })
+              .value();
+
+            // Build the total submission chart data.
+            $scope.submissionGraphData = {
+              labels: [],
+              series: []
+            };
+            var days = new Date($scope.viewDate.year, $scope.viewDate.month - 1, 0).getDate();
+            var templateSeries = [];
+            for (var i = 1; i <= days; i++) {
+              // Create each day label
+              $scope.submissionGraphData.labels.push(i);
+
+              // add the series data for each graph line.
+              templateSeries.push(0);
+            }
+            for (var q = 0; q < (quantity + 1); q++) {
+              $scope.submissionGraphData.series.push(_.clone(templateSeries));
+            }
+
+            // If there is no usage, skip traversing the data.
+            if (!top || top.length === 0) {
+              return $scope.$apply();
+            }
+
+            // Group the submission data into 6 groups for quick glance views.
+            var groupPos = 0;
+            _(data)
+              .groupBy(function(item) {
+                if (top.indexOf(item._id) !== -1) {
+                  return 'other';
+                }
+
+                return item._id;
+              })
+              .forEach(function(group) {
+                _(group)
+                  .filter({type: 's'})
+                  .forEach(function(entry) {
+                    var day = parseInt(entry.day);
+                    $scope.submissionGraphData.series[groupPos][day - 1] += entry.calls;
+                  });
+
+                groupPos += 1;
+              });
+
             $scope.$apply();
           });
         });

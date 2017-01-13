@@ -99,6 +99,11 @@
               <h3>Total Non-Submissions: {{totalMonthlyNonsubmissions !== null ? totalMonthlyNonsubmissions : '---'}}</h3>
             </div>
           </div>
+          <div class="row">
+            <div class="col-sm-12 project-data">
+              <chartist class="ct-chart" chartist-data="submissionGraphData" chartist-chart-type="Line" chartist-chart-options="analyticsOptions" chartist-events="analyticsEvents"></chartist>
+            </div>
+          </div>
         </div>
       </div>
     </div>
