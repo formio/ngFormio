@@ -1442,6 +1442,11 @@ app.controller('ProjectFormioController', [
       $scope.monthlyNonsubmissions = null;
       $scope.totalMonthlySubmissions = null;
       $scope.totalMonthlyNonsubmissions = null;
+      $scope.submissionGraphOptions = {
+        plugins: [
+          Chartist.plugins.tooltip()
+        ]
+      };
 
       var BSON = new RegExp('^[0-9a-fA-F]{24}$');
       var url = AppConfig.apiBase + '/analytics/project/year/' + $scope.viewDate.year + '/month/' + $scope.viewDate.month;
@@ -1552,10 +1557,10 @@ app.controller('ProjectFormioController', [
               $scope.submissionGraphData.labels.push(i);
 
               // add the series data for each graph line.
-              templateSeries.push(0);
+              templateSeries.push({meta: '', value: 0});
             }
             for (var q = 0; q < (quantity + 1); q++) {
-              $scope.submissionGraphData.series.push(_.clone(templateSeries));
+              $scope.submissionGraphData.series.push(_.cloneDeep(templateSeries));
             }
 
             // If there is no usage, skip traversing the data.
@@ -1567,18 +1572,19 @@ app.controller('ProjectFormioController', [
             var groupPos = 0;
             _(data)
               .groupBy(function(item) {
-                if (top.indexOf(item._id) !== -1) {
+                if (top.indexOf(item._id) === -1) {
                   return 'other';
                 }
 
                 return item._id;
               })
-              .forEach(function(group) {
+              .forEach(function(group, category) {
                 _(group)
                   .filter({type: 's'})
                   .forEach(function(entry) {
                     var day = parseInt(entry.day);
-                    $scope.submissionGraphData.series[groupPos][day - 1] += entry.calls;
+                    $scope.submissionGraphData.series[groupPos][day - 1]['meta'] = category;
+                    $scope.submissionGraphData.series[groupPos][day - 1]['value'] += entry.calls;
                   });
 
                 groupPos += 1;
