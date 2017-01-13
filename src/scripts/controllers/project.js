@@ -1442,11 +1442,6 @@ app.controller('ProjectFormioController', [
       $scope.monthlyNonsubmissions = null;
       $scope.totalMonthlySubmissions = null;
       $scope.totalMonthlyNonsubmissions = null;
-      $scope.submissionGraphOptions = {
-        plugins: [
-          Chartist.plugins.tooltip()
-        ]
-      };
 
       var BSON = new RegExp('^[0-9a-fA-F]{24}$');
       var url = AppConfig.apiBase + '/analytics/project/year/' + $scope.viewDate.year + '/month/' + $scope.viewDate.month;
@@ -1511,6 +1506,69 @@ app.controller('ProjectFormioController', [
         $scope.usageLoading = false;
         $scope.$apply();
 
+        var buildUsageGraph = function(type, typeData, symbol, quantity) {
+          $scope[type + 'GraphOptions'] = {
+            plugins: [
+              Chartist.plugins.tooltip()
+            ]
+          };
+
+          // Grab the top 5 submission users, and compare them, with the overall.
+          var quantity = quantity || 5;
+          var top = _(typeData)
+            .take(quantity)
+            .map(function(item) {
+              return item._id;
+            })
+            .value();
+          $scope[type + 'DisplayTop'] = 'Top ' +  quantity + ': ' + top.join(', ');
+
+          // Build the total submission chart data.
+          $scope[type + 'GraphData'] = {
+            labels: [],
+            series: []
+          };
+          var days = new Date($scope.viewDate.year, $scope.viewDate.month - 1, 0).getDate();
+          var templateSeries = [];
+          for (var i = 1; i <= days; i++) {
+            // Create each day label
+            $scope[type + 'GraphData'].labels.push(i);
+
+            // add the series data for each graph line.
+            templateSeries.push({meta: '', value: 0});
+          }
+          for (var q = 0; q < (quantity + 1); q++) {
+            $scope[type + 'GraphData'].series.push(_.cloneDeep(templateSeries));
+          }
+
+          // If there is no usage, skip traversing the data.
+          if (!top || top.length === 0) {
+            return $scope.$apply();
+          }
+
+          // Group the submission data into 6 groups for quick glance views.
+          var groupPos = 0;
+          _(data)
+            .groupBy(function(item) {
+              if (top.indexOf(item._id) === -1) {
+                return 'other';
+              }
+
+              return item._id;
+            })
+            .forEach(function(group, category) {
+              _(group)
+                .filter({type: symbol})
+                .forEach(function(entry) {
+                  var day = parseInt(entry.day);
+                  $scope[type + 'GraphData'].series[groupPos][day - 1]['meta'] = category;
+                  $scope[type + 'GraphData'].series[groupPos][day - 1]['value'] += entry.calls;
+                });
+
+              groupPos += 1;
+            });
+        };
+
         // Update project data for top submissions.
         var allProjects = _.uniq(_.map($scope.monthlySubmissions, '_id').concat(_.map($scope.monthlyNonsubmissions, '_id')));
         getProjectData(allProjects, function(submissionData) {
@@ -1536,59 +1594,8 @@ app.controller('ProjectFormioController', [
             $scope.monthlyNonsubmissions = filterEmployees(merge($scope.monthlyNonsubmissions, ownerData, 'owner'));
             $scope.totalMonthlyNonsubmissions = _.sum(_.map($scope.monthlyNonsubmissions, 'nonsubmissions'));
 
-            // Grab the top 5 submission users, and compare them, with the overall.
-            var quantity = 5;
-            var top = _($scope.monthlySubmissions)
-              .take(quantity)
-              .map(function(item) {
-                return item._id;
-              })
-              .value();
-
-            // Build the total submission chart data.
-            $scope.submissionGraphData = {
-              labels: [],
-              series: []
-            };
-            var days = new Date($scope.viewDate.year, $scope.viewDate.month - 1, 0).getDate();
-            var templateSeries = [];
-            for (var i = 1; i <= days; i++) {
-              // Create each day label
-              $scope.submissionGraphData.labels.push(i);
-
-              // add the series data for each graph line.
-              templateSeries.push({meta: '', value: 0});
-            }
-            for (var q = 0; q < (quantity + 1); q++) {
-              $scope.submissionGraphData.series.push(_.cloneDeep(templateSeries));
-            }
-
-            // If there is no usage, skip traversing the data.
-            if (!top || top.length === 0) {
-              return $scope.$apply();
-            }
-
-            // Group the submission data into 6 groups for quick glance views.
-            var groupPos = 0;
-            _(data)
-              .groupBy(function(item) {
-                if (top.indexOf(item._id) === -1) {
-                  return 'other';
-                }
-
-                return item._id;
-              })
-              .forEach(function(group, category) {
-                _(group)
-                  .filter({type: 's'})
-                  .forEach(function(entry) {
-                    var day = parseInt(entry.day);
-                    $scope.submissionGraphData.series[groupPos][day - 1]['meta'] = category;
-                    $scope.submissionGraphData.series[groupPos][day - 1]['value'] += entry.calls;
-                  });
-
-                groupPos += 1;
-              });
+            buildUsageGraph('submission', $scope.monthlySubmissions, 's');
+            buildUsageGraph('nonsubmission', $scope.monthlyNonsubmissions, 'ns');
 
             $scope.$apply();
           });
