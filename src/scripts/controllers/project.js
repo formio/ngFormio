@@ -1508,6 +1508,7 @@ app.controller('ProjectFormioController', [
 
         var buildUsageGraph = function(type, typeData, symbol, quantity) {
           $scope[type + 'GraphOptions'] = {
+            onlyInteger: true,
             plugins: [
               Chartist.plugins.tooltip()
             ]
