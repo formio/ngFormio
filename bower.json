@@ -1,6 +1,6 @@
 {
   "name": "ng-formio",
-  "version": "2.7.1",
+  "version": "2.8.0",
   "authors": [
     "Travis Tidwell <travis@form.io>"
   ],
@@ -20,7 +20,7 @@
     "angular-sanitize": "^1.6.1",
     "angular-moment": "^1.0.1",
     "bootstrap": "^3.3.7",
-    "bootstrap-ui-datetime-picker": "^2.4.3",
+    "bootstrap-ui-datetime-picker": "^2.5.0",
     "signature_pad": "^1.5.3",
     "angular-ui-mask": "formio/ui-mask#1.8.8-beta.1",
     "angular-file-saver": "^1.1.2",
