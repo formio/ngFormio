@@ -853,7 +853,7 @@ app.controller('FormActionIndexController', [
       }
       available.unshift($scope.newAction);
       $scope.availableActions = _.filter(available, function(action) {
-        return action.name !== 'sql'
+        return action.name !== 'sql';
       });
     });
   }
