@@ -1506,6 +1506,20 @@ app.controller('ProjectFormioController', [
         $scope.usageLoading = false;
         $scope.$apply();
 
+        /**
+         * Build a usage graph for the submission analytics.
+         *
+         * @param {String} type
+         *   submission or nonsubmission.
+         * @param {Array} typeData
+         *   The input data to graph.
+         * @param {String} symbol
+         *   s or ns, corresponding to the type.
+         * @param [Number] quantity
+         *   The number of top results to display.
+         *
+         * @returns {*}
+         */
         var buildUsageGraph = function(type, typeData, symbol, quantity) {
           $scope[type + 'GraphOptions'] = {
             onlyInteger: true,
