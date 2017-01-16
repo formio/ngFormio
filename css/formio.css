@@ -196,5 +196,6 @@ input[type="password"][draggable="true"] {
 
 
 .input-description {
-  padding: 0.25em;
+  padding: 0.2em;
+  font-size: 0.9em;
 }
