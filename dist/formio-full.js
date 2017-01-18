@@ -74100,6 +74100,7 @@ module.exports = function(app) {
       formioComponentsProvider.register('htmlelement', {
         title: 'HTML Element',
         template: 'formio/components/htmlelement.html',
+        viewTemplate: 'formio/components/htmlelement.html',
         settings: {
           key: 'html',
           input: false,
@@ -74208,7 +74209,11 @@ module.exports = function(app) {
           if ($scope.builder) return; // FOR-71 - Skip parsing input data.
 
           // Ensure that values are numbers.
-          if ($scope.data.hasOwnProperty($scope.component.key) && isNumeric($scope.data[$scope.component.key])) {
+          if (
+            $scope.data &&
+            $scope.data.hasOwnProperty($scope.component.key) &&
+            isNumeric($scope.data[$scope.component.key])
+          ) {
             $scope.data[$scope.component.key] = parseFloat($scope.data[$scope.component.key]);
           }
         }]
@@ -75230,7 +75235,7 @@ module.exports = function(app) {
       ));
 
       $templateCache.put('formio/componentsView/signature.html', FormioUtils.fieldWrap(
-        "<div ng-if=\"data[component.key] === 'YES'\">\n  [ Signature is hidden ]\n</div>\n<div ng-if=\"data[component.key] !== 'YES'\">\n  <img class=\"signature\" ng-attr-src=\"{{data[component.key]}}\" src=\"\" />\n</div>\n"
+        "<div ng-if=\"data[component.key] === 'YES'\">\n  [ Signature is hidden ]\n</div>\n<div ng-if=\"data[component.key] && (data[component.key] !== 'YES')\">\n  <img class=\"signature\" ng-attr-src=\"{{ data[component.key] }}\" src=\"\" />\n</div>\n<div class=\"well text-center\" ng-if=\"!data[component.key] || (data[component.key] === 'NO')\">\n  <strong>No signature provided</strong>\n</div>\n"
       ));
     }
   ]);
@@ -77586,7 +77591,7 @@ app.run([
     );
 
     $templateCache.put('formio/element-view.html',
-      "<div>\n  <div><strong>{{ component.label }}</strong></div>\n  <div ng-bind-html=\"data | tableView:component\"></div>\n</div>\n"
+      "<div>\n  <div ng-if=\"component.label\"><strong>{{ component.label }}</strong></div>\n  <div ng-bind-html=\"data | tableView:component\"></div>\n</div>\n"
     );
 
     $templateCache.put('formio/errors.html',
