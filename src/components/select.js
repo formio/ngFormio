@@ -244,27 +244,89 @@ module.exports = function(app) {
                 initialized.resolve();
                 break;
               case 'json':
+                var items;
+
+                // Set the new result.
+                var setResult = function(data, append) {
+                  // coerce the data into an array.
+                  if (!(data instanceof Array)) {
+                    data = [data];
+                  }
+
+                  if (data.length < options.params.limit) {
+                    $scope.hasNextPage = false;
+                  }
+                  if (append) {
+                    $scope.selectItems = $scope.selectItems.concat(data);
+                  }
+                  else {
+                    $scope.selectItems = data;
+                  }
+                };
+
                 try {
-                  $scope.selectItems = angular.fromJson(settings.data.json);
+                  if (typeof $scope.component.data.json === 'string') {
+                    items = angular.fromJson($scope.component.data.json);
+                  }
+                  else if (typeof $scope.component.data.json === 'object') {
+                    items = $scope.component.data.json;
+                  }
+                  else {
+                    items = [];
+                  }
 
                   if (selectValues) {
                     // Allow dot notation in the selectValue property.
                     if (selectValues.indexOf('.') !== -1) {
                       var parts = selectValues.split('.');
-                      var select = $scope.selectItems;
+                      var select = items;
                       for (var i in parts) {
                         select = select[parts[i]];
                       }
-                      $scope.selectItems = select;
+                      items = select;
                     }
                     else {
-                      $scope.selectItems = $scope.selectItems[selectValues];
+                      items = items[selectValues];
                     }
                   }
                 }
                 catch (error) {
-                  $scope.selectItems = [];
+                  /* eslint-disable no-console */
+                  console.warn('Error parsing JSON in ' + $scope.component.key, error);
+                  /* eslint-enable no-console */
+                  items = [];
                 }
+                options.params = {
+                  limit: $scope.component.limit || 20,
+                  skip: 0
+                };
+
+                var lastInput;
+                $scope.refreshItems = function(input, url, append) {
+                  // If they typed in a search, reset skip.
+                  if (lastInput !== input) {
+                    lastInput = input;
+                    options.params.skip = 0;
+                  }
+                  var selectItems = items;
+                  if (input) {
+                    selectItems = selectItems.filter(function(item) {
+                      // Get the visible string from the interpolated item.
+                      var value = $interpolate($scope.component.template)({item: item}).replace(/<(?:.|\n)*?>/gm, '');
+                      switch ($scope.component.filter) {
+                        case 'startsWith':
+                          return value.toLowerCase().indexOf(input.toLowerCase()) !== -1;
+                        case 'contains':
+                        default:
+                          return value.toLowerCase().lastIndexOf(input.toLowerCase(), 0) === 0;
+                      }
+                    });
+                  }
+                  selectItems = selectItems.slice(options.params.skip, options.params.skip + options.params.limit);
+                  setResult(selectItems, append);
+                };
+                $scope.refreshItems();
+
                 initialized.resolve();
                 break;
               case 'custom':
@@ -313,7 +375,7 @@ module.exports = function(app) {
                 }
 
                 options.params = {
-                  limit: 100,
+                  limit: $scope.component.limit || 100,
                   skip: 0
                 };
 
