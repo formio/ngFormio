@@ -852,7 +852,9 @@ app.controller('FormActionIndexController', [
         available.shift();
       }
       available.unshift($scope.newAction);
-      $scope.availableActions = available;
+      $scope.availableActions = _.filter(available, function(action) {
+        return action.name !== 'sql';
+      });
     });
   }
 ]);
