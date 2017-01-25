@@ -24,189 +24,614 @@
         </div>
       </div>
     </div>
-    <br>
 
     <!-- The Overview display -->
     <div class="row" ng-if="view === 'Overview'">
-      <div class="row">
-        <div class="col-md-6">
-          <h3>Projects Created: {{projectsCreated.length || 0}}</h3>
+      <div class="panel panel-default control-panel">
+        <div class="panel-heading">
+          Current<i class="pull-right glyphicon glyphicon-refresh" ng-click="getTotalProjects()"></i>
         </div>
-        <div class="col-md-6">
-          <h3>Users Created: {{usersCreated.length || 0}}</h3>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="row">
+                <div class="col-md-6"><h3>Commercial Projects: {{totalProjectsCommercial !== null ? totalProjectsCommercial.length : '---'}}</h3></div>
+                <div class="col-md-6"><h3>Team Projects: {{totalProjectsTeam !== null ? totalProjectsTeam.length : '---'}}</h3></div>
+              </div>
+              <div class="row">
+                <div class="col-md-6"><h3>Independent Projects: {{totalProjectsIndependent !== null ? totalProjectsIndependent.length : '---'}}</h3></div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="row">
-        <div class="col-md-6">
-          <h3>Total Submissions: {{totalMonthlySubmissions || 0}}</h3>
+
+      <div class="panel panel-default control-panel">
+        <div class="panel-heading">
+          Projects<i class="pull-right glyphicon glyphicon-refresh" ng-click="getProjectsCreated(); getProjectUpgrades(); getTotalProjects()"></i>
         </div>
-        <div class="col-md-6">
-          <h3>Total Non-Submissions: {{totalMonthlyNonsubmissions || 0}}</h3>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-6">
+              <h3>New Projects: {{projectsCreated !== null ? projectsCreated.length : '---'}}</h3>
+            </div>
+            <div class="col-md-6">
+              <h3>Total Projects: {{totalProjectsNotDeleted !== null ? totalProjectsNotDeleted.length : '---'}}</h3>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <h3>Monthly Upgrades: {{monthlyUpgrades !== null ? monthlyUpgrades : '---'}}</h3>
+            </div>
+            <div class="col-md-6">
+              <h3>Monthly Downgrades: {{monthlyDowngrades !== null ? monthlyDowngrades : '---'}}</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel panel-default control-panel">
+        <div class="panel-heading">
+          Users<i class="pull-right glyphicon glyphicon-refresh" ng-click="getUsersCreated(); getTotalUsers()"></i>
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-6">
+              <h3>New Users: {{usersCreated !== null ? usersCreated.length : '---'}}</h3>
+            </div>
+            <div class="col-md-6">
+              <h3>Total Users: {{totalUsersNotDeleted !== null ? totalUsersNotDeleted.length : '---'}}</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel panel-default control-panel">
+        <div class="panel-heading">
+          Usage<i class="pull-right glyphicon glyphicon-refresh" ng-click="getAPIUsage()"></i>
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-6">
+              <h3>Total Submissions: {{totalMonthlySubmissions !== null ? totalMonthlySubmissions : '---'}}</h3>
+            </div>
+            <div class="col-md-6">
+              <h3>Total Non-Submissions: {{totalMonthlyNonsubmissions !== null ? totalMonthlyNonsubmissions : '---'}}</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row" ng-if="view === 'Current'">
+      <div class="panel panel-default control-panel">
+        <div class="panel-heading">
+          Upgrade Project
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-6">
+              <input type="text" class="form-control" ng-model="input.project" placeholder="Project _id to upgrade">
+            </div>
+            <div class="col-md-4">
+              <select class="form-control" ng-model="input.plan" ng-options="plan for plan in plans"></select>
+            </div>
+            <div class="col-md-2">
+              <button class="btn btn-primary btn-block" ng-click="updateProject()">Update</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel panel-default control-panel">
+        <div class="panel-heading">
+          Find User
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-6">
+              <input type="text" class="form-control" ng-model="inputUser._id" placeholder="User _id">
+            </div>
+            <div class="col-md-6">
+              <input type="text" class="form-control" ng-model="inputUser.data.email" placeholder="User Email Address">
+            </div>
+          </div><br>
+          <div class="row">
+            <div class="col-md-6">
+              <input type="text" class="form-control" ng-model="inputUser.data.name" placeholder="User Form.io Username">
+            </div>
+            <div class="col-md-6">
+              <button class="btn btn-primary btn-block" ng-click="findUser()">Find User</button>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12">
+
+              <div class="panel panel-default control-panel" ng-if="searchUser.data">
+                <div class="panel-heading">
+                  User
+                </div>
+                <div class="panel-body">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <table class="table table-striped">
+                        <thead>
+                          <tr>
+                            <td ng-if="showIds">User _id</td>
+                            <td>Full Name</td>
+                            <td>Username</td>
+                            <td>Email</td>
+                            <td ng-if="showCreated">Created Date</td>
+                            <td>Deleted</td>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td ng-if="showIds">{{searchUser.data._id}}</td>
+                            <td>{{searchUser.data.data.fullName}}</td>
+                            <td>{{searchUser.data.data.name}}</td>
+                            <td>{{searchUser.data.data.email}}</td>
+                            <td ng-if="showCreated">{{searchUser.data.created}}</td>
+                            <td>{{searchUser.data.deleted._id}}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="panel panel-default control-panel" ng-if="searchUser.projects">
+                <div class="panel-heading">
+                  Projects
+                </div>
+                <div class="panel-body">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <table class="table table-striped">
+                        <thead>
+                        <tr>
+                          <td>#</td>
+                          <td ng-if="showIds">Project _id</td>
+                          <td>Project Name</td>
+                          <td>Project Title</td>
+                          <td>Project Plan</td>
+                          <td ng-if="showCreated">Project Created</td>
+                          <td ng-if="showIds">Owner _id</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="element in searchUser.projects track by $index">
+                          <td>{{$index + 1}}</td>
+                          <td ng-if="showIds">{{element._id}}</td>
+                          <td>{{element.name}}</td>
+                          <td>{{element.title}}</td>
+                          <td>{{element.plan}}</td>
+                          <td ng-if="showCreated">{{element.created}}</td>
+                          <td ng-if="showIds">{{element.owner._id}}</td>
+                        </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel panel-default control-panel">
+        <div class="panel-heading">
+          Premium Projects<i class="pull-right glyphicon glyphicon-refresh" ng-click="getTotalProjects()"></i>
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="panel panel-default control-panel">
+                <div class="panel-heading">
+                  Commercial Projects ({{totalProjectsCommercial !== null ? totalProjectsCommercial.length : '---'}})<i class="pull-right glyphicon glyphicon-refresh" ng-click="getTotalProjects()"></i>
+                </div>
+                <div class="panel-body">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <table class="table table-striped">
+                        <thead>
+                        <tr>
+                          <td>#</td>
+                          <td ng-if="showIds">Project _id</td>
+                          <td>Project Name</td>
+                          <td>Project Title</td>
+                          <td>Project Plan</td>
+                          <td ng-if="showCreated">Project Created</td>
+                          <td ng-if="showIds">Owner _id</td>
+                          <td>Owner Name</td>
+                          <td>Owner Email</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="element in totalProjectsCommercial track by $index">
+                          <td>{{$index + 1}}</td>
+                          <td ng-if="showIds">{{element._id}}</td>
+                          <td>{{element.name}}</td>
+                          <td>{{element.title}}</td>
+                          <td>{{element.plan}}</td>
+                          <td ng-if="showCreated">{{element.created}}</td>
+                          <td ng-if="showIds">{{element.owner._id}}</td>
+                          <td>{{element.owner.data.name}}</td>
+                          <td>{{element.owner.data.email}}</td>
+                        </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12">
+              <div class="panel panel-default control-panel">
+                <div class="panel-heading">
+                  Team Projects ({{totalProjectsTeam !== null ? totalProjectsTeam.length : '---'}})<i class="pull-right glyphicon glyphicon-refresh" ng-click="getTotalProjects()"></i>
+                </div>
+                <div class="panel-body">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <table class="table table-striped">
+                        <thead>
+                        <tr>
+                          <td>#</td>
+                          <td ng-if="showIds">Project _id</td>
+                          <td>Project Name</td>
+                          <td>Project Title</td>
+                          <td>Project Plan</td>
+                          <td ng-if="showCreated">Project Created</td>
+                          <td ng-if="showIds">Owner _id</td>
+                          <td>Owner Name</td>
+                          <td>Owner Email</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="element in totalProjectsTeam track by $index">
+                          <td>{{$index + 1}}</td>
+                          <td ng-if="showIds">{{element._id}}</td>
+                          <td>{{element.name}}</td>
+                          <td>{{element.title}}</td>
+                          <td>{{element.plan}}</td>
+                          <td ng-if="showCreated">{{element.created}}</td>
+                          <td ng-if="showIds">{{element.owner._id}}</td>
+                          <td>{{element.owner.data.name}}</td>
+                          <td>{{element.owner.data.email}}</td>
+                        </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12">
+              <div class="panel panel-default control-panel">
+                <div class="panel-heading">
+                  Independent Projects ({{totalProjectsIndependent !== null ? totalProjectsIndependent.length : '---'}})<i class="pull-right glyphicon glyphicon-refresh" ng-click="getTotalProjects()"></i>
+                </div>
+                <div class="panel-body">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <table class="table table-striped">
+                        <thead>
+                        <tr>
+                          <td>#</td>
+                          <td ng-if="showIds">Project _id</td>
+                          <td>Project Name</td>
+                          <td>Project Title</td>
+                          <td>Project Plan</td>
+                          <td ng-if="showCreated">Project Created</td>
+                          <td ng-if="showIds">Owner _id</td>
+                          <td>Owner Name</td>
+                          <td>Owner Email</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="element in totalProjectsIndependent track by $index">
+                          <td>{{$index + 1}}</td>
+                          <td ng-if="showIds">{{element._id}}</td>
+                          <td>{{element.name}}</td>
+                          <td>{{element.title}}</td>
+                          <td>{{element.plan}}</td>
+                          <td ng-if="showCreated">{{element.created}}</td>
+                          <td ng-if="showIds">{{element.owner._id}}</td>
+                          <td>{{element.owner.data.name}}</td>
+                          <td>{{element.owner.data.email}}</td>
+                        </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- The Usage display -->
     <div class="row" ng-if="view === 'Usage'">
-      <div class="row">
-        <div class="col-md-12">
-          <h3>
-            {{showDaily ? 'Daily' : 'Monthly'}}
-            Submission Requests for
-            {{ viewDate.month + ' / ' + (showDaily ? viewDate.month + ' / ' : '') + viewDate.year }},
-            by Project ({{totalMonthlySubmissions}})
-          </h3>
-          <table class="table table-striped">
-            <thead>
-            <tr>
-              <td>#</td>
-              <td ng-if="showIds">Project _id</td>
-              <td>Project Requests</td>
-              <td>Project Name</td>
-              <td>Project Title</td>
-              <td>Project Plan</td>
-              <td ng-if="showCreated">Project Created</td>
-              <td ng-if="showIds">Owner _id</td>
-              <td>Owner Name</td>
-              <td>Owner Email</td>
-            </tr>
-            </thead>
-            <tbody>
-            <tr ng-repeat="element in monthlySubmissions track by $index">
-              <td>{{$index + 1}}</td>
-              <td ng-if="showIds">{{element._id}}</td>
-              <td>{{element.submissions}}</td>
-              <td>{{element.name}}</td>
-              <td>{{element.title}}</td>
-              <td>{{element.plan}}</td>
-              <td ng-if="showCreated">{{element.created}}</td>
-              <td ng-if="showIds">{{element.owner}}</td>
-              <td>{{element.ownerData.name}}</td>
-              <td>{{element.ownerData.email}}</td>
-            </tr>
-            </tbody>
-          </table>
+      <div class="panel panel-default control-panel">
+        <div class="panel-heading">
+          Usage<i class="pull-right glyphicon glyphicon-refresh" ng-click="getAPIUsage()"></i>
         </div>
-      </div>
-      <br>
-      <div class="row">
-        <div class="col-md-12">
-          <h3>
-            {{showDaily ? 'Daily' : 'Monthly'}}
-            Non-Submission Requests for
-            {{viewDate.month + ' / ' + (showDaily ? viewDate.month + ' / ' : '') + viewDate.year}},
-            by Project ({{totalMonthlyNonsubmissions}})
-          </h3>
-          <table class="table table-striped">
-            <thead>
-              <tr>
-                <td>#</td>
-                <td ng-if="showIds">Project _id</td>
-                <td>Project Requests</td>
-                <td>Project Name</td>
-                <td>Project Title</td>
-                <td>Project Plan</td>
-                <td ng-if="showCreated">Project Created</td>
-                <td ng-if="showIds">Owner _id</td>
-                <td>Owner Name</td>
-                <td>Owner Email</td>
-              </tr>
-            </thead>
-            <tbody>
-              <tr ng-repeat="element in monthlyNonsubmissions track by $index">
-                <td>{{$index + 1}}</td>
-                <td ng-if="showIds">{{element._id}}</td>
-                <td>{{element.nonsubmissions}}</td>
-                <td>{{element.name}}</td>
-                <td>{{element.title}}</td>
-                <td>{{element.plan}}</td>
-                <td ng-if="showCreated">{{element.created}}</td>
-                <td ng-if="showIds">{{element.owner}}</td>
-                <td>{{element.ownerData.name}}</td>
-                <td>{{element.ownerData.email}}</td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-12">
+              <h3>
+                {{showDaily ? 'Daily' : 'Monthly'}}
+                Submission Requests for
+                {{ viewDate.month + ' / ' + (showDaily ? viewDate.month + ' / ' : '') + viewDate.year }},
+                by Project ({{totalMonthlySubmissions}})
+              </h3>
+              <table class="table table-striped">
+                <thead>
+                <tr>
+                  <td>#</td>
+                  <td ng-if="showIds">Project _id</td>
+                  <td>Project Requests</td>
+                  <td>Project Name</td>
+                  <td>Project Title</td>
+                  <td>Project Plan</td>
+                  <td ng-if="showCreated">Project Created</td>
+                  <td ng-if="showIds">Owner _id</td>
+                  <td>Owner Name</td>
+                  <td>Owner Email</td>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="element in monthlySubmissions track by $index">
+                  <td>{{$index + 1}}</td>
+                  <td ng-if="showIds">{{element._id}}</td>
+                  <td>{{element.submissions}}</td>
+                  <td>{{element.name}}</td>
+                  <td>{{element.title}}</td>
+                  <td>{{element.plan}}</td>
+                  <td ng-if="showCreated">{{element.created}}</td>
+                  <td ng-if="showIds">{{element.owner}}</td>
+                  <td>{{element.ownerData.name}}</td>
+                  <td>{{element.ownerData.email}}</td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <br>
+          <div class="row">
+            <div class="col-md-12">
+              <h3>
+                {{showDaily ? 'Daily' : 'Monthly'}}
+                Non-Submission Requests for
+                {{viewDate.month + ' / ' + (showDaily ? viewDate.month + ' / ' : '') + viewDate.year}},
+                by Project ({{totalMonthlyNonsubmissions}})
+              </h3>
+              <table class="table table-striped">
+                <thead>
+                <tr>
+                  <td>#</td>
+                  <td ng-if="showIds">Project _id</td>
+                  <td>Project Requests</td>
+                  <td>Project Name</td>
+                  <td>Project Title</td>
+                  <td>Project Plan</td>
+                  <td ng-if="showCreated">Project Created</td>
+                  <td ng-if="showIds">Owner _id</td>
+                  <td>Owner Name</td>
+                  <td>Owner Email</td>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="element in monthlyNonsubmissions track by $index">
+                  <td>{{$index + 1}}</td>
+                  <td ng-if="showIds">{{element._id}}</td>
+                  <td>{{element.nonsubmissions}}</td>
+                  <td>{{element.name}}</td>
+                  <td>{{element.title}}</td>
+                  <td>{{element.plan}}</td>
+                  <td ng-if="showCreated">{{element.created}}</td>
+                  <td ng-if="showIds">{{element.owner}}</td>
+                  <td>{{element.ownerData.name}}</td>
+                  <td>{{element.ownerData.email}}</td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- The Users Display -->
     <div class="row" ng-if="view === 'Users'">
-      <div class="row">
-        <div class="col-md-12">
-          <h3>
-            New Users by
-            {{showDaily ? 'Day' : 'Month'}}
-            for
-            {{viewDate.month + ' / ' + (showDaily ? viewDate.month + ' / ' : '') + viewDate.year}}
-          </h3>
-          <table class="table table-striped">
-            <thead>
-            <tr>
-              <td>#</td>
-              <td ng-if="showIds">User _id</td>
-              <td>User Name</td>
-              <td>User Full Name</td>
-              <td>User Email</td>
-              <td ng-if="showCreated">Created</td>
-              <td>Deleted</td>
-            </tr>
-            </thead>
-            <tbody>
-            <tr ng-repeat="element in usersCreated track by $index">
-              <td>{{$index + 1}}</td>
-              <td ng-if="showIds">{{element._id}}</td>
-              <td>{{element.data.name}}</td>
-              <td>{{element.data.fullName}}</td>
-              <td>{{element.data.email}}</td>
-              <td ng-if="showCreated">{{element.created}}</td>
-              <td>{{element.deleted}}</td>
-            </tr>
-            </tbody>
-          </table>
+      <div class="panel panel-default control-panel">
+        <div class="panel-heading">
+          Users as of {{viewDate.month + ' / ' + (showDaily ? viewDate.month + ' / ' : '') + viewDate.year}}<i class="pull-right glyphicon glyphicon-refresh" ng-click="getTotalUsers()"></i>
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="row">
+                <div class="col-md-6"><h3>Active Users: {{totalUsersNotDeleted !== null ? totalUsersNotDeleted.length : '---'}}</h3></div>
+                <div class="col-md-6"><h3>Deleted Users: {{totalUsersDeleted !== null ? totalUsersDeleted.length : '---'}}</h3></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel panel-default control-panel">
+        <div class="panel-heading">
+          New Users<i class="pull-right glyphicon glyphicon-refresh" ng-click="getUsersCreated()"></i>
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-12">
+              <h3>
+                New Users by
+                {{showDaily ? 'Day' : 'Month'}}
+                for
+                {{viewDate.month + ' / ' + (showDaily ? viewDate.month + ' / ' : '') + viewDate.year}}
+              </h3>
+              <table class="table table-striped">
+                <thead>
+                <tr>
+                  <td>#</td>
+                  <td ng-if="showIds">User _id</td>
+                  <td>User Name</td>
+                  <td>User Full Name</td>
+                  <td>User Email</td>
+                  <td ng-if="showCreated">Created</td>
+                  <td>Deleted</td>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="element in usersCreated track by $index" ng-class="element.deleted !== null ? 'danger' : ''">
+                  <td>{{$index + 1}}</td>
+                  <td ng-if="showIds">{{element._id}}</td>
+                  <td>{{element.data.name}}</td>
+                  <td>{{element.data.fullName}}</td>
+                  <td>{{element.data.email}}</td>
+                  <td ng-if="showCreated">{{element.created}}</td>
+                  <td>{{element.deleted}}</td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- The Projects Display -->
     <div class="row" ng-if="view === 'Projects'">
-      <div class="row">
-        <div class="col-md-12">
-          <h3>
-            New Projects by
-            {{showDaily ? 'Day' : 'Month'}}
-            for
-            {{viewDate.month + ' / ' + (showDaily ? viewDate.month + ' / ' : '') + viewDate.year}}
-          </h3>
-          <table class="table table-striped">
-            <thead>
-            <tr>
-              <td>#</td>
-              <td ng-if="showIds">Project _id</td>
-              <td>Project Name</td>
-              <td>Project Title</td>
-              <td>Project Plan</td>
-              <td ng-if="showCreated">Project Created</td>
-              <td ng-if="showIds">Owner _id</td>
-              <td>Owner Name</td>
-              <td>Owner Email</td>
-            </tr>
-            </thead>
-            <tbody>
-            <tr ng-repeat="element in projectsCreated track by $index">
-              <td>{{$index + 1}}</td>
-              <td ng-if="showIds">{{element._id}}</td>
-              <td>{{element.name}}</td>
-              <td>{{element.title}}</td>
-              <td>{{element.plan}}</td>
-              <td ng-if="showCreated">{{element.created}}</td>
-              <td ng-if="showIds">{{element.owner}}</td>
-              <td>{{element.ownerData.name}}</td>
-              <td>{{element.ownerData.email}}</td>
-            </tr>
-            </tbody>
-          </table>
+      <div class="panel panel-default control-panel">
+        <div class="panel-heading">
+          Projects as of {{viewDate.month + ' / ' + (showDaily ? viewDate.month + ' / ' : '') + viewDate.year}}<i class="pull-right glyphicon glyphicon-refresh" ng-click="getTotalProjects()"></i>
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="row">
+                <div class="col-md-6"><h3>Active Projects: {{totalProjectsNotDeleted !== null ? totalProjectsNotDeleted.length : '---'}}</h3></div>
+                <div class="col-md-6"><h3>Deleted Projects: {{totalProjectsDeleted !== null ? totalProjectsDeleted.length : '---'}}</h3></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel panel-default control-panel">
+        <div class="panel-heading">
+          New Projects<i class="pull-right glyphicon glyphicon-refresh" ng-click="getProjectsCreated(); getProjectUpgrades()"></i>
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-12">
+              <h3>
+                New Projects by
+                {{showDaily ? 'Day' : 'Month'}}
+                for
+                {{viewDate.month + ' / ' + (showDaily ? viewDate.month + ' / ' : '') + viewDate.year}}
+              </h3>
+              <table class="table table-striped">
+                <thead>
+                <tr>
+                  <td>#</td>
+                  <td ng-if="showIds">Project _id</td>
+                  <td>Project Name</td>
+                  <td>Project Title</td>
+                  <td>Project Plan</td>
+                  <td ng-if="showCreated">Project Created</td>
+                  <td ng-if="showIds">Owner _id</td>
+                  <td>Owner Name</td>
+                  <td>Owner Email</td>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="element in projectsCreated track by $index">
+                  <td>{{$index + 1}}</td>
+                  <td ng-if="showIds">{{element._id}}</td>
+                  <td>{{element.name}}</td>
+                  <td>{{element.title}}</td>
+                  <td>{{element.plan}}</td>
+                  <td ng-if="showCreated">{{element.created}}</td>
+                  <td ng-if="showIds">{{element.owner}}</td>
+                  <td>{{element.ownerData.name}}</td>
+                  <td>{{element.ownerData.email}}</td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- The Upgrades Display -->
+    <div class="row" ng-if="view === 'Upgrades'">
+      <div class="panel panel-default control-panel">
+        <div class="panel-heading">
+          Project Plan Changes<i class="pull-right glyphicon glyphicon-refresh" ng-click="getProjectUpgrades()"></i>
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-12">
+              <h3>
+                Project Plan Status Changes by
+                {{showDaily ? 'Day' : 'Month'}}
+                for
+                {{viewDate.month + ' / ' + (showDaily ? viewDate.month + ' / ' : '') + viewDate.year}}
+              </h3>
+              <table class="table table-striped">
+                <thead>
+                <tr>
+                  <td>#</td>
+                  <td ng-if="showCreated">Event Date</td>
+                  <td ng-if="showIds">Project _id</td>
+                  <td>Project Name</td>
+                  <td>Project Title</td>
+                  <td>Old Plan</td>
+                  <td>New Plan</td>
+                  <td ng-if="showCreated">Project Created</td>
+                  <td ng-if="showIds">Owner _id</td>
+                  <td>Owner Name</td>
+                  <td>Owner Email</td>
+                  <td ng-if="showCreated">Owner Created</td>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="element in projectUpgrades track by $index" class="{{element.plan}}">
+                  <td>{{$index + 1}}</td>
+                  <td ng-if="showCreated">{{element.created}}</td>
+                  <td ng-if="showIds">{{element._id}}</td>
+                  <td>{{element.data.project.name}}</td>
+                  <td>{{element.data.project.title}}</td>
+                  <td>{{element.data.oldPlan}}</td>
+                  <td>{{element.data.newPlan}}</td>
+                  <td ng-if="showCreated">{{element.created}}</td>
+                  <td ng-if="showIds">{{element.data.project.owner._id}}</td>
+                  <td>{{element.data.project.owner.data.name}}</td>
+                  <td>{{element.data.project.owner.data.email}}</td>
+                  <td ng-if="showCreated">{{element.data.project.owner.created}}</td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
     </div>

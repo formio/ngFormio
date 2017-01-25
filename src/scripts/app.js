@@ -17,7 +17,6 @@ angular
     'ui.bootstrap.tpls',
     'ui.select',
     'ui.bootstrap.datetimepicker',
-    'ui-notification',
     'angularMoment',
     'ngCkeditor',
     'formioApp.controllers',
@@ -26,19 +25,30 @@ angular
     'truncate',
     'ngFileUpload',
     'ngDialog',
-    'swaggerUi'
+    'swaggerUi',
+    'toastr'
   ])
   .config([
     '$stateProvider',
     '$urlRouterProvider',
+    '$locationProvider',
     'FormioProvider',
     'AppConfig',
+    'toastrConfig',
     function(
       $stateProvider,
       $urlRouterProvider,
+      $locationProvider,
       FormioProvider,
-      AppConfig
+      AppConfig,
+      toastrConfig
     ) {
+      // Reset the hashPrefix to remove the "!".
+      $locationProvider.hashPrefix('');
+
+      // Allow HTML in the notifications.
+      toastrConfig.allowHtml = true;
+
       // Set the base URL for our API.
       FormioProvider.setBaseUrl(AppConfig.apiBase);
       FormioProvider.setDomain(AppConfig.domain);
@@ -159,6 +169,11 @@ angular
           templateUrl: 'views/project/preview.html',
           controller: 'ProjectPreviewController'
         })
+        .state('project.build', {
+          url: '/build',
+          templateUrl: 'views/project/build.html',
+          controller: 'ProjectBuildController'
+        })
         .state('project.launch', {
           url: '',
           templateUrl: 'views/project/launch/index.html',
@@ -222,6 +237,10 @@ angular
         .state('project.settings.apiKeys', {
           url: '/apiKeys',
           templateUrl: 'views/project/apiKeys/index.html'
+        })
+        .state('project.settings.customjscss', {
+          url: '/customjscss',
+          templateUrl: 'views/project/customjscss/index.html'
         })
         .state('project.settings.oauth', {
           url: '/oauth',

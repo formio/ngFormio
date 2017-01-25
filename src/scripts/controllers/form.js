@@ -239,6 +239,7 @@ app.controller('FormController', [
   'FormioUtils',
   'AppConfig',
   'SubmissionAccessLabels',
+  'AccessLabels',
   'ResourceAccessLabels',
   'GoogleAnalytics',
   '$q',
@@ -252,6 +253,7 @@ app.controller('FormController', [
     FormioUtils,
     AppConfig,
     SubmissionAccessLabels,
+    AccessLabels,
     ResourceAccessLabels,
     GoogleAnalytics,
     $q
@@ -298,25 +300,24 @@ app.controller('FormController', [
     $scope.embedCode = '';
     $scope.setEmbedCode = function(gotoUrl) {
       var embedCode = '<script type="text/javascript">';
-      embedCode += '(function a(u) {';
-      embedCode +=   'if (typeof jQuery === "undefined") {';
-      embedCode +=     'return setTimeout(a, 100);';
-      embedCode +=   '}';
-      embedCode +=   'document.write(';
-      embedCode +=     'jQuery(document.createElement("script")).attr("src", "https://npmcdn.com/seamless@latest")';
-      embedCode +=   ');';
-      embedCode +=   '(function b($) {';
-      embedCode +=     'if (typeof $.fn.seamless === "undefined") {';
-      embedCode +=       'return setTimeout(b, 100);';
-      embedCode +=     '}';
-      embedCode +=     '$(function() {';
-      embedCode +=       '$(\'#formio-form\').seamless({fallback:false}).receive(function(d, e) {';
-      embedCode +=         gotoUrl ? 'window.location.href = "' + gotoUrl + '";' : '';
-      embedCode +=       '});';
-      embedCode +=     '});';
-      embedCode +=   '})(jQuery);';
-      embedCode += '})();</script>';
-      embedCode += '<iframe id="formio-form" style="width:100%;border:none;" height="600px" src="https://form.io/view/#/' + $scope.currentProject.name + '/' + $scope.form.path + '?iframe=1&header=0"></iframe>';
+      embedCode += '(function a(d, w, u) {';
+      embedCode +=    'var h = d.getElementsByTagName("head")[0];';
+      embedCode +=    'var s = d.createElement("script");';
+      embedCode +=    's.type = "text/javascript";';
+      embedCode +=    's.src = "' + AppConfig.appBase + '/lib/seamless/seamless.parent.min.js";';
+      embedCode +=    's.onload = function b() {';
+      embedCode +=        'var f = d.getElementById("formio-form-' + $scope.form._id + '");';
+      embedCode +=        'if (!f || (typeof w.seamless === u)) {';
+      embedCode +=            'return setTimeout(b, 100);';
+      embedCode +=        '}';
+      embedCode +=        'w.seamless(f, {fallback:false}).receive(function(d, e) {';
+      embedCode +=            gotoUrl ? 'window.location.href = "' + gotoUrl + '";' : '';
+      embedCode +=        '});';
+      embedCode +=    '};';
+      embedCode +=    'h.appendChild(s);';
+      embedCode += '})(document, window);';
+      embedCode += '</script>';
+      embedCode += '<iframe id="formio-form-' + $scope.form._id + '" style="width:100%;border:none;" height="600px" src="https://formview.io/#/' + $scope.currentProject.name + '/' + $scope.form.path + '?iframe=1&header=0"></iframe>';
       $scope.embedCode = embedCode;
     };
 
@@ -399,6 +400,29 @@ app.controller('FormController', [
       $scope.setEmbedCode();
     });
 
+    $scope.updateCurrentFormResources = function(form) {
+      // Build the list of selectable resources for the submission resource access ui.
+      $scope.currentFormResources = _(FormioUtils.flattenComponents(form.components))
+        .filter(function(component) {
+          if (component.type === 'resource') {
+            return true;
+          }
+          if (component.type === 'select' && component.dataSrc === 'resource') {
+            return true;
+          }
+
+          return false;
+        })
+        .map(function(component) {
+          return {
+            label: component.label || '',
+            key: component.key || '',
+            defaultPermission: component.defaultPermission || ''
+          };
+        })
+        .value();
+    };
+
     // Load the form.
     if ($scope.formId) {
       $scope.loadFormPromise = $scope.formio.loadForm()
@@ -408,17 +432,7 @@ app.controller('FormController', [
             form.display = 'form';
           }
 
-          // Build the list of selectable resources for the submission resource access ui.
-          $scope.currentFormResources = _(FormioUtils.flattenComponents(form.components))
-            .filter({type: 'resource'})
-            .map(function(component) {
-              return {
-                label: component.label || '',
-                key: component.key || '',
-                defaultPermission: component.defaultPermission || ''
-              };
-            })
-            .value();
+          $scope.updateCurrentFormResources(form);
 
           $scope.form = form;
           $scope.formTags = _.map(form.tags, function(tag) {
@@ -464,6 +478,7 @@ app.controller('FormController', [
 
     $scope.submissionAccessLabels = SubmissionAccessLabels;
     $scope.resourceAccessLabels = ResourceAccessLabels;
+    $scope.accessLabels = AccessLabels;
 
     // Get the swagger URL.
     $scope.getSwaggerURL = function(format) {
@@ -487,38 +502,51 @@ app.controller('FormController', [
     $scope.saveForm = function() {
       angular.element('.has-error').removeClass('has-error');
 
-      $scope.formio.saveForm(angular.copy($scope.form)) // Copy to remove angular $$hashKey
-        .then(function(form) {
-          var method = $stateParams.formId ? 'updated' : 'created';
+      // Copy to remove angular $$hashKey
+      $scope.formio.saveForm(angular.copy($scope.form), {
+        getHeaders: true
+      })
+      .then(function(response) {
+        $scope.form = response.result;
+        var headers = response.headers;
+        var method = $stateParams.formId ? 'updated' : 'created';
+        GoogleAnalytics.sendEvent('Form', method.substring(0, method.length - 1), null, 1);
+
+        if (headers.hasOwnProperty('x-form-merge')) {
+          FormioAlerts.addAlert({
+            type: 'warning',
+            message: 'This form has been modified by another user. All form changes have been merged and saved.'
+          });
+        }
+        else {
           FormioAlerts.addAlert({
             type: 'success',
             message: 'Successfully ' + method + ' form!'
           });
-          GoogleAnalytics.sendEvent('Form', method.substring(0, method.length - 1), null, 1);
+        }
 
-          if(method === 'created') {
-            // Reload page to start editing as an existing form.
-            $state.go('project.' + $scope.formInfo.type + '.form.edit', {formId: form._id});
-          }
+        // Reload page when a form is created or merged.
+        if (method === 'created' || headers.hasOwnProperty('x-form-merge')) {
+          $state.go('project.' + $scope.formInfo.type + '.form.edit', {formId: $scope.form._id}, {reload: true});
+        }
+      })
+      .catch(function(err) {
+        if (err) {
+          FormioAlerts.onError.call(FormioAlerts, err);
+        }
 
-        })
-        .catch(function(err) {
-          if (err) {
-            FormioAlerts.onError.call(FormioAlerts, err);
+        // FOR-128 - if we're editing a form, make note of the components with issues.
+        try {
+          var issues = (/Component keys must be unique: (.*)/.exec(_.get(err, 'errors.components.message'))).slice(1);
+          if (($state.includes('project.form.form.edit') || $state.includes('project.form.create')) && (issues.length > 0)) {
+            issues = (issues.shift()).toString().split(', ');
+            issues.forEach(function(issue) {
+              angular.element('div.dropzone #' + issue).parent().addClass('has-error');
+            });
           }
-
-          // FOR-128 - if we're editing a form, make note of the components with issues.
-          try {
-            var issues = (/Component keys must be unique: (.*)/.exec(_.get(err, 'errors.components.message'))).slice(1);
-            if (($state.includes('project.form.form.edit') || $state.includes('project.form.create')) && (issues.length > 0)) {
-              issues = (issues.shift()).toString().split(', ');
-              issues.forEach(function(issue) {
-                angular.element('div.dropzone #' + issue).parent().addClass('has-error');
-              });
-            }
-          }
-          catch (e) {}
-        });
+        }
+        catch (e) {}
+      });
     };
 
     // Delete a form.
@@ -538,6 +566,7 @@ app.controller('FormController', [
     // Called when the form is updated.
     $scope.$on('formUpdate', function(event, form) {
       event.stopPropagation();
+      $scope.updateCurrentFormResources(form);
       $scope.form.components = form.components;
     });
 
@@ -596,7 +625,7 @@ app.controller('FormShareController', ['$scope', function($scope) {
 
   // Method to load the preview.
   var loadPreview = function() {
-    $scope.previewUrl = 'https://form.io/view/#/';
+    $scope.previewUrl = 'https://formview.io/#/';
     $scope.previewUrl += $scope.currentProject.name + '/' + $scope.currentForm.path + '?';
     $scope.previewUrl += $scope.options.showHeader ? 'header=1' : 'header=0';
     if ($scope.options.theme) {
@@ -625,6 +654,11 @@ app.controller('FormShareController', ['$scope', function($scope) {
       if (access.type === 'create_own') {
         $scope.form.submissionAccess[index].roles.push(defaultRole._id);
       }
+      if(access.type === 'read_all') {
+        if($scope.form.access[index].roles !=  defaultRole._id) {
+          $scope.form.access[index].roles.push(defaultRole._id);
+        }
+      }
     });
     $scope.publicForm = true;
     $scope.saveForm();
@@ -635,6 +669,9 @@ app.controller('FormShareController', ['$scope', function($scope) {
     angular.forEach($scope.form.submissionAccess, function(access, index) {
       if (access.type === 'create_own' || access.type === 'create_all') {
         _.pull($scope.form.submissionAccess[index].roles, defaultRole._id);
+      }
+      if (access.type === 'read_all') {
+        _.pull($scope.form.access[index].roles, defaultRole._id);
       }
     });
     $scope.publicForm = false;
@@ -661,6 +698,12 @@ app.controller('FormShareController', ['$scope', function($scope) {
               $scope.publicForm = true;
             }
           });
+          angular.forEach($scope.form.access, function(access) {
+            if ((access.type === 'read_all') &&
+            (_.indexOf(access.roles, defaultRole._id) !== -1)) {
+              $scope.publicForm = true;
+            }
+          });
         }
       });
 
@@ -673,25 +716,25 @@ app.controller('FormShareController', ['$scope', function($scope) {
 
 app.factory('FormioAlerts', [
   '$rootScope',
-  'Notification',
+  'toastr',
   function (
     $rootScope,
-    Notification
+    toastr
   ) {
     return {
       addAlert: function (alert) {
         switch (alert.type) {
           case 'danger':
-            Notification.error({message: alert.message});
+            toastr.error(alert.message);
             break;
           case 'info':
-            Notification.info({message: alert.message});
+            toastr.info(alert.message);
             break;
           case 'success':
-            Notification.success({message: alert.message});
+            toastr.success(alert.message);
             break;
           case 'warning':
-            Notification.warning({message: alert.message});
+            toastr.warning(alert.message);
             break;
         }
 
@@ -809,7 +852,9 @@ app.controller('FormActionIndexController', [
         available.shift();
       }
       available.unshift($scope.newAction);
-      $scope.availableActions = available;
+      $scope.availableActions = _.filter(available, function(action) {
+        return action.name !== 'sql';
+      });
     });
   }
 ]);
@@ -1674,6 +1719,33 @@ app.constant('ResourceAccessLabels', {
   'admin': {
     label: 'Admin',
     tooltip: 'The Admin permission will allow a resource, defined in the submission, to read and edit all of the submission data.'
+  }
+});
+
+app.constant('AccessLabels', {
+  'read_all': {
+  label: 'Read Form Definition',
+  tooltip: 'The Read permission will allow a user, with one of the given Roles, to read the form.'
+  },
+  'update_all': {
+  label: 'Update Form Definition',
+  tooltip: 'The Update permission will allow a user, with one of the given Roles, to read and edit the form.'
+  },
+  'delete_all': {
+  label: 'Delete Form Definition',
+  tooltip: 'The Delete permission will allow a user, with one of the given Roles, to delete the form.'
+  },
+  'read_own': {
+  label: 'Read Form Definition (Restricted to owners)',
+  tooltip: 'The Read Own permission will allow a user, with one of the given Roles, to read a form. A user can only read a form if they are defined as its owner.'
+  },
+  'update_own': {
+  label: 'Update Form Definition (Restricted to owners)',
+  tooltip: 'The Update Own permission will allow a user, with one of the given Roles, to update a form. A user can only update a form if they are defined as its owner.'
+  },
+  'delete_own': {
+  label: 'Delete Form Definition (Restricted to owners)',
+  tooltip: 'The Delete Own permission will allow a user, with one of the given Roles, to delete a form. A user can only delete a form if they are defined as its owner.'
   }
 });
 

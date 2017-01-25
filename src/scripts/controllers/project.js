@@ -2,6 +2,9 @@
 
 /* globals NumberAbbreviate, chance */
 
+// loadedFiles is used to prevent double loading files on each session.
+var loadedFiles = [];
+
 var app = angular.module('formioApp.controllers.project', ['angular-chartist']);
 
 /*
@@ -196,11 +199,23 @@ app.controller('ProjectController', [
     $scope.currentProject = {_id: $stateParams.projectId, access: []};
     $scope.projectApi = '';
 
+    $scope.rolesLoading = true;
+    $scope.loadRoles = function() {
+      return $http.get($scope.formio.projectUrl + '/role').then(function(result) {
+        $scope.currentProjectRoles = result.data;
+        $scope.rolesLoading = false;
+
+        return $scope.currentProjectRoles;
+      });
+    };
+    $scope.loadRoles();
+
     $scope.loadProjectPromise = $scope.formio.loadProject().then(function(result) {
       $scope.currentProject = result;
       $scope.projectApi = AppConfig.protocol + '//' + result.name + '.' + AppConfig.serverHost;
       $rootScope.currentProject = result;
       $scope.projectsLoaded = true;
+      var allowedFiles, allow, custom;
 
       var currTime = (new Date()).getTime();
       var projTime = (new Date(result.created.toString())).getTime();
@@ -214,6 +229,58 @@ app.controller('ProjectController', [
         $scope.currentProjectRoles = result.data;
         $scope.rolesLoading = false;
       });
+
+      try {
+        allowedFiles = JSON.parse(localStorage.getItem('allowedFiles')) || {};
+      }
+      catch(err) {
+        // iOS in private mode will throw errors.
+      }
+      // Dynamically load JS files.
+      if ($scope.currentProject.settings && $scope.currentProject.settings.custom && $scope.currentProject.settings.custom.js && loadedFiles.indexOf($scope.currentProject.settings.custom.js) === -1) {
+        try {
+          allow = allowedFiles.hasOwnProperty($scope.currentProject.settings.custom.js) ? allowedFiles[$scope.currentProject.settings.custom.js] : null;
+          if (allow === null) {
+            allowedFiles[$scope.currentProject.settings.custom.js] = allow = window.confirm('This project contains custom javascript. Would you like to load it? Be sure you trust the source as loading custom javascript can be a security concern.');
+            localStorage.setItem('allowedFiles', JSON.stringify(allowedFiles));
+          }
+
+          if(allow) {
+            loadedFiles.push($scope.currentProject.settings.custom.js);
+            custom = document.createElement('script');
+            custom.setAttribute('type','text/javascript');
+            custom.setAttribute('src', $scope.currentProject.settings.custom.js);
+            document.head.appendChild(custom);
+          }
+        }
+        catch(err) {
+          console.log(err);
+        }
+      }
+
+      // Dynamically load CSS files.
+      if ($scope.currentProject.settings && $scope.currentProject.settings.custom && $scope.currentProject.settings.custom.css && loadedFiles.indexOf($scope.currentProject.settings.custom.css) === -1) {
+        try {
+          allow = allowedFiles.hasOwnProperty($scope.currentProject.settings.custom.css) ? allowedFiles[$scope.currentProject.settings.custom.css] : null;
+          if (allow === null) {
+            allowedFiles[$scope.currentProject.settings.custom.css] = allow = window.confirm('This project contains custom styles. Would you like to load it? Be sure you trust the source as loading custom styles can be a security concern.');
+            localStorage.setItem('allowedFiles', JSON.stringify(allowedFiles));
+          }
+
+          if(allow) {
+            loadedFiles.push($scope.currentProject.settings.custom.css);
+            custom = document.createElement("link");
+            custom.setAttribute("rel", "stylesheet");
+            custom.setAttribute("type", "text/css");
+            custom.setAttribute("href", $scope.currentProject.settings.custom.css);
+            document.head.appendChild(custom);
+            localStorage.setItem('loadedFiles', loadedFiles);
+          }
+        }
+        catch(err) {
+          console.log(err);
+        }
+      }
 
       // Load the users teams.
       $scope.userTeamsLoading = true;
@@ -325,6 +392,29 @@ app.controller('ProjectController', [
   }
 ]);
 
+app.controller('ProjectBuildController', [
+  '$scope',
+  '$http',
+  function($scope, $http) {
+    // This is restricted to form.io domains.
+    var key = 'AIzaSyDms9ureQ45lp6BT6LuZtoANB_GcR2jZmE';
+
+    $scope.angular1 = [];
+    $scope.angular2 = [];
+    $scope.react = [];
+
+    $http.get('https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails,id,snippet,status&maxResults=50&playlistId=PLL9kNSjqyfJ70DiT2Yn_8cCXGpEs_ReRb&key=' + key).then(function(result) {
+      $scope.angular1 = result.data.items;
+    });
+    $http.get('https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails,id,snippet,status&maxResults=50&playlistId=PLL9kNSjqyfJ5Mj5FvZ7gL4MZj5o4yN5Sg&key=' + key).then(function(result) {
+      $scope.react = result.data.items;
+    });
+    $http.get('https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails,id,snippet,status&maxResults=50&playlistId=PLL9kNSjqyfJ51N9rw0Wnqu6Yl8OMZdE-Q&key=' + key).then(function(result) {
+      $scope.angular2 = result.data.items;
+    });
+  }
+]);
+
 app.directive('projectStep', function() {
   return {
     restrict: 'E',
@@ -402,10 +492,6 @@ app.provider('ProjectProgress', function() {
               next(hasUser);
             });
           }
-        },
-        {
-          key: 'demoApp',
-          route: 'project.preview'
         },
         {
           key: 'modifyForm',
@@ -980,6 +1066,8 @@ app.controller('LaunchController', [
       url += '&appUrl=' + encodeURIComponent($location.protocol() + '://' + project.name + '.' + AppConfig.serverHost);
       $scope.previewUrl = $sce.trustAsResourceUrl(url);
       $scope.repo = project.settings.preview.repo;
+      var parts = $scope.repo.split('/');
+      $scope.appFolder = parts[parts.length - 1];
     });
     $scope.$watch('project', function(newProject, oldProject) {
       if (newProject && newProject.name) {
@@ -995,17 +1083,19 @@ app.controller('ProjectFormioController', [
   'AppConfig',
   '$window',
   '$http',
+  'FormioAlerts',
   function(
     $scope,
     Formio,
     AppConfig,
     $window,
-    $http
+    $http,
+    FormioAlerts
   ) {
     $scope.currentSection.title = 'Admin Data';
     $scope.currentSection.icon = 'glyphicon glyphicon-globe';
     $scope.currentSection.help = '';
-    $scope.views = ['Overview', 'Usage', 'Users', 'Projects'];
+    $scope.views = ['Overview', 'Current', 'Usage', 'Users', 'Projects', 'Upgrades'];
     $scope.view = $scope.views[0];
     $scope.showDaily = false;
     $scope.showCreated = false;
@@ -1015,14 +1105,13 @@ app.controller('ProjectFormioController', [
 
     // Initialize the first graph, by loading the formio team and filtering out all bad data.
     $scope.init = function() {
-      $http.get(AppConfig.teamForm + '/submission/56856be57535d60100ce7ee3')
-        .then(function(result) {
-          _employees = _(result.data.data.members)
-            .map('_id')
-            .value();
+      $http.get(AppConfig.teamForm + '/submission/56856be57535d60100ce7ee3').then(function(result) {
+        _employees = _(result.data.data.members)
+          .map('_id')
+          .value();
 
-          $scope.updateUsage();
-        });
+        $scope.updateUsage();
+      });
     };
 
     $scope.toggle = function(btn) {
@@ -1071,10 +1160,9 @@ app.controller('ProjectFormioController', [
         projectIds = [projectIds];
       }
 
-      Formio.request(AppConfig.apiBase + '/analytics/translate/project', 'POST', projectIds)
-        .then(function(data) {
-          return next(data);
-        });
+      Formio.request(AppConfig.apiBase + '/analytics/translate/project', 'POST', projectIds, undefined, undefined, true).then(function(data) {
+        return next(data);
+      });
     };
 
     /**
@@ -1087,10 +1175,9 @@ app.controller('ProjectFormioController', [
         ownerIds = [ownerIds];
       }
 
-      Formio.request(AppConfig.apiBase + '/analytics/translate/owner', 'POST', ownerIds)
-        .then(function(data) {
-          return next(data);
-        });
+      Formio.request(AppConfig.apiBase + '/analytics/translate/owner', 'POST', ownerIds, undefined, undefined, true).then(function(data) {
+        return next(data);
+      });
     };
 
     /**
@@ -1131,22 +1218,24 @@ app.controller('ProjectFormioController', [
      * @returns {Array}
      *   The filtered contents.
      */
-    var filterEmployees = function(items) {
+    var filterEmployees = function(items, path) {
+      path = path || 'data.email';
+
       var ignoredEmails = ['@form.io', '@example', '@test', 'test@', '@prodtest', '@delaplex.in', '@tudip.nl'];
       return _(items)
         .reject(function(item) {
           var hasIgnoredEmail = _.some(ignoredEmails, function(value) {
             if (
               $scope.showEmployees ||
-              (!_.get(item, 'data.email') && !_.get(item, 'ownerData.email')) ||
-              _.get(item, 'data.email') === '' ||
+              (!_.get(item, path) && !_.get(item, 'ownerData.email')) ||
+              _.get(item, path) === '' ||
               _.get(item, 'ownerData.email') === ''
             ) {
               return false;
             }
 
             // Filter the data.email or ownerData.email based on whats available.
-            return _.has(item, 'data.email') ? (item.data.email.toString().indexOf(value) !== -1) : (item.ownerData.email.toString().indexOf(value) !== -1);
+            return _.has(item, path) ? (_.get(item, path).toString().indexOf(value) !== -1) : false;
           });
 
           return (!$scope.showEmployees && _employees.indexOf(item.owner) !== -1) || hasIgnoredEmail;
@@ -1157,19 +1246,304 @@ app.controller('ProjectFormioController', [
     /**
      * Get the formio projects created during the configured time period, to the next logical unit of time.
      */
-    var getProjectsCreated = function() {
+    $scope.getProjectsCreated = function() {
+      $scope.projectsCreated = null;
       var url = AppConfig.apiBase + '/analytics/created/projects/year/' + $scope.viewDate.year + '/month/' + $scope.viewDate.month;
       if ($scope.showDaily) {
         url += '/day/' + $scope.viewDate.day;
       }
 
-      Formio.request(url, 'GET')
-        .then(function(data) {
-          $scope.projectsCreated = _(data)
-            .orderBy(['created'], ['desc'])
+      Formio.request(url, 'GET', undefined, undefined, true).then(function(data) {
+        $scope.projectsCreated = _(data)
+          .orderBy(['created'], ['desc'])
+          .value();
+
+        var allOwners = _.map(data, 'owner');
+        getOwnerData(allOwners, function(ownerData) {
+          // Change the data response format for merge.
+          ownerData = _(ownerData)
+            .map(function(element) {
+              return {
+                owner: element._id,
+                ownerData: element.data
+              };
+            })
             .value();
 
-          var allOwners = _.map(data, 'owner');
+          $scope.projectsCreated = filterEmployees(merge($scope.projectsCreated, ownerData, 'owner'));
+          $scope.$apply();
+        });
+      });
+    };
+
+    /**
+     * Get the formio users created during the configured time period, to the next logical unit of time.
+     */
+    $scope.getUsersCreated = function() {
+      $scope.usersCreated = null;
+      var url = AppConfig.apiBase + '/analytics/created/users/year/' + $scope.viewDate.year + '/month/' + $scope.viewDate.month;
+      if ($scope.showDaily) {
+        url += '/day/' + $scope.viewDate.day;
+      }
+
+      Formio.request(url, 'GET', undefined, undefined, true).then(function(data) {
+        $scope.usersCreated = _(data)
+          .orderBy(['created'], ['desc'])
+          .value();
+
+        $scope.usersCreated = filterEmployees($scope.usersCreated);
+        $scope.$apply();
+      });
+    };
+
+    /**
+     * Get the list of upgraded/downgraded projects during the configured time period.
+     */
+    $scope.getProjectUpgrades = function() {
+      $scope.projectUpgrades = null;
+      $scope.monthlyUpgrades = null;
+      $scope.monthlyDowngrades = null;
+      var plans = {
+        trial: 0,
+        basic: 1,
+        independent: 2,
+        team: 3,
+        commercial: 4
+      };
+      var url = AppConfig.apiBase + '/analytics/upgrades/projects/year/' + $scope.viewDate.year + '/month/' + $scope.viewDate.month;
+      if ($scope.showDaily) {
+        url += '/day/' + $scope.viewDate.day;
+      }
+
+      Formio.request(url, 'GET', undefined, undefined, true).then(function(data) {
+        $scope.projectUpgrades = _(data)
+          .orderBy(['created'], ['desc'])
+          .map(function(item) {
+            item.plan = plans[item.data.oldPlan] < plans[item.data.newPlan] ? 'success' : 'danger';
+            return item;
+          })
+          .value();
+
+        $scope.projectUpgrades = filterEmployees($scope.projectUpgrades, 'data.project.owner.data.email');
+        $scope.monthlyUpgrades = _($scope.projectUpgrades)
+          .filter(function(item) {
+            return item.plan == 'success';
+          })
+          .value().length;
+        $scope.monthlyDowngrades = (($scope.projectUpgrades.length || 0) - ($scope.monthlyUpgrades || 0)) || 0;
+        $scope.$apply();
+      });
+    };
+
+    $scope.getTotalProjects = function() {
+      $scope.totalProjects = null;
+      $scope.totalProjectsNotDeleted = null;
+      $scope.totalProjectsDeleted = null;
+      $scope.totalProjectsCommercial = null;
+      $scope.totalProjectsTeam = null;
+      $scope.totalProjectsIndependent = null;
+
+      var url = AppConfig.apiBase + '/analytics/total/projects/year/' + $scope.viewDate.year + '/month/' + $scope.viewDate.month;
+      if ($scope.showDaily) {
+        url += '/day/' + $scope.viewDate.day;
+      }
+
+      Formio.request(url, 'GET', undefined, undefined, true).then(function(data) {
+        $scope.totalProjects = _(data)
+          .orderBy(['created'], ['desc'])
+          .value();
+        $scope.totalProjects = filterEmployees($scope.totalProjects, 'owner.data.email');
+
+        $scope.totalProjectsNotDeleted = [];
+        $scope.totalProjectsDeleted = [];
+        $scope.totalProjectsCommercial = [];
+        $scope.totalProjectsTeam = [];
+        $scope.totalProjectsIndependent = [];
+        _($scope.totalProjects)
+          .each(function(item) {
+            // Build the project count lists.
+            if (item.deleted === null) {
+              $scope.totalProjectsNotDeleted.push(item);
+            }
+            else if (item.deleted !== null) {
+              $scope.totalProjectsDeleted.push(item);
+            }
+
+            // Build the premium project count lists.
+            if (item.plan === 'commercial') {
+              $scope.totalProjectsCommercial.push(item);
+            }
+            else if (item.plan === 'team') {
+              $scope.totalProjectsTeam.push(item);
+            }
+            else if (item.plan === 'independent') {
+              $scope.totalProjectsIndependent.push(item);
+            }
+          });
+
+        $scope.$apply();
+      });
+    };
+
+    $scope.plans = ['basic', 'independent', 'team', 'commercial'];
+    $scope.input = {
+      project: '',
+      plan: $scope.plans[0]
+    };
+    $scope.updateProject = function() {
+      Formio.request(AppConfig.apiBase + '/analytics/upgrade', 'PUT', {
+        project: $scope.input.project,
+        plan: $scope.input.plan
+      })
+      .then(function(data) {
+        FormioAlerts.addAlert({
+          type: 'success',
+          message: data
+        });
+        if (data === 'OK') {
+          $scope.input.project = '';
+          $scope.input.plan = $scope.plans[0];
+          $scope.getTotalProjects();
+        }
+      })
+      .catch(function(err) {
+        FormioAlerts.addAlert({
+          type: 'danger',
+          message: err.message || err
+        });
+      });
+    };
+
+    $scope.inputUser = {deleted: null};
+    $scope.searchUser = {
+      data: null,
+      projects: null
+    };
+    $scope.findUser = function() {
+      $scope.searchUser.data = _.first(_($scope.totalUsers)
+        .filter($scope.inputUser)
+        .value());
+
+      $scope.searchUser.projects = _($scope.totalProjects)
+        .filter({owner: {_id: $scope.searchUser.data._id}, deleted: null})
+        .value();
+
+      // Reset the search fields
+      $scope.inputUser = {deleted: null};
+    };
+
+    $scope.getTotalUsers = function() {
+      $scope.totalUsers = null;
+      $scope.totalUsersNotDeleted = null;
+      $scope.totalUsersDeleted = null;
+      var url = AppConfig.apiBase + '/analytics/total/users/year/' + $scope.viewDate.year + '/month/' + $scope.viewDate.month;
+      if ($scope.showDaily) {
+        url += '/day/' + $scope.viewDate.day;
+      }
+
+      Formio.request(url, 'GET', undefined, undefined, true).then(function(data) {
+        $scope.totalUsers = _(data)
+          .orderBy(['created'], ['desc'])
+          .value();
+        $scope.totalUsers = filterEmployees($scope.totalUsers, 'data.email');
+
+        $scope.totalUsersNotDeleted = [];
+        $scope.totalUsersDeleted = [];
+        _($scope.totalUsers)
+          .each(function(item) {
+            if (item.deleted === null) {
+              $scope.totalUsersNotDeleted.push(item);
+            }
+            else if (item.deleted !== null) {
+              $scope.totalUsersDeleted.push(item);
+            }
+          });
+
+        $scope.$apply();
+      });
+    };
+
+    /**
+     * Get the list of api usage during the configured time period.
+     */
+    $scope.getAPIUsage = function() {
+      $scope.monthlyUsage = null;
+      $scope.monthlySubmissions = null;
+      $scope.monthlyNonsubmissions = null;
+      $scope.totalMonthlySubmissions = null;
+      $scope.totalMonthlyNonsubmissions = null;
+
+      var BSON = new RegExp('^[0-9a-fA-F]{24}$');
+      var url = AppConfig.apiBase + '/analytics/project/year/' + $scope.viewDate.year + '/month/' + $scope.viewDate.month;
+      if ($scope.showDaily) {
+        url += '/day/' + $scope.viewDate.day;
+      }
+
+      Formio.request(url, 'GET', undefined, undefined, true).then(function(data) {
+        data = _(data)
+          .map(function(element) {
+            var calls = element[0];
+            var key = element[1].split(':');
+            var _y = key[0];
+            var _m = key[1];
+            var _d = key[2];
+            var project = key[3];
+            var type = key[4];
+
+            return {_id: project, calls: calls, type: type, year: _y, month: _m, day: _d};
+          })
+          .filter(function(item) {
+            if (_.isString(item._id) && BSON.test(item._id)) {
+              return true;
+            }
+
+            return false;
+          })
+          .value();
+
+        $scope.monthlyUsage = _(data)
+          .groupBy(function(element) {
+            return element._id;
+          })
+          .map(function(groups, _id) {
+            var submissions = _(groups)
+              .filter({type: 's'})
+              .map('calls')
+              .value();
+            var nonsubmissions = _(groups)
+              .filter({type: 'ns'})
+              .map('calls')
+              .value();
+
+            return {
+              _id: _id,
+              submissions: _.sum(submissions),
+              nonsubmissions: _.sum(nonsubmissions)
+            };
+          })
+          .value();
+
+        $scope.monthlySubmissions = _($scope.monthlyUsage)
+          .orderBy(['submissions'], ['desc'])
+          .reject({submissions: 0})
+          .value();
+
+        $scope.monthlyNonsubmissions = _($scope.monthlyUsage)
+          .orderBy(['nonsubmissions'], ['desc'])
+          .reject({nonsubmissions: 0})
+          .value();
+
+        $scope.usageLoading = false;
+        $scope.$apply();
+
+        // Update project data for top submissions.
+        var allProjects = _.uniq(_.map($scope.monthlySubmissions, '_id').concat(_.map($scope.monthlyNonsubmissions, '_id')));
+        getProjectData(allProjects, function(submissionData) {
+          $scope.monthlySubmissions = merge($scope.monthlySubmissions, submissionData);
+          $scope.monthlyNonsubmissions = merge($scope.monthlyNonsubmissions, submissionData);
+          $scope.$apply();
+
+          var allOwners = _.uniq(_.map($scope.monthlySubmissions, 'owner').concat(_.map($scope.monthlyNonsubmissions, 'owner')));
           getOwnerData(allOwners, function(ownerData) {
             // Change the data response format for merge.
             ownerData = _(ownerData)
@@ -1181,30 +1555,15 @@ app.controller('ProjectFormioController', [
               })
               .value();
 
-            $scope.projectsCreated = filterEmployees(merge($scope.projectsCreated, ownerData, 'owner'));
+            // Merge all values and filter out the formio employees if set.
+            $scope.monthlySubmissions = filterEmployees(merge($scope.monthlySubmissions, ownerData, 'owner'));
+            $scope.totalMonthlySubmissions = _.sum(_.map($scope.monthlySubmissions, 'submissions'));
+            $scope.monthlyNonsubmissions = filterEmployees(merge($scope.monthlyNonsubmissions, ownerData, 'owner'));
+            $scope.totalMonthlyNonsubmissions = _.sum(_.map($scope.monthlyNonsubmissions, 'nonsubmissions'));
             $scope.$apply();
           });
         });
-    };
-
-    /**
-     * Get the formio users created during the configured time period, to the next logical unit of time.
-     */
-    var getUsersCreated = function() {
-      var url = AppConfig.apiBase + '/analytics/created/users/year/' + $scope.viewDate.year + '/month/' + $scope.viewDate.month;
-      if ($scope.showDaily) {
-        url += '/day/' + $scope.viewDate.day;
-      }
-
-      Formio.request(url, 'GET')
-        .then(function(data) {
-          $scope.usersCreated = _(data)
-            .orderBy(['created'], ['desc'])
-            .value();
-
-          $scope.usersCreated = filterEmployees($scope.usersCreated);
-          $scope.$apply();
-        });
+      });
     };
 
     /**
@@ -1227,6 +1586,8 @@ app.controller('ProjectFormioController', [
       // Add the overview data.
       csv += 'Overview\n';
       csv += 'Projects Created,' + ($scope.projectsCreated.length || 0) + '\n';
+      csv += 'Project Plan Upgrades,' + ($scope.monthlyUpgrades || 0) + '\n';
+      csv += 'Project Plan Downgrades,' + ($scope.monthlyDowngrades || 0) + '\n';
       csv += 'Users Created,' + ($scope.usersCreated.length || 0) + '\n';
       csv += 'Submissions,' + $scope.totalMonthlySubmissions + '\n';
       csv += 'Non-Submissions,' + $scope.totalMonthlyNonsubmissions + '\n';
@@ -1291,6 +1652,22 @@ app.controller('ProjectFormioController', [
           (element.ownerData && element.ownerData.email ? element.ownerData.email : '') + '\n';
       });
 
+      csv += '\nProject Plan Status Changes\n';
+      csv += 'Event Date,Project _id,Project Name,Project Title,Old Plan,New Plan,Created,Owner _id,Owner Name,Owner Email\n';
+      _.forEach($scope.projectUpgrades, function(element) {
+        csv +=
+          _.get(element, 'created', '') + ',' +
+          _.get(element, 'data.project._id', '') + ',' +
+          _.get(element, 'data.project.name', '') + ',' +
+          _.get(element, 'data.project.title', '') + ',' +
+          _.get(element, 'data.oldPlan', '') + ',' +
+          _.get(element, 'data.newPlan', '') + ',' +
+          _.get(element, 'data.project.created', '') + ',' +
+          _.get(element, 'data.project.owner._id', '') + ',' +
+          _.get(element, 'data.project.owner.data.name', '') + ',' +
+          _.get(element, 'data.project.owner.data.email', '') + '\n';
+      });
+
       // Create and init dl.
       var dl = $window.document.createElement('a');
       dl.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv));
@@ -1303,103 +1680,22 @@ app.controller('ProjectFormioController', [
       $scope.usageLoading = true;
 
       // Load the number of projects created during this reference time.
-      getProjectsCreated();
+      $scope.getProjectsCreated();
 
       // Load the number of users created during this reference time.
-      getUsersCreated();
+      $scope.getUsersCreated();
 
-      var BSON = new RegExp('^[0-9a-fA-F]{24}$');
-      var url = AppConfig.apiBase + '/analytics/project/year/' + $scope.viewDate.year + '/month/' + $scope.viewDate.month;
-      if ($scope.showDaily) {
-        url += '/day/' + $scope.viewDate.day;
-      }
+      // Load all the project upgrades during the reference time.
+      $scope.getProjectUpgrades();
 
-      Formio.request(url, 'GET')
-        .then(function(data) {
-          data = _(data)
-            .map(function(element) {
-              var calls = element[0];
-              var key = element[1].split(':');
-              var _y = key[0];
-              var _m = key[1];
-              var _d = key[2];
-              var project = key[3];
-              var type = key[4];
+      $scope.getAPIUsage();
+      $scope.getTotalProjects();
+      $scope.getTotalUsers();
 
-              return {_id: project, calls: calls, type: type, year: _y, month: _m, day: _d};
-            })
-            .filter(function(item) {
-              if (_.isString(item._id) && BSON.test(item._id)) {
-                return true;
-              }
-
-              return false;
-            })
-            .value();
-
-          $scope.monthlyUsage = _(data)
-            .groupBy(function(element) {
-              return element._id;
-            })
-            .map(function(groups, _id) {
-              var submissions = _(groups)
-                .filter({type: 's'})
-                .map('calls')
-                .value();
-              var nonsubmissions = _(groups)
-                .filter({type: 'ns'})
-                .map('calls')
-                .value();
-
-              return {
-                _id: _id,
-                submissions: _.sum(submissions),
-                nonsubmissions: _.sum(nonsubmissions)
-              };
-            })
-            .value();
-
-          $scope.monthlySubmissions = _($scope.monthlyUsage)
-            .orderBy(['submissions'], ['desc'])
-            .reject({submissions: 0})
-            .value();
-
-          $scope.monthlyNonsubmissions = _($scope.monthlyUsage)
-            .orderBy(['nonsubmissions'], ['desc'])
-            .reject({nonsubmissions: 0})
-            .value();
-
-          $scope.usageLoading = false;
-          $scope.$apply();
-
-          // Update project data for top submissions.
-          var allProjects = _.uniq(_.map($scope.monthlySubmissions, '_id').concat(_.map($scope.monthlyNonsubmissions, '_id')));
-          getProjectData(allProjects, function(submissionData) {
-            $scope.monthlySubmissions = merge($scope.monthlySubmissions, submissionData);
-            $scope.monthlyNonsubmissions = merge($scope.monthlyNonsubmissions, submissionData);
-            $scope.$apply();
-
-            var allOwners = _.uniq(_.map($scope.monthlySubmissions, 'owner').concat(_.map($scope.monthlyNonsubmissions, 'owner')));
-            getOwnerData(allOwners, function(ownerData) {
-              // Change the data response format for merge.
-              ownerData = _(ownerData)
-                .map(function(element) {
-                  return {
-                    owner: element._id,
-                    ownerData: element.data
-                  };
-                })
-                .value();
-
-              // Merge all values and filter out the formio employees if set.
-              $scope.monthlySubmissions = filterEmployees(merge($scope.monthlySubmissions, ownerData, 'owner'));
-              $scope.totalMonthlySubmissions = _.sum(_.map($scope.monthlySubmissions, 'submissions'));
-              $scope.monthlyNonsubmissions = filterEmployees(merge($scope.monthlyNonsubmissions, ownerData, 'owner'));
-              $scope.totalMonthlyNonsubmissions = _.sum(_.map($scope.monthlyNonsubmissions, 'nonsubmissions'));
-              $scope.$apply();
-            });
-          });
-        });
+      $scope.searchUser = {
+        data: null,
+        projects: null
+      };
     };
   }
 ]);

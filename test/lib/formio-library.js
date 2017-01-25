@@ -372,6 +372,10 @@ module.exports = function(config) {
       var driver = this.driver;
       driver.localStorage('DELETE', 'formioToken')
         .then(function() {
+          return driver.localStorage('DELETE', 'formioUser');
+        })
+        .then(driver.refresh)
+        .then(function() {
           next();
         })
         .catch(next);
@@ -595,8 +599,8 @@ module.exports = function(config) {
       text = replacements(text);
 
       var driver = this.driver;
-      driver.waitForVisible('//div[@class=\'ui-notification\']/div[@class=\'message\']', timeout)
-        .getText('//div[@class=\'ui-notification\']/div[@class=\'message\']')
+      driver.waitForExist('//div[@class=\'toast-message\']', timeout)
+        .getText('//div[@class=\'toast-message\']')
         .then(function(alert) {
           assert.equal(text, alert);
           next();
