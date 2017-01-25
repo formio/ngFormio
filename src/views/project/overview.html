@@ -54,9 +54,16 @@
       </div>
       <div class="col-md-6">
         <legend>Project Info</legend>
-        <div class="alert label-trial" ng-if="currentProject.plan === 'trial'">
-          This Project is on the Trial Plan. You have {{trialDaysRemaining}} days remaining. <a href="" ng-click="showUpgradeDialog(currentProject)">Upgrade</a> your project to keep the Premium Features.
+
+        <div class="panel panel-danger panel-trial" ng-if="currentProject.plan === 'trial'">
+          <div class="panel-heading">
+            <h3 class="panel-title">Notice</h3>
+          </div>
+          <div class="panel-body">
+            This Project is on the Trial Plan. You have {{trialDaysRemaining}} days remaining. <a href="" ng-click="showUpgradeDialog(currentProject)">Upgrade</a> your project to keep the Premium Features.
+          </div>
         </div>
+
         <div class="project-info">
           <ul class="list-group table table-striped">
             <li class="list-group-item">

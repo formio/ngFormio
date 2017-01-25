@@ -635,6 +635,11 @@ pre code {
   color: #999;
 }
 
+.panel-trial > .panel-heading {
+  background-color: $price-panel-trial;
+  border-color: $price-panel-trial;
+}
+
 /***************************** Feedback *****************************/
 .feedback {
   position: fixed;
