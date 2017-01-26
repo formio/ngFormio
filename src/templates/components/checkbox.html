@@ -1,12 +1,12 @@
 <div class="checkbox">
-  <label for="{{ componentId }}" ng-class="{'field-required': component.validate.required}">
+  <label for="{{ componentId }}" ng-class="{'field-required': isRequired(component)}">
     <input
       type="{{ component.inputType }}"
       id="{{ componentId }}"
       tabindex="{{ component.tabindex || 0 }}"
       ng-disabled="readOnly"
       ng-model="data[component.key]"
-      ng-required="component.validate.required"
+      ng-required="isRequired(component)"
     >
     <span ng-if="!(component.hideLabel && component.datagridLabel === false)">{{ component.label | formioTranslate:null:builder }}</span>
   </label>

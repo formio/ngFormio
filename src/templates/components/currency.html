@@ -5,7 +5,7 @@
   name="{{ componentId }}"
   tabindex="{{ component.tabindex || 0 }}"
   ng-model="data[component.key]"
-  ng-required="component.validate.required"
+  ng-required="isRequired(component)"
   ng-disabled="readOnly"
   safe-multiple-to-single
   placeholder="{{ component.placeholder }}"

@@ -93,6 +93,10 @@ module.exports = function() {
           return $scope.readOnly || component.disabled || (Array.isArray($scope.disableComponents) && $scope.disableComponents.indexOf(component.key) !== -1);
         };
 
+        $scope.isRequired = function(component) {
+          return (component.validate && component.validate.required) || (Array.isArray($scope.requireComponents) && $scope.requireComponents.indexOf(component.key) !== -1);
+        };
+
         // Called when the form is submitted.
         $scope.onSubmit = function(form) {
           $scope.formioAlerts = [];

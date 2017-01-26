@@ -78,7 +78,11 @@ module.exports = [
             }
           };
 
-          $scope.isDisabled = $scope.$parent.isDisabled;
+          $scope.isDisabled = function(component) {
+            return $scope.readOnly || $scope.$parent.isDisabled(component);
+          };
+
+          $scope.isRequired = $scope.$parent.isRequired;
 
           // Pass through checkConditional since this is an isolate scope.
           $scope.checkConditional = $scope.$parent.checkConditional;

@@ -14,7 +14,7 @@
         tabindex="{{ component.tabindex || 0 }}"
         value="{{ v.value }}"
         ng-model="data[component.key][question.value]"
-        ng-required="component.validate.required"
+        ng-required="isRequired(component)"
         ng-disabled="readOnly"
         custom-validator="component.validate.custom"
       >
