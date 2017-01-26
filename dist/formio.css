@@ -193,3 +193,9 @@ input[type="password"][draggable="true"] {
 .bs-wizard > .bs-wizard-step:last-child  > .progress {width: 50%;}
 .bs-wizard > .bs-wizard-step.disabled a.bs-wizard-dot{ pointer-events: none; }
 /*END Form Wizard*/
+
+
+.input-description {
+  padding: 0.2em;
+  font-size: 0.9em;
+}

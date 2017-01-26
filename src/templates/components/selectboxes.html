@@ -15,5 +15,8 @@
     grid-col="gridCol"
     builder="builder"
   ></formio-select-boxes>
+  <div ng-if="!!component.description" class="input-description text-muted">
+    <span>{{ component.description }}</span>
+  </div>
   <formio-errors ng-if="::!builder"></formio-errors>
 </div>
