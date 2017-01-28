@@ -64865,7 +64865,7 @@ module.exports = function(app) {
             // FOR-71 - Skip functionality in the builder view.
             if ($scope.builder) return;
             var settings = $scope.component;
-            var options = {cache: true};
+            var options = {};
             $scope.nowrap = true;
             $scope.hasNextPage = false;
             $scope.selectItems = [];
@@ -65072,14 +65072,11 @@ module.exports = function(app) {
 
                   // Disable auth for outgoing requests.
                   if (!settings.authenticate && url.indexOf(Formio.getBaseUrl()) === -1) {
-                    options = {
-                      disableJWT: true,
-                      headers: {
-                        Authorization: undefined,
-                        Pragma: undefined,
-                        'Cache-Control': undefined
-                      }
-                    };
+                    options.disableJWT = true;
+                    options.headers = options.headers || {};
+                    options.headers.Authorization = undefined;
+                    options.headers.Pragma = undefined;
+                    options.headers['Cache-Control'] = undefined;
                   }
                 }
                 else {
