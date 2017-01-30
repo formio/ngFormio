@@ -9451,6 +9451,23 @@ module.exports = function() {
 
 },{}],49:[function(_dereq_,module,exports){
 "use strict";
+module.exports = ['$sce', '$parse', '$compile', function($sce, $parse, $compile) {
+  return {
+    restrict: 'A',
+    compile: function formioBindHtmlCompile(tElement, tAttrs) {
+      var formioBindHtmlGetter = $parse(tAttrs.formioBindHtml);
+      $compile.$$addBindingClass(tElement);
+      return function formioBindHtmlLink(scope, element, attr) {
+        $compile.$$addBindingInfo(element, attr.formioBindHtml);
+        var value = formioBindHtmlGetter(scope);
+        element.html($sce.getTrustedHtml(value) || '');
+      };
+    }
+  };
+}];
+
+},{}],50:[function(_dereq_,module,exports){
+"use strict";
 module.exports = [
   'Formio',
   'formioComponents',
@@ -9879,7 +9896,7 @@ module.exports = [
   }
 ];
 
-},{}],50:[function(_dereq_,module,exports){
+},{}],51:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'formioComponents',
@@ -9946,7 +9963,7 @@ module.exports = [
   }
 ];
 
-},{}],51:[function(_dereq_,module,exports){
+},{}],52:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -10029,7 +10046,7 @@ module.exports = function() {
   };
 };
 
-},{}],52:[function(_dereq_,module,exports){
+},{}],53:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$compile',
@@ -10048,7 +10065,7 @@ module.exports = [
   }
 ];
 
-},{}],53:[function(_dereq_,module,exports){
+},{}],54:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -10058,7 +10075,7 @@ module.exports = function() {
   };
 };
 
-},{}],54:[function(_dereq_,module,exports){
+},{}],55:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -10090,7 +10107,7 @@ module.exports = function() {
   };
 };
 
-},{}],55:[function(_dereq_,module,exports){
+},{}],56:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -10145,7 +10162,7 @@ module.exports = function() {
   };
 };
 
-},{}],56:[function(_dereq_,module,exports){
+},{}],57:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -10574,7 +10591,7 @@ module.exports = function() {
   };
 };
 
-},{}],57:[function(_dereq_,module,exports){
+},{}],58:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -10757,7 +10774,7 @@ module.exports = [
   }
 ];
 
-},{}],58:[function(_dereq_,module,exports){
+},{}],59:[function(_dereq_,module,exports){
 "use strict";
 var formioUtils = _dereq_('formio-utils');
 
@@ -10856,7 +10873,7 @@ module.exports = function() {
   };
 };
 
-},{"formio-utils":2}],59:[function(_dereq_,module,exports){
+},{"formio-utils":2}],60:[function(_dereq_,module,exports){
 "use strict";
 var _filter = _dereq_('lodash.filter');
 var _get = _dereq_('lodash.get');
@@ -10868,7 +10885,7 @@ module.exports = function() {
   };
 };
 
-},{"lodash.filter":9,"lodash.get":10}],60:[function(_dereq_,module,exports){
+},{"lodash.filter":9,"lodash.get":10}],61:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$q',
@@ -10917,7 +10934,7 @@ module.exports = [
   }
 ];
 
-},{}],61:[function(_dereq_,module,exports){
+},{}],62:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -10951,7 +10968,7 @@ module.exports = [
   }
 ];
 
-},{}],62:[function(_dereq_,module,exports){
+},{}],63:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'FormioUtils',
@@ -10960,7 +10977,7 @@ module.exports = [
   }
 ];
 
-},{}],63:[function(_dereq_,module,exports){
+},{}],64:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$sce',
@@ -10973,7 +10990,7 @@ module.exports = [
   }
 ];
 
-},{}],64:[function(_dereq_,module,exports){
+},{}],65:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   function() {
@@ -10992,7 +11009,7 @@ module.exports = [
   }
 ];
 
-},{}],65:[function(_dereq_,module,exports){
+},{}],66:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'formioTableView',
@@ -11005,7 +11022,7 @@ module.exports = [
   }
 ];
 
-},{}],66:[function(_dereq_,module,exports){
+},{}],67:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -11020,7 +11037,7 @@ module.exports = [
   }
 ];
 
-},{}],67:[function(_dereq_,module,exports){
+},{}],68:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$filter',
@@ -11049,7 +11066,7 @@ module.exports = [
   }
 ];
 
-},{}],68:[function(_dereq_,module,exports){
+},{}],69:[function(_dereq_,module,exports){
 "use strict";
 _dereq_('./polyfills/polyfills');
 
@@ -11102,6 +11119,8 @@ app.directive('formioComponentView', _dereq_('./directives/formioComponentView')
 app.directive('formioElement', _dereq_('./directives/formioElement'));
 
 app.directive('formioWizard', _dereq_('./directives/formioWizard'));
+
+app.directive('formioBindHtml', _dereq_('./directives/formioBindHtml.js'));
 
 /**
  * Filter to flatten form components.
@@ -11156,7 +11175,7 @@ app.run([
     );
 
     $templateCache.put('formio/submission.html',
-      "<div>\n  <div ng-repeat=\"component in form.components track by $index\">\n    <formio-component-view\n      form=\"form\"\n      component=\"component\"\n      data=\"submission.data\"\n      ignore=\"ignore\"\n      submission=\"submission\"\n      ng-if=\"builder ? '::true' : isVisible(component)\"\n      builder=\"builder\"\n    ></formio-component-view>\n  </div>\n</div>\n"
+      "<div>\n  <div ng-repeat=\"component in form.components track by $index\" ng-if=\"submission && submission.data\">\n    <formio-component-view\n      form=\"form\"\n      component=\"component\"\n      data=\"submission.data\"\n      ignore=\"ignore\"\n      submission=\"submission\"\n      ng-if=\"builder ? '::true' : isVisible(component)\"\n      builder=\"builder\"\n    ></formio-component-view>\n  </div>\n</div>\n"
     );
 
     $templateCache.put('formio/submissions.html',
@@ -11173,7 +11192,7 @@ app.run([
     );
 
     $templateCache.put('formio/element-view.html',
-      "<div>\n  <div ng-if=\"component.label\"><strong>{{ component.label }}</strong></div>\n  <div ng-bind-html=\"data | tableView:component\"></div>\n</div>\n"
+      "<div>\n  <div ng-if=\"component.label\"><strong>{{ component.label }}</strong></div>\n  <div formio-bind-html=\"data | tableView:component\"></div>\n</div>\n"
     );
 
     $templateCache.put('formio/errors.html',
@@ -11184,7 +11203,7 @@ app.run([
 
 _dereq_('./components');
 
-},{"./components":31,"./directives/customValidator":47,"./directives/formio":48,"./directives/formioComponent":49,"./directives/formioComponentView":50,"./directives/formioDelete":51,"./directives/formioElement":52,"./directives/formioErrors":53,"./directives/formioSubmission":54,"./directives/formioSubmissions":55,"./directives/formioWizard":56,"./factories/FormioScope":57,"./factories/FormioUtils":58,"./factories/Lodash":59,"./factories/formioInterceptor":60,"./factories/formioTableView":61,"./filters/flattenComponents":62,"./filters/safehtml":63,"./filters/tableComponents":64,"./filters/tableFieldView":65,"./filters/tableView":66,"./filters/translate":67,"./polyfills/polyfills":70,"./providers/Formio":71}],69:[function(_dereq_,module,exports){
+},{"./components":31,"./directives/customValidator":47,"./directives/formio":48,"./directives/formioBindHtml.js":49,"./directives/formioComponent":50,"./directives/formioComponentView":51,"./directives/formioDelete":52,"./directives/formioElement":53,"./directives/formioErrors":54,"./directives/formioSubmission":55,"./directives/formioSubmissions":56,"./directives/formioWizard":57,"./factories/FormioScope":58,"./factories/FormioUtils":59,"./factories/Lodash":60,"./factories/formioInterceptor":61,"./factories/formioTableView":62,"./filters/flattenComponents":63,"./filters/safehtml":64,"./filters/tableComponents":65,"./filters/tableFieldView":66,"./filters/tableView":67,"./filters/translate":68,"./polyfills/polyfills":71,"./providers/Formio":72}],70:[function(_dereq_,module,exports){
 "use strict";
 'use strict';
 
@@ -11215,13 +11234,13 @@ if (typeof Object.assign != 'function') {
   })();
 }
 
-},{}],70:[function(_dereq_,module,exports){
+},{}],71:[function(_dereq_,module,exports){
 "use strict";
 'use strict';
 
 _dereq_('./Object.assign');
 
-},{"./Object.assign":69}],71:[function(_dereq_,module,exports){
+},{"./Object.assign":70}],72:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   // The formio class.
@@ -11289,5 +11308,5 @@ module.exports = function() {
   };
 };
 
-},{"formiojs":3}]},{},[68])(68)
+},{"formiojs":3}]},{},[69])(69)
 });
