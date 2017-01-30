@@ -1073,13 +1073,15 @@ app.controller('ProjectFormioController', [
   '$window',
   '$http',
   'FormioAlerts',
+  'Chartist',
   function(
     $scope,
     Formio,
     AppConfig,
     $window,
     $http,
-    FormioAlerts
+    FormioAlerts,
+    Chartist
   ) {
     $scope.currentSection.title = 'Admin Data';
     $scope.currentSection.icon = 'glyphicon glyphicon-globe';
@@ -1548,7 +1550,7 @@ app.controller('ProjectFormioController', [
           };
 
           // Grab the top 5 submission users, and compare them, with the overall.
-          var quantity = quantity || 5;
+          quantity = quantity || 5;
           var top = _(typeData)
             .take(quantity)
             .map(function(item) {
@@ -1595,8 +1597,8 @@ app.controller('ProjectFormioController', [
                 .filter({type: symbol})
                 .forEach(function(entry) {
                   var day = parseInt(entry.day);
-                  $scope[type + 'GraphData'].series[groupPos][day - 1]['meta'] = category;
-                  $scope[type + 'GraphData'].series[groupPos][day - 1]['value'] += entry.calls;
+                  $scope[type + 'GraphData'].series[groupPos][day - 1].meta = category;
+                  $scope[type + 'GraphData'].series[groupPos][day - 1].value += entry.calls;
                 });
 
               groupPos += 1;
