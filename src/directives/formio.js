@@ -145,7 +145,7 @@ module.exports = function() {
             }
             if ($scope.submission.data.hasOwnProperty(component.key)) {
               var value = $scope.submission.data[component.key];
-              if (component.type === 'number') {
+              if (component.type === 'number' && (value !== null)) {
                 submissionData.data[component.key] = value ? parseFloat(value) : 0;
               }
               else {
