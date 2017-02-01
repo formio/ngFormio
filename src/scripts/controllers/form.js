@@ -1338,12 +1338,9 @@ app.controller('FormSubmissionsController', [
                       break;
                     default: type = 'string';
                   }
-                  return [
-                    'data.' + component.key.replace(/\./g, '.data.'), // Key
-                    {                                                 // Value
-                      type: type
-                    }
-                  ];
+
+                  // FOR-323 - Escape data to fix keys with - in them, because they are not valid js identifiers.
+                  return ['["data.' + component.key.replace(/\./g, '.data.') + '"]', {type: type}];
                 })
                 .concat([
                   ['created', {type: 'date'}],
@@ -1405,14 +1402,16 @@ app.controller('FormSubmissionsController', [
                   _.each(result.data, function(row) {
                     var key = 'data.' + component.key.replace(/\./g, '.data.');
                     var value = _.get(row, key);
-                    if(value === undefined) {
+                    if (value === undefined) {
                       // This looks like it does nothing but it ensures
                       // that the path to the key is reachable by
                       // creating objects that don't exist
-                      _.set(row, key, undefined);
+                      // FOR-323 - Change to empty string so the grid isnt full of "undefined"s
+                      _.set(row, key, '');
                     }
                   });
                 });
+
                 return result;
               })
               .then(options.success)
@@ -1451,8 +1450,9 @@ app.controller('FormSubmissionsController', [
               break;
             default: filterable = true;
           }
+
           return {
-            field: 'data.' + component.key.replace(/\./g, '.data.'),
+            field: '["data.' + component.key.replace(/\./g, '.data.') + '"]',
             title: component.label || component.key,
             template: function(dataItem) {
               var value = Formio.fieldData(dataItem.data.toJSON(), component);
