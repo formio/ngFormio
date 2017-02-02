@@ -17,8 +17,13 @@ module.exports = function(app) {
               true: true,
               false: false
             };
-            if ($scope.data && $scope.data[$scope.component.key] && !($scope.data[$scope.component.key] instanceof Boolean)) {
-              $scope.data[$scope.component.key] = boolean[$scope.data[$scope.component.key]] || false;
+            if ($scope.data && $scope.data.hasOwnProperty($scope.component.key) && !($scope.data[$scope.component.key] instanceof Boolean)) {
+              if ($scope.component.validate && $scope.component.validate.required && !$scope.data[$scope.component.key]) {
+                delete $scope.data[$scope.component.key];
+              }
+              else {
+                $scope.data[$scope.component.key] = boolean[$scope.data[$scope.component.key]] || false;
+              }
               loadComplete();
             }
           });
