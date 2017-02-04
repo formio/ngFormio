@@ -11,11 +11,7 @@ module.exports = function(gulp, plugins) {
           "/bower_components": "bower_components"
         }
       },
-      ghostMode: {
-        forms: {
-          submit: false
-        }
-      }
+      ghostMode: false
     });
 
     // watch for changes
