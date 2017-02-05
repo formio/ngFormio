@@ -1256,8 +1256,6 @@ footer {
   .ct-label {
     font-family: $font-family-base;
     font-size: $font-size-small;
-    color: $text-color;
-    fill: $text-color;
 
     &.ct-horizontal {
       width: 125px !important;
@@ -1270,19 +1268,27 @@ footer {
     }
   }
 
-  // Variable analytics graph.
-  .ct-chart-line {
-    .ct-series-a .ct-line {
-      stroke: $brand-secondary
+  &.project-summary {
+    .ct-label {
+      color: $text-color;
+      fill: $text-color;
     }
-    .ct-series-a .ct-point {
-      stroke: $brand-primary;
 
-      &:hover {
-        stroke-width: 20px !important;
+    // Variable analytics graph.
+    .ct-chart-line {
+      .ct-series-a .ct-line {
+        stroke: $brand-secondary
+      }
+      .ct-series-a .ct-point {
+        stroke: $brand-primary;
+
+        &:hover {
+          stroke-width: 20px !important;
+        }
       }
     }
   }
+
   .chart-buttons {
     text-align: center;
   }
