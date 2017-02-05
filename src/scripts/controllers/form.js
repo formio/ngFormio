@@ -105,8 +105,7 @@ app.config([
         })
         .state(parentName + '.form.api', {
           url: '/api',
-          templateUrl: 'views/form/form-api.html',
-          controller: 'ApiController'
+          templateUrl: 'views/form/form-api.html'
         });
 
       var formStates = {};
