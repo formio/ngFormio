@@ -23,7 +23,7 @@ app.config([
         title: 'Forms',
         name: 'Form',
         icon: 'fa fa-tasks',
-        help: 'https://help.form.io/userguide/#forms',
+        help: 'https://help.form.io/userguide/forms/',
         description: 'Forms serve as an input interface for Resources as well as free-form user input within your Application. Example: Login Form, Contact Form, etc.'
       },
       resource: {
@@ -31,7 +31,7 @@ app.config([
         title: 'Resources',
         name: 'Resource',
         icon: 'fa fa-database',
-        help: 'https://help.form.io/userguide/#resources',
+        help: 'https://help.form.io/userguide/resources/',
         description: 'Resources are the objects within your Application. Example: User, Company, Vehicle, etc.'
       }
     };
@@ -105,8 +105,7 @@ app.config([
         })
         .state(parentName + '.form.api', {
           url: '/api',
-          templateUrl: 'views/form/form-api.html',
-          controller: 'ApiController'
+          templateUrl: 'views/form/form-api.html'
         });
 
       var formStates = {};
