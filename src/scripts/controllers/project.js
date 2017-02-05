@@ -387,7 +387,9 @@ app.controller('ProjectBuildController', [
   function($scope, $http) {
     // This is restricted to form.io domains.
     var key = 'AIzaSyDms9ureQ45lp6BT6LuZtoANB_GcR2jZmE';
-
+    $scope.currentSection.title = 'Building Applications on Form.io';
+    $scope.currentSection.icon = 'fa fa-cubes';
+    $scope.currentSection.help = 'https://help.form.io/intro/appdev/';
     $scope.angular1 = [];
     $scope.angular2 = [];
     $scope.react = [];
@@ -977,9 +979,6 @@ app.controller('ProjectPreviewController', [
     $location,
     AppConfig
   ) {
-    $scope.currentSection.title = 'Preview';
-    $scope.currentSection.icon = 'fa fa-laptop';
-    $scope.currentSection.help = 'https://help.form.io/embedding/';
     $scope.previewUrl = '';
     $scope.repo = '';
     $scope.hasTemplate = true;
