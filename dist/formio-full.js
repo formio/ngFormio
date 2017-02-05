@@ -73492,6 +73492,17 @@ module.exports = function(app) {
             }
           });
 
+          // If they have 12 hour time enabled, we need to ensure that we see the meridian in the format.
+          if (
+            $scope.component.enableTime &&
+            $scope.component.timePicker &&
+            $scope.component.timePicker.showMeridian &&
+            ($scope.component.format.indexOf('mm') !== -1) &&
+            ($scope.component.format.indexOf('a') === -1)
+          ) {
+            $scope.component.format += ' a';
+          }
+
           if ($scope.component.defaultDate.length === 0) {
             $scope.component.defaultDate = '';
           }
@@ -73535,7 +73546,7 @@ module.exports = function(app) {
           label: '',
           key: 'datetimeField',
           placeholder: '',
-          format: 'yyyy-MM-dd HH:mm',
+          format: 'yyyy-MM-dd HH:mm a',
           enableDate: true,
           enableTime: true,
           defaultDate: '',
