@@ -3,7 +3,7 @@
   "private": true,
   "dependencies": {
     "angular": "^1.6.1",
-    "angular-ui-router": "^0.3.2",
+    "angular-ui-router": "^0.4.2",
     "angular-sanitize": "^1.6.1",
     "angular-bootstrap": "^2.4.0",
     "moment": "^2.17.1",
