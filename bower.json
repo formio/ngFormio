@@ -19,7 +19,7 @@
     "angular-truncate-2": "^0.4.2",
     "bootstrap-sass": "^3.3.7",
     "ng-dialog": "^0.6.4",
-    "angular-swagger-ui": "git@github.com:randallknutson/angular-swagger-ui.git#master",
+    "angular-swagger-ui": "https://github.com/randallknutson/angular-swagger-ui.git#master",
     "number-abbreviate": "^1.2.1",
     "ng-formio": "^2.9.5",
     "ng-formio-builder": "^2.8.1",
