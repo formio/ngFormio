@@ -40,6 +40,7 @@ module.exports = function(app) {
           defaultValue: false,
           protected: false,
           persistent: true,
+          clearOnHide: true,
           validate: {
             required: false
           }

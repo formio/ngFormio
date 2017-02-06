@@ -18,7 +18,8 @@ module.exports = function(app) {
           multiple: false,
           defaultValue: '',
           protected: false,
-          persistent: true
+          persistent: true,
+          clearOnHide: true
         },
         viewTemplate: 'formio/componentsView/file.html'
       });

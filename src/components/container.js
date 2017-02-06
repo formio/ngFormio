@@ -17,7 +17,8 @@ module.exports = function(app) {
           label: '',
           key: 'container',
           protected: false,
-          persistent: true
+          persistent: true,
+          clearOnHide: true
         }
       });
     }

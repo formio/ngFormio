@@ -25,6 +25,7 @@ module.exports = function(app) {
           maxWidth: '2.5',
           protected: false,
           persistent: true,
+          clearOnHide: true,
           validate: {
             required: false
           }

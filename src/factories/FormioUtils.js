@@ -4,11 +4,13 @@ module.exports = function() {
   return {
     checkVisible: function(component, row, data) {
       if (!formioUtils.checkCondition(component, row, data)) {
-        if (row && row.hasOwnProperty(component.key)) {
-          delete row[component.key];
-        }
-        if (data && data.hasOwnProperty(component.key)) {
-          delete data[component.key];
+        if (!component.hasOwnProperty('clearOnHide') || component.clearOnHide !== false) {
+          if (row && row.hasOwnProperty(component.key)) {
+            delete row[component.key];
+          }
+          if (data && data.hasOwnProperty(component.key)) {
+            delete data[component.key];
+          }
         }
         return false;
       }

@@ -26,6 +26,7 @@ module.exports = function(app) {
           protected: false,
           persistent: true,
           wysiwyg: false,
+          clearOnHide: true,
           validate: {
             required: false,
             minLength: '',

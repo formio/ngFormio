@@ -98,6 +98,7 @@ module.exports = function(app) {
           multiple: false,
           protected: false,
           persistent: true,
+          clearOnHide: true,
           validate: {
             required: false
           },
