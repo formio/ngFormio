@@ -63660,12 +63660,41 @@ module.exports = function(app) {
         group: 'advanced',
         controller: ['$scope', '$timeout', function($scope, $timeout) {
           if ($scope.builder) return;
+
+          var dateValue = function() {
+            // If the date is set, then return the true date value.
+            if ($scope.data[$scope.component.key]) {
+              return ($scope.data[$scope.component.key] instanceof Date) ? $scope.data[$scope.component.key] : new Date($scope.data[$scope.component.key]);
+            }
+
+            // See if a default date is set.
+            if ($scope.component.defaultDate) {
+              var defaultDate = new Date($scope.component.defaultDate);
+              if (!defaultDate || isNaN(defaultDate.getDate())) {
+                try {
+                  defaultDate = new Date(eval($scope.component.defaultDate));
+                }
+                catch (e) {
+                  defaultDate = '';
+                }
+              }
+
+              if (defaultDate && !isNaN(defaultDate.getDate())) {
+                return defaultDate;
+              }
+            }
+
+            // Default to empty.
+            return '';
+          };
+
           // Ensure the date value is always a date object when loaded, then unbind the watch.
           var loadComplete = $scope.$watch('data.' + $scope.component.key, function() {
-            if ($scope.data && $scope.data[$scope.component.key] && !($scope.data[$scope.component.key] instanceof Date)) {
-              $scope.data[$scope.component.key] = new Date($scope.data[$scope.component.key]);
-              loadComplete();
+            if (!$scope.data) {
+              return;
             }
+            $scope.data[$scope.component.key] = dateValue();
+            loadComplete();
           });
 
           // If they have 12 hour time enabled, we need to ensure that we see the meridian in the format.
@@ -63677,28 +63706,6 @@ module.exports = function(app) {
             ($scope.component.format.indexOf('a') === -1)
           ) {
             $scope.component.format += ' a';
-          }
-
-          if ($scope.component.defaultDate.length === 0) {
-            $scope.component.defaultDate = '';
-          }
-          else {
-            var dateVal = new Date($scope.component.defaultDate);
-            if (isNaN(dateVal.getDate())) {
-              try {
-                dateVal = new Date(eval($scope.component.defaultDate));
-              }
-              catch (e) {
-                dateVal = '';
-              }
-            }
-
-            if (isNaN(dateVal)) {
-              dateVal = '';
-            }
-
-            $scope.component.defaultDate = dateVal;
-            $scope.data[$scope.component.key] = dateVal;
           }
 
           if (!$scope.component.maxDate) {
@@ -63725,7 +63732,7 @@ module.exports = function(app) {
           format: 'yyyy-MM-dd HH:mm a',
           enableDate: true,
           enableTime: true,
-          defaultDate: '',
+          defaultDate: 'moment.now()',
           minDate: null,
           maxDate: null,
           datepickerMode: 'day',
