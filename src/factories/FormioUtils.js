@@ -69,7 +69,7 @@ module.exports = function() {
             '<formio-errors ng-if="::!builder"></formio-errors>' +
           '</div>' +
         '</div>' +
-        '<div ng-if="!!component.description" class="input-description text-muted">' +
+        '<div ng-if="!!component.description" class="help-block">' +
           '<span>{{ component.description }}</span>' +
         '</div>' +
         '<div ng-if="component.multiple"><table class="table table-bordered">' +

@@ -21,7 +21,7 @@
     <button ng-if="hasNextPage && ($index == $select.items.length-1)" class="btn btn-success btn-block" ng-click="loadMoreItems($select, $event)" ng-disabled="selectLoading">Load more...</button>
   </ui-select-choices>
 </ui-select>
-<div ng-if="!!component.description" class="input-description text-muted">
+<div ng-if="!!component.description" class="help-block">
   <span>{{ component.description }}</span>
 </div>
 <formio-errors ng-if="::!builder"></formio-errors>
