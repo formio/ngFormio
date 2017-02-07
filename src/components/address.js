@@ -55,6 +55,7 @@ module.exports = function(app) {
           placeholder: '',
           multiple: false,
           protected: false,
+          clearOnHide: true,
           unique: false,
           persistent: true,
           map: {

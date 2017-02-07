@@ -19,6 +19,7 @@ module.exports = function(app) {
           protected: false,
           unique: false,
           persistent: true,
+          clearOnHide: true,
           kickbox: {
             enabled: false
           }
