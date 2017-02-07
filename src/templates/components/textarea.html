@@ -2,7 +2,7 @@
   class="form-control"
   ng-model="data[component.key]"
   ng-disabled="readOnly"
-  ng-required="component.validate.required"
+  ng-required="isRequired(component)"
   safe-multiple-to-single
   id="{{ componentId }}"
   name="{{ componentId }}"

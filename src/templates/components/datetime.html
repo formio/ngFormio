@@ -8,7 +8,7 @@
     ng-click="calendarOpen = true"
     ng-init="calendarOpen = false"
     ng-disabled="readOnly"
-    ng-required="component.validate.required"
+    ng-required="isRequired(component)"
     is-open="calendarOpen"
     datetime-picker="{{ component.format }}"
     min-date="component.minDate"

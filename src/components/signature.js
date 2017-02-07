@@ -102,7 +102,7 @@ module.exports = function(app) {
         });
 
         function readSignature() {
-          if (scope.component.validate.required && signaturePad.isEmpty()) {
+          if (scope.$parent.isRequired(scope.component) && signaturePad.isEmpty()) {
             ngModel.$setViewValue('');
           }
           else {

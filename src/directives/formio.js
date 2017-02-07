@@ -93,6 +93,10 @@ module.exports = function() {
           return $scope.readOnly || component.disabled || (Array.isArray($scope.disableComponents) && $scope.disableComponents.indexOf(component.key) !== -1);
         };
 
+        $scope.isRequired = function(component) {
+          return (component.validate && component.validate.required) || (Array.isArray($scope.requireComponents) && $scope.requireComponents.indexOf(component.key) !== -1);
+        };
+
         // Called when the form is submitted.
         $scope.onSubmit = function(form) {
           $scope.formioAlerts = [];
@@ -141,7 +145,7 @@ module.exports = function() {
             }
             if ($scope.submission.data.hasOwnProperty(component.key)) {
               var value = $scope.submission.data[component.key];
-              if (component.type === 'number') {
+              if (component.type === 'number' && (value !== null)) {
                 submissionData.data[component.key] = value ? parseFloat(value) : 0;
               }
               else {
@@ -233,9 +237,9 @@ module.exports = function() {
           // Allow custom action urls.
           if ($scope.action) {
             var method = submissionData._id ? 'put' : 'post';
-            $http[method]($scope.action, submissionData).then(function(submission) {
+            $http[method]($scope.action, submissionData).then(function(response) {
               Formio.clearCache();
-              onSubmitDone(method, submission);
+              onSubmitDone(method, response.data);
             }, FormioScope.onError($scope, $element))
               .finally(function() {
                 form.submitting = false;
