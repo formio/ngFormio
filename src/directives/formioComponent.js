@@ -79,7 +79,7 @@ module.exports = [
           };
 
           $scope.isDisabled = function(component) {
-            return $scope.readOnly || $scope.$parent.isDisabled(component);
+            return $scope.readOnly || (typeof $scope.$parent.isDisabled === 'function' && $scope.$parent.isDisabled(component));
           };
 
           $scope.isRequired = $scope.$parent.isRequired;
