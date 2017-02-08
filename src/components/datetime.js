@@ -84,7 +84,7 @@ module.exports = function(app) {
           format: 'yyyy-MM-dd HH:mm a',
           enableDate: true,
           enableTime: true,
-          defaultDate: 'moment.now()',
+          defaultDate: '',
           minDate: null,
           maxDate: null,
           datepickerMode: 'day',
