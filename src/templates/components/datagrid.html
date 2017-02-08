@@ -23,14 +23,14 @@
           builder="builder"
         ></formio-component>
       </td>
-      <td>
+      <td ng-if="!component.hasOwnProperty('validate') || !component.validate.hasOwnProperty('minLength') || rows.length > component.validate.minLength">
         <a ng-click="removeRow(rowIndex)" class="btn btn-default">
           <span class="glyphicon glyphicon-remove-circle"></span>
         </a>
       </td>
     </tr>
   </table>
-  <div class="datagrid-add">
+  <div class="datagrid-add" ng-if="!component.hasOwnProperty('validate') || !component.validate.hasOwnProperty('maxLength') || rows.length < component.validate.maxLength">
     <a ng-click="addRow()" class="btn btn-primary">
       <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {{ component.addAnother || "Add Another" | formioTranslate:null:builder }}
     </a>
