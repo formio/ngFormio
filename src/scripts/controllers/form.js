@@ -1324,13 +1324,18 @@ app.controller('FormSubmissionsController', [
         field: field,
         title: component.label || component.key,
         template: function(dataItem) {
-          var value = Formio.fieldData(dataItem.data.toJSON(), component);
+          var val = dataItem.data;
+          if (path && _.has(val, path)) {
+            val = _.get(val, path)
+          }
+
+          var value = Formio.fieldData(val.toJSON(), component);
           var componentInfo = formioComponents.components[component.type];
           if (!componentInfo.tableView) {
-            if(value === undefined) {
+            if (value === undefined) {
               return '';
             }
-            if(component.multiple) {
+            if (component.multiple) {
               return value.join(', ');
             }
             return value;
@@ -1339,7 +1344,7 @@ app.controller('FormSubmissionsController', [
             var values = [];
             angular.forEach(value, function(arrayValue) {
               arrayValue = componentInfo.tableView(arrayValue, component, $interpolate, formioComponents);
-              if(arrayValue === undefined) {
+              if (arrayValue === undefined) {
                 return values.push('');
               }
               values.push(arrayValue);
@@ -1347,7 +1352,7 @@ app.controller('FormSubmissionsController', [
             return values.join(', ');
           }
           value = componentInfo.tableView(value, component, $interpolate, formioComponents);
-          if(value === undefined) {
+          if (value === undefined) {
             return '';
           }
           return value;
@@ -1445,32 +1450,11 @@ app.controller('FormSubmissionsController', [
                     break;
                   case 'lte': params[filter.field + '__lte'] = filter.value;
                     break;
-
-
                 }
               });
+
               $http.get($scope.formio.submissionsUrl, {
                 params: params
-              })
-              .then(function(result) {
-                // Fill in gaps in data so Kendo doesn't crash on missing nested fields
-                _(FormioUtils.flattenComponents($scope.form.components))
-                .filter($scope.tableView)
-                .each(function(component) {
-                  _.each(result.data, function(row) {
-                    var key = 'data.' + component.key.replace(/\./g, '.data.');
-                    var value = _.get(row, key);
-                    if (value === undefined) {
-                      // This looks like it does nothing but it ensures
-                      // that the path to the key is reachable by
-                      // creating objects that don't exist
-                      // FOR-323 - Change to empty string so the grid isnt full of "undefined"s
-                      _.set(row, key, '');
-                    }
-                  });
-                });
-
-                return result;
               })
               .then(options.success)
               .catch(function(err) {
@@ -1493,9 +1477,11 @@ app.controller('FormSubmissionsController', [
         });
 
         // Generate columns
-        var columns = _(FormioUtils.flattenComponents($scope.form.components))
-        .filter($scope.tableView)
-        .map(function(component) {
+        var columns = [];
+        FormioUtils.eachComponent($scope.form.components, function(component, path) {
+          if (component.tableView === false || !component.key) {
+            return;
+          }
           // FOR-310 - If this component was already added to the grid, dont add it again.
           if (component.key && containerComponents.indexOf(component.key) !== -1) {
             return;
@@ -1503,7 +1489,6 @@ app.controller('FormSubmissionsController', [
 
           // Pluck out every component in a container, so they dont appear as [Object object].
           if (component.type === 'container') {
-            var temp = [];
             FormioUtils.eachComponent(component.components, function(item) {
               if (!item.key) {
                 return;
@@ -1511,18 +1496,15 @@ app.controller('FormSubmissionsController', [
 
               // If this component has a key, blacklist it from being added again.
               containerComponents.push(item.key);
-              temp.push(getKendoCell(item, component.key));
+              columns.push(getKendoCell(item, component.key));
             }, true);
-
-            return temp;
+            return;
           }
 
-          return getKendoCell(component)
-        })
-        .flatten()
-        .filter()
-        .value()
-        .concat([
+          columns.push(getKendoCell(component));
+        }, true);
+
+        columns.push(
           {
             field: 'created',
             title: 'Submitted',
@@ -1545,7 +1527,7 @@ app.controller('FormSubmissionsController', [
               return moment(dataItem.modified).format('lll');
             }
           }
-        ]);
+        );
 
         // Define grid options
         $scope.gridOptions = {
