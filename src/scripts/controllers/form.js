@@ -1302,9 +1302,68 @@ app.controller('FormSubmissionsController', [
       });
     };
 
+    var getKendoCell = function(component, path) {
+      var filterable;
+      switch(component.type) {
+        case 'datetime': filterable = { ui: 'datetimepicker' };
+          break;
+        // Filtering is not supported for these data types in resourcejs yet
+        case 'address':
+        case 'resource':
+        case 'signature':
+          filterable = false;
+          break;
+        default: filterable = true;
+      }
+
+      var field = path
+        ? '["data.' + path + '.' + component.key.replace(/\./g, '.data.') + '"]'
+        : '["data.' + component.key.replace(/\./g, '.data.') + '"]';
+
+      return {
+        field: field,
+        title: component.label || component.key,
+        template: function(dataItem) {
+          var value = Formio.fieldData(dataItem.data.toJSON(), component);
+          var componentInfo = formioComponents.components[component.type];
+          if (!componentInfo.tableView) {
+            if(value === undefined) {
+              return '';
+            }
+            if(component.multiple) {
+              return value.join(', ');
+            }
+            return value;
+          }
+          if (component.multiple && (value.length > 0)) {
+            var values = [];
+            angular.forEach(value, function(arrayValue) {
+              arrayValue = componentInfo.tableView(arrayValue, component, $interpolate, formioComponents);
+              if(arrayValue === undefined) {
+                return values.push('');
+              }
+              values.push(arrayValue);
+            });
+            return values.join(', ');
+          }
+          value = componentInfo.tableView(value, component, $interpolate, formioComponents);
+          if(value === undefined) {
+            return '';
+          }
+          return value;
+        },
+        // Disabling sorting on embedded fields because it doesn't work in resourcejs yet
+        width: '200px',
+        filterable: filterable
+      };
+    };
+
     // When form is loaded, create the columns
     $scope.loadFormPromise.then(function() {
-      $timeout(function() { // Won't load on state change without this for some reason
+      // Load the grid on the next digest.
+      $timeout(function() {
+        // Track component keys inside containers, so they dont appear in the grid more than once.
+        var containerComponents = [];
 
         // Define DataSource
         var dataSource = new kendo.data.DataSource({
@@ -1436,57 +1495,32 @@ app.controller('FormSubmissionsController', [
         // Generate columns
         var columns = _(FormioUtils.flattenComponents($scope.form.components))
         .filter($scope.tableView)
-        .map(function(component){
-          var filterable;
-          switch(component.type) {
-            case 'datetime': filterable = { ui: 'datetimepicker' };
-              break;
-            // Filtering is not supported for these data types in resourcejs yet
-            case 'address':
-            case 'resource':
-            case 'signature':
-              filterable = false;
-              break;
-            default: filterable = true;
+        .map(function(component) {
+          // FOR-310 - If this component was already added to the grid, dont add it again.
+          if (component.key && containerComponents.indexOf(component.key) !== -1) {
+            return;
           }
 
-          return {
-            field: '["data.' + component.key.replace(/\./g, '.data.') + '"]',
-            title: component.label || component.key,
-            template: function(dataItem) {
-              var value = Formio.fieldData(dataItem.data.toJSON(), component);
-              var componentInfo = formioComponents.components[component.type];
-              if (!componentInfo.tableView) {
-                if(value === undefined) {
-                  return '';
-                }
-                if(component.multiple) {
-                  return value.join(', ');
-                }
-                return value;
+          // Pluck out every component in a container, so they dont appear as [Object object].
+          if (component.type === 'container') {
+            var temp = [];
+            FormioUtils.eachComponent(component.components, function(item) {
+              if (!item.key) {
+                return;
               }
-              if (component.multiple && (value.length > 0)) {
-                var values = [];
-                angular.forEach(value, function(arrayValue) {
-                  arrayValue = componentInfo.tableView(arrayValue, component, $interpolate, formioComponents);
-                  if(arrayValue === undefined) {
-                    return values.push('');
-                  }
-                  values.push(arrayValue);
-                });
-                return values.join(', ');
-              }
-              value = componentInfo.tableView(value, component, $interpolate, formioComponents);
-              if(value === undefined) {
-                return '';
-              }
-              return value;
-            },
-            // Disabling sorting on embedded fields because it doesn't work in resourcejs yet
-            width: '200px',
-            filterable: filterable
-          };
+
+              // If this component has a key, blacklist it from being added again.
+              containerComponents.push(item.key);
+              temp.push(getKendoCell(item, component.key));
+            }, true);
+
+            return temp;
+          }
+
+          return getKendoCell(component)
         })
+        .flatten()
+        .filter()
         .value()
         .concat([
           {
