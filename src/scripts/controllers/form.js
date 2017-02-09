@@ -1330,8 +1330,8 @@ app.controller('FormSubmissionsController', [
           }
 
           var value = Formio.fieldData(val.toJSON(), component);
-          var componentInfo = formioComponents.components[component.type];
-          if (!componentInfo.tableView) {
+          var componentInfo = formioComponents.components[component.type] || formioComponents.components.custom;
+          if (!componentInfo || !componentInfo.tableView) {
             if (value === undefined) {
               return '';
             }
