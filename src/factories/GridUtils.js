@@ -17,27 +17,24 @@ module.exports = function() {
     };
 
     var makeRow = function(data) {
-      var view = '<tr>';
+      var view = ''; // = '<tr>';
 
       if (typeof data === 'string' || typeof data === 'number') {
         view += '<td>' + data + '</td>';
       }
       else if (data instanceof Array) {
-        data.forEach(function(item) {
-          view += makeRow(item);
-        });
+        view += startTable('') + makeRow(data) + finishTable();
       }
       else if (typeof data === 'object') {
         var labels = Object.keys(data);
 
-        view += startTable(labels);
+        view += startTable(labels)
         labels.forEach(function(key) {
           view += makeRow(data[key]);
         });
         view += finishTable();
       }
 
-      view += '</tr>';
       return view;
     };
 
