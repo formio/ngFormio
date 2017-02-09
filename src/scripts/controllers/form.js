@@ -1367,9 +1367,6 @@ app.controller('FormSubmissionsController', [
     $scope.loadFormPromise.then(function() {
       // Load the grid on the next digest.
       $timeout(function() {
-        // Track component keys inside containers, so they dont appear in the grid more than once.
-        var containerComponents = [];
-
         // Define DataSource
         var dataSource = new kendo.data.DataSource({
           page: 1,
@@ -1476,29 +1473,26 @@ app.controller('FormSubmissionsController', [
           }
         });
 
+        // Track component keys inside objects, so they dont appear in the grid more than once.
+        var componentHistory = [];
+
         // Generate columns
         var columns = [];
-        FormioUtils.eachComponent($scope.form.components, function(component, path) {
+        FormioUtils.eachComponent($scope.form.components, function(component, componentPath) {
           if (component.tableView === false || !component.key) {
             return;
           }
           // FOR-310 - If this component was already added to the grid, dont add it again.
-          if (component.key && containerComponents.indexOf(component.key) !== -1) {
+          if (component.key && componentHistory.indexOf(component.key) !== -1) {
             return;
           }
 
-          // Pluck out every component in a container, so they dont appear as [Object object].
-          if (component.type === 'container') {
-            FormioUtils.eachComponent(component.components, function(item) {
-              if (!item.key) {
-                return;
+          if (['container', 'datagrid'].indexOf(component.type) !== -1) {
+            FormioUtils.eachComponent(component.components, function(component) {
+              if (component.key) {
+                componentHistory.push(component.key)
               }
-
-              // If this component has a key, blacklist it from being added again.
-              containerComponents.push(item.key);
-              columns.push(getKendoCell(item, component.key));
             }, true);
-            return;
           }
 
           columns.push(getKendoCell(component));
