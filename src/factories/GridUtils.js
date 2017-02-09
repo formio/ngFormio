@@ -44,7 +44,16 @@ module.exports = function() {
 
     // Create a template
     var view = '';
-    var label = component && component.label ? component.label : '';
+    var label;
+    if (!label && component && component.label) {
+      label = component.label;
+    }
+    else if (!label && component && component.key) {
+      label = component.key;
+    }
+    else {
+      label = '';
+    }
     view += startTable(label);
     view += makeRow(data);
     view += finishTable();
