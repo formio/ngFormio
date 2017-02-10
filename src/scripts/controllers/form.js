@@ -1316,17 +1316,14 @@ app.controller('FormSubmissionsController', [
         default: filterable = true;
       }
 
-      var field = path
-        ? '["data.' + path + '.' + component.key.replace(/\./g, '.data.') + '"]'
-        : '["data.' + component.key.replace(/\./g, '.data.') + '"]';
-
+      var field = path ? '["data.' + path + '.' + component.key.replace(/\./g, '.data.') + '"]' : '["data.' + component.key.replace(/\./g, '.data.') + '"]';
       return {
         field: field,
         title: component.label || component.key,
         template: function(dataItem) {
           var val = dataItem.data;
           if (path && _.has(val, path)) {
-            val = _.get(val, path)
+            val = _.get(val, path);
           }
 
           var value = Formio.fieldData(val.toJSON(), component);
@@ -1490,7 +1487,7 @@ app.controller('FormSubmissionsController', [
           if (['container', 'datagrid'].indexOf(component.type) !== -1) {
             FormioUtils.eachComponent(component.components, function(component) {
               if (component.key) {
-                componentHistory.push(component.key)
+                componentHistory.push(component.key);
               }
             }, true);
           }
