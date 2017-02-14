@@ -1,4 +1,4 @@
-/*! ng-formio v2.9.6 | https://unpkg.com/ng-formio@2.9.6/LICENSE.txt */
+/*! ng-formio v2.9.9 | https://unpkg.com/ng-formio@2.9.9/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 /*!
  * EventEmitter2
@@ -1819,12 +1819,14 @@ Formio.deregisterPlugin = function(plugin) {
 
 module.exports = Formio;
 
-},{"./providers":4,"eventemitter2":1,"native-promise-only":11,"shallow-copy":12,"whatwg-fetch":13}],4:[function(_dereq_,module,exports){
+},{"./providers":5,"eventemitter2":1,"native-promise-only":12,"shallow-copy":13,"whatwg-fetch":14}],4:[function(_dereq_,module,exports){
+arguments[4][3][0].apply(exports,arguments)
+},{"./providers":5,"dup":3,"eventemitter2":1,"native-promise-only":12,"shallow-copy":13,"whatwg-fetch":14}],5:[function(_dereq_,module,exports){
 module.exports = {
   storage: _dereq_('./storage')
 };
 
-},{"./storage":6}],5:[function(_dereq_,module,exports){
+},{"./storage":7}],6:[function(_dereq_,module,exports){
 var Promise = _dereq_("native-promise-only");
 var dropbox = function(formio) {
   return {
@@ -1900,14 +1902,14 @@ module.exports = dropbox;
 
 
 
-},{"native-promise-only":11}],6:[function(_dereq_,module,exports){
+},{"native-promise-only":12}],7:[function(_dereq_,module,exports){
 module.exports = {
   dropbox: _dereq_('./dropbox.js'),
   s3: _dereq_('./s3.js'),
   url: _dereq_('./url.js'),
 };
 
-},{"./dropbox.js":5,"./s3.js":7,"./url.js":8}],7:[function(_dereq_,module,exports){
+},{"./dropbox.js":6,"./s3.js":8,"./url.js":9}],8:[function(_dereq_,module,exports){
 var Promise = _dereq_("native-promise-only");
 var s3 = function(formio) {
   return {
@@ -2025,8 +2027,9 @@ s3.title = 'S3';
 s3.name = 's3';
 module.exports = s3;
 
-},{"native-promise-only":11}],8:[function(_dereq_,module,exports){
+},{"native-promise-only":12}],9:[function(_dereq_,module,exports){
 var Promise = _dereq_("native-promise-only");
+var Formio  = _dereq_("../../Formio");
 var url = function(formio) {
   return {
     title: 'Url',
@@ -2057,7 +2060,7 @@ var url = function(formio) {
             resolve({
               storage: 'url',
               name: fileName,
-              url: xhr.response.url,
+              url: xhr.responseURL + '/' + fileName,
               size: file.size,
               type: file.type
             });
@@ -2077,6 +2080,7 @@ var url = function(formio) {
         }
 
         xhr.open('POST', url);
+        xhr.setRequestHeader('x-jwt-token', Formio.getToken());
         xhr.send(fd);
       });
     },
@@ -2091,7 +2095,7 @@ url.name = 'url';
 url.title = 'Url';
 module.exports = url;
 
-},{"native-promise-only":11}],9:[function(_dereq_,module,exports){
+},{"../../Formio":3,"native-promise-only":12}],10:[function(_dereq_,module,exports){
 (function (global){
 /**
  * lodash (Custom Build) <https://lodash.com/>
@@ -4461,7 +4465,7 @@ function property(path) {
 module.exports = filter;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],10:[function(_dereq_,module,exports){
+},{}],11:[function(_dereq_,module,exports){
 (function (global){
 /**
  * lodash (Custom Build) <https://lodash.com/>
@@ -5396,7 +5400,7 @@ function get(object, path, defaultValue) {
 module.exports = get;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],11:[function(_dereq_,module,exports){
+},{}],12:[function(_dereq_,module,exports){
 (function (global){
 /*! Native Promise Only
     v0.8.1 (c) Kyle Simpson
@@ -5773,7 +5777,7 @@ module.exports = get;
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],12:[function(_dereq_,module,exports){
+},{}],13:[function(_dereq_,module,exports){
 module.exports = function (obj) {
     if (!obj || typeof obj !== 'object') return obj;
     
@@ -5810,7 +5814,7 @@ var isArray = Array.isArray || function (xs) {
     return {}.toString.call(xs) === '[object Array]';
 };
 
-},{}],13:[function(_dereq_,module,exports){
+},{}],14:[function(_dereq_,module,exports){
 (function(self) {
   'use strict';
 
@@ -6205,7 +6209,7 @@ var isArray = Array.isArray || function (xs) {
   self.fetch.polyfill = true
 })(typeof self !== 'undefined' ? self : this);
 
-},{}],14:[function(_dereq_,module,exports){
+},{}],15:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -6293,7 +6297,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],15:[function(_dereq_,module,exports){
+},{}],16:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -6471,7 +6475,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],16:[function(_dereq_,module,exports){
+},{}],17:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -6533,7 +6537,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],17:[function(_dereq_,module,exports){
+},{}],18:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -6567,7 +6571,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],18:[function(_dereq_,module,exports){
+},{}],19:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.provider('formioComponents', function() {
@@ -6627,7 +6631,7 @@ module.exports = function(app) {
   }]);
 };
 
-},{}],19:[function(_dereq_,module,exports){
+},{}],20:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -6672,7 +6676,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],20:[function(_dereq_,module,exports){
+},{}],21:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -6701,7 +6705,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],21:[function(_dereq_,module,exports){
+},{}],22:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -6811,7 +6815,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],22:[function(_dereq_,module,exports){
+},{}],23:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -6836,7 +6840,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],23:[function(_dereq_,module,exports){
+},{}],24:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -6943,7 +6947,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],24:[function(_dereq_,module,exports){
+},{}],25:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -7031,7 +7035,7 @@ module.exports = function(app) {
           format: 'yyyy-MM-dd HH:mm a',
           enableDate: true,
           enableTime: true,
-          defaultDate: 'moment.now()',
+          defaultDate: '',
           minDate: null,
           maxDate: null,
           datepickerMode: 'day',
@@ -7073,7 +7077,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],25:[function(_dereq_,module,exports){
+},{}],26:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -7248,7 +7252,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],26:[function(_dereq_,module,exports){
+},{}],27:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -7281,7 +7285,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],27:[function(_dereq_,module,exports){
+},{}],28:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -7317,7 +7321,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],28:[function(_dereq_,module,exports){
+},{}],29:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -7569,7 +7573,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],29:[function(_dereq_,module,exports){
+},{}],30:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -7602,7 +7606,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],30:[function(_dereq_,module,exports){
+},{}],31:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -7694,7 +7698,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],31:[function(_dereq_,module,exports){
+},{}],32:[function(_dereq_,module,exports){
 "use strict";
 var app = angular.module('formio');
 
@@ -7736,7 +7740,7 @@ _dereq_('./panel')(app);
 _dereq_('./table')(app);
 _dereq_('./well')(app);
 
-},{"./address":14,"./button":15,"./checkbox":16,"./columns":17,"./components":18,"./container":19,"./content":20,"./currency":21,"./custom":22,"./datagrid":23,"./datetime":24,"./day":25,"./email":26,"./fieldset":27,"./file":28,"./hidden":29,"./htmlelement":30,"./number":32,"./page":33,"./panel":34,"./password":35,"./phonenumber":36,"./radio":37,"./resource":38,"./select":39,"./selectboxes":40,"./signature":41,"./survey":42,"./table":43,"./textarea":44,"./textfield":45,"./well":46}],32:[function(_dereq_,module,exports){
+},{"./address":15,"./button":16,"./checkbox":17,"./columns":18,"./components":19,"./container":20,"./content":21,"./currency":22,"./custom":23,"./datagrid":24,"./datetime":25,"./day":26,"./email":27,"./fieldset":28,"./file":29,"./hidden":30,"./htmlelement":31,"./number":33,"./page":34,"./panel":35,"./password":36,"./phonenumber":37,"./radio":38,"./resource":39,"./select":40,"./selectboxes":41,"./signature":42,"./survey":43,"./table":44,"./textarea":45,"./textfield":46,"./well":47}],33:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -7800,7 +7804,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],33:[function(_dereq_,module,exports){
+},{}],34:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -7827,7 +7831,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],34:[function(_dereq_,module,exports){
+},{}],35:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -7863,7 +7867,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],35:[function(_dereq_,module,exports){
+},{}],36:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -7893,7 +7897,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],36:[function(_dereq_,module,exports){
+},{}],37:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -7927,7 +7931,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],37:[function(_dereq_,module,exports){
+},{}],38:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -7977,7 +7981,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],38:[function(_dereq_,module,exports){
+},{}],39:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -8104,7 +8108,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],39:[function(_dereq_,module,exports){
+},{}],40:[function(_dereq_,module,exports){
 "use strict";
 /*eslint max-depth: ["error", 6]*/
 
@@ -8627,7 +8631,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],40:[function(_dereq_,module,exports){
+},{}],41:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -8734,7 +8738,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],41:[function(_dereq_,module,exports){
+},{}],42:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -8874,7 +8878,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],42:[function(_dereq_,module,exports){
+},{}],43:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -8950,7 +8954,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],43:[function(_dereq_,module,exports){
+},{}],44:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -8995,7 +8999,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],44:[function(_dereq_,module,exports){
+},{}],45:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -9052,7 +9056,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],45:[function(_dereq_,module,exports){
+},{}],46:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -9112,7 +9116,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],46:[function(_dereq_,module,exports){
+},{}],47:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -9145,7 +9149,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],47:[function(_dereq_,module,exports){
+},{}],48:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -9223,7 +9227,7 @@ module.exports = function() {
   };
 };
 
-},{}],48:[function(_dereq_,module,exports){
+},{}],49:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -9492,7 +9496,7 @@ module.exports = function() {
   };
 };
 
-},{}],49:[function(_dereq_,module,exports){
+},{}],50:[function(_dereq_,module,exports){
 "use strict";
 module.exports = ['$sce', '$parse', '$compile', function($sce, $parse, $compile) {
   return {
@@ -9509,7 +9513,7 @@ module.exports = ['$sce', '$parse', '$compile', function($sce, $parse, $compile)
   };
 }];
 
-},{}],50:[function(_dereq_,module,exports){
+},{}],51:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -9592,7 +9596,7 @@ module.exports = [
           };
 
           $scope.isDisabled = function(component) {
-            return $scope.readOnly || $scope.$parent.isDisabled(component);
+            return $scope.readOnly || (typeof $scope.$parent.isDisabled === 'function' && $scope.$parent.isDisabled(component));
           };
 
           $scope.isRequired = $scope.$parent.isRequired;
@@ -9939,7 +9943,7 @@ module.exports = [
   }
 ];
 
-},{}],51:[function(_dereq_,module,exports){
+},{}],52:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'formioComponents',
@@ -10006,7 +10010,7 @@ module.exports = [
   }
 ];
 
-},{}],52:[function(_dereq_,module,exports){
+},{}],53:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -10089,7 +10093,7 @@ module.exports = function() {
   };
 };
 
-},{}],53:[function(_dereq_,module,exports){
+},{}],54:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$compile',
@@ -10108,7 +10112,7 @@ module.exports = [
   }
 ];
 
-},{}],54:[function(_dereq_,module,exports){
+},{}],55:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -10118,7 +10122,7 @@ module.exports = function() {
   };
 };
 
-},{}],55:[function(_dereq_,module,exports){
+},{}],56:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -10150,7 +10154,7 @@ module.exports = function() {
   };
 };
 
-},{}],56:[function(_dereq_,module,exports){
+},{}],57:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -10205,7 +10209,7 @@ module.exports = function() {
   };
 };
 
-},{}],57:[function(_dereq_,module,exports){
+},{}],58:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -10634,7 +10638,7 @@ module.exports = function() {
   };
 };
 
-},{}],58:[function(_dereq_,module,exports){
+},{}],59:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -10817,7 +10821,7 @@ module.exports = [
   }
 ];
 
-},{}],59:[function(_dereq_,module,exports){
+},{}],60:[function(_dereq_,module,exports){
 "use strict";
 var formioUtils = _dereq_('formio-utils');
 
@@ -10918,7 +10922,7 @@ module.exports = function() {
   };
 };
 
-},{"formio-utils":2}],60:[function(_dereq_,module,exports){
+},{"formio-utils":2}],61:[function(_dereq_,module,exports){
 "use strict";
 var _filter = _dereq_('lodash.filter');
 var _get = _dereq_('lodash.get');
@@ -10930,7 +10934,7 @@ module.exports = function() {
   };
 };
 
-},{"lodash.filter":9,"lodash.get":10}],61:[function(_dereq_,module,exports){
+},{"lodash.filter":10,"lodash.get":11}],62:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$q',
@@ -10979,7 +10983,7 @@ module.exports = [
   }
 ];
 
-},{}],62:[function(_dereq_,module,exports){
+},{}],63:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -11013,7 +11017,7 @@ module.exports = [
   }
 ];
 
-},{}],63:[function(_dereq_,module,exports){
+},{}],64:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'FormioUtils',
@@ -11022,7 +11026,7 @@ module.exports = [
   }
 ];
 
-},{}],64:[function(_dereq_,module,exports){
+},{}],65:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$sce',
@@ -11035,7 +11039,7 @@ module.exports = [
   }
 ];
 
-},{}],65:[function(_dereq_,module,exports){
+},{}],66:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   function() {
@@ -11054,7 +11058,7 @@ module.exports = [
   }
 ];
 
-},{}],66:[function(_dereq_,module,exports){
+},{}],67:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'formioTableView',
@@ -11067,7 +11071,7 @@ module.exports = [
   }
 ];
 
-},{}],67:[function(_dereq_,module,exports){
+},{}],68:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -11082,7 +11086,7 @@ module.exports = [
   }
 ];
 
-},{}],68:[function(_dereq_,module,exports){
+},{}],69:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$filter',
@@ -11111,7 +11115,7 @@ module.exports = [
   }
 ];
 
-},{}],69:[function(_dereq_,module,exports){
+},{}],70:[function(_dereq_,module,exports){
 "use strict";
 _dereq_('./polyfills/polyfills');
 
@@ -11248,7 +11252,7 @@ app.run([
 
 _dereq_('./components');
 
-},{"./components":31,"./directives/customValidator":47,"./directives/formio":48,"./directives/formioBindHtml.js":49,"./directives/formioComponent":50,"./directives/formioComponentView":51,"./directives/formioDelete":52,"./directives/formioElement":53,"./directives/formioErrors":54,"./directives/formioSubmission":55,"./directives/formioSubmissions":56,"./directives/formioWizard":57,"./factories/FormioScope":58,"./factories/FormioUtils":59,"./factories/Lodash":60,"./factories/formioInterceptor":61,"./factories/formioTableView":62,"./filters/flattenComponents":63,"./filters/safehtml":64,"./filters/tableComponents":65,"./filters/tableFieldView":66,"./filters/tableView":67,"./filters/translate":68,"./polyfills/polyfills":71,"./providers/Formio":72}],70:[function(_dereq_,module,exports){
+},{"./components":32,"./directives/customValidator":48,"./directives/formio":49,"./directives/formioBindHtml.js":50,"./directives/formioComponent":51,"./directives/formioComponentView":52,"./directives/formioDelete":53,"./directives/formioElement":54,"./directives/formioErrors":55,"./directives/formioSubmission":56,"./directives/formioSubmissions":57,"./directives/formioWizard":58,"./factories/FormioScope":59,"./factories/FormioUtils":60,"./factories/Lodash":61,"./factories/formioInterceptor":62,"./factories/formioTableView":63,"./filters/flattenComponents":64,"./filters/safehtml":65,"./filters/tableComponents":66,"./filters/tableFieldView":67,"./filters/tableView":68,"./filters/translate":69,"./polyfills/polyfills":72,"./providers/Formio":73}],71:[function(_dereq_,module,exports){
 "use strict";
 'use strict';
 
@@ -11279,13 +11283,13 @@ if (typeof Object.assign != 'function') {
   })();
 }
 
-},{}],71:[function(_dereq_,module,exports){
+},{}],72:[function(_dereq_,module,exports){
 "use strict";
 'use strict';
 
 _dereq_('./Object.assign');
 
-},{"./Object.assign":70}],72:[function(_dereq_,module,exports){
+},{"./Object.assign":71}],73:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   // The formio class.
@@ -11353,5 +11357,5 @@ module.exports = function() {
   };
 };
 
-},{"formiojs":3}]},{},[69])(69)
+},{"formiojs":4}]},{},[70])(70)
 });
