@@ -13,6 +13,11 @@ module.exports = function(app) {
         controller: ['$scope', '$timeout', function($scope, $timeout) {
           if ($scope.builder) return;
 
+          // Close calendar pop up when tabbing off button
+          $scope.onKeyDown = function(event) {
+            return event.keyCode == 9 ? false : $scope.calendarOpen;
+          };
+
           var dateValue = function() {
             // If the date is set, then return the true date value.
             if ($scope.data[$scope.component.key]) {
