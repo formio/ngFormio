@@ -9,7 +9,8 @@ var app = angular.module('formio', [
   'ui.mask',
   'angularMoment',
   'ngFileUpload',
-  'ngFileSaver'
+  'ngFileSaver',
+  'ngDialog'
 ]);
 
 /**
@@ -90,7 +91,14 @@ app.config([
 
 app.run([
   '$templateCache',
-  function($templateCache) {
+  '$rootScope',
+  'ngDialog',
+  function($templateCache, $rootScope, ngDialog) {
+    // Close all open dialogs on state change.
+    $rootScope.$on('$stateChangeStart', function() {
+      ngDialog.closeAll(false);
+    });
+
     // The template for the formio forms.
     $templateCache.put('formio.html',
       fs.readFileSync(__dirname + '/templates/formio.html', 'utf8')
