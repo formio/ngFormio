@@ -502,7 +502,7 @@ app.controller('FormController', [
       angular.element('.has-error').removeClass('has-error');
 
       // Copy to remove angular $$hashKey
-      $scope.formio.saveForm(angular.copy($scope.form), {
+      return $scope.formio.saveForm(angular.copy($scope.form), {
         getHeaders: true
       })
       .then(function(response) {
@@ -576,9 +576,15 @@ app.controller('FormController', [
 app.controller('FormEditController', [
   '$scope',
   '$q',
+  'ngDialog',
+  '$state',
+  '$timeout',
   function(
     $scope,
-    $q
+    $q,
+    ngDialog,
+    $state,
+    $timeout
   ) {
     // Clone original form after it has loaded, or immediately
     // if we're not loading a form
@@ -586,11 +592,81 @@ app.controller('FormEditController', [
       $scope.originalForm = _.cloneDeep($scope.form);
     });
 
+    /**
+     * Util function to show the cancel dialogue.
+     *
+     * @returns {Promise}
+     */
+    $scope.showCancelDialogue = function() {
+      var dialog = ngDialog.open({
+        template: 'views/form/cancel-confirm.html',
+        showClose: true,
+        className: 'ngdialog-theme-default',
+        controller: ['$scope', function($scope) {
+          // Reject the cancel action.
+          $scope.confirmSave = function() {
+            $scope.closeThisDialog('save');
+          };
+
+          // Accept the cancel action.
+          $scope.confirmCancel = function() {
+            $scope.closeThisDialog('close');
+          };
+        }]
+      });
+
+      return dialog.closePromise.then(function(data) {
+        if (data.value === 'save') {
+          throw 'save';
+        }
+
+        return data;
+      });
+    };
+
     // Revert to original form and go back
     $scope.cancel = function() {
-      _.assign($scope.form, $scope.originalForm);
-      $scope.back('project.' + $scope.formInfo.type + '.form.view');
+      return $scope.back('project.' + $scope.formInfo.type + '.form.view', {reload: true});
     };
+
+    // Listen for events to navigate away from the form builder.
+    $scope.$on('$stateChangeStart', function(event, transition, params, a, b, c, d) {
+      if (params && params.stateChangeStart === true) {
+        return;
+      }
+
+      // If the form hasnt been modified, skip this cancel modal logic.
+      var eq = _.matches($scope.form);
+      if (eq($scope.originalForm)) {
+        return;
+      }
+
+      // Stop the transition event and check for the return of $scope.cancel.
+      event.preventDefault();
+
+      // Try to cancel the view.
+      $scope.showCancelDialogue()
+      .then(function() {
+        $timeout(function() {
+          // Cancel without save was clicked, revert the form and get out.
+          $scope.form = angular.copy($scope.originalForm);
+          $state.go(transition.name, {notify: false});
+        });
+      })
+      .catch(function(val) {
+        // If a value was given, the modal was closed with the x or escape. Take no action and stay on the current page.
+        if (val && val !== 'save') {
+          console.error(val);
+          return;
+        }
+
+        // If there was no return the cancel action was rejected, save the form before navigation.
+        return $scope.saveForm()
+        .catch(function(err) {
+          console.error(err);
+        });
+      });
+    });
   }
 ]);
 
