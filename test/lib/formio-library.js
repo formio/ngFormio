@@ -7,7 +7,7 @@ var request = require('request');
 var chance = (new require('chance'))();
 var _ = require('lodash');
 
-module.exports = function(config) {
+module.exports = function (config) {
   // Global timeout for wait* commands.
   var timeout = 10000;
   var state = {};
@@ -19,7 +19,7 @@ module.exports = function(config) {
    * @param options
    * @returns {*}
    */
-  chance.username = function(options) {
+  chance.username = function (options) {
     options = options || {};
     _.extend(options, {
       length: chance.natural({min: 5, max: 20}),
@@ -33,7 +33,7 @@ module.exports = function(config) {
    * @param options
    * @returns {*}
    */
-  chance.password = function(options) {
+  chance.password = function (options) {
     options = options || {};
     _.extend(options, {
       length: chance.natural({min: 5, max: 20})
@@ -46,7 +46,7 @@ module.exports = function(config) {
    *
    * @param {String} type
    */
-  var random = function(type) {
+  var random = function (type) {
     switch (type) {
       case 'fullName' :
         return chance.name();
@@ -79,7 +79,7 @@ module.exports = function(config) {
    * @returns {boolean}
    *   If the cache key was updated or not.
    */
-  var update = function(cacheKey, oldKey, newValue) {
+  var update = function (cacheKey, oldKey, newValue) {
     // Attempt to get cached values.
     if (_.has(state, cacheKey)) {
       // Get the object at the old cache key.
@@ -108,7 +108,7 @@ module.exports = function(config) {
    *
    * @returns {*}
    */
-  var replacements = function(text) {
+  var replacements = function (text) {
     if (text === '${empty}') {
       return '';
     }
@@ -124,7 +124,7 @@ module.exports = function(config) {
     // Regex to find ${key.value}
     var searchRegex = /(.*)\.(.*)/;
 
-    text = text.replace(regex, function(match, str) {
+    text = text.replace(regex, function (match, str) {
       // If this is a request for a random string and store, get a random string and store it at #key.
       if (randomAssignRegex.test(str)) {
         var type = randomAssignRegex.exec(str).pop();
@@ -173,7 +173,7 @@ module.exports = function(config) {
    * @param next
    * @returns {*}
    */
-  var handleResponse = function(driver, err, response, body, next) {
+  var handleResponse = function (driver, err, response, body, next) {
     if (err) {
       return next(err);
     }
@@ -181,12 +181,13 @@ module.exports = function(config) {
     var token = response.headers['x-jwt-token'] || '';
     driver.localStorage('DELETE')
       .localStorage('POST', {key: 'formioToken', value: token})
-      .then(function() {
+      .then(function () {
         if (typeof body === 'string') {
           try {
             body = JSON.parse(body);
           }
-          catch(e) {}
+          catch (e) {
+          }
         }
 
         next(null, body);
@@ -204,7 +205,7 @@ module.exports = function(config) {
    * @param password
    * @param next
    */
-  var authUser = function(driver, projectName, formName, email, password, next) {
+  var authUser = function (driver, projectName, formName, email, password, next) {
     request({
       rejectUnauthorized: false,
       uri: config.serverProtocol + '://' + projectName + '.' + config.serverHost + '/' + formName + '/submission',
@@ -215,7 +216,7 @@ module.exports = function(config) {
           'password': password
         }
       }
-    }, function(err, response, body) {
+    }, function (err, response, body) {
       handleResponse(driver, err, response, body, next);
     });
   };
@@ -231,7 +232,7 @@ module.exports = function(config) {
    * @param password
    * @param next
    */
-  var createUser = function(driver, projectName, formName, username, email, password, next) {
+  var createUser = function (driver, projectName, formName, username, email, password, next) {
     request({
       rejectUnauthorized: false,
       uri: config.serverProtocol + '://' + projectName + '.' + config.serverHost + '/' + formName + '/submission',
@@ -244,7 +245,7 @@ module.exports = function(config) {
           'verifyPassword': password
         }
       }
-    }, function(err, response, body) {
+    }, function (err, response, body) {
       handleResponse(driver, err, response, body, next);
     });
   };
@@ -258,13 +259,13 @@ module.exports = function(config) {
    * @param password
    * @param next
    */
-  var createAndAuthUser = function(driver, username, email, password, next) {
-    createUser(driver, 'formio', 'user/register', username, email, password, function(err, user) {
+  var createAndAuthUser = function (driver, username, email, password, next) {
+    createUser(driver, 'formio', 'user/register', username, email, password, function (err, user) {
       if (err) {
         return next(err);
       }
 
-      authUser(driver, 'formio', 'user/login', email, password, function(err, res) {
+      authUser(driver, 'formio', 'user/login', email, password, function (err, res) {
         if (err) {
           return next(err);
         }
@@ -285,8 +286,8 @@ module.exports = function(config) {
    * @param description
    * @param next
    */
-  var createProject = function(driver, title, description, next) {
-    driver.localStorage('GET', 'formioToken', function(err, res) {
+  var createProject = function (driver, title, description, next) {
+    driver.localStorage('GET', 'formioToken', function (err, res) {
       if (err) {
         return next(err);
       }
@@ -305,8 +306,8 @@ module.exports = function(config) {
         headers: {
           'x-jwt-token': res.value
         }
-      }, function(err, response, body) {
-        handleResponse(driver, err, response, body, function(err, result) {
+      }, function (err, response, body) {
+        handleResponse(driver, err, response, body, function (err, result) {
           if (err) {
             next(err);
           }
@@ -316,13 +317,13 @@ module.exports = function(config) {
         });
       });
     })
-    .catch(next);
+      .catch(next);
   };
 
   /**
    * Get a project from the temporary cache.
    */
-  var getProject = function(title, next) {
+  var getProject = function (title, next) {
     if (!projects[title]) {
       next('Project not found');
     }
@@ -330,65 +331,93 @@ module.exports = function(config) {
   }
 
   var library = English.library()
-    .given('I am (?:on|at) (?:the )?(.+?)(?: page)?$', function(url, next) {
-      var path = (url === 'home') ? config.baseUrl + '/' : config.baseUrl + url;
+      .given('I am (?:on|at) (?:the )?(.+?)(?: page)?$', function (url, next) {
+        var path = (url === 'home') ? config.baseUrl + '/' : config.baseUrl + url;
 
-      var driver = this.driver;
-      driver.url(path)
-        .then(function() {
-          next();
-        })
-        .catch(next);
-    })
-    .given('I am (?:on|at) (?:the )?$TITLE project overview page', function(title, next) {
-      title = replacements(title);
-      var driver = this.driver;
-      getProject(title, function(err, project) {
-        var path = config.baseUrl + '/#/project/' + project._id + '/overview';
+        var driver = this.driver;
         driver.url(path)
-          .then(function() {
+          .then(function () {
             next();
           })
           .catch(next);
-      });
-    })
-    .given('an account exists with the username $USERNAME, email $EMAIL and password $PASSWORD', function(username, email, password, next) {
-      username = replacements(username);
-      email = replacements(email);
-      password = replacements(password);
+      })
+      .given('I am (?:on|at) (?:the )?$TITLE project overview page', function (title, next) {
+        title = replacements(title);
+        var driver = this.driver;
+        getProject(title, function (err, project) {
+          var path = config.baseUrl + '/#/project/' + project._id + '/overview';
+          driver.url(path)
+            .then(function () {
+              next();
+            })
+            .catch(next);
+        });
+      })
+      .given('an account exists with the username $USERNAME, email $EMAIL and password $PASSWORD', function (username, email, password, next) {
+        username = replacements(username);
+        email = replacements(email);
+        password = replacements(password);
 
-      var driver = this.driver;
-      authUser(driver, 'formio', 'user/login', email, password, function(err, res) {
-        if (err || res === 'Invalid user') {
-          // User doesn't exist. Create it.
-          return createUser(driver, 'formio', 'user/register', username, email, password, next);
+        var driver = this.driver;
+        authUser(driver, 'formio', 'user/login', email, password, function (err, res) {
+          if (err || res === 'Invalid user') {
+            // User doesn't exist. Create it.
+            return createUser(driver, 'formio', 'user/register', username, email, password, next);
+          }
+
+          // User already exists. Do nothing.
+          next();
+        });
+      })
+      .given('I am logged out', function (next) {
+        var driver = this.driver;
+        driver.localStorage('DELETE', 'formioToken')
+          .then(function () {
+            return driver.localStorage('DELETE', 'formioUser');
+          })
+          .then(driver.refresh)
+          .then(function () {
+            next();
+          })
+          .catch(next);
+      })
+      .given('I am logged in(?: for )?(.+)?$', function (tempUser, next) {
+        if (!next && tempUser) {
+          next = tempUser;
+          tempUser = null;
         }
 
-        // User already exists. Do nothing.
-        next();
-      });
-    })
-    .given('I am logged out', function(next) {
-      var driver = this.driver;
-      driver.localStorage('DELETE', 'formioToken')
-        .then(function() {
-          return driver.localStorage('DELETE', 'formioUser');
-        })
-        .then(driver.refresh)
-        .then(function() {
-          next();
-        })
-        .catch(next);
-    })
-    .given('I am logged in(?: for )?(.+)?$', function(tempUser, next) {
-      if (!next && tempUser) {
-        next = tempUser;
-        tempUser = null;
-      }
+        var driver = this.driver;
+        if (tempUser && state[tempUser]) {
+          authUser(driver, 'formio', 'user/login', state[tempUser].email, state[tempUser].password, function (err, res) {
+            if (err) {
+              return next(err);
+            }
+            if (!res) {
+              return next(new Error('Authentication Failed.'));
+            }
 
-      var driver = this.driver;
-      if (tempUser && state[tempUser]) {
-        authUser(driver, 'formio', 'user/login', state[tempUser].email, state[tempUser].password, function(err, res) {
+            next();
+          });
+        }
+        else {
+          state[tempUser] = {};
+          state[tempUser].fullName = chance.name();
+          state[tempUser].name = chance.username();
+          state[tempUser].email = chance.email();
+          state[tempUser].password = chance.word({length: 10});
+          createAndAuthUser(driver, state[tempUser].name, state[tempUser].email, state[tempUser].password, function (err, res) {
+            if (err) {
+              return next(err);
+            }
+
+            next();
+          });
+        }
+      })
+      .given('I am logged in as $EMAIL with password $PASSWORD', function (email, password, next) {
+        var driver = this.driver;
+        authUser(driver, 'formio', 'user/login', email, password, function (err, res) {
           if (err) {
             return next(err);
           }
@@ -398,381 +427,629 @@ module.exports = function(config) {
 
           next();
         });
-      }
-      else {
-        state[tempUser] = {};
-        state[tempUser].fullName = chance.name();
-        state[tempUser].name = chance.username();
-        state[tempUser].email = chance.email();
-        state[tempUser].password = chance.word({length: 10});
-        createAndAuthUser(driver, state[tempUser].name, state[tempUser].email, state[tempUser].password, function(err, res) {
+      })
+      .given('A project exists with the $title and $description', function (title, description, next) {
+        title = replacements(title);
+        description = replacements(description);
+
+        var driver = this.driver;
+        createProject(driver, title, description, function (err, res) {
           if (err) {
             return next(err);
           }
 
-          next();
+          next(null, res);
         });
-      }
-    })
-    .given('I am logged in as $EMAIL with password $PASSWORD', function(email, password, next) {
-      var driver = this.driver;
-      authUser(driver, 'formio', 'user/login', email, password, function(err, res) {
-        if (err) {
-          return next(err);
-        }
-        if (!res) {
-          return next(new Error('Authentication Failed.'));
-        }
-
-        next();
-      });
-    })
-    .given('A project exists with the $title and $description', function(title, description, next) {
-      title = replacements(title);
-      description = replacements(description);
-
-      var driver = this.driver;
-      createProject(driver, title, description, function(err, res) {
-        if (err) {
-          return next(err);
-        }
-
-        next(null, res);
-      });
-    })
-    .when('I click (?:on )?the $LINK link', function(link, next) {
-      var driver = this.driver;
-      driver.waitForExist('=' + link, timeout)
-        .click('=' + link)
-        .then(function() {
-          next();
-        })
-        .catch(next);
-    })
-    .when('I click (?:on )?the $BUTTON button', function(button, next) {
-      var driver = this.driver;
-      driver.waitForExist('//button[contains(.,\'' + button + '\')]', timeout)
-        .click('//button[contains(.,\'' + button + '\')]')
-        .then(next)
-        .catch(next);
-    })
-    .when('I click on the $element element', function(element, next) {
-      var driver = this.driver;
-      driver.waitForExist(element, timeout)
-        .waitForVisible(element, timeout)
-        .click(element)
-        .then(next)
-        .catch(next);
-    })
-    .when('I update the project to the $plan', function(plan, next) {
-      var driver = this.driver;
-      driver.waitForExist('//*[contains(@class, "selected-plan")]//h3', timeout)
-        .waitForVisible('//*[contains(@class, "selected-plan")]//h3', timeout)
-        .click('//*[contains(@class, "selected-plan")]//h3')
-        .waitForVisible('//*[contains(@class, "plan-menu")]//*[text()="' + plan + '"]', timeout)
-        .click('//*[contains(@class, "plan-menu")]//*[text()="' + plan + '"]')
-        .then(next)
-        .catch(next);
-    })
-    .when('I select $text in $element', function(text, element, next) {
-      var xpath = element.indexOf('#') !== -1
-        ? '//*[@id="' + (element.split('#'))[1] + '"]'
-        : '//*[contains(@class, "' + element + '")]';
-
-      var driver = this.driver;
-      driver.waitForExist(element, timeout)
-        .waitForVisible(xpath, timeout)
-        .click(xpath)
-        .waitForVisible(xpath + '//*[text()="' + text + '"]', timeout)
-        .click(xpath + '//*[text()="' + text + '"]')
-        .then(next)
-        .catch(next);
-    })
-    .when('I enter $TEXT in the $FIELD field', function(text, field, next) {
-      var driver = this.driver;
-      driver.waitForExist(field, timeout)
-        .setValue(field, replacements(text))
-        .then(next)
-        .catch(next);
-    })
-    .when('I expand the user menu', function(next) {
-      var driver = this.driver;
-      driver.waitForExist('#user-menu')
-        .click('#user-menu')
-        .then(next)
-        .catch(next);
-    })
-    .when('I wait $TIME milliseconds', function(time, next) {
-      var driver = this.driver;
-      driver.pause(time)
-        .then(next)
-        .catch(next);
-    })
-    .then('the title is $TITLE', function(title, next) {
-      var driver = this.driver;
-      driver.getTitle()
-        .then(function(res) {
-          try {
-            assert.equal(res, title);
+      })
+      .when('I click (?:on )?the $LINK link', function (link, next) {
+        var driver = this.driver;
+        driver.waitForExist('=' + link, timeout)
+          .click('=' + link)
+          .then(function () {
             next();
-          }
-          catch(err) {
-            next(err);
-          }
-        })
-        .catch(next);
-    })
-    .then('I am (?:on|at) (?:the )?(.+?)(?: page)$', function(path, next) {
-      path = (path === 'home') ? config.baseUrl + '/' : config.baseUrl + path;
-
-      var driver = this.driver;
-      driver.url()
-        .then(function(res) {
-          assert.equal(res.value, path);
-          next();
-        })
-        .catch(next);
-    })
-    .then('I am on the $title project portal', function(title, next) {
-      title = replacements(title);
-
-      var driver = this.driver;
-      driver.waitForExist('.project-title')
-        .getText('.project-title')
-        .then(function(found) {
-          assert.equal(found, title);
-          next();
-        })
-        .catch(next);
-    })
-    .then('I have been logged in', function(next) {
-      var driver = this.driver;
-      var tries = 0;
-
-      (function attempt() {
-        if (tries > 15) {
-          return next(new Error('No formioToken found.'));
-        }
-
-        driver.pause(50)
-          .localStorage('GET', 'formioToken', function(err, res) {
-            if (err) {
-              return next(err);
-            }
-            if (res.value) {
-              return next();
-            }
-
-            tries += 1;
-            attempt();
           })
           .catch(next);
-      })();
-    })
-    .then('I have been logged out', function(next) {
-      var driver = this.driver;
-      var _old = {};
-      var tries = 0;
+      })
+      .when('I click (?:on )?the $BUTTON button', function (button, next) {
+        var driver = this.driver;
+        driver.waitForExist('//button[contains(.,\'' + button + '\')]', timeout)
+          .click('//button[contains(.,\'' + button + '\')]')
+          .then(next)
+          .catch(next);
+      })
+      .when('I click on the $element element', function (element, next) {
+        var driver = this.driver;
+        driver.waitForExist(element, timeout)
+          .waitForVisible(element, timeout)
+          .click(element)
+          .then(next)
+          .catch(next);
+      })
+      .when('I update the project to the $plan', function (plan, next) {
+        var driver = this.driver;
+        driver.waitForExist('//*[contains(@class, "selected-plan")]//h3', timeout)
+          .waitForVisible('//*[contains(@class, "selected-plan")]//h3', timeout)
+          .click('//*[contains(@class, "selected-plan")]//h3')
+          .waitForVisible('//*[contains(@class, "plan-menu")]//*[text()="' + plan + '"]', timeout)
+          .click('//*[contains(@class, "plan-menu")]//*[text()="' + plan + '"]')
+          .then(next)
+          .catch(next);
+      })
+      .when('I select $text in $element', function (text, element, next) {
+        var xpath = element.indexOf('#') !== -1
+          ? '//*[@id="' + (element.split('#'))[1] + '"]'
+          : '//*[contains(@class, "' + element + '")]';
 
-      (function attempt() {
-        if (tries > 15) {
-          return next(new Error('User still logged in: ' + JSON.stringify(_old)));
-        }
-
-        driver.pause(50)
-          .localStorage('GET', 'formioToken', function(err, res) {
-            if (err) {
-              return next(err);
-            }
-            if (!res.value) {
-              return next();
-            }
-
-            _old = res.value;
-            tries += 1;
-            attempt();
+        var driver = this.driver;
+        driver.waitForExist(element, timeout)
+          .waitForVisible(xpath, timeout)
+          .click(xpath)
+          .waitForVisible(xpath + '//*[text()="' + text + '"]', timeout)
+          .click(xpath + '//*[text()="' + text + '"]')
+          .then(next)
+          .catch(next);
+      })
+      .when('I enter $TEXT in the $FIELD field', function (text, field, next) {
+        var driver = this.driver;
+        driver.waitForExist(field, timeout)
+          .setValue(field, replacements(text))
+          .then(next)
+          .catch(next);
+      })
+      .when('I expand the user menu', function (next) {
+        var driver = this.driver;
+        driver.waitForExist('#user-menu')
+          .click('#user-menu')
+          .then(next)
+          .catch(next);
+      })
+      .when('I wait $TIME milliseconds', function (time, next) {
+        var driver = this.driver;
+        driver.pause(time)
+          .then(next)
+          .catch(next);
+      }).when('I click on the image with source $text', function (text, next) {
+        var driver = this.driver;
+        driver.waitForExist('//img[contains(@src, \'' + text + '\')]', timeout)
+          .waitForVisible('//img[contains(@src, \'' + text + '\')]', timeout)
+          .click('//div//img[contains(@src, \'' + text + '\')]', timeout)
+          .then(next)
+          .catch(next);
+      })//surendra
+      .when('I click on the icon $icon', function (icon, next) {
+        var driver = this.driver;
+        driver.waitForExist('//*[contains(@class,\'' + icon + '\')]', timeout)
+          .waitForVisible('//*[contains(@class,\'' + icon + '\')]', timeout)
+          .click('//*[contains(@class,\'' + icon + '\')]', timeout)
+          .then(next)
+          .catch(next);
+      })//surendra
+      .when('I donot have a value in the $title field', function (title, next) {
+        var driver = this.driver;
+        driver.waitForExist('//*[@id="title"]', timeout)
+          .getText('//*[@id="title"]')
+          .then(function (result) {
+            result += "*";
+            assert("*", result);
+            next();
           })
           .catch(next);
-      })();
-    })
-    .then('I see a notification with (?:the text )?$TEXT', function(text, next) {
-      text = replacements(text);
 
-      var driver = this.driver;
-      driver.waitForExist('//div[@class=\'toast-message\']', timeout)
-        .getText('//div[@class=\'toast-message\']')
-        .then(function(alert) {
-          assert.equal(text, alert);
-          next();
-        })
-        .catch(next);
-    })
-    .then('A help block shows with the text $text', function(text, next) {
-      text = replacements(text);
+      })//surendra
+      .when('I select the $project project template', function (project, next) {
+        var driver = this.driver;
+        driver.waitForExist('//*[contains(@class, "template-card") and contains(., "' + project + '")]', timeout)
+          .waitForVisible('//*[contains(@class, "template-card") and contains(., "' + project + '")]', timeout)
+          .click('//*[contains(@class, "template-card") and contains(., "' + project + '")]', timeout)
+          .then(next)
+          .catch(next);
+      })//surendra
+      .when('I click the $link link in $section of project progress', function (link, section, next) {
+        var driver = this.driver;
+        driver.waitForExist('//*[contains(text(),"' + section + '")]//..//..//a[contains(text(),"' + link + '")]', timeout)
+          .waitForVisible('//*[contains(text(),"' + section + '")]//..//..//a[contains(text(),"' + link + '")]', timeout)
+          .click('//*[contains(text(),"' + section + '")]//..//..//a[contains(text(),"' + link + '")]', timeout)
+          .then(next)
+          .catch(next);
+      })//surendra
+      .when('I click on $button button for $formname form', function (button, formname, next) {
+        var driver = this.driver;
+        var path = '//div//h2[contains(text(),\'Forms\')]//..//div[contains(@class,\'form-list\')]//a' +
+          '//h4[contains(text(),\'' + formname + '\')]//..//..//..//a[contains(text(),\'' + button + '\')]';
+        driver.waitForExist(path, timeout)
+          .click(path, timeout)
+          .then(next)
+          .catch(next);
+      })//surendra
+      .when('I click (?:on )?the $BUTTON input button', function (button, next) {
+        var driver = this.driver;
+        driver.waitForExist('//input[contains(@value,\'' + button + '\')]', timeout)
+          .click('//input[contains(@value,\'' + button + '\')]')
+          .then(next)
+          .catch(next);
+      })//surendra
+      .when('I select $text in select component', function (text, next) {
+        var driver = this.driver;
+        driver.waitForExist('//select', timeout)
+          .click('//select')
+          .waitForVisible( '//*[text()="' + text + '"]', timeout)
+          .click('//*[text()="' + text + '"]',timeout)
+          .then(next)
+          .catch(next);
+      })//surendra 'grid view in overview page'
+      .then('the title is $TITLE', function (title, next) {
+        var driver = this.driver;
+        driver.getTitle()
+          .then(function (res) {
+            try {
+              assert.equal(res, title);
+              next();
+            }
+            catch (err) {
+              next(err);
+            }
+          })
+          .catch(next);
+      })
+      .then('I am (?:on|at) (?:the )?(.+?)(?: page)$', function (path, next) {
+        path = (path === 'home') ? config.baseUrl + '/' : config.baseUrl + path;
 
-      var driver = this.driver;
-      driver.waitForVisible('//*[contains(@class, \'help-block\') and contains(., \'' + text + '\')]', timeout)
-        .getText('//*[contains(@class, \'help-block\') and contains(., \'' + text + '\')]')
-        .then(function(alert) {
-          assert.equal(text, alert);
-          next();
-        })
-        .catch(next);
-    })
-    .then('I see the plaintext $text', function(text, next) {
-      text = replacements(text);
+        var driver = this.driver;
+        driver.url()
+          .then(function (res) {
+            assert.equal(res.value.toLowerCase(), path.toLowerCase());
+            next();
+          })
+          .catch(next);
+      })
+      .then('I am on the $title project portal', function (title, next) {
+        title = replacements(title);
 
-      var driver = this.driver;
-      driver.waitForExist('//*[text()=\'' + text + '\']', timeout)
-        .isVisible('//*[text()=\'' + text + '\']')
-        .then(function(visible) {
-          assert.equal(visible, true);
-          next();
-        })
-        .catch(next);
-    })
-    .then('I see $TEXT', function(text, next) {
-      text = replacements(text);
+        var driver = this.driver;
+        driver.waitForExist('.project-title')
+          .getText('.project-title')
+          .then(function (found) {
+            assert.equal(found, title);
+            next();
+          })
+          .catch(next);
+      })
+      .then('I have been logged in', function (next) {
+        var driver = this.driver;
+        var tries = 0;
 
-      var driver = this.driver;
-      driver.waitForExist('//*[*=\'' + text + '\']', timeout)
-        .isVisible('//*[*=\'' + text + '\']')
-        .then(function(visible) {
-          if (!(visible instanceof Array)) {
-            visible = [visible];
+        (function attempt() {
+          if (tries > 15) {
+            return next(new Error('No formioToken found.'));
           }
 
-          assert.equal(_.any(visible), true);
-          next();
-        })
-        .catch(next);
-    })
-    .then('I see an input $element with the value $value', function(element, value, next) {
-      value = replacements(value);
+          driver.pause(50)
+            .localStorage('GET', 'formioToken', function (err, res) {
+              if (err) {
+                return next(err);
+              }
+              if (res.value) {
+                return next();
+              }
 
-      var driver = this.driver;
-      driver.waitForExist(element, timeout)
-        .isVisible(element)
-        .then(function(visible) {
-          if (!(visible instanceof Array)) {
-            visible = [visible];
+              tries += 1;
+              attempt();
+            })
+            .catch(next);
+        })();
+      })
+      .then('I have been logged out', function (next) {
+        var driver = this.driver;
+        var _old = {};
+        var tries = 0;
+
+        (function attempt() {
+          if (tries > 15) {
+            return next(new Error('User still logged in: ' + JSON.stringify(_old)));
           }
 
-          assert(_.any(visible));
-        })
-        .getValue(element)
-        .then(function(found) {
-          assert.equal(found, value);
-          next();
-        })
-        .catch(next);
-    })
-    .then('I see $element with the text $text', function(element, text, next) {
-      text = replacements(text);
+          driver.pause(50)
+            .localStorage('GET', 'formioToken', function (err, res) {
+              if (err) {
+                return next(err);
+              }
+              if (!res.value) {
+                return next();
+              }
 
-      var driver = this.driver;
-      driver.waitForExist(element, timeout)
-        .isVisible(element)
-        .then(function(visible) {
-          if (!(visible instanceof Array)) {
-            visible = [visible];
-          }
+              _old = res.value;
+              tries += 1;
+              attempt();
+            })
+            .catch(next);
+        })();
+      })
+      .then('I see a notification with (?:the text )?$TEXT', function (text, next) {
+        text = replacements(text);
 
-          assert(_.any(visible));
-        })
-        .getText(element)
-        .then(function(found) {
-          try {
-            assert.equal(found, text);
-            return next();
-          }
-          catch(e) {}
+        var driver = this.driver;
+        driver.waitForExist('//div[@class=\'toast-message\']', timeout)
+          .getText('//div[@class=\'toast-message\']')
+          .then(function (alert) {
+            assert.equal(text, alert);
+            next();
+          })
+          .catch(next);
+      })
+      .then('A help block shows with the text $text', function (text, next) {
+        text = replacements(text);
 
-          assert(_.startsWith(found, text) || _.endsWith(found, text));
+        var driver = this.driver;
+        driver.waitForVisible('//*[contains(@class, \'help-block\') and contains(., \'' + text + '\')]', timeout)
+          .getText('//*[contains(@class, \'help-block\') and contains(., \'' + text + '\')]')
+          .then(function (alert) {
+            assert.equal(text, alert);
+            next();
+          })
+          .catch(next);
+      })
+      .then('I see the plaintext $text', function (text, next) {
+        text = replacements(text);
 
-          next();
-        })
-        .catch(next);
-    })
-    .then('the $BUTTON button is disabled', function(button, next) {
-      var driver = this.driver;
-      driver.waitForExist('//button[text()=\'' + button + '\']', timeout)
-        .isEnabled('//button[text()=\'' + button + '\']')
-        .then(function(enabled) {
-          assert(!enabled);
-          next();
-        })
-        .catch(next);
-    })
-    .then('the user account for $user was updated with $new for $old', function(user, newValue, oldKey, next) {
-      if (!user || !newValue || !oldKey) {
-        return next('Wrong values given for: user|newValue|oldKey');
-      }
+        var driver = this.driver;
+        driver.waitForExist('//*[contains(text(),\'' + text + '\')]', timeout)
+          .isVisible('//*[contains(text(),\'' + text + '\')]')
+          .then(function (visible) {
+            assert.equal(visible, true);
+            next();
+          })
+          .catch(next);
+      })
+      .then('I see $TEXT', function (text, next) {
+        text = replacements(text);
 
-      // Attempt to translate the given new value.
-      user = user.toString();
-      // If testing for a new random value
-      if (newValue === '${random}') {
-        // Confirm the current key has an old value.
-        assert.equal(_.has(state, user + '.' + oldKey + '_old'), true);
-        // Confirm the current keys old value is different from the current value.
-        assert.notEqual(_.get(state, user + '.' + oldKey + '_old'), _.get(state, user + '.' + oldKey));
-        return next();
-      }
-      else {
-        newValue = replacements(newValue);
-      }
+        var driver = this.driver;
+        driver.waitForExist('//*[*=\'' + text + '\']', timeout)
+          .isVisible('//*[*=\'' + text + '\']')
+          .then(function (visible) {
+            if (!(visible instanceof Array)) {
+              visible = [visible];
+            }
 
-      // Update the value and continue.
-      update(user, oldKey, newValue);
-      next();
-    })
-    .then('the user profile for $user was changed', function(user, next) {
-      var _fullName = user.toString() + '.fullName';
-      var _name = user.toString() + '.name';
-      var _email = user.toString() + '.email';
-      var _password = user.toString() + '.password';
-      var fullName = replacements('${' + _fullName + '}');
-      var name = replacements('${' + _name + '}');
-      var email = replacements('${' + _email + '}');
-      var password = replacements('${' + _password + '}');
+            assert.equal(_.any(visible), true);
+            next();
+          })
+          .catch(next);
+      })
+      .then('I see an input $element with the value $value', function (element, value, next) {
+        value = replacements(value);
 
-      var driver = this.driver;
-      authUser(driver, 'formio', 'user/login', email, password, function(err, res) {
-        if (err) {
-          return next(err);
+        var driver = this.driver;
+        driver.waitForExist(element, timeout)
+          .isVisible(element)
+          .then(function (visible) {
+            if (!(visible instanceof Array)) {
+              visible = [visible];
+            }
+
+            assert(_.any(visible));
+          })
+          .getValue(element)
+          .then(function (found) {
+            assert.equal(found, value);
+            next();
+          })
+          .catch(next);
+      })
+      .then('I see $element with the text $text', function (element, text, next) {
+        text = replacements(text);
+
+        var driver = this.driver;
+        driver.waitForExist(element, timeout)
+          .isVisible(element)
+          .then(function (visible) {
+            if (!(visible instanceof Array)) {
+              visible = [visible];
+            }
+
+            assert(_.any(visible));
+          })
+          .getText(element)
+          .then(function (found) {
+            try {
+              assert.equal(found, text);
+              return next();
+            }
+            catch (e) {
+            }
+
+            assert(_.startsWith(found, text) || _.endsWith(found, text));
+
+            next();
+          })
+          .catch(next);
+      })
+      .then('the $BUTTON button is disabled', function (button, next) {
+        var driver = this.driver;
+        driver.waitForExist('//button[text()=\'' + button + '\']', timeout)
+          .isEnabled('//button[text()=\'' + button + '\']')
+          .then(function (enabled) {
+            assert(!enabled);
+            next();
+          })
+          .catch(next);
+      })
+      .then('the user account for $user was updated with $new for $old', function (user, newValue, oldKey, next) {
+        if (!user || !newValue || !oldKey) {
+          return next('Wrong values given for: user|newValue|oldKey');
         }
-        if (!res) {
-          return next(new Error('Authentication Failed.'));
-        }
 
-        assert.equal(_.get(res, 'data.fullName'), fullName);
-        assert.equal(_.get(res, 'data.name'), name);
-        assert.equal(_.get(res, 'data.email'), email);
-
-        // Compare old values if present.
-        [
-          {current: fullName, label: _fullName},
-          {current: name, label: _name},
-          {current: email, label: _email},
-          {current: password, label: _password}
-        ].forEach(function(element) {
-          if (_.has(state, element.label + '_old')) {
-            assert.notEqual(element.current, _.get(state, element.label + '_old'));
-          }
-        });
-
-        next(null, res);
-      });
-    })
-    .then('I see the $element modal', function(element, next) {
-      var driver = this.driver;
-      driver.waitForVisible(element, timeout)
-        .then(function() {
+        // Attempt to translate the given new value.
+        user = user.toString();
+        // If testing for a new random value
+        if (newValue === '${random}') {
+          // Confirm the current key has an old value.
+          assert.equal(_.has(state, user + '.' + oldKey + '_old'), true);
+          // Confirm the current keys old value is different from the current value.
+          assert.notEqual(_.get(state, user + '.' + oldKey + '_old'), _.get(state, user + '.' + oldKey));
           return next();
+        }
+        else {
+          newValue = replacements(newValue);
+        }
+
+        // Update the value and continue.
+        update(user, oldKey, newValue);
+        next();
+      })
+      .then('the user profile for $user was changed', function (user, next) {
+        var _fullName = user.toString() + '.fullName';
+        var _name = user.toString() + '.name';
+        var _email = user.toString() + '.email';
+        var _password = user.toString() + '.password';
+        var fullName = replacements('${' + _fullName + '}');
+        var name = replacements('${' + _name + '}');
+        var email = replacements('${' + _email + '}');
+        var password = replacements('${' + _password + '}');
+
+        var driver = this.driver;
+        authUser(driver, 'formio', 'user/login', email, password, function (err, res) {
+          if (err) {
+            return next(err);
+          }
+          if (!res) {
+            return next(new Error('Authentication Failed.'));
+          }
+
+          assert.equal(_.get(res, 'data.fullName'), fullName);
+          assert.equal(_.get(res, 'data.name'), name);
+          assert.equal(_.get(res, 'data.email'), email);
+
+          // Compare old values if present.
+          [
+            {current: fullName, label: _fullName},
+            {current: name, label: _name},
+            {current: email, label: _email},
+            {current: password, label: _password}
+          ].forEach(function (element) {
+            if (_.has(state, element.label + '_old')) {
+              assert.notEqual(element.current, _.get(state, element.label + '_old'));
+            }
+          });
+
+          next(null, res);
+        });
+      })
+      .then('I see the $element modal', function (element, next) {
+        var driver = this.driver;
+        driver.waitForVisible(element, timeout)
+          .then(function () {
+            return next();
+          })
+          .catch(next);
+      }).then('I am on the $page page of $text project', function (page, text, next) {
+        var driver = this.driver;
+        driver.url()
+          .then(function (res) {
+            var path = res.value.split("/");
+            var x = (path[path.length - 1] + '*') == "*" ? path[path.length - 2] : path[path.length - 1];
+            assert.equal(x, page);
+            next();
+          }).waitForVisible('//*[contains(@class, "project-title")]//a[contains(text(),\'' + text + '\')]', timeout)
+          .isVisible('//*[contains(@class, "project-title")]//a[contains(text(),\'' + text + '\')]')
+          .then(function (alert) {
+            assert.equal(alert, true);
+            next();
+          })
+          .catch(next);
+      })//surendra
+
+      .then('I see $project project on the portal page', function (text, next) {
+        text = replacements(text);
+
+        var driver = this.driver;
+        driver.waitForExist('//a[text()=\'' + text + '\']', timeout)
+          .isVisible('//a[text()=\'' + text + '\']')
+          .then(function (visible) {
+            assert.equal(visible, true);
+            next();
+          })
+          .catch(next);
+      })//surendra
+      .then('Default project is selected by default', function (next) {
+        var driver = this.driver;
+        driver.waitForExist('//*[contains(@class,"thumbnail template-card template-card-selected")]', timeout)
+          .isVisible('//*[contains(@class, "thumbnail template-card template-card-selected")]//h4[contains(text(), \'Default\')]')
+          .then(function (res) {
+            assert.equal(res, true);
+            next();
+          })
+          .catch(next);
+      })//surendra
+      .then('I am on new window with url $link', function (link, next) {
+        var driver = this.driver;
+        driver.windowHandles()
+          .then(function (result) {
+            driver.window(result.value[result.value.length - 1])
+              .url()
+              .then(function (res) {
+                assert.equal(res.value, link);
+                next();
+              })
+              .window(result.value[0])
+          })
+          .catch(next);
+      })//surendra
+      .then('The Template list is expanded', function (next) {
+        var driver = this.driver;
+        driver.waitForExist('//*[contains(@class,"thumbnail template-cards")]', timeout)
+          .isVisible('//*[contains(@class, "thumbnail template-card")]//h4[contains(text(), \'Prize Drawing\')]')
+          .then(function (res) {
+            assert.equal(res, true);
+            next();
+          })
+          .catch(next);
+      })//surendra
+      .then('The Default tile has green border', function (next) {
+        var driver = this.driver;
+        driver.waitForExist('//*[contains(@class, "template-card") and contains(., "Default")]', timeout)
+          .isVisible('//*[contains(@class, "template-card") and contains(., "Default")]')
+          .elementIdCssProperty('//*[contains(@class, "template-card") and contains(., "Default")]', 'background-color')
+          .then(function (result) {
+            console.log("***********" + result);
+            next();
+          })
+          .catch(next);
+      })//surendra
+      .then('I see $name is already expanded', function (name, next) {
+        var driver = this.driver;
+        driver.waitForExist('//*[contains(text(),"' + name + '")]//..//..//*[contains(@class,"contents ng-scope")]', timeout)
+          .isVisible('//*[contains(text(),"' + name + '")]//..//..//*[contains(@class,"contents ng-scope")]')
+          .then(function (result) {
+            assert.equal(result, true);
+            next();
+          })
+          .catch(next);
+      })//surendra
+      .then('I am taken to submission $name page', function (name, next) {
+        var driver = this.driver;
+        driver.waitForExist('//li[contains(@class,"active")]//a[contains(text(),"' + name + '")]', timeout)
+          .isVisible('//li[contains(@class,"active")]//a[contains(text(),"' + name + '")]')
+          .then(function (res) {
+            assert.equal(res, true);
+            next();
+          })
+          .catch(next);
+      })//surendra
+
+      .then('I can see $formname in the $section Section', function (formname, section, next) {
+        var driver = this.driver;
+        var path = '//div//h2[contains(text(),\'' + section + '\')]//..//div[contains(@class,\'form-list\')]//a//h4[contains(text(),\'' + formname + '\')]';
+        driver.waitForExist(path, timeout)
+          .isVisible(path)
+          .then(function (res) {
+            assert.equal(res, true);
+            next();
+          })
+          .catch(next);
+      })
+      .then('The step $step has been checked', function (step, next) {
+        var driver = this.driver;
+        driver.waitForExist('//*[contains(@title,\'' + step + '\')]//*[contains(@class,\'fa pull-right project-icon fa-check-circle-o\')]', timeout)
+          .isVisible('//*[contains(@title,\'' + step + '\')]//*[contains(@class,\'fa pull-right project-icon fa-check-circle-o\')]')
+          .then(function (res) {
+            assert.equal(res, true);
+            next();
+          })
+          .catch(next);
+      })//surendra
+
+      .then('I am on $section section of $page page', function (section, page, next) {
+        var driver = this.driver;
+        driver.waitForExist('//li[contains(@class, \'active\') and contains(text(),\'\')]', timeout)
+          .getText('//li[contains(@class, \'active\') and contains(text(),\'\')]')
+          .then(function (res) {
+              var d = page + "*" + section;
+              var x = res[0] + "*" + res[1];
+              assert.equal(x, d);
+              next();
+            }
+          )
+          .catch(next);
+      })//surendra
+      .then('The default display view for the Submission Grid is set to $value', function (value, next) {
+        var driver = this.driver;
+        driver.waitForExist('//*[@selected]', timeout)
+          .getText('//*[@selected]')
+          .then(function (res) {
+            assert.equal(res, value);
+            next();
+          })
+          .catch(next);
+      })//surendra
+      .then('I see the current year/month/date next to grid view selector field', function (next) {
+        var driver = this.driver;
+        var d = new Date();
+        var x = d.getFullYear() + " / " + (d.getMonth() + 1) + " / " + d.getDate();
+        driver.waitForExist('//h4[contains(text(),\'UTC\')]', timeout)
+          .getText('//h4[contains(text(),\'UTC\')]')
+          .then(function (res) {
+            var temp = false;
+            if (res.includes(x)) {
+              temp = true;
+            }
+            assert.equal(temp, true);
+            next();
+          })
+          .catch(next);
+      })//surendra
+      .then('I see the amount of days on the X Axis of grid matching the number of days in the current month', function (next) {
+        var driver = this.driver;
+        var d = new Date();
+        var daycount = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+        driver.waitForExist('//*[@class=\'ct-point\']', timeout)
+          .elements('.ct-point')
+          .then(function(ele){
+            assert.equal(JSON.parse(JSON.stringify(ele)).value.length,daycount);
+            next();
+          })
+          .catch(next);
+      })//surendra
+
+    .then('I see the ‘Grid View’ switch to $value values in the X axis', function (value,next) {
+      var driver = this.driver;
+      driver.waitForExist('//*[@class=\'ct-point\']', timeout)
+        .elements('.ct-point')
+        .then(function(ele){
+          assert.equal(JSON.parse(JSON.stringify(ele)).value.length,value);
+          next();
         })
         .catch(next);
-    });
-
+    })//surendra
+    .then('I see list of options $options on selection list',function(options,next){
+         var driver = this.driver;
+         driver.waitForExist('//select//option')
+           .getText('//select//option')
+           .then(function(ele){
+             var dat = "";
+             for(var i=0; i<ele.length;i++){
+               dat += ele[i];
+               if(i!=ele.length-1){
+                 dat += ", ";
+               }
+             }
+             assert.equal(dat,options)
+             next();
+           })
+           .catch(next);
+    })//surendra
+      .then('I see project progress is at $title', function (title, next) {
+        title = replacements(title);
+        var driver = this.driver;
+        driver.waitForExist('.overlay')
+          .getText('.overlay')
+          .then(function (found) {
+            assert.equal(found, title);
+            next();
+          })
+          .catch(next);
+      })//padma
+     
+    ;
   return library;
 };
