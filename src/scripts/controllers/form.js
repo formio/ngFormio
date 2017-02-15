@@ -506,7 +506,7 @@ app.controller('FormController', [
         getHeaders: true
       })
       .then(function(response) {
-        $scope.form = response.result;
+        $scope.form = $scope.originalForm = response.result;
         var headers = response.headers;
         var method = $stateParams.formId ? 'updated' : 'created';
         GoogleAnalytics.sendEvent('Form', method.substring(0, method.length - 1), null, 1);
@@ -526,7 +526,7 @@ app.controller('FormController', [
 
         // Reload page when a form is created or merged.
         if (method === 'created' || headers.hasOwnProperty('x-form-merge')) {
-          $state.go('project.' + $scope.formInfo.type + '.form.edit', {formId: $scope.form._id}, {reload: true});
+          $state.go('project.' + $scope.formInfo.type + '.form.edit', {formId: $scope.form._id}, {reload: true, notify: false});
         }
       })
       .catch(function(err) {
@@ -578,18 +578,31 @@ app.controller('FormEditController', [
   '$q',
   'ngDialog',
   '$state',
-  '$timeout',
   function(
     $scope,
     $q,
     ngDialog,
-    $state,
-    $timeout
+    $state
   ) {
     // Clone original form after it has loaded, or immediately
     // if we're not loading a form
     ($scope.loadFormPromise || $q.when()).then(function() {
       $scope.originalForm = _.cloneDeep($scope.form);
+    });
+
+    // Track any modifications for save/cancel prompt on navigation away from the builder.
+    var dirty = false;
+    $scope.$on('formBuilder:add', function() {
+      dirty = true;
+    });
+    $scope.$on('formBuilder:update', function() {
+      dirty = true;
+    });
+    $scope.$on('formBuilder:remove', function() {
+      dirty = true;
+    });
+    $scope.$on('formBuilder:edit', function() {
+      dirty = true;
     });
 
     /**
@@ -616,11 +629,11 @@ app.controller('FormEditController', [
       });
 
       return dialog.closePromise.then(function(data) {
-        if (data.value === 'save') {
-          throw 'save';
+        if (data.value === 'close') {
+          return data;
         }
 
-        return data;
+        throw data.value;
       });
     };
 
@@ -630,14 +643,9 @@ app.controller('FormEditController', [
     };
 
     // Listen for events to navigate away from the form builder.
-    $scope.$on('$stateChangeStart', function(event, transition, params, a, b, c, d) {
-      if (params && params.stateChangeStart === true) {
-        return;
-      }
-
+    $scope.$on('$stateChangeStart', function(event, transition) {
       // If the form hasnt been modified, skip this cancel modal logic.
-      var eq = _.matches($scope.form);
-      if (eq($scope.originalForm)) {
+      if (!dirty) {
         return;
       }
 
@@ -647,21 +655,24 @@ app.controller('FormEditController', [
       // Try to cancel the view.
       $scope.showCancelDialogue()
       .then(function() {
-        $timeout(function() {
-          // Cancel without save was clicked, revert the form and get out.
-          $scope.form = angular.copy($scope.originalForm);
-          $state.go(transition.name, {notify: false});
-        });
+        // Cancel without save was clicked, revert the form and get out.
+        $scope.form = $scope.$parent.form = angular.copy($scope.originalForm);
+        dirty = false;
+        $state.go(transition.name, {notify: false});
       })
       .catch(function(val) {
         // If a value was given, the modal was closed with the x or escape. Take no action and stay on the current page.
-        if (val && val !== 'save') {
+        if (!val || (val && val !== 'save')) {
           console.error(val);
           return;
         }
 
         // If there was no return the cancel action was rejected, save the form before navigation.
         return $scope.saveForm()
+        .then(function(result) {
+          dirty = false;
+          return result;
+        })
         .catch(function(err) {
           console.error(err);
         });
