@@ -35,31 +35,28 @@ module.exports = function(app) {
   });
 
   // A directive to have ui-select open on focus
-  app.directive('uiSelectOpenOnFocus', ['$timeout', function($timeout) {
+  app.directive('uiSelectOpenOnFocus', [function() {
     return {
       require: 'uiSelect',
       restrict: 'A',
       link: function($scope, el, attrs, uiSelect) {
         if ($scope.builder) return;
-        var autoopen = true;
+        var focuscount = -1;
 
         angular.element(uiSelect.focusser).on('focus', function() {
-          if (autoopen) {
+          if (focuscount-- < 0) {
             uiSelect.activate();
           }
         });
 
         // Disable the auto open when this select element has been activated.
         $scope.$on('uis:activate', function() {
-          autoopen = false;
+          focuscount = 1;
         });
 
         // Re-enable the auto open after the select element has been closed
         $scope.$on('uis:close', function() {
-          autoopen = false;
-          $timeout(function() {
-            autoopen = true;
-          }, 250);
+          focuscount = 1;
         });
       }
     };

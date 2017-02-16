@@ -25,9 +25,8 @@
       ng-model="date.month"
       ng-change="onChange()"
       ng-disabled="readOnly"
-    >
-      <option ng-repeat="month in months" value="{{$index}}">{{ month }}</option>
-    </select>
+      ng-options="month.value as month.label for month in months"
+    ></select>
   </div>
   <div class="form-group col-xs-3" ng-if="!component.dayFirst && !component.fields.day.hide">
     <label for="{{componentId}}-day" ng-class="{'field-required': component.fields.day.required}">{{ "Day" | formioTranslate:null:builder }}</label>
@@ -56,7 +55,6 @@
       ng-change="onChange()"
       style="padding-right: 10px;"
       placeholder="{{component.fields.year.placeholder}}"
-      day-part
       characters="4"
       min="0"
       max="2100"

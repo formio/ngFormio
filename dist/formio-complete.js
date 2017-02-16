@@ -63854,8 +63854,11 @@ module.exports = function(app) {
             if (!$scope.data) {
               return;
             }
+            var valueSet = !!$scope.data[$scope.component.key];
             $scope.data[$scope.component.key] = dateValue();
-            loadComplete();
+            if (valueSet) {
+              loadComplete();
+            }
           });
 
           // If they have 12 hour time enabled, we need to ensure that we see the meridian in the format.
@@ -63991,12 +63994,25 @@ module.exports = function(app) {
       templateUrl: 'formio/components/day-input.html',
       controller: ['$scope', function($scope) {
         if ($scope.builder) return;
-        $scope.months = [$scope.component.fields.month.placeholder, 'January', 'February', 'March', 'April', 'May', 'June',
-          'July', 'August', 'September', 'October', 'November', 'December'];
+        $scope.months = [
+          {value: 0, label: $scope.component.fields.month.placeholder},
+          {value: 1, label: 'January'},
+          {value: 2, label: 'February'},
+          {value: 3, label: 'March'},
+          {value: 4, label: 'April'},
+          {value: 5, label: 'May'},
+          {value: 6, label: 'June'},
+          {value: 7, label: 'July'},
+          {value: 8, label: 'August'},
+          {value: 9, label: 'September'},
+          {value: 10, label: 'October'},
+          {value: 11, label: 'November'},
+          {value: 12, label: 'December'}
+        ];
 
         $scope.date = {
           day: '',
-          month: '',
+          month: 0,
           year: ''
         };
       }],
@@ -64011,18 +64027,30 @@ module.exports = function(app) {
               : ngModel.$viewValue;
             if ((parts instanceof Array) && parts.length === 3) {
               scope.date.day = parts[(scope.component.dayFirst ? 0 : 1)];
-              scope.date.month = parseInt(parts[(scope.component.dayFirst ? 1 : 0)]).toString();
+              scope.date.month = parseInt(parts[(scope.component.dayFirst ? 1 : 0)], 10);
               scope.date.year = parts[2];
             }
           }
         });
 
         var padLeft = function padLeft(nr, n, str) {
-          return Array(n - String(nr.toString()).length + 1).join(str || '0') + nr.toString();
+          nr = nr.toString();
+          if (nr.length > n) {
+            return nr.substr(0, n);
+          }
+
+          return Array((n - nr.length) + 1).join(str || '0') + nr;
         };
 
         scope.onChange = function() {
-          ngModel.$setViewValue(padLeft(scope.date.day, 2) + '/' + padLeft(scope.date.month, 2) + '/' + padLeft(scope.date.year, 4));
+          var day = padLeft(scope.date.day, 2);
+          var month = padLeft(scope.date.month, 2);
+          var year = padLeft(scope.date.year, 4);
+          var value = scope.component.dayFirst ? day : month;
+          value += '/';
+          value += scope.component.dayFirst ? month : day;
+          value += '/' + year;
+          ngModel.$setViewValue(value);
         };
 
         ngModel.$validators.day = function(modelValue, viewValue) {
@@ -64104,7 +64132,7 @@ module.exports = function(app) {
         "<div class=\"day-input\">\n  <day-input\n    name=\"{{componentId}}\"\n    component-id=\"componentId\"\n    read-only=\"isDisabled(component, data)\"\n    component=\"component\"\n    ng-required=\"isRequired(component)\"\n    custom-validator=\"component.validate.custom\"\n    ng-model=\"data[component.key]\"\n    tabindex=\"{{ component.tabindex || 0 }}\"\n    builder=\"builder\"\n  ></day-input>\n</div>\n"
       ));
       $templateCache.put('formio/components/day-input.html',
-        "<div class=\"daySelect form row\">\n  <div class=\"form-group col-xs-3\" ng-if=\"component.dayFirst && !component.fields.day.hide\">\n    <label for=\"{{componentId}}-day\" ng-class=\"{'field-required': component.fields.day.required}\">{{ \"Day\" | formioTranslate:null:builder }}</label>\n    <input\n      class=\"form-control\"\n      type=\"text\"\n      id=\"{{componentId}}-day\"\n      ng-model=\"date.day\"\n      ng-change=\"onChange()\"\n      style=\"padding-right: 10px;\"\n      placeholder=\"{{component.fields.day.placeholder}}\"\n      day-part\n      characters=\"2\"\n      min=\"0\"\n      max=\"31\"\n      ng-disabled=\"readOnly\"\n    />\n  </div>\n  <div class=\"form-group col-xs-4\" ng-if=\"!component.fields.month.hide\">\n    <label for=\"{{componentId}}-month\" ng-class=\"{'field-required': component.fields.month.required}\">{{ \"Month\" | formioTranslate:null:builder }}</label>\n    <select\n      class=\"form-control\"\n      type=\"text\"\n      id=\"{{componentId}}-month\"\n      ng-model=\"date.month\"\n      ng-change=\"onChange()\"\n      ng-disabled=\"readOnly\"\n    >\n      <option ng-repeat=\"month in months\" value=\"{{$index}}\">{{ month }}</option>\n    </select>\n  </div>\n  <div class=\"form-group col-xs-3\" ng-if=\"!component.dayFirst && !component.fields.day.hide\">\n    <label for=\"{{componentId}}-day\" ng-class=\"{'field-required': component.fields.day.required}\">{{ \"Day\" | formioTranslate:null:builder }}</label>\n    <input\n      class=\"form-control\"\n      type=\"text\"\n      id=\"{{componentId}}-day1\"\n      ng-model=\"date.day\"\n      ng-change=\"onChange()\"\n      style=\"padding-right: 10px;\"\n      placeholder=\"{{component.fields.day.placeholder}}\"\n      day-part\n      characters=\"2\"\n      min=\"0\"\n      max=\"31\"\n      ng-disabled=\"readOnly\"\n    />\n  </div>\n  <div class=\"form-group col-xs-5\" ng-if=\"!component.fields.year.hide\">\n    <label for=\"{{componentId}}-year\" ng-class=\"{'field-required': component.fields.year.required}\">{{ \"Year\" | formioTranslate:null:builder }}</label>\n    <input\n      class=\"form-control\"\n      type=\"text\"\n      id=\"{{componentId}}-year\"\n      ng-model=\"date.year\"\n      ng-change=\"onChange()\"\n      style=\"padding-right: 10px;\"\n      placeholder=\"{{component.fields.year.placeholder}}\"\n      day-part\n      characters=\"4\"\n      min=\"0\"\n      max=\"2100\"\n      ng-disabled=\"readOnly\"\n    />\n  </div>\n</div>\n"
+        "<div class=\"daySelect form row\">\n  <div class=\"form-group col-xs-3\" ng-if=\"component.dayFirst && !component.fields.day.hide\">\n    <label for=\"{{componentId}}-day\" ng-class=\"{'field-required': component.fields.day.required}\">{{ \"Day\" | formioTranslate:null:builder }}</label>\n    <input\n      class=\"form-control\"\n      type=\"text\"\n      id=\"{{componentId}}-day\"\n      ng-model=\"date.day\"\n      ng-change=\"onChange()\"\n      style=\"padding-right: 10px;\"\n      placeholder=\"{{component.fields.day.placeholder}}\"\n      day-part\n      characters=\"2\"\n      min=\"0\"\n      max=\"31\"\n      ng-disabled=\"readOnly\"\n    />\n  </div>\n  <div class=\"form-group col-xs-4\" ng-if=\"!component.fields.month.hide\">\n    <label for=\"{{componentId}}-month\" ng-class=\"{'field-required': component.fields.month.required}\">{{ \"Month\" | formioTranslate:null:builder }}</label>\n    <select\n      class=\"form-control\"\n      type=\"text\"\n      id=\"{{componentId}}-month\"\n      ng-model=\"date.month\"\n      ng-change=\"onChange()\"\n      ng-disabled=\"readOnly\"\n      ng-options=\"month.value as month.label for month in months\"\n    ></select>\n  </div>\n  <div class=\"form-group col-xs-3\" ng-if=\"!component.dayFirst && !component.fields.day.hide\">\n    <label for=\"{{componentId}}-day\" ng-class=\"{'field-required': component.fields.day.required}\">{{ \"Day\" | formioTranslate:null:builder }}</label>\n    <input\n      class=\"form-control\"\n      type=\"text\"\n      id=\"{{componentId}}-day1\"\n      ng-model=\"date.day\"\n      ng-change=\"onChange()\"\n      style=\"padding-right: 10px;\"\n      placeholder=\"{{component.fields.day.placeholder}}\"\n      day-part\n      characters=\"2\"\n      min=\"0\"\n      max=\"31\"\n      ng-disabled=\"readOnly\"\n    />\n  </div>\n  <div class=\"form-group col-xs-5\" ng-if=\"!component.fields.year.hide\">\n    <label for=\"{{componentId}}-year\" ng-class=\"{'field-required': component.fields.year.required}\">{{ \"Year\" | formioTranslate:null:builder }}</label>\n    <input\n      class=\"form-control\"\n      type=\"text\"\n      id=\"{{componentId}}-year\"\n      ng-model=\"date.year\"\n      ng-change=\"onChange()\"\n      style=\"padding-right: 10px;\"\n      placeholder=\"{{component.fields.year.placeholder}}\"\n      characters=\"4\"\n      min=\"0\"\n      max=\"2100\"\n      ng-disabled=\"readOnly\"\n    />\n  </div>\n</div>\n"
       );
     }
   ]);
@@ -65005,31 +65033,28 @@ module.exports = function(app) {
   });
 
   // A directive to have ui-select open on focus
-  app.directive('uiSelectOpenOnFocus', ['$timeout', function($timeout) {
+  app.directive('uiSelectOpenOnFocus', [function() {
     return {
       require: 'uiSelect',
       restrict: 'A',
       link: function($scope, el, attrs, uiSelect) {
         if ($scope.builder) return;
-        var autoopen = true;
+        var focuscount = -1;
 
         angular.element(uiSelect.focusser).on('focus', function() {
-          if (autoopen) {
+          if (focuscount-- < 0) {
             uiSelect.activate();
           }
         });
 
         // Disable the auto open when this select element has been activated.
         $scope.$on('uis:activate', function() {
-          autoopen = false;
+          focuscount = 1;
         });
 
         // Re-enable the auto open after the select element has been closed
         $scope.$on('uis:close', function() {
-          autoopen = false;
-          $timeout(function() {
-            autoopen = true;
-          }, 250);
+          focuscount = 1;
         });
       }
     };
