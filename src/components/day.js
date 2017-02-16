@@ -52,8 +52,21 @@ module.exports = function(app) {
       templateUrl: 'formio/components/day-input.html',
       controller: ['$scope', function($scope) {
         if ($scope.builder) return;
-        $scope.months = [$scope.component.fields.month.placeholder, 'January', 'February', 'March', 'April', 'May', 'June',
-          'July', 'August', 'September', 'October', 'November', 'December'];
+        $scope.months = [
+          {value: '', label: $scope.component.fields.month.placeholder},
+          {value: '01', label: 'January'},
+          {value: '02', label: 'February'},
+          {value: '03', label: 'March'},
+          {value: '04', label: 'April'},
+          {value: '05', label: 'May'},
+          {value: '06', label: 'June'},
+          {value: '07', label: 'July'},
+          {value: '08', label: 'August'},
+          {value: '09', label: 'September'},
+          {value: '10', label: 'October'},
+          {value: '11', label: 'November'},
+          {value: '12', label: 'December'}
+        ];
 
         $scope.date = {
           day: '',
@@ -72,18 +85,30 @@ module.exports = function(app) {
               : ngModel.$viewValue;
             if ((parts instanceof Array) && parts.length === 3) {
               scope.date.day = parts[(scope.component.dayFirst ? 0 : 1)];
-              scope.date.month = parseInt(parts[(scope.component.dayFirst ? 1 : 0)]).toString();
+              scope.date.month = parts[(scope.component.dayFirst ? 1 : 0)];
               scope.date.year = parts[2];
             }
           }
         });
 
         var padLeft = function padLeft(nr, n, str) {
-          return Array(n - String(nr.toString()).length + 1).join(str || '0') + nr.toString();
+          nr = nr.toString();
+          if (nr.length > n) {
+            return nr.substr(0, n);
+          }
+
+          return Array((n - nr.length) + 1).join(str || '0') + nr;
         };
 
         scope.onChange = function() {
-          ngModel.$setViewValue(padLeft(scope.date.day, 2) + '/' + padLeft(scope.date.month, 2) + '/' + padLeft(scope.date.year, 4));
+          var day = padLeft(scope.date.day, 2);
+          var month = padLeft(scope.date.month, 2);
+          var year = padLeft(scope.date.year, 4);
+          var value = scope.component.dayFirst ? day : month;
+          value += '/';
+          value += scope.component.dayFirst ? month : day;
+          value += '/' + year;
+          ngModel.$setViewValue(value);
         };
 
         ngModel.$validators.day = function(modelValue, viewValue) {
