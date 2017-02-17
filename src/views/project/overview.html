@@ -15,13 +15,6 @@
                 <li ng-repeat="userForm in userForms track by $index">Create a new <a href="#" ui-sref="project.form.form.view({formId: userForm._id})">{{userForm.title}}</a></li>
               </ul>
             </project-step>
-            <project-step title="'Preview the demo application'" complete="steps.demoApp.complete" open="steps.demoApp.open">
-              <p class="list-group-item-text">Login and check out the default running application for your project.</p>
-              <ul>
-                <li>Go to the <a href="#" ui-sref="project.preview">Preview</a> page.</li>
-                <li>Login using one of the accounts you set up in the previous step.</li>
-              </ul>
-            </project-step>
             <project-step title="'Modify a form'" complete="steps.modifyForm.complete" open="steps.modifyForm.open">
               <p class="list-group-item-text">Change an existing form within the project, such as adding, editing or removing a field, and see it update in the preview application.</p>
               <ul>
@@ -165,7 +158,7 @@
         <div class="col-md-12">
           <legend>Submission Activity</legend>
         </div>
-        <div class="project-data" ng-controller="ChartController">
+        <div class="project-data project-summary" ng-controller="ChartController">
           <div class="col-sm-12">
             <h3 class="center">{{label[currentType]}}</h3>
             <h4>{{viewDate.year}} / {{viewDate.month}} / {{viewDate.day}}&nbsp;(UTC)&emsp;<select ng-init="graphChange()" ng-options="type for type in types" ng-model="graphType" ng-change="graphChange()"></select></h4>

@@ -1,17 +1,89 @@
 <div class="panel panel-success">
   <div class="panel-heading">
-    <h3 class="panel-title">Embed Code</h3>
+    <h3 class="panel-title">Embed URL</h3>
   </div>
   <div class="panel-body">
-    Here is the code to embed this form within your application.
-    <span><pre style="font-size:1.2em;"><code>&lt;formio src="'{{ apiProtocol }}//{{ currentProject.name }}.{{ apiServer }}/{{ form.path }}'"&gt;&lt;/formio&gt;</code></pre></span>
+    This is the url that can be used to embed this form into your application. Your form exists as a JSON object that defines how to render the form.
+    <span><pre style="font-size:1.2em;"><code>{{ apiProtocol }}//{{ currentProject.name }}.{{ apiServer }}/{{ form.path }}</code></pre></span>
+    <a href="{{ apiProtocol }}//{{ currentProject.name }}.{{ apiServer }}/{{ form.path }}" target="_blank">Preview the form definition</a>
   </div>
 </div>
 <h3>How to Embed</h3>
-<p>Try one of these two ways to embed this form within your HTML application.</p>
+<p>Use one of our renderer libraries to embed within your application. If you need a different platform, please <a href="http://formio.github.io/help.form.io/support/" target="_blank">contact support</a>.</p>
 <div class="row">
-  <div class="col-sm-6">
+  <div class="col-md-6">
+    <div class="panel panel-success">
+      <div class="panel-heading">
+        <h3 class="panel-title">Angular 1.x</h3>
+      </div>
+      <div class="panel-body">
+        <h5>Include the ngFormio module</h5>
+        <p>Be sure you have added the <a href="https://github.com/formio/ngFormio" target="_blank">ngFormio</a> library to your application and have included it in the modules list in the app declaration.</p>
+        <h5>Embed within a template</h5>
+        <p>To embed a form within your angular 1.x application, add the formio directive within a template.</p>
+        <span><pre><code>
+          angular.module('yourApp', [
+          &nbsp;&nbsp;'formio'
+          ]);
+
+          ---
+
+          &lt;formio src="'{{ apiProtocol }}//{{ currentProject.name }}.{{ apiServer }}/{{ form.path }}'" /&gt;
+        </code></pre></span>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
     <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h3 class="panel-title">React</h3>
+      </div>
+      <div class="panel-body">
+        <h5>Include the react-formio library</h5>
+        <p>Be sure you have added the <a href="https://github.com/formio/react-formio" target="_blank">react-formio</a> libary to your application.</p>
+        <h5>Render the directive</h5>
+        <p>To embed a form within your react application, import the Formio library and add it to the render tree.</p>
+        <span><pre><code>
+          import React from 'react';
+          import ReactDOM from 'react-dom';
+          import { Formio } from 'react-formio';
+
+          ReactDOM.render(
+          &nbsp;&nbsp;&lt;Formio src="{{ apiProtocol }}//{{ currentProject.name }}.{{ apiServer }}/{{ form.path }}" /&gt;, document.getElementById('example')
+          );
+
+        </code></pre></span>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="panel panel-warning">
+      <div class="panel-heading">
+        <h3 class="panel-title">Angular 2.x</h3>
+      </div>
+      <div class="panel-body">
+        <h5>Include the ng2-formio module</h5>
+        <p>Be sure you have added the <a href="https://github.com/formio/ng2-formio" target="_blank">ng2-formio</a> library to your application and have included it in the modules list in the app declaration.</p>
+        <h5>Embed within a template</h5>
+        <p>To embed a form within your angular 2.x application, add the formio directive within a template.</p>
+        <span><pre><code>
+          import { FormioModule } from 'ng2-formio';
+          @NgModule({
+          &nbsp;&nbsp;imports: [ BrowserModule, ReactiveFormsModule, FormioModule ],
+          &nbsp;&nbsp;declarations: [ AppComponent ],
+          &nbsp;&nbsp;bootstrap: [ AppComponent ]
+          })
+          export class AppModule { }
+
+          ---
+
+          &lt;formio src='{{ apiProtocol }}//{{ currentProject.name }}.{{ apiServer }}/{{ form.path }}' /&gt;
+        </code></pre></span>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="panel panel-info">
       <div class="panel-heading">
         <h3 class="panel-title">Quick Embed - iFrame</h3>
       </div>
@@ -28,37 +100,8 @@
       </div>
     </div>
   </div>
-
-  <div class="col-sm-6">
-    <div class="panel panel-info">
-      <div class="panel-heading">
-        <h3 class="panel-title">HTML Embed</h3>
-      </div>
-      <div class="panel-body">
-        <p>For HTML embedding, you can either use <strong>Bower</strong> or add the script directly.</p>
-        <ul>
-          <li>For <strong>Bower</strong> embedding
-            <p><pre><code>bower install --save ng-formio</code></pre></p>
-            <p>We recommend using a tool called <a target="_blank" href="https://github.com/taptapship/wiredep">Wiredep</a> to automatically add all the dependencies to the &lt;script&gt; section.</p>
-          </li>
-          <li>For <strong>Script Tag</strong> embedding
-            <p>Add the following along with the other scripts on your HTML page.</p>
-            <p><pre><code>&lt;script type="text/javascript" src="https://npmcdn.com/ng-formio@latest/dist/formio-complete.min.js"&gt;&lt;/script&gt;</code></pre></p>
-            <p>You will need to also include both <strong>Angular.js (1.5)</strong> and <strong>jQuery</strong> as a dependency to your application to get this working.</p>
-          </li>
-        </ul>
-        <p>Next, you will need to create an angular application and add <strong>formio</strong> as an included module. Add this below the include tag.</p>
-        <p><pre><code>&lt;script type="text/javascript"&gt;
-&nbsp;&nbsp;angular.module('formioApp', ['formio']);
-&nbsp;&nbsp;angular.bootstrap(document, ['formioApp']);
-&lt;/script&gt;
-        </code></pre></p>
-        <p>You can then add the <strong>&lt;formio&gt;</strong> tag anywhere within your HTML document, and it will render this form. Please go to <a href="https://help.form.io/api/#angular">https://help.form.io/api/#angular</a> for more information.</p>
-      </div>
-    </div>
-  </div>
 </div>
 <h3>Example Application</h3>
-<p>If you are getting started, it may be easiest to first download our starter template project found @ <a target="_blank" href="https://github.com/formio/formio-app-template">https://github.com/formio/formio-app-template</a></p>
+<p>If you are getting started, it may be easiest to first download our angular starter template project found @ <a target="_blank" href="https://github.com/formio/ng-app-starterkit">https://github.com/formio/ng-app-starterkit</a></p>
 <h3>Need more help?</h3>
 <p>We have a lot of documentation @ <a target="_blank" href="https://help.form.io">https://help.form.io</a> that is there to help you get embedding working within your application. Of course, if this still does not help, please feel free to contact our <a href="https://help.form.io/support">Support</a>.</p>

@@ -164,10 +164,10 @@ angular
           templateUrl: 'views/formio/index.html',
           controller: 'ProjectFormioController'
         })
-        .state('project.preview', {
-          url: '/preview',
-          templateUrl: 'views/project/preview.html',
-          controller: 'ProjectPreviewController'
+        .state('project.build', {
+          url: '/build',
+          templateUrl: 'views/project/build.html',
+          controller: 'ProjectBuildController'
         })
         .state('project.launch', {
           url: '',
@@ -178,6 +178,11 @@ angular
           url: '/form',
           templateUrl: 'views/project/launch/form.html',
           controller: 'LaunchController'
+        })
+        .state('project.launch.preview', {
+          url: '/preview',
+          templateUrl: 'views/project/preview.html',
+          controller: 'ProjectPreviewController'
         })
         .state('project.launch.local', {
           url: '/local',
