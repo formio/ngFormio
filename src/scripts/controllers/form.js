@@ -426,6 +426,9 @@ app.controller('FormController', [
     if ($scope.formId) {
       $scope.loadFormPromise = $scope.formio.loadForm()
         .then(function(form) {
+          // FOR-362 - Fix pass by reference issue with the internal cache.
+          form = _.cloneDeep(form);
+
           // Ensure the display is form.
           if (!form.display) {
             form.display = 'form';
