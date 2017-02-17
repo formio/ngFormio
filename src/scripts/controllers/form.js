@@ -289,7 +289,7 @@ app.controller('FormController', [
         if (!$scope.form.settings) {
           $scope.form.settings = {};
         }
-        $scope.form.settings.pdf = AppConfig.pdfHost + filePath.replace(/\.pdf$/, '') + '.html';
+        $scope.form.settings.pdf = AppConfig.pdfServer + filePath.replace(/\.pdf$/, '') + '.html';
         ngDialog.close();
       }, function (resp) {
         console.warn(resp.status);
