@@ -6,7 +6,7 @@ module.exports = function(app) {
       formioComponentsProvider.register('textarea', {
         title: 'Text Area',
         template: function($scope) {
-          if ($scope.component.wysiwyg) {
+          if (!$scope.readOnly && $scope.component.wysiwyg) {
             var defaults = {
               toolbarGroups:  [
                 {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
@@ -34,7 +34,6 @@ module.exports = function(app) {
             else {
               $scope.component.wysiwyg = angular.extend(defaults, $scope.component.wysiwyg);
             }
-            $scope.wysiwyg = $scope.component.wysiwyg;
             return 'formio/components/texteditor.html';
           }
           return 'formio/components/textarea.html';
