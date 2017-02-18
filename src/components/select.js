@@ -187,7 +187,7 @@ module.exports = function(app) {
               return $q.resolve([]);
             };
             $scope.$on('refreshList', function(event, url, input) {
-                $scope.refreshItems(input, url);
+              $scope.refreshItems(input, url);
             });
 
             // Add a watch if they wish to refresh on selection of another field.
