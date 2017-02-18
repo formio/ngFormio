@@ -1,4 +1,4 @@
-/*! ng-formio v2.9.10 | https://unpkg.com/ng-formio@2.9.10/LICENSE.txt */
+/*! ng-formio v2.10.0 | https://unpkg.com/ng-formio@2.10.0/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 /*!
  * EventEmitter2
@@ -6632,6 +6632,7 @@ module.exports = function(app) {
 },{}],19:[function(_dereq_,module,exports){
 "use strict";
 
+
 module.exports = function(app) {
   app.config([
     'formioComponentsProvider',
@@ -6642,6 +6643,41 @@ module.exports = function(app) {
         viewTemplate: 'formio/componentsView/container.html',
         group: 'advanced',
         icon: 'fa fa-folder-open',
+        tableView: function(data, component, $interpolate, componentInfo) {
+          var view = '<table class="table table-striped table-bordered"><thead><tr>';
+          angular.forEach(component.components, function(component) {
+            view += '<th>' + component.label + '</th>';
+          });
+          view += '</tr></thead>';
+          view += '<tbody>';
+          view += '<tr>';
+          angular.forEach(component.components, function(component) {
+            var info = componentInfo.components.hasOwnProperty(component.type) ? componentInfo.components[component.type] : {};
+            if (info.tableView) {
+              view += '<td>' +
+                info.tableView(
+                  data && component.key && data.hasOwnProperty(component.key) ? data[component.key] : '',
+                  component,
+                  $interpolate,
+                  componentInfo
+                ) + '</td>';
+              return;
+            }
+
+            view += '<td>';
+            if (component.prefix) {
+              view += component.prefix;
+            }
+            view += data && component.key && data.hasOwnProperty(component.key) ? data[component.key] : '';
+            if (component.suffix) {
+              view += ' ' + component.suffix;
+            }
+            view += '</td>';
+          });
+          view += '</tr>';
+          view += '</tbody></table>';
+          return view;
+        },
         settings: {
           input: true,
           tree: true,
@@ -6816,6 +6852,8 @@ module.exports = function(app) {
 },{}],22:[function(_dereq_,module,exports){
 "use strict";
 
+var GridUtils = _dereq_('../factories/GridUtils')();
+
 module.exports = function(app) {
   app.config([
     'formioComponentsProvider',
@@ -6824,7 +6862,8 @@ module.exports = function(app) {
         title: 'Custom',
         template: 'formio/components/custom.html',
         group: 'advanced',
-        settings: {}
+        settings: {},
+        tableView: GridUtils.generic
       });
     }
   ]);
@@ -6838,7 +6877,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],23:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":60}],23:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -6915,6 +6954,17 @@ module.exports = function(app) {
 
       // Pull out the rows and cols for easy iteration.
       $scope.rows = $scope.data[$scope.component.key];
+      // If less than minLength, add that many rows.
+      if ($scope.component.validate && $scope.component.validate.hasOwnProperty('minLength') && $scope.rows.length < $scope.component.validate.minLength) {
+        var toAdd = $scope.component.validate.minLength - $scope.rows.length;
+        for (var i = 0; i < toAdd; i++) {
+          $scope.rows.push({});
+        }
+      }
+      // If more than maxLength, remove extra rows.
+      if ($scope.component.validate && $scope.component.validate.hasOwnProperty('maxLength') && $scope.rows.length < $scope.component.validate.maxLength) {
+        $scope.rows = $scope.rows.slice(0, $scope.component.validate.maxLength);
+      }
       $scope.cols = $scope.component.components;
       $scope.localKeys = $scope.component.components.map(function(component) {
         return component.key;
@@ -6939,7 +6989,7 @@ module.exports = function(app) {
     'FormioUtils',
     function($templateCache, FormioUtils) {
       $templateCache.put('formio/components/datagrid.html', FormioUtils.fieldWrap(
-        "<div class=\"formio-data-grid\" ng-controller=\"formioDataGrid\">\n  <table ng-class=\"{'table-striped': component.striped, 'table-bordered': component.bordered, 'table-hover': component.hover, 'table-condensed': component.condensed}\" class=\"table datagrid-table\">\n    <tr>\n      <th\n        ng-repeat=\"col in cols track by $index\"\n        ng-class=\"{'field-required': col.validate.required}\"\n        ng-if=\"builder ? '::true' : anyVisible(col)\"\n      >{{ col.label | formioTranslate:null:builder }}</th>\n    </tr>\n    <tr ng-repeat=\"row in rows track by $index\" ng-init=\"rowIndex = $index\">\n      <td ng-repeat=\"col in cols track by $index\" ng-init=\"col.hideLabel = true; colIndex = $index\" class=\"formio-data-grid-row\" ng-if=\"builder ? '::true' : anyVisible(col)\">\n        <formio-component\n          component=\"col\"\n          data=\"rows[rowIndex]\"\n          formio-form=\"formioForm\"\n          formio=\"formio\"\n          submission=\"submission\"\n          hide-components=\"hideComponents\"\n          ng-if=\"builder ? '::true' : isVisible(col, row)\"\n          read-only=\"isDisabled(col, row)\"\n          grid-row=\"rowIndex\"\n          grid-col=\"colIndex\"\n          builder=\"builder\"\n        ></formio-component>\n      </td>\n      <td>\n        <a ng-click=\"removeRow(rowIndex)\" class=\"btn btn-default\">\n          <span class=\"glyphicon glyphicon-remove-circle\"></span>\n        </a>\n      </td>\n    </tr>\n  </table>\n  <div class=\"datagrid-add\">\n    <a ng-click=\"addRow()\" class=\"btn btn-primary\">\n      <span class=\"glyphicon glyphicon-plus\" aria-hidden=\"true\"></span> {{ component.addAnother || \"Add Another\" | formioTranslate:null:builder }}\n    </a>\n  </div>\n</div>\n"
+        "<div class=\"formio-data-grid\" ng-controller=\"formioDataGrid\">\n  <table ng-class=\"{'table-striped': component.striped, 'table-bordered': component.bordered, 'table-hover': component.hover, 'table-condensed': component.condensed}\" class=\"table datagrid-table\">\n    <tr>\n      <th\n        ng-repeat=\"col in cols track by $index\"\n        ng-class=\"{'field-required': col.validate.required}\"\n        ng-if=\"builder ? '::true' : anyVisible(col)\"\n      >{{ col.label | formioTranslate:null:builder }}</th>\n    </tr>\n    <tr ng-repeat=\"row in rows track by $index\" ng-init=\"rowIndex = $index\">\n      <td ng-repeat=\"col in cols track by $index\" ng-init=\"col.hideLabel = true; colIndex = $index\" class=\"formio-data-grid-row\" ng-if=\"builder ? '::true' : anyVisible(col)\">\n        <formio-component\n          component=\"col\"\n          data=\"rows[rowIndex]\"\n          formio-form=\"formioForm\"\n          formio=\"formio\"\n          submission=\"submission\"\n          hide-components=\"hideComponents\"\n          ng-if=\"builder ? '::true' : isVisible(col, row)\"\n          read-only=\"isDisabled(col, row)\"\n          grid-row=\"rowIndex\"\n          grid-col=\"colIndex\"\n          builder=\"builder\"\n        ></formio-component>\n      </td>\n      <td ng-if=\"!component.hasOwnProperty('validate') || !component.validate.hasOwnProperty('minLength') || rows.length > component.validate.minLength\">\n        <a ng-click=\"removeRow(rowIndex)\" class=\"btn btn-default\">\n          <span class=\"glyphicon glyphicon-remove-circle\"></span>\n        </a>\n      </td>\n    </tr>\n  </table>\n  <div class=\"datagrid-add\" ng-if=\"!component.hasOwnProperty('validate') || !component.validate.hasOwnProperty('maxLength') || rows.length < component.validate.maxLength\">\n    <a ng-click=\"addRow()\" class=\"btn btn-primary\">\n      <span class=\"glyphicon glyphicon-plus\" aria-hidden=\"true\"></span> {{ component.addAnother || \"Add Another\" | formioTranslate:null:builder }}\n    </a>\n  </div>\n</div>\n"
       ));
     }
   ]);
@@ -7602,6 +7652,8 @@ module.exports = function(app) {
 },{}],29:[function(_dereq_,module,exports){
 "use strict";
 
+var GridUtils = _dereq_('../factories/GridUtils')();
+
 module.exports = function(app) {
   app.config([
     'formioComponentsProvider',
@@ -7618,7 +7670,8 @@ module.exports = function(app) {
           protected: false,
           unique: false,
           persistent: true
-        }
+        },
+        tableView: GridUtils.generic
       });
     }
   ]);
@@ -7632,7 +7685,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],30:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":60}],30:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -9918,6 +9971,12 @@ module.exports = [
                 }
                 // FOR-135 - Add default values for select components.
                 else if ($scope.component.type === 'select') {
+                  // FOR-337 - Fix default values for select components without multi enabled.
+                  if (!mult) {
+                    $scope.data[$scope.component.key] = $scope.component.defaultValue;
+                    return;
+                  }
+
                   // If using the values input, split the default values, and search the options for each value in the list.
                   if ($scope.component.dataSrc === 'values') {
                     var temp = [];
@@ -10975,6 +11034,78 @@ module.exports = function() {
 
 },{"formio-utils":2}],60:[function(_dereq_,module,exports){
 "use strict";
+module.exports = function() {
+  var generic = function(data, component) {
+    var startTable = function(labels) {
+      if (!(labels instanceof Array)) {
+        labels = [labels];
+      }
+
+      var view = '<table class="table table-striped table-bordered"><thead><tr>';
+
+      labels.forEach(function(item) {
+        view += '<th>' + item + '</th>';
+      });
+
+      view += '</tr></thead>';
+      view += '<tbody>';
+      return view;
+    };
+
+    var finishTable = function() {
+      return '</tbody></table>';
+    };
+
+    var makeRow = function(data) {
+      var view = '<tr>';
+
+      if (typeof data === 'string' || typeof data === 'number') {
+        view += '<td>' + data + '</td>';
+      }
+      else if (data instanceof Array) {
+        data.forEach(function(item) {
+          view += makeRow(item);
+        });
+      }
+      else if (typeof data === 'object') {
+        var labels = Object.keys(data);
+
+        view += startTable(labels);
+        labels.forEach(function(key) {
+          view += makeRow(data[key]);
+        });
+        view += finishTable();
+      }
+
+      view += '</tr>';
+      return view;
+    };
+
+    // Create a template
+    var view = '';
+    var label;
+    if (!label && component && component.label) {
+      label = component.label;
+    }
+    else if (!label && component && component.key) {
+      label = component.key;
+    }
+    else {
+      label = '';
+    }
+    view += startTable(label);
+    view += makeRow(data);
+    view += finishTable();
+    return view;
+  };
+
+  return {
+    generic: generic
+  };
+};
+
+},{}],61:[function(_dereq_,module,exports){
+"use strict";
 var _filter = _dereq_('lodash.filter');
 var _get = _dereq_('lodash.get');
 
@@ -10985,7 +11116,7 @@ module.exports = function() {
   };
 };
 
-},{"lodash.filter":9,"lodash.get":10}],61:[function(_dereq_,module,exports){
+},{"lodash.filter":9,"lodash.get":10}],62:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$q',
@@ -11034,7 +11165,7 @@ module.exports = [
   }
 ];
 
-},{}],62:[function(_dereq_,module,exports){
+},{}],63:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -11068,7 +11199,7 @@ module.exports = [
   }
 ];
 
-},{}],63:[function(_dereq_,module,exports){
+},{}],64:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'FormioUtils',
@@ -11077,7 +11208,7 @@ module.exports = [
   }
 ];
 
-},{}],64:[function(_dereq_,module,exports){
+},{}],65:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$sce',
@@ -11090,7 +11221,7 @@ module.exports = [
   }
 ];
 
-},{}],65:[function(_dereq_,module,exports){
+},{}],66:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   function() {
@@ -11109,7 +11240,7 @@ module.exports = [
   }
 ];
 
-},{}],66:[function(_dereq_,module,exports){
+},{}],67:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'formioTableView',
@@ -11122,7 +11253,7 @@ module.exports = [
   }
 ];
 
-},{}],67:[function(_dereq_,module,exports){
+},{}],68:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -11137,7 +11268,7 @@ module.exports = [
   }
 ];
 
-},{}],68:[function(_dereq_,module,exports){
+},{}],69:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$filter',
@@ -11166,7 +11297,7 @@ module.exports = [
   }
 ];
 
-},{}],69:[function(_dereq_,module,exports){
+},{}],70:[function(_dereq_,module,exports){
 "use strict";
 _dereq_('./polyfills/polyfills');
 
@@ -11284,7 +11415,7 @@ app.run([
 
     // A formio component template.
     $templateCache.put('formio/component.html',
-      "<div class=\"form-group has-feedback form-field-type-{{ component.type }} formio-component-{{ component.key }} {{component.customClass}}\" id=\"form-group-{{ componentId }}\" ng-class=\"{'has-error': formioForm[componentId].$invalid && !formioForm[componentId].$pristine }\" ng-style=\"component.style\" ng-hide=\"component.hidden\">\n  <formio-element></formio-element>\n</div>\n"
+      "<div class=\"form-group form-field-type-{{ component.type }} formio-component-{{ component.key }} {{component.customClass}}\" id=\"form-group-{{ componentId }}\"\n     ng-class=\"{'has-feedback ': (component.hideLabel === true || component.label === '' || !component.label) && component.validate.required,\n             'has-error': formioForm[componentId].$invalid && !formioForm[componentId].$pristine }\"\n     ng-style=\"component.style\"\n     ng-hide=\"component.hidden\">\n  <formio-element></formio-element>\n</div>\n\n"
     );
 
     $templateCache.put('formio/component-view.html',
@@ -11303,7 +11434,7 @@ app.run([
 
 _dereq_('./components');
 
-},{"./components":31,"./directives/customValidator":47,"./directives/formio":48,"./directives/formioBindHtml.js":49,"./directives/formioComponent":50,"./directives/formioComponentView":51,"./directives/formioDelete":52,"./directives/formioElement":53,"./directives/formioErrors":54,"./directives/formioSubmission":55,"./directives/formioSubmissions":56,"./directives/formioWizard":57,"./factories/FormioScope":58,"./factories/FormioUtils":59,"./factories/Lodash":60,"./factories/formioInterceptor":61,"./factories/formioTableView":62,"./filters/flattenComponents":63,"./filters/safehtml":64,"./filters/tableComponents":65,"./filters/tableFieldView":66,"./filters/tableView":67,"./filters/translate":68,"./polyfills/polyfills":71,"./providers/Formio":72}],70:[function(_dereq_,module,exports){
+},{"./components":31,"./directives/customValidator":47,"./directives/formio":48,"./directives/formioBindHtml.js":49,"./directives/formioComponent":50,"./directives/formioComponentView":51,"./directives/formioDelete":52,"./directives/formioElement":53,"./directives/formioErrors":54,"./directives/formioSubmission":55,"./directives/formioSubmissions":56,"./directives/formioWizard":57,"./factories/FormioScope":58,"./factories/FormioUtils":59,"./factories/Lodash":61,"./factories/formioInterceptor":62,"./factories/formioTableView":63,"./filters/flattenComponents":64,"./filters/safehtml":65,"./filters/tableComponents":66,"./filters/tableFieldView":67,"./filters/tableView":68,"./filters/translate":69,"./polyfills/polyfills":72,"./providers/Formio":73}],71:[function(_dereq_,module,exports){
 "use strict";
 'use strict';
 
@@ -11334,13 +11465,13 @@ if (typeof Object.assign != 'function') {
   })();
 }
 
-},{}],71:[function(_dereq_,module,exports){
+},{}],72:[function(_dereq_,module,exports){
 "use strict";
 'use strict';
 
 _dereq_('./Object.assign');
 
-},{"./Object.assign":70}],72:[function(_dereq_,module,exports){
+},{"./Object.assign":71}],73:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   // The formio class.
@@ -11408,5 +11539,5 @@ module.exports = function() {
   };
 };
 
-},{"formiojs":3}]},{},[69])(69)
+},{"formiojs":3}]},{},[70])(70)
 });

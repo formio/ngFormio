@@ -1,8 +1,8 @@
 module.exports = function() {
-  var generic = function(data, component, $interpolate, componentInfo) {
+  var generic = function(data, component) {
     var startTable = function(labels) {
       if (!(labels instanceof Array)) {
-        labels = [labels]
+        labels = [labels];
       }
 
       var view = '<table class="table table-striped table-bordered"><thead><tr>';
@@ -14,6 +14,10 @@ module.exports = function() {
       view += '</tr></thead>';
       view += '<tbody>';
       return view;
+    };
+
+    var finishTable = function() {
+      return '</tbody></table>';
     };
 
     var makeRow = function(data) {
@@ -39,10 +43,6 @@ module.exports = function() {
 
       view += '</tr>';
       return view;
-    };
-
-    var finishTable = function() {
-      return '</tbody></table>';
     };
 
     // Create a template
