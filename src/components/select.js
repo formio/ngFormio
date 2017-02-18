@@ -135,13 +135,15 @@ module.exports = function(app) {
           'Formio',
           '$interpolate',
           '$q',
+          '$timeout',
           function(
             $rootScope,
             $scope,
             $http,
             Formio,
             $interpolate,
-            $q
+            $q,
+            $timeout
           ) {
             // FOR-71 - Skip functionality in the builder view.
             if ($scope.builder) return;
@@ -150,6 +152,7 @@ module.exports = function(app) {
             $scope.nowrap = true;
             $scope.hasNextPage = false;
             $scope.selectItems = [];
+
             var initialized = $q.defer();
             initialized.promise.then(function() {
               $scope.$emit('selectLoaded', $scope.component);
@@ -180,20 +183,16 @@ module.exports = function(app) {
               return valueProp ? item[valueProp] : item;
             };
 
-            $scope.refreshItems = angular.noop;
+            $scope.refreshItems = function() {
+              return $q.resolve([]);
+            };
             $scope.$on('refreshList', function(event, url, input) {
               $scope.refreshItems(input, url);
             });
 
             // Add a watch if they wish to refresh on selection of another field.
-            var refreshWatch, refreshWatchRow;
             if (settings.refreshOn) {
-              // Remove the old watch.
               var refreshing = false;
-              if (refreshWatch) refreshWatch();
-              if (refreshWatchRow) refreshWatchRow();
-
-              // Refresh the data.
               var refreshValue = function() {
                 if (refreshing) {
                   return;
@@ -202,11 +201,11 @@ module.exports = function(app) {
                 var tempData = $scope.data[settings.key];
                 $scope.data[settings.key] = settings.multiple ? [] : '';
                 if (!settings.clearOnRefresh) {
-                  setTimeout(function() {
+                  $timeout(function() {
                     $scope.data[settings.key] = tempData;
                     refreshing = false;
                     $scope.$emit('selectLoaded', $scope.component);
-                  }, 10);
+                  });
                 }
                 else {
                   refreshing = false;
@@ -227,12 +226,12 @@ module.exports = function(app) {
                 });
               };
               if (settings.refreshOn === 'data') {
-                refreshWatch = $scope.$watch('data', refreshValueWhenReady, true);
+                $scope.$watch('data', refreshValueWhenReady, true);
                 return;
               }
 
-              refreshWatchRow = $scope.$watch('data.' + settings.refreshOn, refreshValueWhenReady);
-              refreshWatch = $scope.$watch('submission.data.' + settings.refreshOn, refreshValueWhenReady);
+              $scope.$watch('data.' + settings.refreshOn, refreshValueWhenReady);
+              $scope.$watch('submission.data.' + settings.refreshOn, refreshValueWhenReady);
             }
 
             switch (settings.dataSrc) {
@@ -321,10 +320,9 @@ module.exports = function(app) {
                   }
                   selectItems = selectItems.slice(options.params.skip, options.params.skip + options.params.limit);
                   setResult(selectItems, append);
+                  return initialized.resolve($scope.selectItems);
                 };
                 $scope.refreshItems();
-
-                initialized.resolve();
                 break;
               case 'custom':
                 $scope.refreshItems = function() {
@@ -338,7 +336,7 @@ module.exports = function(app) {
                   catch (error) {
                     $scope.selectItems = [];
                   }
-                  initialized.resolve();
+                  return initialized.resolve($scope.selectItems);
                 };
                 $scope.refreshItems();
                 break;
@@ -381,7 +379,6 @@ module.exports = function(app) {
                 };
 
                 if (url) {
-                  $scope.selectLoading = false;
                   $scope.hasNextPage = true;
                   $scope.refreshItems = function(input, newUrl, append) {
                     newUrl = newUrl || url;
@@ -390,11 +387,6 @@ module.exports = function(app) {
                       formioBase: $rootScope.apiBase || 'https://api.form.io'
                     });
                     if (!newUrl) {
-                      return;
-                    }
-
-                    // Do not want to call if it is already loading.
-                    if ($scope.selectLoading) {
                       return;
                     }
 
@@ -435,7 +427,6 @@ module.exports = function(app) {
                       }
                     };
 
-                    $scope.selectLoading = true;
                     return $http.get(newUrl, options).then(function(result) {
                       var data = result.data;
                       if (data) {
@@ -455,9 +446,9 @@ module.exports = function(app) {
                           setResult(data);
                         }
                       }
-                    })['finally'](function() {
-                      $scope.selectLoading = false;
-                      initialized.resolve();
+                      return $scope.selectItems;
+                    }).finally(function() {
+                      initialized.resolve($scope.selectItems);
                     });
                   };
                   $scope.refreshItems();
@@ -465,7 +456,7 @@ module.exports = function(app) {
                 break;
               default:
                 $scope.selectItems = [];
-                initialized.resolve();
+                initialized.resolve($scope.selectItems);
             }
           }
         ],
