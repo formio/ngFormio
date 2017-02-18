@@ -355,6 +355,12 @@ module.exports = [
                 }
                 // FOR-135 - Add default values for select components.
                 else if ($scope.component.type === 'select') {
+                  // FOR-337 - Fix default values for select components without multi enabled.
+                  if (!mult) {
+                    $scope.data[$scope.component.key] = $scope.component.defaultValue;
+                    return;
+                  }
+
                   // If using the values input, split the default values, and search the options for each value in the list.
                   if ($scope.component.dataSrc === 'values') {
                     var temp = [];
