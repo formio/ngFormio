@@ -8,28 +8,23 @@ module.exports = function(app) {
         template: function($scope) {
           if ($scope.component.wysiwyg) {
             var defaults = {
-              toolbar: 'full',
-              'toolbar_full': [
-                {
-                  name: 'basicstyles',
-                  items: ['Bold', 'Italic', 'Strike', 'Underline']
-                },
-                {name: 'paragraph', items: ['BulletedList', 'NumberedList', 'Blockquote']},
-                {name: 'editing', items: ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock']},
-                {name: 'links', items: ['Link', 'Unlink', 'Anchor']},
-                {name: 'tools', items: ['SpellChecker', 'Maximize']},
+              toolbarGroups:  [
+                {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
+                {name: 'paragraph', groups: ['list', 'indent', 'blocks', 'align', 'bidi', 'paragraph']},
+                {name: 'links', groups: ['links']},
+                {name: 'insert', groups: ['insert']},
                 '/',
-                {
-                  name: 'styles',
-                  items: ['Format', 'FontSize', 'TextColor', 'PasteText', 'PasteFromWord', 'RemoveFormat']
-                },
-                {name: 'insert', items: ['Image', 'Table', 'SpecialChar']},
-                {name: 'forms', items: ['Outdent', 'Indent']},
-                {name: 'clipboard', items: ['Undo', 'Redo']},
-                {name: 'document', items: ['PageBreak', 'Source']}
+                {name: 'styles', groups: ['styles']},
+                {name: 'colors', groups: ['colors']},
+                {name: 'clipboard', groups: ['clipboard', 'undo']},
+                {name: 'editing', groups: ['find', 'selection', 'spellchecker', 'editing']},
+                {name: 'forms', groups: ['forms']},
+                {name: 'document', groups: ['mode', 'document', 'doctools']},
+                {name: 'others', groups: ['others']},
+                {name: 'tools', groups: ['tools']}
               ],
-              disableNativeSpellChecker: false,
-              uiColor: '#FAFAFA',
+              removeButtons: 'Cut,Copy,Paste,Underline,Subscript,Superscript,Scayt,About',
+              uiColor: '#eeeeee',
               height: '400px',
               width: '100%'
             };
