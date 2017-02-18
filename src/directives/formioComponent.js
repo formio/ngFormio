@@ -319,6 +319,11 @@ module.exports = [
                   value = $scope.component.defaultValue;
                 }
 
+                // If no default is provided, then skip...
+                if (!value || !value.length) {
+                  return;
+                }
+
                 // FOR-193 - Fix default value for the number component.
                 // FOR-262 - Fix multiple default value for the number component.
                 if ($scope.component.type === 'number') {
@@ -355,7 +360,7 @@ module.exports = [
                     var temp = [];
 
                     $scope.component.data.values.forEach(function(item) {
-                      if (value && value.indexOf(item.value) !== -1) {
+                      if (value.indexOf(item.value) !== -1) {
                         temp.push(item);
                       }
                     });
