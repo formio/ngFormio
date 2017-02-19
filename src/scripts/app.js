@@ -18,7 +18,7 @@ angular
     'ui.select',
     'ui.bootstrap.datetimepicker',
     'angularMoment',
-    'ngCkeditor',
+    'ckeditor',
     'formioApp.controllers',
     'formioApp.utils',
     'kendo.directives',
