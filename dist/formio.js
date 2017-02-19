@@ -1,4 +1,4 @@
-/*! ng-formio v2.10.2 | https://unpkg.com/ng-formio@2.10.2/LICENSE.txt */
+/*! ng-formio v2.10.3 | https://unpkg.com/ng-formio@2.10.3/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 /*!
  * EventEmitter2
@@ -9080,19 +9080,19 @@ module.exports = function(app) {
             var defaults = {
               toolbarGroups:  [
                 {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
-                {name: 'paragraph', groups: ['list', 'indent', 'blocks', 'align', 'bidi', 'paragraph']},
+                {name: 'paragraph', groups: ['list', 'indent', 'blocks', 'align', 'bidi', 'paragraph', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock']},
                 {name: 'links', groups: ['links']},
                 {name: 'insert', groups: ['insert']},
                 '/',
-                {name: 'styles', groups: ['styles']},
+                {name: 'styles', groups: ['Styles', 'Format', 'Font', 'FontSize']},
                 {name: 'colors', groups: ['colors']},
                 {name: 'clipboard', groups: ['clipboard', 'undo']},
                 {name: 'editing', groups: ['find', 'selection', 'spellchecker', 'editing']},
-                {name: 'forms', groups: ['forms']},
                 {name: 'document', groups: ['mode', 'document', 'doctools']},
                 {name: 'others', groups: ['others']},
                 {name: 'tools', groups: ['tools']}
               ],
+              extraPlugins: 'justify,font',
               removeButtons: 'Cut,Copy,Paste,Underline,Subscript,Superscript,Scayt,About',
               uiColor: '#eeeeee',
               height: '400px',
