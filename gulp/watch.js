@@ -8,7 +8,8 @@ module.exports = function(gulp, plugins) {
       server: {
         baseDir: ['.tmp', 'src'],
         routes: {
-          "/bower_components": "bower_components"
+          "/bower_components": "bower_components",
+          "/lib/seamless": "bower_components/seamless/build"
         }
       },
       ghostMode: false

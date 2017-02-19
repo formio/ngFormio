@@ -2,10 +2,10 @@
   "name": "formio-app",
   "private": true,
   "dependencies": {
-    "angular": "^1.6.1",
+    "angular": "^1.6.2",
     "angular-ui-router": "^0.4.2",
-    "angular-sanitize": "^1.6.1",
-    "angular-bootstrap": "^2.4.0",
+    "angular-sanitize": "^1.6.2",
+    "angular-bootstrap": "^2.5.0",
     "moment": "^2.17.1",
     "angular-moment": "^1.0.1",
     "ng-sortable": "^1.3.7",
@@ -18,14 +18,14 @@
     "lodash": "^4.17.2",
     "angular-truncate-2": "^0.4.2",
     "bootstrap-sass": "^3.3.7",
-    "ng-dialog": "^0.6.4",
+    "ng-dialog": "^1.0.0",
     "angular-swagger-ui": "https://github.com/randallknutson/angular-swagger-ui.git#master",
     "number-abbreviate": "^1.2.1",
-    "ng-formio": "^2.9.8",
-    "ng-formio-builder": "^2.9.6",
+    "ng-formio": "^2.10.2",
+    "ng-formio-builder": "^2.10.2",
     "ng-tags-input": "^3.1.1",
     "chance": "^1.0.4",
-    "ng-file-upload": "^12.0.4",
+    "ng-file-upload": "^12.2.13",
     "ckeditor": "^4.6.2",
     "jquery": "2.2.4",
     "qs": "https://github.com/ljharb/qs.git#^6.2.1",
@@ -94,12 +94,6 @@
         "ng-file-upload.min.js"
       ]
     },
-    "angular-ui-select": {
-      "main": [
-        "dist/select.min.js",
-        "dist/select.css"
-      ]
-    },
     "signature_pad": {
       "main": [
         "signature_pad.min.js"
@@ -108,12 +102,6 @@
     "angular-ui-mask": {
       "main": [
         "dist/mask.min.js"
-      ]
-    },
-    "ui-select": {
-      "main": [
-        "dist/select.min.js",
-        "dist/select.css"
       ]
     },
     "lodash": {
@@ -138,12 +126,6 @@
         "js/ngDialog.min.js",
         "css/ngDialog.css",
         "css/ngDialog-theme-default.css"
-      ]
-    },
-    "ng-ckeditor": {
-      "main": [
-        "ng-ckeditor.min.js",
-        "ng-ckeditor.css"
       ]
     },
     "angular-base64": {
