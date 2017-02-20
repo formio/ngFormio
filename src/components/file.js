@@ -42,8 +42,9 @@ module.exports = function(app) {
           if ($scope.builder) return;
           $scope.removeFile = function(event, index) {
             var component = $scope.$parent.component;
-            if (component.storage == 'url')
+            if (component.storage === 'url') {
               $scope.$parent.formio.makeRequest('', component.url + '/' + $scope.files[index].name, 'delete');
+            }
             event.preventDefault();
             $scope.files.splice(index, 1);
           };
@@ -73,8 +74,9 @@ module.exports = function(app) {
           if ($scope.builder) return;
           $scope.removeFile = function(event, index) {
             var component = $scope.$parent.component;
-            if (component.storage == 'url')
+            if (component.storage === 'url') {
               $scope.$parent.formio.makeRequest('', component.url + '/' + $scope.files[index].name, 'delete');
+            }
             event.preventDefault();
             $scope.files.splice(index, 1);
           };
