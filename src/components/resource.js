@@ -105,7 +105,7 @@ module.exports = function(app) {
                   $scope.formUrl = $scope.formio.formsUrl + '/' + $scope.component.resource;
 
                   // Bind when the form is loaded.
-                  $scope.$on('formLoad', function(event, form) {
+                  $scope.$on('formLoad', function(event) {
                     event.stopPropagation(); // Don't confuse app
                   });
 
@@ -114,17 +114,19 @@ module.exports = function(app) {
                     var component = $scope.component;
                     var data      = $scope.data;
 
-                    if (component.multiple)
+                    if (component.multiple) {
                       data[component.key].push(submission);
-                    else
+                    }
+                    else {
                       data[component.key] = submission;
+                    }
 
                     $scope.refreshSubmissions();
                     $scope.closeThisDialog(submission);
                   });
                 }]
-              }).closePromise.then(function(e) {
-                var cancelled = e.value === false || e.value === '$closeButton' || e.value === '$document';
+              }).closePromise.then(function(/*e*/) {
+              //var cancelled = e.value === false || e.value === '$closeButton' || e.value === '$document';
               });
             };
           }
