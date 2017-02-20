@@ -15,7 +15,7 @@ module.exports = function(app) {
 
           // Close calendar pop up when tabbing off button
           $scope.onKeyDown = function(event) {
-            return event.keyCode == 9 ? false : $scope.calendarOpen;
+            return event.keyCode === 9 ? false : $scope.calendarOpen;
           };
 
           var dateValue = function() {
