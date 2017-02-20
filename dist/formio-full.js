@@ -1,4 +1,4 @@
-/*! ng-formio v2.10.3 | https://unpkg.com/ng-formio@2.10.3/LICENSE.txt */
+/*! ng-formio v2.10.4 | https://unpkg.com/ng-formio@2.10.4/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -77734,28 +77734,31 @@ module.exports = function() {
       return '</tbody></table>';
     };
 
-    var makeRow = function(data) {
-      var view = '<tr>';
+    var makeRow = function(data, noRow) {
+      var view = !noRow ? '<tr>' : '';
 
       if (typeof data === 'string' || typeof data === 'number') {
         view += '<td>' + data + '</td>';
+      }
+      else if (data === null || data === undefined) {
+        view += '<td></td>';
       }
       else if (data instanceof Array) {
         data.forEach(function(item) {
           view += makeRow(item);
         });
       }
-      else if (typeof data === 'object') {
+      else if (typeof data === 'object' && data !== null && data !== undefined) {
         var labels = Object.keys(data);
 
-        view += startTable(labels);
+        view += '<td>' + startTable(labels);
         labels.forEach(function(key) {
-          view += makeRow(data[key]);
+          view += makeRow(data[key], true);
         });
-        view += finishTable();
+        view += finishTable() + '</td>';
       }
 
-      view += '</tr>';
+      view += !noRow ? '</tr>' : '';
       return view;
     };
 
@@ -77771,6 +77774,7 @@ module.exports = function() {
     else {
       label = '';
     }
+
     view += startTable(label);
     view += makeRow(data);
     view += finishTable();
