@@ -1,6 +1,6 @@
 'use strict';
 
-/* globals NumberAbbreviate, chance */
+/* globals NumberAbbreviate, chance, Chartist */
 
 // loadedFiles is used to prevent double loading files on each session.
 var loadedFiles = [];
