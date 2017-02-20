@@ -20,28 +20,31 @@ module.exports = function() {
       return '</tbody></table>';
     };
 
-    var makeRow = function(data) {
-      var view = '<tr>';
+    var makeRow = function(data, noRow) {
+      var view = !noRow ? '<tr>' : '';
 
       if (typeof data === 'string' || typeof data === 'number') {
         view += '<td>' + data + '</td>';
+      }
+      else if (data === null || data === undefined) {
+        view += '<td></td>';
       }
       else if (data instanceof Array) {
         data.forEach(function(item) {
           view += makeRow(item);
         });
       }
-      else if (typeof data === 'object') {
+      else if (typeof data === 'object' && data !== null && data !== undefined) {
         var labels = Object.keys(data);
 
-        view += startTable(labels);
+        view += '<td>' + startTable(labels);
         labels.forEach(function(key) {
-          view += makeRow(data[key]);
+          view += makeRow(data[key], true);
         });
-        view += finishTable();
+        view += finishTable() + '</td>';
       }
 
-      view += '</tr>';
+      view += !noRow ? '</tr>' : '';
       return view;
     };
 
@@ -57,6 +60,7 @@ module.exports = function() {
     else {
       label = '';
     }
+
     view += startTable(label);
     view += makeRow(data);
     view += finishTable();
