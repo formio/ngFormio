@@ -1,6 +1,6 @@
 'use strict';
 
-/* globals NumberAbbreviate, chance */
+/* globals NumberAbbreviate, chance, Chartist */
 
 // loadedFiles is used to prevent double loading files on each session.
 var loadedFiles = [];
@@ -1072,15 +1072,13 @@ app.controller('ProjectFormioController', [
   '$window',
   '$http',
   'FormioAlerts',
-  'Chartist',
   function(
     $scope,
     Formio,
     AppConfig,
     $window,
     $http,
-    FormioAlerts,
-    Chartist
+    FormioAlerts
   ) {
     $scope.currentSection.title = 'Admin Data';
     $scope.currentSection.icon = 'glyphicon glyphicon-globe';
