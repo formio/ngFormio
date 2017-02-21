@@ -612,7 +612,7 @@ app.controller('FormEditController', [
     var parentSave = $scope.saveForm;
     $scope.saveForm = function() {
       dirty = false;
-      parentSave();
+      return parentSave();
     };
 
     /**
@@ -681,7 +681,7 @@ app.controller('FormEditController', [
         return $scope.saveForm()
         .then(function(result) {
           dirty = false;
-          return result;
+          $state.go(transition.name, {reload: true, notify: false});
         })
         .catch(function(err) {
           console.error(err);
