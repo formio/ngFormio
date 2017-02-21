@@ -608,6 +608,13 @@ app.controller('FormEditController', [
       dirty = true;
     });
 
+    // Wrap saveForm in the editor to clear dirty when saved.
+    var parentSave = $scope.saveForm;
+    $scope.saveForm = function() {
+      dirty = false;
+      parentSave();
+    };
+
     /**
      * Util function to show the cancel dialogue.
      *
