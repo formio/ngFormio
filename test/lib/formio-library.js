@@ -577,6 +577,7 @@ module.exports = function (config) {
           .then(next)
           .catch(next);
       })//surendra 'grid view in overview page'
+
       .then('the title is $TITLE', function (title, next) {
         var driver = this.driver;
         driver.getTitle()
@@ -961,12 +962,29 @@ module.exports = function (config) {
 
       .then('I am on $section section of $page page', function (section, page, next) {
         var driver = this.driver;
-        driver.waitForExist('//li[contains(@class, \'active\') and contains(text(),\'\')]', timeout)
-          .getText('//li[contains(@class, \'active\') and contains(text(),\'\')]')
+      /*  driver.waitForExist('//li[contains(@class, \'active\') and contains(text(),\'\')]', timeout)
+          .getText('//li[contains(@class, \'active\') and contains(text(),\'\')]')*/
+          driver.waitForExist('//*[contains(@class, \'active\')]',timeout)
+          .getText('//*[contains(@class, \'active\')]')
           .then(function (res) {
+              console.log(res);
               var d = page + "*" + section;
               var x = res[0] + "*" + res[1];
               assert.equal(x, d);
+              next();
+            }
+          )
+          .catch(next);
+      })//surendra
+      .then('I am on $section section', function (section, next) {
+        var driver = this.driver;
+        /*  driver.waitForExist('//li[contains(@class, \'active\') and contains(text(),\'\')]', timeout)
+         .getText('//li[contains(@class, \'active\') and contains(text(),\'\')]')*/
+        driver.waitForExist('//*[contains(@class, \'active\')]',timeout)
+          .getText('//*[contains(@class, \'active\')]')
+          .then(function (res) {
+              console.log(res);
+              assert.equal(res, section);
               next();
             }
           )
@@ -1038,6 +1056,18 @@ module.exports = function (config) {
            })
            .catch(next);
     })//surendra
+      .then('I donot see $Resourcename resource', function (resourcename, next) {
+        var driver = this.driver;
+        var path = '//*[contains(@class,"list-group")]//h4[contains(text(),\'\')]';
+        driver.getText(path, timeout)
+          .then(function(temp){
+            console.log(temp)
+            var res = temp.indexOf(resourcename) != -1  ? true : false;
+            assert.equal(res,false);
+            next();
+          })
+          .catch(next);
+      })//surendra
       .then('I see project progress is at $title', function (title, next) {
         title = replacements(title);
         var driver = this.driver;
@@ -1049,7 +1079,18 @@ module.exports = function (config) {
           })
           .catch(next);
       })//padma
-     
+      .then('I see $Resourcename resource', function (resourcename, next) {
+        var driver = this.driver;
+        var path = '//*[contains(@class,"list-group")]//h4[contains(text(),\''+resourcename+'\')]';
+        driver.waitForExist(path, timeout)
+          .isVisible(path, timeout)
+          .then(function(){
+            next();
+          })
+          .catch(next);
+      })//padma
+
+
     ;
   return library;
 };

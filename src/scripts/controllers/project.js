@@ -387,7 +387,9 @@ app.controller('ProjectBuildController', [
   function($scope, $http) {
     // This is restricted to form.io domains.
     var key = 'AIzaSyDms9ureQ45lp6BT6LuZtoANB_GcR2jZmE';
-
+    $scope.currentSection.title = 'Building Applications on Form.io';
+    $scope.currentSection.icon = 'fa fa-cubes';
+    $scope.currentSection.help = 'https://help.form.io/intro/appdev/';
     $scope.angular1 = [];
     $scope.angular2 = [];
     $scope.react = [];
@@ -977,9 +979,6 @@ app.controller('ProjectPreviewController', [
     $location,
     AppConfig
   ) {
-    $scope.currentSection.title = 'Preview';
-    $scope.currentSection.icon = 'fa fa-laptop';
-    $scope.currentSection.help = 'https://help.form.io/embedding/';
     $scope.previewUrl = '';
     $scope.repo = '';
     $scope.hasTemplate = true;
@@ -1073,13 +1072,15 @@ app.controller('ProjectFormioController', [
   '$window',
   '$http',
   'FormioAlerts',
+  'Chartist',
   function(
     $scope,
     Formio,
     AppConfig,
     $window,
     $http,
-    FormioAlerts
+    FormioAlerts,
+    Chartist
   ) {
     $scope.currentSection.title = 'Admin Data';
     $scope.currentSection.icon = 'glyphicon glyphicon-globe';
@@ -1525,6 +1526,84 @@ app.controller('ProjectFormioController', [
         $scope.usageLoading = false;
         $scope.$apply();
 
+        /**
+         * Build a usage graph for the submission analytics.
+         *
+         * @param {String} type
+         *   submission or nonsubmission.
+         * @param {Array} typeData
+         *   The input data to graph.
+         * @param {String} symbol
+         *   s or ns, corresponding to the type.
+         * @param [Number] quantity
+         *   The number of top results to display.
+         *
+         * @returns {*}
+         */
+        var buildUsageGraph = function(type, typeData, symbol, quantity) {
+          $scope[type + 'GraphOptions'] = {
+            onlyInteger: true,
+            plugins: [
+              Chartist.plugins.tooltip()
+            ]
+          };
+
+          // Grab the top 5 submission users, and compare them, with the overall.
+          quantity = quantity || 5;
+          var top = _(typeData)
+            .take(quantity)
+            .map(function(item) {
+              return item._id;
+            })
+            .value();
+          $scope[type + 'DisplayTop'] = 'Top ' +  quantity + ': ' + top.join(', ');
+
+          // Build the total submission chart data.
+          $scope[type + 'GraphData'] = {
+            labels: [],
+            series: []
+          };
+          var days = new Date($scope.viewDate.year, $scope.viewDate.month - 1, 0).getDate();
+          var templateSeries = [];
+          for (var i = 1; i <= days; i++) {
+            // Create each day label
+            $scope[type + 'GraphData'].labels.push(i);
+
+            // add the series data for each graph line.
+            templateSeries.push({meta: '', value: 0});
+          }
+          for (var q = 0; q < (quantity + 1); q++) {
+            $scope[type + 'GraphData'].series.push(_.cloneDeep(templateSeries));
+          }
+
+          // If there is no usage, skip traversing the data.
+          if (!top || top.length === 0) {
+            return $scope.$apply();
+          }
+
+          // Group the submission data into 6 groups for quick glance views.
+          var groupPos = 0;
+          _(data)
+            .groupBy(function(item) {
+              if (top.indexOf(item._id) === -1) {
+                return 'other';
+              }
+
+              return item._id;
+            })
+            .forEach(function(group, category) {
+              _(group)
+                .filter({type: symbol})
+                .forEach(function(entry) {
+                  var day = parseInt(entry.day);
+                  $scope[type + 'GraphData'].series[groupPos][day - 1].meta = category;
+                  $scope[type + 'GraphData'].series[groupPos][day - 1].value += entry.calls;
+                });
+
+              groupPos += 1;
+            });
+        };
+
         // Update project data for top submissions.
         var allProjects = _.uniq(_.map($scope.monthlySubmissions, '_id').concat(_.map($scope.monthlyNonsubmissions, '_id')));
         getProjectData(allProjects, function(submissionData) {
@@ -1549,6 +1628,10 @@ app.controller('ProjectFormioController', [
             $scope.totalMonthlySubmissions = _.sum(_.map($scope.monthlySubmissions, 'submissions'));
             $scope.monthlyNonsubmissions = filterEmployees(merge($scope.monthlyNonsubmissions, ownerData, 'owner'));
             $scope.totalMonthlyNonsubmissions = _.sum(_.map($scope.monthlyNonsubmissions, 'nonsubmissions'));
+
+            buildUsageGraph('submission', $scope.monthlySubmissions, 's');
+            buildUsageGraph('nonsubmission', $scope.monthlyNonsubmissions, 'ns');
+
             $scope.$apply();
           });
         });

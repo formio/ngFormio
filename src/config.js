@@ -56,6 +56,7 @@ if (apiProtocol !== protocol && ['localhost', 'portal.localhost', 'lvh.me', 'por
 
   window.location.replace(url);
 }
+serverHost = 'formio.local';
 var appBase = protocol + '//' + host;
 var apiBase = apiProtocol + '//api.' + serverHost;
 var formioBase = apiProtocol + '//formio.' + serverHost;

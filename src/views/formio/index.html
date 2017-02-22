@@ -92,11 +92,26 @@
         </div>
         <div class="panel-body">
           <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-12">
               <h3>Total Submissions: {{totalMonthlySubmissions !== null ? totalMonthlySubmissions : '---'}}</h3>
             </div>
-            <div class="col-md-6">
+          </div>
+          <div class="row" ng-if="!showDaily">
+            <div class="col-sm-12 project-data">
+              <h6>{{submissionDisplayTop}}</h6>
+              <chartist class="ct-chart" chartist-data="submissionGraphData" chartist-chart-type="Line" chartist-chart-options="submissionGraphOptions"></chartist>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12">
               <h3>Total Non-Submissions: {{totalMonthlyNonsubmissions !== null ? totalMonthlyNonsubmissions : '---'}}</h3>
+            </div>
+          </div>
+          <div class="row" ng-if="!showDaily">
+            <div class="col-sm-12 project-data">
+              <h6>{{nonsubmissionDisplayTop}}</h6>
+              <chartist class="ct-chart" chartist-data="nonsubmissionGraphData" chartist-chart-type="Line" chartist-chart-options="nonsubmissionGraphOptions"></chartist>
             </div>
           </div>
         </div>
@@ -378,6 +393,14 @@
                 {{ viewDate.month + ' / ' + (showDaily ? viewDate.month + ' / ' : '') + viewDate.year }},
                 by Project ({{totalMonthlySubmissions}})
               </h3>
+
+              <div class="row" ng-if="!showDaily">
+                <div class="col-sm-12 project-data">
+                  <h6>{{submissionDisplayTop}}</h6>
+                  <chartist class="ct-chart" chartist-data="submissionGraphData" chartist-chart-type="Line" chartist-chart-options="submissionGraphOptions"></chartist>
+                </div>
+              </div>
+
               <table class="table table-striped">
                 <thead>
                 <tr>
@@ -419,6 +442,14 @@
                 {{viewDate.month + ' / ' + (showDaily ? viewDate.month + ' / ' : '') + viewDate.year}},
                 by Project ({{totalMonthlyNonsubmissions}})
               </h3>
+
+              <div class="row" ng-if="!showDaily">
+                <div class="col-sm-12 project-data">
+                  <h6>{{nonsubmissionDisplayTop}}</h6>
+                  <chartist class="ct-chart" chartist-data="nonsubmissionGraphData" chartist-chart-type="Line" chartist-chart-options="nonsubmissionGraphOptions"></chartist>
+                </div>
+              </div>
+
               <table class="table table-striped">
                 <thead>
                 <tr>

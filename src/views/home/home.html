@@ -7,11 +7,11 @@
         <iframe src="https://player.vimeo.com/video/133415659?title=0&byline=0&portrait=0" style="width:100%" height="360" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
       </div>
       <div class="col col-sm-4">
-        <a class="btn btn-default btn-block btn-lg" href="https://help.form.io/start/" target="_blank"  role="button"><i class="fa fa-play-circle-o"></i> 5 min. tutorial</a>
-        <a class="btn btn-default btn-block btn-lg" href="https://help.form.io/tutorials/walkthroughs/#servicetracker" target="_blank"  role="button"><i class="fa fa-book"></i> Complete Walkthrough</a>
-        <a class="btn btn-default btn-block btn-lg" href="https://help.form.io/userguide/" target="_blank" role="button"><i class="fa fa-search"></i> User Guide</a>
-        <a class="btn btn-default btn-block btn-lg" href="https://help.form.io/developer/info/" target="_blank" role="button"><i class="fa fa-file-code-o"></i> Developer Info</a>
-        <a class="btn btn-default btn-block btn-lg" href="https://help.form.io/tutorials/videos/" target="_blank" role="button"><i class="fa fa-video-camera"></i> Tutorial Videos</a>
+        <a class="btn btn-default btn-block btn-lg" href="https://help.form.io/intro/welcome/" target="_blank"  role="button"><i class="fa fa-rocket"></i> Getting Started</a>
+        <a class="btn btn-default btn-block btn-lg" href="https://help.form.io/intro/howworks/" target="_blank" role="button"><i class="fa fa-question-circle"></i> How it works</a>
+        <a class="btn btn-default btn-block btn-lg" href="https://help.form.io/intro/guide/" target="_blank"  role="button"><i class="fa fa-book"></i> 30 minute guide</a>
+        <a class="btn btn-default btn-block btn-lg" href="https://help.form.io/developer/info/welcome/" target="_blank" role="button"><i class="fa fa-file-code-o"></i> Developer Info</a>
+        <a class="btn btn-default btn-block btn-lg" href="https://help.form.io/tutorials/videos/welcome/" target="_blank" role="button"><i class="fa fa-youtube-play"></i> Tutorials</a>
       </div>
     </div>
   </div>
@@ -62,7 +62,7 @@
     <div class="col-md-9 existing-projects-section">
       <h2><span ng-if="projectsLoaded && projects.length" ng-cloak>Existing Projects</span></h2>
       <div class="project well" ng-if="projectsLoaded && !projects.length" ng-cloak>
-        <h4 class="project-title">Step 1: Create your project</h4>
+        <h4 class="project-title">Step 1: Create your project <small><a href="https://help.form.io/userguide/projects/#new-project" target="_blank"><i class="fa fa-info-circle"></i></a></small></h4>
         <ng-include src="'views/project/help.html'"></ng-include>
         <a ui-sref="createProject()" class="btn btn-md btn-primary"><span class="glyphicon glyphicon-plus circle"></span> Create Project</a>
       </div>
@@ -96,7 +96,7 @@
       </div>
     </div>
     <div class="col-md-3">
-      <h2>Teams</h2>
+      <h2>Teams <small><a href="https://help.form.io/userguide/teams/"><i class="fa fa-info-circle"></i></a></small></h2>
       <div class="well" ng-show="!teamsLoading && !(teamsEnabled || teamMember) && !onPrem">
         <span class="team-upgrade">Want to work collaboratively? Upgrade a project to TeamPro to enable Team functionality.</span>
       </div>
