@@ -70,27 +70,3 @@ Feature: Project Overview - Project Progress Functionality 13
     And I see project progress is at 100%
     When I click on the icon progress-radial
     Then The step Launch your application has been checked
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -24,13 +24,3 @@ Feature: Project Overview - Submission Activity Grid Functionality 14
     Then I see list of options Year, Month, Day on selection list
     When I select Month in select component
     Then I see the amount of days on the X Axis of grid matching the number of days in the current month
-
-
-
-
-
-
-
-
-
-

@@ -26,6 +26,3 @@ Feature: Test 16 Creating/Editing A Resource
     When I enter A in the #resource-search field
     Then I see Admin resource
     And I donot see User resource
-
-
-

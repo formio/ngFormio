@@ -98,16 +98,3 @@ Feature: {User Portal - Creating Project Templates} 9 and {Custom Project Creati
       |Prize Drawing|
       |Form Manager |
       |ToDo List    |
-
-
-
-
-
-
-
-
-
-
-
-
-
