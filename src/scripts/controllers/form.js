@@ -505,47 +505,47 @@ app.controller('FormController', [
       $scope.formio.saveForm(angular.copy($scope.form), {
         getHeaders: true
       })
-      .then(function(response) {
-        $scope.form = response.result;
-        var headers = response.headers;
-        var method = $stateParams.formId ? 'updated' : 'created';
-        GoogleAnalytics.sendEvent('Form', method.substring(0, method.length - 1), null, 1);
+        .then(function(response) {
+          $scope.form = response.result;
+          var headers = response.headers;
+          var method = $stateParams.formId ? 'updated' : 'created';
+          GoogleAnalytics.sendEvent('Form', method.substring(0, method.length - 1), null, 1);
 
-        if (headers.hasOwnProperty('x-form-merge')) {
-          FormioAlerts.addAlert({
-            type: 'warning',
-            message: 'This form has been modified by another user. All form changes have been merged and saved.'
-          });
-        }
-        else {
-          FormioAlerts.addAlert({
-            type: 'success',
-            message: 'Successfully ' + method + ' form!'
-          });
-        }
-
-        // Reload page when a form is created or merged.
-        if (method === 'created' || headers.hasOwnProperty('x-form-merge')) {
-          $state.go('project.' + $scope.formInfo.type + '.form.edit', {formId: $scope.form._id}, {reload: true});
-        }
-      })
-      .catch(function(err) {
-        if (err) {
-          FormioAlerts.onError.call(FormioAlerts, err);
-        }
-
-        // FOR-128 - if we're editing a form, make note of the components with issues.
-        try {
-          var issues = (/Component keys must be unique: (.*)/.exec(_.get(err, 'errors.components.message'))).slice(1);
-          if (($state.includes('project.form.form.edit') || $state.includes('project.form.create')) && (issues.length > 0)) {
-            issues = (issues.shift()).toString().split(', ');
-            issues.forEach(function(issue) {
-              angular.element('div.dropzone #' + issue).parent().addClass('has-error');
+          if (headers.hasOwnProperty('x-form-merge')) {
+            FormioAlerts.addAlert({
+              type: 'warning',
+              message: 'This form has been modified by another user. All form changes have been merged and saved.'
             });
           }
-        }
-        catch (e) {}
-      });
+          else {
+            FormioAlerts.addAlert({
+              type: 'success',
+              message: 'Successfully ' + method + ' form!'
+            });
+          }
+
+          // Reload page when a form is created or merged.
+          if (method === 'created' || headers.hasOwnProperty('x-form-merge')) {
+            $state.go('project.' + $scope.formInfo.type + '.form.edit', {formId: $scope.form._id}, {reload: true});
+          }
+        })
+        .catch(function(err) {
+          if (err) {
+            FormioAlerts.onError.call(FormioAlerts, err);
+          }
+
+          // FOR-128 - if we're editing a form, make note of the components with issues.
+          try {
+            var issues = (/Component keys must be unique: (.*)/.exec(_.get(err, 'errors.components.message'))).slice(1);
+            if (($state.includes('project.form.form.edit') || $state.includes('project.form.create')) && (issues.length > 0)) {
+              issues = (issues.shift()).toString().split(', ');
+              issues.forEach(function(issue) {
+                angular.element('div.dropzone #' + issue).parent().addClass('has-error');
+              });
+            }
+          }
+          catch (e) {}
+        });
     };
 
     // Delete a form.
@@ -699,7 +699,7 @@ app.controller('FormShareController', ['$scope', function($scope) {
           });
           angular.forEach($scope.form.access, function(access) {
             if ((access.type === 'read_all') &&
-            (_.indexOf(access.roles, defaultRole._id) !== -1)) {
+              (_.indexOf(access.roles, defaultRole._id) !== -1)) {
               $scope.publicForm = true;
             }
           });
@@ -1278,34 +1278,92 @@ app.controller('FormSubmissionsController', [
       var activeElement;
 
       angular.element($window.document).bind('mousewheel DOMMouseScroll', function(e) {
-          var scrollTo = null;
+        var scrollTo = null;
 
-          if (!angular.element(activeElement).closest('.k-popup').length) {
-            return;
-          }
+        if (!angular.element(activeElement).closest('.k-popup').length) {
+          return;
+        }
 
-          if (e.type === 'mousewheel') {
-              scrollTo = (e.originalEvent.wheelDelta * -1);
-          }
-          else if (e.type === 'DOMMouseScroll') {
-              scrollTo = 40 * e.originalEvent.detail;
-          }
+        if (e.type === 'mousewheel') {
+          scrollTo = (e.originalEvent.wheelDelta * -1);
+        }
+        else if (e.type === 'DOMMouseScroll') {
+          scrollTo = 40 * e.originalEvent.detail;
+        }
 
-          if (scrollTo) {
-              e.preventDefault();
-              element.scrollTop(scrollTo + element.scrollTop());
-          }
+        if (scrollTo) {
+          e.preventDefault();
+          element.scrollTop(scrollTo + element.scrollTop());
+        }
       });
 
       angular.element($window.document).on('mouseover', function(e) {
-            activeElement = e.target;
+        activeElement = e.target;
       });
+    };
+
+    var getKendoCell = function(component, path) {
+      var filterable;
+      switch(component.type) {
+        case 'datetime': filterable = { ui: 'datetimepicker' };
+          break;
+        // Filtering is not supported for these data types in resourcejs yet
+        case 'address':
+        case 'resource':
+        case 'signature':
+          filterable = false;
+          break;
+        default: filterable = true;
+      }
+
+      var field = path ? '["data.' + path + '.' + component.key.replace(/\./g, '.data.') + '"]' : '["data.' + component.key.replace(/\./g, '.data.') + '"]';
+      return {
+        field: field,
+        title: component.label || component.key,
+        template: function(dataItem) {
+          var val = dataItem.data;
+          if (path && _.has(val, path)) {
+            val = _.get(val, path);
+          }
+
+          var value = Formio.fieldData(val.toJSON(), component);
+          var componentInfo = formioComponents.components[component.type] || formioComponents.components.custom;
+          if (!componentInfo || !componentInfo.tableView) {
+            if (value === undefined) {
+              return '';
+            }
+            if (component.multiple) {
+              return value.join(', ');
+            }
+            return value;
+          }
+          if (component.multiple && (value.length > 0)) {
+            var values = [];
+            angular.forEach(value, function(arrayValue) {
+              arrayValue = componentInfo.tableView(arrayValue, component, $interpolate, formioComponents);
+              if (arrayValue === undefined) {
+                return values.push('');
+              }
+              values.push(arrayValue);
+            });
+            return values.join(', ');
+          }
+          value = componentInfo.tableView(value, component, $interpolate, formioComponents);
+          if (value === undefined) {
+            return '';
+          }
+          return value;
+        },
+        // Disabling sorting on embedded fields because it doesn't work in resourcejs yet
+        width: '200px',
+        filterable: filterable
+      };
     };
 
     // When form is loaded, create the columns
     $scope.loadFormPromise.then(function() {
-      $timeout(function() { // Won't load on state change without this for some reason
-
+      // Load the grid on the next digest.
+      $timeout(function() {
         // Define DataSource
         var dataSource = new kendo.data.DataSource({
           page: 1,
@@ -1386,109 +1444,58 @@ app.controller('FormSubmissionsController', [
                     break;
                   case 'lte': params[filter.field + '__lte'] = filter.value;
                     break;
-
-
                 }
               });
+
               $http.get($scope.formio.submissionsUrl, {
                 params: params
               })
-              .then(function(result) {
-                // Fill in gaps in data so Kendo doesn't crash on missing nested fields
-                _(FormioUtils.flattenComponents($scope.form.components))
-                .filter($scope.tableView)
-                .each(function(component) {
-                  _.each(result.data, function(row) {
-                    var key = 'data.' + component.key.replace(/\./g, '.data.');
-                    var value = _.get(row, key);
-                    if (value === undefined) {
-                      // This looks like it does nothing but it ensures
-                      // that the path to the key is reachable by
-                      // creating objects that don't exist
-                      // FOR-323 - Change to empty string so the grid isnt full of "undefined"s
-                      _.set(row, key, '');
-                    }
-                  });
+                .then(options.success)
+                .catch(function(err) {
+                  FormioAlerts.onError(err);
+                  options.error(err);
                 });
-
-                return result;
-              })
-              .then(options.success)
-              .catch(function(err) {
-                FormioAlerts.onError(err);
-                options.error(err);
-              });
             },
             destroy: function(options) {
               $scope.recentlyDeletedPromises.push($http.delete($scope.formio.submissionsUrl + '/' + options.data._id)
-              .then(function(result) {
-                GoogleAnalytics.sendEvent('Submission', 'delete', null, 1);
-                options.success();
-              })
-              .catch(function(err) {
-                FormioAlerts.onError(err);
-                options.error(err);
-              }));
+                .then(function(result) {
+                  GoogleAnalytics.sendEvent('Submission', 'delete', null, 1);
+                  options.success();
+                })
+                .catch(function(err) {
+                  FormioAlerts.onError(err);
+                  options.error(err);
+                }));
             }
           }
         });
 
+        // Track component keys inside objects, so they dont appear in the grid more than once.
+        var componentHistory = [];
+
         // Generate columns
-        var columns = _(FormioUtils.flattenComponents($scope.form.components))
-        .filter($scope.tableView)
-        .map(function(component){
-          var filterable;
-          switch(component.type) {
-            case 'datetime': filterable = { ui: 'datetimepicker' };
-              break;
-            // Filtering is not supported for these data types in resourcejs yet
-            case 'address':
-            case 'resource':
-            case 'signature':
-              filterable = false;
-              break;
-            default: filterable = true;
+        var columns = [];
+        FormioUtils.eachComponent($scope.form.components, function(component, componentPath) {
+          if (component.tableView === false || !component.key) {
+            return;
+          }
+          // FOR-310 - If this component was already added to the grid, dont add it again.
+          if (component.key && componentHistory.indexOf(component.key) !== -1) {
+            return;
           }
 
-          return {
-            field: '["data.' + component.key.replace(/\./g, '.data.') + '"]',
-            title: component.label || component.key,
-            template: function(dataItem) {
-              var value = Formio.fieldData(dataItem.data.toJSON(), component);
-              var componentInfo = formioComponents.components[component.type];
-              if (!componentInfo.tableView) {
-                if(value === undefined) {
-                  return '';
-                }
-                if(component.multiple) {
-                  return value.join(', ');
-                }
-                return value;
+          if (['container', 'datagrid'].indexOf(component.type) !== -1) {
+            FormioUtils.eachComponent(component.components, function(component) {
+              if (component.key) {
+                componentHistory.push(component.key);
               }
-              if (component.multiple && (value.length > 0)) {
-                var values = [];
-                angular.forEach(value, function(arrayValue) {
-                  arrayValue = componentInfo.tableView(arrayValue, component, $interpolate, formioComponents);
-                  if(arrayValue === undefined) {
-                    return values.push('');
-                  }
-                  values.push(arrayValue);
-                });
-                return values.join(', ');
-              }
-              value = componentInfo.tableView(value, component, $interpolate, formioComponents);
-              if(value === undefined) {
-                return '';
-              }
-              return value;
-            },
-            // Disabling sorting on embedded fields because it doesn't work in resourcejs yet
-            width: '200px',
-            filterable: filterable
-          };
-        })
-        .value()
-        .concat([
+            }, true);
+          }
+
+          columns.push(getKendoCell(component));
+        }, true);
+
+        columns.push(
           {
             field: 'created',
             title: 'Submitted',
@@ -1511,7 +1518,7 @@ app.controller('FormSubmissionsController', [
               return moment(dataItem.modified).format('lll');
             }
           }
-        ]);
+        );
 
         // Define grid options
         $scope.gridOptions = {
@@ -1560,17 +1567,17 @@ app.controller('FormSubmissionsController', [
           // so we set it to something that isn't a property on submissions
           templateSettings: { paramName: 'notdata' },
           toolbar:
-            '<div>' +
-              '<button class="btn btn-default btn-xs" ng-click="view()" ng-disabled="selected().length != 1" ng-class="{\'btn-primary\':selected().length == 1}">' +
-                '<span class="glyphicon glyphicon-eye-open"></span> View' +
-              '</button>&nbsp;' +
-              '<button class="btn btn-default btn-xs" ng-click="edit()" ng-disabled="selected().length != 1" ng-class="{\'btn-primary\':selected().length == 1}">' +
-                '<span class="glyphicon glyphicon-edit"></span> Edit' +
-              '</button>&nbsp;' +
-              '<button class="btn btn-default btn-xs" ng-click="delete()" ng-disabled="selected().length < 1" ng-class="{\'btn-danger\':selected().length >= 1}">' +
-                '<span class="glyphicon glyphicon-remove-circle"></span> Delete' +
-              '</button>' +
-            '</div>',
+          '<div>' +
+          '<button class="btn btn-default btn-xs" ng-click="view()" ng-disabled="selected().length != 1" ng-class="{\'btn-primary\':selected().length == 1}">' +
+          '<span class="glyphicon glyphicon-eye-open"></span> View' +
+          '</button>&nbsp;' +
+          '<button class="btn btn-default btn-xs" ng-click="edit()" ng-disabled="selected().length != 1" ng-class="{\'btn-primary\':selected().length == 1}">' +
+          '<span class="glyphicon glyphicon-edit"></span> Edit' +
+          '</button>&nbsp;' +
+          '<button class="btn btn-default btn-xs" ng-click="delete()" ng-disabled="selected().length < 1" ng-class="{\'btn-danger\':selected().length >= 1}">' +
+          '<span class="glyphicon glyphicon-remove-circle"></span> Delete' +
+          '</button>' +
+          '</div>',
           change: $scope.$apply.bind($scope),
           dataSource: dataSource,
           columns: columns,
@@ -1723,28 +1730,28 @@ app.constant('ResourceAccessLabels', {
 
 app.constant('AccessLabels', {
   'read_all': {
-  label: 'Read Form Definition',
-  tooltip: 'The Read permission will allow a user, with one of the given Roles, to read the form.'
+    label: 'Read Form Definition',
+    tooltip: 'The Read permission will allow a user, with one of the given Roles, to read the form.'
   },
   'update_all': {
-  label: 'Update Form Definition',
-  tooltip: 'The Update permission will allow a user, with one of the given Roles, to read and edit the form.'
+    label: 'Update Form Definition',
+    tooltip: 'The Update permission will allow a user, with one of the given Roles, to read and edit the form.'
   },
   'delete_all': {
-  label: 'Delete Form Definition',
-  tooltip: 'The Delete permission will allow a user, with one of the given Roles, to delete the form.'
+    label: 'Delete Form Definition',
+    tooltip: 'The Delete permission will allow a user, with one of the given Roles, to delete the form.'
   },
   'read_own': {
-  label: 'Read Form Definition (Restricted to owners)',
-  tooltip: 'The Read Own permission will allow a user, with one of the given Roles, to read a form. A user can only read a form if they are defined as its owner.'
+    label: 'Read Form Definition (Restricted to owners)',
+    tooltip: 'The Read Own permission will allow a user, with one of the given Roles, to read a form. A user can only read a form if they are defined as its owner.'
   },
   'update_own': {
-  label: 'Update Form Definition (Restricted to owners)',
-  tooltip: 'The Update Own permission will allow a user, with one of the given Roles, to update a form. A user can only update a form if they are defined as its owner.'
+    label: 'Update Form Definition (Restricted to owners)',
+    tooltip: 'The Update Own permission will allow a user, with one of the given Roles, to update a form. A user can only update a form if they are defined as its owner.'
   },
   'delete_own': {
-  label: 'Delete Form Definition (Restricted to owners)',
-  tooltip: 'The Delete Own permission will allow a user, with one of the given Roles, to delete a form. A user can only delete a form if they are defined as its owner.'
+    label: 'Delete Form Definition (Restricted to owners)',
+    tooltip: 'The Delete Own permission will allow a user, with one of the given Roles, to delete a form. A user can only delete a form if they are defined as its owner.'
   }
 });
 

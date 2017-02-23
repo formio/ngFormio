@@ -22,7 +22,7 @@ Feature: Login Functionality
     When I enter ${random-password} in the .login-container #password field
     And I click the LOG IN button
     Then I have been logged out
-    And I see .alert with the text Missing username
+    And I see .alert with the text Username not provided.
 
   Scenario: Missing password
     Given I am logged out
