@@ -31,7 +31,7 @@ var config = {
 
 Yadda.plugins.mocha.StepLevelPlugin.init();
 new Yadda.FeatureFileSearch('./test/features').each(function(file) {
-  if(file.includes('create-resource.feature')) {
+
     before(function (done) {
       library = require('./lib/formio-library')(config);
       done();
@@ -60,7 +60,7 @@ new Yadda.FeatureFileSearch('./test/features').each(function(file) {
         driver.end();
       });
     });
-  }
+
 });
 
 function takeScreenshotOnFailure(test) {
