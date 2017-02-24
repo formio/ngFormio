@@ -17,8 +17,12 @@ module.exports = function(app) {
               true: true,
               false: false
             };
+            var defaultValue = $scope.component.hasOwnProperty('defaultValue')
+              ? boolean[$scope.component.defaultValue] || false
+              : false;
+
             if ($scope.data && $scope.component.key) {
-              $scope.data[$scope.component.key] = boolean[$scope.data[$scope.component.key]] || false;
+              $scope.data[$scope.component.key] = boolean[$scope.data[$scope.component.key]] || defaultValue;
               loadComplete();
             }
           });
