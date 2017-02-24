@@ -12,7 +12,8 @@
       </div>
     </div>
     <div class="col-md-6 text-right">
-      <a ui-sref="project.{{ formType }}.create()" ng-if="listMode === formType" class="btn btn-success"><span class="glyphicon glyphicon-plus"></span> New {{ formType | capitalize }}</a>
+      <a ui-sref="project.{{ formType }}.import()" ng-if="listMode === formType" class="btn btn-primary"><span class="glyphicon glyphicon-cloud-download"></span> Import {{ formType | capitalize }}</a>
+      <a ui-sref="project.{{ formType }}.create()" ng-if="listMode === formType" class="btn btn-success"><span class="glyphicon glyphicon-plus"></span> Create {{ formType | capitalize }}</a>
     </div>
   </div>
   <div class="form-list">

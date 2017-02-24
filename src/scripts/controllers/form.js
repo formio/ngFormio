@@ -68,7 +68,18 @@ app.config([
           url: '/create/' + type,
           templateUrl: 'views/form/form-edit.html',
           controller: 'FormController',
-          params: {formType: type}
+          params: {
+            formType: type,
+            components: null
+          }
+        })
+        .state(parentName + '.import', {
+          url: '/import',
+          templateUrl: 'views/form/form-import.html',
+          controller: 'FormImportController',
+          params: {
+            formType: type
+          }
         })
         .state(parentName + '.form', {
           abstract: true,
@@ -261,6 +272,7 @@ app.controller('FormController', [
     $scope.projectId = $stateParams.projectId;
 
     // Resource information.
+    $scope.isCopy = !!($stateParams.components && $stateParams.components.length);
     $scope.formId = $stateParams.formId;
     $scope.formUrl = '/project/' + $scope.projectId + '/form';
     $scope.formUrl += $stateParams.formId ? ('/' + $stateParams.formId) : '';
@@ -280,7 +292,7 @@ app.controller('FormController', [
       title: '',
       display: 'form',
       type: formType,
-      components: [],
+      components: $stateParams.components || [],
       access: [],
       submissionAccess: []
     };
@@ -575,9 +587,11 @@ app.controller('FormController', [
 
 app.controller('FormEditController', [
   '$scope',
+  '$state',
   '$q',
   function(
     $scope,
+    $state,
     $q
   ) {
     // Clone original form after it has loaded, or immediately
@@ -586,11 +600,43 @@ app.controller('FormEditController', [
       $scope.originalForm = _.cloneDeep($scope.form);
     });
 
+    $scope.copy = function() {
+      $state.go('project.' + $scope.formInfo.type + '.create', { components: _.cloneDeep($scope.form.components)});
+    };
+
     // Revert to original form and go back
     $scope.cancel = function() {
       _.assign($scope.form, $scope.originalForm);
       $scope.back('project.' + $scope.formInfo.type + '.form.view');
     };
+  }
+]);
+
+app.controller('FormImportController', [
+  '$scope',
+  '$state',
+  '$stateParams',
+  'Formio',
+  'FormioAlerts',
+  function(
+    $scope,
+    $state,
+    $stateParams,
+    Formio,
+    FormioAlerts
+  ) {
+    $scope.capitalize = _.capitalize;
+    $scope.formType = $stateParams.formType || 'form';
+
+    $scope.importForm = function() {
+      (new Formio($scope.embedURL)).loadForm()
+        .then(function(form) {
+          $state.go('project.' + form.type + '.create', { components: form.components});
+        })
+        .catch(function(error) {
+          FormioAlerts.warn('Error fetching form: ' + error);
+        })
+    }
   }
 ]);
 
@@ -751,7 +797,6 @@ app.factory('FormioAlerts', [
         });
       },
       onError: function (error) {
-        console.log(error);
         var errors = error.hasOwnProperty('errors') ? error.errors : error.data && error.data.errors;
         if(errors && (Object.keys(errors).length || errors.length) > 0) {
           _.each(errors, (function(e) {
