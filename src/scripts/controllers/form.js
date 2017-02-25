@@ -562,6 +562,7 @@ app.controller('FormController', [
       })
       .then(function(response) {
         $scope.form = response.result;
+        $scope.form.builder = true;
         var headers = response.headers;
         var method = $stateParams.formId ? 'updated' : 'created';
         GoogleAnalytics.sendEvent('Form', method.substring(0, method.length - 1), null, 1);
