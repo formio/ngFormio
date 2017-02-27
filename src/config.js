@@ -69,7 +69,7 @@ angular.module('formioApp').constant('AppConfig', {
   apiServer: serverHost,
   serverHost: serverHost,
   protocol: apiProtocol,
-  pdfServer: 'http://localhost:4005',
+  pdfServer: 'https://files.form.io',
   tutorial: 'https://help.form.io/start/',
   userForm: formioBase + '/user',
   userLoginForm: formioBase + '/user/login',
