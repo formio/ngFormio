@@ -1,21 +1,22 @@
-<div class="project-section-content project-section-inner-content">
+<div class="project-section-content project-section-inner-content row">
   <div class="col-sm-12">
-    <div class=""><strong>To launch your project you can either launch an individual form or the full application. Select which you would like to do.</strong><br /><br /></div>
-    <div>
-      <div class="col-md-12">
-        <span style="display: inline-block; vertical-align: top;">
-          <h1 >Launch </h1>
-        </span>
-        <ul  style="display: inline-block;" class="nav nav-pills">
-          <li class="well" role="presentation" ng-class="{active:($state.includes('project.launch.form'))}"><a ui-sref="project.launch.form">A Single Form</a></li>
-          <li class="well" role="presentation" ng-class="{active:($state.includes('project.launch.local'))}"><a ui-sref="project.launch.local">Local App Development</a></li>
-          <li class="well" role="presentation" ng-class="{active:($state.includes('project.launch.app'))}"><a ui-sref="project.launch.app">Web App</a></li>
-          <li class="well" role="presentation" ng-class="{active:($state.includes('project.launch.cordova'))}"><a ui-sref="project.launch.cordova">iOS/Android App</a></li>
-        </ul>
-      </div>
-    </div>
+    <p>One of the major benefits with building a Serverless Application with Form.io, is the amount of flexibility you have in terms of launching and hosting your application. Some of the more common deployments are as follows.</p>
+    <ul>
+      <li>Launch a simple hosted form for quick data collection.</li>
+      <li>Host your web application within a <strong>Content Delivery Network (CDN)</strong></li>
+      <li>Compile your application as a native mobile application.</li>
+      <li>Install and run your application on your Local machine.</li>
+    </ul>
+    <p>To read more about how to compile your application for deployment, read our <a href="https://help.form.io/intro/appdev/#deployapp" target="_blank">Deploying your Application</a> section of our Help Docs.</p>
   </div>
-  <div class="col-sm-12" style="padding: 0 20px 40px 0;">
+  <div class="col-sm-12">
+    <ul class="nav nav-tabs">
+      <li role="presentation" ng-class="{active:($state.includes('project.launch.form'))}"><a ui-sref="project.launch.form">A Single Form</a></li>
+      <li role="presentation" ng-class="{active:($state.includes('project.launch.preview'))}"><a ui-sref="project.launch.preview">Application Preview</a></li>
+      <li role="presentation" ng-class="{active:($state.includes('project.launch.local'))}"><a ui-sref="project.launch.local">Local App Development</a></li>
+      <li role="presentation" ng-class="{active:($state.includes('project.launch.app'))}"><a ui-sref="project.launch.app">Web App</a></li>
+      <li role="presentation" ng-class="{active:($state.includes('project.launch.cordova'))}"><a ui-sref="project.launch.cordova">iOS/Android App</a></li>
+    </ul>
     <ng-form>
       <i id="project-loader" ng-if="!currentProject" style="font-size: 2em;" class="fa fa-spinner fa-pulse"></i>
       <div ng-if="currentProject" ui-view></div>

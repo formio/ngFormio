@@ -6,13 +6,13 @@
     <div class="row">
       <div class="col-lg-2 col-md-4 col-sm-4">
         <div id="form-group-title" class="form-group">
-          <label for="title" class="control-label">Title</label>
+          <label for="title" class="control-label field-required">Title</label>
           <input type="text" ng-model="form.title" ng-change="titleChange('{{form.title}}')" class="form-control" id="title" placeholder="Enter the form title" autofocus="!formId"/>
         </div>
       </div>
       <div class="col-lg-2 col-md-4 col-sm-4">
         <div id="form-group-name" class="form-group" ng-class="{'has-warning': originalForm.name && form.name !== originalForm.name && form.type === 'resource'}">
-          <label for="name" class="control-label">Name</label>
+          <label for="name" class="control-label field-required">Name</label>
           <input type="text" ng-model="form.name" class="form-control" id="name" placeholder="Enter the form machine name"/>
           <p ng-if="originalForm.name && form.name !== originalForm.name && form.type === 'resource'" class="help-block"><span class="glyphicon glyphicon-exclamation-sign"></span>
             Changing the name of a resource will break embedded components in other forms that refer to this resource.
@@ -27,7 +27,7 @@
       </div>
       <div class="col-lg-3 col-md-4 col-sm-4">
         <div id="form-group-path" class="form-group">
-          <label for="path" class="control-label">API Path</label>
+          <label for="path" class="control-label field-required">API Path</label>
           <div class="input-group">
             <span class="input-group-addon" style="font-size:0.7em;">{{ apiProtocol }}//{{ currentProject.name }}.{{ apiServer }}/</span>
             <input type="text" class="form-control" id="path" ng-model="form.path" placeholder="example" style="text-transform: lowercase; width:120px;">
