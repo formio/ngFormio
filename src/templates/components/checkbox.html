@@ -7,6 +7,7 @@
       ng-disabled="readOnly"
       ng-model="data[component.key]"
       ng-required="isRequired(component)"
+      custom-validator="component.validate.custom"
     >
     <span ng-if="!(component.hideLabel && component.datagridLabel === false)">{{ component.label | formioTranslate:null:builder }}</span>
   </label>
