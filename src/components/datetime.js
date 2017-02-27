@@ -114,6 +114,7 @@ module.exports = function(app) {
           },
           protected: false,
           persistent: true,
+          hidden: false,
           clearOnHide: true,
           validate: {
             required: false,

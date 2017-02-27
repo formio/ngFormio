@@ -1,6 +1,12 @@
 <div>
   <i style="font-size: 2em;" ng-if="formLoading" ng-class="{'formio-hidden': !formLoading}" class="formio-loading glyphicon glyphicon-refresh glyphicon-spin"></i>
   <formio-wizard ng-if="form.display === 'wizard'" src="src" form="form" submission="submission" form-action="formAction" read-only="readOnly" hide-components="hideComponents" disable-components="disableComponents" formio-options="formioOptions" storage="form.name"></formio-wizard>
+  <div ng-if="form.display === 'pdf' && form.settings.pdf" style="position:relative;">
+    <span style="position:absolute;right:10px;top:10px;cursor:pointer;" class="btn btn-default no-disable" ng-click="zoomIn()"><i class="fa fa-search-plus"></i></span>
+    <span style="position:absolute;right:10px;top:60px;cursor:pointer;" class="btn btn-default no-disable" ng-click="zoomOut()"><i class="fa fa-search-minus"></i></span>
+    <iframe src="{{ getIframeSrc(form.settings.pdf) | trustAsResourceUrl }}" seamless class="formio-iframe"></iframe>
+    <button ng-if="!readOnly && !form.builder" type="button" class="btn btn-primary" ng-click="submitIFrameForm()">Submit</button>
+  </div>
   <form ng-if="!form.display || (form.display === 'form')" role="form" name="formioForm" ng-submit="onSubmit(formioForm)" novalidate>
     <div ng-repeat="alert in formioAlerts track by $index" class="alert alert-{{ alert.type }}" role="alert" ng-if="::!builder">
       {{ alert.message | formioTranslate:null:builder }}

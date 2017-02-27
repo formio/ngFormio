@@ -22,19 +22,33 @@ module.exports = function() {
       'FormioScope',
       'Formio',
       'FormioUtils',
+      '$q',
       function(
         $scope,
         $http,
         $element,
         FormioScope,
         Formio,
-        FormioUtils
+        FormioUtils,
+        $q
       ) {
+        var iframeReady = $q.defer();
         $scope._src = $scope.src || '';
         $scope.formioAlerts = [];
         // Shows the given alerts (single or array), and dismisses old alerts
         this.showAlerts = $scope.showAlerts = function(alerts) {
           $scope.formioAlerts = [].concat(alerts);
+        };
+
+        $scope.getIframeSrc = function(src) {
+          var iframeSrc = src + '?token=' + Formio.getToken();
+          if ($scope.form.builder) {
+            iframeSrc += '&builder=1';
+          }
+          if ($scope.readOnly) {
+            iframeSrc += '&readonly=1';
+          }
+          return iframeSrc;
         };
 
         // Add the live form parameter to the url.
@@ -43,9 +57,56 @@ module.exports = function() {
           $scope._src += 'live=1';
         }
 
-        var cancelFormLoadEvent = $scope.$on('formLoad', function() {
-          cancelFormLoadEvent();
+        var sendIframeMessage = function(message) {
+          iframeReady.promise.then(function(iframe) {
+            iframe.contentWindow.postMessage(JSON.stringify(message), '*');
+          });
+        };
+
+        $scope.$on('iframe-ready', function() {
+          var iframe = $element.find('.formio-iframe')[0];
+          if (iframe) {
+            iframeReady.resolve(iframe);
+            if ($scope.form) {
+              sendIframeMessage({name: 'form', data: $scope.form});
+            }
+            if ($scope.submission) {
+              sendIframeMessage({name: 'submission', data: $scope.submission});
+            }
+          }
         });
+
+        $scope.$on('iframeMessage', function(event, message) {
+          sendIframeMessage(message);
+        });
+
+        var cancelFormLoadEvent = $scope.$on('formLoad', function(event, form) {
+          cancelFormLoadEvent();
+          sendIframeMessage({name: 'form', data: form});
+        });
+
+        $scope.$on('submissionLoad', function(event, submission) {
+          submission.editable = !$scope.readOnly;
+          sendIframeMessage({name: 'submission', data: submission});
+        });
+
+        // Submit the form from the iframe.
+        $scope.$on('iframe-submission', function(event, submission) {
+          $scope.submitForm(submission);
+        });
+
+        // Called from the submit on iframe.
+        $scope.submitIFrameForm = function() {
+          sendIframeMessage({name: 'getSubmission'});
+        };
+
+        $scope.zoomIn = function() {
+          sendIframeMessage({name: 'zoomIn'});
+        };
+
+        $scope.zoomOut = function() {
+          sendIframeMessage({name: 'zoomOut'});
+        };
 
         // FOR-71
         if (!$scope._src && !$scope.builder) {
@@ -87,6 +148,64 @@ module.exports = function() {
             $scope.submission ? $scope.submission.data : null,
             $scope.hideComponents
           );
+        };
+
+        // Show the submit message and say the form is no longer submitting.
+        var onSubmit = function(submission, message, form) {
+          if (message) {
+            $scope.showAlerts({
+              type: 'success',
+              message: message
+            });
+          }
+          if (form) {
+            form.submitting = false;
+          }
+        };
+
+        // Called when a submission has been made.
+        var onSubmitDone = function(method, submission, form) {
+          var message = '';
+          if ($scope.options && $scope.options.submitMessage) {
+            message = $scope.options.submitMessage;
+          }
+          else {
+            message = 'Submission was ' + ((method === 'put') ? 'updated' : 'created') + '.';
+          }
+          onSubmit(submission, message, form);
+          // Trigger the form submission.
+          $scope.$emit('formSubmission', submission);
+        };
+
+        $scope.submitForm = function(submissionData, form) {
+          // Allow custom action urls.
+          if ($scope.action) {
+            var method = submissionData._id ? 'put' : 'post';
+            $http[method]($scope.action, submissionData).success(function(submission) {
+              Formio.clearCache();
+              onSubmitDone(method, submission, form);
+            }).error(FormioScope.onError($scope, $element))
+              .finally(function() {
+                if (form) {
+                  form.submitting = false;
+                }
+              });
+          }
+
+          // If they wish to submit to the default location.
+          else if ($scope.formio && !$scope.formio.noSubmit) {
+            // copy to remove angular $$hashKey
+            $scope.formio.saveSubmission(submissionData, $scope.formioOptions).then(function(submission) {
+              onSubmitDone(submission.method, submission, form);
+            }, FormioScope.onError($scope, $element)).finally(function() {
+              if (form) {
+                form.submitting = false;
+              }
+            });
+          }
+          else {
+            $scope.$emit('formSubmission', submissionData);
+          }
         };
 
         $scope.isDisabled = function(component) {
@@ -189,34 +308,9 @@ module.exports = function() {
             }
           });
 
-          // Show the submit message and say the form is no longer submitting.
-          var onSubmit = function(submission, message) {
-            if (message) {
-              $scope.showAlerts({
-                type: 'success',
-                message: message
-              });
-            }
-            form.submitting = false;
-          };
-
-          // Called when a submission has been made.
-          var onSubmitDone = function(method, submission) {
-            var message = '';
-            if ($scope.options && $scope.options.submitMessage) {
-              message = $scope.options.submitMessage;
-            }
-            else {
-              message = 'Submission was ' + ((method === 'put') ? 'updated' : 'created') + '.';
-            }
-            onSubmit(submission, message);
-            // Trigger the form submission.
-            $scope.$emit('formSubmission', submission);
-          };
-
           // Allow the form to be completed externally.
           $scope.$on('submitDone', function(event, submission, message) {
-            onSubmit(submission, message);
+            onSubmit(submission, message, form);
           });
 
           // Allow an error to be thrown externally.
@@ -233,31 +327,7 @@ module.exports = function() {
 
           // Make sure to make a copy of the submission data to remove bad characters.
           submissionData = angular.copy(submissionData);
-
-          // Allow custom action urls.
-          if ($scope.action) {
-            var method = submissionData._id ? 'put' : 'post';
-            $http[method]($scope.action, submissionData).then(function(response) {
-              Formio.clearCache();
-              onSubmitDone(method, response.data);
-            }, FormioScope.onError($scope, $element))
-              .finally(function() {
-                form.submitting = false;
-              });
-          }
-
-          // If they wish to submit to the default location.
-          else if ($scope.formio && !$scope.formio.noSubmit) {
-            // copy to remove angular $$hashKey
-            $scope.formio.saveSubmission(submissionData, $scope.formioOptions).then(function(submission) {
-              onSubmitDone(submission.method, submission);
-            }, FormioScope.onError($scope, $element)).finally(function() {
-              form.submitting = false;
-            });
-          }
-          else {
-            $scope.$emit('formSubmission', submissionData);
-          }
+          $scope.submitForm(submissionData, form);
         };
       }
     ],

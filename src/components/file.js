@@ -19,6 +19,7 @@ module.exports = function(app) {
           defaultValue: '',
           protected: false,
           persistent: true,
+          hidden: false,
           clearOnHide: true
         },
         viewTemplate: 'formio/componentsView/file.html'
