@@ -46,7 +46,7 @@
   },
   "dependencies": {
     "browser-sync": "^2.10.1",
-    "ckeditor": "^4.6.2",
+    "ckeditor": "4.6.1",
     "debug": "^2.2.0",
     "dotenv": "1.2.0",
     "express": "4.12.3",
