@@ -426,6 +426,9 @@ app.controller('FormController', [
     if ($scope.formId) {
       $scope.loadFormPromise = $scope.formio.loadForm()
         .then(function(form) {
+          // FOR-362 - Fix pass by reference issue with the internal cache.
+          form = _.cloneDeep(form);
+
           // Ensure the display is form.
           if (!form.display) {
             form.display = 'form';
@@ -502,11 +505,11 @@ app.controller('FormController', [
       angular.element('.has-error').removeClass('has-error');
 
       // Copy to remove angular $$hashKey
-      $scope.formio.saveForm(angular.copy($scope.form), {
+      return $scope.formio.saveForm(angular.copy($scope.form), {
         getHeaders: true
       })
       .then(function(response) {
-        $scope.form = response.result;
+        $scope.form = $scope.originalForm = response.result;
         var headers = response.headers;
         var method = $stateParams.formId ? 'updated' : 'created';
         GoogleAnalytics.sendEvent('Form', method.substring(0, method.length - 1), null, 1);
@@ -576,9 +579,13 @@ app.controller('FormController', [
 app.controller('FormEditController', [
   '$scope',
   '$q',
+  'ngDialog',
+  '$state',
   function(
     $scope,
-    $q
+    $q,
+    ngDialog,
+    $state
   ) {
     // Clone original form after it has loaded, or immediately
     // if we're not loading a form
@@ -586,11 +593,101 @@ app.controller('FormEditController', [
       $scope.originalForm = _.cloneDeep($scope.form);
     });
 
+    // Track any modifications for save/cancel prompt on navigation away from the builder.
+    var dirty = false;
+    $scope.$on('formBuilder:add', function() {
+      dirty = true;
+    });
+    $scope.$on('formBuilder:update', function() {
+      dirty = true;
+    });
+    $scope.$on('formBuilder:remove', function() {
+      dirty = true;
+    });
+    $scope.$on('formBuilder:edit', function() {
+      dirty = true;
+    });
+
+    // Wrap saveForm in the editor to clear dirty when saved.
+    var parentSave = $scope.saveForm;
+    $scope.saveForm = function() {
+      dirty = false;
+      return parentSave();
+    };
+
+    /**
+     * Util function to show the cancel dialogue.
+     *
+     * @returns {Promise}
+     */
+    $scope.showCancelDialogue = function() {
+      var dialog = ngDialog.open({
+        template: 'views/form/cancel-confirm.html',
+        showClose: true,
+        className: 'ngdialog-theme-default',
+        controller: ['$scope', function($scope) {
+          // Reject the cancel action.
+          $scope.confirmSave = function() {
+            $scope.closeThisDialog('save');
+          };
+
+          // Accept the cancel action.
+          $scope.confirmCancel = function() {
+            $scope.closeThisDialog('close');
+          };
+        }]
+      });
+
+      return dialog.closePromise.then(function(data) {
+        if (data.value === 'close') {
+          return data;
+        }
+
+        throw data.value;
+      });
+    };
+
     // Revert to original form and go back
     $scope.cancel = function() {
-      _.assign($scope.form, $scope.originalForm);
-      $scope.back('project.' + $scope.formInfo.type + '.form.view');
+      return $scope.back('project.' + $scope.formInfo.type + '.form.view', {reload: true});
     };
+
+    // Listen for events to navigate away from the form builder.
+    $scope.$on('$stateChangeStart', function(event, transition) {
+      // If the form hasnt been modified, skip this cancel modal logic.
+      if (!dirty) {
+        return;
+      }
+
+      // Stop the transition event and check for the return of $scope.cancel.
+      event.preventDefault();
+
+      // Try to cancel the view.
+      $scope.showCancelDialogue()
+      .then(function() {
+        // Cancel without save was clicked, revert the form and get out.
+        $scope.form = $scope.$parent.form = angular.copy($scope.originalForm);
+        dirty = false;
+        $state.go(transition.name, {notify: false});
+      })
+      .catch(function(val) {
+        // If a value was given, the modal was closed with the x or escape. Take no action and stay on the current page.
+        if (!val || (val && val !== 'save')) {
+          console.error(val);
+          return;
+        }
+
+        // If there was no return the cancel action was rejected, save the form before navigation.
+        return $scope.saveForm()
+        .then(function(result) {
+          dirty = false;
+          $state.go(transition.name, {reload: true, notify: false});
+        })
+        .catch(function(err) {
+          console.error(err);
+        });
+      });
+    });
   }
 ]);
 
