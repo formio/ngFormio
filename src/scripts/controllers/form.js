@@ -1239,10 +1239,24 @@ app.controller('FormActionEditController', [
 
       var component = FormioUtils.getComponent($scope.form.components, _.get($scope, 'action.data.condition.field'));
       if (!component) {
+        // Add an alert to the window
         FormioAlerts.addAlert({
           type: 'danger',
           message: '<i class="glyphicon glyphicon-exclamation-sign"></i> This Action will not execute because the conditional settings are invalid. Please fix them before proceeding.'
         });
+
+        // Try to highlight the issue in the dom.
+        try {
+          $timeout(function() {
+            var element = angular.element('#field .ui-select-match span.btn-default.form-control');
+            element.css('border-color', 'red').on('blur', function() {
+              element.css('border-color', '');
+            });
+          });
+        }
+        catch (e) {
+          // do nothing if we cant find the input field.
+        }
       }
     });
 
