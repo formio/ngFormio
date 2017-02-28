@@ -1236,6 +1236,14 @@ app.controller('FormActionEditController', [
       ) {
         FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> This is a Premium Action, please upgrade your <a ui-sref="project.settings.plan">project plan</a> to enable it.');
       }
+
+      var component = FormioUtils.getComponent($scope.form.components, _.get($scope, 'action.data.condition.field'));
+      if (!component) {
+        FormioAlerts.addAlert({
+          type: 'danger',
+          message: '<i class="glyphicon glyphicon-exclamation-sign"></i> This Action will not execute because the conditional settings are invalid. Please fix them before proceeding.'
+        });
+      }
     });
 
     $scope.$on('formSubmission', function(event) {
