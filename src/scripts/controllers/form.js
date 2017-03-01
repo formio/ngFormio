@@ -1238,7 +1238,8 @@ app.controller('FormActionEditController', [
       }
 
       var component = FormioUtils.getComponent($scope.form.components, _.get($scope, 'action.data.condition.field'));
-      if (!component) {
+      var field = _.get($scope, 'action.data.condition.field');
+      if (!component && (field !== undefined && field !== '')) {
         // Add an alert to the window
         FormioAlerts.addAlert({
           type: 'danger',
