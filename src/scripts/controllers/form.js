@@ -1236,6 +1236,29 @@ app.controller('FormActionEditController', [
       ) {
         FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> This is a Premium Action, please upgrade your <a ui-sref="project.settings.plan">project plan</a> to enable it.');
       }
+
+      var component = FormioUtils.getComponent($scope.form.components, _.get($scope, 'action.data.condition.field'));
+      var field = _.get($scope, 'action.data.condition.field');
+      if (!component && (field !== undefined && field !== '')) {
+        // Add an alert to the window
+        FormioAlerts.addAlert({
+          type: 'danger',
+          message: '<i class="glyphicon glyphicon-exclamation-sign"></i> This Action will not execute because the conditional settings are invalid. Please fix them before proceeding.'
+        });
+
+        // Try to highlight the issue in the dom.
+        try {
+          $timeout(function() {
+            var element = angular.element('#field .ui-select-match span.btn-default.form-control');
+            element.css('border-color', 'red').on('blur', function() {
+              element.css('border-color', '');
+            });
+          });
+        }
+        catch (e) {
+          // do nothing if we cant find the input field.
+        }
+      }
     });
 
     $scope.$on('formSubmission', function(event) {
