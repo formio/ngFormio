@@ -9,22 +9,32 @@ module.exports = function(app) {
         tableView: function(data) {
           return data ? 'Yes' : 'No';
         },
-        controller: ['$scope', function($scope) {
+        controller: ['$scope', '$timeout', function($scope, $timeout) {
           if ($scope.builder) return;
+          var boolean = {
+            true: true,
+            false: false
+          };
+          var defaultValue = $scope.component.hasOwnProperty('defaultValue')
+            ? boolean[$scope.component.defaultValue] || false
+            : false;
+
+          // On the first load, attempt to set the default value.
+          $scope.data[$scope.component.key] = boolean[$scope.data[$scope.component.key]] || defaultValue;
+
           // FA-850 - Ensure the checked value is always a boolean object when loaded, then unbind the watch.
-          var loadComplete = $scope.$watch('data.' + $scope.component.key, function() {
-            var boolean = {
-              true: true,
-              false: false
-            };
-            if ($scope.data && $scope.data.hasOwnProperty($scope.component.key) && !($scope.data[$scope.component.key] instanceof Boolean)) {
-              if ($scope.component.validate && $scope.component.validate.required && !$scope.data[$scope.component.key]) {
+          $scope.$watch('data.' + $scope.component.key, function() {
+            if (!$scope.data || !$scope.component.key) return;
+
+            // If the component is required, and its current value is false, delete the entry.
+            if (
+              $scope.component.validate
+              && $scope.component.validate.required
+              && (boolean[$scope.data[$scope.component.key]] || false) === false
+            ) {
+              $timeout(function() {
                 delete $scope.data[$scope.component.key];
-              }
-              else {
-                $scope.data[$scope.component.key] = boolean[$scope.data[$scope.component.key]] || false;
-              }
-              loadComplete();
+              });
             }
           });
         }],

@@ -13,6 +13,11 @@ module.exports = function(app) {
         controller: ['$scope', '$timeout', function($scope, $timeout) {
           if ($scope.builder) return;
 
+          // Close calendar pop up when tabbing off button
+          $scope.onKeyDown = function(event) {
+            return event.keyCode === 9 ? false : $scope.calendarOpen;
+          };
+
           var dateValue = function() {
             // If the date is set, then return the true date value.
             if ($scope.data[$scope.component.key]) {
@@ -45,8 +50,11 @@ module.exports = function(app) {
             if (!$scope.data) {
               return;
             }
+            var valueSet = !!$scope.data[$scope.component.key];
             $scope.data[$scope.component.key] = dateValue();
-            loadComplete();
+            if (valueSet) {
+              loadComplete();
+            }
           });
 
           // If they have 12 hour time enabled, we need to ensure that we see the meridian in the format.

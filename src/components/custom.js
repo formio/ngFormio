@@ -1,4 +1,6 @@
 var fs = require('fs');
+var GridUtils = require('../factories/GridUtils')();
+
 module.exports = function(app) {
   app.config([
     'formioComponentsProvider',
@@ -7,7 +9,8 @@ module.exports = function(app) {
         title: 'Custom',
         template: 'formio/components/custom.html',
         group: 'advanced',
-        settings: {}
+        settings: {},
+        tableView: GridUtils.generic
       });
     }
   ]);

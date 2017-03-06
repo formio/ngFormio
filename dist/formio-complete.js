@@ -1,4 +1,4 @@
-/*! ng-formio v2.9.9 | https://unpkg.com/ng-formio@2.9.9/LICENSE.txt */
+/*! ng-formio v2.10.6 | https://unpkg.com/ng-formio@2.10.6/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -1343,7 +1343,7 @@ return /******/ (function(modules) { // webpackBootstrap
 })();
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"angular":9,"moment":35}],3:[function(_dereq_,module,exports){
+},{"angular":9,"moment":34}],3:[function(_dereq_,module,exports){
 /**
  * @license AngularJS v1.6.2
  * (c) 2010-2017 Google, Inc. http://angularjs.org
@@ -47738,13 +47738,19 @@ module.exports = {
       if (data && (value === null || typeof value === 'undefined')) {
         value = this.getValue({data: data}, cond.when);
       }
+      // FOR-400 - Fix issue where falsey values were being evaluated as show=true
       if (value === null || typeof value === 'undefined') {
-        value = component.hasOwnProperty('defaultValue') ? component.defaultValue : '';
+        return false;
       }
       // Special check for selectboxes component.
       if (typeof value === 'object' && value.hasOwnProperty(cond.eq)) {
         return value[cond.eq].toString() === cond.show.toString();
       }
+      // FOR-179 - Check for multiple values.
+      if (value instanceof Array && value.indexOf(cond.eq) !== -1) {
+        return (cond.show.toString() === 'true');
+      }
+
       return (value.toString() === cond.eq.toString()) === (cond.show.toString() === 'true');
     }
 
@@ -47771,18 +47777,7 @@ module.exports = {
         return null;
       }
 
-      if (data instanceof Array) {
-        for (i = 0; i < data.length; i++) {
-          if (typeof data[i] === 'object') {
-            value = search(data[i]);
-          }
-
-          if (value) {
-            return value;
-          }
-        }
-      }
-      else if (typeof data === 'object') {
+      if (typeof data === 'object' && !(data instanceof Array)) {
         if (data.hasOwnProperty(key)) {
           return data[key];
         }
@@ -48686,14 +48681,12 @@ Formio.deregisterPlugin = function(plugin) {
 
 module.exports = Formio;
 
-},{"./providers":28,"eventemitter2":24,"native-promise-only":36,"shallow-copy":39,"whatwg-fetch":42}],27:[function(_dereq_,module,exports){
-arguments[4][26][0].apply(exports,arguments)
-},{"./providers":28,"dup":26,"eventemitter2":24,"native-promise-only":36,"shallow-copy":39,"whatwg-fetch":42}],28:[function(_dereq_,module,exports){
+},{"./providers":27,"eventemitter2":24,"native-promise-only":35,"shallow-copy":38,"whatwg-fetch":41}],27:[function(_dereq_,module,exports){
 module.exports = {
   storage: _dereq_('./storage')
 };
 
-},{"./storage":30}],29:[function(_dereq_,module,exports){
+},{"./storage":29}],28:[function(_dereq_,module,exports){
 var Promise = _dereq_("native-promise-only");
 var dropbox = function(formio) {
   return {
@@ -48769,14 +48762,14 @@ module.exports = dropbox;
 
 
 
-},{"native-promise-only":36}],30:[function(_dereq_,module,exports){
+},{"native-promise-only":35}],29:[function(_dereq_,module,exports){
 module.exports = {
   dropbox: _dereq_('./dropbox.js'),
   s3: _dereq_('./s3.js'),
   url: _dereq_('./url.js'),
 };
 
-},{"./dropbox.js":29,"./s3.js":31,"./url.js":32}],31:[function(_dereq_,module,exports){
+},{"./dropbox.js":28,"./s3.js":30,"./url.js":31}],30:[function(_dereq_,module,exports){
 var Promise = _dereq_("native-promise-only");
 var s3 = function(formio) {
   return {
@@ -48894,9 +48887,9 @@ s3.title = 'S3';
 s3.name = 's3';
 module.exports = s3;
 
-},{"native-promise-only":36}],32:[function(_dereq_,module,exports){
+},{"native-promise-only":35}],31:[function(_dereq_,module,exports){
 var Promise = _dereq_("native-promise-only");
-var Formio  = _dereq_("../../Formio");
+var Formio  = _dereq_("../../formio");
 var url = function(formio) {
   return {
     title: 'Url',
@@ -48962,7 +48955,7 @@ url.name = 'url';
 url.title = 'Url';
 module.exports = url;
 
-},{"../../Formio":26,"native-promise-only":36}],33:[function(_dereq_,module,exports){
+},{"../../formio":26,"native-promise-only":35}],32:[function(_dereq_,module,exports){
 (function (global){
 /**
  * lodash (Custom Build) <https://lodash.com/>
@@ -51332,7 +51325,7 @@ function property(path) {
 module.exports = filter;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],34:[function(_dereq_,module,exports){
+},{}],33:[function(_dereq_,module,exports){
 (function (global){
 /**
  * lodash (Custom Build) <https://lodash.com/>
@@ -52267,7 +52260,7 @@ function get(object, path, defaultValue) {
 module.exports = get;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],35:[function(_dereq_,module,exports){
+},{}],34:[function(_dereq_,module,exports){
 //! moment.js
 //! version : 2.17.1
 //! authors : Tim Wood, Iskren Chernev, Moment.js contributors
@@ -56570,7 +56563,7 @@ return hooks;
 
 })));
 
-},{}],36:[function(_dereq_,module,exports){
+},{}],35:[function(_dereq_,module,exports){
 (function (global){
 /*! Native Promise Only
     v0.8.1 (c) Kyle Simpson
@@ -56947,7 +56940,7 @@ return hooks;
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],37:[function(_dereq_,module,exports){
+},{}],36:[function(_dereq_,module,exports){
 /**!
  * AngularJS file upload directives and services. Supports: file upload/drop/paste, resume, cancel/abort,
  * progress, resize, thumbnail, preview, validation and CORS
@@ -59847,10 +59840,10 @@ ngFileUpload.service('UploadExif', ['UploadResize', '$q', function (UploadResize
 }]);
 
 
-},{}],38:[function(_dereq_,module,exports){
+},{}],37:[function(_dereq_,module,exports){
 _dereq_('./dist/ng-file-upload-all');
 module.exports = 'ngFileUpload';
-},{"./dist/ng-file-upload-all":37}],39:[function(_dereq_,module,exports){
+},{"./dist/ng-file-upload-all":36}],38:[function(_dereq_,module,exports){
 module.exports = function (obj) {
     if (!obj || typeof obj !== 'object') return obj;
     
@@ -59887,7 +59880,7 @@ var isArray = Array.isArray || function (xs) {
     return {}.toString.call(xs) === '[object Array]';
 };
 
-},{}],40:[function(_dereq_,module,exports){
+},{}],39:[function(_dereq_,module,exports){
 (function (root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module unless amdModuleId is set
@@ -60278,7 +60271,7 @@ return SignaturePad;
 
 }));
 
-},{}],41:[function(_dereq_,module,exports){
+},{}],40:[function(_dereq_,module,exports){
 /*!
  * ui-select
  * http://github.com/angular-ui/ui-select
@@ -62672,7 +62665,7 @@ $templateCache.put("selectize/match.tpl.html","<div ng-hide=\"$select.searchEnab
 $templateCache.put("selectize/no-choice.tpl.html","<div class=\"ui-select-no-choice selectize-dropdown\" ng-show=\"$select.items.length == 0\"><div class=\"selectize-dropdown-content\"><div data-selectable=\"\" ng-transclude=\"\"></div></div></div>");
 $templateCache.put("selectize/select-multiple.tpl.html","<div class=\"ui-select-container selectize-control multi plugin-remove_button\" ng-class=\"{\'open\': $select.open}\"><div class=\"selectize-input\" ng-class=\"{\'focus\': $select.open, \'disabled\': $select.disabled, \'selectize-focus\' : $select.focus}\" ng-click=\"$select.open && !$select.searchEnabled ? $select.toggle($event) : $select.activate()\"><div class=\"ui-select-match\"></div><input type=\"search\" autocomplete=\"off\" tabindex=\"-1\" class=\"ui-select-search\" ng-class=\"{\'ui-select-search-hidden\':!$select.searchEnabled}\" placeholder=\"{{$selectMultiple.getPlaceholder()}}\" ng-model=\"$select.search\" ng-disabled=\"$select.disabled\" aria-expanded=\"{{$select.open}}\" aria-label=\"{{ $select.baseTitle }}\" ondrop=\"return false;\"></div><div class=\"ui-select-choices\"></div><div class=\"ui-select-no-choice\"></div></div>");
 $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container selectize-control single\" ng-class=\"{\'open\': $select.open}\"><div class=\"selectize-input\" ng-class=\"{\'focus\': $select.open, \'disabled\': $select.disabled, \'selectize-focus\' : $select.focus}\" ng-click=\"$select.open && !$select.searchEnabled ? $select.toggle($event) : $select.activate()\"><div class=\"ui-select-match\"></div><input type=\"search\" autocomplete=\"off\" tabindex=\"-1\" class=\"ui-select-search ui-select-toggle\" ng-class=\"{\'ui-select-search-hidden\':!$select.searchEnabled}\" ng-click=\"$select.toggle($event)\" placeholder=\"{{$select.placeholder}}\" ng-model=\"$select.search\" ng-hide=\"!$select.isEmpty() && !$select.open\" ng-disabled=\"$select.disabled\" aria-label=\"{{ $select.baseTitle }}\"></div><div class=\"ui-select-choices\"></div><div class=\"ui-select-no-choice\"></div></div>");}]);
-},{}],42:[function(_dereq_,module,exports){
+},{}],41:[function(_dereq_,module,exports){
 (function(self) {
   'use strict';
 
@@ -63067,7 +63060,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
   self.fetch.polyfill = true
 })(typeof self !== 'undefined' ? self : this);
 
-},{}],43:[function(_dereq_,module,exports){
+},{}],42:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -63155,7 +63148,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],44:[function(_dereq_,module,exports){
+},{}],43:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -63333,7 +63326,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],45:[function(_dereq_,module,exports){
+},{}],44:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -63346,22 +63339,32 @@ module.exports = function(app) {
         tableView: function(data) {
           return data ? 'Yes' : 'No';
         },
-        controller: ['$scope', function($scope) {
+        controller: ['$scope', '$timeout', function($scope, $timeout) {
           if ($scope.builder) return;
+          var boolean = {
+            true: true,
+            false: false
+          };
+          var defaultValue = $scope.component.hasOwnProperty('defaultValue')
+            ? boolean[$scope.component.defaultValue] || false
+            : false;
+
+          // On the first load, attempt to set the default value.
+          $scope.data[$scope.component.key] = boolean[$scope.data[$scope.component.key]] || defaultValue;
+
           // FA-850 - Ensure the checked value is always a boolean object when loaded, then unbind the watch.
-          var loadComplete = $scope.$watch('data.' + $scope.component.key, function() {
-            var boolean = {
-              true: true,
-              false: false
-            };
-            if ($scope.data && $scope.data.hasOwnProperty($scope.component.key) && !($scope.data[$scope.component.key] instanceof Boolean)) {
-              if ($scope.component.validate && $scope.component.validate.required && !$scope.data[$scope.component.key]) {
+          $scope.$watch('data.' + $scope.component.key, function() {
+            if (!$scope.data || !$scope.component.key) return;
+
+            // If the component is required, and its current value is false, delete the entry.
+            if (
+              $scope.component.validate
+              && $scope.component.validate.required
+              && (boolean[$scope.data[$scope.component.key]] || false) === false
+            ) {
+              $timeout(function() {
                 delete $scope.data[$scope.component.key];
-              }
-              else {
-                $scope.data[$scope.component.key] = boolean[$scope.data[$scope.component.key]] || false;
-              }
-              loadComplete();
+              });
             }
           });
         }],
@@ -63389,13 +63392,13 @@ module.exports = function(app) {
     '$templateCache',
     function($templateCache) {
       $templateCache.put('formio/components/checkbox.html',
-        "<div class=\"checkbox\">\n  <label for=\"{{ componentId }}\" ng-class=\"{'field-required': isRequired(component)}\">\n    <input\n      type=\"{{ component.inputType }}\"\n      id=\"{{ componentId }}\"\n      tabindex=\"{{ component.tabindex || 0 }}\"\n      ng-disabled=\"readOnly\"\n      ng-model=\"data[component.key]\"\n      ng-required=\"isRequired(component)\"\n    >\n    <span ng-if=\"!(component.hideLabel && component.datagridLabel === false)\">{{ component.label | formioTranslate:null:builder }}</span>\n  </label>\n</div>\n<div ng-if=\"!!component.description\" class=\"help-block\">\n  <span>{{ component.description }}</span>\n</div>\n"
+        "<div class=\"checkbox\">\n  <label for=\"{{ componentId }}\" ng-class=\"{'field-required': isRequired(component)}\">\n    <input\n      type=\"{{ component.inputType }}\"\n      id=\"{{ componentId }}\"\n      tabindex=\"{{ component.tabindex || 0 }}\"\n      ng-disabled=\"readOnly\"\n      ng-model=\"data[component.key]\"\n      ng-required=\"isRequired(component)\"\n      custom-validator=\"component.validate.custom\"\n    >\n    <span ng-if=\"!(component.hideLabel && component.datagridLabel === false)\">{{ component.label | formioTranslate:null:builder }}</span>\n  </label>\n</div>\n<div ng-if=\"!!component.description\" class=\"help-block\">\n  <span>{{ component.description }}</span>\n</div>\n"
       );
     }
   ]);
 };
 
-},{}],46:[function(_dereq_,module,exports){
+},{}],45:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -63429,7 +63432,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],47:[function(_dereq_,module,exports){
+},{}],46:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.provider('formioComponents', function() {
@@ -63489,8 +63492,9 @@ module.exports = function(app) {
   }]);
 };
 
-},{}],48:[function(_dereq_,module,exports){
+},{}],47:[function(_dereq_,module,exports){
 "use strict";
+
 
 module.exports = function(app) {
   app.config([
@@ -63502,6 +63506,41 @@ module.exports = function(app) {
         viewTemplate: 'formio/componentsView/container.html',
         group: 'advanced',
         icon: 'fa fa-folder-open',
+        tableView: function(data, component, $interpolate, componentInfo) {
+          var view = '<table class="table table-striped table-bordered"><thead><tr>';
+          angular.forEach(component.components, function(component) {
+            view += '<th>' + component.label + '</th>';
+          });
+          view += '</tr></thead>';
+          view += '<tbody>';
+          view += '<tr>';
+          angular.forEach(component.components, function(component) {
+            var info = componentInfo.components.hasOwnProperty(component.type) ? componentInfo.components[component.type] : {};
+            if (info.tableView) {
+              view += '<td>' +
+                info.tableView(
+                  data && component.key && data.hasOwnProperty(component.key) ? data[component.key] : '',
+                  component,
+                  $interpolate,
+                  componentInfo
+                ) + '</td>';
+              return;
+            }
+
+            view += '<td>';
+            if (component.prefix) {
+              view += component.prefix;
+            }
+            view += data && component.key && data.hasOwnProperty(component.key) ? data[component.key] : '';
+            if (component.suffix) {
+              view += ' ' + component.suffix;
+            }
+            view += '</td>';
+          });
+          view += '</tr>';
+          view += '</tbody></table>';
+          return view;
+        },
         settings: {
           input: true,
           tree: true,
@@ -63534,7 +63573,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],49:[function(_dereq_,module,exports){
+},{}],48:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -63563,7 +63602,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],50:[function(_dereq_,module,exports){
+},{}],49:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -63673,8 +63712,10 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],51:[function(_dereq_,module,exports){
+},{}],50:[function(_dereq_,module,exports){
 "use strict";
+
+var GridUtils = _dereq_('../factories/GridUtils')();
 
 module.exports = function(app) {
   app.config([
@@ -63684,7 +63725,8 @@ module.exports = function(app) {
         title: 'Custom',
         template: 'formio/components/custom.html',
         group: 'advanced',
-        settings: {}
+        settings: {},
+        tableView: GridUtils.generic
       });
     }
   ]);
@@ -63698,7 +63740,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],52:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":88}],51:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -63775,6 +63817,17 @@ module.exports = function(app) {
 
       // Pull out the rows and cols for easy iteration.
       $scope.rows = $scope.data[$scope.component.key];
+      // If less than minLength, add that many rows.
+      if ($scope.component.validate && $scope.component.validate.hasOwnProperty('minLength') && $scope.rows.length < $scope.component.validate.minLength) {
+        var toAdd = $scope.component.validate.minLength - $scope.rows.length;
+        for (var i = 0; i < toAdd; i++) {
+          $scope.rows.push({});
+        }
+      }
+      // If more than maxLength, remove extra rows.
+      if ($scope.component.validate && $scope.component.validate.hasOwnProperty('maxLength') && $scope.rows.length < $scope.component.validate.maxLength) {
+        $scope.rows = $scope.rows.slice(0, $scope.component.validate.maxLength);
+      }
       $scope.cols = $scope.component.components;
       $scope.localKeys = $scope.component.components.map(function(component) {
         return component.key;
@@ -63799,13 +63852,13 @@ module.exports = function(app) {
     'FormioUtils',
     function($templateCache, FormioUtils) {
       $templateCache.put('formio/components/datagrid.html', FormioUtils.fieldWrap(
-        "<div class=\"formio-data-grid\" ng-controller=\"formioDataGrid\">\n  <table ng-class=\"{'table-striped': component.striped, 'table-bordered': component.bordered, 'table-hover': component.hover, 'table-condensed': component.condensed}\" class=\"table datagrid-table\">\n    <tr>\n      <th\n        ng-repeat=\"col in cols track by $index\"\n        ng-class=\"{'field-required': col.validate.required}\"\n        ng-if=\"builder ? '::true' : anyVisible(col)\"\n      >{{ col.label | formioTranslate:null:builder }}</th>\n    </tr>\n    <tr ng-repeat=\"row in rows track by $index\" ng-init=\"rowIndex = $index\">\n      <td ng-repeat=\"col in cols track by $index\" ng-init=\"col.hideLabel = true; colIndex = $index\" class=\"formio-data-grid-row\" ng-if=\"builder ? '::true' : anyVisible(col)\">\n        <formio-component\n          component=\"col\"\n          data=\"rows[rowIndex]\"\n          formio-form=\"formioForm\"\n          formio=\"formio\"\n          submission=\"submission\"\n          hide-components=\"hideComponents\"\n          ng-if=\"builder ? '::true' : isVisible(col, row)\"\n          read-only=\"isDisabled(col, row)\"\n          grid-row=\"rowIndex\"\n          grid-col=\"colIndex\"\n          builder=\"builder\"\n        ></formio-component>\n      </td>\n      <td>\n        <a ng-click=\"removeRow(rowIndex)\" class=\"btn btn-default\">\n          <span class=\"glyphicon glyphicon-remove-circle\"></span>\n        </a>\n      </td>\n    </tr>\n  </table>\n  <div class=\"datagrid-add\">\n    <a ng-click=\"addRow()\" class=\"btn btn-primary\">\n      <span class=\"glyphicon glyphicon-plus\" aria-hidden=\"true\"></span> {{ component.addAnother || \"Add Another\" | formioTranslate:null:builder }}\n    </a>\n  </div>\n</div>\n"
+        "<div class=\"formio-data-grid\" ng-controller=\"formioDataGrid\">\n  <table ng-class=\"{'table-striped': component.striped, 'table-bordered': component.bordered, 'table-hover': component.hover, 'table-condensed': component.condensed}\" class=\"table datagrid-table\">\n    <tr>\n      <th\n        ng-repeat=\"col in cols track by $index\"\n        ng-class=\"{'field-required': col.validate.required}\"\n        ng-if=\"builder ? '::true' : anyVisible(col)\"\n      >{{ col.label | formioTranslate:null:builder }}</th>\n    </tr>\n    <tr ng-repeat=\"row in rows track by $index\" ng-init=\"rowIndex = $index\">\n      <td ng-repeat=\"col in cols track by $index\" ng-init=\"col.hideLabel = true; colIndex = $index\" class=\"formio-data-grid-row\" ng-if=\"builder ? '::true' : anyVisible(col)\">\n        <formio-component\n          component=\"col\"\n          data=\"rows[rowIndex]\"\n          formio-form=\"formioForm\"\n          formio=\"formio\"\n          submission=\"submission\"\n          hide-components=\"hideComponents\"\n          ng-if=\"builder ? '::true' : isVisible(col, row)\"\n          read-only=\"isDisabled(col, row)\"\n          grid-row=\"rowIndex\"\n          grid-col=\"colIndex\"\n          builder=\"builder\"\n        ></formio-component>\n      </td>\n      <td ng-if=\"!component.hasOwnProperty('validate') || !component.validate.hasOwnProperty('minLength') || rows.length > component.validate.minLength\">\n        <a ng-click=\"removeRow(rowIndex)\" class=\"btn btn-default\">\n          <span class=\"glyphicon glyphicon-remove-circle\"></span>\n        </a>\n      </td>\n    </tr>\n  </table>\n  <div class=\"datagrid-add\" ng-if=\"!component.hasOwnProperty('validate') || !component.validate.hasOwnProperty('maxLength') || rows.length < component.validate.maxLength\">\n    <a ng-click=\"addRow()\" class=\"btn btn-primary\">\n      <span class=\"glyphicon glyphicon-plus\" aria-hidden=\"true\"></span> {{ component.addAnother || \"Add Another\" | formioTranslate:null:builder }}\n    </a>\n  </div>\n</div>\n"
       ));
     }
   ]);
 };
 
-},{}],53:[function(_dereq_,module,exports){
+},{}],52:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -63821,6 +63874,11 @@ module.exports = function(app) {
         group: 'advanced',
         controller: ['$scope', '$timeout', function($scope, $timeout) {
           if ($scope.builder) return;
+
+          // Close calendar pop up when tabbing off button
+          $scope.onKeyDown = function(event) {
+            return event.keyCode === 9 ? false : $scope.calendarOpen;
+          };
 
           var dateValue = function() {
             // If the date is set, then return the true date value.
@@ -63854,8 +63912,11 @@ module.exports = function(app) {
             if (!$scope.data) {
               return;
             }
+            var valueSet = !!$scope.data[$scope.component.key];
             $scope.data[$scope.component.key] = dateValue();
-            loadComplete();
+            if (valueSet) {
+              loadComplete();
+            }
           });
 
           // If they have 12 hour time enabled, we need to ensure that we see the meridian in the format.
@@ -63929,13 +63990,13 @@ module.exports = function(app) {
     'FormioUtils',
     function($templateCache, FormioUtils) {
       $templateCache.put('formio/components/datetime.html', FormioUtils.fieldWrap(
-        "<div class=\"input-group\">\n  <input\n    type=\"text\"\n    class=\"form-control\"\n    name=\"{{ componentId }}\"\n    id=\"{{ componentId }}\"\n    ng-focus=\"calendarOpen = autoOpen\"\n    ng-click=\"calendarOpen = true\"\n    ng-init=\"calendarOpen = false\"\n    ng-disabled=\"readOnly\"\n    ng-required=\"isRequired(component)\"\n    is-open=\"calendarOpen\"\n    datetime-picker=\"{{ component.format }}\"\n    min-date=\"component.minDate\"\n    max-date=\"component.maxDate\"\n    datepicker-mode=\"component.datepickerMode\"\n    when-closed=\"onClosed()\"\n    custom-validator=\"component.validate.custom\"\n    enable-date=\"component.enableDate\"\n    enable-time=\"component.enableTime\"\n    ng-model=\"data[component.key]\"\n    tabindex=\"{{ component.tabindex || 0 }}\"\n    placeholder=\"{{ component.placeholder | formioTranslate:null:builder }}\"\n    datepicker-options=\"component.datePicker\"\n    timepicker-options=\"component.timePicker\"\n  />\n  <span class=\"input-group-btn\">\n    <button type=\"button\" ng-disabled=\"readOnly\" class=\"btn btn-default\" ng-click=\"calendarOpen = true\">\n      <i ng-if=\"component.enableDate\" class=\"glyphicon glyphicon-calendar\"></i>\n      <i ng-if=\"!component.enableDate\" class=\"glyphicon glyphicon-time\"></i>\n    </button>\n  </span>\n</div>\n"
+        "<div class=\"input-group\">\n  <input\n    type=\"text\"\n    class=\"form-control\"\n    name=\"{{ componentId }}\"\n    id=\"{{ componentId }}\"\n    ng-focus=\"calendarOpen = autoOpen\"\n    ng-click=\"calendarOpen = true\"\n    ng-init=\"calendarOpen = false\"\n    ng-disabled=\"readOnly\"\n    ng-required=\"isRequired(component)\"\n    is-open=\"calendarOpen\"\n    datetime-picker=\"{{ component.format }}\"\n    min-date=\"component.minDate\"\n    max-date=\"component.maxDate\"\n    datepicker-mode=\"component.datepickerMode\"\n    when-closed=\"onClosed()\"\n    custom-validator=\"component.validate.custom\"\n    enable-date=\"component.enableDate\"\n    enable-time=\"component.enableTime\"\n    ng-model=\"data[component.key]\"\n    tabindex=\"{{ component.tabindex || 0 }}\"\n    placeholder=\"{{ component.placeholder | formioTranslate:null:builder }}\"\n    datepicker-options=\"component.datePicker\"\n    timepicker-options=\"component.timePicker\"\n  />\n  <span class=\"input-group-btn\">\n    <button type=\"button\" ng-disabled=\"readOnly\" class=\"btn btn-default\" ng-click=\"calendarOpen = true\" ng-keydown=\"calendarOpen = onKeyDown($event)\">\n      <i ng-if=\"component.enableDate\" class=\"glyphicon glyphicon-calendar\"></i>\n      <i ng-if=\"!component.enableDate\" class=\"glyphicon glyphicon-time\"></i>\n    </button>\n  </span>\n</div>\n"
       ));
     }
   ]);
 };
 
-},{}],54:[function(_dereq_,module,exports){
+},{}],53:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -63991,8 +64052,21 @@ module.exports = function(app) {
       templateUrl: 'formio/components/day-input.html',
       controller: ['$scope', function($scope) {
         if ($scope.builder) return;
-        $scope.months = [$scope.component.fields.month.placeholder, 'January', 'February', 'March', 'April', 'May', 'June',
-          'July', 'August', 'September', 'October', 'November', 'December'];
+        $scope.months = [
+          {value: '', label: $scope.component.fields.month.placeholder},
+          {value: '01', label: 'January'},
+          {value: '02', label: 'February'},
+          {value: '03', label: 'March'},
+          {value: '04', label: 'April'},
+          {value: '05', label: 'May'},
+          {value: '06', label: 'June'},
+          {value: '07', label: 'July'},
+          {value: '08', label: 'August'},
+          {value: '09', label: 'September'},
+          {value: '10', label: 'October'},
+          {value: '11', label: 'November'},
+          {value: '12', label: 'December'}
+        ];
 
         $scope.date = {
           day: '',
@@ -64011,18 +64085,30 @@ module.exports = function(app) {
               : ngModel.$viewValue;
             if ((parts instanceof Array) && parts.length === 3) {
               scope.date.day = parts[(scope.component.dayFirst ? 0 : 1)];
-              scope.date.month = parseInt(parts[(scope.component.dayFirst ? 1 : 0)]).toString();
+              scope.date.month = parts[(scope.component.dayFirst ? 1 : 0)];
               scope.date.year = parts[2];
             }
           }
         });
 
         var padLeft = function padLeft(nr, n, str) {
-          return Array(n - String(nr.toString()).length + 1).join(str || '0') + nr.toString();
+          nr = nr.toString();
+          if (nr.length > n) {
+            return nr.substr(0, n);
+          }
+
+          return Array((n - nr.length) + 1).join(str || '0') + nr;
         };
 
         scope.onChange = function() {
-          ngModel.$setViewValue(padLeft(scope.date.day, 2) + '/' + padLeft(scope.date.month, 2) + '/' + padLeft(scope.date.year, 4));
+          var day = padLeft(scope.date.day, 2);
+          var month = padLeft(scope.date.month, 2);
+          var year = padLeft(scope.date.year, 4);
+          var value = scope.component.dayFirst ? day : month;
+          value += '/';
+          value += scope.component.dayFirst ? month : day;
+          value += '/' + year;
+          ngModel.$setViewValue(value);
         };
 
         ngModel.$validators.day = function(modelValue, viewValue) {
@@ -64104,13 +64190,13 @@ module.exports = function(app) {
         "<div class=\"day-input\">\n  <day-input\n    name=\"{{componentId}}\"\n    component-id=\"componentId\"\n    read-only=\"isDisabled(component, data)\"\n    component=\"component\"\n    ng-required=\"isRequired(component)\"\n    custom-validator=\"component.validate.custom\"\n    ng-model=\"data[component.key]\"\n    tabindex=\"{{ component.tabindex || 0 }}\"\n    builder=\"builder\"\n  ></day-input>\n</div>\n"
       ));
       $templateCache.put('formio/components/day-input.html',
-        "<div class=\"daySelect form row\">\n  <div class=\"form-group col-xs-3\" ng-if=\"component.dayFirst && !component.fields.day.hide\">\n    <label for=\"{{componentId}}-day\" ng-class=\"{'field-required': component.fields.day.required}\">{{ \"Day\" | formioTranslate:null:builder }}</label>\n    <input\n      class=\"form-control\"\n      type=\"text\"\n      id=\"{{componentId}}-day\"\n      ng-model=\"date.day\"\n      ng-change=\"onChange()\"\n      style=\"padding-right: 10px;\"\n      placeholder=\"{{component.fields.day.placeholder}}\"\n      day-part\n      characters=\"2\"\n      min=\"0\"\n      max=\"31\"\n      ng-disabled=\"readOnly\"\n    />\n  </div>\n  <div class=\"form-group col-xs-4\" ng-if=\"!component.fields.month.hide\">\n    <label for=\"{{componentId}}-month\" ng-class=\"{'field-required': component.fields.month.required}\">{{ \"Month\" | formioTranslate:null:builder }}</label>\n    <select\n      class=\"form-control\"\n      type=\"text\"\n      id=\"{{componentId}}-month\"\n      ng-model=\"date.month\"\n      ng-change=\"onChange()\"\n      ng-disabled=\"readOnly\"\n    >\n      <option ng-repeat=\"month in months\" value=\"{{$index}}\">{{ month }}</option>\n    </select>\n  </div>\n  <div class=\"form-group col-xs-3\" ng-if=\"!component.dayFirst && !component.fields.day.hide\">\n    <label for=\"{{componentId}}-day\" ng-class=\"{'field-required': component.fields.day.required}\">{{ \"Day\" | formioTranslate:null:builder }}</label>\n    <input\n      class=\"form-control\"\n      type=\"text\"\n      id=\"{{componentId}}-day1\"\n      ng-model=\"date.day\"\n      ng-change=\"onChange()\"\n      style=\"padding-right: 10px;\"\n      placeholder=\"{{component.fields.day.placeholder}}\"\n      day-part\n      characters=\"2\"\n      min=\"0\"\n      max=\"31\"\n      ng-disabled=\"readOnly\"\n    />\n  </div>\n  <div class=\"form-group col-xs-5\" ng-if=\"!component.fields.year.hide\">\n    <label for=\"{{componentId}}-year\" ng-class=\"{'field-required': component.fields.year.required}\">{{ \"Year\" | formioTranslate:null:builder }}</label>\n    <input\n      class=\"form-control\"\n      type=\"text\"\n      id=\"{{componentId}}-year\"\n      ng-model=\"date.year\"\n      ng-change=\"onChange()\"\n      style=\"padding-right: 10px;\"\n      placeholder=\"{{component.fields.year.placeholder}}\"\n      day-part\n      characters=\"4\"\n      min=\"0\"\n      max=\"2100\"\n      ng-disabled=\"readOnly\"\n    />\n  </div>\n</div>\n"
+        "<div class=\"daySelect form row\">\n  <div class=\"form-group col-xs-3\" ng-if=\"component.dayFirst && !component.fields.day.hide\">\n    <label for=\"{{componentId}}-day\" ng-class=\"{'field-required': component.fields.day.required}\">{{ \"Day\" | formioTranslate:null:builder }}</label>\n    <input\n      class=\"form-control\"\n      type=\"text\"\n      id=\"{{componentId}}-day\"\n      ng-model=\"date.day\"\n      ng-change=\"onChange()\"\n      style=\"padding-right: 10px;\"\n      placeholder=\"{{component.fields.day.placeholder}}\"\n      day-part\n      characters=\"2\"\n      min=\"0\"\n      max=\"31\"\n      ng-disabled=\"readOnly\"\n    />\n  </div>\n  <div class=\"form-group col-xs-4\" ng-if=\"!component.fields.month.hide\">\n    <label for=\"{{componentId}}-month\" ng-class=\"{'field-required': component.fields.month.required}\">{{ \"Month\" | formioTranslate:null:builder }}</label>\n    <select\n      class=\"form-control\"\n      type=\"text\"\n      id=\"{{componentId}}-month\"\n      ng-model=\"date.month\"\n      ng-change=\"onChange()\"\n      ng-disabled=\"readOnly\"\n      ng-options=\"month.value as month.label for month in months\"\n    ></select>\n  </div>\n  <div class=\"form-group col-xs-3\" ng-if=\"!component.dayFirst && !component.fields.day.hide\">\n    <label for=\"{{componentId}}-day\" ng-class=\"{'field-required': component.fields.day.required}\">{{ \"Day\" | formioTranslate:null:builder }}</label>\n    <input\n      class=\"form-control\"\n      type=\"text\"\n      id=\"{{componentId}}-day1\"\n      ng-model=\"date.day\"\n      ng-change=\"onChange()\"\n      style=\"padding-right: 10px;\"\n      placeholder=\"{{component.fields.day.placeholder}}\"\n      day-part\n      characters=\"2\"\n      min=\"0\"\n      max=\"31\"\n      ng-disabled=\"readOnly\"\n    />\n  </div>\n  <div class=\"form-group col-xs-5\" ng-if=\"!component.fields.year.hide\">\n    <label for=\"{{componentId}}-year\" ng-class=\"{'field-required': component.fields.year.required}\">{{ \"Year\" | formioTranslate:null:builder }}</label>\n    <input\n      class=\"form-control\"\n      type=\"text\"\n      id=\"{{componentId}}-year\"\n      ng-model=\"date.year\"\n      ng-change=\"onChange()\"\n      style=\"padding-right: 10px;\"\n      placeholder=\"{{component.fields.year.placeholder}}\"\n      characters=\"4\"\n      min=\"0\"\n      max=\"2100\"\n      ng-disabled=\"readOnly\"\n    />\n  </div>\n</div>\n"
       );
     }
   ]);
 };
 
-},{}],55:[function(_dereq_,module,exports){
+},{}],54:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -64143,7 +64229,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],56:[function(_dereq_,module,exports){
+},{}],55:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -64179,7 +64265,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],57:[function(_dereq_,module,exports){
+},{}],56:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -64224,6 +64310,10 @@ module.exports = function(app) {
         function($scope) {
           if ($scope.builder) return;
           $scope.removeFile = function(event, index) {
+            var component = $scope.$parent.component;
+            if (component.storage === 'url') {
+              $scope.$parent.formio.makeRequest('', component.url + '/' + $scope.files[index].name, 'delete');
+            }
             event.preventDefault();
             $scope.files.splice(index, 1);
           };
@@ -64252,6 +64342,10 @@ module.exports = function(app) {
         function($scope) {
           if ($scope.builder) return;
           $scope.removeFile = function(event, index) {
+            var component = $scope.$parent.component;
+            if (component.storage === 'url') {
+              $scope.$parent.formio.makeRequest('', component.url + '/' + $scope.files[index].name, 'delete');
+            }
             event.preventDefault();
             $scope.files.splice(index, 1);
           };
@@ -64311,7 +64405,7 @@ module.exports = function(app) {
         form: '=',
         width: '='
       },
-      template: '<img ng-src="{{ imageSrc }}" alt="{{ file.name }}" ng-style="{width: width}" />',
+      template: '<img ng-src="{{ file.imageSrc }}" alt="{{ file.name }}" ng-style="{width: width}" />',
       controller: [
         '$rootScope',
         '$scope',
@@ -64326,7 +64420,7 @@ module.exports = function(app) {
           var formio = new Formio($scope.form);
           formio.downloadFile($scope.file)
             .then(function(result) {
-              $scope.imageSrc = result.url;
+              $scope.file.imageSrc = result.url;
               $scope.$apply();
             });
         }
@@ -64349,6 +64443,9 @@ module.exports = function(app) {
 
       // This fixes new fields having an empty space in the array.
       if ($scope.data && $scope.data[$scope.component.key] === '') {
+        $scope.data[$scope.component.key] = [];
+      }
+      if ($scope.data && $scope.data[$scope.component.key] === undefined) {
         $scope.data[$scope.component.key] = [];
       }
       if ($scope.data && $scope.data[$scope.component.key] && $scope.data[$scope.component.key][0] === '') {
@@ -64431,8 +64528,10 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],58:[function(_dereq_,module,exports){
+},{}],57:[function(_dereq_,module,exports){
 "use strict";
+
+var GridUtils = _dereq_('../factories/GridUtils')();
 
 module.exports = function(app) {
   app.config([
@@ -64450,7 +64549,8 @@ module.exports = function(app) {
           protected: false,
           unique: false,
           persistent: true
-        }
+        },
+        tableView: GridUtils.generic
       });
     }
   ]);
@@ -64464,7 +64564,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],59:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":88}],58:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -64556,7 +64656,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],60:[function(_dereq_,module,exports){
+},{}],59:[function(_dereq_,module,exports){
 "use strict";
 var app = angular.module('formio');
 
@@ -64598,7 +64698,7 @@ _dereq_('./panel')(app);
 _dereq_('./table')(app);
 _dereq_('./well')(app);
 
-},{"./address":43,"./button":44,"./checkbox":45,"./columns":46,"./components":47,"./container":48,"./content":49,"./currency":50,"./custom":51,"./datagrid":52,"./datetime":53,"./day":54,"./email":55,"./fieldset":56,"./file":57,"./hidden":58,"./htmlelement":59,"./number":61,"./page":62,"./panel":63,"./password":64,"./phonenumber":65,"./radio":66,"./resource":67,"./select":68,"./selectboxes":69,"./signature":70,"./survey":71,"./table":72,"./textarea":73,"./textfield":74,"./well":75}],61:[function(_dereq_,module,exports){
+},{"./address":42,"./button":43,"./checkbox":44,"./columns":45,"./components":46,"./container":47,"./content":48,"./currency":49,"./custom":50,"./datagrid":51,"./datetime":52,"./day":53,"./email":54,"./fieldset":55,"./file":56,"./hidden":57,"./htmlelement":58,"./number":60,"./page":61,"./panel":62,"./password":63,"./phonenumber":64,"./radio":65,"./resource":66,"./select":67,"./selectboxes":68,"./signature":69,"./survey":70,"./table":71,"./textarea":72,"./textfield":73,"./well":74}],60:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -64662,7 +64762,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],62:[function(_dereq_,module,exports){
+},{}],61:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -64689,7 +64789,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],63:[function(_dereq_,module,exports){
+},{}],62:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -64725,7 +64825,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],64:[function(_dereq_,module,exports){
+},{}],63:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -64755,7 +64855,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],65:[function(_dereq_,module,exports){
+},{}],64:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -64789,7 +64889,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],66:[function(_dereq_,module,exports){
+},{}],65:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -64839,7 +64939,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],67:[function(_dereq_,module,exports){
+},{}],66:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -64966,7 +65066,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],68:[function(_dereq_,module,exports){
+},{}],67:[function(_dereq_,module,exports){
 "use strict";
 /*eslint max-depth: ["error", 6]*/
 
@@ -65005,31 +65105,28 @@ module.exports = function(app) {
   });
 
   // A directive to have ui-select open on focus
-  app.directive('uiSelectOpenOnFocus', ['$timeout', function($timeout) {
+  app.directive('uiSelectOpenOnFocus', [function() {
     return {
       require: 'uiSelect',
       restrict: 'A',
       link: function($scope, el, attrs, uiSelect) {
         if ($scope.builder) return;
-        var autoopen = true;
+        var focuscount = -1;
 
         angular.element(uiSelect.focusser).on('focus', function() {
-          if (autoopen) {
+          if (focuscount-- < 0) {
             uiSelect.activate();
           }
         });
 
         // Disable the auto open when this select element has been activated.
         $scope.$on('uis:activate', function() {
-          autoopen = false;
+          focuscount = 1;
         });
 
         // Re-enable the auto open after the select element has been closed
         $scope.$on('uis:close', function() {
-          autoopen = false;
-          $timeout(function() {
-            autoopen = true;
-          }, 250);
+          focuscount = 1;
         });
       }
     };
@@ -65108,13 +65205,15 @@ module.exports = function(app) {
           'Formio',
           '$interpolate',
           '$q',
+          '$timeout',
           function(
             $rootScope,
             $scope,
             $http,
             Formio,
             $interpolate,
-            $q
+            $q,
+            $timeout
           ) {
             // FOR-71 - Skip functionality in the builder view.
             if ($scope.builder) return;
@@ -65123,6 +65222,7 @@ module.exports = function(app) {
             $scope.nowrap = true;
             $scope.hasNextPage = false;
             $scope.selectItems = [];
+
             var initialized = $q.defer();
             initialized.promise.then(function() {
               $scope.$emit('selectLoaded', $scope.component);
@@ -65153,20 +65253,16 @@ module.exports = function(app) {
               return valueProp ? item[valueProp] : item;
             };
 
-            $scope.refreshItems = angular.noop;
+            $scope.refreshItems = function() {
+              return $q.resolve([]);
+            };
             $scope.$on('refreshList', function(event, url, input) {
               $scope.refreshItems(input, url);
             });
 
             // Add a watch if they wish to refresh on selection of another field.
-            var refreshWatch, refreshWatchRow;
             if (settings.refreshOn) {
-              // Remove the old watch.
               var refreshing = false;
-              if (refreshWatch) refreshWatch();
-              if (refreshWatchRow) refreshWatchRow();
-
-              // Refresh the data.
               var refreshValue = function() {
                 if (refreshing) {
                   return;
@@ -65175,11 +65271,11 @@ module.exports = function(app) {
                 var tempData = $scope.data[settings.key];
                 $scope.data[settings.key] = settings.multiple ? [] : '';
                 if (!settings.clearOnRefresh) {
-                  setTimeout(function() {
+                  $timeout(function() {
                     $scope.data[settings.key] = tempData;
                     refreshing = false;
                     $scope.$emit('selectLoaded', $scope.component);
-                  }, 10);
+                  });
                 }
                 else {
                   refreshing = false;
@@ -65200,12 +65296,12 @@ module.exports = function(app) {
                 });
               };
               if (settings.refreshOn === 'data') {
-                refreshWatch = $scope.$watch('data', refreshValueWhenReady, true);
+                $scope.$watch('data', refreshValueWhenReady, true);
                 return;
               }
 
-              refreshWatchRow = $scope.$watch('data.' + settings.refreshOn, refreshValueWhenReady);
-              refreshWatch = $scope.$watch('submission.data.' + settings.refreshOn, refreshValueWhenReady);
+              $scope.$watch('data.' + settings.refreshOn, refreshValueWhenReady);
+              $scope.$watch('submission.data.' + settings.refreshOn, refreshValueWhenReady);
             }
 
             switch (settings.dataSrc) {
@@ -65294,10 +65390,9 @@ module.exports = function(app) {
                   }
                   selectItems = selectItems.slice(options.params.skip, options.params.skip + options.params.limit);
                   setResult(selectItems, append);
+                  return initialized.resolve($scope.selectItems);
                 };
                 $scope.refreshItems();
-
-                initialized.resolve();
                 break;
               case 'custom':
                 $scope.refreshItems = function() {
@@ -65311,7 +65406,7 @@ module.exports = function(app) {
                   catch (error) {
                     $scope.selectItems = [];
                   }
-                  initialized.resolve();
+                  return initialized.resolve($scope.selectItems);
                 };
                 $scope.refreshItems();
                 break;
@@ -65354,7 +65449,6 @@ module.exports = function(app) {
                 };
 
                 if (url) {
-                  $scope.selectLoading = false;
                   $scope.hasNextPage = true;
                   $scope.refreshItems = function(input, newUrl, append) {
                     newUrl = newUrl || url;
@@ -65363,11 +65457,6 @@ module.exports = function(app) {
                       formioBase: $rootScope.apiBase || 'https://api.form.io'
                     });
                     if (!newUrl) {
-                      return;
-                    }
-
-                    // Do not want to call if it is already loading.
-                    if ($scope.selectLoading) {
                       return;
                     }
 
@@ -65408,7 +65497,6 @@ module.exports = function(app) {
                       }
                     };
 
-                    $scope.selectLoading = true;
                     return $http.get(newUrl, options).then(function(result) {
                       var data = result.data;
                       if (data) {
@@ -65428,9 +65516,9 @@ module.exports = function(app) {
                           setResult(data);
                         }
                       }
-                    })['finally'](function() {
-                      $scope.selectLoading = false;
-                      initialized.resolve();
+                      return $scope.selectItems;
+                    }).finally(function() {
+                      initialized.resolve($scope.selectItems);
                     });
                   };
                   $scope.refreshItems();
@@ -65438,7 +65526,7 @@ module.exports = function(app) {
                 break;
               default:
                 $scope.selectItems = [];
-                initialized.resolve();
+                initialized.resolve($scope.selectItems);
             }
           }
         ],
@@ -65489,7 +65577,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],69:[function(_dereq_,module,exports){
+},{}],68:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -65596,7 +65684,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],70:[function(_dereq_,module,exports){
+},{}],69:[function(_dereq_,module,exports){
 (function (SignaturePad){
 "use strict";
 
@@ -65738,7 +65826,7 @@ module.exports = function(app) {
 };
 
 }).call(this,_dereq_("signature_pad"))
-},{"signature_pad":40}],71:[function(_dereq_,module,exports){
+},{"signature_pad":39}],70:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -65814,7 +65902,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],72:[function(_dereq_,module,exports){
+},{}],71:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -65859,7 +65947,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],73:[function(_dereq_,module,exports){
+},{}],72:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -65869,8 +65957,34 @@ module.exports = function(app) {
       formioComponentsProvider.register('textarea', {
         title: 'Text Area',
         template: function($scope) {
-          if ($scope.component.wysiwyg) {
-            $scope.wysiwyg = $scope.component.wysiwyg;
+          if (!$scope.readOnly && $scope.component.wysiwyg) {
+            var defaults = {
+              toolbarGroups:  [
+                {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
+                {name: 'paragraph', groups: ['list', 'indent', 'blocks', 'align', 'bidi', 'paragraph', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock']},
+                {name: 'links', groups: ['links']},
+                {name: 'insert', groups: ['insert']},
+                '/',
+                {name: 'styles', groups: ['Styles', 'Format', 'Font', 'FontSize']},
+                {name: 'colors', groups: ['colors']},
+                {name: 'clipboard', groups: ['clipboard', 'undo']},
+                {name: 'editing', groups: ['find', 'selection', 'spellchecker', 'editing']},
+                {name: 'document', groups: ['mode', 'document', 'doctools']},
+                {name: 'others', groups: ['others']},
+                {name: 'tools', groups: ['tools']}
+              ],
+              extraPlugins: 'justify,font',
+              removeButtons: 'Cut,Copy,Paste,Underline,Subscript,Superscript,Scayt,About',
+              uiColor: '#eeeeee',
+              height: '400px',
+              width: '100%'
+            };
+            if ($scope.component.wysiwyg === true) {
+              $scope.component.wysiwyg = defaults;
+            }
+            else {
+              $scope.component.wysiwyg = angular.extend(defaults, $scope.component.wysiwyg);
+            }
             return 'formio/components/texteditor.html';
           }
           return 'formio/components/textarea.html';
@@ -65910,13 +66024,13 @@ module.exports = function(app) {
         "<textarea\n  class=\"form-control\"\n  ng-model=\"data[component.key]\"\n  ng-disabled=\"readOnly\"\n  ng-required=\"isRequired(component)\"\n  safe-multiple-to-single\n  id=\"{{ componentId }}\"\n  name=\"{{ componentId }}\"\n  tabindex=\"{{ component.tabindex || 0 }}\"\n  placeholder=\"{{ component.placeholder | formioTranslate:null:builder }}\"\n  custom-validator=\"component.validate.custom\"\n  rows=\"{{ component.rows }}\"\n></textarea>\n"
       ));
       $templateCache.put('formio/components/texteditor.html', FormioUtils.fieldWrap(
-        "<textarea\n  class=\"form-control\"\n  ng-model=\"data[component.key]\"\n  ng-disabled=\"readOnly\"\n  ng-required=\"isRequired(component)\"\n  ckeditor=\"wysiwyg\"\n  safe-multiple-to-single\n  id=\"{{ componentId }}\"\n  name=\"{{ componentId }}\"\n  tabindex=\"{{ component.tabindex || 0 }}\"\n  placeholder=\"{{ component.placeholder }}\"\n  custom-validator=\"component.validate.custom\"\n  rows=\"{{ component.rows }}\"\n></textarea>\n"
+        "<textarea\n  class=\"form-control\"\n  ng-model=\"data[component.key]\"\n  ng-disabled=\"readOnly\"\n  ng-required=\"isRequired(component)\"\n  ckeditor=\"component.wysiwyg\"\n  safe-multiple-to-single\n  id=\"{{ componentId }}\"\n  name=\"{{ componentId }}\"\n  tabindex=\"{{ component.tabindex || 0 }}\"\n  placeholder=\"{{ component.placeholder }}\"\n  custom-validator=\"component.validate.custom\"\n  rows=\"{{ component.rows }}\"\n></textarea>\n"
       ));
     }
   ]);
 };
 
-},{}],74:[function(_dereq_,module,exports){
+},{}],73:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -65976,7 +66090,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],75:[function(_dereq_,module,exports){
+},{}],74:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -66009,7 +66123,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],76:[function(_dereq_,module,exports){
+},{}],75:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -66087,7 +66201,7 @@ module.exports = function() {
   };
 };
 
-},{}],77:[function(_dereq_,module,exports){
+},{}],76:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -66356,7 +66470,7 @@ module.exports = function() {
   };
 };
 
-},{}],78:[function(_dereq_,module,exports){
+},{}],77:[function(_dereq_,module,exports){
 "use strict";
 module.exports = ['$sce', '$parse', '$compile', function($sce, $parse, $compile) {
   return {
@@ -66373,7 +66487,7 @@ module.exports = ['$sce', '$parse', '$compile', function($sce, $parse, $compile)
   };
 }];
 
-},{}],79:[function(_dereq_,module,exports){
+},{}],78:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -66416,11 +66530,13 @@ module.exports = [
         '$http',
         '$controller',
         'FormioUtils',
+        '$timeout',
         function(
           $scope,
           $http,
           $controller,
-          FormioUtils
+          FormioUtils,
+          $timeout
         ) {
           $scope.builder = $scope.builder || false;
           // Options to match jquery.maskedinput masks
@@ -66591,7 +66707,7 @@ module.exports = [
               component.controller($scope.component, $scope, $http, Formio);
             }
             else {
-              $controller(component.controller, {$scope: $scope});
+              $controller(component.controller, {$scope: $scope, $timeout: $timeout});
             }
           }
 
@@ -66696,6 +66812,11 @@ module.exports = [
                   value = $scope.component.defaultValue;
                 }
 
+                // If no default is provided, then skip...
+                if (!value || !value.length) {
+                  return;
+                }
+
                 // FOR-193 - Fix default value for the number component.
                 // FOR-262 - Fix multiple default value for the number component.
                 if ($scope.component.type === 'number') {
@@ -66727,12 +66848,18 @@ module.exports = [
                 }
                 // FOR-135 - Add default values for select components.
                 else if ($scope.component.type === 'select') {
+                  // FOR-337 - Fix default values for select components without multi enabled.
+                  if (!mult) {
+                    $scope.data[$scope.component.key] = $scope.component.defaultValue;
+                    return;
+                  }
+
                   // If using the values input, split the default values, and search the options for each value in the list.
                   if ($scope.component.dataSrc === 'values') {
                     var temp = [];
 
                     $scope.component.data.values.forEach(function(item) {
-                      if (value && value.indexOf(item.value) !== -1) {
+                      if (value.indexOf(item.value) !== -1) {
                         temp.push(item);
                       }
                     });
@@ -66803,7 +66930,7 @@ module.exports = [
   }
 ];
 
-},{}],80:[function(_dereq_,module,exports){
+},{}],79:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'formioComponents',
@@ -66870,7 +66997,7 @@ module.exports = [
   }
 ];
 
-},{}],81:[function(_dereq_,module,exports){
+},{}],80:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -66953,7 +67080,7 @@ module.exports = function() {
   };
 };
 
-},{}],82:[function(_dereq_,module,exports){
+},{}],81:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$compile',
@@ -66972,7 +67099,7 @@ module.exports = [
   }
 ];
 
-},{}],83:[function(_dereq_,module,exports){
+},{}],82:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -66982,7 +67109,7 @@ module.exports = function() {
   };
 };
 
-},{}],84:[function(_dereq_,module,exports){
+},{}],83:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -67014,7 +67141,7 @@ module.exports = function() {
   };
 };
 
-},{}],85:[function(_dereq_,module,exports){
+},{}],84:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -67069,7 +67196,7 @@ module.exports = function() {
   };
 };
 
-},{}],86:[function(_dereq_,module,exports){
+},{}],85:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -67498,7 +67625,7 @@ module.exports = function() {
   };
 };
 
-},{}],87:[function(_dereq_,module,exports){
+},{}],86:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -67681,15 +67808,16 @@ module.exports = [
   }
 ];
 
-},{}],88:[function(_dereq_,module,exports){
+},{}],87:[function(_dereq_,module,exports){
 "use strict";
 var formioUtils = _dereq_('formio-utils');
 
 module.exports = function() {
   return {
     checkVisible: function(component, row, data) {
-      if (!formioUtils.checkCondition(component, row, data)) {
-        if (!component.hasOwnProperty('clearOnHide') || component.clearOnHide !== false) {
+      var visible = formioUtils.checkCondition(component, row, data);
+      if (!visible) {
+        if (!component.hasOwnProperty('clearOnHide') || component.clearOnHide.toString() === 'true') {
           if (row && row.hasOwnProperty(component.key)) {
             delete row[component.key];
           }
@@ -67782,7 +67910,83 @@ module.exports = function() {
   };
 };
 
-},{"formio-utils":25}],89:[function(_dereq_,module,exports){
+},{"formio-utils":25}],88:[function(_dereq_,module,exports){
+"use strict";
+module.exports = function() {
+  var generic = function(data, component) {
+    var startTable = function(labels) {
+      if (!(labels instanceof Array)) {
+        labels = [labels];
+      }
+
+      var view = '<table class="table table-striped table-bordered"><thead><tr>';
+
+      labels.forEach(function(item) {
+        view += '<th>' + item + '</th>';
+      });
+
+      view += '</tr></thead>';
+      view += '<tbody>';
+      return view;
+    };
+
+    var finishTable = function() {
+      return '</tbody></table>';
+    };
+
+    var makeRow = function(data, noRow) {
+      var view = !noRow ? '<tr>' : '';
+
+      if (typeof data === 'string' || typeof data === 'number') {
+        view += '<td>' + data + '</td>';
+      }
+      else if (data === null || data === undefined) {
+        view += '<td></td>';
+      }
+      else if (data instanceof Array) {
+        data.forEach(function(item) {
+          view += makeRow(item);
+        });
+      }
+      else if (typeof data === 'object' && data !== null && data !== undefined) {
+        var labels = Object.keys(data);
+
+        view += '<td>' + startTable(labels);
+        labels.forEach(function(key) {
+          view += makeRow(data[key], true);
+        });
+        view += finishTable() + '</td>';
+      }
+
+      view += !noRow ? '</tr>' : '';
+      return view;
+    };
+
+    // Create a template
+    var view = '';
+    var label;
+    if (!label && component && component.label) {
+      label = component.label;
+    }
+    else if (!label && component && component.key) {
+      label = component.key;
+    }
+    else {
+      label = '';
+    }
+
+    view += startTable(label);
+    view += makeRow(data);
+    view += finishTable();
+    return view;
+  };
+
+  return {
+    generic: generic
+  };
+};
+
+},{}],89:[function(_dereq_,module,exports){
 "use strict";
 var _filter = _dereq_('lodash.filter');
 var _get = _dereq_('lodash.get');
@@ -67794,7 +67998,7 @@ module.exports = function() {
   };
 };
 
-},{"lodash.filter":33,"lodash.get":34}],90:[function(_dereq_,module,exports){
+},{"lodash.filter":32,"lodash.get":33}],90:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$q',
@@ -67989,7 +68193,7 @@ _dereq_('angular-ui-bootstrap');
 _dereq_('bootstrap-ui-datetime-picker/dist/datetime-picker');
 _dereq_('./formio');
 
-},{"./formio":99,"angular-file-saver":1,"angular-moment":2,"angular-sanitize":4,"angular-ui-bootstrap":6,"angular-ui-mask/dist/mask":7,"bootstrap":11,"bootstrap-ui-datetime-picker/dist/datetime-picker":10,"ng-file-upload":38,"signature_pad":40,"ui-select/dist/select":41}],99:[function(_dereq_,module,exports){
+},{"./formio":99,"angular-file-saver":1,"angular-moment":2,"angular-sanitize":4,"angular-ui-bootstrap":6,"angular-ui-mask/dist/mask":7,"bootstrap":11,"bootstrap-ui-datetime-picker/dist/datetime-picker":10,"ng-file-upload":37,"signature_pad":39,"ui-select/dist/select":40}],99:[function(_dereq_,module,exports){
 "use strict";
 _dereq_('./polyfills/polyfills');
 
@@ -68107,7 +68311,7 @@ app.run([
 
     // A formio component template.
     $templateCache.put('formio/component.html',
-      "<div class=\"form-group has-feedback form-field-type-{{ component.type }} formio-component-{{ component.key }} {{component.customClass}}\" id=\"form-group-{{ componentId }}\" ng-class=\"{'has-error': formioForm[componentId].$invalid && !formioForm[componentId].$pristine }\" ng-style=\"component.style\" ng-hide=\"component.hidden\">\n  <formio-element></formio-element>\n</div>\n"
+      "<div class=\"form-group form-field-type-{{ component.type }} formio-component-{{ component.key }} {{component.customClass}}\" id=\"form-group-{{ componentId }}\"\n     ng-class=\"{'has-feedback ': (component.hideLabel === true || component.label === '' || !component.label) && component.validate.required,\n             'has-error': formioForm[componentId].$invalid && !formioForm[componentId].$pristine }\"\n     ng-style=\"component.style\"\n     ng-hide=\"component.hidden\">\n  <formio-element></formio-element>\n</div>\n\n"
     );
 
     $templateCache.put('formio/component-view.html',
@@ -68126,7 +68330,7 @@ app.run([
 
 _dereq_('./components');
 
-},{"./components":60,"./directives/customValidator":76,"./directives/formio":77,"./directives/formioBindHtml.js":78,"./directives/formioComponent":79,"./directives/formioComponentView":80,"./directives/formioDelete":81,"./directives/formioElement":82,"./directives/formioErrors":83,"./directives/formioSubmission":84,"./directives/formioSubmissions":85,"./directives/formioWizard":86,"./factories/FormioScope":87,"./factories/FormioUtils":88,"./factories/Lodash":89,"./factories/formioInterceptor":90,"./factories/formioTableView":91,"./filters/flattenComponents":92,"./filters/safehtml":93,"./filters/tableComponents":94,"./filters/tableFieldView":95,"./filters/tableView":96,"./filters/translate":97,"./polyfills/polyfills":101,"./providers/Formio":102}],100:[function(_dereq_,module,exports){
+},{"./components":59,"./directives/customValidator":75,"./directives/formio":76,"./directives/formioBindHtml.js":77,"./directives/formioComponent":78,"./directives/formioComponentView":79,"./directives/formioDelete":80,"./directives/formioElement":81,"./directives/formioErrors":82,"./directives/formioSubmission":83,"./directives/formioSubmissions":84,"./directives/formioWizard":85,"./factories/FormioScope":86,"./factories/FormioUtils":87,"./factories/Lodash":89,"./factories/formioInterceptor":90,"./factories/formioTableView":91,"./filters/flattenComponents":92,"./filters/safehtml":93,"./filters/tableComponents":94,"./filters/tableFieldView":95,"./filters/tableView":96,"./filters/translate":97,"./polyfills/polyfills":101,"./providers/Formio":102}],100:[function(_dereq_,module,exports){
 "use strict";
 'use strict';
 
@@ -68231,5 +68435,5 @@ module.exports = function() {
   };
 };
 
-},{"formiojs":27}]},{},[98])(98)
+},{"formiojs":26}]},{},[98])(98)
 });

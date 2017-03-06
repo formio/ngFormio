@@ -73,6 +73,17 @@ module.exports = function(app) {
 
       // Pull out the rows and cols for easy iteration.
       $scope.rows = $scope.data[$scope.component.key];
+      // If less than minLength, add that many rows.
+      if ($scope.component.validate && $scope.component.validate.hasOwnProperty('minLength') && $scope.rows.length < $scope.component.validate.minLength) {
+        var toAdd = $scope.component.validate.minLength - $scope.rows.length;
+        for (var i = 0; i < toAdd; i++) {
+          $scope.rows.push({});
+        }
+      }
+      // If more than maxLength, remove extra rows.
+      if ($scope.component.validate && $scope.component.validate.hasOwnProperty('maxLength') && $scope.rows.length < $scope.component.validate.maxLength) {
+        $scope.rows = $scope.rows.slice(0, $scope.component.validate.maxLength);
+      }
       $scope.cols = $scope.component.components;
       $scope.localKeys = $scope.component.components.map(function(component) {
         return component.key;

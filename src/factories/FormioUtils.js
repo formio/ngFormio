@@ -3,8 +3,9 @@ var formioUtils = require('formio-utils');
 module.exports = function() {
   return {
     checkVisible: function(component, row, data) {
-      if (!formioUtils.checkCondition(component, row, data)) {
-        if (!component.hasOwnProperty('clearOnHide') || component.clearOnHide !== false) {
+      var visible = formioUtils.checkCondition(component, row, data);
+      if (!visible) {
+        if (!component.hasOwnProperty('clearOnHide') || component.clearOnHide.toString() === 'true') {
           if (row && row.hasOwnProperty(component.key)) {
             delete row[component.key];
           }

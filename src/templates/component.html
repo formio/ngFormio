@@ -1,3 +1,8 @@
-<div class="form-group has-feedback form-field-type-{{ component.type }} formio-component-{{ component.key }} {{component.customClass}}" id="form-group-{{ componentId }}" ng-class="{'has-error': formioForm[componentId].$invalid && !formioForm[componentId].$pristine }" ng-style="component.style" ng-hide="component.hidden">
+<div class="form-group form-field-type-{{ component.type }} formio-component-{{ component.key }} {{component.customClass}}" id="form-group-{{ componentId }}"
+     ng-class="{'has-feedback ': (component.hideLabel === true || component.label === '' || !component.label) && component.validate.required,
+             'has-error': formioForm[componentId].$invalid && !formioForm[componentId].$pristine }"
+     ng-style="component.style"
+     ng-hide="component.hidden">
   <formio-element></formio-element>
 </div>
+

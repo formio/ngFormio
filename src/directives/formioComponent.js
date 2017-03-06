@@ -39,11 +39,13 @@ module.exports = [
         '$http',
         '$controller',
         'FormioUtils',
+        '$timeout',
         function(
           $scope,
           $http,
           $controller,
-          FormioUtils
+          FormioUtils,
+          $timeout
         ) {
           $scope.builder = $scope.builder || false;
           // Options to match jquery.maskedinput masks
@@ -214,7 +216,7 @@ module.exports = [
               component.controller($scope.component, $scope, $http, Formio);
             }
             else {
-              $controller(component.controller, {$scope: $scope});
+              $controller(component.controller, {$scope: $scope, $timeout: $timeout});
             }
           }
 
@@ -319,6 +321,11 @@ module.exports = [
                   value = $scope.component.defaultValue;
                 }
 
+                // If no default is provided, then skip...
+                if (!value || !value.length) {
+                  return;
+                }
+
                 // FOR-193 - Fix default value for the number component.
                 // FOR-262 - Fix multiple default value for the number component.
                 if ($scope.component.type === 'number') {
@@ -350,12 +357,18 @@ module.exports = [
                 }
                 // FOR-135 - Add default values for select components.
                 else if ($scope.component.type === 'select') {
+                  // FOR-337 - Fix default values for select components without multi enabled.
+                  if (!mult) {
+                    $scope.data[$scope.component.key] = $scope.component.defaultValue;
+                    return;
+                  }
+
                   // If using the values input, split the default values, and search the options for each value in the list.
                   if ($scope.component.dataSrc === 'values') {
                     var temp = [];
 
                     $scope.component.data.values.forEach(function(item) {
-                      if (value && value.indexOf(item.value) !== -1) {
+                      if (value.indexOf(item.value) !== -1) {
                         temp.push(item);
                       }
                     });
