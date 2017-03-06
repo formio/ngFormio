@@ -17,7 +17,6 @@
     <link rel="stylesheet" href="/bower_components/angular-swagger-ui/dist/css/swagger-ui.min.css" />
     <link rel="stylesheet" href="/bower_components/angular-ui-select/dist/select.css" />
     <link rel="stylesheet" href="/bower_components/ng-formio/dist/formio.min.css" />
-    <link rel="stylesheet" href="/bower_components/ng-ckeditor/ng-ckeditor.css" />
     <link rel="stylesheet" href="/bower_components/ng-tags-input/ng-tags-input.css" />
     <link rel="stylesheet" href="/bower_components/ng-formio-builder/dist/ngFormBuilder.min.css" />
     <link rel="stylesheet" href="/bower_components/angular-toastr/dist/angular-toastr.min.css" />
@@ -35,7 +34,6 @@
     <link rel="stylesheet" href="/lib/kendo-ui/styles/kendo.bootstrap.min.css" />
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,700' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Comfortaa:400,700' rel='stylesheet' type='text/css'>
-    <script src="lib/ckeditor/ckeditor.js" type="text/javascript"></script>
     <script type="text/javascript" src="//www.googleadservices.com/pagead/conversion_async.js" charset="utf-8"></script>
     <!-- Favicons -->
     <link rel="apple-touch-icon" sizes="57x57" href="/images/favicons/apple-touch-icon-57x57.png">
@@ -204,7 +202,7 @@
           </div>
         </div>
         <div class="row">
-          <span class="copyright">Made with <i class="fa fa-heart"></i> in Dallas, TX - &copy; Form.io LLC 2015. All rights reserved</span> - <span>{{ appConfig.appVersion }}</span>
+          <span class="copyright">Made with <i class="fa fa-heart"></i> in Dallas, TX - &copy; Form.io LLC {{ appConfig.copyrightYear }}. All rights reserved</span> - <span>{{ appConfig.appVersion }}</span>
         </div>
       </div>
     </footer>
@@ -225,6 +223,7 @@
 
       ga('create', 'UA-58453303-1', 'auto');
     </script>
+    <script src="/lib/ckeditor/ckeditor.js" type="text/javascript"></script>
 
     <!-- build:js scripts/vendor.js -->
     <!-- bower:js -->
@@ -252,18 +251,17 @@
     <script src="/bower_components/blob-polyfill/Blob.js"></script>
     <script src="/bower_components/file-saver.js/FileSaver.js"></script>
     <script src="/bower_components/angular-file-saver/dist/angular-file-saver.bundle.js"></script>
-    <script src="/bower_components/angular-ui-select/dist/select.min.js"></script>
+    <script src="/bower_components/angular-ui-select/dist/select.js"></script>
     <script src="/bower_components/ng-formio/dist/formio.min.js"></script>
     <script src="/bower_components/angular-drag-and-drop-lists/angular-drag-and-drop-lists.js"></script>
-    <script src="/bower_components/ckeditor/ckeditor.js"></script>
-    <script src="/bower_components/ng-ckeditor/ng-ckeditor.min.js"></script>
     <script src="/bower_components/ng-tags-input/ng-tags-input.js"></script>
+    <script src="/bower_components/angular-ckeditor/angular-ckeditor.js"></script>
     <script src="/bower_components/ng-formio-builder/dist/ngFormBuilder.min.js"></script>
     <script src="/bower_components/chance/chance.js"></script>
     <script src="/bower_components/qs/dist/qs.js"></script>
     <script src="/bower_components/angular-toastr/dist/angular-toastr.tpls.min.js"></script>
-    <script src="/bower_components/seamless/build/seamless.parent.min.js"></script>
     <script src="/bower_components/chartist-plugin-tooltip/dist/chartist-plugin-tooltip.min.js"></script>
+    <script src="/bower_components/seamless/build/seamless.parent.min.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 
@@ -296,7 +294,6 @@
     <!-- inject:js -->
     <script src="scripts/app.js"></script>
     <script src="scripts/components/resourcefields.js"></script>
-    <script src="scripts/utils/utils.js"></script>
     <script src="scripts/controllers/access.js"></script>
     <script src="scripts/controllers/controllers.js"></script>
     <script src="scripts/controllers/environmentSwitcher.js"></script>
@@ -308,6 +305,7 @@
     <script src="scripts/controllers/role.js"></script>
     <script src="scripts/controllers/team.js"></script>
     <script src="scripts/controllers/user.js"></script>
+    <script src="scripts/utils/utils.js"></script>
     <!-- endinject -->
     <!-- endbuild -->
 

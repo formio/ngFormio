@@ -8,5 +8,18 @@
       <label class="control-label">Form Tags</label>
       <tags-input ng-model="formTags" on-tag-added="addTag($tag)" on-tag-removed="removeTag($tag)"></tags-input>
     </div>
+    <div class="panel panel-danger">
+      <div class="panel-heading">
+        Form Deployment MachineName
+      </div>
+      <div class="panel-body">
+        <div class="well well-sm">
+          Warning: Tampering with the Form machineName can break Project imports and exports. This should not be tampered
+          with, unless you know what you're doing.
+        </div>
+        <label for="machineName" class="control-label">MachineName</label>
+        <input type="text" ng-model="form.machineName" class="form-control" id="machineName"/>
+      </div>
+    </div>
   </div>
 </uib-accordion>

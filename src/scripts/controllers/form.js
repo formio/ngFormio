@@ -426,6 +426,9 @@ app.controller('FormController', [
     if ($scope.formId) {
       $scope.loadFormPromise = $scope.formio.loadForm()
         .then(function(form) {
+          // FOR-362 - Fix pass by reference issue with the internal cache.
+          form = _.cloneDeep(form);
+
           // Ensure the display is form.
           if (!form.display) {
             form.display = 'form';
@@ -502,11 +505,11 @@ app.controller('FormController', [
       angular.element('.has-error').removeClass('has-error');
 
       // Copy to remove angular $$hashKey
-      $scope.formio.saveForm(angular.copy($scope.form), {
+      return $scope.formio.saveForm(angular.copy($scope.form), {
         getHeaders: true
       })
       .then(function(response) {
-        $scope.form = response.result;
+        $scope.form = $scope.originalForm = response.result;
         var headers = response.headers;
         var method = $stateParams.formId ? 'updated' : 'created';
         GoogleAnalytics.sendEvent('Form', method.substring(0, method.length - 1), null, 1);
@@ -576,9 +579,13 @@ app.controller('FormController', [
 app.controller('FormEditController', [
   '$scope',
   '$q',
+  'ngDialog',
+  '$state',
   function(
     $scope,
-    $q
+    $q,
+    ngDialog,
+    $state
   ) {
     // Clone original form after it has loaded, or immediately
     // if we're not loading a form
@@ -586,11 +593,101 @@ app.controller('FormEditController', [
       $scope.originalForm = _.cloneDeep($scope.form);
     });
 
+    // Track any modifications for save/cancel prompt on navigation away from the builder.
+    var dirty = false;
+    $scope.$on('formBuilder:add', function() {
+      dirty = true;
+    });
+    $scope.$on('formBuilder:update', function() {
+      dirty = true;
+    });
+    $scope.$on('formBuilder:remove', function() {
+      dirty = true;
+    });
+    $scope.$on('formBuilder:edit', function() {
+      dirty = true;
+    });
+
+    // Wrap saveForm in the editor to clear dirty when saved.
+    var parentSave = $scope.saveForm;
+    $scope.saveForm = function() {
+      dirty = false;
+      return parentSave();
+    };
+
+    /**
+     * Util function to show the cancel dialogue.
+     *
+     * @returns {Promise}
+     */
+    $scope.showCancelDialogue = function() {
+      var dialog = ngDialog.open({
+        template: 'views/form/cancel-confirm.html',
+        showClose: true,
+        className: 'ngdialog-theme-default',
+        controller: ['$scope', function($scope) {
+          // Reject the cancel action.
+          $scope.confirmSave = function() {
+            $scope.closeThisDialog('save');
+          };
+
+          // Accept the cancel action.
+          $scope.confirmCancel = function() {
+            $scope.closeThisDialog('close');
+          };
+        }]
+      });
+
+      return dialog.closePromise.then(function(data) {
+        if (data.value === 'close') {
+          return data;
+        }
+
+        throw data.value;
+      });
+    };
+
     // Revert to original form and go back
     $scope.cancel = function() {
-      _.assign($scope.form, $scope.originalForm);
-      $scope.back('project.' + $scope.formInfo.type + '.form.view');
+      return $scope.back('project.' + $scope.formInfo.type + '.form.view', {reload: true});
     };
+
+    // Listen for events to navigate away from the form builder.
+    $scope.$on('$stateChangeStart', function(event, transition) {
+      // If the form hasnt been modified, skip this cancel modal logic.
+      if (!dirty) {
+        return;
+      }
+
+      // Stop the transition event and check for the return of $scope.cancel.
+      event.preventDefault();
+
+      // Try to cancel the view.
+      $scope.showCancelDialogue()
+      .then(function() {
+        // Cancel without save was clicked, revert the form and get out.
+        $scope.form = $scope.$parent.form = angular.copy($scope.originalForm);
+        dirty = false;
+        $state.go(transition.name, {notify: false});
+      })
+      .catch(function(val) {
+        // If a value was given, the modal was closed with the x or escape. Take no action and stay on the current page.
+        if (!val || (val && val !== 'save')) {
+          console.error(val);
+          return;
+        }
+
+        // If there was no return the cancel action was rejected, save the form before navigation.
+        return $scope.saveForm()
+        .then(function(result) {
+          dirty = false;
+          $state.go(transition.name, {reload: true, notify: false});
+        })
+        .catch(function(err) {
+          console.error(err);
+        });
+      });
+    });
   }
 ]);
 
@@ -1302,10 +1399,68 @@ app.controller('FormSubmissionsController', [
       });
     };
 
+    var getKendoCell = function(component, path) {
+      var filterable;
+      switch(component.type) {
+        case 'datetime': filterable = { ui: 'datetimepicker' };
+          break;
+        // Filtering is not supported for these data types in resourcejs yet
+        case 'address':
+        case 'resource':
+        case 'signature':
+          filterable = false;
+          break;
+        default: filterable = true;
+      }
+
+      var field = path ? '["data.' + path + '.' + component.key.replace(/\./g, '.data.') + '"]' : '["data.' + component.key.replace(/\./g, '.data.') + '"]';
+      return {
+        field: field,
+        title: component.label || component.key,
+        template: function(dataItem) {
+          var val = dataItem.data;
+          if (path && _.has(val, path)) {
+            val = _.get(val, path);
+          }
+
+          var value = Formio.fieldData(val.toJSON(), component);
+          var componentInfo = formioComponents.components[component.type] || formioComponents.components.custom;
+          if (!componentInfo || !componentInfo.tableView) {
+            if (value === undefined) {
+              return '';
+            }
+            if (component.multiple) {
+              return value.join(', ');
+            }
+            return value;
+          }
+          if (component.multiple && (value.length > 0)) {
+            var values = [];
+            angular.forEach(value, function(arrayValue) {
+              arrayValue = componentInfo.tableView(arrayValue, component, $interpolate, formioComponents);
+              if (arrayValue === undefined) {
+                return values.push('');
+              }
+              values.push(arrayValue);
+            });
+            return values.join(', ');
+          }
+          value = componentInfo.tableView(value, component, $interpolate, formioComponents);
+          if (value === undefined) {
+            return '';
+          }
+          return value;
+        },
+        // Disabling sorting on embedded fields because it doesn't work in resourcejs yet
+        width: '200px',
+        filterable: filterable
+      };
+    };
+
     // When form is loaded, create the columns
     $scope.loadFormPromise.then(function() {
-      $timeout(function() { // Won't load on state change without this for some reason
-
+      // Load the grid on the next digest.
+      $timeout(function() {
         // Define DataSource
         var dataSource = new kendo.data.DataSource({
           page: 1,
@@ -1386,32 +1541,11 @@ app.controller('FormSubmissionsController', [
                     break;
                   case 'lte': params[filter.field + '__lte'] = filter.value;
                     break;
-
-
                 }
               });
+
               $http.get($scope.formio.submissionsUrl, {
                 params: params
-              })
-              .then(function(result) {
-                // Fill in gaps in data so Kendo doesn't crash on missing nested fields
-                _(FormioUtils.flattenComponents($scope.form.components))
-                .filter($scope.tableView)
-                .each(function(component) {
-                  _.each(result.data, function(row) {
-                    var key = 'data.' + component.key.replace(/\./g, '.data.');
-                    var value = _.get(row, key);
-                    if (value === undefined) {
-                      // This looks like it does nothing but it ensures
-                      // that the path to the key is reachable by
-                      // creating objects that don't exist
-                      // FOR-323 - Change to empty string so the grid isnt full of "undefined"s
-                      _.set(row, key, '');
-                    }
-                  });
-                });
-
-                return result;
               })
               .then(options.success)
               .catch(function(err) {
@@ -1433,62 +1567,32 @@ app.controller('FormSubmissionsController', [
           }
         });
 
+        // Track component keys inside objects, so they dont appear in the grid more than once.
+        var componentHistory = [];
+
         // Generate columns
-        var columns = _(FormioUtils.flattenComponents($scope.form.components))
-        .filter($scope.tableView)
-        .map(function(component){
-          var filterable;
-          switch(component.type) {
-            case 'datetime': filterable = { ui: 'datetimepicker' };
-              break;
-            // Filtering is not supported for these data types in resourcejs yet
-            case 'address':
-            case 'resource':
-            case 'signature':
-              filterable = false;
-              break;
-            default: filterable = true;
+        var columns = [];
+        FormioUtils.eachComponent($scope.form.components, function(component, componentPath) {
+          if (component.tableView === false || !component.key) {
+            return;
+          }
+          // FOR-310 - If this component was already added to the grid, dont add it again.
+          if (component.key && componentHistory.indexOf(component.key) !== -1) {
+            return;
           }
 
-          return {
-            field: '["data.' + component.key.replace(/\./g, '.data.') + '"]',
-            title: component.label || component.key,
-            template: function(dataItem) {
-              var value = Formio.fieldData(dataItem.data.toJSON(), component);
-              var componentInfo = formioComponents.components[component.type];
-              if (!componentInfo.tableView) {
-                if(value === undefined) {
-                  return '';
-                }
-                if(component.multiple) {
-                  return value.join(', ');
-                }
-                return value;
+          if (['container', 'datagrid'].indexOf(component.type) !== -1) {
+            FormioUtils.eachComponent(component.components, function(component) {
+              if (component.key) {
+                componentHistory.push(component.key);
               }
-              if (component.multiple && (value.length > 0)) {
-                var values = [];
-                angular.forEach(value, function(arrayValue) {
-                  arrayValue = componentInfo.tableView(arrayValue, component, $interpolate, formioComponents);
-                  if(arrayValue === undefined) {
-                    return values.push('');
-                  }
-                  values.push(arrayValue);
-                });
-                return values.join(', ');
-              }
-              value = componentInfo.tableView(value, component, $interpolate, formioComponents);
-              if(value === undefined) {
-                return '';
-              }
-              return value;
-            },
-            // Disabling sorting on embedded fields because it doesn't work in resourcejs yet
-            width: '200px',
-            filterable: filterable
-          };
-        })
-        .value()
-        .concat([
+            }, true);
+          }
+
+          columns.push(getKendoCell(component));
+        }, true);
+
+        columns.push(
           {
             field: 'created',
             title: 'Submitted',
@@ -1511,7 +1615,7 @@ app.controller('FormSubmissionsController', [
               return moment(dataItem.modified).format('lll');
             }
           }
-        ]);
+        );
 
         // Define grid options
         $scope.gridOptions = {
