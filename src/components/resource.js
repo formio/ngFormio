@@ -130,7 +130,12 @@ module.exports = function(app) {
               });
             };
 
-            // Close all open dialogs on state change.
+            // Close all open dialogs on state change (using UI-Router).
+            $scope.$on('$stateChangeStart', function() {
+              ngDialog.closeAll(false);
+            });
+
+            // Close all open dialogs on route change (using ngRoute).
             $scope.$on('$routeChangeStart', function() {
               ngDialog.closeAll(false);
             });
