@@ -129,6 +129,11 @@ module.exports = function(app) {
               //var cancelled = e.value === false || e.value === '$closeButton' || e.value === '$document';
               });
             };
+
+            // Close all open dialogs on state change.
+            $scope.$on('$routeChangeStart', function() {
+              ngDialog.closeAll(false);
+            });
           }
         }],
         group: 'advanced',
