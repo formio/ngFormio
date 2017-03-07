@@ -1316,7 +1316,8 @@ app.controller('FormSubmissionsController', [
     // Creates resourcejs sort query from kendo datasource read options
     var getSortQuery = function(options) {
       return _.map(options, function(opt) {
-        return (opt.dir === 'desc' ? '-' : '') + opt.field;
+        // FOR-395 - Remove the fix applied in FOR-323 to fix issues with the filter query being escaped.
+        return (opt.dir === 'desc' ? '-' : '') + opt.field.replace(/^\["|"\]$/gi, '');
       }).join(' ');
     };
 
