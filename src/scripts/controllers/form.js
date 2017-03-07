@@ -1519,6 +1519,9 @@ app.controller('FormSubmissionsController', [
                 sort: getSortQuery(options.data.sort)
               };
               _.each(filters, function(filter) {
+                // FOR-395 - Fix query regression with FOR-323
+                filter.field = filter.field.replace(/^\["|"\]$/gi, '');
+
                 switch(filter.operator) {
                   case 'eq': params[filter.field] = filter.value;
                     break;
