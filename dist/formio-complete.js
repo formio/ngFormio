@@ -1,4 +1,4 @@
-/*! ng-formio v2.10.6 | https://unpkg.com/ng-formio@2.10.6/LICENSE.txt */
+/*! ng-formio v2.11.1 | https://unpkg.com/ng-formio@2.11.1/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -48889,7 +48889,6 @@ module.exports = s3;
 
 },{"native-promise-only":35}],31:[function(_dereq_,module,exports){
 var Promise = _dereq_("native-promise-only");
-var Formio  = _dereq_("../../formio");
 var url = function(formio) {
   return {
     title: 'Url',
@@ -48917,12 +48916,22 @@ var url = function(formio) {
         xhr.onload = function() {
           if (xhr.status >= 200 && xhr.status < 300) {
             // Need to test if xhr.response is decoded or not.
+            var respData = {};
+            try {
+              respData = (typeof xhr.response === 'string') ? JSON.parse(xhr.response) : {};
+              respData = (respData && respData.data) ? respData.data : {};
+            }
+            catch(err) {
+              respData = {};
+            }
+
             resolve({
               storage: 'url',
               name: fileName,
               url: xhr.responseURL + '/' + fileName,
               size: file.size,
-              type: file.type
+              type: file.type,
+              data: respData
             });
           }
           else {
@@ -48940,7 +48949,10 @@ var url = function(formio) {
         }
 
         xhr.open('POST', url);
-        xhr.setRequestHeader('x-jwt-token', Formio.getToken());
+        var token = localStorage.getItem('formioToken');
+        if (token) {
+          xhr.setRequestHeader('x-jwt-token', token);
+        }
         xhr.send(fd);
       });
     },
@@ -48955,7 +48967,7 @@ url.name = 'url';
 url.title = 'Url';
 module.exports = url;
 
-},{"../../formio":26,"native-promise-only":35}],32:[function(_dereq_,module,exports){
+},{"native-promise-only":35}],32:[function(_dereq_,module,exports){
 (function (global){
 /**
  * lodash (Custom Build) <https://lodash.com/>
