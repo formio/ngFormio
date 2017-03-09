@@ -51,6 +51,7 @@ angular.module('formioApp')
     function ($scope, $window, $state, Environments, Formio) {
       $scope.environments = Environments.environments;
       $scope.currentEnvironment = Environments.currentEnvironment;
+      $scope.environmentTypes = ['Subdomains', 'Subdirectories', 'ProjectId'];
       $scope.switchEnvironment = function(environment) {
         if($window.confirm('Changing environments will switch backend servers and log you out. Are you sure?')) {
           Environments.setCurrentEnvironment(environment);

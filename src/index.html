@@ -96,6 +96,10 @@
                       <div class="form-group">
                         <input type="text" class="form-control" placeholder="http://lvh.me:3000" ng-model="environment.url">
                       </div>
+                      <div class="form-group">
+                        <!--<label class="form-label">Project Path</label>-->
+                        <select ng-options="option as option for option in environmentTypes" ng-model="environment.type" placeholder="Project Paths"></select>
+                      </div>
                       <a class="btn btn-default" ng-click="saveEnvironment($event)">Add</a>
                       <span ng-click="cancelEnvironment()"><i class="fa fa-close"></i></span>
                     </form>
@@ -294,6 +298,7 @@
     <!-- inject:js -->
     <script src="scripts/app.js"></script>
     <script src="scripts/components/resourcefields.js"></script>
+    <script src="scripts/utils/utils.js"></script>
     <script src="scripts/controllers/access.js"></script>
     <script src="scripts/controllers/controllers.js"></script>
     <script src="scripts/controllers/environmentSwitcher.js"></script>
@@ -305,7 +310,6 @@
     <script src="scripts/controllers/role.js"></script>
     <script src="scripts/controllers/team.js"></script>
     <script src="scripts/controllers/user.js"></script>
-    <script src="scripts/utils/utils.js"></script>
     <!-- endinject -->
     <!-- endbuild -->
 
