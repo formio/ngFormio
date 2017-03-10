@@ -6,7 +6,7 @@ Feature: Login Functionality
     When I enter test@test.com in the .login-container #email field
     When I click the LOG IN button
     Then I have been logged out
-    And I see .alert with the text Password not provided.
+    And I see .alert with the text Missing password
 
   Scenario: Bad password
     Given an account exists with the username ${random-name>login.name}, email ${random-email>login.email} and password ${random-password>login.password}
@@ -15,6 +15,7 @@ Feature: Login Functionality
     And I enter ${random-password} in the .login-container #password field
     When I click the LOG IN button
     Then I have been logged out
+    And I wait 2000 milliseconds
     And I see .alert with the text Incorrect password
 
   Scenario: Missing email
@@ -22,6 +23,7 @@ Feature: Login Functionality
     When I enter ${random-password} in the .login-container #password field
     And I click the LOG IN button
     Then I have been logged out
+    And I wait 2000 milliseconds
     And I see .alert with the text Username not provided.
 
   Scenario: Missing password
@@ -29,7 +31,8 @@ Feature: Login Functionality
     When I enter ${random-email} in the .login-container #email field
     And I click the LOG IN button
     Then I have been logged out
-    And I see .alert with the text Password not provided.
+    And I wait 2000 milliseconds
+    And I see .alert with the text Missing password
 
   Scenario: Unknown user
     Given I am logged out
@@ -37,6 +40,7 @@ Feature: Login Functionality
     And I enter ${random-password} in the .login-container #password field
     And I click the LOG IN button
     Then I have been logged out
+    And I wait 2000 milliseconds
     And I see .alert with the text Invalid user
 
   Scenario: Logging in

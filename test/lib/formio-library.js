@@ -468,8 +468,6 @@ module.exports = function(config) {
      .when('I click the $text link in Resources section', function (text, next) {
       var driver = this.driver;
       driver.waitForExist('//a[contains(@ng-repeat,"resource in forms")and contains (text(),"'+text+'") ]', timeout)
-        .waitForVisible('//a[contains(@ng-repeat,"resource in forms")and contains (text(),"'+text+'")]', timeout)
-        .isVisible('//a[contains(@ng-repeat,"resource in forms")and contains (text(),"'+text+'") ]')
         .click('//a[contains(@ng-repeat,"resource in forms")and contains (text(),"'+text+'") ]')
         .then(function(){
           driver.pause(1000);
@@ -482,7 +480,6 @@ module.exports = function(config) {
  .when('I click on the icon $icon', function (icon, next) {
        var driver = this.driver;
        driver.waitForExist('//*[contains(@class,\'' + icon + '\')]', timeout)
-         .waitForVisible('//*[contains(@class,\'' + icon + '\')]', timeout)
          .click('//*[contains(@class,\'' + icon + '\')]', timeout)
          .then(next)
          .catch(next);
@@ -491,7 +488,6 @@ module.exports = function(config) {
     .when('I click on the $button with $link', function (button,link, next) {
        var driver = this.driver;
        driver.waitForExist('//a[contains(@class,"btn btn-default btn-block btn-lg") and contains(@href,"'+link+'")]', timeout)
-         .waitForVisible('//a[contains(@class,"btn btn-default btn-block btn-lg") and contains(@href,"'+link+'")]', timeout)
          .click('//a[contains(@class,"btn btn-default btn-block btn-lg") and contains(@href,"'+link+'")]', timeout)
          .then(next)
          .catch(next);
@@ -828,7 +824,7 @@ module.exports = function(config) {
 
  .then('I see $text form', function(text,next){
       var driver = this.driver;
-      var path = '//div//h4[contains(text(),"'+text+'")]';
+      var path = '//div[contains(@class,"form-list")]//ul//li//a//h4[contains(text(),"'+text+'")]';
       driver.waitForExist(path,timeout)
       .then(function(res){
         console.log(res);
