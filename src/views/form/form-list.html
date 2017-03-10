@@ -26,11 +26,10 @@
             <a ui-sref="project.{{ listMode }}.form.view({formId: form._id})" ng-if="listMode === 'form' && formType === 'resource'"><h4>{{ form.title }}</h4></a>
             <a ui-sref="project.{{ form.type }}.form.submission.index({formId: form._id})" ng-if="listMode === 'data'"><h4>{{ form.title }}</h4></a>
             <h4 class="ellipsis" ng-if="listMode == 'launch'">{{ form.title }}</h4>
-            <div class="form-list-description" ng-if="listMode === 'form'">GET&nbsp;{{projectApi }}/{{ form.path }}</div>
+            <div class="form-list-description" ng-if="listMode === 'form'">GET&nbsp;{{ projectApi }}/{{ form.path }}</div>
             <div class="form-list-description" ng-if="listMode === 'resource'">{{ componentCount(form.components) }} components on this resource.</div>
-            <div class="form-list-description" ng-if="listMode === 'data'">GET&nbsp;{{projectApi }}/{{ form.path }}/submission</div>
-            <div class="form-updated" ng-if="listMode !== 'data'">Updated {{ form.modified | timeSince }} ago</div>
-            <div class="form-updated" ng-if="listMode === 'data'">Updated {{ form.modified | timeSince }} ago</div>
+            <div class="form-list-description" ng-if="listMode === 'data'">GET&nbsp;{{ projectApi }}/{{ form.path }}/submission</div>
+            <div class="form-updated">Updated {{ form.modified | timeSince }} ago</div>
           </div>
           <div class="col-md-6">
             <div class="form-list-buttons" ng-if="listMode == 'form' || listMode == 'resource'">

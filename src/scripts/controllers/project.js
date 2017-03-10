@@ -213,7 +213,7 @@ app.controller('ProjectController', [
 
     $scope.loadProjectPromise = $scope.formio.loadProject().then(function(result) {
       $scope.currentProject = result;
-      $scope.projectApi = AppConfig.protocol + '//' + result.name + '.' + AppConfig.serverHost;
+      $scope.projectApi = $rootScope.projectPath(result);
       $rootScope.currentProject = result;
       $scope.showName = !(result.plan && result.plan === 'basic');
       $scope.projectsLoaded = true;
@@ -1059,7 +1059,7 @@ app.controller('LaunchController', [
     });
     $scope.$watch('project', function(newProject, oldProject) {
       if (newProject && newProject.name) {
-        $scope.projectApi = AppConfig.protocol + '//' + newProject.name + '.' + AppConfig.serverHost;
+        $scope.projectApi = $rootScope.projectPath(newProject);
       }
     });
   }
