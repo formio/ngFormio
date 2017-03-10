@@ -488,12 +488,10 @@ module.exports = function(config) {
 
    .when('I click on the playicon', function (next) {
        var driver = this.driver;
-       console.log("test");
        driver.frame(0)
           .then(function(res){
-            console.log(res);
-            driver.waitForExist('//div[contains(@class,"play-icon")]',timeout)
-            .click('//div[contains(@class,"play-icon")]',timeout)
+            driver.waitForExist('//button[contains(@title,"Play")]',timeout)
+            .click('//button[contains(@title,"Play")]',timeout)
             .pause(1000)
             next();
             })
@@ -501,15 +499,33 @@ module.exports = function(config) {
          .catch(next);
      })//padma
 
-   /*.then('I see the video is playing',function(next){
+
+ .when('I see that the video is playing', function (next) {
+       var driver = this.driver;
+       console.log("video test");
+       driver.frame(0)
+          .then(function(res){
+            console.log("test2");
+            driver.waitForExist('//button[contains(@title,"Pause")]',timeout)
+          
+.pause(1000)
+            next();
+            })
+          
+         .catch(next);
+     })//padma
+  /* .then('I see video is playing',function(next){
       var driver = this.driver;
       driver.frame(0)
         .then(function(res){
           console.log(res);
-
+           driver.waitForExist('//button[contains(@title,"Pause")]',timeout)
+            .then(function(res){
+            assert.equal(res,true);
+            next();
         })
 
-
+        .catch(next);
    })   //Padma */
 
     .when('I click on the $button with $link', function (button,link, next) {
@@ -538,6 +554,47 @@ module.exports = function(config) {
         .then(next)
         .catch(next);
     })
+    .when('I drag and drop $title component', function(title, next) {
+      var driver = this.driver;
+      console.log("test")
+      driver.dragAndDrop('//div[contains(@id,"accordiongroup")]//span[contains(@title,"'+title+'")]', '//div[contains(@class,"alert")]', next)
+      .catch(next);
+    }) //Padma
+
+    .then('I see $TEXT in the $FIELD field', function (text, field, next) {
+        var driver = this.driver;
+        driver.waitForExist(field, timeout)
+          .getValue(field)
+          .then(function (temp) {
+            assert.equal(temp,replacements(text))
+            next();
+          })
+          .catch(next);
+      })//surendra//to check text in the autopopulated field
+
+      .when('I click (?:on )?the $BUTTON input button', function (button, next) {
+       var driver = this.driver;
+       driver.waitForExist('//input[contains(@value,\'' + button + '\')]', timeout)
+         .click('//input[contains(@value,\'' + button + '\')]')
+         .then(next)
+         .catch(next);
+     })//surendra
+
+     .then('I see element with the $value value', function (value, next) {
+       var driver = this.driver;
+       driver.waitForExist('//*[contains(@value,\'' + value + '\')]', timeout)
+         .isVisible('//*[contains(@value,\'' + value + '\')]', timeout)
+         .then(function (temp) {
+           if (typeof(temp) == 'object') {
+             assert.equal(temp[0], true);
+           } else {
+             assert.equal(temp, true);
+           }
+           next();
+         })
+         .catch(next);
+     })//surendra
+
     .when('I click on the $element element', function(element, next) {
       var driver = this.driver;
       driver.waitForExist(element, timeout)
@@ -604,7 +661,7 @@ module.exports = function(config) {
           next();
         })
         .catch(next);
-    }) //Padma
+    }) //Padma (Not working)
     .when('I expand the user menu', function(next) {
       var driver = this.driver;
       driver.waitForExist('#user-menu')
@@ -658,6 +715,183 @@ module.exports = function(config) {
         .catch(next);
     })
 
+    .then('I donot see $Resourcename resource', function (resourcename, next) {
+        var driver = this.driver;
+        var path = '//*[contains(@class , "form-list")]//li//h4';
+        driver.getText(path, timeout)
+          .then(function(temp){
+            
+            var res = temp.indexOf(resourcename) != -1  ? true : false;
+            assert.equal(res,false);
+            next();
+          })
+          .catch(next);
+      })//surendra
+
+          .then('I donot see $Resourcename form', function (resourcename, next) {
+        var driver = this.driver;
+        var path = '//*[contains(@class , "form-list")]//li//h4';
+        driver.getText(path, timeout)
+          .then(function(temp){
+      
+            var res = temp.indexOf(resourcename) == -1  ? true : false;
+            assert.equal(res,true);
+            next();
+          })
+          .catch(next);
+      })//surendra
+
+     .then('I donot see any $text forms', function (text,next) {
+        var driver = this.driver;
+        var path = '//h2[text()=\''+text+'\']//..//*[contains(@class , "form-list")]//ul';
+        driver.getText(path, timeout)
+          .then(function(temp){
+            assert.equal(temp,"");
+            next();
+          })
+          .catch(next);
+      })//surendra
+
+       .then('I see Anonymous roles for User Login form', function (next) {
+        var driver = this.driver;
+        var path = '//span [contains(text(), "Anonymous")]';
+        driver.waitForExist(path,timeout)
+        .getText(path, timeout)
+          .then(function(temp){
+           if (temp[0]==temp[1]){
+            assert.equal(temp[0],"Anonymous");
+            next();
+           }
+          })
+          .catch(next);
+      })//Padma (working)
+
+      .then('I see the $component component',function(component, next){
+      var driver = this.driver;
+      driver.waitForExist('//label[contains(text(),\''+component+'\')]',timeout)
+        .isVisible('//label[contains(text(),\''+component+'\')]',timeout)
+        .then(function(temp){
+          assert(temp,true);
+          next();
+        })
+        .catch(next);
+    })//surendra
+
+      
+
+      .then('I see the submissions datagrid',function( next){
+      var driver = this.driver;
+      driver.waitForExist('//div[contains(@kendo-grid,"grid")]',timeout)
+        .isVisible('//div[contains(@kendo-grid,"grid")]',timeout)
+        .then(function(temp){
+          assert(temp,true);
+          next();
+        })
+        .catch(next);
+    })//Padma
+
+     .then('I see the $action action',function(action, next){
+      var driver = this.driver;
+        driver.waitForExist('//tr[contains(@data-ng-repeat,"action in actions")]//..//a[contains(text(),"'+action+'")]',timeout)
+       .isVisible('//tr[contains(@data-ng-repeat,"action in actions")]//..//a[contains(text(),"'+action+'")]',timeout)
+        .then(function(temp){
+          assert.equal(temp,true);
+          next();
+        })
+        .catch(next);
+    })//Padma
+       
+    /*.when('I click on $button button for $formname form', function (button, formname, next) {
+        var driver = this.driver;
+        var path = '//div[contains(@class,\'form-list\')]//a' +
+          '//h4[contains(text(),\'' + formname + '\')]//..//..//..//a[contains(text(),\'' + button + '\')]';
+        driver.waitForExist(path, timeout)
+          .click(path, timeout)
+          .then(next)
+          .catch(next);
+      })//surendra */
+
+    .then('I am on the $page page of $text project', function (page, text, next) {
+        var driver = this.driver;
+        driver.url()
+          .then(function (res) {
+            var path = res.value.split("/");
+            var x = (path[path.length - 1] + '*') == "*" ? path[path.length - 2] : path[path.length - 1];
+            assert.equal(x, page);
+          
+          }).waitForVisible('//*[contains(@class, "project-title")]//a[contains(text(),\'' + replacements(text) + '\')]', timeout)
+          .isVisible('//*[contains(@class, "project-title")]//a[contains(text(),\'' + replacements(text) + '\')]')
+          .then(function (alert) {
+            assert.equal(alert, true);
+            next();
+          })
+          .catch(next);
+      })//surendra
+
+
+      .then('I see ApiEndpoint', function (next) {
+        var driver = this.driver;
+        driver.waitForExist('//h5[contains(@class,"ellipsis ng-binding")]', timeout)
+          .getText('//h5[contains(@class,"ellipsis ng-binding")]')
+          .then(function (res) {
+            console.log(res);
+			var path = res.split("//");
+			var x = path[path.length - 1];
+			console.log(x);
+			var y = x.split(".");
+			var api = y[0];
+			console.log(api);
+			
+            next();
+          })
+          .catch(next);
+      }) //Padma (working)
+
+.then('I see $file is downloaded on my computer', function (file,next) {
+        var driver = this.driver;
+		
+		driver.click('//*[contains(@class,"fa fa-home")]', timeout)
+		.then(function(temp){
+          console.log(temp);
+          driver.waitForExist('//strong[contains(@class,"ng-binding")]',timeout)
+          .then(function (alert) {
+            console.log(alert);
+            driver.getText('//strong[contains(@class,"ng-binding")]')
+            .then(function(api){
+            console.log(api);
+            var filepath = 'file:///C:/Users/Paddy/Downloads/'+api+'.json';
+            console.log(filepath);
+            driver.pullFileFromDevice(filepath)
+           .then(function(temp){
+          console.log(temp);
+        
+          next();
+        })
+        })
+          })
+        })
+        .catch(next);
+    })//Padma (trial)
+
+
+    /*  .then('I donot see any form', function (next) {
+        var driver = this.driver;
+        var path = '//*[contains(@class , "form-list")]//ul';
+        driver.getText(path, timeout)
+          .then(function(temp){
+            assert.equal(temp,"");
+            next();
+          })
+          .catch(next);
+      })//surendra */
+      .when('I clear the $element field',function(element,next){
+     var driver = this.driver;
+     driver.waitForExist(element, timeout)
+       .setValue(element, replacements(""))
+       .then(next)
+       .catch(next);
+   })//surendra
+
       .then('I do not see $element with the text $text', function (element, text, next) {
       text = replacements(text);
       var driver = this.driver;
@@ -704,12 +938,48 @@ module.exports = function(config) {
       .isVisible(path,timeout)
       .getText(path)
       .then(function(res){
-        console.log(res);
         assert.equal(res[1],text);
         next();
       })
        .catch(next);
   }) //Padma (working)
+
+
+  .then('I see $text form', function(text,next){
+      var driver = this.driver;
+      var path = '//div//h4[contains(text(),"'+text+'")]';
+      driver.waitForExist(path,timeout)
+      .isVisible(path,timeout)
+      .getText(path)
+      .then(function(res){
+      
+        assert.equal(res,text);
+        next();
+      })
+       .catch(next);
+  }) //Padma (working)
+
+  /*.then('I see the $action action ', function (action next) {
+      var driver = this.driver;
+	 	  driver.waitForExist('//span[contains(text(),"'+form+'")]',timeout)
+      .isVisible(path,timeout)
+      .getText(path)
+      .then(function(res){
+        console.log("test1");
+        console.log(res);
+        assert.equal(res,text);
+      })
+       console.log("test2");
+      driver.waitForExist('//tr[contains(@data-ng-repeat,"action in actions")]',timeout)
+        .getText('//a[contains(@ng-if,"action._id")]')
+        .then(function(res){
+           console.log("test3");
+          console.log(res+"^^^^^^^");
+		assert.equal(res,Action);
+          next();
+        })
+        .catch(next);
+    }) // Padma */
 
   .then('I see $Resourcename resource', function (resourcename, next) {
         var driver = this.driver;
@@ -717,6 +987,17 @@ module.exports = function(config) {
         driver.waitForExist(path, timeout)
         .isVisible(path, timeout)
         .then(function(){
+        next();
+      })
+          .catch(next);
+      })//Padma (working)
+
+     .then('I donot see Welcome banner', function (next) {
+        var driver = this.driver;
+        var path = '//div[contains(@ng-if,"showWelcome")]';
+        driver.waitForExist(path, timeout)
+          .then(function(res){
+          assert.equal(res,false);
         next();
       })
           .catch(next);
@@ -884,15 +1165,13 @@ module.exports = function(config) {
       .catch(next);
     }) //padma (working for doc test)
 
-      .then('I am on new window with url $link',function(link, next){
+    .then('I am on new window with url $link',function(link, next){
      var driver = this.driver;
      driver.windowHandles()
        .then(function (result) {
          driver.window(result.value[result.value.length-1])
            .url()
            .then(function(res){
-             console.log("res.value:" +res.value);
-             console.log("link:" +link);
              assert.equal(res.value,link);
              next();
            })
@@ -901,6 +1180,19 @@ module.exports = function(config) {
        })
        .catch(next);
    }) //(Working)
+
+   .then('I see $msg text',function(msg,next){
+     var driver = this.driver;
+     console.log("test");
+     driver.waitForVisible('//div//h4[contains(text(),"Thank you!")]', timeout)
+     .isVisible('//div//h4[contains(text(),"Thank you!")]')
+     .then(function (result) {
+             console.log(result);
+             assert.equal(result,true);
+             next();
+          })
+       .catch(next);
+   }) //Padma (Not worked yet thank you msg)
 
     .then('the $BUTTON button is disabled', function(button, next) {
       var driver = this.driver;
@@ -1023,7 +1315,6 @@ module.exports = function(config) {
       driver.waitForExist('//div//h5[contains(text(),\'Roles\')]',timeout)
         .getText('//div//h5[contains(text(),\'Roles\')]//..//..//a')
         .then(function(res){
-          console.log(res+"^^^^^^^");
           var temp = res.indexOf(text) > -1 ? true : false;
           assert.equal(temp, false);
           next();
@@ -1036,7 +1327,6 @@ module.exports = function(config) {
       driver.waitForExist('//div//h5[contains(text(),\'Resources\')]',timeout)
         .getText('//div//h5[contains(text(),\'Resources\')]//..//..//a')
         .then(function(res){
-          console.log(res+"^^^^^^^");
           var temp = res.indexOf(text) > -1 ? true : false;
           assert.equal(temp, false);
           next();
@@ -1057,16 +1347,17 @@ module.exports = function(config) {
         .catch(next);
     }) //Padma (Not working)
 
-    .when('I click on $button button for $Resourcename resource', function (button, formname, next) {
+    .when('I click on the $button button for $Resourcename resource', function (button, formname, next) {
         var driver = this.driver;
         var path = '//div//h2[contains(text(),\'Resources\')]//..//div[contains(@class,\'form-list\')]//a' +
-          '//h4[contains(text(),\'' + formname + '\')]//..//..//..//span[contains(@class,\'' + button + '\')]';
+          '//h4[contains(text(),\'' + formname + '\')]//..//..//..//*[contains(@class,\'' + button + '\')]';
         driver.waitForExist(path, timeout)
           .click(path, timeout)
           .then(next)
           .catch(next);
-      })//surendra
+      })
 
+        
     .when('I click button with $text text', function(text, next) {
 	      text = replacements(text);
         var driver = this.driver;
@@ -1086,12 +1377,14 @@ module.exports = function(config) {
 .when('I click on $button button for $formname form', function (button, formname, next) {
         var driver = this.driver;
         var path = '//div//h2[contains(text(),\'Forms\')]//..//div[contains(@class,\'form-list\')]//a' +
-          '//h4[contains(text(),\'' + formname + '\')]//..//..//..//span[contains(@class,\'' + button + '\')]';
+          '//h4[contains(text(),\'' + formname + '\')]//..//..//..//*[contains(@class,\'' + button + '\')]';
         driver.waitForExist(path, timeout)
           .click(path, timeout)
           .then(next)
           .catch(next);
-      })//surendra
+      })//surendra 
+
+ 
 
       .when('I click on $text text element', function (text, next) {
         var driver = this.driver;
@@ -1183,7 +1476,9 @@ module.exports = function(config) {
 
         })
         .catch(next);
-    })
+    }) //Padma
+
+  
     .then('I see the $element modal', function(element, next) {
       var driver = this.driver;
       driver.waitForVisible(element, timeout)

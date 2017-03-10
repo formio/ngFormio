@@ -101,7 +101,7 @@ Scenario: Deleting a Resource will remove the Resource in the ‘Overview’ sec
     And I wait 1000 milliseconds
     When I click on the .fa-database element
     And I wait 1000 milliseconds
-    When I click on glyphicon-trash button for Admin resource
+    When I click on the glyphicon-trash button for Admin resource
     And I wait 1000 milliseconds
     And I see button.btn.btn-danger with the text Yes
     And I click the Yes button
@@ -116,7 +116,7 @@ Scenario: Deleting a Form will remove the Form in the ‘Overview’ section UI
     And I wait 1000 milliseconds
     When I click on the .fa-tasks element
     And I wait 1000 milliseconds
-    When I click on glyphicon-trash button for User Login form
+    When I click on glyphicon-trash button for User Login form 
     And I wait 1000 milliseconds
     And I see button.btn.btn-danger with the text Yes
     And I click the Yes button
