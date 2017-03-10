@@ -8,6 +8,7 @@ Scenario: Clicking ‘Data’ button for Resource on Resource page
     When I click on the .fa-tasks element
     And I wait 1000 milliseconds
     Then I am taken to Forms page
+    And I wait 1000 milliseconds
     Then I see User Login form
     Then I see User Register form
     Then I see User resource
@@ -21,6 +22,7 @@ Scenario: Searching for existing Forms/Resource with search bar
     When I click on the .fa-tasks element
     And I wait 1000 milliseconds
     Then I am taken to Forms page
+    And I wait 1000 milliseconds
     When I enter Lo in the #form-search field
     Then I see User Login form
     And I donot see User Register form
