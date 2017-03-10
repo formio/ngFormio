@@ -811,7 +811,7 @@ module.exports = function(config) {
   }) //Padma (working)
 
 
-  .then('I see $text form', function(text,next){
+/*  .then('I see $text form', function(text,next){
       var driver = this.driver;
       var path = '//div//h4[contains(text(),"'+text+'")]';
       driver.waitForExist(path,timeout)
@@ -823,7 +823,26 @@ module.exports = function(config) {
         next();
       })
        .catch(next);
-  }) //Padma (working)
+  }) //Padma (working) */
+
+
+ .then('I see $text form', function(text,next){
+      var driver = this.driver;
+      var path = '//div//h4[contains(text(),"'+text+'")]';
+      driver.waitForExist(path,timeout)
+      .then(function(res){
+        console.log(res);
+        driver.getText(path)
+          .then(function(result){
+            console.log(result);
+          driver.pause(1000);
+          assert.equal(result,text);
+          next();
+      })
+      
+      })
+       .catch(next);
+  }) //Padma (working)  
 
   
   .then('I see $Resourcename resource', function (resourcename, next) {
