@@ -9,7 +9,7 @@ var _ = require('lodash');
 
 module.exports = function(config) {
   // Global timeout for wait* commands.
-  var timeout = 30000;
+  var timeout = 10000;
   var state = {};
   var projects = {};
    var helpPage = 'http://formio.github.io/help.form.io';
