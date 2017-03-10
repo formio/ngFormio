@@ -1150,7 +1150,7 @@ module.exports = function(config) {
         .catch(next);
     }) // Padma
 
- .then('I see project progress is at $title', function (title, next) {
+ /* .then('I see project progress is at $title', function (title, next) {
       title = replacements(title);
 
       var driver = this.driver;
@@ -1159,6 +1159,24 @@ module.exports = function(config) {
         .then(function (found) {
           assert.equal(found, title);
           next();
+        })
+        .catch(next);
+    }) // Padma */
+
+
+    .then('I see project progress is at $title', function (title, next) {
+      title = replacements(title);
+
+      var driver = this.driver;
+      driver.waitForExist('.overlay')
+        
+        .then(function (found) {
+          driver.getText('.overlay')
+           .then(function (found) {
+          assert.equal(found, title);
+          next();
+        })
+          
         })
         .catch(next);
     }) // Padma
