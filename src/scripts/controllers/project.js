@@ -563,7 +563,7 @@ app.provider('ProjectProgress', function() {
             if (!project.steps) {
               project.steps = [];
             }
-            formio = new Formio(AppConfig.protocol + '//' + project.name + '.' + AppConfig.serverHost);
+            formio = new Formio($rootScope.projectPath(project));
 
             formio.loadForms({
                 params: {
