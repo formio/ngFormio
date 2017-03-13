@@ -20,12 +20,13 @@ Feature: Project Overview - Project Progress Functionality 13
    Then The step Set up project user accounts has been checked
 
  Scenario: Completing 'Modify a form' step
+   When I wait 1000 milliseconds
    Then I see Modify a form is already expanded
    When I click the Form link in Modify a form of project progress
    Then I am on the form page of Default project
    And I can see User Login in the Forms Section
    And I can see User Register in the Forms Section
-   When I click on Edit button for User Login form
+   When I click on the glyphicon glyphicon-edit button for User Login resource in Forms section
    Then I am on the edit page of Default project
    When I enter first user form  in the #title field
    And I click on the Save Form input button
@@ -34,6 +35,7 @@ Feature: Project Overview - Project Progress Functionality 13
    And The step Modify a form has been checked
 
   Scenario: Completing ‘Set up Email/File Storage/Data provider’ step
+    When I wait 1000 milliseconds
     Then I see Set up Email/File Storage/Data providers is already expanded
     When I click the Email Provider link in Set up Email/File Storage/Data provider of project progress
     Then I am on the email page of Default project
@@ -44,6 +46,7 @@ Feature: Project Overview - Project Progress Functionality 13
     And The step Set up Email/File Storage/Data provider has been checked
 
   Scenario: Completing ‘Clone the demo app to your local computer’ step
+    When I wait 1000 milliseconds
     Then I see Clone the demo app to your local computer is already expanded
     When I click the Local App Development link in Clone the demo app to your local computer of project progress
     Then I am on Local App Development section of Launch page
@@ -52,6 +55,7 @@ Feature: Project Overview - Project Progress Functionality 13
     Then The step Clone the demo app to your local computer has been checked
 
   Scenario: Completing ‘Create a new form’ step
+    When I wait 1000 milliseconds
     Then I see Create a new form is already expanded
     When I click the create a form link in Create a new form of project progress
     Then I see the plaintext New Form
@@ -64,6 +68,7 @@ Feature: Project Overview - Project Progress Functionality 13
     Then The step Create a new form has been checked
 
   Scenario: Completing ‘Launch your application’ step
+    When I wait 1000 milliseconds
     Then I see Launch your application is already expanded
     When I click the Launch link in Launch your application of project progress
     Then I am on Web App section of Launch page

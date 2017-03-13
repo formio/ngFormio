@@ -778,7 +778,6 @@ module.exports = function (config) {
           .getText(element)
           .then(function (found) {
             try {
-              console.log(found + "************")
               assert.equal(found, text);
               return next();
             }
@@ -961,7 +960,6 @@ module.exports = function (config) {
           .isVisible('//*[contains(@class, "template-card") and contains(., "Default")]')
           .elementIdCssProperty('//*[contains(@class, "template-card") and contains(., "Default")]', 'background-color')
           .then(function (result) {
-            console.log("***********" + result);
             next();
           })
           .catch(next);
@@ -1016,7 +1014,6 @@ module.exports = function (config) {
         driver.waitForExist('//*[contains(@class, \'active\')]', timeout)
           .getText('//*[contains(@class, \'active\')]')
           .then(function (res) {
-              console.log(res);
               var d = page + "*" + section;
               var x = res[0] + "*" + res[1];
               assert.equal(x, d);
@@ -1032,7 +1029,6 @@ module.exports = function (config) {
         driver.waitForExist('//*[contains(@class, \'active\')]', timeout)
           .getText('//*[contains(@class, \'active\')]')
           .then(function (res) {
-              console.log(res);
               assert.equal(res, section);
               next();
             }
@@ -1110,7 +1106,6 @@ module.exports = function (config) {
         var path = '//*[contains(@class , "form-list")]//li//h4';
         driver.getText(path, timeout)
           .then(function (temp) {
-            console.log(temp);
             var res = temp.indexOf(resourcename) != -1 ? true : false;
             assert.equal(res, false);
             next();

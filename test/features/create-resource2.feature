@@ -242,7 +242,7 @@ Feature: Test 16 Creating/Editing A Resource part2
     When I enter test in the //*[contains(@placeholder,"Add a tag")] field
     And I click on the //*[contains(text(),"Advanced Settings")] element
     And I click on the //*[contains(text(),"Advanced Settings")] element
-    Then I see test in the field Form Tags
+    Then I see span text test in the field Form Tags
 
 
   Scenario: Adding Custom Action URL

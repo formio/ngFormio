@@ -36,31 +36,29 @@ new Yadda.FeatureFileSearch('./test/features').each(function(file) {
       library = require('./lib/formio-library')(config);
       done();
     });
+  featureFile(file, function (feature) {
+    before(function (done) {
+      driver = webdriver
+        .remote(options)
+        .init()
+        .setViewportSize({width: 1280, height: 720})
+        .url(options.baseUrl, done);
+    });
 
-    featureFile(file, function (feature) {
-      before(function (done) {
-        driver = webdriver
-          .remote(options)
-          .init()
-          .setViewportSize({width: 1280, height: 720})
-          .url(options.baseUrl, done);
-      });
-
-      scenarios(feature.scenarios, function (scenario) {
-        steps(scenario.steps, function (step, done) {
-          Yadda.createInstance(library, {driver: driver}).run(step, done);
-        });
-      });
-
-      afterEach(function () {
-        takeScreenshotOnFailure(this.currentTest);
-      });
-
-      after(function () {
-        driver.end();
+    scenarios(feature.scenarios, function (scenario) {
+      steps(scenario.steps, function (step, done) {
+        Yadda.createInstance(library, {driver: driver}).run(step, done);
       });
     });
 
+    afterEach(function () {
+      takeScreenshotOnFailure(this.currentTest);
+    });
+
+    after(function () {
+      driver.end();
+    });
+  });
 });
 
 function takeScreenshotOnFailure(test) {
