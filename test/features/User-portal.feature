@@ -9,12 +9,13 @@ Scenario: Closing the Welcome Module
     When I click on the .fa-close element
     And I wait 1000 milliseconds
     Then I donot see Welcome banner
+    And I wait 1000 milliseconds
     Then I see Step 1: Create your project project portal
 
 Scenario: Welcome module when Project count is zero
     Given I am logged in for profileuser1
     And I am on /#/
-    When My project count is zero
+    When My project count is 0
 	And I see .welcome-banner with the text Welcome to
 
 Scenario: Using the Welcome Module
@@ -55,7 +56,7 @@ Scenario: Using the Welcome Module
 Scenario: Portal Documentation/Links
     Given I am logged in for profileuser1
     And I am on /#/
-    When My project count is zero
+    When My project count is 0
     Then I am on the Step 1: Create your project project portal
     When I click on the Getting Started Guide link
     Then I am on new window with url https://help.form.io/intro/explore/
@@ -63,6 +64,6 @@ Scenario: Portal Documentation/Links
 Scenario: Teams messaging on portal
     Given I am logged in for profileuser1s
     And I am on /#/
-    When My project count is zero
+    When My project count is 0
     Then I see the plaintext Want to work collaboratively? Upgrade a project to TeamPro to enable Team functionality.
    

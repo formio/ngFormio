@@ -1,4 +1,6 @@
 Feature: Project Overview - Project Info Functionality 
+
+
 Scenario: Viewing ‘Project Info’ information
     Given I am logged in for profileuser3
     And A project exists with the ${random-title>project3.title} and ${random-description>project3.description}
@@ -18,6 +20,20 @@ Scenario: Viewing ‘Project Info’ information
     When I click the Upgrade Project link
     Then I see the .project-upgrade-dialog modal
 
+Scenario Outline: Testing role
+    Given I am logged in for profileuser3
+    And A project exists with the ${random-title>project3.title} and ${random-description>project3.description}
+    And I am on the ${project3.title} project overview page
+    When I click the [link] link
+    Then I see the plaintext [text]
+
+    Examples:
+      | link                    | text                  |
+      | User Login              | User Login Form       |
+      | User Register           | User Register Form    |
+      | User                    | User Resource         |          
+      | Admin                   | Admin Resource        |
+
 Scenario Outline: Navigating to Roles from Project Info section
     Given I am logged in for profileuser3
     And A project exists with the ${random-title>project3.title} and ${random-description>project3.description}
@@ -33,34 +49,6 @@ Scenario Outline: Navigating to Roles from Project Info section
   |Anonymous    |Anonymous      |
   |Authenticated|Authenticated  |
 
-    
-Scenario Outline: Navigating to Resources from Project Info section
-    Given I am logged in for profileuser3
-    And A project exists with the ${random-title>project3.title} and ${random-description>project3.description}
-    And I am on the ${project3.title} project overview page
-    And I wait 2000 milliseconds
-    When I click the [link] link in Resources section
-    And I wait 2000 milliseconds
-    Then I am on [text] Resource | page
-
-  Examples:
-  |link |text |
-  |User |User |          
-  |Admin|Admin| 
-
-Scenario Outline: Navigating to Forms from Project Info section 
-    Given I am logged in for profileuser3
-    And A project exists with the ${random-title>project3.title} and ${random-description>project3.description}
-    And I am on the ${project3.title} project overview page
-    And I wait 2000 milliseconds 
-    When I click the [link] link
-    And I wait 2000 milliseconds
-    Then I am on [text] Form | page
-
-  Examples:
-  |link          |text         |
-  |User Login    |User Login   |          
-  |User Register |User Register|
 
 Scenario: Navigating to Portal from project overview
     Given I am logged in for profileuser3
@@ -84,45 +72,48 @@ Scenario: Deleting a Role will remove the Role in the ‘Overview’ section UI
     Given I am logged in for profileuser3
     And A project exists with the ${random-title>project3.title} and ${random-description>project3.description}
     And I am on the ${project3.title} project overview page
-    And I wait 1000 milliseconds
+    And I wait 2000 milliseconds
     When I click the Authenticated link
-    And I wait 1000 milliseconds
+    And I wait 2000 milliseconds
     Then I am on the edit page with Edit Authenticated Role
     When I click on the Delete link
     And I see button.btn.btn-danger with the text Yes
     And I click the Yes button
     And I click on the .progress-radial element
-    And I wait 1000 milliseconds
-    Then I do not see the Authenticated link in Roles section
-
-Scenario: Deleting a Resource will remove the Resource in the ‘Overview’ section UI
-    Given I am logged in for profileuser3
-    And I am on the ${project3.title} project overview page
-    And I wait 1000 milliseconds
-    When I click on the .fa-database element
-    And I wait 1000 milliseconds
-    When I click on the glyphicon-trash button for Admin resource
-    And I wait 1000 milliseconds
-    And I see button.btn.btn-danger with the text Yes
-    And I click the Yes button
-    And I click on the .progress-radial element
-    And I wait 1000 milliseconds
-    Then I do not see the Admin link in Resources section
+    And I wait 2000 milliseconds
+    Then I donot see the Authenticated link in Roles section
 
 Scenario: Deleting a Form will remove the Form in the ‘Overview’ section UI
     Given I am logged in for profileuser3
     And A project exists with the ${random-title>project3.title} and ${random-description>project3.description}
     And I am on the ${project3.title} project overview page
-    And I wait 1000 milliseconds
+    And I wait 2000 milliseconds
     When I click on the .fa-tasks element
-    And I wait 1000 milliseconds
-    When I click on glyphicon-trash button for User Login form 
-    And I wait 1000 milliseconds
+    And I wait 2000 milliseconds
+    When I click on the glyphicon glyphicon-trash button for User Login resource in Forms section
+    And I wait 2000 milliseconds
     And I see button.btn.btn-danger with the text Yes
     And I click the Yes button
     And I click on the .progress-radial element
-    And I wait 1000 milliseconds
-    Then I do not see the User Login link in Forms section
+    And I wait 2000 milliseconds
+    Then I donot see the User Login link in Forms section
+
+Scenario: Deleting a Resource will remove the Resource in the ‘Overview’ section UI
+    Given I am logged in for profileuser3
+    And I am on the ${project3.title} project overview page
+    And I wait 2000 milliseconds
+    When I click on the .fa-database element
+    And I wait 2000 milliseconds
+     When I click on the glyphicon glyphicon-trash button for Admin resource in Resources section
+    And I wait 2000 milliseconds
+    And I see button.btn.btn-danger with the text Yes
+    And I click the Yes button
+    And I click on the .progress-radial element
+    And I wait 2000 milliseconds
+    Then I donot see the Admin link in Resources section
+
+
+
 
 
     
