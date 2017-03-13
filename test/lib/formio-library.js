@@ -330,6 +330,7 @@ module.exports = function (config) {
     next(null, projects[title]);
   }
 
+
   var library = English.library()
       .given('I am (?:on|at) (?:the )?(.+?)(?: page)?$', function (url, next) {
         var path = (url === 'home') ? config.baseUrl + '/' : config.baseUrl + url;
@@ -519,7 +520,6 @@ module.exports = function (config) {
       .when('I click on the icon $icon', function (icon, next) {
         var driver = this.driver;
         driver.waitForExist('//*[contains(@class,\'' + icon + '\')]', timeout)
-          .waitForVisible('//*[contains(@class,\'' + icon + '\')]', timeout)
           .click('//*[contains(@class,\'' + icon + '\')]', timeout)
           .then(next)
           .catch(next);
@@ -552,10 +552,10 @@ module.exports = function (config) {
           .then(next)
           .catch(next);
       })//surendra
-      .when('I click on $button button for $formname form', function (button, formname, next) {
+      .when('I click on the $button button for $name resource in $section section', function (button, name, section, next) {
         var driver = this.driver;
-        var path = '//div//h2[contains(text(),\'Forms\')]//..//div[contains(@class,\'form-list\')]//a' +
-          '//h4[contains(text(),\'' + formname + '\')]//..//..//..//a[contains(text(),\'' + button + '\')]';
+        var path = '//div//h2[contains(text(),\'' + section + '\')]//..//div[contains(@class,\'form-list\')]//a' +
+          '//h4[contains(text(),\'' + name + '\')]//..//..//..//*[contains(@class,\'' + button + '\')]';
         driver.waitForExist(path, timeout)
           .click(path, timeout)
           .then(next)
@@ -572,11 +572,33 @@ module.exports = function (config) {
         var driver = this.driver;
         driver.waitForExist('//select', timeout)
           .click('//select')
-          .waitForVisible( '//*[text()="' + text + '"]', timeout)
-          .click('//*[text()="' + text + '"]',timeout)
+          .waitForVisible('//*[text()="' + text + '"]', timeout)
+          .click('//*[text()="' + text + '"]', timeout)
           .then(next)
           .catch(next);
       })//surendra 'grid view in overview page'
+      .when('I clear the $element field', function (element, next) {
+        var driver = this.driver;
+        driver.waitForExist(element, timeout)
+          .setValue(element, replacements(""))
+          .then(next)
+          .catch(next);
+      })//surendra
+      .when('I click on notification', function (next) {
+        var driver = this.driver;
+        driver.waitForExist('//div[@class=\'toast-message\']', timeout)
+          .click('//div[@class=\'toast-message\']')
+          .then(next)
+          .catch(next);
+      })//surendra
+      .when('I click on the $name link in api page', function (name, next) {
+        var driver = this.driver;
+        driver.waitForExist('//*[text()=\'' + name + '\']//..//td/a', timeout)
+          .click('//*[text()=\'' + name + '\']//..//td/a')
+          .then(next)
+          .catch(next);
+      })//surendra 'click on the endpoint links in the api page of the resource'
+
 
       .then('the title is $TITLE', function (title, next) {
         var driver = this.driver;
@@ -691,12 +713,15 @@ module.exports = function (config) {
       })
       .then('I see the plaintext $text', function (text, next) {
         text = replacements(text);
-
         var driver = this.driver;
         driver.waitForExist('//*[contains(text(),\'' + text + '\')]', timeout)
           .isVisible('//*[contains(text(),\'' + text + '\')]')
           .then(function (visible) {
-            assert.equal(visible, true);
+            if (typeof(visible) == 'object') {
+              assert.equal(visible.indexOf(true) > -1, true);
+            } else {
+              assert.equal(visible, true);
+            }
             next();
           })
           .catch(next);
@@ -753,6 +778,7 @@ module.exports = function (config) {
           .getText(element)
           .then(function (found) {
             try {
+              console.log(found + "************")
               assert.equal(found, text);
               return next();
             }
@@ -850,9 +876,8 @@ module.exports = function (config) {
             var path = res.value.split("/");
             var x = (path[path.length - 1] + '*') == "*" ? path[path.length - 2] : path[path.length - 1];
             assert.equal(x, page);
-            next();
-          }).waitForVisible('//*[contains(@class, "project-title")]//a[contains(text(),\'' + text + '\')]', timeout)
-          .isVisible('//*[contains(@class, "project-title")]//a[contains(text(),\'' + text + '\')]')
+          }).waitForVisible('//*[contains(@class, "project-title")]//a[contains(text(),\'' + replacements(text) + '\')]', timeout)
+          .isVisible('//*[contains(@class, "project-title")]//a[contains(text(),\'' + replacements(text) + '\')]')
           .then(function (alert) {
             assert.equal(alert, true);
             next();
@@ -896,6 +921,30 @@ module.exports = function (config) {
           })
           .catch(next);
       })//surendra
+      .then('I am on new window', function (next) {
+        var driver = this.driver;
+        driver.windowHandles()
+          .then(function (result) {
+            driver.window(result.value[result.value.length - 1])
+              .url()
+              .then(function (res) {
+                next();
+              })
+          })
+          .catch(next);
+      })//surendra
+      .then('I go back to previous window', function (next) {
+        var driver = this.driver;
+        driver.windowHandles()
+          .then(function (result) {
+            driver.window(result.value[0])
+              .then(function () {
+                next();
+              })
+              .catch(next);
+          })
+      })//surendra
+
       .then('The Template list is expanded', function (next) {
         var driver = this.driver;
         driver.waitForExist('//*[contains(@class,"thumbnail template-cards")]', timeout)
@@ -962,9 +1011,9 @@ module.exports = function (config) {
 
       .then('I am on $section section of $page page', function (section, page, next) {
         var driver = this.driver;
-      /*  driver.waitForExist('//li[contains(@class, \'active\') and contains(text(),\'\')]', timeout)
-          .getText('//li[contains(@class, \'active\') and contains(text(),\'\')]')*/
-          driver.waitForExist('//*[contains(@class, \'active\')]',timeout)
+        /*  driver.waitForExist('//li[contains(@class, \'active\') and contains(text(),\'\')]', timeout)
+         .getText('//li[contains(@class, \'active\') and contains(text(),\'\')]')*/
+        driver.waitForExist('//*[contains(@class, \'active\')]', timeout)
           .getText('//*[contains(@class, \'active\')]')
           .then(function (res) {
               console.log(res);
@@ -980,7 +1029,7 @@ module.exports = function (config) {
         var driver = this.driver;
         /*  driver.waitForExist('//li[contains(@class, \'active\') and contains(text(),\'\')]', timeout)
          .getText('//li[contains(@class, \'active\') and contains(text(),\'\')]')*/
-        driver.waitForExist('//*[contains(@class, \'active\')]',timeout)
+        driver.waitForExist('//*[contains(@class, \'active\')]', timeout)
           .getText('//*[contains(@class, \'active\')]')
           .then(function (res) {
               console.log(res);
@@ -1022,48 +1071,165 @@ module.exports = function (config) {
         var daycount = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
         driver.waitForExist('//*[@class=\'ct-point\']', timeout)
           .elements('.ct-point')
-          .then(function(ele){
-            assert.equal(JSON.parse(JSON.stringify(ele)).value.length,daycount);
+          .then(function (ele) {
+            assert.equal(JSON.parse(JSON.stringify(ele)).value.length, daycount);
             next();
           })
           .catch(next);
       })//surendra
 
-    .then('I see the ‘Grid View’ switch to $value values in the X axis', function (value,next) {
-      var driver = this.driver;
-      driver.waitForExist('//*[@class=\'ct-point\']', timeout)
-        .elements('.ct-point')
-        .then(function(ele){
-          assert.equal(JSON.parse(JSON.stringify(ele)).value.length,value);
-          next();
-        })
-        .catch(next);
-    })//surendra
-    .then('I see list of options $options on selection list',function(options,next){
-         var driver = this.driver;
-         driver.waitForExist('//select//option')
-           .getText('//select//option')
-           .then(function(ele){
-             var dat = "";
-             for(var i=0; i<ele.length;i++){
-               dat += ele[i];
-               if(i!=ele.length-1){
-                 dat += ", ";
-               }
-             }
-             assert.equal(dat,options)
-             next();
-           })
-           .catch(next);
-    })//surendra
+      .then('I see the ‘Grid View’ switch to $value values in the X axis', function (value, next) {
+        var driver = this.driver;
+        driver.waitForExist('//*[@class=\'ct-point\']', timeout)
+          .elements('.ct-point')
+          .then(function (ele) {
+            assert.equal(JSON.parse(JSON.stringify(ele)).value.length, value);
+            next();
+          })
+          .catch(next);
+      })//surendra
+      .then('I see list of options $options on selection list', function (options, next) {
+        var driver = this.driver;
+        driver.waitForExist('//select//option')
+          .getText('//select//option')
+          .then(function (ele) {
+            var dat = "";
+            for (var i = 0; i < ele.length; i++) {
+              dat += ele[i];
+              if (i != ele.length - 1) {
+                dat += ", ";
+              }
+            }
+            assert.equal(dat, options)
+            next();
+          })
+          .catch(next);
+      })//surendra
       .then('I donot see $Resourcename resource', function (resourcename, next) {
         var driver = this.driver;
-        var path = '//*[contains(@class,"list-group")]//h4[contains(text(),\'\')]';
+        var path = '//*[contains(@class , "form-list")]//li//h4';
         driver.getText(path, timeout)
-          .then(function(temp){
-            console.log(temp)
-            var res = temp.indexOf(resourcename) != -1  ? true : false;
-            assert.equal(res,false);
+          .then(function (temp) {
+            console.log(temp);
+            var res = temp.indexOf(resourcename) != -1 ? true : false;
+            assert.equal(res, false);
+            next();
+          })
+          .catch(next);
+      })//surendra
+      .then('I donot see any $text forms', function (text, next) {
+        var driver = this.driver;
+        var path = '//h2[text()=\'' + text + '\']//..//*[contains(@class , "form-list")]//ul';
+        driver.getText(path, timeout)
+          .then(function (temp) {
+            assert.equal(temp, "");
+            next();
+          })
+          .catch(next);
+      })//surendra
+      .then('I see the $component component', function (component, next) {
+        var driver = this.driver;
+        driver.waitForExist('//label[contains(text(),\'' + component + '\')]', timeout)
+          .isVisible('//label[contains(text(),\'' + component + '\')]', timeout)
+          .then(function (temp) {
+            assert.equal(temp, true);
+            next();
+          })
+          .catch(next);
+      })//surendra
+      .then('I donot see the $component component', function (component, next) {
+        var driver = this.driver;
+        driver.waitForExist('//label[contains(text(),\'' + component + '\')]', timeout)
+          .isVisible('//label[contains(text(),\'' + component + '\')]', timeout)
+          .then(function (temp) {
+            assert.equal(temp, false);
+            next();
+          })
+          .catch(next);
+      })//surendra
+      .then('I see $TEXT in the $FIELD field', function (text, field, next) {
+        var driver = this.driver;
+        driver.waitForExist(field, timeout)
+          .getValue(field, replacements(text))
+          .then(function (temp) {
+            assert.equal(temp, text)
+            next();
+          })
+          .catch(next);
+      })//surendra//to check text in the autopopulated field
+      .then('I see element with the $value value', function (value, next) {
+        var driver = this.driver;
+        driver.waitForExist('//*[contains(@value,\'' + value + '\')]', timeout)
+          .isVisible('//*[contains(@value,\'' + value + '\')]', timeout)
+          .then(function (temp) {
+            if (typeof(temp) == 'object') {
+              assert.equal(temp[0], true);
+            } else {
+              assert.equal(temp, true);
+            }
+            next();
+          })
+          .catch(next);
+      })//surendra
+      .then('I see $text for $field in the table of $section section', function (text, field, section, next) {
+        var driver = this.driver;
+        var path = '//*[text()=\'' + section + '\']//..//..//*[text()=\'' + field + '\']//..//*[contains(text(),\'\')]';
+        driver.waitForExist(path, timeout)
+          .getText(path)
+          .then(function (result) {
+            if (text.indexOf(',') != -1) {
+              var d = text.split(",");
+              var res = false;
+              for (var i = 0; i < d.length; i++) {
+                res = result.indexOf(d[i]) > -1 ? true : false;
+              }
+              assert.equal(res, true);
+            } else {
+              assert.equal(result[1].endsWith(text), true);
+            }
+            next();
+          })
+          .catch(next);
+
+      })//surendra
+      .then('I am on new window and i see json data', function (next) {
+        var driver = this.driver;
+
+        driver.windowHandles()
+          .then(function (result) {
+            driver.window(result.value[result.value.length - 1])
+              .getText('//*')
+              .then(function (res) {
+                var result = true;
+                var obj = JSON.parse(res);
+                assert.equal((typeof(obj) == 'object'), true);
+                next();
+              })
+              .window(result.value[0])
+          })
+          .catch(next);
+      })//surendra
+      .then('I see $role permission for $access', function (role, access, next) {
+        var driver = this.driver;
+        driver.waitForExist('//*[text()=\'' + access + '\']//..//..//td[2]', timeout)
+          .getText('//*[text()=\'' + access + '\']//..//..//td[2]')
+          .then(function (res) {
+            var data = res.split(',');
+            var result = false;
+            for (var i = 0; i < data.length; i++) {
+              result = res.indexOf(data) > -1;
+            }
+            assert.equal(result, true);
+            next();
+          })
+          .catch(next);
+      })//surendra
+      .then('I see span text $text in the field $field', function (text, field, next) {
+        var driver = this.driver;
+        driver.waitForExist('//label[contains(text(),\'' + field + '\')]//..//span[contains(text(),\'' + text + '\')]', timeout)
+          .isVisible('//label[contains(text(),\'' + field + '\')]//..//span[contains(text(),\'' + text + '\')]')
+          .then(function (res) {
+            assert.equal(res, true);
             next();
           })
           .catch(next);
@@ -1081,16 +1247,24 @@ module.exports = function (config) {
       })//padma
       .then('I see $Resourcename resource', function (resourcename, next) {
         var driver = this.driver;
-        var path = '//*[contains(@class,"list-group")]//h4[contains(text(),\''+resourcename+'\')]';
+        var path = '//*[contains(@class , "form-list")]//li//h4[contains(text(),\'' + resourcename + '\')]';
         driver.waitForExist(path, timeout)
           .isVisible(path, timeout)
-          .then(function(){
+          .then(function () {
             next();
           })
           .catch(next);
       })//padma
-
-
+      .then('I see the $action action', function (action, next) {
+        var driver = this.driver;
+        driver.waitForExist('//tr[contains(@data-ng-repeat,"action in actions")]//..//a[contains(text(),"' + action + '")]', timeout)
+          .isVisible('//tr[contains(@data-ng-repeat,"action in actions")]//..//a[contains(text(),"' + action + '")]', timeout)
+          .then(function (temp) {
+            assert.equal(temp, true);
+            next();
+          })
+          .catch(next);
+      })//Padma
     ;
   return library;
 };

@@ -30,8 +30,8 @@ Feature: {User Portal - Creating Project Templates} 9 and {Custom Project Creati
 
   Scenario: Clicking help links on custom project page
     Given I am on /#/create/project page
-    When I click on the https://help.form.io link
-    Then I am on new window with url https://help.form.io/
+    When I click on the Getting Started Guide link
+    Then I am on new window with url https://help.form.io/intro/explore/
     Given I am on /#/create/project page
     When I click on the icon glyphicon glyphicon-question-sign
     Then I am on new window with url https://help.form.io/userguide/project-templates/
