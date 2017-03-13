@@ -633,7 +633,7 @@ module.exports = function (config) {
       var driver = this.driver;
       driver.url()
         .then(function (res) {
-          assert.equal(res.value, path);
+          assert.equal(res.value.toLowerCase(), path.toLowerCase());
           next();
         })
         .catch(next);

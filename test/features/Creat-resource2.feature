@@ -215,6 +215,7 @@ Feature: Test 16 Creating/Editing A Resource part2
     Then I see editResource in the #name field
     When I enter editResource in the #path field
     And I click on the Create Resource input button
+    And I wait 500 milliseconds
     Then I see a notification with the text Successfully created form!
     When I click on notification
     When I click on the icon fa fa-database
