@@ -25,7 +25,8 @@ Scenario Outline: Testing role
     And A project exists with the ${random-title>project3.title} and ${random-description>project3.description}
     And I am on the ${project3.title} project overview page
     When I click the [link] link
-    Then I see the plaintext [text]
+    And I wait 1000 milliseconds
+    Then I see the plaintext [text] 
 
     Examples:
       | link                    | text                  |

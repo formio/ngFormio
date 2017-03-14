@@ -365,7 +365,6 @@ module.exports = function (config) {
           // User doesn't exist. Create it.
           return createUser(driver, 'formio', 'user/register', username, email, password, next);
         }
-
         // User already exists. Do nothing.
         next();
       });
@@ -462,7 +461,7 @@ module.exports = function (config) {
         .click('//a[contains(@class,"btn btn-default btn-block btn-lg") and contains(@href,"' + link + '")]', timeout)
         .then(next)
         .catch(next);
-    }) //Padma
+    }) //Padma 
     .when('I click (?:on )?the $BUTTON button', function (button, next) {
       var driver = this.driver;
       driver.waitForExist('//button[contains(.,\'' + button + '\')]', timeout)
@@ -719,69 +718,6 @@ module.exports = function (config) {
         .then(next)
         .catch(next);
     })//surendra
-    .then('I do not see $element with the text $text', function (element, text, next) {
-      text = replacements(text);
-      var driver = this.driver;
-      driver.waitForExist(element, timeout)
-        .isVisible(element)
-        .then(function (visible) {
-          if (!(visible instanceof Array)) {
-            visible = [visible];
-          }
-
-          assert(_.any(visible));
-        })
-        .getText(element)
-        .then(function (found) {
-          try {
-            assert.notEqual(found, text);
-            return next();
-          }
-          catch (e) { }
-
-          assert(_.startsWith(found, text) || _.endsWith(found, text));
-
-          next();
-        })
-        .catch(next);
-    }) //Padma (Working) 
-    .then('I am on $text page', function (text, next) {
-      var driver = this.driver;
-      driver.waitForExist('//span[contains(@class, "form-title")]', timeout)
-        .isVisible('//span[contains(@class, "form-title")]')
-        .getText('//span[contains(@class, "form-title")]')
-        .then(function (found) {
-          assert.equal(found, text);
-          next();
-        })
-        .catch(next);
-    }) // Padma (Working)
-    .then('I am taken to $text page', function (text, next) {
-      var driver = this.driver;
-      var path = '//div//h2[contains(text(),"' + text + '")]';
-      driver.waitForExist(path, timeout)
-        .isVisible(path, timeout)
-        .getText(path)
-        .then(function (res) {
-          assert.equal(res[1], text);
-          next();
-        })
-        .catch(next);
-    }) //Padma (working)
-    .then('I see $text (?:form|resource)', function (text, next) {
-      var driver = this.driver;
-      var path = '//div[contains(@class,"form-list")]//ul//li//a//h4[text()="' + text + '"]';
-      driver.waitForExist(path, timeout)
-        .then(function (res) {
-          driver.getText(path)
-            .then(function (result) {
-              driver.pause(1000);
-              assert.equal(result, text);
-              next();
-            })
-        })
-        .catch(next);
-    }) //Padma (working)  
     .then('I donot see $TEXT', function (text, next) {
       text = replacements(text);
       var driver = this.driver;
@@ -903,6 +839,7 @@ module.exports = function (config) {
         .then(function (found) {
           driver.pause(1000);
           try {
+            console.log("found" + found);
             assert.equal(found, text);
             return next();
           }
@@ -913,7 +850,7 @@ module.exports = function (config) {
           next();
         })
         .catch(next);
-    }) //worked for feedback feature
+    })
     .then('I do not see the $element element', function (element, next) {
       var driver = this.driver;
       console.log("test");
@@ -924,7 +861,7 @@ module.exports = function (config) {
           return next();
         })
         .catch(next);
-    }) //padma (working for doc test)
+    }) //padma
     .then('I am on new window with url $link', function (link, next) {
       var driver = this.driver;
       driver.windowHandles()
@@ -959,7 +896,7 @@ module.exports = function (config) {
           next();
         })
         .catch(next);
-    }) //Padma (working in support request)
+    }) //Padma
     .then('the user account for $user was updated with $new for $old', function (user, newValue, oldKey, next) {
       if (!user || !newValue || !oldKey) {
         return next('Wrong values given for: user|newValue|oldKey');
@@ -1047,7 +984,7 @@ module.exports = function (config) {
           next();
         })
         .catch(next);
-    }) //Padma//Used Functions
+    }) //Padma
     .when('I click on the $button button for $name resource in $section section', function (button, name, section, next) {
       var driver = this.driver;
       var path = '//div//h2[contains(text(),\'' + section + '\')]//..//div[contains(@class,\'form-list\')]//a' +
@@ -1087,7 +1024,7 @@ module.exports = function (config) {
           next();
         })
         .catch(next);
-    }) // Padma (working)
+    }) // Padma 
     .when('I click (?:on )?the $LINK link', function (link, next) {
       var driver = this.driver;
       driver.waitForExist('=' + link, timeout)
@@ -1115,10 +1052,8 @@ module.exports = function (config) {
     })
     .then('I see project progress is at $title', function (title, next) {
       title = replacements(title);
-
       var driver = this.driver;
       driver.waitForExist('.overlay')
-
         .then(function (found) {
           driver.getText('.overlay')
             .then(function (found) {

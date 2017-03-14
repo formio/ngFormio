@@ -4,7 +4,7 @@ Scenario: Expanding Feedback modal
     Given I am on the /#/auth page
     When I click on the .feedback element
     Then I see the .feedback element 
-    And I do not see .feedback with the text Feedback
+    And I donot see Feedback
 
 Scenario: Clicking ‘Submit’ button with no value in the ‘Feedback’ field
 	Given I am on the /#/auth page
@@ -15,7 +15,7 @@ Scenario: Clicking ‘Submit’ button with no value in the ‘Feedback’ field
 	
 Scenario: Closes Feedback modal
 	When I click on the .feedback-cancel element
-    Then I do not see .feedback with the text Close
+    Then I donot see Close
 	And I see .feedback with the text Feedback
 
 Scenario: Submitting Feedback request
@@ -26,5 +26,5 @@ Scenario: Submitting Feedback request
 	And the Send it! button is enabled
 	And I click on the Send it! button
     And I wait 1000 milliseconds
-    And I do not see .feedback with the text Close
+    And I donot see Close
 	And I see .feedback with the text Feedback

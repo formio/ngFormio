@@ -7,12 +7,13 @@ Scenario: Clicking ‘Data’ button for Resource on Resource page
     And I wait 2000 milliseconds
     When I click on the .fa-tasks element
     And I wait 2000 milliseconds
-    Then I am taken to Forms page
+    Then I am on the form page of ${project3.title} project
     And I wait 2000 milliseconds
-    Then I see User Login form
-    Then I see User Register form
-    Then I see User resource
-    Then I see Admin resource 
+    Then I can see User Login in the Forms  Section
+    Then I can see User Register in the Forms  Section
+    Then I can see User Register in the Forms  Section
+    Then I can see User in the Resource Forms Section
+    Then I can see Admin in the Resource Forms Section 
 
 Scenario: Searching for existing Forms/Resource with search bar 
     Given I am logged in for profileuser3
@@ -21,18 +22,18 @@ Scenario: Searching for existing Forms/Resource with search bar
     And I wait 2000 milliseconds
     When I click on the .fa-tasks element
     And I wait 2000 milliseconds
-    Then I am taken to Forms page
+    Then I am on the form page of ${project3.title} project
     And I wait 2000 milliseconds
     When I enter Lo in the #form-search field
-    Then I see User Login form
+    Then I can see User Login in the Forms  Section
     And I donot see User Register form
     When I enter R in the #form-search field
-    Then I see User Register form
+    Then I can see User Register in the Forms  Section
     When I enter Us in the #resource-search field
-    Then I see User resource
+    Then I can see User in the Resource Forms Section
     And I donot see Admin resource
     When I enter A in the #resource-search field
-    Then I see Admin resource
+    Then I can see Admin in the Resource Forms Section
     And I donot see User resource
 
 
@@ -43,7 +44,7 @@ Scenario: Searching for non existing Forms in search bar
     And I wait 2000 milliseconds
     When I click on the .fa-tasks element
     And I wait 2000 milliseconds
-    Then I am taken to Forms page
+    Then I am on the form page of ${project3.title} project
     When I enter Z in the #form-search field
     And I wait 2000 milliseconds
     And I donot see any Forms  forms
@@ -52,12 +53,12 @@ Scenario: Searching for non existing Forms in search bar
     And I donot see any Resource Forms forms
     And I wait 2000 milliseconds
     When I clear the #form-search field
-    Then I see User Login form
-    Then I see User Register form
+    Then I can see User Login in the Forms  Section
+    Then I can see User Register in the Forms  Section
     And I wait 2000 milliseconds
     When I clear the #resource-search field
-    Then I see User resource
-    Then I see Admin resource
+    Then I can see User in the Resource Forms Section
+    Then I can see Admin in the Resource Forms Section
 
 Scenario: Clicking ‘Edit’ button for Form on Form page
     Given I am logged in for profileuser3
@@ -66,7 +67,7 @@ Scenario: Clicking ‘Edit’ button for Form on Form page
     And I wait 2000 milliseconds
     When I click on the .fa-tasks element
     And I wait 2000 milliseconds
-    Then I am taken to Forms page
+    Then I am on the form page of ${project3.title} project
 	When I click on the glyphicon glyphicon-edit button for User Login resource in Forms section
     And I wait 2000 milliseconds
     Then I am on the edit page of ${project3.title} project
@@ -81,7 +82,7 @@ Scenario: Clicking ‘Data’ button for Form on Form page
     And I wait 2000 milliseconds
     When I click on the .fa-tasks element
     And I wait 2000 milliseconds
-    Then I am taken to Forms page
+    Then I am on the form page of ${project3.title} project
 	When I click on the fa fa-table button for User Login resource in Forms section
     Then I am on the submission page of ${project3.title} project
     Then I see the submissions datagrid
@@ -93,7 +94,7 @@ Scenario: Clicking ‘Action’ button for Form on Form page
     And I wait 2000 milliseconds
     When I click on the .fa-tasks element
     And I wait 2000 milliseconds
-    Then I am taken to Forms page
+    Then I am on the form page of ${project3.title} project
 	When I click on the fa fa-paper-plane button for User Login resource in Forms section
     Then I am on the action page of ${project3.title} project
     And I wait 2000 milliseconds
@@ -106,7 +107,7 @@ Scenario: Clicking ‘Access’ button for Form on Form page
     And I wait 2000 milliseconds
     When I click on the .fa-tasks element
     And I wait 2000 milliseconds
-    Then I am taken to Forms page
+    Then I am on the form page of ${project3.title} project
     And I wait 2000 milliseconds
     When I click on the fa-lock button for User Login resource in Forms section
     Then I am on the permission page of ${project3.title} project
@@ -120,13 +121,13 @@ Scenario:Deleting a ‘Form’
     And I wait 2000 milliseconds
     When I click on the .fa-tasks element
     And I wait 2000 milliseconds
-    Then I am taken to Forms page
+    Then I am on the form page of ${project3.title} project
     When I click on the glyphicon glyphicon-trash button for User Login resource in Forms section
     And I wait 2000 milliseconds
     And I see button.btn.btn-danger with the text Yes
     And I click the Yes button
-    And I wait 500 milliseconds
-    Then I am taken to Forms page
+    And I wait 2000 milliseconds
+   Then I am on the form page of ${project3.title} project
     And I wait 2000 milliseconds
     And I donot see User Login form
 
