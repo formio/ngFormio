@@ -20,7 +20,7 @@ Scenario: Viewing ‘Project Info’ information
     When I click the Upgrade Project link
     Then I see the .project-upgrade-dialog modal
 
-Scenario Outline: Testing role
+Scenario Outline: Navigating to Forms/Resources from Project Info section
     Given I am logged in for profileuser3
     And A project exists with the ${random-title>project3.title} and ${random-description>project3.description}
     And I am on the ${project3.title} project overview page

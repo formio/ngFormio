@@ -10,7 +10,7 @@ Scenario: Closing the Welcome Module
     And I wait 1000 milliseconds
     Then I donot see Welcome banner
     And I wait 1000 milliseconds
-    Then I see Step 1: Create your project project portal
+    Then I see the Step 1: Create your project project portal
 
 Scenario: Welcome module when Project count is zero
     Given I am logged in for profileuser1

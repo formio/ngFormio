@@ -479,8 +479,8 @@ module.exports = function (config) {
         })
         .catch(next);
     })//surendra//to check text in the autopopulated field
-   
-     .when('I donot have a value in the $title field', function (title, next) {
+
+    .when('I donot have a value in the $title field', function (title, next) {
       var driver = this.driver;
       driver.waitForExist('//*[@id="title"]', timeout)
         .getText('//*[@id="title"]')
@@ -555,7 +555,7 @@ module.exports = function (config) {
         .then(next)
         .catch(next);
     }) // surendra
- 
+
     .when('I select the $project project template', function (project, next) {
       var driver = this.driver;
       driver.waitForExist('//*[contains(@class, "template-card") and contains(., "' + project + '")]', timeout)
@@ -609,7 +609,7 @@ module.exports = function (config) {
         })
         .catch(next);
     })
-    .then('I am on the $title project portal', function (title, next) {
+    .then('I (?:am|see) (?:on )?the $title project portal', function (title, next) {
       title = replacements(title);
 
       var driver = this.driver;
@@ -811,7 +811,6 @@ module.exports = function (config) {
         .then(function (found) {
           driver.pause(1000);
           try {
-            console.log("found" + found);
             assert.equal(found, text);
             return next();
           }
@@ -825,10 +824,9 @@ module.exports = function (config) {
     })
     .then('I do not see the $element element', function (element, next) {
       var driver = this.driver;
-      console.log("test");
+
       driver.isVisible(element)
         .then(function (vis) {
-          console.log('vis:' + vis);
           assert.equal(vis, false);
           return next();
         })
@@ -944,17 +942,6 @@ module.exports = function (config) {
       driver.waitForExist(path, timeout)
         .click(path, timeout)
         .then(next)
-        .catch(next);
-    }) //Padma
-    .then('I see $title project portal', function (title, next) {
-      title = replacements(title);
-      var driver = this.driver;
-      driver.waitForExist('.project-title')
-        .getText('.project-title')
-        .then(function (found) {
-          assert.equal(found, title);
-          next();
-        })
         .catch(next);
     }) //Padma
     .when('I click on the $button button for $name resource in $section section', function (button, name, section, next) {
@@ -1095,7 +1082,6 @@ module.exports = function (config) {
       if (num == "0") {
         driver.waitForExist(path0, timeout)
           .then(function (res) {
-            console.log("path0");
             assert.equal(res, true);
             next();
           })
@@ -1126,18 +1112,6 @@ module.exports = function (config) {
         )
         .catch(next);
     })//surendra
-  
-
-  
-
- 
-
- 
- 
- 
-  
- 
-
     .then('I can see $formname in the $section Section', function (formname, section, next) {
       var driver = this.driver;
       var path = '//div//h2[contains(text(),\'' + section + '\')]//..//div[contains(@class,\'form-list\')]//a//h4[contains(text(),\'' + formname + '\')]';
@@ -1149,7 +1123,6 @@ module.exports = function (config) {
         })
         .catch(next);
     })
-  
     .when('I click the $link link in $section of project progress', function (link, section, next) {
       var driver = this.driver;
       driver.waitForExist('//*[contains(text(),"' + section + '")]//..//..//a[contains(text(),"' + link + '")]', timeout)
