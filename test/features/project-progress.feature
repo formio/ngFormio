@@ -15,6 +15,7 @@ Feature: Project Overview - Project Progress Functionality 13
    And I click on the Submit button
    Then I see a notification with the text New submission added!
    And I am taken to submission View page
+   And I wait 1000 milliseconds
    And I see project progress is at 30%
    When I click on the icon progress-radial
    Then The step Set up project user accounts has been checked
@@ -31,6 +32,7 @@ Feature: Project Overview - Project Progress Functionality 13
    When I enter first user form  in the #title field
    And I click on the Save Form input button
    And I click on the icon progress-radial
+   And I wait 1000 milliseconds
    Then I see project progress is at 45%
    And The step Modify a form has been checked
 
@@ -50,6 +52,7 @@ Feature: Project Overview - Project Progress Functionality 13
     Then I see Clone the demo app to your local computer is already expanded
     When I click the Local App Development link in Clone the demo app to your local computer of project progress
     Then I am on Local App Development section of Launch page
+    And I wait 1000 milliseconds
     And I see project progress is at 70%
     When I click on the icon progress-radial
     Then The step Clone the demo app to your local computer has been checked
@@ -63,12 +66,13 @@ Feature: Project Overview - Project Progress Functionality 13
     And I enter newForm in the #name field
     And I enter newForm in the #path field
     And I click on the Create Form input button
+    And I wait 1000 milliseconds
     Then I see project progress is at 85%
     When I click on the icon progress-radial
     Then The step Create a new form has been checked
 
   Scenario: Completing ‘Launch your application’ step
-    When I wait 1000 milliseconds
+    When I wait 2000 milliseconds
     Then I see Launch your application is already expanded
     When I click the Launch link in Launch your application of project progress
     Then I am on Web App section of Launch page
