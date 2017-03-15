@@ -101,7 +101,7 @@ Feature: Test 16 Creating/Editing A Resource part2
     When I click on notification
     When I click on the icon fa fa-database
     Then I am on the resource page of ${project3.title} project
-    And I see Test Resource resource
+    And I can see Test Resource in the Resources section
     When I click on the Test Resource link
     Then I am on the edit page of ${project3.title} project
     When I enter Edit Resource in the #title field
@@ -111,7 +111,7 @@ Feature: Test 16 Creating/Editing A Resource part2
     Then I see a notification with the text Successfully updated form!
     When I click on the icon fa fa-database
     Then I am on the resource page of ${project3.title} project
-    And I see Edit Resource resource
+    And I can see Edit Resource in the Resources section
     When I click on the fa fa-code button for Edit Resource resource in Resources section
     Then I am on the api page of ${project3.title} project
     Then I see editresource for Form Endpoint in the table of API Information section
@@ -127,7 +127,7 @@ Feature: Test 16 Creating/Editing A Resource part2
     When I click on notification
     When I click on the icon fa fa-database
     Then I am on the resource page of ${project3.title} project
-    And I see Edit Resource resource
+    And I can see Edit Resource in the Resources section
     When I click on the Edit Resource link
     When I enter Test Resource in the #title field
     Then I see testResource in the #name field
@@ -201,7 +201,7 @@ Feature: Test 16 Creating/Editing A Resource part2
     When I click on notification
     And I click on the icon fa fa-database
     Then I am on the resource page of ${project3.title} project
-    And I see Edit Resource resource
+    And I can see Edit Resource in the Resources section
 
     Examples:
 
@@ -219,7 +219,7 @@ Feature: Test 16 Creating/Editing A Resource part2
     When I click on notification
     When I click on the icon fa fa-database
     Then I am on the resource page of ${project3.title} project
-    And I see Edit Resource resource
+    And I can see Edit Resource in the Resources section
     When I click on the Edit Resource link
     And I enter Test Resource in the #title field
     And I clear the #path field

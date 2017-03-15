@@ -615,8 +615,9 @@ module.exports = function (config) {
           .catch(next);
       })
       .then('I am (?:on|at) (?:the )?(.+?)(?: page)$', function (path, next) {
-        path = (path === 'home') ? config.baseUrl + '/' : config.baseUrl + path;
-
+        if (!path.includes('http')) {
+          path = (path === 'home') ? config.baseUrl + '/' : config.baseUrl + path;
+        }
         var driver = this.driver;
         driver.url()
           .then(function (res) {
@@ -906,20 +907,6 @@ module.exports = function (config) {
           })
           .catch(next);
       })//surendra
-      .then('I am on new window with url $link', function (link, next) {
-        var driver = this.driver;
-        driver.windowHandles()
-          .then(function (result) {
-            driver.window(result.value[result.value.length - 1])
-              .url()
-              .then(function (res) {
-                assert.equal(res.value, link);
-                next();
-              })
-              .window(result.value[0])
-          })
-          .catch(next);
-      })//surendra
       .then('I am on new window', function (next) {
         var driver = this.driver;
         driver.windowHandles()
@@ -927,23 +914,24 @@ module.exports = function (config) {
             driver.window(result.value[result.value.length - 1])
               .url()
               .then(function (res) {
+                assert.equal(result.value.length, 2);
                 next();
               })
           })
           .catch(next);
       })//surendra
-      .then('I go back to previous window', function (next) {
+      .then('I close the window', function (next) {
         var driver = this.driver;
         driver.windowHandles()
           .then(function (result) {
-            driver.window(result.value[0])
+            driver.close()
+              .window(result.value[0])
               .then(function () {
                 next();
               })
-              .catch(next);
           })
+          .catch(next)
       })//surendra
-
       .then('The Template list is expanded', function (next) {
         var driver = this.driver;
         driver.waitForExist('//*[contains(@class,"thumbnail template-cards")]', timeout)
@@ -987,7 +975,7 @@ module.exports = function (config) {
 
       .then('I can see $formname in the $section Section', function (formname, section, next) {
         var driver = this.driver;
-        var path = '//div//h2[contains(text(),\'' + section + '\')]//..//div[contains(@class,\'form-list\')]//a//h4[contains(text(),\'' + formname + '\')]';
+        var path = '//div//h2[text()=\'' + section + '\']//..//div[contains(@class,\'form-list\')]//a//h4[contains(text(),\'' + formname + '\')]';
         driver.waitForExist(path, timeout)
           .isVisible(path)
           .then(function (res) {
@@ -995,7 +983,7 @@ module.exports = function (config) {
             next();
           })
           .catch(next);
-      })
+      })//surendra
       .then('The step $step has been checked', function (step, next) {
         var driver = this.driver;
         driver.waitForExist('//*[contains(@title,\'' + step + '\')]//*[contains(@class,\'fa pull-right project-icon fa-check-circle-o\')]', timeout)
@@ -1187,20 +1175,15 @@ module.exports = function (config) {
           .catch(next);
 
       })//surendra
-      .then('I am on new window and i see json data', function (next) {
+      .then('I see json data', function (next) {
         var driver = this.driver;
-
-        driver.windowHandles()
-          .then(function (result) {
-            driver.window(result.value[result.value.length - 1])
-              .getText('//*')
-              .then(function (res) {
-                var result = true;
-                var obj = JSON.parse(res);
-                assert.equal((typeof(obj) == 'object'), true);
-                next();
-              })
-              .window(result.value[0])
+        driver.waitForExist('//*', timeout)
+          .getText('//*')
+          .then(function (res) {
+            var result = true;
+            var obj = JSON.parse(res);
+            assert.equal((typeof(obj) == 'object'), true);
+            next();
           })
           .catch(next);
       })//surendra
@@ -1236,16 +1219,6 @@ module.exports = function (config) {
           .getText('.overlay')
           .then(function (found) {
             assert.equal(found, title);
-            next();
-          })
-          .catch(next);
-      })//padma
-      .then('I see $Resourcename resource', function (resourcename, next) {
-        var driver = this.driver;
-        var path = '//*[contains(@class , "form-list")]//li//h4[contains(text(),\'' + resourcename + '\')]';
-        driver.waitForExist(path, timeout)
-          .isVisible(path, timeout)
-          .then(function () {
             next();
           })
           .catch(next);
