@@ -44,6 +44,7 @@ Feature: Project Overview - Project Progress Functionality 13
     When I click on the Save Settings button
     And I wait 1000 milliseconds
     Then I am on the overview page of Default project
+    And I wait 1000 milliseconds
     And I see project progress is at 55%
     And The step Set up Email/File Storage/Data provider has been checked
 
@@ -76,6 +77,7 @@ Feature: Project Overview - Project Progress Functionality 13
     Then I see Launch your application is already expanded
     When I click the Launch link in Launch your application of project progress
     Then I am on Web App section of Launch page
+    And I wait 1000 milliseconds
     And I see project progress is at 100%
     When I click on the icon progress-radial
     Then The step Launch your application has been checked
