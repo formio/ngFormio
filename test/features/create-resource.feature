@@ -8,8 +8,8 @@ Feature: Test 16 Creating/Editing A Resource
     Then I am on the resource page of ${project3.title} project
 
   Scenario:  Accessing the Resource page
-    Then I can see User in the Resources Section
-    And I can see Admin in the Resources Section
+    Then I can see User in the Resources section
+    And I can see Admin in the Resources section
 
   Scenario: Clicking ‘More Info’ help button
     When I wait 1000 milliseconds
@@ -20,18 +20,18 @@ Feature: Test 16 Creating/Editing A Resource
 
   Scenario: Searching for existing Resource in Resource search bar
     When I enter Us in the #resource-search field
-    Then I can see User in the Resources Section
+    Then I can see User in the Resources section
     And I donot see Admin resource
     When I enter A in the #resource-search field
-    Then I can see Admin in the Resources Section
+    Then I can see Admin in the Resources section
     And I donot see User resource
 
   Scenario: Searching for non-existing resource in the resource bar
     When I enter Z in the #resource-search field
     And I donot see any Resources forms
     When I clear the #resource-search field
-    Then I can see User in the Resources Section
-    And I can see Admin in the Resources Section
+    Then I can see User in the Resources section
+    And I can see Admin in the Resources section
 
   Scenario: Clicking ‘Edit’ button for Resource on Resource page
     When I click on the glyphicon glyphicon-edit button for User resource in Resources section
@@ -48,18 +48,17 @@ Feature: Test 16 Creating/Editing A Resource
     Then I am on API section of Developer Info page
     Then I close the window
     And I wait 1000 milliseconds
-    When I click on the Form Endpoint link in api page
+    #When I click on the Form Endpoint link in api page
     #Then I am on new window
     #Then I see json data
 
-  Scenario Outline: Clicking on the 'I' help icons in the resource api page
+  Scenario Outline: Clicking on the 'I' help icon for [method] method in row [number] in the resource api page
     When I click on the fa fa-code button for Admin resource in Resources section
+    Then I am on the api page of ${project3.title} project
     When I click on the //table/tbody/tr[[number]]/td[2]//*[contains(text(),'[method]')]//..//a element
     Then I am on new window
     Then I see the plaintext [text]
     Then I close the window
-    And I wait 1000 milliseconds
-    Then I am on the resource page of ${project3.title} project
     Examples:
       | method | number | text                |
       | GET    | 2      | Get Form            |
@@ -125,7 +124,7 @@ Feature: Test 16 Creating/Editing A Resource
     And I see element with the Save Resource value
     When I click on the icon fa fa-database
     Then I am on the resource page of ${project3.title} project
-    And I can see Test Resource in the Resources  Section
+    And I can see Test Resource in the Resources section
     When I click on the icon fa fa-tasks
     Then I am on the form page of ${project3.title} project
-    And I can see Test Resource in the Resource Forms Section
+    And I can see Test Resource in the Resource Forms section

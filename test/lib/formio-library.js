@@ -534,7 +534,6 @@ module.exports = function (config) {
             next();
           })
           .catch(next);
-
       })//surendra
       .when('I select the $project project template', function (project, next) {
         var driver = this.driver;
@@ -973,7 +972,7 @@ module.exports = function (config) {
           .catch(next);
       })//surendra
 
-      .then('I can see $formname in the $section Section', function (formname, section, next) {
+      .then('I can see $formname in the $section section', function (formname, section, next) {
         var driver = this.driver;
         var path = '//div//h2[text()=\'' + section + '\']//..//div[contains(@class,\'form-list\')]//a//h4[contains(text(),\'' + formname + '\')]';
         driver.waitForExist(path, timeout)
@@ -997,8 +996,6 @@ module.exports = function (config) {
 
       .then('I am on $section section of $page page', function (section, page, next) {
         var driver = this.driver;
-        /*  driver.waitForExist('//li[contains(@class, \'active\') and contains(text(),\'\')]', timeout)
-         .getText('//li[contains(@class, \'active\') and contains(text(),\'\')]')*/
         driver.waitForExist('//*[contains(@class, \'active\')]', timeout)
           .getText('//*[contains(@class, \'active\')]')
           .then(function (res) {
@@ -1012,8 +1009,6 @@ module.exports = function (config) {
       })//surendra
       .then('I am on $section section', function (section, next) {
         var driver = this.driver;
-        /*  driver.waitForExist('//li[contains(@class, \'active\') and contains(text(),\'\')]', timeout)
-         .getText('//li[contains(@class, \'active\') and contains(text(),\'\')]')*/
         driver.waitForExist('//*[contains(@class, \'active\')]', timeout)
           .getText('//*[contains(@class, \'active\')]')
           .then(function (res) {

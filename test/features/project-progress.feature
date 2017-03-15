@@ -24,8 +24,8 @@ Feature: Project Overview - Project Progress Functionality 13
    Then I see Modify a form is already expanded
    When I click the Form link in Modify a form of project progress
    Then I am on the form page of Default project
-   And I can see User Login in the Forms  Section
-   And I can see User Register in the Forms  Section
+   And I can see User Login in the Forms  section
+   And I can see User Register in the Forms  section
    When I click on the glyphicon glyphicon-edit button for User Login resource in Forms section
    Then I am on the edit page of Default project
    When I enter first user form  in the #title field
