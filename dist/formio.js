@@ -1814,7 +1814,7 @@ Formio.deregisterPlugin = function(plugin) {
 
 module.exports = Formio;
 
-},{"./providers":4,"eventemitter2":1,"native-promise-only":117,"shallow-copy":118,"whatwg-fetch":119}],4:[function(_dereq_,module,exports){
+},{"./providers":4,"eventemitter2":1,"native-promise-only":13,"shallow-copy":14,"whatwg-fetch":15}],4:[function(_dereq_,module,exports){
 module.exports = {
   storage: _dereq_('./storage')
 };
@@ -1895,7 +1895,7 @@ module.exports = dropbox;
 
 
 
-},{"native-promise-only":117}],6:[function(_dereq_,module,exports){
+},{"native-promise-only":13}],6:[function(_dereq_,module,exports){
 module.exports = {
   dropbox: _dereq_('./dropbox.js'),
   s3: _dereq_('./s3.js'),
@@ -2020,7 +2020,7 @@ s3.title = 'S3';
 s3.name = 's3';
 module.exports = s3;
 
-},{"native-promise-only":117}],8:[function(_dereq_,module,exports){
+},{"native-promise-only":13}],8:[function(_dereq_,module,exports){
 var Promise = _dereq_("native-promise-only");
 var url = function(formio) {
   return {
@@ -2100,7 +2100,7 @@ url.name = 'url';
 url.title = 'Url';
 module.exports = url;
 
-},{"native-promise-only":117}],9:[function(_dereq_,module,exports){
+},{"native-promise-only":13}],9:[function(_dereq_,module,exports){
 (function (global){
 /**
  * lodash (Custom Build) <https://lodash.com/>
@@ -5406,227 +5406,122 @@ module.exports = get;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],11:[function(_dereq_,module,exports){
-var getNative = _dereq_('./_getNative'),
-    root = _dereq_('./_root');
+(function (global){
+/**
+ * Lodash (Custom Build) <https://lodash.com/>
+ * Build: `lodash modularize exports="npm" -o ./`
+ * Copyright JS Foundation and other contributors <https://js.foundation/>
+ * Released under MIT license <https://lodash.com/license>
+ * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
+ * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+ */
 
-/* Built-in method references that are verified to be native. */
-var DataView = getNative(root, 'DataView');
+/** Used as the size to enable large array optimizations. */
+var LARGE_ARRAY_SIZE = 200;
 
-module.exports = DataView;
+/** Used to stand-in for `undefined` hash values. */
+var HASH_UNDEFINED = '__lodash_hash_undefined__';
 
-},{"./_getNative":54,"./_root":86}],12:[function(_dereq_,module,exports){
-var hashClear = _dereq_('./_hashClear'),
-    hashDelete = _dereq_('./_hashDelete'),
-    hashGet = _dereq_('./_hashGet'),
-    hashHas = _dereq_('./_hashHas'),
-    hashSet = _dereq_('./_hashSet');
+/** Used to compose bitmasks for value comparisons. */
+var COMPARE_PARTIAL_FLAG = 1,
+    COMPARE_UNORDERED_FLAG = 2;
+
+/** Used as references for various `Number` constants. */
+var MAX_SAFE_INTEGER = 9007199254740991;
+
+/** `Object#toString` result references. */
+var argsTag = '[object Arguments]',
+    arrayTag = '[object Array]',
+    asyncTag = '[object AsyncFunction]',
+    boolTag = '[object Boolean]',
+    dateTag = '[object Date]',
+    errorTag = '[object Error]',
+    funcTag = '[object Function]',
+    genTag = '[object GeneratorFunction]',
+    mapTag = '[object Map]',
+    numberTag = '[object Number]',
+    nullTag = '[object Null]',
+    objectTag = '[object Object]',
+    promiseTag = '[object Promise]',
+    proxyTag = '[object Proxy]',
+    regexpTag = '[object RegExp]',
+    setTag = '[object Set]',
+    stringTag = '[object String]',
+    symbolTag = '[object Symbol]',
+    undefinedTag = '[object Undefined]',
+    weakMapTag = '[object WeakMap]';
+
+var arrayBufferTag = '[object ArrayBuffer]',
+    dataViewTag = '[object DataView]',
+    float32Tag = '[object Float32Array]',
+    float64Tag = '[object Float64Array]',
+    int8Tag = '[object Int8Array]',
+    int16Tag = '[object Int16Array]',
+    int32Tag = '[object Int32Array]',
+    uint8Tag = '[object Uint8Array]',
+    uint8ClampedTag = '[object Uint8ClampedArray]',
+    uint16Tag = '[object Uint16Array]',
+    uint32Tag = '[object Uint32Array]';
 
 /**
- * Creates a hash object.
- *
- * @private
- * @constructor
- * @param {Array} [entries] The key-value pairs to cache.
+ * Used to match `RegExp`
+ * [syntax characters](http://ecma-international.org/ecma-262/7.0/#sec-patterns).
  */
-function Hash(entries) {
-  var index = -1,
-      length = entries == null ? 0 : entries.length;
+var reRegExpChar = /[\\^$.*+?()[\]{}|]/g;
 
-  this.clear();
-  while (++index < length) {
-    var entry = entries[index];
-    this.set(entry[0], entry[1]);
-  }
-}
+/** Used to detect host constructors (Safari). */
+var reIsHostCtor = /^\[object .+?Constructor\]$/;
 
-// Add methods to `Hash`.
-Hash.prototype.clear = hashClear;
-Hash.prototype['delete'] = hashDelete;
-Hash.prototype.get = hashGet;
-Hash.prototype.has = hashHas;
-Hash.prototype.set = hashSet;
+/** Used to detect unsigned integer values. */
+var reIsUint = /^(?:0|[1-9]\d*)$/;
 
-module.exports = Hash;
+/** Used to identify `toStringTag` values of typed arrays. */
+var typedArrayTags = {};
+typedArrayTags[float32Tag] = typedArrayTags[float64Tag] =
+typedArrayTags[int8Tag] = typedArrayTags[int16Tag] =
+typedArrayTags[int32Tag] = typedArrayTags[uint8Tag] =
+typedArrayTags[uint8ClampedTag] = typedArrayTags[uint16Tag] =
+typedArrayTags[uint32Tag] = true;
+typedArrayTags[argsTag] = typedArrayTags[arrayTag] =
+typedArrayTags[arrayBufferTag] = typedArrayTags[boolTag] =
+typedArrayTags[dataViewTag] = typedArrayTags[dateTag] =
+typedArrayTags[errorTag] = typedArrayTags[funcTag] =
+typedArrayTags[mapTag] = typedArrayTags[numberTag] =
+typedArrayTags[objectTag] = typedArrayTags[regexpTag] =
+typedArrayTags[setTag] = typedArrayTags[stringTag] =
+typedArrayTags[weakMapTag] = false;
 
-},{"./_hashClear":59,"./_hashDelete":60,"./_hashGet":61,"./_hashHas":62,"./_hashSet":63}],13:[function(_dereq_,module,exports){
-var listCacheClear = _dereq_('./_listCacheClear'),
-    listCacheDelete = _dereq_('./_listCacheDelete'),
-    listCacheGet = _dereq_('./_listCacheGet'),
-    listCacheHas = _dereq_('./_listCacheHas'),
-    listCacheSet = _dereq_('./_listCacheSet');
+/** Detect free variable `global` from Node.js. */
+var freeGlobal = typeof global == 'object' && global && global.Object === Object && global;
 
-/**
- * Creates an list cache object.
- *
- * @private
- * @constructor
- * @param {Array} [entries] The key-value pairs to cache.
- */
-function ListCache(entries) {
-  var index = -1,
-      length = entries == null ? 0 : entries.length;
+/** Detect free variable `self`. */
+var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
 
-  this.clear();
-  while (++index < length) {
-    var entry = entries[index];
-    this.set(entry[0], entry[1]);
-  }
-}
+/** Used as a reference to the global object. */
+var root = freeGlobal || freeSelf || Function('return this')();
 
-// Add methods to `ListCache`.
-ListCache.prototype.clear = listCacheClear;
-ListCache.prototype['delete'] = listCacheDelete;
-ListCache.prototype.get = listCacheGet;
-ListCache.prototype.has = listCacheHas;
-ListCache.prototype.set = listCacheSet;
+/** Detect free variable `exports`. */
+var freeExports = typeof exports == 'object' && exports && !exports.nodeType && exports;
 
-module.exports = ListCache;
+/** Detect free variable `module`. */
+var freeModule = freeExports && typeof module == 'object' && module && !module.nodeType && module;
 
-},{"./_listCacheClear":69,"./_listCacheDelete":70,"./_listCacheGet":71,"./_listCacheHas":72,"./_listCacheSet":73}],14:[function(_dereq_,module,exports){
-var getNative = _dereq_('./_getNative'),
-    root = _dereq_('./_root');
+/** Detect the popular CommonJS extension `module.exports`. */
+var moduleExports = freeModule && freeModule.exports === freeExports;
 
-/* Built-in method references that are verified to be native. */
-var Map = getNative(root, 'Map');
+/** Detect free variable `process` from Node.js. */
+var freeProcess = moduleExports && freeGlobal.process;
 
-module.exports = Map;
+/** Used to access faster Node.js helpers. */
+var nodeUtil = (function() {
+  try {
+    return freeProcess && freeProcess.binding && freeProcess.binding('util');
+  } catch (e) {}
+}());
 
-},{"./_getNative":54,"./_root":86}],15:[function(_dereq_,module,exports){
-var mapCacheClear = _dereq_('./_mapCacheClear'),
-    mapCacheDelete = _dereq_('./_mapCacheDelete'),
-    mapCacheGet = _dereq_('./_mapCacheGet'),
-    mapCacheHas = _dereq_('./_mapCacheHas'),
-    mapCacheSet = _dereq_('./_mapCacheSet');
+/* Node.js helper references. */
+var nodeIsTypedArray = nodeUtil && nodeUtil.isTypedArray;
 
-/**
- * Creates a map cache object to store key-value pairs.
- *
- * @private
- * @constructor
- * @param {Array} [entries] The key-value pairs to cache.
- */
-function MapCache(entries) {
-  var index = -1,
-      length = entries == null ? 0 : entries.length;
-
-  this.clear();
-  while (++index < length) {
-    var entry = entries[index];
-    this.set(entry[0], entry[1]);
-  }
-}
-
-// Add methods to `MapCache`.
-MapCache.prototype.clear = mapCacheClear;
-MapCache.prototype['delete'] = mapCacheDelete;
-MapCache.prototype.get = mapCacheGet;
-MapCache.prototype.has = mapCacheHas;
-MapCache.prototype.set = mapCacheSet;
-
-module.exports = MapCache;
-
-},{"./_mapCacheClear":74,"./_mapCacheDelete":75,"./_mapCacheGet":76,"./_mapCacheHas":77,"./_mapCacheSet":78}],16:[function(_dereq_,module,exports){
-var getNative = _dereq_('./_getNative'),
-    root = _dereq_('./_root');
-
-/* Built-in method references that are verified to be native. */
-var Promise = getNative(root, 'Promise');
-
-module.exports = Promise;
-
-},{"./_getNative":54,"./_root":86}],17:[function(_dereq_,module,exports){
-var getNative = _dereq_('./_getNative'),
-    root = _dereq_('./_root');
-
-/* Built-in method references that are verified to be native. */
-var Set = getNative(root, 'Set');
-
-module.exports = Set;
-
-},{"./_getNative":54,"./_root":86}],18:[function(_dereq_,module,exports){
-var MapCache = _dereq_('./_MapCache'),
-    setCacheAdd = _dereq_('./_setCacheAdd'),
-    setCacheHas = _dereq_('./_setCacheHas');
-
-/**
- *
- * Creates an array cache object to store unique values.
- *
- * @private
- * @constructor
- * @param {Array} [values] The values to cache.
- */
-function SetCache(values) {
-  var index = -1,
-      length = values == null ? 0 : values.length;
-
-  this.__data__ = new MapCache;
-  while (++index < length) {
-    this.add(values[index]);
-  }
-}
-
-// Add methods to `SetCache`.
-SetCache.prototype.add = SetCache.prototype.push = setCacheAdd;
-SetCache.prototype.has = setCacheHas;
-
-module.exports = SetCache;
-
-},{"./_MapCache":15,"./_setCacheAdd":87,"./_setCacheHas":88}],19:[function(_dereq_,module,exports){
-var ListCache = _dereq_('./_ListCache'),
-    stackClear = _dereq_('./_stackClear'),
-    stackDelete = _dereq_('./_stackDelete'),
-    stackGet = _dereq_('./_stackGet'),
-    stackHas = _dereq_('./_stackHas'),
-    stackSet = _dereq_('./_stackSet');
-
-/**
- * Creates a stack cache object to store key-value pairs.
- *
- * @private
- * @constructor
- * @param {Array} [entries] The key-value pairs to cache.
- */
-function Stack(entries) {
-  var data = this.__data__ = new ListCache(entries);
-  this.size = data.size;
-}
-
-// Add methods to `Stack`.
-Stack.prototype.clear = stackClear;
-Stack.prototype['delete'] = stackDelete;
-Stack.prototype.get = stackGet;
-Stack.prototype.has = stackHas;
-Stack.prototype.set = stackSet;
-
-module.exports = Stack;
-
-},{"./_ListCache":13,"./_stackClear":90,"./_stackDelete":91,"./_stackGet":92,"./_stackHas":93,"./_stackSet":94}],20:[function(_dereq_,module,exports){
-var root = _dereq_('./_root');
-
-/** Built-in value references. */
-var Symbol = root.Symbol;
-
-module.exports = Symbol;
-
-},{"./_root":86}],21:[function(_dereq_,module,exports){
-var root = _dereq_('./_root');
-
-/** Built-in value references. */
-var Uint8Array = root.Uint8Array;
-
-module.exports = Uint8Array;
-
-},{"./_root":86}],22:[function(_dereq_,module,exports){
-var getNative = _dereq_('./_getNative'),
-    root = _dereq_('./_root');
-
-/* Built-in method references that are verified to be native. */
-var WeakMap = getNative(root, 'WeakMap');
-
-module.exports = WeakMap;
-
-},{"./_getNative":54,"./_root":86}],23:[function(_dereq_,module,exports){
 /**
  * A specialized version of `_.filter` for arrays without support for
  * iteratee shorthands.
@@ -5651,21 +5546,683 @@ function arrayFilter(array, predicate) {
   return result;
 }
 
-module.exports = arrayFilter;
+/**
+ * Appends the elements of `values` to `array`.
+ *
+ * @private
+ * @param {Array} array The array to modify.
+ * @param {Array} values The values to append.
+ * @returns {Array} Returns `array`.
+ */
+function arrayPush(array, values) {
+  var index = -1,
+      length = values.length,
+      offset = array.length;
 
-},{}],24:[function(_dereq_,module,exports){
-var baseTimes = _dereq_('./_baseTimes'),
-    isArguments = _dereq_('./isArguments'),
-    isArray = _dereq_('./isArray'),
-    isBuffer = _dereq_('./isBuffer'),
-    isIndex = _dereq_('./_isIndex'),
-    isTypedArray = _dereq_('./isTypedArray');
+  while (++index < length) {
+    array[offset + index] = values[index];
+  }
+  return array;
+}
+
+/**
+ * A specialized version of `_.some` for arrays without support for iteratee
+ * shorthands.
+ *
+ * @private
+ * @param {Array} [array] The array to iterate over.
+ * @param {Function} predicate The function invoked per iteration.
+ * @returns {boolean} Returns `true` if any element passes the predicate check,
+ *  else `false`.
+ */
+function arraySome(array, predicate) {
+  var index = -1,
+      length = array == null ? 0 : array.length;
+
+  while (++index < length) {
+    if (predicate(array[index], index, array)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * The base implementation of `_.times` without support for iteratee shorthands
+ * or max array length checks.
+ *
+ * @private
+ * @param {number} n The number of times to invoke `iteratee`.
+ * @param {Function} iteratee The function invoked per iteration.
+ * @returns {Array} Returns the array of results.
+ */
+function baseTimes(n, iteratee) {
+  var index = -1,
+      result = Array(n);
+
+  while (++index < n) {
+    result[index] = iteratee(index);
+  }
+  return result;
+}
+
+/**
+ * The base implementation of `_.unary` without support for storing metadata.
+ *
+ * @private
+ * @param {Function} func The function to cap arguments for.
+ * @returns {Function} Returns the new capped function.
+ */
+function baseUnary(func) {
+  return function(value) {
+    return func(value);
+  };
+}
+
+/**
+ * Checks if a `cache` value for `key` exists.
+ *
+ * @private
+ * @param {Object} cache The cache to query.
+ * @param {string} key The key of the entry to check.
+ * @returns {boolean} Returns `true` if an entry for `key` exists, else `false`.
+ */
+function cacheHas(cache, key) {
+  return cache.has(key);
+}
+
+/**
+ * Gets the value at `key` of `object`.
+ *
+ * @private
+ * @param {Object} [object] The object to query.
+ * @param {string} key The key of the property to get.
+ * @returns {*} Returns the property value.
+ */
+function getValue(object, key) {
+  return object == null ? undefined : object[key];
+}
+
+/**
+ * Converts `map` to its key-value pairs.
+ *
+ * @private
+ * @param {Object} map The map to convert.
+ * @returns {Array} Returns the key-value pairs.
+ */
+function mapToArray(map) {
+  var index = -1,
+      result = Array(map.size);
+
+  map.forEach(function(value, key) {
+    result[++index] = [key, value];
+  });
+  return result;
+}
+
+/**
+ * Creates a unary function that invokes `func` with its argument transformed.
+ *
+ * @private
+ * @param {Function} func The function to wrap.
+ * @param {Function} transform The argument transform.
+ * @returns {Function} Returns the new function.
+ */
+function overArg(func, transform) {
+  return function(arg) {
+    return func(transform(arg));
+  };
+}
+
+/**
+ * Converts `set` to an array of its values.
+ *
+ * @private
+ * @param {Object} set The set to convert.
+ * @returns {Array} Returns the values.
+ */
+function setToArray(set) {
+  var index = -1,
+      result = Array(set.size);
+
+  set.forEach(function(value) {
+    result[++index] = value;
+  });
+  return result;
+}
 
 /** Used for built-in method references. */
-var objectProto = Object.prototype;
+var arrayProto = Array.prototype,
+    funcProto = Function.prototype,
+    objectProto = Object.prototype;
+
+/** Used to detect overreaching core-js shims. */
+var coreJsData = root['__core-js_shared__'];
+
+/** Used to resolve the decompiled source of functions. */
+var funcToString = funcProto.toString;
 
 /** Used to check objects for own properties. */
 var hasOwnProperty = objectProto.hasOwnProperty;
+
+/** Used to detect methods masquerading as native. */
+var maskSrcKey = (function() {
+  var uid = /[^.]+$/.exec(coreJsData && coreJsData.keys && coreJsData.keys.IE_PROTO || '');
+  return uid ? ('Symbol(src)_1.' + uid) : '';
+}());
+
+/**
+ * Used to resolve the
+ * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
+ * of values.
+ */
+var nativeObjectToString = objectProto.toString;
+
+/** Used to detect if a method is native. */
+var reIsNative = RegExp('^' +
+  funcToString.call(hasOwnProperty).replace(reRegExpChar, '\\$&')
+  .replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g, '$1.*?') + '$'
+);
+
+/** Built-in value references. */
+var Buffer = moduleExports ? root.Buffer : undefined,
+    Symbol = root.Symbol,
+    Uint8Array = root.Uint8Array,
+    propertyIsEnumerable = objectProto.propertyIsEnumerable,
+    splice = arrayProto.splice,
+    symToStringTag = Symbol ? Symbol.toStringTag : undefined;
+
+/* Built-in method references for those with the same name as other `lodash` methods. */
+var nativeGetSymbols = Object.getOwnPropertySymbols,
+    nativeIsBuffer = Buffer ? Buffer.isBuffer : undefined,
+    nativeKeys = overArg(Object.keys, Object);
+
+/* Built-in method references that are verified to be native. */
+var DataView = getNative(root, 'DataView'),
+    Map = getNative(root, 'Map'),
+    Promise = getNative(root, 'Promise'),
+    Set = getNative(root, 'Set'),
+    WeakMap = getNative(root, 'WeakMap'),
+    nativeCreate = getNative(Object, 'create');
+
+/** Used to detect maps, sets, and weakmaps. */
+var dataViewCtorString = toSource(DataView),
+    mapCtorString = toSource(Map),
+    promiseCtorString = toSource(Promise),
+    setCtorString = toSource(Set),
+    weakMapCtorString = toSource(WeakMap);
+
+/** Used to convert symbols to primitives and strings. */
+var symbolProto = Symbol ? Symbol.prototype : undefined,
+    symbolValueOf = symbolProto ? symbolProto.valueOf : undefined;
+
+/**
+ * Creates a hash object.
+ *
+ * @private
+ * @constructor
+ * @param {Array} [entries] The key-value pairs to cache.
+ */
+function Hash(entries) {
+  var index = -1,
+      length = entries == null ? 0 : entries.length;
+
+  this.clear();
+  while (++index < length) {
+    var entry = entries[index];
+    this.set(entry[0], entry[1]);
+  }
+}
+
+/**
+ * Removes all key-value entries from the hash.
+ *
+ * @private
+ * @name clear
+ * @memberOf Hash
+ */
+function hashClear() {
+  this.__data__ = nativeCreate ? nativeCreate(null) : {};
+  this.size = 0;
+}
+
+/**
+ * Removes `key` and its value from the hash.
+ *
+ * @private
+ * @name delete
+ * @memberOf Hash
+ * @param {Object} hash The hash to modify.
+ * @param {string} key The key of the value to remove.
+ * @returns {boolean} Returns `true` if the entry was removed, else `false`.
+ */
+function hashDelete(key) {
+  var result = this.has(key) && delete this.__data__[key];
+  this.size -= result ? 1 : 0;
+  return result;
+}
+
+/**
+ * Gets the hash value for `key`.
+ *
+ * @private
+ * @name get
+ * @memberOf Hash
+ * @param {string} key The key of the value to get.
+ * @returns {*} Returns the entry value.
+ */
+function hashGet(key) {
+  var data = this.__data__;
+  if (nativeCreate) {
+    var result = data[key];
+    return result === HASH_UNDEFINED ? undefined : result;
+  }
+  return hasOwnProperty.call(data, key) ? data[key] : undefined;
+}
+
+/**
+ * Checks if a hash value for `key` exists.
+ *
+ * @private
+ * @name has
+ * @memberOf Hash
+ * @param {string} key The key of the entry to check.
+ * @returns {boolean} Returns `true` if an entry for `key` exists, else `false`.
+ */
+function hashHas(key) {
+  var data = this.__data__;
+  return nativeCreate ? (data[key] !== undefined) : hasOwnProperty.call(data, key);
+}
+
+/**
+ * Sets the hash `key` to `value`.
+ *
+ * @private
+ * @name set
+ * @memberOf Hash
+ * @param {string} key The key of the value to set.
+ * @param {*} value The value to set.
+ * @returns {Object} Returns the hash instance.
+ */
+function hashSet(key, value) {
+  var data = this.__data__;
+  this.size += this.has(key) ? 0 : 1;
+  data[key] = (nativeCreate && value === undefined) ? HASH_UNDEFINED : value;
+  return this;
+}
+
+// Add methods to `Hash`.
+Hash.prototype.clear = hashClear;
+Hash.prototype['delete'] = hashDelete;
+Hash.prototype.get = hashGet;
+Hash.prototype.has = hashHas;
+Hash.prototype.set = hashSet;
+
+/**
+ * Creates an list cache object.
+ *
+ * @private
+ * @constructor
+ * @param {Array} [entries] The key-value pairs to cache.
+ */
+function ListCache(entries) {
+  var index = -1,
+      length = entries == null ? 0 : entries.length;
+
+  this.clear();
+  while (++index < length) {
+    var entry = entries[index];
+    this.set(entry[0], entry[1]);
+  }
+}
+
+/**
+ * Removes all key-value entries from the list cache.
+ *
+ * @private
+ * @name clear
+ * @memberOf ListCache
+ */
+function listCacheClear() {
+  this.__data__ = [];
+  this.size = 0;
+}
+
+/**
+ * Removes `key` and its value from the list cache.
+ *
+ * @private
+ * @name delete
+ * @memberOf ListCache
+ * @param {string} key The key of the value to remove.
+ * @returns {boolean} Returns `true` if the entry was removed, else `false`.
+ */
+function listCacheDelete(key) {
+  var data = this.__data__,
+      index = assocIndexOf(data, key);
+
+  if (index < 0) {
+    return false;
+  }
+  var lastIndex = data.length - 1;
+  if (index == lastIndex) {
+    data.pop();
+  } else {
+    splice.call(data, index, 1);
+  }
+  --this.size;
+  return true;
+}
+
+/**
+ * Gets the list cache value for `key`.
+ *
+ * @private
+ * @name get
+ * @memberOf ListCache
+ * @param {string} key The key of the value to get.
+ * @returns {*} Returns the entry value.
+ */
+function listCacheGet(key) {
+  var data = this.__data__,
+      index = assocIndexOf(data, key);
+
+  return index < 0 ? undefined : data[index][1];
+}
+
+/**
+ * Checks if a list cache value for `key` exists.
+ *
+ * @private
+ * @name has
+ * @memberOf ListCache
+ * @param {string} key The key of the entry to check.
+ * @returns {boolean} Returns `true` if an entry for `key` exists, else `false`.
+ */
+function listCacheHas(key) {
+  return assocIndexOf(this.__data__, key) > -1;
+}
+
+/**
+ * Sets the list cache `key` to `value`.
+ *
+ * @private
+ * @name set
+ * @memberOf ListCache
+ * @param {string} key The key of the value to set.
+ * @param {*} value The value to set.
+ * @returns {Object} Returns the list cache instance.
+ */
+function listCacheSet(key, value) {
+  var data = this.__data__,
+      index = assocIndexOf(data, key);
+
+  if (index < 0) {
+    ++this.size;
+    data.push([key, value]);
+  } else {
+    data[index][1] = value;
+  }
+  return this;
+}
+
+// Add methods to `ListCache`.
+ListCache.prototype.clear = listCacheClear;
+ListCache.prototype['delete'] = listCacheDelete;
+ListCache.prototype.get = listCacheGet;
+ListCache.prototype.has = listCacheHas;
+ListCache.prototype.set = listCacheSet;
+
+/**
+ * Creates a map cache object to store key-value pairs.
+ *
+ * @private
+ * @constructor
+ * @param {Array} [entries] The key-value pairs to cache.
+ */
+function MapCache(entries) {
+  var index = -1,
+      length = entries == null ? 0 : entries.length;
+
+  this.clear();
+  while (++index < length) {
+    var entry = entries[index];
+    this.set(entry[0], entry[1]);
+  }
+}
+
+/**
+ * Removes all key-value entries from the map.
+ *
+ * @private
+ * @name clear
+ * @memberOf MapCache
+ */
+function mapCacheClear() {
+  this.size = 0;
+  this.__data__ = {
+    'hash': new Hash,
+    'map': new (Map || ListCache),
+    'string': new Hash
+  };
+}
+
+/**
+ * Removes `key` and its value from the map.
+ *
+ * @private
+ * @name delete
+ * @memberOf MapCache
+ * @param {string} key The key of the value to remove.
+ * @returns {boolean} Returns `true` if the entry was removed, else `false`.
+ */
+function mapCacheDelete(key) {
+  var result = getMapData(this, key)['delete'](key);
+  this.size -= result ? 1 : 0;
+  return result;
+}
+
+/**
+ * Gets the map value for `key`.
+ *
+ * @private
+ * @name get
+ * @memberOf MapCache
+ * @param {string} key The key of the value to get.
+ * @returns {*} Returns the entry value.
+ */
+function mapCacheGet(key) {
+  return getMapData(this, key).get(key);
+}
+
+/**
+ * Checks if a map value for `key` exists.
+ *
+ * @private
+ * @name has
+ * @memberOf MapCache
+ * @param {string} key The key of the entry to check.
+ * @returns {boolean} Returns `true` if an entry for `key` exists, else `false`.
+ */
+function mapCacheHas(key) {
+  return getMapData(this, key).has(key);
+}
+
+/**
+ * Sets the map `key` to `value`.
+ *
+ * @private
+ * @name set
+ * @memberOf MapCache
+ * @param {string} key The key of the value to set.
+ * @param {*} value The value to set.
+ * @returns {Object} Returns the map cache instance.
+ */
+function mapCacheSet(key, value) {
+  var data = getMapData(this, key),
+      size = data.size;
+
+  data.set(key, value);
+  this.size += data.size == size ? 0 : 1;
+  return this;
+}
+
+// Add methods to `MapCache`.
+MapCache.prototype.clear = mapCacheClear;
+MapCache.prototype['delete'] = mapCacheDelete;
+MapCache.prototype.get = mapCacheGet;
+MapCache.prototype.has = mapCacheHas;
+MapCache.prototype.set = mapCacheSet;
+
+/**
+ *
+ * Creates an array cache object to store unique values.
+ *
+ * @private
+ * @constructor
+ * @param {Array} [values] The values to cache.
+ */
+function SetCache(values) {
+  var index = -1,
+      length = values == null ? 0 : values.length;
+
+  this.__data__ = new MapCache;
+  while (++index < length) {
+    this.add(values[index]);
+  }
+}
+
+/**
+ * Adds `value` to the array cache.
+ *
+ * @private
+ * @name add
+ * @memberOf SetCache
+ * @alias push
+ * @param {*} value The value to cache.
+ * @returns {Object} Returns the cache instance.
+ */
+function setCacheAdd(value) {
+  this.__data__.set(value, HASH_UNDEFINED);
+  return this;
+}
+
+/**
+ * Checks if `value` is in the array cache.
+ *
+ * @private
+ * @name has
+ * @memberOf SetCache
+ * @param {*} value The value to search for.
+ * @returns {number} Returns `true` if `value` is found, else `false`.
+ */
+function setCacheHas(value) {
+  return this.__data__.has(value);
+}
+
+// Add methods to `SetCache`.
+SetCache.prototype.add = SetCache.prototype.push = setCacheAdd;
+SetCache.prototype.has = setCacheHas;
+
+/**
+ * Creates a stack cache object to store key-value pairs.
+ *
+ * @private
+ * @constructor
+ * @param {Array} [entries] The key-value pairs to cache.
+ */
+function Stack(entries) {
+  var data = this.__data__ = new ListCache(entries);
+  this.size = data.size;
+}
+
+/**
+ * Removes all key-value entries from the stack.
+ *
+ * @private
+ * @name clear
+ * @memberOf Stack
+ */
+function stackClear() {
+  this.__data__ = new ListCache;
+  this.size = 0;
+}
+
+/**
+ * Removes `key` and its value from the stack.
+ *
+ * @private
+ * @name delete
+ * @memberOf Stack
+ * @param {string} key The key of the value to remove.
+ * @returns {boolean} Returns `true` if the entry was removed, else `false`.
+ */
+function stackDelete(key) {
+  var data = this.__data__,
+      result = data['delete'](key);
+
+  this.size = data.size;
+  return result;
+}
+
+/**
+ * Gets the stack value for `key`.
+ *
+ * @private
+ * @name get
+ * @memberOf Stack
+ * @param {string} key The key of the value to get.
+ * @returns {*} Returns the entry value.
+ */
+function stackGet(key) {
+  return this.__data__.get(key);
+}
+
+/**
+ * Checks if a stack value for `key` exists.
+ *
+ * @private
+ * @name has
+ * @memberOf Stack
+ * @param {string} key The key of the entry to check.
+ * @returns {boolean} Returns `true` if an entry for `key` exists, else `false`.
+ */
+function stackHas(key) {
+  return this.__data__.has(key);
+}
+
+/**
+ * Sets the stack `key` to `value`.
+ *
+ * @private
+ * @name set
+ * @memberOf Stack
+ * @param {string} key The key of the value to set.
+ * @param {*} value The value to set.
+ * @returns {Object} Returns the stack cache instance.
+ */
+function stackSet(key, value) {
+  var data = this.__data__;
+  if (data instanceof ListCache) {
+    var pairs = data.__data__;
+    if (!Map || (pairs.length < LARGE_ARRAY_SIZE - 1)) {
+      pairs.push([key, value]);
+      this.size = ++data.size;
+      return this;
+    }
+    data = this.__data__ = new MapCache(pairs);
+  }
+  data.set(key, value);
+  this.size = data.size;
+  return this;
+}
+
+// Add methods to `Stack`.
+Stack.prototype.clear = stackClear;
+Stack.prototype['delete'] = stackDelete;
+Stack.prototype.get = stackGet;
+Stack.prototype.has = stackHas;
+Stack.prototype.set = stackSet;
 
 /**
  * Creates an array of the enumerable property names of the array-like `value`.
@@ -5702,111 +6259,6 @@ function arrayLikeKeys(value, inherited) {
   return result;
 }
 
-module.exports = arrayLikeKeys;
-
-},{"./_baseTimes":41,"./_isIndex":64,"./isArguments":100,"./isArray":101,"./isBuffer":103,"./isTypedArray":110}],25:[function(_dereq_,module,exports){
-/**
- * A specialized version of `_.map` for arrays without support for iteratee
- * shorthands.
- *
- * @private
- * @param {Array} [array] The array to iterate over.
- * @param {Function} iteratee The function invoked per iteration.
- * @returns {Array} Returns the new mapped array.
- */
-function arrayMap(array, iteratee) {
-  var index = -1,
-      length = array == null ? 0 : array.length,
-      result = Array(length);
-
-  while (++index < length) {
-    result[index] = iteratee(array[index], index, array);
-  }
-  return result;
-}
-
-module.exports = arrayMap;
-
-},{}],26:[function(_dereq_,module,exports){
-/**
- * Appends the elements of `values` to `array`.
- *
- * @private
- * @param {Array} array The array to modify.
- * @param {Array} values The values to append.
- * @returns {Array} Returns `array`.
- */
-function arrayPush(array, values) {
-  var index = -1,
-      length = values.length,
-      offset = array.length;
-
-  while (++index < length) {
-    array[offset + index] = values[index];
-  }
-  return array;
-}
-
-module.exports = arrayPush;
-
-},{}],27:[function(_dereq_,module,exports){
-/**
- * A specialized version of `_.some` for arrays without support for iteratee
- * shorthands.
- *
- * @private
- * @param {Array} [array] The array to iterate over.
- * @param {Function} predicate The function invoked per iteration.
- * @returns {boolean} Returns `true` if any element passes the predicate check,
- *  else `false`.
- */
-function arraySome(array, predicate) {
-  var index = -1,
-      length = array == null ? 0 : array.length;
-
-  while (++index < length) {
-    if (predicate(array[index], index, array)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-module.exports = arraySome;
-
-},{}],28:[function(_dereq_,module,exports){
-var baseAssignValue = _dereq_('./_baseAssignValue'),
-    eq = _dereq_('./eq');
-
-/** Used for built-in method references. */
-var objectProto = Object.prototype;
-
-/** Used to check objects for own properties. */
-var hasOwnProperty = objectProto.hasOwnProperty;
-
-/**
- * Assigns `value` to `key` of `object` if the existing value is not equivalent
- * using [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
- * for equality comparisons.
- *
- * @private
- * @param {Object} object The object to modify.
- * @param {string} key The key of the property to assign.
- * @param {*} value The value to assign.
- */
-function assignValue(object, key, value) {
-  var objValue = object[key];
-  if (!(hasOwnProperty.call(object, key) && eq(objValue, value)) ||
-      (value === undefined && !(key in object))) {
-    baseAssignValue(object, key, value);
-  }
-}
-
-module.exports = assignValue;
-
-},{"./_baseAssignValue":30,"./eq":98}],29:[function(_dereq_,module,exports){
-var eq = _dereq_('./eq');
-
 /**
  * Gets the index at which the `key` is found in `array` of key-value pairs.
  *
@@ -5825,65 +6277,6 @@ function assocIndexOf(array, key) {
   return -1;
 }
 
-module.exports = assocIndexOf;
-
-},{"./eq":98}],30:[function(_dereq_,module,exports){
-var defineProperty = _dereq_('./_defineProperty');
-
-/**
- * The base implementation of `assignValue` and `assignMergeValue` without
- * value checks.
- *
- * @private
- * @param {Object} object The object to modify.
- * @param {string} key The key of the property to assign.
- * @param {*} value The value to assign.
- */
-function baseAssignValue(object, key, value) {
-  if (key == '__proto__' && defineProperty) {
-    defineProperty(object, key, {
-      'configurable': true,
-      'enumerable': true,
-      'value': value,
-      'writable': true
-    });
-  } else {
-    object[key] = value;
-  }
-}
-
-module.exports = baseAssignValue;
-
-},{"./_defineProperty":47}],31:[function(_dereq_,module,exports){
-var castPath = _dereq_('./_castPath'),
-    toKey = _dereq_('./_toKey');
-
-/**
- * The base implementation of `_.get` without support for default values.
- *
- * @private
- * @param {Object} object The object to query.
- * @param {Array|string} path The path of the property to get.
- * @returns {*} Returns the resolved value.
- */
-function baseGet(object, path) {
-  path = castPath(path, object);
-
-  var index = 0,
-      length = path.length;
-
-  while (object != null && index < length) {
-    object = object[toKey(path[index++])];
-  }
-  return (index && index == length) ? object : undefined;
-}
-
-module.exports = baseGet;
-
-},{"./_castPath":45,"./_toKey":96}],32:[function(_dereq_,module,exports){
-var arrayPush = _dereq_('./_arrayPush'),
-    isArray = _dereq_('./isArray');
-
 /**
  * The base implementation of `getAllKeys` and `getAllKeysIn` which uses
  * `keysFunc` and `symbolsFunc` to get the enumerable property names and
@@ -5899,20 +6292,6 @@ function baseGetAllKeys(object, keysFunc, symbolsFunc) {
   var result = keysFunc(object);
   return isArray(object) ? result : arrayPush(result, symbolsFunc(object));
 }
-
-module.exports = baseGetAllKeys;
-
-},{"./_arrayPush":26,"./isArray":101}],33:[function(_dereq_,module,exports){
-var Symbol = _dereq_('./_Symbol'),
-    getRawTag = _dereq_('./_getRawTag'),
-    objectToString = _dereq_('./_objectToString');
-
-/** `Object#toString` result references. */
-var nullTag = '[object Null]',
-    undefinedTag = '[object Undefined]';
-
-/** Built-in value references. */
-var symToStringTag = Symbol ? Symbol.toStringTag : undefined;
 
 /**
  * The base implementation of `getTag` without fallbacks for buggy environments.
@@ -5930,15 +6309,6 @@ function baseGetTag(value) {
     : objectToString(value);
 }
 
-module.exports = baseGetTag;
-
-},{"./_Symbol":20,"./_getRawTag":55,"./_objectToString":84}],34:[function(_dereq_,module,exports){
-var baseGetTag = _dereq_('./_baseGetTag'),
-    isObjectLike = _dereq_('./isObjectLike');
-
-/** `Object#toString` result references. */
-var argsTag = '[object Arguments]';
-
 /**
  * The base implementation of `_.isArguments`.
  *
@@ -5949,12 +6319,6 @@ var argsTag = '[object Arguments]';
 function baseIsArguments(value) {
   return isObjectLike(value) && baseGetTag(value) == argsTag;
 }
-
-module.exports = baseIsArguments;
-
-},{"./_baseGetTag":33,"./isObjectLike":108}],35:[function(_dereq_,module,exports){
-var baseIsEqualDeep = _dereq_('./_baseIsEqualDeep'),
-    isObjectLike = _dereq_('./isObjectLike');
 
 /**
  * The base implementation of `_.isEqual` which supports partial comparisons
@@ -5979,32 +6343,6 @@ function baseIsEqual(value, other, bitmask, customizer, stack) {
   }
   return baseIsEqualDeep(value, other, bitmask, customizer, baseIsEqual, stack);
 }
-
-module.exports = baseIsEqual;
-
-},{"./_baseIsEqualDeep":36,"./isObjectLike":108}],36:[function(_dereq_,module,exports){
-var Stack = _dereq_('./_Stack'),
-    equalArrays = _dereq_('./_equalArrays'),
-    equalByTag = _dereq_('./_equalByTag'),
-    equalObjects = _dereq_('./_equalObjects'),
-    getTag = _dereq_('./_getTag'),
-    isArray = _dereq_('./isArray'),
-    isBuffer = _dereq_('./isBuffer'),
-    isTypedArray = _dereq_('./isTypedArray');
-
-/** Used to compose bitmasks for value comparisons. */
-var COMPARE_PARTIAL_FLAG = 1;
-
-/** `Object#toString` result references. */
-var argsTag = '[object Arguments]',
-    arrayTag = '[object Array]',
-    objectTag = '[object Object]';
-
-/** Used for built-in method references. */
-var objectProto = Object.prototype;
-
-/** Used to check objects for own properties. */
-var hasOwnProperty = objectProto.hasOwnProperty;
 
 /**
  * A specialized version of `baseIsEqual` for arrays and objects which performs
@@ -6065,39 +6403,6 @@ function baseIsEqualDeep(object, other, bitmask, customizer, equalFunc, stack) {
   return equalObjects(object, other, bitmask, customizer, equalFunc, stack);
 }
 
-module.exports = baseIsEqualDeep;
-
-},{"./_Stack":19,"./_equalArrays":48,"./_equalByTag":49,"./_equalObjects":50,"./_getTag":57,"./isArray":101,"./isBuffer":103,"./isTypedArray":110}],37:[function(_dereq_,module,exports){
-var isFunction = _dereq_('./isFunction'),
-    isMasked = _dereq_('./_isMasked'),
-    isObject = _dereq_('./isObject'),
-    toSource = _dereq_('./_toSource');
-
-/**
- * Used to match `RegExp`
- * [syntax characters](http://ecma-international.org/ecma-262/7.0/#sec-patterns).
- */
-var reRegExpChar = /[\\^$.*+?()[\]{}|]/g;
-
-/** Used to detect host constructors (Safari). */
-var reIsHostCtor = /^\[object .+?Constructor\]$/;
-
-/** Used for built-in method references. */
-var funcProto = Function.prototype,
-    objectProto = Object.prototype;
-
-/** Used to resolve the decompiled source of functions. */
-var funcToString = funcProto.toString;
-
-/** Used to check objects for own properties. */
-var hasOwnProperty = objectProto.hasOwnProperty;
-
-/** Used to detect if a method is native. */
-var reIsNative = RegExp('^' +
-  funcToString.call(hasOwnProperty).replace(reRegExpChar, '\\$&')
-  .replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g, '$1.*?') + '$'
-);
-
 /**
  * The base implementation of `_.isNative` without bad shim checks.
  *
@@ -6114,56 +6419,6 @@ function baseIsNative(value) {
   return pattern.test(toSource(value));
 }
 
-module.exports = baseIsNative;
-
-},{"./_isMasked":67,"./_toSource":97,"./isFunction":105,"./isObject":107}],38:[function(_dereq_,module,exports){
-var baseGetTag = _dereq_('./_baseGetTag'),
-    isLength = _dereq_('./isLength'),
-    isObjectLike = _dereq_('./isObjectLike');
-
-/** `Object#toString` result references. */
-var argsTag = '[object Arguments]',
-    arrayTag = '[object Array]',
-    boolTag = '[object Boolean]',
-    dateTag = '[object Date]',
-    errorTag = '[object Error]',
-    funcTag = '[object Function]',
-    mapTag = '[object Map]',
-    numberTag = '[object Number]',
-    objectTag = '[object Object]',
-    regexpTag = '[object RegExp]',
-    setTag = '[object Set]',
-    stringTag = '[object String]',
-    weakMapTag = '[object WeakMap]';
-
-var arrayBufferTag = '[object ArrayBuffer]',
-    dataViewTag = '[object DataView]',
-    float32Tag = '[object Float32Array]',
-    float64Tag = '[object Float64Array]',
-    int8Tag = '[object Int8Array]',
-    int16Tag = '[object Int16Array]',
-    int32Tag = '[object Int32Array]',
-    uint8Tag = '[object Uint8Array]',
-    uint8ClampedTag = '[object Uint8ClampedArray]',
-    uint16Tag = '[object Uint16Array]',
-    uint32Tag = '[object Uint32Array]';
-
-/** Used to identify `toStringTag` values of typed arrays. */
-var typedArrayTags = {};
-typedArrayTags[float32Tag] = typedArrayTags[float64Tag] =
-typedArrayTags[int8Tag] = typedArrayTags[int16Tag] =
-typedArrayTags[int32Tag] = typedArrayTags[uint8Tag] =
-typedArrayTags[uint8ClampedTag] = typedArrayTags[uint16Tag] =
-typedArrayTags[uint32Tag] = true;
-typedArrayTags[argsTag] = typedArrayTags[arrayTag] =
-typedArrayTags[arrayBufferTag] = typedArrayTags[boolTag] =
-typedArrayTags[dataViewTag] = typedArrayTags[dateTag] =
-typedArrayTags[errorTag] = typedArrayTags[funcTag] =
-typedArrayTags[mapTag] = typedArrayTags[numberTag] =
-typedArrayTags[objectTag] = typedArrayTags[regexpTag] =
-typedArrayTags[setTag] = typedArrayTags[stringTag] =
-typedArrayTags[weakMapTag] = false;
-
 /**
  * The base implementation of `_.isTypedArray` without Node.js optimizations.
  *
@@ -6175,18 +6430,6 @@ function baseIsTypedArray(value) {
   return isObjectLike(value) &&
     isLength(value.length) && !!typedArrayTags[baseGetTag(value)];
 }
-
-module.exports = baseIsTypedArray;
-
-},{"./_baseGetTag":33,"./isLength":106,"./isObjectLike":108}],39:[function(_dereq_,module,exports){
-var isPrototype = _dereq_('./_isPrototype'),
-    nativeKeys = _dereq_('./_nativeKeys');
-
-/** Used for built-in method references. */
-var objectProto = Object.prototype;
-
-/** Used to check objects for own properties. */
-var hasOwnProperty = objectProto.hasOwnProperty;
 
 /**
  * The base implementation of `_.keys` which doesn't treat sparse arrays as dense.
@@ -6207,202 +6450,6 @@ function baseKeys(object) {
   }
   return result;
 }
-
-module.exports = baseKeys;
-
-},{"./_isPrototype":68,"./_nativeKeys":82}],40:[function(_dereq_,module,exports){
-var assignValue = _dereq_('./_assignValue'),
-    castPath = _dereq_('./_castPath'),
-    isIndex = _dereq_('./_isIndex'),
-    isObject = _dereq_('./isObject'),
-    toKey = _dereq_('./_toKey');
-
-/**
- * The base implementation of `_.set`.
- *
- * @private
- * @param {Object} object The object to modify.
- * @param {Array|string} path The path of the property to set.
- * @param {*} value The value to set.
- * @param {Function} [customizer] The function to customize path creation.
- * @returns {Object} Returns `object`.
- */
-function baseSet(object, path, value, customizer) {
-  if (!isObject(object)) {
-    return object;
-  }
-  path = castPath(path, object);
-
-  var index = -1,
-      length = path.length,
-      lastIndex = length - 1,
-      nested = object;
-
-  while (nested != null && ++index < length) {
-    var key = toKey(path[index]),
-        newValue = value;
-
-    if (index != lastIndex) {
-      var objValue = nested[key];
-      newValue = customizer ? customizer(objValue, key, nested) : undefined;
-      if (newValue === undefined) {
-        newValue = isObject(objValue)
-          ? objValue
-          : (isIndex(path[index + 1]) ? [] : {});
-      }
-    }
-    assignValue(nested, key, newValue);
-    nested = nested[key];
-  }
-  return object;
-}
-
-module.exports = baseSet;
-
-},{"./_assignValue":28,"./_castPath":45,"./_isIndex":64,"./_toKey":96,"./isObject":107}],41:[function(_dereq_,module,exports){
-/**
- * The base implementation of `_.times` without support for iteratee shorthands
- * or max array length checks.
- *
- * @private
- * @param {number} n The number of times to invoke `iteratee`.
- * @param {Function} iteratee The function invoked per iteration.
- * @returns {Array} Returns the array of results.
- */
-function baseTimes(n, iteratee) {
-  var index = -1,
-      result = Array(n);
-
-  while (++index < n) {
-    result[index] = iteratee(index);
-  }
-  return result;
-}
-
-module.exports = baseTimes;
-
-},{}],42:[function(_dereq_,module,exports){
-var Symbol = _dereq_('./_Symbol'),
-    arrayMap = _dereq_('./_arrayMap'),
-    isArray = _dereq_('./isArray'),
-    isSymbol = _dereq_('./isSymbol');
-
-/** Used as references for various `Number` constants. */
-var INFINITY = 1 / 0;
-
-/** Used to convert symbols to primitives and strings. */
-var symbolProto = Symbol ? Symbol.prototype : undefined,
-    symbolToString = symbolProto ? symbolProto.toString : undefined;
-
-/**
- * The base implementation of `_.toString` which doesn't convert nullish
- * values to empty strings.
- *
- * @private
- * @param {*} value The value to process.
- * @returns {string} Returns the string.
- */
-function baseToString(value) {
-  // Exit early for strings to avoid a performance hit in some environments.
-  if (typeof value == 'string') {
-    return value;
-  }
-  if (isArray(value)) {
-    // Recursively convert values (susceptible to call stack limits).
-    return arrayMap(value, baseToString) + '';
-  }
-  if (isSymbol(value)) {
-    return symbolToString ? symbolToString.call(value) : '';
-  }
-  var result = (value + '');
-  return (result == '0' && (1 / value) == -INFINITY) ? '-0' : result;
-}
-
-module.exports = baseToString;
-
-},{"./_Symbol":20,"./_arrayMap":25,"./isArray":101,"./isSymbol":109}],43:[function(_dereq_,module,exports){
-/**
- * The base implementation of `_.unary` without support for storing metadata.
- *
- * @private
- * @param {Function} func The function to cap arguments for.
- * @returns {Function} Returns the new capped function.
- */
-function baseUnary(func) {
-  return function(value) {
-    return func(value);
-  };
-}
-
-module.exports = baseUnary;
-
-},{}],44:[function(_dereq_,module,exports){
-/**
- * Checks if a `cache` value for `key` exists.
- *
- * @private
- * @param {Object} cache The cache to query.
- * @param {string} key The key of the entry to check.
- * @returns {boolean} Returns `true` if an entry for `key` exists, else `false`.
- */
-function cacheHas(cache, key) {
-  return cache.has(key);
-}
-
-module.exports = cacheHas;
-
-},{}],45:[function(_dereq_,module,exports){
-var isArray = _dereq_('./isArray'),
-    isKey = _dereq_('./_isKey'),
-    stringToPath = _dereq_('./_stringToPath'),
-    toString = _dereq_('./toString');
-
-/**
- * Casts `value` to a path array if it's not one.
- *
- * @private
- * @param {*} value The value to inspect.
- * @param {Object} [object] The object to query keys on.
- * @returns {Array} Returns the cast property path array.
- */
-function castPath(value, object) {
-  if (isArray(value)) {
-    return value;
-  }
-  return isKey(value, object) ? [value] : stringToPath(toString(value));
-}
-
-module.exports = castPath;
-
-},{"./_isKey":65,"./_stringToPath":95,"./isArray":101,"./toString":116}],46:[function(_dereq_,module,exports){
-var root = _dereq_('./_root');
-
-/** Used to detect overreaching core-js shims. */
-var coreJsData = root['__core-js_shared__'];
-
-module.exports = coreJsData;
-
-},{"./_root":86}],47:[function(_dereq_,module,exports){
-var getNative = _dereq_('./_getNative');
-
-var defineProperty = (function() {
-  try {
-    var func = getNative(Object, 'defineProperty');
-    func({}, '', {});
-    return func;
-  } catch (e) {}
-}());
-
-module.exports = defineProperty;
-
-},{"./_getNative":54}],48:[function(_dereq_,module,exports){
-var SetCache = _dereq_('./_SetCache'),
-    arraySome = _dereq_('./_arraySome'),
-    cacheHas = _dereq_('./_cacheHas');
-
-/** Used to compose bitmasks for value comparisons. */
-var COMPARE_PARTIAL_FLAG = 1,
-    COMPARE_UNORDERED_FLAG = 2;
 
 /**
  * A specialized version of `baseIsEqualDeep` for arrays with support for
@@ -6477,38 +6524,6 @@ function equalArrays(array, other, bitmask, customizer, equalFunc, stack) {
   stack['delete'](other);
   return result;
 }
-
-module.exports = equalArrays;
-
-},{"./_SetCache":18,"./_arraySome":27,"./_cacheHas":44}],49:[function(_dereq_,module,exports){
-var Symbol = _dereq_('./_Symbol'),
-    Uint8Array = _dereq_('./_Uint8Array'),
-    eq = _dereq_('./eq'),
-    equalArrays = _dereq_('./_equalArrays'),
-    mapToArray = _dereq_('./_mapToArray'),
-    setToArray = _dereq_('./_setToArray');
-
-/** Used to compose bitmasks for value comparisons. */
-var COMPARE_PARTIAL_FLAG = 1,
-    COMPARE_UNORDERED_FLAG = 2;
-
-/** `Object#toString` result references. */
-var boolTag = '[object Boolean]',
-    dateTag = '[object Date]',
-    errorTag = '[object Error]',
-    mapTag = '[object Map]',
-    numberTag = '[object Number]',
-    regexpTag = '[object RegExp]',
-    setTag = '[object Set]',
-    stringTag = '[object String]',
-    symbolTag = '[object Symbol]';
-
-var arrayBufferTag = '[object ArrayBuffer]',
-    dataViewTag = '[object DataView]';
-
-/** Used to convert symbols to primitives and strings. */
-var symbolProto = Symbol ? Symbol.prototype : undefined,
-    symbolValueOf = symbolProto ? symbolProto.valueOf : undefined;
 
 /**
  * A specialized version of `baseIsEqualDeep` for comparing objects of
@@ -6592,20 +6607,6 @@ function equalByTag(object, other, tag, bitmask, customizer, equalFunc, stack) {
   return false;
 }
 
-module.exports = equalByTag;
-
-},{"./_Symbol":20,"./_Uint8Array":21,"./_equalArrays":48,"./_mapToArray":79,"./_setToArray":89,"./eq":98}],50:[function(_dereq_,module,exports){
-var getAllKeys = _dereq_('./_getAllKeys');
-
-/** Used to compose bitmasks for value comparisons. */
-var COMPARE_PARTIAL_FLAG = 1;
-
-/** Used for built-in method references. */
-var objectProto = Object.prototype;
-
-/** Used to check objects for own properties. */
-var hasOwnProperty = objectProto.hasOwnProperty;
-
 /**
  * A specialized version of `baseIsEqualDeep` for objects with support for
  * partial deep comparisons.
@@ -6683,21 +6684,6 @@ function equalObjects(object, other, bitmask, customizer, equalFunc, stack) {
   return result;
 }
 
-module.exports = equalObjects;
-
-},{"./_getAllKeys":52}],51:[function(_dereq_,module,exports){
-(function (global){
-/** Detect free variable `global` from Node.js. */
-var freeGlobal = typeof global == 'object' && global && global.Object === Object && global;
-
-module.exports = freeGlobal;
-
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],52:[function(_dereq_,module,exports){
-var baseGetAllKeys = _dereq_('./_baseGetAllKeys'),
-    getSymbols = _dereq_('./_getSymbols'),
-    keys = _dereq_('./keys');
-
 /**
  * Creates an array of own enumerable property names and symbols of `object`.
  *
@@ -6708,11 +6694,6 @@ var baseGetAllKeys = _dereq_('./_baseGetAllKeys'),
 function getAllKeys(object) {
   return baseGetAllKeys(object, keys, getSymbols);
 }
-
-module.exports = getAllKeys;
-
-},{"./_baseGetAllKeys":32,"./_getSymbols":56,"./keys":111}],53:[function(_dereq_,module,exports){
-var isKeyable = _dereq_('./_isKeyable');
 
 /**
  * Gets the data for `map`.
@@ -6729,12 +6710,6 @@ function getMapData(map, key) {
     : data.map;
 }
 
-module.exports = getMapData;
-
-},{"./_isKeyable":66}],54:[function(_dereq_,module,exports){
-var baseIsNative = _dereq_('./_baseIsNative'),
-    getValue = _dereq_('./_getValue');
-
 /**
  * Gets the native function at `key` of `object`.
  *
@@ -6747,27 +6722,6 @@ function getNative(object, key) {
   var value = getValue(object, key);
   return baseIsNative(value) ? value : undefined;
 }
-
-module.exports = getNative;
-
-},{"./_baseIsNative":37,"./_getValue":58}],55:[function(_dereq_,module,exports){
-var Symbol = _dereq_('./_Symbol');
-
-/** Used for built-in method references. */
-var objectProto = Object.prototype;
-
-/** Used to check objects for own properties. */
-var hasOwnProperty = objectProto.hasOwnProperty;
-
-/**
- * Used to resolve the
- * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
- * of values.
- */
-var nativeObjectToString = objectProto.toString;
-
-/** Built-in value references. */
-var symToStringTag = Symbol ? Symbol.toStringTag : undefined;
 
 /**
  * A specialized version of `baseGetTag` which ignores `Symbol.toStringTag` values.
@@ -6796,21 +6750,6 @@ function getRawTag(value) {
   return result;
 }
 
-module.exports = getRawTag;
-
-},{"./_Symbol":20}],56:[function(_dereq_,module,exports){
-var arrayFilter = _dereq_('./_arrayFilter'),
-    stubArray = _dereq_('./stubArray');
-
-/** Used for built-in method references. */
-var objectProto = Object.prototype;
-
-/** Built-in value references. */
-var propertyIsEnumerable = objectProto.propertyIsEnumerable;
-
-/* Built-in method references for those with the same name as other `lodash` methods. */
-var nativeGetSymbols = Object.getOwnPropertySymbols;
-
 /**
  * Creates an array of the own enumerable symbols of `object`.
  *
@@ -6827,33 +6766,6 @@ var getSymbols = !nativeGetSymbols ? stubArray : function(object) {
     return propertyIsEnumerable.call(object, symbol);
   });
 };
-
-module.exports = getSymbols;
-
-},{"./_arrayFilter":23,"./stubArray":114}],57:[function(_dereq_,module,exports){
-var DataView = _dereq_('./_DataView'),
-    Map = _dereq_('./_Map'),
-    Promise = _dereq_('./_Promise'),
-    Set = _dereq_('./_Set'),
-    WeakMap = _dereq_('./_WeakMap'),
-    baseGetTag = _dereq_('./_baseGetTag'),
-    toSource = _dereq_('./_toSource');
-
-/** `Object#toString` result references. */
-var mapTag = '[object Map]',
-    objectTag = '[object Object]',
-    promiseTag = '[object Promise]',
-    setTag = '[object Set]',
-    weakMapTag = '[object WeakMap]';
-
-var dataViewTag = '[object DataView]';
-
-/** Used to detect maps, sets, and weakmaps. */
-var dataViewCtorString = toSource(DataView),
-    mapCtorString = toSource(Map),
-    promiseCtorString = toSource(Promise),
-    setCtorString = toSource(Set),
-    weakMapCtorString = toSource(WeakMap);
 
 /**
  * Gets the `toStringTag` of `value`.
@@ -6888,148 +6800,6 @@ if ((DataView && getTag(new DataView(new ArrayBuffer(1))) != dataViewTag) ||
   };
 }
 
-module.exports = getTag;
-
-},{"./_DataView":11,"./_Map":14,"./_Promise":16,"./_Set":17,"./_WeakMap":22,"./_baseGetTag":33,"./_toSource":97}],58:[function(_dereq_,module,exports){
-/**
- * Gets the value at `key` of `object`.
- *
- * @private
- * @param {Object} [object] The object to query.
- * @param {string} key The key of the property to get.
- * @returns {*} Returns the property value.
- */
-function getValue(object, key) {
-  return object == null ? undefined : object[key];
-}
-
-module.exports = getValue;
-
-},{}],59:[function(_dereq_,module,exports){
-var nativeCreate = _dereq_('./_nativeCreate');
-
-/**
- * Removes all key-value entries from the hash.
- *
- * @private
- * @name clear
- * @memberOf Hash
- */
-function hashClear() {
-  this.__data__ = nativeCreate ? nativeCreate(null) : {};
-  this.size = 0;
-}
-
-module.exports = hashClear;
-
-},{"./_nativeCreate":81}],60:[function(_dereq_,module,exports){
-/**
- * Removes `key` and its value from the hash.
- *
- * @private
- * @name delete
- * @memberOf Hash
- * @param {Object} hash The hash to modify.
- * @param {string} key The key of the value to remove.
- * @returns {boolean} Returns `true` if the entry was removed, else `false`.
- */
-function hashDelete(key) {
-  var result = this.has(key) && delete this.__data__[key];
-  this.size -= result ? 1 : 0;
-  return result;
-}
-
-module.exports = hashDelete;
-
-},{}],61:[function(_dereq_,module,exports){
-var nativeCreate = _dereq_('./_nativeCreate');
-
-/** Used to stand-in for `undefined` hash values. */
-var HASH_UNDEFINED = '__lodash_hash_undefined__';
-
-/** Used for built-in method references. */
-var objectProto = Object.prototype;
-
-/** Used to check objects for own properties. */
-var hasOwnProperty = objectProto.hasOwnProperty;
-
-/**
- * Gets the hash value for `key`.
- *
- * @private
- * @name get
- * @memberOf Hash
- * @param {string} key The key of the value to get.
- * @returns {*} Returns the entry value.
- */
-function hashGet(key) {
-  var data = this.__data__;
-  if (nativeCreate) {
-    var result = data[key];
-    return result === HASH_UNDEFINED ? undefined : result;
-  }
-  return hasOwnProperty.call(data, key) ? data[key] : undefined;
-}
-
-module.exports = hashGet;
-
-},{"./_nativeCreate":81}],62:[function(_dereq_,module,exports){
-var nativeCreate = _dereq_('./_nativeCreate');
-
-/** Used for built-in method references. */
-var objectProto = Object.prototype;
-
-/** Used to check objects for own properties. */
-var hasOwnProperty = objectProto.hasOwnProperty;
-
-/**
- * Checks if a hash value for `key` exists.
- *
- * @private
- * @name has
- * @memberOf Hash
- * @param {string} key The key of the entry to check.
- * @returns {boolean} Returns `true` if an entry for `key` exists, else `false`.
- */
-function hashHas(key) {
-  var data = this.__data__;
-  return nativeCreate ? (data[key] !== undefined) : hasOwnProperty.call(data, key);
-}
-
-module.exports = hashHas;
-
-},{"./_nativeCreate":81}],63:[function(_dereq_,module,exports){
-var nativeCreate = _dereq_('./_nativeCreate');
-
-/** Used to stand-in for `undefined` hash values. */
-var HASH_UNDEFINED = '__lodash_hash_undefined__';
-
-/**
- * Sets the hash `key` to `value`.
- *
- * @private
- * @name set
- * @memberOf Hash
- * @param {string} key The key of the value to set.
- * @param {*} value The value to set.
- * @returns {Object} Returns the hash instance.
- */
-function hashSet(key, value) {
-  var data = this.__data__;
-  this.size += this.has(key) ? 0 : 1;
-  data[key] = (nativeCreate && value === undefined) ? HASH_UNDEFINED : value;
-  return this;
-}
-
-module.exports = hashSet;
-
-},{"./_nativeCreate":81}],64:[function(_dereq_,module,exports){
-/** Used as references for various `Number` constants. */
-var MAX_SAFE_INTEGER = 9007199254740991;
-
-/** Used to detect unsigned integer values. */
-var reIsUint = /^(?:0|[1-9]\d*)$/;
-
 /**
  * Checks if `value` is a valid array-like index.
  *
@@ -7045,40 +6815,6 @@ function isIndex(value, length) {
     (value > -1 && value % 1 == 0 && value < length);
 }
 
-module.exports = isIndex;
-
-},{}],65:[function(_dereq_,module,exports){
-var isArray = _dereq_('./isArray'),
-    isSymbol = _dereq_('./isSymbol');
-
-/** Used to match property names within property paths. */
-var reIsDeepProp = /\.|\[(?:[^[\]]*|(["'])(?:(?!\1)[^\\]|\\.)*?\1)\]/,
-    reIsPlainProp = /^\w*$/;
-
-/**
- * Checks if `value` is a property name and not a property path.
- *
- * @private
- * @param {*} value The value to check.
- * @param {Object} [object] The object to query keys on.
- * @returns {boolean} Returns `true` if `value` is a property name, else `false`.
- */
-function isKey(value, object) {
-  if (isArray(value)) {
-    return false;
-  }
-  var type = typeof value;
-  if (type == 'number' || type == 'symbol' || type == 'boolean' ||
-      value == null || isSymbol(value)) {
-    return true;
-  }
-  return reIsPlainProp.test(value) || !reIsDeepProp.test(value) ||
-    (object != null && value in Object(object));
-}
-
-module.exports = isKey;
-
-},{"./isArray":101,"./isSymbol":109}],66:[function(_dereq_,module,exports){
 /**
  * Checks if `value` is suitable for use as unique object key.
  *
@@ -7093,17 +6829,6 @@ function isKeyable(value) {
     : (value === null);
 }
 
-module.exports = isKeyable;
-
-},{}],67:[function(_dereq_,module,exports){
-var coreJsData = _dereq_('./_coreJsData');
-
-/** Used to detect methods masquerading as native. */
-var maskSrcKey = (function() {
-  var uid = /[^.]+$/.exec(coreJsData && coreJsData.keys && coreJsData.keys.IE_PROTO || '');
-  return uid ? ('Symbol(src)_1.' + uid) : '';
-}());
-
 /**
  * Checks if `func` has its source masked.
  *
@@ -7114,12 +6839,6 @@ var maskSrcKey = (function() {
 function isMasked(func) {
   return !!maskSrcKey && (maskSrcKey in func);
 }
-
-module.exports = isMasked;
-
-},{"./_coreJsData":46}],68:[function(_dereq_,module,exports){
-/** Used for built-in method references. */
-var objectProto = Object.prototype;
 
 /**
  * Checks if `value` is likely a prototype object.
@@ -7135,329 +6854,6 @@ function isPrototype(value) {
   return value === proto;
 }
 
-module.exports = isPrototype;
-
-},{}],69:[function(_dereq_,module,exports){
-/**
- * Removes all key-value entries from the list cache.
- *
- * @private
- * @name clear
- * @memberOf ListCache
- */
-function listCacheClear() {
-  this.__data__ = [];
-  this.size = 0;
-}
-
-module.exports = listCacheClear;
-
-},{}],70:[function(_dereq_,module,exports){
-var assocIndexOf = _dereq_('./_assocIndexOf');
-
-/** Used for built-in method references. */
-var arrayProto = Array.prototype;
-
-/** Built-in value references. */
-var splice = arrayProto.splice;
-
-/**
- * Removes `key` and its value from the list cache.
- *
- * @private
- * @name delete
- * @memberOf ListCache
- * @param {string} key The key of the value to remove.
- * @returns {boolean} Returns `true` if the entry was removed, else `false`.
- */
-function listCacheDelete(key) {
-  var data = this.__data__,
-      index = assocIndexOf(data, key);
-
-  if (index < 0) {
-    return false;
-  }
-  var lastIndex = data.length - 1;
-  if (index == lastIndex) {
-    data.pop();
-  } else {
-    splice.call(data, index, 1);
-  }
-  --this.size;
-  return true;
-}
-
-module.exports = listCacheDelete;
-
-},{"./_assocIndexOf":29}],71:[function(_dereq_,module,exports){
-var assocIndexOf = _dereq_('./_assocIndexOf');
-
-/**
- * Gets the list cache value for `key`.
- *
- * @private
- * @name get
- * @memberOf ListCache
- * @param {string} key The key of the value to get.
- * @returns {*} Returns the entry value.
- */
-function listCacheGet(key) {
-  var data = this.__data__,
-      index = assocIndexOf(data, key);
-
-  return index < 0 ? undefined : data[index][1];
-}
-
-module.exports = listCacheGet;
-
-},{"./_assocIndexOf":29}],72:[function(_dereq_,module,exports){
-var assocIndexOf = _dereq_('./_assocIndexOf');
-
-/**
- * Checks if a list cache value for `key` exists.
- *
- * @private
- * @name has
- * @memberOf ListCache
- * @param {string} key The key of the entry to check.
- * @returns {boolean} Returns `true` if an entry for `key` exists, else `false`.
- */
-function listCacheHas(key) {
-  return assocIndexOf(this.__data__, key) > -1;
-}
-
-module.exports = listCacheHas;
-
-},{"./_assocIndexOf":29}],73:[function(_dereq_,module,exports){
-var assocIndexOf = _dereq_('./_assocIndexOf');
-
-/**
- * Sets the list cache `key` to `value`.
- *
- * @private
- * @name set
- * @memberOf ListCache
- * @param {string} key The key of the value to set.
- * @param {*} value The value to set.
- * @returns {Object} Returns the list cache instance.
- */
-function listCacheSet(key, value) {
-  var data = this.__data__,
-      index = assocIndexOf(data, key);
-
-  if (index < 0) {
-    ++this.size;
-    data.push([key, value]);
-  } else {
-    data[index][1] = value;
-  }
-  return this;
-}
-
-module.exports = listCacheSet;
-
-},{"./_assocIndexOf":29}],74:[function(_dereq_,module,exports){
-var Hash = _dereq_('./_Hash'),
-    ListCache = _dereq_('./_ListCache'),
-    Map = _dereq_('./_Map');
-
-/**
- * Removes all key-value entries from the map.
- *
- * @private
- * @name clear
- * @memberOf MapCache
- */
-function mapCacheClear() {
-  this.size = 0;
-  this.__data__ = {
-    'hash': new Hash,
-    'map': new (Map || ListCache),
-    'string': new Hash
-  };
-}
-
-module.exports = mapCacheClear;
-
-},{"./_Hash":12,"./_ListCache":13,"./_Map":14}],75:[function(_dereq_,module,exports){
-var getMapData = _dereq_('./_getMapData');
-
-/**
- * Removes `key` and its value from the map.
- *
- * @private
- * @name delete
- * @memberOf MapCache
- * @param {string} key The key of the value to remove.
- * @returns {boolean} Returns `true` if the entry was removed, else `false`.
- */
-function mapCacheDelete(key) {
-  var result = getMapData(this, key)['delete'](key);
-  this.size -= result ? 1 : 0;
-  return result;
-}
-
-module.exports = mapCacheDelete;
-
-},{"./_getMapData":53}],76:[function(_dereq_,module,exports){
-var getMapData = _dereq_('./_getMapData');
-
-/**
- * Gets the map value for `key`.
- *
- * @private
- * @name get
- * @memberOf MapCache
- * @param {string} key The key of the value to get.
- * @returns {*} Returns the entry value.
- */
-function mapCacheGet(key) {
-  return getMapData(this, key).get(key);
-}
-
-module.exports = mapCacheGet;
-
-},{"./_getMapData":53}],77:[function(_dereq_,module,exports){
-var getMapData = _dereq_('./_getMapData');
-
-/**
- * Checks if a map value for `key` exists.
- *
- * @private
- * @name has
- * @memberOf MapCache
- * @param {string} key The key of the entry to check.
- * @returns {boolean} Returns `true` if an entry for `key` exists, else `false`.
- */
-function mapCacheHas(key) {
-  return getMapData(this, key).has(key);
-}
-
-module.exports = mapCacheHas;
-
-},{"./_getMapData":53}],78:[function(_dereq_,module,exports){
-var getMapData = _dereq_('./_getMapData');
-
-/**
- * Sets the map `key` to `value`.
- *
- * @private
- * @name set
- * @memberOf MapCache
- * @param {string} key The key of the value to set.
- * @param {*} value The value to set.
- * @returns {Object} Returns the map cache instance.
- */
-function mapCacheSet(key, value) {
-  var data = getMapData(this, key),
-      size = data.size;
-
-  data.set(key, value);
-  this.size += data.size == size ? 0 : 1;
-  return this;
-}
-
-module.exports = mapCacheSet;
-
-},{"./_getMapData":53}],79:[function(_dereq_,module,exports){
-/**
- * Converts `map` to its key-value pairs.
- *
- * @private
- * @param {Object} map The map to convert.
- * @returns {Array} Returns the key-value pairs.
- */
-function mapToArray(map) {
-  var index = -1,
-      result = Array(map.size);
-
-  map.forEach(function(value, key) {
-    result[++index] = [key, value];
-  });
-  return result;
-}
-
-module.exports = mapToArray;
-
-},{}],80:[function(_dereq_,module,exports){
-var memoize = _dereq_('./memoize');
-
-/** Used as the maximum memoize cache size. */
-var MAX_MEMOIZE_SIZE = 500;
-
-/**
- * A specialized version of `_.memoize` which clears the memoized function's
- * cache when it exceeds `MAX_MEMOIZE_SIZE`.
- *
- * @private
- * @param {Function} func The function to have its output memoized.
- * @returns {Function} Returns the new memoized function.
- */
-function memoizeCapped(func) {
-  var result = memoize(func, function(key) {
-    if (cache.size === MAX_MEMOIZE_SIZE) {
-      cache.clear();
-    }
-    return key;
-  });
-
-  var cache = result.cache;
-  return result;
-}
-
-module.exports = memoizeCapped;
-
-},{"./memoize":112}],81:[function(_dereq_,module,exports){
-var getNative = _dereq_('./_getNative');
-
-/* Built-in method references that are verified to be native. */
-var nativeCreate = getNative(Object, 'create');
-
-module.exports = nativeCreate;
-
-},{"./_getNative":54}],82:[function(_dereq_,module,exports){
-var overArg = _dereq_('./_overArg');
-
-/* Built-in method references for those with the same name as other `lodash` methods. */
-var nativeKeys = overArg(Object.keys, Object);
-
-module.exports = nativeKeys;
-
-},{"./_overArg":85}],83:[function(_dereq_,module,exports){
-var freeGlobal = _dereq_('./_freeGlobal');
-
-/** Detect free variable `exports`. */
-var freeExports = typeof exports == 'object' && exports && !exports.nodeType && exports;
-
-/** Detect free variable `module`. */
-var freeModule = freeExports && typeof module == 'object' && module && !module.nodeType && module;
-
-/** Detect the popular CommonJS extension `module.exports`. */
-var moduleExports = freeModule && freeModule.exports === freeExports;
-
-/** Detect free variable `process` from Node.js. */
-var freeProcess = moduleExports && freeGlobal.process;
-
-/** Used to access faster Node.js helpers. */
-var nodeUtil = (function() {
-  try {
-    return freeProcess && freeProcess.binding && freeProcess.binding('util');
-  } catch (e) {}
-}());
-
-module.exports = nodeUtil;
-
-},{"./_freeGlobal":51}],84:[function(_dereq_,module,exports){
-/** Used for built-in method references. */
-var objectProto = Object.prototype;
-
-/**
- * Used to resolve the
- * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
- * of values.
- */
-var nativeObjectToString = objectProto.toString;
-
 /**
  * Converts `value` to a string using `Object.prototype.toString`.
  *
@@ -7468,258 +6864,6 @@ var nativeObjectToString = objectProto.toString;
 function objectToString(value) {
   return nativeObjectToString.call(value);
 }
-
-module.exports = objectToString;
-
-},{}],85:[function(_dereq_,module,exports){
-/**
- * Creates a unary function that invokes `func` with its argument transformed.
- *
- * @private
- * @param {Function} func The function to wrap.
- * @param {Function} transform The argument transform.
- * @returns {Function} Returns the new function.
- */
-function overArg(func, transform) {
-  return function(arg) {
-    return func(transform(arg));
-  };
-}
-
-module.exports = overArg;
-
-},{}],86:[function(_dereq_,module,exports){
-var freeGlobal = _dereq_('./_freeGlobal');
-
-/** Detect free variable `self`. */
-var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
-
-/** Used as a reference to the global object. */
-var root = freeGlobal || freeSelf || Function('return this')();
-
-module.exports = root;
-
-},{"./_freeGlobal":51}],87:[function(_dereq_,module,exports){
-/** Used to stand-in for `undefined` hash values. */
-var HASH_UNDEFINED = '__lodash_hash_undefined__';
-
-/**
- * Adds `value` to the array cache.
- *
- * @private
- * @name add
- * @memberOf SetCache
- * @alias push
- * @param {*} value The value to cache.
- * @returns {Object} Returns the cache instance.
- */
-function setCacheAdd(value) {
-  this.__data__.set(value, HASH_UNDEFINED);
-  return this;
-}
-
-module.exports = setCacheAdd;
-
-},{}],88:[function(_dereq_,module,exports){
-/**
- * Checks if `value` is in the array cache.
- *
- * @private
- * @name has
- * @memberOf SetCache
- * @param {*} value The value to search for.
- * @returns {number} Returns `true` if `value` is found, else `false`.
- */
-function setCacheHas(value) {
-  return this.__data__.has(value);
-}
-
-module.exports = setCacheHas;
-
-},{}],89:[function(_dereq_,module,exports){
-/**
- * Converts `set` to an array of its values.
- *
- * @private
- * @param {Object} set The set to convert.
- * @returns {Array} Returns the values.
- */
-function setToArray(set) {
-  var index = -1,
-      result = Array(set.size);
-
-  set.forEach(function(value) {
-    result[++index] = value;
-  });
-  return result;
-}
-
-module.exports = setToArray;
-
-},{}],90:[function(_dereq_,module,exports){
-var ListCache = _dereq_('./_ListCache');
-
-/**
- * Removes all key-value entries from the stack.
- *
- * @private
- * @name clear
- * @memberOf Stack
- */
-function stackClear() {
-  this.__data__ = new ListCache;
-  this.size = 0;
-}
-
-module.exports = stackClear;
-
-},{"./_ListCache":13}],91:[function(_dereq_,module,exports){
-/**
- * Removes `key` and its value from the stack.
- *
- * @private
- * @name delete
- * @memberOf Stack
- * @param {string} key The key of the value to remove.
- * @returns {boolean} Returns `true` if the entry was removed, else `false`.
- */
-function stackDelete(key) {
-  var data = this.__data__,
-      result = data['delete'](key);
-
-  this.size = data.size;
-  return result;
-}
-
-module.exports = stackDelete;
-
-},{}],92:[function(_dereq_,module,exports){
-/**
- * Gets the stack value for `key`.
- *
- * @private
- * @name get
- * @memberOf Stack
- * @param {string} key The key of the value to get.
- * @returns {*} Returns the entry value.
- */
-function stackGet(key) {
-  return this.__data__.get(key);
-}
-
-module.exports = stackGet;
-
-},{}],93:[function(_dereq_,module,exports){
-/**
- * Checks if a stack value for `key` exists.
- *
- * @private
- * @name has
- * @memberOf Stack
- * @param {string} key The key of the entry to check.
- * @returns {boolean} Returns `true` if an entry for `key` exists, else `false`.
- */
-function stackHas(key) {
-  return this.__data__.has(key);
-}
-
-module.exports = stackHas;
-
-},{}],94:[function(_dereq_,module,exports){
-var ListCache = _dereq_('./_ListCache'),
-    Map = _dereq_('./_Map'),
-    MapCache = _dereq_('./_MapCache');
-
-/** Used as the size to enable large array optimizations. */
-var LARGE_ARRAY_SIZE = 200;
-
-/**
- * Sets the stack `key` to `value`.
- *
- * @private
- * @name set
- * @memberOf Stack
- * @param {string} key The key of the value to set.
- * @param {*} value The value to set.
- * @returns {Object} Returns the stack cache instance.
- */
-function stackSet(key, value) {
-  var data = this.__data__;
-  if (data instanceof ListCache) {
-    var pairs = data.__data__;
-    if (!Map || (pairs.length < LARGE_ARRAY_SIZE - 1)) {
-      pairs.push([key, value]);
-      this.size = ++data.size;
-      return this;
-    }
-    data = this.__data__ = new MapCache(pairs);
-  }
-  data.set(key, value);
-  this.size = data.size;
-  return this;
-}
-
-module.exports = stackSet;
-
-},{"./_ListCache":13,"./_Map":14,"./_MapCache":15}],95:[function(_dereq_,module,exports){
-var memoizeCapped = _dereq_('./_memoizeCapped');
-
-/** Used to match property names within property paths. */
-var reLeadingDot = /^\./,
-    rePropName = /[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(?:\.|\[\])(?:\.|\[\]|$))/g;
-
-/** Used to match backslashes in property paths. */
-var reEscapeChar = /\\(\\)?/g;
-
-/**
- * Converts `string` to a property path array.
- *
- * @private
- * @param {string} string The string to convert.
- * @returns {Array} Returns the property path array.
- */
-var stringToPath = memoizeCapped(function(string) {
-  var result = [];
-  if (reLeadingDot.test(string)) {
-    result.push('');
-  }
-  string.replace(rePropName, function(match, number, quote, string) {
-    result.push(quote ? string.replace(reEscapeChar, '$1') : (number || match));
-  });
-  return result;
-});
-
-module.exports = stringToPath;
-
-},{"./_memoizeCapped":80}],96:[function(_dereq_,module,exports){
-var isSymbol = _dereq_('./isSymbol');
-
-/** Used as references for various `Number` constants. */
-var INFINITY = 1 / 0;
-
-/**
- * Converts `value` to a string key if it's not a string or symbol.
- *
- * @private
- * @param {*} value The value to inspect.
- * @returns {string|symbol} Returns the key.
- */
-function toKey(value) {
-  if (typeof value == 'string' || isSymbol(value)) {
-    return value;
-  }
-  var result = (value + '');
-  return (result == '0' && (1 / value) == -INFINITY) ? '-0' : result;
-}
-
-module.exports = toKey;
-
-},{"./isSymbol":109}],97:[function(_dereq_,module,exports){
-/** Used for built-in method references. */
-var funcProto = Function.prototype;
-
-/** Used to resolve the decompiled source of functions. */
-var funcToString = funcProto.toString;
 
 /**
  * Converts `func` to its source code.
@@ -7740,9 +6884,6 @@ function toSource(func) {
   return '';
 }
 
-module.exports = toSource;
-
-},{}],98:[function(_dereq_,module,exports){
 /**
  * Performs a
  * [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
@@ -7779,56 +6920,6 @@ function eq(value, other) {
   return value === other || (value !== value && other !== other);
 }
 
-module.exports = eq;
-
-},{}],99:[function(_dereq_,module,exports){
-var baseGet = _dereq_('./_baseGet');
-
-/**
- * Gets the value at `path` of `object`. If the resolved value is
- * `undefined`, the `defaultValue` is returned in its place.
- *
- * @static
- * @memberOf _
- * @since 3.7.0
- * @category Object
- * @param {Object} object The object to query.
- * @param {Array|string} path The path of the property to get.
- * @param {*} [defaultValue] The value returned for `undefined` resolved values.
- * @returns {*} Returns the resolved value.
- * @example
- *
- * var object = { 'a': [{ 'b': { 'c': 3 } }] };
- *
- * _.get(object, 'a[0].b.c');
- * // => 3
- *
- * _.get(object, ['a', '0', 'b', 'c']);
- * // => 3
- *
- * _.get(object, 'a.b.c', 'default');
- * // => 'default'
- */
-function get(object, path, defaultValue) {
-  var result = object == null ? undefined : baseGet(object, path);
-  return result === undefined ? defaultValue : result;
-}
-
-module.exports = get;
-
-},{"./_baseGet":31}],100:[function(_dereq_,module,exports){
-var baseIsArguments = _dereq_('./_baseIsArguments'),
-    isObjectLike = _dereq_('./isObjectLike');
-
-/** Used for built-in method references. */
-var objectProto = Object.prototype;
-
-/** Used to check objects for own properties. */
-var hasOwnProperty = objectProto.hasOwnProperty;
-
-/** Built-in value references. */
-var propertyIsEnumerable = objectProto.propertyIsEnumerable;
-
 /**
  * Checks if `value` is likely an `arguments` object.
  *
@@ -7852,9 +6943,6 @@ var isArguments = baseIsArguments(function() { return arguments; }()) ? baseIsAr
     !propertyIsEnumerable.call(value, 'callee');
 };
 
-module.exports = isArguments;
-
-},{"./_baseIsArguments":34,"./isObjectLike":108}],101:[function(_dereq_,module,exports){
 /**
  * Checks if `value` is classified as an `Array` object.
  *
@@ -7879,12 +6967,6 @@ module.exports = isArguments;
  * // => false
  */
 var isArray = Array.isArray;
-
-module.exports = isArray;
-
-},{}],102:[function(_dereq_,module,exports){
-var isFunction = _dereq_('./isFunction'),
-    isLength = _dereq_('./isLength');
 
 /**
  * Checks if `value` is array-like. A value is considered array-like if it's
@@ -7915,27 +6997,6 @@ function isArrayLike(value) {
   return value != null && isLength(value.length) && !isFunction(value);
 }
 
-module.exports = isArrayLike;
-
-},{"./isFunction":105,"./isLength":106}],103:[function(_dereq_,module,exports){
-var root = _dereq_('./_root'),
-    stubFalse = _dereq_('./stubFalse');
-
-/** Detect free variable `exports`. */
-var freeExports = typeof exports == 'object' && exports && !exports.nodeType && exports;
-
-/** Detect free variable `module`. */
-var freeModule = freeExports && typeof module == 'object' && module && !module.nodeType && module;
-
-/** Detect the popular CommonJS extension `module.exports`. */
-var moduleExports = freeModule && freeModule.exports === freeExports;
-
-/** Built-in value references. */
-var Buffer = moduleExports ? root.Buffer : undefined;
-
-/* Built-in method references for those with the same name as other `lodash` methods. */
-var nativeIsBuffer = Buffer ? Buffer.isBuffer : undefined;
-
 /**
  * Checks if `value` is a buffer.
  *
@@ -7954,11 +7015,6 @@ var nativeIsBuffer = Buffer ? Buffer.isBuffer : undefined;
  * // => false
  */
 var isBuffer = nativeIsBuffer || stubFalse;
-
-module.exports = isBuffer;
-
-},{"./_root":86,"./stubFalse":115}],104:[function(_dereq_,module,exports){
-var baseIsEqual = _dereq_('./_baseIsEqual');
 
 /**
  * Performs a deep comparison between two values to determine if they are
@@ -7992,18 +7048,6 @@ function isEqual(value, other) {
   return baseIsEqual(value, other);
 }
 
-module.exports = isEqual;
-
-},{"./_baseIsEqual":35}],105:[function(_dereq_,module,exports){
-var baseGetTag = _dereq_('./_baseGetTag'),
-    isObject = _dereq_('./isObject');
-
-/** `Object#toString` result references. */
-var asyncTag = '[object AsyncFunction]',
-    funcTag = '[object Function]',
-    genTag = '[object GeneratorFunction]',
-    proxyTag = '[object Proxy]';
-
 /**
  * Checks if `value` is classified as a `Function` object.
  *
@@ -8030,12 +7074,6 @@ function isFunction(value) {
   var tag = baseGetTag(value);
   return tag == funcTag || tag == genTag || tag == asyncTag || tag == proxyTag;
 }
-
-module.exports = isFunction;
-
-},{"./_baseGetTag":33,"./isObject":107}],106:[function(_dereq_,module,exports){
-/** Used as references for various `Number` constants. */
-var MAX_SAFE_INTEGER = 9007199254740991;
 
 /**
  * Checks if `value` is a valid array-like length.
@@ -8068,9 +7106,6 @@ function isLength(value) {
     value > -1 && value % 1 == 0 && value <= MAX_SAFE_INTEGER;
 }
 
-module.exports = isLength;
-
-},{}],107:[function(_dereq_,module,exports){
 /**
  * Checks if `value` is the
  * [language type](http://www.ecma-international.org/ecma-262/7.0/#sec-ecmascript-language-types)
@@ -8101,9 +7136,6 @@ function isObject(value) {
   return value != null && (type == 'object' || type == 'function');
 }
 
-module.exports = isObject;
-
-},{}],108:[function(_dereq_,module,exports){
 /**
  * Checks if `value` is object-like. A value is object-like if it's not `null`
  * and has a `typeof` result of "object".
@@ -8132,47 +7164,6 @@ function isObjectLike(value) {
   return value != null && typeof value == 'object';
 }
 
-module.exports = isObjectLike;
-
-},{}],109:[function(_dereq_,module,exports){
-var baseGetTag = _dereq_('./_baseGetTag'),
-    isObjectLike = _dereq_('./isObjectLike');
-
-/** `Object#toString` result references. */
-var symbolTag = '[object Symbol]';
-
-/**
- * Checks if `value` is classified as a `Symbol` primitive or object.
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a symbol, else `false`.
- * @example
- *
- * _.isSymbol(Symbol.iterator);
- * // => true
- *
- * _.isSymbol('abc');
- * // => false
- */
-function isSymbol(value) {
-  return typeof value == 'symbol' ||
-    (isObjectLike(value) && baseGetTag(value) == symbolTag);
-}
-
-module.exports = isSymbol;
-
-},{"./_baseGetTag":33,"./isObjectLike":108}],110:[function(_dereq_,module,exports){
-var baseIsTypedArray = _dereq_('./_baseIsTypedArray'),
-    baseUnary = _dereq_('./_baseUnary'),
-    nodeUtil = _dereq_('./_nodeUtil');
-
-/* Node.js helper references. */
-var nodeIsTypedArray = nodeUtil && nodeUtil.isTypedArray;
-
 /**
  * Checks if `value` is classified as a typed array.
  *
@@ -8191,13 +7182,6 @@ var nodeIsTypedArray = nodeUtil && nodeUtil.isTypedArray;
  * // => false
  */
 var isTypedArray = nodeIsTypedArray ? baseUnary(nodeIsTypedArray) : baseIsTypedArray;
-
-module.exports = isTypedArray;
-
-},{"./_baseIsTypedArray":38,"./_baseUnary":43,"./_nodeUtil":83}],111:[function(_dereq_,module,exports){
-var arrayLikeKeys = _dereq_('./_arrayLikeKeys'),
-    baseKeys = _dereq_('./_baseKeys'),
-    isArrayLike = _dereq_('./isArrayLike');
 
 /**
  * Creates an array of the own enumerable property names of `object`.
@@ -8231,13 +7215,749 @@ function keys(object) {
   return isArrayLike(object) ? arrayLikeKeys(object) : baseKeys(object);
 }
 
-module.exports = keys;
+/**
+ * This method returns a new empty array.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.13.0
+ * @category Util
+ * @returns {Array} Returns the new empty array.
+ * @example
+ *
+ * var arrays = _.times(2, _.stubArray);
+ *
+ * console.log(arrays);
+ * // => [[], []]
+ *
+ * console.log(arrays[0] === arrays[1]);
+ * // => false
+ */
+function stubArray() {
+  return [];
+}
 
-},{"./_arrayLikeKeys":24,"./_baseKeys":39,"./isArrayLike":102}],112:[function(_dereq_,module,exports){
-var MapCache = _dereq_('./_MapCache');
+/**
+ * This method returns `false`.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.13.0
+ * @category Util
+ * @returns {boolean} Returns `false`.
+ * @example
+ *
+ * _.times(2, _.stubFalse);
+ * // => [false, false]
+ */
+function stubFalse() {
+  return false;
+}
 
-/** Error message constants. */
+module.exports = isEqual;
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],12:[function(_dereq_,module,exports){
+(function (global){
+/**
+ * lodash (Custom Build) <https://lodash.com/>
+ * Build: `lodash modularize exports="npm" -o ./`
+ * Copyright jQuery Foundation and other contributors <https://jquery.org/>
+ * Released under MIT license <https://lodash.com/license>
+ * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
+ * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+ */
+
+/** Used as the `TypeError` message for "Functions" methods. */
 var FUNC_ERROR_TEXT = 'Expected a function';
+
+/** Used to stand-in for `undefined` hash values. */
+var HASH_UNDEFINED = '__lodash_hash_undefined__';
+
+/** Used as references for various `Number` constants. */
+var INFINITY = 1 / 0,
+    MAX_SAFE_INTEGER = 9007199254740991;
+
+/** `Object#toString` result references. */
+var funcTag = '[object Function]',
+    genTag = '[object GeneratorFunction]',
+    symbolTag = '[object Symbol]';
+
+/** Used to match property names within property paths. */
+var reIsDeepProp = /\.|\[(?:[^[\]]*|(["'])(?:(?!\1)[^\\]|\\.)*?\1)\]/,
+    reIsPlainProp = /^\w*$/,
+    reLeadingDot = /^\./,
+    rePropName = /[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(?:\.|\[\])(?:\.|\[\]|$))/g;
+
+/**
+ * Used to match `RegExp`
+ * [syntax characters](http://ecma-international.org/ecma-262/7.0/#sec-patterns).
+ */
+var reRegExpChar = /[\\^$.*+?()[\]{}|]/g;
+
+/** Used to match backslashes in property paths. */
+var reEscapeChar = /\\(\\)?/g;
+
+/** Used to detect host constructors (Safari). */
+var reIsHostCtor = /^\[object .+?Constructor\]$/;
+
+/** Used to detect unsigned integer values. */
+var reIsUint = /^(?:0|[1-9]\d*)$/;
+
+/** Detect free variable `global` from Node.js. */
+var freeGlobal = typeof global == 'object' && global && global.Object === Object && global;
+
+/** Detect free variable `self`. */
+var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
+
+/** Used as a reference to the global object. */
+var root = freeGlobal || freeSelf || Function('return this')();
+
+/**
+ * Gets the value at `key` of `object`.
+ *
+ * @private
+ * @param {Object} [object] The object to query.
+ * @param {string} key The key of the property to get.
+ * @returns {*} Returns the property value.
+ */
+function getValue(object, key) {
+  return object == null ? undefined : object[key];
+}
+
+/**
+ * Checks if `value` is a host object in IE < 9.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a host object, else `false`.
+ */
+function isHostObject(value) {
+  // Many host objects are `Object` objects that can coerce to strings
+  // despite having improperly defined `toString` methods.
+  var result = false;
+  if (value != null && typeof value.toString != 'function') {
+    try {
+      result = !!(value + '');
+    } catch (e) {}
+  }
+  return result;
+}
+
+/** Used for built-in method references. */
+var arrayProto = Array.prototype,
+    funcProto = Function.prototype,
+    objectProto = Object.prototype;
+
+/** Used to detect overreaching core-js shims. */
+var coreJsData = root['__core-js_shared__'];
+
+/** Used to detect methods masquerading as native. */
+var maskSrcKey = (function() {
+  var uid = /[^.]+$/.exec(coreJsData && coreJsData.keys && coreJsData.keys.IE_PROTO || '');
+  return uid ? ('Symbol(src)_1.' + uid) : '';
+}());
+
+/** Used to resolve the decompiled source of functions. */
+var funcToString = funcProto.toString;
+
+/** Used to check objects for own properties. */
+var hasOwnProperty = objectProto.hasOwnProperty;
+
+/**
+ * Used to resolve the
+ * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
+ * of values.
+ */
+var objectToString = objectProto.toString;
+
+/** Used to detect if a method is native. */
+var reIsNative = RegExp('^' +
+  funcToString.call(hasOwnProperty).replace(reRegExpChar, '\\$&')
+  .replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g, '$1.*?') + '$'
+);
+
+/** Built-in value references. */
+var Symbol = root.Symbol,
+    splice = arrayProto.splice;
+
+/* Built-in method references that are verified to be native. */
+var Map = getNative(root, 'Map'),
+    nativeCreate = getNative(Object, 'create');
+
+/** Used to convert symbols to primitives and strings. */
+var symbolProto = Symbol ? Symbol.prototype : undefined,
+    symbolToString = symbolProto ? symbolProto.toString : undefined;
+
+/**
+ * Creates a hash object.
+ *
+ * @private
+ * @constructor
+ * @param {Array} [entries] The key-value pairs to cache.
+ */
+function Hash(entries) {
+  var index = -1,
+      length = entries ? entries.length : 0;
+
+  this.clear();
+  while (++index < length) {
+    var entry = entries[index];
+    this.set(entry[0], entry[1]);
+  }
+}
+
+/**
+ * Removes all key-value entries from the hash.
+ *
+ * @private
+ * @name clear
+ * @memberOf Hash
+ */
+function hashClear() {
+  this.__data__ = nativeCreate ? nativeCreate(null) : {};
+}
+
+/**
+ * Removes `key` and its value from the hash.
+ *
+ * @private
+ * @name delete
+ * @memberOf Hash
+ * @param {Object} hash The hash to modify.
+ * @param {string} key The key of the value to remove.
+ * @returns {boolean} Returns `true` if the entry was removed, else `false`.
+ */
+function hashDelete(key) {
+  return this.has(key) && delete this.__data__[key];
+}
+
+/**
+ * Gets the hash value for `key`.
+ *
+ * @private
+ * @name get
+ * @memberOf Hash
+ * @param {string} key The key of the value to get.
+ * @returns {*} Returns the entry value.
+ */
+function hashGet(key) {
+  var data = this.__data__;
+  if (nativeCreate) {
+    var result = data[key];
+    return result === HASH_UNDEFINED ? undefined : result;
+  }
+  return hasOwnProperty.call(data, key) ? data[key] : undefined;
+}
+
+/**
+ * Checks if a hash value for `key` exists.
+ *
+ * @private
+ * @name has
+ * @memberOf Hash
+ * @param {string} key The key of the entry to check.
+ * @returns {boolean} Returns `true` if an entry for `key` exists, else `false`.
+ */
+function hashHas(key) {
+  var data = this.__data__;
+  return nativeCreate ? data[key] !== undefined : hasOwnProperty.call(data, key);
+}
+
+/**
+ * Sets the hash `key` to `value`.
+ *
+ * @private
+ * @name set
+ * @memberOf Hash
+ * @param {string} key The key of the value to set.
+ * @param {*} value The value to set.
+ * @returns {Object} Returns the hash instance.
+ */
+function hashSet(key, value) {
+  var data = this.__data__;
+  data[key] = (nativeCreate && value === undefined) ? HASH_UNDEFINED : value;
+  return this;
+}
+
+// Add methods to `Hash`.
+Hash.prototype.clear = hashClear;
+Hash.prototype['delete'] = hashDelete;
+Hash.prototype.get = hashGet;
+Hash.prototype.has = hashHas;
+Hash.prototype.set = hashSet;
+
+/**
+ * Creates an list cache object.
+ *
+ * @private
+ * @constructor
+ * @param {Array} [entries] The key-value pairs to cache.
+ */
+function ListCache(entries) {
+  var index = -1,
+      length = entries ? entries.length : 0;
+
+  this.clear();
+  while (++index < length) {
+    var entry = entries[index];
+    this.set(entry[0], entry[1]);
+  }
+}
+
+/**
+ * Removes all key-value entries from the list cache.
+ *
+ * @private
+ * @name clear
+ * @memberOf ListCache
+ */
+function listCacheClear() {
+  this.__data__ = [];
+}
+
+/**
+ * Removes `key` and its value from the list cache.
+ *
+ * @private
+ * @name delete
+ * @memberOf ListCache
+ * @param {string} key The key of the value to remove.
+ * @returns {boolean} Returns `true` if the entry was removed, else `false`.
+ */
+function listCacheDelete(key) {
+  var data = this.__data__,
+      index = assocIndexOf(data, key);
+
+  if (index < 0) {
+    return false;
+  }
+  var lastIndex = data.length - 1;
+  if (index == lastIndex) {
+    data.pop();
+  } else {
+    splice.call(data, index, 1);
+  }
+  return true;
+}
+
+/**
+ * Gets the list cache value for `key`.
+ *
+ * @private
+ * @name get
+ * @memberOf ListCache
+ * @param {string} key The key of the value to get.
+ * @returns {*} Returns the entry value.
+ */
+function listCacheGet(key) {
+  var data = this.__data__,
+      index = assocIndexOf(data, key);
+
+  return index < 0 ? undefined : data[index][1];
+}
+
+/**
+ * Checks if a list cache value for `key` exists.
+ *
+ * @private
+ * @name has
+ * @memberOf ListCache
+ * @param {string} key The key of the entry to check.
+ * @returns {boolean} Returns `true` if an entry for `key` exists, else `false`.
+ */
+function listCacheHas(key) {
+  return assocIndexOf(this.__data__, key) > -1;
+}
+
+/**
+ * Sets the list cache `key` to `value`.
+ *
+ * @private
+ * @name set
+ * @memberOf ListCache
+ * @param {string} key The key of the value to set.
+ * @param {*} value The value to set.
+ * @returns {Object} Returns the list cache instance.
+ */
+function listCacheSet(key, value) {
+  var data = this.__data__,
+      index = assocIndexOf(data, key);
+
+  if (index < 0) {
+    data.push([key, value]);
+  } else {
+    data[index][1] = value;
+  }
+  return this;
+}
+
+// Add methods to `ListCache`.
+ListCache.prototype.clear = listCacheClear;
+ListCache.prototype['delete'] = listCacheDelete;
+ListCache.prototype.get = listCacheGet;
+ListCache.prototype.has = listCacheHas;
+ListCache.prototype.set = listCacheSet;
+
+/**
+ * Creates a map cache object to store key-value pairs.
+ *
+ * @private
+ * @constructor
+ * @param {Array} [entries] The key-value pairs to cache.
+ */
+function MapCache(entries) {
+  var index = -1,
+      length = entries ? entries.length : 0;
+
+  this.clear();
+  while (++index < length) {
+    var entry = entries[index];
+    this.set(entry[0], entry[1]);
+  }
+}
+
+/**
+ * Removes all key-value entries from the map.
+ *
+ * @private
+ * @name clear
+ * @memberOf MapCache
+ */
+function mapCacheClear() {
+  this.__data__ = {
+    'hash': new Hash,
+    'map': new (Map || ListCache),
+    'string': new Hash
+  };
+}
+
+/**
+ * Removes `key` and its value from the map.
+ *
+ * @private
+ * @name delete
+ * @memberOf MapCache
+ * @param {string} key The key of the value to remove.
+ * @returns {boolean} Returns `true` if the entry was removed, else `false`.
+ */
+function mapCacheDelete(key) {
+  return getMapData(this, key)['delete'](key);
+}
+
+/**
+ * Gets the map value for `key`.
+ *
+ * @private
+ * @name get
+ * @memberOf MapCache
+ * @param {string} key The key of the value to get.
+ * @returns {*} Returns the entry value.
+ */
+function mapCacheGet(key) {
+  return getMapData(this, key).get(key);
+}
+
+/**
+ * Checks if a map value for `key` exists.
+ *
+ * @private
+ * @name has
+ * @memberOf MapCache
+ * @param {string} key The key of the entry to check.
+ * @returns {boolean} Returns `true` if an entry for `key` exists, else `false`.
+ */
+function mapCacheHas(key) {
+  return getMapData(this, key).has(key);
+}
+
+/**
+ * Sets the map `key` to `value`.
+ *
+ * @private
+ * @name set
+ * @memberOf MapCache
+ * @param {string} key The key of the value to set.
+ * @param {*} value The value to set.
+ * @returns {Object} Returns the map cache instance.
+ */
+function mapCacheSet(key, value) {
+  getMapData(this, key).set(key, value);
+  return this;
+}
+
+// Add methods to `MapCache`.
+MapCache.prototype.clear = mapCacheClear;
+MapCache.prototype['delete'] = mapCacheDelete;
+MapCache.prototype.get = mapCacheGet;
+MapCache.prototype.has = mapCacheHas;
+MapCache.prototype.set = mapCacheSet;
+
+/**
+ * Assigns `value` to `key` of `object` if the existing value is not equivalent
+ * using [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
+ * for equality comparisons.
+ *
+ * @private
+ * @param {Object} object The object to modify.
+ * @param {string} key The key of the property to assign.
+ * @param {*} value The value to assign.
+ */
+function assignValue(object, key, value) {
+  var objValue = object[key];
+  if (!(hasOwnProperty.call(object, key) && eq(objValue, value)) ||
+      (value === undefined && !(key in object))) {
+    object[key] = value;
+  }
+}
+
+/**
+ * Gets the index at which the `key` is found in `array` of key-value pairs.
+ *
+ * @private
+ * @param {Array} array The array to inspect.
+ * @param {*} key The key to search for.
+ * @returns {number} Returns the index of the matched value, else `-1`.
+ */
+function assocIndexOf(array, key) {
+  var length = array.length;
+  while (length--) {
+    if (eq(array[length][0], key)) {
+      return length;
+    }
+  }
+  return -1;
+}
+
+/**
+ * The base implementation of `_.isNative` without bad shim checks.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a native function,
+ *  else `false`.
+ */
+function baseIsNative(value) {
+  if (!isObject(value) || isMasked(value)) {
+    return false;
+  }
+  var pattern = (isFunction(value) || isHostObject(value)) ? reIsNative : reIsHostCtor;
+  return pattern.test(toSource(value));
+}
+
+/**
+ * The base implementation of `_.set`.
+ *
+ * @private
+ * @param {Object} object The object to modify.
+ * @param {Array|string} path The path of the property to set.
+ * @param {*} value The value to set.
+ * @param {Function} [customizer] The function to customize path creation.
+ * @returns {Object} Returns `object`.
+ */
+function baseSet(object, path, value, customizer) {
+  if (!isObject(object)) {
+    return object;
+  }
+  path = isKey(path, object) ? [path] : castPath(path);
+
+  var index = -1,
+      length = path.length,
+      lastIndex = length - 1,
+      nested = object;
+
+  while (nested != null && ++index < length) {
+    var key = toKey(path[index]),
+        newValue = value;
+
+    if (index != lastIndex) {
+      var objValue = nested[key];
+      newValue = customizer ? customizer(objValue, key, nested) : undefined;
+      if (newValue === undefined) {
+        newValue = isObject(objValue)
+          ? objValue
+          : (isIndex(path[index + 1]) ? [] : {});
+      }
+    }
+    assignValue(nested, key, newValue);
+    nested = nested[key];
+  }
+  return object;
+}
+
+/**
+ * The base implementation of `_.toString` which doesn't convert nullish
+ * values to empty strings.
+ *
+ * @private
+ * @param {*} value The value to process.
+ * @returns {string} Returns the string.
+ */
+function baseToString(value) {
+  // Exit early for strings to avoid a performance hit in some environments.
+  if (typeof value == 'string') {
+    return value;
+  }
+  if (isSymbol(value)) {
+    return symbolToString ? symbolToString.call(value) : '';
+  }
+  var result = (value + '');
+  return (result == '0' && (1 / value) == -INFINITY) ? '-0' : result;
+}
+
+/**
+ * Casts `value` to a path array if it's not one.
+ *
+ * @private
+ * @param {*} value The value to inspect.
+ * @returns {Array} Returns the cast property path array.
+ */
+function castPath(value) {
+  return isArray(value) ? value : stringToPath(value);
+}
+
+/**
+ * Gets the data for `map`.
+ *
+ * @private
+ * @param {Object} map The map to query.
+ * @param {string} key The reference key.
+ * @returns {*} Returns the map data.
+ */
+function getMapData(map, key) {
+  var data = map.__data__;
+  return isKeyable(key)
+    ? data[typeof key == 'string' ? 'string' : 'hash']
+    : data.map;
+}
+
+/**
+ * Gets the native function at `key` of `object`.
+ *
+ * @private
+ * @param {Object} object The object to query.
+ * @param {string} key The key of the method to get.
+ * @returns {*} Returns the function if it's native, else `undefined`.
+ */
+function getNative(object, key) {
+  var value = getValue(object, key);
+  return baseIsNative(value) ? value : undefined;
+}
+
+/**
+ * Checks if `value` is a valid array-like index.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @param {number} [length=MAX_SAFE_INTEGER] The upper bounds of a valid index.
+ * @returns {boolean} Returns `true` if `value` is a valid index, else `false`.
+ */
+function isIndex(value, length) {
+  length = length == null ? MAX_SAFE_INTEGER : length;
+  return !!length &&
+    (typeof value == 'number' || reIsUint.test(value)) &&
+    (value > -1 && value % 1 == 0 && value < length);
+}
+
+/**
+ * Checks if `value` is a property name and not a property path.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @param {Object} [object] The object to query keys on.
+ * @returns {boolean} Returns `true` if `value` is a property name, else `false`.
+ */
+function isKey(value, object) {
+  if (isArray(value)) {
+    return false;
+  }
+  var type = typeof value;
+  if (type == 'number' || type == 'symbol' || type == 'boolean' ||
+      value == null || isSymbol(value)) {
+    return true;
+  }
+  return reIsPlainProp.test(value) || !reIsDeepProp.test(value) ||
+    (object != null && value in Object(object));
+}
+
+/**
+ * Checks if `value` is suitable for use as unique object key.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is suitable, else `false`.
+ */
+function isKeyable(value) {
+  var type = typeof value;
+  return (type == 'string' || type == 'number' || type == 'symbol' || type == 'boolean')
+    ? (value !== '__proto__')
+    : (value === null);
+}
+
+/**
+ * Checks if `func` has its source masked.
+ *
+ * @private
+ * @param {Function} func The function to check.
+ * @returns {boolean} Returns `true` if `func` is masked, else `false`.
+ */
+function isMasked(func) {
+  return !!maskSrcKey && (maskSrcKey in func);
+}
+
+/**
+ * Converts `string` to a property path array.
+ *
+ * @private
+ * @param {string} string The string to convert.
+ * @returns {Array} Returns the property path array.
+ */
+var stringToPath = memoize(function(string) {
+  string = toString(string);
+
+  var result = [];
+  if (reLeadingDot.test(string)) {
+    result.push('');
+  }
+  string.replace(rePropName, function(match, number, quote, string) {
+    result.push(quote ? string.replace(reEscapeChar, '$1') : (number || match));
+  });
+  return result;
+});
+
+/**
+ * Converts `value` to a string key if it's not a string or symbol.
+ *
+ * @private
+ * @param {*} value The value to inspect.
+ * @returns {string|symbol} Returns the key.
+ */
+function toKey(value) {
+  if (typeof value == 'string' || isSymbol(value)) {
+    return value;
+  }
+  var result = (value + '');
+  return (result == '0' && (1 / value) == -INFINITY) ? '-0' : result;
+}
+
+/**
+ * Converts `func` to its source code.
+ *
+ * @private
+ * @param {Function} func The function to process.
+ * @returns {string} Returns the source code.
+ */
+function toSource(func) {
+  if (func != null) {
+    try {
+      return funcToString.call(func);
+    } catch (e) {}
+    try {
+      return (func + '');
+    } catch (e) {}
+  }
+  return '';
+}
 
 /**
  * Creates a function that memoizes the result of `func`. If `resolver` is
@@ -8250,7 +7970,7 @@ var FUNC_ERROR_TEXT = 'Expected a function';
  * function. Its creation may be customized by replacing the `_.memoize.Cache`
  * constructor with one whose instances implement the
  * [`Map`](http://ecma-international.org/ecma-262/7.0/#sec-properties-of-the-map-prototype-object)
- * method interface of `clear`, `delete`, `get`, `has`, and `set`.
+ * method interface of `delete`, `get`, `has`, and `set`.
  *
  * @static
  * @memberOf _
@@ -8284,7 +8004,7 @@ var FUNC_ERROR_TEXT = 'Expected a function';
  * _.memoize.Cache = WeakMap;
  */
 function memoize(func, resolver) {
-  if (typeof func != 'function' || (resolver != null && typeof resolver != 'function')) {
+  if (typeof func != 'function' || (resolver && typeof resolver != 'function')) {
     throw new TypeError(FUNC_ERROR_TEXT);
   }
   var memoized = function() {
@@ -8296,20 +8016,205 @@ function memoize(func, resolver) {
       return cache.get(key);
     }
     var result = func.apply(this, args);
-    memoized.cache = cache.set(key, result) || cache;
+    memoized.cache = cache.set(key, result);
     return result;
   };
   memoized.cache = new (memoize.Cache || MapCache);
   return memoized;
 }
 
-// Expose `MapCache`.
+// Assign cache to `_.memoize`.
 memoize.Cache = MapCache;
 
-module.exports = memoize;
+/**
+ * Performs a
+ * [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
+ * comparison between two values to determine if they are equivalent.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to compare.
+ * @param {*} other The other value to compare.
+ * @returns {boolean} Returns `true` if the values are equivalent, else `false`.
+ * @example
+ *
+ * var object = { 'a': 1 };
+ * var other = { 'a': 1 };
+ *
+ * _.eq(object, object);
+ * // => true
+ *
+ * _.eq(object, other);
+ * // => false
+ *
+ * _.eq('a', 'a');
+ * // => true
+ *
+ * _.eq('a', Object('a'));
+ * // => false
+ *
+ * _.eq(NaN, NaN);
+ * // => true
+ */
+function eq(value, other) {
+  return value === other || (value !== value && other !== other);
+}
 
-},{"./_MapCache":15}],113:[function(_dereq_,module,exports){
-var baseSet = _dereq_('./_baseSet');
+/**
+ * Checks if `value` is classified as an `Array` object.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is an array, else `false`.
+ * @example
+ *
+ * _.isArray([1, 2, 3]);
+ * // => true
+ *
+ * _.isArray(document.body.children);
+ * // => false
+ *
+ * _.isArray('abc');
+ * // => false
+ *
+ * _.isArray(_.noop);
+ * // => false
+ */
+var isArray = Array.isArray;
+
+/**
+ * Checks if `value` is classified as a `Function` object.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a function, else `false`.
+ * @example
+ *
+ * _.isFunction(_);
+ * // => true
+ *
+ * _.isFunction(/abc/);
+ * // => false
+ */
+function isFunction(value) {
+  // The use of `Object#toString` avoids issues with the `typeof` operator
+  // in Safari 8-9 which returns 'object' for typed array and other constructors.
+  var tag = isObject(value) ? objectToString.call(value) : '';
+  return tag == funcTag || tag == genTag;
+}
+
+/**
+ * Checks if `value` is the
+ * [language type](http://www.ecma-international.org/ecma-262/7.0/#sec-ecmascript-language-types)
+ * of `Object`. (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is an object, else `false`.
+ * @example
+ *
+ * _.isObject({});
+ * // => true
+ *
+ * _.isObject([1, 2, 3]);
+ * // => true
+ *
+ * _.isObject(_.noop);
+ * // => true
+ *
+ * _.isObject(null);
+ * // => false
+ */
+function isObject(value) {
+  var type = typeof value;
+  return !!value && (type == 'object' || type == 'function');
+}
+
+/**
+ * Checks if `value` is object-like. A value is object-like if it's not `null`
+ * and has a `typeof` result of "object".
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
+ * @example
+ *
+ * _.isObjectLike({});
+ * // => true
+ *
+ * _.isObjectLike([1, 2, 3]);
+ * // => true
+ *
+ * _.isObjectLike(_.noop);
+ * // => false
+ *
+ * _.isObjectLike(null);
+ * // => false
+ */
+function isObjectLike(value) {
+  return !!value && typeof value == 'object';
+}
+
+/**
+ * Checks if `value` is classified as a `Symbol` primitive or object.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a symbol, else `false`.
+ * @example
+ *
+ * _.isSymbol(Symbol.iterator);
+ * // => true
+ *
+ * _.isSymbol('abc');
+ * // => false
+ */
+function isSymbol(value) {
+  return typeof value == 'symbol' ||
+    (isObjectLike(value) && objectToString.call(value) == symbolTag);
+}
+
+/**
+ * Converts `value` to a string. An empty string is returned for `null`
+ * and `undefined` values. The sign of `-0` is preserved.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to process.
+ * @returns {string} Returns the string.
+ * @example
+ *
+ * _.toString(null);
+ * // => ''
+ *
+ * _.toString(-0);
+ * // => '-0'
+ *
+ * _.toString([1, 2, 3]);
+ * // => '1,2,3'
+ */
+function toString(value) {
+  return value == null ? '' : baseToString(value);
+}
 
 /**
  * Sets the value at `path` of `object`. If a portion of `path` doesn't exist,
@@ -8345,82 +8250,8 @@ function set(object, path, value) {
 
 module.exports = set;
 
-},{"./_baseSet":40}],114:[function(_dereq_,module,exports){
-/**
- * This method returns a new empty array.
- *
- * @static
- * @memberOf _
- * @since 4.13.0
- * @category Util
- * @returns {Array} Returns the new empty array.
- * @example
- *
- * var arrays = _.times(2, _.stubArray);
- *
- * console.log(arrays);
- * // => [[], []]
- *
- * console.log(arrays[0] === arrays[1]);
- * // => false
- */
-function stubArray() {
-  return [];
-}
-
-module.exports = stubArray;
-
-},{}],115:[function(_dereq_,module,exports){
-/**
- * This method returns `false`.
- *
- * @static
- * @memberOf _
- * @since 4.13.0
- * @category Util
- * @returns {boolean} Returns `false`.
- * @example
- *
- * _.times(2, _.stubFalse);
- * // => [false, false]
- */
-function stubFalse() {
-  return false;
-}
-
-module.exports = stubFalse;
-
-},{}],116:[function(_dereq_,module,exports){
-var baseToString = _dereq_('./_baseToString');
-
-/**
- * Converts `value` to a string. An empty string is returned for `null`
- * and `undefined` values. The sign of `-0` is preserved.
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Lang
- * @param {*} value The value to convert.
- * @returns {string} Returns the converted string.
- * @example
- *
- * _.toString(null);
- * // => ''
- *
- * _.toString(-0);
- * // => '-0'
- *
- * _.toString([1, 2, 3]);
- * // => '1,2,3'
- */
-function toString(value) {
-  return value == null ? '' : baseToString(value);
-}
-
-module.exports = toString;
-
-},{"./_baseToString":42}],117:[function(_dereq_,module,exports){
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],13:[function(_dereq_,module,exports){
 (function (global){
 /*! Native Promise Only
     v0.8.1 (c) Kyle Simpson
@@ -8797,7 +8628,7 @@ module.exports = toString;
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],118:[function(_dereq_,module,exports){
+},{}],14:[function(_dereq_,module,exports){
 module.exports = function (obj) {
     if (!obj || typeof obj !== 'object') return obj;
     
@@ -8834,7 +8665,7 @@ var isArray = Array.isArray || function (xs) {
     return {}.toString.call(xs) === '[object Array]';
 };
 
-},{}],119:[function(_dereq_,module,exports){
+},{}],15:[function(_dereq_,module,exports){
 (function(self) {
   'use strict';
 
@@ -9229,7 +9060,7 @@ var isArray = Array.isArray || function (xs) {
   self.fetch.polyfill = true
 })(typeof self !== 'undefined' ? self : this);
 
-},{}],120:[function(_dereq_,module,exports){
+},{}],16:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -9317,7 +9148,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],121:[function(_dereq_,module,exports){
+},{}],17:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -9495,7 +9326,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],122:[function(_dereq_,module,exports){
+},{}],18:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -9567,7 +9398,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],123:[function(_dereq_,module,exports){
+},{}],19:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -9601,7 +9432,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],124:[function(_dereq_,module,exports){
+},{}],20:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.provider('formioComponents', function() {
@@ -9661,7 +9492,7 @@ module.exports = function(app) {
   }]);
 };
 
-},{}],125:[function(_dereq_,module,exports){
+},{}],21:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -9742,7 +9573,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],126:[function(_dereq_,module,exports){
+},{}],22:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -9771,7 +9602,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],127:[function(_dereq_,module,exports){
+},{}],23:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -9881,7 +9712,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],128:[function(_dereq_,module,exports){
+},{}],24:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -9909,7 +9740,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":166}],129:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":62}],25:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -10027,7 +9858,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],130:[function(_dereq_,module,exports){
+},{}],26:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -10165,7 +9996,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],131:[function(_dereq_,module,exports){
+},{}],27:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -10365,7 +10196,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],132:[function(_dereq_,module,exports){
+},{}],28:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -10398,7 +10229,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],133:[function(_dereq_,module,exports){
+},{}],29:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -10434,7 +10265,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],134:[function(_dereq_,module,exports){
+},{}],30:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -10697,7 +10528,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],135:[function(_dereq_,module,exports){
+},{}],31:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -10733,7 +10564,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":166}],136:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":62}],32:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -10825,7 +10656,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],137:[function(_dereq_,module,exports){
+},{}],33:[function(_dereq_,module,exports){
 "use strict";
 var app = angular.module('formio');
 
@@ -10867,7 +10698,7 @@ _dereq_('./panel')(app);
 _dereq_('./table')(app);
 _dereq_('./well')(app);
 
-},{"./address":120,"./button":121,"./checkbox":122,"./columns":123,"./components":124,"./container":125,"./content":126,"./currency":127,"./custom":128,"./datagrid":129,"./datetime":130,"./day":131,"./email":132,"./fieldset":133,"./file":134,"./hidden":135,"./htmlelement":136,"./number":138,"./page":139,"./panel":140,"./password":141,"./phonenumber":142,"./radio":143,"./resource":144,"./select":145,"./selectboxes":146,"./signature":147,"./survey":148,"./table":149,"./textarea":150,"./textfield":151,"./well":152}],138:[function(_dereq_,module,exports){
+},{"./address":16,"./button":17,"./checkbox":18,"./columns":19,"./components":20,"./container":21,"./content":22,"./currency":23,"./custom":24,"./datagrid":25,"./datetime":26,"./day":27,"./email":28,"./fieldset":29,"./file":30,"./hidden":31,"./htmlelement":32,"./number":34,"./page":35,"./panel":36,"./password":37,"./phonenumber":38,"./radio":39,"./resource":40,"./select":41,"./selectboxes":42,"./signature":43,"./survey":44,"./table":45,"./textarea":46,"./textfield":47,"./well":48}],34:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -10931,7 +10762,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],139:[function(_dereq_,module,exports){
+},{}],35:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -10958,7 +10789,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],140:[function(_dereq_,module,exports){
+},{}],36:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -10994,7 +10825,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],141:[function(_dereq_,module,exports){
+},{}],37:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -11024,7 +10855,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],142:[function(_dereq_,module,exports){
+},{}],38:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -11058,7 +10889,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],143:[function(_dereq_,module,exports){
+},{}],39:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -11108,7 +10939,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],144:[function(_dereq_,module,exports){
+},{}],40:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -11235,13 +11066,10 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],145:[function(_dereq_,module,exports){
+},{}],41:[function(_dereq_,module,exports){
 "use strict";
 /*eslint max-depth: ["error", 6]*/
 
-var _get = _dereq_('lodash/get');
-var _set = _dereq_('lodash/set');
-var _isEqual = _dereq_('lodash/isEqual');
 module.exports = function(app) {
   app.directive('formioSelectItem', [
     '$compile',
@@ -11378,6 +11206,7 @@ module.exports = function(app) {
           '$interpolate',
           '$q',
           '$timeout',
+          'Lodash',
           function(
             $rootScope,
             $scope,
@@ -11385,7 +11214,8 @@ module.exports = function(app) {
             Formio,
             $interpolate,
             $q,
-            $timeout
+            $timeout,
+            Lodash
           ) {
             // FOR-71 - Skip functionality in the builder view.
             if ($scope.builder) return;
@@ -11409,7 +11239,7 @@ module.exports = function(app) {
               if (settings.dataSrc === 'values') {
                 return item.value;
               }
-              return valueProp ? _get(item, valueProp) : item;
+              return valueProp ? Lodash.get(item, valueProp) : item;
             };
 
             $scope.refreshItems = function() {
@@ -11474,7 +11304,7 @@ module.exports = function(app) {
                     for (var i=0; i < $scope.selectItems.length; i++) {
                       var item = $scope.selectItems[i];
                       var selectItem = $scope.getSelectItem(item);
-                      if (_isEqual(selectItem, value)) {
+                      if (Lodash.isEqual(selectItem, value)) {
                         found = true;
                         break;
                       }
@@ -11485,7 +11315,7 @@ module.exports = function(app) {
                       var itemValue = value;
                       if (valueProp) {
                         itemValue = {};
-                        _set(itemValue, valueProp, value);
+                        Lodash.set(itemValue, valueProp, value);
                       }
                       $scope.selectItems.push(itemValue);
                     }
@@ -11771,7 +11601,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"lodash/get":99,"lodash/isEqual":104,"lodash/set":113}],146:[function(_dereq_,module,exports){
+},{}],42:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -11878,7 +11708,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],147:[function(_dereq_,module,exports){
+},{}],43:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -12018,7 +11848,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],148:[function(_dereq_,module,exports){
+},{}],44:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -12094,7 +11924,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],149:[function(_dereq_,module,exports){
+},{}],45:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -12139,7 +11969,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],150:[function(_dereq_,module,exports){
+},{}],46:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -12222,7 +12052,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],151:[function(_dereq_,module,exports){
+},{}],47:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -12282,7 +12112,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],152:[function(_dereq_,module,exports){
+},{}],48:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -12315,7 +12145,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],153:[function(_dereq_,module,exports){
+},{}],49:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -12393,7 +12223,7 @@ module.exports = function() {
   };
 };
 
-},{}],154:[function(_dereq_,module,exports){
+},{}],50:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -12662,7 +12492,7 @@ module.exports = function() {
   };
 };
 
-},{}],155:[function(_dereq_,module,exports){
+},{}],51:[function(_dereq_,module,exports){
 "use strict";
 module.exports = ['$sce', '$parse', '$compile', function($sce, $parse, $compile) {
   return {
@@ -12679,7 +12509,7 @@ module.exports = ['$sce', '$parse', '$compile', function($sce, $parse, $compile)
   };
 }];
 
-},{}],156:[function(_dereq_,module,exports){
+},{}],52:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -13122,7 +12952,7 @@ module.exports = [
   }
 ];
 
-},{}],157:[function(_dereq_,module,exports){
+},{}],53:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'formioComponents',
@@ -13189,7 +13019,7 @@ module.exports = [
   }
 ];
 
-},{}],158:[function(_dereq_,module,exports){
+},{}],54:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -13272,7 +13102,7 @@ module.exports = function() {
   };
 };
 
-},{}],159:[function(_dereq_,module,exports){
+},{}],55:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$compile',
@@ -13291,7 +13121,7 @@ module.exports = [
   }
 ];
 
-},{}],160:[function(_dereq_,module,exports){
+},{}],56:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -13301,7 +13131,7 @@ module.exports = function() {
   };
 };
 
-},{}],161:[function(_dereq_,module,exports){
+},{}],57:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -13333,7 +13163,7 @@ module.exports = function() {
   };
 };
 
-},{}],162:[function(_dereq_,module,exports){
+},{}],58:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -13388,7 +13218,7 @@ module.exports = function() {
   };
 };
 
-},{}],163:[function(_dereq_,module,exports){
+},{}],59:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -13817,7 +13647,7 @@ module.exports = function() {
   };
 };
 
-},{}],164:[function(_dereq_,module,exports){
+},{}],60:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -14000,7 +13830,7 @@ module.exports = [
   }
 ];
 
-},{}],165:[function(_dereq_,module,exports){
+},{}],61:[function(_dereq_,module,exports){
 "use strict";
 var formioUtils = _dereq_('formio-utils');
 
@@ -14102,7 +13932,7 @@ module.exports = function() {
   };
 };
 
-},{"formio-utils":2}],166:[function(_dereq_,module,exports){
+},{"formio-utils":2}],62:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   var generic = function(data, component) {
@@ -14178,19 +14008,23 @@ module.exports = function() {
   };
 };
 
-},{}],167:[function(_dereq_,module,exports){
+},{}],63:[function(_dereq_,module,exports){
 "use strict";
 var _filter = _dereq_('lodash.filter');
 var _get = _dereq_('lodash.get');
+var _set = _dereq_('lodash.set');
+var _isEqual = _dereq_('lodash.isequal');
 
 module.exports = function() {
   return {
     filter: _filter,
-    'get': _get
+    'get': _get,
+    'set': _set,
+    'isEqual': _isEqual
   };
 };
 
-},{"lodash.filter":9,"lodash.get":10}],168:[function(_dereq_,module,exports){
+},{"lodash.filter":9,"lodash.get":10,"lodash.isequal":11,"lodash.set":12}],64:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$q',
@@ -14239,7 +14073,7 @@ module.exports = [
   }
 ];
 
-},{}],169:[function(_dereq_,module,exports){
+},{}],65:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -14273,7 +14107,7 @@ module.exports = [
   }
 ];
 
-},{}],170:[function(_dereq_,module,exports){
+},{}],66:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'FormioUtils',
@@ -14282,7 +14116,7 @@ module.exports = [
   }
 ];
 
-},{}],171:[function(_dereq_,module,exports){
+},{}],67:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$sce',
@@ -14295,7 +14129,7 @@ module.exports = [
   }
 ];
 
-},{}],172:[function(_dereq_,module,exports){
+},{}],68:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   function() {
@@ -14314,7 +14148,7 @@ module.exports = [
   }
 ];
 
-},{}],173:[function(_dereq_,module,exports){
+},{}],69:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'formioTableView',
@@ -14327,7 +14161,7 @@ module.exports = [
   }
 ];
 
-},{}],174:[function(_dereq_,module,exports){
+},{}],70:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -14342,7 +14176,7 @@ module.exports = [
   }
 ];
 
-},{}],175:[function(_dereq_,module,exports){
+},{}],71:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$filter',
@@ -14391,7 +14225,7 @@ module.exports = [
   }
 ];
 
-},{}],176:[function(_dereq_,module,exports){
+},{}],72:[function(_dereq_,module,exports){
 "use strict";
 _dereq_('./polyfills/polyfills');
 
@@ -14528,7 +14362,7 @@ app.run([
 
 _dereq_('./components');
 
-},{"./components":137,"./directives/customValidator":153,"./directives/formio":154,"./directives/formioBindHtml.js":155,"./directives/formioComponent":156,"./directives/formioComponentView":157,"./directives/formioDelete":158,"./directives/formioElement":159,"./directives/formioErrors":160,"./directives/formioSubmission":161,"./directives/formioSubmissions":162,"./directives/formioWizard":163,"./factories/FormioScope":164,"./factories/FormioUtils":165,"./factories/Lodash":167,"./factories/formioInterceptor":168,"./factories/formioTableView":169,"./filters/flattenComponents":170,"./filters/safehtml":171,"./filters/tableComponents":172,"./filters/tableFieldView":173,"./filters/tableView":174,"./filters/translate":175,"./polyfills/polyfills":178,"./providers/Formio":179}],177:[function(_dereq_,module,exports){
+},{"./components":33,"./directives/customValidator":49,"./directives/formio":50,"./directives/formioBindHtml.js":51,"./directives/formioComponent":52,"./directives/formioComponentView":53,"./directives/formioDelete":54,"./directives/formioElement":55,"./directives/formioErrors":56,"./directives/formioSubmission":57,"./directives/formioSubmissions":58,"./directives/formioWizard":59,"./factories/FormioScope":60,"./factories/FormioUtils":61,"./factories/Lodash":63,"./factories/formioInterceptor":64,"./factories/formioTableView":65,"./filters/flattenComponents":66,"./filters/safehtml":67,"./filters/tableComponents":68,"./filters/tableFieldView":69,"./filters/tableView":70,"./filters/translate":71,"./polyfills/polyfills":74,"./providers/Formio":75}],73:[function(_dereq_,module,exports){
 "use strict";
 'use strict';
 
@@ -14559,13 +14393,13 @@ if (typeof Object.assign != 'function') {
   })();
 }
 
-},{}],178:[function(_dereq_,module,exports){
+},{}],74:[function(_dereq_,module,exports){
 "use strict";
 'use strict';
 
 _dereq_('./Object.assign');
 
-},{"./Object.assign":177}],179:[function(_dereq_,module,exports){
+},{"./Object.assign":73}],75:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   // The formio class.
@@ -14633,5 +14467,5 @@ module.exports = function() {
   };
 };
 
-},{"formiojs":3}]},{},[176])(176)
+},{"formiojs":3}]},{},[72])(72)
 });
