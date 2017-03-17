@@ -1005,6 +1005,7 @@ app.controller('ProjectPreviewController', [
 ]);
 
 app.controller('LaunchController', [
+  '$rootScope',
   '$scope',
   '$sce',
   '$location',
@@ -1013,6 +1014,7 @@ app.controller('LaunchController', [
   'FormioAlerts',
   'AppConfig',
   function(
+    $rootScope
     $scope,
     $sce,
     $location,
