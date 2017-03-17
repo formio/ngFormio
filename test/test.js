@@ -38,7 +38,6 @@ new Yadda.FeatureFileSearch('./test/features').each(function(file) {
       .init()
       .setViewportSize({width: 1280, height: 720})
       .url(options.baseUrl, done);
-    done();
   });
 
   featureFile(file, function(feature) {
