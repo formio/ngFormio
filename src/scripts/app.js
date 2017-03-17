@@ -640,10 +640,20 @@ angular
         var path = '';
         switch(AppConfig.pathType) {
           case 'Subdomains':
-            path = AppConfig.apiProtocol + '//' + project.name + '.' + AppConfig.apiServer;
+            if (project.hasOwnProperty('name')) {
+              path = AppConfig.apiProtocol + '//' + project.name + '.' + AppConfig.apiServer;
+            }
+            else if (project.hasOwnProperty('_id')) {
+              path = AppConfig.apiBase + '/project/' + project._id;
+            }
             break;
           case 'Subdirectories':
-            path = AppConfig.apiBase + '/' + project.name;
+            if (project.hasOwnProperty('name')) {
+              path = AppConfig.apiBase + '/' + project.name;
+            }
+            else if (project.hasOwnProperty('_id')) {
+              path = AppConfig.apiBase + '/project/' + project._id;
+            }
             break;
           case 'ProjectId':
             path = AppConfig.apiBase + '/project/' + project._id;
