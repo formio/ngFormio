@@ -48,6 +48,7 @@
     "formio-utils": "^0.2.4",
     "formiojs": "^1.5.4",
     "jquery": "^2.2.4",
+    "lodash": "^4.17.4",
     "lodash.filter": "^4.6.0",
     "lodash.get": "^4.4.2",
     "ng-file-upload": "^12.2.13",
