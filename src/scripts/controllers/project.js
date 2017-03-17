@@ -1014,7 +1014,7 @@ app.controller('LaunchController', [
   'FormioAlerts',
   'AppConfig',
   function(
-    $rootScope
+    $rootScope,
     $scope,
     $sce,
     $location,
