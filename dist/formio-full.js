@@ -78319,7 +78319,7 @@ module.exports = function(app) {
                 $scope.loadMoreItems = function($select, $event) {
                   $event.stopPropagation();
                   $event.preventDefault();
-                  options.params.skip = parseInt(options.params.skip);
+                  options.params.skip = parseInt(options.params.skip, 10);
                   options.params.skip += parseInt(options.params.limit, 10);
                   $scope.refreshItems(null, null, true);
                 };
