@@ -380,6 +380,10 @@ $project-header-color: #eee;
   }
 }
 
+.component-settings-button-clone {
+  display: none;
+}
+
 @media (max-width: $screen-md-min) {
   .navbar-home {
     display: none;
