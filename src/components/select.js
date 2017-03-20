@@ -1,5 +1,8 @@
 /*eslint max-depth: ["error", 6]*/
 var fs = require('fs');
+var _get = require('lodash/get');
+var _isEqual = require('lodash/isEqual');
+var _set = require('lodash/set');
 module.exports = function(app) {
   app.directive('formioSelectItem', [
     '$compile',
@@ -136,7 +139,6 @@ module.exports = function(app) {
           '$interpolate',
           '$q',
           '$timeout',
-          'Lodash',
           function(
             $rootScope,
             $scope,
@@ -144,8 +146,7 @@ module.exports = function(app) {
             Formio,
             $interpolate,
             $q,
-            $timeout,
-            Lodash
+            $timeout
           ) {
             // FOR-71 - Skip functionality in the builder view.
             if ($scope.builder) return;
@@ -169,7 +170,7 @@ module.exports = function(app) {
               if (settings.dataSrc === 'values') {
                 return item.value;
               }
-              return valueProp ? Lodash.get(item, valueProp) : item;
+              return valueProp ? _get(item, valueProp) : item;
             };
 
             $scope.refreshItems = function() {
@@ -234,7 +235,7 @@ module.exports = function(app) {
                     for (var i=0; i < $scope.selectItems.length; i++) {
                       var item = $scope.selectItems[i];
                       var selectItem = $scope.getSelectItem(item);
-                      if (Lodash.isEqual(selectItem, value)) {
+                      if (_isEqual(selectItem, value)) {
                         found = true;
                         break;
                       }
@@ -245,7 +246,7 @@ module.exports = function(app) {
                       var itemValue = value;
                       if (valueProp) {
                         itemValue = {};
-                        Lodash.set(itemValue, valueProp, value);
+                        _set(itemValue, valueProp, value);
                       }
                       $scope.selectItems.push(itemValue);
                     }
