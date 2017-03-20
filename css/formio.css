@@ -1,3 +1,7 @@
+.ngdialog.ngdialog-theme-default .ngdialog-content {
+  width: 65%;
+}
+
 .field-required:after {
   color:red;
   content:" *";
