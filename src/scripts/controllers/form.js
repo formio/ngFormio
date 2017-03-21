@@ -295,6 +295,10 @@ app.controller('FormController', [
     // Load the form and submissions.
     $scope.formio = new Formio($scope.formUrl);
 
+    $scope.options = {
+      hideCloneButton: true
+    };
+
     // The url to goto for embedding.
     $scope.embedCode = '';
     $scope.setEmbedCode = function(gotoUrl) {
