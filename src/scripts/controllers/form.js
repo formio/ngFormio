@@ -1621,7 +1621,7 @@ app.controller('FormSubmissionsController', [
           }
 
           columns.push(getKendoCell(component));
-        }, true);
+        });
 
         columns.push(
           {
