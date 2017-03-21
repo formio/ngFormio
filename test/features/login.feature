@@ -6,7 +6,7 @@ Feature: Login Functionality
     When I enter test@test.com in the .login-container #email field
     When I click the LOG IN button
     Then I have been logged out
-    And I see .alert with the text Username or password was incorrect.
+    And I see .alert with the text User or password was incorrect.
 
   Scenario: Bad password
     Given an account exists with the username ${random-name>login.name}, email ${random-email>login.email} and password ${random-password>login.password}
@@ -22,14 +22,14 @@ Feature: Login Functionality
     When I enter ${random-password} in the .login-container #password field
     And I click the LOG IN button
     Then I have been logged out
-    And I see .alert with the text Username or password was incorrect.
+    And I see .alert with the text User or password was incorrect.
 
   Scenario: Missing password
     Given I am logged out
     When I enter ${random-email} in the .login-container #email field
     And I click the LOG IN button
     Then I have been logged out
-    And I see .alert with the text Username or password was incorrect.
+    And I see .alert with the text User or password was incorrect.
 
   Scenario: Unknown user
     Given I am logged out
