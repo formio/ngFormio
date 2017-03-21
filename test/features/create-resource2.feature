@@ -11,7 +11,7 @@ Feature: Test 16 Creating/Editing A Resource part2
     When I click on the New Resource link
     Then I see the plaintext New Resource
     When I enter Test Resource in the #title field
-    Then I see testResource in the #name field
+    Then I see an input #name with the value testResource
     When I enter submission in the #path field
     And I click on the Create Resource input button
     Then I see a notification with the text [message]
@@ -94,7 +94,7 @@ Feature: Test 16 Creating/Editing A Resource part2
     When I click on the New Resource link
     Then I see the plaintext New Resource
     When I enter Test Resource in the #title field
-    Then I see testResource in the #name field
+    Then I see an input #name with the value testResource
     When I enter testResource in the #path field
     And I click on the Create Resource input button
     Then I see a notification with the text Successfully created form!
@@ -105,22 +105,22 @@ Feature: Test 16 Creating/Editing A Resource part2
     When I click on the Test Resource link
     Then I am on the edit page of ${project3.title} project
     When I enter Edit Resource in the #title field
-    Then I see editResource in the #name field
+    Then I see an input #name with the value editResource
     When I enter editresource in the #path field
     And I click on the Save Resource input button
     Then I see a notification with the text Successfully updated form!
     When I click on the icon fa fa-database
     Then I am on the resource page of ${project3.title} project
     And I can see Edit Resource in the Resources section
-    When I click on the fa fa-code button for Edit Resource resource in Resources section
+    When I click on the fa fa-code button for Edit Resource form
     Then I am on the api page of ${project3.title} project
-    Then I see editresource for Form Endpoint in the table of API Information section
+    Then I see editresource for Form Endpoint in the table
 
   Scenario Outline: Attempt to update an existing ‘Resource’ with invalid path name [name]
     When I click on the New Resource link
     Then I see the plaintext New Resource
     When I enter Edit Resource in the #title field
-    Then I see editResource in the #name field
+    Then I see an input #name with the value editResource
     When I enter editResource in the #path field
     And I click on the Create Resource input button
     Then I see a notification with the text Successfully created form!
@@ -130,7 +130,7 @@ Feature: Test 16 Creating/Editing A Resource part2
     And I can see Edit Resource in the Resources section
     When I click on the Edit Resource link
     When I enter Test Resource in the #title field
-    Then I see testResource in the #name field
+    Then I see an input #name with the value testResource
     When I enter submission in the #path field
     And I click on the Save Resource input button
     Then I see a notification with the text [message]
@@ -212,7 +212,7 @@ Feature: Test 16 Creating/Editing A Resource part2
     When I click on the New Resource link
     Then I see the plaintext New Resource
     When I enter Edit Resource in the #title field
-    Then I see editResource in the #name field
+    Then I see an input #name with the value editResource
     When I enter editResource in the #path field
     And I click on the Create Resource input button
     Then I see a notification with the text Successfully created form!
@@ -223,7 +223,7 @@ Feature: Test 16 Creating/Editing A Resource part2
     When I click on the Edit Resource link
     And I enter Test Resource in the #title field
     And I clear the #path field
-    Then I see testResource in the #name field
+    Then I see an input #name with the value testResource
     When I click on the Save Resource input button
     Then I see a notification with the text Path `path` is required.
     When I click on notification
@@ -236,22 +236,22 @@ Feature: Test 16 Creating/Editing A Resource part2
     Then I am on the edit page of ${project3.title} project
 
   Scenario: Adding Form Tags
-    When I click on the glyphicon glyphicon-edit button for User resource in Resources section
-    When I click on the //*[contains(text(),"Advanced Settings")] element
+    When I click on the glyphicon glyphicon-edit button for User form
+    When I click on the Advanced Settings link
     Then I see the Form Tags component
     When I enter test in the //*[contains(@placeholder,"Add a tag")] field
-    And I click on the //*[contains(text(),"Advanced Settings")] element
-    And I click on the //*[contains(text(),"Advanced Settings")] element
+    And I click on the Advanced Settings link
+    And I click on the Advanced Settings link
     Then I see span text test in the field Form Tags
 
 
   Scenario: Adding Custom Action URL
-    When I click on the glyphicon glyphicon-edit button for User resource in Resources section
-    When I click on the //*[contains(text(),"Advanced Settings")] element
+    When I click on the glyphicon glyphicon-edit button for User form
+    When I click on the Advanced Settings link
     Then I see the Custom Action URL component
     When I enter test.com in the //*[contains(@placeholder,"Enter the custom submission URL.")] field
-    And I click on the //*[contains(text(),"Advanced Settings")] element
-    And I click on the //*[contains(text(),"Advanced Settings")] element
+    And I click on the Advanced Settings link
+    And I click on the Advanced Settings link
     Then I see an input //*[contains(@placeholder,"Enter the custom submission URL.")] with the value test.com
 
 

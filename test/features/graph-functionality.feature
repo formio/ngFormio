@@ -1,18 +1,16 @@
 Feature: Project Overview - Submission Activity Grid Functionality 14
 
   Scenario: Viewing default ‘Submission Grid’ view
-    Given I am logged in for projuser2
-    And I am on /#/
-    When I click on the image with source https://app.form.io/formio-app-basic/assets/images/default-thumb.png
-    Then I see a notification with the text New Project created!
-    And I am on the overview page of Default project
-    And The default display view for the Submission Grid is set to Month
+    Given I am logged in for profileuser3
+    And A project exists with the ${random-title>project3.title} and ${random-description>project3.description}
+    And I am on the ${project3.title} project overview page
+    And I see an input //*[@selected] with the value string:Month
     And I see the current year/month/date next to grid view selector field
     And I see the amount of days on the X Axis of grid matching the number of days in the current month
 
   Scenario Outline: Switching between ‘Submission Grid’ view - [option]
     Then I see list of options Year, Month, Day on selection list
-    When I select [option] in select component
+    When I select [option] in ng-valid ng-not-empty
     Then I see the ‘Grid View’ switch to [number] values in the X axis
 
     Examples:
@@ -22,5 +20,5 @@ Feature: Project Overview - Submission Activity Grid Functionality 14
 
   Scenario: Switching between ‘Submission Grid’ view - Month
     Then I see list of options Year, Month, Day on selection list
-    When I select Month in select component
+    When I select Month in ng-valid ng-not-empty
     Then I see the amount of days on the X Axis of grid matching the number of days in the current month

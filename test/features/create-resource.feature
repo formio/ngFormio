@@ -15,7 +15,8 @@ Feature: Test 16 Creating/Editing A Resource
     When I wait 1000 milliseconds
     And I click the More info link
     Then I am on new window
-    And I am on Resources section of User's Guide page
+    And I am on Resources section
+    And I am on User's Guide section
     And I close the window
 
   Scenario: Searching for existing Resource in Resource search bar
@@ -34,18 +35,19 @@ Feature: Test 16 Creating/Editing A Resource
     And I can see Admin in the Resources section
 
   Scenario: Clicking ‘Edit’ button for Resource on Resource page
-    When I click on the glyphicon glyphicon-edit button for User resource in Resources section
+    When I click on the glyphicon glyphicon-edit button for User form
     Then I am on the edit page of ${project3.title} project
     And I see the Email component
     And I see the Password component
 
   Scenario: Clicking ‘API’ button for Resource on Resource page
-    When I click on the fa fa-code button for Admin resource in Resources section
-    Then I see Key,Type,Persistent for Field in the table of Resource Fields section
-    Then I see email,email,true for Email in the table of Resource Fields section
-    When I click on the //a[contains(text(),'Read full API')] element
+    When I click on the fa fa-code button for Admin form
+    Then I see Key,Type,Persistent for Field in the table
+    Then I see email,email,true for Email in the table
+    When I click on the Read full API Documentation link
     Then I am on new window
-    Then I am on API section of Developer Info page
+    Then I am on API section
+    And I am on Developer Info section
     Then I close the window
     And I wait 1000 milliseconds
     #When I click on the Form Endpoint link in api page
@@ -53,7 +55,7 @@ Feature: Test 16 Creating/Editing A Resource
     #Then I see json data
 
   Scenario Outline: Clicking on the 'I' help icon for [method] method in row [number] in the resource api page
-    When I click on the fa fa-code button for Admin resource in Resources section
+    When I click on the fa fa-code button for Admin form
     Then I am on the api page of ${project3.title} project
     When I click on the //table/tbody/tr[[number]]/td[2]//*[contains(text(),'[method]')]//..//a element
     Then I am on new window
@@ -71,18 +73,18 @@ Feature: Test 16 Creating/Editing A Resource
       | DELETE | 6      | Delete a Submission |
 
   Scenario: Clicking ‘Data’ button for Resource on Resource page
-    When I click on the fa fa-table button for Admin resource in Resources section
+    When I click on the fa fa-table button for Admin form
     Then I am on the submission page of ${project3.title} project
     Then I see the plaintext Admin Resource
 
   Scenario: Clicking ‘Action’ button for Resource on Resource page
-    When I click on the fa fa-paper-plane button for Admin resource in Resources section
+    When I click on the fa fa-paper-plane button for Admin form
     Then I am on the action page of ${project3.title} project
-    Then I see the Save Submission action
-    Then I see the Role Assignment action
+    Then I see the Save Submission link
+    Then I see the Role Assignment link
 
   Scenario:Clicking ‘Access’ button for Resource on Resource page
-    When I click on the fa fa-lock button for Admin resource in Resources section
+    When I click on the fa fa-lock button for Admin form
     Then I am on the permission page of ${project3.title} project
     Then I see Administrator permission for Create All Submissions
     Then I see Administrator permission for Read All Submissions
@@ -91,7 +93,7 @@ Feature: Test 16 Creating/Editing A Resource
     Then I see Anonymous,Authenticated,Administrator permission for Read Form Definition
 
   Scenario:Deleting a ‘Resource’
-    When I click on the glyphicon glyphicon-trash button for Admin resource in Resources section
+    When I click on the glyphicon glyphicon-trash button for Admin form
     And I see button.btn.btn-danger with the text Yes
     And I click the Yes button
     And I wait 2000 milliseconds
@@ -101,7 +103,7 @@ Feature: Test 16 Creating/Editing A Resource
     When I click on the New Resource link
     Then I see the plaintext New Resource
     When I enter Test Resource in the #title field
-    Then I see testResource in the #name field
+    Then I see an input #name with the value testResource
     When I click on the Create Resource input button
     Then I see a notification with the text Path `path` is required.
     When I click on notification
@@ -117,11 +119,11 @@ Feature: Test 16 Creating/Editing A Resource
     When I click on the New Resource link
     Then I see the plaintext New Resource
     When I enter Test Resource in the #title field
-    Then I see testResource in the #name field
+    Then I see an input #name with the value testResource
     When I enter testResource in the #path field
     And I click on the Create Resource input button
     Then I see a notification with the text Successfully created form!
-    And I see element with the Save Resource value
+    And I see an element with the Save Resource value
     When I click on the icon fa fa-database
     Then I am on the resource page of ${project3.title} project
     And I can see Test Resource in the Resources section

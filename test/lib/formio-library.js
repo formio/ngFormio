@@ -526,8 +526,8 @@ module.exports = function (config) {
       })//surendra
       .when('I donot have a value in the $title field', function (title, next) {
         var driver = this.driver;
-        driver.waitForExist('//*[@id="title"]', timeout)
-          .getText('//*[@id="title"]')
+        driver.waitForExist('//*[@id="'+title+'"]', timeout)
+          .getText('//*[@id="'+title+'"]')
           .then(function (result) {
             result += "*";
             assert("*", result);
@@ -543,18 +543,17 @@ module.exports = function (config) {
           .then(next)
           .catch(next);
       })//surendra
-      .when('I click the $link link in $section of project progress', function (link, section, next) {
+      .when('I click on $link in $section section', function (link, section, next) {
         var driver = this.driver;
-        driver.waitForExist('//*[contains(text(),"' + section + '")]//..//..//a[contains(text(),"' + link + '")]', timeout)
-          .waitForVisible('//*[contains(text(),"' + section + '")]//..//..//a[contains(text(),"' + link + '")]', timeout)
-          .click('//*[contains(text(),"' + section + '")]//..//..//a[contains(text(),"' + link + '")]', timeout)
+        driver.waitForExist('//*[text()=\''+section+'\']//..//*[text()=\''+link+'\']', timeout)
+          .waitForVisible('//*[text()=\''+section+'\']//..//*[text()=\''+link+'\']', timeout)
+          .click('//*[text()=\''+section+'\']//..//*[text()=\''+link+'\']', timeout)
           .then(next)
           .catch(next);
       })//surendra
-      .when('I click on the $button button for $name resource in $section section', function (button, name, section, next) {
+      .when('I click on the $button button for $name form', function (button, name, next) {
         var driver = this.driver;
-        var path = '//div//h2[contains(text(),\'' + section + '\')]//..//div[contains(@class,\'form-list\')]//a' +
-          '//h4[contains(text(),\'' + name + '\')]//..//..//..//*[contains(@class,\'' + button + '\')]';
+        var path = '//*[text()=\''+name+'\']//..//..//..//*[contains(@class,\''+button+'\')]';
         driver.waitForExist(path, timeout)
           .click(path, timeout)
           .then(next)
@@ -567,15 +566,6 @@ module.exports = function (config) {
           .then(next)
           .catch(next);
       })//surendra
-      .when('I select $text in select component', function (text, next) {
-        var driver = this.driver;
-        driver.waitForExist('//select', timeout)
-          .click('//select')
-          .waitForVisible('//*[text()="' + text + '"]', timeout)
-          .click('//*[text()="' + text + '"]', timeout)
-          .then(next)
-          .catch(next);
-      })//surendra 'grid view in overview page'
       .when('I clear the $element field', function (element, next) {
         var driver = this.driver;
         driver.waitForExist(element, timeout)
@@ -592,8 +582,8 @@ module.exports = function (config) {
       })//surendra
       .when('I click on the $name link in api page', function (name, next) {
         var driver = this.driver;
-        driver.waitForExist('//*[text()=\'' + name + '\']//..//td/a', timeout)
-          .click('//*[text()=\'' + name + '\']//..//td/a')
+        driver.waitForExist('//*[text()=\'' + name + '\']//..//a', timeout)
+          .click('//*[text()=\'' + name + '\']//..//a')
           .then(next)
           .catch(next);
       })//surendra 'click on the endpoint links in the api page of the resource'
@@ -896,10 +886,10 @@ module.exports = function (config) {
           })
           .catch(next);
       })//surendra
-      .then('Default project is selected by default', function (next) {
+      .then('I see $project project is selected', function (project, next) {
         var driver = this.driver;
         driver.waitForExist('//*[contains(@class,"thumbnail template-card template-card-selected")]', timeout)
-          .isVisible('//*[contains(@class, "thumbnail template-card template-card-selected")]//h4[contains(text(), \'Default\')]')
+          .isVisible('//*[contains(@class, "thumbnail template-card template-card-selected")]//h4[contains(text(), \''+project+'\')]')
           .then(function (res) {
             assert.equal(res, true);
             next();
@@ -993,39 +983,15 @@ module.exports = function (config) {
           })
           .catch(next);
       })//surendra
-
-      .then('I am on $section section of $page page', function (section, page, next) {
-        var driver = this.driver;
-        driver.waitForExist('//*[contains(@class, \'active\')]', timeout)
-          .getText('//*[contains(@class, \'active\')]')
-          .then(function (res) {
-              var d = page + "*" + section;
-              var x = res[0] + "*" + res[1];
-              assert.equal(x, d);
-              next();
-            }
-          )
-          .catch(next);
-      })//surendra
       .then('I am on $section section', function (section, next) {
         var driver = this.driver;
         driver.waitForExist('//*[contains(@class, \'active\')]', timeout)
           .getText('//*[contains(@class, \'active\')]')
           .then(function (res) {
-              assert.equal(res, section);
+              assert.equal((res.indexOf(section)!==-1), true);
               next();
             }
           )
-          .catch(next);
-      })//surendra
-      .then('The default display view for the Submission Grid is set to $value', function (value, next) {
-        var driver = this.driver;
-        driver.waitForExist('//*[@selected]', timeout)
-          .getText('//*[@selected]')
-          .then(function (res) {
-            assert.equal(res, value);
-            next();
-          })
           .catch(next);
       })//surendra
       .then('I see the current year/month/date next to grid view selector field', function (next) {
@@ -1125,23 +1091,13 @@ module.exports = function (config) {
           })
           .catch(next);
       })//surendra
-      .then('I see $TEXT in the $FIELD field', function (text, field, next) {
-        var driver = this.driver;
-        driver.waitForExist(field, timeout)
-          .getValue(field, replacements(text))
-          .then(function (temp) {
-            assert.equal(temp, text)
-            next();
-          })
-          .catch(next);
-      })//surendra//to check text in the autopopulated field
-      .then('I see element with the $value value', function (value, next) {
+      .then('I see an element with the $value value', function (value, next) {
         var driver = this.driver;
         driver.waitForExist('//*[contains(@value,\'' + value + '\')]', timeout)
           .isVisible('//*[contains(@value,\'' + value + '\')]', timeout)
           .then(function (temp) {
             if (typeof(temp) == 'object') {
-              assert.equal(temp[0], true);
+              assert.equal((temp.indexOf(true)!==-1), true);
             } else {
               assert.equal(temp, true);
             }
@@ -1149,9 +1105,9 @@ module.exports = function (config) {
           })
           .catch(next);
       })//surendra
-      .then('I see $text for $field in the table of $section section', function (text, field, section, next) {
+      .then('I see $text for $field in the table', function (text, field, next) {
         var driver = this.driver;
-        var path = '//*[text()=\'' + section + '\']//..//..//*[text()=\'' + field + '\']//..//*[contains(text(),\'\')]';
+        var path = '//*[text()=\''+field+'\']//..//*[contains(text(),\'\')]';
         driver.waitForExist(path, timeout)
           .getText(path)
           .then(function (result) {
@@ -1187,10 +1143,10 @@ module.exports = function (config) {
         driver.waitForExist('//*[text()=\'' + access + '\']//..//..//td[2]', timeout)
           .getText('//*[text()=\'' + access + '\']//..//..//td[2]')
           .then(function (res) {
-            var data = res.split(',');
+            var data = role.split(',');
             var result = false;
             for (var i = 0; i < data.length; i++) {
-              result = res.indexOf(data) > -1;
+              result = res.indexOf(data[i]) > -1;
             }
             assert.equal(result, true);
             next();
@@ -1218,10 +1174,10 @@ module.exports = function (config) {
           })
           .catch(next);
       })//padma
-      .then('I see the $action action', function (action, next) {
+      .then('I see the $link link', function (link, next) {
         var driver = this.driver;
-        driver.waitForExist('//tr[contains(@data-ng-repeat,"action in actions")]//..//a[contains(text(),"' + action + '")]', timeout)
-          .isVisible('//tr[contains(@data-ng-repeat,"action in actions")]//..//a[contains(text(),"' + action + '")]', timeout)
+        driver.waitForExist('//a[contains(text(),"' + link + '")]', timeout)
+          .isVisible('//a[contains(text(),"' + link + '")]', timeout)
           .then(function (temp) {
             assert.equal(temp, true);
             next();
