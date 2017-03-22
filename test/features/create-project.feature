@@ -45,7 +45,7 @@ Feature: {User Portal - Creating Project Templates} 9 and {Custom Project Creati
 
   Scenario: Selecting/Highlighting template tiles
     Given I am on /#/create/project page
-    Then I see Default project is selected
+    Then I see Default project template is selected
     #And The Default tile has green border
 
 

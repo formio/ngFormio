@@ -253,7 +253,3 @@ Feature: Test 16 Creating/Editing A Resource part2
     And I click on the Advanced Settings link
     And I click on the Advanced Settings link
     Then I see an input //*[contains(@placeholder,"Enter the custom submission URL.")] with the value test.com
-
-
-
-

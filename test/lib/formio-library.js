@@ -886,7 +886,7 @@ module.exports = function (config) {
           })
           .catch(next);
       })//surendra
-      .then('I see $project project is selected', function (project, next) {
+      .then('I see $project project template is selected', function (project, next) {
         var driver = this.driver;
         driver.waitForExist('//*[contains(@class,"thumbnail template-card template-card-selected")]', timeout)
           .isVisible('//*[contains(@class, "thumbnail template-card template-card-selected")]//h4[contains(text(), \''+project+'\')]')
