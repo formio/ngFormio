@@ -724,7 +724,7 @@ app.controller('FormImportController', [
     $scope.formType = $stateParams.formType || 'form';
 
     $scope.importForm = function() {
-      (new Formio($scope.embedURL)).loadForm()
+      (new Formio($scope.embedURL)).loadForm(null, {noToken: true})
         .then(function(form) {
           $state.go('project.' + form.type + '.create', { components: form.components});
         })
