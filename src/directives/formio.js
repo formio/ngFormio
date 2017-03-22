@@ -237,7 +237,10 @@ module.exports = function() {
           // Allow custom action urls.
           if ($scope.action) {
             var method = submissionData._id ? 'put' : 'post';
-            $http[method]($scope.action, submissionData).then(function(response) {
+            var action = $scope.action;
+            if (method === 'put')
+              action += '/' + submissionData._id;
+            $http[method](action, submissionData).then(function(response) {
               Formio.clearCache();
               onSubmitDone(method, response.data);
             }, FormioScope.onError($scope, $element))
