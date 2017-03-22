@@ -365,7 +365,6 @@ module.exports = function (config) {
             // User doesn't exist. Create it.
             return createUser(driver, 'formio', 'user/register', username, email, password, next);
           }
-
           // User already exists. Do nothing.
           next();
         });
@@ -612,6 +611,90 @@ module.exports = function (config) {
           .then(function (res) {
             assert.equal(res.value.toLowerCase(), path.toLowerCase());
             next();
+      });
+    })
+    .when('I click (?:on )?the $LINK link', function(link, next) {
+      var driver = this.driver;
+      driver.pause(20)
+        .waitForExist('=' + link, timeout)
+        .click('=' + link)
+        .then(function() {
+          next();
+        })
+        .catch(next);
+    })
+    .when('I click (?:on )?the $BUTTON button', function(button, next) {
+      var driver = this.driver;
+      driver.pause(20)
+        .waitForExist('//button[contains(.,\'' + button + '\')]', timeout)
+        .click('//button[contains(.,\'' + button + '\')]')
+        .then(next)
+        .catch(next);
+    })
+    .when('I click on the $element element', function(element, next) {
+      var driver = this.driver;
+      driver.pause(20)
+        .waitForExist(element, timeout)
+        .waitForVisible(element, timeout)
+        .click(element)
+        .then(next)
+        .catch(next);
+    })
+    .when('I update the project to the $plan', function(plan, next) {
+      var driver = this.driver;
+      driver.waitForExist('//*[contains(@class, "selected-plan")]//h3', timeout)
+        .waitForVisible('//*[contains(@class, "selected-plan")]//h3', timeout)
+        .click('//*[contains(@class, "selected-plan")]//h3')
+        .waitForVisible('//*[contains(@class, "plan-menu")]//*[text()="' + plan + '"]', timeout)
+        .click('//*[contains(@class, "plan-menu")]//*[text()="' + plan + '"]')
+        .then(next)
+        .catch(next);
+    })
+    .when('I select $text in $element', function(text, element, next) {
+      var xpath = element.indexOf('#') !== -1
+        ? '//*[@id="' + (element.split('#'))[1] + '"]'
+        : '//*[contains(@class, "' + element + '")]';
+
+      var driver = this.driver;
+      driver.waitForExist(element, timeout)
+        .waitForVisible(xpath, timeout)
+        .click(xpath)
+        .waitForVisible(xpath + '//*[text()="' + text + '"]', timeout)
+        .click(xpath + '//*[text()="' + text + '"]')
+        .then(next)
+        .catch(next);
+    })
+    .when('I enter $TEXT in the $FIELD field', function(text, field, next) {
+      var driver = this.driver;
+      driver.waitForExist(field, timeout)
+        .setValue(field, replacements(text))
+        .then(next)
+        .catch(next);
+    })
+    .when('I expand the user menu', function(next) {
+      var driver = this.driver;
+      driver.waitForExist('#user-menu')
+        .click('#user-menu')
+        .then(next)
+        .catch(next);
+    })
+    .when('I wait $TIME milliseconds', function(time, next) {
+      var driver = this.driver;
+      driver.pause(time)
+        .then(next)
+        .catch(next);
+    })
+    .then('the title is $TITLE', function(title, next) {
+      var driver = this.driver;
+      driver.getTitle()
+        .then(function(res) {
+          try {
+            assert.equal(res, title);
+            next();
+          }
+          catch(err) {
+            next(err);
+          }
           })
           .catch(next);
       })
