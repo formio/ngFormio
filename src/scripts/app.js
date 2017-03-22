@@ -15,6 +15,7 @@ angular
     'ui.bootstrap',
     'ui.bootstrap.alert',
     'ui.bootstrap.tpls',
+    'ui.bootstrap.tooltip',
     'ui.select',
     'ui.bootstrap.datetimepicker',
     'angularMoment',

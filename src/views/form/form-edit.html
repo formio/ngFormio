@@ -37,7 +37,7 @@
       </div>
       <div class="col-lg-3 col-md-4 col-sm-4 save-buttons pull-right">
         <div class="form-group pull-right">
-          <a class="btn btn-default" ng-click="copy()" ng-if="formId"><span class="glyphicon glyphicon-copy"></span></a>
+          <a class="btn btn-default" ng-click="copy()" ng-if="formId" uib-tooltip="Copy this form" title="Copy this form"><span class="glyphicon glyphicon-copy"></span></a>
           <a class="btn btn-default" ng-click="formId ? cancel() : $state.go('project.' + form.type + '.index')">Cancel</a>
           <input ng-hide="highestRole === 'team_read'" type="submit" class="btn btn-primary" ng-click="saveForm()" value="{{formId ? 'Save' : 'Create'}} {{ capitalize(form.type)  }}" />
         </div>
