@@ -359,7 +359,7 @@ module.exports = function(config) {
 
       var driver = this.driver;
       authUser(driver, 'formio', 'user/login', email, password, function(err, res) {
-        if (err || res === 'Invalid user') {
+        if (err || res === 'User or password was incorrect') {
           // User doesn't exist. Create it.
           return createUser(driver, 'formio', 'user/register', username, email, password, next);
         }
@@ -442,7 +442,8 @@ module.exports = function(config) {
     })
     .when('I click (?:on )?the $LINK link', function(link, next) {
       var driver = this.driver;
-      driver.waitForExist('=' + link, timeout)
+      driver.pause(20)
+        .waitForExist('=' + link, timeout)
         .click('=' + link)
         .then(function() {
           next();
@@ -451,14 +452,16 @@ module.exports = function(config) {
     })
     .when('I click (?:on )?the $BUTTON button', function(button, next) {
       var driver = this.driver;
-      driver.waitForExist('//button[contains(.,\'' + button + '\')]', timeout)
+      driver.pause(20)
+        .waitForExist('//button[contains(.,\'' + button + '\')]', timeout)
         .click('//button[contains(.,\'' + button + '\')]')
         .then(next)
         .catch(next);
     })
     .when('I click on the $element element', function(element, next) {
       var driver = this.driver;
-      driver.waitForExist(element, timeout)
+      driver.pause(20)
+        .waitForExist(element, timeout)
         .waitForVisible(element, timeout)
         .click(element)
         .then(next)

@@ -52,8 +52,7 @@
     </div>
     <input type="hidden" ng-model="form.type"/>
     <hr class="form-line">
-    <form-builder ng-if="formId" src="formUrl" form="form" type="form.type" on-save="saveForm" on-cancel="cancel"></form-builder>
-    <form-builder ng-if="!formId" form="form" type="form.type" on-save="saveForm" on-cancel="cancel"></form-builder>
+    <form-builder url="formUrl" form="form" type="form.type" on-save="saveForm" on-cancel="cancel"></form-builder>
     <div ng-include="'views/form/form-settings.html'"></div>
     <div class="form-group pull-right">
       <a class="btn btn-default" ng-click="formId ? cancel() : $state.go('project.' + form.type + '.index')">Cancel</a>
