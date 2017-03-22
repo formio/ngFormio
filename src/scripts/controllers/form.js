@@ -730,8 +730,8 @@ app.controller('FormImportController', [
         })
         .catch(function(error) {
           FormioAlerts.warn('Error fetching form: ' + error);
-        })
-    }
+        });
+    };
   }
 ]);
 
