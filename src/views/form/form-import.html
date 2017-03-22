@@ -1,0 +1,21 @@
+<ul class="nav nav-pills form-nav" ng-if="!formId">
+  <li role="presentation"><span ng-switch="formType" class="navbar-text form-title">Import {{ capitalize(formType) }}</span></li>
+</ul>
+<div ng-class="{'form-content': !formId}" class="form-edit">
+  <form role="form" novalidate>
+    <div class="row">
+      <div class="col-sm-12">
+        <div id="form-group-title" class="form-group">
+          <label for="embedURL" class="control-label field-required">Embed URL</label>
+          <input type="text" ng-model="embedURL" ng-change="titleChange('{{form.title}}')" class="form-control" id="embedURL" />
+          <p>Enter the embed URL for the {{ formType }} you would like to import. <span class="text-muted">This {{ formType }} must be publicly visible.</span></p>
+        </div>
+      </div>
+    </div>
+    <input type="hidden" ng-model="formType"/>
+    <div class="form-group pull-right">
+      <a class="btn btn-default" ng-click="formId ? cancel() : $state.go('project.' + formType + '.index')">Cancel</a>
+      <input type="submit" class="btn btn-primary" ng-click="importForm()" value="Import {{ capitalize(formType) }}" />
+    </div>
+  </form>
+</div>
