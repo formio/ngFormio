@@ -31,18 +31,17 @@ var config = {
 
 Yadda.plugins.mocha.StepLevelPlugin.init();
 new Yadda.FeatureFileSearch('./test/features').each(function(file) {
-  before(function(done) {
-    library = require('./lib/formio-library')(config);
-    driver = webdriver
-      .remote(options)
-      .init()
-      .setViewportSize({width: 1280, height: 720})
-      .url(options.baseUrl, done);
-  });
-
-  featureFile(file, function(feature) {
-    before(function(done) {
-      driver.url(options.baseUrl, done);
+    before(function (done) {
+      library = require('./lib/formio-library')(config);
+      done();
+    });
+  featureFile(file, function (feature) {
+    before(function (done) {
+      driver = webdriver
+        .remote(options)
+        .init()
+        .setViewportSize({width: 1280, height: 720})
+        .url(options.baseUrl, done);
     });
 
     scenarios(feature.scenarios, function (scenario) {
@@ -55,10 +54,9 @@ new Yadda.FeatureFileSearch('./test/features').each(function(file) {
       takeScreenshotOnFailure(this.currentTest);
     });
 
-  });
-
-  after(function() {
-    driver.end();
+    after(function () {
+      driver.end();
+    });
   });
 });
 
