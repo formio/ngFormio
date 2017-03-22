@@ -238,8 +238,9 @@ module.exports = function() {
           if ($scope.action) {
             var method = submissionData._id ? 'put' : 'post';
             var action = $scope.action;
-            if (method === 'put')
+            if (method === 'put') {
               action += '/' + submissionData._id;
+            }
             $http[method](action, submissionData).then(function(response) {
               Formio.clearCache();
               onSubmitDone(method, response.data);
