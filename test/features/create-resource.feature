@@ -100,7 +100,7 @@ Feature: Test 16 Creating/Editing A Resource
     Then I am on the resource page of ${project3.title} project
 
   Scenario: Attempt to create a new Resource with blank Resource fields
-    When I click on the New Resource link
+    When I click on the Create Resource link
     Then I see the plaintext New Resource
     When I enter Test Resource in the #title field
     Then I see an input #name with the value testResource
@@ -116,7 +116,7 @@ Feature: Test 16 Creating/Editing A Resource
     Then I am on the resource page of ${project3.title} project
 
   Scenario: Creating a new ‘Resource’
-    When I click on the New Resource link
+    When I click on the Create Resource link
     Then I see the plaintext New Resource
     When I enter Test Resource in the #title field
     Then I see an input #name with the value testResource
