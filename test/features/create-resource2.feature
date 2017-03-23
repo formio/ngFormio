@@ -8,7 +8,7 @@ Feature: Test 16 Creating/Editing A Resource part2
     Then I am on the resource page of ${project3.title} project
 
   Scenario Outline: Attempt to create a new ‘Resource’ with invalid path name [name]
-    When I click on the New Resource link
+    When I click on the Create Resource link
     Then I see the plaintext New Resource
     When I enter Test Resource in the #title field
     Then I see an input #name with the value testResource
@@ -91,7 +91,7 @@ Feature: Test 16 Creating/Editing A Resource part2
       | Form path cannot contain one of the following names: submission, report, exists, export, role, current, logout, import, form, storage/s3, storage/dropbox, dropbox/auth, upgrade, access, atlassian/oauth/authorize, atlassian/oauth/finalize, sqlconnector |
 
   Scenario: Editing an existing ‘Resource’
-    When I click on the New Resource link
+    When I click on the Create Resource link
     Then I see the plaintext New Resource
     When I enter Test Resource in the #title field
     Then I see an input #name with the value testResource
@@ -117,7 +117,7 @@ Feature: Test 16 Creating/Editing A Resource part2
     Then I see editresource for Form Endpoint in the table
 
   Scenario Outline: Attempt to update an existing ‘Resource’ with invalid path name [name]
-    When I click on the New Resource link
+    When I click on the Create Resource link
     Then I see the plaintext New Resource
     When I enter Edit Resource in the #title field
     Then I see an input #name with the value editResource
@@ -209,7 +209,7 @@ Feature: Test 16 Creating/Editing A Resource part2
       | Form path cannot contain one of the following names: submission, report, exists, export, role, current, logout, import, form, storage/s3, storage/dropbox, dropbox/auth, upgrade, access, atlassian/oauth/authorize, atlassian/oauth/finalize, sqlconnector |
 
   Scenario:  Attempt to Edit an existing Resource with blank fields
-    When I click on the New Resource link
+    When I click on the Create Resource link
     Then I see the plaintext New Resource
     When I enter Edit Resource in the #title field
     Then I see an input #name with the value editResource
