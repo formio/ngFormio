@@ -1,6 +1,6 @@
 {
   "name": "ng-formio",
-  "version": "2.11.1",
+  "version": "2.14.0",
   "authors": [
     "Travis Tidwell <travis@form.io>"
   ],
@@ -15,9 +15,9 @@
     "form"
   ],
   "dependencies": {
-    "angular": "^1.6.2",
+    "angular": "^1.6.3",
     "ng-file-upload": "^12.2.13",
-    "angular-sanitize": "^1.6.2",
+    "angular-sanitize": "^1.6.3",
     "angular-moment": "^1.0.1",
     "bootstrap": "^3.3.7",
     "bootstrap-ui-datetime-picker": "^2.5.4",

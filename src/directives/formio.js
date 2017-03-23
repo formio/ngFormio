@@ -94,7 +94,7 @@ module.exports = function() {
         };
 
         $scope.isRequired = function(component) {
-          return (component.validate && component.validate.required) || (Array.isArray($scope.requireComponents) && $scope.requireComponents.indexOf(component.key) !== -1);
+          return FormioUtils.isRequired(component, $scope.requireComponents);
         };
 
         // Called when the form is submitted.
@@ -237,7 +237,11 @@ module.exports = function() {
           // Allow custom action urls.
           if ($scope.action) {
             var method = submissionData._id ? 'put' : 'post';
-            $http[method]($scope.action, submissionData).then(function(response) {
+            var action = $scope.action;
+            if (method === 'put') {
+              action += '/' + submissionData._id;
+            }
+            $http[method](action, submissionData).then(function(response) {
               Formio.clearCache();
               onSubmitDone(method, response.data);
             }, FormioScope.onError($scope, $element))
