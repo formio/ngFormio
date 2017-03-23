@@ -85,7 +85,9 @@ module.exports = [
             return $scope.readOnly || (typeof $scope.$parent.isDisabled === 'function' && $scope.$parent.isDisabled(component));
           };
 
-          $scope.isRequired = $scope.$parent.isRequired;
+          $scope.isRequired = function(component) {
+            return FormioUtils.isRequired(component);
+          };
 
           // Pass through checkConditional since this is an isolate scope.
           $scope.checkConditional = $scope.$parent.checkConditional;

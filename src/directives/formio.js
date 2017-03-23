@@ -94,7 +94,7 @@ module.exports = function() {
         };
 
         $scope.isRequired = function(component) {
-          return (component.validate && component.validate.required) || (Array.isArray($scope.requireComponents) && $scope.requireComponents.indexOf(component.key) !== -1);
+          return FormioUtils.isRequired(component, $scope.requireComponents);
         };
 
         // Called when the form is submitted.

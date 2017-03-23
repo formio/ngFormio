@@ -94,6 +94,16 @@ module.exports = function() {
           '</tr>' +
         '</table></div>';
       return template;
+    },
+
+    /**
+     * Check if a component is required
+     *
+     * @param {Object} component The component to be checked
+     * @param {Array} componentsToRequire An array of component keys manually set to mark specific components as required
+     */
+    isRequired: function(component, componentsToRequire) {
+      return (component.validate && component.validate.required) || (Array.isArray(componentsToRequire) && componentsToRequire.indexOf(component.key) !== -1);
     }
   };
 };
