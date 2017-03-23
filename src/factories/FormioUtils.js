@@ -1,4 +1,4 @@
-var formioUtils = require('formio-utils');
+var formioUtils = require('formiojs/utils');
 
 module.exports = function() {
   return {
