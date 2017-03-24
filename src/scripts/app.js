@@ -52,6 +52,7 @@ angular
 
       // Set the base URL for our API.
       FormioProvider.setBaseUrl(AppConfig.apiBase);
+      FormioProvider.setAppUrl(AppConfig.formioBase);
       FormioProvider.setDomain(AppConfig.domain);
 
       $stateProvider
