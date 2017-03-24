@@ -288,6 +288,22 @@ app.controller('ProjectController', [
         $scope.projectTeamsLoading = false;
       });
 
+      var primaryProjectPromise;
+      if ($scope.currentProject.project) {
+        // This is an environment. Load the primary Project
+        primaryProjectPromise = (new Formio('/project/' + $scope.currentProject.project)).loadProject();
+      }
+      else {
+        // This is the primary environment.
+        primaryProjectPromise = $q.when($scope.currentProject);
+      }
+      primaryProjectPromise.then(function(primaryProject) {
+        $scope.primaryProject = primaryProject;
+        Formio.loadProjects('?project=' + $scope.primaryProject._id).then(function(environments) {
+          $scope.environments = environments;
+        });
+      });
+
       // Calculate the users highest role within the project.
       $q.all([userTeamsPromise, projectTeamsPromise]).then(function() {
         var roles = _.has($scope.user, 'roles') ? $scope.user.roles : [];
@@ -2063,6 +2079,38 @@ app.controller('ProjectPlanController', [
     $scope.$on('formSubmission', function() {
       $scope.submitted = true;
     });
+  }
+]);
+
+app.controller('ProjectEnvironmentAddController', [
+  '$scope',
+  'FormioProject',
+  function(
+    $scope,
+    FormioProject
+  ) {
+    $scope.environmentTypes = [
+      {
+        key: 'hosted',
+        label: 'Hosted'
+      },
+      {
+        key: 'onPremise',
+        label: 'On Premise'
+      }
+    ];
+
+    $scope.environment = {
+      title: '',
+      type: 'hosted',
+      project: $scope.primaryProject._id
+    };
+
+    $scope.saveEnvironment = function() {
+      FormioProject.createProject($scope.environment).then(function(project) {
+        $state.go('project.overview', {projectId: project._id});
+      });
+    }
   }
 ]);
 

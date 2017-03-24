@@ -1,0 +1,10 @@
+<div class="alert alert-success" role="alert"><i class="fa fa-lock fa-lg"></i> Project Settings are encrypted for your protection.</div>
+<div class="col-sm-3">
+  <ng-include src="'views/project/settings/menu.html'" />
+</div>
+<div class="col-sm-9" style="padding: 0 20px 40px 0;">
+  <ng-form>
+    <i id="project-loader" ng-if="!currentProject" style="font-size: 2em;" class="fa fa-spinner fa-pulse"></i>
+    <div ng-if="currentProject" ui-view></div>
+  </ng-form>
+</div>

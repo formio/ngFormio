@@ -1,0 +1,25 @@
+<div class="project-section-content">
+  <div class="project-section-inner-content">
+    <h2>Add Environment</h2>
+    <form name="projectForm" ng-submit="saveEnvironment()" novalidate>
+      <div id="form-group-title" class="form-group" ng-class="{'has-error': projectForm.title.$invalid && projectForm.title.$dirty}">
+        <label for="title" class="control-label required-field"><strong>Environment Name</strong></label>
+        <input type="text" class="form-control" id="title" name="title" ng-model="environment.title" placeholder="Enter an environment name" ng-maxlength="63" ng-required="true" autofocus="true">
+        <p>Examples: Dev, Test, Staging</p>
+        <p class="help-block" ng-show="projectForm.title.$error.maxlength">Environment name cannot be longer than 63 characters.</p>
+      </div>
+      <div class="form-group">
+        <label for="type" class="control-label"><strong>Type</strong></label>
+        <select id="type" class="form-control" ng-model="environment.type" ng-options="option.key as option.label for option in environmentTypes" />
+        <p>Select an environment type. Hosted for on form.io and On Premise for docker based deployments.</p>
+      </div>
+      <div class="form-group" ng-if="environment.type === 'onPremise'">
+        <label for="externalUrl" class="control-label"><strong>External Url</strong></label>
+        <input id="externalUrl" class="form-control" ng-model="environment.externalUrl" />
+        <p>Enter the URL for the on premise environment.</p>
+      </div>
+      <a ng-if="!environment._id" ui-sref="project.overview()" class="btn btn-default">Cancel</a>
+      <button type="submit" class="btn btn-primary" ng-disabled="projectForm.$invalid">{{environment._id ? 'Save Environment' : 'Create Environment'}}</button>
+    </form>
+  </div>
+</div>

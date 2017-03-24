@@ -461,7 +461,7 @@ div.project-section-separator {
   color: $brand-primary;
   padding-left: 20px;
   padding-top: 20px;
-  border-bottom: solid lighten($brand-primary, 10%) 8px;
+  border-bottom: solid #eeeeee 8px;
   h2 {
     color: $project-header-color;
     a {
@@ -488,6 +488,44 @@ div.project-section-separator {
   .project-description {
     overflow: hidden;
     display: inline-block;
+  }
+
+  .project-plan {
+    background-color: $brand-primary;
+    padding: 5px 10px;
+    color: white;
+    border-radius: 12px;
+    position: relative;
+    top: -3px;
+  }
+
+  .project-nav {
+    border: 0px;
+    li {
+      //margin-bottom: -4px;
+      a {
+        color: white;
+        background-color: inherit;
+        border: 0px;
+      }
+    }
+    li.active {
+      a {
+        color: #222222;
+      }
+      a:hover {
+        border: 0px;
+      }
+      background-color: #eeeeee;
+      border-top: solid $brand-primary 4px;
+      margin-top: -4px;
+    }
+  }
+}
+
+ul.project-settings-menu {
+  ul {
+    margin-left: 15px;
   }
 }
 

@@ -142,10 +142,15 @@ angular
         .state('project.overview', {
           url: '/overview',
           controller: 'ProjectOverviewController',
-          templateUrl: 'views/project/overview.html',
+          templateUrl: 'views/project/overview/index.html',
           params: {
             graphType: 'Month'
           }
+        })
+        .state('project.environment', {
+          url: '/addenv',
+          controller: 'ProjectEnvironmentAddController',
+          templateUrl: 'views/project/addEnvironment.html'
         })
         .state('createProject', {
           url: '/create/project',
@@ -154,7 +159,7 @@ angular
         })
         .state('project.data', {
           url: '/data',
-          templateUrl: 'views/project/data.html',
+          templateUrl: 'views/project/data/index.html',
           controller: 'ProjectDataController',
           params: {
             graphType: 'Month'
@@ -167,7 +172,7 @@ angular
         })
         .state('project.build', {
           url: '/build',
-          templateUrl: 'views/project/build.html',
+          templateUrl: 'views/project/build/index.html',
           controller: 'ProjectBuildController'
         })
         .state('project.launch', {
@@ -207,63 +212,78 @@ angular
         })
         .state('project.settings', {
           url: '/settings',
-          templateUrl: 'views/project/settings.html',
+          templateUrl: 'views/project/settings/settings.html',
           controller: 'ProjectSettingsController'
         })
         .state('project.settings.project', {
           url: '/project',
-          templateUrl: 'views/project/project-settings.html'
+          templateUrl: 'views/project/settings/project-settings.html'
+        })
+        .state('project.settings.database', {
+          url: '/database',
+          parent: 'project.settings',
+          templateUrl: 'views/project/settings/database/index.html',
+        })
+        .state('project.settings.deployment', {
+          url: '/deployment',
+          parent: 'project.settings',
+          templateUrl: 'views/project/settings/deployment/index.html',
+        })
+        .state('project.settings.logs', {
+          url: '/logs',
+          parent: 'project.settings',
+          templateUrl: 'views/project/settings/logs/index.html',
         })
         .state('project.settings.access', {
           url: '/access',
           parent: 'project.settings',
-          templateUrl: 'views/project/access/access.html',
+          templateUrl: 'views/project/settings/access/access.html',
           controller: 'AccessController'
         })
         .state('project.settings.email', {
           url: '/email',
           parent: 'project.settings',
-          templateUrl: 'views/project/email/email.html'
+          templateUrl: 'views/project/settings/integrations/email/email.html'
         })
         .state('project.settings.storage', {
           url: '/storage',
           parent: 'project.settings',
-          templateUrl: 'views/project/storage/storage.html',
+          templateUrl: 'views/project/settings/integrations/storage/storage.html',
           controller: 'ProjectStorageController'
         })
         .state('project.settings.data', {
           url: '/data',
-          templateUrl: 'views/project/data/index.html'
+          templateUrl: 'views/project/settings/integrations/data/index.html'
         })
         .state('project.settings.apiKeys', {
           url: '/apiKeys',
-          templateUrl: 'views/project/apiKeys/index.html'
+          templateUrl: 'views/project/settings/integrations/apiKeys/index.html'
         })
         .state('project.settings.customjscss', {
           url: '/customjscss',
-          templateUrl: 'views/project/customjscss/index.html'
+          templateUrl: 'views/project/settings/integrations/customjscss/index.html'
         })
         .state('project.settings.oauth', {
           url: '/oauth',
-          templateUrl: 'views/project/oauth/index.html'
+          templateUrl: 'views/project/settings/integrations/oauth/index.html'
         })
         .state('project.settings.roles', {
           abstract: true,
           url: '/roles',
-          templateUrl: 'views/project/roles/roles.html'
+          templateUrl: 'views/project/settings/roles/roles.html'
         })
         .state('project.settings.roles.view', {
           url: '',
-          templateUrl: 'views/project/roles/view.html'
+          templateUrl: 'views/project/settings/roles/view.html'
         })
         .state('project.settings.roles.edit', {
           url: '/:roleId/edit',
-          templateUrl: 'views/project/roles/edit.html',
+          templateUrl: 'views/project/settings/roles/edit.html',
           controller: 'RoleController'
         })
         .state('project.settings.roles.delete', {
           url: '/:roleId/delete',
-          templateUrl: 'views/project/roles/delete.html',
+          templateUrl: 'views/project/settings/roles/delete.html',
           controller: 'RoleController'
         })
         .state('project.settings.teams', {
@@ -383,6 +403,37 @@ angular
           });
           return deferred.promise;
         },
+        createEnvironment: function(project) {
+          var deferred = $q.defer();
+          var formio = new Formio();
+
+          // Default all new projects to have cors set to '*'.
+          if (!project.settings) {
+            project.settings = {};
+          }
+          if (!project.settings.cors) {
+            project.settings.cors = '*';
+          }
+
+          formio.saveProject(project).then(function(project) {
+            FormioAlerts.addAlert({
+              type: 'success',
+              message: 'New Environment created!'
+            });
+            GoogleAnalytics.sendEvent('Project', 'create', null, 1);
+            deferred.resolve(project);
+          }, function(error) {
+            if (error.data && error.data.message && error.data.message.indexOf('duplicate key error index') !== -1) {
+              error.data.errors.name = {
+                path: 'name',
+                message: 'Environment domain already exists. Please pick a different domain.'
+              };
+            }
+            FormioAlerts.onError(error);
+            deferred.reject();
+          });
+          return deferred.promise;
+        },
         loadTemplates: function() {
           var deferred = $q.defer();
           deferred.resolve(AppConfig.templates);
@@ -468,7 +519,7 @@ angular
       $scope.projects = {};
       $scope.projectsLoaded = false;
       // TODO: query for unlimited projects instead of this limit
-      var _projectsPromise = Formio.loadProjects('?limit=9007199254740991&sort=-modified')
+      var _projectsPromise = Formio.loadProjects('?limit=9007199254740991&sort=-modified&&project__exists=false')
         .then(function(projects) {
           $scope.projectsLoaded = true;
           angular.element('#projects-loader').hide();

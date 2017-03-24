@@ -6,7 +6,7 @@
   </div>
   <div id="form-group-name" class="form-group" ng-if="showName" ng-class="{'has-error': projectForm.name.$invalid && projectForm.name.$dirty, 'has-success': projectForm.name.$valid}">
     <label for="name" class="control-label required-field">Domain Name</label>
-    <div class="input-group" style="width: 300px;">
+    <div class="input-group" style="width: 400px;">
       <span class="input-group-addon">{{ apiProtocol }}//</span>
       <input type="text" class="form-control" id="name" name="name" ng-model="currentProject.name" title="{{ currentProject.name }}" placeholder="myproject" valid-subdomain unique-checker="/project/available" ng-model-options="{ debounce: { 'default': 500, 'blur': 0 } }" ng-maxlength="63" ng-required="!showName">
       <i class="form-control-feedback glyphicon" ng-class="{'glyphicon-ok': projectForm.name.$valid, 'glyphicon-remove': projectForm.name.$invalid && projectForm.name.$dirty}" style="right: -36px;"></i>
@@ -114,36 +114,6 @@
           </table>
         </div>
         <p><a class="text-muted" href="" ng-click="unloadTemplate()">Nevermind, I don't want this template.</a></p>
-      </div>
-    </div>
-  </div>
-  <div class="form-group" ng-if="currentProject && currentProject._id">
-    <div id="form-group-cors" class="form-group">
-      <label for="cors" class="control-label">CORS - Cross Origin Resource Sharing</label>
-      <textarea class="form-control" id="cors" ng-disabled="currentProject.plan === 'basic'" ng-model="currentProject.settings.cors" placeholder="A comma separated list of domains that forms may be embedded on. Use * to allow all domains."></textarea>
-      <p ng-if="currentProject.plan === 'basic'">Upgrade your project to enable CORS.</p>
-    </div>
-    <div class="panel panel-default">
-      <div class="panel-heading">Preview</div>
-      <div class="panel-body">
-        <label for="preview-repo" class="control-label">Preview Git Repo</label>
-        <input type="text" class="form-control" id="preview-repo" ng-model="currentProject.settings.preview.repo" placeholder="The git repository for the preview app." />
-        <label for="preview-repo" class="control-label">Preview App Url</label>
-        <input type="text" class="form-control" id="preview-url" ng-model="currentProject.settings.preview.url" placeholder="The app url for the preview app." />
-      </div>
-    </div>
-    <div class="panel panel-default">
-      <div class="panel-heading">Export Project</div>
-      <div class="panel-body">
-        <p>The following button will export your project as a JSON file that can then be used as a template for other projects.</p>
-        <a href="//api.{{ appConfig.serverHost }}/project/{{ currentProject._id }}/export?x-jwt-token={{ token }}" class="btn btn-success">Export Project</a>
-      </div>
-    </div>
-    <div class="panel panel-default">
-      <div class="panel-heading">Delete Project</div>
-      <div class="panel-body">
-        <p>Deleting a project will make it disappear forever! This cannot be undone, so make sure you really want to delete it.</p>
-        <a ui-sref="project.delete()" class="btn btn-danger">Delete</a>
       </div>
     </div>
   </div>
