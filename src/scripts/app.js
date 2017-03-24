@@ -51,7 +51,6 @@ angular
       toastrConfig.allowHtml = true;
 
       // Set the base URL for our API.
-      FormioProvider.setAppUrl(AppConfig.formioBase);
       FormioProvider.setBaseUrl(AppConfig.apiBase);
       FormioProvider.setDomain(AppConfig.domain);
 
