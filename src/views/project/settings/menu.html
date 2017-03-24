@@ -4,15 +4,15 @@
     <li role="presentation" ng-class="{active:($state.includes('project.settings.project'))}"><a ui-sref="project.settings.project">Settings</a></li>
     <li role="presentation" ng-class="{active:($state.includes('project.settings.deployment'))}"><a ui-sref="project.settings.deployment">Deployment</a></li>
     <li role="presentation" ng-class="{active:($state.includes('project.settings.database'))}"><a ui-sref="project.settings.database">Database</a></li>
-    <li role="presentation" ng-class="{active:($state.includes('project.settings.integrations'))}">
-      <a ng-click="showIntegrations = !showIntegrations" role="button" aria-haspopup="true" aria-expanded="false">Integrations</a>
-      <ul ng-if="showIntegrations" class="nav nav-pills nav-stacked">
-        <li role="presentation" ng-class="{active:($state.includes('project.settings.oauth'))}"><a ui-sref="project.settings.oauth">OAuth</a></li>
-        <li role="presentation" ng-class="{active:($state.includes('project.settings.email'))}"><a ui-sref="project.settings.email">Email Providers</a></li>
-        <li role="presentation" ng-class="{active:($state.includes('project.settings.storage'))}"><a ui-sref="project.settings.storage">File Storage</a></li>
-        <li role="presentation" ng-class="{active:($state.includes('project.settings.data'))}"><a ui-sref="project.settings.data">Data Connections</a></li>
-        <li role="presentation" ng-class="{active:($state.includes('project.settings.apiKeys'))}"><a ui-sref="project.settings.apiKeys">API Keys</a></li>
-        <li role="presentation" ng-class="{active:($state.includes('project.settings.customjscss'))}"><a ui-sref="project.settings.customjscss">Custom JS and CSS</a></li>
+    <li role="presentation" ng-class="{active:($state.is('project.settings.integrations'))}">
+      <a ui-sref="project.settings.integrations" role="button" aria-haspopup="true" aria-expanded="false">Integrations</a>
+      <ul ng-if="$state.includes('project.settings.integrations')" class="nav nav-pills nav-stacked">
+        <li role="presentation" ng-class="{active:($state.includes('project.settings.integrations.oauth'))}"><a ui-sref="project.settings.integrations.oauth">OAuth</a></li>
+        <li role="presentation" ng-class="{active:($state.includes('project.settings.integrations.email'))}"><a ui-sref="project.settings.integrations.email">Email Providers</a></li>
+        <li role="presentation" ng-class="{active:($state.includes('project.settings.integrations.storage'))}"><a ui-sref="project.settings.integrations.storage">File Storage</a></li>
+        <li role="presentation" ng-class="{active:($state.includes('project.settings.integrations.data'))}"><a ui-sref="project.settings.integrations.data">Data Connections</a></li>
+        <li role="presentation" ng-class="{active:($state.includes('project.settings.integrations.apiKeys'))}"><a ui-sref="project.settings.integrations.apiKeys">API Keys</a></li>
+        <li role="presentation" ng-class="{active:($state.includes('project.settings.integrations.customjscss'))}"><a ui-sref="project.settings.integrations.customjscss">Custom JS and CSS</a></li>
       </ul>
     </li>
     <li role="presentation" ng-class="{active:($state.includes('project.settings.logs'))}"><a ui-sref="project.settings.logs">Logs</a></li>

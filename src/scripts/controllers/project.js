@@ -212,7 +212,7 @@ app.controller('ProjectController', [
     $scope.loadRoles();
 
     $scope.minPlan= function(plan, project) {
-      var plans = ['basic', 'individual', 'team', 'trial', 'commercial'];
+      var plans = ['basic', 'independent', 'team', 'trial', 'commercial'];
       var checkProject = project || $scope.primaryProject || { plan: 'none' };
       return plans.indexOf(checkProject.plan) >= plans.indexOf(plan);
     }

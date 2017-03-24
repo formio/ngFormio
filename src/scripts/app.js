@@ -235,38 +235,53 @@ angular
           parent: 'project.settings',
           templateUrl: 'views/project/settings/logs/index.html',
         })
+        .state('project.settings.integrations', {
+          url: '/integrations',
+          //abstract: true,
+          parent: 'project.settings',
+          template: '<ui-view />'
+        })
+        .state('project.settings.integrations.email', {
+          url: '/email',
+          parent: 'project.settings.integrations',
+          templateUrl: 'views/project/settings/integrations/email/email.html'
+        })
+        .state('project.settings.integrations.storage', {
+          url: '/storage',
+          parent: 'project.settings.integrations',
+          templateUrl: 'views/project/settings/integrations/storage/storage.html',
+          controller: 'ProjectStorageController'
+        })
+        .state('project.settings.integrations.data', {
+          url: '/data',
+          parent: 'project.settings.integrations',
+          templateUrl: 'views/project/settings/integrations/data/index.html'
+        })
+        .state('project.settings.integrations.apiKeys', {
+          url: '/apiKeys',
+          parent: 'project.settings.integrations',
+          templateUrl: 'views/project/settings/integrations/apiKeys/index.html'
+        })
+        .state('project.settings.integrations.customjscss', {
+          url: '/customjscss',
+          parent: 'project.settings.integrations',
+          templateUrl: 'views/project/settings/integrations/customjscss/index.html'
+        })
+        .state('project.settings.integrations.oauth', {
+          url: '/oauth',
+          parent: 'project.settings.integrations',
+          templateUrl: 'views/project/settings/integrations/oauth/index.html'
+        })
+        .state('project.access', {
+          url: '/access',
+          templateUrl: 'views/project/access/index.html',
+          //controller: 'ProjectDataController'
+        })
         .state('project.settings.access', {
           url: '/access',
           parent: 'project.settings',
           templateUrl: 'views/project/access/access/access.html',
           controller: 'AccessController'
-        })
-        .state('project.settings.email', {
-          url: '/email',
-          parent: 'project.settings',
-          templateUrl: 'views/project/settings/integrations/email/email.html'
-        })
-        .state('project.settings.storage', {
-          url: '/storage',
-          parent: 'project.settings',
-          templateUrl: 'views/project/settings/integrations/storage/storage.html',
-          controller: 'ProjectStorageController'
-        })
-        .state('project.settings.data', {
-          url: '/data',
-          templateUrl: 'views/project/settings/integrations/data/index.html'
-        })
-        .state('project.settings.apiKeys', {
-          url: '/apiKeys',
-          templateUrl: 'views/project/settings/integrations/apiKeys/index.html'
-        })
-        .state('project.settings.customjscss', {
-          url: '/customjscss',
-          templateUrl: 'views/project/settings/integrations/customjscss/index.html'
-        })
-        .state('project.settings.oauth', {
-          url: '/oauth',
-          templateUrl: 'views/project/settings/integrations/oauth/index.html'
         })
         .state('project.settings.roles', {
           abstract: true,
