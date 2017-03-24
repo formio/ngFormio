@@ -517,7 +517,8 @@ module.exports = function (config) {
       driver.waitForExist(element, timeout)
         .waitForVisible(element, timeout)
         .click(element)
-        .then(function () {
+        .then(function (ele) {
+          console.log("ele :" + ele);
           driver.pause(1000);
           next();
         })
