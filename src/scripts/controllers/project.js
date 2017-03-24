@@ -211,6 +211,12 @@ app.controller('ProjectController', [
     };
     $scope.loadRoles();
 
+    $scope.minPlan= function(plan, project) {
+      var plans = ['basic', 'individual', 'team', 'trial', 'commercial'];
+      var checkProject = project || $scope.primaryProject || { plan: 'none' };
+      return plans.indexOf(checkProject.plan) >= plans.indexOf(plan);
+    }
+
     $scope.loadProjectPromise = $scope.formio.loadProject().then(function(result) {
       $scope.currentProject = result;
       $scope.projectApi = AppConfig.protocol + '//' + result.name + '.' + AppConfig.serverHost;
@@ -511,7 +517,7 @@ app.provider('ProjectProgress', function() {
               .then(function(projectForms) {
                 forms = projectForms;
                 forms.forEach(function(form) {
-                  if ((new Date(project.created).getTime() + 10000) < new Date(form.modified).getTime()) {
+                  if (project && (new Date(project.created).getTime() + 10000) < new Date(form.modified).getTime()) {
                     return next(true);
                   }
                 });
@@ -542,7 +548,7 @@ app.provider('ProjectProgress', function() {
               .then(function(projectForms) {
                 forms = projectForms;
                 forms.forEach(function(form) {
-                  if ((new Date(project.created).getTime() + 10000) < new Date(form.created).getTime()) {
+                  if (project && (new Date(project.created).getTime() + 10000) < new Date(form.created).getTime()) {
                     return next(true);
                   }
                 });

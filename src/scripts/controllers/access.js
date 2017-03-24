@@ -82,7 +82,7 @@ app.directive('permissionEditor', ['$q', function($q) {
       permissionFilter: '=?'
     },
     restrict: 'E',
-    templateUrl: 'views/project/settings/access/permission-editor.html',
+    templateUrl: 'views/project/access/access/permission-editor.html',
     link: function($scope) {
       // Fill in missing permissions / enforce order
       ($scope.waitFor || $q.when()).then(function() {
@@ -140,7 +140,7 @@ app.directive('resourcePermissionEditor', ['$q', 'FormioUtils', function($q, For
       form: '='
     },
     restrict: 'E',
-    templateUrl: 'views/project/settings/access/resource-permission-editor.html',
+    templateUrl: 'views/project/access/access/resource-permission-editor.html',
     link: function($scope) {
       // Maintain a list of unique resources.
       $scope.uniqueResources = _($scope.resources)

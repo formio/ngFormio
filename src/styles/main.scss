@@ -201,10 +201,8 @@ li.user-dropdown a {
 }
 
 .sidebar {
-  position: fixed;
-  top: 45px;
-  bottom: 0;
-  left: 0;
+  position: relative;
+  float: left;
   z-index: 1000;
   display: block;
   padding: 20px;
@@ -306,12 +304,17 @@ $project-header-color: #eee;
   }
 }
 
+.project-container {
+  position: relative;
+}
+
 .project-sidebar {
   border: none;
   background-color: darken($brand-primary, 25%);
   text-align: center;
   padding: 0;
-  width: 6%;
+  width: 85px;
+  position: absolute;
   .nav {
     margin: 0;
     li {
@@ -341,9 +344,10 @@ $project-header-color: #eee;
 }
 
 .project-main {
-  margin-left: 6%;
-  width: 94%;
+  float: left;
+  width: 100%;
   padding: 0;
+  border-left: solid darken($brand-primary, 25%) 85px;
 }
 
 .project-content {

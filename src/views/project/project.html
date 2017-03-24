@@ -1,37 +1,32 @@
-<div class="project-sidebar sidebar">
-  <ul class="nav nav-sidebar">
-    <!--<li ng-class="{active: isActive('project.overview')}"><a ui-sref="project.overview">-->
-      <!--<div class="progress-radial progress-{{ stepsPercent }}">-->
-        <!--<div class="overlay">{{ stepsPercent }}%</div>-->
-      <!--</div>-->
-      <!--<span>Overview</span></a>-->
-    <!--</li>-->
-    <li ng-class="{active: isActive('project.overview')}"><a ui-sref="project.overview"><i class="fa fa-tachometer"></i><br/><span>Dashboard</span></a></li>
-    <li ng-class="{active: isActive('project.resource') && !isActive('project.form.form.submission')}"><a ui-sref="project.resource.index"><i class="fa fa-database"></i><br/><span>Resources</span></a></li>
-    <li ng-class="{active: isActive('project.form')}"><a ui-sref="project.form.index"><i class="fa fa-tasks"></i><br/><span>Forms</span></a></li>
-    <li ng-class="{active: isActive('project.api')}"><a ui-sref="project.api"><img src="images/swagger-logo.png" style="width:2em;" /><br/><span>API</span></a></li>
-    <li ng-class="{active: isActive('project.data')}"><a ui-sref="project.data"><i class="fa fa-table"></i><br/><span>Data</span></a></li>
-    <li ng-if="currentProject._id === '553db92f72f702e714dd9778'" ng-class="{active: isActive('project.formio')}"><a ui-sref="project.formio"><i class="glyphicon glyphicon-globe"></i><br/><span>Form.io</span></a></li>
-    <li ng-class="{active: isActive('project.build')}"><a ui-sref="project.build"><i class="fa fa-cubes"></i><br/><span>Build</span></a></li>
-    <li ng-class="{active: isActive('project.launch')}"><a ui-sref="project.launch.form" id="nav-bar-launch-link"><i class="fa fa-rocket"></i><br/><span>Launch</span></a></li>
+<div class="project-section-header">
+  <a class="btn btn-primary pull-right project-section-header-button" ng-show="projectSettingsVisible() && !onPrem" ng-click="showUpgradeDialog(primaryProject)"><i class="fa fa-arrow-circle-up"></i> Upgrade Project</a>
+  <a class="btn btn-primary pull-right project-section-header-button" ng-if="user._id === primaryProject.owner && minPlan('team')" ui-sref="project.settings.teams.view">Teams</a>
+  <ul class="list-inline">
+    <li><h2 class="project-title"><a ui-sref="project.overview">{{ primaryProject.title }}</a></h2></li>
+    <li ng-if="currentSection.title"><h2>›</h2></li>
+    <li ng-if="currentSection.title"><h2><i class="{{ currentSection.icon }}"></i> {{ currentSection.title }}</h2></li>
+    <li><span class="project-plan">{{ getPlanName(primaryProject.plan) }}</span></li>
+  </ul>
+  <ul class="nav nav-tabs project-nav" ng-if="environments.length || minPlan('team')">
+    <li ng-class="{ active: currentProject._id === environment._id }" ng-repeat="environment in environments"><a ui-sref="project.overview({ projectId: environment._id })">{{ environment.title }}</a></li>
+    <li ng-class="{ active: currentProject._id === primaryProject._id }"><a ui-sref="project.overview({ projectId: primaryProject._id})">Prod</a></li>
+    <li ng-if="minPlan('team')"><a ui-sref="project.environment">+ Add Environment</a></li>
   </ul>
 </div>
-
-<div class="project-main">
-  <div class="project-section-header">
-    <a class="btn btn-primary pull-right project-section-header-button" ng-show="projectSettingsVisible() && !onPrem" ng-click="showUpgradeDialog(primaryProject)"><i class="fa fa-arrow-circle-up"></i> Upgrade Project</a>
-    <a class="btn btn-primary pull-right project-section-header-button" ng-if="user._id === primaryProject.owner && (primaryProject.plan === 'team' || primaryProject.plan === 'commercial')" ui-sref="project.settings.teams.view">Teams</a>
-    <ul class="list-inline">
-      <li><h2 class="project-title"><a ui-sref="project.overview">{{ primaryProject.title }}</a></h2></li>
-      <li ng-if="currentSection.title"><h2>›</h2></li>
-      <li ng-if="currentSection.title"><h2><i class="{{ currentSection.icon }}"></i> {{ currentSection.title }}</h2></li>
-      <li><span class="project-plan">{{ getPlanName(primaryProject.plan) }}</span></li>
-    </ul>
-    <ul class="nav nav-tabs project-nav" ng-if="environments.length || primary.project.plan !== 'basic'">
-      <li ng-class="{ active: currentProject._id === environment._id }" ng-repeat="environment in environments"><a ui-sref="project.overview({ projectId: environment._id })">{{ environment.title }}</a></li>
-      <li ng-class="{ active: currentProject._id === primaryProject._id }"><a ui-sref="project.overview({ projectId: primaryProject._id})">Prod</a></li>
-      <li ng-if="primary.project.plan !== 'basic'"><a ui-sref="project.environment">+ Add Environment</a></li>
+<div class="project-container">
+  <div class="project-sidebar sidebar">
+    <ul class="nav nav-sidebar">
+      <li ng-class="{active: isActive('project.overview')}"><a ui-sref="project.overview"><i class="fa fa-tachometer"></i><br/><span>Dashboard</span></a></li>
+      <li ng-class="{active: isActive('project.resource') && !isActive('project.form.form.submission')}"><a ui-sref="project.resource.index"><i class="fa fa-database"></i><br/><span>Resources</span></a></li>
+      <li ng-class="{active: isActive('project.form')}"><a ui-sref="project.form.index"><i class="fa fa-tasks"></i><br/><span>Forms</span></a></li>
+      <li ng-class="{active: isActive('project.api')}"><a ui-sref="project.api"><img src="images/swagger-logo.png" style="width:2em;" /><br/><span>API</span></a></li>
+      <li ng-class="{active: isActive('project.access')}"><a ui-sref="project.access"><i class="fa fa-shield"></i><br/><span>Access</span></a></li>
+      <li ng-if="currentProject._id === '553db92f72f702e714dd9778'" ng-class="{active: isActive('project.formio')}"><a ui-sref="project.formio"><i class="glyphicon glyphicon-globe"></i><br/><span>Form.io</span></a></li>
+      <li ng-class="{active: isActive('project.build')}"><a ui-sref="project.build"><i class="fa fa-cubes"></i><br/><span>Build</span></a></li>
+      <li ng-class="{active: isActive('project.launch')}"><a ui-sref="project.launch.form" id="nav-bar-launch-link"><i class="fa fa-rocket"></i><br/><span>Launch</span></a></li>
     </ul>
   </div>
-  <div class="project-content" ui-view></div>
+  <div class="project-main">
+    <div class="project-content" ui-view></div>
+  </div>
 </div>

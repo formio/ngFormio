@@ -238,7 +238,7 @@ angular
         .state('project.settings.access', {
           url: '/access',
           parent: 'project.settings',
-          templateUrl: 'views/project/settings/access/access.html',
+          templateUrl: 'views/project/access/access/access.html',
           controller: 'AccessController'
         })
         .state('project.settings.email', {
@@ -271,20 +271,20 @@ angular
         .state('project.settings.roles', {
           abstract: true,
           url: '/roles',
-          templateUrl: 'views/project/settings/roles/roles.html'
+          templateUrl: 'views/project/access/roles/roles.html'
         })
         .state('project.settings.roles.view', {
           url: '',
-          templateUrl: 'views/project/settings/roles/view.html'
+          templateUrl: 'views/project/access/roles/view.html'
         })
         .state('project.settings.roles.edit', {
           url: '/:roleId/edit',
-          templateUrl: 'views/project/settings/roles/edit.html',
+          templateUrl: 'views/project/access/roles/edit.html',
           controller: 'RoleController'
         })
         .state('project.settings.roles.delete', {
           url: '/:roleId/delete',
-          templateUrl: 'views/project/settings/roles/delete.html',
+          templateUrl: 'views/project/access/roles/delete.html',
           controller: 'RoleController'
         })
         .state('project.settings.teams', {
