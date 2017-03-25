@@ -1,20 +1,37 @@
 <div class="well">
   <ul class="nav nav-pills nav-stacked project-settings-menu">
     <li role="presentation" ng-class="{active:($state.includes('project.overview'))}"><a ui-sref="project.overview">Overview</a></li>
-    <li role="presentation" ng-class="{active:($state.includes('project.settings.project'))}"><a ui-sref="project.settings.project">Settings</a></li>
-    <li role="presentation" ng-class="{active:($state.includes('project.settings.deployment'))}"><a ui-sref="project.settings.deployment">Deployment</a></li>
-    <li role="presentation" ng-class="{active:($state.includes('project.settings.database'))}"><a ui-sref="project.settings.database">Database</a></li>
+    <li role="presentation" ng-class="{active:($state.includes('project.settings.project'))}"><a ui-sref="project.settings.project">{{ projectType }} Info</a></li>
+    <li role="presentation" ng-class="{active:($state.includes('project.settings.definition'))}">
+      <a ui-sref="project.settings.definition.deploy">Project Definition</a>
+      <ul ng-if="$state.current.name.includes('project.settings.definition')" class="nav nav-pills nav-stacked">
+        <li role="presentation" ng-class="{active:($state.includes('project.settings.definition.deploy'))}"><a ui-sref="project.settings.definition.deploy">Deploy</a></li>
+        <li role="presentation" ng-class="{active:($state.includes('project.settings.definition.import'))}"><a ui-sref="project.settings.definition.import">Import</a></li>
+        <li role="presentation" ng-class="{active:($state.includes('project.settings.definition.export'))}"><a ui-sref="project.settings.definition.export">Export</a></li>
+        <li role="presentation" ng-class="{active:($state.includes('project.settings.definition.delete'))}"><a ui-sref="project.settings.definition.delete">Delete</a></li>
+      </ul>
+    </li>
+    <li role="presentation" ng-class="{active:($state.includes('project.settings.database'))}">
+      <a ui-sref="project.settings.database.clone">Database</a>
+      <ul ng-if="$state.current.name.includes('project.settings.database')" class="nav nav-pills nav-stacked">
+        <li role="presentation" ng-class="{active:($state.includes('project.settings.database.clone'))}"><a ui-sref="project.settings.database.clone">Clone</a></li>
+        <li role="presentation" ng-class="{active:($state.includes('project.settings.database.import'))}"><a ui-sref="project.settings.database.import">Import</a></li>
+        <li role="presentation" ng-class="{active:($state.includes('project.settings.database.export'))}"><a ui-sref="project.settings.database.export">Export</a></li>
+        <li role="presentation" ng-class="{active:($state.includes('project.settings.database.wipe'))}"><a ui-sref="project.settings.database.wipe">Wipe</a></li>
+      </ul>
+    </li>
     <li role="presentation" ng-class="{active:($state.is('project.settings.integrations'))}">
-      <a ui-sref="project.settings.integrations" role="button" aria-haspopup="true" aria-expanded="false">Integrations</a>
-      <ul ng-if="$state.includes('project.settings.integrations')" class="nav nav-pills nav-stacked">
-        <li role="presentation" ng-class="{active:($state.includes('project.settings.integrations.oauth'))}"><a ui-sref="project.settings.integrations.oauth">OAuth</a></li>
+      <a ui-sref="project.settings.integrations.email" role="button" aria-haspopup="true" aria-expanded="false">Integrations</a>
+      <ul ng-if="$state.current.name.includes('project.settings.integrations')" class="nav nav-pills nav-stacked">
         <li role="presentation" ng-class="{active:($state.includes('project.settings.integrations.email'))}"><a ui-sref="project.settings.integrations.email">Email Providers</a></li>
         <li role="presentation" ng-class="{active:($state.includes('project.settings.integrations.storage'))}"><a ui-sref="project.settings.integrations.storage">File Storage</a></li>
         <li role="presentation" ng-class="{active:($state.includes('project.settings.integrations.data'))}"><a ui-sref="project.settings.integrations.data">Data Connections</a></li>
+        <li role="presentation" ng-class="{active:($state.includes('project.settings.integrations.oauth'))}"><a ui-sref="project.settings.integrations.oauth">OAuth</a></li>
         <li role="presentation" ng-class="{active:($state.includes('project.settings.integrations.apiKeys'))}"><a ui-sref="project.settings.integrations.apiKeys">API Keys</a></li>
         <li role="presentation" ng-class="{active:($state.includes('project.settings.integrations.customjscss'))}"><a ui-sref="project.settings.integrations.customjscss">Custom JS and CSS</a></li>
       </ul>
     </li>
+    <li role="presentation" ng-class="{active:($state.includes('project.settings.activity'))}"><a ui-sref="project.settings.activity">Activity</a></li>
     <li role="presentation" ng-class="{active:($state.includes('project.settings.logs'))}"><a ui-sref="project.settings.logs">Logs</a></li>
     <!--<li role="presentation" ng-class="{active:($state.includes('project.settings.roles'))}"><a ui-sref="project.settings.roles.view">Roles</a></li>-->
     <!--<li role="presentation" ng-class="{active:($state.includes('project.settings.access'))}"><a ui-sref="project.settings.access">Access</a></li>-->

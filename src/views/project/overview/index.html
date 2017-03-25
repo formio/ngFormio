@@ -9,10 +9,6 @@
       <div class="col-md-3">
         <div class="">
           <ng-include src="'views/project/settings/menu.html'" />
-          <h4>Settings</h4>
-          <ul>
-            <li>Live mode (disable wipe, import DB, modifying resources and forms)</li>
-          </ul>
         </div>
       </div>
       <div class="col-md-9">
@@ -112,20 +108,6 @@
         <div ng-if="!hasTeams() && !onPrem">
           <div class="well">
             <h4><a href="" ng-click="showUpgradeDialog(currentProject)">Upgrade Plan</a> to enable teams for this project</h4>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="submission-activity">
-        <div class="col-md-12">
-          <legend>Submission Activity</legend>
-        </div>
-        <div class="project-data project-summary" ng-controller="ChartController">
-          <div class="col-sm-12">
-            <h3 class="center">{{label[currentType]}}</h3>
-            <h4>{{viewDate.year}} / {{viewDate.month}} / {{viewDate.day}}&nbsp;(UTC)&emsp;<select ng-init="graphChange()" ng-options="type for type in types" ng-model="graphType" ng-change="graphChange()"></select></h4>
-            <chartist class="ct-chart" chartist-data="analytics" chartist-chart-type="Line" chartist-chart-options="analyticsOptions" chartist-events="analyticsEvents"></chartist>
           </div>
         </div>
       </div>

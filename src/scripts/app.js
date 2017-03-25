@@ -143,10 +143,7 @@ angular
         .state('project.overview', {
           url: '/overview',
           controller: 'ProjectOverviewController',
-          templateUrl: 'views/project/overview/index.html',
-          params: {
-            graphType: 'Month'
-          }
+          templateUrl: 'views/project/overview/index.html'
         })
         .state('project.environment', {
           url: '/addenv',
@@ -222,13 +219,63 @@ angular
         })
         .state('project.settings.database', {
           url: '/database',
-          parent: 'project.settings',
-          templateUrl: 'views/project/settings/database/index.html',
+          abstract: true,
+          parent: 'project.settings'
         })
-        .state('project.settings.deployment', {
-          url: '/deployment',
+        .state('project.settings.database.clone', {
+          url: '/database',
           parent: 'project.settings',
-          templateUrl: 'views/project/settings/deployment/index.html',
+          templateUrl: 'views/project/settings/database/clone.html'
+        })
+        .state('project.settings.database.import', {
+          url: '/database/import',
+          parent: 'project.settings',
+          templateUrl: 'views/project/settings/database/import.html'
+        })
+        .state('project.settings.database.export', {
+          url: '/database/export',
+          parent: 'project.settings',
+          templateUrl: 'views/project/settings/database/export.html'
+        })
+        .state('project.settings.database.wipe', {
+          url: '/database/wipe',
+          parent: 'project.settings',
+          templateUrl: 'views/project/settings/database/wipe.html',
+        })
+        .state('project.settings.definition', {
+          url: '/definition',
+          abstract: true,
+          parent: 'project.settings'
+        })
+        .state('project.settings.definition.deploy', {
+          url: '/definition',
+          parent: 'project.settings',
+          templateUrl: 'views/project/settings/definition/deploy.html',
+          controller: 'ProjectDeployController'
+        })
+        .state('project.settings.definition.import', {
+          url: '/definition/import',
+          parent: 'project.settings',
+          templateUrl: 'views/project/settings/definition/import.html'
+        })
+        .state('project.settings.definition.export', {
+          url: '/definition/export',
+          parent: 'project.settings',
+          templateUrl: 'views/project/settings/definition/export.html'
+        })
+        .state('project.settings.definition.delete', {
+          url: '/definition/delete',
+          parent: 'project.settings',
+          templateUrl: 'views/project/settings/definition/delete.html'
+        })
+        .state('project.settings.activity', {
+          url: '/activity',
+          parent: 'project.settings',
+          controller: 'ProjectOverviewController',
+          templateUrl: 'views/project/settings/activity/index.html',
+          params: {
+            graphType: 'Month'
+          }
         })
         .state('project.settings.logs', {
           url: '/logs',
@@ -237,39 +284,38 @@ angular
         })
         .state('project.settings.integrations', {
           url: '/integrations',
-          //abstract: true,
-          parent: 'project.settings',
-          template: '<ui-view />'
+          abstract: true,
+          parent: 'project.settings'
         })
         .state('project.settings.integrations.email', {
-          url: '/email',
-          parent: 'project.settings.integrations',
+          //url: '/integrations/email',
+          parent: 'project.settings',
           templateUrl: 'views/project/settings/integrations/email/email.html'
         })
         .state('project.settings.integrations.storage', {
-          url: '/storage',
-          parent: 'project.settings.integrations',
+          url: '/integrations/storage',
+          parent: 'project.settings',
           templateUrl: 'views/project/settings/integrations/storage/storage.html',
           controller: 'ProjectStorageController'
         })
-        .state('project.settings.integrations.data', {
-          url: '/data',
+        .state('project.settings.data', {
+          url: '/integrations/data',
           parent: 'project.settings.integrations',
           templateUrl: 'views/project/settings/integrations/data/index.html'
         })
         .state('project.settings.integrations.apiKeys', {
-          url: '/apiKeys',
-          parent: 'project.settings.integrations',
+          url: '/integrations/apiKeys',
+          parent: 'project.settings',
           templateUrl: 'views/project/settings/integrations/apiKeys/index.html'
         })
         .state('project.settings.integrations.customjscss', {
-          url: '/customjscss',
-          parent: 'project.settings.integrations',
+          url: '/integrations/customjscss',
+          parent: 'project.settings',
           templateUrl: 'views/project/settings/integrations/customjscss/index.html'
         })
         .state('project.settings.integrations.oauth', {
-          url: '/oauth',
-          parent: 'project.settings.integrations',
+          url: '/integrations/oauth',
+          parent: 'project.settings',
           templateUrl: 'views/project/settings/integrations/oauth/index.html'
         })
         .state('project.access', {

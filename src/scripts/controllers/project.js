@@ -215,10 +215,15 @@ app.controller('ProjectController', [
       var plans = ['basic', 'independent', 'team', 'trial', 'commercial'];
       var checkProject = project || $scope.primaryProject || { plan: 'none' };
       return plans.indexOf(checkProject.plan) >= plans.indexOf(plan);
-    }
+    };
+
+    $scope.switchEnv = function(environmentId) {
+      $state.go('.', {projectId: environmentId});
+    };
 
     $scope.loadProjectPromise = $scope.formio.loadProject().then(function(result) {
       $scope.currentProject = result;
+      $scope.projectType = $scope.currentProject.hasOwnProperty('project') ? 'Environment' : 'Project';
       $scope.projectApi = AppConfig.protocol + '//' + result.name + '.' + AppConfig.serverHost;
       $rootScope.currentProject = result;
       $scope.showName = !(result.plan && result.plan === 'basic');
@@ -400,6 +405,27 @@ app.controller('ProjectController', [
     $scope.getAPICallsPercent = ProjectPlans.getAPICallsPercent.bind(ProjectPlans);
     $scope.getProgressBarClass = ProjectPlans.getProgressBarClass.bind(ProjectPlans);
     $scope.showUpgradeDialog = ProjectUpgradeDialog.show.bind(ProjectUpgradeDialog);
+  }
+]);
+
+app.controller('ProjectDeployController', [
+  '$scope',
+  function($scope) {
+    // This just fakes it for now.
+    $scope.versions = [
+      '1.0.0',
+      '1.0.1',
+      '1.0.2',
+      '1.1.0',
+      '1.2.0',
+      '1.2.1'
+    ];
+    $scope.deployVersion = $scope.versions[5];
+
+    $scope.addVersion = function(version) {
+      $scope.versions.push(version);
+      $scope.version = '';
+    }
   }
 ]);
 
@@ -1800,7 +1826,6 @@ app.controller('ProjectSettingsController', [
   'FormioAlerts',
   '$http',
   'AppConfig',
-  '$interval',
   function(
     $scope,
     $rootScope,
@@ -1808,11 +1833,11 @@ app.controller('ProjectSettingsController', [
     GoogleAnalytics,
     FormioAlerts,
     $http,
-    AppConfig,
-    $interval
+    AppConfig
   ) {
     if (!$scope.highestRole || ($scope.highestRole && ['team_read', 'team_write'].indexOf($scope.highestRole) !== -1)) {
-      $state.go('project.overview');
+      // this is constantly going to overview on reload.
+      //$state.go('project.overview');
       return;
     }
 

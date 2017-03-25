@@ -8,8 +8,8 @@
     <li><span class="project-plan">{{ getPlanName(primaryProject.plan) }}</span></li>
   </ul>
   <ul class="nav nav-tabs project-nav" ng-if="environments.length || minPlan('team')">
-    <li ng-class="{ active: currentProject._id === environment._id }" ng-repeat="environment in environments"><a ui-sref="project.overview({ projectId: environment._id })">{{ environment.title }}</a></li>
-    <li ng-class="{ active: currentProject._id === primaryProject._id }"><a ui-sref="project.overview({ projectId: primaryProject._id})">Prod</a></li>
+    <li ng-class="{ active: currentProject._id === environment._id }" ng-repeat="environment in environments"><a ng-click="switchEnv(environment._id)">{{ environment.title }}</a></li>
+    <li ng-class="{ active: currentProject._id === primaryProject._id }"><a ng-click="switchEnv(primaryProject._id)">Prod</a></li>
     <li ng-if="minPlan('team')"><a ui-sref="project.environment">+ Add Environment</a></li>
   </ul>
 </div>
