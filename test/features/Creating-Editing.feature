@@ -68,7 +68,7 @@ Scenario: Clicking ‘Edit’ button for Form on Form page
     When I click on the .fa-tasks element
     And I wait 2000 milliseconds
     Then I am on the form page of ${project3.title} project
-	When I click on the glyphicon glyphicon-edit button for User Login resource in Forms section
+	When I click on the glyphicon glyphicon-edit button for User Login form
     And I wait 2000 milliseconds
     Then I am on the edit page of ${project3.title} project
     And I wait 2000 milliseconds
@@ -83,7 +83,7 @@ Scenario: Clicking ‘Data’ button for Form on Form page
     When I click on the .fa-tasks element
     And I wait 2000 milliseconds
     Then I am on the form page of ${project3.title} project
-	When I click on the fa fa-table button for User Login resource in Forms section
+	When I click on the fa fa-table button for User Login form
     Then I am on the submission page of ${project3.title} project
     Then I see the submissions datagrid
 
@@ -95,10 +95,10 @@ Scenario: Clicking ‘Action’ button for Form on Form page
     When I click on the .fa-tasks element
     And I wait 2000 milliseconds
     Then I am on the form page of ${project3.title} project
-	When I click on the fa fa-paper-plane button for User Login resource in Forms section
+	When I click on the fa fa-paper-plane button for User Login form
     Then I am on the action page of ${project3.title} project
     And I wait 2000 milliseconds
-    Then I see the Login action
+    Then I see the Login link
 
 Scenario: Clicking ‘Access’ button for Form on Form page
 	Given I am logged in for profileuser3
@@ -109,7 +109,7 @@ Scenario: Clicking ‘Access’ button for Form on Form page
     And I wait 2000 milliseconds
     Then I am on the form page of ${project3.title} project
     And I wait 2000 milliseconds
-    When I click on the fa-lock button for User Login resource in Forms section
+    When I click on the fa-lock button for User Login form
     Then I am on the permission page of ${project3.title} project
     Then I see Anonymous permission for Create Own Submissions
     Then I see Anonymous permission for Read Form Definition
@@ -122,7 +122,7 @@ Scenario:Deleting a ‘Form’
     When I click on the .fa-tasks element
     And I wait 2000 milliseconds
     Then I am on the form page of ${project3.title} project
-    When I click on the glyphicon glyphicon-trash button for User Login resource in Forms section
+    When I click on the glyphicon glyphicon-trash button for User Login form
     And I wait 2000 milliseconds
     And I see button.btn.btn-danger with the text Yes
     And I click the Yes button

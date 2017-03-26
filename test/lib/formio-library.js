@@ -454,7 +454,7 @@ module.exports = function (config) {
       driver.waitForExist('//*[contains(@class,\'' + icon + '\')]', timeout)
         .click('//*[contains(@class,\'' + icon + '\')]', timeout)
         .then(next)
-         .catch(next);
+        .catch(next);
     })//surendra
     .when('I click on the $button with $link', function (button, link, next) {
       var driver = this.driver;
@@ -520,11 +520,7 @@ module.exports = function (config) {
         .waitForExist(element, timeout)
         .waitForVisible(element, timeout)
         .click(element)
-        .then(function (ele) {
-          console.log("ele :" + ele);
-          driver.pause(1000);
-          next();
-        })
+        .then(next)
         .catch(next);
     })
     .when('I update the project to the $plan', function (plan, next) {
@@ -677,16 +673,16 @@ module.exports = function (config) {
         })
         .catch(next);
     })//Padma
-   .then('I see the $link link', function (link, next) {
-       var driver = this.driver;
-       driver.waitForExist('//a[contains(text(),"' + link + '")]', timeout)
-         .isVisible('//a[contains(text(),"' + link + '")]', timeout)
-         .then(function (temp) {
-           assert.equal(temp, true);
-           next();
-         })
-         .catch(next);
-     })//Padma
+    .then('I see the $link link', function (link, next) {
+      var driver = this.driver;
+      driver.waitForExist('//a[contains(text(),"' + link + '")]', timeout)
+        .isVisible('//a[contains(text(),"' + link + '")]', timeout)
+        .then(function (temp) {
+          assert.equal(temp, true);
+          next();
+        })
+        .catch(next);
+    })//Padma
     .when('I clear the $element field', function (element, next) {
       var driver = this.driver;
       driver.waitForExist(element, timeout)
@@ -948,14 +944,14 @@ module.exports = function (config) {
         .then(next)
         .catch(next);
     }) //Padma
-   .when('I click on the $button button for $name form', function (button, name, next) {
-        var driver = this.driver;
-        var path = '//*[text()=\''+name+'\']//..//..//..//*[contains(@class,\''+button+'\')]';
-        driver.waitForExist(path, timeout)
-          .click(path, timeout)
-          .then(next)
-          .catch(next);
-      })//surendra
+    .when('I click on the $button button for $name form', function (button, name, next) {
+      var driver = this.driver;
+      var path = '//*[text()=\'' + name + '\']//..//..//..//*[contains(@class,\'' + button + '\')]';
+      driver.waitForExist(path, timeout)
+        .click(path, timeout)
+        .then(next)
+        .catch(next);
+    })//surendra
     .then('I see $role permission for $access', function (role, access, next) {
       var driver = this.driver;
       driver.waitForExist('//*[text()=\'' + access + '\']//..//..//td[2]', timeout)
@@ -989,10 +985,10 @@ module.exports = function (config) {
     }) // Padma 
     .when('I click (?:on )?the $LINK link', function (link, next) {
       var driver = this.driver;
-      driver.waitForExist('=' + link, timeout)
+      driver.pause(20)
+        .waitForExist('=' + link, timeout)
         .click('=' + link)
         .then(function () {
-          driver.pause(1000);
           next();
         })
         .catch(next);
@@ -1067,7 +1063,7 @@ module.exports = function (config) {
         })
         .catch(next);
     }) //Padma
-    .then('I donot see the $text link in $section section', function (text, section, next) {
+    .then('I donot see the $text link in $section section', function(text, section, next) {
       var driver = this.driver;
       var path = '//*[contains(@class,\'project-info\')]//h5[text()=\'' + section + '\']//..//..//*[contains(text(),\'\')]';
       driver.waitForExist(path, timeout)
@@ -1078,7 +1074,7 @@ module.exports = function (config) {
         })
         .catch(next);
     }) //Padma
-    .when('My project count is $num', function (num, next) {
+    .when('My project count is $num', function(num, next) {
       var driver = this.driver;
       var path0 = '//*[contains(@ng-if, "projectsLoaded && !projects.length")]';
       var path1 = '//div[@ng-repeat="project in projects"]//div//h4';
@@ -1102,7 +1098,7 @@ module.exports = function (config) {
       }
       driver.catch(next);
     }) //Padma
-    .then('I am on $section section of $page page', function (section, page, next) {
+    .then('I am on $section section of $page page', function(section, page, next) {
       var driver = this.driver;
       driver.waitForExist('//*[contains(@class, \'active\')]', timeout)
         .getText('//*[contains(@class, \'active\')]')
@@ -1126,14 +1122,14 @@ module.exports = function (config) {
         })
         .catch(next);
     })
- .when('I click on $link in $section section', function (link, section, next) {
-        var driver = this.driver;
-        driver.waitForExist('//*[text()=\''+section+'\']//..//*[text()=\''+link+'\']', timeout)
-          .waitForVisible('//*[text()=\''+section+'\']//..//*[text()=\''+link+'\']', timeout)
-          .click('//*[text()=\''+section+'\']//..//*[text()=\''+link+'\']', timeout)
-          .then(next)
-          .catch(next);
-      })//surendra
+    .when('I click on $link in $section section', function (link, section, next) {
+      var driver = this.driver;
+      driver.waitForExist('//*[text()=\'' + section + '\']//..//*[text()=\'' + link + '\']', timeout)
+        .waitForVisible('//*[text()=\'' + section + '\']//..//*[text()=\'' + link + '\']', timeout)
+        .click('//*[text()=\'' + section + '\']//..//*[text()=\'' + link + '\']', timeout)
+        .then(next)
+        .catch(next);
+    })//surendra
     .then('I am taken to submission $name page', function (name, next) {
       var driver = this.driver;
       driver.waitForExist('//li[contains(@class,"active")]//a[contains(text(),"' + name + '")]', timeout)

@@ -25,6 +25,5 @@ Scenario: Submitting Feedback request
 	When I enter feedback-test in the #feedback field
 	And the Send it! button is enabled
 	And I click on the Send it! button
-    And I wait 1000 milliseconds
     And I donot see Close
 	And I see .feedback with the text Feedback
