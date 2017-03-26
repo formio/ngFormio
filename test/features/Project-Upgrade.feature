@@ -18,7 +18,7 @@ Feature: Project Upgrade Functionality
   Scenario: Defaults to Team Pro
     Given I am logged in for upgradeUser
     And I am on the ${upgradeProject.title} project overview page
-    When I click the Upgrade Project link
+    When I click the  Upgrade Project link
     And I wait 1000 milliseconds
     Then I see Are you sure you want to change your project plan to Team Pro?
 

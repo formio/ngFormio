@@ -5,7 +5,7 @@ Scenario: Clicking ‘Data’ button for Resource on Resource page
     And A project exists with the ${random-title>project3.title} and ${random-description>project3.description}
     And I am on the ${project3.title} project overview page
     And I wait 2000 milliseconds
-    When I click on the .fa-tasks element
+    When I click on the .fa.fa-tasks element
     And I wait 2000 milliseconds
     Then I am on the form page of ${project3.title} project
     And I wait 2000 milliseconds
@@ -20,7 +20,7 @@ Scenario: Searching for existing Forms/Resource with search bar
     And A project exists with the ${random-title>project3.title} and ${random-description>project3.description}
     And I am on the ${project3.title} project overview page
     And I wait 2000 milliseconds
-    When I click on the .fa-tasks element
+    When I click on the .fa.fa-tasks element
     And I wait 2000 milliseconds
     Then I am on the form page of ${project3.title} project
     And I wait 2000 milliseconds
@@ -42,7 +42,7 @@ Scenario: Searching for non existing Forms in search bar
     And A project exists with the ${random-title>project3.title} and ${random-description>project3.description}
     And I am on the ${project3.title} project overview page
     And I wait 2000 milliseconds
-    When I click on the .fa-tasks element
+    When I click on the .fa.fa-tasks element
     And I wait 2000 milliseconds
     Then I am on the form page of ${project3.title} project
     When I enter Z in the #form-search field
@@ -65,7 +65,7 @@ Scenario: Clicking ‘Edit’ button for Form on Form page
     And A project exists with the ${random-title>project3.title} and ${random-description>project3.description}
     And I am on the ${project3.title} project overview page
     And I wait 2000 milliseconds
-    When I click on the .fa-tasks element
+    When I click on the .fa.fa-tasks element
     And I wait 2000 milliseconds
     Then I am on the form page of ${project3.title} project
 	When I click on the glyphicon glyphicon-edit button for User Login form
@@ -80,7 +80,7 @@ Scenario: Clicking ‘Data’ button for Form on Form page
     And A project exists with the ${random-title>project3.title} and ${random-description>project3.description}
     And I am on the ${project3.title} project overview page
     And I wait 2000 milliseconds
-    When I click on the .fa-tasks element
+    When I click on the .fa.fa-tasks element
     And I wait 2000 milliseconds
     Then I am on the form page of ${project3.title} project
 	When I click on the fa fa-table button for User Login form
@@ -92,7 +92,7 @@ Scenario: Clicking ‘Action’ button for Form on Form page
     And A project exists with the ${random-title>project3.title} and ${random-description>project3.description}
     And I am on the ${project3.title} project overview page
     And I wait 2000 milliseconds
-    When I click on the .fa-tasks element
+    When I click on the .fa.fa-tasks element
     And I wait 2000 milliseconds
     Then I am on the form page of ${project3.title} project
 	When I click on the fa fa-paper-plane button for User Login form
@@ -105,7 +105,7 @@ Scenario: Clicking ‘Access’ button for Form on Form page
     And A project exists with the ${random-title>project3.title} and ${random-description>project3.description}
     And I am on the ${project3.title} project overview page
     And I wait 2000 milliseconds
-    When I click on the .fa-tasks element
+    When I click on the .fa.fa-tasks element
     And I wait 2000 milliseconds
     Then I am on the form page of ${project3.title} project
     And I wait 2000 milliseconds
@@ -119,7 +119,7 @@ Scenario:Deleting a ‘Form’
     And A project exists with the ${random-title>project3.title} and ${random-description>project3.description}
     And I am on the ${project3.title} project overview page
     And I wait 2000 milliseconds
-    When I click on the .fa-tasks element
+    When I click on the .fa.fa-tasks element
     And I wait 2000 milliseconds
     Then I am on the form page of ${project3.title} project
     When I click on the glyphicon glyphicon-trash button for User Login form
