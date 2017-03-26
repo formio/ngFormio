@@ -5,7 +5,7 @@ Scenario: Clicking ‘Data’ button for Resource on Resource page
     And A project exists with the ${random-title>project3.title} and ${random-description>project3.description}
     And I am on the ${project3.title} project overview page
     And I wait 2000 milliseconds
-    When I click on the .fa.fa-tasks element
+    When I click on the .fa-tasks element
     #And I wait 100 milliseconds
     Then I am on the form page of ${project3.title} project
     #And I wait 2000 milliseconds
