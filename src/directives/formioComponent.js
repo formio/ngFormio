@@ -1,11 +1,12 @@
+var _cloneDeep = require('lodash/cloneDeep');
+var _filter = require('lodash/filter');
+var _get = require('lodash/get');
 module.exports = [
   'Formio',
   'formioComponents',
-  'Lodash',
   function(
     Formio,
-    formioComponents,
-    _
+    formioComponents
   ) {
     return {
       replace: true,
@@ -84,7 +85,9 @@ module.exports = [
             return $scope.readOnly || (typeof $scope.$parent.isDisabled === 'function' && $scope.$parent.isDisabled(component));
           };
 
-          $scope.isRequired = $scope.$parent.isRequired;
+          $scope.isRequired = function(component) {
+            return FormioUtils.isRequired(component);
+          };
 
           // Pass through checkConditional since this is an isolate scope.
           $scope.checkConditional = $scope.$parent.checkConditional;
@@ -121,7 +124,7 @@ module.exports = [
             if ($scope.component.hasOwnProperty('customDefaultValue')) {
               try {
                 /* eslint-disable no-unused-vars */
-                var data = _.cloneDeep($scope.data);
+                var data = _cloneDeep($scope.data);
                 /* eslint-enable no-unused-vars */
                 value = eval('(function(data) { var value = "";' + $scope.component.customDefaultValue.toString() + '; return value; })(data)');
               }
@@ -142,7 +145,7 @@ module.exports = [
                   // If only one part was specified, search by value
                   /* eslint-disable max-depth */
                   if (parts.length === 1) {
-                    results = _.filter($scope.selectItems, {value: parts[0]});
+                    results = _filter($scope.selectItems, {value: parts[0]});
 
                     // Trim results based on multiple
                     if (!$scope.component.multiple) {
@@ -157,7 +160,7 @@ module.exports = [
                     var search = {};
                     search[parts[0]] = parts[1];
 
-                    results = _.filter($scope.selectItems, search);
+                    results = _filter($scope.selectItems, search);
 
                     // Trim results based on multiple
                     if (!$scope.component.multiple) {
@@ -241,8 +244,8 @@ module.exports = [
               defaultItems.forEach(function(item) {
                 var parts = item.split(':');
                 if (parts.length === 2) {
-                  var result = _.filter(searchItems, function(potential) {
-                    if (_.get(potential, parts[0]) === parts[1]) {
+                  var result = _filter(searchItems, function(potential) {
+                    if (_get(potential, parts[0]) === parts[1]) {
                       return true;
                     }
                   });
