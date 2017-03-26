@@ -6,9 +6,9 @@ Scenario: Clicking ‘Data’ button for Resource on Resource page
     And I am on the ${project3.title} project overview page
     And I wait 2000 milliseconds
     When I click on the .fa.fa-tasks element
-    And I wait 2000 milliseconds
+    #And I wait 100 milliseconds
     Then I am on the form page of ${project3.title} project
-    And I wait 2000 milliseconds
+    #And I wait 2000 milliseconds
     Then I can see User Login in the Forms  Section
     Then I can see User Register in the Forms  Section
     Then I can see User Register in the Forms  Section

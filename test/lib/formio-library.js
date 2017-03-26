@@ -521,8 +521,9 @@ module.exports = function (config) {
       driver.pause(20)
         .waitForExist(element, timeout)
         .then(function (res) {
+          console.log(res);
           driver.waitForVisible(element, timeout)
-            .click(element)
+          .click(element)
           next();
         })
 
