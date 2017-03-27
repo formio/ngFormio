@@ -454,9 +454,12 @@ module.exports = function(config) {
     .when('I click on the icon $icon', function(icon, next) {
       var driver = this.driver;
       driver.waitForExist('//*[contains(@class,\'' + icon + '\')]', timeout)
-        .click('//*[contains(@class,\'' + icon + '\')]', timeout)
-        .then(next)
-        .catch(next);
+        .then(function(res){
+          console.log(res);
+          driver.click('//*[contains(@class,\'' + icon + '\')]', timeout)
+          next();
+        })
+       .catch(next);
     })//surendra
     .when('I click on the $button with $link', function(button, link, next) {
       var driver = this.driver;
