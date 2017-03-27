@@ -498,8 +498,8 @@ module.exports = function (config) {
       })
       .when('I expand the user menu', function (next) {
         var driver = this.driver;
-        driver.waitForExist('#user-menu')
-          .click('#user-menu')
+        driver.waitForExist('//*[contains(@id,\'user-menu\')]')
+          .click('//*[contains(@id,\'user-menu\')]')
           .then(next)
           .catch(next);
       })
@@ -560,8 +560,8 @@ module.exports = function (config) {
       })//surendra
       .when('I click (?:on )?the $BUTTON input button', function (button, next) {
         var driver = this.driver;
-        driver.waitForExist('//input[contains(@value,\'' + button + '\')]', timeout)
-          .click('//input[contains(@value,\'' + button + '\')]')
+        driver.waitForExist('//*[contains(@value,\'' + button + '\')]', timeout)
+          .click('//*[contains(@value,\'' + button + '\')]')
           .then(next)
           .catch(next);
       })//surendra
@@ -1034,8 +1034,8 @@ module.exports = function (config) {
       })//surendra
       .then('I see list of options $options on selection list', function (options, next) {
         var driver = this.driver;
-        driver.waitForExist('//select//option')
-          .getText('//select//option')
+        driver.waitForExist('//select//option[contains(text(),\'\')]')
+          .getText('//select//option[contains(text(),\'\')]')
           .then(function (ele) {
             var dat = "";
             for (var i = 0; i < ele.length; i++) {

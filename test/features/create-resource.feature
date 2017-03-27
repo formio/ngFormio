@@ -4,7 +4,7 @@ Feature: Test 16 Creating/Editing A Resource
     Given I am logged in for profileuser3
     And A project exists with the ${random-title>project3.title} and ${random-description>project3.description}
     And I am on the ${project3.title} project overview page
-    When I click on the icon fa fa-database
+    When I click on the Resources link
     Then I am on the resource page of ${project3.title} project
 
   Scenario:  Accessing the Resource page
@@ -124,7 +124,7 @@ Feature: Test 16 Creating/Editing A Resource
     And I click on the Create Resource input button
     Then I see a notification with the text Successfully created form!
     And I see an element with the Save Resource value
-    When I click on the icon fa fa-database
+    When I click on the Resources link
     Then I am on the resource page of ${project3.title} project
     And I can see Test Resource in the Resources section
     When I click on the icon fa fa-tasks

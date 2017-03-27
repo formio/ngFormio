@@ -4,7 +4,7 @@ Feature: Test 16 Creating/Editing A Resource part2
     Given I am logged in for profileuser3
     And A project exists with the ${random-title>project3.title} and ${random-description>project3.description}
     And I am on the ${project3.title} project overview page
-    When I click on the icon fa fa-database
+    When I click on the Resources link
     Then I am on the resource page of ${project3.title} project
 
   Scenario Outline: Attempt to create a new ‘Resource’ with invalid path name [name]
@@ -81,7 +81,7 @@ Feature: Test 16 Creating/Editing A Resource part2
     Then I see a notification with the text [message]
     When I click on notification
     Then I am on the resource page of ${project3.title} project
-    When I click on the icon fa fa-database
+    When I click on the Resources link
     Then I am on the resource page of ${project3.title} project
     And I donot see Test Resource resource
 
@@ -99,7 +99,7 @@ Feature: Test 16 Creating/Editing A Resource part2
     And I click on the Create Resource input button
     Then I see a notification with the text Successfully created form!
     When I click on notification
-    When I click on the icon fa fa-database
+    When I click on the Resources link
     Then I am on the resource page of ${project3.title} project
     And I can see Test Resource in the Resources section
     When I click on the Test Resource link
@@ -109,7 +109,7 @@ Feature: Test 16 Creating/Editing A Resource part2
     When I enter editresource in the #path field
     And I click on the Save Resource input button
     Then I see a notification with the text Successfully updated form!
-    When I click on the icon fa fa-database
+    When I click on the Resources link
     Then I am on the resource page of ${project3.title} project
     And I can see Edit Resource in the Resources section
     When I click on the fa fa-code button for Edit Resource form
@@ -125,7 +125,7 @@ Feature: Test 16 Creating/Editing A Resource part2
     And I click on the Create Resource input button
     Then I see a notification with the text Successfully created form!
     When I click on notification
-    When I click on the icon fa fa-database
+    When I click on the Resources link
     Then I am on the resource page of ${project3.title} project
     And I can see Edit Resource in the Resources section
     When I click on the Edit Resource link
@@ -199,7 +199,7 @@ Feature: Test 16 Creating/Editing A Resource part2
     And I click on the Save Resource input button
     Then I see a notification with the text [message]
     When I click on notification
-    And I click on the icon fa fa-database
+    When I click on the Resources link
     Then I am on the resource page of ${project3.title} project
     And I can see Edit Resource in the Resources section
 
@@ -217,7 +217,7 @@ Feature: Test 16 Creating/Editing A Resource part2
     And I click on the Create Resource input button
     Then I see a notification with the text Successfully created form!
     When I click on notification
-    When I click on the icon fa fa-database
+    When I click on the Resources link
     Then I am on the resource page of ${project3.title} project
     And I can see Edit Resource in the Resources section
     When I click on the Edit Resource link
