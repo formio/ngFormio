@@ -4,6 +4,7 @@ Scenario: Viewing ‘Project Info’ information
     Given I am logged in for profileuser3
     And A project exists with the ${random-title>project3.title} and ${random-description>project3.description}
     And I am on the ${project3.title} project overview page
+    And I wait 2000 milliseconds
     Then I see project progress is at 15%
     Then I see Roles
     Then I see the Administrator link in Roles section

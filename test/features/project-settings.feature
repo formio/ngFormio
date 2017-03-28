@@ -10,6 +10,7 @@ Scenario Outline: Updating Project Title/ Description
   And I click on the Save Project button
   Then I am on the [Title] project portal
   When I click on the icon fa fa-home
+  And I wait 1000 milliseconds
   And I am on /#/ 
   Then I see [Element] with the text [Text]
 
