@@ -362,7 +362,7 @@ module.exports = function(config) {
       var driver = this.driver;
 
       authUser(driver, 'formio', 'user/login', email, password, function(err, res) {
-        if (err || res === 'User or password was incorrect.') {
+        if (err || res === 'User or password was incorrect') {
           // User doesn't exist. Create it.
           return createUser(driver, 'formio', 'user/register', username, email, password, next);
         }
