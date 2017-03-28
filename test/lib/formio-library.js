@@ -455,7 +455,6 @@ module.exports = function(config) {
       var driver = this.driver;
       driver.waitForExist('//*[contains(@class,\'' + icon + '\')]', timeout)
         .then(function(res){
-          console.log(res);
           driver.click('//*[contains(@class,\'' + icon + '\')]', timeout)
           next();
         })

@@ -10,7 +10,6 @@ Feature: User Profile Functionality
     And I see #profile-username with the text Username: ${profileuser1.name}
     And I see #profile-email with the text Email: ${profileuser1.email}
     And I click on the Edit link
-    And I wait 1000 milliseconds
     And I see the plaintext Name
     And I see an input #fullName with the value ${empty}
     And I see the plaintext Username

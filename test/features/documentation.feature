@@ -24,7 +24,6 @@ Scenario: Expanding the Documentation button
     Then I see the .fa-wifi element
     Then I see the .fa-ship element
     When I click on the #content element
-    And I wait 2000 milliseconds
     Then I do not see the .docs-dropdown element
 
 Scenario Outline: Navigating to documentation links
@@ -32,7 +31,6 @@ Scenario Outline: Navigating to documentation links
     When I click on the Docs link
     When I click on the [link1] link
     Then I am on new window with url [link2]
-    And I wait 500 milliseconds
 
 Examples:
   |link1                                   |link2                                                           |

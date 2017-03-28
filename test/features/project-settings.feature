@@ -8,13 +8,9 @@ Scenario Outline: Updating Project Title/ Description
   When I click on the #nav-bar-settings-link element
   And I enter [Text] in the [Field] field
   And I click on the Save Project button
-  And I wait 1000 milliseconds
   Then I am on the [Title] project portal
-  And I wait 1000 milliseconds
   When I click on the icon fa fa-home
-  And I wait 1000 milliseconds
   And I am on /#/ 
-  And I wait 1000 milliseconds
   Then I see [Element] with the text [Text]
 
  Examples:
@@ -32,9 +28,7 @@ Scenario Outline: Updating Preview git rep field/‘Preview App URL’ field
   When I click on the #nav-bar-settings-link element
   And I enter [Text] in the [Field] field
   And I click on the Save Project button
-  And I wait 1000 milliseconds
   When I click on the #nav-bar-settings-link element
-  And I wait 1000 milliseconds
   Then I see [Text] in the [Field] field
 
   Examples:
