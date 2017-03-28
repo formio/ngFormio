@@ -78,7 +78,7 @@
               </h4>
               <span class="label label-success">{{ team.owner === user._id ? 'OWNER' : 'MEMBER'}}</span>
             </a>
-            <a ng-if="highestRole === 'owner'" ui-sref="project.settings.teams.add" class="list-group-item"><i class="fa fa-plus"></i> Add Team</a>
+            <a ng-if="highestRole === 'owner'" ui-sref="project.teams.add" class="list-group-item"><i class="fa fa-plus"></i> Add Team</a>
           </div>
           <h4>
             <span ng-if="highestRole === 'owner'">You are the project <strong>owner</strong>.</span>

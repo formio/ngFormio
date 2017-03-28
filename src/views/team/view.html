@@ -33,7 +33,7 @@
       <td class="col-sm-6 ellipsis">{{project.title}}</td>
       <td class="col-sm-5">{{ getPermissionLabel(project.permission) }}</td>
       <td class="col-sm-1">
-        <button ui-sref="project.settings.teams.edit({teamId: team._id, projectId: project._id})" class="btn btn-default btn-xs">
+        <button ui-sref="project.teams.edit({teamId: team._id, projectId: project._id})" class="btn btn-default btn-xs">
           <span class="glyphicon glyphicon-edit"></span>&nbsp;Edit
         </button>
       </td>

@@ -292,13 +292,7 @@ app.controller('ProjectController', [
         $scope.currentProjectEligibleTeams = _.filter(result.data, {owner: $scope.user._id});
       });
 
-      // Load the projects teams.
       $scope.projectTeamsLoading = true;
-      var projectTeamsPromise = $http.get(AppConfig.apiBase + '/team/project/' + $scope.currentProject._id).then(function(result) {
-        $scope.currentProjectTeams = result.data;
-        $scope.projectTeamsLoading = false;
-      });
-
       var primaryProjectPromise;
       if ($scope.currentProject.project) {
         // This is an environment. Load the primary Project
@@ -310,62 +304,71 @@ app.controller('ProjectController', [
       }
       primaryProjectPromise.then(function(primaryProject) {
         $scope.primaryProject = primaryProject;
+
+        // Load project environments
         Formio.loadProjects('?project=' + $scope.primaryProject._id).then(function(environments) {
           $scope.environments = environments;
         });
-      });
 
-      // Calculate the users highest role within the project.
-      $q.all([userTeamsPromise, projectTeamsPromise]).then(function() {
-        var roles = _.has($scope.user, 'roles') ? $scope.user.roles : [];
-        var teams = _($scope.userTeams ? $scope.userTeams : [])
-          .map('_id')
-          .filter()
-          .value();
-        var allRoles = _(roles.concat(teams)).filter().value();
-        var highestRole = null;
+        // Load the projects teams.
+        var projectTeamsPromise = $http.get(AppConfig.apiBase + '/team/project/' + $scope.primaryProject._id).then(function(result) {
+          $scope.currentProjectTeams = result.data;
+          $scope.projectTeamsLoading = false;
+        });
 
-        /**
-         * Determine if the user contains a role of the given type.
-         *
-         * @param {String} type
-         *   The type of role to search for.
-         * @returns {boolean}
-         *   If the current user has the role or not.
-         */
-        var hasRoles = function(type) {
-          var potential = _($scope.currentProjectTeams)
-            .filter({permission: type})
+        // Calculate the users highest role within the project.
+        $q.all([userTeamsPromise, projectTeamsPromise]).then(function() {
+          var roles = _.has($scope.user, 'roles') ? $scope.user.roles : [];
+          var teams = _($scope.userTeams ? $scope.userTeams : [])
             .map('_id')
+            .filter()
             .value();
-          return (_.intersection(allRoles, potential).length > 0);
-        };
+          var allRoles = _(roles.concat(teams)).filter().value();
+          var highestRole = null;
 
-        $scope.projectPermissions = {
-          read: true,
-          write: true,
-          admin: true
-        };
-        if (_.has($scope.user, '_id') && _.has($scope.currentProject, 'owner') &&  ($scope.user._id === $scope.currentProject.owner)) {
-          highestRole = 'owner';
-        }
-        else if (hasRoles('team_admin')) {
-          highestRole = 'team_admin';
-        }
-        else if (hasRoles('team_write')) {
-          highestRole = 'team_write';
-          $scope.projectPermissions.admin = false;
-        }
-        else if (hasRoles('team_read')) {
-          highestRole = 'team_read';
-          $scope.projectPermissions.admin = false;
-          $scope.projectPermissions.write = false;
-        }
-        else {
-          highestRole = 'anonymous';
-        }
+          /**
+           * Determine if the user contains a role of the given type.
+           *
+           * @param {String} type
+           *   The type of role to search for.
+           * @returns {boolean}
+           *   If the current user has the role or not.
+           */
+          var hasRoles = function(type) {
+            var potential = _($scope.currentProjectTeams)
+              .filter({permission: type})
+              .map('_id')
+              .value();
+            return (_.intersection(allRoles, potential).length > 0);
+          };
 
-        $scope.highestRole = highestRole;
+          $scope.projectPermissions = {
+            read: true,
+            write: true,
+            admin: true
+          };
+          if (_.has($scope.user, '_id') && _.has($scope.currentProject, 'owner') &&  ($scope.user._id === $scope.currentProject.owner)) {
+            highestRole = 'owner';
+          }
+          else if (hasRoles('team_admin')) {
+            highestRole = 'team_admin';
+          }
+          else if (hasRoles('team_write')) {
+            highestRole = 'team_write';
+            $scope.projectPermissions.admin = false;
+          }
+          else if (hasRoles('team_read')) {
+            highestRole = 'team_read';
+            $scope.projectPermissions.admin = false;
+            $scope.projectPermissions.write = false;
+          }
+          else {
+            highestRole = 'anonymous';
+          }
+
+          $scope.highestRole = highestRole;
+        });
+
       });
 
       $scope.projectSettingsVisible = function() {
@@ -1949,6 +1952,15 @@ app.controller('ProjectSettingsController', [
   }
 ]);
 
+app.controller('ProjectTeamController', [
+  '$scope',
+  function(
+    $scope
+  ) {
+
+  }
+]);
+
 app.controller('ProjectTeamViewController', [
   '$scope',
   'TeamPermissions',
@@ -2048,7 +2060,7 @@ app.controller('ProjectTeamEditController', [
           });
           GoogleAnalytics.sendEvent('Project', 'update', null, 1);
           // Reload state so alerts display and project updates.
-          $state.go('project.settings.teams.view', null, {reload: true});
+          $state.go('project.teams.view', null, {reload: true});
         }, FormioAlerts.onError.bind(FormioAlerts))
         .catch(FormioAlerts.onError.bind(FormioAlerts));
     };
@@ -2070,7 +2082,7 @@ app.controller('ProjectTeamDeleteController', [
   ) {
     $scope.removeTeam = _.filter($scope.currentProjectTeams, {_id: $stateParams.teamId})[0];
     $scope.saveTeam = function() {
-      if(!$scope.removeTeam || !$scope.removeTeam) return $state.go('project.settings.teams.view', null, {reload: true});
+      if(!$scope.removeTeam || !$scope.removeTeam) return $state.go('project.teams.view', null, {reload: true});
 
       // Search the present permissions to remove the given permission.
       var access = $scope.currentProject.access ||  [];
@@ -2092,7 +2104,7 @@ app.controller('ProjectTeamDeleteController', [
           });
           GoogleAnalytics.sendEvent('Project', 'update', null, 1);
           // Reload state so alerts display and project updates.
-          $state.go('project.settings.teams.view', null, {reload: true});
+          $state.go('project.teams.view', null, {reload: true});
         }, FormioAlerts.onError.bind(FormioAlerts))
         .catch(FormioAlerts.onError.bind(FormioAlerts));
     };

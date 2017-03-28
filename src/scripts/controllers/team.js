@@ -110,7 +110,7 @@ app.controller('TeamAddController', [
         type: 'success',
         message: 'Team was deleted.'
       });
-      $state.go('project.settings.teams.view');
+      $state.go('project.teams.view');
     });
   }
 ]);

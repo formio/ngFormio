@@ -17,15 +17,15 @@
       <td>
         <div class="row">
           <div class="col-sm-8 ellipsis">
-            <h4><a ui-sref="project.settings.teams.edit({teamId: team._id})">{{ team.data.name }}</a></h4>
+            <h4><a ui-sref="project.teams.edit({teamId: team._id})">{{ team.data.name }}</a></h4>
           </div>
           <div class="col-sm-2">
             <h4>{{ getPermissionLabel(team.permission) }}</h4>
           </div>
           <div class="col-sm-2">
             <div class="button-group pull-right" style="display:flex;">
-              <a ui-sref="project.settings.teams.edit({teamId: team._id})" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-edit"></span> Edit</a>&nbsp;
-              <a ui-sref="project.settings.teams.delete({teamId: team._id})" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-trash"></span></a>
+              <a ui-sref="project.teams.edit({teamId: team._id})" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-edit"></span> Edit</a>&nbsp;
+              <a ui-sref="project.teams.delete({teamId: team._id})" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-trash"></span></a>
             </div>
           </div>
         </div>
@@ -35,7 +35,7 @@
 </table>
 
 <div ng-if="currentProject.owner === user._id" class="text-right">
-  <a ui-sref="project.settings.teams.add()" class="btn btn-success" ng-if="currentProjectEligibleTeams && currentProjectEligibleTeams.length !== 0"><span class="glyphicon glyphicon-plus"></span> Add Team</a>
+  <a ui-sref="project.teams.add()" class="btn btn-success" ng-if="currentProjectEligibleTeams && currentProjectEligibleTeams.length !== 0"><span class="glyphicon glyphicon-plus"></span> Add Team</a>
 </div>
 <div class="text-center">
   <a ui-sref="createTeam()" class="btn btn-success" ng-if="!currentProjectEligibleTeams || currentProjectEligibleTeams.length === 0">Create a Team</a>

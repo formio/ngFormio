@@ -353,6 +353,7 @@ angular
         .state('project.teams', {
           abstract: true,
           url: '/teams',
+          controller: 'ProjectTeamController',
           templateUrl: 'views/project/teams/teams.html'
         })
         .state('project.teams.view', {
