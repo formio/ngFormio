@@ -354,13 +354,12 @@ module.exports = function (config) {
             .catch(next);
         });
       })
-      .given('an account exists with the username $USERNAME, email $EMAIL and password $PASSWORD', function (username, email, password, next) {
+      .given('an account exists with the username $USERNAME, email $EMAIL and password $PASSWORD', function(username, email, password, next) {
         username = replacements(username);
         email = replacements(email);
         password = replacements(password);
-
         var driver = this.driver;
-        authUser(driver, 'formio', 'user/login', email, password, function (err, res) {
+        authUser(driver, 'formio', 'user/login', email, password, function(err, res) {
           if (err || res === 'Invalid user') {
             // User doesn't exist. Create it.
             return createUser(driver, 'formio', 'user/register', username, email, password, next);
@@ -626,7 +625,7 @@ module.exports = function (config) {
           })
           .catch(next);
       })
-      .then('I have been logged in', function (next) {
+      .then('I have been logged in', function(next) {
         var driver = this.driver;
         var tries = 0;
 
@@ -636,14 +635,13 @@ module.exports = function (config) {
           }
 
           driver.pause(50)
-            .localStorage('GET', 'formioToken', function (err, res) {
+            .localStorage('GET', 'formioToken', function(err, res) {
               if (err) {
                 return next(err);
               }
               if (res.value) {
                 return next();
               }
-
               tries += 1;
               attempt();
             })
