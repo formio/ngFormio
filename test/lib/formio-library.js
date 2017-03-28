@@ -360,8 +360,7 @@ module.exports = function (config) {
         password = replacements(password);
         var driver = this.driver;
         authUser(driver, 'formio', 'user/login', email, password, function(err, res) {
-          console.log("response => "+res );
-          if (err || res === 'Invalid user') {
+          if (err || res === 'User or password was incorrect') {
             // User doesn't exist. Create it.
             return createUser(driver, 'formio', 'user/register', username, email, password, next);
           }
@@ -750,13 +749,13 @@ module.exports = function (config) {
           })
           .catch(next);
       })
-      .then('I see $element with the text $text', function (element, text, next) {
+      .then('I see $element with the text $text', function(element, text, next) {
         text = replacements(text);
 
         var driver = this.driver;
         driver.waitForExist(element, timeout)
           .isVisible(element)
-          .then(function (visible) {
+          .then(function(visible) {
             if (!(visible instanceof Array)) {
               visible = [visible];
             }
@@ -764,13 +763,12 @@ module.exports = function (config) {
             assert(_.any(visible));
           })
           .getText(element)
-          .then(function (found) {
+          .then(function(found) {
             try {
               assert.equal(found, text);
               return next();
             }
-            catch (e) {
-            }
+            catch(e) {}
 
             assert(_.startsWith(found, text) || _.endsWith(found, text));
 
