@@ -45,7 +45,6 @@ Feature: Login Functionality
     When I enter ${login2.email} in the .login-container #email field
     And I enter ${login2.password} in the .login-container #password field
     And I click the LOG IN button
-    And I wait 1000 milliseconds
     Then I have been logged in
 
   Scenario: Logging out
