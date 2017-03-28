@@ -101,6 +101,7 @@ Scenario:Deleting a ‘Form’
     When I click on the glyphicon glyphicon-trash button for User Login form
     And I see button.btn.btn-danger with the text Yes
     And I click the Yes button
+    And I wait 1000 milliseconds
     Then I am on the form page of ${project3.title} project
     And I donot see User Login form
 
