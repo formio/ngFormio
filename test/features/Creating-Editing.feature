@@ -4,9 +4,9 @@ Scenario: Clicking ‘Data’ button for Resource on Resource page
     Given I am logged in for profileuser3
     And A project exists with the ${random-title>project3.title} and ${random-description>project3.description}
     And I am on the ${project3.title} project overview page
-    And I wait 100 milliseconds
+    And I wait 1000 milliseconds
     When I click on the Forms link
-    And I wait 100 milliseconds
+    And I wait 1000 milliseconds
     Then I am on the form page of ${project3.title} project
     Then I can see User Login in the Forms  Section
     Then I can see User Register in the Forms  Section
