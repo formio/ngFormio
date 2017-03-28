@@ -4,6 +4,7 @@ Feature: Project Upgrade Functionality
     Given I am logged in for upgradeUser
     And A project exists with the ${random-title>upgradeProject.title} and ${random-description>upgradeProject.description}
     And I am on the ${upgradeProject.title} project overview page
+    And I wait 1000 milliseconds
     When I click the Upgrade Project link
     Then I see the .project-upgrade-dialog modal
     And the Submit button is disabled
@@ -18,16 +19,16 @@ Feature: Project Upgrade Functionality
   Scenario: Defaults to Team Pro
     Given I am logged in for upgradeUser
     And I am on the ${upgradeProject.title} project overview page
-    When I click the  Upgrade Project link
     And I wait 1000 milliseconds
-    Then I see Are you sure you want to change your project plan to Team Pro?
+    When I click the Upgrade Project link
+    Then I see Team Pro
 
   Scenario: Upgrades to Independent
     Given I am logged in for upgradeUser
     And I am on the ${upgradeProject.title} project overview page
+    And I wait 1000 milliseconds
     When I click the Upgrade Project link
     And I update the project to the Independent Plan
-    And I wait 1000 milliseconds
     And I click the Change plan to Independent button
     And I am on the ${upgradeProject.title} project overview page
     Then I see #project-plan-display with the text Independent
@@ -35,6 +36,7 @@ Feature: Project Upgrade Functionality
   Scenario: Upgrades to Team Pro
     Given I am logged in for upgradeUser
     And I am on the ${upgradeProject.title} project overview page
+    And I wait 1000 milliseconds
     When I click the Upgrade Project link
     And I update the project to the Team Pro Plan
     And I click the Change plan to Team Pro button
@@ -44,6 +46,7 @@ Feature: Project Upgrade Functionality
   Scenario: Upgrades to Commercial
     Given I am logged in for upgradeUser
     And I am on the ${upgradeProject.title} project overview page
+    And I wait 1000 milliseconds
     When I click the Upgrade Project link
     And I update the project to the Commercial Plan
     And I click the Change plan to Commercial button
@@ -53,6 +56,7 @@ Feature: Project Upgrade Functionality
   Scenario: Downgrades to Team Pro
     Given I am logged in for upgradeUser
     And I am on the ${upgradeProject.title} project overview page
+    And I wait 1000 milliseconds
     When I click the Upgrade Project link
     And I update the project to the Team Pro Plan
     And I click the Change plan to Team Pro button
@@ -62,6 +66,7 @@ Feature: Project Upgrade Functionality
   Scenario: Downgrades to Independent
     Given I am logged in for upgradeUser
     And I am on the ${upgradeProject.title} project overview page
+    And I wait 1000 milliseconds
     When I click the Upgrade Project link
     And I update the project to the Independent Plan
     And I click the Change plan to Independent button
@@ -71,6 +76,7 @@ Feature: Project Upgrade Functionality
   Scenario: Downgrades to Basic
     Given I am logged in for upgradeUser
     And I am on the ${upgradeProject.title} project overview page
+    And I wait 1000 milliseconds
     When I click the Upgrade Project link
     And I update the project to the Basic Plan
     And I click the Change plan to Basic button
