@@ -150,7 +150,7 @@ app.controller('ProjectCreateController', [
 
     $scope.saveProject = function() {
       FormioProject.createProject($scope.currentProject).then(function(project) {
-        $state.go('project.overview', {projectId: project._id});
+        $state.go('project.env.overview', {projectId: project._id});
       });
     };
   }
@@ -1837,8 +1837,8 @@ app.controller('ProjectSettingsController', [
   ) {
     if (!$scope.highestRole || ($scope.highestRole && ['team_read', 'team_write'].indexOf($scope.highestRole) !== -1)) {
       // this is constantly going to overview on reload.
-      //$state.go('project.overview');
-      return;
+      //$state.go('project.env.overview');
+      //return;
     }
 
     $scope.currentSection.title = 'Settings';
@@ -2115,9 +2115,11 @@ app.controller('ProjectPlanController', [
 
 app.controller('ProjectEnvironmentAddController', [
   '$scope',
+  '$state',
   'FormioProject',
   function(
     $scope,
+    $state,
     FormioProject
   ) {
     $scope.environmentTypes = [
@@ -2139,7 +2141,7 @@ app.controller('ProjectEnvironmentAddController', [
 
     $scope.saveEnvironment = function() {
       FormioProject.createProject($scope.environment).then(function(project) {
-        $state.go('project.overview', {projectId: project._id});
+        $state.go('project.env.overview', {projectId: project._id});
       });
     }
   }

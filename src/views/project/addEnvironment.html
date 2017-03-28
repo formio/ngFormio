@@ -18,7 +18,7 @@
         <input id="externalUrl" class="form-control" ng-model="environment.externalUrl" />
         <p>Enter the URL for the on premise environment.</p>
       </div>
-      <a ng-if="!environment._id" ui-sref="project.overview()" class="btn btn-default">Cancel</a>
+      <a ng-if="!environment._id" ui-sref="project.env.overview()" class="btn btn-default">Cancel</a>
       <button type="submit" class="btn btn-primary" ng-disabled="projectForm.$invalid">{{environment._id ? 'Save Environment' : 'Create Environment'}}</button>
     </form>
   </div>

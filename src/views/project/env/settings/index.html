@@ -131,5 +131,5 @@
     </div>
   </div>
   <a ng-if="!currentProject._id" ui-sref="home()" class="btn btn-default">Cancel</a>
-  <button type="submit" class="btn btn-primary" ng-disabled="projectForm.$invalid">{{currentProject._id ? 'Save Project' : 'Create Project'}}</button>
+  <button type="submit" class="btn btn-primary" ng-disabled="projectForm.$invalid">{{currentProject._id ? 'Save ' + projectType + ' Settings' : 'Create ' + projectType}}</button>
 </form>

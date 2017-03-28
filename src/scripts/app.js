@@ -140,11 +140,6 @@ angular
             showWelcomeModal: false
           }
         })
-        .state('project.overview', {
-          url: '/overview',
-          controller: 'ProjectOverviewController',
-          templateUrl: 'views/project/overview/index.html'
-        })
         .state('project.environment', {
           url: '/addenv',
           controller: 'ProjectEnvironmentAddController',
@@ -208,115 +203,122 @@ angular
           templateUrl: 'views/project/api/index.html',
           controller: 'ApiController'
         })
-        .state('project.settings', {
+        .state('project.env', {
+          url: '/env',
+          abstract: true,
+          templateUrl: 'views/project/env/index.html'
+        })
+        .state('project.env.overview', {
+          url: '/overview',
+          controller: 'ProjectOverviewController',
+          templateUrl: 'views/project/env/overview/index.html'
+        })
+        .state('project.env.settings', {
           url: '/settings',
-          templateUrl: 'views/project/settings/settings.html',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/settings/index.html',
           controller: 'ProjectSettingsController'
         })
-        .state('project.settings.project', {
-          url: '/project',
-          templateUrl: 'views/project/settings/project-settings.html'
-        })
-        .state('project.settings.database', {
+        .state('project.env.database', {
           url: '/database',
           abstract: true,
-          parent: 'project.settings'
+          parent: 'project.env'
         })
-        .state('project.settings.database.clone', {
+        .state('project.env.database.clone', {
           url: '/database',
-          parent: 'project.settings',
-          templateUrl: 'views/project/settings/database/clone.html'
+          parent: 'project.env',
+          templateUrl: 'views/project/env/database/clone.html'
         })
-        .state('project.settings.database.import', {
+        .state('project.env.database.import', {
           url: '/database/import',
-          parent: 'project.settings',
-          templateUrl: 'views/project/settings/database/import.html'
+          parent: 'project.env',
+          templateUrl: 'views/project/env/database/import.html'
         })
-        .state('project.settings.database.export', {
+        .state('project.env.database.export', {
           url: '/database/export',
-          parent: 'project.settings',
-          templateUrl: 'views/project/settings/database/export.html'
+          parent: 'project.env',
+          templateUrl: 'views/project/env/database/export.html'
         })
-        .state('project.settings.database.wipe', {
+        .state('project.env.database.wipe', {
           url: '/database/wipe',
-          parent: 'project.settings',
-          templateUrl: 'views/project/settings/database/wipe.html',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/database/wipe.html',
         })
-        .state('project.settings.definition', {
+        .state('project.env.definition', {
           url: '/definition',
           abstract: true,
-          parent: 'project.settings'
+          parent: 'project.env'
         })
-        .state('project.settings.definition.deploy', {
+        .state('project.env.definition.deploy', {
           url: '/definition',
-          parent: 'project.settings',
-          templateUrl: 'views/project/settings/definition/deploy.html',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/definition/deploy.html',
           controller: 'ProjectDeployController'
         })
-        .state('project.settings.definition.import', {
+        .state('project.env.definition.import', {
           url: '/definition/import',
-          parent: 'project.settings',
-          templateUrl: 'views/project/settings/definition/import.html'
+          parent: 'project.env',
+          templateUrl: 'views/project/env/definition/import.html'
         })
-        .state('project.settings.definition.export', {
+        .state('project.env.definition.export', {
           url: '/definition/export',
-          parent: 'project.settings',
-          templateUrl: 'views/project/settings/definition/export.html'
+          parent: 'project.env',
+          templateUrl: 'views/project/env/definition/export.html'
         })
-        .state('project.settings.definition.delete', {
+        .state('project.env.definition.delete', {
           url: '/definition/delete',
-          parent: 'project.settings',
-          templateUrl: 'views/project/settings/definition/delete.html'
+          parent: 'project.env',
+          templateUrl: 'views/project/env/definition/delete.html'
         })
-        .state('project.settings.activity', {
+        .state('project.env.activity', {
           url: '/activity',
-          parent: 'project.settings',
+          parent: 'project.env',
           controller: 'ProjectOverviewController',
-          templateUrl: 'views/project/settings/activity/index.html',
+          templateUrl: 'views/project/env/activity/index.html',
           params: {
             graphType: 'Month'
           }
         })
-        .state('project.settings.logs', {
+        .state('project.env.logs', {
           url: '/logs',
-          parent: 'project.settings',
-          templateUrl: 'views/project/settings/logs/index.html',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/logs/index.html',
         })
-        .state('project.settings.integrations', {
+        .state('project.env.integrations', {
           url: '/integrations',
           abstract: true,
-          parent: 'project.settings'
+          parent: 'project.env'
         })
-        .state('project.settings.integrations.email', {
-          //url: '/integrations/email',
-          parent: 'project.settings',
-          templateUrl: 'views/project/settings/integrations/email/email.html'
+        .state('project.env.integrations.email', {
+          url: '/integrations/email',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/integrations/email/email.html'
         })
-        .state('project.settings.integrations.storage', {
+        .state('project.env.integrations.storage', {
           url: '/integrations/storage',
-          parent: 'project.settings',
-          templateUrl: 'views/project/settings/integrations/storage/storage.html',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/integrations/storage/storage.html',
           controller: 'ProjectStorageController'
         })
-        .state('project.settings.data', {
+        .state('project.env.integrations.data', {
           url: '/integrations/data',
-          parent: 'project.settings.integrations',
-          templateUrl: 'views/project/settings/integrations/data/index.html'
+          parent: 'project.env',
+          templateUrl: 'views/project/env/integrations/data/index.html'
         })
-        .state('project.settings.integrations.apiKeys', {
+        .state('project.env.integrations.apiKeys', {
           url: '/integrations/apiKeys',
-          parent: 'project.settings',
-          templateUrl: 'views/project/settings/integrations/apiKeys/index.html'
+          parent: 'project.env',
+          templateUrl: 'views/project/env/integrations/apiKeys/index.html'
         })
-        .state('project.settings.integrations.customjscss', {
+        .state('project.env.integrations.customjscss', {
           url: '/integrations/customjscss',
-          parent: 'project.settings',
-          templateUrl: 'views/project/settings/integrations/customjscss/index.html'
+          parent: 'project.env',
+          templateUrl: 'views/project/env/integrations/customjscss/index.html'
         })
-        .state('project.settings.integrations.oauth', {
+        .state('project.env.integrations.oauth', {
           url: '/integrations/oauth',
-          parent: 'project.settings',
-          templateUrl: 'views/project/settings/integrations/oauth/index.html'
+          parent: 'project.env',
+          templateUrl: 'views/project/env/integrations/oauth/index.html'
         })
         .state('project.access', {
           url: '/access',
@@ -348,27 +350,27 @@ angular
           templateUrl: 'views/project/access/roles/delete.html',
           controller: 'RoleController'
         })
-        .state('project.settings.teams', {
+        .state('project.teams', {
           abstract: true,
           url: '/teams',
           templateUrl: 'views/project/teams/teams.html'
         })
-        .state('project.settings.teams.view', {
+        .state('project.teams.view', {
           url: '',
           controller: 'ProjectTeamViewController',
           templateUrl: 'views/project/teams/view.html'
         })
-        .state('project.settings.teams.add', {
+        .state('project.teams.add', {
           url: '/add',
           controller: 'ProjectTeamEditController',
           templateUrl: 'views/project/teams/edit.html'
         })
-        .state('project.settings.teams.edit', {
+        .state('project.teams.edit', {
           url: '/:teamId/edit',
           controller: 'ProjectTeamEditController',
           templateUrl: 'views/project/teams/edit.html'
         })
-        .state('project.settings.teams.delete', {
+        .state('project.teams.delete', {
           url: '/:teamId/delete',
           controller: 'ProjectTeamDeleteController',
           templateUrl: 'views/project/teams/delete.html'
@@ -573,7 +575,7 @@ angular
         if (!$scope.submitted) {
           $scope.submitted = true;
           FormioProject.createProject(template).then(function(project) {
-            $state.go('project.overview', {projectId: project._id});
+            $state.go('project.env.overview', {projectId: project._id});
           });
         }
       };
@@ -786,7 +788,7 @@ angular
       });
 
       $rootScope.goToProject = function(project) {
-        $state.go('project.overview', {
+        $state.go('project.env.overview', {
           projectId: project._id
         });
       };
