@@ -35,7 +35,7 @@
   </div>
   <div class="panel-body">
     <div class="well">
-      User Permissions allow you to control who can create, view, and modify form submissions. Here you may assign Project Roles to permissions. <strong>Roles</strong> can be created and edited in <a ui-sref="project.settings.roles.view({projectId: currentProject._id})">Project Settings</a>.
+      User Permissions allow you to control who can create, view, and modify form submissions. Here you may assign Project Roles to permissions. <strong>Roles</strong> can be created and edited in <a ui-sref="project.access({projectId: currentProject._id})">Project Settings</a>.
     </div>
     <div ng-if="form._id">
       <permission-editor permissions="form.submissionAccess" labels="submissionAccessLabels" roles="currentProjectRoles" wait-for="loadFormPromise"></permission-editor>

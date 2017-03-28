@@ -4,12 +4,12 @@
     <td>
       <div class="row">
         <div class="col-xs-5">
-          <h4><a ui-sref="project.settings.roles.edit({roleId: role._id})">{{ role.title }}</a></h4>
+          <h4><a ui-sref="project.roles.edit({roleId: role._id})">{{ role.title }}</a></h4>
         </div>
         <div class="col-xs-7">
           <div class="button-group pull-right" style="display:flex;">
-            <a ui-sref="project.settings.roles.edit({roleId: role._id})" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-edit"></span> Edit</a>&nbsp;
-            <a ui-sref="project.settings.roles.delete({roleId: role._id})" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-trash"></span></a>
+            <a ui-sref="project.roles.edit({roleId: role._id})" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-edit"></span> Edit</a>&nbsp;
+            <a ui-sref="project.roles.delete({roleId: role._id})" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-trash"></span></a>
           </div>
         </div>
       </div>
@@ -23,5 +23,5 @@
   </tbody>
 </table>
 <div class="text-right">
-  <a ui-sref="project.settings.roles.edit()" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> New Role</a>
+  <a ui-sref="project.roles.edit()" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> New Role</a>
 </div>

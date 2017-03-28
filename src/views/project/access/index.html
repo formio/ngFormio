@@ -1,5 +1,13 @@
 <div class="project-section-content">
   <div class="project-section-inner-content">
-    This section controls Project Level Access and Roles.
+    <div class="row">
+      <div class="col-md-6">
+        <ng-include src="'views/project/access/access/access.html'" />
+      </div>
+      <div class="col-md-6">
+        <h4>Project Roles</h4>
+        <ng-include src="'views/project/access/roles/view.html'" />
+      </div>
+    </div>
   </div>
 </div>

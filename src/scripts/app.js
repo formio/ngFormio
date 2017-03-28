@@ -323,29 +323,19 @@ angular
         .state('project.access', {
           url: '/access',
           templateUrl: 'views/project/access/index.html',
-          //controller: 'ProjectDataController'
+            controller: 'AccessController'
         })
-        .state('project.settings.access', {
-          url: '/access',
-          parent: 'project.settings',
-          templateUrl: 'views/project/access/access/access.html',
-          controller: 'AccessController'
-        })
-        .state('project.settings.roles', {
+        .state('project.roles', {
           abstract: true,
           url: '/roles',
           templateUrl: 'views/project/access/roles/roles.html'
         })
-        .state('project.settings.roles.view', {
-          url: '',
-          templateUrl: 'views/project/access/roles/view.html'
-        })
-        .state('project.settings.roles.edit', {
+        .state('project.roles.edit', {
           url: '/:roleId/edit',
           templateUrl: 'views/project/access/roles/edit.html',
           controller: 'RoleController'
         })
-        .state('project.settings.roles.delete', {
+        .state('project.roles.delete', {
           url: '/:roleId/delete',
           templateUrl: 'views/project/access/roles/delete.html',
           controller: 'RoleController'
