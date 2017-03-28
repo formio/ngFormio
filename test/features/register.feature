@@ -69,7 +69,6 @@ Feature: Register Functionality
     And I enter ${random-password>register3.password} in the .register-container #password field
     And I enter ${register3.password} in the .register-container #verifyPassword field
     And I click the REGISTER button
-    When I wait 1000 milliseconds
     Then I see .alert with the text Email must be unique.
 
   Scenario: Successful registration
