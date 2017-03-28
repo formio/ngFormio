@@ -140,15 +140,15 @@ angular
             showWelcomeModal: false
           }
         })
-        .state('project.environment', {
-          url: '/addenv',
-          controller: 'ProjectEnvironmentAddController',
-          templateUrl: 'views/project/addEnvironment.html'
-        })
         .state('createProject', {
           url: '/create/project',
           templateUrl: 'views/project/create.html',
           controller: 'ProjectCreateController'
+        })
+        .state('project.environment', {
+          url: '/addenv',
+          controller: 'ProjectCreateEnvironmentController',
+          templateUrl: 'views/project/create.html'
         })
         .state('project.data', {
           url: '/data',
@@ -212,6 +212,11 @@ angular
           url: '/overview',
           controller: 'ProjectOverviewController',
           templateUrl: 'views/project/env/overview/index.html'
+        })
+        .state('project.env.tour', {
+          url: '/tour',
+          controller: 'ProjectOverviewController',
+          templateUrl: 'views/project/env/tour/index.html'
         })
         .state('project.env.settings', {
           url: '/settings',

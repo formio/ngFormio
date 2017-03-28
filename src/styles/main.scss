@@ -880,8 +880,8 @@ footer {
   padding: 0 0 25px 0;
   text-align: center;
   background-color: darken($brand-secondary, 2%);
-  display: table-row;
-  width: 100%;
+  border-left: 85px solid darken($brand-primary, 25%);
+;
   a {
     color: white;
   }

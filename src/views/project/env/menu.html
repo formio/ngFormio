@@ -1,7 +1,7 @@
 <div class="well">
   <ul class="nav nav-pills nav-stacked project-settings-menu">
     <li role="presentation" ng-class="{active:($state.includes('project.env.overview'))}"><a ui-sref="project.env.overview">Overview</a></li>
-    <li role="presentation" ng-class="{active:($state.includes('project.env.tour'))}"><a ui-sref="project.env.tour">Tour</a></li>
+    <li role="presentation" ng-class="{active:($state.includes('project.env.tour'))}"><a ui-sref="project.env.tour">Tour ({{ stepsPercent }}%)</a></li>
     <li role="presentation" ng-class="{active:($state.includes('project.env.settings'))}"><a ui-sref="project.env.settings">Environment Settings</a></li>
     <li role="presentation" ng-class="{active:($state.includes('project.env.definition'))}">
       <a ui-sref="project.env.definition.deploy">Project Definition</a>

@@ -156,6 +156,30 @@ app.controller('ProjectCreateController', [
   }
 ]);
 
+app.controller('ProjectCreateEnvironmentController', [
+  '$scope',
+  function(
+    $scope
+  ) {
+    $scope.environmentTypes = [
+      {
+        key: 'hosted',
+        label: 'Hosted'
+      },
+      {
+        key: 'onPremise',
+        label: 'On Premise'
+      }
+    ];
+
+    $scope.currentProject = {
+      title: '',
+      //type: 'hosted',
+      project: $scope.primaryProject._id
+    };
+  }
+]);
+
 app.controller('ProjectController', [
   '$scope',
   '$rootScope',
@@ -2122,40 +2146,6 @@ app.controller('ProjectPlanController', [
     $scope.$on('formSubmission', function() {
       $scope.submitted = true;
     });
-  }
-]);
-
-app.controller('ProjectEnvironmentAddController', [
-  '$scope',
-  '$state',
-  'FormioProject',
-  function(
-    $scope,
-    $state,
-    FormioProject
-  ) {
-    $scope.environmentTypes = [
-      {
-        key: 'hosted',
-        label: 'Hosted'
-      },
-      {
-        key: 'onPremise',
-        label: 'On Premise'
-      }
-    ];
-
-    $scope.environment = {
-      title: '',
-      type: 'hosted',
-      project: $scope.primaryProject._id
-    };
-
-    $scope.saveEnvironment = function() {
-      FormioProject.createProject($scope.environment).then(function(project) {
-        $state.go('project.env.overview', {projectId: project._id});
-      });
-    }
   }
 ]);
 

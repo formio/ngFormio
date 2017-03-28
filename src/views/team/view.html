@@ -3,17 +3,20 @@
   <thead>
     <tr>
       <th>Member</th>
+      <th>Role</th>
+      <th></th>
     </tr>
   </thead>
   <tbody>
     <tr ng-repeat="member in team.data.members">
       <td>
-        <div class="col-sm-11">
-          {{ member.data.name }}
-        </div>
-        <div class="col-sm-1">
-          <button ng-show="(team.owner !== member._id) && (member._id === user._id)" class="btn btn-danger btn-xs" ng-click="leaveTeam(team._id)">Leave</button>
-        </div>
+        {{ member.data.name }}
+      </td>
+      <td>
+        <span class="label label-success">{{ team.owner === member._id ? 'OWNER' : 'MEMBER'}}</span>
+      </td>
+      <td>
+        <button ng-show="(team.owner !== member._id) && (member._id === user._id)" class="btn btn-danger btn-xs" ng-click="leaveTeam(team._id)">Leave</button>
       </td>
     </tr>
   </tbody>
