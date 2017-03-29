@@ -1,6 +1,6 @@
 Feature : Creating Editing a form
 
-Scenario: Clicking ‘Data’ button for Resource on Resource page
+  Scenario: Clicking ‘Data’ button for Resource on Resource page
     Given I am logged in for profileuser3
     And A project exists with the ${random-title>project3.title} and ${random-description>project3.description}
     And I am on the ${project3.title} project overview page
@@ -12,7 +12,7 @@ Scenario: Clicking ‘Data’ button for Resource on Resource page
     Then I can see User in the Resource Forms Section
     Then I can see Admin in the Resource Forms Section 
 
-Scenario: Searching for existing Forms/Resource with search bar 
+  Scenario: Searching for existing Forms/Resource with search bar 
     Given I am logged in for profileuser3
     And A project exists with the ${random-title>project3.title} and ${random-description>project3.description}
     And I am on the ${project3.title} project overview page
@@ -30,8 +30,7 @@ Scenario: Searching for existing Forms/Resource with search bar
     Then I can see Admin in the Resource Forms Section
     And I donot see User resource
 
-
-Scenario: Searching for non existing Forms in search bar
+  Scenario: Searching for non existing Forms in search bar
     Given I am logged in for profileuser3
     And A project exists with the ${random-title>project3.title} and ${random-description>project3.description}
     And I am on the ${project3.title} project overview page
@@ -48,7 +47,7 @@ Scenario: Searching for non existing Forms in search bar
     Then I can see User in the Resource Forms Section
     Then I can see Admin in the Resource Forms Section
 
-Scenario: Clicking ‘Edit’ button for Form on Form page
+  Scenario: Clicking ‘Edit’ button for Form on Form page
     Given I am logged in for profileuser3
     And A project exists with the ${random-title>project3.title} and ${random-description>project3.description}
     And I am on the ${project3.title} project overview page
@@ -59,7 +58,7 @@ Scenario: Clicking ‘Edit’ button for Form on Form page
     And I see the Email component
     And I see the Password component
 
-Scenario: Clicking ‘Data’ button for Form on Form page
+  Scenario: Clicking ‘Data’ button for Form on Form page
     Given I am logged in for profileuser3
     And A project exists with the ${random-title>project3.title} and ${random-description>project3.description}
     And I am on the ${project3.title} project overview page
@@ -69,7 +68,7 @@ Scenario: Clicking ‘Data’ button for Form on Form page
     Then I am on the submission page of ${project3.title} project
     Then I see the submissions datagrid
 
-Scenario: Clicking ‘Action’ button for Form on Form page
+  Scenario: Clicking ‘Action’ button for Form on Form page
     Given I am logged in for profileuser3
     And A project exists with the ${random-title>project3.title} and ${random-description>project3.description}
     And I am on the ${project3.title} project overview page
@@ -79,7 +78,7 @@ Scenario: Clicking ‘Action’ button for Form on Form page
     Then I am on the action page of ${project3.title} project
     Then I see the Login link
 
-Scenario: Clicking ‘Access’ button for Form on Form page
+  Scenario: Clicking ‘Access’ button for Form on Form page
 	Given I am logged in for profileuser3
     And A project exists with the ${random-title>project3.title} and ${random-description>project3.description}
     And I am on the ${project3.title} project overview page
@@ -90,7 +89,7 @@ Scenario: Clicking ‘Access’ button for Form on Form page
     Then I see Anonymous permission for Create Own Submissions
     Then I see Anonymous permission for Read Form Definition
 
-Scenario:Deleting a ‘Form’
+  Scenario:Deleting a ‘Form’
     Given I am logged in for profileuser3
     And A project exists with the ${random-title>project3.title} and ${random-description>project3.description}
     And I am on the ${project3.title} project overview page

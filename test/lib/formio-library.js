@@ -416,8 +416,6 @@ module.exports = function(config) {
         });
       }
     })
-
-
     .given('I am logged in as $EMAIL with password $PASSWORD', function(email, password, next) {
       var driver = this.driver;
       authUser(driver, 'formio', 'user/login', email, password, function(err, res) {
@@ -454,19 +452,19 @@ module.exports = function(config) {
     .when('I click on the icon $icon', function(icon, next) {
       var driver = this.driver;
       driver.waitForExist('//*[contains(@class,\'' + icon + '\')]', timeout)
-        .then(function(res){
+        .then(function(res) {
           driver.click('//*[contains(@class,\'' + icon + '\')]', timeout)
           next();
         })
-       .catch(next);
-    })//surendra
+        .catch(next);
+    })
     .when('I click on the $button with $link', function(button, link, next) {
       var driver = this.driver;
       driver.waitForExist('//a[contains(@class,"btn btn-default btn-block btn-lg") and contains(@href,"' + link + '")]', timeout)
         .click('//a[contains(@class,"btn btn-default btn-block btn-lg") and contains(@href,"' + link + '")]', timeout)
         .then(next)
         .catch(next);
-    }) //Padma 
+    })
     .when('I click (?:on )?the $BUTTON button', function(button, next) {
       var driver = this.driver;
       driver.pause(20)
@@ -484,8 +482,7 @@ module.exports = function(config) {
           next();
         })
         .catch(next);
-    })//surendra//to check text in the autopopulated field
-
+    })
     .when('I donot have a value in the $title field', function(title, next) {
       var driver = this.driver;
       driver.waitForExist('//*[@id="title"]', timeout)
@@ -496,14 +493,14 @@ module.exports = function(config) {
           next();
         })
         .catch(next);
-    })//surendra
+    })
     .when('I click (?:on )?the $BUTTON input button', function(button, next) {
       var driver = this.driver;
       driver.waitForExist('//input[contains(@value,\'' + button + '\')]', timeout)
         .click('//input[contains(@value,\'' + button + '\')]')
         .then(next)
         .catch(next);
-    })//surendra
+    })
     .then('I see element with the $value value', function(value, next) {
       var driver = this.driver;
       driver.waitForExist('//*[contains(@value,\'' + value + '\')]', timeout)
@@ -517,8 +514,8 @@ module.exports = function(config) {
           next();
         })
         .catch(next);
-    })//surendra
-   .when('I click on the $element element', function(element, next) {
+    })
+    .when('I click on the $element element', function(element, next) {
       var driver = this.driver;
       driver.pause(20)
         .waitForExist(element, timeout)
@@ -558,8 +555,7 @@ module.exports = function(config) {
         .click('//div//img[contains(@src, \'' + text + '\')]', timeout)
         .then(next)
         .catch(next);
-    }) // surendra
-
+    })
     .when('I select the $project project template', function(project, next) {
       var driver = this.driver;
       driver.waitForExist('//*[contains(@class, "template-card") and contains(., "' + project + '")]', timeout)
@@ -567,7 +563,7 @@ module.exports = function(config) {
         .click('//*[contains(@class, "template-card") and contains(., "' + project + '")]', timeout)
         .then(next)
         .catch(next);
-    })//surendra
+    })
     .when('I enter $TEXT in the $FIELD field', function(text, field, next) {
       var driver = this.driver;
       driver.waitForExist(field, timeout)
@@ -635,7 +631,7 @@ module.exports = function(config) {
           next();
         })
         .catch(next);
-    })//surendra
+    })
     .then('I donot see $Resourcename form', function(resourcename, next) {
       var driver = this.driver;
       var path = '//*[contains(@class , "form-list")]//li//h4';
@@ -646,7 +642,7 @@ module.exports = function(config) {
           next();
         })
         .catch(next);
-    })//surendra
+    })
     .then('I donot see any $text forms', function(text, next) {
       var driver = this.driver;
       var path = '//h2[text()=\'' + text + '\']//..//*[contains(@class , "form-list")]//ul';
@@ -656,7 +652,7 @@ module.exports = function(config) {
           next();
         })
         .catch(next);
-    })//surendra
+    })
     .then('I see the $component component', function(component, next) {
       var driver = this.driver;
       driver.waitForExist('//label[contains(text(),\'' + component + '\')]', timeout)
@@ -666,7 +662,7 @@ module.exports = function(config) {
           next();
         })
         .catch(next);
-    })//surendra
+    })
     .then('I see the submissions datagrid', function(next) {
       var driver = this.driver;
       driver.waitForExist('//div[contains(@kendo-grid,"grid")]', timeout)
@@ -676,7 +672,7 @@ module.exports = function(config) {
           next();
         })
         .catch(next);
-    })//Padma
+    })
     .then('I see the $link link', function(link, next) {
       var driver = this.driver;
       driver.waitForExist('//a[contains(text(),"' + link + '")]', timeout)
@@ -686,14 +682,14 @@ module.exports = function(config) {
           next();
         })
         .catch(next);
-    })//Padma
+    })
     .when('I clear the $element field', function(element, next) {
       var driver = this.driver;
       driver.waitForExist(element, timeout)
         .setValue(element, replacements(""))
         .then(next)
         .catch(next);
-    })//surendra
+    })
     .then('I donot see $TEXT', function(text, next) {
       text = replacements(text);
       var driver = this.driver;
@@ -835,7 +831,7 @@ module.exports = function(config) {
           return next();
         })
         .catch(next);
-    }) //padma
+    })
     .then('I am on new window with url $link', function(link, next) {
       var driver = this.driver;
       driver.windowHandles()
@@ -846,7 +842,6 @@ module.exports = function(config) {
               assert.equal(res.value, link);
               next();
             })
-
             .window(result.value[0])
         })
         .catch(next);
@@ -870,7 +865,7 @@ module.exports = function(config) {
           next();
         })
         .catch(next);
-    }) //Padma
+    })
     .then('the user account for $user was updated with $new for $old', function(user, newValue, oldKey, next) {
       if (!user || !newValue || !oldKey) {
         return next('Wrong values given for: user|newValue|oldKey');
@@ -939,7 +934,7 @@ module.exports = function(config) {
           return next();
         })
         .catch(next);
-    }) // Padma
+    })
     .when('I click on $text text element', function(text, next) {
       var driver = this.driver;
       var path = '//span[contains(text(),"' + text + '")]';
@@ -947,7 +942,7 @@ module.exports = function(config) {
         .click(path, timeout)
         .then(next)
         .catch(next);
-    }) //Padma
+    })
     .when('I click on the $button button for $name form', function(button, name, next) {
       var driver = this.driver;
       var path = '//*[text()=\'' + name + '\']//..//..//..//*[contains(@class,\'' + button + '\')]';
@@ -955,7 +950,7 @@ module.exports = function(config) {
         .click(path, timeout)
         .then(next)
         .catch(next);
-    })//surendra
+    })
     .then('I see $role permission for $access', function(role, access, next) {
       var driver = this.driver;
       driver.waitForExist('//*[text()=\'' + access + '\']//..//..//td[2]', timeout)
@@ -970,7 +965,7 @@ module.exports = function(config) {
           next();
         })
         .catch(next);
-    })//surendra
+    })
     .then('I am on the edit page with $text', function(text, next) {
       var driver = this.driver;
       driver.url()
@@ -986,7 +981,7 @@ module.exports = function(config) {
           next();
         })
         .catch(next);
-    }) // Padma 
+    })
     .when('I click (?:on )?the $LINK link', function(link, next) {
       var driver = this.driver;
       driver.pause(20)
@@ -1022,10 +1017,9 @@ module.exports = function(config) {
               assert.equal(found, title);
               next();
             })
-
         })
         .catch(next);
-    }) // Padma
+    })
     .then('I see the plaintext $text', function(text, next) {
       text = replacements(text);
       var driver = this.driver;
@@ -1055,7 +1049,7 @@ module.exports = function(config) {
           next();
         })
         .catch(next);
-    })//surendra
+    })
     .then('I see the $text link in $section section', function(text, section, next) {
       var driver = this.driver;
       var path = '//*[contains(@class,\'project-info\')]//h5[text()=\'' + section + '\']//..//..//*[text()=\'' + text + '\']';
@@ -1066,7 +1060,7 @@ module.exports = function(config) {
           next();
         })
         .catch(next);
-    }) //Padma
+    })
     .then('I donot see the $text link in $section section', function(text, section, next) {
       var driver = this.driver;
       var path = '//*[contains(@class,\'project-info\')]//h5[text()=\'' + section + '\']//..//..//*[contains(text(),\'\')]';
@@ -1077,7 +1071,7 @@ module.exports = function(config) {
           next();
         })
         .catch(next);
-    }) //Padma
+    })
     .when('My project count is $num', function(num, next) {
       var driver = this.driver;
       var path0 = '//*[contains(@ng-if, "projectsLoaded && !projects.length")]';
@@ -1101,7 +1095,7 @@ module.exports = function(config) {
           })
       }
       driver.catch(next);
-    }) //Padma
+    })
     .then('I am on $section section of $page page', function(section, page, next) {
       var driver = this.driver;
       driver.waitForExist('//*[contains(@class, \'active\')]', timeout)
@@ -1114,7 +1108,7 @@ module.exports = function(config) {
         }
         )
         .catch(next);
-    })//surendra
+    })
     .then('I can see $formname in the $section Section', function(formname, section, next) {
       var driver = this.driver;
       var path = '//div//h2[contains(text(),\'' + section + '\')]//..//div[contains(@class,\'form-list\')]//a//h4[contains(text(),\'' + formname + '\')]';
@@ -1133,7 +1127,7 @@ module.exports = function(config) {
         .click('//*[text()=\'' + section + '\']//..//*[text()=\'' + link + '\']', timeout)
         .then(next)
         .catch(next);
-    })//surendra
+    })
     .then('I am taken to submission $name page', function(name, next) {
       var driver = this.driver;
       driver.waitForExist('//li[contains(@class,"active")]//a[contains(text(),"' + name + '")]', timeout)
@@ -1143,7 +1137,7 @@ module.exports = function(config) {
           next();
         })
         .catch(next);
-    })//surendra
+    })
     .then('I see the $element modal', function(element, next) {
       var driver = this.driver;
       driver.waitForVisible(element, timeout)
