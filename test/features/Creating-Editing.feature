@@ -76,6 +76,7 @@ Feature : Creating Editing a form
     Then I am on the form page of ${project3.title} project
 	When I click on the fa fa-paper-plane button for User Login form
     Then I am on the action page of ${project3.title} project
+    And I wait 1000 milliseconds
     Then I see the Login link
 
   Scenario: Clicking ‘Access’ button for Form on Form page
