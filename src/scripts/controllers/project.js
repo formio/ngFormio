@@ -158,8 +158,12 @@ app.controller('ProjectCreateController', [
 
 app.controller('ProjectCreateEnvironmentController', [
   '$scope',
+  '$state',
+  'FormioProject',
   function(
-    $scope
+    $scope,
+    $state,
+    FormioProject
   ) {
     $scope.environmentTypes = [
       {
@@ -183,6 +187,12 @@ app.controller('ProjectCreateEnvironmentController', [
         $scope.currentProject.name = newTitle.replace(/\W/g, '').toLowerCase() + '-' + primaryProject.name;
       });
     });
+
+    $scope.saveProject = function() {
+      FormioProject.createProject($scope.currentProject).then(function(project) {
+        $state.go('project.env.overview', {projectId: project._id});
+      });
+    };
   }
 ]);
 
