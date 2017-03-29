@@ -1,5 +1,8 @@
 module.exports = function() {
   var generic = function(data, component) {
+    if (typeof data === 'string') {
+      return data;
+    }
     var startTable = function(labels) {
       if (!(labels instanceof Array)) {
         labels = [labels];
