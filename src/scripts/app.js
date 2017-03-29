@@ -148,7 +148,7 @@ angular
         .state('project.environment', {
           url: '/addenv',
           controller: 'ProjectCreateEnvironmentController',
-          templateUrl: 'views/project/create.html'
+          templateUrl: 'views/project/env/create.html'
         })
         .state('project.data', {
           url: '/data',

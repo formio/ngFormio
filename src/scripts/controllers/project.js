@@ -172,11 +172,17 @@ app.controller('ProjectCreateEnvironmentController', [
       }
     ];
 
-    $scope.currentProject = {
-      title: '',
-      //type: 'hosted',
-      project: $scope.primaryProject._id
-    };
+    $scope.currentProject = {};
+    $scope.primaryProjectPromise.then(function(primaryProject) {
+      $scope.currentProject = {
+        title: '',
+        //type: 'hosted',
+        project: primaryProject._id
+      };
+      $scope.$watch('currentProject.title', function(newTitle) {
+        $scope.currentProject.name = newTitle.replace(/\W/g, '').toLowerCase() + '-' + primaryProject.name;
+      });
+    });
   }
 ]);
 
@@ -245,6 +251,9 @@ app.controller('ProjectController', [
       $state.go('.', {projectId: environmentId});
     };
 
+    var primaryProjectQ = $q.defer();
+    $scope.primaryProjectPromise = primaryProjectQ.promise;
+
     $scope.loadProjectPromise = $scope.formio.loadProject().then(function(result) {
       $scope.currentProject = result;
       $scope.projectType = $scope.currentProject.hasOwnProperty('project') ? 'Environment' : 'Project';
@@ -308,6 +317,7 @@ app.controller('ProjectController', [
 
       // Load the users teams.
       $scope.userTeamsLoading = true;
+
       var userTeamsPromise = $http.get(AppConfig.apiBase + '/team/all').then(function(result) {
         $scope.userTeams = result.data;
         $scope.userTeamsLoading = false;
@@ -317,16 +327,15 @@ app.controller('ProjectController', [
       });
 
       $scope.projectTeamsLoading = true;
-      var primaryProjectPromise;
       if ($scope.currentProject.project) {
         // This is an environment. Load the primary Project
-        primaryProjectPromise = (new Formio('/project/' + $scope.currentProject.project)).loadProject();
+        primaryProjectQ.resolve((new Formio('/project/' + $scope.currentProject.project)).loadProject());
       }
       else {
         // This is the primary environment.
-        primaryProjectPromise = $q.when($scope.currentProject);
+        primaryProjectQ.resolve($scope.currentProject);
       }
-      primaryProjectPromise.then(function(primaryProject) {
+      $scope.primaryProjectPromise.then(function(primaryProject) {
         $scope.primaryProject = primaryProject;
 
         // Load project environments
