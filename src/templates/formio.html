@@ -4,6 +4,7 @@
   <div ng-if="form.display === 'pdf' && form.settings.pdf" style="position:relative;">
     <span style="position:absolute;right:10px;top:10px;cursor:pointer;" class="btn btn-default no-disable" ng-click="zoomIn()"><i class="fa fa-search-plus"></i></span>
     <span style="position:absolute;right:10px;top:60px;cursor:pointer;" class="btn btn-default no-disable" ng-click="zoomOut()"><i class="fa fa-search-minus"></i></span>
+    <a ng-if="iframeReady" style="position:absolute;right:10px;top:110px;cursor:pointer;" class="btn btn-primary no-disable" href="{{ getPDFDownload(form.settings.pdf) | trustAsResourceUrl }}" target="_blank"><i class="fa fa-download"></i></a>
     <iframe src="{{ getIframeSrc(form.settings.pdf) | trustAsResourceUrl }}" seamless class="formio-iframe"></iframe>
     <button ng-if="!readOnly && !form.builder" type="button" class="btn btn-primary" ng-click="submitIFrameForm()">Submit</button>
   </div>

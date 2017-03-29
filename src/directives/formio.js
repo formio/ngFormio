@@ -35,6 +35,7 @@ module.exports = function() {
         var iframeReady = $q.defer();
         $scope._src = $scope.src || '';
         $scope.formioAlerts = [];
+        $scope.iframeReady = false;
         // Shows the given alerts (single or array), and dismisses old alerts
         this.showAlerts = $scope.showAlerts = function(alerts) {
           $scope.formioAlerts = [].concat(alerts);
@@ -51,6 +52,21 @@ module.exports = function() {
           return iframeSrc;
         };
 
+        $scope.getPDFDownload = function(src) {
+          var iframe = $scope.getIframeSrc(src);
+          var download = iframe.replace('/pdf/', '/download/');
+          if ($scope.form && $scope.form._id) {
+            download += '&form=' + $scope.form._id;
+            if ($scope.form.project) {
+              download += '&project=' + $scope.form.project;
+            }
+          }
+          if ($scope.submission && $scope.submission._id) {
+            download += '&submission=' + $scope.submission._id;
+          }
+          return download;
+        };
+
         // Add the live form parameter to the url.
         if ($scope._src && ($scope._src.indexOf('live=') === -1)) {
           $scope._src += ($scope._src.indexOf('?') === -1) ? '?' : '&';
@@ -64,6 +80,7 @@ module.exports = function() {
         };
 
         $scope.$on('iframe-ready', function() {
+          $scope.iframeReady = true;
           var iframe = $element.find('.formio-iframe')[0];
           if (iframe) {
             iframeReady.resolve(iframe);
