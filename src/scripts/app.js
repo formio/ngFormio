@@ -263,7 +263,8 @@ angular
         .state('project.env.definition.import', {
           url: '/definition/import',
           parent: 'project.env',
-          templateUrl: 'views/project/env/definition/import.html'
+          templateUrl: 'views/project/env/definition/import.html',
+          controller: 'ProjectImportController'
         })
         .state('project.env.definition.export', {
           url: '/definition/export',
@@ -400,11 +401,6 @@ angular
           url: '/delete',
           controller: 'TeamDeleteController',
           templateUrl: 'views/team/delete.html'
-        })
-        .state('importExport', {
-          url: '/import-export',
-          templateUrl: 'views/import/index.html',
-          controller: 'ImportExportController'
         })
         .state('help', {
           url: '/help',
@@ -1035,4 +1031,28 @@ angular
         return this.permissions[type].label;
       }
     };
-  });
+  })
+  .directive("fileread", [function () {
+    return {
+      scope: {
+        fileread: "=",
+        readAs: "=?"
+      },
+      link: function (scope, element, attributes) {
+        element.bind("change", function (changeEvent) {
+          var reader = new FileReader();
+          reader.onload = function (loadEvent) {
+            scope.$apply(function () {
+              scope.fileread = loadEvent.target.result;
+            });
+          }
+          if (scope.readAs === 'base64') {
+            reader.readAsDataURL(changeEvent.target.files[0]);
+          }
+          else {
+            reader.readAsText(changeEvent.target.files[0]);
+          }
+        });
+      }
+    }
+  }]);

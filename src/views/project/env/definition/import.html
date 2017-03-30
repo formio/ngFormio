@@ -3,7 +3,7 @@
 <div class="well">
   <div class="form-inline">
     <label class="control-label" for="file">Name</label>
-    <input id="file" class="form-control" type="file" name="file">
-    <button type="submit" class="btn btn-primary">Import Project Definition to {{ currentProject.title }}</button>
+    <input id="file" class="form-control" type="file" name="file" accept=".json" fileread="importFile">
+    <button type="submit" class="btn btn-primary" ng-click="importVersion(importFile)">Import Project Definition to {{ currentProject.title }}</button>
   </div>
 </div>

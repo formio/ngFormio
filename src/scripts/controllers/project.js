@@ -456,21 +456,98 @@ app.controller('ProjectController', [
 
 app.controller('ProjectDeployController', [
   '$scope',
-  function($scope) {
-    // This just fakes it for now.
-    $scope.versions = [
-      '1.0.0',
-      '1.0.1',
-      '1.0.2',
-      '1.1.0',
-      '1.2.0',
-      '1.2.1'
-    ];
-    $scope.deployVersion = $scope.versions[5];
+  'AppConfig',
+  'Formio',
+  'FormioAlerts',
+  function(
+    $scope,
+    AppConfig,
+    Formio,
+    FormioAlerts
+  ) {
+    var loadVersions = function() {
+      Formio.makeStaticRequest(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/version', 'GET', null, {ignoreCache: true})
+        .then(function(versions) {
+          $scope.versions = versions;
+        });
+    };
+
+    loadVersions();
 
     $scope.addVersion = function(version) {
-      $scope.versions.push(version);
-      $scope.version = '';
+      if (!version) {
+        return FormioAlerts.addAlert({
+          type: 'warning',
+          message: 'Please enter a version identifier.'
+        });
+      }
+      Formio.makeStaticRequest(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/version', 'POST', {
+        project: $scope.primaryProject._id,
+        version: version
+      })
+        .then(function() {
+          loadVersions();
+          $scope.version = '';
+          FormioAlerts.addAlert({
+            type: 'success',
+            message: 'Project Definition Version was created.'
+          });
+        })
+        .catch(FormioAlerts.onError.bind(FormioAlerts));
+    };
+
+    $scope.deployVersion = function(version) {
+      if (!version) {
+        return FormioAlerts.addAlert({
+          type: 'warning',
+          message: 'Please select a version to deploy.'
+        });
+      }
+      Formio.makeStaticRequest(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/deploy', 'POST', {
+        type: 'version',
+        id: version._id
+      })
+        .then(function() {
+          $scope.deployVersionOption = '';
+          FormioAlerts.addAlert({
+            type: 'success',
+            message: 'Project Definition ' + version.version + ' deployed to ' + $scope.currentProject.title + '.'
+          });
+        })
+        .catch(FormioAlerts.onError.bind(FormioAlerts));
+    };
+  }
+]);
+
+app.controller('ProjectImportController', [
+  '$scope',
+  'AppConfig',
+  'Formio',
+  'FormioAlerts',
+  function(
+    $scope,
+    AppConfig,
+    Formio,
+    FormioAlerts
+  ) {
+    $scope.importVersion = function(template) {
+      if (!template) {
+        return FormioAlerts.addAlert({
+          type: 'warning',
+          message: 'Please select a file to import.'
+        });
+      }
+      Formio.makeStaticRequest(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/import', 'POST', {
+          template: template
+        })
+        .then(function() {
+          $scope.deployVersionOption = '';
+          FormioAlerts.addAlert({
+            type: 'success',
+            message: 'Project Definition imported to ' + $scope.currentProject.title + '.'
+          });
+        })
+        .catch(FormioAlerts.onError.bind(FormioAlerts));
     }
   }
 ]);

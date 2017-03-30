@@ -4,10 +4,10 @@
     <div class="col-md-6">
       <h4>Deploy version</h4>
       <div>
-        <select class="form-control" ng-model="deployVersion" ng-options="selectVersion as selectVersion for selectVersion in versions"></select>
+        <select class="form-control" ng-model="deployVersionOption" ng-options="selectVersion as selectVersion.version for selectVersion in versions"></select>
         <br />
       </div>
-      <span class="btn btn-primary">Deploy project defintion version to {{ currentProject.title }}</span>
+      <span class="btn btn-primary" ng-click="deployVersion(deployVersionOption)">Deploy project definition version to {{ currentProject.title }}</span>
     </div>
     <div class="col-md-6">
       <h4>Create a version from current definition</h4>
