@@ -1,8 +1,7 @@
 /*eslint max-depth: ["error", 6]*/
 var fs = require('fs');
 var _get = require('lodash/get');
-var _isEqual = require('lodash/isEqual');
-var _set = require('lodash/set');
+var _cloneDeep = require('lodash/cloneDeep');
 module.exports = function(app) {
   app.directive('formioSelectItem', [
     '$compile',
@@ -170,7 +169,20 @@ module.exports = function(app) {
               if (settings.dataSrc === 'values') {
                 return item.value;
               }
-              return valueProp ? _get(item, valueProp) : item;
+
+              // Allow dot notation in the value property.
+              if (valueProp.indexOf('.') !== -1) {
+                var parts = valueProp.split('.');
+                var prop = item;
+                for (var i in parts) {
+                  if (prop.hasOwnProperty(parts[i])) {
+                    prop = prop[parts[i]];
+                  }
+                }
+                return prop;
+              }
+
+              return valueProp ? item[valueProp] : item;
             };
 
             $scope.refreshItems = function() {
@@ -180,80 +192,48 @@ module.exports = function(app) {
               $scope.refreshItems(input, url);
             });
 
-            var refreshing = false;
-            var refreshValue = function() {
-              if (refreshing) {
-                return;
-              }
-              refreshing = true;
-              var tempData = $scope.data[settings.key];
-              $scope.data[settings.key] = settings.multiple ? [] : '';
-              if (!settings.clearOnRefresh) {
-                $timeout(function() {
-                  $scope.data[settings.key] = tempData;
-                  refreshing = false;
-                  $scope.$emit('selectLoaded', $scope.component);
-                });
-              }
-              else {
-                refreshing = false;
-                $scope.$emit('selectLoaded', $scope.component);
-              }
-            };
-
-            // Refresh the items when ready.
-            var refreshItemsWhenReady = function() {
-              initialized.promise.then(function() {
-                var refreshPromise = $scope.refreshItems();
-                if (refreshPromise) {
-                  refreshPromise.then(refreshValue);
-                }
-                else {
-                  refreshValue();
-                }
-              });
-            };
-
             // Add a watch if they wish to refresh on selection of another field.
             if (settings.refreshOn) {
+              var refreshing = false;
+              var refreshValue = function() {
+                if (refreshing) {
+                  return;
+                }
+                refreshing = true;
+                var tempData = $scope.data[settings.key];
+                $scope.data[settings.key] = settings.multiple ? [] : '';
+                if (!settings.clearOnRefresh) {
+                  $timeout(function() {
+                    $scope.data[settings.key] = tempData;
+                    refreshing = false;
+                    $scope.$emit('selectLoaded', $scope.component);
+                  });
+                }
+                else {
+                  refreshing = false;
+                  $scope.$emit('selectLoaded', $scope.component);
+                }
+              };
+
+              // Refresh the value.
+              var refreshValueWhenReady = function() {
+                initialized.promise.then(function() {
+                  var refreshPromise = $scope.refreshItems();
+                  if (refreshPromise) {
+                    refreshPromise.then(refreshValue);
+                  }
+                  else {
+                    refreshValue();
+                  }
+                });
+              };
               if (settings.refreshOn === 'data') {
-                $scope.$watch('data', refreshItemsWhenReady, true);
+                $scope.$watch('data', refreshValueWhenReady, true);
                 return;
               }
 
-              $scope.$watch('data.' + settings.refreshOn, refreshItemsWhenReady);
-              $scope.$watch('submission.data.' + settings.refreshOn, refreshItemsWhenReady);
-            }
-            else {
-              // Watch for the data to be set, and ensure the value is set properly.
-              var dataWatch = $scope.$watch('data.' + settings.key, function(value) {
-                if (value) {
-                  initialized.promise.then(function() {
-                    dataWatch();
-                    // Iterate through the list of items and see if our value exists...
-                    var found = false;
-                    for (var i=0; i < $scope.selectItems.length; i++) {
-                      var item = $scope.selectItems[i];
-                      var selectItem = $scope.getSelectItem(item);
-                      if (_isEqual(selectItem, value)) {
-                        found = true;
-                        break;
-                      }
-                    }
-
-                    // If the item is not found in the select items array, then add it manually.
-                    if (!found) {
-                      var itemValue = value;
-                      if (valueProp) {
-                        itemValue = {};
-                        _set(itemValue, valueProp, value);
-                      }
-                      $scope.selectItems.push(itemValue);
-                    }
-                    refreshValue();
-                  });
-                }
-              });
+              $scope.$watch('data.' + settings.refreshOn, refreshValueWhenReady);
+              $scope.$watch('submission.data.' + settings.refreshOn, refreshValueWhenReady);
             }
 
             switch (settings.dataSrc) {
@@ -340,8 +320,6 @@ module.exports = function(app) {
                       }
                     });
                   }
-                  options.params.skip = parseInt(options.params.skip, 10);
-                  options.params.limit = parseInt(options.params.limit, 10);
                   selectItems = selectItems.slice(options.params.skip, options.params.skip + options.params.limit);
                   setResult(selectItems, append);
                   return initialized.resolve($scope.selectItems);
@@ -352,8 +330,8 @@ module.exports = function(app) {
                 $scope.refreshItems = function() {
                   try {
                     /* eslint-disable no-unused-vars */
-                    var data = _.cloneDeep($scope.submission.data);
-                    var row = _.cloneDeep($scope.data);
+                    var data = _cloneDeep($scope.submission.data);
+                    var row = _cloneDeep($scope.data);
                     /* eslint-enable no-unused-vars */
                     $scope.selectItems = eval('(function(data, row) { var values = [];' + settings.data.custom.toString() + '; return values; })(data, row)');
                   }
@@ -457,7 +435,7 @@ module.exports = function(app) {
                       if (data) {
                         // If the selectValue prop is defined, use it.
                         if (selectValues) {
-                          setResult(_.get(data, selectValues, []));
+                          setResult(_get(data, selectValues, []));
                         }
                         // Attempt to default to the formio settings for a resource.
                         else if (data.hasOwnProperty('data')) {
