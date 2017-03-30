@@ -238,7 +238,8 @@ module.exports = function() {
           if ($scope.action) {
             var method = submissionData._id ? 'put' : 'post';
             var action = $scope.action;
-            if (method === 'put') {
+            // Add the action Id if it is not already part of the url.
+            if (method === 'put' && (action.indexOf(submissionData._id) === -1)) {
               action += '/' + submissionData._id;
             }
             $http[method](action, submissionData).then(function(response) {

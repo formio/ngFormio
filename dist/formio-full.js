@@ -1,4 +1,4 @@
-/*! ng-formio v2.14.1 | https://unpkg.com/ng-formio@2.14.1/LICENSE.txt */
+/*! ng-formio v2.14.3 | https://unpkg.com/ng-formio@2.14.3/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -48063,7 +48063,7 @@ var Formio = function () {
       var _url = type + 'Url';
       var method = this[_id] || data._id ? 'put' : 'post';
       var reqUrl = this[_id] ? this[_url] : this[type + 'sUrl'];
-      if (!this[_id] && data._id && method === 'put') {
+      if (!this[_id] && data._id && method === 'put' && reqUrl.indexOf(data._id) === -1) {
         reqUrl += '/' + data._id;
       }
       Formio.cache = {};
@@ -76751,6 +76751,7 @@ module.exports = function(app) {
 var _get = _dereq_('lodash/get');
 var _isEqual = _dereq_('lodash/isEqual');
 var _set = _dereq_('lodash/set');
+var _cloneDeep = _dereq_('lodash/cloneDeep');
 module.exports = function(app) {
   app.directive('formioSelectItem', [
     '$compile',
@@ -76918,7 +76919,15 @@ module.exports = function(app) {
               if (settings.dataSrc === 'values') {
                 return item.value;
               }
-              return valueProp ? _get(item, valueProp) : item;
+
+              // Get the item value.
+              var itemValue = valueProp ? _get(item, valueProp) : item;
+              if (itemValue === undefined) {
+                /* eslint-disable no-console */
+                console.warn('Cannot find value property within select: ' + valueProp);
+                /* eslint-enable no-console */
+              }
+              return itemValue;
             };
 
             $scope.refreshItems = function() {
@@ -76949,10 +76958,38 @@ module.exports = function(app) {
               }
             };
 
+            // Ensures that the value is within the select items.
+            var ensureValue = function() {
+              var value = $scope.data[settings.key];
+              if (!value) {
+                return;
+              }
+              // Iterate through the list of items and see if our value exists...
+              var found = false;
+              for (var i=0; i < $scope.selectItems.length; i++) {
+                var item = $scope.selectItems[i];
+                var selectItem = $scope.getSelectItem(item);
+                if (_isEqual(selectItem, value)) {
+                  found = true;
+                  break;
+                }
+              }
+
+              // If the item is not found in the select items array, then add it manually.
+              if (!found) {
+                var itemValue = value;
+                if (valueProp) {
+                  itemValue = {};
+                  _set(itemValue, valueProp, value);
+                }
+                $scope.selectItems.push(itemValue);
+              }
+            };
+
             // Refresh the items when ready.
             var refreshItemsWhenReady = function() {
               initialized.promise.then(function() {
-                var refreshPromise = $scope.refreshItems();
+                var refreshPromise = $scope.refreshItems(true);
                 if (refreshPromise) {
                   refreshPromise.then(refreshValue);
                 }
@@ -76978,26 +77015,7 @@ module.exports = function(app) {
                 if (value) {
                   initialized.promise.then(function() {
                     dataWatch();
-                    // Iterate through the list of items and see if our value exists...
-                    var found = false;
-                    for (var i=0; i < $scope.selectItems.length; i++) {
-                      var item = $scope.selectItems[i];
-                      var selectItem = $scope.getSelectItem(item);
-                      if (_isEqual(selectItem, value)) {
-                        found = true;
-                        break;
-                      }
-                    }
-
-                    // If the item is not found in the select items array, then add it manually.
-                    if (!found) {
-                      var itemValue = value;
-                      if (valueProp) {
-                        itemValue = {};
-                        _set(itemValue, valueProp, value);
-                      }
-                      $scope.selectItems.push(itemValue);
-                    }
+                    ensureValue();
                     refreshValue();
                   });
                 }
@@ -77100,8 +77118,8 @@ module.exports = function(app) {
                 $scope.refreshItems = function() {
                   try {
                     /* eslint-disable no-unused-vars */
-                    var data = _.cloneDeep($scope.submission.data);
-                    var row = _.cloneDeep($scope.data);
+                    var data = _cloneDeep($scope.submission.data);
+                    var row = _cloneDeep($scope.data);
                     /* eslint-enable no-unused-vars */
                     $scope.selectItems = eval('(function(data, row) { var values = [];' + settings.data.custom.toString() + '; return values; })(data, row)');
                   }
@@ -77148,12 +77166,16 @@ module.exports = function(app) {
                   $event.preventDefault();
                   options.params.skip = parseInt(options.params.skip, 10);
                   options.params.skip += parseInt(options.params.limit, 10);
-                  $scope.refreshItems(null, null, true);
+                  $scope.refreshItems(true, null, true);
                 };
 
                 if (url) {
                   $scope.hasNextPage = true;
                   $scope.refreshItems = function(input, newUrl, append) {
+                    if (!input) {
+                      return;
+                    }
+
                     newUrl = newUrl || url;
                     newUrl = $interpolate(newUrl)({
                       data: $scope.data,
@@ -77164,7 +77186,11 @@ module.exports = function(app) {
                     }
 
                     // If this is a search, then add that to the filter.
-                    if (settings.searchField && input) {
+                    if (
+                      settings.searchField &&
+                      (typeof input === 'string') &&
+                      input
+                    ) {
                       newUrl += ((newUrl.indexOf('?') === -1) ? '?' : '&') +
                         encodeURIComponent(settings.searchField) +
                         '=' +
@@ -77198,6 +77224,9 @@ module.exports = function(app) {
                       else {
                         $scope.selectItems = data;
                       }
+
+                      // Ensure the value is set to what it should be set to.
+                      ensureValue();
                     };
 
                     return $http.get(newUrl, options).then(function(result) {
@@ -77205,7 +77234,7 @@ module.exports = function(app) {
                       if (data) {
                         // If the selectValue prop is defined, use it.
                         if (selectValues) {
-                          setResult(_.get(data, selectValues, []));
+                          setResult(_get(data, selectValues, []));
                         }
                         // Attempt to default to the formio settings for a resource.
                         else if (data.hasOwnProperty('data')) {
@@ -77224,8 +77253,9 @@ module.exports = function(app) {
                       initialized.resolve($scope.selectItems);
                     });
                   };
-                  $scope.refreshItems();
+                  $scope.refreshItems(true);
                 }
+                ensureValue();
                 break;
               default:
                 $scope.selectItems = [];
@@ -77280,7 +77310,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"lodash/get":170,"lodash/isEqual":177,"lodash/set":188}],226:[function(_dereq_,module,exports){
+},{"lodash/cloneDeep":167,"lodash/get":170,"lodash/isEqual":177,"lodash/set":188}],226:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -78146,7 +78176,8 @@ module.exports = function() {
           if ($scope.action) {
             var method = submissionData._id ? 'put' : 'post';
             var action = $scope.action;
-            if (method === 'put') {
+            // Add the action Id if it is not already part of the url.
+            if (method === 'put' && (action.indexOf(submissionData._id) === -1)) {
               action += '/' + submissionData._id;
             }
             $http[method](action, submissionData).then(function(response) {
