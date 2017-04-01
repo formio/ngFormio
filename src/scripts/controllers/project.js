@@ -474,28 +474,6 @@ app.controller('ProjectDeployController', [
 
     loadVersions();
 
-    $scope.addVersion = function(version) {
-      if (!version) {
-        return FormioAlerts.addAlert({
-          type: 'warning',
-          message: 'Please enter a version identifier.'
-        });
-      }
-      Formio.makeStaticRequest(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/version', 'POST', {
-        project: $scope.primaryProject._id,
-        version: version
-      })
-        .then(function() {
-          loadVersions();
-          $scope.version = '';
-          FormioAlerts.addAlert({
-            type: 'success',
-            message: 'Project Definition Version was created.'
-          });
-        })
-        .catch(FormioAlerts.onError.bind(FormioAlerts));
-    };
-
     $scope.deployVersion = function(version) {
       if (!version) {
         return FormioAlerts.addAlert({
@@ -513,6 +491,40 @@ app.controller('ProjectDeployController', [
             type: 'success',
             message: 'Project Definition ' + version.version + ' deployed to ' + $scope.currentProject.title + '.'
           });
+        })
+        .catch(FormioAlerts.onError.bind(FormioAlerts));
+    };
+  }
+]);
+
+app.controller('ProjectCreateController', [
+  '$scope',
+  'AppConfig',
+  'Formio',
+  'FormioAlerts',
+  function(
+    $scope,
+    AppConfig,
+    Formio,
+    FormioAlerts
+  ) {
+    $scope.addVersion = function(version) {
+      if (!version) {
+        return FormioAlerts.addAlert({
+          type: 'warning',
+          message: 'Please enter a version identifier.'
+        });
+      }
+      Formio.makeStaticRequest(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/version', 'POST', {
+        project: $scope.primaryProject._id,
+        version: version
+      })
+        .then(function() {
+          FormioAlerts.addAlert({
+            type: 'success',
+            message: 'Project Definition Version was created.'
+          });
+          $state.go('project.env.version.deploy');
         })
         .catch(FormioAlerts.onError.bind(FormioAlerts));
     };
@@ -1996,11 +2008,17 @@ app.controller('ProjectSettingsController', [
           pool: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
         })
       });
+      $scope.formio.saveProject($scope.currentProject);
     };
 
     $scope.removeKey = function($index) {
       $scope.currentProject.settings.keys.splice($index, 1);
+      $scope.formio.saveProject($scope.currentProject);
     };
+
+    $scope.updateProject = function() {
+      $scope.formio.saveProject($scope.currentProject);
+    }
 
     // Save the Project.
     $scope.saveProject = function() {

@@ -14,7 +14,7 @@
       <tbody>
       <tr ng-repeat="key in currentProject.settings.keys">
         <td>
-          <input type="text" class="form-control" ng-model="key.name">
+          <input type="text" class="form-control" ng-model="key.name" ng-change="updateProject()" ng-model-options='{ debounce: 300 }'>
         </td>
         <td>{{ key.key }}</td>
         <td><button ng-click="removeKey($index)"><i class="fa fa-trash"></i></button></td>
@@ -39,5 +39,3 @@
     </ul>
   </div>
 </div>
-<hr></hr>
-<button class="btn btn-primary" ng-click="saveProject()">Save Settings</button>

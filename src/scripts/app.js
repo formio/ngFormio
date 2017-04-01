@@ -232,7 +232,8 @@ angular
         .state('project.env.settings.apiKeys', {
           url: '/settings/apiKeys',
           parent: 'project.env',
-          templateUrl: 'views/project/env/settings/apiKeys/index.html'
+          templateUrl: 'views/project/env/settings/apiKeys/index.html',
+          controller: 'ProjectSettingsController'
         })
         .state('project.env.settings.customjscss', {
           url: '/settings/customjscss',
@@ -280,6 +281,12 @@ angular
           templateUrl: 'views/project/env/version/deploy.html',
           controller: 'ProjectDeployController'
         })
+        .state('project.env.version.create', {
+          url: '/version/create',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/version/create.html',
+          controller: 'ProjectCreateController'
+        })
         .state('project.env.version.import', {
           url: '/version/import',
           parent: 'project.env',
@@ -314,6 +321,11 @@ angular
           url: '/integrations',
           abstract: true,
           parent: 'project.env'
+        })
+        .state('project.env.integrations.info', {
+          url: '/integrations/info',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/integrations/index.html'
         })
         .state('project.env.integrations.email', {
           url: '/integrations/email',
