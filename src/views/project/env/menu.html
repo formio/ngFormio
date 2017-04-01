@@ -2,14 +2,21 @@
   <ul class="nav nav-pills nav-stacked project-settings-menu">
     <li role="presentation" ng-class="{active:($state.includes('project.env.overview'))}"><a ui-sref="project.env.overview">Overview</a></li>
     <li role="presentation" ng-class="{active:($state.includes('project.env.tour'))}"><a ui-sref="project.env.tour">Tour ({{ stepsPercent }}%)</a></li>
-    <li role="presentation" ng-class="{active:($state.includes('project.env.settings'))}"><a ui-sref="project.env.settings">Environment Settings</a></li>
-    <li role="presentation" ng-class="{active:($state.includes('project.env.definition'))}">
-      <a ui-sref="project.env.definition.deploy">Project Definition</a>
-      <ul ng-if="$state.current.name.includes('project.env.definition')" class="nav nav-pills nav-stacked">
-        <li role="presentation" ng-class="{active:($state.includes('project.env.definition.deploy'))}"><a ui-sref="project.env.definition.deploy">Deploy</a></li>
-        <li role="presentation" ng-class="{active:($state.includes('project.env.definition.import'))}"><a ui-sref="project.env.definition.import">Import</a></li>
-        <li role="presentation" ng-class="{active:($state.includes('project.env.definition.export'))}"><a ui-sref="project.env.definition.export">Export</a></li>
-        <li role="presentation" ng-class="{active:($state.includes('project.env.definition.delete'))}"><a ui-sref="project.env.definition.delete">Delete</a></li>
+    <li role="presentation" ng-class="{active:($state.includes('project.env.settings'))}">
+      <a ui-sref="project.env.settings.info" ng-class="{active:($state.includes('project.env.settings.info'))}">Environment Settings</a>
+      <ul ng-if="$state.current.name.includes('project.env.settings')" class="nav nav-pills nav-stacked">
+        <li role="presentation" ng-class="{active:($state.includes('project.env.settings.apiKeys'))}"><a ui-sref="project.env.settings.apiKeys">API Keys</a></li>
+        <li role="presentation" ng-class="{active:($state.includes('project.env.settings.cors'))}"><a ui-sref="project.env.settings.cors">CORS</a></li>
+        <li role="presentation" ng-class="{active:($state.includes('project.env.settings.customjscss'))}"><a ui-sref="project.env.settings.customjscss">Custom JS and CSS</a></li>
+      </ul>
+    </li>
+    <li role="presentation" ng-class="{active:($state.includes('project.env.version'))}">
+      <a ui-sref="project.env.version.deploy">Project Versions</a>
+      <ul ng-if="$state.current.name.includes('project.env.version')" class="nav nav-pills nav-stacked">
+        <li role="presentation" ng-class="{active:($state.includes('project.env.version.deploy'))}"><a ui-sref="project.env.version.deploy">Deploy</a></li>
+        <li role="presentation" ng-class="{active:($state.includes('project.env.version.import'))}"><a ui-sref="project.env.version.import">Import</a></li>
+        <li role="presentation" ng-class="{active:($state.includes('project.env.version.export'))}"><a ui-sref="project.env.version.export">Export</a></li>
+        <li role="presentation" ng-class="{active:($state.includes('project.env.version.delete'))}"><a ui-sref="project.env.version.delete">Delete</a></li>
       </ul>
     </li>
     <!--<li role="presentation" ng-class="{active:($state.includes('project.env.database'))}">-->
@@ -28,8 +35,6 @@
         <li role="presentation" ng-class="{active:($state.includes('project.env.integrations.storage'))}"><a ui-sref="project.env.integrations.storage">File Storage</a></li>
         <li role="presentation" ng-class="{active:($state.includes('project.env.integrations.data'))}"><a ui-sref="project.env.integrations.data">Data Connections</a></li>
         <li role="presentation" ng-class="{active:($state.includes('project.env.integrations.oauth'))}"><a ui-sref="project.env.integrations.oauth">OAuth</a></li>
-        <li role="presentation" ng-class="{active:($state.includes('project.env.integrations.apiKeys'))}"><a ui-sref="project.env.integrations.apiKeys">API Keys</a></li>
-        <li role="presentation" ng-class="{active:($state.includes('project.env.integrations.customjscss'))}"><a ui-sref="project.env.integrations.customjscss">Custom JS and CSS</a></li>
       </ul>
     </li>
     <li role="presentation" ng-class="{active:($state.includes('project.env.activity'))}"><a ui-sref="project.env.activity">Activity</a></li>

@@ -220,9 +220,29 @@ angular
         })
         .state('project.env.settings', {
           url: '/settings',
+          abstract: true,
+          parent: 'project.env'
+        })
+        .state('project.env.settings.info', {
+          url: '/settings',
           parent: 'project.env',
           templateUrl: 'views/project/env/settings/index.html',
           controller: 'ProjectSettingsController'
+        })
+        .state('project.env.settings.apiKeys', {
+          url: '/settings/apiKeys',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/settings/apiKeys/index.html'
+        })
+        .state('project.env.settings.customjscss', {
+          url: '/settings/customjscss',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/settings/customjscss/index.html'
+        })
+        .state('project.env.settings.cors', {
+          url: '/settings/cors',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/settings/cors/index.html'
         })
         .state('project.env.database', {
           url: '/database',
@@ -249,32 +269,32 @@ angular
           parent: 'project.env',
           templateUrl: 'views/project/env/database/wipe.html',
         })
-        .state('project.env.definition', {
-          url: '/definition',
+        .state('project.env.version', {
+          url: '/version',
           abstract: true,
           parent: 'project.env'
         })
-        .state('project.env.definition.deploy', {
-          url: '/definition',
+        .state('project.env.version.deploy', {
+          url: '/version',
           parent: 'project.env',
-          templateUrl: 'views/project/env/definition/deploy.html',
+          templateUrl: 'views/project/env/version/deploy.html',
           controller: 'ProjectDeployController'
         })
-        .state('project.env.definition.import', {
-          url: '/definition/import',
+        .state('project.env.version.import', {
+          url: '/version/import',
           parent: 'project.env',
-          templateUrl: 'views/project/env/definition/import.html',
+          templateUrl: 'views/project/env/version/import.html',
           controller: 'ProjectImportController'
         })
-        .state('project.env.definition.export', {
-          url: '/definition/export',
+        .state('project.env.version.export', {
+          url: '/version/export',
           parent: 'project.env',
-          templateUrl: 'views/project/env/definition/export.html'
+          templateUrl: 'views/project/env/version/export.html'
         })
-        .state('project.env.definition.delete', {
-          url: '/definition/delete',
+        .state('project.env.version.delete', {
+          url: '/version/delete',
           parent: 'project.env',
-          templateUrl: 'views/project/env/definition/delete.html'
+          templateUrl: 'views/project/env/version/delete.html'
         })
         .state('project.env.activity', {
           url: '/activity',
@@ -311,16 +331,6 @@ angular
           parent: 'project.env',
           templateUrl: 'views/project/env/integrations/data/index.html'
         })
-        .state('project.env.integrations.apiKeys', {
-          url: '/integrations/apiKeys',
-          parent: 'project.env',
-          templateUrl: 'views/project/env/integrations/apiKeys/index.html'
-        })
-        .state('project.env.integrations.customjscss', {
-          url: '/integrations/customjscss',
-          parent: 'project.env',
-          templateUrl: 'views/project/env/integrations/customjscss/index.html'
-        })
         .state('project.env.integrations.oauth', {
           url: '/integrations/oauth',
           parent: 'project.env',
@@ -347,30 +357,9 @@ angular
           controller: 'RoleController'
         })
         .state('project.teams', {
-          abstract: true,
           url: '/teams',
           controller: 'ProjectTeamController',
-          templateUrl: 'views/project/teams/teams.html'
-        })
-        .state('project.teams.view', {
-          url: '',
-          controller: 'ProjectTeamViewController',
-          templateUrl: 'views/project/teams/view.html'
-        })
-        .state('project.teams.add', {
-          url: '/add',
-          controller: 'ProjectTeamEditController',
-          templateUrl: 'views/project/teams/edit.html'
-        })
-        .state('project.teams.edit', {
-          url: '/:teamId/edit',
-          controller: 'ProjectTeamEditController',
-          templateUrl: 'views/project/teams/edit.html'
-        })
-        .state('project.teams.delete', {
-          url: '/:teamId/delete',
-          controller: 'ProjectTeamDeleteController',
-          templateUrl: 'views/project/teams/delete.html'
+          templateUrl: 'views/project/teams/index.html'
         })
         .state('project.delete', {
           url: '/delete',
@@ -391,11 +380,6 @@ angular
           url: '/view',
           controller: 'TeamViewController',
           templateUrl: 'views/team/view.html'
-        })
-        .state('team.edit', {
-          url: '/edit',
-          controller: 'TeamEditController',
-          templateUrl: 'views/team/edit.html'
         })
         .state('team.delete', {
           url: '/delete',

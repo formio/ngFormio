@@ -333,7 +333,7 @@ app.controller('ProjectController', [
         $scope.userTeamsLoading = false;
 
         // Separate out the teams that the current user owns, to save an api call.
-        $scope.currentProjectEligibleTeams = _.filter(result.data, {owner: $scope.user._id});
+        $scope.primaryProjectEligibleTeams = _.filter(result.data, {owner: $scope.user._id});
       });
 
       $scope.projectTeamsLoading = true;
@@ -355,7 +355,7 @@ app.controller('ProjectController', [
 
         // Load the projects teams.
         var projectTeamsPromise = $http.get(AppConfig.apiBase + '/team/project/' + $scope.primaryProject._id).then(function(result) {
-          $scope.currentProjectTeams = result.data;
+          $scope.primaryProjectTeams = result.data;
           $scope.projectTeamsLoading = false;
         });
 
@@ -378,7 +378,7 @@ app.controller('ProjectController', [
            *   If the current user has the role or not.
            */
           var hasRoles = function(type) {
-            var potential = _($scope.currentProjectTeams)
+            var potential = _($scope.primaryProjectTeams)
               .filter({permission: type})
               .map('_id')
               .value();
@@ -2074,21 +2074,121 @@ app.controller('ProjectSettingsController', [
 
 app.controller('ProjectTeamController', [
   '$scope',
-  function(
-    $scope
-  ) {
-
-  }
-]);
-
-app.controller('ProjectTeamViewController', [
-  '$scope',
+  '$http',
+  'AppConfig',
+  'FormioAlerts',
   'TeamPermissions',
+  'GoogleAnalytics',
   function(
     $scope,
-    TeamPermissions
+    $http,
+    AppConfig,
+    FormioAlerts,
+    TeamPermissions,
+    GoogleAnalytics
   ) {
     $scope.getPermissionLabel = TeamPermissions.getPermissionLabel.bind(TeamPermissions);
+
+    $scope.primaryProjectPromise.then(function(primaryProject) {
+      var projectTeamsPromise = $http.get(AppConfig.apiBase + '/team/project/' + primaryProject._id).then(function(result) {
+        $scope.primaryProjectTeams = result.data;
+
+        $http.get(AppConfig.apiBase + '/team/all').then(function(result) {
+          $scope.userTeams = result.data;
+          $scope.userTeamsLoading = false;
+
+          // Separate out the teams that the current user owns, to save an api call.
+          $scope.primaryProjectEligibleTeams = _.filter(result.data, {owner: $scope.user._id});
+          $scope.uniqueEligibleTeams = _.filter($scope.primaryProjectEligibleTeams, function(team) {
+            return _.findIndex($scope.primaryProjectTeams, { _id: team._id }) === -1;
+          });
+        });
+      });
+    });
+
+    var setTeamPermission = function(project, team, permission) {
+      var access = project.access ||  [];
+      var found = false;
+
+      // Search the present permissions to add the new permission.
+      access = _.forEach(access, function(permission) {
+        // Remove all the old permissions.
+        permission.roles = permission.roles || [];
+        permission.roles = _.without(permission.roles, team._id);
+
+        // Add the given role to the new permission type.
+        if (permission && permission.type === permission) {
+          found = true;
+
+          permission.roles = permission.roles || [];
+          permission.roles.push(team._id);
+        }
+      });
+
+      // This team permission was not found, add it.
+      if(!found && permission) {
+        access.push({
+          type: permission,
+          roles: [team._id]
+        });
+      }
+
+      // Update the current project access with the new team access.
+      project.access = access;
+    };
+
+    var saveProject = function(project) {
+      $scope.formio.saveProject($scope.primaryProject)
+        .then(function(project) {
+          $scope.primaryProject = project;
+          GoogleAnalytics.sendEvent('Project', 'update', null, 1);
+        }, FormioAlerts.onError.bind(FormioAlerts))
+        .catch(FormioAlerts.onError.bind(FormioAlerts));
+    };
+
+    $scope.teamPermissions = [
+      {
+        value: 'team_read',
+        label: 'Read',
+        description: ''
+      },
+      {
+        value: 'team_write',
+        label: 'Write',
+        description: ''
+      },
+      {
+        value: 'team_admin',
+        label: 'Admin',
+        description: ''
+      }
+    ];
+
+    $scope.added = {
+      team: undefined
+    };
+
+    $scope.addTeam = function(team) {
+      setTeamPermission($scope.primaryProject, team, 'team_read');
+      saveProject($scope.primaryProject);
+      _.remove($scope.uniqueEligibleTeams, { _id: team._id });
+      team.permission = 'team_read';
+      $scope.primaryProjectTeams.push(team);
+      $scope.added.team = undefined;
+    };
+
+    $scope.removeTeam = function(team) {
+      setTeamPermission($scope.primaryProject, team);
+      saveProject($scope.primaryProject);
+      _.remove($scope.primaryProjectTeams, { _id: team._id });
+      delete team.permission;
+      $scope.uniqueEligibleTeams.push(team);
+    };
+
+    $scope.updateTeam = function(team, permission) {
+      setTeamPermission($scope.primaryProject, team, permission);
+      saveProject($scope.primaryProject);
+    };
   }
 ]);
 
@@ -2115,15 +2215,15 @@ app.controller('ProjectTeamEditController', [
     };
 
     if($scope.addTeam._id && !$scope.addTeam.permission) {
-      $scope.addTeam.permission = _.filter($scope.currentProjectTeams, {_id: $scope.addTeam._id})[0].permission;
+      $scope.addTeam.permission = _.filter($scope.primaryProjectTeams, {_id: $scope.addTeam._id})[0].permission;
     }
 
     // Only allow users to select teams that do not have permissions yet.
-    var current = _.map($scope.currentProjectTeams, '_id');
+    var current = _.map($scope.primaryProjectTeams, '_id');
 
     // If editing a old permission, only allow the current team to be edited.
     if($scope.addTeam._id) {
-      $scope.uniqueEligibleTeams = _.filter($scope.currentProjectTeams, {_id: $scope.addTeam._id});
+      $scope.uniqueEligibleTeams = _.filter($scope.primaryProjectTeams, {_id: $scope.addTeam._id});
     }
     else {
       // Get the latest team data.
@@ -2132,8 +2232,8 @@ app.controller('ProjectTeamEditController', [
         $scope.userTeamsLoading = false;
 
         // Separate out the teams that the current user owns, to save an api call.
-        $scope.currentProjectEligibleTeams = _.filter(result.data, {owner: $scope.user._id});
-        $scope.uniqueEligibleTeams = _.filter($scope.currentProjectEligibleTeams, function(team) {
+        $scope.primaryProjectEligibleTeams = _.filter(result.data, {owner: $scope.user._id});
+        $scope.uniqueEligibleTeams = _.filter($scope.primaryProjectEligibleTeams, function(team) {
           return (current.indexOf(team._id) === -1);
         });
       });
@@ -2141,7 +2241,7 @@ app.controller('ProjectTeamEditController', [
 
     // Save the new team access with the existing project permissions.
     $scope.saveTeam = function() {
-      var access = $scope.currentProject.access ||  [];
+      var access = $scope.primaryProject.access ||  [];
       var found = false;
 
       // Search the present permissions to add the new permission.
@@ -2168,11 +2268,11 @@ app.controller('ProjectTeamEditController', [
       }
 
       // Update the current project access with the new team access.
-      $scope.currentProject.access = access;
+      $scope.primaryProject.access = access;
 
       // Use the formio service to save the current project.
-      if (!$scope.currentProject._id) { return FormioAlerts.onError(new Error('No Project found.')); }
-      $scope.formio.saveProject($scope.currentProject)
+      if (!$scope.primaryProject._id) { return FormioAlerts.onError(new Error('No Project found.')); }
+      $scope.formio.saveProject($scope.primaryProject)
         .then(function(project) {
           FormioAlerts.addAlert({
             type: 'success',
@@ -2180,7 +2280,7 @@ app.controller('ProjectTeamEditController', [
           });
           GoogleAnalytics.sendEvent('Project', 'update', null, 1);
           // Reload state so alerts display and project updates.
-          $state.go('project.teams.view', null, {reload: true});
+          $state.go('project.teams', null, {reload: true});
         }, FormioAlerts.onError.bind(FormioAlerts))
         .catch(FormioAlerts.onError.bind(FormioAlerts));
     };
@@ -2200,23 +2300,23 @@ app.controller('ProjectTeamDeleteController', [
     GoogleAnalytics,
     $state
   ) {
-    $scope.removeTeam = _.filter($scope.currentProjectTeams, {_id: $stateParams.teamId})[0];
+    $scope.removeTeam = _.filter($scope.primaryProjectTeams, {_id: $stateParams.teamId})[0];
     $scope.saveTeam = function() {
-      if(!$scope.removeTeam || !$scope.removeTeam) return $state.go('project.teams.view', null, {reload: true});
+      if(!$scope.removeTeam || !$scope.removeTeam) return $state.go('project.teams', null, {reload: true});
 
       // Search the present permissions to remove the given permission.
-      var access = $scope.currentProject.access ||  [];
+      var access = $scope.primaryProject.access ||  [];
       access = _.forEach(access, function(permission) {
         permission.roles = permission.roles || [];
         permission.roles = _.without(permission.roles, $scope.removeTeam._id);
       });
 
       // Update the current project access with the new team access.
-      $scope.currentProject.access = access;
+      $scope.primaryProject.access = access;
 
       // Use the formio service to save the current project.
-      if (!$scope.currentProject._id) { return FormioAlerts.onError(new Error('No Project found.')); }
-      $scope.formio.saveProject($scope.currentProject)
+      if (!$scope.primaryProject._id) { return FormioAlerts.onError(new Error('No Project found.')); }
+      $scope.formio.saveProject($scope.primaryProject)
         .then(function(project) {
           FormioAlerts.addAlert({
             type: 'success',
@@ -2224,7 +2324,7 @@ app.controller('ProjectTeamDeleteController', [
           });
           GoogleAnalytics.sendEvent('Project', 'update', null, 1);
           // Reload state so alerts display and project updates.
-          $state.go('project.teams.view', null, {reload: true});
+          $state.go('project.teams', null, {reload: true});
         }, FormioAlerts.onError.bind(FormioAlerts))
         .catch(FormioAlerts.onError.bind(FormioAlerts));
     };
@@ -2236,7 +2336,7 @@ app.controller('ProjectPlanController', [
   function($scope) {
     $scope.submission = {
       data: {
-        project: $scope.currentProject._id
+        project: $scope.primaryProject._id
       }
     };
     $scope.$on('formSubmission', function() {

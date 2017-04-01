@@ -2,26 +2,6 @@
 
 var app = angular.module('formioApp.controllers.team', []);
 
-app.controller('TeamCreateController', [
-  '$scope',
-  '$state',
-  'FormioAlerts',
-  function(
-    $scope,
-    $state,
-    FormioAlerts
-  ) {
-    $scope.$on('formSubmission', function(event) {
-      event.stopPropagation();
-      FormioAlerts.addAlert({
-        type: 'success',
-        message: 'New team created!'
-      });
-      $state.go('home');
-    });
-  }
-]);
-
 app.controller('TeamController', [
   '$scope',
   '$stateParams',
@@ -38,6 +18,26 @@ app.controller('TeamController', [
     $scope.formio = new Formio($scope.teamUrl);
     $scope.formio.loadSubmission().then(function(team) {
       $scope.team = team;
+    });
+  }
+]);
+
+app.controller('TeamCreateController', [
+  '$scope',
+  '$state',
+  'FormioAlerts',
+  function(
+    $scope,
+    $state,
+    FormioAlerts
+  ) {
+    $scope.$on('formSubmission', function(event, team) {
+      event.stopPropagation();
+      FormioAlerts.addAlert({
+        type: 'success',
+        message: 'New team created!'
+      });
+      $state.go('team.view', { teamId: team._id });
     });
   }
 ]);
@@ -64,6 +64,12 @@ app.controller('TeamViewController', [
     TeamPermissions
   ) {
     $scope.getPermissionLabel = TeamPermissions.getPermissionLabel.bind(TeamPermissions);
+
+    $scope.activeView = 'members';
+    $scope.switchView = function(view) {
+      $scope.activeView = view;
+    }
+
     $scope.teamPermissionsLoaded = false;
     Formio.request(AppConfig.apiBase + '/team/' + $stateParams.teamId + '/projects', 'GET')
       .then(function(teams) {
@@ -92,40 +98,16 @@ app.controller('TeamViewController', [
           $state.go('home', null, {reload: true});
         });
     };
-  }
-]);
 
-app.controller('TeamAddController', [
-  '$scope',
-  '$state',
-  'FormioAlerts',
-  function(
-    $scope,
-    $state,
-    FormioAlerts
-  ) {
-    $scope.$on('formSubmission', function(event) {
-      event.stopPropagation();
-      FormioAlerts.addAlert({
-        type: 'success',
-        message: 'Team was deleted.'
-      });
-      $state.go('project.teams.view');
-    });
-  }
-]);
+    $scope.addMember = function(member) {
+      console.log('add', member);
+    };
 
-app.controller('TeamEditController', [
-  '$scope',
-  '$state',
-  function(
-    $scope,
-    $state
-  ) {
-    $scope.$on('formSubmission', function(event) {
-      event.stopPropagation();
-      $state.go('home');
-    });
+    $scope.removeMember = function(member) {
+      console.log($scope.team.data.members, member);
+      _.remove($scope.team.data.members, { _id: member._id });
+      console.log($scope.team.data.members);
+    }
   }
 ]);
 
@@ -146,5 +128,10 @@ app.controller('TeamDeleteController', [
       });
       $state.go('home');
     });
+
+    $scope.$on('cancel', function(event) {
+      event.stopPropagation();
+      $state.go('team.view', { teamId: $scope.team._id });
+    })
   }
 ]);

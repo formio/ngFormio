@@ -2,10 +2,9 @@
   <div class="project-section-inner-content">
     <div class="row">
       <div class="col-md-12">
-        <p class="project-create-message">Congratulations! You've created a project. <br />Follow these steps to test out, customize and deploy an application using this project.</p>
         <legend>Project Info</legend>
         <div class="project-info">
-          <ul class="list-group table table-striped">
+          <ul class="list-group">
             <li class="list-group-item">
               <div class="row">
                 <div class="col-xs-3"><h5 class="ellipsis">Title</h5></div>
@@ -16,69 +15,15 @@
             </li>
             <li class="list-group-item">
               <div class="row">
-                <div class="col-xs-3"><h5>Current Plan</h5></div>
-                <div class="col-xs-9">
-                  <h5 id="project-plan-display">{{ getPlanName(currentProject.plan) }}</h5>
-                </div>
-              </div>
-            </li>
-            <li class="list-group-item">
-              <div class="row">
-                <div class="col-xs-3"><h5>Submission Requests</h5></div>
-                <div class="col-xs-9">
-                  <div class="progress">
-                    <div class="progress-bar" role="progressbar" ng-style="{width: getAPICallsPercent(currentProject.apiCalls)}" ng-class="getProgressBarClass(currentProject.apiCalls)"></div>
-                  </div>
-                  <p class="text-center text-muted progress-caption"><small>{{ currentProject.apiCalls.used | number }} / {{ getAPICallsLimit(currentProject.apiCalls) }}</small></p>
-                </div>
-              </div>
-            </li>
-            <li class="list-group-item">
-              <div class="row">
                 <div class="col-xs-3"><h5>API Endpoint</h5></div>
                 <div class="col-xs-9">
-                  <h5 class="ellipsis">{{ apiProtocol }}//{{ currentProject.name }}.{{ apiServer }}</h5>
-                </div>
-              </div>
-            </li>
-            <li class="list-group-item">
-              <div class="row">
-                <div class="col-xs-3"><h5>Roles</h5></div>
-                <div class="col-xs-9">
-                  <h5><a class="label label-primary" style="margin-right: 5px; display: inline-block" ng-repeat="role in currentProjectRoles" ui-sref="project.roles.edit({roleId: role._id})">{{ role.title }}</a></h5>
-                </div>
-              </div>
-            </li>
-            <li class="list-group-item">
-              <div class="row">
-                <div class="col-xs-3"><h5>Resources</h5></div>
-                <div class="col-xs-9">
-                  <h5><a class="label label-primary" style="margin-right: 5px; display: inline-block" ng-repeat="resource in forms | filter : {type: 'resource'}" ui-sref="project.resource.form.view({formId: resource._id, formType: 'resource'})">{{ resource.title }}</a></h5>
-                </div>
-              </div>
-            </li>
-            <li class="list-group-item">
-              <div class="row">
-                <div class="col-xs-3"><h5>Forms</h5></div>
-                <div class="col-xs-9">
-                  <h5><a class="label label-primary" style="margin-right: 5px; display: inline-block" ng-repeat="form in forms | filter : {type: 'form'}" ui-sref="project.form.form.view({formId: form._id, formType: 'form'})">{{ form.title }}</a></h5>
+                  <h4 class="">{{ apiProtocol }}//{{ currentProject.name }}.{{ apiServer }}</h4>
                 </div>
               </div>
             </li>
           </ul>
         </div>
         <div ng-if="hasTeams()">
-          <div class="list-group">
-            <a ui-sref="team.view({teamId: team._id})" class="list-group-item" ng-repeat="team in currentProjectTeams">
-              <span class="badge"><i class="fa fa-users"></i>&nbsp;{{ team.data.members.length || 0 }}</span>
-              <h4 class="list-group-item-heading">
-                {{ team.data.name }}
-                <small ng-if="team.permission === 'team_read'">Read-only</small>
-                <small ng-if="team.permission === 'team_admin'">Admin</small>
-              </h4>
-            </a>
-            <a ng-if="highestRole === 'owner'" ui-sref="project.teams.add" class="list-group-item"><i class="fa fa-plus"></i> Add Team</a>
-          </div>
           <h4>
             <span ng-if="highestRole === 'owner'">You are the project <strong>owner</strong>.</span>
             <span ng-if="highestRole === 'team_admin'">You are a project <strong>admin</strong>.</span>
