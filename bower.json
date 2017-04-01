@@ -1,6 +1,6 @@
 {
   "name": "ng-formio",
-  "version": "2.14.2",
+  "version": "2.15.0",
   "authors": [
     "Travis Tidwell <travis@form.io>"
   ],
@@ -15,13 +15,12 @@
     "form"
   ],
   "dependencies": {
-    "angular": "^1.6.3",
+    "angular": "^1.6.4",
     "ng-file-upload": "^12.2.13",
     "angular-sanitize": "^1.6.3",
     "angular-moment": "^1.0.1",
     "bootstrap": "^3.3.7",
     "bootstrap-ui-datetime-picker": "^2.5.4",
-    "signature_pad": "^1.5.3",
     "angular-ui-mask": "formio/ui-mask#1.8.8-beta.1",
     "angular-file-saver": "^1.1.3",
     "angular-ui-select": "^0.19.6",

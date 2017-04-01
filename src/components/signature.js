@@ -1,4 +1,5 @@
 var fs = require('fs');
+var SignaturePad = require('signature_pad');
 module.exports = function(app) {
   app.config([
     'formioComponentsProvider',
@@ -73,7 +74,6 @@ module.exports = function(app) {
         });
 
         // Create the signature pad.
-        /* global SignaturePad:false */
         var signaturePad = new SignaturePad(element[0], {
           minWidth: scope.component.minWidth,
           maxWidth: scope.component.maxWidth,

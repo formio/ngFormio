@@ -1,4 +1,4 @@
-/*! ng-formio v2.14.2 | https://unpkg.com/ng-formio@2.14.2/LICENSE.txt */
+/*! ng-formio v2.15.0 | https://unpkg.com/ng-formio@2.15.0/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 /*!
  * EventEmitter2
@@ -960,7 +960,7 @@ var Formio = function () {
       var _url = type + 'Url';
       var method = this[_id] || data._id ? 'put' : 'post';
       var reqUrl = this[_id] ? this[_url] : this[type + 'sUrl'];
-      if (!this[_id] && data._id && method === 'put') {
+      if (!this[_id] && data._id && method === 'put' && reqUrl.indexOf(data._id) === -1) {
         reqUrl += '/' + data._id;
       }
       Formio.cache = {};
@@ -1705,7 +1705,7 @@ Formio.events = new EventEmitter({
 module.exports = global.Formio = Formio;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./providers":3,"eventemitter2":1,"native-promise-only":164,"shallow-copy":165,"whatwg-fetch":166}],3:[function(_dereq_,module,exports){
+},{"./providers":3,"eventemitter2":1,"native-promise-only":167,"shallow-copy":168,"whatwg-fetch":170}],3:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = {
@@ -1784,7 +1784,7 @@ var dropbox = function dropbox(formio) {
 dropbox.title = 'Dropbox';
 module.exports = dropbox;
 
-},{"native-promise-only":164}],5:[function(_dereq_,module,exports){
+},{"native-promise-only":167}],5:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = {
@@ -1908,7 +1908,7 @@ var s3 = function s3(formio) {
 s3.title = 'S3';
 module.exports = s3;
 
-},{"native-promise-only":164}],7:[function(_dereq_,module,exports){
+},{"native-promise-only":167}],7:[function(_dereq_,module,exports){
 'use strict';
 
 var Promise = _dereq_("native-promise-only");
@@ -1987,7 +1987,7 @@ var url = function url(formio) {
 url.title = 'Url';
 module.exports = url;
 
-},{"native-promise-only":164}],8:[function(_dereq_,module,exports){
+},{"native-promise-only":167}],8:[function(_dereq_,module,exports){
 'use strict';
 
 var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -2209,7 +2209,7 @@ module.exports = {
   }
 };
 
-},{"lodash/get":144}],9:[function(_dereq_,module,exports){
+},{"lodash/get":145}],9:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = _dereq_('./build/utils');
@@ -2223,7 +2223,7 @@ var DataView = getNative(root, 'DataView');
 
 module.exports = DataView;
 
-},{"./_getNative":88,"./_root":129}],11:[function(_dereq_,module,exports){
+},{"./_getNative":89,"./_root":130}],11:[function(_dereq_,module,exports){
 var hashClear = _dereq_('./_hashClear'),
     hashDelete = _dereq_('./_hashDelete'),
     hashGet = _dereq_('./_hashGet'),
@@ -2257,7 +2257,7 @@ Hash.prototype.set = hashSet;
 
 module.exports = Hash;
 
-},{"./_hashClear":96,"./_hashDelete":97,"./_hashGet":98,"./_hashHas":99,"./_hashSet":100}],12:[function(_dereq_,module,exports){
+},{"./_hashClear":97,"./_hashDelete":98,"./_hashGet":99,"./_hashHas":100,"./_hashSet":101}],12:[function(_dereq_,module,exports){
 var listCacheClear = _dereq_('./_listCacheClear'),
     listCacheDelete = _dereq_('./_listCacheDelete'),
     listCacheGet = _dereq_('./_listCacheGet'),
@@ -2291,7 +2291,7 @@ ListCache.prototype.set = listCacheSet;
 
 module.exports = ListCache;
 
-},{"./_listCacheClear":110,"./_listCacheDelete":111,"./_listCacheGet":112,"./_listCacheHas":113,"./_listCacheSet":114}],13:[function(_dereq_,module,exports){
+},{"./_listCacheClear":111,"./_listCacheDelete":112,"./_listCacheGet":113,"./_listCacheHas":114,"./_listCacheSet":115}],13:[function(_dereq_,module,exports){
 var getNative = _dereq_('./_getNative'),
     root = _dereq_('./_root');
 
@@ -2300,7 +2300,7 @@ var Map = getNative(root, 'Map');
 
 module.exports = Map;
 
-},{"./_getNative":88,"./_root":129}],14:[function(_dereq_,module,exports){
+},{"./_getNative":89,"./_root":130}],14:[function(_dereq_,module,exports){
 var mapCacheClear = _dereq_('./_mapCacheClear'),
     mapCacheDelete = _dereq_('./_mapCacheDelete'),
     mapCacheGet = _dereq_('./_mapCacheGet'),
@@ -2334,7 +2334,7 @@ MapCache.prototype.set = mapCacheSet;
 
 module.exports = MapCache;
 
-},{"./_mapCacheClear":115,"./_mapCacheDelete":116,"./_mapCacheGet":117,"./_mapCacheHas":118,"./_mapCacheSet":119}],15:[function(_dereq_,module,exports){
+},{"./_mapCacheClear":116,"./_mapCacheDelete":117,"./_mapCacheGet":118,"./_mapCacheHas":119,"./_mapCacheSet":120}],15:[function(_dereq_,module,exports){
 var getNative = _dereq_('./_getNative'),
     root = _dereq_('./_root');
 
@@ -2343,7 +2343,7 @@ var Promise = getNative(root, 'Promise');
 
 module.exports = Promise;
 
-},{"./_getNative":88,"./_root":129}],16:[function(_dereq_,module,exports){
+},{"./_getNative":89,"./_root":130}],16:[function(_dereq_,module,exports){
 var getNative = _dereq_('./_getNative'),
     root = _dereq_('./_root');
 
@@ -2352,7 +2352,7 @@ var Set = getNative(root, 'Set');
 
 module.exports = Set;
 
-},{"./_getNative":88,"./_root":129}],17:[function(_dereq_,module,exports){
+},{"./_getNative":89,"./_root":130}],17:[function(_dereq_,module,exports){
 var MapCache = _dereq_('./_MapCache'),
     setCacheAdd = _dereq_('./_setCacheAdd'),
     setCacheHas = _dereq_('./_setCacheHas');
@@ -2381,7 +2381,7 @@ SetCache.prototype.has = setCacheHas;
 
 module.exports = SetCache;
 
-},{"./_MapCache":14,"./_setCacheAdd":130,"./_setCacheHas":131}],18:[function(_dereq_,module,exports){
+},{"./_MapCache":14,"./_setCacheAdd":131,"./_setCacheHas":132}],18:[function(_dereq_,module,exports){
 var ListCache = _dereq_('./_ListCache'),
     stackClear = _dereq_('./_stackClear'),
     stackDelete = _dereq_('./_stackDelete'),
@@ -2410,7 +2410,7 @@ Stack.prototype.set = stackSet;
 
 module.exports = Stack;
 
-},{"./_ListCache":12,"./_stackClear":133,"./_stackDelete":134,"./_stackGet":135,"./_stackHas":136,"./_stackSet":137}],19:[function(_dereq_,module,exports){
+},{"./_ListCache":12,"./_stackClear":134,"./_stackDelete":135,"./_stackGet":136,"./_stackHas":137,"./_stackSet":138}],19:[function(_dereq_,module,exports){
 var root = _dereq_('./_root');
 
 /** Built-in value references. */
@@ -2418,7 +2418,7 @@ var Symbol = root.Symbol;
 
 module.exports = Symbol;
 
-},{"./_root":129}],20:[function(_dereq_,module,exports){
+},{"./_root":130}],20:[function(_dereq_,module,exports){
 var root = _dereq_('./_root');
 
 /** Built-in value references. */
@@ -2426,7 +2426,7 @@ var Uint8Array = root.Uint8Array;
 
 module.exports = Uint8Array;
 
-},{"./_root":129}],21:[function(_dereq_,module,exports){
+},{"./_root":130}],21:[function(_dereq_,module,exports){
 var getNative = _dereq_('./_getNative'),
     root = _dereq_('./_root');
 
@@ -2435,7 +2435,7 @@ var WeakMap = getNative(root, 'WeakMap');
 
 module.exports = WeakMap;
 
-},{"./_getNative":88,"./_root":129}],22:[function(_dereq_,module,exports){
+},{"./_getNative":89,"./_root":130}],22:[function(_dereq_,module,exports){
 /**
  * Adds the key-value `pair` to `map`.
  *
@@ -2571,7 +2571,7 @@ function arrayLikeKeys(value, inherited) {
 
 module.exports = arrayLikeKeys;
 
-},{"./_baseTimes":59,"./_isIndex":104,"./isArguments":147,"./isArray":148,"./isBuffer":150,"./isTypedArray":156}],27:[function(_dereq_,module,exports){
+},{"./_baseTimes":60,"./_isIndex":105,"./isArguments":148,"./isArray":149,"./isBuffer":151,"./isTypedArray":158}],27:[function(_dereq_,module,exports){
 /**
  * A specialized version of `_.map` for arrays without support for iteratee
  * shorthands.
@@ -2699,7 +2699,7 @@ function assignValue(object, key, value) {
 
 module.exports = assignValue;
 
-},{"./_baseAssignValue":35,"./eq":142}],32:[function(_dereq_,module,exports){
+},{"./_baseAssignValue":35,"./eq":143}],32:[function(_dereq_,module,exports){
 var eq = _dereq_('./eq');
 
 /**
@@ -2722,7 +2722,7 @@ function assocIndexOf(array, key) {
 
 module.exports = assocIndexOf;
 
-},{"./eq":142}],33:[function(_dereq_,module,exports){
+},{"./eq":143}],33:[function(_dereq_,module,exports){
 var copyObject = _dereq_('./_copyObject'),
     keys = _dereq_('./keys');
 
@@ -2741,7 +2741,7 @@ function baseAssign(object, source) {
 
 module.exports = baseAssign;
 
-},{"./_copyObject":73,"./keys":157}],34:[function(_dereq_,module,exports){
+},{"./_copyObject":74,"./keys":159}],34:[function(_dereq_,module,exports){
 var copyObject = _dereq_('./_copyObject'),
     keysIn = _dereq_('./keysIn');
 
@@ -2760,7 +2760,7 @@ function baseAssignIn(object, source) {
 
 module.exports = baseAssignIn;
 
-},{"./_copyObject":73,"./keysIn":158}],35:[function(_dereq_,module,exports){
+},{"./_copyObject":74,"./keysIn":160}],35:[function(_dereq_,module,exports){
 var defineProperty = _dereq_('./_defineProperty');
 
 /**
@@ -2787,7 +2787,7 @@ function baseAssignValue(object, key, value) {
 
 module.exports = baseAssignValue;
 
-},{"./_defineProperty":79}],36:[function(_dereq_,module,exports){
+},{"./_defineProperty":80}],36:[function(_dereq_,module,exports){
 var Stack = _dereq_('./_Stack'),
     arrayEach = _dereq_('./_arrayEach'),
     assignValue = _dereq_('./_assignValue'),
@@ -2942,7 +2942,7 @@ function baseClone(value, bitmask, customizer, key, object, stack) {
 
 module.exports = baseClone;
 
-},{"./_Stack":18,"./_arrayEach":24,"./_assignValue":31,"./_baseAssign":33,"./_baseAssignIn":34,"./_cloneBuffer":65,"./_copyArray":72,"./_copySymbols":74,"./_copySymbolsIn":75,"./_getAllKeys":84,"./_getAllKeysIn":85,"./_getTag":93,"./_initCloneArray":101,"./_initCloneByTag":102,"./_initCloneObject":103,"./isArray":148,"./isBuffer":150,"./isObject":153,"./keys":157}],37:[function(_dereq_,module,exports){
+},{"./_Stack":18,"./_arrayEach":24,"./_assignValue":31,"./_baseAssign":33,"./_baseAssignIn":34,"./_cloneBuffer":66,"./_copyArray":73,"./_copySymbols":75,"./_copySymbolsIn":76,"./_getAllKeys":85,"./_getAllKeysIn":86,"./_getTag":94,"./_initCloneArray":102,"./_initCloneByTag":103,"./_initCloneObject":104,"./isArray":149,"./isBuffer":151,"./isObject":155,"./keys":159}],37:[function(_dereq_,module,exports){
 var isObject = _dereq_('./isObject');
 
 /** Built-in value references. */
@@ -2974,7 +2974,7 @@ var baseCreate = (function() {
 
 module.exports = baseCreate;
 
-},{"./isObject":153}],38:[function(_dereq_,module,exports){
+},{"./isObject":155}],38:[function(_dereq_,module,exports){
 var baseForOwn = _dereq_('./_baseForOwn'),
     createBaseEach = _dereq_('./_createBaseEach');
 
@@ -2990,7 +2990,7 @@ var baseEach = createBaseEach(baseForOwn);
 
 module.exports = baseEach;
 
-},{"./_baseForOwn":41,"./_createBaseEach":77}],39:[function(_dereq_,module,exports){
+},{"./_baseForOwn":41,"./_createBaseEach":78}],39:[function(_dereq_,module,exports){
 var baseEach = _dereq_('./_baseEach');
 
 /**
@@ -3031,7 +3031,7 @@ var baseFor = createBaseFor();
 
 module.exports = baseFor;
 
-},{"./_createBaseFor":78}],41:[function(_dereq_,module,exports){
+},{"./_createBaseFor":79}],41:[function(_dereq_,module,exports){
 var baseFor = _dereq_('./_baseFor'),
     keys = _dereq_('./keys');
 
@@ -3049,7 +3049,7 @@ function baseForOwn(object, iteratee) {
 
 module.exports = baseForOwn;
 
-},{"./_baseFor":40,"./keys":157}],42:[function(_dereq_,module,exports){
+},{"./_baseFor":40,"./keys":159}],42:[function(_dereq_,module,exports){
 var castPath = _dereq_('./_castPath'),
     toKey = _dereq_('./_toKey');
 
@@ -3075,7 +3075,7 @@ function baseGet(object, path) {
 
 module.exports = baseGet;
 
-},{"./_castPath":63,"./_toKey":139}],43:[function(_dereq_,module,exports){
+},{"./_castPath":64,"./_toKey":140}],43:[function(_dereq_,module,exports){
 var arrayPush = _dereq_('./_arrayPush'),
     isArray = _dereq_('./isArray');
 
@@ -3097,7 +3097,7 @@ function baseGetAllKeys(object, keysFunc, symbolsFunc) {
 
 module.exports = baseGetAllKeys;
 
-},{"./_arrayPush":28,"./isArray":148}],44:[function(_dereq_,module,exports){
+},{"./_arrayPush":28,"./isArray":149}],44:[function(_dereq_,module,exports){
 var Symbol = _dereq_('./_Symbol'),
     getRawTag = _dereq_('./_getRawTag'),
     objectToString = _dereq_('./_objectToString');
@@ -3127,7 +3127,7 @@ function baseGetTag(value) {
 
 module.exports = baseGetTag;
 
-},{"./_Symbol":19,"./_getRawTag":90,"./_objectToString":127}],45:[function(_dereq_,module,exports){
+},{"./_Symbol":19,"./_getRawTag":91,"./_objectToString":128}],45:[function(_dereq_,module,exports){
 /**
  * The base implementation of `_.hasIn` without support for deep paths.
  *
@@ -3162,7 +3162,7 @@ function baseIsArguments(value) {
 
 module.exports = baseIsArguments;
 
-},{"./_baseGetTag":44,"./isObjectLike":154}],47:[function(_dereq_,module,exports){
+},{"./_baseGetTag":44,"./isObjectLike":156}],47:[function(_dereq_,module,exports){
 var baseIsEqualDeep = _dereq_('./_baseIsEqualDeep'),
     isObjectLike = _dereq_('./isObjectLike');
 
@@ -3192,7 +3192,7 @@ function baseIsEqual(value, other, bitmask, customizer, stack) {
 
 module.exports = baseIsEqual;
 
-},{"./_baseIsEqualDeep":48,"./isObjectLike":154}],48:[function(_dereq_,module,exports){
+},{"./_baseIsEqualDeep":48,"./isObjectLike":156}],48:[function(_dereq_,module,exports){
 var Stack = _dereq_('./_Stack'),
     equalArrays = _dereq_('./_equalArrays'),
     equalByTag = _dereq_('./_equalByTag'),
@@ -3277,7 +3277,7 @@ function baseIsEqualDeep(object, other, bitmask, customizer, equalFunc, stack) {
 
 module.exports = baseIsEqualDeep;
 
-},{"./_Stack":18,"./_equalArrays":80,"./_equalByTag":81,"./_equalObjects":82,"./_getTag":93,"./isArray":148,"./isBuffer":150,"./isTypedArray":156}],49:[function(_dereq_,module,exports){
+},{"./_Stack":18,"./_equalArrays":81,"./_equalByTag":82,"./_equalObjects":83,"./_getTag":94,"./isArray":149,"./isBuffer":151,"./isTypedArray":158}],49:[function(_dereq_,module,exports){
 var Stack = _dereq_('./_Stack'),
     baseIsEqual = _dereq_('./_baseIsEqual');
 
@@ -3390,7 +3390,7 @@ function baseIsNative(value) {
 
 module.exports = baseIsNative;
 
-},{"./_isMasked":107,"./_toSource":140,"./isFunction":151,"./isObject":153}],51:[function(_dereq_,module,exports){
+},{"./_isMasked":108,"./_toSource":141,"./isFunction":153,"./isObject":155}],51:[function(_dereq_,module,exports){
 var baseGetTag = _dereq_('./_baseGetTag'),
     isLength = _dereq_('./isLength'),
     isObjectLike = _dereq_('./isObjectLike');
@@ -3452,7 +3452,7 @@ function baseIsTypedArray(value) {
 
 module.exports = baseIsTypedArray;
 
-},{"./_baseGetTag":44,"./isLength":152,"./isObjectLike":154}],52:[function(_dereq_,module,exports){
+},{"./_baseGetTag":44,"./isLength":154,"./isObjectLike":156}],52:[function(_dereq_,module,exports){
 var baseMatches = _dereq_('./_baseMatches'),
     baseMatchesProperty = _dereq_('./_baseMatchesProperty'),
     identity = _dereq_('./identity'),
@@ -3485,7 +3485,7 @@ function baseIteratee(value) {
 
 module.exports = baseIteratee;
 
-},{"./_baseMatches":55,"./_baseMatchesProperty":56,"./identity":146,"./isArray":148,"./property":160}],53:[function(_dereq_,module,exports){
+},{"./_baseMatches":55,"./_baseMatchesProperty":56,"./identity":147,"./isArray":149,"./property":162}],53:[function(_dereq_,module,exports){
 var isPrototype = _dereq_('./_isPrototype'),
     nativeKeys = _dereq_('./_nativeKeys');
 
@@ -3517,7 +3517,7 @@ function baseKeys(object) {
 
 module.exports = baseKeys;
 
-},{"./_isPrototype":108,"./_nativeKeys":124}],54:[function(_dereq_,module,exports){
+},{"./_isPrototype":109,"./_nativeKeys":125}],54:[function(_dereq_,module,exports){
 var isObject = _dereq_('./isObject'),
     isPrototype = _dereq_('./_isPrototype'),
     nativeKeysIn = _dereq_('./_nativeKeysIn');
@@ -3552,7 +3552,7 @@ function baseKeysIn(object) {
 
 module.exports = baseKeysIn;
 
-},{"./_isPrototype":108,"./_nativeKeysIn":125,"./isObject":153}],55:[function(_dereq_,module,exports){
+},{"./_isPrototype":109,"./_nativeKeysIn":126,"./isObject":155}],55:[function(_dereq_,module,exports){
 var baseIsMatch = _dereq_('./_baseIsMatch'),
     getMatchData = _dereq_('./_getMatchData'),
     matchesStrictComparable = _dereq_('./_matchesStrictComparable');
@@ -3576,7 +3576,7 @@ function baseMatches(source) {
 
 module.exports = baseMatches;
 
-},{"./_baseIsMatch":49,"./_getMatchData":87,"./_matchesStrictComparable":121}],56:[function(_dereq_,module,exports){
+},{"./_baseIsMatch":49,"./_getMatchData":88,"./_matchesStrictComparable":122}],56:[function(_dereq_,module,exports){
 var baseIsEqual = _dereq_('./_baseIsEqual'),
     get = _dereq_('./get'),
     hasIn = _dereq_('./hasIn'),
@@ -3611,7 +3611,7 @@ function baseMatchesProperty(path, srcValue) {
 
 module.exports = baseMatchesProperty;
 
-},{"./_baseIsEqual":47,"./_isKey":105,"./_isStrictComparable":109,"./_matchesStrictComparable":121,"./_toKey":139,"./get":144,"./hasIn":145}],57:[function(_dereq_,module,exports){
+},{"./_baseIsEqual":47,"./_isKey":106,"./_isStrictComparable":110,"./_matchesStrictComparable":122,"./_toKey":140,"./get":145,"./hasIn":146}],57:[function(_dereq_,module,exports){
 /**
  * The base implementation of `_.property` without support for deep paths.
  *
@@ -3646,6 +3646,55 @@ function basePropertyDeep(path) {
 module.exports = basePropertyDeep;
 
 },{"./_baseGet":42}],59:[function(_dereq_,module,exports){
+var assignValue = _dereq_('./_assignValue'),
+    castPath = _dereq_('./_castPath'),
+    isIndex = _dereq_('./_isIndex'),
+    isObject = _dereq_('./isObject'),
+    toKey = _dereq_('./_toKey');
+
+/**
+ * The base implementation of `_.set`.
+ *
+ * @private
+ * @param {Object} object The object to modify.
+ * @param {Array|string} path The path of the property to set.
+ * @param {*} value The value to set.
+ * @param {Function} [customizer] The function to customize path creation.
+ * @returns {Object} Returns `object`.
+ */
+function baseSet(object, path, value, customizer) {
+  if (!isObject(object)) {
+    return object;
+  }
+  path = castPath(path, object);
+
+  var index = -1,
+      length = path.length,
+      lastIndex = length - 1,
+      nested = object;
+
+  while (nested != null && ++index < length) {
+    var key = toKey(path[index]),
+        newValue = value;
+
+    if (index != lastIndex) {
+      var objValue = nested[key];
+      newValue = customizer ? customizer(objValue, key, nested) : undefined;
+      if (newValue === undefined) {
+        newValue = isObject(objValue)
+          ? objValue
+          : (isIndex(path[index + 1]) ? [] : {});
+      }
+    }
+    assignValue(nested, key, newValue);
+    nested = nested[key];
+  }
+  return object;
+}
+
+module.exports = baseSet;
+
+},{"./_assignValue":31,"./_castPath":64,"./_isIndex":105,"./_toKey":140,"./isObject":155}],60:[function(_dereq_,module,exports){
 /**
  * The base implementation of `_.times` without support for iteratee shorthands
  * or max array length checks.
@@ -3667,7 +3716,7 @@ function baseTimes(n, iteratee) {
 
 module.exports = baseTimes;
 
-},{}],60:[function(_dereq_,module,exports){
+},{}],61:[function(_dereq_,module,exports){
 var Symbol = _dereq_('./_Symbol'),
     arrayMap = _dereq_('./_arrayMap'),
     isArray = _dereq_('./isArray'),
@@ -3706,7 +3755,7 @@ function baseToString(value) {
 
 module.exports = baseToString;
 
-},{"./_Symbol":19,"./_arrayMap":27,"./isArray":148,"./isSymbol":155}],61:[function(_dereq_,module,exports){
+},{"./_Symbol":19,"./_arrayMap":27,"./isArray":149,"./isSymbol":157}],62:[function(_dereq_,module,exports){
 /**
  * The base implementation of `_.unary` without support for storing metadata.
  *
@@ -3722,7 +3771,7 @@ function baseUnary(func) {
 
 module.exports = baseUnary;
 
-},{}],62:[function(_dereq_,module,exports){
+},{}],63:[function(_dereq_,module,exports){
 /**
  * Checks if a `cache` value for `key` exists.
  *
@@ -3737,7 +3786,7 @@ function cacheHas(cache, key) {
 
 module.exports = cacheHas;
 
-},{}],63:[function(_dereq_,module,exports){
+},{}],64:[function(_dereq_,module,exports){
 var isArray = _dereq_('./isArray'),
     isKey = _dereq_('./_isKey'),
     stringToPath = _dereq_('./_stringToPath'),
@@ -3760,7 +3809,7 @@ function castPath(value, object) {
 
 module.exports = castPath;
 
-},{"./_isKey":105,"./_stringToPath":138,"./isArray":148,"./toString":163}],64:[function(_dereq_,module,exports){
+},{"./_isKey":106,"./_stringToPath":139,"./isArray":149,"./toString":166}],65:[function(_dereq_,module,exports){
 var Uint8Array = _dereq_('./_Uint8Array');
 
 /**
@@ -3778,7 +3827,7 @@ function cloneArrayBuffer(arrayBuffer) {
 
 module.exports = cloneArrayBuffer;
 
-},{"./_Uint8Array":20}],65:[function(_dereq_,module,exports){
+},{"./_Uint8Array":20}],66:[function(_dereq_,module,exports){
 var root = _dereq_('./_root');
 
 /** Detect free variable `exports`. */
@@ -3815,7 +3864,7 @@ function cloneBuffer(buffer, isDeep) {
 
 module.exports = cloneBuffer;
 
-},{"./_root":129}],66:[function(_dereq_,module,exports){
+},{"./_root":130}],67:[function(_dereq_,module,exports){
 var cloneArrayBuffer = _dereq_('./_cloneArrayBuffer');
 
 /**
@@ -3833,7 +3882,7 @@ function cloneDataView(dataView, isDeep) {
 
 module.exports = cloneDataView;
 
-},{"./_cloneArrayBuffer":64}],67:[function(_dereq_,module,exports){
+},{"./_cloneArrayBuffer":65}],68:[function(_dereq_,module,exports){
 var addMapEntry = _dereq_('./_addMapEntry'),
     arrayReduce = _dereq_('./_arrayReduce'),
     mapToArray = _dereq_('./_mapToArray');
@@ -3857,7 +3906,7 @@ function cloneMap(map, isDeep, cloneFunc) {
 
 module.exports = cloneMap;
 
-},{"./_addMapEntry":22,"./_arrayReduce":29,"./_mapToArray":120}],68:[function(_dereq_,module,exports){
+},{"./_addMapEntry":22,"./_arrayReduce":29,"./_mapToArray":121}],69:[function(_dereq_,module,exports){
 /** Used to match `RegExp` flags from their coerced string values. */
 var reFlags = /\w*$/;
 
@@ -3876,7 +3925,7 @@ function cloneRegExp(regexp) {
 
 module.exports = cloneRegExp;
 
-},{}],69:[function(_dereq_,module,exports){
+},{}],70:[function(_dereq_,module,exports){
 var addSetEntry = _dereq_('./_addSetEntry'),
     arrayReduce = _dereq_('./_arrayReduce'),
     setToArray = _dereq_('./_setToArray');
@@ -3900,7 +3949,7 @@ function cloneSet(set, isDeep, cloneFunc) {
 
 module.exports = cloneSet;
 
-},{"./_addSetEntry":23,"./_arrayReduce":29,"./_setToArray":132}],70:[function(_dereq_,module,exports){
+},{"./_addSetEntry":23,"./_arrayReduce":29,"./_setToArray":133}],71:[function(_dereq_,module,exports){
 var Symbol = _dereq_('./_Symbol');
 
 /** Used to convert symbols to primitives and strings. */
@@ -3920,7 +3969,7 @@ function cloneSymbol(symbol) {
 
 module.exports = cloneSymbol;
 
-},{"./_Symbol":19}],71:[function(_dereq_,module,exports){
+},{"./_Symbol":19}],72:[function(_dereq_,module,exports){
 var cloneArrayBuffer = _dereq_('./_cloneArrayBuffer');
 
 /**
@@ -3938,7 +3987,7 @@ function cloneTypedArray(typedArray, isDeep) {
 
 module.exports = cloneTypedArray;
 
-},{"./_cloneArrayBuffer":64}],72:[function(_dereq_,module,exports){
+},{"./_cloneArrayBuffer":65}],73:[function(_dereq_,module,exports){
 /**
  * Copies the values of `source` to `array`.
  *
@@ -3960,7 +4009,7 @@ function copyArray(source, array) {
 
 module.exports = copyArray;
 
-},{}],73:[function(_dereq_,module,exports){
+},{}],74:[function(_dereq_,module,exports){
 var assignValue = _dereq_('./_assignValue'),
     baseAssignValue = _dereq_('./_baseAssignValue');
 
@@ -4002,7 +4051,7 @@ function copyObject(source, props, object, customizer) {
 
 module.exports = copyObject;
 
-},{"./_assignValue":31,"./_baseAssignValue":35}],74:[function(_dereq_,module,exports){
+},{"./_assignValue":31,"./_baseAssignValue":35}],75:[function(_dereq_,module,exports){
 var copyObject = _dereq_('./_copyObject'),
     getSymbols = _dereq_('./_getSymbols');
 
@@ -4020,7 +4069,7 @@ function copySymbols(source, object) {
 
 module.exports = copySymbols;
 
-},{"./_copyObject":73,"./_getSymbols":91}],75:[function(_dereq_,module,exports){
+},{"./_copyObject":74,"./_getSymbols":92}],76:[function(_dereq_,module,exports){
 var copyObject = _dereq_('./_copyObject'),
     getSymbolsIn = _dereq_('./_getSymbolsIn');
 
@@ -4038,7 +4087,7 @@ function copySymbolsIn(source, object) {
 
 module.exports = copySymbolsIn;
 
-},{"./_copyObject":73,"./_getSymbolsIn":92}],76:[function(_dereq_,module,exports){
+},{"./_copyObject":74,"./_getSymbolsIn":93}],77:[function(_dereq_,module,exports){
 var root = _dereq_('./_root');
 
 /** Used to detect overreaching core-js shims. */
@@ -4046,7 +4095,7 @@ var coreJsData = root['__core-js_shared__'];
 
 module.exports = coreJsData;
 
-},{"./_root":129}],77:[function(_dereq_,module,exports){
+},{"./_root":130}],78:[function(_dereq_,module,exports){
 var isArrayLike = _dereq_('./isArrayLike');
 
 /**
@@ -4080,7 +4129,7 @@ function createBaseEach(eachFunc, fromRight) {
 
 module.exports = createBaseEach;
 
-},{"./isArrayLike":149}],78:[function(_dereq_,module,exports){
+},{"./isArrayLike":150}],79:[function(_dereq_,module,exports){
 /**
  * Creates a base function for methods like `_.forIn` and `_.forOwn`.
  *
@@ -4107,7 +4156,7 @@ function createBaseFor(fromRight) {
 
 module.exports = createBaseFor;
 
-},{}],79:[function(_dereq_,module,exports){
+},{}],80:[function(_dereq_,module,exports){
 var getNative = _dereq_('./_getNative');
 
 var defineProperty = (function() {
@@ -4120,7 +4169,7 @@ var defineProperty = (function() {
 
 module.exports = defineProperty;
 
-},{"./_getNative":88}],80:[function(_dereq_,module,exports){
+},{"./_getNative":89}],81:[function(_dereq_,module,exports){
 var SetCache = _dereq_('./_SetCache'),
     arraySome = _dereq_('./_arraySome'),
     cacheHas = _dereq_('./_cacheHas');
@@ -4205,7 +4254,7 @@ function equalArrays(array, other, bitmask, customizer, equalFunc, stack) {
 
 module.exports = equalArrays;
 
-},{"./_SetCache":17,"./_arraySome":30,"./_cacheHas":62}],81:[function(_dereq_,module,exports){
+},{"./_SetCache":17,"./_arraySome":30,"./_cacheHas":63}],82:[function(_dereq_,module,exports){
 var Symbol = _dereq_('./_Symbol'),
     Uint8Array = _dereq_('./_Uint8Array'),
     eq = _dereq_('./eq'),
@@ -4319,7 +4368,7 @@ function equalByTag(object, other, tag, bitmask, customizer, equalFunc, stack) {
 
 module.exports = equalByTag;
 
-},{"./_Symbol":19,"./_Uint8Array":20,"./_equalArrays":80,"./_mapToArray":120,"./_setToArray":132,"./eq":142}],82:[function(_dereq_,module,exports){
+},{"./_Symbol":19,"./_Uint8Array":20,"./_equalArrays":81,"./_mapToArray":121,"./_setToArray":133,"./eq":143}],83:[function(_dereq_,module,exports){
 var getAllKeys = _dereq_('./_getAllKeys');
 
 /** Used to compose bitmasks for value comparisons. */
@@ -4410,7 +4459,7 @@ function equalObjects(object, other, bitmask, customizer, equalFunc, stack) {
 
 module.exports = equalObjects;
 
-},{"./_getAllKeys":84}],83:[function(_dereq_,module,exports){
+},{"./_getAllKeys":85}],84:[function(_dereq_,module,exports){
 (function (global){
 /** Detect free variable `global` from Node.js. */
 var freeGlobal = typeof global == 'object' && global && global.Object === Object && global;
@@ -4418,7 +4467,7 @@ var freeGlobal = typeof global == 'object' && global && global.Object === Object
 module.exports = freeGlobal;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],84:[function(_dereq_,module,exports){
+},{}],85:[function(_dereq_,module,exports){
 var baseGetAllKeys = _dereq_('./_baseGetAllKeys'),
     getSymbols = _dereq_('./_getSymbols'),
     keys = _dereq_('./keys');
@@ -4436,7 +4485,7 @@ function getAllKeys(object) {
 
 module.exports = getAllKeys;
 
-},{"./_baseGetAllKeys":43,"./_getSymbols":91,"./keys":157}],85:[function(_dereq_,module,exports){
+},{"./_baseGetAllKeys":43,"./_getSymbols":92,"./keys":159}],86:[function(_dereq_,module,exports){
 var baseGetAllKeys = _dereq_('./_baseGetAllKeys'),
     getSymbolsIn = _dereq_('./_getSymbolsIn'),
     keysIn = _dereq_('./keysIn');
@@ -4455,7 +4504,7 @@ function getAllKeysIn(object) {
 
 module.exports = getAllKeysIn;
 
-},{"./_baseGetAllKeys":43,"./_getSymbolsIn":92,"./keysIn":158}],86:[function(_dereq_,module,exports){
+},{"./_baseGetAllKeys":43,"./_getSymbolsIn":93,"./keysIn":160}],87:[function(_dereq_,module,exports){
 var isKeyable = _dereq_('./_isKeyable');
 
 /**
@@ -4475,7 +4524,7 @@ function getMapData(map, key) {
 
 module.exports = getMapData;
 
-},{"./_isKeyable":106}],87:[function(_dereq_,module,exports){
+},{"./_isKeyable":107}],88:[function(_dereq_,module,exports){
 var isStrictComparable = _dereq_('./_isStrictComparable'),
     keys = _dereq_('./keys');
 
@@ -4501,7 +4550,7 @@ function getMatchData(object) {
 
 module.exports = getMatchData;
 
-},{"./_isStrictComparable":109,"./keys":157}],88:[function(_dereq_,module,exports){
+},{"./_isStrictComparable":110,"./keys":159}],89:[function(_dereq_,module,exports){
 var baseIsNative = _dereq_('./_baseIsNative'),
     getValue = _dereq_('./_getValue');
 
@@ -4520,7 +4569,7 @@ function getNative(object, key) {
 
 module.exports = getNative;
 
-},{"./_baseIsNative":50,"./_getValue":94}],89:[function(_dereq_,module,exports){
+},{"./_baseIsNative":50,"./_getValue":95}],90:[function(_dereq_,module,exports){
 var overArg = _dereq_('./_overArg');
 
 /** Built-in value references. */
@@ -4528,7 +4577,7 @@ var getPrototype = overArg(Object.getPrototypeOf, Object);
 
 module.exports = getPrototype;
 
-},{"./_overArg":128}],90:[function(_dereq_,module,exports){
+},{"./_overArg":129}],91:[function(_dereq_,module,exports){
 var Symbol = _dereq_('./_Symbol');
 
 /** Used for built-in method references. */
@@ -4576,7 +4625,7 @@ function getRawTag(value) {
 
 module.exports = getRawTag;
 
-},{"./_Symbol":19}],91:[function(_dereq_,module,exports){
+},{"./_Symbol":19}],92:[function(_dereq_,module,exports){
 var arrayFilter = _dereq_('./_arrayFilter'),
     stubArray = _dereq_('./stubArray');
 
@@ -4608,7 +4657,7 @@ var getSymbols = !nativeGetSymbols ? stubArray : function(object) {
 
 module.exports = getSymbols;
 
-},{"./_arrayFilter":25,"./stubArray":161}],92:[function(_dereq_,module,exports){
+},{"./_arrayFilter":25,"./stubArray":164}],93:[function(_dereq_,module,exports){
 var arrayPush = _dereq_('./_arrayPush'),
     getPrototype = _dereq_('./_getPrototype'),
     getSymbols = _dereq_('./_getSymbols'),
@@ -4635,7 +4684,7 @@ var getSymbolsIn = !nativeGetSymbols ? stubArray : function(object) {
 
 module.exports = getSymbolsIn;
 
-},{"./_arrayPush":28,"./_getPrototype":89,"./_getSymbols":91,"./stubArray":161}],93:[function(_dereq_,module,exports){
+},{"./_arrayPush":28,"./_getPrototype":90,"./_getSymbols":92,"./stubArray":164}],94:[function(_dereq_,module,exports){
 var DataView = _dereq_('./_DataView'),
     Map = _dereq_('./_Map'),
     Promise = _dereq_('./_Promise'),
@@ -4695,7 +4744,7 @@ if ((DataView && getTag(new DataView(new ArrayBuffer(1))) != dataViewTag) ||
 
 module.exports = getTag;
 
-},{"./_DataView":10,"./_Map":13,"./_Promise":15,"./_Set":16,"./_WeakMap":21,"./_baseGetTag":44,"./_toSource":140}],94:[function(_dereq_,module,exports){
+},{"./_DataView":10,"./_Map":13,"./_Promise":15,"./_Set":16,"./_WeakMap":21,"./_baseGetTag":44,"./_toSource":141}],95:[function(_dereq_,module,exports){
 /**
  * Gets the value at `key` of `object`.
  *
@@ -4710,7 +4759,7 @@ function getValue(object, key) {
 
 module.exports = getValue;
 
-},{}],95:[function(_dereq_,module,exports){
+},{}],96:[function(_dereq_,module,exports){
 var castPath = _dereq_('./_castPath'),
     isArguments = _dereq_('./isArguments'),
     isArray = _dereq_('./isArray'),
@@ -4751,7 +4800,7 @@ function hasPath(object, path, hasFunc) {
 
 module.exports = hasPath;
 
-},{"./_castPath":63,"./_isIndex":104,"./_toKey":139,"./isArguments":147,"./isArray":148,"./isLength":152}],96:[function(_dereq_,module,exports){
+},{"./_castPath":64,"./_isIndex":105,"./_toKey":140,"./isArguments":148,"./isArray":149,"./isLength":154}],97:[function(_dereq_,module,exports){
 var nativeCreate = _dereq_('./_nativeCreate');
 
 /**
@@ -4768,7 +4817,7 @@ function hashClear() {
 
 module.exports = hashClear;
 
-},{"./_nativeCreate":123}],97:[function(_dereq_,module,exports){
+},{"./_nativeCreate":124}],98:[function(_dereq_,module,exports){
 /**
  * Removes `key` and its value from the hash.
  *
@@ -4787,7 +4836,7 @@ function hashDelete(key) {
 
 module.exports = hashDelete;
 
-},{}],98:[function(_dereq_,module,exports){
+},{}],99:[function(_dereq_,module,exports){
 var nativeCreate = _dereq_('./_nativeCreate');
 
 /** Used to stand-in for `undefined` hash values. */
@@ -4819,7 +4868,7 @@ function hashGet(key) {
 
 module.exports = hashGet;
 
-},{"./_nativeCreate":123}],99:[function(_dereq_,module,exports){
+},{"./_nativeCreate":124}],100:[function(_dereq_,module,exports){
 var nativeCreate = _dereq_('./_nativeCreate');
 
 /** Used for built-in method references. */
@@ -4844,7 +4893,7 @@ function hashHas(key) {
 
 module.exports = hashHas;
 
-},{"./_nativeCreate":123}],100:[function(_dereq_,module,exports){
+},{"./_nativeCreate":124}],101:[function(_dereq_,module,exports){
 var nativeCreate = _dereq_('./_nativeCreate');
 
 /** Used to stand-in for `undefined` hash values. */
@@ -4869,7 +4918,7 @@ function hashSet(key, value) {
 
 module.exports = hashSet;
 
-},{"./_nativeCreate":123}],101:[function(_dereq_,module,exports){
+},{"./_nativeCreate":124}],102:[function(_dereq_,module,exports){
 /** Used for built-in method references. */
 var objectProto = Object.prototype;
 
@@ -4897,7 +4946,7 @@ function initCloneArray(array) {
 
 module.exports = initCloneArray;
 
-},{}],102:[function(_dereq_,module,exports){
+},{}],103:[function(_dereq_,module,exports){
 var cloneArrayBuffer = _dereq_('./_cloneArrayBuffer'),
     cloneDataView = _dereq_('./_cloneDataView'),
     cloneMap = _dereq_('./_cloneMap'),
@@ -4979,7 +5028,7 @@ function initCloneByTag(object, tag, cloneFunc, isDeep) {
 
 module.exports = initCloneByTag;
 
-},{"./_cloneArrayBuffer":64,"./_cloneDataView":66,"./_cloneMap":67,"./_cloneRegExp":68,"./_cloneSet":69,"./_cloneSymbol":70,"./_cloneTypedArray":71}],103:[function(_dereq_,module,exports){
+},{"./_cloneArrayBuffer":65,"./_cloneDataView":67,"./_cloneMap":68,"./_cloneRegExp":69,"./_cloneSet":70,"./_cloneSymbol":71,"./_cloneTypedArray":72}],104:[function(_dereq_,module,exports){
 var baseCreate = _dereq_('./_baseCreate'),
     getPrototype = _dereq_('./_getPrototype'),
     isPrototype = _dereq_('./_isPrototype');
@@ -4999,7 +5048,7 @@ function initCloneObject(object) {
 
 module.exports = initCloneObject;
 
-},{"./_baseCreate":37,"./_getPrototype":89,"./_isPrototype":108}],104:[function(_dereq_,module,exports){
+},{"./_baseCreate":37,"./_getPrototype":90,"./_isPrototype":109}],105:[function(_dereq_,module,exports){
 /** Used as references for various `Number` constants. */
 var MAX_SAFE_INTEGER = 9007199254740991;
 
@@ -5023,7 +5072,7 @@ function isIndex(value, length) {
 
 module.exports = isIndex;
 
-},{}],105:[function(_dereq_,module,exports){
+},{}],106:[function(_dereq_,module,exports){
 var isArray = _dereq_('./isArray'),
     isSymbol = _dereq_('./isSymbol');
 
@@ -5054,7 +5103,7 @@ function isKey(value, object) {
 
 module.exports = isKey;
 
-},{"./isArray":148,"./isSymbol":155}],106:[function(_dereq_,module,exports){
+},{"./isArray":149,"./isSymbol":157}],107:[function(_dereq_,module,exports){
 /**
  * Checks if `value` is suitable for use as unique object key.
  *
@@ -5071,7 +5120,7 @@ function isKeyable(value) {
 
 module.exports = isKeyable;
 
-},{}],107:[function(_dereq_,module,exports){
+},{}],108:[function(_dereq_,module,exports){
 var coreJsData = _dereq_('./_coreJsData');
 
 /** Used to detect methods masquerading as native. */
@@ -5093,7 +5142,7 @@ function isMasked(func) {
 
 module.exports = isMasked;
 
-},{"./_coreJsData":76}],108:[function(_dereq_,module,exports){
+},{"./_coreJsData":77}],109:[function(_dereq_,module,exports){
 /** Used for built-in method references. */
 var objectProto = Object.prototype;
 
@@ -5113,7 +5162,7 @@ function isPrototype(value) {
 
 module.exports = isPrototype;
 
-},{}],109:[function(_dereq_,module,exports){
+},{}],110:[function(_dereq_,module,exports){
 var isObject = _dereq_('./isObject');
 
 /**
@@ -5130,7 +5179,7 @@ function isStrictComparable(value) {
 
 module.exports = isStrictComparable;
 
-},{"./isObject":153}],110:[function(_dereq_,module,exports){
+},{"./isObject":155}],111:[function(_dereq_,module,exports){
 /**
  * Removes all key-value entries from the list cache.
  *
@@ -5145,7 +5194,7 @@ function listCacheClear() {
 
 module.exports = listCacheClear;
 
-},{}],111:[function(_dereq_,module,exports){
+},{}],112:[function(_dereq_,module,exports){
 var assocIndexOf = _dereq_('./_assocIndexOf');
 
 /** Used for built-in method references. */
@@ -5182,7 +5231,7 @@ function listCacheDelete(key) {
 
 module.exports = listCacheDelete;
 
-},{"./_assocIndexOf":32}],112:[function(_dereq_,module,exports){
+},{"./_assocIndexOf":32}],113:[function(_dereq_,module,exports){
 var assocIndexOf = _dereq_('./_assocIndexOf');
 
 /**
@@ -5203,7 +5252,7 @@ function listCacheGet(key) {
 
 module.exports = listCacheGet;
 
-},{"./_assocIndexOf":32}],113:[function(_dereq_,module,exports){
+},{"./_assocIndexOf":32}],114:[function(_dereq_,module,exports){
 var assocIndexOf = _dereq_('./_assocIndexOf');
 
 /**
@@ -5221,7 +5270,7 @@ function listCacheHas(key) {
 
 module.exports = listCacheHas;
 
-},{"./_assocIndexOf":32}],114:[function(_dereq_,module,exports){
+},{"./_assocIndexOf":32}],115:[function(_dereq_,module,exports){
 var assocIndexOf = _dereq_('./_assocIndexOf');
 
 /**
@@ -5249,7 +5298,7 @@ function listCacheSet(key, value) {
 
 module.exports = listCacheSet;
 
-},{"./_assocIndexOf":32}],115:[function(_dereq_,module,exports){
+},{"./_assocIndexOf":32}],116:[function(_dereq_,module,exports){
 var Hash = _dereq_('./_Hash'),
     ListCache = _dereq_('./_ListCache'),
     Map = _dereq_('./_Map');
@@ -5272,7 +5321,7 @@ function mapCacheClear() {
 
 module.exports = mapCacheClear;
 
-},{"./_Hash":11,"./_ListCache":12,"./_Map":13}],116:[function(_dereq_,module,exports){
+},{"./_Hash":11,"./_ListCache":12,"./_Map":13}],117:[function(_dereq_,module,exports){
 var getMapData = _dereq_('./_getMapData');
 
 /**
@@ -5292,7 +5341,7 @@ function mapCacheDelete(key) {
 
 module.exports = mapCacheDelete;
 
-},{"./_getMapData":86}],117:[function(_dereq_,module,exports){
+},{"./_getMapData":87}],118:[function(_dereq_,module,exports){
 var getMapData = _dereq_('./_getMapData');
 
 /**
@@ -5310,7 +5359,7 @@ function mapCacheGet(key) {
 
 module.exports = mapCacheGet;
 
-},{"./_getMapData":86}],118:[function(_dereq_,module,exports){
+},{"./_getMapData":87}],119:[function(_dereq_,module,exports){
 var getMapData = _dereq_('./_getMapData');
 
 /**
@@ -5328,7 +5377,7 @@ function mapCacheHas(key) {
 
 module.exports = mapCacheHas;
 
-},{"./_getMapData":86}],119:[function(_dereq_,module,exports){
+},{"./_getMapData":87}],120:[function(_dereq_,module,exports){
 var getMapData = _dereq_('./_getMapData');
 
 /**
@@ -5352,7 +5401,7 @@ function mapCacheSet(key, value) {
 
 module.exports = mapCacheSet;
 
-},{"./_getMapData":86}],120:[function(_dereq_,module,exports){
+},{"./_getMapData":87}],121:[function(_dereq_,module,exports){
 /**
  * Converts `map` to its key-value pairs.
  *
@@ -5372,7 +5421,7 @@ function mapToArray(map) {
 
 module.exports = mapToArray;
 
-},{}],121:[function(_dereq_,module,exports){
+},{}],122:[function(_dereq_,module,exports){
 /**
  * A specialized version of `matchesProperty` for source values suitable
  * for strict equality comparisons, i.e. `===`.
@@ -5394,7 +5443,7 @@ function matchesStrictComparable(key, srcValue) {
 
 module.exports = matchesStrictComparable;
 
-},{}],122:[function(_dereq_,module,exports){
+},{}],123:[function(_dereq_,module,exports){
 var memoize = _dereq_('./memoize');
 
 /** Used as the maximum memoize cache size. */
@@ -5422,7 +5471,7 @@ function memoizeCapped(func) {
 
 module.exports = memoizeCapped;
 
-},{"./memoize":159}],123:[function(_dereq_,module,exports){
+},{"./memoize":161}],124:[function(_dereq_,module,exports){
 var getNative = _dereq_('./_getNative');
 
 /* Built-in method references that are verified to be native. */
@@ -5430,7 +5479,7 @@ var nativeCreate = getNative(Object, 'create');
 
 module.exports = nativeCreate;
 
-},{"./_getNative":88}],124:[function(_dereq_,module,exports){
+},{"./_getNative":89}],125:[function(_dereq_,module,exports){
 var overArg = _dereq_('./_overArg');
 
 /* Built-in method references for those with the same name as other `lodash` methods. */
@@ -5438,7 +5487,7 @@ var nativeKeys = overArg(Object.keys, Object);
 
 module.exports = nativeKeys;
 
-},{"./_overArg":128}],125:[function(_dereq_,module,exports){
+},{"./_overArg":129}],126:[function(_dereq_,module,exports){
 /**
  * This function is like
  * [`Object.keys`](http://ecma-international.org/ecma-262/7.0/#sec-object.keys)
@@ -5460,7 +5509,7 @@ function nativeKeysIn(object) {
 
 module.exports = nativeKeysIn;
 
-},{}],126:[function(_dereq_,module,exports){
+},{}],127:[function(_dereq_,module,exports){
 var freeGlobal = _dereq_('./_freeGlobal');
 
 /** Detect free variable `exports`. */
@@ -5484,7 +5533,7 @@ var nodeUtil = (function() {
 
 module.exports = nodeUtil;
 
-},{"./_freeGlobal":83}],127:[function(_dereq_,module,exports){
+},{"./_freeGlobal":84}],128:[function(_dereq_,module,exports){
 /** Used for built-in method references. */
 var objectProto = Object.prototype;
 
@@ -5508,7 +5557,7 @@ function objectToString(value) {
 
 module.exports = objectToString;
 
-},{}],128:[function(_dereq_,module,exports){
+},{}],129:[function(_dereq_,module,exports){
 /**
  * Creates a unary function that invokes `func` with its argument transformed.
  *
@@ -5525,7 +5574,7 @@ function overArg(func, transform) {
 
 module.exports = overArg;
 
-},{}],129:[function(_dereq_,module,exports){
+},{}],130:[function(_dereq_,module,exports){
 var freeGlobal = _dereq_('./_freeGlobal');
 
 /** Detect free variable `self`. */
@@ -5536,7 +5585,7 @@ var root = freeGlobal || freeSelf || Function('return this')();
 
 module.exports = root;
 
-},{"./_freeGlobal":83}],130:[function(_dereq_,module,exports){
+},{"./_freeGlobal":84}],131:[function(_dereq_,module,exports){
 /** Used to stand-in for `undefined` hash values. */
 var HASH_UNDEFINED = '__lodash_hash_undefined__';
 
@@ -5557,7 +5606,7 @@ function setCacheAdd(value) {
 
 module.exports = setCacheAdd;
 
-},{}],131:[function(_dereq_,module,exports){
+},{}],132:[function(_dereq_,module,exports){
 /**
  * Checks if `value` is in the array cache.
  *
@@ -5573,7 +5622,7 @@ function setCacheHas(value) {
 
 module.exports = setCacheHas;
 
-},{}],132:[function(_dereq_,module,exports){
+},{}],133:[function(_dereq_,module,exports){
 /**
  * Converts `set` to an array of its values.
  *
@@ -5593,7 +5642,7 @@ function setToArray(set) {
 
 module.exports = setToArray;
 
-},{}],133:[function(_dereq_,module,exports){
+},{}],134:[function(_dereq_,module,exports){
 var ListCache = _dereq_('./_ListCache');
 
 /**
@@ -5610,7 +5659,7 @@ function stackClear() {
 
 module.exports = stackClear;
 
-},{"./_ListCache":12}],134:[function(_dereq_,module,exports){
+},{"./_ListCache":12}],135:[function(_dereq_,module,exports){
 /**
  * Removes `key` and its value from the stack.
  *
@@ -5630,7 +5679,7 @@ function stackDelete(key) {
 
 module.exports = stackDelete;
 
-},{}],135:[function(_dereq_,module,exports){
+},{}],136:[function(_dereq_,module,exports){
 /**
  * Gets the stack value for `key`.
  *
@@ -5646,7 +5695,7 @@ function stackGet(key) {
 
 module.exports = stackGet;
 
-},{}],136:[function(_dereq_,module,exports){
+},{}],137:[function(_dereq_,module,exports){
 /**
  * Checks if a stack value for `key` exists.
  *
@@ -5662,7 +5711,7 @@ function stackHas(key) {
 
 module.exports = stackHas;
 
-},{}],137:[function(_dereq_,module,exports){
+},{}],138:[function(_dereq_,module,exports){
 var ListCache = _dereq_('./_ListCache'),
     Map = _dereq_('./_Map'),
     MapCache = _dereq_('./_MapCache');
@@ -5698,7 +5747,7 @@ function stackSet(key, value) {
 
 module.exports = stackSet;
 
-},{"./_ListCache":12,"./_Map":13,"./_MapCache":14}],138:[function(_dereq_,module,exports){
+},{"./_ListCache":12,"./_Map":13,"./_MapCache":14}],139:[function(_dereq_,module,exports){
 var memoizeCapped = _dereq_('./_memoizeCapped');
 
 /** Used to match property names within property paths. */
@@ -5728,7 +5777,7 @@ var stringToPath = memoizeCapped(function(string) {
 
 module.exports = stringToPath;
 
-},{"./_memoizeCapped":122}],139:[function(_dereq_,module,exports){
+},{"./_memoizeCapped":123}],140:[function(_dereq_,module,exports){
 var isSymbol = _dereq_('./isSymbol');
 
 /** Used as references for various `Number` constants. */
@@ -5751,7 +5800,7 @@ function toKey(value) {
 
 module.exports = toKey;
 
-},{"./isSymbol":155}],140:[function(_dereq_,module,exports){
+},{"./isSymbol":157}],141:[function(_dereq_,module,exports){
 /** Used for built-in method references. */
 var funcProto = Function.prototype;
 
@@ -5779,7 +5828,7 @@ function toSource(func) {
 
 module.exports = toSource;
 
-},{}],141:[function(_dereq_,module,exports){
+},{}],142:[function(_dereq_,module,exports){
 var baseClone = _dereq_('./_baseClone');
 
 /** Used to compose bitmasks for cloning. */
@@ -5810,7 +5859,7 @@ function cloneDeep(value) {
 
 module.exports = cloneDeep;
 
-},{"./_baseClone":36}],142:[function(_dereq_,module,exports){
+},{"./_baseClone":36}],143:[function(_dereq_,module,exports){
 /**
  * Performs a
  * [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
@@ -5849,7 +5898,7 @@ function eq(value, other) {
 
 module.exports = eq;
 
-},{}],143:[function(_dereq_,module,exports){
+},{}],144:[function(_dereq_,module,exports){
 var arrayFilter = _dereq_('./_arrayFilter'),
     baseFilter = _dereq_('./_baseFilter'),
     baseIteratee = _dereq_('./_baseIteratee'),
@@ -5899,7 +5948,7 @@ function filter(collection, predicate) {
 
 module.exports = filter;
 
-},{"./_arrayFilter":25,"./_baseFilter":39,"./_baseIteratee":52,"./isArray":148}],144:[function(_dereq_,module,exports){
+},{"./_arrayFilter":25,"./_baseFilter":39,"./_baseIteratee":52,"./isArray":149}],145:[function(_dereq_,module,exports){
 var baseGet = _dereq_('./_baseGet');
 
 /**
@@ -5934,7 +5983,7 @@ function get(object, path, defaultValue) {
 
 module.exports = get;
 
-},{"./_baseGet":42}],145:[function(_dereq_,module,exports){
+},{"./_baseGet":42}],146:[function(_dereq_,module,exports){
 var baseHasIn = _dereq_('./_baseHasIn'),
     hasPath = _dereq_('./_hasPath');
 
@@ -5970,7 +6019,7 @@ function hasIn(object, path) {
 
 module.exports = hasIn;
 
-},{"./_baseHasIn":45,"./_hasPath":95}],146:[function(_dereq_,module,exports){
+},{"./_baseHasIn":45,"./_hasPath":96}],147:[function(_dereq_,module,exports){
 /**
  * This method returns the first argument it receives.
  *
@@ -5993,7 +6042,7 @@ function identity(value) {
 
 module.exports = identity;
 
-},{}],147:[function(_dereq_,module,exports){
+},{}],148:[function(_dereq_,module,exports){
 var baseIsArguments = _dereq_('./_baseIsArguments'),
     isObjectLike = _dereq_('./isObjectLike');
 
@@ -6031,7 +6080,7 @@ var isArguments = baseIsArguments(function() { return arguments; }()) ? baseIsAr
 
 module.exports = isArguments;
 
-},{"./_baseIsArguments":46,"./isObjectLike":154}],148:[function(_dereq_,module,exports){
+},{"./_baseIsArguments":46,"./isObjectLike":156}],149:[function(_dereq_,module,exports){
 /**
  * Checks if `value` is classified as an `Array` object.
  *
@@ -6059,7 +6108,7 @@ var isArray = Array.isArray;
 
 module.exports = isArray;
 
-},{}],149:[function(_dereq_,module,exports){
+},{}],150:[function(_dereq_,module,exports){
 var isFunction = _dereq_('./isFunction'),
     isLength = _dereq_('./isLength');
 
@@ -6094,7 +6143,7 @@ function isArrayLike(value) {
 
 module.exports = isArrayLike;
 
-},{"./isFunction":151,"./isLength":152}],150:[function(_dereq_,module,exports){
+},{"./isFunction":153,"./isLength":154}],151:[function(_dereq_,module,exports){
 var root = _dereq_('./_root'),
     stubFalse = _dereq_('./stubFalse');
 
@@ -6134,7 +6183,44 @@ var isBuffer = nativeIsBuffer || stubFalse;
 
 module.exports = isBuffer;
 
-},{"./_root":129,"./stubFalse":162}],151:[function(_dereq_,module,exports){
+},{"./_root":130,"./stubFalse":165}],152:[function(_dereq_,module,exports){
+var baseIsEqual = _dereq_('./_baseIsEqual');
+
+/**
+ * Performs a deep comparison between two values to determine if they are
+ * equivalent.
+ *
+ * **Note:** This method supports comparing arrays, array buffers, booleans,
+ * date objects, error objects, maps, numbers, `Object` objects, regexes,
+ * sets, strings, symbols, and typed arrays. `Object` objects are compared
+ * by their own, not inherited, enumerable properties. Functions and DOM
+ * nodes are compared by strict equality, i.e. `===`.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Lang
+ * @param {*} value The value to compare.
+ * @param {*} other The other value to compare.
+ * @returns {boolean} Returns `true` if the values are equivalent, else `false`.
+ * @example
+ *
+ * var object = { 'a': 1 };
+ * var other = { 'a': 1 };
+ *
+ * _.isEqual(object, other);
+ * // => true
+ *
+ * object === other;
+ * // => false
+ */
+function isEqual(value, other) {
+  return baseIsEqual(value, other);
+}
+
+module.exports = isEqual;
+
+},{"./_baseIsEqual":47}],153:[function(_dereq_,module,exports){
 var baseGetTag = _dereq_('./_baseGetTag'),
     isObject = _dereq_('./isObject');
 
@@ -6173,7 +6259,7 @@ function isFunction(value) {
 
 module.exports = isFunction;
 
-},{"./_baseGetTag":44,"./isObject":153}],152:[function(_dereq_,module,exports){
+},{"./_baseGetTag":44,"./isObject":155}],154:[function(_dereq_,module,exports){
 /** Used as references for various `Number` constants. */
 var MAX_SAFE_INTEGER = 9007199254740991;
 
@@ -6210,7 +6296,7 @@ function isLength(value) {
 
 module.exports = isLength;
 
-},{}],153:[function(_dereq_,module,exports){
+},{}],155:[function(_dereq_,module,exports){
 /**
  * Checks if `value` is the
  * [language type](http://www.ecma-international.org/ecma-262/7.0/#sec-ecmascript-language-types)
@@ -6243,7 +6329,7 @@ function isObject(value) {
 
 module.exports = isObject;
 
-},{}],154:[function(_dereq_,module,exports){
+},{}],156:[function(_dereq_,module,exports){
 /**
  * Checks if `value` is object-like. A value is object-like if it's not `null`
  * and has a `typeof` result of "object".
@@ -6274,7 +6360,7 @@ function isObjectLike(value) {
 
 module.exports = isObjectLike;
 
-},{}],155:[function(_dereq_,module,exports){
+},{}],157:[function(_dereq_,module,exports){
 var baseGetTag = _dereq_('./_baseGetTag'),
     isObjectLike = _dereq_('./isObjectLike');
 
@@ -6305,7 +6391,7 @@ function isSymbol(value) {
 
 module.exports = isSymbol;
 
-},{"./_baseGetTag":44,"./isObjectLike":154}],156:[function(_dereq_,module,exports){
+},{"./_baseGetTag":44,"./isObjectLike":156}],158:[function(_dereq_,module,exports){
 var baseIsTypedArray = _dereq_('./_baseIsTypedArray'),
     baseUnary = _dereq_('./_baseUnary'),
     nodeUtil = _dereq_('./_nodeUtil');
@@ -6334,7 +6420,7 @@ var isTypedArray = nodeIsTypedArray ? baseUnary(nodeIsTypedArray) : baseIsTypedA
 
 module.exports = isTypedArray;
 
-},{"./_baseIsTypedArray":51,"./_baseUnary":61,"./_nodeUtil":126}],157:[function(_dereq_,module,exports){
+},{"./_baseIsTypedArray":51,"./_baseUnary":62,"./_nodeUtil":127}],159:[function(_dereq_,module,exports){
 var arrayLikeKeys = _dereq_('./_arrayLikeKeys'),
     baseKeys = _dereq_('./_baseKeys'),
     isArrayLike = _dereq_('./isArrayLike');
@@ -6373,7 +6459,7 @@ function keys(object) {
 
 module.exports = keys;
 
-},{"./_arrayLikeKeys":26,"./_baseKeys":53,"./isArrayLike":149}],158:[function(_dereq_,module,exports){
+},{"./_arrayLikeKeys":26,"./_baseKeys":53,"./isArrayLike":150}],160:[function(_dereq_,module,exports){
 var arrayLikeKeys = _dereq_('./_arrayLikeKeys'),
     baseKeysIn = _dereq_('./_baseKeysIn'),
     isArrayLike = _dereq_('./isArrayLike');
@@ -6407,7 +6493,7 @@ function keysIn(object) {
 
 module.exports = keysIn;
 
-},{"./_arrayLikeKeys":26,"./_baseKeysIn":54,"./isArrayLike":149}],159:[function(_dereq_,module,exports){
+},{"./_arrayLikeKeys":26,"./_baseKeysIn":54,"./isArrayLike":150}],161:[function(_dereq_,module,exports){
 var MapCache = _dereq_('./_MapCache');
 
 /** Error message constants. */
@@ -6482,7 +6568,7 @@ memoize.Cache = MapCache;
 
 module.exports = memoize;
 
-},{"./_MapCache":14}],160:[function(_dereq_,module,exports){
+},{"./_MapCache":14}],162:[function(_dereq_,module,exports){
 var baseProperty = _dereq_('./_baseProperty'),
     basePropertyDeep = _dereq_('./_basePropertyDeep'),
     isKey = _dereq_('./_isKey'),
@@ -6516,7 +6602,44 @@ function property(path) {
 
 module.exports = property;
 
-},{"./_baseProperty":57,"./_basePropertyDeep":58,"./_isKey":105,"./_toKey":139}],161:[function(_dereq_,module,exports){
+},{"./_baseProperty":57,"./_basePropertyDeep":58,"./_isKey":106,"./_toKey":140}],163:[function(_dereq_,module,exports){
+var baseSet = _dereq_('./_baseSet');
+
+/**
+ * Sets the value at `path` of `object`. If a portion of `path` doesn't exist,
+ * it's created. Arrays are created for missing index properties while objects
+ * are created for all other missing properties. Use `_.setWith` to customize
+ * `path` creation.
+ *
+ * **Note:** This method mutates `object`.
+ *
+ * @static
+ * @memberOf _
+ * @since 3.7.0
+ * @category Object
+ * @param {Object} object The object to modify.
+ * @param {Array|string} path The path of the property to set.
+ * @param {*} value The value to set.
+ * @returns {Object} Returns `object`.
+ * @example
+ *
+ * var object = { 'a': [{ 'b': { 'c': 3 } }] };
+ *
+ * _.set(object, 'a[0].b.c', 4);
+ * console.log(object.a[0].b.c);
+ * // => 4
+ *
+ * _.set(object, ['x', '0', 'y', 'z'], 5);
+ * console.log(object.x[0].y.z);
+ * // => 5
+ */
+function set(object, path, value) {
+  return object == null ? object : baseSet(object, path, value);
+}
+
+module.exports = set;
+
+},{"./_baseSet":59}],164:[function(_dereq_,module,exports){
 /**
  * This method returns a new empty array.
  *
@@ -6541,7 +6664,7 @@ function stubArray() {
 
 module.exports = stubArray;
 
-},{}],162:[function(_dereq_,module,exports){
+},{}],165:[function(_dereq_,module,exports){
 /**
  * This method returns `false`.
  *
@@ -6561,7 +6684,7 @@ function stubFalse() {
 
 module.exports = stubFalse;
 
-},{}],163:[function(_dereq_,module,exports){
+},{}],166:[function(_dereq_,module,exports){
 var baseToString = _dereq_('./_baseToString');
 
 /**
@@ -6591,7 +6714,7 @@ function toString(value) {
 
 module.exports = toString;
 
-},{"./_baseToString":60}],164:[function(_dereq_,module,exports){
+},{"./_baseToString":61}],167:[function(_dereq_,module,exports){
 (function (global){
 /*! Native Promise Only
     v0.8.1 (c) Kyle Simpson
@@ -6968,7 +7091,7 @@ module.exports = toString;
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],165:[function(_dereq_,module,exports){
+},{}],168:[function(_dereq_,module,exports){
 module.exports = function (obj) {
     if (!obj || typeof obj !== 'object') return obj;
     
@@ -7005,7 +7128,538 @@ var isArray = Array.isArray || function (xs) {
     return {}.toString.call(xs) === '[object Array]';
 };
 
-},{}],166:[function(_dereq_,module,exports){
+},{}],169:[function(_dereq_,module,exports){
+/*!
+ * Signature Pad v1.6.0
+ * https://github.com/szimek/signature_pad
+ *
+ * Copyright 2017 Szymon Nowak
+ * Released under the MIT license
+ *
+ * The main idea and some parts of the code (e.g. drawing variable width Bézier curve) are taken from:
+ * http://corner.squareup.com/2012/07/smoother-signatures.html
+ *
+ * Implementation of interpolation using cubic Bézier curves is taken from:
+ * http://benknowscode.wordpress.com/2012/09/14/path-interpolation-using-cubic-bezier-and-control-point-estimation-in-javascript
+ *
+ * Algorithm for approximated length of a Bézier curve is taken from:
+ * http://www.lemoda.net/maths/bezier-length/index.html
+ *
+ */
+
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+	typeof define === 'function' && define.amd ? define(factory) :
+	(global.SignaturePad = factory());
+}(this, (function () { 'use strict';
+
+function Point(x, y, time) {
+  this.x = x;
+  this.y = y;
+  this.time = time || new Date().getTime();
+}
+
+Point.prototype.velocityFrom = function (start) {
+  return this.time !== start.time ? this.distanceTo(start) / (this.time - start.time) : 1;
+};
+
+Point.prototype.distanceTo = function (start) {
+  return Math.sqrt(Math.pow(this.x - start.x, 2) + Math.pow(this.y - start.y, 2));
+};
+
+function Bezier(startPoint, control1, control2, endPoint) {
+  this.startPoint = startPoint;
+  this.control1 = control1;
+  this.control2 = control2;
+  this.endPoint = endPoint;
+}
+
+// Returns approximated length.
+Bezier.prototype.length = function () {
+  var steps = 10;
+  var length = 0;
+  var px = void 0;
+  var py = void 0;
+
+  for (var i = 0; i <= steps; i += 1) {
+    var t = i / steps;
+    var cx = this._point(t, this.startPoint.x, this.control1.x, this.control2.x, this.endPoint.x);
+    var cy = this._point(t, this.startPoint.y, this.control1.y, this.control2.y, this.endPoint.y);
+    if (i > 0) {
+      var xdiff = cx - px;
+      var ydiff = cy - py;
+      length += Math.sqrt(xdiff * xdiff + ydiff * ydiff);
+    }
+    px = cx;
+    py = cy;
+  }
+
+  return length;
+};
+
+/* eslint-disable no-multi-spaces, space-in-parens */
+Bezier.prototype._point = function (t, start, c1, c2, end) {
+  return start * (1.0 - t) * (1.0 - t) * (1.0 - t) + 3.0 * c1 * (1.0 - t) * (1.0 - t) * t + 3.0 * c2 * (1.0 - t) * t * t + end * t * t * t;
+};
+
+function SignaturePad(canvas, options) {
+  var self = this;
+  var opts = options || {};
+
+  this.velocityFilterWeight = opts.velocityFilterWeight || 0.7;
+  this.minWidth = opts.minWidth || 0.5;
+  this.maxWidth = opts.maxWidth || 2.5;
+  this.dotSize = opts.dotSize || function () {
+    return (this.minWidth + this.maxWidth) / 2;
+  };
+  this.penColor = opts.penColor || 'black';
+  this.backgroundColor = opts.backgroundColor || 'rgba(0,0,0,0)';
+  this.onBegin = opts.onBegin;
+  this.onEnd = opts.onEnd;
+
+  this._canvas = canvas;
+  this._ctx = canvas.getContext('2d');
+  this.clear();
+
+  // We need add these inline so they are available to unbind while still having
+  // access to 'self' we could use _.bind but it's not worth adding a dependency.
+  this._handleMouseDown = function (event) {
+    if (event.which === 1) {
+      self._mouseButtonDown = true;
+      self._strokeBegin(event);
+    }
+  };
+
+  this._handleMouseMove = function (event) {
+    if (self._mouseButtonDown) {
+      self._strokeUpdate(event);
+    }
+  };
+
+  this._handleMouseUp = function (event) {
+    if (event.which === 1 && self._mouseButtonDown) {
+      self._mouseButtonDown = false;
+      self._strokeEnd(event);
+    }
+  };
+
+  this._handleTouchStart = function (event) {
+    if (event.targetTouches.length === 1) {
+      var touch = event.changedTouches[0];
+      self._strokeBegin(touch);
+    }
+  };
+
+  this._handleTouchMove = function (event) {
+    // Prevent scrolling.
+    event.preventDefault();
+
+    var touch = event.targetTouches[0];
+    self._strokeUpdate(touch);
+  };
+
+  this._handleTouchEnd = function (event) {
+    var wasCanvasTouched = event.target === self._canvas;
+    if (wasCanvasTouched) {
+      event.preventDefault();
+      self._strokeEnd(event);
+    }
+  };
+
+  // Enable mouse and touch event handlers
+  this.on();
+}
+
+// Public methods
+SignaturePad.prototype.clear = function () {
+  var ctx = this._ctx;
+  var canvas = this._canvas;
+
+  ctx.fillStyle = this.backgroundColor;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  this._data = [];
+  this._reset();
+  this._isEmpty = true;
+};
+
+SignaturePad.prototype.fromDataURL = function (dataUrl) {
+  var _this = this;
+
+  var image = new Image();
+  var ratio = window.devicePixelRatio || 1;
+  var width = this._canvas.width / ratio;
+  var height = this._canvas.height / ratio;
+
+  this._reset();
+  image.src = dataUrl;
+  image.onload = function () {
+    _this._ctx.drawImage(image, 0, 0, width, height);
+  };
+  this._isEmpty = false;
+};
+
+SignaturePad.prototype.toDataURL = function (type) {
+  var _canvas;
+
+  switch (type) {
+    case 'image/svg+xml':
+      return this._toSVG();
+    default:
+      for (var _len = arguments.length, options = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+        options[_key - 1] = arguments[_key];
+      }
+
+      return (_canvas = this._canvas).toDataURL.apply(_canvas, [type].concat(options));
+  }
+};
+
+SignaturePad.prototype.on = function () {
+  this._handleMouseEvents();
+  this._handleTouchEvents();
+};
+
+SignaturePad.prototype.off = function () {
+  this._canvas.removeEventListener('mousedown', this._handleMouseDown);
+  this._canvas.removeEventListener('mousemove', this._handleMouseMove);
+  document.removeEventListener('mouseup', this._handleMouseUp);
+
+  this._canvas.removeEventListener('touchstart', this._handleTouchStart);
+  this._canvas.removeEventListener('touchmove', this._handleTouchMove);
+  this._canvas.removeEventListener('touchend', this._handleTouchEnd);
+};
+
+SignaturePad.prototype.isEmpty = function () {
+  return this._isEmpty;
+};
+
+// Private methods
+SignaturePad.prototype._strokeBegin = function (event) {
+  this._data.push([]);
+  this._reset();
+  this._strokeUpdate(event);
+
+  if (typeof this.onBegin === 'function') {
+    this.onBegin(event);
+  }
+};
+
+SignaturePad.prototype._strokeUpdate = function (event) {
+  var x = event.clientX;
+  var y = event.clientY;
+
+  var point = this._createPoint(x, y);
+
+  var _addPoint = this._addPoint(point),
+      curve = _addPoint.curve,
+      widths = _addPoint.widths;
+
+  if (curve && widths) {
+    this._drawCurve(curve, widths.start, widths.end);
+  }
+
+  this._data[this._data.length - 1].push({
+    x: point.x,
+    y: point.y,
+    time: point.time
+  });
+};
+
+SignaturePad.prototype._strokeEnd = function (event) {
+  var canDrawCurve = this.points.length > 2;
+  var point = this.points[0];
+
+  if (!canDrawCurve && point) {
+    this._drawDot(point);
+  }
+
+  if (typeof this.onEnd === 'function') {
+    this.onEnd(event);
+  }
+};
+
+SignaturePad.prototype._handleMouseEvents = function () {
+  this._mouseButtonDown = false;
+
+  this._canvas.addEventListener('mousedown', this._handleMouseDown);
+  this._canvas.addEventListener('mousemove', this._handleMouseMove);
+  document.addEventListener('mouseup', this._handleMouseUp);
+};
+
+SignaturePad.prototype._handleTouchEvents = function () {
+  // Pass touch events to canvas element on mobile IE11 and Edge.
+  this._canvas.style.msTouchAction = 'none';
+  this._canvas.style.touchAction = 'none';
+
+  this._canvas.addEventListener('touchstart', this._handleTouchStart);
+  this._canvas.addEventListener('touchmove', this._handleTouchMove);
+  this._canvas.addEventListener('touchend', this._handleTouchEnd);
+};
+
+SignaturePad.prototype._reset = function () {
+  this.points = [];
+  this._lastVelocity = 0;
+  this._lastWidth = (this.minWidth + this.maxWidth) / 2;
+  this._ctx.fillStyle = this.penColor;
+};
+
+SignaturePad.prototype._createPoint = function (x, y, time) {
+  var rect = this._canvas.getBoundingClientRect();
+
+  return new Point(x - rect.left, y - rect.top, time || new Date().getTime());
+};
+
+SignaturePad.prototype._addPoint = function (point) {
+  var points = this.points;
+  var tmp = void 0;
+
+  points.push(point);
+
+  if (points.length > 2) {
+    // To reduce the initial lag make it work with 3 points
+    // by copying the first point to the beginning.
+    if (points.length === 3) points.unshift(points[0]);
+
+    tmp = this._calculateCurveControlPoints(points[0], points[1], points[2]);
+    var c2 = tmp.c2;
+    tmp = this._calculateCurveControlPoints(points[1], points[2], points[3]);
+    var c3 = tmp.c1;
+    var curve = new Bezier(points[1], c2, c3, points[2]);
+    var widths = this._calculateCurveWidths(curve);
+
+    // Remove the first element from the list,
+    // so that we always have no more than 4 points in points array.
+    points.shift();
+
+    return { curve: curve, widths: widths };
+  }
+
+  return {};
+};
+
+SignaturePad.prototype._calculateCurveControlPoints = function (s1, s2, s3) {
+  var dx1 = s1.x - s2.x;
+  var dy1 = s1.y - s2.y;
+  var dx2 = s2.x - s3.x;
+  var dy2 = s2.y - s3.y;
+
+  var m1 = { x: (s1.x + s2.x) / 2.0, y: (s1.y + s2.y) / 2.0 };
+  var m2 = { x: (s2.x + s3.x) / 2.0, y: (s2.y + s3.y) / 2.0 };
+
+  var l1 = Math.sqrt(dx1 * dx1 + dy1 * dy1);
+  var l2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
+
+  var dxm = m1.x - m2.x;
+  var dym = m1.y - m2.y;
+
+  var k = l2 / (l1 + l2);
+  var cm = { x: m2.x + dxm * k, y: m2.y + dym * k };
+
+  var tx = s2.x - cm.x;
+  var ty = s2.y - cm.y;
+
+  return {
+    c1: new Point(m1.x + tx, m1.y + ty),
+    c2: new Point(m2.x + tx, m2.y + ty)
+  };
+};
+
+SignaturePad.prototype._calculateCurveWidths = function (curve) {
+  var startPoint = curve.startPoint;
+  var endPoint = curve.endPoint;
+  var widths = { start: null, end: null };
+
+  var velocity = this.velocityFilterWeight * endPoint.velocityFrom(startPoint) + (1 - this.velocityFilterWeight) * this._lastVelocity;
+
+  var newWidth = this._strokeWidth(velocity);
+
+  widths.start = this._lastWidth;
+  widths.end = newWidth;
+
+  this._lastVelocity = velocity;
+  this._lastWidth = newWidth;
+
+  return widths;
+};
+
+SignaturePad.prototype._strokeWidth = function (velocity) {
+  return Math.max(this.maxWidth / (velocity + 1), this.minWidth);
+};
+
+SignaturePad.prototype._drawPoint = function (x, y, size) {
+  var ctx = this._ctx;
+
+  ctx.moveTo(x, y);
+  ctx.arc(x, y, size, 0, 2 * Math.PI, false);
+  this._isEmpty = false;
+};
+
+SignaturePad.prototype._drawCurve = function (curve, startWidth, endWidth) {
+  var ctx = this._ctx;
+  var widthDelta = endWidth - startWidth;
+  var drawSteps = Math.floor(curve.length());
+
+  ctx.beginPath();
+
+  for (var i = 0; i < drawSteps; i += 1) {
+    // Calculate the Bezier (x, y) coordinate for this step.
+    var t = i / drawSteps;
+    var tt = t * t;
+    var ttt = tt * t;
+    var u = 1 - t;
+    var uu = u * u;
+    var uuu = uu * u;
+
+    var x = uuu * curve.startPoint.x;
+    x += 3 * uu * t * curve.control1.x;
+    x += 3 * u * tt * curve.control2.x;
+    x += ttt * curve.endPoint.x;
+
+    var y = uuu * curve.startPoint.y;
+    y += 3 * uu * t * curve.control1.y;
+    y += 3 * u * tt * curve.control2.y;
+    y += ttt * curve.endPoint.y;
+
+    var width = startWidth + ttt * widthDelta;
+    this._drawPoint(x, y, width);
+  }
+
+  ctx.closePath();
+  ctx.fill();
+};
+
+SignaturePad.prototype._drawDot = function (point) {
+  var ctx = this._ctx;
+  var width = typeof this.dotSize === 'function' ? this.dotSize() : this.dotSize;
+
+  ctx.beginPath();
+  this._drawPoint(point.x, point.y, width);
+  ctx.closePath();
+  ctx.fill();
+};
+
+SignaturePad.prototype._fromData = function (pointGroups, drawCurve, drawDot) {
+  for (var i = 0; i < pointGroups.length; i += 1) {
+    var group = pointGroups[i];
+
+    if (group.length > 1) {
+      for (var j = 0; j < group.length; j += 1) {
+        var rawPoint = group[j];
+        var point = new Point(rawPoint.x, rawPoint.y, rawPoint.time);
+
+        if (j === 0) {
+          // First point in a group. Nothing to draw yet.
+          this._reset();
+          this._addPoint(point);
+        } else if (j !== group.length - 1) {
+          // Middle point in a group.
+          var _addPoint2 = this._addPoint(point),
+              curve = _addPoint2.curve,
+              widths = _addPoint2.widths;
+
+          if (curve && widths) {
+            drawCurve(curve, widths);
+          }
+        } else {
+          // Last point in a group. Do nothing.
+        }
+      }
+    } else {
+      this._reset();
+      var _rawPoint = group[0];
+      drawDot(_rawPoint);
+    }
+  }
+};
+
+SignaturePad.prototype._toSVG = function () {
+  var _this2 = this;
+
+  var pointGroups = this._data;
+  var canvas = this._canvas;
+  var ratio = Math.max(window.devicePixelRatio || 1, 1);
+  var minX = 0;
+  var minY = 0;
+  var maxX = canvas.width / ratio;
+  var maxY = canvas.height / ratio;
+  var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+
+  svg.setAttributeNS(null, 'width', canvas.width);
+  svg.setAttributeNS(null, 'height', canvas.height);
+
+  this._fromData(pointGroups, function (curve, widths) {
+    var path = document.createElement('path');
+
+    // Need to check curve for NaN values, these pop up when drawing
+    // lines on the canvas that are not continuous. E.g. Sharp corners
+    // or stopping mid-stroke and than continuing without lifting mouse.
+    if (!isNaN(curve.control1.x) && !isNaN(curve.control1.y) && !isNaN(curve.control2.x) && !isNaN(curve.control2.y)) {
+      var attr = 'M ' + curve.startPoint.x.toFixed(3) + ',' + curve.startPoint.y.toFixed(3) + ' ' + ('C ' + curve.control1.x.toFixed(3) + ',' + curve.control1.y.toFixed(3) + ' ') + (curve.control2.x.toFixed(3) + ',' + curve.control2.y.toFixed(3) + ' ') + (curve.endPoint.x.toFixed(3) + ',' + curve.endPoint.y.toFixed(3));
+
+      path.setAttribute('d', attr);
+      path.setAttribute('stroke-width', (widths.end * 2.25).toFixed(3));
+      path.setAttribute('stroke', _this2.penColor);
+      path.setAttribute('fill', 'none');
+      path.setAttribute('stroke-linecap', 'round');
+
+      svg.appendChild(path);
+    }
+  }, function (rawPoint) {
+    var circle = document.createElement('circle');
+    var dotSize = typeof _this2.dotSize === 'function' ? _this2.dotSize() : _this2.dotSize;
+    circle.setAttribute('r', dotSize);
+    circle.setAttribute('cx', rawPoint.x);
+    circle.setAttribute('cy', rawPoint.y);
+    circle.setAttribute('fill', _this2.penColor);
+
+    svg.appendChild(circle);
+  });
+
+  var prefix = 'data:image/svg+xml;base64,';
+  var header = '<svg' + ' xmlns="http://www.w3.org/2000/svg"' + ' xmlns:xlink="http://www.w3.org/1999/xlink"' + (' viewBox="' + minX + ' ' + minY + ' ' + maxX + ' ' + maxY + '"') + (' width="' + maxX + '"') + (' height="' + maxY + '"') + '>';
+  var body = svg.innerHTML;
+
+  // IE hack for missing innerHTML property on SVGElement
+  if (body === undefined) {
+    var dummy = document.createElement('dummy');
+    var nodes = svg.childNodes;
+    dummy.innerHTML = '';
+
+    for (var i = 0; i < nodes.length; i += 1) {
+      dummy.appendChild(nodes[i].cloneNode(true));
+    }
+
+    body = dummy.innerHTML;
+  }
+
+  var footer = '</svg>';
+  var data = header + body + footer;
+
+  return prefix + btoa(data);
+};
+
+SignaturePad.prototype.fromData = function (pointGroups) {
+  var _this3 = this;
+
+  this.clear();
+
+  this._fromData(pointGroups, function (curve, widths) {
+    return _this3._drawCurve(curve, widths.start, widths.end);
+  }, function (rawPoint) {
+    return _this3._drawDot(rawPoint);
+  });
+};
+
+SignaturePad.prototype.toData = function () {
+  return this._data;
+};
+
+return SignaturePad;
+
+})));
+
+},{}],170:[function(_dereq_,module,exports){
 (function(self) {
   'use strict';
 
@@ -7400,7 +8054,7 @@ var isArray = Array.isArray || function (xs) {
   self.fetch.polyfill = true
 })(typeof self !== 'undefined' ? self : this);
 
-},{}],167:[function(_dereq_,module,exports){
+},{}],171:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -7489,7 +8143,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],168:[function(_dereq_,module,exports){
+},{}],172:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -7667,7 +8321,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],169:[function(_dereq_,module,exports){
+},{}],173:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -7747,7 +8401,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],170:[function(_dereq_,module,exports){
+},{}],174:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -7781,7 +8435,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],171:[function(_dereq_,module,exports){
+},{}],175:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.provider('formioComponents', function() {
@@ -7841,7 +8495,7 @@ module.exports = function(app) {
   }]);
 };
 
-},{}],172:[function(_dereq_,module,exports){
+},{}],176:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -7922,7 +8576,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],173:[function(_dereq_,module,exports){
+},{}],177:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -7951,7 +8605,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],174:[function(_dereq_,module,exports){
+},{}],178:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -8062,7 +8716,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],175:[function(_dereq_,module,exports){
+},{}],179:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -8090,7 +8744,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":213}],176:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":217}],180:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -8209,7 +8863,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],177:[function(_dereq_,module,exports){
+},{}],181:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -8348,7 +9002,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],178:[function(_dereq_,module,exports){
+},{}],182:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -8549,7 +9203,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],179:[function(_dereq_,module,exports){
+},{}],183:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -8583,7 +9237,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],180:[function(_dereq_,module,exports){
+},{}],184:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -8619,7 +9273,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],181:[function(_dereq_,module,exports){
+},{}],185:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -8883,7 +9537,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],182:[function(_dereq_,module,exports){
+},{}],186:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -8919,7 +9573,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":213}],183:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":217}],187:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -9011,7 +9665,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],184:[function(_dereq_,module,exports){
+},{}],188:[function(_dereq_,module,exports){
 "use strict";
 var app = angular.module('formio');
 
@@ -9053,7 +9707,7 @@ _dereq_('./panel')(app);
 _dereq_('./table')(app);
 _dereq_('./well')(app);
 
-},{"./address":167,"./button":168,"./checkbox":169,"./columns":170,"./components":171,"./container":172,"./content":173,"./currency":174,"./custom":175,"./datagrid":176,"./datetime":177,"./day":178,"./email":179,"./fieldset":180,"./file":181,"./hidden":182,"./htmlelement":183,"./number":185,"./page":186,"./panel":187,"./password":188,"./phonenumber":189,"./radio":190,"./resource":191,"./select":192,"./selectboxes":193,"./signature":194,"./survey":195,"./table":196,"./textarea":197,"./textfield":198,"./well":199}],185:[function(_dereq_,module,exports){
+},{"./address":171,"./button":172,"./checkbox":173,"./columns":174,"./components":175,"./container":176,"./content":177,"./currency":178,"./custom":179,"./datagrid":180,"./datetime":181,"./day":182,"./email":183,"./fieldset":184,"./file":185,"./hidden":186,"./htmlelement":187,"./number":189,"./page":190,"./panel":191,"./password":192,"./phonenumber":193,"./radio":194,"./resource":195,"./select":196,"./selectboxes":197,"./signature":198,"./survey":199,"./table":200,"./textarea":201,"./textfield":202,"./well":203}],189:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -9118,7 +9772,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],186:[function(_dereq_,module,exports){
+},{}],190:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -9145,7 +9799,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],187:[function(_dereq_,module,exports){
+},{}],191:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -9181,7 +9835,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],188:[function(_dereq_,module,exports){
+},{}],192:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -9212,7 +9866,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],189:[function(_dereq_,module,exports){
+},{}],193:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -9247,7 +9901,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],190:[function(_dereq_,module,exports){
+},{}],194:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -9298,7 +9952,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],191:[function(_dereq_,module,exports){
+},{}],195:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -9426,11 +10080,13 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],192:[function(_dereq_,module,exports){
+},{}],196:[function(_dereq_,module,exports){
 "use strict";
 /*eslint max-depth: ["error", 6]*/
 
 var _get = _dereq_('lodash/get');
+var _isEqual = _dereq_('lodash/isEqual');
+var _set = _dereq_('lodash/set');
 var _cloneDeep = _dereq_('lodash/cloneDeep');
 module.exports = function(app) {
   app.directive('formioSelectItem', [
@@ -9600,19 +10256,14 @@ module.exports = function(app) {
                 return item.value;
               }
 
-              // Allow dot notation in the value property.
-              if (valueProp.indexOf('.') !== -1) {
-                var parts = valueProp.split('.');
-                var prop = item;
-                for (var i in parts) {
-                  if (prop.hasOwnProperty(parts[i])) {
-                    prop = prop[parts[i]];
-                  }
-                }
-                return prop;
+              // Get the item value.
+              var itemValue = valueProp ? _get(item, valueProp) : item;
+              if (itemValue === undefined) {
+                /* eslint-disable no-console */
+                console.warn('Cannot find value property within select: ' + valueProp);
+                /* eslint-enable no-console */
               }
-
-              return valueProp ? item[valueProp] : item;
+              return itemValue;
             };
 
             $scope.refreshItems = function() {
@@ -9622,48 +10273,89 @@ module.exports = function(app) {
               $scope.refreshItems(input, url);
             });
 
-            // Add a watch if they wish to refresh on selection of another field.
-            if (settings.refreshOn) {
-              var refreshing = false;
-              var refreshValue = function() {
-                if (refreshing) {
-                  return;
-                }
-                refreshing = true;
-                var tempData = $scope.data[settings.key];
-                $scope.data[settings.key] = settings.multiple ? [] : '';
-                if (!settings.clearOnRefresh) {
-                  $timeout(function() {
-                    $scope.data[settings.key] = tempData;
-                    refreshing = false;
-                    $scope.$emit('selectLoaded', $scope.component);
-                  });
-                }
-                else {
+            var refreshing = false;
+            var refreshValue = function() {
+              if (refreshing) {
+                return;
+              }
+              refreshing = true;
+              var tempData = $scope.data[settings.key];
+              $scope.data[settings.key] = settings.multiple ? [] : '';
+              if (!settings.clearOnRefresh) {
+                $timeout(function() {
+                  $scope.data[settings.key] = tempData;
                   refreshing = false;
                   $scope.$emit('selectLoaded', $scope.component);
-                }
-              };
-
-              // Refresh the value.
-              var refreshValueWhenReady = function() {
-                initialized.promise.then(function() {
-                  var refreshPromise = $scope.refreshItems();
-                  if (refreshPromise) {
-                    refreshPromise.then(refreshValue);
-                  }
-                  else {
-                    refreshValue();
-                  }
                 });
-              };
+              }
+              else {
+                refreshing = false;
+                $scope.$emit('selectLoaded', $scope.component);
+              }
+            };
+
+            // Ensures that the value is within the select items.
+            var ensureValue = function() {
+              var value = $scope.data[settings.key];
+              if (!value) {
+                return;
+              }
+              // Iterate through the list of items and see if our value exists...
+              var found = false;
+              for (var i=0; i < $scope.selectItems.length; i++) {
+                var item = $scope.selectItems[i];
+                var selectItem = $scope.getSelectItem(item);
+                if (_isEqual(selectItem, value)) {
+                  found = true;
+                  break;
+                }
+              }
+
+              // If the item is not found in the select items array, then add it manually.
+              if (!found) {
+                var itemValue = value;
+                if (valueProp) {
+                  itemValue = {};
+                  _set(itemValue, valueProp, value);
+                }
+                $scope.selectItems.push(itemValue);
+              }
+            };
+
+            // Refresh the items when ready.
+            var refreshItemsWhenReady = function() {
+              initialized.promise.then(function() {
+                var refreshPromise = $scope.refreshItems(true);
+                if (refreshPromise) {
+                  refreshPromise.then(refreshValue);
+                }
+                else {
+                  refreshValue();
+                }
+              });
+            };
+
+            // Add a watch if they wish to refresh on selection of another field.
+            if (settings.refreshOn) {
               if (settings.refreshOn === 'data') {
-                $scope.$watch('data', refreshValueWhenReady, true);
+                $scope.$watch('data', refreshItemsWhenReady, true);
                 return;
               }
 
-              $scope.$watch('data.' + settings.refreshOn, refreshValueWhenReady);
-              $scope.$watch('submission.data.' + settings.refreshOn, refreshValueWhenReady);
+              $scope.$watch('data.' + settings.refreshOn, refreshItemsWhenReady);
+              $scope.$watch('submission.data.' + settings.refreshOn, refreshItemsWhenReady);
+            }
+            else {
+              // Watch for the data to be set, and ensure the value is set properly.
+              var dataWatch = $scope.$watch('data.' + settings.key, function(value) {
+                if (value) {
+                  initialized.promise.then(function() {
+                    dataWatch();
+                    ensureValue();
+                    refreshValue();
+                  });
+                }
+              });
             }
 
             switch (settings.dataSrc) {
@@ -9750,6 +10442,8 @@ module.exports = function(app) {
                       }
                     });
                   }
+                  options.params.skip = parseInt(options.params.skip, 10);
+                  options.params.limit = parseInt(options.params.limit, 10);
                   selectItems = selectItems.slice(options.params.skip, options.params.skip + options.params.limit);
                   setResult(selectItems, append);
                   return initialized.resolve($scope.selectItems);
@@ -9808,12 +10502,16 @@ module.exports = function(app) {
                   $event.preventDefault();
                   options.params.skip = parseInt(options.params.skip, 10);
                   options.params.skip += parseInt(options.params.limit, 10);
-                  $scope.refreshItems(null, null, true);
+                  $scope.refreshItems(true, null, true);
                 };
 
                 if (url) {
                   $scope.hasNextPage = true;
                   $scope.refreshItems = function(input, newUrl, append) {
+                    if (!input) {
+                      return;
+                    }
+
                     newUrl = newUrl || url;
                     newUrl = $interpolate(newUrl)({
                       data: $scope.data,
@@ -9824,7 +10522,11 @@ module.exports = function(app) {
                     }
 
                     // If this is a search, then add that to the filter.
-                    if (settings.searchField && input) {
+                    if (
+                      settings.searchField &&
+                      (typeof input === 'string') &&
+                      input
+                    ) {
                       newUrl += ((newUrl.indexOf('?') === -1) ? '?' : '&') +
                         encodeURIComponent(settings.searchField) +
                         '=' +
@@ -9858,6 +10560,9 @@ module.exports = function(app) {
                       else {
                         $scope.selectItems = data;
                       }
+
+                      // Ensure the value is set to what it should be set to.
+                      ensureValue();
                     };
 
                     return $http.get(newUrl, options).then(function(result) {
@@ -9884,8 +10589,9 @@ module.exports = function(app) {
                       initialized.resolve($scope.selectItems);
                     });
                   };
-                  $scope.refreshItems();
+                  $scope.refreshItems(true);
                 }
+                ensureValue();
                 break;
               default:
                 $scope.selectItems = [];
@@ -9941,7 +10647,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"lodash/cloneDeep":141,"lodash/get":144}],193:[function(_dereq_,module,exports){
+},{"lodash/cloneDeep":142,"lodash/get":145,"lodash/isEqual":152,"lodash/set":163}],197:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -10049,9 +10755,10 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],194:[function(_dereq_,module,exports){
+},{}],198:[function(_dereq_,module,exports){
 "use strict";
 
+var SignaturePad = _dereq_('signature_pad');
 module.exports = function(app) {
   app.config([
     'formioComponentsProvider',
@@ -10126,7 +10833,6 @@ module.exports = function(app) {
         });
 
         // Create the signature pad.
-        /* global SignaturePad:false */
         var signaturePad = new SignaturePad(element[0], {
           minWidth: scope.component.minWidth,
           maxWidth: scope.component.maxWidth,
@@ -10190,7 +10896,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],195:[function(_dereq_,module,exports){
+},{"signature_pad":169}],199:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -10267,7 +10973,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],196:[function(_dereq_,module,exports){
+},{}],200:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -10312,7 +11018,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],197:[function(_dereq_,module,exports){
+},{}],201:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -10396,7 +11102,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],198:[function(_dereq_,module,exports){
+},{}],202:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -10457,7 +11163,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],199:[function(_dereq_,module,exports){
+},{}],203:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -10490,7 +11196,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],200:[function(_dereq_,module,exports){
+},{}],204:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -10568,7 +11274,7 @@ module.exports = function() {
   };
 };
 
-},{}],201:[function(_dereq_,module,exports){
+},{}],205:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -10771,7 +11477,8 @@ module.exports = function() {
           if ($scope.action) {
             var method = submissionData._id ? 'put' : 'post';
             var action = $scope.action;
-            if (method === 'put') {
+            // Add the action Id if it is not already part of the url.
+            if (method === 'put' && (action.indexOf(submissionData._id) === -1)) {
               action += '/' + submissionData._id;
             }
             $http[method](action, submissionData).success(function(submission) {
@@ -10928,7 +11635,7 @@ module.exports = function() {
   };
 };
 
-},{}],202:[function(_dereq_,module,exports){
+},{}],206:[function(_dereq_,module,exports){
 "use strict";
 module.exports = ['$sce', '$parse', '$compile', function($sce, $parse, $compile) {
   return {
@@ -10945,7 +11652,7 @@ module.exports = ['$sce', '$parse', '$compile', function($sce, $parse, $compile)
   };
 }];
 
-},{}],203:[function(_dereq_,module,exports){
+},{}],207:[function(_dereq_,module,exports){
 "use strict";
 var _cloneDeep = _dereq_('lodash/cloneDeep');
 var _filter = _dereq_('lodash/filter');
@@ -11391,7 +12098,7 @@ module.exports = [
   }
 ];
 
-},{"lodash/cloneDeep":141,"lodash/filter":143,"lodash/get":144}],204:[function(_dereq_,module,exports){
+},{"lodash/cloneDeep":142,"lodash/filter":144,"lodash/get":145}],208:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'formioComponents',
@@ -11458,7 +12165,7 @@ module.exports = [
   }
 ];
 
-},{}],205:[function(_dereq_,module,exports){
+},{}],209:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -11541,7 +12248,7 @@ module.exports = function() {
   };
 };
 
-},{}],206:[function(_dereq_,module,exports){
+},{}],210:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$compile',
@@ -11560,7 +12267,7 @@ module.exports = [
   }
 ];
 
-},{}],207:[function(_dereq_,module,exports){
+},{}],211:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -11570,7 +12277,7 @@ module.exports = function() {
   };
 };
 
-},{}],208:[function(_dereq_,module,exports){
+},{}],212:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -11602,7 +12309,7 @@ module.exports = function() {
   };
 };
 
-},{}],209:[function(_dereq_,module,exports){
+},{}],213:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -11657,7 +12364,7 @@ module.exports = function() {
   };
 };
 
-},{}],210:[function(_dereq_,module,exports){
+},{}],214:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -12086,7 +12793,7 @@ module.exports = function() {
   };
 };
 
-},{}],211:[function(_dereq_,module,exports){
+},{}],215:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -12269,7 +12976,7 @@ module.exports = [
   }
 ];
 
-},{}],212:[function(_dereq_,module,exports){
+},{}],216:[function(_dereq_,module,exports){
 "use strict";
 var formioUtils = _dereq_('formiojs/utils');
 
@@ -12381,7 +13088,7 @@ module.exports = function() {
   };
 };
 
-},{"formiojs/utils":9}],213:[function(_dereq_,module,exports){
+},{"formiojs/utils":9}],217:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   var generic = function(data, component) {
@@ -12460,7 +13167,7 @@ module.exports = function() {
   };
 };
 
-},{}],214:[function(_dereq_,module,exports){
+},{}],218:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$q',
@@ -12509,7 +13216,7 @@ module.exports = [
   }
 ];
 
-},{}],215:[function(_dereq_,module,exports){
+},{}],219:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -12543,7 +13250,7 @@ module.exports = [
   }
 ];
 
-},{}],216:[function(_dereq_,module,exports){
+},{}],220:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'FormioUtils',
@@ -12552,7 +13259,7 @@ module.exports = [
   }
 ];
 
-},{}],217:[function(_dereq_,module,exports){
+},{}],221:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$sce',
@@ -12565,7 +13272,7 @@ module.exports = [
   }
 ];
 
-},{}],218:[function(_dereq_,module,exports){
+},{}],222:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   function() {
@@ -12584,7 +13291,7 @@ module.exports = [
   }
 ];
 
-},{}],219:[function(_dereq_,module,exports){
+},{}],223:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'formioTableView',
@@ -12597,7 +13304,7 @@ module.exports = [
   }
 ];
 
-},{}],220:[function(_dereq_,module,exports){
+},{}],224:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -12612,7 +13319,7 @@ module.exports = [
   }
 ];
 
-},{}],221:[function(_dereq_,module,exports){
+},{}],225:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$filter',
@@ -12661,7 +13368,7 @@ module.exports = [
   }
 ];
 
-},{}],222:[function(_dereq_,module,exports){
+},{}],226:[function(_dereq_,module,exports){
 "use strict";
 module.exports = ['$sce', function($sce) {
   return function(val) {
@@ -12669,7 +13376,7 @@ module.exports = ['$sce', function($sce) {
   };
 }];
 
-},{}],223:[function(_dereq_,module,exports){
+},{}],227:[function(_dereq_,module,exports){
 "use strict";
 _dereq_('./polyfills/polyfills');
 
@@ -12819,7 +13526,7 @@ app.run([
 
 _dereq_('./components');
 
-},{"./components":184,"./directives/customValidator":200,"./directives/formio":201,"./directives/formioBindHtml.js":202,"./directives/formioComponent":203,"./directives/formioComponentView":204,"./directives/formioDelete":205,"./directives/formioElement":206,"./directives/formioErrors":207,"./directives/formioSubmission":208,"./directives/formioSubmissions":209,"./directives/formioWizard":210,"./factories/FormioScope":211,"./factories/FormioUtils":212,"./factories/formioInterceptor":214,"./factories/formioTableView":215,"./filters/flattenComponents":216,"./filters/safehtml":217,"./filters/tableComponents":218,"./filters/tableFieldView":219,"./filters/tableView":220,"./filters/translate":221,"./filters/trusturl":222,"./polyfills/polyfills":225,"./providers/Formio":226}],224:[function(_dereq_,module,exports){
+},{"./components":188,"./directives/customValidator":204,"./directives/formio":205,"./directives/formioBindHtml.js":206,"./directives/formioComponent":207,"./directives/formioComponentView":208,"./directives/formioDelete":209,"./directives/formioElement":210,"./directives/formioErrors":211,"./directives/formioSubmission":212,"./directives/formioSubmissions":213,"./directives/formioWizard":214,"./factories/FormioScope":215,"./factories/FormioUtils":216,"./factories/formioInterceptor":218,"./factories/formioTableView":219,"./filters/flattenComponents":220,"./filters/safehtml":221,"./filters/tableComponents":222,"./filters/tableFieldView":223,"./filters/tableView":224,"./filters/translate":225,"./filters/trusturl":226,"./polyfills/polyfills":229,"./providers/Formio":230}],228:[function(_dereq_,module,exports){
 "use strict";
 'use strict';
 
@@ -12850,13 +13557,13 @@ if (typeof Object.assign != 'function') {
   })();
 }
 
-},{}],225:[function(_dereq_,module,exports){
+},{}],229:[function(_dereq_,module,exports){
 "use strict";
 'use strict';
 
 _dereq_('./Object.assign');
 
-},{"./Object.assign":224}],226:[function(_dereq_,module,exports){
+},{"./Object.assign":228}],230:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   // The formio class.
@@ -12924,5 +13631,5 @@ module.exports = function() {
   };
 };
 
-},{"formiojs":2}]},{},[223])(223)
+},{"formiojs":2}]},{},[227])(227)
 });

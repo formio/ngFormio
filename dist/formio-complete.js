@@ -1,4 +1,4 @@
-/*! ng-formio v2.14.2 | https://unpkg.com/ng-formio@2.14.2/LICENSE.txt */
+/*! ng-formio v2.15.0 | https://unpkg.com/ng-formio@2.15.0/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -1343,7 +1343,7 @@ return /******/ (function(modules) { // webpackBootstrap
 })();
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"angular":9,"moment":187}],3:[function(_dereq_,module,exports){
+},{"angular":9,"moment":190}],3:[function(_dereq_,module,exports){
 /**
  * @license AngularJS v1.6.3
  * (c) 2010-2017 Google, Inc. http://angularjs.org
@@ -10673,7 +10673,7 @@ angular.module('ui.mask', [])
 }());
 },{}],8:[function(_dereq_,module,exports){
 /**
- * @license AngularJS v1.6.3
+ * @license AngularJS v1.6.4
  * (c) 2010-2017 Google, Inc. http://angularjs.org
  * License: MIT
  */
@@ -10730,7 +10730,7 @@ function minErr(module, ErrorConstructor) {
       return match;
     });
 
-    message += '\nhttp://errors.angularjs.org/1.6.3/' +
+    message += '\nhttp://errors.angularjs.org/1.6.4/' +
       (module ? module + '/' : '') + code;
 
     for (i = 0, paramPrefix = '?'; i < templateArgs.length; i++, paramPrefix = '&') {
@@ -10803,6 +10803,7 @@ function minErr(module, ErrorConstructor) {
   includes,
   arrayRemove,
   copy,
+  simpleCompare,
   equals,
   csp,
   jq,
@@ -11781,6 +11782,10 @@ function copy(source, destination, maxDepth) {
 }
 
 
+// eslint-disable-next-line no-self-compare
+function simpleCompare(a, b) { return a === b || (a !== a && b !== b); }
+
+
 /**
  * @ngdoc function
  * @name angular.equals
@@ -11861,7 +11866,7 @@ function equals(o1, o2) {
       }
     } else if (isDate(o1)) {
       if (!isDate(o2)) return false;
-      return equals(o1.getTime(), o2.getTime());
+      return simpleCompare(o1.getTime(), o2.getTime());
     } else if (isRegExp(o1)) {
       if (!isRegExp(o2)) return false;
       return o1.toString() === o2.toString();
@@ -13416,11 +13421,11 @@ function toDebugString(obj, maxDepth) {
 var version = {
   // These placeholder strings will be replaced by grunt's `build` task.
   // They need to be double- or single-quoted.
-  full: '1.6.3',
+  full: '1.6.4',
   major: 1,
   minor: 6,
-  dot: 3,
-  codeName: 'scriptalicious-bootstrapping'
+  dot: 4,
+  codeName: 'phenomenal-footnote'
 };
 
 
@@ -13566,7 +13571,7 @@ function publishExternalAPI(angular) {
       });
     }
   ])
-  .info({ angularVersion: '1.6.3' });
+  .info({ angularVersion: '1.6.4' });
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -13770,12 +13775,6 @@ function jqLiteHasData(node) {
   return false;
 }
 
-function jqLiteCleanData(nodes) {
-  for (var i = 0, ii = nodes.length; i < ii; i++) {
-    jqLiteRemoveData(nodes[i]);
-  }
-}
-
 function jqLiteBuildFragment(html, context) {
   var tmp, tag, wrap,
       fragment = context.createDocumentFragment(),
@@ -13878,13 +13877,10 @@ function jqLiteClone(element) {
 }
 
 function jqLiteDealoc(element, onlyDescendants) {
-  if (!onlyDescendants) jqLiteRemoveData(element);
+  if (!onlyDescendants && jqLiteAcceptsData(element)) jqLite.cleanData([element]);
 
   if (element.querySelectorAll) {
-    var descendants = element.querySelectorAll('*');
-    for (var i = 0, l = descendants.length; i < l; i++) {
-      jqLiteRemoveData(descendants[i]);
-    }
+    jqLite.cleanData(element.querySelectorAll('*'));
   }
 }
 
@@ -14182,7 +14178,11 @@ forEach({
   data: jqLiteData,
   removeData: jqLiteRemoveData,
   hasData: jqLiteHasData,
-  cleanData: jqLiteCleanData
+  cleanData: function jqLiteCleanData(nodes) {
+    for (var i = 0, ii = nodes.length; i < ii; i++) {
+      jqLiteRemoveData(nodes[i]);
+    }
+  }
 }, function(fn, name) {
   JQLite[name] = fn;
 });
@@ -18043,9 +18043,9 @@ function $TemplateCacheProvider() {
  * initialized.
  *
  * <div class="alert alert-warning">
- * **Deprecation warning:** although bindings for non-ES6 class controllers are currently
- * bound to `this` before the controller constructor is called, this use is now deprecated. Please place initialization
- * code that relies upon bindings inside a `$onInit` method on the controller, instead.
+ * **Deprecation warning:** if `$compileProcvider.preAssignBindingsEnabled(true)` was called, bindings for non-ES6 class
+ * controllers are bound to `this` before the controller constructor is called but this use is now deprecated. Please
+ * place initialization code that relies upon bindings inside a `$onInit` method on the controller, instead.
  * </div>
  *
  * It is also possible to set `bindToController` to an object hash with the same format as the `scope` property.
@@ -19058,7 +19058,14 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
    *
    * If disabled (false), the compiler calls the constructor first before assigning bindings.
    *
-   * The default value is true in Angular 1.5.x but will switch to false in Angular 1.6.x.
+   * The default value is false.
+   *
+   * @deprecated
+   * sinceVersion="1.6.0"
+   * removeVersion="1.7.0"
+   *
+   * This method and the option to assign the bindings before calling the controller's constructor
+   * will be removed in v1.7.0.
    */
   var preAssignBindingsEnabled = false;
   this.preAssignBindingsEnabled = function(enabled) {
@@ -21148,8 +21155,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
             if (parentGet.literal) {
               compare = equals;
             } else {
-              // eslint-disable-next-line no-self-compare
-              compare = function simpleCompare(a, b) { return a === b || (a !== a && b !== b); };
+              compare = simpleCompare;
             }
             parentSet = parentGet.assign || function() {
               // reset the change, or we will throw this exception on every $digest
@@ -21224,9 +21230,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
       });
 
       function recordChanges(key, currentValue, previousValue) {
-        if (isFunction(destination.$onChanges) && currentValue !== previousValue &&
-            // eslint-disable-next-line no-self-compare
-            (currentValue === currentValue || previousValue === previousValue)) {
+        if (isFunction(destination.$onChanges) && !simpleCompare(currentValue, previousValue)) {
           // If we have not already scheduled the top level onChangesQueue handler then do so now
           if (!onChangesQueue) {
             scope.$$postDigest(flushOnChangesQueue);
@@ -21841,7 +21845,12 @@ function defaultHttpResponseTransform(data, headers) {
     if (tempData) {
       var contentType = headers('Content-Type');
       if ((contentType && (contentType.indexOf(APPLICATION_JSON) === 0)) || isJsonLike(tempData)) {
-        data = fromJson(tempData);
+        try {
+          data = fromJson(tempData);
+        } catch (e) {
+          throw $httpMinErr('baddata', 'Data must be a valid JSON object. Received: "{0}". ' +
+          'Parse error: "{1}"', data, e);
+        }
       }
     }
   }
@@ -23746,7 +23755,7 @@ function $IntervalProvider() {
       * @param {boolean=} [invokeApply=true] If set to `false` skips model dirty checking, otherwise
       *   will invoke `fn` within the {@link ng.$rootScope.Scope#$apply $apply} block.
       * @param {...*=} Pass additional parameters to the executed function.
-      * @returns {promise} A promise which will be notified on each iteration.
+      * @returns {promise} A promise which will be notified on each iteration. It will resolve once all iterations of the interval complete.
       *
       * @example
       * <example module="intervalExample" name="interval-service">
@@ -25969,15 +25978,13 @@ function isConstant(ast) {
   return ast.constant;
 }
 
-function ASTCompiler(astBuilder, $filter) {
-  this.astBuilder = astBuilder;
+function ASTCompiler($filter) {
   this.$filter = $filter;
 }
 
 ASTCompiler.prototype = {
-  compile: function(expression) {
+  compile: function(ast) {
     var self = this;
-    var ast = this.astBuilder.ast(expression);
     this.state = {
       nextId: 0,
       filters: {},
@@ -26032,8 +26039,6 @@ ASTCompiler.prototype = {
           ifDefined,
           plusFn);
     this.state = this.stage = undefined;
-    fn.literal = isLiteral(ast);
-    fn.constant = isConstant(ast);
     return fn;
   },
 
@@ -26436,15 +26441,13 @@ ASTCompiler.prototype = {
 };
 
 
-function ASTInterpreter(astBuilder, $filter) {
-  this.astBuilder = astBuilder;
+function ASTInterpreter($filter) {
   this.$filter = $filter;
 }
 
 ASTInterpreter.prototype = {
-  compile: function(expression) {
+  compile: function(ast) {
     var self = this;
-    var ast = this.astBuilder.ast(expression);
     findConstantAndWatchExpressions(ast, self.$filter);
     var assignable;
     var assign;
@@ -26483,8 +26486,6 @@ ASTInterpreter.prototype = {
     if (inputs) {
       fn.inputs = inputs;
     }
-    fn.literal = isLiteral(ast);
-    fn.constant = isConstant(ast);
     return fn;
   },
 
@@ -26813,20 +26814,21 @@ ASTInterpreter.prototype = {
 /**
  * @constructor
  */
-var Parser = function Parser(lexer, $filter, options) {
-  this.lexer = lexer;
-  this.$filter = $filter;
-  this.options = options;
+function Parser(lexer, $filter, options) {
   this.ast = new AST(lexer, options);
-  this.astCompiler = options.csp ? new ASTInterpreter(this.ast, $filter) :
-                                   new ASTCompiler(this.ast, $filter);
-};
+  this.astCompiler = options.csp ? new ASTInterpreter($filter) :
+                                   new ASTCompiler($filter);
+}
 
 Parser.prototype = {
   constructor: Parser,
 
   parse: function(text) {
-    return this.astCompiler.compile(text);
+    var ast = this.ast.ast(text);
+    var fn = this.astCompiler.compile(ast);
+    fn.literal = isLiteral(ast);
+    fn.constant = isConstant(ast);
+    return fn;
   }
 };
 
@@ -26972,8 +26974,8 @@ function $ParseProvider() {
             if (parsedExpression.constant) {
               parsedExpression.$$watchDelegate = constantWatchDelegate;
             } else if (oneTime) {
-              parsedExpression.$$watchDelegate = parsedExpression.literal ?
-                  oneTimeLiteralWatchDelegate : oneTimeWatchDelegate;
+              parsedExpression.oneTime = true;
+              parsedExpression.$$watchDelegate = oneTimeWatchDelegate;
             } else if (parsedExpression.inputs) {
               parsedExpression.$$watchDelegate = inputsWatchDelegate;
             }
@@ -26995,14 +26997,14 @@ function $ParseProvider() {
         return newValue === oldValueOfValue;
       }
 
-      if (typeof newValue === 'object' && !compareObjectIdentity) {
+      if (typeof newValue === 'object') {
 
         // attempt to convert the value to a primitive type
         // TODO(docs): add a note to docs that by implementing valueOf even objects and arrays can
         //             be cheaply dirty-checked
         newValue = getValueOf(newValue);
 
-        if (typeof newValue === 'object') {
+        if (typeof newValue === 'object' && !compareObjectIdentity) {
           // objects/arrays are not supported - deep-watching them would be too expensive
           return false;
         }
@@ -27059,6 +27061,7 @@ function $ParseProvider() {
     }
 
     function oneTimeWatchDelegate(scope, listener, objectEquality, parsedExpression, prettyPrintExpression) {
+      var isDone = parsedExpression.literal ? isAllDefined : isDefined;
       var unwatch, lastValue;
       if (parsedExpression.inputs) {
         unwatch = inputsWatchDelegate(scope, oneTimeListener, objectEquality, parsedExpression, prettyPrintExpression);
@@ -27075,9 +27078,9 @@ function $ParseProvider() {
         if (isFunction(listener)) {
           listener(value, old, scope);
         }
-        if (isDefined(value)) {
+        if (isDone(value)) {
           scope.$$postDigest(function() {
-            if (isDefined(lastValue)) {
+            if (isDone(lastValue)) {
               unwatch();
             }
           });
@@ -27085,31 +27088,12 @@ function $ParseProvider() {
       }
     }
 
-    function oneTimeLiteralWatchDelegate(scope, listener, objectEquality, parsedExpression) {
-      var unwatch, lastValue;
-      unwatch = scope.$watch(function oneTimeWatch(scope) {
-        return parsedExpression(scope);
-      }, function oneTimeListener(value, old, scope) {
-        lastValue = value;
-        if (isFunction(listener)) {
-          listener(value, old, scope);
-        }
-        if (isAllDefined(value)) {
-          scope.$$postDigest(function() {
-            if (isAllDefined(lastValue)) unwatch();
-          });
-        }
-      }, objectEquality);
-
-      return unwatch;
-
-      function isAllDefined(value) {
-        var allDefined = true;
-        forEach(value, function(val) {
-          if (!isDefined(val)) allDefined = false;
-        });
-        return allDefined;
-      }
+    function isAllDefined(value) {
+      var allDefined = true;
+      forEach(value, function(val) {
+        if (!isDefined(val)) allDefined = false;
+      });
+      return allDefined;
     }
 
     function constantWatchDelegate(scope, listener, objectEquality, parsedExpression) {
@@ -27125,26 +27109,31 @@ function $ParseProvider() {
       var watchDelegate = parsedExpression.$$watchDelegate;
       var useInputs = false;
 
-      var regularWatch =
-          watchDelegate !== oneTimeLiteralWatchDelegate &&
-          watchDelegate !== oneTimeWatchDelegate;
+      var isDone = parsedExpression.literal ? isAllDefined : isDefined;
 
-      var fn = regularWatch ? function regularInterceptedExpression(scope, locals, assign, inputs) {
+      function regularInterceptedExpression(scope, locals, assign, inputs) {
         var value = useInputs && inputs ? inputs[0] : parsedExpression(scope, locals, assign, inputs);
         return interceptorFn(value, scope, locals);
-      } : function oneTimeInterceptedExpression(scope, locals, assign, inputs) {
-        var value = parsedExpression(scope, locals, assign, inputs);
+      }
+
+      function oneTimeInterceptedExpression(scope, locals, assign, inputs) {
+        var value = useInputs && inputs ? inputs[0] : parsedExpression(scope, locals, assign, inputs);
         var result = interceptorFn(value, scope, locals);
         // we only return the interceptor's result if the
         // initial value is defined (for bind-once)
-        return isDefined(value) ? result : value;
-      };
+        return isDone(value) ? result : value;
+      }
 
-      // Propagate $$watchDelegates other then inputsWatchDelegate
+      var fn = parsedExpression.oneTime ? oneTimeInterceptedExpression : regularInterceptedExpression;
+
+      // Propogate the literal/oneTime attributes
+      fn.literal = parsedExpression.literal;
+      fn.oneTime = parsedExpression.oneTime;
+
+      // Propagate or create inputs / $$watchDelegates
       useInputs = !parsedExpression.inputs;
-      if (parsedExpression.$$watchDelegate &&
-          parsedExpression.$$watchDelegate !== inputsWatchDelegate) {
-        fn.$$watchDelegate = parsedExpression.$$watchDelegate;
+      if (watchDelegate && watchDelegate !== inputsWatchDelegate) {
+        fn.$$watchDelegate = watchDelegate;
         fn.inputs = parsedExpression.inputs;
       } else if (!interceptorFn.$stateful) {
         // If there is an interceptor, but no watchDelegate then treat the interceptor like
@@ -29361,12 +29350,21 @@ function $$SanitizeUriProvider() {
 var $sceMinErr = minErr('$sce');
 
 var SCE_CONTEXTS = {
+  // HTML is used when there's HTML rendered (e.g. ng-bind-html, iframe srcdoc binding).
   HTML: 'html',
+
+  // Style statements or stylesheets. Currently unused in AngularJS.
   CSS: 'css',
+
+  // An URL used in a context where it does not refer to a resource that loads code. Currently
+  // unused in AngularJS.
   URL: 'url',
-  // RESOURCE_URL is a subtype of URL used in contexts where a privileged resource is sourced from a
-  // url.  (e.g. ng-include, script src, templateUrl)
+
+  // RESOURCE_URL is a subtype of URL used where the referred-to resource could be interpreted as
+  // code. (e.g. ng-include, script src binding, templateUrl)
   RESOURCE_URL: 'resourceUrl',
+
+  // Script. Currently unused in AngularJS.
   JS: 'js'
 };
 
@@ -29428,6 +29426,16 @@ function adjustMatchers(matchers) {
  * `$sceDelegate` is a service that is used by the `$sce` service to provide {@link ng.$sce Strict
  * Contextual Escaping (SCE)} services to AngularJS.
  *
+ * For an overview of this service and the functionnality it provides in AngularJS, see the main
+ * page for {@link ng.$sce SCE}. The current page is targeted for developers who need to alter how
+ * SCE works in their application, which shouldn't be needed in most cases.
+ *
+ * <div class="alert alert-danger">
+ * AngularJS strongly relies on contextual escaping for the security of bindings: disabling or
+ * modifying this might cause cross site scripting (XSS) vulnerabilities. For libraries owners,
+ * changes to this service will also influence users, so be extra careful and document your changes.
+ * </div>
+ *
  * Typically, you would configure or override the {@link ng.$sceDelegate $sceDelegate} instead of
  * the `$sce` service to customize the way Strict Contextual Escaping works in AngularJS.  This is
  * because, while the `$sce` provides numerous shorthand methods, etc., you really only need to
@@ -29453,10 +29461,14 @@ function adjustMatchers(matchers) {
  * @description
  *
  * The `$sceDelegateProvider` provider allows developers to configure the {@link ng.$sceDelegate
- * $sceDelegate} service.  This allows one to get/set the whitelists and blacklists used to ensure
- * that the URLs used for sourcing Angular templates are safe.  Refer {@link
- * ng.$sceDelegateProvider#resourceUrlWhitelist $sceDelegateProvider.resourceUrlWhitelist} and
- * {@link ng.$sceDelegateProvider#resourceUrlBlacklist $sceDelegateProvider.resourceUrlBlacklist}
+ * $sceDelegate service}, used as a delegate for {@link ng.$sce Strict Contextual Escaping (SCE)}.
+ *
+ * The `$sceDelegateProvider` allows one to get/set the whitelists and blacklists used to ensure
+ * that the URLs used for sourcing AngularJS templates and other script-running URLs are safe (all
+ * places that use the `$sce.RESOURCE_URL` context). See
+ * {@link ng.$sceDelegateProvider#resourceUrlWhitelist $sceDelegateProvider.resourceUrlWhitelist}
+ * and
+ * {@link ng.$sceDelegateProvider#resourceUrlBlacklist $sceDelegateProvider.resourceUrlBlacklist},
  *
  * For the general details about this service in Angular, read the main page for {@link ng.$sce
  * Strict Contextual Escaping (SCE)}.
@@ -29485,6 +29497,13 @@ function adjustMatchers(matchers) {
  *    ]);
  *  });
  * ```
+ * Note that an empty whitelist will block every resource URL from being loaded, and will require
+ * you to manually mark each one as trusted with `$sce.trustAsResourceUrl`. However, templates
+ * requested by {@link ng.$templateRequest $templateRequest} that are present in
+ * {@link ng.$templateCache $templateCache} will not go through this check. If you have a mechanism
+ * to populate your templates in that cache at config time, then it is a good idea to remove 'self'
+ * from that whitelist. This helps to mitigate the security impact of certain types of issues, like
+ * for instance attacker-controlled `ng-includes`.
  */
 
 function $SceDelegateProvider() {
@@ -29500,23 +29519,23 @@ function $SceDelegateProvider() {
    * @kind function
    *
    * @param {Array=} whitelist When provided, replaces the resourceUrlWhitelist with the value
-   *    provided.  This must be an array or null.  A snapshot of this array is used so further
-   *    changes to the array are ignored.
+   *     provided.  This must be an array or null.  A snapshot of this array is used so further
+   *     changes to the array are ignored.
+   *     Follow {@link ng.$sce#resourceUrlPatternItem this link} for a description of the items
+   *     allowed in this array.
    *
-   *    Follow {@link ng.$sce#resourceUrlPatternItem this link} for a description of the items
-   *    allowed in this array.
+   * @return {Array} The currently set whitelist array.
    *
-   *    <div class="alert alert-warning">
-   *    **Note:** an empty whitelist array will block all URLs!
-   *    </div>
-   *
-   * @return {Array} the currently set whitelist array.
+   * @description
+   * Sets/Gets the whitelist of trusted resource URLs.
    *
    * The **default value** when no whitelist has been explicitly set is `['self']` allowing only
    * same origin resource requests.
    *
-   * @description
-   * Sets/Gets the whitelist of trusted resource URLs.
+   * <div class="alert alert-warning">
+   * **Note:** the default whitelist of 'self' is not recommended if your app shares its origin
+   * with other apps! It is a good idea to limit it to only your application's directory.
+   * </div>
    */
   this.resourceUrlWhitelist = function(value) {
     if (arguments.length) {
@@ -29531,25 +29550,23 @@ function $SceDelegateProvider() {
    * @kind function
    *
    * @param {Array=} blacklist When provided, replaces the resourceUrlBlacklist with the value
-   *    provided.  This must be an array or null.  A snapshot of this array is used so further
-   *    changes to the array are ignored.
+   *     provided.  This must be an array or null.  A snapshot of this array is used so further
+   *     changes to the array are ignored.</p><p>
+   *     Follow {@link ng.$sce#resourceUrlPatternItem this link} for a description of the items
+   *     allowed in this array.</p><p>
+   *     The typical usage for the blacklist is to **block
+   *     [open redirects](http://cwe.mitre.org/data/definitions/601.html)** served by your domain as
+   *     these would otherwise be trusted but actually return content from the redirected domain.
+   *     </p><p>
+   *     Finally, **the blacklist overrides the whitelist** and has the final say.
    *
-   *    Follow {@link ng.$sce#resourceUrlPatternItem this link} for a description of the items
-   *    allowed in this array.
-   *
-   *    The typical usage for the blacklist is to **block
-   *    [open redirects](http://cwe.mitre.org/data/definitions/601.html)** served by your domain as
-   *    these would otherwise be trusted but actually return content from the redirected domain.
-   *
-   *    Finally, **the blacklist overrides the whitelist** and has the final say.
-   *
-   * @return {Array} the currently set blacklist array.
-   *
-   * The **default value** when no whitelist has been explicitly set is the empty array (i.e. there
-   * is no blacklist.)
+   * @return {Array} The currently set blacklist array.
    *
    * @description
    * Sets/Gets the blacklist of trusted resource URLs.
+   *
+   * The **default value** when no whitelist has been explicitly set is the empty array (i.e. there
+   * is no blacklist.)
    */
 
   this.resourceUrlBlacklist = function(value) {
@@ -29633,17 +29650,24 @@ function $SceDelegateProvider() {
      * @name $sceDelegate#trustAs
      *
      * @description
-     * Returns an object that is trusted by angular for use in specified strict
-     * contextual escaping contexts (such as ng-bind-html, ng-include, any src
-     * attribute interpolation, any dom event binding attribute interpolation
-     * such as for onclick,  etc.) that uses the provided value.
-     * See {@link ng.$sce $sce} for enabling strict contextual escaping.
+     * Returns a trusted representation of the parameter for the specified context. This trusted
+     * object will later on be used as-is, without any security check, by bindings or directives
+     * that require this security context.
+     * For instance, marking a string as trusted for the `$sce.HTML` context will entirely bypass
+     * the potential `$sanitize` call in corresponding `$sce.HTML` bindings or directives, such as
+     * `ng-bind-html`. Note that in most cases you won't need to call this function: if you have the
+     * sanitizer loaded, passing the value itself will render all the HTML that does not pose a
+     * security risk.
      *
-     * @param {string} type The kind of context in which this value is safe for use.  e.g. url,
-     *   resourceUrl, html, js and css.
-     * @param {*} value The value that that should be considered trusted/safe.
-     * @returns {*} A value that can be used to stand in for the provided `value` in places
-     * where Angular expects a $sce.trustAs() return value.
+     * See {@link ng.$sceDelegate#getTrusted getTrusted} for the function that will consume those
+     * trusted values, and {@link ng.$sce $sce} for general documentation about strict contextual
+     * escaping.
+     *
+     * @param {string} type The context in which this value is safe for use, e.g. `$sce.URL`,
+     *     `$sce.RESOURCE_URL`, `$sce.HTML`, `$sce.JS` or `$sce.CSS`.
+     *
+     * @param {*} value The value that should be considered trusted.
+     * @return {*} A trusted representation of value, that can be used in the given context.
      */
     function trustAs(type, trustedValue) {
       var Constructor = (byType.hasOwnProperty(type) ? byType[type] : null);
@@ -29675,11 +29699,11 @@ function $SceDelegateProvider() {
      * ng.$sceDelegate#trustAs `$sceDelegate.trustAs`}.
      *
      * If the passed parameter is not a value that had been returned by {@link
-     * ng.$sceDelegate#trustAs `$sceDelegate.trustAs`}, returns it as-is.
+     * ng.$sceDelegate#trustAs `$sceDelegate.trustAs`}, it must be returned as-is.
      *
      * @param {*} value The result of a prior {@link ng.$sceDelegate#trustAs `$sceDelegate.trustAs`}
-     *      call or anything else.
-     * @returns {*} The `value` that was originally provided to {@link ng.$sceDelegate#trustAs
+     *     call or anything else.
+     * @return {*} The `value` that was originally provided to {@link ng.$sceDelegate#trustAs
      *     `$sceDelegate.trustAs`} if `value` is the result of such a call.  Otherwise, returns
      *     `value` unchanged.
      */
@@ -29696,33 +29720,38 @@ function $SceDelegateProvider() {
      * @name $sceDelegate#getTrusted
      *
      * @description
-     * Takes the result of a {@link ng.$sceDelegate#trustAs `$sceDelegate.trustAs`} call and
-     * returns the originally supplied value if the queried context type is a supertype of the
-     * created type.  If this condition isn't satisfied, throws an exception.
+     * Takes any input, and either returns a value that's safe to use in the specified context, or
+     * throws an exception.
      *
-     * <div class="alert alert-danger">
-     * Disabling auto-escaping is extremely dangerous, it usually creates a Cross Site Scripting
-     * (XSS) vulnerability in your application.
-     * </div>
+     * In practice, there are several cases. When given a string, this function runs checks
+     * and sanitization to make it safe without prior assumptions. When given the result of a {@link
+     * ng.$sceDelegate#trustAs `$sceDelegate.trustAs`} call, it returns the originally supplied
+     * value if that value's context is valid for this call's context. Finally, this function can
+     * also throw when there is no way to turn `maybeTrusted` in a safe value (e.g., no sanitization
+     * is available or possible.)
      *
-     * @param {string} type The kind of context in which this value is to be used.
+     * @param {string} type The context in which this value is to be used (such as `$sce.HTML`).
      * @param {*} maybeTrusted The result of a prior {@link ng.$sceDelegate#trustAs
-     *     `$sceDelegate.trustAs`} call.
-     * @returns {*} The value the was originally provided to {@link ng.$sceDelegate#trustAs
-     *     `$sceDelegate.trustAs`} if valid in this context.  Otherwise, throws an exception.
+     *     `$sceDelegate.trustAs`} call, or anything else (which will not be considered trusted.)
+     * @return {*} A version of the value that's safe to use in the given context, or throws an
+     *     exception if this is impossible.
      */
     function getTrusted(type, maybeTrusted) {
       if (maybeTrusted === null || isUndefined(maybeTrusted) || maybeTrusted === '') {
         return maybeTrusted;
       }
       var constructor = (byType.hasOwnProperty(type) ? byType[type] : null);
+      // If maybeTrusted is a trusted class instance or subclass instance, then unwrap and return
+      // as-is.
       if (constructor && maybeTrusted instanceof constructor) {
         return maybeTrusted.$$unwrapTrustedValue();
       }
-      // If we get here, then we may only take one of two actions.
-      // 1. sanitize the value for the requested type, or
-      // 2. throw an exception.
+      // Otherwise, if we get here, then we may either make it safe, or throw an exception. This
+      // depends on the context: some are sanitizatible (HTML), some use whitelists (RESOURCE_URL),
+      // some are impossible to do (JS). This step isn't implemented for CSS and URL, as AngularJS
+      // has no corresponding sinks.
       if (type === SCE_CONTEXTS.RESOURCE_URL) {
+        // RESOURCE_URL uses a whitelist.
         if (isResourceUrlAllowedByPolicy(maybeTrusted)) {
           return maybeTrusted;
         } else {
@@ -29731,8 +29760,10 @@ function $SceDelegateProvider() {
               maybeTrusted.toString());
         }
       } else if (type === SCE_CONTEXTS.HTML) {
+        // htmlSanitizer throws its own error when no sanitizer is available.
         return htmlSanitizer(maybeTrusted);
       }
+      // Default error when the $sce service has no way to make the input safe.
       throw $sceMinErr('unsafe', 'Attempting to use an unsafe value in a safe context.');
     }
 
@@ -29768,21 +29799,27 @@ function $SceDelegateProvider() {
  *
  * # Strict Contextual Escaping
  *
- * Strict Contextual Escaping (SCE) is a mode in which AngularJS requires bindings in certain
- * contexts to result in a value that is marked as safe to use for that context.  One example of
- * such a context is binding arbitrary html controlled by the user via `ng-bind-html`.  We refer
- * to these contexts as privileged or SCE contexts.
+ * Strict Contextual Escaping (SCE) is a mode in which AngularJS constrains bindings to only render
+ * trusted values. Its goal is to assist in writing code in a way that (a) is secure by default, and
+ * (b) makes auditing for security vulnerabilities such as XSS, clickjacking, etc. a lot easier.
  *
- * As of version 1.2, Angular ships with SCE enabled by default.
+ * ## Overview
  *
- * Note:  When enabled (the default), IE<11 in quirks mode is not supported.  In this mode, IE<11 allow
- * one to execute arbitrary javascript by the use of the expression() syntax.  Refer
- * <http://blogs.msdn.com/b/ie/archive/2008/10/16/ending-expressions.aspx> to learn more about them.
- * You can ensure your document is in standards mode and not quirks mode by adding `<!doctype html>`
- * to the top of your HTML document.
+ * To systematically block XSS security bugs, AngularJS treats all values as untrusted by default in
+ * HTML or sensitive URL bindings. When binding untrusted values, AngularJS will automatically
+ * run security checks on them (sanitizations, whitelists, depending on context), or throw when it
+ * cannot guarantee the security of the result. That behavior depends strongly on contexts: HTML
+ * can be sanitized, but template URLs cannot, for instance.
  *
- * SCE assists in writing code in a way that (a) is secure by default and (b) makes auditing for
- * security vulnerabilities such as XSS, clickjacking, etc. a lot easier.
+ * To illustrate this, consider the `ng-bind-html` directive. It renders its value directly as HTML:
+ * we call that the *context*. When given an untrusted input, AngularJS will attempt to sanitize it
+ * before rendering if a sanitizer is available, and throw otherwise. To bypass sanitization and
+ * render the input as-is, you will need to mark it as trusted for that context before attempting
+ * to bind it.
+ *
+ * As of version 1.2, AngularJS ships with SCE enabled by default.
+ *
+ * ## In practice
  *
  * Here's an example of a binding in a privileged context:
  *
@@ -29792,10 +29829,10 @@ function $SceDelegateProvider() {
  * ```
  *
  * Notice that `ng-bind-html` is bound to `userHtml` controlled by the user.  With SCE
- * disabled, this application allows the user to render arbitrary HTML into the DIV.
- * In a more realistic example, one may be rendering user comments, blog articles, etc. via
- * bindings.  (HTML is just one example of a context where rendering user controlled input creates
- * security vulnerabilities.)
+ * disabled, this application allows the user to render arbitrary HTML into the DIV, which would
+ * be an XSS security bug. In a more realistic example, one may be rendering user comments, blog
+ * articles, etc. via bindings. (HTML is just one example of a context where rendering user
+ * controlled input creates security vulnerabilities.)
  *
  * For the case of HTML, you might use a library, either on the client side, or on the server side,
  * to sanitize unsafe HTML before binding to the value and rendering it in the document.
@@ -29805,25 +29842,29 @@ function $SceDelegateProvider() {
  * ensure that you didn't accidentally delete the line that sanitized the value, or renamed some
  * properties/fields and forgot to update the binding to the sanitized value?
  *
- * To be secure by default, you want to ensure that any such bindings are disallowed unless you can
- * determine that something explicitly says it's safe to use a value for binding in that
- * context.  You can then audit your code (a simple grep would do) to ensure that this is only done
- * for those values that you can easily tell are safe - because they were received from your server,
- * sanitized by your library, etc.  You can organize your codebase to help with this - perhaps
- * allowing only the files in a specific directory to do this.  Ensuring that the internal API
- * exposed by that code doesn't markup arbitrary values as safe then becomes a more manageable task.
+ * To be secure by default, AngularJS makes sure bindings go through that sanitization, or
+ * any similar validation process, unless there's a good reason to trust the given value in this
+ * context.  That trust is formalized with a function call. This means that as a developer, you
+ * can assume all untrusted bindings are safe. Then, to audit your code for binding security issues,
+ * you just need to ensure the values you mark as trusted indeed are safe - because they were
+ * received from your server, sanitized by your library, etc. You can organize your codebase to
+ * help with this - perhaps allowing only the files in a specific directory to do this.
+ * Ensuring that the internal API exposed by that code doesn't markup arbitrary values as safe then
+ * becomes a more manageable task.
  *
  * In the case of AngularJS' SCE service, one uses {@link ng.$sce#trustAs $sce.trustAs}
  * (and shorthand methods such as {@link ng.$sce#trustAsHtml $sce.trustAsHtml}, etc.) to
- * obtain values that will be accepted by SCE / privileged contexts.
- *
+ * build the trusted versions of your values.
  *
  * ## How does it work?
  *
  * In privileged contexts, directives and code will bind to the result of {@link ng.$sce#getTrusted
- * $sce.getTrusted(context, value)} rather than to the value directly.  Directives use {@link
- * ng.$sce#parseAs $sce.parseAs} rather than `$parse` to watch attribute bindings, which performs the
- * {@link ng.$sce#getTrusted $sce.getTrusted} behind the scenes on non-constant literals.
+ * $sce.getTrusted(context, value)} rather than to the value directly.  Think of this function as
+ * a way to enforce the required security context in your data sink. Directives use {@link
+ * ng.$sce#parseAs $sce.parseAs} rather than `$parse` to watch attribute bindings, which performs
+ * the {@link ng.$sce#getTrusted $sce.getTrusted} behind the scenes on non-constant literals. Also,
+ * when binding without directives, AngularJS will understand the context of your bindings
+ * automatically.
  *
  * As an example, {@link ng.directive:ngBindHtml ngBindHtml} uses {@link
  * ng.$sce#parseAsHtml $sce.parseAsHtml(binding expression)}.  Here's the actual code (slightly
@@ -29864,11 +29905,12 @@ function $SceDelegateProvider() {
  * It's important to remember that SCE only applies to interpolation expressions.
  *
  * If your expressions are constant literals, they're automatically trusted and you don't need to
- * call `$sce.trustAs` on them (remember to include the `ngSanitize` module) (e.g.
- * `<div ng-bind-html="'<b>implicitly trusted</b>'"></div>`) just works.
- *
- * Additionally, `a[href]` and `img[src]` automatically sanitize their URLs and do not pass them
- * through {@link ng.$sce#getTrusted $sce.getTrusted}.  SCE doesn't play a role here.
+ * call `$sce.trustAs` on them (e.g.
+ * `<div ng-bind-html="'<b>implicitly trusted</b>'"></div>`) just works. The `$sceDelegate` will
+ * also use the `$sanitize` service if it is available when binding untrusted values to
+ * `$sce.HTML` context. AngularJS provides an implementation in `angular-sanitize.js`, and if you
+ * wish to use it, you will also need to depend on the {@link ngSanitize `ngSanitize`} module in
+ * your application.
  *
  * The included {@link ng.$sceDelegate $sceDelegate} comes with sane defaults to allow you to load
  * templates in `ng-include` from your application's domain without having to even know about SCE.
@@ -29886,11 +29928,17 @@ function $SceDelegateProvider() {
  *
  * | Context             | Notes          |
  * |---------------------|----------------|
- * | `$sce.HTML`         | For HTML that's safe to source into the application.  The {@link ng.directive:ngBindHtml ngBindHtml} directive uses this context for bindings. If an unsafe value is encountered and the {@link ngSanitize $sanitize} module is present this will sanitize the value instead of throwing an error. |
- * | `$sce.CSS`          | For CSS that's safe to source into the application.  Currently unused.  Feel free to use it in your own directives. |
- * | `$sce.URL`          | For URLs that are safe to follow as links.  Currently unused (`<a href=` and `<img src=` sanitize their urls and don't constitute an SCE context. |
- * | `$sce.RESOURCE_URL` | For URLs that are not only safe to follow as links, but whose contents are also safe to include in your application.  Examples include `ng-include`, `src` / `ngSrc` bindings for tags other than `IMG`, `VIDEO`, `AUDIO`, `SOURCE`, and `TRACK` (e.g. `IFRAME`, `OBJECT`, etc.)  <br><br>Note that `$sce.RESOURCE_URL` makes a stronger statement about the URL than `$sce.URL` does and therefore contexts requiring values trusted for `$sce.RESOURCE_URL` can be used anywhere that values trusted for `$sce.URL` are required. |
- * | `$sce.JS`           | For JavaScript that is safe to execute in your application's context.  Currently unused.  Feel free to use it in your own directives. |
+ * | `$sce.HTML`         | For HTML that's safe to source into the application.  The {@link ng.directive:ngBindHtml ngBindHtml} directive uses this context for bindings. If an unsafe value is encountered, and the {@link ngSanitize.$sanitize $sanitize} service is available (implemented by the {@link ngSanitize ngSanitize} module) this will sanitize the value instead of throwing an error. |
+ * | `$sce.CSS`          | For CSS that's safe to source into the application.  Currently, no bindings require this context. Feel free to use it in your own directives. |
+ * | `$sce.URL`          | For URLs that are safe to follow as links.  Currently unused (`<a href=`, `<img src=`, and some others sanitize their urls and don't constitute an SCE context.) |
+ * | `$sce.RESOURCE_URL` | For URLs that are not only safe to follow as links, but whose contents are also safe to include in your application.  Examples include `ng-include`, `src` / `ngSrc` bindings for tags other than `IMG`, `VIDEO`, `AUDIO`, `SOURCE`, and `TRACK` (e.g. `IFRAME`, `OBJECT`, etc.)  <br><br>Note that `$sce.RESOURCE_URL` makes a stronger statement about the URL than `$sce.URL` does (it's not just the URL that matters, but also what is at the end of it), and therefore contexts requiring values trusted for `$sce.RESOURCE_URL` can be used anywhere that values trusted for `$sce.URL` are required. |
+ * | `$sce.JS`           | For JavaScript that is safe to execute in your application's context.  Currently, no bindings require this context.  Feel free to use it in your own directives. |
+ *
+ *
+ * Be aware that `a[href]` and `img[src]` automatically sanitize their URLs and do not pass them
+ * through {@link ng.$sce#getTrusted $sce.getTrusted}. There's no CSS-, URL-, or JS-context bindings
+ * in AngularJS currently, so their corresponding `$sce.trustAs` functions aren't useful yet. This
+ * might evolve.
  *
  * ## Format of items in {@link ng.$sceDelegateProvider#resourceUrlWhitelist resourceUrlWhitelist}/{@link ng.$sceDelegateProvider#resourceUrlBlacklist Blacklist} <a name="resourceUrlPatternItem"></a>
  *
@@ -30009,14 +30057,15 @@ function $SceDelegateProvider() {
  * for little coding overhead.  It will be much harder to take an SCE disabled application and
  * either secure it on your own or enable SCE at a later stage.  It might make sense to disable SCE
  * for cases where you have a lot of existing code that was written before SCE was introduced and
- * you're migrating them a module at a time.
+ * you're migrating them a module at a time. Also do note that this is an app-wide setting, so if
+ * you are writing a library, you will cause security bugs applications using it.
  *
  * That said, here's how you can completely disable SCE:
  *
  * ```
  * angular.module('myAppWithSceDisabledmyApp', []).config(function($sceProvider) {
  *   // Completely disable SCE.  For demonstration purposes only!
- *   // Do not use in new projects.
+ *   // Do not use in new projects or libraries.
  *   $sceProvider.enabled(false);
  * });
  * ```
@@ -30031,8 +30080,8 @@ function $SceProvider() {
    * @name $sceProvider#enabled
    * @kind function
    *
-   * @param {boolean=} value If provided, then enables/disables SCE.
-   * @return {boolean} true if SCE is enabled, false otherwise.
+   * @param {boolean=} value If provided, then enables/disables SCE application-wide.
+   * @return {boolean} True if SCE is enabled, false otherwise.
    *
    * @description
    * Enables/disables SCE and returns the current value.
@@ -30086,9 +30135,9 @@ function $SceProvider() {
    *     getTrusted($sce.RESOURCE_URL, value) succeeding implies that getTrusted($sce.URL, value)
    *     will also succeed.
    *
-   * Inheritance happens to capture this in a natural way.  In some future, we
-   * may not use inheritance anymore.  That is OK because no code outside of
-   * sce.js and sceSpecs.js would need to be aware of this detail.
+   * Inheritance happens to capture this in a natural way. In some future, we may not use
+   * inheritance anymore. That is OK because no code outside of sce.js and sceSpecs.js would need to
+   * be aware of this detail.
    */
 
   this.$get = ['$parse', '$sceDelegate', function(
@@ -30110,8 +30159,8 @@ function $SceProvider() {
      * @name $sce#isEnabled
      * @kind function
      *
-     * @return {Boolean} true if SCE is enabled, false otherwise.  If you want to set the value, you
-     * have to do it at module config time on {@link ng.$sceProvider $sceProvider}.
+     * @return {Boolean} True if SCE is enabled, false otherwise.  If you want to set the value, you
+     *     have to do it at module config time on {@link ng.$sceProvider $sceProvider}.
      *
      * @description
      * Returns a boolean indicating if SCE is enabled.
@@ -30138,14 +30187,14 @@ function $SceProvider() {
      * wraps the expression in a call to {@link ng.$sce#getTrusted $sce.getTrusted(*type*,
      * *result*)}
      *
-     * @param {string} type The kind of SCE context in which this result will be used.
+     * @param {string} type The SCE context in which this result will be used.
      * @param {string} expression String expression to compile.
-     * @returns {function(context, locals)} a function which represents the compiled expression:
+     * @return {function(context, locals)} A function which represents the compiled expression:
      *
-     *    * `context` – `{object}` – an object against which any expressions embedded in the strings
-     *      are evaluated against (typically a scope object).
-     *    * `locals` – `{object=}` – local variables context object, useful for overriding values in
-     *      `context`.
+     *    * `context` – `{object}` – an object against which any expressions embedded in the
+     *      strings are evaluated against (typically a scope object).
+     *    * `locals` – `{object=}` – local variables context object, useful for overriding values
+     *      in `context`.
      */
     sce.parseAs = function sceParseAs(type, expr) {
       var parsed = $parse(expr);
@@ -30163,18 +30212,18 @@ function $SceProvider() {
      * @name $sce#trustAs
      *
      * @description
-     * Delegates to {@link ng.$sceDelegate#trustAs `$sceDelegate.trustAs`}.  As such,
-     * returns an object that is trusted by angular for use in specified strict contextual
-     * escaping contexts (such as ng-bind-html, ng-include, any src attribute
-     * interpolation, any dom event binding attribute interpolation such as for onclick,  etc.)
-     * that uses the provided value.  See * {@link ng.$sce $sce} for enabling strict contextual
-     * escaping.
+     * Delegates to {@link ng.$sceDelegate#trustAs `$sceDelegate.trustAs`}. As such, returns a
+     * wrapped object that represents your value, and the trust you have in its safety for the given
+     * context. AngularJS can then use that value as-is in bindings of the specified secure context.
+     * This is used in bindings for `ng-bind-html`, `ng-include`, and most `src` attribute
+     * interpolations. See {@link ng.$sce $sce} for strict contextual escaping.
      *
-     * @param {string} type The kind of context in which this value is safe for use.  e.g. url,
-     *   resourceUrl, html, js and css.
-     * @param {*} value The value that that should be considered trusted/safe.
-     * @returns {*} A value that can be used to stand in for the provided `value` in places
-     * where Angular expects a $sce.trustAs() return value.
+     * @param {string} type The context in which this value is safe for use, e.g. `$sce.URL`,
+     *     `$sce.RESOURCE_URL`, `$sce.HTML`, `$sce.JS` or `$sce.CSS`.
+     *
+     * @param {*} value The value that that should be considered trusted.
+     * @return {*} A wrapped version of value that can be used as a trusted variant of your `value`
+     *     in the context you specified.
      */
 
     /**
@@ -30185,11 +30234,23 @@ function $SceProvider() {
      * Shorthand method.  `$sce.trustAsHtml(value)` →
      *     {@link ng.$sceDelegate#trustAs `$sceDelegate.trustAs($sce.HTML, value)`}
      *
-     * @param {*} value The value to trustAs.
-     * @returns {*} An object that can be passed to {@link ng.$sce#getTrustedHtml
-     *     $sce.getTrustedHtml(value)} to obtain the original value.  (privileged directives
-     *     only accept expressions that are either literal constants or are the
-     *     return value of {@link ng.$sce#trustAs $sce.trustAs}.)
+     * @param {*} value The value to mark as trusted for `$sce.HTML` context.
+     * @return {*} A wrapped version of value that can be used as a trusted variant of your `value`
+     *     in `$sce.HTML` context (like `ng-bind-html`).
+     */
+
+    /**
+     * @ngdoc method
+     * @name $sce#trustAsCss
+     *
+     * @description
+     * Shorthand method.  `$sce.trustAsCss(value)` →
+     *     {@link ng.$sceDelegate#trustAs `$sceDelegate.trustAs($sce.CSS, value)`}
+     *
+     * @param {*} value The value to mark as trusted for `$sce.CSS` context.
+     * @return {*} A wrapped version of value that can be used as a trusted variant
+     *     of your `value` in `$sce.CSS` context. This context is currently unused, so there are
+     *     almost no reasons to use this function so far.
      */
 
     /**
@@ -30200,11 +30261,10 @@ function $SceProvider() {
      * Shorthand method.  `$sce.trustAsUrl(value)` →
      *     {@link ng.$sceDelegate#trustAs `$sceDelegate.trustAs($sce.URL, value)`}
      *
-     * @param {*} value The value to trustAs.
-     * @returns {*} An object that can be passed to {@link ng.$sce#getTrustedUrl
-     *     $sce.getTrustedUrl(value)} to obtain the original value.  (privileged directives
-     *     only accept expressions that are either literal constants or are the
-     *     return value of {@link ng.$sce#trustAs $sce.trustAs}.)
+     * @param {*} value The value to mark as trusted for `$sce.URL` context.
+     * @return {*} A wrapped version of value that can be used as a trusted variant of your `value`
+     *     in `$sce.URL` context. That context is currently unused, so there are almost no reasons
+     *     to use this function so far.
      */
 
     /**
@@ -30215,11 +30275,10 @@ function $SceProvider() {
      * Shorthand method.  `$sce.trustAsResourceUrl(value)` →
      *     {@link ng.$sceDelegate#trustAs `$sceDelegate.trustAs($sce.RESOURCE_URL, value)`}
      *
-     * @param {*} value The value to trustAs.
-     * @returns {*} An object that can be passed to {@link ng.$sce#getTrustedResourceUrl
-     *     $sce.getTrustedResourceUrl(value)} to obtain the original value.  (privileged directives
-     *     only accept expressions that are either literal constants or are the return
-     *     value of {@link ng.$sce#trustAs $sce.trustAs}.)
+     * @param {*} value The value to mark as trusted for `$sce.RESOURCE_URL` context.
+     * @return {*} A wrapped version of value that can be used as a trusted variant of your `value`
+     *     in `$sce.RESOURCE_URL` context (template URLs in `ng-include`, most `src` attribute
+     *     bindings, ...)
      */
 
     /**
@@ -30230,11 +30289,10 @@ function $SceProvider() {
      * Shorthand method.  `$sce.trustAsJs(value)` →
      *     {@link ng.$sceDelegate#trustAs `$sceDelegate.trustAs($sce.JS, value)`}
      *
-     * @param {*} value The value to trustAs.
-     * @returns {*} An object that can be passed to {@link ng.$sce#getTrustedJs
-     *     $sce.getTrustedJs(value)} to obtain the original value.  (privileged directives
-     *     only accept expressions that are either literal constants or are the
-     *     return value of {@link ng.$sce#trustAs $sce.trustAs}.)
+     * @param {*} value The value to mark as trusted for `$sce.JS` context.
+     * @return {*} A wrapped version of value that can be used as a trusted variant of your `value`
+     *     in `$sce.JS` context. That context is currently unused, so there are almost no reasons to
+     *     use this function so far.
      */
 
     /**
@@ -30243,16 +30301,17 @@ function $SceProvider() {
      *
      * @description
      * Delegates to {@link ng.$sceDelegate#getTrusted `$sceDelegate.getTrusted`}.  As such,
-     * takes the result of a {@link ng.$sce#trustAs `$sce.trustAs`}() call and returns the
-     * originally supplied value if the queried context type is a supertype of the created type.
-     * If this condition isn't satisfied, throws an exception.
+     * takes any input, and either returns a value that's safe to use in the specified context,
+     * or throws an exception. This function is aware of trusted values created by the `trustAs`
+     * function and its shorthands, and when contexts are appropriate, returns the unwrapped value
+     * as-is. Finally, this function can also throw when there is no way to turn `maybeTrusted` in a
+     * safe value (e.g., no sanitization is available or possible.)
      *
-     * @param {string} type The kind of context in which this value is to be used.
-     * @param {*} maybeTrusted The result of a prior {@link ng.$sce#trustAs `$sce.trustAs`}
-     *                         call.
-     * @returns {*} The value the was originally provided to
-     *              {@link ng.$sce#trustAs `$sce.trustAs`} if valid in this context.
-     *              Otherwise, throws an exception.
+     * @param {string} type The context in which this value is to be used.
+     * @param {*} maybeTrusted The result of a prior {@link ng.$sce#trustAs
+     *     `$sce.trustAs`} call, or anything else (which will not be considered trusted.)
+     * @return {*} A version of the value that's safe to use in the given context, or throws an
+     *     exception if this is impossible.
      */
 
     /**
@@ -30264,7 +30323,7 @@ function $SceProvider() {
      *     {@link ng.$sceDelegate#getTrusted `$sceDelegate.getTrusted($sce.HTML, value)`}
      *
      * @param {*} value The value to pass to `$sce.getTrusted`.
-     * @returns {*} The return value of `$sce.getTrusted($sce.HTML, value)`
+     * @return {*} The return value of `$sce.getTrusted($sce.HTML, value)`
      */
 
     /**
@@ -30276,7 +30335,7 @@ function $SceProvider() {
      *     {@link ng.$sceDelegate#getTrusted `$sceDelegate.getTrusted($sce.CSS, value)`}
      *
      * @param {*} value The value to pass to `$sce.getTrusted`.
-     * @returns {*} The return value of `$sce.getTrusted($sce.CSS, value)`
+     * @return {*} The return value of `$sce.getTrusted($sce.CSS, value)`
      */
 
     /**
@@ -30288,7 +30347,7 @@ function $SceProvider() {
      *     {@link ng.$sceDelegate#getTrusted `$sceDelegate.getTrusted($sce.URL, value)`}
      *
      * @param {*} value The value to pass to `$sce.getTrusted`.
-     * @returns {*} The return value of `$sce.getTrusted($sce.URL, value)`
+     * @return {*} The return value of `$sce.getTrusted($sce.URL, value)`
      */
 
     /**
@@ -30300,7 +30359,7 @@ function $SceProvider() {
      *     {@link ng.$sceDelegate#getTrusted `$sceDelegate.getTrusted($sce.RESOURCE_URL, value)`}
      *
      * @param {*} value The value to pass to `$sceDelegate.getTrusted`.
-     * @returns {*} The return value of `$sce.getTrusted($sce.RESOURCE_URL, value)`
+     * @return {*} The return value of `$sce.getTrusted($sce.RESOURCE_URL, value)`
      */
 
     /**
@@ -30312,7 +30371,7 @@ function $SceProvider() {
      *     {@link ng.$sceDelegate#getTrusted `$sceDelegate.getTrusted($sce.JS, value)`}
      *
      * @param {*} value The value to pass to `$sce.getTrusted`.
-     * @returns {*} The return value of `$sce.getTrusted($sce.JS, value)`
+     * @return {*} The return value of `$sce.getTrusted($sce.JS, value)`
      */
 
     /**
@@ -30324,12 +30383,12 @@ function $SceProvider() {
      *     {@link ng.$sce#parseAs `$sce.parseAs($sce.HTML, value)`}
      *
      * @param {string} expression String expression to compile.
-     * @returns {function(context, locals)} a function which represents the compiled expression:
+     * @return {function(context, locals)} A function which represents the compiled expression:
      *
-     *    * `context` – `{object}` – an object against which any expressions embedded in the strings
-     *      are evaluated against (typically a scope object).
-     *    * `locals` – `{object=}` – local variables context object, useful for overriding values in
-     *      `context`.
+     *    * `context` – `{object}` – an object against which any expressions embedded in the
+     *      strings are evaluated against (typically a scope object).
+     *    * `locals` – `{object=}` – local variables context object, useful for overriding values
+     *      in `context`.
      */
 
     /**
@@ -30341,12 +30400,12 @@ function $SceProvider() {
      *     {@link ng.$sce#parseAs `$sce.parseAs($sce.CSS, value)`}
      *
      * @param {string} expression String expression to compile.
-     * @returns {function(context, locals)} a function which represents the compiled expression:
+     * @return {function(context, locals)} A function which represents the compiled expression:
      *
-     *    * `context` – `{object}` – an object against which any expressions embedded in the strings
-     *      are evaluated against (typically a scope object).
-     *    * `locals` – `{object=}` – local variables context object, useful for overriding values in
-     *      `context`.
+     *    * `context` – `{object}` – an object against which any expressions embedded in the
+     *      strings are evaluated against (typically a scope object).
+     *    * `locals` – `{object=}` – local variables context object, useful for overriding values
+     *      in `context`.
      */
 
     /**
@@ -30358,12 +30417,12 @@ function $SceProvider() {
      *     {@link ng.$sce#parseAs `$sce.parseAs($sce.URL, value)`}
      *
      * @param {string} expression String expression to compile.
-     * @returns {function(context, locals)} a function which represents the compiled expression:
+     * @return {function(context, locals)} A function which represents the compiled expression:
      *
-     *    * `context` – `{object}` – an object against which any expressions embedded in the strings
-     *      are evaluated against (typically a scope object).
-     *    * `locals` – `{object=}` – local variables context object, useful for overriding values in
-     *      `context`.
+     *    * `context` – `{object}` – an object against which any expressions embedded in the
+     *      strings are evaluated against (typically a scope object).
+     *    * `locals` – `{object=}` – local variables context object, useful for overriding values
+     *      in `context`.
      */
 
     /**
@@ -30375,12 +30434,12 @@ function $SceProvider() {
      *     {@link ng.$sce#parseAs `$sce.parseAs($sce.RESOURCE_URL, value)`}
      *
      * @param {string} expression String expression to compile.
-     * @returns {function(context, locals)} a function which represents the compiled expression:
+     * @return {function(context, locals)} A function which represents the compiled expression:
      *
-     *    * `context` – `{object}` – an object against which any expressions embedded in the strings
-     *      are evaluated against (typically a scope object).
-     *    * `locals` – `{object=}` – local variables context object, useful for overriding values in
-     *      `context`.
+     *    * `context` – `{object}` – an object against which any expressions embedded in the
+     *      strings are evaluated against (typically a scope object).
+     *    * `locals` – `{object=}` – local variables context object, useful for overriding values
+     *      in `context`.
      */
 
     /**
@@ -30392,12 +30451,12 @@ function $SceProvider() {
      *     {@link ng.$sce#parseAs `$sce.parseAs($sce.JS, value)`}
      *
      * @param {string} expression String expression to compile.
-     * @returns {function(context, locals)} a function which represents the compiled expression:
+     * @return {function(context, locals)} A function which represents the compiled expression:
      *
-     *    * `context` – `{object}` – an object against which any expressions embedded in the strings
-     *      are evaluated against (typically a scope object).
-     *    * `locals` – `{object=}` – local variables context object, useful for overriding values in
-     *      `context`.
+     *    * `context` – `{object}` – an object against which any expressions embedded in the
+     *      strings are evaluated against (typically a scope object).
+     *    * `locals` – `{object=}` – local variables context object, useful for overriding values
+     *      in `context`.
      */
 
     // Shorthand delegations.
@@ -31257,8 +31316,9 @@ function $FilterProvider($provide) {
  *     The final result is an array of those elements that the predicate returned true for.
  *
  * @param {function(actual, expected)|true|false} [comparator] Comparator which is used in
- *     determining if the expected value (from the filter expression) and actual value (from
- *     the object in the array) should be considered a match.
+ *     determining if values retrieved using `expression` (when it is not a function) should be
+ *     considered a match based on the the expected value (from the filter expression) and actual
+ *     value (from the object in the array).
  *
  *   Can be one of:
  *
@@ -31953,7 +32013,7 @@ var DATE_FORMATS = {
      GGGG: longEraGetter
 };
 
-var DATE_FORMATS_SPLIT = /((?:[^yMLdHhmsaZEwG']+)|(?:'(?:[^']|'')*')|(?:E+|y+|M+|L+|d+|H+|h+|m+|s+|a|Z|G+|w+))(.*)/,
+var DATE_FORMATS_SPLIT = /((?:[^yMLdHhmsaZEwG']+)|(?:'(?:[^']|'')*')|(?:E+|y+|M+|L+|d+|H+|h+|m+|s+|a|Z|G+|w+))([\s\S]*)/,
     NUMBER_STRING = /^-?\d+$/;
 
 /**
@@ -32011,6 +32071,8 @@ var DATE_FORMATS_SPLIT = /((?:[^yMLdHhmsaZEwG']+)|(?:'(?:[^']|'')*')|(?:E+|y+|M+
  *   `format` string can contain literal values. These need to be escaped by surrounding with single quotes (e.g.
  *   `"h 'in the morning'"`). In order to output a single quote, escape it - i.e., two single quotes in a sequence
  *   (e.g. `"h 'o''clock'"`).
+ *
+ *   Any other characters in the `format` string will be output as-is.
  *
  * @param {(Date|number|string)} date Date to format either as Date object, milliseconds (string or
  *    number) or various ISO 8601 datetime string formats (e.g. yyyy-MM-ddTHH:mm:ss.sssZ and its
@@ -36626,13 +36688,6 @@ function classDirective(name, selector) {
     return {
       restrict: 'AC',
       link: function(scope, element, attr) {
-        var expression = attr[name].trim();
-        var isOneTime = (expression.charAt(0) === ':') && (expression.charAt(1) === ':');
-
-        var watchInterceptor = isOneTime ? toFlatValue : toClassString;
-        var watchExpression = $parse(expression, watchInterceptor);
-        var watchAction = isOneTime ? ngClassOneTimeWatchAction : ngClassWatchAction;
-
         var classCounts = element.data('$classCounts');
         var oldModulo = true;
         var oldClassString;
@@ -36655,7 +36710,7 @@ function classDirective(name, selector) {
           scope.$watch(indexWatchExpression, ngClassIndexWatchAction);
         }
 
-        scope.$watch(watchExpression, watchAction, isOneTime);
+        scope.$watch($parse(attr[name], toClassString), ngClassWatchAction);
 
         function addClasses(classString) {
           classString = digestClassCounts(split(classString), 1);
@@ -36697,9 +36752,9 @@ function classDirective(name, selector) {
         }
 
         function ngClassIndexWatchAction(newModulo) {
-          // This watch-action should run before the `ngClass[OneTime]WatchAction()`, thus it
+          // This watch-action should run before the `ngClassWatchAction()`, thus it
           // adds/removes `oldClassString`. If the `ngClass` expression has changed as well, the
-          // `ngClass[OneTime]WatchAction()` will update the classes.
+          // `ngClassWatchAction()` will update the classes.
           if (newModulo === selector) {
             addClasses(oldClassString);
           } else {
@@ -36709,15 +36764,13 @@ function classDirective(name, selector) {
           oldModulo = newModulo;
         }
 
-        function ngClassOneTimeWatchAction(newClassValue) {
-          var newClassString = toClassString(newClassValue);
-
-          if (newClassString !== oldClassString) {
-            ngClassWatchAction(newClassString);
-          }
-        }
-
         function ngClassWatchAction(newClassString) {
+          // When using a one-time binding the newClassString will return
+          // the pre-interceptor value until the one-time is complete
+          if (!isString(newClassString)) {
+            newClassString = toClassString(newClassString);
+          }
+
           if (oldModulo === selector) {
             updateClasses(oldClassString, newClassString);
           }
@@ -36763,34 +36816,6 @@ function classDirective(name, selector) {
     }
 
     return classString;
-  }
-
-  function toFlatValue(classValue) {
-    var flatValue = classValue;
-
-    if (isArray(classValue)) {
-      flatValue = classValue.map(toFlatValue);
-    } else if (isObject(classValue)) {
-      var hasUndefined = false;
-
-      flatValue = Object.keys(classValue).filter(function(key) {
-        var value = classValue[key];
-
-        if (!hasUndefined && isUndefined(value)) {
-          hasUndefined = true;
-        }
-
-        return value;
-      });
-
-      if (hasUndefined) {
-        // Prevent the `oneTimeLiteralWatchInterceptor` from unregistering
-        // the watcher, by including at least one `undefined` value.
-        flatValue.push(undefined);
-      }
-    }
-
-    return flatValue;
   }
 }
 
@@ -38971,7 +38996,9 @@ function NgModelController($scope, $exceptionHandler, $attr, $element, $parse, $
 
   this.$$currentValidationRunId = 0;
 
-  this.$$scope = $scope;
+  // https://github.com/angular/angular.js/issues/15833
+  // Prevent `$$scope` from being iterated over by `copy` when NgModelController is deep watched
+  Object.defineProperty(this, '$$scope', {value: $scope});
   this.$$attr = $attr;
   this.$$element = $element;
   this.$$animate = $animate;
@@ -39580,8 +39607,8 @@ function setupModelWatcher(ctrl) {
   //    -> scope value did not change since the last digest as
   //       ng-change executes in apply phase
   // 4. view should be changed back to 'a'
-  ctrl.$$scope.$watch(function ngModelWatch() {
-    var modelValue = ctrl.$$ngModelGet(ctrl.$$scope);
+  ctrl.$$scope.$watch(function ngModelWatch(scope) {
+    var modelValue = ctrl.$$ngModelGet(scope);
 
     // if scope model value and ngModel value are out of sync
     // TODO(perf): why not move this to the action fn?
@@ -48055,7 +48082,7 @@ var Formio = function () {
       var _url = type + 'Url';
       var method = this[_id] || data._id ? 'put' : 'post';
       var reqUrl = this[_id] ? this[_url] : this[type + 'sUrl'];
-      if (!this[_id] && data._id && method === 'put') {
+      if (!this[_id] && data._id && method === 'put' && reqUrl.indexOf(data._id) === -1) {
         reqUrl += '/' + data._id;
       }
       Formio.cache = {};
@@ -48800,7 +48827,7 @@ Formio.events = new EventEmitter({
 module.exports = global.Formio = Formio;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./providers":26,"eventemitter2":24,"native-promise-only":188,"shallow-copy":191,"whatwg-fetch":194}],26:[function(_dereq_,module,exports){
+},{"./providers":26,"eventemitter2":24,"native-promise-only":191,"shallow-copy":194,"whatwg-fetch":197}],26:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = {
@@ -48879,7 +48906,7 @@ var dropbox = function dropbox(formio) {
 dropbox.title = 'Dropbox';
 module.exports = dropbox;
 
-},{"native-promise-only":188}],28:[function(_dereq_,module,exports){
+},{"native-promise-only":191}],28:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = {
@@ -49003,7 +49030,7 @@ var s3 = function s3(formio) {
 s3.title = 'S3';
 module.exports = s3;
 
-},{"native-promise-only":188}],30:[function(_dereq_,module,exports){
+},{"native-promise-only":191}],30:[function(_dereq_,module,exports){
 'use strict';
 
 var Promise = _dereq_("native-promise-only");
@@ -49082,7 +49109,7 @@ var url = function url(formio) {
 url.title = 'Url';
 module.exports = url;
 
-},{"native-promise-only":188}],31:[function(_dereq_,module,exports){
+},{"native-promise-only":191}],31:[function(_dereq_,module,exports){
 'use strict';
 
 var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -49304,7 +49331,7 @@ module.exports = {
   }
 };
 
-},{"lodash/get":167}],32:[function(_dereq_,module,exports){
+},{"lodash/get":168}],32:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = _dereq_('./build/utils');
@@ -49318,7 +49345,7 @@ var DataView = getNative(root, 'DataView');
 
 module.exports = DataView;
 
-},{"./_getNative":111,"./_root":152}],34:[function(_dereq_,module,exports){
+},{"./_getNative":112,"./_root":153}],34:[function(_dereq_,module,exports){
 var hashClear = _dereq_('./_hashClear'),
     hashDelete = _dereq_('./_hashDelete'),
     hashGet = _dereq_('./_hashGet'),
@@ -49352,7 +49379,7 @@ Hash.prototype.set = hashSet;
 
 module.exports = Hash;
 
-},{"./_hashClear":119,"./_hashDelete":120,"./_hashGet":121,"./_hashHas":122,"./_hashSet":123}],35:[function(_dereq_,module,exports){
+},{"./_hashClear":120,"./_hashDelete":121,"./_hashGet":122,"./_hashHas":123,"./_hashSet":124}],35:[function(_dereq_,module,exports){
 var listCacheClear = _dereq_('./_listCacheClear'),
     listCacheDelete = _dereq_('./_listCacheDelete'),
     listCacheGet = _dereq_('./_listCacheGet'),
@@ -49386,7 +49413,7 @@ ListCache.prototype.set = listCacheSet;
 
 module.exports = ListCache;
 
-},{"./_listCacheClear":133,"./_listCacheDelete":134,"./_listCacheGet":135,"./_listCacheHas":136,"./_listCacheSet":137}],36:[function(_dereq_,module,exports){
+},{"./_listCacheClear":134,"./_listCacheDelete":135,"./_listCacheGet":136,"./_listCacheHas":137,"./_listCacheSet":138}],36:[function(_dereq_,module,exports){
 var getNative = _dereq_('./_getNative'),
     root = _dereq_('./_root');
 
@@ -49395,7 +49422,7 @@ var Map = getNative(root, 'Map');
 
 module.exports = Map;
 
-},{"./_getNative":111,"./_root":152}],37:[function(_dereq_,module,exports){
+},{"./_getNative":112,"./_root":153}],37:[function(_dereq_,module,exports){
 var mapCacheClear = _dereq_('./_mapCacheClear'),
     mapCacheDelete = _dereq_('./_mapCacheDelete'),
     mapCacheGet = _dereq_('./_mapCacheGet'),
@@ -49429,7 +49456,7 @@ MapCache.prototype.set = mapCacheSet;
 
 module.exports = MapCache;
 
-},{"./_mapCacheClear":138,"./_mapCacheDelete":139,"./_mapCacheGet":140,"./_mapCacheHas":141,"./_mapCacheSet":142}],38:[function(_dereq_,module,exports){
+},{"./_mapCacheClear":139,"./_mapCacheDelete":140,"./_mapCacheGet":141,"./_mapCacheHas":142,"./_mapCacheSet":143}],38:[function(_dereq_,module,exports){
 var getNative = _dereq_('./_getNative'),
     root = _dereq_('./_root');
 
@@ -49438,7 +49465,7 @@ var Promise = getNative(root, 'Promise');
 
 module.exports = Promise;
 
-},{"./_getNative":111,"./_root":152}],39:[function(_dereq_,module,exports){
+},{"./_getNative":112,"./_root":153}],39:[function(_dereq_,module,exports){
 var getNative = _dereq_('./_getNative'),
     root = _dereq_('./_root');
 
@@ -49447,7 +49474,7 @@ var Set = getNative(root, 'Set');
 
 module.exports = Set;
 
-},{"./_getNative":111,"./_root":152}],40:[function(_dereq_,module,exports){
+},{"./_getNative":112,"./_root":153}],40:[function(_dereq_,module,exports){
 var MapCache = _dereq_('./_MapCache'),
     setCacheAdd = _dereq_('./_setCacheAdd'),
     setCacheHas = _dereq_('./_setCacheHas');
@@ -49476,7 +49503,7 @@ SetCache.prototype.has = setCacheHas;
 
 module.exports = SetCache;
 
-},{"./_MapCache":37,"./_setCacheAdd":153,"./_setCacheHas":154}],41:[function(_dereq_,module,exports){
+},{"./_MapCache":37,"./_setCacheAdd":154,"./_setCacheHas":155}],41:[function(_dereq_,module,exports){
 var ListCache = _dereq_('./_ListCache'),
     stackClear = _dereq_('./_stackClear'),
     stackDelete = _dereq_('./_stackDelete'),
@@ -49505,7 +49532,7 @@ Stack.prototype.set = stackSet;
 
 module.exports = Stack;
 
-},{"./_ListCache":35,"./_stackClear":156,"./_stackDelete":157,"./_stackGet":158,"./_stackHas":159,"./_stackSet":160}],42:[function(_dereq_,module,exports){
+},{"./_ListCache":35,"./_stackClear":157,"./_stackDelete":158,"./_stackGet":159,"./_stackHas":160,"./_stackSet":161}],42:[function(_dereq_,module,exports){
 var root = _dereq_('./_root');
 
 /** Built-in value references. */
@@ -49513,7 +49540,7 @@ var Symbol = root.Symbol;
 
 module.exports = Symbol;
 
-},{"./_root":152}],43:[function(_dereq_,module,exports){
+},{"./_root":153}],43:[function(_dereq_,module,exports){
 var root = _dereq_('./_root');
 
 /** Built-in value references. */
@@ -49521,7 +49548,7 @@ var Uint8Array = root.Uint8Array;
 
 module.exports = Uint8Array;
 
-},{"./_root":152}],44:[function(_dereq_,module,exports){
+},{"./_root":153}],44:[function(_dereq_,module,exports){
 var getNative = _dereq_('./_getNative'),
     root = _dereq_('./_root');
 
@@ -49530,7 +49557,7 @@ var WeakMap = getNative(root, 'WeakMap');
 
 module.exports = WeakMap;
 
-},{"./_getNative":111,"./_root":152}],45:[function(_dereq_,module,exports){
+},{"./_getNative":112,"./_root":153}],45:[function(_dereq_,module,exports){
 /**
  * Adds the key-value `pair` to `map`.
  *
@@ -49666,7 +49693,7 @@ function arrayLikeKeys(value, inherited) {
 
 module.exports = arrayLikeKeys;
 
-},{"./_baseTimes":82,"./_isIndex":127,"./isArguments":170,"./isArray":171,"./isBuffer":173,"./isTypedArray":179}],50:[function(_dereq_,module,exports){
+},{"./_baseTimes":83,"./_isIndex":128,"./isArguments":171,"./isArray":172,"./isBuffer":174,"./isTypedArray":181}],50:[function(_dereq_,module,exports){
 /**
  * A specialized version of `_.map` for arrays without support for iteratee
  * shorthands.
@@ -49794,7 +49821,7 @@ function assignValue(object, key, value) {
 
 module.exports = assignValue;
 
-},{"./_baseAssignValue":58,"./eq":165}],55:[function(_dereq_,module,exports){
+},{"./_baseAssignValue":58,"./eq":166}],55:[function(_dereq_,module,exports){
 var eq = _dereq_('./eq');
 
 /**
@@ -49817,7 +49844,7 @@ function assocIndexOf(array, key) {
 
 module.exports = assocIndexOf;
 
-},{"./eq":165}],56:[function(_dereq_,module,exports){
+},{"./eq":166}],56:[function(_dereq_,module,exports){
 var copyObject = _dereq_('./_copyObject'),
     keys = _dereq_('./keys');
 
@@ -49836,7 +49863,7 @@ function baseAssign(object, source) {
 
 module.exports = baseAssign;
 
-},{"./_copyObject":96,"./keys":180}],57:[function(_dereq_,module,exports){
+},{"./_copyObject":97,"./keys":182}],57:[function(_dereq_,module,exports){
 var copyObject = _dereq_('./_copyObject'),
     keysIn = _dereq_('./keysIn');
 
@@ -49855,7 +49882,7 @@ function baseAssignIn(object, source) {
 
 module.exports = baseAssignIn;
 
-},{"./_copyObject":96,"./keysIn":181}],58:[function(_dereq_,module,exports){
+},{"./_copyObject":97,"./keysIn":183}],58:[function(_dereq_,module,exports){
 var defineProperty = _dereq_('./_defineProperty');
 
 /**
@@ -49882,7 +49909,7 @@ function baseAssignValue(object, key, value) {
 
 module.exports = baseAssignValue;
 
-},{"./_defineProperty":102}],59:[function(_dereq_,module,exports){
+},{"./_defineProperty":103}],59:[function(_dereq_,module,exports){
 var Stack = _dereq_('./_Stack'),
     arrayEach = _dereq_('./_arrayEach'),
     assignValue = _dereq_('./_assignValue'),
@@ -50037,7 +50064,7 @@ function baseClone(value, bitmask, customizer, key, object, stack) {
 
 module.exports = baseClone;
 
-},{"./_Stack":41,"./_arrayEach":47,"./_assignValue":54,"./_baseAssign":56,"./_baseAssignIn":57,"./_cloneBuffer":88,"./_copyArray":95,"./_copySymbols":97,"./_copySymbolsIn":98,"./_getAllKeys":107,"./_getAllKeysIn":108,"./_getTag":116,"./_initCloneArray":124,"./_initCloneByTag":125,"./_initCloneObject":126,"./isArray":171,"./isBuffer":173,"./isObject":176,"./keys":180}],60:[function(_dereq_,module,exports){
+},{"./_Stack":41,"./_arrayEach":47,"./_assignValue":54,"./_baseAssign":56,"./_baseAssignIn":57,"./_cloneBuffer":89,"./_copyArray":96,"./_copySymbols":98,"./_copySymbolsIn":99,"./_getAllKeys":108,"./_getAllKeysIn":109,"./_getTag":117,"./_initCloneArray":125,"./_initCloneByTag":126,"./_initCloneObject":127,"./isArray":172,"./isBuffer":174,"./isObject":178,"./keys":182}],60:[function(_dereq_,module,exports){
 var isObject = _dereq_('./isObject');
 
 /** Built-in value references. */
@@ -50069,7 +50096,7 @@ var baseCreate = (function() {
 
 module.exports = baseCreate;
 
-},{"./isObject":176}],61:[function(_dereq_,module,exports){
+},{"./isObject":178}],61:[function(_dereq_,module,exports){
 var baseForOwn = _dereq_('./_baseForOwn'),
     createBaseEach = _dereq_('./_createBaseEach');
 
@@ -50085,7 +50112,7 @@ var baseEach = createBaseEach(baseForOwn);
 
 module.exports = baseEach;
 
-},{"./_baseForOwn":64,"./_createBaseEach":100}],62:[function(_dereq_,module,exports){
+},{"./_baseForOwn":64,"./_createBaseEach":101}],62:[function(_dereq_,module,exports){
 var baseEach = _dereq_('./_baseEach');
 
 /**
@@ -50126,7 +50153,7 @@ var baseFor = createBaseFor();
 
 module.exports = baseFor;
 
-},{"./_createBaseFor":101}],64:[function(_dereq_,module,exports){
+},{"./_createBaseFor":102}],64:[function(_dereq_,module,exports){
 var baseFor = _dereq_('./_baseFor'),
     keys = _dereq_('./keys');
 
@@ -50144,7 +50171,7 @@ function baseForOwn(object, iteratee) {
 
 module.exports = baseForOwn;
 
-},{"./_baseFor":63,"./keys":180}],65:[function(_dereq_,module,exports){
+},{"./_baseFor":63,"./keys":182}],65:[function(_dereq_,module,exports){
 var castPath = _dereq_('./_castPath'),
     toKey = _dereq_('./_toKey');
 
@@ -50170,7 +50197,7 @@ function baseGet(object, path) {
 
 module.exports = baseGet;
 
-},{"./_castPath":86,"./_toKey":162}],66:[function(_dereq_,module,exports){
+},{"./_castPath":87,"./_toKey":163}],66:[function(_dereq_,module,exports){
 var arrayPush = _dereq_('./_arrayPush'),
     isArray = _dereq_('./isArray');
 
@@ -50192,7 +50219,7 @@ function baseGetAllKeys(object, keysFunc, symbolsFunc) {
 
 module.exports = baseGetAllKeys;
 
-},{"./_arrayPush":51,"./isArray":171}],67:[function(_dereq_,module,exports){
+},{"./_arrayPush":51,"./isArray":172}],67:[function(_dereq_,module,exports){
 var Symbol = _dereq_('./_Symbol'),
     getRawTag = _dereq_('./_getRawTag'),
     objectToString = _dereq_('./_objectToString');
@@ -50222,7 +50249,7 @@ function baseGetTag(value) {
 
 module.exports = baseGetTag;
 
-},{"./_Symbol":42,"./_getRawTag":113,"./_objectToString":150}],68:[function(_dereq_,module,exports){
+},{"./_Symbol":42,"./_getRawTag":114,"./_objectToString":151}],68:[function(_dereq_,module,exports){
 /**
  * The base implementation of `_.hasIn` without support for deep paths.
  *
@@ -50257,7 +50284,7 @@ function baseIsArguments(value) {
 
 module.exports = baseIsArguments;
 
-},{"./_baseGetTag":67,"./isObjectLike":177}],70:[function(_dereq_,module,exports){
+},{"./_baseGetTag":67,"./isObjectLike":179}],70:[function(_dereq_,module,exports){
 var baseIsEqualDeep = _dereq_('./_baseIsEqualDeep'),
     isObjectLike = _dereq_('./isObjectLike');
 
@@ -50287,7 +50314,7 @@ function baseIsEqual(value, other, bitmask, customizer, stack) {
 
 module.exports = baseIsEqual;
 
-},{"./_baseIsEqualDeep":71,"./isObjectLike":177}],71:[function(_dereq_,module,exports){
+},{"./_baseIsEqualDeep":71,"./isObjectLike":179}],71:[function(_dereq_,module,exports){
 var Stack = _dereq_('./_Stack'),
     equalArrays = _dereq_('./_equalArrays'),
     equalByTag = _dereq_('./_equalByTag'),
@@ -50372,7 +50399,7 @@ function baseIsEqualDeep(object, other, bitmask, customizer, equalFunc, stack) {
 
 module.exports = baseIsEqualDeep;
 
-},{"./_Stack":41,"./_equalArrays":103,"./_equalByTag":104,"./_equalObjects":105,"./_getTag":116,"./isArray":171,"./isBuffer":173,"./isTypedArray":179}],72:[function(_dereq_,module,exports){
+},{"./_Stack":41,"./_equalArrays":104,"./_equalByTag":105,"./_equalObjects":106,"./_getTag":117,"./isArray":172,"./isBuffer":174,"./isTypedArray":181}],72:[function(_dereq_,module,exports){
 var Stack = _dereq_('./_Stack'),
     baseIsEqual = _dereq_('./_baseIsEqual');
 
@@ -50485,7 +50512,7 @@ function baseIsNative(value) {
 
 module.exports = baseIsNative;
 
-},{"./_isMasked":130,"./_toSource":163,"./isFunction":174,"./isObject":176}],74:[function(_dereq_,module,exports){
+},{"./_isMasked":131,"./_toSource":164,"./isFunction":176,"./isObject":178}],74:[function(_dereq_,module,exports){
 var baseGetTag = _dereq_('./_baseGetTag'),
     isLength = _dereq_('./isLength'),
     isObjectLike = _dereq_('./isObjectLike');
@@ -50547,7 +50574,7 @@ function baseIsTypedArray(value) {
 
 module.exports = baseIsTypedArray;
 
-},{"./_baseGetTag":67,"./isLength":175,"./isObjectLike":177}],75:[function(_dereq_,module,exports){
+},{"./_baseGetTag":67,"./isLength":177,"./isObjectLike":179}],75:[function(_dereq_,module,exports){
 var baseMatches = _dereq_('./_baseMatches'),
     baseMatchesProperty = _dereq_('./_baseMatchesProperty'),
     identity = _dereq_('./identity'),
@@ -50580,7 +50607,7 @@ function baseIteratee(value) {
 
 module.exports = baseIteratee;
 
-},{"./_baseMatches":78,"./_baseMatchesProperty":79,"./identity":169,"./isArray":171,"./property":183}],76:[function(_dereq_,module,exports){
+},{"./_baseMatches":78,"./_baseMatchesProperty":79,"./identity":170,"./isArray":172,"./property":185}],76:[function(_dereq_,module,exports){
 var isPrototype = _dereq_('./_isPrototype'),
     nativeKeys = _dereq_('./_nativeKeys');
 
@@ -50612,7 +50639,7 @@ function baseKeys(object) {
 
 module.exports = baseKeys;
 
-},{"./_isPrototype":131,"./_nativeKeys":147}],77:[function(_dereq_,module,exports){
+},{"./_isPrototype":132,"./_nativeKeys":148}],77:[function(_dereq_,module,exports){
 var isObject = _dereq_('./isObject'),
     isPrototype = _dereq_('./_isPrototype'),
     nativeKeysIn = _dereq_('./_nativeKeysIn');
@@ -50647,7 +50674,7 @@ function baseKeysIn(object) {
 
 module.exports = baseKeysIn;
 
-},{"./_isPrototype":131,"./_nativeKeysIn":148,"./isObject":176}],78:[function(_dereq_,module,exports){
+},{"./_isPrototype":132,"./_nativeKeysIn":149,"./isObject":178}],78:[function(_dereq_,module,exports){
 var baseIsMatch = _dereq_('./_baseIsMatch'),
     getMatchData = _dereq_('./_getMatchData'),
     matchesStrictComparable = _dereq_('./_matchesStrictComparable');
@@ -50671,7 +50698,7 @@ function baseMatches(source) {
 
 module.exports = baseMatches;
 
-},{"./_baseIsMatch":72,"./_getMatchData":110,"./_matchesStrictComparable":144}],79:[function(_dereq_,module,exports){
+},{"./_baseIsMatch":72,"./_getMatchData":111,"./_matchesStrictComparable":145}],79:[function(_dereq_,module,exports){
 var baseIsEqual = _dereq_('./_baseIsEqual'),
     get = _dereq_('./get'),
     hasIn = _dereq_('./hasIn'),
@@ -50706,7 +50733,7 @@ function baseMatchesProperty(path, srcValue) {
 
 module.exports = baseMatchesProperty;
 
-},{"./_baseIsEqual":70,"./_isKey":128,"./_isStrictComparable":132,"./_matchesStrictComparable":144,"./_toKey":162,"./get":167,"./hasIn":168}],80:[function(_dereq_,module,exports){
+},{"./_baseIsEqual":70,"./_isKey":129,"./_isStrictComparable":133,"./_matchesStrictComparable":145,"./_toKey":163,"./get":168,"./hasIn":169}],80:[function(_dereq_,module,exports){
 /**
  * The base implementation of `_.property` without support for deep paths.
  *
@@ -50741,6 +50768,55 @@ function basePropertyDeep(path) {
 module.exports = basePropertyDeep;
 
 },{"./_baseGet":65}],82:[function(_dereq_,module,exports){
+var assignValue = _dereq_('./_assignValue'),
+    castPath = _dereq_('./_castPath'),
+    isIndex = _dereq_('./_isIndex'),
+    isObject = _dereq_('./isObject'),
+    toKey = _dereq_('./_toKey');
+
+/**
+ * The base implementation of `_.set`.
+ *
+ * @private
+ * @param {Object} object The object to modify.
+ * @param {Array|string} path The path of the property to set.
+ * @param {*} value The value to set.
+ * @param {Function} [customizer] The function to customize path creation.
+ * @returns {Object} Returns `object`.
+ */
+function baseSet(object, path, value, customizer) {
+  if (!isObject(object)) {
+    return object;
+  }
+  path = castPath(path, object);
+
+  var index = -1,
+      length = path.length,
+      lastIndex = length - 1,
+      nested = object;
+
+  while (nested != null && ++index < length) {
+    var key = toKey(path[index]),
+        newValue = value;
+
+    if (index != lastIndex) {
+      var objValue = nested[key];
+      newValue = customizer ? customizer(objValue, key, nested) : undefined;
+      if (newValue === undefined) {
+        newValue = isObject(objValue)
+          ? objValue
+          : (isIndex(path[index + 1]) ? [] : {});
+      }
+    }
+    assignValue(nested, key, newValue);
+    nested = nested[key];
+  }
+  return object;
+}
+
+module.exports = baseSet;
+
+},{"./_assignValue":54,"./_castPath":87,"./_isIndex":128,"./_toKey":163,"./isObject":178}],83:[function(_dereq_,module,exports){
 /**
  * The base implementation of `_.times` without support for iteratee shorthands
  * or max array length checks.
@@ -50762,7 +50838,7 @@ function baseTimes(n, iteratee) {
 
 module.exports = baseTimes;
 
-},{}],83:[function(_dereq_,module,exports){
+},{}],84:[function(_dereq_,module,exports){
 var Symbol = _dereq_('./_Symbol'),
     arrayMap = _dereq_('./_arrayMap'),
     isArray = _dereq_('./isArray'),
@@ -50801,7 +50877,7 @@ function baseToString(value) {
 
 module.exports = baseToString;
 
-},{"./_Symbol":42,"./_arrayMap":50,"./isArray":171,"./isSymbol":178}],84:[function(_dereq_,module,exports){
+},{"./_Symbol":42,"./_arrayMap":50,"./isArray":172,"./isSymbol":180}],85:[function(_dereq_,module,exports){
 /**
  * The base implementation of `_.unary` without support for storing metadata.
  *
@@ -50817,7 +50893,7 @@ function baseUnary(func) {
 
 module.exports = baseUnary;
 
-},{}],85:[function(_dereq_,module,exports){
+},{}],86:[function(_dereq_,module,exports){
 /**
  * Checks if a `cache` value for `key` exists.
  *
@@ -50832,7 +50908,7 @@ function cacheHas(cache, key) {
 
 module.exports = cacheHas;
 
-},{}],86:[function(_dereq_,module,exports){
+},{}],87:[function(_dereq_,module,exports){
 var isArray = _dereq_('./isArray'),
     isKey = _dereq_('./_isKey'),
     stringToPath = _dereq_('./_stringToPath'),
@@ -50855,7 +50931,7 @@ function castPath(value, object) {
 
 module.exports = castPath;
 
-},{"./_isKey":128,"./_stringToPath":161,"./isArray":171,"./toString":186}],87:[function(_dereq_,module,exports){
+},{"./_isKey":129,"./_stringToPath":162,"./isArray":172,"./toString":189}],88:[function(_dereq_,module,exports){
 var Uint8Array = _dereq_('./_Uint8Array');
 
 /**
@@ -50873,7 +50949,7 @@ function cloneArrayBuffer(arrayBuffer) {
 
 module.exports = cloneArrayBuffer;
 
-},{"./_Uint8Array":43}],88:[function(_dereq_,module,exports){
+},{"./_Uint8Array":43}],89:[function(_dereq_,module,exports){
 var root = _dereq_('./_root');
 
 /** Detect free variable `exports`. */
@@ -50910,7 +50986,7 @@ function cloneBuffer(buffer, isDeep) {
 
 module.exports = cloneBuffer;
 
-},{"./_root":152}],89:[function(_dereq_,module,exports){
+},{"./_root":153}],90:[function(_dereq_,module,exports){
 var cloneArrayBuffer = _dereq_('./_cloneArrayBuffer');
 
 /**
@@ -50928,7 +51004,7 @@ function cloneDataView(dataView, isDeep) {
 
 module.exports = cloneDataView;
 
-},{"./_cloneArrayBuffer":87}],90:[function(_dereq_,module,exports){
+},{"./_cloneArrayBuffer":88}],91:[function(_dereq_,module,exports){
 var addMapEntry = _dereq_('./_addMapEntry'),
     arrayReduce = _dereq_('./_arrayReduce'),
     mapToArray = _dereq_('./_mapToArray');
@@ -50952,7 +51028,7 @@ function cloneMap(map, isDeep, cloneFunc) {
 
 module.exports = cloneMap;
 
-},{"./_addMapEntry":45,"./_arrayReduce":52,"./_mapToArray":143}],91:[function(_dereq_,module,exports){
+},{"./_addMapEntry":45,"./_arrayReduce":52,"./_mapToArray":144}],92:[function(_dereq_,module,exports){
 /** Used to match `RegExp` flags from their coerced string values. */
 var reFlags = /\w*$/;
 
@@ -50971,7 +51047,7 @@ function cloneRegExp(regexp) {
 
 module.exports = cloneRegExp;
 
-},{}],92:[function(_dereq_,module,exports){
+},{}],93:[function(_dereq_,module,exports){
 var addSetEntry = _dereq_('./_addSetEntry'),
     arrayReduce = _dereq_('./_arrayReduce'),
     setToArray = _dereq_('./_setToArray');
@@ -50995,7 +51071,7 @@ function cloneSet(set, isDeep, cloneFunc) {
 
 module.exports = cloneSet;
 
-},{"./_addSetEntry":46,"./_arrayReduce":52,"./_setToArray":155}],93:[function(_dereq_,module,exports){
+},{"./_addSetEntry":46,"./_arrayReduce":52,"./_setToArray":156}],94:[function(_dereq_,module,exports){
 var Symbol = _dereq_('./_Symbol');
 
 /** Used to convert symbols to primitives and strings. */
@@ -51015,7 +51091,7 @@ function cloneSymbol(symbol) {
 
 module.exports = cloneSymbol;
 
-},{"./_Symbol":42}],94:[function(_dereq_,module,exports){
+},{"./_Symbol":42}],95:[function(_dereq_,module,exports){
 var cloneArrayBuffer = _dereq_('./_cloneArrayBuffer');
 
 /**
@@ -51033,7 +51109,7 @@ function cloneTypedArray(typedArray, isDeep) {
 
 module.exports = cloneTypedArray;
 
-},{"./_cloneArrayBuffer":87}],95:[function(_dereq_,module,exports){
+},{"./_cloneArrayBuffer":88}],96:[function(_dereq_,module,exports){
 /**
  * Copies the values of `source` to `array`.
  *
@@ -51055,7 +51131,7 @@ function copyArray(source, array) {
 
 module.exports = copyArray;
 
-},{}],96:[function(_dereq_,module,exports){
+},{}],97:[function(_dereq_,module,exports){
 var assignValue = _dereq_('./_assignValue'),
     baseAssignValue = _dereq_('./_baseAssignValue');
 
@@ -51097,7 +51173,7 @@ function copyObject(source, props, object, customizer) {
 
 module.exports = copyObject;
 
-},{"./_assignValue":54,"./_baseAssignValue":58}],97:[function(_dereq_,module,exports){
+},{"./_assignValue":54,"./_baseAssignValue":58}],98:[function(_dereq_,module,exports){
 var copyObject = _dereq_('./_copyObject'),
     getSymbols = _dereq_('./_getSymbols');
 
@@ -51115,7 +51191,7 @@ function copySymbols(source, object) {
 
 module.exports = copySymbols;
 
-},{"./_copyObject":96,"./_getSymbols":114}],98:[function(_dereq_,module,exports){
+},{"./_copyObject":97,"./_getSymbols":115}],99:[function(_dereq_,module,exports){
 var copyObject = _dereq_('./_copyObject'),
     getSymbolsIn = _dereq_('./_getSymbolsIn');
 
@@ -51133,7 +51209,7 @@ function copySymbolsIn(source, object) {
 
 module.exports = copySymbolsIn;
 
-},{"./_copyObject":96,"./_getSymbolsIn":115}],99:[function(_dereq_,module,exports){
+},{"./_copyObject":97,"./_getSymbolsIn":116}],100:[function(_dereq_,module,exports){
 var root = _dereq_('./_root');
 
 /** Used to detect overreaching core-js shims. */
@@ -51141,7 +51217,7 @@ var coreJsData = root['__core-js_shared__'];
 
 module.exports = coreJsData;
 
-},{"./_root":152}],100:[function(_dereq_,module,exports){
+},{"./_root":153}],101:[function(_dereq_,module,exports){
 var isArrayLike = _dereq_('./isArrayLike');
 
 /**
@@ -51175,7 +51251,7 @@ function createBaseEach(eachFunc, fromRight) {
 
 module.exports = createBaseEach;
 
-},{"./isArrayLike":172}],101:[function(_dereq_,module,exports){
+},{"./isArrayLike":173}],102:[function(_dereq_,module,exports){
 /**
  * Creates a base function for methods like `_.forIn` and `_.forOwn`.
  *
@@ -51202,7 +51278,7 @@ function createBaseFor(fromRight) {
 
 module.exports = createBaseFor;
 
-},{}],102:[function(_dereq_,module,exports){
+},{}],103:[function(_dereq_,module,exports){
 var getNative = _dereq_('./_getNative');
 
 var defineProperty = (function() {
@@ -51215,7 +51291,7 @@ var defineProperty = (function() {
 
 module.exports = defineProperty;
 
-},{"./_getNative":111}],103:[function(_dereq_,module,exports){
+},{"./_getNative":112}],104:[function(_dereq_,module,exports){
 var SetCache = _dereq_('./_SetCache'),
     arraySome = _dereq_('./_arraySome'),
     cacheHas = _dereq_('./_cacheHas');
@@ -51300,7 +51376,7 @@ function equalArrays(array, other, bitmask, customizer, equalFunc, stack) {
 
 module.exports = equalArrays;
 
-},{"./_SetCache":40,"./_arraySome":53,"./_cacheHas":85}],104:[function(_dereq_,module,exports){
+},{"./_SetCache":40,"./_arraySome":53,"./_cacheHas":86}],105:[function(_dereq_,module,exports){
 var Symbol = _dereq_('./_Symbol'),
     Uint8Array = _dereq_('./_Uint8Array'),
     eq = _dereq_('./eq'),
@@ -51414,7 +51490,7 @@ function equalByTag(object, other, tag, bitmask, customizer, equalFunc, stack) {
 
 module.exports = equalByTag;
 
-},{"./_Symbol":42,"./_Uint8Array":43,"./_equalArrays":103,"./_mapToArray":143,"./_setToArray":155,"./eq":165}],105:[function(_dereq_,module,exports){
+},{"./_Symbol":42,"./_Uint8Array":43,"./_equalArrays":104,"./_mapToArray":144,"./_setToArray":156,"./eq":166}],106:[function(_dereq_,module,exports){
 var getAllKeys = _dereq_('./_getAllKeys');
 
 /** Used to compose bitmasks for value comparisons. */
@@ -51505,7 +51581,7 @@ function equalObjects(object, other, bitmask, customizer, equalFunc, stack) {
 
 module.exports = equalObjects;
 
-},{"./_getAllKeys":107}],106:[function(_dereq_,module,exports){
+},{"./_getAllKeys":108}],107:[function(_dereq_,module,exports){
 (function (global){
 /** Detect free variable `global` from Node.js. */
 var freeGlobal = typeof global == 'object' && global && global.Object === Object && global;
@@ -51513,7 +51589,7 @@ var freeGlobal = typeof global == 'object' && global && global.Object === Object
 module.exports = freeGlobal;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],107:[function(_dereq_,module,exports){
+},{}],108:[function(_dereq_,module,exports){
 var baseGetAllKeys = _dereq_('./_baseGetAllKeys'),
     getSymbols = _dereq_('./_getSymbols'),
     keys = _dereq_('./keys');
@@ -51531,7 +51607,7 @@ function getAllKeys(object) {
 
 module.exports = getAllKeys;
 
-},{"./_baseGetAllKeys":66,"./_getSymbols":114,"./keys":180}],108:[function(_dereq_,module,exports){
+},{"./_baseGetAllKeys":66,"./_getSymbols":115,"./keys":182}],109:[function(_dereq_,module,exports){
 var baseGetAllKeys = _dereq_('./_baseGetAllKeys'),
     getSymbolsIn = _dereq_('./_getSymbolsIn'),
     keysIn = _dereq_('./keysIn');
@@ -51550,7 +51626,7 @@ function getAllKeysIn(object) {
 
 module.exports = getAllKeysIn;
 
-},{"./_baseGetAllKeys":66,"./_getSymbolsIn":115,"./keysIn":181}],109:[function(_dereq_,module,exports){
+},{"./_baseGetAllKeys":66,"./_getSymbolsIn":116,"./keysIn":183}],110:[function(_dereq_,module,exports){
 var isKeyable = _dereq_('./_isKeyable');
 
 /**
@@ -51570,7 +51646,7 @@ function getMapData(map, key) {
 
 module.exports = getMapData;
 
-},{"./_isKeyable":129}],110:[function(_dereq_,module,exports){
+},{"./_isKeyable":130}],111:[function(_dereq_,module,exports){
 var isStrictComparable = _dereq_('./_isStrictComparable'),
     keys = _dereq_('./keys');
 
@@ -51596,7 +51672,7 @@ function getMatchData(object) {
 
 module.exports = getMatchData;
 
-},{"./_isStrictComparable":132,"./keys":180}],111:[function(_dereq_,module,exports){
+},{"./_isStrictComparable":133,"./keys":182}],112:[function(_dereq_,module,exports){
 var baseIsNative = _dereq_('./_baseIsNative'),
     getValue = _dereq_('./_getValue');
 
@@ -51615,7 +51691,7 @@ function getNative(object, key) {
 
 module.exports = getNative;
 
-},{"./_baseIsNative":73,"./_getValue":117}],112:[function(_dereq_,module,exports){
+},{"./_baseIsNative":73,"./_getValue":118}],113:[function(_dereq_,module,exports){
 var overArg = _dereq_('./_overArg');
 
 /** Built-in value references. */
@@ -51623,7 +51699,7 @@ var getPrototype = overArg(Object.getPrototypeOf, Object);
 
 module.exports = getPrototype;
 
-},{"./_overArg":151}],113:[function(_dereq_,module,exports){
+},{"./_overArg":152}],114:[function(_dereq_,module,exports){
 var Symbol = _dereq_('./_Symbol');
 
 /** Used for built-in method references. */
@@ -51671,7 +51747,7 @@ function getRawTag(value) {
 
 module.exports = getRawTag;
 
-},{"./_Symbol":42}],114:[function(_dereq_,module,exports){
+},{"./_Symbol":42}],115:[function(_dereq_,module,exports){
 var arrayFilter = _dereq_('./_arrayFilter'),
     stubArray = _dereq_('./stubArray');
 
@@ -51703,7 +51779,7 @@ var getSymbols = !nativeGetSymbols ? stubArray : function(object) {
 
 module.exports = getSymbols;
 
-},{"./_arrayFilter":48,"./stubArray":184}],115:[function(_dereq_,module,exports){
+},{"./_arrayFilter":48,"./stubArray":187}],116:[function(_dereq_,module,exports){
 var arrayPush = _dereq_('./_arrayPush'),
     getPrototype = _dereq_('./_getPrototype'),
     getSymbols = _dereq_('./_getSymbols'),
@@ -51730,7 +51806,7 @@ var getSymbolsIn = !nativeGetSymbols ? stubArray : function(object) {
 
 module.exports = getSymbolsIn;
 
-},{"./_arrayPush":51,"./_getPrototype":112,"./_getSymbols":114,"./stubArray":184}],116:[function(_dereq_,module,exports){
+},{"./_arrayPush":51,"./_getPrototype":113,"./_getSymbols":115,"./stubArray":187}],117:[function(_dereq_,module,exports){
 var DataView = _dereq_('./_DataView'),
     Map = _dereq_('./_Map'),
     Promise = _dereq_('./_Promise'),
@@ -51790,7 +51866,7 @@ if ((DataView && getTag(new DataView(new ArrayBuffer(1))) != dataViewTag) ||
 
 module.exports = getTag;
 
-},{"./_DataView":33,"./_Map":36,"./_Promise":38,"./_Set":39,"./_WeakMap":44,"./_baseGetTag":67,"./_toSource":163}],117:[function(_dereq_,module,exports){
+},{"./_DataView":33,"./_Map":36,"./_Promise":38,"./_Set":39,"./_WeakMap":44,"./_baseGetTag":67,"./_toSource":164}],118:[function(_dereq_,module,exports){
 /**
  * Gets the value at `key` of `object`.
  *
@@ -51805,7 +51881,7 @@ function getValue(object, key) {
 
 module.exports = getValue;
 
-},{}],118:[function(_dereq_,module,exports){
+},{}],119:[function(_dereq_,module,exports){
 var castPath = _dereq_('./_castPath'),
     isArguments = _dereq_('./isArguments'),
     isArray = _dereq_('./isArray'),
@@ -51846,7 +51922,7 @@ function hasPath(object, path, hasFunc) {
 
 module.exports = hasPath;
 
-},{"./_castPath":86,"./_isIndex":127,"./_toKey":162,"./isArguments":170,"./isArray":171,"./isLength":175}],119:[function(_dereq_,module,exports){
+},{"./_castPath":87,"./_isIndex":128,"./_toKey":163,"./isArguments":171,"./isArray":172,"./isLength":177}],120:[function(_dereq_,module,exports){
 var nativeCreate = _dereq_('./_nativeCreate');
 
 /**
@@ -51863,7 +51939,7 @@ function hashClear() {
 
 module.exports = hashClear;
 
-},{"./_nativeCreate":146}],120:[function(_dereq_,module,exports){
+},{"./_nativeCreate":147}],121:[function(_dereq_,module,exports){
 /**
  * Removes `key` and its value from the hash.
  *
@@ -51882,7 +51958,7 @@ function hashDelete(key) {
 
 module.exports = hashDelete;
 
-},{}],121:[function(_dereq_,module,exports){
+},{}],122:[function(_dereq_,module,exports){
 var nativeCreate = _dereq_('./_nativeCreate');
 
 /** Used to stand-in for `undefined` hash values. */
@@ -51914,7 +51990,7 @@ function hashGet(key) {
 
 module.exports = hashGet;
 
-},{"./_nativeCreate":146}],122:[function(_dereq_,module,exports){
+},{"./_nativeCreate":147}],123:[function(_dereq_,module,exports){
 var nativeCreate = _dereq_('./_nativeCreate');
 
 /** Used for built-in method references. */
@@ -51939,7 +52015,7 @@ function hashHas(key) {
 
 module.exports = hashHas;
 
-},{"./_nativeCreate":146}],123:[function(_dereq_,module,exports){
+},{"./_nativeCreate":147}],124:[function(_dereq_,module,exports){
 var nativeCreate = _dereq_('./_nativeCreate');
 
 /** Used to stand-in for `undefined` hash values. */
@@ -51964,7 +52040,7 @@ function hashSet(key, value) {
 
 module.exports = hashSet;
 
-},{"./_nativeCreate":146}],124:[function(_dereq_,module,exports){
+},{"./_nativeCreate":147}],125:[function(_dereq_,module,exports){
 /** Used for built-in method references. */
 var objectProto = Object.prototype;
 
@@ -51992,7 +52068,7 @@ function initCloneArray(array) {
 
 module.exports = initCloneArray;
 
-},{}],125:[function(_dereq_,module,exports){
+},{}],126:[function(_dereq_,module,exports){
 var cloneArrayBuffer = _dereq_('./_cloneArrayBuffer'),
     cloneDataView = _dereq_('./_cloneDataView'),
     cloneMap = _dereq_('./_cloneMap'),
@@ -52074,7 +52150,7 @@ function initCloneByTag(object, tag, cloneFunc, isDeep) {
 
 module.exports = initCloneByTag;
 
-},{"./_cloneArrayBuffer":87,"./_cloneDataView":89,"./_cloneMap":90,"./_cloneRegExp":91,"./_cloneSet":92,"./_cloneSymbol":93,"./_cloneTypedArray":94}],126:[function(_dereq_,module,exports){
+},{"./_cloneArrayBuffer":88,"./_cloneDataView":90,"./_cloneMap":91,"./_cloneRegExp":92,"./_cloneSet":93,"./_cloneSymbol":94,"./_cloneTypedArray":95}],127:[function(_dereq_,module,exports){
 var baseCreate = _dereq_('./_baseCreate'),
     getPrototype = _dereq_('./_getPrototype'),
     isPrototype = _dereq_('./_isPrototype');
@@ -52094,7 +52170,7 @@ function initCloneObject(object) {
 
 module.exports = initCloneObject;
 
-},{"./_baseCreate":60,"./_getPrototype":112,"./_isPrototype":131}],127:[function(_dereq_,module,exports){
+},{"./_baseCreate":60,"./_getPrototype":113,"./_isPrototype":132}],128:[function(_dereq_,module,exports){
 /** Used as references for various `Number` constants. */
 var MAX_SAFE_INTEGER = 9007199254740991;
 
@@ -52118,7 +52194,7 @@ function isIndex(value, length) {
 
 module.exports = isIndex;
 
-},{}],128:[function(_dereq_,module,exports){
+},{}],129:[function(_dereq_,module,exports){
 var isArray = _dereq_('./isArray'),
     isSymbol = _dereq_('./isSymbol');
 
@@ -52149,7 +52225,7 @@ function isKey(value, object) {
 
 module.exports = isKey;
 
-},{"./isArray":171,"./isSymbol":178}],129:[function(_dereq_,module,exports){
+},{"./isArray":172,"./isSymbol":180}],130:[function(_dereq_,module,exports){
 /**
  * Checks if `value` is suitable for use as unique object key.
  *
@@ -52166,7 +52242,7 @@ function isKeyable(value) {
 
 module.exports = isKeyable;
 
-},{}],130:[function(_dereq_,module,exports){
+},{}],131:[function(_dereq_,module,exports){
 var coreJsData = _dereq_('./_coreJsData');
 
 /** Used to detect methods masquerading as native. */
@@ -52188,7 +52264,7 @@ function isMasked(func) {
 
 module.exports = isMasked;
 
-},{"./_coreJsData":99}],131:[function(_dereq_,module,exports){
+},{"./_coreJsData":100}],132:[function(_dereq_,module,exports){
 /** Used for built-in method references. */
 var objectProto = Object.prototype;
 
@@ -52208,7 +52284,7 @@ function isPrototype(value) {
 
 module.exports = isPrototype;
 
-},{}],132:[function(_dereq_,module,exports){
+},{}],133:[function(_dereq_,module,exports){
 var isObject = _dereq_('./isObject');
 
 /**
@@ -52225,7 +52301,7 @@ function isStrictComparable(value) {
 
 module.exports = isStrictComparable;
 
-},{"./isObject":176}],133:[function(_dereq_,module,exports){
+},{"./isObject":178}],134:[function(_dereq_,module,exports){
 /**
  * Removes all key-value entries from the list cache.
  *
@@ -52240,7 +52316,7 @@ function listCacheClear() {
 
 module.exports = listCacheClear;
 
-},{}],134:[function(_dereq_,module,exports){
+},{}],135:[function(_dereq_,module,exports){
 var assocIndexOf = _dereq_('./_assocIndexOf');
 
 /** Used for built-in method references. */
@@ -52277,7 +52353,7 @@ function listCacheDelete(key) {
 
 module.exports = listCacheDelete;
 
-},{"./_assocIndexOf":55}],135:[function(_dereq_,module,exports){
+},{"./_assocIndexOf":55}],136:[function(_dereq_,module,exports){
 var assocIndexOf = _dereq_('./_assocIndexOf');
 
 /**
@@ -52298,7 +52374,7 @@ function listCacheGet(key) {
 
 module.exports = listCacheGet;
 
-},{"./_assocIndexOf":55}],136:[function(_dereq_,module,exports){
+},{"./_assocIndexOf":55}],137:[function(_dereq_,module,exports){
 var assocIndexOf = _dereq_('./_assocIndexOf');
 
 /**
@@ -52316,7 +52392,7 @@ function listCacheHas(key) {
 
 module.exports = listCacheHas;
 
-},{"./_assocIndexOf":55}],137:[function(_dereq_,module,exports){
+},{"./_assocIndexOf":55}],138:[function(_dereq_,module,exports){
 var assocIndexOf = _dereq_('./_assocIndexOf');
 
 /**
@@ -52344,7 +52420,7 @@ function listCacheSet(key, value) {
 
 module.exports = listCacheSet;
 
-},{"./_assocIndexOf":55}],138:[function(_dereq_,module,exports){
+},{"./_assocIndexOf":55}],139:[function(_dereq_,module,exports){
 var Hash = _dereq_('./_Hash'),
     ListCache = _dereq_('./_ListCache'),
     Map = _dereq_('./_Map');
@@ -52367,7 +52443,7 @@ function mapCacheClear() {
 
 module.exports = mapCacheClear;
 
-},{"./_Hash":34,"./_ListCache":35,"./_Map":36}],139:[function(_dereq_,module,exports){
+},{"./_Hash":34,"./_ListCache":35,"./_Map":36}],140:[function(_dereq_,module,exports){
 var getMapData = _dereq_('./_getMapData');
 
 /**
@@ -52387,7 +52463,7 @@ function mapCacheDelete(key) {
 
 module.exports = mapCacheDelete;
 
-},{"./_getMapData":109}],140:[function(_dereq_,module,exports){
+},{"./_getMapData":110}],141:[function(_dereq_,module,exports){
 var getMapData = _dereq_('./_getMapData');
 
 /**
@@ -52405,7 +52481,7 @@ function mapCacheGet(key) {
 
 module.exports = mapCacheGet;
 
-},{"./_getMapData":109}],141:[function(_dereq_,module,exports){
+},{"./_getMapData":110}],142:[function(_dereq_,module,exports){
 var getMapData = _dereq_('./_getMapData');
 
 /**
@@ -52423,7 +52499,7 @@ function mapCacheHas(key) {
 
 module.exports = mapCacheHas;
 
-},{"./_getMapData":109}],142:[function(_dereq_,module,exports){
+},{"./_getMapData":110}],143:[function(_dereq_,module,exports){
 var getMapData = _dereq_('./_getMapData');
 
 /**
@@ -52447,7 +52523,7 @@ function mapCacheSet(key, value) {
 
 module.exports = mapCacheSet;
 
-},{"./_getMapData":109}],143:[function(_dereq_,module,exports){
+},{"./_getMapData":110}],144:[function(_dereq_,module,exports){
 /**
  * Converts `map` to its key-value pairs.
  *
@@ -52467,7 +52543,7 @@ function mapToArray(map) {
 
 module.exports = mapToArray;
 
-},{}],144:[function(_dereq_,module,exports){
+},{}],145:[function(_dereq_,module,exports){
 /**
  * A specialized version of `matchesProperty` for source values suitable
  * for strict equality comparisons, i.e. `===`.
@@ -52489,7 +52565,7 @@ function matchesStrictComparable(key, srcValue) {
 
 module.exports = matchesStrictComparable;
 
-},{}],145:[function(_dereq_,module,exports){
+},{}],146:[function(_dereq_,module,exports){
 var memoize = _dereq_('./memoize');
 
 /** Used as the maximum memoize cache size. */
@@ -52517,7 +52593,7 @@ function memoizeCapped(func) {
 
 module.exports = memoizeCapped;
 
-},{"./memoize":182}],146:[function(_dereq_,module,exports){
+},{"./memoize":184}],147:[function(_dereq_,module,exports){
 var getNative = _dereq_('./_getNative');
 
 /* Built-in method references that are verified to be native. */
@@ -52525,7 +52601,7 @@ var nativeCreate = getNative(Object, 'create');
 
 module.exports = nativeCreate;
 
-},{"./_getNative":111}],147:[function(_dereq_,module,exports){
+},{"./_getNative":112}],148:[function(_dereq_,module,exports){
 var overArg = _dereq_('./_overArg');
 
 /* Built-in method references for those with the same name as other `lodash` methods. */
@@ -52533,7 +52609,7 @@ var nativeKeys = overArg(Object.keys, Object);
 
 module.exports = nativeKeys;
 
-},{"./_overArg":151}],148:[function(_dereq_,module,exports){
+},{"./_overArg":152}],149:[function(_dereq_,module,exports){
 /**
  * This function is like
  * [`Object.keys`](http://ecma-international.org/ecma-262/7.0/#sec-object.keys)
@@ -52555,7 +52631,7 @@ function nativeKeysIn(object) {
 
 module.exports = nativeKeysIn;
 
-},{}],149:[function(_dereq_,module,exports){
+},{}],150:[function(_dereq_,module,exports){
 var freeGlobal = _dereq_('./_freeGlobal');
 
 /** Detect free variable `exports`. */
@@ -52579,7 +52655,7 @@ var nodeUtil = (function() {
 
 module.exports = nodeUtil;
 
-},{"./_freeGlobal":106}],150:[function(_dereq_,module,exports){
+},{"./_freeGlobal":107}],151:[function(_dereq_,module,exports){
 /** Used for built-in method references. */
 var objectProto = Object.prototype;
 
@@ -52603,7 +52679,7 @@ function objectToString(value) {
 
 module.exports = objectToString;
 
-},{}],151:[function(_dereq_,module,exports){
+},{}],152:[function(_dereq_,module,exports){
 /**
  * Creates a unary function that invokes `func` with its argument transformed.
  *
@@ -52620,7 +52696,7 @@ function overArg(func, transform) {
 
 module.exports = overArg;
 
-},{}],152:[function(_dereq_,module,exports){
+},{}],153:[function(_dereq_,module,exports){
 var freeGlobal = _dereq_('./_freeGlobal');
 
 /** Detect free variable `self`. */
@@ -52631,7 +52707,7 @@ var root = freeGlobal || freeSelf || Function('return this')();
 
 module.exports = root;
 
-},{"./_freeGlobal":106}],153:[function(_dereq_,module,exports){
+},{"./_freeGlobal":107}],154:[function(_dereq_,module,exports){
 /** Used to stand-in for `undefined` hash values. */
 var HASH_UNDEFINED = '__lodash_hash_undefined__';
 
@@ -52652,7 +52728,7 @@ function setCacheAdd(value) {
 
 module.exports = setCacheAdd;
 
-},{}],154:[function(_dereq_,module,exports){
+},{}],155:[function(_dereq_,module,exports){
 /**
  * Checks if `value` is in the array cache.
  *
@@ -52668,7 +52744,7 @@ function setCacheHas(value) {
 
 module.exports = setCacheHas;
 
-},{}],155:[function(_dereq_,module,exports){
+},{}],156:[function(_dereq_,module,exports){
 /**
  * Converts `set` to an array of its values.
  *
@@ -52688,7 +52764,7 @@ function setToArray(set) {
 
 module.exports = setToArray;
 
-},{}],156:[function(_dereq_,module,exports){
+},{}],157:[function(_dereq_,module,exports){
 var ListCache = _dereq_('./_ListCache');
 
 /**
@@ -52705,7 +52781,7 @@ function stackClear() {
 
 module.exports = stackClear;
 
-},{"./_ListCache":35}],157:[function(_dereq_,module,exports){
+},{"./_ListCache":35}],158:[function(_dereq_,module,exports){
 /**
  * Removes `key` and its value from the stack.
  *
@@ -52725,7 +52801,7 @@ function stackDelete(key) {
 
 module.exports = stackDelete;
 
-},{}],158:[function(_dereq_,module,exports){
+},{}],159:[function(_dereq_,module,exports){
 /**
  * Gets the stack value for `key`.
  *
@@ -52741,7 +52817,7 @@ function stackGet(key) {
 
 module.exports = stackGet;
 
-},{}],159:[function(_dereq_,module,exports){
+},{}],160:[function(_dereq_,module,exports){
 /**
  * Checks if a stack value for `key` exists.
  *
@@ -52757,7 +52833,7 @@ function stackHas(key) {
 
 module.exports = stackHas;
 
-},{}],160:[function(_dereq_,module,exports){
+},{}],161:[function(_dereq_,module,exports){
 var ListCache = _dereq_('./_ListCache'),
     Map = _dereq_('./_Map'),
     MapCache = _dereq_('./_MapCache');
@@ -52793,7 +52869,7 @@ function stackSet(key, value) {
 
 module.exports = stackSet;
 
-},{"./_ListCache":35,"./_Map":36,"./_MapCache":37}],161:[function(_dereq_,module,exports){
+},{"./_ListCache":35,"./_Map":36,"./_MapCache":37}],162:[function(_dereq_,module,exports){
 var memoizeCapped = _dereq_('./_memoizeCapped');
 
 /** Used to match property names within property paths. */
@@ -52823,7 +52899,7 @@ var stringToPath = memoizeCapped(function(string) {
 
 module.exports = stringToPath;
 
-},{"./_memoizeCapped":145}],162:[function(_dereq_,module,exports){
+},{"./_memoizeCapped":146}],163:[function(_dereq_,module,exports){
 var isSymbol = _dereq_('./isSymbol');
 
 /** Used as references for various `Number` constants. */
@@ -52846,7 +52922,7 @@ function toKey(value) {
 
 module.exports = toKey;
 
-},{"./isSymbol":178}],163:[function(_dereq_,module,exports){
+},{"./isSymbol":180}],164:[function(_dereq_,module,exports){
 /** Used for built-in method references. */
 var funcProto = Function.prototype;
 
@@ -52874,7 +52950,7 @@ function toSource(func) {
 
 module.exports = toSource;
 
-},{}],164:[function(_dereq_,module,exports){
+},{}],165:[function(_dereq_,module,exports){
 var baseClone = _dereq_('./_baseClone');
 
 /** Used to compose bitmasks for cloning. */
@@ -52905,7 +52981,7 @@ function cloneDeep(value) {
 
 module.exports = cloneDeep;
 
-},{"./_baseClone":59}],165:[function(_dereq_,module,exports){
+},{"./_baseClone":59}],166:[function(_dereq_,module,exports){
 /**
  * Performs a
  * [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
@@ -52944,7 +53020,7 @@ function eq(value, other) {
 
 module.exports = eq;
 
-},{}],166:[function(_dereq_,module,exports){
+},{}],167:[function(_dereq_,module,exports){
 var arrayFilter = _dereq_('./_arrayFilter'),
     baseFilter = _dereq_('./_baseFilter'),
     baseIteratee = _dereq_('./_baseIteratee'),
@@ -52994,7 +53070,7 @@ function filter(collection, predicate) {
 
 module.exports = filter;
 
-},{"./_arrayFilter":48,"./_baseFilter":62,"./_baseIteratee":75,"./isArray":171}],167:[function(_dereq_,module,exports){
+},{"./_arrayFilter":48,"./_baseFilter":62,"./_baseIteratee":75,"./isArray":172}],168:[function(_dereq_,module,exports){
 var baseGet = _dereq_('./_baseGet');
 
 /**
@@ -53029,7 +53105,7 @@ function get(object, path, defaultValue) {
 
 module.exports = get;
 
-},{"./_baseGet":65}],168:[function(_dereq_,module,exports){
+},{"./_baseGet":65}],169:[function(_dereq_,module,exports){
 var baseHasIn = _dereq_('./_baseHasIn'),
     hasPath = _dereq_('./_hasPath');
 
@@ -53065,7 +53141,7 @@ function hasIn(object, path) {
 
 module.exports = hasIn;
 
-},{"./_baseHasIn":68,"./_hasPath":118}],169:[function(_dereq_,module,exports){
+},{"./_baseHasIn":68,"./_hasPath":119}],170:[function(_dereq_,module,exports){
 /**
  * This method returns the first argument it receives.
  *
@@ -53088,7 +53164,7 @@ function identity(value) {
 
 module.exports = identity;
 
-},{}],170:[function(_dereq_,module,exports){
+},{}],171:[function(_dereq_,module,exports){
 var baseIsArguments = _dereq_('./_baseIsArguments'),
     isObjectLike = _dereq_('./isObjectLike');
 
@@ -53126,7 +53202,7 @@ var isArguments = baseIsArguments(function() { return arguments; }()) ? baseIsAr
 
 module.exports = isArguments;
 
-},{"./_baseIsArguments":69,"./isObjectLike":177}],171:[function(_dereq_,module,exports){
+},{"./_baseIsArguments":69,"./isObjectLike":179}],172:[function(_dereq_,module,exports){
 /**
  * Checks if `value` is classified as an `Array` object.
  *
@@ -53154,7 +53230,7 @@ var isArray = Array.isArray;
 
 module.exports = isArray;
 
-},{}],172:[function(_dereq_,module,exports){
+},{}],173:[function(_dereq_,module,exports){
 var isFunction = _dereq_('./isFunction'),
     isLength = _dereq_('./isLength');
 
@@ -53189,7 +53265,7 @@ function isArrayLike(value) {
 
 module.exports = isArrayLike;
 
-},{"./isFunction":174,"./isLength":175}],173:[function(_dereq_,module,exports){
+},{"./isFunction":176,"./isLength":177}],174:[function(_dereq_,module,exports){
 var root = _dereq_('./_root'),
     stubFalse = _dereq_('./stubFalse');
 
@@ -53229,7 +53305,44 @@ var isBuffer = nativeIsBuffer || stubFalse;
 
 module.exports = isBuffer;
 
-},{"./_root":152,"./stubFalse":185}],174:[function(_dereq_,module,exports){
+},{"./_root":153,"./stubFalse":188}],175:[function(_dereq_,module,exports){
+var baseIsEqual = _dereq_('./_baseIsEqual');
+
+/**
+ * Performs a deep comparison between two values to determine if they are
+ * equivalent.
+ *
+ * **Note:** This method supports comparing arrays, array buffers, booleans,
+ * date objects, error objects, maps, numbers, `Object` objects, regexes,
+ * sets, strings, symbols, and typed arrays. `Object` objects are compared
+ * by their own, not inherited, enumerable properties. Functions and DOM
+ * nodes are compared by strict equality, i.e. `===`.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Lang
+ * @param {*} value The value to compare.
+ * @param {*} other The other value to compare.
+ * @returns {boolean} Returns `true` if the values are equivalent, else `false`.
+ * @example
+ *
+ * var object = { 'a': 1 };
+ * var other = { 'a': 1 };
+ *
+ * _.isEqual(object, other);
+ * // => true
+ *
+ * object === other;
+ * // => false
+ */
+function isEqual(value, other) {
+  return baseIsEqual(value, other);
+}
+
+module.exports = isEqual;
+
+},{"./_baseIsEqual":70}],176:[function(_dereq_,module,exports){
 var baseGetTag = _dereq_('./_baseGetTag'),
     isObject = _dereq_('./isObject');
 
@@ -53268,7 +53381,7 @@ function isFunction(value) {
 
 module.exports = isFunction;
 
-},{"./_baseGetTag":67,"./isObject":176}],175:[function(_dereq_,module,exports){
+},{"./_baseGetTag":67,"./isObject":178}],177:[function(_dereq_,module,exports){
 /** Used as references for various `Number` constants. */
 var MAX_SAFE_INTEGER = 9007199254740991;
 
@@ -53305,7 +53418,7 @@ function isLength(value) {
 
 module.exports = isLength;
 
-},{}],176:[function(_dereq_,module,exports){
+},{}],178:[function(_dereq_,module,exports){
 /**
  * Checks if `value` is the
  * [language type](http://www.ecma-international.org/ecma-262/7.0/#sec-ecmascript-language-types)
@@ -53338,7 +53451,7 @@ function isObject(value) {
 
 module.exports = isObject;
 
-},{}],177:[function(_dereq_,module,exports){
+},{}],179:[function(_dereq_,module,exports){
 /**
  * Checks if `value` is object-like. A value is object-like if it's not `null`
  * and has a `typeof` result of "object".
@@ -53369,7 +53482,7 @@ function isObjectLike(value) {
 
 module.exports = isObjectLike;
 
-},{}],178:[function(_dereq_,module,exports){
+},{}],180:[function(_dereq_,module,exports){
 var baseGetTag = _dereq_('./_baseGetTag'),
     isObjectLike = _dereq_('./isObjectLike');
 
@@ -53400,7 +53513,7 @@ function isSymbol(value) {
 
 module.exports = isSymbol;
 
-},{"./_baseGetTag":67,"./isObjectLike":177}],179:[function(_dereq_,module,exports){
+},{"./_baseGetTag":67,"./isObjectLike":179}],181:[function(_dereq_,module,exports){
 var baseIsTypedArray = _dereq_('./_baseIsTypedArray'),
     baseUnary = _dereq_('./_baseUnary'),
     nodeUtil = _dereq_('./_nodeUtil');
@@ -53429,7 +53542,7 @@ var isTypedArray = nodeIsTypedArray ? baseUnary(nodeIsTypedArray) : baseIsTypedA
 
 module.exports = isTypedArray;
 
-},{"./_baseIsTypedArray":74,"./_baseUnary":84,"./_nodeUtil":149}],180:[function(_dereq_,module,exports){
+},{"./_baseIsTypedArray":74,"./_baseUnary":85,"./_nodeUtil":150}],182:[function(_dereq_,module,exports){
 var arrayLikeKeys = _dereq_('./_arrayLikeKeys'),
     baseKeys = _dereq_('./_baseKeys'),
     isArrayLike = _dereq_('./isArrayLike');
@@ -53468,7 +53581,7 @@ function keys(object) {
 
 module.exports = keys;
 
-},{"./_arrayLikeKeys":49,"./_baseKeys":76,"./isArrayLike":172}],181:[function(_dereq_,module,exports){
+},{"./_arrayLikeKeys":49,"./_baseKeys":76,"./isArrayLike":173}],183:[function(_dereq_,module,exports){
 var arrayLikeKeys = _dereq_('./_arrayLikeKeys'),
     baseKeysIn = _dereq_('./_baseKeysIn'),
     isArrayLike = _dereq_('./isArrayLike');
@@ -53502,7 +53615,7 @@ function keysIn(object) {
 
 module.exports = keysIn;
 
-},{"./_arrayLikeKeys":49,"./_baseKeysIn":77,"./isArrayLike":172}],182:[function(_dereq_,module,exports){
+},{"./_arrayLikeKeys":49,"./_baseKeysIn":77,"./isArrayLike":173}],184:[function(_dereq_,module,exports){
 var MapCache = _dereq_('./_MapCache');
 
 /** Error message constants. */
@@ -53577,7 +53690,7 @@ memoize.Cache = MapCache;
 
 module.exports = memoize;
 
-},{"./_MapCache":37}],183:[function(_dereq_,module,exports){
+},{"./_MapCache":37}],185:[function(_dereq_,module,exports){
 var baseProperty = _dereq_('./_baseProperty'),
     basePropertyDeep = _dereq_('./_basePropertyDeep'),
     isKey = _dereq_('./_isKey'),
@@ -53611,7 +53724,44 @@ function property(path) {
 
 module.exports = property;
 
-},{"./_baseProperty":80,"./_basePropertyDeep":81,"./_isKey":128,"./_toKey":162}],184:[function(_dereq_,module,exports){
+},{"./_baseProperty":80,"./_basePropertyDeep":81,"./_isKey":129,"./_toKey":163}],186:[function(_dereq_,module,exports){
+var baseSet = _dereq_('./_baseSet');
+
+/**
+ * Sets the value at `path` of `object`. If a portion of `path` doesn't exist,
+ * it's created. Arrays are created for missing index properties while objects
+ * are created for all other missing properties. Use `_.setWith` to customize
+ * `path` creation.
+ *
+ * **Note:** This method mutates `object`.
+ *
+ * @static
+ * @memberOf _
+ * @since 3.7.0
+ * @category Object
+ * @param {Object} object The object to modify.
+ * @param {Array|string} path The path of the property to set.
+ * @param {*} value The value to set.
+ * @returns {Object} Returns `object`.
+ * @example
+ *
+ * var object = { 'a': [{ 'b': { 'c': 3 } }] };
+ *
+ * _.set(object, 'a[0].b.c', 4);
+ * console.log(object.a[0].b.c);
+ * // => 4
+ *
+ * _.set(object, ['x', '0', 'y', 'z'], 5);
+ * console.log(object.x[0].y.z);
+ * // => 5
+ */
+function set(object, path, value) {
+  return object == null ? object : baseSet(object, path, value);
+}
+
+module.exports = set;
+
+},{"./_baseSet":82}],187:[function(_dereq_,module,exports){
 /**
  * This method returns a new empty array.
  *
@@ -53636,7 +53786,7 @@ function stubArray() {
 
 module.exports = stubArray;
 
-},{}],185:[function(_dereq_,module,exports){
+},{}],188:[function(_dereq_,module,exports){
 /**
  * This method returns `false`.
  *
@@ -53656,7 +53806,7 @@ function stubFalse() {
 
 module.exports = stubFalse;
 
-},{}],186:[function(_dereq_,module,exports){
+},{}],189:[function(_dereq_,module,exports){
 var baseToString = _dereq_('./_baseToString');
 
 /**
@@ -53686,7 +53836,7 @@ function toString(value) {
 
 module.exports = toString;
 
-},{"./_baseToString":83}],187:[function(_dereq_,module,exports){
+},{"./_baseToString":84}],190:[function(_dereq_,module,exports){
 //! moment.js
 //! version : 2.18.1
 //! authors : Tim Wood, Iskren Chernev, Moment.js contributors
@@ -58151,7 +58301,7 @@ return hooks;
 
 })));
 
-},{}],188:[function(_dereq_,module,exports){
+},{}],191:[function(_dereq_,module,exports){
 (function (global){
 /*! Native Promise Only
     v0.8.1 (c) Kyle Simpson
@@ -58528,7 +58678,7 @@ return hooks;
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],189:[function(_dereq_,module,exports){
+},{}],192:[function(_dereq_,module,exports){
 /**!
  * AngularJS file upload directives and services. Supports: file upload/drop/paste, resume, cancel/abort,
  * progress, resize, thumbnail, preview, validation and CORS
@@ -61428,10 +61578,10 @@ ngFileUpload.service('UploadExif', ['UploadResize', '$q', function (UploadResize
 }]);
 
 
-},{}],190:[function(_dereq_,module,exports){
+},{}],193:[function(_dereq_,module,exports){
 _dereq_('./dist/ng-file-upload-all');
 module.exports = 'ngFileUpload';
-},{"./dist/ng-file-upload-all":189}],191:[function(_dereq_,module,exports){
+},{"./dist/ng-file-upload-all":192}],194:[function(_dereq_,module,exports){
 module.exports = function (obj) {
     if (!obj || typeof obj !== 'object') return obj;
     
@@ -61468,28 +61618,12 @@ var isArray = Array.isArray || function (xs) {
     return {}.toString.call(xs) === '[object Array]';
 };
 
-},{}],192:[function(_dereq_,module,exports){
-(function (root, factory) {
-  if (typeof define === 'function' && define.amd) {
-    // AMD. Register as an anonymous module unless amdModuleId is set
-    define([], function () {
-      return (root['SignaturePad'] = factory());
-    });
-  } else if (typeof exports === 'object') {
-    // Node. Does not work with strict CommonJS, but
-    // only CommonJS-like environments that support module.exports,
-    // like Node.
-    module.exports = factory();
-  } else {
-    root['SignaturePad'] = factory();
-  }
-}(this, function () {
-
+},{}],195:[function(_dereq_,module,exports){
 /*!
- * Signature Pad v1.5.3
+ * Signature Pad v1.6.0
  * https://github.com/szimek/signature_pad
  *
- * Copyright 2016 Szymon Nowak
+ * Copyright 2017 Szymon Nowak
  * Released under the MIT license
  *
  * The main idea and some parts of the code (e.g. drawing variable width Bézier curve) are taken from:
@@ -61502,364 +61636,520 @@ var isArray = Array.isArray || function (xs) {
  * http://www.lemoda.net/maths/bezier-length/index.html
  *
  */
-var SignaturePad = (function (document) {
-    "use strict";
 
-    var SignaturePad = function (canvas, options) {
-        var self = this,
-            opts = options || {};
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+	typeof define === 'function' && define.amd ? define(factory) :
+	(global.SignaturePad = factory());
+}(this, (function () { 'use strict';
 
-        this.velocityFilterWeight = opts.velocityFilterWeight || 0.7;
-        this.minWidth = opts.minWidth || 0.5;
-        this.maxWidth = opts.maxWidth || 2.5;
-        this.dotSize = opts.dotSize || function () {
-            return (this.minWidth + this.maxWidth) / 2;
-        };
-        this.penColor = opts.penColor || "black";
-        this.backgroundColor = opts.backgroundColor || "rgba(0,0,0,0)";
-        this.onEnd = opts.onEnd;
-        this.onBegin = opts.onBegin;
+function Point(x, y, time) {
+  this.x = x;
+  this.y = y;
+  this.time = time || new Date().getTime();
+}
 
-        this._canvas = canvas;
-        this._ctx = canvas.getContext("2d");
-        this.clear();
+Point.prototype.velocityFrom = function (start) {
+  return this.time !== start.time ? this.distanceTo(start) / (this.time - start.time) : 1;
+};
 
-        // we need add these inline so they are available to unbind while still having
-        //  access to 'self' we could use _.bind but it's not worth adding a dependency
-        this._handleMouseDown = function (event) {
-            if (event.which === 1) {
-                self._mouseButtonDown = true;
-                self._strokeBegin(event);
-            }
-        };
+Point.prototype.distanceTo = function (start) {
+  return Math.sqrt(Math.pow(this.x - start.x, 2) + Math.pow(this.y - start.y, 2));
+};
 
-        this._handleMouseMove = function (event) {
-            if (self._mouseButtonDown) {
-                self._strokeUpdate(event);
-            }
-        };
+function Bezier(startPoint, control1, control2, endPoint) {
+  this.startPoint = startPoint;
+  this.control1 = control1;
+  this.control2 = control2;
+  this.endPoint = endPoint;
+}
 
-        this._handleMouseUp = function (event) {
-            if (event.which === 1 && self._mouseButtonDown) {
-                self._mouseButtonDown = false;
-                self._strokeEnd(event);
-            }
-        };
+// Returns approximated length.
+Bezier.prototype.length = function () {
+  var steps = 10;
+  var length = 0;
+  var px = void 0;
+  var py = void 0;
 
-        this._handleTouchStart = function (event) {
-            if (event.targetTouches.length == 1) {
-                var touch = event.changedTouches[0];
-                self._strokeBegin(touch);
-             }
-        };
+  for (var i = 0; i <= steps; i += 1) {
+    var t = i / steps;
+    var cx = this._point(t, this.startPoint.x, this.control1.x, this.control2.x, this.endPoint.x);
+    var cy = this._point(t, this.startPoint.y, this.control1.y, this.control2.y, this.endPoint.y);
+    if (i > 0) {
+      var xdiff = cx - px;
+      var ydiff = cy - py;
+      length += Math.sqrt(xdiff * xdiff + ydiff * ydiff);
+    }
+    px = cx;
+    py = cy;
+  }
 
-        this._handleTouchMove = function (event) {
-            // Prevent scrolling.
-            event.preventDefault();
+  return length;
+};
 
-            var touch = event.targetTouches[0];
-            self._strokeUpdate(touch);
-        };
+/* eslint-disable no-multi-spaces, space-in-parens */
+Bezier.prototype._point = function (t, start, c1, c2, end) {
+  return start * (1.0 - t) * (1.0 - t) * (1.0 - t) + 3.0 * c1 * (1.0 - t) * (1.0 - t) * t + 3.0 * c2 * (1.0 - t) * t * t + end * t * t * t;
+};
 
-        this._handleTouchEnd = function (event) {
-            var wasCanvasTouched = event.target === self._canvas;
-            if (wasCanvasTouched) {
-                event.preventDefault();
-                self._strokeEnd(event);
-            }
-        };
+function SignaturePad(canvas, options) {
+  var self = this;
+  var opts = options || {};
 
-        this._handleMouseEvents();
-        this._handleTouchEvents();
-    };
+  this.velocityFilterWeight = opts.velocityFilterWeight || 0.7;
+  this.minWidth = opts.minWidth || 0.5;
+  this.maxWidth = opts.maxWidth || 2.5;
+  this.dotSize = opts.dotSize || function () {
+    return (this.minWidth + this.maxWidth) / 2;
+  };
+  this.penColor = opts.penColor || 'black';
+  this.backgroundColor = opts.backgroundColor || 'rgba(0,0,0,0)';
+  this.onBegin = opts.onBegin;
+  this.onEnd = opts.onEnd;
 
-    SignaturePad.prototype.clear = function () {
-        var ctx = this._ctx,
-            canvas = this._canvas;
+  this._canvas = canvas;
+  this._ctx = canvas.getContext('2d');
+  this.clear();
 
-        ctx.fillStyle = this.backgroundColor;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        this._reset();
-    };
+  // We need add these inline so they are available to unbind while still having
+  // access to 'self' we could use _.bind but it's not worth adding a dependency.
+  this._handleMouseDown = function (event) {
+    if (event.which === 1) {
+      self._mouseButtonDown = true;
+      self._strokeBegin(event);
+    }
+  };
 
-    SignaturePad.prototype.toDataURL = function (imageType, quality) {
-        var canvas = this._canvas;
-        return canvas.toDataURL.apply(canvas, arguments);
-    };
+  this._handleMouseMove = function (event) {
+    if (self._mouseButtonDown) {
+      self._strokeUpdate(event);
+    }
+  };
 
-    SignaturePad.prototype.fromDataURL = function (dataUrl) {
-        var self = this,
-            image = new Image(),
-            ratio = window.devicePixelRatio || 1,
-            width = this._canvas.width / ratio,
-            height = this._canvas.height / ratio;
+  this._handleMouseUp = function (event) {
+    if (event.which === 1 && self._mouseButtonDown) {
+      self._mouseButtonDown = false;
+      self._strokeEnd(event);
+    }
+  };
 
-        this._reset();
-        image.src = dataUrl;
-        image.onload = function () {
-            self._ctx.drawImage(image, 0, 0, width, height);
-        };
-        this._isEmpty = false;
-    };
+  this._handleTouchStart = function (event) {
+    if (event.targetTouches.length === 1) {
+      var touch = event.changedTouches[0];
+      self._strokeBegin(touch);
+    }
+  };
 
-    SignaturePad.prototype._strokeUpdate = function (event) {
-        var point = this._createPoint(event);
-        this._addPoint(point);
-    };
+  this._handleTouchMove = function (event) {
+    // Prevent scrolling.
+    event.preventDefault();
 
-    SignaturePad.prototype._strokeBegin = function (event) {
-        this._reset();
-        this._strokeUpdate(event);
-        if (typeof this.onBegin === 'function') {
-            this.onBegin(event);
+    var touch = event.targetTouches[0];
+    self._strokeUpdate(touch);
+  };
+
+  this._handleTouchEnd = function (event) {
+    var wasCanvasTouched = event.target === self._canvas;
+    if (wasCanvasTouched) {
+      event.preventDefault();
+      self._strokeEnd(event);
+    }
+  };
+
+  // Enable mouse and touch event handlers
+  this.on();
+}
+
+// Public methods
+SignaturePad.prototype.clear = function () {
+  var ctx = this._ctx;
+  var canvas = this._canvas;
+
+  ctx.fillStyle = this.backgroundColor;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  this._data = [];
+  this._reset();
+  this._isEmpty = true;
+};
+
+SignaturePad.prototype.fromDataURL = function (dataUrl) {
+  var _this = this;
+
+  var image = new Image();
+  var ratio = window.devicePixelRatio || 1;
+  var width = this._canvas.width / ratio;
+  var height = this._canvas.height / ratio;
+
+  this._reset();
+  image.src = dataUrl;
+  image.onload = function () {
+    _this._ctx.drawImage(image, 0, 0, width, height);
+  };
+  this._isEmpty = false;
+};
+
+SignaturePad.prototype.toDataURL = function (type) {
+  var _canvas;
+
+  switch (type) {
+    case 'image/svg+xml':
+      return this._toSVG();
+    default:
+      for (var _len = arguments.length, options = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+        options[_key - 1] = arguments[_key];
+      }
+
+      return (_canvas = this._canvas).toDataURL.apply(_canvas, [type].concat(options));
+  }
+};
+
+SignaturePad.prototype.on = function () {
+  this._handleMouseEvents();
+  this._handleTouchEvents();
+};
+
+SignaturePad.prototype.off = function () {
+  this._canvas.removeEventListener('mousedown', this._handleMouseDown);
+  this._canvas.removeEventListener('mousemove', this._handleMouseMove);
+  document.removeEventListener('mouseup', this._handleMouseUp);
+
+  this._canvas.removeEventListener('touchstart', this._handleTouchStart);
+  this._canvas.removeEventListener('touchmove', this._handleTouchMove);
+  this._canvas.removeEventListener('touchend', this._handleTouchEnd);
+};
+
+SignaturePad.prototype.isEmpty = function () {
+  return this._isEmpty;
+};
+
+// Private methods
+SignaturePad.prototype._strokeBegin = function (event) {
+  this._data.push([]);
+  this._reset();
+  this._strokeUpdate(event);
+
+  if (typeof this.onBegin === 'function') {
+    this.onBegin(event);
+  }
+};
+
+SignaturePad.prototype._strokeUpdate = function (event) {
+  var x = event.clientX;
+  var y = event.clientY;
+
+  var point = this._createPoint(x, y);
+
+  var _addPoint = this._addPoint(point),
+      curve = _addPoint.curve,
+      widths = _addPoint.widths;
+
+  if (curve && widths) {
+    this._drawCurve(curve, widths.start, widths.end);
+  }
+
+  this._data[this._data.length - 1].push({
+    x: point.x,
+    y: point.y,
+    time: point.time
+  });
+};
+
+SignaturePad.prototype._strokeEnd = function (event) {
+  var canDrawCurve = this.points.length > 2;
+  var point = this.points[0];
+
+  if (!canDrawCurve && point) {
+    this._drawDot(point);
+  }
+
+  if (typeof this.onEnd === 'function') {
+    this.onEnd(event);
+  }
+};
+
+SignaturePad.prototype._handleMouseEvents = function () {
+  this._mouseButtonDown = false;
+
+  this._canvas.addEventListener('mousedown', this._handleMouseDown);
+  this._canvas.addEventListener('mousemove', this._handleMouseMove);
+  document.addEventListener('mouseup', this._handleMouseUp);
+};
+
+SignaturePad.prototype._handleTouchEvents = function () {
+  // Pass touch events to canvas element on mobile IE11 and Edge.
+  this._canvas.style.msTouchAction = 'none';
+  this._canvas.style.touchAction = 'none';
+
+  this._canvas.addEventListener('touchstart', this._handleTouchStart);
+  this._canvas.addEventListener('touchmove', this._handleTouchMove);
+  this._canvas.addEventListener('touchend', this._handleTouchEnd);
+};
+
+SignaturePad.prototype._reset = function () {
+  this.points = [];
+  this._lastVelocity = 0;
+  this._lastWidth = (this.minWidth + this.maxWidth) / 2;
+  this._ctx.fillStyle = this.penColor;
+};
+
+SignaturePad.prototype._createPoint = function (x, y, time) {
+  var rect = this._canvas.getBoundingClientRect();
+
+  return new Point(x - rect.left, y - rect.top, time || new Date().getTime());
+};
+
+SignaturePad.prototype._addPoint = function (point) {
+  var points = this.points;
+  var tmp = void 0;
+
+  points.push(point);
+
+  if (points.length > 2) {
+    // To reduce the initial lag make it work with 3 points
+    // by copying the first point to the beginning.
+    if (points.length === 3) points.unshift(points[0]);
+
+    tmp = this._calculateCurveControlPoints(points[0], points[1], points[2]);
+    var c2 = tmp.c2;
+    tmp = this._calculateCurveControlPoints(points[1], points[2], points[3]);
+    var c3 = tmp.c1;
+    var curve = new Bezier(points[1], c2, c3, points[2]);
+    var widths = this._calculateCurveWidths(curve);
+
+    // Remove the first element from the list,
+    // so that we always have no more than 4 points in points array.
+    points.shift();
+
+    return { curve: curve, widths: widths };
+  }
+
+  return {};
+};
+
+SignaturePad.prototype._calculateCurveControlPoints = function (s1, s2, s3) {
+  var dx1 = s1.x - s2.x;
+  var dy1 = s1.y - s2.y;
+  var dx2 = s2.x - s3.x;
+  var dy2 = s2.y - s3.y;
+
+  var m1 = { x: (s1.x + s2.x) / 2.0, y: (s1.y + s2.y) / 2.0 };
+  var m2 = { x: (s2.x + s3.x) / 2.0, y: (s2.y + s3.y) / 2.0 };
+
+  var l1 = Math.sqrt(dx1 * dx1 + dy1 * dy1);
+  var l2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
+
+  var dxm = m1.x - m2.x;
+  var dym = m1.y - m2.y;
+
+  var k = l2 / (l1 + l2);
+  var cm = { x: m2.x + dxm * k, y: m2.y + dym * k };
+
+  var tx = s2.x - cm.x;
+  var ty = s2.y - cm.y;
+
+  return {
+    c1: new Point(m1.x + tx, m1.y + ty),
+    c2: new Point(m2.x + tx, m2.y + ty)
+  };
+};
+
+SignaturePad.prototype._calculateCurveWidths = function (curve) {
+  var startPoint = curve.startPoint;
+  var endPoint = curve.endPoint;
+  var widths = { start: null, end: null };
+
+  var velocity = this.velocityFilterWeight * endPoint.velocityFrom(startPoint) + (1 - this.velocityFilterWeight) * this._lastVelocity;
+
+  var newWidth = this._strokeWidth(velocity);
+
+  widths.start = this._lastWidth;
+  widths.end = newWidth;
+
+  this._lastVelocity = velocity;
+  this._lastWidth = newWidth;
+
+  return widths;
+};
+
+SignaturePad.prototype._strokeWidth = function (velocity) {
+  return Math.max(this.maxWidth / (velocity + 1), this.minWidth);
+};
+
+SignaturePad.prototype._drawPoint = function (x, y, size) {
+  var ctx = this._ctx;
+
+  ctx.moveTo(x, y);
+  ctx.arc(x, y, size, 0, 2 * Math.PI, false);
+  this._isEmpty = false;
+};
+
+SignaturePad.prototype._drawCurve = function (curve, startWidth, endWidth) {
+  var ctx = this._ctx;
+  var widthDelta = endWidth - startWidth;
+  var drawSteps = Math.floor(curve.length());
+
+  ctx.beginPath();
+
+  for (var i = 0; i < drawSteps; i += 1) {
+    // Calculate the Bezier (x, y) coordinate for this step.
+    var t = i / drawSteps;
+    var tt = t * t;
+    var ttt = tt * t;
+    var u = 1 - t;
+    var uu = u * u;
+    var uuu = uu * u;
+
+    var x = uuu * curve.startPoint.x;
+    x += 3 * uu * t * curve.control1.x;
+    x += 3 * u * tt * curve.control2.x;
+    x += ttt * curve.endPoint.x;
+
+    var y = uuu * curve.startPoint.y;
+    y += 3 * uu * t * curve.control1.y;
+    y += 3 * u * tt * curve.control2.y;
+    y += ttt * curve.endPoint.y;
+
+    var width = startWidth + ttt * widthDelta;
+    this._drawPoint(x, y, width);
+  }
+
+  ctx.closePath();
+  ctx.fill();
+};
+
+SignaturePad.prototype._drawDot = function (point) {
+  var ctx = this._ctx;
+  var width = typeof this.dotSize === 'function' ? this.dotSize() : this.dotSize;
+
+  ctx.beginPath();
+  this._drawPoint(point.x, point.y, width);
+  ctx.closePath();
+  ctx.fill();
+};
+
+SignaturePad.prototype._fromData = function (pointGroups, drawCurve, drawDot) {
+  for (var i = 0; i < pointGroups.length; i += 1) {
+    var group = pointGroups[i];
+
+    if (group.length > 1) {
+      for (var j = 0; j < group.length; j += 1) {
+        var rawPoint = group[j];
+        var point = new Point(rawPoint.x, rawPoint.y, rawPoint.time);
+
+        if (j === 0) {
+          // First point in a group. Nothing to draw yet.
+          this._reset();
+          this._addPoint(point);
+        } else if (j !== group.length - 1) {
+          // Middle point in a group.
+          var _addPoint2 = this._addPoint(point),
+              curve = _addPoint2.curve,
+              widths = _addPoint2.widths;
+
+          if (curve && widths) {
+            drawCurve(curve, widths);
+          }
+        } else {
+          // Last point in a group. Do nothing.
         }
-    };
+      }
+    } else {
+      this._reset();
+      var _rawPoint = group[0];
+      drawDot(_rawPoint);
+    }
+  }
+};
 
-    SignaturePad.prototype._strokeDraw = function (point) {
-        var ctx = this._ctx,
-            dotSize = typeof(this.dotSize) === 'function' ? this.dotSize() : this.dotSize;
+SignaturePad.prototype._toSVG = function () {
+  var _this2 = this;
 
-        ctx.beginPath();
-        this._drawPoint(point.x, point.y, dotSize);
-        ctx.closePath();
-        ctx.fill();
-    };
+  var pointGroups = this._data;
+  var canvas = this._canvas;
+  var ratio = Math.max(window.devicePixelRatio || 1, 1);
+  var minX = 0;
+  var minY = 0;
+  var maxX = canvas.width / ratio;
+  var maxY = canvas.height / ratio;
+  var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
 
-    SignaturePad.prototype._strokeEnd = function (event) {
-        var canDrawCurve = this.points.length > 2,
-            point = this.points[0];
+  svg.setAttributeNS(null, 'width', canvas.width);
+  svg.setAttributeNS(null, 'height', canvas.height);
 
-        if (!canDrawCurve && point) {
-            this._strokeDraw(point);
-        }
-        if (typeof this.onEnd === 'function') {
-            this.onEnd(event);
-        }
-    };
+  this._fromData(pointGroups, function (curve, widths) {
+    var path = document.createElement('path');
 
-    SignaturePad.prototype._handleMouseEvents = function () {
-        this._mouseButtonDown = false;
+    // Need to check curve for NaN values, these pop up when drawing
+    // lines on the canvas that are not continuous. E.g. Sharp corners
+    // or stopping mid-stroke and than continuing without lifting mouse.
+    if (!isNaN(curve.control1.x) && !isNaN(curve.control1.y) && !isNaN(curve.control2.x) && !isNaN(curve.control2.y)) {
+      var attr = 'M ' + curve.startPoint.x.toFixed(3) + ',' + curve.startPoint.y.toFixed(3) + ' ' + ('C ' + curve.control1.x.toFixed(3) + ',' + curve.control1.y.toFixed(3) + ' ') + (curve.control2.x.toFixed(3) + ',' + curve.control2.y.toFixed(3) + ' ') + (curve.endPoint.x.toFixed(3) + ',' + curve.endPoint.y.toFixed(3));
 
-        this._canvas.addEventListener("mousedown", this._handleMouseDown);
-        this._canvas.addEventListener("mousemove", this._handleMouseMove);
-        document.addEventListener("mouseup", this._handleMouseUp);
-    };
+      path.setAttribute('d', attr);
+      path.setAttribute('stroke-width', (widths.end * 2.25).toFixed(3));
+      path.setAttribute('stroke', _this2.penColor);
+      path.setAttribute('fill', 'none');
+      path.setAttribute('stroke-linecap', 'round');
 
-    SignaturePad.prototype._handleTouchEvents = function () {
-        // Pass touch events to canvas element on mobile IE11 and Edge.
-        this._canvas.style.msTouchAction = 'none';
-        this._canvas.style.touchAction = 'none';
+      svg.appendChild(path);
+    }
+  }, function (rawPoint) {
+    var circle = document.createElement('circle');
+    var dotSize = typeof _this2.dotSize === 'function' ? _this2.dotSize() : _this2.dotSize;
+    circle.setAttribute('r', dotSize);
+    circle.setAttribute('cx', rawPoint.x);
+    circle.setAttribute('cy', rawPoint.y);
+    circle.setAttribute('fill', _this2.penColor);
 
-        this._canvas.addEventListener("touchstart", this._handleTouchStart);
-        this._canvas.addEventListener("touchmove", this._handleTouchMove);
-        this._canvas.addEventListener("touchend", this._handleTouchEnd);
-    };
+    svg.appendChild(circle);
+  });
 
-    SignaturePad.prototype.on = function () {
-        this._handleMouseEvents();
-        this._handleTouchEvents();
-    };
+  var prefix = 'data:image/svg+xml;base64,';
+  var header = '<svg' + ' xmlns="http://www.w3.org/2000/svg"' + ' xmlns:xlink="http://www.w3.org/1999/xlink"' + (' viewBox="' + minX + ' ' + minY + ' ' + maxX + ' ' + maxY + '"') + (' width="' + maxX + '"') + (' height="' + maxY + '"') + '>';
+  var body = svg.innerHTML;
 
-    SignaturePad.prototype.off = function () {
-        this._canvas.removeEventListener("mousedown", this._handleMouseDown);
-        this._canvas.removeEventListener("mousemove", this._handleMouseMove);
-        document.removeEventListener("mouseup", this._handleMouseUp);
+  // IE hack for missing innerHTML property on SVGElement
+  if (body === undefined) {
+    var dummy = document.createElement('dummy');
+    var nodes = svg.childNodes;
+    dummy.innerHTML = '';
 
-        this._canvas.removeEventListener("touchstart", this._handleTouchStart);
-        this._canvas.removeEventListener("touchmove", this._handleTouchMove);
-        this._canvas.removeEventListener("touchend", this._handleTouchEnd);
-    };
+    for (var i = 0; i < nodes.length; i += 1) {
+      dummy.appendChild(nodes[i].cloneNode(true));
+    }
 
-    SignaturePad.prototype.isEmpty = function () {
-        return this._isEmpty;
-    };
+    body = dummy.innerHTML;
+  }
 
-    SignaturePad.prototype._reset = function () {
-        this.points = [];
-        this._lastVelocity = 0;
-        this._lastWidth = (this.minWidth + this.maxWidth) / 2;
-        this._isEmpty = true;
-        this._ctx.fillStyle = this.penColor;
-    };
+  var footer = '</svg>';
+  var data = header + body + footer;
 
-    SignaturePad.prototype._createPoint = function (event) {
-        var rect = this._canvas.getBoundingClientRect();
-        return new Point(
-            event.clientX - rect.left,
-            event.clientY - rect.top
-        );
-    };
+  return prefix + btoa(data);
+};
 
-    SignaturePad.prototype._addPoint = function (point) {
-        var points = this.points,
-            c2, c3,
-            curve, tmp;
+SignaturePad.prototype.fromData = function (pointGroups) {
+  var _this3 = this;
 
-        points.push(point);
+  this.clear();
 
-        if (points.length > 2) {
-            // To reduce the initial lag make it work with 3 points
-            // by copying the first point to the beginning.
-            if (points.length === 3) points.unshift(points[0]);
+  this._fromData(pointGroups, function (curve, widths) {
+    return _this3._drawCurve(curve, widths.start, widths.end);
+  }, function (rawPoint) {
+    return _this3._drawDot(rawPoint);
+  });
+};
 
-            tmp = this._calculateCurveControlPoints(points[0], points[1], points[2]);
-            c2 = tmp.c2;
-            tmp = this._calculateCurveControlPoints(points[1], points[2], points[3]);
-            c3 = tmp.c1;
-            curve = new Bezier(points[1], c2, c3, points[2]);
-            this._addCurve(curve);
-
-            // Remove the first element from the list,
-            // so that we always have no more than 4 points in points array.
-            points.shift();
-        }
-    };
-
-    SignaturePad.prototype._calculateCurveControlPoints = function (s1, s2, s3) {
-        var dx1 = s1.x - s2.x, dy1 = s1.y - s2.y,
-            dx2 = s2.x - s3.x, dy2 = s2.y - s3.y,
-
-            m1 = {x: (s1.x + s2.x) / 2.0, y: (s1.y + s2.y) / 2.0},
-            m2 = {x: (s2.x + s3.x) / 2.0, y: (s2.y + s3.y) / 2.0},
-
-            l1 = Math.sqrt(dx1*dx1 + dy1*dy1),
-            l2 = Math.sqrt(dx2*dx2 + dy2*dy2),
-
-            dxm = (m1.x - m2.x),
-            dym = (m1.y - m2.y),
-
-            k = l2 / (l1 + l2),
-            cm = {x: m2.x + dxm*k, y: m2.y + dym*k},
-
-            tx = s2.x - cm.x,
-            ty = s2.y - cm.y;
-
-        return {
-            c1: new Point(m1.x + tx, m1.y + ty),
-            c2: new Point(m2.x + tx, m2.y + ty)
-        };
-    };
-
-    SignaturePad.prototype._addCurve = function (curve) {
-        var startPoint = curve.startPoint,
-            endPoint = curve.endPoint,
-            velocity, newWidth;
-
-        velocity = endPoint.velocityFrom(startPoint);
-        velocity = this.velocityFilterWeight * velocity
-            + (1 - this.velocityFilterWeight) * this._lastVelocity;
-
-        newWidth = this._strokeWidth(velocity);
-        this._drawCurve(curve, this._lastWidth, newWidth);
-
-        this._lastVelocity = velocity;
-        this._lastWidth = newWidth;
-    };
-
-    SignaturePad.prototype._drawPoint = function (x, y, size) {
-        var ctx = this._ctx;
-
-        ctx.moveTo(x, y);
-        ctx.arc(x, y, size, 0, 2 * Math.PI, false);
-        this._isEmpty = false;
-    };
-
-    SignaturePad.prototype._drawCurve = function (curve, startWidth, endWidth) {
-        var ctx = this._ctx,
-            widthDelta = endWidth - startWidth,
-            drawSteps, width, i, t, tt, ttt, u, uu, uuu, x, y;
-
-        drawSteps = Math.floor(curve.length());
-        ctx.beginPath();
-        for (i = 0; i < drawSteps; i++) {
-            // Calculate the Bezier (x, y) coordinate for this step.
-            t = i / drawSteps;
-            tt = t * t;
-            ttt = tt * t;
-            u = 1 - t;
-            uu = u * u;
-            uuu = uu * u;
-
-            x = uuu * curve.startPoint.x;
-            x += 3 * uu * t * curve.control1.x;
-            x += 3 * u * tt * curve.control2.x;
-            x += ttt * curve.endPoint.x;
-
-            y = uuu * curve.startPoint.y;
-            y += 3 * uu * t * curve.control1.y;
-            y += 3 * u * tt * curve.control2.y;
-            y += ttt * curve.endPoint.y;
-
-            width = startWidth + ttt * widthDelta;
-            this._drawPoint(x, y, width);
-        }
-        ctx.closePath();
-        ctx.fill();
-    };
-
-    SignaturePad.prototype._strokeWidth = function (velocity) {
-        return Math.max(this.maxWidth / (velocity + 1), this.minWidth);
-    };
-
-
-    var Point = function (x, y, time) {
-        this.x = x;
-        this.y = y;
-        this.time = time || new Date().getTime();
-    };
-
-    Point.prototype.velocityFrom = function (start) {
-        return (this.time !== start.time) ? this.distanceTo(start) / (this.time - start.time) : 1;
-    };
-
-    Point.prototype.distanceTo = function (start) {
-        return Math.sqrt(Math.pow(this.x - start.x, 2) + Math.pow(this.y - start.y, 2));
-    };
-
-    var Bezier = function (startPoint, control1, control2, endPoint) {
-        this.startPoint = startPoint;
-        this.control1 = control1;
-        this.control2 = control2;
-        this.endPoint = endPoint;
-    };
-
-    // Returns approximated length.
-    Bezier.prototype.length = function () {
-        var steps = 10,
-            length = 0,
-            i, t, cx, cy, px, py, xdiff, ydiff;
-
-        for (i = 0; i <= steps; i++) {
-            t = i / steps;
-            cx = this._point(t, this.startPoint.x, this.control1.x, this.control2.x, this.endPoint.x);
-            cy = this._point(t, this.startPoint.y, this.control1.y, this.control2.y, this.endPoint.y);
-            if (i > 0) {
-                xdiff = cx - px;
-                ydiff = cy - py;
-                length += Math.sqrt(xdiff * xdiff + ydiff * ydiff);
-            }
-            px = cx;
-            py = cy;
-        }
-        return length;
-    };
-
-    Bezier.prototype._point = function (t, start, c1, c2, end) {
-        return          start * (1.0 - t) * (1.0 - t)  * (1.0 - t)
-               + 3.0 *  c1    * (1.0 - t) * (1.0 - t)  * t
-               + 3.0 *  c2    * (1.0 - t) * t          * t
-               +        end   * t         * t          * t;
-    };
-
-    return SignaturePad;
-})(document);
+SignaturePad.prototype.toData = function () {
+  return this._data;
+};
 
 return SignaturePad;
 
-}));
+})));
 
-},{}],193:[function(_dereq_,module,exports){
+},{}],196:[function(_dereq_,module,exports){
 /*!
  * ui-select
  * http://github.com/angular-ui/ui-select
@@ -64253,7 +64543,7 @@ $templateCache.put("selectize/match.tpl.html","<div ng-hide=\"$select.searchEnab
 $templateCache.put("selectize/no-choice.tpl.html","<div class=\"ui-select-no-choice selectize-dropdown\" ng-show=\"$select.items.length == 0\"><div class=\"selectize-dropdown-content\"><div data-selectable=\"\" ng-transclude=\"\"></div></div></div>");
 $templateCache.put("selectize/select-multiple.tpl.html","<div class=\"ui-select-container selectize-control multi plugin-remove_button\" ng-class=\"{\'open\': $select.open}\"><div class=\"selectize-input\" ng-class=\"{\'focus\': $select.open, \'disabled\': $select.disabled, \'selectize-focus\' : $select.focus}\" ng-click=\"$select.open && !$select.searchEnabled ? $select.toggle($event) : $select.activate()\"><div class=\"ui-select-match\"></div><input type=\"search\" autocomplete=\"off\" tabindex=\"-1\" class=\"ui-select-search\" ng-class=\"{\'ui-select-search-hidden\':!$select.searchEnabled}\" placeholder=\"{{$selectMultiple.getPlaceholder()}}\" ng-model=\"$select.search\" ng-disabled=\"$select.disabled\" aria-expanded=\"{{$select.open}}\" aria-label=\"{{ $select.baseTitle }}\" ondrop=\"return false;\"></div><div class=\"ui-select-choices\"></div><div class=\"ui-select-no-choice\"></div></div>");
 $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container selectize-control single\" ng-class=\"{\'open\': $select.open}\"><div class=\"selectize-input\" ng-class=\"{\'focus\': $select.open, \'disabled\': $select.disabled, \'selectize-focus\' : $select.focus}\" ng-click=\"$select.open && !$select.searchEnabled ? $select.toggle($event) : $select.activate()\"><div class=\"ui-select-match\"></div><input type=\"search\" autocomplete=\"off\" tabindex=\"-1\" class=\"ui-select-search ui-select-toggle\" ng-class=\"{\'ui-select-search-hidden\':!$select.searchEnabled}\" ng-click=\"$select.toggle($event)\" placeholder=\"{{$select.placeholder}}\" ng-model=\"$select.search\" ng-hide=\"!$select.isEmpty() && !$select.open\" ng-disabled=\"$select.disabled\" aria-label=\"{{ $select.baseTitle }}\"></div><div class=\"ui-select-choices\"></div><div class=\"ui-select-no-choice\"></div></div>");}]);
-},{}],194:[function(_dereq_,module,exports){
+},{}],197:[function(_dereq_,module,exports){
 (function(self) {
   'use strict';
 
@@ -64648,7 +64938,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
   self.fetch.polyfill = true
 })(typeof self !== 'undefined' ? self : this);
 
-},{}],195:[function(_dereq_,module,exports){
+},{}],198:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -64737,7 +65027,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],196:[function(_dereq_,module,exports){
+},{}],199:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -64915,7 +65205,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],197:[function(_dereq_,module,exports){
+},{}],200:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -64995,7 +65285,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],198:[function(_dereq_,module,exports){
+},{}],201:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -65029,7 +65319,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],199:[function(_dereq_,module,exports){
+},{}],202:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.provider('formioComponents', function() {
@@ -65089,7 +65379,7 @@ module.exports = function(app) {
   }]);
 };
 
-},{}],200:[function(_dereq_,module,exports){
+},{}],203:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -65170,7 +65460,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],201:[function(_dereq_,module,exports){
+},{}],204:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -65199,7 +65489,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],202:[function(_dereq_,module,exports){
+},{}],205:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -65310,7 +65600,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],203:[function(_dereq_,module,exports){
+},{}],206:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -65338,7 +65628,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":241}],204:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":244}],207:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -65457,7 +65747,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],205:[function(_dereq_,module,exports){
+},{}],208:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -65596,7 +65886,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],206:[function(_dereq_,module,exports){
+},{}],209:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -65797,7 +66087,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],207:[function(_dereq_,module,exports){
+},{}],210:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -65831,7 +66121,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],208:[function(_dereq_,module,exports){
+},{}],211:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -65867,7 +66157,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],209:[function(_dereq_,module,exports){
+},{}],212:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -66131,7 +66421,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],210:[function(_dereq_,module,exports){
+},{}],213:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -66167,7 +66457,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":241}],211:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":244}],214:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -66259,7 +66549,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],212:[function(_dereq_,module,exports){
+},{}],215:[function(_dereq_,module,exports){
 "use strict";
 var app = angular.module('formio');
 
@@ -66301,7 +66591,7 @@ _dereq_('./panel')(app);
 _dereq_('./table')(app);
 _dereq_('./well')(app);
 
-},{"./address":195,"./button":196,"./checkbox":197,"./columns":198,"./components":199,"./container":200,"./content":201,"./currency":202,"./custom":203,"./datagrid":204,"./datetime":205,"./day":206,"./email":207,"./fieldset":208,"./file":209,"./hidden":210,"./htmlelement":211,"./number":213,"./page":214,"./panel":215,"./password":216,"./phonenumber":217,"./radio":218,"./resource":219,"./select":220,"./selectboxes":221,"./signature":222,"./survey":223,"./table":224,"./textarea":225,"./textfield":226,"./well":227}],213:[function(_dereq_,module,exports){
+},{"./address":198,"./button":199,"./checkbox":200,"./columns":201,"./components":202,"./container":203,"./content":204,"./currency":205,"./custom":206,"./datagrid":207,"./datetime":208,"./day":209,"./email":210,"./fieldset":211,"./file":212,"./hidden":213,"./htmlelement":214,"./number":216,"./page":217,"./panel":218,"./password":219,"./phonenumber":220,"./radio":221,"./resource":222,"./select":223,"./selectboxes":224,"./signature":225,"./survey":226,"./table":227,"./textarea":228,"./textfield":229,"./well":230}],216:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -66366,7 +66656,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],214:[function(_dereq_,module,exports){
+},{}],217:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -66393,7 +66683,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],215:[function(_dereq_,module,exports){
+},{}],218:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -66429,7 +66719,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],216:[function(_dereq_,module,exports){
+},{}],219:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -66460,7 +66750,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],217:[function(_dereq_,module,exports){
+},{}],220:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -66495,7 +66785,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],218:[function(_dereq_,module,exports){
+},{}],221:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -66546,7 +66836,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],219:[function(_dereq_,module,exports){
+},{}],222:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -66674,11 +66964,13 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],220:[function(_dereq_,module,exports){
+},{}],223:[function(_dereq_,module,exports){
 "use strict";
 /*eslint max-depth: ["error", 6]*/
 
 var _get = _dereq_('lodash/get');
+var _isEqual = _dereq_('lodash/isEqual');
+var _set = _dereq_('lodash/set');
 var _cloneDeep = _dereq_('lodash/cloneDeep');
 module.exports = function(app) {
   app.directive('formioSelectItem', [
@@ -66848,19 +67140,14 @@ module.exports = function(app) {
                 return item.value;
               }
 
-              // Allow dot notation in the value property.
-              if (valueProp.indexOf('.') !== -1) {
-                var parts = valueProp.split('.');
-                var prop = item;
-                for (var i in parts) {
-                  if (prop.hasOwnProperty(parts[i])) {
-                    prop = prop[parts[i]];
-                  }
-                }
-                return prop;
+              // Get the item value.
+              var itemValue = valueProp ? _get(item, valueProp) : item;
+              if (itemValue === undefined) {
+                /* eslint-disable no-console */
+                console.warn('Cannot find value property within select: ' + valueProp);
+                /* eslint-enable no-console */
               }
-
-              return valueProp ? item[valueProp] : item;
+              return itemValue;
             };
 
             $scope.refreshItems = function() {
@@ -66870,48 +67157,89 @@ module.exports = function(app) {
               $scope.refreshItems(input, url);
             });
 
-            // Add a watch if they wish to refresh on selection of another field.
-            if (settings.refreshOn) {
-              var refreshing = false;
-              var refreshValue = function() {
-                if (refreshing) {
-                  return;
-                }
-                refreshing = true;
-                var tempData = $scope.data[settings.key];
-                $scope.data[settings.key] = settings.multiple ? [] : '';
-                if (!settings.clearOnRefresh) {
-                  $timeout(function() {
-                    $scope.data[settings.key] = tempData;
-                    refreshing = false;
-                    $scope.$emit('selectLoaded', $scope.component);
-                  });
-                }
-                else {
+            var refreshing = false;
+            var refreshValue = function() {
+              if (refreshing) {
+                return;
+              }
+              refreshing = true;
+              var tempData = $scope.data[settings.key];
+              $scope.data[settings.key] = settings.multiple ? [] : '';
+              if (!settings.clearOnRefresh) {
+                $timeout(function() {
+                  $scope.data[settings.key] = tempData;
                   refreshing = false;
                   $scope.$emit('selectLoaded', $scope.component);
-                }
-              };
-
-              // Refresh the value.
-              var refreshValueWhenReady = function() {
-                initialized.promise.then(function() {
-                  var refreshPromise = $scope.refreshItems();
-                  if (refreshPromise) {
-                    refreshPromise.then(refreshValue);
-                  }
-                  else {
-                    refreshValue();
-                  }
                 });
-              };
+              }
+              else {
+                refreshing = false;
+                $scope.$emit('selectLoaded', $scope.component);
+              }
+            };
+
+            // Ensures that the value is within the select items.
+            var ensureValue = function() {
+              var value = $scope.data[settings.key];
+              if (!value) {
+                return;
+              }
+              // Iterate through the list of items and see if our value exists...
+              var found = false;
+              for (var i=0; i < $scope.selectItems.length; i++) {
+                var item = $scope.selectItems[i];
+                var selectItem = $scope.getSelectItem(item);
+                if (_isEqual(selectItem, value)) {
+                  found = true;
+                  break;
+                }
+              }
+
+              // If the item is not found in the select items array, then add it manually.
+              if (!found) {
+                var itemValue = value;
+                if (valueProp) {
+                  itemValue = {};
+                  _set(itemValue, valueProp, value);
+                }
+                $scope.selectItems.push(itemValue);
+              }
+            };
+
+            // Refresh the items when ready.
+            var refreshItemsWhenReady = function() {
+              initialized.promise.then(function() {
+                var refreshPromise = $scope.refreshItems(true);
+                if (refreshPromise) {
+                  refreshPromise.then(refreshValue);
+                }
+                else {
+                  refreshValue();
+                }
+              });
+            };
+
+            // Add a watch if they wish to refresh on selection of another field.
+            if (settings.refreshOn) {
               if (settings.refreshOn === 'data') {
-                $scope.$watch('data', refreshValueWhenReady, true);
+                $scope.$watch('data', refreshItemsWhenReady, true);
                 return;
               }
 
-              $scope.$watch('data.' + settings.refreshOn, refreshValueWhenReady);
-              $scope.$watch('submission.data.' + settings.refreshOn, refreshValueWhenReady);
+              $scope.$watch('data.' + settings.refreshOn, refreshItemsWhenReady);
+              $scope.$watch('submission.data.' + settings.refreshOn, refreshItemsWhenReady);
+            }
+            else {
+              // Watch for the data to be set, and ensure the value is set properly.
+              var dataWatch = $scope.$watch('data.' + settings.key, function(value) {
+                if (value) {
+                  initialized.promise.then(function() {
+                    dataWatch();
+                    ensureValue();
+                    refreshValue();
+                  });
+                }
+              });
             }
 
             switch (settings.dataSrc) {
@@ -66998,6 +67326,8 @@ module.exports = function(app) {
                       }
                     });
                   }
+                  options.params.skip = parseInt(options.params.skip, 10);
+                  options.params.limit = parseInt(options.params.limit, 10);
                   selectItems = selectItems.slice(options.params.skip, options.params.skip + options.params.limit);
                   setResult(selectItems, append);
                   return initialized.resolve($scope.selectItems);
@@ -67056,12 +67386,16 @@ module.exports = function(app) {
                   $event.preventDefault();
                   options.params.skip = parseInt(options.params.skip, 10);
                   options.params.skip += parseInt(options.params.limit, 10);
-                  $scope.refreshItems(null, null, true);
+                  $scope.refreshItems(true, null, true);
                 };
 
                 if (url) {
                   $scope.hasNextPage = true;
                   $scope.refreshItems = function(input, newUrl, append) {
+                    if (!input) {
+                      return;
+                    }
+
                     newUrl = newUrl || url;
                     newUrl = $interpolate(newUrl)({
                       data: $scope.data,
@@ -67072,7 +67406,11 @@ module.exports = function(app) {
                     }
 
                     // If this is a search, then add that to the filter.
-                    if (settings.searchField && input) {
+                    if (
+                      settings.searchField &&
+                      (typeof input === 'string') &&
+                      input
+                    ) {
                       newUrl += ((newUrl.indexOf('?') === -1) ? '?' : '&') +
                         encodeURIComponent(settings.searchField) +
                         '=' +
@@ -67106,6 +67444,9 @@ module.exports = function(app) {
                       else {
                         $scope.selectItems = data;
                       }
+
+                      // Ensure the value is set to what it should be set to.
+                      ensureValue();
                     };
 
                     return $http.get(newUrl, options).then(function(result) {
@@ -67132,8 +67473,9 @@ module.exports = function(app) {
                       initialized.resolve($scope.selectItems);
                     });
                   };
-                  $scope.refreshItems();
+                  $scope.refreshItems(true);
                 }
+                ensureValue();
                 break;
               default:
                 $scope.selectItems = [];
@@ -67189,7 +67531,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"lodash/cloneDeep":164,"lodash/get":167}],221:[function(_dereq_,module,exports){
+},{"lodash/cloneDeep":165,"lodash/get":168,"lodash/isEqual":175,"lodash/set":186}],224:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -67297,10 +67639,10 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],222:[function(_dereq_,module,exports){
-(function (SignaturePad){
+},{}],225:[function(_dereq_,module,exports){
 "use strict";
 
+var SignaturePad = _dereq_('signature_pad');
 module.exports = function(app) {
   app.config([
     'formioComponentsProvider',
@@ -67375,7 +67717,6 @@ module.exports = function(app) {
         });
 
         // Create the signature pad.
-        /* global SignaturePad:false */
         var signaturePad = new SignaturePad(element[0], {
           minWidth: scope.component.minWidth,
           maxWidth: scope.component.maxWidth,
@@ -67439,8 +67780,7 @@ module.exports = function(app) {
   ]);
 };
 
-}).call(this,_dereq_("signature_pad"))
-},{"signature_pad":192}],223:[function(_dereq_,module,exports){
+},{"signature_pad":195}],226:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -67517,7 +67857,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],224:[function(_dereq_,module,exports){
+},{}],227:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -67562,7 +67902,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],225:[function(_dereq_,module,exports){
+},{}],228:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -67646,7 +67986,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],226:[function(_dereq_,module,exports){
+},{}],229:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -67707,7 +68047,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],227:[function(_dereq_,module,exports){
+},{}],230:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -67740,7 +68080,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],228:[function(_dereq_,module,exports){
+},{}],231:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -67818,7 +68158,7 @@ module.exports = function() {
   };
 };
 
-},{}],229:[function(_dereq_,module,exports){
+},{}],232:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -68021,7 +68361,8 @@ module.exports = function() {
           if ($scope.action) {
             var method = submissionData._id ? 'put' : 'post';
             var action = $scope.action;
-            if (method === 'put') {
+            // Add the action Id if it is not already part of the url.
+            if (method === 'put' && (action.indexOf(submissionData._id) === -1)) {
               action += '/' + submissionData._id;
             }
             $http[method](action, submissionData).success(function(submission) {
@@ -68178,7 +68519,7 @@ module.exports = function() {
   };
 };
 
-},{}],230:[function(_dereq_,module,exports){
+},{}],233:[function(_dereq_,module,exports){
 "use strict";
 module.exports = ['$sce', '$parse', '$compile', function($sce, $parse, $compile) {
   return {
@@ -68195,7 +68536,7 @@ module.exports = ['$sce', '$parse', '$compile', function($sce, $parse, $compile)
   };
 }];
 
-},{}],231:[function(_dereq_,module,exports){
+},{}],234:[function(_dereq_,module,exports){
 "use strict";
 var _cloneDeep = _dereq_('lodash/cloneDeep');
 var _filter = _dereq_('lodash/filter');
@@ -68641,7 +68982,7 @@ module.exports = [
   }
 ];
 
-},{"lodash/cloneDeep":164,"lodash/filter":166,"lodash/get":167}],232:[function(_dereq_,module,exports){
+},{"lodash/cloneDeep":165,"lodash/filter":167,"lodash/get":168}],235:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'formioComponents',
@@ -68708,7 +69049,7 @@ module.exports = [
   }
 ];
 
-},{}],233:[function(_dereq_,module,exports){
+},{}],236:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -68791,7 +69132,7 @@ module.exports = function() {
   };
 };
 
-},{}],234:[function(_dereq_,module,exports){
+},{}],237:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$compile',
@@ -68810,7 +69151,7 @@ module.exports = [
   }
 ];
 
-},{}],235:[function(_dereq_,module,exports){
+},{}],238:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -68820,7 +69161,7 @@ module.exports = function() {
   };
 };
 
-},{}],236:[function(_dereq_,module,exports){
+},{}],239:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -68852,7 +69193,7 @@ module.exports = function() {
   };
 };
 
-},{}],237:[function(_dereq_,module,exports){
+},{}],240:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -68907,7 +69248,7 @@ module.exports = function() {
   };
 };
 
-},{}],238:[function(_dereq_,module,exports){
+},{}],241:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -69336,7 +69677,7 @@ module.exports = function() {
   };
 };
 
-},{}],239:[function(_dereq_,module,exports){
+},{}],242:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -69519,7 +69860,7 @@ module.exports = [
   }
 ];
 
-},{}],240:[function(_dereq_,module,exports){
+},{}],243:[function(_dereq_,module,exports){
 "use strict";
 var formioUtils = _dereq_('formiojs/utils');
 
@@ -69631,7 +69972,7 @@ module.exports = function() {
   };
 };
 
-},{"formiojs/utils":32}],241:[function(_dereq_,module,exports){
+},{"formiojs/utils":32}],244:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   var generic = function(data, component) {
@@ -69710,7 +70051,7 @@ module.exports = function() {
   };
 };
 
-},{}],242:[function(_dereq_,module,exports){
+},{}],245:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$q',
@@ -69759,7 +70100,7 @@ module.exports = [
   }
 ];
 
-},{}],243:[function(_dereq_,module,exports){
+},{}],246:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -69793,7 +70134,7 @@ module.exports = [
   }
 ];
 
-},{}],244:[function(_dereq_,module,exports){
+},{}],247:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'FormioUtils',
@@ -69802,7 +70143,7 @@ module.exports = [
   }
 ];
 
-},{}],245:[function(_dereq_,module,exports){
+},{}],248:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$sce',
@@ -69815,7 +70156,7 @@ module.exports = [
   }
 ];
 
-},{}],246:[function(_dereq_,module,exports){
+},{}],249:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   function() {
@@ -69834,7 +70175,7 @@ module.exports = [
   }
 ];
 
-},{}],247:[function(_dereq_,module,exports){
+},{}],250:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'formioTableView',
@@ -69847,7 +70188,7 @@ module.exports = [
   }
 ];
 
-},{}],248:[function(_dereq_,module,exports){
+},{}],251:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -69862,7 +70203,7 @@ module.exports = [
   }
 ];
 
-},{}],249:[function(_dereq_,module,exports){
+},{}],252:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$filter',
@@ -69911,7 +70252,7 @@ module.exports = [
   }
 ];
 
-},{}],250:[function(_dereq_,module,exports){
+},{}],253:[function(_dereq_,module,exports){
 "use strict";
 module.exports = ['$sce', function($sce) {
   return function(val) {
@@ -69919,13 +70260,12 @@ module.exports = ['$sce', function($sce) {
   };
 }];
 
-},{}],251:[function(_dereq_,module,exports){
+},{}],254:[function(_dereq_,module,exports){
 "use strict";
 _dereq_('angular-ui-mask/dist/mask');
 _dereq_('ui-select/dist/select');
 _dereq_('angular-moment');
 _dereq_('angular-sanitize');
-_dereq_('signature_pad');
 _dereq_('angular-file-saver');
 _dereq_('ng-file-upload');
 _dereq_('bootstrap');
@@ -69933,7 +70273,7 @@ _dereq_('angular-ui-bootstrap');
 _dereq_('bootstrap-ui-datetime-picker/dist/datetime-picker');
 _dereq_('./formio');
 
-},{"./formio":252,"angular-file-saver":1,"angular-moment":2,"angular-sanitize":4,"angular-ui-bootstrap":6,"angular-ui-mask/dist/mask":7,"bootstrap":11,"bootstrap-ui-datetime-picker/dist/datetime-picker":10,"ng-file-upload":190,"signature_pad":192,"ui-select/dist/select":193}],252:[function(_dereq_,module,exports){
+},{"./formio":255,"angular-file-saver":1,"angular-moment":2,"angular-sanitize":4,"angular-ui-bootstrap":6,"angular-ui-mask/dist/mask":7,"bootstrap":11,"bootstrap-ui-datetime-picker/dist/datetime-picker":10,"ng-file-upload":193,"ui-select/dist/select":196}],255:[function(_dereq_,module,exports){
 "use strict";
 _dereq_('./polyfills/polyfills');
 
@@ -70083,7 +70423,7 @@ app.run([
 
 _dereq_('./components');
 
-},{"./components":212,"./directives/customValidator":228,"./directives/formio":229,"./directives/formioBindHtml.js":230,"./directives/formioComponent":231,"./directives/formioComponentView":232,"./directives/formioDelete":233,"./directives/formioElement":234,"./directives/formioErrors":235,"./directives/formioSubmission":236,"./directives/formioSubmissions":237,"./directives/formioWizard":238,"./factories/FormioScope":239,"./factories/FormioUtils":240,"./factories/formioInterceptor":242,"./factories/formioTableView":243,"./filters/flattenComponents":244,"./filters/safehtml":245,"./filters/tableComponents":246,"./filters/tableFieldView":247,"./filters/tableView":248,"./filters/translate":249,"./filters/trusturl":250,"./polyfills/polyfills":254,"./providers/Formio":255}],253:[function(_dereq_,module,exports){
+},{"./components":215,"./directives/customValidator":231,"./directives/formio":232,"./directives/formioBindHtml.js":233,"./directives/formioComponent":234,"./directives/formioComponentView":235,"./directives/formioDelete":236,"./directives/formioElement":237,"./directives/formioErrors":238,"./directives/formioSubmission":239,"./directives/formioSubmissions":240,"./directives/formioWizard":241,"./factories/FormioScope":242,"./factories/FormioUtils":243,"./factories/formioInterceptor":245,"./factories/formioTableView":246,"./filters/flattenComponents":247,"./filters/safehtml":248,"./filters/tableComponents":249,"./filters/tableFieldView":250,"./filters/tableView":251,"./filters/translate":252,"./filters/trusturl":253,"./polyfills/polyfills":257,"./providers/Formio":258}],256:[function(_dereq_,module,exports){
 "use strict";
 'use strict';
 
@@ -70114,13 +70454,13 @@ if (typeof Object.assign != 'function') {
   })();
 }
 
-},{}],254:[function(_dereq_,module,exports){
+},{}],257:[function(_dereq_,module,exports){
 "use strict";
 'use strict';
 
 _dereq_('./Object.assign');
 
-},{"./Object.assign":253}],255:[function(_dereq_,module,exports){
+},{"./Object.assign":256}],258:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   // The formio class.
@@ -70188,5 +70528,5 @@ module.exports = function() {
   };
 };
 
-},{"formiojs":25}]},{},[251])(251)
+},{"formiojs":25}]},{},[254])(254)
 });
