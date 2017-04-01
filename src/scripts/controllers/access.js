@@ -6,47 +6,47 @@ app.controller('AccessController', ['$scope', function($scope) {
   $scope.permissionLabels = {
     'create_all': {
       label: 'Create All',
-      tooltip: 'The Create All permission will allow a user, with one of the given Roles, to create an Project level entity, regardless of who owns the Project. Additionally with this permission, a user can define the Owner of the entity. E.g. Forms or Roles.'
+      tooltip: 'The Create All permission will allow a user with one of the given Roles to create a form, resource and role and define the Owner of the entity.'
     },
     'read_all': {
       label: 'Read All',
-      tooltip: 'The Read All permission will allow a user, with one of the given Roles, to read an Project level entity, regardless of who owns the Project. E.g. The Project itself or its Roles.'
+      tooltip: 'The Read All permission will allow a user with one of the given Roles to read all forms, resources and roles as well as the project itself regardless of who owns the entity.'
     },
     'update_all': {
       label: 'Update All',
-      tooltip: 'The Update All permission will allow a user, with one of the given Roles, to update an Project level entity, regardless of who owns the Project. Additionally with this permission, a user can change the Owner of an entity. E.g. The Project itself or its Roles.'
+      tooltip: 'The Update All permission will allow a user with one of the given Roles to update all forms, resources and roles as well as the project itself regardless of who owns the entity.'
     },
     'delete_all': {
       label: 'Delete All',
-      tooltip: 'The Delete All permission will allow a user, with one of the given Roles, to delete an Project level entity, regardless of who owns the Project. E.g. The Project itself or its Roles.'
+      tooltip: 'The Delete All permission will allow a user with one of the given Roles to delete all forms, resources and roles as well as the project itself regardless of who owns the entity.'
     },
     'create_own': {
       label: 'Create Own',
-      tooltip: 'The Create Own permission will allow a user, with one of the given Roles, to create an Project level entity. Upon creating an entity, the user will be defined as its Owner. E.g. Forms or Roles.'
+      tooltip: 'The Create Own permission will allow a user with one of the given Roles to create a form or resource and the user will be defined as its Owner.'
     },
     'read_own': {
       label: 'Read Own',
-      tooltip: 'The Read Own permission will allow a user, with one of the given Roles, to read an Project level entity. A user can only read an entity if they are defined as its owner. E.g. Forms or Roles.'
+      tooltip: 'The Read Own permission will allow a user with one of the given Roles to read a form or resource if they are defined as its owner.'
     },
     'update_own': {
       label: 'Update Own',
-      tooltip: 'The Update Own permission will allow a user, with one of the given Roles, to update an Project level entity. A user can only update an entity if they are defined as its owner. E.g. Forms or Roles.'
+      tooltip: 'The Update Own permission will allow a user with one of the given Roles to update a form or resource if they are defined as its owner.'
     },
     'delete_own': {
       label: 'Delete Own',
-      tooltip: 'The Delete Own permission will allow a user, with one of the given Roles, to delete an Project level entity. A user can only delete an entity if they are defined as its owner. E.g. Forms or Roles.'
+      tooltip: 'The Delete Own permission will allow a user with one of the given Roles to delete a form or resource if they are defined as its owner.'
     },
     'team_read': {
       label: 'Team Read',
-      tooltip: 'The Team Read permission will allow a user, on one of the given Teams, the ability to read form definitions.'
+      tooltip: 'The Team Read permission will allow a user on one of the given Teams the ability to read form definitions.'
     },
     'team_write': {
       label: 'Team Write',
-      tooltip: 'The Team Write permission will allow a user, on one of the given Teams, the ability to read and edit form definitions.'
+      tooltip: 'The Team Write permission will allow a user on one of the given Teams the ability to read and edit form definitions.'
     },
     'team_admin': {
       label: 'Team Admin',
-      tooltip: 'The Team Admin permission will allow a user, on one of the given Teams, the ability to read and edit form definitions, project settings, and submission data.'
+      tooltip: 'The Team Admin permission will allow a user on one of the given Teams the ability to read and edit form definitions, project settings, and submission data.'
     }
   };
 }]);
