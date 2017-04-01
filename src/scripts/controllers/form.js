@@ -112,7 +112,8 @@ app.config([
         })
         .state(parentName + '.form.permission', {
           url: '/permission',
-          templateUrl: 'views/form/permission/index.html'
+          templateUrl: 'views/form/permission/index.html',
+          controller: 'FormPermissionController'
         })
         .state(parentName + '.form.api', {
           url: '/api',
@@ -397,6 +398,7 @@ app.controller('FormController', [
     $scope.toggleSelfAccessPermissions = function() {
       $scope.selfAccessPermissions = !$scope.selfAccessPermissions;
       selfAccess($scope.selfAccessPermissions);
+      $scope.$broadcast('permissionsChange');
     };
 
     $scope.$watch('form.display', function(display) {
@@ -1845,38 +1847,53 @@ app.controller('FormSubmissionDeleteController', [
   }
 ]);
 
+app.controller('FormPermissionController', [
+  '$scope',
+  function(
+    $scope
+  ) {
+    $scope.$on('permissionsChange', function() {
+      $scope.formio.saveForm($scope.currentForm);
+    });
+  }
+]);
+
 app.constant('SubmissionAccessLabels', {
-  'create_all': {
-    label: 'Create All Submissions',
-    tooltip: 'The Create All Submissions permission will allow a user, with one of the given Roles, to create a new Submission and assign ownership of that Submission.'
-  },
-  'read_all': {
-    label: 'Read All Submissions',
-    tooltip: 'The Read All Submissions permission will allow a user, with one of the given Roles, to read a Submission, regardless of who owns the Submission.'
-  },
-  'update_all': {
-    label: 'Update All Submissions',
-    tooltip: 'The Update All Submissions permission will allow a user, with one of the given Roles, to update a Submission, regardless of who owns the Submission. Additionally with this permission, a user can change the owner of a Submission.'
-  },
-  'delete_all': {
-    label: 'Delete All Submissions',
-    tooltip: 'The Delete All Submissions permission will allow a user, with one of the given Roles, to delete a Submission, regardless of who owns the Submission.'
-  },
   'create_own': {
     label: 'Create Own Submissions',
-    tooltip: 'The Create Own Submissions permission will allow a user, with one of the given Roles, to create a Submission. Upon creating the Submission, the user will be defined as its owner.'
+    tooltip: 'The Create Own Submissions permission will allow a user with one of the Roles to create a Submission. Upon creating the Submission, the user will be defined as its owner.'
+  },
+  'create_all': {
+    label: 'Create All Submissions',
+    tooltip: 'The Create All Submissions permission will allow a user with one of the Roles to create a new Submission and assign ownership of that Submission to another user.',
+    elevated: true
   },
   'read_own': {
     label: 'Read Own Submissions',
-    tooltip: 'The Read Own Submissions permission will allow a user, with one of the given Roles, to read a Submission. A user can only read a Submission if they are defined as its owner.'
+    tooltip: 'The Read Own Submissions permission will allow a user with one of the Roles to read a Submission. A user can only read a Submission if they are defined as its owner.'
+  },
+  'read_all': {
+    label: 'Read All Submissions',
+    tooltip: 'The Read All Submissions permission will allow a user with one of the Roles to read all Submissions regardless of who owns them.',
+    elevated: true
   },
   'update_own': {
     label: 'Update Own Submissions',
-    tooltip: 'The Update Own Submissions permission will allow a user, with one of the given Roles, to update a Submission. A user can only update a Submission if they are defined as its owner.'
+    tooltip: 'The Update Own Submissions permission will allow a user with one of the Roles to update a Submission. A user can only update a Submission if they are defined as its owner.'
+  },
+  'update_all': {
+    label: 'Update All Submissions',
+    tooltip: 'The Update All Submissions permission will allow a user with one of the Roles to update a Submission, regardless of who owns the Submission. Additionally with this permission, a user can change the owner of a Submission.',
+    elevated: true
   },
   'delete_own': {
     label: 'Delete Own Submissions',
-    tooltip: 'The Delete Own Submissions permission will allow a user, with one of the given Roles, to delete a Submission. A user can only delete a Submission if they are defined as its owner.'
+    tooltip: 'The Delete Own Submissions permission will allow a user with one of the Roles, to delete a Submission. A user can only delete a Submission if they are defined as its owner.'
+  },
+  'delete_all': {
+    label: 'Delete All Submissions',
+    tooltip: 'The Delete All Submissions permission will allow a user with one of the Roles to delete a Submission, regardless of who owns the Submission.',
+    elevated: true
   }
 });
 
@@ -1897,28 +1914,31 @@ app.constant('ResourceAccessLabels', {
 
 app.constant('AccessLabels', {
   'read_all': {
-  label: 'Read Form Definition',
-  tooltip: 'The Read permission will allow a user, with one of the given Roles, to read the form.'
+    label: 'Read Form Definition',
+    tooltip: 'The Read permission will allow a user, with one of the given Roles, to read the form.',
+    elevated: true
   },
   'update_all': {
-  label: 'Update Form Definition',
-  tooltip: 'The Update permission will allow a user, with one of the given Roles, to read and edit the form.'
+    label: 'Update Form Definition',
+    tooltip: 'The Update permission will allow a user, with one of the given Roles, to read and edit the form.',
+    elevated: true
   },
   'delete_all': {
-  label: 'Delete Form Definition',
-  tooltip: 'The Delete permission will allow a user, with one of the given Roles, to delete the form.'
+    label: 'Delete Form Definition',
+    tooltip: 'The Delete permission will allow a user, with one of the given Roles, to delete the form.',
+    elevated: true
   },
   'read_own': {
-  label: 'Read Form Definition (Restricted to owners)',
-  tooltip: 'The Read Own permission will allow a user, with one of the given Roles, to read a form. A user can only read a form if they are defined as its owner.'
+    label: 'Read Form Definition (Restricted to owner)',
+    tooltip: 'The Read Own permission will allow a user, with one of the given Roles, to read a form. A user can only read a form if they are defined as its owner.'
   },
   'update_own': {
-  label: 'Update Form Definition (Restricted to owners)',
-  tooltip: 'The Update Own permission will allow a user, with one of the given Roles, to update a form. A user can only update a form if they are defined as its owner.'
+    label: 'Update Form Definition (Restricted to owner)',
+    tooltip: 'The Update Own permission will allow a user, with one of the given Roles, to update a form. A user can only update a form if they are defined as its owner.'
   },
   'delete_own': {
-  label: 'Delete Form Definition (Restricted to owners)',
-  tooltip: 'The Delete Own permission will allow a user, with one of the given Roles, to delete a form. A user can only delete a form if they are defined as its owner.'
+    label: 'Delete Form Definition (Restricted to owner)',
+    tooltip: 'The Delete Own permission will allow a user, with one of the given Roles, to delete a form. A user can only delete a form if they are defined as its owner.'
   }
 });
 

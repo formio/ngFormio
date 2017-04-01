@@ -6,19 +6,23 @@ app.controller('AccessController', ['$scope', function($scope) {
   $scope.permissionLabels = {
     'create_all': {
       label: 'Create All',
-      tooltip: 'The Create All permission will allow a user with one of the given Roles to create a form, resource and role and define the Owner of the entity.'
+      tooltip: 'The Create All permission will allow a user with one of the given Roles to create a form, resource and role and define the Owner of the entity.',
+      elevated: true
     },
     'read_all': {
       label: 'Read All',
-      tooltip: 'The Read All permission will allow a user with one of the given Roles to read all forms, resources and roles as well as the project itself regardless of who owns the entity.'
+      tooltip: 'The Read All permission will allow a user with one of the given Roles to read all forms, resources and roles as well as the project itself regardless of who owns the entity.',
+      elevated: true
     },
     'update_all': {
       label: 'Update All',
-      tooltip: 'The Update All permission will allow a user with one of the given Roles to update all forms, resources and roles as well as the project itself regardless of who owns the entity.'
+      tooltip: 'The Update All permission will allow a user with one of the given Roles to update all forms, resources and roles as well as the project itself regardless of who owns the entity.',
+      elevated: true
     },
     'delete_all': {
       label: 'Delete All',
-      tooltip: 'The Delete All permission will allow a user with one of the given Roles to delete all forms, resources and roles as well as the project itself regardless of who owns the entity.'
+      tooltip: 'The Delete All permission will allow a user with one of the given Roles to delete all forms, resources and roles as well as the project itself regardless of who owns the entity.',
+      elevated: true
     },
     'create_own': {
       label: 'Create Own',
@@ -49,6 +53,10 @@ app.controller('AccessController', ['$scope', function($scope) {
       tooltip: 'The Team Admin permission will allow a user on one of the given Teams the ability to read and edit form definitions, project settings, and submission data.'
     }
   };
+
+  $scope.$on('permissionsChange', function() {
+    $scope.formio.saveProject($scope.currentProject);
+  });
 }]);
 
 /**
@@ -60,14 +68,14 @@ app.controller('AccessController', ['$scope', function($scope) {
  */
 app.directive('permissionEditor', ['$q', function($q) {
   var PERMISSION_TYPES = [
-    'create_all',
-    'read_all',
-    'update_all',
-    'delete_all',
     'create_own',
+    'create_all',
     'read_own',
+    'read_all',
     'update_own',
+    'update_all',
     'delete_own',
+    'delete_all',
     'team_read',
     'team_write',
     'team_admin'
@@ -125,6 +133,14 @@ app.directive('permissionEditor', ['$q', function($q) {
       $scope.getPermissionTooltip = function(permission) {
         return $scope.labels[permission.type].tooltip;
       };
+
+      $scope.getPermissionElevated = function(permission) {
+        return $scope.labels[permission.type].elevated || false;
+      };
+
+      $scope.onChange = function() {
+        $scope.$emit('permissionsChange');
+      }
     }
   };
 }]);
@@ -222,6 +238,10 @@ app.directive('resourcePermissionEditor', ['$q', 'FormioUtils', function($q, For
       $scope.getPermissionTooltip = function(permission) {
         return $scope.labels[permission.type].tooltip;
       };
+
+      $scope.onChange = function() {
+        $scope.$emit('permissionsChange');
+      }
     }
   };
 }]);

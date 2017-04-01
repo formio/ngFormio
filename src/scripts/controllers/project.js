@@ -2166,7 +2166,7 @@ app.controller('ProjectTeamController', [
 
     $scope.added = {
       team: undefined
-    };
+    }
 
     $scope.addTeam = function(team) {
       setTeamPermission($scope.primaryProject, team, 'team_read');

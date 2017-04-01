@@ -15,7 +15,8 @@
   </div>
   <div class="panel-body">
     <div class="well">
-      Self Access Permissions allow Submissions of this Resource to access themselves, as the owner. You can define granular access control with the Own Submission permissions below.
+      <p>Self Access Permissions allow Submissions of this Resource to access themselves, as the owner. You can define granular access control with the Own Submission permissions below.</p>
+      <p>This is common for user type resources that have someone else create the user. In this case the user cannot update themselves without this checkbox since the user owner is the admin that created them. By checking this box it will allow users to edit themselves regardless of if they own their own submission.</p>
     </div>
     <div ng-if="form._id" class="checkbox">
       <label>
@@ -72,18 +73,10 @@
   </div>
   <div class="panel-body">
     <div class="well">
-      These permissions allow you to give a specific access to a single form.
+      These permissions allow you to give access to a single form's JSON definition so they can render the form. In order to give permission to submit, read or modify data in the form please set Submission Permissions.
     </div>
     <div ng-if="form._id">
       <permission-editor permissions="form.access" labels="accessLabels" permission-filter="'read_all,read_form,update_all,delete_all,read_own,update_own,delete_own'" roles="currentProjectRoles" wait-for="loadFormPromise" form="form"></permission-editor>
     </div>
   </div>
-</div>
-
-
-
-
-<div class="form-group pull-right">
-  <a class="btn btn-default" ng-click="back('project.{{ formInfo.type }}.form.view')">Cancel</a>
-  <input ng-hide="highestRole === 'team_read'" type="submit" class="btn btn-primary" ng-click="saveForm()" value="Save Changes" />
 </div>
