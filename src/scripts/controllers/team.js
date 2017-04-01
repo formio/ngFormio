@@ -68,7 +68,11 @@ app.controller('TeamViewController', [
     $scope.activeView = 'members';
     $scope.switchView = function(view) {
       $scope.activeView = view;
-    }
+    };
+
+    $scope.add = {
+      Person: undefined
+    };
 
     $scope.teamPermissionsLoaded = false;
     Formio.request(AppConfig.apiBase + '/team/' + $stateParams.teamId + '/projects', 'GET')
@@ -99,14 +103,25 @@ app.controller('TeamViewController', [
         });
     };
 
+    $scope.selectMembers = [];
+
+    $scope.refreshMembers = function(input) {
+      Formio.request(AppConfig.apiBase + '/team/members?limit=100&name=' + input, 'GET')
+        .then(function(members) {
+          $scope.selectMembers = members;
+        });
+    };
+
     $scope.addMember = function(member) {
-      console.log('add', member);
+      // Clear out the select.
+      $scope.add.Person = undefined;
+      $scope.team.data.members.push(member);
+      $scope.formio.saveSubmission(angular.copy($scope.team));
     };
 
     $scope.removeMember = function(member) {
-      console.log($scope.team.data.members, member);
       _.remove($scope.team.data.members, { _id: member._id });
-      console.log($scope.team.data.members);
+      $scope.formio.saveSubmission(angular.copy($scope.team));
     }
   }
 ]);

@@ -30,7 +30,12 @@
       <div class="col-xs-5 pull-right" ng-if="activeView === 'members'">
         <div class="input-group ">
           <span class="input-group-addon"><i class='fa fa-user' /></span>
-          <input type="text" class="form-control" placeholder="Add a person" >
+          <ui-select ng-model="add.Person" theme="bootstrap" ng-change="addMember($select.selected)">
+            <ui-select-match placeholder="Add a person">{{$select.selected.data.name}}</ui-select-match>
+            <ui-select-choices repeat="member in selectMembers" refresh="refreshMembers($select.search)" refresh-delay="250" minimum-input-length="3">
+              <span>{{ member.data.name }}</span>
+            </ui-select-choices>
+          </ui-select>
         </div>
       </div>
       <div class="btn-group">

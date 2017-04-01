@@ -34,16 +34,18 @@
         </li>
       </ul>
       <div class="panel-footer">
-        <div class="form-inline">
-          <div class="form-group">
-            <label for="addTeam">Add a team:</label>
-            <ui-select name="addTeam" class="" ng-model="added.team" theme="bootstrap" ng-change="addTeam(added.team)">
-              <ui-select-match>{{$select.selected.data.name}}</ui-select-match>
-              <ui-select-choices repeat="teamOption in uniqueEligibleTeams" value="teamOption">
-                <h4>{{ teamOption.data.name }}</h4>
-                <div>{{ teamOption.data.members.length }} Members</div>
-              </ui-select-choices>
-            </ui-select>
+        <div class="row">
+          <div class="col col-sm-3">
+            <div class="input-group">
+              <span class="input-group-addon">Add a team:</span>
+              <ui-select name="addTeam" class="" ng-model="added.team" theme="bootstrap" ng-change="addTeam(added.team)">
+                <ui-select-match>{{$select.selected.data.name}}</ui-select-match>
+                <ui-select-choices repeat="teamOption in uniqueEligibleTeams" value="teamOption">
+                  <h4>{{ teamOption.data.name }}</h4>
+                  <div>{{ teamOption.data.members.length }} Members</div>
+                </ui-select-choices>
+              </ui-select>
+            </div>
           </div>
         </div>
       </div>
