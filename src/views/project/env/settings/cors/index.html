@@ -7,11 +7,12 @@
         <div class="form-group" ng-if="currentProject && currentProject._id">
           <div id="form-group-cors" class="form-group">
             <label for="cors" class="control-label">CORS - Cross Origin Resource Sharing</label>
-            <textarea class="form-control" id="cors" ng-disabled="currentProject.plan === 'basic'" ng-model="currentProject.settings.cors" placeholder="A comma separated list of domains that forms may be embedded on. Use * to allow all domains."></textarea>
+            <textarea class="form-control" id="cors" ng-disabled="primaryProject.plan === 'basic'" ng-model="currentProject.settings.cors" placeholder="A comma separated list of domains that forms may be embedded on. Use * to allow all domains."></textarea>
           </div>
         </div>
       </div>
     </div>
+    <button class="btn btn-primary" ng-click="saveProject()">Save Settings</button>
   </div>
   <div class="col-sm-6">
     <div class="panel panel-primary">

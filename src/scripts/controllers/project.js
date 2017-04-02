@@ -232,6 +232,7 @@ app.controller('ProjectController', [
   '$http',
   'ProjectUpgradeDialog',
   '$q',
+  'GoogleAnalytics',
   function(
     $scope,
     $rootScope,
@@ -243,7 +244,8 @@ app.controller('ProjectController', [
     ProjectPlans,
     $http,
     ProjectUpgradeDialog,
-    $q
+    $q,
+    GoogleAnalytics
   ) {
     $scope.currentSection = {};
     $rootScope.activeSideBar = 'projects';
@@ -273,12 +275,26 @@ app.controller('ProjectController', [
         return $scope.currentProjectRoles;
       });
     };
+
     $scope.loadRoles();
 
     $scope.minPlan= function(plan, project) {
       var plans = ['basic', 'independent', 'team', 'trial', 'commercial'];
       var checkProject = project || $scope.primaryProject || { plan: 'none' };
       return plans.indexOf(checkProject.plan) >= plans.indexOf(plan);
+    };
+
+    $scope.saveProject = function() {
+      if (!$scope.currentProject._id) { return FormioAlerts.onError(new Error('No Project found.')); }
+      $scope.formio.saveProject($scope.currentProject)
+        .then(function(project) {
+          FormioAlerts.addAlert({
+            type: 'success',
+            message: 'Project settings saved.'
+          });
+          GoogleAnalytics.sendEvent('Project', 'update', null, 1);
+        }, FormioAlerts.onError.bind(FormioAlerts))
+        .catch(FormioAlerts.onError.bind(FormioAlerts));
     };
 
     $scope.switchEnv = function(environmentId) {

@@ -1,4 +1,3 @@
-<div uib-alert class="alert alert-warning" type="warning">API Keys provide <strong>Ownership</strong> access to this project. Please be careful when allocating and distributing them. <strong>Never user an API Key within a front-end application!</strong></div>
 <div class="row">
   <div class="col col-sm-6">
     <h3>API Keys</h3>
@@ -24,18 +23,22 @@
     <button class="btn btn-primary" ng-click="addKey()">Add New Key</button>
   </div>
   <div class="col col-sm-6">
-    <h3>How to use API Keys</h3>
-    <p>API Keys allow you to provide <strong>Ownership</strong> access to other systems external to Form.io.</p>
-    <p>This is done by providing the following keys either within the <code>x-token</code> header, or the <code>token</code> query parameter.</p>
-    <p><strong>Examples:</strong></p>
-    <ul>
-      <li>GET - <code>{{ apiProtocol }}//myproject.{{ apiServer }}/myform?token=23234lkj234lklkj234lkj2lkj34</code></li>
-      <li>GET - <code>{{ apiProtocol }}//myproject.{{ apiServer }}/myform</code>
+    <div class="panel panel-primary">
+      <div class="panel-heading">How to use API Keys</div>
+      <div class="panel-body">
+        <p>API Keys are designed for server to server communication to allow a backend server to talk directly to Form.io and has full access to all of the data, forms, resources and other settings in a project. They provide full <strong>Ownership</strong> access.</p>
+        <p><span class="text-danger">API Keys should <strong>never</strong> be used in a browser.</span></p>
+        <p>To use an API Key provide the key within the <code>x-token</code> header of a request.</p>
+        <p><strong>Example:</strong></p>
         <ul>
-          <li>Header: <code>x-token</code></li>
-          <li>Value: <code>23234lkj234lklkj234lkj2lkj34</code></li>
+          <li>GET - <code>{{ apiProtocol }}//myproject.{{ apiServer }}/myform</code>
+            <ul>
+              <li>Header: <code>x-token</code></li>
+              <li>Value: <code>23234lkj234lklkj234lkj2lkj34</code></li>
+            </ul>
+          </li>
         </ul>
-      </li>
-    </ul>
+      </div>
+    </div>
   </div>
 </div>
