@@ -672,25 +672,25 @@ app.provider('ProjectProgress', function() {
             next(true);
           }
         },
-        {
-          key: 'setupUsers',
-          complete: function(next) {
-            var promises = [];
-            userForms.forEach(function(userForm) {
-              var userFormio = new Formio(AppConfig.apiBase + '/project/' + userForm.project + '/form/' + userForm._id + '/submission');
-              promises.push(userFormio.loadSubmissions());
-            });
-            $q.all(promises).then(function(results) {
-              var hasUser = true;
-              results.forEach(function(result) {
-                if (result.length === 0) {
-                  hasUser = false;
-                }
-              });
-              next(hasUser);
-            });
-          }
-        },
+        //{
+        //  key: 'setupUsers',
+        //  complete: function(next) {
+        //    var promises = [];
+        //    userForms.forEach(function(userForm) {
+        //      var userFormio = new Formio(AppConfig.apiBase + '/project/' + userForm.project + '/form/' + userForm._id + '/submission');
+        //      promises.push(userFormio.loadSubmissions());
+        //    });
+        //    $q.all(promises).then(function(results) {
+        //      var hasUser = true;
+        //      results.forEach(function(result) {
+        //        if (result.length === 0) {
+        //          hasUser = false;
+        //        }
+        //      });
+        //      next(hasUser);
+        //    });
+        //  }
+        //},
         {
           key: 'modifyForm',
           complete: function(next) {
@@ -714,7 +714,7 @@ app.provider('ProjectProgress', function() {
           key: 'setupProviders',
           complete: function(next) {
             var projectSettings = project.settings || {};
-            var result = (projectSettings.email || projectSettings.storage);
+            var result = (projectSettings.email || projectSettings.storage || projectSettings.data);
             next(result);
           }
         },
@@ -727,6 +727,7 @@ app.provider('ProjectProgress', function() {
           complete: function(next) {
             formio.loadForms({
                 params: {
+                  type: 'form',
                   limit: Number.MAX_SAFE_INTEGER // Don't limit results
                 }
               })
@@ -734,6 +735,26 @@ app.provider('ProjectProgress', function() {
                 forms = projectForms;
                 forms.forEach(function(form) {
                   if (project && (new Date(project.created).getTime() + 10000) < new Date(form.created).getTime()) {
+                    return next(true);
+                  }
+                });
+                next(false);
+              });
+          }
+        },
+        {
+          key: 'newResource',
+          complete: function(next) {
+            formio.loadForms({
+                params: {
+                  type: 'resource',
+                  limit: Number.MAX_SAFE_INTEGER // Don't limit results
+                }
+              })
+              .then(function(projectForms) {
+                forms = projectForms;
+                forms.forEach(function(resource) {
+                  if (project && (new Date(project.created).getTime() + 10000) < new Date(resource.created).getTime()) {
                     return next(true);
                   }
                 });

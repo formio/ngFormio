@@ -3,10 +3,24 @@
   <project-step title="'Create a project'" complete="currentProject.steps" open="steps.createProject.open">
     <p class="list-group-item-text">Create a project, either from an existing template or a custom project.</p>
   </project-step>
-  <project-step title="'Set up project user accounts'" complete="steps.setupUsers.complete" open="steps.setupUsers.open">
-    <p class="list-group-item-text">Before previewing set up at least one of each user type for the project.</p>
+  <!--<project-step title="'Set up project user accounts'" complete="steps.setupUsers.complete" open="steps.setupUsers.open">-->
+    <!--<p class="list-group-item-text">Before previewing set up at least one of each user type for the project.</p>-->
+    <!--<ul>-->
+      <!--<li ng-repeat="userForm in userForms track by $index">Create a new <a href="#" ui-sref="project.form.form.view({formId: userForm._id})">{{userForm.title}}</a></li>-->
+    <!--</ul>-->
+  <!--</project-step>-->
+  <project-step title="'Create a new resource'" complete="steps.newResource.complete" open="steps.newResource.open">
+    <p class="list-group-item-text">Add a new resource to your project with your own custom fields and actions.</p>
     <ul>
-      <li ng-repeat="userForm in userForms track by $index">Create a new <a href="#" ui-sref="project.form.form.view({formId: userForm._id})">{{userForm.title}}</a></li>
+      <li>Go to the <a href="#" ui-sref="project.resource.create">create a resource</a> page.</li>
+      <li class="list-group-item-text">Use the &lt;formio&gt; embed tag to add the new form to your application.</li>
+    </ul>
+  </project-step>
+  <project-step title="'Create a new form'" complete="steps.newForm.complete" open="steps.newForm.open">
+    <p class="list-group-item-text">Add a new form to your project with your own custom fields and actions.</p>
+    <ul>
+      <li>Go to the <a href="#" ui-sref="project.form.create">create a form</a> page.</li>
+      <li class="list-group-item-text">Use the &lt;formio&gt; embed tag to add the new form to your application.</li>
     </ul>
   </project-step>
   <project-step title="'Modify a form'" complete="steps.modifyForm.complete" open="steps.modifyForm.open">
@@ -28,13 +42,6 @@
     <p class="list-group-item-text">Make a copy of the demo application on your computer so that it can be customized and deployed.</p>
     <ul>
       <li>Go to the <a href="#" ui-sref="project.launch.local">Local App Development</a> page</li>
-    </ul>
-  </project-step>
-  <project-step title="'Create a new form'" complete="steps.newForm.complete" open="steps.newForm.open">
-    <p class="list-group-item-text">Add a new form to your project with your own custom fields and actions.</p>
-    <ul>
-      <li>Go to the <a href="#" ui-sref="project.form.create">create a form</a> page.</li>
-      <li class="list-group-item-text">Use the &lt;formio&gt; embed tag to add the new form to your application.</li>
     </ul>
   </project-step>
   <project-step title="'Launch your application'" complete="steps.launchApp.complete" open="steps.launchApp.open">
