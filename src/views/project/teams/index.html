@@ -1,6 +1,7 @@
 <div class="project-section-inner-content">
   <i ng-if="projectTeamsLoading" style="font-size: 2em;" class="fa fa-spinner fa-pulse"></i>
-  <div ng-if="!projectTeamsLoading && minPlan('team')">
+  <div ng-if="!projectTeamsLoading">
+    <upgrade-warning ng-if="!minPlan('team')" warning="Upgrade your project to Team Pro or above to enable teams."></upgrade-warning>
     <div class="panel panel-default">
       <div class="panel-heading clearfix">
         <div class="btn-group pull-right">
@@ -52,9 +53,5 @@
     </div>
   </div>
   <div ng-if="!projectTeamsLoading && !minPlan('team')">
-    <div class="upgrade-warning text-center">
-      <p>Upgrade your project to Team Pro or above to enable teams.</p>
-      <a class="btn btn-primary project-section-header-button" ng-show="projectSettingsVisible() && !onPrem" ng-click="showUpgradeDialog(primaryProject)"><i class="fa fa-arrow-circle-up"></i> Upgrade Project</a>
-    </div>
   </div>
 </div>

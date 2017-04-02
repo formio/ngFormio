@@ -540,6 +540,7 @@ ul.project-settings-menu {
 
 .project-section-inner-content {
   padding: 20px;
+  position: relative;
 }
 
 .project-form-form-view-page .form-content, .project-resource-form-api-page .form-content {
@@ -1679,11 +1680,19 @@ footer {
   width: auto;
 }
 
-.upgrade-warning {
-  padding: 100px;
-  background-color: #666666;
-  color: white;
-  width: 50%;
-  margin: auto;
-  border-radius: 5px;
+.upgrade-warning-container {
+  width: 100%;
+  min-height: 500px;
+  position: absolute;
+  background-color: rgba(128,128,128,0.3);
+  z-index: 10;
+  padding: 50px;
+  .upgrade-warning {
+    padding: 100px;
+    background-color: #666666;
+    color: white;
+    width: 50%;
+    margin: auto;
+    border-radius: 5px;
+  }
 }

@@ -1,10 +1,4 @@
-<div ng-if="!projectTeamsLoading && !minPlan('team')">
-  <div class="upgrade-warning text-center">
-    <p>Upgrade your project to Team Pro or above to enable CORS Settings.</p>
-    <a class="btn btn-primary project-section-header-button" ng-show="projectSettingsVisible() && !onPrem" ng-click="showUpgradeDialog(primaryProject)"><i class="fa fa-arrow-circle-up"></i> Upgrade Project</a>
-  </div>
-  <br />
-</div>
+<upgrade-warning ng-if="!minPlan('independent')" warning="Upgrade your project to a paid plan to enable CORS Settings."></upgrade-warning>
 <div class="row">
   <div class="col-sm-6">
     <div class="panel panel-default">
@@ -14,7 +8,6 @@
           <div id="form-group-cors" class="form-group">
             <label for="cors" class="control-label">CORS - Cross Origin Resource Sharing</label>
             <textarea class="form-control" id="cors" ng-disabled="currentProject.plan === 'basic'" ng-model="currentProject.settings.cors" placeholder="A comma separated list of domains that forms may be embedded on. Use * to allow all domains."></textarea>
-            <p ng-if="currentProject.plan === 'basic'">Upgrade your project to enable CORS.</p>
           </div>
         </div>
       </div>

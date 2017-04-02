@@ -80,6 +80,30 @@ app.directive('uniqueChecker', ['$http', '$q', 'Formio', function($http, $q, For
   };
 }]);
 
+app.directive('upgradeWarning', function() {
+  return {
+    restrict: 'E',
+    templateUrl: 'views/project/upgradeWarning.html',
+    controller: [
+      '$scope',
+      '$attrs',
+      'ProjectUpgradeDialog',
+      function(
+        $scope,
+        $attrs,
+        ProjectUpgradeDialog
+      ) {
+        $scope.warning = $attrs.warning
+        $scope.projectSettingsVisible = function() {
+          return ($scope.highestRole === 'owner' || $scope.highestRole === 'team_admin');
+        };
+
+        $scope.showUpgradeDialog = ProjectUpgradeDialog.show.bind(ProjectUpgradeDialog);
+      }
+    ]
+  }
+});
+
 app.controller('ProjectCreateController', [
   '$scope',
   '$rootScope',

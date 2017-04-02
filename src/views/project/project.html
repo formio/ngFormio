@@ -7,10 +7,10 @@
     <li ng-if="currentSection.title"><h2><i class="{{ currentSection.icon }}"></i> {{ currentSection.title }}</h2></li>
     <li><span class="project-plan">{{ getPlanName(primaryProject.plan) }}</span></li>
   </ul>
-  <ul class="nav nav-tabs project-nav" ng-if="environments.length || minPlan('team')">
+  <ul class="nav nav-tabs project-nav">
     <li ng-class="{ active: currentProject._id === environment._id }" ng-repeat="environment in environments"><a ng-click="switchEnv(environment._id)">{{ environment.title }}</a></li>
     <li ng-class="{ active: currentProject._id === primaryProject._id }"><a ng-click="switchEnv(primaryProject._id)">Live</a></li>
-    <li ng-if="minPlan('team')"><a ui-sref="project.environment">+ Add Environment</a></li>
+    <li><a ui-sref="project.environment">+ Add Environment</a></li>
   </ul>
 </div>
 <div class="project-container">
