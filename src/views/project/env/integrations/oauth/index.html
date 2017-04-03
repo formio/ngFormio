@@ -1,24 +1,27 @@
+<div class="alert alert-warning" role="alert" ng-if="['basic'].indexOf(currentProject.plan) !== -1 && projectSettingsVisible() && !onPrem">
+  OAuth Authentication is not available on the Basic plan. Please <a ng-click="showUpgradeDialog(currentProject)">Upgrade</a> this project to access this feature.
+</div>
 <uib-accordion close-others="true">
-  <div uib-accordion-group class="panel panel-default" heading="GitHub">
+  <div uib-accordion-group class="panel panel-default" heading="GitHub" is-disabled="['basic'].indexOf(currentProject.plan) !== -1">
     <ng-include src="'views/project/env/integrations/oauth/github.html'"></ng-include>
   </div>
-  <div uib-accordion-group class="panel panel-default" heading="Facebook">
+  <div uib-accordion-group class="panel panel-default" heading="Facebook" is-disabled="['basic'].indexOf(currentProject.plan) !== -1">
     <ng-include src="'views/project/env/integrations/oauth/facebook.html'"></ng-include>
   </div>
-  <div uib-accordion-group class="panel panel-default" heading="Dropbox">
+  <div uib-accordion-group class="panel panel-default" heading="Dropbox" is-disabled="['basic'].indexOf(currentProject.plan) !== -1">
     <ng-include src="'views/project/env/integrations/oauth/dropbox.html'"></ng-include>
   </div>
-  <div uib-accordion-group class="panel panel-default" heading="Office 365">
+  <div uib-accordion-group class="panel panel-default" heading="Office 365" is-disabled="['basic'].indexOf(currentProject.plan) !== -1">
     <ng-include src="'views/project/env/integrations/oauth/office365.html'"></ng-include>
   </div>
-  <div uib-accordion-group class="panel panel-default" heading="Google">
+  <div uib-accordion-group class="panel panel-default" heading="Google" is-disabled="['basic'].indexOf(currentProject.plan) !== -1">
     <ng-include src="'views/project/env/integrations/oauth/google.html'"></ng-include>
   </div>
-  <div uib-accordion-group class="panel panel-default" heading="Twitter">
+  <div uib-accordion-group class="panel panel-default" heading="Twitter" is-disabled="['basic'].indexOf(currentProject.plan) !== -1">
     <ng-include src="'views/project/env/integrations/oauth/twitter.html'"></ng-include>
   </div>
-   <div uib-accordion-group class="panel panel-default" heading="Linkedin">
+   <div uib-accordion-group class="panel panel-default" heading="Linkedin" is-disabled="['basic'].indexOf(currentProject.plan) !== -1">
     <ng-include src="'views/project/env/integrations/oauth/linkedin.html'"></ng-include>
   </div>
 </uib-accordion>
-<button class="btn btn-primary" ng-click="saveProject()">Save Settings</button>
+<button ng-if="['basic'].indexOf(currentProject.plan) === -1" class="btn btn-primary" ng-click="saveProject()">Save Settings</button>

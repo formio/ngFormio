@@ -944,6 +944,13 @@ angular
   .factory('ProjectPlans', ['$filter', function($filter) {
     return {
       plans: {
+        trial: {
+          order: 0,
+          name: 'trial',
+          title: 'Trial',
+          labelStyle: 'label-trial',
+          priceDescription: 'Free 30 day trial'
+        },
         basic: {
           order: 1,
           name: 'basic',

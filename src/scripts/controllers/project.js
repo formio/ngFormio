@@ -122,7 +122,6 @@ app.controller('ProjectCreateController', [
     $rootScope.noBreadcrumb = false;
     $scope.currentProject = {template: 'default'};
     $scope.hasTemplate = false;
-    $scope.showName = false;
     $scope.templateLimit = 3;
 
     $scope.templates = [];
@@ -309,9 +308,21 @@ app.controller('ProjectController', [
       $scope.projectType = $scope.currentProject.hasOwnProperty('project') ? 'Environment' : 'Project';
       $scope.projectApi = AppConfig.protocol + '//' + result.name + '.' + AppConfig.serverHost;
       $rootScope.currentProject = result;
-      $scope.showName = !(result.plan && result.plan === 'basic');
       $scope.projectsLoaded = true;
       var allowedFiles, allow, custom;
+
+      var currTime = (new Date()).getTime();
+      var projTime = (new Date(result.created.toString())).getTime();
+      var delta = Math.ceil(parseInt((currTime - projTime) / 1000));
+      var day = 86400;
+      var remaining = 30 - parseInt(delta / day);
+      $scope.trialDaysRemaining = remaining > 0 ? remaining : 0;
+
+      $scope.rolesLoading = true;
+      $http.get($scope.formio.projectUrl + '/role').then(function(result) {
+        $scope.currentProjectRoles = result.data;
+        $scope.rolesLoading = false;
+      });
 
       try {
         allowedFiles = JSON.parse(localStorage.getItem('allowedFiles')) || {};
@@ -718,7 +729,7 @@ app.provider('ProjectProgress', function() {
               .then(function(projectForms) {
                 forms = projectForms;
                 forms.forEach(function(form) {
-                  if (project && (new Date(project.created).getTime() + 10000) < new Date(form.modified).getTime()) {
+                  if (project && ((new Date(project.created).getTime() + 10000) < new Date(form.modified).getTime())) {
                     return next(true);
                   }
                 });
@@ -770,7 +781,7 @@ app.provider('ProjectProgress', function() {
               .then(function(projectForms) {
                 forms = projectForms;
                 forms.forEach(function(resource) {
-                  if (project && (new Date(project.created).getTime() + 10000) < new Date(resource.created).getTime()) {
+                  if (project && ((new Date(project.created).getTime() + 10000) < new Date(form.created).getTime())) {
                     return next(true);
                   }
                 });
@@ -937,7 +948,7 @@ app.controller('ProjectOverviewController', [
     var abbreviator = new NumberAbbreviate();
 
     $scope.hasTeams = function() {
-      return $scope.currentProject.plan === 'team' || $scope.currentProject.plan === 'commercial';
+      return ['trial', 'team', 'commercial'].indexOf($scope.currentProject.plan) !== -1;
     };
 
     $scope.getLastModified = function() {
@@ -2620,6 +2631,13 @@ app.factory('ProjectUpgradeDialog', [
                 }
               };
 
+              var currTime = (new Date()).getTime();
+              var projTime = (new Date(project.created.toString())).getTime();
+              var delta = Math.ceil(parseInt((currTime - projTime) / 1000));
+              var day = 86400;
+              var remaining = 30 - parseInt(delta / day);
+              $scope.trialDaysRemaining = remaining > 0 ? remaining : 0;
+
               $scope.$on('formSubmission', function() {
                 if(getActiveForm() === $scope.paymentForm) {
                   loadPaymentInfo();
@@ -2669,7 +2687,6 @@ app.factory('ProjectUpgradeDialog', [
               if ($scope.selectedPlan === undefined) {
                 $scope.selectedPlan = 'team';
               }
-
             }
           ]
         });
