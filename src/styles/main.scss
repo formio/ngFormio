@@ -500,12 +500,15 @@ div.project-section-separator {
   }
 
   .project-plan {
-    background-color: $brand-primary;
+    //background-color: $brand-primary;
     padding: 5px 10px;
     color: white;
     border-radius: 12px;
     position: relative;
     top: -3px;
+    //&.label-success {
+    //  background-color: $brand-primary;
+    //}
   }
 
   .project-nav {

@@ -285,7 +285,7 @@ angular
           url: '/version/create',
           parent: 'project.env',
           templateUrl: 'views/project/env/version/create.html',
-          controller: 'ProjectCreateController'
+          controller: 'ProjectVersionCreateController'
         })
         .state('project.env.version.import', {
           url: '/version/import',
@@ -947,7 +947,7 @@ angular
         trial: {
           order: 0,
           name: 'trial',
-          title: 'Trial',
+          title: 'Team Pro Trial',
           labelStyle: 'label-trial',
           priceDescription: 'Free 30 day trial'
         },
@@ -968,14 +968,14 @@ angular
         team: {
           order: 3,
           name: 'team',
-          title: 'Team Pro',
+          title: 'Team Pro Hosted',
           labelStyle: 'label-success',
           priceDescription: 'Starting at $100/mo'
         },
         commercial: {
           order: 4,
           name: 'commercial',
-          title: 'Commercial',
+          title: 'Team Pro On Site',
           labelStyle: 'label-commercial',
           priceDescription: 'Starting at $250/mo per instance'
         }

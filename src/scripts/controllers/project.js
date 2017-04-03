@@ -548,7 +548,7 @@ app.controller('ProjectDeployController', [
   }
 ]);
 
-app.controller('ProjectCreateController', [
+app.controller('ProjectVersionCreateController', [
   '$scope',
   'AppConfig',
   'Formio',
@@ -781,7 +781,7 @@ app.provider('ProjectProgress', function() {
               .then(function(projectForms) {
                 forms = projectForms;
                 forms.forEach(function(resource) {
-                  if (project && ((new Date(project.created).getTime() + 10000) < new Date(form.created).getTime())) {
+                  if (project && ((new Date(project.created).getTime() + 10000) < new Date(resource.created).getTime())) {
                     return next(true);
                   }
                 });
