@@ -2198,7 +2198,7 @@ app.controller('ProjectTeamController', [
       });
     });
 
-    var setTeamPermission = function(project, team, permission) {
+    var setTeamPermission = function(project, team, newPermission) {
       var access = project.access ||  [];
       var found = false;
 
@@ -2209,7 +2209,7 @@ app.controller('ProjectTeamController', [
         permission.roles = _.without(permission.roles, team._id);
 
         // Add the given role to the new permission type.
-        if (permission && permission.type === permission) {
+        if (permission && permission.type === newPermission) {
           found = true;
 
           permission.roles = permission.roles || [];
@@ -2218,9 +2218,9 @@ app.controller('ProjectTeamController', [
       });
 
       // This team permission was not found, add it.
-      if(!found && permission) {
+      if(!found && newPermission) {
         access.push({
-          type: permission,
+          type: newPermission,
           roles: [team._id]
         });
       }
@@ -2233,8 +2233,8 @@ app.controller('ProjectTeamController', [
       (new Formio(AppConfig.apiBase + '/project/' + $scope.primaryProject._id)).saveProject($scope.primaryProject)
         .then(function(project) {
           $scope.primaryProject = project;
-          GoogleAnalytics.sendEvent('Project', 'update', null, 1);
-        }, FormioAlerts.onError.bind(FormioAlerts))
+          //GoogleAnalytics.sendEvent('Project', 'update', null, 1);
+        })
         .catch(FormioAlerts.onError.bind(FormioAlerts));
     };
 
@@ -2280,145 +2280,6 @@ app.controller('ProjectTeamController', [
     $scope.updateTeam = function(team, permission) {
       setTeamPermission($scope.primaryProject, team, permission);
       saveProject($scope.primaryProject);
-    };
-  }
-]);
-
-app.controller('ProjectTeamEditController', [
-  '$scope',
-  '$state',
-  'FormioAlerts',
-  'GoogleAnalytics',
-  '$stateParams',
-  'AppConfig',
-  '$http',
-  function(
-    $scope,
-    $state,
-    FormioAlerts,
-    GoogleAnalytics,
-    $stateParams,
-    AppConfig,
-    $http
-  ) {
-    $scope.addTeam = {
-      _id: ($stateParams.teamId !== null) ? $stateParams.teamId : null,
-      permission: ($stateParams.permission !== null) ? $stateParams.permission : null
-    };
-
-    if($scope.addTeam._id && !$scope.addTeam.permission) {
-      $scope.addTeam.permission = _.filter($scope.primaryProjectTeams, {_id: $scope.addTeam._id})[0].permission;
-    }
-
-    // Only allow users to select teams that do not have permissions yet.
-    var current = _.map($scope.primaryProjectTeams, '_id');
-
-    // If editing a old permission, only allow the current team to be edited.
-    if($scope.addTeam._id) {
-      $scope.uniqueEligibleTeams = _.filter($scope.primaryProjectTeams, {_id: $scope.addTeam._id});
-    }
-    else {
-      // Get the latest team data.
-      $http.get(AppConfig.apiBase + '/team/all').then(function(result) {
-        $scope.userTeams = result.data;
-        $scope.userTeamsLoading = false;
-
-        // Separate out the teams that the current user owns, to save an api call.
-        $scope.primaryProjectEligibleTeams = _.filter(result.data, {owner: $scope.user._id});
-        $scope.uniqueEligibleTeams = _.filter($scope.primaryProjectEligibleTeams, function(team) {
-          return (current.indexOf(team._id) === -1);
-        });
-      });
-    }
-
-    // Save the new team access with the existing project permissions.
-    $scope.saveTeam = function() {
-      var access = $scope.primaryProject.access ||  [];
-      var found = false;
-
-      // Search the present permissions to add the new permission.
-      access = _.forEach(access, function(permission) {
-        // Remove all the old permissions.
-        permission.roles = permission.roles || [];
-        permission.roles = _.without(permission.roles, $scope.addTeam._id);
-
-        // Add the given role to the new permission type.
-        if (permission.type === $scope.addTeam.permission) {
-          found = true;
-
-          permission.roles = permission.roles || [];
-          permission.roles.push($scope.addTeam._id);
-        }
-      });
-
-      // This team permission was not found, add it.
-      if(!found) {
-        access.push({
-          type: $scope.addTeam.permission,
-          roles: [$scope.addTeam._id]
-        });
-      }
-
-      // Update the current project access with the new team access.
-      $scope.primaryProject.access = access;
-
-      // Use the formio service to save the current project.
-      if (!$scope.primaryProject._id) { return FormioAlerts.onError(new Error('No Project found.')); }
-      $scope.formio.saveProject($scope.primaryProject)
-        .then(function(project) {
-          FormioAlerts.addAlert({
-            type: 'success',
-            message: 'Team saved.'
-          });
-          GoogleAnalytics.sendEvent('Project', 'update', null, 1);
-          // Reload state so alerts display and project updates.
-          $state.go('project.teams', null, {reload: true});
-        }, FormioAlerts.onError.bind(FormioAlerts))
-        .catch(FormioAlerts.onError.bind(FormioAlerts));
-    };
-  }
-]);
-
-app.controller('ProjectTeamDeleteController', [
-  '$scope',
-  '$stateParams',
-  'FormioAlerts',
-  'GoogleAnalytics',
-  '$state',
-  function(
-    $scope,
-    $stateParams,
-    FormioAlerts,
-    GoogleAnalytics,
-    $state
-  ) {
-    $scope.removeTeam = _.filter($scope.primaryProjectTeams, {_id: $stateParams.teamId})[0];
-    $scope.saveTeam = function() {
-      if(!$scope.removeTeam || !$scope.removeTeam) return $state.go('project.teams', null, {reload: true});
-
-      // Search the present permissions to remove the given permission.
-      var access = $scope.primaryProject.access ||  [];
-      access = _.forEach(access, function(permission) {
-        permission.roles = permission.roles || [];
-        permission.roles = _.without(permission.roles, $scope.removeTeam._id);
-      });
-
-      // Update the current project access with the new team access.
-      $scope.primaryProject.access = access;
-
-      // Use the formio service to save the current project.
-      if (!$scope.primaryProject._id) { return FormioAlerts.onError(new Error('No Project found.')); }
-      $scope.formio.saveProject($scope.primaryProject)
-        .then(function(project) {
-          FormioAlerts.addAlert({
-            type: 'success',
-            message: 'Team removed.'
-          });
-          GoogleAnalytics.sendEvent('Project', 'update', null, 1);
-          // Reload state so alerts display and project updates.
-          $state.go('project.teams', null, {reload: true});
-        }, FormioAlerts.onError.bind(FormioAlerts))
-        .catch(FormioAlerts.onError.bind(FormioAlerts));
     };
   }
 ]);

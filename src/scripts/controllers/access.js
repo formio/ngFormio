@@ -140,7 +140,7 @@ app.directive('permissionEditor', ['$q', function($q) {
 
       $scope.onChange = function() {
         $scope.$emit('permissionsChange');
-      }
+      };
     }
   };
 }]);
@@ -241,7 +241,7 @@ app.directive('resourcePermissionEditor', ['$q', 'FormioUtils', function($q, For
 
       $scope.onChange = function() {
         $scope.$emit('permissionsChange');
-      }
+      };
     }
   };
 }]);

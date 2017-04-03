@@ -1048,7 +1048,7 @@ angular
             scope.$apply(function () {
               scope.fileread = loadEvent.target.result;
             });
-          }
+          };
           if (scope.readAs === 'base64') {
             reader.readAsDataURL(changeEvent.target.files[0]);
           }
@@ -1057,5 +1057,5 @@ angular
           }
         });
       }
-    }
+    };
   }]);
