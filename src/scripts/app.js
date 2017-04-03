@@ -221,6 +221,12 @@ angular
           templateUrl: 'views/project/access/access.html',
           controller: 'AccessController'
         })
+        .state('project.settings.pdf', {
+          url: '/pdf',
+          parent: 'project.settings',
+          templateUrl: 'views/project/pdf/index.html',
+          controller: 'PDFController'
+        })
         .state('project.settings.email', {
           url: '/email',
           parent: 'project.settings',
@@ -638,8 +644,6 @@ angular
       $rootScope.apiBase = AppConfig.apiBase;
       $rootScope.apiProtocol = AppConfig.apiProtocol;
       $rootScope.apiServer = AppConfig.apiServer;
-
-      console.log(AppConfig.pdfUploadForm);
 
       // Start the tutorial.
       $rootScope.startTutorial = function() {

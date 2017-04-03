@@ -64,13 +64,23 @@ app.config([
           url: '/',
           templateUrl: 'views/form/' + type + 's.html'
         })
+        .state(parentName + '.new', {
+          url: '/new/' + type,
+          templateUrl: 'views/form/new.html',
+          controller: 'FormController',
+          params: {
+            formType: type,
+            newForm: true
+          }
+        })
         .state(parentName + '.create', {
           url: '/create/' + type,
           templateUrl: 'views/form/form-edit.html',
           controller: 'FormController',
           params: {
             formType: type,
-            components: null
+            components: null,
+            form: null
           }
         })
         .state(parentName + '.import', {
@@ -247,6 +257,7 @@ app.directive('customOnChange', function() {
     }
   };
 });
+
 app.controller('FormController', [
   '$scope',
   '$state',
@@ -263,7 +274,7 @@ app.controller('FormController', [
   '$q',
   'ngDialog',
   'Upload',
-  '$timeout',
+  '$http',
   function(
     $scope,
     $state,
@@ -280,7 +291,7 @@ app.controller('FormController', [
     $q,
     ngDialog,
     Upload,
-    $timeout
+    $http
   ) {
     // Project information.
     $scope.formReady = true;
@@ -288,22 +299,32 @@ app.controller('FormController', [
     $scope.upload = function (file) {
       $scope.uploading = true;
       $scope.formReady = false;
-      var fileName = $stateParams.formId || FormioUtils.uniqueName(file.name);
-      var filePath = '/pdf/' + $scope.projectId + '/' + fileName;
+      var filePath = '/pdf/' + $scope.projectId + '/file';
       Upload.upload({
         url: AppConfig.pdfServer + filePath,
         data: {file: file},
         headers: {'x-jwt-token': Formio.getToken()}
-      }).then(function () {
+      }).then(function (res) {
         $scope.formReady = true;
         $scope.uploading = false;
         if (!$scope.form.settings) {
           $scope.form.settings = {};
         }
-        $scope.form.settings.pdf = AppConfig.pdfServer + filePath.replace(/\.pdf$/, '') + '.html';
+        if (res.data && res.data.path) {
+          $scope.form.settings.pdf = {
+            src: AppConfig.pdfServer + res.data.path,
+            id: res.data.file
+          };
+        }
+        if ($stateParams.newForm) {
+          $scope.form.display = 'pdf';
+          $state.go('project.form.create', {
+            form: $scope.form
+          })
+        }
         ngDialog.close();
       }, function (resp) {
-        console.warn(resp.status);
+        FormioAlerts.onError({message: resp.data});
         $scope.uploading = false;
         ngDialog.close();
       }, function (evt) {
@@ -335,21 +356,39 @@ app.controller('FormController', [
 
     $scope.uploadPDF = function() {
       ngDialog.open({
-        template: 'pdfupload.html',
+        template: 'views/form/upload.html',
         scope: $scope
+      });
+
+      // Determine if we have enough to upload.
+      $scope.purchaseRequired = false;
+      $http.get(AppConfig.pdfServer + '/pdf/' + $stateParams.projectId, {
+        headers: {
+          'x-jwt-token': Formio.getToken()
+        }
+      }).then(function(results) {
+        if (parseInt(results.data.data.active, 10) >= parseInt(results.data.data.total)) {
+          $scope.purchaseRequired = true;
+        }
       });
     };
     var formType = $stateParams.formType || 'form';
     $scope.capitalize = _.capitalize;
-    $scope.form = {
-      title: '',
-      display: 'form',
-      type: formType,
-      components: $stateParams.components || [],
-      access: [],
-      submissionAccess: [],
-      settings: {}
-    };
+
+    if ($stateParams.form) {
+      $scope.form = $stateParams.form;
+    }
+    else {
+      $scope.form = {
+        title: '',
+        display: 'form',
+        type: formType,
+        components: $stateParams.components || [],
+        access: [],
+        submissionAccess: [],
+        settings: {}
+      };
+    }
 
     // Match name of form to title if not customized.
     $scope.titleChange = function(oldTitle) {

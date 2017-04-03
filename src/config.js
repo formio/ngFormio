@@ -63,6 +63,7 @@ angular.module('formioApp').constant('AppConfig', {
   appVersion: 'APP_VERSION',
   copyrightYear: (new Date()).getFullYear().toString(),
   forceSSL: false,
+  pdfPrice: 10,
   appBase: appBase,
   apiBase: apiBase,
   formioBase: formioBase,
@@ -70,8 +71,8 @@ angular.module('formioApp').constant('AppConfig', {
   apiServer: serverHost,
   serverHost: serverHost,
   protocol: apiProtocol,
-  pdfServer: 'https://files.form.io',
-  /*pdfServer: 'http://localhost:4005',*/
+  /*pdfServer: 'https://files.form.io',*/
+  pdfServer: 'http://localhost:4005',
   tutorial: 'https://help.form.io/start/',
   userForm: formioBase + '/user',
   userLoginForm: formioBase + '/user/login',
