@@ -122,7 +122,7 @@ app.controller('TeamViewController', [
     $scope.removeMember = function(member) {
       _.remove($scope.team.data.members, { _id: member._id });
       $scope.formio.saveSubmission(angular.copy($scope.team));
-    }
+    };
   }
 ]);
 
@@ -147,6 +147,6 @@ app.controller('TeamDeleteController', [
     $scope.$on('cancel', function(event) {
       event.stopPropagation();
       $state.go('team.view', { teamId: $scope.team._id });
-    })
+    });
   }
 ]);

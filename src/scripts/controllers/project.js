@@ -93,7 +93,7 @@ app.directive('upgradeWarning', function() {
         $attrs,
         ProjectUpgradeDialog
       ) {
-        $scope.warning = $attrs.warning
+        $scope.warning = $attrs.warning;
         $scope.projectSettingsVisible = function() {
           return ($scope.highestRole === 'owner' || $scope.highestRole === 'team_admin');
         };
@@ -101,7 +101,7 @@ app.directive('upgradeWarning', function() {
         $scope.showUpgradeDialog = ProjectUpgradeDialog.show.bind(ProjectUpgradeDialog);
       }
     ]
-  }
+  };
 });
 
 app.controller('ProjectCreateController', [
@@ -550,11 +550,13 @@ app.controller('ProjectDeployController', [
 
 app.controller('ProjectVersionCreateController', [
   '$scope',
+  '$state',
   'AppConfig',
   'Formio',
   'FormioAlerts',
   function(
     $scope,
+    $state,
     AppConfig,
     Formio,
     FormioAlerts
@@ -611,7 +613,7 @@ app.controller('ProjectImportController', [
           });
         })
         .catch(FormioAlerts.onError.bind(FormioAlerts));
-    }
+    };
   }
 ]);
 
@@ -2090,7 +2092,7 @@ app.controller('ProjectSettingsController', [
 
     $scope.updateProject = function() {
       $scope.formio.saveProject($scope.currentProject);
-    }
+    };
 
     // Save the Project.
     $scope.saveProject = function() {
@@ -2258,7 +2260,7 @@ app.controller('ProjectTeamController', [
 
     $scope.added = {
       team: undefined
-    }
+    };
 
     $scope.addTeam = function(team) {
       setTeamPermission($scope.primaryProject, team, 'team_read');
