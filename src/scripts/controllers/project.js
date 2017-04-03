@@ -2155,6 +2155,7 @@ app.controller('ProjectTeamController', [
   '$scope',
   '$http',
   'AppConfig',
+  'Formio',
   'FormioAlerts',
   'TeamPermissions',
   'GoogleAnalytics',
@@ -2162,6 +2163,7 @@ app.controller('ProjectTeamController', [
     $scope,
     $http,
     AppConfig,
+    Formio,
     FormioAlerts,
     TeamPermissions,
     GoogleAnalytics
@@ -2217,7 +2219,7 @@ app.controller('ProjectTeamController', [
     };
 
     var saveProject = function(project) {
-      $scope.formio.saveProject($scope.primaryProject)
+      (new Formio(AppConfig.apiBase + '/project/' + $scope.primaryProject._id)).saveProject($scope.primaryProject)
         .then(function(project) {
           $scope.primaryProject = project;
           GoogleAnalytics.sendEvent('Project', 'update', null, 1);
