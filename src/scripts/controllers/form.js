@@ -224,7 +224,7 @@ app.directive('formList', function() {
           $scope.formsFinished = true;
         });
         $scope.$watch('project', function(newProject, oldProject) {
-          $scope.projectApi = AppConfig.protocol + '//' + $scope.project.name + '.' + AppConfig.serverHost;
+          $scope.projectApi = $rootScope.projectPath($scope.project);
         });
         $scope.export = function(form, type) {
           window.open(AppConfig.apiBase + '/project/' + $scope.project._id + '/form/' + form._id + '/export?format=' + type + '&x-jwt-token=' + $rootScope.userToken);
