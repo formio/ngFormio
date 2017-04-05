@@ -22,7 +22,7 @@ module.exports = [
       try {
         // Translate text using either angular-translate or angular-gettext
         var translateText = function(text) {
-          if ($translate) return $translate(text);
+          if ($translate) return $translate.instant(text);
           if (gettextCatalog) return gettextCatalog.getString(text);
           return text;
         };
