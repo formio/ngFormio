@@ -8,7 +8,7 @@
       ng-model="date.day"
       ng-change="onChange()"
       style="padding-right: 10px;"
-      placeholder="{{component.fields.day.placeholder}}"
+      ng-attr-placeholder="{{component.fields.day.placeholder}}"
       day-part
       characters="2"
       min="0"
@@ -37,7 +37,7 @@
       ng-model="date.day"
       ng-change="onChange()"
       style="padding-right: 10px;"
-      placeholder="{{component.fields.day.placeholder}}"
+      ng-attr-placeholder="{{component.fields.day.placeholder}}"
       day-part
       characters="2"
       min="0"
@@ -54,7 +54,7 @@
       ng-model="date.year"
       ng-change="onChange()"
       style="padding-right: 10px;"
-      placeholder="{{component.fields.year.placeholder}}"
+      ng-attr-placeholder="{{component.fields.year.placeholder}}"
       characters="4"
       min="0"
       max="2100"

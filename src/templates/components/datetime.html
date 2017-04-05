@@ -20,7 +20,7 @@
     enable-time="component.enableTime"
     ng-model="data[component.key]"
     tabindex="{{ component.tabindex || 0 }}"
-    placeholder="{{ component.placeholder | formioTranslate:null:builder }}"
+    ng-attr-placeholder="{{ component.placeholder | formioTranslate:null:builder }}"
     datepicker-options="component.datePicker"
     timepicker-options="component.timePicker"
   />
