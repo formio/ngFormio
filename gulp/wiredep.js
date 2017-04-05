@@ -19,7 +19,7 @@ module.exports = function(gulp, plugins) {
       }),
         { relative: true}))
       .pipe(wiredep({
-        exclude: ['bootstrap-sass', 'bower_components/bootstrap/'],
+        exclude: ['bootstrap-sass', 'bower_components/bootstrap/', 'bower_components/signature_pad/'],
         ignorePath: /^(\.\.\/)*\.\./
       }))
       .pipe(gulp.dest('src')));

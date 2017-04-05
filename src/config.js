@@ -84,6 +84,7 @@ angular.module('formioApp').constant('AppConfig', {
   forceSSL: false,
   appBase: appBase,
   apiBase: apiBase,
+  formioBase: formioBase,
   apiProtocol: apiProtocol,
   apiServer: serverHost,
   serverHost: serverHost,
