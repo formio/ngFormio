@@ -1072,13 +1072,15 @@ app.controller('ProjectFormioController', [
   '$window',
   '$http',
   'FormioAlerts',
+  'Chartist',
   function(
     $scope,
     Formio,
     AppConfig,
     $window,
     $http,
-    FormioAlerts
+    FormioAlerts,
+    Chartist
   ) {
     $scope.currentSection.title = 'Admin Data';
     $scope.currentSection.icon = 'glyphicon glyphicon-globe';
