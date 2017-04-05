@@ -194,7 +194,8 @@ app.directive('formList', function() {
       project: '=',
       formType: '=',
       numPerPage: '=',
-      listMode: '='
+      listMode: '=',
+      protected: '=?'
     },
     compile: function(element, attrs) {
       if (!attrs.numPerPage) { attrs.numPerPage = 25; }

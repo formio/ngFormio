@@ -16,7 +16,7 @@
           <h4 >{{getPermissionLabel(permission)}}</h4>
         </div>
         <div class="col col-sm-9">
-          <ui-select multiple ng-model="permission.roles" theme="bootstrap" reset-search-input="true" name="{{permission.type}}_role" id="{{permission.type}}_role" ng-change="onChange()">
+          <ui-select multiple ng-model="permission.roles" theme="bootstrap" reset-search-input="true" name="{{permission.type}}_role" id="{{permission.type}}_role" ng-change="onChange()" disabled="currentProject.protect">
             <ui-select-match class="ui-select-match" placeholder="Select roles...">{{$item.title}}</ui-select-match>
             <ui-select-choices class="ui-select-choices" repeat="role._id as role in roles | filter: $select.search">
               <div>{{ role.title }}</div>

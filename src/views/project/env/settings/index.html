@@ -8,7 +8,7 @@
     <label for="name" class="control-label required-field">Domain Name</label>
     <div class="input-group" style="width: 400px;">
       <span class="input-group-addon">{{ apiProtocol }}//</span>
-      <input type="text" class="form-control" id="name" name="name" ng-model="currentProject.name" title="{{ currentProject.name }}" placeholder="myproject" valid-subdomain unique-checker="/project/available" ng-model-options="{ debounce: { 'default': 500, 'blur': 0 } }" ng-maxlength="63" ng-disabled="['basic', 'trial'].indexOf(primaryProject.plan) !== -1" ng-required="['basic', 'trial'].indexOf(primaryProject.plan) === -1">
+      <input type="text" class="form-control" id="name" name="name" ng-model="currentProject.name" title="{{ currentProject.name }}" placeholder="myproject" valid-subdomain unique-checker="/project/available" ng-model-options="{ debounce: { 'default': 500, 'blur': 0 } }" ng-maxlength="63" ng-disabled="['basic', 'trial'].indexOf(primaryProject.plan) !== -1 || currentProject.protect" ng-required="['basic', 'trial'].indexOf(primaryProject.plan) === -1">
       <i class="form-control-feedback glyphicon" ng-class="{'glyphicon-ok': projectForm.name.$valid, 'glyphicon-remove': projectForm.name.$invalid && projectForm.name.$dirty}" style="right: -36px;"></i>
       <span class="input-group-addon">.{{ apiServer }}</span>
     </div>
