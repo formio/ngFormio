@@ -317,14 +317,14 @@ $project-header-color: #eee;
   background-color: darken($brand-primary, 25%);
   text-align: center;
   padding: 0;
-  width: 85px;
+  width: 70px;
   position: absolute;
   .nav {
     margin: 0;
     li {
       & > a {
-        height: 90px;
-        padding: 20px 0 0 0;
+        height: 70px;
+        padding: 14px 0 0 0;
         color: $project-header-color;
         &:hover {
           background-color: darken($brand-primary, 20%);
@@ -333,7 +333,7 @@ $project-header-color: #eee;
           font-size: 0.6em;
         }
         i {
-          font-size: 2em;
+          font-size: 1.8em;
         }
       }
       &.active {
@@ -352,7 +352,7 @@ $project-header-color: #eee;
   width: 100%;
   min-height: 700px;
   padding: 0;
-  border-left: solid darken($brand-primary, 25%) 85px;
+  border-left: solid darken($brand-primary, 25%) 70px;
 }
 
 .project-content {
@@ -1396,11 +1396,15 @@ footer {
   .list-group {
     padding: 0px;
 
+    .list-group-heading {
+      font-weight: bold;
+      font-size: 1.8em;
+      background-color: $table-bg-hover;
+    }
+
     .list-group-item {
       padding: 30px 0;
       border-color: #eeeeee;
-      border-left: none;
-      border-right: none;
       &:nth-child(even) {
         background-color: $table-bg-accent;
       }
@@ -1428,6 +1432,7 @@ footer {
 
 .list-group.list-group-striped {
   .list-group-item {
+    border-color: #eeeeee;
     &:nth-child(odd) {
       background-color: $table-bg-accent;
     }
@@ -1716,4 +1721,14 @@ footer {
     margin: auto;
     border-radius: 5px;
   }
+}
+
+.trial {
+  .count {
+    font-size: 3em;
+  }
+}
+
+.table > tbody > tr > td {
+  border: 1px solid #eee;
 }

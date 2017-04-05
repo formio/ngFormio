@@ -24,9 +24,9 @@
     <input type="text" class="form-control" id="description" name="description" ng-model="currentProject.description" placeholder="Enter a short description for your project." ng-maxlength="512">
     <p class="help-block" ng-show="projectForm.description.$error.maxlength">Description cannot be longer than 512 characters.</p>
   </div>
-  <div id="form-group-protect" class="form-group" ng-if="projectType === 'Project'">
+  <div id="form-group-protect" class="form-group" ng-if="currentProject._id">
     <label for="protect" class="control-label">
-      <input type="checkbox" id="protect" ng-model="project.protect"> Protected mode
+      <input type="checkbox" id="protect" ng-model="currentProject.protect"> Protected mode
     </label>
     <div class="text-muted">
       <p>When checked:<p>

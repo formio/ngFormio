@@ -1,36 +1,23 @@
 <div class="project-section-content">
   <div class="project-section-inner-content">
-    <div class="panel panel-danger panel-trial" ng-if="currentProject.plan === 'trial'">
-      <div class="panel-heading">
-        <h3 class="panel-title">Notice</h3>
-      </div>
-      <div class="panel-body">
-        This Project is on the Trial Plan. You have {{trialDaysRemaining}} days remaining. <a href="" ng-click="showUpgradeDialog(currentProject)">Upgrade</a> your project to keep the Premium Features.
-      </div>
-    </div>
-
     <div class="row">
-      <div class="col-md-12">
-        <legend>Project Info</legend>
-        <div class="project-info">
-          <ul class="list-group">
-            <li class="list-group-item">
-              <div class="row">
-                <div class="col-xs-3"><h5 class="ellipsis">Title</h5></div>
-                <div class="col-xs-9">
-                  <span><h5>{{ currentProject.title }}</h5></span>
-                </div>
-              </div>
-            </li>
-            <li class="list-group-item">
-              <div class="row">
-                <div class="col-xs-3"><h5>API Endpoint</h5></div>
-                <div class="col-xs-9">
-                  <h4 class="">{{ apiProtocol }}//{{ currentProject.name }}.{{ apiServer }}</h4>
-                </div>
-              </div>
-            </li>
-          </ul>
+      <div class="col col-md-8  ">
+      </div>
+      <div class="col col-md-4">
+        <div ng-if="primaryProject.plan === 'trial'" class="trial text-center">
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <div class="count">{{trialDaysRemaining}}</div>
+              <p>Days remaining on your<br /> Team Pro trial</p>
+              <a class="btn btn-primary project-section-header-button" ng-click="showUpgradeDialog(primaryProject)"><i class="fa fa-arrow-circle-up"></i> Upgrade Now</a>
+            </div>
+          </div>
+        </div>
+        <h4>{{ currentProject.title }}</h4>
+        <p class="">{{ apiProtocol }}//{{ currentProject.name }}.{{ apiServer }}</p>
+        <p><strong>Current version</strong> {{ currentProject.version }}</p>
+        <div ng-if="currentProject.protect">
+          <strong>Protected</strong> - This environment is protected from changes.
         </div>
         <div ng-if="hasTeams()">
           <h4>
@@ -48,11 +35,6 @@
             <dt ng-class="{'text-muted': !projectPermissions.admin}">Administrate</dt>
             <dd><i class="fa" ng-class="{'text-success fa-check': projectPermissions.admin, 'text-muted fa-times': !projectPermissions.admin}"></i></dd>
           </dl>
-        </div>
-        <div ng-if="!hasTeams() && !onPrem">
-          <div class="well">
-            <h4><a href="" ng-click="showUpgradeDialog(currentProject)">Upgrade Plan</a> to enable teams for this project</h4>
-          </div>
         </div>
       </div>
     </div>
