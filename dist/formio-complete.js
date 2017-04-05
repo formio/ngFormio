@@ -1345,7 +1345,7 @@ return /******/ (function(modules) { // webpackBootstrap
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"angular":9,"moment":190}],3:[function(_dereq_,module,exports){
 /**
- * @license AngularJS v1.6.3
+ * @license AngularJS v1.6.4
  * (c) 2010-2017 Google, Inc. http://angularjs.org
  * License: MIT
  */
@@ -1900,7 +1900,7 @@ function sanitizeText(chars) {
 // define ngSanitize module and register $sanitize service
 angular.module('ngSanitize', [])
   .provider('$sanitize', $SanitizeProvider)
-  .info({ angularVersion: '1.6.3' });
+  .info({ angularVersion: '1.6.4' });
 
 /**
  * @ngdoc filter
@@ -47943,7 +47943,7 @@ var Formio = function () {
       this.projectUrl = options.project;
     }
 
-    var project = this.projectUrl || Formio.appUrl;
+    var project = this.projectUrl || Formio.projectUrl;
 
     // The baseURL is the same as the projectUrl. This is almost certainly against
     // the Open Source server.
@@ -48049,8 +48049,8 @@ var Formio = function () {
     }
 
     // Set the app url if it is not set.
-    if (!Formio.appUrlSet) {
-      Formio.appUrl = this.projectUrl;
+    if (!Formio.projectUrlSet) {
+      Formio.projectUrl = this.projectUrl;
     }
   }
 
@@ -48523,8 +48523,8 @@ var Formio = function () {
     key: 'setBaseUrl',
     value: function setBaseUrl(url) {
       Formio.baseUrl = url;
-      if (!Formio.appUrlSet) {
-        Formio.appUrl = url;
+      if (!Formio.projectUrlSet) {
+        Formio.projectUrl = url;
       }
     }
   }, {
@@ -48545,13 +48545,26 @@ var Formio = function () {
   }, {
     key: 'setAppUrl',
     value: function setAppUrl(url) {
-      Formio.appUrl = url;
-      Formio.appUrlSet = true;
+      console.warn('Formio.setAppUrl() is deprecated. Use Formio.setProjectUrl instead.');
+      Formio.projectUrl = url;
+      Formio.projectUrlSet = true;
+    }
+  }, {
+    key: 'setProjectUrl',
+    value: function setProjectUrl(url) {
+      Formio.projectUrl = url;
+      Formio.projectUrlSet = true;
     }
   }, {
     key: 'getAppUrl',
     value: function getAppUrl() {
-      return Formio.appUrl;
+      console.warn('Formio.getAppUrl() is deprecated. Use Formio.getProjectUrl instead.');
+      return Formio.projectUrl;
+    }
+  }, {
+    key: 'getProjectUrl',
+    value: function getProjectUrl() {
+      return Formio.projectUrl;
     }
   }, {
     key: 'clearCache',
@@ -48814,8 +48827,8 @@ var Formio = function () {
 
 exports.Formio = Formio;
 Formio.baseUrl = 'https://api.form.io';
-Formio.appUrl = Formio.baseUrl;
-Formio.appUrlSet = false;
+Formio.projectUrl = Formio.baseUrl;
+Formio.projectUrlSet = false;
 Formio.plugins = [];
 Formio.cache = {};
 Formio.providers = _dereq_('./providers');
@@ -70119,7 +70132,7 @@ module.exports = [
       try {
         // Translate text using either angular-translate or angular-gettext
         var translateText = function(text) {
-          if ($translate) return $translate(text);
+          if ($translate) return $translate.instant(text);
           if (gettextCatalog) return gettextCatalog.getString(text);
           return text;
         };
