@@ -1617,39 +1617,11 @@ app.controller('FormSubmissionsController', [
               $http.get($scope.formio.submissionsUrl, {
                 params: params
               })
-<<<<<<< HEAD
-              .then(function(result) {
-                // Fill in gaps in data so Kendo doesn't crash on missing nested fields
-                _(FormioUtils.flattenComponents($scope.form.components))
-                .filter($scope.tableView)
-                .each(function(component) {
-                  _.each(result.data, function(row) {
-                    var key = 'data.' + component.key.replace(/\./g, '.data.');
-                    var value = _.get(row, key);
-                    if (value === undefined) {
-                      // This looks like it does nothing but it ensures
-                      // that the path to the key is reachable by
-                      // creating objects that don't exist
-                      // FOR-323 - Change to empty string so the grid isnt full of "undefined"s
-                      _.set(row, key, '');
-                    }
-                  });
-                });
-
-                return result;
-              })
-              .then(options.success)
-              .catch(function(err) {
-                FormioAlerts.onError(err);
-                options.error(err);
-              });
-=======
                 .then(options.success)
                 .catch(function(err) {
                   FormioAlerts.onError(err);
                   options.error(err);
                 });
->>>>>>> 760a0fa5f953f92cdb193882e925ae36882ef13e
             },
             destroy: function(options) {
               $scope.recentlyDeletedPromises.push($http.delete($scope.formio.submissionsUrl + '/' + options.data._id)
@@ -1674,7 +1646,6 @@ app.controller('FormSubmissionsController', [
           if (component.tableView === false || !component.key) {
             return;
           }
-
           // FOR-310 - If this component was already added to the grid, dont add it again.
           if (component.key && componentHistory.indexOf(component.key) !== -1) {
             return;
