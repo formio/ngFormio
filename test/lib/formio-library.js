@@ -793,18 +793,21 @@ module.exports = function(config) {
           .catch(next);
       })();
     })
-    .then('I see a notification with (?:the text )?$TEXT', function(text, next) {
-      text = replacements(text);
+      .then('I see a notification with (?:the text )?$TEXT', function (text, next) {
+        text = replacements(text);
 
-      var driver = this.driver;
-      driver.waitForExist('//div[@class=\'toast-message\']', timeout)
-        .getText('//div[@class=\'toast-message\']')
-        .then(function(alert) {
-          assert.equal(text, alert);
-          next();
-        })
-        .catch(next);
-    })
+        var driver = this.driver;
+        driver.waitForExist('//div[@class=\'toast-message\']', timeout)
+          .getText('//div[@class=\'toast-message\']')
+          .then(function (alert) {
+            if (!alert instanceof Array) {
+              alert = [alert];
+            }
+            assert(alert.indexOf(text) !== -1, 'Notification not found.');
+            next();
+          })
+          .catch(next);
+      })
     .then('A help block shows with the text $text', function(text, next) {
       text = replacements(text);
 
