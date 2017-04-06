@@ -1377,7 +1377,7 @@ module.exports = function(config) {
           next();
         })
         .catch(next);
-    })//padma
+    })
     .then('I see the $link link', function(link, next) {
       var driver = this.driver;
       driver.waitForExist('//a[contains(text(),"' + link + '")]', timeout)
@@ -1387,7 +1387,7 @@ module.exports = function(config) {
           next();
         })
         .catch(next);
-    })//Padma
+    })
     ;
   return library;
 };

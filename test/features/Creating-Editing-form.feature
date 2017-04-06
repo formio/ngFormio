@@ -6,11 +6,11 @@ Feature : Creating Editing a form
     And I am on the ${project3.title} project overview page
     When I click on the Forms link
     Then I am on the form page of ${project3.title} project
-    Then I can see User Login in the Forms  Section
-    Then I can see User Register in the Forms  Section
-    Then I can see User Register in the Forms  Section
-    Then I can see User in the Resource Forms Section
-    Then I can see Admin in the Resource Forms Section 
+    Then I can see User Login in the Forms  section
+    Then I can see User Register in the Forms  section
+    Then I can see User Register in the Forms  section
+    Then I can see User in the Resource Forms section
+    Then I can see Admin in the Resource Forms section 
 
   Scenario: Searching for existing Forms/Resource with search bar 
     Given I am logged in for profileuser3
@@ -19,15 +19,15 @@ Feature : Creating Editing a form
     When I click on the Forms link
     Then I am on the form page of ${project3.title} project
     When I enter Lo in the #form-search field
-    Then I can see User Login in the Forms  Section
+    Then I can see User Login in the Forms  section
     And I donot see User Register form
     When I enter R in the #form-search field
-    Then I can see User Register in the Forms  Section
+    Then I can see User Register in the Forms  section
     When I enter Us in the #resource-search field
-    Then I can see User in the Resource Forms Section
+    Then I can see User in the Resource Forms section
     And I donot see Admin resource
     When I enter A in the #resource-search field
-    Then I can see Admin in the Resource Forms Section
+    Then I can see Admin in the Resource Forms section
     And I donot see User resource
 
   Scenario: Searching for non existing Forms in search bar
@@ -41,11 +41,11 @@ Feature : Creating Editing a form
     When I enter Z in the #resource-search field
     And I donot see any Resource Forms forms
     When I clear the #form-search field
-    Then I can see User Login in the Forms  Section
-    Then I can see User Register in the Forms  Section
+    Then I can see User Login in the Forms  section
+    Then I can see User Register in the Forms  section
     When I clear the #resource-search field
-    Then I can see User in the Resource Forms Section
-    Then I can see Admin in the Resource Forms Section
+    Then I can see User in the Resource Forms section
+    Then I can see Admin in the Resource Forms section
 
   Scenario: Clicking ‘Edit’ button for Form on Form page
     Given I am logged in for profileuser3
@@ -53,7 +53,7 @@ Feature : Creating Editing a form
     And I am on the ${project3.title} project overview page
     When I click on the Forms link
     Then I am on the form page of ${project3.title} project
-	When I click on the glyphicon glyphicon-edit button for User Login form
+	  When I click on the glyphicon glyphicon-edit button for User Login form
     Then I am on the edit page of ${project3.title} project
     And I see the Email component
     And I see the Password component
@@ -64,7 +64,7 @@ Feature : Creating Editing a form
     And I am on the ${project3.title} project overview page
     When I click on the Forms link
     Then I am on the form page of ${project3.title} project
-	When I click on the fa fa-table button for User Login form
+	  When I click on the fa fa-table button for User Login form
     Then I am on the submission page of ${project3.title} project
     Then I see the submissions datagrid
 
@@ -74,7 +74,7 @@ Feature : Creating Editing a form
     And I am on the ${project3.title} project overview page
     When I click on the Forms link
     Then I am on the form page of ${project3.title} project
-	When I click on the fa fa-paper-plane button for User Login form
+	  When I click on the fa fa-paper-plane button for User Login form
     Then I am on the action page of ${project3.title} project
     And I wait 1000 milliseconds
     Then I see the Login link
