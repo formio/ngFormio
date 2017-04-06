@@ -14,7 +14,7 @@
           </div>
         </div>
         <h4>{{ currentProject.title }}</h4>
-        <p class="">{{ apiProtocol }}//{{ currentProject.name }}.{{ apiServer }}</p>
+        <p class="">{{ projectPath(currentProject) }}</p>
         <p><strong>Current version</strong> {{ currentProject.version }}</p>
         <div ng-if="currentProject.protect">
           <strong>Protected</strong> - This environment is protected from changes.

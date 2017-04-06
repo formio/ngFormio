@@ -9,6 +9,7 @@ module.exports = function(gulp, plugins) {
         baseDir: ['.tmp', 'src'],
         routes: {
           "/bower_components": "bower_components",
+          "/node_modules": "node_modules",
           "/lib/seamless": "node_modules/seamless/build",
           "/lib/ckeditor": "node_modules/ckeditor"
         }

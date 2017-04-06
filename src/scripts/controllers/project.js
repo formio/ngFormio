@@ -306,7 +306,7 @@ app.controller('ProjectController', [
     $scope.loadProjectPromise = $scope.formio.loadProject().then(function(result) {
       $scope.currentProject = result;
       $scope.projectType = $scope.currentProject.hasOwnProperty('project') ? 'Environment' : 'Project';
-      $scope.projectApi = AppConfig.protocol + '//' + result.name + '.' + AppConfig.serverHost;
+      $scope.projectApi = $rootScope.projectPath(result);
       $rootScope.currentProject = result;
       $scope.projectsLoaded = true;
       var allowedFiles, allow, custom;
@@ -820,7 +820,7 @@ app.provider('ProjectProgress', function() {
             if (!project.steps) {
               project.steps = [];
             }
-            formio = new Formio(AppConfig.protocol + '//' + project.name + '.' + AppConfig.serverHost);
+            formio = new Formio($rootScope.projectPath(project));
 
             formio.loadForms({
                 params: {
@@ -1262,6 +1262,7 @@ app.controller('ProjectPreviewController', [
 ]);
 
 app.controller('LaunchController', [
+  '$rootScope',
   '$scope',
   '$sce',
   '$location',
@@ -1270,6 +1271,7 @@ app.controller('LaunchController', [
   'FormioAlerts',
   'AppConfig',
   function(
+    $rootScope,
     $scope,
     $sce,
     $location,
@@ -1316,7 +1318,7 @@ app.controller('LaunchController', [
     });
     $scope.$watch('project', function(newProject, oldProject) {
       if (newProject && newProject.name) {
-        $scope.projectApi = AppConfig.protocol + '//' + newProject.name + '.' + AppConfig.serverHost;
+        $scope.projectApi = $rootScope.projectPath(newProject);
       }
     });
   }
@@ -1329,13 +1331,15 @@ app.controller('ProjectFormioController', [
   '$window',
   '$http',
   'FormioAlerts',
+  'Chartist',
   function(
     $scope,
     Formio,
     AppConfig,
     $window,
     $http,
-    FormioAlerts
+    FormioAlerts,
+    Chartist
   ) {
     $scope.currentSection.title = 'Admin Data';
     $scope.currentSection.icon = 'glyphicon glyphicon-globe';

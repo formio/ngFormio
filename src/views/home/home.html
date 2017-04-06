@@ -71,7 +71,7 @@
           <div class="project well" ng-click="goToProject(project)" title="{{ project.title }}">
             <span class="label project-plan-label" ng-class="getPlanLabel(project.plan)">{{ getPlanName(project.plan) | uppercase }}</span>
             <h4 class="project-title ellipsis"><a ui-sref="project.env.overview({projectId: project._id})">{{ project.title }}</a></h4>
-            <p class="project-url ellipsis" ui-sref="project.env.overview({projectId: project._id})"><strong>{{ project.name }}</strong>.{{ apiServer}}</p>
+            <p class="project-url ellipsis" ui-sref="project.env.overview({projectId: project._id})"><strong>{{ projectPath(project) }}</strong></p>
             <p class="project-description">{{ project.description | characters: 50 }}</p>
             <div class="project-section-separator"></div>
             <p class="progress-label text-center"><small>Monthly API Calls</small></p>
