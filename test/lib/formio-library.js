@@ -800,7 +800,10 @@ module.exports = function(config) {
       driver.waitForExist('//div[@class=\'toast-message\']', timeout)
         .getText('//div[@class=\'toast-message\']')
         .then(function(alert) {
-          assert.equal(text, alert);
+          if (!alert instanceof Array) {
+            alert = [alert];
+          }
+          assert(alert.indexOf(text) !== -1, 'Notification not found.');
           next();
         })
         .catch(next);
