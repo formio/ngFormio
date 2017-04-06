@@ -297,7 +297,7 @@ app.controller('ProjectController', [
     };
 
     $scope.switchEnv = function(environmentId) {
-      $state.go('.', {projectId: environmentId});
+      $state.go('project.env.overview', {projectId: environmentId});
     };
 
     var primaryProjectQ = $q.defer();
