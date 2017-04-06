@@ -684,7 +684,7 @@ module.exports = function (config) {
             if (!alert instanceof Array) {
               alert = [alert];
             }
-            assert.equal(alert.indeOf(text) !== -1);
+            assert(alert.indexOf(text) !== -1, 'Notification not found.');
             next();
           })
           .catch(next);
