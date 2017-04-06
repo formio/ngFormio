@@ -681,7 +681,10 @@ module.exports = function (config) {
         driver.waitForExist('//div[@class=\'toast-message\']', timeout)
           .getText('//div[@class=\'toast-message\']')
           .then(function (alert) {
-            assert.equal(text, alert);
+            if (!alert instanceof Array) {
+              alert = [alert];
+            }
+            assert.equal(alert.indeOf(text) !== -1);
             next();
           })
           .catch(next);
