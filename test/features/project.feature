@@ -118,5 +118,5 @@ Feature: Project Functionality
     And I click on the Delete link
     Then I see .project-section-inner-content h2 with the text Are you sure you wish to delete the Project
     And I see button.btn.btn-danger with the text Yes
-    And I click the Yes button
+    And I click the Yes buttons
     Then I see a notification with the text Project was deleted!
