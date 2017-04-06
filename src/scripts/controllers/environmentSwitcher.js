@@ -51,6 +51,7 @@ angular.module('formioApp')
     function ($scope, $window, $state, Environments, Formio) {
       $scope.environments = Environments.environments;
       $scope.currentEnvironment = Environments.currentEnvironment;
+      $scope.environmentTypes = ['Subdomains', 'Subdirectories', 'ProjectId'];
       $scope.switchEnvironment = function(environment) {
         if($window.confirm('Changing environments will switch backend servers and log you out. Are you sure?')) {
           Environments.setCurrentEnvironment(environment);
@@ -77,6 +78,7 @@ angular.module('formioApp')
         $scope.errors = {};
         $scope.errors.nameRequired = !$scope.environment.name;
         $scope.errors.urlRequired = !$scope.environment.url;
+        $scope.errors.typeRequired = !$scope.environment.type;
         if ($scope.environment.url) {
           var parts = $scope.environment.url.split('://');
           if (parts.length !== 2) {
@@ -90,9 +92,6 @@ angular.module('formioApp')
           if (parser.hostname === 'localhost') {
             $scope.errors.localhost = true;
           }
-          else if (parser.hostname.split('.').length !== 2) {
-            $scope.errors.urlParts = true;
-          }
         }
         valid = !$scope.errors.nameRequired && !$scope.errors.urlRequired && !$scope.errors.urlInvalid && !$scope.errors.urlParts && !$scope.errors.localhost;
         if (valid) {
@@ -102,6 +101,11 @@ angular.module('formioApp')
       };
       $scope.cancelEnvironment = function() {
         $scope.addingEnvironment = false;
+      };
+      $scope.typeClick = function($event) {
+        // Keep the dropdown from closing.
+        $event.preventDefault();
+        $event.stopPropagation();
       };
     }
   ]);
