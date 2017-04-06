@@ -694,16 +694,6 @@ module.exports = function(config) {
         })
         .catch(next);
     })
-    .then('I see the $link link', function(link, next) {
-      var driver = this.driver;
-      driver.waitForExist('//a[contains(text(),"' + link + '")]', timeout)
-        .isVisible('//a[contains(text(),"' + link + '")]', timeout)
-        .then(function(temp) {
-          assert.equal(temp, true);
-          next();
-        })
-        .catch(next);
-    })
     .then('I donot see $TEXT', function(text, next) {
       text = replacements(text);
       var driver = this.driver;
