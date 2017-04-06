@@ -905,20 +905,6 @@ module.exports = function(config) {
         })
         .catch(next);
     })
-    .then('I am on new window with url $link', function(link, next) {
-      var driver = this.driver;
-      driver.windowHandles()
-        .then(function(result) {
-          driver.window(result.value[result.value.length - 1])
-            .url()
-            .then(function(res) {
-              assert.equal(res.value, link);
-              next();
-            })
-            .window(result.value[0])
-        })
-        .catch(next);
-    })
     .then('the $BUTTON button is enabled', function(button, next) {
       var driver = this.driver;
       driver.waitForExist('//button[text()=\'' + button + '\']', timeout)

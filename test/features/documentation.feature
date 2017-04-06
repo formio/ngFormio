@@ -30,7 +30,9 @@ Feature : Documentation Feature
     Given I am on the /#/auth page 
     When I click on the Docs link
     When I click on the [link1] link
-    Then I am on new window with url [link2]
+    Then I am on new window
+    Then I am on [link2] page
+    And I close the window
 
   Examples:
     |link1                                   |link2                                                           |

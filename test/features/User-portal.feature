@@ -19,31 +19,41 @@ Feature: User Portal Links and Welcome Module
     Given I am logged in for profileuser1 
     And I am on /#/   
     When I click on the Getting Started with https://help.form.io/intro/welcome/
-    Then I am on new window with url https://help.form.io/intro/welcome/
+    Then I am on new window
+    Then I am on https://help.form.io/intro/welcome/ page
+    And I close the window 
 
   Scenario: Using the Welcome Module
     Given I am logged in for profileuser1 
     And I am on /#/   
     When I click on the How it works with https://help.form.io/intro/howworks/
-    Then I am on new window with url https://help.form.io/intro/howworks/
+    Then I am on new window
+    Then I am on https://help.form.io/intro/howworks/ page
+    And I close the window 
 
   Scenario: Using the Welcome Module
     Given I am logged in for profileuser1 
     And I am on /#/   
     When I click on the 30 minute guide with https://help.form.io/intro/guide/
-    Then I am on new window with url https://help.form.io/intro/guide/
+    Then I am on new window
+    Then I am on https://help.form.io/intro/guide/ page
+    And I close the window 
 
   Scenario: Using the Welcome Module
     Given I am logged in for profileuser1 
     And I am on /#/   
     When I click on the Developer Info with https://help.form.io/developer/info/welcome/
-    Then I am on new window with url https://help.form.io/developer/info/welcome/
+    Then I am on new window
+    Then I am on https://help.form.io/developer/info/welcome/ page
+    And I close the window 
 
   Scenario: Using the Welcome Module
     Given I am logged in for profileuser1 
     And I am on /#/   
     When I click on the Tutorials with https://help.form.io/tutorials/videos/welcome/
-    Then I am on new window with url https://help.form.io/tutorials/videos/welcome/
+    Then I am on new window
+    Then I am on https://help.form.io/tutorials/videos/welcome/ page
+    And I close the window 
 
   Scenario: Portal Documentation/Links
     Given I am logged in for profileuser1
@@ -51,7 +61,9 @@ Feature: User Portal Links and Welcome Module
     When My project count is 0
     Then I am on the Step 1: Create your project project portal
     When I click on the Getting Started Guide link
-    Then I am on new window with url https://help.form.io/intro/explore/
+    Then I am on new window
+    Then I am on https://help.form.io/intro/explore/ page
+    And I close the window 
 
   Scenario: Teams messaging on portal
     Given I am logged in for profileuser1s
