@@ -119,4 +119,4 @@ Feature: Project Functionality
     Then I see .project-section-inner-content h2 with the text Are you sure you wish to delete the Project
     And I see button.btn.btn-danger with the text Yes
     And I click the Yes buttons
-    Then I see a notification with the text You are not authorized to view some data on this page. Project was deleted!
+    Then I see a notification with the text Project was deleted!
