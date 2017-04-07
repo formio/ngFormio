@@ -11,7 +11,7 @@
   min="{{ component.validate.min }}"
   max="{{ component.validate.max }}"
   step="{{ component.validate.step }}"
-  placeholder="{{ component.placeholder | formioTranslate:null:builder }}"
+  ng-attr-placeholder="{{ component.placeholder | formioTranslate:null:builder }}"
   custom-validator="component.validate.custom"
   ui-mask="{{ component.inputMask }}"
   ui-mask-placeholder=""
