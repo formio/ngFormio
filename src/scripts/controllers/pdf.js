@@ -1,22 +1,118 @@
 'use strict';
 
+/* globals chance, location */
+
 angular.module('formioApp.controllers.pdf', ['ngDialog'])
+  .factory('PDFServer', [
+    '$http',
+    'Formio',
+    '$q',
+    'AppConfig',
+    function(
+      $http,
+      Formio,
+      $q,
+      AppConfig
+    ) {
+      var infoCache = {};
+      return {
+        ensureFileToken: function(project) {
+          if (project.settings.filetoken) {
+            return $q.resolve(project);
+          }
+
+          // Create a key and save the project.
+          project.settings.filetoken = chance.string({
+            length: 30,
+            pool: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+          });
+          return (new Formio('/project/' + project._id)).saveProject(project);
+        },
+        ensureProject: function(projectPromise, cb) {
+          return projectPromise.then(this.ensureFileToken.bind(this));
+        },
+        pdfUrl: function(project) {
+          return AppConfig.pdfServer + '/pdf/' + project._id;
+        },
+        getInfo: function(projectPromise) {
+          return this.ensureProject(projectPromise).then(function(project) {
+            if (infoCache.hasOwnProperty(project._id)) {
+              return $q.resolve(infoCache[project._id]);
+            }
+            return $http.get(this.pdfUrl(project), {
+              headers: {
+                'x-file-token': project.settings.filetoken,
+                'x-host': location.hostname
+              }
+            }).then(function(results) {
+              infoCache[project._id] = results.data;
+              return results.data;
+            });
+          }.bind(this));
+        },
+        purchasePDF: function(projectPromise, purchase) {
+          return this.ensureProject(projectPromise).then(function(project) {
+            return this.getInfo(projectPromise).then(function(info) {
+              if (info.data.host !== location.hostname) {
+                throw {data: 'Cannot modify pdfs under different host names.'};
+              }
+              infoCache[project._id] = null;
+              return $http.post(this.pdfUrl(project) + '/purchase', purchase, {
+                headers: {
+                  'x-file-token': project.settings.filetoken,
+                  'x-host': location.hostname
+                }
+              });
+            }.bind(this));
+          }.bind(this));
+        },
+        deletePDF: function(projectPromise, pdf) {
+          return this.ensureProject(projectPromise).then(function(project) {
+            return this.getInfo(projectPromise).then(function(info) {
+              if (info.data.host !== location.hostname) {
+                throw {data: 'Cannot modify pdfs under different host names.'};
+              }
+              infoCache[project._id] = null;
+              return $http.delete(this.pdfUrl(project) + '/file/' + pdf.data.id, {
+                headers: {
+                  'x-file-token': project.settings.filetoken,
+                  'x-host': location.hostname
+                }
+              });
+            }.bind(this));
+          }.bind(this));
+        },
+        getPDFs: function(projectPromise) {
+          return this.ensureProject(projectPromise).then(function(project) {
+            return $http.get(this.pdfUrl(project) + '/file', {
+              headers: {
+                'x-file-token': project.settings.filetoken,
+                'x-host': location.hostname
+              }
+            }).then(function(results) {
+              return results.data;
+            });
+          }.bind(this));
+        }
+      };
+    }
+  ])
   .controller('PDFController', [
     '$scope',
     '$stateParams',
     'AppConfig',
     '$http',
-    'Formio',
     'ngDialog',
     'FormioAlerts',
+    'PDFServer',
     function(
       $scope,
       $stateParams,
       AppConfig,
       $http,
-      Formio,
       ngDialog,
-      FormioAlerts
+      FormioAlerts,
+      PDFServer
     ) {
       $scope.availablePDFs = [];
       $scope.forms = {};
@@ -85,18 +181,13 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
           data.submission = $scope.buyNumber.toString();
         }
 
-        // Post the results.
-        $http.post($scope.pdfProject + '/purchase', data, {
-          headers: {
-            'x-jwt-token': Formio.getToken()
-          }
-        }).then(function(results) {
+        PDFServer.purchasePDF($scope.loadProjectPromise, data).then(function(results) {
           $scope.pdfInfo.data = results.data.data;
           $scope.buyComplete = true;
         }, function(err) {
-          FormioAlerts.onError({message: err.data});
+          FormioAlerts.onError({message: err.data || err.message});
         }).catch(function(err) {
-          FormioAlerts.onError({message: err.data});
+          FormioAlerts.onError({message: err.data || err.message});
         });
       };
 
@@ -114,22 +205,13 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
       };
 
       $scope.getPDFs = function() {
-        // Get all of the pdfs for this project.
-        $http.get($scope.pdfProject + '/file', {
-          headers: {
-            'x-jwt-token': Formio.getToken()
-          }
-        }).then(function(results) {
-          $scope.availablePDFs = results.data;
+        PDFServer.getPDFs($scope.loadProjectPromise).then(function(pdfs) {
+          $scope.availablePDFs = pdfs;
         });
       };
 
       $scope.confirmDelete = function() {
-        $http.delete($scope.pdfProject + '/file/' + $scope.currentPDF.data.id, {
-          headers: {
-            'x-jwt-token': Formio.getToken()
-          }
-        }).then(function(results) {
+        PDFServer.deletePDF($scope.loadProjectPromise, $scope.currentPDF).then(function() {
           $scope.pdfInfo.data.active = (parseInt($scope.pdfInfo.data.active, 10) - 1).toString();
           $scope.cancel();
           $scope.getPDFs();
@@ -150,14 +232,9 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
         });
       };
 
-      $scope.pdfProject = AppConfig.pdfServer + '/pdf/' + $stateParams.projectId;
       $scope.pdfInfo = {};
-      $http.get($scope.pdfProject, {
-        headers: {
-          'x-jwt-token': Formio.getToken()
-        }
-      }).then(function(results) {
-        $scope.pdfInfo = results.data;
+      PDFServer.getInfo($scope.loadProjectPromise).then(function(info) {
+        $scope.pdfInfo = info;
       });
 
       // Get all of the forms that have a pdf attached to them.

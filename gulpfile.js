@@ -24,7 +24,7 @@ gulp.task('build', ['jshint', 'wiredep', 'html', 'views', 'images', 'libraries',
 
 var s3 = require("gulp-s3");
 gulp.task('deploy:beta', function () {
-  var settings = require('./aws.json');
+  var settings = require('../aws.json');
   settings.bucket = 'beta.form.io';
   settings.region = 'us-west-2';
   return gulp.src(['./dist/**/*', '!./dist/lib/**/*', '!./dist/config.js']).pipe(s3(settings));

@@ -9,7 +9,8 @@ var app = angular.module('formioApp.controllers.form', [
   'ngFormBuilder',
   'formio',
   'bgf.paginateAnything',
-  'ngTagsInput'
+  'ngTagsInput',
+  'formioApp.controllers.pdf'
 ]);
 
 app.config([
@@ -274,6 +275,7 @@ app.controller('FormController', [
   '$q',
   'ngDialog',
   'Upload',
+  'PDFServer',
   '$http',
   function(
     $scope,
@@ -291,6 +293,7 @@ app.controller('FormController', [
     $q,
     ngDialog,
     Upload,
+    PDFServer,
     $http
   ) {
     // Project information.
@@ -300,35 +303,37 @@ app.controller('FormController', [
       $scope.uploading = true;
       $scope.formReady = false;
       var filePath = '/pdf/' + $scope.projectId + '/file';
-      Upload.upload({
-        url: AppConfig.pdfServer + filePath,
-        data: {file: file},
-        headers: {'x-jwt-token': Formio.getToken()}
-      }).then(function (res) {
-        $scope.formReady = true;
-        $scope.uploading = false;
-        if (!$scope.form.settings) {
-          $scope.form.settings = {};
-        }
-        if (res.data && res.data.path) {
-          $scope.form.settings.pdf = {
-            src: AppConfig.pdfServer + res.data.path,
-            id: res.data.file
-          };
-        }
-        if ($stateParams.newForm) {
-          $scope.form.display = 'pdf';
-          $state.go('project.form.create', {
-            form: $scope.form
-          })
-        }
-        ngDialog.close();
-      }, function (resp) {
-        FormioAlerts.onError({message: resp.data});
-        $scope.uploading = false;
-        ngDialog.close();
-      }, function (evt) {
-        $scope.uploadProgress = parseInt(100.0 * evt.loaded / evt.total);
+      PDFServer.ensureProject($scope.loadProjectPromise).then(function(project) {
+        Upload.upload({
+          url: AppConfig.pdfServer + filePath,
+          data: {file: file},
+          headers: {'x-file-token': project.settings.filetoken}
+        }).then(function (res) {
+          $scope.formReady = true;
+          $scope.uploading = false;
+          if (!$scope.form.settings) {
+            $scope.form.settings = {};
+          }
+          if (res.data && res.data.path) {
+            $scope.form.settings.pdf = {
+              src: AppConfig.pdfServer + res.data.path,
+              id: res.data.file
+            };
+          }
+          if ($stateParams.newForm) {
+            $scope.form.display = 'pdf';
+            $state.go('project.form.create', {
+              form: $scope.form
+            });
+          }
+          ngDialog.close();
+        }, function (resp) {
+          FormioAlerts.onError({message: resp.data});
+          $scope.uploading = false;
+          ngDialog.close();
+        }, function (evt) {
+          $scope.uploadProgress = parseInt(100.0 * evt.loaded / evt.total);
+        });
       });
     };
 
@@ -362,12 +367,8 @@ app.controller('FormController', [
 
       // Determine if we have enough to upload.
       $scope.purchaseRequired = false;
-      $http.get(AppConfig.pdfServer + '/pdf/' + $stateParams.projectId, {
-        headers: {
-          'x-jwt-token': Formio.getToken()
-        }
-      }).then(function(results) {
-        if (parseInt(results.data.data.active, 10) >= parseInt(results.data.data.total)) {
+      PDFServer.getInfo($scope.loadProjectPromise).then(function(info) {
+        if (parseInt(info.data.active, 10) >= parseInt(info.data.total)) {
           $scope.purchaseRequired = true;
         }
       });

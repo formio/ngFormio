@@ -344,6 +344,8 @@ app.controller('ProjectController', [
       $scope.projectSettingsVisible = function() {
         return ($scope.highestRole === 'owner' || $scope.highestRole === 'team_admin');
       };
+
+      return $scope.currentProject;
     }).catch(function(err) {
       if (!err) {
         FormioAlerts.addAlert({
