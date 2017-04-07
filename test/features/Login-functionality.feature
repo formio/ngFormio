@@ -52,3 +52,4 @@ Feature: Login Functionality
     When I expand the user menu
     And I click the Log Out link
     Then I have been logged out
+
