@@ -1,4 +1,4 @@
-/*! ng-formio v2.15.0 | https://unpkg.com/ng-formio@2.15.0/LICENSE.txt */
+/*! ng-formio v2.15.2 | https://unpkg.com/ng-formio@2.15.2/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -48357,6 +48357,7 @@ var Formio = function () {
           return resolve(Formio.cache[cacheKey]);
         }
 
+        var requestToken = '';
         resolve(new Promise(function (resolve, reject) {
           // Set up and fetch request
           var headers = header || new Headers({
@@ -48377,6 +48378,7 @@ var Formio = function () {
             options.body = JSON.stringify(data);
           }
 
+          requestToken = headers.get('x-jwt-token');
           resolve(fetch(url, options));
         }).catch(function (err) {
           err.message = 'Could not connect to API server (' + err.message + ')';
@@ -48398,7 +48400,18 @@ var Formio = function () {
 
           // Handle fetch results
           var token = response.headers.get('x-jwt-token');
-          if (response.status >= 200 && response.status < 300 && token && token !== '') {
+
+          // In some strange cases, the fetch library will return an x-jwt-token without sending
+          // one to the server. This has even been debugged on the server to verify that no token
+          // was introduced with the request, but the response contains a token. This is an Invalid
+          // case where we do not send an x-jwt-token and get one in return for any GET request.
+          var tokenIntroduced = false;
+          if (method === 'GET' && !requestToken && token && url.indexOf('token=') === -1 && url.indexOf('x-jwt-token=' === -1)) {
+            console.warn('Token was introduced in request.');
+            tokenIntroduced = true;
+          }
+
+          if (response.status >= 200 && response.status < 300 && token && token !== '' && !tokenIntroduced) {
             Formio.setToken(token);
           }
           // 204 is no content. Don't try to .json() it.
@@ -48672,13 +48685,10 @@ var Formio = function () {
   }, {
     key: 'logout',
     value: function logout() {
-      var onLogout = function onLogout(result) {
-        Formio.setToken(null);
-        Formio.setUser(null);
-        Formio.clearCache();
-        return result;
-      };
-      return Formio.makeStaticRequest(Formio.baseUrl + '/logout').then(onLogout).catch(onLogout);
+      Formio.setToken(null);
+      Formio.setUser(null);
+      Formio.clearCache();
+      return Formio.makeStaticRequest(Formio.baseUrl + '/logout');
     }
 
     /**
