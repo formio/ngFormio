@@ -23,10 +23,12 @@ var host = window.location.host;
 var environment = JSON.parse(localStorage.getItem('currentEnvironment'));
 var protocol = window.location.protocol;
 var serverHost, apiProtocol;
+var pathType = 'Subdomains';
 if (environment) {
   var parts = environment.url.split('//');
   apiProtocol = parts[0];
   serverHost = parts[1];
+  pathType = environment.type || 'Subdomains';
 }
 else {
   serverHost = host;
@@ -54,14 +56,32 @@ if (apiProtocol !== protocol && ['localhost', 'portal.localhost', 'lvh.me', 'por
   }
   url += window.location.hash;
 
-  window.location.replace(url);
+  // If running under http, confirm switching back to https to prevent looping.
+  if (protocol === 'http:') {
+    if (confirm('The API server is running under HTTPS. Do you want to switch the portal as well? (Recommended)')) {
+      setTimeout(function() {
+        window.location.replace(url);
+      }, 100);
+    }
+  }
+  else {
+    setTimeout(function() {
+      window.location.replace(url);
+    }, 100);
+  }
 }
+
 var appBase = protocol + '//' + host;
 var apiBase = apiProtocol + '//api.' + serverHost;
 var formioBase = apiProtocol + '//formio.' + serverHost;
+if (['form.io', 'test-form.io'].indexOf(serverHost) ===  -1) {
+  apiBase = apiProtocol + '//' + serverHost;
+  formioBase = apiProtocol + '//' + serverHost + '/formio';
+}
 angular.module('formioApp').constant('AppConfig', {
   appVersion: 'APP_VERSION',
   copyrightYear: (new Date()).getFullYear().toString(),
+  pathType: pathType,
   forceSSL: false,
   pdfPrice: 10,
   appBase: appBase,

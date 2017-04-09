@@ -12,3 +12,4 @@ test/screenshots/*.png
 *~
 npm-debug.log
 
+.vscode

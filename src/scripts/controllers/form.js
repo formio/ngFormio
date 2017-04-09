@@ -235,7 +235,7 @@ app.directive('formList', function() {
           $scope.formsFinished = true;
         });
         $scope.$watch('project', function(newProject, oldProject) {
-          $scope.projectApi = AppConfig.protocol + '//' + $scope.project.name + '.' + AppConfig.serverHost;
+          $scope.projectApi = $rootScope.projectPath($scope.project);
         });
         $scope.export = function(form, type) {
           window.open(AppConfig.apiBase + '/project/' + $scope.project._id + '/form/' + form._id + '/export?format=' + type + '&x-jwt-token=' + $rootScope.userToken);
@@ -936,7 +936,7 @@ app.controller('FormShareController', ['$scope', function($scope) {
           });
           angular.forEach($scope.form.access, function(access) {
             if ((access.type === 'read_all') &&
-            (_.indexOf(access.roles, defaultRole._id) !== -1)) {
+              (_.indexOf(access.roles, defaultRole._id) !== -1)) {
               $scope.publicForm = true;
             }
           });
@@ -1538,27 +1538,27 @@ app.controller('FormSubmissionsController', [
       var activeElement;
 
       angular.element($window.document).bind('mousewheel DOMMouseScroll', function(e) {
-          var scrollTo = null;
+        var scrollTo = null;
 
-          if (!angular.element(activeElement).closest('.k-popup').length) {
-            return;
-          }
+        if (!angular.element(activeElement).closest('.k-popup').length) {
+          return;
+        }
 
-          if (e.type === 'mousewheel') {
-              scrollTo = (e.originalEvent.wheelDelta * -1);
-          }
-          else if (e.type === 'DOMMouseScroll') {
-              scrollTo = 40 * e.originalEvent.detail;
-          }
+        if (e.type === 'mousewheel') {
+          scrollTo = (e.originalEvent.wheelDelta * -1);
+        }
+        else if (e.type === 'DOMMouseScroll') {
+          scrollTo = 40 * e.originalEvent.detail;
+        }
 
-          if (scrollTo) {
-              e.preventDefault();
-              element.scrollTop(scrollTo + element.scrollTop());
-          }
+        if (scrollTo) {
+          e.preventDefault();
+          element.scrollTop(scrollTo + element.scrollTop());
+        }
       });
 
       angular.element($window.document).on('mouseover', function(e) {
-            activeElement = e.target;
+        activeElement = e.target;
       });
     };
 
@@ -1713,22 +1713,22 @@ app.controller('FormSubmissionsController', [
               $http.get($scope.formio.submissionsUrl, {
                 params: params
               })
-              .then(options.success)
-              .catch(function(err) {
-                FormioAlerts.onError(err);
-                options.error(err);
-              });
+                .then(options.success)
+                .catch(function(err) {
+                  FormioAlerts.onError(err);
+                  options.error(err);
+                });
             },
             destroy: function(options) {
               $scope.recentlyDeletedPromises.push($http.delete($scope.formio.submissionsUrl + '/' + options.data._id)
-              .then(function(result) {
-                GoogleAnalytics.sendEvent('Submission', 'delete', null, 1);
-                options.success();
-              })
-              .catch(function(err) {
-                FormioAlerts.onError(err);
-                options.error(err);
-              }));
+                .then(function(result) {
+                  GoogleAnalytics.sendEvent('Submission', 'delete', null, 1);
+                  options.success();
+                })
+                .catch(function(err) {
+                  FormioAlerts.onError(err);
+                  options.error(err);
+                }));
             }
           }
         });
@@ -1830,17 +1830,17 @@ app.controller('FormSubmissionsController', [
           // so we set it to something that isn't a property on submissions
           templateSettings: { paramName: 'notdata' },
           toolbar:
-            '<div>' +
-              '<button class="btn btn-default btn-xs" ng-click="view()" ng-disabled="selected().length != 1" ng-class="{\'btn-primary\':selected().length == 1}">' +
-                '<span class="glyphicon glyphicon-eye-open"></span> View' +
-              '</button>&nbsp;' +
-              '<button class="btn btn-default btn-xs" ng-click="edit()" ng-disabled="selected().length != 1" ng-class="{\'btn-primary\':selected().length == 1}">' +
-                '<span class="glyphicon glyphicon-edit"></span> Edit' +
-              '</button>&nbsp;' +
-              '<button class="btn btn-default btn-xs" ng-click="delete()" ng-disabled="selected().length < 1" ng-class="{\'btn-danger\':selected().length >= 1}">' +
-                '<span class="glyphicon glyphicon-remove-circle"></span> Delete' +
-              '</button>' +
-            '</div>',
+          '<div>' +
+          '<button class="btn btn-default btn-xs" ng-click="view()" ng-disabled="selected().length != 1" ng-class="{\'btn-primary\':selected().length == 1}">' +
+          '<span class="glyphicon glyphicon-eye-open"></span> View' +
+          '</button>&nbsp;' +
+          '<button class="btn btn-default btn-xs" ng-click="edit()" ng-disabled="selected().length != 1" ng-class="{\'btn-primary\':selected().length == 1}">' +
+          '<span class="glyphicon glyphicon-edit"></span> Edit' +
+          '</button>&nbsp;' +
+          '<button class="btn btn-default btn-xs" ng-click="delete()" ng-disabled="selected().length < 1" ng-class="{\'btn-danger\':selected().length >= 1}">' +
+          '<span class="glyphicon glyphicon-remove-circle"></span> Delete' +
+          '</button>' +
+          '</div>',
           change: $scope.$apply.bind($scope),
           dataSource: dataSource,
           columns: columns,
@@ -1993,28 +1993,28 @@ app.constant('ResourceAccessLabels', {
 
 app.constant('AccessLabels', {
   'read_all': {
-  label: 'Read Form Definition',
-  tooltip: 'The Read permission will allow a user, with one of the given Roles, to read the form.'
+    label: 'Read Form Definition',
+    tooltip: 'The Read permission will allow a user, with one of the given Roles, to read the form.'
   },
   'update_all': {
-  label: 'Update Form Definition',
-  tooltip: 'The Update permission will allow a user, with one of the given Roles, to read and edit the form.'
+    label: 'Update Form Definition',
+    tooltip: 'The Update permission will allow a user, with one of the given Roles, to read and edit the form.'
   },
   'delete_all': {
-  label: 'Delete Form Definition',
-  tooltip: 'The Delete permission will allow a user, with one of the given Roles, to delete the form.'
+    label: 'Delete Form Definition',
+    tooltip: 'The Delete permission will allow a user, with one of the given Roles, to delete the form.'
   },
   'read_own': {
-  label: 'Read Form Definition (Restricted to owners)',
-  tooltip: 'The Read Own permission will allow a user, with one of the given Roles, to read a form. A user can only read a form if they are defined as its owner.'
+    label: 'Read Form Definition (Restricted to owners)',
+    tooltip: 'The Read Own permission will allow a user, with one of the given Roles, to read a form. A user can only read a form if they are defined as its owner.'
   },
   'update_own': {
-  label: 'Update Form Definition (Restricted to owners)',
-  tooltip: 'The Update Own permission will allow a user, with one of the given Roles, to update a form. A user can only update a form if they are defined as its owner.'
+    label: 'Update Form Definition (Restricted to owners)',
+    tooltip: 'The Update Own permission will allow a user, with one of the given Roles, to update a form. A user can only update a form if they are defined as its owner.'
   },
   'delete_own': {
-  label: 'Delete Form Definition (Restricted to owners)',
-  tooltip: 'The Delete Own permission will allow a user, with one of the given Roles, to delete a form. A user can only delete a form if they are defined as its owner.'
+    label: 'Delete Form Definition (Restricted to owners)',
+    tooltip: 'The Delete Own permission will allow a user, with one of the given Roles, to delete a form. A user can only delete a form if they are defined as its owner.'
   }
 });
 

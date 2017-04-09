@@ -645,6 +645,32 @@ angular
       $rootScope.apiProtocol = AppConfig.apiProtocol;
       $rootScope.apiServer = AppConfig.apiServer;
 
+      $rootScope.projectPath = function(project) {
+        var path = '';
+        switch(AppConfig.pathType) {
+          case 'Subdomains':
+            if (project.hasOwnProperty('name')) {
+              path = AppConfig.apiProtocol + '//' + project.name + '.' + AppConfig.apiServer;
+            }
+            else if (project.hasOwnProperty('_id')) {
+              path = AppConfig.apiBase + '/project/' + project._id;
+            }
+            break;
+          case 'Subdirectories':
+            if (project.hasOwnProperty('name')) {
+              path = AppConfig.apiBase + '/' + project.name;
+            }
+            else if (project.hasOwnProperty('_id')) {
+              path = AppConfig.apiBase + '/project/' + project._id;
+            }
+            break;
+          case 'ProjectId':
+            path = AppConfig.apiBase + '/project/' + project._id;
+            break;
+        }
+        return path;
+      };
+
       // Start the tutorial.
       $rootScope.startTutorial = function() {
         $window.open(AppConfig.tutorial, 'formio-tutorial', 'height=640,width=960');
