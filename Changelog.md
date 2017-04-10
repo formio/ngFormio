@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## 2.15.2
 ### Fixed
- - Upgraded formiojs library to fix token persistence issues.
+ - Upgraded formiojs library to 2.4.2 to fix token persistence issues.
 
 ## 2.15.1
 ### Fixed
