@@ -1,0 +1,53 @@
+<p class="project-create-message">Congratulations! You've created a project. <br />Follow these steps to test out, customize and deploy an application using this project.</p>
+<ul class="list-group project-setup">
+  <project-step title="'Create a project'" complete="currentProject.steps" open="steps.createProject.open">
+    <p class="list-group-item-text">Create a project, either from an existing template or a custom project.</p>
+  </project-step>
+  <!--<project-step title="'Set up project user accounts'" complete="steps.setupUsers.complete" open="steps.setupUsers.open">-->
+    <!--<p class="list-group-item-text">Before previewing set up at least one of each user type for the project.</p>-->
+    <!--<ul>-->
+      <!--<li ng-repeat="userForm in userForms track by $index">Create a new <a href="#" ui-sref="project.form.form.view({formId: userForm._id})">{{userForm.title}}</a></li>-->
+    <!--</ul>-->
+  <!--</project-step>-->
+  <project-step title="'Create a new resource'" complete="steps.newResource.complete" open="steps.newResource.open">
+    <p class="list-group-item-text">Add a new resource to your project with your own custom fields and actions.</p>
+    <ul>
+      <li>Go to the <a href="#" ui-sref="project.resource.create">create a resource</a> page.</li>
+      <li class="list-group-item-text">Use the &lt;formio&gt; embed tag to add the new form to your application.</li>
+    </ul>
+  </project-step>
+  <project-step title="'Create a new form'" complete="steps.newForm.complete" open="steps.newForm.open">
+    <p class="list-group-item-text">Add a new form to your project with your own custom fields and actions.</p>
+    <ul>
+      <li>Go to the <a href="#" ui-sref="project.form.create">create a form</a> page.</li>
+      <li class="list-group-item-text">Use the &lt;formio&gt; embed tag to add the new form to your application.</li>
+    </ul>
+  </project-step>
+  <project-step title="'Modify a form'" complete="steps.modifyForm.complete" open="steps.modifyForm.open">
+    <p class="list-group-item-text">Change an existing form within the project, such as adding, editing or removing a field, and see it update in the preview application.</p>
+    <ul>
+      <li>Go to the <a href="#" ui-sref="project.form.index">Forms</a> section and modify a form.</li>
+      <li>Return to <a href="#" ui-sref="project.preview">Preview</a> and find the form in the demo application.</li>
+    </ul>
+  </project-step>
+  <project-step title="'Set up Email/File Storage/Data providers'" complete="steps.setupProviders.complete" open="steps.setupProviders.open">
+    <p class="list-group-item-text">Set up how you want to send emails, store files and send your data within your project.</p>
+    <ul>
+      <li>Edit the project <a href="#" ui-sref="project.env.integrations.email">Email Provider</a> settings</li>
+      <li>Edit the project <a href="#" ui-sref="project.env.integrations.storage">File Storage</a> settings</li>
+      <li>Edit the project <a href="#" ui-sref="project.env.integrations.data">Data Connectors</a> settings</li>
+    </ul>
+  </project-step>
+  <project-step title="'Clone the demo app to your local computer'" complete="steps.cloneApp.complete" open="steps.cloneApp.open">
+    <p class="list-group-item-text">Make a copy of the demo application on your computer so that it can be customized and deployed.</p>
+    <ul>
+      <li>Go to the <a href="#" ui-sref="project.launch.local">Local App Development</a> page</li>
+    </ul>
+  </project-step>
+  <project-step title="'Launch your application'" complete="steps.launchApp.complete" open="steps.launchApp.open">
+    <p class="list-group-item-text">Build and deploy your application to a host or CDN.</p>
+    <ul>
+      <li>Go to the <a href="#" ui-sref="project.launch.app">Launch</a> page</li>
+    </ul>
+  </project-step>
+</ul>

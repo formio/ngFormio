@@ -1,0 +1,14 @@
+<upgrade-warning ng-if="!minPlan('team')" warning="Upgrade your project to Team Pro or above to enable deploying to environments." />
+<div>
+  <h3>Deploy to {{ currentProject.title }}</h3>
+  <div class="row">
+    <div class="col-md-12">
+      <h4>Deploy version</h4>
+      <div>
+        <select class="form-control" ng-model="deployVersionOption" ng-options="selectVersion as selectVersion.version for selectVersion in versions"></select>
+        <br />
+      </div>
+      <span class="btn btn-primary" ng-click="deployVersion(deployVersionOption)">Deploy project definition version to {{ currentProject.title }}</span>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,42 @@
+<div class="project-section-content">
+  <div class="project-section-inner-content">
+    <div class="row">
+      <div class="col col-md-8  ">
+      </div>
+      <div class="col col-md-4">
+        <div ng-if="primaryProject.plan === 'trial'" class="trial text-center">
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <div class="count">{{trialDaysRemaining}}</div>
+              <p>Days remaining on your<br /> Team Pro trial</p>
+              <a class="btn btn-primary project-section-header-button" ng-click="showUpgradeDialog(primaryProject)"><i class="fa fa-arrow-circle-up"></i> Upgrade Now</a>
+            </div>
+          </div>
+        </div>
+        <h4>{{ currentProject.title }}</h4>
+        <p class="">{{ projectPath(currentProject) }}</p>
+        <p><strong>Current version</strong> {{ currentProject.version }}</p>
+        <div ng-if="currentProject.protect">
+          <strong>Protected</strong> - This environment is protected from changes.
+        </div>
+        <div ng-if="hasTeams()">
+          <h4>
+            <span ng-if="highestRole === 'owner'">You are the project <strong>owner</strong>.</span>
+            <span ng-if="highestRole === 'team_admin'">You are a project <strong>admin</strong>.</span>
+            <span ng-if="highestRole === 'team_write'">You are a project <strong>member</strong>.</span>
+            <span ng-if="highestRole === 'team_read'">You are a <strong>read-only project member</strong>.</span>
+            You can:
+          </h4>
+          <dl class="dl-horizontal">
+            <dt ng-class="{'text-muted': !projectPermissions.read}">Read</dt>
+            <dd><i class="fa" ng-class="{'text-success fa-check': projectPermissions.read, 'text-muted fa-times': !projectPermissions.read}"></i></dd>
+            <dt ng-class="{'text-muted': !projectPermissions.write}">Write</dt>
+            <dd><i class="fa" ng-class="{'text-success fa-check': projectPermissions.write, 'text-muted fa-times': !projectPermissions.write}"></i></dd>
+            <dt ng-class="{'text-muted': !projectPermissions.admin}">Administrate</dt>
+            <dd><i class="fa" ng-class="{'text-success fa-check': projectPermissions.admin, 'text-muted fa-times': !projectPermissions.admin}"></i></dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

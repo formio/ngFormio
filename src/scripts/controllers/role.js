@@ -41,7 +41,7 @@ app.controller('RoleController', [
             message: 'Role successfully ' + ($scope.role._id ? 'saved' : 'created') + '.'
           });
 
-          $scope.back('project.settings.roles.view');
+          $scope.back('project.access');
         }, FormioAlerts.onError.bind(FormioAlerts))
         .catch(FormioAlerts.onError.bind(FormioAlerts));
     };
@@ -60,7 +60,7 @@ app.controller('RoleController', [
           message: 'Role successfully deleted.'
         });
 
-        $scope.back('project.settings.roles.view');
+        $scope.back('project.access');
       }).catch(function(err) {
         var error = {};
         switch(err.status) {

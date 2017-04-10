@@ -1,0 +1,7 @@
+<form class="form-horizontal" role="form">
+  <h2>Are you sure you wish to delete the role <strong>{{ originalRole.title }}</strong>?</h2>
+  <div class="btn-toolbar">
+    <button ng-click="deleteRole()" class="btn btn-danger">Yes</button>
+    <button ng-click="back('project.access')" class="btn btn-default">No</button>
+  </div>
+</form>
