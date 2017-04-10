@@ -56,19 +56,31 @@ module.exports = function() {
           return iframeSrc;
         };
 
+        $scope.downloadUrl = '';
         $scope.getPDFDownload = function(pdf) {
+          if (!$scope.formio) {
+            return;
+          }
           var download = '';
           if ($scope.formio && $scope.formio.submissionUrl) {
             download = $scope.formio.submissionUrl;
           }
-          else {
+          else if ($scope.submission._id) {
             download = Formio.baseUrl + '/project/' + $scope.form.project + '/';
             download += '/form/' + $scope.form._id;
             download += '/submission/' + $scope.submission._id;
           }
+          if (!download) {
+            return;
+          }
+
           download += '/download/' + pdf.id;
-          download += '?token=' + Formio.getToken();
-          return download;
+          var allowedPath = download.replace(Formio.baseUrl, '');
+          return $scope.formio.getTempToken(3600, 'GET:' + allowedPath).then(function(tempToken) {
+            download += '?token=' + tempToken;
+            $scope.downloadUrl = download;
+            return download;
+          });
         };
 
         // Add the live form parameter to the url.
@@ -103,6 +115,9 @@ module.exports = function() {
 
         var cancelFormLoadEvent = $scope.$on('formLoad', function(event, form) {
           cancelFormLoadEvent();
+          iframeReady.promise.then(function() {
+            $scope.getPDFDownload(form.settings.pdf);
+          });
           sendIframeMessage({name: 'form', data: form});
         });
 
