@@ -273,13 +273,15 @@ $project-header-color: #eee;
   padding: 35px 0 0 0;
   background-color: $brand-secondary;
   color: $project-header-color;
+  .project-center {
+    display: flex;
+    justify-content: space-around;
+  }
   .new-project-header {
-    position:absolute;
-    top: 0;
-    margin: 10px 0 0 0;
+    text-align: center;
+    margin: 0 0 20px;
   }
   .new-project-section {
-    float: left;
     margin-right: 10px;
   }
 }
@@ -291,12 +293,10 @@ $project-header-color: #eee;
 .project-template-item {
   .project-template-card {
     .project-template-img {
-      width: 133px;
-      height: 100px;
-      border: solid $brand-primary 4px;
+      width: 153px;
+      height: 150px;
       &:hover {
         cursor: pointer;
-        border: solid lighten($brand-primary, 20%) 4px;
       }
     }
     .project-template-info {
@@ -306,6 +306,11 @@ $project-header-color: #eee;
       }
     }
   }
+}
+.current {
+  background-color: $brand-secondary;
+  text-align: center;
+  color: white;
 }
 
 .project-container {

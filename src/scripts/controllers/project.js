@@ -2048,6 +2048,16 @@ app.controller('ProjectSettingsController', [
     $http,
     AppConfig
   ) {
+    if(!window.localStorage.getItem('framework')) {
+      window.localStorage.setItem('framework','angularjs');
+      $rootScope.framework = window.localStorage.getItem('framework');
+    } else {
+      $rootScope.framework = window.localStorage.getItem('framework');
+    }
+    $scope.chooseFramework = function (framework) {
+      window.localStorage.setItem('framework',framework);
+      $rootScope.framework = window.localStorage.getItem('framework');
+    };
     if (!$scope.highestRole || ($scope.highestRole && ['team_read', 'team_write'].indexOf($scope.highestRole) !== -1)) {
       // this is constantly going to overview on reload.
       //$state.go('project.env.overview');

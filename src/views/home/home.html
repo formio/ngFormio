@@ -26,35 +26,65 @@
   </div>
 </div>
 <div class="new-project-row" ng-if="showHeader" ng-class="{'new-project-row-min': !showWelcome()}" >
+  <h3 class="new-project-header text-center">Getting Started</h3>
   <div class="container">
+    <!--<div class="new-project-section">-->
+      <!--<ul class="list-inline">-->
+        <!--<li class="project-template-item">-->
+          <!--<div class="project-template-card" id="create-custom-project" ui-sref="createProject()">-->
+            <!--<img class="project-template-img" src="images/angularjs.png" />-->
+            <!--<div class="project-template-info">-->
+              <!--<h5 class="ellipsis">Angular 1.x Project</h5>-->
+            <!--</div>-->
+          <!--</div>-->
+        <!--</li>-->
+      <!--</ul>-->
+    <!--</div>-->
     <div class="new-project-section">
-      <ul class="list-inline">
+      <ul class="list-inline project-center">
         <li class="project-template-item">
-          <div class="project-template-card" id="create-custom-project" ui-sref="createProject()">
-            <img class="project-template-img" src="images/empty-project.png" />
+          <div class="project-template-card"
+               ng-click="chooseFramework('angular')" ui-sref="createProject()">
+            <img class="project-template-img" src="images/angularjs.png" />
             <div class="project-template-info">
-              <h5 class="ellipsis">Custom Project</h5>
+              <h5 class="ellipsis">Angular 1.x Project</h5>
+            </div>
+          </div>
+        </li>
+        <li class="project-template-item">
+          <div class="project-template-card" ng-click="chooseFramework('angular2')" ui-sref="createProject()">
+            <img class="project-template-img" src="images/angular.svg" />
+            <div class="project-template-info">
+              <h5 class="ellipsis">Angular 2.x Project</h5>
+            </div>
+          </div>
+        </li>
+        <li class="project-template-item">
+          <div class="project-template-card" ng-click="chooseFramework('react')" ui-sref="createProject()">
+            <img class="project-template-img" src="images/react-js.png" />
+            <div class="project-template-info">
+              <h5 class="ellipsis">React Project</h5>
             </div>
           </div>
         </li>
       </ul>
     </div>
-    <div class="new-project-section">
-      <h5 style="margin-top: 45px;">&mdash; OR &mdash;</h5>
-    </div>
-    <div class="new-project-section">
-      <h5 class="new-project-header">Application Templates</h5>
-      <ul class="list-inline">
-        <li ng-repeat="template in templates" class="project-template-item">
-          <div class="project-template-card" ng-click="createProject(template)">
-            <img ng-if="template.thumbnail" class="project-template-img" ng-src="{{ template.thumbnail }}" />
-            <div class="project-template-info">
-              <h5 class="ellipsis">{{ template.title }}</h5>
-            </div>
-          </div>
-        </li>
-      </ul>
-    </div>
+    <!--<div class="new-project-section">-->
+      <!--<h5 style="margin-top: 45px;">&mdash; OR &mdash;</h5>-->
+    <!--</div>-->
+    <!--<div class="new-project-section">-->
+      <!--<h2 class="new-project-header">Application Templates</h2>-->
+      <!--<ul class="list-inline">-->
+        <!--<li ng-repeat="template in templates" class="project-template-item">-->
+          <!--<div class="project-template-card" ng-click="createProject(template)">-->
+            <!--<img ng-if="template.thumbnail" class="project-template-img" ng-src="{{ template.thumbnail }}" />-->
+            <!--<div class="project-template-info">-->
+              <!--<h5 class="ellipsis">{{ template.title }}</h5>-->
+            <!--</div>-->
+          <!--</div>-->
+        <!--</li>-->
+      <!--</ul>-->
+    <!--</div>-->
   </div>
 </div>
 <div class="container projects">

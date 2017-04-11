@@ -48,7 +48,7 @@
       <div class="panel-body">
         <p>These project templates will automatically create some Resources and Forms to help bootstrap your project.</p>
         <div class="row">
-          <div class="col-sm-6 col-md-4" ng-repeat="template in templates | limitTo:templateLimit" ng-click="currentProject.template = template.template">
+          <div class="col-sm-6 col-md-4" ng-repeat="template in templates | limitTo:templateLimit " ng-click="currentProject.template = template.template">
             <div class="thumbnail template-card" ng-class="{'template-card-selected': template.template == currentProject.template}">
               <div class="project-tile-icon">
                 <img ng-if="template.thumbnail" class="project-template-img" ng-src="{{ template.thumbnail }}" />
