@@ -731,7 +731,6 @@ angular
     'FormioAlerts',
     'Formio',
     'AppConfig',
-    'ProjectProgress',
     'GoogleAnalytics',
     '$location',
     '$window',
@@ -744,7 +743,6 @@ angular
       FormioAlerts,
       Formio,
       AppConfig,
-      ProjectProgress,
       GoogleAnalytics,
       $location,
       $window,
@@ -947,10 +945,6 @@ angular
           classes.push(className + '-page');
         }
         $rootScope.mainClass = classes.join(' ');
-      });
-
-      $rootScope.$watch('currentProject', function(newProject) {
-        ProjectProgress.setProject(newProject);
       });
 
       // Set the active sidebar.
