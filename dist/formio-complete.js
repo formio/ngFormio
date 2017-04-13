@@ -48349,7 +48349,6 @@ var Formio = function () {
           return resolve(Formio.cache[cacheKey]);
         }
 
-        var requestToken = '';
         resolve(new Promise(function (resolve, reject) {
           // Set up and fetch request
           var headers = header || new Headers({
@@ -48370,7 +48369,6 @@ var Formio = function () {
             options.body = JSON.stringify(data);
           }
 
-          requestToken = headers.get('x-jwt-token');
           resolve(fetch(url, options));
         }).catch(function (err) {
           err.message = 'Could not connect to API server (' + err.message + ')';
@@ -48392,18 +48390,7 @@ var Formio = function () {
 
           // Handle fetch results
           var token = response.headers.get('x-jwt-token');
-
-          // In some strange cases, the fetch library will return an x-jwt-token without sending
-          // one to the server. This has even been debugged on the server to verify that no token
-          // was introduced with the request, but the response contains a token. This is an Invalid
-          // case where we do not send an x-jwt-token and get one in return for any GET request.
-          var tokenIntroduced = false;
-          if (method === 'GET' && !requestToken && token && url.indexOf('token=') === -1 && url.indexOf('x-jwt-token=' === -1)) {
-            console.warn('Token was introduced in request.');
-            tokenIntroduced = true;
-          }
-
-          if (response.status >= 200 && response.status < 300 && token && token !== '' && !tokenIntroduced) {
+          if (response.status >= 200 && response.status < 300 && token && token !== '') {
             Formio.setToken(token);
           }
           // 204 is no content. Don't try to .json() it.
@@ -48677,10 +48664,13 @@ var Formio = function () {
   }, {
     key: 'logout',
     value: function logout() {
-      Formio.setToken(null);
-      Formio.setUser(null);
-      Formio.clearCache();
-      return Formio.makeStaticRequest(Formio.baseUrl + '/logout');
+      var onLogout = function onLogout(result) {
+        Formio.setToken(null);
+        Formio.setUser(null);
+        Formio.clearCache();
+        return result;
+      };
+      return Formio.makeStaticRequest(Formio.baseUrl + '/logout').then(onLogout).catch(onLogout);
     }
 
     /**
@@ -65816,11 +65806,8 @@ module.exports = function(app) {
             if (!$scope.data) {
               return;
             }
-            var valueSet = !!$scope.data[$scope.component.key];
             $scope.data[$scope.component.key] = dateValue();
-            if (valueSet) {
-              loadComplete();
-            }
+            loadComplete();
           });
 
           // If they have 12 hour time enabled, we need to ensure that we see the meridian in the format.
