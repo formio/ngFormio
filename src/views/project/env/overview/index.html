@@ -19,6 +19,9 @@
         <div ng-if="currentProject.protect">
           <strong>Protected</strong> - This environment is protected from changes.
         </div>
+        <div>
+          <a ui-sref="project.delete()" class="btn btn-danger">Delete {{ currentProject.title }}</a>
+        </div>
         <div ng-if="hasTeams()">
           <h4>
             <span ng-if="highestRole === 'owner'">You are the project <strong>owner</strong>.</span>

@@ -534,7 +534,7 @@ app.controller('ProjectDeployController', [
       }
       Formio.makeStaticRequest(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/deploy', 'POST', {
         type: 'version',
-        id: version._id
+        id: version.version
       })
         .then(function() {
           $scope.deployVersionOption = '';
@@ -694,114 +694,114 @@ app.provider('ProjectProgress', function() {
       Formio,
       AppConfig
     ) {
-      stepDefinitions = [
-        {
-          key: 'createProject',
-          complete: function(next) {
-            next(true);
-          }
-        },
-        //{
-        //  key: 'setupUsers',
-        //  complete: function(next) {
-        //    var promises = [];
-        //    userForms.forEach(function(userForm) {
-        //      var userFormio = new Formio(AppConfig.apiBase + '/project/' + userForm.project + '/form/' + userForm._id + '/submission');
-        //      promises.push(userFormio.loadSubmissions());
-        //    });
-        //    $q.all(promises).then(function(results) {
-        //      var hasUser = true;
-        //      results.forEach(function(result) {
-        //        if (result.length === 0) {
-        //          hasUser = false;
-        //        }
-        //      });
-        //      next(hasUser);
-        //    });
-        //  }
-        //},
-        {
-          key: 'modifyForm',
-          complete: function(next) {
-            formio.loadForms({
-                params: {
-                  limit: Number.MAX_SAFE_INTEGER // Don't limit results
-                }
-              })
-              .then(function(projectForms) {
-                forms = projectForms;
-                forms.forEach(function(form) {
-                  if (project && ((new Date(project.created).getTime() + 10000) < new Date(form.modified).getTime())) {
-                    return next(true);
-                  }
-                });
-                next(false);
-              });
-          }
-        },
-        {
-          key: 'setupProviders',
-          complete: function(next) {
-            var projectSettings = project.settings || {};
-            var result = (projectSettings.email || projectSettings.storage || projectSettings.data);
-            next(result);
-          }
-        },
-        {
-          key: 'cloneApp',
-          route: 'project.launch.local'
-        },
-        {
-          key: 'newForm',
-          complete: function(next) {
-            formio.loadForms({
-                params: {
-                  type: 'form',
-                  limit: Number.MAX_SAFE_INTEGER // Don't limit results
-                }
-              })
-              .then(function(projectForms) {
-                forms = projectForms;
-                forms.forEach(function(form) {
-                  if (project && (new Date(project.created).getTime() + 10000) < new Date(form.created).getTime()) {
-                    return next(true);
-                  }
-                });
-                next(false);
-              });
-          }
-        },
-        {
-          key: 'newResource',
-          complete: function(next) {
-            formio.loadForms({
-                params: {
-                  type: 'resource',
-                  limit: Number.MAX_SAFE_INTEGER // Don't limit results
-                }
-              })
-              .then(function(projectForms) {
-                forms = projectForms;
-                forms.forEach(function(resource) {
-                  if (project && ((new Date(project.created).getTime() + 10000) < new Date(resource.created).getTime())) {
-                    return next(true);
-                  }
-                });
-                next(false);
-              });
-          }
-        },
-        {
-          key: 'launchApp',
-          route: 'project.launch.app'
-        }
-      ];
+      //stepDefinitions = [
+      //  {
+      //    key: 'createProject',
+      //    complete: function(next) {
+      //      next(true);
+      //    }
+      //  },
+      //  //{
+      //  //  key: 'setupUsers',
+      //  //  complete: function(next) {
+      //  //    var promises = [];
+      //  //    userForms.forEach(function(userForm) {
+      //  //      var userFormio = new Formio(AppConfig.apiBase + '/project/' + userForm.project + '/form/' + userForm._id + '/submission');
+      //  //      promises.push(userFormio.loadSubmissions());
+      //  //    });
+      //  //    $q.all(promises).then(function(results) {
+      //  //      var hasUser = true;
+      //  //      results.forEach(function(result) {
+      //  //        if (result.length === 0) {
+      //  //          hasUser = false;
+      //  //        }
+      //  //      });
+      //  //      next(hasUser);
+      //  //    });
+      //  //  }
+      //  //},
+      //  {
+      //    key: 'modifyForm',
+      //    complete: function(next) {
+      //      formio.loadForms({
+      //          params: {
+      //            limit: Number.MAX_SAFE_INTEGER // Don't limit results
+      //          }
+      //        })
+      //        .then(function(projectForms) {
+      //          forms = projectForms;
+      //          forms.forEach(function(form) {
+      //            if (project && ((new Date(project.created).getTime() + 10000) < new Date(form.modified).getTime())) {
+      //              return next(true);
+      //            }
+      //          });
+      //          next(false);
+      //        });
+      //    }
+      //  },
+      //  {
+      //    key: 'setupProviders',
+      //    complete: function(next) {
+      //      var projectSettings = project.settings || {};
+      //      var result = (projectSettings.email || projectSettings.storage || projectSettings.data);
+      //      next(result);
+      //    }
+      //  },
+      //  {
+      //    key: 'cloneApp',
+      //    route: 'project.launch.local'
+      //  },
+      //  {
+      //    key: 'newForm',
+      //    complete: function(next) {
+      //      formio.loadForms({
+      //          params: {
+      //            type: 'form',
+      //            limit: Number.MAX_SAFE_INTEGER // Don't limit results
+      //          }
+      //        })
+      //        .then(function(projectForms) {
+      //          forms = projectForms;
+      //          forms.forEach(function(form) {
+      //            if (project && (new Date(project.created).getTime() + 10000) < new Date(form.created).getTime()) {
+      //              return next(true);
+      //            }
+      //          });
+      //          next(false);
+      //        });
+      //    }
+      //  },
+      //  {
+      //    key: 'newResource',
+      //    complete: function(next) {
+      //      formio.loadForms({
+      //          params: {
+      //            type: 'resource',
+      //            limit: Number.MAX_SAFE_INTEGER // Don't limit results
+      //          }
+      //        })
+      //        .then(function(projectForms) {
+      //          forms = projectForms;
+      //          forms.forEach(function(resource) {
+      //            if (project && ((new Date(project.created).getTime() + 10000) < new Date(resource.created).getTime())) {
+      //              return next(true);
+      //            }
+      //          });
+      //          next(false);
+      //        });
+      //    }
+      //  },
+      //  {
+      //    key: 'launchApp',
+      //    route: 'project.launch.app'
+      //  }
+      //];
       // Define route based steps.
-      angular.forEach(stepDefinitions, function(step) {
-        if (step.route) {
-          states[step.route] = step.key;
-        }
-      });
+      //angular.forEach(stepDefinitions, function(step) {
+      //  if (step.route) {
+      //    states[step.route] = step.key;
+      //  }
+      //});
 
       var saveStep = function(step) {
         if (project.steps.indexOf(step) === -1) {
@@ -904,9 +904,9 @@ app.provider('ProjectProgress', function() {
         },
       };
 
-      $rootScope.$on('$stateChangeSuccess', function(event, state) {
-        progress.checkComplete(state);
-      }).bind(this);
+      //$rootScope.$on('$stateChangeSuccess', function(event, state) {
+      //  progress.checkComplete(state);
+      //}).bind(this);
 
       return progress;
     }

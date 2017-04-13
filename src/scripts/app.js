@@ -298,11 +298,6 @@ angular
           parent: 'project.env',
           templateUrl: 'views/project/env/version/export.html'
         })
-        .state('project.env.version.delete', {
-          url: '/version/delete',
-          parent: 'project.env',
-          templateUrl: 'views/project/env/version/delete.html'
-        })
         .state('project.env.activity', {
           url: '/activity',
           parent: 'project.env',

@@ -2,13 +2,23 @@
 <div>
   <h3>Deploy to {{ currentProject.title }}</h3>
   <div class="row">
-    <div class="col-md-12">
+    <div class="col-md-8">
       <h4>Deploy version</h4>
       <div>
         <select class="form-control" ng-model="deployVersionOption" ng-options="selectVersion as selectVersion.version for selectVersion in versions"></select>
         <br />
       </div>
       <span class="btn btn-primary" ng-click="deployVersion(deployVersionOption)">Deploy project definition version to {{ currentProject.title }}</span>
+    </div>
+    <div class="col-md-4">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <h3 class="panel-title">Deploying a project version</h3>
+        </div>
+        <div class="panel-body">
+          <p>About...</p>
+        </div>
+      </div>
     </div>
   </div>
 </div>
