@@ -11497,6 +11497,7 @@ module.exports = function() {
 
           download += '/download/' + pdf.id;
           var allowedPath = download.replace(Formio.baseUrl, '');
+          allowedPath = allowedPath.replace(Formio.getProjectUrl(), '');
           return $scope.formio.getTempToken(3600, 'GET:' + allowedPath).then(function(tempToken) {
             download += '?token=' + tempToken;
             $scope.downloadUrl = download;
