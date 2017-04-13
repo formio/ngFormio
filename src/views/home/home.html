@@ -28,28 +28,13 @@
 <div class="new-project-row" ng-if="showHeader" ng-class="{'new-project-row-min': !showWelcome()}" >
   <div class="container">
     <div class="new-project-section">
+      <h3 class="new-project-header text-center">Create a project for</h3>
       <ul class="list-inline">
-        <li class="project-template-item">
-          <div class="project-template-card" id="create-custom-project" ui-sref="createProject()">
-            <img class="project-template-img" src="images/empty-project.png" />
+        <li ng-repeat="platform in platforms" class="project-template-item">
+          <div class="project-template-card" ng-click="createProject(platform)">
+            <img ng-if="platform.img" class="project-template-img" ng-src="{{ platform.img }}" />
             <div class="project-template-info">
-              <h5 class="ellipsis">Custom Project</h5>
-            </div>
-          </div>
-        </li>
-      </ul>
-    </div>
-    <div class="new-project-section">
-      <h5 style="margin-top: 45px;">&mdash; OR &mdash;</h5>
-    </div>
-    <div class="new-project-section">
-      <h5 class="new-project-header">Application Templates</h5>
-      <ul class="list-inline">
-        <li ng-repeat="template in templates" class="project-template-item">
-          <div class="project-template-card" ng-click="createProject(template)">
-            <img ng-if="template.thumbnail" class="project-template-img" ng-src="{{ template.thumbnail }}" />
-            <div class="project-template-info">
-              <h5 class="ellipsis">{{ template.title }}</h5>
+              <h5 class="ellipsis">{{ platform.title }}</h5>
             </div>
           </div>
         </li>
