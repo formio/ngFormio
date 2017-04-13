@@ -50,11 +50,8 @@ module.exports = function(app) {
             if (!$scope.data) {
               return;
             }
-            var valueSet = !!$scope.data[$scope.component.key];
             $scope.data[$scope.component.key] = dateValue();
-            if (valueSet) {
-              loadComplete();
-            }
+            loadComplete();
           });
 
           // If they have 12 hour time enabled, we need to ensure that we see the meridian in the format.

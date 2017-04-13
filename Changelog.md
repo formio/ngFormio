@@ -5,17 +5,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
-### Added
 
-### Changed
+## 2.15.3
+### Added
+ - Allow translating month part of day component.
 
 ### Fixed
-
-### Removed
+ - Could not type in datetime component until a date was selected.
 
 ## 2.15.2
 ### Fixed
- - Upgraded formiojs library to fix token persistence issues.
+ - Upgraded formiojs library to 2.4.2 to fix token persistence issues.
 
 ## 2.15.1
 ### Fixed
