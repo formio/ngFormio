@@ -575,8 +575,8 @@ angular
           img: 'images/platforms/html5.png'
         },
         {
-          title: 'Embedded Forms',
-          name: 'embedded',
+          title: 'Simple',
+          name: 'simple',
           img: 'images/platforms/form.png'
         },
         {
