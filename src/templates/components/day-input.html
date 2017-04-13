@@ -25,7 +25,7 @@
       ng-model="date.month"
       ng-change="onChange()"
       ng-disabled="readOnly"
-      ng-options="month.value as month.label for month in months"
+      ng-options="month.value as month.label | formioTranslate:null:builder for month in months"
     ></select>
   </div>
   <div class="form-group col-xs-3" ng-if="!component.dayFirst && !component.fields.day.hide">
