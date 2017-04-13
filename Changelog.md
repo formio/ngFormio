@@ -5,14 +5,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
-### Added
 
-### Changed
+## 2.15.3
+### Added
+ - Allow translating month part of day component.
 
 ### Fixed
  - Could not type in datetime component until a date was selected.
-
-### Removed
 
 ## 2.15.2
 ### Fixed
