@@ -1,0 +1,28 @@
+<table class="table table-striped">
+  <tbody>
+  <tr ng-repeat="role in currentProjectRoles">
+    <td>
+      <div class="row">
+        <div class="col-xs-5">
+          <h4 ng-if="!currentProject.protect"><a ui-sref="project.roles.edit({roleId: role._id})">{{ role.title }}</a></h4>
+          <h4 ng-if="currentProject.protect">{{ role.title }}</h4>
+        </div>
+        <div class="col-xs-7">
+          <div class="button-group pull-right" style="display:flex;">
+            <a ui-sref="project.roles.edit({roleId: role._id})" class="btn btn-default btn-xs" ng-class="{disabled: currentProject.protect}"><span class="glyphicon glyphicon-edit"></span> Edit</a>&nbsp;
+            <a ui-sref="project.roles.delete({roleId: role._id})" class="btn btn-default btn-xs" ng-class="{disabled: currentProject.protect}"><span class="glyphicon glyphicon-trash"></span></a>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-12">
+          {{ role.description }}
+        </div>
+      </div>
+    </td>
+  </tr>
+  </tbody>
+</table>
+<div class="text-right">
+  <a ui-sref="project.roles.edit()" class="btn btn-primary" ng-class="{disabled: currentProject.protect}"><span class="glyphicon glyphicon-plus"></span> New Role</a>
+</div>

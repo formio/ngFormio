@@ -3,7 +3,7 @@
     <div class="dropdown">
     <div class="dropdown-toggle selected-plan" data-toggle="dropdown">
       <h3>{{getPlan(selectedPlan).title}} Plan <i class="fa fa-caret-down"></i></h3>
-      <p class="text-muted price-description"><small>{{getPlan(selectedPlan).priceDescription}}</small></p>
+      <p class="text-muted price-description"><small>{{getPlan(selectedPlan).priceDescription}}{{ selectedPlan === 'trial' ? ' (' + trialDaysRemaining + ' Days Remaining)' : '' }}</small></p>
     </div>
 
       <ul class="dropdown-menu plan-menu">
@@ -209,6 +209,61 @@
         </tr>
       </table>
 
+      <table ng-switch-when="trial" class="table table-condensed feature-table">
+        <tr>
+          <td>Team Collaboration</td>
+          <td class="text-right"><i class="fa fa-check"></i></td>
+        </tr>
+        <tr>
+          <td>Premium Actions</td>
+          <td class="text-right"><i class="fa fa-check"></i></td>
+        </tr>
+        <tr>
+          <td>Self Selected Domains</td>
+          <td class="text-right">&nbsp;</td>
+        </tr>
+        <tr>
+          <td>Data Management</td>
+          <td class="text-right"><i class="fa fa-check"></i></td>
+        </tr>
+        <tr>
+          <td>Multiple Email Providers</td>
+          <td class="text-right"><i class="fa fa-check"></i></td>
+        </tr>
+        <tr>
+          <td>Multi-resource &amp; OAuth Auth</td>
+          <td class="text-right"><i class="fa fa-check"></i></td>
+        </tr>
+        <tr>
+          <td>Offline Mode</td>
+          <td class="text-right"><i class="fa fa-check"></i></td>
+        </tr>
+        <tr>
+          <td>File Uploads</td>
+          <td class="text-right"><i class="fa fa-check"></i></td>
+        </tr>
+        <tr>
+          <td>CORS</td>
+          <td class="text-right"><i class="fa fa-check"></i></td>
+        </tr>
+        <tr>
+          <td>Websocket Integration</td>
+          <td class="text-right"><i class="fa fa-check"></i></td>
+        </tr>
+        <tr>
+          <td>On-Site Deployment</td>
+          <td class="text-right">&nbsp;</td>
+        </tr>
+        <tr>
+          <td>Independent Database</td>
+          <td class="text-right">&nbsp;</td>
+        </tr>
+        <tr>
+          <td>Priority Support</td>
+          <td class="text-right">&nbsp;</td>
+        </tr>
+      </table>
+
       <table ng-switch-when="commercial" class="table table-condensed feature-table">
         <tr>
           <td>Team Collaboration</td>
@@ -287,8 +342,17 @@
   <div class="col-sm-8 form-column">
     <h3><i class="fa fa-credit-card"></i> {{ currentProject.plan === selectedPlan ? 'Keep Current Plan' : 'Change Plan' }}</h3>
     <div ng-if="!paymentInfoLoading && !paymentInfo">
-      <h5 class="text-muted">First, you'll need to enter your credit card info.<br>Your first month will be billed on a prorated basis.</h5>
-      <formio src="paymentForm" form-action="'/payeezy'"></formio>
+      <div ng-if="['basic', 'trial'].indexOf(selectedPlan) === -1">
+        <h5 class="text-muted">First, you'll need to enter your credit card info.<br>Your first month will be billed on a prorated basis.</h5>
+        <formio src="paymentForm" form-action="'/payeezy'"></formio>
+      </div>
+      <div ng-if="['basic', 'trial'].indexOf(selectedPlan) !== -1">
+        <h5>No payment required for the {{getPlan(selectedPlan).title}} plan</h5>
+        <div class="form-group pull-right" ng-if="(currentProject.plan !== selectedPlan)">
+          <a class="btn btn-default" ng-click="closeThisDialog(false)">Cancel</a>
+          <button class="btn btn-primary" ng-click="upgradeProject(selectedPlan)">Change plan to {{getPlan(selectedPlan).title}}</button>
+        </div>
+      </div>
     </div>
     <div ng-if="!paymentInfoLoading && paymentInfo">
       <div ng-if="(currentProject.plan !== selectedPlan)">
@@ -296,7 +360,7 @@
         <h5 class="text-muted">You can still change the project plan on the left.</h5>
       </div>
       <br>
-      <div ng-if="selectedPlan !== 'basic'">
+      <div ng-if="['basic', 'trial'].indexOf(selectedPlan) === -1">
         <h5>Payments will be charged to:</h5>
         <h5 class="payment-info"><strong>{{capitalize(paymentInfo.cardType)}} ending in {{paymentInfo.ccNumber.substr(-4)}}</strong></h5>
         <h5 class="text-muted payment-info">Expires on {{paymentInfo.ccExpiryMonth}}/{{paymentInfo.ccExpiryYear}}</h5>
@@ -304,7 +368,7 @@
         <p><small><a class="btn btn-sm btn-default" ng-click="changePaymentInfo()">Change my credit card</a></small></p>
         <br>
       </div>
-      <div ng-if="selectedPlan === 'basic'">
+      <div ng-if="['basic', 'trial'].indexOf(selectedPlan) !== -1">
         <h5>No payment required for Basic plan</h5>
       </div>
       <div class="form-group pull-right" ng-if="(currentProject.plan !== selectedPlan)">

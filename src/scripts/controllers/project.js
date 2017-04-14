@@ -80,6 +80,30 @@ app.directive('uniqueChecker', ['$http', '$q', 'Formio', function($http, $q, For
   };
 }]);
 
+app.directive('upgradeWarning', function() {
+  return {
+    restrict: 'E',
+    templateUrl: 'views/project/upgradeWarning.html',
+    controller: [
+      '$scope',
+      '$attrs',
+      'ProjectUpgradeDialog',
+      function(
+        $scope,
+        $attrs,
+        ProjectUpgradeDialog
+      ) {
+        $scope.warning = $attrs.warning;
+        $scope.projectSettingsVisible = function() {
+          return ($scope.highestRole === 'owner' || $scope.highestRole === 'team_admin');
+        };
+
+        $scope.showUpgradeDialog = ProjectUpgradeDialog.show.bind(ProjectUpgradeDialog);
+      }
+    ]
+  };
+});
+
 app.controller('ProjectCreateController', [
   '$scope',
   '$rootScope',
@@ -98,7 +122,6 @@ app.controller('ProjectCreateController', [
     $rootScope.noBreadcrumb = false;
     $scope.currentProject = {template: 'default'};
     $scope.hasTemplate = false;
-    $scope.showName = false;
     $scope.templateLimit = 3;
 
     $scope.templates = [];
@@ -150,7 +173,47 @@ app.controller('ProjectCreateController', [
 
     $scope.saveProject = function() {
       FormioProject.createProject($scope.currentProject).then(function(project) {
-        $state.go('project.overview', {projectId: project._id});
+        $state.go('project.env.overview', {projectId: project._id});
+      });
+    };
+  }
+]);
+
+app.controller('ProjectCreateEnvironmentController', [
+  '$scope',
+  '$state',
+  'FormioProject',
+  function(
+    $scope,
+    $state,
+    FormioProject
+  ) {
+    $scope.environmentTypes = [
+      {
+        key: 'hosted',
+        label: 'Hosted'
+      },
+      {
+        key: 'onPremise',
+        label: 'On Premise'
+      }
+    ];
+
+    $scope.currentProject = {};
+    $scope.primaryProjectPromise.then(function(primaryProject) {
+      $scope.currentProject = {
+        title: '',
+        //type: 'hosted',
+        project: primaryProject._id
+      };
+      $scope.$watch('currentProject.title', function(newTitle) {
+        $scope.currentProject.name = newTitle.replace(/\W/g, '').toLowerCase() + '-' + primaryProject.name;
+      });
+    });
+
+    $scope.saveProject = function() {
+      FormioProject.createProject($scope.currentProject).then(function(project) {
+        $state.go('project.env.overview', {projectId: project._id});
       });
     };
   }
@@ -168,6 +231,7 @@ app.controller('ProjectController', [
   '$http',
   'ProjectUpgradeDialog',
   '$q',
+  'GoogleAnalytics',
   function(
     $scope,
     $rootScope,
@@ -179,7 +243,8 @@ app.controller('ProjectController', [
     ProjectPlans,
     $http,
     ProjectUpgradeDialog,
-    $q
+    $q,
+    GoogleAnalytics
   ) {
     $scope.currentSection = {};
     $rootScope.activeSideBar = 'projects';
@@ -209,15 +274,55 @@ app.controller('ProjectController', [
         return $scope.currentProjectRoles;
       });
     };
+
     $scope.loadRoles();
+
+    $scope.minPlan= function(plan, project) {
+      var plans = ['basic', 'independent', 'team', 'trial', 'commercial'];
+      var checkProject = project || $scope.primaryProject || { plan: 'none' };
+      return plans.indexOf(checkProject.plan) >= plans.indexOf(plan);
+    };
+
+    $scope.saveProject = function() {
+      if (!$scope.currentProject._id) { return FormioAlerts.onError(new Error('No Project found.')); }
+      $scope.formio.saveProject($scope.currentProject)
+        .then(function(project) {
+          FormioAlerts.addAlert({
+            type: 'success',
+            message: 'Project settings saved.'
+          });
+          GoogleAnalytics.sendEvent('Project', 'update', null, 1);
+        }, FormioAlerts.onError.bind(FormioAlerts))
+        .catch(FormioAlerts.onError.bind(FormioAlerts));
+    };
+
+    $scope.switchEnv = function(environmentId) {
+      $state.go('project.env.overview', {projectId: environmentId});
+    };
+
+    var primaryProjectQ = $q.defer();
+    $scope.primaryProjectPromise = primaryProjectQ.promise;
 
     $scope.loadProjectPromise = $scope.formio.loadProject().then(function(result) {
       $scope.currentProject = result;
+      $scope.projectType = $scope.currentProject.hasOwnProperty('project') ? 'Environment' : 'Project';
       $scope.projectApi = $rootScope.projectPath(result);
       $rootScope.currentProject = result;
-      $scope.showName = !(result.plan && result.plan === 'basic');
       $scope.projectsLoaded = true;
       var allowedFiles, allow, custom;
+
+      var currTime = (new Date()).getTime();
+      var projTime = (new Date(result.created.toString())).getTime();
+      var delta = Math.ceil(parseInt((currTime - projTime) / 1000));
+      var day = 86400;
+      var remaining = 30 - parseInt(delta / day);
+      $scope.trialDaysRemaining = remaining > 0 ? remaining : 0;
+
+      $scope.rolesLoading = true;
+      $http.get($scope.formio.projectUrl + '/role').then(function(result) {
+        $scope.currentProjectRoles = result.data;
+        $scope.rolesLoading = false;
+      });
 
       try {
         allowedFiles = JSON.parse(localStorage.getItem('allowedFiles')) || {};
@@ -273,72 +378,91 @@ app.controller('ProjectController', [
 
       // Load the users teams.
       $scope.userTeamsLoading = true;
+
       var userTeamsPromise = $http.get(AppConfig.apiBase + '/team/all').then(function(result) {
         $scope.userTeams = result.data;
         $scope.userTeamsLoading = false;
 
         // Separate out the teams that the current user owns, to save an api call.
-        $scope.currentProjectEligibleTeams = _.filter(result.data, {owner: $scope.user._id});
+        $scope.primaryProjectEligibleTeams = _.filter(result.data, {owner: $scope.user._id});
       });
 
-      // Load the projects teams.
       $scope.projectTeamsLoading = true;
-      var projectTeamsPromise = $http.get(AppConfig.apiBase + '/team/project/' + $scope.currentProject._id).then(function(result) {
-        $scope.currentProjectTeams = result.data;
-        $scope.projectTeamsLoading = false;
-      });
+      if ($scope.currentProject.project) {
+        // This is an environment. Load the primary Project
+        primaryProjectQ.resolve((new Formio('/project/' + $scope.currentProject.project)).loadProject());
+      }
+      else {
+        // This is the primary environment.
+        primaryProjectQ.resolve($scope.currentProject);
+      }
+      $scope.primaryProjectPromise.then(function(primaryProject) {
+        $scope.primaryProject = primaryProject;
 
-      // Calculate the users highest role within the project.
-      $q.all([userTeamsPromise, projectTeamsPromise]).then(function() {
-        var roles = _.has($scope.user, 'roles') ? $scope.user.roles : [];
-        var teams = _($scope.userTeams ? $scope.userTeams : [])
-          .map('_id')
-          .filter()
-          .value();
-        var allRoles = _(roles.concat(teams)).filter().value();
-        var highestRole = null;
+        // Load project environments
+        Formio.loadProjects('?project=' + $scope.primaryProject._id).then(function(environments) {
+          $scope.environments = environments;
+        });
 
-        /**
-         * Determine if the user contains a role of the given type.
-         *
-         * @param {String} type
-         *   The type of role to search for.
-         * @returns {boolean}
-         *   If the current user has the role or not.
-         */
-        var hasRoles = function(type) {
-          var potential = _($scope.currentProjectTeams)
-            .filter({permission: type})
+        // Load the projects teams.
+        var projectTeamsPromise = $http.get(AppConfig.apiBase + '/team/project/' + $scope.primaryProject._id).then(function(result) {
+          $scope.primaryProjectTeams = result.data;
+          $scope.projectTeamsLoading = false;
+        });
+
+        // Calculate the users highest role within the project.
+        $q.all([userTeamsPromise, projectTeamsPromise]).then(function() {
+          var roles = _.has($scope.user, 'roles') ? $scope.user.roles : [];
+          var teams = _($scope.userTeams ? $scope.userTeams : [])
             .map('_id')
+            .filter()
             .value();
-          return (_.intersection(allRoles, potential).length > 0);
-        };
+          var allRoles = _(roles.concat(teams)).filter().value();
+          var highestRole = null;
 
-        $scope.projectPermissions = {
-          read: true,
-          write: true,
-          admin: true
-        };
-        if (_.has($scope.user, '_id') && _.has($scope.currentProject, 'owner') &&  ($scope.user._id === $scope.currentProject.owner)) {
-          highestRole = 'owner';
-        }
-        else if (hasRoles('team_admin')) {
-          highestRole = 'team_admin';
-        }
-        else if (hasRoles('team_write')) {
-          highestRole = 'team_write';
-          $scope.projectPermissions.admin = false;
-        }
-        else if (hasRoles('team_read')) {
-          highestRole = 'team_read';
-          $scope.projectPermissions.admin = false;
-          $scope.projectPermissions.write = false;
-        }
-        else {
-          highestRole = 'anonymous';
-        }
+          /**
+           * Determine if the user contains a role of the given type.
+           *
+           * @param {String} type
+           *   The type of role to search for.
+           * @returns {boolean}
+           *   If the current user has the role or not.
+           */
+          var hasRoles = function(type) {
+            var potential = _($scope.primaryProjectTeams)
+              .filter({permission: type})
+              .map('_id')
+              .value();
+            return (_.intersection(allRoles, potential).length > 0);
+          };
 
-        $scope.highestRole = highestRole;
+          $scope.projectPermissions = {
+            read: true,
+            write: true,
+            admin: true
+          };
+          if (_.has($scope.user, '_id') && _.has($scope.currentProject, 'owner') &&  ($scope.user._id === $scope.currentProject.owner)) {
+            highestRole = 'owner';
+          }
+          else if (hasRoles('team_admin')) {
+            highestRole = 'team_admin';
+          }
+          else if (hasRoles('team_write')) {
+            highestRole = 'team_write';
+            $scope.projectPermissions.admin = false;
+          }
+          else if (hasRoles('team_read')) {
+            highestRole = 'team_read';
+            $scope.projectPermissions.admin = false;
+            $scope.projectPermissions.write = false;
+          }
+          else {
+            highestRole = 'anonymous';
+          }
+
+          $scope.highestRole = highestRole;
+        });
+
       });
 
       $scope.projectSettingsVisible = function() {
@@ -380,6 +504,118 @@ app.controller('ProjectController', [
     $scope.getAPICallsPercent = ProjectPlans.getAPICallsPercent.bind(ProjectPlans);
     $scope.getProgressBarClass = ProjectPlans.getProgressBarClass.bind(ProjectPlans);
     $scope.showUpgradeDialog = ProjectUpgradeDialog.show.bind(ProjectUpgradeDialog);
+  }
+]);
+
+app.controller('ProjectDeployController', [
+  '$scope',
+  'AppConfig',
+  'Formio',
+  'FormioAlerts',
+  function(
+    $scope,
+    AppConfig,
+    Formio,
+    FormioAlerts
+  ) {
+    var loadVersions = function() {
+      Formio.makeStaticRequest(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/version', 'GET', null, {ignoreCache: true})
+        .then(function(versions) {
+          $scope.versions = versions;
+        });
+    };
+
+    loadVersions();
+
+    $scope.deployVersion = function(version) {
+      if (!version) {
+        return FormioAlerts.addAlert({
+          type: 'warning',
+          message: 'Please select a version to deploy.'
+        });
+      }
+      Formio.makeStaticRequest(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/deploy', 'POST', {
+        type: 'version',
+        id: version.version
+      })
+        .then(function() {
+          $scope.deployVersionOption = '';
+          FormioAlerts.addAlert({
+            type: 'success',
+            message: 'Project Definition ' + version.version + ' deployed to ' + $scope.currentProject.title + '.'
+          });
+        })
+        .catch(FormioAlerts.onError.bind(FormioAlerts));
+    };
+  }
+]);
+
+app.controller('ProjectVersionCreateController', [
+  '$scope',
+  '$state',
+  'AppConfig',
+  'Formio',
+  'FormioAlerts',
+  function(
+    $scope,
+    $state,
+    AppConfig,
+    Formio,
+    FormioAlerts
+  ) {
+    $scope.addVersion = function(version) {
+      if (!version) {
+        return FormioAlerts.addAlert({
+          type: 'warning',
+          message: 'Please enter a version identifier.'
+        });
+      }
+      Formio.makeStaticRequest(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/version', 'POST', {
+        project: $scope.primaryProject._id,
+        version: version
+      })
+        .then(function() {
+          FormioAlerts.addAlert({
+            type: 'success',
+            message: 'Project Definition Version was created.'
+          });
+          $state.go('project.env.version.deploy');
+        })
+        .catch(FormioAlerts.onError.bind(FormioAlerts));
+    };
+  }
+]);
+
+app.controller('ProjectImportController', [
+  '$scope',
+  'AppConfig',
+  'Formio',
+  'FormioAlerts',
+  function(
+    $scope,
+    AppConfig,
+    Formio,
+    FormioAlerts
+  ) {
+    $scope.importVersion = function(template) {
+      if (!template) {
+        return FormioAlerts.addAlert({
+          type: 'warning',
+          message: 'Please select a file to import.'
+        });
+      }
+      Formio.makeStaticRequest(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/import', 'POST', {
+          template: template
+        })
+        .then(function() {
+          $scope.deployVersionOption = '';
+          FormioAlerts.addAlert({
+            type: 'success',
+            message: 'Project Definition imported to ' + $scope.currentProject.title + '.'
+          });
+        })
+        .catch(FormioAlerts.onError.bind(FormioAlerts));
+    };
   }
 ]);
 
@@ -439,235 +675,14 @@ app.directive('projectStep', function() {
   };
 });
 
-app.provider('ProjectProgress', function() {
-  // TODO: Should we make this configurable with a register function?
-  var stepDefinitions;
-  var steps = {};
-  var project;
-  var forms = [];
-  var userForms = [];
-  var states = {};
-  var formio;
-
-  this.$get = [
-    '$rootScope',
-    '$q',
-    'Formio',
-    'AppConfig',
-    function(
-      $rootScope,
-      $q,
-      Formio,
-      AppConfig
-    ) {
-      stepDefinitions = [
-        {
-          key: 'createProject',
-          complete: function(next) {
-            next(true);
-          }
-        },
-        {
-          key: 'setupUsers',
-          complete: function(next) {
-            var promises = [];
-            userForms.forEach(function(userForm) {
-              var userFormio = new Formio(AppConfig.apiBase + '/project/' + userForm.project + '/form/' + userForm._id + '/submission');
-              promises.push(userFormio.loadSubmissions());
-            });
-            $q.all(promises).then(function(results) {
-              var hasUser = true;
-              results.forEach(function(result) {
-                if (result.length === 0) {
-                  hasUser = false;
-                }
-              });
-              next(hasUser);
-            });
-          }
-        },
-        {
-          key: 'modifyForm',
-          complete: function(next) {
-            formio.loadForms({
-                params: {
-                  limit: Number.MAX_SAFE_INTEGER // Don't limit results
-                }
-              })
-              .then(function(projectForms) {
-                forms = projectForms;
-                forms.forEach(function(form) {
-                  if ((new Date(project.created).getTime() + 10000) < new Date(form.modified).getTime()) {
-                    return next(true);
-                  }
-                });
-                next(false);
-              });
-          }
-        },
-        {
-          key: 'setupProviders',
-          complete: function(next) {
-            var projectSettings = project.settings || {};
-            var result = (projectSettings.email || projectSettings.storage);
-            next(result);
-          }
-        },
-        {
-          key: 'cloneApp',
-          route: 'project.launch.local'
-        },
-        {
-          key: 'newForm',
-          complete: function(next) {
-            formio.loadForms({
-                params: {
-                  limit: Number.MAX_SAFE_INTEGER // Don't limit results
-                }
-              })
-              .then(function(projectForms) {
-                forms = projectForms;
-                forms.forEach(function(form) {
-                  if ((new Date(project.created).getTime() + 10000) < new Date(form.created).getTime()) {
-                    return next(true);
-                  }
-                });
-                next(false);
-              });
-          }
-        },
-        {
-          key: 'launchApp',
-          route: 'project.launch.app'
-        }
-      ];
-      // Define route based steps.
-      angular.forEach(stepDefinitions, function(step) {
-        if (step.route) {
-          states[step.route] = step.key;
-        }
-      });
-
-      var saveStep = function(step) {
-        if (project.steps.indexOf(step) === -1) {
-          project.steps.push(step);
-          formio.saveProject(project);
-        }
-      };
-
-      var progress = {
-        steps: steps,
-        userForms: userForms,
-        setProject: function(newProject) {
-          project = newProject;
-          if (project) {
-            // Initialize new projects.
-            if (!project.steps) {
-              project.steps = [];
-            }
-            formio = new Formio($rootScope.projectPath(project));
-
-            formio.loadForms({
-                params: {
-                  limit: Number.MAX_SAFE_INTEGER // Don't limit results
-                }
-              })
-              .then(function(projectForms) {
-                forms = projectForms;
-
-                // Empty userForms without breaking prototypical inheritance.
-                userForms.length = 0;
-                angular.forEach(forms, function(form) {
-                  if (form.name === 'user' || (form.tags && form.tags.indexOf('user') !== -1)) {
-                    userForms.push(form);
-                  }
-                });
-                progress.checkComplete();
-              });
-          }
-        },
-        checkComplete: function(state) {
-          if (!project) {
-            return;
-          }
-          var promises = [];
-          // Check for state changes
-          if (state && states[state.name] && project.steps.indexOf(states[state.name]) === -1) {
-            saveStep(states[state.name]);
-          }
-
-          // Check each complete function
-          angular.forEach(stepDefinitions, function(step) {
-            var defer = $q.defer();
-            if (project.steps && project.steps.indexOf(step.key) !== -1) {
-              defer.resolve({
-                key: step.key,
-                complete: true
-              });
-            }
-            else if (typeof step.complete === 'function') {
-              step.complete(function(result) {
-                // If we evaluate to true and haven't before, save to project.
-                if (result && project && project.steps.indexOf(step.key) === -1) {
-                  saveStep(step.key);
-                }
-                defer.resolve({
-                  key: step.key,
-                  complete: result
-                });
-              });
-            }
-            else {
-              defer.resolve({
-                key: step.key,
-                complete: false
-              });
-            }
-            promises.push(defer.promise);
-          });
-
-          $q.all(promises).then(function(results) {
-            var atIncomplete = false;
-            var complete = 0;
-            angular.forEach(results, function(result) {
-              steps[result.key] = {
-                complete: result.complete,
-                open: false
-              };
-              if (steps[result.key].complete) {
-                complete++;
-              }
-              else {
-                if (!atIncomplete) {
-                  steps[result.key].open = true;
-                  atIncomplete = true;
-                }
-              }
-            });
-            $rootScope.stepsPercent = Math.round(complete / results.length * 20) * 5;
-          });
-        },
-      };
-
-      $rootScope.$on('$stateChangeSuccess', function(event, state) {
-        progress.checkComplete(state);
-      }).bind(this);
-
-      return progress;
-    }
-  ];
-});
-
 app.controller('ProjectOverviewController', [
   '$scope',
-  'ProjectProgress',
   '$stateParams',
   'AppConfig',
   'Formio',
   'FormioAlerts',
   function(
     $scope,
-    ProjectProgress,
     $stateParams,
     AppConfig,
     Formio,
@@ -676,9 +691,6 @@ app.controller('ProjectOverviewController', [
     $scope.currentSection.title = 'Overview';
     $scope.currentSection.icon = 'fa fa-dashboard';
     $scope.currentSection.help = '';
-
-    $scope.steps = ProjectProgress.steps;
-    $scope.userForms = ProjectProgress.userForms;
 
     var formio = new Formio(AppConfig.apiBase + '/project/' + $scope.currentProject._id);
 
@@ -695,7 +707,7 @@ app.controller('ProjectOverviewController', [
     var abbreviator = new NumberAbbreviate();
 
     $scope.hasTeams = function() {
-      return $scope.currentProject.plan === 'team' || $scope.currentProject.plan === 'commercial';
+      return ['trial', 'team', 'commercial'].indexOf($scope.currentProject.plan) !== -1;
     };
 
     $scope.getLastModified = function() {
@@ -1784,7 +1796,6 @@ app.controller('ProjectSettingsController', [
   'FormioAlerts',
   '$http',
   'AppConfig',
-  '$interval',
   function(
     $scope,
     $rootScope,
@@ -1792,12 +1803,12 @@ app.controller('ProjectSettingsController', [
     GoogleAnalytics,
     FormioAlerts,
     $http,
-    AppConfig,
-    $interval
+    AppConfig
   ) {
     if (!$scope.highestRole || ($scope.highestRole && ['team_read', 'team_write'].indexOf($scope.highestRole) !== -1)) {
-      $state.go('project.overview');
-      return;
+      // this is constantly going to overview on reload.
+      //$state.go('project.env.overview');
+      //return;
     }
 
     $scope.currentSection.title = 'Settings';
@@ -1832,10 +1843,16 @@ app.controller('ProjectSettingsController', [
           pool: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
         })
       });
+      $scope.formio.saveProject($scope.currentProject);
     };
 
     $scope.removeKey = function($index) {
       $scope.currentProject.settings.keys.splice($index, 1);
+      $scope.formio.saveProject($scope.currentProject);
+    };
+
+    $scope.updateProject = function() {
+      $scope.formio.saveProject($scope.currentProject);
     };
 
     // Save the Project.
@@ -1908,152 +1925,124 @@ app.controller('ProjectSettingsController', [
   }
 ]);
 
-app.controller('ProjectTeamViewController', [
+app.controller('ProjectTeamController', [
   '$scope',
+  '$http',
+  'AppConfig',
+  'Formio',
+  'FormioAlerts',
   'TeamPermissions',
+  'GoogleAnalytics',
   function(
     $scope,
-    TeamPermissions
+    $http,
+    AppConfig,
+    Formio,
+    FormioAlerts,
+    TeamPermissions,
+    GoogleAnalytics
   ) {
     $scope.getPermissionLabel = TeamPermissions.getPermissionLabel.bind(TeamPermissions);
-  }
-]);
 
-app.controller('ProjectTeamEditController', [
-  '$scope',
-  '$state',
-  'FormioAlerts',
-  'GoogleAnalytics',
-  '$stateParams',
-  'AppConfig',
-  '$http',
-  function(
-    $scope,
-    $state,
-    FormioAlerts,
-    GoogleAnalytics,
-    $stateParams,
-    AppConfig,
-    $http
-  ) {
-    $scope.addTeam = {
-      _id: ($stateParams.teamId !== null) ? $stateParams.teamId : null,
-      permission: ($stateParams.permission !== null) ? $stateParams.permission : null
-    };
+    $scope.primaryProjectPromise.then(function(primaryProject) {
+      var projectTeamsPromise = $http.get(AppConfig.apiBase + '/team/project/' + primaryProject._id).then(function(result) {
+        $scope.primaryProjectTeams = result.data;
 
-    if($scope.addTeam._id && !$scope.addTeam.permission) {
-      $scope.addTeam.permission = _.filter($scope.currentProjectTeams, {_id: $scope.addTeam._id})[0].permission;
-    }
+        $http.get(AppConfig.apiBase + '/team/all').then(function(result) {
+          $scope.userTeams = result.data;
+          $scope.userTeamsLoading = false;
 
-    // Only allow users to select teams that do not have permissions yet.
-    var current = _.map($scope.currentProjectTeams, '_id');
-
-    // If editing a old permission, only allow the current team to be edited.
-    if($scope.addTeam._id) {
-      $scope.uniqueEligibleTeams = _.filter($scope.currentProjectTeams, {_id: $scope.addTeam._id});
-    }
-    else {
-      // Get the latest team data.
-      $http.get(AppConfig.apiBase + '/team/all').then(function(result) {
-        $scope.userTeams = result.data;
-        $scope.userTeamsLoading = false;
-
-        // Separate out the teams that the current user owns, to save an api call.
-        $scope.currentProjectEligibleTeams = _.filter(result.data, {owner: $scope.user._id});
-        $scope.uniqueEligibleTeams = _.filter($scope.currentProjectEligibleTeams, function(team) {
-          return (current.indexOf(team._id) === -1);
+          // Separate out the teams that the current user owns, to save an api call.
+          $scope.primaryProjectEligibleTeams = _.filter(result.data, {owner: $scope.user._id});
+          $scope.uniqueEligibleTeams = _.filter($scope.primaryProjectEligibleTeams, function(team) {
+            return _.findIndex($scope.primaryProjectTeams, { _id: team._id }) === -1;
+          });
         });
       });
-    }
+    });
 
-    // Save the new team access with the existing project permissions.
-    $scope.saveTeam = function() {
-      var access = $scope.currentProject.access ||  [];
+    var setTeamPermission = function(project, team, newPermission) {
+      var access = project.access ||  [];
       var found = false;
 
       // Search the present permissions to add the new permission.
       access = _.forEach(access, function(permission) {
         // Remove all the old permissions.
         permission.roles = permission.roles || [];
-        permission.roles = _.without(permission.roles, $scope.addTeam._id);
+        permission.roles = _.without(permission.roles, team._id);
 
         // Add the given role to the new permission type.
-        if (permission.type === $scope.addTeam.permission) {
+        if (permission && permission.type === newPermission) {
           found = true;
 
           permission.roles = permission.roles || [];
-          permission.roles.push($scope.addTeam._id);
+          permission.roles.push(team._id);
         }
       });
 
       // This team permission was not found, add it.
-      if(!found) {
+      if(!found && newPermission) {
         access.push({
-          type: $scope.addTeam.permission,
-          roles: [$scope.addTeam._id]
+          type: newPermission,
+          roles: [team._id]
         });
       }
 
       // Update the current project access with the new team access.
-      $scope.currentProject.access = access;
+      project.access = access;
+    };
 
-      // Use the formio service to save the current project.
-      if (!$scope.currentProject._id) { return FormioAlerts.onError(new Error('No Project found.')); }
-      $scope.formio.saveProject($scope.currentProject)
+    var saveProject = function(project) {
+      (new Formio(AppConfig.apiBase + '/project/' + $scope.primaryProject._id)).saveProject($scope.primaryProject)
         .then(function(project) {
-          FormioAlerts.addAlert({
-            type: 'success',
-            message: 'Team saved.'
-          });
-          GoogleAnalytics.sendEvent('Project', 'update', null, 1);
-          // Reload state so alerts display and project updates.
-          $state.go('project.settings.teams.view', null, {reload: true});
-        }, FormioAlerts.onError.bind(FormioAlerts))
+          $scope.primaryProject = project;
+          //GoogleAnalytics.sendEvent('Project', 'update', null, 1);
+        })
         .catch(FormioAlerts.onError.bind(FormioAlerts));
     };
-  }
-]);
 
-app.controller('ProjectTeamDeleteController', [
-  '$scope',
-  '$stateParams',
-  'FormioAlerts',
-  'GoogleAnalytics',
-  '$state',
-  function(
-    $scope,
-    $stateParams,
-    FormioAlerts,
-    GoogleAnalytics,
-    $state
-  ) {
-    $scope.removeTeam = _.filter($scope.currentProjectTeams, {_id: $stateParams.teamId})[0];
-    $scope.saveTeam = function() {
-      if(!$scope.removeTeam || !$scope.removeTeam) return $state.go('project.settings.teams.view', null, {reload: true});
+    $scope.teamPermissions = [
+      {
+        value: 'team_read',
+        label: 'Read',
+        description: ''
+      },
+      {
+        value: 'team_write',
+        label: 'Write',
+        description: ''
+      },
+      {
+        value: 'team_admin',
+        label: 'Admin',
+        description: ''
+      }
+    ];
 
-      // Search the present permissions to remove the given permission.
-      var access = $scope.currentProject.access ||  [];
-      access = _.forEach(access, function(permission) {
-        permission.roles = permission.roles || [];
-        permission.roles = _.without(permission.roles, $scope.removeTeam._id);
-      });
+    $scope.added = {
+      team: undefined
+    };
 
-      // Update the current project access with the new team access.
-      $scope.currentProject.access = access;
+    $scope.addTeam = function(team) {
+      setTeamPermission($scope.primaryProject, team, 'team_read');
+      saveProject($scope.primaryProject);
+      _.remove($scope.uniqueEligibleTeams, { _id: team._id });
+      team.permission = 'team_read';
+      $scope.primaryProjectTeams.push(team);
+      $scope.added.team = undefined;
+    };
 
-      // Use the formio service to save the current project.
-      if (!$scope.currentProject._id) { return FormioAlerts.onError(new Error('No Project found.')); }
-      $scope.formio.saveProject($scope.currentProject)
-        .then(function(project) {
-          FormioAlerts.addAlert({
-            type: 'success',
-            message: 'Team removed.'
-          });
-          GoogleAnalytics.sendEvent('Project', 'update', null, 1);
-          // Reload state so alerts display and project updates.
-          $state.go('project.settings.teams.view', null, {reload: true});
-        }, FormioAlerts.onError.bind(FormioAlerts))
-        .catch(FormioAlerts.onError.bind(FormioAlerts));
+    $scope.removeTeam = function(team) {
+      setTeamPermission($scope.primaryProject, team);
+      saveProject($scope.primaryProject);
+      _.remove($scope.primaryProjectTeams, { _id: team._id });
+      delete team.permission;
+      $scope.uniqueEligibleTeams.push(team);
+    };
+
+    $scope.updateTeam = function(team, permission) {
+      setTeamPermission($scope.primaryProject, team, permission);
+      saveProject($scope.primaryProject);
     };
   }
 ]);
@@ -2063,7 +2052,7 @@ app.controller('ProjectPlanController', [
   function($scope) {
     $scope.submission = {
       data: {
-        project: $scope.currentProject._id
+        project: $scope.primaryProject._id
       }
     };
     $scope.$on('formSubmission', function() {
@@ -2266,6 +2255,13 @@ app.factory('ProjectUpgradeDialog', [
                 }
               };
 
+              var currTime = (new Date()).getTime();
+              var projTime = (new Date(project.created.toString())).getTime();
+              var delta = Math.ceil(parseInt((currTime - projTime) / 1000));
+              var day = 86400;
+              var remaining = 30 - parseInt(delta / day);
+              $scope.trialDaysRemaining = remaining > 0 ? remaining : 0;
+
               $scope.$on('formSubmission', function() {
                 if(getActiveForm() === $scope.paymentForm) {
                   loadPaymentInfo();
@@ -2315,7 +2311,6 @@ app.factory('ProjectUpgradeDialog', [
               if ($scope.selectedPlan === undefined) {
                 $scope.selectedPlan = 'team';
               }
-
             }
           ]
         });

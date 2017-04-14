@@ -1,0 +1,24 @@
+<upgrade-warning ng-if="!minPlan('team')" warning="Upgrade your project to Team Pro or above to enable deploying to environments." />
+<div>
+  <h3>Create version from {{ currentProject.title }}</h3>
+  <div class="row">
+    <div class="col-md-8">
+      <h4>Create a version from current definition</h4>
+      <input class="form-control" placeholder="0.0.0" ng-model="version" />
+      <br />
+      <span class="btn btn-default" ng-click="addVersion(version)">Create version</span>
+    </div>
+    <div class="col-md-4">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <h3 class="panel-title">Creating a project version</h3>
+        </div>
+        <div class="panel-body">
+          <p>Creating a version from an environment will bundle all forms, resources, roles, actions and access into a setting and store them with the associated tag.</p>
+          <p>This version tag can then be deployed into another environment which will overwrite the project there.</p>
+          <p>To create a new version, enter a version tag into the version field and click <strong>Create bersion</strong>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

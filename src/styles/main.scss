@@ -11,6 +11,10 @@
   cursor: pointer;
 }
 
+:focus {
+  outline: none;
+}
+
 body {
   padding-top: 45px;
 }
@@ -201,10 +205,8 @@ li.user-dropdown a {
 }
 
 .sidebar {
-  position: fixed;
-  top: 45px;
-  bottom: 0;
-  left: 0;
+  position: relative;
+  float: left;
   z-index: 1000;
   display: block;
   padding: 20px;
@@ -268,14 +270,8 @@ $project-header-color: #eee;
 
 .new-project-row {
   position:relative;
-  padding: 35px 0 0 0;
   background-color: $brand-secondary;
   color: $project-header-color;
-  .new-project-header {
-    position:absolute;
-    top: 0;
-    margin: 10px 0 0 0;
-  }
   .new-project-section {
     float: left;
     margin-right: 10px;
@@ -289,9 +285,10 @@ $project-header-color: #eee;
 .project-template-item {
   .project-template-card {
     .project-template-img {
-      width: 133px;
-      height: 100px;
-      border: solid $brand-primary 4px;
+      width: 80px;
+      height: 80px;
+      //border: solid $brand-primary 4px;
+      margin: 10px 35px;
       &:hover {
         cursor: pointer;
         border: solid lighten($brand-primary, 20%) 4px;
@@ -306,18 +303,23 @@ $project-header-color: #eee;
   }
 }
 
+.project-container {
+  position: relative;
+}
+
 .project-sidebar {
   border: none;
   background-color: darken($brand-primary, 25%);
   text-align: center;
   padding: 0;
-  width: 6%;
+  width: 70px;
+  position: absolute;
   .nav {
     margin: 0;
     li {
       & > a {
-        height: 90px;
-        padding: 20px 0 0 0;
+        height: 70px;
+        padding: 14px 0 0 0;
         color: $project-header-color;
         &:hover {
           background-color: darken($brand-primary, 20%);
@@ -326,7 +328,7 @@ $project-header-color: #eee;
           font-size: 0.6em;
         }
         i {
-          font-size: 2em;
+          font-size: 1.8em;
         }
       }
       &.active {
@@ -341,9 +343,11 @@ $project-header-color: #eee;
 }
 
 .project-main {
-  margin-left: 6%;
-  width: 94%;
+  float: left;
+  width: 100%;
+  min-height: 700px;
   padding: 0;
+  border-left: solid darken($brand-primary, 25%) 70px;
 }
 
 .project-content {
@@ -461,7 +465,7 @@ div.project-section-separator {
   color: $brand-primary;
   padding-left: 20px;
   padding-top: 20px;
-  border-bottom: solid lighten($brand-primary, 10%) 8px;
+  border-bottom: solid #eeeeee 8px;
   h2 {
     color: $project-header-color;
     a {
@@ -489,10 +493,48 @@ div.project-section-separator {
     overflow: hidden;
     display: inline-block;
   }
+
+  .project-plan {
+    padding: 5px 10px;
+    color: white;
+    border-radius: 12px;
+    position: relative;
+    top: -3px;
+  }
+
+  .project-nav {
+    border: 0px;
+    li {
+      //margin-bottom: -4px;
+      a {
+        color: white;
+        background-color: inherit;
+        border: 0px;
+      }
+    }
+    li.active {
+      a {
+        color: #222222;
+      }
+      a:hover {
+        border: 0px;
+      }
+      background-color: #eeeeee;
+      border-top: solid $brand-primary 4px;
+      margin-top: -4px;
+    }
+  }
+}
+
+ul.project-settings-menu {
+  ul {
+    margin-left: 15px;
+  }
 }
 
 .project-section-inner-content {
   padding: 20px;
+  position: relative;
 }
 
 .project-form-form-view-page .form-content, .project-resource-form-api-page .form-content {
@@ -636,6 +678,11 @@ pre code {
 
 .panel-default .panel-title .text-muted {
   color: #999;
+}
+
+.panel-trial > .panel-heading {
+  background-color: $price-panel-trial;
+  border-color: $price-panel-trial;
 }
 
 /***************************** Feedback *****************************/
@@ -838,7 +885,8 @@ footer {
   text-align: center;
   background-color: darken($brand-secondary, 2%);
   display: table-row;
-  width: 100%;
+  border-left: 85px solid darken($brand-primary, 25%);
+;
   a {
     color: white;
   }
@@ -1159,6 +1207,10 @@ footer {
   background-color: #CD69C9;
   color: #FFF;
 }
+.label-trial {
+  background-color: $price-panel-trial;
+  color: #FFF;
+}
 
 .ellipsis {
   overflow: hidden;
@@ -1339,11 +1391,15 @@ footer {
   .list-group {
     padding: 0px;
 
+    .list-group-heading {
+      font-weight: bold;
+      font-size: 1.8em;
+      background-color: $table-bg-hover;
+    }
+
     .list-group-item {
       padding: 30px 0;
       border-color: #eeeeee;
-      border-left: none;
-      border-right: none;
       &:nth-child(even) {
         background-color: $table-bg-accent;
       }
@@ -1365,6 +1421,15 @@ footer {
           }
         }
       }
+    }
+  }
+}
+
+.list-group.list-group-striped {
+  .list-group-item {
+    border-color: #eeeeee;
+    &:nth-child(odd) {
+      background-color: $table-bg-accent;
     }
   }
 }
@@ -1490,6 +1555,10 @@ footer {
 
     &.plan-column-commercial {
       background-color: darken($price-panel-commercial, 10%);
+    }
+
+    &.plan-column-trial {
+      background-color: darken($price-panel-trial, 10%);
     }
 
     .table {
@@ -1623,4 +1692,38 @@ footer {
   p.help-block {
     color: red;
   }
+}
+
+.form-inline .ui-select-container {
+  postion:absolute;
+  display: inline-block;
+  vertical-align: middle;
+  width: auto;
+}
+
+.upgrade-warning-container {
+  width: 97%;
+  min-height: 500px;
+  position: absolute;
+  background-color: rgba(128,128,128,0.3);
+  z-index: 10;
+  padding: 50px;
+  .upgrade-warning {
+    padding: 100px;
+    background-color: #666666;
+    color: white;
+    width: 50%;
+    margin: auto;
+    border-radius: 5px;
+  }
+}
+
+.trial {
+  .count {
+    font-size: 3em;
+  }
+}
+
+.table > tbody > tr > td {
+  border: 1px solid #eee;
 }
