@@ -7,4 +7,5 @@ require('ng-file-upload');
 require('bootstrap');
 require('angular-ui-bootstrap');
 require('bootstrap-ui-datetime-picker/dist/datetime-picker');
+require('ng-dialog');
 require('./formio');

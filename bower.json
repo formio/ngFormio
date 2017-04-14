@@ -18,6 +18,7 @@
     "angular": "^1.6.4",
     "ng-file-upload": "^12.2.13",
     "angular-sanitize": "^1.6.4",
+    "ng-dialog": "^1.0.1",
     "angular-moment": "^1.0.1",
     "bootstrap": "^3.3.7",
     "bootstrap-ui-datetime-picker": "^2.5.4",
