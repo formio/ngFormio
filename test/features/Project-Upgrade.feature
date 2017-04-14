@@ -33,52 +33,52 @@ Feature: Project Upgrade Functionality
     And I am on the ${upgradeProject.title} project overview page
     Then I see #project-plan-display with the text Independent
 
-  Scenario: Upgrades to Team Pro
-    Given I am logged in for upgradeUser
-    And I am on the ${upgradeProject.title} project overview page
-    And I wait 1000 milliseconds
-    When I click the Upgrade Project link
-    And I update the project to the Team Pro Plan
-    And I click the Change plan to Team Pro button
-    And I am on the ${upgradeProject.title} project overview page
-    Then I see #project-plan-display with the text Team Pro
+#  Scenario: Upgrades to Team Pro
+#    Given I am logged in for upgradeUser
+#    And I am on the ${upgradeProject.title} project overview page
+#    And I wait 1000 milliseconds
+#    When I click the Upgrade Project link
+#    And I update the project to the Team Pro Plan
+#    And I click the Change plan to Team Pro button
+#    And I am on the ${upgradeProject.title} project overview page
+#    Then I see #project-plan-display with the text Team Pro
+#
+#  Scenario: Upgrades to Commercial
+#    Given I am logged in for upgradeUser
+#    And I am on the ${upgradeProject.title} project overview page
+#    And I wait 1000 milliseconds
+#    When I click the Upgrade Project link
+#    And I update the project to the Commercial Plan
+#    And I click the Change plan to Commercial button
+#    And I am on the ${upgradeProject.title} project overview page
+#    Then I see #project-plan-display with the text Commercial
 
-  Scenario: Upgrades to Commercial
-    Given I am logged in for upgradeUser
-    And I am on the ${upgradeProject.title} project overview page
-    And I wait 1000 milliseconds
-    When I click the Upgrade Project link
-    And I update the project to the Commercial Plan
-    And I click the Change plan to Commercial button
-    And I am on the ${upgradeProject.title} project overview page
-    Then I see #project-plan-display with the text Commercial
-
-  Scenario: Downgrades to Team Pro
-    Given I am logged in for upgradeUser
-    And I am on the ${upgradeProject.title} project overview page
-    And I wait 1000 milliseconds
-    When I click the Upgrade Project link
-    And I update the project to the Team Pro Plan
-    And I click the Change plan to Team Pro button
-    And I am on the ${upgradeProject.title} project overview page
-    Then I see #project-plan-display with the text Team Pro
-
-  Scenario: Downgrades to Independent
-    Given I am logged in for upgradeUser
-    And I am on the ${upgradeProject.title} project overview page
-    And I wait 1000 milliseconds
-    When I click the Upgrade Project link
-    And I update the project to the Independent Plan
-    And I click the Change plan to Independent button
-    And I am on the ${upgradeProject.title} project overview page
-    Then I see #project-plan-display with the text Independent
-
-  Scenario: Downgrades to Basic
-    Given I am logged in for upgradeUser
-    And I am on the ${upgradeProject.title} project overview page
-    And I wait 1000 milliseconds
-    When I click the Upgrade Project link
-    And I update the project to the Basic Plan
-    And I click the Change plan to Basic button
-    And I am on the ${upgradeProject.title} project overview page
-    Then I see #project-plan-display with the text Basic
+#  Scenario: Downgrades to Team Pro
+#    Given I am logged in for upgradeUser
+#    And I am on the ${upgradeProject.title} project overview page
+#    And I wait 1000 milliseconds
+#    When I click the Upgrade Project link
+#    And I update the project to the Team Pro Plan
+#    And I click the Change plan to Team Pro button
+#    And I am on the ${upgradeProject.title} project overview page
+#    Then I see #project-plan-display with the text Team Pro
+#
+#  Scenario: Downgrades to Independent
+#    Given I am logged in for upgradeUser
+#    And I am on the ${upgradeProject.title} project overview page
+#    And I wait 1000 milliseconds
+#    When I click the Upgrade Project link
+#    And I update the project to the Independent Plan
+#    And I click the Change plan to Independent button
+#    And I am on the ${upgradeProject.title} project overview page
+#    Then I see #project-plan-display with the text Independent
+#
+#  Scenario: Downgrades to Basic
+#    Given I am logged in for upgradeUser
+#    And I am on the ${upgradeProject.title} project overview page
+#    And I wait 1000 milliseconds
+#    When I click the Upgrade Project link
+#    And I update the project to the Basic Plan
+#    And I click the Change plan to Basic button
+#    And I am on the ${upgradeProject.title} project overview page
+#    Then I see #project-plan-display with the text Basic
