@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## 2.15.4
+### Fixed
+ - Datetime component won't load existing dates on submissions.
+
 ## 2.15.3
 ### Added
  - Allow translating month part of day component.
