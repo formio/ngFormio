@@ -199,7 +199,7 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
         $scope.buyMin = $scope.buyNumber;
         $scope.calculateTotal();
         ngDialog.open({
-          template: 'views/project/pdf/purchase.html',
+          template: 'views/project/env/pdf/purchase.html',
           scope: $scope
         });
       };

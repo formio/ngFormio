@@ -556,19 +556,19 @@ angular
 
       $scope.platforms = [
         {
-          title: 'AngularJS 1.x',
-          name: 'angular1',
-          img: 'images/platforms/angularjs1.svg'
-        },
-        {
-          title: 'Angular 2.x+',
-          name: 'angular1',
+          title: 'Angular',
+          name: 'angular2',
           img: 'images/platforms/angular2.png'
         },
         {
           title: 'React.js',
           name: 'react',
           img: 'images/platforms/react.svg'
+        },
+        {
+          title: 'AngularJS',
+          name: 'angular1',
+          img: 'images/platforms/angularjs1.svg'
         },
         {
           title: 'Vue.js',

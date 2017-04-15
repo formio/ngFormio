@@ -19,6 +19,9 @@ body {
   padding-top: 45px;
 }
 
+.grow { transition: all .2s ease-in-out; }
+.grow:hover { transform: scale(1.2); }
+
 .btn {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -270,8 +273,8 @@ $project-header-color: #eee;
 
 .new-project-row {
   position:relative;
-  background-color: $brand-secondary;
-  color: $project-header-color;
+  background-color: #eee;
+  color: #333;
   .new-project-section {
     float: left;
     margin-right: 10px;
@@ -291,7 +294,6 @@ $project-header-color: #eee;
       margin: 10px 35px;
       &:hover {
         cursor: pointer;
-        border: solid lighten($brand-primary, 20%) 4px;
       }
     }
     .project-template-info {
@@ -461,7 +463,7 @@ div.project-section-separator {
 }
 
 .project-section-header {
-  background-color: $brand-secondary;
+  background-color: #777;
   color: $brand-primary;
   padding-left: 20px;
   padding-top: 20px;
@@ -510,6 +512,7 @@ div.project-section-separator {
         color: white;
         background-color: inherit;
         border: 0px;
+        padding: 6px 15px;
       }
     }
     li.active {

@@ -30,7 +30,7 @@
     <div class="new-project-section">
       <h3 class="new-project-header text-center">Getting Started</h3>
       <ul class="list-inline">
-        <li ng-repeat="platform in platforms" class="project-template-item">
+        <li ng-repeat="platform in platforms" class="project-template-item grow">
           <div class="project-template-card" ng-click="createProject(platform)">
             <img ng-if="platform.img" class="project-template-img" ng-src="{{ platform.img }}" />
             <div class="project-template-info">
