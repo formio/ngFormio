@@ -1,0 +1,49 @@
+<div ng-if="!purchaseAsk && !buyComplete">
+  <h3>Buy more {{ type() }}</h3>
+  <table class="table table-bordered" style="background-color:white">
+    <tr>
+      <th>Amount</th>
+      <td>
+        <div class="input-group">
+          <span class="input-group-btn">
+              <button type="button" class="btn btn-danger btn-number" ng-click="decrementAmount()"><i class="fa fa-minus"></i></button>
+          </span>
+          <input type="text" class="form-control input-number" ng-model="buyNumber" min="{{ buyMin }}" disabled="true">
+          <span class="input-group-btn">
+            <button type="button" class="btn btn-success btn-number" ng-click="incrementAmount()"><i class="fa fa-plus"></i></button>
+          </span>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <th>Price</th>
+      <td><h3>{{ total() }}</h3></td>
+    </tr>
+  </table>
+  <ul class="list-inline">
+    <li><button class="btn btn-success" ng-click="askToBuy()">Purchase</button></li>
+    <li><button class="btn btn-default" ng-click="cancel()">Cancel</button></li>
+  </ul>
+</div>
+<div ng-if="purchaseAsk && !buyComplete">
+  <h3>Are you sure you wish add the following purchase?</h3>
+  <table class="table table-bordered" style="background-color:white">
+    <tr>
+      <th>{{ type() }}</th>
+      <td>{{ buyNumber }}</td>
+    </tr>
+    <tr>
+      <th><h3>Total</h3></th>
+      <td><h3>{{ total() }}</h3></td>
+    </tr>
+  </table>
+  <button class="btn btn-success" ng-click="makePurchase()">Yes. Make Purchase</button>
+  <button class="btn btn-danger" ng-click="cancel()">No</button>
+</div>
+<div ng-if="buyComplete">
+  <div class="alert alert-danger" role="alert" ng-if="buyError">{{ buyError }}</div>
+  <h3>Thank you for your purchase!</h3>
+  <p>This will be added to your next invoice.</p>
+  <button class="btn btn-default" ng-click="cancel()">Close</button>
+</div>
+

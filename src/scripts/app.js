@@ -270,6 +270,12 @@ angular
           parent: 'project.env',
           templateUrl: 'views/project/env/database/wipe.html',
         })
+        .state('project.env.pdf', {
+          url: '/pdf',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/pdf/index.html',
+          controller: 'PDFController'
+        })
         .state('project.env.version', {
           url: '/version',
           abstract: true,
@@ -766,6 +772,7 @@ angular
       $rootScope.teamForm = AppConfig.teamForm;
       $rootScope.feedbackForm = AppConfig.feedbackForm;
       $rootScope.resetPassForm = AppConfig.resetPassForm;
+      $rootScope.pdfUploadForm = AppConfig.pdfUploadForm;
       $rootScope.planForm = AppConfig.planForm;
       $rootScope.apiBase = AppConfig.apiBase;
       $rootScope.apiProtocol = AppConfig.apiProtocol;

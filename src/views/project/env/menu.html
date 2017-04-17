@@ -10,6 +10,7 @@
         <li role="presentation" ng-class="{active:($state.includes('project.env.settings.customjscss'))}"><a ui-sref="project.env.settings.customjscss">Custom JS and CSS</a></li>
       </ul>
     </li>
+    <li role="presentation" ng-class="{active:($state.includes('project.env.pdf'))}"><a ui-sref="project.env.pdf">PDFs</a></li>
     <li role="presentation" ng-class="{active:($state.includes('project.env.version.deploy'))}">
       <a ui-sref="project.env.version.deploy">Project Versions</a>
       <ul ng-if="$state.current.name.includes('project.env.version')" class="nav nav-pills nav-stacked">

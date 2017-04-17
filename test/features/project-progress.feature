@@ -68,7 +68,7 @@ Feature: Project Overview - Project Progress Functionality 13
     And I enter newForm in the #name field
     And I enter newForm in the #path field
     And I click on the Create Form input button
-    And I wait 1000 milliseconds
+    And I wait 2000 milliseconds
     Then I see project progress is at 85%
     When I click on the icon progress-radial
     Then The step Create a new form has been checked

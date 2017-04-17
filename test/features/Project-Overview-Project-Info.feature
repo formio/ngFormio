@@ -83,15 +83,15 @@ Feature: Project Overview - Project Info Functionality
     And I click on the .progress-radial element
     Then I donot see the User Login link in Forms section
 
-  Scenario: Deleting a Resource will remove the Resource in the ‘Overview’ section UI
-    Given I am logged in for profileuser3
-    And I am on the ${project3.title} project overview page
-    When I click on the .fa-database element
-    When I click on the glyphicon glyphicon-trash button for Admin form
-    And I see button.btn.btn-danger with the text Yes
-    And I click the Yes button
-    And I click on the .progress-radial element
-    Then I donot see the Admin link in Resources section
+#  Scenario: Deleting a Resource will remove the Resource in the ‘Overview’ section UI
+#    Given I am logged in for profileuser3
+#    And I am on the ${project3.title} project overview page
+#    When I click on the .fa-database element
+#    When I click on the glyphicon glyphicon-trash button for Admin form
+#    And I see button.btn.btn-danger with the text Yes
+#    And I click the Yes button
+#    And I click on the .progress-radial element
+#    Then I donot see the Admin link in Resources section
 
 
 
