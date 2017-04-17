@@ -518,31 +518,31 @@ app.controller('ProjectDeployController', [
     Formio,
     FormioAlerts
   ) {
-    var loadVersions = function() {
-      Formio.makeStaticRequest(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/version', 'GET', null, {ignoreCache: true})
-        .then(function(versions) {
-          $scope.versions = versions;
+    var loadTags = function() {
+      Formio.makeStaticRequest(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/tag', 'GET', null, {ignoreCache: true})
+        .then(function(tags) {
+          $scope.tags = tags;
         });
     };
 
-    loadVersions();
+    loadTags();
 
-    $scope.deployVersion = function(version) {
-      if (!version) {
+    $scope.deployTag = function(tag) {
+      if (!tag) {
         return FormioAlerts.addAlert({
           type: 'warning',
-          message: 'Please select a version to deploy.'
+          message: 'Please select a tag to deploy.'
         });
       }
       Formio.makeStaticRequest(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/deploy', 'POST', {
-        type: 'version',
-        id: version.version
+        type: 'tag',
+        id: tag.tag
       })
         .then(function() {
-          $scope.deployVersionOption = '';
+          $scope.deployTagOption = '';
           FormioAlerts.addAlert({
             type: 'success',
-            message: 'Project Definition ' + version.version + ' deployed to ' + $scope.currentProject.title + '.'
+            message: 'Project tag ' + tag.tag + ' deployed to ' + $scope.currentProject.title + '.'
           });
         })
         .catch(FormioAlerts.onError.bind(FormioAlerts));
@@ -550,7 +550,7 @@ app.controller('ProjectDeployController', [
   }
 ]);
 
-app.controller('ProjectVersionCreateController', [
+app.controller('ProjectTagCreateController', [
   '$scope',
   '$state',
   'AppConfig',
@@ -563,23 +563,23 @@ app.controller('ProjectVersionCreateController', [
     Formio,
     FormioAlerts
   ) {
-    $scope.addVersion = function(version) {
-      if (!version) {
+    $scope.addTag = function(tag) {
+      if (!tag) {
         return FormioAlerts.addAlert({
           type: 'warning',
-          message: 'Please enter a version identifier.'
+          message: 'Please enter a tag identifier.'
         });
       }
-      Formio.makeStaticRequest(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/version', 'POST', {
+      Formio.makeStaticRequest(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/tag', 'POST', {
         project: $scope.primaryProject._id,
-        version: version
+        tag: tag
       })
         .then(function() {
           FormioAlerts.addAlert({
             type: 'success',
-            message: 'Project Definition Version was created.'
+            message: 'Project Tag was created.'
           });
-          $state.go('project.env.version.deploy');
+          $state.go('project.env.deployments.deploy');
         })
         .catch(FormioAlerts.onError.bind(FormioAlerts));
     };
@@ -597,7 +597,7 @@ app.controller('ProjectImportController', [
     Formio,
     FormioAlerts
   ) {
-    $scope.importVersion = function(template) {
+    $scope.importTemplate = function(template) {
       if (!template) {
         return FormioAlerts.addAlert({
           type: 'warning',
@@ -608,10 +608,10 @@ app.controller('ProjectImportController', [
           template: template
         })
         .then(function() {
-          $scope.deployVersionOption = '';
+          $scope.importFile = null;
           FormioAlerts.addAlert({
             type: 'success',
-            message: 'Project Definition imported to ' + $scope.currentProject.title + '.'
+            message: 'Project template imported to ' + $scope.currentProject.title + '.'
           });
         })
         .catch(FormioAlerts.onError.bind(FormioAlerts));
