@@ -356,7 +356,8 @@ $project-header-color: #eee;
   margin-top: 0;
 }
 
-.navbar {
+.navbar.navbar-inverse {
+  background-color: darken($brand-primary, 25%);
   border-radius: 0;
   margin-bottom: 0;
 }
@@ -503,6 +504,7 @@ div.project-section-separator {
       margin-right: 4px;
     }
     li.active {
+      background-color: darken($brand-primary, 25%);
       border-top: solid $brand-primary 4px;
       margin-top: -4px;
       a {
