@@ -281,10 +281,6 @@ $project-header-color: #eee;
   }
 }
 
-.new-project-row-min {
-  background-color: darken($brand-primary, 15%);
-}
-
 .project-template-item {
   .project-template-card {
     .project-template-img {
@@ -363,7 +359,6 @@ $project-header-color: #eee;
 .navbar {
   border-radius: 0;
   margin-bottom: 0;
-  background-color: #eee;
 }
 
 .navbar-nav {
@@ -463,15 +458,14 @@ div.project-section-separator {
 }
 
 .project-section-header {
-  background-color: #777;
-  color: $brand-primary;
+  background-color: #eee;
   padding-left: 20px;
-  padding-top: 20px;
-  border-bottom: solid #eeeeee 8px;
+  padding-top: 6px;
+  border-bottom: solid $brand-secondary 8px;
   h2 {
-    color: $project-header-color;
+    color: #666;
     a {
-      color: $project-header-color;
+      color: #666;
       &:hover, &:focus {
         text-decoration: none;
       }
@@ -505,26 +499,16 @@ div.project-section-separator {
   }
 
   .project-nav {
-    border: 0px;
     li {
-      //margin-bottom: -4px;
-      a {
-        color: white;
-        background-color: inherit;
-        border: 0px;
-        padding: 6px 15px;
-      }
+      margin-right: 4px;
     }
     li.active {
-      a {
-        color: #222222;
-      }
-      a:hover {
-        border: 0px;
-      }
-      background-color: #eeeeee;
       border-top: solid $brand-primary 4px;
       margin-top: -4px;
+      a {
+        margin-right: 0;
+        border-top: none;
+      }
     }
   }
 }
@@ -565,7 +549,7 @@ ul.project-settings-menu {
 }
 
 .project-section-header-button {
-  border: solid $project-header-color 2px;
+  border: solid #fff 2px;
   margin-right: 5px;
 }
 
