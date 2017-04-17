@@ -459,10 +459,10 @@ div.project-section-separator {
 }
 
 .project-section-header {
-  background-color: #eee;
+  background-color: #fff;
   padding-left: 20px;
   padding-top: 6px;
-  border-bottom: solid $brand-secondary 8px;
+  border-bottom: solid #eee 8px;
   h2 {
     color: #666;
     a {
@@ -499,17 +499,21 @@ div.project-section-separator {
     top: -3px;
   }
 
-  .project-nav {
+  .nav-tabs.project-nav {
+    border: none;
     li {
       margin-right: 4px;
+      a {
+        background-color: #efefef;
+        border: none;
+      }
     }
     li.active {
-      background-color: darken($brand-primary, 25%);
-      border-top: solid $brand-primary 4px;
-      margin-top: -4px;
+      border-top: solid $brand-secondary 4px;
       a {
+        background-color: #eee;
         margin-right: 0;
-        border-top: none;
+        border: none;
       }
     }
   }
@@ -551,7 +555,7 @@ ul.project-settings-menu {
 }
 
 .project-section-header-button {
-  border: solid #fff 2px;
+  border: solid #333 2px;
   margin-right: 5px;
 }
 
