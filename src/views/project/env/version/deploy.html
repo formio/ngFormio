@@ -3,7 +3,7 @@
   <h3>Deploy to {{ currentProject.title }}</h3>
   <div class="row">
     <div class="col-md-8">
-      <h4>Deploy version</h4>
+      <h4>Version</h4>
       <div ng-if="versions.length">
         <p><select class="form-control" ng-model="deployVersionOption" ng-options="selectVersion as selectVersion.version for selectVersion in versions"></select></p>
         <span class="btn btn-primary" ng-click="deployVersion(deployVersionOption)">Deploy project definition version to {{ currentProject.title }}</span>
