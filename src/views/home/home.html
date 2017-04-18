@@ -31,7 +31,7 @@
       <h3 class="new-project-header text-center">Getting Started</h3>
       <ul class="list-inline">
         <li ng-repeat="platform in platforms" class="project-template-item grow">
-          <div class="project-template-card" ng-click="createProject(platform)">
+          <div class="project-template-card" ng-click="newProject(platform)">
             <img ng-if="platform.img" class="project-template-img" ng-src="{{ platform.img }}" />
             <div class="project-template-info">
               <h5 class="ellipsis">{{ platform.title }} Project</h5>
@@ -98,3 +98,11 @@
     </div>
   </div>
 </div>
+<script type="text/ng-template" id="newProject">
+  <div class="row">
+    <div class="col-sm-12 col-margin-bottom" ng-controller="ProjectCreateController">
+      <h2>New {{ selectedPlatform.title }} Project</h2>
+      <ng-include src="'views/project/env/settings/index.html'"></ng-include>
+    </div>
+  </div>
+</script>

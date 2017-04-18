@@ -123,6 +123,7 @@ app.controller('ProjectCreateController', [
     $scope.currentProject = {template: 'default'};
     $scope.hasTemplate = false;
     $scope.templateLimit = 3;
+    $scope.isBusy = false;
 
     $scope.templates = [];
     FormioProject.loadTemplates().then(function(templates) {
@@ -172,7 +173,9 @@ app.controller('ProjectCreateController', [
     };
 
     $scope.saveProject = function() {
+      $scope.isBusy = true;
       FormioProject.createProject($scope.currentProject).then(function(project) {
+        $scope.isBusy = false;
         $state.go('project.env.overview', {projectId: project._id});
       });
     };
@@ -2185,14 +2188,17 @@ app.controller('ProjectDeleteController', [
     FormioAlerts,
     GoogleAnalytics
   ) {
+    $scope.isBusy = false;
     $scope.deleteProject = function() {
       if (!$scope.currentProject || !$scope.currentProject._id) { return; }
+      $scope.isBusy = true;
       $scope.formio.deleteProject()
         .then(function() {
           FormioAlerts.addAlert({
             type: 'success',
             message: 'Project was deleted!'
           });
+          $scope.isBusy = false;
           GoogleAnalytics.sendEvent('Project', 'delete', null, 1);
           $state.go('home');
         }, FormioAlerts.onError.bind(FormioAlerts))

@@ -507,6 +507,7 @@ angular
     'ProjectUpgradeDialog',
     '$timeout',
     '$q',
+    'ngDialog',
     function(
       $scope,
       $state,
@@ -518,7 +519,8 @@ angular
       ProjectPlans,
       ProjectUpgradeDialog,
       $timeout,
-      $q
+      $q,
+      ngDialog
     ) {
       $rootScope.showHeader = true;
       $rootScope.activeSideBar = 'home';
@@ -598,6 +600,19 @@ angular
       });
 
       $scope.submitted = false;
+      $scope.selectedPlatform = null;
+      $scope.newProject = function(platform) {
+        $scope.selectedPlatform = platform;
+        $scope.currentProject = {
+          template: platform
+        };
+        console.log(platform);
+        ngDialog.open({
+          template: 'newProject',
+          scope: $scope
+        });
+      };
+
       $scope.createProject = function(template) {
         if (!$scope.submitted) {
           $scope.submitted = true;
