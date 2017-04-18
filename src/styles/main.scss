@@ -350,6 +350,8 @@ $project-header-color: #eee;
 
 .project-content {
   margin-bottom: 40px;
+  position: relative;
+  min-height: 700px;
 }
 
 .main .page-header {
@@ -1720,12 +1722,17 @@ footer {
 }
 
 .upgrade-warning-container {
-  width: 97%;
-  min-height: 500px;
+  width: 100%;
   position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
   background-color: rgba(128,128,128,0.3);
   z-index: 10;
   padding: 50px;
+  margin-bottom: -40px;
+  min-height: 600px;
   .upgrade-warning {
     padding: 100px;
     background-color: #666666;
