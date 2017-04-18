@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 
 ### Fixed
+ - Fixing issue with the form builder notifications and content component being flagged as modified on load.
 
 ### Removed
 
