@@ -526,6 +526,7 @@ div.project-section-separator {
       margin-right: 4px;
       margin-bottom: 0;
       a {
+        padding: 6px 15px;
         background-color: #efefef;
         border: none;
       }
@@ -1712,6 +1713,10 @@ footer {
   p.help-block {
     color: red;
   }
+}
+
+.project-title-header {
+  margin-bottom: 6px;
 }
 
 .form-inline .ui-select-container {
