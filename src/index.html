@@ -118,7 +118,7 @@
               </li>
               <li class="dropdown">
                 <a href="" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-book"></i> Docs<b class="caret"></b></a>
-                <ul class="dropdown-menu">
+                <ul class="dropdown-menu help-menu">
                   <li class="no-hover">
                     <div class="row docs-dropdown">
                       <div class="col-md-3">
@@ -184,7 +184,7 @@
 
     <footer>
       <div class="footer-banner"><img src="images/footerlogo-before.png" /></div>
-      <div class="container">
+      <div class="container footer-content">
         <div class="row" ng-if="$state.current.name === 'auth'">
           <div class="col-md-3">
             <ul class="list-group">
@@ -300,6 +300,7 @@
     <!-- inject:js -->
     <script src="scripts/app.js"></script>
     <script src="scripts/components/resourcefields.js"></script>
+    <script src="scripts/utils/utils.js"></script>
     <script src="scripts/controllers/access.js"></script>
     <script src="scripts/controllers/controllers.js"></script>
     <script src="scripts/controllers/environmentSwitcher.js"></script>
@@ -311,7 +312,6 @@
     <script src="scripts/controllers/role.js"></script>
     <script src="scripts/controllers/team.js"></script>
     <script src="scripts/controllers/user.js"></script>
-    <script src="scripts/utils/utils.js"></script>
     <!-- endinject -->
     <!-- endbuild -->
 

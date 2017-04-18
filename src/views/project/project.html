@@ -1,6 +1,6 @@
 <div class="project-section-header">
-  <a class="btn btn-success pull-right project-section-header-button" ng-show="projectSettingsVisible() && !onPrem" ng-click="showUpgradeDialog(primaryProject)"><i class="fa fa-arrow-circle-up"></i> Upgrade Project</a>
-  <a class="btn btn-success pull-right project-section-header-button" ng-if="user._id === primaryProject.owner" ui-sref="project.teams">Teams</a>
+  <a class="btn btn-primary pull-right project-section-header-button" ng-show="projectSettingsVisible() && !onPrem" ng-click="showUpgradeDialog(primaryProject)"><i class="fa fa-arrow-circle-up"></i> Upgrade Project</a>
+  <a class="btn btn-primary pull-right project-section-header-button" ng-if="user._id === primaryProject.owner" ui-sref="project.teams"><i class="fa fa-users"></i> Teams</a>
   <ul class="list-inline project-title-header">
     <li><h2 class="project-title"><a ui-sref="project.env.overview">{{ primaryProject.title }}</a></h2></li>
     <li ng-if="currentSection.title"><h2>›</h2></li>

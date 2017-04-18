@@ -12,8 +12,8 @@
       </div>
     </div>
     <div class="col-md-6 text-right">
-      <a ui-sref="project.{{ formType }}.new()" ng-if="'form' === formType" class="btn btn-success" ng-class="{disabled: protected}"><span class="glyphicon glyphicon-plus"></span> Create {{ formType | capitalize }}</a>
-      <a ui-sref="project.{{ formType }}.create()" ng-if="'resource' === formType" class="btn btn-success" ng-class="{disabled: protected}"><span class="glyphicon glyphicon-plus"></span> Create {{ formType | capitalize }}</a>
+      <a ui-sref="project.{{ formType }}.new()" ng-if="'form' === formType" class="btn btn-success" ng-class="{disabled: protected}"><i class="fa fa-plus"></i> New {{ formType | capitalize }}</a>
+      <a ui-sref="project.{{ formType }}.create()" ng-if="'resource' === formType" class="btn btn-success" ng-class="{disabled: protected}"><i class="fa fa-plus"></i> New {{ formType | capitalize }}</a>
       <a ui-sref="project.{{ formType }}.import()" ng-if="listMode === formType" class="btn btn-default" uib-tooltip="Import a {{ formType | capitalize }}" ng-class="{disabled: protected}"><span class="glyphicon glyphicon-cloud-download"></span></a>
     </div>
   </div>

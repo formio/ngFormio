@@ -357,9 +357,29 @@ $project-header-color: #eee;
 }
 
 .navbar.navbar-inverse {
-  background-color: darken($brand-primary, 25%);
   border-radius: 0;
   margin-bottom: 0;
+
+  .dropdown-menu {
+    background-color: darken($brand-primary, 20%);
+  }
+
+  .help-menu {
+    color: #eee;
+    .list-group-item {
+      background-color: darken($brand-primary, 15%);
+      border-color: $brand-primary;
+      a {
+        color: #eee;
+        &:hover {
+          color: #fff;
+        }
+      }
+      &:hover {
+        background-color: darken($brand-primary, 10%);
+      }
+    }
+  }
 }
 
 .navbar-nav {
@@ -460,13 +480,12 @@ div.project-section-separator {
 
 .project-section-header {
   background-color: #fff;
-  padding-left: 20px;
-  padding-top: 6px;
+  padding: 6px 10px 0 10px;
   border-bottom: solid #eee 8px;
   h2 {
-    color: #666;
+    color: #333;
     a {
-      color: #666;
+      color: #333;
       &:hover, &:focus {
         text-decoration: none;
       }
@@ -874,12 +893,10 @@ body {
 
 footer {
   color: #f0f0f0;
-  padding: 0 0 25px 0;
   text-align: center;
   background-color: darken($brand-secondary, 2%);
   display: table-row;
   border-left: 85px solid darken($brand-primary, 25%);
-;
   a {
     color: white;
   }
@@ -890,9 +907,16 @@ footer {
   .section-heading {
     color: #eee;
   }
-  .footer-banner img {
-    margin-top: -2.2em;
-    width: 100%;
+  .footer-content {
+    padding: 50px 0;
+  }
+  .footer-banner {
+    position:absolute;
+    z-index: 100;
+    img {
+      margin-top: -2.2em;
+      width: 100%;
+    }
   }
   .list-group .list-group-item {
     font-size: 1.1em;
@@ -952,6 +976,11 @@ footer {
   .project-description {
     max-height: 50px;
   }
+}
+
+.nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
+  color:#eee;
+  background-color:$brand-secondary;
 }
 
 .projects,
