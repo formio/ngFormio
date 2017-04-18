@@ -481,7 +481,7 @@ div.project-section-separator {
 .project-section-header {
   background-color: #fff;
   padding: 6px 10px 0 10px;
-  border-bottom: solid #eee 8px;
+  border-bottom: solid $brand-secondary 8px;
   h2 {
     color: #333;
     a {
@@ -522,16 +522,17 @@ div.project-section-separator {
     border: none;
     li {
       margin-right: 4px;
+      margin-bottom: 0;
       a {
         background-color: #efefef;
         border: none;
       }
     }
     li.active {
-      border-top: solid $brand-secondary 4px;
       a {
-        background-color: #eee;
+        background-color: $brand-secondary;
         margin-right: 0;
+        color: #fff;
         border: none;
       }
     }
@@ -609,7 +610,7 @@ ul.project-settings-menu {
 }
 
 .form-nav {
-  background-color: $gray-lighter;
+  background-color: #efefef;
   color: $gray;
   padding: 5px 10px;
   .nav-pills {
@@ -976,11 +977,6 @@ footer {
   .project-description {
     max-height: 50px;
   }
-}
-
-.nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
-  color:#eee;
-  background-color:$brand-secondary;
 }
 
 .projects,
