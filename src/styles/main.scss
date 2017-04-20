@@ -19,6 +19,10 @@ body {
   padding-top: 45px;
 }
 
+.grow { transition: all .2s ease-in-out; }
+.grow:hover { transform: scale(1.2); }
+
+
 .btn {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -270,31 +274,21 @@ $project-header-color: #eee;
 
 .new-project-row {
   position:relative;
-  padding: 35px 0 0 0;
-  background-color: $brand-secondary;
-  color: $project-header-color;
-  .project-center {
-    display: flex;
-    justify-content: space-around;
-  }
-  .new-project-header {
-    text-align: center;
-    margin: 0 0 20px;
-  }
+  background-color: #eee;
+  color: #333;
   .new-project-section {
+    float: left;
     margin-right: 10px;
   }
-}
-
-.new-project-row-min {
-  background-color: darken($brand-primary, 15%);
 }
 
 .project-template-item {
   .project-template-card {
     .project-template-img {
-      width: 153px;
-      height: 150px;
+      width: 80px;
+      height: 80px;
+      //border: solid $brand-primary 4px;
+      margin: 10px 35px;
       &:hover {
         cursor: pointer;
       }
@@ -306,11 +300,6 @@ $project-header-color: #eee;
       }
     }
   }
-}
-.current {
-  background-color: $brand-secondary;
-  text-align: center;
-  color: white;
 }
 
 .project-container {
@@ -362,16 +351,38 @@ $project-header-color: #eee;
 
 .project-content {
   margin-bottom: 40px;
+  position: relative;
+  min-height: 700px;
 }
 
 .main .page-header {
   margin-top: 0;
 }
 
-.navbar {
+.navbar.navbar-inverse {
   border-radius: 0;
   margin-bottom: 0;
-  background-color: #eee;
+
+  .dropdown-menu {
+    background-color: darken($brand-primary, 20%);
+  }
+
+  .help-menu {
+    color: #eee;
+    .list-group-item {
+      background-color: darken($brand-primary, 15%);
+      border-color: $brand-primary;
+      a {
+        color: #eee;
+        &:hover {
+          color: #fff;
+        }
+      }
+      &:hover {
+        background-color: darken($brand-primary, 10%);
+      }
+    }
+  }
 }
 
 .navbar-nav {
@@ -471,15 +482,13 @@ div.project-section-separator {
 }
 
 .project-section-header {
-  background-color: $brand-secondary;
-  color: $brand-primary;
-  padding-left: 20px;
-  padding-top: 20px;
-  border-bottom: solid #eeeeee 8px;
+  background-color: #fff;
+  padding: 6px 10px 0 10px;
+  border-bottom: solid $brand-secondary 8px;
   h2 {
-    color: $project-header-color;
+    color: #333;
     a {
-      color: $project-header-color;
+      color: #333;
       &:hover, &:focus {
         text-decoration: none;
       }
@@ -512,26 +521,24 @@ div.project-section-separator {
     top: -3px;
   }
 
-  .project-nav {
-    border: 0px;
+  .nav-tabs.project-nav {
+    border: none;
     li {
-      //margin-bottom: -4px;
+      margin-right: 4px;
+      margin-bottom: 0;
       a {
-        color: white;
-        background-color: inherit;
-        border: 0px;
+        padding: 6px 15px;
+        background-color: #efefef;
+        border: none;
       }
     }
     li.active {
       a {
-        color: #222222;
+        background-color: $brand-secondary;
+        margin-right: 0;
+        color: #fff;
+        border: none;
       }
-      a:hover {
-        border: 0px;
-      }
-      background-color: #eeeeee;
-      border-top: solid $brand-primary 4px;
-      margin-top: -4px;
     }
   }
 }
@@ -547,7 +554,7 @@ ul.project-settings-menu {
   position: relative;
 }
 
-.project-form-form-view-page .form-content, .project-resource-form-api-page .form-content {
+.project-resource-form-view-page .form-content, .project-form-form-view-page .form-content, .project-resource-form-api-page .form-content {
   background-color: #666;
 }
 
@@ -572,7 +579,7 @@ ul.project-settings-menu {
 }
 
 .project-section-header-button {
-  border: solid $project-header-color 2px;
+  border: solid #333 2px;
   margin-right: 5px;
 }
 
@@ -607,7 +614,7 @@ ul.project-settings-menu {
 }
 
 .form-nav {
-  background-color: $gray-lighter;
+  background-color: #efefef;
   color: $gray;
   padding: 5px 10px;
   .nav-pills {
@@ -891,12 +898,10 @@ body {
 
 footer {
   color: #f0f0f0;
-  padding: 0 0 25px 0;
   text-align: center;
   background-color: darken($brand-secondary, 2%);
   display: table-row;
   border-left: 85px solid darken($brand-primary, 25%);
-;
   a {
     color: white;
   }
@@ -907,9 +912,16 @@ footer {
   .section-heading {
     color: #eee;
   }
-  .footer-banner img {
-    margin-top: -2.2em;
-    width: 100%;
+  .footer-content {
+    padding: 50px 0;
+  }
+  .footer-banner {
+    position:absolute;
+    z-index: 100;
+    img {
+      margin-top: -2.2em;
+      width: 100%;
+    }
   }
   .list-group .list-group-item {
     font-size: 1.1em;
@@ -1704,6 +1716,10 @@ footer {
   }
 }
 
+.project-title-header {
+  margin-bottom: 6px;
+}
+
 .form-inline .ui-select-container {
   postion:absolute;
   display: inline-block;
@@ -1712,12 +1728,17 @@ footer {
 }
 
 .upgrade-warning-container {
-  width: 97%;
-  min-height: 500px;
+  width: 100%;
   position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
   background-color: rgba(128,128,128,0.3);
   z-index: 10;
   padding: 50px;
+  margin-bottom: -40px;
+  min-height: 600px;
   .upgrade-warning {
     padding: 100px;
     background-color: #666666;
@@ -1732,6 +1753,12 @@ footer {
   .count {
     font-size: 3em;
   }
+}
+
+.current {
+  text-align: center;
+  background-color:$brand-primary;
+  color: white;
 }
 
 .table > tbody > tr > td {

@@ -1,9 +1,24 @@
-<h3>Import {{ currentProject.title }} Project Definition </h3>
-<p>Importing a project definition will update all forms, resources, roles and access for the environment from a definition file.</p>
-<div class="well">
-  <div class="form-inline">
-    <label class="control-label" for="file">Name</label>
-    <input id="file" class="form-control" type="file" name="file" accept=".json" fileread="importFile">
-    <button type="submit" class="btn btn-primary" ng-click="importVersion(importFile)">Import Project Definition to {{ currentProject.title }}</button>
+<div>
+  <h3>Import {{ currentProject.title }} Project Definition </h3>
+  <div class="row">
+    <div class="col-md-8">
+      <p>Importing a project definition will update all forms, resources, roles and access for the environment from a definition file.</p>
+      <div class="form-inline">
+        <label class="control-label" for="file">Name</label>
+        <p><input id="file" class="form-control" type="file" name="file" accept=".json" fileread="importFile"></p>
+        <p><button type="submit" class="btn btn-primary" ng-click="importVersion(importFile)">Import Project Version to {{ currentProject.title }}</button></p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <h3 class="panel-title">Importing a project version</h3>
+        </div>
+        <div class="panel-body">
+          <p>Importing a project version to an environment will replace all forms, resources, roles, actions and access settings with the ones in the properly formatted JSON file.</p>
+          <p>To import, select the file and click <strong>Import Project Version</strong>.</p>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

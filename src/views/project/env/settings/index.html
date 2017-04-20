@@ -124,5 +124,5 @@
     </div>
   </div>
   <a ng-if="!currentProject._id" ui-sref="home()" class="btn btn-default">Cancel</a>
-  <button type="submit" class="btn btn-primary" ng-disabled="projectForm.$invalid">{{currentProject._id ? 'Save Environment Settings' : 'Create ' + projectType}}</button>
+  <button type="submit" class="btn btn-primary" ng-disabled="projectForm.$invalid"><i ng-if="isBusy" class="fa fa-spinner fa-refresh"></i> {{currentProject._id ? 'Save Environment Settings' : 'Create ' + projectType}}</button>
 </form>

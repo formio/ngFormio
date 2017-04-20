@@ -1,7 +1,7 @@
 <div class="well">
   <ul class="nav nav-pills nav-stacked project-settings-menu">
     <li role="presentation" ng-class="{active:($state.includes('project.env.overview'))}"><a ui-sref="project.env.overview">Overview</a></li>
-    <li role="presentation" ng-class="{active:($state.includes('project.env.tour'))}"><a ui-sref="project.env.tour">Tour ({{ stepsPercent }}%)</a></li>
+    <!--<li role="presentation" ng-class="{active:($state.includes('project.env.tour'))}"><a ui-sref="project.env.tour">Tour ({{ stepsPercent }}%)</a></li>-->
     <li role="presentation" ng-class="{active:($state.includes('project.env.settings.info'))}">
       <a ui-sref="project.env.settings.info" ng-class="{active:($state.includes('project.env.settings.info'))}">Environment Settings</a>
       <ul ng-if="$state.current.name.includes('project.env.settings')" class="nav nav-pills nav-stacked">
@@ -11,13 +11,13 @@
         <li role="presentation" ng-class="{active:($state.includes('project.env.settings.frameworks'))}"><a ui-sref="project.env.settings.frameworks">Frameworks</a></li>
       </ul>
     </li>
+    <li role="presentation" ng-class="{active:($state.includes('project.env.pdf'))}"><a ui-sref="project.env.pdf">PDFs</a></li>
     <li role="presentation" ng-class="{active:($state.includes('project.env.version.deploy'))}">
       <a ui-sref="project.env.version.deploy">Project Versions</a>
       <ul ng-if="$state.current.name.includes('project.env.version')" class="nav nav-pills nav-stacked">
         <li role="presentation" ng-class="{active:($state.includes('project.env.version.create'))}"><a ui-sref="project.env.version.create">Create</a></li>
         <li role="presentation" ng-class="{active:($state.includes('project.env.version.import'))}"><a ui-sref="project.env.version.import">Import</a></li>
         <li role="presentation" ng-class="{active:($state.includes('project.env.version.export'))}"><a ui-sref="project.env.version.export">Export</a></li>
-        <li role="presentation" ng-class="{active:($state.includes('project.env.version.delete'))}"><a ui-sref="project.env.version.delete">Delete</a></li>
       </ul>
     </li>
     <!--<li role="presentation" ng-class="{active:($state.includes('project.env.database'))}">-->

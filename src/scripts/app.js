@@ -276,6 +276,12 @@ angular
           parent: 'project.env',
           templateUrl: 'views/project/env/database/wipe.html',
         })
+        .state('project.env.pdf', {
+          url: '/pdf',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/pdf/index.html',
+          controller: 'PDFController'
+        })
         .state('project.env.version', {
           url: '/version',
           abstract: true,
@@ -303,11 +309,6 @@ angular
           url: '/version/export',
           parent: 'project.env',
           templateUrl: 'views/project/env/version/export.html'
-        })
-        .state('project.env.version.delete', {
-          url: '/version/delete',
-          parent: 'project.env',
-          templateUrl: 'views/project/env/version/delete.html'
         })
         .state('project.env.activity', {
           url: '/activity',
@@ -514,6 +515,7 @@ angular
     'ProjectUpgradeDialog',
     '$timeout',
     '$q',
+    'ngDialog',
     function(
       $scope,
       $state,
@@ -525,7 +527,8 @@ angular
       ProjectPlans,
       ProjectUpgradeDialog,
       $timeout,
-      $q
+      $q,
+      ngDialog
     ) {
       if(!window.localStorage.getItem('framework')) {
         window.localStorage.setItem('framework','angularjs');
@@ -567,6 +570,44 @@ angular
         return (project.plan === 'team' || project.plan === 'commercial');
       };
 
+      $scope.platforms = [
+        {
+          title: 'Angular',
+          name: 'angular2',
+          img: 'images/platforms/angular2.png'
+        },
+        {
+          title: 'React.js',
+          name: 'react',
+          img: 'images/platforms/react.svg'
+        },
+        {
+          title: 'AngularJS',
+          name: 'angular1',
+          img: 'images/platforms/angularjs1.svg'
+        },
+        {
+          title: 'Vue.js',
+          name: 'vue',
+          img: 'images/platforms/vue.png'
+        },
+        {
+          title: 'HTML 5',
+          name: 'html5',
+          img: 'images/platforms/html5.png'
+        },
+        {
+          title: 'Simple',
+          name: 'simple',
+          img: 'images/platforms/form.png'
+        },
+        {
+          title: 'Custom',
+          name: 'custom',
+          img: 'images/empty-project.png'
+        },
+      ];
+
       $scope.templates = [];
       FormioProject.loadTemplates().then(function(templates) {
         $scope.templates = templates;
@@ -577,6 +618,19 @@ angular
       };
 
       $scope.submitted = false;
+      $scope.selectedPlatform = null;
+      $scope.newProject = function(platform) {
+        $scope.selectedPlatform = platform;
+        $scope.currentProject = {
+          template: platform
+        };
+        console.log(platform);
+        ngDialog.open({
+          template: 'newProject',
+          scope: $scope
+        });
+      };
+
       $scope.createProject = function(template) {
         if (!$scope.submitted) {
           $scope.submitted = true;
@@ -716,7 +770,6 @@ angular
     'FormioAlerts',
     'Formio',
     'AppConfig',
-    'ProjectProgress',
     'GoogleAnalytics',
     '$location',
     '$window',
@@ -729,7 +782,6 @@ angular
       FormioAlerts,
       Formio,
       AppConfig,
-      ProjectProgress,
       GoogleAnalytics,
       $location,
       $window,
@@ -753,6 +805,7 @@ angular
       $rootScope.teamForm = AppConfig.teamForm;
       $rootScope.feedbackForm = AppConfig.feedbackForm;
       $rootScope.resetPassForm = AppConfig.resetPassForm;
+      $rootScope.pdfUploadForm = AppConfig.pdfUploadForm;
       $rootScope.planForm = AppConfig.planForm;
       $rootScope.apiBase = AppConfig.apiBase;
       $rootScope.apiProtocol = AppConfig.apiProtocol;
@@ -940,10 +993,6 @@ angular
           classes.push(className + '-page');
         }
         $rootScope.mainClass = classes.join(' ');
-      });
-
-      $rootScope.$watch('currentProject', function(newProject) {
-        ProjectProgress.setProject(newProject);
       });
 
       // Set the active sidebar.

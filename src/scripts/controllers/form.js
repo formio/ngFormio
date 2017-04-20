@@ -9,7 +9,8 @@ var app = angular.module('formioApp.controllers.form', [
   'ngFormBuilder',
   'formio',
   'bgf.paginateAnything',
-  'ngTagsInput'
+  'ngTagsInput',
+  'formioApp.controllers.pdf'
 ]);
 
 app.config([
@@ -64,13 +65,23 @@ app.config([
           url: '/',
           templateUrl: 'views/form/' + type + 's.html'
         })
+        .state(parentName + '.new', {
+          url: '/new/' + type,
+          templateUrl: 'views/form/new.html',
+          controller: 'FormController',
+          params: {
+            formType: type,
+            newForm: true
+          }
+        })
         .state(parentName + '.create', {
           url: '/create/' + type,
           templateUrl: 'views/form/form-edit.html',
           controller: 'FormController',
           params: {
             formType: type,
-            components: null
+            components: null,
+            form: null
           }
         })
         .state(parentName + '.import', {
@@ -240,6 +251,15 @@ app.directive('formList', function() {
     ]
   };
 });
+app.directive('customOnChange', function() {
+  return {
+    restrict: 'A',
+    link: function (scope, element, attrs) {
+      var onChangeHandler = scope.$eval(attrs.customOnChange);
+      element.bind('change', onChangeHandler);
+    }
+  };
+});
 
 app.controller('FormController', [
   '$scope',
@@ -255,6 +275,10 @@ app.controller('FormController', [
   'ResourceAccessLabels',
   'GoogleAnalytics',
   '$q',
+  'ngDialog',
+  'Upload',
+  'PDFServer',
+  '$http',
   function(
     $scope,
     $state,
@@ -268,12 +292,56 @@ app.controller('FormController', [
     AccessLabels,
     ResourceAccessLabels,
     GoogleAnalytics,
-    $q
+    $q,
+    ngDialog,
+    Upload,
+    PDFServer,
+    $http
   ) {
     // Project information.
+    $scope.formReady = true;
     $scope.projectId = $stateParams.projectId;
+    $scope.upload = function (file) {
+      $scope.uploading = true;
+      $scope.formReady = false;
+      var filePath = '/pdf/' + $scope.projectId + '/file';
+      PDFServer.ensureProject($scope.loadProjectPromise).then(function(project) {
+        Upload.upload({
+          url: AppConfig.pdfServer + filePath,
+          data: {file: file},
+          headers: {'x-file-token': project.settings.filetoken}
+        }).then(function (res) {
+          $scope.formReady = true;
+          $scope.uploading = false;
+          if (!$scope.form.settings) {
+            $scope.form.settings = {};
+          }
+          if (res.data && res.data.path) {
+            $scope.form.settings.pdf = {
+              src: AppConfig.pdfServer + res.data.path,
+              id: res.data.file
+            };
+          }
+          if ($stateParams.newForm) {
+            $scope.form.display = 'pdf';
+            $state.go('project.form.create', {
+              form: $scope.form
+            });
+          }
+          ngDialog.close();
+        }, function (resp) {
+          FormioAlerts.onError({message: resp.data});
+          $scope.uploading = false;
+          ngDialog.close();
+        }, function (evt) {
+          $scope.uploadProgress = parseInt(100.0 * evt.loaded / evt.total);
+        });
+      });
+    };
 
     // Resource information.
+    $scope.uploading = false;
+    $scope.uploadProgress = 0;
     $scope.isCopy = !!($stateParams.components && $stateParams.components.length);
     $scope.formId = $stateParams.formId;
     $scope.formUrl = '/project/' + $scope.projectId + '/form';
@@ -286,18 +354,44 @@ app.controller('FormController', [
       {
         name: 'wizard',
         title: 'Wizard'
+      },
+      {
+        name: 'pdf',
+        title: 'PDF'
       }
     ];
+
+    $scope.uploadPDF = function() {
+      ngDialog.open({
+        template: 'views/form/upload.html',
+        scope: $scope
+      });
+
+      // Determine if we have enough to upload.
+      $scope.purchaseRequired = false;
+      PDFServer.getInfo($scope.loadProjectPromise).then(function(info) {
+        if (parseInt(info.data.active, 10) >= parseInt(info.data.total)) {
+          $scope.purchaseRequired = true;
+        }
+      });
+    };
     var formType = $stateParams.formType || 'form';
     $scope.capitalize = _.capitalize;
-    $scope.form = {
-      title: '',
-      display: 'form',
-      type: formType,
-      components: $stateParams.components || [],
-      access: [],
-      submissionAccess: []
-    };
+
+    if ($stateParams.form) {
+      $scope.form = $stateParams.form;
+    }
+    else {
+      $scope.form = {
+        title: '',
+        display: 'form',
+        type: formType,
+        components: $stateParams.components || [],
+        access: [],
+        submissionAccess: [],
+        settings: {}
+      };
+    }
 
     // Match name of form to title if not customized.
     $scope.titleChange = function(oldTitle) {
@@ -452,6 +546,7 @@ app.controller('FormController', [
           $scope.updateCurrentFormResources(form);
 
           $scope.form = form;
+          $scope.form.page = 0;
           $scope.formTags = _.map(form.tags, function(tag) {
             return {text: tag};
           });
@@ -523,47 +618,48 @@ app.controller('FormController', [
       return $scope.formio.saveForm(angular.copy($scope.form), {
         getHeaders: true
       })
-        .then(function(response) {
-          $scope.form = response.result;
-          var headers = response.headers;
-          var method = $stateParams.formId ? 'updated' : 'created';
-          GoogleAnalytics.sendEvent('Form', method.substring(0, method.length - 1), null, 1);
+      .then(function(response) {
+        $scope.form = $scope.originalForm = response.result;
+        $scope.form.builder = true;
+        var headers = response.headers;
+        var method = $stateParams.formId ? 'updated' : 'created';
+        GoogleAnalytics.sendEvent('Form', method.substring(0, method.length - 1), null, 1);
 
-          if (headers.hasOwnProperty('x-form-merge')) {
-            FormioAlerts.addAlert({
-              type: 'warning',
-              message: 'This form has been modified by another user. All form changes have been merged and saved.'
+        if (headers.hasOwnProperty('x-form-merge')) {
+          FormioAlerts.addAlert({
+            type: 'warning',
+            message: 'This form has been modified by another user. All form changes have been merged and saved.'
+          });
+        }
+        else {
+          FormioAlerts.addAlert({
+            type: 'success',
+            message: 'Successfully ' + method + ' form!'
+          });
+        }
+
+        // Reload page when a form is created or merged.
+        if (method === 'created' || headers.hasOwnProperty('x-form-merge')) {
+          $state.go('project.' + $scope.formInfo.type + '.form.edit', {formId: $scope.form._id}, {reload: true});
+        }
+      })
+      .catch(function(err) {
+        if (err) {
+          FormioAlerts.onError.call(FormioAlerts, err);
+        }
+
+        // FOR-128 - if we're editing a form, make note of the components with issues.
+        try {
+          var issues = (/Component keys must be unique: (.*)/.exec(_.get(err, 'errors.components.message'))).slice(1);
+          if (($state.includes('project.form.form.edit') || $state.includes('project.form.create')) && (issues.length > 0)) {
+            issues = (issues.shift()).toString().split(', ');
+            issues.forEach(function(issue) {
+              angular.element('div.dropzone #' + issue).parent().addClass('has-error');
             });
           }
-          else {
-            FormioAlerts.addAlert({
-              type: 'success',
-              message: 'Successfully ' + method + ' form!'
-            });
-          }
-
-          // Reload page when a form is created or merged.
-          if (method === 'created' || headers.hasOwnProperty('x-form-merge')) {
-            $state.go('project.' + $scope.formInfo.type + '.form.edit', {formId: $scope.form._id}, {reload: true});
-          }
-        })
-        .catch(function(err) {
-          if (err) {
-            FormioAlerts.onError.call(FormioAlerts, err);
-          }
-
-          // FOR-128 - if we're editing a form, make note of the components with issues.
-          try {
-            var issues = (/Component keys must be unique: (.*)/.exec(_.get(err, 'errors.components.message'))).slice(1);
-            if (($state.includes('project.form.form.edit') || $state.includes('project.form.create')) && (issues.length > 0)) {
-              issues = (issues.shift()).toString().split(', ');
-              issues.forEach(function(issue) {
-                angular.element('div.dropzone #' + issue).parent().addClass('has-error');
-              });
-            }
-          }
-          catch (e) {}
-        });
+        }
+        catch (e) {}
+      });
     };
 
     // Delete a form.

@@ -1,3 +1,19 @@
-<h3>Export {{ projectType }} {{ currentProject.title }}</h3>
-<p>The following button will export your project as a JSON file that can then be used as a template for other projects.</p>
-<a href="//api.{{ appConfig.serverHost }}/project/{{ currentProject._id }}/export?x-jwt-token={{ token }}" class="btn btn-success">Export Project</a>
+<div>
+  <h3>Export {{ projectType }} {{ currentProject.title }}</h3>
+  <div class="row">
+    <div class="col-md-8">
+      <p>The following button will export your project as a JSON file that can then be used as a template for other projects.</p>
+      <a href="//api.{{ appConfig.serverHost }}/project/{{ currentProject._id }}/export?x-jwt-token={{ token }}" class="btn btn-success">Export Project</a>
+    </div>
+    <div class="col-md-4">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <h3 class="panel-title">Exporting a project version</h3>
+        </div>
+        <div class="panel-body">
+          <p>Exporting a project version will bundle all the forms, resources, roles, actions and access into a JSON file and download it to your computer. This file can be used to import into another environment or create a new project with the same definition as this one.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

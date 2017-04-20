@@ -8,5 +8,6 @@ angular.module('formioApp.controllers', [
   'formioApp.controllers.user',
   'formioApp.controllers.help',
   'formioApp.controllers.role',
+  'formioApp.controllers.pdf',
   'formioApp.controllers.access'
 ]);

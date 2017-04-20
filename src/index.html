@@ -16,9 +16,9 @@
     <link rel="stylesheet" href="/bower_components/ng-dialog/css/ngDialog-theme-default.css" />
     <link rel="stylesheet" href="/bower_components/angular-swagger-ui/dist/css/swagger-ui.min.css" />
     <link rel="stylesheet" href="/bower_components/angular-ui-select/dist/select.css" />
-    <link rel="stylesheet" href="/bower_components/ng-formio/dist/formio.min.css" />
+    <link rel="stylesheet" href="/bower_components/ng-formio/css/formio.css" />
     <link rel="stylesheet" href="/bower_components/ng-tags-input/ng-tags-input.css" />
-    <link rel="stylesheet" href="/bower_components/ng-formio-builder/dist/ngFormBuilder.min.css" />
+    <link rel="stylesheet" href="/bower_components/ng-formio-builder/css/ngFormBuilder.css" />
     <link rel="stylesheet" href="/bower_components/angular-toastr/dist/angular-toastr.min.css" />
     <link rel="stylesheet" href="/bower_components/chartist-plugin-tooltip/dist/chartist-plugin-tooltip.css" />
     <!-- endbower -->
@@ -59,7 +59,7 @@
       <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
     <div id="content">
-      <nav class="navbar navbar-fixed-top">
+      <nav class="navbar navbar-fixed-top navbar-inverse">
         <ul id="home-button" class="nav navbar-nav navbar-left navbar-home" ng-if="isActive('project')" ng-cloak>
           <li><a ui-sref="home" title="Home"><i class="fa fa-home"></i></a></li>
         </ul>
@@ -118,7 +118,7 @@
               </li>
               <li class="dropdown">
                 <a href="" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-book"></i> Docs<b class="caret"></b></a>
-                <ul class="dropdown-menu">
+                <ul class="dropdown-menu help-menu">
                   <li class="no-hover">
                     <div class="row docs-dropdown">
                       <div class="col-md-3">
@@ -184,7 +184,7 @@
 
     <footer>
       <div class="footer-banner"><img src="images/footerlogo-before.png" /></div>
-      <div class="container">
+      <div class="container footer-content">
         <div class="row" ng-if="$state.current.name === 'auth'">
           <div class="col-md-3">
             <ul class="list-group">
@@ -258,11 +258,11 @@
     <script src="/bower_components/file-saver.js/FileSaver.js"></script>
     <script src="/bower_components/angular-file-saver/dist/angular-file-saver.bundle.js"></script>
     <script src="/bower_components/angular-ui-select/dist/select.js"></script>
-    <script src="/bower_components/ng-formio/dist/formio.min.js"></script>
+    <script src="/bower_components/ng-formio/dist/formio.js"></script>
     <script src="/bower_components/angular-drag-and-drop-lists/angular-drag-and-drop-lists.js"></script>
     <script src="/bower_components/ng-tags-input/ng-tags-input.js"></script>
     <script src="/bower_components/angular-ckeditor/angular-ckeditor.js"></script>
-    <script src="/bower_components/ng-formio-builder/dist/ngFormBuilder.min.js"></script>
+    <script src="/bower_components/ng-formio-builder/dist/ngFormBuilder.js"></script>
     <script src="/bower_components/chance/chance.js"></script>
     <script src="/bower_components/qs/dist/qs.js"></script>
     <script src="/bower_components/angular-toastr/dist/angular-toastr.tpls.min.js"></script>
@@ -306,6 +306,7 @@
     <script src="scripts/controllers/feedback.js"></script>
     <script src="scripts/controllers/form.js"></script>
     <script src="scripts/controllers/help.js"></script>
+    <script src="scripts/controllers/pdf.js"></script>
     <script src="scripts/controllers/project.js"></script>
     <script src="scripts/controllers/role.js"></script>
     <script src="scripts/controllers/team.js"></script>

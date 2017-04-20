@@ -123,6 +123,7 @@ app.controller('ProjectCreateController', [
     $scope.currentProject = {template: 'default'};
     $scope.hasTemplate = false;
     $scope.templateLimit = 3;
+    $scope.isBusy = false;
 
     $scope.templates = [];
     FormioProject.loadTemplates().then(function(templates) {
@@ -172,7 +173,9 @@ app.controller('ProjectCreateController', [
     };
 
     $scope.saveProject = function() {
+      $scope.isBusy = true;
       FormioProject.createProject($scope.currentProject).then(function(project) {
+        $scope.isBusy = false;
         $state.go('project.env.overview', {projectId: project._id});
       });
     };
@@ -468,6 +471,8 @@ app.controller('ProjectController', [
       $scope.projectSettingsVisible = function() {
         return ($scope.highestRole === 'owner' || $scope.highestRole === 'team_admin');
       };
+
+      return $scope.currentProject;
     }).catch(function(err) {
       if (!err) {
         FormioAlerts.addAlert({
@@ -534,7 +539,7 @@ app.controller('ProjectDeployController', [
       }
       Formio.makeStaticRequest(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/deploy', 'POST', {
         type: 'version',
-        id: version._id
+        id: version.version
       })
         .then(function() {
           $scope.deployVersionOption = '';
@@ -673,256 +678,14 @@ app.directive('projectStep', function() {
   };
 });
 
-app.provider('ProjectProgress', function() {
-  // TODO: Should we make this configurable with a register function?
-  var stepDefinitions;
-  var steps = {};
-  var project;
-  var forms = [];
-  var userForms = [];
-  var states = {};
-  var formio;
-
-  this.$get = [
-    '$rootScope',
-    '$q',
-    'Formio',
-    'AppConfig',
-    function(
-      $rootScope,
-      $q,
-      Formio,
-      AppConfig
-    ) {
-      stepDefinitions = [
-        {
-          key: 'createProject',
-          complete: function(next) {
-            next(true);
-          }
-        },
-        //{
-        //  key: 'setupUsers',
-        //  complete: function(next) {
-        //    var promises = [];
-        //    userForms.forEach(function(userForm) {
-        //      var userFormio = new Formio(AppConfig.apiBase + '/project/' + userForm.project + '/form/' + userForm._id + '/submission');
-        //      promises.push(userFormio.loadSubmissions());
-        //    });
-        //    $q.all(promises).then(function(results) {
-        //      var hasUser = true;
-        //      results.forEach(function(result) {
-        //        if (result.length === 0) {
-        //          hasUser = false;
-        //        }
-        //      });
-        //      next(hasUser);
-        //    });
-        //  }
-        //},
-        {
-          key: 'modifyForm',
-          complete: function(next) {
-            formio.loadForms({
-                params: {
-                  limit: Number.MAX_SAFE_INTEGER // Don't limit results
-                }
-              })
-              .then(function(projectForms) {
-                forms = projectForms;
-                forms.forEach(function(form) {
-                  if (project && ((new Date(project.created).getTime() + 10000) < new Date(form.modified).getTime())) {
-                    return next(true);
-                  }
-                });
-                next(false);
-              });
-          }
-        },
-        {
-          key: 'setupProviders',
-          complete: function(next) {
-            var projectSettings = project.settings || {};
-            var result = (projectSettings.email || projectSettings.storage || projectSettings.data);
-            next(result);
-          }
-        },
-        {
-          key: 'cloneApp',
-          route: 'project.launch.local'
-        },
-        {
-          key: 'newForm',
-          complete: function(next) {
-            formio.loadForms({
-                params: {
-                  type: 'form',
-                  limit: Number.MAX_SAFE_INTEGER // Don't limit results
-                }
-              })
-              .then(function(projectForms) {
-                forms = projectForms;
-                forms.forEach(function(form) {
-                  if (project && (new Date(project.created).getTime() + 10000) < new Date(form.created).getTime()) {
-                    return next(true);
-                  }
-                });
-                next(false);
-              });
-          }
-        },
-        {
-          key: 'newResource',
-          complete: function(next) {
-            formio.loadForms({
-                params: {
-                  type: 'resource',
-                  limit: Number.MAX_SAFE_INTEGER // Don't limit results
-                }
-              })
-              .then(function(projectForms) {
-                forms = projectForms;
-                forms.forEach(function(resource) {
-                  if (project && ((new Date(project.created).getTime() + 10000) < new Date(resource.created).getTime())) {
-                    return next(true);
-                  }
-                });
-                next(false);
-              });
-          }
-        },
-        {
-          key: 'launchApp',
-          route: 'project.launch.app'
-        }
-      ];
-      // Define route based steps.
-      angular.forEach(stepDefinitions, function(step) {
-        if (step.route) {
-          states[step.route] = step.key;
-        }
-      });
-
-      var saveStep = function(step) {
-        if (project.steps.indexOf(step) === -1) {
-          project.steps.push(step);
-          formio.saveProject(project);
-        }
-      };
-
-      var progress = {
-        steps: steps,
-        userForms: userForms,
-        setProject: function(newProject) {
-          project = newProject;
-          if (project) {
-            // Initialize new projects.
-            if (!project.steps) {
-              project.steps = [];
-            }
-            formio = new Formio($rootScope.projectPath(project));
-
-            formio.loadForms({
-                params: {
-                  limit: Number.MAX_SAFE_INTEGER // Don't limit results
-                }
-              })
-              .then(function(projectForms) {
-                forms = projectForms;
-
-                // Empty userForms without breaking prototypical inheritance.
-                userForms.length = 0;
-                angular.forEach(forms, function(form) {
-                  if (form.name === 'user' || (form.tags && form.tags.indexOf('user') !== -1)) {
-                    userForms.push(form);
-                  }
-                });
-                progress.checkComplete();
-              });
-          }
-        },
-        checkComplete: function(state) {
-          if (!project) {
-            return;
-          }
-          var promises = [];
-          // Check for state changes
-          if (state && states[state.name] && project.steps.indexOf(states[state.name]) === -1) {
-            saveStep(states[state.name]);
-          }
-
-          // Check each complete function
-          angular.forEach(stepDefinitions, function(step) {
-            var defer = $q.defer();
-            if (project.steps && project.steps.indexOf(step.key) !== -1) {
-              defer.resolve({
-                key: step.key,
-                complete: true
-              });
-            }
-            else if (typeof step.complete === 'function') {
-              step.complete(function(result) {
-                // If we evaluate to true and haven't before, save to project.
-                if (result && project && project.steps.indexOf(step.key) === -1) {
-                  saveStep(step.key);
-                }
-                defer.resolve({
-                  key: step.key,
-                  complete: result
-                });
-              });
-            }
-            else {
-              defer.resolve({
-                key: step.key,
-                complete: false
-              });
-            }
-            promises.push(defer.promise);
-          });
-
-          $q.all(promises).then(function(results) {
-            var atIncomplete = false;
-            var complete = 0;
-            angular.forEach(results, function(result) {
-              steps[result.key] = {
-                complete: result.complete,
-                open: false
-              };
-              if (steps[result.key].complete) {
-                complete++;
-              }
-              else {
-                if (!atIncomplete) {
-                  steps[result.key].open = true;
-                  atIncomplete = true;
-                }
-              }
-            });
-            $rootScope.stepsPercent = Math.round(complete / results.length * 20) * 5;
-          });
-        },
-      };
-
-      $rootScope.$on('$stateChangeSuccess', function(event, state) {
-        progress.checkComplete(state);
-      }).bind(this);
-
-      return progress;
-    }
-  ];
-});
-
 app.controller('ProjectOverviewController', [
   '$scope',
-  'ProjectProgress',
   '$stateParams',
   'AppConfig',
   'Formio',
   'FormioAlerts',
   function(
     $scope,
-    ProjectProgress,
     $stateParams,
     AppConfig,
     Formio,
@@ -931,9 +694,6 @@ app.controller('ProjectOverviewController', [
     $scope.currentSection.title = 'Overview';
     $scope.currentSection.icon = 'fa fa-dashboard';
     $scope.currentSection.help = '';
-
-    $scope.steps = ProjectProgress.steps;
-    $scope.userForms = ProjectProgress.userForms;
 
     var formio = new Formio(AppConfig.apiBase + '/project/' + $scope.currentProject._id);
 
@@ -2048,6 +1808,45 @@ app.controller('ProjectSettingsController', [
     $http,
     AppConfig
   ) {
+
+    $scope.platforms = [
+      {
+        title: 'Angular',
+        name: 'angular2',
+        img: 'images/platforms/angular2.png'
+      },
+      {
+        title: 'React.js',
+        name: 'react',
+        img: 'images/platforms/react.svg'
+      },
+      {
+        title: 'AngularJS',
+        name: 'angular',
+        img: 'images/platforms/angularjs1.svg'
+      },
+      {
+        title: 'Vue.js',
+        name: 'vue',
+        img: 'images/platforms/vue.png'
+      },
+      {
+        title: 'HTML 5',
+        name: 'html5',
+        img: 'images/platforms/html5.png'
+      },
+      {
+        title: 'Simple',
+        name: 'simple',
+        img: 'images/platforms/form.png'
+      },
+      {
+        title: 'Custom',
+        name: 'custom',
+        img: 'images/empty-project.png'
+      },
+    ];
+
     if(!window.localStorage.getItem('framework')) {
       window.localStorage.setItem('framework','angularjs');
       $rootScope.framework = window.localStorage.getItem('framework');
@@ -2438,14 +2237,17 @@ app.controller('ProjectDeleteController', [
     FormioAlerts,
     GoogleAnalytics
   ) {
+    $scope.isBusy = false;
     $scope.deleteProject = function() {
       if (!$scope.currentProject || !$scope.currentProject._id) { return; }
+      $scope.isBusy = true;
       $scope.formio.deleteProject()
         .then(function() {
           FormioAlerts.addAlert({
             type: 'success',
             message: 'Project was deleted!'
           });
+          $scope.isBusy = false;
           GoogleAnalytics.sendEvent('Project', 'delete', null, 1);
           $state.go('home');
         }, FormioAlerts.onError.bind(FormioAlerts))
