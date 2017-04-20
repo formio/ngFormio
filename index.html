@@ -1,0 +1,300 @@
+<!doctype html>
+<html class='no-js'>
+<head>
+  <meta charset='utf-8'>
+  <title>Form.io Form Builder</title>
+  <meta name='viewport' content='width=device-width'>
+  <link rel='stylesheet' href='https://cdn.rawgit.com/odra/ng-json-explorer/master/dist/angular-json-explorer.min.css'>
+  <link rel='stylesheet' href='https://unpkg.com/bootswatch@3.3.7/yeti/bootstrap.min.css' />
+  <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' />
+  <link rel='stylesheet' href='dist/formio-full.css' />
+  <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css' />
+</head>
+<body ng-app='formRenderer'>
+<!-- BROWSE HAPPY BEGINS HERE -->
+<style>
+  .browsehappy {
+    display:block;
+    width:100%;
+    height:100px;
+    background-color:#f2dede;
+    margin: 0 0 10px;
+    font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif;
+    font-size: 22px;
+    line-height: 1.4;
+    color: #333;
+    padding-top: 15px;
+    vertical-align:middle;
+  }
+  .browsehappy span {
+    vertical-align:middle;
+    margin:20px 20px 20px 20px;
+    background:url('https://cdn.rawgit.com/alrra/browser-logos/master/internet-explorer/internet-explorer_64x64.png') no-repeat;
+    height:64px;
+    width:64px;
+    display:inline-block;
+  }
+
+  .formbuilder {
+    height: 600px;
+  }
+
+  .formcomponents {
+    width: 30%;
+  }
+
+  .formarea {
+    width: 70%;
+  }
+
+  .component-settings .nav-link {
+    font-size: 0.6em;
+  }
+
+  .jsonviewer {
+    max-height: 600px;
+    overflow: scroll;
+  }
+
+  .form-type-select {
+    display: inline-block;
+    width: 100px;
+    height: 28px;
+    vertical-align: top;
+  }
+</style>
+<!--[if IE 6]><p class='browsehappy'><img />You are using an <strong>outdated</strong> browser. Please <a href='http://browsehappy.com/'>upgrade your browser</a> to improve your experience.</p><![endif]-->
+<!--[if IE 7]><p class='browsehappy'><img src='https://cdn.rawgit.com/alrra/browser-logos/master/internet-explorer/internet-explorer_64x64.png' />You are using an <strong>outdated</strong> browser. Please <a href='http://browsehappy.com/'>upgrade your browser</a> to improve your experience.</p><![endif]-->
+<!--[if IE 8]><p class='browsehappy'><img src='https://cdn.rawgit.com/alrra/browser-logos/master/internet-explorer/internet-explorer_64x64.png' />You are using an <strong>outdated</strong> browser. Please <a href='http://browsehappy.com/'>upgrade your browser</a> to improve your experience.</p><![endif]-->
+<!--[if IE 9]><p class='browsehappy'><img src='https://cdn.rawgit.com/alrra/browser-logos/master/internet-explorer/internet-explorer_64x64.png' />You are using an <strong>outdated</strong> browser. Please <a href='http://browsehappy.com/'>upgrade your browser</a> to improve your experience.</p><![endif]-->
+<!-- BROWSE HAPPY ENDS HERE -->
+<div class='jumbotron'>
+  <div class='container text-center'>
+    <p><img src='http://code-maven.com/img/angularjs.png' /></p>
+    <h1>JSON Powered <a href='https://github.com/formio/ngFormio' target='_blank'>Form Renderer</a></h1>
+    <p><strong>Open Source</strong> by <a target='_blank' href='https://form.io'><img src='https://help.form.io/assets/formio-logo.png' /></a></p>
+  </div>
+</div>
+<div class='page-content' ng-app='formioApp'>
+  <div class='container-fluid'>
+    <div>
+      <div class='row'>
+        <div class='col-sm-4'>
+          <h3 class='text-center text-muted'>A JSON Schema</h3>
+          <pre class='bg-info'><h4><code>$rootScope.form = </code></h4></pre>
+          <div class='well jsonviewer'>
+            <json-explorer data='form' collapsed='jsonCollapsed'></json-explorer>
+          </div>
+        </div>
+        <div class='col-sm-8'>
+          <h3 class='text-center text-muted'>Renders as a Form</h3>
+          <pre class='text-center bg-info'><h4><code>&lt;formio form='form'&gt;&lt;/formio&gt;</code></h4></pre>
+          <div class='well' style='background-color: #fdfdfd;'>
+            <formio form='form'></formio>
+          </div>
+        </div>
+      </div>
+      <div class='row'>
+        <div class='col-sm-10 col-sm-offset-1 text-center'>
+          <h3 class='text-center text-muted'>which connects to our API Platform</h3>
+          <p>hosted or on-premise</p>
+          <a href='https://form.io' target='_blank'><img style='width:100%' src='https://raw.githubusercontent.com/formio/help.form.io/gh-pages/assets/img/formioapi2.png' /></a>
+        </div>
+      </div>
+      <div class='row' style='margin-top: 40px;'>
+        <div class='col-sm-12 text-center'>
+          <a href='https://form.io' target='_blank' class='btn btn-lg btn-success'>Get Started</a>
+        </div>
+      </div>
+      <div class='row well' style='margin-top: 50px;'>
+        <div class='container'>
+          <div class='row'>
+            <div class='col-lg-12 text-center'>
+              <h2 class='section-heading'>We are Open Source!</h2>
+              <h3 class='section-subheading text-muted'>We are proud to offer our core Form &amp; API platform as Open Source.</h3>
+              <h3 class='section-subheading text-muted'>Find us on GitHub @ <a href='https://github.com/formio/formio' target='_blank'>https://github.com/formio/formio</a></h3>
+            </div>
+          </div>
+          <div class='row'>
+            <div class='col-md-4'><a href='https://github.com/formio/formio' target='_blank'><img class='img-responsive' src='https://form.io/assets/images/github-logo.png'></a></div>
+            <div class='col-md-8'>
+              <p>Getting started is as easy as...</p>
+              <pre style='background-color: white;'>git clone https://github.com/formio/formio.git
+cd formio
+npm install
+node server</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <a href='https://github.com/formio/formio' target='_blank'><img style='position: absolute; top: 0; right: 0; border: 0;' src='https://camo.githubusercontent.com/e7bbb0521b397edbd5fe43e7f760759336b5e05f/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677265656e5f3030373230302e706e67' alt='Fork me on GitHub' data-canonical-src='https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png'></a>
+</div>
+<script src='https://cdn.ckeditor.com/4.5.11/standard/ckeditor.js'></script>
+<script src='https://unpkg.com/signature_pad@1.5.3/signature_pad.min.js'></script>
+<script src='dist/formio-full.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js'></script>
+<script src='https://cdn.rawgit.com/odra/ng-json-explorer/master/dist/angular-json-explorer.min.js'></script>
+<script type='text/javascript'>
+  angular
+    .module('formRenderer', ['ui.bootstrap', 'ui.select', 'formio', 'ngJsonExplorer'])
+    .run(['$rootScope', '$timeout', function($rootScope, $timeout) {
+      $rootScope.jsonCollapsed = true;
+      $timeout(function() {
+        $rootScope.jsonCollapsed = false;
+      }, 200);
+      $rootScope.form = {
+        components: [{
+          input: true,
+          tableView: true,
+          inputType: 'text',
+          inputMask: '',
+          label: 'First Name',
+          key: 'firstName',
+          placeholder: 'Enter your first name',
+          prefix: '',
+          suffix: '',
+          multiple: false,
+          defaultValue: '',
+          protected: false,
+          unique: false,
+          persistent: true,
+          validate: {
+            required: false,
+            minLength: '',
+            maxLength: '',
+            pattern: '',
+            custom: '',
+            customPrivate: false
+          },
+          conditional: {
+            show: false,
+            when: null,
+            eq: ''
+          },
+          type: 'textfield'
+        }, {
+          input: true,
+          tableView: true,
+          inputType: 'text',
+          inputMask: '',
+          label: 'Last Name',
+          key: 'lastName',
+          placeholder: 'Enter your last name',
+          prefix: '',
+          suffix: '',
+          multiple: false,
+          defaultValue: '',
+          protected: false,
+          unique: false,
+          persistent: true,
+          validate: {
+            required: false,
+            minLength: '',
+            maxLength: '',
+            pattern: '',
+            custom: '',
+            customPrivate: false
+          },
+          conditional: {
+            show: false,
+            when: null,
+            eq: ''
+          },
+          type: 'textfield'
+        }, {
+          type: 'select',
+          validate: {
+            required: false
+          },
+          clearOnHide: true,
+          persistent: true,
+          unique: false,
+          protected: false,
+          multiple: true,
+          template: '<span>{{ item.label }}</span>',
+          authenticate: false,
+          filter: '',
+          refreshOn: '',
+          defaultValue: '',
+          valueProperty: '',
+          dataSrc: 'values',
+          data: {
+            custom: '',
+            resource: '',
+            url: '',
+            json: '',
+            values: [
+              {
+                label: 'Raindrops on roses',
+                value: 'raindropsOnRoses'
+              },
+              {
+                label: 'Whiskers on Kittens',
+                value: 'whiskersOnKittens'
+              },
+              {
+                label: 'Bright copper kettles',
+                value: 'brightCopperKettles'
+              },
+              {
+                label: 'Warm woolen Mittens',
+                value: 'warmWoolenMittens'
+              },
+              [
+
+              ]
+            ]
+          },
+          placeholder: 'Select a few',
+          key: 'favoriteThings',
+          label: 'Favorite Things',
+          tableView: true,
+          input: true
+        }, {
+          input: true,
+          tableView: true,
+          label: 'Message',
+          key: 'message',
+          placeholder: 'What do you think?',
+          prefix: '',
+          suffix: '',
+          rows: 3,
+          multiple: false,
+          defaultValue: '',
+          protected: false,
+          persistent: true,
+          validate: {
+            required: false,
+            minLength: '',
+            maxLength: '',
+            pattern: '',
+            custom: ''
+          },
+          type: 'textarea',
+          conditional: {
+            show: false,
+            when: null,
+            eq: ''
+          }
+        }, {
+          type: 'button',
+          theme: 'primary',
+          disableOnInvalid: true,
+          action: 'submit',
+          block: false,
+          rightIcon: '',
+          leftIcon: '',
+          size: 'md',
+          key: 'submit',
+          tableView: false,
+          label: 'Submit',
+          input: true
+        }],
+        display: 'form'
+      };
+    }]);
+</script>
+</body>
+</html>

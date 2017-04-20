@@ -1,6 +1,6 @@
 {
   "name": "ng-formio",
-  "version": "2.15.5",
+  "version": "2.15.6",
   "description": "The form redering engine behind Form.IO.",
   "main": "dist/formio.min.js",
   "scripts": {
@@ -52,7 +52,7 @@
     "lodash": "^4.17.4",
     "ng-file-upload": "^12.2.13",
     "signature_pad": "^1.6.0",
-    "ui-select": "^0.19.6"
+    "ui-select": "^0.19.8"
   },
   "browserify": {
     "transform": [
