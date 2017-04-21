@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Fixed
+ - Changed the yearRange attribute for the datetime component to yearRows and yearColumns, to reflect changes made to
+   the angular 1 component.
 
 ## 2.15.7
 ### Changed
