@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Fixed
+ - Fixing issue with meridian support and time selection in the datetime component
 
 ## 2.15.7
 ### Changed
