@@ -105,7 +105,8 @@ module.exports = function(app) {
             initDate: '',
             minMode: 'day',
             maxMode: 'year',
-            yearRange: '20'
+            yearRows: 4,
+            yearColumns: 5
           },
           timePicker: {
             hourStep: 1,
