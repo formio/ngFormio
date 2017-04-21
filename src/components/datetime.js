@@ -70,6 +70,9 @@ module.exports = function(app) {
           ) {
             $scope.component.format += ' a';
           }
+          else {
+            $scope.component.format = $scope.component.format.replace(/ a/, '');
+          }
 
           if (!$scope.component.maxDate) {
             delete $scope.component.maxDate;
