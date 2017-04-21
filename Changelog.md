@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
  - Fixed min/max validation issues with the datetime component
 
+## 2.15.7
+### Changed
+ - The type on the button component to use ng-attr-type so that it works with IE.
+
 ## 2.15.6
 ### Added
  - An index.html example page
