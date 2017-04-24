@@ -132,7 +132,7 @@ module.exports = function(app) {
             minMode: 'day',
             maxMode: 'year',
             yearRows: 4,
-            yearColumns: 5
+            yearColumns: 5,
             minDate: null,
             maxDate: null
           },
