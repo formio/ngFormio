@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Fixed
+ - Fixed min/max validation issues with the datetime component
  - Fixed an issue with the survey component and default values rendering.
  - Fixed an issue with the survey component not getting submission values bound in certain view states
 
