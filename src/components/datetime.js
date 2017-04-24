@@ -71,11 +71,36 @@ module.exports = function(app) {
             $scope.component.format += ' a';
           }
 
-          if (!$scope.component.maxDate) {
-            delete $scope.component.maxDate;
+          if (!$scope.component.datePicker.maxDate) {
+            delete $scope.component.datePicker.maxDate;
           }
-          if (!$scope.component.minDate) {
-            delete $scope.component.minDate;
+          else {
+            var maxDate = new Date($scope.component.datePicker.maxDate);
+            $scope.component.datePicker.maxDate = new Date(
+              maxDate.getUTCFullYear(),
+              maxDate.getUTCMonth(),
+              maxDate.getUTCDate(),
+              23,
+              59,
+              59,
+              999
+            );
+          }
+
+          if (!$scope.component.datePicker.minDate) {
+            delete $scope.component.datePicker.minDate;
+          }
+          else {
+            var minDate = new Date($scope.component.datePicker.minDate);
+            $scope.component.datePicker.minDate = new Date(
+              minDate.getUTCFullYear(),
+              minDate.getUTCMonth(),
+              minDate.getUTCDate(),
+              0,
+              0,
+              0,
+              0
+            );
           }
 
           $scope.autoOpen = true;
@@ -96,8 +121,6 @@ module.exports = function(app) {
           enableDate: true,
           enableTime: true,
           defaultDate: '',
-          minDate: null,
-          maxDate: null,
           datepickerMode: 'day',
           datePicker: {
             showWeeks: true,
@@ -107,6 +130,8 @@ module.exports = function(app) {
             maxMode: 'year',
             yearRows: 4,
             yearColumns: 5
+            minDate: null,
+            maxDate: null
           },
           timePicker: {
             hourStep: 1,
