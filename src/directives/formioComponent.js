@@ -405,6 +405,19 @@ module.exports = [
                     });
                   }
                 }
+                // FOR-504 - Fix default values for survey components.
+                else if ($scope.component.type === 'survey') {
+                  if (!$scope.component.hasOwnProperty('defaultValue')) {
+                    return;
+                  }
+
+                  $scope.data[$scope.component.key] = $scope.data[$scope.component.key] || {};
+                  $scope.component.questions.forEach(function(question) {
+                    $timeout(function() {
+                      $scope.data[$scope.component.key][question.value] = $scope.data[$scope.component.key][question.value] || $scope.component.defaultValue;
+                    });
+                  });
+                }
                 else {
                   if (!mult) {
                     $scope.data[$scope.component.key] = $scope.component.defaultValue;

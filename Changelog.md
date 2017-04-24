@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Fixed
+ - Fixed an issue with the survey component and default values rendering.
+ - Fixed an issue with the survey component not getting submission values bound in certain view states
 
 ## 2.15.7
 ### Changed
