@@ -128,7 +128,8 @@ module.exports = function(app) {
             initDate: '',
             minMode: 'day',
             maxMode: 'year',
-            yearRange: '20',
+            yearRows: 4,
+            yearColumns: 5
             minDate: null,
             maxDate: null
           },
