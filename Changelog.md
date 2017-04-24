@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Fixed
  - Fixing issue with meridian support and time selection in the datetime component
+ - Changed the yearRange attribute for the datetime component to yearRows and yearColumns, to reflect changes made to
+   the angular 1 component.
+ - Fixed min/max validation issues with the datetime component
+ - Fixed an issue with the survey component and default values rendering.
+ - Fixed an issue with the survey component not getting submission values bound in certain view states
 
 ## 2.15.7
 ### Changed
