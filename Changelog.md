@@ -5,8 +5,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## 2.16.0
+### Added
+ - The ability to add inline Resources with an "Add Resource" button on Resource components.
+ - Adding iframe support to allow for iframe rendered forms and control over those forms.
+ - Configurable input types for checkboxes to be either a checkbox or radio input.
+
 ### Changed
  - Upgrade formiojs to 2.6.0
+ - Upgrade ng-dialog to 1.1.0
 
 ## 2.15.8
 ### Fixed
