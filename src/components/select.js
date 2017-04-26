@@ -539,6 +539,7 @@ module.exports = function(app) {
           protected: false,
           unique: false,
           persistent: true,
+          hidden: false,
           clearOnHide: true,
           validate: {
             required: false

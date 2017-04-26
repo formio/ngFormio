@@ -59,7 +59,7 @@ app.filter('tableView', require('./filters/tableView'));
 app.filter('tableFieldView', require('./filters/tableFieldView'));
 app.filter('safehtml', require('./filters/safehtml'));
 app.filter('formioTranslate', require('./filters/translate'));
-
+app.filter('trustAsResourceUrl', require('./filters/trusturl'));
 app.config([
   '$httpProvider',
   '$injector',
@@ -88,7 +88,22 @@ app.config([
 
 app.run([
   '$templateCache',
-  function($templateCache) {
+  '$rootScope',
+  '$window',
+  function($templateCache, $rootScope, $window) {
+    $window.addEventListener('message', function(event) {
+      var eventData = null;
+      try {
+        eventData = JSON.parse(event.data);
+      }
+      catch (err) {
+        eventData = null;
+      }
+      if (eventData && eventData.name) {
+        $rootScope.$broadcast('iframe-' + eventData.name, eventData.data);
+      }
+    });
+
     // The template for the formio forms.
     $templateCache.put('formio.html',
       fs.readFileSync(__dirname + '/templates/formio.html', 'utf8')

@@ -1,4 +1,4 @@
-/*! ng-formio v2.15.8 | https://unpkg.com/ng-formio@2.15.8/LICENSE.txt */
+/*! ng-formio v2.16.0 | https://unpkg.com/ng-formio@2.16.0/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -48869,7 +48869,7 @@ Formio.events = new EventEmitter({
 module.exports = global.Formio = Formio;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./providers":26,"eventemitter2":24,"native-promise-only":191,"shallow-copy":194,"whatwg-fetch":197}],26:[function(_dereq_,module,exports){
+},{"./providers":26,"eventemitter2":24,"native-promise-only":191,"shallow-copy":195,"whatwg-fetch":198}],26:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = {
@@ -58721,6 +58721,923 @@ return hooks;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],192:[function(_dereq_,module,exports){
+/*
+ * ngDialog - easy modals and popup windows
+ * http://github.com/likeastore/ngDialog
+ * (c) 2013-2015 MIT License, https://likeastore.com
+ */
+
+(function (root, factory) {
+    if (typeof module !== 'undefined' && module.exports) {
+        // CommonJS
+        if (typeof angular === 'undefined') {
+            factory(_dereq_('angular'));
+        } else {
+            factory(angular);
+        }
+        module.exports = 'ngDialog';
+    } else if (typeof define === 'function' && define.amd) {
+        // AMD
+        define(['angular'], factory);
+    } else {
+        // Global Variables
+        factory(root.angular);
+    }
+}(this, function (angular) {
+    'use strict';
+
+    var m = angular.module('ngDialog', []);
+
+    var $el = angular.element;
+    var isDef = angular.isDefined;
+    var style = (document.body || document.documentElement).style;
+    var animationEndSupport = isDef(style.animation) || isDef(style.WebkitAnimation) || isDef(style.MozAnimation) || isDef(style.MsAnimation) || isDef(style.OAnimation);
+    var animationEndEvent = 'animationend webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend';
+    var focusableElementSelector = 'a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), iframe, object, embed, *[tabindex], *[contenteditable]';
+    var disabledAnimationClass = 'ngdialog-disabled-animation';
+    var forceElementsReload = { html: false, body: false };
+    var scopes = {};
+    var openIdStack = [];
+    var keydownIsBound = false;
+    var openOnePerName = false;
+
+
+    m.provider('ngDialog', function () {
+        var defaults = this.defaults = {
+            className: 'ngdialog-theme-default',
+            appendClassName: '',
+            disableAnimation: false,
+            plain: false,
+            showClose: true,
+            closeByDocument: true,
+            closeByEscape: true,
+            closeByNavigation: false,
+            appendTo: false,
+            preCloseCallback: false,
+            onOpenCallback: false,
+            overlay: true,
+            cache: true,
+            trapFocus: true,
+            preserveFocus: true,
+            ariaAuto: true,
+            ariaRole: null,
+            ariaLabelledById: null,
+            ariaLabelledBySelector: null,
+            ariaDescribedById: null,
+            ariaDescribedBySelector: null,
+            bodyClassName: 'ngdialog-open',
+            width: null,
+            height: null
+        };
+
+        this.setForceHtmlReload = function (_useIt) {
+            forceElementsReload.html = _useIt || false;
+        };
+
+        this.setForceBodyReload = function (_useIt) {
+            forceElementsReload.body = _useIt || false;
+        };
+
+        this.setDefaults = function (newDefaults) {
+            angular.extend(defaults, newDefaults);
+        };
+
+        this.setOpenOnePerName = function (isOpenOne) {
+            openOnePerName = isOpenOne || false;
+        };
+
+        var globalID = 0, dialogsCount = 0, closeByDocumentHandler, defers = {};
+
+        this.$get = ['$document', '$templateCache', '$compile', '$q', '$http', '$rootScope', '$timeout', '$window', '$controller', '$injector',
+            function ($document, $templateCache, $compile, $q, $http, $rootScope, $timeout, $window, $controller, $injector) {
+                var $elements = [];
+
+                var privateMethods = {
+                    onDocumentKeydown: function (event) {
+                        if (event.keyCode === 27) {
+                            publicMethods.close('$escape');
+                        }
+                    },
+
+                    activate: function($dialog) {
+                        var options = $dialog.data('$ngDialogOptions');
+
+                        if (options.trapFocus) {
+                            $dialog.on('keydown', privateMethods.onTrapFocusKeydown);
+
+                            // Catch rogue changes (eg. after unfocusing everything by clicking a non-focusable element)
+                            $elements.body.on('keydown', privateMethods.onTrapFocusKeydown);
+                        }
+                    },
+
+                    deactivate: function ($dialog) {
+                        $dialog.off('keydown', privateMethods.onTrapFocusKeydown);
+                        $elements.body.off('keydown', privateMethods.onTrapFocusKeydown);
+                    },
+
+                    deactivateAll: function (els) {
+                        angular.forEach(els,function(el) {
+                            var $dialog = angular.element(el);
+                            privateMethods.deactivate($dialog);
+                        });
+                    },
+
+                    setBodyPadding: function (width) {
+                        var originalBodyPadding = parseInt(($elements.body.css('padding-right') || 0), 10);
+                        $elements.body.css('padding-right', (originalBodyPadding + width) + 'px');
+                        $elements.body.data('ng-dialog-original-padding', originalBodyPadding);
+                        $rootScope.$broadcast('ngDialog.setPadding', width);
+                    },
+
+                    resetBodyPadding: function () {
+                        var originalBodyPadding = $elements.body.data('ng-dialog-original-padding');
+                        if (originalBodyPadding) {
+                            $elements.body.css('padding-right', originalBodyPadding + 'px');
+                        } else {
+                            $elements.body.css('padding-right', '');
+                        }
+                        $rootScope.$broadcast('ngDialog.setPadding', 0);
+                    },
+
+                    performCloseDialog: function ($dialog, value) {
+                        var options = $dialog.data('$ngDialogOptions');
+                        var id = $dialog.attr('id');
+                        var scope = scopes[id];
+                        privateMethods.deactivate($dialog);
+
+                        if (!scope) {
+                            // Already closed
+                            return;
+                        }
+
+                        if (typeof $window.Hammer !== 'undefined') {
+                            var hammerTime = scope.hammerTime;
+                            hammerTime.off('tap', closeByDocumentHandler);
+                            hammerTime.destroy && hammerTime.destroy();
+                            delete scope.hammerTime;
+                        } else {
+                            $dialog.unbind('click');
+                        }
+
+                        if (dialogsCount === 1) {
+                            $elements.body.unbind('keydown', privateMethods.onDocumentKeydown);
+                        }
+
+                        if (!$dialog.hasClass('ngdialog-closing')){
+                            dialogsCount -= 1;
+                        }
+
+                        var previousFocus = $dialog.data('$ngDialogPreviousFocus');
+                        if (previousFocus && previousFocus.focus) {
+                            previousFocus.focus();
+                        }
+
+                        $rootScope.$broadcast('ngDialog.closing', $dialog, value);
+                        dialogsCount = dialogsCount < 0 ? 0 : dialogsCount;
+                        if (animationEndSupport && !options.disableAnimation) {
+                            scope.$destroy();
+                            $dialog.unbind(animationEndEvent).bind(animationEndEvent, function () {
+                                privateMethods.closeDialogElement($dialog, value);
+                            }).addClass('ngdialog-closing');
+                        } else {
+                            scope.$destroy();
+                            privateMethods.closeDialogElement($dialog, value);
+                        }
+                        if (defers[id]) {
+                            defers[id].resolve({
+                                id: id,
+                                value: value,
+                                $dialog: $dialog,
+                                remainingDialogs: dialogsCount
+                            });
+                            delete defers[id];
+                        }
+                        if (scopes[id]) {
+                            delete scopes[id];
+                        }
+                        openIdStack.splice(openIdStack.indexOf(id), 1);
+                        if (!openIdStack.length) {
+                            $elements.body.unbind('keydown', privateMethods.onDocumentKeydown);
+                            keydownIsBound = false;
+                        }
+
+                        if (dialogsCount == 0)
+                        {
+                            closeByDocumentHandler = undefined;
+                        }
+                    },
+
+                    closeDialogElement: function($dialog, value) {
+                        var options = $dialog.data('$ngDialogOptions');
+                        $dialog.remove();
+                        if (dialogsCount === 0) {
+                            $elements.html.removeClass(options.bodyClassName);
+                            $elements.body.removeClass(options.bodyClassName);
+                            privateMethods.resetBodyPadding();
+                        }
+                        $rootScope.$broadcast('ngDialog.closed', $dialog, value);
+                    },
+
+                    closeDialog: function ($dialog, value) {
+                        var preCloseCallback = $dialog.data('$ngDialogPreCloseCallback');
+
+                        if (preCloseCallback && angular.isFunction(preCloseCallback)) {
+
+                            var preCloseCallbackResult = preCloseCallback.call($dialog, value);
+
+                            if (angular.isObject(preCloseCallbackResult)) {
+                                if (preCloseCallbackResult.closePromise) {
+                                    preCloseCallbackResult.closePromise.then(function () {
+                                        privateMethods.performCloseDialog($dialog, value);
+                                    }, function () {
+                                        return false;
+                                    });
+                                } else {
+                                    preCloseCallbackResult.then(function () {
+                                        privateMethods.performCloseDialog($dialog, value);
+                                    }, function () {
+                                        return false;
+                                    });
+                                }
+                            } else if (preCloseCallbackResult !== false) {
+                                privateMethods.performCloseDialog($dialog, value);
+                            } else {
+                                return false;
+                            }
+                        } else {
+                            privateMethods.performCloseDialog($dialog, value);
+                        }
+                    },
+
+                    onTrapFocusKeydown: function(ev) {
+                        var el = angular.element(ev.currentTarget);
+                        var $dialog;
+
+                        if (el.hasClass('ngdialog')) {
+                            $dialog = el;
+                        } else {
+                            $dialog = privateMethods.getActiveDialog();
+
+                            if ($dialog === null) {
+                                return;
+                            }
+                        }
+
+                        var isTab = (ev.keyCode === 9);
+                        var backward = (ev.shiftKey === true);
+
+                        if (isTab) {
+                            privateMethods.handleTab($dialog, ev, backward);
+                        }
+                    },
+
+                    handleTab: function($dialog, ev, backward) {
+                        var focusableElements = privateMethods.getFocusableElements($dialog);
+
+                        if (focusableElements.length === 0) {
+                            if (document.activeElement && document.activeElement.blur) {
+                                document.activeElement.blur();
+                            }
+                            return;
+                        }
+
+                        var currentFocus = document.activeElement;
+                        var focusIndex = Array.prototype.indexOf.call(focusableElements, currentFocus);
+
+                        var isFocusIndexUnknown = (focusIndex === -1);
+                        var isFirstElementFocused = (focusIndex === 0);
+                        var isLastElementFocused = (focusIndex === focusableElements.length - 1);
+
+                        var cancelEvent = false;
+
+                        if (backward) {
+                            if (isFocusIndexUnknown || isFirstElementFocused) {
+                                focusableElements[focusableElements.length - 1].focus();
+                                cancelEvent = true;
+                            }
+                        } else {
+                            if (isFocusIndexUnknown || isLastElementFocused) {
+                                focusableElements[0].focus();
+                                cancelEvent = true;
+                            }
+                        }
+
+                        if (cancelEvent) {
+                            ev.preventDefault();
+                            ev.stopPropagation();
+                        }
+                    },
+
+                    autoFocus: function($dialog) {
+                        var dialogEl = $dialog[0];
+
+                        // Browser's (Chrome 40, Forefix 37, IE 11) don't appear to honor autofocus on the dialog, but we should
+                        var autoFocusEl = dialogEl.querySelector('*[autofocus]');
+                        if (autoFocusEl !== null) {
+                            autoFocusEl.focus();
+
+                            if (document.activeElement === autoFocusEl) {
+                                return;
+                            }
+
+                            // Autofocus element might was display: none, so let's continue
+                        }
+
+                        var focusableElements = privateMethods.getFocusableElements($dialog);
+
+                        if (focusableElements.length > 0) {
+                            focusableElements[0].focus();
+                            return;
+                        }
+
+                        // We need to focus something for the screen readers to notice the dialog
+                        var contentElements = privateMethods.filterVisibleElements(dialogEl.querySelectorAll('h1,h2,h3,h4,h5,h6,p,span'));
+
+                        if (contentElements.length > 0) {
+                            var contentElement = contentElements[0];
+                            $el(contentElement).attr('tabindex', '-1').css('outline', '0');
+                            contentElement.focus();
+                        }
+                    },
+
+                    getFocusableElements: function ($dialog) {
+                        var dialogEl = $dialog[0];
+
+                        var rawElements = dialogEl.querySelectorAll(focusableElementSelector);
+
+                        // Ignore untabbable elements, ie. those with tabindex = -1
+                        var tabbableElements = privateMethods.filterTabbableElements(rawElements);
+
+                        return privateMethods.filterVisibleElements(tabbableElements);
+                    },
+
+                    filterTabbableElements: function (els) {
+                        var tabbableFocusableElements = [];
+
+                        for (var i = 0; i < els.length; i++) {
+                            var el = els[i];
+
+                            if ($el(el).attr('tabindex') !== '-1') {
+                                tabbableFocusableElements.push(el);
+                            }
+                        }
+
+                        return tabbableFocusableElements;
+                    },
+
+                    filterVisibleElements: function (els) {
+                        var visibleFocusableElements = [];
+
+                        for (var i = 0; i < els.length; i++) {
+                            var el = els[i];
+
+                            if (el.offsetWidth > 0 || el.offsetHeight > 0) {
+                                visibleFocusableElements.push(el);
+                            }
+                        }
+
+                        return visibleFocusableElements;
+                    },
+
+                    getActiveDialog: function () {
+                        var dialogs = document.querySelectorAll('.ngdialog');
+
+                        if (dialogs.length === 0) {
+                            return null;
+                        }
+
+                        // TODO: This might be incorrect if there are a mix of open dialogs with different 'appendTo' values
+                        return $el(dialogs[dialogs.length - 1]);
+                    },
+
+                    applyAriaAttributes: function ($dialog, options) {
+                        if (options.ariaAuto) {
+                            if (!options.ariaRole) {
+                                var detectedRole = (privateMethods.getFocusableElements($dialog).length > 0) ?
+                                    'dialog' :
+                                    'alertdialog';
+
+                                options.ariaRole = detectedRole;
+                            }
+
+                            if (!options.ariaLabelledBySelector) {
+                                options.ariaLabelledBySelector = 'h1,h2,h3,h4,h5,h6';
+                            }
+
+                            if (!options.ariaDescribedBySelector) {
+                                options.ariaDescribedBySelector = 'article,section,p';
+                            }
+                        }
+
+                        if (options.ariaRole) {
+                            $dialog.attr('role', options.ariaRole);
+                        }
+
+                        privateMethods.applyAriaAttribute(
+                            $dialog, 'aria-labelledby', options.ariaLabelledById, options.ariaLabelledBySelector);
+
+                        privateMethods.applyAriaAttribute(
+                            $dialog, 'aria-describedby', options.ariaDescribedById, options.ariaDescribedBySelector);
+                    },
+
+                    applyAriaAttribute: function($dialog, attr, id, selector) {
+                        if (id) {
+                            $dialog.attr(attr, id);
+                            return;
+                        }
+
+                        if (selector) {
+                            var dialogId = $dialog.attr('id');
+
+                            var firstMatch = $dialog[0].querySelector(selector);
+
+                            if (!firstMatch) {
+                                return;
+                            }
+
+                            var generatedId = dialogId + '-' + attr;
+
+                            $el(firstMatch).attr('id', generatedId);
+
+                            $dialog.attr(attr, generatedId);
+
+                            return generatedId;
+                        }
+                    },
+
+                    detectUIRouter: function() {
+                        //Detect if ui-router module is installed if not return false
+                        try {
+                            angular.module('ui.router');
+                            return true;
+                        } catch(err) {
+                            return false;
+                        }
+                    },
+
+                    getRouterLocationEventName: function() {
+                        if(privateMethods.detectUIRouter()) {
+                            return '$stateChangeStart';
+                        }
+                        return '$locationChangeStart';
+                    }
+                };
+
+                var publicMethods = {
+                    __PRIVATE__: privateMethods,
+
+                    /*
+                     * @param {Object} options:
+                     * - template {String} - id of ng-template, url for partial, plain string (if enabled)
+                     * - plain {Boolean} - enable plain string templates, default false
+                     * - scope {Object}
+                     * - controller {String}
+                     * - controllerAs {String}
+                     * - className {String} - dialog theme class
+                     * - appendClassName {String} - dialog theme class to be appended to defaults
+                     * - disableAnimation {Boolean} - set to true to disable animation
+                     * - showClose {Boolean} - show close button, default true
+                     * - closeByEscape {Boolean} - default true
+                     * - closeByDocument {Boolean} - default true
+                     * - preCloseCallback {String|Function} - user supplied function name/function called before closing dialog (if set)
+                     * - onOpenCallback {String|Function} - user supplied function name/function called after opening dialog (if set)
+                     * - bodyClassName {String} - class added to body at open dialog
+                     * @return {Object} dialog
+                     */
+                    open: function (opts) {
+                        var dialogID = null;
+                        opts = opts || {};
+                        if (openOnePerName && opts.name) {
+                            dialogID = opts.name.toLowerCase().replace(/\s/g, '-') + '-dialog';
+                            if (this.isOpen(dialogID)) {
+                                return;
+                            }
+                        }
+                        var options = angular.copy(defaults);
+                        var localID = ++globalID;
+                        dialogID = dialogID || 'ngdialog' + localID;
+                        openIdStack.push(dialogID);
+
+                        // Merge opts.data with predefined via setDefaults
+                        if (typeof options.data !== 'undefined') {
+                            if (typeof opts.data === 'undefined') {
+                                opts.data = {};
+                            }
+                            opts.data = angular.merge(angular.copy(options.data), opts.data);
+                        }
+
+                        angular.extend(options, opts);
+
+                        var defer;
+                        defers[dialogID] = defer = $q.defer();
+
+                        var scope;
+                        scopes[dialogID] = scope = angular.isObject(options.scope) ? options.scope.$new() : $rootScope.$new();
+
+                        var $dialog, $dialogParent, $dialogContent;
+
+                        var resolve = angular.extend({}, options.resolve);
+
+                        angular.forEach(resolve, function (value, key) {
+                            resolve[key] = angular.isString(value) ? $injector.get(value) : $injector.invoke(value, null, null, key);
+                        });
+
+                        $q.all({
+                            template: loadTemplate(options.template || options.templateUrl),
+                            locals: $q.all(resolve)
+                        }).then(function (setup) {
+                            var template = setup.template,
+                                locals = setup.locals;
+
+                            if (options.showClose) {
+                                template += '<button aria-label="Dismiss" class="ngdialog-close"></button>';
+                            }
+
+                            var hasOverlayClass = options.overlay ? '' : ' ngdialog-no-overlay';
+                            $dialog = $el('<div id="' + dialogID + '" class="ngdialog' + hasOverlayClass + '"></div>');
+                            $dialog.html((options.overlay ?
+                                '<div class="ngdialog-overlay"></div><div class="ngdialog-content" role="document">' + template + '</div>' :
+                                '<div class="ngdialog-content" role="document">' + template + '</div>'));
+
+                            $dialog.data('$ngDialogOptions', options);
+
+                            scope.ngDialogId = dialogID;
+
+                            if (options.data && angular.isString(options.data)) {
+                                var firstLetter = options.data.replace(/^\s*/, '')[0];
+                                scope.ngDialogData = (firstLetter === '{' || firstLetter === '[') ? angular.fromJson(options.data) : new String(options.data);
+                                scope.ngDialogData.ngDialogId = dialogID;
+                            } else if (options.data && angular.isObject(options.data)) {
+                                scope.ngDialogData = options.data;
+                                scope.ngDialogData.ngDialogId = dialogID;
+                            }
+
+                            if (options.className) {
+                                $dialog.addClass(options.className);
+                            }
+
+                            if (options.appendClassName) {
+                                $dialog.addClass(options.appendClassName);
+                            }
+
+                            if (options.width) {
+                                $dialogContent = $dialog[0].querySelector('.ngdialog-content');
+                                if (angular.isString(options.width)) {
+                                    $dialogContent.style.width = options.width;
+                                } else {
+                                    $dialogContent.style.width = options.width + 'px';
+                                }
+                            }
+
+                            if (options.height) {
+                                $dialogContent = $dialog[0].querySelector('.ngdialog-content');
+                                if (angular.isString(options.height)) {
+                                    $dialogContent.style.height = options.height;
+                                } else {
+                                    $dialogContent.style.height = options.height + 'px';
+                                }
+                            }
+
+                            if (options.disableAnimation) {
+                                $dialog.addClass(disabledAnimationClass);
+                            }
+
+                            if (options.appendTo && angular.isString(options.appendTo)) {
+                                $dialogParent = angular.element(document.querySelector(options.appendTo));
+                            } else {
+                                $dialogParent = $elements.body;
+                            }
+
+                            privateMethods.applyAriaAttributes($dialog, options);
+
+                            [
+                                { name: '$ngDialogPreCloseCallback', value: options.preCloseCallback },
+                                { name: '$ngDialogOnOpenCallback', value: options.onOpenCallback }
+                            ].forEach(function (option) {
+                                if (option.value) {
+                                    var callback;
+
+                                    if (angular.isFunction(option.value)) {
+                                        callback = option.value;
+                                    } else if (angular.isString(option.value)) {
+                                        if (scope) {
+                                            if (angular.isFunction(scope[option.value])) {
+                                                callback = scope[option.value];
+                                            } else if (scope.$parent && angular.isFunction(scope.$parent[option.value])) {
+                                                callback = scope.$parent[option.value];
+                                            } else if ($rootScope && angular.isFunction($rootScope[option.value])) {
+                                                callback = $rootScope[option.value];
+                                            }
+                                        }
+                                    }
+
+                                    if (callback) {
+                                        $dialog.data(option.name, callback);
+                                    }
+                                }
+                            });
+
+                            scope.closeThisDialog = function (value) {
+                                privateMethods.closeDialog($dialog, value);
+                            };
+
+                            if (options.controller && (angular.isString(options.controller) || angular.isArray(options.controller) || angular.isFunction(options.controller))) {
+
+                                var label;
+
+                                if (options.controllerAs && angular.isString(options.controllerAs)) {
+                                    label = options.controllerAs;
+                                }
+
+                                var controllerInstance = $controller(options.controller, angular.extend(
+                                    locals,
+                                    {
+                                        $scope: scope,
+                                        $element: $dialog
+                                    }),
+                                    true,
+                                    label
+                                );
+
+                                if(options.bindToController) {
+                                    angular.extend(controllerInstance.instance, {ngDialogId: scope.ngDialogId, ngDialogData: scope.ngDialogData, closeThisDialog: scope.closeThisDialog, confirm: scope.confirm});
+                                }
+
+                                if(typeof controllerInstance === 'function'){
+                                    $dialog.data('$ngDialogControllerController', controllerInstance());
+                                } else {
+                                    $dialog.data('$ngDialogControllerController', controllerInstance);
+                                }
+                            }
+
+                            $timeout(function () {
+                                var $activeDialogs = document.querySelectorAll('.ngdialog');
+                                privateMethods.deactivateAll($activeDialogs);
+
+                                $compile($dialog)(scope);
+                                var widthDiffs = $window.innerWidth - $elements.body.prop('clientWidth');
+                                $elements.html.addClass(options.bodyClassName);
+                                $elements.body.addClass(options.bodyClassName);
+                                var scrollBarWidth = widthDiffs - ($window.innerWidth - $elements.body.prop('clientWidth'));
+                                if (scrollBarWidth > 0) {
+                                    privateMethods.setBodyPadding(scrollBarWidth);
+                                }
+                                $dialogParent.append($dialog);
+
+                                privateMethods.activate($dialog);
+
+                                if (options.trapFocus) {
+                                    privateMethods.autoFocus($dialog);
+                                }
+
+                                if (options.name) {
+                                    $rootScope.$broadcast('ngDialog.opened', {dialog: $dialog, name: options.name});
+                                } else {
+                                    $rootScope.$broadcast('ngDialog.opened', $dialog);
+                                }
+                                var onOpenCallback = $dialog.data('$ngDialogOnOpenCallback');
+                                if (onOpenCallback && angular.isFunction(onOpenCallback)) {
+                                    onOpenCallback.call($dialog);
+                                }
+
+                            });
+
+                            if (!keydownIsBound) {
+                                $elements.body.bind('keydown', privateMethods.onDocumentKeydown);
+                                keydownIsBound = true;
+                            }
+
+                            if (options.closeByNavigation) {
+                                var eventName = privateMethods.getRouterLocationEventName();
+                                $rootScope.$on(eventName, function ($event) {
+                                    if (privateMethods.closeDialog($dialog) === false)
+                                        $event.preventDefault();
+                                });
+                            }
+
+                            if (options.preserveFocus) {
+                                $dialog.data('$ngDialogPreviousFocus', document.activeElement);
+                            }
+
+                            closeByDocumentHandler = function (event) {
+                                var isOverlay = options.closeByDocument ? $el(event.target).hasClass('ngdialog-overlay') : false;
+                                var isCloseBtn = $el(event.target).hasClass('ngdialog-close');
+
+                                if (isOverlay || isCloseBtn) {
+                                    publicMethods.close($dialog.attr('id'), isCloseBtn ? '$closeButton' : '$document');
+                                }
+                            };
+
+                            if (typeof $window.Hammer !== 'undefined') {
+                                var hammerTime = scope.hammerTime = $window.Hammer($dialog[0]);
+                                hammerTime.on('tap', closeByDocumentHandler);
+                            } else {
+                                $dialog.bind('click', closeByDocumentHandler);
+                            }
+
+                            dialogsCount += 1;
+
+                            return publicMethods;
+                        });
+
+                        return {
+                            id: dialogID,
+                            closePromise: defer.promise,
+                            close: function (value) {
+                                privateMethods.closeDialog($dialog, value);
+                            }
+                        };
+
+                        function loadTemplateUrl (tmpl, config) {
+                            var config = config || {};
+                            config.headers = config.headers || {};
+
+                            angular.extend(config.headers, {'Accept': 'text/html'});
+
+                            $rootScope.$broadcast('ngDialog.templateLoading', tmpl);
+                            return $http.get(tmpl, config).then(function(res) {
+                                $rootScope.$broadcast('ngDialog.templateLoaded', tmpl);
+                                return res.data || '';
+                            });
+                        }
+
+                        function loadTemplate (tmpl) {
+                            if (!tmpl) {
+                                return 'Empty template';
+                            }
+
+                            if (angular.isString(tmpl) && options.plain) {
+                                return tmpl;
+                            }
+
+                            if (typeof options.cache === 'boolean' && !options.cache) {
+                                return loadTemplateUrl(tmpl, {cache: false});
+                            }
+
+                            return loadTemplateUrl(tmpl, {cache: $templateCache});
+                        }
+                    },
+
+                    /*
+                     * @param {Object} options:
+                     * - template {String} - id of ng-template, url for partial, plain string (if enabled)
+                     * - plain {Boolean} - enable plain string templates, default false
+                     * - name {String}
+                     * - scope {Object}
+                     * - controller {String}
+                     * - controllerAs {String}
+                     * - className {String} - dialog theme class
+                     * - appendClassName {String} - dialog theme class to be appended to defaults
+                     * - showClose {Boolean} - show close button, default true
+                     * - closeByEscape {Boolean} - default false
+                     * - closeByDocument {Boolean} - default false
+                     * - preCloseCallback {String|Function} - user supplied function name/function called before closing dialog (if set); not called on confirm
+                     * - bodyClassName {String} - class added to body at open dialog
+                     *
+                     * @return {Object} dialog
+                     */
+                    openConfirm: function (opts) {
+                        var defer = $q.defer();
+                        var options = angular.copy(defaults);
+
+                        opts = opts || {};
+
+                        // Merge opts.data with predefined via setDefaults
+                        if (typeof options.data !== 'undefined') {
+                            if (typeof opts.data === 'undefined') {
+                                opts.data = {};
+                            }
+                            opts.data = angular.merge(angular.copy(options.data), opts.data);
+                        }
+
+                        angular.extend(options, opts);
+
+                        options.scope = angular.isObject(options.scope) ? options.scope.$new() : $rootScope.$new();
+                        options.scope.confirm = function (value) {
+                            defer.resolve(value);
+                            var $dialog = $el(document.getElementById(openResult.id));
+                            privateMethods.performCloseDialog($dialog, value);
+                        };
+
+                        var openResult = publicMethods.open(options);
+                        if (openResult) {
+                            openResult.closePromise.then(function (data) {
+                                if (data) {
+                                    return defer.reject(data.value);
+                                }
+                                return defer.reject();
+                            });
+                            return defer.promise;
+                        }
+                    },
+
+                    isOpen: function(id) {
+                        var $dialog = $el(document.getElementById(id));
+                        return $dialog.length > 0;
+                    },
+
+                    /*
+                     * @param {String} id
+                     * @return {Object} dialog
+                     */
+                    close: function (id, value) {
+                        var $dialog = $el(document.getElementById(id));
+
+                        if ($dialog.length) {
+                            privateMethods.closeDialog($dialog, value);
+                        } else {
+                            if (id === '$escape') {
+                                var topDialogId = openIdStack[openIdStack.length - 1];
+                                $dialog = $el(document.getElementById(topDialogId));
+                                if ($dialog.data('$ngDialogOptions').closeByEscape) {
+                                    privateMethods.closeDialog($dialog, '$escape');
+                                }
+                            } else {
+                                publicMethods.closeAll(value);
+                            }
+                        }
+
+                        return publicMethods;
+                    },
+
+                    closeAll: function (value) {
+                        var $all = document.querySelectorAll('.ngdialog');
+
+                        // Reverse order to ensure focus restoration works as expected
+                        for (var i = $all.length - 1; i >= 0; i--) {
+                            var dialog = $all[i];
+                            privateMethods.closeDialog($el(dialog), value);
+                        }
+                    },
+
+                    getOpenDialogs: function() {
+                        return openIdStack;
+                    },
+
+                    getDefaults: function () {
+                        return defaults;
+                    }
+                };
+
+                angular.forEach(
+                    ['html', 'body'],
+                    function(elementName) {
+                        $elements[elementName] = $document.find(elementName);
+                        if (forceElementsReload[elementName]) {
+                            var eventName = privateMethods.getRouterLocationEventName();
+                            $rootScope.$on(eventName, function () {
+                                $elements[elementName] = $document.find(elementName);
+                            });
+                        }
+                    }
+                );
+
+                return publicMethods;
+            }];
+    });
+
+    m.directive('ngDialog', ['ngDialog', function (ngDialog) {
+        return {
+            restrict: 'A',
+            scope: {
+                ngDialogScope: '='
+            },
+            link: function (scope, elem, attrs) {
+                elem.on('click', function (e) {
+                    e.preventDefault();
+
+                    var ngDialogScope = angular.isDefined(scope.ngDialogScope) ? scope.ngDialogScope : 'noScope';
+                    angular.isDefined(attrs.ngDialogClosePrevious) && ngDialog.close(attrs.ngDialogClosePrevious);
+
+                    var defaults = ngDialog.getDefaults();
+
+                    ngDialog.open({
+                        template: attrs.ngDialog,
+                        className: attrs.ngDialogClass || defaults.className,
+                        appendClassName: attrs.ngDialogAppendClass,
+                        controller: attrs.ngDialogController,
+                        controllerAs: attrs.ngDialogControllerAs,
+                        bindToController: attrs.ngDialogBindToController,
+                        disableAnimation: attrs.ngDialogDisableAnimation,
+                        scope: ngDialogScope,
+                        data: attrs.ngDialogData,
+                        showClose: attrs.ngDialogShowClose === 'false' ? false : (attrs.ngDialogShowClose === 'true' ? true : defaults.showClose),
+                        closeByDocument: attrs.ngDialogCloseByDocument === 'false' ? false : (attrs.ngDialogCloseByDocument === 'true' ? true : defaults.closeByDocument),
+                        closeByEscape: attrs.ngDialogCloseByEscape === 'false' ? false : (attrs.ngDialogCloseByEscape === 'true' ? true : defaults.closeByEscape),
+                        overlay: attrs.ngDialogOverlay === 'false' ? false : (attrs.ngDialogOverlay === 'true' ? true : defaults.overlay),
+                        preCloseCallback: attrs.ngDialogPreCloseCallback || defaults.preCloseCallback,
+                        onOpenCallback: attrs.ngDialogOnOpenCallback || defaults.onOpenCallback,
+                        bodyClassName: attrs.ngDialogBodyClass || defaults.bodyClassName
+                    });
+                });
+            }
+        };
+    }]);
+
+    return m;
+}));
+
+},{"angular":9}],193:[function(_dereq_,module,exports){
 /**!
  * AngularJS file upload directives and services. Supports: file upload/drop/paste, resume, cancel/abort,
  * progress, resize, thumbnail, preview, validation and CORS
@@ -61620,10 +62537,10 @@ ngFileUpload.service('UploadExif', ['UploadResize', '$q', function (UploadResize
 }]);
 
 
-},{}],193:[function(_dereq_,module,exports){
+},{}],194:[function(_dereq_,module,exports){
 _dereq_('./dist/ng-file-upload-all');
 module.exports = 'ngFileUpload';
-},{"./dist/ng-file-upload-all":192}],194:[function(_dereq_,module,exports){
+},{"./dist/ng-file-upload-all":193}],195:[function(_dereq_,module,exports){
 module.exports = function (obj) {
     if (!obj || typeof obj !== 'object') return obj;
     
@@ -61660,7 +62577,7 @@ var isArray = Array.isArray || function (xs) {
     return {}.toString.call(xs) === '[object Array]';
 };
 
-},{}],195:[function(_dereq_,module,exports){
+},{}],196:[function(_dereq_,module,exports){
 /*!
  * Signature Pad v1.6.0
  * https://github.com/szimek/signature_pad
@@ -62191,7 +63108,7 @@ return SignaturePad;
 
 })));
 
-},{}],196:[function(_dereq_,module,exports){
+},{}],197:[function(_dereq_,module,exports){
 /*!
  * ui-select
  * http://github.com/angular-ui/ui-select
@@ -64619,12 +65536,49 @@ $templateCache.put("selectize/match.tpl.html","<div ng-hide=\"$select.searchEnab
 $templateCache.put("selectize/no-choice.tpl.html","<div class=\"ui-select-no-choice selectize-dropdown\" ng-show=\"$select.items.length == 0\"><div class=\"selectize-dropdown-content\"><div data-selectable=\"\" ng-transclude=\"\"></div></div></div>");
 $templateCache.put("selectize/select-multiple.tpl.html","<div class=\"ui-select-container selectize-control multi plugin-remove_button\" ng-class=\"{\'open\': $select.open}\"><div class=\"selectize-input\" ng-class=\"{\'focus\': $select.open, \'disabled\': $select.disabled, \'selectize-focus\' : $select.focus}\" ng-click=\"$select.open && !$select.searchEnabled ? $select.toggle($event) : $select.activate()\"><div class=\"ui-select-match\"></div><input type=\"search\" autocomplete=\"off\" tabindex=\"-1\" class=\"ui-select-search\" ng-class=\"{\'ui-select-search-hidden\':!$select.searchEnabled}\" placeholder=\"{{$selectMultiple.getPlaceholder()}}\" ng-model=\"$select.search\" ng-disabled=\"$select.disabled\" aria-expanded=\"{{$select.open}}\" aria-label=\"{{ $select.baseTitle }}\" ondrop=\"return false;\"></div><div class=\"ui-select-choices\"></div><div class=\"ui-select-no-choice\"></div></div>");
 $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container selectize-control single\" ng-class=\"{\'open\': $select.open}\"><div class=\"selectize-input\" ng-class=\"{\'focus\': $select.open, \'disabled\': $select.disabled, \'selectize-focus\' : $select.focus}\" ng-click=\"$select.open && !$select.searchEnabled ? $select.toggle($event) : $select.activate()\"><div class=\"ui-select-match\"></div><input type=\"search\" autocomplete=\"off\" tabindex=\"-1\" class=\"ui-select-search ui-select-toggle\" ng-class=\"{\'ui-select-search-hidden\':!$select.searchEnabled}\" ng-click=\"$select.toggle($event)\" placeholder=\"{{$select.placeholder}}\" ng-model=\"$select.search\" ng-hide=\"!$select.isEmpty() && !$select.open\" ng-disabled=\"$select.disabled\" aria-label=\"{{ $select.baseTitle }}\"></div><div class=\"ui-select-choices\"></div><div class=\"ui-select-no-choice\"></div></div>");}]);
-},{}],197:[function(_dereq_,module,exports){
+},{}],198:[function(_dereq_,module,exports){
 (function(self) {
   'use strict';
 
   if (self.fetch) {
     return
+  }
+
+  var support = {
+    searchParams: 'URLSearchParams' in self,
+    iterable: 'Symbol' in self && 'iterator' in Symbol,
+    blob: 'FileReader' in self && 'Blob' in self && (function() {
+      try {
+        new Blob()
+        return true
+      } catch(e) {
+        return false
+      }
+    })(),
+    formData: 'FormData' in self,
+    arrayBuffer: 'ArrayBuffer' in self
+  }
+
+  if (support.arrayBuffer) {
+    var viewClasses = [
+      '[object Int8Array]',
+      '[object Uint8Array]',
+      '[object Uint8ClampedArray]',
+      '[object Int16Array]',
+      '[object Uint16Array]',
+      '[object Int32Array]',
+      '[object Uint32Array]',
+      '[object Float32Array]',
+      '[object Float64Array]'
+    ]
+
+    var isDataView = function(obj) {
+      return obj && DataView.prototype.isPrototypeOf(obj)
+    }
+
+    var isArrayBufferView = ArrayBuffer.isView || function(obj) {
+      return obj && viewClasses.indexOf(Object.prototype.toString.call(obj)) > -1
+    }
   }
 
   function normalizeName(name) {
@@ -64644,6 +65598,24 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
     return value
   }
 
+  // Build a destructive iterator for the value list
+  function iteratorFor(items) {
+    var iterator = {
+      next: function() {
+        var value = items.shift()
+        return {done: value === undefined, value: value}
+      }
+    }
+
+    if (support.iterable) {
+      iterator[Symbol.iterator] = function() {
+        return iterator
+      }
+    }
+
+    return iterator
+  }
+
   function Headers(headers) {
     this.map = {}
 
@@ -64651,7 +65623,10 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
       headers.forEach(function(value, name) {
         this.append(name, value)
       }, this)
-
+    } else if (Array.isArray(headers)) {
+      headers.forEach(function(header) {
+        this.append(header[0], header[1])
+      }, this)
     } else if (headers) {
       Object.getOwnPropertyNames(headers).forEach(function(name) {
         this.append(name, headers[name])
@@ -64662,12 +65637,8 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
   Headers.prototype.append = function(name, value) {
     name = normalizeName(name)
     value = normalizeValue(value)
-    var list = this.map[name]
-    if (!list) {
-      list = []
-      this.map[name] = list
-    }
-    list.push(value)
+    var oldValue = this.map[name]
+    this.map[name] = oldValue ? oldValue+','+value : value
   }
 
   Headers.prototype['delete'] = function(name) {
@@ -64675,12 +65646,8 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
   }
 
   Headers.prototype.get = function(name) {
-    var values = this.map[normalizeName(name)]
-    return values ? values[0] : null
-  }
-
-  Headers.prototype.getAll = function(name) {
-    return this.map[normalizeName(name)] || []
+    name = normalizeName(name)
+    return this.has(name) ? this.map[name] : null
   }
 
   Headers.prototype.has = function(name) {
@@ -64688,15 +65655,37 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
   }
 
   Headers.prototype.set = function(name, value) {
-    this.map[normalizeName(name)] = [normalizeValue(value)]
+    this.map[normalizeName(name)] = normalizeValue(value)
   }
 
   Headers.prototype.forEach = function(callback, thisArg) {
-    Object.getOwnPropertyNames(this.map).forEach(function(name) {
-      this.map[name].forEach(function(value) {
-        callback.call(thisArg, value, name, this)
-      }, this)
-    }, this)
+    for (var name in this.map) {
+      if (this.map.hasOwnProperty(name)) {
+        callback.call(thisArg, this.map[name], name, this)
+      }
+    }
+  }
+
+  Headers.prototype.keys = function() {
+    var items = []
+    this.forEach(function(value, name) { items.push(name) })
+    return iteratorFor(items)
+  }
+
+  Headers.prototype.values = function() {
+    var items = []
+    this.forEach(function(value) { items.push(value) })
+    return iteratorFor(items)
+  }
+
+  Headers.prototype.entries = function() {
+    var items = []
+    this.forEach(function(value, name) { items.push([name, value]) })
+    return iteratorFor(items)
+  }
+
+  if (support.iterable) {
+    Headers.prototype[Symbol.iterator] = Headers.prototype.entries
   }
 
   function consumed(body) {
@@ -64719,46 +65708,59 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
 
   function readBlobAsArrayBuffer(blob) {
     var reader = new FileReader()
+    var promise = fileReaderReady(reader)
     reader.readAsArrayBuffer(blob)
-    return fileReaderReady(reader)
+    return promise
   }
 
   function readBlobAsText(blob) {
     var reader = new FileReader()
+    var promise = fileReaderReady(reader)
     reader.readAsText(blob)
-    return fileReaderReady(reader)
+    return promise
   }
 
-  var support = {
-    blob: 'FileReader' in self && 'Blob' in self && (function() {
-      try {
-        new Blob()
-        return true
-      } catch(e) {
-        return false
-      }
-    })(),
-    formData: 'FormData' in self,
-    arrayBuffer: 'ArrayBuffer' in self
+  function readArrayBufferAsText(buf) {
+    var view = new Uint8Array(buf)
+    var chars = new Array(view.length)
+
+    for (var i = 0; i < view.length; i++) {
+      chars[i] = String.fromCharCode(view[i])
+    }
+    return chars.join('')
+  }
+
+  function bufferClone(buf) {
+    if (buf.slice) {
+      return buf.slice(0)
+    } else {
+      var view = new Uint8Array(buf.byteLength)
+      view.set(new Uint8Array(buf))
+      return view.buffer
+    }
   }
 
   function Body() {
     this.bodyUsed = false
 
-
     this._initBody = function(body) {
       this._bodyInit = body
-      if (typeof body === 'string') {
+      if (!body) {
+        this._bodyText = ''
+      } else if (typeof body === 'string') {
         this._bodyText = body
       } else if (support.blob && Blob.prototype.isPrototypeOf(body)) {
         this._bodyBlob = body
       } else if (support.formData && FormData.prototype.isPrototypeOf(body)) {
         this._bodyFormData = body
-      } else if (!body) {
-        this._bodyText = ''
-      } else if (support.arrayBuffer && ArrayBuffer.prototype.isPrototypeOf(body)) {
-        // Only support ArrayBuffers for POST method.
-        // Receiving ArrayBuffers happens via Blobs, instead.
+      } else if (support.searchParams && URLSearchParams.prototype.isPrototypeOf(body)) {
+        this._bodyText = body.toString()
+      } else if (support.arrayBuffer && support.blob && isDataView(body)) {
+        this._bodyArrayBuffer = bufferClone(body.buffer)
+        // IE 10-11 can't handle a DataView body.
+        this._bodyInit = new Blob([this._bodyArrayBuffer])
+      } else if (support.arrayBuffer && (ArrayBuffer.prototype.isPrototypeOf(body) || isArrayBufferView(body))) {
+        this._bodyArrayBuffer = bufferClone(body)
       } else {
         throw new Error('unsupported BodyInit type')
       }
@@ -64768,6 +65770,8 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
           this.headers.set('content-type', 'text/plain;charset=UTF-8')
         } else if (this._bodyBlob && this._bodyBlob.type) {
           this.headers.set('content-type', this._bodyBlob.type)
+        } else if (support.searchParams && URLSearchParams.prototype.isPrototypeOf(body)) {
+          this.headers.set('content-type', 'application/x-www-form-urlencoded;charset=UTF-8')
         }
       }
     }
@@ -64781,6 +65785,8 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
 
         if (this._bodyBlob) {
           return Promise.resolve(this._bodyBlob)
+        } else if (this._bodyArrayBuffer) {
+          return Promise.resolve(new Blob([this._bodyArrayBuffer]))
         } else if (this._bodyFormData) {
           throw new Error('could not read FormData body as blob')
         } else {
@@ -64789,27 +65795,28 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
       }
 
       this.arrayBuffer = function() {
-        return this.blob().then(readBlobAsArrayBuffer)
-      }
-
-      this.text = function() {
-        var rejected = consumed(this)
-        if (rejected) {
-          return rejected
-        }
-
-        if (this._bodyBlob) {
-          return readBlobAsText(this._bodyBlob)
-        } else if (this._bodyFormData) {
-          throw new Error('could not read FormData body as text')
+        if (this._bodyArrayBuffer) {
+          return consumed(this) || Promise.resolve(this._bodyArrayBuffer)
         } else {
-          return Promise.resolve(this._bodyText)
+          return this.blob().then(readBlobAsArrayBuffer)
         }
       }
-    } else {
-      this.text = function() {
-        var rejected = consumed(this)
-        return rejected ? rejected : Promise.resolve(this._bodyText)
+    }
+
+    this.text = function() {
+      var rejected = consumed(this)
+      if (rejected) {
+        return rejected
+      }
+
+      if (this._bodyBlob) {
+        return readBlobAsText(this._bodyBlob)
+      } else if (this._bodyArrayBuffer) {
+        return Promise.resolve(readArrayBufferAsText(this._bodyArrayBuffer))
+      } else if (this._bodyFormData) {
+        throw new Error('could not read FormData body as text')
+      } else {
+        return Promise.resolve(this._bodyText)
       }
     }
 
@@ -64837,7 +65844,8 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
   function Request(input, options) {
     options = options || {}
     var body = options.body
-    if (Request.prototype.isPrototypeOf(input)) {
+
+    if (input instanceof Request) {
       if (input.bodyUsed) {
         throw new TypeError('Already read')
       }
@@ -64848,12 +65856,12 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
       }
       this.method = input.method
       this.mode = input.mode
-      if (!body) {
+      if (!body && input._bodyInit != null) {
         body = input._bodyInit
         input.bodyUsed = true
       }
     } else {
-      this.url = input
+      this.url = String(input)
     }
 
     this.credentials = options.credentials || this.credentials || 'omit'
@@ -64871,7 +65879,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
   }
 
   Request.prototype.clone = function() {
-    return new Request(this)
+    return new Request(this, { body: this._bodyInit })
   }
 
   function decode(body) {
@@ -64887,16 +65895,17 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
     return form
   }
 
-  function headers(xhr) {
-    var head = new Headers()
-    var pairs = (xhr.getAllResponseHeaders() || '').trim().split('\n')
-    pairs.forEach(function(header) {
-      var split = header.trim().split(':')
-      var key = split.shift().trim()
-      var value = split.join(':').trim()
-      head.append(key, value)
+  function parseHeaders(rawHeaders) {
+    var headers = new Headers()
+    rawHeaders.split(/\r?\n/).forEach(function(line) {
+      var parts = line.split(':')
+      var key = parts.shift().trim()
+      if (key) {
+        var value = parts.join(':').trim()
+        headers.append(key, value)
+      }
     })
-    return head
+    return headers
   }
 
   Body.call(Request.prototype)
@@ -64907,10 +65916,10 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
     }
 
     this.type = 'default'
-    this.status = options.status
+    this.status = 'status' in options ? options.status : 200
     this.ok = this.status >= 200 && this.status < 300
-    this.statusText = options.statusText
-    this.headers = options.headers instanceof Headers ? options.headers : new Headers(options.headers)
+    this.statusText = 'statusText' in options ? options.statusText : 'OK'
+    this.headers = new Headers(options.headers)
     this.url = options.url || ''
     this._initBody(bodyInit)
   }
@@ -64948,40 +65957,16 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
 
   self.fetch = function(input, init) {
     return new Promise(function(resolve, reject) {
-      var request
-      if (Request.prototype.isPrototypeOf(input) && !init) {
-        request = input
-      } else {
-        request = new Request(input, init)
-      }
-
+      var request = new Request(input, init)
       var xhr = new XMLHttpRequest()
 
-      function responseURL() {
-        if ('responseURL' in xhr) {
-          return xhr.responseURL
-        }
-
-        // Avoid security warnings on getResponseHeader when not allowed by CORS
-        if (/^X-Request-URL:/m.test(xhr.getAllResponseHeaders())) {
-          return xhr.getResponseHeader('X-Request-URL')
-        }
-
-        return
-      }
-
       xhr.onload = function() {
-        var status = (xhr.status === 1223) ? 204 : xhr.status
-        if (status < 100 || status > 599) {
-          reject(new TypeError('Network request failed'))
-          return
-        }
         var options = {
-          status: status,
+          status: xhr.status,
           statusText: xhr.statusText,
-          headers: headers(xhr),
-          url: responseURL()
+          headers: parseHeaders(xhr.getAllResponseHeaders() || '')
         }
+        options.url = 'responseURL' in xhr ? xhr.responseURL : options.headers.get('X-Request-URL')
         var body = 'response' in xhr ? xhr.response : xhr.responseText
         resolve(new Response(body, options))
       }
@@ -65014,7 +65999,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
   self.fetch.polyfill = true
 })(typeof self !== 'undefined' ? self : this);
 
-},{}],198:[function(_dereq_,module,exports){
+},{}],199:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -65076,6 +66061,7 @@ module.exports = function(app) {
           clearOnHide: true,
           unique: false,
           persistent: true,
+          hidden: false,
           map: {
             region: '',
             key: ''
@@ -65102,7 +66088,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],199:[function(_dereq_,module,exports){
+},{}],200:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -65280,7 +66266,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],200:[function(_dereq_,module,exports){
+},{}],201:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -65310,20 +66296,22 @@ module.exports = function(app) {
             : defaultValue;
 
           // FA-850 - Ensure the checked value is always a boolean object when loaded, then unbind the watch.
-          $scope.$watch('data.' + $scope.component.key, function() {
-            if (!$scope.data || !$scope.component.key) return;
+          if ($scope.component.inputType === 'checkbox') {
+            $scope.$watch('data.' + $scope.component.key, function() {
+              if (!$scope.data || !$scope.component.key) return;
 
-            // If the component is required, and its current value is false, delete the entry.
-            if (
-              $scope.component.validate
-              && $scope.component.validate.required
-              && (boolean[$scope.data[$scope.component.key]] || false) === false
-            ) {
-              $timeout(function() {
-                delete $scope.data[$scope.component.key];
-              });
-            }
-          });
+              // If the component is required, and its current value is false, delete the entry.
+              if (
+                $scope.component.validate
+                && $scope.component.validate.required
+                && (boolean[$scope.data[$scope.component.key]] || false) === false
+              ) {
+                $timeout(function() {
+                  delete $scope.data[$scope.component.key];
+                });
+              }
+            });
+          }
         }],
         settings: {
           input: true,
@@ -65337,6 +66325,9 @@ module.exports = function(app) {
           defaultValue: false,
           protected: false,
           persistent: true,
+          hidden: false,
+          name: '',
+          value: '',
           clearOnHide: true,
           validate: {
             required: false
@@ -65349,13 +66340,13 @@ module.exports = function(app) {
     '$templateCache',
     function($templateCache) {
       $templateCache.put('formio/components/checkbox.html',
-        "<div class=\"checkbox\">\n  <label for=\"{{ componentId }}\" ng-class=\"{'field-required': isRequired(component)}\">\n    <input\n      type=\"{{ component.inputType }}\"\n      id=\"{{ componentId }}\"\n      tabindex=\"{{ component.tabindex || 0 }}\"\n      ng-disabled=\"readOnly\"\n      ng-model=\"data[component.key]\"\n      ng-required=\"isRequired(component)\"\n      custom-validator=\"component.validate.custom\"\n    >\n    <span ng-if=\"!(component.hideLabel && component.datagridLabel === false)\">{{ component.label | formioTranslate:null:builder }}</span>\n  </label>\n</div>\n<div ng-if=\"!!component.description\" class=\"help-block\">\n  <span>{{ component.description }}</span>\n</div>\n"
+        "<div class=\"checkbox\">\n  <label for=\"{{ componentId }}\" ng-class=\"{'field-required': isRequired(component)}\">\n    <input\n      ng-if=\"component.name\"\n      type=\"{{ component.inputType }}\"\n      id=\"{{ componentId }}\"\n      name=\"{{ component.name }}\"\n      value=\"{{ component.value }}\"\n      tabindex=\"{{ component.tabindex || 0 }}\"\n      ng-disabled=\"readOnly\"\n      ng-model=\"data[component.name]\"\n      ng-required=\"component.validate.required\"\n    >\n    <input\n      ng-if=\"!component.name\"\n      type=\"{{ component.inputType }}\"\n      id=\"{{ componentId }}\"\n      tabindex=\"{{ component.tabindex || 0 }}\"\n      ng-disabled=\"readOnly\"\n      ng-model=\"data[component.key]\"\n      ng-required=\"isRequired(component)\"\n      custom-validator=\"component.validate.custom\"\n    >\n    <span ng-if=\"!(component.hideLabel && component.datagridLabel === false)\">{{ component.label | formioTranslate:null:builder }}</span>\n  </label>\n</div>\n<div ng-if=\"!!component.description\" class=\"help-block\">\n  <span>{{ component.description }}</span>\n</div>\n"
       );
     }
   ]);
 };
 
-},{}],201:[function(_dereq_,module,exports){
+},{}],202:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -65389,7 +66380,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],202:[function(_dereq_,module,exports){
+},{}],203:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.provider('formioComponents', function() {
@@ -65449,7 +66440,7 @@ module.exports = function(app) {
   }]);
 };
 
-},{}],203:[function(_dereq_,module,exports){
+},{}],204:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -65530,7 +66521,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],204:[function(_dereq_,module,exports){
+},{}],205:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -65559,7 +66550,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],205:[function(_dereq_,module,exports){
+},{}],206:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -65642,6 +66633,7 @@ module.exports = function(app) {
           defaultValue: '',
           protected: false,
           persistent: true,
+          hidden: false,
           clearOnHide: true,
           validate: {
             required: false,
@@ -65669,7 +66661,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],206:[function(_dereq_,module,exports){
+},{}],207:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -65697,7 +66689,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":244}],207:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":245}],208:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -65748,6 +66740,7 @@ module.exports = function(app) {
           key: 'datagrid',
           protected: false,
           persistent: true,
+          hidden: false,
           clearOnHide: true
         }
       });
@@ -65815,7 +66808,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],208:[function(_dereq_,module,exports){
+},{}],209:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -65965,6 +66958,7 @@ module.exports = function(app) {
           },
           protected: false,
           persistent: true,
+          hidden: false,
           clearOnHide: true,
           validate: {
             required: false,
@@ -65985,7 +66979,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],209:[function(_dereq_,module,exports){
+},{}],210:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -66163,6 +67157,7 @@ module.exports = function(app) {
           dayFirst: false,
           protected: false,
           persistent: true,
+          hidden: false,
           clearOnHide: true,
           validate: {
             custom: ''
@@ -66185,7 +67180,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],210:[function(_dereq_,module,exports){
+},{}],211:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -66208,6 +67203,7 @@ module.exports = function(app) {
           protected: false,
           unique: false,
           persistent: true,
+          hidden: false,
           clearOnHide: true,
           kickbox: {
             enabled: false
@@ -66218,7 +67214,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],211:[function(_dereq_,module,exports){
+},{}],212:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -66254,7 +67250,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],212:[function(_dereq_,module,exports){
+},{}],213:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -66277,6 +67273,7 @@ module.exports = function(app) {
           defaultValue: '',
           protected: false,
           persistent: true,
+          hidden: false,
           clearOnHide: true
         },
         viewTemplate: 'formio/componentsView/file.html'
@@ -66517,7 +67514,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],213:[function(_dereq_,module,exports){
+},{}],214:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -66553,7 +67550,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":244}],214:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":245}],215:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -66645,7 +67642,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],215:[function(_dereq_,module,exports){
+},{}],216:[function(_dereq_,module,exports){
 "use strict";
 var app = angular.module('formio');
 
@@ -66687,7 +67684,7 @@ _dereq_('./panel')(app);
 _dereq_('./table')(app);
 _dereq_('./well')(app);
 
-},{"./address":198,"./button":199,"./checkbox":200,"./columns":201,"./components":202,"./container":203,"./content":204,"./currency":205,"./custom":206,"./datagrid":207,"./datetime":208,"./day":209,"./email":210,"./fieldset":211,"./file":212,"./hidden":213,"./htmlelement":214,"./number":216,"./page":217,"./panel":218,"./password":219,"./phonenumber":220,"./radio":221,"./resource":222,"./select":223,"./selectboxes":224,"./signature":225,"./survey":226,"./table":227,"./textarea":228,"./textfield":229,"./well":230}],216:[function(_dereq_,module,exports){
+},{"./address":199,"./button":200,"./checkbox":201,"./columns":202,"./components":203,"./container":204,"./content":205,"./currency":206,"./custom":207,"./datagrid":208,"./datetime":209,"./day":210,"./email":211,"./fieldset":212,"./file":213,"./hidden":214,"./htmlelement":215,"./number":217,"./page":218,"./panel":219,"./password":220,"./phonenumber":221,"./radio":222,"./resource":223,"./select":224,"./selectboxes":225,"./signature":226,"./survey":227,"./table":228,"./textarea":229,"./textfield":230,"./well":231}],217:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -66713,6 +67710,7 @@ module.exports = function(app) {
           defaultValue: '',
           protected: false,
           persistent: true,
+          hidden: false,
           clearOnHide: true,
           validate: {
             required: false,
@@ -66751,7 +67749,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],217:[function(_dereq_,module,exports){
+},{}],218:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -66778,7 +67776,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],218:[function(_dereq_,module,exports){
+},{}],219:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -66814,7 +67812,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],219:[function(_dereq_,module,exports){
+},{}],220:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -66837,6 +67835,7 @@ module.exports = function(app) {
           suffix: '',
           protected: true,
           persistent: true,
+          hidden: false,
           clearOnHide: true
         }
       });
@@ -66844,7 +67843,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],220:[function(_dereq_,module,exports){
+},{}],221:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -66867,6 +67866,7 @@ module.exports = function(app) {
           protected: false,
           unique: false,
           persistent: true,
+          hidden: false,
           defaultValue: '',
           clearOnHide: true,
           validate: {
@@ -66878,7 +67878,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],221:[function(_dereq_,module,exports){
+},{}],222:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -66907,6 +67907,7 @@ module.exports = function(app) {
           defaultValue: '',
           protected: false,
           persistent: true,
+          hidden: false,
           clearOnHide: true,
           validate: {
             required: false,
@@ -66928,7 +67929,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],222:[function(_dereq_,module,exports){
+},{}],223:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -66947,7 +67948,7 @@ module.exports = function(app) {
         template: function($scope) {
           return $scope.component.multiple ? 'formio/components/resource-multiple.html' : 'formio/components/resource.html';
         },
-        controller: ['$scope', 'Formio', function($scope, Formio) {
+        controller: ['$scope', 'Formio', 'ngDialog', function($scope, Formio, ngDialog) {
           if ($scope.builder) return;
           var settings = $scope.component;
           var params = settings.params || {};
@@ -67012,6 +68013,65 @@ module.exports = function(app) {
             };
 
             $scope.refreshSubmissions();
+
+            // Add a new resource.
+            $scope.newResource = function() {
+              var template  = '<br>' +
+                              '<div class="row">' +
+                                '<div class="col-sm-12">' +
+                                  '<div class="panel panel-default">' +
+                                    '<div class="panel-heading">' +
+                                      '<h3 class="panel-title">{{ component.addResourceLabel || "Add Resource" | formioTranslate}}</h3>' +
+                                    '</div>' +
+                                    '<div class="panel-body">' +
+                                      '<formio src="formUrl"></formio>' +
+                                    '</div>' +
+                                  '</div>' +
+                                '</div>' +
+                              '</div>';
+
+              ngDialog.open({
+                template: template,
+                plain: true,
+                scope: $scope,
+                controller: ['$scope', function($scope) {
+                  $scope.formUrl = $scope.formio.formsUrl + '/' + $scope.component.resource;
+
+                  // Bind when the form is loaded.
+                  $scope.$on('formLoad', function(event) {
+                    event.stopPropagation(); // Don't confuse app
+                  });
+
+                  // Bind when the form is submitted.
+                  $scope.$on('formSubmission', function(event, submission) {
+                    var component = $scope.component;
+                    var data      = $scope.data;
+
+                    if (component.multiple) {
+                      data[component.key].push(submission);
+                    }
+                    else {
+                      data[component.key] = submission;
+                    }
+
+                    $scope.refreshSubmissions();
+                    $scope.closeThisDialog(submission);
+                  });
+                }]
+              }).closePromise.then(function(/*e*/) {
+              //var cancelled = e.value === false || e.value === '$closeButton' || e.value === '$document';
+              });
+            };
+
+            // Close all open dialogs on state change (using UI-Router).
+            $scope.$on('$stateChangeStart', function() {
+              ngDialog.closeAll(false);
+            });
+
+            // Close all open dialogs on route change (using ngRoute).
+            $scope.$on('$routeChangeStart', function() {
+              ngDialog.closeAll(false);
+            });
           }
         }],
         group: 'advanced',
@@ -67030,6 +68090,7 @@ module.exports = function(app) {
           multiple: false,
           protected: false,
           persistent: true,
+          hidden: false,
           clearOnHide: true,
           validate: {
             required: false
@@ -67044,18 +68105,18 @@ module.exports = function(app) {
     '$templateCache',
     function($templateCache) {
       $templateCache.put('formio/components/resource.html',
-        "<label ng-if=\"component.label && !component.hideLabel\" for=\"{{ componentId }}\" class=\"control-label\" ng-class=\"{'field-required': isRequired(component)}\">{{ component.label | formioTranslate:null:builder }}</label>\n<span ng-if=\"!component.label && isRequired(component)\" class=\"glyphicon glyphicon-asterisk form-control-feedback field-required-inline\" aria-hidden=\"true\"></span>\n<ui-select ui-select-required safe-multiple-to-single ui-select-open-on-focus ng-model=\"data[component.key]\" ng-disabled=\"readOnly\" ng-required=\"isRequired(component)\" id=\"{{ componentId }}\" name=\"{{ componentId }}\" theme=\"bootstrap\" tabindex=\"{{ component.tabindex || 0 }}\">\n  <ui-select-match class=\"ui-select-match\" placeholder=\"{{ component.placeholder | formioTranslate:null:builder }}\">\n    <formio-select-item template=\"component.template\" item=\"$item || $select.selected\" select=\"$select\"></formio-select-item>\n  </ui-select-match>\n  <ui-select-choices class=\"ui-select-choices\" repeat=\"item in selectItems | filter: $select.search\" refresh=\"refreshSubmissions($select.search)\" refresh-delay=\"250\">\n    <formio-select-item template=\"component.template\" item=\"item\" select=\"$select\"></formio-select-item>\n    <button ng-if=\"hasNextPage && ($index == $select.items.length-1)\" class=\"btn btn-success btn-block\" ng-click=\"loadMoreItems($select, $event)\" ng-disabled=\"resourceLoading\">Load more...</button>\n  </ui-select-choices>\n</ui-select>\n<formio-errors ng-if=\"::!builder\"></formio-errors>\n"
+        "<div ng-if=\"!component.addResource\">\n  <label ng-if=\"component.label && !component.hideLabel\" for=\"{{ componentId }}\" class=\"control-label\" ng-class=\"{'field-required': isRequired(component)}\">{{ component.label | formioTranslate:null:builder }}</label>\n  <span ng-if=\"!component.label && isRequired(component)\" class=\"glyphicon glyphicon-asterisk form-control-feedback field-required-inline\" aria-hidden=\"true\"></span>\n  <ui-select ui-select-required safe-multiple-to-single ui-select-open-on-focus ng-model=\"data[component.key]\" ng-disabled=\"readOnly\" ng-required=\"isRequired(component)\" id=\"{{ componentId }}\" name=\"{{ componentId }}\" theme=\"bootstrap\" tabindex=\"{{ component.tabindex || 0 }}\">\n    <ui-select-match class=\"ui-select-match\" placeholder=\"{{ component.placeholder | formioTranslate:null:builder }}\">\n      <formio-select-item template=\"component.template\" item=\"$item || $select.selected\" select=\"$select\"></formio-select-item>\n    </ui-select-match>\n    <ui-select-choices class=\"ui-select-choices\" repeat=\"item in selectItems | filter: $select.search\" refresh=\"refreshSubmissions($select.search)\" refresh-delay=\"250\">\n      <formio-select-item template=\"component.template\" item=\"item\" select=\"$select\"></formio-select-item>\n      <button ng-if=\"hasNextPage && ($index == $select.items.length-1)\" class=\"btn btn-success btn-block\" ng-click=\"loadMoreItems($select, $event)\" ng-disabled=\"resourceLoading\">Load more...</button>\n    </ui-select-choices>\n  </ui-select>\n  <formio-errors ng-if=\"::!builder\"></formio-errors>\n</div>\n<div ng-if=\"component.addResource\">\n  <table class=\"table table-bordered\">\n    <label ng-if=\"component.label && !component.hideLabel\" for=\"{{ componentId }}\" class=\"control-label\" ng-class=\"{'field-required': isRequired(component)}\">{{ component.label | formioTranslate:null:builder }}</label>\n    <span ng-if=\"!component.label && isRequired(component)\" class=\"glyphicon glyphicon-asterisk form-control-feedback field-required-inline\" aria-hidden=\"true\"></span>\n    <tr>\n      <td>\n        <ui-select ui-select-required safe-multiple-to-single ui-select-open-on-focus ng-model=\"data[component.key]\" ng-disabled=\"readOnly\" ng-required=\"isRequired(component)\" id=\"{{ componentId }}\" name=\"{{ componentId }}\" theme=\"bootstrap\" tabindex=\"{{ component.tabindex || 0 }}\">\n          <ui-select-match class=\"ui-select-match\" placeholder=\"{{ component.placeholder | formioTranslate:null:builder }}\">\n            <formio-select-item template=\"component.template\" item=\"$item || $select.selected\" select=\"$select\"></formio-select-item>\n          </ui-select-match>\n          <ui-select-choices class=\"ui-select-choices\" repeat=\"item in selectItems | filter: $select.search\" refresh=\"refreshSubmissions($select.search)\" refresh-delay=\"250\">\n            <formio-select-item template=\"component.template\" item=\"item\" select=\"$select\"></formio-select-item>\n            <button ng-if=\"hasNextPage && ($index == $select.items.length-1)\" class=\"btn btn-success btn-block\" ng-click=\"loadMoreItems($select, $event)\" ng-disabled=\"resourceLoading\">Load more...</button>\n          </ui-select-choices>\n        </ui-select>\n        <formio-errors ng-if=\"::!builder\"></formio-errors>\n      </td>\n    </tr>\n    <tr>\n      <td>\n        <a ng-click=\"newResource()\" class=\"btn btn-primary\">\n          <span class=\"glyphicon glyphicon-plus\" aria-hidden=\"true\"></span> {{ component.addResourceLabel || \"Add Resource\" | formioTranslate:null:builder}}\n        </a>\n      </td>\n    </tr>\n  </table>\n</div>\n"
       );
 
       // Change the ui-select to ui-select multiple.
       $templateCache.put('formio/components/resource-multiple.html',
-        $templateCache.get('formio/components/resource.html').replace('<ui-select', '<ui-select multiple')
+        $templateCache.get('formio/components/resource.html').replace(/<ui-select\s/g, '<ui-select multiple ')
       );
     }
   ]);
 };
 
-},{}],223:[function(_dereq_,module,exports){
+},{}],224:[function(_dereq_,module,exports){
 "use strict";
 /*eslint max-depth: ["error", 6]*/
 
@@ -67598,6 +68659,7 @@ module.exports = function(app) {
           protected: false,
           unique: false,
           persistent: true,
+          hidden: false,
           clearOnHide: true,
           validate: {
             required: false
@@ -67621,7 +68683,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"lodash/cloneDeep":165,"lodash/get":168,"lodash/isEqual":175,"lodash/set":186}],224:[function(_dereq_,module,exports){
+},{"lodash/cloneDeep":165,"lodash/get":168,"lodash/isEqual":175,"lodash/set":186}],225:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -67706,6 +68768,7 @@ module.exports = function(app) {
           inline: false,
           protected: false,
           persistent: true,
+          hidden: false,
           clearOnHide: true,
           validate: {
             required: false
@@ -67728,7 +68791,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],225:[function(_dereq_,module,exports){
+},{}],226:[function(_dereq_,module,exports){
 "use strict";
 
 var SignaturePad = _dereq_('signature_pad');
@@ -67758,6 +68821,7 @@ module.exports = function(app) {
           maxWidth: '2.5',
           protected: false,
           persistent: true,
+          hidden: false,
           clearOnHide: true,
           validate: {
             required: false
@@ -67868,7 +68932,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"signature_pad":195}],226:[function(_dereq_,module,exports){
+},{"signature_pad":196}],227:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -67905,6 +68969,7 @@ module.exports = function(app) {
           defaultValue: '',
           protected: false,
           persistent: true,
+          hidden: false,
           clearOnHide: true,
           validate: {
             required: false,
@@ -67926,7 +68991,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],227:[function(_dereq_,module,exports){
+},{}],228:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -67971,7 +69036,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],228:[function(_dereq_,module,exports){
+},{}],229:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -68026,6 +69091,7 @@ module.exports = function(app) {
           defaultValue: '',
           protected: false,
           persistent: true,
+          hidden: false,
           wysiwyg: false,
           clearOnHide: true,
           validate: {
@@ -68054,7 +69120,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],229:[function(_dereq_,module,exports){
+},{}],230:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -68081,6 +69147,7 @@ module.exports = function(app) {
           protected: false,
           unique: false,
           persistent: true,
+          hidden: false,
           clearOnHide: true,
           validate: {
             required: false,
@@ -68114,7 +69181,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],230:[function(_dereq_,module,exports){
+},{}],231:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -68147,7 +69214,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],231:[function(_dereq_,module,exports){
+},{}],232:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -68225,7 +69292,7 @@ module.exports = function() {
   };
 };
 
-},{}],232:[function(_dereq_,module,exports){
+},{}],233:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -68251,19 +69318,66 @@ module.exports = function() {
       'FormioScope',
       'Formio',
       'FormioUtils',
+      '$q',
       function(
         $scope,
         $http,
         $element,
         FormioScope,
         Formio,
-        FormioUtils
+        FormioUtils,
+        $q
       ) {
+        var iframeReady = $q.defer();
         $scope._src = $scope.src || '';
         $scope.formioAlerts = [];
+        $scope.iframeReady = false;
         // Shows the given alerts (single or array), and dismisses old alerts
         this.showAlerts = $scope.showAlerts = function(alerts) {
           $scope.formioAlerts = [].concat(alerts);
+        };
+
+        $scope.getIframeSrc = function(pdf) {
+          var iframeSrc = pdf.src + '.html';
+          var params = [];
+          if ($scope.form.builder) {
+            params.push('builder=1');
+          }
+          if ($scope.readOnly) {
+            params.push('readonly=1');
+          }
+          if (params.length) {
+            iframeSrc += '?' + params.join('&');
+          }
+          return iframeSrc;
+        };
+
+        $scope.downloadUrl = '';
+        $scope.getPDFDownload = function(pdf) {
+          if (!$scope.formio) {
+            return;
+          }
+          var download = '';
+          if ($scope.formio && $scope.formio.submissionUrl) {
+            download = $scope.formio.submissionUrl;
+          }
+          else if ($scope.submission._id) {
+            download = Formio.baseUrl + '/project/' + $scope.form.project + '/';
+            download += '/form/' + $scope.form._id;
+            download += '/submission/' + $scope.submission._id;
+          }
+          if (!download) {
+            return;
+          }
+
+          download += '/download/' + pdf.id;
+          var allowedPath = download.replace(Formio.baseUrl, '');
+          allowedPath = allowedPath.replace(Formio.getProjectUrl(), '');
+          return $scope.formio.getTempToken(3600, 'GET:' + allowedPath).then(function(tempToken) {
+            download += '?token=' + tempToken;
+            $scope.downloadUrl = download;
+            return download;
+          });
         };
 
         // Add the live form parameter to the url.
@@ -68272,9 +69386,60 @@ module.exports = function() {
           $scope._src += 'live=1';
         }
 
-        var cancelFormLoadEvent = $scope.$on('formLoad', function() {
-          cancelFormLoadEvent();
+        var sendIframeMessage = function(message) {
+          iframeReady.promise.then(function(iframe) {
+            iframe.contentWindow.postMessage(JSON.stringify(message), '*');
+          });
+        };
+
+        $scope.$on('iframe-ready', function() {
+          $scope.iframeReady = true;
+          var iframe = $element.find('.formio-iframe')[0];
+          if (iframe) {
+            iframeReady.resolve(iframe);
+            if ($scope.form) {
+              sendIframeMessage({name: 'form', data: $scope.form});
+            }
+            if ($scope.submission) {
+              sendIframeMessage({name: 'submission', data: $scope.submission});
+            }
+          }
         });
+
+        $scope.$on('iframeMessage', function(event, message) {
+          sendIframeMessage(message);
+        });
+
+        var cancelFormLoadEvent = $scope.$on('formLoad', function(event, form) {
+          cancelFormLoadEvent();
+          iframeReady.promise.then(function() {
+            $scope.getPDFDownload(form.settings.pdf);
+          });
+          sendIframeMessage({name: 'form', data: form});
+        });
+
+        $scope.$on('submissionLoad', function(event, submission) {
+          submission.editable = !$scope.readOnly;
+          sendIframeMessage({name: 'submission', data: submission});
+        });
+
+        // Submit the form from the iframe.
+        $scope.$on('iframe-submission', function(event, submission) {
+          $scope.submitForm(submission);
+        });
+
+        // Called from the submit on iframe.
+        $scope.submitIFrameForm = function() {
+          sendIframeMessage({name: 'getSubmission'});
+        };
+
+        $scope.zoomIn = function() {
+          sendIframeMessage({name: 'zoomIn'});
+        };
+
+        $scope.zoomOut = function() {
+          sendIframeMessage({name: 'zoomOut'});
+        };
 
         // FOR-71
         if (!$scope._src && !$scope.builder) {
@@ -68316,6 +69481,69 @@ module.exports = function() {
             $scope.submission ? $scope.submission.data : null,
             $scope.hideComponents
           );
+        };
+
+        // Show the submit message and say the form is no longer submitting.
+        var onSubmit = function(submission, message, form) {
+          if (message) {
+            $scope.showAlerts({
+              type: 'success',
+              message: message
+            });
+          }
+          if (form) {
+            form.submitting = false;
+          }
+        };
+
+        // Called when a submission has been made.
+        var onSubmitDone = function(method, submission, form) {
+          var message = '';
+          if ($scope.options && $scope.options.submitMessage) {
+            message = $scope.options.submitMessage;
+          }
+          else {
+            message = 'Submission was ' + ((method === 'put') ? 'updated' : 'created') + '.';
+          }
+          onSubmit(submission, message, form);
+          // Trigger the form submission.
+          $scope.$emit('formSubmission', submission);
+        };
+
+        $scope.submitForm = function(submissionData, form) {
+          // Allow custom action urls.
+          if ($scope.action) {
+            var method = submissionData._id ? 'put' : 'post';
+            var action = $scope.action;
+            // Add the action Id if it is not already part of the url.
+            if (method === 'put' && (action.indexOf(submissionData._id) === -1)) {
+              action += '/' + submissionData._id;
+            }
+            $http[method](action, submissionData).success(function(submission) {
+              Formio.clearCache();
+              onSubmitDone(method, submission, form);
+            }, FormioScope.onError($scope, $element))
+              .finally(function() {
+                if (form) {
+                  form.submitting = false;
+                }
+              });
+          }
+
+          // If they wish to submit to the default location.
+          else if ($scope.formio && !$scope.formio.noSubmit) {
+            // copy to remove angular $$hashKey
+            $scope.formio.saveSubmission(submissionData, $scope.formioOptions).then(function(submission) {
+              onSubmitDone(submission.method, submission, form);
+            }, FormioScope.onError($scope, $element)).finally(function() {
+              if (form) {
+                form.submitting = false;
+              }
+            });
+          }
+          else {
+            $scope.$emit('formSubmission', submissionData);
+          }
         };
 
         $scope.isDisabled = function(component) {
@@ -68418,34 +69646,9 @@ module.exports = function() {
             }
           });
 
-          // Show the submit message and say the form is no longer submitting.
-          var onSubmit = function(submission, message) {
-            if (message) {
-              $scope.showAlerts({
-                type: 'success',
-                message: message
-              });
-            }
-            form.submitting = false;
-          };
-
-          // Called when a submission has been made.
-          var onSubmitDone = function(method, submission) {
-            var message = '';
-            if ($scope.options && $scope.options.submitMessage) {
-              message = $scope.options.submitMessage;
-            }
-            else {
-              message = 'Submission was ' + ((method === 'put') ? 'updated' : 'created') + '.';
-            }
-            onSubmit(submission, message);
-            // Trigger the form submission.
-            $scope.$emit('formSubmission', submission);
-          };
-
           // Allow the form to be completed externally.
           $scope.$on('submitDone', function(event, submission, message) {
-            onSubmit(submission, message);
+            onSubmit(submission, message, form);
           });
 
           // Allow an error to be thrown externally.
@@ -68462,36 +69665,7 @@ module.exports = function() {
 
           // Make sure to make a copy of the submission data to remove bad characters.
           submissionData = angular.copy(submissionData);
-
-          // Allow custom action urls.
-          if ($scope.action) {
-            var method = submissionData._id ? 'put' : 'post';
-            var action = $scope.action;
-            // Add the action Id if it is not already part of the url.
-            if (method === 'put' && (action.indexOf(submissionData._id) === -1)) {
-              action += '/' + submissionData._id;
-            }
-            $http[method](action, submissionData).then(function(response) {
-              Formio.clearCache();
-              onSubmitDone(method, response.data);
-            }, FormioScope.onError($scope, $element))
-              .finally(function() {
-                form.submitting = false;
-              });
-          }
-
-          // If they wish to submit to the default location.
-          else if ($scope.formio && !$scope.formio.noSubmit) {
-            // copy to remove angular $$hashKey
-            $scope.formio.saveSubmission(submissionData, $scope.formioOptions).then(function(submission) {
-              onSubmitDone(submission.method, submission);
-            }, FormioScope.onError($scope, $element)).finally(function() {
-              form.submitting = false;
-            });
-          }
-          else {
-            $scope.$emit('formSubmission', submissionData);
-          }
+          $scope.submitForm(submissionData, form);
         };
       }
     ],
@@ -68499,7 +69673,7 @@ module.exports = function() {
   };
 };
 
-},{}],233:[function(_dereq_,module,exports){
+},{}],234:[function(_dereq_,module,exports){
 "use strict";
 module.exports = ['$sce', '$parse', '$compile', function($sce, $parse, $compile) {
   return {
@@ -68516,7 +69690,7 @@ module.exports = ['$sce', '$parse', '$compile', function($sce, $parse, $compile)
   };
 }];
 
-},{}],234:[function(_dereq_,module,exports){
+},{}],235:[function(_dereq_,module,exports){
 "use strict";
 var _cloneDeep = _dereq_('lodash/cloneDeep');
 var _filter = _dereq_('lodash/filter');
@@ -68975,7 +70149,7 @@ module.exports = [
   }
 ];
 
-},{"lodash/cloneDeep":165,"lodash/filter":167,"lodash/get":168}],235:[function(_dereq_,module,exports){
+},{"lodash/cloneDeep":165,"lodash/filter":167,"lodash/get":168}],236:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'formioComponents',
@@ -69042,7 +70216,7 @@ module.exports = [
   }
 ];
 
-},{}],236:[function(_dereq_,module,exports){
+},{}],237:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -69125,7 +70299,7 @@ module.exports = function() {
   };
 };
 
-},{}],237:[function(_dereq_,module,exports){
+},{}],238:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$compile',
@@ -69144,7 +70318,7 @@ module.exports = [
   }
 ];
 
-},{}],238:[function(_dereq_,module,exports){
+},{}],239:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -69154,7 +70328,7 @@ module.exports = function() {
   };
 };
 
-},{}],239:[function(_dereq_,module,exports){
+},{}],240:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -69186,7 +70360,7 @@ module.exports = function() {
   };
 };
 
-},{}],240:[function(_dereq_,module,exports){
+},{}],241:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -69241,7 +70415,7 @@ module.exports = function() {
   };
 };
 
-},{}],241:[function(_dereq_,module,exports){
+},{}],242:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -69670,7 +70844,7 @@ module.exports = function() {
   };
 };
 
-},{}],242:[function(_dereq_,module,exports){
+},{}],243:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -69853,7 +71027,7 @@ module.exports = [
   }
 ];
 
-},{}],243:[function(_dereq_,module,exports){
+},{}],244:[function(_dereq_,module,exports){
 "use strict";
 var formioUtils = _dereq_('formiojs/utils');
 
@@ -69965,7 +71139,7 @@ module.exports = function() {
   };
 };
 
-},{"formiojs/utils":32}],244:[function(_dereq_,module,exports){
+},{"formiojs/utils":32}],245:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   var generic = function(data, component) {
@@ -70044,7 +71218,7 @@ module.exports = function() {
   };
 };
 
-},{}],245:[function(_dereq_,module,exports){
+},{}],246:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$q',
@@ -70093,7 +71267,7 @@ module.exports = [
   }
 ];
 
-},{}],246:[function(_dereq_,module,exports){
+},{}],247:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -70127,7 +71301,7 @@ module.exports = [
   }
 ];
 
-},{}],247:[function(_dereq_,module,exports){
+},{}],248:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'FormioUtils',
@@ -70136,7 +71310,7 @@ module.exports = [
   }
 ];
 
-},{}],248:[function(_dereq_,module,exports){
+},{}],249:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$sce',
@@ -70149,7 +71323,7 @@ module.exports = [
   }
 ];
 
-},{}],249:[function(_dereq_,module,exports){
+},{}],250:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   function() {
@@ -70168,7 +71342,7 @@ module.exports = [
   }
 ];
 
-},{}],250:[function(_dereq_,module,exports){
+},{}],251:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'formioTableView',
@@ -70181,7 +71355,7 @@ module.exports = [
   }
 ];
 
-},{}],251:[function(_dereq_,module,exports){
+},{}],252:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -70196,7 +71370,7 @@ module.exports = [
   }
 ];
 
-},{}],252:[function(_dereq_,module,exports){
+},{}],253:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$filter',
@@ -70245,7 +71419,15 @@ module.exports = [
   }
 ];
 
-},{}],253:[function(_dereq_,module,exports){
+},{}],254:[function(_dereq_,module,exports){
+"use strict";
+module.exports = ['$sce', function($sce) {
+  return function(val) {
+    return $sce.trustAsResourceUrl(val);
+  };
+}];
+
+},{}],255:[function(_dereq_,module,exports){
 "use strict";
 _dereq_('angular-ui-mask/dist/mask');
 _dereq_('ui-select/dist/select');
@@ -70256,9 +71438,10 @@ _dereq_('ng-file-upload');
 _dereq_('bootstrap');
 _dereq_('angular-ui-bootstrap');
 _dereq_('bootstrap-ui-datetime-picker/dist/datetime-picker');
+_dereq_('ng-dialog');
 _dereq_('./formio');
 
-},{"./formio":254,"angular-file-saver":1,"angular-moment":2,"angular-sanitize":4,"angular-ui-bootstrap":6,"angular-ui-mask/dist/mask":7,"bootstrap":11,"bootstrap-ui-datetime-picker/dist/datetime-picker":10,"ng-file-upload":193,"ui-select/dist/select":196}],254:[function(_dereq_,module,exports){
+},{"./formio":256,"angular-file-saver":1,"angular-moment":2,"angular-sanitize":4,"angular-ui-bootstrap":6,"angular-ui-mask/dist/mask":7,"bootstrap":11,"bootstrap-ui-datetime-picker/dist/datetime-picker":10,"ng-dialog":192,"ng-file-upload":194,"ui-select/dist/select":197}],256:[function(_dereq_,module,exports){
 "use strict";
 _dereq_('./polyfills/polyfills');
 
@@ -70321,7 +71504,7 @@ app.filter('tableView', _dereq_('./filters/tableView'));
 app.filter('tableFieldView', _dereq_('./filters/tableFieldView'));
 app.filter('safehtml', _dereq_('./filters/safehtml'));
 app.filter('formioTranslate', _dereq_('./filters/translate'));
-
+app.filter('trustAsResourceUrl', _dereq_('./filters/trusturl'));
 app.config([
   '$httpProvider',
   '$injector',
@@ -70350,10 +71533,25 @@ app.config([
 
 app.run([
   '$templateCache',
-  function($templateCache) {
+  '$rootScope',
+  '$window',
+  function($templateCache, $rootScope, $window) {
+    $window.addEventListener('message', function(event) {
+      var eventData = null;
+      try {
+        eventData = JSON.parse(event.data);
+      }
+      catch (err) {
+        eventData = null;
+      }
+      if (eventData && eventData.name) {
+        $rootScope.$broadcast('iframe-' + eventData.name, eventData.data);
+      }
+    });
+
     // The template for the formio forms.
     $templateCache.put('formio.html',
-      "<div>\n  <i style=\"font-size: 2em;\" ng-if=\"formLoading\" ng-class=\"{'formio-hidden': !formLoading}\" class=\"formio-loading glyphicon glyphicon-refresh glyphicon-spin\"></i>\n  <formio-wizard ng-if=\"form.display === 'wizard'\" src=\"src\" form=\"form\" submission=\"submission\" form-action=\"formAction\" read-only=\"readOnly\" hide-components=\"hideComponents\" disable-components=\"disableComponents\" formio-options=\"formioOptions\" storage=\"form.name\"></formio-wizard>\n  <form ng-if=\"!form.display || (form.display === 'form')\" role=\"form\" name=\"formioForm\" ng-submit=\"onSubmit(formioForm)\" novalidate>\n    <div ng-repeat=\"alert in formioAlerts track by $index\" class=\"alert alert-{{ alert.type }}\" role=\"alert\" ng-if=\"::!builder\">\n      {{ alert.message | formioTranslate:null:builder }}\n    </div>\n    <!-- DO NOT PUT \"track by $index\" HERE SINCE DYNAMICALLY ADDING/REMOVING COMPONENTS WILL BREAK -->\n    <formio-component\n      ng-repeat=\"component in form.components track by $index\"\n      component=\"component\"\n      ng-if=\"builder ? '::true' : isVisible(component)\"\n      data=\"submission.data\"\n      formio-form=\"formioForm\"\n      formio=\"formio\"\n      submission=\"submission\"\n      hide-components=\"hideComponents\"\n      read-only=\"isDisabled(component, submission.data)\"\n      builder=\"builder\"\n    ></formio-component>\n  </form>\n</div>\n"
+      "<div>\n  <i style=\"font-size: 2em;\" ng-if=\"formLoading\" ng-class=\"{'formio-hidden': !formLoading}\" class=\"formio-loading glyphicon glyphicon-refresh glyphicon-spin\"></i>\n  <formio-wizard ng-if=\"form.display === 'wizard'\" src=\"src\" form=\"form\" submission=\"submission\" form-action=\"formAction\" read-only=\"readOnly\" hide-components=\"hideComponents\" disable-components=\"disableComponents\" formio-options=\"formioOptions\" storage=\"form.name\"></formio-wizard>\n  <div ng-if=\"form.display === 'pdf' && form.settings.pdf\" style=\"position:relative;\">\n    <span style=\"position:absolute;right:10px;top:10px;cursor:pointer;\" class=\"btn btn-default no-disable\" ng-click=\"zoomIn()\"><spann class=\"glyphicon glyphicon-zoom-in\"></spann></span>\n    <span style=\"position:absolute;right:10px;top:60px;cursor:pointer;\" class=\"btn btn-default no-disable\" ng-click=\"zoomOut()\"><span class=\"glyphicon glyphicon-zoom-out\"></span></span>\n    <a ng-if=\"downloadUrl\" style=\"position:absolute;right:10px;top:110px;cursor:pointer;\" class=\"btn btn-primary no-disable\" href=\"{{ downloadUrl | trustAsResourceUrl }}\" target=\"_blank\"><span class=\"glyphicon glyphicon-cloud-download\"></span></a>\n    <iframe src=\"{{ getIframeSrc(form.settings.pdf) | trustAsResourceUrl }}\" seamless class=\"formio-iframe\"></iframe>\n    <button ng-if=\"!readOnly && !form.builder\" type=\"button\" class=\"btn btn-primary\" ng-click=\"submitIFrameForm()\">Submit</button>\n  </div>\n  <form ng-if=\"!form.display || (form.display === 'form')\" role=\"form\" name=\"formioForm\" ng-submit=\"onSubmit(formioForm)\" novalidate>\n    <div ng-repeat=\"alert in formioAlerts track by $index\" class=\"alert alert-{{ alert.type }}\" role=\"alert\" ng-if=\"::!builder\">\n      {{ alert.message | formioTranslate:null:builder }}\n    </div>\n    <!-- DO NOT PUT \"track by $index\" HERE SINCE DYNAMICALLY ADDING/REMOVING COMPONENTS WILL BREAK -->\n    <formio-component\n      ng-repeat=\"component in form.components track by $index\"\n      component=\"component\"\n      ng-if=\"builder ? '::true' : isVisible(component)\"\n      data=\"submission.data\"\n      formio-form=\"formioForm\"\n      formio=\"formio\"\n      submission=\"submission\"\n      hide-components=\"hideComponents\"\n      read-only=\"isDisabled(component, submission.data)\"\n      builder=\"builder\"\n    ></formio-component>\n  </form>\n</div>\n"
     );
 
     $templateCache.put('formio-wizard.html',
@@ -70393,7 +71591,7 @@ app.run([
 
 _dereq_('./components');
 
-},{"./components":215,"./directives/customValidator":231,"./directives/formio":232,"./directives/formioBindHtml.js":233,"./directives/formioComponent":234,"./directives/formioComponentView":235,"./directives/formioDelete":236,"./directives/formioElement":237,"./directives/formioErrors":238,"./directives/formioSubmission":239,"./directives/formioSubmissions":240,"./directives/formioWizard":241,"./factories/FormioScope":242,"./factories/FormioUtils":243,"./factories/formioInterceptor":245,"./factories/formioTableView":246,"./filters/flattenComponents":247,"./filters/safehtml":248,"./filters/tableComponents":249,"./filters/tableFieldView":250,"./filters/tableView":251,"./filters/translate":252,"./polyfills/polyfills":256,"./providers/Formio":257}],255:[function(_dereq_,module,exports){
+},{"./components":216,"./directives/customValidator":232,"./directives/formio":233,"./directives/formioBindHtml.js":234,"./directives/formioComponent":235,"./directives/formioComponentView":236,"./directives/formioDelete":237,"./directives/formioElement":238,"./directives/formioErrors":239,"./directives/formioSubmission":240,"./directives/formioSubmissions":241,"./directives/formioWizard":242,"./factories/FormioScope":243,"./factories/FormioUtils":244,"./factories/formioInterceptor":246,"./factories/formioTableView":247,"./filters/flattenComponents":248,"./filters/safehtml":249,"./filters/tableComponents":250,"./filters/tableFieldView":251,"./filters/tableView":252,"./filters/translate":253,"./filters/trusturl":254,"./polyfills/polyfills":258,"./providers/Formio":259}],257:[function(_dereq_,module,exports){
 "use strict";
 'use strict';
 
@@ -70424,13 +71622,13 @@ if (typeof Object.assign != 'function') {
   })();
 }
 
-},{}],256:[function(_dereq_,module,exports){
+},{}],258:[function(_dereq_,module,exports){
 "use strict";
 'use strict';
 
 _dereq_('./Object.assign');
 
-},{"./Object.assign":255}],257:[function(_dereq_,module,exports){
+},{"./Object.assign":257}],259:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   // The formio class.
@@ -70498,5 +71696,5 @@ module.exports = function() {
   };
 };
 
-},{"formiojs":25}]},{},[253])(253)
+},{"formiojs":25}]},{},[255])(255)
 });

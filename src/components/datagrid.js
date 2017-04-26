@@ -47,6 +47,7 @@ module.exports = function(app) {
           key: 'datagrid',
           protected: false,
           persistent: true,
+          hidden: false,
           clearOnHide: true
         }
       });

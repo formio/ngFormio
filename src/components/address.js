@@ -58,6 +58,7 @@ module.exports = function(app) {
           clearOnHide: true,
           unique: false,
           persistent: true,
+          hidden: false,
           map: {
             region: '',
             key: ''

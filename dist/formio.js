@@ -1,4 +1,4 @@
-/*! ng-formio v2.15.8 | https://unpkg.com/ng-formio@2.15.8/LICENSE.txt */
+/*! ng-formio v2.16.0 | https://unpkg.com/ng-formio@2.16.0/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 /*!
  * EventEmitter2
@@ -7709,6 +7709,43 @@ return SignaturePad;
     return
   }
 
+  var support = {
+    searchParams: 'URLSearchParams' in self,
+    iterable: 'Symbol' in self && 'iterator' in Symbol,
+    blob: 'FileReader' in self && 'Blob' in self && (function() {
+      try {
+        new Blob()
+        return true
+      } catch(e) {
+        return false
+      }
+    })(),
+    formData: 'FormData' in self,
+    arrayBuffer: 'ArrayBuffer' in self
+  }
+
+  if (support.arrayBuffer) {
+    var viewClasses = [
+      '[object Int8Array]',
+      '[object Uint8Array]',
+      '[object Uint8ClampedArray]',
+      '[object Int16Array]',
+      '[object Uint16Array]',
+      '[object Int32Array]',
+      '[object Uint32Array]',
+      '[object Float32Array]',
+      '[object Float64Array]'
+    ]
+
+    var isDataView = function(obj) {
+      return obj && DataView.prototype.isPrototypeOf(obj)
+    }
+
+    var isArrayBufferView = ArrayBuffer.isView || function(obj) {
+      return obj && viewClasses.indexOf(Object.prototype.toString.call(obj)) > -1
+    }
+  }
+
   function normalizeName(name) {
     if (typeof name !== 'string') {
       name = String(name)
@@ -7726,6 +7763,24 @@ return SignaturePad;
     return value
   }
 
+  // Build a destructive iterator for the value list
+  function iteratorFor(items) {
+    var iterator = {
+      next: function() {
+        var value = items.shift()
+        return {done: value === undefined, value: value}
+      }
+    }
+
+    if (support.iterable) {
+      iterator[Symbol.iterator] = function() {
+        return iterator
+      }
+    }
+
+    return iterator
+  }
+
   function Headers(headers) {
     this.map = {}
 
@@ -7733,7 +7788,10 @@ return SignaturePad;
       headers.forEach(function(value, name) {
         this.append(name, value)
       }, this)
-
+    } else if (Array.isArray(headers)) {
+      headers.forEach(function(header) {
+        this.append(header[0], header[1])
+      }, this)
     } else if (headers) {
       Object.getOwnPropertyNames(headers).forEach(function(name) {
         this.append(name, headers[name])
@@ -7744,12 +7802,8 @@ return SignaturePad;
   Headers.prototype.append = function(name, value) {
     name = normalizeName(name)
     value = normalizeValue(value)
-    var list = this.map[name]
-    if (!list) {
-      list = []
-      this.map[name] = list
-    }
-    list.push(value)
+    var oldValue = this.map[name]
+    this.map[name] = oldValue ? oldValue+','+value : value
   }
 
   Headers.prototype['delete'] = function(name) {
@@ -7757,12 +7811,8 @@ return SignaturePad;
   }
 
   Headers.prototype.get = function(name) {
-    var values = this.map[normalizeName(name)]
-    return values ? values[0] : null
-  }
-
-  Headers.prototype.getAll = function(name) {
-    return this.map[normalizeName(name)] || []
+    name = normalizeName(name)
+    return this.has(name) ? this.map[name] : null
   }
 
   Headers.prototype.has = function(name) {
@@ -7770,15 +7820,37 @@ return SignaturePad;
   }
 
   Headers.prototype.set = function(name, value) {
-    this.map[normalizeName(name)] = [normalizeValue(value)]
+    this.map[normalizeName(name)] = normalizeValue(value)
   }
 
   Headers.prototype.forEach = function(callback, thisArg) {
-    Object.getOwnPropertyNames(this.map).forEach(function(name) {
-      this.map[name].forEach(function(value) {
-        callback.call(thisArg, value, name, this)
-      }, this)
-    }, this)
+    for (var name in this.map) {
+      if (this.map.hasOwnProperty(name)) {
+        callback.call(thisArg, this.map[name], name, this)
+      }
+    }
+  }
+
+  Headers.prototype.keys = function() {
+    var items = []
+    this.forEach(function(value, name) { items.push(name) })
+    return iteratorFor(items)
+  }
+
+  Headers.prototype.values = function() {
+    var items = []
+    this.forEach(function(value) { items.push(value) })
+    return iteratorFor(items)
+  }
+
+  Headers.prototype.entries = function() {
+    var items = []
+    this.forEach(function(value, name) { items.push([name, value]) })
+    return iteratorFor(items)
+  }
+
+  if (support.iterable) {
+    Headers.prototype[Symbol.iterator] = Headers.prototype.entries
   }
 
   function consumed(body) {
@@ -7801,46 +7873,59 @@ return SignaturePad;
 
   function readBlobAsArrayBuffer(blob) {
     var reader = new FileReader()
+    var promise = fileReaderReady(reader)
     reader.readAsArrayBuffer(blob)
-    return fileReaderReady(reader)
+    return promise
   }
 
   function readBlobAsText(blob) {
     var reader = new FileReader()
+    var promise = fileReaderReady(reader)
     reader.readAsText(blob)
-    return fileReaderReady(reader)
+    return promise
   }
 
-  var support = {
-    blob: 'FileReader' in self && 'Blob' in self && (function() {
-      try {
-        new Blob()
-        return true
-      } catch(e) {
-        return false
-      }
-    })(),
-    formData: 'FormData' in self,
-    arrayBuffer: 'ArrayBuffer' in self
+  function readArrayBufferAsText(buf) {
+    var view = new Uint8Array(buf)
+    var chars = new Array(view.length)
+
+    for (var i = 0; i < view.length; i++) {
+      chars[i] = String.fromCharCode(view[i])
+    }
+    return chars.join('')
+  }
+
+  function bufferClone(buf) {
+    if (buf.slice) {
+      return buf.slice(0)
+    } else {
+      var view = new Uint8Array(buf.byteLength)
+      view.set(new Uint8Array(buf))
+      return view.buffer
+    }
   }
 
   function Body() {
     this.bodyUsed = false
 
-
     this._initBody = function(body) {
       this._bodyInit = body
-      if (typeof body === 'string') {
+      if (!body) {
+        this._bodyText = ''
+      } else if (typeof body === 'string') {
         this._bodyText = body
       } else if (support.blob && Blob.prototype.isPrototypeOf(body)) {
         this._bodyBlob = body
       } else if (support.formData && FormData.prototype.isPrototypeOf(body)) {
         this._bodyFormData = body
-      } else if (!body) {
-        this._bodyText = ''
-      } else if (support.arrayBuffer && ArrayBuffer.prototype.isPrototypeOf(body)) {
-        // Only support ArrayBuffers for POST method.
-        // Receiving ArrayBuffers happens via Blobs, instead.
+      } else if (support.searchParams && URLSearchParams.prototype.isPrototypeOf(body)) {
+        this._bodyText = body.toString()
+      } else if (support.arrayBuffer && support.blob && isDataView(body)) {
+        this._bodyArrayBuffer = bufferClone(body.buffer)
+        // IE 10-11 can't handle a DataView body.
+        this._bodyInit = new Blob([this._bodyArrayBuffer])
+      } else if (support.arrayBuffer && (ArrayBuffer.prototype.isPrototypeOf(body) || isArrayBufferView(body))) {
+        this._bodyArrayBuffer = bufferClone(body)
       } else {
         throw new Error('unsupported BodyInit type')
       }
@@ -7850,6 +7935,8 @@ return SignaturePad;
           this.headers.set('content-type', 'text/plain;charset=UTF-8')
         } else if (this._bodyBlob && this._bodyBlob.type) {
           this.headers.set('content-type', this._bodyBlob.type)
+        } else if (support.searchParams && URLSearchParams.prototype.isPrototypeOf(body)) {
+          this.headers.set('content-type', 'application/x-www-form-urlencoded;charset=UTF-8')
         }
       }
     }
@@ -7863,6 +7950,8 @@ return SignaturePad;
 
         if (this._bodyBlob) {
           return Promise.resolve(this._bodyBlob)
+        } else if (this._bodyArrayBuffer) {
+          return Promise.resolve(new Blob([this._bodyArrayBuffer]))
         } else if (this._bodyFormData) {
           throw new Error('could not read FormData body as blob')
         } else {
@@ -7871,27 +7960,28 @@ return SignaturePad;
       }
 
       this.arrayBuffer = function() {
-        return this.blob().then(readBlobAsArrayBuffer)
-      }
-
-      this.text = function() {
-        var rejected = consumed(this)
-        if (rejected) {
-          return rejected
-        }
-
-        if (this._bodyBlob) {
-          return readBlobAsText(this._bodyBlob)
-        } else if (this._bodyFormData) {
-          throw new Error('could not read FormData body as text')
+        if (this._bodyArrayBuffer) {
+          return consumed(this) || Promise.resolve(this._bodyArrayBuffer)
         } else {
-          return Promise.resolve(this._bodyText)
+          return this.blob().then(readBlobAsArrayBuffer)
         }
       }
-    } else {
-      this.text = function() {
-        var rejected = consumed(this)
-        return rejected ? rejected : Promise.resolve(this._bodyText)
+    }
+
+    this.text = function() {
+      var rejected = consumed(this)
+      if (rejected) {
+        return rejected
+      }
+
+      if (this._bodyBlob) {
+        return readBlobAsText(this._bodyBlob)
+      } else if (this._bodyArrayBuffer) {
+        return Promise.resolve(readArrayBufferAsText(this._bodyArrayBuffer))
+      } else if (this._bodyFormData) {
+        throw new Error('could not read FormData body as text')
+      } else {
+        return Promise.resolve(this._bodyText)
       }
     }
 
@@ -7919,7 +8009,8 @@ return SignaturePad;
   function Request(input, options) {
     options = options || {}
     var body = options.body
-    if (Request.prototype.isPrototypeOf(input)) {
+
+    if (input instanceof Request) {
       if (input.bodyUsed) {
         throw new TypeError('Already read')
       }
@@ -7930,12 +8021,12 @@ return SignaturePad;
       }
       this.method = input.method
       this.mode = input.mode
-      if (!body) {
+      if (!body && input._bodyInit != null) {
         body = input._bodyInit
         input.bodyUsed = true
       }
     } else {
-      this.url = input
+      this.url = String(input)
     }
 
     this.credentials = options.credentials || this.credentials || 'omit'
@@ -7953,7 +8044,7 @@ return SignaturePad;
   }
 
   Request.prototype.clone = function() {
-    return new Request(this)
+    return new Request(this, { body: this._bodyInit })
   }
 
   function decode(body) {
@@ -7969,16 +8060,17 @@ return SignaturePad;
     return form
   }
 
-  function headers(xhr) {
-    var head = new Headers()
-    var pairs = (xhr.getAllResponseHeaders() || '').trim().split('\n')
-    pairs.forEach(function(header) {
-      var split = header.trim().split(':')
-      var key = split.shift().trim()
-      var value = split.join(':').trim()
-      head.append(key, value)
+  function parseHeaders(rawHeaders) {
+    var headers = new Headers()
+    rawHeaders.split(/\r?\n/).forEach(function(line) {
+      var parts = line.split(':')
+      var key = parts.shift().trim()
+      if (key) {
+        var value = parts.join(':').trim()
+        headers.append(key, value)
+      }
     })
-    return head
+    return headers
   }
 
   Body.call(Request.prototype)
@@ -7989,10 +8081,10 @@ return SignaturePad;
     }
 
     this.type = 'default'
-    this.status = options.status
+    this.status = 'status' in options ? options.status : 200
     this.ok = this.status >= 200 && this.status < 300
-    this.statusText = options.statusText
-    this.headers = options.headers instanceof Headers ? options.headers : new Headers(options.headers)
+    this.statusText = 'statusText' in options ? options.statusText : 'OK'
+    this.headers = new Headers(options.headers)
     this.url = options.url || ''
     this._initBody(bodyInit)
   }
@@ -8030,40 +8122,16 @@ return SignaturePad;
 
   self.fetch = function(input, init) {
     return new Promise(function(resolve, reject) {
-      var request
-      if (Request.prototype.isPrototypeOf(input) && !init) {
-        request = input
-      } else {
-        request = new Request(input, init)
-      }
-
+      var request = new Request(input, init)
       var xhr = new XMLHttpRequest()
 
-      function responseURL() {
-        if ('responseURL' in xhr) {
-          return xhr.responseURL
-        }
-
-        // Avoid security warnings on getResponseHeader when not allowed by CORS
-        if (/^X-Request-URL:/m.test(xhr.getAllResponseHeaders())) {
-          return xhr.getResponseHeader('X-Request-URL')
-        }
-
-        return
-      }
-
       xhr.onload = function() {
-        var status = (xhr.status === 1223) ? 204 : xhr.status
-        if (status < 100 || status > 599) {
-          reject(new TypeError('Network request failed'))
-          return
-        }
         var options = {
-          status: status,
+          status: xhr.status,
           statusText: xhr.statusText,
-          headers: headers(xhr),
-          url: responseURL()
+          headers: parseHeaders(xhr.getAllResponseHeaders() || '')
         }
+        options.url = 'responseURL' in xhr ? xhr.responseURL : options.headers.get('X-Request-URL')
         var body = 'response' in xhr ? xhr.response : xhr.responseText
         resolve(new Response(body, options))
       }
@@ -8158,6 +8226,7 @@ module.exports = function(app) {
           clearOnHide: true,
           unique: false,
           persistent: true,
+          hidden: false,
           map: {
             region: '',
             key: ''
@@ -8392,20 +8461,22 @@ module.exports = function(app) {
             : defaultValue;
 
           // FA-850 - Ensure the checked value is always a boolean object when loaded, then unbind the watch.
-          $scope.$watch('data.' + $scope.component.key, function() {
-            if (!$scope.data || !$scope.component.key) return;
+          if ($scope.component.inputType === 'checkbox') {
+            $scope.$watch('data.' + $scope.component.key, function() {
+              if (!$scope.data || !$scope.component.key) return;
 
-            // If the component is required, and its current value is false, delete the entry.
-            if (
-              $scope.component.validate
-              && $scope.component.validate.required
-              && (boolean[$scope.data[$scope.component.key]] || false) === false
-            ) {
-              $timeout(function() {
-                delete $scope.data[$scope.component.key];
-              });
-            }
-          });
+              // If the component is required, and its current value is false, delete the entry.
+              if (
+                $scope.component.validate
+                && $scope.component.validate.required
+                && (boolean[$scope.data[$scope.component.key]] || false) === false
+              ) {
+                $timeout(function() {
+                  delete $scope.data[$scope.component.key];
+                });
+              }
+            });
+          }
         }],
         settings: {
           input: true,
@@ -8419,6 +8490,9 @@ module.exports = function(app) {
           defaultValue: false,
           protected: false,
           persistent: true,
+          hidden: false,
+          name: '',
+          value: '',
           clearOnHide: true,
           validate: {
             required: false
@@ -8431,7 +8505,7 @@ module.exports = function(app) {
     '$templateCache',
     function($templateCache) {
       $templateCache.put('formio/components/checkbox.html',
-        "<div class=\"checkbox\">\n  <label for=\"{{ componentId }}\" ng-class=\"{'field-required': isRequired(component)}\">\n    <input\n      type=\"{{ component.inputType }}\"\n      id=\"{{ componentId }}\"\n      tabindex=\"{{ component.tabindex || 0 }}\"\n      ng-disabled=\"readOnly\"\n      ng-model=\"data[component.key]\"\n      ng-required=\"isRequired(component)\"\n      custom-validator=\"component.validate.custom\"\n    >\n    <span ng-if=\"!(component.hideLabel && component.datagridLabel === false)\">{{ component.label | formioTranslate:null:builder }}</span>\n  </label>\n</div>\n<div ng-if=\"!!component.description\" class=\"help-block\">\n  <span>{{ component.description }}</span>\n</div>\n"
+        "<div class=\"checkbox\">\n  <label for=\"{{ componentId }}\" ng-class=\"{'field-required': isRequired(component)}\">\n    <input\n      ng-if=\"component.name\"\n      type=\"{{ component.inputType }}\"\n      id=\"{{ componentId }}\"\n      name=\"{{ component.name }}\"\n      value=\"{{ component.value }}\"\n      tabindex=\"{{ component.tabindex || 0 }}\"\n      ng-disabled=\"readOnly\"\n      ng-model=\"data[component.name]\"\n      ng-required=\"component.validate.required\"\n    >\n    <input\n      ng-if=\"!component.name\"\n      type=\"{{ component.inputType }}\"\n      id=\"{{ componentId }}\"\n      tabindex=\"{{ component.tabindex || 0 }}\"\n      ng-disabled=\"readOnly\"\n      ng-model=\"data[component.key]\"\n      ng-required=\"isRequired(component)\"\n      custom-validator=\"component.validate.custom\"\n    >\n    <span ng-if=\"!(component.hideLabel && component.datagridLabel === false)\">{{ component.label | formioTranslate:null:builder }}</span>\n  </label>\n</div>\n<div ng-if=\"!!component.description\" class=\"help-block\">\n  <span>{{ component.description }}</span>\n</div>\n"
       );
     }
   ]);
@@ -8724,6 +8798,7 @@ module.exports = function(app) {
           defaultValue: '',
           protected: false,
           persistent: true,
+          hidden: false,
           clearOnHide: true,
           validate: {
             required: false,
@@ -8830,6 +8905,7 @@ module.exports = function(app) {
           key: 'datagrid',
           protected: false,
           persistent: true,
+          hidden: false,
           clearOnHide: true
         }
       });
@@ -9047,6 +9123,7 @@ module.exports = function(app) {
           },
           protected: false,
           persistent: true,
+          hidden: false,
           clearOnHide: true,
           validate: {
             required: false,
@@ -9245,6 +9322,7 @@ module.exports = function(app) {
           dayFirst: false,
           protected: false,
           persistent: true,
+          hidden: false,
           clearOnHide: true,
           validate: {
             custom: ''
@@ -9290,6 +9368,7 @@ module.exports = function(app) {
           protected: false,
           unique: false,
           persistent: true,
+          hidden: false,
           clearOnHide: true,
           kickbox: {
             enabled: false
@@ -9359,6 +9438,7 @@ module.exports = function(app) {
           defaultValue: '',
           protected: false,
           persistent: true,
+          hidden: false,
           clearOnHide: true
         },
         viewTemplate: 'formio/componentsView/file.html'
@@ -9795,6 +9875,7 @@ module.exports = function(app) {
           defaultValue: '',
           protected: false,
           persistent: true,
+          hidden: false,
           clearOnHide: true,
           validate: {
             required: false,
@@ -9919,6 +10000,7 @@ module.exports = function(app) {
           suffix: '',
           protected: true,
           persistent: true,
+          hidden: false,
           clearOnHide: true
         }
       });
@@ -9949,6 +10031,7 @@ module.exports = function(app) {
           protected: false,
           unique: false,
           persistent: true,
+          hidden: false,
           defaultValue: '',
           clearOnHide: true,
           validate: {
@@ -9989,6 +10072,7 @@ module.exports = function(app) {
           defaultValue: '',
           protected: false,
           persistent: true,
+          hidden: false,
           clearOnHide: true,
           validate: {
             required: false,
@@ -10029,7 +10113,7 @@ module.exports = function(app) {
         template: function($scope) {
           return $scope.component.multiple ? 'formio/components/resource-multiple.html' : 'formio/components/resource.html';
         },
-        controller: ['$scope', 'Formio', function($scope, Formio) {
+        controller: ['$scope', 'Formio', 'ngDialog', function($scope, Formio, ngDialog) {
           if ($scope.builder) return;
           var settings = $scope.component;
           var params = settings.params || {};
@@ -10094,6 +10178,65 @@ module.exports = function(app) {
             };
 
             $scope.refreshSubmissions();
+
+            // Add a new resource.
+            $scope.newResource = function() {
+              var template  = '<br>' +
+                              '<div class="row">' +
+                                '<div class="col-sm-12">' +
+                                  '<div class="panel panel-default">' +
+                                    '<div class="panel-heading">' +
+                                      '<h3 class="panel-title">{{ component.addResourceLabel || "Add Resource" | formioTranslate}}</h3>' +
+                                    '</div>' +
+                                    '<div class="panel-body">' +
+                                      '<formio src="formUrl"></formio>' +
+                                    '</div>' +
+                                  '</div>' +
+                                '</div>' +
+                              '</div>';
+
+              ngDialog.open({
+                template: template,
+                plain: true,
+                scope: $scope,
+                controller: ['$scope', function($scope) {
+                  $scope.formUrl = $scope.formio.formsUrl + '/' + $scope.component.resource;
+
+                  // Bind when the form is loaded.
+                  $scope.$on('formLoad', function(event) {
+                    event.stopPropagation(); // Don't confuse app
+                  });
+
+                  // Bind when the form is submitted.
+                  $scope.$on('formSubmission', function(event, submission) {
+                    var component = $scope.component;
+                    var data      = $scope.data;
+
+                    if (component.multiple) {
+                      data[component.key].push(submission);
+                    }
+                    else {
+                      data[component.key] = submission;
+                    }
+
+                    $scope.refreshSubmissions();
+                    $scope.closeThisDialog(submission);
+                  });
+                }]
+              }).closePromise.then(function(/*e*/) {
+              //var cancelled = e.value === false || e.value === '$closeButton' || e.value === '$document';
+              });
+            };
+
+            // Close all open dialogs on state change (using UI-Router).
+            $scope.$on('$stateChangeStart', function() {
+              ngDialog.closeAll(false);
+            });
+
+            // Close all open dialogs on route change (using ngRoute).
+            $scope.$on('$routeChangeStart', function() {
+              ngDialog.closeAll(false);
+            });
           }
         }],
         group: 'advanced',
@@ -10112,6 +10255,7 @@ module.exports = function(app) {
           multiple: false,
           protected: false,
           persistent: true,
+          hidden: false,
           clearOnHide: true,
           validate: {
             required: false
@@ -10126,12 +10270,12 @@ module.exports = function(app) {
     '$templateCache',
     function($templateCache) {
       $templateCache.put('formio/components/resource.html',
-        "<label ng-if=\"component.label && !component.hideLabel\" for=\"{{ componentId }}\" class=\"control-label\" ng-class=\"{'field-required': isRequired(component)}\">{{ component.label | formioTranslate:null:builder }}</label>\n<span ng-if=\"!component.label && isRequired(component)\" class=\"glyphicon glyphicon-asterisk form-control-feedback field-required-inline\" aria-hidden=\"true\"></span>\n<ui-select ui-select-required safe-multiple-to-single ui-select-open-on-focus ng-model=\"data[component.key]\" ng-disabled=\"readOnly\" ng-required=\"isRequired(component)\" id=\"{{ componentId }}\" name=\"{{ componentId }}\" theme=\"bootstrap\" tabindex=\"{{ component.tabindex || 0 }}\">\n  <ui-select-match class=\"ui-select-match\" placeholder=\"{{ component.placeholder | formioTranslate:null:builder }}\">\n    <formio-select-item template=\"component.template\" item=\"$item || $select.selected\" select=\"$select\"></formio-select-item>\n  </ui-select-match>\n  <ui-select-choices class=\"ui-select-choices\" repeat=\"item in selectItems | filter: $select.search\" refresh=\"refreshSubmissions($select.search)\" refresh-delay=\"250\">\n    <formio-select-item template=\"component.template\" item=\"item\" select=\"$select\"></formio-select-item>\n    <button ng-if=\"hasNextPage && ($index == $select.items.length-1)\" class=\"btn btn-success btn-block\" ng-click=\"loadMoreItems($select, $event)\" ng-disabled=\"resourceLoading\">Load more...</button>\n  </ui-select-choices>\n</ui-select>\n<formio-errors ng-if=\"::!builder\"></formio-errors>\n"
+        "<div ng-if=\"!component.addResource\">\n  <label ng-if=\"component.label && !component.hideLabel\" for=\"{{ componentId }}\" class=\"control-label\" ng-class=\"{'field-required': isRequired(component)}\">{{ component.label | formioTranslate:null:builder }}</label>\n  <span ng-if=\"!component.label && isRequired(component)\" class=\"glyphicon glyphicon-asterisk form-control-feedback field-required-inline\" aria-hidden=\"true\"></span>\n  <ui-select ui-select-required safe-multiple-to-single ui-select-open-on-focus ng-model=\"data[component.key]\" ng-disabled=\"readOnly\" ng-required=\"isRequired(component)\" id=\"{{ componentId }}\" name=\"{{ componentId }}\" theme=\"bootstrap\" tabindex=\"{{ component.tabindex || 0 }}\">\n    <ui-select-match class=\"ui-select-match\" placeholder=\"{{ component.placeholder | formioTranslate:null:builder }}\">\n      <formio-select-item template=\"component.template\" item=\"$item || $select.selected\" select=\"$select\"></formio-select-item>\n    </ui-select-match>\n    <ui-select-choices class=\"ui-select-choices\" repeat=\"item in selectItems | filter: $select.search\" refresh=\"refreshSubmissions($select.search)\" refresh-delay=\"250\">\n      <formio-select-item template=\"component.template\" item=\"item\" select=\"$select\"></formio-select-item>\n      <button ng-if=\"hasNextPage && ($index == $select.items.length-1)\" class=\"btn btn-success btn-block\" ng-click=\"loadMoreItems($select, $event)\" ng-disabled=\"resourceLoading\">Load more...</button>\n    </ui-select-choices>\n  </ui-select>\n  <formio-errors ng-if=\"::!builder\"></formio-errors>\n</div>\n<div ng-if=\"component.addResource\">\n  <table class=\"table table-bordered\">\n    <label ng-if=\"component.label && !component.hideLabel\" for=\"{{ componentId }}\" class=\"control-label\" ng-class=\"{'field-required': isRequired(component)}\">{{ component.label | formioTranslate:null:builder }}</label>\n    <span ng-if=\"!component.label && isRequired(component)\" class=\"glyphicon glyphicon-asterisk form-control-feedback field-required-inline\" aria-hidden=\"true\"></span>\n    <tr>\n      <td>\n        <ui-select ui-select-required safe-multiple-to-single ui-select-open-on-focus ng-model=\"data[component.key]\" ng-disabled=\"readOnly\" ng-required=\"isRequired(component)\" id=\"{{ componentId }}\" name=\"{{ componentId }}\" theme=\"bootstrap\" tabindex=\"{{ component.tabindex || 0 }}\">\n          <ui-select-match class=\"ui-select-match\" placeholder=\"{{ component.placeholder | formioTranslate:null:builder }}\">\n            <formio-select-item template=\"component.template\" item=\"$item || $select.selected\" select=\"$select\"></formio-select-item>\n          </ui-select-match>\n          <ui-select-choices class=\"ui-select-choices\" repeat=\"item in selectItems | filter: $select.search\" refresh=\"refreshSubmissions($select.search)\" refresh-delay=\"250\">\n            <formio-select-item template=\"component.template\" item=\"item\" select=\"$select\"></formio-select-item>\n            <button ng-if=\"hasNextPage && ($index == $select.items.length-1)\" class=\"btn btn-success btn-block\" ng-click=\"loadMoreItems($select, $event)\" ng-disabled=\"resourceLoading\">Load more...</button>\n          </ui-select-choices>\n        </ui-select>\n        <formio-errors ng-if=\"::!builder\"></formio-errors>\n      </td>\n    </tr>\n    <tr>\n      <td>\n        <a ng-click=\"newResource()\" class=\"btn btn-primary\">\n          <span class=\"glyphicon glyphicon-plus\" aria-hidden=\"true\"></span> {{ component.addResourceLabel || \"Add Resource\" | formioTranslate:null:builder}}\n        </a>\n      </td>\n    </tr>\n  </table>\n</div>\n"
       );
 
       // Change the ui-select to ui-select multiple.
       $templateCache.put('formio/components/resource-multiple.html',
-        $templateCache.get('formio/components/resource.html').replace('<ui-select', '<ui-select multiple')
+        $templateCache.get('formio/components/resource.html').replace(/<ui-select\s/g, '<ui-select multiple ')
       );
     }
   ]);
@@ -10680,6 +10824,7 @@ module.exports = function(app) {
           protected: false,
           unique: false,
           persistent: true,
+          hidden: false,
           clearOnHide: true,
           validate: {
             required: false
@@ -10788,6 +10933,7 @@ module.exports = function(app) {
           inline: false,
           protected: false,
           persistent: true,
+          hidden: false,
           clearOnHide: true,
           validate: {
             required: false
@@ -10840,6 +10986,7 @@ module.exports = function(app) {
           maxWidth: '2.5',
           protected: false,
           persistent: true,
+          hidden: false,
           clearOnHide: true,
           validate: {
             required: false
@@ -10987,6 +11134,7 @@ module.exports = function(app) {
           defaultValue: '',
           protected: false,
           persistent: true,
+          hidden: false,
           clearOnHide: true,
           validate: {
             required: false,
@@ -11108,6 +11256,7 @@ module.exports = function(app) {
           defaultValue: '',
           protected: false,
           persistent: true,
+          hidden: false,
           wysiwyg: false,
           clearOnHide: true,
           validate: {
@@ -11163,6 +11312,7 @@ module.exports = function(app) {
           protected: false,
           unique: false,
           persistent: true,
+          hidden: false,
           clearOnHide: true,
           validate: {
             required: false,
@@ -11333,19 +11483,66 @@ module.exports = function() {
       'FormioScope',
       'Formio',
       'FormioUtils',
+      '$q',
       function(
         $scope,
         $http,
         $element,
         FormioScope,
         Formio,
-        FormioUtils
+        FormioUtils,
+        $q
       ) {
+        var iframeReady = $q.defer();
         $scope._src = $scope.src || '';
         $scope.formioAlerts = [];
+        $scope.iframeReady = false;
         // Shows the given alerts (single or array), and dismisses old alerts
         this.showAlerts = $scope.showAlerts = function(alerts) {
           $scope.formioAlerts = [].concat(alerts);
+        };
+
+        $scope.getIframeSrc = function(pdf) {
+          var iframeSrc = pdf.src + '.html';
+          var params = [];
+          if ($scope.form.builder) {
+            params.push('builder=1');
+          }
+          if ($scope.readOnly) {
+            params.push('readonly=1');
+          }
+          if (params.length) {
+            iframeSrc += '?' + params.join('&');
+          }
+          return iframeSrc;
+        };
+
+        $scope.downloadUrl = '';
+        $scope.getPDFDownload = function(pdf) {
+          if (!$scope.formio) {
+            return;
+          }
+          var download = '';
+          if ($scope.formio && $scope.formio.submissionUrl) {
+            download = $scope.formio.submissionUrl;
+          }
+          else if ($scope.submission._id) {
+            download = Formio.baseUrl + '/project/' + $scope.form.project + '/';
+            download += '/form/' + $scope.form._id;
+            download += '/submission/' + $scope.submission._id;
+          }
+          if (!download) {
+            return;
+          }
+
+          download += '/download/' + pdf.id;
+          var allowedPath = download.replace(Formio.baseUrl, '');
+          allowedPath = allowedPath.replace(Formio.getProjectUrl(), '');
+          return $scope.formio.getTempToken(3600, 'GET:' + allowedPath).then(function(tempToken) {
+            download += '?token=' + tempToken;
+            $scope.downloadUrl = download;
+            return download;
+          });
         };
 
         // Add the live form parameter to the url.
@@ -11354,9 +11551,60 @@ module.exports = function() {
           $scope._src += 'live=1';
         }
 
-        var cancelFormLoadEvent = $scope.$on('formLoad', function() {
-          cancelFormLoadEvent();
+        var sendIframeMessage = function(message) {
+          iframeReady.promise.then(function(iframe) {
+            iframe.contentWindow.postMessage(JSON.stringify(message), '*');
+          });
+        };
+
+        $scope.$on('iframe-ready', function() {
+          $scope.iframeReady = true;
+          var iframe = $element.find('.formio-iframe')[0];
+          if (iframe) {
+            iframeReady.resolve(iframe);
+            if ($scope.form) {
+              sendIframeMessage({name: 'form', data: $scope.form});
+            }
+            if ($scope.submission) {
+              sendIframeMessage({name: 'submission', data: $scope.submission});
+            }
+          }
         });
+
+        $scope.$on('iframeMessage', function(event, message) {
+          sendIframeMessage(message);
+        });
+
+        var cancelFormLoadEvent = $scope.$on('formLoad', function(event, form) {
+          cancelFormLoadEvent();
+          iframeReady.promise.then(function() {
+            $scope.getPDFDownload(form.settings.pdf);
+          });
+          sendIframeMessage({name: 'form', data: form});
+        });
+
+        $scope.$on('submissionLoad', function(event, submission) {
+          submission.editable = !$scope.readOnly;
+          sendIframeMessage({name: 'submission', data: submission});
+        });
+
+        // Submit the form from the iframe.
+        $scope.$on('iframe-submission', function(event, submission) {
+          $scope.submitForm(submission);
+        });
+
+        // Called from the submit on iframe.
+        $scope.submitIFrameForm = function() {
+          sendIframeMessage({name: 'getSubmission'});
+        };
+
+        $scope.zoomIn = function() {
+          sendIframeMessage({name: 'zoomIn'});
+        };
+
+        $scope.zoomOut = function() {
+          sendIframeMessage({name: 'zoomOut'});
+        };
 
         // FOR-71
         if (!$scope._src && !$scope.builder) {
@@ -11398,6 +11646,69 @@ module.exports = function() {
             $scope.submission ? $scope.submission.data : null,
             $scope.hideComponents
           );
+        };
+
+        // Show the submit message and say the form is no longer submitting.
+        var onSubmit = function(submission, message, form) {
+          if (message) {
+            $scope.showAlerts({
+              type: 'success',
+              message: message
+            });
+          }
+          if (form) {
+            form.submitting = false;
+          }
+        };
+
+        // Called when a submission has been made.
+        var onSubmitDone = function(method, submission, form) {
+          var message = '';
+          if ($scope.options && $scope.options.submitMessage) {
+            message = $scope.options.submitMessage;
+          }
+          else {
+            message = 'Submission was ' + ((method === 'put') ? 'updated' : 'created') + '.';
+          }
+          onSubmit(submission, message, form);
+          // Trigger the form submission.
+          $scope.$emit('formSubmission', submission);
+        };
+
+        $scope.submitForm = function(submissionData, form) {
+          // Allow custom action urls.
+          if ($scope.action) {
+            var method = submissionData._id ? 'put' : 'post';
+            var action = $scope.action;
+            // Add the action Id if it is not already part of the url.
+            if (method === 'put' && (action.indexOf(submissionData._id) === -1)) {
+              action += '/' + submissionData._id;
+            }
+            $http[method](action, submissionData).success(function(submission) {
+              Formio.clearCache();
+              onSubmitDone(method, submission, form);
+            }, FormioScope.onError($scope, $element))
+              .finally(function() {
+                if (form) {
+                  form.submitting = false;
+                }
+              });
+          }
+
+          // If they wish to submit to the default location.
+          else if ($scope.formio && !$scope.formio.noSubmit) {
+            // copy to remove angular $$hashKey
+            $scope.formio.saveSubmission(submissionData, $scope.formioOptions).then(function(submission) {
+              onSubmitDone(submission.method, submission, form);
+            }, FormioScope.onError($scope, $element)).finally(function() {
+              if (form) {
+                form.submitting = false;
+              }
+            });
+          }
+          else {
+            $scope.$emit('formSubmission', submissionData);
+          }
         };
 
         $scope.isDisabled = function(component) {
@@ -11500,34 +11811,9 @@ module.exports = function() {
             }
           });
 
-          // Show the submit message and say the form is no longer submitting.
-          var onSubmit = function(submission, message) {
-            if (message) {
-              $scope.showAlerts({
-                type: 'success',
-                message: message
-              });
-            }
-            form.submitting = false;
-          };
-
-          // Called when a submission has been made.
-          var onSubmitDone = function(method, submission) {
-            var message = '';
-            if ($scope.options && $scope.options.submitMessage) {
-              message = $scope.options.submitMessage;
-            }
-            else {
-              message = 'Submission was ' + ((method === 'put') ? 'updated' : 'created') + '.';
-            }
-            onSubmit(submission, message);
-            // Trigger the form submission.
-            $scope.$emit('formSubmission', submission);
-          };
-
           // Allow the form to be completed externally.
           $scope.$on('submitDone', function(event, submission, message) {
-            onSubmit(submission, message);
+            onSubmit(submission, message, form);
           });
 
           // Allow an error to be thrown externally.
@@ -11544,36 +11830,7 @@ module.exports = function() {
 
           // Make sure to make a copy of the submission data to remove bad characters.
           submissionData = angular.copy(submissionData);
-
-          // Allow custom action urls.
-          if ($scope.action) {
-            var method = submissionData._id ? 'put' : 'post';
-            var action = $scope.action;
-            // Add the action Id if it is not already part of the url.
-            if (method === 'put' && (action.indexOf(submissionData._id) === -1)) {
-              action += '/' + submissionData._id;
-            }
-            $http[method](action, submissionData).then(function(response) {
-              Formio.clearCache();
-              onSubmitDone(method, response.data);
-            }, FormioScope.onError($scope, $element))
-              .finally(function() {
-                form.submitting = false;
-              });
-          }
-
-          // If they wish to submit to the default location.
-          else if ($scope.formio && !$scope.formio.noSubmit) {
-            // copy to remove angular $$hashKey
-            $scope.formio.saveSubmission(submissionData, $scope.formioOptions).then(function(submission) {
-              onSubmitDone(submission.method, submission);
-            }, FormioScope.onError($scope, $element)).finally(function() {
-              form.submitting = false;
-            });
-          }
-          else {
-            $scope.$emit('formSubmission', submissionData);
-          }
+          $scope.submitForm(submissionData, form);
         };
       }
     ],
@@ -13329,6 +13586,14 @@ module.exports = [
 
 },{}],226:[function(_dereq_,module,exports){
 "use strict";
+module.exports = ['$sce', function($sce) {
+  return function(val) {
+    return $sce.trustAsResourceUrl(val);
+  };
+}];
+
+},{}],227:[function(_dereq_,module,exports){
+"use strict";
 _dereq_('./polyfills/polyfills');
 
 
@@ -13390,7 +13655,7 @@ app.filter('tableView', _dereq_('./filters/tableView'));
 app.filter('tableFieldView', _dereq_('./filters/tableFieldView'));
 app.filter('safehtml', _dereq_('./filters/safehtml'));
 app.filter('formioTranslate', _dereq_('./filters/translate'));
-
+app.filter('trustAsResourceUrl', _dereq_('./filters/trusturl'));
 app.config([
   '$httpProvider',
   '$injector',
@@ -13419,10 +13684,25 @@ app.config([
 
 app.run([
   '$templateCache',
-  function($templateCache) {
+  '$rootScope',
+  '$window',
+  function($templateCache, $rootScope, $window) {
+    $window.addEventListener('message', function(event) {
+      var eventData = null;
+      try {
+        eventData = JSON.parse(event.data);
+      }
+      catch (err) {
+        eventData = null;
+      }
+      if (eventData && eventData.name) {
+        $rootScope.$broadcast('iframe-' + eventData.name, eventData.data);
+      }
+    });
+
     // The template for the formio forms.
     $templateCache.put('formio.html',
-      "<div>\n  <i style=\"font-size: 2em;\" ng-if=\"formLoading\" ng-class=\"{'formio-hidden': !formLoading}\" class=\"formio-loading glyphicon glyphicon-refresh glyphicon-spin\"></i>\n  <formio-wizard ng-if=\"form.display === 'wizard'\" src=\"src\" form=\"form\" submission=\"submission\" form-action=\"formAction\" read-only=\"readOnly\" hide-components=\"hideComponents\" disable-components=\"disableComponents\" formio-options=\"formioOptions\" storage=\"form.name\"></formio-wizard>\n  <form ng-if=\"!form.display || (form.display === 'form')\" role=\"form\" name=\"formioForm\" ng-submit=\"onSubmit(formioForm)\" novalidate>\n    <div ng-repeat=\"alert in formioAlerts track by $index\" class=\"alert alert-{{ alert.type }}\" role=\"alert\" ng-if=\"::!builder\">\n      {{ alert.message | formioTranslate:null:builder }}\n    </div>\n    <!-- DO NOT PUT \"track by $index\" HERE SINCE DYNAMICALLY ADDING/REMOVING COMPONENTS WILL BREAK -->\n    <formio-component\n      ng-repeat=\"component in form.components track by $index\"\n      component=\"component\"\n      ng-if=\"builder ? '::true' : isVisible(component)\"\n      data=\"submission.data\"\n      formio-form=\"formioForm\"\n      formio=\"formio\"\n      submission=\"submission\"\n      hide-components=\"hideComponents\"\n      read-only=\"isDisabled(component, submission.data)\"\n      builder=\"builder\"\n    ></formio-component>\n  </form>\n</div>\n"
+      "<div>\n  <i style=\"font-size: 2em;\" ng-if=\"formLoading\" ng-class=\"{'formio-hidden': !formLoading}\" class=\"formio-loading glyphicon glyphicon-refresh glyphicon-spin\"></i>\n  <formio-wizard ng-if=\"form.display === 'wizard'\" src=\"src\" form=\"form\" submission=\"submission\" form-action=\"formAction\" read-only=\"readOnly\" hide-components=\"hideComponents\" disable-components=\"disableComponents\" formio-options=\"formioOptions\" storage=\"form.name\"></formio-wizard>\n  <div ng-if=\"form.display === 'pdf' && form.settings.pdf\" style=\"position:relative;\">\n    <span style=\"position:absolute;right:10px;top:10px;cursor:pointer;\" class=\"btn btn-default no-disable\" ng-click=\"zoomIn()\"><spann class=\"glyphicon glyphicon-zoom-in\"></spann></span>\n    <span style=\"position:absolute;right:10px;top:60px;cursor:pointer;\" class=\"btn btn-default no-disable\" ng-click=\"zoomOut()\"><span class=\"glyphicon glyphicon-zoom-out\"></span></span>\n    <a ng-if=\"downloadUrl\" style=\"position:absolute;right:10px;top:110px;cursor:pointer;\" class=\"btn btn-primary no-disable\" href=\"{{ downloadUrl | trustAsResourceUrl }}\" target=\"_blank\"><span class=\"glyphicon glyphicon-cloud-download\"></span></a>\n    <iframe src=\"{{ getIframeSrc(form.settings.pdf) | trustAsResourceUrl }}\" seamless class=\"formio-iframe\"></iframe>\n    <button ng-if=\"!readOnly && !form.builder\" type=\"button\" class=\"btn btn-primary\" ng-click=\"submitIFrameForm()\">Submit</button>\n  </div>\n  <form ng-if=\"!form.display || (form.display === 'form')\" role=\"form\" name=\"formioForm\" ng-submit=\"onSubmit(formioForm)\" novalidate>\n    <div ng-repeat=\"alert in formioAlerts track by $index\" class=\"alert alert-{{ alert.type }}\" role=\"alert\" ng-if=\"::!builder\">\n      {{ alert.message | formioTranslate:null:builder }}\n    </div>\n    <!-- DO NOT PUT \"track by $index\" HERE SINCE DYNAMICALLY ADDING/REMOVING COMPONENTS WILL BREAK -->\n    <formio-component\n      ng-repeat=\"component in form.components track by $index\"\n      component=\"component\"\n      ng-if=\"builder ? '::true' : isVisible(component)\"\n      data=\"submission.data\"\n      formio-form=\"formioForm\"\n      formio=\"formio\"\n      submission=\"submission\"\n      hide-components=\"hideComponents\"\n      read-only=\"isDisabled(component, submission.data)\"\n      builder=\"builder\"\n    ></formio-component>\n  </form>\n</div>\n"
     );
 
     $templateCache.put('formio-wizard.html',
@@ -13462,7 +13742,7 @@ app.run([
 
 _dereq_('./components');
 
-},{"./components":188,"./directives/customValidator":204,"./directives/formio":205,"./directives/formioBindHtml.js":206,"./directives/formioComponent":207,"./directives/formioComponentView":208,"./directives/formioDelete":209,"./directives/formioElement":210,"./directives/formioErrors":211,"./directives/formioSubmission":212,"./directives/formioSubmissions":213,"./directives/formioWizard":214,"./factories/FormioScope":215,"./factories/FormioUtils":216,"./factories/formioInterceptor":218,"./factories/formioTableView":219,"./filters/flattenComponents":220,"./filters/safehtml":221,"./filters/tableComponents":222,"./filters/tableFieldView":223,"./filters/tableView":224,"./filters/translate":225,"./polyfills/polyfills":228,"./providers/Formio":229}],227:[function(_dereq_,module,exports){
+},{"./components":188,"./directives/customValidator":204,"./directives/formio":205,"./directives/formioBindHtml.js":206,"./directives/formioComponent":207,"./directives/formioComponentView":208,"./directives/formioDelete":209,"./directives/formioElement":210,"./directives/formioErrors":211,"./directives/formioSubmission":212,"./directives/formioSubmissions":213,"./directives/formioWizard":214,"./factories/FormioScope":215,"./factories/FormioUtils":216,"./factories/formioInterceptor":218,"./factories/formioTableView":219,"./filters/flattenComponents":220,"./filters/safehtml":221,"./filters/tableComponents":222,"./filters/tableFieldView":223,"./filters/tableView":224,"./filters/translate":225,"./filters/trusturl":226,"./polyfills/polyfills":229,"./providers/Formio":230}],228:[function(_dereq_,module,exports){
 "use strict";
 'use strict';
 
@@ -13493,13 +13773,13 @@ if (typeof Object.assign != 'function') {
   })();
 }
 
-},{}],228:[function(_dereq_,module,exports){
+},{}],229:[function(_dereq_,module,exports){
 "use strict";
 'use strict';
 
 _dereq_('./Object.assign');
 
-},{"./Object.assign":227}],229:[function(_dereq_,module,exports){
+},{"./Object.assign":228}],230:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   // The formio class.
@@ -13567,5 +13847,5 @@ module.exports = function() {
   };
 };
 
-},{"formiojs":2}]},{},[226])(226)
+},{"formiojs":2}]},{},[227])(227)
 });
