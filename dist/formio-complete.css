@@ -102,12 +102,6 @@
   animation: ngdialog-fadeout 0.5s;
 }
 
-.ngdialog-close {
-  -webkit-appearance: none;
-  background: none;
-  border: none;
-}
-
 .ngdialog-close:before {
   font-family: 'Helvetica', Arial, sans-serif;
   content: '\00D7';
@@ -118,7 +112,6 @@ html.ngdialog-open,
 body.ngdialog-open {
   overflow: hidden;
 }
-
 @-webkit-keyframes ngdialog-flyin {
   0% {
     opacity: 0;
@@ -313,7 +306,7 @@ body.ngdialog-open {
 /*!
  * ui-select
  * http://github.com/angular-ui/ui-select
- * Version: 0.19.5 - 2016-10-24T23:13:59.551Z
+ * Version: 0.19.7 - 2017-04-15T14:28:36.790Z
  * License: MIT
  */
 
@@ -637,19 +630,12 @@ body > .ui-select-bootstrap.open {
 }
 
 /* Spinner */
-.ui-select-refreshing {
+.ui-select-refreshing.glyphicon {
     position: absolute;
     right: 0;
     padding: 8px 27px;
-    top: 1px;
-    display: inline-block;
-    font-family: 'Glyphicons Halflings';
-    font-style: normal;
-    font-weight: normal;
-    line-height: 1;
-    -webkit-font-smoothing:antialiased;
  }
- 
+
 @-webkit-keyframes ui-select-spin {
   0% {
     -webkit-transform: rotate(0deg);
@@ -678,7 +664,8 @@ body > .ui-select-bootstrap.open {
 
 .ui-select-refreshing.ng-animate {
   -webkit-animation: none 0s;
-} 
+}
+
 .ngdialog.ngdialog-theme-default .ngdialog-content {
   width: 65%;
 }

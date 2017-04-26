@@ -7,12 +7,12 @@
   </thead>
   <tr ng-repeat="question in component.questions">
     <td>{{ question.label }}</td>
-    <td ng-repeat="v in component.values" style="text-align: center;">
+    <td ng-repeat="v in component.values track by $index" style="text-align: center;">
       <input
         type="radio"
         id="{{ componentId }}-{{ question.value }}-{{ v.value }}" name="{{ componentId }}-{{ question.value }}"
         tabindex="{{ component.tabindex || 0 }}"
-        value="{{ v.value }}"
+        ng-value="v.value"
         ng-model="data[component.key][question.value]"
         ng-required="isRequired(component)"
         ng-disabled="readOnly"
