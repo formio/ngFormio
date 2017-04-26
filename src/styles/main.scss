@@ -22,6 +22,7 @@ body {
 .grow { transition: all .2s ease-in-out; }
 .grow:hover { transform: scale(1.2); }
 
+
 .btn {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1752,6 +1753,18 @@ footer {
   .count {
     font-size: 3em;
   }
+}
+
+.ngdialog {
+  .ngdialog-content {
+    width: 80% !important;
+  }
+}
+
+.current {
+  text-align: center;
+  background-color:$brand-primary;
+  color: white;
 }
 
 .table > tbody > tr > td {

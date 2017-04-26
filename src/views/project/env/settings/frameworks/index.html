@@ -1,0 +1,24 @@
+<div class="panel panel-default">
+  <div class="panel-heading">Framework Helper</div>
+  <div class="panel-body">
+    <div>These settings allow the control of the frameworks helpers inside the project, Documentation, projects templates, videos..</div>
+    <label class="control-label"><strong>Change Framework Helper</strong></label>
+    <div class="new-project-section">
+      <ul class="list-inline">
+        <li ng-repeat="platform in platforms" class="project-template-item grow"
+            ng-class="{'current':$root.framework == platform.name}">
+          <div  ng-if="$root.framework == platform.name" class="project-template-info text-center">
+            <h5 class="ellipsis">Current</h5>
+          </div>
+          <div class="project-template-card" ng-click="newProject(platform);chooseFramework(platform.name)">
+            <img ng-if="platform.img" class="project-template-img" ng-src="{{ platform.img }}" />
+            <div class="project-template-info">
+              <h5 class="ellipsis">{{ platform.title }} Project</h5>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+</div>

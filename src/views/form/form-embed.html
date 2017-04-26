@@ -11,7 +11,7 @@
 <h3>How to Embed</h3>
 <p>Use one of our renderer libraries to embed within your application. If you need a different platform, please <a href="http://formio.github.io/help.form.io/support/" target="_blank">contact support</a>.</p>
 <div class="row">
-  <div class="col-md-6">
+  <div  class="col-md-6" ng-if="$root.framework == 'angular'">
     <div class="panel panel-success">
       <div class="panel-heading">
         <h3 class="panel-title">Angular 1.x</h3>
@@ -33,7 +33,62 @@
       </div>
     </div>
   </div>
-  <div class="col-md-6">
+  <div  class="col-md-6" ng-if="$root.framework == 'vue'">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h3 class="panel-title">Vue.JS</h3>
+      </div>
+      <div class="panel-body">
+        <h5>Creating a Vue component</h5>
+        <p>Be sure you have added the <a href="https://github.com/formio/formio.js" target="_blank">formiojs</a> library to your application and imported it in the app declaration.</p>
+        <h5>Embed within a template</h5>
+        <p>To embed a form within your Vue application, lets create a component call FormVue, first you have to import
+          FormioForm from the formiojs library.</p>
+        <span><pre><code>
+          // FormVue.vue
+          &lt;template&gt;
+           &nbsp;&nbsp; &lt;div id="formio"&gt; &lt;/div&gt;
+          &lt;/template&gt;
+          &lt;script&gt;
+          &nbsp;&nbsp;import FormioForm from 'formiojs/form';
+            &nbsp;&nbsp;export default {
+           &nbsp;&nbsp; &nbsp;&nbsp;name: 'formio-vue',
+          &nbsp;&nbsp;  &nbsp;&nbsp;props: ['src'],
+    &nbsp;&nbsp;&nbsp;&nbsp; mounted () {
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;let self = this;
+       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;let form = new FormioForm(document.getElementById('formio'));
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;form.src = self.src;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;form.on('submit', (submission) => {
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; console.log('The form was just submitted!!!');
+     &nbsp;&nbsp;&nbsp;&nbsp; });
+     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;form.on('error', (errors) => {
+      &nbsp;&nbsp;  &nbsp;&nbsp;  &nbsp;&nbsp;console.log('We have errors!');
+     &nbsp;&nbsp; &nbsp;&nbsp;})
+     &nbsp;&nbsp; &nbsp;&nbsp;}
+    &nbsp;&nbsp;}
+  &lt;/script&gt;
+
+          ---
+          // Then we can use our component in our App.vue.
+                &lt;template&gt;
+           &nbsp;&nbsp;&lt;div id="app"&gt;
+           &nbsp;&nbsp;&lt;formio-vue src="'{{ projectPath(currentProject) }}/{{ form.path }}'"&gt;&lt;/formio-vue&gt;
+           &lt;/div&gt;
+          &lt;/template&gt;
+          &lt;script&gt;
+		&nbsp;&nbsp;import FormioVue from './components/Formio.vue'
+    &nbsp;&nbsp;export default {
+      &nbsp;&nbsp;&nbsp;&nbsp;name: 'app',
+      &nbsp;&nbsp;&nbsp;&nbsp;components: {
+          &nbsp;&nbsp;&nbsp;&nbsp;FormioVue
+      &nbsp;&nbsp;}
+    &nbsp;&nbsp;}
+   &lt;/script&gt;
+        </code></pre></span>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6" ng-if="$root.framework == 'react'">
     <div class="panel panel-primary">
       <div class="panel-heading">
         <h3 class="panel-title">React</h3>
@@ -56,7 +111,7 @@
       </div>
     </div>
   </div>
-  <div class="col-md-6">
+  <div class="col-md-6" ng-if="$root.framework == 'angular2'">
     <div class="panel panel-warning">
       <div class="panel-heading">
         <h3 class="panel-title">Angular 2.x</h3>
@@ -101,7 +156,14 @@
     </div>
   </div>
 </div>
-<h3>Example Application</h3>
-<p>If you are getting started, it may be easiest to first download our angular starter template project found @ <a target="_blank" href="https://github.com/formio/ng-app-starterkit">https://github.com/formio/ng-app-starterkit</a></p>
+<h3  ng-if="$root.framework == 'angular'">Example Application</h3>
+<p  ng-if="$root.framework == 'angular'">If you are getting started, it may be easiest to first download our Angular
+  starter template project found @ <a target="_blank" href="https://github.com/formio/ng-app-starterkit">https://github.com/formio/ng-app-starterkit</a></p>
+<h3  ng-if="$root.framework == 'angular2'">Example Application</h3>
+<p  ng-if="$root.framework == 'angular2'">If you are getting started, it may be easiest to first download our Angular 2
+  starter template project found @ <a target="_blank" href="https://github.com/formio/ng2-formio">https://github.com/formio/ng2-formio</a></p>
+<h3  ng-if="$root.framework == 'react'">Example Application</h3>
+<p  ng-if="$root.framework == 'react'">If you are getting started, it may be easiest to first download our React
+  starter template project found @ <a target="_blank" href="https://github.com/formio/react-formio">https://github.com/formio/react-formio</a></p>
 <h3>Need more help?</h3>
 <p>We have a lot of documentation @ <a target="_blank" href="https://help.form.io">https://help.form.io</a> that is there to help you get embedding working within your application. Of course, if this still does not help, please feel free to contact our <a href="https://help.form.io/support">Support</a>.</p>

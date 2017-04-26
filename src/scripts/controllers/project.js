@@ -1808,6 +1808,55 @@ app.controller('ProjectSettingsController', [
     $http,
     AppConfig
   ) {
+
+    $scope.platforms = [
+      {
+        title: 'Angular',
+        name: 'angular2',
+        img: 'images/platforms/angular2.png'
+      },
+      {
+        title: 'React.js',
+        name: 'react',
+        img: 'images/platforms/react.svg'
+      },
+      {
+        title: 'AngularJS',
+        name: 'angular',
+        img: 'images/platforms/angularjs1.svg'
+      },
+      {
+        title: 'Vue.js',
+        name: 'vue',
+        img: 'images/platforms/vue.png'
+      },
+      {
+        title: 'HTML 5',
+        name: 'html5',
+        img: 'images/platforms/html5.png'
+      },
+      {
+        title: 'Simple',
+        name: 'simple',
+        img: 'images/platforms/form.png'
+      },
+      {
+        title: 'Custom',
+        name: 'custom',
+        img: 'images/empty-project.png'
+      },
+    ];
+
+    if(!window.localStorage.getItem('framework')) {
+      window.localStorage.setItem('framework','angularjs');
+      $rootScope.framework = window.localStorage.getItem('framework');
+    } else {
+      $rootScope.framework = window.localStorage.getItem('framework');
+    }
+    $scope.chooseFramework = function (framework) {
+      window.localStorage.setItem('framework',framework);
+      $rootScope.framework = window.localStorage.getItem('framework');
+    };
     if (!$scope.highestRole || ($scope.highestRole && ['team_read', 'team_write'].indexOf($scope.highestRole) !== -1)) {
       // this is constantly going to overview on reload.
       //$state.go('project.env.overview');
