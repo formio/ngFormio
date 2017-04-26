@@ -574,7 +574,7 @@ angular
         {
           title: 'Angular',
           name: 'angular2',
-          img: 'images/platforms/angular2.png'
+          img: 'images/angular2.png'
         },
         {
           title: 'React.js',
