@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## 2.15.8
 ### Fixed
  - Fixing issue with meridian support and time selection in the datetime component
  - Changed the yearRange attribute for the datetime component to yearRows and yearColumns, to reflect changes made to
