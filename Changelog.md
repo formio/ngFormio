@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 
 ### Fixed
+ - Fixed issue where the resource fields appeared twice on the save submission action configuration page.
 
 ### Removed
 
