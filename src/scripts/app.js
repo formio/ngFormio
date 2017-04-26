@@ -276,33 +276,33 @@ angular
           templateUrl: 'views/project/env/pdf/index.html',
           controller: 'PDFController'
         })
-        .state('project.env.version', {
-          url: '/version',
+        .state('project.env.deployments', {
+          url: '/deployments',
           abstract: true,
           parent: 'project.env'
         })
-        .state('project.env.version.deploy', {
-          url: '/version',
+        .state('project.env.deployments.deploy', {
+          url: '/deployments',
           parent: 'project.env',
-          templateUrl: 'views/project/env/version/deploy.html',
+          templateUrl: 'views/project/env/deployments/deploy.html',
           controller: 'ProjectDeployController'
         })
-        .state('project.env.version.create', {
-          url: '/version/create',
+        .state('project.env.deployments.create', {
+          url: '/deployments/create',
           parent: 'project.env',
-          templateUrl: 'views/project/env/version/create.html',
-          controller: 'ProjectVersionCreateController'
+          templateUrl: 'views/project/env/deployments/create.html',
+          controller: 'ProjectTagCreateController'
         })
-        .state('project.env.version.import', {
-          url: '/version/import',
+        .state('project.env.deployments.import', {
+          url: '/deployments/import',
           parent: 'project.env',
-          templateUrl: 'views/project/env/version/import.html',
+          templateUrl: 'views/project/env/deployments/import.html',
           controller: 'ProjectImportController'
         })
-        .state('project.env.version.export', {
-          url: '/version/export',
+        .state('project.env.deployments.export', {
+          url: '/deployments/export',
           parent: 'project.env',
-          templateUrl: 'views/project/env/version/export.html'
+          templateUrl: 'views/project/env/deployments/export.html'
         })
         .state('project.env.activity', {
           url: '/activity',
