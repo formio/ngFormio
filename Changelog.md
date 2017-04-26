@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.16.0
+### Changed
+ - Upgrade formiojs to 2.6.0
+
 ## 2.15.8
 ### Fixed
  - Fixing issue with meridian support and time selection in the datetime component
