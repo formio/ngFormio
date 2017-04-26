@@ -1755,6 +1755,12 @@ footer {
   }
 }
 
+.ngdialog {
+  .ngdialog-content {
+    width: 80% !important;
+  }
+}
+
 .current {
   text-align: center;
   background-color:$brand-primary;
