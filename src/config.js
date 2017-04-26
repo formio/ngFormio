@@ -74,7 +74,7 @@ if (apiProtocol !== protocol && ['localhost', 'portal.localhost', 'lvh.me', 'por
 var appBase = protocol + '//' + host;
 var apiBase = apiProtocol + '//api.' + serverHost;
 var formioBase = apiProtocol + '//formio.' + serverHost;
-if (['form.io', 'test-form.io'].indexOf(serverHost) ===  -1) {
+if (['form.io', 'test-form.io'].indexOf(serverHost) ===  -1 && pathType !== 'Subdomains') {
   apiBase = apiProtocol + '//' + serverHost;
   formioBase = apiProtocol + '//' + serverHost + '/formio';
 }

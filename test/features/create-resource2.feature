@@ -88,7 +88,7 @@ Feature: Test 16 Creating/Editing A Resource part2
     Examples:
 
       | message                                                                                                                                                                                                                                                     |
-      | Form path cannot contain one of the following names: submission, report, exists, export, role, current, logout, import, form, storage/s3, storage/dropbox, dropbox/auth, upgrade, access, atlassian/oauth/authorize, atlassian/oauth/finalize, sqlconnector |
+      | Form path cannot contain one of the following names: submission, report, version, tag, exists, export, import, clone, deploy, wipe, role, current, logout, form, token, logs, classic, storage/s3, storage/dropbox, dropbox/auth, upgrade, access, atlassian/oauth/authorize, atlassian/oauth/finalize, sqlconnector, token |
 
   Scenario: Editing an existing ‘Resource’
     When I click on the Create Resource link
@@ -206,7 +206,7 @@ Feature: Test 16 Creating/Editing A Resource part2
     Examples:
 
       | message                                                                                                                                                                                                                                                     |
-      | Form path cannot contain one of the following names: submission, report, exists, export, role, current, logout, import, form, storage/s3, storage/dropbox, dropbox/auth, upgrade, access, atlassian/oauth/authorize, atlassian/oauth/finalize, sqlconnector |
+      | Form path cannot contain one of the following names: submission, report, version, tag, exists, export, import, clone, deploy, wipe, role, current, logout, form, token, logs, classic, storage/s3, storage/dropbox, dropbox/auth, upgrade, access, atlassian/oauth/authorize, atlassian/oauth/finalize, sqlconnector, token |
 
   Scenario:  Attempt to Edit an existing Resource with blank fields
     When I click on the Create Resource link

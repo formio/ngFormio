@@ -22,6 +22,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
  - Tour
 
+## 4.0.5
+### Fixed
+ - Fixed issue where the resource fields appeared twice on the save submission action configuration page.
+ - Fixing issue with the form builder notifications and content component being flagged as modified on load.
+
+### Changed
+ - Upgraded ng-formio to 2.15.8
+ - Upgraded ng-formio-builder to 2.15.8
+
 ## 4.0.3
 ### Fixed
  - Fix Go to login link on reset password done page.

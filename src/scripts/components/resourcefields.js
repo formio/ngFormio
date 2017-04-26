@@ -65,11 +65,8 @@ angular.module('formioApp').config([
           $scope.$watch('data.resource', function(data) {
             if (!data) { return; }
             $scope.data.fields = $scope.data.fields || {};
-            if (data !== $scope.data.resource) {
-              $scope.data.resource = data;
-            }
-            $scope.resourceComponents = [];
             $http.get(AppConfig.apiBase + settings.basePath + '/' + data).then(function(results) {
+              $scope.resourceComponents = [];
               FormioUtils.eachComponent(results.data.components, function(component) {
                 if (component.type !== 'button') {
                   $scope.resourceComponents.push({
