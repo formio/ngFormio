@@ -57,6 +57,11 @@ module.exports = function() {
         };
 
         $scope.downloadUrl = '';
+
+        var base64EncodeUrl = function(str) {
+          return btoa(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/\=+$/, '');
+        };
+
         $scope.getPDFDownload = function(pdf) {
           if (!$scope.formio) {
             return;
@@ -78,7 +83,7 @@ module.exports = function() {
           var allowedPath = download.replace(Formio.baseUrl, '');
           allowedPath = allowedPath.replace(Formio.getProjectUrl(), '');
           return $scope.formio.getTempToken(3600, 'GET:' + allowedPath).then(function(tempToken) {
-            download += '?token=' + tempToken;
+            download += '/' + base64EncodeUrl(tempToken);
             $scope.downloadUrl = download;
             return download;
           });
