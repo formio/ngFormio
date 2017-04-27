@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.16.1
+### Changed
+ - Changed how the download token is added to the URL to keep ELB from clobbering it.
+
 ## 2.16.0
 ### Added
  - The ability to add inline Resources with an "Add Resource" button on Resource components.
