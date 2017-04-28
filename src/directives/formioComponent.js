@@ -153,11 +153,11 @@ module.exports = [
                   try {
                     if (valid !== true) {
                       $scope.component.customError = valid;
-                      $scope.formioForm[$scope.component.key].$setValidity('valid', false);
+                      $scope.formioForm[$scope.component.key].$setValidity('custom', false);
                       return;
                     }
 
-                    $scope.formioForm[$scope.component.key].$setValidity('valid', true);
+                    $scope.formioForm[$scope.component.key].$setValidity('custom', true);
                   }
                   catch (e) {
                     // Ignore any issues while editing the components.
