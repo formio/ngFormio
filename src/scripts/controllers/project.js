@@ -1795,6 +1795,7 @@ app.controller('ProjectSettingsController', [
   '$state',
   'GoogleAnalytics',
   'FormioAlerts',
+  'ProjectPlatforms',
   '$http',
   'AppConfig',
   function(
@@ -1803,47 +1804,12 @@ app.controller('ProjectSettingsController', [
     $state,
     GoogleAnalytics,
     FormioAlerts,
+    ProjectPlatforms,
     $http,
     AppConfig
   ) {
 
-    $scope.platforms = [
-      {
-        title: 'Angular',
-        name: 'angular2',
-        img: 'images/platforms/angular2.png'
-      },
-      {
-        title: 'React.js',
-        name: 'react',
-        img: 'images/platforms/react.svg'
-      },
-      {
-        title: 'AngularJS',
-        name: 'angular',
-        img: 'images/platforms/angularjs1.svg'
-      },
-      {
-        title: 'Vue.js',
-        name: 'vue',
-        img: 'images/platforms/vue.png'
-      },
-      {
-        title: 'HTML 5',
-        name: 'html5',
-        img: 'images/platforms/html5.png'
-      },
-      {
-        title: 'Simple',
-        name: 'simple',
-        img: 'images/platforms/form.png'
-      },
-      {
-        title: 'Custom',
-        name: 'custom',
-        img: 'images/empty-project.png'
-      },
-    ];
+    $scope.platforms = ProjectPlatforms;
 
     if(!window.localStorage.getItem('framework')) {
       window.localStorage.setItem('framework','angularjs');
@@ -2370,4 +2336,42 @@ app.factory('ProjectUpgradeDialog', [
       }
     };
   }
+]);
+
+app.constant('ProjectPlatforms', [
+  {
+    title: 'AngularJS Project',
+    name: 'angular',
+    img: 'images/platforms/angularjs1.svg'
+  },
+  {
+    title: 'Angular 2+ Project',
+    name: 'angular2',
+    img: 'images/platforms/angular2.png'
+  },
+  {
+    title: 'React.js Project',
+    name: 'react',
+    img: 'images/platforms/react.svg'
+  },
+  {
+    title: 'Vue.js Project',
+    name: 'vue',
+    img: 'images/platforms/vue.png'
+  },
+  {
+    title: 'HTML 5 Project',
+    name: 'html5',
+    img: 'images/platforms/html5.png'
+  },
+  {
+    title: 'Simple Forms',
+    name: 'simple',
+    img: 'images/platforms/form.png'
+  },
+  {
+    title: 'Custom Project',
+    name: 'custom',
+    img: 'images/empty-project.png'
+  },
 ]);

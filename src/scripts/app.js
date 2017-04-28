@@ -513,6 +513,7 @@ angular
     'AppConfig',
     'ProjectPlans',
     'ProjectUpgradeDialog',
+    'ProjectPlatforms',
     '$timeout',
     '$q',
     'ngDialog',
@@ -526,6 +527,7 @@ angular
       AppConfig,
       ProjectPlans,
       ProjectUpgradeDialog,
+      ProjectPlatforms,
       $timeout,
       $q,
       ngDialog
@@ -570,43 +572,7 @@ angular
         return (project.plan === 'team' || project.plan === 'commercial');
       };
 
-      $scope.platforms = [
-        {
-          title: 'Angular',
-          name: 'angular2',
-          img: 'images/angular2.png'
-        },
-        {
-          title: 'React.js',
-          name: 'react',
-          img: 'images/platforms/react.svg'
-        },
-        {
-          title: 'AngularJS',
-          name: 'angular1',
-          img: 'images/platforms/angularjs1.svg'
-        },
-        {
-          title: 'Vue.js',
-          name: 'vue',
-          img: 'images/platforms/vue.png'
-        },
-        {
-          title: 'HTML 5',
-          name: 'html5',
-          img: 'images/platforms/html5.png'
-        },
-        {
-          title: 'Simple',
-          name: 'simple',
-          img: 'images/platforms/form.png'
-        },
-        {
-          title: 'Custom',
-          name: 'custom',
-          img: 'images/empty-project.png'
-        },
-      ];
+      $scope.platforms = ProjectPlatforms;
 
       $scope.templates = [];
       FormioProject.loadTemplates().then(function(templates) {
