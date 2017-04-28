@@ -7,7 +7,9 @@ var jsonLogic;
 try {
   jsonLogic = require('json-logic-js') || undefined;
 }
-catch (e) {}
+catch (e) {
+  // Ignore optional module.
+}
 
 module.exports = [
   'Formio',
@@ -157,7 +159,9 @@ module.exports = [
 
                     $scope.formioForm[$scope.component.key].$setValidity('valid', true);
                   }
-                  catch (e) {}
+                  catch (e) {
+                    // Ignore any issues while editing the components.
+                  }
                 });
               }
             }, true);

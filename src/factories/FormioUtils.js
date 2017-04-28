@@ -5,7 +5,9 @@ var jsonLogic;
 try {
   jsonLogic = require('json-logic-js') || undefined;
 }
-catch (e) {}
+catch (e) {
+  // Ignore optional module.
+}
 
 module.exports = function() {
   return {
@@ -14,7 +16,7 @@ module.exports = function() {
       if (jsonLogic && !!component.jsonConditional) {
         try {
           if (typeof component.jsonConditional === 'string') {
-            component.jsonConditional = JSON.parse(component.jsonConditional)
+            component.jsonConditional = JSON.parse(component.jsonConditional);
           }
 
           return !!jsonLogic.apply(component.jsonConditional, data);
