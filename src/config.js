@@ -1,44 +1,13 @@
-// If environment configurations are passed in the querystring, first override existing configurations.
-var query = Qs.parse(window.location.search.substr(1));
-if (query.hasOwnProperty('environments') && query.hasOwnProperty('currentEnvironment')) {
-  localStorage.setItem('environments', JSON.stringify(query.environments));
-  localStorage.setItem('currentEnvironment', JSON.stringify(query.currentEnvironment));
-  // Ensure they are logged out since we are switching environments
-  localStorage.removeItem('formioToken');
-  localStorage.removeItem('formioUser');
-  // Rebuild the window url and replace without the environment querystrings.
-  if (history.replaceState) {
-    var url = window.location.protocol
-      + "//"
-      + window.location.host
-      + window.location.pathname
-      + window.location.hash;
-
-    history.replaceState({page: url}, document.getElementsByTagName('title')[0].innerHTML, url);
-  }
-}
-
-// Finally, get around to configuring the site.
 var host = window.location.host;
-var environment = JSON.parse(localStorage.getItem('currentEnvironment'));
 var protocol = window.location.protocol;
 var serverHost, apiProtocol;
 var pathType = 'Subdomains';
-if (environment) {
-  var parts = environment.url.split('//');
-  apiProtocol = parts[0];
-  serverHost = parts[1];
-  pathType = environment.type || 'Subdomains';
-}
-else {
-  serverHost = host;
-  apiProtocol = (serverHost.split(':')[0] !== 'localhost') ? 'https:' : protocol;
-  //apiProtocol = protocol;
-  var parts = serverHost.split('.');
-  if (parts[0] === 'portal') {
-    parts.shift();
-    serverHost = parts.join('.');
-  }
+serverHost = host;
+apiProtocol = (serverHost.split(':')[0] !== 'localhost') ? 'https:' : protocol;
+var parts = serverHost.split('.');
+if (parts[0] === 'portal') {
+  parts.shift();
+  serverHost = parts.join('.');
 }
 // Force portal and server to match protocols if not on localhost.
 if (apiProtocol !== protocol && ['localhost', 'portal.localhost', 'lvh.me', 'portal.lvh.me'].indexOf(window.location.hostname) === -1) {
@@ -46,15 +15,7 @@ if (apiProtocol !== protocol && ['localhost', 'portal.localhost', 'lvh.me', 'por
     + "//"
     + window.location.host
     + window.location.pathname;
-
-  // Add environment information if set.
-  if (localStorage.getItem('environments') && localStorage.getItem('currentEnvironment')) {
-    url += '?' + Qs.stringify({
-        environments: JSON.parse(localStorage.getItem('environments')),
-        currentEnvironment: JSON.parse(localStorage.getItem('currentEnvironment'))
-      });
-  }
-  url += window.location.hash;
+    + window.location.hash;
 
   // If running under http, confirm switching back to https to prevent looping.
   if (protocol === 'http:') {
