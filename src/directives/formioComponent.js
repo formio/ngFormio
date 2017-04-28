@@ -147,17 +147,18 @@ module.exports = [
                   valid = err.message;
                 }
 
-                if (valid !== true) {
-                  $timeout(function() {
-                    $scope.component.customError = valid;
-                    $scope.formioForm[$scope.component.key].$setValidity('valid', false);
-                  });
-                }
-                else {
-                  $timeout(function() {
+                $timeout(function() {
+                  try {
+                    if (valid !== true) {
+                      $scope.component.customError = valid;
+                      $scope.formioForm[$scope.component.key].$setValidity('valid', false);
+                      return;
+                    }
+
                     $scope.formioForm[$scope.component.key].$setValidity('valid', true);
-                  });
-                }
+                  }
+                  catch (e) {}
+                });
               }
             }, true);
           }
