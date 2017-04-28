@@ -1,4 +1,4 @@
-/*! ng-formio v2.16.1 | https://unpkg.com/ng-formio@2.16.1/LICENSE.txt */
+/*! ng-formio v2.16.2 | https://unpkg.com/ng-formio@2.16.2/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -79617,10 +79617,6 @@ module.exports = function() {
 
         $scope.downloadUrl = '';
 
-        var base64EncodeUrl = function(str) {
-          return btoa(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/\=+$/, '');
-        };
-
         $scope.getPDFDownload = function(pdf) {
           if (!$scope.formio) {
             return;
@@ -79642,7 +79638,7 @@ module.exports = function() {
           var allowedPath = download.replace(Formio.baseUrl, '');
           allowedPath = allowedPath.replace(Formio.getProjectUrl(), '');
           return $scope.formio.getTempToken(3600, 'GET:' + allowedPath).then(function(tempToken) {
-            download += '/' + base64EncodeUrl(tempToken);
+            download += '?token=' + tempToken.key;
             $scope.downloadUrl = download;
             return download;
           });
