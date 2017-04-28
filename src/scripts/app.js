@@ -513,7 +513,7 @@ angular
     'AppConfig',
     'ProjectPlans',
     'ProjectUpgradeDialog',
-    'ProjectPlatforms',
+    'ProjectFrameworks',
     '$timeout',
     '$q',
     'ngDialog',
@@ -527,7 +527,7 @@ angular
       AppConfig,
       ProjectPlans,
       ProjectUpgradeDialog,
-      ProjectPlatforms,
+      ProjectFrameworks,
       $timeout,
       $q,
       ngDialog
@@ -572,27 +572,22 @@ angular
         return (project.plan === 'team' || project.plan === 'commercial');
       };
 
-      $scope.platforms = ProjectPlatforms;
+      $scope.platforms = ProjectFrameworks;
 
       $scope.templates = [];
       FormioProject.loadTemplates().then(function(templates) {
         $scope.templates = templates;
       });
-      $scope.chooseFramework = function (framework) {
-        window.localStorage.setItem('framework',framework);
-        $rootScope.framework = window.localStorage.getItem('framework');
-      };
 
       $scope.submitted = false;
       $scope.selectedPlatform = null;
-      $scope.newProject = function(platform) {
-        $scope.selectedPlatform = platform;
+      $scope.newProject = function(framework) {
+        $scope.selectedPlatform = framework;
         $scope.currentProject = {
-          template: platform
+          framework: framework.name
         };
-        console.log(platform);
         ngDialog.open({
-          template: 'newProject',
+          templateUrl: 'views/project/create.html',
           scope: $scope
         });
       };

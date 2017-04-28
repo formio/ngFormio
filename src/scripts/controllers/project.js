@@ -120,57 +120,57 @@ app.controller('ProjectCreateController', [
     FormioProject
   ) {
     $rootScope.noBreadcrumb = false;
-    $scope.currentProject = {template: 'default'};
-    $scope.hasTemplate = false;
-    $scope.templateLimit = 3;
+    //$scope.currentProject = {template: 'default'};
+    //$scope.hasTemplate = false;
+    //$scope.templateLimit = 3;
     $scope.isBusy = false;
 
-    $scope.templates = [];
-    FormioProject.loadTemplates().then(function(templates) {
-      $scope.templates = templates;
-      angular.forEach(templates, function(template) {
-        if (template.name === $scope.currentProject.template) {
-          $scope.currentProject.template = template.template;
-        }
-      });
-    });
-
-    $scope.showAllTemplates = function() {
-      $scope.templateLimit = Infinity;
-    };
-
-    $scope.loadTemplate = function() {
-      var input = angular.element(this).get(0);
-      if (!input || input.length === 0) {
-        return;
-      }
-      var template = input.files[0];
-
-      // FOR-107 - Fix for safari where FileReader isnt a function.
-      if (typeof window.FileReader !== 'function' && typeof window.FileReader !== 'object') {
-        return;
-      }
-
-      if (!template) {
-        return;
-      }
-
-      // Read the file.
-      var reader = new FileReader();
-      reader.onload = function(e) {
-        $scope.oldTemplate = $scope.currentProject.template;
-        $scope.currentProject.template = JSON.parse(e.target.result);
-        $scope.hasTemplate = true;
-        $scope.$apply();
-      };
-      reader.readAsText(template);
-    };
-
-    $scope.unloadTemplate = function() {
-      $scope.currentProject.template = $scope.oldTemplate;
-      $scope.oldTemplate = null;
-      $scope.hasTemplate = false;
-    };
+    //$scope.templates = [];
+    //FormioProject.loadTemplates().then(function(templates) {
+    //  $scope.templates = templates;
+    //  angular.forEach(templates, function(template) {
+    //    if (template.name === $scope.currentProject.template) {
+    //      $scope.currentProject.template = template.template;
+    //    }
+    //  });
+    //});
+    //
+    //$scope.showAllTemplates = function() {
+    //  $scope.templateLimit = Infinity;
+    //};
+    //
+    //$scope.loadTemplate = function() {
+    //  var input = angular.element(this).get(0);
+    //  if (!input || input.length === 0) {
+    //    return;
+    //  }
+    //  var template = input.files[0];
+    //
+    //  // FOR-107 - Fix for safari where FileReader isnt a function.
+    //  if (typeof window.FileReader !== 'function' && typeof window.FileReader !== 'object') {
+    //    return;
+    //  }
+    //
+    //  if (!template) {
+    //    return;
+    //  }
+    //
+    //  // Read the file.
+    //  var reader = new FileReader();
+    //  reader.onload = function(e) {
+    //    $scope.oldTemplate = $scope.currentProject.template;
+    //    $scope.currentProject.template = JSON.parse(e.target.result);
+    //    $scope.hasTemplate = true;
+    //    $scope.$apply();
+    //  };
+    //  reader.readAsText(template);
+    //};
+    //
+    //$scope.unloadTemplate = function() {
+    //  $scope.currentProject.template = $scope.oldTemplate;
+    //  $scope.oldTemplate = null;
+    //  $scope.hasTemplate = false;
+    //};
 
     $scope.saveProject = function() {
       $scope.isBusy = true;
@@ -1795,7 +1795,7 @@ app.controller('ProjectSettingsController', [
   '$state',
   'GoogleAnalytics',
   'FormioAlerts',
-  'ProjectPlatforms',
+  'ProjectFrameworks',
   '$http',
   'AppConfig',
   function(
@@ -1804,23 +1804,13 @@ app.controller('ProjectSettingsController', [
     $state,
     GoogleAnalytics,
     FormioAlerts,
-    ProjectPlatforms,
+    ProjectFrameworks,
     $http,
     AppConfig
   ) {
 
-    $scope.platforms = ProjectPlatforms;
+    $scope.platforms = ProjectFrameworks;
 
-    if(!window.localStorage.getItem('framework')) {
-      window.localStorage.setItem('framework','angularjs');
-      $rootScope.framework = window.localStorage.getItem('framework');
-    } else {
-      $rootScope.framework = window.localStorage.getItem('framework');
-    }
-    $scope.chooseFramework = function (framework) {
-      window.localStorage.setItem('framework',framework);
-      $rootScope.framework = window.localStorage.getItem('framework');
-    };
     if (!$scope.highestRole || ($scope.highestRole && ['team_read', 'team_write'].indexOf($scope.highestRole) !== -1)) {
       // this is constantly going to overview on reload.
       //$state.go('project.env.overview');
@@ -2338,7 +2328,7 @@ app.factory('ProjectUpgradeDialog', [
   }
 ]);
 
-app.constant('ProjectPlatforms', [
+app.constant('ProjectFrameworks', [
   {
     title: 'AngularJS Project',
     name: 'angular',
