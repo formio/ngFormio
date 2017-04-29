@@ -120,10 +120,14 @@ app.controller('ProjectCreateController', [
     FormioProject
   ) {
     $rootScope.noBreadcrumb = false;
+    $scope.isBusy = false;
+
+    $scope.createType = 'Project';
+    $scope.projectType = 'Project';
+
     //$scope.currentProject = {template: 'default'};
     //$scope.hasTemplate = false;
     //$scope.templateLimit = 3;
-    $scope.isBusy = false;
 
     //$scope.templates = [];
     //FormioProject.loadTemplates().then(function(templates) {
@@ -201,6 +205,7 @@ app.controller('ProjectCreateEnvironmentController', [
         label: 'On Premise'
       }
     ];
+    $scope.createType = 'Environment';
 
     $scope.currentProject = {};
     $scope.primaryProjectPromise.then(function(primaryProject) {
@@ -308,7 +313,7 @@ app.controller('ProjectController', [
 
     $scope.loadProjectPromise = $scope.formio.loadProject().then(function(result) {
       $scope.currentProject = result;
-      $scope.projectType = $scope.currentProject.hasOwnProperty('project') ? 'Environment' : 'Project';
+      $scope.projectType = 'Environment';
       $scope.projectApi = $rootScope.projectPath(result);
       $rootScope.currentProject = result;
       $scope.projectsLoaded = true;
@@ -622,31 +627,6 @@ app.controller('ProjectImportController', [
   }
 ]);
 
-app.controller('ProjectBuildController', [
-  '$scope',
-  '$http',
-  function($scope, $http) {
-    // This is restricted to form.io domains.
-    var key = 'AIzaSyDms9ureQ45lp6BT6LuZtoANB_GcR2jZmE';
-    $scope.currentSection.title = 'Building Applications on Form.io';
-    $scope.currentSection.icon = 'fa fa-cubes';
-    $scope.currentSection.help = 'https://help.form.io/intro/appdev/';
-    $scope.angular1 = [];
-    $scope.angular2 = [];
-    $scope.react = [];
-
-    $http.get('https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails,id,snippet,status&maxResults=50&playlistId=PLL9kNSjqyfJ70DiT2Yn_8cCXGpEs_ReRb&key=' + key).then(function(result) {
-      $scope.angular1 = result.data.items;
-    });
-    $http.get('https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails,id,snippet,status&maxResults=50&playlistId=PLL9kNSjqyfJ5Mj5FvZ7gL4MZj5o4yN5Sg&key=' + key).then(function(result) {
-      $scope.react = result.data.items;
-    });
-    $http.get('https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails,id,snippet,status&maxResults=50&playlistId=PLL9kNSjqyfJ51N9rw0Wnqu6Yl8OMZdE-Q&key=' + key).then(function(result) {
-      $scope.angular2 = result.data.items;
-    });
-  }
-]);
-
 app.directive('projectStep', function() {
   return {
     restrict: 'E',
@@ -681,16 +661,21 @@ app.directive('projectStep', function() {
 app.controller('ProjectOverviewController', [
   '$scope',
   '$stateParams',
+  '$http',
   'AppConfig',
   'Formio',
   'FormioAlerts',
   function(
     $scope,
     $stateParams,
+    $http,
     AppConfig,
     Formio,
     FormioAlerts
   ) {
+    // This is restricted to form.io domains.
+    var key = 'AIzaSyDms9ureQ45lp6BT6LuZtoANB_GcR2jZmE';
+
     $scope.currentSection.title = 'Overview';
     $scope.currentSection.icon = 'fa fa-dashboard';
     $scope.currentSection.help = '';
@@ -724,6 +709,20 @@ app.controller('ProjectOverviewController', [
     };
 
     $scope.graphType = $stateParams.graphType;
+
+    $scope.angular1 = [];
+    $scope.angular2 = [];
+    $scope.react = [];
+
+    $http.get('https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails,id,snippet,status&maxResults=50&playlistId=PLL9kNSjqyfJ70DiT2Yn_8cCXGpEs_ReRb&key=' + key).then(function(result) {
+      $scope.angular1 = result.data.items;
+    });
+    $http.get('https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails,id,snippet,status&maxResults=50&playlistId=PLL9kNSjqyfJ5Mj5FvZ7gL4MZj5o4yN5Sg&key=' + key).then(function(result) {
+      $scope.react = result.data.items;
+    });
+    $http.get('https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails,id,snippet,status&maxResults=50&playlistId=PLL9kNSjqyfJ51N9rw0Wnqu6Yl8OMZdE-Q&key=' + key).then(function(result) {
+      $scope.angular2 = result.data.items;
+    });
   }
 ]);
 
@@ -1928,6 +1927,47 @@ app.controller('ProjectSettingsController', [
         });
       });
     };
+  }
+]);
+
+app.controller('PrimaryProjectSettingsController', [
+  '$scope',
+  '$rootScope',
+  '$state',
+  'ProjectFrameworks',
+  'Formio',
+  'FormioAlerts',
+  'GoogleAnalytics',
+  function(
+    $scope,
+    $rootScope,
+    $state,
+    ProjectFrameworks,
+    Formio,
+    FormioAlerts,
+    GoogleAnalytics
+  ) {
+    $scope.frameworks = ProjectFrameworks;
+
+    $scope.primaryProjectPromise.then(function(primaryProject) {
+      $scope.project = _.clone(primaryProject);
+      $scope.formio = new Formio('/project/' + primaryProject._id);
+
+    });
+
+    $scope.saveProject = function() {
+      $scope.formio.saveProject($scope.project)
+        .then(function(project) {
+          FormioAlerts.addAlert({
+            type: 'success',
+            message: 'Project settings saved.'
+          });
+          GoogleAnalytics.sendEvent('Project', 'update', null, 1);
+          $state.go('project.env.overview', null, { reload: true });
+        }, FormioAlerts.onError.bind(FormioAlerts))
+        .catch(FormioAlerts.onError.bind(FormioAlerts));
+    };
+
   }
 ]);
 

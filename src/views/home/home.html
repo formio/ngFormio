@@ -20,7 +20,7 @@
   <div class="container">
     <div class="row">
       <div class="col-sm-10 col-sm-offset-1 text-center">
-        <p>What we going to build now? let's create a new project with your favorite framework</p>
+        <p>What are you going to build now? Let's create a new project with your favorite framework.</p>
       </div>
     </div>
   </div>
@@ -49,8 +49,7 @@
       <div class="project well" ng-if="projectsLoaded && !projects.length" ng-cloak>
         <h4 class="project-title">Create your project <small><a href="https://help.form.io/userguide/projects/#new-project" target="_blank"><i class="fa fa-info-circle"></i></a></small></h4>
         <ng-include src="'views/project/help.html'"></ng-include>
-        <a ng-click="newProject()" class="btn btn-md btn-primary"><span class="glyphicon glyphicon-plus circle"></span>
-          Create Project</a>
+        <strong>Select a framework above to get started.</strong>
       </div>
       <div class="row" ng-if="projectsLoaded && projects.length" ng-cloak>
         <div class="col-sm-4" ng-repeat="project in projects">

@@ -87,7 +87,8 @@ app.directive('permissionEditor', ['$q', function($q) {
       permissions: '=',
       labels: '=',
       waitFor: '=',
-      permissionFilter: '=?'
+      permissionFilter: '=?',
+      protected: '=?'
     },
     restrict: 'E',
     templateUrl: 'views/project/access/access/permission-editor.html',

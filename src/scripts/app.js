@@ -163,11 +163,6 @@ angular
           templateUrl: 'views/formio/index.html',
           controller: 'ProjectFormioController'
         })
-        .state('project.build', {
-          url: '/build',
-          templateUrl: 'views/project/build/index.html',
-          controller: 'ProjectBuildController'
-        })
         .state('project.launch', {
           url: '',
           templateUrl: 'views/project/launch/index.html',
@@ -202,6 +197,11 @@ angular
           url: '/api',
           templateUrl: 'views/project/api/index.html',
           controller: 'ApiController'
+        })
+        .state('project.settings', {
+          url: '/settings',
+          templateUrl: 'views/project/settings.html',
+          controller: 'PrimaryProjectSettingsController'
         })
         .state('project.env', {
           url: '/env',
@@ -239,12 +239,6 @@ angular
           url: '/settings/customjscss',
           parent: 'project.env',
           templateUrl: 'views/project/env/settings/customjscss/index.html'
-        })
-        .state('project.env.settings.frameworks', {
-          url: '/settings/frameworks',
-          parent: 'project.env',
-          templateUrl: 'views/project/env/settings/frameworks/index.html',
-          controller: 'ProjectSettingsController'
         })
         .state('project.env.settings.cors', {
           url: '/settings/cors',
@@ -532,12 +526,6 @@ angular
       $q,
       ngDialog
     ) {
-      if(!window.localStorage.getItem('framework')) {
-        window.localStorage.setItem('framework','angularjs');
-        $rootScope.framework = window.localStorage.getItem('framework');
-      } else {
-        $rootScope.framework = window.localStorage.getItem('framework');
-      }
       $rootScope.showHeader = true;
       $rootScope.activeSideBar = 'home';
       $rootScope.currentProject = null;
@@ -771,14 +759,6 @@ angular
       $rootScope.apiBase = AppConfig.apiBase;
       $rootScope.apiProtocol = AppConfig.apiProtocol;
       $rootScope.apiServer = AppConfig.apiServer;
-
-      if(!window.localStorage.getItem('framework')) {
-        window.localStorage.setItem('framework','angularjs');
-        $rootScope.framework = window.localStorage.getItem('framework');
-      } else {
-        $rootScope.framework = window.localStorage.getItem('framework');
-      }
-
 
       $rootScope.projectPath = function(project) {
         var path = '';
