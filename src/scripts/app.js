@@ -163,11 +163,6 @@ angular
           templateUrl: 'views/formio/index.html',
           controller: 'ProjectFormioController'
         })
-        .state('project.build', {
-          url: '/build',
-          templateUrl: 'views/project/build/index.html',
-          controller: 'ProjectBuildController'
-        })
         .state('project.launch', {
           url: '',
           templateUrl: 'views/project/launch/index.html',
@@ -202,6 +197,11 @@ angular
           url: '/api',
           templateUrl: 'views/project/api/index.html',
           controller: 'ApiController'
+        })
+        .state('project.settings', {
+          url: '/settings',
+          templateUrl: 'views/project/settings.html',
+          controller: 'PrimaryProjectSettingsController'
         })
         .state('project.env', {
           url: '/env',
@@ -239,12 +239,6 @@ angular
           url: '/settings/customjscss',
           parent: 'project.env',
           templateUrl: 'views/project/env/settings/customjscss/index.html'
-        })
-        .state('project.env.settings.frameworks', {
-          url: '/settings/frameworks',
-          parent: 'project.env',
-          templateUrl: 'views/project/env/settings/frameworks/index.html',
-          controller: 'ProjectSettingsController'
         })
         .state('project.env.settings.cors', {
           url: '/settings/cors',
@@ -513,6 +507,7 @@ angular
     'AppConfig',
     'ProjectPlans',
     'ProjectUpgradeDialog',
+    'ProjectFrameworks',
     '$timeout',
     '$q',
     'ngDialog',
@@ -526,16 +521,11 @@ angular
       AppConfig,
       ProjectPlans,
       ProjectUpgradeDialog,
+      ProjectFrameworks,
       $timeout,
       $q,
       ngDialog
     ) {
-      if(!window.localStorage.getItem('framework')) {
-        window.localStorage.setItem('framework','angularjs');
-        $rootScope.framework = window.localStorage.getItem('framework');
-      } else {
-        $rootScope.framework = window.localStorage.getItem('framework');
-      }
       $rootScope.showHeader = true;
       $rootScope.activeSideBar = 'home';
       $rootScope.currentProject = null;
@@ -570,63 +560,22 @@ angular
         return (project.plan === 'team' || project.plan === 'commercial');
       };
 
-      $scope.platforms = [
-        {
-          title: 'Angular',
-          name: 'angular2',
-          img: 'images/angular2.png'
-        },
-        {
-          title: 'React.js',
-          name: 'react',
-          img: 'images/platforms/react.svg'
-        },
-        {
-          title: 'AngularJS',
-          name: 'angular1',
-          img: 'images/platforms/angularjs1.svg'
-        },
-        {
-          title: 'Vue.js',
-          name: 'vue',
-          img: 'images/platforms/vue.png'
-        },
-        {
-          title: 'HTML 5',
-          name: 'html5',
-          img: 'images/platforms/html5.png'
-        },
-        {
-          title: 'Simple',
-          name: 'simple',
-          img: 'images/platforms/form.png'
-        },
-        {
-          title: 'Custom',
-          name: 'custom',
-          img: 'images/empty-project.png'
-        },
-      ];
+      $scope.platforms = ProjectFrameworks;
 
       $scope.templates = [];
       FormioProject.loadTemplates().then(function(templates) {
         $scope.templates = templates;
       });
-      $scope.chooseFramework = function (framework) {
-        window.localStorage.setItem('framework',framework);
-        $rootScope.framework = window.localStorage.getItem('framework');
-      };
 
       $scope.submitted = false;
       $scope.selectedPlatform = null;
-      $scope.newProject = function(platform) {
-        $scope.selectedPlatform = platform;
+      $scope.newProject = function(framework) {
+        $scope.selectedPlatform = framework;
         $scope.currentProject = {
-          template: platform
+          framework: framework.name
         };
-        console.log(platform);
         ngDialog.open({
-          template: 'newProject',
+          templateUrl: 'views/project/create.html',
           scope: $scope
         });
       };
@@ -810,14 +759,6 @@ angular
       $rootScope.apiBase = AppConfig.apiBase;
       $rootScope.apiProtocol = AppConfig.apiProtocol;
       $rootScope.apiServer = AppConfig.apiServer;
-
-      if(!window.localStorage.getItem('framework')) {
-        window.localStorage.setItem('framework','angularjs');
-        $rootScope.framework = window.localStorage.getItem('framework');
-      } else {
-        $rootScope.framework = window.localStorage.getItem('framework');
-      }
-
 
       $rootScope.projectPath = function(project) {
         var path = '';

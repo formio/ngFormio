@@ -1,16 +1,6 @@
-<div class="container">
-  <h2>New Project</h2>
-  <div class="col-sm-8 col-margin-bottom">
+<div class="row">
+  <div class="col-sm-12 col-margin-bottom" ng-controller="ProjectCreateController">
+    <h2>New {{ selectedPlatform.title }}</h2>
     <ng-include src="'views/project/env/settings/index.html'"></ng-include>
-  </div>
-  <div class="col-sm-4">
-    <div class="panel panel-info project-help-panel">
-      <div class="panel-heading">
-        <h3 class="panel-title"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> About Projects</h3>
-      </div>
-      <div class="panel-body">
-        <ng-include src="'views/project/help.html'"></ng-include>
-      </div>
-    </div>
   </div>
 </div>

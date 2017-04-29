@@ -251,7 +251,6 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
           }
           $scope.forms[form.settings.pdf.id].push(form);
         });
-        console.log($scope.forms);
       });
 
       $scope.getPDFs();

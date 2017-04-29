@@ -1,15 +1,15 @@
 <div class="project-section-header">
-  <a class="btn btn-primary pull-right project-section-header-button" ng-show="projectSettingsVisible() && !onPrem" ng-click="showUpgradeDialog(primaryProject)"><i class="fa fa-arrow-circle-up"></i> Upgrade Project</a>
+  <a class="pull-right project-section-header-icon" ng-if="user._id === primaryProject.owner" ui-sref="project.settings"><i class="fa fa-cog" title="Project Settings"></i></a>
   <a class="btn btn-primary pull-right project-section-header-button" ng-if="user._id === primaryProject.owner" ui-sref="project.teams"><i class="fa fa-users"></i> Teams</a>
   <ul class="list-inline project-title-header">
     <li><h2 class="project-title"><a ui-sref="project.env.overview">{{ primaryProject.title }}</a></h2></li>
     <li ng-if="currentSection.title"><h2>›</h2></li>
     <li ng-if="currentSection.title"><h2><i class="{{ currentSection.icon }}"></i> {{ currentSection.title }}</h2></li>
-    <li><span class="project-plan {{ getPlanLabel(primaryProject.plan) }}">{{ getPlanName(primaryProject.plan) }}</span></li>
+    <li><span class="project-plan {{ getPlanLabel(primaryProject.plan) }}" ng-disabled="!projectSettingsVisible()" ng-click="showUpgradeDialog(primaryProject)">{{ getPlanName(primaryProject.plan) }}</span></li>
   </ul>
   <ul class="nav nav-tabs project-nav">
-    <li ng-class="{ active: currentProject._id === environment._id }" ng-repeat="environment in environments"><a ng-click="switchEnv(environment._id)">{{ environment.title }} <span ng-if="environment.protect">(protected)</span></a></li>
-    <li ng-class="{ active: currentProject._id === primaryProject._id }"><a ng-click="switchEnv(primaryProject._id)">Live <span ng-if="primaryProject.protect">(protected)</span></a></li>
+    <li ng-class="{ active: currentProject._id === environment._id }" ng-repeat="environment in environments"><a ng-click="switchEnv(environment._id)"><i class="fa fa-shield" ng-if="environment.protect"></i> {{ environment.title }}</a></li>
+    <li ng-class="{ active: currentProject._id === primaryProject._id }"><a ng-click="switchEnv(primaryProject._id)"><i class="fa fa-shield" ng-if="primaryProject.protect"></i> Live</a></li>
     <li ng-if="environments.length < 3"><a ui-sref="project.environment">+ Add Environment</a></li>
   </ul>
 </div>
@@ -23,7 +23,6 @@
       <li ng-class="{active: isActive('project.data')}"><a ui-sref="project.data"><i class="fa fa-database" /><br/><span>Data</span></a></li>
       <li ng-class="{active: isActive('project.access')}"><a ui-sref="project.access"><i class="fa fa-shield"></i><br/><span>Access</span></a></li>
       <li ng-if="currentProject._id === '553db92f72f702e714dd9778'" ng-class="{active: isActive('project.formio')}"><a ui-sref="project.formio"><i class="glyphicon glyphicon-globe"></i><br/><span>Form.io</span></a></li>
-      <li ng-class="{active: isActive('project.build')}"><a ui-sref="project.build"><i class="fa fa-cubes"></i><br/><span>Build</span></a></li>
       <li ng-class="{active: isActive('project.launch')}"><a ui-sref="project.launch.form" id="nav-bar-launch-link"><i class="fa fa-rocket"></i><br/><span>Launch</span></a></li>
     </ul>
   </div>

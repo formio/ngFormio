@@ -120,57 +120,61 @@ app.controller('ProjectCreateController', [
     FormioProject
   ) {
     $rootScope.noBreadcrumb = false;
-    $scope.currentProject = {template: 'default'};
-    $scope.hasTemplate = false;
-    $scope.templateLimit = 3;
     $scope.isBusy = false;
 
-    $scope.templates = [];
-    FormioProject.loadTemplates().then(function(templates) {
-      $scope.templates = templates;
-      angular.forEach(templates, function(template) {
-        if (template.name === $scope.currentProject.template) {
-          $scope.currentProject.template = template.template;
-        }
-      });
-    });
+    $scope.createType = 'Project';
+    $scope.projectType = 'Project';
 
-    $scope.showAllTemplates = function() {
-      $scope.templateLimit = Infinity;
-    };
+    //$scope.currentProject = {template: 'default'};
+    //$scope.hasTemplate = false;
+    //$scope.templateLimit = 3;
 
-    $scope.loadTemplate = function() {
-      var input = angular.element(this).get(0);
-      if (!input || input.length === 0) {
-        return;
-      }
-      var template = input.files[0];
-
-      // FOR-107 - Fix for safari where FileReader isnt a function.
-      if (typeof window.FileReader !== 'function' && typeof window.FileReader !== 'object') {
-        return;
-      }
-
-      if (!template) {
-        return;
-      }
-
-      // Read the file.
-      var reader = new FileReader();
-      reader.onload = function(e) {
-        $scope.oldTemplate = $scope.currentProject.template;
-        $scope.currentProject.template = JSON.parse(e.target.result);
-        $scope.hasTemplate = true;
-        $scope.$apply();
-      };
-      reader.readAsText(template);
-    };
-
-    $scope.unloadTemplate = function() {
-      $scope.currentProject.template = $scope.oldTemplate;
-      $scope.oldTemplate = null;
-      $scope.hasTemplate = false;
-    };
+    //$scope.templates = [];
+    //FormioProject.loadTemplates().then(function(templates) {
+    //  $scope.templates = templates;
+    //  angular.forEach(templates, function(template) {
+    //    if (template.name === $scope.currentProject.template) {
+    //      $scope.currentProject.template = template.template;
+    //    }
+    //  });
+    //});
+    //
+    //$scope.showAllTemplates = function() {
+    //  $scope.templateLimit = Infinity;
+    //};
+    //
+    //$scope.loadTemplate = function() {
+    //  var input = angular.element(this).get(0);
+    //  if (!input || input.length === 0) {
+    //    return;
+    //  }
+    //  var template = input.files[0];
+    //
+    //  // FOR-107 - Fix for safari where FileReader isnt a function.
+    //  if (typeof window.FileReader !== 'function' && typeof window.FileReader !== 'object') {
+    //    return;
+    //  }
+    //
+    //  if (!template) {
+    //    return;
+    //  }
+    //
+    //  // Read the file.
+    //  var reader = new FileReader();
+    //  reader.onload = function(e) {
+    //    $scope.oldTemplate = $scope.currentProject.template;
+    //    $scope.currentProject.template = JSON.parse(e.target.result);
+    //    $scope.hasTemplate = true;
+    //    $scope.$apply();
+    //  };
+    //  reader.readAsText(template);
+    //};
+    //
+    //$scope.unloadTemplate = function() {
+    //  $scope.currentProject.template = $scope.oldTemplate;
+    //  $scope.oldTemplate = null;
+    //  $scope.hasTemplate = false;
+    //};
 
     $scope.saveProject = function() {
       $scope.isBusy = true;
@@ -201,6 +205,7 @@ app.controller('ProjectCreateEnvironmentController', [
         label: 'On Premise'
       }
     ];
+    $scope.createType = 'Environment';
 
     $scope.currentProject = {};
     $scope.primaryProjectPromise.then(function(primaryProject) {
@@ -308,7 +313,7 @@ app.controller('ProjectController', [
 
     $scope.loadProjectPromise = $scope.formio.loadProject().then(function(result) {
       $scope.currentProject = result;
-      $scope.projectType = $scope.currentProject.hasOwnProperty('project') ? 'Environment' : 'Project';
+      $scope.projectType = 'Environment';
       $scope.projectApi = $rootScope.projectPath(result);
       $rootScope.currentProject = result;
       $scope.projectsLoaded = true;
@@ -622,31 +627,6 @@ app.controller('ProjectImportController', [
   }
 ]);
 
-app.controller('ProjectBuildController', [
-  '$scope',
-  '$http',
-  function($scope, $http) {
-    // This is restricted to form.io domains.
-    var key = 'AIzaSyDms9ureQ45lp6BT6LuZtoANB_GcR2jZmE';
-    $scope.currentSection.title = 'Building Applications on Form.io';
-    $scope.currentSection.icon = 'fa fa-cubes';
-    $scope.currentSection.help = 'https://help.form.io/intro/appdev/';
-    $scope.angular1 = [];
-    $scope.angular2 = [];
-    $scope.react = [];
-
-    $http.get('https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails,id,snippet,status&maxResults=50&playlistId=PLL9kNSjqyfJ70DiT2Yn_8cCXGpEs_ReRb&key=' + key).then(function(result) {
-      $scope.angular1 = result.data.items;
-    });
-    $http.get('https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails,id,snippet,status&maxResults=50&playlistId=PLL9kNSjqyfJ5Mj5FvZ7gL4MZj5o4yN5Sg&key=' + key).then(function(result) {
-      $scope.react = result.data.items;
-    });
-    $http.get('https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails,id,snippet,status&maxResults=50&playlistId=PLL9kNSjqyfJ51N9rw0Wnqu6Yl8OMZdE-Q&key=' + key).then(function(result) {
-      $scope.angular2 = result.data.items;
-    });
-  }
-]);
-
 app.directive('projectStep', function() {
   return {
     restrict: 'E',
@@ -681,16 +661,21 @@ app.directive('projectStep', function() {
 app.controller('ProjectOverviewController', [
   '$scope',
   '$stateParams',
+  '$http',
   'AppConfig',
   'Formio',
   'FormioAlerts',
   function(
     $scope,
     $stateParams,
+    $http,
     AppConfig,
     Formio,
     FormioAlerts
   ) {
+    // This is restricted to form.io domains.
+    var key = 'AIzaSyDms9ureQ45lp6BT6LuZtoANB_GcR2jZmE';
+
     $scope.currentSection.title = 'Overview';
     $scope.currentSection.icon = 'fa fa-dashboard';
     $scope.currentSection.help = '';
@@ -724,6 +709,20 @@ app.controller('ProjectOverviewController', [
     };
 
     $scope.graphType = $stateParams.graphType;
+
+    $scope.angular1 = [];
+    $scope.angular2 = [];
+    $scope.react = [];
+
+    $http.get('https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails,id,snippet,status&maxResults=50&playlistId=PLL9kNSjqyfJ70DiT2Yn_8cCXGpEs_ReRb&key=' + key).then(function(result) {
+      $scope.angular1 = result.data.items;
+    });
+    $http.get('https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails,id,snippet,status&maxResults=50&playlistId=PLL9kNSjqyfJ5Mj5FvZ7gL4MZj5o4yN5Sg&key=' + key).then(function(result) {
+      $scope.react = result.data.items;
+    });
+    $http.get('https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails,id,snippet,status&maxResults=50&playlistId=PLL9kNSjqyfJ51N9rw0Wnqu6Yl8OMZdE-Q&key=' + key).then(function(result) {
+      $scope.angular2 = result.data.items;
+    });
   }
 ]);
 
@@ -1795,6 +1794,7 @@ app.controller('ProjectSettingsController', [
   '$state',
   'GoogleAnalytics',
   'FormioAlerts',
+  'ProjectFrameworks',
   '$http',
   'AppConfig',
   function(
@@ -1803,58 +1803,13 @@ app.controller('ProjectSettingsController', [
     $state,
     GoogleAnalytics,
     FormioAlerts,
+    ProjectFrameworks,
     $http,
     AppConfig
   ) {
 
-    $scope.platforms = [
-      {
-        title: 'Angular',
-        name: 'angular2',
-        img: 'images/platforms/angular2.png'
-      },
-      {
-        title: 'React.js',
-        name: 'react',
-        img: 'images/platforms/react.svg'
-      },
-      {
-        title: 'AngularJS',
-        name: 'angular',
-        img: 'images/platforms/angularjs1.svg'
-      },
-      {
-        title: 'Vue.js',
-        name: 'vue',
-        img: 'images/platforms/vue.png'
-      },
-      {
-        title: 'HTML 5',
-        name: 'html5',
-        img: 'images/platforms/html5.png'
-      },
-      {
-        title: 'Simple',
-        name: 'simple',
-        img: 'images/platforms/form.png'
-      },
-      {
-        title: 'Custom',
-        name: 'custom',
-        img: 'images/empty-project.png'
-      },
-    ];
+    $scope.platforms = ProjectFrameworks;
 
-    if(!window.localStorage.getItem('framework')) {
-      window.localStorage.setItem('framework','angularjs');
-      $rootScope.framework = window.localStorage.getItem('framework');
-    } else {
-      $rootScope.framework = window.localStorage.getItem('framework');
-    }
-    $scope.chooseFramework = function (framework) {
-      window.localStorage.setItem('framework',framework);
-      $rootScope.framework = window.localStorage.getItem('framework');
-    };
     if (!$scope.highestRole || ($scope.highestRole && ['team_read', 'team_write'].indexOf($scope.highestRole) !== -1)) {
       // this is constantly going to overview on reload.
       //$state.go('project.env.overview');
@@ -1972,6 +1927,47 @@ app.controller('ProjectSettingsController', [
         });
       });
     };
+  }
+]);
+
+app.controller('PrimaryProjectSettingsController', [
+  '$scope',
+  '$rootScope',
+  '$state',
+  'ProjectFrameworks',
+  'Formio',
+  'FormioAlerts',
+  'GoogleAnalytics',
+  function(
+    $scope,
+    $rootScope,
+    $state,
+    ProjectFrameworks,
+    Formio,
+    FormioAlerts,
+    GoogleAnalytics
+  ) {
+    $scope.frameworks = ProjectFrameworks;
+
+    $scope.primaryProjectPromise.then(function(primaryProject) {
+      $scope.project = _.clone(primaryProject);
+      $scope.formio = new Formio('/project/' + primaryProject._id);
+
+    });
+
+    $scope.saveProject = function() {
+      $scope.formio.saveProject($scope.project)
+        .then(function(project) {
+          FormioAlerts.addAlert({
+            type: 'success',
+            message: 'Project settings saved.'
+          });
+          GoogleAnalytics.sendEvent('Project', 'update', null, 1);
+          $state.go('project.env.overview', null, { reload: true });
+        }, FormioAlerts.onError.bind(FormioAlerts))
+        .catch(FormioAlerts.onError.bind(FormioAlerts));
+    };
+
   }
 ]);
 
@@ -2370,4 +2366,42 @@ app.factory('ProjectUpgradeDialog', [
       }
     };
   }
+]);
+
+app.constant('ProjectFrameworks', [
+  {
+    title: 'AngularJS Project',
+    name: 'angular',
+    img: 'images/platforms/angularjs1.svg'
+  },
+  {
+    title: 'Angular 2+ Project',
+    name: 'angular2',
+    img: 'images/platforms/angular2.png'
+  },
+  {
+    title: 'React.js Project',
+    name: 'react',
+    img: 'images/platforms/react.svg'
+  },
+  {
+    title: 'Vue.js Project',
+    name: 'vue',
+    img: 'images/platforms/vue.png'
+  },
+  {
+    title: 'HTML 5 Project',
+    name: 'html5',
+    img: 'images/platforms/html5.png'
+  },
+  {
+    title: 'Simple Forms',
+    name: 'simple',
+    img: 'images/platforms/form.png'
+  },
+  {
+    title: 'Custom Project',
+    name: 'custom',
+    img: 'images/empty-project.png'
+  },
 ]);
