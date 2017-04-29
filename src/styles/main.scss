@@ -484,7 +484,6 @@ div.project-section-separator {
 .project-section-header {
   background-color: #fff;
   padding: 6px 10px 0 10px;
-  border-bottom: solid $brand-secondary 8px;
   h2 {
     color: #333;
     a {
@@ -541,6 +540,23 @@ div.project-section-separator {
       }
     }
   }
+}
+
+.project-section-info {
+  background-color: $brand-secondary;
+  color: white;
+  padding: 5px 10px;
+  a {
+    color: white;
+    text-decoration: none;
+  }
+}
+
+.project-trial-remaining {
+  font-size: 1.2em;
+  top: -2px;
+  position: relative;
+  margin-left: 10px;
 }
 
 ul.project-settings-menu {

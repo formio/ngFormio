@@ -544,7 +544,7 @@ app.controller('ProjectDeployController', [
       }
       Formio.makeStaticRequest(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/deploy', 'POST', {
         type: 'tag',
-        id: tag.tag
+        tag: tag.tag
       })
         .then(function() {
           $scope.deployTagOption = '';

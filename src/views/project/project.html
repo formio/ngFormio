@@ -5,13 +5,17 @@
     <li><h2 class="project-title"><a ui-sref="project.env.overview">{{ primaryProject.title }}</a></h2></li>
     <li ng-if="currentSection.title"><h2>›</h2></li>
     <li ng-if="currentSection.title"><h2><i class="{{ currentSection.icon }}"></i> {{ currentSection.title }}</h2></li>
-    <li><span class="project-plan {{ getPlanLabel(primaryProject.plan) }}" ng-disabled="!projectSettingsVisible()" ng-click="showUpgradeDialog(primaryProject)">{{ getPlanName(primaryProject.plan) }}</span></li>
+    <li><span class="project-plan {{ getPlanLabel(primaryProject.plan) }}" ng-disabled="!projectSettingsVisible()" ng-click="showUpgradeDialog(primaryProject)">{{ getPlanName(primaryProject.plan) }}</span> <span ng-if="primaryProject.plan === 'trial'" class="project-trial-remaining"><strong>{{trialDaysRemaining}}</strong> Days remaining <a class="" ng-click="showUpgradeDialog(primaryProject)"><i class="fa fa-arrow-circle-up"></i> Upgrade Now</a></span>
+    </li>
   </ul>
   <ul class="nav nav-tabs project-nav">
     <li ng-class="{ active: currentProject._id === environment._id }" ng-repeat="environment in environments"><a ng-click="switchEnv(environment._id)"><i class="fa fa-shield" ng-if="environment.protect"></i> {{ environment.title }}</a></li>
     <li ng-class="{ active: currentProject._id === primaryProject._id }"><a ng-click="switchEnv(primaryProject._id)"><i class="fa fa-shield" ng-if="primaryProject.protect"></i> Live</a></li>
     <li ng-if="environments.length < 3"><a ui-sref="project.environment">+ Add Environment</a></li>
   </ul>
+</div>
+<div class="project-section-info">
+  <span><strong>API Url:</strong> <a ui-sref="project.env.settings.info">{{ projectPath(currentProject) }}</a></span> <span> | <strong>Current tag:</strong> <a ui-sref="project.env.deployments.deploy">{{ currentProject.tag }}</a></span> <span ng-if="currentProject.protect"> | <strong><a ui-sref="project.env.settings.info">Protected</a></strong> - This environment is protected from changes.</span>
 </div>
 <div class="project-container">
   <div class="project-sidebar sidebar">
