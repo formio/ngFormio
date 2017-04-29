@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Project Environments!
  - Version deployments/creation
  - Locking environments
+ - Framework support
 
 ### Changed
  - Projects are created from platforms, not templates
@@ -21,6 +22,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Removed
  - Tour
+ - Environment Switcher
+ - Project Templates
 
 ## 4.0.5
 ### Fixed
