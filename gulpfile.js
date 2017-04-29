@@ -27,7 +27,7 @@ gulp.task('deploy:beta', function () {
   var settings = require('../aws.json');
   settings.bucket = 'beta.form.io';
   settings.region = 'us-west-2';
-  return gulp.src(['./dist/**/*', '!./dist/lib/**/*', '!./dist/config.js']).pipe(s3(settings));
+  return gulp.src(['./dist/**/*', '!./dist/lib/**/*']).pipe(s3(settings));
 });
 
 gulp.task('default', ['clean'], function() {
