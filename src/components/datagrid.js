@@ -20,14 +20,13 @@ module.exports = function(app) {
           angular.forEach(data, function(row) {
             view += '<tr>';
             formioUtils.eachComponent(component.components, function(component) {
-              var info = componentInfo.components.hasOwnProperty(component.type) ? componentInfo.components[component.type] : {};
-
               // Don't render disabled fields.
               if (!component.tableView) {
                 return;
               }
 
               // If the component has a defined tableView, use that, otherwise try and use the raw data as a string.
+              var info = componentInfo.components.hasOwnProperty(component.type) ? componentInfo.components[component.type] : {};
               if (info.tableView) {
                 view += '<td>' + info.tableView(row[component.key] || '', component, $interpolate, componentInfo) + '</td>';
               }
