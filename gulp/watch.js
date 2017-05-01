@@ -6,7 +6,8 @@ module.exports = function(gulp, plugins) {
   return function() {
     var bundle = plugins.browserify({
       entries: './src/formio.js',
-      debug: true
+      debug: true,
+      ignoreMissing: true
     });
 
     var build = require('./scripts-basic')(gulp, plugins, bundle);
