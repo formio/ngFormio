@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.16.3
+### Fixed
+ - Issue where "success" on $http is deprecated and is now using regular promise "then"
+
 ## 2.16.2
 ### Changed
  - Changed how the temp tokens are added to the pdf submission download url.

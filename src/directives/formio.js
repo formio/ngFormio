@@ -224,7 +224,7 @@ module.exports = function() {
             if (method === 'put' && (action.indexOf(submissionData._id) === -1)) {
               action += '/' + submissionData._id;
             }
-            $http[method](action, submissionData).success(function(submission) {
+            $http[method](action, submissionData).then(function(submission) {
               Formio.clearCache();
               onSubmitDone(method, submission, form);
             }, FormioScope.onError($scope, $element))
