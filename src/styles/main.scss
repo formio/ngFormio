@@ -347,7 +347,7 @@ $project-header-color: #eee;
   width: 100%;
   min-height: 700px;
   padding: 0;
-  border-left: solid #eee 70px;
+  border-left: solid darken($brand-primary, 25%) 70px;
 }
 
 .project-content {
@@ -537,6 +537,9 @@ div.project-section-separator {
         background-color: $brand-secondary;
         color: #fff;
         border: none;
+        .badge {
+          background-color: darken($brand-secondary, 10%);
+        }
       }
     }
     li.active {
@@ -545,6 +548,9 @@ div.project-section-separator {
         margin-right: 0;
         color: #000;
         border: none;
+        .badge {
+          background-color: #999;
+        }
       }
     }
   }

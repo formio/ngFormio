@@ -9,8 +9,8 @@
     </li>
   </ul>
   <ul class="nav nav-tabs project-nav">
-    <li ng-class="{ active: currentProject._id === environment._id }" ng-repeat="environment in environments"><a ng-click="switchEnv(environment._id)"><i class="fa fa-shield" ng-if="environment.protect"></i> {{ environment.title }}</a></li>
-    <li ng-class="{ active: currentProject._id === primaryProject._id }"><a ng-click="switchEnv(primaryProject._id)"><i class="fa fa-shield" ng-if="primaryProject.protect"></i> Live</a></li>
+    <li ng-class="{ active: currentProject._id === environment._id }" ng-repeat="environment in environments"><a ng-click="switchEnv(environment._id)"><i class="fa fa-shield" ng-if="environment.protect"></i> {{ environment.title }} <span class="badge" ng-if="environment.tag !== '0.0.0'">{{ environment.tag }}</span></a></li>
+    <li ng-class="{ active: currentProject._id === primaryProject._id }"><a ng-click="switchEnv(primaryProject._id)"><i class="fa fa-shield" ng-if="primaryProject.protect"></i> Live <span class="badge" ng-if="primaryProject.tag !== '0.0.0'">{{ primaryProject.tag }}</span></a></li>
     <li ng-if="environments.length < 3"><a ui-sref="project.environment">+ Add Environment</a></li>
   </ul>
 </div>
@@ -24,13 +24,13 @@
       <li ng-class="{active: isActive('project.data')}"><a ui-sref="project.data"><i class="fa fa-database" /><br/><span>Data</span></a></li>
       <li ng-class="{active: isActive('project.access')}"><a ui-sref="project.access"><i class="fa fa-shield"></i><br/><span>Access</span></a></li>
       <li ng-if="currentProject._id === '553db92f72f702e714dd9778'" ng-class="{active: isActive('project.formio')}"><a ui-sref="project.formio"><i class="glyphicon glyphicon-globe"></i><br/><span>Form.io</span></a></li>
-      <li ng-class="{active: isActive('project.launch')}"><a ui-sref="project.launch.form" id="nav-bar-launch-link"><i class="fa fa-rocket"></i><br/><span>Launch</span></a></li>
+      <!--<li ng-class="{active: isActive('project.launch')}"><a ui-sref="project.launch.form" id="nav-bar-launch-link"><i class="fa fa-rocket"></i><br/><span>Launch</span></a></li>-->
       <li ng-class="{active: isActive('project.env')}"><a ui-sref="project.env.settings.info"><i class="fa fa-gear"></i><br /><span>Settings</span></a></li></li>
     </ul>
   </div>
   <div class="project-main">
-    <div class="project-section-info">
-      <span><strong>API Url:</strong> <a ui-sref="project.env.settings.info">{{ projectPath(currentProject) }}</a></span> <span> | <strong>Current tag:</strong> <a ui-sref="project.env.deployments.deploy">{{ currentProject.tag }}</a></span> <span ng-if="currentProject.protect"> | <strong><a ui-sref="project.env.settings.info">Protected</a></strong> - This environment is protected from changes.</span>
+    <div class="project-section-info pull-right">
+      <span><strong>Project Url:</strong> <a ui-sref="project.env.settings.info">{{ projectPath(currentProject) }}</a></span> <span>
     </div>
     <div class="project-content" ui-view></div>
   </div>
