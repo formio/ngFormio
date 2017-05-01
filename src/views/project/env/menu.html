@@ -1,6 +1,6 @@
 <div class="well">
   <ul class="nav nav-pills nav-stacked project-settings-menu">
-    <li role="presentation" ng-class="{active:($state.includes('project.env.overview'))}"><a ui-sref="project.env.overview">Overview</a></li>
+    <!--<li role="presentation" ng-class="{active:($state.includes('project.overview'))}"><a ui-sref="project.overview">Overview</a></li>-->
     <!--<li role="presentation" ng-class="{active:($state.includes('project.env.tour'))}"><a ui-sref="project.env.tour">Tour ({{ stepsPercent }}%)</a></li>-->
     <li role="presentation" ng-class="{active:($state.includes('project.env.settings.info'))}">
       <a ui-sref="project.env.settings.info" ng-class="{active:($state.includes('project.env.settings.info'))}">Environment Settings</a>
@@ -10,7 +10,6 @@
         <li role="presentation" ng-class="{active:($state.includes('project.env.settings.customjscss'))}"><a ui-sref="project.env.settings.customjscss">Custom JS and CSS</a></li>
       </ul>
     </li>
-    <li role="presentation" ng-class="{active:($state.includes('project.env.pdf'))}"><a ui-sref="project.env.pdf">PDFs</a></li>
     <li role="presentation" ng-class="{active:($state.includes('project.env.deployments.deploy'))}">
       <a ui-sref="project.env.deployments.deploy">Deployments</a>
       <ul ng-if="$state.current.name.includes('project.env.deployments')" class="nav nav-pills nav-stacked">
@@ -31,6 +30,7 @@
     <li role="presentation" ng-class="{active:($state.is('project.env.integrations.info'))}">
       <a ui-sref="project.env.integrations.info" role="button" aria-haspopup="true" aria-expanded="false">Integrations</a>
       <ul ng-if="$state.current.name.includes('project.env.integrations')" class="nav nav-pills nav-stacked">
+        <li role="presentation" ng-class="{active:($state.includes('project.env.integrations.pdf'))}"><a ui-sref="project.env.integrations.pdf">PDFs</a></li>
         <li role="presentation" ng-class="{active:($state.includes('project.env.integrations.email'))}"><a ui-sref="project.env.integrations.email">Email Providers</a></li>
         <li role="presentation" ng-class="{active:($state.includes('project.env.integrations.storage'))}"><a ui-sref="project.env.integrations.storage">File Storage</a></li>
         <li role="presentation" ng-class="{active:($state.includes('project.env.integrations.data'))}"><a ui-sref="project.env.integrations.data">Data Connections</a></li>

@@ -180,7 +180,7 @@ app.controller('ProjectCreateController', [
       $scope.isBusy = true;
       FormioProject.createProject($scope.currentProject).then(function(project) {
         $scope.isBusy = false;
-        $state.go('project.env.overview', {projectId: project._id});
+        $state.go('project.overview', {projectId: project._id});
       });
     };
   }
@@ -221,7 +221,7 @@ app.controller('ProjectCreateEnvironmentController', [
 
     $scope.saveProject = function() {
       FormioProject.createProject($scope.currentProject).then(function(project) {
-        $state.go('project.env.overview', {projectId: project._id});
+        $state.go('project.overview', {projectId: project._id});
       });
     };
   }
@@ -305,7 +305,7 @@ app.controller('ProjectController', [
     };
 
     $scope.switchEnv = function(environmentId) {
-      $state.go('project.env.overview', {projectId: environmentId});
+      $state.go('project.overview', {projectId: environmentId});
     };
 
     var primaryProjectQ = $q.defer();
@@ -1812,7 +1812,7 @@ app.controller('ProjectSettingsController', [
 
     if (!$scope.highestRole || ($scope.highestRole && ['team_read', 'team_write'].indexOf($scope.highestRole) !== -1)) {
       // this is constantly going to overview on reload.
-      //$state.go('project.env.overview');
+      //$state.go('project.overview');
       //return;
     }
 
@@ -1963,7 +1963,7 @@ app.controller('PrimaryProjectSettingsController', [
             message: 'Project settings saved.'
           });
           GoogleAnalytics.sendEvent('Project', 'update', null, 1);
-          $state.go('project.env.overview', null, { reload: true });
+          $state.go('project.overview', null, { reload: true });
         }, FormioAlerts.onError.bind(FormioAlerts))
         .catch(FormioAlerts.onError.bind(FormioAlerts));
     };

@@ -2,7 +2,7 @@
   <a class="pull-right project-section-header-icon" ng-if="user._id === primaryProject.owner" ui-sref="project.settings"><i class="fa fa-cog" title="Project Settings"></i></a>
   <a class="btn btn-primary pull-right project-section-header-button" ng-if="user._id === primaryProject.owner" ui-sref="project.teams"><i class="fa fa-users"></i> Teams</a>
   <ul class="list-inline project-title-header">
-    <li><h2 class="project-title"><a ui-sref="project.env.overview">{{ primaryProject.title }}</a></h2></li>
+    <li><h2 class="project-title"><a ui-sref="project.overview">{{ primaryProject.title }}</a></h2></li>
     <li ng-if="currentSection.title"><h2>›</h2></li>
     <li ng-if="currentSection.title"><h2><i class="{{ currentSection.icon }}"></i> {{ currentSection.title }}</h2></li>
     <li><span class="project-plan {{ getPlanLabel(primaryProject.plan) }}" ng-disabled="!projectSettingsVisible()" ng-click="showUpgradeDialog(primaryProject)">{{ getPlanName(primaryProject.plan) }}</span> <span ng-if="primaryProject.plan === 'trial'" class="project-trial-remaining"><strong>{{trialDaysRemaining}}</strong> Days remaining <a class="" ng-click="showUpgradeDialog(primaryProject)"><i class="fa fa-arrow-circle-up"></i> Upgrade Now</a></span>
@@ -14,13 +14,10 @@
     <li ng-if="environments.length < 3"><a ui-sref="project.environment">+ Add Environment</a></li>
   </ul>
 </div>
-<div class="project-section-info">
-  <span><strong>API Url:</strong> <a ui-sref="project.env.settings.info">{{ projectPath(currentProject) }}</a></span> <span> | <strong>Current tag:</strong> <a ui-sref="project.env.deployments.deploy">{{ currentProject.tag }}</a></span> <span ng-if="currentProject.protect"> | <strong><a ui-sref="project.env.settings.info">Protected</a></strong> - This environment is protected from changes.</span>
-</div>
 <div class="project-container">
   <div class="project-sidebar sidebar">
     <ul class="nav nav-sidebar">
-      <li ng-class="{active: isActive('project.env')}"><a ui-sref="project.env.overview"><i class="fa fa-tachometer"></i><br/><span>Dashboard</span></a></li>
+      <li ng-class="{active: isActive('project.overview')}"><a ui-sref="project.overview"><i class="fa fa-tachometer"></i><br/><span>Welcome</span></a></li>
       <li ng-class="{active: isActive('project.resource') && !isActive('project.form.form.submission')}"><a ui-sref="project.resource.index"><i class="fa fa-database"></i><br/><span>Resources</span></a></li>
       <li ng-class="{active: isActive('project.form')}"><a ui-sref="project.form.index"><i class="fa fa-tasks"></i><br/><span>Forms</span></a></li>
       <li ng-class="{active: isActive('project.api')}"><a ui-sref="project.api"><img src="images/swagger-logo.png" style="width:2em;" /><br/><span>API</span></a></li>
@@ -28,9 +25,13 @@
       <li ng-class="{active: isActive('project.access')}"><a ui-sref="project.access"><i class="fa fa-shield"></i><br/><span>Access</span></a></li>
       <li ng-if="currentProject._id === '553db92f72f702e714dd9778'" ng-class="{active: isActive('project.formio')}"><a ui-sref="project.formio"><i class="glyphicon glyphicon-globe"></i><br/><span>Form.io</span></a></li>
       <li ng-class="{active: isActive('project.launch')}"><a ui-sref="project.launch.form" id="nav-bar-launch-link"><i class="fa fa-rocket"></i><br/><span>Launch</span></a></li>
+      <li ng-class="{active: isActive('project.env')}"><a ui-sref="project.env.settings.info"><i class="fa fa-gear"></i><br /><span>Settings</span></a></li></li>
     </ul>
   </div>
   <div class="project-main">
+    <div class="project-section-info">
+      <span><strong>API Url:</strong> <a ui-sref="project.env.settings.info">{{ projectPath(currentProject) }}</a></span> <span> | <strong>Current tag:</strong> <a ui-sref="project.env.deployments.deploy">{{ currentProject.tag }}</a></span> <span ng-if="currentProject.protect"> | <strong><a ui-sref="project.env.settings.info">Protected</a></strong> - This environment is protected from changes.</span>
+    </div>
     <div class="project-content" ui-view></div>
   </div>
 </div>

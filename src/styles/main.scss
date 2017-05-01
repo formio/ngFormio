@@ -309,6 +309,7 @@ $project-header-color: #eee;
 .project-sidebar {
   border: none;
   background-color: darken($brand-primary, 25%);
+  border-top: 7px solid white;
   text-align: center;
   padding: 0;
   width: 70px;
@@ -346,7 +347,7 @@ $project-header-color: #eee;
   width: 100%;
   min-height: 700px;
   padding: 0;
-  border-left: solid darken($brand-primary, 25%) 70px;
+  border-left: solid #eee 70px;
 }
 
 .project-content {
@@ -482,12 +483,12 @@ div.project-section-separator {
 }
 
 .project-section-header {
-  background-color: #fff;
+  background-color: #eee;
   padding: 6px 10px 0 10px;
   h2 {
-    color: #333;
+    color: darken($brand-primary, 20%);
     a {
-      color: #333;
+      color: darken($brand-primary, 20%);
       &:hover, &:focus {
         text-decoration: none;
       }
@@ -499,6 +500,11 @@ div.project-section-separator {
     font-weight: normal;
     margin: 0;
     font-size: 2em;
+    h2 {
+      a {
+        color: #aaa;
+      }
+    }
     .project-title-link {
       color: $project-header-color;
       &:hover, &:focus {
@@ -521,21 +527,23 @@ div.project-section-separator {
   }
 
   .nav-tabs.project-nav {
+    margin-left: 75px;
     border: none;
     li {
       margin-right: 4px;
       margin-bottom: 0;
       a {
         padding: 6px 15px;
-        background-color: #efefef;
+        background-color: $brand-secondary;
+        color: #fff;
         border: none;
       }
     }
     li.active {
       a {
-        background-color: $brand-secondary;
+        background-color: #fff;
         margin-right: 0;
-        color: #fff;
+        color: #000;
         border: none;
       }
     }
@@ -543,11 +551,11 @@ div.project-section-separator {
 }
 
 .project-section-info {
-  background-color: $brand-secondary;
-  color: white;
-  padding: 5px 10px;
+  background-color: white;
+  color: #333;
+  padding: 10px 10px 10px 18px;
   a {
-    color: white;
+    color: #333;
     text-decoration: none;
   }
 }

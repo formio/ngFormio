@@ -208,10 +208,10 @@ angular
           abstract: true,
           templateUrl: 'views/project/env/index.html'
         })
-        .state('project.env.overview', {
+        .state('project.overview', {
           url: '/overview',
           controller: 'ProjectOverviewController',
-          templateUrl: 'views/project/env/overview/index.html'
+          templateUrl: 'views/project/overview/index.html'
         })
         .state('project.env.tour', {
           url: '/tour',
@@ -270,7 +270,7 @@ angular
           parent: 'project.env',
           templateUrl: 'views/project/env/database/wipe.html',
         })
-        .state('project.env.pdf', {
+        .state('project.env.integrations.pdf', {
           url: '/pdf',
           parent: 'project.env',
           templateUrl: 'views/project/env/pdf/index.html',
@@ -584,7 +584,7 @@ angular
         if (!$scope.submitted) {
           $scope.submitted = true;
           FormioProject.createProject(template).then(function(project) {
-            $state.go('project.env.overview', {projectId: project._id});
+            $state.go('project.overview', {projectId: project._id});
           });
         }
       };
@@ -822,7 +822,7 @@ angular
       });
 
       $rootScope.goToProject = function(project) {
-        $state.go('project.env.overview', {
+        $state.go('project.overview', {
           projectId: project._id
         });
       };
