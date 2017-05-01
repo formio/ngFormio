@@ -8,7 +8,7 @@ module.exports = [
     $interpolate
   ) {
     return function(value, component) {
-      if (!value) {
+      if (!value && value !== 0) {
         return '';
       }
       if (!component || !component.input|| !component.type) {
