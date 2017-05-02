@@ -11,8 +11,6 @@ module.exports = function(app) {
         },
         group: 'advanced',
         controller: ['$scope', '$timeout', function($scope, $timeout) {
-          if ($scope.builder) return;
-
           // Close calendar pop up when tabbing off button
           $scope.onKeyDown = function(event) {
             return event.keyCode === 9 ? false : $scope.calendarOpen;
@@ -64,13 +62,15 @@ module.exports = function(app) {
           if (
             $scope.component.enableTime &&
             $scope.component.timePicker &&
-            $scope.component.timePicker.showMeridian &&
-            ($scope.component.format.indexOf('mm') !== -1) &&
-            ($scope.component.format.indexOf('a') === -1)
+            $scope.component.timePicker.showMeridian
           ) {
-            $scope.component.format += ' a';
+            // If we're missing the meridian string and were in 12 hr, add it.
+            if ($scope.component.format.indexOf(' a') === -1) {
+              $scope.component.format += ' a';
+            }
           }
           else {
+            // Remove any meridian reference, because were not in 12 hr.
             $scope.component.format = $scope.component.format.replace(/ a/, '');
           }
 
