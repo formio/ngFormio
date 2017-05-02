@@ -38,6 +38,9 @@
     "vinyl-source-stream": "^1.1.0",
     "watchify": "^3.4.0"
   },
+  "optionalDependencies": {
+    "json-logic-js": "^1.1.0"
+  },
   "dependencies": {
     "angular": "^1.6.4",
     "angular-file-saver": "^1.1.3",

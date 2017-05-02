@@ -1,6 +1,16 @@
 var _cloneDeep = require('lodash/cloneDeep');
 var _filter = require('lodash/filter');
 var _get = require('lodash/get');
+
+// FOR-524 - Attempt to load json logic.
+var jsonLogic;
+try {
+  jsonLogic = require('json-logic-js') || undefined;
+}
+catch (e) {
+  // Ignore optional module.
+}
+
 module.exports = [
   'Formio',
   'formioComponents',
@@ -94,15 +104,65 @@ module.exports = [
 
           // FOR-71 - Dont watch in the builder view.
           // Calculate value when data changes.
-          if (!$scope.builder && $scope.component.calculateValue) {
+          if (!$scope.builder && ($scope.component.calculateValue || (jsonLogic && _get($scope.component, 'validate.json')))) {
             $scope.$watch('data', function() {
-              try {
-                $scope.data[$scope.component.key] = eval('(function(data) { var value = [];' + $scope.component.calculateValue.toString() + '; return value; })($scope.data)');
+              // Process calculated value stuff if present.
+              if ($scope.component.calculateValue) {
+                try {
+                  $scope.data[$scope.component.key] = eval('(function(data) { var value = [];' + $scope.component.calculateValue.toString() + '; return value; })($scope.data)');
+                }
+                catch (e) {
+                  /* eslint-disable no-console */
+                  console.warn('An error occurred calculating a value for ' + $scope.component.key, e);
+                  /* eslint-enable no-console */
+                }
               }
-              catch (e) {
-                /* eslint-disable no-console */
-                console.warn('An error occurred calculating a value for ' + $scope.component.key, e);
-                /* eslint-enable no-console */
+
+              // Process jsonLogic stuff if present.
+              if (jsonLogic && _get($scope.component, 'validate.json')) {
+                var input;
+
+                // Only json parse once.
+                if (typeof $scope.component.validate.json === 'string') {
+                  try {
+                    input = JSON.parse($scope.component.validate.json);
+                    $scope.component.validate.json = input;
+                  }
+                  catch (e) {
+                    /* eslint-disable no-console */
+                    console.warn('Invalid JSON validator given for ' + $scope.component.key);
+                    console.warn($scope.component.validate.json);
+                    /* eslint-enable no-console */
+                    delete $scope.component.validate.json;
+                    return;
+                  }
+                }
+                else {
+                  input = $scope.component.validate.json;
+                }
+
+                var valid;
+                try {
+                  valid = jsonLogic.apply(input, $scope.submission.data);
+                }
+                catch (err) {
+                  valid = err.message;
+                }
+
+                $timeout(function() {
+                  try {
+                    if (valid !== true) {
+                      $scope.component.customError = valid;
+                      $scope.formioForm[$scope.component.key].$setValidity('custom', false);
+                      return;
+                    }
+
+                    $scope.formioForm[$scope.component.key].$setValidity('custom', true);
+                  }
+                  catch (e) {
+                    // Ignore any issues while editing the components.
+                  }
+                });
               }
             }, true);
           }
