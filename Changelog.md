@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [UNRELEASED]
+### Fixed
+ - Fixed issue where forms saved with the content component would flag the builder as being dirty.
+
 ## 4.0.5
 ### Fixed
  - Fixed issue where the resource fields appeared twice on the save submission action configuration page.
