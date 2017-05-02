@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [UNRELEASED]
+### Fixed
+ - Issue where the datetime meridian could become un-synchronized from the component settings format field and show
+   different meridian settings
+ - Issue where the datetime meridian was not consistent between the submission grid and submission view.
+ - Issue where viewing a submission with a datetime component and default value didnt display on the first rendering of
+   the edit state.
+
 ## 2.16.3
 ### Fixed
  - Issue where "success" on $http is deprecated and is now using regular promise "then"
