@@ -17,7 +17,7 @@
 <div class="project-container">
   <div class="project-sidebar sidebar">
     <ul class="nav nav-sidebar">
-      <li ng-class="{active: isActive('project.overview')}"><a ui-sref="project.overview"><i class="fa fa-tachometer"></i><br/><span>Welcome</span></a></li>
+      <li ng-class="{active: isActive('project.overview')}"><a ui-sref="project.overview"><i class="fa fa-hand-spock-o"></i><br/><span>Welcome</span></a></li>
       <li ng-class="{active: isActive('project.resource') && !isActive('project.form.form.submission')}"><a ui-sref="project.resource.index"><i class="fa fa-database"></i><br/><span>Resources</span></a></li>
       <li ng-class="{active: isActive('project.form')}"><a ui-sref="project.form.index"><i class="fa fa-tasks"></i><br/><span>Forms</span></a></li>
       <li ng-class="{active: isActive('project.api')}"><a ui-sref="project.api"><img src="images/swagger-logo.png" style="width:2em;" /><br/><span>API</span></a></li>
@@ -30,7 +30,7 @@
   </div>
   <div class="project-main">
     <div class="project-section-info pull-right">
-      <span><strong>Project Url:</strong> <a ui-sref="project.env.settings.info">{{ projectPath(currentProject) }}</a></span> <span>
+      <span><strong>Project Url:</strong> <a ui-sref="project.env.settings.info">{{ projectPath(currentProject) }}</a></span>
     </div>
     <div class="project-content" ui-view></div>
   </div>

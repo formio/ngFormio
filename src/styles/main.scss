@@ -26,6 +26,7 @@ body {
 .btn {
   overflow: hidden;
   text-overflow: ellipsis;
+  border-radius: 3px;
 }
 
 .btn-light {
@@ -535,6 +536,7 @@ div.project-section-separator {
       a {
         padding: 6px 15px;
         background-color: $brand-secondary;
+        border-radius: 3px 3px 0 0;
         color: #fff;
         border: none;
         .badge {
@@ -609,8 +611,9 @@ ul.project-settings-menu {
 }
 
 .project-section-header-button {
-  border: solid #333 2px;
+  border: none !important;
   margin-right: 5px;
+  margin-top: 3px;
 }
 
 .project-section-header-icon {
