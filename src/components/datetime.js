@@ -44,17 +44,10 @@ module.exports = function(app) {
           };
 
           // Ensure the date value is always a date object when loaded, then unbind the watch.
-          var loadComplete = $scope.$watch('data.' + $scope.component.key, function() {
-            if (!$scope.data) {
-              return;
-            }
-            var valueSet = !!$scope.data[$scope.component.key];
+          $scope.$watch('data.' + $scope.component.key, function() {
             var newValue = dateValue();
             if (newValue) {
               $scope.data[$scope.component.key] = newValue;
-            }
-            if (valueSet) {
-              loadComplete();
             }
           });
 
