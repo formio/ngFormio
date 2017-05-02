@@ -20,8 +20,8 @@ module.exports = function(app) {
           angular.forEach(data, function(row) {
             view += '<tr>';
             formioUtils.eachComponent(component.components, function(component) {
-              // Don't render disabled fields.
-              if (!component.tableView) {
+              // Don't render disabled fields, or fields with undefined data.
+              if (!component.tableView || row[component.key] === undefined) {
                 return;
               }
 
