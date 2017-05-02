@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [UNRELEASED]
+### Fixed
+ - Issue where form components inside containers, inside layout components, inside containers would not render in the
+   submission grid.
+ - Issue where form components inside data grids, inside layout components, inside containers would not render in the
+   submission grid.
+
 ## 2.16.3
 ### Fixed
  - Issue where "success" on $http is deprecated and is now using regular promise "then"
