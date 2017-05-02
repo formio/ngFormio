@@ -51,21 +51,19 @@ module.exports = function(app) {
             }
           });
 
-          // If they have 12 hour time enabled, we need to ensure that we see the meridian in the format.
-          if (
-            $scope.component.enableTime &&
-            $scope.component.timePicker &&
-            $scope.component.timePicker.showMeridian
-          ) {
+          // Watch for changes to the meridian settings to synchronize the submissionGrid and component view.
+          $scope.$watch('component.timePicker.showMeridian', function(update) {
+            // Remove any meridian reference, because were not in 12 hr.
+            if (!$scope.component.enableTime || !update) {
+              $scope.component.format = $scope.component.format.replace(/ a/, '');
+              return;
+            }
+
             // If we're missing the meridian string and were in 12 hr, add it.
-            if ($scope.component.format.indexOf(' a') === -1) {
+            if (update && $scope.component.format.indexOf(' a') === -1) {
               $scope.component.format += ' a';
             }
-          }
-          else {
-            // Remove any meridian reference, because were not in 12 hr.
-            $scope.component.format = $scope.component.format.replace(/ a/, '');
-          }
+          });
 
           if (!$scope.component.datePicker.maxDate) {
             delete $scope.component.datePicker.maxDate;
