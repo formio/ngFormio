@@ -111,13 +111,15 @@ app.controller('ProjectCreateController', [
   'FormioAlerts',
   'Formio',
   'FormioProject',
+  'ProjectFrameworks',
   function(
     $scope,
     $rootScope,
     $state,
     FormioAlerts,
     Formio,
-    FormioProject
+    FormioProject,
+    ProjectFrameworks
   ) {
     $rootScope.noBreadcrumb = false;
     $scope.isBusy = false;
@@ -125,60 +127,21 @@ app.controller('ProjectCreateController', [
     $scope.createType = 'Project';
     $scope.projectType = 'Project';
 
-    //$scope.currentProject = {template: 'default'};
-    //$scope.hasTemplate = false;
-    //$scope.templateLimit = 3;
+    $scope.frameworks = ProjectFrameworks;
 
-    //$scope.templates = [];
-    //FormioProject.loadTemplates().then(function(templates) {
-    //  $scope.templates = templates;
-    //  angular.forEach(templates, function(template) {
-    //    if (template.name === $scope.currentProject.template) {
-    //      $scope.currentProject.template = template.template;
-    //    }
-    //  });
-    //});
-    //
-    //$scope.showAllTemplates = function() {
-    //  $scope.templateLimit = Infinity;
-    //};
-    //
-    //$scope.loadTemplate = function() {
-    //  var input = angular.element(this).get(0);
-    //  if (!input || input.length === 0) {
-    //    return;
-    //  }
-    //  var template = input.files[0];
-    //
-    //  // FOR-107 - Fix for safari where FileReader isnt a function.
-    //  if (typeof window.FileReader !== 'function' && typeof window.FileReader !== 'object') {
-    //    return;
-    //  }
-    //
-    //  if (!template) {
-    //    return;
-    //  }
-    //
-    //  // Read the file.
-    //  var reader = new FileReader();
-    //  reader.onload = function(e) {
-    //    $scope.oldTemplate = $scope.currentProject.template;
-    //    $scope.currentProject.template = JSON.parse(e.target.result);
-    //    $scope.hasTemplate = true;
-    //    $scope.$apply();
-    //  };
-    //  reader.readAsText(template);
-    //};
-    //
-    //$scope.unloadTemplate = function() {
-    //  $scope.currentProject.template = $scope.oldTemplate;
-    //  $scope.oldTemplate = null;
-    //  $scope.hasTemplate = false;
-    //};
+    $scope.project = {};
+
+    if ($scope.selectedFramework) {
+      $scope.project.framework = $scope.selectedFramework.name;
+      $scope.hideFrameworks = true;
+    }
+    else {
+      $scope.project.framework = $scope.frameworks[0].name;
+    }
 
     $scope.saveProject = function() {
       $scope.isBusy = true;
-      FormioProject.createProject($scope.currentProject).then(function(project) {
+      FormioProject.createProject($scope.project).then(function(project) {
         $scope.isBusy = false;
         $state.go('project.overview', {projectId: project._id});
       });

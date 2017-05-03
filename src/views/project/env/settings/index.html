@@ -20,11 +20,6 @@
     </div>
     <p ng-if="['basic', 'trial'].indexOf(primaryProject.plan) !== -1 && projectSettingsVisible() && !onPrem" class="text-danger"><em><a ng-click="showUpgradeDialog(currentProject)">Upgrade</a> your project to enable Custom Domains.</em></p>
   </div>
-  <div id="form-group-description" class="form-group" ng-class="{'has-error': projectForm.description.$invalid}" ng-if="projectType === 'Project'">
-    <label for="description" class="control-label">Description</label>
-    <input type="text" class="form-control" id="description" name="description" ng-model="currentProject.description" placeholder="Enter a short description for your project." ng-maxlength="512">
-    <p class="help-block" ng-show="projectForm.description.$error.maxlength">Description cannot be longer than 512 characters.</p>
-  </div>
   <div id="form-group-protect" class="form-group" ng-if="currentProject._id">
     <label for="protect" class="control-label">
       <input type="checkbox" id="protect" ng-model="currentProject.protect"> Protected mode
@@ -37,105 +32,5 @@
       </ul>
     </div>
   </div>
-  <div ng-if="!currentProject._id && createType === 'Project'">
-    <div class="alert alert-success">
-      <h3>Free 30 day Team Pro Trial</h3>
-      <p>Test out all the features of Team Pro Trial for 30 days. No Credit Card required!</p>
-      <p>These include</p>
-      <ul>
-        <li>The ability to create teams and collaborate with other developers</li>
-        <li>Test out 3rd party integrations such as Email, File storage and Data connectors</li>
-        <li>Create multiple environments for Dev/Stage/Live to set up a deployment and testing workflow for your project.</li>
-      </ul>
-      <p>You can upgrade or downgrade your project at any time.</p>
-    </div>
-  </div>
-  <!--<div id="form-group-template"  class="form-group" ng-if="currentProject.template && !hasTemplate">-->
-    <!--<div class="panel panel-default" >-->
-      <!--<div class="panel-heading">-->
-        <!--<div class="panel-title">-->
-          <!--<span>Select a template</span>-->
-          <!--<a class="pull-right text-muted" href="https://help.form.io/userguide/project-templates/" target="_blank"><i class="glyphicon glyphicon-question-sign"></i></a>-->
-        <!--</div>-->
-      <!--</div>-->
-      <!--<div class="panel-body">-->
-        <!--<p>These project templates will automatically create some Resources and Forms to help bootstrap your project.</p>-->
-        <!--<div class="row">-->
-          <!--<div class="col-sm-6 col-md-4" ng-repeat="template in templates | limitTo:templateLimit " ng-click="currentProject.template = template.template">-->
-            <!--<div class="thumbnail template-card" ng-class="{'template-card-selected': template.template == currentProject.template}">-->
-              <!--<div class="project-tile-icon">-->
-                <!--<img ng-if="template.thumbnail" class="project-template-img" ng-src="{{ template.thumbnail }}" />-->
-                <!--<i ng-if="!template.thumbnail" class="fa fa-html5"></i>-->
-              <!--</div>-->
-              <!--<div class="caption">-->
-                <!--<input ng-hide="true" type="radio" name="{{template.name}}" value="{{template.template}}" ng-model="currentProject.template">-->
-                <!--<h4>{{template.title}}</h4>-->
-                <!--<p class="text-muted">{{template.description}}</p>-->
-              <!--</div>-->
-            <!--</div>-->
-          <!--</div>-->
-        <!--</div>-->
-        <!--<div class="row" ng-hide="templates.length <= templateLimit">-->
-          <!--<div class="col-xs-10 col-xs-offset-1 col-more-templates">-->
-            <!--<button type="button" class="btn btn-default btn-block" ng-click="showAllTemplates()">Show More Templates</button>-->
-          <!--</div>-->
-        <!--</div>-->
-        <!--<div class="row">-->
-          <!--<div class="col-xs-12 text-center">-->
-            <!--<div class="col-xs-5 col-vertical-center"><hr></div>&lt;!&ndash;-->
-            <!--&ndash;&gt;<div class="col-xs-1 col-vertical-center text-center"><small>OR</small></div>&lt;!&ndash;-->
-            <!--&ndash;&gt;<div class="col-xs-5 col-vertical-center"><hr></div>-->
-          <!--</div>-->
-        <!--</div>-->
-        <!--<div class="row">-->
-          <!--<div class="col-xs-12">-->
-            <!--<span class="btn btn-default btn-block btn-file">-->
-              <!--Upload Your Own Template <input id="template-select" type="file" accept=".json" onchange="angular.element(this).scope().loadTemplate.call(this)">-->
-            <!--</span>-->
-          <!--</div>-->
-        <!--</div>-->
-      <!--</div>-->
-    <!--</div>-->
-  <!--</div>-->
-  <!--<div ng-if="hasTemplate">-->
-    <!--<div class="panel panel-success">-->
-      <!--<div class="panel-heading">Template Information</div>-->
-      <!--<div class="panel-body">-->
-        <!--<div class="table-responsive">-->
-          <!--<table class="table">-->
-            <!--<tr><td>Title</td><td>{{ currentProject.template.title }}</td></tr>-->
-            <!--<tr><td>Name</td><td>{{ currentProject.template.name }}</td></tr>-->
-            <!--<tr><td>Description</td><td>{{ currentProject.template.description }}</td></tr>-->
-            <!--<tr>-->
-              <!--<td>Roles</td>-->
-              <!--<td>-->
-                <!--<span class="label label-primary" style="margin-right: 5px;" ng-repeat="role in currentProject.template.roles">{{ role.title }}</span>-->
-              <!--</td>-->
-            <!--</tr>-->
-            <!--<tr>-->
-              <!--<td>Resources</td>-->
-              <!--<td>-->
-                <!--<span class="label label-primary" style="margin-right: 5px;" ng-repeat="resource in currentProject.template.resources">{{ resource.title }}</span>-->
-              <!--</td>-->
-            <!--</tr>-->
-            <!--<tr>-->
-              <!--<td>Forms</td>-->
-              <!--<td>-->
-                <!--<span class="label label-primary" style="margin-right: 5px;" ng-repeat="form in currentProject.template.forms">{{ form.title }}</span>-->
-              <!--</td>-->
-            <!--</tr>-->
-            <!--<tr>-->
-              <!--<td>Actions</td>-->
-              <!--<td>-->
-                <!--<span class="label label-primary" style="margin-right: 5px;" ng-repeat="action in currentProject.template.actions">{{ action.title }} for {{ action.form }}</span>-->
-              <!--</td>-->
-            <!--</tr>-->
-          <!--</table>-->
-        <!--</div>-->
-        <!--<p><a class="text-muted" href="" ng-click="unloadTemplate()">Nevermind, I don't want this template.</a></p>-->
-      <!--</div>-->
-    <!--</div>-->
-  <!--</div>-->
-  <!--<a ng-if="!currentProject._id" ui-sref="home()" class="btn btn-default">Cancel</a>-->
-  <button type="submit" class="btn btn-primary" ng-disabled="projectForm.$invalid"><i ng-if="isBusy" class="fa fa-spinner fa-refresh"></i> {{currentProject._id ? 'Save ' + projectType : (createType === 'Environment' ? 'Add Environment' : 'Get Started') }}</button>
+  <button type="submit" class="btn btn-primary" ng-disabled="projectForm.$invalid"><i ng-if="isBusy" class="fa fa-spinner fa-refresh"></i> {{currentProject._id ? 'Save ' + projectType : 'Add Environment' }}</button>
 </form>

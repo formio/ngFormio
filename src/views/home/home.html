@@ -30,11 +30,11 @@
         <p>Select a framework to get started with a new project on a <strong>free 30 day Team Pro trial</strong></p>
       </div>
       <ul class="list-inline">
-        <li ng-repeat="platform in platforms" class="project-template-item grow">
-          <div class="project-template-card" ng-click="newProject(platform);">
-            <img ng-if="platform.img" class="project-template-img" ng-src="{{ platform.img }}" />
+        <li ng-repeat="framework in frameworks" class="project-template-item grow">
+          <div class="project-template-card" ng-click="newProject(framework);">
+            <img ng-if="framework.img" class="project-template-img" ng-src="{{ framework.img }}" />
             <div class="project-template-info">
-              <h5 class="ellipsis">{{ platform.title }}</h5>
+              <h5 class="ellipsis">{{ framework.title }}</h5>
             </div>
           </div>
         </li>
@@ -74,7 +74,7 @@
           </div>
         </div>
         <div class="col-sm-4 project-example">
-          <div class="project well" title="My Awesome Project" ng-click="newProject(platforms[0]);">
+          <div class="project well" title="My Awesome Project" ng-click="newProject();">
             <div class="text-center"><h4>New Project</h4></div>
             <div class="text-center"><i class="fa fa-plus"></i></div>
           </div>

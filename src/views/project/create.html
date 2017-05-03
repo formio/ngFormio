@@ -1,6 +1,19 @@
 <div class="row">
+  <div class="col-sm-12">
+    <div class="alert alert-success">
+      <h3>Free 30 day Team Pro Trial</h3>
+      <p>Test out all the features of Team Pro Trial for 30 days. No Credit Card required!</p>
+      <p>These include</p>
+      <ul>
+        <li>The ability to create teams and collaborate with other developers</li>
+        <li>Test out 3rd party integrations such as Email, File storage and Data connectors</li>
+        <li>Create multiple environments for Dev/Stage/Live to set up a deployment and testing workflow for your project.</li>
+      </ul>
+      <p>You can upgrade or downgrade your project at any time.</p>
+    </div>
+  </div>
   <div class="col-sm-12 col-margin-bottom" ng-controller="ProjectCreateController">
-    <h2>New {{ selectedPlatform.title }}</h2>
-    <ng-include src="'views/project/env/settings/index.html'"></ng-include>
+    <h2>New {{ selectedFramework.title }}</h2>
+    <ng-include src="'views/project/settings.html'"></ng-include>
   </div>
 </div>

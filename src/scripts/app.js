@@ -200,7 +200,7 @@ angular
         })
         .state('project.settings', {
           url: '/settings',
-          templateUrl: 'views/project/settings.html',
+          templateUrl: 'views/project/primary-settings.html',
           controller: 'PrimaryProjectSettingsController'
         })
         .state('project.env', {
@@ -560,7 +560,7 @@ angular
         return (project.plan === 'team' || project.plan === 'commercial' || project.plan === 'trial');
       };
 
-      $scope.platforms = ProjectFrameworks;
+      $scope.frameworks = ProjectFrameworks;
 
       $scope.templates = [];
       FormioProject.loadTemplates().then(function(templates) {
@@ -568,12 +568,9 @@ angular
       });
 
       $scope.submitted = false;
-      $scope.selectedPlatform = null;
+      $scope.selectedFramework = null;
       $scope.newProject = function(framework) {
-        $scope.selectedPlatform = framework;
-        $scope.currentProject = {
-          framework: framework.name
-        };
+        $scope.selectedFramework = framework;
         ngDialog.open({
           templateUrl: 'views/project/create.html',
           scope: $scope

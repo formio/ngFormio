@@ -1,40 +1,25 @@
-<div class="project-section-inner-content">
-  <h2>Project Settings</h2>
-  <div class="row">
-    <div class="col-sm-8">
-      <form name="projectForm" ng-submit="saveProject()" novalidate>
-        <div id="form-group-title" class="form-group" ng-class="{'has-error': projectForm.title.$invalid && projectForm.title.$dirty}">
-          <label for="title" class="control-label required-field">{{ createType }} Title</label>
-          <input type="text" class="form-control" id="title" name="title" ng-model="project.title" placeholder="Give your {{ createType }} a name." ng-maxlength="63" ng-required="true" autofocus="true">
-          <p class="help-block" ng-show="projectForm.title.$error.maxlength">{{ projectType }} Title cannot be longer than 63 characters.</p>
-        </div>
-        <div id="form-group-description" class="form-group" ng-class="{'has-error': projectForm.description.$invalid}">
-          <label for="description" class="control-label">Description</label>
-          <input type="text" class="form-control" id="description" name="description" ng-model="project.description" placeholder="Enter a short description for your project." ng-maxlength="512">
-          <p class="help-block" ng-show="projectForm.description.$error.maxlength">Description cannot be longer than 512 characters.</p>
-        </div>
-        <div>
-          <label for="description" class="control-label">Target Framework</label>
-          <p class="text-muted">Select which framework you plan to build this project in.</p>
-          <ui-select ng-model="project.framework" theme="bootstrap">
-            <ui-select-match placeholder="Select framework">{{$select.selected.title}}</ui-select-match>
-            <ui-select-choices repeat="framework.name as framework in frameworks" refresh="refreshMembers($select.search)" refresh-delay="250">
-              <span>{{ framework.title }}</span>
-            </ui-select-choices>
-          </ui-select>
-        </div>
-        <br />
-        <a ui-sref="project.overview()" class="btn btn-default">Cancel</a>
-        <button type="submit" class="btn btn-primary" ng-disabled="projectForm.$invalid"><i ng-if="isBusy" class="fa fa-spinner fa-refresh"></i> Save Project</button>
-      </form>
-    </div>
-    <div class="col-sm-4">
-      <div class="panel panel-primary">
-        <div class="panel-heading">Global Project Settings</div>
-        <div class="panel-body">
-          <p>These project settings are the main settings for the project. Most settings are found within Environment settings for each environment.</p>
-        </div>
-      </div>
-    </div>
+<form name="projectForm" ng-submit="saveProject()" novalidate>
+  <div id="form-group-title" class="form-group" ng-class="{'has-error': projectForm.title.$invalid && projectForm.title.$dirty}">
+    <label for="title" class="control-label required-field">{{ createType }} Title</label>
+    <input type="text" class="form-control" id="title" name="title" ng-model="project.title" placeholder="Give your {{ createType }} a name." ng-maxlength="63" ng-required="true" autofocus="true">
+    <p class="help-block" ng-show="projectForm.title.$error.maxlength">{{ projectType }} Title cannot be longer than 63 characters.</p>
   </div>
-</div>
+  <div id="form-group-description" class="form-group" ng-class="{'has-error': projectForm.description.$invalid}">
+    <label for="description" class="control-label">Description</label>
+    <input type="text" class="form-control" id="description" name="description" ng-model="project.description" placeholder="Enter a short description for your project." ng-maxlength="512">
+    <p class="help-block" ng-show="projectForm.description.$error.maxlength">Description cannot be longer than 512 characters.</p>
+  </div>
+  <div ng-if="!hideFrameworks">
+    <label for="description" class="control-label">Target Framework</label>
+    <p class="text-muted">Select which framework you plan to build this project in.</p>
+    <ui-select ng-model="project.framework" theme="bootstrap">
+      <ui-select-match placeholder="Select framework">{{$select.selected.title}}</ui-select-match>
+      <ui-select-choices repeat="framework.name as framework in frameworks" refresh="refreshMembers($select.search)" refresh-delay="250">
+        <span>{{ framework.title }}</span>
+      </ui-select-choices>
+    </ui-select>
+  </div>
+  <br />
+  <a ui-sref="project.overview()" class="btn btn-default" ng-if="project._id">Cancel</a>
+  <button type="submit" class="btn btn-primary" ng-disabled="projectForm.$invalid"><i ng-if="isBusy" class="fa fa-spinner fa-refresh"></i> {{ project._id ? 'Save Project' : 'Create Project'}}</button>
+</form>
