@@ -738,6 +738,7 @@ app.controller('FormEditController', [
     // Wrap saveForm in the editor to clear dirty when saved.
     var parentSave = $scope.saveForm;
     $scope.saveForm = function() {
+      contentLoaded = false;
       dirty = false;
       return parentSave();
     };

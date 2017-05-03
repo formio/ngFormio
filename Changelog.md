@@ -25,6 +25,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Environment Switcher
  - Project Templates
 
+## 4.0.7
+### Fixed
+ - Fixed issue where forms saved with the content component would flag the builder as being dirty.
+
+### Changed
+ - Upgraded ng-formio to 2.16.4
+
+## 4.0.6
+### Reverted
+ - Rolled back ngDialog to fix firefox issues.
+
+### Changed
+ - Upgraded ng-formio to 2.16.3
+
 ## 4.0.5
 ### Fixed
  - Fixed issue where the resource fields appeared twice on the save submission action configuration page.
