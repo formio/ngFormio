@@ -136,6 +136,9 @@ app.controller('ProjectCreateController', [
       $scope.hideFrameworks = true;
     }
     else {
+      $scope.selectedFramework = {
+        title: 'Project'
+      };
       $scope.project.framework = $scope.frameworks[0].name;
     }
 
