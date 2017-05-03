@@ -5,6 +5,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [UNRELEASED]
+## 4.0.8
+### Changed
+ - Upgraded ng-formio to 2.16.5 to revert tableview changes.
+
 ## 4.0.7
 ### Fixed
  - Fixed issue where forms saved with the content component would flag the builder as being dirty.
