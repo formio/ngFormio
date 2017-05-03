@@ -1,4 +1,5 @@
 var fs = require('fs');
+var formioUtils = require('formiojs/utils');
 
 module.exports = function(app) {
   app.config([
@@ -13,12 +14,19 @@ module.exports = function(app) {
         tableView: function(data, component, $interpolate, componentInfo) {
           var view = '<table class="table table-striped table-bordered"><thead><tr>';
           angular.forEach(component.components, function(component) {
-            view += '<th>' + component.label + '</th>';
+            view += '<th>' + (component.label || '') + ' (' + component.key + ')</th>';
           });
           view += '</tr></thead>';
           view += '<tbody>';
           view += '<tr>';
-          angular.forEach(component.components, function(component) {
+          //angular.forEach(component.components, function(component) {
+          formioUtils.eachComponent(component.components, function(component) {
+            // Don't render disabled fields, or fields with undefined data.
+            if (!component.tableView || data[component.key] === undefined) {
+              return;
+            }
+
+            // If the component has a defined tableView, use that, otherwise try and use the raw data as a string.
             var info = componentInfo.components.hasOwnProperty(component.type) ? componentInfo.components[component.type] : {};
             if (info.tableView) {
               view += '<td>' +
@@ -40,7 +48,7 @@ module.exports = function(app) {
               view += ' ' + component.suffix;
             }
             view += '</td>';
-          });
+          }, true);
           view += '</tr>';
           view += '</tbody></table>';
           return view;
