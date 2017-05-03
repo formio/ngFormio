@@ -5,8 +5,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [UNRELEASED]
+## 4.0.7
 ### Fixed
  - Fixed issue where forms saved with the content component would flag the builder as being dirty.
+
+### Changed
+ - Upgraded ng-formio to 2.16.4
+
+## 4.0.6
+### Reverted
+ - Rolled back ngDialog to fix firefox issues.
+
+### Changed
+ - Upgraded ng-formio to 2.16.3
 
 ## 4.0.5
 ### Fixed
