@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [UNRELEASED]
+
+## 2.16.4
 ### Fixed
  - Issue where the datetime meridian could become un-synchronized from the component settings format field and show
    different meridian settings
