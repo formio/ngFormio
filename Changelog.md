@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [UNRELEASED]
 ### Fixed
+ - Issue where the datetime meridian could become un-synchronized from the component settings format field and show
+   different meridian settings
+ - Issue where the datetime meridian was not consistent between the submission grid and submission view.
+ - Issue where viewing a submission with a datetime component and default value didnt display on the first rendering of
+   the edit state.
  - Issue where form components inside containers, inside layout components, inside containers would not render in the
    submission grid.
  - Issue where form components inside data grids, inside layout components, inside containers would not render in the
