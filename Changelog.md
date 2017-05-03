@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [UNRELEASED]
+### Removed
+ - FOR-404 fix, as it regressed the submission grid for 2.16.4
 
 ## 2.16.4
 ### Fixed
