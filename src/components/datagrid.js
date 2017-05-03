@@ -1,6 +1,4 @@
 var fs = require('fs');
-var formioUtils = require('formiojs/utils');
-
 module.exports = function(app) {
   app.config([
     'formioComponentsProvider',
@@ -12,20 +10,13 @@ module.exports = function(app) {
         tableView: function(data, component, $interpolate, componentInfo) {
           var view = '<table class="table table-striped table-bordered"><thead><tr>';
           angular.forEach(component.components, function(component) {
-            view += '<th>' + (component.label || '') + ' (' + component.key + ')</th>';
+            view += '<th>' + component.label + '</th>';
           });
           view += '</tr></thead>';
           view += '<tbody>';
-
           angular.forEach(data, function(row) {
             view += '<tr>';
-            formioUtils.eachComponent(component.components, function(component) {
-              // Don't render disabled fields, or fields with undefined data.
-              if (!component.tableView || row[component.key] === undefined) {
-                return;
-              }
-
-              // If the component has a defined tableView, use that, otherwise try and use the raw data as a string.
+            angular.forEach(component.components, function(component) {
               var info = componentInfo.components.hasOwnProperty(component.type) ? componentInfo.components[component.type] : {};
               if (info.tableView) {
                 view += '<td>' + info.tableView(row[component.key] || '', component, $interpolate, componentInfo) + '</td>';
