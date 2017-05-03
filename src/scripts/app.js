@@ -557,7 +557,7 @@ angular
       });
 
       $scope.teamSupport = function(project) {
-        return (project.plan === 'team' || project.plan === 'commercial');
+        return (project.plan === 'team' || project.plan === 'commercial' || project.plan === 'trial');
       };
 
       $scope.platforms = ProjectFrameworks;

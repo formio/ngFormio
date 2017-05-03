@@ -568,6 +568,19 @@ div.project-section-separator {
   }
 }
 
+.project-example {
+  .well {
+    border: 2px dashed #ddd;
+    background-color: inherit;
+    box-shadow: none;
+    cursor: pointer;
+    padding-top: 100px;
+    i.fa-plus {
+      font-size: 3em;
+    }
+  }
+}
+
 .project-trial-remaining {
   font-size: 1.2em;
   top: -2px;

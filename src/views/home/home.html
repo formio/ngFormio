@@ -19,9 +19,6 @@
 <div class="welcome-info-strip" ng-if="showWelcome()">
   <div class="container">
     <div class="row">
-      <div class="col-sm-10 col-sm-offset-1 text-center">
-        <p>What are you going to build now? Let's create a new project with your favorite framework.</p>
-      </div>
     </div>
   </div>
 </div>
@@ -29,6 +26,9 @@
   <div class="container">
     <div class="new-project-section">
       <h3 class="new-project-header text-center">Getting Started</h3>
+      <div class="text-center">
+        <p>Select a framework to get started with a new project on a <strong>free 30 day Team Pro trial</strong></p>
+      </div>
       <ul class="list-inline">
         <li ng-repeat="platform in platforms" class="project-template-item grow">
           <div class="project-template-card" ng-click="newProject(platform);">
@@ -45,13 +45,8 @@
 <div class="container projects">
   <div class="row">
     <div class="col-md-9 existing-projects-section">
-      <h2><span ng-if="projectsLoaded && projects.length" ng-cloak>Existing Projects</span></h2>
-      <div class="project well" ng-if="projectsLoaded && !projects.length" ng-cloak>
-        <h4 class="project-title">Create your project <small><a href="https://help.form.io/userguide/projects/#new-project" target="_blank"><i class="fa fa-info-circle"></i></a></small></h4>
-        <ng-include src="'views/project/help.html'"></ng-include>
-        <strong>Select a framework above to get started.</strong>
-      </div>
-      <div class="row" ng-if="projectsLoaded && projects.length" ng-cloak>
+      <h2><span ng-if="projectsLoaded" ng-cloak>Existing Projects</span></h2>
+      <div class="row" ng-if="projectsLoaded" ng-cloak>
         <div class="col-sm-4" ng-repeat="project in projects">
           <div class="project well" ng-click="goToProject(project)" title="{{ project.title }}">
             <span class="label project-plan-label" ng-class="getPlanLabel(project.plan)">{{ getPlanName(project.plan) | uppercase }}</span>
@@ -78,21 +73,27 @@
             </div>
           </div>
         </div>
+        <div class="col-sm-4 project-example">
+          <div class="project well" title="My Awesome Project" ng-click="newProject(platforms[0]);">
+            <div class="text-center"><h4>New Project</h4></div>
+            <div class="text-center"><i class="fa fa-plus"></i></div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="col-md-3">
-      <h2>Teams <small><a href="https://help.form.io/userguide/teams/"><i class="fa fa-info-circle"></i></a></small></h2>
-      <div class="well" ng-show="!teamsLoading && !(teamsEnabled || teamMember) && !onPrem">
-        <span class="team-upgrade">Want to work collaboratively? Upgrade a project to TeamPro to enable Team functionality.</span>
-      </div>
-      <div class="list-group" ng-show="!teamsLoading && (teamsEnabled || teamMember || onPrem)">
+      <h2>Teams <small><a href="https://help.form.io/userguide/teams/" target="_blank"><i class="fa fa-info-circle"></i></a></small></h2>
+      <div class="list-group" ng-show="!teamsLoading">
+        <div class="well" ng-show="!teams.length">
+          <span class="team-upgrade">Want to work collaboratively? Create a team to allow others to help work on your project.</span>
+        </div>
         <a ui-sref="team.view({teamId: team._id})" class="list-group-item" ng-repeat="team in teams">
           <span class="badge"><i class="fa fa-users"></i>&nbsp;{{ team.data.members.length || 0 }}</span>
           <h4 class="list-group-item-heading">{{ team.data.name }}</h4>
           <span class="label label-success">{{ team.owner === user._id ? 'OWNER' : 'MEMBER'}}</span>
         </a>
       </div>
-      <div class="list-group" ng-show="teamsEnabled || onPrem">
+      <div class="list-group">
         <a ui-sref="createTeam()" class="btn btn-primary btn-block"><span class="glyphicon glyphicon-plus circle"></span> Create Team</a>
       </div>
     </div>

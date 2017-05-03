@@ -2399,7 +2399,7 @@ app.constant('ProjectFrameworks', [
     img: 'images/platforms/html5.png'
   },
   {
-    title: 'Simple Forms',
+    title: 'Stand-Alone Forms',
     name: 'simple',
     img: 'images/platforms/form.png'
   },
