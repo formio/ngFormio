@@ -311,7 +311,7 @@ app.controller('ProjectController', [
     var primaryProjectQ = $q.defer();
     $scope.primaryProjectPromise = primaryProjectQ.promise;
 
-    $scope.loadProjectPromise = $scope.formio.loadProject().then(function(result) {
+    $scope.loadProjectPromise = $scope.formio.loadProject(null, {ignoreCache: true}).then(function(result) {
       $scope.currentProject = result;
       $scope.projectType = 'Environment';
       $scope.environmentName = ($scope.currentProject.project) ? $scope.currentProject.title : 'Live';
@@ -399,7 +399,7 @@ app.controller('ProjectController', [
       $scope.projectTeamsLoading = true;
       if ($scope.currentProject.project) {
         // This is an environment. Load the primary Project
-        primaryProjectQ.resolve((new Formio('/project/' + $scope.currentProject.project)).loadProject());
+        primaryProjectQ.resolve((new Formio('/project/' + $scope.currentProject.project)).loadProject(null, {ignoreCache: true}));
       }
       else {
         // This is the primary environment.
@@ -409,7 +409,7 @@ app.controller('ProjectController', [
         $scope.primaryProject = primaryProject;
 
         // Load project environments
-        Formio.loadProjects('?project=' + $scope.primaryProject._id).then(function(environments) {
+        Formio.makeStaticRequest(AppConfig.apiBase + '/project?project=' + $scope.primaryProject._id, 'GET', null, {ignoreCache: true}).then(function(environments) {
           $scope.environments = environments;
         });
 
@@ -513,29 +513,18 @@ app.controller('ProjectController', [
     $scope.getAPICallsPercent = ProjectPlans.getAPICallsPercent.bind(ProjectPlans);
     $scope.getProgressBarClass = ProjectPlans.getProgressBarClass.bind(ProjectPlans);
     $scope.showUpgradeDialog = ProjectUpgradeDialog.show.bind(ProjectUpgradeDialog);
-
-    $scope.setCurrentTag = function(tag) {
-      if ($scope.currentProject._id === $scope.primaryProject._id) {
-        $scope.primaryProject._id = tag;
-      }
-      else {
-        $scope.environments.forEach(function(environment) {
-          if (environment._id === $scope.currentProject._id) {
-            environment.tag = tag;
-          }
-        });
-      }
-    }
   }
 ]);
 
 app.controller('ProjectDeployController', [
   '$scope',
+  '$state',
   'AppConfig',
   'Formio',
   'FormioAlerts',
   function(
     $scope,
+    $state,
     AppConfig,
     Formio,
     FormioAlerts
@@ -566,7 +555,7 @@ app.controller('ProjectDeployController', [
             type: 'success',
             message: 'Project tag ' + tag.tag + ' deployed to ' + $scope.currentProject.title + '.'
           });
-          $scope.setCurrentTag(tag.tag);
+          $state.transitionTo($state.current, null, { reload: true, inherit: true, notify: true });
         })
         .catch(FormioAlerts.onError.bind(FormioAlerts));
     };
@@ -602,7 +591,7 @@ app.controller('ProjectTagCreateController', [
             type: 'success',
             message: 'Project Tag was created.'
           });
-          $scope.setCurrentTag(tag);
+          $state.transitionTo($state.current, null, { reload: true, inherit: true, notify: true });
         })
         .catch(FormioAlerts.onError.bind(FormioAlerts));
     };
