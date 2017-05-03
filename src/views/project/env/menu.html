@@ -11,9 +11,9 @@
       </ul>
     </li>
     <li role="presentation" ng-class="{active:($state.includes('project.env.deployments.deploy'))}">
-      <a ui-sref="project.env.deployments.deploy">Deployments</a>
+      <a ui-sref="project.env.deployments.deploy">Deployment</a>
       <ul ng-if="$state.current.name.includes('project.env.deployments')" class="nav nav-pills nav-stacked">
-        <li role="presentation" ng-class="{active:($state.includes('project.env.deployments.create'))}"><a ui-sref="project.env.deployments.create">Create Tag</a></li>
+        <li role="presentation" ng-class="{active:($state.includes('project.env.deployments.create'))}"><a ui-sref="project.env.deployments.create">Create Version Tag</a></li>
         <li role="presentation" ng-class="{active:($state.includes('project.env.deployments.import'))}"><a ui-sref="project.env.deployments.import">Import Template</a></li>
         <li role="presentation" ng-class="{active:($state.includes('project.env.deployments.export'))}"><a ui-sref="project.env.deployments.export">Export Template</a></li>
       </ul>

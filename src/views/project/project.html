@@ -1,6 +1,9 @@
 <div class="project-section-header">
   <a class="pull-right project-section-header-icon" ng-if="user._id === primaryProject.owner" ui-sref="project.settings"><i class="fa fa-cog" title="Project Settings"></i></a>
   <a class="btn btn-primary pull-right project-section-header-button" ng-if="user._id === primaryProject.owner" ui-sref="project.teams"><i class="fa fa-users"></i> Teams</a>
+  <div style="right: 0; position: absolute; margin-top: 50px; margin-right: 20px;">
+    <span class="pull-right"><strong>{{ environmentName }} Project Url:</strong> {{ projectPath(currentProject) }}</span>
+  </div>
   <ul class="list-inline project-title-header">
     <li><h2 class="project-title"><a ui-sref="project.overview">{{ primaryProject.title }}</a></h2></li>
     <li ng-if="currentSection.title"><h2>›</h2></li>
@@ -29,9 +32,6 @@
     </ul>
   </div>
   <div class="project-main">
-    <div class="project-section-info pull-right">
-      <span><strong>Project Url:</strong> <a ui-sref="project.env.settings.info">{{ projectPath(currentProject) }}</a></span>
-    </div>
     <div class="project-content" ui-view></div>
   </div>
 </div>

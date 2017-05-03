@@ -314,6 +314,7 @@ app.controller('ProjectController', [
     $scope.loadProjectPromise = $scope.formio.loadProject().then(function(result) {
       $scope.currentProject = result;
       $scope.projectType = 'Environment';
+      $scope.environmentName = ($scope.currentProject.project) ? $scope.currentProject.title : 'Live';
       $scope.projectApi = $rootScope.projectPath(result);
       $rootScope.currentProject = result;
       $scope.projectsLoaded = true;
@@ -512,6 +513,19 @@ app.controller('ProjectController', [
     $scope.getAPICallsPercent = ProjectPlans.getAPICallsPercent.bind(ProjectPlans);
     $scope.getProgressBarClass = ProjectPlans.getProgressBarClass.bind(ProjectPlans);
     $scope.showUpgradeDialog = ProjectUpgradeDialog.show.bind(ProjectUpgradeDialog);
+
+    $scope.setCurrentTag = function(tag) {
+      if ($scope.currentProject._id === $scope.primaryProject._id) {
+        $scope.primaryProject._id = tag;
+      }
+      else {
+        $scope.environments.forEach(function(environment) {
+          if (environment._id === $scope.currentProject._id) {
+            environment.tag = tag;
+          }
+        });
+      }
+    }
   }
 ]);
 
@@ -552,6 +566,7 @@ app.controller('ProjectDeployController', [
             type: 'success',
             message: 'Project tag ' + tag.tag + ' deployed to ' + $scope.currentProject.title + '.'
           });
+          $scope.setCurrentTag(tag.tag);
         })
         .catch(FormioAlerts.onError.bind(FormioAlerts));
     };
@@ -587,7 +602,7 @@ app.controller('ProjectTagCreateController', [
             type: 'success',
             message: 'Project Tag was created.'
           });
-          $state.go('project.env.deployments.deploy');
+          $scope.setCurrentTag(tag);
         })
         .catch(FormioAlerts.onError.bind(FormioAlerts));
     };

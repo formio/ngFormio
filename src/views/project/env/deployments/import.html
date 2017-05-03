@@ -1,12 +1,12 @@
 <div>
-  <h3>Import {{ currentProject.title }} Project Template </h3>
+  <h3>Import Project Template to {{ environmentName }}</h3>
   <div class="row">
     <div class="col-md-8">
       <p>Importing a project definition will update all forms, resources, roles and access for the environment from a definition file.</p>
       <div class="form-inline">
         <label class="control-label" for="file">Name</label>
         <p><input id="file" class="form-control" type="file" name="file" accept=".json" fileread="importFile"></p>
-        <p><button type="submit" class="btn btn-primary" ng-click="importTemplate(importFile)">Import Project Template to {{ currentProject.title }}</button></p>
+        <p><button type="submit" class="btn btn-primary" ng-click="importTemplate(importFile)">Import Project Template to {{ environmentName }}</button></p>
       </div>
     </div>
     <div class="col-md-4">
