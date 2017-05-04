@@ -10,8 +10,24 @@ module.exports = function(app) {
         settings: {
           input: false,
           key: 'columns',
-          columns: [{components: []}, {components: []}]
+          columns: [{components: [], width: 6, offset: 0, push: 0, pull: 0},
+                    {components: [], width: 6, offset: 0, push: 0, pull: 0}]
         },
+        controller: ['$scope', function($scope) {
+          // Adjust column component setting from before width, offset...
+          if ($scope.component.columns.length   === 2
+          &&  $scope.component.columns[0].width === undefined
+          &&  $scope.component.columns[1].width === undefined) {
+              $scope.component.columns[0].width   = 6;
+              $scope.component.columns[0].offset  = 0;
+              $scope.component.columns[0].push    = 0;
+              $scope.component.columns[0].pull    = 0;
+              $scope.component.columns[1].width   = 6;
+              $scope.component.columns[1].offset  = 0;
+              $scope.component.columns[1].push    = 0;
+              $scope.component.columns[1].pull    = 0;
+          }
+        }],
         viewTemplate: 'formio/componentsView/columns.html'
       });
     }
