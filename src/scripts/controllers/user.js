@@ -126,7 +126,11 @@ app.controller('ProfileController', [
     });
 
     $scope.$on('formSubmission', function(event, submission) {
-      if (typeof submission === 'string') return; // If the form submission response wasn't an obj escape - FA-771
+      // FA-771 - If the form submission response wasn't an obj escape
+      // FOR-549 - Don't clobber the rootScope user with an OK response from updating payment information.
+      if (typeof submission === 'string' || submission.data === 'OK') {
+        return;
+      }
       $rootScope.user = submission;
       Formio.setUser(submission); // Update the cached user in localstorage.
     });
@@ -185,7 +189,9 @@ app.factory('UserInfo', [
   ) {
     return {
       getPaymentInfo: function() {
-        if (!$rootScope.user) $q.reject('Must be logged in to get payment info.');
+        if (!$rootScope.user) {
+          return $q.reject('Must be logged in to get payment info.');
+        }
 
         var formio = new Formio(AppConfig.paymentForm);
         return formio.loadSubmissions({params: {
