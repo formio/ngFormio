@@ -5,6 +5,18 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [UNRELEASED]
+### Added
+ - Updated bugfix for FOR-404
+
+### Fixed
+ - Issue where form components inside containers, inside layout components, inside containers would not render in the
+   submission grid.
+ - Issue where form components inside data grids, inside layout components, inside containers would not render in the
+   submission grid.
+
+## 2.16.5
+### Removed
+ - FOR-404 fix, as it regressed the submission grid for 2.16.4
 
 ## 2.16.4
 ### Fixed
@@ -13,10 +25,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Issue where the datetime meridian was not consistent between the submission grid and submission view.
  - Issue where viewing a submission with a datetime component and default value didnt display on the first rendering of
    the edit state.
- - Issue where form components inside containers, inside layout components, inside containers would not render in the
-   submission grid.
- - Issue where form components inside data grids, inside layout components, inside containers would not render in the
-   submission grid.
 
 ## 2.16.3
 ### Fixed
