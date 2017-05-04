@@ -1,5 +1,4 @@
 var fs = require('fs');
-var formioUtils = require('formiojs/utils');
 
 module.exports = function(app) {
   app.config([
@@ -13,42 +12,50 @@ module.exports = function(app) {
         icon: 'fa fa-folder-open',
         tableView: function(data, component, $interpolate, componentInfo) {
           var view = '<table class="table table-striped table-bordered"><thead><tr>';
+
+          // Render a column header for each component.
           angular.forEach(component.components, function(component) {
             view += '<th>' + (component.label || '') + ' (' + component.key + ')</th>';
           });
           view += '</tr></thead>';
           view += '<tbody>';
           view += '<tr>';
-          //angular.forEach(component.components, function(component) {
-          formioUtils.eachComponent(component.components, function(component) {
+
+          // Render a value for each column item.
+          angular.forEach(component.components, function(component) {
+            // If the component has a defined tableView, use that, otherwise try and use the raw data as a string.
+            var info = componentInfo.components.hasOwnProperty(component.type)
+              ? componentInfo.components[component.type]
+              : {};
+
             // Don't render disabled fields, or fields with undefined data.
-            if (!component.tableView || data[component.key] === undefined) {
+            if (component.tableView === false || (component.tableView === undefined && !info.tableView)) {
+              view += '<td></td>';
               return;
             }
 
-            // If the component has a defined tableView, use that, otherwise try and use the raw data as a string.
-            var info = componentInfo.components.hasOwnProperty(component.type) ? componentInfo.components[component.type] : {};
             if (info.tableView) {
               view += '<td>' +
                 info.tableView(
-                  data && component.key && data.hasOwnProperty(component.key) ? data[component.key] : '',
+                  data && component.key && (data.hasOwnProperty(component.key) ? data[component.key] : data),
                   component,
                   $interpolate,
                   componentInfo
                 ) + '</td>';
-              return;
             }
+            else {
+              view += '<td>';
+              if (component.prefix) {
+                view += component.prefix;
+              }
+              view += data && component.key && (data.hasOwnProperty(component.key) ? data[component.key] : data);
+              if (component.suffix) {
+                view += ' ' + component.suffix;
+              }
+              view += '</td>';
+            }
+          });
 
-            view += '<td>';
-            if (component.prefix) {
-              view += component.prefix;
-            }
-            view += data && component.key && data.hasOwnProperty(component.key) ? data[component.key] : '';
-            if (component.suffix) {
-              view += ' ' + component.suffix;
-            }
-            view += '</td>';
-          }, true);
           view += '</tr>';
           view += '</tbody></table>';
           return view;
