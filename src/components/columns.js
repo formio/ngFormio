@@ -17,8 +17,10 @@ module.exports = function(app) {
         tableView: function(data, component, $interpolate, componentInfo) {
           var view = '<table class="table table-striped table-bordered"><thead><tr>';
 
-          angular.forEach(component.columns, function() {
-            view += '<th>Column (' + component.key + ')</th>';
+          angular.forEach(component.columns, function(column) {
+            angular.forEach(column.components, function(component) {
+              view += '<th>' + (component.label || '') + ' (' + component.key + ')</th>';
+            });
           });
           view += '</tr></thead>';
           view += '<tbody>';
