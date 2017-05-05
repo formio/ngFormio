@@ -15,6 +15,8 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
       AppConfig
     ) {
       var infoCache = {};
+      var infoReady = $q.defer();
+      var infoPromise = null;
       return {
         ensureFileToken: function(project) {
           if (project.settings.filetoken) {
@@ -39,6 +41,10 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
             if (infoCache.hasOwnProperty(project._id)) {
               return $q.resolve(infoCache[project._id]);
             }
+            if (infoPromise) {
+              return infoPromise;
+            }
+            infoPromise = infoReady.promise;
             return $http.get(this.pdfUrl(project), {
               headers: {
                 'x-file-token': project.settings.filetoken,
@@ -46,6 +52,7 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
               }
             }).then(function(results) {
               infoCache[project._id] = results.data;
+              infoReady.resolve(results.data);
               return results.data;
             });
           }.bind(this));
@@ -53,10 +60,14 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
         purchasePDF: function(projectPromise, purchase) {
           return this.ensureProject(projectPromise).then(function(project) {
             return this.getInfo(projectPromise).then(function(info) {
+              if (!info) {
+                throw {data: 'Cannot find project information.'};
+              }
               if (info.data.host !== location.hostname) {
                 throw {data: 'Cannot modify pdfs under different host names.'};
               }
               infoCache[project._id] = null;
+              delete infoCache[project._id];
               return $http.post(this.pdfUrl(project) + '/purchase', purchase, {
                 headers: {
                   'x-file-token': project.settings.filetoken,
@@ -69,10 +80,14 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
         deletePDF: function(projectPromise, pdf) {
           return this.ensureProject(projectPromise).then(function(project) {
             return this.getInfo(projectPromise).then(function(info) {
+              if (!info) {
+                throw {data: 'Cannot find project information.'};
+              }
               if (info.data.host !== location.hostname) {
                 throw {data: 'Cannot modify pdfs under different host names.'};
               }
               infoCache[project._id] = null;
+              delete infoCache[project._id];
               return $http.delete(this.pdfUrl(project) + '/file/' + pdf.data.id, {
                 headers: {
                   'x-file-token': project.settings.filetoken,
@@ -84,14 +99,19 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
         },
         getPDFs: function(projectPromise) {
           return this.ensureProject(projectPromise).then(function(project) {
-            return $http.get(this.pdfUrl(project) + '/file', {
-              headers: {
-                'x-file-token': project.settings.filetoken,
-                'x-host': location.hostname
+            return this.getInfo(projectPromise).then(function(info) {
+              if (!info) {
+                throw {data: 'Cannot find project information.'};
               }
-            }).then(function(results) {
-              return results.data;
-            });
+              return $http.get(this.pdfUrl(project) + '/file', {
+                headers: {
+                  'x-file-token': project.settings.filetoken,
+                  'x-host': location.hostname
+                }
+              }).then(function(results) {
+                return results.data;
+              });
+            }.bind(this));
           }.bind(this));
         }
       };
@@ -120,9 +140,14 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
       $scope.totalPrice = 100;
       $scope.currentPlan = 'hosted';
 
-      $scope.onPlanChange = function() {
-        $scope.currentPlan = this.currentPlan;
-        if (this.currentPlan === 'hosted') {
+      $scope.onPlanChange = function(plan) {
+        $scope.currentPlan = plan || this.currentPlan;
+        if (this.currentPlan === 'basic') {
+          $scope.numForms = '1';
+          $scope.numSubmissions = '10';
+          $scope.totalPrice = 0;
+        }
+        else if (this.currentPlan === 'hosted') {
           $scope.numForms = '1,000';
           $scope.numSubmissions = '10,000';
           $scope.totalPrice = 100;
@@ -139,30 +164,34 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
           return 'Hosted';
         }
         else {
-          return 'Enterprise: On-Premise or Private Cloud'
+          return 'Enterprise: On-Premise or Private Cloud';
         }
       };
 
       $scope.forms = {};
-      $scope.buyPrice = 0;
       $scope.buyError = '';
-      $scope.buyNumber = 0;
       $scope.getPDFUrl = function(pdf) {
         return AppConfig.pdfServer + pdf.data.path + '.html';
       };
 
-      $scope.getAvailable = function() {
-        return parseInt($scope.pdfInfo.data.total, 10) - parseInt($scope.pdfInfo.data.active, 10);
-      };
-
-      $scope.type = function() {
-        return ($scope.buyType === 'pdfs') ? 'PDF Forms' : 'Submission PDFs';
-      };
-
-      $scope.total = function() {
-        var total = '$' + $scope.buyPrice + ' ';
-        total += ($scope.buyType === 'pdfs') ? 'per month' : 'one time';
-        return total;
+      $scope.getAvailable = function(type) {
+        if ($scope.pdfInfo.data.plan === 'enterprise') {
+          return 'Unlimited';
+        }
+        var allowedForms = 1;
+        var allowedSubmissions = 10;
+        if ($scope.pdfInfo.data.plan === 'hosted') {
+          allowedForms = 1000;
+          allowedSubmissions = 10000;
+        }
+        if (type === 'forms') {
+          var forms = parseInt($scope.pdfInfo.data.forms, 10);
+          return (allowedForms - forms);
+        }
+        else {
+          var submissions = parseInt($scope.pdfInfo.data.submissions, 10);
+          return (allowedSubmissions - submissions);
+        }
       };
 
       $scope.askToBuy = function() {
@@ -175,34 +204,32 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
 
       $scope.makePurchase = function() {
         $scope.buyError = '';
-        var data = {
-          pdf: '0',
-          submission: '0'
-        };
-
-        if ($scope.buyType === 'pdfs') {
-          data.pdf = $scope.buyNumber.toString();
-        }
-        else {
-          data.submission = $scope.buyNumber.toString();
-        }
-
-        PDFServer.purchasePDF($scope.loadProjectPromise, data).then(function(results) {
+        PDFServer.purchasePDF($scope.loadProjectPromise, {
+          plan: $scope.currentPlan
+        }).then(function(results) {
           $scope.pdfInfo.data = results.data.data;
           $scope.buyComplete = true;
+          if ($scope.currentPlan === 'basic') {
+            $scope.onPlanChange('hosted');
+          }
+          else if ($scope.currentPlan === 'hosted') {
+            $scope.onPlanChange('enterprise');
+          }
+          else if ($scope.currentPlan === 'enterprise') {
+            $scope.onPlanChange('hosted');
+          }
         }, function(err) {
-          FormioAlerts.onError({message: err.data || err.message});
+          $scope.buyError = err.data || err.message;
+          FormioAlerts.onError({message: $scope.buyError});
         }).catch(function(err) {
-          FormioAlerts.onError({message: err.data || err.message});
+          $scope.buyError = err.data || err.message;
+          FormioAlerts.onError({message: $scope.buyError});
         });
       };
 
       $scope.purchase = function(type) {
         $scope.buyComplete = false;
         $scope.purchaseAsk = false;
-        $scope.buyType = type;
-        $scope.buyNumber = (type === 'pdfs') ? 5 : 1000;
-        $scope.buyMin = 1000;
         ngDialog.open({
           template: 'views/project/env/pdf/purchase.html',
           scope: $scope
@@ -232,14 +259,20 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
       $scope.deletePDF = function(pdf) {
         $scope.currentPDF = pdf;
         ngDialog.open({
-          template: 'views/project/pdf/delete.html',
+          template: 'views/project/env/pdf/delete.html',
           scope: $scope
         });
       };
 
       $scope.pdfInfo = {};
       PDFServer.getInfo($scope.loadProjectPromise).then(function(info) {
+        if (!info) {
+          throw {data: 'Cannot find project information.'};
+        }
         $scope.pdfInfo = info;
+        if (info.data.plan === 'hosted') {
+          $scope.onPlanChange('enterprise');
+        }
       });
 
       // Get all of the forms that have a pdf attached to them.

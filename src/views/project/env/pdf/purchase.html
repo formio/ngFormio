@@ -2,8 +2,9 @@
   <h2>Select your plan</h2>
   <div class="form-group">
     <select class="form-control" ng-model="currentPlan" name="plan" id="plan" ng-change="onPlanChange()">
-      <option value="hosted">Hosted</option>
-      <option value="enterprise">Enterprise: On-Premise or Private Cloud</option>
+      <option value="basic" ng-if="pdfInfo.data.plan !== 'basic'">Basic</option>
+      <option value="hosted" ng-if="pdfInfo.data.plan !== 'hosted'">Hosted</option>
+      <option value="enterprise" ng-if="pdfInfo.data.plan !== 'enterprise'">Enterprise: On-Premise or Private Cloud</option>
     </select>
   </div>
   <table class="table table-bordered" style="background-color:white">

@@ -10,15 +10,18 @@
       <table class="table table-bordered">
         <tr>
           <th><h4>Available</h4></th>
-          <td><h4>{{ getAvailable() }}</h4></td>
+          <td><h4>{{ getAvailable('forms') }}</h4></td>
         </tr>
         <tr>
           <th><h4>Total</h4></th>
-          <td><h4>{{ pdfInfo.data.total }}</h4></td>
+          <td><h4>{{ pdfInfo.data.forms }}</h4></td>
         </tr>
       </table>
       <div class="panel-footer">
-        <a class="btn btn-primary btn-block" ng-click="purchase('pdfs')">Upgrade</a>
+        <a class="btn btn-primary btn-block" ng-click="purchase('pdfs')">
+          <span ng-if="pdfInfo.data.plan !== 'enterprise'">Upgrade</span>
+          <span ng-if="pdfInfo.data.plan === 'enterprise'">Downgrade</span>
+        </a>
       </div>
     </div>
   </div>
@@ -33,11 +36,18 @@
       <table class="table table-bordered">
         <tr>
           <th><h4>Available</h4></th>
-          <td><h4>{{ pdfInfo.data.conversions }}</h4></td>
+          <td><h4>{{ getAvailable('submissions') }}</h4></td>
+        </tr>
+        <tr>
+          <th><h4>Total</h4></th>
+          <td><h4>{{ pdfInfo.data.submissions }}</h4></td>
         </tr>
       </table>
       <div class="panel-footer">
-        <a class="btn btn-primary btn-block" ng-click="purchase('submissions')">Upgrade</a>
+        <a class="btn btn-primary btn-block" ng-click="purchase('submissions')">
+          <span ng-if="pdfInfo.data.plan !== 'enterprise'">Upgrade</span>
+          <span ng-if="pdfInfo.data.plan === 'enterprise'">Downgrade</span>
+        </a>
       </div>
     </div>
   </div>
