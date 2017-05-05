@@ -143,7 +143,10 @@ module.exports = [
 
                 var valid;
                 try {
-                  valid = jsonLogic.apply(input, $scope.submission.data);
+                  valid = jsonLogic.apply(input, {
+                    data: $scope.submission.data,
+                    row: $scope.data
+                  });
                 }
                 catch (err) {
                   valid = err.message;
