@@ -1,36 +1,8 @@
 var formioUtils = require('formiojs/utils');
 
-// FOR-524 - Attempt to load json logic.
-var jsonLogic;
-try {
-  jsonLogic = require('json-logic-js') || undefined;
-}
-catch (e) {
-  // Ignore optional module.
-}
-
 module.exports = function() {
   return {
     checkVisible: function(component, row, data) {
-      // FOR-524 - Add json conditional visibility support.
-      if (jsonLogic && !!component.jsonConditional) {
-        try {
-          if (typeof component.jsonConditional === 'string') {
-            component.jsonConditional = JSON.parse(component.jsonConditional);
-          }
-
-          return !!jsonLogic.apply(component.jsonConditional, data);
-        }
-        catch (e) {
-          /* eslint-disable no-console */
-          console.warn('Invalid JSON validator given for ' + component.key);
-          console.warn(component.jsonConditional);
-          /* eslint-enable no-console */
-          delete component.jsonConditional;
-          return true; // Show by default.
-        }
-      }
-
       var visible = formioUtils.checkCondition(component, row, data);
       if (!visible) {
         if (!component.hasOwnProperty('clearOnHide') || component.clearOnHide.toString() === 'true') {
