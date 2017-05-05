@@ -15,47 +15,63 @@ module.exports = function(app) {
         },
         viewTemplate: 'formio/componentsView/columns.html',
         tableView: function(data, component, $interpolate, componentInfo) {
-          var view = '<table class="table table-striped table-bordered"><thead><tr>';
+          // Generate a column for the component.
+          var columnForComponent = function(component) {
+            // If no component is given, generate an empty cell.
+            if (!component) {
+              return '<td></td>';
+            }
 
-          angular.forEach(component.columns, function(column) {
-            angular.forEach(column.components, function(component) {
-              view += '<th>' + (component.label || '') + ' (' + component.key + ')</th>';
-            });
+            var view = '';
+
+            // If the component has a defined tableView, use that, otherwise try and use the raw data as a string.
+            var info = componentInfo.components.hasOwnProperty(component.type)
+              ? componentInfo.components[component.type]
+              : {};
+            if (info.tableView) {
+              view += '<td>' +
+                info.tableView(
+                  data && component.key && (data.hasOwnProperty(component.key) ? data[component.key] : ''),
+                  component,
+                  $interpolate,
+                  componentInfo
+                ) + '</td>';
+            }
+            else {
+              view += '<td>';
+              if (component.prefix) {
+                view += component.prefix;
+              }
+              view += data && component.key && (data.hasOwnProperty(component.key) ? data[component.key] : '');
+              if (component.suffix) {
+                view += ' ' + component.suffix;
+              }
+              view += '</td>';
+            }
+
+            return view;
+          };
+
+          var view = '<table class="table table-striped table-bordered"><thead><tr>';
+          var maxRows = 0;
+
+          angular.forEach(component.columns, function(column, index) {
+            // Get the maximum number of rows based on the number of components.
+            maxRows = Math.max(maxRows, (column.components.length || 0));
+
+            // Add a header for each column.
+            view += '<th>Column ' + (index + 1) + ' (' + component.key + ')</th>';
           });
           view += '</tr></thead>';
           view += '<tbody>';
-          view += '<tr>';
 
-          angular.forEach(component.columns, function(column) {
-            angular.forEach(column.components, function(component) {
-              // If the component has a defined tableView, use that, otherwise try and use the raw data as a string.
-              var info = componentInfo.components.hasOwnProperty(component.type)
-                ? componentInfo.components[component.type]
-                : {};
-              if (info.tableView) {
-                view += '<td>' +
-                  info.tableView(
-                    data && component.key && (data.hasOwnProperty(component.key) ? data[component.key] : ''),
-                    component,
-                    $interpolate,
-                    componentInfo
-                  ) + '</td>';
-              }
-              else {
-                view += '<td>';
-                if (component.prefix) {
-                  view += component.prefix;
-                }
-                view += data && component.key && (data.hasOwnProperty(component.key) ? data[component.key] : '');
-                if (component.suffix) {
-                  view += ' ' + component.suffix;
-                }
-                view += '</td>';
-              }
-            });
-          });
-
-          view += '</tr>';
+          for (var index = 0; index < maxRows; index++) {
+            view += '<tr>';
+            for (var col = 0; col < component.columns.length; col++) {
+              view += columnForComponent(component.columns[col].components[index] || undefined);
+            }
+            view += '</tr>';
+          }
           view += '</tbody></table>';
           return view;
         }
