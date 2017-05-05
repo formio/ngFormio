@@ -115,6 +115,34 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
       PDFServer
     ) {
       $scope.availablePDFs = [];
+      $scope.numForms = '1,000';
+      $scope.numSubmissions = '10,000';
+      $scope.totalPrice = 100;
+      $scope.currentPlan = 'hosted';
+
+      $scope.onPlanChange = function() {
+        $scope.currentPlan = this.currentPlan;
+        if (this.currentPlan === 'hosted') {
+          $scope.numForms = '1,000';
+          $scope.numSubmissions = '10,000';
+          $scope.totalPrice = 100;
+        }
+        else {
+          $scope.numForms = 'Unlimited';
+          $scope.numSubmissions = 'Unlimited';
+          $scope.totalPrice = 250;
+        }
+      };
+
+      $scope.getPlan = function() {
+        if ($scope.currentPlan === 'hosted') {
+          return 'Hosted';
+        }
+        else {
+          return 'Enterprise: On-Premise or Private Cloud'
+        }
+      };
+
       $scope.forms = {};
       $scope.buyPrice = 0;
       $scope.buyError = '';
@@ -139,28 +167,6 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
 
       $scope.askToBuy = function() {
         $scope.purchaseAsk = true;
-      };
-
-      $scope.calculateTotal = function() {
-        if ($scope.buyType === 'pdfs') {
-          $scope.buyPrice = parseInt(parseFloat($scope.buyNumber) * parseFloat(AppConfig.pdfPrice), 10);
-        }
-        else {
-          $scope.buyPrice = parseInt((parseFloat($scope.buyNumber) * parseFloat(AppConfig.pdfPrice)) / 1000, 10);
-        }
-      };
-
-      $scope.decrementAmount = function() {
-        $scope.buyNumber -= ($scope.buyType === 'pdfs') ? 5 : 1000;
-        if ($scope.buyNumber < $scope.buyMin) {
-          $scope.buyNumber = $scope.buyMin;
-        }
-        $scope.calculateTotal();
-      };
-
-      $scope.incrementAmount = function() {
-        $scope.buyNumber += ($scope.buyType === 'pdfs') ? 5 : 1000;
-        $scope.calculateTotal();
       };
 
       $scope.cancel = function() {
@@ -196,8 +202,7 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
         $scope.purchaseAsk = false;
         $scope.buyType = type;
         $scope.buyNumber = (type === 'pdfs') ? 5 : 1000;
-        $scope.buyMin = $scope.buyNumber;
-        $scope.calculateTotal();
+        $scope.buyMin = 1000;
         ngDialog.open({
           template: 'views/project/env/pdf/purchase.html',
           scope: $scope
