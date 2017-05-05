@@ -22,7 +22,14 @@ module.exports = function(app) {
               return '<td></td>';
             }
 
-            var view = '';
+            // Generate a table for each component with one column to display the key/value for each component.
+            var view = '<td>';
+            view += '<table class="table table-striped table-bordered"><thead><tr>';
+
+            // Add a header for each component.
+            view += '<th>' + (component.label || '') + ' (' + component.key + ')</th>';
+            view += '</tr></thead>';
+            view += '<tbody>';
 
             // If the component has a defined tableView, use that, otherwise try and use the raw data as a string.
             var info = componentInfo.components.hasOwnProperty(component.type)
@@ -49,6 +56,8 @@ module.exports = function(app) {
               view += '</td>';
             }
 
+            view += '</tbody></table>';
+            view += '</td>';
             return view;
           };
 
