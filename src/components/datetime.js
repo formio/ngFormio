@@ -11,8 +11,6 @@ module.exports = function(app) {
         },
         group: 'advanced',
         controller: ['$scope', '$timeout', function($scope, $timeout) {
-          if ($scope.builder) return;
-
           // Close calendar pop up when tabbing off button
           $scope.onKeyDown = function(event) {
             return event.keyCode === 9 ? false : $scope.calendarOpen;
@@ -46,33 +44,26 @@ module.exports = function(app) {
           };
 
           // Ensure the date value is always a date object when loaded, then unbind the watch.
-          var loadComplete = $scope.$watch('data.' + $scope.component.key, function() {
-            if (!$scope.data) {
-              return;
-            }
-            var valueSet = !!$scope.data[$scope.component.key];
+          $scope.$watch('data.' + $scope.component.key, function() {
             var newValue = dateValue();
             if (newValue) {
               $scope.data[$scope.component.key] = newValue;
             }
-            if (valueSet) {
-              loadComplete();
-            }
           });
 
-          // If they have 12 hour time enabled, we need to ensure that we see the meridian in the format.
-          if (
-            $scope.component.enableTime &&
-            $scope.component.timePicker &&
-            $scope.component.timePicker.showMeridian &&
-            ($scope.component.format.indexOf('mm') !== -1) &&
-            ($scope.component.format.indexOf('a') === -1)
-          ) {
-            $scope.component.format += ' a';
-          }
-          else {
-            $scope.component.format = $scope.component.format.replace(/ a/, '');
-          }
+          // Watch for changes to the meridian settings to synchronize the submissionGrid and component view.
+          $scope.$watch('component.timePicker.showMeridian', function(update) {
+            // Remove any meridian reference, because were not in 12 hr.
+            if (!$scope.component.enableTime || !update) {
+              $scope.component.format = $scope.component.format.replace(/ a/, '');
+              return;
+            }
+
+            // If we're missing the meridian string and were in 12 hr, add it.
+            if (update && $scope.component.format.indexOf(' a') === -1) {
+              $scope.component.format += ' a';
+            }
+          });
 
           if (!$scope.component.datePicker.maxDate) {
             delete $scope.component.datePicker.maxDate;
