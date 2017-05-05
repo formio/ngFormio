@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
  - Upgrade formio.js to 2.7.3
  - Changed the jsonLogic to use both row and data for logic.
+ - No longer use "jsonConditionals" in favor of "conditions.json" property.
+ 
+## Removed
+ - jsonLogic from conditionals since that is now handled within the formio.js library.
 
 ## 2.16.5
 ### Removed
