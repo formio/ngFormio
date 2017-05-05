@@ -310,7 +310,6 @@ $project-header-color: #eee;
 .project-sidebar {
   border: none;
   background-color: darken($brand-primary, 25%);
-  border-top: 7px solid white;
   text-align: center;
   padding: 0;
   width: 70px;
@@ -666,9 +665,10 @@ ul.project-settings-menu {
 }
 
 .form-nav {
-  background-color: #efefef;
+  background-color: #fff;
   color: $gray;
   padding: 5px 10px;
+  border-bottom: 2px solid #eee;
   .nav-pills {
     li {
       padding: 0;
