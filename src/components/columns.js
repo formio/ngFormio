@@ -1,4 +1,6 @@
 var fs = require('fs');
+var GridUtils = require('../factories/GridUtils')();
+
 module.exports = function(app) {
   app.config([
     'formioComponentsProvider',
@@ -15,52 +17,6 @@ module.exports = function(app) {
         },
         viewTemplate: 'formio/componentsView/columns.html',
         tableView: function(data, component, $interpolate, componentInfo) {
-          // Generate a column for the component.
-          var columnForComponent = function(component) {
-            // If no component is given, generate an empty cell.
-            if (!component) {
-              return '<td></td>';
-            }
-
-            // Generate a table for each component with one column to display the key/value for each component.
-            var view = '<td>';
-            view += '<table class="table table-striped table-bordered"><thead><tr>';
-
-            // Add a header for each component.
-            view += '<th>' + (component.label || '') + ' (' + component.key + ')</th>';
-            view += '</tr></thead>';
-            view += '<tbody>';
-
-            // If the component has a defined tableView, use that, otherwise try and use the raw data as a string.
-            var info = componentInfo.components.hasOwnProperty(component.type)
-              ? componentInfo.components[component.type]
-              : {};
-            if (info.tableView) {
-              view += '<td>' +
-                info.tableView(
-                  data && component.key && (data.hasOwnProperty(component.key) ? data[component.key] : ''),
-                  component,
-                  $interpolate,
-                  componentInfo
-                ) + '</td>';
-            }
-            else {
-              view += '<td>';
-              if (component.prefix) {
-                view += component.prefix;
-              }
-              view += data && component.key && (data.hasOwnProperty(component.key) ? data[component.key] : '');
-              if (component.suffix) {
-                view += ' ' + component.suffix;
-              }
-              view += '</td>';
-            }
-
-            view += '</tbody></table>';
-            view += '</td>';
-            return view;
-          };
-
           var view = '<table class="table table-striped table-bordered"><thead><tr>';
           var maxRows = 0;
 
@@ -75,11 +31,9 @@ module.exports = function(app) {
           view += '<tbody>';
 
           for (var index = 0; index < maxRows; index++) {
-            view += '<tr>';
             for (var col = 0; col < component.columns.length; col++) {
-              view += columnForComponent(component.columns[col].components[index] || undefined);
+              view += '<tr>' + GridUtils.columnForComponent(data, component.columns[col].components[index] || undefined, $interpolate, componentInfo) + '</td>';
             }
-            view += '</tr>';
           }
           view += '</tbody></table>';
           return view;
