@@ -1664,7 +1664,7 @@ app.controller('FormSubmissionsController', [
             return;
           }
 
-          if (['container', 'datagrid'].indexOf(component.type) !== -1) {
+          if (['container', 'datagrid', 'well'].indexOf(component.type) !== -1) {
             FormioUtils.eachComponent(component.components, function(component) {
               if (component.key) {
                 componentHistory.push(component.key);
@@ -1673,7 +1673,7 @@ app.controller('FormSubmissionsController', [
           }
 
           columns.push(getKendoCell(component));
-        });
+        }, true);
 
         columns.push(
           {
