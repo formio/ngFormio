@@ -25,6 +25,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Environment Switcher
  - Project Templates
 
+## 4.0.9
+### Fixed
+ - Fixed issue where updating payment information would clobber the logged in users profile until a relog was performed.
+
+## 4.0.8
+### Changed
+ - Upgraded ng-formio to 2.16.5 to revert tableview changes.
+
 ## 4.0.7
 ### Fixed
  - Fixed issue where forms saved with the content component would flag the builder as being dirty.
