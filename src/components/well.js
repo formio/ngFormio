@@ -16,16 +16,17 @@ module.exports = function(app) {
           tableView: true
         },
         viewTemplate: 'formio/componentsView/well.html',
-        tableView: function(data, component, $interpolate, componentInfo) {
-          var view = '<table class="table table-striped table-bordered"><thead><tr>';
+        tableView: function(data, component, $interpolate, componentInfo, tableChild) {
+          var view = '<table class="table table-striped table-bordered table-child">';
 
-          // Add a header for the well.
-          view += '<th>Well ' + ' (' + component.key + ')</th>';
-          view += '</tr></thead>';
+          if (!tableChild) {
+            view += '<thead><tr>';
+            view += '<th>Well (' + component.key + ')</th>';
+            view += '</tr></thead>';
+          }
           view += '<tbody>';
-
           angular.forEach(component.components, function(component) {
-            view += '<tr>' + GridUtils.columnForComponent(data, component, $interpolate, componentInfo) + '</td>';
+            view += '<tr>' + GridUtils.columnForComponent(data, component, $interpolate, componentInfo, true) + '</tr>';
           });
 
           view += '</tbody></table>';

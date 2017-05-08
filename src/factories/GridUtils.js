@@ -71,7 +71,7 @@ module.exports = function() {
   };
 
   // Generate a column for the component.
-  var columnForComponent = function(data, component, $interpolate, componentInfo) {
+  var columnForComponent = function(data, component, $interpolate, componentInfo, tableChild) {
     // If no component is given, generate an empty cell.
     if (!component) {
       return '<td></td>';
@@ -79,9 +79,8 @@ module.exports = function() {
 
     // Generate a table for each component with one column to display the key/value for each component.
     var view = '<td>';
-    view += '<table class="table table-striped table-bordered"><thead><tr>';
-
-    // Add a header for each component.
+    view += '<table class="table table-striped table-bordered' + (tableChild ? ' table-child' : '') + '">';
+    view += '<thead><tr>';
     view += '<th>' + (component.label || '') + ' (' + component.key + ')</th>';
     view += '</tr></thead>';
     view += '<tbody>';
@@ -93,10 +92,11 @@ module.exports = function() {
     if (info.tableView) {
       view += '<td>' +
         info.tableView(
-          data && component.key && (data.hasOwnProperty(component.key) ? data[component.key] : ''),
+          data && component.key && (data.hasOwnProperty(component.key) ? data[component.key] : data),
           component,
           $interpolate,
-          componentInfo
+          componentInfo,
+          tableChild
         ) + '</td>';
     }
     else {
@@ -104,7 +104,7 @@ module.exports = function() {
       if (component.prefix) {
         view += component.prefix;
       }
-      view += data && component.key && (data.hasOwnProperty(component.key) ? data[component.key] : '');
+      view += data && component.key && (data.hasOwnProperty(component.key) ? data[component.key] : data);
       if (component.suffix) {
         view += ' ' + component.suffix;
       }
