@@ -10,7 +10,7 @@ module.exports = function(app) {
         template: 'formio/components/datagrid.html',
         group: 'advanced',
         tableView: function(data, component, $interpolate, componentInfo, tableChild) {
-          var view = '<table class="table table-striped table-bordered">';
+          var view = '<table class="table table-striped table-bordered table-child">';
 
           if (!tableChild) {
             view += '<thead><tr>';
@@ -32,7 +32,8 @@ module.exports = function(app) {
               // If the component has a defined tableView, use that, otherwise try and use the raw data as a string.
               var info = componentInfo.components.hasOwnProperty(component.type) ? componentInfo.components[component.type] : {};
               if (info.tableView) {
-                view += '<td>' + info.tableView(row[component.key] || '', component, $interpolate, componentInfo, true) + '</td>';
+                // Reset the tableChild value for datagrids, so that components have headers.
+                view += '<td>' + info.tableView(row[component.key] || '', component, $interpolate, componentInfo, false) + '</td>';
               }
               else {
                 view += '<td>';
