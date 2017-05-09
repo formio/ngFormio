@@ -104,7 +104,7 @@ module.exports = function() {
       if (component.prefix) {
         view += component.prefix;
       }
-      view += data && component.key && (data.hasOwnProperty(component.key) ? data[component.key] : data);
+      view += data && component.key && (data.hasOwnProperty(component.key) ? data[component.key] : '');
       if (component.suffix) {
         view += ' ' + component.suffix;
       }
