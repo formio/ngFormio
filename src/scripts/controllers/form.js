@@ -1680,6 +1680,17 @@ app.controller('FormSubmissionsController', [
               }, true);
             });
           }
+          else if (['table'].indexOf(component.type) !== -1) {
+            component.rows.forEach(function(row) {
+              row.forEach(function(col) {
+                FormioUtils.eachComponent(col.components, function(component) {
+                  if (component.key) {
+                    componentHistory.push(component.key);
+                  }
+                }, true)
+              })
+            })
+          }
 
           columns.push(getKendoCell(component));
         }, true);
