@@ -17,26 +17,33 @@ module.exports = function(app) {
         },
         viewTemplate: 'formio/componentsView/columns.html',
         tableView: function(data, component, $interpolate, componentInfo, tableChild) {
-          var view = '<table class="table table-striped table-bordered">';
+          var view = '<table class="table table-striped table-bordered table-child">';
           if (!tableChild) {
             view += '<thead><tr>';
-            var maxRows = 0;
+          }
 
-            angular.forEach(component.columns, function(column, index) {
-              // Get the maximum number of rows based on the number of components.
-              maxRows = Math.max(maxRows, (column.components.length || 0));
+          var maxRows = 0;
+          angular.forEach(component.columns, function(column, index) {
+            // Get the maximum number of rows based on the number of components.
+            maxRows = Math.max(maxRows, (column.components.length || 0));
 
+            if (!tableChild) {
               // Add a header for each column.
               view += '<th>Column ' + (index + 1) + ' (' + component.key + ')</th>';
-            });
+            }
+          });
+
+          if (!tableChild) {
             view += '</tr></thead>';
           }
 
           view += '<tbody>';
           for (var index = 0; index < maxRows; index++) {
+            view += '<tr>';
             for (var col = 0; col < component.columns.length; col++) {
-              view += '<tr>' + GridUtils.columnForComponent(data, component.columns[col].components[index] || undefined, $interpolate, componentInfo, true) + '</td>';
+              view += GridUtils.columnForComponent(data, component.columns[col].components[index] || undefined, $interpolate, componentInfo, true);
             }
+            view += '</tr>'
           }
           view += '</tbody></table>';
           return view;
