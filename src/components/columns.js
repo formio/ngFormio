@@ -43,7 +43,7 @@ module.exports = function(app) {
             for (var col = 0; col < component.columns.length; col++) {
               view += GridUtils.columnForComponent(data, component.columns[col].components[index] || undefined, $interpolate, componentInfo, true);
             }
-            view += '</tr>'
+            view += '</tr>';
           }
           view += '</tbody></table>';
           return view;
