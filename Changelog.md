@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [UNRELEASED]
 ### Added
  - Updated bugfix for FOR-404
+ - TableView rendering to all layout components
 
 ### Fixed
  - Issue where form components inside containers, inside layout components, inside containers would not render in the
