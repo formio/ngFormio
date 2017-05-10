@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
  - TableView rendering to all layout components
 
+## 4.0.10
+### Changed
+ - Upgraded ng-formio and ng-formio-builder to 2.16.6
+
+## 4.0.9
+### Fixed
+ - Fixed issue where updating payment information would clobber the logged in users profile until a relog was performed.
+
 ## 4.0.8
 ### Changed
  - Upgraded ng-formio to 2.16.5 to revert tableview changes.
