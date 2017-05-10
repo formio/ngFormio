@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [UNRELEASED]
+### Added
+ - TableView rendering to all layout components
+
 ## 4.0.8
 ### Changed
  - Upgraded ng-formio to 2.16.5 to revert tableview changes.
