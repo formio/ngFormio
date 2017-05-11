@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+### [UNRELEASED]
+### Fixed
+ - Issue with the signature component, where the size of the input field was also used for the component which would
+   allow for its footer label to be covered by other components.
+
 ## 2.16.6
 ### Changed
  - Upgrade formio.js to 2.7.3
