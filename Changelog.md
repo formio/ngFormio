@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [UNRELEASED]
+### Changed
+ - Updating the add team button to only be available to the project owner.
+
 ## 4.0.10
 ### Changed
  - Upgraded ng-formio and ng-formio-builder to 2.16.6
