@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [UNRELEASED]
+### Fixed
+ - Fixing issue where certain api responses would be stored as json strings rather than error messages
+
 ## 2.16.6
 ### Changed
  - Upgrade formio.js to 2.7.3
