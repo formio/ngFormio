@@ -1795,10 +1795,7 @@ app.controller('ProjectSettingsController', [
     }
 
     $scope.loadProjectPromise.then(function() {
-      // Mask child scope's reference to currentProject with a clone
-      // Parent reference gets updated when we reload after saving
       $scope.currentProject.plan = $scope.currentProject.plan || 'basic';
-      $scope.currentProject = _.cloneDeep($scope.currentProject);
     });
 
     $scope.addKey = function() {
