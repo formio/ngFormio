@@ -521,7 +521,7 @@ app.controller('FormController', [
           if (component.type === 'resource') {
             return true;
           }
-          if (component.type === 'select' && component.dataSrc === 'resource') {
+          if (component.type === 'select' && ['resource', 'url'].indexOf(component.dataSrc) !== -1) {
             return true;
           }
 
