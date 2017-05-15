@@ -1,36 +1,15 @@
-<form name="projectForm" ng-submit="saveProject()" novalidate>
-  <div id="form-group-title" class="form-group" ng-class="{'has-error': projectForm.title.$invalid && projectForm.title.$dirty}">
-    <label for="title" class="control-label required-field">{{ createType }} Title</label>
-    <input ng-if="!currentProject._id || currentProject._id !== primaryProject._id" type="text" class="form-control" id="title" name="title" ng-model="currentProject.title" placeholder="Give your {{ createType }} a name." ng-maxlength="63" ng-required="true" autofocus="true">
-    <input ng-if="currentProject._id && currentProject._id === primaryProject._id" type="text" class="form-control" value="Live" disabled="true">
-    <p class="help-block" ng-show="projectForm.title.$error.maxlength">{{ projectType }} Title cannot be longer than 63 characters.</p>
+<div class="row">
+  <div class="col-sm-8 col-margin-bottom">
+    <ng-include src="'views/project/env/settings.html'"></ng-include>
   </div>
-  <div id="form-group-name" class="form-group" ng-class="{'has-error': projectForm.name.$invalid && projectForm.name.$dirty, 'has-success': projectForm.name.$valid}">
-    <label for="name" class="control-label required-field">Domain Name</label>
-    <div class="input-group" style="width: 400px;">
-      <span class="input-group-addon">{{ apiProtocol }}//</span>
-      <input type="text" class="form-control" id="name" name="name" ng-model="currentProject.name" title="{{ currentProject.name }}" placeholder="myproject" valid-subdomain unique-checker="/project/available" ng-model-options="{ debounce: { 'default': 500, 'blur': 0 } }" ng-maxlength="63" ng-disabled="['basic', 'trial'].indexOf(primaryProject.plan) !== -1 || currentProject.protect" ng-required="['basic', 'trial'].indexOf(primaryProject.plan) === -1">
-      <i class="form-control-feedback glyphicon" ng-class="{'glyphicon-ok': projectForm.name.$valid, 'glyphicon-remove': projectForm.name.$invalid && projectForm.name.$dirty}" style="right: -36px;"></i>
-      <span class="input-group-addon">.{{ apiServer }}</span>
+  <div class="col-sm-4">
+    <div class="panel panel-danger">
+      <div class="panel-heading">Delete Environment</div>
+      <div class="panel-body">
+        <p>To remove this environment, select the delete button</p>
+        <a ui-sref="project.delete({projectId: currentProject._id})" class="btn btn-danger">Delete {{ currentProject.title }} Environment</a>
+      </div>
     </div>
-    <div ng-if="['basic', 'trial'].indexOf(primaryProject.plan) === -1 && projectSettingsVisible() && !onPrem">
-      <p class="help-block" ng-show="projectForm.name.$error.maxlength">Domain Name cannot be longer than 63 characters.</p>
-      <p class="help-block" ng-show="projectForm.name.$error.unique && projectForm.name.$dirty">This domain is unavailable. Please pick a different domain.</p>
-      <p class="help-block" ng-show="projectForm.name.$valid">This domain is available!</p>
-    </div>
-    <p ng-if="['basic', 'trial'].indexOf(primaryProject.plan) !== -1 && projectSettingsVisible() && !onPrem" class="text-danger"><em><a ng-click="showUpgradeDialog(currentProject)">Upgrade</a> your project to a paid plan to enable custom subdomains.</em></p>
+
   </div>
-  <div id="form-group-protect" class="form-group" ng-if="currentProject._id">
-    <label for="protect" class="control-label">
-      <input type="checkbox" id="protect" ng-model="currentProject.protect"> Protected mode
-    </label>
-    <div class="text-muted">
-      <p>When checked:<p>
-      <ul>
-        <li>Form, resource, role, and project access modifictions are forbidden</li>
-        <li>The project definition can only be deployed by tag number</li>
-      </ul>
-    </div>
-  </div>
-  <button type="submit" class="btn btn-primary" ng-disabled="projectForm.$invalid"><i ng-if="isBusy" class="fa fa-spinner fa-refresh"></i> {{currentProject._id ? 'Save ' + projectType : 'Add Environment' }}</button>
-</form>
+</div>
