@@ -5,7 +5,7 @@
     <input ng-if="currentProject._id && currentProject._id === primaryProject._id" type="text" class="form-control" value="Live" disabled="true">
     <p class="help-block" ng-show="projectForm.title.$error.maxlength">{{ projectType }} Title cannot be longer than 63 characters.</p>
   </div>
-  <div id="form-group-name" class="form-group" ng-if="minPlan('independent')" ng-class="{'has-error': projectForm.name.$invalid && projectForm.name.$dirty, 'has-success': projectForm.name.$valid}">
+  <div id="form-group-name" class="form-group" ng-class="{'has-error': projectForm.name.$invalid && projectForm.name.$dirty, 'has-success': projectForm.name.$valid}">
     <label for="name" class="control-label required-field">Domain Name</label>
     <div class="input-group" style="width: 400px;">
       <span class="input-group-addon">{{ apiProtocol }}//</span>
@@ -18,7 +18,7 @@
       <p class="help-block" ng-show="projectForm.name.$error.unique && projectForm.name.$dirty">This domain is unavailable. Please pick a different domain.</p>
       <p class="help-block" ng-show="projectForm.name.$valid">This domain is available!</p>
     </div>
-    <p ng-if="['basic', 'trial'].indexOf(primaryProject.plan) !== -1 && projectSettingsVisible() && !onPrem" class="text-danger"><em><a ng-click="showUpgradeDialog(currentProject)">Upgrade</a> your project to enable Custom Domains.</em></p>
+    <p ng-if="['basic', 'trial'].indexOf(primaryProject.plan) !== -1 && projectSettingsVisible() && !onPrem" class="text-danger"><em><a ng-click="showUpgradeDialog(currentProject)">Upgrade</a> your project to a paid plan to enable custom subdomains.</em></p>
   </div>
   <div id="form-group-protect" class="form-group" ng-if="currentProject._id">
     <label for="protect" class="control-label">
