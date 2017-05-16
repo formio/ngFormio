@@ -4,8 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [UNRELEASED]
+### [UNRELEASED]
 ### Fixed
+ - Issue with the signature component, where the size of the input field was also used for the component which would
+   allow for its footer label to be covered by other components.
  - Fixing issue where certain api responses would be stored as json strings rather than error messages
 
 ## 2.16.6
