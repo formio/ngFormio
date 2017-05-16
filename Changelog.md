@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [UNRELEASED]
+### Changed
+ - Updating the add team button to only be available to the project owner.
+
 ### Fixed
  - Fixed issue where the save submission action mapped to another resource would redirect you to the wrong page after
    making a new submission in the portal preview
