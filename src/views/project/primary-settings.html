@@ -11,7 +11,7 @@
           <p>These project settings are the main settings for the project. Most settings are found within Environment settings for each environment.</p>
         </div>
       </div>
-      <div class="panel panel-danger">
+      <div class="panel panel-danger" ng-if="primaryProject.owner === user._id">
         <div class="panel-heading">Delete Project</div>
         <div class="panel-body">
           <p>To remove this project and all of it's environments, select this delete button.</p>
