@@ -10982,6 +10982,7 @@ module.exports = function(app) {
               });
             }
 
+            var lastInput;
             switch (settings.dataSrc) {
               case 'values':
                 $scope.selectItems = settings.data.values;
@@ -11045,7 +11046,6 @@ module.exports = function(app) {
                   skip: 0
                 };
 
-                var lastInput;
                 $scope.refreshItems = function(input, url, append) {
                   // If they typed in a search, reset skip.
                   if (lastInput !== input) {
@@ -11132,10 +11132,11 @@ module.exports = function(app) {
                 if (url) {
                   $scope.hasNextPage = true;
                   $scope.refreshItems = function(input, newUrl, append) {
-                    if (!input) {
+                    if (input === lastInput) {
                       return;
                     }
 
+                    lastInput = input;
                     newUrl = newUrl || url;
                     newUrl = $interpolate(newUrl)({
                       data: $scope.data,

@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
    allow for its footer label to be covered by other components.
  - Fixing issue where certain api responses would be stored as json strings rather than error messages
  - Issue where the submit on "action" was passing the wrong object to the submit handlers.
+ - Issue where the select search would not reset when they clear out the search box.
 
 ## 2.16.6
 ### Changed
