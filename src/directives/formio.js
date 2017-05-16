@@ -38,6 +38,11 @@ module.exports = function() {
         $scope.iframeReady = false;
         // Shows the given alerts (single or array), and dismisses old alerts
         this.showAlerts = $scope.showAlerts = function(alerts) {
+          try {
+            alerts.message = (JSON.parse(alerts.message)).data;
+          }
+          catch (e) {}
+
           $scope.formioAlerts = [].concat(alerts);
         };
 
