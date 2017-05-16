@@ -1687,9 +1687,9 @@ app.controller('FormSubmissionsController', [
                   if (component.key) {
                     componentHistory.push(component.key);
                   }
-                }, true)
-              })
-            })
+                }, true);
+              });
+            });
           }
 
           columns.push(getKendoCell(component));
