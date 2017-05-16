@@ -1,4 +1,5 @@
 var fs = require('fs');
+var GridUtils = require('../factories/GridUtils')();
 
 module.exports = function(app) {
   app.config([
@@ -10,38 +11,22 @@ module.exports = function(app) {
         viewTemplate: 'formio/componentsView/container.html',
         group: 'advanced',
         icon: 'fa fa-folder-open',
-        tableView: function(data, component, $interpolate, componentInfo) {
-          var view = '<table class="table table-striped table-bordered"><thead><tr>';
-          angular.forEach(component.components, function(component) {
-            view += '<th>' + component.label + '</th>';
-          });
-          view += '</tr></thead>';
-          view += '<tbody>';
-          view += '<tr>';
-          angular.forEach(component.components, function(component) {
-            var info = componentInfo.components.hasOwnProperty(component.type) ? componentInfo.components[component.type] : {};
-            if (info.tableView) {
-              view += '<td>' +
-                info.tableView(
-                  data && component.key && data.hasOwnProperty(component.key) ? data[component.key] : '',
-                  component,
-                  $interpolate,
-                  componentInfo
-                ) + '</td>';
-              return;
-            }
+        tableView: function(data, component, $interpolate, componentInfo, tableChild) {
+          var view = '<table class="table table-striped table-bordered table-child">';
 
-            view += '<td>';
-            if (component.prefix) {
-              view += component.prefix;
-            }
-            view += data && component.key && data.hasOwnProperty(component.key) ? data[component.key] : '';
-            if (component.suffix) {
-              view += ' ' + component.suffix;
-            }
-            view += '</td>';
+          if (!tableChild) {
+            view += '<thead><tr>';
+            view += '<th>' + (component.label || '') + ' (' + component.key + ')</th>';
+            view += '</tr></thead>';
+          }
+
+          view += '<tbody>';
+
+          // Render a value for each column item.
+          angular.forEach(component.components, function(component) {
+            view += '<tr>' + GridUtils.columnForComponent(data, component, $interpolate, componentInfo, true) + '</tr>';
           });
-          view += '</tr>';
+
           view += '</tbody></table>';
           return view;
         },
