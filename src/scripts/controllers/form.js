@@ -508,7 +508,7 @@ app.controller('FormController', [
       });
       GoogleAnalytics.sendEvent('Submission', 'create', null, 1);
       if (submission._id) {
-        $state.go('project.' + $scope.formInfo.type + '.form.submission.item.view', {subId: submission._id});
+        $state.go('project.' + $scope.formInfo.type + '.form.submission.item.view', {formId: submission.form, subId: submission._id});
       }
     });
 
