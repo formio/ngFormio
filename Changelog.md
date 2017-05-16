@@ -4,7 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [UNRELEASED]
+## 2.17.0
+### Changed
+ - Removed sourcemaps from build files.
+
 ### Added
  - Updated bugfix for FOR-404
  - TableView rendering to all layout components
@@ -17,6 +20,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Issue with the signature component, where the size of the input field was also used for the component which would
    allow for its footer label to be covered by other components.
  - Fixing issue where certain api responses would be stored as json strings rather than error messages
+ - Issue where the submit on "action" was passing the wrong object to the submit handlers.
 
 ## 2.16.6
 ### Changed

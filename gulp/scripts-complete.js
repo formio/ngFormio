@@ -2,7 +2,7 @@ module.exports = function(gulp, plugins) {
   return function() {
     return plugins.browserify({
       entries: './src/formio-complete.js',
-      debug: true,
+      debug: false,
       standalone: 'formio',
       insertGlobalVars: {
         SignaturePad: function() {
