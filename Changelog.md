@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [UNRELEASED]
 ### Fixed
  - Fixed an issue with editing teams, where you wouldn't be taken to the team view, but rather the project overview.
+ - Fixed issue where the save submission action mapped to another resource would redirect you to the wrong page after
+   making a new submission in the portal preview
 
 ## 4.0.10
 ### Changed
