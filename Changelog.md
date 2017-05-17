@@ -12,8 +12,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Updating the add team button to only be available to the project owner.
 
 ### Fixed
+ - Fixed an issue with editing teams, where you wouldn't be taken to the team view, but rather the project overview.
  - Fixed issue where the save submission action mapped to another resource would redirect you to the wrong page after
    making a new submission in the portal preview
+   
+### Changed
+ - Upgraded ng-formio to 2.17.0
+ - Upgraded ng-formio-builder to 2.17.0
 
 ## 4.0.10
 ### Changed
