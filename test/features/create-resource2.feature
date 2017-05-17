@@ -249,7 +249,7 @@ Feature: Test 16 Creating/Editing A Resource part2
     When I click on the glyphicon glyphicon-edit button for User form
     When I click on the Advanced Settings link
     Then I see the Custom Action URL component
-    When I enter test.com in the //*[contains(@placeholder,"Enter the custom submission URL.")] field
+    When I enter example.com in the //*[contains(@placeholder,"Enter the custom submission URL.")] field
     And I click on the Advanced Settings link
     And I click on the Advanced Settings link
-    Then I see an input //*[contains(@placeholder,"Enter the custom submission URL.")] with the value test.com
+    Then I see an input //*[contains(@placeholder,"Enter the custom submission URL.")] with the value example.com
