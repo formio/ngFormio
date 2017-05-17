@@ -5,6 +5,7 @@ module.exports = function() {
     templateUrl: 'formio-wizard.html',
     scope: {
       src: '=?',
+      url: '=?',
       formAction: '=?',
       form: '=?',
       submission: '=?',
@@ -69,6 +70,7 @@ module.exports = function() {
         }
 
         $scope.formio = null;
+        $scope.url = $scope.url || $scope.src;
         $scope.page = {};
         $scope.pages = [];
         $scope.hasTitles = false;
