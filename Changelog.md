@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
  - An empty array was being appended to select data values when editing fields. 
 
+## 2.17.2
+### Fixed
+ - Issue with ngDialog not getting added to module dependencies.
+
 ## 2.17.1
 ### Fixed
  - File upload in wizards wasn't working.
