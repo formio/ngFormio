@@ -1503,7 +1503,7 @@ app.controller('FormSubmissionsController', [
             val = _.get(val, path);
           }
 
-          var value = Formio.fieldData(val.toJSON(), component);
+          var value = Formio.fieldData(val.toJSON(), component) || val.toJSON();
           var componentInfo = formioComponents.components[component.type] || formioComponents.components.custom;
           if (!componentInfo || !componentInfo.tableView) {
             if (value === undefined) {
@@ -1664,16 +1664,36 @@ app.controller('FormSubmissionsController', [
             return;
           }
 
-          if (['container', 'datagrid'].indexOf(component.type) !== -1) {
+          if (['container', 'datagrid', 'well', 'fieldset'].indexOf(component.type) !== -1) {
             FormioUtils.eachComponent(component.components, function(component) {
               if (component.key) {
                 componentHistory.push(component.key);
               }
             }, true);
           }
+          else if (['columns'].indexOf(component.type) !== -1) {
+            component.columns.forEach(function(column) {
+              FormioUtils.eachComponent(column.components, function(component) {
+                if (component.key) {
+                  componentHistory.push(component.key);
+                }
+              }, true);
+            });
+          }
+          else if (['table'].indexOf(component.type) !== -1) {
+            component.rows.forEach(function(row) {
+              row.forEach(function(col) {
+                FormioUtils.eachComponent(col.components, function(component) {
+                  if (component.key) {
+                    componentHistory.push(component.key);
+                  }
+                }, true);
+              });
+            });
+          }
 
           columns.push(getKendoCell(component));
-        });
+        }, true);
 
         columns.push(
           {

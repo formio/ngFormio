@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [UNRELEASED]
+### Added
+ - TableView rendering to all layout components
+
 ### Changed
  - Updating the add team button to only be available to the project owner.
 
