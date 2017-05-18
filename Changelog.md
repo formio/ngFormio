@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [UNRELEASED]
 
+## 4.0.12
+### Changed
+ - Upgraded ng-formio to 2.18.0
+ - Upgraded ng-formio-builder to 2.18.0
+
 ## 4.0.11
 ### Added
  - TableView rendering to all layout components
