@@ -213,7 +213,7 @@ module.exports = function(app) {
             // Ensures that the value is within the select items.
             var ensureValue = function() {
               var value = $scope.data[settings.key];
-              if (!value) {
+              if (!value || (Array.isArray(value) && value.length === 0)) {
                 return;
               }
               // Iterate through the list of items and see if our value exists...
