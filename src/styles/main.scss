@@ -1003,6 +1003,12 @@ footer {
   margin-left: 10px;
 }
 
+.table-child {
+  td {
+    padding: 1px !important;
+  }
+}
+
 /***************************** Landing Page *****************************/
 .welcome-banner {
   background-color: darken($brand-primary, 25%);

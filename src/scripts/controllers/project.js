@@ -386,7 +386,7 @@ app.controller('ProjectController', [
         });
 
         // Calculate the users highest role within the project.
-        $q.all([userTeamsPromise, projectTeamsPromise]).then(function() {
+        $scope.highestRoleLoaded = $q.all([userTeamsPromise, projectTeamsPromise]).then(function() {
           var roles = _.has($scope.user, 'roles') ? $scope.user.roles : [];
           var teams = _($scope.userTeams ? $scope.userTeams : [])
             .map('_id')
@@ -1780,22 +1780,24 @@ app.controller('ProjectSettingsController', [
 
     $scope.platforms = ProjectFrameworks;
 
-    if (!$scope.highestRole || ($scope.highestRole && ['team_read', 'team_write'].indexOf($scope.highestRole) !== -1)) {
-      // this is constantly going to overview on reload.
-      //$state.go('project.overview');
-      //return;
-    }
-
-    $scope.currentSection.title = 'Settings';
-    $scope.currentSection.icon = 'fa fa-cogs';
-    $scope.currentSection.help = 'https://help.form.io/userguide/#settings-project';
-    // Go to first settings section
-    if($state.current.name === 'project.settings') {
-      $state.go('project.settings.project', {location: 'replace'});
-    }
-
     $scope.loadProjectPromise.then(function() {
       $scope.currentProject.plan = $scope.currentProject.plan || 'basic';
+
+      $scope.highestRoleLoaded.then(function() {
+        // Check the highest role, after the project has been loaded.
+        if (!$scope.highestRole || ($scope.highestRole && ['team_read', 'team_write'].indexOf($scope.highestRole) !== -1)) {
+          $state.go('project.overview');
+          return;
+        }
+
+        $scope.currentSection.title = 'Settings';
+        $scope.currentSection.icon = 'fa fa-cogs';
+        $scope.currentSection.help = 'https://help.form.io/userguide/#settings-project';
+        // Go to first settings section
+        if($state.current.name === 'project.settings') {
+          $state.go('project.settings.project', {location: 'replace'});
+        }
+      });
     });
 
     $scope.addKey = function() {

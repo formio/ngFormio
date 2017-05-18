@@ -25,6 +25,27 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Environment Switcher
  - Project Templates
 
+## 4.0.12
+### Changed
+ - Upgraded ng-formio to 2.18.0
+ - Upgraded ng-formio-builder to 2.18.0
+
+## 4.0.11
+### Added
+ - TableView rendering to all layout components
+
+### Changed
+ - Updating the add team button to only be available to the project owner.
+
+### Fixed
+ - Fixed an issue with editing teams, where you wouldn't be taken to the team view, but rather the project overview.
+ - Fixed issue where the save submission action mapped to another resource would redirect you to the wrong page after
+   making a new submission in the portal preview
+   
+### Changed
+ - Upgraded ng-formio to 2.17.0
+ - Upgraded ng-formio-builder to 2.17.0
+
 ## 4.0.10
 ### Changed
  - Upgraded ng-formio and ng-formio-builder to 2.16.6
