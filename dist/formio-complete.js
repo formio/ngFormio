@@ -66743,8 +66743,24 @@ module.exports = function(app) {
           input: false,
           tableView: true,
           key: 'columns',
-          columns: [{components: []}, {components: []}]
+          columns: [{components: [], width: 6, offset: 0, push: 0, pull: 0},
+                    {components: [], width: 6, offset: 0, push: 0, pull: 0}]
         },
+        controller: ['$scope', function($scope) {
+          // Adjust column component setting from before width, offset...
+          if ($scope.component.columns.length   === 2
+          &&  $scope.component.columns[0].width === undefined
+          &&  $scope.component.columns[1].width === undefined) {
+              $scope.component.columns[0].width   = 6;
+              $scope.component.columns[0].offset  = 0;
+              $scope.component.columns[0].push    = 0;
+              $scope.component.columns[0].pull    = 0;
+              $scope.component.columns[1].width   = 6;
+              $scope.component.columns[1].offset  = 0;
+              $scope.component.columns[1].push    = 0;
+              $scope.component.columns[1].pull    = 0;
+          }
+        }],
         viewTemplate: 'formio/componentsView/columns.html',
         tableView: function(data, component, $interpolate, componentInfo, tableChild) {
           var view = '<table class="table table-striped table-bordered table-child">';
@@ -66785,11 +66801,11 @@ module.exports = function(app) {
     '$templateCache',
     function($templateCache) {
       $templateCache.put('formio/components/columns.html',
-        "<div class=\"row\">\n  <div class=\"col-sm-6\" ng-repeat=\"column in component.columns track by $index\">\n    <formio-component\n      ng-repeat=\"_component in column.components track by $index\"\n      component=\"_component\"\n      data=\"data\"\n      formio=\"formio\"\n      submission=\"submission\"\n      hide-components=\"hideComponents\"\n      ng-if=\"builder ? '::true' : isVisible(_component, data)\"\n      formio-form=\"formioForm\"\n      read-only=\"isDisabled(_component, data)\"\n      grid-row=\"gridRow\"\n      grid-col=\"gridCol\"\n      builder=\"builder\"\n    ></formio-component>\n  </div>\n</div>\n"
+        "<div class=\"row\">\n  <div ng-show=\"column.width\" ng-class=\"'col-sm-' + column.width + ' col-sm-offset-' + column.offset + ' col-sm-push-' + column.push + ' col-sm-pull-' + column.pull\" ng-repeat=\"column in component.columns track by $index\">\n    <formio-component\n      ng-repeat=\"_component in column.components track by $index\"\n      component=\"_component\"\n      data=\"data\"\n      formio=\"formio\"\n      submission=\"submission\"\n      hide-components=\"hideComponents\"\n      ng-if=\"builder ? '::true' : isVisible(_component, data)\"\n      formio-form=\"formioForm\"\n      read-only=\"isDisabled(_component, data)\"\n      grid-row=\"gridRow\"\n      grid-col=\"gridCol\"\n      builder=\"builder\"\n    ></formio-component>\n  </div>\n</div>\n"
       );
 
       $templateCache.put('formio/componentsView/columns.html',
-        "<div class=\"row\">\n  <div class=\"col-sm-6\" ng-repeat=\"column in component.columns track by $index\">\n    <formio-component-view\n      ng-repeat=\"_component in column.components track by $index\"\n      component=\"_component\"\n      data=\"data\"\n      form=\"form\"\n      submission=\"submission\"\n      ignore=\"ignore\"\n      ng-if=\"builder ? '::true' : isVisible(_component, data)\"\n      builder=\"builder\"\n    ></formio-component-view>\n  </div>\n</div>\n"
+        "<div class=\"row\">\n  <div ng-show=\"column.width\" ng-class=\"'col-sm-' + column.width + ' col-sm-offset-' + column.offset + ' col-sm-push-' + column.push + ' col-sm-pull-' + column.pull\" ng-repeat=\"column in component.columns track by $index\">\n    <formio-component-view\n      ng-repeat=\"_component in column.components track by $index\"\n      component=\"_component\"\n      data=\"data\"\n      form=\"form\"\n      submission=\"submission\"\n      ignore=\"ignore\"\n      ng-if=\"builder ? '::true' : isVisible(_component, data)\"\n      builder=\"builder\"\n    ></formio-component-view>\n  </div>\n</div>\n"
       );
     }
   ]);
@@ -68756,7 +68772,7 @@ module.exports = function(app) {
             // Ensures that the value is within the select items.
             var ensureValue = function() {
               var value = $scope.data[settings.key];
-              if (!value) {
+              if (!value || (Array.isArray(value) && value.length === 0)) {
                 return;
               }
               // Iterate through the list of items and see if our value exists...

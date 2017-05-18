@@ -5,8 +5,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## 2.18.0
 ### Fixed
- - An empty array was being appended to select data values when editing fields. 
+ - An empty array was being appended to select data values when editing fields.
+  
+### Added
+ - Ability to specify width, offset, push and pull on columns.
 
 ## 2.17.2
 ### Fixed
