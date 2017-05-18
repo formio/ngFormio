@@ -1,4 +1,6 @@
 var fs = require('fs');
+var formioUtils = require('formiojs/utils');
+
 module.exports = function(app) {
   app.config([
     'formioComponentsProvider',
@@ -7,19 +9,31 @@ module.exports = function(app) {
         title: 'Data Grid',
         template: 'formio/components/datagrid.html',
         group: 'advanced',
-        tableView: function(data, component, $interpolate, componentInfo) {
-          var view = '<table class="table table-striped table-bordered"><thead><tr>';
-          angular.forEach(component.components, function(component) {
-            view += '<th>' + component.label + '</th>';
-          });
-          view += '</tr></thead>';
+        tableView: function(data, component, $interpolate, componentInfo, tableChild) {
+          var view = '<table class="table table-striped table-bordered table-child">';
+
+          if (!tableChild) {
+            view += '<thead><tr>';
+            angular.forEach(component.components, function(component) {
+              view += '<th>' + (component.label || '') + ' (' + component.key + ')</th>';
+            });
+            view += '</tr></thead>';
+          }
+
           view += '<tbody>';
           angular.forEach(data, function(row) {
             view += '<tr>';
-            angular.forEach(component.components, function(component) {
+            formioUtils.eachComponent(component.components, function(component) {
+              // Don't render disabled fields, or fields with undefined data.
+              if (!component.tableView || row[component.key] === undefined) {
+                return;
+              }
+
+              // If the component has a defined tableView, use that, otherwise try and use the raw data as a string.
               var info = componentInfo.components.hasOwnProperty(component.type) ? componentInfo.components[component.type] : {};
               if (info.tableView) {
-                view += '<td>' + info.tableView(row[component.key] || '', component, $interpolate, componentInfo) + '</td>';
+                // Reset the tableChild value for datagrids, so that components have headers.
+                view += '<td>' + info.tableView(row[component.key] || '', component, $interpolate, componentInfo, false) + '</td>';
               }
               else {
                 view += '<td>';

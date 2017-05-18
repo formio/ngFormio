@@ -70,7 +70,54 @@ module.exports = function() {
     return view;
   };
 
+  // Generate a column for the component.
+  var columnForComponent = function(data, component, $interpolate, componentInfo, tableChild) {
+    // If no component is given, generate an empty cell.
+    if (!component) {
+      return '<td></td>';
+    }
+
+    // Generate a table for each component with one column to display the key/value for each component.
+    var view = '<td>';
+    view += '<table class="table table-striped table-bordered' + (tableChild ? ' table-child' : '') + '">';
+    view += '<thead><tr>';
+    view += '<th>' + (component.label || '') + ' (' + component.key + ')</th>';
+    view += '</tr></thead>';
+    view += '<tbody>';
+
+    // If the component has a defined tableView, use that, otherwise try and use the raw data as a string.
+    var info = componentInfo.components.hasOwnProperty(component.type)
+      ? componentInfo.components[component.type]
+      : {};
+    if (info.tableView) {
+      view += '<td>' +
+        info.tableView(
+          data && component.key && (data.hasOwnProperty(component.key) ? data[component.key] : data),
+          component,
+          $interpolate,
+          componentInfo,
+          tableChild
+        ) + '</td>';
+    }
+    else {
+      view += '<td>';
+      if (component.prefix) {
+        view += component.prefix;
+      }
+      view += data && component.key && (data.hasOwnProperty(component.key) ? data[component.key] : '');
+      if (component.suffix) {
+        view += ' ' + component.suffix;
+      }
+      view += '</td>';
+    }
+
+    view += '</tbody></table>';
+    view += '</td>';
+    return view;
+  };
+
   return {
-    generic: generic
+    generic: generic,
+    columnForComponent: columnForComponent
   };
 };

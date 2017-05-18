@@ -38,6 +38,13 @@ module.exports = function() {
         $scope.iframeReady = false;
         // Shows the given alerts (single or array), and dismisses old alerts
         this.showAlerts = $scope.showAlerts = function(alerts) {
+          /* eslint-disable no-empty */
+          try {
+            alerts.message = (JSON.parse(alerts.message)).data;
+          }
+          catch (e) {}
+          /* eslint-enable no-empty */
+
           $scope.formioAlerts = [].concat(alerts);
         };
 
@@ -224,9 +231,9 @@ module.exports = function() {
             if (method === 'put' && (action.indexOf(submissionData._id) === -1)) {
               action += '/' + submissionData._id;
             }
-            $http[method](action, submissionData).then(function(submission) {
+            $http[method](action, submissionData).then(function(response) {
               Formio.clearCache();
-              onSubmitDone(method, submission, form);
+              onSubmitDone(method, response.data, form);
             }, FormioScope.onError($scope, $element))
               .finally(function() {
                 if (form) {

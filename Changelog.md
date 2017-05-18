@@ -4,7 +4,43 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [UNRELEASED]
+## 2.17.2
+### Fixed
+ - Issue with ngDialog not getting added to module dependencies.
+
+## 2.17.1
+### Fixed
+ - File upload in wizards wasn't working.
+
+## 2.17.0
+### Changed
+ - Removed sourcemaps from build files.
+
+### Added
+ - Updated bugfix for FOR-404
+ - TableView rendering to all layout components
+
+### Fixed
+ - Issue where form components inside containers, inside layout components, inside containers would not render in the
+   submission grid.
+ - Issue where form components inside data grids, inside layout components, inside containers would not render in the
+   submission grid.
+ - Issue with the signature component, where the size of the input field was also used for the component which would
+   allow for its footer label to be covered by other components.
+ - Fixing issue where certain api responses would be stored as json strings rather than error messages
+ - Issue where the submit on "action" was passing the wrong object to the submit handlers.
+ - Issue where the select search would not reset when they clear out the search box.
+
+## 2.16.6
+### Changed
+ - Upgrade formio.js to 2.7.3
+ - Changed the jsonLogic to use both row and data for logic.
+ - No longer use "jsonConditionals" in favor of "conditions.json" property.
+ 
+## Removed
+ - jsonLogic from conditionals since that is now handled within the formio.js library.
+
+## 2.16.5
 ### Removed
  - FOR-404 fix, as it regressed the submission grid for 2.16.4
 
