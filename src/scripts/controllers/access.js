@@ -176,6 +176,8 @@ app.directive('resourcePermissionEditor', ['$q', 'FormioUtils', function($q, For
           .without(change.key)
           .uniq()
           .value();
+
+        $scope.onChange();
       };
       $scope.removeSelected = function(change, val) {
         _.map(FormioUtils.flattenComponents($scope.form.components), function(component) {
@@ -188,6 +190,8 @@ app.directive('resourcePermissionEditor', ['$q', 'FormioUtils', function($q, For
         $scope.uniqueResources = _($scope.uniqueResources)
           .uniq()
           .value();
+
+        $scope.onChange();
       };
 
       var permissions = [];

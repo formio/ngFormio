@@ -112,15 +112,14 @@ app.controller('TeamViewController', [
         });
     };
 
-    $scope.addMember = function(member) {
-      // Clear out the select.
+    $scope.changeRole = function(member, role) {
       $scope.add.Person = undefined;
-      $scope.team.data.members.push(member);
-      $scope.formio.saveSubmission(angular.copy($scope.team));
-    };
-
-    $scope.removeMember = function(member) {
+      _.remove($scope.team.data.admins, { _id: member._id });
       _.remove($scope.team.data.members, { _id: member._id });
+      if (role) {
+        $scope.team.data[role] = $scope.team.data[role] || [];
+        $scope.team.data[role].push(member);
+      }
       $scope.formio.saveSubmission(angular.copy($scope.team));
     };
   }
