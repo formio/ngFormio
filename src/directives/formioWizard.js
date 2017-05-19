@@ -80,6 +80,7 @@ module.exports = function() {
         }
         $scope.currentPage = session ? session.page : 0;
         $scope.formioAlerts = [];
+        $scope.formioOptions = $scope.formioOptions || {};
 
         var getForm = function() {
           var element = $element.find('#formio-wizard-form');
