@@ -16,7 +16,7 @@
           <div class="row">
             <div class="col-sm-5 ellipsis">
               <h4><a ui-sref="team.view({teamId: team._id})">{{ team.data.name }}</a></h4>
-              <p>{{ team.data.members.length }} Members</p>
+              <p>{{ team.data.members.length + team.data.admins.length }} Members</p>
             </div>
             <div class="col-sm-5">
               <select class="form-controls" ng-model="team.permission" ng-options="permission.value as permission.label for permission in teamPermissions" ng-change="updateTeam(team, team.permission)" ng-required="true" placeholder="Select a team" />

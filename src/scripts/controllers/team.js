@@ -16,21 +16,34 @@ app.controller('TeamController', [
     $scope.teamUrl = $rootScope.teamForm + '/submission/' + $stateParams.teamId;
     $scope.team = {};
     $scope.formio = new Formio($scope.teamUrl);
-    $scope.formio.loadSubmission().then(function(team) {
+    $scope.loadTeamPromise = $scope.formio.loadSubmission().then(function(team) {
       $scope.team = team;
     });
   }
 ]);
 
 app.controller('TeamCreateController', [
+  '$rootScope',
   '$scope',
   '$state',
   'FormioAlerts',
   function(
+    $rootScope,
     $scope,
     $state,
     FormioAlerts
   ) {
+
+    $scope.team = {data: {}};
+    $scope.team.data.members = [];
+    $scope.team.data.admins = [];
+    $scope.team.data.members.push({
+      _id: $rootScope.user._id,
+      data: {
+        name: $rootScope.user.data.name || $rootScope.user.data.email.substr(0, $rootScope.user.data.email.indexOf('@'))
+      }
+    });
+
     $scope.$on('formSubmission', function(event, team) {
       event.stopPropagation();
       FormioAlerts.addAlert({
@@ -80,6 +93,11 @@ app.controller('TeamViewController', [
         $scope.teamPermissionsLoaded = true;
         $scope.teamPermissions = teams;
       });
+
+    $scope.isAdmin = false;
+    $scope.loadTeamPromise.then(function() {
+      $scope.isAdmin = $scope.team.owner === $rootScope.user._id || _.find($scope.team.data.admins, {_id: $rootScope.user._id});
+    });
 
     $scope.leaveTeam = function(id) {
       // Always clear cache for the current teams.

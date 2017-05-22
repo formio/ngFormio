@@ -556,8 +556,22 @@ angular
         }
       });
 
+      Formio.request($scope.appConfig.apiBase + '/team/all', 'GET').then(function(results) {
+        $scope.userTeams  = results;
+      });
+
       $scope.teamSupport = function(project) {
         return (project.plan === 'team' || project.plan === 'commercial' || project.plan === 'trial');
+      };
+
+      $scope.teamAdmin = function(project, user) {
+        var user = user || $rootScope.user;
+        var userTeams = _($scope.userTeams ? $scope.userTeams : [])
+          .map('_id')
+          .filter()
+          .value();
+
+        return project.owner === user._id || _.intersection(userTeams, project.adminTeams).length > 0;
       };
 
       $scope.frameworks = ProjectFrameworks;
@@ -605,17 +619,22 @@ angular
       $q.all([_teamsPromise, _projectsPromise]).then(function() {
         $scope.projects = _.map($scope.projects, function(project) {
           project.teams = [];
+          project.adminTeams = [];
 
           // Build the projects teams list if present in the permissions.
           _.forEach(project.access, function(permission) {
             if (_.startsWith(permission.type, 'team_')) {
               permission.roles = permission.roles || [];
               project.teams.push(permission.roles);
+              if (permission.type === 'team_admin') {
+                project.adminTeams.push(permission.roles);
+              }
             }
           });
 
           // Filter and translate the teams for use on the ui.
           project.teams = _.uniq(_.flattenDeep(project.teams));
+          project.adminTeams = _.uniq(_.flattenDeep(project.adminTeams));
           project.teams = _.map(project.teams, function(team) {
             _.forEach($scope.teams, function(loadedTeam) {
               if (loadedTeam._id === team) {

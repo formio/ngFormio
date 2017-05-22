@@ -251,10 +251,18 @@ app.controller('ProjectController', [
 
     $scope.loadRoles();
 
-    $scope.minPlan= function(plan, project) {
+    $scope.minPlan = function(plan, project) {
       var plans = ['basic', 'independent', 'team', 'trial', 'commercial'];
       var checkProject = project || $scope.primaryProject || { plan: 'none' };
       return plans.indexOf(checkProject.plan) >= plans.indexOf(plan);
+    };
+
+    $scope.minRole = function(role, user, project) {
+      user = user || $rootScope.user;
+      project = project || $scope.primaryProject;
+      var roles = ['team_read', 'team_write', 'team_admin', 'owner'];
+
+      return plans.indexOf(myRole) >= roles.indexOf(role);
     };
 
     $scope.saveProject = function() {
@@ -357,9 +365,10 @@ app.controller('ProjectController', [
       var userTeamsPromise = $http.get(AppConfig.apiBase + '/team/all').then(function(result) {
         $scope.userTeams = result.data;
         $scope.userTeamsLoading = false;
+      });
 
-        // Separate out the teams that the current user owns, to save an api call.
-        $scope.primaryProjectEligibleTeams = _.filter(result.data, {owner: $scope.user._id});
+      var userTeamsOwnPromise = $http.get(AppConfig.apiBase + '/team/own').then(function(result) {
+        $scope.primaryProjectEligibleTeams = result.data;
       });
 
       $scope.projectTeamsLoading = true;
@@ -1966,9 +1975,11 @@ app.controller('ProjectTeamController', [
         $http.get(AppConfig.apiBase + '/team/all').then(function(result) {
           $scope.userTeams = result.data;
           $scope.userTeamsLoading = false;
+        });
 
+        $http.get(AppConfig.apiBase + '/team/own').then(function(result) {
           // Separate out the teams that the current user owns, to save an api call.
-          $scope.primaryProjectEligibleTeams = _.filter(result.data, {owner: $scope.user._id});
+          $scope.primaryProjectEligibleTeams = result.data;
           $scope.uniqueEligibleTeams = _.filter($scope.primaryProjectEligibleTeams, function(team) {
             return _.findIndex($scope.primaryProjectTeams, { _id: team._id }) === -1;
           });

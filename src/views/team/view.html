@@ -8,7 +8,7 @@
       <li class="list-group-item">
         <div class="row">
           <div class="col-sm-6">
-            <h5>{{ team.data.members.length || 0 }}</h5>
+            <h5>{{ team.data.members.length + team.data.admins.length || 0 }}</h5>
             <div>Members</div>
           </div>
           <div class="col-sm-6">
@@ -17,10 +17,10 @@
           </div>
         </div>
       </li>
-      <li class="list-group-item" ng-show="(team.owner !== user._id)" >
+      <li class="list-group-item" ng-show="!isAdmin" >
         <span class="btn btn-danger btn-xs" ng-click="leaveTeam(team._id)">Leave</span>
       </li>
-      <li class="list-group-item" ng-show="(team.owner === user._id)" >
+      <li class="list-group-item" ng-show="isAdmin" >
         <a class="btn btn-danger btn-xs" ui-sref="team.delete()">Delete Team</a>
       </li>
     </ul>
@@ -47,7 +47,7 @@
     <div class="panel panel-default" ng-if="activeView === 'members'">
       <ul class="list-group">
         <li class="list-group-item" ng-if="team.data.members.length" ng-repeat="member in team.data.admins">
-          <div class="btn-group pull-right" ng-if="team.owner === user._id">
+          <div class="btn-group pull-right" ng-if="isAdmin && team.owner !== member._id">
             <span class="dropdown">
               <span ng-if="authenticated" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-cog" /></span>
               <ul class="dropdown-menu">
@@ -60,7 +60,7 @@
           <span class="label label-success">{{ team.owner === member._id ? 'OWNER' : 'TEAM ADMIN'}}</span>
         </li>
         <li class="list-group-item" ng-if="team.data.members.length" ng-repeat="member in team.data.members">
-          <div class="btn-group pull-right" ng-if="team.owner === user._id">
+          <div class="btn-group pull-right" ng-if="isAdmin && team.owner !== member._id">
             <span class="dropdown">
               <span ng-if="authenticated" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-cog" /></span>
               <ul class="dropdown-menu">
@@ -77,7 +77,7 @@
         </li>
       </ul>
     </div>
-    <div ng-if="team.owner === user._id && activeView === 'projects'">
+    <div ng-if="activeView === 'projects'">
       <table class="table table-striped" ng-if="teamPermissions.length">
         <thead>
         <tr>
@@ -91,7 +91,7 @@
           <td class="col-sm-6 ellipsis">{{project.title}}</td>
           <td class="col-sm-5">{{ getPermissionLabel(project.permission) }}</td>
           <td class="col-sm-1">
-            <span ui-sref="project.teams({projectId: project._id})" class="btn btn-default btn-xs">
+            <span ui-sref="project.teams({projectId: project._id})" class="btn btn-default btn-xs" ng-if="isAdmin">
               <span class="glyphicon glyphicon-edit"></span>&nbsp;Modify
             </span>
           </td>
