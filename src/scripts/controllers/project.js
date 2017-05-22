@@ -295,7 +295,7 @@ app.controller('ProjectController', [
       var allowedFiles, allow, custom;
 
       var currTime = (new Date()).getTime();
-      var projTime = (new Date(result.created.toString())).getTime();
+      var projTime = (new Date(result.trial.toString())).getTime();
       var delta = Math.ceil(parseInt((currTime - projTime) / 1000));
       var day = 86400;
       var remaining = 30 - parseInt(delta / day);
@@ -2285,7 +2285,7 @@ app.factory('ProjectUpgradeDialog', [
               };
 
               var currTime = (new Date()).getTime();
-              var projTime = (new Date(project.created.toString())).getTime();
+              var projTime = (new Date(project.trial.toString())).getTime();
               var delta = Math.ceil(parseInt((currTime - projTime) / 1000));
               var day = 86400;
               var remaining = 30 - parseInt(delta / day);
