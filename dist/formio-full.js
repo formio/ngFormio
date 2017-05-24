@@ -48922,6 +48922,7 @@ module.exports = global.Formio = Formio;
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{"./providers":27,"eventemitter2":25,"native-promise-only":207,"shallow-copy":212,"whatwg-fetch":215}],27:[function(_dereq_,module,exports){
 =======
 },{"./providers":27,"eventemitter2":25,"native-promise-only":204,"shallow-copy":209,"whatwg-fetch":212}],27:[function(_dereq_,module,exports){
@@ -48954,6 +48955,9 @@ module.exports = global.Formio = Formio;
 =======
 },{"./providers":27,"eventemitter2":25,"native-promise-only":207,"shallow-copy":212,"whatwg-fetch":215}],27:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{"./providers":27,"eventemitter2":25,"native-promise-only":207,"shallow-copy":212,"whatwg-fetch":215}],27:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 'use strict';
 
 module.exports = {
@@ -73750,6 +73754,7 @@ module.exports = 'ngFileUpload';
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 },{"./dist/ng-file-upload-all":206}],208:[function(_dereq_,module,exports){
 >>>>>>> optional image gallery for images attachments
@@ -73774,6 +73779,8 @@ module.exports = 'ngFileUpload';
 >>>>>>> optional image gallery for images attachments
 =======
 >>>>>>> Build
+=======
+>>>>>>> optional image gallery for images attachments
 (function (global){
 /*
 	ng-photoswipe v0.2.0
@@ -73784,6 +73791,7 @@ module.exports = 'ngFileUpload';
 "format amd";!function(){"use strict";function a(a){function b(b,c,d){function e(e,f){e.template=e.template||"views/ng-photoswipe.html",c.get(e.template,{cache:d}).success(function(c){var d=a.element(c);f.append(b(d)(e))}),e.start=function(){e.open=!0,g()};var g=function(){var b=document.querySelectorAll(".pswp")[0];a.isUndefined(e.options.getThumbBoundsFn)&&a.isDefined(e.slideSelector)&&(e.options=a.merge({},{getThumbBoundsFn:function(a){var b=document.querySelectorAll(e.slideSelector)[a],c=window.pageYOffset||document.documentElement.scrollTop,d=b.getBoundingClientRect();return{x:d.left,y:d.top+c,w:d.width}}},e.options)),e.gallery=new PhotoSwipe(b,PhotoSwipeUI_Default||!1,e.slides,e.options),e.gallery.init(),e.item=e.gallery.currItem,e.gallery.listen("destroy",function(){e.safeApply(function(){(e.onClose||a.noop)()})}),e.gallery.listen("afterChange",function(){e.safeApply(function(){e.item=e.gallery.currItem})})};e.$watch("open",function(a,b){a!=b?a&&g():!a&&e.gallery&&(e.gallery.close(),e.gallery=null)}),e.safeApply=function(a){var b=this.$root.$$phase;"$apply"==b||"$digest"==b?a&&"function"==typeof a&&a():this.$apply(a)},e.$on("destroy",function(){e.gallery=null})}return{restrict:"AE",replace:!0,scope:{open:"=",options:"=",slides:"=",slideSelector:"@",template:"@",onClose:"&"},link:e}}return b.$inject=["$compile","$http","$templateCache"],a.module("ngPhotoswipe",[]).directive("ngPhotoswipe",b)}"function"==typeof define&&define.amd?define(["angular","photoswipe"],a):"undefined"!=typeof module&&module&&module.exports?(a(angular,_dereq_("photoswipe")),module.exports="ngPhotoswipe"):a(angular,("undefined"!=typeof global?global:window).Photoswipe)}(),angular.module("ngPhotoswipe").run(["$templateCache",function(a){"use strict";a.put("views/ng-photoswipe.html",'<div><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button> <button class="pswp__button pswp__button--share" title=Share></button> <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button> <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button> <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div></div>')}]);
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -73823,6 +73831,9 @@ module.exports = 'ngFileUpload';
 =======
 },{"photoswipe":undefined}],212:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{"photoswipe":undefined}],212:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 module.exports = function (obj) {
     if (!obj || typeof obj !== 'object') return obj;
     
@@ -73866,6 +73877,7 @@ var isArray = Array.isArray || function (xs) {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{}],213:[function(_dereq_,module,exports){
 =======
 },{}],210:[function(_dereq_,module,exports){
@@ -73898,6 +73910,9 @@ var isArray = Array.isArray || function (xs) {
 =======
 },{}],213:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],213:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 /*!
  * Signature Pad v1.6.0
  * https://github.com/szimek/signature_pad
@@ -74435,6 +74450,7 @@ return SignaturePad;
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{}],214:[function(_dereq_,module,exports){
 =======
 },{}],211:[function(_dereq_,module,exports){
@@ -74467,6 +74483,9 @@ return SignaturePad;
 =======
 },{}],214:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],214:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 /*!
  * ui-select
  * http://github.com/angular-ui/ui-select
@@ -76901,6 +76920,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{}],215:[function(_dereq_,module,exports){
 =======
 },{}],212:[function(_dereq_,module,exports){
@@ -76933,6 +76953,9 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
 =======
 },{}],215:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],215:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 (function(self) {
   'use strict';
 
@@ -77402,6 +77425,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{}],216:[function(_dereq_,module,exports){
 =======
 },{}],213:[function(_dereq_,module,exports){
@@ -77434,6 +77458,9 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
 =======
 },{}],216:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],216:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 
 module.exports = function(app) {
@@ -77529,6 +77556,7 @@ module.exports = function(app) {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{}],217:[function(_dereq_,module,exports){
 =======
 },{}],214:[function(_dereq_,module,exports){
@@ -77561,6 +77589,9 @@ module.exports = function(app) {
 =======
 },{}],217:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],217:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 
 module.exports = function(app) {
@@ -77745,6 +77776,7 @@ module.exports = function(app) {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{}],218:[function(_dereq_,module,exports){
 =======
 },{}],215:[function(_dereq_,module,exports){
@@ -77777,6 +77809,9 @@ module.exports = function(app) {
 =======
 },{}],218:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],218:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 
 module.exports = function(app) {
@@ -77863,6 +77898,7 @@ module.exports = function(app) {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{}],219:[function(_dereq_,module,exports){
 =======
 },{}],216:[function(_dereq_,module,exports){
@@ -77895,6 +77931,9 @@ module.exports = function(app) {
 =======
 },{}],219:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],219:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -77986,6 +78025,7 @@ module.exports = function(app) {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{"../factories/GridUtils":263}],220:[function(_dereq_,module,exports){
 =======
 },{"../factories/GridUtils":259}],217:[function(_dereq_,module,exports){
@@ -78018,6 +78058,9 @@ module.exports = function(app) {
 =======
 },{"../factories/GridUtils":263}],220:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{"../factories/GridUtils":263}],220:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 module.exports = function(app) {
   app.provider('formioComponents', function() {
@@ -78084,6 +78127,7 @@ module.exports = function(app) {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{}],221:[function(_dereq_,module,exports){
 =======
 },{}],218:[function(_dereq_,module,exports){
@@ -78116,6 +78160,9 @@ module.exports = function(app) {
 =======
 },{}],221:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],221:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -78188,6 +78235,7 @@ module.exports = function(app) {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{"../factories/GridUtils":263}],222:[function(_dereq_,module,exports){
 =======
 },{"../factories/GridUtils":259}],219:[function(_dereq_,module,exports){
@@ -78220,6 +78268,9 @@ module.exports = function(app) {
 =======
 },{"../factories/GridUtils":263}],222:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{"../factories/GridUtils":263}],222:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 
 module.exports = function(app) {
@@ -78248,6 +78299,7 @@ module.exports = function(app) {
   ]);
 };
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -78287,6 +78339,9 @@ module.exports = function(app) {
 =======
 },{}],223:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],223:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 
 
@@ -78404,6 +78459,7 @@ module.exports = function(app) {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{}],224:[function(_dereq_,module,exports){
 =======
 },{}],221:[function(_dereq_,module,exports){
@@ -78436,6 +78492,9 @@ module.exports = function(app) {
 =======
 },{}],224:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],224:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -78463,6 +78522,7 @@ module.exports = function(app) {
   ]);
 };
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -78502,6 +78562,9 @@ module.exports = function(app) {
 =======
 },{"../factories/GridUtils":263}],225:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{"../factories/GridUtils":263}],225:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 
 var formioUtils = _dereq_('formiojs/utils');
@@ -78641,6 +78704,7 @@ module.exports = function(app) {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{"formiojs/utils":33}],226:[function(_dereq_,module,exports){
 =======
 },{"formiojs/utils":33}],223:[function(_dereq_,module,exports){
@@ -78673,6 +78737,9 @@ module.exports = function(app) {
 =======
 },{"formiojs/utils":33}],226:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{"formiojs/utils":33}],226:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 
 module.exports = function(app) {
@@ -78841,6 +78908,7 @@ module.exports = function(app) {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{}],227:[function(_dereq_,module,exports){
 =======
 },{}],224:[function(_dereq_,module,exports){
@@ -78873,6 +78941,9 @@ module.exports = function(app) {
 =======
 },{}],227:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],227:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 
 module.exports = function(app) {
@@ -79080,6 +79151,7 @@ module.exports = function(app) {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{}],228:[function(_dereq_,module,exports){
 =======
 },{}],225:[function(_dereq_,module,exports){
@@ -79112,6 +79184,9 @@ module.exports = function(app) {
 =======
 },{}],228:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],228:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -79152,6 +79227,7 @@ module.exports = function(app) {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{}],229:[function(_dereq_,module,exports){
 =======
 },{}],226:[function(_dereq_,module,exports){
@@ -79184,6 +79260,9 @@ module.exports = function(app) {
 =======
 },{}],229:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],229:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -79244,6 +79323,7 @@ module.exports = function(app) {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{"../factories/GridUtils":263}],230:[function(_dereq_,module,exports){
 =======
 },{"../factories/GridUtils":259}],227:[function(_dereq_,module,exports){
@@ -79276,6 +79356,9 @@ module.exports = function(app) {
 =======
 },{"../factories/GridUtils":263}],230:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{"../factories/GridUtils":263}],230:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 
 module.exports = function(app) {
@@ -79593,6 +79676,7 @@ module.exports = function(app) {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> optional image gallery for images attachments
 =======
@@ -79605,6 +79689,8 @@ module.exports = function(app) {
 >>>>>>> optional image gallery for images attachments
 =======
 >>>>>>> Build
+=======
+>>>>>>> optional image gallery for images attachments
 },{}],231:[function(_dereq_,module,exports){
 "use strict";
 
@@ -79716,6 +79802,7 @@ module.exports = function(app) {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 },{}],228:[function(_dereq_,module,exports){
 >>>>>>> optional image gallery for images attachments
@@ -79740,6 +79827,8 @@ module.exports = function(app) {
 >>>>>>> optional image gallery for images attachments
 =======
 >>>>>>> Build
+=======
+>>>>>>> optional image gallery for images attachments
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -79782,6 +79871,7 @@ module.exports = function(app) {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{"../factories/GridUtils":263}],233:[function(_dereq_,module,exports){
 =======
 },{"../factories/GridUtils":259}],229:[function(_dereq_,module,exports){
@@ -79814,6 +79904,9 @@ module.exports = function(app) {
 =======
 },{"../factories/GridUtils":263}],233:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{"../factories/GridUtils":263}],233:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 
 
@@ -79912,6 +80005,7 @@ module.exports = function(app) {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{}],234:[function(_dereq_,module,exports){
 =======
 },{}],230:[function(_dereq_,module,exports){
@@ -79944,6 +80038,9 @@ module.exports = function(app) {
 =======
 },{}],234:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],234:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 var app = angular.module('formio');
 
@@ -79993,6 +80090,7 @@ _dereq_('./well')(app);
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{"./address":216,"./button":217,"./checkbox":218,"./columns":219,"./components":220,"./container":221,"./content":222,"./currency":223,"./custom":224,"./datagrid":225,"./datetime":226,"./day":227,"./email":228,"./fieldset":229,"./file":230,"./form":231,"./hidden":232,"./htmlelement":233,"./number":235,"./page":236,"./panel":237,"./password":238,"./phonenumber":239,"./radio":240,"./resource":241,"./select":242,"./selectboxes":243,"./signature":244,"./survey":245,"./table":246,"./textarea":247,"./textfield":248,"./well":249}],235:[function(_dereq_,module,exports){
 =======
 },{"./address":213,"./button":214,"./checkbox":215,"./columns":216,"./components":217,"./container":218,"./content":219,"./currency":220,"./custom":221,"./datagrid":222,"./datetime":223,"./day":224,"./email":225,"./fieldset":226,"./file":227,"./hidden":228,"./htmlelement":229,"./number":231,"./page":232,"./panel":233,"./password":234,"./phonenumber":235,"./radio":236,"./resource":237,"./select":238,"./selectboxes":239,"./signature":240,"./survey":241,"./table":242,"./textarea":243,"./textfield":244,"./well":245}],231:[function(_dereq_,module,exports){
@@ -80025,6 +80123,9 @@ _dereq_('./well')(app);
 =======
 },{"./address":216,"./button":217,"./checkbox":218,"./columns":219,"./components":220,"./container":221,"./content":222,"./currency":223,"./custom":224,"./datagrid":225,"./datetime":226,"./day":227,"./email":228,"./fieldset":229,"./file":230,"./form":231,"./hidden":232,"./htmlelement":233,"./number":235,"./page":236,"./panel":237,"./password":238,"./phonenumber":239,"./radio":240,"./resource":241,"./select":242,"./selectboxes":243,"./signature":244,"./survey":245,"./table":246,"./textarea":247,"./textfield":248,"./well":249}],235:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{"./address":216,"./button":217,"./checkbox":218,"./columns":219,"./components":220,"./container":221,"./content":222,"./currency":223,"./custom":224,"./datagrid":225,"./datetime":226,"./day":227,"./email":228,"./fieldset":229,"./file":230,"./form":231,"./hidden":232,"./htmlelement":233,"./number":235,"./page":236,"./panel":237,"./password":238,"./phonenumber":239,"./radio":240,"./resource":241,"./select":242,"./selectboxes":243,"./signature":244,"./survey":245,"./table":246,"./textarea":247,"./textfield":248,"./well":249}],235:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 
 
@@ -80096,6 +80197,7 @@ module.exports = function(app) {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{}],236:[function(_dereq_,module,exports){
 =======
 },{}],232:[function(_dereq_,module,exports){
@@ -80128,6 +80230,9 @@ module.exports = function(app) {
 =======
 },{}],236:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],236:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 
 module.exports = function(app) {
@@ -80154,6 +80259,7 @@ module.exports = function(app) {
   ]);
 };
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -80193,6 +80299,9 @@ module.exports = function(app) {
 =======
 },{}],237:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],237:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 
 module.exports = function(app) {
@@ -80235,6 +80344,7 @@ module.exports = function(app) {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{}],238:[function(_dereq_,module,exports){
 =======
 },{}],234:[function(_dereq_,module,exports){
@@ -80267,6 +80377,9 @@ module.exports = function(app) {
 =======
 },{}],238:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],238:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -80297,6 +80410,7 @@ module.exports = function(app) {
   ]);
 };
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -80336,6 +80450,9 @@ module.exports = function(app) {
 =======
 },{}],239:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],239:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -80377,6 +80494,7 @@ module.exports = function(app) {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{}],240:[function(_dereq_,module,exports){
 =======
 },{}],236:[function(_dereq_,module,exports){
@@ -80409,6 +80527,9 @@ module.exports = function(app) {
 =======
 },{}],240:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],240:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 
 
@@ -80466,6 +80587,7 @@ module.exports = function(app) {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{}],241:[function(_dereq_,module,exports){
 =======
 },{}],237:[function(_dereq_,module,exports){
@@ -80498,6 +80620,9 @@ module.exports = function(app) {
 =======
 },{}],241:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],241:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 
 module.exports = function(app) {
@@ -80691,6 +80816,7 @@ module.exports = function(app) {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{}],242:[function(_dereq_,module,exports){
 =======
 },{}],238:[function(_dereq_,module,exports){
@@ -80723,6 +80849,9 @@ module.exports = function(app) {
 =======
 },{}],242:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],242:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 /*eslint max-depth: ["error", 6]*/
 
@@ -81338,6 +81467,7 @@ module.exports = function(app) {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{"lodash/assign":176,"lodash/cloneDeep":177,"lodash/get":181,"lodash/isEqual":188,"lodash/set":202}],243:[function(_dereq_,module,exports){
 =======
 },{"lodash/assign":176,"lodash/cloneDeep":177,"lodash/get":181,"lodash/isEqual":188,"lodash/set":199}],239:[function(_dereq_,module,exports){
@@ -81370,6 +81500,9 @@ module.exports = function(app) {
 =======
 },{"lodash/assign":176,"lodash/cloneDeep":177,"lodash/get":181,"lodash/isEqual":188,"lodash/set":202}],243:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{"lodash/assign":176,"lodash/cloneDeep":177,"lodash/get":181,"lodash/isEqual":188,"lodash/set":202}],243:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 
 
@@ -81484,6 +81617,7 @@ module.exports = function(app) {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{}],244:[function(_dereq_,module,exports){
 =======
 },{}],240:[function(_dereq_,module,exports){
@@ -81516,6 +81650,9 @@ module.exports = function(app) {
 =======
 },{}],244:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],244:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 
 var SignaturePad = _dereq_('signature_pad');
@@ -81663,6 +81800,7 @@ module.exports = function(app) {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{"signature_pad":213}],245:[function(_dereq_,module,exports){
 =======
 },{"signature_pad":210}],241:[function(_dereq_,module,exports){
@@ -81695,6 +81833,9 @@ module.exports = function(app) {
 =======
 },{"signature_pad":213}],245:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{"signature_pad":213}],245:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 
 
@@ -81760,6 +81901,7 @@ module.exports = function(app) {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{}],246:[function(_dereq_,module,exports){
 =======
 },{}],242:[function(_dereq_,module,exports){
@@ -81792,6 +81934,9 @@ module.exports = function(app) {
 =======
 },{}],246:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],246:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -81877,6 +82022,7 @@ module.exports = function(app) {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{"../factories/GridUtils":263}],247:[function(_dereq_,module,exports){
 =======
 },{"../factories/GridUtils":259}],243:[function(_dereq_,module,exports){
@@ -81909,6 +82055,9 @@ module.exports = function(app) {
 =======
 },{"../factories/GridUtils":263}],247:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{"../factories/GridUtils":263}],247:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 
 module.exports = function(app) {
@@ -81999,6 +82148,7 @@ module.exports = function(app) {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{}],248:[function(_dereq_,module,exports){
 =======
 },{}],244:[function(_dereq_,module,exports){
@@ -82031,6 +82181,9 @@ module.exports = function(app) {
 =======
 },{}],248:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],248:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 
 
@@ -82098,6 +82251,7 @@ module.exports = function(app) {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{}],249:[function(_dereq_,module,exports){
 =======
 },{}],245:[function(_dereq_,module,exports){
@@ -82130,6 +82284,9 @@ module.exports = function(app) {
 =======
 },{}],249:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],249:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -82188,6 +82345,7 @@ module.exports = function(app) {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{"../factories/GridUtils":263}],250:[function(_dereq_,module,exports){
 =======
 },{"../factories/GridUtils":259}],246:[function(_dereq_,module,exports){
@@ -82220,6 +82378,9 @@ module.exports = function(app) {
 =======
 },{"../factories/GridUtils":263}],250:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{"../factories/GridUtils":263}],250:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 module.exports = function() {
   return {
@@ -82304,6 +82465,7 @@ module.exports = function() {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{}],251:[function(_dereq_,module,exports){
 =======
 },{}],247:[function(_dereq_,module,exports){
@@ -82336,6 +82498,9 @@ module.exports = function() {
 =======
 },{}],251:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],251:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 module.exports = function() {
   return {
@@ -82740,6 +82905,7 @@ module.exports = function() {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{}],252:[function(_dereq_,module,exports){
 =======
 },{}],248:[function(_dereq_,module,exports){
@@ -82772,6 +82938,9 @@ module.exports = function() {
 =======
 },{}],252:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],252:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 module.exports = ['$sce', '$parse', '$compile', function($sce, $parse, $compile) {
   return {
@@ -82788,6 +82957,7 @@ module.exports = ['$sce', '$parse', '$compile', function($sce, $parse, $compile)
   };
 }];
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -82827,6 +82997,9 @@ module.exports = ['$sce', '$parse', '$compile', function($sce, $parse, $compile)
 =======
 },{}],253:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],253:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 var _get = _dereq_('lodash/get');
 
@@ -83092,6 +83265,7 @@ module.exports = [
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{"lodash/get":181}],254:[function(_dereq_,module,exports){
 =======
 },{"json-logic-js":35,"lodash/cloneDeep":177,"lodash/filter":180,"lodash/get":181}],250:[function(_dereq_,module,exports){
@@ -83124,6 +83298,9 @@ module.exports = [
 =======
 },{"lodash/get":181}],254:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{"lodash/get":181}],254:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 module.exports = [
   'formioComponents',
@@ -83197,6 +83374,7 @@ module.exports = [
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{}],255:[function(_dereq_,module,exports){
 =======
 },{}],251:[function(_dereq_,module,exports){
@@ -83229,6 +83407,9 @@ module.exports = [
 =======
 },{}],255:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],255:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 module.exports = function() {
   return {
@@ -83318,6 +83499,7 @@ module.exports = function() {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{}],256:[function(_dereq_,module,exports){
 =======
 },{}],252:[function(_dereq_,module,exports){
@@ -83350,6 +83532,9 @@ module.exports = function() {
 =======
 },{}],256:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],256:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 module.exports = [
   '$compile',
@@ -83368,6 +83553,7 @@ module.exports = [
   }
 ];
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -83407,6 +83593,9 @@ module.exports = [
 =======
 },{}],257:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],257:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 module.exports = function() {
   return {
@@ -83416,6 +83605,7 @@ module.exports = function() {
   };
 };
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -83455,6 +83645,9 @@ module.exports = function() {
 =======
 },{}],258:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],258:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 module.exports = function() {
   return {
@@ -83486,6 +83679,7 @@ module.exports = function() {
   };
 };
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -83525,6 +83719,9 @@ module.exports = function() {
 =======
 },{}],259:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],259:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 module.exports = function() {
   return {
@@ -83586,6 +83783,7 @@ module.exports = function() {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{}],260:[function(_dereq_,module,exports){
 =======
 },{}],256:[function(_dereq_,module,exports){
@@ -83618,6 +83816,9 @@ module.exports = function() {
 =======
 },{}],260:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],260:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 var isNaN = _dereq_('lodash/isNAN');
 var isFinite = _dereq_('lodash/isFinite');
@@ -84210,6 +84411,7 @@ module.exports = function() {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{"lodash/isFinite":189,"lodash/isNAN":192}],261:[function(_dereq_,module,exports){
 =======
 },{}],257:[function(_dereq_,module,exports){
@@ -84242,6 +84444,9 @@ module.exports = function() {
 =======
 },{"lodash/isFinite":189,"lodash/isNAN":192}],261:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{"lodash/isFinite":189,"lodash/isNAN":192}],261:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 module.exports = [
   'Formio',
@@ -84431,6 +84636,7 @@ module.exports = [
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{}],262:[function(_dereq_,module,exports){
 =======
 },{}],258:[function(_dereq_,module,exports){
@@ -84463,6 +84669,9 @@ module.exports = [
 =======
 },{}],262:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],262:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 var formioUtils = _dereq_('formiojs/utils');
 var _filter = _dereq_('lodash/filter');
@@ -84875,6 +85084,7 @@ module.exports = function() {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{"formiojs/utils":33,"lodash/filter":180,"lodash/get":181}],263:[function(_dereq_,module,exports){
 =======
 },{"formiojs/utils":33}],259:[function(_dereq_,module,exports){
@@ -84907,6 +85117,9 @@ module.exports = function() {
 =======
 },{"formiojs/utils":33,"lodash/filter":180,"lodash/get":181}],263:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{"formiojs/utils":33,"lodash/filter":180,"lodash/get":181}],263:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 module.exports = function() {
   var generic = function(data, component) {
@@ -85039,6 +85252,7 @@ module.exports = function() {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{}],264:[function(_dereq_,module,exports){
 =======
 },{}],260:[function(_dereq_,module,exports){
@@ -85071,6 +85285,9 @@ module.exports = function() {
 =======
 },{}],264:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],264:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 module.exports = [
   '$q',
@@ -85126,6 +85343,7 @@ module.exports = [
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{}],265:[function(_dereq_,module,exports){
 =======
 },{}],261:[function(_dereq_,module,exports){
@@ -85158,6 +85376,9 @@ module.exports = [
 =======
 },{}],265:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],265:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 module.exports = [
   'Formio',
@@ -85198,6 +85419,7 @@ module.exports = [
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{}],266:[function(_dereq_,module,exports){
 =======
 },{}],262:[function(_dereq_,module,exports){
@@ -85230,6 +85452,9 @@ module.exports = [
 =======
 },{}],266:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],266:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 module.exports = [
   'FormioUtils',
@@ -85238,6 +85463,7 @@ module.exports = [
   }
 ];
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -85277,6 +85503,9 @@ module.exports = [
 =======
 },{}],267:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],267:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 module.exports = [
   '$sce',
@@ -85289,6 +85518,7 @@ module.exports = [
   }
 ];
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -85328,6 +85558,9 @@ module.exports = [
 =======
 },{}],268:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],268:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 module.exports = [
   function() {
@@ -85346,6 +85579,7 @@ module.exports = [
   }
 ];
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -85385,6 +85619,9 @@ module.exports = [
 =======
 },{}],269:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],269:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 module.exports = [
   'formioTableView',
@@ -85397,6 +85634,7 @@ module.exports = [
   }
 ];
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -85436,6 +85674,9 @@ module.exports = [
 =======
 },{}],270:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],270:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 module.exports = [
   'Formio',
@@ -85450,6 +85691,7 @@ module.exports = [
   }
 ];
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -85489,6 +85731,9 @@ module.exports = [
 =======
 },{}],271:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],271:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 module.exports = [
   '$filter',
@@ -85544,6 +85789,7 @@ module.exports = [
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{}],272:[function(_dereq_,module,exports){
 =======
 },{}],268:[function(_dereq_,module,exports){
@@ -85576,6 +85822,9 @@ module.exports = [
 =======
 },{}],272:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],272:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 module.exports = ['$sce', function($sce) {
   return function(val) {
@@ -85583,6 +85832,7 @@ module.exports = ['$sce', function($sce) {
   };
 }];
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -85622,6 +85872,9 @@ module.exports = ['$sce', function($sce) {
 =======
 },{}],273:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],273:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 (function (global){
 "use strict";
 global.jQuery = _dereq_('jquery');
@@ -85640,6 +85893,7 @@ _dereq_('ng-photoswipe');
 _dereq_('./formio');
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -85679,6 +85933,9 @@ _dereq_('./formio');
 =======
 },{"./formio":274,"angular":10,"angular-file-saver":1,"angular-moment":2,"angular-sanitize":4,"angular-ui-bootstrap":6,"angular-ui-mask":8,"bootstrap":12,"bootstrap-ui-datetime-picker/dist/datetime-picker":11,"jquery":34,"ng-dialog":208,"ng-file-upload":210,"ng-photoswipe":211,"ui-select/dist/select":214}],274:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{"./formio":274,"angular":10,"angular-file-saver":1,"angular-moment":2,"angular-sanitize":4,"angular-ui-bootstrap":6,"angular-ui-mask":8,"bootstrap":12,"bootstrap-ui-datetime-picker/dist/datetime-picker":11,"jquery":34,"ng-dialog":208,"ng-file-upload":210,"ng-photoswipe":211,"ui-select/dist/select":214}],274:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 _dereq_('./polyfills/polyfills');
 
@@ -85837,6 +86094,7 @@ _dereq_('./components');
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{"./components":234,"./directives/customValidator":250,"./directives/formio":251,"./directives/formioBindHtml.js":252,"./directives/formioComponent":253,"./directives/formioComponentView":254,"./directives/formioDelete":255,"./directives/formioElement":256,"./directives/formioErrors":257,"./directives/formioSubmission":258,"./directives/formioSubmissions":259,"./directives/formioWizard":260,"./factories/FormioScope":261,"./factories/FormioUtils":262,"./factories/formioInterceptor":264,"./factories/formioTableView":265,"./filters/flattenComponents":266,"./filters/safehtml":267,"./filters/tableComponents":268,"./filters/tableFieldView":269,"./filters/tableView":270,"./filters/translate":271,"./filters/trusturl":272,"./polyfills/polyfills":276,"./providers/Formio":277}],275:[function(_dereq_,module,exports){
 =======
 },{"./components":230,"./directives/customValidator":246,"./directives/formio":247,"./directives/formioBindHtml.js":248,"./directives/formioComponent":249,"./directives/formioComponentView":250,"./directives/formioDelete":251,"./directives/formioElement":252,"./directives/formioErrors":253,"./directives/formioSubmission":254,"./directives/formioSubmissions":255,"./directives/formioWizard":256,"./factories/FormioScope":257,"./factories/FormioUtils":258,"./factories/formioInterceptor":260,"./factories/formioTableView":261,"./filters/flattenComponents":262,"./filters/safehtml":263,"./filters/tableComponents":264,"./filters/tableFieldView":265,"./filters/tableView":266,"./filters/translate":267,"./filters/trusturl":268,"./polyfills/polyfills":272,"./providers/Formio":273}],271:[function(_dereq_,module,exports){
@@ -85869,6 +86127,9 @@ _dereq_('./components');
 =======
 },{"./components":234,"./directives/customValidator":250,"./directives/formio":251,"./directives/formioBindHtml.js":252,"./directives/formioComponent":253,"./directives/formioComponentView":254,"./directives/formioDelete":255,"./directives/formioElement":256,"./directives/formioErrors":257,"./directives/formioSubmission":258,"./directives/formioSubmissions":259,"./directives/formioWizard":260,"./factories/FormioScope":261,"./factories/FormioUtils":262,"./factories/formioInterceptor":264,"./factories/formioTableView":265,"./filters/flattenComponents":266,"./filters/safehtml":267,"./filters/tableComponents":268,"./filters/tableFieldView":269,"./filters/tableView":270,"./filters/translate":271,"./filters/trusturl":272,"./polyfills/polyfills":276,"./providers/Formio":277}],275:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{"./components":234,"./directives/customValidator":250,"./directives/formio":251,"./directives/formioBindHtml.js":252,"./directives/formioComponent":253,"./directives/formioComponentView":254,"./directives/formioDelete":255,"./directives/formioElement":256,"./directives/formioErrors":257,"./directives/formioSubmission":258,"./directives/formioSubmissions":259,"./directives/formioWizard":260,"./factories/FormioScope":261,"./factories/FormioUtils":262,"./factories/formioInterceptor":264,"./factories/formioTableView":265,"./filters/flattenComponents":266,"./filters/safehtml":267,"./filters/tableComponents":268,"./filters/tableFieldView":269,"./filters/tableView":270,"./filters/translate":271,"./filters/trusturl":272,"./polyfills/polyfills":276,"./providers/Formio":277}],275:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 'use strict';
 
@@ -85899,6 +86160,7 @@ if (typeof Object.assign != 'function') {
   })();
 }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -85938,11 +86200,15 @@ if (typeof Object.assign != 'function') {
 =======
 },{}],276:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{}],276:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 'use strict';
 
 _dereq_('./Object.assign');
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -85982,6 +86248,9 @@ _dereq_('./Object.assign');
 =======
 },{"./Object.assign":275}],277:[function(_dereq_,module,exports){
 >>>>>>> Build
+=======
+},{"./Object.assign":275}],277:[function(_dereq_,module,exports){
+>>>>>>> optional image gallery for images attachments
 "use strict";
 module.exports = function() {
   // The formio class.
@@ -86058,6 +86327,7 @@ module.exports = function() {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 },{"formiojs":26}]},{},[273])(273)
 =======
 },{"formiojs":26}]},{},[269])(269)
@@ -86090,4 +86360,7 @@ module.exports = function() {
 =======
 },{"formiojs":26}]},{},[273])(273)
 >>>>>>> Build
+=======
+},{"formiojs":26}]},{},[273])(273)
+>>>>>>> optional image gallery for images attachments
 });
