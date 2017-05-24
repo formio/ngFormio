@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="/bower_components/ng-formio-builder/css/ngFormBuilder.css" />
     <link rel="stylesheet" href="/bower_components/angular-toastr/dist/angular-toastr.min.css" />
     <link rel="stylesheet" href="/bower_components/chartist-plugin-tooltip/dist/chartist-plugin-tooltip.css" />
+    <link rel="stylesheet" href="/bower_components/angular-bootstrap-lightbox/dist/angular-bootstrap-lightbox.css" />
     <!-- endbower -->
     <!-- endbuild -->
 
@@ -60,9 +61,6 @@
     <![endif]-->
     <div id="content">
       <nav class="navbar navbar-fixed-top navbar-inverse">
-        <ul id="home-button" class="nav navbar-nav navbar-left navbar-home" ng-if="isActive('project')" ng-cloak>
-          <li><a ui-sref="home" title="Home"><i class="fa fa-home"></i></a></li>
-        </ul>
         <div ng-class="{container: !isActive('project')}" ng-cloak>
           <div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -229,6 +227,7 @@
     <script src="/bower_components/angular-toastr/dist/angular-toastr.tpls.min.js"></script>
     <script src="/bower_components/chartist-plugin-tooltip/dist/chartist-plugin-tooltip.min.js"></script>
     <script src="/bower_components/seamless/build/seamless.parent.min.js"></script>
+    <script src="/bower_components/angular-bootstrap-lightbox/dist/angular-bootstrap-lightbox.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 

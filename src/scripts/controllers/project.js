@@ -251,18 +251,10 @@ app.controller('ProjectController', [
 
     $scope.loadRoles();
 
-    $scope.minPlan = function(plan, project) {
+    $scope.minPlan= function(plan, project) {
       var plans = ['basic', 'independent', 'team', 'trial', 'commercial'];
       var checkProject = project || $scope.primaryProject || { plan: 'none' };
       return plans.indexOf(checkProject.plan) >= plans.indexOf(plan);
-    };
-
-    $scope.minRole = function(role, user, project) {
-      user = user || $rootScope.user;
-      project = project || $scope.primaryProject;
-      var roles = ['team_read', 'team_write', 'team_admin', 'owner'];
-
-      return plans.indexOf(myRole) >= roles.indexOf(role);
     };
 
     $scope.saveProject = function() {
@@ -295,7 +287,7 @@ app.controller('ProjectController', [
       var allowedFiles, allow, custom;
 
       var currTime = (new Date()).getTime();
-      var projTime = (new Date(result.trial.toString())).getTime();
+      var projTime = (new Date(result.created.toString())).getTime();
       var delta = Math.ceil(parseInt((currTime - projTime) / 1000));
       var day = 86400;
       var remaining = 30 - parseInt(delta / day);
@@ -365,10 +357,9 @@ app.controller('ProjectController', [
       var userTeamsPromise = $http.get(AppConfig.apiBase + '/team/all').then(function(result) {
         $scope.userTeams = result.data;
         $scope.userTeamsLoading = false;
-      });
 
-      var userTeamsOwnPromise = $http.get(AppConfig.apiBase + '/team/own').then(function(result) {
-        $scope.primaryProjectEligibleTeams = result.data;
+        // Separate out the teams that the current user owns, to save an api call.
+        $scope.primaryProjectEligibleTeams = _.filter(result.data, {owner: $scope.user._id});
       });
 
       $scope.projectTeamsLoading = true;
@@ -1008,6 +999,7 @@ app.controller('LaunchController', [
   'Formio',
   'FormioAlerts',
   'AppConfig',
+  'Lightbox',
   function(
     $rootScope,
     $scope,
@@ -1016,13 +1008,22 @@ app.controller('LaunchController', [
     $http,
     Formio,
     FormioAlerts,
-    AppConfig
+    AppConfig,
+    Lightbox
   ) {
+    $scope.repository = '';
+    $scope.step = 'welcome';
+    $scope.stepActive = 'welcome';
+    $scope.welcome = true;
+    $scope.advanceSteps = false;
+    $scope.repo = '';
     $scope.currentSection.title = 'Launch';
     $scope.currentSection.icon = 'fa fa-rocket';
     $scope.currentSection.help = 'https://help.form.io/embedding/';
     $scope.hasTemplate = true;
     var formio = new Formio(AppConfig.apiBase + '/project/' + $scope.currentProject._id);
+
+
 
     formio.loadForms({
         params: {
@@ -1035,33 +1036,135 @@ app.controller('LaunchController', [
       .catch(FormioAlerts.onError.bind(FormioAlerts));
 
     $scope.$watch('currentProject', function(project) {
+
+      $scope.framework= project.framework;
+      if (project.framework === 'angular') {
+        $scope.repository = 'https://github.com/formio/ng-app-starterkit';
+      }
+      if (project.framework === 'angular2') {
+        $scope.repository = 'https://github.com/formio/ng2-formio';
+      }
+      if (project.framework === 'react') {
+        $scope.repository = 'https://github.com/formio/react-formio';
+      }
       if (!project.settings) {
         return;
       }
       if (!project.settings.preview) {
         $scope.hasTemplate = false;
         project.settings.preview = {
-          repo: 'https://github.com/formio/formio-app-template',
+          repository: 'https://github.com/formio/formio-app-template',
           url: 'http://formio.github.io/formio-app-template/'
         };
-      }
 
-      var url = project.settings.preview.url.replace('http://', $location.protocol() + '://');
-      url += '/?apiUrl=' + encodeURIComponent(AppConfig.apiBase);
-      url += '&appUrl=' + encodeURIComponent($location.protocol() + '://' + project.name + '.' + AppConfig.serverHost);
-      $scope.previewUrl = $sce.trustAsResourceUrl(url);
-      $scope.repo = project.settings.preview.repo;
-      var parts = $scope.repo.split('/');
-      $scope.appFolder = parts[parts.length - 1];
+      }
     });
+
+    // Change Steps on Overview
+    $scope.nextStep = function (next){
+
+      $scope.step = next;
+      if (next === 'form'|| next==='action') {
+        $scope.stepActive ='form';
+      }
+      if(next === 'embed') {
+        $scope.stepActive ='embed';
+      }
+      if(next === 'adFeatures') {
+        $scope.stepActive = 'adFeatures';
+        $scope.welcome = false;
+        $scope.advanceSteps = true;
+      }
+      if (next === 'welcome') {
+        $scope.stepActive ='welcome';
+        $scope.welcome = true;
+        $scope.advanceSteps = false;
+      }
+      if (next === 'account') {
+        $scope.stepActive ='account';
+      }
+      if (next === 'launch') {
+        $scope.stepActive ='launch';
+      }
+      if ( next ==='download' || next==='setup' || next === 'start') {
+        $scope.stepActive ='start';
+      }
+      if (next === 'resource' || next === 'emberResource') {
+        $scope.stepActive ='resource';
+      }
+    };
+    // Change Steps on Overview
+    $scope.prevStep = function (prev){
+      $scope.step = prev;
+      if (prev === 'form'|| prev==='action') {
+        $scope.stepActive ='form';
+      }
+      if(prev === 'embed') {
+        $scope.stepActive ='embed';
+      }
+      if(prev === 'adFeatures') {
+        $scope.stepActive = 'adFeatures';
+        $scope.welcome = false;
+        $scope.advanceSteps = true;
+      }
+      if (prev === 'welcome') {
+        $scope.stepActive ='welcome';
+        $scope.welcome = true;
+        $scope.advanceSteps = false;
+      }
+      if (prev === 'account') {
+        $scope.stepActive ='account';
+      }
+      if (prev === 'launch') {
+        $scope.stepActive ='launch';
+      }
+      if ( prev ==='download' || prev==='setup' || prev === 'start') {
+        $scope.stepActive ='start';
+      }
+      if (prev === 'resource' || prev === 'emberResource') {
+        $scope.stepActive ='resource';
+      }
+    };
+//light box images
+    $scope.formCreate = [
+      {
+        'url': 'https://monosnap.com/file/xiUp2i1xQYy1XwA581awTJnZqeB787.png',
+        'thumbUrl': 'https://monosnap.com/file/xiUp2i1xQYy1XwA581awTJnZqeB787.png',
+        'caption': 'Name the Form.'
+      },
+      {
+        'url': 'https://monosnap.com/file/j8MyWTPZKtGm3SbwwrdnXA8UsCc9i4.png',
+        'thumbUrl': 'https://monosnap.com/file/j8MyWTPZKtGm3SbwwrdnXA8UsCc9i4.png',
+        'caption': 'Drag and Drop.'
+      },
+      {
+        'url': 'https://monosnap.com/file/BsqWN7Q6B9rv7Wbw32Fw9kNb8b1qLo.png',
+        'thumbUrl': 'https://monosnap.com/file/BsqWN7Q6B9rv7Wbw32Fw9kNb8b1qLo.png',
+        'caption': 'Save the field component.'
+      }];
+    $scope.formAction = [
+      {
+        'url': 'https://monosnap.com/file/3p8XyDte8PKG1cP9jO9oqsvXiJeVv7.png',
+        'thumbUrl': 'https://monosnap.com/file/3p8XyDte8PKG1cP9jO9oqsvXiJeVv7.png',
+        'caption': 'Select Action'
+      },
+      {
+        'url': 'https://monosnap.com/file/F9sKZl3QOHuffZGK5l0OQQaecBWUkJ.png',
+        'thumbUrl': 'https://monosnap.com/file/F9sKZl3QOHuffZGK5l0OQQaecBWUkJ.png',
+        'caption': 'Setting Email.'
+      }];
     $scope.$watch('project', function(newProject, oldProject) {
       if (newProject && newProject.name) {
         $scope.projectApi = $rootScope.projectPath(newProject);
       }
     });
+    $scope.openLightboxModal = function (images,index) {
+      Lightbox.openModal(images, index);
+      Lightbox.fullScreenMode=false;
+    };
+
   }
 ]);
-
 app.controller('ProjectFormioController', [
   '$scope',
   'Formio',
@@ -1975,11 +2078,9 @@ app.controller('ProjectTeamController', [
         $http.get(AppConfig.apiBase + '/team/all').then(function(result) {
           $scope.userTeams = result.data;
           $scope.userTeamsLoading = false;
-        });
 
-        $http.get(AppConfig.apiBase + '/team/own').then(function(result) {
           // Separate out the teams that the current user owns, to save an api call.
-          $scope.primaryProjectEligibleTeams = result.data;
+          $scope.primaryProjectEligibleTeams = _.filter(result.data, {owner: $scope.user._id});
           $scope.uniqueEligibleTeams = _.filter($scope.primaryProjectEligibleTeams, function(team) {
             return _.findIndex($scope.primaryProjectTeams, { _id: team._id }) === -1;
           });
@@ -2285,7 +2386,7 @@ app.factory('ProjectUpgradeDialog', [
               };
 
               var currTime = (new Date()).getTime();
-              var projTime = (new Date(project.trial.toString())).getTime();
+              var projTime = (new Date(project.created.toString())).getTime();
               var delta = Math.ceil(parseInt((currTime - projTime) / 1000));
               var day = 86400;
               var remaining = 30 - parseInt(delta / day);

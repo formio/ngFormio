@@ -27,7 +27,8 @@ angular
     'ngFileUpload',
     'ngDialog',
     'swaggerUi',
-    'toastr'
+    'toastr',
+    'bootstrapLightbox'
   ])
   .config([
     '$stateProvider',
@@ -210,7 +211,7 @@ angular
         })
         .state('project.overview', {
           url: '/overview',
-          controller: 'ProjectOverviewController',
+          controller: 'LaunchController',
           templateUrl: 'views/project/overview/index.html'
         })
         .state('project.env.tour', {
