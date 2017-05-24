@@ -48869,7 +48869,7 @@ Formio.events = new EventEmitter({
 module.exports = global.Formio = Formio;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./providers":26,"eventemitter2":24,"native-promise-only":192,"shallow-copy":196,"whatwg-fetch":199}],26:[function(_dereq_,module,exports){
+},{"./providers":26,"eventemitter2":24,"native-promise-only":192,"shallow-copy":197,"whatwg-fetch":200}],26:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = {
@@ -62970,6 +62970,17 @@ ngFileUpload.service('UploadExif', ['UploadResize', '$q', function (UploadResize
 _dereq_('./dist/ng-file-upload-all');
 module.exports = 'ngFileUpload';
 },{"./dist/ng-file-upload-all":194}],196:[function(_dereq_,module,exports){
+(function (global){
+/*
+	ng-photoswipe v0.2.0
+	(c) 2016 Massimiliano Sartoretto <massimilianosartoretto@gmail.com> 
+	License: MIT 
+*/
+
+"format amd";!function(){"use strict";function a(a){function b(b,c,d){function e(e,f){e.template=e.template||"views/ng-photoswipe.html",c.get(e.template,{cache:d}).success(function(c){var d=a.element(c);f.append(b(d)(e))}),e.start=function(){e.open=!0,g()};var g=function(){var b=document.querySelectorAll(".pswp")[0];a.isUndefined(e.options.getThumbBoundsFn)&&a.isDefined(e.slideSelector)&&(e.options=a.merge({},{getThumbBoundsFn:function(a){var b=document.querySelectorAll(e.slideSelector)[a],c=window.pageYOffset||document.documentElement.scrollTop,d=b.getBoundingClientRect();return{x:d.left,y:d.top+c,w:d.width}}},e.options)),e.gallery=new PhotoSwipe(b,PhotoSwipeUI_Default||!1,e.slides,e.options),e.gallery.init(),e.item=e.gallery.currItem,e.gallery.listen("destroy",function(){e.safeApply(function(){(e.onClose||a.noop)()})}),e.gallery.listen("afterChange",function(){e.safeApply(function(){e.item=e.gallery.currItem})})};e.$watch("open",function(a,b){a!=b?a&&g():!a&&e.gallery&&(e.gallery.close(),e.gallery=null)}),e.safeApply=function(a){var b=this.$root.$$phase;"$apply"==b||"$digest"==b?a&&"function"==typeof a&&a():this.$apply(a)},e.$on("destroy",function(){e.gallery=null})}return{restrict:"AE",replace:!0,scope:{open:"=",options:"=",slides:"=",slideSelector:"@",template:"@",onClose:"&"},link:e}}return b.$inject=["$compile","$http","$templateCache"],a.module("ngPhotoswipe",[]).directive("ngPhotoswipe",b)}"function"==typeof define&&define.amd?define(["angular","photoswipe"],a):"undefined"!=typeof module&&module&&module.exports?(a(angular,_dereq_("photoswipe")),module.exports="ngPhotoswipe"):a(angular,("undefined"!=typeof global?global:window).Photoswipe)}(),angular.module("ngPhotoswipe").run(["$templateCache",function(a){"use strict";a.put("views/ng-photoswipe.html",'<div><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button> <button class="pswp__button pswp__button--share" title=Share></button> <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button> <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button> <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div></div>')}]);
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"photoswipe":undefined}],197:[function(_dereq_,module,exports){
 module.exports = function (obj) {
     if (!obj || typeof obj !== 'object') return obj;
     
@@ -63006,7 +63017,7 @@ var isArray = Array.isArray || function (xs) {
     return {}.toString.call(xs) === '[object Array]';
 };
 
-},{}],197:[function(_dereq_,module,exports){
+},{}],198:[function(_dereq_,module,exports){
 /*!
  * Signature Pad v1.6.0
  * https://github.com/szimek/signature_pad
@@ -63537,7 +63548,7 @@ return SignaturePad;
 
 })));
 
-},{}],198:[function(_dereq_,module,exports){
+},{}],199:[function(_dereq_,module,exports){
 /*!
  * ui-select
  * http://github.com/angular-ui/ui-select
@@ -65965,7 +65976,7 @@ $templateCache.put("selectize/match.tpl.html","<div ng-hide=\"$select.searchEnab
 $templateCache.put("selectize/no-choice.tpl.html","<div class=\"ui-select-no-choice selectize-dropdown\" ng-show=\"$select.items.length == 0\"><div class=\"selectize-dropdown-content\"><div data-selectable=\"\" ng-transclude=\"\"></div></div></div>");
 $templateCache.put("selectize/select-multiple.tpl.html","<div class=\"ui-select-container selectize-control multi plugin-remove_button\" ng-class=\"{\'open\': $select.open}\"><div class=\"selectize-input\" ng-class=\"{\'focus\': $select.open, \'disabled\': $select.disabled, \'selectize-focus\' : $select.focus}\" ng-click=\"$select.open && !$select.searchEnabled ? $select.toggle($event) : $select.activate()\"><div class=\"ui-select-match\"></div><input type=\"search\" autocomplete=\"off\" tabindex=\"-1\" class=\"ui-select-search\" ng-class=\"{\'ui-select-search-hidden\':!$select.searchEnabled}\" placeholder=\"{{$selectMultiple.getPlaceholder()}}\" ng-model=\"$select.search\" ng-disabled=\"$select.disabled\" aria-expanded=\"{{$select.open}}\" aria-label=\"{{ $select.baseTitle }}\" ondrop=\"return false;\"></div><div class=\"ui-select-choices\"></div><div class=\"ui-select-no-choice\"></div></div>");
 $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container selectize-control single\" ng-class=\"{\'open\': $select.open}\"><div class=\"selectize-input\" ng-class=\"{\'focus\': $select.open, \'disabled\': $select.disabled, \'selectize-focus\' : $select.focus}\" ng-click=\"$select.open && !$select.searchEnabled ? $select.toggle($event) : $select.activate()\"><div class=\"ui-select-match\"></div><input type=\"search\" autocomplete=\"off\" tabindex=\"-1\" class=\"ui-select-search ui-select-toggle\" ng-class=\"{\'ui-select-search-hidden\':!$select.searchEnabled}\" ng-click=\"$select.toggle($event)\" placeholder=\"{{$select.placeholder}}\" ng-model=\"$select.search\" ng-hide=\"!$select.isEmpty() && !$select.open\" ng-disabled=\"$select.disabled\" aria-label=\"{{ $select.baseTitle }}\"></div><div class=\"ui-select-choices\"></div><div class=\"ui-select-no-choice\"></div></div>");}]);
-},{}],199:[function(_dereq_,module,exports){
+},{}],200:[function(_dereq_,module,exports){
 (function(self) {
   'use strict';
 
@@ -66428,7 +66439,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
   self.fetch.polyfill = true
 })(typeof self !== 'undefined' ? self : this);
 
-},{}],200:[function(_dereq_,module,exports){
+},{}],201:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -66517,7 +66528,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],201:[function(_dereq_,module,exports){
+},{}],202:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -66695,7 +66706,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],202:[function(_dereq_,module,exports){
+},{}],203:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -66775,7 +66786,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],203:[function(_dereq_,module,exports){
+},{}],204:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -66860,7 +66871,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":246}],204:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":247}],205:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.provider('formioComponents', function() {
@@ -66920,7 +66931,7 @@ module.exports = function(app) {
   }]);
 };
 
-},{}],205:[function(_dereq_,module,exports){
+},{}],206:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -66986,7 +66997,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":246}],206:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":247}],207:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -67015,7 +67026,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],207:[function(_dereq_,module,exports){
+},{}],208:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -67126,7 +67137,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],208:[function(_dereq_,module,exports){
+},{}],209:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -67154,7 +67165,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":246}],209:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":247}],210:[function(_dereq_,module,exports){
 "use strict";
 
 var formioUtils = _dereq_('formiojs/utils');
@@ -67287,7 +67298,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"formiojs/utils":32}],210:[function(_dereq_,module,exports){
+},{"formiojs/utils":32}],211:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -67449,7 +67460,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],211:[function(_dereq_,module,exports){
+},{}],212:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -67650,7 +67661,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],212:[function(_dereq_,module,exports){
+},{}],213:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -67684,7 +67695,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],213:[function(_dereq_,module,exports){
+},{}],214:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -67738,7 +67749,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":246}],214:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":247}],215:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -67762,7 +67773,8 @@ module.exports = function(app) {
           protected: false,
           persistent: true,
           hidden: false,
-          clearOnHide: true
+          clearOnHide: true,
+          slides: false
         },
         viewTemplate: 'formio/componentsView/file.html'
       });
@@ -67808,12 +67820,14 @@ module.exports = function(app) {
         files: '=',
         form: '=',
         width: '=',
-        readOnly: '='
+        readOnly: '=',
+        slides: '='
       },
       templateUrl: 'formio/components/formio-image-list.html',
       controller: [
         '$scope',
-        function($scope) {
+        '$timeout',
+        function($scope, $timeout) {
           if ($scope.builder) return;
           $scope.removeFile = function(event, index) {
             var component = $scope.$parent.component;
@@ -67822,6 +67836,47 @@ module.exports = function(app) {
             }
             event.preventDefault();
             $scope.files.splice(index, 1);
+          };
+
+          $scope.onImageClicked = function(e, index) {
+            if (!$scope.slides) {
+              return;
+            }
+            //http://photoswipe.com/documentation/getting-started.html
+            // Create the images list for the slider:
+            // Look for the parent container of the clicked image by searching the closest elemnt with 'files' attr.
+            // Then get the list of image nodes.
+            // Get the natural dimensions of the images, not the thumbnailed dimensions.
+            var slides = angular.element(e.target).closest('[files]').find('span img').map(function(i, img) {
+              return {
+                src: $scope.files[i].imageSrc,
+                w: img.naturalWidth,
+                h: img.naturalHeight
+              };
+            });
+
+            $scope.slideConfig = {
+              slides: slides,
+              options: {
+                index: index,
+                history: false,
+                shareButtons: [
+                    {id:'download', label:'Download image', url:'{{raw_image_url}}', download:true}
+                ]
+              }
+            };
+
+            // Slider haves buttons that triggers the submit in the form.
+            // Wait for the slider to be rendered and prevent submission event
+            $timeout(function() {
+              angular.element('.pswp button').bind('click', function(e) {
+                e.preventDefault();
+              });
+            });
+          };
+
+          $scope.onSliderClose = function() {
+            $scope.slideConfig = null;
           };
         }
       ]
@@ -67984,7 +68039,7 @@ module.exports = function(app) {
       $templateCache
     ) {
       $templateCache.put('formio/components/formio-image-list.html',
-        "<div>\n  <span ng-repeat=\"file in files track by $index\" ng-if=\"file\">\n    <formio-image file=\"file\" form=\"form\" width=\"width\"></formio-image>\n    <span ng-if=\"!readOnly\" style=\"width:1%;white-space:nowrap;\">\n      <a href=\"#\" ng-click=\"removeFile($event, $index)\" style=\"padding: 2px 4px;\" class=\"btn btn-sm btn-default\"><span class=\"glyphicon glyphicon-remove\"></span></a>\n    </span>\n  </span>\n</div>\n"
+        "<div>\n  <span ng-repeat=\"file in files track by $index\" ng-if=\"file\">\n    <formio-image file=\"file\" form=\"form\" width=\"width\" ng-click=\"onImageClicked($event, $index)\"></formio-image>\n    <span ng-if=\"!readOnly\" style=\"width:1%;white-space:nowrap;\">\n      <a href=\"#\" ng-click=\"removeFile($event, $index)\" style=\"padding: 2px 4px;\" class=\"btn btn-sm btn-default\"><span class=\"glyphicon glyphicon-remove\"></span></a>\n    </span>\n  </span>\n  <div\n    ng-photoswipe\n    slides=\"slideConfig.slides\"\n    slide-selector=\"span img\"\n    open=\"slideConfig\"\n    on-close=\"onSliderClose()\"\n    options=\"slideConfig.options\">\n  </div>\n</div>\n"
       );
 
       $templateCache.put('formio/components/formio-file-list.html',
@@ -67992,7 +68047,7 @@ module.exports = function(app) {
       );
 
       $templateCache.put('formio/components/file.html',
-        "<label ng-if=\"component.label && !component.hideLabel\" for=\"{{ componentId }}\" class=\"control-label\" ng-class=\"{'field-required': isRequired(component)}\">{{ component.label | formioTranslate:null:builder }}</label>\n<span ng-if=\"!component.label && isRequired(component)\" class=\"glyphicon glyphicon-asterisk form-control-feedback field-required-inline\" aria-hidden=\"true\"></span>\n<div ng-controller=\"formioFileUpload\">\n  <formio-file-list files=\"data[component.key]\" form=\"formio.formUrl\" ng-if=\"!component.image\"></formio-file-list>\n  <formio-image-list files=\"data[component.key]\" form=\"formio.formUrl\" width=\"component.imageSize\" ng-if=\"component.image\"></formio-image-list>\n  <div ng-if=\"!readOnly && (component.multiple || (!component.multiple && !data[component.key].length))\">\n    <div ngf-drop=\"upload($files)\" class=\"fileSelector\" ngf-drag-over-class=\"'fileDragOver'\" ngf-multiple=\"component.multiple\" id=\"{{ componentId }}\" name=\"{{ componentId }}\"><span class=\"glyphicon glyphicon-cloud-upload\"></span>Drop files to attach, or <a style=\"cursor: pointer;\" ngf-select=\"upload($files)\" tabindex=\"{{ component.tabindex || 0 }}\" ngf-multiple=\"component.multiple\">browse</a>.</div>\n    <div ng-if=\"!component.storage\" class=\"alert alert-warning\">No storage has been set for this field. File uploads are disabled until storage is set up.</div>\n    <div ngf-no-file-drop>File Drag/Drop is not supported for this browser</div>\n  </div>\n  <div ng-repeat=\"fileUpload in fileUploads track by $index\" ng-class=\"{'has-error': fileUpload.status === 'error'}\" class=\"file\">\n    <div class=\"row\">\n      <div class=\"fileName control-label col-sm-10\">{{ fileUpload.name }} <span ng-click=\"removeUpload(fileUpload.name)\" class=\"glyphicon glyphicon-remove\"></span></div>\n      <div class=\"fileSize control-label col-sm-2 text-right\">{{ fileSize(fileUpload.size) }}</div>\n    </div>\n    <div class=\"row\">\n      <div class=\"col-sm-12\">\n        <span ng-if=\"fileUpload.status === 'progress'\">\n          <div class=\"progress\">\n            <div class=\"progress-bar\" role=\"progressbar\" aria-valuenow=\"{{fileUpload.progress}}\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"width:{{fileUpload.progress}}%\">\n              <span class=\"sr-only\">{{fileUpload.progress}}% Complete</span>\n            </div>\n          </div>\n        </span>\n        <div ng-if=\"!fileUpload.status !== 'progress'\" class=\"bg-{{ fileUpload.status }} control-label\">{{ fileUpload.message }}</div>\n      </div>\n    </div>\n  </div>\n</div>\n"
+        "<label ng-if=\"component.label && !component.hideLabel\" for=\"{{ componentId }}\" class=\"control-label\" ng-class=\"{'field-required': isRequired(component)}\">{{ component.label | formioTranslate:null:builder }}</label>\n<span ng-if=\"!component.label && isRequired(component)\" class=\"glyphicon glyphicon-asterisk form-control-feedback field-required-inline\" aria-hidden=\"true\"></span>\n<div ng-controller=\"formioFileUpload\">\n  <formio-file-list files=\"data[component.key]\" form=\"formio.formUrl\" ng-if=\"!component.image\"></formio-file-list>\n  <formio-image-list files=\"data[component.key]\" form=\"formio.formUrl\" width=\"component.imageSize\" ng-if=\"component.image\" slides=\"component.image && component.slides\"></formio-image-list>\n  <div ng-if=\"!readOnly && (component.multiple || (!component.multiple && !data[component.key].length))\">\n    <div ngf-drop=\"upload($files)\" class=\"fileSelector\" ngf-drag-over-class=\"'fileDragOver'\" ngf-multiple=\"component.multiple\" id=\"{{ componentId }}\" name=\"{{ componentId }}\"><span class=\"glyphicon glyphicon-cloud-upload\"></span>Drop files to attach, or <a style=\"cursor: pointer;\" ngf-select=\"upload($files)\" tabindex=\"{{ component.tabindex || 0 }}\" ngf-multiple=\"component.multiple\">browse</a>.</div>\n    <div ng-if=\"!component.storage\" class=\"alert alert-warning\">No storage has been set for this field. File uploads are disabled until storage is set up.</div>\n    <div ngf-no-file-drop>File Drag/Drop is not supported for this browser</div>\n  </div>\n  <div ng-repeat=\"fileUpload in fileUploads track by $index\" ng-class=\"{'has-error': fileUpload.status === 'error'}\" class=\"file\">\n    <div class=\"row\">\n      <div class=\"fileName control-label col-sm-10\">{{ fileUpload.name }} <span ng-click=\"removeUpload(fileUpload.name)\" class=\"glyphicon glyphicon-remove\"></span></div>\n      <div class=\"fileSize control-label col-sm-2 text-right\">{{ fileSize(fileUpload.size) }}</div>\n    </div>\n    <div class=\"row\">\n      <div class=\"col-sm-12\">\n        <span ng-if=\"fileUpload.status === 'progress'\">\n          <div class=\"progress\">\n            <div class=\"progress-bar\" role=\"progressbar\" aria-valuenow=\"{{fileUpload.progress}}\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"width:{{fileUpload.progress}}%\">\n              <span class=\"sr-only\">{{fileUpload.progress}}% Complete</span>\n            </div>\n          </div>\n        </span>\n        <div ng-if=\"!fileUpload.status !== 'progress'\" class=\"bg-{{ fileUpload.status }} control-label\">{{ fileUpload.message }}</div>\n      </div>\n    </div>\n  </div>\n</div>\n"
       );
 
       $templateCache.put('formio/componentsView/file.html',
@@ -68002,7 +68057,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],215:[function(_dereq_,module,exports){
+},{}],216:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -68038,7 +68093,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":246}],216:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":247}],217:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -68130,7 +68185,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],217:[function(_dereq_,module,exports){
+},{}],218:[function(_dereq_,module,exports){
 "use strict";
 var app = angular.module('formio');
 
@@ -68172,7 +68227,7 @@ _dereq_('./panel')(app);
 _dereq_('./table')(app);
 _dereq_('./well')(app);
 
-},{"./address":200,"./button":201,"./checkbox":202,"./columns":203,"./components":204,"./container":205,"./content":206,"./currency":207,"./custom":208,"./datagrid":209,"./datetime":210,"./day":211,"./email":212,"./fieldset":213,"./file":214,"./hidden":215,"./htmlelement":216,"./number":218,"./page":219,"./panel":220,"./password":221,"./phonenumber":222,"./radio":223,"./resource":224,"./select":225,"./selectboxes":226,"./signature":227,"./survey":228,"./table":229,"./textarea":230,"./textfield":231,"./well":232}],218:[function(_dereq_,module,exports){
+},{"./address":201,"./button":202,"./checkbox":203,"./columns":204,"./components":205,"./container":206,"./content":207,"./currency":208,"./custom":209,"./datagrid":210,"./datetime":211,"./day":212,"./email":213,"./fieldset":214,"./file":215,"./hidden":216,"./htmlelement":217,"./number":219,"./page":220,"./panel":221,"./password":222,"./phonenumber":223,"./radio":224,"./resource":225,"./select":226,"./selectboxes":227,"./signature":228,"./survey":229,"./table":230,"./textarea":231,"./textfield":232,"./well":233}],219:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -68237,7 +68292,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],219:[function(_dereq_,module,exports){
+},{}],220:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -68264,7 +68319,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],220:[function(_dereq_,module,exports){
+},{}],221:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -68300,7 +68355,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],221:[function(_dereq_,module,exports){
+},{}],222:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -68331,7 +68386,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],222:[function(_dereq_,module,exports){
+},{}],223:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -68366,7 +68421,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],223:[function(_dereq_,module,exports){
+},{}],224:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -68417,7 +68472,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],224:[function(_dereq_,module,exports){
+},{}],225:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -68604,7 +68659,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],225:[function(_dereq_,module,exports){
+},{}],226:[function(_dereq_,module,exports){
 "use strict";
 /*eslint max-depth: ["error", 6]*/
 
@@ -69172,7 +69227,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"lodash/cloneDeep":166,"lodash/get":169,"lodash/isEqual":176,"lodash/set":187}],226:[function(_dereq_,module,exports){
+},{"lodash/cloneDeep":166,"lodash/get":169,"lodash/isEqual":176,"lodash/set":187}],227:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -69280,7 +69335,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],227:[function(_dereq_,module,exports){
+},{}],228:[function(_dereq_,module,exports){
 "use strict";
 
 var SignaturePad = _dereq_('signature_pad');
@@ -69421,7 +69476,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"signature_pad":197}],228:[function(_dereq_,module,exports){
+},{"signature_pad":198}],229:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -69480,7 +69535,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],229:[function(_dereq_,module,exports){
+},{}],230:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -69559,7 +69614,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":246}],230:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":247}],231:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -69643,7 +69698,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],231:[function(_dereq_,module,exports){
+},{}],232:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -69704,7 +69759,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],232:[function(_dereq_,module,exports){
+},{}],233:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -69756,7 +69811,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":246}],233:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":247}],234:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -69834,7 +69889,7 @@ module.exports = function() {
   };
 };
 
-},{}],234:[function(_dereq_,module,exports){
+},{}],235:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -70223,7 +70278,7 @@ module.exports = function() {
   };
 };
 
-},{}],235:[function(_dereq_,module,exports){
+},{}],236:[function(_dereq_,module,exports){
 "use strict";
 module.exports = ['$sce', '$parse', '$compile', function($sce, $parse, $compile) {
   return {
@@ -70240,7 +70295,7 @@ module.exports = ['$sce', '$parse', '$compile', function($sce, $parse, $compile)
   };
 }];
 
-},{}],236:[function(_dereq_,module,exports){
+},{}],237:[function(_dereq_,module,exports){
 "use strict";
 var _cloneDeep = _dereq_('lodash/cloneDeep');
 var _filter = _dereq_('lodash/filter');
@@ -70762,7 +70817,7 @@ module.exports = [
   }
 ];
 
-},{"json-logic-js":33,"lodash/cloneDeep":166,"lodash/filter":168,"lodash/get":169}],237:[function(_dereq_,module,exports){
+},{"json-logic-js":33,"lodash/cloneDeep":166,"lodash/filter":168,"lodash/get":169}],238:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'formioComponents',
@@ -70829,7 +70884,7 @@ module.exports = [
   }
 ];
 
-},{}],238:[function(_dereq_,module,exports){
+},{}],239:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -70912,7 +70967,7 @@ module.exports = function() {
   };
 };
 
-},{}],239:[function(_dereq_,module,exports){
+},{}],240:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$compile',
@@ -70931,7 +70986,7 @@ module.exports = [
   }
 ];
 
-},{}],240:[function(_dereq_,module,exports){
+},{}],241:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -70941,7 +70996,7 @@ module.exports = function() {
   };
 };
 
-},{}],241:[function(_dereq_,module,exports){
+},{}],242:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -70973,7 +71028,7 @@ module.exports = function() {
   };
 };
 
-},{}],242:[function(_dereq_,module,exports){
+},{}],243:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -71028,7 +71083,7 @@ module.exports = function() {
   };
 };
 
-},{}],243:[function(_dereq_,module,exports){
+},{}],244:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -71506,7 +71561,7 @@ module.exports = function() {
   };
 };
 
-},{}],244:[function(_dereq_,module,exports){
+},{}],245:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -71689,7 +71744,7 @@ module.exports = [
   }
 ];
 
-},{}],245:[function(_dereq_,module,exports){
+},{}],246:[function(_dereq_,module,exports){
 "use strict";
 var formioUtils = _dereq_('formiojs/utils');
 
@@ -71801,7 +71856,7 @@ module.exports = function() {
   };
 };
 
-},{"formiojs/utils":32}],246:[function(_dereq_,module,exports){
+},{"formiojs/utils":32}],247:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   var generic = function(data, component) {
@@ -71927,7 +71982,7 @@ module.exports = function() {
   };
 };
 
-},{}],247:[function(_dereq_,module,exports){
+},{}],248:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$q',
@@ -71976,7 +72031,7 @@ module.exports = [
   }
 ];
 
-},{}],248:[function(_dereq_,module,exports){
+},{}],249:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -72010,7 +72065,7 @@ module.exports = [
   }
 ];
 
-},{}],249:[function(_dereq_,module,exports){
+},{}],250:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'FormioUtils',
@@ -72019,7 +72074,7 @@ module.exports = [
   }
 ];
 
-},{}],250:[function(_dereq_,module,exports){
+},{}],251:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$sce',
@@ -72032,7 +72087,7 @@ module.exports = [
   }
 ];
 
-},{}],251:[function(_dereq_,module,exports){
+},{}],252:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   function() {
@@ -72051,7 +72106,7 @@ module.exports = [
   }
 ];
 
-},{}],252:[function(_dereq_,module,exports){
+},{}],253:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'formioTableView',
@@ -72064,7 +72119,7 @@ module.exports = [
   }
 ];
 
-},{}],253:[function(_dereq_,module,exports){
+},{}],254:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -72079,7 +72134,7 @@ module.exports = [
   }
 ];
 
-},{}],254:[function(_dereq_,module,exports){
+},{}],255:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$filter',
@@ -72128,7 +72183,7 @@ module.exports = [
   }
 ];
 
-},{}],255:[function(_dereq_,module,exports){
+},{}],256:[function(_dereq_,module,exports){
 "use strict";
 module.exports = ['$sce', function($sce) {
   return function(val) {
@@ -72136,7 +72191,7 @@ module.exports = ['$sce', function($sce) {
   };
 }];
 
-},{}],256:[function(_dereq_,module,exports){
+},{}],257:[function(_dereq_,module,exports){
 "use strict";
 _dereq_('angular-ui-mask/dist/mask');
 _dereq_('ui-select/dist/select');
@@ -72148,9 +72203,10 @@ _dereq_('bootstrap');
 _dereq_('angular-ui-bootstrap');
 _dereq_('bootstrap-ui-datetime-picker/dist/datetime-picker');
 _dereq_('ng-dialog');
+_dereq_('ng-photoswipe');
 _dereq_('./formio');
 
-},{"./formio":257,"angular-file-saver":1,"angular-moment":2,"angular-sanitize":4,"angular-ui-bootstrap":6,"angular-ui-mask/dist/mask":7,"bootstrap":11,"bootstrap-ui-datetime-picker/dist/datetime-picker":10,"ng-dialog":193,"ng-file-upload":195,"ui-select/dist/select":198}],257:[function(_dereq_,module,exports){
+},{"./formio":258,"angular-file-saver":1,"angular-moment":2,"angular-sanitize":4,"angular-ui-bootstrap":6,"angular-ui-mask/dist/mask":7,"bootstrap":11,"bootstrap-ui-datetime-picker/dist/datetime-picker":10,"ng-dialog":193,"ng-file-upload":195,"ng-photoswipe":196,"ui-select/dist/select":199}],258:[function(_dereq_,module,exports){
 "use strict";
 _dereq_('./polyfills/polyfills');
 
@@ -72164,7 +72220,8 @@ var app = angular.module('formio', [
   'angularMoment',
   'ngDialog',
   'ngFileUpload',
-  'ngFileSaver'
+  'ngFileSaver',
+  'ngPhotoswipe'
 ]);
 
 /**
@@ -72301,7 +72358,7 @@ app.run([
 
 _dereq_('./components');
 
-},{"./components":217,"./directives/customValidator":233,"./directives/formio":234,"./directives/formioBindHtml.js":235,"./directives/formioComponent":236,"./directives/formioComponentView":237,"./directives/formioDelete":238,"./directives/formioElement":239,"./directives/formioErrors":240,"./directives/formioSubmission":241,"./directives/formioSubmissions":242,"./directives/formioWizard":243,"./factories/FormioScope":244,"./factories/FormioUtils":245,"./factories/formioInterceptor":247,"./factories/formioTableView":248,"./filters/flattenComponents":249,"./filters/safehtml":250,"./filters/tableComponents":251,"./filters/tableFieldView":252,"./filters/tableView":253,"./filters/translate":254,"./filters/trusturl":255,"./polyfills/polyfills":259,"./providers/Formio":260}],258:[function(_dereq_,module,exports){
+},{"./components":218,"./directives/customValidator":234,"./directives/formio":235,"./directives/formioBindHtml.js":236,"./directives/formioComponent":237,"./directives/formioComponentView":238,"./directives/formioDelete":239,"./directives/formioElement":240,"./directives/formioErrors":241,"./directives/formioSubmission":242,"./directives/formioSubmissions":243,"./directives/formioWizard":244,"./factories/FormioScope":245,"./factories/FormioUtils":246,"./factories/formioInterceptor":248,"./factories/formioTableView":249,"./filters/flattenComponents":250,"./filters/safehtml":251,"./filters/tableComponents":252,"./filters/tableFieldView":253,"./filters/tableView":254,"./filters/translate":255,"./filters/trusturl":256,"./polyfills/polyfills":260,"./providers/Formio":261}],259:[function(_dereq_,module,exports){
 "use strict";
 'use strict';
 
@@ -72332,13 +72389,13 @@ if (typeof Object.assign != 'function') {
   })();
 }
 
-},{}],259:[function(_dereq_,module,exports){
+},{}],260:[function(_dereq_,module,exports){
 "use strict";
 'use strict';
 
 _dereq_('./Object.assign');
 
-},{"./Object.assign":258}],260:[function(_dereq_,module,exports){
+},{"./Object.assign":259}],261:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   // The formio class.
@@ -72408,5 +72465,5 @@ module.exports = function() {
   };
 };
 
-},{"formiojs":25}]},{},[256])(256)
+},{"formiojs":25}]},{},[257])(257)
 });

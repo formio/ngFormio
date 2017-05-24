@@ -20,7 +20,8 @@ module.exports = function(app) {
           protected: false,
           persistent: true,
           hidden: false,
-          clearOnHide: true
+          clearOnHide: true,
+          slides: false
         },
         viewTemplate: 'formio/componentsView/file.html'
       });
@@ -66,12 +67,14 @@ module.exports = function(app) {
         files: '=',
         form: '=',
         width: '=',
-        readOnly: '='
+        readOnly: '=',
+        slides: '='
       },
       templateUrl: 'formio/components/formio-image-list.html',
       controller: [
         '$scope',
-        function($scope) {
+        '$timeout',
+        function($scope, $timeout) {
           if ($scope.builder) return;
           $scope.removeFile = function(event, index) {
             var component = $scope.$parent.component;
@@ -80,6 +83,47 @@ module.exports = function(app) {
             }
             event.preventDefault();
             $scope.files.splice(index, 1);
+          };
+
+          $scope.onImageClicked = function(e, index) {
+            if (!$scope.slides) {
+              return;
+            }
+            //http://photoswipe.com/documentation/getting-started.html
+            // Create the images list for the slider:
+            // Look for the parent container of the clicked image by searching the closest elemnt with 'files' attr.
+            // Then get the list of image nodes.
+            // Get the natural dimensions of the images, not the thumbnailed dimensions.
+            var slides = angular.element(e.target).closest('[files]').find('span img').map(function(i, img) {
+              return {
+                src: $scope.files[i].imageSrc,
+                w: img.naturalWidth,
+                h: img.naturalHeight
+              };
+            });
+
+            $scope.slideConfig = {
+              slides: slides,
+              options: {
+                index: index,
+                history: false,
+                shareButtons: [
+                    {id:'download', label:'Download image', url:'{{raw_image_url}}', download:true}
+                ]
+              }
+            };
+
+            // Slider haves buttons that triggers the submit in the form.
+            // Wait for the slider to be rendered and prevent submission event
+            $timeout(function() {
+              angular.element('.pswp button').bind('click', function(e) {
+                e.preventDefault();
+              });
+            });
+          };
+
+          $scope.onSliderClose = function() {
+            $scope.slideConfig = null;
           };
         }
       ]
