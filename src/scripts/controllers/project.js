@@ -251,7 +251,7 @@ app.controller('ProjectController', [
 
     $scope.loadRoles();
 
-    $scope.minPlan= function(plan, project) {
+    $scope.minPlan = function(plan, project) {
       var plans = ['basic', 'independent', 'team', 'trial', 'commercial'];
       var checkProject = project || $scope.primaryProject || { plan: 'none' };
       return plans.indexOf(checkProject.plan) >= plans.indexOf(plan);
@@ -287,7 +287,7 @@ app.controller('ProjectController', [
       var allowedFiles, allow, custom;
 
       var currTime = (new Date()).getTime();
-      var projTime = (new Date(result.created.toString())).getTime();
+      var projTime = (new Date(result.trial.toString())).getTime();
       var delta = Math.ceil(parseInt((currTime - projTime) / 1000));
       var day = 86400;
       var remaining = 30 - parseInt(delta / day);
@@ -360,6 +360,10 @@ app.controller('ProjectController', [
 
         // Separate out the teams that the current user owns, to save an api call.
         $scope.primaryProjectEligibleTeams = _.filter(result.data, {owner: $scope.user._id});
+      });
+
+      var userTeamsOwnPromise = $http.get(AppConfig.apiBase + '/team/own').then(function(result) {
+        $scope.primaryProjectEligibleTeams = result.data;
       });
 
       $scope.projectTeamsLoading = true;
@@ -2078,9 +2082,10 @@ app.controller('ProjectTeamController', [
         $http.get(AppConfig.apiBase + '/team/all').then(function(result) {
           $scope.userTeams = result.data;
           $scope.userTeamsLoading = false;
+        });
 
-          // Separate out the teams that the current user owns, to save an api call.
-          $scope.primaryProjectEligibleTeams = _.filter(result.data, {owner: $scope.user._id});
+        $http.get(AppConfig.apiBase + '/team/own').then(function(result) {
+          $scope.primaryProjectEligibleTeams = result.data;
           $scope.uniqueEligibleTeams = _.filter($scope.primaryProjectEligibleTeams, function(team) {
             return _.findIndex($scope.primaryProjectTeams, { _id: team._id }) === -1;
           });
@@ -2386,7 +2391,7 @@ app.factory('ProjectUpgradeDialog', [
               };
 
               var currTime = (new Date()).getTime();
-              var projTime = (new Date(project.created.toString())).getTime();
+              var projTime = (new Date(project.trial.toString())).getTime();
               var delta = Math.ceil(parseInt((currTime - projTime) / 1000));
               var day = 86400;
               var remaining = 30 - parseInt(delta / day);

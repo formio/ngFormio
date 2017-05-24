@@ -1,4 +1,4 @@
-var host = 'localhost:3000';
+var host = window.location.host;
 var protocol = window.location.protocol;
 var serverHost, apiProtocol;
 var pathType = 'Subdomains';
