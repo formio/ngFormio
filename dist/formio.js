@@ -1,8 +1,12 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 /*! ng-formio v2.19.4 | https://unpkg.com/ng-formio@2.19.4/LICENSE.txt */
 =======
 /*! ng-formio v2.18.4 | https://unpkg.com/ng-formio@2.18.4/LICENSE.txt */
+>>>>>>> optional image gallery for images attachments
+=======
+/*! ng-formio v2.19.2 | https://unpkg.com/ng-formio@2.19.2/LICENSE.txt */
 >>>>>>> optional image gallery for images attachments
 =======
 /*! ng-formio v2.19.2 | https://unpkg.com/ng-formio@2.19.2/LICENSE.txt */
