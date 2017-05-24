@@ -566,7 +566,7 @@ angular
       };
 
       $scope.teamAdmin = function(project, user) {
-        var user = user || $rootScope.user;
+        user = user || $rootScope.user;
         var userTeams = _($scope.userTeams ? $scope.userTeams : [])
           .map('_id')
           .filter()
