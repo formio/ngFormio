@@ -10,7 +10,8 @@ var app = angular.module('formio', [
   'angularMoment',
   'ngDialog',
   'ngFileUpload',
-  'ngFileSaver'
+  'ngFileSaver',
+  'ngPhotoswipe'
 ]);
 
 /**
