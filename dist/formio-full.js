@@ -1,4 +1,4 @@
-/*! ng-formio v2.18.0 | https://unpkg.com/ng-formio@2.18.0/LICENSE.txt */
+/*! ng-formio v2.18.1 | https://unpkg.com/ng-formio@2.18.1/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -49284,6 +49284,17 @@ module.exports = {
   },
 
   /**
+   * Returns if this component has a conditional statement.
+   *
+   * @param component - The component JSON schema.
+   *
+   * @returns {boolean} - TRUE - This component has a conditional, FALSE - No conditional provided.
+   */
+  hasCondition: function hasCondition(component) {
+    return component.hasOwnProperty('customConditional') && component.customConditional || component.hasOwnProperty('conditional') && component.conditional && component.conditional.when || component.hasOwnProperty('conditional') && component.conditional && component.conditional.json;
+  },
+
+  /**
    * Checks the conditions for a provided component and data.
    *
    * @param component
@@ -69401,9 +69412,13 @@ return hooks;
     var forceElementsReload = { html: false, body: false };
     var scopes = {};
     var openIdStack = [];
+    var activeBodyClasses = [];
     var keydownIsBound = false;
     var openOnePerName = false;
+    var closeByNavigationDialogStack = [];
 
+    var UI_ROUTER_VERSION_LEGACY = 'legacy';
+    var UI_ROUTER_VERSION_ONE_PLUS = '1.0.0+';
 
     m.provider('ngDialog', function () {
         var defaults = this.defaults = {
@@ -69573,11 +69588,17 @@ return hooks;
                     closeDialogElement: function($dialog, value) {
                         var options = $dialog.data('$ngDialogOptions');
                         $dialog.remove();
-                        if (dialogsCount === 0) {
+
+                        activeBodyClasses.splice(activeBodyClasses.indexOf(options.bodyClassName), 1);
+                        if (activeBodyClasses.indexOf(options.bodyClassName) === -1) {
                             $elements.html.removeClass(options.bodyClassName);
                             $elements.body.removeClass(options.bodyClassName);
+                        }
+
+                        if (dialogsCount === 0) {
                             privateMethods.resetBodyPadding();
                         }
+
                         $rootScope.$broadcast('ngDialog.closed', $dialog, value);
                     },
 
@@ -69809,17 +69830,23 @@ return hooks;
                     },
 
                     detectUIRouter: function() {
-                        //Detect if ui-router module is installed if not return false
-                        try {
-                            angular.module('ui.router');
-                            return true;
-                        } catch(err) {
-                            return false;
+                        // Detect if ui-router module is installed
+                        // Returns ui-router version string if installed
+                        // Otherwise false
+
+                        if ($injector.has('$transitions')) {
+                            // Only 1.0.0+ ui.router allows us to inject $transitions
+                            return UI_ROUTER_VERSION_ONE_PLUS;
                         }
+                        else if ($injector.has('$state')) {
+                            // The legacy ui.router allows us to inject $state
+                            return UI_ROUTER_VERSION_LEGACY;
+                        }
+                        return false;
                     },
 
                     getRouterLocationEventName: function() {
-                        if(privateMethods.detectUIRouter()) {
+                        if (privateMethods.detectUIRouter()) {
                             return '$stateChangeStart';
                         }
                         return '$locationChangeStart';
@@ -70021,6 +70048,7 @@ return hooks;
                                 var widthDiffs = $window.innerWidth - $elements.body.prop('clientWidth');
                                 $elements.html.addClass(options.bodyClassName);
                                 $elements.body.addClass(options.bodyClassName);
+                                activeBodyClasses.push(options.bodyClassName);
                                 var scrollBarWidth = widthDiffs - ($window.innerWidth - $elements.body.prop('clientWidth'));
                                 if (scrollBarWidth > 0) {
                                     privateMethods.setBodyPadding(scrollBarWidth);
@@ -70051,11 +70079,7 @@ return hooks;
                             }
 
                             if (options.closeByNavigation) {
-                                var eventName = privateMethods.getRouterLocationEventName();
-                                $rootScope.$on(eventName, function ($event) {
-                                    if (privateMethods.closeDialog($dialog) === false)
-                                        $event.preventDefault();
-                                });
+                                closeByNavigationDialogStack.push($dialog);
                             }
 
                             if (options.preserveFocus) {
@@ -70234,6 +70258,31 @@ return hooks;
                         }
                     }
                 );
+
+                // Listen to navigation events to close dialog
+                var uiRouterVersion = privateMethods.detectUIRouter();
+                if (uiRouterVersion === UI_ROUTER_VERSION_ONE_PLUS) {
+                    var $transitions = $injector.get('$transitions');
+                    $transitions.onStart({}, function (trans) {
+                        while (closeByNavigationDialogStack.length > 0) {
+                            var toCloseDialog = closeByNavigationDialogStack.pop();
+                            if (privateMethods.closeDialog(toCloseDialog) === false) {
+                                return false;
+                            }
+                        }
+                    });
+                }
+                else {
+                    var eventName = uiRouterVersion === UI_ROUTER_VERSION_LEGACY ? '$stateChangeStart' : '$locationChangeStart';
+                    $rootScope.$on(eventName, function ($event) {
+                        while (closeByNavigationDialogStack.length > 0) {
+                            var toCloseDialog = closeByNavigationDialogStack.pop();
+                            if (privateMethods.closeDialog(toCloseDialog) === false) {
+                                $event.preventDefault();
+                            }
+                        }
+                    });
+                }
 
                 return publicMethods;
             }];
@@ -82571,7 +82620,9 @@ module.exports = function() {
     setApiUrl: Formio.setBaseUrl,
     getApiUrl: Formio.getBaseUrl,
     setAppUrl: Formio.setAppUrl,
+    setProjectUrl: Formio.setProjectUrl,
     getAppUrl: Formio.getAppUrl,
+    getProjectUrl: Formio.getProjectUrl,
     registerPlugin: Formio.registerPlugin,
     getPlugin: Formio.getPlugin,
     providers: Formio.providers,

@@ -4,9 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## 2.18.1
 ### Added
  - Add setProjectUrl and getProjectUrl options to FormioProvider.
+ - Allow formio wizard to be naviagle without completion using wizardFreeNavigation parameter.
 
 ## 2.18.0
 ### Fixed
