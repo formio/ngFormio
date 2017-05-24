@@ -1,4 +1,4 @@
-/*! ng-formio v2.17.2 | https://unpkg.com/ng-formio@2.17.2/LICENSE.txt */
+/*! ng-formio v2.18.0 | https://unpkg.com/ng-formio@2.18.0/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -81326,6 +81326,7 @@ module.exports = function() {
         }
         $scope.currentPage = session ? session.page : 0;
         $scope.formioAlerts = [];
+        $scope.formioOptions = $scope.formioOptions || {};
 
         var getForm = function() {
           var element = $element.find('#formio-wizard-form');
@@ -81337,6 +81338,12 @@ module.exports = function() {
 
         // Show the current page.
         var showPage = function(scroll) {
+          // When allowing navigate on invsalid
+          // prev page alert can be visible.
+          // Let's clear it
+          $scope.showAlerts(null);
+          $scope.pageWasVisited[$scope.currentPage] = true;
+
           $scope.wizardLoaded = false;
           $scope.page.components = [];
           $scope.page.components.length = 0;
@@ -81372,6 +81379,18 @@ module.exports = function() {
             }
           });
         }
+
+        // We can be comming back with the 'prev' button.
+        // Wait for the form to be loaded.
+        // Then timeout to wait the loaded form to be rendered
+        // before checking for errors.
+        $scope.$on('formLoad', function() {
+          if ($scope.pageHasErrors[$scope.currentPage]) {
+            $timeout(function() {
+              $scope.checkErrors();
+            });
+          }
+        });
 
         // Shows the given alerts (single or array), and dismisses old alerts
         this.showAlerts = $scope.showAlerts = function(alerts) {
@@ -81410,6 +81429,22 @@ module.exports = function() {
         $scope.submit = function() {
           if ($scope.checkErrors()) {
             return;
+          }
+
+          // We want to submit, but free navigation is enabled.
+          // Lets check if previous pages where not visited or has errors.
+          // If find one, stop searching, go to that page and do not continue with the submission.
+          if ($scope.formioOptions.wizardFreeNavigation) {
+            var backToPage = null;
+            for (var i = 0; i < $scope.pages.length; i++) {
+              if ($scope.pageHasErrors[i] || !$scope.pageWasVisited[i]) {
+                backToPage = i;
+                break;
+              }
+            }
+            if (backToPage !== null) {
+              return $scope.goto(backToPage);
+            }
           }
 
           // Create a sanitized submission object.
@@ -81530,10 +81565,20 @@ module.exports = function() {
           $scope.$emit('cancel');
         };
 
+        $scope.pageHasErrors = {};
+        $scope.pageWasVisited = {};
+
         // Move onto the next page.
         $scope.next = function() {
-          if ($scope.checkErrors()) {
-            return;
+          var errors = $scope.checkErrors();
+          if (errors) {
+            $scope.pageHasErrors[$scope.currentPage] = true;
+            if (!$scope.formioOptions.wizardFreeNavigation) {
+              return;
+            }
+          }
+          else {
+            $scope.pageHasErrors[$scope.currentPage] = false;
           }
           if ($scope.currentPage >= ($scope.pages.length - 1)) {
             return;
@@ -81560,6 +81605,8 @@ module.exports = function() {
           if (page >= $scope.pages.length) {
             return;
           }
+          var errors = $scope.checkErrors();
+          $scope.pageHasErrors[$scope.currentPage] = errors;
           $scope.currentPage = page;
           showPage(true);
         };
@@ -82436,7 +82483,7 @@ app.run([
     );
 
     $templateCache.put('formio-wizard.html',
-      "<div class=\"formio-wizard-wrapper\">\n  <div class=\"row bs-wizard\" style=\"border-bottom:0;\" ng-class=\"{hasTitles: hasTitles}\">\n    <div ng-class=\"{disabled: ($index > currentPage), active: ($index == currentPage), complete: ($index < currentPage), noTitle: !page.title}\" class=\"{{ colclass }} bs-wizard-step\" ng-repeat=\"page in pages track by $index\">\n      <div class=\"bs-wizard-stepnum-wrapper\">\n        <div class=\"text-center bs-wizard-stepnum\" ng-if=\"page.title\">{{ page.title }}</div>\n      </div>\n      <div class=\"progress\"><div class=\"progress-bar progress-bar-primary\"></div></div>\n      <a ng-click=\"goto($index)\" class=\"bs-wizard-dot bg-primary\"><div class=\"bs-wizard-dot-inner bg-success\"></div></a>\n    </div>\n  </div>\n  <style type=\"text/css\">.bs-wizard > .bs-wizard-step:first-child { margin-left: {{ margin }}%; }</style>\n  <i ng-show=\"!wizardLoaded\" id=\"formio-loading\" style=\"font-size: 2em;\" class=\"glyphicon glyphicon-refresh glyphicon-spin\"></i>\n  <div ng-repeat=\"alert in formioAlerts track by $index\" class=\"alert alert-{{ alert.type }}\" role=\"alert\">{{ alert.message | formioTranslate:null:builder }}</div>\n  <div class=\"formio-wizard\">\n    <formio\n      ng-if=\"wizardLoaded\"\n      submission=\"submission\"\n      form=\"page\"\n      url=\"url\"\n      read-only=\"readOnly\"\n      hide-components=\"hideComponents\"\n      disable-components=\"disableComponents\"\n      formio-options=\"formioOptions\"\n      id=\"formio-wizard-form\"\n    ></formio>\n  </div>\n  <ul ng-show=\"wizardLoaded\" class=\"list-inline\">\n    <li><a class=\"btn btn-default\" ng-click=\"cancel()\">Cancel</a></li>\n    <li ng-if=\"currentPage > 0\"><a class=\"btn btn-primary\" ng-click=\"prev()\">Previous</a></li>\n    <li ng-if=\"currentPage < (pages.length - 1)\">\n      <a class=\"btn btn-primary\" ng-click=\"next()\">Next</a>\n    </li>\n    <li ng-if=\"currentPage >= (pages.length - 1)\">\n      <a class=\"btn btn-primary\" ng-click=\"submit()\">Submit Form</a>\n    </li>\n  </ul>\n</div>\n"
+      "<div class=\"formio-wizard-wrapper\">\n  <div class=\"row bs-wizard\" style=\"border-bottom:0;\" ng-class=\"{hasTitles: hasTitles}\">\n    <div ng-class=\"{disabled: ($index > currentPage) && !formioOptions.wizardFreeNavigation, active: ($index == currentPage), complete: ($index < currentPage), noTitle: !page.title}\" class=\"{{ colclass }} bs-wizard-step\" ng-repeat=\"page in pages track by $index\">\n      <div class=\"bs-wizard-stepnum-wrapper\">\n        <div class=\"text-center bs-wizard-stepnum\" ng-if=\"page.title\">{{ page.title }}</div>\n      </div>\n      <div class=\"progress\"><div class=\"progress-bar progress-bar-primary\"></div></div>\n      <a ng-click=\"goto($index)\" class=\"bs-wizard-dot bg-primary\"><div class=\"bs-wizard-dot-inner\"\n        ng-class=\"{\n          'bg-success': !pageHasErrors[$index],\n          'bg-danger': pageHasErrors[$index],\n          'bg-warning': !pageWasVisited[$index] && currentPage > $index\n        }\"></div></a>\n    </div>\n  </div>\n  <style type=\"text/css\">.bs-wizard > .bs-wizard-step:first-child { margin-left: {{ margin }}%; }</style>\n  <i ng-show=\"!wizardLoaded\" id=\"formio-loading\" style=\"font-size: 2em;\" class=\"glyphicon glyphicon-refresh glyphicon-spin\"></i>\n  <div ng-repeat=\"alert in formioAlerts track by $index\" class=\"alert alert-{{ alert.type }}\" role=\"alert\">{{ alert.message | formioTranslate:null:builder }}</div>\n  <div class=\"formio-wizard\">\n    <formio\n      ng-if=\"wizardLoaded\"\n      submission=\"submission\"\n      form=\"page\"\n      url=\"url\"\n      read-only=\"readOnly\"\n      hide-components=\"hideComponents\"\n      disable-components=\"disableComponents\"\n      formio-options=\"formioOptions\"\n      id=\"formio-wizard-form\"\n    ></formio>\n  </div>\n  <ul ng-show=\"wizardLoaded\" class=\"list-inline\">\n    <li><a class=\"btn btn-default\" ng-click=\"cancel()\">Cancel</a></li>\n    <li ng-if=\"currentPage > 0\"><a class=\"btn btn-primary\" ng-click=\"prev()\">Previous</a></li>\n    <li ng-if=\"currentPage < (pages.length - 1)\">\n      <a class=\"btn btn-primary\" ng-click=\"next()\">Next</a>\n    </li>\n    <li ng-if=\"currentPage >= (pages.length - 1)\">\n      <a class=\"btn btn-primary\" ng-click=\"submit()\">Submit Form</a>\n    </li>\n  </ul>\n</div>\n"
     );
 
     $templateCache.put('formio-delete.html',

@@ -80,6 +80,7 @@ module.exports = function() {
         }
         $scope.currentPage = session ? session.page : 0;
         $scope.formioAlerts = [];
+        $scope.formioOptions = $scope.formioOptions || {};
 
         var getForm = function() {
           var element = $element.find('#formio-wizard-form');
@@ -91,6 +92,12 @@ module.exports = function() {
 
         // Show the current page.
         var showPage = function(scroll) {
+          // When allowing navigate on invsalid
+          // prev page alert can be visible.
+          // Let's clear it
+          $scope.showAlerts(null);
+          $scope.pageWasVisited[$scope.currentPage] = true;
+
           $scope.wizardLoaded = false;
           $scope.page.components = [];
           $scope.page.components.length = 0;
@@ -126,6 +133,18 @@ module.exports = function() {
             }
           });
         }
+
+        // We can be comming back with the 'prev' button.
+        // Wait for the form to be loaded.
+        // Then timeout to wait the loaded form to be rendered
+        // before checking for errors.
+        $scope.$on('formLoad', function() {
+          if ($scope.pageHasErrors[$scope.currentPage]) {
+            $timeout(function() {
+              $scope.checkErrors();
+            });
+          }
+        });
 
         // Shows the given alerts (single or array), and dismisses old alerts
         this.showAlerts = $scope.showAlerts = function(alerts) {
@@ -164,6 +183,22 @@ module.exports = function() {
         $scope.submit = function() {
           if ($scope.checkErrors()) {
             return;
+          }
+
+          // We want to submit, but free navigation is enabled.
+          // Lets check if previous pages where not visited or has errors.
+          // If find one, stop searching, go to that page and do not continue with the submission.
+          if ($scope.formioOptions.wizardFreeNavigation) {
+            var backToPage = null;
+            for (var i = 0; i < $scope.pages.length; i++) {
+              if ($scope.pageHasErrors[i] || !$scope.pageWasVisited[i]) {
+                backToPage = i;
+                break;
+              }
+            }
+            if (backToPage !== null) {
+              return $scope.goto(backToPage);
+            }
           }
 
           // Create a sanitized submission object.
@@ -284,10 +319,20 @@ module.exports = function() {
           $scope.$emit('cancel');
         };
 
+        $scope.pageHasErrors = {};
+        $scope.pageWasVisited = {};
+
         // Move onto the next page.
         $scope.next = function() {
-          if ($scope.checkErrors()) {
-            return;
+          var errors = $scope.checkErrors();
+          if (errors) {
+            $scope.pageHasErrors[$scope.currentPage] = true;
+            if (!$scope.formioOptions.wizardFreeNavigation) {
+              return;
+            }
+          }
+          else {
+            $scope.pageHasErrors[$scope.currentPage] = false;
           }
           if ($scope.currentPage >= ($scope.pages.length - 1)) {
             return;
@@ -314,6 +359,8 @@ module.exports = function() {
           if (page >= $scope.pages.length) {
             return;
           }
+          var errors = $scope.checkErrors();
+          $scope.pageHasErrors[$scope.currentPage] = errors;
           $scope.currentPage = page;
           showPage(true);
         };
