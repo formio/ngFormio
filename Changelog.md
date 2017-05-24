@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Added
+ - Add setProjectUrl and getProjectUrl options to FormioProvider.
 
 ## 2.18.0
 ### Fixed
