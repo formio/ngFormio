@@ -1,40 +1,64 @@
-<div class="panel panel-info">
-    <div class="panel-heading">
-      <a class="pull-right" href="https://help.form.io/userguide/actions/" target="_blank"><i class="glyphicon glyphicon-question-sign "></i></a>
+<div class="row">
+  <div class="col-md-8">
+    <div class="panel panel-info">
+  <div class="panel-heading">
+    <a class="pull-right" href="https://help.form.io/userguide/actions/" target="_blank"><i
+      class="glyphicon glyphicon-question-sign "></i></a>
 
-      <h3 class="panel-title">Form Actions</h3>
-    </div>
-    <div class="panel-body">
-        <table class="table table-striped">
-            <thead>
-            <tr>
-                <th>Name</th>
-                <th>Operations</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr data-ng-repeat="action in actions">
-                <td>
-                    <span ng-if="!action._id">{{ action.title }}</span>
-                    <a ng-if="action._id" ui-sref="project.{{ formInfo.type }}.form.action.item.edit({actionId: action._id})"><span ng-if="action.settings.provider"> {{ action.settings.provider }} </span>{{ action.title }}</a>
-                </td>
-                <td>
-                    <span ng-if="!action._id">none</span>
-                    <div class="button-group" style="display:flex;" ng-if="action._id">
-                        <a ui-sref="project.{{ formInfo.type }}.form.action.item.edit({actionId: action._id})" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-edit"></span></a>&nbsp;
-                        <a ng-hide="highestRole === 'team_read'" ui-sref="project.{{ formInfo.type }}.form.action.item.delete({actionId: action._id})" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove-circle"></span></a>
-                    </div>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
-    <div class="panel-footer" ng-hide="highestRole === 'team_read'">
-        <form class="form-inline">
-            <div class="form-group">
-                <select id="action-select" name="action-select" ng-model="newAction" class="form-control" ng-options="action as action.title for action in availableActions"></select>
-            </div>
-            <a ng-click="addAction()" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Add Action</a>
-        </form>
-    </div>
+    <h3 class="panel-title">Form Actions</h3>
+  </div>
+  <div class="panel-body">
+    <table class="table table-striped">
+      <thead>
+      <tr>
+        <th>Name</th>
+        <th>Operations</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr data-ng-repeat="action in actions">
+        <td>
+          <span ng-if="!action._id">{{ action.title }}</span>
+          <a ng-if="action._id"
+             ui-sref="project.{{ formInfo.type }}.form.action.item.edit({actionId: action._id})"><span
+            ng-if="action.settings.provider"> {{ action.settings.provider }} </span>{{ action.title }}</a>
+        </td>
+        <td>
+          <span ng-if="!action._id">none</span>
+          <div class="button-group" style="display:flex;" ng-if="action._id">
+            <a ui-sref="project.{{ formInfo.type }}.form.action.item.edit({actionId: action._id})"
+               class="btn btn-default btn-xs"><span class="glyphicon glyphicon-edit"></span></a>&nbsp;
+            <a ng-hide="highestRole === 'team_read'"
+               ui-sref="project.{{ formInfo.type }}.form.action.item.delete({actionId: action._id})"
+               class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove-circle"></span></a>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="panel-footer" ng-hide="highestRole === 'team_read'">
+    <form class="form-inline">
+      <div class="form-group">
+        <select id="action-select" name="action-select" ng-model="newAction" class="form-control"
+                ng-options="action as action.title for action in availableActions"></select>
+      </div>
+      <a ng-click="addAction()" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Add Action</a>
+    </form>
+  </div>
 </div>
+  </div>
+  <div class="col-md-4">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h3 class="panel-title">About Form Actions</h3>
+      </div>
+      <div class="panel-body">
+        <p>Form actions are triggered whenever a user interacts with form submission data. There are many types of Form Actions that can be triggered such as saving to a database, sending an email or sending the data to a third party system. You can configure multiple actions on a form as well as make those actions conditional or only trigger for certain actions or at certain points of the process.</p>
+        <p><a class="btn btn-primary" href="https://help.form.io/userguide/actions/" target="_blank"><i class="fa fa-book"></i> More Info</a></p>
+        <p>It is also possible to intercept the request programatically with <a href="https://help.form.io/developer/info/middleware/" target="_blank">Remote Middleware</a>.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
