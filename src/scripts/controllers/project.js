@@ -155,11 +155,17 @@ app.controller('ProjectCreateController', [
 app.controller('ProjectCreateEnvironmentController', [
   '$scope',
   '$state',
+  'AppConfig',
+  'Formio',
   'FormioProject',
+  'FormioAlerts',
   function(
     $scope,
     $state,
-    FormioProject
+    AppConfig,
+    Formio,
+    FormioProject,
+    FormioAlerts
   ) {
     $scope.environmentTypes = [
       {
@@ -186,8 +192,14 @@ app.controller('ProjectCreateEnvironmentController', [
     });
 
     $scope.saveProject = function() {
-      FormioProject.createProject($scope.currentProject).then(function(project) {
-        $state.go('project.overview', {projectId: project._id});
+      FormioProject.createEnvironment($scope.currentProject).then(function(project) {
+        // Update team access to new environment.
+        project.access = project.access.concat(_.filter($scope.primaryProject.access, function(access) { return access.type.indexOf('team_') === 0;}));
+        (new Formio(AppConfig.apiBase + '/project/' + project._id)).saveProject(angular.copy(project))
+          .catch(FormioAlerts.onError.bind(FormioAlerts))
+          .then(function() {
+            $state.go('project.overview', {projectId: project._id});
+          });
       });
     };
   }
@@ -2125,11 +2137,7 @@ app.controller('ProjectTeamController', [
     };
 
     var saveProject = function(project) {
-      (new Formio(AppConfig.apiBase + '/project/' + $scope.primaryProject._id)).saveProject($scope.primaryProject)
-        .then(function(project) {
-          $scope.primaryProject = project;
-          //GoogleAnalytics.sendEvent('Project', 'update', null, 1);
-        })
+      return (new Formio(AppConfig.apiBase + '/project/' + project._id)).saveProject(angular.copy(project))
         .catch(FormioAlerts.onError.bind(FormioAlerts));
     };
 
@@ -2157,7 +2165,14 @@ app.controller('ProjectTeamController', [
 
     $scope.addTeam = function(team) {
       setTeamPermission($scope.primaryProject, team, 'team_read');
-      saveProject($scope.primaryProject);
+      saveProject($scope.primaryProject).then(function(project) {
+        $scope.primaryProject = project;
+      });
+      // Add team to environments as well
+      $scope.environments.forEach(function(environment) {
+        setTeamPermission(environment, team, 'team_read');
+        saveProject(environment);
+      });
       _.remove($scope.uniqueEligibleTeams, { _id: team._id });
       team.permission = 'team_read';
       $scope.primaryProjectTeams.push(team);
@@ -2166,7 +2181,14 @@ app.controller('ProjectTeamController', [
 
     $scope.removeTeam = function(team) {
       setTeamPermission($scope.primaryProject, team);
-      saveProject($scope.primaryProject);
+      saveProject($scope.primaryProject).then(function(project) {
+        $scope.primaryProject = project;
+      });
+      // Remove team from environments as well
+      $scope.environments.forEach(function(environment) {
+        setTeamPermission(environment, team);
+        saveProject(environment);
+      });
       _.remove($scope.primaryProjectTeams, { _id: team._id });
       delete team.permission;
       $scope.uniqueEligibleTeams.push(team);
@@ -2174,7 +2196,14 @@ app.controller('ProjectTeamController', [
 
     $scope.updateTeam = function(team, permission) {
       setTeamPermission($scope.primaryProject, team, permission);
-      saveProject($scope.primaryProject);
+      saveProject($scope.primaryProject).then(function(project) {
+        $scope.primaryProject = project;
+      });
+      // Update team in environments as well
+      $scope.environments.forEach(function(environment) {
+        setTeamPermission(environment, team, permission);
+        saveProject(environment);
+      });
     };
   }
 ]);
