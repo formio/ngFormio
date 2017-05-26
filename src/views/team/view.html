@@ -12,7 +12,7 @@
             <div>Members</div>
           </div>
           <div class="col-sm-6">
-            <h5>{{ teamPermissions.length }}</h5>
+            <h5>{{ teamPermissions.length || 0 }}</h5>
             <div>Projects</div>
           </div>
         </div>
@@ -74,6 +74,9 @@
         </li>
         <li class="list-group-item" ng-if="!team.data.members.length">
           No members in this team.
+        </li>
+        <li class="list-group-item disabled">
+          Team Admins can add this team to their projects and manage team members.
         </li>
       </ul>
     </div>

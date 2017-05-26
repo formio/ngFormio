@@ -22,19 +22,7 @@ if (apiProtocol !== protocol && ['localhost', 'portal.localhost', 'lvh.me', 'por
     + window.location.pathname;
     + window.location.hash;
 
-  // If running under http, confirm switching back to https to prevent looping.
-  if (protocol === 'http:') {
-    if (confirm('The API server is running under HTTPS. Do you want to switch the portal as well? (Recommended)')) {
-      setTimeout(function() {
-        window.location.replace(url);
-      }, 100);
-    }
-  }
-  else {
-    setTimeout(function() {
-      window.location.replace(url);
-    }, 100);
-  }
+  window.location.replace(url);
 }
 
 var appBase = protocol + '//' + host;

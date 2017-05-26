@@ -287,7 +287,7 @@ app.controller('ProjectController', [
       var allowedFiles, allow, custom;
 
       var currTime = (new Date()).getTime();
-      var projTime = (new Date(result.trial.toString())).getTime();
+      var projTime = (new Date(result.created.toString())).getTime();
       var delta = Math.ceil(parseInt((currTime - projTime) / 1000));
       var day = 86400;
       var remaining = 30 - parseInt(delta / day);
@@ -2136,17 +2136,17 @@ app.controller('ProjectTeamController', [
     $scope.teamPermissions = [
       {
         value: 'team_read',
-        label: 'Read',
+        label: 'Project Read',
         description: ''
       },
       {
         value: 'team_write',
-        label: 'Write',
+        label: 'Project Write',
         description: ''
       },
       {
         value: 'team_admin',
-        label: 'Admin',
+        label: 'Project Admin',
         description: ''
       }
     ];
@@ -2318,6 +2318,8 @@ app.controller('ProjectDeleteController', [
     GoogleAnalytics
   ) {
     $scope.isBusy = false;
+    var isProject = ($scope.currentProject._id === $scope.primaryProject._id);
+    var type = (isProject ? 'Project' : 'Environment');
     $scope.deleteProject = function() {
       if (!$scope.currentProject || !$scope.currentProject._id) { return; }
       $scope.isBusy = true;
@@ -2325,11 +2327,16 @@ app.controller('ProjectDeleteController', [
         .then(function() {
           FormioAlerts.addAlert({
             type: 'success',
-            message: 'Project was deleted!'
+            message: type + ' was deleted!'
           });
           $scope.isBusy = false;
-          GoogleAnalytics.sendEvent('Project', 'delete', null, 1);
-          $state.go('home');
+          GoogleAnalytics.sendEvent(type, 'delete', null, 1);
+          if (isProject) {
+            $state.go('home');
+          }
+          else {
+            $state.go('project.overview', {projectId: $scope.primaryProject._id});
+          }
         }, FormioAlerts.onError.bind(FormioAlerts))
         .catch(FormioAlerts.onError.bind(FormioAlerts));
     };
@@ -2391,7 +2398,7 @@ app.factory('ProjectUpgradeDialog', [
               };
 
               var currTime = (new Date()).getTime();
-              var projTime = (new Date(project.trial.toString())).getTime();
+              var projTime = (new Date(project.created.toString())).getTime();
               var delta = Math.ceil(parseInt((currTime - projTime) / 1000));
               var day = 86400;
               var remaining = 30 - parseInt(delta / day);
