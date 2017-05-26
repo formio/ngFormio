@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+### Added
+ -  Allow interpolation of file directories for uploads.
+
 ## 2.18.1
 ### Added
  - Add setProjectUrl and getProjectUrl options to FormioProvider.
