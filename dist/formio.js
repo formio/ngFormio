@@ -10031,9 +10031,11 @@ module.exports = function(app) {
 
   app.controller('formioFileUpload', [
     '$scope',
+    '$interpolate',
     'FormioUtils',
     function(
       $scope,
+      $interpolate,
       FormioUtils
     ) {
       if ($scope.builder) return;
@@ -10065,6 +10067,7 @@ module.exports = function(app) {
               message: 'Starting upload'
             };
             var dir = $scope.component.dir || '';
+            dir = $interpolate(dir)({data: $scope.data, row: $scope.row});
             var formio = null;
             if ($scope.formio) {
               formio = $scope.formio;
@@ -11179,16 +11182,17 @@ module.exports = function(app) {
                       (typeof input === 'string') &&
                       input
                     ) {
-                      newUrl += ((newUrl.indexOf('?') === -1) ? '?' : '&') +
-                        encodeURIComponent(settings.searchField) +
-                        '=' +
-                        encodeURIComponent(input);
+                      options.params[encodeURIComponent(settings.searchField)] = encodeURIComponent(input);
+                    }
+                    else {
+                      delete options.params[encodeURIComponent(settings.searchField)];
                     }
 
                     // Add the other filter.
                     if (settings.filter) {
                       var filter = $interpolate(settings.filter)({data: $scope.data});
-                      newUrl += ((newUrl.indexOf('?') === -1) ? '?' : '&') + filter;
+                      // This changes 'a=b&c=d' into an object and assigns to params.
+                      options.params.assign(JSON.parse('{"' + decodeURI(filter).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}'));
                     }
 
                     // If they wish to return only some fields.
@@ -11217,8 +11221,17 @@ module.exports = function(app) {
                       ensureValue();
                     };
 
-                    return $http.get(newUrl, options).then(function(result) {
-                      var data = result.data;
+                    var promise;
+                    if (settings.dataSrc === 'resource') {
+                      promise = (new Formio(newUrl)).loadSubmissions(options);
+                    }
+                    else {
+                      promise = $http.get(newUrl, options).then(function(result) {
+                        return result.data;
+                      });
+                    }
+
+                    return promise.then(function(data) {
                       if (data) {
                         // If the selectValue prop is defined, use it.
                         if (selectValues) {
@@ -14115,7 +14128,7 @@ module.exports = [
     $interpolate
   ) {
     return function(value, component) {
-      if (!value && value !== 0) {
+      if (!value && value !== 0 && value !== false) {
         return '';
       }
       if (!component || !component.input|| !component.type) {
