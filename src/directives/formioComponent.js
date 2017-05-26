@@ -99,6 +99,33 @@ module.exports = [
             return FormioUtils.isRequired(component);
           };
 
+          // Survey components haves questions.
+          // We want to make the survey component label marked with error if any
+          // of the questions is in invalid state.
+          // So, first check if conponent has questions, then iterate over them.
+          // Break in the first invalid question. Is enough to set the has-error
+          // class to the survey component.
+          // Note: Chek that this method is used in the template.
+          $scope.invalidQuestions = function(formioForm) {
+            var errorInQuestions = false;
+            if (!$scope.component.questions) {
+              errorInQuestions = false;
+            }
+            else {
+              var i;
+              for (i = 0; i < $scope.component.questions.length; i++) {
+                var question = $scope.component.questions[i];
+                var questionInputName = [$scope.component.key, question.value].join('-');
+                var formInput = formioForm[questionInputName];
+                if (formInput && !formInput.$pristine && formInput.$invalid) {
+                  errorInQuestions = true;
+                  break;
+                }
+              }
+            }
+            return errorInQuestions;
+          };
+
           // Pass through checkConditional since this is an isolate scope.
           $scope.checkConditional = $scope.$parent.checkConditional;
 
