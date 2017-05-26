@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## 2.18.3
+### Fixed
+ - Changed Object.assign to lodash assign for compatibility.
+
 ## 2.18.2 
 ### Added
  -  Allow interpolation of file directories for uploads.

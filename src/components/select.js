@@ -2,6 +2,7 @@
 var fs = require('fs');
 var _get = require('lodash/get');
 var _isEqual = require('lodash/isEqual');
+var _assign = require('lodash/assign');
 var _set = require('lodash/set');
 var _cloneDeep = require('lodash/cloneDeep');
 module.exports = function(app) {
@@ -454,7 +455,7 @@ module.exports = function(app) {
                     if (settings.filter) {
                       var filter = $interpolate(settings.filter)({data: $scope.data});
                       // This changes 'a=b&c=d' into an object and assigns to params.
-                      options.params.assign(JSON.parse('{"' + decodeURI(filter).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}'));
+                      _assign(options.params, JSON.parse('{"' + decodeURI(filter).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}'));
                     }
 
                     // If they wish to return only some fields.
