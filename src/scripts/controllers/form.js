@@ -837,7 +837,7 @@ app.controller('FormEmbedController', [
     $scope.primaryProjectPromise.then(function(project) {
       $scope.current = {
         framework: project.framework || 'none'
-      }
+      };
     });
 
     $scope.frameworks = ProjectFrameworks;
