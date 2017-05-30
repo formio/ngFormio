@@ -5,6 +5,8 @@
     <span class="pull-right"><strong>{{ environmentName }} Project Url:</strong> {{ projectPath(currentProject) }}</span>
   </div>
   <ul class="list-inline project-title-header">
+    <li><h2><a ui-sref="home" title="Home"><i class="fa fa-home"></i><br /></a></h2></li>
+    <li ng-if="currentSection.title"><h2>›</h2></li>
     <li><h2 class="project-title"><a ui-sref="project.overview">{{ primaryProject.title }}</a></h2></li>
     <li ng-if="currentSection.title"><h2>›</h2></li>
     <li ng-if="currentSection.title"><h2><i class="{{ currentSection.icon }}"></i> {{ currentSection.title }}</h2></li>
@@ -28,10 +30,9 @@
       <li ng-class="{active: isActive('project.access')}"><a ui-sref="project.access"><i class="fa fa-shield"></i><br/><span>Access</span></a></li>
       <li ng-if="currentProject._id === '553db92f72f702e714dd9778'" ng-class="{active: isActive('project.formio')}"><a ui-sref="project.formio"><i class="glyphicon glyphicon-globe"></i><br/><span>Form.io</span></a></li>
       <!--<li ng-class="{active: isActive('project.launch')}"><a ui-sref="project.launch.form" id="nav-bar-launch-link"><i class="fa fa-rocket"></i><br/><span>Launch</span></a></li>-->
-      <li style="border-bottom: 1px solid #fff;" ng-class="{active: isActive('project.env')}"><a
+      <li ng-class="{active: isActive('project.env')}"><a
         ui-sref="project.env.settings.info"><i
         class="fa fa-gear"></i><br /><span>Settings</span></a></li></li>
-      <li><a ui-sref="home" title="Exit"><i class="fa fa-sign-out"></i><br /><span>Projects</span></a></li>
     </ul>
   </div>
   <div class="project-main">

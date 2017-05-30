@@ -693,6 +693,9 @@ angular
   ])
   .filter('capitalize', function() {
     return function(token) {
+      if (!token) {
+        return '';
+      }
       return token.charAt(0).toUpperCase() + token.slice(1);
     };
   })
