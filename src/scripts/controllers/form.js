@@ -109,6 +109,7 @@ app.config([
         })
         .state(parentName + '.form.embed', {
           url: '/embed',
+          controller: 'FormEmbedController',
           templateUrl: 'views/form/form-embed.html'
         })
         .state(parentName + '.form.share', {
@@ -822,6 +823,24 @@ app.controller('FormEditController', [
         });
       });
     });
+  }
+]);
+
+app.controller('FormEmbedController', [
+  '$scope',
+  'ProjectFrameworks',
+  function(
+    $scope,
+    ProjectFrameworks
+  ) {
+    console.log($scope);
+    $scope.primaryProjectPromise.then(function(project) {
+      $scope.current = {
+        framework: project.framework
+      }
+    });
+
+    $scope.frameworks = ProjectFrameworks;
   }
 ]);
 

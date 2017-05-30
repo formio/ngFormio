@@ -1053,7 +1053,7 @@ app.controller('LaunchController', [
 
     $scope.$watch('currentProject', function(project) {
 
-      $scope.framework= project.framework;
+      $scope.framework = project.framework;
       if (project.framework === 'angular') {
         $scope.repository = 'https://github.com/formio/ng-app-starterkit';
       }
