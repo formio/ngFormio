@@ -48869,11 +48869,7 @@ Formio.events = new EventEmitter({
 module.exports = global.Formio = Formio;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-<<<<<<< HEAD
 },{"./providers":26,"eventemitter2":24,"native-promise-only":202,"shallow-copy":206,"whatwg-fetch":209}],26:[function(_dereq_,module,exports){
-=======
-},{"./providers":26,"eventemitter2":24,"native-promise-only":192,"shallow-copy":196,"whatwg-fetch":199}],26:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 'use strict';
 
 module.exports = {
@@ -63291,11 +63287,7 @@ ngFileUpload.service('UploadExif', ['UploadResize', '$q', function (UploadResize
 },{}],205:[function(_dereq_,module,exports){
 _dereq_('./dist/ng-file-upload-all');
 module.exports = 'ngFileUpload';
-<<<<<<< HEAD
 },{"./dist/ng-file-upload-all":204}],206:[function(_dereq_,module,exports){
-=======
-},{"./dist/ng-file-upload-all":194}],196:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 module.exports = function (obj) {
     if (!obj || typeof obj !== 'object') return obj;
     
@@ -63332,11 +63324,7 @@ var isArray = Array.isArray || function (xs) {
     return {}.toString.call(xs) === '[object Array]';
 };
 
-<<<<<<< HEAD
 },{}],207:[function(_dereq_,module,exports){
-=======
-},{}],197:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 /*!
  * Signature Pad v1.6.0
  * https://github.com/szimek/signature_pad
@@ -63867,11 +63855,7 @@ return SignaturePad;
 
 })));
 
-<<<<<<< HEAD
 },{}],208:[function(_dereq_,module,exports){
-=======
-},{}],198:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 /*!
  * ui-select
  * http://github.com/angular-ui/ui-select
@@ -66299,11 +66283,7 @@ $templateCache.put("selectize/match.tpl.html","<div ng-hide=\"$select.searchEnab
 $templateCache.put("selectize/no-choice.tpl.html","<div class=\"ui-select-no-choice selectize-dropdown\" ng-show=\"$select.items.length == 0\"><div class=\"selectize-dropdown-content\"><div data-selectable=\"\" ng-transclude=\"\"></div></div></div>");
 $templateCache.put("selectize/select-multiple.tpl.html","<div class=\"ui-select-container selectize-control multi plugin-remove_button\" ng-class=\"{\'open\': $select.open}\"><div class=\"selectize-input\" ng-class=\"{\'focus\': $select.open, \'disabled\': $select.disabled, \'selectize-focus\' : $select.focus}\" ng-click=\"$select.open && !$select.searchEnabled ? $select.toggle($event) : $select.activate()\"><div class=\"ui-select-match\"></div><input type=\"search\" autocomplete=\"off\" tabindex=\"-1\" class=\"ui-select-search\" ng-class=\"{\'ui-select-search-hidden\':!$select.searchEnabled}\" placeholder=\"{{$selectMultiple.getPlaceholder()}}\" ng-model=\"$select.search\" ng-disabled=\"$select.disabled\" aria-expanded=\"{{$select.open}}\" aria-label=\"{{ $select.baseTitle }}\" ondrop=\"return false;\"></div><div class=\"ui-select-choices\"></div><div class=\"ui-select-no-choice\"></div></div>");
 $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container selectize-control single\" ng-class=\"{\'open\': $select.open}\"><div class=\"selectize-input\" ng-class=\"{\'focus\': $select.open, \'disabled\': $select.disabled, \'selectize-focus\' : $select.focus}\" ng-click=\"$select.open && !$select.searchEnabled ? $select.toggle($event) : $select.activate()\"><div class=\"ui-select-match\"></div><input type=\"search\" autocomplete=\"off\" tabindex=\"-1\" class=\"ui-select-search ui-select-toggle\" ng-class=\"{\'ui-select-search-hidden\':!$select.searchEnabled}\" ng-click=\"$select.toggle($event)\" placeholder=\"{{$select.placeholder}}\" ng-model=\"$select.search\" ng-hide=\"!$select.isEmpty() && !$select.open\" ng-disabled=\"$select.disabled\" aria-label=\"{{ $select.baseTitle }}\"></div><div class=\"ui-select-choices\"></div><div class=\"ui-select-no-choice\"></div></div>");}]);
-<<<<<<< HEAD
 },{}],209:[function(_dereq_,module,exports){
-=======
-},{}],199:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 (function(self) {
   'use strict';
 
@@ -66766,11 +66746,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
   self.fetch.polyfill = true
 })(typeof self !== 'undefined' ? self : this);
 
-<<<<<<< HEAD
 },{}],210:[function(_dereq_,module,exports){
-=======
-},{}],200:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 
 module.exports = function(app) {
@@ -66859,11 +66835,7 @@ module.exports = function(app) {
   ]);
 };
 
-<<<<<<< HEAD
 },{}],211:[function(_dereq_,module,exports){
-=======
-},{}],201:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 
 module.exports = function(app) {
@@ -67041,11 +67013,7 @@ module.exports = function(app) {
   ]);
 };
 
-<<<<<<< HEAD
 },{}],212:[function(_dereq_,module,exports){
-=======
-},{}],202:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 
 module.exports = function(app) {
@@ -67125,11 +67093,7 @@ module.exports = function(app) {
   ]);
 };
 
-<<<<<<< HEAD
 },{}],213:[function(_dereq_,module,exports){
-=======
-},{}],203:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -67214,11 +67178,7 @@ module.exports = function(app) {
   ]);
 };
 
-<<<<<<< HEAD
 },{"../factories/GridUtils":256}],214:[function(_dereq_,module,exports){
-=======
-},{"../factories/GridUtils":246}],204:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 module.exports = function(app) {
   app.provider('formioComponents', function() {
@@ -67278,11 +67238,7 @@ module.exports = function(app) {
   }]);
 };
 
-<<<<<<< HEAD
 },{}],215:[function(_dereq_,module,exports){
-=======
-},{}],205:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -67348,11 +67304,7 @@ module.exports = function(app) {
   ]);
 };
 
-<<<<<<< HEAD
 },{"../factories/GridUtils":256}],216:[function(_dereq_,module,exports){
-=======
-},{"../factories/GridUtils":246}],206:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 
 module.exports = function(app) {
@@ -67381,11 +67333,7 @@ module.exports = function(app) {
   ]);
 };
 
-<<<<<<< HEAD
 },{}],217:[function(_dereq_,module,exports){
-=======
-},{}],207:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 
 
@@ -67496,11 +67444,7 @@ module.exports = function(app) {
   ]);
 };
 
-<<<<<<< HEAD
 },{}],218:[function(_dereq_,module,exports){
-=======
-},{}],208:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -67528,11 +67472,7 @@ module.exports = function(app) {
   ]);
 };
 
-<<<<<<< HEAD
 },{"../factories/GridUtils":256}],219:[function(_dereq_,module,exports){
-=======
-},{"../factories/GridUtils":246}],209:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 
 var formioUtils = _dereq_('formiojs/utils');
@@ -67665,11 +67605,7 @@ module.exports = function(app) {
   ]);
 };
 
-<<<<<<< HEAD
 },{"formiojs/utils":32}],220:[function(_dereq_,module,exports){
-=======
-},{"formiojs/utils":32}],210:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 
 module.exports = function(app) {
@@ -67831,11 +67767,7 @@ module.exports = function(app) {
   ]);
 };
 
-<<<<<<< HEAD
 },{}],221:[function(_dereq_,module,exports){
-=======
-},{}],211:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 
 module.exports = function(app) {
@@ -68036,11 +67968,7 @@ module.exports = function(app) {
   ]);
 };
 
-<<<<<<< HEAD
 },{}],222:[function(_dereq_,module,exports){
-=======
-},{}],212:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -68074,11 +68002,7 @@ module.exports = function(app) {
   ]);
 };
 
-<<<<<<< HEAD
 },{}],223:[function(_dereq_,module,exports){
-=======
-},{}],213:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -68132,11 +68056,7 @@ module.exports = function(app) {
   ]);
 };
 
-<<<<<<< HEAD
 },{"../factories/GridUtils":256}],224:[function(_dereq_,module,exports){
-=======
-},{"../factories/GridUtils":246}],214:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 
 module.exports = function(app) {
@@ -68403,11 +68323,7 @@ module.exports = function(app) {
   ]);
 };
 
-<<<<<<< HEAD
 },{}],225:[function(_dereq_,module,exports){
-=======
-},{}],215:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -68443,11 +68359,7 @@ module.exports = function(app) {
   ]);
 };
 
-<<<<<<< HEAD
 },{"../factories/GridUtils":256}],226:[function(_dereq_,module,exports){
-=======
-},{"../factories/GridUtils":246}],216:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 
 
@@ -68539,11 +68451,7 @@ module.exports = function(app) {
   ]);
 };
 
-<<<<<<< HEAD
 },{}],227:[function(_dereq_,module,exports){
-=======
-},{}],217:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 var app = angular.module('formio');
 
@@ -68585,11 +68493,7 @@ _dereq_('./panel')(app);
 _dereq_('./table')(app);
 _dereq_('./well')(app);
 
-<<<<<<< HEAD
 },{"./address":210,"./button":211,"./checkbox":212,"./columns":213,"./components":214,"./container":215,"./content":216,"./currency":217,"./custom":218,"./datagrid":219,"./datetime":220,"./day":221,"./email":222,"./fieldset":223,"./file":224,"./hidden":225,"./htmlelement":226,"./number":228,"./page":229,"./panel":230,"./password":231,"./phonenumber":232,"./radio":233,"./resource":234,"./select":235,"./selectboxes":236,"./signature":237,"./survey":238,"./table":239,"./textarea":240,"./textfield":241,"./well":242}],228:[function(_dereq_,module,exports){
-=======
-},{"./address":200,"./button":201,"./checkbox":202,"./columns":203,"./components":204,"./container":205,"./content":206,"./currency":207,"./custom":208,"./datagrid":209,"./datetime":210,"./day":211,"./email":212,"./fieldset":213,"./file":214,"./hidden":215,"./htmlelement":216,"./number":218,"./page":219,"./panel":220,"./password":221,"./phonenumber":222,"./radio":223,"./resource":224,"./select":225,"./selectboxes":226,"./signature":227,"./survey":228,"./table":229,"./textarea":230,"./textfield":231,"./well":232}],218:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 
 
@@ -68654,11 +68558,7 @@ module.exports = function(app) {
   ]);
 };
 
-<<<<<<< HEAD
 },{}],229:[function(_dereq_,module,exports){
-=======
-},{}],219:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 
 module.exports = function(app) {
@@ -68685,11 +68585,7 @@ module.exports = function(app) {
   ]);
 };
 
-<<<<<<< HEAD
 },{}],230:[function(_dereq_,module,exports){
-=======
-},{}],220:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 
 module.exports = function(app) {
@@ -68725,11 +68621,7 @@ module.exports = function(app) {
   ]);
 };
 
-<<<<<<< HEAD
 },{}],231:[function(_dereq_,module,exports){
-=======
-},{}],221:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -68760,11 +68652,7 @@ module.exports = function(app) {
   ]);
 };
 
-<<<<<<< HEAD
 },{}],232:[function(_dereq_,module,exports){
-=======
-},{}],222:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -68799,11 +68687,7 @@ module.exports = function(app) {
   ]);
 };
 
-<<<<<<< HEAD
 },{}],233:[function(_dereq_,module,exports){
-=======
-},{}],223:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 
 
@@ -68854,11 +68738,7 @@ module.exports = function(app) {
   ]);
 };
 
-<<<<<<< HEAD
 },{}],234:[function(_dereq_,module,exports){
-=======
-},{}],224:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 
 module.exports = function(app) {
@@ -69045,11 +68925,7 @@ module.exports = function(app) {
   ]);
 };
 
-<<<<<<< HEAD
 },{}],235:[function(_dereq_,module,exports){
-=======
-},{}],225:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 /*eslint max-depth: ["error", 6]*/
 
@@ -69638,11 +69514,7 @@ module.exports = function(app) {
   ]);
 };
 
-<<<<<<< HEAD
 },{"lodash/assign":174,"lodash/cloneDeep":175,"lodash/get":179,"lodash/isEqual":186,"lodash/set":197}],236:[function(_dereq_,module,exports){
-=======
-},{"lodash/cloneDeep":166,"lodash/get":169,"lodash/isEqual":176,"lodash/set":187}],226:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 
 
@@ -69750,11 +69622,7 @@ module.exports = function(app) {
   ]);
 };
 
-<<<<<<< HEAD
 },{}],237:[function(_dereq_,module,exports){
-=======
-},{}],227:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 
 var SignaturePad = _dereq_('signature_pad');
@@ -69895,11 +69763,7 @@ module.exports = function(app) {
   ]);
 };
 
-<<<<<<< HEAD
 },{"signature_pad":207}],238:[function(_dereq_,module,exports){
-=======
-},{"signature_pad":197}],228:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 
 
@@ -69958,11 +69822,7 @@ module.exports = function(app) {
   ]);
 };
 
-<<<<<<< HEAD
 },{}],239:[function(_dereq_,module,exports){
-=======
-},{}],229:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -70041,11 +69901,7 @@ module.exports = function(app) {
   ]);
 };
 
-<<<<<<< HEAD
 },{"../factories/GridUtils":256}],240:[function(_dereq_,module,exports){
-=======
-},{"../factories/GridUtils":246}],230:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 
 module.exports = function(app) {
@@ -70129,11 +69985,7 @@ module.exports = function(app) {
   ]);
 };
 
-<<<<<<< HEAD
 },{}],241:[function(_dereq_,module,exports){
-=======
-},{}],231:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 
 
@@ -70194,11 +70046,7 @@ module.exports = function(app) {
   ]);
 };
 
-<<<<<<< HEAD
 },{}],242:[function(_dereq_,module,exports){
-=======
-},{}],232:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -70250,11 +70098,7 @@ module.exports = function(app) {
   ]);
 };
 
-<<<<<<< HEAD
 },{"../factories/GridUtils":256}],243:[function(_dereq_,module,exports){
-=======
-},{"../factories/GridUtils":246}],233:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 module.exports = function() {
   return {
@@ -70332,11 +70176,7 @@ module.exports = function() {
   };
 };
 
-<<<<<<< HEAD
 },{}],244:[function(_dereq_,module,exports){
-=======
-},{}],234:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 module.exports = function() {
   return {
@@ -70726,11 +70566,7 @@ module.exports = function() {
   };
 };
 
-<<<<<<< HEAD
 },{}],245:[function(_dereq_,module,exports){
-=======
-},{}],235:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 module.exports = ['$sce', '$parse', '$compile', function($sce, $parse, $compile) {
   return {
@@ -70747,11 +70583,7 @@ module.exports = ['$sce', '$parse', '$compile', function($sce, $parse, $compile)
   };
 }];
 
-<<<<<<< HEAD
 },{}],246:[function(_dereq_,module,exports){
-=======
-},{}],236:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 var _cloneDeep = _dereq_('lodash/cloneDeep');
 var _filter = _dereq_('lodash/filter');
@@ -71300,11 +71132,7 @@ module.exports = [
   }
 ];
 
-<<<<<<< HEAD
 },{"json-logic-js":33,"lodash/cloneDeep":175,"lodash/filter":178,"lodash/get":179}],247:[function(_dereq_,module,exports){
-=======
-},{"json-logic-js":33,"lodash/cloneDeep":166,"lodash/filter":168,"lodash/get":169}],237:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 module.exports = [
   'formioComponents',
@@ -71371,11 +71199,7 @@ module.exports = [
   }
 ];
 
-<<<<<<< HEAD
 },{}],248:[function(_dereq_,module,exports){
-=======
-},{}],238:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 module.exports = function() {
   return {
@@ -71458,11 +71282,7 @@ module.exports = function() {
   };
 };
 
-<<<<<<< HEAD
 },{}],249:[function(_dereq_,module,exports){
-=======
-},{}],239:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 module.exports = [
   '$compile',
@@ -71481,11 +71301,7 @@ module.exports = [
   }
 ];
 
-<<<<<<< HEAD
 },{}],250:[function(_dereq_,module,exports){
-=======
-},{}],240:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 module.exports = function() {
   return {
@@ -71495,11 +71311,7 @@ module.exports = function() {
   };
 };
 
-<<<<<<< HEAD
 },{}],251:[function(_dereq_,module,exports){
-=======
-},{}],241:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 module.exports = function() {
   return {
@@ -71531,11 +71343,7 @@ module.exports = function() {
   };
 };
 
-<<<<<<< HEAD
 },{}],252:[function(_dereq_,module,exports){
-=======
-},{}],242:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 module.exports = function() {
   return {
@@ -71590,11 +71398,7 @@ module.exports = function() {
   };
 };
 
-<<<<<<< HEAD
 },{}],253:[function(_dereq_,module,exports){
-=======
-},{}],243:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 module.exports = function() {
   return {
@@ -72072,11 +71876,7 @@ module.exports = function() {
   };
 };
 
-<<<<<<< HEAD
 },{}],254:[function(_dereq_,module,exports){
-=======
-},{}],244:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 module.exports = [
   'Formio',
@@ -72259,11 +72059,7 @@ module.exports = [
   }
 ];
 
-<<<<<<< HEAD
 },{}],255:[function(_dereq_,module,exports){
-=======
-},{}],245:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 var formioUtils = _dereq_('formiojs/utils');
 
@@ -72375,11 +72171,7 @@ module.exports = function() {
   };
 };
 
-<<<<<<< HEAD
 },{"formiojs/utils":32}],256:[function(_dereq_,module,exports){
-=======
-},{"formiojs/utils":32}],246:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 module.exports = function() {
   var generic = function(data, component) {
@@ -72505,11 +72297,7 @@ module.exports = function() {
   };
 };
 
-<<<<<<< HEAD
 },{}],257:[function(_dereq_,module,exports){
-=======
-},{}],247:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 module.exports = [
   '$q',
@@ -72558,11 +72346,7 @@ module.exports = [
   }
 ];
 
-<<<<<<< HEAD
 },{}],258:[function(_dereq_,module,exports){
-=======
-},{}],248:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 module.exports = [
   'Formio',
@@ -72596,11 +72380,7 @@ module.exports = [
   }
 ];
 
-<<<<<<< HEAD
 },{}],259:[function(_dereq_,module,exports){
-=======
-},{}],249:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 module.exports = [
   'FormioUtils',
@@ -72609,11 +72389,7 @@ module.exports = [
   }
 ];
 
-<<<<<<< HEAD
 },{}],260:[function(_dereq_,module,exports){
-=======
-},{}],250:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 module.exports = [
   '$sce',
@@ -72626,11 +72402,7 @@ module.exports = [
   }
 ];
 
-<<<<<<< HEAD
 },{}],261:[function(_dereq_,module,exports){
-=======
-},{}],251:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 module.exports = [
   function() {
@@ -72649,11 +72421,7 @@ module.exports = [
   }
 ];
 
-<<<<<<< HEAD
 },{}],262:[function(_dereq_,module,exports){
-=======
-},{}],252:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 module.exports = [
   'formioTableView',
@@ -72666,11 +72434,7 @@ module.exports = [
   }
 ];
 
-<<<<<<< HEAD
 },{}],263:[function(_dereq_,module,exports){
-=======
-},{}],253:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 module.exports = [
   'Formio',
@@ -72685,11 +72449,7 @@ module.exports = [
   }
 ];
 
-<<<<<<< HEAD
 },{}],264:[function(_dereq_,module,exports){
-=======
-},{}],254:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 module.exports = [
   '$filter',
@@ -72738,11 +72498,7 @@ module.exports = [
   }
 ];
 
-<<<<<<< HEAD
 },{}],265:[function(_dereq_,module,exports){
-=======
-},{}],255:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 module.exports = ['$sce', function($sce) {
   return function(val) {
@@ -72750,11 +72506,7 @@ module.exports = ['$sce', function($sce) {
   };
 }];
 
-<<<<<<< HEAD
 },{}],266:[function(_dereq_,module,exports){
-=======
-},{}],256:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 _dereq_('angular-ui-mask/dist/mask');
 _dereq_('ui-select/dist/select');
@@ -72768,11 +72520,7 @@ _dereq_('bootstrap-ui-datetime-picker/dist/datetime-picker');
 _dereq_('ng-dialog');
 _dereq_('./formio');
 
-<<<<<<< HEAD
 },{"./formio":267,"angular-file-saver":1,"angular-moment":2,"angular-sanitize":4,"angular-ui-bootstrap":6,"angular-ui-mask/dist/mask":7,"bootstrap":11,"bootstrap-ui-datetime-picker/dist/datetime-picker":10,"ng-dialog":203,"ng-file-upload":205,"ui-select/dist/select":208}],267:[function(_dereq_,module,exports){
-=======
-},{"./formio":257,"angular-file-saver":1,"angular-moment":2,"angular-sanitize":4,"angular-ui-bootstrap":6,"angular-ui-mask/dist/mask":7,"bootstrap":11,"bootstrap-ui-datetime-picker/dist/datetime-picker":10,"ng-dialog":193,"ng-file-upload":195,"ui-select/dist/select":198}],257:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 _dereq_('./polyfills/polyfills');
 
@@ -72923,11 +72671,7 @@ app.run([
 
 _dereq_('./components');
 
-<<<<<<< HEAD
 },{"./components":227,"./directives/customValidator":243,"./directives/formio":244,"./directives/formioBindHtml.js":245,"./directives/formioComponent":246,"./directives/formioComponentView":247,"./directives/formioDelete":248,"./directives/formioElement":249,"./directives/formioErrors":250,"./directives/formioSubmission":251,"./directives/formioSubmissions":252,"./directives/formioWizard":253,"./factories/FormioScope":254,"./factories/FormioUtils":255,"./factories/formioInterceptor":257,"./factories/formioTableView":258,"./filters/flattenComponents":259,"./filters/safehtml":260,"./filters/tableComponents":261,"./filters/tableFieldView":262,"./filters/tableView":263,"./filters/translate":264,"./filters/trusturl":265,"./polyfills/polyfills":269,"./providers/Formio":270}],268:[function(_dereq_,module,exports){
-=======
-},{"./components":217,"./directives/customValidator":233,"./directives/formio":234,"./directives/formioBindHtml.js":235,"./directives/formioComponent":236,"./directives/formioComponentView":237,"./directives/formioDelete":238,"./directives/formioElement":239,"./directives/formioErrors":240,"./directives/formioSubmission":241,"./directives/formioSubmissions":242,"./directives/formioWizard":243,"./factories/FormioScope":244,"./factories/FormioUtils":245,"./factories/formioInterceptor":247,"./factories/formioTableView":248,"./filters/flattenComponents":249,"./filters/safehtml":250,"./filters/tableComponents":251,"./filters/tableFieldView":252,"./filters/tableView":253,"./filters/translate":254,"./filters/trusturl":255,"./polyfills/polyfills":259,"./providers/Formio":260}],258:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 'use strict';
 
@@ -72958,21 +72702,13 @@ if (typeof Object.assign != 'function') {
   })();
 }
 
-<<<<<<< HEAD
 },{}],269:[function(_dereq_,module,exports){
-=======
-},{}],259:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 'use strict';
 
 _dereq_('./Object.assign');
 
-<<<<<<< HEAD
 },{"./Object.assign":268}],270:[function(_dereq_,module,exports){
-=======
-},{"./Object.assign":258}],260:[function(_dereq_,module,exports){
->>>>>>> Build and depuration
 "use strict";
 module.exports = function() {
   // The formio class.
@@ -73042,9 +72778,5 @@ module.exports = function() {
   };
 };
 
-<<<<<<< HEAD
 },{"formiojs":25}]},{},[266])(266)
-=======
-},{"formiojs":25}]},{},[256])(256)
->>>>>>> Build and depuration
 });
