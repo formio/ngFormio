@@ -162,9 +162,11 @@ module.exports = function(app) {
 
   app.controller('formioFileUpload', [
     '$scope',
+    '$interpolate',
     'FormioUtils',
     function(
       $scope,
+      $interpolate,
       FormioUtils
     ) {
       if ($scope.builder) return;
@@ -196,6 +198,7 @@ module.exports = function(app) {
               message: 'Starting upload'
             };
             var dir = $scope.component.dir || '';
+            dir = $interpolate(dir)({data: $scope.data, row: $scope.row});
             var formio = null;
             if ($scope.formio) {
               formio = $scope.formio;

@@ -2,6 +2,7 @@
 var fs = require('fs');
 var _get = require('lodash/get');
 var _isEqual = require('lodash/isEqual');
+var _assign = require('lodash/assign');
 var _set = require('lodash/set');
 var _cloneDeep = require('lodash/cloneDeep');
 module.exports = function(app) {
@@ -444,16 +445,17 @@ module.exports = function(app) {
                       (typeof input === 'string') &&
                       input
                     ) {
-                      newUrl += ((newUrl.indexOf('?') === -1) ? '?' : '&') +
-                        encodeURIComponent(settings.searchField) +
-                        '=' +
-                        encodeURIComponent(input);
+                      options.params[encodeURIComponent(settings.searchField)] = encodeURIComponent(input);
+                    }
+                    else {
+                      delete options.params[encodeURIComponent(settings.searchField)];
                     }
 
                     // Add the other filter.
                     if (settings.filter) {
                       var filter = $interpolate(settings.filter)({data: $scope.data});
-                      newUrl += ((newUrl.indexOf('?') === -1) ? '?' : '&') + filter;
+                      // This changes 'a=b&c=d' into an object and assigns to params.
+                      _assign(options.params, JSON.parse('{"' + decodeURI(filter).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}'));
                     }
 
                     // If they wish to return only some fields.
@@ -482,8 +484,17 @@ module.exports = function(app) {
                       ensureValue();
                     };
 
-                    return $http.get(newUrl, options).then(function(result) {
-                      var data = result.data;
+                    var promise;
+                    if (settings.dataSrc === 'resource') {
+                      promise = (new Formio(newUrl)).loadSubmissions(options);
+                    }
+                    else {
+                      promise = $http.get(newUrl, options).then(function(result) {
+                        return result.data;
+                      });
+                    }
+
+                    return promise.then(function(data) {
                       if (data) {
                         // If the selectValue prop is defined, use it.
                         if (selectValues) {
