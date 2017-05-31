@@ -425,8 +425,15 @@ module.exports = function(app) {
                 if (url) {
                   $scope.hasNextPage = true;
                   $scope.refreshItems = function(input, newUrl, append) {
-                    if (input === lastInput) {
-                      return;
+                    if (typeof input === 'string') {
+                      if (input === lastInput) {
+                        return;
+                      }
+                      else {
+                        // Since the search has changed, reset the limit and skip.
+                        options.params.limit = $scope.component.limit || 100;
+                        options.params.skip = 0;
+                      }
                     }
 
                     lastInput = input;
@@ -472,6 +479,9 @@ module.exports = function(app) {
 
                       if (data.length < options.params.limit) {
                         $scope.hasNextPage = false;
+                      }
+                      else {
+                        $scope.hasNextPage = true;
                       }
                       if (append) {
                         $scope.selectItems = $scope.selectItems.concat(data);
