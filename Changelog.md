@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## 2.18.4
+### Fixed
+ - Fixed issues with validation on submit
+ - Fixed select not searching and loading more properly.
+
 ## 2.18.3
 ### Fixed
  - Changed Object.assign to lodash assign for compatibility.
