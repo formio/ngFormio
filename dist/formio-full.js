@@ -79691,6 +79691,15 @@ module.exports = function(app) {
                       promise = (new Formio(newUrl)).loadSubmissions(options);
                     }
                     else {
+                      // Add in headers if specified
+                      if ($scope.component.data.hasOwnProperty('headers') && $scope.component.data.headers.length > 0) {
+                        options.headers = _assign(options.headers, $scope.component.data.headers.reduce(function(headers, current) {
+                          if (current.key) {
+                            headers[current.key] = current.value;
+                          }
+                          return headers;
+                        }, {}));
+                      }
                       promise = $http.get(newUrl, options).then(function(result) {
                         return result.data;
                       });
@@ -81828,7 +81837,7 @@ module.exports = function() {
         $scope.checkErrors = function() {
           if (!$scope.isValid()) {
             // Change all of the fields to not be pristine.
-            angular.forEach($element.find('[name="formioForm"]').children(), function(element) {
+            angular.forEach($element.find('[name="formioForm"]').find('*'), function(element) {
               var elementScope = angular.element(element).scope();
               var fieldForm = elementScope.formioForm;
               if (fieldForm[elementScope.component.key]) {
