@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [UNRELEASED]
 
+## 4.0.13
+### Changed
+ - Upgraded ng-formio to 2.18.5
+ - Upgraded ng-formio-builder to 2.18.2
+
 ## 4.0.12
 ### Changed
  - Upgraded ng-formio to 2.18.0
