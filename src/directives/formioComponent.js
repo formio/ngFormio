@@ -2,15 +2,6 @@ var _cloneDeep = require('lodash/cloneDeep');
 var _filter = require('lodash/filter');
 var _get = require('lodash/get');
 
-// FOR-524 - Attempt to load json logic.
-var jsonLogic;
-try {
-  jsonLogic = require('json-logic-js') || undefined;
-}
-catch (e) {
-  // Ignore optional module.
-}
-
 module.exports = [
   'Formio',
   'formioComponents',
@@ -104,22 +95,37 @@ module.exports = [
 
           // FOR-71 - Dont watch in the builder view.
           // Calculate value when data changes.
-          if (!$scope.builder && ($scope.component.calculateValue || (jsonLogic && _get($scope.component, 'validate.json')))) {
+          if (!$scope.builder && ($scope.component.calculateValue || _get($scope.component, 'validate.json'))) {
             $scope.$watch('data', function() {
               // Process calculated value stuff if present.
               if ($scope.component.calculateValue) {
-                try {
-                  $scope.data[$scope.component.key] = eval('(function(data) { var value = [];' + $scope.component.calculateValue.toString() + '; return value; })($scope.data)');
+                if (typeof $scope.component.calculateValue === 'string') {
+                  try {
+                    $scope.data[$scope.component.key] = eval('(function(data) { var value = [];' + $scope.component.calculateValue.toString() + '; return value; })($scope.data)');
+                  }
+                  catch (e) {
+                    /* eslint-disable no-console */
+                    console.warn('An error occurred calculating a value for ' + $scope.component.key, e);
+                    /* eslint-enable no-console */
+                  }
                 }
-                catch (e) {
-                  /* eslint-disable no-console */
-                  console.warn('An error occurred calculating a value for ' + $scope.component.key, e);
-                  /* eslint-enable no-console */
+                else {
+                  try {
+                    $scope.data[$scope.component.key] = FormioUtils.jsonLogic.apply($scope.component.calculateValue, {
+                      data: $scope.submission ? $scope.submission.data : $scope.data,
+                      row: $scope.data
+                    });
+                  }
+                  catch (e) {
+                    /* eslint-disable no-console */
+                    console.warn('An error occurred calculating a value for ' + $scope.component.key, e);
+                    /* eslint-enable no-console */
+                  }
                 }
               }
 
               // Process jsonLogic stuff if present.
-              if (jsonLogic && _get($scope.component, 'validate.json')) {
+              if (_get($scope.component, 'validate.json')) {
                 var input;
 
                 // Only json parse once.
@@ -143,8 +149,8 @@ module.exports = [
 
                 var valid;
                 try {
-                  valid = jsonLogic.apply(input, {
-                    data: $scope.submission.data,
+                  valid = FormioUtils.jsonLogic.apply(input, {
+                    data: $scope.submission ? $scope.submission.data : $scope.data,
                     row: $scope.data
                   });
                 }
@@ -185,17 +191,33 @@ module.exports = [
           $scope.addFieldValue = function() {
             var value = '';
             if ($scope.component.hasOwnProperty('customDefaultValue')) {
-              try {
-                /* eslint-disable no-unused-vars */
-                var data = _cloneDeep($scope.data);
-                /* eslint-enable no-unused-vars */
-                value = eval('(function(data) { var value = "";' + $scope.component.customDefaultValue.toString() + '; return value; })(data)');
+              if (typeof $scope.component.customDefaultValue === 'string') {
+                try {
+                  /* eslint-disable no-unused-vars */
+                  var data = _cloneDeep($scope.data);
+                  /* eslint-enable no-unused-vars */
+                  value = eval('(function(data) { var value = "";' + $scope.component.customDefaultValue.toString() + '; return value; })(data)');
+                }
+                catch (e) {
+                  /* eslint-disable no-console */
+                  console.warn('An error occurrend in a custom default value in ' + $scope.component.key, e);
+                  /* eslint-enable no-console */
+                  value = '';
+                }
               }
-              catch (e) {
-                /* eslint-disable no-console */
-                console.warn('An error occurrend in a custom default value in ' + $scope.component.key, e);
-                /* eslint-enable no-console */
-                value = '';
+              else {
+                try {
+                  value = FormioUtils.jsonLogic.apply($scope.component.customDefaultValue, {
+                    data: $scope.submission ? $scope.submission.data : $scope.data,
+                    row: $scope.data
+                  });
+                }
+                catch (err) {
+                  /* eslint-disable no-console */
+                  console.warn('An error occurrend in a custom default value in ' + $scope.component.key, err);
+                  /* eslint-enable no-console */
+                  value = '';
+                }
               }
             }
             else if ($scope.component.hasOwnProperty('defaultValue')) {

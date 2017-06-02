@@ -1,7 +1,37 @@
 var formioUtils = require('formiojs/utils');
 
 module.exports = function() {
+  var hooks = {};
   return {
+    hook: function(name, cb) {
+      var parts = name.split(':');
+      var scope = parts[0];
+      name = (parts.length > 1) ? parts[1] : scope;
+
+      if (!hooks[name]) {
+        hooks[name] = {};
+      }
+      hooks[name][scope] = cb;
+    },
+    alter: function() {
+      var name = arguments[0];
+      var fn = (typeof arguments[arguments.length - 1] === 'function') ? arguments[arguments.length - 1] : null;
+      var args = Array.prototype.slice.call(arguments, 1);
+      if (hooks && hooks[name]) {
+        angular.forEach(hooks[name], function(hook) {
+          hook.apply(this, args);
+        }.bind(this));
+      }
+      else {
+        // If this is an async hook instead of a sync.
+        if (fn) {
+          return fn(null, arguments[1]);
+        }
+        else {
+          return arguments[1];
+        }
+      }
+    },
     checkVisible: function(component, row, data) {
       var visible = formioUtils.checkCondition(component, row, data);
       if (!visible) {
@@ -29,6 +59,7 @@ module.exports = function() {
     eachComponent: formioUtils.eachComponent,
     getComponent: formioUtils.getComponent,
     getValue: formioUtils.getValue,
+    jsonLogic: formioUtils.jsonLogic,
     hideFields: function(form, components) {
       this.eachComponent(form.components, function(component) {
         for (var i in components) {

@@ -378,7 +378,12 @@ module.exports = function() {
 
           // Make sure to make a copy of the submission data to remove bad characters.
           submissionData = angular.copy(submissionData);
-          $scope.submitForm(submissionData, form);
+          FormioUtils.alter('submit', $scope, submissionData, function(err) {
+            if (err) {
+              return this.showAlerts(err.alerts);
+            }
+            $scope.submitForm(submissionData, form);
+          }.bind(this));
         };
       }
     ],

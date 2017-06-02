@@ -1,5 +1,5 @@
 <div class="formio-wizard-wrapper">
-  <div class="row bs-wizard" style="border-bottom:0;" ng-class="{hasTitles: hasTitles}">
+  <div class="row bs-wizard" style="border-bottom:0;" ng-class="{hasTitles: hasTitles}" ng-if="activePage.breadcrumb !== 'none'">
     <div ng-class="{disabled: ($index > currentPage) && !formioOptions.wizardFreeNavigation, active: ($index == currentPage), complete: ($index < currentPage), noTitle: !page.title}" class="{{ colclass }} bs-wizard-step" ng-repeat="page in pages track by $index">
       <div class="bs-wizard-stepnum-wrapper">
         <div class="text-center bs-wizard-stepnum" ng-if="page.title">{{ page.title }}</div>
