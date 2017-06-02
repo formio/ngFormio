@@ -5,7 +5,11 @@
       <th ng-repeat="v in component.values track by $index" style="text-align: center;">{{ v.label }}</th>
     </tr>
   </thead>
-  <tr ng-repeat="question in component.questions">
+  <tr ng-repeat="question in component.questions"
+    ng-init="inputName = componentId + '-' + question.value"
+    ng-class="{
+      'text-danger': !formioForm[inputName].$pristine && formioForm[inputName].$invalid
+    }">
     <td>{{ question.label }}</td>
     <td ng-repeat="v in component.values track by $index" style="text-align: center;">
       <input

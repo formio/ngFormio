@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## 2.18.5
+### Added
+ - Add headers to Select Urls if specified.
+ 
+### Fixed
+ - Fields inside a panel inside a wizard didn't highlight properly if validation failed.
+ - Survey components didn't hightlight validations properly.
+
 ## 2.18.4
 ### Fixed
  - Fixed issues with validation on submit
