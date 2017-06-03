@@ -23,8 +23,9 @@ module.exports = function(app) {
           persistent: true
         },
         controller: ['$scope', 'FormioUtils', 'Formio', function($scope, FormioUtils, Formio) {
+          var url = $scope.component.src;
           if ($scope.component.form) {
-            var url = '';
+            url = '';
             if ($scope.component.project) {
               url += '/project/' + $scope.component.project;
             }
@@ -32,38 +33,52 @@ module.exports = function(app) {
               url += $scope.formio.projectUrl;
             }
             url += '/form/' + $scope.component.form;
-            $scope.component.src = (new Formio(url)).formUrl;
+            url = (new Formio(url)).formUrl;
           }
 
-          var submitForm = function(cb) {
-            var url = $scope.component.src;
-            if ($scope.data[$scope.component.key] && $scope.data[$scope.component.key]._id) {
-              url += '/submission/' + $scope.data[$scope.component.key]._id;
+          if ($scope.data[$scope.component.key] && $scope.data[$scope.component.key]._id) {
+            url += '/submission/' + $scope.data[$scope.component.key]._id;
+          }
+
+          $scope.formFormio = new Formio(url);
+          $scope.formFormio.loadForm().then(function(form) {
+            $scope.componentForm = form;
+          });
+
+          var submitForm = function(scope, cb) {
+            if (FormioUtils.getComponent(scope.activePage.components, $scope.component.key)) {
+              $scope.formFormio.saveSubmission($scope.data[$scope.component.key]).then(function(sub) {
+                angular.merge($scope.data[$scope.component.key], sub);
+                cb();
+              }, cb);
             }
-            (new Formio(url)).saveSubmission($scope.data[$scope.component.key]).then(function(sub) {
-              $scope.data[$scope.component.key] = sub;
-              cb();
-            }, cb);
+            else {
+              return cb();
+            }
           };
 
-          FormioUtils.hook('formComponent:submit', function(scope, cb) {
-            submitForm(function(err) {
-              if (err) {
-                return cb(err);
-              }
+          // Hook into the submit method.
+          FormioUtils.hook($scope.component.key + ':submit', function(scope, data, cb) {
+            submitForm(scope, cb);
+          });
 
-              if ($scope.component.reference) {
-                $scope.data[$scope.component.key] = {_id: $scope.data[$scope.component.key]._id};
-              }
+          // Hook into the nextpage method.
+          FormioUtils.hook($scope.component.key + ':nextPage', function(scope, cb) {
+            submitForm(scope, cb);
+          });
 
-              cb();
+          // See if we need to load the submission into scope.
+          if (
+            $scope.data[$scope.component.key] &&
+            $scope.data[$scope.component.key]._id &&
+            !$scope.data[$scope.component.key].data
+          ) {
+            $scope.formFormio.loadSubmission().then(function(submission) {
+              angular.merge($scope.data[$scope.component.key], submission);
             });
-          });
+          }
 
-          FormioUtils.hook('formComponent:nextPage', function(scope, cb) {
-            submitForm(cb);
-          });
-
+          // Make sure to hide the submit button on the loaded form.
           $scope.$on('formLoad', function(err, form) {
             FormioUtils.eachComponent(form.components, function(component) {
               if ((component.type === 'button') && (component.action === 'submit')) {

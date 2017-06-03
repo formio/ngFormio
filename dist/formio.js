@@ -10704,8 +10704,9 @@ module.exports = function(app) {
           persistent: true
         },
         controller: ['$scope', 'FormioUtils', 'Formio', function($scope, FormioUtils, Formio) {
+          var url = $scope.component.src;
           if ($scope.component.form) {
-            var url = '';
+            url = '';
             if ($scope.component.project) {
               url += '/project/' + $scope.component.project;
             }
@@ -10713,38 +10714,52 @@ module.exports = function(app) {
               url += $scope.formio.projectUrl;
             }
             url += '/form/' + $scope.component.form;
-            $scope.component.src = (new Formio(url)).formUrl;
+            url = (new Formio(url)).formUrl;
           }
 
-          var submitForm = function(cb) {
-            var url = $scope.component.src;
-            if ($scope.data[$scope.component.key] && $scope.data[$scope.component.key]._id) {
-              url += '/submission/' + $scope.data[$scope.component.key]._id;
+          if ($scope.data[$scope.component.key] && $scope.data[$scope.component.key]._id) {
+            url += '/submission/' + $scope.data[$scope.component.key]._id;
+          }
+
+          $scope.formFormio = new Formio(url);
+          $scope.formFormio.loadForm().then(function(form) {
+            $scope.componentForm = form;
+          });
+
+          var submitForm = function(scope, cb) {
+            if (FormioUtils.getComponent(scope.activePage.components, $scope.component.key)) {
+              $scope.formFormio.saveSubmission($scope.data[$scope.component.key]).then(function(sub) {
+                angular.merge($scope.data[$scope.component.key], sub);
+                cb();
+              }, cb);
             }
-            (new Formio(url)).saveSubmission($scope.data[$scope.component.key]).then(function(sub) {
-              $scope.data[$scope.component.key] = sub;
-              cb();
-            }, cb);
+            else {
+              return cb();
+            }
           };
 
-          FormioUtils.hook('formComponent:submit', function(scope, cb) {
-            submitForm(function(err) {
-              if (err) {
-                return cb(err);
-              }
+          // Hook into the submit method.
+          FormioUtils.hook($scope.component.key + ':submit', function(scope, data, cb) {
+            submitForm(scope, cb);
+          });
 
-              if ($scope.component.reference) {
-                $scope.data[$scope.component.key] = {_id: $scope.data[$scope.component.key]._id};
-              }
+          // Hook into the nextpage method.
+          FormioUtils.hook($scope.component.key + ':nextPage', function(scope, cb) {
+            submitForm(scope, cb);
+          });
 
-              cb();
+          // See if we need to load the submission into scope.
+          if (
+            $scope.data[$scope.component.key] &&
+            $scope.data[$scope.component.key]._id &&
+            !$scope.data[$scope.component.key].data
+          ) {
+            $scope.formFormio.loadSubmission().then(function(submission) {
+              angular.merge($scope.data[$scope.component.key], submission);
             });
-          });
+          }
 
-          FormioUtils.hook('formComponent:nextPage', function(scope, cb) {
-            submitForm(cb);
-          });
-
+          // Make sure to hide the submit button on the loaded form.
           $scope.$on('formLoad', function(err, form) {
             FormioUtils.eachComponent(form.components, function(component) {
               if ((component.type === 'button') && (component.action === 'submit')) {
@@ -10761,7 +10776,7 @@ module.exports = function(app) {
     '$templateCache',
     function($templateCache) {
       $templateCache.put('formio/components/form.html',
-        "<formio src=\"component.src\" submission=\"data[component.key]\"></formio>\n"
+        "<i style=\"font-size: 2em;\" ng-if=\"!componentForm\" ng-class=\"{'formio-hidden': componentForm}\" class=\"formio-loading glyphicon glyphicon-refresh glyphicon-spin\"></i>\n<formio ng-if=\"componentForm\" form=\"componentForm\" submission=\"data[component.key]\"></formio>\n"
       );
     }
   ]);
@@ -12913,109 +12928,109 @@ module.exports = function() {
           }
 
           form.submitting = true;
-
-          // Create a sanitized submission object.
-          var submissionData = {data: {}};
-          if ($scope.submission._id) {
-            submissionData._id = $scope.submission._id;
-          }
-          if ($scope.submission.data._id) {
-            submissionData._id = $scope.submission.data._id;
-          }
-
-          var grabIds = function(input) {
-            if (!input) {
-              return [];
-            }
-
-            if (!(input instanceof Array)) {
-              input = [input];
-            }
-
-            var final = [];
-            input.forEach(function(element) {
-              if (element && element._id) {
-                final.push(element._id);
-              }
-            });
-
-            return final;
-          };
-
-          var defaultPermissions = {};
-          FormioUtils.eachComponent($scope.form.components, function(component) {
-            if (component.type === 'resource' && component.key && component.defaultPermission) {
-              defaultPermissions[component.key] = component.defaultPermission;
-            }
-            if ($scope.submission.data.hasOwnProperty(component.key)) {
-              var value = $scope.submission.data[component.key];
-              if (component.type === 'number' && (value !== null)) {
-                submissionData.data[component.key] = value ? parseFloat(value) : 0;
-              }
-              else {
-                submissionData.data[component.key] = value;
-              }
-            }
-          }, true);
-
-          angular.forEach($scope.submission.data, function(value, key) {
-            if (value && !value.hasOwnProperty('_id')) {
-              submissionData.data[key] = value;
-            }
-
-            // Setup the submission access.
-            var perm = defaultPermissions[key];
-            if (perm) {
-              submissionData.access = submissionData.access || [];
-
-              // Coerce value into an array for plucking.
-              if (!(value instanceof Array)) {
-                value = [value];
-              }
-
-              // Try to find and update an existing permission.
-              var found = false;
-              submissionData.access.forEach(function(permission) {
-                if (permission.type === perm) {
-                  found = true;
-                  permission.resources = permission.resources || [];
-                  permission.resources.concat(grabIds(value));
-                }
-              });
-
-              // Add a permission, because one was not found.
-              if (!found) {
-                submissionData.access.push({
-                  type: perm,
-                  resources: grabIds(value)
-                });
-              }
-            }
-          });
-
-          // Allow the form to be completed externally.
-          $scope.$on('submitDone', function(event, submission, message) {
-            onSubmit(submission, message, form);
-          });
-
-          // Allow an error to be thrown externally.
-          $scope.$on('submitError', function(event, error) {
-            FormioScope.onError($scope, $element)(error);
-          });
-
-          var submitEvent = $scope.$emit('formSubmit', submissionData);
-          if (submitEvent.defaultPrevented) {
-            // Listener wants to cancel the form submission
-            form.submitting = false;
-            return;
-          }
-
-          // Make sure to make a copy of the submission data to remove bad characters.
-          submissionData = angular.copy(submissionData);
-          FormioUtils.alter('submit', $scope, submissionData, function(err) {
+          FormioUtils.alter('submit', $scope, $scope.submission, function(err) {
             if (err) {
               return this.showAlerts(err.alerts);
             }
+
+            // Create a sanitized submission object.
+            var submissionData = {data: {}};
+            if ($scope.submission._id) {
+              submissionData._id = $scope.submission._id;
+            }
+            if ($scope.submission.data._id) {
+              submissionData._id = $scope.submission.data._id;
+            }
+
+            var grabIds = function(input) {
+              if (!input) {
+                return [];
+              }
+
+              if (!(input instanceof Array)) {
+                input = [input];
+              }
+
+              var final = [];
+              input.forEach(function(element) {
+                if (element && element._id) {
+                  final.push(element._id);
+                }
+              });
+
+              return final;
+            };
+
+            var defaultPermissions = {};
+            FormioUtils.eachComponent($scope.form.components, function(component) {
+              if (component.type === 'resource' && component.key && component.defaultPermission) {
+                defaultPermissions[component.key] = component.defaultPermission;
+              }
+              if ($scope.submission.data.hasOwnProperty(component.key)) {
+                var value = $scope.submission.data[component.key];
+                if (component.type === 'number' && (value !== null)) {
+                  submissionData.data[component.key] = value ? parseFloat(value) : 0;
+                }
+                else {
+                  submissionData.data[component.key] = value;
+                }
+              }
+            }, true);
+
+            angular.forEach($scope.submission.data, function(value, key) {
+              if (value && !value.hasOwnProperty('_id')) {
+                submissionData.data[key] = value;
+              }
+
+              // Setup the submission access.
+              var perm = defaultPermissions[key];
+              if (perm) {
+                submissionData.access = submissionData.access || [];
+
+                // Coerce value into an array for plucking.
+                if (!(value instanceof Array)) {
+                  value = [value];
+                }
+
+                // Try to find and update an existing permission.
+                var found = false;
+                submissionData.access.forEach(function(permission) {
+                  if (permission.type === perm) {
+                    found = true;
+                    permission.resources = permission.resources || [];
+                    permission.resources.concat(grabIds(value));
+                  }
+                });
+
+                // Add a permission, because one was not found.
+                if (!found) {
+                  submissionData.access.push({
+                    type: perm,
+                    resources: grabIds(value)
+                  });
+                }
+              }
+            });
+
+            // Allow the form to be completed externally.
+            $scope.$on('submitDone', function(event, submission, message) {
+              onSubmit(submission, message, form);
+            });
+
+            // Allow an error to be thrown externally.
+            $scope.$on('submitError', function(event, error) {
+              FormioScope.onError($scope, $element)(error);
+            });
+
+            var submitEvent = $scope.$emit('formSubmit', submissionData);
+            if (submitEvent.defaultPrevented) {
+              // Listener wants to cancel the form submission
+              form.submitting = false;
+              return;
+            }
+
+            // Make sure to make a copy of the submission data to remove bad characters.
+            submissionData = angular.copy(submissionData);
             $scope.submitForm(submissionData, form);
           }.bind(this));
         };
@@ -13044,8 +13059,6 @@ module.exports = ['$sce', '$parse', '$compile', function($sce, $parse, $compile)
 
 },{}],274:[function(_dereq_,module,exports){
 "use strict";
-var _cloneDeep = _dereq_('lodash/cloneDeep');
-var _filter = _dereq_('lodash/filter');
 var _get = _dereq_('lodash/get');
 
 module.exports = [
@@ -13170,32 +13183,7 @@ module.exports = [
           // Calculate value when data changes.
           if (!$scope.builder && ($scope.component.calculateValue || _get($scope.component, 'validate.json'))) {
             $scope.$watch('data', function() {
-              // Process calculated value stuff if present.
-              if ($scope.component.calculateValue) {
-                if (typeof $scope.component.calculateValue === 'string') {
-                  try {
-                    $scope.data[$scope.component.key] = eval('(function(data) { var value = [];' + $scope.component.calculateValue.toString() + '; return value; })($scope.data)');
-                  }
-                  catch (e) {
-                    /* eslint-disable no-console */
-                    console.warn('An error occurred calculating a value for ' + $scope.component.key, e);
-                    /* eslint-enable no-console */
-                  }
-                }
-                else {
-                  try {
-                    $scope.data[$scope.component.key] = FormioUtils.jsonLogic.apply($scope.component.calculateValue, {
-                      data: $scope.submission ? $scope.submission.data : $scope.data,
-                      row: $scope.data
-                    });
-                  }
-                  catch (e) {
-                    /* eslint-disable no-console */
-                    console.warn('An error occurred calculating a value for ' + $scope.component.key, e);
-                    /* eslint-enable no-console */
-                  }
-                }
-              }
+              FormioUtils.checkCalculated($scope.component, $scope.submission, $scope.data);
 
               // Process jsonLogic stuff if present.
               if (_get($scope.component, 'validate.json')) {
@@ -13262,87 +13250,11 @@ module.exports = [
 
           // Add a new field value.
           $scope.addFieldValue = function() {
-            var value = '';
-            if ($scope.component.hasOwnProperty('customDefaultValue')) {
-              if (typeof $scope.component.customDefaultValue === 'string') {
-                try {
-                  /* eslint-disable no-unused-vars */
-                  var data = _cloneDeep($scope.data);
-                  /* eslint-enable no-unused-vars */
-                  value = eval('(function(data) { var value = "";' + $scope.component.customDefaultValue.toString() + '; return value; })(data)');
-                }
-                catch (e) {
-                  /* eslint-disable no-console */
-                  console.warn('An error occurrend in a custom default value in ' + $scope.component.key, e);
-                  /* eslint-enable no-console */
-                  value = '';
-                }
-              }
-              else {
-                try {
-                  value = FormioUtils.jsonLogic.apply($scope.component.customDefaultValue, {
-                    data: $scope.submission ? $scope.submission.data : $scope.data,
-                    row: $scope.data
-                  });
-                }
-                catch (err) {
-                  /* eslint-disable no-console */
-                  console.warn('An error occurrend in a custom default value in ' + $scope.component.key, err);
-                  /* eslint-enable no-console */
-                  value = '';
-                }
-              }
-            }
-            else if ($scope.component.hasOwnProperty('defaultValue')) {
-              // Fix for select components
-              if ($scope.component.type === 'select') {
-                try {
-                  // Allow a key:value search
-                  var parts = $scope.component.defaultValue.split(':');
-                  var results;
-                  // If only one part was specified, search by value
-                  /* eslint-disable max-depth */
-                  if (parts.length === 1) {
-                    results = _filter($scope.selectItems, {value: parts[0]});
-
-                    // Trim results based on multiple
-                    if (!$scope.component.multiple) {
-                      value = results.shift();
-                    }
-                    else {
-                      value = results;
-                    }
-                  }
-                  // If two parts were specified, allow for key and value customization.
-                  else if (parts.length === 2) {
-                    var search = {};
-                    search[parts[0]] = parts[1];
-
-                    results = _filter($scope.selectItems, search);
-
-                    // Trim results based on multiple
-                    if (!$scope.component.multiple) {
-                      value = results.shift();
-                    }
-                    else {
-                      value = results;
-                    }
-                  }
-                }
-                catch (e) {
-                  /* eslint-disable no-console */
-                  console.log('An issue occurred with the select defaultValue for: ' + $scope.component.key);
-                  console.log('Could not find defaultValue (' + $scope.defaultValue + ') in the selectItems');
-                  console.log($scope.selectItems);
-                  /* eslint-enable no-console */
-                }
-              }
-              else {
-                value = $scope.component.defaultValue;
-              }
-            }
-            $scope.data[$scope.component.key] = $scope.data[$scope.component.key] || [];
-            $scope.data[$scope.component.key].push(value);
+            var defaultData = {};
+            FormioUtils.checkDefaultValue($scope.component, $scope.submission, defaultData, $scope, function() {
+              $scope.data[$scope.component.key] = $scope.data[$scope.component.key] || [];
+              $scope.data[$scope.component.key].push(defaultData[$scope.component.key]);
+            });
           };
 
           // Remove a field value.
@@ -13383,218 +13295,9 @@ module.exports = [
 
           // FOR-71 - Dont watch in the builder view.
           if (!$scope.builder) {
-            /**
-             * Using the list of default options, split them with the identifier, and use filter to get each item.
-             *
-             * @param defaultItems
-             * @param searchItems
-             * @returns {Array}
-             */
-            var pluckItems = function(defaultItems, searchItems) {
-              var temp = [];
-              if (!defaultItems || !defaultItems.length) {
-                return temp;
-              }
-              if (typeof defaultItems === 'string') {
-                defaultItems = [defaultItems];
-              }
-
-              defaultItems.forEach(function(item) {
-                var parts = item.split(':');
-                if (parts.length === 2) {
-                  var result = _filter(searchItems, function(potential) {
-                    if (_get(potential, parts[0]) === parts[1]) {
-                      return true;
-                    }
-                  });
-
-                  if (result) {
-                    temp = temp.concat(result);
-                  }
-                }
-              });
-
-              return temp;
-            };
-
-            $scope.$watch('component.multiple', function(mult) {
-              // Establish a default for data.
+            $scope.$watch('component.multiple', function() {
               $scope.data = $scope.data || {};
-              var value = null;
-
-              // Use the current data or default.
-              if ($scope.data.hasOwnProperty($scope.component.key)) {
-                if (!mult) {
-                  $scope.data[$scope.component.key] = $scope.data[$scope.component.key];
-                  return;
-                }
-
-                // If a value is present, and its an array, assign it to the value.
-                if ($scope.data[$scope.component.key] instanceof Array) {
-                  value = $scope.data[$scope.component.key];
-                }
-                // If a value is present and it is not an array, wrap the value.
-                else {
-                  value = $scope.data[$scope.component.key].split(',');
-                }
-
-                $scope.data[$scope.component.key] = value;
-                return;
-              }
-              else if ($scope.component.hasOwnProperty('customDefaultValue')) {
-                if (!mult) {
-                  try {
-                    value = eval('(function(data) { var value = "";' + $scope.component.customDefaultValue.toString() + '; return value; })($scope.data)');
-                  }
-                  catch (e) {
-                    /* eslint-disable no-console */
-                    console.warn('An error occurrend in a custom default value in ' + $scope.component.key, e);
-                    /* eslint-enable no-console */
-                    value = '';
-                  }
-                  $scope.data[$scope.component.key] = value;
-                  return;
-                }
-
-                try {
-                  value = eval('(function(data) { var value = "";' + $scope.component.customDefaultValue.toString() + '; return value; })($scope.data)');
-                }
-                catch (e) {
-                  /* eslint-disable no-console */
-                  console.warn('An error occurrend in a custom default value in ' + $scope.component.key, e);
-                  /* eslint-enable no-console */
-                  value = '';
-                }
-                $scope.data[$scope.component.key] = value;
-                return;
-              }
-              else if ($scope.component.hasOwnProperty('defaultValue')) {
-                // FA-835 - The default values for select boxes are set in the component.
-                if ($scope.component.type === 'selectboxes') {
-                  return;
-                }
-
-                // If there is a default value and it is not an array, wrap the value.
-                if (mult && typeof $scope.component.defaultValue === 'string') {
-                  value = $scope.component.defaultValue.split(',');
-                }
-                else {
-                  value = $scope.component.defaultValue;
-                }
-
-                // If no default is provided, then skip...
-                if (!value || !value.length) {
-                  return;
-                }
-
-                // FOR-193 - Fix default value for the number component.
-                // FOR-262 - Fix multiple default value for the number component.
-                if ($scope.component.type === 'number') {
-                  if (!mult) {
-                    // FOR-290 - Fix default values for number components, to allow decimal numbers.
-                    if ($scope.component.defaultValue.indexOf('.') !== -1) {
-                      $scope.data[$scope.component.key] = parseFloat($scope.component.defaultValue);
-                      return;
-                    }
-
-                    $scope.data[$scope.component.key] = parseInt($scope.component.defaultValue);
-                    return;
-                  }
-
-                  $scope.data[$scope.component.key] = value.map(function(item) {
-                    try {
-                      // FOR-290 - Fix default values for number components, to allow decimal numbers.
-                      if (item.indexOf('.') !== -1) {
-                        return parseFloat(item);
-                      }
-
-                      return parseInt(item);
-                    }
-                    catch (e) {
-                      return 0;
-                    }
-                  });
-                  return;
-                }
-                // FOR-135 - Add default values for select components.
-                else if ($scope.component.type === 'select') {
-                  // FOR-337 - Fix default values for select components without multi enabled.
-                  if (!mult) {
-                    $scope.data[$scope.component.key] = $scope.component.defaultValue;
-                    return;
-                  }
-
-                  // If using the values input, split the default values, and search the options for each value in the list.
-                  if ($scope.component.dataSrc === 'values') {
-                    var temp = [];
-
-                    $scope.component.data.values.forEach(function(item) {
-                      if (value.indexOf(item.value) !== -1) {
-                        temp.push(item);
-                      }
-                    });
-
-                    $scope.data[$scope.component.key] = temp;
-                    return;
-                  }
-                  // If using json input, split the values and search each key path for the item
-                  else if ($scope.component.dataSrc === 'json') {
-                    if (typeof $scope.component.data.json === 'string') {
-                      try {
-                        $scope.component.data.json = JSON.parse($scope.component.data.json);
-                      }
-                      catch (e) {
-                        /* eslint-disable no-console */
-                        console.log(e);
-                        console.log('Could not parse the given JSON for the select component: ' + $scope.component.key);
-                        console.log($scope.component.data.json);
-                        /* eslint-enable no-console */
-                        $scope.component.data.json = [];
-                      }
-                    }
-
-                    $scope.data[$scope.component.key] = pluckItems(value, $scope.component.data.json);
-                    return;
-                  }
-                  else if ($scope.component.dataSrc === 'url' || $scope.component.dataSrc === 'resource') {
-                    // Wait until loading is done.
-                    $scope.$on('selectLoaded', function() {
-                      $scope.data[$scope.component.key] = pluckItems(value, $scope.selectItems);
-                    });
-                  }
-                }
-                // FOR-504 - Fix default values for survey components.
-                else if ($scope.component.type === 'survey') {
-                  if (!$scope.component.hasOwnProperty('defaultValue')) {
-                    return;
-                  }
-
-                  $scope.data[$scope.component.key] = $scope.data[$scope.component.key] || {};
-                  $scope.component.questions.forEach(function(question) {
-                    $timeout(function() {
-                      $scope.data[$scope.component.key][question.value] = $scope.data[$scope.component.key][question.value] || $scope.component.defaultValue;
-                    });
-                  });
-                }
-                else {
-                  if (!mult) {
-                    $scope.data[$scope.component.key] = $scope.component.defaultValue;
-                    return;
-                  }
-
-                  // If there is a default value and it is an array, assign it to the value.
-                  if ($scope.component.defaultValue instanceof Array) {
-                    $scope.data[$scope.component.key] = $scope.component.defaultValue;
-                    return;
-                  }
-
-                  // Make the defaultValue a single element array because were multi.
-                  $scope.data[$scope.component.key] = [$scope.component.defaultValue];
-                  return;
-                }
-              }
-
-              // Couldn't safely default, don't add a garbage value.
+              FormioUtils.checkDefaultValue($scope.component, $scope.submission, $scope.data, $scope);
               return;
             });
           }
@@ -13613,7 +13316,7 @@ module.exports = [
   }
 ];
 
-},{"lodash/cloneDeep":207,"lodash/filter":210,"lodash/get":211}],275:[function(_dereq_,module,exports){
+},{"lodash/get":211}],275:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'formioComponents',
@@ -14092,106 +13795,106 @@ module.exports = function() {
             }
           }
 
-          // Create a sanitized submission object.
-          var submissionData = {data: {}};
-          if ($scope.submission._id) {
-            submissionData._id = $scope.submission._id;
-          }
-          if ($scope.submission.data._id) {
-            submissionData._id = $scope.submission.data._id;
-          }
-
-          var grabIds = function(input) {
-            if (!input) {
-              return [];
-            }
-
-            if (!(input instanceof Array)) {
-              input = [input];
-            }
-
-            var final = [];
-            input.forEach(function(element) {
-              if (element && element._id) {
-                final.push(element._id);
-              }
-            });
-
-            return final;
-          };
-
-          var defaultPermissions = {};
-          FormioUtils.eachComponent($scope.form.components, function(component) {
-            if (component.type === 'resource' && component.key && component.defaultPermission) {
-              defaultPermissions[component.key] = component.defaultPermission;
-            }
-            if (submissionData.data.hasOwnProperty(component.key) && (component.type === 'number')) {
-              var value = $scope.submission.data[component.key];
-              if (component.type === 'number') {
-                submissionData.data[component.key] = value ? parseFloat(value) : 0;
-              }
-              else {
-                submissionData.data[component.key] = value;
-              }
-            }
-          }, true);
-
-          angular.forEach($scope.submission.data, function(value, key) {
-            submissionData.data[key] = value;
-
-            // Setup the submission access.
-            var perm = defaultPermissions[key];
-            if (perm) {
-              submissionData.access = submissionData.access || [];
-
-              // Coerce value into an array for plucking.
-              if (!(value instanceof Array)) {
-                value = [value];
-              }
-
-              // Try to find and update an existing permission.
-              var found = false;
-              submissionData.access.forEach(function(permission) {
-                if (permission.type === perm) {
-                  found = true;
-                  permission.resources = permission.resources || [];
-                  permission.resources.concat(grabIds(value));
-                }
-              });
-
-              // Add a permission, because one was not found.
-              if (!found) {
-                submissionData.access.push({
-                  type: perm,
-                  resources: grabIds(value)
-                });
-              }
-            }
-          });
-          // Strip out any angular keys.
-          submissionData = angular.copy(submissionData);
-
-          var submitEvent = $scope.$emit('formSubmit', submissionData);
-          if (submitEvent.defaultPrevented) {
-              // Listener wants to cancel the form submission
-              return;
-          }
-
-          var onDone = function(submission) {
-            if ($scope.storage && !$scope.readOnly) {
-              localStorage.setItem($scope.storage, '');
-            }
-            $scope.showAlerts({
-              type: 'success',
-              message: 'Submission Complete!'
-            });
-            $scope.$emit('formSubmission', submission);
-          };
-
-          FormioUtils.alter('submit', $scope, submissionData, function(err) {
+          FormioUtils.alter('submit', $scope, $scope.submission, function(err) {
             if (err) {
               return this.showAlerts(err.alerts);
             }
+
+            // Create a sanitized submission object.
+            var submissionData = {data: {}};
+            if ($scope.submission._id) {
+              submissionData._id = $scope.submission._id;
+            }
+            if ($scope.submission.data._id) {
+              submissionData._id = $scope.submission.data._id;
+            }
+
+            var grabIds = function(input) {
+              if (!input) {
+                return [];
+              }
+
+              if (!(input instanceof Array)) {
+                input = [input];
+              }
+
+              var final = [];
+              input.forEach(function(element) {
+                if (element && element._id) {
+                  final.push(element._id);
+                }
+              });
+
+              return final;
+            };
+
+            var defaultPermissions = {};
+            FormioUtils.eachComponent($scope.form.components, function(component) {
+              if (component.type === 'resource' && component.key && component.defaultPermission) {
+                defaultPermissions[component.key] = component.defaultPermission;
+              }
+              if (submissionData.data.hasOwnProperty(component.key) && (component.type === 'number')) {
+                var value = $scope.submission.data[component.key];
+                if (component.type === 'number') {
+                  submissionData.data[component.key] = value ? parseFloat(value) : 0;
+                }
+                else {
+                  submissionData.data[component.key] = value;
+                }
+              }
+            }, true);
+
+            angular.forEach($scope.submission.data, function(value, key) {
+              submissionData.data[key] = value;
+
+              // Setup the submission access.
+              var perm = defaultPermissions[key];
+              if (perm) {
+                submissionData.access = submissionData.access || [];
+
+                // Coerce value into an array for plucking.
+                if (!(value instanceof Array)) {
+                  value = [value];
+                }
+
+                // Try to find and update an existing permission.
+                var found = false;
+                submissionData.access.forEach(function(permission) {
+                  if (permission.type === perm) {
+                    found = true;
+                    permission.resources = permission.resources || [];
+                    permission.resources.concat(grabIds(value));
+                  }
+                });
+
+                // Add a permission, because one was not found.
+                if (!found) {
+                  submissionData.access.push({
+                    type: perm,
+                    resources: grabIds(value)
+                  });
+                }
+              }
+            });
+            // Strip out any angular keys.
+            submissionData = angular.copy(submissionData);
+
+            var submitEvent = $scope.$emit('formSubmit', submissionData);
+            if (submitEvent.defaultPrevented) {
+              // Listener wants to cancel the form submission
+              return;
+            }
+
+            var onDone = function(submission) {
+              if ($scope.storage && !$scope.readOnly) {
+                localStorage.setItem($scope.storage, '');
+              }
+              $scope.showAlerts({
+                type: 'success',
+                message: 'Submission Complete!'
+              });
+              $scope.$emit('formSubmission', submission);
+            };
 
             // Save to specified action.
             if ($scope.action) {
@@ -14390,17 +14093,26 @@ module.exports = function() {
           });
 
           // FOR-71
-          if (!$scope.builder && hasConditionalPages) {
+          if (!$scope.builder) {
             $scope.$watch('submission.data', function(data) {
-              var newPages = [];
-              angular.forEach(allPages, function(page) {
-                if (FormioUtils.isVisible(page, null, data)) {
-                  newPages.push(page);
+              if (hasConditionalPages) {
+                var newPages = [];
+                angular.forEach(allPages, function(page) {
+                  if (FormioUtils.isVisible(page, null, data)) {
+                    newPages.push(page);
+                  }
+                });
+                $scope.pages = newPages;
+                updatePages();
+                setTimeout($scope.$apply.bind($scope), 10);
+              }
+
+              // Calculate values for hidden fields outside of wizard.
+              angular.forEach(form.components, function(component) {
+                if (component.type !== 'panel') {
+                  FormioUtils.checkCalculated(component, $scope.submission, $scope.submission.data);
                 }
               });
-              $scope.pages = newPages;
-              updatePages();
-              setTimeout($scope.$apply.bind($scope), 10);
             }, true);
           }
 
@@ -14636,28 +14348,53 @@ module.exports = [
 },{}],283:[function(_dereq_,module,exports){
 "use strict";
 var formioUtils = _dereq_('formiojs/utils');
+var _filter = _dereq_('lodash/filter');
+var _get = _dereq_('lodash/get');
 
 module.exports = function() {
   var hooks = {};
   return {
+    // Asynchronously iterate through a map.
+    each: function(items, each, done) {
+      var index = -1;
+      var arrayItems = [];
+      for (var i in items) {
+        arrayItems.push(items[i]);
+      }
+
+      (function next(err, previous) {
+        if (err) {
+          err.item = previous;
+          return done ? done(err) : null;
+        }
+        index++;
+        var item = arrayItems[index];
+        if (!item) {
+          return done ? done() : null;
+        }
+        each(item, function(err) {
+          next(err, item);
+        });
+      })();
+    },
     hook: function(name, cb) {
       var parts = name.split(':');
-      var scope = parts[0];
-      name = (parts.length > 1) ? parts[1] : scope;
+      var key = parts[0];
+      name = (parts.length > 1) ? parts[1] : key;
 
       if (!hooks[name]) {
         hooks[name] = {};
       }
-      hooks[name][scope] = cb;
+      hooks[name][key] = cb;
     },
     alter: function() {
       var name = arguments[0];
       var fn = (typeof arguments[arguments.length - 1] === 'function') ? arguments[arguments.length - 1] : null;
-      var args = Array.prototype.slice.call(arguments, 1);
+      var args = Array.prototype.slice.call(arguments, 1, (arguments.length - 1));
       if (hooks && hooks[name]) {
-        angular.forEach(hooks[name], function(hook) {
-          hook.apply(this, args);
-        }.bind(this));
+        this.each(hooks[name], function(hook, next) {
+          hook.apply(this, args.concat([next]));
+        }, fn);
       }
       else {
         // If this is an async hook instead of a sync.
@@ -14666,6 +14403,244 @@ module.exports = function() {
         }
         else {
           return arguments[1];
+        }
+      }
+    },
+    pluckItems: function(defaultItems, searchItems) {
+      var temp = [];
+      if (!defaultItems || !defaultItems.length) {
+        return temp;
+      }
+      if (typeof defaultItems === 'string') {
+        defaultItems = [defaultItems];
+      }
+
+      defaultItems.forEach(function(item) {
+        var parts = item.split(':');
+        if (parts.length === 2) {
+          var result = _filter(searchItems, function(potential) {
+            if (_get(potential, parts[0]) === parts[1]) {
+              return true;
+            }
+          });
+
+          if (result) {
+            temp = temp.concat(result);
+          }
+        }
+      });
+
+      return temp;
+    },
+    checkDefaultValue: function(component, submission, data, $scope, done) {
+      /* eslint-disable max-depth */
+      var value = '';
+      if (!done) {
+        done = function(added) {
+          return added;
+        };
+      }
+
+      // Use the current data or default.
+      if (data.hasOwnProperty(component.key)) {
+        if (!component.multiple) {
+          return done(false);
+        }
+
+        // If the value is an array then we are good.
+        if (data[component.key] instanceof Array) {
+          return done(false);
+        }
+
+        // Split the value based on CSV
+        data[component.key] = data[component.key].split(',');
+        return done(true);
+      }
+      else if (component.hasOwnProperty('customDefaultValue')) {
+        if (typeof component.customDefaultValue === 'string') {
+          try {
+            value = eval('(function(data) { var value = "";' + component.customDefaultValue + '; return value; })(data)');
+          }
+          catch (e) {
+            /* eslint-disable no-console */
+            console.warn('An error occurrend in a custom default value in ' + component.key, e);
+            /* eslint-enable no-console */
+            value = '';
+          }
+        }
+        else {
+          try {
+            value = formioUtils.jsonLogic.apply(component.customDefaultValue, {
+              data: submission ? submission.data : data,
+              row: data
+            });
+          }
+          catch (e) {
+            /* eslint-disable no-console */
+            console.warn('An error occurred calculating a value for ' + component.key, e);
+            /* eslint-enable no-console */
+            value = '';
+          }
+        }
+        data[component.key] = component.multiple ? [value] : value;
+        return done(true);
+      }
+      else if (component.hasOwnProperty('defaultValue')) {
+        // FA-835 - The default values for select boxes are set in the component.
+        if (component.type === 'selectboxes') {
+          return done(false);
+        }
+
+        // If there is a default value and it is not an array, wrap the value.
+        if (component.multiple && typeof component.defaultValue === 'string') {
+          value = component.defaultValue.split(',');
+        }
+        else {
+          value = component.defaultValue;
+        }
+
+        // If no default is provided, then skip...
+        if (!value || !value.length) {
+          return done(false);
+        }
+
+        // FOR-193 - Fix default value for the number component.
+        // FOR-262 - Fix multiple default value for the number component.
+        if (component.type === 'number') {
+          if (!component.multiple) {
+            // FOR-290 - Fix default values for number components, to allow decimal numbers.
+            if (component.defaultValue.indexOf('.') !== -1) {
+              data[component.key] = parseFloat(component.defaultValue);
+              return done(true);
+            }
+
+            data[component.key] = parseInt(component.defaultValue);
+            return done(true);
+          }
+
+          data[component.key] = value.map(function(item) {
+            try {
+              // FOR-290 - Fix default values for number components, to allow decimal numbers.
+              if (item.indexOf('.') !== -1) {
+                return parseFloat(item);
+              }
+
+              return parseInt(item);
+            }
+            catch (e) {
+              return 0;
+            }
+          });
+          return done(true);
+        }
+        // FOR-135 - Add default values for select components.
+        else if (component.type === 'select') {
+          // FOR-337 - Fix default values for select components without multi enabled.
+          if (!component.multiple) {
+            data[component.key] = component.defaultValue;
+            return done(true);
+          }
+
+          // If using the values input, split the default values, and search the options for each value in the list.
+          if (component.dataSrc === 'values') {
+            var temp = [];
+
+            component.data.values.forEach(function(item) {
+              if (value.indexOf(item.value) !== -1) {
+                temp.push(item);
+              }
+            });
+
+            data[component.key] = temp;
+            return done(true);
+          }
+          // If using json input, split the values and search each key path for the item
+          else if (component.dataSrc === 'json') {
+            if (typeof component.data.json === 'string') {
+              try {
+                component.data.json = JSON.parse(component.data.json);
+              }
+              catch (e) {
+                /* eslint-disable no-console */
+                console.log(e);
+                console.log('Could not parse the given JSON for the select component: ' + component.key);
+                console.log(component.data.json);
+                /* eslint-enable no-console */
+                component.data.json = [];
+              }
+            }
+
+            data[component.key] = this.pluckItems(value, component.data.json);
+            return done(true);
+          }
+          else if (component.dataSrc === 'url' || component.dataSrc === 'resource') {
+            // Wait until loading is done.
+            $scope.$on('selectLoaded', function() {
+              data[component.key] = this.pluckItems(value, $scope.selectItems);
+              return done(true);
+            }.bind(this));
+          }
+        }
+        // FOR-504 - Fix default values for survey components.
+        else if (component.type === 'survey') {
+          if (!component.hasOwnProperty('defaultValue')) {
+            return done(false);
+          }
+
+          data[component.key] = data[component.key] || {};
+          this.each(component.questions, function(question, next) {
+            setTimeout(function() {
+              data[component.key][question.value] = data[component.key][question.value] || component.defaultValue;
+              return next();
+            }, 1);
+          }, function() {
+            done(true);
+          });
+        }
+        else {
+          if (!component.multiple) {
+            data[component.key] = component.defaultValue;
+            return done(true);
+          }
+
+          // If there is a default value and it is an array, assign it to the value.
+          if (component.defaultValue instanceof Array) {
+            data[component.key] = component.defaultValue;
+            return done(true);
+          }
+
+          // Make the defaultValue a single element array because were multi.
+          data[component.key] = [component.defaultValue];
+          return done(true);
+        }
+      }
+      /* eslint-enable max-depth */
+    },
+    checkCalculated: function(component, submission, data) {
+      // Process calculated value stuff if present.
+      if (component.calculateValue) {
+        if (typeof component.calculateValue === 'string') {
+          try {
+            data[component.key] = eval('(function(data) { var value = [];' + component.calculateValue.toString() + '; return value; })(data)');
+          }
+          catch (e) {
+            /* eslint-disable no-console */
+            console.warn('An error occurred calculating a value for ' + component.key, e);
+            /* eslint-enable no-console */
+          }
+        }
+        else {
+          try {
+            data[component.key] = formioUtils.jsonLogic.apply(component.calculateValue, {
+              data: submission ? submission.data : data,
+              row: data
+            });
+          }
+          catch (e) {
+            /* eslint-disable no-console */
+            console.warn('An error occurred calculating a value for ' + component.key, e);
+            /* eslint-enable no-console */
+          }
         }
       }
     },
@@ -14776,7 +14751,7 @@ module.exports = function() {
   };
 };
 
-},{"formiojs/utils":65}],284:[function(_dereq_,module,exports){
+},{"formiojs/utils":65,"lodash/filter":210,"lodash/get":211}],284:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   var generic = function(data, component) {

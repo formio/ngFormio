@@ -209,106 +209,106 @@ module.exports = function() {
             }
           }
 
-          // Create a sanitized submission object.
-          var submissionData = {data: {}};
-          if ($scope.submission._id) {
-            submissionData._id = $scope.submission._id;
-          }
-          if ($scope.submission.data._id) {
-            submissionData._id = $scope.submission.data._id;
-          }
-
-          var grabIds = function(input) {
-            if (!input) {
-              return [];
-            }
-
-            if (!(input instanceof Array)) {
-              input = [input];
-            }
-
-            var final = [];
-            input.forEach(function(element) {
-              if (element && element._id) {
-                final.push(element._id);
-              }
-            });
-
-            return final;
-          };
-
-          var defaultPermissions = {};
-          FormioUtils.eachComponent($scope.form.components, function(component) {
-            if (component.type === 'resource' && component.key && component.defaultPermission) {
-              defaultPermissions[component.key] = component.defaultPermission;
-            }
-            if (submissionData.data.hasOwnProperty(component.key) && (component.type === 'number')) {
-              var value = $scope.submission.data[component.key];
-              if (component.type === 'number') {
-                submissionData.data[component.key] = value ? parseFloat(value) : 0;
-              }
-              else {
-                submissionData.data[component.key] = value;
-              }
-            }
-          }, true);
-
-          angular.forEach($scope.submission.data, function(value, key) {
-            submissionData.data[key] = value;
-
-            // Setup the submission access.
-            var perm = defaultPermissions[key];
-            if (perm) {
-              submissionData.access = submissionData.access || [];
-
-              // Coerce value into an array for plucking.
-              if (!(value instanceof Array)) {
-                value = [value];
-              }
-
-              // Try to find and update an existing permission.
-              var found = false;
-              submissionData.access.forEach(function(permission) {
-                if (permission.type === perm) {
-                  found = true;
-                  permission.resources = permission.resources || [];
-                  permission.resources.concat(grabIds(value));
-                }
-              });
-
-              // Add a permission, because one was not found.
-              if (!found) {
-                submissionData.access.push({
-                  type: perm,
-                  resources: grabIds(value)
-                });
-              }
-            }
-          });
-          // Strip out any angular keys.
-          submissionData = angular.copy(submissionData);
-
-          var submitEvent = $scope.$emit('formSubmit', submissionData);
-          if (submitEvent.defaultPrevented) {
-              // Listener wants to cancel the form submission
-              return;
-          }
-
-          var onDone = function(submission) {
-            if ($scope.storage && !$scope.readOnly) {
-              localStorage.setItem($scope.storage, '');
-            }
-            $scope.showAlerts({
-              type: 'success',
-              message: 'Submission Complete!'
-            });
-            $scope.$emit('formSubmission', submission);
-          };
-
-          FormioUtils.alter('submit', $scope, submissionData, function(err) {
+          FormioUtils.alter('submit', $scope, $scope.submission, function(err) {
             if (err) {
               return this.showAlerts(err.alerts);
             }
+
+            // Create a sanitized submission object.
+            var submissionData = {data: {}};
+            if ($scope.submission._id) {
+              submissionData._id = $scope.submission._id;
+            }
+            if ($scope.submission.data._id) {
+              submissionData._id = $scope.submission.data._id;
+            }
+
+            var grabIds = function(input) {
+              if (!input) {
+                return [];
+              }
+
+              if (!(input instanceof Array)) {
+                input = [input];
+              }
+
+              var final = [];
+              input.forEach(function(element) {
+                if (element && element._id) {
+                  final.push(element._id);
+                }
+              });
+
+              return final;
+            };
+
+            var defaultPermissions = {};
+            FormioUtils.eachComponent($scope.form.components, function(component) {
+              if (component.type === 'resource' && component.key && component.defaultPermission) {
+                defaultPermissions[component.key] = component.defaultPermission;
+              }
+              if (submissionData.data.hasOwnProperty(component.key) && (component.type === 'number')) {
+                var value = $scope.submission.data[component.key];
+                if (component.type === 'number') {
+                  submissionData.data[component.key] = value ? parseFloat(value) : 0;
+                }
+                else {
+                  submissionData.data[component.key] = value;
+                }
+              }
+            }, true);
+
+            angular.forEach($scope.submission.data, function(value, key) {
+              submissionData.data[key] = value;
+
+              // Setup the submission access.
+              var perm = defaultPermissions[key];
+              if (perm) {
+                submissionData.access = submissionData.access || [];
+
+                // Coerce value into an array for plucking.
+                if (!(value instanceof Array)) {
+                  value = [value];
+                }
+
+                // Try to find and update an existing permission.
+                var found = false;
+                submissionData.access.forEach(function(permission) {
+                  if (permission.type === perm) {
+                    found = true;
+                    permission.resources = permission.resources || [];
+                    permission.resources.concat(grabIds(value));
+                  }
+                });
+
+                // Add a permission, because one was not found.
+                if (!found) {
+                  submissionData.access.push({
+                    type: perm,
+                    resources: grabIds(value)
+                  });
+                }
+              }
+            });
+            // Strip out any angular keys.
+            submissionData = angular.copy(submissionData);
+
+            var submitEvent = $scope.$emit('formSubmit', submissionData);
+            if (submitEvent.defaultPrevented) {
+              // Listener wants to cancel the form submission
+              return;
+            }
+
+            var onDone = function(submission) {
+              if ($scope.storage && !$scope.readOnly) {
+                localStorage.setItem($scope.storage, '');
+              }
+              $scope.showAlerts({
+                type: 'success',
+                message: 'Submission Complete!'
+              });
+              $scope.$emit('formSubmission', submission);
+            };
 
             // Save to specified action.
             if ($scope.action) {
@@ -507,17 +507,26 @@ module.exports = function() {
           });
 
           // FOR-71
-          if (!$scope.builder && hasConditionalPages) {
+          if (!$scope.builder) {
             $scope.$watch('submission.data', function(data) {
-              var newPages = [];
-              angular.forEach(allPages, function(page) {
-                if (FormioUtils.isVisible(page, null, data)) {
-                  newPages.push(page);
+              if (hasConditionalPages) {
+                var newPages = [];
+                angular.forEach(allPages, function(page) {
+                  if (FormioUtils.isVisible(page, null, data)) {
+                    newPages.push(page);
+                  }
+                });
+                $scope.pages = newPages;
+                updatePages();
+                setTimeout($scope.$apply.bind($scope), 10);
+              }
+
+              // Calculate values for hidden fields outside of wizard.
+              angular.forEach(form.components, function(component) {
+                if (component.type !== 'panel') {
+                  FormioUtils.checkCalculated(component, $scope.submission, $scope.submission.data);
                 }
               });
-              $scope.pages = newPages;
-              updatePages();
-              setTimeout($scope.$apply.bind($scope), 10);
             }, true);
           }
 
