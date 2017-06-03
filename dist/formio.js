@@ -13650,7 +13650,13 @@ module.exports = function() {
             // Change all of the fields to not be pristine.
             angular.forEach($element.find('[name="formioForm"]').find('*'), function(element) {
               var elementScope = angular.element(element).scope();
+              if (!elementScope || !elementScope.component) {
+                return;
+              }
               var fieldForm = elementScope.formioForm;
+              if (!fieldForm) {
+                return;
+              }
               if (fieldForm[elementScope.component.key]) {
                 fieldForm[elementScope.component.key].$pristine = false;
               }
