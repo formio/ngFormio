@@ -16,6 +16,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Upgrade ng-dialog to v1.3.0
  - Upgrade bootstrap-ui-datetime-picker to v2.6.0
 
+### Fixed
+ - Default issue with the number field.
+
 ## 2.18.5
 ### Added
  - Add headers to Select Urls if specified.
