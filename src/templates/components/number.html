@@ -1,5 +1,5 @@
 <input
-  type="{{ component.inputType }}"
+  type="number"
   class="form-control"
   id="{{ componentId }}"
   name="{{ componentId }}"
@@ -8,9 +8,9 @@
   ng-required="isRequired(component)"
   ng-disabled="readOnly"
   safe-multiple-to-single
-  min="{{ component.validate.min }}"
-  max="{{ component.validate.max }}"
-  step="{{ component.validate.step }}"
+  ng-attr-min="{{ component.validate.min }}"
+  ng-attr-max="{{ component.validate.max }}"
+  ng-attr-step="{{ component.validate.step }}"
   ng-attr-placeholder="{{ component.placeholder | formioTranslate:null:builder }}"
   custom-validator="component.validate.custom"
   ui-mask="{{ component.inputMask }}"
