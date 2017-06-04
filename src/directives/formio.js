@@ -279,106 +279,111 @@ module.exports = function() {
           }
 
           form.submitting = true;
-
-          // Create a sanitized submission object.
-          var submissionData = {data: {}};
-          if ($scope.submission._id) {
-            submissionData._id = $scope.submission._id;
-          }
-          if ($scope.submission.data._id) {
-            submissionData._id = $scope.submission.data._id;
-          }
-
-          var grabIds = function(input) {
-            if (!input) {
-              return [];
+          FormioUtils.alter('submit', $scope, $scope.submission, function(err) {
+            if (err) {
+              return this.showAlerts(err.alerts);
             }
 
-            if (!(input instanceof Array)) {
-              input = [input];
+            // Create a sanitized submission object.
+            var submissionData = {data: {}};
+            if ($scope.submission._id) {
+              submissionData._id = $scope.submission._id;
+            }
+            if ($scope.submission.data._id) {
+              submissionData._id = $scope.submission.data._id;
             }
 
-            var final = [];
-            input.forEach(function(element) {
-              if (element && element._id) {
-                final.push(element._id);
-              }
-            });
-
-            return final;
-          };
-
-          var defaultPermissions = {};
-          FormioUtils.eachComponent($scope.form.components, function(component) {
-            if (component.type === 'resource' && component.key && component.defaultPermission) {
-              defaultPermissions[component.key] = component.defaultPermission;
-            }
-            if ($scope.submission.data.hasOwnProperty(component.key)) {
-              var value = $scope.submission.data[component.key];
-              if (component.type === 'number' && (value !== null)) {
-                submissionData.data[component.key] = value ? parseFloat(value) : 0;
-              }
-              else {
-                submissionData.data[component.key] = value;
-              }
-            }
-          }, true);
-
-          angular.forEach($scope.submission.data, function(value, key) {
-            if (value && !value.hasOwnProperty('_id')) {
-              submissionData.data[key] = value;
-            }
-
-            // Setup the submission access.
-            var perm = defaultPermissions[key];
-            if (perm) {
-              submissionData.access = submissionData.access || [];
-
-              // Coerce value into an array for plucking.
-              if (!(value instanceof Array)) {
-                value = [value];
+            var grabIds = function(input) {
+              if (!input) {
+                return [];
               }
 
-              // Try to find and update an existing permission.
-              var found = false;
-              submissionData.access.forEach(function(permission) {
-                if (permission.type === perm) {
-                  found = true;
-                  permission.resources = permission.resources || [];
-                  permission.resources.concat(grabIds(value));
+              if (!(input instanceof Array)) {
+                input = [input];
+              }
+
+              var final = [];
+              input.forEach(function(element) {
+                if (element && element._id) {
+                  final.push(element._id);
                 }
               });
 
-              // Add a permission, because one was not found.
-              if (!found) {
-                submissionData.access.push({
-                  type: perm,
-                  resources: grabIds(value)
-                });
+              return final;
+            };
+
+            var defaultPermissions = {};
+            FormioUtils.eachComponent($scope.form.components, function(component) {
+              if (component.type === 'resource' && component.key && component.defaultPermission) {
+                defaultPermissions[component.key] = component.defaultPermission;
               }
+              if ($scope.submission.data.hasOwnProperty(component.key)) {
+                var value = $scope.submission.data[component.key];
+                if (component.type === 'number' && (value !== null)) {
+                  submissionData.data[component.key] = value ? parseFloat(value) : 0;
+                }
+                else {
+                  submissionData.data[component.key] = value;
+                }
+              }
+            }, true);
+
+            angular.forEach($scope.submission.data, function(value, key) {
+              if (value && !value.hasOwnProperty('_id')) {
+                submissionData.data[key] = value;
+              }
+
+              // Setup the submission access.
+              var perm = defaultPermissions[key];
+              if (perm) {
+                submissionData.access = submissionData.access || [];
+
+                // Coerce value into an array for plucking.
+                if (!(value instanceof Array)) {
+                  value = [value];
+                }
+
+                // Try to find and update an existing permission.
+                var found = false;
+                submissionData.access.forEach(function(permission) {
+                  if (permission.type === perm) {
+                    found = true;
+                    permission.resources = permission.resources || [];
+                    permission.resources.concat(grabIds(value));
+                  }
+                });
+
+                // Add a permission, because one was not found.
+                if (!found) {
+                  submissionData.access.push({
+                    type: perm,
+                    resources: grabIds(value)
+                  });
+                }
+              }
+            });
+
+            // Allow the form to be completed externally.
+            $scope.$on('submitDone', function(event, submission, message) {
+              onSubmit(submission, message, form);
+            });
+
+            // Allow an error to be thrown externally.
+            $scope.$on('submitError', function(event, error) {
+              FormioScope.onError($scope, $element)(error);
+            });
+
+            var submitEvent = $scope.$emit('formSubmit', submissionData);
+            if (submitEvent.defaultPrevented) {
+              // Listener wants to cancel the form submission
+              form.submitting = false;
+              return;
             }
-          });
 
-          // Allow the form to be completed externally.
-          $scope.$on('submitDone', function(event, submission, message) {
-            onSubmit(submission, message, form);
-          });
-
-          // Allow an error to be thrown externally.
-          $scope.$on('submitError', function(event, error) {
-            FormioScope.onError($scope, $element)(error);
-          });
-
-          var submitEvent = $scope.$emit('formSubmit', submissionData);
-          if (submitEvent.defaultPrevented) {
-            // Listener wants to cancel the form submission
-            form.submitting = false;
-            return;
-          }
-
-          // Make sure to make a copy of the submission data to remove bad characters.
-          submissionData = angular.copy(submissionData);
-          $scope.submitForm(submissionData, form);
+            // Make sure to make a copy of the submission data to remove bad characters.
+            submissionData = angular.copy(submissionData);
+            $scope.submitForm(submissionData, form);
+          }.bind(this));
         };
       }
     ],

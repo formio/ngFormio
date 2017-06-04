@@ -1,0 +1,2 @@
+<i style="font-size: 2em;" ng-if="!componentForm" ng-class="{'formio-hidden': componentForm}" class="formio-loading glyphicon glyphicon-refresh glyphicon-spin"></i>
+<formio ng-if="componentForm" form="componentForm" submission="data[component.key]"></formio>

@@ -4,7 +4,20 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## 2.19.0
+### Added
+ - Form component to allow for complex multi-form workflows.
+ - Dynamic next page to the wizard.
+ - Hook system that allows any external system to hook into the submit and nextPage handlers.
+
+### Changed
+ - Moved the default value checks to a common utils file to save code duplication.
+ - Moved calculated values into utils for code simplification.
+ - Upgrade ng-dialog to v1.3.0
+ - Upgrade bootstrap-ui-datetime-picker to v2.6.0
+
+### Fixed
+ - Default issue with the number field.
 
 ## 2.18.5
 ### Added
