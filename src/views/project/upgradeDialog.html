@@ -18,30 +18,81 @@
     </div>
 
     <div ng-switch="selectedPlan">
+      <table ng-switch-when="trial" class="table table-condensed feature-table">
+        <tr>
+          <td>Form and Data Management</td>
+          <td class="text-right"><i class="fa fa-check"></i></td>
+        </tr>
+        <tr>
+          <td>Role Based Access Control</td>
+          <td class="text-right"><i class="fa fa-check"></i></td>
+        </tr>
+        <tr>
+          <td>Premium Actions</td>
+          <td class="text-right"><i class="fa fa-check"></i></td>
+        </tr>
+        <tr>
+          <td>3rd Party Email Providers</td>
+          <td class="text-right"><i class="fa fa-check"></i></td>
+        </tr>
+        <tr>
+          <td>Custom Subdomains</td>
+          <td class="text-right">&nbsp;</i></td>
+        </tr>
+        <tr>
+          <td>Offline Mode</td>
+          <td class="text-right"><i class="fa fa-check"></i></td>
+        </tr>
+        <tr>
+          <td>File Uploads</td>
+          <td class="text-right"><i class="fa fa-check"></i></td>
+        </tr>
+        <tr>
+          <td>CORS</td>
+          <td class="text-right"><i class="fa fa-check"></i></td>
+        </tr>
+        <tr>
+          <td>Websocket Integration</td>
+          <td class="text-right"><i class="fa fa-check"></i></td>
+        </tr>
+        <tr>
+          <td>Team Collaboration</td>
+          <td class="text-right"><i class="fa fa-check"></i></td>
+        </tr>
+        <tr>
+          <td>Project Environments</td>
+          <td class="text-right"><i class="fa fa-check"></i></td>
+        </tr>
+        <tr>
+          <td>Priority Support</td>
+          <td class="text-right">&nbsp;</td>
+        </tr>
+        <tr>
+          <td># of Submission Requests</td>
+          <td class="text-right"><strong>10,000</strong></td>
+        </tr>
+      </table>
+
       <table ng-switch-when="basic" class="table table-condensed feature-table">
         <tr>
-          <td>Individual Developers</td>
+          <td>Form and Data Management</td>
           <td class="text-right"><i class="fa fa-check"></i></td>
         </tr>
         <tr>
-          <td>Basic Actions</td>
+          <td>Role Based Access Control</td>
           <td class="text-right"><i class="fa fa-check"></i></td>
         </tr>
         <tr>
-          <td>Assigned Domains</td>
-          <td class="text-right"><i class="fa fa-check"></i></td>
+          <td>Premium Actions</td>
+          <td class="text-right">&nbsp;</i></td>
         </tr>
         <tr>
-          <td>Data Management</td>
-          <td class="text-right"><i class="fa fa-check"></i></td>
+          <td>3rd Party Email Providers</td>
+          <td class="text-right">&nbsp;</i></td>
         </tr>
         <tr>
-          <td>DIY Email Gateway</td>
-          <td class="text-right"><i class="fa fa-check"></i></td>
-        </tr>
-        <tr>
-          <td>Multi-resource Auth</td>
-          <td class="text-right"><i class="fa fa-check"></i></td>
+          <td>Custom Subdomains</td>
+          <td class="text-right">&nbsp;</i></td>
         </tr>
         <tr>
           <td>Offline Mode</td>
@@ -60,11 +111,11 @@
           <td class="text-right">&nbsp;</td>
         </tr>
         <tr>
-          <td>On-Site Deployment</td>
+          <td>Team Collaboration</td>
           <td class="text-right">&nbsp;</td>
         </tr>
         <tr>
-          <td>Independent Database</td>
+          <td>Project Environments</td>
           <td class="text-right">&nbsp;</td>
         </tr>
         <tr>
@@ -72,14 +123,18 @@
           <td class="text-right"><i class="fa fa-check"></i></td>
         </tr>
         <tr>
-          <td># of Requests</td>
+          <td># of Submission Requests</td>
           <td class="text-right"><strong>1,000</strong></td>
         </tr>
       </table>
 
       <table ng-switch-when="independent" class="table table-condensed feature-table">
         <tr>
-          <td>Individual Developers</td>
+          <td>Form and Data Management</td>
+          <td class="text-right"><i class="fa fa-check"></i></td>
+        </tr>
+        <tr>
+          <td>Role Based Access Control</td>
           <td class="text-right"><i class="fa fa-check"></i></td>
         </tr>
         <tr>
@@ -87,19 +142,11 @@
           <td class="text-right"><i class="fa fa-check"></i></td>
         </tr>
         <tr>
-          <td>Self Selected Domains</td>
+          <td>3rd Party Email Providers</td>
           <td class="text-right"><i class="fa fa-check"></i></td>
         </tr>
         <tr>
-          <td>Data Management</td>
-          <td class="text-right"><i class="fa fa-check"></i></td>
-        </tr>
-        <tr>
-          <td>Multiple Email Providers</td>
-          <td class="text-right"><i class="fa fa-check"></i></td>
-        </tr>
-        <tr>
-          <td>Multi-resource &amp; OAuth Auth</td>
+          <td>Custom Subdomains</td>
           <td class="text-right"><i class="fa fa-check"></i></td>
         </tr>
         <tr>
@@ -119,11 +166,11 @@
           <td class="text-right">&nbsp;</td>
         </tr>
         <tr>
-          <td>On-Site Deployment</td>
+          <td>Team Collaboration</td>
           <td class="text-right">&nbsp;</td>
         </tr>
         <tr>
-          <td>Independent Database</td>
+          <td>Project Environments</td>
           <td class="text-right">&nbsp;</td>
         </tr>
         <tr>
@@ -131,14 +178,18 @@
           <td class="text-right"><i class="fa fa-check"></i></td>
         </tr>
         <tr>
-          <td># of Requests</td>
+          <td># of Submission Requests</td>
           <td class="text-right"><strong>10,000</strong></td>
         </tr>
       </table>
 
       <table ng-switch-when="team" class="table table-condensed feature-table">
         <tr>
-          <td>Team Collaboration</td>
+          <td>Form and Data Management</td>
+          <td class="text-right"><i class="fa fa-check"></i></td>
+        </tr>
+        <tr>
+          <td>Role Based Access Control</td>
           <td class="text-right"><i class="fa fa-check"></i></td>
         </tr>
         <tr>
@@ -146,19 +197,11 @@
           <td class="text-right"><i class="fa fa-check"></i></td>
         </tr>
         <tr>
-          <td>Self Selected Domains</td>
+          <td>3rd Party Email Providers</td>
           <td class="text-right"><i class="fa fa-check"></i></td>
         </tr>
         <tr>
-          <td>Data Management</td>
-          <td class="text-right"><i class="fa fa-check"></i></td>
-        </tr>
-        <tr>
-          <td>Multiple Email Providers</td>
-          <td class="text-right"><i class="fa fa-check"></i></td>
-        </tr>
-        <tr>
-          <td>Multi-resource &amp; OAuth Auth</td>
+          <td>Custom Subdomains</td>
           <td class="text-right"><i class="fa fa-check"></i></td>
         </tr>
         <tr>
@@ -178,95 +221,30 @@
           <td class="text-right"><i class="fa fa-check"></i></td>
         </tr>
         <tr>
-          <td>On-Site Deployment</td>
-          <td class="text-right">&nbsp;</td>
-        </tr>
-        <tr>
-          <td>Independent Database</td>
-          <td class="text-right">&nbsp;</td>
-        </tr>
-        <tr>
-          <td>Priority Support</td>
-          <td class="text-right"><i class="fa fa-check"></i></td>
-        </tr>
-        <tr>
-          <td colspan="2">
-            <table class="table table-condensed table-bordered">
-              <tr>
-                <td>250k Requests</td>
-                <td>$100/mo</td>
-              </tr>
-              <tr>
-                <td>500k Requests</td>
-                <td>$250/mo</td>
-              </tr>
-              <tr>
-                <td>2M Requests</td>
-                <td>$500/mo</td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-      </table>
-
-      <table ng-switch-when="trial" class="table table-condensed feature-table">
-        <tr>
           <td>Team Collaboration</td>
           <td class="text-right"><i class="fa fa-check"></i></td>
         </tr>
         <tr>
-          <td>Premium Actions</td>
-          <td class="text-right"><i class="fa fa-check"></i></td>
-        </tr>
-        <tr>
-          <td>Self Selected Domains</td>
-          <td class="text-right">&nbsp;</td>
-        </tr>
-        <tr>
-          <td>Data Management</td>
-          <td class="text-right"><i class="fa fa-check"></i></td>
-        </tr>
-        <tr>
-          <td>Multiple Email Providers</td>
-          <td class="text-right"><i class="fa fa-check"></i></td>
-        </tr>
-        <tr>
-          <td>Multi-resource &amp; OAuth Auth</td>
-          <td class="text-right"><i class="fa fa-check"></i></td>
-        </tr>
-        <tr>
-          <td>Offline Mode</td>
-          <td class="text-right"><i class="fa fa-check"></i></td>
-        </tr>
-        <tr>
-          <td>File Uploads</td>
-          <td class="text-right"><i class="fa fa-check"></i></td>
-        </tr>
-        <tr>
-          <td>CORS</td>
-          <td class="text-right"><i class="fa fa-check"></i></td>
-        </tr>
-        <tr>
-          <td>Websocket Integration</td>
-          <td class="text-right"><i class="fa fa-check"></i></td>
-        </tr>
-        <tr>
-          <td>On-Site Deployment</td>
-          <td class="text-right">&nbsp;</td>
-        </tr>
-        <tr>
-          <td>Independent Database</td>
+          <td>Project Environments</td>
           <td class="text-right">&nbsp;</td>
         </tr>
         <tr>
           <td>Priority Support</td>
-          <td class="text-right">&nbsp;</td>
+          <td class="text-right"><i class="fa fa-check"></i></td>
+        </tr>
+        <tr>
+          <td># of Submission Requests</td>
+          <td class="text-right"><strong>250,000</strong></td>
         </tr>
       </table>
 
       <table ng-switch-when="commercial" class="table table-condensed feature-table">
         <tr>
-          <td>Team Collaboration</td>
+          <td>Form and Data Management</td>
+          <td class="text-right"><i class="fa fa-check"></i></td>
+        </tr>
+        <tr>
+          <td>Role Based Access Control</td>
           <td class="text-right"><i class="fa fa-check"></i></td>
         </tr>
         <tr>
@@ -274,19 +252,11 @@
           <td class="text-right"><i class="fa fa-check"></i></td>
         </tr>
         <tr>
-          <td>Self Selected Domains</td>
+          <td>3rd Party Email Providers</td>
           <td class="text-right"><i class="fa fa-check"></i></td>
         </tr>
         <tr>
-          <td>Data Management</td>
-          <td class="text-right"><i class="fa fa-check"></i></td>
-        </tr>
-        <tr>
-          <td>Multiple Email Providers</td>
-          <td class="text-right"><i class="fa fa-check"></i></td>
-        </tr>
-        <tr>
-          <td>Multi-resource &amp; OAuth Auth</td>
+          <td>Custom Subdomains</td>
           <td class="text-right"><i class="fa fa-check"></i></td>
         </tr>
         <tr>
@@ -306,11 +276,11 @@
           <td class="text-right"><i class="fa fa-check"></i></td>
         </tr>
         <tr>
-          <td>On-Site Deployment</td>
+          <td>Team Collaboration</td>
           <td class="text-right"><i class="fa fa-check"></i></td>
         </tr>
         <tr>
-          <td>Independent Database</td>
+          <td>Project Environments</td>
           <td class="text-right"><i class="fa fa-check"></i></td>
         </tr>
         <tr>
@@ -318,22 +288,8 @@
           <td class="text-right"><i class="fa fa-check"></i></td>
         </tr>
         <tr>
-          <td colspan="2">
-            <table class="table table-condensed table-bordered">
-              <tr>
-                <td>Per Instance</td>
-                <td>$250/mo</td>
-              </tr>
-              <tr>
-                <td>Per 3 Instances</td>
-                <td>$500/mo</td>
-              </tr>
-              <tr>
-                <td>Form Management</td>
-                <td>$100/mo</td>
-              </tr>
-            </table>
-          </td>
+          <td># of Submission Requests</td>
+          <td class="text-right"><strong>2,000,000</strong></td>
         </tr>
       </table>
     </div>
