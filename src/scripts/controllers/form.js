@@ -612,6 +612,7 @@ app.controller('FormEditController', [
     // Track any modifications for save/cancel prompt on navigation away from the builder.
     var dirty = false;
     var contentLoaded = false;
+    var formSubmit = false;
     $scope.$on('formBuilder:add', function(event) {
       // FOR-488 - Fix issues with loading the content component and flagging the builder as dirty.
       if (event.targetScope.formComponent.settings.type === 'content') {
@@ -626,8 +627,10 @@ app.controller('FormEditController', [
         contentLoaded = true;
         return;
       }
-
-      dirty = true;
+      if(formSubmit = true)
+        dirty = false;
+      else
+        dirty = true;
     });
     $scope.$on('formBuilder:remove', function() {
       dirty = true;
@@ -641,6 +644,7 @@ app.controller('FormEditController', [
     $scope.saveForm = function() {
       contentLoaded = false;
       dirty = false;
+      formSubmit = true;
       return parentSave();
     };
 
