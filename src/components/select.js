@@ -439,7 +439,8 @@ module.exports = function(app) {
                     lastInput = input;
                     newUrl = newUrl || url;
                     newUrl = $interpolate(newUrl)({
-                      data: $scope.data,
+                      data: $scope.submission.data,
+                      row: $scope.data,
                       formioBase: $rootScope.apiBase || 'https://api.form.io'
                     });
                     if (!newUrl) {
@@ -460,7 +461,10 @@ module.exports = function(app) {
 
                     // Add the other filter.
                     if (settings.filter) {
-                      var filter = $interpolate(settings.filter)({data: $scope.data});
+                      var filter = $interpolate(settings.filter)({
+                        data: $scope.submission.data,
+                        row: $scope.data
+                      });
                       // This changes 'a=b&c=d' into an object and assigns to params.
                       _assign(options.params, JSON.parse('{"' + decodeURI(filter).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}'));
                     }
