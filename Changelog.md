@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Added
+ - Added 'disable limiting response' option for select component with url as datasource.
+
 ## 2.18.4
 ### Fixed
  - Fixed issues with validation on submit

@@ -499,6 +499,20 @@ module.exports = function(app) {
                       promise = (new Formio(newUrl)).loadSubmissions(options);
                     }
                     else {
+                      // Add in headers if specified
+                      if ($scope.component.data.hasOwnProperty('headers') && $scope.component.data.headers.length > 0) {
+                        options.headers = _assign(options.headers, $scope.component.data.headers.reduce(function(headers, current) {
+                          if (current.key) {
+                            headers[current.key] = current.value;
+                          }
+                          return headers;
+                        }, {}));
+                      }
+                      //If disableLimit is true and data source is 'url' then removing 'limit' and 'skip' parameters from options.
+                      if (settings.dataSrc === 'url' && settings.data.disableLimit) {
+                        delete options.params.limit;
+                        delete options.params.skip;
+                      }
                       promise = $http.get(newUrl, options).then(function(result) {
                         return result.data;
                       });
