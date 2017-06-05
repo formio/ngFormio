@@ -5,13 +5,13 @@
   },
   "scripts": {
     "start": "node app.js",
-    "test": "APPPROTOCOL=http APPDOMAIN=portal.localhost APPPORT=$PORT mocha --timeout 60000 --reporter spec test/test.js",
+    "test": "APPPROTOCOL=http APPDOMAIN=portal.localhost APPPORT=$PORT mocha --timeout 60000 --retries 3 -b --reporter spec test/test.js",
     "test-win": "mocha --timeout 60000 --reporter spec test/test.js"
   },
   "main": "./index.js",
   "devDependencies": {
     "autoprefixer-core": "^4.0.2",
-    "browser-sync": "^2.18.8",
+    "browser-sync": "^2.18.12",
     "chance": "^0.7.7",
     "del": "^1.1.1",
     "gulp": "^3.6.0",
