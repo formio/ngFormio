@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Fixed 
+ - Fixed wizard validation
+
 ## 2.18.5
 ### Added
  - Add headers to Select Urls if specified.
