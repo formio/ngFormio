@@ -19,6 +19,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
  - Default issue with the number field.
 
+### Fixed
+ - Fix select url interpolation inside a datagrid to have both data and row.
+
 ## 2.18.5
 ### Added
  - Add headers to Select Urls if specified.
