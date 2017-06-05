@@ -1009,9 +1009,9 @@ angular
         trial: {
           order: 0,
           name: 'trial',
-          title: 'Team Pro Trial',
+          title: 'Trial',
           labelStyle: 'label-trial',
-          priceDescription: 'Free 30 day trial'
+          priceDescription: 'Free for 30 days'
         },
         basic: {
           order: 1,
@@ -1030,16 +1030,16 @@ angular
         team: {
           order: 3,
           name: 'team',
-          title: 'Team Pro Hosted',
+          title: 'Team Pro',
           labelStyle: 'label-success',
-          priceDescription: 'Starting at $100/mo'
+          priceDescription: '$100/mo'
         },
         commercial: {
           order: 4,
           name: 'commercial',
-          title: 'Team Pro On Site',
+          title: 'Commercial',
           labelStyle: 'label-commercial',
-          priceDescription: 'Starting at $250/mo per instance'
+          priceDescription: '$250/mo'
         }
       },
       getPlans: function() {
