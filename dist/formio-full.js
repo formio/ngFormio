@@ -79855,7 +79855,8 @@ module.exports = function(app) {
                     lastInput = input;
                     newUrl = newUrl || url;
                     newUrl = $interpolate(newUrl)({
-                      data: $scope.data,
+                      data: $scope.submission.data,
+                      row: $scope.data,
                       formioBase: $rootScope.apiBase || 'https://api.form.io'
                     });
                     if (!newUrl) {
@@ -79876,7 +79877,10 @@ module.exports = function(app) {
 
                     // Add the other filter.
                     if (settings.filter) {
-                      var filter = $interpolate(settings.filter)({data: $scope.data});
+                      var filter = $interpolate(settings.filter)({
+                        data: $scope.submission.data,
+                        row: $scope.data
+                      });
                       // This changes 'a=b&c=d' into an object and assigns to params.
                       _assign(options.params, JSON.parse('{"' + decodeURI(filter).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}'));
                     }
@@ -79924,6 +79928,13 @@ module.exports = function(app) {
                           return headers;
                         }, {}));
                       }
+
+                      //If disableLimit is true and data source is 'url' then removing 'limit' and 'skip' parameters from options.
+                      if (settings.dataSrc === 'url' && settings.data.disableLimit) {
+                        delete options.params.limit;
+                        delete options.params.skip;
+                      }
+
                       promise = $http.get(newUrl, options).then(function(result) {
                         return result.data;
                       });

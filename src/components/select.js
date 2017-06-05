@@ -512,6 +512,13 @@ module.exports = function(app) {
                           return headers;
                         }, {}));
                       }
+
+                      //If disableLimit is true and data source is 'url' then removing 'limit' and 'skip' parameters from options.
+                      if (settings.dataSrc === 'url' && settings.data.disableLimit) {
+                        delete options.params.limit;
+                        delete options.params.skip;
+                      }
+
                       promise = $http.get(newUrl, options).then(function(result) {
                         return result.data;
                       });

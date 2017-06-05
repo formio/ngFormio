@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+
+## 2.19.1
+### Added
+ - Added 'disable limiting response' option for select component with url as datasource.
+
+### Fixed
+ - Default issue with the number field.
+ - Fix select url interpolation inside a datagrid to have both data and row.
+
 ## 2.19.0
 ### Added
  - Form component to allow for complex multi-form workflows.
@@ -15,12 +25,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Moved calculated values into utils for code simplification.
  - Upgrade ng-dialog to v1.3.0
  - Upgrade bootstrap-ui-datetime-picker to v2.6.0
-
-### Fixed
- - Default issue with the number field.
-
-### Fixed
- - Fix select url interpolation inside a datagrid to have both data and row.
 
 ## 2.18.5
 ### Added
