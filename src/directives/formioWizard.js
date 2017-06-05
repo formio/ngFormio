@@ -174,7 +174,7 @@ module.exports = function() {
               });
             $scope.formioAlerts = [{
               type: 'danger',
-              message: 'Please fix the following errors before submitting.'
+              message: 'Please fix the following errors before proceeding.'
             }];
             return true;
           }
