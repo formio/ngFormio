@@ -162,17 +162,19 @@ module.exports = function() {
         // Check for errors.
         $scope.checkErrors = function() {
           if (!$scope.isValid()) {
-            // Change all of the fields to not be pristine.
-            angular.forEach($element.find('[name="formioForm"]').find('*'), function(element) {
-              var elementScope = angular.element(element).scope();
-              var fieldForm = elementScope.formioForm;
-              if (fieldForm[elementScope.component.key]) {
-                fieldForm[elementScope.component.key].$pristine = false;
-              }
-            });
+              angular.forEach($element.find('[name="formioForm"]').find("*"), function (element) {
+                var elementScope = angular.element(element).scope();
+                if (elementScope.formioForm) {
+                  var fieldForm = elementScope.formioForm;
+                  if (fieldForm[elementScope.component.key]) {
+                    fieldForm[elementScope.component.key].$pristine = false;
+                  }
+                }
+
+              });
             $scope.formioAlerts = [{
               type: 'danger',
-              message: 'Please fix the following errors before proceeding.'
+              message: 'Please fix the following errors before submitting.'
             }];
             return true;
           }
