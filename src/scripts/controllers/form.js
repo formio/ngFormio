@@ -612,25 +612,23 @@ app.controller('FormEditController', [
     // Track any modifications for save/cancel prompt on navigation away from the builder.
     var dirty = false;
     var contentLoaded = false;
-    var formSubmit = false;
+    setTimeout(function() {
+      contentLoaded = true;
+    }, 3000);
+
     $scope.$on('formBuilder:add', function(event) {
       // FOR-488 - Fix issues with loading the content component and flagging the builder as dirty.
       if (event.targetScope.formComponent.settings.type === 'content') {
-        contentLoaded = true;
+        dirty = true;
       }
 
-      dirty = true;
     });
     $scope.$on('formBuilder:update', function(event) {
       // FOR-488 - Fix issues with loading the content component and flagging the builder as dirty.
-      if (!contentLoaded && event.targetScope.formComponent.settings.type === 'content') {
-        contentLoaded = true;
-        return;
-      }
-      if(formSubmit = true)
-        dirty = false;
-      else
+      if (contentLoaded && event.targetScope.formComponent.settings.type === 'content') {
         dirty = true;
+      }
+
     });
     $scope.$on('formBuilder:remove', function() {
       dirty = true;
@@ -644,7 +642,6 @@ app.controller('FormEditController', [
     $scope.saveForm = function() {
       contentLoaded = false;
       dirty = false;
-      formSubmit = true;
       return parentSave();
     };
 
