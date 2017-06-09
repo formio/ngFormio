@@ -6,9 +6,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [UNRELEASED]
 
+## 4.0.15
 ### Fixed
  - Some empty components were displaying incorrectly in submission grid.
 
+### Changed
+ - Upgraded ng-formio to 2.19.2
+ - Upgraded ng-formio-builder to 2.19.2
+
+## 4.0.14
 ### Changed
  - Upgraded ng-formio to 2.19.1
  - Upgraded ng-formio-builder to 2.19.1
