@@ -179,8 +179,10 @@ module.exports = function() {
           }
           form.$setDirty(true);
           for (var key in form) {
-            if (form[key] && form[key].$validate) {
+            if (form[key] && form[key].hasOwnProperty('$pristine')) {
               form[key].$setDirty(true);
+            }
+            if (form[key] && form[key].$validate) {
               form[key].$validate();
             }
           }
