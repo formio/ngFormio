@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## 2.19.2
+### Fixed
+ - Fix radio buttons validation highlighting.
+ - Fix select component crashing if no submission.
+ - Fix signature component within columns.
+
 ## 2.19.1
 ### Added
  - Added 'disable limiting response' option for select component with url as datasource.
