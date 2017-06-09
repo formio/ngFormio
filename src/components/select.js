@@ -438,9 +438,10 @@ module.exports = function(app) {
 
                     lastInput = input;
                     newUrl = newUrl || url;
+                    var submissionData = $scope.submission ? $scope.submission.data : {};
                     newUrl = $interpolate(newUrl)({
-                      data: $scope.submission.data,
-                      row: $scope.data,
+                      data: submissionData,
+                      row: $scope.data || {},
                       formioBase: $rootScope.apiBase || 'https://api.form.io'
                     });
                     if (!newUrl) {
@@ -461,8 +462,9 @@ module.exports = function(app) {
 
                     // Add the other filter.
                     if (settings.filter) {
+                      var submissionData = $scope.submission ? $scope.submission.data : {};
                       var filter = $interpolate(settings.filter)({
-                        data: $scope.submission.data,
+                        data: submissionData,
                         row: $scope.data
                       });
                       // This changes 'a=b&c=d' into an object and assigns to params.
