@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Upgraded ng-formio-builder to 2.19.1
 
 ### Fixed
+ - All spinners to give feedback.
  - Bugs with Teams and Access
  - Some empty components were displaying incorrectly in submission grid.
 

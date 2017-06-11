@@ -699,11 +699,13 @@ app.controller('FormEditController', [
   '$q',
   'ngDialog',
   '$state',
+  '$timeout',
   function(
     $scope,
     $q,
     ngDialog,
-    $state
+    $state,
+    $timeout
   ) {
     // Clone original form after it has loaded, or immediately
     // if we're not loading a form
@@ -718,7 +720,7 @@ app.controller('FormEditController', [
     // Track any modifications for save/cancel prompt on navigation away from the builder.
     var dirty = false;
     var contentLoaded = false;
-    setTimeout(function() {
+    $timeout(function() {
       contentLoaded = true;
     }, 3000);
 
