@@ -1,4 +1,4 @@
-/*! ng-formio v2.19.1 | https://unpkg.com/ng-formio@2.19.1/LICENSE.txt */
+/*! ng-formio v2.19.3 | https://unpkg.com/ng-formio@2.19.3/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -49181,6 +49181,8 @@ function _interopRequireDefault(obj) {
 var _get = _dereq_('lodash/get');
 
 module.exports = {
+  jsonLogic: _jsonLogicJs2.default, // Share
+
   /**
    * Determine if a component is a layout component or not.
    *
@@ -77549,7 +77551,7 @@ module.exports = function(app) {
     '$templateCache',
     function($templateCache) {
       $templateCache.put('formio/components/columns.html',
-        "<div class=\"row\">\n  <div ng-show=\"column.width\" class=\"col-sm-{{column.width}} col-sm-offset{{column.offset}} col-sm-push-{{column.push}} col-sm-pull-{{column.pull}}\" ng-repeat=\"column in component.columns track by $index\">\n    <formio-component\n      ng-repeat=\"_component in column.components track by $index\"\n      component=\"_component\"\n      data=\"data\"\n      formio=\"formio\"\n      submission=\"submission\"\n      hide-components=\"hideComponents\"\n      ng-if=\"builder ? '::true' : isVisible(_component, data)\"\n      formio-form=\"formioForm\"\n      read-only=\"isDisabled(_component, data)\"\n      grid-row=\"gridRow\"\n      grid-col=\"gridCol\"\n      builder=\"builder\"\n    ></formio-component>\n  </div>\n</div>\n"
+        "<div class=\"row\">\n  <div ng-show=\"column.width\" class=\"col-sm-{{column.width}} col-sm-offset-{{column.offset}} col-sm-push-{{column.push}} col-sm-pull-{{column.pull}}\" ng-repeat=\"column in component.columns track by $index\">\n    <formio-component\n      ng-repeat=\"_component in column.components track by $index\"\n      component=\"_component\"\n      data=\"data\"\n      formio=\"formio\"\n      submission=\"submission\"\n      hide-components=\"hideComponents\"\n      ng-if=\"builder ? '::true' : isVisible(_component, data)\"\n      formio-form=\"formioForm\"\n      read-only=\"isDisabled(_component, data)\"\n      grid-row=\"gridRow\"\n      grid-col=\"gridCol\"\n      builder=\"builder\"\n    ></formio-component>\n  </div>\n</div>\n"
       );
 
       $templateCache.put('formio/componentsView/columns.html',

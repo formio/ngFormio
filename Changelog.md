@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## 2.19.3
+### Fixed
+ - Issues with jsonLogic where the library was not shared with FormioUtils.
+ - Issue with a bad class within the columns component.
+
 ## 2.19.2
 ### Fixed
  - Fix radio buttons validation highlighting.
