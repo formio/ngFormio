@@ -306,9 +306,13 @@ app.controller('FormController', [
       $scope.uploading = true;
       $scope.formReady = false;
       var filePath = '/pdf/' + $scope.projectId + '/file';
+      var pdfServer = AppConfig.pdfServer;
+      if ($scope.currentProject.settings.pdfserver) {
+        pdfServer = $scope.currentProject.settings.pdfserver;
+      }
       PDFServer.ensureProject($scope.loadProjectPromise).then(function(project) {
         Upload.upload({
-          url: AppConfig.pdfServer + filePath,
+          url: pdfServer + filePath,
           data: {file: file},
           headers: {'x-file-token': project.settings.filetoken}
         }).then(function (res) {
@@ -319,7 +323,7 @@ app.controller('FormController', [
           }
           if (res.data && res.data.path) {
             $scope.form.settings.pdf = {
-              src: AppConfig.pdfServer + res.data.path,
+              src: pdfServer + res.data.path,
               id: res.data.file
             };
           }
