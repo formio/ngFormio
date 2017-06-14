@@ -113,6 +113,7 @@ module.exports = function() {
               sendIframeMessage({name: 'form', data: $scope.form});
             }
             if ($scope.submission) {
+              $scope.submission.readOnly = $scope.readOnly;
               sendIframeMessage({name: 'submission', data: $scope.submission});
             }
           }
@@ -131,7 +132,7 @@ module.exports = function() {
         });
 
         $scope.$on('submissionLoad', function(event, submission) {
-          submission.editable = !$scope.readOnly;
+          submission.readOnly = $scope.readOnly;
           sendIframeMessage({name: 'submission', data: submission});
         });
 

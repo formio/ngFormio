@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## 2.19.4
+### Fixed
+ - Issue with the iframe not setting the readonly flag properly on submissions.
+
 ## 2.19.3
 ### Fixed
  - Issues with jsonLogic where the library was not shared with FormioUtils.
