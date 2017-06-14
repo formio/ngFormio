@@ -803,6 +803,10 @@ input[type="password"][draggable="true"] {
   margin-right: 5px;
 }
 
+.attachments-slides img {
+  cursor: pointer;
+}
+
 .component-type-selectboxes .checkbox-inline input[type="checkbox"],
 .form-field-type-selectboxes .checkbox-inline input[type="checkbox"],
 .form-field-type-radio .radio-inline input[type="radio"]
