@@ -14,15 +14,19 @@ if (parts[0] === 'beta') {
   parts[0] = 'test-' + parts[0];
   serverHost = parts.join('.');
 }
+
 // Force portal and server to match protocols if not on localhost.
 if (apiProtocol !== protocol && ['localhost', 'portal.localhost', 'lvh.me', 'portal.lvh.me'].indexOf(window.location.hostname) === -1) {
-  var url = apiProtocol
-    + "//"
-    + window.location.host
-    + window.location.pathname;
-    + window.location.hash;
+  var response = confirm('The API protocol (' + apiProtocol + ') is different than this portal (' + protocol + '). Switch to ' + apiProtocol + '?');
+  if (response) {
+    var url = apiProtocol
+      + "//"
+      + window.location.host
+      + window.location.pathname;
+    + window.location.hash + urlQuery;
 
-  window.location.replace(url);
+    window.location.replace(url);
+  }
 }
 
 var appBase = protocol + '//' + host;
