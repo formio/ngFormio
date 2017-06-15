@@ -23,7 +23,7 @@ if (apiProtocol !== protocol && ['localhost', 'portal.localhost', 'lvh.me', 'por
       + "//"
       + window.location.host
       + window.location.pathname;
-    + window.location.hash + urlQuery;
+      + window.location.hash;
 
     window.location.replace(url);
   }
