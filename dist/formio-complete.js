@@ -67228,7 +67228,7 @@ module.exports = function(app) {
         group: 'layout',
         settings: {
           input: false,
-          tableView: true,
+          tableView: false,
           key: 'columns',
           columns: [{components: [], width: 6, offset: 0, push: 0, pull: 0},
                     {components: [], width: 6, offset: 0, push: 0, pull: 0}]
@@ -68138,7 +68138,7 @@ module.exports = function(app) {
         settings: {
           key: 'fieldset',
           input: false,
-          tableView: true,
+          tableView: false,
           legend: '',
           components: []
         },
@@ -68814,6 +68814,8 @@ module.exports = function(app) {
 },{}],234:[function(_dereq_,module,exports){
 "use strict";
 
+var GridUtils = _dereq_('../factories/GridUtils')();
+
 module.exports = function(app) {
   app.config([
     'formioComponentsProvider',
@@ -68827,9 +68829,26 @@ module.exports = function(app) {
           input: false,
           title: '',
           theme: 'default',
+          tableView: false,
           components: []
         },
-        viewTemplate: 'formio/componentsView/panel.html'
+        viewTemplate: 'formio/componentsView/panel.html',
+        tableView: function(data, component, $interpolate, componentInfo, tableChild) {
+          var view = '<table class="table table-striped table-bordered table-child">';
+
+          if (!tableChild) {
+            view += '<thead><tr>';
+            view += '<th>Panel (' + component.key + ')</th>';
+            view += '</tr></thead>';
+          }
+          view += '<tbody>';
+          angular.forEach(component.components, function(component) {
+            view += '<tr>' + GridUtils.columnForComponent(data, component, $interpolate, componentInfo, true) + '</tr>';
+          });
+
+          view += '</tbody></table>';
+          return view;
+        }
       });
     }
   ]);
@@ -68847,7 +68866,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],235:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":260}],235:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -70093,7 +70112,7 @@ module.exports = function(app) {
           bordered: false,
           hover: false,
           condensed: false,
-          tableView: true
+          tableView: false
         },
         tableView: function(data, component, $interpolate, componentInfo, tableChild) {
           var view = '<table class="table table-striped table-bordered table-child">';
@@ -70106,9 +70125,9 @@ module.exports = function(app) {
 
           view += '<tbody>';
 
-          for (var row = 0; row < this.settings.numRows; row++) {
+          for (var row = 0; row < component.numRows; row++) {
             view += '<tr>';
-            for (var col = 0; col < this.settings.numCols; col++) {
+            for (var col = 0; col < component.numCols; col++) {
               view += '<td>';
               // Each column is its own table.
               view += '<table class="table table-striped table-bordered table-child">';
@@ -70309,7 +70328,7 @@ module.exports = function(app) {
           key: 'well',
           input: false,
           components: [],
-          tableView: true
+          tableView: false
         },
         viewTemplate: 'formio/componentsView/well.html',
         tableView: function(data, component, $interpolate, componentInfo, tableChild) {
