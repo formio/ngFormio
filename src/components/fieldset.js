@@ -12,7 +12,7 @@ module.exports = function(app) {
         settings: {
           key: 'fieldset',
           input: false,
-          tableView: true,
+          tableView: false,
           legend: '',
           components: []
         },

@@ -4,7 +4,12 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [UNRELEASED]
+### Changed
+ - Change tableView default to false for layout components.
+
+### Added
+ - Add tableView template for panel component.
 
 ## 2.19.4
 ### Fixed

@@ -13,7 +13,7 @@ module.exports = function(app) {
           key: 'well',
           input: false,
           components: [],
-          tableView: true
+          tableView: false
         },
         viewTemplate: 'formio/componentsView/well.html',
         tableView: function(data, component, $interpolate, componentInfo, tableChild) {
