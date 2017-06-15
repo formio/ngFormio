@@ -21,7 +21,7 @@ module.exports = function(app) {
           bordered: false,
           hover: false,
           condensed: false,
-          tableView: true
+          tableView: false
         },
         tableView: function(data, component, $interpolate, componentInfo, tableChild) {
           var view = '<table class="table table-striped table-bordered table-child">';
@@ -34,9 +34,9 @@ module.exports = function(app) {
 
           view += '<tbody>';
 
-          for (var row = 0; row < this.settings.numRows; row++) {
+          for (var row = 0; row < component.numRows; row++) {
             view += '<tr>';
-            for (var col = 0; col < this.settings.numCols; col++) {
+            for (var col = 0; col < component.numCols; col++) {
               view += '<td>';
               // Each column is its own table.
               view += '<table class="table table-striped table-bordered table-child">';
