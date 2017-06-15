@@ -612,7 +612,7 @@ app.controller('FormEditController', [
     // Track any modifications for save/cancel prompt on navigation away from the builder.
     var dirty = false;
     var contentLoaded = false;
-    setTimeout(function() {
+    window.setTimeout(function() {
       contentLoaded = true;
     }, 3000);
 
