@@ -1799,7 +1799,7 @@ app.controller('FormSubmissionsController', [
             return;
           }
 
-          if (['container', 'datagrid', 'well', 'fieldset'].indexOf(component.type) !== -1) {
+          if (['container', 'datagrid', 'well', 'fieldset', 'panel'].indexOf(component.type) !== -1) {
             FormioUtils.eachComponent(component.components, function(component) {
               if (component.key) {
                 componentHistory.push(component.key);
