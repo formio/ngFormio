@@ -99,7 +99,7 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
               }
               infoCache[project._id] = null;
               delete infoCache[project._id];
-              var pdfFile = this.pdfUrl(project) + '/file/' + pdf.data.id;
+              var pdfFile = this.pdfUrl(project, true) + '/file/' + pdf.data.id;
               return $http.delete(pdfFile, {
                 headers: {
                   'x-file-token': project.settings.filetoken,
