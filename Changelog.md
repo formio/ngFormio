@@ -5,8 +5,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [UNRELEASED]
+## 4.0.18
+### Changed
+ - Upgraded ng-formio-builder to 2.19.4
 
-## 4.0.16
+## 4.0.16, 4.0.17
 ### Changed
  - Fix for content component's 'unsaved changes' error message
  - Upgraded ng-formio to 2.19.5
