@@ -368,7 +368,9 @@ module.exports = function() {
             // Allow for script execution.
             if (typeof currentPage.nextPage === 'string') {
               try {
-                eval(currentPage.nextPage.toString());
+                var next = nextPage;
+                eval('(function(data) {' + currentPage.nextPage.toString() + '})($scope.submission.data)');
+                page = next;
                 if (!isNaN(parseInt(page, 10)) && isFinite(page)) {
                   return page;
                 }
