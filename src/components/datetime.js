@@ -10,7 +10,10 @@ module.exports = function(app) {
           return $interpolate('<span>{{ "' + data + '" | date: "' + component.format + '" }}</span>')();
         },
         group: 'advanced',
-        controller: ['$scope', '$timeout', function($scope, $timeout) {
+        /* eslint-disable no-unused-vars */
+        // NOTE: Do not delete the "moment" variable here. That is needed to make moment() work in default dates.
+        controller: ['$scope', '$timeout', 'moment', function($scope, $timeout, moment) {
+        /* eslint-enable no-unused-vars */
           // Close calendar pop up when tabbing off button
           $scope.onKeyDown = function(event) {
             return event.keyCode === 9 ? false : $scope.calendarOpen;
