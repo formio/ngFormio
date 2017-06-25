@@ -474,7 +474,15 @@ angular
       $scope.projects = {};
       $scope.projectsLoaded = false;
       // TODO: query for unlimited projects instead of this limit
-      var _projectsPromise = Formio.loadProjects('?limit=9007199254740991&sort=-modified')
+      var _projectsPromise = Formio.loadProjects('?limit=9007199254740991&sort=-modified&project__exists=false')
+        .then(function(projects) {
+          // If this is an old server, this will load without the project__exists.
+          if (projects.length === 0) {
+            return Formio.loadProjects('?limit=9007199254740991&sort=-modified')
+          } else {
+            return projects;
+          }
+        })
         .then(function(projects) {
           $scope.projectsLoaded = true;
           angular.element('#projects-loader').hide();
@@ -873,6 +881,13 @@ angular
   .factory('ProjectPlans', ['$filter', function($filter) {
     return {
       plans: {
+        trial: {
+          order: 0,
+          name: 'trial',
+          title: 'Trial',
+          labelStyle: 'label-success',
+          priceDescription: 'Free for 30 days'
+        },
         basic: {
           order: 1,
           name: 'basic',
@@ -892,14 +907,14 @@ angular
           name: 'team',
           title: 'Team Pro',
           labelStyle: 'label-success',
-          priceDescription: 'Starting at $100/mo'
+          priceDescription: '$100/mo'
         },
         commercial: {
           order: 4,
           name: 'commercial',
           title: 'Commercial',
           labelStyle: 'label-commercial',
-          priceDescription: 'Starting at $250/mo per instance'
+          priceDescription: '$250/mo'
         }
       },
       getPlans: function() {
