@@ -1375,7 +1375,7 @@ app.controller('ProjectFormioController', [
       });
     };
 
-    $scope.plans = ['basic', 'independent', 'team', 'commercial'];
+    $scope.plans = ['basic', 'independent', 'team', 'commercial', 'trial'];
     $scope.input = {
       project: '',
       plan: $scope.plans[0]
