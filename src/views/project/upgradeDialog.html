@@ -9,9 +9,12 @@
     </div>
 
       <ul class="dropdown-menu plan-menu">
-        <li class="plan-menu-item" ng-repeat="plan in plans"
-          ng-class="{active: plan.name === selectedPlan}">
-          <a href="" ng-click="setSelectedPlan(plan.name)">
+        <li
+          class="plan-menu-item"
+          ng-repeat="plan in plans"
+          ng-class="{active: plan.name === selectedPlan}"
+          ng-if="plan.name !== 'trial' || currentProject.plan === 'trial'"
+        >          <a href="" ng-click="setSelectedPlan(plan.name)">
             <h4>{{plan.title}} Plan</h4>
             <p class="text-muted">{{plan.priceDescription}}</p>
           </a>
