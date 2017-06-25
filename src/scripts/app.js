@@ -478,7 +478,7 @@ angular
         .then(function(projects) {
           // If this is an old server, this will load without the project__exists.
           if (projects.length === 0) {
-            return Formio.loadProjects('?limit=9007199254740991&sort=-modified')
+            return Formio.loadProjects('?limit=9007199254740991&sort=-modified');
           } else {
             return projects;
           }
