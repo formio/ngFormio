@@ -1,9 +1,0 @@
-<div ng-if="data[component.key] === 'YES'">
-  [ Signature is hidden ]
-</div>
-<div ng-if="data[component.key] && (data[component.key] !== 'YES')">
-  <img class="signature" ng-attr-src="{{ data[component.key] }}" src="" />
-</div>
-<div class="well text-center" ng-if="!data[component.key] || (data[component.key] === 'NO')">
-  <strong>No signature provided</strong>
-</div>
