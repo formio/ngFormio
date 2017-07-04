@@ -5,7 +5,7 @@
   },
   "scripts": {
     "start": "node app.js",
-    "test": "APPPROTOCOL=http APPDOMAIN=portal.localhost APPPORT=$PORT mocha --timeout 60000 --retries 3 -b --reporter spec test/test.js",
+    "test": "APPPROTOCOL=http APPDOMAIN=portal.localhost APPPORT=$PORT protractor protractor.conf.js",
     "test-win": "mocha --timeout 60000 --reporter spec test/test.js",
     "test-pro": "protractor protractor.conf.js"
   },
