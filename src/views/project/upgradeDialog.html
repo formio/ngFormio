@@ -3,13 +3,18 @@
     <div class="dropdown">
     <div class="dropdown-toggle selected-plan" data-toggle="dropdown">
       <h3>{{getPlan(selectedPlan).title}} Plan <i class="fa fa-caret-down"></i></h3>
-      <p class="text-muted price-description"><small>{{getPlan(selectedPlan).priceDescription}}{{ selectedPlan === 'trial' ? ' (' + trialDaysRemaining + ' Days Remaining)' : '' }}</small></p>
+      <p class="text-muted price-description"><small>{{getPlan(selectedPlan).priceDescription}}
+        <span ng-if="selectedPlan === 'trial'">{{ trialDaysRemaining > 0 ? ' (' + trialDaysRemaining + ' Days Remaining)' : '(Expired)' }}</span>
+      </small></p>
     </div>
 
       <ul class="dropdown-menu plan-menu">
-        <li class="plan-menu-item" ng-repeat="plan in plans"
-          ng-class="{active: plan.name === selectedPlan}">
-          <a href="" ng-click="setSelectedPlan(plan.name)">
+        <li
+          class="plan-menu-item"
+          ng-repeat="plan in plans"
+          ng-class="{active: plan.name === selectedPlan}"
+          ng-if="plan.name !== 'trial' || currentProject.plan === 'trial'"
+        >          <a href="" ng-click="setSelectedPlan(plan.name)">
             <h4>{{plan.title}} Plan</h4>
             <p class="text-muted">{{plan.priceDescription}}</p>
           </a>
@@ -25,6 +30,10 @@
         </tr>
         <tr>
           <td>Role Based Access Control</td>
+          <td class="text-right"><i class="fa fa-check"></i></td>
+        </tr>
+        <tr>
+          <td>Basic Actions</td>
           <td class="text-right"><i class="fa fa-check"></i></td>
         </tr>
         <tr>
@@ -83,6 +92,10 @@
           <td class="text-right"><i class="fa fa-check"></i></td>
         </tr>
         <tr>
+          <td>Basic Actions</td>
+          <td class="text-right"><i class="fa fa-check"></i></td>
+        </tr>
+        <tr>
           <td>Premium Actions</td>
           <td class="text-right">&nbsp;</i></td>
         </tr>
@@ -135,6 +148,10 @@
         </tr>
         <tr>
           <td>Role Based Access Control</td>
+          <td class="text-right"><i class="fa fa-check"></i></td>
+        </tr>
+        <tr>
+          <td>Basic Actions</td>
           <td class="text-right"><i class="fa fa-check"></i></td>
         </tr>
         <tr>
@@ -193,6 +210,10 @@
           <td class="text-right"><i class="fa fa-check"></i></td>
         </tr>
         <tr>
+          <td>Basic Actions</td>
+          <td class="text-right"><i class="fa fa-check"></i></td>
+        </tr>
+        <tr>
           <td>Premium Actions</td>
           <td class="text-right"><i class="fa fa-check"></i></td>
         </tr>
@@ -245,6 +266,10 @@
         </tr>
         <tr>
           <td>Role Based Access Control</td>
+          <td class="text-right"><i class="fa fa-check"></i></td>
+        </tr>
+        <tr>
+          <td>Basic Actions</td>
           <td class="text-right"><i class="fa fa-check"></i></td>
         </tr>
         <tr>
@@ -306,7 +331,7 @@
         <h5>No payment required for the {{getPlan(selectedPlan).title}} plan</h5>
         <div class="form-group pull-right" ng-if="(currentProject.plan !== selectedPlan)">
           <a class="btn btn-default" ng-click="closeThisDialog(false)">Cancel</a>
-          <button class="btn btn-primary" ng-click="upgradeProject(selectedPlan)">Change plan to {{getPlan(selectedPlan).title}}</button>
+          <button ng-disabled="selectedPlan === 'trial' && trialDaysRemaining  <= 0" class="btn btn-primary" ng-click="upgradeProject(selectedPlan)">Change plan to {{getPlan(selectedPlan).title}}</button>
         </div>
       </div>
     </div>
@@ -325,11 +350,11 @@
         <br>
       </div>
       <div ng-if="['basic', 'trial'].indexOf(selectedPlan) !== -1">
-        <h5>No payment required for Basic plan</h5>
+        <h5>No payment required for the {{getPlan(selectedPlan).title}} plan</h5>
       </div>
       <div class="form-group pull-right" ng-if="(currentProject.plan !== selectedPlan)">
         <a class="btn btn-default" ng-click="closeThisDialog(false)">Cancel</a>
-        <button class="btn btn-primary" ng-click="upgradeProject(selectedPlan)">Change plan to {{getPlan(selectedPlan).title}}</button>
+        <button ng-disabled="selectedPlan === 'trial' && trialDaysRemaining  <= 0" class="btn btn-primary" ng-click="upgradeProject(selectedPlan)">Change plan to {{getPlan(selectedPlan).title}}</button>
       </div>
     </div>
   </div>

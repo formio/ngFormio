@@ -306,9 +306,13 @@ app.controller('FormController', [
       $scope.uploading = true;
       $scope.formReady = false;
       var filePath = '/pdf/' + $scope.projectId + '/file';
+      var pdfServer = AppConfig.pdfServer;
+      if ($scope.currentProject.settings.pdfserver) {
+        pdfServer = $scope.currentProject.settings.pdfserver;
+      }
       PDFServer.ensureProject($scope.loadProjectPromise).then(function(project) {
         Upload.upload({
-          url: AppConfig.pdfServer + filePath,
+          url: pdfServer + filePath,
           data: {file: file},
           headers: {'x-file-token': project.settings.filetoken}
         }).then(function (res) {
@@ -319,7 +323,7 @@ app.controller('FormController', [
           }
           if (res.data && res.data.path) {
             $scope.form.settings.pdf = {
-              src: AppConfig.pdfServer + res.data.path,
+              src: pdfServer + res.data.path,
               id: res.data.file
             };
           }
@@ -699,11 +703,13 @@ app.controller('FormEditController', [
   '$q',
   'ngDialog',
   '$state',
+  '$timeout',
   function(
     $scope,
     $q,
     ngDialog,
-    $state
+    $state,
+    $timeout
   ) {
     // Clone original form after it has loaded, or immediately
     // if we're not loading a form
@@ -718,22 +724,23 @@ app.controller('FormEditController', [
     // Track any modifications for save/cancel prompt on navigation away from the builder.
     var dirty = false;
     var contentLoaded = false;
+    $timeout(function() {
+      contentLoaded = true;
+    }, 3000);
+
     $scope.$on('formBuilder:add', function(event) {
       // FOR-488 - Fix issues with loading the content component and flagging the builder as dirty.
       if (event.targetScope.formComponent.settings.type === 'content') {
-        contentLoaded = true;
+        dirty = true;
       }
 
-      dirty = true;
     });
     $scope.$on('formBuilder:update', function(event) {
       // FOR-488 - Fix issues with loading the content component and flagging the builder as dirty.
-      if (!contentLoaded && event.targetScope.formComponent.settings.type === 'content') {
-        contentLoaded = true;
-        return;
+      if (contentLoaded && event.targetScope.formComponent.settings.type === 'content') {
+        dirty = true;
       }
 
-      dirty = true;
     });
     $scope.$on('formBuilder:remove', function() {
       dirty = true;
@@ -1792,7 +1799,7 @@ app.controller('FormSubmissionsController', [
             return;
           }
 
-          if (['container', 'datagrid', 'well', 'fieldset'].indexOf(component.type) !== -1) {
+          if (['container', 'datagrid', 'well', 'fieldset', 'panel'].indexOf(component.type) !== -1) {
             FormioUtils.eachComponent(component.components, function(component) {
               if (component.key) {
                 componentHistory.push(component.key);

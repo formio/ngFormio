@@ -35,6 +35,7 @@ angular
     '$urlRouterProvider',
     '$locationProvider',
     'FormioProvider',
+    'formioComponentsProvider',
     'AppConfig',
     'toastrConfig',
     function(
@@ -42,6 +43,7 @@ angular
       $urlRouterProvider,
       $locationProvider,
       FormioProvider,
+      formioComponentsProvider,
       AppConfig,
       toastrConfig
     ) {
@@ -55,6 +57,9 @@ angular
       FormioProvider.setBaseUrl(AppConfig.apiBase);
       FormioProvider.setAppUrl(AppConfig.formioBase);
       FormioProvider.setDomain(AppConfig.domain);
+
+      // Disable form component until we can fix it.
+      formioComponentsProvider.register('form', {disabled: true});
 
       $stateProvider
         .state('home', {
@@ -1011,7 +1016,7 @@ angular
           name: 'trial',
           title: 'Trial',
           labelStyle: 'label-trial',
-          priceDescription: 'Free for 30 days'
+          priceDescription: 'Free 30 days'
         },
         basic: {
           order: 1,

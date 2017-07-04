@@ -30,6 +30,24 @@ gulp.task('deploy:beta', function () {
   return gulp.src(['./dist/**/*', '!./dist/lib/**/*']).pipe(s3(settings));
 });
 
+gulp.task('deploy:beta:test', function () {
+  var settings = require('../aws.json');
+  settings.bucket = 'portal.test-form.io';
+  settings.region = 'us-west-2';
+  return gulp.src(['./dist/**/*', '!./dist/lib/**/*']).pipe(s3(settings, {
+    uploadPath: '/beta/'
+  }));
+});
+
+gulp.task('deploy:beta:prod', function () {
+  var settings = require('../aws.json');
+  settings.bucket = 'portal.form.io';
+  settings.region = 'us-west-2';
+  return gulp.src(['./dist/**/*', '!./dist/lib/**/*']).pipe(s3(settings, {
+    uploadPath: '/beta/'
+  }));
+});
+
 gulp.task('default', ['clean'], function() {
   gulp.start('build');
 });

@@ -8,11 +8,13 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
     'Formio',
     '$q',
     'AppConfig',
+    'FormioAlerts',
     function(
       $http,
       Formio,
       $q,
-      AppConfig
+      AppConfig,
+      FormioAlerts
     ) {
       var infoCache = {};
       var infoReady = $q.defer();
@@ -33,8 +35,12 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
         ensureProject: function(projectPromise, cb) {
           return projectPromise.then(this.ensureFileToken.bind(this));
         },
-        pdfUrl: function(project) {
-          return AppConfig.pdfServer + '/pdf/' + project._id;
+        pdfUrl: function(project, remote) {
+          var pdfServer = AppConfig.pdfServer;
+          if (remote && project.settings.pdfserver) {
+            pdfServer = project.settings.pdfserver;
+          }
+          return pdfServer + '/pdf/' + project._id;
         },
         getInfo: function(projectPromise) {
           return this.ensureProject(projectPromise).then(function(project) {
@@ -45,7 +51,8 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
               return infoPromise;
             }
             infoPromise = infoReady.promise;
-            return $http.get(this.pdfUrl(project), {
+            var pdfProjectUrl = this.pdfUrl(project);
+            return $http.get(pdfProjectUrl, {
               headers: {
                 'x-file-token': project.settings.filetoken,
                 'x-host': location.hostname
@@ -54,6 +61,8 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
               infoCache[project._id] = results.data;
               infoReady.resolve(results.data);
               return results.data;
+            }, function(err) {
+              FormioAlerts.onError('Unable to fetch PDF project information. ' + pdfProjectUrl);
             });
           }.bind(this));
         },
@@ -73,6 +82,8 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
                   'x-file-token': project.settings.filetoken,
                   'x-host': location.hostname
                 }
+              }, function(err) {
+                FormioAlerts.onError('Unable to make purchase. Please contact support.');
               });
             }.bind(this));
           }.bind(this));
@@ -88,11 +99,14 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
               }
               infoCache[project._id] = null;
               delete infoCache[project._id];
-              return $http.delete(this.pdfUrl(project) + '/file/' + pdf.data.id, {
+              var pdfFile = this.pdfUrl(project, true) + '/file/' + pdf.data.id;
+              return $http.delete(pdfFile, {
                 headers: {
                   'x-file-token': project.settings.filetoken,
                   'x-host': location.hostname
                 }
+              }, function(err) {
+                FormioAlerts.onError('Unable to delete PDF ' + pdfFile);
               });
             }.bind(this));
           }.bind(this));
@@ -103,13 +117,16 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
               if (!info) {
                 throw {data: 'Cannot find project information.'};
               }
-              return $http.get(this.pdfUrl(project) + '/file', {
+              var pdfsUrl = this.pdfUrl(project, true) + '/file';
+              return $http.get(pdfsUrl, {
                 headers: {
                   'x-file-token': project.settings.filetoken,
                   'x-host': location.hostname
                 }
               }).then(function(results) {
                 return results.data;
+              }, function(err) {
+                FormioAlerts.onError('Unable to fetch pdfs at ' + pdfsUrl);
               });
             }.bind(this));
           }.bind(this));
@@ -139,6 +156,12 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
       $scope.numSubmissions = '10,000';
       $scope.totalPrice = 100;
       $scope.currentPlan = 'hosted';
+      $scope.currentTab = 'pdf';
+      $scope.loading = true;
+
+      $scope.setTab = function(tab) {
+        $scope.currentTab = tab;
+      };
 
       $scope.onPlanChange = function(plan) {
         $scope.currentPlan = plan || this.currentPlan;
@@ -171,7 +194,11 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
       $scope.forms = {};
       $scope.buyError = '';
       $scope.getPDFUrl = function(pdf) {
-        return AppConfig.pdfServer + pdf.data.path + '.html';
+        var pdfServer = AppConfig.pdfServer;
+        if ($scope.currentProject.settings.pdfserver) {
+          pdfServer = $scope.currentProject.settings.pdfserver;
+        }
+        return pdfServer + pdf.data.path + '.html';
       };
 
       $scope.getAvailable = function(type) {
@@ -270,6 +297,7 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
           throw {data: 'Cannot find project information.'};
         }
         $scope.pdfInfo = info;
+        $scope.loading = false;
         if (info.data.plan === 'hosted') {
           $scope.onPlanChange('enterprise');
         }
