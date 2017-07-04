@@ -137,5 +137,8 @@
         "dist/datetime-picker.min.js"
       ]
     }
+  },
+  "resolutions": {
+    "angular-bootstrap": "^2.5.0"
   }
 }

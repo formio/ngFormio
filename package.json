@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node app.js",
     "test": "APPPROTOCOL=http APPDOMAIN=portal.localhost APPPORT=$PORT mocha --timeout 60000 --retries 3 -b --reporter spec test/test.js",
-    "test-win": "mocha --timeout 60000 --reporter spec test/test.js"
+    "test-win": "mocha --timeout 60000 --reporter spec test/test.js",
+    "test-pro": "protractor protractor.conf.js"
   },
   "main": "./index.js",
   "devDependencies": {
@@ -47,6 +48,8 @@
     "yargs": "^3.8.0"
   },
   "dependencies": {
+    "chai": "^4.0.2",
+    "chai-as-promised": "^7.0.0",
     "ckeditor": "4.6.1",
     "debug": "^2.2.0",
     "dotenv": "1.2.0",
@@ -56,6 +59,7 @@
     "mocha": "^2.3.2",
     "mongoose": "^4.1.6",
     "ng-file-upload": "^10.0.2",
+    "protractor": "^5.1.2",
     "request": "^2.63.0",
     "seamless": "^1.0.0",
     "signature_pad": "^1.6.0",
