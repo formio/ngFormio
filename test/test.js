@@ -3,7 +3,7 @@
 // Boot up the formio server so we can access the resources.
 require('dotenv').load({silent: true});
 var Yadda = require('yadda');
-var webdriver = require('webdriverjs-angular');
+var webdriver = require('webdriverio');
 var driver = null;
 var formio = null;
 var library = null;
@@ -12,6 +12,10 @@ var domain = process.env.APPDOMAIN || 'localhost';
 var port = process.env.APPPORT || 80;
 var serverHost = process.env.SERVERHOST || 'localhost:3000';
 var serverProtocol = process.env.SERVERPROTOCOL || 'http';
+var chai = require('chai');
+var chaiAsPromised = require('chai-as-promised');
+chai.use(chaiAsPromised);
+var expect = chai.expect;
 var url = (port === 80)
   ? protocol + '://' + domain
   : protocol + '://' + domain + ':' + port;
@@ -26,43 +30,24 @@ var config = {
   protocol: protocol,
   baseUrl: url,
   serverProtocol: serverProtocol,
-  serverHost: serverHost
+  serverHost: serverHost,
+  expect :expect
 };
 
-Yadda.plugins.mocha.StepLevelPlugin.init();
-new Yadda.FeatureFileSearch('./test/features').each(function(file) {
-    before(function (done) {
-      library = require('./lib/formio-library')(config);
-      done();
-    });
-    featureFile(file, function (feature) {
-      before(function (done) {
-        driver = webdriver
-          .remote(options)
-          .init()
-          .setViewportSize({width: 1280, height: 720})
-          .url(options.baseUrl, done);
-      });
+var custom = require('./lib/formio-library');
+var actions = new custom(config);
+before(function(next){
+  browser.get(url).then(next).catch(next);
+})
 
-      scenarios(feature.scenarios, function (scenario) {
-        steps(scenario.steps, function (step, done) {
-          Yadda.createInstance(library, {driver: driver}).run(step, done);
-        });
-      });
-
-      afterEach(function () {
-        takeScreenshotOnFailure(this.currentTest);
-      });
-
-      after(function () {
-        driver.end();
-      });
-    });
+describe("",function () {
+  require('./features/register.spec')(actions);
+  require('./features/loginFunctionality.spec')(actions);
+  require('./features/userPortalandWelcome.spec')(actions);
+  require('./features/supportRequest.spec')(actions);
+  require('./features/feedbackrequest.spec')(actions);
+  require('./features/documentationLinks.spec')(actions);
+  require('./features/profileFunctionality.spec')(actions);
+  //require('./features/create-project.spec')(actions);
 });
 
-function takeScreenshotOnFailure(test) {
-  if (test.state != 'passed') {
-    var path = './test/screenshots/' + test.title.replace(/\W+/g, '_').toLowerCase() + '.png';
-    driver.saveScreenshot(path);
-  }
-}

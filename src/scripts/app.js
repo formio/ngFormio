@@ -1024,7 +1024,7 @@ angular
           name: 'trial',
           title: 'Trial',
           labelStyle: 'label-trial',
-          priceDescription: 'Free for 30 days'
+          priceDescription: 'Free 30 days'
         },
         basic: {
           order: 1,
