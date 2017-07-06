@@ -1,14 +1,17 @@
 <div class="row row-eq-height no-gutter project-upgrade-dialog">
   <div class="col-sm-4 plan-column" ng-class="'plan-column-' + selectedPlan">
     <div class="dropdown">
-    <div class="dropdown-toggle selected-plan" data-toggle="dropdown">
-      <h3>{{getPlan(selectedPlan).title}} Plan <i class="fa fa-caret-down"></i></h3>
-      <p class="text-muted price-description"><small>{{getPlan(selectedPlan).priceDescription}}{{ selectedPlan === 'trial' ? ' (' + trialDaysRemaining + ' Days Remaining)' : '' }}</small></p>
-    </div>
-
+      <div class="dropdown-toggle selected-plan" data-toggle="dropdown">
+        <h3>{{getPlan(selectedPlan).title}} Plan <i class="fa fa-caret-down"></i></h3>
+        <p class="text-muted price-description"><small>{{getPlan(selectedPlan).priceDescription}}{{ selectedPlan === 'trial' ? ' (' + trialDaysRemaining + ' Days Remaining)' : '' }}</small></p>
+      </div>
       <ul class="dropdown-menu plan-menu">
-        <li class="plan-menu-item" ng-repeat="plan in plans"
-          ng-class="{active: plan.name === selectedPlan}">
+        <li
+          class="plan-menu-item"
+          ng-repeat="plan in plans"
+          ng-class="{active: plan.name === selectedPlan}"
+          ng-if="plan.name !== 'trial' || currentProject.plan === 'trial'"
+        >
           <a href="" ng-click="setSelectedPlan(plan.name)">
             <h4>{{plan.title}} Plan</h4>
             <p class="text-muted">{{plan.priceDescription}}</p>
@@ -16,7 +19,6 @@
         </li>
       </ul>
     </div>
-
     <div ng-switch="selectedPlan">
       <table ng-switch-when="trial" class="table table-condensed feature-table">
         <tr>
