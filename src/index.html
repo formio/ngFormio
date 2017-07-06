@@ -76,7 +76,7 @@
           <div id="navbar" class="navbar-collapse collapse navbar-menu">
             <ul class="nav navbar-nav navbar-right">
               <li>
-                <a class="btn btn-default" style="margin-top: 5px;" href="/beta">Try Beta UI</a>
+                <a class="btn btn-primary" style="margin-top: 5px;" href="/">Go back to Classic UI</a>
               </li>
               <li class="dropbox" ng-controller="environmentSwitcher">
                 <a ng-cloak href="" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-server"></i> {{ (currentEnvironment.name ? currentEnvironment.name : 'Environments') }}<b class="caret"></b></a>
@@ -304,6 +304,7 @@
     <script src="scripts/components/resourcefields.js"></script>
     <script src="scripts/controllers/access.js"></script>
     <script src="scripts/controllers/controllers.js"></script>
+    <script src="scripts/controllers/environmentSwitcher.js"></script>
     <script src="scripts/controllers/feedback.js"></script>
     <script src="scripts/controllers/form.js"></script>
     <script src="scripts/controllers/help.js"></script>
