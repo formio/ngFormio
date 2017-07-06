@@ -54,7 +54,6 @@ if (apiProtocol !== protocol && ['localhost', 'portal.localhost', 'lvh.me', 'por
       + "//"
       + window.location.host
       + window.location.pathname;
-      + window.location.hash;
 
     // Add environment information if set.
     if (localStorage.getItem('environments') && localStorage.getItem('currentEnvironment')) {
@@ -84,6 +83,11 @@ if (apiProtocol !== protocol && ['localhost', 'portal.localhost', 'lvh.me', 'por
 var appBase = protocol + '//' + host;
 var apiBase = apiProtocol + '//api.' + serverHost;
 var formioBase = apiProtocol + '//formio.' + serverHost;
+if (['form.io', 'test-form.io'].indexOf(serverHost) ===  -1 && pathType !== 'Subdomains') {
+  apiBase = apiProtocol + '//' + serverHost;
+  formioBase = apiProtocol + '//' + serverHost + '/formio';
+}
+
 angular.module('formioApp').constant('AppConfig', {
   appVersion: 'APP_VERSION',
   copyrightYear: (new Date()).getFullYear().toString(),
