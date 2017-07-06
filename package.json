@@ -50,7 +50,7 @@
     "angular-ui-mask": "formio/ui-mask#1.8.8-beta.1",
     "bootstrap": "^3.3.7",
     "bootstrap-ui-datetime-picker": "^2.5.4",
-    "formiojs": "^2.9.5",
+    "formiojs": "^2.11.8",
     "jquery": "^3.2.1",
     "lodash": "^4.17.4",
     "ng-dialog": "^1.3.0",

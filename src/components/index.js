@@ -30,6 +30,7 @@ require('./signature')(app);
 require('./custom')(app);
 require('./container')(app);
 require('./datagrid')(app);
+require('./editgrid')(app);
 require('./survey')(app);
 
 // Layout
