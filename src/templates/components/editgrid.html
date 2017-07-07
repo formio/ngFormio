@@ -2,11 +2,14 @@
   <label ng-if="component.label && !component.hideLabel" for="{{ component.key }}" class="control-label" ng-class="{'field-required': isRequired(component)}">{{ component.label | formioTranslate:null:builder }}</label>
   <div class="formio-data-grid" id="{{ component.key }}" ng-controller="formioEditGrid">
     <ul class="list-group">
-      <li class="list-group-item list-group-header">
+      <li ng-if="component.templates.header" class="list-group-item list-group-header">
         <render-template template="component.templates.header" data="headerData" />
       </li>
       <li class="list-group-item" ng-repeat="row in rows track by $index" ng-init="rowIndex = $index">
         <edit-grid-row />
+      </li>
+      <li ng-if="component.templates.footer" class="list-group-item list-group-footer">
+        <render-template template="component.templates.footer" data="headerData" />
       </li>
     </ul>
     <div class="datagrid-add" ng-if="!component.hasOwnProperty('validate') || !component.validate.hasOwnProperty('maxLength') || rows.length < component.validate.maxLength">

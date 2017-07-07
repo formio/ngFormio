@@ -86,7 +86,8 @@ module.exports = function(app) {
               '      <div class="btn btn-danger removeRow">Delete</div> \n' +
               '    </div> \n' +
               '  </div> \n' +
-              '</div>'
+              '</div>',
+            footer: ''
           }
         }
       });
