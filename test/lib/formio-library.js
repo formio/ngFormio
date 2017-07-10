@@ -455,7 +455,7 @@ module.exports = function(config) {
   this.logout = function () {
     it('I am logging out', function (next) {
       try {
-        browser.executeScript('localStorage.removeItem("formioToken");')
+        browser.executeScript('localStorage.clear();')
           .then(browser.refresh())
           .then(function () {
             next();
@@ -740,6 +740,17 @@ module.exports = function(config) {
         next(null, res);
       });
     })
+  };
+
+  this.clearCache = function () {
+    it('Clearing local cache' ,function(next){
+         state = {};
+         for(k in state){
+           console.log(state.k+"<--");
+         }
+
+         next();
+    });
   };
 
 };

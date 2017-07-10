@@ -1,6 +1,9 @@
 module.exports = function (actions) {
   describe('{User Profile Functionality',function(){
     describe('Profile navigation',function(){
+      actions.goToPage("#/");
+      actions.logout();
+      actions.waitForActionToComplete(9000);
       actions.iAmLoggedInFor('profileuser1');
       actions.goToPage('#/');
       actions.clickOnElement('#user-menu');
@@ -23,6 +26,7 @@ module.exports = function (actions) {
       actions.iSeeTextIn(".alert","We never store your credit card number.");
     });
     describe('Update fullname',function(){
+      actions.logout();
       actions.iAmLoggedInFor('profileuser1');
       actions.goToPage('#/profile/edit');
       actions.waitForActionToComplete(500);
@@ -30,10 +34,12 @@ module.exports = function (actions) {
       actions.enterTextInField('.profile-edit-page #fullName','${random-fullName>profileuser1.fullName}');
       actions.clickOnElementWithText('Submit');
       actions.iSeeTextIn(".alert","Submission was created.");
+      actions.waitForActionToComplete(9000);
       actions.valueUpdate('profileuser1','${random}','fullName');
       actions.valueChanged('profileuser1');
     });
     describe('Update username',function(){
+      actions.logout();
       actions.iAmLoggedInFor('profileuser1');
       actions.goToPage('#/profile/edit');
       actions.iSeeText("Username");
@@ -44,6 +50,7 @@ module.exports = function (actions) {
       actions.valueChanged('profileuser1');
     });
     describe('Update email',function(){
+      actions.logout();
       actions.iAmLoggedInFor('profileuser1');
       actions.goToPage('#/profile/edit');
       actions.waitForActionToComplete(500);
@@ -55,6 +62,7 @@ module.exports = function (actions) {
       actions.valueChanged('profileuser1');
     });
     describe('Update password',function(){
+      actions.logout();
       actions.iAmLoggedInFor('profileuser1');
       actions.goToPage('#/profile/edit');
       actions.iSeeText("Password");
@@ -66,6 +74,7 @@ module.exports = function (actions) {
       actions.valueChanged('profileuser1');
     });
     describe('Update all profile settings',function(){
+      actions.logout();
       actions.iAmLoggedInFor('profileuser1');
       actions.goToPage('#/profile/edit');
       actions.waitForActionToComplete(500);

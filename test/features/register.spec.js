@@ -77,5 +77,9 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('REGISTER');
       actions.iAmLoggedIn();
     });
+    describe('clearing cache',function(){
+      actions.clearCache();
+      //browser.quit();
+    });
   });
 }

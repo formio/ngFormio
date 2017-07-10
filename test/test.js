@@ -36,12 +36,13 @@ var config = {
 
 var custom = require('./lib/formio-library');
 var actions = new custom(config);
+
 before(function(next){
   var width = 1280;
   var height = 720;
   browser.driver.manage().window().setSize(width, height);
   browser.get(url).then(next).catch(next);
-})
+});
 
 describe("",function () {
   require('./features/register.spec')(actions);
@@ -51,6 +52,6 @@ describe("",function () {
   require('./features/feedbackrequest.spec')(actions);
   require('./features/documentationLinks.spec')(actions);
   require('./features/profileFunctionality.spec')(actions);
-  require('./features/create-project.spec')(actions);
+  //require('./features/create-project.spec')(actions);
 });
 
