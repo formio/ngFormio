@@ -1,0 +1,44 @@
+<upgrade-warning ng-if="!minPlan('commercial')" warning="Upgrade your project to a commercial plan to enable Remote Environments."></upgrade-warning>
+<div class="panel panel-default">
+  <div class="panel-heading">Remote Environment</div>
+  <div class="panel-body" ng-controller="ProjectRemoteController">
+    <div ng-if="!currentProject.settings.remote">
+      <h3>Connect to remote server</h3>
+      <div ng-if="!remoteProjects">
+        <div>Enter the URL of the remote server you would like to use for this environment.</div>
+        <label class="control-label"><strong>Server URL</strong></label>
+        <input type="text" class="form-control" id="serverURL" ng-model="remote.url" placeholder="The url of the remote server." />
+        <p class="text-muted">Use the root url of the server, not a project url.</p>
+        <div class="form-group">
+          <label class="form-label">Project Path Type</label>
+          <select class="form-control" ng-options="option as option for option in environmentTypes" ng-model="remote.type" placeholder="Project Paths">
+          </select>
+        </div>
+        <label class="control-label"><strong>Access Key</strong></label>
+        <input type="text" class="form-control" id="accessKey" ng-model="remote.accessKey" placeholder="The access key for the server." />
+        <p class="text-muted">Configured in an environment variable for your server.</p>
+        <div class="btn btn-primary" ng-click="connect()">Continue</div>
+        <div ng-if="remoteError" class="text-danger">{{remoteError}}</div>
+      </div>
+      <div ng-if="remoteProjects">
+        <span><strong>Select an existing environment or a new environment:</strong></span>
+        <ui-select name="selectProject" class="" ng-model="remote.project" theme="bootstrap">
+          <ui-select-match>{{$select.selected.title}} ({{$select.selected.name}})</ui-select-match>
+          <ui-select-choices repeat="project in remoteProjects | filter:$select.search">
+            {{project.title}} ({{project.name}})
+          </ui-select-choices>
+        </ui-select>
+        <div class="btn btn-primary" ng-click="move()">Connect Environment</div>
+        <div ng-if="remoteError" class="text-danger">{{remoteError}}</div>
+      </div>
+    </div>
+    <div ng-if="currentProject.settings.remote">
+      <div><strong>Remote Server:</strong></div>
+      <div>{{ currentProject.settings.remote.url }}</div>
+      <div><strong>Environment:</strong></div>
+      <div>{{ currentProject.settings.remote.project.title}} ({{ currentProject.settings.remote.project.name }})</div>
+      <div class="btn btn-default" ng-click="disconnect()">Disconnect</div>
+    </div>
+  </div>
+</div>
+<!--<button class="btn btn-primary" ng-click="saveProject()">Save Settings</button>-->

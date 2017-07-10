@@ -235,6 +235,12 @@ angular
           templateUrl: 'views/project/env/settings/index.html',
           controller: 'ProjectSettingsController'
         })
+        .state('project.env.settings.remote', {
+          url: '/settings/remote',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/settings/remote/index.html',
+          controller: 'ProjectSettingsController'
+        })
         .state('project.env.settings.apiKeys', {
           url: '/settings/apiKeys',
           parent: 'project.env',

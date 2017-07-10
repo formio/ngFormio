@@ -5,6 +5,7 @@
     <li role="presentation" ng-class="{active:($state.includes('project.env.settings.info'))}">
       <a ui-sref="project.env.settings.info" ng-class="{active:($state.includes('project.env.settings.info'))}">Environment Settings</a>
       <ul ng-if="$state.current.name.includes('project.env.settings')" class="nav nav-pills nav-stacked">
+        <li role="presentation" ng-class="{active:($state.includes('project.env.settings.remote'))}"><a ui-sref="project.env.settings.remote">Remote Environment</a></li>
         <li role="presentation" ng-class="{active:($state.includes('project.env.settings.apiKeys'))}"><a ui-sref="project.env.settings.apiKeys">API Keys</a></li>
         <li role="presentation" ng-class="{active:($state.includes('project.env.settings.cors'))}"><a ui-sref="project.env.settings.cors">CORS</a></li>
         <li role="presentation" ng-class="{active:($state.includes('project.env.settings.customjscss'))}"><a ui-sref="project.env.settings.customjscss">Custom JS and CSS</a></li>

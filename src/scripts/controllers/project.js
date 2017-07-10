@@ -2027,6 +2027,103 @@ app.controller('ProjectSettingsController', [
   }
 ]);
 
+app.controller('ProjectRemoteController', [
+  '$http',
+  '$scope',
+  '$stateParams',
+  'AppConfig',
+  function($http, $scope, $stateParams, AppConfig) {
+    $scope.remote = {
+      type: 'Subdomains'
+    };
+    $scope.environmentTypes = ['Subdomains', 'Subdirectories', 'ProjectId'];
+
+
+    $scope.connect = function() {
+      if (!$scope.remote.url) {
+        return;
+      }
+      $http({
+        method: 'GET',
+        url: $scope.remote.url + '/project',
+        headers: {
+          'access-key': $scope.remote.accessKey
+        },
+        config: {disableJWT: true}
+      })
+        .then(function(result) {
+          delete $scope.remoteError;
+          if (!Array.isArray(result.data)) {
+            $scope.remoteError = 'Server did not respond properly. It may not be a form.io server.';
+          }
+          else {
+            $scope.remoteProjects = result.data;
+            $scope.remoteProjects.unshift({
+              title: 'New Environment',
+              name: 'new'
+            });
+          }
+        })
+        .catch(function(err) {
+          if (err.status === -1) {
+            $scope.remoteError = 'Remote server did not respond to a CORS request properly. It may not be a properly configured form.io server.';
+          }
+          else {
+            $scope.remoteError = err.status + ' - ' + err.statusText + ': ' + err.data;
+            if (err.status === 401) {
+              $scope.remoteError += '. Please check your access key';
+            }
+          }
+        });
+    };
+
+    $scope.move = function() {
+      $http({
+        method: 'GET',
+        url: AppConfig.apiBase + '/project/' + $stateParams.projectId + '/export'
+      })
+        .then(function(result) {
+          if ($scope.remote.project.name === 'new') {
+            var project = angular.copy($scope.currentProject);
+            project.template = result.data;
+            delete project.access;
+            delete project._id;
+            $http({
+              method: 'POST',
+              url: $scope.remote.url + '/project',
+              headers: {
+                'access-key': $scope.remote.accessKey
+              },
+              data: project,
+              config: {disableJWT: true}
+            })
+              .then(function(result) {
+                $scope.remote.project = result.data;
+                $scope.currentProject.settings.remote = $scope.remote;
+                $scope.saveProject();
+              })
+              .catch(function(err) {
+                $scope.remoteError = 'Error importing environment - ' + err.status + ' - ' + err.statusText + ': ' + err.data;
+              });
+          }
+          else {
+            // Connecting to existing project
+            $scope.currentProject.settings.remote = $scope.remote;
+            $scope.saveProject();
+          }
+        })
+        .catch(function(err) {
+          $scope.remoteError = 'Error exporting environment - ' + err.status + ' - ' + err.statusText + ': ' + err.data;
+        });
+    }
+
+    $scope.disconnect = function() {
+      delete $scope.currentProject.settings.remote;
+      $scope.saveProject();
+    }
+  }
+]);
+
 app.controller('PrimaryProjectSettingsController', [
   '$scope',
   '$rootScope',
