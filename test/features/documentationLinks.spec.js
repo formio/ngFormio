@@ -16,7 +16,7 @@ module.exports = function (actions) {
      actions.goToPage('#/auth');
      actions.clickOnElementWithText(' Docs');
      actions.iSeeElement('.docs-dropdown');
-     actions.clickOnElement('#content');
+     actions.clickOnElementWithText(' Docs');
      actions.waitForActionToComplete(2000);
      actions.iDonotSeeElement('.docs-dropdown');
      });

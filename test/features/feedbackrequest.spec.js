@@ -27,6 +27,7 @@ module.exports = function (actions) {
       actions.enterTextInField("#feedback","feedback-test");
       actions.btnEnabled('Send it!');
       actions.clickOnElementWithText('Send it!');
+      actions.waitForActionToComplete(500);
       actions.iDonotSeeText('Close');
       actions.iSeeElement('.feedback');
 
