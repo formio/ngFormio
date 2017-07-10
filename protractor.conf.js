@@ -10,8 +10,6 @@ exports.config = {
   capabilities: {
     'browserName': 'chrome'
   },
-
-  baseUrl: 'http://localhost:3000',
   allScriptSTimeout : 10000,
   getPageTimeout: 10000,
   // Spec patterns are relative to the current working directory when

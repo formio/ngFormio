@@ -652,7 +652,6 @@ module.exports = function(config) {
   this.checkIfLoggedOut = function () {
     it('I am logged Out', function (next) {
       try {
-        browser.waitForAngular();
         var value = browser.executeScript("return localStorage.getItem('formioToken');");
         config.expect(value).to.eventually.equal(null);
         next();

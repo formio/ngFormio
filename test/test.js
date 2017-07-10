@@ -18,6 +18,7 @@ var expect = chai.expect;
 var url = (port === 80)
   ? protocol + '://' + domain
   : protocol + '://' + domain + ':' + port;
+console.log("url -> "+ url);
 var options = {
   baseUrl: url,
   desiredCapabilities: {
