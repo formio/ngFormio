@@ -742,15 +742,4 @@ module.exports = function(config) {
     })
   };
 
-  this.clearCache = function () {
-    it('Clearing local cache' ,function(next){
-         state = {};
-         for(k in state){
-           console.log(state.k+"<--");
-         }
-
-         next();
-    });
-  };
-
 };

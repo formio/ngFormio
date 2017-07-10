@@ -3,7 +3,6 @@ module.exports = function (actions) {
     describe('Profile navigation',function(){
       actions.goToPage("#/");
       actions.logout();
-      actions.waitForActionToComplete(9000);
       actions.iAmLoggedInFor('profileuser1');
       actions.goToPage('#/');
       actions.clickOnElement('#user-menu');
