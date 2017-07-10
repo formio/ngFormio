@@ -1,8 +1,6 @@
 'use strict';
 
 var assert = require('assert');
-var Yadda = require('yadda');
-var English = Yadda.localisation.English;
 var request = require('request');
 var chance = (new require('chance'))();
 var _ = require('lodash');

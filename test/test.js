@@ -2,7 +2,6 @@
 
 // Boot up the formio server so we can access the resources.
 require('dotenv').load({silent: true});
-var Yadda = require('yadda');
 var webdriver = require('webdriverio');
 var driver = null;
 var formio = null;
