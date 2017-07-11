@@ -349,7 +349,7 @@ app.controller('ProjectController', [
       $scope.trialDaysRemaining = remaining > 0 ? remaining : 0;
 
       $scope.rolesLoading = true;
-      $http.get($scope.localFormio.projectUrl + '/role').then(function(result) {
+      $http.get($scope.projectUrl + '/role').then(function(result) {
         $scope.currentProjectRoles = result.data;
         $scope.rolesLoading = false;
       });
@@ -530,7 +530,7 @@ app.controller('ProjectController', [
     };
 
     $scope.getSwaggerURL = function(format) {
-      return AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/spec.json';
+      return $scope.projectUrl + '/spec.json';
     };
 
     $scope.getPlanName = ProjectPlans.getPlanName.bind(ProjectPlans);
