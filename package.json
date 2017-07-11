@@ -47,6 +47,8 @@
     "angular-moment": "^1.0.1",
     "angular-sanitize": "^1.6.4",
     "angular-ui-bootstrap": "^2.5.0",
+    "ckeditor": "4.5.11",
+    "angular-ckeditor": "github:lemonde/angular-ckeditor#v1.0.3",
     "angular-ui-mask": "formio/ui-mask#1.8.8-beta.1",
     "bootstrap": "^3.3.7",
     "bootstrap-ui-datetime-picker": "^2.5.4",
