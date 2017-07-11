@@ -24,8 +24,9 @@ module.exports = function(app) {
         },
         controller: ['$scope', 'FormioUtils', 'Formio', function($scope, FormioUtils, Formio) {
           var url = $scope.component.src;
+          var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
           if ($scope.component.form) {
-            url = '';
+            url = baseUrl;
             if ($scope.component.project) {
               url += '/project/' + $scope.component.project;
             }
@@ -33,14 +34,14 @@ module.exports = function(app) {
               url += $scope.formio.projectUrl;
             }
             url += '/form/' + $scope.component.form;
-            url = (new Formio(url)).formUrl;
+            url = (new Formio(url, {base: baseUrl})).formUrl;
           }
 
           if ($scope.data[$scope.component.key] && $scope.data[$scope.component.key]._id) {
             url += '/submission/' + $scope.data[$scope.component.key]._id;
           }
 
-          $scope.formFormio = new Formio(url);
+          $scope.formFormio = new Formio(url, {base: baseUrl});
           $scope.formFormio.loadForm().then(function(form) {
             $scope.componentForm = form;
           });

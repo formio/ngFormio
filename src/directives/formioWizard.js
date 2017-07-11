@@ -67,6 +67,7 @@ module.exports = function() {
         $http,
         $timeout
       ) {
+        $scope.options = $scope.options || {};
         var session = ($scope.storage && !$scope.readOnly) ? localStorage.getItem($scope.storage) : false;
         if (session) {
           session = angular.fromJson(session);

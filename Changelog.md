@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [UNRELEASED]
 ### Added
+ - Allow passing in a baseUrl for forms on a different path.
  - Time component.
 
 ## 2.19.5

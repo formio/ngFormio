@@ -28,7 +28,8 @@ module.exports = function(app) {
             settings.defaultValue = [];
           }
           if (settings.resource) {
-            var url = '';
+            var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
+            var url = baseUrl;
             if (settings.project) {
               url += '/project/' + settings.project;
             }
@@ -36,7 +37,7 @@ module.exports = function(app) {
               url += $scope.formio.projectUrl;
             }
             url += '/form/' + settings.resource;
-            var formio = new Formio(url);
+            var formio = new Formio(url, {base: baseUrl});
 
             // Refresh the items.
             $scope.refreshSubmissions = function(input, append) {
