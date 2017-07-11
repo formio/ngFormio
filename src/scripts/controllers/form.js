@@ -203,7 +203,8 @@ app.directive('formList', function() {
     scope: {
       formName: '=',
       forms: '=',
-      project: '=',
+      formio: '=',
+      projectUrl: '=',
       formType: '=',
       numPerPage: '=',
       listMode: '=',
@@ -229,19 +230,23 @@ app.directive('formList', function() {
         $rootScope.noBreadcrumb = false;
         $rootScope.currentForm = false;
         $scope.search = {};
-        $scope.formsUrl = AppConfig.apiBase + '/project/' + $scope.project._id + '/form?limit=9999999';
-        if ($scope.formType) {
-          $scope.formsUrl += '&type=' + $scope.formType;
-        }
-        $http.get($scope.formsUrl).then(function(response) {
-          $scope.forms = response.data;
-          $scope.formsFinished = true;
-        });
-        $scope.$watch('project', function(newProject, oldProject) {
-          $scope.projectApi = $rootScope.projectPath($scope.project);
+        $scope.forms = [];
+        $scope.$watch('projectUrl', function() {
+          var query = {
+            params: {
+              limit: 9999999
+            }
+          }
+          if ($scope.formType) {
+            query.params.type = $scope.formType
+          }
+          $scope.formio.loadForms(query).then(function(forms) {
+            $scope.forms = forms;
+            $scope.formsFinished = true;
+          });
         });
         $scope.export = function(form, type) {
-          window.open(AppConfig.apiBase + '/project/' + $scope.project._id + '/form/' + form._id + '/export?format=' + type + '&x-jwt-token=' + $rootScope.userToken);
+          window.open($scope.projectUrl + '/form/' + form._id + '/export?format=' + type + '&x-jwt-token=' + $rootScope.userToken);
         };
         $scope.componentCount = function(components) {
           return _(FormioUtils.flattenComponents(components)).filter(function (o) {
@@ -840,7 +845,6 @@ app.controller('FormEmbedController', [
     $scope,
     ProjectFrameworks
   ) {
-    console.log($scope);
     $scope.primaryProjectPromise.then(function(project) {
       $scope.current = {
         framework: project.framework || 'none'

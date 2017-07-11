@@ -799,27 +799,30 @@ angular
       $rootScope.apiProtocol = AppConfig.apiProtocol;
       $rootScope.apiServer = AppConfig.apiServer;
 
-      $rootScope.projectPath = function(project) {
+      $rootScope.projectPath = function(project, base, type) {
         var path = '';
-        switch(AppConfig.pathType) {
+        var serverBase = base || AppConfig.apiBase;
+        var server = serverBase.replace(/(^\w+:|^)\/\//, '');
+        var protocol = serverBase.indexOf('https') === 0 ? 'https:' : 'http:';
+        switch(type || AppConfig.pathType) {
           case 'Subdomains':
             if (project.hasOwnProperty('name')) {
-              path = AppConfig.apiProtocol + '//' + project.name + '.' + AppConfig.apiServer;
+              path = protocol + '//' + project.name + '.' + server;
             }
             else if (project.hasOwnProperty('_id')) {
-              path = AppConfig.apiBase + '/project/' + project._id;
+              path = base + '/project/' + project._id;
             }
             break;
           case 'Subdirectories':
             if (project.hasOwnProperty('name')) {
-              path = AppConfig.apiBase + '/' + project.name;
+              path = base + '/' + project.name;
             }
             else if (project.hasOwnProperty('_id')) {
-              path = AppConfig.apiBase + '/project/' + project._id;
+              path = base + '/project/' + project._id;
             }
             break;
           case 'ProjectId':
-            path = AppConfig.apiBase + '/project/' + project._id;
+            path = base + '/project/' + project._id;
             break;
         }
         return path;

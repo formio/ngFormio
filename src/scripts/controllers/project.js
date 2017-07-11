@@ -248,8 +248,9 @@ app.controller('ProjectController', [
     $scope.formsLoading = true;
     $scope.forms = [];
     $scope.formio = new Formio('/project/' + $stateParams.projectId);
+    $scope.localFormio = $scope.formio;
     $scope.currentProject = {_id: $stateParams.projectId, access: []};
-    $scope.projectApi = '';
+    $scope.projectUrl = '';
 
     $scope.rolesLoading = true;
     $scope.loadRoles = function() {
@@ -282,6 +283,19 @@ app.controller('ProjectController', [
         .catch(FormioAlerts.onError.bind(FormioAlerts));
     };
 
+    $scope.saveLocalProject = function() {
+      if (!$scope.localProject._id) { return FormioAlerts.onError(new Error('No Project found.')); }
+      $scope.localFormio.saveProject($scope.localProject)
+        .then(function(project) {
+          FormioAlerts.addAlert({
+            type: 'success',
+            message: 'Project settings saved.'
+          });
+          GoogleAnalytics.sendEvent('Project', 'update', null, 1);
+        }, FormioAlerts.onError.bind(FormioAlerts))
+        .catch(FormioAlerts.onError.bind(FormioAlerts));
+    };
+
     $scope.switchEnv = function(environmentId) {
       $state.go('project.overview', {projectId: environmentId});
     };
@@ -290,11 +304,39 @@ app.controller('ProjectController', [
     $scope.primaryProjectPromise = primaryProjectQ.promise;
 
     $scope.loadProjectPromise = $scope.formio.loadProject(null, {ignoreCache: true}).then(function(result) {
-      $scope.currentProject = result;
+      $scope.localProject = result;
+      var promiseResult = result;
+      // If this is a remote project, load the remote.
+      if ($scope.localProject.remote) {
+        $scope.projectUrl = $rootScope.projectPath($scope.localProject.remote.project, $scope.localProject.remote.url, $scope.localProject.remote.type);
+        $scope.projectProtocol = $scope.localProject.remote.url.indexOf('https') === 0 ? 'https:' : 'http:';
+        $scope.projectServer = $scope.localProject.remote.url.replace(/(^\w+:|^)\/\//, '');
+        $scope.localFormio = $scope.formio;
+        $scope.formio = new Formio($scope.projectUrl, { base: $scope.localProject.remote.url });
+        promiseResult = $scope.formio
+          .loadProject(null, {
+            ignoreCache: true,
+            disableJWT: true,
+            // Remove once better authentication is set up.
+            header: new Headers({
+              'Accept': 'application/json',
+              'Content-type': 'application/json; charset=UTF-8',
+              'access-key': $scope.localProject.remote.accessKey
+            })
+          })
+          .then(function(result) {
+            $scope.currentProject = result;
+            return result;
+          });
+      }
+      else {
+        $scope.projectProtocol = AppConfig.apiProtocol;
+        $scope.projectServer = AppConfig.apiServer;
+        $scope.currentProject = $scope.localProject;
+        $scope.projectUrl = $rootScope.projectPath(result);
+      }
       $scope.projectType = 'Environment';
-      $scope.environmentName = ($scope.currentProject.project) ? $scope.currentProject.title : 'Live';
-      $scope.projectApi = $rootScope.projectPath(result);
-      $rootScope.currentProject = result;
+      $scope.environmentName = ($scope.localProject.project) ? result.title : 'Live';
       $scope.projectsLoaded = true;
       var allowedFiles, allow, custom;
 
@@ -306,7 +348,7 @@ app.controller('ProjectController', [
       $scope.trialDaysRemaining = remaining > 0 ? remaining : 0;
 
       $scope.rolesLoading = true;
-      $http.get($scope.formio.projectUrl + '/role').then(function(result) {
+      $http.get($scope.localFormio.projectUrl + '/role').then(function(result) {
         $scope.currentProjectRoles = result.data;
         $scope.rolesLoading = false;
       });
@@ -318,7 +360,8 @@ app.controller('ProjectController', [
         // iOS in private mode will throw errors.
       }
       // Dynamically load JS files.
-      if ($scope.currentProject.settings && $scope.currentProject.settings.custom && $scope.currentProject.settings.custom.js && loadedFiles.indexOf($scope.currentProject.settings.custom.js) === -1) {
+      // TODO: Fix this for remote projects.
+      if ($scope.localProject.settings && $scope.localProject.settings.custom && $scope.localProject.settings.custom.js && loadedFiles.indexOf($scope.localProject.settings.custom.js) === -1) {
         try {
           allow = allowedFiles.hasOwnProperty($scope.currentProject.settings.custom.js) ? allowedFiles[$scope.currentProject.settings.custom.js] : null;
           if (allow === null) {
@@ -340,7 +383,7 @@ app.controller('ProjectController', [
       }
 
       // Dynamically load CSS files.
-      if ($scope.currentProject.settings && $scope.currentProject.settings.custom && $scope.currentProject.settings.custom.css && loadedFiles.indexOf($scope.currentProject.settings.custom.css) === -1) {
+      if ($scope.localProject.settings && $scope.localProject.settings.custom && $scope.localProject.settings.custom.css && loadedFiles.indexOf($scope.localProject.settings.custom.css) === -1) {
         try {
           allow = allowedFiles.hasOwnProperty($scope.currentProject.settings.custom.css) ? allowedFiles[$scope.currentProject.settings.custom.css] : null;
           if (allow === null) {
@@ -379,13 +422,13 @@ app.controller('ProjectController', [
       });
 
       $scope.projectTeamsLoading = true;
-      if ($scope.currentProject.project) {
+      if ($scope.localProject.project) {
         // This is an environment. Load the primary Project
-        primaryProjectQ.resolve((new Formio('/project/' + $scope.currentProject.project)).loadProject(null, {ignoreCache: true}));
+        primaryProjectQ.resolve((new Formio('/project/' + $scope.localProject.project)).loadProject(null, {ignoreCache: true}));
       }
       else {
         // This is the primary environment.
-        primaryProjectQ.resolve($scope.currentProject);
+        primaryProjectQ.resolve($scope.localProject);
       }
       $scope.primaryProjectPromise.then(function(primaryProject) {
         $scope.primaryProject = primaryProject;
@@ -460,7 +503,7 @@ app.controller('ProjectController', [
         return ($scope.highestRole === 'owner' || $scope.highestRole === 'team_admin');
       };
 
-      return $scope.currentProject;
+      return promiseResult;
     }).catch(function(err) {
       if (!err) {
         FormioAlerts.addAlert({
@@ -1171,7 +1214,7 @@ app.controller('LaunchController', [
       }];
     $scope.$watch('project', function(newProject, oldProject) {
       if (newProject && newProject.name) {
-        $scope.projectApi = $rootScope.projectPath(newProject);
+        $scope.projectUrl = $rootScope.projectPath(newProject);
       }
     });
     $scope.openLightboxModal = function (images,index) {
@@ -1181,6 +1224,7 @@ app.controller('LaunchController', [
 
   }
 ]);
+
 app.controller('ProjectFormioController', [
   '$scope',
   'Formio',
@@ -1909,7 +1953,7 @@ app.controller('ProjectSettingsController', [
     $scope.platforms = ProjectFrameworks;
 
     $scope.loadProjectPromise.then(function() {
-      $scope.currentProject.plan = $scope.currentProject.plan || 'basic';
+      $scope.localProject.plan = $scope.localProject.plan || 'basic';
 
       $scope.highestRoleLoaded.then(function() {
         // Check the highest role, after the project has been loaded.
@@ -2038,8 +2082,8 @@ app.controller('ProjectRemoteController', [
     };
     $scope.environmentTypes = ['Subdomains', 'Subdirectories', 'ProjectId'];
 
-
-    $scope.connect = function() {
+    $scope.key = {};
+    $scope.check = function() {
       if (!$scope.remote.url) {
         return;
       }
@@ -2047,7 +2091,7 @@ app.controller('ProjectRemoteController', [
         method: 'GET',
         url: $scope.remote.url + '/project',
         headers: {
-          'access-key': $scope.remote.accessKey
+          'access-key': $scope.key.access
         },
         config: {disableJWT: true}
       })
@@ -2077,13 +2121,13 @@ app.controller('ProjectRemoteController', [
         });
     };
 
-    $scope.move = function() {
-      $http({
-        method: 'GET',
-        url: AppConfig.apiBase + '/project/' + $stateParams.projectId + '/export'
-      })
-        .then(function(result) {
-          if ($scope.remote.project.name === 'new') {
+    $scope.connect = function() {
+      if ($scope.remote.project.name === 'new') {
+        $http({
+          method: 'GET',
+          url: AppConfig.apiBase + '/project/' + $stateParams.projectId + '/export'
+        })
+          .then(function(result) {
             var project = angular.copy($scope.currentProject);
             project.template = result.data;
             delete project.access;
@@ -2092,34 +2136,34 @@ app.controller('ProjectRemoteController', [
               method: 'POST',
               url: $scope.remote.url + '/project',
               headers: {
-                'access-key': $scope.remote.accessKey
+                'access-key': $scope.accessKey
               },
               data: project,
               config: {disableJWT: true}
             })
               .then(function(result) {
                 $scope.remote.project = result.data;
-                $scope.currentProject.settings.remote = $scope.remote;
-                $scope.saveProject();
+                $scope.localProject.remote = angular.copy($scope.remote);
+                $scope.saveLocalProject();
               })
               .catch(function(err) {
                 $scope.remoteError = 'Error importing environment - ' + err.status + ' - ' + err.statusText + ': ' + err.data;
               });
-          }
-          else {
-            // Connecting to existing project
-            $scope.currentProject.settings.remote = $scope.remote;
-            $scope.saveProject();
-          }
         })
         .catch(function(err) {
           $scope.remoteError = 'Error exporting environment - ' + err.status + ' - ' + err.statusText + ': ' + err.data;
         });
-    }
+      }
+      else {
+        // Connecting to existing project
+        $scope.localProject.remote = angular.copy($scope.remote);
+        $scope.saveLocalProject();
+      }
+    };
 
     $scope.disconnect = function() {
-      delete $scope.currentProject.settings.remote;
-      $scope.saveProject();
+      delete $scope.localProject.remote;
+      $scope.saveLocalProject();
     }
   }
 ]);

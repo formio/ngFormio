@@ -205,7 +205,7 @@ bower install</pre>
                       <h4>Configure for your project</h4>
                       <p>In order for the app to use your form.io project, you need to configure the app to know where it is.</p>
                       <p>Change the first line of <strong>/src/config.js</strong> to say the following.</p>
-                      <p><pre>var APP_URL = '{{ projectApi }}';</pre></p>
+                      <p><pre>var APP_URL = '{{ projectUrl }}';</pre></p>
                       <h4>Running the app</h4>
                       <p>You can run a development version of the application from the command line.</p>
                       <p><pre>gulp serve</pre></p>
@@ -336,7 +336,7 @@ bower install</pre>
           import { Formio } from 'react-formio';
 
           ReactDOM.render(
-          &nbsp;&nbsp;&lt;Formio src="{{ projectPath(currentProject) }}/email" /&gt;,document.getElementById('example')
+          &nbsp;&nbsp;&lt;Formio src="{{ projectUrl }}/email" /&gt;,document.getElementById('example')
           );
 
         </code></pre></span>
@@ -361,7 +361,7 @@ bower install</pre>
 
           ---
 
-          &lt;formio src="'{{ projectPath(currentProject) }}/email'" /&gt;
+          &lt;formio src="'{{ projectUrl }}/email'" /&gt;
         </code></pre></span>
                     </div>
                   </div>
@@ -405,7 +405,7 @@ bower install</pre>
           // Then we can use our component in our App.vue.
                 &lt;template&gt;
            &nbsp;&nbsp;&lt;div id="app"&gt;
-           &nbsp;&nbsp;&lt;formio-vue src="'{{ projectPath(currentProject) }}/email'"&gt;&lt;/formio-vue&gt;
+           &nbsp;&nbsp;&lt;formio-vue src="'{{ projectUrl }}/email'"&gt;&lt;/formio-vue&gt;
            &lt;/div&gt;
           &lt;/template&gt;
           &lt;script&gt;
@@ -442,7 +442,7 @@ bower install</pre>
 
           ---
 
-          &lt;formio src='{{ projectPath(currentProject) }}/email' /&gt;
+          &lt;formio src='{{ projectUrl }}/email' /&gt;
         </code></pre></span>
                     </div>
                   </div>
