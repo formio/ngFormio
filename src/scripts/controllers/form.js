@@ -257,6 +257,7 @@ app.directive('formList', function() {
     ]
   };
 });
+
 app.directive('customOnChange', function() {
   return {
     restrict: 'A',
@@ -354,22 +355,6 @@ app.controller('FormController', [
     $scope.uploadProgress = 0;
     $scope.isCopy = !!($stateParams.components && $stateParams.components.length);
     $scope.formId = $stateParams.formId;
-    $scope.formUrl = '/project/' + $scope.projectId + '/form';
-    $scope.formUrl += $stateParams.formId ? ('/' + $stateParams.formId) : '';
-    $scope.formDisplays = [
-      {
-        name: 'form',
-        title: 'Form'
-      },
-      {
-        name: 'wizard',
-        title: 'Wizard'
-      },
-      {
-        name: 'pdf',
-        title: 'PDF'
-      }
-    ];
 
     $scope.uploadPDF = function() {
       ngDialog.open({
@@ -415,9 +400,6 @@ app.controller('FormController', [
         $scope.form.name = _.camelCase($scope.form.title);
       }
     };
-
-    // Load the form and submissions.
-    $scope.formio = new Formio($scope.formUrl);
 
     // The url to goto for embedding.
     $scope.embedCode = '';
@@ -546,63 +528,86 @@ app.controller('FormController', [
         })
         .value();
     };
+    var loadFormQ = $q.defer();
+    $scope.loadFormPromise = loadFormQ.promise;
 
-    // Load the form.
-    if ($scope.formId) {
-      $scope.loadFormPromise = $scope.formio.loadForm()
-        .then(function(form) {
-          // FOR-362 - Fix pass by reference issue with the internal cache.
-          form = _.cloneDeep(form);
+    // Load the form and submissions.
+    $scope.loadProjectPromise.then(function() {
+      $scope.formUrl = $scope.projectUrl + '/form';
+      $scope.formUrl += $stateParams.formId ? ('/' + $stateParams.formId) : '';
+      $scope.formDisplays = [
+        {
+          name: 'form',
+          title: 'Form'
+        },
+        {
+          name: 'wizard',
+          title: 'Wizard'
+        },
+        {
+          name: 'pdf',
+          title: 'PDF'
+        }
+      ];
+      $scope.formio = new Formio($scope.formUrl, { base: $scope.baseUrl });
+      // Load the form.
+      if ($scope.formId) {
+        loadFormQ.resolve($scope.formio.loadForm()
+          .then(function(form) {
+            // FOR-362 - Fix pass by reference issue with the internal cache.
+            form = _.cloneDeep(form);
 
-          // Ensure the display is form.
-          if (!form.display) {
-            form.display = 'form';
-          }
+            // Ensure the display is form.
+            if (!form.display) {
+              form.display = 'form';
+            }
 
-          $scope.updateCurrentFormResources(form);
+            $scope.updateCurrentFormResources(form);
 
-          $scope.form = form;
-          $scope.form.page = 0;
-          $scope.formTags = _.map(form.tags, function(tag) {
-            return {text: tag};
-          });
-
-          $rootScope.currentForm = $scope.form;
-        }, FormioAlerts.onError.bind(FormioAlerts))
-        .catch(FormioAlerts.onError.bind(FormioAlerts));
-
-      $scope.formio.loadActions()
-        .then(function(actions) {
-          // Get the available actions for the form, to check if premium actions are present.
-          $scope.formio.availableActions().then(function(available) {
-            var premium = _.map(_.filter(available, function(action) {
-              return (action.hasOwnProperty('premium') && action.premium === true);
-            }), 'name');
-
-            $scope.hasPremAction = _.some(actions, function(action) {
-              return (action.hasOwnProperty('name') && action.name && premium.indexOf(action.name) !== -1);
+            $scope.form = form;
+            $scope.form.page = 0;
+            $scope.formTags = _.map(form.tags, function(tag) {
+              return {text: tag};
             });
-          });
 
-          $scope.actions = actions;
-          $scope.hasAuthAction = actions.some(function(action) {
-            return action.name === 'login' || action.name === 'oauth';
-          });
-        }, FormioAlerts.onError.bind(FormioAlerts))
-        .catch(FormioAlerts.onError.bind(FormioAlerts));
-    }
-    else {
-      $scope.loadFormPromise = $q.when();
-    }
+            $rootScope.currentForm = $scope.form;
+          }, FormioAlerts.onError.bind(FormioAlerts))
+          .catch(FormioAlerts.onError.bind(FormioAlerts)));
 
-    $scope.loadFormPromise
-      .then(function() {
-        // Watch for the first load of the form. Used to parse self access permissions once.
-        var loaded = $scope.$watch('form.submissionAccess', function() {
-          $scope.selfAccessPermissions = selfAccess();
-          loaded();
+        $scope.formio.loadActions()
+          .then(function(actions) {
+            // Get the available actions for the form, to check if premium actions are present.
+            $scope.formio.availableActions().then(function(available) {
+              var premium = _.map(_.filter(available, function(action) {
+                return (action.hasOwnProperty('premium') && action.premium === true);
+              }), 'name');
+
+              $scope.hasPremAction = _.some(actions, function(action) {
+                return (action.hasOwnProperty('name') && action.name && premium.indexOf(action.name) !== -1);
+              });
+            });
+
+            $scope.actions = actions;
+            $scope.hasAuthAction = actions.some(function(action) {
+              return action.name === 'login' || action.name === 'oauth';
+            });
+          }, FormioAlerts.onError.bind(FormioAlerts))
+          .catch(FormioAlerts.onError.bind(FormioAlerts));
+      }
+      else {
+        loadFormQ.resolve();
+      }
+
+      $scope.loadFormPromise
+        .then(function() {
+          // Watch for the first load of the form. Used to parse self access permissions once.
+          var loaded = $scope.$watch('form.submissionAccess', function() {
+            $scope.selfAccessPermissions = selfAccess();
+            loaded();
+          });
         });
-      });
+
+    });
 
     $scope.submissionAccessLabels = SubmissionAccessLabels;
     $scope.resourceAccessLabels = ResourceAccessLabels;
@@ -610,7 +615,7 @@ app.controller('FormController', [
 
     // Get the swagger URL.
     $scope.getSwaggerURL = function(format) {
-      return AppConfig.apiBase + '/project/' + $scope.projectId + '/form/' + $scope.formId + '/spec.json';
+      return $scope.projectUrl + '/form/' + $scope.formId + '/spec.json';
     };
 
     // When a submission is made.
@@ -1944,18 +1949,20 @@ app.controller('FormSubmissionController', [
     Formio
   ) {
     // Submission information.
-    $scope.submissionId = $stateParams.subId;
-    $scope.submissionUrl = $scope.formUrl;
-    $scope.submissionUrl += $stateParams.subId ? ('/submission/' + $stateParams.subId) : '';
-    $scope.submissionData = Formio.submissionData;
-    $scope.submission = {};
+    $scope.loadProjectPromise.then(function() {
+      $scope.submissionId = $stateParams.subId;
+      $scope.submissionUrl = $scope.formUrl;
+      $scope.submissionUrl += $stateParams.subId ? ('/submission/' + $stateParams.subId) : '';
+      $scope.submissionData = Formio.submissionData;
+      $scope.submission = {};
 
-    // Load the form and submissions.
-    $scope.formio = new Formio($scope.submissionUrl);
+      // Load the form and submissions.
+      $scope.formio = new Formio($scope.submissionUrl, {base: $scope.baseUrl});
 
-    // Load the submission.
-    $scope.formio.loadSubmission().then(function(submission) {
-      $scope.submission = submission;
+      // Load the submission.
+      $scope.formio.loadSubmission().then(function(submission) {
+        $scope.submission = submission;
+      });
     });
   }
 ]);
