@@ -43,6 +43,10 @@
   padding: inherit;
 }
 
+.has-error span.ui-select-toggle {
+  border: 1px solid red;
+}
+
 .form-control.btn-default {
   background-color: #fff;
 }
