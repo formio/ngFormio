@@ -110,7 +110,8 @@ module.exports = function(app) {
           $scope.getFile = function(evt) {
             evt.preventDefault();
             $scope.form = $scope.form || $rootScope.filePath;
-            var formio = new Formio($scope.form);
+            var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
+            var formio = new Formio($scope.form, {base: baseUrl});
             formio
               .downloadFile($scope.file).then(function(file) {
                 if (file) {
@@ -149,7 +150,8 @@ module.exports = function(app) {
         ) {
           if ($scope.builder) return;
           $scope.form = $scope.form || $rootScope.filePath;
-          var formio = new Formio($scope.form);
+          var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
+          var formio = new Formio($scope.form, {base: baseUrl});
           formio.downloadFile($scope.file)
             .then(function(result) {
               $scope.file.imageSrc = result.url;

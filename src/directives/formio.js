@@ -33,6 +33,7 @@ module.exports = function() {
         $q
       ) {
         var iframeReady = $q.defer();
+        $scope.options = $scope.options || {};
         $scope._src = $scope.src || '';
         $scope.formioAlerts = [];
         $scope.iframeReady = false;

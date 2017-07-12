@@ -16,6 +16,7 @@ module.exports = function() {
       hideComponents: '=?',
       disableComponents: '=?',
       formioOptions: '=?',
+      options: '=?',
       storage: '=?'
     },
     link: function(scope, element) {
@@ -67,6 +68,8 @@ module.exports = function() {
         $http,
         $timeout
       ) {
+        $scope.options = $scope.options || {};
+        $scope.baseUrl = $scope.options.baseurl || Formio.getBaseUrl();
         var session = ($scope.storage && !$scope.readOnly) ? localStorage.getItem($scope.storage) : false;
         if (session) {
           session = angular.fromJson(session);
@@ -133,7 +136,7 @@ module.exports = function() {
         };
 
         if (!$scope.form && $scope.src) {
-          (new Formio($scope.src)).loadForm().then(function(form) {
+          (new Formio($scope.src, {base: $scope.baseUrl})).loadForm().then(function(form) {
             $scope.form = form;
             if (!$scope.wizardLoaded) {
               showPage();
@@ -560,7 +563,7 @@ module.exports = function() {
             }
             var formUrl = form.project ? '/project/' + form.project : '';
             formUrl += '/form/' + form._id;
-            $scope.formio = new Formio(formUrl);
+            $scope.formio = new Formio(formUrl, {base: $scope.baseUrl});
             setForm(form);
           });
         }
@@ -570,14 +573,14 @@ module.exports = function() {
 
         // Load the form.
         if ($scope.src) {
-          $scope.formio = new Formio($scope.src);
+          $scope.formio = new Formio($scope.src, {base: $scope.baseUrl});
           $scope.formio.loadForm().then(function(form) {
             setForm(form);
           });
         }
         else {
           $scope.src = '';
-          $scope.formio = new Formio($scope.src);
+          $scope.formio = new Formio($scope.src, {base: $scope.baseUrl});
         }
       }
     ]

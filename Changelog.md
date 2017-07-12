@@ -5,7 +5,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [UNRELEASED]
+
+## 2.19.7
+### Fixed
+ - Day component.
+
+## 2.19.6
 ### Added
+ - Allow passing in a baseUrl for forms on a different path.
  - Time component.
 
 ## 2.19.5
