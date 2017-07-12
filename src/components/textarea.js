@@ -36,6 +36,9 @@ module.exports = function(app) {
             }
             return 'formio/components/texteditor.html';
           }
+          else if (!$scope.readOnly && $scope.component.components) {
+            return 'formio/components/scripteditor.html';
+          }
           return 'formio/components/textarea.html';
         },
         settings: {
@@ -75,6 +78,9 @@ module.exports = function(app) {
       ));
       $templateCache.put('formio/components/texteditor.html', FormioUtils.fieldWrap(
         fs.readFileSync(__dirname + '/../templates/components/texteditor.html', 'utf8')
+      ));
+      $templateCache.put('formio/components/scripteditor.html', FormioUtils.fieldWrap(
+        fs.readFileSync(__dirname + '/../templates/components/scripteditor.html', 'utf8')
       ));
     }
   ]);

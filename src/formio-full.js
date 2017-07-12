@@ -10,4 +10,5 @@ require('bootstrap');
 require('angular-ui-bootstrap');
 require('bootstrap-ui-datetime-picker/dist/datetime-picker');
 require('ng-dialog');
+require('angular-ui-ace/src/ui-ace');
 require('./formio');
