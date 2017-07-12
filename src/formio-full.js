@@ -1,3 +1,4 @@
+window.CKEDITOR_BASEPATH = 'node_modules/ckeditor/';
 global.jQuery = require('jquery');
 require('angular');
 require('angular-ui-mask');
@@ -9,5 +10,7 @@ require('ng-file-upload');
 require('bootstrap');
 require('angular-ui-bootstrap');
 require('bootstrap-ui-datetime-picker/dist/datetime-picker');
+require('ckeditor/ckeditor');
+require('angular-ckeditor/angular-ckeditor');
 require('ng-dialog');
 require('./formio');
