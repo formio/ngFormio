@@ -1081,11 +1081,11 @@ app.controller('LaunchController', [
     $scope.currentSection.icon = 'fa fa-check-square-o';
     $scope.currentSection.help = 'https://help.form.io/embedding/';
     $scope.hasTemplate = true;
-    var formio = new Formio(AppConfig.apiBase + '/project/' + $scope.currentProject._id);
+    //var formio = new Formio(AppConfig.apiBase + '/project/' + $scope.currentProject._id);
 
 
 
-    formio.loadForms({
+    $scope.formio.loadForms({
         params: {
           limit: Number.MAX_SAFE_INTEGER // Don't limit results
         }
@@ -1950,7 +1950,6 @@ app.controller('ProjectSettingsController', [
     $http,
     AppConfig
   ) {
-
     $scope.platforms = ProjectFrameworks;
 
     $scope.loadProjectPromise.then(function() {

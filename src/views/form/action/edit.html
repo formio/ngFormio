@@ -6,5 +6,5 @@
       This is a Premium Action, not available on the {{ getPlanName(currentProject.plan) }} plan. Please <a ng-click="showUpgradeDialog(currentProject)">Upgrade</a> this project to access this feature.
     </div>
   </div>
-</div>
-<formio form="actionInfo.settingsForm" submission="action" form-action="actionUrl" read-only="highestRole === 'team_read'"></formio>
+</div>{{baseUrl}}
+<formio form="actionInfo.settingsForm" submission="action" form-action="actionUrl" read-only="highestRole === 'team_read'" options="{ baseUrl: baseUrl }"></formio>
