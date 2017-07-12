@@ -78,6 +78,14 @@ module.exports = [
             for (var key in $scope.data) {
               delete $scope.data[key];
             }
+
+            // Set the form to pristine again.
+            for (var compKey in $scope.formioForm) {
+              if ($scope.formioForm[compKey].hasOwnProperty('$setPristine')) {
+                $scope.formioForm[compKey].$setPristine();
+                $scope.formioForm[compKey].$setUntouched();
+              }
+            }
           };
 
           $scope.isDisabled = function(component) {
