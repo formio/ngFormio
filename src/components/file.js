@@ -150,8 +150,8 @@ module.exports = function(app) {
         ) {
           if ($scope.builder) return;
           $scope.form = $scope.form || $rootScope.filePath;
-          var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl()
-          var formio = new Formio($scope.form, { base: baseUrl });
+          var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
+          var formio = new Formio($scope.form, {base: baseUrl});
           formio.downloadFile($scope.file)
             .then(function(result) {
               $scope.file.imageSrc = result.url;

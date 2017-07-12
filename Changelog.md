@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## 2.19.7
 ### Fixed
  - Day component.
+ - Dependencies for the wysiwyg component.
+ - Issue where a reset form would not set the form to pristine again.
 
 ## 2.19.6
 ### Added
