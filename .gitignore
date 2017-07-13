@@ -2,4 +2,6 @@
 .bower.json
 node_modules
 bower_components
+lib
+dist
 .idea
