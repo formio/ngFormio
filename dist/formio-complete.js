@@ -71665,8 +71665,30 @@ module.exports = function(app) {
             }
             return 'formio/components/texteditor.html';
           }
+          if ($scope.readOnly && $scope.component.wysiwyg) {
+            return 'formio/componentsView/content.html';
+          }
           return 'formio/components/textarea.html';
         },
+        viewTemplate: function($scope) {
+          if ($scope.readOnly && $scope.component.wysiwyg) {
+            return 'formio/componentsView/content.html';
+          }
+          else {
+            return 'formio/components/textarea.html';
+          }
+        },
+        controller: [
+          '$scope',
+          '$sanitize',
+          function($scope, $sanitize) {
+            if ($scope.readOnly && $scope.component.wysiwyg) {
+              $scope.$watch('data.' + $scope.component.key, function() {
+                $scope.html = $sanitize($scope.data[$scope.component.key]);
+              });
+            }
+          }
+        ],
         settings: {
           input: true,
           tableView: true,
@@ -71701,6 +71723,9 @@ module.exports = function(app) {
               FormioUtils) {
       $templateCache.put('formio/components/textarea.html', FormioUtils.fieldWrap(
         "<textarea\n  class=\"form-control\"\n  ng-model=\"data[component.key]\"\n  ng-disabled=\"readOnly\"\n  ng-required=\"isRequired(component)\"\n  safe-multiple-to-single\n  id=\"{{ componentId }}\"\n  name=\"{{ componentId }}\"\n  tabindex=\"{{ component.tabindex || 0 }}\"\n  ng-attr-placeholder=\"{{ component.placeholder | formioTranslate:null:builder }}\"\n  custom-validator=\"component.validate.custom\"\n  rows=\"{{ component.rows }}\"\n></textarea>\n"
+      ));
+      $templateCache.put('formio/componentsView/content.html', FormioUtils.fieldWrap(
+        "<div class=\"well\" id=\"{{ component.key }}\" style=\"margin:0;\">\n  <div ng-bind-html=\"html\"></div>\n</div>\n"
       ));
       $templateCache.put('formio/components/texteditor.html', FormioUtils.fieldWrap(
         "<textarea\n  class=\"form-control\"\n  ng-model=\"data[component.key]\"\n  ng-disabled=\"readOnly\"\n  ng-required=\"isRequired(component)\"\n  ckeditor=\"component.wysiwyg\"\n  safe-multiple-to-single\n  id=\"{{ componentId }}\"\n  name=\"{{ componentId }}\"\n  tabindex=\"{{ component.tabindex || 0 }}\"\n  ng-attr-placeholder=\"{{ component.placeholder }}\"\n  custom-validator=\"component.validate.custom\"\n  rows=\"{{ component.rows }}\"\n></textarea>\n"

@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Day component.
  - Dependencies for the wysiwyg component.
  - Issue where a reset form would not set the form to pristine again.
+ - Fixed the readOnly display of wysiwyg text areas to show the html content.
 
 ## 2.19.6
 ### Added
