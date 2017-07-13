@@ -4,7 +4,12 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [UNRELEASED]
+## 2.20.3
+### Fixed
+ - The submission view for text area with wysiwyg.
+
+## 2.20.2
+--- SAME AS 2.19.7: Released to sync with form builder library. ---
 
 ## 2.19.7
 ### Fixed

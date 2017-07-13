@@ -42,13 +42,24 @@ module.exports = function(app) {
           return 'formio/components/textarea.html';
         },
         viewTemplate: function($scope) {
-          if ($scope.readOnly && $scope.component.wysiwyg) {
+          if ($scope.component.wysiwyg) {
             return 'formio/componentsView/content.html';
           }
           else {
             return 'formio/components/textarea.html';
           }
         },
+        viewController: [
+          '$scope',
+          '$sanitize',
+          function($scope, $sanitize) {
+            if ($scope.component.wysiwyg) {
+              $scope.$watch('data.' + $scope.component.key, function() {
+                $scope.html = $sanitize($scope.data[$scope.component.key]);
+              });
+            }
+          }
+        ],
         controller: [
           '$scope',
           '$sanitize',
