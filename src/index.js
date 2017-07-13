@@ -5,7 +5,7 @@ import FormioProvider from './providers/Formio';
 import Formio from './directives/formio';
 //import FormioWizard from './directives/formioWizard';
 
-var app = angular.module('formio', []);
+const app = angular.module('formio', []);
 
 /**
  * Create the formio provider.

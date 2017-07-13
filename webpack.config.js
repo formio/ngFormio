@@ -1,6 +1,7 @@
 const webpack = require('webpack');
 const path = require('path');
 
+const nodeExternals = require('webpack-node-externals');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const autoprefixer = require('autoprefixer');
 
@@ -62,10 +63,11 @@ module.exports = {
     }),
     new ExtractTextPlugin('styles.css')
   ],
+  externals: [nodeExternals()],
   devtool: 'source-map',
-  //resolve: {
-    //symlinks: false
-  //},
+  resolve: {
+    symlinks: false
+  },
   devServer: {
     historyApiFallback: true
   }
