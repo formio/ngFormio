@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.20.4
+### Fixed
+ - An error that would show up if $scope.options was not defined.
+
 ## 2.20.3
 ### Fixed
  - The submission view for text area with wysiwyg.

@@ -22,6 +22,7 @@ module.exports = function(app) {
           $scope.selectItems = [];
           $scope.hasNextPage = false;
           $scope.resourceLoading = false;
+          $scope.options = $scope.options || {};
           params.limit = 100;
           params.skip = 0;
           if (settings.multiple) {
