@@ -63,7 +63,13 @@ module.exports = {
     }),
     new ExtractTextPlugin('styles.css')
   ],
-  externals: [nodeExternals()],
+  //externals: [nodeExternals()],
+  externals: {
+    jquery: 'jQuery',
+    angular: 'angular',
+    lodash: '_',
+    moment: 'moment'
+  },
   devtool: 'source-map',
   resolve: {
     symlinks: false

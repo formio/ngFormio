@@ -1,6 +1,7 @@
-import {Formio as FormioCore} from 'formiojs/full';
+import {Formio} from 'formiojs/full';
 
-export default function() {
+const app = angular.module('formio');
+app.provider('Formio', function() {
   return {
     restrict: 'E',
     replace: true,
@@ -13,13 +14,13 @@ export default function() {
     },
     link: function (scope, element) {
       if (scope.src) {
-        scope.createPromise = FormioCore.createForm(element, scope.src, scope.options).then(formio => {
+        scope.createPromise = Formio.createForm(element, scope.src, scope.options).then(formio => {
           scope.formio = formio;
           scope.formio.src = src;
         });
       }
       if (form) {
-        scope.createPromise = FormioCore.createForm(element, scope.form, scope.options).then(formio => {
+        scope.createPromise = Formio.createForm(element, scope.form, scope.options).then(formio => {
           scope.formio = formio;
           scope.formio.form = form;
         });
@@ -35,7 +36,7 @@ export default function() {
       '$scope',
       function ($scope) {
         $scope.$watch('src', function (src) {
-          $scope.createPromise = FormioCore.createForm(this.element, src, $scope.options).then(formio => {
+          $scope.createPromise = Formio.createForm(this.element, src, $scope.options).then(formio => {
             $scope.formio = formio;
             $scope.formio.src = src;
           });
@@ -43,7 +44,7 @@ export default function() {
         });
 
         $scope.$watch('form', function (form) {
-          $scope.createPromise = FormioCore.createForm(this.element, form, $scope.options).then(formio => {
+          $scope.createPromise = Formio.createForm(this.element, form, $scope.options).then(formio => {
             $scope.formio = formio;
             $scope.formio.form = form;
           });
@@ -62,4 +63,4 @@ export default function() {
     ],
     template: '<div />'
   };
-}
+});

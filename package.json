@@ -2,7 +2,7 @@
   "name": "ng-formio",
   "version": "2.19.6",
   "description": "The form redering engine behind Form.IO.",
-  "main": "dist/formio.min.js",
+  "main": "dist/formio.js",
   "scripts": {
     "test": "node test/test",
     "build": "babel ./src --ignore=*.spec.js --out-dir ./lib --presets es2015,react,stage-2",
@@ -32,9 +32,7 @@
   "dependencies": {
     "angular": "^1.5.0",
     "formiojs": "^2.12.0",
-    "jquery": "^3.2.1",
-    "text-mask-all": "github:text-mask/text-mask",
-    "whatwg-fetch": "^2.0.3"
+    "jquery": "^3.2.1"
   },
   "browserify": {
     "transform": [

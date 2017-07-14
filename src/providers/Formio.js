@@ -1,7 +1,7 @@
-module.exports = function() {
-  // The formio class.
-  var Formio = require('formiojs');
+import {Formio} from 'formiojs/full';
 
+const app = angular.module('formio');
+app.factory('FormioUtils', function() {
   // Return the provider interface.
   return {
 
@@ -64,4 +64,4 @@ module.exports = function() {
       }
     ]
   };
-};
+});

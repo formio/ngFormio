@@ -1,10 +1,8 @@
 import "babel-polyfill";
 import util from 'formiojs/utils';
 
-import FormioProvider from './providers/Formio';
-import Formio from './directives/formio';
-//import FormioWizard from './directives/formioWizard';
-
+import './providers';
+import './directives';
 const app = angular.module('formio', []);
 
 /**
