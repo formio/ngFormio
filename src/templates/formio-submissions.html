@@ -1,0 +1,41 @@
+<div>
+  <div ng-repeat="alert in formioAlerts track by $index" class="alert alert-{{ alert.type }}" role="alert">
+    {{ alert.message | formioTranslate:null:builder }}
+  </div>
+  <table class="table">
+    <thead>
+      <tr>
+        <th ng-repeat="component in form.components | flattenComponents track by $index" ng-if="tableView(component)">{{ component.label || component.key }}</th>
+        <th>Submitted</th>
+        <th>Updated</th>
+        <th>Operations</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="submission in submissions track by $index" class="formio-submission" ng-click="$emit('submissionView', submission)">
+        <td ng-repeat="component in form.components | flattenComponents track by $index" ng-if="tableView(component)">{{ submission.data | tableView:component }}</td>
+        <td>{{ submission.created | amDateFormat:'l, h:mm:ss a' }}</td>
+        <td>{{ submission.modified | amDateFormat:'l, h:mm:ss a' }}</td>
+        <td>
+          <div class="button-group" style="display:flex;">
+            <a ng-click="$emit('submissionView', submission); $event.stopPropagation();" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-eye-open"></span></a>&nbsp;
+            <a ng-click="$emit('submissionEdit', submission); $event.stopPropagation();" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-edit"></span></a>&nbsp;
+            <a ng-click="$emit('submissionDelete', submission); $event.stopPropagation();" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove-circle"></span></a>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <pagination
+    ng-if="submissions.serverCount > perPage"
+    ng-model="currentPage"
+    ng-change="pageChanged(currentPage)"
+    total-items="submissions.serverCount"
+    items-per-page="perPage"
+    direction-links="false"
+    boundary-links="true"
+    first-text="&laquo;"
+    last-text="&raquo;"
+    >
+  </pagination>
+</div>

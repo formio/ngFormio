@@ -1,0 +1,13 @@
+<div>
+  <div ng-repeat="component in form.components track by $index" ng-if="submission && submission.data">
+    <formio-component-view
+      form="form"
+      component="component"
+      data="submission.data"
+      ignore="ignore"
+      submission="submission"
+      ng-if="builder ? '::true' : isVisible(component)"
+      builder="builder"
+    ></formio-component-view>
+  </div>
+</div>

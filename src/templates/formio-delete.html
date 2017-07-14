@@ -1,0 +1,10 @@
+<form role="form">
+  <div ng-repeat="alert in formioAlerts track by $index" class="alert alert-{{ alert.type }}" role="alert">
+    {{ alert.message | formioTranslate:null:builder }}
+  </div>
+  <h3>{{ deleteMessage | formioTranslate:null:builder }}</h3>
+  <div class="btn-toolbar">
+    <button ng-click="onDelete()" class="btn btn-danger">{{ 'Yes' | formioTranslate:null:builder }}</button>
+    <button ng-click="onCancel()" class="btn btn-default">{{ 'No' | formioTranslate:null:builder }}</button>
+  </div>
+</form>
