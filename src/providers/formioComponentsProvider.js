@@ -14,23 +14,13 @@ export default app.provider('formioComponents', function() {
   };
   return {
     addGroup: function(name, group) {
-      groups[name] = group;
+      console.warn('formioComponents is deprecated');
     },
     register: function(type, component, group) {
-      if (!components[type]) {
-        components[type] = component;
-      }
-      else {
-        angular.extend(components[type], component);
-      }
-
-      // Set the type for this component.
-      if (!components[type].group) {
-        components[type].group = group || '__component';
-      }
-      components[type].settings.type = type;
+      console.warn('formioComponents is deprecated');
     },
     $get: function() {
+      console.warn('formioComponents is deprecated');
       return {
         components: components,
         groups: groups

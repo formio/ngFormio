@@ -29,12 +29,7 @@ module.exports = {
       //},
       {
         test: /\.(css|scss)$/,
-        loaders: [
-          'style-loader',
-          'css-loader',
-          'sass-loader',
-          'postcss-loader'
-        ]
+        loader: ExtractTextPlugin.extract({ fallback: 'style-loader', use: ['css-loader', 'sass-loader', 'postcss-loader']})
       },
       {
         test: /\.(woff2?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
@@ -57,13 +52,13 @@ module.exports = {
       'moment': 'moment'
     }),
     new webpack.optimize.OccurrenceOrderPlugin(),
-    new webpack.LoaderOptionsPlugin({
-      options: {
-        postcss: () => [autoprefixer]
-      },
-      debug: true
-    }),
-    new ExtractTextPlugin('styles.css')
+    //new webpack.LoaderOptionsPlugin({
+    //  options: {
+    //    postcss: () => [autoprefixer]
+    //  },
+    //  debug: true
+    //}),
+    new ExtractTextPlugin('formio.css')
   ],
   //externals: [nodeExternals()],
   externals: {

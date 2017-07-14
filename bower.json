@@ -1,0 +1,20 @@
+{
+  "name": "ng-formio",
+  "main": [
+    "dist/ng-formio.js",
+    "dist/formio.css"
+  ],
+  "version": "3.0.0",
+  "authors": [
+    "Travis Tidwell <travis@form.io>"
+  ],
+  "description": "The Angular.JS form builder.",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "test",
+    "tests"
+  ],
+  "dependencies": {}
+}

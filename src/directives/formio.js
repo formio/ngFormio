@@ -13,47 +13,42 @@ export default app.directive('formio', function() {
       options: '=?'
     },
     link: function (scope, element) {
-      if (scope.src) {
-        scope.createPromise = Formio.createForm(element, scope.src, scope.options).then(formio => {
-          scope.formio = formio;
-          scope.formio.src = src;
-        });
-      }
-      if (form) {
-        scope.createPromise = Formio.createForm(element, scope.form, scope.options).then(formio => {
-          scope.formio = formio;
-          scope.formio.form = form;
-        });
-      }
+      scope.element = element[0];
 
-      scope.initializeFormio = function () {
-
-      };
-
-      scope.initializeFormio();
+      scope.initializeForm();
     },
     controller: [
       '$scope',
       function ($scope) {
-        $scope.$watch('src', function (src) {
-          $scope.createPromise = Formio.createForm(this.element, src, $scope.options).then(formio => {
-            $scope.formio = formio;
-            $scope.formio.src = src;
-          });
-          $scope.initializeFormio();
-        });
+        $scope.initializeForm = function() {
+          if ($scope.src) {
+            $scope.createPromise = Formio.createForm($scope.element, $scope.src, $scope.options)
+              .then(formio => {
+                $scope.formio = formio;
+                $scope.formio.src = $scope.src;
+                return formio;
+              });
+          }
+          if ($scope.form && !$scope.src) {
+            $scope.createPromise = Formio.createForm($scope.element, $scope.form, $scope.options)
+              .then(formio => {
+                $scope.formio = formio;
+                $scope.formio.submission = $scope.form;
+                return formio;
+              });
+          }
+          if ($scope.submission && $scope.createPromise) {
+            $scope.createPromise
+              .then(() => {
+                $scope.formio.submission = $scope.submission
+              });
+          }
+        };
+        $scope.$watch('src', $scope.initializeForm);
 
-        $scope.$watch('form', function (form) {
-          $scope.createPromise = Formio.createForm(this.element, form, $scope.options).then(formio => {
-            $scope.formio = formio;
-            $scope.formio.form = form;
-          });
-          $scope.initializeFormio();
-        });
+        $scope.$watch('form', $scope.initializeForm);
 
-        $scope.$watch('submission', function (submission) {
-          $scope.formio.form = submission;
-        });
+        $scope.$watch('submission', $scope.initializeForm);
 
         // Clean up the Form from DOM.
         $scope.$on('$destroy', function () {
