@@ -13,7 +13,7 @@ module.exports = function (actions) {
       actions.iSeeValueIn("#profile-username","Username: ${profileuser1.name}");
       actions.iSeeValueIn("#profile-email","Email: ${profileuser1.email}");
       actions.clickOnElementWithText('Edit');
-      actions.waitForActionToComplete(1000);
+      actions.waitForActionToComplete(2000);
       actions.iSeeText("Name");
       actions.iSeeValueIn('#fullName','${empty}');
       actions.iSeeText("Username");
@@ -29,7 +29,7 @@ module.exports = function (actions) {
       actions.logout();
       actions.iAmLoggedInFor('profileuser1');
       actions.goToPage('#/profile/edit');
-      actions.waitForActionToComplete(1000);
+      actions.waitForActionToComplete(1500);
       actions.iSeeText("Name");
       actions.enterTextInField('.profile-edit-page #fullName','${random-fullName>profileuser1.fullName}');
       actions.clickOnElementWithText('Submit');
@@ -52,7 +52,7 @@ module.exports = function (actions) {
       actions.logout();
       actions.iAmLoggedInFor('profileuser1');
       actions.goToPage('#/profile/edit');
-      actions.waitForActionToComplete(1000);
+      actions.waitForActionToComplete(2000);
       actions.iSeeText("Email");
       actions.enterTextInField('.profile-edit-page #email','${random-email>profileuser1.email}');
       actions.clickOnElementWithText('Submit');
@@ -67,7 +67,7 @@ module.exports = function (actions) {
       actions.iSeeText("Password");
       actions.enterTextInField('.profile-edit-page #password','${random-password>profileuser1.password}');
       actions.clickOnElementWithText('Submit');
-      actions.waitForActionToComplete(1000);
+      actions.waitForActionToComplete(1500);
       actions.iSeeTextIn(".alert","Submission was created.");
       actions.valueUpdate('profileuser1','${random}','password');
       actions.valueChanged('profileuser1');
@@ -76,7 +76,7 @@ module.exports = function (actions) {
       actions.logout();
       actions.iAmLoggedInFor('profileuser1');
       actions.goToPage('#/profile/edit');
-      actions.waitForActionToComplete(1000);
+      actions.waitForActionToComplete(2000);
       actions.iSeeText("Name");
       actions.iSeeText("Username");
       actions.iSeeText("Email");

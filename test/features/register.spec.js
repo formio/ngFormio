@@ -75,7 +75,7 @@ module.exports = function (actions) {
       actions.enterTextInField('.register-container #password', '${random-password>register3.password}');
       actions.enterTextInField('.register-container #verifyPassword', '${register3.password}');
       actions.clickOnElementWithText('REGISTER');
-      actions.waitForActionToComplete(1000);
+      actions.waitForActionToComplete(3000);
       actions.iAmLoggedIn();
     });
 
