@@ -7,12 +7,13 @@ module.exports = function (actions) {
       actions.goToPage('#/');
       actions.clickOnElement('#user-menu');
       actions.clickOnElementWithText(' Profile');
+      actions.waitForActionToComplete(1000);
       actions.checkingUrlIamOn("#/profile/view");
       actions.iSeeText("User Profile");
       actions.iSeeValueIn("#profile-username","Username: ${profileuser1.name}");
       actions.iSeeValueIn("#profile-email","Email: ${profileuser1.email}");
       actions.clickOnElementWithText('Edit');
-      actions.waitForActionToComplete(500);
+      actions.waitForActionToComplete(1000);
       actions.iSeeText("Name");
       actions.iSeeValueIn('#fullName','${empty}');
       actions.iSeeText("Username");
@@ -28,12 +29,11 @@ module.exports = function (actions) {
       actions.logout();
       actions.iAmLoggedInFor('profileuser1');
       actions.goToPage('#/profile/edit');
-      actions.waitForActionToComplete(500);
+      actions.waitForActionToComplete(1000);
       actions.iSeeText("Name");
       actions.enterTextInField('.profile-edit-page #fullName','${random-fullName>profileuser1.fullName}');
       actions.clickOnElementWithText('Submit');
       actions.iSeeTextIn(".alert","Submission was created.");
-      actions.waitForActionToComplete(9000);
       actions.valueUpdate('profileuser1','${random}','fullName');
       actions.valueChanged('profileuser1');
     });
@@ -52,7 +52,7 @@ module.exports = function (actions) {
       actions.logout();
       actions.iAmLoggedInFor('profileuser1');
       actions.goToPage('#/profile/edit');
-      actions.waitForActionToComplete(500);
+      actions.waitForActionToComplete(1000);
       actions.iSeeText("Email");
       actions.enterTextInField('.profile-edit-page #email','${random-email>profileuser1.email}');
       actions.clickOnElementWithText('Submit');
@@ -76,7 +76,7 @@ module.exports = function (actions) {
       actions.logout();
       actions.iAmLoggedInFor('profileuser1');
       actions.goToPage('#/profile/edit');
-      actions.waitForActionToComplete(500);
+      actions.waitForActionToComplete(1000);
       actions.iSeeText("Name");
       actions.iSeeText("Username");
       actions.iSeeText("Email");
