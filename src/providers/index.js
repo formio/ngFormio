@@ -1,1 +1,2 @@
-import './Formio';
+import './formio';
+import './formioComponentsProvider';

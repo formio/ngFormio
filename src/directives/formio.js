@@ -1,7 +1,7 @@
 import {Formio} from 'formiojs/full';
 
 const app = angular.module('formio');
-export default app.provider('Formio', function() {
+export default app.directive('formio', function() {
   return {
     restrict: 'E',
     replace: true,
