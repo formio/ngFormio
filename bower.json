@@ -6,7 +6,8 @@
   ],
   "version": "3.0.0",
   "authors": [
-    "Travis Tidwell <travis@form.io>"
+    "Travis Tidwell <travis@form.io>",
+    "Randall Knutson <randall@form.io>"
   ],
   "description": "The Angular.JS form builder.",
   "license": "MIT",

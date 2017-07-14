@@ -1,4 +1,7 @@
-module.exports = function() {
+import template from '../templates/formio-delete.html';
+
+const app = angular.module('formio');
+app.directive('formioDelete', function() {
   return {
     restrict: 'E',
     replace: true,
@@ -10,7 +13,7 @@ module.exports = function() {
       resourceName: '=?',
       message: '=?'
     },
-    templateUrl: 'formio-delete.html',
+    template: template,
     controller: [
       '$scope',
       '$element',
@@ -77,4 +80,4 @@ module.exports = function() {
       }
     ]
   };
-};
+});

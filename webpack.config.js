@@ -28,6 +28,15 @@ module.exports = {
       //  enforce: 'pre'
       //},
       {
+        test: /\.(html)$/,
+        use: {
+          loader: 'html-loader',
+          options: {
+            attrs: [':data-src']
+          }
+        }
+      },
+      {
         test: /\.(css|scss)$/,
         loader: ExtractTextPlugin.extract({ fallback: 'style-loader', use: ['css-loader', 'sass-loader', 'postcss-loader']})
       },

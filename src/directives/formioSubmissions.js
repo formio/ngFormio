@@ -1,4 +1,7 @@
-module.exports = function() {
+import template from '../templates/formio-submissions.html';
+
+const app = angular.module('formio');
+app.directive('formioSubmissions', function() {
   return {
     replace: true,
     restrict: 'E',
@@ -8,7 +11,7 @@ module.exports = function() {
       submissions: '=?',
       perPage: '=?'
     },
-    templateUrl: 'formio/submissions.html',
+    template: template,
     controller: [
       '$scope',
       '$element',
@@ -49,4 +52,4 @@ module.exports = function() {
       }
     ]
   };
-};
+});
