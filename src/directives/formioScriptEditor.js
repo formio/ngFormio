@@ -33,7 +33,7 @@ module.exports = ['FormioUtils', function(FormioUtils) {
             // Disable message: 'Automatically scrolling cursor into view after selection change this will be disabled in the next version set editor.$blockScrolling = Infinity to disable this message'
             editor.$blockScrolling = Infinity;
             editor.setOptions({enableBasicAutocompletion: true});
-            editor.components = $scope.form ? $scope.form.components : $scope.component.components;
+            editor.components = $scope.form ? $scope.form.components : $scope.component.editorComponents;
             /* eslint-disable no-undef*/
             var tools = ace.require('ace/ext/language_tools');
             /* eslint-enable  no-undef*/
