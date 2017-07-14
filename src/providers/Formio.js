@@ -1,7 +1,7 @@
 import {Formio} from 'formiojs/full';
 
 const app = angular.module('formio');
-app.factory('FormioUtils', function() {
+export default app.factory('FormioUtils', function() {
   // Return the provider interface.
   return {
 

@@ -9,7 +9,9 @@ module.exports = {
   entry: './src/index.js',
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'formio.js'
+    filename: 'ng-formio.js',
+    libraryTarget: 'umd',
+    library: 'ngformio'
   },
   module: {
     loaders: [
