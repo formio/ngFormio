@@ -17,10 +17,12 @@ module.exports = [
       templateUrl: 'formio/component-view.html',
       controller: [
         '$scope',
+        '$controller',
         'Formio',
         'FormioUtils',
         function(
           $scope,
+          $controller,
           Formio,
           FormioUtils
         ) {
@@ -47,6 +49,10 @@ module.exports = [
           }
           else {
             $scope.template = component.viewTemplate;
+          }
+
+          if (component.viewController) {
+            $controller(component.viewController, {$scope: $scope});
           }
 
           // Set the component name.

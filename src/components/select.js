@@ -386,14 +386,16 @@ module.exports = function(app) {
               case 'url':
               case 'resource':
                 var url = '';
+                var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
+                //var baseUrl = Formio.getBaseUrl();
                 if (settings.dataSrc === 'url') {
                   url = settings.data.url;
                   if (url.substr(0, 1) === '/') {
-                    url = Formio.getBaseUrl() + settings.data.url;
+                    url = baseUrl + settings.data.url;
                   }
 
                   // Disable auth for outgoing requests.
-                  if (!settings.authenticate && url.indexOf(Formio.getBaseUrl()) === -1) {
+                  if (!settings.authenticate && url.indexOf(baseUrl) === -1) {
                     options.disableJWT = true;
                     options.headers = options.headers || {};
                     options.headers.Authorization = undefined;
@@ -402,7 +404,7 @@ module.exports = function(app) {
                   }
                 }
                 else {
-                  url = Formio.getBaseUrl();
+                  url = baseUrl;
                   if (settings.data.project) {
                     url += '/project/' + settings.data.project;
                   }

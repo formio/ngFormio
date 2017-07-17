@@ -11,7 +11,8 @@ var app = angular.module('formio', [
   'ngDialog',
   'ngFileUpload',
   'ngFileSaver',
-  'ui.ace'
+  'ui.ace',
+  'ckeditor'
 ]);
 
 /**

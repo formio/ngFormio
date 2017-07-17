@@ -8,6 +8,7 @@ require('angular-file-saver');
 require('ng-file-upload');
 require('bootstrap');
 require('angular-ui-bootstrap');
+require('angular-ckeditor');
 require('bootstrap-ui-datetime-picker/dist/datetime-picker');
 require('ng-dialog');
 require('angular-ui-ace/src/ui-ace');
