@@ -17,7 +17,6 @@ module.exports = function (actions) {
       actions.enterTextInField('#fullName','Test-name');
       actions.enterTextInField('#email','email@example.com');
       actions.enterTextInField('#message','Test_message');
-      actions.waitForActionToComplete(500);
       actions.btnEnabled ('Submit');
       actions.clickOnElementWithText('Submit');
       actions.iSeeTextIn(".alert","Submission was created.");

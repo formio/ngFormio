@@ -18,7 +18,6 @@ var expect = chai.expect;
 var url = (port === 80)
   ? protocol + '://' + domain
   : protocol + '://' + domain + ':' + port;
-console.log("port -> " + port);
 var options = {
   baseUrl: url,
   desiredCapabilities: {
@@ -31,27 +30,31 @@ var config = {
   baseUrl: url,
   serverProtocol: serverProtocol,
   serverHost: serverHost,
-  expect :expect
+  expect: expect
 };
 
 var custom = require('./lib/formio-library');
 var actions = new custom(config);
 
-before(function(next){
+before(function (next) {
   var width = 1280;
   var height = 720;
   browser.driver.manage().window().setSize(width, height);
   browser.get(url).then(next).catch(next);
 });
 
-describe("",function () {
-  require('./features/register.spec')(actions);
-  require('./features/loginFunctionality.spec')(actions);
-  require('./features/userPortalandWelcome.spec')(actions);
-  require('./features/supportRequest.spec')(actions);
-  require('./features/feedbackrequest.spec')(actions);
-  require('./features/documentationLinks.spec')(actions);
-  require('./features/profileFunctionality.spec')(actions);
+describe("", function () {
+  // require('./features/register.spec')(actions);
+  // require('./features/loginFunctionality.spec')(actions);
+  // require('./features/userPortalandWelcome.spec')(actions);
+  // require('./features/supportRequest.spec')(actions);
+   require('./features/feedbackrequest.spec')(actions);
+  // require('./features/documentationLinks.spec')(actions);
+  // require('./features/profileFunctionality.spec')(actions);
+  // require('./features/project.spec')(actions);
+  //require('./features/resetPassword.spec')(actions);
   //require('./features/create-project.spec')(actions);
+  //require('./features/createResource2.spec')(actions);
+
 });
 

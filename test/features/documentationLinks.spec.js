@@ -17,7 +17,6 @@ module.exports = function (actions) {
      actions.clickOnElementWithText(' Docs');
      actions.iSeeElement('.docs-dropdown');
      actions.clickOnElementWithText(' Docs');
-     actions.waitForActionToComplete(2000);
      actions.iDonotSeeElement('.docs-dropdown');
      });
 

@@ -41,7 +41,8 @@ module.exports = function (actions){
     });
 
      describe('Save project settings',function(){
-      actions.iAmLoggedInFor('projuser2');
+       actions.logout();
+       actions.iAmLoggedInFor('projuser2');
       actions.goToPage("/#");
       actions.projectExisting('${random-title>project3.title}','${random-description>project3.description}');
       actions.iSeeTextIn('.project.well>h4>a','${project3.title}');
@@ -49,10 +50,11 @@ module.exports = function (actions){
       actions.portalIamOn('${project3.title}');
       actions.clickOnElement('.fa.fa-cog');
       actions.clickOnElementWithText(' Save Project');
-      actions.iSeeTextIn('.alert','Project Settings Saved.');
+      actions.iSeeTextIn('.toast-message','Project settings saved.');
     });
 
    describe('Cant save project after removing title', function(){
+    actions.logout();
     actions.iAmLoggedInFor('projuser4');
     actions.goToPage("/#");
     actions.projectExisting('${random-title>project4.title}','${random-description>project4.description}');
@@ -65,6 +67,7 @@ module.exports = function (actions){
   });
 
   describe('Can save project after removing its description', function(){
+    actions.logout();
     actions.iAmLoggedInFor('projuser5');
     actions.goToPage("/#");
     actions.projectExisting('${random-title>project5.title}','${random-description>project5.description}');
@@ -74,10 +77,11 @@ module.exports = function (actions){
     actions.clickOnElement('.fa.fa-cog');
     actions.enterTextInField('#description','${empty}');
     actions.clickOnElementWithText(' Save Project');
-    //actions.iSeeTextIn('.alert','Project Settings Saved.');
+    actions.iSeeTextIn('.toast-message','Project settings saved.');
   });
 
   describe('Deleting a project warning', function(){
+    actions.logout();
     actions.iAmLoggedInFor('projuser7');
     actions.goToPage("/#");
     actions.projectExisting('${random-title>project7.title}','${random-description>project7.description}');
@@ -85,15 +89,13 @@ module.exports = function (actions){
     actions.clickOnElementWithText('Manage');
     actions.portalIamOn('${project7.title}');
     actions.clickOnElement('.fa.fa-cog');
-    //actions.iSeeTextIn('.panel-body','To remove this project and all of it\'s environments, select this delete button.');
+    actions.iSeeText("To remove this project and all of it\'s environments, select this delete button.");
     actions.iSeeTextIn('.btn.btn-danger.ng-binding','Delete ${project7.title} Project');
     actions.clickOnElementWithText('Delete ${project7.title} Project');
-    //actions.iSeeTextIn('.project-section-inner-content>h2','Are you sure you wish to delete the Project ');
+    actions.iSeeText('Are you sure you wish to delete the Project ');
     actions.iSeeTextIn('.btn.btn-danger','Yes');
     actions.clickOnElementWithText(' Yes');
-    actions.iSeeTextIn('.alert',' Project was deleted!');
-    actions.waitForActionToComplete(9000);
-
+    actions.iSeeTextIn('.toast-message','Project was deleted!');
   });
   });
 };

@@ -20,7 +20,6 @@ describe('Project Update Setting Functionality', function(){
       actions.clickOnElementWithText(' Save Project');
       actions.portalIamOn('${project3.title}');
       actions.clickOnElement('.fa.fa-home');
-      actions.waitForActionToComplete(1000);
       actions.goToPage("/#");
       actions.iSeeValueIn(settings[2],settings[3]);
 

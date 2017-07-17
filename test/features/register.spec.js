@@ -2,7 +2,6 @@ module.exports = function (actions) {
   describe('Register Functionality',function() {
     describe('Empty Register', function () {
       actions.logout();
-      actions.waitForActionToComplete(1000);
       actions.btnDisabled('REGISTER');
     });
     describe('No Username', function () {
@@ -75,9 +74,7 @@ module.exports = function (actions) {
       actions.enterTextInField('.register-container #password', '${random-password>register3.password}');
       actions.enterTextInField('.register-container #verifyPassword', '${register3.password}');
       actions.clickOnElementWithText('REGISTER');
-      actions.waitForActionToComplete(3000);
       actions.iAmLoggedIn();
     });
-
   });
 };
