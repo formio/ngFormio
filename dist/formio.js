@@ -1,4 +1,4 @@
-/*! ng-formio v2.20.4 | https://unpkg.com/ng-formio@2.20.4/LICENSE.txt */
+/*! ng-formio v2.20.5 | https://unpkg.com/ng-formio@2.20.5/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 /*!
  * EventEmitter2
@@ -2030,6 +2030,7 @@ url.title = 'Url';
 module.exports = url;
 
 },{"native-promise-only":198}],8:[function(_dereq_,module,exports){
+(function (global){
 'use strict';
 
 var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -2060,8 +2061,24 @@ function _interopRequireDefault(obj) {
   return obj && obj.__esModule ? obj : { default: obj };
 }
 
-module.exports = {
+var FormioUtils = {
   jsonLogic: _jsonLogicJs2.default, // Share
+
+  /**
+   * Determines the boolean value of a setting.
+   *
+   * @param value
+   * @return {boolean}
+   */
+  boolValue: function boolValue(value) {
+    if (typeof value === 'boolean') {
+      return value;
+    } else if (typeof value === 'string') {
+      return value.toLowerCase() === 'true';
+    } else {
+      return !!value;
+    }
+  },
 
   /**
    * Determine if a component is a layout component or not.
@@ -2140,24 +2157,66 @@ module.exports = {
   },
 
   /**
+   * Matches if a component matches the query.
+   *
+   * @param component
+   * @param query
+   * @return {boolean}
+   */
+  matchComponent: function matchComponent(component, query) {
+    if (typeof query === 'string') {
+      return component.key === query;
+    } else {
+      var matches = false;
+      for (var search in query) {
+        matches = (0, _get3.default)(component, search) === query[search];
+        if (!matches) {
+          break;
+        }
+      }
+      return matches;
+    }
+  },
+
+  /**
    * Get a component by its key
    *
    * @param {Object} components
    *   The components to iterate.
-   * @param {String} key
-   *   The key of the component to get.
+   * @param {String|Object} key
+   *   The key of the component to get, or a query of the component to search.
    *
    * @returns {Object}
    *   The component that matches the given key, or undefined if not found.
    */
   getComponent: function getComponent(components, key) {
     var result;
-    module.exports.eachComponent(components, function (component) {
-      if (component.key === key) {
+    FormioUtils.eachComponent(components, function (component, path) {
+      if (FormioUtils.matchComponent(component, key)) {
+        component.path = path;
         result = component;
+        return true;
       }
     });
     return result;
+  },
+
+  /**
+   * Finds a component provided a query of properties of that component.
+   *
+   * @param components
+   * @param query
+   * @return {*}
+   */
+  findComponents: function findComponents(components, query) {
+    var results = [];
+    FormioUtils.eachComponent(components, function (component, path) {
+      if (FormioUtils.matchComponent(component, query)) {
+        component.path = path;
+        results.push(component);
+      }
+    }, true);
+    return results;
   },
 
   /**
@@ -2173,7 +2232,7 @@ module.exports = {
    */
   flattenComponents: function flattenComponents(components, includeAll) {
     var flattened = {};
-    module.exports.eachComponent(components, function (component, path) {
+    FormioUtils.eachComponent(components, function (component, path) {
       flattened[path] = component;
     }, includeAll);
     return flattened;
@@ -2332,6 +2391,9 @@ module.exports = {
   }
 };
 
+module.exports = global.FormioUtils = FormioUtils;
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"json-logic-js":10,"lodash/clone":162,"lodash/get":168,"lodash/template":194}],9:[function(_dereq_,module,exports){
 'use strict';
 
@@ -14659,7 +14721,7 @@ module.exports = function(app) {
     '$templateCache',
     function($templateCache) {
       $templateCache.put('formio/components/columns.html',
-        "<div class=\"row\">\n  <div ng-show=\"column.width\" class=\"col-sm-{{column.width}} col-sm-offset-{{column.offset}} col-sm-push-{{column.push}} col-sm-pull-{{column.pull}}\" ng-repeat=\"column in component.columns track by $index\">\n    <formio-component\n      ng-repeat=\"_component in column.components track by $index\"\n      component=\"_component\"\n      data=\"data\"\n      formio=\"formio\"\n      submission=\"submission\"\n      hide-components=\"hideComponents\"\n      ng-if=\"builder ? '::true' : isVisible(_component, data)\"\n      formio-form=\"formioForm\"\n      read-only=\"isDisabled(_component, data)\"\n      grid-row=\"gridRow\"\n      grid-col=\"gridCol\"\n      builder=\"builder\"\n      options=\"options\"\n    ></formio-component>\n  </div>\n</div>\n"
+        "<div class=\"row\">\n  <div class=\"col-sm-{{column.width}} col-sm-offset-{{column.offset}} col-sm-push-{{column.push}} col-sm-pull-{{column.pull}}\" ng-repeat=\"column in component.columns track by $index\">\n    <formio-component\n      ng-repeat=\"_component in column.components track by $index\"\n      component=\"_component\"\n      data=\"data\"\n      formio=\"formio\"\n      submission=\"submission\"\n      hide-components=\"hideComponents\"\n      ng-if=\"builder ? '::true' : isVisible(_component, data)\"\n      formio-form=\"formioForm\"\n      read-only=\"isDisabled(_component, data)\"\n      grid-row=\"gridRow\"\n      grid-col=\"gridCol\"\n      builder=\"builder\"\n      options=\"options\"\n    ></formio-component>\n  </div>\n</div>\n"
       );
 
       $templateCache.put('formio/componentsView/columns.html',
@@ -14669,7 +14731,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":250}],206:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":251}],206:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.provider('formioComponents', function() {
@@ -14795,7 +14857,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":250}],208:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":251}],208:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -14963,7 +15025,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":250}],211:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":251}],211:[function(_dereq_,module,exports){
 "use strict";
 
 var formioUtils = _dereq_('formiojs/utils');
@@ -15556,7 +15618,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":250}],216:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":251}],216:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -15670,6 +15732,7 @@ module.exports = function(app) {
           $scope.getFile = function(evt) {
             evt.preventDefault();
             $scope.form = $scope.form || $rootScope.filePath;
+            $scope.options = $scope.options || {};
             var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
             var formio = new Formio($scope.form, {base: baseUrl});
             formio
@@ -15710,6 +15773,7 @@ module.exports = function(app) {
         ) {
           if ($scope.builder) return;
           $scope.form = $scope.form || $rootScope.filePath;
+          $scope.options = $scope.options || {};
           var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
           var formio = new Formio($scope.form, {base: baseUrl});
           formio.downloadFile($scope.file)
@@ -15853,6 +15917,7 @@ module.exports = function(app) {
         },
         controller: ['$scope', 'FormioUtils', 'Formio', function($scope, FormioUtils, Formio) {
           var url = $scope.component.src;
+          $scope.options = $scope.options || {};
           var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
           if ($scope.component.form) {
             url = baseUrl;
@@ -15860,7 +15925,7 @@ module.exports = function(app) {
               url += '/project/' + $scope.component.project;
             }
             else if ($scope.formio && $scope.formio.projectUrl) {
-              url += $scope.formio.projectUrl;
+              url  = $scope.formio.projectUrl;
             }
             url += '/form/' + $scope.component.form;
             url = (new Formio(url, {base: baseUrl})).formUrl;
@@ -15931,7 +15996,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":250}],218:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":251}],218:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -15967,7 +16032,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":250}],219:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":251}],219:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -16250,7 +16315,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":250}],224:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":251}],224:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -16406,7 +16471,7 @@ module.exports = function(app) {
               url += '/project/' + settings.project;
             }
             else if ($scope.formio && $scope.formio.projectUrl) {
-              url += $scope.formio.projectUrl;
+              url  = $scope.formio.projectUrl;
             }
             url += '/form/' + settings.resource;
             var formio = new Formio(url, {base: baseUrl});
@@ -17437,7 +17502,7 @@ module.exports = function(app) {
           angular.forEach(component.questions, function(question) {
             view += '<tr>';
             view += '<th>' + question.label + '</th>';
-            view += '<td>' + values[data[question.value]] + '</td>';
+            view += '<td>' + question.value + '</td>';
             view += '</tr>';
           });
           view += '</tbody></table>';
@@ -17554,7 +17619,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":250}],233:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":251}],233:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -17596,6 +17661,9 @@ module.exports = function(app) {
           }
           if ($scope.readOnly && $scope.component.wysiwyg) {
             return 'formio/componentsView/content.html';
+          }
+          if (!$scope.readOnly && $scope.component.editorComponents) {
+            return 'formio/components/scripteditor.html';
           }
           return 'formio/components/textarea.html';
         },
@@ -17669,6 +17737,9 @@ module.exports = function(app) {
       ));
       $templateCache.put('formio/components/texteditor.html', FormioUtils.fieldWrap(
         "<textarea\n  class=\"form-control\"\n  ng-model=\"data[component.key]\"\n  ng-disabled=\"readOnly\"\n  ng-required=\"isRequired(component)\"\n  ckeditor=\"component.wysiwyg\"\n  safe-multiple-to-single\n  id=\"{{ componentId }}\"\n  name=\"{{ componentId }}\"\n  tabindex=\"{{ component.tabindex || 0 }}\"\n  ng-attr-placeholder=\"{{ component.placeholder }}\"\n  custom-validator=\"component.validate.custom\"\n  rows=\"{{ component.rows }}\"\n></textarea>\n"
+      ));
+      $templateCache.put('formio/components/scripteditor.html', FormioUtils.fieldWrap(
+        "<formio-script-editor \n  ng-model=\"data[component.key]\"\n  ng-disabled=\"readOnly\"\n  ng-required=\"isRequired(component)\"\n  safe-multiple-to-single\n  id=\"{{ componentId }}\"\n  name=\"{{ componentId }}\"\n  tabindex=\"{{ component.tabindex || 0 }}\"\n  ng-attr-placeholder=\"{{ component.placeholder | formioTranslate:null:builder }}\"\n  custom-validator=\"component.validate.custom\"\n  rows=\"{{ component.rows }}\"\n></formio-script-editor>\n\n"
       ));
     }
   ]);
@@ -17859,7 +17930,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":250}],237:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":251}],237:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -18809,6 +18880,81 @@ module.exports = function() {
 
 },{}],245:[function(_dereq_,module,exports){
 "use strict";
+// Javascript editor directive
+module.exports = ['FormioUtils', function(FormioUtils) {
+  return {
+    restrict: 'E',
+    require: ['ngModel'],
+    replace: true,
+    template: function() {
+      if (typeof ace !== 'undefined') {
+        return '<div ui-ace="aceOptions" ng-style="aceStyles"></div>';
+      }
+      else {
+        return '<textarea class="form-control"></textarea>';
+      }
+    },
+    link: function($scope, element, attrs) {
+      if (typeof ace !== 'undefined') {
+        var rows = attrs.rows ? attrs.rows - 0 : 5;
+        $scope.aceStyles = {
+          height: rows * 25 + 'px'
+        };
+      }
+    },
+    controller: ['$scope', function($scope) {
+      if (typeof ace !== 'undefined') {
+        $scope.aceOptions = {
+          useWrapMode: true,
+          showGutter: true,
+          theme: 'dawn',
+          mode: 'javascript',
+          showIndentGuides: true,
+          showPrintMargin: false,
+          onLoad: function(editor) {
+            // Disable message: 'Automatically scrolling cursor into view after selection change this will be disabled in the next version set editor.$blockScrolling = Infinity to disable this message'
+            editor.$blockScrolling = Infinity;
+            editor.setOptions({enableBasicAutocompletion: true});
+            editor.components = $scope.form ? $scope.form.components : $scope.component.editorComponents;
+            /* eslint-disable no-undef*/
+            var tools = ace.require('ace/ext/language_tools');
+            /* eslint-enable  no-undef*/
+            if (tools.completed !== true) {
+                tools.completed   = true;
+                tools.addCompleter({
+                  getCompletions: function(editor, session, pos, prefix, callback) {
+                    callback(null, _.map(FormioUtils.flattenComponents(editor.components, true), function(comp) {
+                      return {name: comp.key, value: comp.key, score: 1000, meta: 'component'};
+                    }));
+                  }
+                });
+            }
+            function update() {
+                var show = !editor.session.getValue().length;
+                var node =  editor.renderer.emptyMessageNode;
+                if (!show && node) {
+                    editor.renderer.scroller.removeChild(editor.renderer.emptyMessageNode);
+                    editor.renderer.emptyMessageNode = null;
+                }
+                else if (show && !node) {
+                    node = editor.renderer.emptyMessageNode = document.createElement('div');
+                    node.innerHTML = editor.container.attributes['placeholder'].value.replace('\n', '<br>');
+                    node.className = 'ace_invisible ace_emptyMessage';
+                    node.style.padding = '0 9px';
+                    editor.renderer.scroller.appendChild(node);
+                }
+            }
+            editor.on('input', update);
+            setTimeout(update, 100);
+          }
+        };
+      }
+    }]
+  };
+}];
+
+},{}],246:[function(_dereq_,module,exports){
+"use strict";
 module.exports = function() {
   return {
     replace: true,
@@ -18839,7 +18985,7 @@ module.exports = function() {
   };
 };
 
-},{}],246:[function(_dereq_,module,exports){
+},{}],247:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -18895,7 +19041,7 @@ module.exports = function() {
   };
 };
 
-},{}],247:[function(_dereq_,module,exports){
+},{}],248:[function(_dereq_,module,exports){
 "use strict";
 var isNaN = _dereq_('lodash/isNAN');
 var isFinite = _dereq_('lodash/isFinite');
@@ -19486,7 +19632,7 @@ module.exports = function() {
   };
 };
 
-},{"lodash/isFinite":177,"lodash/isNAN":180}],248:[function(_dereq_,module,exports){
+},{"lodash/isFinite":177,"lodash/isNAN":180}],249:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -19670,7 +19816,7 @@ module.exports = [
   }
 ];
 
-},{}],249:[function(_dereq_,module,exports){
+},{}],250:[function(_dereq_,module,exports){
 "use strict";
 var formioUtils = _dereq_('formiojs/utils');
 var _filter = _dereq_('lodash/filter');
@@ -20076,7 +20222,7 @@ module.exports = function() {
   };
 };
 
-},{"formiojs/utils":9,"lodash/filter":167,"lodash/get":168}],250:[function(_dereq_,module,exports){
+},{"formiojs/utils":9,"lodash/filter":167,"lodash/get":168}],251:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   var generic = function(data, component) {
@@ -20202,7 +20348,7 @@ module.exports = function() {
   };
 };
 
-},{}],251:[function(_dereq_,module,exports){
+},{}],252:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$q',
@@ -20251,7 +20397,7 @@ module.exports = [
   }
 ];
 
-},{}],252:[function(_dereq_,module,exports){
+},{}],253:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -20285,7 +20431,7 @@ module.exports = [
   }
 ];
 
-},{}],253:[function(_dereq_,module,exports){
+},{}],254:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'FormioUtils',
@@ -20294,7 +20440,7 @@ module.exports = [
   }
 ];
 
-},{}],254:[function(_dereq_,module,exports){
+},{}],255:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$sce',
@@ -20307,7 +20453,7 @@ module.exports = [
   }
 ];
 
-},{}],255:[function(_dereq_,module,exports){
+},{}],256:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   function() {
@@ -20326,7 +20472,7 @@ module.exports = [
   }
 ];
 
-},{}],256:[function(_dereq_,module,exports){
+},{}],257:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'formioTableView',
@@ -20339,7 +20485,7 @@ module.exports = [
   }
 ];
 
-},{}],257:[function(_dereq_,module,exports){
+},{}],258:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -20354,7 +20500,7 @@ module.exports = [
   }
 ];
 
-},{}],258:[function(_dereq_,module,exports){
+},{}],259:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$filter',
@@ -20403,7 +20549,7 @@ module.exports = [
   }
 ];
 
-},{}],259:[function(_dereq_,module,exports){
+},{}],260:[function(_dereq_,module,exports){
 "use strict";
 module.exports = ['$sce', function($sce) {
   return function(val) {
@@ -20411,7 +20557,7 @@ module.exports = ['$sce', function($sce) {
   };
 }];
 
-},{}],260:[function(_dereq_,module,exports){
+},{}],261:[function(_dereq_,module,exports){
 "use strict";
 _dereq_('./polyfills/polyfills');
 
@@ -20426,6 +20572,7 @@ var app = angular.module('formio', [
   'ngDialog',
   'ngFileUpload',
   'ngFileSaver',
+  'ui.ace',
   'ckeditor'
 ]);
 
@@ -20466,6 +20613,8 @@ app.directive('formioElement', _dereq_('./directives/formioElement'));
 app.directive('formioWizard', _dereq_('./directives/formioWizard'));
 
 app.directive('formioBindHtml', _dereq_('./directives/formioBindHtml.js'));
+
+app.directive('formioScriptEditor', _dereq_('./directives/formioScriptEditor'));
 
 /**
  * Filter to flatten form components.
@@ -20563,7 +20712,7 @@ app.run([
 
 _dereq_('./components');
 
-},{"./components":220,"./directives/customValidator":237,"./directives/formio":238,"./directives/formioBindHtml.js":239,"./directives/formioComponent":240,"./directives/formioComponentView":241,"./directives/formioDelete":242,"./directives/formioElement":243,"./directives/formioErrors":244,"./directives/formioSubmission":245,"./directives/formioSubmissions":246,"./directives/formioWizard":247,"./factories/FormioScope":248,"./factories/FormioUtils":249,"./factories/formioInterceptor":251,"./factories/formioTableView":252,"./filters/flattenComponents":253,"./filters/safehtml":254,"./filters/tableComponents":255,"./filters/tableFieldView":256,"./filters/tableView":257,"./filters/translate":258,"./filters/trusturl":259,"./polyfills/polyfills":262,"./providers/Formio":263}],261:[function(_dereq_,module,exports){
+},{"./components":220,"./directives/customValidator":237,"./directives/formio":238,"./directives/formioBindHtml.js":239,"./directives/formioComponent":240,"./directives/formioComponentView":241,"./directives/formioDelete":242,"./directives/formioElement":243,"./directives/formioErrors":244,"./directives/formioScriptEditor":245,"./directives/formioSubmission":246,"./directives/formioSubmissions":247,"./directives/formioWizard":248,"./factories/FormioScope":249,"./factories/FormioUtils":250,"./factories/formioInterceptor":252,"./factories/formioTableView":253,"./filters/flattenComponents":254,"./filters/safehtml":255,"./filters/tableComponents":256,"./filters/tableFieldView":257,"./filters/tableView":258,"./filters/translate":259,"./filters/trusturl":260,"./polyfills/polyfills":263,"./providers/Formio":264}],262:[function(_dereq_,module,exports){
 "use strict";
 'use strict';
 
@@ -20594,13 +20743,13 @@ if (typeof Object.assign != 'function') {
   })();
 }
 
-},{}],262:[function(_dereq_,module,exports){
+},{}],263:[function(_dereq_,module,exports){
 "use strict";
 'use strict';
 
 _dereq_('./Object.assign');
 
-},{"./Object.assign":261}],263:[function(_dereq_,module,exports){
+},{"./Object.assign":262}],264:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   // The formio class.
@@ -20670,5 +20819,5 @@ module.exports = function() {
   };
 };
 
-},{"formiojs":2}]},{},[260])(260)
+},{"formiojs":2}]},{},[261])(261)
 });
