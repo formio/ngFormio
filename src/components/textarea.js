@@ -39,6 +39,9 @@ module.exports = function(app) {
           if ($scope.readOnly && $scope.component.wysiwyg) {
             return 'formio/componentsView/content.html';
           }
+          if (!$scope.readOnly && $scope.component.editorComponents) {
+            return 'formio/components/scripteditor.html';
+          }
           return 'formio/components/textarea.html';
         },
         viewTemplate: function($scope) {
@@ -111,6 +114,9 @@ module.exports = function(app) {
       ));
       $templateCache.put('formio/components/texteditor.html', FormioUtils.fieldWrap(
         fs.readFileSync(__dirname + '/../templates/components/texteditor.html', 'utf8')
+      ));
+      $templateCache.put('formio/components/scripteditor.html', FormioUtils.fieldWrap(
+        fs.readFileSync(__dirname + '/../templates/components/scripteditor.html', 'utf8')
       ));
     }
   ]);
