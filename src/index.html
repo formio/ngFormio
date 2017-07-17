@@ -31,6 +31,7 @@
   <!-- endinject -->
   <!-- endbuild -->
 
+<<<<<<< HEAD
   <link rel="stylesheet" href="/lib/kendo-ui/styles/kendo.common.min.css" />
   <link rel="stylesheet" href="/lib/kendo-ui/styles/kendo.bootstrap.min.css" />
   <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,700' rel='stylesheet' type='text/css'>
@@ -121,6 +122,151 @@
                     </ul>
                   </div>
                 </div>
+=======
+    <link rel="stylesheet" href="/lib/kendo-ui/styles/kendo.common.min.css" />
+    <link rel="stylesheet" href="/lib/kendo-ui/styles/kendo.bootstrap.min.css" />
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,700' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Comfortaa:400,700' rel='stylesheet' type='text/css'>
+    <script type="text/javascript" src="//www.googleadservices.com/pagead/conversion_async.js" charset="utf-8"></script>
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="57x57" href="/images/favicons/apple-touch-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/images/favicons/apple-touch-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/images/favicons/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/images/favicons/apple-touch-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/images/favicons/apple-touch-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/images/favicons/apple-touch-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/images/favicons/apple-touch-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/images/favicons/apple-touch-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/favicons/apple-touch-icon-180x180.png">
+    <link rel="icon" type="image/png" href="/images/favicons/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="/images/favicons/android-chrome-192x192.png" sizes="192x192">
+    <link rel="icon" type="image/png" href="/images/favicons/favicon-96x96.png" sizes="96x96">
+    <link rel="icon" type="image/png" href="/images/favicons/favicon-16x16.png" sizes="16x16">
+    <link rel="manifest" href="/images/favicons/manifest.json">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="msapplication-TileImage" content="/images/favicons/mstile-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+  </head>
+  <body ng-app="formioApp">
+    <!--[if lt IE 10]>
+      <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+    <![endif]-->
+    <div id="content">
+      <nav class="navbar navbar-fixed-top navbar-inverse">
+        <div ng-class="{container: !isActive('project')}" ng-cloak>
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a ui-sref="home" title="Home" class="navbar-brand">
+              <img height="25px;" src="images/formio-logo.png" />
+            </a>
+          </div>
+          <div id="navbar" class="navbar-collapse collapse navbar-menu">
+            <ul class="nav navbar-nav navbar-right">
+              <li>
+                <a class="btn btn-primary" style="margin-top: 5px;" href="/">Use Classic UI</a>
+              </li>
+              <li class="dropbox" ng-controller="environmentSwitcher">
+                <a ng-cloak href="" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-server"></i> {{ (currentEnvironment.name ? currentEnvironment.name : 'Environments') }}<b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                  <li ng-if="environments.length && currentEnvironment">
+                    <a ng-click="switchEnvironment()">Form.io</a>
+                  </li>
+                  <li style="position:  relative;" ng-repeat="environment in environments track by $index" ng-if="environment.url !== currentEnvironment.url">
+                    <span style="right: 10px; top: 10px; position: absolute;" ng-click="removeEnvironment($event, $index)"><i class="fa fa-close"></i></span>
+                    <a ng-click="switchEnvironment(environment)">{{environment.name}}</a>
+                  </li>
+                  <li ng-if="!addingEnvironment" ><a ng-click="addEnvironment($event)">Add Environment</a></li>
+                  <li ng-if="addingEnvironment" style="width: 620px;">
+                    <form class="form-inline" style="margin: 5px 10px;">
+                      <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Name" ng-model="environment.name">
+                      </div>
+                      <div class="form-group">
+                        <input type="text" class="form-control" placeholder="http://lvh.me:3000" ng-model="environment.url">
+                      </div>
+                      <div class="form-group">
+                        <!--<label class="form-label">Project Path</label>-->
+                        <select class="form-control" ng-options="option as option for option in environmentTypes" ng-model="environment.type" ng-click="typeClick($event)" placeholder="Project Paths">
+                          <option value="">(Project Path Type)</option>
+                        </select>
+                      </div>
+                      <a class="btn btn-default" ng-click="saveEnvironment($event)">Add</a>
+                      <span ng-click="cancelEnvironment()"><i class="fa fa-close"></i></span>
+                    </form>
+                    <div class="environment-errors">
+                      <p class="help-block" ng-show="errors.nameRequired">Environment name is required.</p>
+                      <p class="help-block" ng-show="errors.urlRequired">Environment Url is required.</p>
+                      <p class="help-block" ng-show="errors.typeRequired">Project Path Type is required.</p>
+                      <p class="help-block" ng-show="errors.urlInvalid">Url is not valid.</p>
+                      <p class="help-block" ng-show="errors.localhost">http://localhost cannot be used as a domain since it does not support subdomains. Use <strong>http://lvh.me</strong> instead for 127.0.0.1.</p>
+                    </div>
+                  </li>
+                  <li><a href="https://help.form.io/userguide/environment-switcher/" target="_blank">Help</a></li>
+                </ul>
+              </li>
+              <li class="dropdown">
+                <a href="" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-book"></i> Docs<b class="caret"></b></a>
+                <ul class="dropdown-menu help-menu">
+                  <li class="no-hover">
+                    <div class="row docs-dropdown">
+                      <div class="col-md-3">
+                        <h5 class="section-heading"><i class="fa fa-book"></i> Guides</h5>
+                        <ul class="list-group">
+                          <li class="list-group-item"><a href="https://help.form.io/intro/welcome/" target="_blank"><i class="fa fa-rocket"></i> Getting Started</a></li>
+                          <li class="list-group-item"><a href="https://help.form.io/intro/howworks/" target="_blank"><i class="fa fa-info-circle"></i> How it works</a></li>
+                          <li class="list-group-item"><a href="https://help.form.io/userguide/introduction/" target="_blank"><i class="fa fa-laptop"></i> User Guide</a></li>
+                          <li class="list-group-item"><a href="https://help.form.io/intro/appdev/" target="_blank"><i class="fa fa-server"></i> Application Development</a></li>
+                          <li class="list-group-item"><a href="https://help.form.io/intro/guide/" target="_blank"><i class="fa fa-book"></i> 30 minute guide</a></li>
+                        </ul>
+                      </div>
+                      <div class="col-md-3">
+                        <h5 class="section-heading"><i class="fa fa-wrench"></i> Developer Info</h5>
+                        <ul class="list-group">
+                          <li class="list-group-item"><a href="https://help.form.io/developer/info/welcome/" target="_blank"><i class="fa fa-code"></i> Developer Section</a></li>
+                          <li class="list-group-item"><a href="https://documenter.getpostman.com/view/684631/formio-api/2Jvuks" target="_blank"><i class="fa fa-cloud-upload"></i> API Docs</a></li>
+                          <li class="list-group-item"><a href="https://github.com/formio" target="_blank"><i class="fa fa-github"></i> Github Projects</a></li>
+                          <li class="list-group-item"><a href="https://help.form.io/developer/libraries/angular/" target="_blank"><i class="fa fa-cubes"></i> App Libraries</a></li>
+                          <li class="list-group-item"><a href="https://help.form.io/developer/libraries/cli/" target="_blank"><i class="fa fa-terminal"></i> CLI Tool</a></li>
+                          <li class="list-group-item"><a href="https://help.form.io/tutorials/walkthroughs/eventmanager/" target="_blank"><i class="fa fa-check-square-o"></i> Walkthroughs</a></li>
+                        </ul>
+                      </div>
+                      <div class="col-md-3">
+                        <h5 class="section-heading"><i class="fa fa-cloud"></i> Integrations</h5>
+                        <ul class="list-group">
+                          <li class="list-group-item"><a href="https://help.form.io/developer/integrations/email/" target="_blank"><i class="fa fa-envelope"></i> Email Providers</a></li>
+                          <li class="list-group-item"><a href="https://help.form.io/developer/integrations/filestorage/" target="_blank"><i class="fa fa-file"></i> File Storage Providers</a></li>
+                          <li class="list-group-item"><a href="https://help.form.io/developer/integrations/oauth/" target="_blank"><i class="fa fa-user"></i> OAuth Providers</a></li>
+                          <li class="list-group-item"><a href="https://help.form.io/developer/info/lambda/" target="_blank"><i class="fa fa-amazon"></i> AWS Lamba</a></li>
+                          <li class="list-group-item"><a href="https://help.form.io/developer/info/auth0/" target="_blank"><i class="fa fa-user"></i> Auth0</a></li>
+                        </ul>
+                      </div>
+                      <div class="col-md-3">
+                        <h5 class="section-heading"><i class="fa fa-space-shuttle"></i> Advanced Features</h5>
+                        <ul class="list-group">
+                          <li class="list-group-item"><a href="https://help.form.io/developer/info/bootstrap/" target="_blank"><i class="fa fa-copy"></i> Application Cloning</a></li>
+                          <li class="list-group-item"><a href="https://help.form.io/userguide/actions/" target="_blank"><i class="fa fa-cogs"></i> Form Actions</a></li>
+                          <li class="list-group-item"><a href="https://help.form.io/developer/info/offline/" target="_blank"><i class="fa fa-wifi"></i> Offline Mode</a></li>
+                          <li class="list-group-item"><a href="https://help.form.io/userguide/docker/" target="_blank"><i class="fa fa-ship"></i> Docker Deployments</a></li>
+                        </ul>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </li>
+              <li class="dropdown user-dropdown" ng-cloak>
+                <a ng-if="authenticated" class="dropdown-toggle" id="user-menu" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-user"></i> {{ user.data.name }}<b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                  <li><a ui-sref="profile.view()"><i class="fa fa-user"></i> Profile</a></li>
+                  <li ng-if="!onPrem"><a ui-sref="profile.payment.view()"><i class="fa fa-credit-card"></i> Payment Info</a></li>
+                  <li class="divider"></li>
+                  <li><a href="" id="logout" ng-click="logout()"><i class="fa fa-power-off"></i> Log Out</a></li>
+                </ul>
+>>>>>>> 6ed07586d90a71bc770e0e9c32560f2f07bb1b46
               </li>
             </ul>
           </li>
@@ -255,12 +401,14 @@
 <script src="/lib/kendo-ui/js/kendo.angular.min.js" type="text/javascript"></script>
 <!-- endbuild -->
 
+<<<<<<< HEAD
 <!-- build:js scripts/app.js -->
 <!-- inject:js -->
 <script src="scripts/app.js"></script>
 <script src="scripts/components/resourcefields.js"></script>
 <script src="scripts/controllers/access.js"></script>
 <script src="scripts/controllers/controllers.js"></script>
+<script src="scripts/controllers/environmentSwitcher.js"></script>
 <script src="scripts/controllers/feedback.js"></script>
 <script src="scripts/controllers/form.js"></script>
 <script src="scripts/controllers/help.js"></script>
@@ -272,6 +420,26 @@
 <script src="scripts/utils/utils.js"></script>
 <!-- endinject -->
 <!-- endbuild -->
+=======
+    <!-- build:js scripts/app.js -->
+    <!-- inject:js -->
+    <script src="scripts/app.js"></script>
+    <script src="scripts/components/resourcefields.js"></script>
+    <script src="scripts/controllers/access.js"></script>
+    <script src="scripts/controllers/controllers.js"></script>
+    <script src="scripts/controllers/environmentSwitcher.js"></script>
+    <script src="scripts/controllers/feedback.js"></script>
+    <script src="scripts/controllers/form.js"></script>
+    <script src="scripts/controllers/help.js"></script>
+    <script src="scripts/controllers/pdf.js"></script>
+    <script src="scripts/controllers/project.js"></script>
+    <script src="scripts/controllers/role.js"></script>
+    <script src="scripts/controllers/team.js"></script>
+    <script src="scripts/controllers/user.js"></script>
+    <script src="scripts/utils/utils.js"></script>
+    <!-- endinject -->
+    <!-- endbuild -->
+>>>>>>> 6ed07586d90a71bc770e0e9c32560f2f07bb1b46
 
 <script src="config.js" type="text/javascript"></script>
 </body>

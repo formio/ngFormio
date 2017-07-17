@@ -10,14 +10,12 @@ exports.config = {
   capabilities: {
     'browserName': 'chrome'
   },
-
-  baseUrl: 'http://localhost:3000',
   allScriptSTimeout : 10000,
   getPageTimeout: 10000,
   // Spec patterns are relative to the current working directory when
   // protractor is called.
   // specs: [paths.e2e + '/**/*.js'],
-  specs: ['test/test.spec.js'],
+  specs: ['test/test.js'],
   framework : 'mocha',
   // Options to be passed to Jasmine-node.
   //jasmineNodeOpts: {
@@ -27,8 +25,6 @@ exports.config = {
   mochaOpts: {
     reporter: "spec",
     slow: 1000,
-    timeout: 10000
+    timeout: 60000
   }
 };
-
-
