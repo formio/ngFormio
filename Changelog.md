@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [UNRELEASED]
+
+### Fixed
+ - Columns components hiding if width is not set.
+
 ## 2.20.4
 ### Fixed
  - An error that would show up if $scope.options was not defined.
