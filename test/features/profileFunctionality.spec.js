@@ -1,8 +1,8 @@
 module.exports = function (actions) {
   describe('{User Profile Functionality',function(){
     describe('Profile navigation',function(){
-      actions.goToPage("#/");
       actions.logout();
+      actions.goToPage("#/");
       actions.iAmLoggedInFor('profileuser1');
       actions.goToPage('#/');
       actions.clickOnElement('#user-menu');
