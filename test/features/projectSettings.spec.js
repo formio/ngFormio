@@ -12,7 +12,7 @@ module.exports = function (actions) {
         actions.iAmLoggedInFor('projuser2');
         actions.projectExisting('${random-title>project3.title}', '${random-description>project3.description}');
         actions.goToPage("/#");
-        actions.iSeeText('${project3.title}');
+        actions.iSeeTextIn('.project.well>h4>a', '${project3.title}');
         actions.clickOnElementWithText('Manage');
         actions.portalIamOn('${project3.title}');
         actions.clickOnElement('.fa.fa-cog');
