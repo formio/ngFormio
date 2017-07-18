@@ -6,8 +6,7 @@
   "scripts": {
     "start": "node app.js",
     "test": "APPPROTOCOL=http APPDOMAIN=portal.localhost APPPORT=$PORT protractor protractor.conf.js",
-    "test-win": "mocha --timeout 60000 --reporter spec test/test.js",
-    "test-pro": "protractor protractor.conf.js"
+    "test-win": "protractor protractor.conf.js"
   },
   "main": "./index.js",
   "devDependencies": {
@@ -57,7 +56,7 @@
     "express": "4.12.3",
     "gulp-s3": "^0.11.0",
     "lodash": "^3.10.1",
-    "mocha": "^2.3.2",
+    "mocha": "^3.4.2",
     "mongoose": "^4.1.6",
     "ng-file-upload": "^10.0.2",
     "protractor": "^5.1.2",

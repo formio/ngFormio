@@ -40,7 +40,6 @@ module.exports = function (actions) {
       actions.enterTextInField('.login-container #password','${login2.password}');
       actions.clickOnElementWithText('LOG IN');
       actions.iAmLoggedIn();
-      actions.waitForActionToComplete(2000);
       actions.checkingUrlIamOn('#/');
       actions.clickOnElement('#user-menu');
       actions.clickOnElement('#logout');
