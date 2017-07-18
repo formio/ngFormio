@@ -353,18 +353,18 @@ module.exports = function (config) {
       url = config.baseUrl + "/" + url;
     }
     it('I am on ' + url, function (next) {
-          browser.wait(function(){
-           return browser.getCurrentUrl().then(function(cUrl){
-             return  cUrl.toLowerCase() == url.toLowerCase();
-            });
-          },timeout).then(function(value){
-            try{
-              assert.equal(value,true);
-              next();
-            }catch(err){
-              next(err);
-            }
-          });
+      browser.wait(function () {
+        return browser.getCurrentUrl().then(function (cUrl) {
+          return cUrl.toLowerCase() == url.toLowerCase();
+        });
+      }, timeout).then(function (value) {
+        try {
+          assert.equal(value, true);
+          next();
+        } catch (err) {
+          next(err);
+        }
+      });
     });
   };
 
@@ -379,14 +379,14 @@ module.exports = function (config) {
       try {
         var ele = element(by.xpath("//*[text()='" + text + "']"));
         browser.wait(function () {
-          return ele.isPresent().then(function(res){
+          return ele.isPresent().then(function (res) {
             return !res;
           })
         }, timeout).then(function (value) {
-          try{
-            assert.equal(value,true);
+          try {
+            assert.equal(value, true);
             next();
-          }catch(err){
+          } catch (err) {
             next(err);
           }
         });
@@ -440,7 +440,7 @@ module.exports = function (config) {
   this.iSeeTextIn = function (ele, text) {
     text = replacements(text);
     it('I see text "' + text + '"', function (next) {
-      ele = (typeof (ele) == 'object') ? ele : element(by.cssContainingText(ele,text));
+      ele = (typeof (ele) == 'object') ? ele : element(by.cssContainingText(ele, text));
       browser.wait(function () {
         return ele.isPresent();
       }, timeout).then(function () {
@@ -489,16 +489,19 @@ module.exports = function (config) {
       try {
         var btn = element(by.xpath('//button[text()=\'' + field + '\']'));
         browser.wait(function () {
-         return btn.isPresent().then(function(){
-            return btn.isEnabled().then(function(res){
-              return !res;
-            });
-          })
+          return btn.isPresent().then(function (present) {
+            if (present) {
+              return btn.isEnabled().then(function (res) {
+                return !res;
+              });
+            }
+            return present;
+          });
         }, timeout).then(function (value) {
-          try{
-            assert.equal(value,true);
+          try {
+            assert.equal(value, true);
             next();
-          }catch(err){
+          } catch (err) {
             next(err);
           }
         });
@@ -513,14 +516,17 @@ module.exports = function (config) {
       try {
         var btn = element(by.xpath('//button[text()="' + field + '"]'));
         browser.wait(function () {
-          return btn.isPresent().then(function(){
-            return btn.isEnabled();
+          return btn.isPresent().then(function (present) {
+            if (present) {
+              return btn.isEnabled();
+            }
+            return present;
           });
         }, timeout).then(function (value) {
-          try{
-            assert.equal(value,true);
+          try {
+            assert.equal(value, true);
             next();
-          }catch(err){
+          } catch (err) {
             next(err);
           }
         });
@@ -851,13 +857,12 @@ module.exports = function (config) {
             return next(err);
           }
           browser.refresh().then(function () {
-            next(null, res);
-          })
+            next();
+          });
         });
       } catch (err) {
         next(err);
       }
-
     });
   };
 };
