@@ -230,12 +230,14 @@ module.exports = function(app) {
                   }
                   $scope.data[$scope.component.key].push(fileInfo);
                   $scope.$apply();
+                  $scope.$emit('fileUploaded', fileName, fileInfo);
                 })
                 .catch(function(response) {
                   $scope.fileUploads[fileName].status = 'error';
                   $scope.fileUploads[fileName].message = response.data;
                   delete $scope.fileUploads[fileName].progress;
                   $scope.$apply();
+                  $scope.$emit('fileUploadFailed', fileName, response);
                 });
             }
           });
