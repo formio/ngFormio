@@ -47,7 +47,6 @@ module.exports = function (actions) {
     describe('Save project settings', function () {
       actions.logout();
       actions.iAmLoggedInFor('projuser2');
-      actions.goToPage("/#");
       actions.projectExisting('${random-title>project3.title}', '${random-description>project3.description}');
       actions.goToPage("/#");
       actions.iSeeTextIn('.project.well>h4>a', '${project3.title}');

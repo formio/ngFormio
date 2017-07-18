@@ -551,7 +551,7 @@ module.exports = function (config) {
     it('I have been logged in', function (next) {
       var tries = 0;
       (function attempt() {
-        if (tries > 15) {
+        if (tries > 25) {
           return next(new Error('No formioToken found.'));
         }
         browser.sleep(100).then(function () {
@@ -853,12 +853,11 @@ module.exports = function (config) {
         description = replacements(description);
         var driver = browser;
         createProject(driver, title, description, function (err, res) {
+          console.log("Project exists with " + JSON.stringify(res));
           if (err) {
             return next(err);
           }
-          browser.refresh().then(function () {
-            next();
-          });
+            next(null,res);
         });
       } catch (err) {
         next(err);
