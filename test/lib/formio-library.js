@@ -421,11 +421,12 @@ module.exports = function(config) {
 
   this.iSeeTextIn = function (ele, text) {
     it('I see text "' + text + '"', function (next) {
-      ele = (typeof (ele) == 'object') ? ele : element(by.css(ele, text));
+      ele = (typeof (ele) == 'object') ? ele : element(by.css(ele));
       browser.wait(function () {
         return ele.isPresent();
       }, config.timeout);
       try {
+        text = replacements(text);
         config.expect(ele.getText()).to.eventually.equal(text);
         next();
       } catch (err) {
