@@ -10,8 +10,9 @@ module.exports = function (actions) {
       val.forEach(function (settings) {
         actions.logout();
         actions.iAmLoggedInFor('projuser2');
-        actions.projectExisting('${random-title>project3.title}', '${random-description>project3.description}');
         actions.goToPage("/#");
+        actions.clickOnElement('.fa-close');
+        actions.projectExisting('${random-title>project3.title}', '${random-description>project3.description}');
         actions.iSeeTextIn('.project.well>h4>a', '${project3.title}');
         actions.clickOnElementWithText('Manage');
         actions.portalIamOn('${project3.title}');

@@ -856,7 +856,9 @@ module.exports = function (config) {
           if (err) {
             return next(err);
           }
+          browser.refresh().then(function () {
             next(null,res);
+          });
         });
       } catch (err) {
         next(err);
