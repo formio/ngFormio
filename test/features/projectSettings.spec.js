@@ -10,8 +10,7 @@ module.exports = function (actions) {
       val.forEach(function (settings) {
         actions.logout();
         actions.iAmLoggedInFor('projuser2');
-        actions.goToPage("/#");
-        actions.clickOnElement('.fa.fa-close');
+        actions.goToPage("#/");
         actions.projectExisting('${random-title>project3.title}', '${random-description>project3.description}');
         actions.iSeeTextIn('.project.well>h4>a', '${project3.title}');
         actions.clickOnElementWithText('Manage');
@@ -20,8 +19,7 @@ module.exports = function (actions) {
         actions.enterTextInField(settings[1], settings[0]);
         actions.clickOnElementWithText(' Save Project');
         actions.portalIamOn('${project3.title}');
-        actions.clickOnElement('.fa.fa-home');
-        actions.goToPage("/#");
+        actions.goToPage("#/");
         actions.iSeeValueIn(settings[2], settings[3]);
       });
     });

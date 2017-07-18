@@ -47,8 +47,7 @@ module.exports = function (actions) {
     describe('Save project settings', function () {
       actions.logout();
       actions.iAmLoggedInFor('projuser2');
-      actions.goToPage("/#");
-      actions.clickOnElement('.fa.fa-close');
+      actions.goToPage("#/");
       actions.projectExisting('${random-title>project3.title}', '${random-description>project3.description}');
       actions.iSeeTextIn('.project.well>h4>a', '${project3.title}');
       actions.clickOnElementWithText('Manage');
@@ -61,8 +60,7 @@ module.exports = function (actions) {
     describe('Cant save project after removing title', function () {
       actions.logout();
       actions.iAmLoggedInFor('projuser4');
-      actions.goToPage("/#");
-      actions.clickOnElement('.fa.fa-close');
+      actions.goToPage("#/");
       actions.projectExisting('${random-title>project4.title}', '${random-description>project4.description}');
       actions.iSeeTextIn('.project.well>h4>a', '${project4.title}');
       actions.clickOnElementWithText('Manage');
@@ -75,8 +73,7 @@ module.exports = function (actions) {
     describe('Can save project after removing its description', function () {
       actions.logout();
       actions.iAmLoggedInFor('projuser5');
-      actions.goToPage("/#");
-      actions.clickOnElement('.fa.fa-close');
+      actions.goToPage("#/");
       actions.projectExisting('${random-title>project5.title}', '${random-description>project5.description}');
       actions.iSeeTextIn('.project.well>h4>a', '${project5.title}');
       actions.clickOnElementWithText('Manage');
@@ -90,8 +87,8 @@ module.exports = function (actions) {
     describe('Deleting a project warning', function () {
       actions.logout();
       actions.iAmLoggedInFor('projuser7');
-      actions.goToPage("/#");
-      actions.clickOnElement('.fa.fa-close');
+      actions.goToPage("#/");
+      actions.clickOnElement("xpath://*[contains(@class,'fa-close')]");
       actions.projectExisting('${random-title>project7.title}', '${random-description>project7.description}');
       actions.iSeeTextIn('.project.well>h4>a', '${project7.title}');
       actions.clickOnElementWithText('Manage');
