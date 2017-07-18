@@ -19,7 +19,7 @@ module.exports = function (actions) {
         actions.enterTextInField(settings[1], settings[0]);
         actions.clickOnElementWithText(' Save Project');
         actions.portalIamOn('${project3.title}');
-        actions.clickOnElement('.fa.fa-home');
+        actions.clickOnElement('xpath://h2//a[@title="Home"]');
         actions.goToPage("#/");
         actions.iSeeValueIn(settings[2], settings[3]);
       });

@@ -802,8 +802,7 @@ module.exports = function (config) {
           elet.getAttribute('value').then(function (value) {
             config.expect(value === title);
             next();
-          })
-
+          });
         });
       } catch (err) {
         next(err);
