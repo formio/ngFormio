@@ -48,8 +48,7 @@ module.exports = function (actions) {
       actions.logout();
       actions.iAmLoggedInFor('projuser2');
       actions.goToPage("/#");
-      actions.iSeeText('Welcome to ');
-      actions.clickOnElement('.fa-close');
+      actions.clickOnElement('.fa.fa-close');
       actions.projectExisting('${random-title>project3.title}', '${random-description>project3.description}');
       actions.iSeeTextIn('.project.well>h4>a', '${project3.title}');
       actions.clickOnElementWithText('Manage');
@@ -63,8 +62,7 @@ module.exports = function (actions) {
       actions.logout();
       actions.iAmLoggedInFor('projuser4');
       actions.goToPage("/#");
-      actions.iSeeText('Welcome to ');
-      actions.clickOnElement('.fa-close');
+      actions.clickOnElement('.fa.fa-close');
       actions.projectExisting('${random-title>project4.title}', '${random-description>project4.description}');
       actions.iSeeTextIn('.project.well>h4>a', '${project4.title}');
       actions.clickOnElementWithText('Manage');
@@ -78,8 +76,7 @@ module.exports = function (actions) {
       actions.logout();
       actions.iAmLoggedInFor('projuser5');
       actions.goToPage("/#");
-      actions.iSeeText('Welcome to ');
-      actions.clickOnElement('.fa-close');
+      actions.clickOnElement('.fa.fa-close');
       actions.projectExisting('${random-title>project5.title}', '${random-description>project5.description}');
       actions.iSeeTextIn('.project.well>h4>a', '${project5.title}');
       actions.clickOnElementWithText('Manage');
@@ -94,8 +91,7 @@ module.exports = function (actions) {
       actions.logout();
       actions.iAmLoggedInFor('projuser7');
       actions.goToPage("/#");
-      actions.iSeeText('Welcome to ');
-      actions.clickOnElement('.fa-close');
+      actions.clickOnElement('.fa.fa-close');
       actions.projectExisting('${random-title>project7.title}', '${random-description>project7.description}');
       actions.iSeeTextIn('.project.well>h4>a', '${project7.title}');
       actions.clickOnElementWithText('Manage');

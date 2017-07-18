@@ -11,8 +11,7 @@ module.exports = function (actions) {
         actions.logout();
         actions.iAmLoggedInFor('projuser2');
         actions.goToPage("/#");
-        actions.iSeeText('Welcome to ');
-        actions.clickOnElement('.fa-close');
+        actions.clickOnElement('.fa.fa-close');
         actions.projectExisting('${random-title>project3.title}', '${random-description>project3.description}');
         actions.iSeeTextIn('.project.well>h4>a', '${project3.title}');
         actions.clickOnElementWithText('Manage');
