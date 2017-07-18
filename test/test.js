@@ -52,9 +52,9 @@ describe("", function () {
   require('./features/documentationLinks.spec')(actions);
   require('./features/profileFunctionality.spec')(actions);
   require('./features/project.spec')(actions);
-  require('./features/resetPassword.spec')(actions);
-  require('./features/create-project.spec')(actions);
-  require('./features/createResource2.spec')(actions);
+  //require('./features/resetPassword.spec')(actions);
+  //require('./features/create-project.spec')(actions);
+  //require('./features/createResource2.spec')(actions);
 
 });
 
