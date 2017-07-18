@@ -438,13 +438,13 @@ module.exports = function (config) {
   };
 
   this.iSeeTextIn = function (ele, text) {
+    text = replacements(text);
     it('I see text "' + text + '"', function (next) {
-      ele = (typeof (ele) == 'object') ? ele : element(by.cssContainingText(ele,replacements(text)));
+      ele = (typeof (ele) == 'object') ? ele : element(by.cssContainingText(ele,text));
       browser.wait(function () {
         return ele.isPresent();
       }, timeout).then(function () {
         try {
-          text = replacements(text);
           config.expect(ele.getText()).to.eventually.equal(text);
           next();
         } catch (err) {
@@ -489,9 +489,11 @@ module.exports = function (config) {
       try {
         var btn = element(by.xpath('//button[text()=\'' + field + '\']'));
         browser.wait(function () {
-          return btn.isEnabled().then(function(res){
-            return !res;
-          });
+         return btn.isPresent().then(function(){
+            return btn.isEnabled().then(function(res){
+              return !res;
+            });
+          })
         }, timeout).then(function (value) {
           try{
             assert.equal(value,true);
@@ -511,7 +513,9 @@ module.exports = function (config) {
       try {
         var btn = element(by.xpath('//button[text()="' + field + '"]'));
         browser.wait(function () {
-          return btn.isEnabled();
+          return btn.isPresent().then(function(){
+            return btn.isEnabled();
+          });
         }, timeout).then(function (value) {
           try{
             assert.equal(value,true);
@@ -544,7 +548,7 @@ module.exports = function (config) {
         if (tries > 15) {
           return next(new Error('No formioToken found.'));
         }
-        browser.sleep(50).then(function () {
+        browser.sleep(100).then(function () {
           browser.executeScript("return localStorage.getItem('formioToken');")
             .then(function (res) {
               if (res) {

@@ -60,7 +60,7 @@ module.exports = function (actions) {
       actions.logout();
       actions.iAmLoggedInFor('profileuser1');
       actions.goToPage('#/profile/edit');
-      actions.iSeeTextIn(".control-label","Password");
+      actions.iSeeText("Password");
       actions.enterTextInField('.profile-edit-page #password','${random-password>profileuser1.password}');
       actions.clickOnElementWithText('Submit');
       actions.iSeeTextIn(".alert","Submission was created.");
