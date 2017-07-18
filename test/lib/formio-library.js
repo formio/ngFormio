@@ -399,7 +399,7 @@ module.exports = function (config) {
   this.iSeeText = function (text) {
     it('I see text "' + text + '"', function (next) {
       try {
-        var xpath = '//*[contains(text(),"' + text + '")]';
+        var xpath = '//*[contains(text(),"' + replacements(text) + '")]';
         browser.wait(function () {
           return element(by.xpath(xpath)).isPresent();
         }, timeout).then(function (result) {
@@ -853,7 +853,6 @@ module.exports = function (config) {
         description = replacements(description);
         var driver = browser;
         createProject(driver, title, description, function (err, res) {
-          console.log("Project exists with " + JSON.stringify(res));
           if (err) {
             return next(err);
           }

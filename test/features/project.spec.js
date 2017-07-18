@@ -62,7 +62,7 @@ module.exports = function (actions) {
       actions.iAmLoggedInFor('projuser4');
       actions.projectExisting('${random-title>project4.title}', '${random-description>project4.description}');
       actions.goToPage("/#");
-      actions.iSeeTextIn('.project.well>h4>a', '${project4.title}');
+      actions.iSeeText('${project4.title}');
       actions.clickOnElementWithText('Manage');
       actions.portalIamOn('${project4.title}');
       actions.clickOnElement('.fa.fa-cog');
@@ -75,7 +75,7 @@ module.exports = function (actions) {
       actions.iAmLoggedInFor('projuser5');
       actions.projectExisting('${random-title>project5.title}', '${random-description>project5.description}');
       actions.goToPage("/#");
-      actions.iSeeTextIn('.project.well>h4>a', '${project5.title}');
+      actions.iSeeText('${project5.title}');
       actions.clickOnElementWithText('Manage');
       actions.portalIamOn('${project5.title}');
       actions.clickOnElement('.fa.fa-cog');
@@ -89,7 +89,8 @@ module.exports = function (actions) {
       actions.iAmLoggedInFor('projuser7');
       actions.projectExisting('${random-title>project7.title}', '${random-description>project7.description}');
       actions.goToPage("/#");
-      actions.iSeeTextIn('.project.well>h4>a', '${project7.title}');
+      actions.waitForActionToComplete(6000);
+      actions.iSeeText('${project7.title}');
       actions.clickOnElementWithText('Manage');
       actions.portalIamOn('${project7.title}');
       actions.clickOnElement('.fa.fa-cog');
