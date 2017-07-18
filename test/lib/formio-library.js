@@ -428,7 +428,7 @@ module.exports = function (config) {
 
   this.clickOnElementWithText = function (text) {
     it('I click on the ' + text, function (next) {
-      var ele = text.startsWith("xpath:") ? element(by.xpath(text.substring(text.indexOf(':') + 1))) : element(by.xpath('//*[text()="' + replacements(text.toString()) + '"]'));
+      var ele =  element(by.xpath('//*[text()="' + replacements(text.toString()) + '"]'));
       browser.wait(function () {
         return ele.isPresent();
       }, timeout).then(function (res) {
@@ -538,7 +538,7 @@ module.exports = function (config) {
 
   this.clickOnElement = function (text) {
     it('I click on the ' + text, function (next) {
-      var ele = element(by.css(text));
+      var ele = text.startsWith("xpath:") ? element(by.xpath(text.substring(text.indexOf(':') + 1))) : element(by.css(text));
       browser.wait(function () {
         return ele.isPresent();
       }, timeout).then(function () {
