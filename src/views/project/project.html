@@ -36,6 +36,14 @@
     </ul>
   </div>
   <div class="project-main">
+    <div ng-if="projectError">
+      <div class="well">
+        <div class="alert alert-danger">
+          {{projectError}}
+        </div>
+        <p>If you are seeing this error then there is a configuration issue preventing the form.io portal from accessing your project. Common issues are a misconfigured CORS setting or your remote server might be offline or inaccessible.</p>
+      </div>
+    </div>
     <div class="project-content" ui-view></div>
   </div>
 </div>

@@ -364,17 +364,17 @@ app.controller('ProjectController', [
       // TODO: Fix this for remote projects.
       if ($scope.localProject.settings && $scope.localProject.settings.custom && $scope.localProject.settings.custom.js && loadedFiles.indexOf($scope.localProject.settings.custom.js) === -1) {
         try {
-          allow = allowedFiles.hasOwnProperty($scope.currentProject.settings.custom.js) ? allowedFiles[$scope.currentProject.settings.custom.js] : null;
+          allow = allowedFiles.hasOwnProperty($scope.localProject.settings.custom.js) ? allowedFiles[$scope.localProject.settings.custom.js] : null;
           if (allow === null) {
-            allowedFiles[$scope.currentProject.settings.custom.js] = allow = window.confirm('This project contains custom javascript. Would you like to load it? Be sure you trust the source as loading custom javascript can be a security concern.');
+            allowedFiles[$scope.localProject.settings.custom.js] = allow = window.confirm('This project contains custom javascript. Would you like to load it? Be sure you trust the source as loading custom javascript can be a security concern.');
             localStorage.setItem('allowedFiles', JSON.stringify(allowedFiles));
           }
 
           if(allow) {
-            loadedFiles.push($scope.currentProject.settings.custom.js);
+            loadedFiles.push($scope.localProject.settings.custom.js);
             custom = document.createElement('script');
             custom.setAttribute('type','text/javascript');
-            custom.setAttribute('src', $scope.currentProject.settings.custom.js);
+            custom.setAttribute('src', $scope.localProject.settings.custom.js);
             document.head.appendChild(custom);
           }
         }
@@ -386,18 +386,18 @@ app.controller('ProjectController', [
       // Dynamically load CSS files.
       if ($scope.localProject.settings && $scope.localProject.settings.custom && $scope.localProject.settings.custom.css && loadedFiles.indexOf($scope.localProject.settings.custom.css) === -1) {
         try {
-          allow = allowedFiles.hasOwnProperty($scope.currentProject.settings.custom.css) ? allowedFiles[$scope.currentProject.settings.custom.css] : null;
+          allow = allowedFiles.hasOwnProperty($scope.localProject.settings.custom.css) ? allowedFiles[$scope.localProject.settings.custom.css] : null;
           if (allow === null) {
-            allowedFiles[$scope.currentProject.settings.custom.css] = allow = window.confirm('This project contains custom styles. Would you like to load it? Be sure you trust the source as loading custom styles can be a security concern.');
+            allowedFiles[$scope.localProject.settings.custom.css] = allow = window.confirm('This project contains custom styles. Would you like to load it? Be sure you trust the source as loading custom styles can be a security concern.');
             localStorage.setItem('allowedFiles', JSON.stringify(allowedFiles));
           }
 
           if(allow) {
-            loadedFiles.push($scope.currentProject.settings.custom.css);
+            loadedFiles.push($scope.localProject.settings.custom.css);
             custom = document.createElement("link");
             custom.setAttribute("rel", "stylesheet");
             custom.setAttribute("type", "text/css");
-            custom.setAttribute("href", $scope.currentProject.settings.custom.css);
+            custom.setAttribute("href", $scope.localProject.settings.custom.css);
             document.head.appendChild(custom);
             localStorage.setItem('loadedFiles', loadedFiles);
           }
@@ -504,25 +504,28 @@ app.controller('ProjectController', [
         return ($scope.highestRole === 'owner' || $scope.highestRole === 'team_admin');
       };
 
+      $scope.projectError = false;
       return promiseResult;
     }).catch(function(err) {
       if (!err) {
-        FormioAlerts.addAlert({
-          type: 'danger',
-          message: window.location.origin + ' is not allowed to access the API. To fix this, go to your project page on https://form.io and add ' + window.location.origin + ' to your project CORS settings.'
-        });
+        //FormioAlerts.addAlert({
+        //  type: 'danger',
+        //  message: window.location.origin + ' is not allowed to access the API. To fix this, go to your project page on https://form.io and add ' + window.location.origin + ' to your project CORS settings.'
+        //});
+        $scope.projectError = window.location.origin + ' is not allowed to access the API. To fix this, go to your project page on https://form.io and add ' + window.location.origin + ' to your project CORS settings.';
       }
       else {
         var error = err.message || err;
         if(typeof err === 'object') {
           error = JSON.stringify(error);
         }
-        FormioAlerts.addAlert({
-          type: 'danger',
-          message: 'Could not load Project (' + error + ')'
-        });
+        $scope.projectError = error;
+        //FormioAlerts.addAlert({
+        //  type: 'danger',
+        //  message: 'Could not connect to Environment (' + error + ')'
+        //});
       }
-      $state.go('home');
+      //$state.go('home');
     });
 
     $scope.getRole = function(id) {
@@ -2093,7 +2096,7 @@ app.controller('ProjectRemoteController', [
         headers: {
           'access-key': $scope.key.access
         },
-        config: {disableJWT: true}
+        disableJWT: true
       })
         .then(function(result) {
           delete $scope.remoteError;
