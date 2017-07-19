@@ -385,6 +385,7 @@ module.exports = function(app) {
                 break;
               case 'url':
               case 'resource':
+                $scope.options = $scope.options || {};
                 var url = '';
                 var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
                 //var baseUrl = Formio.getBaseUrl();
