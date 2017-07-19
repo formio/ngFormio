@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
  - Columns components hiding if width is not set.
+ - Hide form alert on valid form.
 
 ## 2.20.4
 ### Fixed
