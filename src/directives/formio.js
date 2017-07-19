@@ -271,6 +271,8 @@ module.exports = function() {
           return FormioUtils.isRequired(component, $scope.requireComponents);
         };
 
+        var alertsWatcher = null;
+
         // Called when the form is submitted.
         $scope.onSubmit = function(form) {
           $scope.formioAlerts = [];
@@ -279,6 +281,16 @@ module.exports = function() {
               type: 'danger',
               message: 'Please fix the following errors before submitting.'
             });
+
+            alertsWatcher = $scope.$watch(function() {
+              return form.$valid;
+            }, function(value) {
+              if (value) {
+                $scope.formioAlerts = [];
+                alertsWatcher();
+              }
+            });
+
             return;
           }
 
