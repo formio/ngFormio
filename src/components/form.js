@@ -49,7 +49,7 @@ module.exports = function(app) {
 
           var submitForm = function(scope, cb) {
             if (FormioUtils.getComponent(scope.activePage.components, $scope.component.key)) {
-              $scope.formFormio.saveSubmission($scope.data[$scope.component.key]).then(function(sub) {
+              $scope.formFormio.saveSubmission(angular.copy($scope.data[$scope.component.key])).then(function(sub) {
                 angular.merge($scope.data[$scope.component.key], sub);
                 cb();
               }, cb);
