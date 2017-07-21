@@ -285,7 +285,7 @@ app.controller('ProjectController', [
 
     $scope.saveLocalProject = function() {
       if (!$scope.localProject._id) { return FormioAlerts.onError(new Error('No Project found.')); }
-      $scope.localFormio.saveProject($scope.localProject)
+      return $scope.localFormio.saveProject($scope.localProject)
         .then(function(project) {
           FormioAlerts.addAlert({
             type: 'success',
@@ -308,6 +308,7 @@ app.controller('ProjectController', [
       var promiseResult = result;
       // If this is a remote project, load the remote.
       if ($scope.localProject.remote) {
+        $scope.isRemote = true;
         $scope.projectUrl = $rootScope.projectPath($scope.localProject.remote.project, $scope.localProject.remote.url, $scope.localProject.remote.type);
         $scope.projectProtocol = $scope.localProject.remote.url.indexOf('https') === 0 ? 'https:' : 'http:';
         $scope.projectServer = $scope.localProject.remote.url.replace(/(^\w+:|^)\/\//, '');
@@ -476,7 +477,7 @@ app.controller('ProjectController', [
             write: true,
             admin: true
           };
-          if (_.has($scope.user, '_id') && _.has($scope.currentProject, 'owner') &&  ($scope.user._id === $scope.currentProject.owner)) {
+          if (_.has($scope.user, '_id') && _.has($scope.localProject, 'owner') &&  ($scope.user._id === $scope.localProject.owner)) {
             highestRole = 'owner';
           }
           else if (hasRoles('team_admin')) {
@@ -559,13 +560,13 @@ app.controller('ProjectDeployController', [
     FormioAlerts
   ) {
     var loadTags = function() {
-      Formio.makeStaticRequest(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/tag', 'GET', null, {ignoreCache: true})
+      Formio.makeStaticRequest(AppConfig.apiBase + '/project/' + $scope.primaryProject._id + '/tag', 'GET', null, {ignoreCache: true})
         .then(function(tags) {
           $scope.tags = tags;
         });
     };
 
-    loadTags();
+    $scope.loadProjectPromise.then(loadTags);
 
     $scope.deployTag = function(tag) {
       if (!tag) {
@@ -574,9 +575,9 @@ app.controller('ProjectDeployController', [
           message: 'Please select a tag to deploy.'
         });
       }
-      Formio.makeStaticRequest(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/deploy', 'POST', {
-        type: 'tag',
-        tag: tag.tag
+      Formio.makeStaticRequest($scope.projectUrl + '/deploy', 'POST', {
+        type: 'template',
+        template: tag.template
       })
         .then(function() {
           $scope.deployTagOption = '';
@@ -584,7 +585,10 @@ app.controller('ProjectDeployController', [
             type: 'success',
             message: 'Project tag ' + tag.tag + ' deployed to ' + $scope.currentProject.title + '.'
           });
-          $state.transitionTo($state.current, null, { reload: true, inherit: true, notify: true });
+          //$state.transitionTo($state.current, null, { reload: true, inherit: true, notify: true });
+          $scope.localProject.tag = tag.tag;
+          $scope.saveLocalProject()
+            .then($state.reload);
         })
         .catch(FormioAlerts.onError.bind(FormioAlerts));
     };
@@ -611,16 +615,21 @@ app.controller('ProjectTagCreateController', [
           message: 'Please enter a tag identifier.'
         });
       }
-      Formio.makeStaticRequest(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/tag', 'POST', {
-        project: $scope.primaryProject._id,
-        tag: tag
-      })
-        .then(function() {
-          FormioAlerts.addAlert({
-            type: 'success',
-            message: 'Project Tag was created.'
-          });
-          $state.transitionTo($state.current, null, { reload: true, inherit: true, notify: true });
+      Formio.makeStaticRequest($scope.projectUrl + '/export', 'GET')
+        .then(function(template) {
+          Formio.makeStaticRequest(AppConfig.apiBase + '/project/' + $scope.primaryProject._id + '/tag', 'POST', {
+              project: $scope.primaryProject._id,
+              tag: tag,
+              template: template
+            })
+            .then(function() {
+              FormioAlerts.addAlert({
+                type: 'success',
+                message: 'Project Tag was created.'
+              });
+              $state.transitionTo($state.current, null, { reload: true, inherit: true, notify: true });
+            })
+            .catch(FormioAlerts.onError.bind(FormioAlerts));
         })
         .catch(FormioAlerts.onError.bind(FormioAlerts));
     };
@@ -645,7 +654,7 @@ app.controller('ProjectImportController', [
           message: 'Please select a file to import.'
         });
       }
-      Formio.makeStaticRequest(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/import', 'POST', {
+      Formio.makeStaticRequest($scope.projectUrl + '/import', 'POST', {
           template: template
         })
         .then(function() {
@@ -768,7 +777,7 @@ app.factory('ProjectAnalytics', [
   ) {
       return {
         getSubmissionAnalytics: function(project, year, month, day) {
-          var url = AppConfig.apiBase + '/project/' + project + '/analytics/year/' + year;
+          var url = $scope.projectUrl + '/analytics/year/' + year;
           if (month !== undefined && month !== null) {
             url += '/month/' + month;
           }
@@ -2032,7 +2041,7 @@ app.controller('ProjectSettingsController', [
 
     // Oauth verification for atlassian
     $scope.loginWithOAuth = function() {
-      $http.post(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/atlassian/oauth/authorize')
+      $http.post($scope.currentProject + '/atlassian/oauth/authorize')
         .then(function(result) {
           $scope.authenticatedWithOAuth = true;
           var data = result.data;
@@ -2056,7 +2065,7 @@ app.controller('ProjectSettingsController', [
     };
 
     $scope.verifyOAuth = function() {
-      $http.post(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/atlassian/oauth/finalize', {
+      $http.post($scope.projectUrl + '/atlassian/oauth/finalize', {
         oauth_verifier: $scope.currentProject.settings.atlassian.oauth.oauth_verifier
       })
       .then(function(result) {
@@ -2077,9 +2086,10 @@ app.controller('ProjectSettingsController', [
 app.controller('ProjectRemoteController', [
   '$http',
   '$scope',
+  '$state',
   '$stateParams',
   'AppConfig',
-  function($http, $scope, $stateParams, AppConfig) {
+  function($http, $scope, $state, $stateParams, AppConfig) {
     $scope.remote = {
       type: 'Subdomains'
     };
@@ -2113,7 +2123,7 @@ app.controller('ProjectRemoteController', [
         })
         .catch(function(err) {
           if (err.status === -1) {
-            $scope.remoteError = 'Remote server did not respond to a CORS request properly. It may not be a properly configured form.io server.';
+            $scope.remoteError = 'Remote server did not respond to a CORS request properly. It may not be a properly configured form.io server or does not exist.';
           }
           else {
             $scope.remoteError = err.status + ' - ' + err.statusText + ': ' + err.data;
@@ -2128,7 +2138,7 @@ app.controller('ProjectRemoteController', [
       if ($scope.remote.project.name === 'new') {
         $http({
           method: 'GET',
-          url: AppConfig.apiBase + '/project/' + $stateParams.projectId + '/export'
+          url: $scope.projectUrl + '/export'
         })
           .then(function(result) {
             var project = angular.copy($scope.currentProject);
@@ -2139,10 +2149,10 @@ app.controller('ProjectRemoteController', [
               method: 'POST',
               url: $scope.remote.url + '/project',
               headers: {
-                'access-key': $scope.accessKey
+                'access-key': $scope.key.access
               },
               data: project,
-              config: {disableJWT: true}
+              disableJWT: true
             })
               .then(function(result) {
                 $scope.remote.project = result.data;
@@ -2160,13 +2170,19 @@ app.controller('ProjectRemoteController', [
       else {
         // Connecting to existing project
         $scope.localProject.remote = angular.copy($scope.remote);
-        $scope.saveLocalProject();
+        $scope.saveLocalProject()
+          .then(function() {
+            $state.reload();
+          });
       }
     };
 
     $scope.disconnect = function() {
-      delete $scope.localProject.remote;
-      $scope.saveLocalProject();
+      $scope.localProject.remote = false;
+      $scope.saveLocalProject()
+        .then(function() {
+          $state.reload();
+        });
     }
   }
 ]);
@@ -2400,7 +2416,7 @@ app.controller('ProjectStorageController', [
       }
     });
 
-    $http.get(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/dropbox/auth')
+    $http.get($scope.projectUrl + '/dropbox/auth')
       .then(function(response) {
         $scope.dropboxSettings = response.data;
       });
@@ -2444,7 +2460,7 @@ app.controller('ProjectStorageController', [
             }
             // Post the code to the server so that we can convert it to an auth token.
             params.redirect_uri = settings.redirect_uri;
-            $http.post(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/dropbox/auth', params)
+            $http.post($scope.projectUrl + '/dropbox/auth', params)
               .then(function(response) {
                 // Store the token so any subsequent saves will contain it. We also set it server side in case they
                 // don't press save after connecting to dropbox.
@@ -2469,7 +2485,7 @@ app.controller('ProjectStorageController', [
     };
 
     $scope.dropboxDisconnect = function() {
-      $http.post(AppConfig.apiBase + '/project/' + $scope.currentProject._id + '/dropbox/auth', {})
+      $http.post($scope.projectUrl + '/dropbox/auth', {})
         .then(function(response) {
           // Remove dropbox settings and persist.
           $scope.currentProject.settings.storage = $scope.currentProject.settings.storage || {};
