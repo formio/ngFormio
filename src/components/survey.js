@@ -18,7 +18,7 @@ module.exports = function(app) {
             angular.forEach(component.questions, function (question) {
               view += '<tr>';
               view += '<th>' + question.label + '</th>';
-              view += '<td>' + question.value + '</td>';
+              view += '<td>' + values[data[question.value]] + '</td>';
               view += '</tr>';
             });
           }
