@@ -4,11 +4,19 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [UNRELEASED]
+## 2.20.6
 
 ### Fixed
  - Columns components hiding if width is not set.
  - Hide form alert on valid form.
+ - Fixed issue with required file uploads not enforcing a file upload.
+ - Display issue for the survey component.
+ - Removed the $hashKey from the form submission.
+ 
+### Added
+ - Custom javascript logic to execute on button click.
+ - Take initial values for resource component search from URL
+ - Emit events on File component upload success or failure
 
 ## 2.20.4
 ### Fixed
