@@ -179,17 +179,6 @@ module.exports = function(app) {
         delete $scope.fileUploads[index];
       };
 
-      // This fixes new fields having an empty space in the array.
-      if ($scope.data && $scope.data[$scope.component.key] === '') {
-        $scope.data[$scope.component.key] = [];
-      }
-      if ($scope.data && $scope.data[$scope.component.key] === undefined) {
-        $scope.data[$scope.component.key] = [];
-      }
-      if ($scope.data && $scope.data[$scope.component.key] && $scope.data[$scope.component.key][0] === '') {
-        $scope.data[$scope.component.key].splice(0, 1);
-      }
-
       $scope.upload = function(files) {
         if ($scope.component.storage && files && files.length) {
           angular.forEach(files, function(file) {
@@ -221,13 +210,17 @@ module.exports = function(app) {
               }, $scope.component.url)
                 .then(function(fileInfo) {
                   delete $scope.fileUploads[fileName];
-                  // Ensure that the file component is an array.
-                  if (
-                    !$scope.data[$scope.component.key] ||
-                    !($scope.data[$scope.component.key] instanceof Array)
-                  ) {
+                  // This fixes new fields having an empty space in the array.
+                  if ($scope.data && $scope.data[$scope.component.key] === '') {
                     $scope.data[$scope.component.key] = [];
                   }
+                  if ($scope.data && $scope.data[$scope.component.key] === undefined) {
+                    $scope.data[$scope.component.key] = [];
+                  }
+                  if (!$scope.data[$scope.component.key] || !($scope.data[$scope.component.key] instanceof Array)) {
+                    $scope.data[$scope.component.key] = [];
+                  }
+
                   $scope.data[$scope.component.key].push(fileInfo);
                   $scope.$apply();
                   $scope.$emit('fileUploaded', fileName, fileInfo);
