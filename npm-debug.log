@@ -1,0 +1,151 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/usr/local/bin/node', '/usr/local/bin/npm', 'publish' ]
+2 info using npm@3.10.10
+3 info using node@v6.11.1
+4 verbose publish [ '.' ]
+5 silly cache add args [ '.', null ]
+6 verbose cache add spec .
+7 silly cache add parsed spec Result {
+7 silly cache add   raw: '.',
+7 silly cache add   scope: null,
+7 silly cache add   escapedName: null,
+7 silly cache add   name: null,
+7 silly cache add   rawSpec: '.',
+7 silly cache add   spec: '/Users/travistidwell/Documents/formio/modules/ngFormio',
+7 silly cache add   type: 'directory' }
+8 verbose addLocalDirectory /Users/travistidwell/.npm/ng-formio/2.20.6/package.tgz not in flight; packing
+9 verbose correctMkdir /Users/travistidwell/.npm correctMkdir not in flight; initializing
+10 info lifecycle ng-formio@2.20.6~prepublish: ng-formio@2.20.6
+11 silly lifecycle ng-formio@2.20.6~prepublish: no script for prepublish, continuing
+12 verbose tar pack [ '/Users/travistidwell/.npm/ng-formio/2.20.6/package.tgz',
+12 verbose tar pack   '/Users/travistidwell/Documents/formio/modules/ngFormio' ]
+13 verbose tarball /Users/travistidwell/.npm/ng-formio/2.20.6/package.tgz
+14 verbose folder /Users/travistidwell/Documents/formio/modules/ngFormio
+15 verbose addLocalTarball adding from inside cache /Users/travistidwell/.npm/ng-formio/2.20.6/package.tgz
+16 verbose correctMkdir /Users/travistidwell/.npm correctMkdir not in flight; initializing
+17 silly cache afterAdd ng-formio@2.20.6
+18 verbose afterAdd /Users/travistidwell/.npm/ng-formio/2.20.6/package/package.json not in flight; writing
+19 verbose correctMkdir /Users/travistidwell/.npm correctMkdir not in flight; initializing
+20 verbose afterAdd /Users/travistidwell/.npm/ng-formio/2.20.6/package/package.json written
+21 silly publish { name: 'ng-formio',
+21 silly publish   version: '2.20.6',
+21 silly publish   description: 'The form redering engine behind Form.IO.',
+21 silly publish   main: 'dist/formio.min.js',
+21 silly publish   scripts: { test: 'node test/test' },
+21 silly publish   author: '',
+21 silly publish   license: 'ISC',
+21 silly publish   devDependencies:
+21 silly publish    { 'babel-preset-es2015': '^6.24.0',
+21 silly publish      babelify: '^7.3.0',
+21 silly publish      brfs: '^1.4.3',
+21 silly publish      browserify: '^13.0.1',
+21 silly publish      del: '^2.2.0',
+21 silly publish      eslint: '^2.11.1',
+21 silly publish      'eslint-config-formio': '^1.1.0',
+21 silly publish      gulp: '^3.9.1',
+21 silly publish      'gulp-add-src': '^0.2.0',
+21 silly publish      'gulp-concat': '^2.6.0',
+21 silly publish      'gulp-cssnano': '^2.1.2',
+21 silly publish      'gulp-debug': '^2.1.2',
+21 silly publish      'gulp-derequire': '^2.1.0',
+21 silly publish      'gulp-eslint': '^2.0.0',
+21 silly publish      'gulp-filter': '^4.0.0',
+21 silly publish      'gulp-load-plugins': '^1.2.0',
+21 silly publish      'gulp-rename': '^1.2.2',
+21 silly publish      'gulp-streamify': '^1.0.2',
+21 silly publish      'gulp-uglify': '^1.5.1',
+21 silly publish      'gulp-wrap': '^0.11.0',
+21 silly publish      karma: '^0.13.10',
+21 silly publish      'main-bower-files': '^2.11.1',
+21 silly publish      'node-qunit-phantomjs': '^1.2.1',
+21 silly publish      'run-sequence': '^1.1.5',
+21 silly publish      strictify: '^0.2.0',
+21 silly publish      uglifyify: '^3.0.1',
+21 silly publish      'vinyl-source-stream': '^1.1.0',
+21 silly publish      watchify: '^3.4.0' },
+21 silly publish   optionalDependencies: { 'json-logic-js': '^1.1.0' },
+21 silly publish   dependencies:
+21 silly publish    { angular: '^1.6.4',
+21 silly publish      'angular-ckeditor': 'github:lemonde/angular-ckeditor#v1.0.3',
+21 silly publish      'angular-file-saver': '^1.1.3',
+21 silly publish      'angular-moment': '^1.0.1',
+21 silly publish      'angular-sanitize': '^1.6.4',
+21 silly publish      'angular-ui-ace': '^0.2.3',
+21 silly publish      'angular-ui-bootstrap': '^2.5.0',
+21 silly publish      'angular-ui-mask': 'github:formio/ui-mask#1.8.8-beta.1',
+21 silly publish      bootstrap: '^3.3.7',
+21 silly publish      'bootstrap-ui-datetime-picker': '^2.5.4',
+21 silly publish      formiojs: '^2.9.5',
+21 silly publish      jquery: '^3.2.1',
+21 silly publish      lodash: '^4.17.4',
+21 silly publish      'ng-dialog': '^1.3.0',
+21 silly publish      'ng-file-upload': '^12.2.13',
+21 silly publish      signature_pad: '^1.6.0',
+21 silly publish      'ui-select': '^0.19.8',
+21 silly publish      'json-logic-js': '^1.1.0' },
+21 silly publish   browserify: { transform: [ 'strictify', 'brfs' ] },
+21 silly publish   gitHead: '489143d2537f01f501d116ec5b9321e4868a61d0',
+21 silly publish   readme: 'An Angular.js JSON form renderer for Form.io\n--------------------------------------------\nThis library is meant to be used in conjunction with Form.io to provide dynamic JSON form rendering capabilities. This\nallows you to render any form using the schemas provided by Form.io in the following format.\n\n```\n<formio src="\'https://myapp.form.io/myform\'"></formio>\n```\n\nThe following snippit of code will dynamically render the form within Form.io, as well as automatically hook that form\nup to the REST API generated from the same schema.\n\nHere is a Demo\n-----------------\nhttp://codepen.io/travist/full/xVyMjo/\n\nMulti-page Forms\n-----------------\nThis renderer also supports multi-page forms using the ```formio-wizard``` directive like so.\n\n```\n<formio-wizard src="\'https://myapp.form.io/mywizard\'"></formio-wizard>\n```\n\nThis directive uses Panels within the root of the form to indicate new pages within the form.\n\nInstallation\n------------------\nThere are several ways to add this library to your application. Each of these installation types are for specific use\ncases.\n\n**Full Installation**\n  - <strong>Includes:</strong> Everything including Angular.js and jQuery.\n  - <strong>Usage:</strong> Use this installation if your application does not already have Angular and jQuery and you wish to display a single form on a page.\n  - <strong>Installation:</strong>  Place the following within your application.\n  \n```  \n<link rel="stylesheet" href="https://rawgit.com/formio/ngFormio/master/dist/formio-full.min.css" />\n<script src="https://rawgit.com/formio/ngFormio/master/dist/formio-full.min.js"></script>\n```\n    \n**Complete Installation**\n  - <strong>Includes:</strong> Everything except Angular.js and jQuery\n  - <strong>Usage:</strong> Use this if you are embedding a form within an application that already has Angular.js and jQuery installed.\n  - <strong>Installation:</strong> Place the following within your application.\n  \n```\n<link rel="stylesheet" href="https://rawgit.com/formio/ngFormio/master/dist/formio-complete.min.css" />\n<script src="https://rawgit.com/formio/ngFormio/master/dist/formio-complete.min.js"></script>\n```\n    \n**Basic Installation: (Bower Installation)**\n  - <strong>Includes:</strong> Only the ngFormio renderer library with no dependencies.\n  - <strong>Usage:</strong> When you wish to explicitely include all of the dependencies like when you are using [Wiredep](https://github.com/taptapship/wiredep).\n  - <strong>Installation:</strong> We recommend using [Wiredep](https://github.com/taptapship/wiredep) for the Basic installation since it will wire up all the dependencies for you. You just need to place the following within your application.\n  \n    First install the dependency using <strong>Bower</strong>\n    \n```\nbower install --save ng-formio\n```\n    \nThen, you can add the following to your application.\n  \n```\n<html>\n  <head>\n    <!-- bower:css -->\n    <!-- endbower -->\n  </head>\n  <body>\n    <!-- bower:js -->\n    <!-- endbower -->\n  </body>\n</html>\n```\n    \nThen run Wiredep to wire it up.\n    \n```\n$ node\n> require(\'wiredep\')({ src: \'index.html\' });\n```\n    \nWe also recommend using this within a [Gulp](http://gulpjs.com/) build process using Wiredep in combination with [Gulp UseRef](https://github.com/jonkemp/gulp-useref).\n    \nConfiguration\n-----------------\nOnce you have this installed, you will now need to add this module within your Angular.js application declaration like so...\n\n***app.js***\n```\nangular.module(\'yourApp\', [\n  \'formio\'\n])\n```\n\nUsage\n--------------\nNow that you have the library installed, you can then do the following to add a form to your application.\n\n  - Create an account on https://form.io\n  - Create a new project.\n  - Create a Form within your project. This will then give you an API url like the following. ```https://myapp.form.io/myform```.\n  - You can then embed this form within your application by providing the following.\n  \n  ```<formio src="\'https://myapp.form.io/myform\'"></formio>```\n  \nThis not only renders the form dyanmically within your application, but also automatically hooks up that form to the API\nbackend that is provided from Form.io. \n\nEnjoy!\n\nThe Form.io Team!\n',
+21 silly publish   readmeFilename: 'README.md',
+21 silly publish   _id: 'ng-formio@2.20.6',
+21 silly publish   _shasum: '8729d50679f67aebedb50e5054d6b50511d2ffe6',
+21 silly publish   _from: '.' }
+22 verbose getPublishConfig undefined
+23 silly mapToRegistry name ng-formio
+24 silly mapToRegistry using default registry
+25 silly mapToRegistry registry https://registry.npmjs.org/
+26 silly mapToRegistry data Result {
+26 silly mapToRegistry   raw: 'ng-formio',
+26 silly mapToRegistry   scope: null,
+26 silly mapToRegistry   escapedName: 'ng-formio',
+26 silly mapToRegistry   name: 'ng-formio',
+26 silly mapToRegistry   rawSpec: '',
+26 silly mapToRegistry   spec: 'latest',
+26 silly mapToRegistry   type: 'tag' }
+27 silly mapToRegistry uri https://registry.npmjs.org/ng-formio
+28 verbose publish registryBase https://registry.npmjs.org/
+29 silly publish uploading /Users/travistidwell/.npm/ng-formio/2.20.6/package.tgz
+30 verbose request uri https://registry.npmjs.org/ng-formio
+31 verbose request sending authorization for write operation
+32 info attempt registry request try #1 at 10:23:56 PM
+33 verbose request using bearer token for auth
+34 verbose request id 82d3ad8ed7d8ef6d
+35 http request PUT https://registry.npmjs.org/ng-formio
+36 http 403 https://registry.npmjs.org/ng-formio
+37 verbose headers { 'content-type': 'application/json',
+37 verbose headers   'cache-control': 'max-age=300',
+37 verbose headers   'content-length': '96',
+37 verbose headers   'accept-ranges': 'bytes',
+37 verbose headers   date: 'Sat, 22 Jul 2017 03:24:02 GMT',
+37 verbose headers   via: '1.1 varnish',
+37 verbose headers   connection: 'keep-alive',
+37 verbose headers   'x-served-by': 'cache-dfw1840-DFW',
+37 verbose headers   'x-cache': 'MISS',
+37 verbose headers   'x-cache-hits': '0',
+37 verbose headers   'x-timer': 'S1500693836.482388,VS0,VE5565',
+37 verbose headers   vary: 'Accept-Encoding, Accept' }
+38 verbose request invalidating /Users/travistidwell/.npm/registry.npmjs.org/ng-formio on PUT
+39 error publish Failed PUT 403
+40 verbose stack Error: "You cannot publish over the previously published version 2.20.6." : ng-formio
+40 verbose stack     at makeError (/usr/local/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:302:12)
+40 verbose stack     at CachingRegistryClient.<anonymous> (/usr/local/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:290:14)
+40 verbose stack     at Request._callback (/usr/local/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:210:14)
+40 verbose stack     at Request.self.callback (/usr/local/lib/node_modules/npm/node_modules/request/request.js:187:22)
+40 verbose stack     at emitTwo (events.js:106:13)
+40 verbose stack     at Request.emit (events.js:191:7)
+40 verbose stack     at Request.<anonymous> (/usr/local/lib/node_modules/npm/node_modules/request/request.js:1048:10)
+40 verbose stack     at emitOne (events.js:96:13)
+40 verbose stack     at Request.emit (events.js:188:7)
+40 verbose stack     at IncomingMessage.<anonymous> (/usr/local/lib/node_modules/npm/node_modules/request/request.js:969:12)
+41 verbose statusCode 403
+42 verbose pkgid ng-formio
+43 verbose cwd /Users/travistidwell/Documents/formio/modules/ngFormio
+44 error Darwin 16.6.0
+45 error argv "/usr/local/bin/node" "/usr/local/bin/npm" "publish"
+46 error node v6.11.1
+47 error npm  v3.10.10
+48 error code E403
+49 error "You cannot publish over the previously published version 2.20.6." : ng-formio
+50 error If you need help, you may report this error at:
+50 error     <https://github.com/npm/npm/issues>
+51 verbose exit [ 1, true ]

@@ -4,7 +4,9 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.20.7
 ## 2.20.6
+## 2.20.5
 
 ### Fixed
  - Columns components hiding if width is not set.
