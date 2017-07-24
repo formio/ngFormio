@@ -5,6 +5,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [UNRELEASED]
+## 4.1.5
+ - Upgraded ng-formio to 2.20.7
+ - Upgraded ng-formio-builder to 2.20.12
+
 ## 4.1.3
  - Upgraded ng-formio to 2.20.6
  - Upgraded ng-formio-builder to 2.20.11
