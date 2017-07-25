@@ -385,6 +385,10 @@ module.exports = function(app) {
                 break;
               case 'url':
               case 'resource':
+                if (settings.filter === 'contains' || settings.filter === 'startsWith') {
+                  settings.filter = '';
+                  $scope.component.filter = '';
+                }
                 $scope.options = $scope.options || {};
                 var url = '';
                 var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
