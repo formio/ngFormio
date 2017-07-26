@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+[Unreleased]
+### Fixed
+ - An issue where JSON Logic conditionals were not getting triggered for multi-page forms.
+
 ## 2.20.7
 ## 2.20.6
 ## 2.20.5
