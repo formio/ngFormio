@@ -4,9 +4,20 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-[Unreleased]
+## 2.20.13
+
 ### Fixed
+ - Problem where if you would change the source of Select to resource it would crash the preview.
+ - Issue where checkbox validation errors would not highlight the checkbox field.
  - An issue where JSON Logic conditionals were not getting triggered for multi-page forms.
+
+## 2.20.12
+## 2.20.11
+## 2.20.10
+## 2.20.9
+## 2.20.8
+
+ - No release to synchronize versions with form builder library.
 
 ## 2.20.7
 ## 2.20.6
