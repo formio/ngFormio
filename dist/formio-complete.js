@@ -71460,6 +71460,10 @@ module.exports = function(app) {
                 break;
               case 'url':
               case 'resource':
+                if (settings.filter === 'contains' || settings.filter === 'startsWith') {
+                  settings.filter = '';
+                  $scope.component.filter = '';
+                }
                 $scope.options = $scope.options || {};
                 var url = '';
                 var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
@@ -74008,10 +74012,7 @@ module.exports = function() {
               if (!$scope.hasTitles && component.title) {
                 $scope.hasTitles = true;
               }
-              if (component.customConditional) {
-                hasConditionalPages = true;
-              }
-              else if (component.conditional && component.conditional.when) {
+              if (FormioUtils.hasCondition(component)) {
                 hasConditionalPages = true;
               }
               // Make sure this page is not in the hide compoenents array.

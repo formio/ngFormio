@@ -498,10 +498,7 @@ module.exports = function() {
               if (!$scope.hasTitles && component.title) {
                 $scope.hasTitles = true;
               }
-              if (component.customConditional) {
-                hasConditionalPages = true;
-              }
-              else if (component.conditional && component.conditional.when) {
+              if (FormioUtils.hasCondition(component)) {
                 hasConditionalPages = true;
               }
               // Make sure this page is not in the hide compoenents array.
