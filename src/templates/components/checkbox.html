@@ -15,6 +15,7 @@
       ng-if="!component.name"
       type="{{ component.inputType }}"
       id="{{ componentId }}"
+      name="{{ componentId }}"
       tabindex="{{ component.tabindex || 0 }}"
       ng-disabled="readOnly"
       ng-model="data[component.key]"
