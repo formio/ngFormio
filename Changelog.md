@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.20.14
+### Added
+ - A way to change the submit message with a form json configuration.
+
+### Changed
+ - Upgrade formiojs to 2.13.1
+
 ## 2.20.13
 
 ### Fixed
