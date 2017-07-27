@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
  - Upgrade formiojs to 2.13.1
 
+### Fixed
+ - Issue with custom code execution for buttons within other components.
+
 ## 2.20.13
 
 ### Fixed
