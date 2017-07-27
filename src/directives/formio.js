@@ -219,6 +219,9 @@ module.exports = function() {
           if ($scope.options && $scope.options.submitMessage) {
             message = $scope.options.submitMessage;
           }
+          else if ($scope.form && $scope.form.settings && $scope.form.settings.submitMessage) {
+            message = $scope.form.settings.submitMessage;
+          }
           else {
             message = 'Submission was ' + ((method === 'put') ? 'updated' : 'created') + '.';
           }
