@@ -113,10 +113,8 @@ module.exports = function(app) {
         }
 
         ngModel.$render = function() {
-          var dataUrl = ngModel.$viewValue;
-          if (dataUrl) {
-            signaturePad.fromDataURL(dataUrl);
-          }
+          var dataUrl = ngModel.$viewValue || '';
+          signaturePad.fromDataURL(dataUrl);
         };
         signaturePad.onEnd = function() {
           scope.$evalAsync(readSignature);

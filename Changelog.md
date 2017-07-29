@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## 2.20.15
 ### Fixed
  - An issue where the Signature component would send an undefined URL request.
+ - Issue where FormioUtils.hasCondition was not defined for wizard forms.
 
 ## 2.20.14
 ### Added
