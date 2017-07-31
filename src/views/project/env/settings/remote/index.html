@@ -10,13 +10,17 @@
         <input type="text" class="form-control" id="serverURL" ng-model="remote.url" placeholder="The url of the remote server." />
         <p class="text-muted">Use the root url of the server, not a project url.</p>
         <div class="form-group">
-          <label class="form-label">Project Path Type</label>
+          <label class="control-label"><strong>Project Path Type</strong></label>
           <select class="form-control" ng-options="option as option for option in environmentTypes" ng-model="remote.type" placeholder="Project Paths">
           </select>
+          <p class="text-muted">Subdomain is http://myproject.example.com. * Must have wildcard DNS set up on the server.<br />
+            Subdirectory is http://example.com/myproject. <br />
+            Project Id is http://example.com/project/:projectId. <br />
+          </p>
         </div>
-        <label class="control-label"><strong>Access Key</strong></label>
-        <input type="text" class="form-control" id="accessKey" ng-model="key.access" placeholder="The access key for the server." />
-        <p class="text-muted">Configured in an environment variable for your server.</p>
+        <label class="control-label"><strong>Portal Secret</strong></label>
+        <input type="text" class="form-control" id="portalSecret" ng-model="remote.secret" placeholder="The portal secret for the server." />
+        <p class="text-muted">The secret key for authentication between the portal and your remote server. Configured in the PORTAL_SECRET environment variable on your server.</p>
         <div class="btn btn-primary" ng-click="check()">Continue</div>
         <div ng-if="remoteError" class="text-danger">{{remoteError}}</div>
       </div>

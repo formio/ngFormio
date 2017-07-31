@@ -2095,43 +2095,59 @@ app.controller('ProjectRemoteController', [
     };
     $scope.environmentTypes = ['Subdomains', 'Subdirectories', 'ProjectId'];
 
-    $scope.key = {};
     $scope.check = function() {
-      if (!$scope.remote.url) {
+      if (!$scope.remote.url || !$scope.remote.secret) {
         return;
       }
-      $http({
-        method: 'GET',
-        url: $scope.remote.url + '/project',
-        headers: {
-          'access-key': $scope.key.access
-        },
-        disableJWT: true
-      })
-        .then(function(result) {
-          delete $scope.remoteError;
-          if (!Array.isArray(result.data)) {
-            $scope.remoteError = 'Server did not respond properly. It may not be a form.io server.';
-          }
-          else {
-            $scope.remoteProjects = result.data;
-            $scope.remoteProjects.unshift({
-              title: 'New Environment',
-              name: 'new'
+      $scope.localProject.settings.remoteSecret = $scope.remote.secret;
+      $scope.saveLocalProject()
+        .then(function(project) {
+          $http({
+            method: 'GET',
+            url: $scope.projectUrl + '/access/remote',
+          })
+            .then(function(response) {
+              $scope.remoteToken = response.data;
+              $http({
+                method: 'GET',
+                url: $scope.remote.url + '/project',
+                headers: {
+                  'x-remote-token': $scope.remoteToken
+                },
+                disableJWT: true
+              })
+                .then(function(result) {
+                  delete $scope.remoteError;
+                  if (!Array.isArray(result.data)) {
+                    $scope.remoteError = 'Server did not respond properly. It may not be a form.io server.';
+                  }
+                  else {
+                    $scope.remoteProjects = result.data;
+                    $scope.remoteProjects.unshift({
+                      title: 'New Environment',
+                      name: 'new'
+                    });
+                  }
+                })
+                .catch(function(err) {
+                  if (err.status === -1) {
+                    $scope.remoteError = 'Remote server did not respond to a CORS request properly. It may not be a properly configured form.io server or does not exist.';
+                  }
+                  else {
+                    $scope.remoteError = err.status + ' - ' + err.statusText + ': ' + err.data;
+                    if (err.status === 401) {
+                      $scope.remoteError += '. Please check your access key';
+                    }
+                  }
+                });
             });
-          }
         })
         .catch(function(err) {
-          if (err.status === -1) {
-            $scope.remoteError = 'Remote server did not respond to a CORS request properly. It may not be a properly configured form.io server or does not exist.';
-          }
-          else {
-            $scope.remoteError = err.status + ' - ' + err.statusText + ': ' + err.data;
-            if (err.status === 401) {
-              $scope.remoteError += '. Please check your access key';
-            }
+          if (err) {
+            $scope.remoteError = 'Unable to save Portal Key. Please check your permissions.';
           }
         });
+      return;
     };
 
     $scope.connect = function() {
@@ -2149,7 +2165,7 @@ app.controller('ProjectRemoteController', [
               method: 'POST',
               url: $scope.remote.url + '/project',
               headers: {
-                'access-key': $scope.key.access
+                'x-remote-token': $scope.remoteToken
               },
               data: project,
               disableJWT: true
@@ -2157,6 +2173,7 @@ app.controller('ProjectRemoteController', [
               .then(function(result) {
                 $scope.remote.project = result.data;
                 $scope.localProject.remote = angular.copy($scope.remote);
+                delete $scope.localProject.remote.secret;
                 $scope.saveLocalProject();
               })
               .catch(function(err) {
@@ -2170,6 +2187,7 @@ app.controller('ProjectRemoteController', [
       else {
         // Connecting to existing project
         $scope.localProject.remote = angular.copy($scope.remote);
+        delete $scope.localProject.remote.secret;
         $scope.saveLocalProject()
           .then(function() {
             $state.reload();
