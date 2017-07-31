@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.20.16
+### Changed
+ - Upgraded all dependencies.
+
 ## 2.20.15
 ### Fixed
  - An issue where the Signature component would send an undefined URL request.
