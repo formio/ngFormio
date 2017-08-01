@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.20.17
+### Fixed
+ - Some select urls were being double encoded.
+
 ## 2.20.16
 ### Changed
  - Upgraded all dependencies.
