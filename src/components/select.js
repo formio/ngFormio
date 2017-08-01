@@ -460,10 +460,10 @@ module.exports = function(app) {
                       (typeof input === 'string') &&
                       input
                     ) {
-                      options.params[encodeURIComponent(settings.searchField)] = encodeURIComponent(input);
+                      options.params[settings.searchField] = input;
                     }
                     else {
-                      delete options.params[encodeURIComponent(settings.searchField)];
+                      delete options.params[settings.searchField];
                     }
 
                     // Add the other filter.
