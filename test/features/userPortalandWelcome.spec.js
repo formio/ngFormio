@@ -4,15 +4,20 @@ module.exports = function (actions) {
       actions.logout();
       actions.iAmLoggedInFor('profileuser2');
       actions.goToPage('#/');
-      actions.iSeeTextIn('.welcome-banner','Welcome to\nGetting Started\nHow it works\n30 minute guide\nDeveloper Info\nTutorials');
+      actions.iSeeText('Welcome to ');
       actions.clickOnElement('.fa-close');
-      actions.iDonotSeeText('Welcome to');
+      actions.iDonotSeeText('Welcome to ');
     });
     describe('Welcome module when Project count is zero',function(){
       actions.iAmLoggedInFor('profileuser2');
       actions.goToPage('#/');
       actions.projectCount(0);
-      actions.iSeeTextIn('.welcome-banner','Welcome to\nGetting Started\nHow it works\n30 minute guide\nDeveloper Info\nTutorials');
+      actions.iSeeText('Welcome to ');
+      actions.iSeeText(' Getting Started');
+      actions.iSeeText(' How it works');
+      actions.iSeeText(' 30 minute guide');
+      actions.iSeeText(' Developer Info');
+      actions.iSeeText(' Tutorials');
     });
     describe('Using the Welcome Module',function(){
       actions.iAmLoggedInFor('profileuser2');

@@ -33,16 +33,13 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('LOG IN');
       actions.iSeeTextIn(".alert","User or password was incorrect");
     });
-    describe('Logging in',function(){
+    describe('Logging in and Logging out',function(){
       actions.logout();
       actions.userExistsWith('${random-name>login2.name}','${random-email>login2.email}','${random-password>login2.password}');
       actions.enterTextInField('.login-container #email','${login2.email}');
       actions.enterTextInField('.login-container #password','${login2.password}');
       actions.clickOnElementWithText('LOG IN');
       actions.iAmLoggedIn();
-    });
-    describe('Logging Out',function(){
-      actions.waitForActionToComplete(2000);
       actions.checkingUrlIamOn('#/');
       actions.clickOnElement('#user-menu');
       actions.clickOnElement('#logout');

@@ -8,7 +8,6 @@ module.exports = function (actions) {
       var framework = frameworks[0];
       actions.clickOnElementWithText(framework);
       actions.iSeeText("Create a New "+framework);
-      actions.waitForActionToComplete(2000);
       actions.enterTextInField('title', framework);
       actions.enterTextInField('description','This is first '+framework);
       /* frameworks.forEach(function(framework){

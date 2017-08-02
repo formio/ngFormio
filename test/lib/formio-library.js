@@ -1,15 +1,13 @@
 'use strict';
 
 var assert = require('assert');
-var Yadda = require('yadda');
-var English = Yadda.localisation.English;
 var request = require('request');
 var chance = (new require('chance'))();
 var _ = require('lodash');
 
-module.exports = function(config) {
+module.exports = function (config) {
   // Global timeout for wait* commands.
-  var timeout = 3000;
+  var timeout = 6000;
   var state = {};
   var projects = {};
   var helpPage = 'http://formio.github.io/help.form.io';
@@ -290,14 +288,10 @@ module.exports = function(config) {
    * @param next
    */
   var createProject = function (driver, title, description, next) {
-    driver.localStorage('GET', 'formioToken', function (err, res) {
-      if (err) {
-        return next(err);
-      }
-      if (!res || !res.value) {
+    browser.executeScript("return localStorage.getItem('formioToken');").then(function (res) {
+      if (!res) {
         return next('Not Authenticated!');
       }
-
       request({
         rejectUnauthorized: false,
         uri: config.serverProtocol + '://api.' + config.serverHost + '/project',
@@ -307,7 +301,7 @@ module.exports = function(config) {
           description: description
         },
         headers: {
-          'x-jwt-token': res.value
+          'x-jwt-token': res
         }
       }, function (err, response, body) {
         handleResponse(driver, err, response, body, function (err, result) {
@@ -333,11 +327,11 @@ module.exports = function(config) {
     next(null, projects[title]);
   };
 
-  this.iSeeElement = function(ele){
-    it('I see the element '+ele, function(next){
+  this.iSeeElement = function (ele) {
+    it('I see the element ' + ele, function (next) {
       var EC = protractor.ExpectedConditions;
       var elt = element(by.css(ele));
-      browser.wait(EC.visibilityOf(elt), 5000);
+      browser.wait(EC.visibilityOf(elt), timeout);
       next();
     });
   };
@@ -348,8 +342,9 @@ module.exports = function(config) {
       var ele = element(by.css(field));
       browser.wait(function () {
         return ele.isPresent();
-      }, timeout);
-      ele.clear().sendKeys(text).then(next).catch(next);
+      }, timeout).then(function () {
+        ele.clear().sendKeys(text).then(next).catch(next);
+      });
     });
   };
 
@@ -358,11 +353,18 @@ module.exports = function(config) {
       url = config.baseUrl + "/" + url;
     }
     it('I am on ' + url, function (next) {
-      browser.getCurrentUrl().then(function (cUrl) {
-        config.expect(cUrl.toLowerCase()).to.equal(url.toLowerCase());
-        next();
-      })
-        .catch(next);
+      browser.wait(function () {
+        return browser.getCurrentUrl().then(function (cUrl) {
+          return cUrl.toLowerCase() == url.toLowerCase();
+        });
+      }, timeout).then(function (value) {
+        try {
+          assert.equal(value, true);
+          next();
+        } catch (err) {
+          next(err);
+        }
+      });
     });
   };
 
@@ -375,7 +377,19 @@ module.exports = function(config) {
   this.iDonotSeeText = function (text) {
     it('I donot see "' + text + '"', function (next) {
       try {
-        config.expect(element(by.xpath("//*[text()='" + text + "']")).isPresent()).to.become(false).and.notify(next);
+        var ele = element(by.xpath("//*[text()='" + text + "']"));
+        browser.wait(function () {
+          return ele.isPresent().then(function (res) {
+            return !res;
+          })
+        }, timeout).then(function (value) {
+          try {
+            assert.equal(value, true);
+            next();
+          } catch (err) {
+            next(err);
+          }
+        });
       } catch (err) {
         next(err);
       }
@@ -385,7 +399,7 @@ module.exports = function(config) {
   this.iSeeText = function (text) {
     it('I see text "' + text + '"', function (next) {
       try {
-        var xpath = "//*[contains(text(),'" + text + "')]";
+        var xpath = '//*[contains(text(),"' + replacements(text) + '")]';
         browser.wait(function () {
           return element(by.xpath(xpath)).isPresent();
         }, timeout).then(function (result) {
@@ -411,28 +425,32 @@ module.exports = function(config) {
     });
   };
 
+
   this.clickOnElementWithText = function (text) {
     it('I click on the ' + text, function (next) {
-      var ele = element(by.xpath('//*[text()="' + text + '"]'));
+      var ele =  element(by.xpath('//*[text()="' + replacements(text.toString()) + '"]'));
       browser.wait(function () {
         return ele.isPresent();
-      }, config.timeout);
-      ele.click().then(next).catch(next);
+      }, timeout).then(function (res) {
+        ele.click().then(next).catch(next);
+      });
     });
   };
 
   this.iSeeTextIn = function (ele, text) {
+    text = replacements(text);
     it('I see text "' + text + '"', function (next) {
-      ele = (typeof (ele) == 'object') ? ele : element(by.css(ele, text));
+      ele = (typeof (ele) == 'object') ? ele : element(by.cssContainingText(ele, text));
       browser.wait(function () {
         return ele.isPresent();
-      }, config.timeout);
-      try {
-        config.expect(ele.getText()).to.eventually.equal(text);
-        next();
-      } catch (err) {
-        next(err);
-      }
+      }, timeout).then(function () {
+        try {
+          config.expect(ele.getText()).to.eventually.equal(text);
+          next();
+        } catch (err) {
+          next(err);
+        }
+      });
     });
   };
 
@@ -455,7 +473,7 @@ module.exports = function(config) {
   this.logout = function () {
     it('I am logging out', function (next) {
       try {
-        browser.executeScript('localStorage.removeItem("formioToken");')
+        browser.executeScript('localStorage.clear();')
           .then(browser.refresh())
           .then(function () {
             next();
@@ -470,21 +488,49 @@ module.exports = function(config) {
     it('I see ' + field + ' button is disabled', function (next) {
       try {
         var btn = element(by.xpath('//button[text()=\'' + field + '\']'));
-        config.expect(btn.isEnabled()).to.eventually.equal(false);
-        next();
+        browser.wait(function () {
+          return btn.isPresent().then(function (present) {
+            if (present) {
+              return btn.isEnabled().then(function (res) {
+                return !res;
+              });
+            }
+            return present;
+          });
+        }, timeout).then(function (value) {
+          try {
+            assert.equal(value, true);
+            next();
+          } catch (err) {
+            next(err);
+          }
+        });
       } catch (err) {
         next(err);
       }
     });
   };
 
-  this.btnEnabled = function(field){
-    it('I see ' +field+ ' button is Enabled', function(next){
-      try{
-        var btn = element(by.xpath('//button[text()=\'' + field + '\']'));
-        config.expect(btn.isEnabled()).to.eventually.equal(true);
-        next();
-      } catch(err) {
+  this.btnEnabled = function (field) {
+    it('I see ' + field + ' button is Enabled', function (next) {
+      try {
+        var btn = element(by.xpath('//button[text()="' + field + '"]'));
+        browser.wait(function () {
+          return btn.isPresent().then(function (present) {
+            if (present) {
+              return btn.isEnabled();
+            }
+            return present;
+          });
+        }, timeout).then(function (value) {
+          try {
+            assert.equal(value, true);
+            next();
+          } catch (err) {
+            next(err);
+          }
+        });
+      } catch (err) {
         next(err);
       }
     });
@@ -492,11 +538,12 @@ module.exports = function(config) {
 
   this.clickOnElement = function (text) {
     it('I click on the ' + text, function (next) {
-      var ele = element(by.css(text));
+      var ele = text.startsWith("xpath:") ? element(by.xpath(text.substring(text.indexOf(':') + 1))) : element(by.css(text));
       browser.wait(function () {
         return ele.isPresent();
-      }, config.timeout);
-      ele.click().then(next).catch(next);
+      }, timeout).then(function () {
+        ele.click().then(next).catch(next);
+      });
     });
   };
 
@@ -504,10 +551,10 @@ module.exports = function(config) {
     it('I have been logged in', function (next) {
       var tries = 0;
       (function attempt() {
-        if (tries > 15) {
+        if (tries > 25) {
           return next(new Error('No formioToken found.'));
         }
-        browser.sleep(50).then(function () {
+        browser.sleep(100).then(function () {
           browser.executeScript("return localStorage.getItem('formioToken');")
             .then(function (res) {
               if (res) {
@@ -523,15 +570,15 @@ module.exports = function(config) {
     })
   };
 
-  this.iAmLoggedInFor = function(tempUser) {
-    it("I am logged in for "+tempUser,function(next){
+  this.iAmLoggedInFor = function (tempUser) {
+    it("I am logged in for " + tempUser, function (next) {
       if (!next && tempUser) {
         next = tempUser;
         tempUser = null;
       }
       var driver = browser;
       if (tempUser && state[tempUser]) {
-        authUser(driver, 'formio', 'user/login', state[tempUser].email, state[tempUser].password, function(err, res) {
+        authUser(driver, 'formio', 'user/login', state[tempUser].email, state[tempUser].password, function (err, res) {
           if (err) {
             return next(err);
           }
@@ -546,8 +593,8 @@ module.exports = function(config) {
         state[tempUser].fullName = chance.name();
         state[tempUser].name = chance.username();
         state[tempUser].email = chance.email();
-        state[tempUser].password = chance.word({ length: 10 });
-        createAndAuthUser(driver, state[tempUser].name, state[tempUser].email, state[tempUser].password, function(err, res) {
+        state[tempUser].password = chance.word({length: 10});
+        createAndAuthUser(driver, state[tempUser].name, state[tempUser].email, state[tempUser].password, function (err, res) {
           if (err) {
             return next(err);
           }
@@ -604,17 +651,18 @@ module.exports = function(config) {
       else {
         browser.wait(function () {
           return element(by.xpath('//div[@ng-repeat="project in projects"]')).isPresent();
-        }, config.timeout);
-        try {
-          element.all(by.xpath('//div[@ng-repeat="project in projects"]')).getText().then(function (res) {
-            var arr = new Array(res);
-            var merged = [].concat.apply([], arr);
-            config.expect(merged.length).to.equal(num);
-          });
-          next();
-        } catch (err) {
-          next(err);
-        }
+        }, timeout).then(function () {
+          try {
+            element.all(by.xpath('//div[@ng-repeat="project in projects"]')).getText().then(function (res) {
+              var arr = new Array(res);
+              var merged = [].concat.apply([], arr);
+              config.expect(merged.length).to.equal(num);
+            });
+            next();
+          } catch (err) {
+            next(err);
+          }
+        });
       }
     });
   };
@@ -636,25 +684,25 @@ module.exports = function(config) {
     });
   };
 
-  this.iSeeValueIn = function(ele,text){
+  this.iSeeValueIn = function (ele, text) {
     text = replacements(text.toString());
-    it('I see text '+text+' in '+ele, function (next) {
+    it('I see text ' + text + ' in ' + ele, function (next) {
       var ele1 = (typeof (ele) == 'object') ? ele : element(by.css(ele, text));
       browser.wait(function () {
         return ele1.isPresent();
-      }, config.timeout);
-      ele1.getAttribute('value').then(function (value) {
-        config.expect(value===text);
-        next();
-      })
-        .catch(next);
+      }, timeout).then(function () {
+        ele1.getAttribute('value').then(function (value) {
+          config.expect(value === text);
+          next();
+        })
+          .catch(next);
+      });
     });
   };
 
   this.checkIfLoggedOut = function () {
     it('I am logged Out', function (next) {
       try {
-        browser.waitForAngular();
         var value = browser.executeScript("return localStorage.getItem('formioToken');");
         config.expect(value).to.eventually.equal(null);
         next();
@@ -671,22 +719,22 @@ module.exports = function(config) {
     });
   };
 
-  this.iDonotSeeElement = function(ele){
-    it('I donot see the element '+ele, function(next){
+  this.iDonotSeeElement = function (ele) {
+    it('I donot see the element ' + ele, function (next) {
       var elt = element(by.css(ele));
       browser.wait(function () {
         return elt.isPresent();
-      }, config.timeout).then(function(){
-        elt.isDisplayed().then(function(visible){
-          assert.equal(visible,false);
+      }, timeout).then(function () {
+        elt.isDisplayed().then(function (visible) {
+          assert.equal(visible, false);
         });
         next();
       });
     });
   };
 
-  this.valueUpdate = function(ele,newVal,oldVal){
-    it('The user account for '+ele+' was updated with '+newVal+' for '+oldVal, function(next) {
+  this.valueUpdate = function (ele, newVal, oldVal) {
+    it('The user account for ' + ele + ' was updated with ' + newVal + ' for ' + oldVal, function (next) {
       ele = ele.toString();
       if (newVal === '${random}') {
         assert.equal(_.has(state, ele + '.' + oldVal + '_old'), true);
@@ -701,8 +749,8 @@ module.exports = function(config) {
     });
   };
 
-  this.valueChanged = function(user){
-    it('The user profile for '+user+' was changed.', function(next) {
+  this.valueChanged = function (user) {
+    it('The user profile for ' + user + ' was changed.', function (next) {
       var _fullName = user.toString() + '.fullName';
       var _name = user.toString() + '.name';
       var _email = user.toString() + '.email';
@@ -713,7 +761,7 @@ module.exports = function(config) {
       var password = replacements('${' + _password + '}');
 
       var driver = browser;
-      authUser(driver, 'formio', 'user/login', email, password, function(err, res) {
+      authUser(driver, 'formio', 'user/login', email, password, function (err, res) {
         if (err) {
           return next(err);
         }
@@ -727,11 +775,11 @@ module.exports = function(config) {
 
         // Compare old values if present.
         [
-          { current: fullName, label: _fullName },
-          { current: name, label: _name },
-          { current: email, label: _email },
-          { current: password, label: _password }
-        ].forEach(function(element) {
+          {current: fullName, label: _fullName},
+          {current: name, label: _name},
+          {current: email, label: _email},
+          {current: password, label: _password}
+        ].forEach(function (element) {
           if (_.has(state, element.label + '_old')) {
             assert.notEqual(element.current, _.get(state, element.label + '_old'));
           }
@@ -742,4 +790,78 @@ module.exports = function(config) {
     })
   };
 
+  this.portalIamOn = function (title) {
+    title = replacements(title.toString());
+    it('I am on page "' + title + '"', function (next) {
+      try {
+        var xpath = "//*[@class='project-title']";
+        browser.wait(function () {
+          return element(by.xpath(xpath)).isPresent();
+        }, timeout).then(function (result) {
+          var elet = element.all(by.xpath(xpath))
+          elet.getAttribute('value').then(function (value) {
+            config.expect(value === title);
+            next();
+          });
+        });
+      } catch (err) {
+        next(err);
+      }
+    });
+  };
+
+  this.clickOnElementIn = function (ele, text) {
+    text = replacements(text.toString());
+    it('I click on the ' + text + ' in' + ele + ' element', function (next) {
+      var ele = element(by.xpath('//*[text()=\'' + name + '\']//..//..//..//*[contains(@class,\'' + button + '\')]'));
+      browser.wait(function () {
+        return ele.isPresent();
+      }, timeout).then(function () {
+        ele.click().then(next).catch(next);
+      });
+    });
+  };
+
+  this.projectPageIamOn = function (page, title) {
+    title = replacements(title.toString());
+    it('I am on ' + page + ' page of the ' + title + 'project', function (next) {
+      try {
+        var path = res.value.split("/");
+        var x = (path[path.length - 1] + '*') == "*" ? path[path.length - 2] : path[path.length - 1];
+        var xpath = "//*[@class='project-title']";
+        browser.wait(function () {
+          return element(by.xpath(xpath)).isPresent();
+        }, timeout).then(function (result) {
+          var elet = element.all(by.xpath(xpath))
+          elet.getAttribute('value').then(function (value) {
+            config.expect(value === title);
+            next();
+          })
+
+        });
+      } catch (err) {
+        next(err);
+      }
+    });
+  };
+
+  this.projectExisting = function (title, description) {
+    title = replacements(title);
+    it("Project exists with " + title + ' name', function (next) {
+      try {
+        description = replacements(description);
+        var driver = browser;
+        createProject(driver, title, description, function (err, res) {
+          if (err) {
+            return next(err);
+          }
+          browser.refresh().then(function () {
+            next(null,res);
+          });
+        });
+      } catch (err) {
+        next(err);
+      }
+    });
+  };
 };
