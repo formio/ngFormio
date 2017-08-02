@@ -218,6 +218,7 @@ app.controller('ProjectController', [
   'ProjectUpgradeDialog',
   '$q',
   'GoogleAnalytics',
+  'RemoteTokens',
   function(
     $scope,
     $rootScope,
@@ -230,7 +231,8 @@ app.controller('ProjectController', [
     $http,
     ProjectUpgradeDialog,
     $q,
-    GoogleAnalytics
+    GoogleAnalytics,
+    RemoteTokens
   ) {
     $scope.currentSection = {};
     $rootScope.activeSideBar = 'projects';
@@ -305,8 +307,18 @@ app.controller('ProjectController', [
 
     $scope.loadProjectPromise = $scope.formio.loadProject(null, {ignoreCache: true}).then(function(result) {
       $scope.localProject = result;
+      $scope.localProjectUrl = $rootScope.projectPath(result);
       var promiseResult = result;
       // If this is a remote project, load the remote.
+
+      $scope.rolesLoading = true;
+      var loadRoles = function() {
+        $http.get($scope.projectUrl + '/role').then(function(result) {
+          $scope.currentProjectRoles = result.data;
+          $scope.rolesLoading = false;
+        });
+      };
+
       if ($scope.localProject.remote) {
         $scope.isRemote = true;
         $scope.projectUrl = $rootScope.projectPath($scope.localProject.remote.project, $scope.localProject.remote.url, $scope.localProject.remote.type);
@@ -314,21 +326,25 @@ app.controller('ProjectController', [
         $scope.projectServer = $scope.localProject.remote.url.replace(/(^\w+:|^)\/\//, '');
         $scope.localFormio = $scope.formio;
         $scope.baseUrl = $scope.localProject.remote.url;
-        $scope.formio = new Formio($scope.projectUrl, { base: $scope.localProject.remote.url });
-        promiseResult = $scope.formio
-          .loadProject(null, {
-            ignoreCache: true,
-            disableJWT: true,
-            // Remove once better authentication is set up.
-            header: new Headers({
-              'Accept': 'application/json',
-              'Content-type': 'application/json; charset=UTF-8',
-              'access-key': $scope.localProject.remote.accessKey
-            })
-          })
-          .then(function(result) {
-            $scope.currentProject = result;
-            return result;
+        $scope.formio = new Formio($scope.projectUrl, {  });
+        promiseResult = $http({
+          method: 'GET',
+          url: $scope.localProjectUrl + '/access/remote'
+        })
+          .then(function(response) {
+            RemoteTokens.setRemoteToken($scope.projectUrl, response.data);
+            $scope.formio = new Formio($scope.projectUrl, {
+              base: $scope.localProject.remote.url
+            });
+            return $scope.formio
+              .loadProject(null, {
+                ignoreCache: true
+              })
+              .then(function(currentProject) {
+                $scope.currentProject = currentProject;
+                loadRoles();
+                return currentProject;
+              });
           });
       }
       else {
@@ -336,6 +352,7 @@ app.controller('ProjectController', [
         $scope.projectServer = AppConfig.apiServer;
         $scope.currentProject = $scope.localProject;
         $scope.projectUrl = $rootScope.projectPath(result);
+        loadRoles();
       }
       $scope.projectType = 'Environment';
       $scope.environmentName = ($scope.localProject.project) ? result.title : 'Live';
@@ -348,12 +365,6 @@ app.controller('ProjectController', [
       var day = 86400;
       var remaining = 30 - parseInt(delta / day);
       $scope.trialDaysRemaining = remaining > 0 ? remaining : 0;
-
-      $scope.rolesLoading = true;
-      $http.get($scope.projectUrl + '/role').then(function(result) {
-        $scope.currentProjectRoles = result.data;
-        $scope.rolesLoading = false;
-      });
 
       try {
         allowedFiles = JSON.parse(localStorage.getItem('allowedFiles')) || {};
