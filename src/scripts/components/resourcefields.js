@@ -6,7 +6,7 @@ angular.module('formioApp').config([
       formioComponentsProvider.register('resourcefields', {
         title: 'Resource Fields',
         template: 'formio/components/resourcefields.html',
-        controller: ['$scope', '$rootScope', '$http', 'FormioUtils', function ($scope, $rootScope, $http, FormioUtils) {
+        controller: ['$scope', '$rootScope', '$http', 'FormioUtils', 'Formio', function ($scope, $rootScope, $http, FormioUtils, Formio) {
           var settings = $scope.component;
           var resourceExclude = '';
           $scope.resourceComponents = [];

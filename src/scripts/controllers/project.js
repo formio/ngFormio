@@ -788,7 +788,7 @@ app.factory('ProjectAnalytics', [
   ) {
       return {
         getSubmissionAnalytics: function(project, year, month, day) {
-          var url = $scope.projectUrl + '/analytics/year/' + year;
+          var url = AppConfig.projectUrl + '/analytics/year/' + year;
           if (month !== undefined && month !== null) {
             url += '/month/' + month;
           }
@@ -2115,7 +2115,7 @@ app.controller('ProjectRemoteController', [
         .then(function(project) {
           $http({
             method: 'GET',
-            url: $scope.projectUrl + '/access/remote',
+            url: $scope.projectUrl + '/access/remote'
           })
             .then(function(response) {
               $scope.remoteToken = response.data;
@@ -2212,7 +2212,7 @@ app.controller('ProjectRemoteController', [
         .then(function() {
           $state.reload();
         });
-    }
+    };
   }
 ]);
 

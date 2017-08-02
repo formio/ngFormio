@@ -236,9 +236,9 @@ app.directive('formList', function() {
             params: {
               limit: 9999999
             }
-          }
+          };
           if ($scope.formType) {
-            query.params.type = $scope.formType
+            query.params.type = $scope.formType;
           }
           $scope.formio.loadForms(query).then(function(forms) {
             $scope.forms = forms;

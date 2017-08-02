@@ -1185,8 +1185,8 @@ angular
       return {
         getRemoteToken: this.getRemoteToken,
         setRemoteToken: this.setRemoteToken
-      }
-    }
+      };
+    };
   })
   .factory('RemoteInterceptor', [
     '$q',
