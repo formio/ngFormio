@@ -67,7 +67,7 @@ angular
 
       var RemotePlugin = function() {};
 
-      RemotePlugin.prototype.requestOptions = function(url, options) {
+      RemotePlugin.prototype.requestOptions = function(options, url) {
         var remoteToken = RemoteTokensProvider.getRemoteToken(url);
         if (remoteToken) {
           options.headers.append('x-remote-token', remoteToken);

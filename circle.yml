@@ -30,13 +30,13 @@ test:
     - mv ./test/screenshots/ $CIRCLE_ARTIFACTS/screenshots
 
 deployment:
-  release:
-    tag: /^\d+\.\d+\.\d+$/
+  prerelease:
+    tag: /^\d+\.\d+\.\d+(-.*)$/
     commands:
       - cd dist && tar -czvf ../${TAG}.tgz *
       - aws s3 cp ${TAG}.tgz s3://formio-app-releases/${TAG}.tgz
-  build:
-    tag: /build-.*/
+  release:
+    tag: /^\d+\.\d+\.\d+$/
     commands:
       - cd dist && tar -czvf ../${TAG}.tgz *
       - aws s3 cp ${TAG}.tgz s3://formio-app-releases/${TAG}.tgz
