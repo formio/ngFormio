@@ -58,6 +58,7 @@
     "mocha": "^3.4.2",
     "mongoose": "^4.1.6",
     "ng-file-upload": "^10.0.2",
+    "protobufjs": "^6.8.0",
     "protractor": "^5.1.2",
     "request": "^2.63.0",
     "seamless": "^1.0.0",
