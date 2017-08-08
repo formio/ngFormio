@@ -55,7 +55,7 @@ angular
 
       // Set the base URL for our API.
       FormioProvider.setBaseUrl(AppConfig.apiBase);
-      FormioProvider.setAppUrl(AppConfig.formioBase);
+      FormioProvider.setProjectUrl(AppConfig.formioBase);
       FormioProvider.setDomain(AppConfig.domain);
 
       // Disable form component until we can fix it.
