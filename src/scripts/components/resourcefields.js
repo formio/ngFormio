@@ -6,7 +6,7 @@ angular.module('formioApp').config([
       formioComponentsProvider.register('resourcefields', {
         title: 'Resource Fields',
         template: 'formio/components/resourcefields.html',
-        controller: ['$scope', '$rootScope', '$http', 'FormioUtils', function ($scope, $rootScope, $http, FormioUtils) {
+        controller: ['$scope', '$rootScope', '$http', 'FormioUtils', 'Formio', function ($scope, $rootScope, $http, FormioUtils, Formio) {
           var settings = $scope.component;
           var resourceExclude = '';
           $scope.resourceComponents = [];
@@ -46,11 +46,13 @@ angular.module('formioApp').config([
             multiple: false
           };
 
+          $scope.baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
+
           // Keep track of the available forms on the provided form.
           var formFields = [];
 
           // Fetch the form information.
-          $http.get(AppConfig.apiBase + settings.basePath + '/' + settings.form).then(function(result) {
+          $http.get($scope.baseUrl + settings.basePath + '/' + settings.form).then(function(result) {
             FormioUtils.eachComponent(result.data.components, function(component) {
               if (component.type !== 'button') {
                 formFields.push({
@@ -65,7 +67,7 @@ angular.module('formioApp').config([
           $scope.$watch('data.resource', function(data) {
             if (!data) { return; }
             $scope.data.fields = $scope.data.fields || {};
-            $http.get(AppConfig.apiBase + settings.basePath + '/' + data).then(function(results) {
+            $http.get($scope.baseUrl + settings.basePath + '/' + data).then(function(results) {
               $scope.resourceComponents = [];
               FormioUtils.eachComponent(results.data.components, function(component) {
                 if (component.type !== 'button') {
@@ -131,8 +133,8 @@ angular.module('formioApp').config([
     'FormioUtils',
     function ($templateCache, FormioUtils) {
       $templateCache.put('formio/components/resourcefields.html', FormioUtils.fieldWrap(
-        '<formio-component component="resourceSelect" data="data"></formio-component>' +
-        '<formio-component ng-if="data.resource" component="propertyField" data="data"></formio-component>' +
+        '<formio-component component="resourceSelect" data="data" options="options"></formio-component>' +
+        '<formio-component ng-if="data.resource" component="propertyField" data="data" options="options"></formio-component>' +
         '<fieldset ng-if="data.resource">' +
           '<legend>Resource Fields</legend>' +
           '<div class="well">Below are the fields within the selected resource. For each of these fields, select the corresponding field within this form that you wish to map to the selected Resource.</div>' +

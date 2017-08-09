@@ -46,7 +46,7 @@ bower install</pre>
         <h4>Step 3 - Configure for your project</h4>
         <p>In order for the app to use your form.io project, you need to configure the app to know where it is.</p>
         <p>Change the first line of <strong>/src/config.js</strong> to say the following.</p>
-        <p><pre>var APP_URL = '{{ projectApi }}';</pre></p>
+        <p><pre>var APP_URL = '{{ projectUrl }}';</pre></p>
         <h4>Step 4 - Running the app</h4>
         <p>You can run a development version of the application from the command line. This will start up a server and a browser window and refresh the page any time you change the source code.</p>
         <p><pre>gulp serve</pre></p>
@@ -64,21 +64,21 @@ bower install</pre>
         <p>More information on embedding can be found at <a href="https://help.form.io/developer/info/angular/" target="_blank">Angular Embedding Help</a></p>
         <h4>Basic embedding</h4>
         <p>This would embed one of your forms and allow the data to be submitted back to the API server.</p>
-        <p><pre>&lt;formio src="{{ projectApi }}/{{ forms[0].path }}"&gt;&lt;/formio&gt;</pre></p>
+        <p><pre>&lt;formio src="{{ projectUrl }}/{{ forms[0].path }}"&gt;&lt;/formio&gt;</pre></p>
         <h4>List of Submissions</h4>
         <p>It is often useful to list the submissions already sent to a form backend. This can be done simply using the &lt;formio-submissions&gt; directive.</p>
-        <p><pre>&lt;formio-submissions src="{{ projectApi }}{{ forms[0].path }}"&gt;&lt;/formio-submissions&gt;</pre></p>
+        <p><pre>&lt;formio-submissions src="{{ projectUrl }}{{ forms[0].path }}"&gt;&lt;/formio-submissions&gt;</pre></p>
         <h4>Form Update</h4>
         <p>You can also reference an existing submission in the form url and the data from that submission will be loaded along with the form. When the form is submitted, an update will happen instead of a create.</p>
-        <p><pre>&lt;formio src="{{ projectApi }}/{{ forms[0].path }}submission/{submissionId}"&gt;&lt;/formio&gt;</pre></p>
+        <p><pre>&lt;formio src="{{ projectUrl }}/{{ forms[0].path }}submission/{submissionId}"&gt;&lt;/formio&gt;</pre></p>
         <h4>Form Submission Delete</h4>
         <p>Finally, you can allow users to delete a submission with the &lt;formio-delete&gt; directive. If the user has permission, they can delete the submission.</p>
-        <p><pre>&lt;formio-delete src="{{ projectApi }}/{{ forms[0].path }}submission/{submissionId}"&gt;&lt;/formio-delete&gt;</pre></p>
+        <p><pre>&lt;formio-delete src="{{ projectUrl }}/{{ forms[0].path }}submission/{submissionId}"&gt;&lt;/formio-delete&gt;</pre></p>
 
         <h4>Available forms in your project</h4>
         <ul class="list-group">
           <li class="list-group-item" ng-repeat="form in forms">
-            {{ form.title }} - {{ projectApi }}{{ form.path }}
+            {{ form.title }} - {{ projectUrl }}{{ form.path }}
           </li>
         </ul>
       </div>

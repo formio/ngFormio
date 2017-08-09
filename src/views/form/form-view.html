@@ -9,7 +9,7 @@
     <div ng-if="hasAuthAction" ng-cloak class="alert alert-warning" role="alert"><i class="glyphicon glyphicon-exclamation-sign"></i> This form is read only because it contains an Authentication action.</div>
     <div ng-if="hasPremAction && (currentProject.plan === 'basic')" ng-cloak class="alert alert-warning" role="alert"><i class="glyphicon glyphicon-exclamation-sign"></i> This form contains a Premium action, upgrade your <a ui-sref="project.settings.plan">project plan</a> to enable it.</div>
     <div class="{{currentProject.name}}Form">
-      <formio src="formUrl" read-only="hasAuthAction"></formio>
+      <formio src="formUrl" options="{baseUrl: baseUrl}" read-only="hasAuthAction"></formio>
     </div>
   </div>
 </div>

@@ -1,7 +1,7 @@
 <div class="row">
   <div class="col-md-8">
     <h3>Embedding the {{ form.title }} Form in {{ current.framework | capitalize }} applications</h3>
-    <p><span><pre><code><strong>Embed URL: </strong>{{ projectPath(currentProject) }}/{{ form.path }} <span class="pull-right">{<a href="{{ projectPath(currentProject) }}/{{ form.path }}" target="_blank">Preview JSON</a>}</span></code></pre></span></p>
+    <p><span><pre><code><strong>Embed URL: </strong>{{ projectUrl }}/{{ form.path }} <span class="pull-right">{<a href="{{ projectUrl }}/{{ form.path }}" target="_blank">Preview JSON</a>}</span></code></pre></span></p>
     <p class="text-muted">This is the url that can be used to embed this form into your application. Your form exists as a JSON object that defines how to render the form.</p>
     <div ng-if="current.framework === 'angular'">
       <div class="panel panel-success">
@@ -28,7 +28,7 @@
           <h5>Embed within a template</h5>
           <p>To embed this form, simply place this directive anywhere in a template. Please note that there are single quotes inside the double quotes. This is since the src of the form is interpolated by angular. You can use a variable as well.</p>
           <span><pre><code>
-            &lt;formio src="'{{ projectPath(currentProject) }}/{{ form.path }}'" /&gt;
+            &lt;formio src="'{{ projectUrl }}/{{ form.path }}'" /&gt;
 
           </code></pre></span>
           <h5>Additional options</h5>
@@ -75,7 +75,7 @@
             // Then we can use our component in our App.vue.
                   &lt;template&gt;
              &nbsp;&nbsp;&lt;div id="app"&gt;
-             &nbsp;&nbsp;&lt;formio-vue src="'{{ projectPath(currentProject) }}/{{ form.path }}'"&gt;&lt;/formio-vue&gt;
+             &nbsp;&nbsp;&lt;formio-vue src="'{{ projectUrl }}/{{ form.path }}'"&gt;&lt;/formio-vue&gt;
              &lt;/div&gt;
             &lt;/template&gt;
             &lt;script&gt;
@@ -107,7 +107,7 @@
             import { Formio } from 'react-formio';
 
             ReactDOM.render(
-            &nbsp;&nbsp;&lt;Formio src="{{ projectPath(currentProject) }}/{{ form.path }}" /&gt;, document.getElementById('example')
+            &nbsp;&nbsp;&lt;Formio src="{{ projectUrl }}/{{ form.path }}" /&gt;, document.getElementById('example')
             );
 
           </code></pre></span>
@@ -135,7 +135,7 @@
 
             ---
 
-            &lt;formio src='{{ projectPath(currentProject) }}/{{ form.path }}' /&gt;
+            &lt;formio src='{{ projectUrl }}/{{ form.path }}' /&gt;
           </code></pre></span>
         </div>
       </div>
