@@ -69,6 +69,11 @@ module.exports = function(app) {
             submitForm(scope, cb);
           });
 
+          // Hook into the prevpage method.
+          FormioUtils.hook($scope.component.key + ':prevPage', function(scope, cb) {
+            submitForm(scope, cb);
+          });
+
           // See if we need to load the submission into scope.
           if (
             $scope.data[$scope.component.key] &&
