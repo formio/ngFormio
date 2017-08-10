@@ -1,4 +1,4 @@
-/*! ng-formio v2.20.16 | https://unpkg.com/ng-formio@2.20.16/LICENSE.txt */
+/*! ng-formio v2.21.0 | https://unpkg.com/ng-formio@2.21.0/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 (function (root, factory) {
   // AMD
@@ -79462,6 +79462,7 @@ module.exports = function(app) {
         template: 'formio/components/columns.html',
         group: 'layout',
         settings: {
+          clearOnHide: false,
           input: false,
           tableView: false,
           key: 'columns',
@@ -80380,6 +80381,7 @@ module.exports = function(app) {
         template: 'formio/components/fieldset.html',
         group: 'layout',
         settings: {
+          clearOnHide: false,
           key: 'fieldset',
           input: false,
           tableView: false,
@@ -80700,6 +80702,7 @@ module.exports = function(app) {
         template: 'formio/components/form.html',
         group: 'advanced',
         settings: {
+          clearOnHide: false,
           input: true,
           tableView: true,
           key: 'formField',
@@ -81071,6 +81074,7 @@ module.exports = function(app) {
         template: 'formio/components/panel.html',
         group: 'layout',
         settings: {
+          clearOnHide: false,
           key: 'panel',
           input: false,
           title: '',
@@ -81917,10 +81921,10 @@ module.exports = function(app) {
                       (typeof input === 'string') &&
                       input
                     ) {
-                      options.params[encodeURIComponent(settings.searchField)] = encodeURIComponent(input);
+                      options.params[settings.searchField] = input;
                     }
                     else {
-                      delete options.params[encodeURIComponent(settings.searchField)];
+                      delete options.params[settings.searchField];
                     }
 
                     // Add the other filter.
@@ -82394,6 +82398,7 @@ module.exports = function(app) {
         template: 'formio/components/table.html',
         group: 'layout',
         settings: {
+          clearOnHide: false,
           input: false,
           key: 'table',
           numRows: 3,
@@ -82732,6 +82737,7 @@ module.exports = function(app) {
         template: 'formio/components/well.html',
         group: 'layout',
         settings: {
+          clearOnHide: false,
           key: 'well',
           input: false,
           components: [],
@@ -85578,7 +85584,7 @@ app.run([
     );
 
     $templateCache.put('formio/errors.html',
-      "<div ng-show=\"formioForm[componentId].$error && !formioForm[componentId].$pristine\">\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.email\">{{ component.label || component.placeholder || component.key }} {{'must be a valid email' | formioTranslate:null:builder}}.</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.required\">{{ component.label || component.placeholder || component.key }} {{'is required' | formioTranslate:null:builder}}.</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.number\">{{ component.label || component.placeholder || component.key }} {{'must be a number' | formioTranslate:null:builder}}.</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.maxlength\">{{ component.label || component.placeholder || component.key }} {{'must be shorter than' | formioTranslate:null:builder}} {{ component.validate.maxLength + 1 }} {{'characters' | formioTranslate:null:builder}}.</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.minlength\">{{ component.label || component.placeholder || component.key }} {{'must be longer than' | formioTranslate:null:builder}} {{ component.validate.minLength - 1 }} {{'characters' | formioTranslate:null:builder}}.</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.min\">{{ component.label || component.placeholder || component.key }} {{'must be greater than or equal to' | formioTranslate:null:builder}} {{ component.validate.min }}.</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.max\">{{ component.label || component.placeholder || component.key }} {{'must be less than or equal to' | formioTranslate:null:builder}} {{ component.validate.max }}.</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.custom\">{{ component.customError | formioTranslate }}</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.pattern\">{{ component.label || component.placeholder || component.key }} {{'does not match the pattern' | formioTranslate:null:builder}} {{ component.validate.pattern }}</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.day\">{{ component.label || component.placeholder || component.key }} {{'must be a valid date' | formioTranslate:null:builder}}.</p>\n</div>\n"
+      "<div ng-show=\"formioForm[componentId].$error && !formioForm[componentId].$pristine\">\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.email\">{{ component.errorLabel || component.label || component.placeholder || component.key }} {{'must be a valid email' | formioTranslate:null:builder}}.</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.required\">{{ component.errorLabel || component.label || component.placeholder || component.key }} {{'is required' | formioTranslate:null:builder}}.</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.number\">{{ component.errorLabel || component.label || component.placeholder || component.key }} {{'must be a number' | formioTranslate:null:builder}}.</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.maxlength\">{{ component.errorLabel || component.label || component.placeholder || component.key }} {{'must be shorter than' | formioTranslate:null:builder}} {{ component.validate.maxLength + 1 }} {{'characters' | formioTranslate:null:builder}}.</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.minlength\">{{ component.errorLabel || component.label || component.placeholder || component.key }} {{'must be longer than' | formioTranslate:null:builder}} {{ component.validate.minLength - 1 }} {{'characters' | formioTranslate:null:builder}}.</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.min\">{{ component.errorLabel || component.label || component.placeholder || component.key }} {{'must be greater than or equal to' | formioTranslate:null:builder}} {{ component.validate.min }}.</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.max\">{{ component.errorLabel || component.label || component.placeholder || component.key }} {{'must be less than or equal to' | formioTranslate:null:builder}} {{ component.validate.max }}.</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.custom\">{{ component.customError | formioTranslate }}</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.pattern\">{{ component.errorLabel || component.label || component.placeholder || component.key }} {{'does not match the pattern' | formioTranslate:null:builder}} {{ component.validate.pattern }}</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.day\">{{ component.errorLabel || component.label || component.placeholder || component.key }} {{'must be a valid date' | formioTranslate:null:builder}}.</p>\n</div>\n"
     );
   }
 ]);

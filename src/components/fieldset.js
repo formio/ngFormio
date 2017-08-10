@@ -10,6 +10,7 @@ module.exports = function(app) {
         template: 'formio/components/fieldset.html',
         group: 'layout',
         settings: {
+          clearOnHide: false,
           key: 'fieldset',
           input: false,
           tableView: false,
