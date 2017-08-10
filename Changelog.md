@@ -4,11 +4,17 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-[Unreleased]
+## 2.21.1
 ### Added
  - Error labels to show when an error has occured.
 
-## 2.21.18
+### Fixed
+ - Errors with required file uploads.
+ - The file upload not showing the error messages.
+ - File uploads not working within wizards that pass the url to the directive.
+ - Issue with clearOnHide flag not setting properly on container components.
+
+## 2.20.18
 ### Changed
  - Upgraded formio.js to 2.13.2
 
