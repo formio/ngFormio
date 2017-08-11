@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.21.2
+### Fixed
+ - Issues with number/floats not parsing correctly.
+ - The PDF download button to hit the correct api.
+
+### Added
+ - Support submission of form components which are not in wizard panels
+ - Submit subforms on the page when wizard's Previous button is clicked
+
 ## 2.21.1
 ### Added
  - Error labels to show when an error has occured.
