@@ -356,6 +356,10 @@ app.controller('FormController', [
     $scope.isCopy = !!($stateParams.components && $stateParams.components.length);
     $scope.formId = $stateParams.formId;
 
+    $scope.removePDF = function() {
+      delete $scope.form.settings.pdf;
+    };
+
     $scope.uploadPDF = function() {
       ngDialog.open({
         template: 'views/form/upload.html',

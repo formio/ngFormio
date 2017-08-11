@@ -25,7 +25,8 @@
           <label for="name" class="control-label">Display as</label>
           <div class="input-group">
             <select class="form-control" name="form-display" id="form-display" ng-options="display.name as display.title for display in formDisplays" ng-model="form.display"></select>
-            <span class="btn btn-primary input-group-addon" ng-click="uploadPDF()" ng-if="form.display === 'pdf'"><i class="fa fa-upload"></i></span>
+            <span class="btn btn-primary input-group-addon" ng-click="uploadPDF()" ng-if="form.display === 'pdf' && !form.settings.pdf"><i class="fa fa-upload"></i></span>
+            <span class="btn btn-primary input-group-addon" ng-click="removePDF()" ng-if="form.display === 'pdf' && form.settings.pdf"><i class="fa fa-times"></i></span>
           </div>
         </div>
       </div>
@@ -56,7 +57,7 @@
     <input type="hidden" ng-model="form.type"/>
     <hr class="form-line">
     <div ng-if="form.display === 'pdf' && !form.settings.pdf">
-      <ng-include src="'pdfupload.html'"></ng-include>
+      <ng-include src="'views/form/upload.html'"></ng-include>
       <br/>
     </div>
     <div ng-if="form.display !== 'pdf' || form.settings.pdf">
