@@ -15,6 +15,9 @@ module.exports = function() {
 
       (function next(err, previous) {
         if (err) {
+          if (typeof err === 'string') {
+            err = {alerts: {type: 'danger', message: '{"data": "' + err + '"}'}};
+          }
           err.item = previous;
           return done ? done(err) : null;
         }
