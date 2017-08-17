@@ -301,6 +301,7 @@ module.exports = function() {
           form.submitting = true;
           FormioUtils.alter('submit', $scope, $scope.submission, function(err) {
             if (err) {
+              form.submitting = false;
               return this.showAlerts(err.alerts);
             }
 
