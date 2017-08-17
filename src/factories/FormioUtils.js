@@ -273,6 +273,7 @@ module.exports = function() {
     parseFloat: formioUtils.parseFloat,
     formatAsCurrency: formioUtils.formatAsCurrency,
     checkCalculated: formioUtils.checkCalculated,
+    escapeRegExCharacters: formioUtils.escapeRegExCharacters,
     checkVisible: function(component, row, data) {
       var visible = formioUtils.checkCondition(component, row, data);
       if (!visible) {
