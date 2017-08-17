@@ -138,6 +138,7 @@ module.exports = function(app) {
           '$scope',
           '$http',
           'Formio',
+          'FormioUtils',
           '$interpolate',
           '$q',
           '$timeout',
@@ -146,6 +147,7 @@ module.exports = function(app) {
             $scope,
             $http,
             Formio,
+            FormioUtils,
             $interpolate,
             $q,
             $timeout
@@ -460,7 +462,9 @@ module.exports = function(app) {
                       (typeof input === 'string') &&
                       input
                     ) {
-                      options.params[settings.searchField] = input;
+                      options.params[settings.searchField] = /__regex$/.test(settings.searchField)
+                        ? FormioUtils.escapeRegExCharacters(input)
+                        : input;
                     }
                     else {
                       delete options.params[settings.searchField];
@@ -468,12 +472,13 @@ module.exports = function(app) {
 
                     // Add the other filter.
                     if (settings.filter) {
-                      var filter = $interpolate(settings.filter)({
-                        data: $scope.submission ? $scope.submission.data : {},
-                        row: $scope.data
-                      });
                       // This changes 'a=b&c=d' into an object and assigns to params.
-                      _assign(options.params, JSON.parse('{"' + decodeURI(filter).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}'));
+                      _assign(options.params, _.mapValues(JSON.parse('{"' + decodeURI(settings.filter).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}'), function(value) {
+                        return $interpolate(value)({
+                          data: $scope.submission ? $scope.submission.data : {},
+                          row: $scope.data
+                        });
+                      }));
                     }
 
                     // If they wish to return only some fields.
