@@ -65,32 +65,12 @@ module.exports = function() {
         };
 
         $scope.downloadUrl = '';
-
-        $scope.setDownloadUrl = function() {
+        $scope.setDownloadUrl = function(form) {
           if (!$scope.formio) {
             return;
           }
-          var download = '';
-          var allowedPath = '';
-          if ($scope.formio && $scope.formio.submissionUrl) {
-            download = $scope.formio.submissionUrl;
-            allowedPath = download.replace($scope.formio.projectUrl, '') + '/download';
-          }
-          else if ($scope.submission._id) {
-            download = Formio.baseUrl + '/project/' + $scope.form.project + '/';
-            download += '/form/' + $scope.form._id;
-            download += '/submission/' + $scope.submission._id;
-            allowedPath = download.replace(Formio.baseUrl, '') + '/download';
-          }
-          if (!download) {
-            return;
-          }
-
-          download += '/download';
-          return $scope.formio.getTempToken(3600, 'GET:' + allowedPath).then(function(tempToken) {
-            download += '?token=' + tempToken.key;
-            $scope.downloadUrl = download;
-            return download;
+          $scope.formio.getDownloadUrl(form).then(function(url) {
+            $scope.downloadUrl = url;
           });
         };
 
@@ -129,7 +109,7 @@ module.exports = function() {
 
         var cancelFormLoadEvent = $scope.$on('formLoad', function(event, form) {
           cancelFormLoadEvent();
-          $scope.setDownloadUrl();
+          $scope.setDownloadUrl(form);
           sendIframeMessage({name: 'form', data: form});
         });
 

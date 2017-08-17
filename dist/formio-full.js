@@ -1,4 +1,4 @@
-/*! ng-formio v2.21.2 | https://unpkg.com/ng-formio@2.21.2/LICENSE.txt */
+/*! ng-formio v2.21.3 | https://unpkg.com/ng-formio@2.21.3/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 (function (root, factory) {
   // AMD
@@ -49221,6 +49221,40 @@ var Formio = function () {
     value: function actionInfo(name) {
       return this.makeRequest('actionInfo', this.formUrl + '/actions/' + name);
     }
+  }, {
+    key: 'isObjectId',
+    value: function isObjectId(id) {
+      var checkForHexRegExp = new RegExp("^[0-9a-fA-F]{24}$");
+      return checkForHexRegExp.test(id);
+    }
+  }, {
+    key: 'getProjectId',
+    value: function getProjectId() {
+      if (!this.projectId) {
+        return Promise.resolve('');
+      }
+      if (this.isObjectId(this.projectId)) {
+        return Promise.resolve(this.projectId);
+      } else {
+        return this.loadProject().then(function (project) {
+          return project._id;
+        });
+      }
+    }
+  }, {
+    key: 'getFormId',
+    value: function getFormId() {
+      if (!this.formId) {
+        return Promise.resolve('');
+      }
+      if (this.isObjectId(this.formId)) {
+        return Promise.resolve(this.formId);
+      } else {
+        return this.loadForm().then(function (form) {
+          return form._id;
+        });
+      }
+    }
 
     /**
      * Returns a temporary authentication token for single purpose token generation.
@@ -49238,6 +49272,52 @@ var Formio = function () {
           'x-expire': expire,
           'x-allow': allowed
         })
+      });
+    }
+
+    /**
+     * Get a download url for a submission PDF of this submission.
+     *
+     * @return {*}
+     */
+
+  }, {
+    key: 'getDownloadUrl',
+    value: function getDownloadUrl(form) {
+      var _this2 = this;
+
+      if (!this.submissionId) {
+        return Promise.resolve('');
+      }
+
+      if (!form) {
+        // Make sure to load the form first.
+        return this.loadForm().then(function (_form) {
+          if (!_form) {
+            return '';
+          }
+          return _this2.getDownloadUrl(_form);
+        });
+      }
+
+      var download = '';
+      download = Formio.baseUrl;
+      if (form.project) {
+        download += '/project/' + form.project;
+      }
+      download += '/form/' + form._id;
+      download += '/submission/' + this.submissionId;
+      download += '/download';
+      if (form.settings && form.settings.pdf) {
+        download += '/' + form.settings.pdf.id;
+      }
+      return new Promise(function (resolve, reject) {
+        _this2.getTempToken(3600, 'GET:' + download.replace(Formio.baseUrl, '')).then(function (tempToken) {
+          download += '?token=' + tempToken.key;
+          resolve(download);
+        }, function () {
+          resolve(download);
+        }).catch(reject);
       });
     }
   }, {
@@ -49789,7 +49869,7 @@ var Formio = function () {
 
   }, {
     key: 'form',
-    value: function form(_form, options, done) {
+    value: function form(_form2, options, done) {
       // Fix the parameters.
       if (!done && typeof options === 'function') {
         done = options;
@@ -49802,15 +49882,15 @@ var Formio = function () {
       options = options || {};
 
       // IF they provide a jquery object, then select the element.
-      if (_form.jquery) {
-        _form = _form[0];
+      if (_form2.jquery) {
+        _form2 = _form2[0];
       }
-      if (!_form) {
+      if (!_form2) {
         return done('Invalid Form');
       }
 
       var getAction = function getAction() {
-        return options.form || _form.getAttribute('action');
+        return options.form || _form2.getAttribute('action');
       };
 
       /**
@@ -49846,7 +49926,7 @@ var Formio = function () {
         };
 
         // Get the form data from this form.
-        var formData = new FormData(_form);
+        var formData = new FormData(_form2);
         var entries = formData.entries();
         var entry = null;
         while (entry = entries.next().value) {
@@ -49870,10 +49950,10 @@ var Formio = function () {
       };
 
       // Attach formio to the provided form.
-      if (_form.attachEvent) {
-        _form.attachEvent('submit', submit);
+      if (_form2.attachEvent) {
+        _form2.attachEvent('submit', submit);
       } else {
-        _form.addEventListener('submit', submit);
+        _form2.addEventListener('submit', submit);
       }
 
       return {
@@ -50559,6 +50639,18 @@ var FormioUtils = {
     }).join(',');
     parts[1] = (0, _pad3.default)(parts[1], 2, '0');
     return parts.join('.');
+  },
+
+  /**
+   * Escapes RegEx characters in provided String value.
+   *
+   * @param {String} value
+   *   String for escaping RegEx characters.
+   * @returns {string}
+   *   String with escaped RegEx characters.
+   */
+  escapeRegExCharacters: function escapeRegExCharacters(value) {
+    return value.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
   },
 
   /**
@@ -83700,32 +83792,12 @@ module.exports = function() {
         };
 
         $scope.downloadUrl = '';
-
-        $scope.setDownloadUrl = function() {
+        $scope.setDownloadUrl = function(form) {
           if (!$scope.formio) {
             return;
           }
-          var download = '';
-          var allowedPath = '';
-          if ($scope.formio && $scope.formio.submissionUrl) {
-            download = $scope.formio.submissionUrl;
-            allowedPath = download.replace($scope.formio.projectUrl, '') + '/download';
-          }
-          else if ($scope.submission._id) {
-            download = Formio.baseUrl + '/project/' + $scope.form.project + '/';
-            download += '/form/' + $scope.form._id;
-            download += '/submission/' + $scope.submission._id;
-            allowedPath = download.replace(Formio.baseUrl, '') + '/download';
-          }
-          if (!download) {
-            return;
-          }
-
-          download += '/download';
-          return $scope.formio.getTempToken(3600, 'GET:' + allowedPath).then(function(tempToken) {
-            download += '?token=' + tempToken.key;
-            $scope.downloadUrl = download;
-            return download;
+          $scope.formio.getDownloadUrl(form).then(function(url) {
+            $scope.downloadUrl = url;
           });
         };
 
@@ -83764,7 +83836,7 @@ module.exports = function() {
 
         var cancelFormLoadEvent = $scope.$on('formLoad', function(event, form) {
           cancelFormLoadEvent();
-          $scope.setDownloadUrl();
+          $scope.setDownloadUrl(form);
           sendIframeMessage({name: 'form', data: form});
         });
 
