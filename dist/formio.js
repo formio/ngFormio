@@ -17803,6 +17803,7 @@ module.exports = function(app) {
           '$scope',
           '$http',
           'Formio',
+          'FormioUtils',
           '$interpolate',
           '$q',
           '$timeout',
@@ -17811,6 +17812,7 @@ module.exports = function(app) {
             $scope,
             $http,
             Formio,
+            FormioUtils,
             $interpolate,
             $q,
             $timeout
@@ -18125,7 +18127,9 @@ module.exports = function(app) {
                       (typeof input === 'string') &&
                       input
                     ) {
-                      options.params[settings.searchField] = input;
+                      options.params[settings.searchField] = /__regex$/.test(settings.searchField)
+                        ? FormioUtils.escapeRegExCharacters(input)
+                        : input;
                     }
                     else {
                       delete options.params[settings.searchField];
@@ -18133,12 +18137,13 @@ module.exports = function(app) {
 
                     // Add the other filter.
                     if (settings.filter) {
-                      var filter = $interpolate(settings.filter)({
-                        data: $scope.submission ? $scope.submission.data : {},
-                        row: $scope.data
-                      });
                       // This changes 'a=b&c=d' into an object and assigns to params.
-                      _assign(options.params, JSON.parse('{"' + decodeURI(filter).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}'));
+                      _assign(options.params, _.mapValues(JSON.parse('{"' + decodeURI(settings.filter).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}'), function(value) {
+                        return $interpolate(value)({
+                          data: $scope.submission ? $scope.submission.data : {},
+                          row: $scope.data
+                        });
+                      }));
                     }
 
                     // If they wish to return only some fields.
@@ -19343,6 +19348,7 @@ module.exports = function() {
           form.submitting = true;
           FormioUtils.alter('submit', $scope, $scope.submission, function(err) {
             if (err) {
+              form.submitting = false;
               return this.showAlerts(err.alerts);
             }
 
@@ -20889,6 +20895,9 @@ module.exports = function() {
 
       (function next(err, previous) {
         if (err) {
+          if (typeof err === 'string') {
+            err = {alerts: {type: 'danger', message: '{"data": "' + err + '"}'}};
+          }
           err.item = previous;
           return done ? done(err) : null;
         }
@@ -21144,6 +21153,7 @@ module.exports = function() {
     parseFloat: formioUtils.parseFloat,
     formatAsCurrency: formioUtils.formatAsCurrency,
     checkCalculated: formioUtils.checkCalculated,
+    escapeRegExCharacters: formioUtils.escapeRegExCharacters,
     checkVisible: function(component, row, data) {
       var visible = formioUtils.checkCondition(component, row, data);
       if (!visible) {
