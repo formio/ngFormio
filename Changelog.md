@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## 2.21.3
 ### Fixed
  - The download url for pdf to use the core javascript library.
+ - Fixed crash in FormioUtils each error handling assigning property to a string
 
 ## 2.21.2
 ### Fixed
