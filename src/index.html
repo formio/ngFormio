@@ -75,6 +75,45 @@
           </div>
           <div id="navbar" class="navbar-collapse collapse navbar-menu">
             <ul class="nav navbar-nav navbar-right">
+              <li class="dropbox" ng-controller="environmentSwitcher">
+                <a ng-cloak href="" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-server"></i> {{ (currentEnvironment.name ? currentEnvironment.name : 'Environments') }}<b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                  <li ng-if="environments.length && currentEnvironment">
+                    <a ng-click="switchEnvironment()">Form.io</a>
+                  </li>
+                  <li style="position:  relative;" ng-repeat="environment in environments track by $index" ng-if="environment.url !== currentEnvironment.url">
+                    <span style="right: 10px; top: 10px; position: absolute;" ng-click="removeEnvironment($event, $index)"><i class="fa fa-close"></i></span>
+                    <a ng-click="switchEnvironment(environment)">{{environment.name}}</a>
+                  </li>
+                  <li ng-if="!addingEnvironment" ><a ng-click="addEnvironment($event)">Add Environment</a></li>
+                  <li ng-if="addingEnvironment" style="width: 620px;">
+                    <form class="form-inline" style="margin: 5px 10px;">
+                      <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Name" ng-model="environment.name">
+                      </div>
+                      <div class="form-group">
+                        <input type="text" class="form-control" placeholder="http://lvh.me:3000" ng-model="environment.url">
+                      </div>
+                      <div class="form-group">
+                        <!--<label class="form-label">Project Path</label>-->
+                        <select class="form-control" ng-options="option as option for option in environmentTypes" ng-model="environment.type" ng-click="typeClick($event)" placeholder="Project Paths">
+                          <option value="">(Project Path Type)</option>
+                        </select>
+                      </div>
+                      <a class="btn btn-default" ng-click="saveEnvironment($event)">Add</a>
+                      <span ng-click="cancelEnvironment()"><i class="fa fa-close"></i></span>
+                    </form>
+                    <div class="environment-errors">
+                      <p class="help-block" ng-show="errors.nameRequired">Environment name is required.</p>
+                      <p class="help-block" ng-show="errors.urlRequired">Environment Url is required.</p>
+                      <p class="help-block" ng-show="errors.typeRequired">Project Path Type is required.</p>
+                      <p class="help-block" ng-show="errors.urlInvalid">Url is not valid.</p>
+                      <p class="help-block" ng-show="errors.localhost">http://localhost cannot be used as a domain since it does not support subdomains. Use <strong>http://lvh.me</strong> instead for 127.0.0.1.</p>
+                    </div>
+                  </li>
+                  <li><a href="https://help.form.io/userguide/environment-switcher/" target="_blank">Help</a></li>
+                </ul>
+              </li>
               <li class="dropdown">
                 <a href="" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-book"></i> Docs<b class="caret"></b></a>
                 <ul class="dropdown-menu help-menu">
@@ -263,6 +302,7 @@
     <script src="scripts/components/resourcefields.js"></script>
     <script src="scripts/controllers/access.js"></script>
     <script src="scripts/controllers/controllers.js"></script>
+    <script src="scripts/controllers/environmentSwitcher.js"></script>
     <script src="scripts/controllers/feedback.js"></script>
     <script src="scripts/controllers/form.js"></script>
     <script src="scripts/controllers/help.js"></script>
