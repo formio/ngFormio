@@ -2,8 +2,6 @@
 
 // Boot up the formio server so we can access the resources.
 require('dotenv').load({silent: true});
-var webdriver = require('webdriverio');
-var driver = null;
 var formio = null;
 var library = null;
 var protocol = process.env.APPPROTOCOL || 'http';
@@ -18,13 +16,6 @@ var expect = chai.expect;
 var url = (port === 80)
   ? protocol + '://' + domain
   : protocol + '://' + domain + ':' + port;
-var options = {
-  baseUrl: url,
-  desiredCapabilities: {
-    browserName: 'chrome'
-  },
-  ngRoot: 'body'
-};
 var config = {
   protocol: protocol,
   baseUrl: url,
@@ -51,6 +42,6 @@ describe("", function () {
   require('./features/documentationLinks.spec')(actions);
   require('./features/profileFunctionality.spec')(actions);
   require('./features/project.spec')(actions);
-  require('./features/projectSettings.spec')(actions);
+  //require('./features/projectSettings.spec')(actions);
 });
 
