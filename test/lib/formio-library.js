@@ -10,8 +10,6 @@ module.exports = function (config) {
   var timeout = 6000;
   var state = {};
   var projects = {};
-  var helpPage = 'http://formio.github.io/help.form.io';
-  var helpformio = 'https://help.form.io';
 
   /**
    * Wrap the string function for usernames.
@@ -427,8 +425,8 @@ module.exports = function (config) {
 
 
   this.clickOnElementWithText = function (text) {
-    it('I click on the ' + text, function (next) {
-      var ele =  element(by.xpath('//*[text()="' + replacements(text.toString()) + '"]'));
+    it('I click on the ' + text + ' text', function (next) {
+      var ele =  element.all(by.xpath('//*[text()="' + replacements(text.toString()) + '"]')).first();
       browser.wait(function () {
         return ele.isPresent();
       }, timeout).then(function (res) {
@@ -709,13 +707,6 @@ module.exports = function (config) {
       } catch (err) {
         next(err);
       }
-    });
-  };
-
-  this.goToHelpPage = function (url) {
-    it('I go to ' + url, function (next) {
-      url = helpformio + "/" + url;
-      browser.get(url).then(next).catch(next);
     });
   };
 
