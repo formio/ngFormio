@@ -33,7 +33,8 @@
     "seamless": "^1.0.0",
     "angular-file-saver": "^1.1.3",
     "angular-bootstrap-lightbox": "^0.12.0",
-    "angular-ui-ace": "^0.2.3"
+    "angular-ui-ace": "^0.2.3",
+    "semver": "^4.3.4"
   },
   "overrides": {
     "kendo-ui": {
