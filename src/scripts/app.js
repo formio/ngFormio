@@ -821,7 +821,7 @@ angular
 
       $rootScope.projectPath = function(project, base, type) {
         var path = '';
-        var serverBase = base = base || (AppConfig.protocol + '//' + AppConfig.serverHost);
+        var serverBase = base || AppConfig.protocol + '//' + AppConfig.serverHost;
         var server = serverBase.replace(/(^\w+:|^)\/\//, '');
         var protocol = serverBase.indexOf('https') === 0 ? 'https:' : 'http:';
         switch(type || AppConfig.pathType) {
@@ -830,19 +830,19 @@ angular
               path = protocol + '//' + project.name + '.' + server;
             }
             else if (project.hasOwnProperty('_id')) {
-              path = base + '/project/' + project._id;
+              path = serverBase + '/project/' + project._id;
             }
             break;
           case 'Subdirectories':
             if (project.hasOwnProperty('name')) {
-              path = base + '/' + project.name;
+              path = serverBase + '/' + project.name;
             }
             else if (project.hasOwnProperty('_id')) {
-              path = base + '/project/' + project._id;
+              path = serverBase + '/project/' + project._id;
             }
             break;
           case 'ProjectId':
-            path = base + '/project/' + project._id;
+            path = serverBase + '/project/' + project._id;
             break;
         }
         return path;
