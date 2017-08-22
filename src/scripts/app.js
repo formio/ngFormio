@@ -821,7 +821,7 @@ angular
 
       $rootScope.projectPath = function(project, base, type) {
         var path = '';
-        var serverBase = base || AppConfig.protocol + '//' + AppConfig.serverHost;
+        var serverBase = base = base || (AppConfig.protocol + '//' + AppConfig.serverHost);
         var server = serverBase.replace(/(^\w+:|^)\/\//, '');
         var protocol = serverBase.indexOf('https') === 0 ? 'https:' : 'http:';
         switch(type || AppConfig.pathType) {
