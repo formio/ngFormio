@@ -18,13 +18,13 @@ app.factory('PrimaryProject', function(AppConfig, $q, $http) {
       scope.primaryProject = project;
 
       // Load project environments
-      Formio.makeStaticRequest(AppConfig.apiBase + '/project?project=' + project._id, 'GET', null, {ignoreCache: true}).then(function(environments) {
+      $http.get(AppConfig.apiBase + '/project?project=' + project._id).then(function(environments) {
         scope.environments = environments;
         _.assign($scope, scope);
       });
 
       // Load the projects teams.
-      var projectTeamsPromise = $http.get(AppConfig.apiBase + '/team/project/' + project._id).then(function(result) {
+      $http.get(AppConfig.apiBase + '/team/project/' + project._id).then(function(result) {
         scope.primaryProjectTeams = result.data;
         scope.projectTeamsLoading = false;
         _.assign($scope, scope);
@@ -93,5 +93,5 @@ app.factory('PrimaryProject', function(AppConfig, $q, $http) {
     clear: function() {
       scope = false;
     }
-  }
+  };
 });
