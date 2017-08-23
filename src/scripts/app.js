@@ -34,18 +34,22 @@ angular
     '$stateProvider',
     '$urlRouterProvider',
     '$locationProvider',
+    '$httpProvider',
     'FormioProvider',
     'formioComponentsProvider',
     'AppConfig',
     'toastrConfig',
+    'RemoteTokensProvider',
     function(
       $stateProvider,
       $urlRouterProvider,
       $locationProvider,
+      $httpProvider,
       FormioProvider,
       formioComponentsProvider,
       AppConfig,
-      toastrConfig
+      toastrConfig,
+      RemoteTokensProvider
     ) {
       // Reset the hashPrefix to remove the "!".
       $locationProvider.hashPrefix('');
@@ -55,11 +59,27 @@ angular
 
       // Set the base URL for our API.
       FormioProvider.setBaseUrl(AppConfig.apiBase);
-      FormioProvider.setAppUrl(AppConfig.formioBase);
+      FormioProvider.setProjectUrl(AppConfig.formioBase);
       FormioProvider.setDomain(AppConfig.domain);
 
       // Disable form component until we can fix it.
       formioComponentsProvider.register('form', {disabled: true});
+
+      var RemotePlugin = function() {};
+
+      RemotePlugin.prototype.requestOptions = function(options, url) {
+        var remoteToken = RemoteTokensProvider.getRemoteToken(url);
+        if (remoteToken) {
+          options.headers.append('x-remote-token', remoteToken);
+          options.headers.delete('x-jwt-token');
+        }
+        return options;
+      };
+
+      var remotePlugin = new RemotePlugin();
+
+      FormioProvider.registerPlugin(remotePlugin, 'remote');
+      $httpProvider.interceptors.push('RemoteInterceptor');
 
       $stateProvider
         .state('home', {
@@ -233,6 +253,12 @@ angular
           url: '/settings',
           parent: 'project.env',
           templateUrl: 'views/project/env/settings/index.html',
+          controller: 'ProjectSettingsController'
+        })
+        .state('project.env.settings.remote', {
+          url: '/settings/remote',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/settings/remote/index.html',
           controller: 'ProjectSettingsController'
         })
         .state('project.env.settings.apiKeys', {
@@ -793,27 +819,30 @@ angular
       $rootScope.apiProtocol = AppConfig.apiProtocol;
       $rootScope.apiServer = AppConfig.apiServer;
 
-      $rootScope.projectPath = function(project) {
+      $rootScope.projectPath = function(project, base, type) {
         var path = '';
-        switch(AppConfig.pathType) {
+        var serverBase = base || AppConfig.protocol + '//' + AppConfig.serverHost;
+        var server = serverBase.replace(/(^\w+:|^)\/\//, '');
+        var protocol = serverBase.indexOf('https') === 0 ? 'https:' : 'http:';
+        switch(type || AppConfig.pathType) {
           case 'Subdomains':
             if (project.hasOwnProperty('name')) {
-              path = AppConfig.apiProtocol + '//' + project.name + '.' + AppConfig.apiServer;
+              path = protocol + '//' + project.name + '.' + server;
             }
             else if (project.hasOwnProperty('_id')) {
-              path = AppConfig.apiBase + '/project/' + project._id;
+              path = serverBase + '/project/' + project._id;
             }
             break;
           case 'Subdirectories':
             if (project.hasOwnProperty('name')) {
-              path = AppConfig.apiBase + '/' + project.name;
+              path = serverBase + '/' + project.name;
             }
             else if (project.hasOwnProperty('_id')) {
-              path = AppConfig.apiBase + '/project/' + project._id;
+              path = serverBase + '/project/' + project._id;
             }
             break;
           case 'ProjectId':
-            path = AppConfig.apiBase + '/project/' + project._id;
+            path = serverBase + '/project/' + project._id;
             break;
         }
         return path;
@@ -1133,4 +1162,51 @@ angular
         });
       }
     };
-  }]);
+  }])
+  .provider('RemoteTokens', function () {
+    var that = this;
+    this.tokens = {};
+
+    this.getRemoteToken = function(url) {
+      var token = false;
+      Object.keys(that.tokens).forEach(function(key) {
+        if (url.indexOf(key) === 0) {
+          token = that.tokens[key];
+        }
+      });
+      return token;
+    };
+
+    this.setRemoteToken = function(projectUrl, token) {
+      that.tokens[projectUrl] = token;
+    };
+
+    this.$get = function () {
+      return {
+        getRemoteToken: this.getRemoteToken,
+        setRemoteToken: this.setRemoteToken
+      };
+    };
+  })
+  .factory('RemoteInterceptor', [
+    '$q',
+    'RemoteTokens',
+    function($q, RemoteTokens) {
+      var Interceptor = {
+        /**
+         * Set the token in the request headers.
+         */
+        request: function(config) {
+          if (config.disableJWT) return config;
+          var remoteToken = RemoteTokens.getRemoteToken(config.url);
+          if (remoteToken) {
+            config.headers['x-remote-token'] = remoteToken;
+            delete config.headers['x-jwt-token'];
+          }
+          return config;
+        }
+      };
+
+      return Interceptor;
+    }
+  ]);

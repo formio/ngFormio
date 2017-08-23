@@ -21,6 +21,10 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
       var infoPromise = null;
       return {
         ensureFileToken: function(project) {
+          if (!project.settings) {
+            project.settings = {};
+          }
+
           if (project.settings.filetoken) {
             return $q.resolve(project);
           }

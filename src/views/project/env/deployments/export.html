@@ -3,7 +3,7 @@
   <div class="row">
     <div class="col-md-8">
       <p>The following button will export your project as a JSON file that can then be used as a template for other projects.</p>
-      <a href="//api.{{ appConfig.serverHost }}/project/{{ currentProject._id }}/export?x-jwt-token={{ token }}" class="btn btn-success">Export Template</a>
+      <a href="{{ projectUrl }}/export?x-jwt-token={{ token }}" class="btn btn-success">Export Template</a>
     </div>
     <div class="col-md-4">
       <div class="panel panel-primary">

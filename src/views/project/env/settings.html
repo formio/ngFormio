@@ -8,10 +8,10 @@
   <div id="form-group-name" class="form-group" ng-class="{'has-error': projectForm.name.$invalid && projectForm.name.$dirty, 'has-success': projectForm.name.$valid}">
     <label for="name" class="control-label required-field">Subdomain Name</label>
     <div class="input-group" style="width: 400px;">
-      <span class="input-group-addon">{{ apiProtocol }}//</span>
+      <span class="input-group-addon">{{ projectProtocol }}//</span>
       <input type="text" class="form-control" id="name" name="name" ng-model="currentProject.name" title="{{ currentProject.name }}" placeholder="myproject" valid-subdomain unique-checker="/project/available" ng-model-options="{ debounce: { 'default': 500, 'blur': 0 } }" ng-maxlength="63" ng-disabled="['basic', 'trial'].indexOf(primaryProject.plan) !== -1 || currentProject.protect" ng-required="['basic', 'trial'].indexOf(primaryProject.plan) === -1">
       <i class="form-control-feedback glyphicon" ng-class="{'glyphicon-ok': projectForm.name.$valid, 'glyphicon-remove': projectForm.name.$invalid && projectForm.name.$dirty}" style="right: -36px;"></i>
-      <span class="input-group-addon">.{{ apiServer }}</span>
+      <span class="input-group-addon">.{{ projectServer }}</span>
     </div>
     <div ng-if="['basic', 'trial'].indexOf(primaryProject.plan) === -1 && projectSettingsVisible() && !onPrem">
       <p class="help-block" ng-show="projectForm.name.$error.maxlength">Domain Name cannot be longer than 63 characters.</p>

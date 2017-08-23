@@ -2,7 +2,7 @@
   <a class="pull-right project-section-header-icon" ng-if="highestRole === 'team_admin' || highestRole === 'owner'" ui-sref="project.settings"><i class="fa fa-cog" title="Project Settings"></i></a>
   <a class="btn btn-primary pull-right project-section-header-button" ng-if="highestRole === 'team_admin' || highestRole === 'owner'" ui-sref="project.teams"><i class="fa fa-users"></i> Teams</a>
   <div style="right: 0; position: absolute; margin-top: 50px; margin-right: 20px;">
-    <span class="pull-right"><strong>{{ environmentName }} Project Url:</strong> {{ projectPath(currentProject) }}</span>
+    <span class="pull-right"><strong>{{ environmentName }} Project Url:</strong> {{ projectUrl }}</span>
   </div>
   <ul class="list-inline project-title-header">
     <li><h2><a ui-sref="home" title="Home"><i class="fa fa-home"></i><br /></a></h2></li>
@@ -14,8 +14,8 @@
     </li>
   </ul>
   <ul class="nav nav-tabs project-nav">
-    <li ng-class="{ active: currentProject._id === environment._id }" ng-repeat="environment in environments"><a ng-click="switchEnv(environment._id)"><i class="fa fa-shield" ng-if="environment.protect"></i> {{ environment.title }} <span class="badge" ng-if="environment.tag !== '0.0.0'">{{ environment.tag }}</span></a></li>
-    <li ng-class="{ active: currentProject._id === primaryProject._id }"><a ng-click="switchEnv(primaryProject._id)"><i class="fa fa-shield" ng-if="primaryProject.protect"></i> Live <span class="badge" ng-if="primaryProject.tag !== '0.0.0'">{{ primaryProject.tag }}</span></a></li>
+    <li ng-class="{ active: localProject._id === environment._id }" ng-repeat="environment in environments"><a ng-click="switchEnv(environment._id)"><i class="fa fa-shield" ng-if="environment.protect"></i> {{ environment.title }} <span class="badge" ng-if="environment.tag !== '0.0.0'">{{ environment.tag }}</span></a></li>
+    <li ng-class="{ active: localProject._id === primaryProject._id }"><a ng-click="switchEnv(primaryProject._id)"><i class="fa fa-shield" ng-if="primaryProject.protect"></i> Live <span class="badge" ng-if="primaryProject.tag !== '0.0.0'">{{ primaryProject.tag }}</span></a></li>
     <li ng-if="environments.length < 3"><a ui-sref="project.environment">+ Add Environment</a></li>
   </ul>
 </div>
@@ -36,6 +36,14 @@
     </ul>
   </div>
   <div class="project-main">
+    <div ng-if="projectError">
+      <div class="well">
+        <div class="alert alert-danger">
+          <p>{{projectUrl}} - {{projectError}}</p>
+          <p>If you are seeing this error then there is a configuration issue preventing the form.io portal from accessing your project. Your remote server might be offline or inaccessible.</p>
+        </div>
+      </div>
+    </div>
     <div class="project-content" ui-view></div>
   </div>
 </div>

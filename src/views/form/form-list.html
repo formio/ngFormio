@@ -32,10 +32,10 @@
             </span>
             <h4 ng-if="protected">{{ form.title }}</h4>
             <h4 class="ellipsis" ng-if="listMode == 'launch'">{{ form.title }}</h4>
-            <div class="form-list-description" ng-if="listMode === 'form'">GET&nbsp;{{ projectApi }}/{{ form.path }}</div>
+            <div class="form-list-description" ng-if="listMode === 'form'">GET&nbsp;{{ projectUrl }}/{{ form.path }}</div>
             <div class="form-list-description" ng-if="listMode === 'resource'">{{ componentCount(form.components) }} components on this resource.</div>
-            <div class="form-list-description" ng-if="listMode === 'data'">GET&nbsp;{{ projectApi }}/{{ form.path }}/submission</div>
-            <div class="form-list-description" ng-if="listMode === 'access'">GET&nbsp;{{ projectApi }}/{{ form.path }}</div>
+            <div class="form-list-description" ng-if="listMode === 'data'">GET&nbsp;{{ projectUrl }}/{{ form.path }}/submission</div>
+            <div class="form-list-description" ng-if="listMode === 'access'">GET&nbsp;{{ projectUrl }}/{{ form.path }}</div>
             <div class="form-updated">Updated {{ form.modified | timeSince }} ago</div>
           </div>
           <div class="col-md-6">
