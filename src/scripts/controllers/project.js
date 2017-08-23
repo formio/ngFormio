@@ -505,21 +505,23 @@ app.controller('ProjectDeployController', [
   'AppConfig',
   'Formio',
   'FormioAlerts',
+  'PrimaryProject',
   function(
     $scope,
     $state,
     AppConfig,
     Formio,
-    FormioAlerts
+    FormioAlerts,
+    PrimaryProject
   ) {
-    var loadTags = function() {
-      Formio.makeStaticRequest(AppConfig.apiBase + '/project/' + $scope.primaryProject._id + '/tag', 'GET', null, {ignoreCache: true})
+    var loadTags = function(project) {
+      Formio.makeStaticRequest(AppConfig.apiBase + '/project/' + project._id + '/tag', 'GET', null, {ignoreCache: true})
         .then(function(tags) {
           $scope.tags = tags;
         });
     };
 
-    $scope.loadProjectPromise.then(loadTags);
+    $scope.primaryProjectPromise.then(loadTags);
 
     $scope.deployTag = function(tag) {
       if (!tag) {
@@ -541,7 +543,10 @@ app.controller('ProjectDeployController', [
           //$state.transitionTo($state.current, null, { reload: true, inherit: true, notify: true });
           $scope.localProject.tag = tag.tag;
           $scope.saveLocalProject()
-            .then($state.reload);
+            .then(function() {
+              PrimaryProject.clear();
+              $state.reload();
+            });
         })
         .catch(FormioAlerts.onError.bind(FormioAlerts));
     };
@@ -554,12 +559,14 @@ app.controller('ProjectTagCreateController', [
   'AppConfig',
   'Formio',
   'FormioAlerts',
+  'PrimaryProject',
   function(
     $scope,
     $state,
     AppConfig,
     Formio,
-    FormioAlerts
+    FormioAlerts,
+    PrimaryProject
   ) {
     $scope.addTag = function(tag) {
       if (!tag) {
@@ -570,7 +577,7 @@ app.controller('ProjectTagCreateController', [
       }
       Formio.makeStaticRequest($scope.projectUrl + '/export', 'GET')
         .then(function(template) {
-          Formio.makeStaticRequest(AppConfig.apiBase + '/project/' + $scope.primaryProject._id + '/tag', 'POST', {
+          Formio.makeStaticRequest(AppConfig.apiBase + '/project/' + $scope.localProject._id + '/tag', 'POST', {
               project: $scope.primaryProject._id,
               tag: tag,
               template: template
@@ -580,7 +587,8 @@ app.controller('ProjectTagCreateController', [
                 type: 'success',
                 message: 'Project Tag was created.'
               });
-              $state.transitionTo($state.current, null, { reload: true, inherit: true, notify: true });
+              PrimaryProject.clear();
+              $state.reload();
             })
             .catch(FormioAlerts.onError.bind(FormioAlerts));
         })
