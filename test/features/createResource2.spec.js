@@ -7,7 +7,7 @@ module.exports = function (actions) {
       actions.iAmLoggedInFor('projuser3');
       actions.projectExisting('${random-title>project3.title}', '${random-description>project3.description}');
       actions.goToPage("/#");
-      actions.clickOnElementWithText('${project3.title}');
+      actions.clickOnElementWithText('Manage');
       actions.iSeeText(' Welcome');
       actions.clickOnElementWithText('Resources');
       actions.iSeeText('Resources');
@@ -17,7 +17,7 @@ module.exports = function (actions) {
         actions.enterTextInField('#title', 'Test Resource');
         actions.iSeeValueIn('#name', 'testResource');
         actions.enterTextInField('#path', value);
-        actions.clickOnElementWithText('xpath://*[@value="Create Resource"]');
+        actions.clickOnElement('xpath://*[@value="Create Resource"]');
         actions.iSeeTextIn(".toast-message", message);
         actions.clickOnElement(".toast-message");
       });

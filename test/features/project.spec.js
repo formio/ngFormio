@@ -88,7 +88,6 @@ module.exports = function (actions) {
       actions.logout();
       actions.iAmLoggedInFor('projuser7');
       actions.goToPage("#/");
-      actions.clickOnElement("xpath://*[contains(@class,'fa-close')]");
       actions.projectExisting('${random-title>project7.title}', '${random-description>project7.description}');
       actions.iSeeTextIn('.project.well>h4>a', '${project7.title}');
       actions.clickOnElementWithText('Manage');

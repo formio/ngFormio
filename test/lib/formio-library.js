@@ -12,6 +12,7 @@ module.exports = function (config) {
   var projects = {};
   var helpPage = 'http://formio.github.io/help.form.io';
   var helpformio = 'https://help.form.io';
+  var theProject;
 
   /**
    * Wrap the string function for usernames.
@@ -287,6 +288,7 @@ module.exports = function (config) {
    * @param description
    * @param next
    */
+  var theProject;
   var createProject = function (driver, title, description, next) {
     browser.executeScript("return localStorage.getItem('formioToken');").then(function (res) {
       if (!res) {
@@ -304,6 +306,9 @@ module.exports = function (config) {
           'x-jwt-token': res
         }
       }, function (err, response, body) {
+        var json = JSON.parse(body);
+        theProject = json.name;
+        browser.executeScript("return localStorage.setItem('projectName','" + JSON.parse(body).name + "');");
         handleResponse(driver, err, response, body, function (err, result) {
           if (err) {
             next(err);
@@ -327,6 +332,33 @@ module.exports = function (config) {
     next(null, projects[title]);
   };
 
+  var createForm = function (projectName, formData, formio_token, next) {
+    request({
+      rejectUnauthorized: false,
+      uri: config.serverProtocol + '://' + projectName + '.' + config.serverHost + '/form',
+      method: 'POST',
+      body: JSON.stringify(formData),
+      headers: {
+        'Content-Type': 'application/json',
+        'x-jwt-token': formio_token
+      }
+    }, function (err, response, body) {
+      if (err || response.statusCode != 201) {
+        return next(JSON.parse(response.body).message);
+      }
+      if (response.headers['x-jwt-token']) {
+        if (typeof body === 'string') {
+          try {
+            body = JSON.parse(body);
+          }
+          catch (e) {
+          }
+        }
+        next(null, body);
+      }
+    });
+  };
+
   this.iSeeElement = function (ele) {
     it('I see the element ' + ele, function (next) {
       var EC = protractor.ExpectedConditions;
@@ -339,7 +371,10 @@ module.exports = function (config) {
   this.enterTextInField = function (field, text) {
     it('I enter ' + text + ' in ' + field + ' field', function (next) {
       text = replacements(text.toString());
+      //console.log(text);
+      //var ele = text.startsWith("xpath:") ? element(by.xpath(text.substring(text.indexOf(':') + 1))) : element(by.css(field));
       var ele = element(by.css(field));
+      //console.log(ele);
       browser.wait(function () {
         return ele.isPresent();
       }, timeout).then(function () {
@@ -347,6 +382,32 @@ module.exports = function (config) {
       });
     });
   };
+
+  /*this.enterNumberAndValidate = function (field, num) {
+   it('I enter ' + num + ' in ' + field + ' field', function (next) {
+   //text = replacements(text.toString());
+   var ele = element(by.css(field));
+   browser.wait(function () {
+   return ele.isPresent();
+   }, timeout).then(function () {
+   ele.clear().sendKeys(num).then(function (res) {
+   return !res;
+   })
+   }, timeout).then(function (value) {
+   try {
+   if(num>22){
+   assert.equal(value, 'numberField must be less than or equal to 22.');
+   next();}
+   else if(num<2 ){
+   assert.equal(value, 'numberField must be greater than or equal to 2.');
+   next();}
+   else next();
+   } catch (err) {
+   next(err);
+   };
+   });
+   });
+   };*/
 
   this.checkingUrlIamOn = function (url) {
     if (!url.toLowerCase().includes('http')) {
@@ -429,6 +490,7 @@ module.exports = function (config) {
   this.clickOnElementWithText = function (text) {
     it('I click on the ' + text, function (next) {
       var ele =  element(by.xpath('//*[text()="' + replacements(text.toString()) + '"]'));
+     // console.log(ele);
       browser.wait(function () {
         return ele.isPresent();
       }, timeout).then(function (res) {
@@ -826,8 +888,12 @@ module.exports = function (config) {
     title = replacements(title.toString());
     it('I am on ' + page + ' page of the ' + title + 'project', function (next) {
       try {
-        var path = res.value.split("/");
-        var x = (path[path.length - 1] + '*') == "*" ? path[path.length - 2] : path[path.length - 1];
+        browser.getCurrentUrl().then(function(res){
+          var path = res.split("/");
+          config.expect(path[path.length - 1] ==  page)
+        });
+
+        //var x = (path[path.length - 1] + '*') == "*" ? path[path.length - 2] : path[path.length - 1];
         var xpath = "//*[@class='project-title']";
         browser.wait(function () {
           return element(by.xpath(xpath)).isPresent();
@@ -864,4 +930,92 @@ module.exports = function (config) {
       }
     });
   };
+
+  this. clearTextFromField = function (field) {
+    it('I clear' + field + ' field', function (next) {
+      var ele = element(by.css(field));
+      browser.wait(function () {
+        return ele.isPresent();
+      }, timeout).then(function () {
+        ele.clear().then(next).catch(next);
+      });
+    });
+  };
+  var createForm = function ( formData, formio_token, next) {
+    request({
+      rejectUnauthorized: false,
+      uri: config.serverProtocol + '://' + config.serverHost+'/'+theProject + '/form',
+      method: 'POST',
+      body: JSON.stringify(formData),
+      headers: {
+        'Content-Type': 'application/json',
+        'x-jwt-token': formio_token
+      }
+    }, function (err, response, body) {
+      console.log("uri -> "+ config.serverProtocol + '://' + config.serverHost+'/'+theProject + '/form' );
+      if (err || response.statusCode != 201) {
+        console.log(response + "<-->"+ response.statusCode);
+        return next(JSON.parse(response.body).message);
+      }
+      if (response.headers['x-jwt-token']) {
+        if (typeof body === 'string') {
+          try {
+            body = JSON.parse(body);
+          }
+          catch (e) {
+          }
+        }
+        next(null, body);
+      }
+    });
+  };
+
+  this.creatingForm = function () {
+    it('creating form', function (next) {
+      var formData = require('../createform.json');
+      browser.executeScript("return localStorage.getItem('formioToken');").then(function (res) {
+        createForm(formData, res, function (err, user) {
+          if (err || user == "Bad Token") {
+            return next(new Error(err));
+          }
+          next();
+        });
+      });
+    });
+  };
+
+  this.creatingFormWithComponents = function (comps) {
+    it('creating form', function (next) {
+      var formData = {
+        display: "form"
+        , components: []
+        , "type": "form"
+      };
+      var components = require('../components.json');
+      formData.title = "sampletestform";
+      formData.path = "sampletestpath";
+      formData.name = "sampletestname";
+      //components.textfield.label = "textfield";
+      formData.components.push(components.number);
+      //formData.components.push(components.password);
+       //formData.components.push(components.textarea);
+      //formData.components.push(components.checkbox);
+      formData.components.push(components.selectboxes);
+      //formData.components.push(components.select);
+     // formData.components.push(components.radio);
+      //formData.components.push(components.htmlelement);
+      //formData.components.push(components.htmlelement);
+
+      formData.components.push(components.button);
+      browser.executeScript("return localStorage.getItem('formioToken');").then(function (res) {
+        createForm(formData, res, function (err, user) {
+          if (err || user == "Bad Token") {
+            return next(new Error(err));
+          }
+          next();
+        });
+      });
+    });
+  };
+
 };
