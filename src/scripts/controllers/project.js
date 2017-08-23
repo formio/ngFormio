@@ -685,15 +685,15 @@ app.controller('ProjectOverviewController', [
 
     var formio = new Formio(AppConfig.apiBase + '/project/' + $scope.currentProject._id);
 
-    formio.loadForms({
-        params: {
-          limit: Number.MAX_SAFE_INTEGER // Don't limit results
-        }
-      })
-      .then(function(forms) {
-        $scope.forms = forms;
-      }, FormioAlerts.onError.bind(FormioAlerts))
-      .catch(FormioAlerts.onError.bind(FormioAlerts));
+    //formio.loadForms({
+    //    params: {
+    //      limit: Number.MAX_SAFE_INTEGER // Don't limit results
+    //    }
+    //  })
+    //  .then(function(forms) {
+    //    $scope.forms = forms;
+    //  }, FormioAlerts.onError.bind(FormioAlerts))
+    //  .catch(FormioAlerts.onError.bind(FormioAlerts));
 
     var abbreviator = new NumberAbbreviate();
 
@@ -1058,15 +1058,15 @@ app.controller('LaunchController', [
 
 
 
-    $scope.formio.loadForms({
-        params: {
-          limit: Number.MAX_SAFE_INTEGER // Don't limit results
-        }
-      })
-      .then(function(forms) {
-        $scope.forms = forms;
-      }, FormioAlerts.onError.bind(FormioAlerts))
-      .catch(FormioAlerts.onError.bind(FormioAlerts));
+    //$scope.formio.loadForms({
+    //    params: {
+    //      limit: Number.MAX_SAFE_INTEGER // Don't limit results
+    //    }
+    //  })
+    //  .then(function(forms) {
+    //    $scope.forms = forms;
+    //  }, FormioAlerts.onError.bind(FormioAlerts))
+    //  .catch(FormioAlerts.onError.bind(FormioAlerts));
 
     $scope.$watch('currentProject', function(project) {
 
@@ -2145,7 +2145,9 @@ app.controller('ProjectRemoteController', [
                 $scope.remote.project = result.data;
                 $scope.localProject.remote = angular.copy($scope.remote);
                 delete $scope.localProject.remote.secret;
-                $scope.saveLocalProject();
+                $scope.saveLocalProject().then(function() {
+                  $state.reload();
+                });
               })
               .catch(function(err) {
                 $scope.remoteError = 'Error importing environment - ' + err.status + ' - ' + err.statusText + ': ' + err.data;

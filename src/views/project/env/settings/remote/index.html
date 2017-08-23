@@ -5,10 +5,13 @@
     <div ng-if="!localProject.remote">
       <h3>Connect to remote server</h3>
       <div ng-if="!remoteProjects">
-        <div>Enter the URL of the remote server you would like to use for this environment.</div>
+        <div>Enter the information for your remote server to use for this environment.</div>
         <label class="control-label"><strong>Server URL</strong></label>
-        <input type="text" class="form-control" id="serverURL" ng-model="remote.url" placeholder="The url of the remote server." />
+        <input type="text" class="form-control" id="serverURL" ng-model="remote.url" placeholder="https://myremoteserver.com" />
         <p class="text-muted">Use the root url of the server, not a project url.</p>
+        <label class="control-label"><strong>Portal Secret</strong></label>
+        <input type="text" class="form-control" id="portalSecret" ng-model="remote.secret" placeholder="abcdefg123456" />
+        <p class="text-muted">The secret key for authentication between the portal and your remote server. Configured in the PORTAL_SECRET environment variable on your server.</p>
         <div class="form-group">
           <label class="control-label"><strong>Project Path Type</strong></label>
           <select class="form-control" ng-options="option as option for option in environmentTypes" ng-model="remote.type" placeholder="Project Paths">
@@ -19,9 +22,6 @@
             Subdirectory is https://example.com/myproject. <br />
           </p>
         </div>
-        <label class="control-label"><strong>Portal Secret</strong></label>
-        <input type="text" class="form-control" id="portalSecret" ng-model="remote.secret" placeholder="The portal secret for the server." />
-        <p class="text-muted">The secret key for authentication between the portal and your remote server. Configured in the PORTAL_SECRET environment variable on your server.</p>
         <div class="btn btn-primary" ng-click="check()">Continue</div>
         <div ng-if="remoteError" class="text-danger">{{remoteError}}</div>
       </div>
