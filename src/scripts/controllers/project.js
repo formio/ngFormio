@@ -143,8 +143,11 @@ app.controller('ProjectCreateController', [
     }
 
     $scope.saveProject = function() {
+      $scope.status.save = 'saving';
+
       $scope.isBusy = true;
       FormioProject.createProject($scope.project).then(function(project) {
+        $scope.status.save = 'saved';
         $scope.isBusy = false;
         $state.go('project.overview', {projectId: project._id});
       });
@@ -192,12 +195,15 @@ app.controller('ProjectCreateEnvironmentController', [
     });
 
     $scope.saveProject = function() {
+      $scope.status.save = 'saving';
+
       FormioProject.createEnvironment($scope.currentProject).then(function(project) {
         // Update team access to new environment.
         project.access = project.access.concat(_.filter($scope.primaryProject.access, function(access) { return access.type.indexOf('team_') === 0;}));
         (new Formio(AppConfig.apiBase + '/project/' + project._id)).saveProject(angular.copy(project))
           .catch(FormioAlerts.onError.bind(FormioAlerts))
           .then(function() {
+            $scope.status.save = 'saved';
             $state.go('project.overview', {projectId: project._id});
           });
       });
@@ -219,6 +225,7 @@ app.controller('ProjectController', [
   '$q',
   'GoogleAnalytics',
   'RemoteTokens',
+  'PrimaryProject',
   function(
     $scope,
     $rootScope,
@@ -232,8 +239,15 @@ app.controller('ProjectController', [
     ProjectUpgradeDialog,
     $q,
     GoogleAnalytics,
-    RemoteTokens
+    RemoteTokens,
+    PrimaryProject
   ) {
+    // Load in existing primary project scope.
+    $scope.status = {
+      save: 'pristine'
+    };
+    PrimaryProject.get($scope);
+
     $scope.currentSection = {};
     $rootScope.activeSideBar = 'projects';
     $rootScope.noBreadcrumb = false;
@@ -274,6 +288,7 @@ app.controller('ProjectController', [
 
     $scope.saveProject = function() {
       if (!$scope.currentProject._id) { return FormioAlerts.onError(new Error('No Project found.')); }
+      $scope.status.save = 'saving';
       $scope.formio.saveProject($scope.currentProject)
         .then(function(project) {
           FormioAlerts.addAlert({
@@ -281,6 +296,7 @@ app.controller('ProjectController', [
             message: 'Project settings saved.'
           });
           GoogleAnalytics.sendEvent('Project', 'update', null, 1);
+          $scope.status.save = 'saved';
         }, FormioAlerts.onError.bind(FormioAlerts))
         .catch(FormioAlerts.onError.bind(FormioAlerts));
     };
@@ -444,72 +460,7 @@ app.controller('ProjectController', [
         primaryProjectQ.resolve($scope.localProject);
       }
       $scope.primaryProjectPromise.then(function(primaryProject) {
-        $scope.primaryProject = primaryProject;
-
-        // Load project environments
-        Formio.makeStaticRequest(AppConfig.apiBase + '/project?project=' + $scope.primaryProject._id, 'GET', null, {ignoreCache: true}).then(function(environments) {
-          $scope.environments = environments;
-        });
-
-        // Load the projects teams.
-        var projectTeamsPromise = $http.get(AppConfig.apiBase + '/team/project/' + $scope.primaryProject._id).then(function(result) {
-          $scope.primaryProjectTeams = result.data;
-          $scope.projectTeamsLoading = false;
-        });
-
-        // Calculate the users highest role within the project.
-        $scope.highestRoleLoaded = $q.all([userTeamsPromise, projectTeamsPromise]).then(function() {
-          var roles = _.has($scope.user, 'roles') ? $scope.user.roles : [];
-          var teams = _($scope.userTeams ? $scope.userTeams : [])
-            .map('_id')
-            .filter()
-            .value();
-          var allRoles = _(roles.concat(teams)).filter().value();
-          var highestRole = null;
-
-          /**
-           * Determine if the user contains a role of the given type.
-           *
-           * @param {String} type
-           *   The type of role to search for.
-           * @returns {boolean}
-           *   If the current user has the role or not.
-           */
-          var hasRoles = function(type) {
-            var potential = _($scope.primaryProjectTeams)
-              .filter({permission: type})
-              .map('_id')
-              .value();
-            return (_.intersection(allRoles, potential).length > 0);
-          };
-
-          $scope.projectPermissions = {
-            read: true,
-            write: true,
-            admin: true
-          };
-          if (_.has($scope.user, '_id') && _.has($scope.localProject, 'owner') &&  ($scope.user._id === $scope.localProject.owner)) {
-            highestRole = 'owner';
-          }
-          else if (hasRoles('team_admin')) {
-            highestRole = 'team_admin';
-          }
-          else if (hasRoles('team_write')) {
-            highestRole = 'team_write';
-            $scope.projectPermissions.admin = false;
-          }
-          else if (hasRoles('team_read')) {
-            highestRole = 'team_read';
-            $scope.projectPermissions.admin = false;
-            $scope.projectPermissions.write = false;
-          }
-          else {
-            highestRole = 'anonymous';
-          }
-
-          $scope.highestRole = highestRole;
-        });
-
+        PrimaryProject.set(primaryProject, $scope);
       });
 
       $scope.projectSettingsVisible = function() {
@@ -520,10 +471,6 @@ app.controller('ProjectController', [
       return promiseResult;
     }).catch(function(err) {
       if (!err) {
-        //FormioAlerts.addAlert({
-        //  type: 'danger',
-        //  message: window.location.origin + ' is not allowed to access the API. To fix this, go to your project page on https://form.io and add ' + window.location.origin + ' to your project CORS settings.'
-        //});
         $scope.projectError = window.location.origin + ' is not allowed to access the API. To fix this, go to your project page on https://form.io and add ' + window.location.origin + ' to your project CORS settings.';
       }
       else {
@@ -532,12 +479,7 @@ app.controller('ProjectController', [
           error = JSON.stringify(error);
         }
         $scope.projectError = error;
-        //FormioAlerts.addAlert({
-        //  type: 'danger',
-        //  message: 'Could not connect to Environment (' + error + ')'
-        //});
       }
-      //$state.go('home');
     });
 
     $scope.getRole = function(id) {
@@ -1563,6 +1505,7 @@ app.controller('ProjectFormioController', [
       plan: $scope.plans[0]
     };
     $scope.updateProject = function() {
+      $scope.status.save = 'saving';
       Formio.request(AppConfig.apiBase + '/analytics/upgrade', 'PUT', {
         project: $scope.input.project,
         plan: $scope.input.plan
@@ -1576,6 +1519,7 @@ app.controller('ProjectFormioController', [
           $scope.input.project = '';
           $scope.input.plan = $scope.plans[0];
           $scope.getTotalProjects();
+          $scope.status.save = 'saved';
         }
       })
       .catch(function(err) {
@@ -1996,6 +1940,7 @@ app.controller('ProjectSettingsController', [
     });
 
     $scope.addKey = function() {
+      $scope.status.save = 'saving';
       if (!$scope.currentProject.settings.keys) {
         $scope.currentProject.settings.keys = [];
       }
@@ -2012,12 +1957,17 @@ app.controller('ProjectSettingsController', [
           pool: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
         })
       });
-      $scope.formio.saveProject($scope.currentProject);
+      $scope.formio.saveProject($scope.currentProject).then(function() {
+        $scope.status.save = 'saved';
+      });
     };
 
     $scope.removeKey = function($index) {
+      $scope.status.save = 'saving';
       $scope.currentProject.settings.keys.splice($index, 1);
-      $scope.formio.saveProject($scope.currentProject);
+      $scope.formio.saveProject($scope.currentProject).then(function() {
+        $scope.status.save = 'saved';
+      });
     };
 
     $scope.updateProject = function() {
@@ -2026,6 +1976,7 @@ app.controller('ProjectSettingsController', [
 
     // Save the Project.
     $scope.saveProject = function() {
+      $scope.status.save = 'saving';
       // Need to strip hyphens at the end before submitting
       if($scope.currentProject.name) {
         $scope.currentProject.name = $scope.currentProject.name.toLowerCase().replace(/[^0-9a-z\-]|^\-+|\-+$/g, '');
@@ -2039,6 +1990,7 @@ app.controller('ProjectSettingsController', [
             message: 'Project saved.'
           });
           GoogleAnalytics.sendEvent('Project', 'update', null, 1);
+          $scope.status.save = 'saved';
           // Reload state so alerts display and project updates.
           $state.go($state.current.name, {
             projectId: project._id
@@ -2102,9 +2054,9 @@ app.controller('ProjectRemoteController', [
   'AppConfig',
   function($http, $scope, $state, $stateParams, AppConfig) {
     $scope.remote = {
-      type: 'Subdomains'
+      type: 'Subdirectories'
     };
-    $scope.environmentTypes = ['Subdomains', 'Subdirectories', 'ProjectId'];
+    $scope.environmentTypes = ['Subdomains', 'Subdirectories'];
 
     $scope.check = function() {
       if (!$scope.remote.url || !$scope.remote.secret) {
@@ -2238,10 +2190,10 @@ app.controller('PrimaryProjectSettingsController', [
     $scope.primaryProjectPromise.then(function(primaryProject) {
       $scope.project = _.clone(primaryProject);
       $scope.formio = new Formio('/project/' + primaryProject._id);
-
     });
 
     $scope.saveProject = function() {
+      $scope.status.save = 'saving';
       $scope.formio.saveProject($scope.project)
         .then(function(project) {
           FormioAlerts.addAlert({
@@ -2249,6 +2201,7 @@ app.controller('PrimaryProjectSettingsController', [
             message: 'Project settings saved.'
           });
           GoogleAnalytics.sendEvent('Project', 'update', null, 1);
+          $scope.status.save = 'saved';
           $state.go('project.overview', null, { reload: true });
         }, FormioAlerts.onError.bind(FormioAlerts))
         .catch(FormioAlerts.onError.bind(FormioAlerts));

@@ -1,6 +1,14 @@
 <div class="project-section-header">
   <a class="pull-right project-section-header-icon" ng-if="highestRole === 'team_admin' || highestRole === 'owner'" ui-sref="project.settings"><i class="fa fa-cog" title="Project Settings"></i></a>
   <a class="btn btn-primary pull-right project-section-header-button" ng-if="highestRole === 'team_admin' || highestRole === 'owner'" ui-sref="project.teams"><i class="fa fa-users"></i> Teams</a>
+  <span class="pull-right" style="margin: 10px;">
+    <span class="text-warning" ng-if="status.save === 'saving'">
+      Saving <i class="fa fa-spinner" />
+    </span>
+    <span class="text-success" ng-if="status.save === 'saved'">
+      Saved <i class="fa fa-check" />
+    </span>
+  </span>
   <div style="right: 0; position: absolute; margin-top: 50px; margin-right: 20px;">
     <span class="pull-right"><strong>{{ environmentName }} Project Url:</strong> {{ projectUrl }}</span>
   </div>
