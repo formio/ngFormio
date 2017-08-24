@@ -143,11 +143,8 @@ app.controller('ProjectCreateController', [
     }
 
     $scope.saveProject = function() {
-      $scope.status.save = 'saving';
-
       $scope.isBusy = true;
       FormioProject.createProject($scope.project).then(function(project) {
-        $scope.status.save = 'saved';
         $scope.isBusy = false;
         $state.go('project.overview', {projectId: project._id});
       });
@@ -162,13 +159,15 @@ app.controller('ProjectCreateEnvironmentController', [
   'Formio',
   'FormioProject',
   'FormioAlerts',
+  'PrimaryProject',
   function(
     $scope,
     $state,
     AppConfig,
     Formio,
     FormioProject,
-    FormioAlerts
+    FormioAlerts,
+    PrimaryProject
   ) {
     $scope.environmentTypes = [
       {
@@ -195,15 +194,13 @@ app.controller('ProjectCreateEnvironmentController', [
     });
 
     $scope.saveProject = function() {
-      $scope.status.save = 'saving';
-
       FormioProject.createEnvironment($scope.currentProject).then(function(project) {
         // Update team access to new environment.
         project.access = project.access.concat(_.filter($scope.primaryProject.access, function(access) { return access.type.indexOf('team_') === 0;}));
         (new Formio(AppConfig.apiBase + '/project/' + project._id)).saveProject(angular.copy(project))
           .catch(FormioAlerts.onError.bind(FormioAlerts))
           .then(function() {
-            $scope.status.save = 'saved';
+            PrimaryProject.clear();
             $state.go('project.overview', {projectId: project._id});
           });
       });
