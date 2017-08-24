@@ -460,7 +460,7 @@ module.exports = function (config) {
   };
 
   this.clickOnButton = function (text) {
-    it('I click on the ' + text + ' link', function (next) {
+    it('I click on the ' + text + ' button', function (next) {
       var ele =  element(by.partialButtonText(replacements(text.toString())));
       browser.wait(function () {
         return ele.isPresent();
