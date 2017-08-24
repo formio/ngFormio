@@ -14,11 +14,11 @@ module.exports = function (actions) {
       actions.iSeeTextIn('.project.well>h4>a', '${project3.title}');
 
       val.forEach(function (settings) {
-        actions.clickOnElementWithText('Manage');
+        actions.clickOnLink('Manage');
         actions.portalIamOn('${project3.title}');
-        actions.clickOnElement('.fa.fa-cog');
+        actions.clickOnClass('fa-cog');
         actions.enterTextInField(settings[1], settings[0]);
-        actions.clickOnElementWithText(' Save Project');
+        actions.clickOnButton('Save Project');
         actions.portalIamOn('${project3.title}');
         actions.goToPage("#/");
         actions.iSeeValueIn(settings[2], settings[3]);

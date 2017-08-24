@@ -325,6 +325,13 @@ module.exports = function (config) {
     next(null, projects[title]);
   };
 
+  var scrollTo = function(ele) {
+    return ele.getLocation()
+      .then(function(location) {
+        return browser.executeScript('window.scrollTo(' + location.x + ', ' + (location.y - 60) + ');');
+      });
+  };
+
   this.iSeeElement = function (ele) {
     it('I see the element ' + ele, function (next) {
       var EC = protractor.ExpectedConditions;
@@ -426,11 +433,56 @@ module.exports = function (config) {
 
   this.clickOnElementWithText = function (text) {
     it('I click on the ' + text + ' text', function (next) {
-      var ele =  element.all(by.xpath('//*[text()="' + replacements(text.toString()) + '"]')).first();
+      var ele =  element(by.xpath('//*[text()="' + replacements(text.toString()) + '"]'));
       browser.wait(function () {
         return ele.isPresent();
       }, timeout).then(function (res) {
-        ele.click().then(next).catch(next);
+        scrollTo(ele)
+          .then(function() {
+            ele.click().then(next).catch(next);
+          });
+      });
+    });
+  };
+
+  this.clickOnLink = function (text) {
+    it('I click on the ' + text + ' link', function (next) {
+      var ele =  element(by.partialLinkText(replacements(text.toString())));
+      browser.wait(function () {
+        return ele.isPresent();
+      }, timeout).then(function (res) {
+        scrollTo(ele)
+          .then(function() {
+            ele.click().then(next).catch(next);
+          });
+      });
+    });
+  };
+
+  this.clickOnButton = function (text) {
+    it('I click on the ' + text + ' link', function (next) {
+      var ele =  element(by.partialButtonText(replacements(text.toString())));
+      browser.wait(function () {
+        return ele.isPresent();
+      }, timeout).then(function (res) {
+        scrollTo(ele)
+          .then(function() {
+            ele.click().then(next).catch(next);
+          });
+      });
+    });
+  };
+
+  this.clickOnClass = function (className) {
+    it('I click on the ' + className + ' class', function (next) {
+      var ele =  element(by.className(replacements(className.toString())));
+      browser.wait(function () {
+        return ele.isPresent();
+      }, timeout).then(function (res) {
+        scrollTo(ele)
+          .then(function() {
+            ele.click().then(next).catch(next);
+          });
       });
     });
   };

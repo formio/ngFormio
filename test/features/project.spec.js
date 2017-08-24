@@ -4,7 +4,7 @@ module.exports = function (actions) {
       actions.logout();
       actions.iAmLoggedInFor('projuser1');
       actions.goToPage('#/');
-      actions.clickOnElementWithText('Custom Project');
+      actions.clickOnClass('new-project-custom');
       actions.iSeeText('Project Title');
       actions.iSeeText('Description');
       actions.enterTextInField('#title', '${random-title>project1.title}');
@@ -16,7 +16,7 @@ module.exports = function (actions) {
       actions.logout();
       actions.iAmLoggedInFor('projuser1');
       actions.goToPage('#/');
-      actions.clickOnElementWithText('Custom Project');
+      actions.clickOnClass('new-project-custom');
       actions.iSeeText('Project Title');
       actions.iSeeText('Description');
       actions.btnDisabled(' Create Project');
@@ -26,7 +26,7 @@ module.exports = function (actions) {
       actions.logout();
       actions.iAmLoggedInFor('projuser1');
       actions.goToPage('#/');
-      actions.clickOnElementWithText('Custom Project');
+      actions.clickOnClass('new-project-custom');
       actions.iSeeText('Project Title');
       actions.iSeeText('Description');
       actions.enterTextInField('#title', '${random-title>project1.title}');
@@ -37,7 +37,7 @@ module.exports = function (actions) {
       actions.logout();
       actions.iAmLoggedInFor('projuser1');
       actions.goToPage('#/');
-      actions.clickOnElementWithText('Custom Project');
+      actions.clickOnClass('new-project-custom');
       actions.iSeeText('Project Title');
       actions.iSeeText('Description');
       actions.enterTextInField('#title', '1234567890123456789012345678901234567890123456789012345678901234');
@@ -50,10 +50,10 @@ module.exports = function (actions) {
       actions.goToPage("#/");
       actions.projectExisting('${random-title>project3.title}', '${random-description>project3.description}');
       actions.iSeeTextIn('.project.well>h4>a', '${project3.title}');
-      actions.clickOnElementWithText('Manage');
+      actions.clickOnLink('Manage');
       actions.portalIamOn('${project3.title}');
-      actions.clickOnElement('.fa.fa-cog');
-      actions.clickOnElementWithText(' Save Project');
+      actions.clickOnClass('fa-cog');
+      actions.clickOnButton('Save Project');
       actions.iSeeTextIn('.toast-message', 'Project settings saved.');
     });
 
@@ -63,9 +63,9 @@ module.exports = function (actions) {
       actions.goToPage("#/");
       actions.projectExisting('${random-title>project4.title}', '${random-description>project4.description}');
       actions.iSeeTextIn('.project.well>h4>a', '${project4.title}');
-      actions.clickOnElementWithText('Manage');
+      actions.clickOnLink('Manage');
       actions.portalIamOn('${project4.title}');
-      actions.clickOnElement('.fa.fa-cog');
+      actions.clickOnClass('fa-cog');
       actions.enterTextInField('#title', '${empty}');
       actions.btnDisabled(' Save Project');
     });
@@ -76,11 +76,11 @@ module.exports = function (actions) {
       actions.goToPage("#/");
       actions.projectExisting('${random-title>project5.title}', '${random-description>project5.description}');
       actions.iSeeTextIn('.project.well>h4>a', '${project5.title}');
-      actions.clickOnElementWithText('Manage');
+      actions.clickOnLink('Manage');
       actions.portalIamOn('${project5.title}');
-      actions.clickOnElement('.fa.fa-cog');
+      actions.clickOnClass('fa-cog');
       actions.enterTextInField('#description', '${empty}');
-      actions.clickOnElementWithText(' Save Project');
+      actions.clickOnButton('Save Project');
       actions.iSeeTextIn('.toast-message', 'Project settings saved.');
     });
 
@@ -88,12 +88,12 @@ module.exports = function (actions) {
       actions.logout();
       actions.iAmLoggedInFor('projuser7');
       actions.goToPage("#/");
-      actions.clickOnElement("xpath://*[contains(@class,'fa-close')]");
+      actions.clickOnClass('fa-close');
       actions.projectExisting('${random-title>project7.title}', '${random-description>project7.description}');
       actions.iSeeTextIn('.project.well>h4>a', '${project7.title}');
-      actions.clickOnElementWithText('Manage');
+      actions.clickOnLink('Manage');
       actions.portalIamOn('${project7.title}');
-      actions.clickOnElement('.fa.fa-cog');
+      actions.clickOnClass('fa-cog');
       actions.iSeeText("To remove this project and all of it\'s environments, select this delete button.");
       actions.iSeeTextIn('.btn.btn-danger.ng-binding', 'Delete ${project7.title} Project');
       actions.clickOnElementWithText('Delete ${project7.title} Project');

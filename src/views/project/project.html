@@ -1,5 +1,5 @@
 <div class="project-section-header">
-  <a class="pull-right project-section-header-icon" ng-if="primaryProject && (highestRole === 'team_admin' || highestRole === 'owner')" ui-sref="project.settings"><i class="fa fa-cog" title="Project Settings"></i></a>
+  <a class="pull-right project-section-header-icon" ng-if="highestRole === 'team_admin' || highestRole === 'owner'" ui-sref="project.settings"><i class="fa fa-cog" title="Project Settings"></i></a>
   <a class="btn btn-primary pull-right project-section-header-button" ng-if="highestRole === 'team_admin' || highestRole === 'owner'" ui-sref="project.teams"><i class="fa fa-users"></i> Teams</a>
   <span class="pull-right" style="margin: 10px;">
     <span class="text-warning" ng-if="status.save === 'saving'">

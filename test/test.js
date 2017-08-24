@@ -2,8 +2,6 @@
 
 // Boot up the formio server so we can access the resources.
 require('dotenv').load({silent: true});
-var formio = null;
-var library = null;
 var protocol = process.env.APPPROTOCOL || 'http';
 var domain = process.env.APPDOMAIN || 'localhost';
 var port = process.env.APPPORT || 80;
@@ -28,20 +26,20 @@ var custom = require('./lib/formio-library');
 var actions = new custom(config);
 
 before(function (next) {
-  var width = 1280;
-  var height = 720;
+  var width = 1920;
+  var height = 1080;
   browser.driver.manage().window().setSize(width, height);
   browser.get(url).then(next).catch(next);
 });
 
 describe("", function () {
-  require('./features/register.spec')(actions);
-  require('./features/loginFunctionality.spec')(actions);
-  require('./features/userPortalandWelcome.spec')(actions);
-  require('./features/feedbackrequest.spec')(actions);
-  require('./features/documentationLinks.spec')(actions);
-  require('./features/profileFunctionality.spec')(actions);
+  //require('./features/register.spec')(actions);
+  //require('./features/loginFunctionality.spec')(actions);
+  //require('./features/userPortalandWelcome.spec')(actions);
+  //require('./features/feedbackrequest.spec')(actions);
+  //require('./features/documentationLinks.spec')(actions);
+  //require('./features/profileFunctionality.spec')(actions);
   require('./features/project.spec')(actions);
-  //require('./features/projectSettings.spec')(actions);
+  require('./features/projectSettings.spec')(actions);
 });
 
