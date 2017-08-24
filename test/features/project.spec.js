@@ -50,7 +50,7 @@ module.exports = function (actions) {
       actions.goToPage("#/");
       actions.projectExisting('${random-title>project3.title}', '${random-description>project3.description}');
       actions.iSeeTextIn('.project.well>h4>a', '${project3.title}');
-      actions.clickOnLink('Manage');
+      actions.clickOnButton('Manage');
       actions.portalIamOn('${project3.title}');
       actions.clickOnClass('fa-cog');
       actions.clickOnButton('Save Project');
@@ -63,7 +63,7 @@ module.exports = function (actions) {
       actions.goToPage("#/");
       actions.projectExisting('${random-title>project4.title}', '${random-description>project4.description}');
       actions.iSeeTextIn('.project.well>h4>a', '${project4.title}');
-      actions.clickOnLink('Manage');
+      actions.clickOnButton('Manage');
       actions.portalIamOn('${project4.title}');
       actions.clickOnClass('fa-cog');
       actions.enterTextInField('#title', '${empty}');
@@ -76,7 +76,7 @@ module.exports = function (actions) {
       actions.goToPage("#/");
       actions.projectExisting('${random-title>project5.title}', '${random-description>project5.description}');
       actions.iSeeTextIn('.project.well>h4>a', '${project5.title}');
-      actions.clickOnLink('Manage');
+      actions.clickOnButton('Manage');
       actions.portalIamOn('${project5.title}');
       actions.clickOnClass('fa-cog');
       actions.enterTextInField('#description', '${empty}');
@@ -91,7 +91,7 @@ module.exports = function (actions) {
       actions.clickOnClass('fa-close');
       actions.projectExisting('${random-title>project7.title}', '${random-description>project7.description}');
       actions.iSeeTextIn('.project.well>h4>a', '${project7.title}');
-      actions.clickOnLink('Manage');
+      actions.clickOnButton('Manage');
       actions.portalIamOn('${project7.title}');
       actions.clickOnClass('fa-cog');
       actions.iSeeText("To remove this project and all of it\'s environments, select this delete button.");

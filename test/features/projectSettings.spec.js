@@ -14,7 +14,7 @@ module.exports = function (actions) {
       actions.iSeeTextIn('.project.well>h4>a', '${project3.title}');
 
       val.forEach(function (settings) {
-        actions.clickOnLink('Manage');
+        actions.clickOnButton('Manage');
         actions.portalIamOn('${project3.title}');
         actions.clickOnClass('fa-cog');
         actions.enterTextInField(settings[1], settings[0]);
