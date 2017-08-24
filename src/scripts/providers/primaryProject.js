@@ -18,8 +18,9 @@ app.factory('PrimaryProject', function(AppConfig, $q, $http) {
       scope.primaryProject = project;
 
       // Load project environments
-      $http.get(AppConfig.apiBase + '/project?project=' + project._id).then(function(environments) {
-        scope.environments = environments;
+      $http.get(AppConfig.apiBase + '/project?project=' + project._id).then(function(result) {
+        console.log(result.data);
+        scope.environments = result.data;
         _.assign($scope, scope);
       });
 
