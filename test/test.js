@@ -41,7 +41,7 @@ describe("Formio Tests", function () {
   require('./features/documentationLinks.spec')(actions);
   require('./features/profileFunctionality.spec')(actions);
   require('./features/project.spec')(actions);
-  require('./features/projectSettings.spec')(actions);
+  //require('./features/projectSettings.spec')(actions);
 });
 
 afterEach(function () {
