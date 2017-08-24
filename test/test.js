@@ -7,6 +7,7 @@ var domain = process.env.APPDOMAIN || 'localhost';
 var port = process.env.APPPORT || 80;
 var serverHost = process.env.SERVERHOST || 'localhost:3000';
 var serverProtocol = process.env.SERVERPROTOCOL || 'http';
+var fs = require('fs');
 var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);
@@ -32,14 +33,25 @@ before(function (next) {
   browser.get(url).then(next).catch(next);
 });
 
-describe("", function () {
-  //require('./features/register.spec')(actions);
-  //require('./features/loginFunctionality.spec')(actions);
-  //require('./features/userPortalandWelcome.spec')(actions);
-  //require('./features/feedbackrequest.spec')(actions);
-  //require('./features/documentationLinks.spec')(actions);
-  //require('./features/profileFunctionality.spec')(actions);
+describe("Formio Tests", function () {
+  require('./features/register.spec')(actions);
+  require('./features/loginFunctionality.spec')(actions);
+  require('./features/userPortalandWelcome.spec')(actions);
+  require('./features/feedbackrequest.spec')(actions);
+  require('./features/documentationLinks.spec')(actions);
+  require('./features/profileFunctionality.spec')(actions);
   require('./features/project.spec')(actions);
   require('./features/projectSettings.spec')(actions);
 });
 
+afterEach(function () {
+  if (this.currentTest.state !== 'passed') {
+    var path = './test/screenshots/' + this.currentTest.title.replace(/\W+/g, '_').toLowerCase() + '.png';
+    browser.takeScreenshot().then(function (png) {
+      var stream = fs.createWriteStream(path);
+      stream.write(new Buffer(png, 'base64'));
+      stream.end();
+      console.log(path + ' file saved.');
+    });
+  }
+});
