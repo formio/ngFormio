@@ -62,6 +62,6 @@ afterEach(function () {
   }
   else {
     // Clears the logs for the next run.
-    browser.manage().logs().get('browser');
+    //browser.manage().logs().get('browser');
   }
 });
