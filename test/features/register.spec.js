@@ -36,7 +36,7 @@ module.exports = function (actions) {
       actions.logout();
       actions.enterTextInField('.register-container #email', 'bad-email');
       actions.btnDisabled('REGISTER');
-      actions.iSeeText('Email must be a valid email.');
+      actions.iSeeText('Email must be a valid emails.');
     });
     describe('Mismatched passwords', function () {
       actions.logout();

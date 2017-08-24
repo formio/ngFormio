@@ -9,6 +9,7 @@ test/bower_components
 dist
 aws.json
 test/screenshots/*.png
+test/screenshots/*.txt
 *~
 npm-debug.log
 
