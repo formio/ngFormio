@@ -328,7 +328,7 @@ module.exports = function (config) {
   var scrollTo = function(ele) {
     return ele.getLocation()
       .then(function(location) {
-        return browser.executeScript('window.scrollTo(' + location.x + ', ' + (location.y - 60) + ');');
+        return browser.executeScript('window.scrollTo(' + location.x + ', ' + (location.y - 100) + ');');
       });
   };
 
