@@ -55,6 +55,14 @@ module.exports = function (actions) {
       actions.iSeeEnv('Stage');
     });
 
+    describe('Dont Delete PreProd Environment', function () {
+      actions.iGoToEnv('PreProd');
+      actions.clickOnLink('Settings');
+      actions.clickOnLink('Delete PreProd Environment');
+      actions.clickOnButton('No');
+      actions.iSeeEnv('PreProd');
+    });
+
     describe('Delete PreProd Environment', function () {
       actions.iGoToEnv('PreProd');
       actions.clickOnLink('Settings');
@@ -63,5 +71,11 @@ module.exports = function (actions) {
       actions.iDontSeeEnv('PreProd');
       actions.iSeeText('+ Add Environment');
     });
+
+    // Deployments
+
+    // Protected Mode
+
+    // Settings
   });
 };
