@@ -1,4 +1,4 @@
-<form name="projectForm" ng-submit="saveProject()" novalidate>
+<form name="projectForm" ng-submit="saveProject()" class="env-settings" novalidate>
   <div id="form-group-title" class="form-group" ng-class="{'has-error': projectForm.title.$invalid && projectForm.title.$dirty}">
     <label for="title" class="control-label required-field">{{ createType }} Title</label>
     <input ng-if="!currentProject._id || currentProject._id !== primaryProject._id" type="text" class="form-control" id="title" name="title" ng-model="currentProject.title" placeholder="Give your {{ createType }} a name." ng-maxlength="63" ng-required="true" autofocus="true">

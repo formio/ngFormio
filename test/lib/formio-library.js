@@ -379,8 +379,26 @@ module.exports = function (config) {
     });
   };
 
+  this.waitForClassRemoval = function(className) {
+    it('Wait for class ' + className + ' to disappear', function (next) {
+      try {
+        var ele = element(by.className(className));
+        browser.wait(function() {
+          return ele.isPresent().then(function(present) {
+            return !present;
+          });
+        }, timeout).then(function() {
+          next();
+        }).catch(next);
+      }
+      catch (e) {
+        next(e);
+      }
+    });
+  };
+
   this.iDonotSeeText = function (text) {
-    it('I donot see "' + text + '"', function (next) {
+    it('I do not see "' + text + '"', function (next) {
       try {
         var ele = element(by.xpath("//*[text()='" + text + "']"));
         browser.wait(function () {
@@ -429,7 +447,6 @@ module.exports = function (config) {
       browser.get(url).then(next).catch(next);
     });
   };
-
 
   this.clickOnElementWithText = function (text) {
     it('I click on the ' + text + ' text', function (next) {
@@ -487,6 +504,44 @@ module.exports = function (config) {
     });
   };
 
+  this.iGoToEnv = function (env) {
+    it('I go to environment ' + env, function(next) {
+      var envTab = element(by.xpath('//a[contains(@class, "environment-tab") and contains(text(),"' + env + '")]'));
+      browser.wait(function () {
+        return envTab.isPresent();
+      }, timeout).then(function (res) {
+        scrollTo(envTab)
+          .then(function() {
+            envTab.click().then(next).catch(next);
+          });
+      });
+    });
+  };
+
+  this.iSeeEnv = function (env) {
+    it('I see environment ' + env, function(next) {
+      var envTab = element(by.xpath('//a[contains(@class, "environment-tab") and contains(text(),"' + env + '")]'));
+      browser.wait(function () {
+        return envTab.isPresent();
+      }, timeout).then(function () {
+        next();
+      });
+    });
+  };
+
+  this.iDontSeeEnv = function (env) {
+    it('I see environment ' + env, function(next) {
+      var envTab = element(by.xpath('//a[contains(@class, "environment-tab") and contains(text(),"' + env + '")]'));
+      browser.wait(function () {
+        return envTab.isPresent().then(function(res) {
+          return !res;
+        });
+      }, timeout).then(function () {
+        next();
+      });
+    });
+  };
+
   this.iSeeTextIn = function (ele, text) {
     text = replacements(text);
     it('I see text "' + text + '"', function (next) {
@@ -521,7 +576,7 @@ module.exports = function (config) {
   };
 
   this.logout = function () {
-    it('I am logging out', function (next) {
+    it('Clear login state', function (next) {
       try {
         browser.executeScript('localStorage.clear();')
           .then(browser.refresh())
@@ -537,7 +592,7 @@ module.exports = function (config) {
   this.btnDisabled = function (field) {
     it('I see ' + field + ' button is disabled', function (next) {
       try {
-        var btn = element(by.xpath('//button[text()=\'' + field + '\']'));
+        var btn = element(by.partialButtonText(field));
         browser.wait(function () {
           return btn.isPresent().then(function (present) {
             if (present) {
@@ -905,6 +960,12 @@ module.exports = function (config) {
       } catch (err) {
         next(err);
       }
+    });
+  };
+
+  this.pause = function() {
+    it('Pauses', function(next) {
+      browser.pause();
     });
   };
 };

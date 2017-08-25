@@ -1911,7 +1911,7 @@ app.controller('ProjectSettingsController', [
   'FormioAlerts',
   'ProjectFrameworks',
   '$http',
-  'AppConfig',
+  'PrimaryProject',
   function(
     $scope,
     $rootScope,
@@ -1920,7 +1920,7 @@ app.controller('ProjectSettingsController', [
     FormioAlerts,
     ProjectFrameworks,
     $http,
-    AppConfig
+    PrimaryProject
   ) {
     $scope.platforms = ProjectFrameworks;
 
@@ -1976,12 +1976,15 @@ app.controller('ProjectSettingsController', [
     };
 
     $scope.updateProject = function() {
-      $scope.formio.saveProject($scope.currentProject);
+      $scope.status.save = 'saving';
+      $scope.formio.saveProject($scope.currentProject)
+        .then(function() {
+          $scope.status.save = 'saved';
+        });
     };
 
     // Save the Project.
     $scope.saveProject = function() {
-      $scope.status.save = 'saving';
       // Need to strip hyphens at the end before submitting
       if($scope.currentProject.name) {
         $scope.currentProject.name = $scope.currentProject.name.toLowerCase().replace(/[^0-9a-z\-]|^\-+|\-+$/g, '');
@@ -1995,8 +1998,8 @@ app.controller('ProjectSettingsController', [
             message: 'Project saved.'
           });
           GoogleAnalytics.sendEvent('Project', 'update', null, 1);
-          $scope.status.save = 'saved';
           // Reload state so alerts display and project updates.
+          PrimaryProject.clear();
           $state.go($state.current.name, {
             projectId: project._id
           }, {reload: true});
@@ -2489,11 +2492,13 @@ app.controller('ProjectDeleteController', [
   '$state',
   'FormioAlerts',
   'GoogleAnalytics',
+  'PrimaryProject',
   function(
     $scope,
     $state,
     FormioAlerts,
-    GoogleAnalytics
+    GoogleAnalytics,
+    PrimaryProject
   ) {
     $scope.isBusy = false;
     var isProject = ($scope.currentProject._id === $scope.primaryProject._id);
@@ -2509,6 +2514,7 @@ app.controller('ProjectDeleteController', [
           });
           $scope.isBusy = false;
           GoogleAnalytics.sendEvent(type, 'delete', null, 1);
+          PrimaryProject.clear();
           if (isProject) {
             $state.go('home');
           }

@@ -9,7 +9,7 @@ module.exports = function (actions) {
       actions.iSeeText('Description');
       actions.enterTextInField('#title', '${random-title>project1.title}');
       actions.enterTextInField('#description', '${random-description>project1.description}');
-      actions.clickOnElementWithText(' Create Project');
+      actions.clickOnButton('Create Project');
     });
 
     describe('Project Creation', function () {
@@ -30,7 +30,7 @@ module.exports = function (actions) {
       actions.iSeeText('Project Title');
       actions.iSeeText('Description');
       actions.enterTextInField('#title', '${random-title>project1.title}');
-      actions.clickOnElementWithText(' Create Project');
+      actions.clickOnButton('Create Project');
     });
 
     describe('Character Limits', function () {
