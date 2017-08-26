@@ -4,6 +4,7 @@ var assert = require('assert');
 var request = require('request');
 var chance = (new require('chance'))();
 var _ = require('lodash');
+var dragAndDrop = require('html-dnd').code;
 
 module.exports = function (config) {
   // Global timeout for wait* commands.
@@ -543,8 +544,8 @@ module.exports = function (config) {
   };
 
   this.iSeeTextIn = function (ele, text) {
-    text = replacements(text);
     it('I see text "' + text + '"', function (next) {
+      text = replacements(text);
       ele = (typeof (ele) == 'object') ? ele : element(by.cssContainingText(ele, text));
       browser.wait(function () {
         return ele.isPresent();
@@ -960,6 +961,19 @@ module.exports = function (config) {
       } catch (err) {
         next(err);
       }
+    });
+  };
+
+  this.dragTo = function (field, dropZone) {
+    it("Drag " + field + " to " + dropZone, function(next) {
+      const ele = element(by.xpath('//span[@title="' + field + '"]'));
+      browser.wait(function () {
+        return ele.isPresent();
+      }, timeout).then(function () {
+        const drop = element(by.xpath('//*[contains(@class, "' + dropZone + '")]//ul[contains(@class, "component-list")]'));
+        browser.executeScript(dragAndDrop, ele, drop, 0, 0)
+          .then(next);
+      });
     });
   };
 

@@ -37,6 +37,7 @@
     "gulp-useref": "^3.0.4",
     "gulp-watch": "^4.2.3",
     "gulp-wrapper": "^0.1.5",
+    "html-dnd": "^1.2.0",
     "jshint-stylish": "^1.0.0",
     "main-bower-files": "^2.5.0",
     "merge-stream": "^1.0.0",
