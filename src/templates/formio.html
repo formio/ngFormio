@@ -27,5 +27,8 @@
       builder="builder"
       options="options"
     ></formio-component>
+    <div ng-repeat="alert in formioAlerts track by $index" class="alert alert-{{ alert.type }}" role="alert" ng-if="::!builder">
+      {{ alert.message | formioTranslate:null:builder }}
+    </div>
   </form>
 </div>
