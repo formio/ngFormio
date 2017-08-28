@@ -5,7 +5,7 @@
     <div class="col-md-8">
       <h4>Select Version Tag</h4>
       <div ng-if="tags.length">
-        <p><select class="form-control" ng-model="deployTagOption" ng-options="selectTag as selectTag.tag for selectTag in tags"></select></p>
+        <p><select class="form-control tags" ng-model="deployTagOption" ng-options="selectTag as selectTag.tag for selectTag in tags"></select></p>
         <span class="btn btn-primary" ng-click="deployTag(deployTagOption)">Deploy version tag to {{ environmentName }}</span>
       </div>
       <div ng-if="!tags.length">

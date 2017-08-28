@@ -72,7 +72,60 @@ module.exports = function (actions) {
       actions.iSeeText('+ Add Environment');
     });
 
-    // Deployments
+    describe('Tag Environment', function() {
+      actions.iGoToEnv('Dev');
+      actions.clickOnLink('Settings');
+      actions.clickOnLink('Deployment');
+      actions.clickOnLink('Create Version Tag');
+      actions.enterTextInField('#tag', '0.0.1');
+      actions.clickOnElementWithText('Create version tag');
+      actions.envHasTag('Dev', '0.0.1');
+    });
+
+    describe('Deploys a form', function() {
+      actions.iGoToEnv('Dev');
+      // Create a form.
+      actions.clickOnLink('Forms');
+      actions.clickOnLink('New Form');
+      actions.clickOnElementWithText('API Web Form');
+      actions.iSeeText('New Form');
+      actions.enterTextInField('#title', '${random-title>depform1.title}');
+      actions.enterTextInField('#path', '${random-title>depform1.path}');
+      actions.dragTo('Text Field', 'formarea');
+      actions.iSeeText('Text Field Component');
+      actions.enterTextInField('#label', '${random-title>textfield1.label}');
+      actions.clickOnButton('Save');
+      actions.waitForClassRemoval('ngdialog-overlay');
+      actions.iSeeTextIn('.control-label', '${textfield1.label}');
+      actions.clickOnButton('Create Form');
+    });
+
+    describe('Tag the release', function() {
+      actions.clickOnLink('Settings');
+      actions.clickOnLink('Deployment');
+      actions.clickOnLink('Create Version Tag');
+      actions.enterTextInField('#tag', '0.0.2');
+      actions.clickOnElementWithText('Create version tag');
+      actions.envHasTag('Dev', '0.0.2');
+    });
+
+    describe('Ensure form doesnt exist on Stage', function() {
+      actions.iGoToEnv('Stage');
+      actions.clickOnLink('Forms');
+      actions.iDonotSeeText('${depform1.title}');
+    });
+
+    describe('Deploy the tag to stage', function() {
+      actions.clickOnLink('Settings');
+      actions.clickOnLink('Deployment');
+      actions.selectOption('tags', '0.0.2');
+      actions.clickOnElementWithText('Deploy version tag to Stage');
+      actions.envHasTag('Stage', '0.0.2');
+      actions.clickOnLink('Forms');
+      actions.iSeeText('${depform1.title}');
+    });
+
+    // Deploy update to form
 
     // Protected Mode
 
