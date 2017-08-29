@@ -4,15 +4,15 @@
   <div ng-if="form.display === 'pdf' && form.settings.pdf" style="position:relative;">
     <span style="position:absolute;right:10px;top:10px;cursor:pointer;" class="btn btn-default no-disable" ng-click="zoomIn()"><spann class="glyphicon glyphicon-zoom-in"></spann></span>
     <span style="position:absolute;right:10px;top:60px;cursor:pointer;" class="btn btn-default no-disable" ng-click="zoomOut()"><span class="glyphicon glyphicon-zoom-out"></span></span>
-    <a ng-if="downloadUrl" style="position:absolute;right:10px;top:110px;cursor:pointer;" class="no-disable" href="{{ downloadUrl | trustAsResourceUrl }}" target="_blank"><img src="{{ pdfImage }}" style="width:3em;" /></a>
-    <iframe src="{{ getIframeSrc(form.settings.pdf) | trustAsResourceUrl }}" seamless class="formio-iframe"></iframe>
+    <a ng-if="downloadUrl" style="position:absolute;right:10px;top:110px;cursor:pointer;" class="no-disable" href="{{ downloadUrl | trustAsResourceUrl }}" target="_blank"><img ng-src="{{ pdfImage }}" style="width:3em;" /></a>
+    <iframe ng-src="{{ getIframeSrc(form.settings.pdf) | trustAsResourceUrl }}" seamless class="formio-iframe"></iframe>
     <button ng-if="!readOnly && !form.builder" type="button" class="btn btn-primary" ng-click="submitIFrameForm()">Submit</button>
   </div>
   <form ng-if="!form.display || (form.display === 'form')" role="form" name="formioForm" ng-submit="onSubmit(formioForm)" novalidate>
     <div ng-repeat="alert in formioAlerts track by $index" class="alert alert-{{ alert.type }}" role="alert" ng-if="::!builder">
       {{ alert.message | formioTranslate:null:builder }}
     </div>
-    <a ng-if="downloadUrl && form.settings.pdf.id" class="pull-right no-disable" href="{{ downloadUrl | trustAsResourceUrl }}" target="_blank"><img src="{{ pdfImage }}" style="width:3em;" /></a>
+    <a ng-if="downloadUrl && form.settings.pdf.id" class="pull-right no-disable" href="{{ downloadUrl | trustAsResourceUrl }}" target="_blank"><img ng-src="{{ pdfImage }}" style="width:3em;" /></a>
     <!-- DO NOT PUT "track by $index" HERE SINCE DYNAMICALLY ADDING/REMOVING COMPONENTS WILL BREAK -->
     <formio-component
       ng-repeat="component in form.components track by $index"
