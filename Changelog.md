@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.21.4
+### Changed
+ - Upgraded formio.js to 2.15.2
+
 ## 2.21.3
 ### Fixed
  - The download url for pdf to use the core javascript library.
