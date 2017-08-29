@@ -234,9 +234,9 @@ module.exports = function() {
           // If they wish to submit to the default location.
           else if ($scope.formio && !$scope.formio.noSubmit) {
             // copy to remove angular $$hashKey
-            var method = submissionData._id ? 'put' : 'post';
+            var submissionMethod = submissionData._id ? 'put' : 'post';
             $scope.formio.saveSubmission(submissionData, $scope.formioOptions).then(function(submission) {
-              onSubmitDone(method, submission, form);
+              onSubmitDone(submissionMethod, submission, form);
             }, FormioScope.onError($scope, $element)).finally(function() {
               if (form) {
                 form.submitting = false;
