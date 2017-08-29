@@ -1,4 +1,4 @@
-/*! ng-formio v2.21.3 | https://unpkg.com/ng-formio@2.21.3/LICENSE.txt */
+/*! ng-formio v2.21.4 | https://unpkg.com/ng-formio@2.21.4/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 /*!
  * EventEmitter2
@@ -1176,19 +1176,14 @@ var Formio = function () {
         });
       }
 
-      var download = '';
-      download = Formio.baseUrl;
-      if (form.project) {
-        download += '/project/' + form.project;
-      }
-      download += '/form/' + form._id;
-      download += '/submission/' + this.submissionId;
-      download += '/download';
-      if (form.settings && form.settings.pdf) {
-        download += '/' + form.settings.pdf.id;
-      }
+      var apiUrl = '/project/' + form.project;
+      apiUrl += '/form/' + form._id;
+      apiUrl += '/submission/' + this.submissionId;
+      apiUrl += '/download';
+
+      var download = Formio.baseUrl + apiUrl;
       return new Promise(function (resolve, reject) {
-        _this2.getTempToken(3600, 'GET:' + download.replace(Formio.baseUrl, '')).then(function (tempToken) {
+        _this2.getTempToken(3600, 'GET:' + apiUrl).then(function (tempToken) {
           download += '?token=' + tempToken.key;
           resolve(download);
         }, function () {
