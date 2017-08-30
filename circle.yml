@@ -8,6 +8,9 @@ machine:
     PORT: 3001
     SERVERHOST: test-form.io
     SERVERPROTOCOL: https
+  java:
+    version:
+      oraclejdk8
 
 dependencies:
   pre:
