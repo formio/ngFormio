@@ -8,7 +8,7 @@ var dragAndDrop = require('html-dnd').code;
 
 module.exports = function (config) {
   // Global timeout for wait* commands.
-  var timeout = 6000;
+  var timeout = 10000;
   var state = {};
   var projects = {};
 
