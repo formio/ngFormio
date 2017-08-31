@@ -346,36 +346,15 @@ module.exports = function (config) {
     var ele = element.all(selector).first();
 
     return new Promise(function(resolve, reject) {
-      try {
-        browser.wait(function() {
+      browser.wait(function() {
           return ele.isPresent();
         }, timeout)
-          .then(function() {
-            resolve(ele);
-          })
-          .catch(function(e) {
-            reject(e);
-          });
-      }
-      catch (e) {
-        if (e instanceof StaleElementReferenceException) {
-          browser.waitForAngular().then(function() {
-            ele = element.all(selector).first();
-            browser.wait(function() {
-              return ele.isPresent();
-            }, timeout)
-              .then(function() {
-                resolve(ele);
-              })
-              .catch(function(e) {
-                reject(e);
-              });
-          });
-        }
-        else {
+        .then(function() {
+          resolve(ele);
+        })
+        .catch(function(e) {
           reject(e);
-        }
-      }
+        });
     });
   };
 
@@ -512,13 +491,25 @@ module.exports = function (config) {
   this.clickOnLink = function (text) {
     it('I click on the ' + text + ' link', function (next) {
       try {
-        getElement()
+        var selector = by.partialLinkText(replacements(text.toString()));
+        getElement(selector)
           .then(function(ele) {
             scrollTo(ele)
               .then(function() {
                 ele.click()
-                  .then(next);
-                  //.catch(next);
+                  .then(next)
+                  .catch(function() {
+                    // If it fails, try waiting and start again.
+                    browser.waitForAngular().then(function() {
+                      ele = element.all(selector).first();
+                      browser.wait(function() {
+                          return ele.isPresent();
+                        }, timeout)
+                        .then(function() {
+                          ele.click().then(next).catch(next);
+                        });
+                    });
+                  });
               });
           })
           .catch(function(e) {
