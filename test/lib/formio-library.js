@@ -512,11 +512,13 @@ module.exports = function (config) {
   this.clickOnLink = function (text) {
     it('I click on the ' + text + ' link', function (next) {
       try {
-        getElement(by.partialLinkText(replacements(text.toString())))
+        getElement()
           .then(function(ele) {
             scrollTo(ele)
               .then(function() {
-                ele.click().then(next).catch(next);
+                ele.click()
+                  .then(next);
+                  //.catch(next);
               });
           })
           .catch(function(e) {
