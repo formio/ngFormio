@@ -2081,36 +2081,55 @@ app.controller('ProjectRemoteController', [
               $scope.remoteToken = response.data;
               $http({
                 method: 'GET',
-                url: $scope.remote.url + '/project',
+                url: $scope.remote.url + '/status',
                 headers: {
                   'x-remote-token': $scope.remoteToken
                 },
                 disableJWT: true
               })
                 .then(function(result) {
-                  delete $scope.remoteError;
-                  if (!Array.isArray(result.data)) {
-                    $scope.remoteError = 'Server did not respond properly. It may not be a form.io server.';
+                  if (result && result.data && result.data.version && semver.satisfies(result.data.version, '>=5.0.0-beta.1')) {
+                    $http({
+                      method: 'GET',
+                      url: $scope.remote.url + '/project',
+                      headers: {
+                        'x-remote-token': $scope.remoteToken
+                      },
+                      disableJWT: true
+                    })
+                      .then(function(result) {
+                        delete $scope.remoteError;
+                        if (!Array.isArray(result.data)) {
+                          $scope.remoteError = 'Server did not respond properly. It may not be a form.io server.';
+                        }
+                        else {
+                          $scope.remoteProjects = result.data;
+                          $scope.remoteProjects.unshift({
+                            title: 'New Environment',
+                            name: 'new'
+                          });
+                        }
+                      })
+                      .catch(function(err) {
+                        if (err.status === -1) {
+                          $scope.remoteError = 'Remote server did not respond to a CORS request properly. It may not be a properly configured form.io server or does not exist.';
+                        }
+                        else {
+                          $scope.remoteError = err.status + ' - ' + err.statusText + ': ' + err.data;
+                          if (err.status === 401) {
+                            $scope.remoteError += '. Please check your access key';
+                          }
+                        }
+                      });
                   }
                   else {
-                    $scope.remoteProjects = result.data;
-                    $scope.remoteProjects.unshift({
-                      title: 'New Environment',
-                      name: 'new'
-                    });
+                    $scope.remoteError = 'Remote server is not compatible with Remote Environment functionality. Please upgrade.';
                   }
                 })
                 .catch(function(err) {
-                  if (err.status === -1) {
-                    $scope.remoteError = 'Remote server did not respond to a CORS request properly. It may not be a properly configured form.io server or does not exist.';
-                  }
-                  else {
-                    $scope.remoteError = err.status + ' - ' + err.statusText + ': ' + err.data;
-                    if (err.status === 401) {
-                      $scope.remoteError += '. Please check your access key';
-                    }
-                  }
+                  $scope.remoteError = 'Remote server did not respond to a CORS request properly. It may not be a properly configured form.io server or does not exist.'
                 });
+
             });
         })
         .catch(function(err) {
