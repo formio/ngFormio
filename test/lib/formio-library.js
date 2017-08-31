@@ -494,10 +494,12 @@ module.exports = function (config) {
         var selector = by.partialLinkText(replacements(text.toString()));
         getElement(selector)
           .then(function(ele) {
-            //scrollTo(ele)
-            //  .then(function() {
+            scrollTo(ele)
+              .then(function() {
+                // Refresh element to make sure it is the most recent.
+                ele = element.all(selector).first();
                 ele.click().then(next);
-              //});
+              });
           });
       }
       catch (e) {
