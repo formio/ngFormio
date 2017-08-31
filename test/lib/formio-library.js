@@ -333,6 +333,44 @@ module.exports = function (config) {
       });
   };
 
+  /**
+   * This wrapper function does two things.
+   *
+   * 1. Waits for the element to be present.
+   * 2. Catches StaleElementReferenceException which happens when selenium picks an old copy of the item.
+   *
+   * @param selector
+   * @returns {Promise}
+   */
+  var getElement = function(selector) {
+    var ele = element.all(selector).first();
+
+    return new Promise(function(resolve, reject) {
+      try {
+        browser.wait(function() {
+          return ele.isPresent();
+        }, timeout).then(function() {
+          resolve(ele);
+        });
+      }
+      catch (e) {
+        if (e instanceof StaleElementReferenceException) {
+          browser.waitForAngular().then(function() {
+            ele = element.all(selector).first();
+            browser.wait(function() {
+              return ele.isPresent();
+            }, timeout).then(function() {
+              resolve(ele);
+            });
+          });
+        }
+        else {
+          throw e;
+        }
+      }
+    });
+  };
+
   this.iSeeElement = function (ele) {
     it('I see the element ' + ele, function (next) {
       var EC = protractor.ExpectedConditions;
@@ -465,15 +503,18 @@ module.exports = function (config) {
 
   this.clickOnLink = function (text) {
     it('I click on the ' + text + ' link', function (next) {
-      var ele =  element(by.partialLinkText(replacements(text.toString())));
-      browser.wait(function () {
-        return ele.isPresent();
-      }, timeout).then(function (res) {
-        scrollTo(ele)
-          .then(function() {
-            ele.click().then(next).catch(next);
+      try {
+        getElement(by.partialLinkText(replacements(text.toString())))
+          .then(function (ele) {
+            scrollTo(ele)
+              .then(function() {
+                ele.click().then(next).catch(next);
+              });
           });
-      });
+      }
+      catch (e) {
+        console.log(e);
+      }
     });
   };
 

@@ -30,7 +30,7 @@ module.exports = function (actions) {
       actions.iSeeTextIn(".control-label","Name");
       actions.enterTextInField('.profile-edit-page #fullName','${random-fullName>profileuser1.fullName}');
       actions.clickOnElementWithText('Submit');
-      actions.iSeeTextIn(".alert","Submission was created.");
+      actions.iSeeTextIn(".alert","Submission was updated.");
       actions.valueUpdate('profileuser1','${random}','fullName');
       actions.valueChanged('profileuser1');
     });
@@ -41,7 +41,7 @@ module.exports = function (actions) {
       actions.iSeeTextIn(".control-label","Username");
       actions.enterTextInField('.profile-edit-page #name','${random-name>profileuser1.name}');
       actions.clickOnElementWithText('Submit');
-      actions.iSeeTextIn(".alert","Submission was created.");
+      actions.iSeeTextIn(".alert","Submission was updated.");
       actions.valueUpdate('profileuser1','${random}','name');
       actions.valueChanged('profileuser1');
     });
@@ -52,7 +52,7 @@ module.exports = function (actions) {
       actions.iSeeTextIn(".control-label","Email");
       actions.enterTextInField('.profile-edit-page #email','${random-email>profileuser1.email}');
       actions.clickOnElementWithText('Submit');
-      actions.iSeeTextIn(".alert","Submission was created.");
+      actions.iSeeTextIn(".alert","Submission was updated.");
       actions.valueUpdate('profileuser1','${random}','email');
       actions.valueChanged('profileuser1');
     });
@@ -63,7 +63,7 @@ module.exports = function (actions) {
       actions.iSeeText("Password");
       actions.enterTextInField('.profile-edit-page #password','${random-password>profileuser1.password}');
       actions.clickOnElementWithText('Submit');
-      actions.iSeeTextIn(".alert","Submission was created.");
+      actions.iSeeTextIn(".alert","Submission was updated.");
       actions.valueUpdate('profileuser1','${random}','password');
       actions.valueChanged('profileuser1');
     });
@@ -80,7 +80,7 @@ module.exports = function (actions) {
       actions.enterTextInField('.profile-edit-page #email','${random-email>profileuser1.email}');
       actions.enterTextInField('.profile-edit-page #password','${random-password>profileuser1.password}');
       actions.clickOnElementWithText('Submit');
-      actions.iSeeTextIn(".alert","Submission was created.");
+      actions.iSeeTextIn(".alert","Submission was updated.");
       actions.valueChanged('profileuser1');
     });
   });
