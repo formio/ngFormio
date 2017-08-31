@@ -349,9 +349,13 @@ module.exports = function (config) {
       try {
         browser.wait(function() {
           return ele.isPresent();
-        }, timeout).then(function() {
-          resolve(ele);
-        });
+        }, timeout)
+          .then(function() {
+            resolve(ele);
+          })
+          .catch(function(e) {
+            reject(e);
+          });
       }
       catch (e) {
         if (e instanceof StaleElementReferenceException) {
@@ -359,13 +363,17 @@ module.exports = function (config) {
             ele = element.all(selector).first();
             browser.wait(function() {
               return ele.isPresent();
-            }, timeout).then(function() {
-              resolve(ele);
-            });
+            }, timeout)
+              .then(function() {
+                resolve(ele);
+              })
+              .catch(function(e) {
+                reject(e);
+              });
           });
         }
         else {
-          throw e;
+          reject(e);
         }
       }
     });
@@ -505,15 +513,18 @@ module.exports = function (config) {
     it('I click on the ' + text + ' link', function (next) {
       try {
         getElement(by.partialLinkText(replacements(text.toString())))
-          .then(function (ele) {
+          .then(function(ele) {
             scrollTo(ele)
               .then(function() {
                 ele.click().then(next).catch(next);
               });
+          })
+          .catch(function(e) {
+            next(e);
           });
       }
       catch (e) {
-        console.log(e);
+        next(e);
       }
     });
   };
