@@ -100,30 +100,30 @@ module.exports = function (actions) {
       actions.clickOnButton('Create Form');
     });
 
-    describe('Tag the release', function() {
-      actions.clickOnLink('Settings');
-      actions.clickOnLink('Deployment');
-      actions.clickOnLink('Create Version Tag');
-      actions.enterTextInField('#tag', '0.0.2');
-      actions.clickOnElementWithText('Create version tag');
-      actions.envHasTag('Dev', '0.0.2');
-    });
+    //describe('Tag the release', function() {
+    //  actions.clickOnLink('Settings');
+    //  actions.clickOnLink('Deployment');
+    //  actions.clickOnLink('Create Version Tag');
+    //  actions.enterTextInField('#tag', '0.0.2');
+    //  actions.clickOnElementWithText('Create version tag');
+    //  actions.envHasTag('Dev', '0.0.2');
+    //});
 
-    describe('Ensure form doesnt exist on Stage', function() {
-      actions.iGoToEnv('Stage');
-      actions.clickOnLink('Forms');
-      actions.iDonotSeeText('${depform1.title}');
-    });
-
-    describe('Deploy the tag to stage', function() {
-      actions.clickOnLink('Settings');
-      actions.clickOnLink('Deployment');
-      actions.selectOption('tags', '0.0.2');
-      actions.clickOnElementWithText('Deploy version tag to Stage');
-      actions.envHasTag('Stage', '0.0.2');
-      actions.clickOnLink('Forms');
-      actions.iSeeText('${depform1.title}');
-    });
+    //describe('Ensure form doesnt exist on Stage', function() {
+    //  actions.iGoToEnv('Stage');
+    //  actions.clickOnLink('Forms');
+    //  actions.iDonotSeeText('${depform1.title}');
+    //});
+    //
+    //describe('Deploy the tag to stage', function() {
+    //  actions.clickOnLink('Settings');
+    //  actions.clickOnLink('Deployment');
+    //  actions.selectOption('tags', '0.0.2');
+    //  actions.clickOnElementWithText('Deploy version tag to Stage');
+    //  actions.envHasTag('Stage', '0.0.2');
+    //  actions.clickOnLink('Forms');
+    //  actions.iSeeText('${depform1.title}');
+    //});
 
     // Deploy update to form
 
