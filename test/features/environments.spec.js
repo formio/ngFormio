@@ -102,6 +102,7 @@ module.exports = function (actions) {
 
     describe('Tag the release', function() {
       actions.clickOnLink('Settings');
+      actions.waitForActionToComplete(200);
       actions.clickOnLink('Deployment');
       actions.clickOnLink('Create Version Tag');
       actions.enterTextInField('#tag', '0.0.2');
