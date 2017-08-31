@@ -494,26 +494,10 @@ module.exports = function (config) {
         var selector = by.partialLinkText(replacements(text.toString()));
         getElement(selector)
           .then(function(ele) {
-            scrollTo(ele)
-              .then(function() {
-                ele.click()
-                  .then(next)
-                  .catch(function() {
-                    // If it fails, try waiting and start again.
-                    browser.waitForAngular().then(function() {
-                      ele = element.all(selector).first();
-                      browser.wait(function() {
-                          return ele.isPresent();
-                        }, timeout)
-                        .then(function() {
-                          ele.click().then(next).catch(next);
-                        });
-                    });
-                  });
-              });
-          })
-          .catch(function(e) {
-            next(e);
+            //scrollTo(ele)
+            //  .then(function() {
+                ele.click().then(next);
+              //});
           });
       }
       catch (e) {
