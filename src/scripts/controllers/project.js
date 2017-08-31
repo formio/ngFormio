@@ -1,6 +1,6 @@
 'use strict';
 
-/* globals NumberAbbreviate, chance, Chartist */
+/* globals NumberAbbreviate, chance, Chartist, semver */
 
 // loadedFiles is used to prevent double loading files on each session.
 var loadedFiles = [];
@@ -2127,7 +2127,7 @@ app.controller('ProjectRemoteController', [
                   }
                 })
                 .catch(function(err) {
-                  $scope.remoteError = 'Remote server did not respond to a CORS request properly. It may not be a properly configured form.io server or does not exist.'
+                  $scope.remoteError = 'Remote server did not respond to a CORS request properly. It may not be a properly configured form.io server or does not exist.';
                 });
 
             });
