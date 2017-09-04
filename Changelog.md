@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [UNRELEASED]
+### Fixed
+ - TextArea component in FormioSubmission directive
+
 ## 2.22.1
 ### Changed
  - Upgraded formio.js to 2.16.0
