@@ -48,6 +48,9 @@ module.exports = function(app) {
           if ($scope.component.wysiwyg) {
             return 'formio/componentsView/content.html';
           }
+          else if ($scope.submissionViewMode) {
+            return 'formio/element-view.html';
+          }
           else {
             return 'formio/components/textarea.html';
           }
