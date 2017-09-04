@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.22.1
+### Changed
+ - Upgraded formio.js to 2.16.0
+
+## 2.22.0
+### Fixed
+ - Fix submission message on update.
+ 
+### Changed
+ - Default phone number fields to have input type of "tel"
+ - Upgraded formio.js to 2.16.0 to add cookie fallback in old browsers.
+
+## 2.21.5
+### Changed
+ - Upgraded formio.js to 2.15.2
+
 ## 2.21.3
 ### Fixed
  - The download url for pdf to use the core javascript library.
