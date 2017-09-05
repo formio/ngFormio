@@ -73304,7 +73304,7 @@ module.exports = function(app) {
             return 'formio/componentsView/content.html';
           }
           else {
-            return 'formio/components/textarea.html';
+            return 'formio/element-view.html';
           }
         },
         viewController: [

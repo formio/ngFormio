@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [UNRELEASED]
 ### Fixed
+ - TextArea component in FormioSubmission directive.
  - Clearing value of the component which conditionally displayed from a Select component.
 
 ## 2.22.1
