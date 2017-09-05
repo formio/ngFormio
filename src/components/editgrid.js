@@ -67,7 +67,7 @@ module.exports = function(app) {
           templates: {
             header: '' +
               '<div class="row"> \n' +
-              '  {%components.forEach(function(component) { %} \n' +
+              '  {%util.eachComponent(components, function(component) { %} \n' +
               '    <div class="col-sm-2"> \n' +
               '      {{ component.label }} \n' +
               '    </div> \n' +
@@ -75,7 +75,7 @@ module.exports = function(app) {
               '</div>',
             row: '' +
               '<div class="row"> \n' +
-              '  {%components.forEach(function(component) { %} \n' +
+              '  {%util.eachComponent(components, function(component) { %} \n' +
               '    <div class="col-sm-2"> \n' +
               '      {{ row[component.key] }} \n' +
               '    </div> \n' +
@@ -93,6 +93,82 @@ module.exports = function(app) {
       });
     }
   ]);
+  app.directive('editgridValidation', function() {
+    return {
+      require: 'ngModel',
+      restrict: 'A',
+      link: function(scope, elem, attr, ctrl) {
+        if (scope.builder) return;
+
+        var _get = function(item, path, def) {
+          if (!item) {
+            return def || undefined;
+          }
+          if (!path) {
+            return item;
+          }
+
+          // If the path is a string, turn it into an array.
+          if (typeof path === 'string') {
+            path = path.split('.');
+          }
+          // If the path is an array, take the first element, and recurse its path
+          if (path instanceof Array) {
+            var current = path.shift();
+            if (item.hasOwnProperty(current)) {
+              // If there are no more path items, stop here.
+              if (path.length === 0) {
+                return item[current];
+              }
+
+              return _get(item[current], path);
+            }
+
+            return undefined;
+          }
+
+          return undefined;
+        };
+
+        ctrl.$validators.editgrid = function(modelValue, viewValue) {
+          var valid = true;
+          /*eslint-disable no-unused-vars */
+          if (scope.component.validate && scope.component.validate.row) {
+            var input = modelValue || viewValue;
+
+            // FOR-255 - Enable row data and form data to be visible in the validator.
+            var data = scope.submission.data;
+            var row = scope.data;
+            /*eslint-enable no-unused-vars */
+
+            var custom = scope.component.validate.row;
+            custom = custom.replace(/({{\s{0,}(.*[^\s]){1}\s{0,}}})/g, function(match, $1, $2) {
+              return _get(scope.submission.data, $2);
+            });
+
+            try {
+              /* jshint evil: true */
+              eval(custom);
+            }
+            catch (err) {
+              valid = err.message;
+            }
+
+            if (valid !== true) {
+              scope.component.editGridError = valid;
+              return false;
+            }
+          }
+
+          if (scope.openRows && scope.openRows.length) {
+            scope.component.editGridError = 'Please save all rows before proceeding.';
+            return false;
+          }
+          return true;
+        };
+      }
+    }
+  });
   app.directive('renderTemplate', function() {
     return {
       restrict: 'E',
@@ -134,10 +210,23 @@ module.exports = function(app) {
             $scope.templateData = {
               row: $scope.rowData,
               rowIndex: $scope.rowIndex,
-              components: $scope.component.components
+              components: $scope.component.components,
+              util: formioUtils
             };
           });
-          $scope.editDone = function() {
+          $scope.editDone = function(form) {
+            if (!form.$valid) {
+              form.$setDirty(true);
+              for (var key in form) {
+                if (form[key] && form[key].hasOwnProperty('$pristine')) {
+                  form[key].$setDirty(true);
+                }
+                if (form[key] && form[key].$validate) {
+                  form[key].$validate();
+                }
+              }
+              return;
+            }
             $scope.rows[$scope.rowIndex] = $scope.rowData;
             $scope.openRows.splice($scope.openRows.indexOf($scope.rowIndex), 1);
           }
@@ -169,24 +258,26 @@ module.exports = function(app) {
       '  <div class="edit-body {{component.rowClass}}">' +
       '    <div class="editgrid-edit">' +
       '      <div class="editgrid-body">' +
-      '        <formio-component' +
-      '          ng-repeat="col in component.components track by $index"' +
-      '          ng-init="colIndex = $index"' +
-      '          component="col"' +
-      '          data="rowData"' +
-      '          formio-form="formioForm"' +
-      '          formio="formio"' +
-      '          submission="submission"' +
-      '          hide-components="hideComponents"' +
-      '          ng-if="builder ? \'::true\' : isVisible(col, rowData)"' +
-      '          formio-form="formioForm"' +
-      '          read-only="isDisabled(col, rowData)"' +
-      '          grid-row="rowIndex"' +
-      '          grid-col="colIndex"' +
-      '          builder="builder"' +
-      '        />' +
+      '        <ng-form name="formioForm">' +
+      '          <formio-component' +
+      '            ng-repeat="col in component.components track by $index"' +
+      '            ng-init="colIndex = $index"' +
+      '            component="col"' +
+      '            data="rowData"' +
+      '            formio-form="formioForm"' +
+      '            formio="formio"' +
+      '            submission="submission"' +
+      '            hide-components="hideComponents"' +
+      '            ng-if="builder ? \'::true\' : isVisible(col, rowData)"' +
+      '            formio-form="formioForm"' +
+      '            read-only="isDisabled(col, rowData)"' +
+      '            grid-row="rowIndex"' +
+      '            grid-col="colIndex"' +
+      '            builder="builder"' +
+      '          />' +
+      '        </ng-form>' +
       '        <div class="editgrid-actions">' +
-      '          <div ng-click="editDone()" class="btn btn-primary">{{ component.saveRow || \'Save\' }}</div>' +
+      '          <div ng-click="editDone(formioForm)" class="btn btn-primary">{{ component.saveRow || \'Save\' }}</div>' +
       '          <div ng-if="component.removeRow" on-click="removeRow(rowIndex)" class="btn btn-danger">{{component.removeRow || \'Cancel\' }}</div>' +
       '        </div> ' +
       '      </div>' +
@@ -209,7 +300,8 @@ module.exports = function(app) {
       $scope.$watch('data.' + $scope.component.key, function() {
         $scope.headerData = {
           components: $scope.cols,
-          value: $scope.data[$scope.component.key]
+          value: $scope.data[$scope.component.key],
+          util: formioUtils
         };
       }, true);
 

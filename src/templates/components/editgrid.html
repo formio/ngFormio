@@ -1,4 +1,4 @@
-<ng-form name="{{ componentId }}" ng-model="data[component.key]" custom-validator="component.validate.custom">
+<ng-form name="{{ componentId }}" ng-model="data[component.key]" custom-validator="component.validate.custom" editgrid-validation>
   <label ng-if="component.label && !component.hideLabel" for="{{ component.key }}" class="control-label" ng-class="{'field-required': isRequired(component)}">{{ component.label | formioTranslate:null:builder }}</label>
   <div class="formio-data-grid" id="{{ component.key }}" ng-controller="formioEditGrid">
     <ul class="list-group">

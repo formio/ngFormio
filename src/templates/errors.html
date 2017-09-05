@@ -9,4 +9,5 @@
   <p class="help-block" ng-show="formioForm[componentId].$error.custom">{{ component.customError | formioTranslate }}</p>
   <p class="help-block" ng-show="formioForm[componentId].$error.pattern">{{ component.errorLabel || component.label || component.placeholder || component.key }} {{'does not match the pattern' | formioTranslate:null:builder}} {{ component.validate.pattern }}</p>
   <p class="help-block" ng-show="formioForm[componentId].$error.day">{{ component.errorLabel || component.label || component.placeholder || component.key }} {{'must be a valid date' | formioTranslate:null:builder}}.</p>
+  <p class="help-block" ng-show="formioForm[componentId].$error.editgrid">{{ component.editgridError | formioTranslate }}.</p>
 </div>
