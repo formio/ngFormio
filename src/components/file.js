@@ -110,7 +110,9 @@ module.exports = function(app) {
           $scope.getFile = function(evt) {
             evt.preventDefault();
             $scope.form = $scope.form || $rootScope.filePath;
-            var formio = new Formio($scope.form);
+            $scope.options = $scope.options || {};
+            var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
+            var formio = new Formio($scope.form, {base: baseUrl});
             formio
               .downloadFile($scope.file).then(function(file) {
                 if (file) {
@@ -149,7 +151,9 @@ module.exports = function(app) {
         ) {
           if ($scope.builder) return;
           $scope.form = $scope.form || $rootScope.filePath;
-          var formio = new Formio($scope.form);
+          $scope.options = $scope.options || {};
+          var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
+          var formio = new Formio($scope.form, {base: baseUrl});
           formio.downloadFile($scope.file)
             .then(function(result) {
               $scope.file.imageSrc = result.url;
@@ -174,17 +178,6 @@ module.exports = function(app) {
       $scope.removeUpload = function(index) {
         delete $scope.fileUploads[index];
       };
-
-      // This fixes new fields having an empty space in the array.
-      if ($scope.data && $scope.data[$scope.component.key] === '') {
-        $scope.data[$scope.component.key] = [];
-      }
-      if ($scope.data && $scope.data[$scope.component.key] === undefined) {
-        $scope.data[$scope.component.key] = [];
-      }
-      if ($scope.data && $scope.data[$scope.component.key] && $scope.data[$scope.component.key][0] === '') {
-        $scope.data[$scope.component.key].splice(0, 1);
-      }
 
       $scope.upload = function(files) {
         if ($scope.component.storage && files && files.length) {
@@ -217,21 +210,27 @@ module.exports = function(app) {
               }, $scope.component.url)
                 .then(function(fileInfo) {
                   delete $scope.fileUploads[fileName];
-                  // Ensure that the file component is an array.
-                  if (
-                    !$scope.data[$scope.component.key] ||
-                    !($scope.data[$scope.component.key] instanceof Array)
-                  ) {
+                  // This fixes new fields having an empty space in the array.
+                  if ($scope.data && $scope.data[$scope.component.key] === '') {
                     $scope.data[$scope.component.key] = [];
                   }
+                  if ($scope.data && $scope.data[$scope.component.key] === undefined) {
+                    $scope.data[$scope.component.key] = [];
+                  }
+                  if (!$scope.data[$scope.component.key] || !($scope.data[$scope.component.key] instanceof Array)) {
+                    $scope.data[$scope.component.key] = [];
+                  }
+
                   $scope.data[$scope.component.key].push(fileInfo);
                   $scope.$apply();
+                  $scope.$emit('fileUploaded', fileName, fileInfo);
                 })
                 .catch(function(response) {
                   $scope.fileUploads[fileName].status = 'error';
                   $scope.fileUploads[fileName].message = response.data;
                   delete $scope.fileUploads[fileName].progress;
                   $scope.$apply();
+                  $scope.$emit('fileUploadFailed', fileName, response);
                 });
             }
           });

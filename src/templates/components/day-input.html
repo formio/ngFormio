@@ -3,7 +3,7 @@
     <label for="{{componentId}}-day" ng-class="{'field-required': component.fields.day.required}">{{ "Day" | formioTranslate:null:builder }}</label>
     <input
       class="form-control"
-      type="text"
+      type="number"
       id="{{componentId}}-day"
       ng-model="date.day"
       ng-change="onChange()"
@@ -11,8 +11,8 @@
       ng-attr-placeholder="{{component.fields.day.placeholder}}"
       day-part
       characters="2"
-      min="0"
-      max="31"
+      min="1"
+      max="{{maxDay}}"
       ng-disabled="readOnly"
     />
   </div>
@@ -32,7 +32,7 @@
     <label for="{{componentId}}-day" ng-class="{'field-required': component.fields.day.required}">{{ "Day" | formioTranslate:null:builder }}</label>
     <input
       class="form-control"
-      type="text"
+      type="number"
       id="{{componentId}}-day1"
       ng-model="date.day"
       ng-change="onChange()"
@@ -40,8 +40,8 @@
       ng-attr-placeholder="{{component.fields.day.placeholder}}"
       day-part
       characters="2"
-      min="0"
-      max="31"
+      min="1"
+      max="{{maxDay}}"
       ng-disabled="readOnly"
     />
   </div>
@@ -49,7 +49,7 @@
     <label for="{{componentId}}-year" ng-class="{'field-required': component.fields.year.required}">{{ "Year" | formioTranslate:null:builder }}</label>
     <input
       class="form-control"
-      type="text"
+      type="number"
       id="{{componentId}}-year"
       ng-model="date.year"
       ng-change="onChange()"

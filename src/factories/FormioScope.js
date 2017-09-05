@@ -111,8 +111,9 @@ module.exports = [
           }, this.onError($scope));
         }.bind(this);
 
+        var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
         if ($scope._src) {
-          loader = new Formio($scope._src);
+          loader = new Formio($scope._src, {base: baseUrl});
           if (options.form) {
             $scope.setLoading(true);
 
@@ -152,7 +153,7 @@ module.exports = [
         else {
           // If they provide a url to the form, we still need to create it but tell it to not submit.
           if ($scope.url) {
-            loader = new Formio($scope.url);
+            loader = new Formio($scope.url, {base: baseUrl});
             loader.noSubmit = true;
           }
 

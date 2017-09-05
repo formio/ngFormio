@@ -5,7 +5,130 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [UNRELEASED]
+### Fixed
+ - TextArea component in FormioSubmission directive.
+ - Clearing value of the component which conditionally displayed from a Select component.
+
+## 2.22.1
+### Changed
+ - Upgraded formio.js to 2.16.0
+
+## 2.22.0
+### Fixed
+ - Fix submission message on update.
+ 
+### Changed
+ - Default phone number fields to have input type of "tel"
+ - Upgraded formio.js to 2.16.0 to add cookie fallback in old browsers.
+
+## 2.21.5
+### Changed
+ - Upgraded formio.js to 2.15.2
+
+## 2.21.3
+### Fixed
+ - The download url for pdf to use the core javascript library.
+ - Fixed crash in FormioUtils each error handling assigning property to a string
+ - Search and filter for Select component.
+
+## 2.21.2
+### Fixed
+ - Issues with number/floats not parsing correctly.
+ - The PDF download button to hit the correct api.
+
 ### Added
+ - Support submission of form components which are not in wizard panels
+ - Submit subforms on the page when wizard's Previous button is clicked
+
+## 2.21.1
+### Added
+ - Error labels to show when an error has occured.
+
+### Fixed
+ - Errors with required file uploads.
+ - The file upload not showing the error messages.
+ - File uploads not working within wizards that pass the url to the directive.
+ - Issue with clearOnHide flag not setting properly on container components.
+
+## 2.20.18
+### Changed
+ - Upgraded formio.js to 2.13.2
+
+## 2.20.17
+### Fixed
+ - Some select urls were being double encoded.
+
+## 2.20.16
+### Changed
+ - Upgraded all dependencies.
+
+## 2.20.15
+### Fixed
+ - An issue where the Signature component would send an undefined URL request.
+ - Issue where FormioUtils.hasCondition was not defined for wizard forms.
+
+## 2.20.14
+### Added
+ - A way to change the submit message with a form json configuration.
+
+### Changed
+ - Upgrade formiojs to 2.13.1
+
+### Fixed
+ - Issue with custom code execution for buttons within other components.
+
+## 2.20.13
+
+### Fixed
+ - Problem where if you would change the source of Select to resource it would crash the preview.
+ - Issue where checkbox validation errors would not highlight the checkbox field.
+ - An issue where JSON Logic conditionals were not getting triggered for multi-page forms.
+
+## 2.20.12
+## 2.20.11
+## 2.20.10
+## 2.20.9
+## 2.20.8
+
+ - No release to synchronize versions with form builder library.
+
+## 2.20.7
+## 2.20.6
+## 2.20.5
+
+### Fixed
+ - Columns components hiding if width is not set.
+ - Hide form alert on valid form.
+ - Fixed issue with required file uploads not enforcing a file upload.
+ - Display issue for the survey component.
+ - Removed the $hashKey from the form submission.
+ 
+### Added
+ - Custom javascript logic to execute on button click.
+ - Take initial values for resource component search from URL
+ - Emit events on File component upload success or failure
+
+## 2.20.4
+### Fixed
+ - An error that would show up if $scope.options was not defined.
+
+## 2.20.3
+### Fixed
+ - The submission view for text area with wysiwyg.
+
+## 2.20.2
+--- SAME AS 2.19.7: Released to sync with form builder library. ---
+
+## 2.19.7
+### Fixed
+ - Day component.
+ - Dependencies for the wysiwyg component.
+ - Issue where a reset form would not set the form to pristine again.
+ - Fixed the readOnly display of wysiwyg text areas to show the html content.
+
+## 2.19.6
+### Added
+ - Allow passing in a baseUrl for forms on a different path.
  - Time component.
 
 ## 2.19.5

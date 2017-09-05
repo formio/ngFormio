@@ -21,6 +21,7 @@
           grid-row="rowIndex"
           grid-col="colIndex"
           builder="builder"
+          options="options"
         ></formio-component>
       </td>
       <td ng-if="!component.hasOwnProperty('validate') || !component.validate.hasOwnProperty('minLength') || rows.length > component.validate.minLength">

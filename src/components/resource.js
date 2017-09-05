@@ -15,28 +15,30 @@ module.exports = function(app) {
         template: function($scope) {
           return $scope.component.multiple ? 'formio/components/resource-multiple.html' : 'formio/components/resource.html';
         },
-        controller: ['$scope', 'Formio', 'ngDialog', function($scope, Formio, ngDialog) {
+        controller: ['$scope', 'Formio', 'ngDialog', '$location', function($scope, Formio, ngDialog, $location) {
           if ($scope.builder) return;
           var settings = $scope.component;
           var params = settings.params || {};
           $scope.selectItems = [];
           $scope.hasNextPage = false;
           $scope.resourceLoading = false;
+          $scope.options = $scope.options || {};
           params.limit = 100;
           params.skip = 0;
           if (settings.multiple) {
             settings.defaultValue = [];
           }
           if (settings.resource) {
-            var url = '';
+            var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
+            var url = baseUrl;
             if (settings.project) {
               url += '/project/' + settings.project;
             }
             else if ($scope.formio && $scope.formio.projectUrl) {
-              url += $scope.formio.projectUrl;
+              url  = $scope.formio.projectUrl;
             }
             url += '/form/' + settings.resource;
-            var formio = new Formio(url);
+            var formio = new Formio(url, {base: baseUrl});
 
             // Refresh the items.
             $scope.refreshSubmissions = function(input, append) {
@@ -44,14 +46,38 @@ module.exports = function(app) {
                 return;
               }
               $scope.resourceLoading = true;
+
               // If they wish to return only some fields.
               if (settings.selectFields) {
                 params.select = settings.selectFields;
               }
+
+              // If they wish to return only some submissions.
+              var makeSelection = false;
               if (settings.searchFields && input) {
                 angular.forEach(settings.searchFields, function(field) {
-                  params[field] = input;
+                  if (field === '_id') {
+                    delete params[field];
+                  }
+                  else {
+                    params[field] = input;
+                  }
                 });
+              }
+              else if (settings.searchFields && input === undefined) {
+                var search = $location.search();
+                angular.forEach(settings.searchFields, function(field) {
+                  var key = $scope.component.key + '.' + field;
+                  if (search[key]) {
+                    params[field] = search[key];
+                    makeSelection = true;
+                  }
+                });
+              }
+
+              // If not loading more then start from the beginning.
+              if (!append) {
+                params.skip = 0;
               }
 
               // Load the submissions.
@@ -64,6 +90,17 @@ module.exports = function(app) {
                 }
                 else {
                   $scope.selectItems = submissions;
+                  // If only one choice then select it.
+                  if (makeSelection && submissions.length === 1) {
+                    var component = $scope.component;
+                    var data      = $scope.data;
+                    if (component.multiple) {
+                      data[component.key] = submissions;
+                    }
+                    else {
+                      data[component.key] = submissions[0];
+                    }
+                  }
                 }
                 $scope.hasNextPage = (submissions.length >= params.limit) && ($scope.selectItems.length < submissions.serverCount);
               })['finally'](function() {
@@ -121,7 +158,7 @@ module.exports = function(app) {
                       data[component.key] = submission;
                     }
 
-                    $scope.refreshSubmissions();
+                    $scope.refreshSubmissions(null);
                     $scope.closeThisDialog(submission);
                   });
                 }]

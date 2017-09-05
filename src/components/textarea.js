@@ -36,8 +36,44 @@ module.exports = function(app) {
             }
             return 'formio/components/texteditor.html';
           }
+          if ($scope.readOnly && $scope.component.wysiwyg) {
+            return 'formio/componentsView/content.html';
+          }
+          if (!$scope.readOnly && $scope.component.editorComponents) {
+            return 'formio/components/scripteditor.html';
+          }
           return 'formio/components/textarea.html';
         },
+        viewTemplate: function($scope) {
+          if ($scope.component.wysiwyg) {
+            return 'formio/componentsView/content.html';
+          }
+          else {
+            return 'formio/element-view.html';
+          }
+        },
+        viewController: [
+          '$scope',
+          '$sanitize',
+          function($scope, $sanitize) {
+            if ($scope.component.wysiwyg) {
+              $scope.$watch('data.' + $scope.component.key, function() {
+                $scope.html = $sanitize($scope.data[$scope.component.key]);
+              });
+            }
+          }
+        ],
+        controller: [
+          '$scope',
+          '$sanitize',
+          function($scope, $sanitize) {
+            if ($scope.readOnly && $scope.component.wysiwyg) {
+              $scope.$watch('data.' + $scope.component.key, function() {
+                $scope.html = $sanitize($scope.data[$scope.component.key]);
+              });
+            }
+          }
+        ],
         settings: {
           input: true,
           tableView: true,
@@ -73,8 +109,14 @@ module.exports = function(app) {
       $templateCache.put('formio/components/textarea.html', FormioUtils.fieldWrap(
         fs.readFileSync(__dirname + '/../templates/components/textarea.html', 'utf8')
       ));
+      $templateCache.put('formio/componentsView/content.html', FormioUtils.fieldWrap(
+        fs.readFileSync(__dirname + '/../templates/componentsView/content.html', 'utf8')
+      ));
       $templateCache.put('formio/components/texteditor.html', FormioUtils.fieldWrap(
         fs.readFileSync(__dirname + '/../templates/components/texteditor.html', 'utf8')
+      ));
+      $templateCache.put('formio/components/scripteditor.html', FormioUtils.fieldWrap(
+        fs.readFileSync(__dirname + '/../templates/components/scripteditor.html', 'utf8')
       ));
     }
   ]);

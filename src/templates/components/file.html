@@ -1,8 +1,9 @@
 <label ng-if="component.label && !component.hideLabel" for="{{ componentId }}" class="control-label" ng-class="{'field-required': isRequired(component)}">{{ component.label | formioTranslate:null:builder }}</label>
 <span ng-if="!component.label && isRequired(component)" class="glyphicon glyphicon-asterisk form-control-feedback field-required-inline" aria-hidden="true"></span>
+<div class="formio-errors"><formio-errors ng-if="::!builder"></formio-errors></div>
 <div ng-controller="formioFileUpload">
-  <formio-file-list files="data[component.key]" form="formio.formUrl" ng-if="!component.image"></formio-file-list>
-  <formio-image-list files="data[component.key]" form="formio.formUrl" width="component.imageSize" ng-if="component.image"></formio-image-list>
+  <formio-file-list files="data[component.key]" form="formio.formUrl" ng-if="!component.image" ng-required="isRequired(component)" ng-model="data[component.key]" name="{{ componentId }}"></formio-file-list>
+  <formio-image-list files="data[component.key]" form="formio.formUrl" width="component.imageSize" ng-if="component.image" ng-required="isRequired(component)" ng-model="data[component.key]" name="{{ componentId }}"></formio-image-list>
   <div ng-if="!readOnly && (component.multiple || (!component.multiple && !data[component.key].length))">
     <div ngf-drop="upload($files)" class="fileSelector" ngf-drag-over-class="'fileDragOver'" ngf-multiple="component.multiple" id="{{ componentId }}" name="{{ componentId }}"><span class="glyphicon glyphicon-cloud-upload"></span>Drop files to attach, or <a style="cursor: pointer;" ngf-select="upload($files)" tabindex="{{ component.tabindex || 0 }}" ngf-multiple="component.multiple">browse</a>.</div>
     <div ng-if="!component.storage" class="alert alert-warning">No storage has been set for this field. File uploads are disabled until storage is set up.</div>

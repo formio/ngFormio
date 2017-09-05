@@ -1,5 +1,160 @@
-/*! ng-formio v2.19.6 | https://unpkg.com/ng-formio@2.19.6/LICENSE.txt */
+/*! ng-formio v2.22.1 | https://unpkg.com/ng-formio@2.22.1/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
+(function (root, factory) {
+  // AMD
+  if (typeof define === 'function' && define.amd) define(['angular'], factory);
+  // Global
+  else factory(angular);
+}(this, function (angular) {
+
+  angular
+  .module('ckeditor', [])
+  .directive('ckeditor', ['$parse', ckeditorDirective]);
+
+  // Polyfill setImmediate function.
+  var setImmediate = window && window.setImmediate ? window.setImmediate : function (fn) {
+    setTimeout(fn, 0);
+  };
+
+  /**
+   * CKEditor directive.
+   *
+   * @example
+   * <div ckeditor="options" ng-model="content" ready="onReady()"></div>
+   */
+
+  function ckeditorDirective($parse) {
+    return {
+      restrict: 'A',
+      require: ['ckeditor', 'ngModel'],
+      controller: [
+        '$scope',
+        '$element',
+        '$attrs',
+        '$parse',
+        '$q',
+        ckeditorController
+      ],
+      link: function (scope, element, attrs, ctrls) {
+        // get needed controllers
+        var controller = ctrls[0]; // our own, see below
+        var ngModelController = ctrls[1];
+
+        // Initialize the editor content when it is ready.
+        controller.ready().then(function initialize() {
+          // Sync view on specific events.
+          ['dataReady', 'change', 'blur', 'saveSnapshot'].forEach(function (event) {
+            controller.onCKEvent(event, function syncView() {
+              ngModelController.$setViewValue(controller.instance.getData() || '');
+            });
+          });
+
+          controller.instance.setReadOnly(!! attrs.readonly);
+          attrs.$observe('readonly', function (readonly) {
+            controller.instance.setReadOnly(!! readonly);
+          });
+
+          // Defer the ready handler calling to ensure that the editor is
+          // completely ready and populated with data.
+          setImmediate(function () {
+            $parse(attrs.ready)(scope);
+          });
+        });
+
+        // Set editor data when view data change.
+        ngModelController.$render = function syncEditor() {
+          controller.ready().then(function () {
+            // "noSnapshot" prevent recording an undo snapshot
+            controller.instance.setData(ngModelController.$viewValue || '', {
+              noSnapshot: true,
+              callback: function () {
+                // Amends the top of the undo stack with the current DOM changes
+                // ie: merge snapshot with the first empty one
+                // http://docs.ckeditor.com/#!/api/CKEDITOR.editor-event-updateSnapshot
+                controller.instance.fire('updateSnapshot');
+              }
+            });
+          });
+        };
+      }
+    };
+  }
+
+  /**
+   * CKEditor controller.
+   */
+
+  function ckeditorController($scope, $element, $attrs, $parse, $q) {
+    var config = $parse($attrs.ckeditor)($scope) || {};
+    var editorElement = $element[0];
+    var instance;
+    var readyDeferred = $q.defer(); // a deferred to be resolved when the editor is ready
+
+    // Create editor instance.
+    if (editorElement.hasAttribute('contenteditable') &&
+        editorElement.getAttribute('contenteditable').toLowerCase() == 'true') {
+      instance = this.instance = CKEDITOR.inline(editorElement, config);
+    }
+    else {
+      instance = this.instance = CKEDITOR.replace(editorElement, config);
+    }
+
+    /**
+     * Listen on events of a given type.
+     * This make all event asynchronous and wrapped in $scope.$apply.
+     *
+     * @param {String} event
+     * @param {Function} listener
+     * @returns {Function} Deregistration function for this listener.
+     */
+
+    this.onCKEvent = function (event, listener) {
+      instance.on(event, asyncListener);
+
+      function asyncListener() {
+        var args = arguments;
+        setImmediate(function () {
+          applyListener.apply(null, args);
+        });
+      }
+
+      function applyListener() {
+        var args = arguments;
+        $scope.$apply(function () {
+          listener.apply(null, args);
+        });
+      }
+
+      // Return the deregistration function
+      return function $off() {
+        instance.removeListener(event, applyListener);
+      };
+    };
+
+    this.onCKEvent('instanceReady', function() {
+      readyDeferred.resolve(true);
+    });
+
+    /**
+     * Check if the editor if ready.
+     *
+     * @returns {Promise}
+     */
+    this.ready = function ready() {
+      return readyDeferred.promise;
+    };
+
+    // Destroy editor when the scope is destroyed.
+    $scope.$on('$destroy', function onDestroy() {
+      // do not delete too fast or pending events will throw errors
+      readyDeferred.promise.then(function() {
+        instance.destroy(false);
+      });
+    });
+  }
+}));
+
+},{}],2:[function(_dereq_,module,exports){
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -602,7 +757,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ ])
 });
 ;
-},{}],2:[function(_dereq_,module,exports){
+},{}],3:[function(_dereq_,module,exports){
 (function (global){
 /* angular-moment.js / v1.0.1 / (c) 2013, 2014, 2015, 2016 Uri Shaked / MIT Licence */
 
@@ -1343,9 +1498,9 @@ return /******/ (function(modules) { // webpackBootstrap
 })();
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"angular":9,"moment":204}],3:[function(_dereq_,module,exports){
+},{"angular":11,"moment":244}],4:[function(_dereq_,module,exports){
 /**
- * @license AngularJS v1.6.4
+ * @license AngularJS v1.6.6
  * (c) 2010-2017 Google, Inc. http://angularjs.org
  * License: MIT
  */
@@ -1664,27 +1819,78 @@ function $SanitizeProvider() {
     return obj;
   }
 
-  var inertBodyElement;
-  (function(window) {
-    var doc;
-    if (window.document && window.document.implementation) {
-      doc = window.document.implementation.createHTMLDocument('inert');
+  /**
+   * Create an inert document that contains the dirty HTML that needs sanitizing
+   * Depending upon browser support we use one of three strategies for doing this.
+   * Support: Safari 10.x -> XHR strategy
+   * Support: Firefox -> DomParser strategy
+   */
+  var getInertBodyElement /* function(html: string): HTMLBodyElement */ = (function(window, document) {
+    var inertDocument;
+    if (document && document.implementation) {
+      inertDocument = document.implementation.createHTMLDocument('inert');
     } else {
       throw $sanitizeMinErr('noinert', 'Can\'t create an inert html document');
     }
-    var docElement = doc.documentElement || doc.getDocumentElement();
-    var bodyElements = docElement.getElementsByTagName('body');
+    var inertBodyElement = (inertDocument.documentElement || inertDocument.getDocumentElement()).querySelector('body');
 
-    // usually there should be only one body element in the document, but IE doesn't have any, so we need to create one
-    if (bodyElements.length === 1) {
-      inertBodyElement = bodyElements[0];
+    // Check for the Safari 10.1 bug - which allows JS to run inside the SVG G element
+    inertBodyElement.innerHTML = '<svg><g onload="this.parentNode.remove()"></g></svg>';
+    if (!inertBodyElement.querySelector('svg')) {
+      return getInertBodyElement_XHR;
     } else {
-      var html = doc.createElement('html');
-      inertBodyElement = doc.createElement('body');
-      html.appendChild(inertBodyElement);
-      doc.appendChild(html);
+      // Check for the Firefox bug - which prevents the inner img JS from being sanitized
+      inertBodyElement.innerHTML = '<svg><p><style><img src="</style><img src=x onerror=alert(1)//">';
+      if (inertBodyElement.querySelector('svg img')) {
+        return getInertBodyElement_DOMParser;
+      } else {
+        return getInertBodyElement_InertDocument;
+      }
     }
-  })(window);
+
+    function getInertBodyElement_XHR(html) {
+      // We add this dummy element to ensure that the rest of the content is parsed as expected
+      // e.g. leading whitespace is maintained and tags like `<meta>` do not get hoisted to the `<head>` tag.
+      html = '<remove></remove>' + html;
+      try {
+        html = encodeURI(html);
+      } catch (e) {
+        return undefined;
+      }
+      var xhr = new window.XMLHttpRequest();
+      xhr.responseType = 'document';
+      xhr.open('GET', 'data:text/html;charset=utf-8,' + html, false);
+      xhr.send(null);
+      var body = xhr.response.body;
+      body.firstChild.remove();
+      return body;
+    }
+
+    function getInertBodyElement_DOMParser(html) {
+      // We add this dummy element to ensure that the rest of the content is parsed as expected
+      // e.g. leading whitespace is maintained and tags like `<meta>` do not get hoisted to the `<head>` tag.
+      html = '<remove></remove>' + html;
+      try {
+        var body = new window.DOMParser().parseFromString(html, 'text/html').body;
+        body.firstChild.remove();
+        return body;
+      } catch (e) {
+        return undefined;
+      }
+    }
+
+    function getInertBodyElement_InertDocument(html) {
+      inertBodyElement.innerHTML = html;
+
+      // Support: IE 9-11 only
+      // strip custom-namespaced attributes on IE<=11
+      if (document.documentMode) {
+        stripCustomNsAttrs(inertBodyElement);
+      }
+
+      return inertBodyElement;
+    }
+  })(window, window.document);
 
   /**
    * @example
@@ -1704,7 +1910,9 @@ function $SanitizeProvider() {
     } else if (typeof html !== 'string') {
       html = '' + html;
     }
-    inertBodyElement.innerHTML = html;
+
+    var inertBodyElement = getInertBodyElement(html);
+    if (!inertBodyElement) return '';
 
     //mXSS protection
     var mXSSAttempts = 5;
@@ -1714,12 +1922,9 @@ function $SanitizeProvider() {
       }
       mXSSAttempts--;
 
-      // strip custom-namespaced attributes on IE<=11
-      if (window.document.documentMode) {
-        stripCustomNsAttrs(inertBodyElement);
-      }
-      html = inertBodyElement.innerHTML; //trigger mXSS
-      inertBodyElement.innerHTML = html;
+      // trigger mXSS if it is going to happen by reading and writing the innerHTML
+      html = inertBodyElement.innerHTML;
+      inertBodyElement = getInertBodyElement(html);
     } while (html !== inertBodyElement.innerHTML);
 
     var node = inertBodyElement.firstChild;
@@ -1900,7 +2105,7 @@ function sanitizeText(chars) {
 // define ngSanitize module and register $sanitize service
 angular.module('ngSanitize', [])
   .provider('$sanitize', $SanitizeProvider)
-  .info({ angularVersion: '1.6.4' });
+  .info({ angularVersion: '1.6.6' });
 
 /**
  * @ngdoc filter
@@ -2101,11 +2306,341 @@ angular.module('ngSanitize').filter('linky', ['$sanitize', function($sanitize) {
 
 })(window, window.angular);
 
-},{}],4:[function(_dereq_,module,exports){
+},{}],5:[function(_dereq_,module,exports){
 _dereq_('./angular-sanitize');
 module.exports = 'ngSanitize';
 
-},{"./angular-sanitize":3}],5:[function(_dereq_,module,exports){
+},{"./angular-sanitize":4}],6:[function(_dereq_,module,exports){
+'use strict';
+
+/**
+ * Binds a ACE Editor widget
+ */
+angular.module('ui.ace', [])
+  .constant('uiAceConfig', {})
+  .directive('uiAce', ['uiAceConfig', function (uiAceConfig) {
+
+    if (angular.isUndefined(window.ace)) {
+      throw new Error('ui-ace need ace to work... (o rly?)');
+    }
+
+    /**
+     * Sets editor options such as the wrapping mode or the syntax checker.
+     *
+     * The supported options are:
+     *
+     *   <ul>
+     *     <li>showGutter</li>
+     *     <li>useWrapMode</li>
+     *     <li>onLoad</li>
+     *     <li>theme</li>
+     *     <li>mode</li>
+     *   </ul>
+     *
+     * @param acee
+     * @param session ACE editor session
+     * @param {object} opts Options to be set
+     */
+    var setOptions = function(acee, session, opts) {
+
+      // sets the ace worker path, if running from concatenated
+      // or minified source
+      if (angular.isDefined(opts.workerPath)) {
+        var config = window.ace.require('ace/config');
+        config.set('workerPath', opts.workerPath);
+      }
+      // ace requires loading
+      if (angular.isDefined(opts.require)) {
+        opts.require.forEach(function (n) {
+            window.ace.require(n);
+        });
+      }
+      // Boolean options
+      if (angular.isDefined(opts.showGutter)) {
+        acee.renderer.setShowGutter(opts.showGutter);
+      }
+      if (angular.isDefined(opts.useWrapMode)) {
+        session.setUseWrapMode(opts.useWrapMode);
+      }
+      if (angular.isDefined(opts.showInvisibles)) {
+        acee.renderer.setShowInvisibles(opts.showInvisibles);
+      }
+      if (angular.isDefined(opts.showIndentGuides)) {
+        acee.renderer.setDisplayIndentGuides(opts.showIndentGuides);
+      }
+      if (angular.isDefined(opts.useSoftTabs)) {
+        session.setUseSoftTabs(opts.useSoftTabs);
+      }
+      if (angular.isDefined(opts.showPrintMargin)) {
+        acee.setShowPrintMargin(opts.showPrintMargin);
+      }
+
+      // commands
+      if (angular.isDefined(opts.disableSearch) && opts.disableSearch) {
+        acee.commands.addCommands([
+          {
+            name: 'unfind',
+            bindKey: {
+              win: 'Ctrl-F',
+              mac: 'Command-F'
+            },
+            exec: function () {
+              return false;
+            },
+            readOnly: true
+          }
+        ]);
+      }
+
+      // Basic options
+      if (angular.isString(opts.theme)) {
+        acee.setTheme('ace/theme/' + opts.theme);
+      }
+      if (angular.isString(opts.mode)) {
+        session.setMode('ace/mode/' + opts.mode);
+      }
+      // Advanced options
+      if (angular.isDefined(opts.firstLineNumber)) {
+        if (angular.isNumber(opts.firstLineNumber)) {
+          session.setOption('firstLineNumber', opts.firstLineNumber);
+        } else if (angular.isFunction(opts.firstLineNumber)) {
+          session.setOption('firstLineNumber', opts.firstLineNumber());
+        }
+      }
+
+      // advanced options
+      var key, obj;
+      if (angular.isDefined(opts.advanced)) {
+          for (key in opts.advanced) {
+              // create a javascript object with the key and value
+              obj = { name: key, value: opts.advanced[key] };
+              // try to assign the option to the ace editor
+              acee.setOption(obj.name, obj.value);
+          }
+      }
+
+      // advanced options for the renderer
+      if (angular.isDefined(opts.rendererOptions)) {
+          for (key in opts.rendererOptions) {
+              // create a javascript object with the key and value
+              obj = { name: key, value: opts.rendererOptions[key] };
+              // try to assign the option to the ace editor
+              acee.renderer.setOption(obj.name, obj.value);
+          }
+      }
+
+      // onLoad callbacks
+      angular.forEach(opts.callbacks, function (cb) {
+        if (angular.isFunction(cb)) {
+          cb(acee);
+        }
+      });
+    };
+
+    return {
+      restrict: 'EA',
+      require: '?ngModel',
+      link: function (scope, elm, attrs, ngModel) {
+
+        /**
+         * Corresponds the uiAceConfig ACE configuration.
+         * @type object
+         */
+        var options = uiAceConfig.ace || {};
+
+        /**
+         * uiAceConfig merged with user options via json in attribute or data binding
+         * @type object
+         */
+        var opts = angular.extend({}, options, scope.$eval(attrs.uiAce));
+
+        /**
+         * ACE editor
+         * @type object
+         */
+        var acee = window.ace.edit(elm[0]);
+
+        /**
+         * ACE editor session.
+         * @type object
+         * @see [EditSession]{@link http://ace.c9.io/#nav=api&api=edit_session}
+         */
+        var session = acee.getSession();
+
+        /**
+         * Reference to a change listener created by the listener factory.
+         * @function
+         * @see listenerFactory.onChange
+         */
+        var onChangeListener;
+
+        /**
+         * Reference to a blur listener created by the listener factory.
+         * @function
+         * @see listenerFactory.onBlur
+         */
+        var onBlurListener;
+
+        /**
+         * Calls a callback by checking its existing. The argument list
+         * is variable and thus this function is relying on the arguments
+         * object.
+         * @throws {Error} If the callback isn't a function
+         */
+        var executeUserCallback = function () {
+
+          /**
+           * The callback function grabbed from the array-like arguments
+           * object. The first argument should always be the callback.
+           *
+           * @see [arguments]{@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions_and_function_scope/arguments}
+           * @type {*}
+           */
+          var callback = arguments[0];
+
+          /**
+           * Arguments to be passed to the callback. These are taken
+           * from the array-like arguments object. The first argument
+           * is stripped because that should be the callback function.
+           *
+           * @see [arguments]{@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions_and_function_scope/arguments}
+           * @type {Array}
+           */
+          var args = Array.prototype.slice.call(arguments, 1);
+
+          if (angular.isDefined(callback)) {
+            scope.$evalAsync(function () {
+              if (angular.isFunction(callback)) {
+                callback(args);
+              } else {
+                throw new Error('ui-ace use a function as callback.');
+              }
+            });
+          }
+        };
+
+        /**
+         * Listener factory. Until now only change listeners can be created.
+         * @type object
+         */
+        var listenerFactory = {
+          /**
+           * Creates a change listener which propagates the change event
+           * and the editor session to the callback from the user option
+           * onChange. It might be exchanged during runtime, if this
+           * happens the old listener will be unbound.
+           *
+           * @param callback callback function defined in the user options
+           * @see onChangeListener
+           */
+          onChange: function (callback) {
+            return function (e) {
+              var newValue = session.getValue();
+
+              if (ngModel && newValue !== ngModel.$viewValue &&
+                  // HACK make sure to only trigger the apply outside of the
+                  // digest loop 'cause ACE is actually using this callback
+                  // for any text transformation !
+                  !scope.$$phase && !scope.$root.$$phase) {
+                scope.$evalAsync(function () {
+                  ngModel.$setViewValue(newValue);
+                });
+              }
+
+              executeUserCallback(callback, e, acee);
+            };
+          },
+          /**
+           * Creates a blur listener which propagates the editor session
+           * to the callback from the user option onBlur. It might be
+           * exchanged during runtime, if this happens the old listener
+           * will be unbound.
+           *
+           * @param callback callback function defined in the user options
+           * @see onBlurListener
+           */
+          onBlur: function (callback) {
+            return function () {
+              executeUserCallback(callback, acee);
+            };
+          }
+        };
+
+        attrs.$observe('readonly', function (value) {
+          acee.setReadOnly(!!value || value === '');
+        });
+
+        // Value Blind
+        if (ngModel) {
+          ngModel.$formatters.push(function (value) {
+            if (angular.isUndefined(value) || value === null) {
+              return '';
+            }
+            else if (angular.isObject(value) || angular.isArray(value)) {
+              throw new Error('ui-ace cannot use an object or an array as a model');
+            }
+            return value;
+          });
+
+          ngModel.$render = function () {
+            session.setValue(ngModel.$viewValue);
+          };
+        }
+
+        // Listen for option updates
+        var updateOptions = function (current, previous) {
+          if (current === previous) return;
+          opts = angular.extend({}, options, scope.$eval(attrs.uiAce));
+
+          opts.callbacks = [ opts.onLoad ];
+          if (opts.onLoad !== options.onLoad) {
+            // also call the global onLoad handler
+            opts.callbacks.unshift(options.onLoad);
+          }
+
+          // EVENTS
+
+          // unbind old change listener
+          session.removeListener('change', onChangeListener);
+
+          // bind new change listener
+          onChangeListener = listenerFactory.onChange(opts.onChange);
+          session.on('change', onChangeListener);
+
+          // unbind old blur listener
+          //session.removeListener('blur', onBlurListener);
+          acee.removeListener('blur', onBlurListener);
+
+          // bind new blur listener
+          onBlurListener = listenerFactory.onBlur(opts.onBlur);
+          acee.on('blur', onBlurListener);
+
+          setOptions(acee, session, opts);
+        };
+
+        scope.$watch(attrs.uiAce, updateOptions, /* deep watch */ true);
+
+        // set the options here, even if we try to watch later, if this
+        // line is missing things go wrong (and the tests will also fail)
+        updateOptions(options);
+
+        elm.on('$destroy', function () {
+          acee.session.$stopWorker();
+          acee.destroy();
+        });
+
+        scope.$watch(function() {
+          return [elm[0].offsetWidth, elm[0].offsetHeight];
+        }, function() {
+          acee.resize();
+          acee.renderer.updateFull();
+        }, true);
+
+      }
+    };
+  }]);
+
+},{}],7:[function(_dereq_,module,exports){
 /*
  * angular-ui-bootstrap
  * http://angular-ui.github.io/bootstrap/
@@ -9882,12 +10417,12 @@ angular.module('ui.bootstrap.datepickerPopup').run(function() {!angular.$$csp().
 angular.module('ui.bootstrap.tooltip').run(function() {!angular.$$csp().noInlineStyle && !angular.$$uibTooltipCss && angular.element(document).find('head').prepend('<style type="text/css">[uib-tooltip-popup].tooltip.top-left > .tooltip-arrow,[uib-tooltip-popup].tooltip.top-right > .tooltip-arrow,[uib-tooltip-popup].tooltip.bottom-left > .tooltip-arrow,[uib-tooltip-popup].tooltip.bottom-right > .tooltip-arrow,[uib-tooltip-popup].tooltip.left-top > .tooltip-arrow,[uib-tooltip-popup].tooltip.left-bottom > .tooltip-arrow,[uib-tooltip-popup].tooltip.right-top > .tooltip-arrow,[uib-tooltip-popup].tooltip.right-bottom > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.top-left > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.top-right > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.bottom-left > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.bottom-right > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.left-top > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.left-bottom > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.right-top > .tooltip-arrow,[uib-tooltip-html-popup].tooltip.right-bottom > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.top-left > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.top-right > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.bottom-left > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.bottom-right > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.left-top > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.left-bottom > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.right-top > .tooltip-arrow,[uib-tooltip-template-popup].tooltip.right-bottom > .tooltip-arrow,[uib-popover-popup].popover.top-left > .arrow,[uib-popover-popup].popover.top-right > .arrow,[uib-popover-popup].popover.bottom-left > .arrow,[uib-popover-popup].popover.bottom-right > .arrow,[uib-popover-popup].popover.left-top > .arrow,[uib-popover-popup].popover.left-bottom > .arrow,[uib-popover-popup].popover.right-top > .arrow,[uib-popover-popup].popover.right-bottom > .arrow,[uib-popover-html-popup].popover.top-left > .arrow,[uib-popover-html-popup].popover.top-right > .arrow,[uib-popover-html-popup].popover.bottom-left > .arrow,[uib-popover-html-popup].popover.bottom-right > .arrow,[uib-popover-html-popup].popover.left-top > .arrow,[uib-popover-html-popup].popover.left-bottom > .arrow,[uib-popover-html-popup].popover.right-top > .arrow,[uib-popover-html-popup].popover.right-bottom > .arrow,[uib-popover-template-popup].popover.top-left > .arrow,[uib-popover-template-popup].popover.top-right > .arrow,[uib-popover-template-popup].popover.bottom-left > .arrow,[uib-popover-template-popup].popover.bottom-right > .arrow,[uib-popover-template-popup].popover.left-top > .arrow,[uib-popover-template-popup].popover.left-bottom > .arrow,[uib-popover-template-popup].popover.right-top > .arrow,[uib-popover-template-popup].popover.right-bottom > .arrow{top:auto;bottom:auto;left:auto;right:auto;margin:0;}[uib-popover-popup].popover,[uib-popover-html-popup].popover,[uib-popover-template-popup].popover{display:block !important;}</style>'); angular.$$uibTooltipCss = true; });
 angular.module('ui.bootstrap.timepicker').run(function() {!angular.$$csp().noInlineStyle && !angular.$$uibTimepickerCss && angular.element(document).find('head').prepend('<style type="text/css">.uib-time input{width:50px;}</style>'); angular.$$uibTimepickerCss = true; });
 angular.module('ui.bootstrap.typeahead').run(function() {!angular.$$csp().noInlineStyle && !angular.$$uibTypeaheadCss && angular.element(document).find('head').prepend('<style type="text/css">[uib-typeahead-popup].dropdown-menu{display:block;}</style>'); angular.$$uibTypeaheadCss = true; });
-},{}],6:[function(_dereq_,module,exports){
+},{}],8:[function(_dereq_,module,exports){
 _dereq_('./dist/ui-bootstrap-tpls');
 
 module.exports = 'ui.bootstrap';
 
-},{"./dist/ui-bootstrap-tpls":5}],7:[function(_dereq_,module,exports){
+},{"./dist/ui-bootstrap-tpls":7}],9:[function(_dereq_,module,exports){
 /*!
  * angular-ui-mask
  * https://github.com/angular-ui/ui-mask
@@ -10671,13 +11206,63 @@ angular.module('ui.mask', [])
         ]);
 
 }());
-},{}],8:[function(_dereq_,module,exports){
+},{}],10:[function(_dereq_,module,exports){
 /**
- * @license AngularJS v1.6.4
+ * @license AngularJS v1.6.6
  * (c) 2010-2017 Google, Inc. http://angularjs.org
  * License: MIT
  */
 (function(window) {'use strict';
+
+/* exported
+  minErrConfig,
+  errorHandlingConfig,
+  isValidObjectMaxDepth
+*/
+
+var minErrConfig = {
+  objectMaxDepth: 5
+};
+
+/**
+ * @ngdoc function
+ * @name angular.errorHandlingConfig
+ * @module ng
+ * @kind function
+ *
+ * @description
+ * Configure several aspects of error handling in AngularJS if used as a setter or return the
+ * current configuration if used as a getter. The following options are supported:
+ *
+ * - **objectMaxDepth**: The maximum depth to which objects are traversed when stringified for error messages.
+ *
+ * Omitted or undefined options will leave the corresponding configuration values unchanged.
+ *
+ * @param {Object=} config - The configuration object. May only contain the options that need to be
+ *     updated. Supported keys:
+ *
+ * * `objectMaxDepth`  **{Number}** - The max depth for stringifying objects. Setting to a
+ *   non-positive or non-numeric value, removes the max depth limit.
+ *   Default: 5
+ */
+function errorHandlingConfig(config) {
+  if (isObject(config)) {
+    if (isDefined(config.objectMaxDepth)) {
+      minErrConfig.objectMaxDepth = isValidObjectMaxDepth(config.objectMaxDepth) ? config.objectMaxDepth : NaN;
+    }
+  } else {
+    return minErrConfig;
+  }
+}
+
+/**
+ * @private
+ * @param {Number} maxDepth
+ * @return {boolean}
+ */
+function isValidObjectMaxDepth(maxDepth) {
+  return isNumber(maxDepth) && maxDepth > 0;
+}
 
 /**
  * @description
@@ -10730,7 +11315,7 @@ function minErr(module, ErrorConstructor) {
       return match;
     });
 
-    message += '\nhttp://errors.angularjs.org/1.6.4/' +
+    message += '\nhttp://errors.angularjs.org/1.6.6/' +
       (module ? module + '/' : '') + code;
 
     for (i = 0, paramPrefix = '?'; i < templateArgs.length; i++, paramPrefix = '&') {
@@ -10786,6 +11371,7 @@ function minErr(module, ErrorConstructor) {
   isNumber,
   isNumberNaN,
   isDate,
+  isError,
   isArray,
   isFunction,
   isRegExp,
@@ -10869,50 +11455,6 @@ var VALIDITY_STATE_PROPERTY = 'validity';
 
 
 var hasOwnProperty = Object.prototype.hasOwnProperty;
-
-var minErrConfig = {
-  objectMaxDepth: 5
-};
-
- /**
- * @ngdoc function
- * @name angular.errorHandlingConfig
- * @module ng
- * @kind function
- *
- * @description
- * Configure several aspects of error handling in AngularJS if used as a setter or return the
- * current configuration if used as a getter. The following options are supported:
- *
- * - **objectMaxDepth**: The maximum depth to which objects are traversed when stringified for error messages.
- *
- * Omitted or undefined options will leave the corresponding configuration values unchanged.
- *
- * @param {Object=} config - The configuration object. May only contain the options that need to be
- *     updated. Supported keys:
- *
- * * `objectMaxDepth`  **{Number}** - The max depth for stringifying objects. Setting to a
- *   non-positive or non-numeric value, removes the max depth limit.
- *   Default: 5
- */
-function errorHandlingConfig(config) {
-  if (isObject(config)) {
-    if (isDefined(config.objectMaxDepth)) {
-      minErrConfig.objectMaxDepth = isValidObjectMaxDepth(config.objectMaxDepth) ? config.objectMaxDepth : NaN;
-    }
-  } else {
-    return minErrConfig;
-  }
-}
-
-/**
- * @private
- * @param {Number} maxDepth
- * @return {boolean}
- */
-function isValidObjectMaxDepth(maxDepth) {
-  return isNumber(maxDepth) && maxDepth > 0;
-}
 
 /**
  * @ngdoc function
@@ -11221,6 +11763,20 @@ function extend(dst) {
 * Unlike {@link angular.extend extend()}, `merge()` recursively descends into object properties of source
 * objects, performing a deep copy.
 *
+* @deprecated
+* sinceVersion="1.6.5"
+* This function is deprecated, but will not be removed in the 1.x lifecycle.
+* There are edge cases (see {@link angular.merge#known-issues known issues}) that are not
+* supported by this function. We suggest
+* using [lodash's merge()](https://lodash.com/docs/4.17.4#merge) instead.
+*
+* @knownIssue
+* This is a list of (known) object types that are not handled correctly by this function:
+* - [`Blob`](https://developer.mozilla.org/docs/Web/API/Blob)
+* - [`MediaStream`](https://developer.mozilla.org/docs/Web/API/MediaStream)
+* - [`CanvasGradient`](https://developer.mozilla.org/docs/Web/API/CanvasGradient)
+* - AngularJS {@link $rootScope.Scope scopes};
+*
 * @param {Object} dst Destination object.
 * @param {...Object} src Source object(s).
 * @returns {Object} Reference to `dst`.
@@ -11429,6 +11985,24 @@ function isDate(value) {
  * @returns {boolean} True if `value` is an `Array`.
  */
 var isArray = Array.isArray;
+
+/**
+ * @description
+ * Determines if a reference is an `Error`.
+ * Loosely based on https://www.npmjs.com/package/iserror
+ *
+ * @param {*} value Reference to check.
+ * @returns {boolean} True if `value` is an `Error`.
+ */
+function isError(value) {
+  var tag = toString.call(value);
+  switch (tag) {
+    case '[object Error]': return true;
+    case '[object Exception]': return true;
+    case '[object DOMException]': return true;
+    default: return value instanceof Error;
+  }
+}
 
 /**
  * @ngdoc function
@@ -12110,7 +12684,7 @@ function fromJson(json) {
 
 var ALL_COLONS = /:/g;
 function timezoneToOffset(timezone, fallback) {
-  // Support: IE 9-11 only, Edge 13-14+
+  // Support: IE 9-11 only, Edge 13-15+
   // IE/Edge do not "understand" colon (`:`) in timezone
   timezone = timezone.replace(ALL_COLONS, '');
   var requestedTimezoneOffset = Date.parse('Jan 01, 1970 00:00:00 ' + timezone) / 60000;
@@ -12137,12 +12711,7 @@ function convertTimezoneToLocal(date, timezone, reverse) {
  * @returns {string} Returns the string representation of the element.
  */
 function startingTag(element) {
-  element = jqLite(element).clone();
-  try {
-    // turns out IE does not let you set .html() on elements which
-    // are not allowed to have children. So we just ignore it.
-    element.empty();
-  } catch (e) { /* empty */ }
+  element = jqLite(element).clone().empty();
   var elemHtml = jqLite('<div>').append(element).html();
   try {
     return element[0].nodeType === NODE_TYPE_TEXT ? lowercase(elemHtml) :
@@ -12280,6 +12849,7 @@ function allowAutoBootstrap(document) {
   var script = document.currentScript;
 
   if (!script) {
+    // Support: IE 9-11 only
     // IE does not have `document.currentScript`
     return true;
   }
@@ -13271,7 +13841,7 @@ function shallowCopy(src, dst) {
   return dst || src;
 }
 
-/* global toDebugString: true */
+/* exported toDebugString */
 
 function serializeObject(obj, maxDepth) {
   var seen = [];
@@ -13280,7 +13850,9 @@ function serializeObject(obj, maxDepth) {
   // and a very deep object can cause a performance issue, so we copy the object
   // based on this specific depth and then stringify it.
   if (isValidObjectMaxDepth(maxDepth)) {
-    obj = copy(obj, null, maxDepth);
+    // This file is also included in `angular-loader`, so `copy()` might not always be available in
+    // the closure. Therefore, it is lazily retrieved as `angular.copy()` when needed.
+    obj = angular.copy(obj, null, maxDepth);
   }
   return JSON.stringify(obj, function(key, val) {
     val = toJsonReplacer(key, val);
@@ -13421,11 +13993,11 @@ function toDebugString(obj, maxDepth) {
 var version = {
   // These placeholder strings will be replaced by grunt's `build` task.
   // They need to be double- or single-quoted.
-  full: '1.6.4',
+  full: '1.6.6',
   major: 1,
   minor: 6,
-  dot: 4,
-  codeName: 'phenomenal-footnote'
+  dot: 6,
+  codeName: 'interdimensional-cable'
 };
 
 
@@ -13571,7 +14143,7 @@ function publishExternalAPI(angular) {
       });
     }
   ])
-  .info({ angularVersion: '1.6.4' });
+  .info({ angularVersion: '1.6.6' });
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -16160,6 +16732,7 @@ var $$CoreAnimateQueueProvider = /** @this */ function() {
 var $AnimateProvider = ['$provide', /** @this */ function($provide) {
   var provider = this;
   var classNameFilter = null;
+  var customFilter = null;
 
   this.$$registeredAnimations = Object.create(null);
 
@@ -16214,6 +16787,51 @@ var $AnimateProvider = ['$provide', /** @this */ function($provide) {
 
   /**
    * @ngdoc method
+   * @name $animateProvider#customFilter
+   *
+   * @description
+   * Sets and/or returns the custom filter function that is used to "filter" animations, i.e.
+   * determine if an animation is allowed or not. When no filter is specified (the default), no
+   * animation will be blocked. Setting the `customFilter` value will only allow animations for
+   * which the filter function's return value is truthy.
+   *
+   * This allows to easily create arbitrarily complex rules for filtering animations, such as
+   * allowing specific events only, or enabling animations on specific subtrees of the DOM, etc.
+   * Filtering animations can also boost performance for low-powered devices, as well as
+   * applications containing a lot of structural operations.
+   *
+   * <div class="alert alert-success">
+   *   **Best Practice:**
+   *   Keep the filtering function as lean as possible, because it will be called for each DOM
+   *   action (e.g. insertion, removal, class change) performed by "animation-aware" directives.
+   *   See {@link guide/animations#which-directives-support-animations- here} for a list of built-in
+   *   directives that support animations.
+   *   Performing computationally expensive or time-consuming operations on each call of the
+   *   filtering function can make your animations sluggish.
+   * </div>
+   *
+   * **Note:** If present, `customFilter` will be checked before
+   * {@link $animateProvider#classNameFilter classNameFilter}.
+   *
+   * @param {Function=} filterFn - The filter function which will be used to filter all animations.
+   *   If a falsy value is returned, no animation will be performed. The function will be called
+   *   with the following arguments:
+   *   - **node** `{DOMElement}` - The DOM element to be animated.
+   *   - **event** `{String}` - The name of the animation event (e.g. `enter`, `leave`, `addClass`
+   *     etc).
+   *   - **options** `{Object}` - A collection of options/styles used for the animation.
+   * @return {Function} The current filter function or `null` if there is none set.
+   */
+  this.customFilter = function(filterFn) {
+    if (arguments.length === 1) {
+      customFilter = isFunction(filterFn) ? filterFn : null;
+    }
+
+    return customFilter;
+  };
+
+  /**
+   * @ngdoc method
    * @name $animateProvider#classNameFilter
    *
    * @description
@@ -16223,6 +16841,11 @@ var $AnimateProvider = ['$provide', /** @this */ function($provide) {
    * When setting the `classNameFilter` value, animations will only be performed on elements
    * that successfully match the filter expression. This in turn can boost performance
    * for low-powered devices as well as applications containing a lot of structural operations.
+   *
+   * **Note:** If present, `classNameFilter` will be checked after
+   * {@link $animateProvider#customFilter customFilter}. If `customFilter` is present and returns
+   * false, `classNameFilter` will not be checked.
+   *
    * @param {RegExp=} expression The className expression which will be checked against all animations
    * @return {RegExp} The current CSS className expression value. If null then there is no expression value
    */
@@ -18812,7 +19435,8 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
    * @ngdoc method
    * @name $compileProvider#component
    * @module ng
-   * @param {string} name Name of the component in camelCase (i.e. `myComp` which will match `<my-comp>`)
+   * @param {string|Object} name Name of the component in camelCase (i.e. `myComp` which will match `<my-comp>`),
+   *    or an object map of components where the keys are the names and the values are the component definition objects.
    * @param {Object} options Component definition object (a simplified
    *    {@link ng.$compile#directive-definition-object directive definition object}),
    *    with the following properties (all optional):
@@ -18895,6 +19519,11 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
    * See also {@link ng.$compileProvider#directive $compileProvider.directive()}.
    */
   this.component = function registerComponent(name, options) {
+    if (!isString(name)) {
+      forEach(name, reverseParams(bind(this, registerComponent)));
+      return this;
+    }
+
     var controller = options.controller || function() {};
 
     function factory($injector) {
@@ -19076,6 +19705,31 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
     return preAssignBindingsEnabled;
   };
 
+  /**
+   * @ngdoc method
+   * @name  $compileProvider#strictComponentBindingsEnabled
+   *
+   * @param {boolean=} enabled update the strictComponentBindingsEnabled state if provided, otherwise just return the
+   * current strictComponentBindingsEnabled state
+   * @returns {*} current value if used as getter or itself (chaining) if used as setter
+   *
+   * @kind function
+   *
+   * @description
+   * Call this method to enable/disable strict component bindings check. If enabled, the compiler will enforce that
+   * for all bindings of a component that are not set as optional with `?`, an attribute needs to be provided
+   * on the component's HTML tag.
+   *
+   * The default value is false.
+   */
+  var strictComponentBindingsEnabled = false;
+  this.strictComponentBindingsEnabled = function(enabled) {
+    if (isDefined(enabled)) {
+      strictComponentBindingsEnabled = enabled;
+      return this;
+    }
+    return strictComponentBindingsEnabled;
+  };
 
   var TTL = 10;
   /**
@@ -20830,7 +21484,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
           }
           linkQueue = null;
         }).catch(function(error) {
-          if (error instanceof Error) {
+          if (isError(error)) {
             $exceptionHandler(error);
           }
         });
@@ -21103,12 +21757,20 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
       }
     }
 
+    function strictBindingsCheck(attrName, directiveName) {
+      if (strictComponentBindingsEnabled) {
+        throw $compileMinErr('missingattr',
+          'Attribute \'{0}\' of \'{1}\' is non-optional and must be set!',
+          attrName, directiveName);
+      }
+    }
 
     // Set up $watches for isolate scope and controller bindings.
     function initializeDirectiveBindings(scope, attrs, destination, bindings, directive) {
       var removeWatchCollection = [];
       var initialChanges = {};
       var changes;
+
       forEach(bindings, function initializeBinding(definition, scopeName) {
         var attrName = definition.attrName,
         optional = definition.optional,
@@ -21120,7 +21782,9 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
 
           case '@':
             if (!optional && !hasOwnProperty.call(attrs, attrName)) {
+              strictBindingsCheck(attrName, directive.name);
               destination[scopeName] = attrs[attrName] = undefined;
+
             }
             removeWatch = attrs.$observe(attrName, function(value) {
               if (isString(value) || isBoolean(value)) {
@@ -21147,6 +21811,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
           case '=':
             if (!hasOwnProperty.call(attrs, attrName)) {
               if (optional) break;
+              strictBindingsCheck(attrName, directive.name);
               attrs[attrName] = undefined;
             }
             if (optional && !attrs[attrName]) break;
@@ -21191,6 +21856,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
           case '<':
             if (!hasOwnProperty.call(attrs, attrName)) {
               if (optional) break;
+              strictBindingsCheck(attrName, directive.name);
               attrs[attrName] = undefined;
             }
             if (optional && !attrs[attrName]) break;
@@ -21216,6 +21882,9 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
             break;
 
           case '&':
+            if (!optional && !hasOwnProperty.call(attrs, attrName)) {
+              strictBindingsCheck(attrName, directive.name);
+            }
             // Don't assign Object.prototype method to scope
             parentGet = attrs.hasOwnProperty(attrName) ? $parse(attrs[attrName]) : noop;
 
@@ -21748,7 +22417,7 @@ function $HttpParamSerializerProvider() {
       if (!params) return '';
       var parts = [];
       forEachSorted(params, function(value, key) {
-        if (value === null || isUndefined(value)) return;
+        if (value === null || isUndefined(value) || isFunction(value)) return;
         if (isArray(value)) {
           forEach(value, function(v) {
             parts.push(encodeUriQuery(key)  + '=' + encodeUriQuery(serializeValue(v)));
@@ -21844,10 +22513,15 @@ function defaultHttpResponseTransform(data, headers) {
 
     if (tempData) {
       var contentType = headers('Content-Type');
-      if ((contentType && (contentType.indexOf(APPLICATION_JSON) === 0)) || isJsonLike(tempData)) {
+      var hasJsonContentType = contentType && (contentType.indexOf(APPLICATION_JSON) === 0);
+
+      if (hasJsonContentType || isJsonLike(tempData)) {
         try {
           data = fromJson(tempData);
         } catch (e) {
+          if (!hasJsonContentType) {
+            return data;
+          }
           throw $httpMinErr('baddata', 'Data must be a valid JSON object. Received: "{0}". ' +
           'Parse error: "{1}"', data, e);
         }
@@ -21973,12 +22647,6 @@ function $HttpProvider() {
    * {@link ng.$cacheFactory `$cacheFactory`} to enable or disable caching of HTTP responses
    * by default. See {@link $http#caching $http Caching} for more information.
    *
-   * - **`defaults.xsrfCookieName`** - {string} - Name of cookie containing the XSRF token.
-   * Defaults value is `'XSRF-TOKEN'`.
-   *
-   * - **`defaults.xsrfHeaderName`** - {string} - Name of HTTP header to populate with the
-   * XSRF token. Defaults value is `'X-XSRF-TOKEN'`.
-   *
    * - **`defaults.headers`** - {Object} - Default headers for all $http requests.
    * Refer to {@link ng.$http#setting-http-headers $http} for documentation on
    * setting default headers.
@@ -21987,15 +22655,38 @@ function $HttpProvider() {
    *     - **`defaults.headers.put`**
    *     - **`defaults.headers.patch`**
    *
+   * - **`defaults.jsonpCallbackParam`** - `{string}` - the name of the query parameter that passes the name of the
+   * callback in a JSONP request. The value of this parameter will be replaced with the expression generated by the
+   * {@link $jsonpCallbacks} service. Defaults to `'callback'`.
    *
    * - **`defaults.paramSerializer`** - `{string|function(Object<string,string>):string}` - A function
    *  used to the prepare string representation of request parameters (specified as an object).
    *  If specified as string, it is interpreted as a function registered with the {@link auto.$injector $injector}.
    *  Defaults to {@link ng.$httpParamSerializer $httpParamSerializer}.
    *
-   * - **`defaults.jsonpCallbackParam`** - `{string}` - the name of the query parameter that passes the name of the
-   * callback in a JSONP request. The value of this parameter will be replaced with the expression generated by the
-   * {@link $jsonpCallbacks} service. Defaults to `'callback'`.
+   * - **`defaults.transformRequest`** -
+   * `{Array<function(data, headersGetter)>|function(data, headersGetter)}` -
+   * An array of functions (or a single function) which are applied to the request data.
+   * By default, this is an array with one request transformation function:
+   *
+   *   - If the `data` property of the request configuration object contains an object, serialize it
+   *     into JSON format.
+   *
+   * - **`defaults.transformResponse`** -
+   * `{Array<function(data, headersGetter, status)>|function(data, headersGetter, status)}` -
+   * An array of functions (or a single function) which are applied to the response data. By default,
+   * this is an array which applies one response transformation function that does two things:
+   *
+   *  - If XSRF prefix is detected, strip it
+   *    (see {@link ng.$http#security-considerations Security Considerations in the $http docs}).
+   *  - If the `Content-Type` is `application/json` or the response looks like JSON,
+   *    deserialize it using a JSON parser.
+   *
+   * - **`defaults.xsrfCookieName`** - {string} - Name of cookie containing the XSRF token.
+   * Defaults value is `'XSRF-TOKEN'`.
+   *
+   * - **`defaults.xsrfHeaderName`** - {string} - Name of HTTP header to populate with the
+   * XSRF token. Defaults value is `'X-XSRF-TOKEN'`.
    *
    **/
   var defaults = this.defaults = {
@@ -22143,6 +22834,7 @@ function $HttpProvider() {
      *   - **headers** – `{function([headerName])}` – Header getter function.
      *   - **config** – `{Object}` – The configuration object that was used to generate the request.
      *   - **statusText** – `{string}` – HTTP status text of the response.
+     *   - **xhrStatus** – `{string}` – Status of the XMLHttpRequest (`complete`, `error`, `timeout` or `abort`).
      *
      * A response status code between 200 and 299 is considered a success status and will result in
      * the success callback being called. Any response status code outside of that range is
@@ -22259,15 +22951,18 @@ function $HttpProvider() {
      *
      * Angular provides the following default transformations:
      *
-     * Request transformations (`$httpProvider.defaults.transformRequest` and `$http.defaults.transformRequest`):
+     * Request transformations (`$httpProvider.defaults.transformRequest` and `$http.defaults.transformRequest`) is
+     * an array with one function that does the following:
      *
      * - If the `data` property of the request configuration object contains an object, serialize it
      *   into JSON format.
      *
-     * Response transformations (`$httpProvider.defaults.transformResponse` and `$http.defaults.transformResponse`):
+     * Response transformations (`$httpProvider.defaults.transformResponse` and `$http.defaults.transformResponse`) is
+     * an array with one function that does the following:
      *
      *  - If XSRF prefix is detected, strip it (see Security Considerations section below).
-     *  - If JSON response is detected, deserialize it using a JSON parser.
+     *  - If the `Content-Type` is `application/json` or the response looks like JSON,
+   *      deserialize it using a JSON parser.
      *
      *
      * ### Overriding the Default Transformations Per Request
@@ -22981,9 +23676,9 @@ function $HttpProvider() {
           } else {
             // serving from cache
             if (isArray(cachedResp)) {
-              resolvePromise(cachedResp[1], cachedResp[0], shallowCopy(cachedResp[2]), cachedResp[3]);
+              resolvePromise(cachedResp[1], cachedResp[0], shallowCopy(cachedResp[2]), cachedResp[3], cachedResp[4]);
             } else {
-              resolvePromise(cachedResp, 200, {}, 'OK');
+              resolvePromise(cachedResp, 200, {}, 'OK', 'complete');
             }
           }
         } else {
@@ -23040,10 +23735,10 @@ function $HttpProvider() {
        *  - resolves the raw $http promise
        *  - calls $apply
        */
-      function done(status, response, headersString, statusText) {
+      function done(status, response, headersString, statusText, xhrStatus) {
         if (cache) {
           if (isSuccess(status)) {
-            cache.put(url, [status, response, parseHeaders(headersString), statusText]);
+            cache.put(url, [status, response, parseHeaders(headersString), statusText, xhrStatus]);
           } else {
             // remove promise from the cache
             cache.remove(url);
@@ -23051,7 +23746,7 @@ function $HttpProvider() {
         }
 
         function resolveHttpPromise() {
-          resolvePromise(response, status, headersString, statusText);
+          resolvePromise(response, status, headersString, statusText, xhrStatus);
         }
 
         if (useApplyAsync) {
@@ -23066,7 +23761,7 @@ function $HttpProvider() {
       /**
        * Resolves the raw $http promise.
        */
-      function resolvePromise(response, status, headers, statusText) {
+      function resolvePromise(response, status, headers, statusText, xhrStatus) {
         //status: HTTP response status code, 0, -1 (aborted by timeout / promise)
         status = status >= -1 ? status : 0;
 
@@ -23075,12 +23770,13 @@ function $HttpProvider() {
           status: status,
           headers: headersGetter(headers),
           config: config,
-          statusText: statusText
+          statusText: statusText,
+          xhrStatus: xhrStatus
         });
       }
 
       function resolvePromiseWithResult(result) {
-        resolvePromise(result.data, result.status, shallowCopy(result.headers()), result.statusText);
+        resolvePromise(result.data, result.status, shallowCopy(result.headers()), result.statusText, result.xhrStatus);
       }
 
       function removePendingReq() {
@@ -23181,7 +23877,7 @@ function createHttpBackend($browser, createXhr, $browserDefer, callbacks, rawDoc
       var jsonpDone = jsonpReq(url, callbackPath, function(status, text) {
         // jsonpReq only ever sets status to 200 (OK), 404 (ERROR) or -1 (WAITING)
         var response = (status === 200) && callbacks.getResponse(callbackPath);
-        completeRequest(callback, status, response, '', text);
+        completeRequest(callback, status, response, '', text, 'complete');
         callbacks.removeCallback(callbackPath);
       });
     } else {
@@ -23216,18 +23912,29 @@ function createHttpBackend($browser, createXhr, $browserDefer, callbacks, rawDoc
             status,
             response,
             xhr.getAllResponseHeaders(),
-            statusText);
+            statusText,
+            'complete');
       };
 
       var requestError = function() {
         // The response is always empty
         // See https://xhr.spec.whatwg.org/#request-error-steps and https://fetch.spec.whatwg.org/#concept-network-error
-        completeRequest(callback, -1, null, null, '');
+        completeRequest(callback, -1, null, null, '', 'error');
+      };
+
+      var requestAborted = function() {
+        completeRequest(callback, -1, null, null, '', 'abort');
+      };
+
+      var requestTimeout = function() {
+        // The response is always empty
+        // See https://xhr.spec.whatwg.org/#request-error-steps and https://fetch.spec.whatwg.org/#concept-network-error
+        completeRequest(callback, -1, null, null, '', 'timeout');
       };
 
       xhr.onerror = requestError;
-      xhr.onabort = requestError;
-      xhr.ontimeout = requestError;
+      xhr.onabort = requestAborted;
+      xhr.ontimeout = requestTimeout;
 
       forEach(eventHandlers, function(value, key) {
           xhr.addEventListener(key, value);
@@ -23277,14 +23984,14 @@ function createHttpBackend($browser, createXhr, $browserDefer, callbacks, rawDoc
       }
     }
 
-    function completeRequest(callback, status, response, headersString, statusText) {
+    function completeRequest(callback, status, response, headersString, statusText, xhrStatus) {
       // cancel timeout and subsequent timeout promise resolution
       if (isDefined(timeoutId)) {
         $browserDefer.cancel(timeoutId);
       }
       jsonpDone = xhr = null;
 
-      callback(status, response, headersString, statusText);
+      callback(status, response, headersString, statusText, xhrStatus);
     }
   };
 
@@ -23904,7 +24611,7 @@ function $IntervalProvider() {
     interval.cancel = function(promise) {
       if (promise && promise.$$intervalId in intervals) {
         // Interval cancels should not report as unhandled promise.
-        intervals[promise.$$intervalId].promise.catch(noop);
+        markQExceptionHandled(intervals[promise.$$intervalId].promise);
         intervals[promise.$$intervalId].reject('canceled');
         $window.clearInterval(promise.$$intervalId);
         delete intervals[promise.$$intervalId];
@@ -25046,6 +25753,14 @@ function $LocationProvider() {
  *
  * The main purpose of this service is to simplify debugging and troubleshooting.
  *
+ * To reveal the location of the calls to `$log` in the JavaScript console,
+ * you can "blackbox" the AngularJS source in your browser:
+ *
+ * [Mozilla description of blackboxing](https://developer.mozilla.org/en-US/docs/Tools/Debugger/How_to/Black_box_a_source).
+ * [Chrome description of blackboxing](https://developer.chrome.com/devtools/docs/blackboxing).
+ *
+ * Note: Not all browsers support blackboxing.
+ *
  * The default is to log `debug` messages. You can use
  * {@link ng.$logProvider ng.$logProvider#debugEnabled} to change this.
  *
@@ -25167,7 +25882,7 @@ function $LogProvider() {
     };
 
     function formatError(arg) {
-      if (arg instanceof Error) {
+      if (isError(arg)) {
         if (arg.stack && formatStackTrace) {
           arg = (arg.message && arg.stack.indexOf(arg.message) === -1)
               ? 'Error: ' + arg.message + '\n' + arg.stack
@@ -25181,29 +25896,17 @@ function $LogProvider() {
 
     function consoleLog(type) {
       var console = $window.console || {},
-          logFn = console[type] || console.log || noop,
-          hasApply = false;
+          logFn = console[type] || console.log || noop;
 
-      // Note: reading logFn.apply throws an error in IE11 in IE8 document mode.
-      // The reason behind this is that console.log has type "object" in IE8...
-      try {
-        hasApply = !!logFn.apply;
-      } catch (e) { /* empty */ }
-
-      if (hasApply) {
-        return function() {
-          var args = [];
-          forEach(arguments, function(arg) {
-            args.push(formatError(arg));
-          });
-          return logFn.apply(console, args);
-        };
-      }
-
-      // we are IE which either doesn't have window.console => this is noop and we do nothing,
-      // or we are IE where console.log doesn't have apply so we log at least first 2 args
-      return function(arg1, arg2) {
-        logFn(arg1, arg2 == null ? '' : arg2);
+      return function() {
+        var args = [];
+        forEach(arguments, function(arg) {
+          args.push(formatError(arg));
+        });
+        // Support: IE 9 only
+        // console methods don't inherit from Function.prototype in IE 9 so we can't
+        // call `logFn.apply(console, args)` directly.
+        return Function.prototype.apply.call(logFn, console, args);
       };
     }
   }];
@@ -25831,15 +26534,47 @@ function isStateless($filter, filterName) {
   return !fn.$stateful;
 }
 
-function findConstantAndWatchExpressions(ast, $filter) {
+var PURITY_ABSOLUTE = 1;
+var PURITY_RELATIVE = 2;
+
+// Detect nodes which could depend on non-shallow state of objects
+function isPure(node, parentIsPure) {
+  switch (node.type) {
+    // Computed members might invoke a stateful toString()
+    case AST.MemberExpression:
+      if (node.computed) {
+        return false;
+      }
+      break;
+
+    // Unary always convert to primative
+    case AST.UnaryExpression:
+      return PURITY_ABSOLUTE;
+
+    // The binary + operator can invoke a stateful toString().
+    case AST.BinaryExpression:
+      return node.operator !== '+' ? PURITY_ABSOLUTE : false;
+
+    // Functions / filters probably read state from within objects
+    case AST.CallExpression:
+      return false;
+  }
+
+  return (undefined === parentIsPure) ? PURITY_RELATIVE : parentIsPure;
+}
+
+function findConstantAndWatchExpressions(ast, $filter, parentIsPure) {
   var allConstants;
   var argsToWatch;
   var isStatelessFilter;
+
+  var astIsPure = ast.isPure = isPure(ast, parentIsPure);
+
   switch (ast.type) {
   case AST.Program:
     allConstants = true;
     forEach(ast.body, function(expr) {
-      findConstantAndWatchExpressions(expr.expression, $filter);
+      findConstantAndWatchExpressions(expr.expression, $filter, astIsPure);
       allConstants = allConstants && expr.expression.constant;
     });
     ast.constant = allConstants;
@@ -25849,26 +26584,26 @@ function findConstantAndWatchExpressions(ast, $filter) {
     ast.toWatch = [];
     break;
   case AST.UnaryExpression:
-    findConstantAndWatchExpressions(ast.argument, $filter);
+    findConstantAndWatchExpressions(ast.argument, $filter, astIsPure);
     ast.constant = ast.argument.constant;
     ast.toWatch = ast.argument.toWatch;
     break;
   case AST.BinaryExpression:
-    findConstantAndWatchExpressions(ast.left, $filter);
-    findConstantAndWatchExpressions(ast.right, $filter);
+    findConstantAndWatchExpressions(ast.left, $filter, astIsPure);
+    findConstantAndWatchExpressions(ast.right, $filter, astIsPure);
     ast.constant = ast.left.constant && ast.right.constant;
     ast.toWatch = ast.left.toWatch.concat(ast.right.toWatch);
     break;
   case AST.LogicalExpression:
-    findConstantAndWatchExpressions(ast.left, $filter);
-    findConstantAndWatchExpressions(ast.right, $filter);
+    findConstantAndWatchExpressions(ast.left, $filter, astIsPure);
+    findConstantAndWatchExpressions(ast.right, $filter, astIsPure);
     ast.constant = ast.left.constant && ast.right.constant;
     ast.toWatch = ast.constant ? [] : [ast];
     break;
   case AST.ConditionalExpression:
-    findConstantAndWatchExpressions(ast.test, $filter);
-    findConstantAndWatchExpressions(ast.alternate, $filter);
-    findConstantAndWatchExpressions(ast.consequent, $filter);
+    findConstantAndWatchExpressions(ast.test, $filter, astIsPure);
+    findConstantAndWatchExpressions(ast.alternate, $filter, astIsPure);
+    findConstantAndWatchExpressions(ast.consequent, $filter, astIsPure);
     ast.constant = ast.test.constant && ast.alternate.constant && ast.consequent.constant;
     ast.toWatch = ast.constant ? [] : [ast];
     break;
@@ -25877,30 +26612,28 @@ function findConstantAndWatchExpressions(ast, $filter) {
     ast.toWatch = [ast];
     break;
   case AST.MemberExpression:
-    findConstantAndWatchExpressions(ast.object, $filter);
+    findConstantAndWatchExpressions(ast.object, $filter, astIsPure);
     if (ast.computed) {
-      findConstantAndWatchExpressions(ast.property, $filter);
+      findConstantAndWatchExpressions(ast.property, $filter, astIsPure);
     }
     ast.constant = ast.object.constant && (!ast.computed || ast.property.constant);
-    ast.toWatch = [ast];
+    ast.toWatch = ast.constant ? [] : [ast];
     break;
   case AST.CallExpression:
     isStatelessFilter = ast.filter ? isStateless($filter, ast.callee.name) : false;
     allConstants = isStatelessFilter;
     argsToWatch = [];
     forEach(ast.arguments, function(expr) {
-      findConstantAndWatchExpressions(expr, $filter);
+      findConstantAndWatchExpressions(expr, $filter, astIsPure);
       allConstants = allConstants && expr.constant;
-      if (!expr.constant) {
-        argsToWatch.push.apply(argsToWatch, expr.toWatch);
-      }
+      argsToWatch.push.apply(argsToWatch, expr.toWatch);
     });
     ast.constant = allConstants;
     ast.toWatch = isStatelessFilter ? argsToWatch : [ast];
     break;
   case AST.AssignmentExpression:
-    findConstantAndWatchExpressions(ast.left, $filter);
-    findConstantAndWatchExpressions(ast.right, $filter);
+    findConstantAndWatchExpressions(ast.left, $filter, astIsPure);
+    findConstantAndWatchExpressions(ast.right, $filter, astIsPure);
     ast.constant = ast.left.constant && ast.right.constant;
     ast.toWatch = [ast];
     break;
@@ -25908,11 +26641,9 @@ function findConstantAndWatchExpressions(ast, $filter) {
     allConstants = true;
     argsToWatch = [];
     forEach(ast.elements, function(expr) {
-      findConstantAndWatchExpressions(expr, $filter);
+      findConstantAndWatchExpressions(expr, $filter, astIsPure);
       allConstants = allConstants && expr.constant;
-      if (!expr.constant) {
-        argsToWatch.push.apply(argsToWatch, expr.toWatch);
-      }
+      argsToWatch.push.apply(argsToWatch, expr.toWatch);
     });
     ast.constant = allConstants;
     ast.toWatch = argsToWatch;
@@ -25921,18 +26652,15 @@ function findConstantAndWatchExpressions(ast, $filter) {
     allConstants = true;
     argsToWatch = [];
     forEach(ast.properties, function(property) {
-      findConstantAndWatchExpressions(property.value, $filter);
-      allConstants = allConstants && property.value.constant && !property.computed;
-      if (!property.value.constant) {
-        argsToWatch.push.apply(argsToWatch, property.value.toWatch);
-      }
+      findConstantAndWatchExpressions(property.value, $filter, astIsPure);
+      allConstants = allConstants && property.value.constant;
+      argsToWatch.push.apply(argsToWatch, property.value.toWatch);
       if (property.computed) {
-        findConstantAndWatchExpressions(property.key, $filter);
-        if (!property.key.constant) {
-          argsToWatch.push.apply(argsToWatch, property.key.toWatch);
-        }
+        //`{[key]: value}` implicitly does `key.toString()` which may be non-pure
+        findConstantAndWatchExpressions(property.key, $filter, /*parentIsPure=*/false);
+        allConstants = allConstants && property.key.constant;
+        argsToWatch.push.apply(argsToWatch, property.key.toWatch);
       }
-
     });
     ast.constant = allConstants;
     ast.toWatch = argsToWatch;
@@ -26012,7 +26740,7 @@ ASTCompiler.prototype = {
       var intoId = self.nextId();
       self.recurse(watch, intoId);
       self.return_(intoId);
-      self.state.inputs.push(fnKey);
+      self.state.inputs.push({name: fnKey, isPure: watch.isPure});
       watch.watchId = key;
     });
     this.state.computing = 'fn';
@@ -26048,13 +26776,16 @@ ASTCompiler.prototype = {
 
   watchFns: function() {
     var result = [];
-    var fns = this.state.inputs;
+    var inputs = this.state.inputs;
     var self = this;
-    forEach(fns, function(name) {
-      result.push('var ' + name + '=' + self.generateFunction(name, 's'));
+    forEach(inputs, function(input) {
+      result.push('var ' + input.name + '=' + self.generateFunction(input.name, 's'));
+      if (input.isPure) {
+        result.push(input.name, '.isPure=' + JSON.stringify(input.isPure) + ';');
+      }
     });
-    if (fns.length) {
-      result.push('fn.inputs=[' + fns.join(',') + '];');
+    if (inputs.length) {
+      result.push('fn.inputs=[' + inputs.map(function(i) { return i.name; }).join(',') + '];');
     }
     return result.join('');
   },
@@ -26460,6 +27191,7 @@ ASTInterpreter.prototype = {
       inputs = [];
       forEach(toWatch, function(watch, key) {
         var input = self.recurse(watch);
+        input.isPure = watch.isPure;
         watch.input = input;
         inputs.push(input);
         watch.watchId = key;
@@ -26974,8 +27706,8 @@ function $ParseProvider() {
             if (parsedExpression.constant) {
               parsedExpression.$$watchDelegate = constantWatchDelegate;
             } else if (oneTime) {
-              parsedExpression.oneTime = true;
-              parsedExpression.$$watchDelegate = oneTimeWatchDelegate;
+              parsedExpression.$$watchDelegate = parsedExpression.literal ?
+                  oneTimeLiteralWatchDelegate : oneTimeWatchDelegate;
             } else if (parsedExpression.inputs) {
               parsedExpression.$$watchDelegate = inputsWatchDelegate;
             }
@@ -27026,7 +27758,7 @@ function $ParseProvider() {
         inputExpressions = inputExpressions[0];
         return scope.$watch(function expressionInputWatch(scope) {
           var newInputValue = inputExpressions(scope);
-          if (!expressionInputDirtyCheck(newInputValue, oldInputValueOf, parsedExpression.literal)) {
+          if (!expressionInputDirtyCheck(newInputValue, oldInputValueOf, inputExpressions.isPure)) {
             lastResult = parsedExpression(scope, undefined, undefined, [newInputValue]);
             oldInputValueOf = newInputValue && getValueOf(newInputValue);
           }
@@ -27046,7 +27778,7 @@ function $ParseProvider() {
 
         for (var i = 0, ii = inputExpressions.length; i < ii; i++) {
           var newInputValue = inputExpressions[i](scope);
-          if (changed || (changed = !expressionInputDirtyCheck(newInputValue, oldInputValueOfValues[i], parsedExpression.literal))) {
+          if (changed || (changed = !expressionInputDirtyCheck(newInputValue, oldInputValueOfValues[i], inputExpressions[i].isPure))) {
             oldInputValues[i] = newInputValue;
             oldInputValueOfValues[i] = newInputValue && getValueOf(newInputValue);
           }
@@ -27061,7 +27793,6 @@ function $ParseProvider() {
     }
 
     function oneTimeWatchDelegate(scope, listener, objectEquality, parsedExpression, prettyPrintExpression) {
-      var isDone = parsedExpression.literal ? isAllDefined : isDefined;
       var unwatch, lastValue;
       if (parsedExpression.inputs) {
         unwatch = inputsWatchDelegate(scope, oneTimeListener, objectEquality, parsedExpression, prettyPrintExpression);
@@ -27078,9 +27809,9 @@ function $ParseProvider() {
         if (isFunction(listener)) {
           listener(value, old, scope);
         }
-        if (isDone(value)) {
+        if (isDefined(value)) {
           scope.$$postDigest(function() {
-            if (isDone(lastValue)) {
+            if (isDefined(lastValue)) {
               unwatch();
             }
           });
@@ -27088,12 +27819,31 @@ function $ParseProvider() {
       }
     }
 
-    function isAllDefined(value) {
-      var allDefined = true;
-      forEach(value, function(val) {
-        if (!isDefined(val)) allDefined = false;
-      });
-      return allDefined;
+    function oneTimeLiteralWatchDelegate(scope, listener, objectEquality, parsedExpression) {
+      var unwatch, lastValue;
+      unwatch = scope.$watch(function oneTimeWatch(scope) {
+        return parsedExpression(scope);
+      }, function oneTimeListener(value, old, scope) {
+        lastValue = value;
+        if (isFunction(listener)) {
+          listener(value, old, scope);
+        }
+        if (isAllDefined(value)) {
+          scope.$$postDigest(function() {
+            if (isAllDefined(lastValue)) unwatch();
+          });
+        }
+      }, objectEquality);
+
+      return unwatch;
+
+      function isAllDefined(value) {
+        var allDefined = true;
+        forEach(value, function(val) {
+          if (!isDefined(val)) allDefined = false;
+        });
+        return allDefined;
+      }
     }
 
     function constantWatchDelegate(scope, listener, objectEquality, parsedExpression) {
@@ -27109,37 +27859,41 @@ function $ParseProvider() {
       var watchDelegate = parsedExpression.$$watchDelegate;
       var useInputs = false;
 
-      var isDone = parsedExpression.literal ? isAllDefined : isDefined;
+      var regularWatch =
+          watchDelegate !== oneTimeLiteralWatchDelegate &&
+          watchDelegate !== oneTimeWatchDelegate;
 
-      function regularInterceptedExpression(scope, locals, assign, inputs) {
+      var fn = regularWatch ? function regularInterceptedExpression(scope, locals, assign, inputs) {
         var value = useInputs && inputs ? inputs[0] : parsedExpression(scope, locals, assign, inputs);
         return interceptorFn(value, scope, locals);
-      }
-
-      function oneTimeInterceptedExpression(scope, locals, assign, inputs) {
-        var value = useInputs && inputs ? inputs[0] : parsedExpression(scope, locals, assign, inputs);
+      } : function oneTimeInterceptedExpression(scope, locals, assign, inputs) {
+        var value = parsedExpression(scope, locals, assign, inputs);
         var result = interceptorFn(value, scope, locals);
         // we only return the interceptor's result if the
         // initial value is defined (for bind-once)
-        return isDone(value) ? result : value;
-      }
+        return isDefined(value) ? result : value;
+      };
 
-      var fn = parsedExpression.oneTime ? oneTimeInterceptedExpression : regularInterceptedExpression;
-
-      // Propogate the literal/oneTime attributes
-      fn.literal = parsedExpression.literal;
-      fn.oneTime = parsedExpression.oneTime;
-
-      // Propagate or create inputs / $$watchDelegates
+      // Propagate $$watchDelegates other then inputsWatchDelegate
       useInputs = !parsedExpression.inputs;
       if (watchDelegate && watchDelegate !== inputsWatchDelegate) {
         fn.$$watchDelegate = watchDelegate;
         fn.inputs = parsedExpression.inputs;
       } else if (!interceptorFn.$stateful) {
-        // If there is an interceptor, but no watchDelegate then treat the interceptor like
-        // we treat filters - it is assumed to be a pure function unless flagged with $stateful
+        // Treat interceptor like filters - assume non-stateful by default and use the inputsWatchDelegate
         fn.$$watchDelegate = inputsWatchDelegate;
         fn.inputs = parsedExpression.inputs ? parsedExpression.inputs : [parsedExpression];
+      }
+
+      if (fn.inputs) {
+        fn.inputs = fn.inputs.map(function(e) {
+              // Remove the isPure flag of inputs when it is not absolute because they are now wrapped in a
+              // potentially non-pure interceptor function.
+              if (e.isPure === PURITY_RELATIVE) {
+                return function depurifier(s) { return e(s); };
+              }
+              return e;
+            });
       }
 
       return fn;
@@ -27427,7 +28181,7 @@ function $$QProvider() {
  * @param {function(function)} nextTick Function for executing functions in the next turn.
  * @param {function(...*)} exceptionHandler Function into which unexpected exceptions are passed for
  *     debugging purposes.
- @ param {=boolean} errorOnUnhandledRejections Whether an error should be generated on unhandled
+ * @param {boolean=} errorOnUnhandledRejections Whether an error should be generated on unhandled
  *     promises rejections.
  * @returns {object} Promise manager.
  */
@@ -27498,7 +28252,7 @@ function qFactory(nextTick, exceptionHandler, errorOnUnhandledRejections) {
     state.pending = undefined;
     try {
       for (var i = 0, ii = pending.length; i < ii; ++i) {
-        state.pur = true;
+        markQStateExceptionHandled(state);
         promise = pending[i][0];
         fn = pending[i][state.status];
         try {
@@ -27525,10 +28279,10 @@ function qFactory(nextTick, exceptionHandler, errorOnUnhandledRejections) {
     // eslint-disable-next-line no-unmodified-loop-condition
     while (!queueSize && checkQueue.length) {
       var toCheck = checkQueue.shift();
-      if (!toCheck.pur) {
-        toCheck.pur = true;
+      if (!isStateExceptionHandled(toCheck)) {
+        markQStateExceptionHandled(toCheck);
         var errorMessage = 'Possibly unhandled rejection: ' + toDebugString(toCheck.value);
-        if (toCheck.value instanceof Error) {
+        if (isError(toCheck.value)) {
           exceptionHandler(toCheck.value, errorMessage);
         } else {
           exceptionHandler(errorMessage);
@@ -27538,7 +28292,7 @@ function qFactory(nextTick, exceptionHandler, errorOnUnhandledRejections) {
   }
 
   function scheduleProcessQueue(state) {
-    if (errorOnUnhandledRejections && !state.pending && state.status === 2 && !state.pur) {
+    if (errorOnUnhandledRejections && !state.pending && state.status === 2 && !isStateExceptionHandled(state)) {
       if (queueSize === 0 && checkQueue.length === 0) {
         nextTick(processChecks);
       }
@@ -27817,6 +28571,16 @@ function qFactory(nextTick, exceptionHandler, errorOnUnhandledRejections) {
   $Q.race = race;
 
   return $Q;
+}
+
+function isStateExceptionHandled(state) {
+  return !!state.pur;
+}
+function markQStateExceptionHandled(state) {
+  state.pur = true;
+}
+function markQExceptionHandled(q) {
+  markQStateExceptionHandled(q.$$state);
 }
 
 /** @this */
@@ -28299,6 +29063,12 @@ function $RootScopeProvider() {
        *   values are examined for changes on every call to `$digest`.
        * - The `listener` is called whenever any expression in the `watchExpressions` array changes.
        *
+       * `$watchGroup` is more performant than watching each expression individually, and should be
+       * used when the listener does not need to know which expression has changed.
+       * If the listener needs to know which expression has changed,
+       * {@link ng.$rootScope.Scope#$watch $watch()} or
+       * {@link ng.$rootScope.Scope#$watchCollection $watchCollection()} should be used.
+       *
        * @param {Array.<string|Function(scope)>} watchExpressions Array of expressions that will be individually
        * watched using {@link ng.$rootScope.Scope#$watch $watch()}
        *
@@ -28307,7 +29077,34 @@ function $RootScopeProvider() {
        *    The `newValues` array contains the current values of the `watchExpressions`, with the indexes matching
        *    those of `watchExpression`
        *    and the `oldValues` array contains the previous values of the `watchExpressions`, with the indexes matching
-       *    those of `watchExpression`
+       *    those of `watchExpression`.
+       *
+       *    Note that `newValues` and `oldValues` reflect the differences in each **individual**
+       *    expression, and not the difference of the values between each call of the listener.
+       *    That means the difference between `newValues` and `oldValues` cannot be used to determine
+       *    which expression has changed / remained stable:
+       *
+       *    ```js
+       *
+       *    $scope.$watchGroup(['v1', 'v2'], function(newValues, oldValues) {
+       *      console.log(newValues, oldValues);
+       *    });
+       *
+       *    // newValues, oldValues initially
+       *    // [undefined, undefined], [undefined, undefined]
+       *
+       *    $scope.v1 = 'a';
+       *    $scope.v2 = 'a';
+       *
+       *    // ['a', 'a'], [undefined, undefined]
+       *
+       *    $scope.v2 = 'b'
+       *
+       *    // v1 hasn't changed since it became `'a'`, therefore its oldValue is still `undefined`
+       *    // ['a', 'b'], [undefined, 'a']
+       *
+       *    ```
+       *
        *    The `scope` refers to the current scope.
        * @returns {function()} Returns a de-registration function for all listeners.
        */
@@ -30882,7 +31679,7 @@ function $TimeoutProvider() {
     timeout.cancel = function(promise) {
       if (promise && promise.$$timeoutId in deferreds) {
         // Timeout cancels should not report an unhandled promise.
-        deferreds[promise.$$timeoutId].promise.catch(noop);
+        markQExceptionHandled(deferreds[promise.$$timeoutId].promise);
         deferreds[promise.$$timeoutId].reject('canceled');
         delete deferreds[promise.$$timeoutId];
         return $browser.defer.cancel(promise.$$timeoutId);
@@ -31317,7 +32114,7 @@ function $FilterProvider($provide) {
  *
  * @param {function(actual, expected)|true|false} [comparator] Comparator which is used in
  *     determining if values retrieved using `expression` (when it is not a function) should be
- *     considered a match based on the the expected value (from the filter expression) and actual
+ *     considered a match based on the expected value (from the filter expression) and actual
  *     value (from the object in the array).
  *
  *   Can be one of:
@@ -32236,6 +33033,9 @@ function jsonFilter() {
  * @kind function
  * @description
  * Converts string to lowercase.
+ *
+ * See the {@link ng.uppercase uppercase filter documentation} for a functionally identical example.
+ *
  * @see angular.lowercase
  */
 var lowercaseFilter = valueFn(lowercase);
@@ -32247,7 +33047,23 @@ var lowercaseFilter = valueFn(lowercase);
  * @kind function
  * @description
  * Converts string to uppercase.
- * @see angular.uppercase
+ * @example
+   <example module="uppercaseFilterExample" name="filter-uppercase">
+     <file name="index.html">
+       <script>
+         angular.module('uppercaseFilterExample', [])
+           .controller('ExampleController', ['$scope', function($scope) {
+             $scope.title = 'This is a title';
+           }]);
+       </script>
+       <div ng-controller="ExampleController">
+         <!-- This title should be formatted normally -->
+         <h1>{{title}}</h1>
+         <!-- This title should be capitalized -->
+         <h1>{{title | uppercase}}</h1>
+       </div>
+     </file>
+   </example>
  */
 var uppercaseFilter = valueFn(uppercase);
 
@@ -32435,6 +33251,9 @@ function sliceFn(input, begin, end) {
  * specified predicates can distinguish between two items, `orderBy` will automatically introduce a
  * dummy predicate that returns the item's index as `value`.
  * (If you are using a custom comparator, make sure it can handle this predicate as well.)
+ *
+ * If a custom comparator still can't distinguish between two items, then they will be sorted based
+ * on their index using the built-in comparator.
  *
  * Finally, in an attempt to simplify things, if a predicate returns an object as the extracted
  * value for an item, `orderBy` will try to convert that object to a primitive value, before passing
@@ -32982,7 +33801,7 @@ function orderByFilter($parse) {
         }
       }
 
-      return compare(v1.tieBreaker, v2.tieBreaker) * descending;
+      return (compare(v1.tieBreaker, v2.tieBreaker) || defaultCompare(v1.tieBreaker, v2.tieBreaker)) * descending;
     }
   };
 
@@ -33437,15 +34256,20 @@ var htmlAnchorDirective = valueFn({
  *
  * ## A note about browser compatibility
  *
- * Edge, Firefox, and Internet Explorer do not support the `details` element, it is
+ * Internet Explorer and Edge do not support the `details` element, it is
  * recommended to use {@link ng.ngShow} and {@link ng.ngHide} instead.
  *
  * @example
      <example name="ng-open">
        <file name="index.html">
-         <label>Check me check multiple: <input type="checkbox" ng-model="open"></label><br/>
+         <label>Toggle details: <input type="checkbox" ng-model="open"></label><br/>
          <details id="details" ng-open="open">
-            <summary>Show/Hide me</summary>
+            <summary>List</summary>
+            <ul>
+              <li>Apple</li>
+              <li>Orange</li>
+              <li>Durian</li>
+            </ul>
          </details>
        </file>
        <file name="protractor.js" type="protractor">
@@ -33585,17 +34409,23 @@ function nullFormRenameControl(control, name) {
  * @property {boolean} $dirty True if user has already interacted with the form.
  * @property {boolean} $valid True if all of the containing forms and controls are valid.
  * @property {boolean} $invalid True if at least one containing control or form is invalid.
- * @property {boolean} $pending True if at least one containing control or form is pending.
  * @property {boolean} $submitted True if user has submitted the form even if its invalid.
  *
- * @property {Object} $error Is an object hash, containing references to controls or
- *  forms with failing validators, where:
+ * @property {Object} $pending An object hash, containing references to controls or forms with
+ *  pending validators, where:
+ *
+ *  - keys are validations tokens (error names).
+ *  - values are arrays of controls or forms that have a pending validator for the given error name.
+ *
+ * See {@link form.FormController#$error $error} for a list of built-in validation tokens.
+ *
+ * @property {Object} $error An object hash, containing references to controls or forms with failing
+ *  validators, where:
  *
  *  - keys are validation tokens (error names),
- *  - values are arrays of controls or forms that have a failing validator for given error name.
+ *  - values are arrays of controls or forms that have a failing validator for the given error name.
  *
  *  Built-in validation tokens:
- *
  *  - `email`
  *  - `max`
  *  - `maxlength`
@@ -33841,9 +34671,24 @@ FormController.prototype = {
  * @name form.FormController#$setValidity
  *
  * @description
- * Sets the validity of a form control.
+ * Change the validity state of the form, and notify the parent form (if any).
  *
- * This method will also propagate to parent forms.
+ * Application developers will rarely need to call this method directly. It is used internally, by
+ * {@link ngModel.NgModelController#$setValidity NgModelController.$setValidity()}, to propagate a
+ * control's validity state to the parent `FormController`.
+ *
+ * @param {string} validationErrorKey Name of the validator. The `validationErrorKey` will be
+ *        assigned to either `$error[validationErrorKey]` or `$pending[validationErrorKey]` (for
+ *        unfulfilled `$asyncValidators`), so that it is available for data-binding. The
+ *        `validationErrorKey` should be in camelCase and will get converted into dash-case for
+ *        class name. Example: `myError` will result in `ng-valid-my-error` and
+ *        `ng-invalid-my-error` classes and can be bound to as `{{ someForm.$error.myError }}`.
+ * @param {boolean} isValid Whether the current state is valid (true), invalid (false), pending
+ *        (undefined),  or skipped (null). Pending is used for unfulfilled `$asyncValidators`.
+ *        Skipped is used by AngularJS when validators do not run because of parse errors and when
+ *        `$asyncValidators` do not run because any of the `$validators` failed.
+ * @param {NgModelController | FormController} controller - The controller whose validity state is
+ *        triggering the change.
  */
 addSetValidityMethod({
   clazz: FormController,
@@ -36688,6 +37533,13 @@ function classDirective(name, selector) {
     return {
       restrict: 'AC',
       link: function(scope, element, attr) {
+        var expression = attr[name].trim();
+        var isOneTime = (expression.charAt(0) === ':') && (expression.charAt(1) === ':');
+
+        var watchInterceptor = isOneTime ? toFlatValue : toClassString;
+        var watchExpression = $parse(expression, watchInterceptor);
+        var watchAction = isOneTime ? ngClassOneTimeWatchAction : ngClassWatchAction;
+
         var classCounts = element.data('$classCounts');
         var oldModulo = true;
         var oldClassString;
@@ -36710,7 +37562,7 @@ function classDirective(name, selector) {
           scope.$watch(indexWatchExpression, ngClassIndexWatchAction);
         }
 
-        scope.$watch($parse(attr[name], toClassString), ngClassWatchAction);
+        scope.$watch(watchExpression, watchAction, isOneTime);
 
         function addClasses(classString) {
           classString = digestClassCounts(split(classString), 1);
@@ -36752,9 +37604,9 @@ function classDirective(name, selector) {
         }
 
         function ngClassIndexWatchAction(newModulo) {
-          // This watch-action should run before the `ngClassWatchAction()`, thus it
+          // This watch-action should run before the `ngClass[OneTime]WatchAction()`, thus it
           // adds/removes `oldClassString`. If the `ngClass` expression has changed as well, the
-          // `ngClassWatchAction()` will update the classes.
+          // `ngClass[OneTime]WatchAction()` will update the classes.
           if (newModulo === selector) {
             addClasses(oldClassString);
           } else {
@@ -36764,13 +37616,15 @@ function classDirective(name, selector) {
           oldModulo = newModulo;
         }
 
-        function ngClassWatchAction(newClassString) {
-          // When using a one-time binding the newClassString will return
-          // the pre-interceptor value until the one-time is complete
-          if (!isString(newClassString)) {
-            newClassString = toClassString(newClassString);
-          }
+        function ngClassOneTimeWatchAction(newClassValue) {
+          var newClassString = toClassString(newClassValue);
 
+          if (newClassString !== oldClassString) {
+            ngClassWatchAction(newClassString);
+          }
+        }
+
+        function ngClassWatchAction(newClassString) {
           if (oldModulo === selector) {
             updateClasses(oldClassString, newClassString);
           }
@@ -36816,6 +37670,34 @@ function classDirective(name, selector) {
     }
 
     return classString;
+  }
+
+  function toFlatValue(classValue) {
+    var flatValue = classValue;
+
+    if (isArray(classValue)) {
+      flatValue = classValue.map(toFlatValue);
+    } else if (isObject(classValue)) {
+      var hasUndefined = false;
+
+      flatValue = Object.keys(classValue).filter(function(key) {
+        var value = classValue[key];
+
+        if (!hasUndefined && isUndefined(value)) {
+          hasUndefined = true;
+        }
+
+        return value;
+      });
+
+      if (hasUndefined) {
+        // Prevent the `oneTimeLiteralWatchInterceptor` from unregistering
+        // the watcher, by including at least one `undefined` value.
+        flatValue.push(undefined);
+      }
+    }
+
+    return flatValue;
   }
 }
 
@@ -39657,7 +40539,7 @@ function setupModelWatcher(ctrl) {
  *        (for unfulfilled `$asyncValidators`), so that it is available for data-binding.
  *        The `validationErrorKey` should be in camelCase and will get converted into dash-case
  *        for class name. Example: `myError` will result in `ng-valid-my-error` and `ng-invalid-my-error`
- *        class and can be bound to as  `{{someForm.someControl.$error.myError}}` .
+ *        classes and can be bound to as `{{ someForm.someControl.$error.myError }}`.
  * @param {boolean} isValid Whether the current state is valid (true), invalid (false), pending (undefined),
  *                          or skipped (null). Pending is used for unfulfilled `$asyncValidators`.
  *                          Skipped is used by Angular when validators do not run because of parse errors and
@@ -40732,7 +41614,8 @@ var ngOptionsDirective = ['$compile', '$document', '$parse', function($compile, 
   }
 
 
-  // we can't just jqLite('<option>') since jqLite is not smart enough
+  // Support: IE 9 only
+  // We can't just jqLite('<option>') since jqLite is not smart enough
   // to create it in <select> and IE barfs otherwise.
   var optionTemplate = window.document.createElement('option'),
       optGroupTemplate = window.document.createElement('optgroup');
@@ -40752,6 +41635,9 @@ var ngOptionsDirective = ['$compile', '$document', '$parse', function($compile, 
           break;
         }
       }
+
+      // The empty option will be compiled and rendered before we first generate the options
+      selectElement.empty();
 
       var providedEmptyOption = !!selectCtrl.emptyOption;
 
@@ -40774,12 +41660,15 @@ var ngOptionsDirective = ['$compile', '$document', '$parse', function($compile, 
       if (!multiple) {
 
         selectCtrl.writeValue = function writeNgOptionsValue(value) {
-          var selectedOption = options.selectValueMap[selectElement.val()];
+          // The options might not be defined yet when ngModel tries to render
+          if (!options) return;
+
+          var selectedOption = selectElement[0].options[selectElement[0].selectedIndex];
           var option = options.getOptionFromViewValue(value);
 
           // Make sure to remove the selected attribute from the previously selected option
           // Otherwise, screen readers might get confused
-          if (selectedOption) selectedOption.element.removeAttribute('selected');
+          if (selectedOption) selectedOption.removeAttribute('selected');
 
           if (option) {
             // Don't update the option when it is already selected.
@@ -40789,7 +41678,6 @@ var ngOptionsDirective = ['$compile', '$document', '$parse', function($compile, 
 
             if (selectElement[0].value !== option.selectValue) {
               selectCtrl.removeUnknownOption();
-              selectCtrl.unselectEmptyOption();
 
               selectElement[0].value = option.selectValue;
               option.element.selected = true;
@@ -40797,14 +41685,7 @@ var ngOptionsDirective = ['$compile', '$document', '$parse', function($compile, 
 
             option.element.setAttribute('selected', 'selected');
           } else {
-
-            if (providedEmptyOption) {
-              selectCtrl.selectEmptyOption();
-            } else if (selectCtrl.unknownOption.parent().length) {
-              selectCtrl.updateUnknownOption(value);
-            } else {
-              selectCtrl.renderUnknownOption(value);
-            }
+            selectCtrl.selectUnknownOrEmptyOption(value);
           }
         };
 
@@ -40833,9 +41714,11 @@ var ngOptionsDirective = ['$compile', '$document', '$parse', function($compile, 
       } else {
 
         selectCtrl.writeValue = function writeNgOptionsMultiple(values) {
+          // The options might not be defined yet when ngModel tries to render
+          if (!options) return;
+
           // Only set `<option>.selected` if necessary, in order to prevent some browsers from
           // scrolling to `<option>` elements that are outside the `<select>` element's viewport.
-
           var selectedOptions = values && values.map(getAndUpdateSelectedOption) || [];
 
           options.items.forEach(function(option) {
@@ -40877,12 +41760,10 @@ var ngOptionsDirective = ['$compile', '$document', '$parse', function($compile, 
 
       if (providedEmptyOption) {
 
-        // we need to remove it before calling selectElement.empty() because otherwise IE will
-        // remove the label from the element. wtf?
-        selectCtrl.emptyOption.remove();
-
         // compile the element since there might be bindings in it
         $compile(selectCtrl.emptyOption)(scope);
+
+        selectElement.prepend(selectCtrl.emptyOption);
 
         if (selectCtrl.emptyOption[0].nodeType === NODE_TYPE_COMMENT) {
           // This means the empty option has currently no actual DOM node, probably because
@@ -40901,8 +41782,12 @@ var ngOptionsDirective = ['$compile', '$document', '$parse', function($compile, 
               ngModelCtrl.$render();
 
               optionEl.on('$destroy', function() {
+                var needsRerender = selectCtrl.$isEmptyOptionSelected();
+
                 selectCtrl.hasEmptyOption = false;
                 selectCtrl.emptyOption = undefined;
+
+                if (needsRerender) ngModelCtrl.$render();
               });
             }
           };
@@ -40914,12 +41799,6 @@ var ngOptionsDirective = ['$compile', '$document', '$parse', function($compile, 
         }
 
       }
-
-      selectElement.empty();
-
-      // We need to do this here to ensure that the options object is defined
-      // when we first hit it in writeNgOptionsValue
-      updateOptions();
 
       // We will re-render the option elements if the option values or labels change
       scope.$watchCollection(ngOptions.getWatchables, updateOptions);
@@ -40944,7 +41823,8 @@ var ngOptionsDirective = ['$compile', '$document', '$parse', function($compile, 
       function updateOptionElement(option, element) {
         option.element = element;
         element.disabled = option.disabled;
-        // NOTE: The label must be set before the value, otherwise IE10/11/EDGE create unresponsive
+        // Support: IE 11 only, Edge 12-13 only
+        // NOTE: The label must be set before the value, otherwise IE 11 & Edge create unresponsive
         // selects in certain circumstances when multiple selects are next to each other and display
         // the option list in listbox style, i.e. the select is [multiple], or specifies a [size].
         // See https://github.com/angular/angular.js/issues/11314 for more info.
@@ -40979,11 +41859,6 @@ var ngOptionsDirective = ['$compile', '$document', '$parse', function($compile, 
         options = ngOptions.getOptions();
 
         var groupElementMap = {};
-
-        // Ensure that the empty option is always there if it was explicitly provided
-        if (providedEmptyOption) {
-          selectElement.prepend(selectCtrl.emptyOption);
-        }
 
         options.items.forEach(function addOption(option) {
           var groupElement;
@@ -41029,7 +41904,6 @@ var ngOptionsDirective = ['$compile', '$document', '$parse', function($compile, 
             ngModelCtrl.$render();
           }
         }
-
       }
   }
 
@@ -41503,7 +42377,9 @@ var ngPluralizeDirective = ['$locale', '$interpolate', '$log', function($locale,
  *     more than one tracking expression value resolve to the same key. (This would mean that two distinct objects are
  *     mapped to the same DOM element, which is not possible.)
  *
- *     Note that the tracking expression must come last, after any filters, and the alias expression.
+ *     <div class="alert alert-warning">
+ *       <strong>Note:</strong> the `track by` expression must come last - after any filters, and the alias expression.
+ *     </div>
  *
  *     For example: `item in items` is equivalent to `item in items track by $id(item)`. This implies that the DOM elements
  *     will be associated by item identity in the array.
@@ -41717,7 +42593,7 @@ var ngRepeatDirective = ['$parse', '$animate', '$compile', function($parse, $ani
         // Store a list of elements from previous run. This is a hash where key is the item from the
         // iterator, and the value is objects with following properties.
         //   - scope: bound scope
-        //   - element: previous element.
+        //   - clone: previous element.
         //   - index: position
         //
         // We are using no-proto object so that we don't need to guard against inherited props via
@@ -42820,7 +43696,7 @@ var scriptDirective = ['$templateCache', function($templateCache) {
 var noopNgModelController = { $setViewValue: noop, $render: noop };
 
 function setOptionSelectedStatus(optionEl, value) {
-  optionEl.prop('selected', value); // needed for IE
+  optionEl.prop('selected', value);
   /**
    * When unselecting an option, setting the property to null / false should be enough
    * However, screenreaders might react to the selected attribute instead, see
@@ -42834,10 +43710,120 @@ function setOptionSelectedStatus(optionEl, value) {
 /**
  * @ngdoc type
  * @name  select.SelectController
+ *
  * @description
- * The controller for the `<select>` directive. This provides support for reading
- * and writing the selected value(s) of the control and also coordinates dynamically
- * added `<option>` elements, perhaps by an `ngRepeat` directive.
+ * The controller for the {@link ng.select select} directive. The controller exposes
+ * a few utility methods that can be used to augment the behavior of a regular or an
+ * {@link ng.ngOptions ngOptions} select element.
+ *
+ * @example
+ * ### Set a custom error when the unknown option is selected
+ *
+ * This example sets a custom error "unknownValue" on the ngModelController
+ * when the select element's unknown option is selected, i.e. when the model is set to a value
+ * that is not matched by any option.
+ *
+ * <example name="select-unknown-value-error" module="staticSelect">
+ * <file name="index.html">
+ * <div ng-controller="ExampleController">
+ *   <form name="myForm">
+ *     <label for="testSelect"> Single select: </label><br>
+ *     <select name="testSelect" ng-model="selected" unknown-value-error>
+ *       <option value="option-1">Option 1</option>
+ *       <option value="option-2">Option 2</option>
+ *     </select><br>
+ *     <span ng-if="myForm.testSelect.$error.unknownValue">Error: The current model doesn't match any option</span>
+ *
+ *     <button ng-click="forceUnknownOption()">Force unknown option</button><br>
+ *   </form>
+ * </div>
+ * </file>
+ * <file name="app.js">
+ *  angular.module('staticSelect', [])
+ *    .controller('ExampleController', ['$scope', function($scope) {
+ *      $scope.selected = null;
+ *
+ *      $scope.forceUnknownOption = function() {
+ *        $scope.selected = 'nonsense';
+ *      };
+ *   }])
+ *   .directive('unknownValueError', function() {
+ *     return {
+ *       require: ['ngModel', 'select'],
+ *       link: function(scope, element, attrs, ctrls) {
+ *         var ngModelCtrl = ctrls[0];
+ *         var selectCtrl = ctrls[1];
+ *
+ *         ngModelCtrl.$validators.unknownValue = function(modelValue, viewValue) {
+ *           if (selectCtrl.$isUnknownOptionSelected()) {
+ *             return false;
+ *           }
+ *
+ *           return true;
+ *         };
+ *       }
+ *
+ *     };
+ *   });
+ * </file>
+ *</example>
+ *
+ *
+ * @example
+ * ### Set the "required" error when the unknown option is selected.
+ *
+ * By default, the "required" error on the ngModelController is only set on a required select
+ * when the empty option is selected. This example adds a custom directive that also sets the
+ * error when the unknown option is selected.
+ *
+ * <example name="select-unknown-value-required" module="staticSelect">
+ * <file name="index.html">
+ * <div ng-controller="ExampleController">
+ *   <form name="myForm">
+ *     <label for="testSelect"> Select: </label><br>
+ *     <select name="testSelect" ng-model="selected" unknown-value-required>
+ *       <option value="option-1">Option 1</option>
+ *       <option value="option-2">Option 2</option>
+ *     </select><br>
+ *     <span ng-if="myForm.testSelect.$error.required">Error: Please select a value</span><br>
+ *
+ *     <button ng-click="forceUnknownOption()">Force unknown option</button><br>
+ *   </form>
+ * </div>
+ * </file>
+ * <file name="app.js">
+ *  angular.module('staticSelect', [])
+ *    .controller('ExampleController', ['$scope', function($scope) {
+ *      $scope.selected = null;
+ *
+ *      $scope.forceUnknownOption = function() {
+ *        $scope.selected = 'nonsense';
+ *      };
+ *   }])
+ *   .directive('unknownValueRequired', function() {
+ *     return {
+ *       priority: 1, // This directive must run after the required directive has added its validator
+ *       require: ['ngModel', 'select'],
+ *       link: function(scope, element, attrs, ctrls) {
+ *         var ngModelCtrl = ctrls[0];
+ *         var selectCtrl = ctrls[1];
+ *
+ *         var originalRequiredValidator = ngModelCtrl.$validators.required;
+ *
+ *         ngModelCtrl.$validators.required = function() {
+ *           if (attrs.required && selectCtrl.$isUnknownOptionSelected()) {
+ *             return false;
+ *           }
+ *
+ *           return originalRequiredValidator.apply(this, arguments);
+ *         };
+ *       }
+ *     };
+ *   });
+ * </file>
+ *</example>
+ *
+ *
  */
 var SelectController =
         ['$element', '$scope', /** @this */ function($element, $scope) {
@@ -42855,15 +43841,18 @@ var SelectController =
   // does not match any of the options. When it is rendered the value of the unknown
   // option is '? XXX ?' where XXX is the hashKey of the value that is not known.
   //
+  // Support: IE 9 only
   // We can't just jqLite('<option>') since jqLite is not smart enough
   // to create it in <select> and IE barfs otherwise.
   self.unknownOption = jqLite(window.document.createElement('option'));
 
-  // The empty option is an option with the value '' that te application developer can
-  // provide inside the select. When the model changes to a value that doesn't match an option,
-  // it is selected - so if an empty option is provided, no unknown option is generated.
-  // However, the empty option is not removed when the model matches an option. It is always selectable
-  // and indicates that a "null" selection has been made.
+  // The empty option is an option with the value '' that the application developer can
+  // provide inside the select. It is always selectable and indicates that a "null" selection has
+  // been made by the user.
+  // If the select has an empty option, and the model of the select is set to "undefined" or "null",
+  // the empty option is selected.
+  // If the model is set to a different unmatched value, the unknown option is rendered and
+  // selected, i.e both are present, because a "null" selection and an unknown value are different.
   self.hasEmptyOption = false;
   self.emptyOption = undefined;
 
@@ -42899,7 +43888,7 @@ var SelectController =
 
   self.unselectEmptyOption = function() {
     if (self.hasEmptyOption) {
-      self.emptyOption.removeAttr('selected');
+      setOptionSelectedStatus(self.emptyOption, false);
     }
   };
 
@@ -42941,14 +43930,7 @@ var SelectController =
       var selectedOption = $element[0].options[$element[0].selectedIndex];
       setOptionSelectedStatus(jqLite(selectedOption), true);
     } else {
-      if (value == null && self.emptyOption) {
-        self.removeUnknownOption();
-        self.selectEmptyOption();
-      } else if (self.unknownOption.parent().length) {
-        self.updateUnknownOption(value);
-      } else {
-        self.renderUnknownOption(value);
-      }
+      self.selectUnknownOrEmptyOption(value);
     }
   };
 
@@ -42991,6 +43973,59 @@ var SelectController =
     return !!optionsMap.get(value);
   };
 
+  /**
+   * @ngdoc method
+   * @name select.SelectController#$hasEmptyOption
+   *
+   * @description
+   *
+   * Returns `true` if the select element currently has an empty option
+   * element, i.e. an option that signifies that the select is empty / the selection is null.
+   *
+   */
+  self.$hasEmptyOption = function() {
+    return self.hasEmptyOption;
+  };
+
+  /**
+   * @ngdoc method
+   * @name select.SelectController#$isUnknownOptionSelected
+   *
+   * @description
+   *
+   * Returns `true` if the select element's unknown option is selected. The unknown option is added
+   * and automatically selected whenever the select model doesn't match any option.
+   *
+   */
+  self.$isUnknownOptionSelected = function() {
+    // Presence of the unknown option means it is selected
+    return $element[0].options[0] === self.unknownOption[0];
+  };
+
+  /**
+   * @ngdoc method
+   * @name select.SelectController#$isEmptyOptionSelected
+   *
+   * @description
+   *
+   * Returns `true` if the select element has an empty option and this empty option is currently
+   * selected. Returns `false` if the select element has no empty option or it is not selected.
+   *
+   */
+  self.$isEmptyOptionSelected = function() {
+    return self.hasEmptyOption && $element[0].options[$element[0].selectedIndex] === self.emptyOption[0];
+  };
+
+  self.selectUnknownOrEmptyOption = function(value) {
+    if (value == null && self.emptyOption) {
+      self.removeUnknownOption();
+      self.selectEmptyOption();
+    } else if (self.unknownOption.parent().length) {
+      self.updateUnknownOption(value);
+    } else {
+      self.renderUnknownOption(value);
+    }
+  };
 
   var renderScheduled = false;
   function scheduleRender() {
@@ -43139,6 +44174,9 @@ var SelectController =
  * the content of the `value` attribute or the textContent of the `<option>`, if the value attribute is missing.
  * Value and textContent can be interpolated.
  *
+ * The {@link select.SelectController select controller} exposes utility functions that can be used
+ * to manipulate the select's behavior.
+ *
  * ## Matching model and option values
  *
  * In general, the match between the model and an option is evaluated by strictly comparing the model
@@ -43190,6 +44228,19 @@ var SelectController =
  * set on the model on selection. See {@link ngOptions `ngOptions`}.
  * @param {string=} ngAttrSize sets the size of the select element dynamically. Uses the
  * {@link guide/interpolation#-ngattr-for-binding-to-arbitrary-attributes ngAttr} directive.
+ *
+ *
+ * @knownIssue
+ *
+ * In Firefox, the select model is only updated when the select element is blurred. For example,
+ * when switching between options with the keyboard, the select model is only set to the
+ * currently selected option when the select is blurred, e.g via tab key or clicking the mouse
+ * outside the select.
+ *
+ * This is due to an ambiguity in the select element specification. See the
+ * [issue on the Firefox bug tracker](https://bugzilla.mozilla.org/show_bug.cgi?id=126379)
+ * for more information, and this
+ * [Github comment for a workaround](https://github.com/angular/angular.js/issues/9134#issuecomment-130800488)
  *
  * @example
  * ### Simple `select` elements with static options
@@ -43435,10 +44486,11 @@ var selectDirective = function() {
                                                includes(value, selectCtrl.selectValueMap[option.value]));
             var currentlySelected = option.selected;
 
-            // IE and Edge, adding options to the selection via shift+click/UP/DOWN,
+            // Support: IE 9-11 only, Edge 12-15+
+            // In IE and Edge adding options to the selection via shift+click/UP/DOWN
             // will de-select already selected options if "selected" on those options was set
             // more than once (i.e. when the options were already selected)
-            // So we only modify the selected property if neccessary.
+            // So we only modify the selected property if necessary.
             // Note: this behavior cannot be replicated via unit tests because it only shows in the
             // actual user interface.
             if (shouldBeSelected !== currentlySelected) {
@@ -44044,11 +45096,11 @@ $provide.value("$locale", {
 })(window);
 
 !window.angular.$$csp().noInlineStyle && window.angular.element(document.head).prepend('<style type="text/css">@charset "UTF-8";[ng\\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide:not(.ng-hide-animate){display:none !important;}ng\\:form{display:block;}.ng-animate-shim{visibility:hidden;}.ng-anchor{position:absolute;}</style>');
-},{}],9:[function(_dereq_,module,exports){
+},{}],11:[function(_dereq_,module,exports){
 _dereq_('./angular');
 module.exports = angular;
 
-},{"./angular":8}],10:[function(_dereq_,module,exports){
+},{"./angular":10}],12:[function(_dereq_,module,exports){
 // https://github.com/Gillardo/bootstrap-ui-datetime-picker
 // Version: 2.5.4
 // Released: 2017-01-23 
@@ -44735,7 +45787,7 @@ angular.module('ui.bootstrap.datetimepicker').run(['$templateCache', function($t
 if(typeof exports === 'object' && typeof module === 'object') {
     module.exports = 'ui.bootstrap.datetimepicker';
 }
-},{}],11:[function(_dereq_,module,exports){
+},{}],13:[function(_dereq_,module,exports){
 // This file is autogenerated via the `commonjs` Grunt task. You can require() this file in a CommonJS environment.
 _dereq_('../../js/transition.js')
 _dereq_('../../js/alert.js')
@@ -44749,7 +45801,7 @@ _dereq_('../../js/popover.js')
 _dereq_('../../js/scrollspy.js')
 _dereq_('../../js/tab.js')
 _dereq_('../../js/affix.js')
-},{"../../js/affix.js":12,"../../js/alert.js":13,"../../js/button.js":14,"../../js/carousel.js":15,"../../js/collapse.js":16,"../../js/dropdown.js":17,"../../js/modal.js":18,"../../js/popover.js":19,"../../js/scrollspy.js":20,"../../js/tab.js":21,"../../js/tooltip.js":22,"../../js/transition.js":23}],12:[function(_dereq_,module,exports){
+},{"../../js/affix.js":14,"../../js/alert.js":15,"../../js/button.js":16,"../../js/carousel.js":17,"../../js/collapse.js":18,"../../js/dropdown.js":19,"../../js/modal.js":20,"../../js/popover.js":21,"../../js/scrollspy.js":22,"../../js/tab.js":23,"../../js/tooltip.js":24,"../../js/transition.js":25}],14:[function(_dereq_,module,exports){
 /* ========================================================================
  * Bootstrap: affix.js v3.3.7
  * http://getbootstrap.com/javascript/#affix
@@ -44913,7 +45965,7 @@ _dereq_('../../js/affix.js')
 
 }(jQuery);
 
-},{}],13:[function(_dereq_,module,exports){
+},{}],15:[function(_dereq_,module,exports){
 /* ========================================================================
  * Bootstrap: alert.js v3.3.7
  * http://getbootstrap.com/javascript/#alerts
@@ -45009,7 +46061,7 @@ _dereq_('../../js/affix.js')
 
 }(jQuery);
 
-},{}],14:[function(_dereq_,module,exports){
+},{}],16:[function(_dereq_,module,exports){
 /* ========================================================================
  * Bootstrap: button.js v3.3.7
  * http://getbootstrap.com/javascript/#buttons
@@ -45136,7 +46188,7 @@ _dereq_('../../js/affix.js')
 
 }(jQuery);
 
-},{}],15:[function(_dereq_,module,exports){
+},{}],17:[function(_dereq_,module,exports){
 /* ========================================================================
  * Bootstrap: carousel.js v3.3.7
  * http://getbootstrap.com/javascript/#carousel
@@ -45375,7 +46427,7 @@ _dereq_('../../js/affix.js')
 
 }(jQuery);
 
-},{}],16:[function(_dereq_,module,exports){
+},{}],18:[function(_dereq_,module,exports){
 /* ========================================================================
  * Bootstrap: collapse.js v3.3.7
  * http://getbootstrap.com/javascript/#collapse
@@ -45589,7 +46641,7 @@ _dereq_('../../js/affix.js')
 
 }(jQuery);
 
-},{}],17:[function(_dereq_,module,exports){
+},{}],19:[function(_dereq_,module,exports){
 /* ========================================================================
  * Bootstrap: dropdown.js v3.3.7
  * http://getbootstrap.com/javascript/#dropdowns
@@ -45756,7 +46808,7 @@ _dereq_('../../js/affix.js')
 
 }(jQuery);
 
-},{}],18:[function(_dereq_,module,exports){
+},{}],20:[function(_dereq_,module,exports){
 /* ========================================================================
  * Bootstrap: modal.js v3.3.7
  * http://getbootstrap.com/javascript/#modals
@@ -46097,7 +47149,7 @@ _dereq_('../../js/affix.js')
 
 }(jQuery);
 
-},{}],19:[function(_dereq_,module,exports){
+},{}],21:[function(_dereq_,module,exports){
 /* ========================================================================
  * Bootstrap: popover.js v3.3.7
  * http://getbootstrap.com/javascript/#popovers
@@ -46207,7 +47259,7 @@ _dereq_('../../js/affix.js')
 
 }(jQuery);
 
-},{}],20:[function(_dereq_,module,exports){
+},{}],22:[function(_dereq_,module,exports){
 /* ========================================================================
  * Bootstrap: scrollspy.js v3.3.7
  * http://getbootstrap.com/javascript/#scrollspy
@@ -46381,7 +47433,7 @@ _dereq_('../../js/affix.js')
 
 }(jQuery);
 
-},{}],21:[function(_dereq_,module,exports){
+},{}],23:[function(_dereq_,module,exports){
 /* ========================================================================
  * Bootstrap: tab.js v3.3.7
  * http://getbootstrap.com/javascript/#tabs
@@ -46538,7 +47590,7 @@ _dereq_('../../js/affix.js')
 
 }(jQuery);
 
-},{}],22:[function(_dereq_,module,exports){
+},{}],24:[function(_dereq_,module,exports){
 /* ========================================================================
  * Bootstrap: tooltip.js v3.3.7
  * http://getbootstrap.com/javascript/#tooltip
@@ -47060,7 +48112,7 @@ _dereq_('../../js/affix.js')
 
 }(jQuery);
 
-},{}],23:[function(_dereq_,module,exports){
+},{}],25:[function(_dereq_,module,exports){
 /* ========================================================================
  * Bootstrap: transition.js v3.3.7
  * http://getbootstrap.com/javascript/#transitions
@@ -47121,7 +48173,102 @@ _dereq_('../../js/affix.js')
 
 }(jQuery);
 
-},{}],24:[function(_dereq_,module,exports){
+},{}],26:[function(_dereq_,module,exports){
+exports.defaults = {};
+
+exports.set = function(name, value, options) {
+  // Retrieve options and defaults
+  var opts = options || {};
+  var defaults = exports.defaults;
+
+  // Apply default value for unspecified options
+  var expires  = opts.expires  || defaults.expires;
+  var domain   = opts.domain   || defaults.domain;
+  var path     = opts.path     !== undefined ? opts.path     : (defaults.path !== undefined ? defaults.path : '/');
+  var secure   = opts.secure   !== undefined ? opts.secure   : defaults.secure;
+  var httponly = opts.httponly !== undefined ? opts.httponly : defaults.httponly;
+
+  // Determine cookie expiration date
+  // If succesful the result will be a valid Date, otherwise it will be an invalid Date or false(ish)
+  var expDate = expires ? new Date(
+      // in case expires is an integer, it should specify the number of days till the cookie expires
+      typeof expires === 'number' ? new Date().getTime() + (expires * 864e5) :
+      // else expires should be either a Date object or in a format recognized by Date.parse()
+      expires
+  ) : '';
+
+  // Set cookie
+  document.cookie = name.replace(/[^+#$&^`|]/g, encodeURIComponent)                // Encode cookie name
+  .replace('(', '%28')
+  .replace(')', '%29') +
+  '=' + value.replace(/[^+#$&/:<-\[\]-}]/g, encodeURIComponent) +                  // Encode cookie value (RFC6265)
+  (expDate && expDate.getTime() >= 0 ? ';expires=' + expDate.toUTCString() : '') + // Add expiration date
+  (domain   ? ';domain=' + domain : '') +                                          // Add domain
+  (path     ? ';path='   + path   : '') +                                          // Add path
+  (secure   ? ';secure'           : '') +                                          // Add secure option
+  (httponly ? ';httponly'         : '');                                           // Add httponly option
+};
+
+exports.get = function(name) {
+  var cookies = document.cookie.split(';');
+
+  // Iterate all cookies
+  for(var i = 0; i < cookies.length; i++) {
+    var cookie = cookies[i];
+    var cookieLength = cookie.length;
+
+    // Determine separator index ("name=value")
+    var separatorIndex = cookie.indexOf('=');
+
+    // IE<11 emits the equal sign when the cookie value is empty
+    separatorIndex = separatorIndex < 0 ? cookieLength : separatorIndex;
+
+    var cookie_name = decodeURIComponent(cookie.substring(0, separatorIndex).replace(/^\s+/, ''));
+
+    // Return cookie value if the name matches
+    if (cookie_name === name) {
+      return decodeURIComponent(cookie.substring(separatorIndex + 1, cookieLength));
+    }
+  }
+
+  // Return `null` as the cookie was not found
+  return null;
+};
+
+exports.erase = function(name, options) {
+  exports.set(name, '', {
+    expires:  -1,
+    domain:   options && options.domain,
+    path:     options && options.path,
+    secure:   0,
+    httponly: 0}
+  );
+};
+
+exports.all = function() {
+  var all = {};
+  var cookies = document.cookie.split(';');
+
+  // Iterate all cookies
+  for(var i = 0; i < cookies.length; i++) {
+	  var cookie = cookies[i];
+    var cookieLength = cookie.length;
+
+	  // Determine separator index ("name=value")
+	  var separatorIndex = cookie.indexOf('=');
+
+	  // IE<11 emits the equal sign when the cookie value is empty
+	  separatorIndex = separatorIndex < 0 ? cookieLength : separatorIndex;
+
+    // add the cookie name and value to the `all` object
+	  var cookie_name = decodeURIComponent(cookie.substring(0, separatorIndex).replace(/^\s+/, ''));
+	  all[cookie_name] = decodeURIComponent(cookie.substring(separatorIndex + 1, cookieLength));
+	}
+
+  return all;
+};
+
+},{}],27:[function(_dereq_,module,exports){
 /*!
  * EventEmitter2
  * https://github.com/hij1nx/EventEmitter2
@@ -47845,7 +48992,7 @@ _dereq_('../../js/affix.js')
   }
 }();
 
-},{}],25:[function(_dereq_,module,exports){
+},{}],28:[function(_dereq_,module,exports){
 (function (global){
 'use strict';
 
@@ -47885,6 +49032,7 @@ var Promise = _dereq_("native-promise-only");
 _dereq_('whatwg-fetch');
 var EventEmitter = _dereq_('eventemitter2').EventEmitter2;
 var copy = _dereq_('shallow-copy');
+var cookies = _dereq_('browser-cookies');
 
 /**
  * The Formio interface class.
@@ -48219,6 +49367,40 @@ var Formio = function () {
     value: function actionInfo(name) {
       return this.makeRequest('actionInfo', this.formUrl + '/actions/' + name);
     }
+  }, {
+    key: 'isObjectId',
+    value: function isObjectId(id) {
+      var checkForHexRegExp = new RegExp("^[0-9a-fA-F]{24}$");
+      return checkForHexRegExp.test(id);
+    }
+  }, {
+    key: 'getProjectId',
+    value: function getProjectId() {
+      if (!this.projectId) {
+        return Promise.resolve('');
+      }
+      if (this.isObjectId(this.projectId)) {
+        return Promise.resolve(this.projectId);
+      } else {
+        return this.loadProject().then(function (project) {
+          return project._id;
+        });
+      }
+    }
+  }, {
+    key: 'getFormId',
+    value: function getFormId() {
+      if (!this.formId) {
+        return Promise.resolve('');
+      }
+      if (this.isObjectId(this.formId)) {
+        return Promise.resolve(this.formId);
+      } else {
+        return this.loadForm().then(function (form) {
+          return form._id;
+        });
+      }
+    }
 
     /**
      * Returns a temporary authentication token for single purpose token generation.
@@ -48236,6 +49418,47 @@ var Formio = function () {
           'x-expire': expire,
           'x-allow': allowed
         })
+      });
+    }
+
+    /**
+     * Get a download url for a submission PDF of this submission.
+     *
+     * @return {*}
+     */
+
+  }, {
+    key: 'getDownloadUrl',
+    value: function getDownloadUrl(form) {
+      var _this2 = this;
+
+      if (!this.submissionId) {
+        return Promise.resolve('');
+      }
+
+      if (!form) {
+        // Make sure to load the form first.
+        return this.loadForm().then(function (_form) {
+          if (!_form) {
+            return '';
+          }
+          return _this2.getDownloadUrl(_form);
+        });
+      }
+
+      var apiUrl = '/project/' + form.project;
+      apiUrl += '/form/' + form._id;
+      apiUrl += '/submission/' + this.submissionId;
+      apiUrl += '/download';
+
+      var download = Formio.baseUrl + apiUrl;
+      return new Promise(function (resolve, reject) {
+        _this2.getTempToken(3600, 'GET:' + apiUrl).then(function (tempToken) {
+          download += '?token=' + tempToken.key;
+          resolve(download);
+        }, function () {
+          resolve(download);
+        }).catch(reject);
       });
     }
   }, {
@@ -48287,6 +49510,65 @@ var Formio = function () {
       }.bind(this));
 
       return Formio.pluginAlter('wrapFileRequestPromise', request, requestArgs);
+    }
+
+    // Determine if the user can submit the form.
+
+  }, {
+    key: 'canSubmit',
+    value: function canSubmit() {
+      return Promise.all([this.loadForm(), Formio.currentUser(), Formio.accessInfo()]).then(function (results) {
+        var form = results.shift();
+        var user = results.shift();
+        var access = results.shift();
+
+        // Get the anonymous and admin roles.
+        var anonRole = {};
+        var adminRole = {};
+        for (var roleName in access.roles) {
+          var role = access.roles[roleName];
+          if (role.default) {
+            anonRole = role;
+          }
+          if (role.admin) {
+            adminRole = role;
+          }
+        }
+
+        var canSubmit = false;
+        var canSubmitAnonymously = false;
+
+        // If the user is an admin, then they can submit this form.
+        if (user && user.roles.indexOf(adminRole._id) !== -1) {
+          return true;
+        }
+
+        for (var i in form.submissionAccess) {
+          var subRole = form.submissionAccess[i];
+          if (subRole.type === 'create_all' || subRole.type === 'create_own') {
+            for (var j in subRole.roles) {
+              // Check if anonymous is allowed.
+              if (anonRole._id === subRole.roles[j]) {
+                canSubmitAnonymously = true;
+              }
+              // Check if the logged in user has the appropriate role.
+              if (user && user.roles.indexOf(subRole.roles[j]) !== -1) {
+                canSubmit = true;
+                break;
+              }
+            }
+            if (canSubmit) {
+              break;
+            }
+          }
+        }
+        // If their user cannot submit, but anonymous can, then delete token and allow submission.
+        if (!canSubmit && canSubmitAnonymously) {
+          canSubmit = true;
+          Formio.setUser(null);
+        }
+        return canSubmit;
+      });
     }
   }], [{
     key: 'loadProjects',
@@ -48360,117 +49642,108 @@ var Formio = function () {
         opts = {};
       }
 
+      // Generate a cachekey.
       var cacheKey = btoa(url);
 
-      return new Promise(function (resolve, reject) {
-        // Get the cached promise to save multiple loads.
-        if (!opts.ignoreCache && method === 'GET' && Formio.cache.hasOwnProperty(cacheKey)) {
-          return resolve(Formio.cache[cacheKey]);
+      // Get the cached promise to save multiple loads.
+      if (!opts.ignoreCache && method === 'GET' && Formio.cache.hasOwnProperty(cacheKey)) {
+        return Formio.cache[cacheKey];
+      }
+
+      // Set up and fetch request
+      var headers = header || new Headers({
+        'Accept': 'application/json',
+        'Content-type': 'application/json; charset=UTF-8'
+      });
+      var token = Formio.getToken();
+      if (token && !opts.noToken) {
+        headers.append('x-jwt-token', token);
+      }
+
+      var options = {
+        method: method,
+        headers: headers,
+        mode: 'cors'
+      };
+      if (data) {
+        options.body = JSON.stringify(data);
+      }
+
+      // Allow plugins to alter the options.
+      options = Formio.pluginAlter('requestOptions', options, url);
+
+      var requestToken = options.headers.get('x-jwt-token');
+
+      var requestPromise = fetch(url, options).then(function (response) {
+        // Allow plugins to respond.
+        response = Formio.pluginAlter('requestResponse', response, Formio);
+
+        if (!response.ok) {
+          if (response.status === 440) {
+            Formio.setToken(null);
+            Formio.events.emit('formio.sessionExpired', response.body);
+          } else if (response.status === 401) {
+            Formio.events.emit('formio.unauthorized', response.body);
+          }
+          // Parse and return the error as a rejected promise to reject this promise
+          return (response.headers.get('content-type').indexOf('application/json') !== -1 ? response.json() : response.text()).then(function (error) {
+            throw error;
+          });
         }
 
-        var requestToken = '';
-        resolve(new Promise(function (resolve, reject) {
-          // Set up and fetch request
-          var headers = header || new Headers({
-            'Accept': 'application/json',
-            'Content-type': 'application/json; charset=UTF-8'
-          });
-          var token = Formio.getToken();
-          if (token && !opts.noToken) {
-            headers.append('x-jwt-token', token);
+        // Handle fetch results
+        var token = response.headers.get('x-jwt-token');
+
+        // In some strange cases, the fetch library will return an x-jwt-token without sending
+        // one to the server. This has even been debugged on the server to verify that no token
+        // was introduced with the request, but the response contains a token. This is an Invalid
+        // case where we do not send an x-jwt-token and get one in return for any GET request.
+        var tokenIntroduced = false;
+        if (method === 'GET' && !requestToken && token && url.indexOf('token=') === -1 && url.indexOf('x-jwt-token=' === -1)) {
+          console.warn('Token was introduced in request.');
+          tokenIntroduced = true;
+        }
+
+        if (response.status >= 200 && response.status < 300 && token && token !== '' && !tokenIntroduced) {
+          Formio.setToken(token);
+        }
+        // 204 is no content. Don't try to .json() it.
+        if (response.status === 204) {
+          return {};
+        }
+
+        var getResult = response.headers.get('content-type').indexOf('application/json') !== -1 ? response.json() : response.text();
+        return getResult.then(function (result) {
+          // Add some content-range metadata to the result here
+          var range = response.headers.get('content-range');
+          if (range && (typeof result === 'undefined' ? 'undefined' : _typeof(result)) === 'object') {
+            range = range.split('/');
+            if (range[0] !== '*') {
+              var skipLimit = range[0].split('-');
+              result.skip = Number(skipLimit[0]);
+              result.limit = skipLimit[1] - skipLimit[0] + 1;
+            }
+            result.serverCount = range[1] === '*' ? range[1] : Number(range[1]);
           }
 
-          var options = {
-            method: method,
-            headers: headers,
-            mode: 'cors'
+          if (!opts.getHeaders) {
+            return result;
+          }
+
+          var headers = {};
+          response.headers.forEach(function (item, key) {
+            headers[key] = item;
+          });
+
+          // Return the result with the headers.
+          return {
+            result: result,
+            headers: headers
           };
-          if (data) {
-            options.body = JSON.stringify(data);
-          }
-
-          requestToken = headers.get('x-jwt-token');
-          resolve(fetch(url, options));
-        }).catch(function (err) {
-          err.message = 'Could not connect to API server (' + err.message + ')';
-          err.networkError = true;
-          throw err;
-        }).then(function (response) {
-          if (!response.ok) {
-            if (response.status === 440) {
-              Formio.setToken(null);
-              Formio.events.emit('formio.sessionExpired', response.body);
-            } else if (response.status === 401) {
-              Formio.events.emit('formio.unauthorized', response.body);
-            }
-            // Parse and return the error as a rejected promise to reject this promise
-            return (response.headers.get('content-type').indexOf('application/json') !== -1 ? response.json() : response.text()).then(function (error) {
-              throw error;
-            });
-          }
-
-          // Handle fetch results
-          var token = response.headers.get('x-jwt-token');
-
-          // In some strange cases, the fetch library will return an x-jwt-token without sending
-          // one to the server. This has even been debugged on the server to verify that no token
-          // was introduced with the request, but the response contains a token. This is an Invalid
-          // case where we do not send an x-jwt-token and get one in return for any GET request.
-          var tokenIntroduced = false;
-          if (method === 'GET' && !requestToken && token && url.indexOf('token=') === -1 && url.indexOf('x-jwt-token=' === -1)) {
-            console.warn('Token was introduced in request.');
-            tokenIntroduced = true;
-          }
-
-          if (response.status >= 200 && response.status < 300 && token && token !== '' && !tokenIntroduced) {
-            Formio.setToken(token);
-          }
-          // 204 is no content. Don't try to .json() it.
-          if (response.status === 204) {
-            return {};
-          }
-          return (response.headers.get('content-type').indexOf('application/json') !== -1 ? response.json() : response.text()).then(function (result) {
-            // Add some content-range metadata to the result here
-            var range = response.headers.get('content-range');
-            if (range && (typeof result === 'undefined' ? 'undefined' : _typeof(result)) === 'object') {
-              range = range.split('/');
-              if (range[0] !== '*') {
-                var skipLimit = range[0].split('-');
-                result.skip = Number(skipLimit[0]);
-                result.limit = skipLimit[1] - skipLimit[0] + 1;
-              }
-              result.serverCount = range[1] === '*' ? range[1] : Number(range[1]);
-            }
-
-            if (!opts.getHeaders) {
-              return result;
-            }
-
-            var headers = {};
-            response.headers.forEach(function (item, key) {
-              headers[key] = item;
-            });
-
-            return new Promise(function (resolve, reject) {
-              resolve({ result: result, headers: headers });
-            });
-          });
-        }).catch(function (err) {
-          if (err === 'Bad Token') {
-            Formio.setToken(null);
-            Formio.events.emit('formio.badToken', err);
-          }
-          if (Formio.cache.hasOwnProperty(cacheKey)) {
-            // Remove failed promises from cache
-            delete Formio.cache[cacheKey];
-          }
-          // Propagate error so client can handle accordingly
-          throw err;
-        }));
+        });
       }).then(function (result) {
-        // Save the cache
-        if (method === 'GET') {
-          Formio.cache[cacheKey] = Promise.resolve(result);
+        if (opts.getHeaders) {
+          return result;
         }
 
         // Shallow copy result so modifications don't end up in cache
@@ -48482,7 +49755,30 @@ var Formio = function () {
           return resultCopy;
         }
         return copy(result);
+      }).catch(function (err) {
+        if (err === 'Bad Token') {
+          Formio.setToken(null);
+          Formio.events.emit('formio.badToken', err);
+        }
+        if (err.message) {
+          err.message = 'Could not connect to API server (' + err.message + ')';
+          err.networkError = true;
+        }
+        if (Formio.cache.hasOwnProperty(cacheKey)) {
+          // Remove failed promises from cache
+          delete Formio.cache[cacheKey];
+        }
+        // Propagate error so client can handle accordingly
+        throw err;
       });
+
+      // Cache the request promise.
+      if (method === 'GET') {
+        Formio.cache[cacheKey] = requestPromise;
+      }
+
+      // Return the request promise.
+      return requestPromise;
     }
   }, {
     key: 'setToken',
@@ -48496,14 +49792,22 @@ var Formio = function () {
         Formio.setUser(null);
         // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
         try {
-          return localStorage.removeItem('formioToken');
+          if (typeof Storage !== "undefined") {
+            return localStorage.removeItem('formioToken');
+          } else {
+            return cookies.erase('formioToken');
+          }
         } catch (err) {
           return;
         }
       }
       // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
       try {
-        localStorage.setItem('formioToken', token);
+        if (typeof Storage !== "undefined") {
+          localStorage.setItem('formioToken', token);
+        } else {
+          cookies.set('formioToken', token);
+        }
       } catch (err) {
         // Do nothing.
       }
@@ -48516,9 +49820,12 @@ var Formio = function () {
         return this.token;
       }
       try {
-        var token = localStorage.getItem('formioToken') || '';
-        this.token = token;
-        return token;
+        if (typeof Storage !== "undefined") {
+          this.token = localStorage.getItem('formioToken') || '';
+        } else {
+          this.token = cookies.get('formioToken');
+        }
+        return this.token;
       } catch (e) {
         return '';
       }
@@ -48530,14 +49837,22 @@ var Formio = function () {
         this.setToken(null);
         // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
         try {
-          return localStorage.removeItem('formioUser');
+          if (typeof Storage !== "undefined") {
+            return localStorage.removeItem('formioUser');
+          } else {
+            return cookies.erase('formioUser');
+          }
         } catch (err) {
           return;
         }
       }
       // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
       try {
-        localStorage.setItem('formioUser', JSON.stringify(user));
+        if (typeof Storage !== "undefined") {
+          localStorage.setItem('formioUser', JSON.stringify(user));
+        } else {
+          cookies.set('formioUser', JSON.stringify(user));
+        }
       } catch (err) {
         // Do nothing.
       }
@@ -48546,7 +49861,11 @@ var Formio = function () {
     key: 'getUser',
     value: function getUser() {
       try {
-        return JSON.parse(localStorage.getItem('formioUser') || null);
+        if (typeof Storage !== "undefined") {
+          return JSON.parse(localStorage.getItem('formioUser') || null);
+        } else {
+          return JSON.parse(cookies.get('formioUser'));
+        }
       } catch (e) {
         return;
       }
@@ -48671,6 +49990,11 @@ var Formio = function () {
       }, value);
     }
   }, {
+    key: 'accessInfo',
+    value: function accessInfo() {
+      return Formio.makeStaticRequest(Formio.projectUrl + '/access');
+    }
+  }, {
     key: 'currentUser',
     value: function currentUser() {
       var url = Formio.baseUrl + '/current';
@@ -48706,11 +50030,13 @@ var Formio = function () {
      * Attach an HTML form to Form.io.
      *
      * @param form
+     * @param options
+     * @param done
      */
 
   }, {
     key: 'form',
-    value: function form(_form, options, done) {
+    value: function form(_form2, options, done) {
       // Fix the parameters.
       if (!done && typeof options === 'function') {
         done = options;
@@ -48723,15 +50049,15 @@ var Formio = function () {
       options = options || {};
 
       // IF they provide a jquery object, then select the element.
-      if (_form.jquery) {
-        _form = _form[0];
+      if (_form2.jquery) {
+        _form2 = _form2[0];
       }
-      if (!_form) {
+      if (!_form2) {
         return done('Invalid Form');
       }
 
       var getAction = function getAction() {
-        return options.form || _form.getAttribute('action');
+        return options.form || _form2.getAttribute('action');
       };
 
       /**
@@ -48767,7 +50093,7 @@ var Formio = function () {
         };
 
         // Get the form data from this form.
-        var formData = new FormData(_form);
+        var formData = new FormData(_form2);
         var entries = formData.entries();
         var entry = null;
         while (entry = entries.next().value) {
@@ -48791,10 +50117,10 @@ var Formio = function () {
       };
 
       // Attach formio to the provided form.
-      if (_form.attachEvent) {
-        _form.attachEvent('submit', submit);
+      if (_form2.attachEvent) {
+        _form2.attachEvent('submit', submit);
       } else {
-        _form.addEventListener('submit', submit);
+        _form2.addEventListener('submit', submit);
       }
 
       return {
@@ -48869,14 +50195,57 @@ Formio.events = new EventEmitter({
 module.exports = global.Formio = Formio;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./providers":26,"eventemitter2":24,"native-promise-only":205,"shallow-copy":209,"whatwg-fetch":212}],26:[function(_dereq_,module,exports){
+},{"./providers":29,"browser-cookies":26,"eventemitter2":27,"native-promise-only":245,"shallow-copy":249,"whatwg-fetch":252}],29:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = {
   storage: _dereq_('./storage')
 };
 
-},{"./storage":28}],27:[function(_dereq_,module,exports){
+},{"./storage":32}],30:[function(_dereq_,module,exports){
+'use strict';
+
+var Promise = _dereq_('native-promise-only');
+var base64 = function base64() {
+  return {
+    title: 'Base64',
+    name: 'base64',
+    uploadFile: function uploadFile(file, fileName) {
+      var _this = this;
+
+      var reader = new FileReader();
+
+      return new Promise(function (resolve, reject) {
+        reader.onload = function (event) {
+          var url = event.target.result;
+          resolve({
+            storage: 'base64',
+            name: fileName,
+            url: url,
+            size: file.size,
+            type: file.type,
+            data: url.replace('data:' + file.type + ';base64,', '')
+          });
+        };
+
+        reader.onerror = function () {
+          return reject(_this);
+        };
+
+        reader.readAsDataURL(file);
+      });
+    },
+    downloadFile: function downloadFile(file) {
+      // Return the original as there is nothing to do.
+      return Promise.resolve(file);
+    }
+  };
+};
+
+base64.title = 'Base64';
+module.exports = base64;
+
+},{"native-promise-only":245}],31:[function(_dereq_,module,exports){
 'use strict';
 
 var Promise = _dereq_("native-promise-only");
@@ -48948,16 +50317,17 @@ var dropbox = function dropbox(formio) {
 dropbox.title = 'Dropbox';
 module.exports = dropbox;
 
-},{"native-promise-only":205}],28:[function(_dereq_,module,exports){
+},{"native-promise-only":245}],32:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = {
+  base64: _dereq_('./base64'),
   dropbox: _dereq_('./dropbox.js'),
   s3: _dereq_('./s3.js'),
   url: _dereq_('./url.js')
 };
 
-},{"./dropbox.js":27,"./s3.js":29,"./url.js":30}],29:[function(_dereq_,module,exports){
+},{"./base64":30,"./dropbox.js":31,"./s3.js":33,"./url.js":34}],33:[function(_dereq_,module,exports){
 'use strict';
 
 var Promise = _dereq_("native-promise-only");
@@ -49072,7 +50442,7 @@ var s3 = function s3(formio) {
 s3.title = 'S3';
 module.exports = s3;
 
-},{"native-promise-only":205}],30:[function(_dereq_,module,exports){
+},{"native-promise-only":245}],34:[function(_dereq_,module,exports){
 'use strict';
 
 var Promise = _dereq_("native-promise-only");
@@ -49151,7 +50521,8 @@ var url = function url(formio) {
 url.title = 'Url';
 module.exports = url;
 
-},{"native-promise-only":205}],31:[function(_dereq_,module,exports){
+},{"native-promise-only":245}],35:[function(_dereq_,module,exports){
+(function (global){
 'use strict';
 
 var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -49162,6 +50533,38 @@ var _typeof = typeof Symbol === "function" && _typeof2(Symbol.iterator) === "sym
   return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof2(obj);
 };
 
+var _clone2 = _dereq_('lodash/clone');
+
+var _clone3 = _interopRequireDefault(_clone2);
+
+var _get2 = _dereq_('lodash/get');
+
+var _get3 = _interopRequireDefault(_get2);
+
+var _isString2 = _dereq_('lodash/isString');
+
+var _isString3 = _interopRequireDefault(_isString2);
+
+var _round2 = _dereq_('lodash/round');
+
+var _round3 = _interopRequireDefault(_round2);
+
+var _pad2 = _dereq_('lodash/pad');
+
+var _pad3 = _interopRequireDefault(_pad2);
+
+var _chunk2 = _dereq_('lodash/chunk');
+
+var _chunk3 = _interopRequireDefault(_chunk2);
+
+var _isNaN2 = _dereq_('lodash/isNaN');
+
+var _isNaN3 = _interopRequireDefault(_isNaN2);
+
+var _template = _dereq_('lodash/template');
+
+var _template2 = _interopRequireDefault(_template);
+
 var _jsonLogicJs = _dereq_('json-logic-js');
 
 var _jsonLogicJs2 = _interopRequireDefault(_jsonLogicJs);
@@ -49170,10 +50573,24 @@ function _interopRequireDefault(obj) {
   return obj && obj.__esModule ? obj : { default: obj };
 }
 
-var _get = _dereq_('lodash/get');
-
-module.exports = {
+var FormioUtils = {
   jsonLogic: _jsonLogicJs2.default, // Share
+
+  /**
+   * Determines the boolean value of a setting.
+   *
+   * @param value
+   * @return {boolean}
+   */
+  boolValue: function boolValue(value) {
+    if (typeof value === 'boolean') {
+      return value;
+    } else if (typeof value === 'string') {
+      return value.toLowerCase() === 'true';
+    } else {
+      return !!value;
+    }
+  },
 
   /**
    * Determine if a component is a layout component or not.
@@ -49199,8 +50616,10 @@ module.exports = {
    *   Whether or not to include layout components.
    * @param {String} path
    *   The current data path of the element. Example: data.user.firstName
+   * @param {Object} parent
+   *   The parent object.
    */
-  eachComponent: function eachComponent(components, fn, includeAll, path) {
+  eachComponent: function eachComponent(components, fn, includeAll, path, parent) {
     if (!components) return;
     path = path || '';
     components.forEach(function (component) {
@@ -49209,6 +50628,16 @@ module.exports = {
       var hasComps = component.components && Array.isArray(component.components);
       var noRecurse = false;
       var newPath = component.key ? path ? path + '.' + component.key : component.key : '';
+
+      // Keep track of parent references.
+      if (parent) {
+        // Ensure we don't create infinite JSON structures.
+        component.parent = (0, _clone3.default)(parent);
+        delete component.parent.components;
+        delete component.parent.componentMap;
+        delete component.parent.columns;
+        delete component.parent.rows;
+      }
 
       if (includeAll || component.tree || !hasColumns && !hasRows && !hasComps) {
         noRecurse = fn(component, newPath);
@@ -49224,17 +50653,41 @@ module.exports = {
       if (!noRecurse) {
         if (hasColumns) {
           component.columns.forEach(function (column) {
-            eachComponent(column.components, fn, includeAll, subPath());
+            eachComponent(column.components, fn, includeAll, subPath(), parent ? component : null);
           });
         } else if (hasRows) {
-          [].concat.apply([], component.rows).forEach(function (row) {
-            eachComponent(row.components, fn, includeAll, subPath());
+          component.rows.forEach(function (row) {
+            row.forEach(function (column) {
+              eachComponent(column.components, fn, includeAll, subPath(), parent ? component : null);
+            });
           });
         } else if (hasComps) {
-          eachComponent(component.components, fn, includeAll, subPath());
+          eachComponent(component.components, fn, includeAll, subPath(), parent ? component : null);
         }
       }
     });
+  },
+
+  /**
+   * Matches if a component matches the query.
+   *
+   * @param component
+   * @param query
+   * @return {boolean}
+   */
+  matchComponent: function matchComponent(component, query) {
+    if (typeof query === 'string') {
+      return component.key === query;
+    } else {
+      var matches = false;
+      for (var search in query) {
+        matches = (0, _get3.default)(component, search) === query[search];
+        if (!matches) {
+          break;
+        }
+      }
+      return matches;
+    }
   },
 
   /**
@@ -49242,20 +50695,40 @@ module.exports = {
    *
    * @param {Object} components
    *   The components to iterate.
-   * @param {String} key
-   *   The key of the component to get.
+   * @param {String|Object} key
+   *   The key of the component to get, or a query of the component to search.
    *
    * @returns {Object}
    *   The component that matches the given key, or undefined if not found.
    */
   getComponent: function getComponent(components, key) {
     var result;
-    module.exports.eachComponent(components, function (component) {
-      if (component.key === key) {
+    FormioUtils.eachComponent(components, function (component, path) {
+      if (FormioUtils.matchComponent(component, key)) {
+        component.path = path;
         result = component;
+        return true;
       }
     });
     return result;
+  },
+
+  /**
+   * Finds a component provided a query of properties of that component.
+   *
+   * @param components
+   * @param query
+   * @return {*}
+   */
+  findComponents: function findComponents(components, query) {
+    var results = [];
+    FormioUtils.eachComponent(components, function (component, path) {
+      if (FormioUtils.matchComponent(component, query)) {
+        component.path = path;
+        results.push(component);
+      }
+    }, true);
+    return results;
   },
 
   /**
@@ -49271,7 +50744,7 @@ module.exports = {
    */
   flattenComponents: function flattenComponents(components, includeAll) {
     var flattened = {};
-    module.exports.eachComponent(components, function (component, path) {
+    FormioUtils.eachComponent(components, function (component, path) {
       flattened[path] = component;
     }, includeAll);
     return flattened;
@@ -49286,6 +50759,98 @@ module.exports = {
    */
   hasCondition: function hasCondition(component) {
     return component.hasOwnProperty('customConditional') && component.customConditional || component.hasOwnProperty('conditional') && component.conditional && component.conditional.when || component.hasOwnProperty('conditional') && component.conditional && component.conditional.json;
+  },
+
+  /**
+   * Extension of standard #parseFloat(value) function, that also clears input string.
+   *
+   * @param {any} value
+   *   The value to parse.
+   *
+   * @returns {Number}
+   *   Parsed value.
+   */
+  parseFloat: function (_parseFloat) {
+    function parseFloat(_x) {
+      return _parseFloat.apply(this, arguments);
+    }
+
+    parseFloat.toString = function () {
+      return _parseFloat.toString();
+    };
+
+    return parseFloat;
+  }(function (value) {
+    return parseFloat((0, _isString3.default)(value) ? value.replace(/[^\de.+-]/gi, '') : value);
+  }),
+
+  /**
+   * Formats provided value in way how Currency component uses it.
+   *
+   * @param {any} value
+   *   The value to format.
+   *
+   * @returns {String}
+   *   Value formatted for Currency component.
+   */
+  formatAsCurrency: function formatAsCurrency(value) {
+    var parsedValue = this.parseFloat(value);
+
+    if ((0, _isNaN3.default)(parsedValue)) {
+      return '';
+    }
+
+    var parts = (0, _round3.default)(parsedValue, 2).toString().split('.');
+    parts[0] = (0, _chunk3.default)(Array.from(parts[0]).reverse(), 3).reverse().map(function (part) {
+      return part.reverse().join('');
+    }).join(',');
+    parts[1] = (0, _pad3.default)(parts[1], 2, '0');
+    return parts.join('.');
+  },
+
+  /**
+   * Escapes RegEx characters in provided String value.
+   *
+   * @param {String} value
+   *   String for escaping RegEx characters.
+   * @returns {string}
+   *   String with escaped RegEx characters.
+   */
+  escapeRegExCharacters: function escapeRegExCharacters(value) {
+    return value.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+  },
+
+  /**
+   * Checks the calculated value for a provided component and data.
+   *
+   * @param {Object} component
+   *   The component to check for the calculated value.
+   * @param {Object} submission
+   *   A submission object.
+   * @param data
+   *   The full submission data.
+   */
+  checkCalculated: function checkCalculated(component, submission, data) {
+    // Process calculated value stuff if present.
+    if (component.calculateValue) {
+      if (typeof component.calculateValue === 'string') {
+        try {
+          var util = this;
+          data[component.key] = eval('(function(data, util) { var value = [];' + component.calculateValue.toString() + '; return value; })(data, util)');
+        } catch (e) {
+          console.warn('An error occurred calculating a value for ' + component.key, e);
+        }
+      } else {
+        try {
+          data[component.key] = FormioUtils.jsonLogic.apply(component.calculateValue, {
+            data: submission ? submission.data : data,
+            row: data
+          });
+        } catch (e) {
+          console.warn('An error occurred calculating a value for ' + component.key, e);
+        }
+      }
+    }
   },
 
   /**
@@ -49394,18 +50959,51 @@ module.exports = {
    * @returns {XML|string|*|void}
    */
   interpolate: function interpolate(string, data) {
-    return string.replace(/\{\{\s*([^\s]*)\s*\}\}/g, function (match, token) {
-      return _get(data, token);
+    var templateSettings = {
+      evaluate: /\{\%(.+?)\%\}/g,
+      interpolate: /\{\{(.+?)\}\}/g,
+      escape: /\{\{\{(.+?)\}\}\}/g
+    };
+    try {
+      return (0, _template2.default)(string, templateSettings)(data);
+    } catch (err) {
+      console.warn('Error interpolating template', err, string, data);
+    }
+  },
+
+  /**
+   * Make a filename guaranteed to be unique.
+   * @param name
+   * @returns {string}
+   */
+  uniqueName: function uniqueName(name) {
+    var parts = name.toLowerCase().replace(/[^0-9a-z\.]/g, '').split('.');
+    var fileName = parts[0];
+    var ext = '';
+    if (parts.length > 1) {
+      ext = '.' + parts[parts.length - 1];
+    }
+    return fileName.substr(0, 10) + '-' + this.guid() + ext;
+  },
+
+  guid: function guid() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+      var r = Math.random() * 16 | 0,
+          v = c === 'x' ? r : r & 0x3 | 0x8;
+      return v.toString(16);
     });
   }
 };
 
-},{"json-logic-js":33,"lodash/get":179}],32:[function(_dereq_,module,exports){
+module.exports = global.FormioUtils = FormioUtils;
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"json-logic-js":37,"lodash/chunk":201,"lodash/clone":202,"lodash/get":208,"lodash/isNaN":221,"lodash/isString":226,"lodash/pad":232,"lodash/round":234,"lodash/template":238}],36:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = _dereq_('./build/utils');
 
-},{"./build/utils":31}],33:[function(_dereq_,module,exports){
+},{"./build/utils":35}],37:[function(_dereq_,module,exports){
 /* globals define,module */
 /*
 Using a Universal Module Loader that should be browser, require, and AMD friendly
@@ -49726,6 +51324,9 @@ http://ricostacruz.com/cheatsheets/umdjs.html
     operations[name] = code;
   };
 
+  jsonLogic.rm_operation = function(name) {
+    delete operations[name];
+  };
 
   jsonLogic.rule_like = function(rule, pattern) {
     // console.log("Is ". JSON.stringify(rule) . " like " . JSON.stringify(pattern) . "?");
@@ -49789,7 +51390,7 @@ http://ricostacruz.com/cheatsheets/umdjs.html
   return jsonLogic;
 }));
 
-},{}],34:[function(_dereq_,module,exports){
+},{}],38:[function(_dereq_,module,exports){
 var getNative = _dereq_('./_getNative'),
     root = _dereq_('./_root');
 
@@ -49798,7 +51399,7 @@ var DataView = getNative(root, 'DataView');
 
 module.exports = DataView;
 
-},{"./_getNative":117,"./_root":160}],35:[function(_dereq_,module,exports){
+},{"./_getNative":133,"./_root":180}],39:[function(_dereq_,module,exports){
 var hashClear = _dereq_('./_hashClear'),
     hashDelete = _dereq_('./_hashDelete'),
     hashGet = _dereq_('./_hashGet'),
@@ -49832,7 +51433,7 @@ Hash.prototype.set = hashSet;
 
 module.exports = Hash;
 
-},{"./_hashClear":125,"./_hashDelete":126,"./_hashGet":127,"./_hashHas":128,"./_hashSet":129}],36:[function(_dereq_,module,exports){
+},{"./_hashClear":142,"./_hashDelete":143,"./_hashGet":144,"./_hashHas":145,"./_hashSet":146}],40:[function(_dereq_,module,exports){
 var listCacheClear = _dereq_('./_listCacheClear'),
     listCacheDelete = _dereq_('./_listCacheDelete'),
     listCacheGet = _dereq_('./_listCacheGet'),
@@ -49866,7 +51467,7 @@ ListCache.prototype.set = listCacheSet;
 
 module.exports = ListCache;
 
-},{"./_listCacheClear":140,"./_listCacheDelete":141,"./_listCacheGet":142,"./_listCacheHas":143,"./_listCacheSet":144}],37:[function(_dereq_,module,exports){
+},{"./_listCacheClear":157,"./_listCacheDelete":158,"./_listCacheGet":159,"./_listCacheHas":160,"./_listCacheSet":161}],41:[function(_dereq_,module,exports){
 var getNative = _dereq_('./_getNative'),
     root = _dereq_('./_root');
 
@@ -49875,7 +51476,7 @@ var Map = getNative(root, 'Map');
 
 module.exports = Map;
 
-},{"./_getNative":117,"./_root":160}],38:[function(_dereq_,module,exports){
+},{"./_getNative":133,"./_root":180}],42:[function(_dereq_,module,exports){
 var mapCacheClear = _dereq_('./_mapCacheClear'),
     mapCacheDelete = _dereq_('./_mapCacheDelete'),
     mapCacheGet = _dereq_('./_mapCacheGet'),
@@ -49909,7 +51510,7 @@ MapCache.prototype.set = mapCacheSet;
 
 module.exports = MapCache;
 
-},{"./_mapCacheClear":145,"./_mapCacheDelete":146,"./_mapCacheGet":147,"./_mapCacheHas":148,"./_mapCacheSet":149}],39:[function(_dereq_,module,exports){
+},{"./_mapCacheClear":162,"./_mapCacheDelete":163,"./_mapCacheGet":164,"./_mapCacheHas":165,"./_mapCacheSet":166}],43:[function(_dereq_,module,exports){
 var getNative = _dereq_('./_getNative'),
     root = _dereq_('./_root');
 
@@ -49918,7 +51519,7 @@ var Promise = getNative(root, 'Promise');
 
 module.exports = Promise;
 
-},{"./_getNative":117,"./_root":160}],40:[function(_dereq_,module,exports){
+},{"./_getNative":133,"./_root":180}],44:[function(_dereq_,module,exports){
 var getNative = _dereq_('./_getNative'),
     root = _dereq_('./_root');
 
@@ -49927,7 +51528,7 @@ var Set = getNative(root, 'Set');
 
 module.exports = Set;
 
-},{"./_getNative":117,"./_root":160}],41:[function(_dereq_,module,exports){
+},{"./_getNative":133,"./_root":180}],45:[function(_dereq_,module,exports){
 var MapCache = _dereq_('./_MapCache'),
     setCacheAdd = _dereq_('./_setCacheAdd'),
     setCacheHas = _dereq_('./_setCacheHas');
@@ -49956,7 +51557,7 @@ SetCache.prototype.has = setCacheHas;
 
 module.exports = SetCache;
 
-},{"./_MapCache":38,"./_setCacheAdd":161,"./_setCacheHas":162}],42:[function(_dereq_,module,exports){
+},{"./_MapCache":42,"./_setCacheAdd":181,"./_setCacheHas":182}],46:[function(_dereq_,module,exports){
 var ListCache = _dereq_('./_ListCache'),
     stackClear = _dereq_('./_stackClear'),
     stackDelete = _dereq_('./_stackDelete'),
@@ -49985,7 +51586,7 @@ Stack.prototype.set = stackSet;
 
 module.exports = Stack;
 
-},{"./_ListCache":36,"./_stackClear":166,"./_stackDelete":167,"./_stackGet":168,"./_stackHas":169,"./_stackSet":170}],43:[function(_dereq_,module,exports){
+},{"./_ListCache":40,"./_stackClear":186,"./_stackDelete":187,"./_stackGet":188,"./_stackHas":189,"./_stackSet":190}],47:[function(_dereq_,module,exports){
 var root = _dereq_('./_root');
 
 /** Built-in value references. */
@@ -49993,7 +51594,7 @@ var Symbol = root.Symbol;
 
 module.exports = Symbol;
 
-},{"./_root":160}],44:[function(_dereq_,module,exports){
+},{"./_root":180}],48:[function(_dereq_,module,exports){
 var root = _dereq_('./_root');
 
 /** Built-in value references. */
@@ -50001,7 +51602,7 @@ var Uint8Array = root.Uint8Array;
 
 module.exports = Uint8Array;
 
-},{"./_root":160}],45:[function(_dereq_,module,exports){
+},{"./_root":180}],49:[function(_dereq_,module,exports){
 var getNative = _dereq_('./_getNative'),
     root = _dereq_('./_root');
 
@@ -50010,7 +51611,7 @@ var WeakMap = getNative(root, 'WeakMap');
 
 module.exports = WeakMap;
 
-},{"./_getNative":117,"./_root":160}],46:[function(_dereq_,module,exports){
+},{"./_getNative":133,"./_root":180}],50:[function(_dereq_,module,exports){
 /**
  * Adds the key-value `pair` to `map`.
  *
@@ -50027,7 +51628,7 @@ function addMapEntry(map, pair) {
 
 module.exports = addMapEntry;
 
-},{}],47:[function(_dereq_,module,exports){
+},{}],51:[function(_dereq_,module,exports){
 /**
  * Adds `value` to `set`.
  *
@@ -50044,7 +51645,7 @@ function addSetEntry(set, value) {
 
 module.exports = addSetEntry;
 
-},{}],48:[function(_dereq_,module,exports){
+},{}],52:[function(_dereq_,module,exports){
 /**
  * A faster alternative to `Function#apply`, this function invokes `func`
  * with the `this` binding of `thisArg` and the arguments of `args`.
@@ -50067,7 +51668,7 @@ function apply(func, thisArg, args) {
 
 module.exports = apply;
 
-},{}],49:[function(_dereq_,module,exports){
+},{}],53:[function(_dereq_,module,exports){
 /**
  * A specialized version of `_.forEach` for arrays without support for
  * iteratee shorthands.
@@ -50091,7 +51692,7 @@ function arrayEach(array, iteratee) {
 
 module.exports = arrayEach;
 
-},{}],50:[function(_dereq_,module,exports){
+},{}],54:[function(_dereq_,module,exports){
 /**
  * A specialized version of `_.filter` for arrays without support for
  * iteratee shorthands.
@@ -50118,7 +51719,7 @@ function arrayFilter(array, predicate) {
 
 module.exports = arrayFilter;
 
-},{}],51:[function(_dereq_,module,exports){
+},{}],55:[function(_dereq_,module,exports){
 var baseTimes = _dereq_('./_baseTimes'),
     isArguments = _dereq_('./isArguments'),
     isArray = _dereq_('./isArray'),
@@ -50169,7 +51770,7 @@ function arrayLikeKeys(value, inherited) {
 
 module.exports = arrayLikeKeys;
 
-},{"./_baseTimes":87,"./_isIndex":133,"./isArguments":182,"./isArray":183,"./isBuffer":185,"./isTypedArray":195}],52:[function(_dereq_,module,exports){
+},{"./_baseTimes":96,"./_isIndex":150,"./isArguments":211,"./isArray":212,"./isBuffer":214,"./isTypedArray":228}],56:[function(_dereq_,module,exports){
 /**
  * A specialized version of `_.map` for arrays without support for iteratee
  * shorthands.
@@ -50192,7 +51793,7 @@ function arrayMap(array, iteratee) {
 
 module.exports = arrayMap;
 
-},{}],53:[function(_dereq_,module,exports){
+},{}],57:[function(_dereq_,module,exports){
 /**
  * Appends the elements of `values` to `array`.
  *
@@ -50214,7 +51815,7 @@ function arrayPush(array, values) {
 
 module.exports = arrayPush;
 
-},{}],54:[function(_dereq_,module,exports){
+},{}],58:[function(_dereq_,module,exports){
 /**
  * A specialized version of `_.reduce` for arrays without support for
  * iteratee shorthands.
@@ -50242,7 +51843,7 @@ function arrayReduce(array, iteratee, accumulator, initAccum) {
 
 module.exports = arrayReduce;
 
-},{}],55:[function(_dereq_,module,exports){
+},{}],59:[function(_dereq_,module,exports){
 /**
  * A specialized version of `_.some` for arrays without support for iteratee
  * shorthands.
@@ -50267,7 +51868,35 @@ function arraySome(array, predicate) {
 
 module.exports = arraySome;
 
-},{}],56:[function(_dereq_,module,exports){
+},{}],60:[function(_dereq_,module,exports){
+var baseProperty = _dereq_('./_baseProperty');
+
+/**
+ * Gets the size of an ASCII `string`.
+ *
+ * @private
+ * @param {string} string The string inspect.
+ * @returns {number} Returns the string size.
+ */
+var asciiSize = baseProperty('length');
+
+module.exports = asciiSize;
+
+},{"./_baseProperty":88}],61:[function(_dereq_,module,exports){
+/**
+ * Converts an ASCII `string` to an array.
+ *
+ * @private
+ * @param {string} string The string to convert.
+ * @returns {Array} Returns the converted array.
+ */
+function asciiToArray(string) {
+  return string.split('');
+}
+
+module.exports = asciiToArray;
+
+},{}],62:[function(_dereq_,module,exports){
 var baseAssignValue = _dereq_('./_baseAssignValue'),
     eq = _dereq_('./eq');
 
@@ -50297,7 +51926,7 @@ function assignValue(object, key, value) {
 
 module.exports = assignValue;
 
-},{"./_baseAssignValue":60,"./eq":177}],57:[function(_dereq_,module,exports){
+},{"./_baseAssignValue":66,"./eq":205}],63:[function(_dereq_,module,exports){
 var eq = _dereq_('./eq');
 
 /**
@@ -50320,7 +51949,7 @@ function assocIndexOf(array, key) {
 
 module.exports = assocIndexOf;
 
-},{"./eq":177}],58:[function(_dereq_,module,exports){
+},{"./eq":205}],64:[function(_dereq_,module,exports){
 var copyObject = _dereq_('./_copyObject'),
     keys = _dereq_('./keys');
 
@@ -50339,7 +51968,7 @@ function baseAssign(object, source) {
 
 module.exports = baseAssign;
 
-},{"./_copyObject":101,"./keys":196}],59:[function(_dereq_,module,exports){
+},{"./_copyObject":112,"./keys":229}],65:[function(_dereq_,module,exports){
 var copyObject = _dereq_('./_copyObject'),
     keysIn = _dereq_('./keysIn');
 
@@ -50358,7 +51987,7 @@ function baseAssignIn(object, source) {
 
 module.exports = baseAssignIn;
 
-},{"./_copyObject":101,"./keysIn":197}],60:[function(_dereq_,module,exports){
+},{"./_copyObject":112,"./keysIn":230}],66:[function(_dereq_,module,exports){
 var defineProperty = _dereq_('./_defineProperty');
 
 /**
@@ -50385,7 +52014,7 @@ function baseAssignValue(object, key, value) {
 
 module.exports = baseAssignValue;
 
-},{"./_defineProperty":108}],61:[function(_dereq_,module,exports){
+},{"./_defineProperty":122}],67:[function(_dereq_,module,exports){
 var Stack = _dereq_('./_Stack'),
     arrayEach = _dereq_('./_arrayEach'),
     assignValue = _dereq_('./_assignValue'),
@@ -50540,7 +52169,7 @@ function baseClone(value, bitmask, customizer, key, object, stack) {
 
 module.exports = baseClone;
 
-},{"./_Stack":42,"./_arrayEach":49,"./_assignValue":56,"./_baseAssign":58,"./_baseAssignIn":59,"./_cloneBuffer":93,"./_copyArray":100,"./_copySymbols":102,"./_copySymbolsIn":103,"./_getAllKeys":113,"./_getAllKeysIn":114,"./_getTag":122,"./_initCloneArray":130,"./_initCloneByTag":131,"./_initCloneObject":132,"./isArray":183,"./isBuffer":185,"./isObject":192,"./keys":196}],62:[function(_dereq_,module,exports){
+},{"./_Stack":46,"./_arrayEach":53,"./_assignValue":62,"./_baseAssign":64,"./_baseAssignIn":65,"./_cloneBuffer":104,"./_copyArray":111,"./_copySymbols":113,"./_copySymbolsIn":114,"./_getAllKeys":129,"./_getAllKeysIn":130,"./_getTag":138,"./_initCloneArray":147,"./_initCloneByTag":148,"./_initCloneObject":149,"./isArray":212,"./isBuffer":214,"./isObject":223,"./keys":229}],68:[function(_dereq_,module,exports){
 var isObject = _dereq_('./isObject');
 
 /** Built-in value references. */
@@ -50572,7 +52201,7 @@ var baseCreate = (function() {
 
 module.exports = baseCreate;
 
-},{"./isObject":192}],63:[function(_dereq_,module,exports){
+},{"./isObject":223}],69:[function(_dereq_,module,exports){
 var baseForOwn = _dereq_('./_baseForOwn'),
     createBaseEach = _dereq_('./_createBaseEach');
 
@@ -50588,7 +52217,7 @@ var baseEach = createBaseEach(baseForOwn);
 
 module.exports = baseEach;
 
-},{"./_baseForOwn":66,"./_createBaseEach":106}],64:[function(_dereq_,module,exports){
+},{"./_baseForOwn":72,"./_createBaseEach":117}],70:[function(_dereq_,module,exports){
 var baseEach = _dereq_('./_baseEach');
 
 /**
@@ -50611,7 +52240,7 @@ function baseFilter(collection, predicate) {
 
 module.exports = baseFilter;
 
-},{"./_baseEach":63}],65:[function(_dereq_,module,exports){
+},{"./_baseEach":69}],71:[function(_dereq_,module,exports){
 var createBaseFor = _dereq_('./_createBaseFor');
 
 /**
@@ -50629,7 +52258,7 @@ var baseFor = createBaseFor();
 
 module.exports = baseFor;
 
-},{"./_createBaseFor":107}],66:[function(_dereq_,module,exports){
+},{"./_createBaseFor":118}],72:[function(_dereq_,module,exports){
 var baseFor = _dereq_('./_baseFor'),
     keys = _dereq_('./keys');
 
@@ -50647,7 +52276,7 @@ function baseForOwn(object, iteratee) {
 
 module.exports = baseForOwn;
 
-},{"./_baseFor":65,"./keys":196}],67:[function(_dereq_,module,exports){
+},{"./_baseFor":71,"./keys":229}],73:[function(_dereq_,module,exports){
 var castPath = _dereq_('./_castPath'),
     toKey = _dereq_('./_toKey');
 
@@ -50673,7 +52302,7 @@ function baseGet(object, path) {
 
 module.exports = baseGet;
 
-},{"./_castPath":91,"./_toKey":172}],68:[function(_dereq_,module,exports){
+},{"./_castPath":101,"./_toKey":194}],74:[function(_dereq_,module,exports){
 var arrayPush = _dereq_('./_arrayPush'),
     isArray = _dereq_('./isArray');
 
@@ -50695,7 +52324,7 @@ function baseGetAllKeys(object, keysFunc, symbolsFunc) {
 
 module.exports = baseGetAllKeys;
 
-},{"./_arrayPush":53,"./isArray":183}],69:[function(_dereq_,module,exports){
+},{"./_arrayPush":57,"./isArray":212}],75:[function(_dereq_,module,exports){
 var Symbol = _dereq_('./_Symbol'),
     getRawTag = _dereq_('./_getRawTag'),
     objectToString = _dereq_('./_objectToString');
@@ -50725,7 +52354,7 @@ function baseGetTag(value) {
 
 module.exports = baseGetTag;
 
-},{"./_Symbol":43,"./_getRawTag":119,"./_objectToString":157}],70:[function(_dereq_,module,exports){
+},{"./_Symbol":47,"./_getRawTag":135,"./_objectToString":174}],76:[function(_dereq_,module,exports){
 /**
  * The base implementation of `_.hasIn` without support for deep paths.
  *
@@ -50740,7 +52369,7 @@ function baseHasIn(object, key) {
 
 module.exports = baseHasIn;
 
-},{}],71:[function(_dereq_,module,exports){
+},{}],77:[function(_dereq_,module,exports){
 var baseGetTag = _dereq_('./_baseGetTag'),
     isObjectLike = _dereq_('./isObjectLike');
 
@@ -50760,7 +52389,7 @@ function baseIsArguments(value) {
 
 module.exports = baseIsArguments;
 
-},{"./_baseGetTag":69,"./isObjectLike":193}],72:[function(_dereq_,module,exports){
+},{"./_baseGetTag":75,"./isObjectLike":224}],78:[function(_dereq_,module,exports){
 var baseIsEqualDeep = _dereq_('./_baseIsEqualDeep'),
     isObjectLike = _dereq_('./isObjectLike');
 
@@ -50790,7 +52419,7 @@ function baseIsEqual(value, other, bitmask, customizer, stack) {
 
 module.exports = baseIsEqual;
 
-},{"./_baseIsEqualDeep":73,"./isObjectLike":193}],73:[function(_dereq_,module,exports){
+},{"./_baseIsEqualDeep":79,"./isObjectLike":224}],79:[function(_dereq_,module,exports){
 var Stack = _dereq_('./_Stack'),
     equalArrays = _dereq_('./_equalArrays'),
     equalByTag = _dereq_('./_equalByTag'),
@@ -50875,7 +52504,7 @@ function baseIsEqualDeep(object, other, bitmask, customizer, equalFunc, stack) {
 
 module.exports = baseIsEqualDeep;
 
-},{"./_Stack":42,"./_equalArrays":109,"./_equalByTag":110,"./_equalObjects":111,"./_getTag":122,"./isArray":183,"./isBuffer":185,"./isTypedArray":195}],74:[function(_dereq_,module,exports){
+},{"./_Stack":46,"./_equalArrays":123,"./_equalByTag":124,"./_equalObjects":125,"./_getTag":138,"./isArray":212,"./isBuffer":214,"./isTypedArray":228}],80:[function(_dereq_,module,exports){
 var Stack = _dereq_('./_Stack'),
     baseIsEqual = _dereq_('./_baseIsEqual');
 
@@ -50939,7 +52568,7 @@ function baseIsMatch(object, source, matchData, customizer) {
 
 module.exports = baseIsMatch;
 
-},{"./_Stack":42,"./_baseIsEqual":72}],75:[function(_dereq_,module,exports){
+},{"./_Stack":46,"./_baseIsEqual":78}],81:[function(_dereq_,module,exports){
 var isFunction = _dereq_('./isFunction'),
     isMasked = _dereq_('./_isMasked'),
     isObject = _dereq_('./isObject'),
@@ -50988,7 +52617,7 @@ function baseIsNative(value) {
 
 module.exports = baseIsNative;
 
-},{"./_isMasked":137,"./_toSource":173,"./isFunction":188,"./isObject":192}],76:[function(_dereq_,module,exports){
+},{"./_isMasked":154,"./_toSource":195,"./isFunction":218,"./isObject":223}],82:[function(_dereq_,module,exports){
 var baseGetTag = _dereq_('./_baseGetTag'),
     isLength = _dereq_('./isLength'),
     isObjectLike = _dereq_('./isObjectLike');
@@ -51050,7 +52679,7 @@ function baseIsTypedArray(value) {
 
 module.exports = baseIsTypedArray;
 
-},{"./_baseGetTag":69,"./isLength":189,"./isObjectLike":193}],77:[function(_dereq_,module,exports){
+},{"./_baseGetTag":75,"./isLength":219,"./isObjectLike":224}],83:[function(_dereq_,module,exports){
 var baseMatches = _dereq_('./_baseMatches'),
     baseMatchesProperty = _dereq_('./_baseMatchesProperty'),
     identity = _dereq_('./identity'),
@@ -51083,7 +52712,7 @@ function baseIteratee(value) {
 
 module.exports = baseIteratee;
 
-},{"./_baseMatches":80,"./_baseMatchesProperty":81,"./identity":181,"./isArray":183,"./property":199}],78:[function(_dereq_,module,exports){
+},{"./_baseMatches":86,"./_baseMatchesProperty":87,"./identity":210,"./isArray":212,"./property":233}],84:[function(_dereq_,module,exports){
 var isPrototype = _dereq_('./_isPrototype'),
     nativeKeys = _dereq_('./_nativeKeys');
 
@@ -51115,7 +52744,7 @@ function baseKeys(object) {
 
 module.exports = baseKeys;
 
-},{"./_isPrototype":138,"./_nativeKeys":154}],79:[function(_dereq_,module,exports){
+},{"./_isPrototype":155,"./_nativeKeys":171}],85:[function(_dereq_,module,exports){
 var isObject = _dereq_('./isObject'),
     isPrototype = _dereq_('./_isPrototype'),
     nativeKeysIn = _dereq_('./_nativeKeysIn');
@@ -51150,7 +52779,7 @@ function baseKeysIn(object) {
 
 module.exports = baseKeysIn;
 
-},{"./_isPrototype":138,"./_nativeKeysIn":155,"./isObject":192}],80:[function(_dereq_,module,exports){
+},{"./_isPrototype":155,"./_nativeKeysIn":172,"./isObject":223}],86:[function(_dereq_,module,exports){
 var baseIsMatch = _dereq_('./_baseIsMatch'),
     getMatchData = _dereq_('./_getMatchData'),
     matchesStrictComparable = _dereq_('./_matchesStrictComparable');
@@ -51174,7 +52803,7 @@ function baseMatches(source) {
 
 module.exports = baseMatches;
 
-},{"./_baseIsMatch":74,"./_getMatchData":116,"./_matchesStrictComparable":151}],81:[function(_dereq_,module,exports){
+},{"./_baseIsMatch":80,"./_getMatchData":132,"./_matchesStrictComparable":168}],87:[function(_dereq_,module,exports){
 var baseIsEqual = _dereq_('./_baseIsEqual'),
     get = _dereq_('./get'),
     hasIn = _dereq_('./hasIn'),
@@ -51209,7 +52838,7 @@ function baseMatchesProperty(path, srcValue) {
 
 module.exports = baseMatchesProperty;
 
-},{"./_baseIsEqual":72,"./_isKey":135,"./_isStrictComparable":139,"./_matchesStrictComparable":151,"./_toKey":172,"./get":179,"./hasIn":180}],82:[function(_dereq_,module,exports){
+},{"./_baseIsEqual":78,"./_isKey":152,"./_isStrictComparable":156,"./_matchesStrictComparable":168,"./_toKey":194,"./get":208,"./hasIn":209}],88:[function(_dereq_,module,exports){
 /**
  * The base implementation of `_.property` without support for deep paths.
  *
@@ -51225,7 +52854,7 @@ function baseProperty(key) {
 
 module.exports = baseProperty;
 
-},{}],83:[function(_dereq_,module,exports){
+},{}],89:[function(_dereq_,module,exports){
 var baseGet = _dereq_('./_baseGet');
 
 /**
@@ -51243,7 +52872,60 @@ function basePropertyDeep(path) {
 
 module.exports = basePropertyDeep;
 
-},{"./_baseGet":67}],84:[function(_dereq_,module,exports){
+},{"./_baseGet":73}],90:[function(_dereq_,module,exports){
+/**
+ * The base implementation of `_.propertyOf` without support for deep paths.
+ *
+ * @private
+ * @param {Object} object The object to query.
+ * @returns {Function} Returns the new accessor function.
+ */
+function basePropertyOf(object) {
+  return function(key) {
+    return object == null ? undefined : object[key];
+  };
+}
+
+module.exports = basePropertyOf;
+
+},{}],91:[function(_dereq_,module,exports){
+/** Used as references for various `Number` constants. */
+var MAX_SAFE_INTEGER = 9007199254740991;
+
+/* Built-in method references for those with the same name as other `lodash` methods. */
+var nativeFloor = Math.floor;
+
+/**
+ * The base implementation of `_.repeat` which doesn't coerce arguments.
+ *
+ * @private
+ * @param {string} string The string to repeat.
+ * @param {number} n The number of times to repeat the string.
+ * @returns {string} Returns the repeated string.
+ */
+function baseRepeat(string, n) {
+  var result = '';
+  if (!string || n < 1 || n > MAX_SAFE_INTEGER) {
+    return result;
+  }
+  // Leverage the exponentiation by squaring algorithm for a faster repeat.
+  // See https://en.wikipedia.org/wiki/Exponentiation_by_squaring for more details.
+  do {
+    if (n % 2) {
+      result += string;
+    }
+    n = nativeFloor(n / 2);
+    if (n) {
+      string += string;
+    }
+  } while (n);
+
+  return result;
+}
+
+module.exports = baseRepeat;
+
+},{}],92:[function(_dereq_,module,exports){
 var identity = _dereq_('./identity'),
     overRest = _dereq_('./_overRest'),
     setToString = _dereq_('./_setToString');
@@ -51262,7 +52944,7 @@ function baseRest(func, start) {
 
 module.exports = baseRest;
 
-},{"./_overRest":159,"./_setToString":164,"./identity":181}],85:[function(_dereq_,module,exports){
+},{"./_overRest":176,"./_setToString":184,"./identity":210}],93:[function(_dereq_,module,exports){
 var assignValue = _dereq_('./_assignValue'),
     castPath = _dereq_('./_castPath'),
     isIndex = _dereq_('./_isIndex'),
@@ -51311,7 +52993,7 @@ function baseSet(object, path, value, customizer) {
 
 module.exports = baseSet;
 
-},{"./_assignValue":56,"./_castPath":91,"./_isIndex":133,"./_toKey":172,"./isObject":192}],86:[function(_dereq_,module,exports){
+},{"./_assignValue":62,"./_castPath":101,"./_isIndex":150,"./_toKey":194,"./isObject":223}],94:[function(_dereq_,module,exports){
 var constant = _dereq_('./constant'),
     defineProperty = _dereq_('./_defineProperty'),
     identity = _dereq_('./identity');
@@ -51335,7 +53017,40 @@ var baseSetToString = !defineProperty ? identity : function(func, string) {
 
 module.exports = baseSetToString;
 
-},{"./_defineProperty":108,"./constant":176,"./identity":181}],87:[function(_dereq_,module,exports){
+},{"./_defineProperty":122,"./constant":204,"./identity":210}],95:[function(_dereq_,module,exports){
+/**
+ * The base implementation of `_.slice` without an iteratee call guard.
+ *
+ * @private
+ * @param {Array} array The array to slice.
+ * @param {number} [start=0] The start position.
+ * @param {number} [end=array.length] The end position.
+ * @returns {Array} Returns the slice of `array`.
+ */
+function baseSlice(array, start, end) {
+  var index = -1,
+      length = array.length;
+
+  if (start < 0) {
+    start = -start > length ? 0 : (length + start);
+  }
+  end = end > length ? length : end;
+  if (end < 0) {
+    end += length;
+  }
+  length = start > end ? 0 : ((end - start) >>> 0);
+  start >>>= 0;
+
+  var result = Array(length);
+  while (++index < length) {
+    result[index] = array[index + start];
+  }
+  return result;
+}
+
+module.exports = baseSlice;
+
+},{}],96:[function(_dereq_,module,exports){
 /**
  * The base implementation of `_.times` without support for iteratee shorthands
  * or max array length checks.
@@ -51357,7 +53072,7 @@ function baseTimes(n, iteratee) {
 
 module.exports = baseTimes;
 
-},{}],88:[function(_dereq_,module,exports){
+},{}],97:[function(_dereq_,module,exports){
 var Symbol = _dereq_('./_Symbol'),
     arrayMap = _dereq_('./_arrayMap'),
     isArray = _dereq_('./isArray'),
@@ -51396,7 +53111,7 @@ function baseToString(value) {
 
 module.exports = baseToString;
 
-},{"./_Symbol":43,"./_arrayMap":52,"./isArray":183,"./isSymbol":194}],89:[function(_dereq_,module,exports){
+},{"./_Symbol":47,"./_arrayMap":56,"./isArray":212,"./isSymbol":227}],98:[function(_dereq_,module,exports){
 /**
  * The base implementation of `_.unary` without support for storing metadata.
  *
@@ -51412,7 +53127,28 @@ function baseUnary(func) {
 
 module.exports = baseUnary;
 
-},{}],90:[function(_dereq_,module,exports){
+},{}],99:[function(_dereq_,module,exports){
+var arrayMap = _dereq_('./_arrayMap');
+
+/**
+ * The base implementation of `_.values` and `_.valuesIn` which creates an
+ * array of `object` property values corresponding to the property names
+ * of `props`.
+ *
+ * @private
+ * @param {Object} object The object to query.
+ * @param {Array} props The property names to get values for.
+ * @returns {Object} Returns the array of property values.
+ */
+function baseValues(object, props) {
+  return arrayMap(props, function(key) {
+    return object[key];
+  });
+}
+
+module.exports = baseValues;
+
+},{"./_arrayMap":56}],100:[function(_dereq_,module,exports){
 /**
  * Checks if a `cache` value for `key` exists.
  *
@@ -51427,7 +53163,7 @@ function cacheHas(cache, key) {
 
 module.exports = cacheHas;
 
-},{}],91:[function(_dereq_,module,exports){
+},{}],101:[function(_dereq_,module,exports){
 var isArray = _dereq_('./isArray'),
     isKey = _dereq_('./_isKey'),
     stringToPath = _dereq_('./_stringToPath'),
@@ -51450,7 +53186,27 @@ function castPath(value, object) {
 
 module.exports = castPath;
 
-},{"./_isKey":135,"./_stringToPath":171,"./isArray":183,"./toString":203}],92:[function(_dereq_,module,exports){
+},{"./_isKey":152,"./_stringToPath":193,"./isArray":212,"./toString":243}],102:[function(_dereq_,module,exports){
+var baseSlice = _dereq_('./_baseSlice');
+
+/**
+ * Casts `array` to a slice if it's needed.
+ *
+ * @private
+ * @param {Array} array The array to inspect.
+ * @param {number} start The start position.
+ * @param {number} [end=array.length] The end position.
+ * @returns {Array} Returns the cast slice.
+ */
+function castSlice(array, start, end) {
+  var length = array.length;
+  end = end === undefined ? length : end;
+  return (!start && end >= length) ? array : baseSlice(array, start, end);
+}
+
+module.exports = castSlice;
+
+},{"./_baseSlice":95}],103:[function(_dereq_,module,exports){
 var Uint8Array = _dereq_('./_Uint8Array');
 
 /**
@@ -51468,7 +53224,7 @@ function cloneArrayBuffer(arrayBuffer) {
 
 module.exports = cloneArrayBuffer;
 
-},{"./_Uint8Array":44}],93:[function(_dereq_,module,exports){
+},{"./_Uint8Array":48}],104:[function(_dereq_,module,exports){
 var root = _dereq_('./_root');
 
 /** Detect free variable `exports`. */
@@ -51505,7 +53261,7 @@ function cloneBuffer(buffer, isDeep) {
 
 module.exports = cloneBuffer;
 
-},{"./_root":160}],94:[function(_dereq_,module,exports){
+},{"./_root":180}],105:[function(_dereq_,module,exports){
 var cloneArrayBuffer = _dereq_('./_cloneArrayBuffer');
 
 /**
@@ -51523,7 +53279,7 @@ function cloneDataView(dataView, isDeep) {
 
 module.exports = cloneDataView;
 
-},{"./_cloneArrayBuffer":92}],95:[function(_dereq_,module,exports){
+},{"./_cloneArrayBuffer":103}],106:[function(_dereq_,module,exports){
 var addMapEntry = _dereq_('./_addMapEntry'),
     arrayReduce = _dereq_('./_arrayReduce'),
     mapToArray = _dereq_('./_mapToArray');
@@ -51547,7 +53303,7 @@ function cloneMap(map, isDeep, cloneFunc) {
 
 module.exports = cloneMap;
 
-},{"./_addMapEntry":46,"./_arrayReduce":54,"./_mapToArray":150}],96:[function(_dereq_,module,exports){
+},{"./_addMapEntry":50,"./_arrayReduce":58,"./_mapToArray":167}],107:[function(_dereq_,module,exports){
 /** Used to match `RegExp` flags from their coerced string values. */
 var reFlags = /\w*$/;
 
@@ -51566,7 +53322,7 @@ function cloneRegExp(regexp) {
 
 module.exports = cloneRegExp;
 
-},{}],97:[function(_dereq_,module,exports){
+},{}],108:[function(_dereq_,module,exports){
 var addSetEntry = _dereq_('./_addSetEntry'),
     arrayReduce = _dereq_('./_arrayReduce'),
     setToArray = _dereq_('./_setToArray');
@@ -51590,7 +53346,7 @@ function cloneSet(set, isDeep, cloneFunc) {
 
 module.exports = cloneSet;
 
-},{"./_addSetEntry":47,"./_arrayReduce":54,"./_setToArray":163}],98:[function(_dereq_,module,exports){
+},{"./_addSetEntry":51,"./_arrayReduce":58,"./_setToArray":183}],109:[function(_dereq_,module,exports){
 var Symbol = _dereq_('./_Symbol');
 
 /** Used to convert symbols to primitives and strings. */
@@ -51610,7 +53366,7 @@ function cloneSymbol(symbol) {
 
 module.exports = cloneSymbol;
 
-},{"./_Symbol":43}],99:[function(_dereq_,module,exports){
+},{"./_Symbol":47}],110:[function(_dereq_,module,exports){
 var cloneArrayBuffer = _dereq_('./_cloneArrayBuffer');
 
 /**
@@ -51628,7 +53384,7 @@ function cloneTypedArray(typedArray, isDeep) {
 
 module.exports = cloneTypedArray;
 
-},{"./_cloneArrayBuffer":92}],100:[function(_dereq_,module,exports){
+},{"./_cloneArrayBuffer":103}],111:[function(_dereq_,module,exports){
 /**
  * Copies the values of `source` to `array`.
  *
@@ -51650,7 +53406,7 @@ function copyArray(source, array) {
 
 module.exports = copyArray;
 
-},{}],101:[function(_dereq_,module,exports){
+},{}],112:[function(_dereq_,module,exports){
 var assignValue = _dereq_('./_assignValue'),
     baseAssignValue = _dereq_('./_baseAssignValue');
 
@@ -51692,7 +53448,7 @@ function copyObject(source, props, object, customizer) {
 
 module.exports = copyObject;
 
-},{"./_assignValue":56,"./_baseAssignValue":60}],102:[function(_dereq_,module,exports){
+},{"./_assignValue":62,"./_baseAssignValue":66}],113:[function(_dereq_,module,exports){
 var copyObject = _dereq_('./_copyObject'),
     getSymbols = _dereq_('./_getSymbols');
 
@@ -51710,7 +53466,7 @@ function copySymbols(source, object) {
 
 module.exports = copySymbols;
 
-},{"./_copyObject":101,"./_getSymbols":120}],103:[function(_dereq_,module,exports){
+},{"./_copyObject":112,"./_getSymbols":136}],114:[function(_dereq_,module,exports){
 var copyObject = _dereq_('./_copyObject'),
     getSymbolsIn = _dereq_('./_getSymbolsIn');
 
@@ -51728,7 +53484,7 @@ function copySymbolsIn(source, object) {
 
 module.exports = copySymbolsIn;
 
-},{"./_copyObject":101,"./_getSymbolsIn":121}],104:[function(_dereq_,module,exports){
+},{"./_copyObject":112,"./_getSymbolsIn":137}],115:[function(_dereq_,module,exports){
 var root = _dereq_('./_root');
 
 /** Used to detect overreaching core-js shims. */
@@ -51736,7 +53492,7 @@ var coreJsData = root['__core-js_shared__'];
 
 module.exports = coreJsData;
 
-},{"./_root":160}],105:[function(_dereq_,module,exports){
+},{"./_root":180}],116:[function(_dereq_,module,exports){
 var baseRest = _dereq_('./_baseRest'),
     isIterateeCall = _dereq_('./_isIterateeCall');
 
@@ -51775,7 +53531,7 @@ function createAssigner(assigner) {
 
 module.exports = createAssigner;
 
-},{"./_baseRest":84,"./_isIterateeCall":134}],106:[function(_dereq_,module,exports){
+},{"./_baseRest":92,"./_isIterateeCall":151}],117:[function(_dereq_,module,exports){
 var isArrayLike = _dereq_('./isArrayLike');
 
 /**
@@ -51809,7 +53565,7 @@ function createBaseEach(eachFunc, fromRight) {
 
 module.exports = createBaseEach;
 
-},{"./isArrayLike":184}],107:[function(_dereq_,module,exports){
+},{"./isArrayLike":213}],118:[function(_dereq_,module,exports){
 /**
  * Creates a base function for methods like `_.forIn` and `_.forOwn`.
  *
@@ -51836,7 +53592,108 @@ function createBaseFor(fromRight) {
 
 module.exports = createBaseFor;
 
-},{}],108:[function(_dereq_,module,exports){
+},{}],119:[function(_dereq_,module,exports){
+var baseRepeat = _dereq_('./_baseRepeat'),
+    baseToString = _dereq_('./_baseToString'),
+    castSlice = _dereq_('./_castSlice'),
+    hasUnicode = _dereq_('./_hasUnicode'),
+    stringSize = _dereq_('./_stringSize'),
+    stringToArray = _dereq_('./_stringToArray');
+
+/* Built-in method references for those with the same name as other `lodash` methods. */
+var nativeCeil = Math.ceil;
+
+/**
+ * Creates the padding for `string` based on `length`. The `chars` string
+ * is truncated if the number of characters exceeds `length`.
+ *
+ * @private
+ * @param {number} length The padding length.
+ * @param {string} [chars=' '] The string used as padding.
+ * @returns {string} Returns the padding for `string`.
+ */
+function createPadding(length, chars) {
+  chars = chars === undefined ? ' ' : baseToString(chars);
+
+  var charsLength = chars.length;
+  if (charsLength < 2) {
+    return charsLength ? baseRepeat(chars, length) : chars;
+  }
+  var result = baseRepeat(chars, nativeCeil(length / stringSize(chars)));
+  return hasUnicode(chars)
+    ? castSlice(stringToArray(result), 0, length).join('')
+    : result.slice(0, length);
+}
+
+module.exports = createPadding;
+
+},{"./_baseRepeat":91,"./_baseToString":97,"./_castSlice":102,"./_hasUnicode":141,"./_stringSize":191,"./_stringToArray":192}],120:[function(_dereq_,module,exports){
+var toInteger = _dereq_('./toInteger'),
+    toNumber = _dereq_('./toNumber'),
+    toString = _dereq_('./toString');
+
+/* Built-in method references for those with the same name as other `lodash` methods. */
+var nativeMin = Math.min;
+
+/**
+ * Creates a function like `_.round`.
+ *
+ * @private
+ * @param {string} methodName The name of the `Math` method to use when rounding.
+ * @returns {Function} Returns the new round function.
+ */
+function createRound(methodName) {
+  var func = Math[methodName];
+  return function(number, precision) {
+    number = toNumber(number);
+    precision = precision == null ? 0 : nativeMin(toInteger(precision), 292);
+    if (precision) {
+      // Shift with exponential notation to avoid floating-point issues.
+      // See [MDN](https://mdn.io/round#Examples) for more details.
+      var pair = (toString(number) + 'e').split('e'),
+          value = func(pair[0] + 'e' + (+pair[1] + precision));
+
+      pair = (toString(value) + 'e').split('e');
+      return +(pair[0] + 'e' + (+pair[1] - precision));
+    }
+    return func(number);
+  };
+}
+
+module.exports = createRound;
+
+},{"./toInteger":241,"./toNumber":242,"./toString":243}],121:[function(_dereq_,module,exports){
+var eq = _dereq_('./eq');
+
+/** Used for built-in method references. */
+var objectProto = Object.prototype;
+
+/** Used to check objects for own properties. */
+var hasOwnProperty = objectProto.hasOwnProperty;
+
+/**
+ * Used by `_.defaults` to customize its `_.assignIn` use to assign properties
+ * of source objects to the destination object for all destination properties
+ * that resolve to `undefined`.
+ *
+ * @private
+ * @param {*} objValue The destination value.
+ * @param {*} srcValue The source value.
+ * @param {string} key The key of the property to assign.
+ * @param {Object} object The parent object of `objValue`.
+ * @returns {*} Returns the value to assign.
+ */
+function customDefaultsAssignIn(objValue, srcValue, key, object) {
+  if (objValue === undefined ||
+      (eq(objValue, objectProto[key]) && !hasOwnProperty.call(object, key))) {
+    return srcValue;
+  }
+  return objValue;
+}
+
+module.exports = customDefaultsAssignIn;
+
+},{"./eq":205}],122:[function(_dereq_,module,exports){
 var getNative = _dereq_('./_getNative');
 
 var defineProperty = (function() {
@@ -51849,7 +53706,7 @@ var defineProperty = (function() {
 
 module.exports = defineProperty;
 
-},{"./_getNative":117}],109:[function(_dereq_,module,exports){
+},{"./_getNative":133}],123:[function(_dereq_,module,exports){
 var SetCache = _dereq_('./_SetCache'),
     arraySome = _dereq_('./_arraySome'),
     cacheHas = _dereq_('./_cacheHas');
@@ -51934,7 +53791,7 @@ function equalArrays(array, other, bitmask, customizer, equalFunc, stack) {
 
 module.exports = equalArrays;
 
-},{"./_SetCache":41,"./_arraySome":55,"./_cacheHas":90}],110:[function(_dereq_,module,exports){
+},{"./_SetCache":45,"./_arraySome":59,"./_cacheHas":100}],124:[function(_dereq_,module,exports){
 var Symbol = _dereq_('./_Symbol'),
     Uint8Array = _dereq_('./_Uint8Array'),
     eq = _dereq_('./eq'),
@@ -52048,7 +53905,7 @@ function equalByTag(object, other, tag, bitmask, customizer, equalFunc, stack) {
 
 module.exports = equalByTag;
 
-},{"./_Symbol":43,"./_Uint8Array":44,"./_equalArrays":109,"./_mapToArray":150,"./_setToArray":163,"./eq":177}],111:[function(_dereq_,module,exports){
+},{"./_Symbol":47,"./_Uint8Array":48,"./_equalArrays":123,"./_mapToArray":167,"./_setToArray":183,"./eq":205}],125:[function(_dereq_,module,exports){
 var getAllKeys = _dereq_('./_getAllKeys');
 
 /** Used to compose bitmasks for value comparisons. */
@@ -52139,7 +53996,54 @@ function equalObjects(object, other, bitmask, customizer, equalFunc, stack) {
 
 module.exports = equalObjects;
 
-},{"./_getAllKeys":113}],112:[function(_dereq_,module,exports){
+},{"./_getAllKeys":129}],126:[function(_dereq_,module,exports){
+var basePropertyOf = _dereq_('./_basePropertyOf');
+
+/** Used to map characters to HTML entities. */
+var htmlEscapes = {
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#39;'
+};
+
+/**
+ * Used by `_.escape` to convert characters to HTML entities.
+ *
+ * @private
+ * @param {string} chr The matched character to escape.
+ * @returns {string} Returns the escaped character.
+ */
+var escapeHtmlChar = basePropertyOf(htmlEscapes);
+
+module.exports = escapeHtmlChar;
+
+},{"./_basePropertyOf":90}],127:[function(_dereq_,module,exports){
+/** Used to escape characters for inclusion in compiled string literals. */
+var stringEscapes = {
+  '\\': '\\',
+  "'": "'",
+  '\n': 'n',
+  '\r': 'r',
+  '\u2028': 'u2028',
+  '\u2029': 'u2029'
+};
+
+/**
+ * Used by `_.template` to escape characters for inclusion in compiled string literals.
+ *
+ * @private
+ * @param {string} chr The matched character to escape.
+ * @returns {string} Returns the escaped character.
+ */
+function escapeStringChar(chr) {
+  return '\\' + stringEscapes[chr];
+}
+
+module.exports = escapeStringChar;
+
+},{}],128:[function(_dereq_,module,exports){
 (function (global){
 /** Detect free variable `global` from Node.js. */
 var freeGlobal = typeof global == 'object' && global && global.Object === Object && global;
@@ -52147,7 +54051,7 @@ var freeGlobal = typeof global == 'object' && global && global.Object === Object
 module.exports = freeGlobal;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],113:[function(_dereq_,module,exports){
+},{}],129:[function(_dereq_,module,exports){
 var baseGetAllKeys = _dereq_('./_baseGetAllKeys'),
     getSymbols = _dereq_('./_getSymbols'),
     keys = _dereq_('./keys');
@@ -52165,7 +54069,7 @@ function getAllKeys(object) {
 
 module.exports = getAllKeys;
 
-},{"./_baseGetAllKeys":68,"./_getSymbols":120,"./keys":196}],114:[function(_dereq_,module,exports){
+},{"./_baseGetAllKeys":74,"./_getSymbols":136,"./keys":229}],130:[function(_dereq_,module,exports){
 var baseGetAllKeys = _dereq_('./_baseGetAllKeys'),
     getSymbolsIn = _dereq_('./_getSymbolsIn'),
     keysIn = _dereq_('./keysIn');
@@ -52184,7 +54088,7 @@ function getAllKeysIn(object) {
 
 module.exports = getAllKeysIn;
 
-},{"./_baseGetAllKeys":68,"./_getSymbolsIn":121,"./keysIn":197}],115:[function(_dereq_,module,exports){
+},{"./_baseGetAllKeys":74,"./_getSymbolsIn":137,"./keysIn":230}],131:[function(_dereq_,module,exports){
 var isKeyable = _dereq_('./_isKeyable');
 
 /**
@@ -52204,7 +54108,7 @@ function getMapData(map, key) {
 
 module.exports = getMapData;
 
-},{"./_isKeyable":136}],116:[function(_dereq_,module,exports){
+},{"./_isKeyable":153}],132:[function(_dereq_,module,exports){
 var isStrictComparable = _dereq_('./_isStrictComparable'),
     keys = _dereq_('./keys');
 
@@ -52230,7 +54134,7 @@ function getMatchData(object) {
 
 module.exports = getMatchData;
 
-},{"./_isStrictComparable":139,"./keys":196}],117:[function(_dereq_,module,exports){
+},{"./_isStrictComparable":156,"./keys":229}],133:[function(_dereq_,module,exports){
 var baseIsNative = _dereq_('./_baseIsNative'),
     getValue = _dereq_('./_getValue');
 
@@ -52249,7 +54153,7 @@ function getNative(object, key) {
 
 module.exports = getNative;
 
-},{"./_baseIsNative":75,"./_getValue":123}],118:[function(_dereq_,module,exports){
+},{"./_baseIsNative":81,"./_getValue":139}],134:[function(_dereq_,module,exports){
 var overArg = _dereq_('./_overArg');
 
 /** Built-in value references. */
@@ -52257,7 +54161,7 @@ var getPrototype = overArg(Object.getPrototypeOf, Object);
 
 module.exports = getPrototype;
 
-},{"./_overArg":158}],119:[function(_dereq_,module,exports){
+},{"./_overArg":175}],135:[function(_dereq_,module,exports){
 var Symbol = _dereq_('./_Symbol');
 
 /** Used for built-in method references. */
@@ -52305,7 +54209,7 @@ function getRawTag(value) {
 
 module.exports = getRawTag;
 
-},{"./_Symbol":43}],120:[function(_dereq_,module,exports){
+},{"./_Symbol":47}],136:[function(_dereq_,module,exports){
 var arrayFilter = _dereq_('./_arrayFilter'),
     stubArray = _dereq_('./stubArray');
 
@@ -52337,7 +54241,7 @@ var getSymbols = !nativeGetSymbols ? stubArray : function(object) {
 
 module.exports = getSymbols;
 
-},{"./_arrayFilter":50,"./stubArray":201}],121:[function(_dereq_,module,exports){
+},{"./_arrayFilter":54,"./stubArray":236}],137:[function(_dereq_,module,exports){
 var arrayPush = _dereq_('./_arrayPush'),
     getPrototype = _dereq_('./_getPrototype'),
     getSymbols = _dereq_('./_getSymbols'),
@@ -52364,7 +54268,7 @@ var getSymbolsIn = !nativeGetSymbols ? stubArray : function(object) {
 
 module.exports = getSymbolsIn;
 
-},{"./_arrayPush":53,"./_getPrototype":118,"./_getSymbols":120,"./stubArray":201}],122:[function(_dereq_,module,exports){
+},{"./_arrayPush":57,"./_getPrototype":134,"./_getSymbols":136,"./stubArray":236}],138:[function(_dereq_,module,exports){
 var DataView = _dereq_('./_DataView'),
     Map = _dereq_('./_Map'),
     Promise = _dereq_('./_Promise'),
@@ -52424,7 +54328,7 @@ if ((DataView && getTag(new DataView(new ArrayBuffer(1))) != dataViewTag) ||
 
 module.exports = getTag;
 
-},{"./_DataView":34,"./_Map":37,"./_Promise":39,"./_Set":40,"./_WeakMap":45,"./_baseGetTag":69,"./_toSource":173}],123:[function(_dereq_,module,exports){
+},{"./_DataView":38,"./_Map":41,"./_Promise":43,"./_Set":44,"./_WeakMap":49,"./_baseGetTag":75,"./_toSource":195}],139:[function(_dereq_,module,exports){
 /**
  * Gets the value at `key` of `object`.
  *
@@ -52439,7 +54343,7 @@ function getValue(object, key) {
 
 module.exports = getValue;
 
-},{}],124:[function(_dereq_,module,exports){
+},{}],140:[function(_dereq_,module,exports){
 var castPath = _dereq_('./_castPath'),
     isArguments = _dereq_('./isArguments'),
     isArray = _dereq_('./isArray'),
@@ -52480,7 +54384,35 @@ function hasPath(object, path, hasFunc) {
 
 module.exports = hasPath;
 
-},{"./_castPath":91,"./_isIndex":133,"./_toKey":172,"./isArguments":182,"./isArray":183,"./isLength":189}],125:[function(_dereq_,module,exports){
+},{"./_castPath":101,"./_isIndex":150,"./_toKey":194,"./isArguments":211,"./isArray":212,"./isLength":219}],141:[function(_dereq_,module,exports){
+/** Used to compose unicode character classes. */
+var rsAstralRange = '\\ud800-\\udfff',
+    rsComboMarksRange = '\\u0300-\\u036f',
+    reComboHalfMarksRange = '\\ufe20-\\ufe2f',
+    rsComboSymbolsRange = '\\u20d0-\\u20ff',
+    rsComboRange = rsComboMarksRange + reComboHalfMarksRange + rsComboSymbolsRange,
+    rsVarRange = '\\ufe0e\\ufe0f';
+
+/** Used to compose unicode capture groups. */
+var rsZWJ = '\\u200d';
+
+/** Used to detect strings with [zero-width joiners or code points from the astral planes](http://eev.ee/blog/2015/09/12/dark-corners-of-unicode/). */
+var reHasUnicode = RegExp('[' + rsZWJ + rsAstralRange  + rsComboRange + rsVarRange + ']');
+
+/**
+ * Checks if `string` contains Unicode symbols.
+ *
+ * @private
+ * @param {string} string The string to inspect.
+ * @returns {boolean} Returns `true` if a symbol is found, else `false`.
+ */
+function hasUnicode(string) {
+  return reHasUnicode.test(string);
+}
+
+module.exports = hasUnicode;
+
+},{}],142:[function(_dereq_,module,exports){
 var nativeCreate = _dereq_('./_nativeCreate');
 
 /**
@@ -52497,7 +54429,7 @@ function hashClear() {
 
 module.exports = hashClear;
 
-},{"./_nativeCreate":153}],126:[function(_dereq_,module,exports){
+},{"./_nativeCreate":170}],143:[function(_dereq_,module,exports){
 /**
  * Removes `key` and its value from the hash.
  *
@@ -52516,7 +54448,7 @@ function hashDelete(key) {
 
 module.exports = hashDelete;
 
-},{}],127:[function(_dereq_,module,exports){
+},{}],144:[function(_dereq_,module,exports){
 var nativeCreate = _dereq_('./_nativeCreate');
 
 /** Used to stand-in for `undefined` hash values. */
@@ -52548,7 +54480,7 @@ function hashGet(key) {
 
 module.exports = hashGet;
 
-},{"./_nativeCreate":153}],128:[function(_dereq_,module,exports){
+},{"./_nativeCreate":170}],145:[function(_dereq_,module,exports){
 var nativeCreate = _dereq_('./_nativeCreate');
 
 /** Used for built-in method references. */
@@ -52573,7 +54505,7 @@ function hashHas(key) {
 
 module.exports = hashHas;
 
-},{"./_nativeCreate":153}],129:[function(_dereq_,module,exports){
+},{"./_nativeCreate":170}],146:[function(_dereq_,module,exports){
 var nativeCreate = _dereq_('./_nativeCreate');
 
 /** Used to stand-in for `undefined` hash values. */
@@ -52598,7 +54530,7 @@ function hashSet(key, value) {
 
 module.exports = hashSet;
 
-},{"./_nativeCreate":153}],130:[function(_dereq_,module,exports){
+},{"./_nativeCreate":170}],147:[function(_dereq_,module,exports){
 /** Used for built-in method references. */
 var objectProto = Object.prototype;
 
@@ -52626,7 +54558,7 @@ function initCloneArray(array) {
 
 module.exports = initCloneArray;
 
-},{}],131:[function(_dereq_,module,exports){
+},{}],148:[function(_dereq_,module,exports){
 var cloneArrayBuffer = _dereq_('./_cloneArrayBuffer'),
     cloneDataView = _dereq_('./_cloneDataView'),
     cloneMap = _dereq_('./_cloneMap'),
@@ -52708,7 +54640,7 @@ function initCloneByTag(object, tag, cloneFunc, isDeep) {
 
 module.exports = initCloneByTag;
 
-},{"./_cloneArrayBuffer":92,"./_cloneDataView":94,"./_cloneMap":95,"./_cloneRegExp":96,"./_cloneSet":97,"./_cloneSymbol":98,"./_cloneTypedArray":99}],132:[function(_dereq_,module,exports){
+},{"./_cloneArrayBuffer":103,"./_cloneDataView":105,"./_cloneMap":106,"./_cloneRegExp":107,"./_cloneSet":108,"./_cloneSymbol":109,"./_cloneTypedArray":110}],149:[function(_dereq_,module,exports){
 var baseCreate = _dereq_('./_baseCreate'),
     getPrototype = _dereq_('./_getPrototype'),
     isPrototype = _dereq_('./_isPrototype');
@@ -52728,7 +54660,7 @@ function initCloneObject(object) {
 
 module.exports = initCloneObject;
 
-},{"./_baseCreate":62,"./_getPrototype":118,"./_isPrototype":138}],133:[function(_dereq_,module,exports){
+},{"./_baseCreate":68,"./_getPrototype":134,"./_isPrototype":155}],150:[function(_dereq_,module,exports){
 /** Used as references for various `Number` constants. */
 var MAX_SAFE_INTEGER = 9007199254740991;
 
@@ -52752,7 +54684,7 @@ function isIndex(value, length) {
 
 module.exports = isIndex;
 
-},{}],134:[function(_dereq_,module,exports){
+},{}],151:[function(_dereq_,module,exports){
 var eq = _dereq_('./eq'),
     isArrayLike = _dereq_('./isArrayLike'),
     isIndex = _dereq_('./_isIndex'),
@@ -52784,7 +54716,7 @@ function isIterateeCall(value, index, object) {
 
 module.exports = isIterateeCall;
 
-},{"./_isIndex":133,"./eq":177,"./isArrayLike":184,"./isObject":192}],135:[function(_dereq_,module,exports){
+},{"./_isIndex":150,"./eq":205,"./isArrayLike":213,"./isObject":223}],152:[function(_dereq_,module,exports){
 var isArray = _dereq_('./isArray'),
     isSymbol = _dereq_('./isSymbol');
 
@@ -52815,7 +54747,7 @@ function isKey(value, object) {
 
 module.exports = isKey;
 
-},{"./isArray":183,"./isSymbol":194}],136:[function(_dereq_,module,exports){
+},{"./isArray":212,"./isSymbol":227}],153:[function(_dereq_,module,exports){
 /**
  * Checks if `value` is suitable for use as unique object key.
  *
@@ -52832,7 +54764,7 @@ function isKeyable(value) {
 
 module.exports = isKeyable;
 
-},{}],137:[function(_dereq_,module,exports){
+},{}],154:[function(_dereq_,module,exports){
 var coreJsData = _dereq_('./_coreJsData');
 
 /** Used to detect methods masquerading as native. */
@@ -52854,7 +54786,7 @@ function isMasked(func) {
 
 module.exports = isMasked;
 
-},{"./_coreJsData":104}],138:[function(_dereq_,module,exports){
+},{"./_coreJsData":115}],155:[function(_dereq_,module,exports){
 /** Used for built-in method references. */
 var objectProto = Object.prototype;
 
@@ -52874,7 +54806,7 @@ function isPrototype(value) {
 
 module.exports = isPrototype;
 
-},{}],139:[function(_dereq_,module,exports){
+},{}],156:[function(_dereq_,module,exports){
 var isObject = _dereq_('./isObject');
 
 /**
@@ -52891,7 +54823,7 @@ function isStrictComparable(value) {
 
 module.exports = isStrictComparable;
 
-},{"./isObject":192}],140:[function(_dereq_,module,exports){
+},{"./isObject":223}],157:[function(_dereq_,module,exports){
 /**
  * Removes all key-value entries from the list cache.
  *
@@ -52906,7 +54838,7 @@ function listCacheClear() {
 
 module.exports = listCacheClear;
 
-},{}],141:[function(_dereq_,module,exports){
+},{}],158:[function(_dereq_,module,exports){
 var assocIndexOf = _dereq_('./_assocIndexOf');
 
 /** Used for built-in method references. */
@@ -52943,7 +54875,7 @@ function listCacheDelete(key) {
 
 module.exports = listCacheDelete;
 
-},{"./_assocIndexOf":57}],142:[function(_dereq_,module,exports){
+},{"./_assocIndexOf":63}],159:[function(_dereq_,module,exports){
 var assocIndexOf = _dereq_('./_assocIndexOf');
 
 /**
@@ -52964,7 +54896,7 @@ function listCacheGet(key) {
 
 module.exports = listCacheGet;
 
-},{"./_assocIndexOf":57}],143:[function(_dereq_,module,exports){
+},{"./_assocIndexOf":63}],160:[function(_dereq_,module,exports){
 var assocIndexOf = _dereq_('./_assocIndexOf');
 
 /**
@@ -52982,7 +54914,7 @@ function listCacheHas(key) {
 
 module.exports = listCacheHas;
 
-},{"./_assocIndexOf":57}],144:[function(_dereq_,module,exports){
+},{"./_assocIndexOf":63}],161:[function(_dereq_,module,exports){
 var assocIndexOf = _dereq_('./_assocIndexOf');
 
 /**
@@ -53010,7 +54942,7 @@ function listCacheSet(key, value) {
 
 module.exports = listCacheSet;
 
-},{"./_assocIndexOf":57}],145:[function(_dereq_,module,exports){
+},{"./_assocIndexOf":63}],162:[function(_dereq_,module,exports){
 var Hash = _dereq_('./_Hash'),
     ListCache = _dereq_('./_ListCache'),
     Map = _dereq_('./_Map');
@@ -53033,7 +54965,7 @@ function mapCacheClear() {
 
 module.exports = mapCacheClear;
 
-},{"./_Hash":35,"./_ListCache":36,"./_Map":37}],146:[function(_dereq_,module,exports){
+},{"./_Hash":39,"./_ListCache":40,"./_Map":41}],163:[function(_dereq_,module,exports){
 var getMapData = _dereq_('./_getMapData');
 
 /**
@@ -53053,7 +54985,7 @@ function mapCacheDelete(key) {
 
 module.exports = mapCacheDelete;
 
-},{"./_getMapData":115}],147:[function(_dereq_,module,exports){
+},{"./_getMapData":131}],164:[function(_dereq_,module,exports){
 var getMapData = _dereq_('./_getMapData');
 
 /**
@@ -53071,7 +55003,7 @@ function mapCacheGet(key) {
 
 module.exports = mapCacheGet;
 
-},{"./_getMapData":115}],148:[function(_dereq_,module,exports){
+},{"./_getMapData":131}],165:[function(_dereq_,module,exports){
 var getMapData = _dereq_('./_getMapData');
 
 /**
@@ -53089,7 +55021,7 @@ function mapCacheHas(key) {
 
 module.exports = mapCacheHas;
 
-},{"./_getMapData":115}],149:[function(_dereq_,module,exports){
+},{"./_getMapData":131}],166:[function(_dereq_,module,exports){
 var getMapData = _dereq_('./_getMapData');
 
 /**
@@ -53113,7 +55045,7 @@ function mapCacheSet(key, value) {
 
 module.exports = mapCacheSet;
 
-},{"./_getMapData":115}],150:[function(_dereq_,module,exports){
+},{"./_getMapData":131}],167:[function(_dereq_,module,exports){
 /**
  * Converts `map` to its key-value pairs.
  *
@@ -53133,7 +55065,7 @@ function mapToArray(map) {
 
 module.exports = mapToArray;
 
-},{}],151:[function(_dereq_,module,exports){
+},{}],168:[function(_dereq_,module,exports){
 /**
  * A specialized version of `matchesProperty` for source values suitable
  * for strict equality comparisons, i.e. `===`.
@@ -53155,7 +55087,7 @@ function matchesStrictComparable(key, srcValue) {
 
 module.exports = matchesStrictComparable;
 
-},{}],152:[function(_dereq_,module,exports){
+},{}],169:[function(_dereq_,module,exports){
 var memoize = _dereq_('./memoize');
 
 /** Used as the maximum memoize cache size. */
@@ -53183,7 +55115,7 @@ function memoizeCapped(func) {
 
 module.exports = memoizeCapped;
 
-},{"./memoize":198}],153:[function(_dereq_,module,exports){
+},{"./memoize":231}],170:[function(_dereq_,module,exports){
 var getNative = _dereq_('./_getNative');
 
 /* Built-in method references that are verified to be native. */
@@ -53191,7 +55123,7 @@ var nativeCreate = getNative(Object, 'create');
 
 module.exports = nativeCreate;
 
-},{"./_getNative":117}],154:[function(_dereq_,module,exports){
+},{"./_getNative":133}],171:[function(_dereq_,module,exports){
 var overArg = _dereq_('./_overArg');
 
 /* Built-in method references for those with the same name as other `lodash` methods. */
@@ -53199,7 +55131,7 @@ var nativeKeys = overArg(Object.keys, Object);
 
 module.exports = nativeKeys;
 
-},{"./_overArg":158}],155:[function(_dereq_,module,exports){
+},{"./_overArg":175}],172:[function(_dereq_,module,exports){
 /**
  * This function is like
  * [`Object.keys`](http://ecma-international.org/ecma-262/7.0/#sec-object.keys)
@@ -53221,7 +55153,7 @@ function nativeKeysIn(object) {
 
 module.exports = nativeKeysIn;
 
-},{}],156:[function(_dereq_,module,exports){
+},{}],173:[function(_dereq_,module,exports){
 var freeGlobal = _dereq_('./_freeGlobal');
 
 /** Detect free variable `exports`. */
@@ -53245,7 +55177,7 @@ var nodeUtil = (function() {
 
 module.exports = nodeUtil;
 
-},{"./_freeGlobal":112}],157:[function(_dereq_,module,exports){
+},{"./_freeGlobal":128}],174:[function(_dereq_,module,exports){
 /** Used for built-in method references. */
 var objectProto = Object.prototype;
 
@@ -53269,7 +55201,7 @@ function objectToString(value) {
 
 module.exports = objectToString;
 
-},{}],158:[function(_dereq_,module,exports){
+},{}],175:[function(_dereq_,module,exports){
 /**
  * Creates a unary function that invokes `func` with its argument transformed.
  *
@@ -53286,7 +55218,7 @@ function overArg(func, transform) {
 
 module.exports = overArg;
 
-},{}],159:[function(_dereq_,module,exports){
+},{}],176:[function(_dereq_,module,exports){
 var apply = _dereq_('./_apply');
 
 /* Built-in method references for those with the same name as other `lodash` methods. */
@@ -53324,7 +55256,25 @@ function overRest(func, start, transform) {
 
 module.exports = overRest;
 
-},{"./_apply":48}],160:[function(_dereq_,module,exports){
+},{"./_apply":52}],177:[function(_dereq_,module,exports){
+/** Used to match template delimiters. */
+var reEscape = /<%-([\s\S]+?)%>/g;
+
+module.exports = reEscape;
+
+},{}],178:[function(_dereq_,module,exports){
+/** Used to match template delimiters. */
+var reEvaluate = /<%([\s\S]+?)%>/g;
+
+module.exports = reEvaluate;
+
+},{}],179:[function(_dereq_,module,exports){
+/** Used to match template delimiters. */
+var reInterpolate = /<%=([\s\S]+?)%>/g;
+
+module.exports = reInterpolate;
+
+},{}],180:[function(_dereq_,module,exports){
 var freeGlobal = _dereq_('./_freeGlobal');
 
 /** Detect free variable `self`. */
@@ -53335,7 +55285,7 @@ var root = freeGlobal || freeSelf || Function('return this')();
 
 module.exports = root;
 
-},{"./_freeGlobal":112}],161:[function(_dereq_,module,exports){
+},{"./_freeGlobal":128}],181:[function(_dereq_,module,exports){
 /** Used to stand-in for `undefined` hash values. */
 var HASH_UNDEFINED = '__lodash_hash_undefined__';
 
@@ -53356,7 +55306,7 @@ function setCacheAdd(value) {
 
 module.exports = setCacheAdd;
 
-},{}],162:[function(_dereq_,module,exports){
+},{}],182:[function(_dereq_,module,exports){
 /**
  * Checks if `value` is in the array cache.
  *
@@ -53372,7 +55322,7 @@ function setCacheHas(value) {
 
 module.exports = setCacheHas;
 
-},{}],163:[function(_dereq_,module,exports){
+},{}],183:[function(_dereq_,module,exports){
 /**
  * Converts `set` to an array of its values.
  *
@@ -53392,7 +55342,7 @@ function setToArray(set) {
 
 module.exports = setToArray;
 
-},{}],164:[function(_dereq_,module,exports){
+},{}],184:[function(_dereq_,module,exports){
 var baseSetToString = _dereq_('./_baseSetToString'),
     shortOut = _dereq_('./_shortOut');
 
@@ -53408,7 +55358,7 @@ var setToString = shortOut(baseSetToString);
 
 module.exports = setToString;
 
-},{"./_baseSetToString":86,"./_shortOut":165}],165:[function(_dereq_,module,exports){
+},{"./_baseSetToString":94,"./_shortOut":185}],185:[function(_dereq_,module,exports){
 /** Used to detect hot functions by number of calls within a span of milliseconds. */
 var HOT_COUNT = 800,
     HOT_SPAN = 16;
@@ -53447,7 +55397,7 @@ function shortOut(func) {
 
 module.exports = shortOut;
 
-},{}],166:[function(_dereq_,module,exports){
+},{}],186:[function(_dereq_,module,exports){
 var ListCache = _dereq_('./_ListCache');
 
 /**
@@ -53464,7 +55414,7 @@ function stackClear() {
 
 module.exports = stackClear;
 
-},{"./_ListCache":36}],167:[function(_dereq_,module,exports){
+},{"./_ListCache":40}],187:[function(_dereq_,module,exports){
 /**
  * Removes `key` and its value from the stack.
  *
@@ -53484,7 +55434,7 @@ function stackDelete(key) {
 
 module.exports = stackDelete;
 
-},{}],168:[function(_dereq_,module,exports){
+},{}],188:[function(_dereq_,module,exports){
 /**
  * Gets the stack value for `key`.
  *
@@ -53500,7 +55450,7 @@ function stackGet(key) {
 
 module.exports = stackGet;
 
-},{}],169:[function(_dereq_,module,exports){
+},{}],189:[function(_dereq_,module,exports){
 /**
  * Checks if a stack value for `key` exists.
  *
@@ -53516,7 +55466,7 @@ function stackHas(key) {
 
 module.exports = stackHas;
 
-},{}],170:[function(_dereq_,module,exports){
+},{}],190:[function(_dereq_,module,exports){
 var ListCache = _dereq_('./_ListCache'),
     Map = _dereq_('./_Map'),
     MapCache = _dereq_('./_MapCache');
@@ -53552,7 +55502,47 @@ function stackSet(key, value) {
 
 module.exports = stackSet;
 
-},{"./_ListCache":36,"./_Map":37,"./_MapCache":38}],171:[function(_dereq_,module,exports){
+},{"./_ListCache":40,"./_Map":41,"./_MapCache":42}],191:[function(_dereq_,module,exports){
+var asciiSize = _dereq_('./_asciiSize'),
+    hasUnicode = _dereq_('./_hasUnicode'),
+    unicodeSize = _dereq_('./_unicodeSize');
+
+/**
+ * Gets the number of symbols in `string`.
+ *
+ * @private
+ * @param {string} string The string to inspect.
+ * @returns {number} Returns the string size.
+ */
+function stringSize(string) {
+  return hasUnicode(string)
+    ? unicodeSize(string)
+    : asciiSize(string);
+}
+
+module.exports = stringSize;
+
+},{"./_asciiSize":60,"./_hasUnicode":141,"./_unicodeSize":196}],192:[function(_dereq_,module,exports){
+var asciiToArray = _dereq_('./_asciiToArray'),
+    hasUnicode = _dereq_('./_hasUnicode'),
+    unicodeToArray = _dereq_('./_unicodeToArray');
+
+/**
+ * Converts `string` to an array.
+ *
+ * @private
+ * @param {string} string The string to convert.
+ * @returns {Array} Returns the converted array.
+ */
+function stringToArray(string) {
+  return hasUnicode(string)
+    ? unicodeToArray(string)
+    : asciiToArray(string);
+}
+
+module.exports = stringToArray;
+
+},{"./_asciiToArray":61,"./_hasUnicode":141,"./_unicodeToArray":197}],193:[function(_dereq_,module,exports){
 var memoizeCapped = _dereq_('./_memoizeCapped');
 
 /** Used to match property names within property paths. */
@@ -53582,7 +55572,7 @@ var stringToPath = memoizeCapped(function(string) {
 
 module.exports = stringToPath;
 
-},{"./_memoizeCapped":152}],172:[function(_dereq_,module,exports){
+},{"./_memoizeCapped":169}],194:[function(_dereq_,module,exports){
 var isSymbol = _dereq_('./isSymbol');
 
 /** Used as references for various `Number` constants. */
@@ -53605,7 +55595,7 @@ function toKey(value) {
 
 module.exports = toKey;
 
-},{"./isSymbol":194}],173:[function(_dereq_,module,exports){
+},{"./isSymbol":227}],195:[function(_dereq_,module,exports){
 /** Used for built-in method references. */
 var funcProto = Function.prototype;
 
@@ -53633,7 +55623,95 @@ function toSource(func) {
 
 module.exports = toSource;
 
-},{}],174:[function(_dereq_,module,exports){
+},{}],196:[function(_dereq_,module,exports){
+/** Used to compose unicode character classes. */
+var rsAstralRange = '\\ud800-\\udfff',
+    rsComboMarksRange = '\\u0300-\\u036f',
+    reComboHalfMarksRange = '\\ufe20-\\ufe2f',
+    rsComboSymbolsRange = '\\u20d0-\\u20ff',
+    rsComboRange = rsComboMarksRange + reComboHalfMarksRange + rsComboSymbolsRange,
+    rsVarRange = '\\ufe0e\\ufe0f';
+
+/** Used to compose unicode capture groups. */
+var rsAstral = '[' + rsAstralRange + ']',
+    rsCombo = '[' + rsComboRange + ']',
+    rsFitz = '\\ud83c[\\udffb-\\udfff]',
+    rsModifier = '(?:' + rsCombo + '|' + rsFitz + ')',
+    rsNonAstral = '[^' + rsAstralRange + ']',
+    rsRegional = '(?:\\ud83c[\\udde6-\\uddff]){2}',
+    rsSurrPair = '[\\ud800-\\udbff][\\udc00-\\udfff]',
+    rsZWJ = '\\u200d';
+
+/** Used to compose unicode regexes. */
+var reOptMod = rsModifier + '?',
+    rsOptVar = '[' + rsVarRange + ']?',
+    rsOptJoin = '(?:' + rsZWJ + '(?:' + [rsNonAstral, rsRegional, rsSurrPair].join('|') + ')' + rsOptVar + reOptMod + ')*',
+    rsSeq = rsOptVar + reOptMod + rsOptJoin,
+    rsSymbol = '(?:' + [rsNonAstral + rsCombo + '?', rsCombo, rsRegional, rsSurrPair, rsAstral].join('|') + ')';
+
+/** Used to match [string symbols](https://mathiasbynens.be/notes/javascript-unicode). */
+var reUnicode = RegExp(rsFitz + '(?=' + rsFitz + ')|' + rsSymbol + rsSeq, 'g');
+
+/**
+ * Gets the size of a Unicode `string`.
+ *
+ * @private
+ * @param {string} string The string inspect.
+ * @returns {number} Returns the string size.
+ */
+function unicodeSize(string) {
+  var result = reUnicode.lastIndex = 0;
+  while (reUnicode.test(string)) {
+    ++result;
+  }
+  return result;
+}
+
+module.exports = unicodeSize;
+
+},{}],197:[function(_dereq_,module,exports){
+/** Used to compose unicode character classes. */
+var rsAstralRange = '\\ud800-\\udfff',
+    rsComboMarksRange = '\\u0300-\\u036f',
+    reComboHalfMarksRange = '\\ufe20-\\ufe2f',
+    rsComboSymbolsRange = '\\u20d0-\\u20ff',
+    rsComboRange = rsComboMarksRange + reComboHalfMarksRange + rsComboSymbolsRange,
+    rsVarRange = '\\ufe0e\\ufe0f';
+
+/** Used to compose unicode capture groups. */
+var rsAstral = '[' + rsAstralRange + ']',
+    rsCombo = '[' + rsComboRange + ']',
+    rsFitz = '\\ud83c[\\udffb-\\udfff]',
+    rsModifier = '(?:' + rsCombo + '|' + rsFitz + ')',
+    rsNonAstral = '[^' + rsAstralRange + ']',
+    rsRegional = '(?:\\ud83c[\\udde6-\\uddff]){2}',
+    rsSurrPair = '[\\ud800-\\udbff][\\udc00-\\udfff]',
+    rsZWJ = '\\u200d';
+
+/** Used to compose unicode regexes. */
+var reOptMod = rsModifier + '?',
+    rsOptVar = '[' + rsVarRange + ']?',
+    rsOptJoin = '(?:' + rsZWJ + '(?:' + [rsNonAstral, rsRegional, rsSurrPair].join('|') + ')' + rsOptVar + reOptMod + ')*',
+    rsSeq = rsOptVar + reOptMod + rsOptJoin,
+    rsSymbol = '(?:' + [rsNonAstral + rsCombo + '?', rsCombo, rsRegional, rsSurrPair, rsAstral].join('|') + ')';
+
+/** Used to match [string symbols](https://mathiasbynens.be/notes/javascript-unicode). */
+var reUnicode = RegExp(rsFitz + '(?=' + rsFitz + ')|' + rsSymbol + rsSeq, 'g');
+
+/**
+ * Converts a Unicode `string` to an array.
+ *
+ * @private
+ * @param {string} string The string to convert.
+ * @returns {Array} Returns the converted array.
+ */
+function unicodeToArray(string) {
+  return string.match(reUnicode) || [];
+}
+
+module.exports = unicodeToArray;
+
+},{}],198:[function(_dereq_,module,exports){
 var assignValue = _dereq_('./_assignValue'),
     copyObject = _dereq_('./_copyObject'),
     createAssigner = _dereq_('./_createAssigner'),
@@ -53693,7 +55771,174 @@ var assign = createAssigner(function(object, source) {
 
 module.exports = assign;
 
-},{"./_assignValue":56,"./_copyObject":101,"./_createAssigner":105,"./_isPrototype":138,"./isArrayLike":184,"./keys":196}],175:[function(_dereq_,module,exports){
+},{"./_assignValue":62,"./_copyObject":112,"./_createAssigner":116,"./_isPrototype":155,"./isArrayLike":213,"./keys":229}],199:[function(_dereq_,module,exports){
+var copyObject = _dereq_('./_copyObject'),
+    createAssigner = _dereq_('./_createAssigner'),
+    keysIn = _dereq_('./keysIn');
+
+/**
+ * This method is like `_.assignIn` except that it accepts `customizer`
+ * which is invoked to produce the assigned values. If `customizer` returns
+ * `undefined`, assignment is handled by the method instead. The `customizer`
+ * is invoked with five arguments: (objValue, srcValue, key, object, source).
+ *
+ * **Note:** This method mutates `object`.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @alias extendWith
+ * @category Object
+ * @param {Object} object The destination object.
+ * @param {...Object} sources The source objects.
+ * @param {Function} [customizer] The function to customize assigned values.
+ * @returns {Object} Returns `object`.
+ * @see _.assignWith
+ * @example
+ *
+ * function customizer(objValue, srcValue) {
+ *   return _.isUndefined(objValue) ? srcValue : objValue;
+ * }
+ *
+ * var defaults = _.partialRight(_.assignInWith, customizer);
+ *
+ * defaults({ 'a': 1 }, { 'b': 2 }, { 'a': 3 });
+ * // => { 'a': 1, 'b': 2 }
+ */
+var assignInWith = createAssigner(function(object, source, srcIndex, customizer) {
+  copyObject(source, keysIn(source), object, customizer);
+});
+
+module.exports = assignInWith;
+
+},{"./_copyObject":112,"./_createAssigner":116,"./keysIn":230}],200:[function(_dereq_,module,exports){
+var apply = _dereq_('./_apply'),
+    baseRest = _dereq_('./_baseRest'),
+    isError = _dereq_('./isError');
+
+/**
+ * Attempts to invoke `func`, returning either the result or the caught error
+ * object. Any additional arguments are provided to `func` when it's invoked.
+ *
+ * @static
+ * @memberOf _
+ * @since 3.0.0
+ * @category Util
+ * @param {Function} func The function to attempt.
+ * @param {...*} [args] The arguments to invoke `func` with.
+ * @returns {*} Returns the `func` result or error object.
+ * @example
+ *
+ * // Avoid throwing errors for invalid selectors.
+ * var elements = _.attempt(function(selector) {
+ *   return document.querySelectorAll(selector);
+ * }, '>_>');
+ *
+ * if (_.isError(elements)) {
+ *   elements = [];
+ * }
+ */
+var attempt = baseRest(function(func, args) {
+  try {
+    return apply(func, undefined, args);
+  } catch (e) {
+    return isError(e) ? e : new Error(e);
+  }
+});
+
+module.exports = attempt;
+
+},{"./_apply":52,"./_baseRest":92,"./isError":216}],201:[function(_dereq_,module,exports){
+var baseSlice = _dereq_('./_baseSlice'),
+    isIterateeCall = _dereq_('./_isIterateeCall'),
+    toInteger = _dereq_('./toInteger');
+
+/* Built-in method references for those with the same name as other `lodash` methods. */
+var nativeCeil = Math.ceil,
+    nativeMax = Math.max;
+
+/**
+ * Creates an array of elements split into groups the length of `size`.
+ * If `array` can't be split evenly, the final chunk will be the remaining
+ * elements.
+ *
+ * @static
+ * @memberOf _
+ * @since 3.0.0
+ * @category Array
+ * @param {Array} array The array to process.
+ * @param {number} [size=1] The length of each chunk
+ * @param- {Object} [guard] Enables use as an iteratee for methods like `_.map`.
+ * @returns {Array} Returns the new array of chunks.
+ * @example
+ *
+ * _.chunk(['a', 'b', 'c', 'd'], 2);
+ * // => [['a', 'b'], ['c', 'd']]
+ *
+ * _.chunk(['a', 'b', 'c', 'd'], 3);
+ * // => [['a', 'b', 'c'], ['d']]
+ */
+function chunk(array, size, guard) {
+  if ((guard ? isIterateeCall(array, size, guard) : size === undefined)) {
+    size = 1;
+  } else {
+    size = nativeMax(toInteger(size), 0);
+  }
+  var length = array == null ? 0 : array.length;
+  if (!length || size < 1) {
+    return [];
+  }
+  var index = 0,
+      resIndex = 0,
+      result = Array(nativeCeil(length / size));
+
+  while (index < length) {
+    result[resIndex++] = baseSlice(array, index, (index += size));
+  }
+  return result;
+}
+
+module.exports = chunk;
+
+},{"./_baseSlice":95,"./_isIterateeCall":151,"./toInteger":241}],202:[function(_dereq_,module,exports){
+var baseClone = _dereq_('./_baseClone');
+
+/** Used to compose bitmasks for cloning. */
+var CLONE_SYMBOLS_FLAG = 4;
+
+/**
+ * Creates a shallow clone of `value`.
+ *
+ * **Note:** This method is loosely based on the
+ * [structured clone algorithm](https://mdn.io/Structured_clone_algorithm)
+ * and supports cloning arrays, array buffers, booleans, date objects, maps,
+ * numbers, `Object` objects, regexes, sets, strings, symbols, and typed
+ * arrays. The own enumerable properties of `arguments` objects are cloned
+ * as plain objects. An empty object is returned for uncloneable values such
+ * as error objects, functions, DOM nodes, and WeakMaps.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Lang
+ * @param {*} value The value to clone.
+ * @returns {*} Returns the cloned value.
+ * @see _.cloneDeep
+ * @example
+ *
+ * var objects = [{ 'a': 1 }, { 'b': 2 }];
+ *
+ * var shallow = _.clone(objects);
+ * console.log(shallow[0] === objects[0]);
+ * // => true
+ */
+function clone(value) {
+  return baseClone(value, CLONE_SYMBOLS_FLAG);
+}
+
+module.exports = clone;
+
+},{"./_baseClone":67}],203:[function(_dereq_,module,exports){
 var baseClone = _dereq_('./_baseClone');
 
 /** Used to compose bitmasks for cloning. */
@@ -53724,7 +55969,7 @@ function cloneDeep(value) {
 
 module.exports = cloneDeep;
 
-},{"./_baseClone":61}],176:[function(_dereq_,module,exports){
+},{"./_baseClone":67}],204:[function(_dereq_,module,exports){
 /**
  * Creates a function that returns `value`.
  *
@@ -53752,7 +55997,7 @@ function constant(value) {
 
 module.exports = constant;
 
-},{}],177:[function(_dereq_,module,exports){
+},{}],205:[function(_dereq_,module,exports){
 /**
  * Performs a
  * [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
@@ -53791,7 +56036,52 @@ function eq(value, other) {
 
 module.exports = eq;
 
-},{}],178:[function(_dereq_,module,exports){
+},{}],206:[function(_dereq_,module,exports){
+var escapeHtmlChar = _dereq_('./_escapeHtmlChar'),
+    toString = _dereq_('./toString');
+
+/** Used to match HTML entities and HTML characters. */
+var reUnescapedHtml = /[&<>"']/g,
+    reHasUnescapedHtml = RegExp(reUnescapedHtml.source);
+
+/**
+ * Converts the characters "&", "<", ">", '"', and "'" in `string` to their
+ * corresponding HTML entities.
+ *
+ * **Note:** No other characters are escaped. To escape additional
+ * characters use a third-party library like [_he_](https://mths.be/he).
+ *
+ * Though the ">" character is escaped for symmetry, characters like
+ * ">" and "/" don't need escaping in HTML and have no special meaning
+ * unless they're part of a tag or unquoted attribute value. See
+ * [Mathias Bynens's article](https://mathiasbynens.be/notes/ambiguous-ampersands)
+ * (under "semi-related fun fact") for more details.
+ *
+ * When working with HTML you should always
+ * [quote attribute values](http://wonko.com/post/html-escaping) to reduce
+ * XSS vectors.
+ *
+ * @static
+ * @since 0.1.0
+ * @memberOf _
+ * @category String
+ * @param {string} [string=''] The string to escape.
+ * @returns {string} Returns the escaped string.
+ * @example
+ *
+ * _.escape('fred, barney, & pebbles');
+ * // => 'fred, barney, &amp; pebbles'
+ */
+function escape(string) {
+  string = toString(string);
+  return (string && reHasUnescapedHtml.test(string))
+    ? string.replace(reUnescapedHtml, escapeHtmlChar)
+    : string;
+}
+
+module.exports = escape;
+
+},{"./_escapeHtmlChar":126,"./toString":243}],207:[function(_dereq_,module,exports){
 var arrayFilter = _dereq_('./_arrayFilter'),
     baseFilter = _dereq_('./_baseFilter'),
     baseIteratee = _dereq_('./_baseIteratee'),
@@ -53841,7 +56131,7 @@ function filter(collection, predicate) {
 
 module.exports = filter;
 
-},{"./_arrayFilter":50,"./_baseFilter":64,"./_baseIteratee":77,"./isArray":183}],179:[function(_dereq_,module,exports){
+},{"./_arrayFilter":54,"./_baseFilter":70,"./_baseIteratee":83,"./isArray":212}],208:[function(_dereq_,module,exports){
 var baseGet = _dereq_('./_baseGet');
 
 /**
@@ -53876,7 +56166,7 @@ function get(object, path, defaultValue) {
 
 module.exports = get;
 
-},{"./_baseGet":67}],180:[function(_dereq_,module,exports){
+},{"./_baseGet":73}],209:[function(_dereq_,module,exports){
 var baseHasIn = _dereq_('./_baseHasIn'),
     hasPath = _dereq_('./_hasPath');
 
@@ -53912,7 +56202,7 @@ function hasIn(object, path) {
 
 module.exports = hasIn;
 
-},{"./_baseHasIn":70,"./_hasPath":124}],181:[function(_dereq_,module,exports){
+},{"./_baseHasIn":76,"./_hasPath":140}],210:[function(_dereq_,module,exports){
 /**
  * This method returns the first argument it receives.
  *
@@ -53935,7 +56225,7 @@ function identity(value) {
 
 module.exports = identity;
 
-},{}],182:[function(_dereq_,module,exports){
+},{}],211:[function(_dereq_,module,exports){
 var baseIsArguments = _dereq_('./_baseIsArguments'),
     isObjectLike = _dereq_('./isObjectLike');
 
@@ -53973,7 +56263,7 @@ var isArguments = baseIsArguments(function() { return arguments; }()) ? baseIsAr
 
 module.exports = isArguments;
 
-},{"./_baseIsArguments":71,"./isObjectLike":193}],183:[function(_dereq_,module,exports){
+},{"./_baseIsArguments":77,"./isObjectLike":224}],212:[function(_dereq_,module,exports){
 /**
  * Checks if `value` is classified as an `Array` object.
  *
@@ -54001,7 +56291,7 @@ var isArray = Array.isArray;
 
 module.exports = isArray;
 
-},{}],184:[function(_dereq_,module,exports){
+},{}],213:[function(_dereq_,module,exports){
 var isFunction = _dereq_('./isFunction'),
     isLength = _dereq_('./isLength');
 
@@ -54036,7 +56326,7 @@ function isArrayLike(value) {
 
 module.exports = isArrayLike;
 
-},{"./isFunction":188,"./isLength":189}],185:[function(_dereq_,module,exports){
+},{"./isFunction":218,"./isLength":219}],214:[function(_dereq_,module,exports){
 var root = _dereq_('./_root'),
     stubFalse = _dereq_('./stubFalse');
 
@@ -54076,7 +56366,7 @@ var isBuffer = nativeIsBuffer || stubFalse;
 
 module.exports = isBuffer;
 
-},{"./_root":160,"./stubFalse":202}],186:[function(_dereq_,module,exports){
+},{"./_root":180,"./stubFalse":237}],215:[function(_dereq_,module,exports){
 var baseIsEqual = _dereq_('./_baseIsEqual');
 
 /**
@@ -54113,7 +56403,45 @@ function isEqual(value, other) {
 
 module.exports = isEqual;
 
-},{"./_baseIsEqual":72}],187:[function(_dereq_,module,exports){
+},{"./_baseIsEqual":78}],216:[function(_dereq_,module,exports){
+var baseGetTag = _dereq_('./_baseGetTag'),
+    isObjectLike = _dereq_('./isObjectLike'),
+    isPlainObject = _dereq_('./isPlainObject');
+
+/** `Object#toString` result references. */
+var domExcTag = '[object DOMException]',
+    errorTag = '[object Error]';
+
+/**
+ * Checks if `value` is an `Error`, `EvalError`, `RangeError`, `ReferenceError`,
+ * `SyntaxError`, `TypeError`, or `URIError` object.
+ *
+ * @static
+ * @memberOf _
+ * @since 3.0.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is an error object, else `false`.
+ * @example
+ *
+ * _.isError(new Error);
+ * // => true
+ *
+ * _.isError(Error);
+ * // => false
+ */
+function isError(value) {
+  if (!isObjectLike(value)) {
+    return false;
+  }
+  var tag = baseGetTag(value);
+  return tag == errorTag || tag == domExcTag ||
+    (typeof value.message == 'string' && typeof value.name == 'string' && !isPlainObject(value));
+}
+
+module.exports = isError;
+
+},{"./_baseGetTag":75,"./isObjectLike":224,"./isPlainObject":225}],217:[function(_dereq_,module,exports){
 var root = _dereq_('./_root');
 
 /* Built-in method references for those with the same name as other `lodash` methods. */
@@ -54151,7 +56479,7 @@ function isFinite(value) {
 
 module.exports = isFinite;
 
-},{"./_root":160}],188:[function(_dereq_,module,exports){
+},{"./_root":180}],218:[function(_dereq_,module,exports){
 var baseGetTag = _dereq_('./_baseGetTag'),
     isObject = _dereq_('./isObject');
 
@@ -54190,7 +56518,7 @@ function isFunction(value) {
 
 module.exports = isFunction;
 
-},{"./_baseGetTag":69,"./isObject":192}],189:[function(_dereq_,module,exports){
+},{"./_baseGetTag":75,"./isObject":223}],219:[function(_dereq_,module,exports){
 /** Used as references for various `Number` constants. */
 var MAX_SAFE_INTEGER = 9007199254740991;
 
@@ -54227,7 +56555,7 @@ function isLength(value) {
 
 module.exports = isLength;
 
-},{}],190:[function(_dereq_,module,exports){
+},{}],220:[function(_dereq_,module,exports){
 var isNumber = _dereq_('./isNumber');
 
 /**
@@ -54267,7 +56595,9 @@ function isNaN(value) {
 
 module.exports = isNaN;
 
-},{"./isNumber":191}],191:[function(_dereq_,module,exports){
+},{"./isNumber":222}],221:[function(_dereq_,module,exports){
+arguments[4][220][0].apply(exports,arguments)
+},{"./isNumber":222,"dup":220}],222:[function(_dereq_,module,exports){
 var baseGetTag = _dereq_('./_baseGetTag'),
     isObjectLike = _dereq_('./isObjectLike');
 
@@ -54307,7 +56637,7 @@ function isNumber(value) {
 
 module.exports = isNumber;
 
-},{"./_baseGetTag":69,"./isObjectLike":193}],192:[function(_dereq_,module,exports){
+},{"./_baseGetTag":75,"./isObjectLike":224}],223:[function(_dereq_,module,exports){
 /**
  * Checks if `value` is the
  * [language type](http://www.ecma-international.org/ecma-262/7.0/#sec-ecmascript-language-types)
@@ -54340,7 +56670,7 @@ function isObject(value) {
 
 module.exports = isObject;
 
-},{}],193:[function(_dereq_,module,exports){
+},{}],224:[function(_dereq_,module,exports){
 /**
  * Checks if `value` is object-like. A value is object-like if it's not `null`
  * and has a `typeof` result of "object".
@@ -54371,7 +56701,103 @@ function isObjectLike(value) {
 
 module.exports = isObjectLike;
 
-},{}],194:[function(_dereq_,module,exports){
+},{}],225:[function(_dereq_,module,exports){
+var baseGetTag = _dereq_('./_baseGetTag'),
+    getPrototype = _dereq_('./_getPrototype'),
+    isObjectLike = _dereq_('./isObjectLike');
+
+/** `Object#toString` result references. */
+var objectTag = '[object Object]';
+
+/** Used for built-in method references. */
+var funcProto = Function.prototype,
+    objectProto = Object.prototype;
+
+/** Used to resolve the decompiled source of functions. */
+var funcToString = funcProto.toString;
+
+/** Used to check objects for own properties. */
+var hasOwnProperty = objectProto.hasOwnProperty;
+
+/** Used to infer the `Object` constructor. */
+var objectCtorString = funcToString.call(Object);
+
+/**
+ * Checks if `value` is a plain object, that is, an object created by the
+ * `Object` constructor or one with a `[[Prototype]]` of `null`.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.8.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a plain object, else `false`.
+ * @example
+ *
+ * function Foo() {
+ *   this.a = 1;
+ * }
+ *
+ * _.isPlainObject(new Foo);
+ * // => false
+ *
+ * _.isPlainObject([1, 2, 3]);
+ * // => false
+ *
+ * _.isPlainObject({ 'x': 0, 'y': 0 });
+ * // => true
+ *
+ * _.isPlainObject(Object.create(null));
+ * // => true
+ */
+function isPlainObject(value) {
+  if (!isObjectLike(value) || baseGetTag(value) != objectTag) {
+    return false;
+  }
+  var proto = getPrototype(value);
+  if (proto === null) {
+    return true;
+  }
+  var Ctor = hasOwnProperty.call(proto, 'constructor') && proto.constructor;
+  return typeof Ctor == 'function' && Ctor instanceof Ctor &&
+    funcToString.call(Ctor) == objectCtorString;
+}
+
+module.exports = isPlainObject;
+
+},{"./_baseGetTag":75,"./_getPrototype":134,"./isObjectLike":224}],226:[function(_dereq_,module,exports){
+var baseGetTag = _dereq_('./_baseGetTag'),
+    isArray = _dereq_('./isArray'),
+    isObjectLike = _dereq_('./isObjectLike');
+
+/** `Object#toString` result references. */
+var stringTag = '[object String]';
+
+/**
+ * Checks if `value` is classified as a `String` primitive or object.
+ *
+ * @static
+ * @since 0.1.0
+ * @memberOf _
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a string, else `false`.
+ * @example
+ *
+ * _.isString('abc');
+ * // => true
+ *
+ * _.isString(1);
+ * // => false
+ */
+function isString(value) {
+  return typeof value == 'string' ||
+    (!isArray(value) && isObjectLike(value) && baseGetTag(value) == stringTag);
+}
+
+module.exports = isString;
+
+},{"./_baseGetTag":75,"./isArray":212,"./isObjectLike":224}],227:[function(_dereq_,module,exports){
 var baseGetTag = _dereq_('./_baseGetTag'),
     isObjectLike = _dereq_('./isObjectLike');
 
@@ -54402,7 +56828,7 @@ function isSymbol(value) {
 
 module.exports = isSymbol;
 
-},{"./_baseGetTag":69,"./isObjectLike":193}],195:[function(_dereq_,module,exports){
+},{"./_baseGetTag":75,"./isObjectLike":224}],228:[function(_dereq_,module,exports){
 var baseIsTypedArray = _dereq_('./_baseIsTypedArray'),
     baseUnary = _dereq_('./_baseUnary'),
     nodeUtil = _dereq_('./_nodeUtil');
@@ -54431,7 +56857,7 @@ var isTypedArray = nodeIsTypedArray ? baseUnary(nodeIsTypedArray) : baseIsTypedA
 
 module.exports = isTypedArray;
 
-},{"./_baseIsTypedArray":76,"./_baseUnary":89,"./_nodeUtil":156}],196:[function(_dereq_,module,exports){
+},{"./_baseIsTypedArray":82,"./_baseUnary":98,"./_nodeUtil":173}],229:[function(_dereq_,module,exports){
 var arrayLikeKeys = _dereq_('./_arrayLikeKeys'),
     baseKeys = _dereq_('./_baseKeys'),
     isArrayLike = _dereq_('./isArrayLike');
@@ -54470,7 +56896,7 @@ function keys(object) {
 
 module.exports = keys;
 
-},{"./_arrayLikeKeys":51,"./_baseKeys":78,"./isArrayLike":184}],197:[function(_dereq_,module,exports){
+},{"./_arrayLikeKeys":55,"./_baseKeys":84,"./isArrayLike":213}],230:[function(_dereq_,module,exports){
 var arrayLikeKeys = _dereq_('./_arrayLikeKeys'),
     baseKeysIn = _dereq_('./_baseKeysIn'),
     isArrayLike = _dereq_('./isArrayLike');
@@ -54504,7 +56930,7 @@ function keysIn(object) {
 
 module.exports = keysIn;
 
-},{"./_arrayLikeKeys":51,"./_baseKeysIn":79,"./isArrayLike":184}],198:[function(_dereq_,module,exports){
+},{"./_arrayLikeKeys":55,"./_baseKeysIn":85,"./isArrayLike":213}],231:[function(_dereq_,module,exports){
 var MapCache = _dereq_('./_MapCache');
 
 /** Error message constants. */
@@ -54579,7 +57005,58 @@ memoize.Cache = MapCache;
 
 module.exports = memoize;
 
-},{"./_MapCache":38}],199:[function(_dereq_,module,exports){
+},{"./_MapCache":42}],232:[function(_dereq_,module,exports){
+var createPadding = _dereq_('./_createPadding'),
+    stringSize = _dereq_('./_stringSize'),
+    toInteger = _dereq_('./toInteger'),
+    toString = _dereq_('./toString');
+
+/* Built-in method references for those with the same name as other `lodash` methods. */
+var nativeCeil = Math.ceil,
+    nativeFloor = Math.floor;
+
+/**
+ * Pads `string` on the left and right sides if it's shorter than `length`.
+ * Padding characters are truncated if they can't be evenly divided by `length`.
+ *
+ * @static
+ * @memberOf _
+ * @since 3.0.0
+ * @category String
+ * @param {string} [string=''] The string to pad.
+ * @param {number} [length=0] The padding length.
+ * @param {string} [chars=' '] The string used as padding.
+ * @returns {string} Returns the padded string.
+ * @example
+ *
+ * _.pad('abc', 8);
+ * // => '  abc   '
+ *
+ * _.pad('abc', 8, '_-');
+ * // => '_-abc_-_'
+ *
+ * _.pad('abc', 3);
+ * // => 'abc'
+ */
+function pad(string, length, chars) {
+  string = toString(string);
+  length = toInteger(length);
+
+  var strLength = length ? stringSize(string) : 0;
+  if (!length || strLength >= length) {
+    return string;
+  }
+  var mid = (length - strLength) / 2;
+  return (
+    createPadding(nativeFloor(mid), chars) +
+    string +
+    createPadding(nativeCeil(mid), chars)
+  );
+}
+
+module.exports = pad;
+
+},{"./_createPadding":119,"./_stringSize":191,"./toInteger":241,"./toString":243}],233:[function(_dereq_,module,exports){
 var baseProperty = _dereq_('./_baseProperty'),
     basePropertyDeep = _dereq_('./_basePropertyDeep'),
     isKey = _dereq_('./_isKey'),
@@ -54613,7 +57090,35 @@ function property(path) {
 
 module.exports = property;
 
-},{"./_baseProperty":82,"./_basePropertyDeep":83,"./_isKey":135,"./_toKey":172}],200:[function(_dereq_,module,exports){
+},{"./_baseProperty":88,"./_basePropertyDeep":89,"./_isKey":152,"./_toKey":194}],234:[function(_dereq_,module,exports){
+var createRound = _dereq_('./_createRound');
+
+/**
+ * Computes `number` rounded to `precision`.
+ *
+ * @static
+ * @memberOf _
+ * @since 3.10.0
+ * @category Math
+ * @param {number} number The number to round.
+ * @param {number} [precision=0] The precision to round to.
+ * @returns {number} Returns the rounded number.
+ * @example
+ *
+ * _.round(4.006);
+ * // => 4
+ *
+ * _.round(4.006, 2);
+ * // => 4.01
+ *
+ * _.round(4060, -2);
+ * // => 4100
+ */
+var round = createRound('round');
+
+module.exports = round;
+
+},{"./_createRound":120}],235:[function(_dereq_,module,exports){
 var baseSet = _dereq_('./_baseSet');
 
 /**
@@ -54650,7 +57155,7 @@ function set(object, path, value) {
 
 module.exports = set;
 
-},{"./_baseSet":85}],201:[function(_dereq_,module,exports){
+},{"./_baseSet":93}],236:[function(_dereq_,module,exports){
 /**
  * This method returns a new empty array.
  *
@@ -54675,7 +57180,7 @@ function stubArray() {
 
 module.exports = stubArray;
 
-},{}],202:[function(_dereq_,module,exports){
+},{}],237:[function(_dereq_,module,exports){
 /**
  * This method returns `false`.
  *
@@ -54695,7 +57200,466 @@ function stubFalse() {
 
 module.exports = stubFalse;
 
-},{}],203:[function(_dereq_,module,exports){
+},{}],238:[function(_dereq_,module,exports){
+var assignInWith = _dereq_('./assignInWith'),
+    attempt = _dereq_('./attempt'),
+    baseValues = _dereq_('./_baseValues'),
+    customDefaultsAssignIn = _dereq_('./_customDefaultsAssignIn'),
+    escapeStringChar = _dereq_('./_escapeStringChar'),
+    isError = _dereq_('./isError'),
+    isIterateeCall = _dereq_('./_isIterateeCall'),
+    keys = _dereq_('./keys'),
+    reInterpolate = _dereq_('./_reInterpolate'),
+    templateSettings = _dereq_('./templateSettings'),
+    toString = _dereq_('./toString');
+
+/** Used to match empty string literals in compiled template source. */
+var reEmptyStringLeading = /\b__p \+= '';/g,
+    reEmptyStringMiddle = /\b(__p \+=) '' \+/g,
+    reEmptyStringTrailing = /(__e\(.*?\)|\b__t\)) \+\n'';/g;
+
+/**
+ * Used to match
+ * [ES template delimiters](http://ecma-international.org/ecma-262/7.0/#sec-template-literal-lexical-components).
+ */
+var reEsTemplate = /\$\{([^\\}]*(?:\\.[^\\}]*)*)\}/g;
+
+/** Used to ensure capturing order of template delimiters. */
+var reNoMatch = /($^)/;
+
+/** Used to match unescaped characters in compiled string literals. */
+var reUnescapedString = /['\n\r\u2028\u2029\\]/g;
+
+/**
+ * Creates a compiled template function that can interpolate data properties
+ * in "interpolate" delimiters, HTML-escape interpolated data properties in
+ * "escape" delimiters, and execute JavaScript in "evaluate" delimiters. Data
+ * properties may be accessed as free variables in the template. If a setting
+ * object is given, it takes precedence over `_.templateSettings` values.
+ *
+ * **Note:** In the development build `_.template` utilizes
+ * [sourceURLs](http://www.html5rocks.com/en/tutorials/developertools/sourcemaps/#toc-sourceurl)
+ * for easier debugging.
+ *
+ * For more information on precompiling templates see
+ * [lodash's custom builds documentation](https://lodash.com/custom-builds).
+ *
+ * For more information on Chrome extension sandboxes see
+ * [Chrome's extensions documentation](https://developer.chrome.com/extensions/sandboxingEval).
+ *
+ * @static
+ * @since 0.1.0
+ * @memberOf _
+ * @category String
+ * @param {string} [string=''] The template string.
+ * @param {Object} [options={}] The options object.
+ * @param {RegExp} [options.escape=_.templateSettings.escape]
+ *  The HTML "escape" delimiter.
+ * @param {RegExp} [options.evaluate=_.templateSettings.evaluate]
+ *  The "evaluate" delimiter.
+ * @param {Object} [options.imports=_.templateSettings.imports]
+ *  An object to import into the template as free variables.
+ * @param {RegExp} [options.interpolate=_.templateSettings.interpolate]
+ *  The "interpolate" delimiter.
+ * @param {string} [options.sourceURL='templateSources[n]']
+ *  The sourceURL of the compiled template.
+ * @param {string} [options.variable='obj']
+ *  The data object variable name.
+ * @param- {Object} [guard] Enables use as an iteratee for methods like `_.map`.
+ * @returns {Function} Returns the compiled template function.
+ * @example
+ *
+ * // Use the "interpolate" delimiter to create a compiled template.
+ * var compiled = _.template('hello <%= user %>!');
+ * compiled({ 'user': 'fred' });
+ * // => 'hello fred!'
+ *
+ * // Use the HTML "escape" delimiter to escape data property values.
+ * var compiled = _.template('<b><%- value %></b>');
+ * compiled({ 'value': '<script>' });
+ * // => '<b>&lt;script&gt;</b>'
+ *
+ * // Use the "evaluate" delimiter to execute JavaScript and generate HTML.
+ * var compiled = _.template('<% _.forEach(users, function(user) { %><li><%- user %></li><% }); %>');
+ * compiled({ 'users': ['fred', 'barney'] });
+ * // => '<li>fred</li><li>barney</li>'
+ *
+ * // Use the internal `print` function in "evaluate" delimiters.
+ * var compiled = _.template('<% print("hello " + user); %>!');
+ * compiled({ 'user': 'barney' });
+ * // => 'hello barney!'
+ *
+ * // Use the ES template literal delimiter as an "interpolate" delimiter.
+ * // Disable support by replacing the "interpolate" delimiter.
+ * var compiled = _.template('hello ${ user }!');
+ * compiled({ 'user': 'pebbles' });
+ * // => 'hello pebbles!'
+ *
+ * // Use backslashes to treat delimiters as plain text.
+ * var compiled = _.template('<%= "\\<%- value %\\>" %>');
+ * compiled({ 'value': 'ignored' });
+ * // => '<%- value %>'
+ *
+ * // Use the `imports` option to import `jQuery` as `jq`.
+ * var text = '<% jq.each(users, function(user) { %><li><%- user %></li><% }); %>';
+ * var compiled = _.template(text, { 'imports': { 'jq': jQuery } });
+ * compiled({ 'users': ['fred', 'barney'] });
+ * // => '<li>fred</li><li>barney</li>'
+ *
+ * // Use the `sourceURL` option to specify a custom sourceURL for the template.
+ * var compiled = _.template('hello <%= user %>!', { 'sourceURL': '/basic/greeting.jst' });
+ * compiled(data);
+ * // => Find the source of "greeting.jst" under the Sources tab or Resources panel of the web inspector.
+ *
+ * // Use the `variable` option to ensure a with-statement isn't used in the compiled template.
+ * var compiled = _.template('hi <%= data.user %>!', { 'variable': 'data' });
+ * compiled.source;
+ * // => function(data) {
+ * //   var __t, __p = '';
+ * //   __p += 'hi ' + ((__t = ( data.user )) == null ? '' : __t) + '!';
+ * //   return __p;
+ * // }
+ *
+ * // Use custom template delimiters.
+ * _.templateSettings.interpolate = /{{([\s\S]+?)}}/g;
+ * var compiled = _.template('hello {{ user }}!');
+ * compiled({ 'user': 'mustache' });
+ * // => 'hello mustache!'
+ *
+ * // Use the `source` property to inline compiled templates for meaningful
+ * // line numbers in error messages and stack traces.
+ * fs.writeFileSync(path.join(process.cwd(), 'jst.js'), '\
+ *   var JST = {\
+ *     "main": ' + _.template(mainText).source + '\
+ *   };\
+ * ');
+ */
+function template(string, options, guard) {
+  // Based on John Resig's `tmpl` implementation
+  // (http://ejohn.org/blog/javascript-micro-templating/)
+  // and Laura Doktorova's doT.js (https://github.com/olado/doT).
+  var settings = templateSettings.imports._.templateSettings || templateSettings;
+
+  if (guard && isIterateeCall(string, options, guard)) {
+    options = undefined;
+  }
+  string = toString(string);
+  options = assignInWith({}, options, settings, customDefaultsAssignIn);
+
+  var imports = assignInWith({}, options.imports, settings.imports, customDefaultsAssignIn),
+      importsKeys = keys(imports),
+      importsValues = baseValues(imports, importsKeys);
+
+  var isEscaping,
+      isEvaluating,
+      index = 0,
+      interpolate = options.interpolate || reNoMatch,
+      source = "__p += '";
+
+  // Compile the regexp to match each delimiter.
+  var reDelimiters = RegExp(
+    (options.escape || reNoMatch).source + '|' +
+    interpolate.source + '|' +
+    (interpolate === reInterpolate ? reEsTemplate : reNoMatch).source + '|' +
+    (options.evaluate || reNoMatch).source + '|$'
+  , 'g');
+
+  // Use a sourceURL for easier debugging.
+  var sourceURL = 'sourceURL' in options ? '//# sourceURL=' + options.sourceURL + '\n' : '';
+
+  string.replace(reDelimiters, function(match, escapeValue, interpolateValue, esTemplateValue, evaluateValue, offset) {
+    interpolateValue || (interpolateValue = esTemplateValue);
+
+    // Escape characters that can't be included in string literals.
+    source += string.slice(index, offset).replace(reUnescapedString, escapeStringChar);
+
+    // Replace delimiters with snippets.
+    if (escapeValue) {
+      isEscaping = true;
+      source += "' +\n__e(" + escapeValue + ") +\n'";
+    }
+    if (evaluateValue) {
+      isEvaluating = true;
+      source += "';\n" + evaluateValue + ";\n__p += '";
+    }
+    if (interpolateValue) {
+      source += "' +\n((__t = (" + interpolateValue + ")) == null ? '' : __t) +\n'";
+    }
+    index = offset + match.length;
+
+    // The JS engine embedded in Adobe products needs `match` returned in
+    // order to produce the correct `offset` value.
+    return match;
+  });
+
+  source += "';\n";
+
+  // If `variable` is not specified wrap a with-statement around the generated
+  // code to add the data object to the top of the scope chain.
+  var variable = options.variable;
+  if (!variable) {
+    source = 'with (obj) {\n' + source + '\n}\n';
+  }
+  // Cleanup code by stripping empty strings.
+  source = (isEvaluating ? source.replace(reEmptyStringLeading, '') : source)
+    .replace(reEmptyStringMiddle, '$1')
+    .replace(reEmptyStringTrailing, '$1;');
+
+  // Frame code as the function body.
+  source = 'function(' + (variable || 'obj') + ') {\n' +
+    (variable
+      ? ''
+      : 'obj || (obj = {});\n'
+    ) +
+    "var __t, __p = ''" +
+    (isEscaping
+       ? ', __e = _.escape'
+       : ''
+    ) +
+    (isEvaluating
+      ? ', __j = Array.prototype.join;\n' +
+        "function print() { __p += __j.call(arguments, '') }\n"
+      : ';\n'
+    ) +
+    source +
+    'return __p\n}';
+
+  var result = attempt(function() {
+    return Function(importsKeys, sourceURL + 'return ' + source)
+      .apply(undefined, importsValues);
+  });
+
+  // Provide the compiled function's source by its `toString` method or
+  // the `source` property as a convenience for inlining compiled templates.
+  result.source = source;
+  if (isError(result)) {
+    throw result;
+  }
+  return result;
+}
+
+module.exports = template;
+
+},{"./_baseValues":99,"./_customDefaultsAssignIn":121,"./_escapeStringChar":127,"./_isIterateeCall":151,"./_reInterpolate":179,"./assignInWith":199,"./attempt":200,"./isError":216,"./keys":229,"./templateSettings":239,"./toString":243}],239:[function(_dereq_,module,exports){
+var escape = _dereq_('./escape'),
+    reEscape = _dereq_('./_reEscape'),
+    reEvaluate = _dereq_('./_reEvaluate'),
+    reInterpolate = _dereq_('./_reInterpolate');
+
+/**
+ * By default, the template delimiters used by lodash are like those in
+ * embedded Ruby (ERB) as well as ES2015 template strings. Change the
+ * following template settings to use alternative delimiters.
+ *
+ * @static
+ * @memberOf _
+ * @type {Object}
+ */
+var templateSettings = {
+
+  /**
+   * Used to detect `data` property values to be HTML-escaped.
+   *
+   * @memberOf _.templateSettings
+   * @type {RegExp}
+   */
+  'escape': reEscape,
+
+  /**
+   * Used to detect code to be evaluated.
+   *
+   * @memberOf _.templateSettings
+   * @type {RegExp}
+   */
+  'evaluate': reEvaluate,
+
+  /**
+   * Used to detect `data` property values to inject.
+   *
+   * @memberOf _.templateSettings
+   * @type {RegExp}
+   */
+  'interpolate': reInterpolate,
+
+  /**
+   * Used to reference the data object in the template text.
+   *
+   * @memberOf _.templateSettings
+   * @type {string}
+   */
+  'variable': '',
+
+  /**
+   * Used to import variables into the compiled template.
+   *
+   * @memberOf _.templateSettings
+   * @type {Object}
+   */
+  'imports': {
+
+    /**
+     * A reference to the `lodash` function.
+     *
+     * @memberOf _.templateSettings.imports
+     * @type {Function}
+     */
+    '_': { 'escape': escape }
+  }
+};
+
+module.exports = templateSettings;
+
+},{"./_reEscape":177,"./_reEvaluate":178,"./_reInterpolate":179,"./escape":206}],240:[function(_dereq_,module,exports){
+var toNumber = _dereq_('./toNumber');
+
+/** Used as references for various `Number` constants. */
+var INFINITY = 1 / 0,
+    MAX_INTEGER = 1.7976931348623157e+308;
+
+/**
+ * Converts `value` to a finite number.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.12.0
+ * @category Lang
+ * @param {*} value The value to convert.
+ * @returns {number} Returns the converted number.
+ * @example
+ *
+ * _.toFinite(3.2);
+ * // => 3.2
+ *
+ * _.toFinite(Number.MIN_VALUE);
+ * // => 5e-324
+ *
+ * _.toFinite(Infinity);
+ * // => 1.7976931348623157e+308
+ *
+ * _.toFinite('3.2');
+ * // => 3.2
+ */
+function toFinite(value) {
+  if (!value) {
+    return value === 0 ? value : 0;
+  }
+  value = toNumber(value);
+  if (value === INFINITY || value === -INFINITY) {
+    var sign = (value < 0 ? -1 : 1);
+    return sign * MAX_INTEGER;
+  }
+  return value === value ? value : 0;
+}
+
+module.exports = toFinite;
+
+},{"./toNumber":242}],241:[function(_dereq_,module,exports){
+var toFinite = _dereq_('./toFinite');
+
+/**
+ * Converts `value` to an integer.
+ *
+ * **Note:** This method is loosely based on
+ * [`ToInteger`](http://www.ecma-international.org/ecma-262/7.0/#sec-tointeger).
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to convert.
+ * @returns {number} Returns the converted integer.
+ * @example
+ *
+ * _.toInteger(3.2);
+ * // => 3
+ *
+ * _.toInteger(Number.MIN_VALUE);
+ * // => 0
+ *
+ * _.toInteger(Infinity);
+ * // => 1.7976931348623157e+308
+ *
+ * _.toInteger('3.2');
+ * // => 3
+ */
+function toInteger(value) {
+  var result = toFinite(value),
+      remainder = result % 1;
+
+  return result === result ? (remainder ? result - remainder : result) : 0;
+}
+
+module.exports = toInteger;
+
+},{"./toFinite":240}],242:[function(_dereq_,module,exports){
+var isObject = _dereq_('./isObject'),
+    isSymbol = _dereq_('./isSymbol');
+
+/** Used as references for various `Number` constants. */
+var NAN = 0 / 0;
+
+/** Used to match leading and trailing whitespace. */
+var reTrim = /^\s+|\s+$/g;
+
+/** Used to detect bad signed hexadecimal string values. */
+var reIsBadHex = /^[-+]0x[0-9a-f]+$/i;
+
+/** Used to detect binary string values. */
+var reIsBinary = /^0b[01]+$/i;
+
+/** Used to detect octal string values. */
+var reIsOctal = /^0o[0-7]+$/i;
+
+/** Built-in method references without a dependency on `root`. */
+var freeParseInt = parseInt;
+
+/**
+ * Converts `value` to a number.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to process.
+ * @returns {number} Returns the number.
+ * @example
+ *
+ * _.toNumber(3.2);
+ * // => 3.2
+ *
+ * _.toNumber(Number.MIN_VALUE);
+ * // => 5e-324
+ *
+ * _.toNumber(Infinity);
+ * // => Infinity
+ *
+ * _.toNumber('3.2');
+ * // => 3.2
+ */
+function toNumber(value) {
+  if (typeof value == 'number') {
+    return value;
+  }
+  if (isSymbol(value)) {
+    return NAN;
+  }
+  if (isObject(value)) {
+    var other = typeof value.valueOf == 'function' ? value.valueOf() : value;
+    value = isObject(other) ? (other + '') : other;
+  }
+  if (typeof value != 'string') {
+    return value === 0 ? value : +value;
+  }
+  value = value.replace(reTrim, '');
+  var isBinary = reIsBinary.test(value);
+  return (isBinary || reIsOctal.test(value))
+    ? freeParseInt(value.slice(2), isBinary ? 2 : 8)
+    : (reIsBadHex.test(value) ? NAN : +value);
+}
+
+module.exports = toNumber;
+
+},{"./isObject":223,"./isSymbol":227}],243:[function(_dereq_,module,exports){
 var baseToString = _dereq_('./_baseToString');
 
 /**
@@ -54725,7 +57689,7 @@ function toString(value) {
 
 module.exports = toString;
 
-},{"./_baseToString":88}],204:[function(_dereq_,module,exports){
+},{"./_baseToString":97}],244:[function(_dereq_,module,exports){
 //! moment.js
 //! version : 2.18.1
 //! authors : Tim Wood, Iskren Chernev, Moment.js contributors
@@ -59190,7 +62154,7 @@ return hooks;
 
 })));
 
-},{}],205:[function(_dereq_,module,exports){
+},{}],245:[function(_dereq_,module,exports){
 (function (global){
 /*! Native Promise Only
     v0.8.1 (c) Kyle Simpson
@@ -59567,7 +62531,7 @@ return hooks;
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],206:[function(_dereq_,module,exports){
+},{}],246:[function(_dereq_,module,exports){
 /*
  * ngDialog - easy modals and popup windows
  * http://github.com/likeastore/ngDialog
@@ -60522,7 +63486,7 @@ return hooks;
     return m;
 }));
 
-},{"angular":9}],207:[function(_dereq_,module,exports){
+},{"angular":11}],247:[function(_dereq_,module,exports){
 /**!
  * AngularJS file upload directives and services. Supports: file upload/drop/paste, resume, cancel/abort,
  * progress, resize, thumbnail, preview, validation and CORS
@@ -63422,10 +66386,10 @@ ngFileUpload.service('UploadExif', ['UploadResize', '$q', function (UploadResize
 }]);
 
 
-},{}],208:[function(_dereq_,module,exports){
+},{}],248:[function(_dereq_,module,exports){
 _dereq_('./dist/ng-file-upload-all');
 module.exports = 'ngFileUpload';
-},{"./dist/ng-file-upload-all":207}],209:[function(_dereq_,module,exports){
+},{"./dist/ng-file-upload-all":247}],249:[function(_dereq_,module,exports){
 module.exports = function (obj) {
     if (!obj || typeof obj !== 'object') return obj;
     
@@ -63462,7 +66426,7 @@ var isArray = Array.isArray || function (xs) {
     return {}.toString.call(xs) === '[object Array]';
 };
 
-},{}],210:[function(_dereq_,module,exports){
+},{}],250:[function(_dereq_,module,exports){
 /*!
  * Signature Pad v1.6.0
  * https://github.com/szimek/signature_pad
@@ -63993,7 +66957,7 @@ return SignaturePad;
 
 })));
 
-},{}],211:[function(_dereq_,module,exports){
+},{}],251:[function(_dereq_,module,exports){
 /*!
  * ui-select
  * http://github.com/angular-ui/ui-select
@@ -66421,7 +69385,7 @@ $templateCache.put("selectize/match.tpl.html","<div ng-hide=\"$select.searchEnab
 $templateCache.put("selectize/no-choice.tpl.html","<div class=\"ui-select-no-choice selectize-dropdown\" ng-show=\"$select.items.length == 0\"><div class=\"selectize-dropdown-content\"><div data-selectable=\"\" ng-transclude=\"\"></div></div></div>");
 $templateCache.put("selectize/select-multiple.tpl.html","<div class=\"ui-select-container selectize-control multi plugin-remove_button\" ng-class=\"{\'open\': $select.open}\"><div class=\"selectize-input\" ng-class=\"{\'focus\': $select.open, \'disabled\': $select.disabled, \'selectize-focus\' : $select.focus}\" ng-click=\"$select.open && !$select.searchEnabled ? $select.toggle($event) : $select.activate()\"><div class=\"ui-select-match\"></div><input type=\"search\" autocomplete=\"off\" tabindex=\"-1\" class=\"ui-select-search\" ng-class=\"{\'ui-select-search-hidden\':!$select.searchEnabled}\" placeholder=\"{{$selectMultiple.getPlaceholder()}}\" ng-model=\"$select.search\" ng-disabled=\"$select.disabled\" aria-expanded=\"{{$select.open}}\" aria-label=\"{{ $select.baseTitle }}\" ondrop=\"return false;\"></div><div class=\"ui-select-choices\"></div><div class=\"ui-select-no-choice\"></div></div>");
 $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container selectize-control single\" ng-class=\"{\'open\': $select.open}\"><div class=\"selectize-input\" ng-class=\"{\'focus\': $select.open, \'disabled\': $select.disabled, \'selectize-focus\' : $select.focus}\" ng-click=\"$select.open && !$select.searchEnabled ? $select.toggle($event) : $select.activate()\"><div class=\"ui-select-match\"></div><input type=\"search\" autocomplete=\"off\" tabindex=\"-1\" class=\"ui-select-search ui-select-toggle\" ng-class=\"{\'ui-select-search-hidden\':!$select.searchEnabled}\" ng-click=\"$select.toggle($event)\" placeholder=\"{{$select.placeholder}}\" ng-model=\"$select.search\" ng-hide=\"!$select.isEmpty() && !$select.open\" ng-disabled=\"$select.disabled\" aria-label=\"{{ $select.baseTitle }}\"></div><div class=\"ui-select-choices\"></div><div class=\"ui-select-no-choice\"></div></div>");}]);
-},{}],212:[function(_dereq_,module,exports){
+},{}],252:[function(_dereq_,module,exports){
 (function(self) {
   'use strict';
 
@@ -66884,7 +69848,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
   self.fetch.polyfill = true
 })(typeof self !== 'undefined' ? self : this);
 
-},{}],213:[function(_dereq_,module,exports){
+},{}],253:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -66973,7 +69937,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],214:[function(_dereq_,module,exports){
+},{}],254:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -66996,7 +69960,7 @@ module.exports = function(app) {
           disableOnInvalid: false,
           theme: 'primary'
         },
-        controller: ['$scope', function($scope) {
+        controller: ['$scope', 'FormioUtils', function($scope, FormioUtils) {
           if ($scope.builder) return;
           var settings = $scope.component;
           $scope.getButtonType = function() {
@@ -67006,9 +69970,28 @@ module.exports = function(app) {
               case 'reset':
                 return 'reset';
               case 'event':
+              case 'custom':
               case 'oauth':
               default:
                 return 'button';
+            }
+          };
+
+          var onCustom = function() {
+            try {
+              /* eslint-disable no-unused-vars */
+              var parent = $scope.$parent;
+              while (!parent.form) {
+                parent = parent.$parent;
+              }
+              var components = FormioUtils.flattenComponents(parent.form.components, true);
+              /* eslint-enable no-unused-vars */
+              eval('(function(data) { ' + $scope.component.custom + ' })($scope.data)');
+            }
+            catch (e) {
+              /* eslint-disable no-console */
+              console.warn('An error occurred evaluating custom logic for ' + $scope.component.key, e);
+              /* eslint-enable no-console */
             }
           };
 
@@ -67018,6 +70001,9 @@ module.exports = function(app) {
                 return;
               case 'event':
                 $scope.$emit($scope.component.event, $scope.data);
+                break;
+              case 'custom':
+                onCustom();
                 break;
               case 'reset':
                 $scope.resetForm();
@@ -67151,7 +70137,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],215:[function(_dereq_,module,exports){
+},{}],255:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -67225,13 +70211,13 @@ module.exports = function(app) {
     '$templateCache',
     function($templateCache) {
       $templateCache.put('formio/components/checkbox.html',
-        "<div class=\"checkbox\">\n  <label for=\"{{ componentId }}\" ng-class=\"{'field-required': isRequired(component)}\">\n    <input\n      ng-if=\"component.name\"\n      type=\"{{ component.inputType }}\"\n      id=\"{{ componentId }}\"\n      name=\"{{ component.name }}\"\n      value=\"{{ component.value }}\"\n      tabindex=\"{{ component.tabindex || 0 }}\"\n      ng-disabled=\"readOnly\"\n      ng-model=\"data[component.name]\"\n      ng-required=\"component.validate.required\"\n    >\n    <input\n      ng-if=\"!component.name\"\n      type=\"{{ component.inputType }}\"\n      id=\"{{ componentId }}\"\n      tabindex=\"{{ component.tabindex || 0 }}\"\n      ng-disabled=\"readOnly\"\n      ng-model=\"data[component.key]\"\n      ng-required=\"isRequired(component)\"\n      custom-validator=\"component.validate.custom\"\n    >\n    <span ng-if=\"!(component.hideLabel && component.datagridLabel === false)\">{{ component.label | formioTranslate:null:builder }}</span>\n  </label>\n</div>\n<div ng-if=\"!!component.description\" class=\"help-block\">\n  <span>{{ component.description }}</span>\n</div>\n"
+        "<div class=\"checkbox\">\n  <label for=\"{{ componentId }}\" ng-class=\"{'field-required': isRequired(component)}\">\n    <input\n      ng-if=\"component.name\"\n      type=\"{{ component.inputType }}\"\n      id=\"{{ componentId }}\"\n      name=\"{{ component.name }}\"\n      value=\"{{ component.value }}\"\n      tabindex=\"{{ component.tabindex || 0 }}\"\n      ng-disabled=\"readOnly\"\n      ng-model=\"data[component.name]\"\n      ng-required=\"component.validate.required\"\n    >\n    <input\n      ng-if=\"!component.name\"\n      type=\"{{ component.inputType }}\"\n      id=\"{{ componentId }}\"\n      name=\"{{ componentId }}\"\n      tabindex=\"{{ component.tabindex || 0 }}\"\n      ng-disabled=\"readOnly\"\n      ng-model=\"data[component.key]\"\n      ng-required=\"isRequired(component)\"\n      custom-validator=\"component.validate.custom\"\n    >\n    <span ng-if=\"!(component.hideLabel && component.datagridLabel === false)\">{{ component.label | formioTranslate:null:builder }}</span>\n  </label>\n</div>\n<div ng-if=\"!!component.description\" class=\"help-block\">\n  <span>{{ component.description }}</span>\n</div>\n"
       );
     }
   ]);
 };
 
-},{}],216:[function(_dereq_,module,exports){
+},{}],256:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -67245,6 +70231,7 @@ module.exports = function(app) {
         template: 'formio/components/columns.html',
         group: 'layout',
         settings: {
+          clearOnHide: false,
           input: false,
           tableView: false,
           key: 'columns',
@@ -67306,7 +70293,7 @@ module.exports = function(app) {
     '$templateCache',
     function($templateCache) {
       $templateCache.put('formio/components/columns.html',
-        "<div class=\"row\">\n  <div ng-show=\"column.width\" class=\"col-sm-{{column.width}} col-sm-offset-{{column.offset}} col-sm-push-{{column.push}} col-sm-pull-{{column.pull}}\" ng-repeat=\"column in component.columns track by $index\">\n    <formio-component\n      ng-repeat=\"_component in column.components track by $index\"\n      component=\"_component\"\n      data=\"data\"\n      formio=\"formio\"\n      submission=\"submission\"\n      hide-components=\"hideComponents\"\n      ng-if=\"builder ? '::true' : isVisible(_component, data)\"\n      formio-form=\"formioForm\"\n      read-only=\"isDisabled(_component, data)\"\n      grid-row=\"gridRow\"\n      grid-col=\"gridCol\"\n      builder=\"builder\"\n    ></formio-component>\n  </div>\n</div>\n"
+        "<div class=\"row\">\n  <div class=\"col-sm-{{column.width}} col-sm-offset-{{column.offset}} col-sm-push-{{column.push}} col-sm-pull-{{column.pull}}\" ng-repeat=\"column in component.columns track by $index\">\n    <formio-component\n      ng-repeat=\"_component in column.components track by $index\"\n      component=\"_component\"\n      data=\"data\"\n      formio=\"formio\"\n      submission=\"submission\"\n      hide-components=\"hideComponents\"\n      ng-if=\"builder ? '::true' : isVisible(_component, data)\"\n      formio-form=\"formioForm\"\n      read-only=\"isDisabled(_component, data)\"\n      grid-row=\"gridRow\"\n      grid-col=\"gridCol\"\n      builder=\"builder\"\n      options=\"options\"\n    ></formio-component>\n  </div>\n</div>\n"
       );
 
       $templateCache.put('formio/componentsView/columns.html',
@@ -67316,7 +70303,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":261}],217:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":302}],257:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.provider('formioComponents', function() {
@@ -67376,7 +70363,7 @@ module.exports = function(app) {
   }]);
 };
 
-},{}],218:[function(_dereq_,module,exports){
+},{}],258:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -67436,13 +70423,13 @@ module.exports = function(app) {
     'FormioUtils',
     function($templateCache, FormioUtils) {
       $templateCache.put('formio/components/container.html', FormioUtils.fieldWrap(
-        "<div ng-controller=\"formioContainerComponent\" class=\"formio-container-component\">\n  <formio-component\n    ng-repeat=\"_component in component.components track by $index\"\n    component=\"_component\"\n    data=\"data[parentKey]\"\n    formio=\"formio\"\n    submission=\"submission\"\n    hide-components=\"hideComponents\"\n    ng-if=\"builder ? '::true' : isVisible(_component, data[parentKey])\"\n    formio-form=\"formioForm\"\n    read-only=\"isDisabled(_component, data[parentKey])\"\n    grid-row=\"gridRow\"\n    grid-col=\"gridCol\"\n    builder=\"builder\"\n  ></formio-component>\n</div>\n"
+        "<div ng-controller=\"formioContainerComponent\" class=\"formio-container-component\">\n  <formio-component\n    ng-repeat=\"_component in component.components track by $index\"\n    component=\"_component\"\n    data=\"data[parentKey]\"\n    formio=\"formio\"\n    submission=\"submission\"\n    hide-components=\"hideComponents\"\n    ng-if=\"builder ? '::true' : isVisible(_component, data[parentKey])\"\n    formio-form=\"formioForm\"\n    read-only=\"isDisabled(_component, data[parentKey])\"\n    grid-row=\"gridRow\"\n    grid-col=\"gridCol\"\n    builder=\"builder\"\n    options=\"options\"\n  ></formio-component>\n</div>\n"
       ));
     }
   ]);
 };
 
-},{"../factories/GridUtils":261}],219:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":302}],259:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -67471,7 +70458,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],220:[function(_dereq_,module,exports){
+},{}],260:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -67582,7 +70569,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],221:[function(_dereq_,module,exports){
+},{}],261:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -67610,7 +70597,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":261}],222:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":302}],262:[function(_dereq_,module,exports){
 "use strict";
 
 var formioUtils = _dereq_('formiojs/utils');
@@ -67737,13 +70724,13 @@ module.exports = function(app) {
     'FormioUtils',
     function($templateCache, FormioUtils) {
       $templateCache.put('formio/components/datagrid.html', FormioUtils.fieldWrap(
-        "<div class=\"formio-data-grid\" ng-controller=\"formioDataGrid\">\n  <table ng-class=\"{'table-striped': component.striped, 'table-bordered': component.bordered, 'table-hover': component.hover, 'table-condensed': component.condensed}\" class=\"table datagrid-table\">\n    <tr>\n      <th\n        ng-repeat=\"col in cols track by $index\"\n        ng-class=\"{'field-required': col.validate.required}\"\n        ng-if=\"builder ? '::true' : anyVisible(col)\"\n      >{{ col.label | formioTranslate:null:builder }}</th>\n    </tr>\n    <tr ng-repeat=\"row in rows track by $index\" ng-init=\"rowIndex = $index\">\n      <td ng-repeat=\"col in cols track by $index\" ng-init=\"col.hideLabel = true; colIndex = $index\" class=\"formio-data-grid-row\" ng-if=\"builder ? '::true' : anyVisible(col)\">\n        <formio-component\n          component=\"col\"\n          data=\"rows[rowIndex]\"\n          formio-form=\"formioForm\"\n          formio=\"formio\"\n          submission=\"submission\"\n          hide-components=\"hideComponents\"\n          ng-if=\"builder ? '::true' : isVisible(col, row)\"\n          read-only=\"isDisabled(col, row)\"\n          grid-row=\"rowIndex\"\n          grid-col=\"colIndex\"\n          builder=\"builder\"\n        ></formio-component>\n      </td>\n      <td ng-if=\"!component.hasOwnProperty('validate') || !component.validate.hasOwnProperty('minLength') || rows.length > component.validate.minLength\">\n        <a ng-click=\"removeRow(rowIndex)\" class=\"btn btn-default\">\n          <span class=\"glyphicon glyphicon-remove-circle\"></span>\n        </a>\n      </td>\n    </tr>\n  </table>\n  <div class=\"datagrid-add\" ng-if=\"!component.hasOwnProperty('validate') || !component.validate.hasOwnProperty('maxLength') || rows.length < component.validate.maxLength\">\n    <a ng-click=\"addRow()\" class=\"btn btn-primary\">\n      <span class=\"glyphicon glyphicon-plus\" aria-hidden=\"true\"></span> {{ component.addAnother || \"Add Another\" | formioTranslate:null:builder }}\n    </a>\n  </div>\n</div>\n"
+        "<div class=\"formio-data-grid\" ng-controller=\"formioDataGrid\">\n  <table ng-class=\"{'table-striped': component.striped, 'table-bordered': component.bordered, 'table-hover': component.hover, 'table-condensed': component.condensed}\" class=\"table datagrid-table\">\n    <tr>\n      <th\n        ng-repeat=\"col in cols track by $index\"\n        ng-class=\"{'field-required': col.validate.required}\"\n        ng-if=\"builder ? '::true' : anyVisible(col)\"\n      >{{ col.label | formioTranslate:null:builder }}</th>\n    </tr>\n    <tr ng-repeat=\"row in rows track by $index\" ng-init=\"rowIndex = $index\">\n      <td ng-repeat=\"col in cols track by $index\" ng-init=\"col.hideLabel = true; colIndex = $index\" class=\"formio-data-grid-row\" ng-if=\"builder ? '::true' : anyVisible(col)\">\n        <formio-component\n          component=\"col\"\n          data=\"rows[rowIndex]\"\n          formio-form=\"formioForm\"\n          formio=\"formio\"\n          submission=\"submission\"\n          hide-components=\"hideComponents\"\n          ng-if=\"builder ? '::true' : isVisible(col, row)\"\n          read-only=\"isDisabled(col, row)\"\n          grid-row=\"rowIndex\"\n          grid-col=\"colIndex\"\n          builder=\"builder\"\n          options=\"options\"\n        ></formio-component>\n      </td>\n      <td ng-if=\"!component.hasOwnProperty('validate') || !component.validate.hasOwnProperty('minLength') || rows.length > component.validate.minLength\">\n        <a ng-click=\"removeRow(rowIndex)\" class=\"btn btn-default\">\n          <span class=\"glyphicon glyphicon-remove-circle\"></span>\n        </a>\n      </td>\n    </tr>\n  </table>\n  <div class=\"datagrid-add\" ng-if=\"!component.hasOwnProperty('validate') || !component.validate.hasOwnProperty('maxLength') || rows.length < component.validate.maxLength\">\n    <a ng-click=\"addRow()\" class=\"btn btn-primary\">\n      <span class=\"glyphicon glyphicon-plus\" aria-hidden=\"true\"></span> {{ component.addAnother || \"Add Another\" | formioTranslate:null:builder }}\n    </a>\n  </div>\n</div>\n"
       ));
     }
   ]);
 };
 
-},{"formiojs/utils":32}],223:[function(_dereq_,module,exports){
+},{"formiojs/utils":36}],263:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -67908,45 +70895,10 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],224:[function(_dereq_,module,exports){
+},{}],264:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
-  app.directive('dayPart', function() {
-    return {
-      restrict: 'A',
-      replace: true,
-      require: 'ngModel',
-      link: function(scope, elem, attrs, ngModel) {
-        if (scope.builder) return;
-        var limitLength = attrs.characters || 2;
-        scope.$watch(attrs.ngModel, function() {
-          if (!ngModel.$viewValue) {
-            return;
-          }
-          var render = false;
-          if (ngModel.$viewValue.length > limitLength) {
-            ngModel.$setViewValue(ngModel.$viewValue.substring(0, limitLength));
-            render = true;
-          }
-          if (isNaN(ngModel.$viewValue)) {
-            ngModel.$setViewValue(ngModel.$viewValue.replace(/\D/g,''));
-            render = true;
-          }
-          if (
-            parseInt(ngModel.$viewValue) < parseInt(attrs.min) ||
-            parseInt(ngModel.$viewValue) > parseInt(attrs.max)
-          ) {
-            ngModel.$setViewValue(ngModel.$viewValue.substring(0, limitLength - 1));
-            render = true;
-          }
-          if (render) {
-            ngModel.$render();
-          }
-        });
-      }
-    };
-  });
   app.directive('dayInput', function() {
     return {
       restrict: 'E',
@@ -67965,7 +70917,7 @@ module.exports = function(app) {
       controller: ['$scope', function($scope) {
         if ($scope.builder) return;
         $scope.months = [
-          {value: '', label: $scope.component.fields.month.placeholder},
+          {value: '00', label: $scope.component.fields.month.placeholder},
           {value: '01', label: 'January'},
           {value: '02', label: 'February'},
           {value: '03', label: 'March'},
@@ -67980,9 +70932,50 @@ module.exports = function(app) {
           {value: '12', label: 'December'}
         ];
 
+        function isLeapYear(year) {
+          // Year is leap if it evenly divisible by 400 or evenly divisible by 4 and not evenly divisible by 100.
+          return !(year % 400) || (!!(year % 100) && !(year % 4));
+        }
+
+        function getDaysInMonthCount(month, year) {
+          switch (month) {
+            case 1:     // January
+            case 3:     // March
+            case 5:     // May
+            case 7:     // July
+            case 8:     // August
+            case 10:    // October
+            case 12:    // December
+              return 31;
+            case 4:     // April
+            case 6:     // June
+            case 9:     // September
+            case 11:    // November
+              return 30;
+            case 2:     // February
+              return isLeapYear(year) ? 29 : 28;
+            default:
+              return 0;
+          }
+        }
+
+        $scope.maxDay = 0;
+        $scope.$watch(function() {
+          return $scope.date.month + '/' + $scope.date.year;
+        }, function() {
+          var day = Number($scope.date.day);
+          var month = Number($scope.date.month);
+          var year = Number($scope.date.year);
+          $scope.maxDay = getDaysInMonthCount(month, year);
+
+          if (day > $scope.maxDay) {
+            $scope.date.day = null;
+          }
+        });
+
         $scope.date = {
           day: '',
-          month: '',
+          month: '00',
           year: ''
         };
       }],
@@ -67996,15 +70989,15 @@ module.exports = function(app) {
               ? ngModel.$viewValue.split('/')
               : ngModel.$viewValue;
             if ((parts instanceof Array) && parts.length === 3) {
-              scope.date.day = parts[(scope.component.dayFirst ? 0 : 1)];
+              scope.date.day = Number(parts[(scope.component.dayFirst ? 0 : 1)]);
               scope.date.month = parts[(scope.component.dayFirst ? 1 : 0)];
-              scope.date.year = parts[2];
+              scope.date.year = Number(parts[2]);
             }
           }
         });
 
         var padLeft = function padLeft(nr, n, str) {
-          nr = nr.toString();
+          nr = (nr || '').toString();
           if (nr.length > n) {
             return nr.substr(0, n);
           }
@@ -68068,7 +71061,7 @@ module.exports = function(app) {
           key: 'dayField',
           fields: {
             day: {
-              type: 'text',
+              type: 'number',
               placeholder: '',
               required: false
             },
@@ -68078,7 +71071,7 @@ module.exports = function(app) {
               required: false
             },
             year: {
-              type: 'text',
+              type: 'number',
               placeholder: '',
               required: false
             }
@@ -68103,13 +71096,13 @@ module.exports = function(app) {
         "<div class=\"day-input\">\n  <day-input\n    name=\"{{componentId}}\"\n    component-id=\"componentId\"\n    read-only=\"isDisabled(component, data)\"\n    component=\"component\"\n    ng-required=\"isRequired(component)\"\n    custom-validator=\"component.validate.custom\"\n    ng-model=\"data[component.key]\"\n    tabindex=\"{{ component.tabindex || 0 }}\"\n    builder=\"builder\"\n  ></day-input>\n</div>\n"
       ));
       $templateCache.put('formio/components/day-input.html',
-        "<div class=\"daySelect form row\">\n  <div class=\"form-group col-xs-3\" ng-if=\"component.dayFirst && !component.fields.day.hide\">\n    <label for=\"{{componentId}}-day\" ng-class=\"{'field-required': component.fields.day.required}\">{{ \"Day\" | formioTranslate:null:builder }}</label>\n    <input\n      class=\"form-control\"\n      type=\"text\"\n      id=\"{{componentId}}-day\"\n      ng-model=\"date.day\"\n      ng-change=\"onChange()\"\n      style=\"padding-right: 10px;\"\n      ng-attr-placeholder=\"{{component.fields.day.placeholder}}\"\n      day-part\n      characters=\"2\"\n      min=\"0\"\n      max=\"31\"\n      ng-disabled=\"readOnly\"\n    />\n  </div>\n  <div class=\"form-group col-xs-4\" ng-if=\"!component.fields.month.hide\">\n    <label for=\"{{componentId}}-month\" ng-class=\"{'field-required': component.fields.month.required}\">{{ \"Month\" | formioTranslate:null:builder }}</label>\n    <select\n      class=\"form-control\"\n      type=\"text\"\n      id=\"{{componentId}}-month\"\n      ng-model=\"date.month\"\n      ng-change=\"onChange()\"\n      ng-disabled=\"readOnly\"\n      ng-options=\"month.value as month.label | formioTranslate:null:builder for month in months\"\n    ></select>\n  </div>\n  <div class=\"form-group col-xs-3\" ng-if=\"!component.dayFirst && !component.fields.day.hide\">\n    <label for=\"{{componentId}}-day\" ng-class=\"{'field-required': component.fields.day.required}\">{{ \"Day\" | formioTranslate:null:builder }}</label>\n    <input\n      class=\"form-control\"\n      type=\"text\"\n      id=\"{{componentId}}-day1\"\n      ng-model=\"date.day\"\n      ng-change=\"onChange()\"\n      style=\"padding-right: 10px;\"\n      ng-attr-placeholder=\"{{component.fields.day.placeholder}}\"\n      day-part\n      characters=\"2\"\n      min=\"0\"\n      max=\"31\"\n      ng-disabled=\"readOnly\"\n    />\n  </div>\n  <div class=\"form-group col-xs-5\" ng-if=\"!component.fields.year.hide\">\n    <label for=\"{{componentId}}-year\" ng-class=\"{'field-required': component.fields.year.required}\">{{ \"Year\" | formioTranslate:null:builder }}</label>\n    <input\n      class=\"form-control\"\n      type=\"text\"\n      id=\"{{componentId}}-year\"\n      ng-model=\"date.year\"\n      ng-change=\"onChange()\"\n      style=\"padding-right: 10px;\"\n      ng-attr-placeholder=\"{{component.fields.year.placeholder}}\"\n      characters=\"4\"\n      min=\"0\"\n      max=\"2100\"\n      ng-disabled=\"readOnly\"\n    />\n  </div>\n</div>\n"
+        "<div class=\"daySelect form row\">\n  <div class=\"form-group col-xs-3\" ng-if=\"component.dayFirst && !component.fields.day.hide\">\n    <label for=\"{{componentId}}-day\" ng-class=\"{'field-required': component.fields.day.required}\">{{ \"Day\" | formioTranslate:null:builder }}</label>\n    <input\n      class=\"form-control\"\n      type=\"number\"\n      id=\"{{componentId}}-day\"\n      ng-model=\"date.day\"\n      ng-change=\"onChange()\"\n      style=\"padding-right: 10px;\"\n      ng-attr-placeholder=\"{{component.fields.day.placeholder}}\"\n      day-part\n      characters=\"2\"\n      min=\"1\"\n      max=\"{{maxDay}}\"\n      ng-disabled=\"readOnly\"\n    />\n  </div>\n  <div class=\"form-group col-xs-4\" ng-if=\"!component.fields.month.hide\">\n    <label for=\"{{componentId}}-month\" ng-class=\"{'field-required': component.fields.month.required}\">{{ \"Month\" | formioTranslate:null:builder }}</label>\n    <select\n      class=\"form-control\"\n      type=\"text\"\n      id=\"{{componentId}}-month\"\n      ng-model=\"date.month\"\n      ng-change=\"onChange()\"\n      ng-disabled=\"readOnly\"\n      ng-options=\"month.value as month.label | formioTranslate:null:builder for month in months\"\n    ></select>\n  </div>\n  <div class=\"form-group col-xs-3\" ng-if=\"!component.dayFirst && !component.fields.day.hide\">\n    <label for=\"{{componentId}}-day\" ng-class=\"{'field-required': component.fields.day.required}\">{{ \"Day\" | formioTranslate:null:builder }}</label>\n    <input\n      class=\"form-control\"\n      type=\"number\"\n      id=\"{{componentId}}-day1\"\n      ng-model=\"date.day\"\n      ng-change=\"onChange()\"\n      style=\"padding-right: 10px;\"\n      ng-attr-placeholder=\"{{component.fields.day.placeholder}}\"\n      day-part\n      characters=\"2\"\n      min=\"1\"\n      max=\"{{maxDay}}\"\n      ng-disabled=\"readOnly\"\n    />\n  </div>\n  <div class=\"form-group col-xs-5\" ng-if=\"!component.fields.year.hide\">\n    <label for=\"{{componentId}}-year\" ng-class=\"{'field-required': component.fields.year.required}\">{{ \"Year\" | formioTranslate:null:builder }}</label>\n    <input\n      class=\"form-control\"\n      type=\"number\"\n      id=\"{{componentId}}-year\"\n      ng-model=\"date.year\"\n      ng-change=\"onChange()\"\n      style=\"padding-right: 10px;\"\n      ng-attr-placeholder=\"{{component.fields.year.placeholder}}\"\n      characters=\"4\"\n      min=\"0\"\n      max=\"2100\"\n      ng-disabled=\"readOnly\"\n    />\n  </div>\n</div>\n"
       );
     }
   ]);
 };
 
-},{}],225:[function(_dereq_,module,exports){
+},{}],265:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -68143,7 +71136,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],226:[function(_dereq_,module,exports){
+},{}],266:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -68157,6 +71150,7 @@ module.exports = function(app) {
         template: 'formio/components/fieldset.html',
         group: 'layout',
         settings: {
+          clearOnHide: false,
           key: 'fieldset',
           input: false,
           tableView: false,
@@ -68187,7 +71181,7 @@ module.exports = function(app) {
     '$templateCache',
     function($templateCache) {
       $templateCache.put('formio/components/fieldset.html',
-        "<fieldset id=\"{{ component.key }}\">\n  <legend ng-if=\"component.legend\">{{ component.legend | formioTranslate:null:builder }}</legend>\n  <formio-component\n    ng-repeat=\"_component in component.components track by $index\"\n    component=\"_component\"\n    data=\"data\"\n    formio=\"formio\"\n    submission=\"submission\"\n    hide-components=\"hideComponents\"\n    ng-if=\"builder ? '::true' : isVisible(_component, data)\"\n    read-only=\"isDisabled(_component, data)\"\n    formio-form=\"formioForm\"\n    grid-row=\"gridRow\"\n    grid-col=\"gridCol\"\n    builder=\"builder\"\n  ></formio-component>\n</fieldset>\n"
+        "<fieldset id=\"{{ component.key }}\">\n  <legend ng-if=\"component.legend\">{{ component.legend | formioTranslate:null:builder }}</legend>\n  <formio-component\n    ng-repeat=\"_component in component.components track by $index\"\n    component=\"_component\"\n    data=\"data\"\n    formio=\"formio\"\n    submission=\"submission\"\n    hide-components=\"hideComponents\"\n    ng-if=\"builder ? '::true' : isVisible(_component, data)\"\n    read-only=\"isDisabled(_component, data)\"\n    formio-form=\"formioForm\"\n    grid-row=\"gridRow\"\n    grid-col=\"gridCol\"\n    builder=\"builder\"\n    options=\"options\"\n  ></formio-component>\n</fieldset>\n"
       );
 
       $templateCache.put('formio/componentsView/fieldset.html',
@@ -68197,7 +71191,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":261}],227:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":302}],267:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -68311,7 +71305,9 @@ module.exports = function(app) {
           $scope.getFile = function(evt) {
             evt.preventDefault();
             $scope.form = $scope.form || $rootScope.filePath;
-            var formio = new Formio($scope.form);
+            $scope.options = $scope.options || {};
+            var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
+            var formio = new Formio($scope.form, {base: baseUrl});
             formio
               .downloadFile($scope.file).then(function(file) {
                 if (file) {
@@ -68350,7 +71346,9 @@ module.exports = function(app) {
         ) {
           if ($scope.builder) return;
           $scope.form = $scope.form || $rootScope.filePath;
-          var formio = new Formio($scope.form);
+          $scope.options = $scope.options || {};
+          var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
+          var formio = new Formio($scope.form, {base: baseUrl});
           formio.downloadFile($scope.file)
             .then(function(result) {
               $scope.file.imageSrc = result.url;
@@ -68375,17 +71373,6 @@ module.exports = function(app) {
       $scope.removeUpload = function(index) {
         delete $scope.fileUploads[index];
       };
-
-      // This fixes new fields having an empty space in the array.
-      if ($scope.data && $scope.data[$scope.component.key] === '') {
-        $scope.data[$scope.component.key] = [];
-      }
-      if ($scope.data && $scope.data[$scope.component.key] === undefined) {
-        $scope.data[$scope.component.key] = [];
-      }
-      if ($scope.data && $scope.data[$scope.component.key] && $scope.data[$scope.component.key][0] === '') {
-        $scope.data[$scope.component.key].splice(0, 1);
-      }
 
       $scope.upload = function(files) {
         if ($scope.component.storage && files && files.length) {
@@ -68418,21 +71405,27 @@ module.exports = function(app) {
               }, $scope.component.url)
                 .then(function(fileInfo) {
                   delete $scope.fileUploads[fileName];
-                  // Ensure that the file component is an array.
-                  if (
-                    !$scope.data[$scope.component.key] ||
-                    !($scope.data[$scope.component.key] instanceof Array)
-                  ) {
+                  // This fixes new fields having an empty space in the array.
+                  if ($scope.data && $scope.data[$scope.component.key] === '') {
                     $scope.data[$scope.component.key] = [];
                   }
+                  if ($scope.data && $scope.data[$scope.component.key] === undefined) {
+                    $scope.data[$scope.component.key] = [];
+                  }
+                  if (!$scope.data[$scope.component.key] || !($scope.data[$scope.component.key] instanceof Array)) {
+                    $scope.data[$scope.component.key] = [];
+                  }
+
                   $scope.data[$scope.component.key].push(fileInfo);
                   $scope.$apply();
+                  $scope.$emit('fileUploaded', fileName, fileInfo);
                 })
                 .catch(function(response) {
                   $scope.fileUploads[fileName].status = 'error';
                   $scope.fileUploads[fileName].message = response.data;
                   delete $scope.fileUploads[fileName].progress;
                   $scope.$apply();
+                  $scope.$emit('fileUploadFailed', fileName, response);
                 });
             }
           });
@@ -68454,7 +71447,7 @@ module.exports = function(app) {
       );
 
       $templateCache.put('formio/components/file.html',
-        "<label ng-if=\"component.label && !component.hideLabel\" for=\"{{ componentId }}\" class=\"control-label\" ng-class=\"{'field-required': isRequired(component)}\">{{ component.label | formioTranslate:null:builder }}</label>\n<span ng-if=\"!component.label && isRequired(component)\" class=\"glyphicon glyphicon-asterisk form-control-feedback field-required-inline\" aria-hidden=\"true\"></span>\n<div ng-controller=\"formioFileUpload\">\n  <formio-file-list files=\"data[component.key]\" form=\"formio.formUrl\" ng-if=\"!component.image\"></formio-file-list>\n  <formio-image-list files=\"data[component.key]\" form=\"formio.formUrl\" width=\"component.imageSize\" ng-if=\"component.image\"></formio-image-list>\n  <div ng-if=\"!readOnly && (component.multiple || (!component.multiple && !data[component.key].length))\">\n    <div ngf-drop=\"upload($files)\" class=\"fileSelector\" ngf-drag-over-class=\"'fileDragOver'\" ngf-multiple=\"component.multiple\" id=\"{{ componentId }}\" name=\"{{ componentId }}\"><span class=\"glyphicon glyphicon-cloud-upload\"></span>Drop files to attach, or <a style=\"cursor: pointer;\" ngf-select=\"upload($files)\" tabindex=\"{{ component.tabindex || 0 }}\" ngf-multiple=\"component.multiple\">browse</a>.</div>\n    <div ng-if=\"!component.storage\" class=\"alert alert-warning\">No storage has been set for this field. File uploads are disabled until storage is set up.</div>\n    <div ngf-no-file-drop>File Drag/Drop is not supported for this browser</div>\n  </div>\n  <div ng-repeat=\"fileUpload in fileUploads track by $index\" ng-class=\"{'has-error': fileUpload.status === 'error'}\" class=\"file\">\n    <div class=\"row\">\n      <div class=\"fileName control-label col-sm-10\">{{ fileUpload.name }} <span ng-click=\"removeUpload(fileUpload.name)\" class=\"glyphicon glyphicon-remove\"></span></div>\n      <div class=\"fileSize control-label col-sm-2 text-right\">{{ fileSize(fileUpload.size) }}</div>\n    </div>\n    <div class=\"row\">\n      <div class=\"col-sm-12\">\n        <span ng-if=\"fileUpload.status === 'progress'\">\n          <div class=\"progress\">\n            <div class=\"progress-bar\" role=\"progressbar\" aria-valuenow=\"{{fileUpload.progress}}\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"width:{{fileUpload.progress}}%\">\n              <span class=\"sr-only\">{{fileUpload.progress}}% Complete</span>\n            </div>\n          </div>\n        </span>\n        <div ng-if=\"!fileUpload.status !== 'progress'\" class=\"bg-{{ fileUpload.status }} control-label\">{{ fileUpload.message }}</div>\n      </div>\n    </div>\n  </div>\n</div>\n"
+        "<label ng-if=\"component.label && !component.hideLabel\" for=\"{{ componentId }}\" class=\"control-label\" ng-class=\"{'field-required': isRequired(component)}\">{{ component.label | formioTranslate:null:builder }}</label>\n<span ng-if=\"!component.label && isRequired(component)\" class=\"glyphicon glyphicon-asterisk form-control-feedback field-required-inline\" aria-hidden=\"true\"></span>\n<div class=\"formio-errors\"><formio-errors ng-if=\"::!builder\"></formio-errors></div>\n<div ng-controller=\"formioFileUpload\">\n  <formio-file-list files=\"data[component.key]\" form=\"formio.formUrl\" ng-if=\"!component.image\" ng-required=\"isRequired(component)\" ng-model=\"data[component.key]\" name=\"{{ componentId }}\"></formio-file-list>\n  <formio-image-list files=\"data[component.key]\" form=\"formio.formUrl\" width=\"component.imageSize\" ng-if=\"component.image\" ng-required=\"isRequired(component)\" ng-model=\"data[component.key]\" name=\"{{ componentId }}\"></formio-image-list>\n  <div ng-if=\"!readOnly && (component.multiple || (!component.multiple && !data[component.key].length))\">\n    <div ngf-drop=\"upload($files)\" class=\"fileSelector\" ngf-drag-over-class=\"'fileDragOver'\" ngf-multiple=\"component.multiple\" id=\"{{ componentId }}\" name=\"{{ componentId }}\"><span class=\"glyphicon glyphicon-cloud-upload\"></span>Drop files to attach, or <a style=\"cursor: pointer;\" ngf-select=\"upload($files)\" tabindex=\"{{ component.tabindex || 0 }}\" ngf-multiple=\"component.multiple\">browse</a>.</div>\n    <div ng-if=\"!component.storage\" class=\"alert alert-warning\">No storage has been set for this field. File uploads are disabled until storage is set up.</div>\n    <div ngf-no-file-drop>File Drag/Drop is not supported for this browser</div>\n  </div>\n  <div ng-repeat=\"fileUpload in fileUploads track by $index\" ng-class=\"{'has-error': fileUpload.status === 'error'}\" class=\"file\">\n    <div class=\"row\">\n      <div class=\"fileName control-label col-sm-10\">{{ fileUpload.name }} <span ng-click=\"removeUpload(fileUpload.name)\" class=\"glyphicon glyphicon-remove\"></span></div>\n      <div class=\"fileSize control-label col-sm-2 text-right\">{{ fileSize(fileUpload.size) }}</div>\n    </div>\n    <div class=\"row\">\n      <div class=\"col-sm-12\">\n        <span ng-if=\"fileUpload.status === 'progress'\">\n          <div class=\"progress\">\n            <div class=\"progress-bar\" role=\"progressbar\" aria-valuenow=\"{{fileUpload.progress}}\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"width:{{fileUpload.progress}}%\">\n              <span class=\"sr-only\">{{fileUpload.progress}}% Complete</span>\n            </div>\n          </div>\n        </span>\n        <div ng-if=\"!fileUpload.status !== 'progress'\" class=\"bg-{{ fileUpload.status }} control-label\">{{ fileUpload.message }}</div>\n      </div>\n    </div>\n  </div>\n</div>\n"
       );
 
       $templateCache.put('formio/componentsView/file.html',
@@ -68464,7 +71457,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],228:[function(_dereq_,module,exports){
+},{}],268:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -68478,6 +71471,7 @@ module.exports = function(app) {
         template: 'formio/components/form.html',
         group: 'advanced',
         settings: {
+          clearOnHide: false,
           input: true,
           tableView: true,
           key: 'formField',
@@ -68492,30 +71486,39 @@ module.exports = function(app) {
         },
         controller: ['$scope', 'FormioUtils', 'Formio', function($scope, FormioUtils, Formio) {
           var url = $scope.component.src;
+          $scope.options = $scope.options || {};
+          var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
           if ($scope.component.form) {
-            url = '';
+            url = baseUrl;
             if ($scope.component.project) {
               url += '/project/' + $scope.component.project;
             }
             else if ($scope.formio && $scope.formio.projectUrl) {
-              url += $scope.formio.projectUrl;
+              url  = $scope.formio.projectUrl;
             }
             url += '/form/' + $scope.component.form;
-            url = (new Formio(url)).formUrl;
+            url = (new Formio(url, {base: baseUrl})).formUrl;
           }
 
           if ($scope.data[$scope.component.key] && $scope.data[$scope.component.key]._id) {
             url += '/submission/' + $scope.data[$scope.component.key]._id;
           }
 
-          $scope.formFormio = new Formio(url);
+          $scope.formFormio = new Formio(url, {base: baseUrl});
           $scope.formFormio.loadForm().then(function(form) {
             $scope.componentForm = form;
           });
 
           var submitForm = function(scope, cb) {
-            if (FormioUtils.getComponent(scope.activePage.components, $scope.component.key)) {
-              $scope.formFormio.saveSubmission($scope.data[$scope.component.key]).then(function(sub) {
+            var components = [];
+            if (scope.activePage) {
+              components = scope.activePage.components;
+            }
+            else if (scope.form) {
+              components = scope.form.components;
+            }
+            if (FormioUtils.getComponent(components, $scope.component.key)) {
+              $scope.formFormio.saveSubmission(angular.copy($scope.data[$scope.component.key])).then(function(sub) {
                 angular.merge($scope.data[$scope.component.key], sub);
                 cb();
               }, cb);
@@ -68532,6 +71535,11 @@ module.exports = function(app) {
 
           // Hook into the nextpage method.
           FormioUtils.hook($scope.component.key + ':nextPage', function(scope, cb) {
+            submitForm(scope, cb);
+          });
+
+          // Hook into the prevpage method.
+          FormioUtils.hook($scope.component.key + ':prevPage', function(scope, cb) {
             submitForm(scope, cb);
           });
 
@@ -68569,7 +71577,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":261}],229:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":302}],269:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -68605,7 +71613,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":261}],230:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":302}],270:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -68697,7 +71705,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],231:[function(_dereq_,module,exports){
+},{}],271:[function(_dereq_,module,exports){
 "use strict";
 var app = angular.module('formio');
 
@@ -68741,7 +71749,7 @@ _dereq_('./panel')(app);
 _dereq_('./table')(app);
 _dereq_('./well')(app);
 
-},{"./address":213,"./button":214,"./checkbox":215,"./columns":216,"./components":217,"./container":218,"./content":219,"./currency":220,"./custom":221,"./datagrid":222,"./datetime":223,"./day":224,"./email":225,"./fieldset":226,"./file":227,"./form":228,"./hidden":229,"./htmlelement":230,"./number":232,"./page":233,"./panel":234,"./password":235,"./phonenumber":236,"./radio":237,"./resource":238,"./select":239,"./selectboxes":240,"./signature":241,"./survey":242,"./table":243,"./textarea":244,"./textfield":245,"./time":246,"./well":247}],232:[function(_dereq_,module,exports){
+},{"./address":253,"./button":254,"./checkbox":255,"./columns":256,"./components":257,"./container":258,"./content":259,"./currency":260,"./custom":261,"./datagrid":262,"./datetime":263,"./day":264,"./email":265,"./fieldset":266,"./file":267,"./form":268,"./hidden":269,"./htmlelement":270,"./number":272,"./page":273,"./panel":274,"./password":275,"./phonenumber":276,"./radio":277,"./resource":278,"./select":279,"./selectboxes":280,"./signature":281,"./survey":282,"./table":283,"./textarea":284,"./textfield":285,"./time":286,"./well":287}],272:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -68806,7 +71814,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],233:[function(_dereq_,module,exports){
+},{}],273:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -68827,13 +71835,13 @@ module.exports = function(app) {
     '$templateCache',
     function($templateCache) {
       $templateCache.put('formio/components/page.html',
-        "<formio-component\n  ng-repeat=\"_component in component.components track by $index\"\n  component=\"_component\"\n  data=\"data\"\n  formio=\"formio\"\n  submission=\"submission\"\n  hide-components=\"hideComponents\"\n  ng-if=\"builder ? '::true' : isVisible(_component, data)\"\n  read-only=\"isDisabled(_component, data)\"\n  formio-form=\"formioForm\"\n  grid-row=\"gridRow\"\n  grid-col=\"gridCol\"\n  builder=\"builder\"\n></formio-component>\n"
+        "<formio-component\n  ng-repeat=\"_component in component.components track by $index\"\n  component=\"_component\"\n  data=\"data\"\n  formio=\"formio\"\n  submission=\"submission\"\n  hide-components=\"hideComponents\"\n  ng-if=\"builder ? '::true' : isVisible(_component, data)\"\n  read-only=\"isDisabled(_component, data)\"\n  formio-form=\"formioForm\"\n  grid-row=\"gridRow\"\n  grid-col=\"gridCol\"\n  builder=\"builder\"\n  options=\"options\"\n></formio-component>\n"
       );
     }
   ]);
 };
 
-},{}],234:[function(_dereq_,module,exports){
+},{}],274:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -68847,6 +71855,7 @@ module.exports = function(app) {
         template: 'formio/components/panel.html',
         group: 'layout',
         settings: {
+          clearOnHide: false,
           key: 'panel',
           input: false,
           title: '',
@@ -68878,7 +71887,7 @@ module.exports = function(app) {
     '$templateCache',
     function($templateCache) {
       $templateCache.put('formio/components/panel.html',
-        "<div class=\"panel panel-{{ component.theme }}\" id=\"{{ component.key }}\">\n  <div ng-if=\"component.title\" class=\"panel-heading\">\n    <h3 class=\"panel-title\">{{ component.title | formioTranslate:null:builder }}</h3>\n  </div>\n  <div class=\"panel-body\">\n    <formio-component\n      ng-repeat=\"_component in component.components track by $index\"\n      component=\"_component\"\n      data=\"data\"\n      formio=\"formio\"\n      submission=\"submission\"\n      hide-components=\"hideComponents\"\n      ng-if=\"builder ? '::true' : isVisible(_component, data)\"\n      read-only=\"isDisabled(_component, data)\"\n      formio-form=\"formioForm\"\n      grid-row=\"gridRow\"\n      grid-col=\"gridCol\"\n      builder=\"builder\"\n    ></formio-component>\n  </div>\n</div>\n"
+        "<div class=\"panel panel-{{ component.theme }}\" id=\"{{ component.key }}\">\n  <div ng-if=\"component.title\" class=\"panel-heading\">\n    <h3 class=\"panel-title\">{{ component.title | formioTranslate:null:builder }}</h3>\n  </div>\n  <div class=\"panel-body\">\n    <formio-component\n      ng-repeat=\"_component in component.components track by $index\"\n      component=\"_component\"\n      data=\"data\"\n      formio=\"formio\"\n      submission=\"submission\"\n      hide-components=\"hideComponents\"\n      ng-if=\"builder ? '::true' : isVisible(_component, data)\"\n      read-only=\"isDisabled(_component, data)\"\n      formio-form=\"formioForm\"\n      grid-row=\"gridRow\"\n      grid-col=\"gridCol\"\n      builder=\"builder\"\n      options=\"options\"\n    ></formio-component>\n  </div>\n</div>\n"
       );
 
       $templateCache.put('formio/componentsView/panel.html',
@@ -68888,7 +71897,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":261}],235:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":302}],275:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -68919,7 +71928,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],236:[function(_dereq_,module,exports){
+},{}],276:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -68932,6 +71941,7 @@ module.exports = function(app) {
         settings: {
           input: true,
           tableView: true,
+          inputType: 'tel',
           inputMask: '(999) 999-9999',
           label: '',
           key: 'phonenumberField',
@@ -68954,7 +71964,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],237:[function(_dereq_,module,exports){
+},{}],277:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -69005,7 +72015,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],238:[function(_dereq_,module,exports){
+},{}],278:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -69024,28 +72034,30 @@ module.exports = function(app) {
         template: function($scope) {
           return $scope.component.multiple ? 'formio/components/resource-multiple.html' : 'formio/components/resource.html';
         },
-        controller: ['$scope', 'Formio', 'ngDialog', function($scope, Formio, ngDialog) {
+        controller: ['$scope', 'Formio', 'ngDialog', '$location', function($scope, Formio, ngDialog, $location) {
           if ($scope.builder) return;
           var settings = $scope.component;
           var params = settings.params || {};
           $scope.selectItems = [];
           $scope.hasNextPage = false;
           $scope.resourceLoading = false;
+          $scope.options = $scope.options || {};
           params.limit = 100;
           params.skip = 0;
           if (settings.multiple) {
             settings.defaultValue = [];
           }
           if (settings.resource) {
-            var url = '';
+            var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
+            var url = baseUrl;
             if (settings.project) {
               url += '/project/' + settings.project;
             }
             else if ($scope.formio && $scope.formio.projectUrl) {
-              url += $scope.formio.projectUrl;
+              url  = $scope.formio.projectUrl;
             }
             url += '/form/' + settings.resource;
-            var formio = new Formio(url);
+            var formio = new Formio(url, {base: baseUrl});
 
             // Refresh the items.
             $scope.refreshSubmissions = function(input, append) {
@@ -69053,14 +72065,38 @@ module.exports = function(app) {
                 return;
               }
               $scope.resourceLoading = true;
+
               // If they wish to return only some fields.
               if (settings.selectFields) {
                 params.select = settings.selectFields;
               }
+
+              // If they wish to return only some submissions.
+              var makeSelection = false;
               if (settings.searchFields && input) {
                 angular.forEach(settings.searchFields, function(field) {
-                  params[field] = input;
+                  if (field === '_id') {
+                    delete params[field];
+                  }
+                  else {
+                    params[field] = input;
+                  }
                 });
+              }
+              else if (settings.searchFields && input === undefined) {
+                var search = $location.search();
+                angular.forEach(settings.searchFields, function(field) {
+                  var key = $scope.component.key + '.' + field;
+                  if (search[key]) {
+                    params[field] = search[key];
+                    makeSelection = true;
+                  }
+                });
+              }
+
+              // If not loading more then start from the beginning.
+              if (!append) {
+                params.skip = 0;
               }
 
               // Load the submissions.
@@ -69073,6 +72109,17 @@ module.exports = function(app) {
                 }
                 else {
                   $scope.selectItems = submissions;
+                  // If only one choice then select it.
+                  if (makeSelection && submissions.length === 1) {
+                    var component = $scope.component;
+                    var data      = $scope.data;
+                    if (component.multiple) {
+                      data[component.key] = submissions;
+                    }
+                    else {
+                      data[component.key] = submissions[0];
+                    }
+                  }
                 }
                 $scope.hasNextPage = (submissions.length >= params.limit) && ($scope.selectItems.length < submissions.serverCount);
               })['finally'](function() {
@@ -69130,7 +72177,7 @@ module.exports = function(app) {
                       data[component.key] = submission;
                     }
 
-                    $scope.refreshSubmissions();
+                    $scope.refreshSubmissions(null);
                     $scope.closeThisDialog(submission);
                   });
                 }]
@@ -69192,7 +72239,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],239:[function(_dereq_,module,exports){
+},{}],279:[function(_dereq_,module,exports){
 "use strict";
 /*eslint max-depth: ["error", 6]*/
 
@@ -69334,6 +72381,7 @@ module.exports = function(app) {
           '$scope',
           '$http',
           'Formio',
+          'FormioUtils',
           '$interpolate',
           '$q',
           '$timeout',
@@ -69342,6 +72390,7 @@ module.exports = function(app) {
             $scope,
             $http,
             Formio,
+            FormioUtils,
             $interpolate,
             $q,
             $timeout
@@ -69581,15 +72630,22 @@ module.exports = function(app) {
                 break;
               case 'url':
               case 'resource':
+                if (settings.filter === 'contains' || settings.filter === 'startsWith') {
+                  settings.filter = '';
+                  $scope.component.filter = '';
+                }
+                $scope.options = $scope.options || {};
                 var url = '';
+                var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
+                //var baseUrl = Formio.getBaseUrl();
                 if (settings.dataSrc === 'url') {
                   url = settings.data.url;
                   if (url.substr(0, 1) === '/') {
-                    url = Formio.getBaseUrl() + settings.data.url;
+                    url = baseUrl + settings.data.url;
                   }
 
                   // Disable auth for outgoing requests.
-                  if (!settings.authenticate && url.indexOf(Formio.getBaseUrl()) === -1) {
+                  if (!settings.authenticate && url.indexOf(baseUrl) === -1) {
                     options.disableJWT = true;
                     options.headers = options.headers || {};
                     options.headers.Authorization = undefined;
@@ -69598,7 +72654,7 @@ module.exports = function(app) {
                   }
                 }
                 else {
-                  url = Formio.getBaseUrl();
+                  url = baseUrl;
                   if (settings.data.project) {
                     url += '/project/' + settings.data.project;
                   }
@@ -69649,20 +72705,23 @@ module.exports = function(app) {
                       (typeof input === 'string') &&
                       input
                     ) {
-                      options.params[encodeURIComponent(settings.searchField)] = encodeURIComponent(input);
+                      options.params[settings.searchField] = /__regex$/.test(settings.searchField)
+                        ? FormioUtils.escapeRegExCharacters(input)
+                        : input;
                     }
                     else {
-                      delete options.params[encodeURIComponent(settings.searchField)];
+                      delete options.params[settings.searchField];
                     }
 
                     // Add the other filter.
                     if (settings.filter) {
-                      var filter = $interpolate(settings.filter)({
-                        data: $scope.submission ? $scope.submission.data : {},
-                        row: $scope.data
-                      });
                       // This changes 'a=b&c=d' into an object and assigns to params.
-                      _assign(options.params, JSON.parse('{"' + decodeURI(filter).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}'));
+                      _assign(options.params, _.mapValues(JSON.parse('{"' + decodeURI(settings.filter).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}'), function(value) {
+                        return $interpolate(value)({
+                          data: $scope.submission ? $scope.submission.data : {},
+                          row: $scope.data
+                        });
+                      }));
                     }
 
                     // If they wish to return only some fields.
@@ -69801,7 +72860,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"lodash/assign":174,"lodash/cloneDeep":175,"lodash/get":179,"lodash/isEqual":186,"lodash/set":200}],240:[function(_dereq_,module,exports){
+},{"lodash/assign":198,"lodash/cloneDeep":203,"lodash/get":208,"lodash/isEqual":215,"lodash/set":235}],280:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -69909,7 +72968,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],241:[function(_dereq_,module,exports){
+},{}],281:[function(_dereq_,module,exports){
 "use strict";
 
 var SignaturePad = _dereq_('signature_pad');
@@ -70026,7 +73085,8 @@ module.exports = function(app) {
         }
 
         ngModel.$render = function() {
-          signaturePad.fromDataURL(ngModel.$viewValue);
+          var dataUrl = ngModel.$viewValue || '';
+          signaturePad.fromDataURL(dataUrl);
         };
         signaturePad.onEnd = function() {
           scope.$evalAsync(readSignature);
@@ -70050,7 +73110,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"signature_pad":210}],242:[function(_dereq_,module,exports){
+},{"signature_pad":250}],282:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -70068,12 +73128,14 @@ module.exports = function(app) {
           angular.forEach(component.values, function(v) {
             values[v.value] = v.label;
           });
-          angular.forEach(component.questions, function(question) {
-            view += '<tr>';
-            view += '<th>' + question.label + '</th>';
-            view += '<td>' + values[data[question.value]] + '</td>';
-            view += '</tr>';
-          });
+          if (data) {
+            angular.forEach(component.questions, function(question) {
+              view += '<tr>';
+              view += '<th>' + question.label + '</th>';
+              view += '<td>' + values[data[question.value]] + '</td>';
+              view += '</tr>';
+            });
+          }
           view += '</tbody></table>';
           return view;
         },
@@ -70109,7 +73171,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],243:[function(_dereq_,module,exports){
+},{}],283:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -70123,6 +73185,7 @@ module.exports = function(app) {
         template: 'formio/components/table.html',
         group: 'layout',
         settings: {
+          clearOnHide: false,
           input: false,
           key: 'table',
           numRows: 3,
@@ -70178,7 +73241,7 @@ module.exports = function(app) {
       tableClasses += "'table-hover': component.hover, ";
       tableClasses += "'table-condensed': component.condensed}";
       $templateCache.put('formio/components/table.html',
-        "<div class=\"table-responsive\" id=\"{{ component.key }}\">\n  <table ng-class=\"{'table-striped': component.striped, 'table-bordered': component.bordered, 'table-hover': component.hover, 'table-condensed': component.condensed}\" class=\"table\">\n    <thead ng-if=\"component.header.length\">\n      <th ng-repeat=\"header in component.header track by $index\">{{ header | formioTranslate:null:builder }}</th>\n    </thead>\n    <tbody>\n      <tr ng-repeat=\"row in component.rows track by $index\">\n        <td ng-repeat=\"column in row track by $index\">\n          <formio-component\n            ng-repeat=\"_component in column.components track by $index\"\n            component=\"_component\"\n            data=\"data\"\n            formio=\"formio\"\n            submission=\"submission\"\n            hide-components=\"hideComponents\"\n            ng-if=\"builder ? '::true' : isVisible(_component, data)\"\n            formio-form=\"formioForm\"\n            read-only=\"isDisabled(_component, data)\"\n            grid-row=\"gridRow\"\n            grid-col=\"gridCol\"\n            builder=\"builder\"\n          ></formio-component>\n        </td>\n      </tr>\n    </tbody>\n  </table>\n</div>\n"
+        "<div class=\"table-responsive\" id=\"{{ component.key }}\">\n  <table ng-class=\"{'table-striped': component.striped, 'table-bordered': component.bordered, 'table-hover': component.hover, 'table-condensed': component.condensed}\" class=\"table\">\n    <thead ng-if=\"component.header.length\">\n      <th ng-repeat=\"header in component.header track by $index\">{{ header | formioTranslate:null:builder }}</th>\n    </thead>\n    <tbody>\n      <tr ng-repeat=\"row in component.rows track by $index\">\n        <td ng-repeat=\"column in row track by $index\">\n          <formio-component\n            ng-repeat=\"_component in column.components track by $index\"\n            component=\"_component\"\n            data=\"data\"\n            formio=\"formio\"\n            submission=\"submission\"\n            hide-components=\"hideComponents\"\n            ng-if=\"builder ? '::true' : isVisible(_component, data)\"\n            formio-form=\"formioForm\"\n            read-only=\"isDisabled(_component, data)\"\n            grid-row=\"gridRow\"\n            grid-col=\"gridCol\"\n            builder=\"builder\"\n            options=\"options\"\n          ></formio-component>\n        </td>\n      </tr>\n    </tbody>\n  </table>\n</div>\n"
       );
 
       $templateCache.put('formio/componentsView/table.html',
@@ -70188,7 +73251,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":261}],244:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":302}],284:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -70228,8 +73291,44 @@ module.exports = function(app) {
             }
             return 'formio/components/texteditor.html';
           }
+          if ($scope.readOnly && $scope.component.wysiwyg) {
+            return 'formio/componentsView/content.html';
+          }
+          if (!$scope.readOnly && $scope.component.editorComponents) {
+            return 'formio/components/scripteditor.html';
+          }
           return 'formio/components/textarea.html';
         },
+        viewTemplate: function($scope) {
+          if ($scope.component.wysiwyg) {
+            return 'formio/componentsView/content.html';
+          }
+          else {
+            return 'formio/element-view.html';
+          }
+        },
+        viewController: [
+          '$scope',
+          '$sanitize',
+          function($scope, $sanitize) {
+            if ($scope.component.wysiwyg) {
+              $scope.$watch('data.' + $scope.component.key, function() {
+                $scope.html = $sanitize($scope.data[$scope.component.key]);
+              });
+            }
+          }
+        ],
+        controller: [
+          '$scope',
+          '$sanitize',
+          function($scope, $sanitize) {
+            if ($scope.readOnly && $scope.component.wysiwyg) {
+              $scope.$watch('data.' + $scope.component.key, function() {
+                $scope.html = $sanitize($scope.data[$scope.component.key]);
+              });
+            }
+          }
+        ],
         settings: {
           input: true,
           tableView: true,
@@ -70265,14 +73364,20 @@ module.exports = function(app) {
       $templateCache.put('formio/components/textarea.html', FormioUtils.fieldWrap(
         "<textarea\n  class=\"form-control\"\n  ng-model=\"data[component.key]\"\n  ng-disabled=\"readOnly\"\n  ng-required=\"isRequired(component)\"\n  safe-multiple-to-single\n  id=\"{{ componentId }}\"\n  name=\"{{ componentId }}\"\n  tabindex=\"{{ component.tabindex || 0 }}\"\n  ng-attr-placeholder=\"{{ component.placeholder | formioTranslate:null:builder }}\"\n  custom-validator=\"component.validate.custom\"\n  rows=\"{{ component.rows }}\"\n></textarea>\n"
       ));
+      $templateCache.put('formio/componentsView/content.html', FormioUtils.fieldWrap(
+        "<div class=\"well\" id=\"{{ component.key }}\" style=\"margin:0;\">\n  <div ng-bind-html=\"html\"></div>\n</div>\n"
+      ));
       $templateCache.put('formio/components/texteditor.html', FormioUtils.fieldWrap(
         "<textarea\n  class=\"form-control\"\n  ng-model=\"data[component.key]\"\n  ng-disabled=\"readOnly\"\n  ng-required=\"isRequired(component)\"\n  ckeditor=\"component.wysiwyg\"\n  safe-multiple-to-single\n  id=\"{{ componentId }}\"\n  name=\"{{ componentId }}\"\n  tabindex=\"{{ component.tabindex || 0 }}\"\n  ng-attr-placeholder=\"{{ component.placeholder }}\"\n  custom-validator=\"component.validate.custom\"\n  rows=\"{{ component.rows }}\"\n></textarea>\n"
+      ));
+      $templateCache.put('formio/components/scripteditor.html', FormioUtils.fieldWrap(
+        "<formio-script-editor \n  ng-model=\"data[component.key]\"\n  ng-disabled=\"readOnly\"\n  ng-required=\"isRequired(component)\"\n  safe-multiple-to-single\n  id=\"{{ componentId }}\"\n  name=\"{{ componentId }}\"\n  tabindex=\"{{ component.tabindex || 0 }}\"\n  ng-attr-placeholder=\"{{ component.placeholder | formioTranslate:null:builder }}\"\n  custom-validator=\"component.validate.custom\"\n  rows=\"{{ component.rows }}\"\n></formio-script-editor>\n\n"
       ));
     }
   ]);
 };
 
-},{}],245:[function(_dereq_,module,exports){
+},{}],285:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -70333,7 +73438,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],246:[function(_dereq_,module,exports){
+},{}],286:[function(_dereq_,module,exports){
 "use strict";
 
 var moment = _dereq_('moment');
@@ -70405,7 +73510,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"moment":204}],247:[function(_dereq_,module,exports){
+},{"moment":244}],287:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -70419,6 +73524,7 @@ module.exports = function(app) {
         template: 'formio/components/well.html',
         group: 'layout',
         settings: {
+          clearOnHide: false,
           key: 'well',
           input: false,
           components: [],
@@ -70448,7 +73554,7 @@ module.exports = function(app) {
     '$templateCache',
     function($templateCache) {
       $templateCache.put('formio/components/well.html',
-        "<div class=\"well\" id=\"{{ component.key }}\">\n  <formio-component\n    ng-repeat=\"_component in component.components track by $index\"\n    component=\"_component\"\n    data=\"data\"\n    formio=\"formio\"\n    submission=\"submission\"\n    hide-components=\"hideComponents\"\n    ng-if=\"builder ? '::true' : isVisible(_component, data)\"\n    read-only=\"isDisabled(_component, data)\"\n    formio-form=\"formioForm\"\n    grid-row=\"gridRow\"\n    grid-col=\"gridCol\"\n    builder=\"builder\"\n  ></formio-component>\n</div>\n"
+        "<div class=\"well\" id=\"{{ component.key }}\">\n  <formio-component\n    ng-repeat=\"_component in component.components track by $index\"\n    component=\"_component\"\n    data=\"data\"\n    formio=\"formio\"\n    submission=\"submission\"\n    hide-components=\"hideComponents\"\n    ng-if=\"builder ? '::true' : isVisible(_component, data)\"\n    read-only=\"isDisabled(_component, data)\"\n    formio-form=\"formioForm\"\n    grid-row=\"gridRow\"\n    grid-col=\"gridCol\"\n    builder=\"builder\"\n    options=\"options\"\n  ></formio-component>\n</div>\n"
       );
       $templateCache.put('formio/componentsView/well.html',
         "<div class=\"well\" id=\"{{ component.key }}\">\n  <formio-component-view\n    ng-repeat=\"_component in component.components track by $index\"\n    component=\"_component\"\n    data=\"data\"\n    form=\"form\"\n    submission=\"submission\"\n    ignore=\"ignore\"\n    ng-if=\"builder ? '::true' : isVisible(_component, data)\"\n    builder=\"builder\"\n  ></formio-component-view>\n</div>\n"
@@ -70457,7 +73563,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":261}],248:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":302}],288:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -70535,7 +73641,7 @@ module.exports = function() {
   };
 };
 
-},{}],249:[function(_dereq_,module,exports){
+},{}],289:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -70572,6 +73678,7 @@ module.exports = function() {
         $q
       ) {
         var iframeReady = $q.defer();
+        $scope.options = $scope.options || {};
         $scope._src = $scope.src || '';
         $scope.formioAlerts = [];
         $scope.iframeReady = false;
@@ -70603,31 +73710,12 @@ module.exports = function() {
         };
 
         $scope.downloadUrl = '';
-
-        $scope.getPDFDownload = function(pdf) {
+        $scope.setDownloadUrl = function(form) {
           if (!$scope.formio) {
             return;
           }
-          var download = '';
-          if ($scope.formio && $scope.formio.submissionUrl) {
-            download = $scope.formio.submissionUrl;
-          }
-          else if ($scope.submission._id) {
-            download = Formio.baseUrl + '/project/' + $scope.form.project + '/';
-            download += '/form/' + $scope.form._id;
-            download += '/submission/' + $scope.submission._id;
-          }
-          if (!download) {
-            return;
-          }
-
-          download += '/download/' + pdf.id;
-          var allowedPath = download.replace(Formio.baseUrl, '');
-          allowedPath = allowedPath.replace(Formio.getProjectUrl(), '');
-          return $scope.formio.getTempToken(3600, 'GET:' + allowedPath).then(function(tempToken) {
-            download += '?token=' + tempToken.key;
-            $scope.downloadUrl = download;
-            return download;
+          $scope.formio.getDownloadUrl(form).then(function(url) {
+            $scope.downloadUrl = url;
           });
         };
 
@@ -70662,11 +73750,11 @@ module.exports = function() {
           sendIframeMessage(message);
         });
 
+        $scope.pdfImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPoAAAD6CAMAAAC/MqoPAAAAA3NCSVQICAjb4U/gAAAC9FBMVEX///+HiYuGhomCg4aCgIF6eX12eHokJCQkICAgICAjHSOOj5KJi46DhYd1dnltb3EkICAgICAjHSOVl5qTlZeOj5KHiYt6eX0kICAjHSOZmp2Vl5qGhokkICDOz9G+vsCztbapq66cnqGbnZ6ZmZmTlZckICCbnZ6Zmp2Vl5qTlZeOj5KMioqGhomCg4aCgIGZmp2TlZeCgIGmqauho6aen6KcnqGmqaucnqGbnZ66u76cnqGZmp2Vl5rKISjS0dLR0NHOz9HMzMzHycrHxsfFxMXCwsPCw8W+vsCen6KbnZ7GISjCwsO+v8K+vsCpq66kpqmeoaObnZ7////7+/v5+vr39/j09fXz8/P88PHx8fL37+/u7+/r7O3r6+zp6uvn5+jj5+fz4+P44eLw4eHj5OXi4+Th4uPf4OLf3+Dc3t/b3N7a29z109TY2tvv1NXv0tPX2NrW19jU1tfS09XP0dLOz9Hrx8jxxMbnxsfMzMzkxMXHycrGx8nDxcfqubvCw8XCwsPkuLrutbe/wcO+v8Lftre+vsC7vb+6u763ubu1t7riqqzeqquztbbqpqmxs7bZqKmvsbOtr7Kqra+pq67bnJ7gm56mqavXnJ3nl5ulp6qkpqmjpaeho6aeoaPbj5Gen6KcnqHXjpGbnZ7jiYzfio7SjpDdiYyZmp3LjI6ZmZnahoqVl5rXgoaTlZeSk5bSgIOPkZPOf4Lgen6Oj5LLf4KLjY+Ji46HiYvVcnaGhonNcnWDhYfKcXSCg4bca3DFcXTBcHJ+gIJ9foHRZWl6fH7MZmbOZWnGZGd6eX12eHrBY2bZXGF1dnlydHa4YWNwcXTOV1vKVlvIVlrCVlnPUFW+VVnOTlS3VFe1VFbKS1HGSE3BR0y/R0y7R0zEREq2R0rSP0WzRkmtRUjBOkC4OT6zOD3OMDaqNzrBLTO2KzCzKzCuKi/KISiqKi6lKS2+ICa6HyW7Hya2HySuHiOyHiSrHiKnHSGiHCCeHB+aGx/MBOLyAAAA/HRSTlMAERERERERERERESIiIiIiIiIiMzMzMzMzM0RERERVVVVVVVVVVVVmZmZmZmZmZmZ3d3eIiIiImZmZqqqqqrvMzMzMzMzMzMzMzMzM3d3d3e7u7v////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8PeNL3AAAACXBIWXMAAC37AAAt+wH8h0rnAAAAHHRFWHRTb2Z0d2FyZQBBZG9iZSBGaXJld29ya3MgQ1M26LyyjAAAFydJREFUeJzt3Xl8FNd9AHD31K56LfSIaOumTY80aeK06R23TXq5xXV8ZIRhzWEkgkAHKICQZCwpQpZsSSsWRQdeR2hlCWEsXFkHyELmtMEkGBvnMKZ2iV1jW2COGAOSwPzT33tv5s2bY3fn+O2slg8//DFikeT97u94b2Zn5FtuuRk342bcjJtxM8zCl5nhaWRm+lJNJuHP8Psy/H6/z7uA/1oG/CvVfL+P/vJS7qP/uQx4wVOJh9f/93q6u6LRzs0dHZH29ra21taWluZwOBRqbGxsqK+vr6urra2trq6qqqqsrKyoqFhHo5TEWiFKtKE8TD6NfgF8ZUUlfJNq+G519Q2NoVA4/Lek2lJI931algO8HeCqvKGBwOsIvFqBV+jhJXHCFF+9Huj1hN7Scs/vQvZTJ/f9Ppe3mcjVlGsyrsv1mpI1mtDo6QtVyvHV1WBvDIWbW1pb2//G58tMjRwaLvAHXE7hIA9RuVzscsqNGedsHquFf6t+rqd2kndOb2ttn/2p1OQ9w58ZCHxWlbeYyUnKNXAh4cxqEuwFMLVXVpFmh3pvbYP/Zvu9n/Olot+h3AOBzwtyqHXtgNOmXN/ignuVJmQ/56s9D98J0v5YQ2O4pa090gH2jtt/LQV2WNUCgT8Tqp3KhT7n802bcrXSGXqlPrif4tfwzFM7tHsdo3ds7oR+75j9W97LM3wzA1lfUOXNOvn6anFJ0zY5r3UTucznuVfLXrbXQrO3tEU6o13RFrDf9zmv6Zl+fyCQ9cWIblGLKdc2uVLnDFoEUUj/YcH0K9XUq3hS8nUNlN7V0xMh9ujtHtMzCH3WbcqEExY1bbWLcqHS1XxTbKE2OF/Wi3aa9ua2SLS7t6+vmdpn/4rHdGj1rNuM8jrDhGO1btbiWnUBDc4vLOJ6mnm54ysqIe3h1ki0p69/IBoi9s77ftNTuo/0+pc0s12zkREHnJpxNeGCusAYYvJXqZmneYe0h1ragT4wOBwO07x3ednwQJ8RyPpyG5/tYpvHk2vhGm8+/DLo2cwX7CTtUPGbu58ZHB7tbpTt/+ApHQr+yyabVy6vUOVrqZzPNgM8XwiNvUi2r+ajvpSkvSHUGunqGxzZNdbYGGomNd915y84lPyT7fgvGv9H4qQY/2sS/6OLN+wE+5JtHE/skPb2aN/A6NjuzfXMHu2685ed0X863WMHdPwaJe+V1fWh1s6egZGx/WNkT89q/hvOhl2qZQljiEw71vAs7S2Rrn6gHwrV1Ss1/40/vkHprOPXMPv6hlBbtG8Y6J3Vtbzmez9/Q9KL2DIn26tqG1s6egZ37T88CgOf13zvX9yI9MJChqf2dRXV9c3tXf2j+w8fq2B2VvO9/3gD0gvYIs+mHaS9DgbdMyN7Dx8LgV2oedv2VMsSxhBd6Cke8r62tKIaBl3v8NihY22lFZqat2tPtSxhDOWzTQ7YSd4h7fXh9u6BXQePRdfK9rBi/7mk0rc+Ur5CglhS/t0D6oPl5UHyYPkjO8+onyqJ8apT+rPL8xme2km314Zao/2jB48Okz9o7Hfastt9JiJnyQHjg8Gt6PTly/OVoqdpr25o6ewb2f/y6MrVJbrE3/mzHtElaafJgyvOmH2qc/qy5QwPRb+SYKHimzt6h/ceHi2kf3Rsd0eXDpg8qNix6Iq9AGp+1Zq16yrrQpGewd2HDy8vFPKuHMz8TJLpK1hvQ30LD5YrD34XlZ6Xl8cTDyVfUgrN3tY1MHbotWVGO+Tdcr87o8MHW4WSVx48s5F9dEr41FdZnIn3TePSly4V7atK1lasb4Q5N3bw2NJl+WLNh2wewDum/5QxH9E+WE4/2qj7VDcBdNUOaYeKr25o7ezfdfDo4qUmee/s+vuk019lpa998JShDTDoon11Ccw5GPGj+4/maezqxs6i3Tld+FB4cIXa2Yh0Yif4goKiVWtKK+ubN5PVrfTBxeY1b82OTWcjYCsiPScnh9pJ4iHtK9eUVtSFI72wiy9d+GCMmv9zL+hB3YMHzCaAK/rixYtzeNHnFxStXltRG470wMK+doHOXsvtf5pUOmvrch3yVdNHXcR/E7pqLyhcvXZdbai9G+glDzB7vibv9AR91+8kk75VHeYikn64BJcuJ57Y8wtXlayrhoUd9jRr5j2gz7tc85HO+34jefQzS+hHB0zp+gnghv6gal8K9oKVQG8E+tih1XONdl7z9yXc2jilH1gRYxnT0yW1AxzSH2R4Nu2WFxSVlFbBnga2c6vu5/Z846ybncjujM5jpyd0NfF5y/OLYHVrIPSDRXPuN8k7r/lEb8S6o2/Uc5NAX7RokWAHI4z4hpYobOeKskV7gaHm/y6J9I2aB4WPg/pPdUFfuJDYmT6HVPyqtRWwnesf3V8gZcfLe0fnZ5NFL39V+yD98A1VikN/eiGxL2J2kvaCVSUVcMTeN7J3sRTDLuc9cu+v49PLyzdufUP/IP2QreuIW5qnFywkwe15+TDiyXZueDf59vFr/r6fR6fHfhB9I/v0Ao0d6EUl6+gR+6hksBtqfraH9Efoh4bV3hWd4VnD5yyFOVdaRU7PbZYW5+eva2wMhRvAG2N9/2vv6OxEzRlk+gI179DsMOKh4rueGd61e//BQ4cOv/zy0WPHXvvhyGCkapVhT/uHXtF3qq2OSudFvzgnj+3nWjq6+gaGR3eN7d67d//Bg/ACHAX+D/f3hrQ1f+8veUM/w5Ju3Oi4pjM7r/iKOnJVTXdf/8DA4PDICH0FCJ/ojw2ExZqP2e6o9FNsd7skzqfapz+wYIGqJ/ZlkPbSitqGMNmyRbu6unt64SUYhAqgfEj+a0ej1WrN/1Xy6extGYmffcWii/ZFpNthVwP26rpGcrlwa1s7bF6iXeAfGByh3Q/6Y0f7annN/3bS6UrsjPepTug6e07ecjhyJVeX0Fsj6A0C8ALAQXpPX/+wrIfoq5Nr/p5f9Ii+M+6nOqKrerKpJfaCIjLMyDWUleT2EHJzCHv/hehHx0APsT9ay/JufiCDTd94Kv6nOqVzO6zfMOrgKLVoNb3OQrmAtpZcON3cGuns6u0nF5fthdg90sLsn0kanb37GoTd7alEn2o7np6no9PjOHL0St+Iki80KSV8qm9t3xzt6YehNwaxa6T7MWr/VQS65/HUPAgBv5DNupyl7CxlAXkDFl4A+bq6Wnb1NL2YdGR0dHRksC9M7Leb3DiQalnCoHSG16xx9KxNHjs5Xyjr5WuIQ80UD6kfHhzo72sl9s8Y7amWJQwjfYG8r5NPWcnn54meXGvD8C1tHWzD09/f19MKQ7DFeMNIqmUJQ6aLNS93/IPCiVpa+iq+Xu75Poje7q52sH/FcGNgqmUJ46m584x5V+0MT96Vkt9/ZxdV1taHwjDto909PT3d0U5S83+kt6daljCemivaxYbX4vkb8DKetDzJfLQrGt0caWlovMens6daljCArtrnae2LBDt5eyJfGHhV6x8jN0hFNnd2bu5ob2tuaPxLnT3VsoRB6IqdpT5G3hV7kTLs6ayHHW4kEmlvaw3VN37Kn5mZdnSrdrnoKZ50/GNkO9NG77RuDtXf7ctwdVOkfBcEvZMhn7zfvywvj7wnlJNDT5WTs0iLFpFjaz6SaIvypz6Xxf3GmKP5TQ1b9uVC0bN1Ltwi33raWP8VPwodXz5njvCbni7oE9g1Oxx6X2A4zG7Sabgr4PO7uAdapVM50OllD0y+2JWcoOXfyAcGvB27fFUpuTGQ3vNPb9G5I+DLdJF2mZ4UOQ/2Z9GuKXtrNc8anh3VN9B7EO+YGYB2d01n1e5ezsucRHa27hWI0fFx1neh5ql9HT2gZfH1QMDnottlukmfO5SDcA6Xy3blJTD0vL1+Vw5pyA89gFh/dyCQmeGajjThNEnOzpbt/CVwmvd8rZ2cy6mqrqq6Owsq3nXBY8p5qmU7fwlwap7/5IPKu7MCM100u0h3PeHEMs/WB1rNK7fAVwA94He+vHE6ptw85siDwHnNF9E7ghX8uq/j0DFmu1H+rW83NZXlavPu0L5csJew+8AJ3efPcElfhjLbtfL5z5/9mMbz87md+W3bNXsbbr+L9LrPLR1twgkZl+EQJ+cLjzvOO5vz8m1ixA70Ge7p+PL5H3ysxrP6nndR8yv5DcF3kYLHoFuUz7Umz37yYzFyXduFmlfseHTU2T7/rIb+uGHWm9vjnbPS13wJFh15tjdp5B+fzM6WYust4tWDGXo3dMl/4tCR5dkvaekfZ0tSHLudzU0+a3iw49BRJxwJeVlrkuv+cpmU2G48iNWfpVbshdR+BwodW17GxJLECv/y5SYJ345Hx5rtEBKb7z8C7VlGf1JKYI/Z74tinKxciUtH2rdLAv1HVK7QDXYLg97EzmYdGh1TLrEp9zyjg/zyjyXn9lhzHouO1+eSnGtzehy73TmPRMeVy3RS8Cep/JJKT2S3Puv+A4WOLBfoTC7SJR3dsR2LjjXb9XQm19Dj2G3N+X/HoVP5grhykwEXSy6POVjXy8zoSHYcOt5sZyEftwWlJibX0Z3YjTWPREfsc4FeJj3P5JeelKzarc95HDqyXHpcPlaVzsagY8y6f8OiY8oltoe//FITg5vQEexYdKzZzqKY0c+eVeiPG+juZx0SHW22y8F27pcV+aUyI921HYeON9vlOGmB7nbO49Ix+pzGS1r5paAZ3eWcR6WjyaUntfJLpnKXsw6TjieXvq2VfxCD7sr+r3h0lNkuxxKNXL+ZM6fbnXV4dKTZLscHovzS92PR3djR6BblengMufSShm7c0biys5rHoiP2OY3HRfmVptj0ePb4cx6Jji2XikX5FdNl3ao91qzDoaPLodkF+RXzZd2lHY+ONNuVeFakx5Vr6dZnHRodbbbLUSzIX49Pdzjn/wWJjjfblTjJ5Vdir21u7Eh03D6n0cTlV+KsbRbsseY8Dj0Jcil4VpHHXdus2o2zDpeOKJek5znd5EQFgh2TjjTblchV5FfOxV/cTOhW+h2RjjXbeZy8ooSFZtfjE9vx6HizXYkfc7qltNu99ACNji+XrlyxmXbrcx6TngR5riqfPJeLY58rpB2JngS5VCbQJ/dY/CIbdhy6dblluCQ9KcgnJ52kPWa/00mHSceVS98X5ZNHrH6ZZTsi3Qh3JZc+EOWTk3GP2a3b1SmPR0ftc4igVj553PJXxu93bkejY8uVKafIJydq3Ns1qzsWHV0uTzlVPjFu/Wtj2eeKdiQ68oQj8bpOPjFh5QDOhG6wo9KTIJf0SZ+YsLidNeLN845PR5jtJMoM8omJLTa+PrH9n5NDd9nnEmt1qn6dyycmLO5rTO336+3odCQ5bXVKD57j8gmr21kTu7i+MTs2HUsuKfKfSFsm1LC8r9HbDXv5udh0nD6XaKuzLh+SpHGVbn1fo6WbHcfg0tHk0OrygIMVrUmlT1lf4ET8HLNjOEw60myn8bpCJ5PtbS6fOm9jgVPtc8zsiHRMuaTI6RauTKVP2Vng4tu/hkzHmHAEqyzobKYfV+AQdha4uHY8OqZcGlLom+gfcwX6CZvfKma/o9Exq12SfqLs4orZn7dw+dSUrQVOHfOGvGPRceVBJennlAfGuXzqtCO50Y5Ex5VLNUrS+WmpGpU+tc2R3GDHoSPLpT3KQYu6jB9X6RcsTzrdM9La8ehYE47EuHK4piJzz6t2i5PO8Iy0djQ6pjxXkYsnZjap9Clr56qMdM2cx6IjwkGpHKJrjtTUkr962tKeLiZ9DiYdVS59T6Frspt7gdOvWpx0ce04dFy5xM/LaJO7icuvXi12b08K3aW8RpHrD1FPcPnVdy1+rzj2ZNBdyukultI36f4ieEGRWy75WPYkZd0tfVw5GWeo6jIuv3r1Ief27CT1ulu4VKzITd5z2KHSP3L03msy6a7lZGlj9CGTvzzB6Zbb3YhPzoR3L1fPyZgdogUvqPbnHNqT0+sI8lzl3PN5078uVunXNjiyJ2fCI8jVk5AxTrpv4PJrH1lc3Y23BxH79KMfUeixNuo7OP3aR2TPU1yz7YU333zz4idvvvXWi9sffXi+RftXEekYcCk4EbfeSbygyK9de++F966x+ESN97/jNR1FnrDeIYLvcroaAv2T6++bZN6Ax6PjyNV6j3MKDuzX4smvX3/f5Kv0djQ6kpzXe+xrKHI3vPJR3JyT2J7YjkVHkqv1brafgVemZsdpk2q/ppdf/zABPRuNjiVX691km5r7xAl1uMdP+vXr34ovB/s0o+cq8nf0fxPc8K66l9HLL8K69pYIv3794QRyLDqWXNqk0LXvqAY3vHJVCGPOn4ORPv/FeHS9PDt7mtGV/bvmDdWyfReumskvCtV+8Qn4xPdV+XXd8maUT7OsFyvvqO7jD+VuOz111Sh/77maYPAVsdE/3P7N7ar8rYTyaUYfUujK5nzDiakpg/yjFzbIQ3Cb+YiDeDShfJrRz8vvqLKTcrk7Lqgn4/hR+nPiMctDF83lLyaWTy96k3IBARlyNSeEE7CK+wn9mhd8xUz+lqbTzeXTi65cQTAuBbecntLLX9lg+sbDQx8a6NqtnFE+/ej8AoIj+4Q3mZj7hLmbxnc+1MB/8M1E8ulX8EMKXQ831rkuHn3xokL/gW5BN5VPuzF33igH+ukdlk69PvzEdohH9UerMeTTbHFrMpPvs34DgFnElE+vLc3bBvnpTfaukrMjn070Mr18n73rhWzKp88ePnePttxdJzyhfJpkncFV+RHXCU8snxZ0Ga7IL1gb6W7l04AeVK53x6v0xPLpQA9uOTch0neguK3IU01v4nAmv4CTcivy1NLLhPsbWLnrr6NIihz13RdHzy/3+IRebuvyV5fy1NGDQ5MGuc2Lnt3JU0ZvEm7hOr9Hplu+R92FPNX04uPqbXvntwT3yAu6B+u58D8BxXl/3d6TCw6p92oCXMqVy93mbS0u5UiXFth6cmXjXE7gkrQHccZZhaNdUGLjuQW/p96fS+FSGeKMsyH3nF5zjsuPs9YOjk+h7ePsyD2myymnl7orp1+G5HJH2MdZ73PP6XLKQX6Oj7QavHK3J/eUzm9emzjClzHlvo4dnsu9pO/hd3AJpxrfYXLD2+nY8jkGuXf0oHLX3uTbws5Ffq/hguVr//Dk3tFf53Jhnm2RG93yFZ+Ics/oe8zkTcq51yTLjX3uIb2J97lQ7Yr8HdfrmhO5R/TgOYUu7NOVu3jcN7ojuUd0Xu7qNWHK4drUVJLlpn3uGV1N+oTyUNn4FNaIcyj3hl7D5TKdnHlPtdwb+hYuJzftBWuOTHglj9XnXtPJ4drbx8eFk3EXkvyOYjy5pwUvnIZk9HfcTrgE8Lhyjyb8uE4un4VM8noep8+9oxefM+b8fEp2r2og/YSShE+yeFwv35f0988TyL2ii28rkh+ntA/hvLObPveSDtF0hF0HOr6vCeNNRbdyL+kkysrcH5lbgVuQe01HC1d9zn7oWprSXcnlH+6N80PX0lGennT3fZ6udBx5GtITwC3L049uGZ5IfqPRLU44xB+mmo7ydKNj9Tnez4xOR3la0RPAbcrTiW4Zbk1+49BtTTgk+gyP6NhyQp/hjj4zkPWllMvt9rlMn+mG7icFf1s6ylnB+13Q/YHArKTTE8Adyed9bVYg4HdOzyT0rC+mVm57tsv0LELPdEr3ZZBe/0JK6Q4mHP0fHX2V9HqGzyn9Fh9t9ltvvfVP0ivgGdNWdy6/xU8W9lnEnk548nSzZpFl3e+cnuHPDEDaqT2tIguSHsh0PuVI1jMg7ZD3tNLDs4WcB+C5u8j6LX5a8iTxhJ8eMYumnJS7G7lqT7twLQe6PyOT7GcDgZkzUs2xEDPoM/X5MmE75pJO+p3+guynSfjlZ+wWTuywlSevYapJFoPUKWzeMeQ0oIDSJzI1O5n/B5/xAXbXPcU5AAAAAElFTkSuQmCC';
+
         var cancelFormLoadEvent = $scope.$on('formLoad', function(event, form) {
           cancelFormLoadEvent();
-          iframeReady.promise.then(function() {
-            $scope.getPDFDownload(form.settings.pdf);
-          });
+          $scope.setDownloadUrl(form);
           sendIframeMessage({name: 'form', data: form});
         });
 
@@ -70757,6 +73845,9 @@ module.exports = function() {
           if ($scope.options && $scope.options.submitMessage) {
             message = $scope.options.submitMessage;
           }
+          else if ($scope.form && $scope.form.settings && $scope.form.settings.submitMessage) {
+            message = $scope.form.settings.submitMessage;
+          }
           else {
             message = 'Submission was ' + ((method === 'put') ? 'updated' : 'created') + '.';
           }
@@ -70788,7 +73879,9 @@ module.exports = function() {
           // If they wish to submit to the default location.
           else if ($scope.formio && !$scope.formio.noSubmit) {
             // copy to remove angular $$hashKey
+            var submissionMethod = submissionData._id ? 'put' : 'post';
             $scope.formio.saveSubmission(submissionData, $scope.formioOptions).then(function(submission) {
+              submission.method = submissionMethod;
               onSubmitDone(submission.method, submission, form);
             }, FormioScope.onError($scope, $element)).finally(function() {
               if (form) {
@@ -70809,6 +73902,8 @@ module.exports = function() {
           return FormioUtils.isRequired(component, $scope.requireComponents);
         };
 
+        var alertsWatcher = null;
+
         // Called when the form is submitted.
         $scope.onSubmit = function(form) {
           $scope.formioAlerts = [];
@@ -70817,12 +73912,23 @@ module.exports = function() {
               type: 'danger',
               message: 'Please fix the following errors before submitting.'
             });
+
+            alertsWatcher = $scope.$watch(function() {
+              return form.$valid;
+            }, function(value) {
+              if (value) {
+                $scope.formioAlerts = [];
+                alertsWatcher();
+              }
+            });
+
             return;
           }
 
           form.submitting = true;
           FormioUtils.alter('submit', $scope, $scope.submission, function(err) {
             if (err) {
+              form.submitting = false;
               return this.showAlerts(err.alerts);
             }
 
@@ -70933,7 +74039,7 @@ module.exports = function() {
   };
 };
 
-},{}],250:[function(_dereq_,module,exports){
+},{}],290:[function(_dereq_,module,exports){
 "use strict";
 module.exports = ['$sce', '$parse', '$compile', function($sce, $parse, $compile) {
   return {
@@ -70950,7 +74056,7 @@ module.exports = ['$sce', '$parse', '$compile', function($sce, $parse, $compile)
   };
 }];
 
-},{}],251:[function(_dereq_,module,exports){
+},{}],291:[function(_dereq_,module,exports){
 "use strict";
 var _get = _dereq_('lodash/get');
 
@@ -70975,7 +74081,8 @@ module.exports = [
         readOnly: '=',
         gridRow: '=',
         gridCol: '=',
-        builder: '=?'
+        builder: '=?',
+        options: '=?'
       },
       templateUrl: 'formio/component.html',
       link: function(scope, el, attrs, formioCtrl) {
@@ -71031,6 +74138,14 @@ module.exports = [
             // data in child scopes.
             for (var key in $scope.data) {
               delete $scope.data[key];
+            }
+
+            // Set the form to pristine again.
+            for (var compKey in $scope.formioForm) {
+              if ($scope.formioForm[compKey].hasOwnProperty('$setPristine')) {
+                $scope.formioForm[compKey].$setPristine();
+                $scope.formioForm[compKey].$setUntouched();
+              }
             }
           };
 
@@ -71209,7 +74324,7 @@ module.exports = [
   }
 ];
 
-},{"lodash/get":179}],252:[function(_dereq_,module,exports){
+},{"lodash/get":208}],292:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'formioComponents',
@@ -71230,10 +74345,12 @@ module.exports = [
       templateUrl: 'formio/component-view.html',
       controller: [
         '$scope',
+        '$controller',
         'Formio',
         'FormioUtils',
         function(
           $scope,
+          $controller,
           Formio,
           FormioUtils
         ) {
@@ -71262,6 +74379,10 @@ module.exports = [
             $scope.template = component.viewTemplate;
           }
 
+          if (component.viewController) {
+            $controller(component.viewController, {$scope: $scope});
+          }
+
           // Set the component name.
           $scope.componentId = $scope.component.key;
           if ($scope.gridRow !== undefined) {
@@ -71276,7 +74397,7 @@ module.exports = [
   }
 ];
 
-},{}],253:[function(_dereq_,module,exports){
+},{}],293:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -71304,6 +74425,7 @@ module.exports = function() {
         Formio,
         $http
       ) {
+        $scope.options = $scope.options || {};
         $scope._src = $scope.src || '';
         $scope.formioAlerts = [];
         // Shows the given alerts (single or array), and dismisses old alerts
@@ -71359,7 +74481,7 @@ module.exports = function() {
   };
 };
 
-},{}],254:[function(_dereq_,module,exports){
+},{}],294:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$compile',
@@ -71378,7 +74500,7 @@ module.exports = [
   }
 ];
 
-},{}],255:[function(_dereq_,module,exports){
+},{}],295:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -71388,7 +74510,82 @@ module.exports = function() {
   };
 };
 
-},{}],256:[function(_dereq_,module,exports){
+},{}],296:[function(_dereq_,module,exports){
+"use strict";
+// Javascript editor directive
+module.exports = ['FormioUtils', function(FormioUtils) {
+  return {
+    restrict: 'E',
+    require: ['ngModel'],
+    replace: true,
+    template: function() {
+      if (typeof ace !== 'undefined') {
+        return '<div ui-ace="aceOptions" ng-style="aceStyles"></div>';
+      }
+      else {
+        return '<textarea class="form-control"></textarea>';
+      }
+    },
+    link: function($scope, element, attrs) {
+      if (typeof ace !== 'undefined') {
+        var rows = attrs.rows ? attrs.rows - 0 : 5;
+        $scope.aceStyles = {
+          height: rows * 25 + 'px'
+        };
+      }
+    },
+    controller: ['$scope', function($scope) {
+      if (typeof ace !== 'undefined') {
+        $scope.aceOptions = {
+          useWrapMode: true,
+          showGutter: true,
+          theme: 'dawn',
+          mode: 'javascript',
+          showIndentGuides: true,
+          showPrintMargin: false,
+          onLoad: function(editor) {
+            // Disable message: 'Automatically scrolling cursor into view after selection change this will be disabled in the next version set editor.$blockScrolling = Infinity to disable this message'
+            editor.$blockScrolling = Infinity;
+            editor.setOptions({enableBasicAutocompletion: true});
+            editor.components = $scope.form ? $scope.form.components : $scope.component.editorComponents;
+            /* eslint-disable no-undef*/
+            var tools = ace.require('ace/ext/language_tools');
+            /* eslint-enable  no-undef*/
+            if (tools.completed !== true) {
+                tools.completed   = true;
+                tools.addCompleter({
+                  getCompletions: function(editor, session, pos, prefix, callback) {
+                    callback(null, _.map(FormioUtils.flattenComponents(editor.components, true), function(comp) {
+                      return {name: comp.key, value: comp.key, score: 1000, meta: 'component'};
+                    }));
+                  }
+                });
+            }
+            function update() {
+                var show = !editor.session.getValue().length;
+                var node =  editor.renderer.emptyMessageNode;
+                if (!show && node) {
+                    editor.renderer.scroller.removeChild(editor.renderer.emptyMessageNode);
+                    editor.renderer.emptyMessageNode = null;
+                }
+                else if (show && !node) {
+                    node = editor.renderer.emptyMessageNode = document.createElement('div');
+                    node.innerHTML = editor.container.attributes['placeholder'].value.replace('\n', '<br>');
+                    node.className = 'ace_invisible ace_emptyMessage';
+                    node.style.padding = '0 9px';
+                    editor.renderer.scroller.appendChild(node);
+                }
+            }
+            editor.on('input', update);
+            setTimeout(update, 100);
+          }
+        };
+      }
+    }]
+  };
+}];
+
+},{}],297:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -71420,7 +74617,7 @@ module.exports = function() {
   };
 };
 
-},{}],257:[function(_dereq_,module,exports){
+},{}],298:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -71442,6 +74639,7 @@ module.exports = function() {
         $element,
         FormioScope
       ) {
+        $scope.options = $scope.options || {};
         $scope._src = $scope.src || '';
         $scope.formioAlerts = [];
         // Shows the given alerts (single or array), and dismisses old alerts
@@ -71475,7 +74673,7 @@ module.exports = function() {
   };
 };
 
-},{}],258:[function(_dereq_,module,exports){
+},{}],299:[function(_dereq_,module,exports){
 "use strict";
 var isNaN = _dereq_('lodash/isNAN');
 var isFinite = _dereq_('lodash/isFinite');
@@ -71495,6 +74693,7 @@ module.exports = function() {
       hideComponents: '=?',
       disableComponents: '=?',
       formioOptions: '=?',
+      options: '=?',
       storage: '=?'
     },
     link: function(scope, element) {
@@ -71546,6 +74745,8 @@ module.exports = function() {
         $http,
         $timeout
       ) {
+        $scope.options = $scope.options || {};
+        $scope.baseUrl = $scope.options.baseurl || Formio.getBaseUrl();
         var session = ($scope.storage && !$scope.readOnly) ? localStorage.getItem($scope.storage) : false;
         if (session) {
           session = angular.fromJson(session);
@@ -71612,7 +74813,7 @@ module.exports = function() {
         };
 
         if (!$scope.form && $scope.src) {
-          (new Formio($scope.src)).loadForm().then(function(form) {
+          (new Formio($scope.src, {base: $scope.baseUrl})).loadForm().then(function(form) {
             $scope.form = form;
             if (!$scope.wizardLoaded) {
               showPage();
@@ -71921,6 +75122,17 @@ module.exports = function() {
 
         // Move onto the previous page.
         $scope.prev = function() {
+          var errors = $scope.checkErrors();
+          if (errors) {
+            $scope.pageHasErrors[$scope.currentPage] = true;
+            if (!$scope.formioOptions.wizardFreeNavigation) {
+              return;
+            }
+          }
+          else {
+            $scope.pageHasErrors[$scope.currentPage] = false;
+          }
+
           var prev = $scope.history.pop();
           $scope.currentPage = prev;
           FormioUtils.alter('prevPage', $scope, function(err) {
@@ -71974,10 +75186,7 @@ module.exports = function() {
               if (!$scope.hasTitles && component.title) {
                 $scope.hasTitles = true;
               }
-              if (component.customConditional) {
-                hasConditionalPages = true;
-              }
-              else if (component.conditional && component.conditional.when) {
+              if (FormioUtils.hasCondition(component)) {
                 hasConditionalPages = true;
               }
               // Make sure this page is not in the hide compoenents array.
@@ -72039,7 +75248,7 @@ module.exports = function() {
             }
             var formUrl = form.project ? '/project/' + form.project : '';
             formUrl += '/form/' + form._id;
-            $scope.formio = new Formio(formUrl);
+            $scope.formio = new Formio(formUrl, {base: $scope.baseUrl});
             setForm(form);
           });
         }
@@ -72049,21 +75258,21 @@ module.exports = function() {
 
         // Load the form.
         if ($scope.src) {
-          $scope.formio = new Formio($scope.src);
+          $scope.formio = new Formio($scope.src, {base: $scope.baseUrl});
           $scope.formio.loadForm().then(function(form) {
             setForm(form);
           });
         }
         else {
           $scope.src = '';
-          $scope.formio = new Formio($scope.src);
+          $scope.formio = new Formio($scope.src, {base: $scope.baseUrl});
         }
       }
     ]
   };
 };
 
-},{"lodash/isFinite":187,"lodash/isNAN":190}],259:[function(_dereq_,module,exports){
+},{"lodash/isFinite":217,"lodash/isNAN":220}],300:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -72178,8 +75387,9 @@ module.exports = [
           }, this.onError($scope));
         }.bind(this);
 
+        var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
         if ($scope._src) {
-          loader = new Formio($scope._src);
+          loader = new Formio($scope._src, {base: baseUrl});
           if (options.form) {
             $scope.setLoading(true);
 
@@ -72219,7 +75429,7 @@ module.exports = [
         else {
           // If they provide a url to the form, we still need to create it but tell it to not submit.
           if ($scope.url) {
-            loader = new Formio($scope.url);
+            loader = new Formio($scope.url, {base: baseUrl});
             loader.noSubmit = true;
           }
 
@@ -72246,7 +75456,7 @@ module.exports = [
   }
 ];
 
-},{}],260:[function(_dereq_,module,exports){
+},{}],301:[function(_dereq_,module,exports){
 "use strict";
 var formioUtils = _dereq_('formiojs/utils');
 var _filter = _dereq_('lodash/filter');
@@ -72265,6 +75475,9 @@ module.exports = function() {
 
       (function next(err, previous) {
         if (err) {
+          if (typeof err === 'string') {
+            err = {alerts: {type: 'danger', message: '{"data": "' + err + '"}'}};
+          }
           err.item = previous;
           return done ? done(err) : null;
         }
@@ -72393,7 +75606,7 @@ module.exports = function() {
         }
 
         // If there is a default value and it is not an array, wrap the value.
-        if (component.multiple && typeof component.defaultValue === 'string') {
+        if (component.multiple && component.defaultValue && typeof component.defaultValue === 'string') {
           value = component.defaultValue.split(',');
         }
         else {
@@ -72517,34 +75730,10 @@ module.exports = function() {
       }
       /* eslint-enable max-depth */
     },
-    checkCalculated: function(component, submission, data) {
-      // Process calculated value stuff if present.
-      if (component.calculateValue) {
-        if (typeof component.calculateValue === 'string') {
-          try {
-            data[component.key] = eval('(function(data) { var value = [];' + component.calculateValue.toString() + '; return value; })(data)');
-          }
-          catch (e) {
-            /* eslint-disable no-console */
-            console.warn('An error occurred calculating a value for ' + component.key, e);
-            /* eslint-enable no-console */
-          }
-        }
-        else {
-          try {
-            data[component.key] = formioUtils.jsonLogic.apply(component.calculateValue, {
-              data: submission ? submission.data : data,
-              row: data
-            });
-          }
-          catch (e) {
-            /* eslint-disable no-console */
-            console.warn('An error occurred calculating a value for ' + component.key, e);
-            /* eslint-enable no-console */
-          }
-        }
-      }
-    },
+    parseFloat: formioUtils.parseFloat,
+    formatAsCurrency: formioUtils.formatAsCurrency,
+    checkCalculated: formioUtils.checkCalculated,
+    escapeRegExCharacters: formioUtils.escapeRegExCharacters,
     checkVisible: function(component, row, data) {
       var visible = formioUtils.checkCondition(component, row, data);
       if (!visible) {
@@ -72573,6 +75762,7 @@ module.exports = function() {
     getComponent: formioUtils.getComponent,
     getValue: formioUtils.getValue,
     jsonLogic: formioUtils.jsonLogic,
+    hasCondition: formioUtils.hasCondition,
     hideFields: function(form, components) {
       this.eachComponent(form.components, function(component) {
         for (var i in components) {
@@ -72652,7 +75842,7 @@ module.exports = function() {
   };
 };
 
-},{"formiojs/utils":32,"lodash/filter":178,"lodash/get":179}],261:[function(_dereq_,module,exports){
+},{"formiojs/utils":36,"lodash/filter":207,"lodash/get":208}],302:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   var generic = function(data, component) {
@@ -72778,7 +75968,7 @@ module.exports = function() {
   };
 };
 
-},{}],262:[function(_dereq_,module,exports){
+},{}],303:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$q',
@@ -72827,7 +76017,7 @@ module.exports = [
   }
 ];
 
-},{}],263:[function(_dereq_,module,exports){
+},{}],304:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -72861,7 +76051,7 @@ module.exports = [
   }
 ];
 
-},{}],264:[function(_dereq_,module,exports){
+},{}],305:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'FormioUtils',
@@ -72870,7 +76060,7 @@ module.exports = [
   }
 ];
 
-},{}],265:[function(_dereq_,module,exports){
+},{}],306:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$sce',
@@ -72883,7 +76073,7 @@ module.exports = [
   }
 ];
 
-},{}],266:[function(_dereq_,module,exports){
+},{}],307:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   function() {
@@ -72902,7 +76092,7 @@ module.exports = [
   }
 ];
 
-},{}],267:[function(_dereq_,module,exports){
+},{}],308:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'formioTableView',
@@ -72915,7 +76105,7 @@ module.exports = [
   }
 ];
 
-},{}],268:[function(_dereq_,module,exports){
+},{}],309:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -72930,7 +76120,7 @@ module.exports = [
   }
 ];
 
-},{}],269:[function(_dereq_,module,exports){
+},{}],310:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$filter',
@@ -72979,7 +76169,7 @@ module.exports = [
   }
 ];
 
-},{}],270:[function(_dereq_,module,exports){
+},{}],311:[function(_dereq_,module,exports){
 "use strict";
 module.exports = ['$sce', function($sce) {
   return function(val) {
@@ -72987,7 +76177,7 @@ module.exports = ['$sce', function($sce) {
   };
 }];
 
-},{}],271:[function(_dereq_,module,exports){
+},{}],312:[function(_dereq_,module,exports){
 "use strict";
 _dereq_('angular-ui-mask/dist/mask');
 _dereq_('ui-select/dist/select');
@@ -72997,11 +76187,13 @@ _dereq_('angular-file-saver');
 _dereq_('ng-file-upload');
 _dereq_('bootstrap');
 _dereq_('angular-ui-bootstrap');
+_dereq_('angular-ckeditor');
 _dereq_('bootstrap-ui-datetime-picker/dist/datetime-picker');
 _dereq_('ng-dialog');
+_dereq_('angular-ui-ace/src/ui-ace');
 _dereq_('./formio');
 
-},{"./formio":272,"angular-file-saver":1,"angular-moment":2,"angular-sanitize":4,"angular-ui-bootstrap":6,"angular-ui-mask/dist/mask":7,"bootstrap":11,"bootstrap-ui-datetime-picker/dist/datetime-picker":10,"ng-dialog":206,"ng-file-upload":208,"ui-select/dist/select":211}],272:[function(_dereq_,module,exports){
+},{"./formio":313,"angular-ckeditor":1,"angular-file-saver":2,"angular-moment":3,"angular-sanitize":5,"angular-ui-ace/src/ui-ace":6,"angular-ui-bootstrap":8,"angular-ui-mask/dist/mask":9,"bootstrap":13,"bootstrap-ui-datetime-picker/dist/datetime-picker":12,"ng-dialog":246,"ng-file-upload":248,"ui-select/dist/select":251}],313:[function(_dereq_,module,exports){
 "use strict";
 _dereq_('./polyfills/polyfills');
 
@@ -73015,7 +76207,9 @@ var app = angular.module('formio', [
   'angularMoment',
   'ngDialog',
   'ngFileUpload',
-  'ngFileSaver'
+  'ngFileSaver',
+  'ui.ace',
+  'ckeditor'
 ]);
 
 /**
@@ -73055,6 +76249,8 @@ app.directive('formioElement', _dereq_('./directives/formioElement'));
 app.directive('formioWizard', _dereq_('./directives/formioWizard'));
 
 app.directive('formioBindHtml', _dereq_('./directives/formioBindHtml.js'));
+
+app.directive('formioScriptEditor', _dereq_('./directives/formioScriptEditor'));
 
 /**
  * Filter to flatten form components.
@@ -73112,11 +76308,11 @@ app.run([
 
     // The template for the formio forms.
     $templateCache.put('formio.html',
-      "<div>\n  <i style=\"font-size: 2em;\" ng-if=\"formLoading\" ng-class=\"{'formio-hidden': !formLoading}\" class=\"formio-loading glyphicon glyphicon-refresh glyphicon-spin\"></i>\n  <formio-wizard ng-if=\"form.display === 'wizard'\" src=\"src\" form=\"form\" submission=\"submission\" form-action=\"formAction\" read-only=\"readOnly\" hide-components=\"hideComponents\" disable-components=\"disableComponents\" formio-options=\"formioOptions\" storage=\"form.name\"></formio-wizard>\n  <div ng-if=\"form.display === 'pdf' && form.settings.pdf\" style=\"position:relative;\">\n    <span style=\"position:absolute;right:10px;top:10px;cursor:pointer;\" class=\"btn btn-default no-disable\" ng-click=\"zoomIn()\"><spann class=\"glyphicon glyphicon-zoom-in\"></spann></span>\n    <span style=\"position:absolute;right:10px;top:60px;cursor:pointer;\" class=\"btn btn-default no-disable\" ng-click=\"zoomOut()\"><span class=\"glyphicon glyphicon-zoom-out\"></span></span>\n    <a ng-if=\"downloadUrl\" style=\"position:absolute;right:10px;top:110px;cursor:pointer;\" class=\"btn btn-primary no-disable\" href=\"{{ downloadUrl | trustAsResourceUrl }}\" target=\"_blank\"><span class=\"glyphicon glyphicon-cloud-download\"></span></a>\n    <iframe src=\"{{ getIframeSrc(form.settings.pdf) | trustAsResourceUrl }}\" seamless class=\"formio-iframe\"></iframe>\n    <button ng-if=\"!readOnly && !form.builder\" type=\"button\" class=\"btn btn-primary\" ng-click=\"submitIFrameForm()\">Submit</button>\n  </div>\n  <form ng-if=\"!form.display || (form.display === 'form')\" role=\"form\" name=\"formioForm\" ng-submit=\"onSubmit(formioForm)\" novalidate>\n    <div ng-repeat=\"alert in formioAlerts track by $index\" class=\"alert alert-{{ alert.type }}\" role=\"alert\" ng-if=\"::!builder\">\n      {{ alert.message | formioTranslate:null:builder }}\n    </div>\n    <!-- DO NOT PUT \"track by $index\" HERE SINCE DYNAMICALLY ADDING/REMOVING COMPONENTS WILL BREAK -->\n    <formio-component\n      ng-repeat=\"component in form.components track by $index\"\n      component=\"component\"\n      ng-if=\"builder ? '::true' : isVisible(component)\"\n      data=\"submission.data\"\n      formio-form=\"formioForm\"\n      formio=\"formio\"\n      submission=\"submission\"\n      hide-components=\"hideComponents\"\n      read-only=\"isDisabled(component, submission.data)\"\n      builder=\"builder\"\n    ></formio-component>\n  </form>\n</div>\n"
+      "<div>\n  <i style=\"font-size: 2em;\" ng-if=\"formLoading\" ng-class=\"{'formio-hidden': !formLoading}\" class=\"formio-loading glyphicon glyphicon-refresh glyphicon-spin\"></i>\n  <formio-wizard ng-if=\"form.display === 'wizard'\" src=\"src\" url=\"url\" form=\"form\" submission=\"submission\" form-action=\"formAction\" read-only=\"readOnly\" hide-components=\"hideComponents\" disable-components=\"disableComponents\" formio-options=\"formioOptions\" storage=\"form.name\"></formio-wizard>\n  <div ng-if=\"form.display === 'pdf' && form.settings.pdf\" style=\"position:relative;\">\n    <span style=\"position:absolute;right:10px;top:10px;cursor:pointer;\" class=\"btn btn-default no-disable\" ng-click=\"zoomIn()\"><spann class=\"glyphicon glyphicon-zoom-in\"></spann></span>\n    <span style=\"position:absolute;right:10px;top:60px;cursor:pointer;\" class=\"btn btn-default no-disable\" ng-click=\"zoomOut()\"><span class=\"glyphicon glyphicon-zoom-out\"></span></span>\n    <a ng-if=\"downloadUrl\" style=\"position:absolute;right:10px;top:110px;cursor:pointer;\" class=\"no-disable\" href=\"{{ downloadUrl | trustAsResourceUrl }}\" target=\"_blank\"><img ng-src=\"{{ pdfImage }}\" style=\"width:3em;\" /></a>\n    <iframe ng-src=\"{{ getIframeSrc(form.settings.pdf) | trustAsResourceUrl }}\" seamless class=\"formio-iframe\"></iframe>\n    <button ng-if=\"!readOnly && !form.builder\" type=\"button\" class=\"btn btn-primary\" ng-click=\"submitIFrameForm()\">Submit</button>\n  </div>\n  <form ng-if=\"!form.display || (form.display === 'form')\" role=\"form\" name=\"formioForm\" ng-submit=\"onSubmit(formioForm)\" novalidate>\n    <div ng-repeat=\"alert in formioAlerts track by $index\" class=\"alert alert-{{ alert.type }}\" role=\"alert\" ng-if=\"::!builder\">\n      {{ alert.message | formioTranslate:null:builder }}\n    </div>\n    <a ng-if=\"downloadUrl && form.settings.pdf.id\" class=\"pull-right no-disable\" href=\"{{ downloadUrl | trustAsResourceUrl }}\" target=\"_blank\"><img ng-src=\"{{ pdfImage }}\" style=\"width:3em;\" /></a>\n    <!-- DO NOT PUT \"track by $index\" HERE SINCE DYNAMICALLY ADDING/REMOVING COMPONENTS WILL BREAK -->\n    <formio-component\n      ng-repeat=\"component in form.components track by $index\"\n      component=\"component\"\n      ng-if=\"builder ? '::true' : isVisible(component)\"\n      data=\"submission.data\"\n      formio-form=\"formioForm\"\n      formio=\"formio\"\n      submission=\"submission\"\n      hide-components=\"hideComponents\"\n      read-only=\"isDisabled(component, submission.data)\"\n      builder=\"builder\"\n      options=\"options\"\n    ></formio-component>\n  </form>\n</div>\n"
     );
 
     $templateCache.put('formio-wizard.html',
-      "<div class=\"formio-wizard-wrapper\">\n  <div class=\"row bs-wizard\" style=\"border-bottom:0;\" ng-class=\"{hasTitles: hasTitles}\" ng-if=\"activePage.breadcrumb !== 'none'\">\n    <div ng-class=\"{disabled: ($index > currentPage) && !formioOptions.wizardFreeNavigation, active: ($index == currentPage), complete: ($index < currentPage), noTitle: !page.title}\" class=\"{{ colclass }} bs-wizard-step\" ng-repeat=\"page in pages track by $index\">\n      <div class=\"bs-wizard-stepnum-wrapper\">\n        <div class=\"text-center bs-wizard-stepnum\" ng-if=\"page.title\">{{ page.title }}</div>\n      </div>\n      <div class=\"progress\"><div class=\"progress-bar progress-bar-primary\"></div></div>\n      <a ng-click=\"goto($index)\" class=\"bs-wizard-dot bg-primary\"><div class=\"bs-wizard-dot-inner\"\n        ng-class=\"{\n          'bg-success': !pageHasErrors[$index],\n          'bg-danger': pageHasErrors[$index],\n          'bg-warning': !pageWasVisited[$index] && currentPage > $index\n        }\"></div></a>\n    </div>\n  </div>\n  <style type=\"text/css\">.bs-wizard > .bs-wizard-step:first-child { margin-left: {{ margin }}%; }</style>\n  <i ng-show=\"!wizardLoaded\" id=\"formio-loading\" style=\"font-size: 2em;\" class=\"glyphicon glyphicon-refresh glyphicon-spin\"></i>\n  <div ng-repeat=\"alert in formioAlerts track by $index\" class=\"alert alert-{{ alert.type }}\" role=\"alert\">{{ alert.message | formioTranslate:null:builder }}</div>\n  <div class=\"formio-wizard\">\n    <formio\n      ng-if=\"wizardLoaded\"\n      submission=\"submission\"\n      form=\"page\"\n      url=\"url\"\n      read-only=\"readOnly\"\n      hide-components=\"hideComponents\"\n      disable-components=\"disableComponents\"\n      formio-options=\"formioOptions\"\n      id=\"formio-wizard-form\"\n    ></formio>\n  </div>\n  <ul ng-show=\"wizardLoaded\" class=\"list-inline\">\n    <li><a class=\"btn btn-default\" ng-click=\"cancel()\">Cancel</a></li>\n    <li ng-if=\"currentPage > 0\"><a class=\"btn btn-primary\" ng-click=\"prev()\">Previous</a></li>\n    <li ng-if=\"currentPage < (pages.length - 1)\">\n      <a class=\"btn btn-primary\" ng-click=\"next()\">Next</a>\n    </li>\n    <li ng-if=\"currentPage >= (pages.length - 1)\">\n      <a class=\"btn btn-primary\" ng-click=\"submit()\">Submit Form</a>\n    </li>\n  </ul>\n</div>\n"
+      "<div class=\"formio-wizard-wrapper\">\n  <div class=\"row bs-wizard\" style=\"border-bottom:0;\" ng-class=\"{hasTitles: hasTitles}\" ng-if=\"activePage.breadcrumb !== 'none'\">\n    <div ng-class=\"{disabled: ($index > currentPage) && !formioOptions.wizardFreeNavigation, active: ($index == currentPage), complete: ($index < currentPage), noTitle: !page.title}\" class=\"{{ colclass }} bs-wizard-step\" ng-repeat=\"page in pages track by $index\">\n      <div class=\"bs-wizard-stepnum-wrapper\">\n        <div class=\"text-center bs-wizard-stepnum\" ng-if=\"page.title\">{{ page.title }}</div>\n      </div>\n      <div class=\"progress\"><div class=\"progress-bar progress-bar-primary\"></div></div>\n      <a ng-click=\"goto($index)\" class=\"bs-wizard-dot bg-primary\"><div class=\"bs-wizard-dot-inner\"\n        ng-class=\"{\n          'bg-success': !pageHasErrors[$index],\n          'bg-danger': pageHasErrors[$index],\n          'bg-warning': !pageWasVisited[$index] && currentPage > $index\n        }\"></div></a>\n    </div>\n  </div>\n  <style type=\"text/css\">.bs-wizard > .bs-wizard-step:first-child { margin-left: {{ margin }}%; }</style>\n  <i ng-show=\"!wizardLoaded\" id=\"formio-loading\" style=\"font-size: 2em;\" class=\"glyphicon glyphicon-refresh glyphicon-spin\"></i>\n  <div ng-repeat=\"alert in formioAlerts track by $index\" class=\"alert alert-{{ alert.type }}\" role=\"alert\">{{ alert.message | formioTranslate:null:builder }}</div>\n  <div class=\"formio-wizard\">\n    <formio\n      ng-if=\"wizardLoaded\"\n      submission=\"submission\"\n      form=\"page\"\n      url=\"url\"\n      read-only=\"readOnly\"\n      hide-components=\"hideComponents\"\n      disable-components=\"disableComponents\"\n      formio-options=\"formioOptions\"\n      id=\"formio-wizard-form\"\n      options=\"options\"\n    ></formio>\n  </div>\n  <ul ng-show=\"wizardLoaded\" class=\"list-inline\">\n    <li><a class=\"btn btn-default\" ng-click=\"cancel()\">Cancel</a></li>\n    <li ng-if=\"currentPage > 0\"><a class=\"btn btn-primary\" ng-click=\"prev()\">Previous</a></li>\n    <li ng-if=\"currentPage < (pages.length - 1)\">\n      <a class=\"btn btn-primary\" ng-click=\"next()\">Next</a>\n    </li>\n    <li ng-if=\"currentPage >= (pages.length - 1)\">\n      <a class=\"btn btn-primary\" ng-click=\"submit()\">Submit Form</a>\n    </li>\n  </ul>\n</div>\n"
     );
 
     $templateCache.put('formio-delete.html',
@@ -73145,14 +76341,14 @@ app.run([
     );
 
     $templateCache.put('formio/errors.html',
-      "<div ng-show=\"formioForm[componentId].$error && !formioForm[componentId].$pristine\">\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.email\">{{ component.label || component.placeholder || component.key }} {{'must be a valid email' | formioTranslate:null:builder}}.</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.required\">{{ component.label || component.placeholder || component.key }} {{'is required' | formioTranslate:null:builder}}.</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.number\">{{ component.label || component.placeholder || component.key }} {{'must be a number' | formioTranslate:null:builder}}.</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.maxlength\">{{ component.label || component.placeholder || component.key }} {{'must be shorter than' | formioTranslate:null:builder}} {{ component.validate.maxLength + 1 }} {{'characters' | formioTranslate:null:builder}}.</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.minlength\">{{ component.label || component.placeholder || component.key }} {{'must be longer than' | formioTranslate:null:builder}} {{ component.validate.minLength - 1 }} {{'characters' | formioTranslate:null:builder}}.</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.min\">{{ component.label || component.placeholder || component.key }} {{'must be greater than or equal to' | formioTranslate:null:builder}} {{ component.validate.min }}.</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.max\">{{ component.label || component.placeholder || component.key }} {{'must be less than or equal to' | formioTranslate:null:builder}} {{ component.validate.max }}.</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.custom\">{{ component.customError | formioTranslate }}</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.pattern\">{{ component.label || component.placeholder || component.key }} {{'does not match the pattern' | formioTranslate:null:builder}} {{ component.validate.pattern }}</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.day\">{{ component.label || component.placeholder || component.key }} {{'must be a valid date' | formioTranslate:null:builder}}.</p>\n</div>\n"
+      "<div ng-show=\"formioForm[componentId].$error && !formioForm[componentId].$pristine\">\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.email\">{{ component.errorLabel || component.label || component.placeholder || component.key }} {{'must be a valid email' | formioTranslate:null:builder}}.</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.required\">{{ component.errorLabel || component.label || component.placeholder || component.key }} {{'is required' | formioTranslate:null:builder}}.</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.number\">{{ component.errorLabel || component.label || component.placeholder || component.key }} {{'must be a number' | formioTranslate:null:builder}}.</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.maxlength\">{{ component.errorLabel || component.label || component.placeholder || component.key }} {{'must be shorter than' | formioTranslate:null:builder}} {{ component.validate.maxLength + 1 }} {{'characters' | formioTranslate:null:builder}}.</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.minlength\">{{ component.errorLabel || component.label || component.placeholder || component.key }} {{'must be longer than' | formioTranslate:null:builder}} {{ component.validate.minLength - 1 }} {{'characters' | formioTranslate:null:builder}}.</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.min\">{{ component.errorLabel || component.label || component.placeholder || component.key }} {{'must be greater than or equal to' | formioTranslate:null:builder}} {{ component.validate.min }}.</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.max\">{{ component.errorLabel || component.label || component.placeholder || component.key }} {{'must be less than or equal to' | formioTranslate:null:builder}} {{ component.validate.max }}.</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.custom\">{{ component.customError | formioTranslate }}</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.pattern\">{{ component.errorLabel || component.label || component.placeholder || component.key }} {{'does not match the pattern' | formioTranslate:null:builder}} {{ component.validate.pattern }}</p>\n  <p class=\"help-block\" ng-show=\"formioForm[componentId].$error.day\">{{ component.errorLabel || component.label || component.placeholder || component.key }} {{'must be a valid date' | formioTranslate:null:builder}}.</p>\n</div>\n"
     );
   }
 ]);
 
 _dereq_('./components');
 
-},{"./components":231,"./directives/customValidator":248,"./directives/formio":249,"./directives/formioBindHtml.js":250,"./directives/formioComponent":251,"./directives/formioComponentView":252,"./directives/formioDelete":253,"./directives/formioElement":254,"./directives/formioErrors":255,"./directives/formioSubmission":256,"./directives/formioSubmissions":257,"./directives/formioWizard":258,"./factories/FormioScope":259,"./factories/FormioUtils":260,"./factories/formioInterceptor":262,"./factories/formioTableView":263,"./filters/flattenComponents":264,"./filters/safehtml":265,"./filters/tableComponents":266,"./filters/tableFieldView":267,"./filters/tableView":268,"./filters/translate":269,"./filters/trusturl":270,"./polyfills/polyfills":274,"./providers/Formio":275}],273:[function(_dereq_,module,exports){
+},{"./components":271,"./directives/customValidator":288,"./directives/formio":289,"./directives/formioBindHtml.js":290,"./directives/formioComponent":291,"./directives/formioComponentView":292,"./directives/formioDelete":293,"./directives/formioElement":294,"./directives/formioErrors":295,"./directives/formioScriptEditor":296,"./directives/formioSubmission":297,"./directives/formioSubmissions":298,"./directives/formioWizard":299,"./factories/FormioScope":300,"./factories/FormioUtils":301,"./factories/formioInterceptor":303,"./factories/formioTableView":304,"./filters/flattenComponents":305,"./filters/safehtml":306,"./filters/tableComponents":307,"./filters/tableFieldView":308,"./filters/tableView":309,"./filters/translate":310,"./filters/trusturl":311,"./polyfills/polyfills":315,"./providers/Formio":316}],314:[function(_dereq_,module,exports){
 "use strict";
 'use strict';
 
@@ -73183,13 +76379,13 @@ if (typeof Object.assign != 'function') {
   })();
 }
 
-},{}],274:[function(_dereq_,module,exports){
+},{}],315:[function(_dereq_,module,exports){
 "use strict";
 'use strict';
 
 _dereq_('./Object.assign');
 
-},{"./Object.assign":273}],275:[function(_dereq_,module,exports){
+},{"./Object.assign":314}],316:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   // The formio class.
@@ -73259,5 +76455,5 @@ module.exports = function() {
   };
 };
 
-},{"formiojs":25}]},{},[271])(271)
+},{"formiojs":28}]},{},[312])(312)
 });

@@ -19,7 +19,7 @@ module.exports = function(app) {
           disableOnInvalid: false,
           theme: 'primary'
         },
-        controller: ['$scope', function($scope) {
+        controller: ['$scope', 'FormioUtils', function($scope, FormioUtils) {
           if ($scope.builder) return;
           var settings = $scope.component;
           $scope.getButtonType = function() {
@@ -29,9 +29,28 @@ module.exports = function(app) {
               case 'reset':
                 return 'reset';
               case 'event':
+              case 'custom':
               case 'oauth':
               default:
                 return 'button';
+            }
+          };
+
+          var onCustom = function() {
+            try {
+              /* eslint-disable no-unused-vars */
+              var parent = $scope.$parent;
+              while (!parent.form) {
+                parent = parent.$parent;
+              }
+              var components = FormioUtils.flattenComponents(parent.form.components, true);
+              /* eslint-enable no-unused-vars */
+              eval('(function(data) { ' + $scope.component.custom + ' })($scope.data)');
+            }
+            catch (e) {
+              /* eslint-disable no-console */
+              console.warn('An error occurred evaluating custom logic for ' + $scope.component.key, e);
+              /* eslint-enable no-console */
             }
           };
 
@@ -41,6 +60,9 @@ module.exports = function(app) {
                 return;
               case 'event':
                 $scope.$emit($scope.component.event, $scope.data);
+                break;
+              case 'custom':
+                onCustom();
                 break;
               case 'reset':
                 $scope.resetForm();

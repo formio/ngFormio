@@ -15,6 +15,9 @@ module.exports = function() {
 
       (function next(err, previous) {
         if (err) {
+          if (typeof err === 'string') {
+            err = {alerts: {type: 'danger', message: '{"data": "' + err + '"}'}};
+          }
           err.item = previous;
           return done ? done(err) : null;
         }
@@ -143,7 +146,7 @@ module.exports = function() {
         }
 
         // If there is a default value and it is not an array, wrap the value.
-        if (component.multiple && typeof component.defaultValue === 'string') {
+        if (component.multiple && component.defaultValue && typeof component.defaultValue === 'string') {
           value = component.defaultValue.split(',');
         }
         else {
@@ -267,34 +270,10 @@ module.exports = function() {
       }
       /* eslint-enable max-depth */
     },
-    checkCalculated: function(component, submission, data) {
-      // Process calculated value stuff if present.
-      if (component.calculateValue) {
-        if (typeof component.calculateValue === 'string') {
-          try {
-            data[component.key] = eval('(function(data) { var value = [];' + component.calculateValue.toString() + '; return value; })(data)');
-          }
-          catch (e) {
-            /* eslint-disable no-console */
-            console.warn('An error occurred calculating a value for ' + component.key, e);
-            /* eslint-enable no-console */
-          }
-        }
-        else {
-          try {
-            data[component.key] = formioUtils.jsonLogic.apply(component.calculateValue, {
-              data: submission ? submission.data : data,
-              row: data
-            });
-          }
-          catch (e) {
-            /* eslint-disable no-console */
-            console.warn('An error occurred calculating a value for ' + component.key, e);
-            /* eslint-enable no-console */
-          }
-        }
-      }
-    },
+    parseFloat: formioUtils.parseFloat,
+    formatAsCurrency: formioUtils.formatAsCurrency,
+    checkCalculated: formioUtils.checkCalculated,
+    escapeRegExCharacters: formioUtils.escapeRegExCharacters,
     checkVisible: function(component, row, data) {
       var visible = formioUtils.checkCondition(component, row, data);
       if (!visible) {
@@ -323,6 +302,7 @@ module.exports = function() {
     getComponent: formioUtils.getComponent,
     getValue: formioUtils.getValue,
     jsonLogic: formioUtils.jsonLogic,
+    hasCondition: formioUtils.hasCondition,
     hideFields: function(form, components) {
       this.eachComponent(form.components, function(component) {
         for (var i in components) {

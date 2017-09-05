@@ -10,7 +10,9 @@ var app = angular.module('formio', [
   'angularMoment',
   'ngDialog',
   'ngFileUpload',
-  'ngFileSaver'
+  'ngFileSaver',
+  'ui.ace',
+  'ckeditor'
 ]);
 
 /**
@@ -50,6 +52,8 @@ app.directive('formioElement', require('./directives/formioElement'));
 app.directive('formioWizard', require('./directives/formioWizard'));
 
 app.directive('formioBindHtml', require('./directives/formioBindHtml.js'));
+
+app.directive('formioScriptEditor', require('./directives/formioScriptEditor'));
 
 /**
  * Filter to flatten form components.

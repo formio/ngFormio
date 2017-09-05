@@ -138,6 +138,7 @@ module.exports = function(app) {
           '$scope',
           '$http',
           'Formio',
+          'FormioUtils',
           '$interpolate',
           '$q',
           '$timeout',
@@ -146,6 +147,7 @@ module.exports = function(app) {
             $scope,
             $http,
             Formio,
+            FormioUtils,
             $interpolate,
             $q,
             $timeout
@@ -385,15 +387,22 @@ module.exports = function(app) {
                 break;
               case 'url':
               case 'resource':
+                if (settings.filter === 'contains' || settings.filter === 'startsWith') {
+                  settings.filter = '';
+                  $scope.component.filter = '';
+                }
+                $scope.options = $scope.options || {};
                 var url = '';
+                var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
+                //var baseUrl = Formio.getBaseUrl();
                 if (settings.dataSrc === 'url') {
                   url = settings.data.url;
                   if (url.substr(0, 1) === '/') {
-                    url = Formio.getBaseUrl() + settings.data.url;
+                    url = baseUrl + settings.data.url;
                   }
 
                   // Disable auth for outgoing requests.
-                  if (!settings.authenticate && url.indexOf(Formio.getBaseUrl()) === -1) {
+                  if (!settings.authenticate && url.indexOf(baseUrl) === -1) {
                     options.disableJWT = true;
                     options.headers = options.headers || {};
                     options.headers.Authorization = undefined;
@@ -402,7 +411,7 @@ module.exports = function(app) {
                   }
                 }
                 else {
-                  url = Formio.getBaseUrl();
+                  url = baseUrl;
                   if (settings.data.project) {
                     url += '/project/' + settings.data.project;
                   }
@@ -453,20 +462,23 @@ module.exports = function(app) {
                       (typeof input === 'string') &&
                       input
                     ) {
-                      options.params[encodeURIComponent(settings.searchField)] = encodeURIComponent(input);
+                      options.params[settings.searchField] = /__regex$/.test(settings.searchField)
+                        ? FormioUtils.escapeRegExCharacters(input)
+                        : input;
                     }
                     else {
-                      delete options.params[encodeURIComponent(settings.searchField)];
+                      delete options.params[settings.searchField];
                     }
 
                     // Add the other filter.
                     if (settings.filter) {
-                      var filter = $interpolate(settings.filter)({
-                        data: $scope.submission ? $scope.submission.data : {},
-                        row: $scope.data
-                      });
                       // This changes 'a=b&c=d' into an object and assigns to params.
-                      _assign(options.params, JSON.parse('{"' + decodeURI(filter).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}'));
+                      _assign(options.params, _.mapValues(JSON.parse('{"' + decodeURI(settings.filter).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}'), function(value) {
+                        return $interpolate(value)({
+                          data: $scope.submission ? $scope.submission.data : {},
+                          row: $scope.data
+                        });
+                      }));
                     }
 
                     // If they wish to return only some fields.

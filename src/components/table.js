@@ -10,6 +10,7 @@ module.exports = function(app) {
         template: 'formio/components/table.html',
         group: 'layout',
         settings: {
+          clearOnHide: false,
           input: false,
           key: 'table',
           numRows: 3,

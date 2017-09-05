@@ -10,6 +10,7 @@ module.exports = function(app) {
         template: 'formio/components/columns.html',
         group: 'layout',
         settings: {
+          clearOnHide: false,
           input: false,
           tableView: false,
           key: 'columns',

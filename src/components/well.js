@@ -10,6 +10,7 @@ module.exports = function(app) {
         template: 'formio/components/well.html',
         group: 'layout',
         settings: {
+          clearOnHide: false,
           key: 'well',
           input: false,
           components: [],

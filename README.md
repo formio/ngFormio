@@ -34,20 +34,20 @@ cases.
   - <strong>Usage:</strong> Use this installation if your application does not already have Angular and jQuery and you wish to display a single form on a page.
   - <strong>Installation:</strong>  Place the following within your application.
   
-    ```  
+```  
 <link rel="stylesheet" href="https://rawgit.com/formio/ngFormio/master/dist/formio-full.min.css" />
 <script src="https://rawgit.com/formio/ngFormio/master/dist/formio-full.min.js"></script>
-    ```
+```
     
 **Complete Installation**
   - <strong>Includes:</strong> Everything except Angular.js and jQuery
   - <strong>Usage:</strong> Use this if you are embedding a form within an application that already has Angular.js and jQuery installed.
   - <strong>Installation:</strong> Place the following within your application.
   
-    ```
+```
 <link rel="stylesheet" href="https://rawgit.com/formio/ngFormio/master/dist/formio-complete.min.css" />
 <script src="https://rawgit.com/formio/ngFormio/master/dist/formio-complete.min.js"></script>
-    ```
+```
     
 **Basic Installation: (Bower Installation)**
   - <strong>Includes:</strong> Only the ngFormio renderer library with no dependencies.
@@ -56,33 +56,33 @@ cases.
   
     First install the dependency using <strong>Bower</strong>
     
-    ```
+```
 bower install --save ng-formio
-    ```
+```
     
-    Then, you can add the following to your application.
+Then, you can add the following to your application.
   
-    ```
-    <html>
-    <head>
-      <!-- bower:css -->
-      <!-- endbower -->
-    </head>
-    <body>
-      <!-- bower:js -->
-      <!-- endbower -->
-    </body>
-    </html>
-    ```
+```
+<html>
+  <head>
+    <!-- bower:css -->
+    <!-- endbower -->
+  </head>
+  <body>
+    <!-- bower:js -->
+    <!-- endbower -->
+  </body>
+</html>
+```
     
-    Then run Wiredep to wire it up.
+Then run Wiredep to wire it up.
     
-    ```
+```
 $ node
 > require('wiredep')({ src: 'index.html' });
-    ```
+```
     
-    We also recommend using this within a [Gulp](http://gulpjs.com/) build process using Wiredep in combination with [Gulp UseRef](https://github.com/jonkemp/gulp-useref).
+We also recommend using this within a [Gulp](http://gulpjs.com/) build process using Wiredep in combination with [Gulp UseRef](https://github.com/jonkemp/gulp-useref).
     
 Configuration
 -----------------
