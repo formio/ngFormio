@@ -131,8 +131,40 @@ module.exports = [
           // Calculate value when data changes.
           if (!$scope.builder && ($scope.component.calculateValue || _get($scope.component, 'validate.json'))) {
             $scope.$watch('data', function() {
-              FormioUtils.checkCalculated($scope.component, $scope.submission, $scope.data);
-
+              if($scope.component.type !== "currency") {
+                FormioUtils.checkCalculated($scope.component, $scope.submission, $scope.data);
+              }
+              else{
+                var x = {};
+                for (var key in $scope.data) {
+                  if(typeof $scope.data[key] !== 'number') {
+                    x[key] = parseFloat($scope.data[key].replace(/,/g, ""));
+                  }
+                }
+                FormioUtils.checkCalculated($scope.component, $scope.submission,x);
+                var data = x[$scope.component.key].toString();
+                var point = data.indexOf('.');
+                if (point >= 0) {
+                  data = data.slice(0, point + 3);
+                }
+                var str = data.split('.');
+                if (str[0].length >= 3) {
+                  str[0] = str[0].replace(/(\d)(?=(\d{3})+$)/g, '$1,');
+                }
+                if (str[1] === undefined) {
+                  str[1] = '';
+                }
+                else {
+                  str[1] = '.' + str[1];
+                }
+                var res = (str[0] + str[1]);
+                if(!(isNaN(x[$scope.component.key]))) {
+                  $scope.data[$scope.component.key] = res;
+                }
+                else {
+                  $scope[$scope.component.key] = '';
+                }
+              }
               // Process jsonLogic stuff if present.
               if (_get($scope.component, 'validate.json')) {
                 var input;
