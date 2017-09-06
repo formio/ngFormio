@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [UNRELEASED]
+
+## 2.22.3
+### Fixed
+ - Re-enable fix for select component.
+
+## 2.22.2
 ### Fixed
  - TextArea component in FormioSubmission directive.
  - Clearing value of the component which conditionally displayed from a Select component.
