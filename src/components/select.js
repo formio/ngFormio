@@ -271,7 +271,6 @@ module.exports = function(app) {
                   initialized.promise.then(function() {
                     dataWatch();
                     ensureValue();
-                    refreshValue();
                   });
                 }
               });
