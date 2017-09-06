@@ -47,6 +47,11 @@
   border: 1px solid red;
 }
 
+.errorButton button{
+  background-color: #F04124!important;
+  border-color: #F04124!important;
+}
+
 .form-control.btn-default {
   background-color: #fff;
 }

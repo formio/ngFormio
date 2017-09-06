@@ -1,4 +1,4 @@
-<div>
+<div id="google">
   <i style="font-size: 2em;" ng-if="formLoading" ng-class="{'formio-hidden': !formLoading}" class="formio-loading glyphicon glyphicon-refresh glyphicon-spin"></i>
   <formio-wizard ng-if="form.display === 'wizard'" src="src" url="url" form="form" submission="submission" form-action="formAction" read-only="readOnly" hide-components="hideComponents" disable-components="disableComponents" formio-options="formioOptions" storage="form.name"></formio-wizard>
   <div ng-if="form.display === 'pdf' && form.settings.pdf" style="position:relative;">
@@ -27,5 +27,9 @@
       builder="builder"
       options="options"
     ></formio-component>
+    <div ng-repeat="alert in formioAlerts track by $index" class="alert alert-{{ alert.type }}" role="alert" ng-if="::!builder">
+      {{ alert.message1 | formioTranslate:null:builder }}
+      <a onclick="scroll=window.scrollTo(0,0)">Top</a>
+    </div>
   </form>
 </div>
