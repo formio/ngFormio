@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [UNRELEASED]
 
+## 2.22.4
+### Fixed
+ - Submission handler crashes if no save submission action on form.
+
 ## 2.22.3
 ### Fixed
  - Re-enable fix for select component.
