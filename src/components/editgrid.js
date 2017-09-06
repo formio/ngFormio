@@ -100,6 +100,28 @@ module.exports = function(app) {
       link: function(scope, elem, attr, ctrl) {
         if (scope.builder) return;
 
+        // Add the control to the main form.
+        scope.formioForm.$addControl(ctrl);
+
+        ctrl.$validators.editgrid = function(modelValue, viewValue) {
+          if (scope.openRows && scope.openRows.length) {
+            return false;
+          }
+          return true;
+        };
+      }
+    }
+  });
+  app.directive('editgridRowValidation', function() {
+    return {
+      require: 'ngModel',
+      restrict: 'A',
+      link: function(scope, elem, attr, ctrl) {
+        if (scope.builder) return;
+
+        // Add the control to the main form.
+        scope.formioForm.$addControl(ctrl);
+
         var _get = function(item, path, def) {
           if (!item) {
             return def || undefined;
@@ -130,7 +152,7 @@ module.exports = function(app) {
           return undefined;
         };
 
-        ctrl.$validators.editgrid = function(modelValue, viewValue) {
+        ctrl.$validators.editgridrow = function(modelValue, viewValue) {
           var valid = true;
           /*eslint-disable no-unused-vars */
           if (scope.component.validate && scope.component.validate.row) {
@@ -138,7 +160,7 @@ module.exports = function(app) {
 
             // FOR-255 - Enable row data and form data to be visible in the validator.
             var data = scope.submission.data;
-            var row = scope.data;
+            var row = scope.row;
             /*eslint-enable no-unused-vars */
 
             var custom = scope.component.validate.row;
@@ -155,15 +177,10 @@ module.exports = function(app) {
             }
 
             if (valid !== true) {
-              scope.component.editGridError = valid;
               return false;
             }
           }
 
-          if (scope.openRows && scope.openRows.length) {
-            scope.component.editGridError = 'Please save all rows before proceeding.';
-            return false;
-          }
           return true;
         };
       }
