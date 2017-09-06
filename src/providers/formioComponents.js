@@ -1,4 +1,5 @@
 const app = angular.module('formio');
+
 export default app.provider('formioComponents', function() {
   var components = {};
   var groups = {
@@ -14,10 +15,21 @@ export default app.provider('formioComponents', function() {
   };
   return {
     addGroup: function(name, group) {
-      console.warn('formioComponents is deprecated');
+      groups[name] = group;
     },
     register: function(type, component, group) {
-      console.warn('formioComponents is deprecated');
+      if (!components[type]) {
+        components[type] = component;
+      }
+      else {
+        angular.extend(components[type], component);
+      }
+
+      // Set the type for this component.
+      if (!components[type].group) {
+        components[type].group = group || '__component';
+      }
+      components[type].settings.type = type;
     },
     $get: function() {
       console.warn('formioComponents is deprecated');

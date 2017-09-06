@@ -43,6 +43,42 @@ export default app.directive('formio', function() {
                 $scope.formio.submission = $scope.submission
               });
           }
+          if ($scope.createPromise) {
+            $scope.createPromise.then(function(formio) {
+              // Pass events on.
+              $scope.formio.events.onAny(function() {
+                $scope.$emit.apply($scope, arguments);
+                // Keep backwards compatibility by firing old events as well.
+                var args = Array.prototype.slice.call(arguments);
+                switch(arguments[0]) {
+                  case 'formio.error':
+                    args[0] = 'formError';
+                    $scope.$emit.apply($scope, args);
+                    break;
+                  case 'formio.submit':
+                    args[0] = 'formSubmit';
+                    $scope.$emit.apply($scope, args);
+                    break;
+                  case 'formio.submitDone':
+                    args[0] = 'formSubmission';
+                    $scope.$emit.apply($scope, args);
+                    break;
+                  case 'formio.prevPage':
+                    args[0] = 'wizardPrev';
+                    $scope.$emit.apply($scope, args);
+                    break;
+                  case 'formio.nextPage':
+                    args[0] = 'wizardNext';
+                    $scope.$emit.apply($scope, args);
+                    break;
+                  case 'formio.customEvent':
+                    args[0] = args[1].type;
+                    $scope.$emit.apply($scope, args);
+                    break;
+                }
+              });
+            });
+          }
         };
         $scope.$watch('src', $scope.initializeForm);
 

@@ -1,4 +1,4 @@
 import './Formio';
-import './formioComponentsProvider';
+import './formioComponents';
 import './formioInterceptor';
 import './FormioUtils';
