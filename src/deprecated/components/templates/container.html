@@ -1,0 +1,17 @@
+<div ng-controller="formioContainerComponent" class="formio-container-component">
+  <formio-component
+    ng-repeat="_component in component.components track by $index"
+    component="_component"
+    data="data[parentKey]"
+    formio="formio"
+    submission="submission"
+    hide-components="hideComponents"
+    ng-if="builder ? '::true' : isVisible(_component, data[parentKey])"
+    formio-form="formioForm"
+    read-only="isDisabled(_component, data[parentKey])"
+    grid-row="gridRow"
+    grid-col="gridCol"
+    builder="builder"
+    options="options"
+  ></formio-component>
+</div>

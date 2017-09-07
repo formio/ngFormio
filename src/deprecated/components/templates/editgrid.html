@@ -1,0 +1,25 @@
+<div name="{{ componentId }}" ng-model="data[component.key]" custom-validator="component.validate.custom" editgrid-validation ng-controller="formioEditGrid">
+  <label ng-if="component.label && !component.hideLabel" for="{{ component.key }}" class="control-label" ng-class="{'field-required': isRequired(component)}">{{ component.label | formioTranslate:null:builder }}</label>
+  <div class="formio-data-grid" id="{{ component.key }}">
+    <ul class="list-group">
+      <li ng-if="component.templates.header" class="list-group-item list-group-header">
+        <render-template template="component.templates.header" data="headerData" />
+      </li>
+      <li class="list-group-item" ng-repeat="row in rows track by $index" ng-init="rowIndex = $index">
+        <div name="{{ componentId }}-row-{{ $index }}" ng-model="row" editgrid-row-validation>
+          <edit-grid-row />
+          <p class="help-block" ng-show="openRows.indexOf($index) !== -1 && formioForm.$error.editgrid">{{ 'Please save all rows before proceeding' | formioTranslate }}.</p>
+          <p class="help-block" ng-show="formioForm[componentId + '-row-' + $index].$error.editgridrow">{{ 'Please correct rows before proceeding' | formioTranslate }}.</p>
+        </div>
+      </li>
+      <li ng-if="component.templates.footer" class="list-group-item list-group-footer">
+        <render-template template="component.templates.footer" data="headerData" />
+      </li>
+    </ul>
+    <div class="datagrid-add" ng-if="!component.hasOwnProperty('validate') || !component.validate.hasOwnProperty('maxLength') || rows.length < component.validate.maxLength">
+      <a ng-click="addRow()" class="btn btn-primary">
+        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {{ component.addAnother || "Add Another" | formioTranslate:null:builder }}
+      </a>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,28 @@
+<div class="table-responsive" id="{{ component.key }}">
+  <table ng-class="{'table-striped': component.striped, 'table-bordered': component.bordered, 'table-hover': component.hover, 'table-condensed': component.condensed}" class="table">
+    <thead ng-if="component.header.length">
+      <th ng-repeat="header in component.header track by $index">{{ header | formioTranslate:null:builder }}</th>
+    </thead>
+    <tbody>
+      <tr ng-repeat="row in component.rows track by $index">
+        <td ng-repeat="column in row track by $index">
+          <formio-component
+            ng-repeat="_component in column.components track by $index"
+            component="_component"
+            data="data"
+            formio="formio"
+            submission="submission"
+            hide-components="hideComponents"
+            ng-if="builder ? '::true' : isVisible(_component, data)"
+            formio-form="formioForm"
+            read-only="isDisabled(_component, data)"
+            grid-row="gridRow"
+            grid-col="gridCol"
+            builder="builder"
+            options="options"
+          ></formio-component>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

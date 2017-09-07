@@ -1,0 +1,18 @@
+<div class="select-boxes">
+  <div ng-class="component.inline ? 'checkbox-inline' : 'checkbox'" ng-repeat="v in component.values track by $index">
+    <label class="control-label" for="{{ componentId }}-{{ v.value }}">
+      <input type="checkbox"
+        id="{{ componentId }}-{{ v.value }}"
+        name="{{ componentId }}-{{ v.value }}"
+        value="{{ v.value }}"
+        tabindex="{{ component.tabindex || 0 }}"
+        ng-disabled="readOnly"
+        ng-click="toggleCheckbox(v.value)"
+        ng-checked="model[v.value]"
+        grid-row="gridRow"
+        grid-col="gridCol"
+      >
+      {{ v.label | formioTranslate:null:builder }}
+    </label>
+  </div>
+</div>

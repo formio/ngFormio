@@ -1,0 +1,8 @@
+<div>
+  <span ng-repeat="file in files track by $index" ng-if="file">
+    <formio-image file="file" form="form" width="width"></formio-image>
+    <span ng-if="!readOnly" style="width:1%;white-space:nowrap;">
+      <a href="#" ng-click="removeFile($event, $index)" style="padding: 2px 4px;" class="btn btn-sm btn-default"><span class="glyphicon glyphicon-remove"></span></a>
+    </span>
+  </span>
+</div>

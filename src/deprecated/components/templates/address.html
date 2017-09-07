@@ -1,0 +1,9 @@
+<label ng-if="component.label && !component.hideLabel" for="{{ componentId }}" ng-class="{'field-required': isRequired(component)}">{{ component.label | formioTranslate:null:builder }}</label>
+<span ng-if="!component.label && isRequired(component)" class="glyphicon glyphicon-asterisk form-control-feedback field-required-inline" aria-hidden="true"></span>
+<ui-select ng-model="data[component.key]" safe-multiple-to-single ng-disabled="readOnly" ng-required="isRequired(component)" id="{{ componentId }}" name="{{ componentId }}" tabindex="{{ component.tabindex || 0 }}" theme="bootstrap">
+  <ui-select-match class="ui-select-match" placeholder="{{ component.placeholder | formioTranslate:null:builder }}">{{$item.formatted_address || $select.selected.formatted_address}}</ui-select-match>
+  <ui-select-choices class="ui-select-choices" repeat="address in addresses" refresh="refreshAddress($select.search)" refresh-delay="500">
+    <div ng-bind-html="address.formatted_address | highlight: $select.search"></div>
+  </ui-select-choices>
+</ui-select>
+<formio-errors ng-if="::!builder"></formio-errors>

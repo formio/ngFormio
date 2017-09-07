@@ -1,0 +1,14 @@
+<textarea
+  class="form-control"
+  ng-model="data[component.key]"
+  ng-disabled="readOnly"
+  ng-required="isRequired(component)"
+  ckeditor="component.wysiwyg"
+  safe-multiple-to-single
+  id="{{ componentId }}"
+  name="{{ componentId }}"
+  tabindex="{{ component.tabindex || 0 }}"
+  ng-attr-placeholder="{{ component.placeholder }}"
+  custom-validator="component.validate.custom"
+  rows="{{ component.rows }}"
+></textarea>

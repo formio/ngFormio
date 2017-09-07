@@ -1,0 +1,19 @@
+<input
+  type="number"
+  class="form-control"
+  id="{{ componentId }}"
+  name="{{ componentId }}"
+  tabindex="{{ component.tabindex || 0 }}"
+  ng-model="data[component.key]"
+  ng-required="isRequired(component)"
+  ng-disabled="readOnly"
+  safe-multiple-to-single
+  ng-attr-min="{{ component.validate.min }}"
+  ng-attr-max="{{ component.validate.max }}"
+  ng-attr-step="{{ component.validate.step }}"
+  ng-attr-placeholder="{{ component.placeholder | formioTranslate:null:builder }}"
+  custom-validator="component.validate.custom"
+  ui-mask="{{ component.inputMask }}"
+  ui-mask-placeholder=""
+  ui-options="uiMaskOptions"
+>

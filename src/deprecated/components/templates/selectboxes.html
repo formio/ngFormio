@@ -1,0 +1,22 @@
+<div class="select-boxes">
+  <label ng-if="component.label && !component.hideLabel" for="{{ componentId }}" class="control-label" ng-class="{'field-required': isRequired(component)}">
+    {{ component.label }}
+  </label>
+  <formio-select-boxes
+    name="{{componentId}}"
+    ng-model="data[component.key]"
+    ng-model-options="{allowInvalid: true}"
+    component="component"
+    component-id="componentId"
+    read-only="readOnly"
+    ng-required="isRequired(component)"
+    custom-validator="component.validate.custom"
+    grid-row="gridRow"
+    grid-col="gridCol"
+    builder="builder"
+  ></formio-select-boxes>
+  <div ng-if="!!component.description" class="help-block">
+    <span>{{ component.description }}</span>
+  </div>
+  <formio-errors ng-if="::!builder"></formio-errors>
+</div>

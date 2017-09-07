@@ -1,0 +1,16 @@
+<input
+  type="{{ component.inputType }}"
+  class="form-control"
+  id="{{ componentId }}"
+  name="{{ componentId }}"
+  tabindex="{{ component.tabindex || 0 }}"
+  ng-model="data[component.key]"
+  ng-required="isRequired(component)"
+  ng-disabled="readOnly"
+  safe-multiple-to-single
+  ng-attr-placeholder="{{ component.placeholder }}"
+  custom-validator="component.validate.custom"
+  currency-input
+  ui-mask-placeholder=""
+  ui-options="uiMaskOptions"
+>

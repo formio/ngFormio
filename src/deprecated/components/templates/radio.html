@@ -1,0 +1,17 @@
+<ng-form name="{{ componentId }}" ng-model="data[component.key]" custom-validator="component.validate.custom">
+  <div ng-class="component.inline ? 'radio-inline' : 'radio'" ng-repeat="v in component.values track by $index">
+    <label class="control-label" for="{{ componentId }}-{{ v.value }}">
+      <input
+        type="{{ component.inputType }}"
+        id="{{ componentId }}-{{ v.value }}"
+        value="{{ v.value }}"
+        tabindex="{{ component.tabindex || 0 }}"
+        ng-model="data[component.key]"
+        ng-required="isRequired(component)"
+        custom-validator="component.validate.custom"
+        ng-disabled="readOnly"
+      >
+      {{ v.label | formioTranslate:null:builder }}
+    </label>
+  </div>
+</ng-form>

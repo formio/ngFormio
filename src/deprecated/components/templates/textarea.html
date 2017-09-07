@@ -1,0 +1,13 @@
+<textarea
+  class="form-control"
+  ng-model="data[component.key]"
+  ng-disabled="readOnly"
+  ng-required="isRequired(component)"
+  safe-multiple-to-single
+  id="{{ componentId }}"
+  name="{{ componentId }}"
+  tabindex="{{ component.tabindex || 0 }}"
+  ng-attr-placeholder="{{ component.placeholder | formioTranslate:null:builder }}"
+  custom-validator="component.validate.custom"
+  rows="{{ component.rows }}"
+></textarea>

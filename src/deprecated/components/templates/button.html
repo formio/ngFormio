@@ -1,0 +1,13 @@
+<button ng-attr-type="{{ getButtonType() }}"
+  id="{{ componentId }}"
+  name="{{ componentId }}"
+  ng-class="{'btn-block': component.block}"
+  class="btn btn-{{ component.theme }} btn-{{ component.size }}"
+  ng-disabled="readOnly || formioForm.submitting || (component.disableOnInvalid && formioForm.$invalid)"
+  tabindex="{{ component.tabindex || 0 }}"
+  ng-click="$emit('buttonClick', component, componentId)">
+  <span ng-if="component.leftIcon" class="{{ component.leftIcon }}" aria-hidden="true"></span>
+  <span ng-if="component.leftIcon && component.label">&nbsp;</span>{{ component.label | formioTranslate:null:builder }}<span ng-if="component.rightIcon && component.label">&nbsp;</span>
+  <span ng-if="component.rightIcon" class="{{ component.rightIcon }}" aria-hidden="true"></span>
+   <i ng-if="component.action == 'submit' && formioForm.submitting" class="glyphicon glyphicon-refresh glyphicon-spin"></i>
+</button>

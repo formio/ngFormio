@@ -1,0 +1,27 @@
+<label ng-if="component.label && !component.hideLabel"  for="{{ componentId }}" class="control-label" ng-class="{'field-required': isRequired(component)}">{{ component.label | formioTranslate:null:builder }}</label>
+<span ng-if="!component.label && isRequired(component)" class="glyphicon glyphicon-asterisk form-control-feedback field-required-inline" aria-hidden="true"></span>
+<ui-select
+  ui-select-required
+  ui-select-open-on-focus
+  ng-model="data[component.key]"
+  safe-multiple-to-single
+  name="{{ componentId }}"
+  ng-disabled="readOnly"
+  ng-required="isRequired(component)"
+  id="{{ componentId }}"
+  theme="bootstrap"
+  custom-validator="component.validate.custom"
+  tabindex="{{ component.tabindex || 0 }}"
+>
+  <ui-select-match class="ui-select-match" placeholder="{{ component.placeholder | formioTranslate:null:builder }}">
+    <formio-select-item template="component.template" item="$item || $select.selected" select="$select"></formio-select-item>
+  </ui-select-match>
+  <ui-select-choices class="ui-select-choices" repeat="getSelectItem(item) as item in selectItems | filter: $select.search" refresh="refreshItems($select.search)" refresh-delay="250">
+    <formio-select-item template="component.template" item="item" select="$select"></formio-select-item>
+    <button ng-if="hasNextPage && ($index == $select.items.length-1)" class="btn btn-success btn-block" ng-click="loadMoreItems($select, $event)" ng-disabled="selectLoading">Load more...</button>
+  </ui-select-choices>
+</ui-select>
+<div ng-if="!!component.description" class="help-block">
+  <span>{{ component.description }}</span>
+</div>
+<formio-errors ng-if="::!builder"></formio-errors>

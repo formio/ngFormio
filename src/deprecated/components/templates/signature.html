@@ -1,0 +1,15 @@
+<div ng-if="readOnly">
+  <div ng-if="data[component.key] === 'YES'">
+    [ Signature is hidden ]
+  </div>
+  <div ng-if="data[component.key] !== 'YES'">
+    <img class="signature" ng-attr-src="{{data[component.key]}}" src="" />
+  </div>
+</div>
+<div ng-if="!readOnly" style="width: {{ component.width }}; height: 100%">
+  <a class="btn btn-xs btn-default" style="position:absolute; left: 0; top: 0; z-index: 1000" ng-click="component.clearSignature()">
+    <span class="glyphicon glyphicon-refresh"></span>
+  </a>
+  <canvas signature component="component" name="{{ componentId }}" ng-model="data[component.key]" ng-required="isRequired(component)"></canvas>
+  <div class="formio-signature-footer" style="text-align: center;color:#C3C3C3;" ng-class="{'field-required': isRequired(component)}">{{ component.footer | formioTranslate:null:builder }}</div>
+</div>

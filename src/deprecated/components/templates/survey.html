@@ -1,0 +1,27 @@
+<table class="table table-striped table-bordered">
+  <thead>
+    <tr>
+      <td></td>
+      <th ng-repeat="v in component.values track by $index" style="text-align: center;">{{ v.label }}</th>
+    </tr>
+  </thead>
+  <tr ng-repeat="question in component.questions"
+    ng-init="inputName = componentId + '-' + question.value"
+    ng-class="{
+      'text-danger': !formioForm[inputName].$pristine && formioForm[inputName].$invalid
+    }">
+    <td>{{ question.label }}</td>
+    <td ng-repeat="v in component.values track by $index" style="text-align: center;">
+      <input
+        type="radio"
+        id="{{ componentId }}-{{ question.value }}-{{ v.value }}" name="{{ componentId }}-{{ question.value }}"
+        tabindex="{{ component.tabindex || 0 }}"
+        ng-value="v.value"
+        ng-model="data[component.key][question.value]"
+        ng-required="isRequired(component)"
+        ng-disabled="readOnly"
+        custom-validator="component.validate.custom"
+      >
+    </td>
+  </tr>
+</table>

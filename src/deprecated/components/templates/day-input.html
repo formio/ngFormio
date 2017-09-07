@@ -1,0 +1,64 @@
+<div class="daySelect form row">
+  <div class="form-group col-xs-3" ng-if="component.dayFirst && !component.fields.day.hide">
+    <label for="{{componentId}}-day" ng-class="{'field-required': component.fields.day.required}">{{ "Day" | formioTranslate:null:builder }}</label>
+    <input
+      class="form-control"
+      type="number"
+      id="{{componentId}}-day"
+      ng-model="date.day"
+      ng-change="onChange()"
+      style="padding-right: 10px;"
+      ng-attr-placeholder="{{component.fields.day.placeholder}}"
+      day-part
+      characters="2"
+      min="1"
+      max="{{maxDay}}"
+      ng-disabled="readOnly"
+    />
+  </div>
+  <div class="form-group col-xs-4" ng-if="!component.fields.month.hide">
+    <label for="{{componentId}}-month" ng-class="{'field-required': component.fields.month.required}">{{ "Month" | formioTranslate:null:builder }}</label>
+    <select
+      class="form-control"
+      type="text"
+      id="{{componentId}}-month"
+      ng-model="date.month"
+      ng-change="onChange()"
+      ng-disabled="readOnly"
+      ng-options="month.value as month.label | formioTranslate:null:builder for month in months"
+    ></select>
+  </div>
+  <div class="form-group col-xs-3" ng-if="!component.dayFirst && !component.fields.day.hide">
+    <label for="{{componentId}}-day" ng-class="{'field-required': component.fields.day.required}">{{ "Day" | formioTranslate:null:builder }}</label>
+    <input
+      class="form-control"
+      type="number"
+      id="{{componentId}}-day1"
+      ng-model="date.day"
+      ng-change="onChange()"
+      style="padding-right: 10px;"
+      ng-attr-placeholder="{{component.fields.day.placeholder}}"
+      day-part
+      characters="2"
+      min="1"
+      max="{{maxDay}}"
+      ng-disabled="readOnly"
+    />
+  </div>
+  <div class="form-group col-xs-5" ng-if="!component.fields.year.hide">
+    <label for="{{componentId}}-year" ng-class="{'field-required': component.fields.year.required}">{{ "Year" | formioTranslate:null:builder }}</label>
+    <input
+      class="form-control"
+      type="number"
+      id="{{componentId}}-year"
+      ng-model="date.year"
+      ng-change="onChange()"
+      style="padding-right: 10px;"
+      ng-attr-placeholder="{{component.fields.year.placeholder}}"
+      characters="4"
+      min="0"
+      max="2100"
+      ng-disabled="readOnly"
+    />
+  </div>
+</div>

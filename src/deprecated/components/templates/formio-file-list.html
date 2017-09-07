@@ -1,0 +1,16 @@
+<table class="table table-striped table-bordered">
+  <thead>
+    <tr>
+      <td ng-if="!readOnly" style="width:1%;white-space:nowrap;"></td>
+      <th>File Name</th>
+      <th>Size</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr ng-repeat="file in files track by $index">
+      <td ng-if="!readOnly" style="width:1%;white-space:nowrap;"><a ng-if="!readOnly" href="#" ng-click="removeFile($event, $index)" style="padding: 2px 4px;" class="btn btn-sm btn-default"><span class="glyphicon glyphicon-remove"></span></a></td>
+      <td><formio-file file="file" form="form"></formio-file></td>
+      <td>{{ fileSize(file.size) }}</td>
+    </tr>
+  </tbody>
+</table>

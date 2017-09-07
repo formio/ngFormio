@@ -1,0 +1,31 @@
+<div class="input-group">
+  <input
+    type="text"
+    class="form-control"
+    name="{{ componentId }}"
+    id="{{ componentId }}"
+    ng-focus="calendarOpen = autoOpen"
+    ng-click="calendarOpen = true"
+    ng-init="calendarOpen = false"
+    ng-disabled="readOnly"
+    ng-required="isRequired(component)"
+    is-open="calendarOpen"
+    datetime-picker="{{ component.format }}"
+    datepicker-mode="component.datepickerMode"
+    when-closed="onClosed()"
+    custom-validator="component.validate.custom"
+    enable-date="component.enableDate"
+    enable-time="component.enableTime"
+    ng-model="data[component.key]"
+    tabindex="{{ component.tabindex || 0 }}"
+    ng-attr-placeholder="{{ component.placeholder | formioTranslate:null:builder }}"
+    datepicker-options="component.datePicker"
+    timepicker-options="component.timePicker"
+  />
+  <span class="input-group-btn">
+    <button type="button" ng-disabled="readOnly" class="btn btn-default" ng-click="calendarOpen = true" ng-keydown="calendarOpen = onKeyDown($event)">
+      <i ng-if="component.enableDate" class="glyphicon glyphicon-calendar"></i>
+      <i ng-if="!component.enableDate" class="glyphicon glyphicon-time"></i>
+    </button>
+  </span>
+</div>
