@@ -144,9 +144,8 @@ module.exports = function() {
         if (component.type === 'selectboxes') {
           return done(false);
         }
-
         // If there is a default value and it is not an array, wrap the value.
-        if (component.multiple && component.defaultValue && typeof component.defaultValue === 'string') {
+        if (component.multiple && component.type !== 'file' && typeof component.defaultValue === 'string') {
           value = component.defaultValue.split(',');
         }
         else {
