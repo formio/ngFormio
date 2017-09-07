@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [UNRELEASED]
 
+## 2.22.5
+### Fixed
+ - Default values for multi value fields no longer defaulted to have one field already open.
+
 ## 2.22.4
 ### Fixed
  - Submission handler crashes if no save submission action on form.
