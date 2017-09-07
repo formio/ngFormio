@@ -11,3 +11,7 @@
   <span ng-if="component.rightIcon" class="{{ component.rightIcon }}" aria-hidden="true"></span>
   <i ng-if="component.action == 'submit' && formioForm.submitting" class="glyphicon glyphicon-refresh glyphicon-spin"></i>
 </button>
+<br><br>
+<div ng-if="component.key=='submit' && formioForm.$invalid && !formioForm.$pristine" class="alert alert-danger" onclick="scroll=window.scrollTo(0,0)">
+  Please correct all errors before submitting.
+</div>
