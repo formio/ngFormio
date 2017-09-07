@@ -236,6 +236,10 @@ module.exports = function() {
             // copy to remove angular $$hashKey
             var submissionMethod = submissionData._id ? 'put' : 'post';
             $scope.formio.saveSubmission(submissionData, $scope.formioOptions).then(function(submission) {
+              // If submission saved propagate method to ngFormioHelper for correct message
+              if (typeof submission === 'object') {
+                submission.method = submissionMethod;
+              }
               onSubmitDone(submissionMethod, submission, form);
             }, FormioScope.onError($scope, $element)).finally(function() {
               if (form) {
