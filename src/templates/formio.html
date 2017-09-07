@@ -27,8 +27,5 @@
       builder="builder"
       options="options"
     ></formio-component>
-    <div ng-repeat="alert in formioAlerts track by $index" class="alert alert-{{ alert.type }}" role="alert" ng-if="::!builder">
-      <p onclick="scroll=window.scrollTo(0,0)">{{ alert.message1 | formioTranslate:null:builder }}</p>
-    </div>
   </form>
 </div>

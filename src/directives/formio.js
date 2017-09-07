@@ -265,8 +265,7 @@ module.exports = function() {
           if ($scope.checkErrors(form)) {
             $scope.formioAlerts.push({
               type: 'danger',
-              message: 'Please fix the following errors before submitting.',
-              message1:'Please fix the above errors before submitting.'
+              message: 'Please fix the following errors before submitting.'
             });
 
             alertsWatcher = $scope.$watch(function() {
