@@ -1912,9 +1912,16 @@ li.step-info {
     height: 100%;
     background-color: #fff;
     .flow-side {
-      width: 20%;
+      width: 0;
+      opacity: 0;
       padding: 10px;
       border-right: 1px solid #ddd;
+      &.showtime {
+        width:20%;
+        transition: .75s;
+        opacity: 1;
+        animation-timing-function: ease-in;
+      }
       .flow-side-header {
         flex: 1;
         .flow-side-title {
@@ -1925,6 +1932,14 @@ li.step-info {
       }
       .flow-side-content {
         padding: 10px;
+        transform: translateX(-100%);
+        opacity:0;
+        &.showtime {
+          transition: 1.7s;
+          transform: translateX(0);
+          opacity: 1;
+          animation-timing-function: ease-in;
+        }
         .flow-side-line {
           padding: 0 0 2em 15px;
           .flow-side-steps {
@@ -1994,8 +2009,16 @@ li.step-info {
       }
     }
     .flow-content {
-      width: 80%;
+      width: 100%;
       padding: 30px 20px;
+      &.showtime {
+        width:80%;
+        -webkit-transition: all 2s;
+        -moz-transition: all 2s;
+        -ms-transition: all 2s;
+        -o-transition: all 2s;
+        transition: all 2s;
+      }
     }
   }
   .gallery {
@@ -2006,3 +2029,4 @@ li.step-info {
 .framework-control .ui-select-toggle {
   width: 200px;
 }
+

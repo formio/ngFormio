@@ -11,6 +11,7 @@ app.directive('stepFlow', function() {
     controller: [
       '$scope',
       function($scope) {
+        var element = angular.element;
         $scope.$watch('steps', function() {
           if ($scope.steps) {
             $scope.currentStep = $scope.currentParentStep = $scope.steps[0];
@@ -21,6 +22,12 @@ app.directive('stepFlow', function() {
         if (typeof $scope.active !== 'boolean') {
           $scope.active = true;
         }
+
+        $scope.nextStep = function () {
+          element( document.querySelector( '.flow-side' )).addClass('showtime');
+          element(document.querySelector( '.flow-content' )).addClass('showtime');
+          element(document.querySelector( '.flow-side-content' )).addClass('showtime');
+        };
 
         $scope.changeStep = function(parentStep, childStep) {
           $scope.currentStep = childStep || parentStep;
