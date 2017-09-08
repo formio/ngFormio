@@ -2715,36 +2715,140 @@ app.constant('ProjectFrameworkSteps', {
   angular: [
     {
       step: 'start',
+      noTitle: true,
       title: 'Welcome',
-      icon: 'fa fa-check-circle'
+      icon: 'fa fa-check-circle',
+      template: 'views/project/overview/welcome.html'
     },
     {
-      step: 'setup',
+      step: 'download',
       title: 'Application Setup',
       icon: 'fa fa-sliders',
+      template: 'views/project/overview/react/download.html',
       children: [
         {
           step: 'download',
           title: 'Download',
-          icon: 'fa fa-download'
+          icon: 'fa fa-download',
+          template: 'views/project/overview/angular/download.html'
         },
         {
-          step: 'setup',
+          step: 'configure',
           title: 'Configure',
-          icon: 'fa fa-sliders'
+          icon: 'fa fa-sliders',
+          template: 'views/project/overview/angular/configure.html'
         }
       ]
     },
     {
-      step: 'three',
-      title: 'Three',
-      icon: 'fa fa-check',
+      step: 'user',
+      title: 'Application User',
+      icon: 'fa fa-user-plus',
+      template: 'views/project/overview/user.html',
       children: []
     },
     {
-      step: 'four',
-      title: 'Four',
-      icon: 'fa fa-check',
+      step: 'form',
+      title: 'Create a Form',
+      icon: 'fa fa-wpforms',
+      template: 'views/project/overview/form.html',
+      children: [
+        {
+          step: 'form',
+          title: 'Add a new form',
+          icon: 'fa fa-newspaper-o',
+          template: 'views/project/overview/form.html'
+        },
+        {
+          step: 'action',
+          title: 'Add an action',
+          icon: 'fa fa-mail-reply',
+          template: 'views/project/overview/action.html'
+        }
+      ]
+    },
+    {
+      step: 'embed',
+      title: 'Embed the form',
+      icon: 'fa fa-code',
+      template: 'views/project/overview/angular/embed.html',
+      children: []
+    },
+    {
+      step: 'launch',
+      title: 'Launch',
+      icon: 'fa fa-rocket',
+      template: 'views/project/overview/launch.html',
+      children: []
+    },
+  ],
+  angular2: [
+    {
+      step: 'start',
+      noTitle: true,
+      title: 'Welcome',
+      icon: 'fa fa-check-circle',
+      template: 'views/project/overview/welcome.html'
+    },
+    {
+      step: 'download',
+      title: 'Application Setup',
+      icon: 'fa fa-sliders',
+      template: 'views/project/overview/angular2/download.html',
+      children: [
+        {
+          step: 'download',
+          title: 'Download',
+          icon: 'fa fa-download',
+          template: 'views/project/overview/angular2/download.html'
+        },
+        {
+          step: 'configure',
+          title: 'Configure',
+          icon: 'fa fa-sliders',
+          template: 'views/project/overview/angular2/configure.html'
+        }
+      ]
+    },
+    {
+      step: 'user',
+      title: 'Application User',
+      icon: 'fa fa-user-plus',
+      template: 'views/project/overview/user.html',
+      children: []
+    },
+    {
+      step: 'form',
+      title: 'Create a Form',
+      icon: 'fa fa-wpforms',
+      template: 'views/project/overview/form.html',
+      children: [
+        {
+          step: 'form',
+          title: 'Add a new form',
+          icon: 'fa fa-newspaper-o',
+          template: 'views/project/overview/form.html'
+        },
+        {
+          step: 'action',
+          title: 'Add an action',
+          icon: 'fa fa-mail-reply',
+          template: 'views/project/overview/action.html'
+        }
+      ]
+    },
+    {
+      step: 'embed',
+      title: 'Embed the form',
+      icon: 'fa fa-code',
+      template: 'views/project/overview/angular2/embed.html',
+      children: []
+    },
+    {
+      step: 'launch',
+      title: 'Launch',
+      icon: 'fa fa-rocket',
+      template: 'views/project/overview/launch.html',
       children: []
     },
   ],
@@ -2791,14 +2895,14 @@ app.constant('ProjectFrameworkSteps', {
       children: [
         {
           step: 'form',
-          title: 'Add an new form',
-          icon: 'fa fa-paper-plane',
+          title: 'Add a new form',
+          icon: 'fa fa-newspaper-o',
           template: 'views/project/overview/form.html'
         },
         {
           step: 'action',
           title: 'Add an action',
-          icon: 'fa fa-paper-plane',
+          icon: 'fa fa-mail-reply',
           template: 'views/project/overview/action.html'
         }
       ]
@@ -2814,8 +2918,288 @@ app.constant('ProjectFrameworkSteps', {
       step: 'launch',
       title: 'Launch',
       icon: 'fa fa-rocket',
-      template: 'views/project/overview/react/launch.html',
+      template: 'views/project/overview/launch.html',
       children: []
     },
+  ],
+  vue: [
+    {
+      step: 'start',
+      noTitle: true,
+      title: 'Welcome',
+      icon: 'fa fa-check-circle',
+      template: 'views/project/overview/welcome.html'
+    },
+    {
+      step: 'download',
+      title: 'Application Setup',
+      icon: 'fa fa-sliders',
+      template: 'views/project/overview/vue/download.html',
+      children: [
+        {
+          step: 'download',
+          title: 'Download',
+          icon: 'fa fa-download',
+          template: 'views/project/overview/vue/download.html'
+        },
+        {
+          step: 'configure',
+          title: 'Configure',
+          icon: 'fa fa-sliders',
+          template: 'views/project/overview/vue/configure.html'
+        }
+      ]
+    },
+    {
+      step: 'user',
+      title: 'Application User',
+      icon: 'fa fa-user-plus',
+      template: 'views/project/overview/user.html',
+      children: []
+    },
+    {
+      step: 'form',
+      title: 'Create a Form',
+      icon: 'fa fa-wpforms',
+      template: 'views/project/overview/form.html',
+      children: [
+        {
+          step: 'form',
+          title: 'Add a new form',
+          icon: 'fa fa-newspaper-o',
+          template: 'views/project/overview/form.html'
+        },
+        {
+          step: 'action',
+          title: 'Add an action',
+          icon: 'fa fa-mail-reply',
+          template: 'views/project/overview/action.html'
+        }
+      ]
+    },
+    {
+      step: 'embed',
+      title: 'Embed the form',
+      icon: 'fa fa-code',
+      template: 'views/project/overview/vue/embed.html',
+      children: []
+    },
+    {
+      step: 'launch',
+      title: 'Launch',
+      icon: 'fa fa-rocket',
+      template: 'views/project/overview/launch.html',
+      children: []
+    },
+  ],
+  html5: [
+    {
+      step: 'start',
+      noTitle: true,
+      title: 'Welcome',
+      icon: 'fa fa-check-circle',
+      template: 'views/project/overview/welcome.html'
+    },
+    {
+      step: 'download',
+      title: 'Application Setup',
+      icon: 'fa fa-sliders',
+      template: 'views/project/overview/html5/download.html',
+      children: [
+        {
+          step: 'download',
+          title: 'Download',
+          icon: 'fa fa-download',
+          template: 'views/project/overview/html5/download.html'
+        },
+        {
+          step: 'configure',
+          title: 'Configure',
+          icon: 'fa fa-sliders',
+          template: 'views/project/overview/html5/configure.html'
+        }
+      ]
+    },
+    {
+      step: 'user',
+      title: 'Application User',
+      icon: 'fa fa-user-plus',
+      template: 'views/project/overview/user.html',
+      children: []
+    },
+    {
+      step: 'form',
+      title: 'Create a Form',
+      icon: 'fa fa-wpforms',
+      template: 'views/project/overview/form.html',
+      children: [
+        {
+          step: 'form',
+          title: 'Add a new form',
+          icon: 'fa fa-newspaper-o',
+          template: 'views/project/overview/form.html'
+        },
+        {
+          step: 'action',
+          title: 'Add an action',
+          icon: 'fa fa-mail-reply',
+          template: 'views/project/overview/action.html'
+        }
+      ]
+    },
+    {
+      step: 'embed',
+      title: 'Embed the form',
+      icon: 'fa fa-code',
+      template: 'views/project/overview/html5/embed.html',
+      children: []
+    },
+    {
+      step: 'launch',
+      title: 'Launch',
+      icon: 'fa fa-rocket',
+      template: 'views/project/overview/launch.html',
+      children: []
+    },
+  ],
+  simple: [
+    {
+      step: 'start',
+      noTitle: true,
+      title: 'Welcome',
+      icon: 'fa fa-check-circle',
+      template: 'views/project/overview/welcome.html'
+    },
+    {
+      step: 'download',
+      title: 'Application Setup',
+      icon: 'fa fa-sliders',
+      template: 'views/project/overview/simple/download.html',
+      children: [
+        {
+          step: 'download',
+          title: 'Download',
+          icon: 'fa fa-download',
+          template: 'views/project/overview/simple/download.html'
+        },
+        {
+          step: 'configure',
+          title: 'Configure',
+          icon: 'fa fa-sliders',
+          template: 'views/project/overview/simple/configure.html'
+        }
+      ]
+    },
+    {
+      step: 'user',
+      title: 'Application User',
+      icon: 'fa fa-user-plus',
+      template: 'views/project/overview/user.html',
+      children: []
+    },
+    {
+      step: 'form',
+      title: 'Create a Form',
+      icon: 'fa fa-wpforms',
+      template: 'views/project/overview/form.html',
+      children: [
+        {
+          step: 'form',
+          title: 'Add a new form',
+          icon: 'fa fa-newspaper-o',
+          template: 'views/project/overview/form.html'
+        },
+        {
+          step: 'action',
+          title: 'Add an action',
+          icon: 'fa fa-mail-reply',
+          template: 'views/project/overview/action.html'
+        }
+      ]
+    },
+    {
+      step: 'embed',
+      title: 'Embed the form',
+      icon: 'fa fa-code',
+      template: 'views/project/overview/simple/embed.html',
+      children: []
+    },
+    {
+      step: 'launch',
+      title: 'Launch',
+      icon: 'fa fa-rocket',
+      template: 'views/project/overview/launch.html',
+      children: []
+    },
+  ],
+  custom: [
+    {
+      step: 'start',
+      noTitle: true,
+      title: 'Welcome',
+      icon: 'fa fa-check-circle',
+      template: 'views/project/overview/welcome.html'
+    },
+    {
+      step: 'download',
+      title: 'Application Setup',
+      icon: 'fa fa-sliders',
+      template: 'views/project/overview/custom/download.html',
+      children: [
+        {
+          step: 'download',
+          title: 'Download',
+          icon: 'fa fa-download',
+          template: 'views/project/overview/custom/download.html'
+        },
+        {
+          step: 'configure',
+          title: 'Configure',
+          icon: 'fa fa-sliders',
+          template: 'views/project/overview/custom/configure.html'
+        }
+      ]
+    },
+    {
+      step: 'user',
+      title: 'Application User',
+      icon: 'fa fa-user-plus',
+      template: 'views/project/overview/user.html',
+      children: []
+    },
+    {
+      step: 'form',
+      title: 'Create a Form',
+      icon: 'fa fa-wpforms',
+      template: 'views/project/overview/form.html',
+      children: [
+        {
+          step: 'form',
+          title: 'Add a new form',
+          icon: 'fa fa-newspaper-o',
+          template: 'views/project/overview/form.html'
+        },
+        {
+          step: 'action',
+          title: 'Add an action',
+          icon: 'fa fa-mail-reply',
+          template: 'views/project/overview/action.html'
+        }
+      ]
+    },
+    {
+      step: 'embed',
+      title: 'Embed the form',
+      icon: 'fa fa-code',
+      template: 'views/project/overview/custom/embed.html',
+      children: []
+    },
+    {
+      step: 'launch',
+      title: 'Launch',
+      icon: 'fa fa-rocket',
+      template: 'views/project/overview/launch.html',
+      children: []
+    }
   ]
 });

@@ -13,7 +13,7 @@ app.directive('stepFlow', function() {
       function($scope) {
         $scope.$watch('steps', function() {
           if ($scope.steps) {
-            $scope.currentParentStep = $scope.steps[0];
+            $scope.currentStep = $scope.currentParentStep = $scope.steps[0];
           }
         });
 
@@ -23,6 +23,7 @@ app.directive('stepFlow', function() {
         }
 
         $scope.changeStep = function(parentStep, childStep) {
+          $scope.currentStep = childStep || parentStep;
           $scope.currentParentStep = parentStep;
           if (childStep) {
             $scope.currentChildStep = childStep;
