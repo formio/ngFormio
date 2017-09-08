@@ -11,12 +11,7 @@ module.exports = function (config) {
   var timeout = 10000;
   var state = {};
   var projects = {};
-<<<<<<< HEAD
-=======
-  var helpPage = 'http://formio.github.io/help.form.io';
-  var helpformio = 'https://help.form.io';
   var theProject;
->>>>>>> origin/beta
 
   /**
    * Wrap the string function for usernames.
@@ -336,7 +331,6 @@ module.exports = function (config) {
     next(null, projects[title]);
   };
 
-<<<<<<< HEAD
   var scrollTo = function(ele) {
     return ele.getLocation()
       .then(function(location) {
@@ -356,17 +350,19 @@ module.exports = function (config) {
   var getElement = function(selector) {
     var ele = element.all(selector).first();
 
-    return new Promise(function(resolve, reject) {
-      browser.wait(function() {
+    return new Promise(function (resolve, reject) {
+      browser.wait(function () {
           return ele.isPresent();
         }, timeout)
-        .then(function() {
+        .then(function () {
           resolve(ele);
         })
-        .catch(function(e) {
+        .catch(function (e) {
           reject(e);
         });
-=======
+    });
+  };
+
   var createForm = function (projectName, formData, formio_token, next) {
     request({
       rejectUnauthorized: false,
@@ -391,7 +387,6 @@ module.exports = function (config) {
         }
         next(null, body);
       }
->>>>>>> origin/beta
     });
   };
 
@@ -1092,7 +1087,6 @@ module.exports = function (config) {
     });
   };
 
-<<<<<<< HEAD
   this.dragTo = function (field, dropZone) {
     it("Drag " + field + " to " + dropZone, function(next) {
       const ele = element(by.xpath('//span[@title="' + field + '"]'));
@@ -1111,7 +1105,7 @@ module.exports = function (config) {
       browser.pause();
     });
   };
-=======
+
   this. clearTextFromField = function (field) {
     it('I clear' + field + ' field', function (next) {
       var ele = element(by.css(field));
@@ -1198,6 +1192,4 @@ module.exports = function (config) {
       });
     });
   };
-
->>>>>>> origin/beta
 };
