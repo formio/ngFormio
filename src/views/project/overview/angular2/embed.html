@@ -1,0 +1,24 @@
+<div class="panel panel-warning">
+  <div class="panel-heading">
+    <h3 class="panel-title">Angular 2.x</h3>
+  </div>
+  <div class="panel-body">
+    <h5>Include the ng2-formio module</h5>
+    <p>Be sure you have added the <a href="https://github.com/formio/ng2-formio" target="_blank">ng2-formio</a> library to your application and have included it in the modules list in the app declaration.</p>
+    <h5>Embed within a template</h5>
+    <p>To embed a form within your angular 2.x application, add the formio directive within a template.</p>
+                      <span><pre><code>
+                        import { FormioModule } from 'ng2-formio';
+                        @NgModule({
+                        &nbsp;&nbsp;imports: [ BrowserModule, ReactiveFormsModule, FormioModule ],
+                        &nbsp;&nbsp;declarations: [ AppComponent ],
+                        &nbsp;&nbsp;bootstrap: [ AppComponent ]
+                        })
+                        export class AppModule { }
+
+                        ---
+
+                        &lt;formio src='{{ projectUrl }}/email' /&gt;
+                      </code></pre></span>
+  </div>
+</div>

@@ -1,0 +1,19 @@
+<div class="col-md-6">
+  <p>To create a form, we have to go to the Forms page and click on <a target="_blank" ui-sref="project.form.index">Create  Form</a> Choose API Web Form, Let's name the form Email Action and set an API path</p>
+  <p>With the Drag-n-Drop components select the Special Components and Drag the Email Component, then let's put a Label and a Placeholder to our field component. Finally, hit save and then
+    click Create Form.</p>
+</div>
+<div class="col-md-6">
+  <ul class="gallery gallery1">
+    <li ng-repeat="image in formCreate">
+      <a ng-click="openLightboxModal(formCreate,$index)">
+        <img ng-src="{{image.thumbUrl}}" class="img-thumbnail">
+      </a>
+    </li>
+  </ul>
+</div>
+<div class="col-sm-12">
+
+  <h4 class="text-center">Congrats! we have created an API Web Form, now let's add Actions to this form
+    .</h4>
+</div>

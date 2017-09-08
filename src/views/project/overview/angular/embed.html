@@ -1,0 +1,20 @@
+<div class="panel panel-success">
+  <div class="panel-heading">
+    <h3 class="panel-title">Angular 1.x</h3>
+  </div>
+  <div class="panel-body">
+    <h5>Include the ngFormio module</h5>
+    <p>Be sure you have added the <a href="https://github.com/formio/ngFormio" target="_blank">ngFormio</a> library to your application and have included it in the modules list in the app declaration.</p>
+    <h5>Embed within a template</h5>
+    <p>To embed a form within your angular 1.x application, add the formio directive within a template.</p>
+                      <span><pre><code>
+                        angular.module('yourApp', [
+                        &nbsp;&nbsp;'formio'
+                        ]);
+
+                        ---
+
+                        &lt;formio src="'{{ projectUrl }}/email'" /&gt;
+                      </code></pre></span>
+  </div>
+</div>

@@ -1030,6 +1030,8 @@ app.controller('LaunchController', [
   'FormioAlerts',
   'AppConfig',
   'Lightbox',
+  'ProjectFrameworks',
+  'ProjectFrameworkSteps',
   function(
     $rootScope,
     $scope,
@@ -1039,7 +1041,9 @@ app.controller('LaunchController', [
     Formio,
     FormioAlerts,
     AppConfig,
-    Lightbox
+    Lightbox,
+    ProjectFrameworks,
+    ProjectFrameworkSteps
   ) {
     $scope.repository = '';
     $scope.step = 'welcome';
@@ -1051,6 +1055,7 @@ app.controller('LaunchController', [
     $scope.currentSection.icon = 'fa fa-check-square-o';
     $scope.currentSection.help = 'https://help.form.io/embedding/';
     $scope.hasTemplate = true;
+    $scope.frameworks = ProjectFrameworks;
     //var formio = new Formio(AppConfig.apiBase + '/project/' + $scope.currentProject._id);
 
 
@@ -1066,6 +1071,10 @@ app.controller('LaunchController', [
     //  .catch(FormioAlerts.onError.bind(FormioAlerts));
 
     $scope.$watch('currentProject', function(project) {
+      $scope.current = {
+        framework: project.framework,
+        steps: ProjectFrameworkSteps[project.framework]
+      }
 
       $scope.framework = project.framework;
       if (project.framework === 'angular') {
@@ -2701,3 +2710,112 @@ app.constant('ProjectFrameworks', [
     img: 'images/empty-project.png'
   },
 ]);
+
+app.constant('ProjectFrameworkSteps', {
+  angular: [
+    {
+      step: 'start',
+      title: 'Welcome',
+      icon: 'fa fa-check-circle'
+    },
+    {
+      step: 'setup',
+      title: 'Application Setup',
+      icon: 'fa fa-sliders',
+      children: [
+        {
+          step: 'download',
+          title: 'Download',
+          icon: 'fa fa-download'
+        },
+        {
+          step: 'setup',
+          title: 'Configure',
+          icon: 'fa fa-sliders'
+        }
+      ]
+    },
+    {
+      step: 'three',
+      title: 'Three',
+      icon: 'fa fa-check',
+      children: []
+    },
+    {
+      step: 'four',
+      title: 'Four',
+      icon: 'fa fa-check',
+      children: []
+    },
+  ],
+  react: [
+    {
+      step: 'start',
+      noTitle: true,
+      title: 'Welcome',
+      icon: 'fa fa-check-circle',
+      template: 'views/project/overview/welcome.html'
+    },
+    {
+      step: 'download',
+      title: 'Application Setup',
+      icon: 'fa fa-sliders',
+      template: 'views/project/overview/react/download.html',
+      children: [
+        {
+          step: 'download',
+          title: 'Download',
+          icon: 'fa fa-download',
+          template: 'views/project/overview/react/download.html'
+        },
+        {
+          step: 'configure',
+          title: 'Configure',
+          icon: 'fa fa-sliders',
+          template: 'views/project/overview/react/configure.html'
+        }
+      ]
+    },
+    {
+      step: 'user',
+      title: 'Application User',
+      icon: 'fa fa-user-plus',
+      template: 'views/project/overview/user.html',
+      children: []
+    },
+    {
+      step: 'form',
+      title: 'Create a Form',
+      icon: 'fa fa-wpforms',
+      template: 'views/project/overview/form.html',
+      children: [
+        {
+          step: 'form',
+          title: 'Add an new form',
+          icon: 'fa fa-paper-plane',
+          template: 'views/project/overview/form.html'
+        },
+        {
+          step: 'action',
+          title: 'Add an action',
+          icon: 'fa fa-paper-plane',
+          template: 'views/project/overview/action.html'
+        }
+      ]
+    },
+    {
+      step: 'embed',
+      title: 'Embed the form',
+      icon: 'fa fa-code',
+      template: 'views/project/overview/react/embed.html',
+      children: []
+    },
+    {
+      step: 'launch',
+      title: 'Launch',
+      icon: 'fa fa-rocket',
+      template: 'views/project/overview/react/launch.html',
+      children: []
+    },
+  ]
+});

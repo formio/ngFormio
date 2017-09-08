@@ -1,0 +1,38 @@
+<div class="flow">
+  <div class="flow-container">
+    <div class="flow-side">
+      <div class="flow-side-content">
+        <div class="flow-side-line">
+          <div class="flow-side-steps">
+            <div class="flow-side-step" ng-if="active" ng-repeat="step in steps track by $index">
+              <div ng-click="changeStep(step)" class="flow-side-logo"
+                   ng-class="{'logo-active': currentParentStep.step === step.step }">
+                <i class="{{step.icon}}"></i>
+              </div>
+              <div class="steps">
+                <h4 ng-click="changeStep(step)" class="flow-side-step__title">
+                  {{step.title}}
+                </h4>
+                <div class="step-info" ng-if="step.children && currentParentStep.step === step.step">
+                  <div class="step-item" ng-repeat="childStep in step.children track by $index">
+                    <a ng-click=" changeStep(step, childStep)" ng-class="{'info-active': currentChildStep.step === childStep.step}"><i
+                      class="{{childStep.icon}}"></i>
+                      {{childStep.title}}</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="flow-content">
+      <div class="flow-content-header" ng-if="!currentParentStep.noTitle">
+        <h3 class="flow-content-title">{{currentParentStep.title}}<span ng-if="currentChildStep">: {{ currentChildStep.title}}</span></h3>
+      </div>
+      <div class="flow-content__container">
+        <ng-include src="currentParentStep.template" />
+      </div>
+    </div>
+  </div>
+</div>
