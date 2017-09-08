@@ -313,10 +313,10 @@ app.controller('FormController', [
       $scope.formReady = false;
       var filePath = '/pdf/' + $scope.projectId + '/file';
       var pdfServer = AppConfig.pdfServer;
-      if ($scope.currentProject.settings.pdfserver) {
-        pdfServer = $scope.currentProject.settings.pdfserver;
-      }
-      PDFServer.ensureProject($scope.loadProjectPromise).then(function(project) {
+      PDFServer.ensureProject($scope.primaryProjectPromise).then(function(project) {
+        if (project.settings.pdfserver) {
+          pdfServer = project.settings.pdfserver;
+        }
         Upload.upload({
           url: pdfServer + filePath,
           data: {file: file},
@@ -368,7 +368,7 @@ app.controller('FormController', [
 
       // Determine if we have enough to upload.
       $scope.purchaseRequired = false;
-      PDFServer.getInfo($scope.loadProjectPromise).then(function(info) {
+      PDFServer.getInfo($scope.primaryProjectPromise).then(function(info) {
         var numForms = parseInt(info.data.forms, 10);
         switch (info.data.plan) {
           case 'basic':
