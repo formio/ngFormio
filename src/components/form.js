@@ -35,7 +35,6 @@ module.exports = function(app) {
             $timeout
           ) {
             $scope.options = $scope.options || {};
-            var url = $scope.component.src;
             var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
 
             var refreshForm = function(formObj) {
@@ -43,6 +42,9 @@ module.exports = function(app) {
                 return;
               }
               if ($scope.componentForm) {
+                if ($scope.componentForm._id === formObj._id) {
+                  return;
+                }
                 $scope.componentForm = null;
               }
               $timeout(function() {
@@ -55,15 +57,18 @@ module.exports = function(app) {
                 return;
               }
 
-              url = baseUrl;
-              if ($scope.component.project) {
-                url += '/project/' + $scope.component.project;
+              var url = '';
+              if ($scope.component.src) {
+                url = $scope.component.src;
               }
-              else if ($scope.formio && $scope.formio.projectUrl) {
-                url  = $scope.formio.projectUrl;
+              else if ($scope.formio && $scope.component.form) {
+                url = $scope.formio.formsUrl + '/' + $scope.component.form;
               }
-              url += '/form/' + $scope.component.form;
-              url = (new Formio(url, {base: baseUrl})).formUrl;
+
+              if (!url) {
+                console.warn('Cannot load form. Need to pass in src or url to formio directive.');
+                return;
+              }
 
               if ($scope.data[$scope.component.key] && $scope.data[$scope.component.key]._id) {
                 url += '/submission/' + $scope.data[$scope.component.key]._id;

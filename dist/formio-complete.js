@@ -1,4 +1,4 @@
-/*! ng-formio v2.23.0 | https://unpkg.com/ng-formio@2.23.0/LICENSE.txt */
+/*! ng-formio v2.23.1 | https://unpkg.com/ng-formio@2.23.1/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 (function (root, factory) {
   // AMD
@@ -71955,7 +71955,6 @@ module.exports = function(app) {
             $timeout
           ) {
             $scope.options = $scope.options || {};
-            var url = $scope.component.src;
             var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
 
             var refreshForm = function(formObj) {
@@ -71963,6 +71962,9 @@ module.exports = function(app) {
                 return;
               }
               if ($scope.componentForm) {
+                if ($scope.componentForm._id === formObj._id) {
+                  return;
+                }
                 $scope.componentForm = null;
               }
               $timeout(function() {
@@ -71975,15 +71977,18 @@ module.exports = function(app) {
                 return;
               }
 
-              url = baseUrl;
-              if ($scope.component.project) {
-                url += '/project/' + $scope.component.project;
+              var url = '';
+              if ($scope.component.src) {
+                url = $scope.component.src;
               }
-              else if ($scope.formio && $scope.formio.projectUrl) {
-                url  = $scope.formio.projectUrl;
+              else if ($scope.formio && $scope.component.form) {
+                url = $scope.formio.formsUrl + '/' + $scope.component.form;
               }
-              url += '/form/' + $scope.component.form;
-              url = (new Formio(url, {base: baseUrl})).formUrl;
+
+              if (!url) {
+                console.warn('Cannot load form. Need to pass in src or url to formio directive.');
+                return;
+              }
 
               if ($scope.data[$scope.component.key] && $scope.data[$scope.component.key]._id) {
                 url += '/submission/' + $scope.data[$scope.component.key]._id;
