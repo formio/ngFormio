@@ -1,4 +1,4 @@
-/*! ng-formio v2.22.4 | https://unpkg.com/ng-formio@2.22.4/LICENSE.txt */
+/*! ng-formio v2.22.5 | https://unpkg.com/ng-formio@2.22.5/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 (function (root, factory) {
   // AMD
@@ -80240,6 +80240,10 @@ module.exports = function(app) {
             }
           };
 
+          $scope.hasError = function() {
+            return (settings.action === 'submit') && $scope.formioForm.$invalid && !$scope.formioForm.$pristine;
+          };
+
           var onCustom = function() {
             try {
               /* eslint-disable no-unused-vars */
@@ -80390,7 +80394,7 @@ module.exports = function(app) {
     '$templateCache',
     function($templateCache) {
       $templateCache.put('formio/components/button.html',
-        "<button ng-attr-type=\"{{ getButtonType() }}\"\n  id=\"{{ componentId }}\"\n  name=\"{{ componentId }}\"\n  ng-class=\"{'btn-block': component.block}\"\n  class=\"btn btn-{{ component.theme }} btn-{{ component.size }}\"\n  ng-disabled=\"readOnly || formioForm.submitting || (component.disableOnInvalid && formioForm.$invalid)\"\n  tabindex=\"{{ component.tabindex || 0 }}\"\n  ng-click=\"$emit('buttonClick', component, componentId)\">\n  <span ng-if=\"component.leftIcon\" class=\"{{ component.leftIcon }}\" aria-hidden=\"true\"></span>\n  <span ng-if=\"component.leftIcon && component.label\">&nbsp;</span>{{ component.label | formioTranslate:null:builder }}<span ng-if=\"component.rightIcon && component.label\">&nbsp;</span>\n  <span ng-if=\"component.rightIcon\" class=\"{{ component.rightIcon }}\" aria-hidden=\"true\"></span>\n   <i ng-if=\"component.action == 'submit' && formioForm.submitting\" class=\"glyphicon glyphicon-refresh glyphicon-spin\"></i>\n</button>\n"
+        "<button ng-attr-type=\"{{ getButtonType() }}\"\n    id=\"{{ componentId }}\"\n    name=\"{{ componentId }}\"\n    ng-class=\"{'btn-block': component.block}\"\n    class=\"btn btn-{{ component.theme }} btn-{{ component.size }}\"\n    ng-disabled=\"readOnly || formioForm.submitting || (component.disableOnInvalid && formioForm.$invalid) || hasError()\"\n    tabindex=\"{{ component.tabindex || 0 }}\"\n    ng-click=\"$emit('buttonClick', component, componentId)\">\n  <span ng-if=\"component.leftIcon\" class=\"{{ component.leftIcon }}\" aria-hidden=\"true\"></span>\n  <span ng-if=\"component.leftIcon && component.label\">&nbsp;</span>{{ component.label | formioTranslate:null:builder }}<span ng-if=\"component.rightIcon && component.label\">&nbsp;</span>\n  <span ng-if=\"component.rightIcon\" class=\"{{ component.rightIcon }}\" aria-hidden=\"true\"></span>\n  <i ng-if=\"component.action == 'submit' && formioForm.submitting\" class=\"glyphicon glyphicon-refresh glyphicon-spin\"></i>\n</button>\n<div ng-if=\"hasError()\" class=\"has-error\">\n  <p class=\"help-block\" onclick=\"scroll=window.scrollTo(0,0)\">\n    Please correct all errors before submitting.\n  </p>\n</div>\n"
       );
 
       $templateCache.put('formio/componentsView/button.html',
@@ -80987,7 +80991,7 @@ module.exports = function(app) {
     'FormioUtils',
     function($templateCache, FormioUtils) {
       $templateCache.put('formio/components/datagrid.html', FormioUtils.fieldWrap(
-        "<div class=\"formio-data-grid\" ng-controller=\"formioDataGrid\">\n  <table ng-class=\"{'table-striped': component.striped, 'table-bordered': component.bordered, 'table-hover': component.hover, 'table-condensed': component.condensed}\" class=\"table datagrid-table\">\n    <tr>\n      <th\n        ng-repeat=\"col in cols track by $index\"\n        ng-class=\"{'field-required': col.validate.required}\"\n        ng-if=\"builder ? '::true' : anyVisible(col)\"\n      >{{ col.label | formioTranslate:null:builder }}</th>\n    </tr>\n    <tr ng-repeat=\"row in rows track by $index\" ng-init=\"rowIndex = $index\">\n      <td ng-repeat=\"col in cols track by $index\" ng-init=\"col.hideLabel = true; colIndex = $index\" class=\"formio-data-grid-row\" ng-if=\"builder ? '::true' : anyVisible(col)\">\n        <formio-component\n          component=\"col\"\n          data=\"rows[rowIndex]\"\n          formio-form=\"formioForm\"\n          formio=\"formio\"\n          submission=\"submission\"\n          hide-components=\"hideComponents\"\n          ng-if=\"builder ? '::true' : isVisible(col, row)\"\n          read-only=\"isDisabled(col, row)\"\n          grid-row=\"rowIndex\"\n          grid-col=\"colIndex\"\n          builder=\"builder\"\n          options=\"options\"\n        ></formio-component>\n      </td>\n      <td ng-if=\"!component.hasOwnProperty('validate') || !component.validate.hasOwnProperty('minLength') || rows.length > component.validate.minLength\">\n        <a ng-click=\"removeRow(rowIndex)\" class=\"btn btn-default\">\n          <span class=\"glyphicon glyphicon-remove-circle\"></span>\n        </a>\n      </td>\n    </tr>\n  </table>\n  <div class=\"datagrid-add\" ng-if=\"!component.hasOwnProperty('validate') || !component.validate.hasOwnProperty('maxLength') || rows.length < component.validate.maxLength\">\n    <a ng-click=\"addRow()\" class=\"btn btn-primary\">\n      <span class=\"glyphicon glyphicon-plus\" aria-hidden=\"true\"></span> {{ component.addAnother || \"Add Another\" | formioTranslate:null:builder }}\n    </a>\n  </div>\n</div>\n"
+        "<div class=\"formio-data-grid\" ng-controller=\"formioDataGrid\">\n  <table ng-class=\"{'table-striped': component.striped, 'table-bordered': component.bordered, 'table-hover': component.hover, 'table-condensed': component.condensed}\" class=\"table datagrid-table\">\n    <tr>\n      <th\n        ng-repeat=\"col in cols track by $index\"\n        ng-class=\"{'field-required': col.validate.required}\"\n        ng-if=\"builder ? '::true' : anyVisible(col)\"\n      >{{ col.label | formioTranslate:null:builder }}</th>\n    </tr>\n    <tr ng-repeat=\"row in rows track by $index\" ng-init=\"rowIndex = $index\">\n      <td ng-repeat=\"col in cols track by $index\" ng-init=\"col.hideLabel = true; colIndex = $index\" class=\"formio-data-grid-row\" ng-if=\"builder ? '::true' : anyVisible(col)\">\n        <formio-component\n          component=\"col\"\n          data=\"rows[rowIndex]\"\n          formio-form=\"formioForm\"\n          formio=\"formio\"\n          submission=\"submission\"\n          hide-components=\"hideComponents\"\n          ng-if=\"builder ? '::true' : isVisible(col, row)\"\n          read-only=\"isDisabled(col, row)\"\n          grid-row=\"rowIndex\"\n          grid-col=\"colIndex\"\n          builder=\"builder\"\n          options=\"options\"\n        ></formio-component>\n      </td>\n      <td ng-if=\"!component.hasOwnProperty('validate') || !component.validate.hasOwnProperty('minLength') || rows.length > component.validate.minLength\">\n        <a ng-click=\"(readOnly || formioForm.submitting)? null: removeRow(rowIndex) \" ng-disabled = \"readOnly || formioForm.submitting\" class=\"btn btn-default\">\n          <span class=\"glyphicon glyphicon-remove-circle\"></span>\n        </a>\n      </td>\n    </tr>\n  </table>\n  <div class=\"datagrid-add\" ng-if=\"!component.hasOwnProperty('validate') || !component.validate.hasOwnProperty('maxLength') || rows.length < component.validate.maxLength\">\n    <a ng-click=\"(readOnly || formioForm.submitting)? null: addRow() \" ng-disabled = \"readOnly || formioForm.submitting\" class=\"btn btn-primary\">\n      <span class=\"glyphicon glyphicon-plus\" aria-hidden=\"true\"></span> {{ component.addAnother || \"Add Another\" | formioTranslate:null:builder }}\n    </a>\n  </div>\n</div>\n"
       ));
     }
   ]);
@@ -81747,85 +81751,122 @@ module.exports = function(app) {
           unique: false,
           persistent: true
         },
-        controller: ['$scope', 'FormioUtils', 'Formio', function($scope, FormioUtils, Formio) {
-          var url = $scope.component.src;
-          $scope.options = $scope.options || {};
-          var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
-          if ($scope.component.form) {
-            url = baseUrl;
-            if ($scope.component.project) {
-              url += '/project/' + $scope.component.project;
-            }
-            else if ($scope.formio && $scope.formio.projectUrl) {
-              url  = $scope.formio.projectUrl;
-            }
-            url += '/form/' + $scope.component.form;
-            url = (new Formio(url, {base: baseUrl})).formUrl;
-          }
-
-          if ($scope.data[$scope.component.key] && $scope.data[$scope.component.key]._id) {
-            url += '/submission/' + $scope.data[$scope.component.key]._id;
-          }
-
-          $scope.formFormio = new Formio(url, {base: baseUrl});
-          $scope.formFormio.loadForm().then(function(form) {
-            $scope.componentForm = form;
-          });
-
-          var submitForm = function(scope, cb) {
-            var components = [];
-            if (scope.activePage) {
-              components = scope.activePage.components;
-            }
-            else if (scope.form) {
-              components = scope.form.components;
-            }
-            if (FormioUtils.getComponent(components, $scope.component.key)) {
-              $scope.formFormio.saveSubmission(angular.copy($scope.data[$scope.component.key])).then(function(sub) {
-                angular.merge($scope.data[$scope.component.key], sub);
-                cb();
-              }, cb);
-            }
-            else {
-              return cb();
-            }
-          };
-
-          // Hook into the submit method.
-          FormioUtils.hook($scope.component.key + ':submit', function(scope, data, cb) {
-            submitForm(scope, cb);
-          });
-
-          // Hook into the nextpage method.
-          FormioUtils.hook($scope.component.key + ':nextPage', function(scope, cb) {
-            submitForm(scope, cb);
-          });
-
-          // Hook into the prevpage method.
-          FormioUtils.hook($scope.component.key + ':prevPage', function(scope, cb) {
-            submitForm(scope, cb);
-          });
-
-          // See if we need to load the submission into scope.
-          if (
-            $scope.data[$scope.component.key] &&
-            $scope.data[$scope.component.key]._id &&
-            !$scope.data[$scope.component.key].data
+        controller: [
+          '$scope',
+          'FormioUtils',
+          'Formio',
+          '$timeout',
+          function(
+            $scope,
+            FormioUtils,
+            Formio,
+            $timeout
           ) {
-            $scope.formFormio.loadSubmission().then(function(submission) {
-              angular.merge($scope.data[$scope.component.key], submission);
-            });
-          }
+            $scope.options = $scope.options || {};
+            var url = $scope.component.src;
+            var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
 
-          // Make sure to hide the submit button on the loaded form.
-          $scope.$on('formLoad', function(err, form) {
-            FormioUtils.eachComponent(form.components, function(component) {
-              if ((component.type === 'button') && (component.action === 'submit')) {
-                component.hidden = true;
+            var refreshForm = function(formObj) {
+              if (!formObj) {
+                return;
               }
+              if ($scope.componentForm) {
+                $scope.componentForm = null;
+              }
+              $timeout(function() {
+                $scope.componentForm = formObj;
+              });
+            };
+
+            var loadForm = function() {
+              if (!$scope.component.form) {
+                return;
+              }
+
+              url = baseUrl;
+              if ($scope.component.project) {
+                url += '/project/' + $scope.component.project;
+              }
+              else if ($scope.formio && $scope.formio.projectUrl) {
+                url  = $scope.formio.projectUrl;
+              }
+              url += '/form/' + $scope.component.form;
+              url = (new Formio(url, {base: baseUrl})).formUrl;
+
+              if ($scope.data[$scope.component.key] && $scope.data[$scope.component.key]._id) {
+                url += '/submission/' + $scope.data[$scope.component.key]._id;
+              }
+
+              $scope.formFormio = new Formio(url, {base: baseUrl});
+              if ($scope.formFormio.formId) {
+                $scope.formFormio.loadForm().then(refreshForm);
+              }
+
+              // See if we need to load the submission into scope.
+              if (
+                $scope.formFormio.submissionId &&
+                $scope.data[$scope.component.key] &&
+                $scope.data[$scope.component.key]._id &&
+                !$scope.data[$scope.component.key].data
+              ) {
+                $scope.formFormio.loadSubmission().then(function(submission) {
+                  angular.merge($scope.data[$scope.component.key], submission);
+                });
+              }
+            };
+
+            var submitForm = function(scope, cb) {
+              var components = [];
+              if (scope.activePage) {
+                components = scope.activePage.components;
+              }
+              else if (scope.form) {
+                components = scope.form.components;
+              }
+              if (FormioUtils.getComponent(components, $scope.component.key)) {
+                $scope.formFormio.saveSubmission(angular.copy($scope.data[$scope.component.key])).then(function(sub) {
+                  angular.merge($scope.data[$scope.component.key], sub);
+                  cb();
+                }, cb);
+              }
+              else {
+                return cb();
+              }
+            };
+
+            // Hook into the submit method.
+            FormioUtils.hook($scope.component.key + ':submit', function(scope, data, cb) {
+              submitForm(scope, cb);
             });
-          });
-        }],
+
+            // Hook into the nextpage method.
+            FormioUtils.hook($scope.component.key + ':nextPage', function(scope, cb) {
+              submitForm(scope, cb);
+            });
+
+            // Hook into the prevpage method.
+            FormioUtils.hook($scope.component.key + ':prevPage', function(scope, cb) {
+              submitForm(scope, cb);
+            });
+
+            // Make sure to hide the submit button on the loaded form.
+            $scope.$on('formLoad', function(err, form) {
+              FormioUtils.eachComponent(form.components, function(component) {
+                if ((component.type === 'button') && (component.action === 'submit')) {
+                  component.hidden = true;
+                }
+              });
+            });
+
+            $scope.$watch('component.form', function() {
+              loadForm();
+            });
+
+            $scope.$watch('data[component.key]', function() {
+              refreshForm($scope.componentForm);
+            }, true);
+          }
+        ],
         tableView: GridUtils.generic
       });
     }
@@ -84143,6 +84184,10 @@ module.exports = function() {
             // copy to remove angular $$hashKey
             var submissionMethod = submissionData._id ? 'put' : 'post';
             $scope.formio.saveSubmission(submissionData, $scope.formioOptions).then(function(submission) {
+              // If submission saved propagate method to ngFormioHelper for correct message
+              if (typeof submission === 'object') {
+                submission.method = submissionMethod;
+              }
               onSubmitDone(submissionMethod, submission, form);
             }, FormioScope.onError($scope, $element)).finally(function() {
               if (form) {
@@ -86081,10 +86126,10 @@ module.exports = function() {
                 '<formio-errors ng-if="::!builder"></formio-errors>' +
               '</div>' +
             '</td>' +
-            '<td><a ng-click="removeFieldValue($index)" class="btn btn-default"><span class="glyphicon glyphicon-remove-circle"></span></a></td>' +
+            '<td><a ng-click="(readOnly || formioForm.submitting)? null:removeFieldValue($index) " ng-disabled = "readOnly || formioForm.submitting" class="btn btn-default"><span class="glyphicon glyphicon-remove-circle"></span></a></td>' +
           '</tr>' +
           '<tr>' +
-            '<td colspan="2"><a ng-click="addFieldValue()" class="btn btn-primary"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {{ component.addAnother || "Add Another" | formioTranslate:null:builder }}</a></td>' +
+            '<td colspan="2"><a ng-click="(readOnly || formioForm.submitting)? null: addFieldValue() " ng-disabled = "readOnly || formioForm.submitting" class="btn btn-primary"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {{ component.addAnother || "Add Another" | formioTranslate:null:builder }}</a></td>' +
           '</tr>' +
         '</table></div>';
       return template;

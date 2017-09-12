@@ -36,6 +36,10 @@ module.exports = function(app) {
             }
           };
 
+          $scope.hasError = function() {
+            return (settings.action === 'submit') && $scope.formioForm.$invalid && !$scope.formioForm.$pristine;
+          };
+
           var onCustom = function() {
             try {
               /* eslint-disable no-unused-vars */
