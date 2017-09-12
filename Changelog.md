@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [UNRELEASED]
 
+## 2.23.1
+### Fixed
+ - Issue with the form component for certain option configurations.
+
 ## 2.23.0
 ### Added
  - EditGrid component
