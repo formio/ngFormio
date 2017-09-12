@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [UNRELEASED]
 
-## 2.22.7
+## 2.23.0
 ### Added
  - EditGrid component
 
