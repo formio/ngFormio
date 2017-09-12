@@ -144,9 +144,8 @@ module.exports = function() {
         if (component.type === 'selectboxes') {
           return done(false);
         }
-
         // If there is a default value and it is not an array, wrap the value.
-        if (component.multiple && component.defaultValue && typeof component.defaultValue === 'string') {
+        if (component.multiple && component.type !== 'file' && typeof component.defaultValue === 'string') {
           value = component.defaultValue.split(',');
         }
         else {
@@ -361,10 +360,10 @@ module.exports = function() {
                 '<formio-errors ng-if="::!builder"></formio-errors>' +
               '</div>' +
             '</td>' +
-            '<td><a ng-click="removeFieldValue($index)" class="btn btn-default"><span class="glyphicon glyphicon-remove-circle"></span></a></td>' +
+            '<td><a ng-click="(readOnly || formioForm.submitting)? null:removeFieldValue($index) " ng-disabled = "readOnly || formioForm.submitting" class="btn btn-default"><span class="glyphicon glyphicon-remove-circle"></span></a></td>' +
           '</tr>' +
           '<tr>' +
-            '<td colspan="2"><a ng-click="addFieldValue()" class="btn btn-primary"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {{ component.addAnother || "Add Another" | formioTranslate:null:builder }}</a></td>' +
+            '<td colspan="2"><a ng-click="(readOnly || formioForm.submitting)? null: addFieldValue() " ng-disabled = "readOnly || formioForm.submitting" class="btn btn-primary"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {{ component.addAnother || "Add Another" | formioTranslate:null:builder }}</a></td>' +
           '</tr>' +
         '</table></div>';
       return template;
