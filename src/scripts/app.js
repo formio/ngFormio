@@ -229,6 +229,11 @@ angular
           templateUrl: 'views/project/primary-settings.html',
           controller: 'PrimaryProjectSettingsController'
         })
+        .state('project.billing', {
+          url: '/billing',
+          templateUrl: 'views/project/billing.html',
+          controller: 'ProjectBilling'
+        })
         .state('project.env', {
           url: '/env',
           abstract: true,
@@ -538,7 +543,6 @@ angular
     'FormioProject',
     'AppConfig',
     'ProjectPlans',
-    'ProjectUpgradeDialog',
     'ProjectFrameworks',
     '$timeout',
     '$q',
@@ -552,7 +556,6 @@ angular
       FormioProject,
       AppConfig,
       ProjectPlans,
-      ProjectUpgradeDialog,
       ProjectFrameworks,
       $timeout,
       $q,
@@ -702,8 +705,6 @@ angular
       $scope.getAPICallsLimit = ProjectPlans.getAPICallsLimit.bind(ProjectPlans);
       $scope.getAPICallsPercent = ProjectPlans.getAPICallsPercent.bind(ProjectPlans);
       $scope.getProgressBarClass = ProjectPlans.getProgressBarClass.bind(ProjectPlans);
-
-      $scope.showUpgradeDialog = ProjectUpgradeDialog.show.bind(ProjectUpgradeDialog);
 
       $rootScope.welcomeForceClose = false;
       $scope.closeWelcome = function() {
@@ -1053,35 +1054,40 @@ angular
           name: 'trial',
           title: 'Trial',
           labelStyle: 'label-trial',
-          priceDescription: 'Free 30 days'
+          price: 0,
+          priceDescription: 'Free for 30 days'
         },
         basic: {
           order: 1,
           name: 'basic',
           title: 'Basic',
           labelStyle: 'label-info',
-          priceDescription: 'Free'
+          price: 0,
+          priceDescription: '$0/month'
         },
         independent: {
           order: 2,
           name: 'independent',
           title: 'Independent',
           labelStyle: 'label-warning',
-          priceDescription: '$15/mo'
+          price: 15,
+          priceDescription: '$15/month'
         },
         team: {
           order: 3,
           name: 'team',
           title: 'Team Pro',
           labelStyle: 'label-success',
-          priceDescription: '$100/mo'
+          price: 100,
+          priceDescription: '$100/month'
         },
         commercial: {
           order: 4,
           name: 'commercial',
-          title: 'Commercial',
+          title: 'Enterprise',
           labelStyle: 'label-commercial',
-          priceDescription: '$250/mo'
+          price: 250,
+          priceDescription: '$250/month'
         }
       },
       getPlans: function() {

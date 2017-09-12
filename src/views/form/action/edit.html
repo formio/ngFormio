@@ -3,7 +3,7 @@
   <div class="col-md-12">
     <br>
     <div ng-if="actionInfo.premium === true" class="alert alert-warning">
-      This is a Premium Action, not available on the {{ getPlanName(currentProject.plan) }} plan. Please <a ng-click="showUpgradeDialog(currentProject)">Upgrade</a> this project to access this feature.
+      This is a Premium Action, not available on the {{ getPlanName(currentProject.plan) }} plan. Please <a ui-sref="project.billing({projectId: primaryProject._id})">Upgrade</a> this project to access this feature.
     </div>
   </div>
 </div>

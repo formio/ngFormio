@@ -1510,6 +1510,12 @@ footer {
   }
 }
 
+.list-group {
+  .list-group-heading {
+    background-color: $table-bg-hover;
+  }
+}
+
 .list-group.list-group-striped {
   .list-group-item {
     border-color: #eeeeee;

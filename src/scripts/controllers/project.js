@@ -87,18 +87,14 @@ app.directive('upgradeWarning', function() {
     controller: [
       '$scope',
       '$attrs',
-      'ProjectUpgradeDialog',
       function(
         $scope,
-        $attrs,
-        ProjectUpgradeDialog
+        $attrs
       ) {
         $scope.warning = $attrs.warning;
         $scope.projectSettingsVisible = function() {
           return ($scope.highestRole === 'owner' || $scope.highestRole === 'team_admin');
         };
-
-        $scope.showUpgradeDialog = ProjectUpgradeDialog.show.bind(ProjectUpgradeDialog);
       }
     ]
   };
@@ -218,7 +214,6 @@ app.controller('ProjectController', [
   'AppConfig',
   'ProjectPlans',
   '$http',
-  'ProjectUpgradeDialog',
   '$q',
   'GoogleAnalytics',
   'RemoteTokens',
@@ -233,7 +228,6 @@ app.controller('ProjectController', [
     AppConfig,
     ProjectPlans,
     $http,
-    ProjectUpgradeDialog,
     $q,
     GoogleAnalytics,
     RemoteTokens,
@@ -492,7 +486,6 @@ app.controller('ProjectController', [
     $scope.getAPICallsLimit = ProjectPlans.getAPICallsLimit.bind(ProjectPlans);
     $scope.getAPICallsPercent = ProjectPlans.getAPICallsPercent.bind(ProjectPlans);
     $scope.getProgressBarClass = ProjectPlans.getProgressBarClass.bind(ProjectPlans);
-    $scope.showUpgradeDialog = ProjectUpgradeDialog.show.bind(ProjectUpgradeDialog);
   }
 ]);
 
@@ -2555,121 +2548,103 @@ app.controller('ProjectDeleteController', [
   }
 ]);
 
-app.factory('ProjectUpgradeDialog', [
+app.controller('ProjectBilling', [
   '$rootScope',
-  '$state',
-  'Formio',
-  'FormioAlerts',
-  'ngDialog',
+  '$scope',
   'AppConfig',
-  'ProjectPlans',
+  'FormioAlerts',
   'UserInfo',
-  '$http',
-  function(
-    $rootScope,
-    $state,
-    Formio,
-    FormioAlerts,
-    ngDialog,
-    AppConfig,
-    ProjectPlans,
-    UserInfo,
-    $http
-  ) {
-    return {
-      show: function(project) {
-        if ($rootScope.user._id !== project.owner) {
-          FormioAlerts.onError({
-            message: 'You must be a project\'s owner to upgrade its plan.'
-          });
-          return;
-        }
-        ngDialog.open({
-          template: 'views/project/upgradeDialog.html',
-          showClose: true,
-          className: 'ngdialog-theme-default project-upgrade',
-          controller: [
-            '$scope',
-            function($scope) {
-              var loadPaymentInfo = function() {
-                $scope.paymentInfoLoading = true;
-                UserInfo.getPaymentInfo()
-                .then(function(paymentInfo) {
-                  $scope.paymentInfo = paymentInfo;
-                  $scope.paymentInfoLoading = false;
-                }, FormioAlerts.onError.bind(FormioAlerts))
-                .catch(FormioAlerts.onError.bind(FormioAlerts));
-              };
+  'ProjectPlans',
+  function($rootScope, $scope, AppConfig, FormioAlerts, UserInfo, ProjectPlans) {
+    $scope.primaryProjectPromise.then(function(project) {
 
-              loadPaymentInfo();
+      $scope.plans = ProjectPlans.getPlans();
 
-              var getActiveForm = function() {
-                if(!$scope.paymentInfoLoading && !$scope.paymentInfo) {
-                  return $scope.paymentForm;
-                }
-              };
+      var loadPaymentInfo = function() {
+        $scope.paymentInfoLoading = true;
+        UserInfo.getPaymentInfo()
+          .then(function(paymentInfo) {
+            $scope.paymentInfo = paymentInfo;
+            $scope.paymentInfoLoading = false;
+          }, FormioAlerts.onError.bind(FormioAlerts))
+          .catch(FormioAlerts.onError.bind(FormioAlerts));
+      };
 
-              var currTime = (new Date()).getTime();
-              var projTime = (new Date(project.created.toString())).getTime();
-              var delta = Math.ceil(parseInt((currTime - projTime) / 1000));
-              var day = 86400;
-              var remaining = 30 - parseInt(delta / day);
-              $scope.trialDaysRemaining = remaining > 0 ? remaining : 0;
+      loadPaymentInfo();
 
-              $scope.$on('formSubmission', function() {
-                if(getActiveForm() === $scope.paymentForm) {
-                  loadPaymentInfo();
-                }
-              });
+      var currTime = (new Date()).getTime();
+      var projTime = (new Date(project.created.toString())).getTime();
+      var delta = Math.ceil(parseInt((currTime - projTime) / 1000));
+      var day = 86400;
+      var remaining = 30 - parseInt(delta / day);
+      $scope.trialDaysRemaining = remaining > 0 ? remaining : 0;
 
-              $scope.changePaymentInfo = function() {
-                $scope.paymentInfo = null;
-              };
-              $scope.setSelectedPlan = function(plan) {
-                $scope.selectedPlan = plan;
-              };
+      // Default to the commercial from trial or to current plan.
+      $scope.selectedPlan = $scope.getPlan(project.plan);
+    });
 
-              $scope.upgradeProject = function(plan) {
-                $http.post(AppConfig.apiBase + '/project/' + project._id + '/upgrade',
-                  {plan: plan}
-                )
-                .then(function() {
-                  $scope.closeThisDialog(true);
-                  Formio.clearCache();
-                  $state.reload();
-                }, FormioAlerts.onError.bind(FormioAlerts))
-                .catch(FormioAlerts.onError.bind(FormioAlerts));
-              };
-
-              $scope.capitalize = _.capitalize;
-              $scope.plans = ProjectPlans.getPlans();
-              $scope.getPlan = ProjectPlans.getPlan.bind(ProjectPlans);
-              $scope.paymentForm = AppConfig.paymentForm;
-              $scope.commercialContactForm = AppConfig.commercialContactForm;
-              $scope.commercialContactSubmission = {
-                data: {
-                  project: project._id,
-                  contactName: $rootScope.user.data.fullName,
-                  contactEmail: $rootScope.user.data.email
-                }
-              };
-
-              // Default to the team plan for upgrades, unless they are already team pro, then show commercial.
-              $scope.selectedPlan = ($scope.getPlan(project.plan).order < ProjectPlans.plans.team.order) ? _.find($scope.plans, {order: ProjectPlans.plans.team.order}) : _.find($scope.plans, {order: ProjectPlans.plans.commercial.order});
-
-              // Display the selected plan, by name.
-              if ($scope.selectedPlan) {
-                $scope.selectedPlan = $scope.selectedPlan.name;
-              }
-              // When the plan is unknown, default to team pro.
-              if ($scope.selectedPlan === undefined) {
-                $scope.selectedPlan = 'team';
-              }
-            }
-          ]
-        });
+    var getActiveForm = function() {
+      if(!$scope.paymentInfoLoading && !$scope.paymentInfo) {
+        return $scope.paymentForm;
       }
     };
+
+    $scope.$on('formSubmission', function() {
+      if(getActiveForm() === $scope.paymentForm) {
+        loadPaymentInfo();
+      }
+    });
+    $scope.changePaymentInfo = function() {
+      $scope.paymentInfo = null;
+    };
+    $scope.setSelectedPlan = function(plan) {
+      $scope.selectedPlan = plan;
+    };
+
+    $scope.upgradeProject = function(plan) {
+      $http.post(AppConfig.apiBase + '/project/' + project._id + '/upgrade',
+        {plan: plan}
+        )
+        .then(function() {
+          Formio.clearCache();
+          $state.reload();
+        }, FormioAlerts.onError.bind(FormioAlerts))
+        .catch(FormioAlerts.onError.bind(FormioAlerts));
+    };
+
+    $scope.setSelectedPlan = function(plan) {
+      $scope.selectedPlan = plan;
+    };
+
+    $scope.capitalize = _.capitalize;
+    $scope.plans = ProjectPlans.getPlans();
+    $scope.getPlan = ProjectPlans.getPlan.bind(ProjectPlans);
+    $scope.paymentForm = AppConfig.paymentForm;
+
+    $scope.servers = {
+      api: 0,
+      pdf: 0
+    };
+
+    var calculatePrice = function() {
+      if ($scope.selectedPlan.order < $scope.getPlan('team').order) {
+        $scope.servers = {
+          api: 0,
+          pdf: 0
+        }
+      }
+      if ($scope.selectedPlan) {
+        $scope.pricing = {
+          plan: $scope.selectedPlan.price,
+          api: ($scope.servers.api % 3 * 250) + (Math.floor($scope.servers.api / 3) * 500),
+          pdf: ($scope.servers.pdf % 3 * 250) + (Math.floor($scope.servers.pdf / 3) * 500)
+        }
+        $scope.pricing.total = $scope.pricing.plan + $scope.pricing.api + $scope.pricing.pdf;
+      }
+    };
+
+    $scope.$watch('servers', calculatePrice, true);
+    $scope.$watch('selectedPlan', calculatePrice, true);
   }
 ]);
 

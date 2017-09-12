@@ -18,7 +18,7 @@
     <li><h2 class="project-title"><a ui-sref="project.overview">{{ primaryProject.title }}</a></h2></li>
     <li ng-if="currentSection.title"><h2>›</h2></li>
     <li ng-if="currentSection.title"><h2><i class="{{ currentSection.icon }}"></i> {{ currentSection.title }}</h2></li>
-    <li><span class="project-plan {{ getPlanLabel(primaryProject.plan) }}" ng-disabled="!projectSettingsVisible()" ng-click="showUpgradeDialog(primaryProject)">{{ getPlanName(primaryProject.plan) }}</span> <span ng-if="primaryProject.plan === 'trial'" class="project-trial-remaining"><strong>{{trialDaysRemaining}}</strong> Days remaining <a class="" ng-click="showUpgradeDialog(primaryProject)"><i class="fa fa-arrow-circle-up"></i> Upgrade Now</a></span>
+    <li><a class="project-plan {{ getPlanLabel(primaryProject.plan) }}" ng-disabled="!projectSettingsVisible()" ui-sref="project.billing({projectId: primaryProject._id})">{{ getPlanName(primaryProject.plan) }}</a> <span ng-if="primaryProject.plan === 'trial'" class="project-trial-remaining"><strong>{{trialDaysRemaining}}</strong> Days remaining <a class="" ui-sref="project.billing({projectId: primaryProject._id})"><i class="fa fa-arrow-circle-up"></i> Upgrade Now</a></span>
     </li>
   </ul>
   <ul class="nav nav-tabs project-nav">

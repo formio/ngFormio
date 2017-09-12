@@ -18,7 +18,7 @@
       <p class="help-block" ng-show="projectForm.name.$error.unique && projectForm.name.$dirty">This domain is unavailable. Please pick a different domain.</p>
       <p class="help-block" ng-show="projectForm.name.$valid">This domain is available!</p>
     </div>
-    <p ng-if="['basic', 'trial'].indexOf(primaryProject.plan) !== -1 && projectSettingsVisible() && !onPrem" class="text-danger"><em><a ng-click="showUpgradeDialog(currentProject)">Upgrade</a> your project to a paid plan to enable custom subdomains.</em></p>
+    <p ng-if="['basic', 'trial'].indexOf(primaryProject.plan) !== -1 && projectSettingsVisible() && !onPrem" class="text-danger"><em><a ui-sref="project.billing({projectId: primaryProject._id})">Upgrade</a> your project to a paid plan to enable custom subdomains.</em></p>
   </div>
   <div id="form-group-protect" class="form-group" ng-if="currentProject._id">
     <label for="protect" class="control-label">
