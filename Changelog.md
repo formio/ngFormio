@@ -6,6 +6,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [UNRELEASED]
 
+## 2.22.7
+### Added
+ - EditGrid component
+
+## 2.22.6
+### Fixed
+ - Form component
+
+### Added
+ - Validation feedback on the submit button for a form with errors.
+
 ## 2.22.5
 ### Fixed
  - Default values for multi value fields no longer defaulted to have one field already open.

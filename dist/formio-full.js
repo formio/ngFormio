@@ -1,4 +1,4 @@
-/*! ng-formio v2.22.6 | https://unpkg.com/ng-formio@2.22.6/LICENSE.txt */
+/*! ng-formio v2.22.7 | https://unpkg.com/ng-formio@2.22.7/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 (function (root, factory) {
   // AMD
@@ -80641,7 +80641,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":304}],259:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":305}],259:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.provider('formioComponents', function() {
@@ -80767,7 +80767,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":304}],261:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":305}],261:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -80935,7 +80935,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":304}],264:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":305}],264:[function(_dereq_,module,exports){
 "use strict";
 
 var formioUtils = _dereq_('formiojs/utils');
@@ -81442,6 +81442,390 @@ module.exports = function(app) {
 
 },{}],267:[function(_dereq_,module,exports){
 "use strict";
+
+var formioUtils = _dereq_('formiojs/utils');
+
+module.exports = function(app) {
+  app.config([
+    'formioComponentsProvider',
+    function(formioComponentsProvider) {
+      formioComponentsProvider.register('editgrid', {
+        title: 'Edit Grid',
+        template: 'formio/components/editgrid.html',
+        group: 'advanced',
+        tableView: function(data, component, $interpolate, componentInfo, tableChild) {
+          var view = '<table class="table table-striped table-bordered table-child">';
+
+          if (!tableChild) {
+            view += '<thead><tr>';
+            angular.forEach(component.components, function(component) {
+              view += '<th>' + (component.label || '') + ' (' + component.key + ')</th>';
+            });
+            view += '</tr></thead>';
+          }
+
+          view += '<tbody>';
+          angular.forEach(data, function(row) {
+            view += '<tr>';
+            formioUtils.eachComponent(component.components, function(component) {
+              // Don't render disabled fields, or fields with undefined data.
+              if (!component.tableView || row[component.key] === undefined) {
+                return;
+              }
+
+              // If the component has a defined tableView, use that, otherwise try and use the raw data as a string.
+              var info = componentInfo.components.hasOwnProperty(component.type) ? componentInfo.components[component.type] : {};
+              if (info.tableView) {
+                // Reset the tableChild value for datagrids, so that components have headers.
+                view += '<td>' + info.tableView(row[component.key] || '', component, $interpolate, componentInfo, false) + '</td>';
+              }
+              else {
+                view += '<td>';
+                if (component.prefix) {
+                  view += component.prefix;
+                }
+                view += row[component.key] || '';
+                if (component.suffix) {
+                  view += ' ' + component.suffix;
+                }
+                view += '</td>';
+              }
+            });
+            view += '</tr>';
+          });
+          view += '</tbody></table>';
+          return view;
+        },
+        settings: {
+          input: true,
+          tree: true,
+          components: [],
+          multiple: true,
+          tableView: true,
+          label: '',
+          key: 'editgrid',
+          protected: false,
+          persistent: true,
+          hidden: false,
+          clearOnHide: true,
+          templates: {
+            header: '' +
+              '<div class="row"> \n' +
+              '  {%util.eachComponent(components, function(component) { %} \n' +
+              '    <div class="col-sm-2"> \n' +
+              '      {{ component.label }} \n' +
+              '    </div> \n' +
+              '  {% }) %} \n' +
+              '</div>',
+            row: '' +
+              '<div class="row"> \n' +
+              '  {%util.eachComponent(components, function(component) { %} \n' +
+              '    <div class="col-sm-2"> \n' +
+              '      {{ row[component.key] }} \n' +
+              '    </div> \n' +
+              '  {% }) %} \n' +
+              '  <div class="col-sm-2"> \n' +
+              '    <div class="btn-group pull-right"> \n' +
+              '      <div class="btn btn-default editRow">Edit</div> \n' +
+              '      <div class="btn btn-danger removeRow">Delete</div> \n' +
+              '    </div> \n' +
+              '  </div> \n' +
+              '</div>',
+            footer: ''
+          }
+        }
+      });
+    }
+  ]);
+  app.directive('editgridValidation', function() {
+    return {
+      require: 'ngModel',
+      restrict: 'A',
+      link: function(scope, elem, attr, ctrl) {
+        if (scope.builder) return;
+
+        // Add the control to the main form.
+        scope.formioForm.$addControl(ctrl);
+
+        ctrl.$validators.editgrid = function(modelValue, viewValue) {
+          if (scope.openRows && scope.openRows.length) {
+            return false;
+          }
+          return true;
+        };
+      }
+    }
+  });
+  app.directive('editgridRowValidation', function() {
+    return {
+      require: 'ngModel',
+      restrict: 'A',
+      link: function(scope, elem, attr, ctrl) {
+        if (scope.builder) return;
+
+        // Add the control to the main form.
+        scope.formioForm.$addControl(ctrl);
+
+        var _get = function(item, path, def) {
+          if (!item) {
+            return def || undefined;
+          }
+          if (!path) {
+            return item;
+          }
+
+          // If the path is a string, turn it into an array.
+          if (typeof path === 'string') {
+            path = path.split('.');
+          }
+          // If the path is an array, take the first element, and recurse its path
+          if (path instanceof Array) {
+            var current = path.shift();
+            if (item.hasOwnProperty(current)) {
+              // If there are no more path items, stop here.
+              if (path.length === 0) {
+                return item[current];
+              }
+
+              return _get(item[current], path);
+            }
+
+            return undefined;
+          }
+
+          return undefined;
+        };
+
+        ctrl.$validators.editgridrow = function(modelValue, viewValue) {
+          var valid = true;
+          /*eslint-disable no-unused-vars */
+          if (scope.component.validate && scope.component.validate.row) {
+            var input = modelValue || viewValue;
+
+            // FOR-255 - Enable row data and form data to be visible in the validator.
+            var data = scope.submission.data;
+            var row = scope.row;
+            /*eslint-enable no-unused-vars */
+
+            var custom = scope.component.validate.row;
+            custom = custom.replace(/({{\s{0,}(.*[^\s]){1}\s{0,}}})/g, function(match, $1, $2) {
+              return _get(scope.submission.data, $2);
+            });
+
+            try {
+              /* jshint evil: true */
+              eval(custom);
+            }
+            catch (err) {
+              valid = err.message;
+            }
+
+            if (valid !== true) {
+              return false;
+            }
+          }
+
+          return true;
+        };
+      }
+    }
+  });
+  app.directive('renderTemplate', function() {
+    return {
+      restrict: 'E',
+      replace: true,
+      scope: {
+        template: '=',
+        data: '=',
+        actions: '='
+      },
+      link: function(scope, element, attrs) {
+        scope.$watch('data', function() {
+          // Render template and set in element's innerHTML.
+          element.html(formioUtils.interpolate(scope.template, scope.data));
+          // Add actions to child elements with classes.
+          if (scope.actions && scope.actions.length) {
+            scope.actions.forEach(function(action) {
+              var elements = element.find('.' + action.class);
+              elements.each(function(index, element) {
+                element.addEventListener(action.event, action.action);
+              });
+            });
+          }
+        })
+      }
+    }
+  });
+  app.directive('editGridRow', function() {
+    return {
+      restict: 'E',
+      require: 'ngModel',
+      scope: false,
+      controller: [
+        '$scope',
+        function(
+          $scope
+        ) {
+          $scope.$watchCollection('rows', function() {
+            $scope.rowData = angular.copy($scope.rows[$scope.rowIndex]);
+            $scope.templateData = {
+              row: $scope.rowData,
+              rowIndex: $scope.rowIndex,
+              components: $scope.component.components,
+              util: formioUtils
+            };
+          });
+          $scope.editDone = function(form) {
+            if (!form.$valid) {
+              form.$setDirty(true);
+              for (var key in form) {
+                if (form[key] && form[key].hasOwnProperty('$pristine')) {
+                  form[key].$setDirty(true);
+                }
+                if (form[key] && form[key].$validate) {
+                  form[key].$validate();
+                }
+              }
+              return;
+            }
+            $scope.rows[$scope.rowIndex] = $scope.rowData;
+            $scope.openRows.splice($scope.openRows.indexOf($scope.rowIndex), 1);
+          }
+
+          var editRow = function() {
+            $scope.openRows.push($scope.rowIndex);
+            $scope.$apply();
+          }
+          var removeRow = function() {
+            $scope.removeRow($scope.rowIndex);
+            $scope.$apply();
+          }
+          $scope.actions = [
+            {
+              class: 'removeRow',
+              event: 'click',
+              action: removeRow
+            },
+            {
+              class: 'editRow',
+              event: 'click',
+              action: editRow
+            }
+          ]
+        }
+      ],
+      template: '' +
+      '<div ng-if="openRows.indexOf(rowIndex) !== -1">' +
+      '  <div class="edit-body {{component.rowClass}}">' +
+      '    <div class="editgrid-edit">' +
+      '      <div class="editgrid-body">' +
+      '        <ng-form name="formioForm">' +
+      '          <formio-component' +
+      '            ng-repeat="col in component.components track by $index"' +
+      '            ng-init="colIndex = $index"' +
+      '            component="col"' +
+      '            data="rowData"' +
+      '            formio-form="formioForm"' +
+      '            formio="formio"' +
+      '            submission="submission"' +
+      '            hide-components="hideComponents"' +
+      '            ng-if="builder ? \'::true\' : isVisible(col, rowData)"' +
+      '            formio-form="formioForm"' +
+      '            read-only="isDisabled(col, rowData)"' +
+      '            grid-row="rowIndex"' +
+      '            grid-col="colIndex"' +
+      '            builder="builder"' +
+      '          />' +
+      '        </ng-form>' +
+      '        <div class="editgrid-actions">' +
+      '          <div ng-click="editDone(formioForm)" class="btn btn-primary">{{ component.saveRow || \'Save\' }}</div>' +
+      '          <div ng-if="component.removeRow" on-click="removeRow(rowIndex)" class="btn btn-danger">{{component.removeRow || \'Cancel\' }}</div>' +
+      '        </div> ' +
+      '      </div>' +
+      '    </div>' +
+      '  </div>' +
+      '</div>' +
+      '<div ng-if="openRows.indexOf(rowIndex) === -1">' +
+      '  <render-template template="component.templates.row" data="templateData" actions="actions"/>' +
+      '</div>'
+    }
+  });
+  app.controller('formioEditGrid', [
+    '$scope',
+    'FormioUtils',
+    function($scope, FormioUtils) {
+      if ($scope.builder) return;
+      // Ensure each data grid has a valid data model.
+      $scope.data = $scope.data || {};
+      $scope.data[$scope.component.key] = $scope.data[$scope.component.key] || [];
+      $scope.$watch('data.' + $scope.component.key, function() {
+        $scope.headerData = {
+          components: $scope.cols,
+          value: $scope.data[$scope.component.key],
+          util: formioUtils
+        };
+      }, true);
+
+      $scope.openRows = [];
+
+      // Determine if any component is visible.
+      $scope.anyVisible = function(component) {
+        var data = $scope.data[$scope.component.key];
+        var visible = false;
+        angular.forEach(data, function(rowData) {
+          visible = (visible || FormioUtils.isVisible(component, rowData, $scope.data, $scope.hideComponents));
+        });
+        return visible;
+      };
+
+      // Pull out the rows and cols for easy iteration.
+      $scope.rows = $scope.data[$scope.component.key];
+      // If less than minLength, add that many rows.
+      if ($scope.component.validate && $scope.component.validate.hasOwnProperty('minLength') && $scope.rows.length < $scope.component.validate.minLength) {
+        var toAdd = $scope.component.validate.minLength - $scope.rows.length;
+        for (var i = 0; i < toAdd; i++) {
+          $scope.rows.push({});
+        }
+      }
+      // If more than maxLength, remove extra rows.
+      if ($scope.component.validate && $scope.component.validate.hasOwnProperty('maxLength') && $scope.rows.length < $scope.component.validate.maxLength) {
+        $scope.rows = $scope.rows.slice(0, $scope.component.validate.maxLength);
+      }
+      $scope.cols = $scope.component.components;
+      $scope.localKeys = $scope.component.components.map(function(component) {
+        return component.key;
+      });
+
+      // Add a row the to grid.
+      $scope.addRow = function() {
+        if (!Array.isArray($scope.rows)) {
+          $scope.rows = [];
+        }
+        $scope.openRows.push($scope.rows.length);
+        $scope.rows.push({});
+      };
+
+      // Remove a row from the grid.
+      $scope.removeRow = function(index) {
+        // Make sure to close if it is open.
+        if ($scope.openRows.indexOf(index) !== -1) {
+          $scope.openRows.splice($scope.openRows.indexOf(index), 1);
+        }
+        $scope.rows.splice(index, 1);
+      };
+    }
+  ]);
+  app.run([
+    '$templateCache',
+    'FormioUtils',
+    function($templateCache, FormioUtils) {
+      $templateCache.put('formio/components/editgrid.html', "<div name=\"{{ componentId }}\" ng-model=\"data[component.key]\" custom-validator=\"component.validate.custom\" editgrid-validation ng-controller=\"formioEditGrid\">\n  <label ng-if=\"component.label && !component.hideLabel\" for=\"{{ component.key }}\" class=\"control-label\" ng-class=\"{'field-required': isRequired(component)}\">{{ component.label | formioTranslate:null:builder }}</label>\n  <div class=\"formio-data-grid\" id=\"{{ component.key }}\">\n    <ul class=\"list-group\">\n      <li ng-if=\"component.templates.header\" class=\"list-group-item list-group-header\">\n        <render-template template=\"component.templates.header\" data=\"headerData\" />\n      </li>\n      <li class=\"list-group-item\" ng-repeat=\"row in rows track by $index\" ng-init=\"rowIndex = $index\">\n        <div name=\"{{ componentId }}-row-{{ $index }}\" ng-model=\"row\" editgrid-row-validation>\n          <edit-grid-row />\n          <p class=\"help-block\" ng-show=\"openRows.indexOf($index) !== -1 && formioForm.$error.editgrid\">{{ 'Please save all rows before proceeding' | formioTranslate }}.</p>\n          <p class=\"help-block\" ng-show=\"formioForm[componentId + '-row-' + $index].$error.editgridrow\">{{ 'Please correct rows before proceeding' | formioTranslate }}.</p>\n        </div>\n      </li>\n      <li ng-if=\"component.templates.footer\" class=\"list-group-item list-group-footer\">\n        <render-template template=\"component.templates.footer\" data=\"headerData\" />\n      </li>\n    </ul>\n    <div class=\"datagrid-add\" ng-if=\"!component.hasOwnProperty('validate') || !component.validate.hasOwnProperty('maxLength') || rows.length < component.validate.maxLength\">\n      <a ng-click=\"addRow()\" class=\"btn btn-primary\">\n        <span class=\"glyphicon glyphicon-plus\" aria-hidden=\"true\"></span> {{ component.addAnother || \"Add Another\" | formioTranslate:null:builder }}\n      </a>\n    </div>\n  </div>\n</div>\n");
+    }
+  ]);
+};
+
+},{"formiojs/utils":37}],268:[function(_dereq_,module,exports){
+"use strict";
 module.exports = function(app) {
   app.config([
     'formioComponentsProvider',
@@ -81474,7 +81858,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],268:[function(_dereq_,module,exports){
+},{}],269:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -81529,7 +81913,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":304}],269:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":305}],270:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -81795,7 +82179,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],270:[function(_dereq_,module,exports){
+},{}],271:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -81952,7 +82336,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":304}],271:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":305}],272:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -81988,7 +82372,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":304}],272:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":305}],273:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -82080,7 +82464,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],273:[function(_dereq_,module,exports){
+},{}],274:[function(_dereq_,module,exports){
 "use strict";
 var app = angular.module('formio');
 
@@ -82114,6 +82498,7 @@ _dereq_('./signature')(app);
 _dereq_('./custom')(app);
 _dereq_('./container')(app);
 _dereq_('./datagrid')(app);
+_dereq_('./editgrid')(app);
 _dereq_('./survey')(app);
 
 // Layout
@@ -82124,7 +82509,7 @@ _dereq_('./panel')(app);
 _dereq_('./table')(app);
 _dereq_('./well')(app);
 
-},{"./address":255,"./button":256,"./checkbox":257,"./columns":258,"./components":259,"./container":260,"./content":261,"./currency":262,"./custom":263,"./datagrid":264,"./datetime":265,"./day":266,"./email":267,"./fieldset":268,"./file":269,"./form":270,"./hidden":271,"./htmlelement":272,"./number":274,"./page":275,"./panel":276,"./password":277,"./phonenumber":278,"./radio":279,"./resource":280,"./select":281,"./selectboxes":282,"./signature":283,"./survey":284,"./table":285,"./textarea":286,"./textfield":287,"./time":288,"./well":289}],274:[function(_dereq_,module,exports){
+},{"./address":255,"./button":256,"./checkbox":257,"./columns":258,"./components":259,"./container":260,"./content":261,"./currency":262,"./custom":263,"./datagrid":264,"./datetime":265,"./day":266,"./editgrid":267,"./email":268,"./fieldset":269,"./file":270,"./form":271,"./hidden":272,"./htmlelement":273,"./number":275,"./page":276,"./panel":277,"./password":278,"./phonenumber":279,"./radio":280,"./resource":281,"./select":282,"./selectboxes":283,"./signature":284,"./survey":285,"./table":286,"./textarea":287,"./textfield":288,"./time":289,"./well":290}],275:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -82189,7 +82574,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],275:[function(_dereq_,module,exports){
+},{}],276:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -82216,7 +82601,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],276:[function(_dereq_,module,exports){
+},{}],277:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -82272,7 +82657,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":304}],277:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":305}],278:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -82303,7 +82688,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],278:[function(_dereq_,module,exports){
+},{}],279:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -82339,7 +82724,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],279:[function(_dereq_,module,exports){
+},{}],280:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -82390,7 +82775,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],280:[function(_dereq_,module,exports){
+},{}],281:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -82614,7 +82999,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],281:[function(_dereq_,module,exports){
+},{}],282:[function(_dereq_,module,exports){
 "use strict";
 /*eslint max-depth: ["error", 6]*/
 
@@ -83234,7 +83619,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"lodash/assign":200,"lodash/cloneDeep":205,"lodash/get":210,"lodash/isEqual":217,"lodash/set":237}],282:[function(_dereq_,module,exports){
+},{"lodash/assign":200,"lodash/cloneDeep":205,"lodash/get":210,"lodash/isEqual":217,"lodash/set":237}],283:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -83342,7 +83727,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],283:[function(_dereq_,module,exports){
+},{}],284:[function(_dereq_,module,exports){
 "use strict";
 
 var SignaturePad = _dereq_('signature_pad');
@@ -83484,7 +83869,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"signature_pad":252}],284:[function(_dereq_,module,exports){
+},{"signature_pad":252}],285:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -83545,7 +83930,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],285:[function(_dereq_,module,exports){
+},{}],286:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -83625,7 +84010,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":304}],286:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":305}],287:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -83751,7 +84136,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],287:[function(_dereq_,module,exports){
+},{}],288:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -83812,7 +84197,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],288:[function(_dereq_,module,exports){
+},{}],289:[function(_dereq_,module,exports){
 "use strict";
 
 var moment = _dereq_('moment');
@@ -83884,7 +84269,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"moment":246}],289:[function(_dereq_,module,exports){
+},{"moment":246}],290:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -83937,7 +84322,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":304}],290:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":305}],291:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -84015,7 +84400,7 @@ module.exports = function() {
   };
 };
 
-},{}],291:[function(_dereq_,module,exports){
+},{}],292:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -84416,7 +84801,7 @@ module.exports = function() {
   };
 };
 
-},{}],292:[function(_dereq_,module,exports){
+},{}],293:[function(_dereq_,module,exports){
 "use strict";
 module.exports = ['$sce', '$parse', '$compile', function($sce, $parse, $compile) {
   return {
@@ -84433,7 +84818,7 @@ module.exports = ['$sce', '$parse', '$compile', function($sce, $parse, $compile)
   };
 }];
 
-},{}],293:[function(_dereq_,module,exports){
+},{}],294:[function(_dereq_,module,exports){
 "use strict";
 var _get = _dereq_('lodash/get');
 
@@ -84701,7 +85086,7 @@ module.exports = [
   }
 ];
 
-},{"lodash/get":210}],294:[function(_dereq_,module,exports){
+},{"lodash/get":210}],295:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'formioComponents',
@@ -84774,7 +85159,7 @@ module.exports = [
   }
 ];
 
-},{}],295:[function(_dereq_,module,exports){
+},{}],296:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -84858,7 +85243,7 @@ module.exports = function() {
   };
 };
 
-},{}],296:[function(_dereq_,module,exports){
+},{}],297:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$compile',
@@ -84877,7 +85262,7 @@ module.exports = [
   }
 ];
 
-},{}],297:[function(_dereq_,module,exports){
+},{}],298:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -84887,7 +85272,7 @@ module.exports = function() {
   };
 };
 
-},{}],298:[function(_dereq_,module,exports){
+},{}],299:[function(_dereq_,module,exports){
 "use strict";
 // Javascript editor directive
 module.exports = ['FormioUtils', function(FormioUtils) {
@@ -84962,7 +85347,7 @@ module.exports = ['FormioUtils', function(FormioUtils) {
   };
 }];
 
-},{}],299:[function(_dereq_,module,exports){
+},{}],300:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -84994,7 +85379,7 @@ module.exports = function() {
   };
 };
 
-},{}],300:[function(_dereq_,module,exports){
+},{}],301:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -85050,7 +85435,7 @@ module.exports = function() {
   };
 };
 
-},{}],301:[function(_dereq_,module,exports){
+},{}],302:[function(_dereq_,module,exports){
 "use strict";
 var isNaN = _dereq_('lodash/isNAN');
 var isFinite = _dereq_('lodash/isFinite');
@@ -85649,7 +86034,7 @@ module.exports = function() {
   };
 };
 
-},{"lodash/isFinite":219,"lodash/isNAN":222}],302:[function(_dereq_,module,exports){
+},{"lodash/isFinite":219,"lodash/isNAN":222}],303:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -85833,7 +86218,7 @@ module.exports = [
   }
 ];
 
-},{}],303:[function(_dereq_,module,exports){
+},{}],304:[function(_dereq_,module,exports){
 "use strict";
 var formioUtils = _dereq_('formiojs/utils');
 var _filter = _dereq_('lodash/filter');
@@ -86218,7 +86603,7 @@ module.exports = function() {
   };
 };
 
-},{"formiojs/utils":37,"lodash/filter":209,"lodash/get":210}],304:[function(_dereq_,module,exports){
+},{"formiojs/utils":37,"lodash/filter":209,"lodash/get":210}],305:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   var generic = function(data, component) {
@@ -86344,7 +86729,7 @@ module.exports = function() {
   };
 };
 
-},{}],305:[function(_dereq_,module,exports){
+},{}],306:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$q',
@@ -86393,7 +86778,7 @@ module.exports = [
   }
 ];
 
-},{}],306:[function(_dereq_,module,exports){
+},{}],307:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -86427,7 +86812,7 @@ module.exports = [
   }
 ];
 
-},{}],307:[function(_dereq_,module,exports){
+},{}],308:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'FormioUtils',
@@ -86436,7 +86821,7 @@ module.exports = [
   }
 ];
 
-},{}],308:[function(_dereq_,module,exports){
+},{}],309:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$sce',
@@ -86449,7 +86834,7 @@ module.exports = [
   }
 ];
 
-},{}],309:[function(_dereq_,module,exports){
+},{}],310:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   function() {
@@ -86468,7 +86853,7 @@ module.exports = [
   }
 ];
 
-},{}],310:[function(_dereq_,module,exports){
+},{}],311:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'formioTableView',
@@ -86481,7 +86866,7 @@ module.exports = [
   }
 ];
 
-},{}],311:[function(_dereq_,module,exports){
+},{}],312:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -86496,7 +86881,7 @@ module.exports = [
   }
 ];
 
-},{}],312:[function(_dereq_,module,exports){
+},{}],313:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$filter',
@@ -86545,7 +86930,7 @@ module.exports = [
   }
 ];
 
-},{}],313:[function(_dereq_,module,exports){
+},{}],314:[function(_dereq_,module,exports){
 "use strict";
 module.exports = ['$sce', function($sce) {
   return function(val) {
@@ -86553,7 +86938,7 @@ module.exports = ['$sce', function($sce) {
   };
 }];
 
-},{}],314:[function(_dereq_,module,exports){
+},{}],315:[function(_dereq_,module,exports){
 (function (global){
 "use strict";
 global.jQuery = _dereq_('jquery');
@@ -86573,7 +86958,7 @@ _dereq_('angular-ui-ace/src/ui-ace');
 _dereq_('./formio');
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./formio":315,"angular":12,"angular-ckeditor":1,"angular-file-saver":2,"angular-moment":3,"angular-sanitize":5,"angular-ui-ace/src/ui-ace":6,"angular-ui-bootstrap":8,"angular-ui-mask":10,"bootstrap":14,"bootstrap-ui-datetime-picker/dist/datetime-picker":13,"jquery":38,"ng-dialog":248,"ng-file-upload":250,"ui-select/dist/select":253}],315:[function(_dereq_,module,exports){
+},{"./formio":316,"angular":12,"angular-ckeditor":1,"angular-file-saver":2,"angular-moment":3,"angular-sanitize":5,"angular-ui-ace/src/ui-ace":6,"angular-ui-bootstrap":8,"angular-ui-mask":10,"bootstrap":14,"bootstrap-ui-datetime-picker/dist/datetime-picker":13,"jquery":38,"ng-dialog":248,"ng-file-upload":250,"ui-select/dist/select":253}],316:[function(_dereq_,module,exports){
 "use strict";
 _dereq_('./polyfills/polyfills');
 
@@ -86728,7 +87113,7 @@ app.run([
 
 _dereq_('./components');
 
-},{"./components":273,"./directives/customValidator":290,"./directives/formio":291,"./directives/formioBindHtml.js":292,"./directives/formioComponent":293,"./directives/formioComponentView":294,"./directives/formioDelete":295,"./directives/formioElement":296,"./directives/formioErrors":297,"./directives/formioScriptEditor":298,"./directives/formioSubmission":299,"./directives/formioSubmissions":300,"./directives/formioWizard":301,"./factories/FormioScope":302,"./factories/FormioUtils":303,"./factories/formioInterceptor":305,"./factories/formioTableView":306,"./filters/flattenComponents":307,"./filters/safehtml":308,"./filters/tableComponents":309,"./filters/tableFieldView":310,"./filters/tableView":311,"./filters/translate":312,"./filters/trusturl":313,"./polyfills/polyfills":317,"./providers/Formio":318}],316:[function(_dereq_,module,exports){
+},{"./components":274,"./directives/customValidator":291,"./directives/formio":292,"./directives/formioBindHtml.js":293,"./directives/formioComponent":294,"./directives/formioComponentView":295,"./directives/formioDelete":296,"./directives/formioElement":297,"./directives/formioErrors":298,"./directives/formioScriptEditor":299,"./directives/formioSubmission":300,"./directives/formioSubmissions":301,"./directives/formioWizard":302,"./factories/FormioScope":303,"./factories/FormioUtils":304,"./factories/formioInterceptor":306,"./factories/formioTableView":307,"./filters/flattenComponents":308,"./filters/safehtml":309,"./filters/tableComponents":310,"./filters/tableFieldView":311,"./filters/tableView":312,"./filters/translate":313,"./filters/trusturl":314,"./polyfills/polyfills":318,"./providers/Formio":319}],317:[function(_dereq_,module,exports){
 "use strict";
 'use strict';
 
@@ -86759,13 +87144,13 @@ if (typeof Object.assign != 'function') {
   })();
 }
 
-},{}],317:[function(_dereq_,module,exports){
+},{}],318:[function(_dereq_,module,exports){
 "use strict";
 'use strict';
 
 _dereq_('./Object.assign');
 
-},{"./Object.assign":316}],318:[function(_dereq_,module,exports){
+},{"./Object.assign":317}],319:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   // The formio class.
@@ -86835,5 +87220,5 @@ module.exports = function() {
   };
 };
 
-},{"formiojs":29}]},{},[314])(314)
+},{"formiojs":29}]},{},[315])(315)
 });
