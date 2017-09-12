@@ -1,4 +1,4 @@
-/*! ng-formio v2.22.5 | https://unpkg.com/ng-formio@2.22.5/LICENSE.txt */
+/*! ng-formio v2.22.6 | https://unpkg.com/ng-formio@2.22.6/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 (function (root, factory) {
   // AMD
@@ -61383,8 +61383,11 @@ http://ricostacruz.com/cheatsheets/umdjs.html
     },
     "var": function(a, b) {
       var not_found = (b === undefined) ? null : b;
-      var sub_props = String(a).split(".");
       var data = this;
+      if(typeof a === "undefined" || a==="" || a===null) {
+        return data;
+      }
+      var sub_props = String(a).split(".");
       for(var i = 0; i < sub_props.length; i++) {
         if(data === null) {
           return not_found;
@@ -61436,17 +61439,17 @@ http://ricostacruz.com/cheatsheets/umdjs.html
 
   jsonLogic.is_logic = function(logic) {
     return (
-      logic !== null && typeof logic === "object" && ! Array.isArray(logic)
+      typeof logic === "object" && // An object
+      logic !== null && // but not null
+      ! Array.isArray(logic) && // and not an array
+      Object.keys(logic).length === 1 // with exactly one key
     );
   };
 
   /*
   This helper will defer to the JsonLogic spec as a tie-breaker when different language interpreters define different behavior for the truthiness of primitives.  E.g., PHP considers empty arrays to be falsy, but Javascript considers them to be truthy. JsonLogic, as an ecosystem, needs one consistent answer.
 
-  Literal | JS    |  PHP  |  JsonLogic
-  --------+-------+-------+---------------
-  []      | true  | false | false
-  "0"     | true  | false | true
+  Spec and rationale here: http://jsonlogic.com/truthy
   */
   jsonLogic.truthy = function(value) {
     if(Array.isArray(value) && value.length === 0) {
@@ -61482,6 +61485,7 @@ http://ricostacruz.com/cheatsheets/umdjs.html
     var values = logic[op];
     var i;
     var current;
+    var scopedLogic, scopedData, filtered, initial;
 
     // easy syntax for unary operators, like {"var" : "x"} instead of strict {"var" : ["x"]}
     if( ! Array.isArray(values)) {
@@ -61526,8 +61530,75 @@ http://ricostacruz.com/cheatsheets/umdjs.html
         }
       }
       return current; // Last
-    }
 
+
+
+
+    }else if(op === 'filter'){
+      scopedData = jsonLogic.apply(values[0], data);
+      scopedLogic = values[1];
+
+      if ( ! Array.isArray(scopedData)) {
+          return [];
+      }
+      // Return only the elements from the array in the first argument,
+      // that return truthy when passed to the logic in the second argument.
+      // For parity with JavaScript, reindex the returned array
+      return scopedData.filter(function(datum){
+          return jsonLogic.truthy( jsonLogic.apply(scopedLogic, datum));
+      });
+  }else if(op === 'map'){
+      scopedData = jsonLogic.apply(values[0], data);
+      scopedLogic = values[1];
+
+      if ( ! Array.isArray(scopedData)) {
+          return [];
+      }
+
+      return scopedData.map(function(datum){
+          return jsonLogic.apply(scopedLogic, datum);
+      });
+
+  }else if(op === 'reduce'){
+      scopedData = jsonLogic.apply(values[0], data);
+      scopedLogic = values[1];
+      initial = typeof values[2] !== 'undefined' ? values[2] : null;
+
+      if ( ! Array.isArray(scopedData)) {
+          return initial;
+      }
+
+      return scopedData.reduce(
+          function(accumulator, current){
+              return jsonLogic.apply(
+                  scopedLogic,
+                  {'current':current, 'accumulator':accumulator}
+              );
+          },
+          initial
+      );
+
+    }else if(op === "all") {
+      scopedData = jsonLogic.apply(values[0], data);
+      scopedLogic = values[1];
+      // All of an empty set is false. Note, some and none have correct fallback after the for loop
+      if( ! scopedData.length) {
+        return false;
+      }
+      for(i=0; i < scopedData.length; i+=1) {
+        if( ! jsonLogic.truthy( jsonLogic.apply(scopedLogic, scopedData[i]) )) {
+          return false; // First falsy, short circuit
+        }
+      }
+      return true; // All were truthy
+    }else if(op === "none") {
+      filtered = jsonLogic.apply({'filter' : values}, data);
+      return filtered.length === 0;
+
+    }else if(op === "some") {
+      filtered = jsonLogic.apply({'filter' : values}, data);
+      return filtered.length > 0;
+    }
 
     // Everyone else gets immediate depth-first recursion
     values = values.map(function(val) {
