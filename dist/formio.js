@@ -15517,6 +15517,10 @@ module.exports = function(app) {
             }
           };
 
+          $scope.hasError = function() {
+            return (settings.action === 'submit') && $scope.formioForm.$invalid && !$scope.formioForm.$pristine;
+          };
+
           var onCustom = function() {
             try {
               /* eslint-disable no-unused-vars */
@@ -15667,7 +15671,7 @@ module.exports = function(app) {
     '$templateCache',
     function($templateCache) {
       $templateCache.put('formio/components/button.html',
-        "<button ng-attr-type=\"{{ getButtonType() }}\"\n  id=\"{{ componentId }}\"\n  name=\"{{ componentId }}\"\n  ng-class=\"{'btn-block': component.block}\"\n  class=\"btn btn-{{ component.theme }} btn-{{ component.size }}\"\n  ng-disabled=\"readOnly || formioForm.submitting || (component.disableOnInvalid && formioForm.$invalid)\"\n  tabindex=\"{{ component.tabindex || 0 }}\"\n  ng-click=\"$emit('buttonClick', component, componentId)\">\n  <span ng-if=\"component.leftIcon\" class=\"{{ component.leftIcon }}\" aria-hidden=\"true\"></span>\n  <span ng-if=\"component.leftIcon && component.label\">&nbsp;</span>{{ component.label | formioTranslate:null:builder }}<span ng-if=\"component.rightIcon && component.label\">&nbsp;</span>\n  <span ng-if=\"component.rightIcon\" class=\"{{ component.rightIcon }}\" aria-hidden=\"true\"></span>\n   <i ng-if=\"component.action == 'submit' && formioForm.submitting\" class=\"glyphicon glyphicon-refresh glyphicon-spin\"></i>\n</button>\n"
+        "<button ng-attr-type=\"{{ getButtonType() }}\"\n    id=\"{{ componentId }}\"\n    name=\"{{ componentId }}\"\n    ng-class=\"{'btn-block': component.block}\"\n    class=\"btn btn-{{ component.theme }} btn-{{ component.size }}\"\n    ng-disabled=\"readOnly || formioForm.submitting || (component.disableOnInvalid && formioForm.$invalid) || hasError()\"\n    tabindex=\"{{ component.tabindex || 0 }}\"\n    ng-click=\"$emit('buttonClick', component, componentId)\">\n  <span ng-if=\"component.leftIcon\" class=\"{{ component.leftIcon }}\" aria-hidden=\"true\"></span>\n  <span ng-if=\"component.leftIcon && component.label\">&nbsp;</span>{{ component.label | formioTranslate:null:builder }}<span ng-if=\"component.rightIcon && component.label\">&nbsp;</span>\n  <span ng-if=\"component.rightIcon\" class=\"{{ component.rightIcon }}\" aria-hidden=\"true\"></span>\n  <i ng-if=\"component.action == 'submit' && formioForm.submitting\" class=\"glyphicon glyphicon-refresh glyphicon-spin\"></i>\n</button>\n<div ng-if=\"hasError()\" class=\"has-error\">\n  <p class=\"help-block\" onclick=\"scroll=window.scrollTo(0,0)\">\n    Please correct all errors before submitting.\n  </p>\n</div>\n"
       );
 
       $templateCache.put('formio/componentsView/button.html',
