@@ -7,13 +7,6 @@
           <h5 class="text-muted">Enter your credit card info.<br>Your first month will be billed on a prorated basis.</h5>
           <formio src="paymentForm" form-action="'/payeezy'"></formio>
         </div>
-        <div ng-if="['basic', 'trial'].indexOf(selectedPlan) !== -1">
-          <h5>No payment required for the {{getPlan(selectedPlan).title}} plan</h5>
-          <div class="form-group pull-right" ng-if="(currentProject.plan !== selectedPlan)">
-            <a class="btn btn-default" ng-click="closeThisDialog(false)">Cancel</a>
-            <button ng-disabled="selectedPlan === 'trial' && trialDaysRemaining  <= 0" class="btn btn-primary" ng-click="upgradeProject(selectedPlan)">Change plan to {{getPlan(selectedPlan).title}}</button>
-          </div>
-        </div>
         <div ng-if="!paymentInfoLoading && paymentInfo">
           <h5>Payments will be charged to:</h5>
           <h5 class="payment-info"><strong>{{capitalize(paymentInfo.cardType)}} ending in {{paymentInfo.ccNumber.substr(-4)}}</strong></h5>
@@ -72,7 +65,7 @@
           </div>
         </li>
       </ul>
-      <span class="btn btn-success pull-right" ng-if="primaryProject.plan !== selectedPlan.name" ng-disabled="selectedPlan.price !== 0 && !paymentInfo">Confirm Billing Change</span>
+      <span class="btn btn-success pull-right" ng-if="primaryProject.plan !== selectedPlan.name || servers.api !== primaryProject.billing.servers.api || servers.pdf !== primaryProject.billing.servers.pdf" ng-disabled="selectedPlan.price !== 0 && !paymentInfo" ng-click="changePlan()">Confirm Billing Change</span>
     </div>
     <div class="col-sm-8">
       <ul class="list-group project-plans">
@@ -144,7 +137,7 @@
           </div>
         </li>
         <li class="list-group-item list-group-heading">
-          <div>Servers may be used for multiple projects however each project requires a plan of Team Pro or Enterprise.</div>
+          <div class="text-muted">Servers may be used for multiple projects however each project requires a plan of Team Pro or Enterprise.</div>
         </li>
       </ul>
     </div>

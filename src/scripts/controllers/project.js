@@ -2551,12 +2551,18 @@ app.controller('ProjectDeleteController', [
 app.controller('ProjectBilling', [
   '$rootScope',
   '$scope',
+  '$http',
   'AppConfig',
   'FormioAlerts',
   'UserInfo',
   'ProjectPlans',
-  function($rootScope, $scope, AppConfig, FormioAlerts, UserInfo, ProjectPlans) {
+  function($rootScope, $scope, $http, AppConfig, FormioAlerts, UserInfo, ProjectPlans) {
     $scope.primaryProjectPromise.then(function(project) {
+
+      $scope.servers = angular.copy(project.billing.servers) || {
+        api: 0,
+        pdf: 0
+      };
 
       $scope.plans = ProjectPlans.getPlans();
 
@@ -2601,9 +2607,12 @@ app.controller('ProjectBilling', [
       $scope.selectedPlan = plan;
     };
 
-    $scope.upgradeProject = function(plan) {
-      $http.post(AppConfig.apiBase + '/project/' + project._id + '/upgrade',
-        {plan: plan}
+    $scope.changePlan = function() {
+      $http.post(AppConfig.apiBase + '/project/' + $scope.primaryProject._id + '/upgrade',
+        {
+          plan: $scope.selectedPlan.name,
+          servers: $scope.servers
+        }
         )
         .then(function() {
           Formio.clearCache();
@@ -2621,19 +2630,14 @@ app.controller('ProjectBilling', [
     $scope.getPlan = ProjectPlans.getPlan.bind(ProjectPlans);
     $scope.paymentForm = AppConfig.paymentForm;
 
-    $scope.servers = {
-      api: 0,
-      pdf: 0
-    };
-
     var calculatePrice = function() {
-      if ($scope.selectedPlan.order < $scope.getPlan('team').order) {
-        $scope.servers = {
-          api: 0,
-          pdf: 0
-        }
-      }
       if ($scope.selectedPlan) {
+        if ($scope.selectedPlan.order < $scope.getPlan('team').order) {
+          $scope.servers = {
+            api: 0,
+            pdf: 0
+          }
+        }
         $scope.pricing = {
           plan: $scope.selectedPlan.price,
           api: ($scope.servers.api % 3 * 250) + (Math.floor($scope.servers.api / 3) * 500),
