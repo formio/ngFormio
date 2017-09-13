@@ -7,13 +7,6 @@
           <h5 class="text-muted">Enter your credit card info.<br>Your first month will be billed on a prorated basis.</h5>
           <formio src="paymentForm" form-action="'/payeezy'"></formio>
         </div>
-        <div ng-if="['basic', 'trial'].indexOf(selectedPlan) !== -1">
-          <h5>No payment required for the {{getPlan(selectedPlan).title}} plan</h5>
-          <div class="form-group pull-right" ng-if="(currentProject.plan !== selectedPlan)">
-            <a class="btn btn-default" ng-click="closeThisDialog(false)">Cancel</a>
-            <button ng-disabled="selectedPlan === 'trial' && trialDaysRemaining  <= 0" class="btn btn-primary" ng-click="upgradeProject(selectedPlan)">Change plan to {{getPlan(selectedPlan).title}}</button>
-          </div>
-        </div>
         <div ng-if="!paymentInfoLoading && paymentInfo">
           <h5>Payments will be charged to:</h5>
           <h5 class="payment-info"><strong>{{capitalize(paymentInfo.cardType)}} ending in {{paymentInfo.ccNumber.substr(-4)}}</strong></h5>
@@ -72,7 +65,7 @@
           </div>
         </li>
       </ul>
-      <span class="btn btn-success pull-right" ng-if="primaryProject.plan !== selectedPlan.name" ng-disabled="selectedPlan.price !== 0 && !paymentInfo">Confirm Billing Change</span>
+      <span class="btn btn-success pull-right" ng-if="primaryProject.plan !== selectedPlan.name || servers.api !== primaryProject.billing.servers.api || servers.pdf !== primaryProject.billing.servers.pdf" ng-disabled="selectedPlan.price !== 0 && !paymentInfo" ng-click="changePlan()">Confirm Billing Change</span>
     </div>
     <div class="col-sm-8">
       <ul class="list-group project-plans">
@@ -104,49 +97,72 @@
           </div>
         </li>
       </ul>
-      <ul class="list-group project-onpremise">
-        <li class="list-group-item list-group-heading">
-          <div class="row">
-            <div class="col-sm-10">
-              <h4 style="font-weight:bold">On Premise or Private Cloud Deployments</h4>
+      <div class="hosting-options">
+        <h2>Hosting Options</h2>
+        <ul class="list-group project-onpremise">
+          <li class="list-group-item list-group-heading">
+            <div class="row">
+              <div class="col-sm-10">
+                <h4 style="font-weight:bold">PAAS Hosting with Form.io</h4>
+              </div>
             </div>
-            <div class="col-sm-2">
-              <h4 style="font-weight:bold"># of Servers</h4>
+          </li>
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col-sm-10">
+                <h4>Host your project on our infrastructure</h4>
+              </div>
+              <div class="col-sm-2">
+                <h4>Included</h4>
+              </div>
             </div>
-          </div>
-        </li>
-        <li class="list-group-item">
-          <div class="row">
-            <div class="col-sm-6">
-              <h4 style="font-weight:bold">Form.io API Server</h4>
-              <p>&nbsp;&nbsp;-&nbsp;Unlimited Users/Resources/Forms/Submissions</p>
+          </li>
+        </ul>
+        <h3 class="text-center"> - or -</h3>
+        <ul class="list-group project-onpremise">
+          <li class="list-group-item list-group-heading">
+            <div class="row">
+              <div class="col-sm-10">
+                <h4 style="font-weight:bold">On Premise or Private Cloud Deployments</h4>
+              </div>
+              <div class="col-sm-2">
+                <h4 style="font-weight:bold"># of Servers</h4>
+              </div>
             </div>
-            <div class="col-sm-4">
-              <h4>$250/mo or $500/mo for 3</h4>
+          </li>
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col-sm-6">
+                <h4 style="font-weight:bold">Form.io API Server</h4>
+                <p>&nbsp;&nbsp;-&nbsp;Unlimited Users/Resources/Forms/Submissions</p>
+              </div>
+              <div class="col-sm-4">
+                <h4>$250/mo or $500/mo for 3</h4>
+              </div>
+              <div class="col-sm-2">
+                <input type="number" class="form-control" ng-model="servers.api" ng-disabled="selectedPlan.order < getPlan('team').order" min="0" max="20" />
+              </div>
             </div>
-            <div class="col-sm-2">
-              <input type="number" class="form-control" ng-model="servers.api" ng-disabled="selectedPlan.order < getPlan('team').order" min="0" max="20" />
+          </li>
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col-sm-6">
+                <h4 style="font-weight:bold">PDF Manager Server</h4>
+                <p>&nbsp;&nbsp;-&nbsp;Unlimited PDF Storage and Downloads</p>
+              </div>
+              <div class="col-sm-4">
+                <h4>$250/mo or $500/mo for 3</h4>
+              </div>
+              <div class="col-sm-2">
+                <input type="number" class="form-control" ng-model="servers.pdf" ng-disabled="selectedPlan.order < getPlan('team').order" min="0" max="20" />
+              </div>
             </div>
-          </div>
-        </li>
-        <li class="list-group-item">
-          <div class="row">
-            <div class="col-sm-6">
-              <h4 style="font-weight:bold">PDF Manager Server</h4>
-              <p>&nbsp;&nbsp;-&nbsp;Unlimited PDF Storage and Downloads</p>
-            </div>
-            <div class="col-sm-4">
-              <h4>$250/mo or $500/mo for 3</h4>
-            </div>
-            <div class="col-sm-2">
-              <input type="number" class="form-control" ng-model="servers.pdf" ng-disabled="selectedPlan.order < getPlan('team').order" min="0" max="20" />
-            </div>
-          </div>
-        </li>
-        <li class="list-group-item list-group-heading">
-          <div>Servers may be used for multiple projects however each project requires a plan of Team Pro or Enterprise.</div>
-        </li>
-      </ul>
+          </li>
+          <li class="list-group-item list-group-heading">
+            <div class="text-muted">Servers may be used for multiple projects however each project requires a plan of Team Pro or Enterprise.</div>
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
 </div>

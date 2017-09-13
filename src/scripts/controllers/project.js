@@ -1067,7 +1067,7 @@ app.controller('LaunchController', [
       $scope.current = {
         framework: project.framework,
         steps: ProjectFrameworkSteps[project.framework]
-      }
+      };
 
       $scope.framework = project.framework;
       if (project.framework === 'angular') {
@@ -2551,16 +2551,24 @@ app.controller('ProjectDeleteController', [
 app.controller('ProjectBilling', [
   '$rootScope',
   '$scope',
+  '$http',
+  '$state',
   'AppConfig',
+  'Formio',
   'FormioAlerts',
   'UserInfo',
   'ProjectPlans',
-  function($rootScope, $scope, AppConfig, FormioAlerts, UserInfo, ProjectPlans) {
+  function($rootScope, $scope, $http, $state, AppConfig, Formio, FormioAlerts, UserInfo, ProjectPlans) {
     $scope.primaryProjectPromise.then(function(project) {
+
+      $scope.servers = angular.copy(project.billing.servers) || {
+        api: 0,
+        pdf: 0
+      };
 
       $scope.plans = ProjectPlans.getPlans();
 
-      var loadPaymentInfo = function() {
+      $scope.loadPaymentInfo = function() {
         $scope.paymentInfoLoading = true;
         UserInfo.getPaymentInfo()
           .then(function(paymentInfo) {
@@ -2570,7 +2578,7 @@ app.controller('ProjectBilling', [
           .catch(FormioAlerts.onError.bind(FormioAlerts));
       };
 
-      loadPaymentInfo();
+      $scope.loadPaymentInfo();
 
       var currTime = (new Date()).getTime();
       var projTime = (new Date(project.created.toString())).getTime();
@@ -2591,7 +2599,7 @@ app.controller('ProjectBilling', [
 
     $scope.$on('formSubmission', function() {
       if(getActiveForm() === $scope.paymentForm) {
-        loadPaymentInfo();
+        $scope.loadPaymentInfo();
       }
     });
     $scope.changePaymentInfo = function() {
@@ -2601,9 +2609,12 @@ app.controller('ProjectBilling', [
       $scope.selectedPlan = plan;
     };
 
-    $scope.upgradeProject = function(plan) {
-      $http.post(AppConfig.apiBase + '/project/' + project._id + '/upgrade',
-        {plan: plan}
+    $scope.changePlan = function() {
+      $http.post(AppConfig.apiBase + '/project/' + $scope.primaryProject._id + '/upgrade',
+        {
+          plan: $scope.selectedPlan.name,
+          servers: $scope.servers
+        }
         )
         .then(function() {
           Formio.clearCache();
@@ -2621,24 +2632,19 @@ app.controller('ProjectBilling', [
     $scope.getPlan = ProjectPlans.getPlan.bind(ProjectPlans);
     $scope.paymentForm = AppConfig.paymentForm;
 
-    $scope.servers = {
-      api: 0,
-      pdf: 0
-    };
-
     var calculatePrice = function() {
-      if ($scope.selectedPlan.order < $scope.getPlan('team').order) {
-        $scope.servers = {
-          api: 0,
-          pdf: 0
-        }
-      }
       if ($scope.selectedPlan) {
+        if ($scope.selectedPlan.order < $scope.getPlan('team').order) {
+          $scope.servers = {
+            api: 0,
+            pdf: 0
+          };
+        }
         $scope.pricing = {
           plan: $scope.selectedPlan.price,
           api: ($scope.servers.api % 3 * 250) + (Math.floor($scope.servers.api / 3) * 500),
           pdf: ($scope.servers.pdf % 3 * 250) + (Math.floor($scope.servers.pdf / 3) * 500)
-        }
+        };
         $scope.pricing.total = $scope.pricing.plan + $scope.pricing.api + $scope.pricing.pdf;
       }
     };

@@ -42,9 +42,9 @@ app.directive('stepFlow', function() {
               $scope.currentChildStep = parentStep.children[0];
             }
           }
-        }
+        };
       }
     ],
     templateUrl: 'views/project/stepFlow.html'
-  }
+  };
 });
