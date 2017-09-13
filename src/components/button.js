@@ -21,6 +21,7 @@ module.exports = function(app) {
         },
         controller: ['$scope', 'FormioUtils', function($scope, FormioUtils) {
           if ($scope.builder) return;
+          var clicked = false;
           var settings = $scope.component;
           $scope.getButtonType = function() {
             switch (settings.action) {
@@ -37,7 +38,7 @@ module.exports = function(app) {
           };
 
           $scope.hasError = function() {
-            return (settings.action === 'submit') && $scope.formioForm.$invalid && !$scope.formioForm.$pristine;
+            return clicked && (settings.action === 'submit') && $scope.formioForm.$invalid && !$scope.formioForm.$pristine;
           };
 
           var onCustom = function() {
@@ -59,6 +60,7 @@ module.exports = function(app) {
           };
 
           var onClick = function() {
+            clicked = true;
             switch (settings.action) {
               case 'submit':
                 return;
