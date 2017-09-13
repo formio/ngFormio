@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## 2.23.3
 ### Fixed
  - Issue where the button error would show up if they did not click the button.
+ - Misspelling in one of the templates.
 
 ## 2.23.2
 ### Fixed
