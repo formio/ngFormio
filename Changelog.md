@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [UNRELEASED]
 
+## 2.23.2
+### Fixed
+ - Issue where the urls for the Resource and Select options could get in bad state.
+
 ## 2.23.1
 ### Fixed
  - Issue with the form component for certain option configurations.
