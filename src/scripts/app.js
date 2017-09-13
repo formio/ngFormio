@@ -36,7 +36,6 @@ angular
     '$locationProvider',
     '$httpProvider',
     'FormioProvider',
-    'formioComponentsProvider',
     'AppConfig',
     'toastrConfig',
     'RemoteTokensProvider',
@@ -46,7 +45,6 @@ angular
       $locationProvider,
       $httpProvider,
       FormioProvider,
-      formioComponentsProvider,
       AppConfig,
       toastrConfig,
       RemoteTokensProvider
@@ -61,9 +59,6 @@ angular
       FormioProvider.setBaseUrl(AppConfig.apiBase);
       FormioProvider.setProjectUrl(AppConfig.formioBase);
       FormioProvider.setDomain(AppConfig.domain);
-
-      // Disable form component until we can fix it.
-      //formioComponentsProvider.register('form', {disabled: true});
 
       var RemotePlugin = function() {};
 

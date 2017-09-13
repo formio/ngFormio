@@ -306,7 +306,7 @@ app.controller('FormController', [
     $http
   ) {
     // Project information.
-    $scope.formReady = true;
+    $scope.formReady = false;
     $scope.projectId = $stateParams.projectId;
     $scope.upload = function (file) {
       $scope.uploading = true;
@@ -539,6 +539,7 @@ app.controller('FormController', [
     $scope.loadProjectPromise.then(function() {
       $scope.formUrl = $scope.projectUrl + '/form';
       $scope.formUrl += $stateParams.formId ? ('/' + $stateParams.formId) : '';
+      $scope.formReady = true;
       $scope.formDisplays = [
         {
           name: 'form',
