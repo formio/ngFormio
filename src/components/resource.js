@@ -30,14 +30,18 @@ module.exports = function(app) {
           }
           if (settings.resource) {
             var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
-            var url = baseUrl;
-            if (settings.project) {
-              url += '/project/' + settings.project;
+            var url = '';
+            if ($scope.formio) {
+              url = $scope.formio.formsUrl + '/' + settings.resource;
             }
-            else if ($scope.formio && $scope.formio.projectUrl) {
-              url  = $scope.formio.projectUrl;
+            else {
+              url = baseUrl;
+              if (settings.project) {
+                url += '/project/' + settings.project;
+              }
+              url += '/form/' + settings.resource;
             }
-            url += '/form/' + settings.resource;
+
             var formio = new Formio(url, {base: baseUrl});
 
             // Refresh the items.
