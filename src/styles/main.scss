@@ -2036,3 +2036,11 @@ li.step-info {
   width: 200px;
 }
 
+.cc-form {
+  label {
+    white-space: nowrap;
+  }
+  .ui-select-container {
+    min-width: inherit;
+  }
+}
