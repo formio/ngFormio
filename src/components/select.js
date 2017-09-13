@@ -409,6 +409,9 @@ module.exports = function(app) {
                     options.headers['Cache-Control'] = undefined;
                   }
                 }
+                else if ($scope.formio) {
+                  url = $scope.formio.formsUrl + '/' + settings.data.resource + '/submission';
+                }
                 else {
                   url = baseUrl;
                   if (settings.data.project) {

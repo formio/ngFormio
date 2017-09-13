@@ -72551,14 +72551,16 @@ module.exports = function(app) {
           }
           if (settings.resource) {
             var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
-            var url = baseUrl;
-            if (settings.project) {
+            var url = '';
+            if ($scope.formio) {
+              url = $scope.formio.formsUrl + '/' + settings.resource;
+            }
+            else {
+              url = baseUrl;
               url += '/project/' + settings.project;
+              url += '/form/' + settings.resource;
             }
-            else if ($scope.formio && $scope.formio.projectUrl) {
-              url  = $scope.formio.projectUrl;
-            }
-            url += '/form/' + settings.resource;
+
             var formio = new Formio(url, {base: baseUrl});
 
             // Refresh the items.
@@ -73153,6 +73155,9 @@ module.exports = function(app) {
                     options.headers.Pragma = undefined;
                     options.headers['Cache-Control'] = undefined;
                   }
+                }
+                else if ($scope.formio) {
+                  url = $scope.formio.formsUrl + '/' + settings.data.resource + '/submission';
                 }
                 else {
                   url = baseUrl;
