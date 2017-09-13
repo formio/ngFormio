@@ -2561,7 +2561,7 @@ app.controller('ProjectBilling', [
   function($rootScope, $scope, $http, $state, AppConfig, Formio, FormioAlerts, UserInfo, ProjectPlans) {
     $scope.primaryProjectPromise.then(function(project) {
 
-      $scope.servers = angular.copy(project.billing.servers) || {
+      $scope.servers = (project.billing && project.billing.servers) ? angular.copy(project.billing.servers) : {
         api: 0,
         pdf: 0
       };
