@@ -82820,7 +82820,9 @@ module.exports = function(app) {
             }
             else {
               url = baseUrl;
-              url += '/project/' + settings.project;
+              if (settings.project) {
+                url += '/project/' + settings.project;
+              }
               url += '/form/' + settings.resource;
             }
 
