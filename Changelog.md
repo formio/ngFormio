@@ -5,7 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [UNRELEASED]
-## Fixed
+
+## 2.23.4
+### Fixed
  - Columns show logic in formio-submission directive.
 
 ## 2.23.3
