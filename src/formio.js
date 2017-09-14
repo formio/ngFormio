@@ -47,6 +47,8 @@ app.directive('formioComponent', require('./directives/formioComponent'));
 
 app.directive('formioComponentView', require('./directives/formioComponentView'));
 
+app.directive('formioComponentTooltip', require('./directives/formioComponentTooltip'));
+
 app.directive('formioElement', require('./directives/formioElement'));
 
 app.directive('formioWizard', require('./directives/formioWizard'));
