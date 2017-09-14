@@ -1,5 +1,5 @@
 <div class="row">
-  <div ng-show="column.width" ng-class="'col-sm-' + column.width + ' col-sm-offset-' + column.offset + ' col-sm-push-' + column.push + ' col-sm-pull-' + column.pull" ng-repeat="column in component.columns track by $index">
+  <div class="col-sm-{{column.width}} col-sm-offset-{{column.offset}} col-sm-push-{{column.push}} col-sm-pull-{{column.pull}}" ng-repeat="column in component.columns track by $index">
     <formio-component-view
       ng-repeat="_component in column.components track by $index"
       component="_component"
