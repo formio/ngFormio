@@ -261,7 +261,7 @@ app.controller('ProjectController', [
 
     $scope.rolesLoading = true;
     $scope.loadRoles = function() {
-      return $http.get($scope.formio.projectUrl + '/role').then(function(result) {
+      return $http.get($scope.formio.projectUrl + '/role?limit=1000').then(function(result) {
         $scope.currentProjectRoles = result.data;
         $scope.rolesLoading = false;
 
@@ -320,7 +320,7 @@ app.controller('ProjectController', [
 
       $scope.rolesLoading = true;
       var loadRoles = function() {
-        $http.get($scope.projectUrl + '/role').then(function(result) {
+        $http.get($scope.projectUrl + '/role?limit=1000').then(function(result) {
           $scope.currentProjectRoles = result.data;
           $scope.rolesLoading = false;
         });
