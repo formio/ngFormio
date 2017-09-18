@@ -138,6 +138,37 @@ app.controller('ProjectCreateController', [
       $scope.project.framework = $scope.frameworks[0].name;
     }
 
+    $scope.loadTemplate = function() {
+      var input = angular.element(this).get(0);
+      if (!input || input.length === 0) {
+        return;
+      }
+      var template = input.files[0];
+
+      // FOR-107 - Fix for safari where FileReader isnt a function.
+      if (typeof window.FileReader !== 'function' && typeof window.FileReader !== 'object') {
+        return;
+      }
+
+      if (!template) {
+        return;
+      }
+
+      // Read the file.
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        $scope.project.template = JSON.parse(e.target.result);
+        $scope.hasTemplate = true;
+        $scope.$apply();
+      };
+      reader.readAsText(template);
+    };
+
+    $scope.removeTemplate = function() {
+      delete $scope.project.template;
+      $scope.hasTemplate = false;
+    };
+
     $scope.saveProject = function() {
       $scope.isBusy = true;
       FormioProject.createProject($scope.project).then(function(project) {
