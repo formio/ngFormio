@@ -1,5 +1,8 @@
 <div name="{{ componentId }}" ng-model="data[component.key]" custom-validator="component.validate.custom" editgrid-validation ng-controller="formioEditGrid">
-  <label ng-if="component.label && !component.hideLabel" for="{{ component.key }}" class="control-label" ng-class="{'field-required': isRequired(component)}">{{ component.label | formioTranslate:null:builder }}</label>
+  <label ng-if="component.label && !component.hideLabel" for="{{ component.key }}" class="control-label" ng-class="{'field-required': isRequired(component)}">
+    {{ component.label | formioTranslate:null:builder }}
+    <formio-component-tooltip></formio-component-tooltip>
+  </label>
   <div class="formio-data-grid" id="{{ component.key }}">
     <ul class="list-group">
       <li ng-if="component.templates.header" class="list-group-item list-group-header">

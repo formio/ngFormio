@@ -1,4 +1,7 @@
-<label ng-if="component.label && !component.hideLabel" for="{{ componentId }}" class="control-label" ng-class="{'field-required': isRequired(component)}">{{ component.label | formioTranslate:null:builder }}</label>
+<label ng-if="component.label && !component.hideLabel" for="{{ componentId }}" class="control-label" ng-class="{'field-required': isRequired(component)}">
+  {{ component.label | formioTranslate:null:builder }}
+  <formio-component-tooltip></formio-component-tooltip>
+</label>
 <span ng-if="!component.label && isRequired(component)" class="glyphicon glyphicon-asterisk form-control-feedback field-required-inline" aria-hidden="true"></span>
 <div class="formio-errors"><formio-errors ng-if="::!builder"></formio-errors></div>
 <div ng-controller="formioFileUpload">
