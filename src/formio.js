@@ -5,6 +5,7 @@ var app = angular.module('formio', [
   'ngSanitize',
   'ui.bootstrap',
   'ui.bootstrap.datetimepicker',
+  'ui.bootstrap.popover',
   'ui.select',
   'ui.mask',
   'angularMoment',

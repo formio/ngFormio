@@ -4,14 +4,15 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [UNRELEASED]
+## 2.23.4
 ### Added
  - Mask textfields if input should be hidden.
  - Tooltips to components
 
-## 2.23.4
 ### Fixed
+ - An issue with the form component where it would not fully load the form in certain cases.
  - Columns show logic in formio-submission directive.
+ - Issue where the form component would not refresh when new submission data was presented.
 
 ## 2.23.3
 ### Fixed
