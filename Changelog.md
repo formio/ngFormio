@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [UNRELEASED]
 ### Added
  - Mask textfields if input should be hidden.
+ - Tooltips to components
+
+## 2.23.4
+### Fixed
+ - Columns show logic in formio-submission directive.
 
 ## 2.23.3
 ### Fixed

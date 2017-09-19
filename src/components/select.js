@@ -563,7 +563,6 @@ module.exports = function(app) {
                   };
                   $scope.refreshItems(true);
                 }
-                ensureValue();
                 break;
               default:
                 $scope.selectItems = [];
