@@ -11,5 +11,8 @@
     <span class="glyphicon glyphicon-refresh"></span>
   </a>
   <canvas signature component="component" name="{{ componentId }}" ng-model="data[component.key]" ng-required="isRequired(component)"></canvas>
-  <div class="formio-signature-footer" style="text-align: center;color:#C3C3C3;" ng-class="{'field-required': isRequired(component)}">{{ component.footer | formioTranslate:null:builder }}</div>
+  <div class="formio-signature-footer" style="text-align: center;color:#C3C3C3;" ng-class="{'field-required': isRequired(component)}">
+    {{ component.footer | formioTranslate:null:builder }}
+    <formio-component-tooltip></formio-component-tooltip>
+  </div>
 </div>
