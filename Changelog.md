@@ -11,13 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
  - An issue with the form component where it would not fully load the form in certain cases.
-
-## 2.23.4
-### Fixed
  - Columns show logic in formio-submission directive.
-
-## 2.23.4
-### Fixed
  - Issue where the form component would not refresh when new submission data was presented.
 
 ## 2.23.3
