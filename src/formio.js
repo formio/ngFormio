@@ -5,6 +5,7 @@ var app = angular.module('formio', [
   'ngSanitize',
   'ui.bootstrap',
   'ui.bootstrap.datetimepicker',
+  'ui.bootstrap.popover',
   'ui.select',
   'ui.mask',
   'angularMoment',
@@ -46,6 +47,8 @@ app.directive('formioSubmission', require('./directives/formioSubmission'));
 app.directive('formioComponent', require('./directives/formioComponent'));
 
 app.directive('formioComponentView', require('./directives/formioComponentView'));
+
+app.directive('formioComponentTooltip', require('./directives/formioComponentTooltip'));
 
 app.directive('formioElement', require('./directives/formioElement'));
 
