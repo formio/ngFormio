@@ -5,7 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [UNRELEASED]
-### Added:
+### Added
+ - Mask textfields if input should be hidden.
  - Tooltips to components
 
 ## 2.23.4
