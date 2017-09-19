@@ -23,6 +23,7 @@ module.exports = function() {
       'Formio',
       'FormioUtils',
       '$q',
+      '$timeout',
       function(
         $scope,
         $http,
@@ -30,7 +31,8 @@ module.exports = function() {
         FormioScope,
         Formio,
         FormioUtils,
-        $q
+        $q,
+        $timeout
       ) {
         var iframeReady = $q.defer();
         $scope.options = $scope.options || {};
@@ -66,7 +68,7 @@ module.exports = function() {
 
         $scope.downloadUrl = '';
         $scope.setDownloadUrl = function(form) {
-          if (!$scope.formio) {
+          if (!$scope.formio || $scope.options.noDownload) {
             return;
           }
           $scope.formio.getDownloadUrl(form).then(function(url) {
@@ -109,13 +111,17 @@ module.exports = function() {
 
         var cancelFormLoadEvent = $scope.$on('formLoad', function(event, form) {
           cancelFormLoadEvent();
-          $scope.setDownloadUrl(form);
-          sendIframeMessage({name: 'form', data: form});
+          $timeout(function() {
+            $scope.setDownloadUrl(form);
+            sendIframeMessage({name: 'form', data: form});
+          });
         });
 
         $scope.$on('submissionLoad', function(event, submission) {
-          submission.readOnly = $scope.readOnly;
-          sendIframeMessage({name: 'submission', data: submission});
+          $timeout(function() {
+            submission.readOnly = $scope.readOnly;
+            sendIframeMessage({name: 'submission', data: submission});
+          });
         });
 
         // Submit the form from the iframe.

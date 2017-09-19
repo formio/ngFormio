@@ -1,4 +1,4 @@
-/*! ng-formio v2.23.3 | https://unpkg.com/ng-formio@2.23.3/LICENSE.txt */
+/*! ng-formio v2.23.4 | https://unpkg.com/ng-formio@2.23.4/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 exports.defaults = {};
 
@@ -17498,21 +17498,7 @@ module.exports = function(app) {
           ) {
             $scope.options = $scope.options || {};
             var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
-
-            var refreshForm = function(formObj) {
-              if (!formObj) {
-                return;
-              }
-              if ($scope.componentForm) {
-                if ($scope.componentForm._id === formObj._id) {
-                  return;
-                }
-                $scope.componentForm = null;
-              }
-              $timeout(function() {
-                $scope.componentForm = formObj;
-              });
-            };
+            $scope.componentSubmission = $scope.data[$scope.component.key] || {data: {}};
 
             var loadForm = function() {
               if (!$scope.component.form) {
@@ -17538,7 +17524,20 @@ module.exports = function(app) {
 
               $scope.formFormio = new Formio(url, {base: baseUrl});
               if ($scope.formFormio.formId) {
-                $scope.formFormio.loadForm().then(refreshForm);
+                $scope.formFormio.loadForm().then(function(formObj) {
+                  if (!formObj) {
+                    return;
+                  }
+                  if ($scope.componentForm) {
+                    if ($scope.componentForm._id === formObj._id) {
+                      return;
+                    }
+                    $scope.componentForm = null;
+                  }
+                  $timeout(function() {
+                    $scope.componentForm = formObj;
+                  });
+                });
               }
 
               // See if we need to load the submission into scope.
@@ -17549,12 +17548,23 @@ module.exports = function(app) {
                 !$scope.data[$scope.component.key].data
               ) {
                 $scope.formFormio.loadSubmission().then(function(submission) {
+                  if (!submission) {
+                    return;
+                  }
+
                   angular.merge($scope.data[$scope.component.key], submission);
                 });
               }
             };
 
             var submitForm = function(scope, cb) {
+              var submission = angular.copy($scope.componentSubmission);
+
+              // Only save if we have provided data.
+              if (angular.equals(submission, {})) {
+                return;
+              }
+
               var components = [];
               if (scope.activePage) {
                 components = scope.activePage.components;
@@ -17563,7 +17573,10 @@ module.exports = function(app) {
                 components = scope.form.components;
               }
               if (FormioUtils.getComponent(components, $scope.component.key)) {
-                $scope.formFormio.saveSubmission(angular.copy($scope.data[$scope.component.key])).then(function(sub) {
+                $scope.formFormio.saveSubmission(submission).then(function(sub) {
+                  if (!$scope.data[$scope.component.key]) {
+                    $scope.data[$scope.component.key] = {data: {}};
+                  }
                   angular.merge($scope.data[$scope.component.key], sub);
                   cb();
                 }, cb);
@@ -17601,8 +17614,11 @@ module.exports = function(app) {
               loadForm();
             });
 
-            $scope.$watch('data[component.key]', function() {
-              refreshForm($scope.componentForm);
+            $scope.$watch('data[component.key]', function(submission) {
+              if (!submission) {
+                return;
+              }
+              angular.merge($scope.componentSubmission, submission);
             }, true);
           }
         ],
@@ -17614,7 +17630,7 @@ module.exports = function(app) {
     '$templateCache',
     function($templateCache) {
       $templateCache.put('formio/components/form.html',
-        "<i style=\"font-size: 2em;\" ng-if=\"!componentForm\" ng-class=\"{'formio-hidden': componentForm}\" class=\"formio-loading glyphicon glyphicon-refresh glyphicon-spin\"></i>\n<formio ng-if=\"componentForm\" form=\"componentForm\" submission=\"data[component.key]\"></formio>\n"
+        "<i style=\"font-size: 2em;\" ng-if=\"!componentForm\" ng-class=\"{'formio-hidden': componentForm}\" class=\"formio-loading glyphicon glyphicon-refresh glyphicon-spin\"></i>\n<formio ng-if=\"componentForm\" form=\"componentForm\" submission=\"componentSubmission\"></formio>\n"
       );
     }
   ]);
@@ -19718,6 +19734,7 @@ module.exports = function() {
       'Formio',
       'FormioUtils',
       '$q',
+      '$timeout',
       function(
         $scope,
         $http,
@@ -19725,7 +19742,8 @@ module.exports = function() {
         FormioScope,
         Formio,
         FormioUtils,
-        $q
+        $q,
+        $timeout
       ) {
         var iframeReady = $q.defer();
         $scope.options = $scope.options || {};
@@ -19761,7 +19779,7 @@ module.exports = function() {
 
         $scope.downloadUrl = '';
         $scope.setDownloadUrl = function(form) {
-          if (!$scope.formio) {
+          if (!$scope.formio || $scope.options.noDownload) {
             return;
           }
           $scope.formio.getDownloadUrl(form).then(function(url) {
@@ -19804,13 +19822,17 @@ module.exports = function() {
 
         var cancelFormLoadEvent = $scope.$on('formLoad', function(event, form) {
           cancelFormLoadEvent();
-          $scope.setDownloadUrl(form);
-          sendIframeMessage({name: 'form', data: form});
+          $timeout(function() {
+            $scope.setDownloadUrl(form);
+            sendIframeMessage({name: 'form', data: form});
+          });
         });
 
         $scope.$on('submissionLoad', function(event, submission) {
-          submission.readOnly = $scope.readOnly;
-          sendIframeMessage({name: 'submission', data: submission});
+          $timeout(function() {
+            submission.readOnly = $scope.readOnly;
+            sendIframeMessage({name: 'submission', data: submission});
+          });
         });
 
         // Submit the form from the iframe.

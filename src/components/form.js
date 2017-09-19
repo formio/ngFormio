@@ -36,21 +36,7 @@ module.exports = function(app) {
           ) {
             $scope.options = $scope.options || {};
             var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
-
-            var refreshForm = function(formObj) {
-              if (!formObj) {
-                return;
-              }
-              if ($scope.componentForm) {
-                if ($scope.componentForm._id === formObj._id) {
-                  return;
-                }
-                $scope.componentForm = null;
-              }
-              $timeout(function() {
-                $scope.componentForm = formObj;
-              });
-            };
+            $scope.componentSubmission = $scope.data[$scope.component.key] || {data: {}};
 
             var loadForm = function() {
               if (!$scope.component.form) {
@@ -76,7 +62,20 @@ module.exports = function(app) {
 
               $scope.formFormio = new Formio(url, {base: baseUrl});
               if ($scope.formFormio.formId) {
-                $scope.formFormio.loadForm().then(refreshForm);
+                $scope.formFormio.loadForm().then(function(formObj) {
+                  if (!formObj) {
+                    return;
+                  }
+                  if ($scope.componentForm) {
+                    if ($scope.componentForm._id === formObj._id) {
+                      return;
+                    }
+                    $scope.componentForm = null;
+                  }
+                  $timeout(function() {
+                    $scope.componentForm = formObj;
+                  });
+                });
               }
 
               // See if we need to load the submission into scope.
@@ -87,12 +86,23 @@ module.exports = function(app) {
                 !$scope.data[$scope.component.key].data
               ) {
                 $scope.formFormio.loadSubmission().then(function(submission) {
+                  if (!submission) {
+                    return;
+                  }
+
                   angular.merge($scope.data[$scope.component.key], submission);
                 });
               }
             };
 
             var submitForm = function(scope, cb) {
+              var submission = angular.copy($scope.componentSubmission);
+
+              // Only save if we have provided data.
+              if (angular.equals(submission, {})) {
+                return;
+              }
+
               var components = [];
               if (scope.activePage) {
                 components = scope.activePage.components;
@@ -101,7 +111,10 @@ module.exports = function(app) {
                 components = scope.form.components;
               }
               if (FormioUtils.getComponent(components, $scope.component.key)) {
-                $scope.formFormio.saveSubmission(angular.copy($scope.data[$scope.component.key])).then(function(sub) {
+                $scope.formFormio.saveSubmission(submission).then(function(sub) {
+                  if (!$scope.data[$scope.component.key]) {
+                    $scope.data[$scope.component.key] = {data: {}};
+                  }
                   angular.merge($scope.data[$scope.component.key], sub);
                   cb();
                 }, cb);
@@ -139,8 +152,11 @@ module.exports = function(app) {
               loadForm();
             });
 
-            $scope.$watch('data[component.key]', function() {
-              refreshForm($scope.componentForm);
+            $scope.$watch('data[component.key]', function(submission) {
+              if (!submission) {
+                return;
+              }
+              angular.merge($scope.componentSubmission, submission);
             }, true);
           }
         ],
