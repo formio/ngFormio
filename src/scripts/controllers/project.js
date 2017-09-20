@@ -561,7 +561,6 @@ app.controller('ProjectDeployController', [
             type: 'success',
             message: 'Project tag ' + tag.tag + ' deployed to ' + $scope.currentProject.title + '.'
           });
-          //$state.transitionTo($state.current, null, { reload: true, inherit: true, notify: true });
           // If Remote, update the local project as well.
           if ($scope.localProject._id !== $scope.currentProject._id) {
             $scope.localProject.tag = tag.tag;
@@ -569,7 +568,12 @@ app.controller('ProjectDeployController', [
               .then(function() {
                 PrimaryProject.clear();
                 $state.reload();
+                //$state.transitionTo($state.current, null, { reload: true, inherit: true, notify: true });
               });
+          }
+          else {
+            PrimaryProject.clear();
+            $state.reload();
           }
         })
         .catch(FormioAlerts.onError.bind(FormioAlerts));
