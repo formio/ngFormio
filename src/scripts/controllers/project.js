@@ -2211,6 +2211,7 @@ app.controller('PrimaryProjectSettingsController', [
   'Formio',
   'FormioAlerts',
   'GoogleAnalytics',
+  'PrimaryProject',
   function(
     $scope,
     $rootScope,
@@ -2218,7 +2219,8 @@ app.controller('PrimaryProjectSettingsController', [
     ProjectFrameworks,
     Formio,
     FormioAlerts,
-    GoogleAnalytics
+    GoogleAnalytics,
+    PrimaryProject
   ) {
     $scope.frameworks = ProjectFrameworks;
 
@@ -2237,7 +2239,8 @@ app.controller('PrimaryProjectSettingsController', [
           });
           GoogleAnalytics.sendEvent('Project', 'update', null, 1);
           $scope.status.save = 'saved';
-          $state.go('project.overview', null, { reload: true });
+          PrimaryProject.clear();
+          $state.go('project.overview', null, { reload: true, inherit: true, notify: true });
         }, FormioAlerts.onError.bind(FormioAlerts))
         .catch(FormioAlerts.onError.bind(FormioAlerts));
     };
