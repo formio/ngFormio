@@ -406,28 +406,33 @@ app.controller('FormController', [
     };
 
     // The url to goto for embedding.
+    $scope.iframeCode = '';
     $scope.embedCode = '';
-    $scope.setEmbedCode = function(gotoUrl) {
-      var embedCode = '<script type="text/javascript">';
-      embedCode += '(function a(d, w, u) {';
-      embedCode +=    'var h = d.getElementsByTagName("head")[0];';
-      embedCode +=    'var s = d.createElement("script");';
-      embedCode +=    's.type = "text/javascript";';
-      embedCode +=    's.src = "' + AppConfig.appBase + '/lib/seamless/seamless.parent.min.js";';
-      embedCode +=    's.onload = function b() {';
-      embedCode +=        'var f = d.getElementById("formio-form-' + $scope.form._id + '");';
-      embedCode +=        'if (!f || (typeof w.seamless === u)) {';
-      embedCode +=            'return setTimeout(b, 100);';
-      embedCode +=        '}';
-      embedCode +=        'w.seamless(f, {fallback:false}).receive(function(d, e) {';
-      embedCode +=            gotoUrl ? 'window.location.href = "' + gotoUrl + '";' : '';
-      embedCode +=        '});';
-      embedCode +=    '};';
-      embedCode +=    'h.appendChild(s);';
-      embedCode += '})(document, window);';
-      embedCode += '</script>';
-      embedCode += '<iframe id="formio-form-' + $scope.form._id + '" style="width:100%;border:none;" height="600px" src="https://formview.io/#/' + $scope.currentProject.name + '/' + $scope.form.path + '?iframe=1&header=0"></iframe>';
+    $scope.setiframeCode = function(gotoUrl) {
+      var embedCode = '<script src="https://unpkg.com/formiojs@latest/dist/formio.embed.js?src=';
+      embedCode += $scope.projectUrl + '/' + $scope.form.path;
+      embedCode += '"></script>';
       $scope.embedCode = embedCode;
+      var iframeCode = '<script type="text/javascript">';
+      iframeCode += '(function a(d, w, u) {';
+      iframeCode +=    'var h = d.getElementsByTagName("head")[0];';
+      iframeCode +=    'var s = d.createElement("script");';
+      iframeCode +=    's.type = "text/javascript";';
+      iframeCode +=    's.src = "' + AppConfig.appBase + '/lib/seamless/seamless.parent.min.js";';
+      iframeCode +=    's.onload = function b() {';
+      iframeCode +=        'var f = d.getElementById("formio-form-' + $scope.form._id + '");';
+      iframeCode +=        'if (!f || (typeof w.seamless === u)) {';
+      iframeCode +=            'return setTimeout(b, 100);';
+      iframeCode +=        '}';
+      iframeCode +=        'w.seamless(f, {fallback:false}).receive(function(d, e) {';
+      iframeCode +=            gotoUrl ? 'window.location.href = "' + gotoUrl + '";' : '';
+      iframeCode +=        '});';
+      iframeCode +=    '};';
+      iframeCode +=    'h.appendChild(s);';
+      iframeCode += '})(document, window);';
+      iframeCode += '</script>';
+      iframeCode += '<iframe id="formio-form-' + $scope.form._id + '" style="width:100%;border:none;" height="600px" src="https://formview.io/#/' + $scope.currentProject.name + '/' + $scope.form.path + '?iframe=1&header=0"></iframe>';
+      $scope.iframeCode = iframeCode;
     };
 
     // Keep track of the form tags.
@@ -503,11 +508,11 @@ app.controller('FormController', [
     });
 
     $scope.$watch('form', function() {
-      $scope.setEmbedCode();
+      $scope.setiframeCode();
     });
 
     $scope.$watch('currentProject', function() {
-      $scope.setEmbedCode();
+      $scope.setiframeCode();
     });
 
     $scope.updateCurrentFormResources = function(form) {
@@ -863,10 +868,28 @@ app.controller('FormEmbedController', [
     $scope,
     ProjectFrameworks
   ) {
-    $scope.primaryProjectPromise.then(function(project) {
-      $scope.current = {
-        framework: project.framework || 'none'
-      };
+    var setFramework = function(name) {
+      if (!$scope.current) {
+        $scope.current = {framework: {}};
+      }
+      var customFramework = {};
+      angular.forEach(ProjectFrameworks, function(framework) {
+        if (framework.name === name) {
+          angular.merge($scope.current.framework, framework);
+        }
+        if (framework.name === 'custom') {
+          customFramework = framework;
+        }
+      });
+      if (!$scope.current) {
+        angular.merge($scope.current.framework, customFramework);
+      }
+
+      $scope.embedView = 'views/frameworks/' + $scope.current.framework.name + '/embed.html';
+    };
+
+    $scope.$watch('primaryProject.framework', function(name) {
+      setFramework(name);
     });
 
     $scope.frameworks = ProjectFrameworks;

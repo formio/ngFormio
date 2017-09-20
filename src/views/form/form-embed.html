@@ -1,170 +1,17 @@
 <div class="row">
   <div class="col-md-8">
-    <h3>Embedding the {{ form.title }} Form in {{ current.framework | capitalize }} applications</h3>
-    <p><span><pre><code><strong>Embed URL: </strong>{{ projectUrl }}/{{ form.path }} <span class="pull-right">{<a href="{{ projectUrl }}/{{ form.path }}" target="_blank">Preview JSON</a>}</span></code></pre></span></p>
+    <h3 style="margin-top: 0px;">Form Embedding</h3>
+    <p>This form can be embedded into your application by referencing the following JSON schema URL within your application.</p>
+    <p><span><pre><code><strong></strong>{{ projectUrl }}/{{ form.path }} <span class="pull-right">{<a href="{{ projectUrl }}/{{ form.path }}" target="_blank">Preview JSON</a>}</span></code></pre></span></p>
     <p class="text-muted">This is the url that can be used to embed this form into your application. Your form exists as a JSON object that defines how to render the form.</p>
-    <div ng-if="current.framework === 'angular'">
-      <div class="panel panel-success">
-        <div class="panel-heading">
-          <h3 class="panel-title">Prerequisites</h3>
-        </div>
-        <div class="panel-body">
-          <p>If you are using one of our starter kits, all the prerequisits are already set up.</p>
-          <h5>Include the ngFormio module</h5>
-          <p>Be sure you have added the <a href="https://github.com/formio/ngFormio" target="_blank">ngFormio</a> library to your application and have included it in the modules list in the app declaration.</p>
-          <span><pre><code>
-            angular.module('yourApp', [
-            &nbsp;&nbsp;'formio'
-            ]);
-
-          </code></pre></span>
-        </div>
-      </div>
-      <div class="panel panel-success">
-        <div class="panel-heading">
-          <h3 class="panel-title">Embedding the formio directive</h3>
-        </div>
-        <div class="panel-body">
-          <h5>Embed within a template</h5>
-          <p>To embed this form, simply place this directive anywhere in a template. Please note that there are single quotes inside the double quotes. This is since the src of the form is interpolated by angular. You can use a variable as well.</p>
-          <span><pre><code>
-            &lt;formio src="'{{ projectUrl }}/{{ form.path }}'" /&gt;
-
-          </code></pre></span>
-          <h5>Additional options</h5>
-          <p></p>
-        </div>
-      </div>
-    </div>
-    <div ng-if="current.framework === 'vue'">
-      <div class="panel panel-primary">
-        <div class="panel-heading">
-          <h3 class="panel-title">Vue.JS</h3>
-        </div>
-        <div class="panel-body">
-          <h5>Creating a Vue component</h5>
-          <p>Be sure you have added the <a href="https://github.com/formio/formio.js" target="_blank">formiojs</a> library to your application and imported it in the app declaration.</p>
-          <h5>Embed within a template</h5>
-          <p>To embed a form within your Vue application, lets create a component call FormVue, first you have to import
-            FormioForm from the formiojs library.</p>
-          <span><pre><code>
-            // FormVue.vue
-            &lt;template&gt;
-             &nbsp;&nbsp; &lt;div id="formio"&gt; &lt;/div&gt;
-            &lt;/template&gt;
-            &lt;script&gt;
-            &nbsp;&nbsp;import FormioForm from 'formiojs/form';
-              &nbsp;&nbsp;export default {
-             &nbsp;&nbsp; &nbsp;&nbsp;name: 'formio-vue',
-            &nbsp;&nbsp;  &nbsp;&nbsp;props: ['src'],
-      &nbsp;&nbsp;&nbsp;&nbsp; mounted () {
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;let self = this;
-         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;let form = new FormioForm(document.getElementById('formio'));
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;form.src = self.src;
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;form.on('submit', (submission) => {
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; console.log('The form was just submitted!!!');
-       &nbsp;&nbsp;&nbsp;&nbsp; });
-       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;form.on('error', (errors) => {
-        &nbsp;&nbsp;  &nbsp;&nbsp;  &nbsp;&nbsp;console.log('We have errors!');
-       &nbsp;&nbsp; &nbsp;&nbsp;})
-       &nbsp;&nbsp; &nbsp;&nbsp;}
-      &nbsp;&nbsp;}
-    &lt;/script&gt;
-
-            ---
-            // Then we can use our component in our App.vue.
-                  &lt;template&gt;
-             &nbsp;&nbsp;&lt;div id="app"&gt;
-             &nbsp;&nbsp;&lt;formio-vue src="'{{ projectUrl }}/{{ form.path }}'"&gt;&lt;/formio-vue&gt;
-             &lt;/div&gt;
-            &lt;/template&gt;
-            &lt;script&gt;
-      &nbsp;&nbsp;import FormioVue from './components/Formio.vue'
-      &nbsp;&nbsp;export default {
-        &nbsp;&nbsp;&nbsp;&nbsp;name: 'app',
-        &nbsp;&nbsp;&nbsp;&nbsp;components: {
-            &nbsp;&nbsp;&nbsp;&nbsp;FormioVue
-        &nbsp;&nbsp;}
-      &nbsp;&nbsp;}
-     &lt;/script&gt;
-          </code></pre></span>
-        </div>
-      </div>
-    </div>
-    <div ng-if="current.framework === 'react'">
-      <div class="panel panel-primary">
-        <div class="panel-heading">
-          <h3 class="panel-title">React</h3>
-        </div>
-        <div class="panel-body">
-          <h5>Include the react-formio library</h5>
-          <p>Be sure you have added the <a href="https://github.com/formio/react-formio" target="_blank">react-formio</a> libary to your application.</p>
-          <h5>Render the directive</h5>
-          <p>To embed a form within your react application, import the Formio library and add it to the render tree.</p>
-          <span><pre><code>
-            import React from 'react';
-            import ReactDOM from 'react-dom';
-            import { Formio } from 'react-formio';
-
-            ReactDOM.render(
-            &nbsp;&nbsp;&lt;Formio src="{{ projectUrl }}/{{ form.path }}" /&gt;, document.getElementById('example')
-            );
-
-          </code></pre></span>
-        </div>
-      </div>
-    </div>
-    <div ng-if="current.framework === 'angular2'">
-      <div class="panel panel-warning">
-        <div class="panel-heading">
-          <h3 class="panel-title">Angular 2.x</h3>
-        </div>
-        <div class="panel-body">
-          <h5>Include the ng2-formio module</h5>
-          <p>Be sure you have added the <a href="https://github.com/formio/ng2-formio" target="_blank">ng2-formio</a> library to your application and have included it in the modules list in the app declaration.</p>
-          <h5>Embed within a template</h5>
-          <p>To embed a form within your angular 2.x application, add the formio directive within a template.</p>
-          <span><pre><code>
-            import { FormioModule } from 'ng2-formio';
-            @NgModule({
-            &nbsp;&nbsp;imports: [ BrowserModule, ReactiveFormsModule, FormioModule ],
-            &nbsp;&nbsp;declarations: [ AppComponent ],
-            &nbsp;&nbsp;bootstrap: [ AppComponent ]
-            })
-            export class AppModule { }
-
-            ---
-
-            &lt;formio src='{{ projectUrl }}/{{ form.path }}' /&gt;
-          </code></pre></span>
-        </div>
-      </div>
-    </div>
-    <div ng-if="current.framework === 'simple'">
-      <div class="panel panel-info">
-        <div class="panel-heading">
-          <h3 class="panel-title">Quick Embed - iFrame</h3>
-        </div>
-        <div class="panel-body">
-          <p>The iframe embed allows a self contained embed of this form into your application. Use this if you are embedding this within an existing CMS such as Wordpress or Drupal.</p>
-          <p>
-          <div class="form-group">
-            <label for="gotoUrl">Redirect after submit</label>
-            <input type="text" class="form-control" id="gotoUrl" ng-model="gotoUrl" ng-change="setEmbedCode(gotoUrl)" placeholder="https://example.com">
-          </div>
-          </p>
-          <p><pre><textarea style="width:100%;" rows="8" onclick="this.focus();this.select()" readonly="readonly" ng-model="embedCode"></textarea></pre></p>
-          <small>With this method, you will not have CSS access to the rendered form.</small>
-        </div>
-      </div>
-    </div>
+    <ng-include src="embedView"></ng-include>
   </div>
   <div class="col-md-4">
     <div class="clearfix" style="margin-bottom:5px;">
       <div class="form-inline pull-right framework-control clear">
         <div class="form-group">
           <label class="control-label">Framework</label>
-          <ui-select ng-model="current.framework" theme="bootstrap">
+          <ui-select ng-model="primaryProject.framework" theme="bootstrap">
             <ui-select-match placeholder="Select framework">{{$select.selected.title}}</ui-select-match>
             <ui-select-choices repeat="framework.name as framework in frameworks | filter:$select.search">
               <span>{{ framework.title }}</span>
@@ -173,6 +20,9 @@
         </div>
       </div>
     </div>
+    <h3>Quick Inline Embed</h3>
+    <p>To quickly embed this form without using any framework, you can use the following code snippit.</p>
+    <p><pre><textarea style="width:100%;" rows="4" onclick="this.focus();this.select()" readonly="readonly" ng-model="embedCode"></textarea></pre></p>
     <div class="panel panel-primary">
       <div class="panel-heading">
         <h3 class="panel-title">About Embedding Forms</h3>

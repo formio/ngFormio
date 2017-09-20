@@ -1105,7 +1105,7 @@ app.controller('LaunchController', [
         $scope.repository = 'https://github.com/formio/ng-app-starterkit';
       }
       if (project.framework === 'angular2') {
-        $scope.repository = 'https://github.com/formio/ng2-formio';
+        $scope.repository = 'https://github.com/formio/angular-formio';
       }
       if (project.framework === 'react') {
         $scope.repository = 'https://github.com/formio/react-formio';
@@ -2687,27 +2687,27 @@ app.controller('ProjectBilling', [
 
 app.constant('ProjectFrameworks', [
   {
-    title: 'AngularJS Project',
+    title: 'AngularJS',
     name: 'angular',
     img: 'images/platforms/angularjs1.svg'
   },
   {
-    title: 'Angular 2+ Project',
+    title: 'Angular',
     name: 'angular2',
     img: 'images/platforms/angular2.png'
   },
   {
-    title: 'React.js Project',
+    title: 'React.js',
     name: 'react',
     img: 'images/platforms/react.svg'
   },
   {
-    title: 'Vue.js Project',
+    title: 'Vue.js',
     name: 'vue',
     img: 'images/platforms/vue.png'
   },
   {
-    title: 'HTML 5 Project',
+    title: 'HTML 5',
     name: 'html5',
     img: 'images/platforms/html5.png'
   },
@@ -2717,7 +2717,7 @@ app.constant('ProjectFrameworks', [
     img: 'images/platforms/form.png'
   },
   {
-    title: 'Custom Project',
+    title: 'Custom',
     name: 'custom',
     img: 'images/empty-project.png'
   },
@@ -2783,7 +2783,7 @@ app.constant('ProjectFrameworkSteps', {
       step: 'embed',
       title: 'Embed the form',
       icon: 'fa fa-code',
-      template: 'views/project/overview/angular/embed.html',
+      template: 'views/frameworks/angular/embed.html',
       children: []
     },
     {
@@ -2853,7 +2853,7 @@ app.constant('ProjectFrameworkSteps', {
       step: 'embed',
       title: 'Embed the form',
       icon: 'fa fa-code',
-      template: 'views/project/overview/angular2/embed.html',
+      template: 'views/frameworks/angular2/embed.html',
       children: []
     },
     {
@@ -2993,7 +2993,7 @@ app.constant('ProjectFrameworkSteps', {
       step: 'embed',
       title: 'Embed the form',
       icon: 'fa fa-code',
-      template: 'views/project/overview/vue/embed.html',
+      template: 'views/frameworks/vue/embed.html',
       children: []
     },
     {
@@ -3063,7 +3063,7 @@ app.constant('ProjectFrameworkSteps', {
       step: 'embed',
       title: 'Embed the form',
       icon: 'fa fa-code',
-      template: 'views/project/overview/html5/embed.html',
+      template: 'views/frameworks/html5/embed.html',
       children: []
     },
     {
@@ -3133,7 +3133,7 @@ app.constant('ProjectFrameworkSteps', {
       step: 'embed',
       title: 'Embed the form',
       icon: 'fa fa-code',
-      template: 'views/project/overview/simple/embed.html',
+      template: 'views/frameworks/simple/embed.html',
       children: []
     },
     {
@@ -3203,7 +3203,7 @@ app.constant('ProjectFrameworkSteps', {
       step: 'embed',
       title: 'Embed the form',
       icon: 'fa fa-code',
-      template: 'views/project/overview/custom/embed.html',
+      template: 'views/frameworks/html5/embed.html',
       children: []
     },
     {

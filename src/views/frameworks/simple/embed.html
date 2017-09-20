@@ -1,0 +1,16 @@
+<div class="panel panel-info">
+  <div class="panel-heading">
+    <h3 class="panel-title">iFrame Embed</h3>
+  </div>
+  <div class="panel-body">
+    <p>The iframe embed allows a self contained embed of this form into your application. Use this if you are embedding this within an existing CMS such as Wordpress or Drupal.</p>
+    <p>
+    <div class="form-group">
+      <label for="gotoUrl">Redirect after submit</label>
+      <input type="text" class="form-control" id="gotoUrl" ng-model="gotoUrl" ng-change="setiframeCode(gotoUrl)" placeholder="https://example.com">
+    </div>
+    </p>
+    <p><pre><textarea style="width:100%;" rows="8" onclick="this.focus();this.select()" readonly="readonly" ng-model="iframeCode"></textarea></pre></p>
+    <small>With this method, you will not have CSS access to the rendered form.</small>
+  </div>
+</div>
