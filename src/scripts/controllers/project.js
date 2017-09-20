@@ -2550,12 +2550,13 @@ app.controller('ProjectBilling', [
   '$scope',
   '$http',
   '$state',
+  '$window',
   'AppConfig',
   'Formio',
   'FormioAlerts',
   'UserInfo',
   'ProjectPlans',
-  function($rootScope, $scope, $http, $state, AppConfig, Formio, FormioAlerts, UserInfo, ProjectPlans) {
+  function($rootScope, $scope, $http, $state, $window, AppConfig, Formio, FormioAlerts, UserInfo, ProjectPlans) {
     $scope.primaryProjectPromise.then(function(project) {
 
       $scope.servers = (project.billing && project.billing.servers) ? angular.copy(project.billing.servers) : {
@@ -2615,7 +2616,7 @@ app.controller('ProjectBilling', [
         )
         .then(function() {
           Formio.clearCache();
-          $state.reload();
+          $window.location.reload();
         }, FormioAlerts.onError.bind(FormioAlerts))
         .catch(FormioAlerts.onError.bind(FormioAlerts));
     };
