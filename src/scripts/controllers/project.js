@@ -706,47 +706,13 @@ app.controller('ProjectOverviewController', [
 
     var formio = new Formio(AppConfig.apiBase + '/project/' + $scope.currentProject._id);
 
-    //formio.loadForms({
-    //    params: {
-    //      limit: Number.MAX_SAFE_INTEGER // Don't limit results
-    //    }
-    //  })
-    //  .then(function(forms) {
-    //    $scope.forms = forms;
-    //  }, FormioAlerts.onError.bind(FormioAlerts))
-    //  .catch(FormioAlerts.onError.bind(FormioAlerts));
-
     var abbreviator = new NumberAbbreviate();
 
     $scope.hasTeams = function() {
       return ['trial', 'team', 'commercial'].indexOf($scope.currentProject.plan) !== -1;
     };
 
-    $scope.getLastModified = function() {
-      return _($scope.forms || [])
-        .concat($scope.currentProjectRoles || [])
-        .concat($scope.currentProject || {})
-        .map(function(item) {
-          return new Date(item.modified);
-        })
-        .max();
-    };
-
     $scope.graphType = $stateParams.graphType;
-
-    $scope.angular1 = [];
-    $scope.angular2 = [];
-    $scope.react = [];
-
-    $http.get('https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails,id,snippet,status&maxResults=50&playlistId=PLL9kNSjqyfJ70DiT2Yn_8cCXGpEs_ReRb&key=' + key).then(function(result) {
-      $scope.angular1 = result.data.items;
-    });
-    $http.get('https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails,id,snippet,status&maxResults=50&playlistId=PLL9kNSjqyfJ5Mj5FvZ7gL4MZj5o4yN5Sg&key=' + key).then(function(result) {
-      $scope.react = result.data.items;
-    });
-    $http.get('https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails,id,snippet,status&maxResults=50&playlistId=PLL9kNSjqyfJ51N9rw0Wnqu6Yl8OMZdE-Q&key=' + key).then(function(result) {
-      $scope.angular2 = result.data.items;
-    });
   }
 ]);
 
@@ -759,7 +725,7 @@ app.factory('ProjectAnalytics', [
   ) {
       return {
         getSubmissionAnalytics: function(project, year, month, day) {
-          var url = AppConfig.projectUrl + '/analytics/year/' + year;
+          var url = project + '/analytics/year/' + year;
           if (month !== undefined && month !== null) {
             url += '/month/' + month;
           }
@@ -886,7 +852,7 @@ app.controller('ChartController', [
 
       if(type === 'year') {
         $scope.analyticsLoading = true;
-        ProjectAnalytics.getSubmissionAnalytics($scope.currentProject._id, _y)
+        ProjectAnalytics.getSubmissionAnalytics($scope.projectUrl, _y)
           .then(function(data) {
             $scope.currentType = type;
             $scope.analytics = {
@@ -903,7 +869,7 @@ app.controller('ChartController', [
       }
       else if(type === 'month') {
         $scope.analyticsLoading = true;
-        ProjectAnalytics.getSubmissionAnalytics($scope.currentProject._id, _y, _m)
+        ProjectAnalytics.getSubmissionAnalytics($scope.projectUrl, _y, _m)
           .then(function(data) {
             $scope.currentType = type;
             $scope.analytics = {
@@ -972,7 +938,7 @@ app.controller('ChartController', [
           return local;
         };
 
-        ProjectAnalytics.getSubmissionAnalytics($scope.currentProject._id, _y, _m, _d)
+        ProjectAnalytics.getSubmissionAnalytics($scope.projectUrl, _y, _m, _d)
           .then(function(data) {
             $scope.currentType = type;
             var displayHrs = calculateLocalTimeLabels(_y, _m, _d);
