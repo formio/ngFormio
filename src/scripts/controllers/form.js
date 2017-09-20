@@ -558,9 +558,7 @@ app.controller('FormController', [
           title: 'PDF'
         }
       ];
-      $scope.formio = new Formio($scope.formUrl, {
-        project: $scope.projectUrl
-      });
+      $scope.formio = new Formio($scope.formUrl, {base: $scope.baseUrl});
       // Load the form.
       if ($scope.formId) {
         loadFormQ.resolve($scope.formio.loadForm()
