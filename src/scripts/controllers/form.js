@@ -1292,7 +1292,7 @@ app.controller('FormActionEditController', [
         if(actionInfo && actionInfo.name === 'sql') {
           var typeComponent = FormioUtils.getComponent(actionInfo.settingsForm.components, 'type');
           if(JSON.parse(typeComponent.data.json).length === 0) {
-            FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> You do not have any SQL servers configured. You can add a SQL server in your <a href="#/project/'+$scope.projectId+'/settings/databases">Project Settings</a>.');
+            FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> You do not have any SQL servers configured. You can add a SQL server in your <a href="#/project/'+$scope.currentProject._id+'/env/integrations/data">Environment Settings</a>.');
           }
         }
 
@@ -1300,7 +1300,7 @@ app.controller('FormActionEditController', [
         if(actionInfo && actionInfo.name === 'email') {
           var transportComponent = FormioUtils.getComponent(actionInfo.settingsForm.components, 'transport');
           if(JSON.parse(transportComponent.data.json).length <= 1) {
-            FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> You do not have any email transports configured. You can add an email transport in your <a href="#/project/'+$scope.projectId+'/settings/email">Project Settings</a>, or you can use the default transport (charges may apply).');
+            FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> You do not have any email transports configured. You can add an email transport in your <a href="#/project/'+$scope.currentProject._id+'/env/integrations/email">Environment Settings</a>, or you can use the default transport (charges may apply).');
           }
         }
 
@@ -1308,7 +1308,7 @@ app.controller('FormActionEditController', [
         if (actionInfo && actionInfo.name === 'oauth') {
           var providers = FormioUtils.getComponent(actionInfo.settingsForm.components, 'provider');
           if (providers.data && providers.data.json && providers.data.json === '[]') {
-            FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> The OAuth Action requires a provider to be configured, before it can be used. You can add an OAuth provider in your <a href="#/project/'+$scope.projectId+'/settings/oauth">Project Settings</a>.');
+            FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> The OAuth Action requires a provider to be configured, before it can be used. You can add an OAuth provider in your <a href="#/project/'+$scope.currentProject._id+'/env/integrations/oauth">Environment Settings</a>.');
           }
         }
 
@@ -1316,13 +1316,13 @@ app.controller('FormActionEditController', [
         if (actionInfo && actionInfo.name === 'googlesheet') {
           var settings = _.get($scope, 'currentProject.settings.google');
           if (!_.has(settings, 'clientId')) {
-            FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> The Google Sheets Action requires a Client ID to be configured, before it can be used. You can add all Google Data Connection settings in your <a href="#/project/'+$scope.projectId+'/settings/oauth">Project Settings</a>.');
+            FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> The Google Sheets Action requires a Client ID to be configured, before it can be used. You can add all Google Data Connection settings in your <a href="#/project/'+$scope.currentProject._id+'/env/integrations/oauth">Environment Settings</a>.');
           }
           if (!_.has(settings, 'cskey')) {
-            FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> The Google Sheets Action requires a Client Secret Key to be configured, before it can be used. You can add all Google Data Connection settings in your <a href="#/project/'+$scope.projectId+'/settings/oauth">Project Settings</a>.');
+            FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> The Google Sheets Action requires a Client Secret Key to be configured, before it can be used. You can add all Google Data Connection settings in your <a href="#/project/'+$scope.currentProject._id+'/env/integrations/oauth">Environment Settings</a>.');
           }
           if (!_.has(settings, 'refreshtoken')) {
-            FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> The Google Sheets Action requires a Refresh Token to be configured, before it can be used. You can add all Google Data Connection settings in your <a href="#/project/'+$scope.projectId+'/settings/oauth">Project Settings</a>.');
+            FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> The Google Sheets Action requires a Refresh Token to be configured, before it can be used. You can add all Google Data Connection settings in your <a href="#/project/'+$scope.currentProject._id+'/env/integrations/oauth">Environment Settings</a>.');
           }
         }
 
@@ -1348,7 +1348,7 @@ app.controller('FormActionEditController', [
           };
 
           if(!$scope.currentProject.settings || !$scope.currentProject.settings.hubspot || !$scope.currentProject.settings.hubspot.apikey) {
-            FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> You have not yet configured your Hubspot API key. You can configure your Hubspot API key in your <a href="#/project/'+$scope.projectId+'/settings/hubspot">Project Settings</a>.');
+            FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> You have not yet configured your Hubspot API key. You can configure your Hubspot API key in your <a href="#/project/'+$scope.currentProject._id+'/env/integrations/hubspot">Environment Settings</a>.');
             $scope.formDisabled = true;
           }
           FormioUtils.eachComponent(actionInfo.settingsForm.components, function(component) {
@@ -1467,7 +1467,7 @@ app.controller('FormActionEditController', [
           $scope.currentProject.hasOwnProperty('plan') &&
           ['basic', 'trial'].indexOf($scope.currentProject.plan) !== -1
         ) {
-          FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> This is a Premium Action, please upgrade your <a ui-sref="project.settings.plan">project plan</a> to enable it.');
+          FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> This is a Premium Action, please upgrade your <a ui-sref="project.billing({projectId: $scope.primaryProject._id)">project plan</a> to enable it.');
         }
 
         var component = FormioUtils.getComponent($scope.form.components, _.get($scope, 'action.data.condition.field'));
