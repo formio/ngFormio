@@ -403,6 +403,9 @@ app.controller('FormController', [
       if (!$scope.form.name || $scope.form.name === _.camelCase(oldTitle)) {
         $scope.form.name = _.camelCase($scope.form.title);
       }
+      if (!$scope.form.path || $scope.form.path === _.camelCase(oldTitle).toLowerCase()) {
+        $scope.form.path = _.camelCase($scope.form.title).toLowerCase();
+      }
     };
 
     // The url to goto for embedding.
