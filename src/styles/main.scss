@@ -605,6 +605,9 @@ ul.project-settings-menu {
 
 .project-resource-form-view-page .form-content, .project-form-form-view-page .form-content, .project-resource-form-api-page .form-content {
   background-color: #666;
+  min-height: 700px;
+  padding-bottom: 80px;
+  margin-bottom: -40px;
 }
 
 #application-preview {
@@ -781,6 +784,7 @@ pre code {
     padding: 5px;
     background-color: #fafafa;
     border: 1px solid #e8e8e8;
+    z-index: 1000;
   }
   .feedback-cancel {
     margin: 5px;
