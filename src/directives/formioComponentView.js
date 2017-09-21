@@ -12,7 +12,7 @@ module.exports = [
         form: '=',
         submission: '=',
         ignore: '=?',
-        builder: '=?'
+        options: '=?'
       },
       templateUrl: 'formio/component-view.html',
       controller: [

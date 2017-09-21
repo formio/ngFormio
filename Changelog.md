@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.23.6
+### Changed
+ - Pass along the building flag through the options.
+
 ## 2.23.5
 ### Added
  - Mask textfields if input should be hidden.

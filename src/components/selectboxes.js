@@ -13,11 +13,11 @@ module.exports = function(app) {
         model: '=ngModel',
         gridRow: '=',
         gridCol: '=',
-        builder: '=?'
+        options: '=?'
       },
       templateUrl: 'formio/components/selectboxes-directive.html',
       link: function($scope, el, attrs, ngModel) {
-        if ($scope.builder) return;
+        if ($scope.options && $scope.options.building) return;
         // Initialize model
         var model = {};
         angular.forEach($scope.component.values, function(v) {

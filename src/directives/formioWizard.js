@@ -526,7 +526,7 @@ module.exports = function() {
           });
 
           // FOR-71
-          if (!$scope.builder) {
+          if (!$scope.options.building) {
             $scope.$watch('submission.data', function(data) {
               if (hasConditionalPages) {
                 var newPages = [];
@@ -558,7 +558,7 @@ module.exports = function() {
         };
 
         // FOR-71
-        if (!$scope.builder) {
+        if (!$scope.options.building) {
           $scope.$watch('form', function(form) {
             if (
               $scope.src ||

@@ -10,7 +10,7 @@ module.exports = function(app) {
           return data ? 'Yes' : 'No';
         },
         controller: ['$scope', '$timeout', function($scope, $timeout) {
-          if ($scope.builder) return;
+          if ($scope.options && $scope.options.building) return;
           var boolean = {
             true: true,
             false: false

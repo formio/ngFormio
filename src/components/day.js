@@ -12,11 +12,11 @@ module.exports = function(app) {
         ngModel: '=',
         gridRow: '=',
         gridCol: '=',
-        builder: '=?'
+        options: '=?'
       },
       templateUrl: 'formio/components/day-input.html',
       controller: ['$scope', function($scope) {
-        if ($scope.builder) return;
+        if ($scope.options && $scope.options.building) return;
         $scope.months = [
           {value: '00', label: $scope.component.fields.month.placeholder},
           {value: '01', label: 'January'},
@@ -81,7 +81,7 @@ module.exports = function(app) {
         };
       }],
       link: function(scope, elem, attrs, ngModel) {
-        if (scope.builder) return;
+        if (scope.options && scope.options.building) return;
         // Set the scope values based on the current model.
         scope.$watch('ngModel', function() {
           // Only update on load.

@@ -3,7 +3,7 @@ module.exports = function() {
     restrict: 'A',
     require: 'ngModel',
     link: function(scope, ele, attrs, ctrl) {
-      if (scope.builder) return;
+      if (scope.options && scope.options.building) return;
       if (
         !scope.component.validate ||
         !scope.component.validate.custom

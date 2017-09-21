@@ -54,7 +54,7 @@ module.exports = function() {
         $scope.getIframeSrc = function(pdf) {
           var iframeSrc = pdf.src + '.html';
           var params = [];
-          if ($scope.form.builder) {
+          if ($scope.options && $scope.options.building) {
             params.push('builder=1');
           }
           if ($scope.readOnly) {
@@ -143,7 +143,7 @@ module.exports = function() {
         };
 
         // FOR-71
-        if (!$scope._src && !$scope.builder) {
+        if (!$scope._src && !$scope.options.building) {
           $scope.$watch('src', function(src) {
             if (!src) {
               return;

@@ -10,7 +10,7 @@ module.exports = function(app) {
           return $scope.component.multiple ? 'formio/components/address-multiple.html' : 'formio/components/address.html';
         },
         controller: ['$scope', '$http', function($scope, $http) {
-          if ($scope.builder) return;
+          if ($scope.options && $scope.options.building) return;
           $scope.address = {};
           $scope.addresses = [];
           $scope.refreshAddress = function(address) {

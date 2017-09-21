@@ -1,6 +1,6 @@
 <div class="daySelect form row">
   <div class="form-group col-xs-3" ng-if="component.dayFirst && !component.fields.day.hide">
-    <label for="{{componentId}}-day" ng-class="{'field-required': component.fields.day.required}">{{ "Day" | formioTranslate:null:builder }}</label>
+    <label for="{{componentId}}-day" ng-class="{'field-required': component.fields.day.required}">{{ "Day" | formioTranslate:null:options.building }}</label>
     <input
       class="form-control"
       type="number"
@@ -17,7 +17,7 @@
     />
   </div>
   <div class="form-group col-xs-4" ng-if="!component.fields.month.hide">
-    <label for="{{componentId}}-month" ng-class="{'field-required': component.fields.month.required}">{{ "Month" | formioTranslate:null:builder }}</label>
+    <label for="{{componentId}}-month" ng-class="{'field-required': component.fields.month.required}">{{ "Month" | formioTranslate:null:options.building }}</label>
     <select
       class="form-control"
       type="text"
@@ -25,11 +25,11 @@
       ng-model="date.month"
       ng-change="onChange()"
       ng-disabled="readOnly"
-      ng-options="month.value as month.label | formioTranslate:null:builder for month in months"
+      ng-options="month.value as month.label | formioTranslate:null:options.building for month in months"
     ></select>
   </div>
   <div class="form-group col-xs-3" ng-if="!component.dayFirst && !component.fields.day.hide">
-    <label for="{{componentId}}-day" ng-class="{'field-required': component.fields.day.required}">{{ "Day" | formioTranslate:null:builder }}</label>
+    <label for="{{componentId}}-day" ng-class="{'field-required': component.fields.day.required}">{{ "Day" | formioTranslate:null:options.building }}</label>
     <input
       class="form-control"
       type="number"
@@ -46,7 +46,7 @@
     />
   </div>
   <div class="form-group col-xs-5" ng-if="!component.fields.year.hide">
-    <label for="{{componentId}}-year" ng-class="{'field-required': component.fields.year.required}">{{ "Year" | formioTranslate:null:builder }}</label>
+    <label for="{{componentId}}-year" ng-class="{'field-required': component.fields.year.required}">{{ "Year" | formioTranslate:null:options.building }}</label>
     <input
       class="form-control"
       type="number"

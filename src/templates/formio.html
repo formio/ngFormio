@@ -6,25 +6,24 @@
     <span style="position:absolute;right:10px;top:60px;cursor:pointer;" class="btn btn-default no-disable" ng-click="zoomOut()"><span class="glyphicon glyphicon-zoom-out"></span></span>
     <a ng-if="downloadUrl" style="position:absolute;right:10px;top:110px;cursor:pointer;" class="no-disable" href="{{ downloadUrl | trustAsResourceUrl }}" target="_blank"><img ng-src="{{ pdfImage }}" style="width:3em;" /></a>
     <iframe ng-src="{{ getIframeSrc(form.settings.pdf) | trustAsResourceUrl }}" seamless class="formio-iframe"></iframe>
-    <button ng-if="!readOnly && !form.builder" type="button" class="btn btn-primary" ng-click="submitIFrameForm()">Submit</button>
+    <button ng-if="!readOnly && !options.building" type="button" class="btn btn-primary" ng-click="submitIFrameForm()">Submit</button>
   </div>
   <form ng-if="!form.display || (form.display === 'form')" role="form" name="formioForm" ng-submit="onSubmit(formioForm)" novalidate>
-    <div ng-repeat="alert in formioAlerts track by $index" class="alert alert-{{ alert.type }}" role="alert" ng-if="::!builder">
-      {{ alert.message | formioTranslate:null:builder }}
+    <div ng-repeat="alert in formioAlerts track by $index" class="alert alert-{{ alert.type }}" role="alert" ng-if="::!options.building">
+      {{ alert.message | formioTranslate:null:options.building }}
     </div>
     <a ng-if="downloadUrl && form.settings.pdf.id" class="pull-right no-disable" href="{{ downloadUrl | trustAsResourceUrl }}" target="_blank"><img ng-src="{{ pdfImage }}" style="width:3em;" /></a>
     <!-- DO NOT PUT "track by $index" HERE SINCE DYNAMICALLY ADDING/REMOVING COMPONENTS WILL BREAK -->
     <formio-component
       ng-repeat="component in form.components track by $index"
       component="component"
-      ng-if="builder ? '::true' : isVisible(component)"
+      ng-if="options.building ? '::true' : isVisible(component)"
       data="submission.data"
       formio-form="formioForm"
       formio="formio"
       submission="submission"
       hide-components="hideComponents"
       read-only="isDisabled(component, submission.data)"
-      builder="builder"
       options="options"
     ></formio-component>
   </form>

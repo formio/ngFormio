@@ -6,8 +6,8 @@
       data="submission.data"
       ignore="ignore"
       submission="submission"
-      ng-if="builder ? '::true' : isVisible(component)"
-      builder="builder"
+      ng-if="options.building ? '::true' : isVisible(component)"
+      options="options"
     ></formio-component-view>
   </div>
 </div>

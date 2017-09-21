@@ -40,7 +40,7 @@ module.exports = function(app) {
       controller: [
         '$scope',
         function($scope) {
-          if ($scope.builder) return;
+          if ($scope.options && $scope.options.building) return;
           $scope.removeFile = function(event, index) {
             var component = $scope.$parent.component;
             if (component.storage === 'url') {
@@ -72,7 +72,7 @@ module.exports = function(app) {
       controller: [
         '$scope',
         function($scope) {
-          if ($scope.builder) return;
+          if ($scope.options && $scope.options.building) return;
           $scope.removeFile = function(event, index) {
             var component = $scope.$parent.component;
             if (component.storage === 'url') {
@@ -106,7 +106,7 @@ module.exports = function(app) {
           $scope,
           Formio
         ) {
-          if ($scope.builder) return;
+          if ($scope.options && $scope.options.building) return;
           $scope.getFile = function(evt) {
             evt.preventDefault();
             $scope.form = $scope.form || $rootScope.filePath;
@@ -149,7 +149,7 @@ module.exports = function(app) {
           $scope,
           Formio
         ) {
-          if ($scope.builder) return;
+          if ($scope.options && $scope.options.building) return;
           $scope.form = $scope.form || $rootScope.filePath;
           $scope.options = $scope.options || {};
           var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
@@ -173,7 +173,7 @@ module.exports = function(app) {
       $interpolate,
       FormioUtils
     ) {
-      if ($scope.builder) return;
+      if ($scope.options && $scope.options.building) return;
       $scope.fileUploads = {};
       $scope.removeUpload = function(index) {
         delete $scope.fileUploads[index];

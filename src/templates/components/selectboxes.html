@@ -14,10 +14,10 @@
     custom-validator="component.validate.custom"
     grid-row="gridRow"
     grid-col="gridCol"
-    builder="builder"
+    options="options"
   ></formio-select-boxes>
   <div ng-if="!!component.description" class="help-block">
     <span>{{ component.description }}</span>
   </div>
-  <formio-errors ng-if="::!builder"></formio-errors>
+  <formio-errors ng-if="::!options.building"></formio-errors>
 </div>

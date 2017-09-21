@@ -16,7 +16,7 @@ module.exports = function(app) {
           return $scope.component.multiple ? 'formio/components/resource-multiple.html' : 'formio/components/resource.html';
         },
         controller: ['$scope', 'Formio', 'ngDialog', '$location', function($scope, Formio, ngDialog, $location) {
-          if ($scope.builder) return;
+          if ($scope.options && $scope.options.building) return;
           var settings = $scope.component;
           var params = settings.params || {};
           $scope.selectItems = [];

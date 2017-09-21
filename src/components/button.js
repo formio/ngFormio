@@ -20,7 +20,7 @@ module.exports = function(app) {
           theme: 'primary'
         },
         controller: ['$scope', 'FormioUtils', function($scope, FormioUtils) {
-          if ($scope.builder) return;
+          if ($scope.options && $scope.options.building) return;
           var clicked = false;
           var settings = $scope.component;
           $scope.getButtonType = function() {

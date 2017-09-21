@@ -71,7 +71,7 @@ module.exports = function(app) {
     '$scope',
     'FormioUtils',
     function($scope, FormioUtils) {
-      if ($scope.builder) return;
+      if ($scope.options && $scope.options.building) return;
       // Ensure each data grid has a valid data model.
       $scope.data = $scope.data || {};
       $scope.data[$scope.component.key] = $scope.data[$scope.component.key] || [{}];

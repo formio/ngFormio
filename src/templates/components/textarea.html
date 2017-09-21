@@ -7,7 +7,7 @@
   id="{{ componentId }}"
   name="{{ componentId }}"
   tabindex="{{ component.tabindex || 0 }}"
-  ng-attr-placeholder="{{ component.placeholder | formioTranslate:null:builder }}"
+  ng-attr-placeholder="{{ component.placeholder | formioTranslate:null:options.building }}"
   custom-validator="component.validate.custom"
   rows="{{ component.rows }}"
 ></textarea>

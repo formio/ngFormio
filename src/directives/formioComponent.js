@@ -21,7 +21,6 @@ module.exports = [
         readOnly: '=',
         gridRow: '=',
         gridCol: '=',
-        builder: '=?',
         options: '=?'
       },
       templateUrl: 'formio/component.html',
@@ -48,7 +47,8 @@ module.exports = [
           FormioUtils,
           $timeout
         ) {
-          $scope.builder = $scope.builder || false;
+          $scope.options = $scope.options || {};
+
           // Options to match jquery.maskedinput masks
           $scope.uiMaskOptions = {
             maskDefinitions: {
@@ -63,7 +63,7 @@ module.exports = [
 
           // See if this component is visible or not.
           $scope.isVisible = function(component, row) {
-            if ($scope.builder) return true;
+            if ($scope.options && $scope.options.building) return true;
             return FormioUtils.isVisible(
               component,
               row,
@@ -129,7 +129,7 @@ module.exports = [
 
           // FOR-71 - Dont watch in the builder view.
           // Calculate value when data changes.
-          if (!$scope.builder && ($scope.component.calculateValue || _get($scope.component, 'validate.json'))) {
+          if (!$scope.options.building && ($scope.component.calculateValue || _get($scope.component, 'validate.json'))) {
             $scope.$watch('data', function() {
               FormioUtils.checkCalculated($scope.component, $scope.submission, $scope.data);
 
@@ -242,7 +242,7 @@ module.exports = [
           }
 
           // FOR-71 - Dont watch in the builder view.
-          if (!$scope.builder) {
+          if (!$scope.options.building) {
             $scope.$watch('component.multiple', function() {
               $scope.data = $scope.data || {};
               FormioUtils.checkDefaultValue($scope.component, $scope.submission, $scope.data, $scope);

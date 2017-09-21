@@ -98,7 +98,7 @@ module.exports = function(app) {
       require: 'ngModel',
       restrict: 'A',
       link: function(scope, elem, attr, ctrl) {
-        if (scope.builder) return;
+        if (scope.options && scope.options.building) return;
 
         // Add the control to the main form.
         scope.formioForm.$addControl(ctrl);
@@ -117,7 +117,7 @@ module.exports = function(app) {
       require: 'ngModel',
       restrict: 'A',
       link: function(scope, elem, attr, ctrl) {
-        if (scope.builder) return;
+        if (scope.options && scope.options.building) return;
 
         // Add the control to the main form.
         scope.formioForm.$addControl(ctrl);
@@ -285,12 +285,12 @@ module.exports = function(app) {
       '            formio="formio"' +
       '            submission="submission"' +
       '            hide-components="hideComponents"' +
-      '            ng-if="builder ? \'::true\' : isVisible(col, rowData)"' +
+      '            ng-if="options.building ? \'::true\' : isVisible(col, rowData)"' +
       '            formio-form="formioForm"' +
       '            read-only="isDisabled(col, rowData)"' +
       '            grid-row="rowIndex"' +
       '            grid-col="colIndex"' +
-      '            builder="builder"' +
+      '            options="options"' +
       '          />' +
       '        </ng-form>' +
       '        <div class="editgrid-actions">' +
@@ -310,7 +310,7 @@ module.exports = function(app) {
     '$scope',
     'FormioUtils',
     function($scope, FormioUtils) {
-      if ($scope.builder) return;
+      if ($scope.options && $scope.options.building) return;
       // Ensure each data grid has a valid data model.
       $scope.data = $scope.data || {};
       $scope.data[$scope.component.key] = $scope.data[$scope.component.key] || [];

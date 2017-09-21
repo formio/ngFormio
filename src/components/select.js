@@ -17,7 +17,7 @@ module.exports = function(app) {
           select: '='
         },
         link: function(scope, element) {
-          if (scope.builder) return;
+          if (scope.options && scope.options.building) return;
           if (scope.template) {
             element.append($compile(angular.element(scope.template))(scope));
           }
@@ -30,7 +30,7 @@ module.exports = function(app) {
     return {
       require: 'ngModel',
       link: function(scope, element, attrs, ngModel) {
-        if (scope.builder) return;
+        if (scope.options && scope.options.building) return;
         var oldIsEmpty = ngModel.$isEmpty;
         ngModel.$isEmpty = function(value) {
           return (Array.isArray(value) && value.length === 0) || oldIsEmpty(value);
@@ -45,7 +45,7 @@ module.exports = function(app) {
       require: 'uiSelect',
       restrict: 'A',
       link: function($scope, el, attrs, uiSelect) {
-        if ($scope.builder) return;
+        if ($scope.options && $scope.options.building) return;
         var focuscount = -1;
 
         angular.element(uiSelect.focusser).on('focus', function() {
@@ -152,8 +152,8 @@ module.exports = function(app) {
             $q,
             $timeout
           ) {
-            // FOR-71 - Skip functionality in the builder view.
-            if ($scope.builder) return;
+            // FOR-71 - Skip functionality in the options.building view.
+            if ($scope.options && $scope.options.building) return;
             var settings = $scope.component;
             var options = {};
             $scope.nowrap = true;
