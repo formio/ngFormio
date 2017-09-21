@@ -258,13 +258,13 @@ angular
         })
         .state('project.overview', {
           url: '/overview',
-          controller: 'LaunchController',
-          templateUrl: 'views/project/overview/index.html'
-        })
-        .state('project.env.tour', {
-          url: '/tour',
           controller: 'ProjectOverviewController',
-          templateUrl: 'views/project/env/tour/index.html'
+          templateUrl: 'views/project/overview.html'
+        })
+        .state('project.tour', {
+          url: '/tour',
+          controller: 'LaunchController',
+          templateUrl: 'views/project/tour/index.html'
         })
         .state('project.env.settings', {
           url: '/settings',

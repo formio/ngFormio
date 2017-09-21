@@ -1,0 +1,28 @@
+<div class="project-section-inner-content">
+  <div class="row overview">
+    <div class="col-md-8 overview-content">
+      <h2>Welcome to your Form.io Project</h2>
+      <h4>Projects are a collection of resources, forms, actions and settings that form the backbone of your serverless application.</h4>
+      <p>By using one of the modern web frameworks you can quickly build out an application with dynamic forms.
+        You can also embed your forms directly into other websites or mobile platforms like iOS and Android.</p>
+      <div class="text-center">
+        <img width="500px" src="images/formio.png" alt="">
+        <p>Never done this before? Try the Walkthrough.</p>
+        <a class="btn btn-primary btn-lg" ui-sref="project.tour">Start Walkthrough</a>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <ul class="list-group list-group-striped">
+        <li class="list-group-item lsist-group-heading">
+          <strong>Recently Modified Forms and Resources</strong>
+        </li>
+        <li class="list-group-item" ng-repeat="form in recentForms track by $index">
+          <a ui-sref="project.{{form.type}}.form.edit({formId: form._id})">{{form.title}}</a>
+        </li>
+        <li class="list-group-item text-center">
+          <a ui-sref="project.form.index">More...</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
