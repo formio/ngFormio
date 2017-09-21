@@ -17,7 +17,7 @@ module.exports = function(app) {
           select: '='
         },
         link: function(scope, element) {
-          if (scope.options.building) return;
+          if (scope.options && scope.options.building) return;
           if (scope.template) {
             element.append($compile(angular.element(scope.template))(scope));
           }
@@ -30,7 +30,7 @@ module.exports = function(app) {
     return {
       require: 'ngModel',
       link: function(scope, element, attrs, ngModel) {
-        if (scope.options.building) return;
+        if (scope.options && scope.options.building) return;
         var oldIsEmpty = ngModel.$isEmpty;
         ngModel.$isEmpty = function(value) {
           return (Array.isArray(value) && value.length === 0) || oldIsEmpty(value);

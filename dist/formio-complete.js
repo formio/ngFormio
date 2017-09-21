@@ -70548,7 +70548,7 @@ module.exports = function(app) {
     return {
       restrict: 'A',
       link: function(scope, element) {
-        if (scope.options.building) return;
+        if (scope.options && scope.options.building) return;
         element.bind('keyup', function() {
           var data = scope.data[scope.component.key];
 
@@ -71057,7 +71057,7 @@ module.exports = function(app) {
         };
       }],
       link: function(scope, elem, attrs, ngModel) {
-        if (scope.options.building) return;
+        if (scope.options && scope.options.building) return;
         // Set the scope values based on the current model.
         scope.$watch('ngModel', function() {
           // Only update on load.
@@ -71281,7 +71281,7 @@ module.exports = function(app) {
       require: 'ngModel',
       restrict: 'A',
       link: function(scope, elem, attr, ctrl) {
-        if (scope.options.building) return;
+        if (scope.options && scope.options.building) return;
 
         // Add the control to the main form.
         scope.formioForm.$addControl(ctrl);
@@ -71300,7 +71300,7 @@ module.exports = function(app) {
       require: 'ngModel',
       restrict: 'A',
       link: function(scope, elem, attr, ctrl) {
-        if (scope.options.building) return;
+        if (scope.options && scope.options.building) return;
 
         // Add the control to the main form.
         scope.formioForm.$addControl(ctrl);
@@ -72784,7 +72784,7 @@ module.exports = function(app) {
           select: '='
         },
         link: function(scope, element) {
-          if (scope.options.building) return;
+          if (scope.options && scope.options.building) return;
           if (scope.template) {
             element.append($compile(angular.element(scope.template))(scope));
           }
@@ -72797,7 +72797,7 @@ module.exports = function(app) {
     return {
       require: 'ngModel',
       link: function(scope, element, attrs, ngModel) {
-        if (scope.options.building) return;
+        if (scope.options && scope.options.building) return;
         var oldIsEmpty = ngModel.$isEmpty;
         ngModel.$isEmpty = function(value) {
           return (Array.isArray(value) && value.length === 0) || oldIsEmpty(value);
@@ -73541,7 +73541,7 @@ module.exports = function(app) {
       },
       require: '?ngModel',
       link: function(scope, element, attrs, ngModel) {
-        if (scope.options.building) return;
+        if (scope.options && scope.options.building) return;
         if (!ngModel) {
           return;
         }
@@ -74095,7 +74095,7 @@ module.exports = function() {
     restrict: 'A',
     require: 'ngModel',
     link: function(scope, ele, attrs, ctrl) {
-      if (scope.options.building) return;
+      if (scope.options && scope.options.building) return;
       if (
         !scope.component.validate ||
         !scope.component.validate.custom

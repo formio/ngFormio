@@ -81,7 +81,7 @@ module.exports = function(app) {
         };
       }],
       link: function(scope, elem, attrs, ngModel) {
-        if (scope.options.building) return;
+        if (scope.options && scope.options.building) return;
         // Set the scope values based on the current model.
         scope.$watch('ngModel', function() {
           // Only update on load.
