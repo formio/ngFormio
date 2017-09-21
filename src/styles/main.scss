@@ -1950,9 +1950,6 @@ li.step-info {
           padding: 0 0 2em 15px;
           .flow-side-steps {
             border-left: 1px solid #dddddd;
-            &:last-child {
-              margin-top: 50px;
-            }
             .flow-side-step {
               margin: 45px 0;
               position: relative;
@@ -2016,7 +2013,7 @@ li.step-info {
     }
     .flow-content {
       width: 100%;
-      padding: 30px 20px;
+      padding: 0px 20px;
       &.showtime {
         width:80%;
         -webkit-transition: all 2s;

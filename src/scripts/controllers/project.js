@@ -1095,6 +1095,12 @@ app.controller('LaunchController', [
     //  .catch(FormioAlerts.onError.bind(FormioAlerts));
 
     $scope.$watch('currentProject', function(project) {
+      if (!project) {
+        return;
+      }
+      if (!project.framework) {
+        project.framework = 'angular2';
+      }
       $scope.current = {
         framework: project.framework,
         steps: ProjectFrameworkSteps[project.framework]

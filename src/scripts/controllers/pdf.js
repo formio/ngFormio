@@ -49,6 +49,11 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
         pdfUrl: function(project, remote) {
           return this.pdfServer(project, remote) + '/pdf/' + project._id;
         },
+        clearCache: function() {
+          infoCache = {};
+          infoReady = $q.defer();
+          infoPromise = null;
+        },
         getInfo: function(projectPromise) {
           return this.ensureProject(projectPromise).then(function(project) {
             if (infoCache.hasOwnProperty(project._id)) {
@@ -158,6 +163,7 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
       FormioAlerts,
       PDFServer
     ) {
+      PDFServer.clearCache();
       $scope.availablePDFs = [];
       $scope.numForms = '1,000';
       $scope.numSubmissions = '10,000';
@@ -279,6 +285,7 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
       $scope.confirmDelete = function() {
         PDFServer.deletePDF($scope.primaryProjectPromise, $scope.currentPDF).then(function() {
           $scope.pdfInfo.data.active = (parseInt($scope.pdfInfo.data.active, 10) - 1).toString();
+          PDFServer.clearCache();
           $scope.cancel();
           $scope.getPDFs();
         }, function(err) {
@@ -288,6 +295,10 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
           FormioAlerts.onError({message: err.data});
           $scope.cancel();
         });
+      };
+
+      $scope.canDelete = function(pdf) {
+        return !$scope.forms || !$scope.forms[pdf.data.id] || !$scope.forms[pdf.data.id].length;
       };
 
       $scope.deletePDF = function(pdf) {
