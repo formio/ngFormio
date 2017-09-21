@@ -2,29 +2,23 @@
   <div class="row">
     <div class="col-sm-4">
       <ng-include src="'views/project/settings/menu.html'" />
+      <div class="panel panel-danger" ng-if="primaryProject.owner === user._id">
+        <div class="panel-heading">Delete Project</div>
+        <div class="panel-body">
+          <p>To remove this project and all of it's environments, select this delete button.</p>
+          <a ui-sref="project.delete({projectId: primaryProject._id})" class="btn btn-danger">Delete {{ primaryProject.title }} Project</a>
+        </div>
+      </div>
+      <div class="panel panel-primary">
+        <div class="panel-heading">Global Project Settings</div>
+        <div class="panel-body">
+          <p>These project settings are the main settings for the project. Most settings are found within Environment settings for each environment.</p>
+        </div>
+      </div>
     </div>
     <div class="col-sm-8" style="padding: 0 20px 40px 0;">
       <h2>Project Settings</h2>
-      <div class="row">
-        <div class="col-sm-8">
-          <ng-include src="'views/project/settings.html'"></ng-include>
-        </div>
-        <div class="col-sm-4">
-          <div class="panel panel-primary">
-            <div class="panel-heading">Global Project Settings</div>
-            <div class="panel-body">
-              <p>These project settings are the main settings for the project. Most settings are found within Environment settings for each environment.</p>
-            </div>
-          </div>
-          <div class="panel panel-danger" ng-if="primaryProject.owner === user._id">
-            <div class="panel-heading">Delete Project</div>
-            <div class="panel-body">
-              <p>To remove this project and all of it's environments, select this delete button.</p>
-              <a ui-sref="project.delete({projectId: primaryProject._id})" class="btn btn-danger">Delete {{ primaryProject.title }} Project</a>
-            </div>
-          </div>
-        </div>
-      </div>
+      <ng-include src="'views/project/settings.html'"></ng-include>
     </div>
   </div>
 </div>
