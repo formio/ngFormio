@@ -47,6 +47,8 @@ module.exports = [
           FormioUtils,
           $timeout
         ) {
+          $scope.options = $scope.options || {};
+
           // Options to match jquery.maskedinput masks
           $scope.uiMaskOptions = {
             maskDefinitions: {
@@ -61,7 +63,7 @@ module.exports = [
 
           // See if this component is visible or not.
           $scope.isVisible = function(component, row) {
-            if ($scope.options.building) return true;
+            if ($scope.options && $scope.options.building) return true;
             return FormioUtils.isVisible(
               component,
               row,

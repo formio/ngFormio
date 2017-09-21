@@ -45,7 +45,7 @@ module.exports = function(app) {
       require: 'uiSelect',
       restrict: 'A',
       link: function($scope, el, attrs, uiSelect) {
-        if ($scope.options.building) return;
+        if ($scope.options && $scope.options.building) return;
         var focuscount = -1;
 
         angular.element(uiSelect.focusser).on('focus', function() {
@@ -153,7 +153,7 @@ module.exports = function(app) {
             $timeout
           ) {
             // FOR-71 - Skip functionality in the options.building view.
-            if ($scope.options.building) return;
+            if ($scope.options && $scope.options.building) return;
             var settings = $scope.component;
             var options = {};
             $scope.nowrap = true;

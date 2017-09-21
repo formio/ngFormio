@@ -16,7 +16,7 @@ module.exports = function(app) {
       },
       templateUrl: 'formio/components/day-input.html',
       controller: ['$scope', function($scope) {
-        if ($scope.options.building) return;
+        if ($scope.options && $scope.options.building) return;
         $scope.months = [
           {value: '00', label: $scope.component.fields.month.placeholder},
           {value: '01', label: 'January'},

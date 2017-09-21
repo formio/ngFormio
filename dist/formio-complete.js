@@ -1,4 +1,4 @@
-/*! ng-formio v2.23.5 | https://unpkg.com/ng-formio@2.23.5/LICENSE.txt */
+/*! ng-formio v2.23.6 | https://unpkg.com/ng-formio@2.23.6/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 (function (root, factory) {
   // AMD
@@ -69933,7 +69933,7 @@ module.exports = function(app) {
           return $scope.component.multiple ? 'formio/components/address-multiple.html' : 'formio/components/address.html';
         },
         controller: ['$scope', '$http', function($scope, $http) {
-          if ($scope.options.building) return;
+          if ($scope.options && $scope.options.building) return;
           $scope.address = {};
           $scope.addresses = [];
           $scope.refreshAddress = function(address) {
@@ -70032,7 +70032,7 @@ module.exports = function(app) {
           theme: 'primary'
         },
         controller: ['$scope', 'FormioUtils', function($scope, FormioUtils) {
-          if ($scope.options.building) return;
+          if ($scope.options && $scope.options.building) return;
           var clicked = false;
           var settings = $scope.component;
           $scope.getButtonType = function() {
@@ -70228,7 +70228,7 @@ module.exports = function(app) {
           return data ? 'Yes' : 'No';
         },
         controller: ['$scope', '$timeout', function($scope, $timeout) {
-          if ($scope.options.building) return;
+          if ($scope.options && $scope.options.building) return;
           var boolean = {
             true: true,
             false: false
@@ -70749,7 +70749,7 @@ module.exports = function(app) {
     '$scope',
     'FormioUtils',
     function($scope, FormioUtils) {
-      if ($scope.options.building) return;
+      if ($scope.options && $scope.options.building) return;
       // Ensure each data grid has a valid data model.
       $scope.data = $scope.data || {};
       $scope.data[$scope.component.key] = $scope.data[$scope.component.key] || [{}];
@@ -70992,7 +70992,7 @@ module.exports = function(app) {
       },
       templateUrl: 'formio/components/day-input.html',
       controller: ['$scope', function($scope) {
-        if ($scope.options.building) return;
+        if ($scope.options && $scope.options.building) return;
         $scope.months = [
           {value: '00', label: $scope.component.fields.month.placeholder},
           {value: '01', label: 'January'},
@@ -71493,7 +71493,7 @@ module.exports = function(app) {
     '$scope',
     'FormioUtils',
     function($scope, FormioUtils) {
-      if ($scope.options.building) return;
+      if ($scope.options && $scope.options.building) return;
       // Ensure each data grid has a valid data model.
       $scope.data = $scope.data || {};
       $scope.data[$scope.component.key] = $scope.data[$scope.component.key] || [];
@@ -71696,7 +71696,7 @@ module.exports = function(app) {
       controller: [
         '$scope',
         function($scope) {
-          if ($scope.options.building) return;
+          if ($scope.options && $scope.options.building) return;
           $scope.removeFile = function(event, index) {
             var component = $scope.$parent.component;
             if (component.storage === 'url') {
@@ -71728,7 +71728,7 @@ module.exports = function(app) {
       controller: [
         '$scope',
         function($scope) {
-          if ($scope.options.building) return;
+          if ($scope.options && $scope.options.building) return;
           $scope.removeFile = function(event, index) {
             var component = $scope.$parent.component;
             if (component.storage === 'url') {
@@ -71762,7 +71762,7 @@ module.exports = function(app) {
           $scope,
           Formio
         ) {
-          if ($scope.options.building) return;
+          if ($scope.options && $scope.options.building) return;
           $scope.getFile = function(evt) {
             evt.preventDefault();
             $scope.form = $scope.form || $rootScope.filePath;
@@ -71805,7 +71805,7 @@ module.exports = function(app) {
           $scope,
           Formio
         ) {
-          if ($scope.options.building) return;
+          if ($scope.options && $scope.options.building) return;
           $scope.form = $scope.form || $rootScope.filePath;
           $scope.options = $scope.options || {};
           var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
@@ -71829,7 +71829,7 @@ module.exports = function(app) {
       $interpolate,
       FormioUtils
     ) {
-      if ($scope.options.building) return;
+      if ($scope.options && $scope.options.building) return;
       $scope.fileUploads = {};
       $scope.removeUpload = function(index) {
         delete $scope.fileUploads[index];
@@ -72148,7 +72148,7 @@ module.exports = function(app) {
         },
         templateUrl: 'formio/components/htmlelement-directive.html',
         link: function($scope) {
-          if ($scope.options.building) return;
+          if ($scope.options && $scope.options.building) return;
           var displayError = function(msg) {
             $scope.parseError = 'Invalid HTML: ' + msg.toString();
           };
@@ -72308,7 +72308,7 @@ module.exports = function(app) {
           }
         },
         controller: ['$scope', function($scope) {
-          if ($scope.options.building) return; // FOR-71 - Skip parsing input data.
+          if ($scope.options && $scope.options.building) return; // FOR-71 - Skip parsing input data.
 
           // Ensure that values are numbers.
           if (
@@ -72555,7 +72555,7 @@ module.exports = function(app) {
           return $scope.component.multiple ? 'formio/components/resource-multiple.html' : 'formio/components/resource.html';
         },
         controller: ['$scope', 'Formio', 'ngDialog', '$location', function($scope, Formio, ngDialog, $location) {
-          if ($scope.options.building) return;
+          if ($scope.options && $scope.options.building) return;
           var settings = $scope.component;
           var params = settings.params || {};
           $scope.selectItems = [];
@@ -72812,7 +72812,7 @@ module.exports = function(app) {
       require: 'uiSelect',
       restrict: 'A',
       link: function($scope, el, attrs, uiSelect) {
-        if ($scope.options.building) return;
+        if ($scope.options && $scope.options.building) return;
         var focuscount = -1;
 
         angular.element(uiSelect.focusser).on('focus', function() {
@@ -72920,7 +72920,7 @@ module.exports = function(app) {
             $timeout
           ) {
             // FOR-71 - Skip functionality in the options.building view.
-            if ($scope.options.building) return;
+            if ($scope.options && $scope.options.building) return;
             var settings = $scope.component;
             var options = {};
             $scope.nowrap = true;
@@ -73406,7 +73406,7 @@ module.exports = function(app) {
       },
       templateUrl: 'formio/components/selectboxes-directive.html',
       link: function($scope, el, attrs, ngModel) {
-        if ($scope.options.building) return;
+        if ($scope.options && $scope.options.building) return;
         // Initialize model
         var model = {};
         angular.forEach($scope.component.values, function(v) {
@@ -74224,7 +74224,7 @@ module.exports = function() {
         $scope.getIframeSrc = function(pdf) {
           var iframeSrc = pdf.src + '.html';
           var params = [];
-          if ($scope.options.building) {
+          if ($scope.options && $scope.options.building) {
             params.push('builder=1');
           }
           if ($scope.readOnly) {
@@ -74641,6 +74641,8 @@ module.exports = [
           FormioUtils,
           $timeout
         ) {
+          $scope.options = $scope.options || {};
+
           // Options to match jquery.maskedinput masks
           $scope.uiMaskOptions = {
             maskDefinitions: {
@@ -74655,7 +74657,7 @@ module.exports = [
 
           // See if this component is visible or not.
           $scope.isVisible = function(component, row) {
-            if ($scope.options.building) return true;
+            if ($scope.options && $scope.options.building) return true;
             return FormioUtils.isVisible(
               component,
               row,

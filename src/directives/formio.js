@@ -54,7 +54,7 @@ module.exports = function() {
         $scope.getIframeSrc = function(pdf) {
           var iframeSrc = pdf.src + '.html';
           var params = [];
-          if ($scope.options.building) {
+          if ($scope.options && $scope.options.building) {
             params.push('builder=1');
           }
           if ($scope.readOnly) {
