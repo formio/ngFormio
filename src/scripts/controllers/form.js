@@ -2080,7 +2080,7 @@ app.controller('FormPermissionController', [
     $scope
   ) {
     $scope.$on('permissionsChange', function() {
-      $scope.formio.saveForm($scope.currentForm);
+      $scope.formio.saveForm(angular.copy($scope.currentForm));
     });
   }
 ]);
