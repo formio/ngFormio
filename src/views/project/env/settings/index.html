@@ -3,7 +3,7 @@
     <ng-include src="'views/project/env/settings.html'"></ng-include>
   </div>
   <div class="col-sm-4">
-    <div class="panel panel-danger" ng-if="currentProject._id !== primaryProject._id && ['owner', 'team_admin'].indexOf(highestRole) !== -1">
+    <div class="panel panel-danger" ng-if="localProject._id !== primaryProject._id && ['owner', 'team_admin'].indexOf(highestRole) !== -1">
       <div class="panel-heading">Delete Environment</div>
       <div class="panel-body">
         <p>To remove this environment, select the delete button</p>

@@ -1,7 +1,7 @@
 <div class="project-section-inner-content">
-  <h2>Project Plan and Pricing</h2>
   <div class="row">
     <div class="col-sm-4">
+      <ng-include src="'views/project/settings/menu.html'" />
       <div ng-if="['basic', 'trial'].indexOf(selectedPlan.name) === -1">
         <div ng-if="!paymentInfoLoading && !paymentInfo" class="cc-form">
           <h5 class="text-muted">Enter your credit card info.<br>Your first month will be billed on a prorated basis.</h5>
@@ -67,7 +67,8 @@
       </ul>
       <span class="btn btn-success pull-right" ng-if="primaryProject.plan !== selectedPlan.name || servers.api !== primaryProject.billing.servers.api || servers.pdf !== primaryProject.billing.servers.pdf" ng-disabled="selectedPlan.price !== 0 && !paymentInfo" ng-click="changePlan()">Confirm Billing Change</span>
     </div>
-    <div class="col-sm-8">
+    <div class="col-sm-8" style="padding: 0 20px 40px 0;">
+      <h2>Project Plan and Pricing</h2>
       <ul class="list-group project-plans">
         <li class="list-group-item list-group-heading">
           <div class="row">

@@ -561,13 +561,20 @@ app.controller('ProjectDeployController', [
             type: 'success',
             message: 'Project tag ' + tag.tag + ' deployed to ' + $scope.currentProject.title + '.'
           });
-          //$state.transitionTo($state.current, null, { reload: true, inherit: true, notify: true });
-          $scope.localProject.tag = tag.tag;
-          $scope.saveLocalProject()
-            .then(function() {
-              PrimaryProject.clear();
-              $state.reload();
-            });
+          // If Remote, update the local project as well.
+          if ($scope.localProject._id !== $scope.currentProject._id) {
+            $scope.localProject.tag = tag.tag;
+            $scope.saveLocalProject()
+              .then(function() {
+                PrimaryProject.clear();
+                $state.reload();
+                //$state.transitionTo($state.current, null, { reload: true, inherit: true, notify: true });
+              });
+          }
+          else {
+            PrimaryProject.clear();
+            $state.reload();
+          }
         })
         .catch(FormioAlerts.onError.bind(FormioAlerts));
     };
@@ -704,49 +711,19 @@ app.controller('ProjectOverviewController', [
     $scope.currentSection.icon = 'fa fa-dashboard';
     $scope.currentSection.help = '';
 
-    var formio = new Formio(AppConfig.apiBase + '/project/' + $scope.currentProject._id);
-
-    //formio.loadForms({
-    //    params: {
-    //      limit: Number.MAX_SAFE_INTEGER // Don't limit results
-    //    }
-    //  })
-    //  .then(function(forms) {
-    //    $scope.forms = forms;
-    //  }, FormioAlerts.onError.bind(FormioAlerts))
-    //  .catch(FormioAlerts.onError.bind(FormioAlerts));
-
-    var abbreviator = new NumberAbbreviate();
-
     $scope.hasTeams = function() {
       return ['trial', 'team', 'commercial'].indexOf($scope.currentProject.plan) !== -1;
     };
 
-    $scope.getLastModified = function() {
-      return _($scope.forms || [])
-        .concat($scope.currentProjectRoles || [])
-        .concat($scope.currentProject || {})
-        .map(function(item) {
-          return new Date(item.modified);
-        })
-        .max();
-    };
-
-    $scope.graphType = $stateParams.graphType;
-
-    $scope.angular1 = [];
-    $scope.angular2 = [];
-    $scope.react = [];
-
-    $http.get('https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails,id,snippet,status&maxResults=50&playlistId=PLL9kNSjqyfJ70DiT2Yn_8cCXGpEs_ReRb&key=' + key).then(function(result) {
-      $scope.angular1 = result.data.items;
-    });
-    $http.get('https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails,id,snippet,status&maxResults=50&playlistId=PLL9kNSjqyfJ5Mj5FvZ7gL4MZj5o4yN5Sg&key=' + key).then(function(result) {
-      $scope.react = result.data.items;
-    });
-    $http.get('https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails,id,snippet,status&maxResults=50&playlistId=PLL9kNSjqyfJ51N9rw0Wnqu6Yl8OMZdE-Q&key=' + key).then(function(result) {
-      $scope.angular2 = result.data.items;
-    });
+    $scope.formio.loadForms({
+        params: {
+          sort: '-modified'
+        }
+      })
+      .then(function(forms) {
+        $scope.recentForms = forms;
+      }, FormioAlerts.onError.bind(FormioAlerts))
+      .catch(FormioAlerts.onError.bind(FormioAlerts));
   }
 ]);
 
@@ -759,7 +736,7 @@ app.factory('ProjectAnalytics', [
   ) {
       return {
         getSubmissionAnalytics: function(project, year, month, day) {
-          var url = AppConfig.projectUrl + '/analytics/year/' + year;
+          var url = project + '/analytics/year/' + year;
           if (month !== undefined && month !== null) {
             url += '/month/' + month;
           }
@@ -886,7 +863,7 @@ app.controller('ChartController', [
 
       if(type === 'year') {
         $scope.analyticsLoading = true;
-        ProjectAnalytics.getSubmissionAnalytics($scope.currentProject._id, _y)
+        ProjectAnalytics.getSubmissionAnalytics($scope.projectUrl, _y)
           .then(function(data) {
             $scope.currentType = type;
             $scope.analytics = {
@@ -903,7 +880,7 @@ app.controller('ChartController', [
       }
       else if(type === 'month') {
         $scope.analyticsLoading = true;
-        ProjectAnalytics.getSubmissionAnalytics($scope.currentProject._id, _y, _m)
+        ProjectAnalytics.getSubmissionAnalytics($scope.projectUrl, _y, _m)
           .then(function(data) {
             $scope.currentType = type;
             $scope.analytics = {
@@ -972,7 +949,7 @@ app.controller('ChartController', [
           return local;
         };
 
-        ProjectAnalytics.getSubmissionAnalytics($scope.currentProject._id, _y, _m, _d)
+        ProjectAnalytics.getSubmissionAnalytics($scope.projectUrl, _y, _m, _d)
           .then(function(data) {
             $scope.currentType = type;
             var displayHrs = calculateLocalTimeLabels(_y, _m, _d);
@@ -1081,18 +1058,6 @@ app.controller('LaunchController', [
     $scope.hasTemplate = true;
     $scope.frameworks = ProjectFrameworks;
     //var formio = new Formio(AppConfig.apiBase + '/project/' + $scope.currentProject._id);
-
-
-
-    //$scope.formio.loadForms({
-    //    params: {
-    //      limit: Number.MAX_SAFE_INTEGER // Don't limit results
-    //    }
-    //  })
-    //  .then(function(forms) {
-    //    $scope.forms = forms;
-    //  }, FormioAlerts.onError.bind(FormioAlerts))
-    //  .catch(FormioAlerts.onError.bind(FormioAlerts));
 
     $scope.$watch('currentProject', function(project) {
       if (!project) {
@@ -2244,6 +2209,7 @@ app.controller('PrimaryProjectSettingsController', [
   'Formio',
   'FormioAlerts',
   'GoogleAnalytics',
+  'PrimaryProject',
   function(
     $scope,
     $rootScope,
@@ -2251,7 +2217,8 @@ app.controller('PrimaryProjectSettingsController', [
     ProjectFrameworks,
     Formio,
     FormioAlerts,
-    GoogleAnalytics
+    GoogleAnalytics,
+    PrimaryProject
   ) {
     $scope.frameworks = ProjectFrameworks;
 
@@ -2270,7 +2237,8 @@ app.controller('PrimaryProjectSettingsController', [
           });
           GoogleAnalytics.sendEvent('Project', 'update', null, 1);
           $scope.status.save = 'saved';
-          $state.go('project.overview', null, { reload: true });
+          PrimaryProject.clear();
+          $state.go('project.overview', null, { reload: true, inherit: true, notify: true });
         }, FormioAlerts.onError.bind(FormioAlerts))
         .catch(FormioAlerts.onError.bind(FormioAlerts));
     };
@@ -2590,12 +2558,13 @@ app.controller('ProjectBilling', [
   '$scope',
   '$http',
   '$state',
+  '$window',
   'AppConfig',
   'Formio',
   'FormioAlerts',
   'UserInfo',
   'ProjectPlans',
-  function($rootScope, $scope, $http, $state, AppConfig, Formio, FormioAlerts, UserInfo, ProjectPlans) {
+  function($rootScope, $scope, $http, $state, $window, AppConfig, Formio, FormioAlerts, UserInfo, ProjectPlans) {
     $scope.primaryProjectPromise.then(function(project) {
 
       $scope.servers = (project.billing && project.billing.servers) ? angular.copy(project.billing.servers) : {
@@ -2655,7 +2624,7 @@ app.controller('ProjectBilling', [
         )
         .then(function() {
           Formio.clearCache();
-          $state.reload();
+          $window.location.reload();
         }, FormioAlerts.onError.bind(FormioAlerts))
         .catch(FormioAlerts.onError.bind(FormioAlerts));
     };
@@ -2736,25 +2705,25 @@ app.constant('ProjectFrameworkSteps', {
       noTitle: true,
       title: 'Welcome',
       icon: 'fa fa-check-circle',
-      template: 'views/project/overview/welcome.html'
+      template: 'views/project/tour/welcome.html'
     },
     {
       step: 'download',
       title: 'Application Setup',
       icon: 'fa fa-sliders',
-      template: 'views/project/overview/react/download.html',
+      template: 'views/project/tour/react/download.html',
       children: [
         {
           step: 'download',
           title: 'Download',
           icon: 'fa fa-download',
-          template: 'views/project/overview/angular/download.html'
+          template: 'views/project/tour/angular/download.html'
         },
         {
           step: 'configure',
           title: 'Configure',
           icon: 'fa fa-sliders',
-          template: 'views/project/overview/angular/configure.html'
+          template: 'views/project/tour/angular/configure.html'
         }
       ]
     },
@@ -2762,26 +2731,26 @@ app.constant('ProjectFrameworkSteps', {
       step: 'user',
       title: 'Application User',
       icon: 'fa fa-user-plus',
-      template: 'views/project/overview/user.html',
+      template: 'views/project/tour/user.html',
       children: []
     },
     {
       step: 'form',
       title: 'Create a Form',
       icon: 'fa fa-wpforms',
-      template: 'views/project/overview/form.html',
+      template: 'views/project/tour/form.html',
       children: [
         {
           step: 'form',
           title: 'Add a new form',
           icon: 'fa fa-newspaper-o',
-          template: 'views/project/overview/form.html'
+          template: 'views/project/tour/form.html'
         },
         {
           step: 'action',
           title: 'Add an action',
           icon: 'fa fa-mail-reply',
-          template: 'views/project/overview/action.html'
+          template: 'views/project/tour/action.html'
         }
       ]
     },
@@ -2796,7 +2765,7 @@ app.constant('ProjectFrameworkSteps', {
       step: 'launch',
       title: 'Launch',
       icon: 'fa fa-rocket',
-      template: 'views/project/overview/launch.html',
+      template: 'views/project/tour/launch.html',
       children: []
     },
   ],
@@ -2806,25 +2775,25 @@ app.constant('ProjectFrameworkSteps', {
       noTitle: true,
       title: 'Welcome',
       icon: 'fa fa-check-circle',
-      template: 'views/project/overview/welcome.html'
+      template: 'views/project/tour/welcome.html'
     },
     {
       step: 'download',
       title: 'Application Setup',
       icon: 'fa fa-sliders',
-      template: 'views/project/overview/angular2/download.html',
+      template: 'views/project/tour/angular2/download.html',
       children: [
         {
           step: 'download',
           title: 'Download',
           icon: 'fa fa-download',
-          template: 'views/project/overview/angular2/download.html'
+          template: 'views/project/tour/angular2/download.html'
         },
         {
           step: 'configure',
           title: 'Configure',
           icon: 'fa fa-sliders',
-          template: 'views/project/overview/angular2/configure.html'
+          template: 'views/project/tour/angular2/configure.html'
         }
       ]
     },
@@ -2832,26 +2801,26 @@ app.constant('ProjectFrameworkSteps', {
       step: 'user',
       title: 'Application User',
       icon: 'fa fa-user-plus',
-      template: 'views/project/overview/user.html',
+      template: 'views/project/tour/user.html',
       children: []
     },
     {
       step: 'form',
       title: 'Create a Form',
       icon: 'fa fa-wpforms',
-      template: 'views/project/overview/form.html',
+      template: 'views/project/tour/form.html',
       children: [
         {
           step: 'form',
           title: 'Add a new form',
           icon: 'fa fa-newspaper-o',
-          template: 'views/project/overview/form.html'
+          template: 'views/project/tour/form.html'
         },
         {
           step: 'action',
           title: 'Add an action',
           icon: 'fa fa-mail-reply',
-          template: 'views/project/overview/action.html'
+          template: 'views/project/tour/action.html'
         }
       ]
     },
@@ -2866,7 +2835,7 @@ app.constant('ProjectFrameworkSteps', {
       step: 'launch',
       title: 'Launch',
       icon: 'fa fa-rocket',
-      template: 'views/project/overview/launch.html',
+      template: 'views/project/tour/launch.html',
       children: []
     },
   ],
@@ -2876,25 +2845,25 @@ app.constant('ProjectFrameworkSteps', {
       noTitle: true,
       title: 'Welcome',
       icon: 'fa fa-check-circle',
-      template: 'views/project/overview/welcome.html'
+      template: 'views/project/tour/welcome.html'
     },
     {
       step: 'download',
       title: 'Application Setup',
       icon: 'fa fa-sliders',
-      template: 'views/project/overview/react/download.html',
+      template: 'views/project/tour/react/download.html',
       children: [
         {
           step: 'download',
           title: 'Download',
           icon: 'fa fa-download',
-          template: 'views/project/overview/react/download.html'
+          template: 'views/project/tour/react/download.html'
         },
         {
           step: 'configure',
           title: 'Configure',
           icon: 'fa fa-sliders',
-          template: 'views/project/overview/react/configure.html'
+          template: 'views/project/tour/react/configure.html'
         }
       ]
     },
@@ -2902,26 +2871,26 @@ app.constant('ProjectFrameworkSteps', {
       step: 'user',
       title: 'Application User',
       icon: 'fa fa-user-plus',
-      template: 'views/project/overview/user.html',
+      template: 'views/project/tour/user.html',
       children: []
     },
     {
       step: 'form',
       title: 'Create a Form',
       icon: 'fa fa-wpforms',
-      template: 'views/project/overview/form.html',
+      template: 'views/project/tour/form.html',
       children: [
         {
           step: 'form',
           title: 'Add a new form',
           icon: 'fa fa-newspaper-o',
-          template: 'views/project/overview/form.html'
+          template: 'views/project/tour/form.html'
         },
         {
           step: 'action',
           title: 'Add an action',
           icon: 'fa fa-mail-reply',
-          template: 'views/project/overview/action.html'
+          template: 'views/project/tour/action.html'
         }
       ]
     },
@@ -2929,14 +2898,14 @@ app.constant('ProjectFrameworkSteps', {
       step: 'embed',
       title: 'Embed the form',
       icon: 'fa fa-code',
-      template: 'views/project/overview/react/embed.html',
+      template: 'views/project/tour/react/embed.html',
       children: []
     },
     {
       step: 'launch',
       title: 'Launch',
       icon: 'fa fa-rocket',
-      template: 'views/project/overview/launch.html',
+      template: 'views/project/tour/launch.html',
       children: []
     },
   ],
@@ -2946,25 +2915,25 @@ app.constant('ProjectFrameworkSteps', {
       noTitle: true,
       title: 'Welcome',
       icon: 'fa fa-check-circle',
-      template: 'views/project/overview/welcome.html'
+      template: 'views/project/tour/welcome.html'
     },
     {
       step: 'download',
       title: 'Application Setup',
       icon: 'fa fa-sliders',
-      template: 'views/project/overview/vue/download.html',
+      template: 'views/project/tour/vue/download.html',
       children: [
         {
           step: 'download',
           title: 'Download',
           icon: 'fa fa-download',
-          template: 'views/project/overview/vue/download.html'
+          template: 'views/project/tour/vue/download.html'
         },
         {
           step: 'configure',
           title: 'Configure',
           icon: 'fa fa-sliders',
-          template: 'views/project/overview/vue/configure.html'
+          template: 'views/project/tour/vue/configure.html'
         }
       ]
     },
@@ -2972,26 +2941,26 @@ app.constant('ProjectFrameworkSteps', {
       step: 'user',
       title: 'Application User',
       icon: 'fa fa-user-plus',
-      template: 'views/project/overview/user.html',
+      template: 'views/project/tour/user.html',
       children: []
     },
     {
       step: 'form',
       title: 'Create a Form',
       icon: 'fa fa-wpforms',
-      template: 'views/project/overview/form.html',
+      template: 'views/project/tour/form.html',
       children: [
         {
           step: 'form',
           title: 'Add a new form',
           icon: 'fa fa-newspaper-o',
-          template: 'views/project/overview/form.html'
+          template: 'views/project/tour/form.html'
         },
         {
           step: 'action',
           title: 'Add an action',
           icon: 'fa fa-mail-reply',
-          template: 'views/project/overview/action.html'
+          template: 'views/project/tour/action.html'
         }
       ]
     },
@@ -3006,7 +2975,7 @@ app.constant('ProjectFrameworkSteps', {
       step: 'launch',
       title: 'Launch',
       icon: 'fa fa-rocket',
-      template: 'views/project/overview/launch.html',
+      template: 'views/project/tour/launch.html',
       children: []
     },
   ],
@@ -3016,25 +2985,25 @@ app.constant('ProjectFrameworkSteps', {
       noTitle: true,
       title: 'Welcome',
       icon: 'fa fa-check-circle',
-      template: 'views/project/overview/welcome.html'
+      template: 'views/project/tour/welcome.html'
     },
     {
       step: 'download',
       title: 'Application Setup',
       icon: 'fa fa-sliders',
-      template: 'views/project/overview/html5/download.html',
+      template: 'views/project/tour/html5/download.html',
       children: [
         {
           step: 'download',
           title: 'Download',
           icon: 'fa fa-download',
-          template: 'views/project/overview/html5/download.html'
+          template: 'views/project/tour/html5/download.html'
         },
         {
           step: 'configure',
           title: 'Configure',
           icon: 'fa fa-sliders',
-          template: 'views/project/overview/html5/configure.html'
+          template: 'views/project/tour/html5/configure.html'
         }
       ]
     },
@@ -3042,26 +3011,26 @@ app.constant('ProjectFrameworkSteps', {
       step: 'user',
       title: 'Application User',
       icon: 'fa fa-user-plus',
-      template: 'views/project/overview/user.html',
+      template: 'views/project/tour/user.html',
       children: []
     },
     {
       step: 'form',
       title: 'Create a Form',
       icon: 'fa fa-wpforms',
-      template: 'views/project/overview/form.html',
+      template: 'views/project/tour/form.html',
       children: [
         {
           step: 'form',
           title: 'Add a new form',
           icon: 'fa fa-newspaper-o',
-          template: 'views/project/overview/form.html'
+          template: 'views/project/tour/form.html'
         },
         {
           step: 'action',
           title: 'Add an action',
           icon: 'fa fa-mail-reply',
-          template: 'views/project/overview/action.html'
+          template: 'views/project/tour/action.html'
         }
       ]
     },
@@ -3076,7 +3045,7 @@ app.constant('ProjectFrameworkSteps', {
       step: 'launch',
       title: 'Launch',
       icon: 'fa fa-rocket',
-      template: 'views/project/overview/launch.html',
+      template: 'views/project/tour/launch.html',
       children: []
     },
   ],
@@ -3086,25 +3055,25 @@ app.constant('ProjectFrameworkSteps', {
       noTitle: true,
       title: 'Welcome',
       icon: 'fa fa-check-circle',
-      template: 'views/project/overview/welcome.html'
+      template: 'views/project/tour/welcome.html'
     },
     {
       step: 'download',
       title: 'Application Setup',
       icon: 'fa fa-sliders',
-      template: 'views/project/overview/simple/download.html',
+      template: 'views/project/tour/simple/download.html',
       children: [
         {
           step: 'download',
           title: 'Download',
           icon: 'fa fa-download',
-          template: 'views/project/overview/simple/download.html'
+          template: 'views/project/tour/simple/download.html'
         },
         {
           step: 'configure',
           title: 'Configure',
           icon: 'fa fa-sliders',
-          template: 'views/project/overview/simple/configure.html'
+          template: 'views/project/tour/simple/configure.html'
         }
       ]
     },
@@ -3112,26 +3081,26 @@ app.constant('ProjectFrameworkSteps', {
       step: 'user',
       title: 'Application User',
       icon: 'fa fa-user-plus',
-      template: 'views/project/overview/user.html',
+      template: 'views/project/tour/user.html',
       children: []
     },
     {
       step: 'form',
       title: 'Create a Form',
       icon: 'fa fa-wpforms',
-      template: 'views/project/overview/form.html',
+      template: 'views/project/tour/form.html',
       children: [
         {
           step: 'form',
           title: 'Add a new form',
           icon: 'fa fa-newspaper-o',
-          template: 'views/project/overview/form.html'
+          template: 'views/project/tour/form.html'
         },
         {
           step: 'action',
           title: 'Add an action',
           icon: 'fa fa-mail-reply',
-          template: 'views/project/overview/action.html'
+          template: 'views/project/tour/action.html'
         }
       ]
     },
@@ -3146,7 +3115,7 @@ app.constant('ProjectFrameworkSteps', {
       step: 'launch',
       title: 'Launch',
       icon: 'fa fa-rocket',
-      template: 'views/project/overview/launch.html',
+      template: 'views/project/tour/launch.html',
       children: []
     },
   ],
@@ -3156,25 +3125,25 @@ app.constant('ProjectFrameworkSteps', {
       noTitle: true,
       title: 'Welcome',
       icon: 'fa fa-check-circle',
-      template: 'views/project/overview/welcome.html'
+      template: 'views/project/tour/welcome.html'
     },
     {
       step: 'download',
       title: 'Application Setup',
       icon: 'fa fa-sliders',
-      template: 'views/project/overview/custom/download.html',
+      template: 'views/project/tour/custom/download.html',
       children: [
         {
           step: 'download',
           title: 'Download',
           icon: 'fa fa-download',
-          template: 'views/project/overview/custom/download.html'
+          template: 'views/project/tour/custom/download.html'
         },
         {
           step: 'configure',
           title: 'Configure',
           icon: 'fa fa-sliders',
-          template: 'views/project/overview/custom/configure.html'
+          template: 'views/project/tour/custom/configure.html'
         }
       ]
     },
@@ -3182,26 +3151,26 @@ app.constant('ProjectFrameworkSteps', {
       step: 'user',
       title: 'Application User',
       icon: 'fa fa-user-plus',
-      template: 'views/project/overview/user.html',
+      template: 'views/project/tour/user.html',
       children: []
     },
     {
       step: 'form',
       title: 'Create a Form',
       icon: 'fa fa-wpforms',
-      template: 'views/project/overview/form.html',
+      template: 'views/project/tour/form.html',
       children: [
         {
           step: 'form',
           title: 'Add a new form',
           icon: 'fa fa-newspaper-o',
-          template: 'views/project/overview/form.html'
+          template: 'views/project/tour/form.html'
         },
         {
           step: 'action',
           title: 'Add an action',
           icon: 'fa fa-mail-reply',
-          template: 'views/project/overview/action.html'
+          template: 'views/project/tour/action.html'
         }
       ]
     },
@@ -3216,7 +3185,7 @@ app.constant('ProjectFrameworkSteps', {
       step: 'launch',
       title: 'Launch',
       icon: 'fa fa-rocket',
-      template: 'views/project/overview/launch.html',
+      template: 'views/project/tour/launch.html',
       children: []
     }
   ]

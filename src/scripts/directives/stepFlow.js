@@ -23,12 +23,6 @@ app.directive('stepFlow', function() {
           $scope.active = true;
         }
 
-        $scope.nextStep = function () {
-          element( document.querySelector( '.flow-side' )).addClass('showtime');
-          element(document.querySelector( '.flow-content' )).addClass('showtime');
-          element(document.querySelector( '.flow-side-content' )).addClass('showtime');
-        };
-
         $scope.changeStep = function(parentStep, childStep) {
           $scope.currentStep = childStep || parentStep;
           $scope.currentParentStep = parentStep;
