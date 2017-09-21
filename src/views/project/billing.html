@@ -1,174 +1,168 @@
 <div class="project-section-inner-content">
   <div class="row">
-    <div class="col-sm-3">
+    <div class="col-sm-4">
       <ng-include src="'views/project/settings/menu.html'" />
+      <div ng-if="['basic', 'trial'].indexOf(selectedPlan.name) === -1">
+        <div ng-if="!paymentInfoLoading && !paymentInfo" class="cc-form">
+          <h5 class="text-muted">Enter your credit card info.<br>Your first month will be billed on a prorated basis.</h5>
+          <formio src="paymentForm" form-action="'/payeezy'"></formio>
+        </div>
+        <div ng-if="!paymentInfoLoading && paymentInfo">
+          <h5>Payments will be charged to:</h5>
+          <h5 class="payment-info"><strong>{{capitalize(paymentInfo.cardType)}} ending in {{paymentInfo.ccNumber.substr(-4)}}</strong></h5>
+          <h5 class="text-muted payment-info">Expires on {{paymentInfo.ccExpiryMonth}}/{{paymentInfo.ccExpiryYear}}</h5>
+          <h5 class="text-muted payment-info">Name on Card: {{paymentInfo.cardholderName}}</h5>
+          <p><small><a class="btn btn-sm btn-default" ng-click="changePaymentInfo()">Change my credit card</a></small></p>
+          <br>
+        </div>
+      </div>
+      <ul class="list-group">
+        <li class="list-group-item list-group-heading">
+          <div class="row">
+            <div class="col-xs-12">
+              <h4 style="font-weight:bold">Billing</h4>
+            </div>
+          </div>
+        </li>
+        <li class="list-group-item">
+          <div class="row">
+            <div class="col-xs-7">
+              <h4>Plan ({{ selectedPlan.title }})</h4>
+            </div>
+            <div class="col-xs-5">
+              <h4>${{ pricing.plan }}/month</h4>
+            </div>
+          </div>
+        </li>
+        <li class="list-group-item" ng-if="pricing.api">
+          <div class="row">
+            <div class="col-xs-7">
+              <h4>API Servers ({{servers.api}})</h4>
+            </div>
+            <div class="col-xs-5">
+              <h4>${{ pricing.api }}/month</h4>
+            </div>
+          </div>
+        </li>
+        <li class="list-group-item" ng-if="pricing.pdf">
+          <div class="row">
+            <div class="col-xs-7">
+              <h4>PDF Servers ({{servers.pdf}})</h4>
+            </div>
+            <div class="col-xs-5">
+              <h4>${{ pricing.pdf }}/month</h4>
+            </div>
+          </div>
+        </li>
+        <li class="list-group-item">
+          <div class="row">
+            <div class="col-xs-7">
+              <h4 style="font-weight:bold">Total</h4>
+            </div>
+            <div class="col-xs-5">
+              <h4 style="font-weight:bold">${{ pricing.total }}/month</h4>
+            </div>
+          </div>
+        </li>
+      </ul>
+      <span class="btn btn-success pull-right" ng-if="primaryProject.plan !== selectedPlan.name || servers.api !== primaryProject.billing.servers.api || servers.pdf !== primaryProject.billing.servers.pdf" ng-disabled="selectedPlan.price !== 0 && !paymentInfo" ng-click="changePlan()">Confirm Billing Change</span>
     </div>
-    <div class="col-sm-9" style="padding: 0 20px 40px 0;">
+    <div class="col-sm-8" style="padding: 0 20px 40px 0;">
       <h2>Project Plan and Pricing</h2>
-      <div class="row">
-        <div class="col-sm-4">
-          <div ng-if="['basic', 'trial'].indexOf(selectedPlan.name) === -1">
-            <div ng-if="!paymentInfoLoading && !paymentInfo" class="cc-form">
-              <h5 class="text-muted">Enter your credit card info.<br>Your first month will be billed on a prorated basis.</h5>
-              <formio src="paymentForm" form-action="'/payeezy'"></formio>
+      <ul class="list-group project-plans">
+        <li class="list-group-item list-group-heading">
+          <div class="row">
+            <div class="col-sm-4">
+              <h4 style="font-weight:bold">Plan</h4>
             </div>
-            <div ng-if="!paymentInfoLoading && paymentInfo">
-              <h5>Payments will be charged to:</h5>
-              <h5 class="payment-info"><strong>{{capitalize(paymentInfo.cardType)}} ending in {{paymentInfo.ccNumber.substr(-4)}}</strong></h5>
-              <h5 class="text-muted payment-info">Expires on {{paymentInfo.ccExpiryMonth}}/{{paymentInfo.ccExpiryYear}}</h5>
-              <h5 class="text-muted payment-info">Name on Card: {{paymentInfo.cardholderName}}</h5>
-              <p><small><a class="btn btn-sm btn-default" ng-click="changePaymentInfo()">Change my credit card</a></small></p>
-              <br>
+            <div class="col-sm-4">
+              <h4 style="font-weight:bold">Price</h4>
             </div>
-          </div>
-          <ul class="list-group">
-            <li class="list-group-item list-group-heading">
-              <div class="row">
-                <div class="col-xs-12">
-                  <h4 style="font-weight:bold">Billing</h4>
-                </div>
-              </div>
-            </li>
-            <li class="list-group-item">
-              <div class="row">
-                <div class="col-xs-7">
-                  <h4>Plan ({{ selectedPlan.title }})</h4>
-                </div>
-                <div class="col-xs-5">
-                  <h4>${{ pricing.plan }}/month</h4>
-                </div>
-              </div>
-            </li>
-            <li class="list-group-item" ng-if="pricing.api">
-              <div class="row">
-                <div class="col-xs-7">
-                  <h4>API Servers ({{servers.api}})</h4>
-                </div>
-                <div class="col-xs-5">
-                  <h4>${{ pricing.api }}/month</h4>
-                </div>
-              </div>
-            </li>
-            <li class="list-group-item" ng-if="pricing.pdf">
-              <div class="row">
-                <div class="col-xs-7">
-                  <h4>PDF Servers ({{servers.pdf}})</h4>
-                </div>
-                <div class="col-xs-5">
-                  <h4>${{ pricing.pdf }}/month</h4>
-                </div>
-              </div>
-            </li>
-            <li class="list-group-item">
-              <div class="row">
-                <div class="col-xs-7">
-                  <h4 style="font-weight:bold">Total</h4>
-                </div>
-                <div class="col-xs-5">
-                  <h4 style="font-weight:bold">${{ pricing.total }}/month</h4>
-                </div>
-              </div>
-            </li>
-          </ul>
-          <span class="btn btn-success pull-right" ng-if="primaryProject.plan !== selectedPlan.name || servers.api !== primaryProject.billing.servers.api || servers.pdf !== primaryProject.billing.servers.pdf" ng-disabled="selectedPlan.price !== 0 && !paymentInfo" ng-click="changePlan()">Confirm Billing Change</span>
-        </div>
-        <div class="col-sm-8">
-          <ul class="list-group project-plans">
-            <li class="list-group-item list-group-heading">
-              <div class="row">
-                <div class="col-sm-4">
-                  <h4 style="font-weight:bold">Plan</h4>
-                </div>
-                <div class="col-sm-4">
-                  <h4 style="font-weight:bold">Price</h4>
-                </div>
-                <div class="col-sm-4">
+            <div class="col-sm-4">
 
-                </div>
-              </div>
-            </li>
-            <li class="list-group-item" ng-repeat="plan in plans | orderBy:order:true" ng-if="plan.name !== 'trial' || trialDaysRemaining">
-              <div class="row">
-                <div class="col-sm-4">
-                  <h4 style="font-weight:bold">{{ plan.title }}</h4>
-                </div>
-                <div class="col-sm-4">
-                  <h4>{{ plan.priceDescription }}</h4>
-                </div>
-                <div class="col-sm-4">
-                  <span class="btn btn-default" ng-if="selectedPlan.order !== plan.order" ng-click="setSelectedPlan(plan)">{{ selectedPlan.order > plan.order ? 'Downgrade' : 'Upgrade' }}</span>
-                  <h4 ng-if="selectedPlan.order === plan.order" class="text-warning">Selected</h4>
-                </div>
-              </div>
-            </li>
-          </ul>
-          <div class="hosting-options">
-            <h2>Hosting Options</h2>
-            <ul class="list-group project-onpremise">
-              <li class="list-group-item list-group-heading">
-                <div class="row">
-                  <div class="col-sm-10">
-                    <h4 style="font-weight:bold">PAAS Hosting with Form.io</h4>
-                  </div>
-                </div>
-              </li>
-              <li class="list-group-item">
-                <div class="row">
-                  <div class="col-sm-10">
-                    <h4>Host your project on our infrastructure</h4>
-                  </div>
-                  <div class="col-sm-2">
-                    <h4>Included</h4>
-                  </div>
-                </div>
-              </li>
-            </ul>
-            <h3 class="text-center"> - or -</h3>
-            <ul class="list-group project-onpremise">
-              <li class="list-group-item list-group-heading">
-                <div class="row">
-                  <div class="col-sm-10">
-                    <h4 style="font-weight:bold">On Premise or Private Cloud Deployments</h4>
-                  </div>
-                  <div class="col-sm-2">
-                    <h4 style="font-weight:bold"># of Servers</h4>
-                  </div>
-                </div>
-              </li>
-              <li class="list-group-item">
-                <div class="row">
-                  <div class="col-sm-6">
-                    <h4 style="font-weight:bold">Form.io API Server</h4>
-                    <p>&nbsp;&nbsp;-&nbsp;Unlimited Users/Resources/Forms/Submissions</p>
-                  </div>
-                  <div class="col-sm-4">
-                    <h4>$250/mo or $500/mo for 3</h4>
-                  </div>
-                  <div class="col-sm-2">
-                    <input type="number" class="form-control" ng-model="servers.api" ng-disabled="selectedPlan.order < getPlan('team').order" min="0" max="20" />
-                  </div>
-                </div>
-              </li>
-              <li class="list-group-item">
-                <div class="row">
-                  <div class="col-sm-6">
-                    <h4 style="font-weight:bold">PDF Manager Server</h4>
-                    <p>&nbsp;&nbsp;-&nbsp;Unlimited PDF Storage and Downloads</p>
-                  </div>
-                  <div class="col-sm-4">
-                    <h4>$250/mo or $500/mo for 3</h4>
-                  </div>
-                  <div class="col-sm-2">
-                    <input type="number" class="form-control" ng-model="servers.pdf" ng-disabled="selectedPlan.order < getPlan('team').order" min="0" max="20" />
-                  </div>
-                </div>
-              </li>
-              <li class="list-group-item list-group-heading">
-                <div class="text-muted">Servers may be used for multiple projects however each project requires a plan of Team Pro or Enterprise.</div>
-              </li>
-            </ul>
+            </div>
           </div>
-        </div>
+        </li>
+        <li class="list-group-item" ng-repeat="plan in plans | orderBy:order:true" ng-if="plan.name !== 'trial' || trialDaysRemaining">
+          <div class="row">
+            <div class="col-sm-4">
+              <h4 style="font-weight:bold">{{ plan.title }}</h4>
+            </div>
+            <div class="col-sm-4">
+              <h4>{{ plan.priceDescription }}</h4>
+            </div>
+            <div class="col-sm-4">
+              <span class="btn btn-default" ng-if="selectedPlan.order !== plan.order" ng-click="setSelectedPlan(plan)">{{ selectedPlan.order > plan.order ? 'Downgrade' : 'Upgrade' }}</span>
+              <h4 ng-if="selectedPlan.order === plan.order" class="text-warning">Selected</h4>
+            </div>
+          </div>
+        </li>
+      </ul>
+      <div class="hosting-options">
+        <h2>Hosting Options</h2>
+        <ul class="list-group project-onpremise">
+          <li class="list-group-item list-group-heading">
+            <div class="row">
+              <div class="col-sm-10">
+                <h4 style="font-weight:bold">PAAS Hosting with Form.io</h4>
+              </div>
+            </div>
+          </li>
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col-sm-10">
+                <h4>Host your project on our infrastructure</h4>
+              </div>
+              <div class="col-sm-2">
+                <h4>Included</h4>
+              </div>
+            </div>
+          </li>
+        </ul>
+        <h3 class="text-center"> - or -</h3>
+        <ul class="list-group project-onpremise">
+          <li class="list-group-item list-group-heading">
+            <div class="row">
+              <div class="col-sm-10">
+                <h4 style="font-weight:bold">On Premise or Private Cloud Deployments</h4>
+              </div>
+              <div class="col-sm-2">
+                <h4 style="font-weight:bold"># of Servers</h4>
+              </div>
+            </div>
+          </li>
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col-sm-6">
+                <h4 style="font-weight:bold">Form.io API Server</h4>
+                <p>&nbsp;&nbsp;-&nbsp;Unlimited Users/Resources/Forms/Submissions</p>
+              </div>
+              <div class="col-sm-4">
+                <h4>$250/mo or $500/mo for 3</h4>
+              </div>
+              <div class="col-sm-2">
+                <input type="number" class="form-control" ng-model="servers.api" ng-disabled="selectedPlan.order < getPlan('team').order" min="0" max="20" />
+              </div>
+            </div>
+          </li>
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col-sm-6">
+                <h4 style="font-weight:bold">PDF Manager Server</h4>
+                <p>&nbsp;&nbsp;-&nbsp;Unlimited PDF Storage and Downloads</p>
+              </div>
+              <div class="col-sm-4">
+                <h4>$250/mo or $500/mo for 3</h4>
+              </div>
+              <div class="col-sm-2">
+                <input type="number" class="form-control" ng-model="servers.pdf" ng-disabled="selectedPlan.order < getPlan('team').order" min="0" max="20" />
+              </div>
+            </div>
+          </li>
+          <li class="list-group-item list-group-heading">
+            <div class="text-muted">Servers may be used for multiple projects however each project requires a plan of Team Pro or Enterprise.</div>
+          </li>
+        </ul>
       </div>
     </div>
   </div>
