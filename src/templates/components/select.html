@@ -1,5 +1,5 @@
 <label ng-if="component.label && !component.hideLabel"  for="{{ componentId }}" class="control-label" ng-class="{'field-required': isRequired(component)}">
-  {{ component.label | formioTranslate:null:builder }}
+  {{ component.label | formioTranslate:null:options.building }}
   <formio-component-tooltip></formio-component-tooltip>
 </label>
 <span ng-if="!component.label && isRequired(component)" class="glyphicon glyphicon-asterisk form-control-feedback field-required-inline" aria-hidden="true"></span>
@@ -16,7 +16,7 @@
   custom-validator="component.validate.custom"
   tabindex="{{ component.tabindex || 0 }}"
 >
-  <ui-select-match class="ui-select-match" placeholder="{{ component.placeholder | formioTranslate:null:builder }}">
+  <ui-select-match class="ui-select-match" placeholder="{{ component.placeholder | formioTranslate:null:options.building }}">
     <formio-select-item template="component.template" item="$item || $select.selected" select="$select"></formio-select-item>
   </ui-select-match>
   <ui-select-choices class="ui-select-choices" repeat="getSelectItem(item) as item in selectItems | filter: $select.search" refresh="refreshItems($select.search)" refresh-delay="250">
@@ -27,4 +27,4 @@
 <div ng-if="!!component.description" class="help-block">
   <span>{{ component.description }}</span>
 </div>
-<formio-errors ng-if="::!builder"></formio-errors>
+<formio-errors ng-if="::!options.building"></formio-errors>

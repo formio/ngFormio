@@ -23,7 +23,7 @@
       custom-validator="component.validate.custom"
     >
     <span ng-if="!(component.hideLabel && component.datagridLabel === false)">
-      {{ component.label | formioTranslate:null:builder }}
+      {{ component.label | formioTranslate:null:options.building }}
       <formio-component-tooltip></formio-component-tooltip>
     </span>
   </label>
