@@ -1060,6 +1060,12 @@ app.controller('LaunchController', [
     //var formio = new Formio(AppConfig.apiBase + '/project/' + $scope.currentProject._id);
 
     $scope.$watch('currentProject', function(project) {
+      if (!project) {
+        return;
+      }
+      if (!project.framework) {
+        project.framework = 'angular2';
+      }
       $scope.current = {
         framework: project.framework,
         steps: ProjectFrameworkSteps[project.framework]
