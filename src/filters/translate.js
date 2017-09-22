@@ -5,7 +5,7 @@ module.exports = [
     $filter,
     $injector
   ) {
-    return function(text, key, builder) {
+    var formioTranslate = function(text, key, builder) {
       /**
        * Lookup the available translate libraries, currently supports:
        * angular-translate: @see https://github.com/angular-translate/angular-translate
@@ -42,5 +42,13 @@ module.exports = [
         return text;
       }
     };
+    formioTranslate.$stateful = true;
+    formioTranslate.use = function(language) {
+      if ($injector.has('$translate')) {
+        var $translate = $injector.get('$translate');
+        $translate.use(language);
+      }
+    };
+    return formioTranslate;
   }
 ];
