@@ -25,6 +25,7 @@ docker run -itd \
   -e "FORMIO_S3_REGION=[YOUR S3 REGION]" \
   -e "FORMIO_S3_KEY=[YOUR S3 AUTH KEY]" \
   -e "FORMIO_S3_SECRET=[YOUR S3 AUTH SECRET]" \
+  --restart unless-stopped \
   --name formio-files-core \
   -p 80:4005 \
   formio/formio-files-core;
