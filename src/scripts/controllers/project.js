@@ -388,6 +388,7 @@ app.controller('ProjectController', [
       else {
         $scope.projectProtocol = AppConfig.apiProtocol;
         $scope.projectServer = AppConfig.apiServer;
+        $scope.baseUrl = AppConfig.apiBase;
         $scope.currentProject = $scope.localProject;
         $scope.projectUrl = $rootScope.projectPath(result);
         loadRoles();
