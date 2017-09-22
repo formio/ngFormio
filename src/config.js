@@ -10,11 +10,11 @@ if (parts[0] === 'portal') {
   parts.shift();
   serverHost = parts.join('.');
 }
-if (parts[0] === 'beta') {
-  parts.shift();
-  parts[0] = 'test-' + parts[0];
-  serverHost = parts.join('.');
-}
+//if (parts[0] === 'beta') {
+//  parts.shift();
+//  parts[0] = 'test-' + parts[0];
+//  serverHost = parts.join('.');
+//}
 
 // Force portal and server to match protocols if not on localhost.
 if (apiProtocol !== protocol && ['localhost', 'portal.localhost', 'lvh.me', 'portal.lvh.me'].indexOf(window.location.hostname) === -1) {
