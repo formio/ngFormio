@@ -16,6 +16,24 @@ app.directive('stepFlow', function() {
           if ($scope.steps) {
             $scope.currentStep = $scope.currentParentStep = $scope.steps[0];
           }
+          $scope.nextSteps = {};
+          var lastStep;
+          $scope.steps.forEach(function(step) {
+            if (step.children && step.children.length) {
+              step.children.forEach(function(childStep) {
+                if (lastStep) {
+                  $scope.nextSteps[lastStep.step] = childStep;
+                }
+                lastStep = childStep;
+              });
+            }
+            else {
+              if (lastStep) {
+                $scope.nextSteps[lastStep.step] = step;
+              }
+              lastStep = step;
+            }
+          });
         });
 
         // If not set, default to open.

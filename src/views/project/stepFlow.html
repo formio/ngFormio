@@ -32,6 +32,13 @@
       </div>
       <div class="flow-content__container">
         <ng-include src="currentStep.template" />
+        <div class="row">
+          <div class="col-md-12">
+            <div class="text-right" ng-if="nextSteps[currentStep.step]">
+              Next Step: <a class="btn btn-primary" ng-click=changeStep(nextSteps[currentStep.step])>{{nextSteps[currentStep.step].title}}</a>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
