@@ -13,69 +13,69 @@ module.exports = function (actions) {
       actions.waitForClassRemoval('ngdialog-overlay');
     });
 
-    describe('Create Dev Environent', function () {
-      actions.clickOnLink('Add Environment');
-      actions.iSeeText('New Environment');
-      actions.btnDisabled('Add Environment');
+    describe('Create Dev Stage', function () {
+      actions.clickOnLink('+ New Stage');
+      actions.iSeeText('New Stage');
+      actions.btnDisabled('Add Stage');
       actions.enterTextInField('#title', 'Dev');
-      actions.clickOnButton('Add Environment');
+      actions.clickOnButton('Add Stage');
       actions.waitForClassRemoval('project-env-create');
       actions.iSeeEnv('Dev');
     });
 
-    describe('Create Test Environent', function () {
-      actions.clickOnLink('Add Environment');
-      actions.iSeeText('New Environment');
-      actions.btnDisabled('Add Environment');
+    describe('Create Test Stage', function () {
+      actions.clickOnLink('+ New Stage');
+      actions.iSeeText('New Stage');
+      actions.btnDisabled('Add Stage');
       actions.enterTextInField('#title', 'Test');
-      actions.clickOnButton('Add Environment');
+      actions.clickOnButton('Add Stage');
       actions.waitForClassRemoval('project-env-create');
       actions.iSeeEnv('Test');
     });
 
-    describe('Create PreProd Environent', function () {
-      actions.clickOnLink('Add Environment');
-      actions.iSeeText('New Environment');
-      actions.btnDisabled('Add Environment');
+    describe('Create PreProd Stage', function () {
+      actions.clickOnLink('+ New Stage');
+      actions.iSeeText('New Stage');
+      actions.btnDisabled('Add Stage');
       actions.enterTextInField('#title', 'PreProd');
-      actions.clickOnButton('Add Environment');
+      actions.clickOnButton('Add Stage');
       actions.waitForClassRemoval('project-env-create');
       actions.iSeeEnv('PreProd');
     });
 
-    describe('Can only create 3 environments', function () {
-      actions.iDonotSeeText('+ Add Environment');
+    describe('Can only create 3 stages', function () {
+      actions.iDonotSeeText('+ New Stage');
     });
 
-    describe('Rename Test Environent to Stage', function () {
+    describe('Rename Test Stage to Stage', function () {
       actions.iGoToEnv('Test');
       actions.clickOnLink('Settings');
       actions.enterTextInField('#title', 'Stage');
-      actions.clickOnButton('Save Environment');
+      actions.clickOnButton('Save Stage');
       actions.iSeeEnv('Stage');
     });
 
-    describe('Dont Delete PreProd Environment', function () {
+    describe('Dont Delete PreProd Stage', function () {
       actions.iGoToEnv('PreProd');
       actions.clickOnLink('Settings');
-      actions.clickOnLink('Delete PreProd Environment');
+      actions.clickOnLink('Delete PreProd Stage');
       actions.clickOnButton('No');
       actions.iSeeEnv('PreProd');
     });
 
-    describe('Delete PreProd Environment', function () {
+    describe('Delete PreProd Stage', function () {
       actions.iGoToEnv('PreProd');
       actions.clickOnLink('Settings');
-      actions.clickOnLink('Delete PreProd Environment');
+      actions.clickOnLink('Delete PreProd Stage');
       actions.clickOnButton('Yes');
       actions.iDontSeeEnv('PreProd');
-      actions.iSeeText('+ Add Environment');
+      actions.iSeeText('+ New Stage');
     });
 
-    describe('Tag Environment', function() {
+    describe('Tag Stage', function() {
       actions.iGoToEnv('Dev');
       actions.clickOnLink('Settings');
-      actions.clickOnLink('Deployment');
+      actions.clickOnLink('Staging');
       actions.clickOnLink('Create Version Tag');
       actions.enterTextInField('#tag', '0.0.1');
       actions.clickOnElementWithText('Create version tag');
