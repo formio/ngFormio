@@ -330,33 +330,33 @@ angular
           templateUrl: 'views/project/env/pdf/index.html',
           controller: 'PDFController'
         })
-        .state('project.env.deployments', {
-          url: '/deployments',
+        .state('project.env.staging', {
+          url: '/staging',
           abstract: true,
           parent: 'project.env'
         })
-        .state('project.env.deployments.deploy', {
-          url: '/deployments',
+        .state('project.env.staging.deploy', {
+          url: '/staging',
           parent: 'project.env',
-          templateUrl: 'views/project/env/deployments/deploy.html',
+          templateUrl: 'views/project/env/staging/deploy.html',
           controller: 'ProjectDeployController'
         })
-        .state('project.env.deployments.create', {
-          url: '/deployments/create',
+        .state('project.env.staging.create', {
+          url: '/staging/create',
           parent: 'project.env',
-          templateUrl: 'views/project/env/deployments/create.html',
+          templateUrl: 'views/project/env/staging/create.html',
           controller: 'ProjectTagCreateController'
         })
-        .state('project.env.deployments.import', {
-          url: '/deployments/import',
+        .state('project.env.staging.import', {
+          url: '/staging/import',
           parent: 'project.env',
-          templateUrl: 'views/project/env/deployments/import.html',
+          templateUrl: 'views/project/env/staging/import.html',
           controller: 'ProjectImportController'
         })
-        .state('project.env.deployments.export', {
-          url: '/deployments/export',
+        .state('project.env.staging.export', {
+          url: '/staging/export',
           parent: 'project.env',
-          templateUrl: 'views/project/env/deployments/export.html'
+          templateUrl: 'views/project/env/staging/export.html'
         })
         .state('project.env.activity', {
           url: '/activity',
@@ -527,7 +527,7 @@ angular
           formio.saveProject(project).then(function(project) {
             FormioAlerts.addAlert({
               type: 'success',
-              message: 'New Environment created!'
+              message: 'New Stage created!'
             });
             GoogleAnalytics.sendEvent('Project', 'create', null, 1);
             deferred.resolve(project);
@@ -535,7 +535,7 @@ angular
             if (error.data && error.data.message && error.data.message.indexOf('duplicate key error index') !== -1) {
               error.data.errors.name = {
                 path: 'name',
-                message: 'Environment domain already exists. Please pick a different domain.'
+                message: 'Stage domain already exists. Please pick a different domain.'
               };
             }
             FormioAlerts.onError(error);

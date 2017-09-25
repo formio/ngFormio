@@ -4,10 +4,10 @@
   </div>
   <div class="col-sm-4">
     <div class="panel panel-danger" ng-if="localProject._id !== primaryProject._id && ['owner', 'team_admin'].indexOf(highestRole) !== -1">
-      <div class="panel-heading">Delete Environment</div>
+      <div class="panel-heading">Delete Stage</div>
       <div class="panel-body">
-        <p>To remove this environment, select the delete button</p>
-        <a ui-sref="project.delete({projectId: currentProject._id})" class="btn btn-danger">Delete {{ currentProject.title }} Environment</a>
+        <p>To remove this stage, select the delete button</p>
+        <a ui-sref="project.delete({projectId: currentProject._id})" class="btn btn-danger">Delete {{ currentProject.title }} Stage</a>
       </div>
     </div>
 

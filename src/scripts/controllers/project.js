@@ -206,7 +206,7 @@ app.controller('ProjectCreateEnvironmentController', [
         label: 'On Premise'
       }
     ];
-    $scope.createType = 'Environment';
+    $scope.createType = 'Stage';
 
     $scope.currentProject = {};
     $scope.primaryProjectPromise.then(function(primaryProject) {
@@ -392,7 +392,7 @@ app.controller('ProjectController', [
         $scope.projectUrl = $rootScope.projectPath(result);
         loadRoles();
       }
-      $scope.projectType = 'Environment';
+      $scope.projectType = 'Stage';
       $scope.environmentName = ($scope.localProject.project) ? result.title : 'Live';
       $scope.projectsLoaded = true;
       var allowedFiles, allow, custom;
@@ -2109,7 +2109,7 @@ app.controller('ProjectRemoteController', [
                         else {
                           $scope.remoteProjects = result.data;
                           $scope.remoteProjects.unshift({
-                            title: 'New Environment',
+                            title: 'New Stage',
                             name: 'new'
                           });
                         }
@@ -2127,11 +2127,11 @@ app.controller('ProjectRemoteController', [
                       });
                   }
                   else {
-                    $scope.remoteError = 'Remote server is not compatible with Remote Environment functionality. Please upgrade.';
+                    $scope.remoteError = 'Environment too old of a version. Please upgrade.';
                   }
                 })
                 .catch(function(err) {
-                  $scope.remoteError = 'Remote server did not respond to a CORS request properly. It may not be a properly configured form.io server or does not exist.';
+                  $scope.remoteError = 'Environment did not respond to a CORS request properly. It may not be a properly configured form.io server or does not exist.';
                 });
 
             });
@@ -2528,7 +2528,7 @@ app.controller('ProjectDeleteController', [
   ) {
     $scope.isBusy = false;
     var isProject = ($scope.currentProject._id === $scope.primaryProject._id);
-    var type = (isProject ? 'Project' : 'Environment');
+    var type = (isProject ? 'Project' : 'Stage');
     $scope.deleteProject = function() {
       if (!$scope.currentProject || !$scope.currentProject._id) { return; }
       $scope.isBusy = true;
