@@ -2004,6 +2004,9 @@ li.step-info {
       width:80%;
       padding: 0px 20px;
     }
+    .flow-footer {
+      margin-top: 30px;
+    }
   }
   .gallery {
     list-style: none;
@@ -2024,10 +2027,10 @@ li.step-info {
 }
 
 .btn-blink {
-  -webkit-animation: buttonblink 10s infinite;  /* Safari 4+ */
-  -moz-animation: buttonblink 10s infinite;  /* Fx 5+ */
-  -o-animation: buttonblink 10s infinite;  /* Opera 12+ */
-  animation: buttonblink 10s infinite;  /* IE 10+, Fx 29+ */
+  -webkit-animation: buttonblink 6s infinite;  /* Safari 4+ */
+  -moz-animation: buttonblink 6s infinite;  /* Fx 5+ */
+  -o-animation: buttonblink 6s infinite;  /* Opera 12+ */
+  animation: buttonblink 6s infinite;  /* IE 10+, Fx 29+ */
 }
 
 @keyframes buttonblink {

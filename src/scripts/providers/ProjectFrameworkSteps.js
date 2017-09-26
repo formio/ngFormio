@@ -35,7 +35,7 @@ app.constant('ProjectFrameworkSteps', function(framework) {
     },
     {
       step: 'user',
-      title: 'Application User',
+      title: 'Admin User',
       next: 'Create an Admin user for your application',
       icon: 'fa fa-user-plus',
       template: 'views/project/tour/user.html',

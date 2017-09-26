@@ -1,13 +1,16 @@
-<div class="col-md-12">
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      Create an account
-    </div>
-    <div class="panel-body">
-      <h4>Now you have on your local an application with Form.io</h4>
-      <p>Form.io provides you with an authentication process that is configured when creating a <a href="https://help.form.io/userguide/forms/" target="_blank">Resource</a> or a <a href="https://help.form.io/userguide/resources/" target="_blank">Form</a>, these are called <a href="https://help.form.io/userguide/actions/" target="_blank">Form Actions</a>.
-      </p>
-      <p>Now that we have our running application, let's build a Form with Actions</p>
+<div class="row">
+  <div class="col-md-12">
+    <h4>Create an Admin User account</h4>
+    <p>Your project came pre-configured with three roles: <strong>Administrator</strong>, <strong>Authenticated</strong>, and <strong>Anonymous</strong>. In order to begin using your application, you will need to create an admin user within your project so that you can log in and have the correct permissions. You can adjust the Access for your project by going to the <a ui-sref="project.access">Access</a> settings.</p>
+    <p>Submit the following form to create an Admin. You can also go to <strong>Resources -> Admin -> Use</strong> to create additional Admin users.</p>
+    <p>You can use this account to log in to your application for the first time.</p>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        Create an Admin user account
+      </div>
+      <div class="panel-body" ng-if="variables.projectUrl">
+        <formio src="variables.projectUrl + '/admin'" />
+      </div>
     </div>
   </div>
 </div>

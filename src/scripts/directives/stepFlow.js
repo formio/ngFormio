@@ -6,7 +6,8 @@ app.directive('stepFlow', function() {
   return {
     scope: {
       steps: '=',
-      active: '=?'
+      active: '=?',
+      variables: '='
     },
     controller: [
       '$scope',
@@ -56,6 +57,7 @@ app.directive('stepFlow', function() {
         }
 
         $scope.changeStep = function(parentStep, childStep) {
+          window.scrollTo(0, 0);
           $scope.currentStep = childStep || parentStep;
           $scope.currentParentStep = parentStep;
           if (childStep) {
@@ -71,6 +73,10 @@ app.directive('stepFlow', function() {
           sessionStorage.setItem('stepFlowCurrentChildStep', JSON.stringify($scope.currentChildStep));
           sessionStorage.setItem('stepFlowCurrentParentStep', JSON.stringify($scope.currentParentStep));
         };
+
+        $scope.init = function() {
+          return $scope.variables;
+        }
       }
     ],
     templateUrl: 'views/project/stepFlow.html'
