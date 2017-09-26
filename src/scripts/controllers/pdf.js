@@ -21,6 +21,10 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
       var infoPromise = null;
       return {
         ensureFileToken: function(project) {
+          if (!project.settings) {
+            project.settings = {};
+          }
+
           if (project.settings.filetoken) {
             return $q.resolve(project);
           }
@@ -35,12 +39,20 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
         ensureProject: function(projectPromise, cb) {
           return projectPromise.then(this.ensureFileToken.bind(this));
         },
-        pdfUrl: function(project, remote) {
+        pdfServer: function(project, remote) {
           var pdfServer = AppConfig.pdfServer;
           if (remote && project.settings.pdfserver) {
             pdfServer = project.settings.pdfserver;
           }
-          return pdfServer + '/pdf/' + project._id;
+          return pdfServer;
+        },
+        pdfUrl: function(project, remote) {
+          return this.pdfServer(project, remote) + '/pdf/' + project._id;
+        },
+        clearCache: function() {
+          infoCache = {};
+          infoReady = $q.defer();
+          infoPromise = null;
         },
         getInfo: function(projectPromise) {
           return this.ensureProject(projectPromise).then(function(project) {
@@ -151,6 +163,7 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
       FormioAlerts,
       PDFServer
     ) {
+      PDFServer.clearCache();
       $scope.availablePDFs = [];
       $scope.numForms = '1,000';
       $scope.numSubmissions = '10,000';
@@ -195,8 +208,8 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
       $scope.buyError = '';
       $scope.getPDFUrl = function(pdf) {
         var pdfServer = AppConfig.pdfServer;
-        if ($scope.currentProject.settings.pdfserver) {
-          pdfServer = $scope.currentProject.settings.pdfserver;
+        if ($scope.primaryProject.settings.pdfserver) {
+          pdfServer = $scope.primaryProject.settings.pdfserver;
         }
         return pdfServer + pdf.data.path + '.html';
       };
@@ -231,7 +244,7 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
 
       $scope.makePurchase = function() {
         $scope.buyError = '';
-        PDFServer.purchasePDF($scope.loadProjectPromise, {
+        PDFServer.purchasePDF($scope.primaryProjectPromise, {
           plan: $scope.currentPlan
         }).then(function(results) {
           $scope.pdfInfo.data = results.data.data;
@@ -264,14 +277,15 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
       };
 
       $scope.getPDFs = function() {
-        PDFServer.getPDFs($scope.loadProjectPromise).then(function(pdfs) {
+        PDFServer.getPDFs($scope.primaryProjectPromise).then(function(pdfs) {
           $scope.availablePDFs = pdfs;
         });
       };
 
       $scope.confirmDelete = function() {
-        PDFServer.deletePDF($scope.loadProjectPromise, $scope.currentPDF).then(function() {
+        PDFServer.deletePDF($scope.primaryProjectPromise, $scope.currentPDF).then(function() {
           $scope.pdfInfo.data.active = (parseInt($scope.pdfInfo.data.active, 10) - 1).toString();
+          PDFServer.clearCache();
           $scope.cancel();
           $scope.getPDFs();
         }, function(err) {
@@ -283,6 +297,10 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
         });
       };
 
+      $scope.canDelete = function(pdf) {
+        return !$scope.forms || !$scope.forms[pdf.data.id] || !$scope.forms[pdf.data.id].length;
+      };
+
       $scope.deletePDF = function(pdf) {
         $scope.currentPDF = pdf;
         ngDialog.open({
@@ -292,7 +310,7 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
       };
 
       $scope.pdfInfo = {};
-      PDFServer.getInfo($scope.loadProjectPromise).then(function(info) {
+      PDFServer.getInfo($scope.primaryProjectPromise).then(function(info) {
         if (!info) {
           throw {data: 'Cannot find project information.'};
         }

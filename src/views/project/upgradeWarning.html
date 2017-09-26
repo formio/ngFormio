@@ -1,6 +1,6 @@
 <div class="upgrade-warning-container">
   <div class="upgrade-warning text-center">
     <p>{{ warning }}</p>
-    <a class="btn btn-primary project-section-header-button" ng-click="showUpgradeDialog(primaryProject)"><i class="fa fa-arrow-circle-up"></i> Upgrade Project</a>
+    <a class="btn btn-primary project-section-header-button" ui-sref="project.billing({projectId: primaryProject._id})"><i class="fa fa-arrow-circle-up"></i> Upgrade Project</a>
   </div>
 </div>

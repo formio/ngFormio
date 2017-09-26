@@ -48,6 +48,13 @@ gulp.task('deploy:beta:prod', function () {
   }));
 });
 
+gulp.task('deploy:beta:develop', function () {
+  var settings = require('../aws.json');
+  settings.bucket = 'portal.develop-form.io';
+  settings.region = 'us-west-2';
+  return gulp.src(['./dist/**/*', '!./dist/lib/**/*']).pipe(s3(settings));
+});
+
 gulp.task('default', ['clean'], function() {
   gulp.start('build');
 });

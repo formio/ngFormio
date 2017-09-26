@@ -1,0 +1,49 @@
+<div class="panel panel-warning">
+  <div class="panel-heading">
+    <h3 class="panel-title">Install angular-formio</h3>
+  </div>
+  <div class="panel-body">
+    <p>Install the <strong>angular-formio</strong> module.</p>
+    <pre><code>npm install --save angular-formio</code></pre>
+  </div>
+</div>
+<div class="panel panel-warning">
+  <div class="panel-heading">
+    <h3 class="panel-title">Import the FormioModule</h3>
+  </div>
+  <div class="panel-body">
+    <strong>app.module.ts</strong>
+    <pre><code>import { NgModule } from '@angular/core';
+import { FormioModule } from 'angular-formio';
+import { BrowserModule } from '@angular/platform-browser';
+import { MainComponent } from './main.component.ts';
+
+@NgModule({
+&nbsp;&nbsp;&nbsp;imports: [
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BrowserModule,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FormioModule
+&nbsp;&nbsp;&nbsp;],
+&nbsp;&nbsp;&nbsp;declarations: [
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MainComponent
+&nbsp;&nbsp;&nbsp;],
+&nbsp;&nbsp;&nbsp;bootstrap: [
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MainComponent
+&nbsp;&nbsp;&nbsp;]
+})
+export class AppModule {}</code></pre>
+  </div>
+</div>
+<div class="panel panel-warning">
+  <div class="panel-heading">
+    <h3 class="panel-title">Embed the form</h3>
+  </div>
+  <div class="panel-body">
+    <p>Include the <strong>&lt;formio&gt;</strong> component within MainComponent</p>
+    <strong>main.component.ts</strong>
+    <pre><code>import { Component } from '@angular/core';
+@Component({
+  &nbsp;&nbsp;&nbsp;template: '&lt;formio src="{{ projectUrl }}/{{ form.path }}"&gt;&lt;/formio&gt;'
+})
+export class MainComponent {}</code></pre>
+  </div>
+</div>

@@ -34,18 +34,22 @@ angular
     '$stateProvider',
     '$urlRouterProvider',
     '$locationProvider',
+    '$httpProvider',
     'FormioProvider',
-    'formioComponentsProvider',
     'AppConfig',
     'toastrConfig',
+    'RemoteTokensProvider',
+    'formioComponentsProvider',
     function(
       $stateProvider,
       $urlRouterProvider,
       $locationProvider,
+      $httpProvider,
       FormioProvider,
-      formioComponentsProvider,
       AppConfig,
-      toastrConfig
+      toastrConfig,
+      RemoteTokensProvider,
+      formioComponentsProvider
     ) {
       // Reset the hashPrefix to remove the "!".
       $locationProvider.hashPrefix('');
@@ -55,11 +59,44 @@ angular
 
       // Set the base URL for our API.
       FormioProvider.setBaseUrl(AppConfig.apiBase);
-      FormioProvider.setAppUrl(AppConfig.formioBase);
+      FormioProvider.setProjectUrl(AppConfig.formioBase);
       FormioProvider.setDomain(AppConfig.domain);
 
-      // Disable form component until we can fix it.
-      formioComponentsProvider.register('form', {disabled: true});
+      formioComponentsProvider.addGroup('advanced', {
+        title: 'Advanced'
+      });
+      formioComponentsProvider.addGroup('data', {
+        title: 'Data'
+      });
+      formioComponentsProvider.addGroup('layout', {
+        title: 'Layout'
+      });
+      formioComponentsProvider.addGroup('premium', {
+        title: 'Premium'
+      });
+      formioComponentsProvider.register('datagrid', {group: 'data', title: 'Datagrid (Array)'});
+      formioComponentsProvider.register('editgrid', {group: 'data', title: 'Editgrid (Array)'});
+      formioComponentsProvider.register('container', {group: 'data', title: 'Container (Object)'});
+      formioComponentsProvider.register('hidden', {group: 'data'});
+      formioComponentsProvider.register('form', {group: 'premium', title: 'Nested Form'});
+      formioComponentsProvider.register('file', {group: 'premium'});
+      formioComponentsProvider.register('custom', {group: 'premium'});
+
+      var RemotePlugin = function() {};
+
+      RemotePlugin.prototype.requestOptions = function(options, url) {
+        var remoteToken = RemoteTokensProvider.getRemoteToken(url);
+        if (remoteToken) {
+          options.headers.append('x-remote-token', remoteToken);
+          options.headers.delete('x-jwt-token');
+        }
+        return options;
+      };
+
+      var remotePlugin = new RemotePlugin();
+
+      FormioProvider.registerPlugin(remotePlugin, 'remote');
+      $httpProvider.interceptors.push('RemoteInterceptor');
 
       $stateProvider
         .state('home', {
@@ -209,6 +246,11 @@ angular
           templateUrl: 'views/project/primary-settings.html',
           controller: 'PrimaryProjectSettingsController'
         })
+        .state('project.billing', {
+          url: '/billing',
+          templateUrl: 'views/project/billing.html',
+          controller: 'ProjectBilling'
+        })
         .state('project.env', {
           url: '/env',
           abstract: true,
@@ -216,13 +258,13 @@ angular
         })
         .state('project.overview', {
           url: '/overview',
-          controller: 'LaunchController',
-          templateUrl: 'views/project/overview/index.html'
-        })
-        .state('project.env.tour', {
-          url: '/tour',
           controller: 'ProjectOverviewController',
-          templateUrl: 'views/project/env/tour/index.html'
+          templateUrl: 'views/project/overview.html'
+        })
+        .state('project.tour', {
+          url: '/tour',
+          controller: 'LaunchController',
+          templateUrl: 'views/project/tour/index.html'
         })
         .state('project.env.settings', {
           url: '/settings',
@@ -233,6 +275,12 @@ angular
           url: '/settings',
           parent: 'project.env',
           templateUrl: 'views/project/env/settings/index.html',
+          controller: 'ProjectSettingsController'
+        })
+        .state('project.env.settings.remote', {
+          url: '/settings/remote',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/settings/remote/index.html',
           controller: 'ProjectSettingsController'
         })
         .state('project.env.settings.apiKeys', {
@@ -282,33 +330,33 @@ angular
           templateUrl: 'views/project/env/pdf/index.html',
           controller: 'PDFController'
         })
-        .state('project.env.deployments', {
-          url: '/deployments',
+        .state('project.env.staging', {
+          url: '/staging',
           abstract: true,
           parent: 'project.env'
         })
-        .state('project.env.deployments.deploy', {
-          url: '/deployments',
+        .state('project.env.staging.deploy', {
+          url: '/staging',
           parent: 'project.env',
-          templateUrl: 'views/project/env/deployments/deploy.html',
+          templateUrl: 'views/project/env/staging/deploy.html',
           controller: 'ProjectDeployController'
         })
-        .state('project.env.deployments.create', {
-          url: '/deployments/create',
+        .state('project.env.staging.create', {
+          url: '/staging/create',
           parent: 'project.env',
-          templateUrl: 'views/project/env/deployments/create.html',
+          templateUrl: 'views/project/env/staging/create.html',
           controller: 'ProjectTagCreateController'
         })
-        .state('project.env.deployments.import', {
-          url: '/deployments/import',
+        .state('project.env.staging.import', {
+          url: '/staging/import',
           parent: 'project.env',
-          templateUrl: 'views/project/env/deployments/import.html',
+          templateUrl: 'views/project/env/staging/import.html',
           controller: 'ProjectImportController'
         })
-        .state('project.env.deployments.export', {
-          url: '/deployments/export',
+        .state('project.env.staging.export', {
+          url: '/staging/export',
           parent: 'project.env',
-          templateUrl: 'views/project/env/deployments/export.html'
+          templateUrl: 'views/project/env/staging/export.html'
         })
         .state('project.env.activity', {
           url: '/activity',
@@ -479,7 +527,7 @@ angular
           formio.saveProject(project).then(function(project) {
             FormioAlerts.addAlert({
               type: 'success',
-              message: 'New Environment created!'
+              message: 'New Stage created!'
             });
             GoogleAnalytics.sendEvent('Project', 'create', null, 1);
             deferred.resolve(project);
@@ -487,7 +535,7 @@ angular
             if (error.data && error.data.message && error.data.message.indexOf('duplicate key error index') !== -1) {
               error.data.errors.name = {
                 path: 'name',
-                message: 'Environment domain already exists. Please pick a different domain.'
+                message: 'Stage domain already exists. Please pick a different domain.'
               };
             }
             FormioAlerts.onError(error);
@@ -512,7 +560,6 @@ angular
     'FormioProject',
     'AppConfig',
     'ProjectPlans',
-    'ProjectUpgradeDialog',
     'ProjectFrameworks',
     '$timeout',
     '$q',
@@ -526,7 +573,6 @@ angular
       FormioProject,
       AppConfig,
       ProjectPlans,
-      ProjectUpgradeDialog,
       ProjectFrameworks,
       $timeout,
       $q,
@@ -677,8 +723,6 @@ angular
       $scope.getAPICallsPercent = ProjectPlans.getAPICallsPercent.bind(ProjectPlans);
       $scope.getProgressBarClass = ProjectPlans.getProgressBarClass.bind(ProjectPlans);
 
-      $scope.showUpgradeDialog = ProjectUpgradeDialog.show.bind(ProjectUpgradeDialog);
-
       $rootScope.welcomeForceClose = false;
       $scope.closeWelcome = function() {
         $rootScope.welcomeForceClose = true;
@@ -793,27 +837,30 @@ angular
       $rootScope.apiProtocol = AppConfig.apiProtocol;
       $rootScope.apiServer = AppConfig.apiServer;
 
-      $rootScope.projectPath = function(project) {
+      $rootScope.projectPath = function(project, base, type) {
         var path = '';
-        switch(AppConfig.pathType) {
+        var serverBase = base || AppConfig.protocol + '//' + AppConfig.serverHost;
+        var server = serverBase.replace(/(^\w+:|^)\/\//, '');
+        var protocol = serverBase.indexOf('https') === 0 ? 'https:' : 'http:';
+        switch(type || AppConfig.pathType) {
           case 'Subdomains':
             if (project.hasOwnProperty('name')) {
-              path = AppConfig.apiProtocol + '//' + project.name + '.' + AppConfig.apiServer;
+              path = protocol + '//' + project.name + '.' + server;
             }
             else if (project.hasOwnProperty('_id')) {
-              path = AppConfig.apiBase + '/project/' + project._id;
+              path = serverBase + '/project/' + project._id;
             }
             break;
           case 'Subdirectories':
             if (project.hasOwnProperty('name')) {
-              path = AppConfig.apiBase + '/' + project.name;
+              path = serverBase + '/' + project.name;
             }
             else if (project.hasOwnProperty('_id')) {
-              path = AppConfig.apiBase + '/project/' + project._id;
+              path = serverBase + '/project/' + project._id;
             }
             break;
           case 'ProjectId':
-            path = AppConfig.apiBase + '/project/' + project._id;
+            path = serverBase + '/project/' + project._id;
             break;
         }
         return path;
@@ -1024,35 +1071,40 @@ angular
           name: 'trial',
           title: 'Trial',
           labelStyle: 'label-trial',
-          priceDescription: 'Free 30 days'
+          price: 0,
+          priceDescription: 'Free for 30 days'
         },
         basic: {
           order: 1,
           name: 'basic',
           title: 'Basic',
           labelStyle: 'label-info',
-          priceDescription: 'Free'
+          price: 0,
+          priceDescription: '$0/month'
         },
         independent: {
           order: 2,
           name: 'independent',
           title: 'Independent',
           labelStyle: 'label-warning',
-          priceDescription: '$15/mo'
+          price: 15,
+          priceDescription: '$15/month'
         },
         team: {
           order: 3,
           name: 'team',
           title: 'Team Pro',
           labelStyle: 'label-success',
-          priceDescription: '$100/mo'
+          price: 100,
+          priceDescription: '$100/month'
         },
         commercial: {
           order: 4,
           name: 'commercial',
-          title: 'Commercial',
+          title: 'Enterprise',
           labelStyle: 'label-commercial',
-          priceDescription: '$250/mo'
+          price: 250,
+          priceDescription: '$250/month'
         }
       },
       getPlans: function() {
@@ -1133,4 +1185,51 @@ angular
         });
       }
     };
-  }]);
+  }])
+  .provider('RemoteTokens', function () {
+    var that = this;
+    this.tokens = {};
+
+    this.getRemoteToken = function(url) {
+      var token = false;
+      Object.keys(that.tokens).forEach(function(key) {
+        if (url.indexOf(key) === 0) {
+          token = that.tokens[key];
+        }
+      });
+      return token;
+    };
+
+    this.setRemoteToken = function(projectUrl, token) {
+      that.tokens[projectUrl] = token;
+    };
+
+    this.$get = function () {
+      return {
+        getRemoteToken: this.getRemoteToken,
+        setRemoteToken: this.setRemoteToken
+      };
+    };
+  })
+  .factory('RemoteInterceptor', [
+    '$q',
+    'RemoteTokens',
+    function($q, RemoteTokens) {
+      var Interceptor = {
+        /**
+         * Set the token in the request headers.
+         */
+        request: function(config) {
+          if (config.disableJWT) return config;
+          var remoteToken = RemoteTokens.getRemoteToken(config.url);
+          if (remoteToken) {
+            config.headers['x-remote-token'] = remoteToken;
+            delete config.headers['x-jwt-token'];
+          }
+          return config;
+        }
+      };
+
+      return Interceptor;
+    }
+  ]);

@@ -203,7 +203,8 @@ app.directive('formList', function() {
     scope: {
       formName: '=',
       forms: '=',
-      project: '=',
+      formio: '=',
+      projectUrl: '=',
       formType: '=',
       numPerPage: '=',
       listMode: '=',
@@ -229,19 +230,23 @@ app.directive('formList', function() {
         $rootScope.noBreadcrumb = false;
         $rootScope.currentForm = false;
         $scope.search = {};
-        $scope.formsUrl = AppConfig.apiBase + '/project/' + $scope.project._id + '/form?limit=9999999';
-        if ($scope.formType) {
-          $scope.formsUrl += '&type=' + $scope.formType;
-        }
-        $http.get($scope.formsUrl).then(function(response) {
-          $scope.forms = response.data;
-          $scope.formsFinished = true;
-        });
-        $scope.$watch('project', function(newProject, oldProject) {
-          $scope.projectApi = $rootScope.projectPath($scope.project);
+        $scope.forms = [];
+        $scope.$watch('projectUrl', function() {
+          var query = {
+            params: {
+              limit: 9999999
+            }
+          };
+          if ($scope.formType) {
+            query.params.type = $scope.formType;
+          }
+          $scope.formio.loadForms(query).then(function(forms) {
+            $scope.forms = forms;
+            $scope.formsFinished = true;
+          });
         });
         $scope.export = function(form, type) {
-          window.open(AppConfig.apiBase + '/project/' + $scope.project._id + '/form/' + form._id + '/export?format=' + type + '&x-jwt-token=' + $rootScope.userToken);
+          window.open($scope.projectUrl + '/form/' + form._id + '/export?format=' + type + '&x-jwt-token=' + $rootScope.userToken);
         };
         $scope.componentCount = function(components) {
           return _(FormioUtils.flattenComponents(components)).filter(function (o) {
@@ -252,6 +257,7 @@ app.directive('formList', function() {
     ]
   };
 });
+
 app.directive('customOnChange', function() {
   return {
     restrict: 'A',
@@ -300,46 +306,49 @@ app.controller('FormController', [
     $http
   ) {
     // Project information.
-    $scope.formReady = true;
+    $scope.formReady = false;
     $scope.projectId = $stateParams.projectId;
     $scope.upload = function (file) {
       $scope.uploading = true;
       $scope.formReady = false;
-      var filePath = '/pdf/' + $scope.projectId + '/file';
-      var pdfServer = AppConfig.pdfServer;
-      if ($scope.currentProject.settings.pdfserver) {
-        pdfServer = $scope.currentProject.settings.pdfserver;
-      }
-      PDFServer.ensureProject($scope.loadProjectPromise).then(function(project) {
-        Upload.upload({
-          url: pdfServer + filePath,
-          data: {file: file},
-          headers: {'x-file-token': project.settings.filetoken}
-        }).then(function (res) {
-          $scope.formReady = true;
-          $scope.uploading = false;
-          if (!$scope.form.settings) {
-            $scope.form.settings = {};
+      $scope.primaryProjectPromise.then(function(primaryProject) {
+        var filePath = '/pdf/' + primaryProject._id + '/file';
+        var pdfServer = AppConfig.pdfServer;
+        PDFServer.ensureFileToken(primaryProject).then(function(project) {
+          if (project.settings.pdfserver) {
+            pdfServer = project.settings.pdfserver;
           }
-          if (res.data && res.data.path) {
-            $scope.form.settings.pdf = {
-              src: pdfServer + res.data.path,
-              id: res.data.file
-            };
-          }
-          if ($stateParams.newForm) {
-            $scope.form.display = 'pdf';
-            $state.go('project.form.create', {
-              form: $scope.form
-            });
-          }
-          ngDialog.close();
-        }, function (resp) {
-          FormioAlerts.onError({message: resp.data});
-          $scope.uploading = false;
-          ngDialog.close();
-        }, function (evt) {
-          $scope.uploadProgress = parseInt(100.0 * evt.loaded / evt.total);
+          Upload.upload({
+            url: pdfServer + filePath,
+            data: {file: file},
+            headers: {'x-file-token': project.settings.filetoken}
+          }).then(function (res) {
+            PDFServer.clearCache();
+            $scope.formReady = true;
+            $scope.uploading = false;
+            if (!$scope.form.settings) {
+              $scope.form.settings = {};
+            }
+            if (res.data && res.data.path) {
+              $scope.form.settings.pdf = {
+                src: pdfServer + res.data.path,
+                id: res.data.file
+              };
+            }
+            if ($stateParams.newForm) {
+              $scope.form.display = 'pdf';
+              $state.go('project.form.create', {
+                form: $scope.form
+              });
+            }
+            ngDialog.close();
+          }, function (resp) {
+            FormioAlerts.onError({message: resp.data});
+            $scope.uploading = false;
+            ngDialog.close();
+          }, function (evt) {
+            $scope.uploadProgress = parseInt(100.0 * evt.loaded / evt.total);
+          });
         });
       });
     };
@@ -349,22 +358,10 @@ app.controller('FormController', [
     $scope.uploadProgress = 0;
     $scope.isCopy = !!($stateParams.components && $stateParams.components.length);
     $scope.formId = $stateParams.formId;
-    $scope.formUrl = '/project/' + $scope.projectId + '/form';
-    $scope.formUrl += $stateParams.formId ? ('/' + $stateParams.formId) : '';
-    $scope.formDisplays = [
-      {
-        name: 'form',
-        title: 'Form'
-      },
-      {
-        name: 'wizard',
-        title: 'Wizard'
-      },
-      {
-        name: 'pdf',
-        title: 'PDF'
-      }
-    ];
+
+    $scope.removePDF = function() {
+      delete $scope.form.settings.pdf;
+    };
 
     $scope.uploadPDF = function() {
       ngDialog.open({
@@ -374,7 +371,7 @@ app.controller('FormController', [
 
       // Determine if we have enough to upload.
       $scope.purchaseRequired = false;
-      PDFServer.getInfo($scope.loadProjectPromise).then(function(info) {
+      PDFServer.getInfo($scope.primaryProjectPromise).then(function(info) {
         var numForms = parseInt(info.data.forms, 10);
         switch (info.data.plan) {
           case 'basic':
@@ -409,34 +406,39 @@ app.controller('FormController', [
       if (!$scope.form.name || $scope.form.name === _.camelCase(oldTitle)) {
         $scope.form.name = _.camelCase($scope.form.title);
       }
+      if (!$scope.form.path || $scope.form.path === _.camelCase(oldTitle).toLowerCase()) {
+        $scope.form.path = _.camelCase($scope.form.title).toLowerCase();
+      }
     };
 
-    // Load the form and submissions.
-    $scope.formio = new Formio($scope.formUrl);
-
     // The url to goto for embedding.
+    $scope.iframeCode = '';
     $scope.embedCode = '';
-    $scope.setEmbedCode = function(gotoUrl) {
-      var embedCode = '<script type="text/javascript">';
-      embedCode += '(function a(d, w, u) {';
-      embedCode +=    'var h = d.getElementsByTagName("head")[0];';
-      embedCode +=    'var s = d.createElement("script");';
-      embedCode +=    's.type = "text/javascript";';
-      embedCode +=    's.src = "' + AppConfig.appBase + '/lib/seamless/seamless.parent.min.js";';
-      embedCode +=    's.onload = function b() {';
-      embedCode +=        'var f = d.getElementById("formio-form-' + $scope.form._id + '");';
-      embedCode +=        'if (!f || (typeof w.seamless === u)) {';
-      embedCode +=            'return setTimeout(b, 100);';
-      embedCode +=        '}';
-      embedCode +=        'w.seamless(f, {fallback:false}).receive(function(d, e) {';
-      embedCode +=            gotoUrl ? 'window.location.href = "' + gotoUrl + '";' : '';
-      embedCode +=        '});';
-      embedCode +=    '};';
-      embedCode +=    'h.appendChild(s);';
-      embedCode += '})(document, window);';
-      embedCode += '</script>';
-      embedCode += '<iframe id="formio-form-' + $scope.form._id + '" style="width:100%;border:none;" height="600px" src="https://formview.io/#/' + $scope.currentProject.name + '/' + $scope.form.path + '?iframe=1&header=0"></iframe>';
+    $scope.setiframeCode = function(gotoUrl) {
+      var embedCode = '<script src="https://unpkg.com/formiojs@latest/dist/formio.embed.js?src=';
+      embedCode += $scope.projectUrl + '/' + $scope.form.path;
+      embedCode += '"></script>';
       $scope.embedCode = embedCode;
+      var iframeCode = '<script type="text/javascript">';
+      iframeCode += '(function a(d, w, u) {';
+      iframeCode +=    'var h = d.getElementsByTagName("head")[0];';
+      iframeCode +=    'var s = d.createElement("script");';
+      iframeCode +=    's.type = "text/javascript";';
+      iframeCode +=    's.src = "' + AppConfig.appBase + '/lib/seamless/seamless.parent.min.js";';
+      iframeCode +=    's.onload = function b() {';
+      iframeCode +=        'var f = d.getElementById("formio-form-' + $scope.form._id + '");';
+      iframeCode +=        'if (!f || (typeof w.seamless === u)) {';
+      iframeCode +=            'return setTimeout(b, 100);';
+      iframeCode +=        '}';
+      iframeCode +=        'w.seamless(f, {fallback:false}).receive(function(d, e) {';
+      iframeCode +=            gotoUrl ? 'window.location.href = "' + gotoUrl + '";' : '';
+      iframeCode +=        '});';
+      iframeCode +=    '};';
+      iframeCode +=    'h.appendChild(s);';
+      iframeCode += '})(document, window);';
+      iframeCode += '</script>';
+      iframeCode += '<iframe id="formio-form-' + $scope.form._id + '" style="width:100%;border:none;" height="600px" src="https://formview.io/#/' + $scope.currentProject.name + '/' + $scope.form.path + '?iframe=1&header=0"></iframe>';
+      $scope.iframeCode = iframeCode;
     };
 
     // Keep track of the form tags.
@@ -512,11 +514,11 @@ app.controller('FormController', [
     });
 
     $scope.$watch('form', function() {
-      $scope.setEmbedCode();
+      $scope.setiframeCode();
     });
 
     $scope.$watch('currentProject', function() {
-      $scope.setEmbedCode();
+      $scope.setiframeCode();
     });
 
     $scope.updateCurrentFormResources = function(form) {
@@ -541,63 +543,91 @@ app.controller('FormController', [
         })
         .value();
     };
+    var loadFormQ = $q.defer();
+    $scope.loadFormPromise = loadFormQ.promise;
 
-    // Load the form.
-    if ($scope.formId) {
-      $scope.loadFormPromise = $scope.formio.loadForm()
-        .then(function(form) {
-          // FOR-362 - Fix pass by reference issue with the internal cache.
-          form = _.cloneDeep(form);
+    // Load the form and submissions.
+    $scope.loadProjectPromise.then(function() {
+      $scope.formUrl = $scope.projectUrl + '/form';
+      $scope.formUrl += $stateParams.formId ? ('/' + $stateParams.formId) : '';
+      $scope.formDisplays = [
+        {
+          name: 'form',
+          title: 'Form'
+        },
+        {
+          name: 'wizard',
+          title: 'Wizard'
+        },
+        {
+          name: 'pdf',
+          title: 'PDF'
+        }
+      ];
+      $scope.formio = new Formio($scope.formUrl, {base: $scope.baseUrl});
+      // Load the form.
+      if ($scope.formId) {
+        loadFormQ.resolve($scope.formio.loadForm()
+          .then(function(form) {
+            // FOR-362 - Fix pass by reference issue with the internal cache.
+            form = _.cloneDeep(form);
 
-          // Ensure the display is form.
-          if (!form.display) {
-            form.display = 'form';
-          }
+            // Ensure the display is form.
+            if (!form.display) {
+              form.display = 'form';
+            }
 
-          $scope.updateCurrentFormResources(form);
+            $scope.updateCurrentFormResources(form);
 
-          $scope.form = form;
-          $scope.form.page = 0;
-          $scope.formTags = _.map(form.tags, function(tag) {
-            return {text: tag};
-          });
-
-          $rootScope.currentForm = $scope.form;
-        }, FormioAlerts.onError.bind(FormioAlerts))
-        .catch(FormioAlerts.onError.bind(FormioAlerts));
-
-      $scope.formio.loadActions()
-        .then(function(actions) {
-          // Get the available actions for the form, to check if premium actions are present.
-          $scope.formio.availableActions().then(function(available) {
-            var premium = _.map(_.filter(available, function(action) {
-              return (action.hasOwnProperty('premium') && action.premium === true);
-            }), 'name');
-
-            $scope.hasPremAction = _.some(actions, function(action) {
-              return (action.hasOwnProperty('name') && action.name && premium.indexOf(action.name) !== -1);
+            $scope.form = form;
+            $scope.form.page = 0;
+            $scope.formTags = _.map(form.tags, function(tag) {
+              return {text: tag};
             });
-          });
 
-          $scope.actions = actions;
-          $scope.hasAuthAction = actions.some(function(action) {
-            return action.name === 'login' || action.name === 'oauth';
-          });
-        }, FormioAlerts.onError.bind(FormioAlerts))
-        .catch(FormioAlerts.onError.bind(FormioAlerts));
-    }
-    else {
-      $scope.loadFormPromise = $q.when();
-    }
+            $rootScope.currentForm = $scope.form;
+            $scope.formReady = true;
+            return form;
+          }, FormioAlerts.onError.bind(FormioAlerts))
+          .catch(FormioAlerts.onError.bind(FormioAlerts)));
 
-    $scope.loadFormPromise
-      .then(function() {
-        // Watch for the first load of the form. Used to parse self access permissions once.
-        var loaded = $scope.$watch('form.submissionAccess', function() {
-          $scope.selfAccessPermissions = selfAccess();
-          loaded();
+        $scope.formio.loadActions()
+          .then(function(actions) {
+            // Get the available actions for the form, to check if premium actions are present.
+            $scope.formio.availableActions().then(function(available) {
+              var premium = _.map(_.filter(available, function(action) {
+                return (action.hasOwnProperty('premium') && action.premium === true);
+              }), 'name');
+
+              $scope.hasPremAction = _.some(actions, function(action) {
+                return (action.hasOwnProperty('name') && action.name && premium.indexOf(action.name) !== -1);
+              });
+            });
+
+            $scope.actions = actions;
+            $scope.hasAuthAction = actions.some(function(action) {
+              return action.name === 'login' || action.name === 'oauth';
+            });
+          }, FormioAlerts.onError.bind(FormioAlerts))
+          .catch(FormioAlerts.onError.bind(FormioAlerts));
+      }
+      else {
+        $scope.formReady = true;
+        loadFormQ.resolve();
+      }
+
+      $scope.loadFormPromise
+        .then(function() {
+          $scope.form.builder = false;
+
+          // Watch for the first load of the form. Used to parse self access permissions once.
+          var loaded = $scope.$watch('form.submissionAccess', function() {
+            $scope.selfAccessPermissions = selfAccess();
+            loaded();
+          });
         });
-      });
+
+    });
 
     $scope.submissionAccessLabels = SubmissionAccessLabels;
     $scope.resourceAccessLabels = ResourceAccessLabels;
@@ -605,7 +635,7 @@ app.controller('FormController', [
 
     // Get the swagger URL.
     $scope.getSwaggerURL = function(format) {
-      return AppConfig.apiBase + '/project/' + $scope.projectId + '/form/' + $scope.formId + '/spec.json';
+      return $scope.projectUrl + '/form/' + $scope.formId + '/spec.json';
     };
 
     // When a submission is made.
@@ -631,7 +661,6 @@ app.controller('FormController', [
       })
       .then(function(response) {
         $scope.form = $scope.originalForm = response.result;
-        $scope.form.builder = true;
         var headers = response.headers;
         var method = $stateParams.formId ? 'updated' : 'created';
         GoogleAnalytics.sendEvent('Form', method.substring(0, method.length - 1), null, 1);
@@ -711,6 +740,10 @@ app.controller('FormEditController', [
     $state,
     $timeout
   ) {
+    $scope.loadFormPromise.then(function() {
+      $scope.form.builder = true;
+    });
+
     // Clone original form after it has loaded, or immediately
     // if we're not loading a form
     ($scope.loadFormPromise || $q.when()).then(function() {
@@ -840,11 +873,28 @@ app.controller('FormEmbedController', [
     $scope,
     ProjectFrameworks
   ) {
-    console.log($scope);
-    $scope.primaryProjectPromise.then(function(project) {
-      $scope.current = {
-        framework: project.framework || 'none'
-      };
+    var setFramework = function(name) {
+      if (!$scope.current) {
+        $scope.current = {framework: {}};
+      }
+      var customFramework = {};
+      angular.forEach(ProjectFrameworks, function(framework) {
+        if (framework.name === name) {
+          angular.merge($scope.current.framework, framework);
+        }
+        if (framework.name === 'custom') {
+          customFramework = framework;
+        }
+      });
+      if (!$scope.current) {
+        angular.merge($scope.current.framework, customFramework);
+      }
+
+      $scope.embedView = 'views/frameworks/' + $scope.current.framework.name + '/embed.html';
+    };
+
+    $scope.$watch('primaryProject.framework', function(name) {
+      setFramework(name);
     });
 
     $scope.frameworks = ProjectFrameworks;
@@ -868,7 +918,7 @@ app.controller('FormImportController', [
     $scope.formType = $stateParams.formType || 'form';
 
     $scope.importForm = function() {
-      (new Formio($scope.embedURL)).loadForm(null, {noToken: true})
+      (new Formio($scope.embedURL, {base: $scope.baseUrl})).loadForm(null, {noToken: true})
         .then(function(form) {
           $state.go('project.' + form.type + '.create', { components: form.components});
         })
@@ -1125,18 +1175,20 @@ app.controller('FormActionIndexController', [
         });
       }
     };
-    $scope.formio.loadActions()
-      .then(function(actions) {
-        $scope.actions = actions;
-      }, FormioAlerts.onError.bind(FormioAlerts))
-      .catch(FormioAlerts.onError.bind(FormioAlerts));
-    $scope.formio.availableActions().then(function(available) {
-      if (!available[0].name) {
-        available.shift();
-      }
-      available.unshift($scope.newAction);
-      $scope.availableActions = _.filter(available, function(action) {
-        return action.name !== 'sql';
+    $scope.loadProjectPromise.then(function() {
+      $scope.formio.loadActions()
+        .then(function(actions) {
+          $scope.actions = actions;
+        }, FormioAlerts.onError.bind(FormioAlerts))
+        .catch(FormioAlerts.onError.bind(FormioAlerts));
+      $scope.formio.availableActions().then(function(available) {
+        if (!available[0].name) {
+          available.shift();
+        }
+        available.unshift($scope.newAction);
+        $scope.availableActions = _.filter(available, function(action) {
+          return action.name !== 'sql';
+        });
       });
     });
   }
@@ -1185,7 +1237,7 @@ app.factory('ActionInfoLoader', [
          */
         var loadAction = function(defaults) {
           if ($stateParams.actionId) {
-            var loader = new Formio($scope.actionUrl);
+            var loader = new Formio($scope.actionUrl, {base: $scope.baseUrl});
             return loader.loadAction().then(function(action) {
               $scope.action = _.merge($scope.action, {data: action});
               return getActionInfo(action.name);
@@ -1240,212 +1292,214 @@ app.controller('FormActionEditController', [
     // component selection inputs.
     $cacheFactory.get('$http').removeAll();
 
-    // Helpful warnings for certain actions
-    ActionInfoLoader.load($scope, $stateParams).then(function(actionInfo) {
-      // SQL Action missing sql server warning
-      if(actionInfo && actionInfo.name === 'sql') {
-        var typeComponent = FormioUtils.getComponent(actionInfo.settingsForm.components, 'type');
-        if(JSON.parse(typeComponent.data.json).length === 0) {
-          FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> You do not have any SQL servers configured. You can add a SQL server in your <a href="#/project/'+$scope.projectId+'/settings/databases">Project Settings</a>.');
-        }
-      }
-
-      // Email action missing transports (other than the default one).
-      if(actionInfo && actionInfo.name === 'email') {
-        var transportComponent = FormioUtils.getComponent(actionInfo.settingsForm.components, 'transport');
-        if(JSON.parse(transportComponent.data.json).length <= 1) {
-          FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> You do not have any email transports configured. You can add an email transport in your <a href="#/project/'+$scope.projectId+'/settings/email">Project Settings</a>, or you can use the default transport (charges may apply).');
-        }
-      }
-
-      // Oauth action alert for new resource missing role assignment.
-      if (actionInfo && actionInfo.name === 'oauth') {
-        var providers = FormioUtils.getComponent(actionInfo.settingsForm.components, 'provider');
-        if (providers.data && providers.data.json && providers.data.json === '[]') {
-          FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> The OAuth Action requires a provider to be configured, before it can be used. You can add an OAuth provider in your <a href="#/project/'+$scope.projectId+'/settings/oauth">Project Settings</a>.');
-        }
-      }
-
-      // Google Sheets action alert for missing settings.
-      if (actionInfo && actionInfo.name === 'googlesheet') {
-        var settings = _.get($scope, 'currentProject.settings.google');
-        if (!_.has(settings, 'clientId')) {
-          FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> The Google Sheets Action requires a Client ID to be configured, before it can be used. You can add all Google Data Connection settings in your <a href="#/project/'+$scope.projectId+'/settings/oauth">Project Settings</a>.');
-        }
-        if (!_.has(settings, 'cskey')) {
-          FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> The Google Sheets Action requires a Client Secret Key to be configured, before it can be used. You can add all Google Data Connection settings in your <a href="#/project/'+$scope.projectId+'/settings/oauth">Project Settings</a>.');
-        }
-        if (!_.has(settings, 'refreshtoken')) {
-          FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> The Google Sheets Action requires a Refresh Token to be configured, before it can be used. You can add all Google Data Connection settings in your <a href="#/project/'+$scope.projectId+'/settings/oauth">Project Settings</a>.');
-        }
-      }
-
-      // Hubspot action missing settings due to missing API key.
-      if(actionInfo && actionInfo.name === 'hubspotContact') {
-        var showFields = function(key, value) {
-          var fields = {
-            '_value': 'none',
-            '_field': 'none'
-          };
-          switch(value) {
-            case 'field':
-              fields._field = '';
-              break;
-            case 'value':
-            case 'increment':
-            case 'decrement':
-              fields._value = '';
-              break;
+    $scope.loadProjectPromise.then(function() {
+      // Helpful warnings for certain actions
+      ActionInfoLoader.load($scope, $stateParams).then(function(actionInfo) {
+        // SQL Action missing sql server warning
+        if(actionInfo && actionInfo.name === 'sql') {
+          var typeComponent = FormioUtils.getComponent(actionInfo.settingsForm.components, 'type');
+          if(JSON.parse(typeComponent.data.json).length === 0) {
+            FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> You do not have any SQL servers configured. You can add a SQL server in your <a href="#/project/'+$scope.currentProject._id+'/env/integrations/data">Stage Settings</a>.');
           }
-          angular.element('#form-group-' + key + '_value').css('display', fields._value);
-          angular.element('#form-group-' + key + '_field').css('display', fields._field);
-        };
-
-        if(!$scope.currentProject.settings || !$scope.currentProject.settings.hubspot || !$scope.currentProject.settings.hubspot.apikey) {
-          FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> You have not yet configured your Hubspot API key. You can configure your Hubspot API key in your <a href="#/project/'+$scope.projectId+'/settings/hubspot">Project Settings</a>.');
-          $scope.formDisabled = true;
         }
-        FormioUtils.eachComponent(actionInfo.settingsForm.components, function(component) {
-          if (!component.key) {
+
+        // Email action missing transports (other than the default one).
+        if(actionInfo && actionInfo.name === 'email') {
+          var transportComponent = FormioUtils.getComponent(actionInfo.settingsForm.components, 'transport');
+          if(JSON.parse(transportComponent.data.json).length <= 1) {
+            FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> You do not have any email transports configured. You can add an email transport in your <a href="#/project/'+$scope.currentProject._id+'/env/integrations/email">Stage Settings</a>, or you can use the default transport (charges may apply).');
+          }
+        }
+
+        // Oauth action alert for new resource missing role assignment.
+        if (actionInfo && actionInfo.name === 'oauth') {
+          var providers = FormioUtils.getComponent(actionInfo.settingsForm.components, 'provider');
+          if (providers.data && providers.data.json && providers.data.json === '[]') {
+            FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> The OAuth Action requires a provider to be configured, before it can be used. You can add an OAuth provider in your <a href="#/project/'+$scope.currentProject._id+'/env/integrations/oauth">Stage Settings</a>.');
+          }
+        }
+
+        // Google Sheets action alert for missing settings.
+        if (actionInfo && actionInfo.name === 'googlesheet') {
+          var settings = _.get($scope, 'currentProject.settings.google');
+          if (!_.has(settings, 'clientId')) {
+            FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> The Google Sheets Action requires a Client ID to be configured, before it can be used. You can add all Google Data Connection settings in your <a href="#/project/'+$scope.currentProject._id+'/env/integrations/oauth">Stage Settings</a>.');
+          }
+          if (!_.has(settings, 'cskey')) {
+            FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> The Google Sheets Action requires a Client Secret Key to be configured, before it can be used. You can add all Google Data Connection settings in your <a href="#/project/'+$scope.currentProject._id+'/env/integrations/oauth">Stage Settings</a>.');
+          }
+          if (!_.has(settings, 'refreshtoken')) {
+            FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> The Google Sheets Action requires a Refresh Token to be configured, before it can be used. You can add all Google Data Connection settings in your <a href="#/project/'+$scope.currentProject._id+'/env/integrations/oauth">Stage Settings</a>.');
+          }
+        }
+
+        // Hubspot action missing settings due to missing API key.
+        if(actionInfo && actionInfo.name === 'hubspotContact') {
+          var showFields = function(key, value) {
+            var fields = {
+              '_value': 'none',
+              '_field': 'none'
+            };
+            switch(value) {
+              case 'field':
+                fields._field = '';
+                break;
+              case 'value':
+              case 'increment':
+              case 'decrement':
+                fields._value = '';
+                break;
+            }
+            angular.element('#form-group-' + key + '_value').css('display', fields._value);
+            angular.element('#form-group-' + key + '_field').css('display', fields._field);
+          };
+
+          if(!$scope.currentProject.settings || !$scope.currentProject.settings.hubspot || !$scope.currentProject.settings.hubspot.apikey) {
+            FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> You have not yet configured your Hubspot API key. You can configure your Hubspot API key in your <a href="#/project/'+$scope.currentProject._id+'/env/integrations/hubspot">Stage Settings</a>.');
+            $scope.formDisabled = true;
+          }
+          FormioUtils.eachComponent(actionInfo.settingsForm.components, function(component) {
+            if (!component.key) {
+              return;
+            }
+
+            var result = component.key.match(/(.*)_action/);
+            if (result) {
+              $timeout(function() {
+                showFields(result[1], $scope.action.data.settings[result[0]]);
+              });
+              $scope.$watch('action.data.settings.' + result[0], function(current) {
+                showFields(result[1], current);
+              });
+            }
+          });
+        }
+
+        // Hide role settings component as needed
+        var toggleVisible = function(association) {
+          if(!association) {
             return;
           }
 
-          var result = component.key.match(/(.*)_action/);
-          if (result) {
-            $timeout(function() {
-              showFields(result[1], $scope.action.data.settings[result[0]]);
-            });
-            $scope.$watch('action.data.settings.' + result[0], function(current) {
-              showFields(result[1], current);
-            });
-          }
-        });
-      }
+          angular.element('#form-group-role').css('display', (association === 'new' ? '' : 'none'));
+          angular.element('#form-group-resource').css('display', (association === 'link' ? 'none' : ''));
+        };
 
-      // Hide role settings component as needed
-      var toggleVisible = function(association) {
-        if(!association) {
-          return;
-        }
-
-        angular.element('#form-group-role').css('display', (association === 'new' ? '' : 'none'));
-        angular.element('#form-group-resource').css('display', (association === 'link' ? 'none' : ''));
-      };
-
-      // Find the role settings component, and require it as needed.
-      var toggleRequired = function(association, formComponents) {
-        if(!formComponents || !association) {
-          return;
-        }
-
-        var roleComponent = FormioUtils.getComponent(formComponents, 'role');
-        var resourceComponent = FormioUtils.getComponent(formComponents, 'resource');
-        // Update the validation settings.
-        if (roleComponent) {
-          roleComponent.validate = roleComponent.validate || {};
-          roleComponent.validate.required = (association === 'new' ? true : false);
-        }
-        if (resourceComponent) {
-          resourceComponent.validate = resourceComponent.validate || {};
-          resourceComponent.validate.required = (association === 'link' ? false : true);
-        }
-      };
-
-      // Auth action validation changes for new resource missing role assignment.
-      if(actionInfo && actionInfo.name === 'auth') {
-        // Force the validation to be run on page load.
-        $timeout(function() {
-          var action = $scope.action.data.settings || {};
-          toggleVisible(action.association);
-          toggleRequired(action.association, actionInfo.settingsForm.components);
-        });
-
-        // Watch for changes to the action settings.
-        $scope.$watch('action.data.settings', function(current, old) {
-          // Make the role setting required if this is for new resource associations.
-          if(current.association !== old.association) {
-            toggleVisible(current.association);
-            toggleRequired(current.association, actionInfo.settingsForm.components);
-
-            // Dont save the old role settings if this is an existing association.
-            current.role = (current.role && (current.association === 'new')) || '';
-          }
-        }, true);
-      }
-
-      var showProviderFields = function(association, provider) {
-        angular.element('[id^=form-group-autofill-]').css('display', 'none');
-        if(association === 'new' && provider) {
-          angular.element('[id^=form-group-autofill-' + provider + ']').css('display', '');
-        }
-      };
-
-      if(actionInfo && actionInfo.name === 'oauth') {
-        // Show warning if button component has no options
-        var buttonComponent = FormioUtils.getComponent(actionInfo.settingsForm.components, 'button');
-        if(JSON.parse(buttonComponent.data.json).length === 0) {
-          FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> You do not have any Button components with the `oauth` action on this form, which is required to use this action. You can add a Button component on the <a href="#/project/'+$scope.projectId+'/form/'+$scope.formId+'/edit">form edit page</a>.');
-        }
-        // Force the validation to be run on page load.
-        $timeout(function() {
-          var action = $scope.action.data.settings || {};
-          toggleVisible(action.association);
-          toggleRequired(action.association, actionInfo.settingsForm.components);
-          showProviderFields(action.association, action.provider);
-        });
-
-        // Watch for changes to the action settings.
-        $scope.$watch('action.data.settings', function(current, old) {
-          // Make the role setting required if this is for new resource associations.
-          if(current.association !== old.association) {
-            toggleVisible(current.association);
-            toggleRequired(current.association, actionInfo.settingsForm.components);
-            showProviderFields(current.association, current.provider);
-
-            // Dont save the old role settings if this is an existing association.
-            current.role = (current.role && (current.association === 'new')) || '';
+        // Find the role settings component, and require it as needed.
+        var toggleRequired = function(association, formComponents) {
+          if(!formComponents || !association) {
+            return;
           }
 
-          if(current.provider !== old.provider) {
-            showProviderFields(current.association, current.provider);
+          var roleComponent = FormioUtils.getComponent(formComponents, 'role');
+          var resourceComponent = FormioUtils.getComponent(formComponents, 'resource');
+          // Update the validation settings.
+          if (roleComponent) {
+            roleComponent.validate = roleComponent.validate || {};
+            roleComponent.validate.required = (association === 'new' ? true : false);
           }
-        }, true);
-      }
+          if (resourceComponent) {
+            resourceComponent.validate = resourceComponent.validate || {};
+            resourceComponent.validate.required = (association === 'link' ? false : true);
+          }
+        };
 
-      // Check for, and warn about premium actions being present.
-      if(
-        actionInfo &&
-        actionInfo.hasOwnProperty('premium') &&
-        actionInfo.premium === true &&
-        $scope.currentProject &&
-        $scope.currentProject.hasOwnProperty('plan') &&
-        ['basic', 'trial'].indexOf($scope.currentProject.plan) !== -1
-      ) {
-        FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> This is a Premium Action, please upgrade your <a ui-sref="project.settings.plan">project plan</a> to enable it.');
-      }
-
-      var component = FormioUtils.getComponent($scope.form.components, _.get($scope, 'action.data.condition.field'));
-      var field = _.get($scope, 'action.data.condition.field');
-      if (!component && (field !== undefined && field !== '')) {
-        // Add an alert to the window
-        FormioAlerts.addAlert({
-          type: 'danger',
-          message: '<i class="glyphicon glyphicon-exclamation-sign"></i> This Action will not execute because the conditional settings are invalid. Please fix them before proceeding.'
-        });
-
-        // Try to highlight the issue in the dom.
-        try {
+        // Auth action validation changes for new resource missing role assignment.
+        if(actionInfo && actionInfo.name === 'auth') {
+          // Force the validation to be run on page load.
           $timeout(function() {
-            var element = angular.element('#field .ui-select-match span.btn-default.form-control');
-            element.css('border-color', 'red').on('blur', function() {
-              element.css('border-color', '');
-            });
+            var action = $scope.action.data.settings || {};
+            toggleVisible(action.association);
+            toggleRequired(action.association, actionInfo.settingsForm.components);
           });
+
+          // Watch for changes to the action settings.
+          $scope.$watch('action.data.settings', function(current, old) {
+            // Make the role setting required if this is for new resource associations.
+            if(current.association !== old.association) {
+              toggleVisible(current.association);
+              toggleRequired(current.association, actionInfo.settingsForm.components);
+
+              // Dont save the old role settings if this is an existing association.
+              current.role = (current.role && (current.association === 'new')) || '';
+            }
+          }, true);
         }
-        catch (e) {
-          // do nothing if we cant find the input field.
+
+        var showProviderFields = function(association, provider) {
+          angular.element('[id^=form-group-autofill-]').css('display', 'none');
+          if(association === 'new' && provider) {
+            angular.element('[id^=form-group-autofill-' + provider + ']').css('display', '');
+          }
+        };
+
+        if(actionInfo && actionInfo.name === 'oauth') {
+          // Show warning if button component has no options
+          var buttonComponent = FormioUtils.getComponent(actionInfo.settingsForm.components, 'button');
+          if(JSON.parse(buttonComponent.data.json).length === 0) {
+            FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> You do not have any Button components with the `oauth` action on this form, which is required to use this action. You can add a Button component on the <a href="#/project/'+$scope.projectId+'/form/'+$scope.formId+'/edit">form edit page</a>.');
+          }
+          // Force the validation to be run on page load.
+          $timeout(function() {
+            var action = $scope.action.data.settings || {};
+            toggleVisible(action.association);
+            toggleRequired(action.association, actionInfo.settingsForm.components);
+            showProviderFields(action.association, action.provider);
+          });
+
+          // Watch for changes to the action settings.
+          $scope.$watch('action.data.settings', function(current, old) {
+            // Make the role setting required if this is for new resource associations.
+            if(current.association !== old.association) {
+              toggleVisible(current.association);
+              toggleRequired(current.association, actionInfo.settingsForm.components);
+              showProviderFields(current.association, current.provider);
+
+              // Dont save the old role settings if this is an existing association.
+              current.role = (current.role && (current.association === 'new')) || '';
+            }
+
+            if(current.provider !== old.provider) {
+              showProviderFields(current.association, current.provider);
+            }
+          }, true);
         }
-      }
+
+        // Check for, and warn about premium actions being present.
+        if(
+          actionInfo &&
+          actionInfo.hasOwnProperty('premium') &&
+          actionInfo.premium === true &&
+          $scope.currentProject &&
+          $scope.currentProject.hasOwnProperty('plan') &&
+          ['basic', 'trial'].indexOf($scope.currentProject.plan) !== -1
+        ) {
+          FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> This is a Premium Action, please upgrade your <a ui-sref="project.billing({projectId: $scope.primaryProject._id)">project plan</a> to enable it.');
+        }
+
+        var component = FormioUtils.getComponent($scope.form.components, _.get($scope, 'action.data.condition.field'));
+        var field = _.get($scope, 'action.data.condition.field');
+        if (!component && (field !== undefined && field !== '')) {
+          // Add an alert to the window
+          FormioAlerts.addAlert({
+            type: 'danger',
+            message: '<i class="glyphicon glyphicon-exclamation-sign"></i> This Action will not execute because the conditional settings are invalid. Please fix them before proceeding.'
+          });
+
+          // Try to highlight the issue in the dom.
+          try {
+            $timeout(function() {
+              var element = angular.element('#field .ui-select-match span.btn-default.form-control');
+              element.css('border-color', 'red').on('blur', function() {
+                element.css('border-color', '');
+              });
+            });
+          }
+          catch (e) {
+            // do nothing if we cant find the input field.
+          }
+        }
+      });
     });
 
     $scope.$on('formSubmission', function(event) {
@@ -1940,18 +1994,29 @@ app.controller('FormSubmissionController', [
     Formio
   ) {
     // Submission information.
-    $scope.submissionId = $stateParams.subId;
-    $scope.submissionUrl = $scope.formUrl;
-    $scope.submissionUrl += $stateParams.subId ? ('/submission/' + $stateParams.subId) : '';
-    $scope.submissionData = Formio.submissionData;
-    $scope.submission = {};
+    $scope.loadProjectPromise.then(function() {
+      $scope.submissionReady = false;
+      $scope.submissionId = $stateParams.subId;
+      $scope.submissionUrl = $scope.formUrl;
+      $scope.submissionUrl += $stateParams.subId ? ('/submission/' + $stateParams.subId) : '';
+      $scope.submissionData = Formio.submissionData;
+      $scope.submission = {};
+      $scope.downloadUrl = '';
+      $scope.pdfImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPoAAAD6CAMAAAC/MqoPAAAAA3NCSVQICAjb4U/gAAAC9FBMVEX///+HiYuGhomCg4aCgIF6eX12eHokJCQkICAgICAjHSOOj5KJi46DhYd1dnltb3EkICAgICAjHSOVl5qTlZeOj5KHiYt6eX0kICAjHSOZmp2Vl5qGhokkICDOz9G+vsCztbapq66cnqGbnZ6ZmZmTlZckICCbnZ6Zmp2Vl5qTlZeOj5KMioqGhomCg4aCgIGZmp2TlZeCgIGmqauho6aen6KcnqGmqaucnqGbnZ66u76cnqGZmp2Vl5rKISjS0dLR0NHOz9HMzMzHycrHxsfFxMXCwsPCw8W+vsCen6KbnZ7GISjCwsO+v8K+vsCpq66kpqmeoaObnZ7////7+/v5+vr39/j09fXz8/P88PHx8fL37+/u7+/r7O3r6+zp6uvn5+jj5+fz4+P44eLw4eHj5OXi4+Th4uPf4OLf3+Dc3t/b3N7a29z109TY2tvv1NXv0tPX2NrW19jU1tfS09XP0dLOz9Hrx8jxxMbnxsfMzMzkxMXHycrGx8nDxcfqubvCw8XCwsPkuLrutbe/wcO+v8Lftre+vsC7vb+6u763ubu1t7riqqzeqquztbbqpqmxs7bZqKmvsbOtr7Kqra+pq67bnJ7gm56mqavXnJ3nl5ulp6qkpqmjpaeho6aeoaPbj5Gen6KcnqHXjpGbnZ7jiYzfio7SjpDdiYyZmp3LjI6ZmZnahoqVl5rXgoaTlZeSk5bSgIOPkZPOf4Lgen6Oj5LLf4KLjY+Ji46HiYvVcnaGhonNcnWDhYfKcXSCg4bca3DFcXTBcHJ+gIJ9foHRZWl6fH7MZmbOZWnGZGd6eX12eHrBY2bZXGF1dnlydHa4YWNwcXTOV1vKVlvIVlrCVlnPUFW+VVnOTlS3VFe1VFbKS1HGSE3BR0y/R0y7R0zEREq2R0rSP0WzRkmtRUjBOkC4OT6zOD3OMDaqNzrBLTO2KzCzKzCuKi/KISiqKi6lKS2+ICa6HyW7Hya2HySuHiOyHiSrHiKnHSGiHCCeHB+aGx/MBOLyAAAA/HRSTlMAERERERERERERESIiIiIiIiIiMzMzMzMzM0RERERVVVVVVVVVVVVmZmZmZmZmZmZ3d3eIiIiImZmZqqqqqrvMzMzMzMzMzMzMzMzM3d3d3e7u7v////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8PeNL3AAAACXBIWXMAAC37AAAt+wH8h0rnAAAAHHRFWHRTb2Z0d2FyZQBBZG9iZSBGaXJld29ya3MgQ1M26LyyjAAAFydJREFUeJzt3Xl8FNd9AHD31K56LfSIaOumTY80aeK06R23TXq5xXV8ZIRhzWEkgkAHKICQZCwpQpZsSSsWRQdeR2hlCWEsXFkHyELmtMEkGBvnMKZ2iV1jW2COGAOSwPzT33tv5s2bY3fn+O2slg8//DFikeT97u94b2Zn5FtuuRk342bcjJtxM8zCl5nhaWRm+lJNJuHP8Psy/H6/z7uA/1oG/CvVfL+P/vJS7qP/uQx4wVOJh9f/93q6u6LRzs0dHZH29ra21taWluZwOBRqbGxsqK+vr6urra2trq6qqqqsrKyoqFhHo5TEWiFKtKE8TD6NfgF8ZUUlfJNq+G519Q2NoVA4/Lek2lJI931algO8HeCqvKGBwOsIvFqBV+jhJXHCFF+9Huj1hN7Scs/vQvZTJ/f9Ppe3mcjVlGsyrsv1mpI1mtDo6QtVyvHV1WBvDIWbW1pb2//G58tMjRwaLvAHXE7hIA9RuVzscsqNGedsHquFf6t+rqd2kndOb2ttn/2p1OQ9w58ZCHxWlbeYyUnKNXAh4cxqEuwFMLVXVpFmh3pvbYP/Zvu9n/Olot+h3AOBzwtyqHXtgNOmXN/ignuVJmQ/56s9D98J0v5YQ2O4pa090gH2jtt/LQV2WNUCgT8Tqp3KhT7n802bcrXSGXqlPrif4tfwzFM7tHsdo3ds7oR+75j9W97LM3wzA1lfUOXNOvn6anFJ0zY5r3UTucznuVfLXrbXQrO3tEU6o13RFrDf9zmv6Zl+fyCQ9cWIblGLKdc2uVLnDFoEUUj/YcH0K9XUq3hS8nUNlN7V0xMh9ujtHtMzCH3WbcqEExY1bbWLcqHS1XxTbKE2OF/Wi3aa9ua2SLS7t6+vmdpn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';
 
-    // Load the form and submissions.
-    $scope.formio = new Formio($scope.submissionUrl);
+      // Load the form and submissions.
+      $scope.formio = new Formio($scope.submissionUrl, {base: $scope.baseUrl});
 
-    // Load the submission.
-    $scope.formio.loadSubmission().then(function(submission) {
-      $scope.submission = submission;
+      $scope.loadFormPromise.then(function(form) {
+        $scope.formio.getDownloadUrl(form).then(function(url) {
+          $scope.downloadUrl = url;
+        });
+
+        $scope.formio.loadSubmission().then(function(submission) {
+          $scope.submission = submission;
+          $scope.submissionReady = true;
+        });
+      });
     });
   }
 ]);
@@ -2019,7 +2084,7 @@ app.controller('FormPermissionController', [
     $scope
   ) {
     $scope.$on('permissionsChange', function() {
-      $scope.formio.saveForm($scope.currentForm);
+      $scope.formio.saveForm(angular.copy($scope.currentForm));
     });
   }
 ]);

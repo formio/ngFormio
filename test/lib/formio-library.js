@@ -4,14 +4,14 @@ var assert = require('assert');
 var request = require('request');
 var chance = (new require('chance'))();
 var _ = require('lodash');
+var dragAndDrop = require('html-dnd').code;
 
-module.exports = function(config) {
+module.exports = function (config) {
   // Global timeout for wait* commands.
-  var timeout = 3000;
+  var timeout = 10000;
   var state = {};
   var projects = {};
-  var helpPage = 'http://formio.github.io/help.form.io';
-  var helpformio = 'https://help.form.io';
+  var theProject;
 
   /**
    * Wrap the string function for usernames.
@@ -287,15 +287,12 @@ module.exports = function(config) {
    * @param description
    * @param next
    */
+  var theProject;
   var createProject = function (driver, title, description, next) {
-    driver.localStorage('GET', 'formioToken', function (err, res) {
-      if (err) {
-        return next(err);
-      }
-      if (!res || !res.value) {
+    browser.executeScript("return localStorage.getItem('formioToken');").then(function (res) {
+      if (!res) {
         return next('Not Authenticated!');
       }
-
       request({
         rejectUnauthorized: false,
         uri: config.serverProtocol + '://api.' + config.serverHost + '/project',
@@ -305,9 +302,12 @@ module.exports = function(config) {
           description: description
         },
         headers: {
-          'x-jwt-token': res.value
+          'x-jwt-token': res
         }
       }, function (err, response, body) {
+        var json = JSON.parse(body);
+        theProject = json.name;
+        browser.executeScript("return localStorage.setItem('projectName','" + JSON.parse(body).name + "');");
         handleResponse(driver, err, response, body, function (err, result) {
           if (err) {
             next(err);
@@ -331,11 +331,70 @@ module.exports = function(config) {
     next(null, projects[title]);
   };
 
-  this.iSeeElement = function(ele){
-    it('I see the element '+ele, function(next){
+  var scrollTo = function(ele) {
+    return ele.getLocation()
+      .then(function(location) {
+        return browser.executeScript('window.scrollTo(' + location.x + ', ' + (location.y - 100) + ');');
+      });
+  };
+
+  /**
+   * This wrapper function does two things.
+   *
+   * 1. Waits for the element to be present.
+   * 2. Catches StaleElementReferenceException which happens when selenium picks an old copy of the item.
+   *
+   * @param selector
+   * @returns {Promise}
+   */
+  var getElement = function(selector) {
+    var ele = element.all(selector).first();
+
+    return new Promise(function (resolve, reject) {
+      browser.wait(function () {
+          return ele.isPresent();
+        }, timeout)
+        .then(function () {
+          resolve(ele);
+        })
+        .catch(function (e) {
+          reject(e);
+        });
+    });
+  };
+
+  var createForm = function (projectName, formData, formio_token, next) {
+    request({
+      rejectUnauthorized: false,
+      uri: config.serverProtocol + '://' + projectName + '.' + config.serverHost + '/form',
+      method: 'POST',
+      body: JSON.stringify(formData),
+      headers: {
+        'Content-Type': 'application/json',
+        'x-jwt-token': formio_token
+      }
+    }, function (err, response, body) {
+      if (err || response.statusCode != 201) {
+        return next(JSON.parse(response.body).message);
+      }
+      if (response.headers['x-jwt-token']) {
+        if (typeof body === 'string') {
+          try {
+            body = JSON.parse(body);
+          }
+          catch (e) {
+          }
+        }
+        next(null, body);
+      }
+    });
+  };
+
+  this.iSeeElement = function (ele) {
+    it('I see the element ' + ele, function (next) {
       var EC = protractor.ExpectedConditions;
       var elt = element(by.css(ele));
-      browser.wait(EC.visibilityOf(elt), 5000);
+      browser.wait(EC.visibilityOf(elt), timeout);
       next();
     });
   };
@@ -343,24 +402,61 @@ module.exports = function(config) {
   this.enterTextInField = function (field, text) {
     it('I enter ' + text + ' in ' + field + ' field', function (next) {
       text = replacements(text.toString());
+      //console.log(text);
+      //var ele = text.startsWith("xpath:") ? element(by.xpath(text.substring(text.indexOf(':') + 1))) : element(by.css(field));
       var ele = element(by.css(field));
+      //console.log(ele);
       browser.wait(function () {
         return ele.isPresent();
-      }, timeout);
-      ele.clear().sendKeys(text).then(next).catch(next);
+      }, timeout).then(function () {
+        ele.clear().sendKeys(text).then(next).catch(next);
+      });
     });
   };
+
+  /*this.enterNumberAndValidate = function (field, num) {
+   it('I enter ' + num + ' in ' + field + ' field', function (next) {
+   //text = replacements(text.toString());
+   var ele = element(by.css(field));
+   browser.wait(function () {
+   return ele.isPresent();
+   }, timeout).then(function () {
+   ele.clear().sendKeys(num).then(function (res) {
+   return !res;
+   })
+   }, timeout).then(function (value) {
+   try {
+   if(num>22){
+   assert.equal(value, 'numberField must be less than or equal to 22.');
+   next();}
+   else if(num<2 ){
+   assert.equal(value, 'numberField must be greater than or equal to 2.');
+   next();}
+   else next();
+   } catch (err) {
+   next(err);
+   };
+   });
+   });
+   };*/
 
   this.checkingUrlIamOn = function (url) {
     if (!url.toLowerCase().includes('http')) {
       url = config.baseUrl + "/" + url;
     }
     it('I am on ' + url, function (next) {
-      browser.getCurrentUrl().then(function (cUrl) {
-        config.expect(cUrl.toLowerCase()).to.equal(url.toLowerCase());
-        next();
-      })
-        .catch(next);
+      browser.wait(function () {
+        return browser.getCurrentUrl().then(function (cUrl) {
+          return cUrl.toLowerCase() == url.toLowerCase();
+        });
+      }, timeout).then(function (value) {
+        try {
+          assert.equal(value, true);
+          next();
+        } catch (err) {
+          next(err);
+        }
+      });
     });
   };
 
@@ -370,10 +466,40 @@ module.exports = function(config) {
     });
   };
 
-  this.iDonotSeeText = function (text) {
-    it('I donot see "' + text + '"', function (next) {
+  this.waitForClassRemoval = function(className) {
+    it('Wait for class ' + className + ' to disappear', function (next) {
       try {
-        config.expect(element(by.xpath("//*[text()='" + text + "']")).isPresent()).to.become(false).and.notify(next);
+        var ele = element(by.className(className));
+        browser.wait(function() {
+          return ele.isPresent().then(function(present) {
+            return !present;
+          });
+        }, timeout).then(function() {
+          next();
+        }).catch(next);
+      }
+      catch (e) {
+        next(e);
+      }
+    });
+  };
+
+  this.iDonotSeeText = function (text) {
+    it('I do not see "' + text + '"', function (next) {
+      try {
+        var ele = element(by.xpath("//*[text()='" + text + "']"));
+        browser.wait(function () {
+          return ele.isPresent().then(function (res) {
+            return !res;
+          })
+        }, timeout).then(function (value) {
+          try {
+            assert.equal(value, true);
+            next();
+          } catch (err) {
+            next(err);
+          }
+        });
       } catch (err) {
         next(err);
       }
@@ -383,7 +509,7 @@ module.exports = function(config) {
   this.iSeeText = function (text) {
     it('I see text "' + text + '"', function (next) {
       try {
-        var xpath = "//*[contains(text(),'" + text + "')]";
+        var xpath = '//*[contains(text(),"' + replacements(text) + '")]';
         browser.wait(function () {
           return element(by.xpath(xpath)).isPresent();
         }, timeout).then(function (result) {
@@ -410,27 +536,146 @@ module.exports = function(config) {
   };
 
   this.clickOnElementWithText = function (text) {
-    it('I click on the ' + text, function (next) {
-      var ele = element(by.xpath('//*[text()="' + text + '"]'));
+    it('I click on the ' + text + ' text', function (next) {
+      var ele =  element(by.xpath('//*[text()="' + replacements(text.toString()) + '"]'));
+     // console.log(ele);
       browser.wait(function () {
         return ele.isPresent();
-      }, config.timeout);
-      ele.click().then(next).catch(next);
+      }, timeout).then(function (res) {
+        scrollTo(ele)
+          .then(function() {
+            ele.click().then(next).catch(next);
+          });
+      });
+    });
+  };
+
+  this.clickOnLink = function (text) {
+    it('I click on the ' + text + ' link', function (next) {
+      try {
+        var selector = by.partialLinkText(replacements(text.toString()));
+        getElement(selector)
+          .then(function(ele) {
+            scrollTo(ele)
+              .then(function() {
+                // Refresh element to make sure it is the most recent.
+                ele = element.all(selector).first();
+                ele.click().then(next);
+              });
+          });
+      }
+      catch (e) {
+        next(e);
+      }
+    });
+  };
+
+  this.clickOnButton = function (text) {
+    it('I click on the ' + text + ' button', function (next) {
+      var ele =  element(by.partialButtonText(replacements(text.toString())));
+      browser.wait(function () {
+        return ele.isPresent();
+      }, timeout).then(function (res) {
+        scrollTo(ele)
+          .then(function() {
+            ele.click().then(next).catch(next);
+          });
+      });
+    });
+  };
+
+  this.clickOnClass = function (className) {
+    it('I click on the ' + className + ' class', function (next) {
+      var ele =  element(by.className(replacements(className.toString())));
+      browser.wait(function () {
+        return ele.isPresent();
+      }, timeout).then(function (res) {
+        scrollTo(ele)
+          .then(function() {
+            ele.click().then(next).catch(next);
+          });
+      });
+    });
+  };
+
+  this.iGoToEnv = function (env) {
+    it('I go to environment ' + env, function(next) {
+      var envTab = element(by.xpath('//a[contains(@class, "environment-tab") and contains(text(),"' + env + '")]'));
+      browser.wait(function () {
+        return envTab.isPresent();
+      }, timeout).then(function (res) {
+        scrollTo(envTab)
+          .then(function() {
+            envTab.click().then(next).catch(next);
+          });
+      });
+    });
+  };
+
+  this.envHasTag = function(env, tag) {
+    it('Environment ' + env + ' has tag ' + tag, function(next) {
+      var envTab = element(by.xpath('//a[contains(@class, "environment-tab") and contains(text(),"' + env + '")]/span[text()="' + tag + '"]'));
+      browser.wait(function () {
+        return envTab.isPresent();
+      }, timeout).then(function() {
+        next();
+      });
+    });
+  };
+
+  this.selectOption = function(select, option) {
+    it('Selects ' + option + ' in ' + select, function(next) {
+      var sel = element(by.xpath('//select[contains(@class, "' + select + '")]'));
+      //var sel = element(by.css(select));
+      browser.wait(function() {
+        return sel.isPresent();
+      }, timeout).then(function() {
+        sel.click().then(function() {
+          var opt = element(by.xpath('//select[contains(@class, "' + select + '")]/option[@label="' + option + '"]'));
+          opt.click().then(next);
+        });
+      });
+    });
+  };
+
+  this.iSeeEnv = function (env) {
+    it('I see environment ' + env, function(next) {
+      var envTab = element(by.xpath('//a[contains(@class, "environment-tab") and contains(text(),"' + env + '")]'));
+      browser.wait(function () {
+        return envTab.isPresent();
+      }, timeout).then(function () {
+        next();
+      });
+    });
+  };
+
+  this.iDontSeeEnv = function (env) {
+    it('I see environment ' + env, function(next) {
+      var envTab = element(by.xpath('//a[contains(@class, "environment-tab") and contains(text(),"' + env + '")]'));
+      browser.wait(function () {
+        return envTab.isPresent().then(function(res) {
+          return !res;
+        });
+      }, timeout).then(function () {
+        next();
+      });
     });
   };
 
   this.iSeeTextIn = function (ele, text) {
     it('I see text "' + text + '"', function (next) {
-      ele = (typeof (ele) == 'object') ? ele : element(by.css(ele, text));
+      text = replacements(text);
+      ele = (typeof (ele) == 'object') ? ele : element(by.cssContainingText(ele, text));
       browser.wait(function () {
         return ele.isPresent();
-      }, config.timeout);
-      try {
-        config.expect(ele.getText()).to.eventually.equal(text);
-        next();
-      } catch (err) {
-        next(err);
-      }
+      }, timeout).then(function () {
+        try {
+          config.expect(ele.getText()).to.eventually.equal(text);
+          next();
+        } catch (err) {
+          next(err);
+        }
+      });
     });
   };
 
@@ -451,7 +696,7 @@ module.exports = function(config) {
   };
 
   this.logout = function () {
-    it('I am logging out', function (next) {
+    it('Clear login state', function (next) {
       try {
         browser.executeScript('localStorage.clear();')
           .then(browser.refresh())
@@ -467,22 +712,50 @@ module.exports = function(config) {
   this.btnDisabled = function (field) {
     it('I see ' + field + ' button is disabled', function (next) {
       try {
-        var btn = element(by.xpath('//button[text()=\'' + field + '\']'));
-        config.expect(btn.isEnabled()).to.eventually.equal(false);
-        next();
+        var btn = element(by.partialButtonText(field));
+        browser.wait(function () {
+          return btn.isPresent().then(function (present) {
+            if (present) {
+              return btn.isEnabled().then(function (res) {
+                return !res;
+              });
+            }
+            return present;
+          });
+        }, timeout).then(function (value) {
+          try {
+            assert.equal(value, true);
+            next();
+          } catch (err) {
+            next(err);
+          }
+        });
       } catch (err) {
         next(err);
       }
     });
   };
 
-  this.btnEnabled = function(field){
-    it('I see ' +field+ ' button is Enabled', function(next){
-      try{
-        var btn = element(by.xpath('//button[text()=\'' + field + '\']'));
-        config.expect(btn.isEnabled()).to.eventually.equal(true);
-        next();
-      } catch(err) {
+  this.btnEnabled = function (field) {
+    it('I see ' + field + ' button is Enabled', function (next) {
+      try {
+        var btn = element(by.xpath('//button[text()="' + field + '"]'));
+        browser.wait(function () {
+          return btn.isPresent().then(function (present) {
+            if (present) {
+              return btn.isEnabled();
+            }
+            return present;
+          });
+        }, timeout).then(function (value) {
+          try {
+            assert.equal(value, true);
+            next();
+          } catch (err) {
+            next(err);
+          }
+        });
+      } catch (err) {
         next(err);
       }
     });
@@ -490,11 +763,12 @@ module.exports = function(config) {
 
   this.clickOnElement = function (text) {
     it('I click on the ' + text, function (next) {
-      var ele = element(by.css(text));
+      var ele = text.startsWith("xpath:") ? element(by.xpath(text.substring(text.indexOf(':') + 1))) : element(by.css(text));
       browser.wait(function () {
         return ele.isPresent();
-      }, config.timeout);
-      ele.click().then(next).catch(next);
+      }, timeout).then(function () {
+        ele.click().then(next).catch(next);
+      });
     });
   };
 
@@ -502,10 +776,10 @@ module.exports = function(config) {
     it('I have been logged in', function (next) {
       var tries = 0;
       (function attempt() {
-        if (tries > 15) {
+        if (tries > 25) {
           return next(new Error('No formioToken found.'));
         }
-        browser.sleep(50).then(function () {
+        browser.sleep(100).then(function () {
           browser.executeScript("return localStorage.getItem('formioToken');")
             .then(function (res) {
               if (res) {
@@ -521,15 +795,15 @@ module.exports = function(config) {
     })
   };
 
-  this.iAmLoggedInFor = function(tempUser) {
-    it("I am logged in for "+tempUser,function(next){
+  this.iAmLoggedInFor = function (tempUser) {
+    it("I am logged in for " + tempUser, function (next) {
       if (!next && tempUser) {
         next = tempUser;
         tempUser = null;
       }
       var driver = browser;
       if (tempUser && state[tempUser]) {
-        authUser(driver, 'formio', 'user/login', state[tempUser].email, state[tempUser].password, function(err, res) {
+        authUser(driver, 'formio', 'user/login', state[tempUser].email, state[tempUser].password, function (err, res) {
           if (err) {
             return next(err);
           }
@@ -544,8 +818,8 @@ module.exports = function(config) {
         state[tempUser].fullName = chance.name();
         state[tempUser].name = chance.username();
         state[tempUser].email = chance.email();
-        state[tempUser].password = chance.word({ length: 10 });
-        createAndAuthUser(driver, state[tempUser].name, state[tempUser].email, state[tempUser].password, function(err, res) {
+        state[tempUser].password = chance.word({length: 10});
+        createAndAuthUser(driver, state[tempUser].name, state[tempUser].email, state[tempUser].password, function (err, res) {
           if (err) {
             return next(err);
           }
@@ -602,17 +876,18 @@ module.exports = function(config) {
       else {
         browser.wait(function () {
           return element(by.xpath('//div[@ng-repeat="project in projects"]')).isPresent();
-        }, config.timeout);
-        try {
-          element.all(by.xpath('//div[@ng-repeat="project in projects"]')).getText().then(function (res) {
-            var arr = new Array(res);
-            var merged = [].concat.apply([], arr);
-            config.expect(merged.length).to.equal(num);
-          });
-          next();
-        } catch (err) {
-          next(err);
-        }
+        }, timeout).then(function () {
+          try {
+            element.all(by.xpath('//div[@ng-repeat="project in projects"]')).getText().then(function (res) {
+              var arr = new Array(res);
+              var merged = [].concat.apply([], arr);
+              config.expect(merged.length).to.equal(num);
+            });
+            next();
+          } catch (err) {
+            next(err);
+          }
+        });
       }
     });
   };
@@ -634,18 +909,19 @@ module.exports = function(config) {
     });
   };
 
-  this.iSeeValueIn = function(ele,text){
+  this.iSeeValueIn = function (ele, text) {
     text = replacements(text.toString());
-    it('I see text '+text+' in '+ele, function (next) {
+    it('I see text ' + text + ' in ' + ele, function (next) {
       var ele1 = (typeof (ele) == 'object') ? ele : element(by.css(ele, text));
       browser.wait(function () {
         return ele1.isPresent();
-      }, config.timeout);
-      ele1.getAttribute('value').then(function (value) {
-        config.expect(value===text);
-        next();
-      })
-        .catch(next);
+      }, timeout).then(function () {
+        ele1.getAttribute('value').then(function (value) {
+          config.expect(value === text);
+          next();
+        })
+          .catch(next);
+      });
     });
   };
 
@@ -661,29 +937,22 @@ module.exports = function(config) {
     });
   };
 
-  this.goToHelpPage = function (url) {
-    it('I go to ' + url, function (next) {
-      url = helpformio + "/" + url;
-      browser.get(url).then(next).catch(next);
-    });
-  };
-
-  this.iDonotSeeElement = function(ele){
-    it('I donot see the element '+ele, function(next){
+  this.iDonotSeeElement = function (ele) {
+    it('I donot see the element ' + ele, function (next) {
       var elt = element(by.css(ele));
       browser.wait(function () {
         return elt.isPresent();
-      }, config.timeout).then(function(){
-        elt.isDisplayed().then(function(visible){
-          assert.equal(visible,false);
+      }, timeout).then(function () {
+        elt.isDisplayed().then(function (visible) {
+          assert.equal(visible, false);
         });
         next();
       });
     });
   };
 
-  this.valueUpdate = function(ele,newVal,oldVal){
-    it('The user account for '+ele+' was updated with '+newVal+' for '+oldVal, function(next) {
+  this.valueUpdate = function (ele, newVal, oldVal) {
+    it('The user account for ' + ele + ' was updated with ' + newVal + ' for ' + oldVal, function (next) {
       ele = ele.toString();
       if (newVal === '${random}') {
         assert.equal(_.has(state, ele + '.' + oldVal + '_old'), true);
@@ -698,8 +967,8 @@ module.exports = function(config) {
     });
   };
 
-  this.valueChanged = function(user){
-    it('The user profile for '+user+' was changed.', function(next) {
+  this.valueChanged = function (user) {
+    it('The user profile for ' + user + ' was changed.', function (next) {
       var _fullName = user.toString() + '.fullName';
       var _name = user.toString() + '.name';
       var _email = user.toString() + '.email';
@@ -710,7 +979,7 @@ module.exports = function(config) {
       var password = replacements('${' + _password + '}');
 
       var driver = browser;
-      authUser(driver, 'formio', 'user/login', email, password, function(err, res) {
+      authUser(driver, 'formio', 'user/login', email, password, function (err, res) {
         if (err) {
           return next(err);
         }
@@ -724,11 +993,11 @@ module.exports = function(config) {
 
         // Compare old values if present.
         [
-          { current: fullName, label: _fullName },
-          { current: name, label: _name },
-          { current: email, label: _email },
-          { current: password, label: _password }
-        ].forEach(function(element) {
+          {current: fullName, label: _fullName},
+          {current: name, label: _name},
+          {current: email, label: _email},
+          {current: password, label: _password}
+        ].forEach(function (element) {
           if (_.has(state, element.label + '_old')) {
             assert.notEqual(element.current, _.get(state, element.label + '_old'));
           }
@@ -739,4 +1008,188 @@ module.exports = function(config) {
     })
   };
 
+  this.portalIamOn = function (title) {
+    title = replacements(title.toString());
+    it('I am on page "' + title + '"', function (next) {
+      try {
+        var xpath = "//*[@class='project-title']";
+        browser.wait(function () {
+          return element(by.xpath(xpath)).isPresent();
+        }, timeout).then(function (result) {
+          var elet = element.all(by.xpath(xpath))
+          elet.getAttribute('value').then(function (value) {
+            config.expect(value === title);
+            next();
+          });
+        });
+      } catch (err) {
+        next(err);
+      }
+    });
+  };
+
+  this.clickOnElementIn = function (ele, text) {
+    text = replacements(text.toString());
+    it('I click on the ' + text + ' in' + ele + ' element', function (next) {
+      var ele = element(by.xpath('//*[text()=\'' + name + '\']//..//..//..//*[contains(@class,\'' + button + '\')]'));
+      browser.wait(function () {
+        return ele.isPresent();
+      }, timeout).then(function () {
+        ele.click().then(next).catch(next);
+      });
+    });
+  };
+
+  this.projectPageIamOn = function (page, title) {
+    title = replacements(title.toString());
+    it('I am on ' + page + ' page of the ' + title + 'project', function (next) {
+      try {
+        browser.getCurrentUrl().then(function(res){
+          var path = res.split("/");
+          config.expect(path[path.length - 1] ==  page)
+        });
+
+        //var x = (path[path.length - 1] + '*') == "*" ? path[path.length - 2] : path[path.length - 1];
+        var xpath = "//*[@class='project-title']";
+        browser.wait(function () {
+          return element(by.xpath(xpath)).isPresent();
+        }, timeout).then(function (result) {
+          var elet = element.all(by.xpath(xpath))
+          elet.getAttribute('value').then(function (value) {
+            config.expect(value === title);
+            next();
+          })
+
+        });
+      } catch (err) {
+        next(err);
+      }
+    });
+  };
+
+  this.projectExisting = function (title, description) {
+    title = replacements(title);
+    it("Project exists with " + title + ' name', function (next) {
+      try {
+        description = replacements(description);
+        var driver = browser;
+        createProject(driver, title, description, function (err, res) {
+          if (err) {
+            return next(err);
+          }
+          browser.refresh().then(function () {
+            next(null,res);
+          });
+        });
+      } catch (err) {
+        next(err);
+      }
+    });
+  };
+
+  this.dragTo = function (field, dropZone) {
+    it("Drag " + field + " to " + dropZone, function(next) {
+      const ele = element(by.xpath('//span[@title="' + field + '"]'));
+      browser.wait(function () {
+        return ele.isPresent();
+      }, timeout).then(function () {
+        const drop = element(by.xpath('//*[contains(@class, "' + dropZone + '")]//ul[contains(@class, "component-list")]'));
+        browser.executeScript(dragAndDrop, ele, drop, 0, 0)
+          .then(next);
+      });
+    });
+  };
+
+  this.pause = function() {
+    it('Pauses', function(next) {
+      browser.pause();
+    });
+  };
+
+  this. clearTextFromField = function (field) {
+    it('I clear' + field + ' field', function (next) {
+      var ele = element(by.css(field));
+      browser.wait(function () {
+        return ele.isPresent();
+      }, timeout).then(function () {
+        ele.clear().then(next).catch(next);
+      });
+    });
+  };
+  var createForm = function ( formData, formio_token, next) {
+    request({
+      rejectUnauthorized: false,
+      uri: config.serverProtocol + '://' + config.serverHost+'/'+theProject + '/form',
+      method: 'POST',
+      body: JSON.stringify(formData),
+      headers: {
+        'Content-Type': 'application/json',
+        'x-jwt-token': formio_token
+      }
+    }, function (err, response, body) {
+      console.log("uri -> "+ config.serverProtocol + '://' + config.serverHost+'/'+theProject + '/form' );
+      if (err || response.statusCode != 201) {
+        console.log(response + "<-->"+ response.statusCode);
+        return next(JSON.parse(response.body).message);
+      }
+      if (response.headers['x-jwt-token']) {
+        if (typeof body === 'string') {
+          try {
+            body = JSON.parse(body);
+          }
+          catch (e) {
+          }
+        }
+        next(null, body);
+      }
+    });
+  };
+
+  this.creatingForm = function () {
+    it('creating form', function (next) {
+      var formData = require('../createform.json');
+      browser.executeScript("return localStorage.getItem('formioToken');").then(function (res) {
+        createForm(formData, res, function (err, user) {
+          if (err || user == "Bad Token") {
+            return next(new Error(err));
+          }
+          next();
+        });
+      });
+    });
+  };
+
+  this.creatingFormWithComponents = function (comps) {
+    it('creating form', function (next) {
+      var formData = {
+        display: "form"
+        , components: []
+        , "type": "form"
+      };
+      var components = require('../components.json');
+      formData.title = "sampletestform";
+      formData.path = "sampletestpath";
+      formData.name = "sampletestname";
+      //components.textfield.label = "textfield";
+      formData.components.push(components.number);
+      //formData.components.push(components.password);
+       //formData.components.push(components.textarea);
+      //formData.components.push(components.checkbox);
+      formData.components.push(components.selectboxes);
+      //formData.components.push(components.select);
+     // formData.components.push(components.radio);
+      //formData.components.push(components.htmlelement);
+      //formData.components.push(components.htmlelement);
+
+      formData.components.push(components.button);
+      browser.executeScript("return localStorage.getItem('formioToken');").then(function (res) {
+        createForm(formData, res, function (err, user) {
+          if (err || user == "Bad Token") {
+            return next(new Error(err));
+          }
+          next();
+        });
+      });
+    });
+  };
 };

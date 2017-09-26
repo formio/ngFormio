@@ -1,16 +1,16 @@
-<upgrade-warning ng-if="!minPlan('commercial')" warning="Upgrade your project to Commercial to enable creating environments." />
-<div class="project-section-inner-content">
-  <h2>New Environment</h2>
+<upgrade-warning ng-if="!minPlan('commercial')" warning="Upgrade your project to Enterprise to enable creating stages." />
+<div class="project-section-inner-content project-env-create">
+  <h2>New Stage</h2>
   <div class="row">
     <div class="col-sm-8 col-margin-bottom">
       <ng-include src="'views/project/env/settings.html'"></ng-include>
     </div>
     <div class="col-sm-4">
       <div class="panel panel-primary">
-        <div class="panel-heading">Project Environments</div>
+        <div class="panel-heading">Project Stages</div>
         <div class="panel-body">
-          <p>Project Environments allow testing out configuration changes before pushing them to your Live environment.</p>
-          <p>Creating Dev and Test environments are a good way to start. You can use tagging to tag your forms, resources, roles and project access settings. Then deploy them to another environment.</p>
+          <p>Project Stages allow testing out configuration changes before pushing them to your Live stage.</p>
+          <p>Creating Dev and Test stages are a good way to start. You can use tagging to tag your forms, resources, roles and project access settings. Then deploy them to another stage.</p>
         </div>
       </div>
     </div>

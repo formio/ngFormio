@@ -55,7 +55,10 @@ app.controller('AccessController', ['$scope', function($scope) {
   };
 
   $scope.$on('permissionsChange', function() {
-    $scope.formio.saveProject($scope.currentProject);
+    $scope.status.save = 'saving';
+    $scope.formio.saveProject($scope.currentProject).then(function() {
+      $scope.status.save = 'saved';
+    });
   });
 }]);
 

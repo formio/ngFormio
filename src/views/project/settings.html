@@ -19,6 +19,29 @@
       </ui-select-choices>
     </ui-select>
   </div>
+  <div ng-if="!project._id">
+    <div class="panel panel-default">
+      <div class="panel-heading" role="tab" id="advancedHeading">
+        <h4 class="panel-title">
+          <a role="button" data-toggle="collapse" href="#advanced" aria-controls="advanced">
+            Advanced Options
+          </a>
+        </h4>
+      </div>
+      <div id="advanced" class="panel-collapse collapse" role="tabpanel" aria-labelledby="advancedHeading">
+        <div class="panel-body">
+          <div ng-if="!hasTemplate">
+            <span class="btn btn-default btn-block btn-file">
+              Upload A Project Template <input id="template-select" type="file" accept=".json" onchange="angular.element(this).scope().loadTemplate.call(this)">
+            </span>
+          </div>
+          <div ng-if="hasTemplate">
+            Template added. <a ng-click="removeTemplate()">remove</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   <br />
   <a ui-sref="project.overview()" class="btn btn-default" ng-if="project._id">Cancel</a>
   <button type="submit" class="btn btn-primary" ng-disabled="projectForm.$invalid"><i ng-if="isBusy" class="fa fa-spinner fa-pulse"></i> {{ project._id ? 'Save Project' : 'Create Project'}}</button>

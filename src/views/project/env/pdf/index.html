@@ -25,6 +25,7 @@ docker run -itd \
   -e "FORMIO_S3_REGION=[YOUR S3 REGION]" \
   -e "FORMIO_S3_KEY=[YOUR S3 AUTH KEY]" \
   -e "FORMIO_S3_SECRET=[YOUR S3 AUTH SECRET]" \
+  --restart unless-stopped \
   --name formio-files-core \
   -p 80:4005 \
   formio/formio-files-core;
@@ -118,7 +119,7 @@ docker run -itd \
       </ul></td>
       <td>
         <ul class="list-inline">
-          <li><button class="btn btn-default" ng-click="deletePDF(pdf)"><span class="glyphicon glyphicon-trash"></span></button></li>
+          <li><button class="btn btn-default" ng-if="canDelete(pdf)" ng-click="deletePDF(pdf)"><span class="glyphicon glyphicon-trash"></span></button></li>
         </ul>
       </td>
     </tr>

@@ -1,0 +1,33 @@
+<div class="panel panel-success">
+  <div class="panel-heading">
+    <h3 class="panel-title">Install ng-formio</h3>
+  </div>
+  <div class="panel-body">
+    <p>To start, you will need to install the <strong>ng-formio</strong> library.</p>
+    <strong>NPM</strong>
+    <pre><code>npm install --save ng-formio</code></pre>
+    <strong>Bower</strong>
+    <pre><code>bower install --save ng-formio</code></pre>
+  </div>
+</div>
+<div class="panel panel-success">
+  <div class="panel-heading">
+    <h3 class="panel-title">Include the <strong>formio</strong> module</h3>
+  </div>
+  <div class="panel-body">
+    <p>Next, include the formio module in your AngularJS application.</p>
+    <pre><code>angular.module('yourApp', [
+      &nbsp;&nbsp;'formio'
+      ]);</code></pre>
+  </div>
+</div>
+
+<div class="panel panel-success">
+  <div class="panel-heading">
+    <h3 class="panel-title">Embed the <strong>&lt;formio&gt;</strong> directive</h3>
+  </div>
+  <div class="panel-body">
+    <p>To embed this form, simply place this directive anywhere in a template. Please note that there are single quotes inside the double quotes. This is since the src of the form is interpolated by angular. You can use a variable as well.</p>
+    <span><pre><code>&lt;formio src="'{{ projectUrl }}/{{ form.path }}'" /&gt;</code></pre></span>
+  </div>
+</div>

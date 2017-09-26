@@ -1,0 +1,49 @@
+<upgrade-warning ng-if="!minPlan('team')" warning="Upgrade your project to a team or commercial plan to enable Remote Environments."></upgrade-warning>
+<div class="panel panel-default">
+  <div class="panel-heading">Remote Environment</div>
+  <div class="panel-body" ng-controller="ProjectRemoteController">
+    <div ng-if="!localProject.remote">
+      <h3>Connect to remote environment</h3>
+      <div ng-if="!remoteProjects">
+        <div>Enter the information for your remote environment to use for this stage.</div>
+        <label class="control-label"><strong>Server URL</strong></label>
+        <input type="text" class="form-control" id="serverURL" ng-model="remote.url" placeholder="https://myremoteserver.com" />
+        <p class="text-muted">Use the root url of the environment, not a project url.</p>
+        <label class="control-label"><strong>Portal Secret</strong></label>
+        <input type="text" class="form-control" id="portalSecret" ng-model="remote.secret" placeholder="abcdefg123456" />
+        <p class="text-muted">The secret key for authentication between the portal and your remote environment. Configured in the PORTAL_SECRET environment variable on your server.</p>
+        <div class="form-group">
+          <label class="control-label"><strong>Project Path Type</strong></label>
+          <select class="form-control" ng-options="option as option for option in environmentTypes" ng-model="remote.type" placeholder="Project Paths">
+          </select>
+          <p class="text-muted">
+            Project path type depends on how DNS is set up for your remote environment. If you have a wildcard DNS entry for the domain use Subdomain. <br />
+            Subdomain is https://myproject.example.com. * Must have wildcard DNS set up on the environment.<br />
+            Subdirectory is https://example.com/myproject. <br />
+          </p>
+        </div>
+        <div class="btn btn-primary" ng-click="check()">Continue</div>
+        <div ng-if="remoteError" class="text-danger">{{remoteError}}</div>
+      </div>
+      <div ng-if="remoteProjects">
+        <span><strong>Select an existing stage or a new stage:</strong></span>
+        <ui-select name="selectProject" class="" ng-model="remote.project" theme="bootstrap">
+          <ui-select-match>{{$select.selected.title}} ({{$select.selected.name}})</ui-select-match>
+          <ui-select-choices repeat="project in remoteProjects | filter:$select.search">
+            {{project.title}} ({{project.name}})
+          </ui-select-choices>
+        </ui-select>
+        <div class="btn btn-primary" ng-click="connect()">Connect Stage</div>
+        <div ng-if="remoteError" class="text-danger">{{remoteError}}</div>
+      </div>
+    </div>
+    <div ng-if="localProject.remote">
+      <div><strong>Remote Environment:</strong></div>
+      <div>{{ localProject.remote.url }}</div>
+      <div><strong>Stage:</strong></div>
+      <div>{{ localProject.remote.project.title}} ({{ localProject.remote.project.name }})</div>
+      <div class="btn btn-default" ng-click="disconnect()">Disconnect</div>
+    </div>
+  </div>
+</div>
+<!--<button class="btn btn-primary" ng-click="saveProject()">Save Settings</button>-->
