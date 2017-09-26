@@ -173,7 +173,10 @@ app.controller('ProjectCreateController', [
       $scope.isBusy = true;
       FormioProject.createProject($scope.project).then(function(project) {
         $scope.isBusy = false;
-        $state.go('project.overview', {projectId: project._id});
+        // Reset tour and go directly to it.
+        sessionStorage.removeItem('stepFlowCurrentParentStep');
+        sessionStorage.removeItem('stepFlowCurrentChildStep');
+        $state.go('project.tour', {projectId: project._id});
       });
     };
   }
@@ -398,13 +401,6 @@ app.controller('ProjectController', [
       $scope.projectsLoaded = true;
       var allowedFiles, allow, custom;
 
-      var currTime = (new Date()).getTime();
-      var projTime = (new Date(result.created.toString())).getTime();
-      var delta = Math.ceil(parseInt((currTime - projTime) / 1000));
-      var day = 86400;
-      var remaining = 30 - parseInt(delta / day);
-      $scope.trialDaysRemaining = remaining > 0 ? remaining : 0;
-
       try {
         allowedFiles = JSON.parse(localStorage.getItem('allowedFiles')) || {};
       }
@@ -483,6 +479,17 @@ app.controller('ProjectController', [
         primaryProjectQ.resolve($scope.localProject);
       }
       $scope.primaryProjectPromise.then(function(primaryProject) {
+        var currTime = (new Date()).getTime();
+        var trialTime = (new Date(primaryProject.trial.toString())).getTime();
+        var createTime = (new Date(primaryProject.created.toString())).getTime();
+        var delta = Math.ceil(parseInt((currTime - trialTime) / 1000));
+        var day = 86400;
+        var trialRemaining = 30 - parseInt(delta / day);
+        var createdDays = parseInt(Math.ceil(parseInt((currTime - createTime) / 1000)) / day);
+
+        $scope.trialDaysRemaining = trialRemaining > 0 ? trialRemaining : 0;
+        $scope.createdDays = createdDays;
+
         PrimaryProject.set(primaryProject, $scope);
       });
 

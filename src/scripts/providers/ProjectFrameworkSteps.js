@@ -20,12 +20,14 @@ app.constant('ProjectFrameworkSteps', function(framework) {
         {
           step: 'download',
           title: 'Download',
+          next: 'Download a starterkit application',
           icon: 'fa fa-download',
           template: 'views/project/tour/download.html'
         },
         {
           step: 'configure',
           title: 'Configure',
+          next: 'Configure the starterkit application',
           icon: 'fa fa-sliders',
           template: 'views/project/tour/configure.html'
         }
@@ -34,6 +36,7 @@ app.constant('ProjectFrameworkSteps', function(framework) {
     {
       step: 'user',
       title: 'Application User',
+      next: 'Create an Admin user for your application',
       icon: 'fa fa-user-plus',
       template: 'views/project/tour/user.html',
       children: []
@@ -47,12 +50,14 @@ app.constant('ProjectFrameworkSteps', function(framework) {
         {
           step: 'form',
           title: 'Add a new form',
+          next: 'Create a new form to put in your application',
           icon: 'fa fa-newspaper-o',
           template: 'views/project/tour/form.html'
         },
         {
           step: 'action',
           title: 'Add an action',
+          next: 'Add an email action to your form',
           icon: 'fa fa-mail-reply',
           template: 'views/project/tour/action.html'
         }
@@ -61,6 +66,7 @@ app.constant('ProjectFrameworkSteps', function(framework) {
     {
       step: 'embed',
       title: 'Embed the form',
+      next: 'Embed the form within your application',
       icon: 'fa fa-code',
       template: 'views/project/tour/embed.html',
       children: []
@@ -68,6 +74,7 @@ app.constant('ProjectFrameworkSteps', function(framework) {
     {
       step: 'launch',
       title: 'Launch',
+      next: 'Launch your application',
       icon: 'fa fa-rocket',
       template: 'views/project/tour/launch.html',
       children: []
@@ -75,6 +82,7 @@ app.constant('ProjectFrameworkSteps', function(framework) {
     {
       step: 'next',
       title: 'Next Steps',
+      next: 'See what else you can do with Form.io',
       icon: 'fa fa-chevron-circle-right',
       template: 'views/project/tour/next.html',
       children: []

@@ -13,8 +13,22 @@ app.directive('stepFlow', function() {
       function($scope) {
         var element = angular.element;
         $scope.$watch('steps', function() {
-          if ($scope.steps) {
-            $scope.currentStep = $scope.currentParentStep = $scope.steps[0];
+          var parentStep = false;
+          var childStep = false;
+          try {
+            parentStep = JSON.parse(sessionStorage.getItem('stepFlowCurrentParentStep'));
+            childStep = JSON.parse(sessionStorage.getItem('stepFlowCurrentChildStep'));
+          }
+          catch (e) {
+            console.warn('Error getting previous step flows.');
+          }
+          if (parentStep) {
+            $scope.changeStep(parentStep, childStep);
+          }
+          else {
+            if ($scope.steps) {
+              $scope.currentStep = $scope.currentParentStep = $scope.steps[0];
+            }
           }
           $scope.nextSteps = {};
           var lastStep;
@@ -54,6 +68,8 @@ app.directive('stepFlow', function() {
               $scope.currentChildStep = parentStep.children[0];
             }
           }
+          sessionStorage.setItem('stepFlowCurrentChildStep', JSON.stringify($scope.currentChildStep));
+          sessionStorage.setItem('stepFlowCurrentParentStep', JSON.stringify($scope.currentParentStep));
         };
       }
     ],

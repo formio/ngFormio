@@ -1,6 +1,5 @@
 @import "variables.scss";
 @import "mixins.scss";
-@import "circle.scss";
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
   display: none !important;
 }
@@ -1943,7 +1942,7 @@ li.step-info {
               margin-top: 10px;
             }
             .flow-side-step {
-              margin: 45px 0;
+              margin: 45px 0 30px 0;
               position: relative;
               &:first-child {
                 margin-top: 0;
@@ -1957,13 +1956,6 @@ li.step-info {
                     font-size: 32px;
                   }
                 }
-              }
-              &:last-child {
-                margin-top: 15px;
-                margin-bottom: 0;
-              }
-              .flow-side-step__title {
-
               }
               .flow-side-logo {
                 position: absolute;
@@ -1984,6 +1976,13 @@ li.step-info {
               .logo-active {
                 background-color: #0ea6ff;
               }
+              .step-item {
+                padding-top: 20px;
+                font-size: 17px;
+              }
+              .step-item:last-child {
+                margin-bottom: -15px;
+              }
               .steps {
                 margin-left: 40px;
                 .step-info {
@@ -1992,8 +1991,6 @@ li.step-info {
                   }
                   .info-active {
                     color: #58c01a;
-                    font-weight: bold;
-                    border-radius: 5px;
                   }
                 }
               }
@@ -2023,5 +2020,49 @@ li.step-info {
   }
   .ui-select-container {
     min-width: inherit;
+  }
+}
+
+.btn-blink {
+  -webkit-animation: buttonblink 10s infinite;  /* Safari 4+ */
+  -moz-animation: buttonblink 10s infinite;  /* Fx 5+ */
+  -o-animation: buttonblink 10s infinite;  /* Opera 12+ */
+  animation: buttonblink 10s infinite;  /* IE 10+, Fx 29+ */
+}
+
+@keyframes buttonblink {
+  0%, 100% {
+    color: #fff;
+    background-color: #0079c0;
+    border-color: #0069a7;
+  }
+  50% {
+    color: #fff;
+    background-color: #58c01a;
+    border-color: #4eaa17;
+  }
+}
+@-webkit-keyframes buttonblink {
+  0%, 100% {
+    color: #fff;
+    background-color: #0079c0;
+    border-color: #0069a7;
+  }
+  50% {
+    color: #fff;
+    background-color: #58c01a;
+    border-color: #4eaa17;
+  }
+}
+@-moz-keyframes buttonblink {
+  0%, 100% {
+    color: #fff;
+    background-color: #0079c0;
+    border-color: #0069a7;
+  }
+  50% {
+    color: #fff;
+    background-color: #58c01a;
+    border-color: #4eaa17;
   }
 }
