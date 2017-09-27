@@ -1,5 +1,7 @@
 'use strict';
 
+/* globals sessionStorage */
+
 var app = angular.module('formioApp');
 
 app.directive('stepFlow', function() {
@@ -77,7 +79,7 @@ app.directive('stepFlow', function() {
 
         $scope.init = function() {
           return $scope.variables;
-        }
+        };
       }
     ],
     templateUrl: 'views/project/stepFlow.html'
