@@ -346,6 +346,33 @@ $project-header-color: #eee;
   }
 }
 
+.project-sidebar-button {
+  display: inline-block;
+  border: none;
+  background-color: darken($brand-primary, 25%);
+  color: $project-header-color;
+  text-align: center;
+  padding: 10px;
+  width: 70px;
+  vertical-align: middle;
+  span {
+    font-size: 0.7em;
+  }
+  i {
+    font-size: 1.8em;
+  }
+}
+
+.nav-pills-button {
+  display: inline-block;
+  padding: 10px 15px;
+  vertical-align: middle;
+  color: #333333;
+  background-color: #e7e7e7;
+  border-color: #ccc;
+  border-radius: 0;
+}
+
 .project-main {
   float: left;
   width: 100%;

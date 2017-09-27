@@ -48,7 +48,7 @@ app.directive('stepFlow', function() {
           }
           else {
             if ($scope.steps) {
-              $scope.currentStep = $scope.currentParentStep = $scope.steps[0];
+              $scope.changeStep($scope.steps[0]);
             }
           }
         });

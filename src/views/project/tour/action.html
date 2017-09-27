@@ -1,23 +1,37 @@
-<div class="col-md-6">
-  <p>To add an email action you have to go to the actions page in your form and select the email action,
-    then click on Add Action</p>
-  <p>
-    This will create an action when a form is submitted, let's send an email notification from
-    no-reply@form.io to
-    the email that we submit in our form.
-    We are going to use our <b>data object</b> to select the field component that is called "email" and then we
-    can write any message to send.</p>
-</div>
-<div class="col-md-6">
-  <ul class="gallery gallery1">
-    <li ng-repeat="image in formAction">
-      <a ng-click="openLightboxModal(formCreate,$index)">
-        <img ng-src="{{image.thumbUrl}}" class="img-thumbnail">
-      </a>
-    </li>
-  </ul>
-</div>
-<div class="text-center">
-  <h4>That's it! we set an Email Action to our API Web Form, in this case every time that our form is
-    submitted we send an Email. Now, how we put this form in our app?.</h4>
+<div class="row">
+  <div class="col-md-12">
+    <ul class="list-group">
+      <li class="list-group-item">
+        <div>
+          To add an action, go to the <strong>Demographics Form</strong> and click on the <span class="btn btn-default nav-pills-button"><i class="fa fa-paper-plane"></i> <span>Actions</span></span> tab at the top.</a>
+        </div>
+      </li>
+      <li class="list-group-item">
+        <div>
+          You should already see a <strong>Save Submission</strong> action. All new forms automatically get this action which instructs the API to save the submission to the database. If you remove this action it will no longer save anything when the form is submitted. Leave it there for this walkthrough.
+        </div>
+      </li>
+      <li class="list-group-item">
+        <p>Select <strong>Email</strong> from the <strong>Select an Action</strong> dropdown</p>
+        <p>Click the <a class="btn btn-primary"><i class="fa fa-plus"></i> Add Action</a> button to start adding a new action.</p>
+      </li>
+      <li class="list-group-item">
+        <p>In the <strong>To: Email Address</strong> field, add in the email field: <strong>{{'{{'}}data.email&#125;&#125;</strong>. This must match the API Property of the Email field we added to our form.</p>
+        <p>The <strong>data</strong> variable is available with all of the data that was submitted from the form fields and you can use {{'{{'}}&#125;&#125; to indicate replacements. In this case we are going to send the email to whatever email address was entered in the form.</p>
+        <p>You can also modify the <strong>From</strong>, <strong>Subject</strong> and the <strong>Message</strong> fields or leave them as defaults.. We provide a submission() macro automatically that will print out a table of the data values.</p>
+      </li>
+      <li class="list-group-item">
+        <p>Click the <a class="btn btn-primary">Save Action</a> button to finish adding the action to your Demographics form. Now every time a new submission occurs to the form, the data is emailed to the email address on the form.</p>
+      </li>
+      <li class="list-group-item">
+        <p>Go to the <span class="btn btn-default nav-pills-button"><i class="fa fa-check-square-o"></i> <span>Use</span></span> tab to test it out.</p>
+      </li>
+      <li class="list-group-item">
+        <p>After submitting the form, you should receive an email (provided you entered your email address) and you should see the submission in the <span class="btn btn-default nav-pills-button"><i class="fa fa-database"></i> <span>Data</span></span> tab.</p>
+      </li>
+      <li class="list-group-item">
+        <p>You now know your Demographics form is working and an email will be sent on submission. Now lets look at how to add this form to your application.</p>
+      </li>
+    </ul>
+  </div>
 </div>
