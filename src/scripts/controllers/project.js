@@ -544,7 +544,7 @@ app.controller('ProjectDeployController', [
     PrimaryProject
   ) {
     var loadTags = function(project) {
-      Formio.makeStaticRequest(AppConfig.apiBase + '/project/' + project._id + '/tag', 'GET', null, {ignoreCache: true})
+      Formio.makeStaticRequest(AppConfig.apiBase + '/project/' + project._id + '/tag?limit=1000', 'GET', null, {ignoreCache: true})
         .then(function(tags) {
           $scope.tags = tags;
         });
