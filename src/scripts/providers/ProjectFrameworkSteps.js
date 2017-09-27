@@ -20,7 +20,7 @@ app.constant('ProjectFrameworkSteps', function(framework) {
         {
           step: 'download',
           title: 'Download',
-          next: 'Download a starterkit application',
+          next: 'Download a StarterKit Application',
           icon: 'fa fa-download',
           template: 'views/project/tour/download.html'
         },

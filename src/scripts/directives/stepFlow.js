@@ -14,6 +14,24 @@ app.directive('stepFlow', function() {
       function($scope) {
         var element = angular.element;
         $scope.$watch('steps', function() {
+          $scope.nextSteps = {};
+          var lastStep;
+          $scope.steps.forEach(function(step) {
+            if (step.children && step.children.length) {
+              step.children.forEach(function(childStep) {
+                if (lastStep) {
+                  $scope.nextSteps[lastStep.step] = {parentStep: step, childStep: childStep};
+                }
+                lastStep = childStep;
+              });
+            }
+            else {
+              if (lastStep) {
+                $scope.nextSteps[lastStep.step] = {parentStep: step};
+              }
+              lastStep = step;
+            }
+          });
           var parentStep = false;
           var childStep = false;
           try {
@@ -31,24 +49,6 @@ app.directive('stepFlow', function() {
               $scope.currentStep = $scope.currentParentStep = $scope.steps[0];
             }
           }
-          $scope.nextSteps = {};
-          var lastStep;
-          $scope.steps.forEach(function(step) {
-            if (step.children && step.children.length) {
-              step.children.forEach(function(childStep) {
-                if (lastStep) {
-                  $scope.nextSteps[lastStep.step] = childStep;
-                }
-                lastStep = childStep;
-              });
-            }
-            else {
-              if (lastStep) {
-                $scope.nextSteps[lastStep.step] = step;
-              }
-              lastStep = step;
-            }
-          });
         });
 
         // If not set, default to open.
@@ -60,6 +60,7 @@ app.directive('stepFlow', function() {
           window.scrollTo(0, 0);
           $scope.currentStep = childStep || parentStep;
           $scope.currentParentStep = parentStep;
+          $scope.nextStep = $scope.nextSteps[$scope.currentStep.step];
           if (childStep) {
             $scope.currentChildStep = childStep;
           }
