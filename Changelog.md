@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.23.7
+### Changed
+ - Make formioTranslate filter stateful
+ - Upgrade angular-moment to 1.1.0
+ 
+### Fixed
+ - The form component to pass along the form options and readOnly states.
+
 ## 2.23.6
 ### Changed
  - Pass along the building flag through the options.
