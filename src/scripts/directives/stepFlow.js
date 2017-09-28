@@ -1,6 +1,6 @@
 'use strict';
 
-/* globals sessionStorage */
+/* globals localStorage */
 
 var app = angular.module('formioApp');
 
@@ -37,8 +37,8 @@ app.directive('stepFlow', function() {
           var parentStep = false;
           var childStep = false;
           try {
-            parentStep = JSON.parse(sessionStorage.getItem('stepFlowCurrentParentStep'));
-            childStep = JSON.parse(sessionStorage.getItem('stepFlowCurrentChildStep'));
+            parentStep = JSON.parse(localStorage.getItem('stepFlowCurrentParentStep'));
+            childStep = JSON.parse(localStorage.getItem('stepFlowCurrentChildStep'));
           }
           catch (e) {
             console.warn('Error getting previous step flows.');
@@ -73,8 +73,8 @@ app.directive('stepFlow', function() {
               $scope.currentChildStep = parentStep.children[0];
             }
           }
-          sessionStorage.setItem('stepFlowCurrentChildStep', JSON.stringify($scope.currentChildStep));
-          sessionStorage.setItem('stepFlowCurrentParentStep', JSON.stringify($scope.currentParentStep));
+          localStorage.setItem('stepFlowCurrentChildStep', JSON.stringify($scope.currentChildStep));
+          localStorage.setItem('stepFlowCurrentParentStep', JSON.stringify($scope.currentParentStep));
         };
 
         $scope.init = function() {

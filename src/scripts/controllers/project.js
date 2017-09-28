@@ -1,6 +1,6 @@
 'use strict';
 
-/* globals NumberAbbreviate, chance, Chartist, semver, sessionStorage */
+/* globals NumberAbbreviate, chance, Chartist, semver, localStorage */
 
 // loadedFiles is used to prevent double loading files on each session.
 var loadedFiles = [];
@@ -174,8 +174,8 @@ app.controller('ProjectCreateController', [
       FormioProject.createProject($scope.project).then(function(project) {
         $scope.isBusy = false;
         // Reset tour and go directly to it.
-        sessionStorage.removeItem('stepFlowCurrentParentStep');
-        sessionStorage.removeItem('stepFlowCurrentChildStep');
+        localStorage.removeItem('stepFlowCurrentParentStep');
+        localStorage.removeItem('stepFlowCurrentChildStep');
         $state.go('project.tour', {projectId: project._id});
       });
     };
