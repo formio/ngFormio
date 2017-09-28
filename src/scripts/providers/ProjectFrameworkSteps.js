@@ -94,7 +94,7 @@ app.constant('ProjectFrameworkSteps', function(framework) {
       steps[1].template = 'views/frameworks/angular/download.html';
       steps[1].children[0].template = 'views/frameworks/angular/download.html';
       steps[1].children[1].template = 'views/frameworks/angular/configure.html';
-      steps[4].template = 'views/frameworks/angular/embed.html';
+      steps[4].template = 'views/frameworks/angular/embed-app.html';
       break;
     case 'angular2':
       steps[1].template = 'views/frameworks/angular2/download.html';
