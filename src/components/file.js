@@ -14,6 +14,7 @@ module.exports = function(app) {
           key: 'file',
           image: false,
           imageSize: '200',
+          keepFileName: false,
           placeholder: '',
           multiple: false,
           defaultValue: '',
@@ -184,6 +185,10 @@ module.exports = function(app) {
           angular.forEach(files, function(file) {
             // Get a unique name for this file to keep file collisions from occurring.
             var fileName = FormioUtils.uniqueName(file.name);
+            if ($scope.component.keepFileName === true) {
+              fileName = file.name;
+            }
+
             $scope.fileUploads[fileName] = {
               name: fileName,
               size: file.size,
