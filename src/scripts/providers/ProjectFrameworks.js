@@ -21,11 +21,13 @@ app.constant('ProjectFrameworks', [
   {
     title: 'Vue.js',
     name: 'vue',
+    disabled: true,
     img: 'images/platforms/vue.png'
   },
   {
     title: 'HTML 5',
     name: 'html5',
+    disabled: true,
     img: 'images/platforms/html5.png'
   },
   {

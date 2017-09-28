@@ -636,6 +636,10 @@ angular
       $scope.submitted = false;
       $scope.selectedFramework = null;
       $scope.newProject = function(framework) {
+        // Don't allow disabled frameworks.
+        if (framework.disabled) {
+          return;
+        }
         $scope.selectedFramework = framework;
         ngDialog.open({
           templateUrl: 'views/project/create.html',

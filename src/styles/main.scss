@@ -283,7 +283,18 @@ $project-header-color: #eee;
 }
 
 .project-template-item {
+  position: relative;
   .project-template-card {
+    .framework-coming-soon {
+      position: absolute;
+      color: red;
+      text-align: center;
+      width: 100%;
+      font-weight: bolder;
+      font-size: 2em;
+      opacity: 0.3;
+      margin-top: 30px;
+    }
     .project-template-img {
       width: 80px;
       height: 80px;

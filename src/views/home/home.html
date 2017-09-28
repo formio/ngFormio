@@ -32,6 +32,7 @@
       <ul class="list-inline">
         <li ng-repeat="framework in frameworks" class="project-template-item grow">
           <div class="project-template-card new-project-{{framework.name}}" ng-click="newProject(framework);">
+            <div class="framework-coming-soon" ng-if="framework.disabled">Coming Soon</div>
             <img ng-if="framework.img" class="project-template-img" ng-src="{{ framework.img }}" />
             <div class="project-template-info">
               <h5 class="ellipsis">{{ framework.title }}</h5>
