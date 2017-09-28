@@ -1544,6 +1544,26 @@ footer {
   .list-group-heading {
     background-color: $table-bg-hover;
   }
+  .list-group-item-title {
+    margin: 20px 0;
+    .count-badge {
+      color: #fff;
+      font-size: 2.5em;
+      padding-top: 12px;
+      background-color: $brand-primary;
+      border-radius: 50%;
+      height: 75px;
+      width: 75px;
+      display: inline-block;
+      text-align: center;
+      vertical-align: middle;
+    }
+    h5 {
+      display: inline-block;
+      font-size: 1.7em;
+      margin-left: 20px;
+    }
+  }
 }
 
 .list-group.list-group-striped {

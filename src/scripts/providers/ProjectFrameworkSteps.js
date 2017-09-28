@@ -91,23 +91,27 @@ app.constant('ProjectFrameworkSteps', function(framework) {
 
   switch(framework) {
     case 'angular':
-      steps[1].children[0].template = 'views/project/tour/angular/download.html';
-      steps[1].children[1].template = 'views/project/tour/angular/configure.html';
+      steps[1].template = 'views/frameworks/angular/download.html';
+      steps[1].children[0].template = 'views/frameworks/angular/download.html';
+      steps[1].children[1].template = 'views/frameworks/angular/configure.html';
       steps[4].template = 'views/frameworks/angular/embed.html';
       break;
     case 'angular2':
-      steps[1].children[0].template = 'views/project/tour/angular2/download.html';
-      steps[1].children[1].template = 'views/project/tour/angular2/configure.html';
+      steps[1].template = 'views/frameworks/angular2/download.html';
+      steps[1].children[0].template = 'views/frameworks/angular2/download.html';
+      steps[1].children[1].template = 'views/frameworks/angular2/configure.html';
       steps[4].template = 'views/frameworks/angular2/embed.html';
       break;
     case 'react':
-      steps[1].children[0].template = 'views/project/tour/react/download.html';
-      steps[1].children[1].template = 'views/project/tour/react/configure.html';
+      steps[1].template = 'views/frameworks/react/download.html';
+      steps[1].children[0].template = 'views/frameworks/react/download.html';
+      steps[1].children[1].template = 'views/frameworks/react/configure.html';
       steps[4].template = 'views/frameworks/react/embed.html';
       break;
     case 'vue':
-      steps[1].children[0].template = 'views/project/tour/vue/download.html';
-      steps[1].children[1].template = 'views/project/tour/vue/configure.html';
+      steps[1].template = 'views/frameworks/vue/download.html';
+      steps[1].children[0].template = 'views/frameworks/vue/download.html';
+      steps[1].children[1].template = 'views/frameworks/vue/configure.html';
       steps[4].template = 'views/frameworks/vue/embed.html';
       break;
     case 'html5':
