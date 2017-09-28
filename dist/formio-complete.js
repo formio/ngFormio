@@ -1,4 +1,4 @@
-/*! ng-formio v2.23.6 | https://unpkg.com/ng-formio@2.23.6/LICENSE.txt */
+/*! ng-formio v2.23.7 | https://unpkg.com/ng-formio@2.23.7/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 (function (root, factory) {
   // AMD
@@ -759,7 +759,7 @@ return /******/ (function(modules) { // webpackBootstrap
 ;
 },{}],3:[function(_dereq_,module,exports){
 (function (global){
-/* angular-moment.js / v1.0.1 / (c) 2013, 2014, 2015, 2016 Uri Shaked / MIT Licence */
+/* angular-moment.js / v1.1.0 / (c) 2013, 2014, 2015, 2016, 2017 Uri Shaked / MIT Licence */
 
 'format amd';
 /* global define */
@@ -1493,7 +1493,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	} else if (typeof module !== 'undefined' && module && module.exports && (typeof _dereq_ === 'function') && !isElectron) {
 		module.exports = angularMoment(_dereq_('angular'), _dereq_('moment'));
 	} else {
-		angularMoment(angular, (typeof global !== 'undefined' ? global : window).moment);
+		angularMoment(angular, (typeof global !== 'undefined' && typeof global.moment !== 'undefined' ? global : window).moment);
 	}
 })();
 
@@ -72090,7 +72090,7 @@ module.exports = function(app) {
     '$templateCache',
     function($templateCache) {
       $templateCache.put('formio/components/form.html',
-        "<i style=\"font-size: 2em;\" ng-if=\"!componentForm\" ng-class=\"{'formio-hidden': componentForm}\" class=\"formio-loading glyphicon glyphicon-refresh glyphicon-spin\"></i>\n<formio ng-if=\"componentForm\" form=\"componentForm\" submission=\"componentSubmission\"></formio>\n"
+        "<i style=\"font-size: 2em;\" ng-if=\"!componentForm\" ng-class=\"{'formio-hidden': componentForm}\" class=\"formio-loading glyphicon glyphicon-refresh glyphicon-spin\"></i>\n<formio\n  ng-if=\"componentForm\"\n  form=\"componentForm\"\n  submission=\"componentSubmission\"\n  read-only=\"readOnly\"\n  hide-components=\"hideComponents\"\n  options=\"options\"\n></formio>\n"
       );
     }
   ]);
@@ -76681,7 +76681,7 @@ module.exports = [
     $filter,
     $injector
   ) {
-    return function(text, key, builder) {
+    var formioTranslate = function(text, key, builder) {
       /**
        * Lookup the available translate libraries, currently supports:
        * angular-translate: @see https://github.com/angular-translate/angular-translate
@@ -76718,6 +76718,14 @@ module.exports = [
         return text;
       }
     };
+    formioTranslate.$stateful = true;
+    formioTranslate.use = function(language) {
+      if ($injector.has('$translate')) {
+        var $translate = $injector.get('$translate');
+        $translate.use(language);
+      }
+    };
+    return formioTranslate;
   }
 ];
 

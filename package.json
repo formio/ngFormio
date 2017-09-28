@@ -1,6 +1,6 @@
 {
   "name": "ng-formio",
-  "version": "2.23.6",
+  "version": "2.23.7",
   "description": "The form redering engine behind Form.IO.",
   "main": "dist/formio.min.js",
   "scripts": {
@@ -45,7 +45,7 @@
     "angular": "^1.6.5",
     "angular-ckeditor": "lemonde/angular-ckeditor#v1.0.3",
     "angular-file-saver": "^1.1.3",
-    "angular-moment": "^1.0.1",
+    "angular-moment": "^1.1.0",
     "angular-sanitize": "^1.6.5",
     "angular-ui-ace": "^0.2.3",
     "angular-ui-bootstrap": "^2.5.0",
