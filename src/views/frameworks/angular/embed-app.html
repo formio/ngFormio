@@ -4,10 +4,10 @@
       This step assumes ngFormio is installed, configured and loaded as a dependency of your AngularJS application. If you configured your application earlier in the walkthrough you should be good to go.
     </div>
     <p>The simplest way to embed a Form.io form inside your app is to use the <strong>formio</strong> directive. There are lots of options for how to do this. Based on what you want to do, use one of the following:</p>
-    <ul class="list-group">
+    <ul class="list-group steps">
       <li class="list-group-item">
         <div class="list-group-item-title">
-          <span class="count-badge">1</span>
+          <span class="count-badge">A</span>
           <h5>Simple Uncontrolled Embed</h5>
         </div>
         <p>The easiest way to do an embed is to directly embed via the form URL. First, set up a sample page in your application using UI router.</p>
@@ -43,7 +43,7 @@ app.controller('DemographicsController, function($scope, $state) {
       </li>
       <li class="list-group-item">
         <div class="list-group-item-title">
-          <span class="count-badge">2</span>
+          <span class="count-badge">B</span>
           <h5>Controlled Embed</h5>
         </div>
         <p>This is similar to the uncontrolled embed but we are going to load the form first and then pass it to the formio directive. First, set up a sample page in your application using UI router.</p>
@@ -88,7 +88,7 @@ app.controller('DemographicsController, function($scope, $state, config, Formio)
       </li>
       <li class="list-group-item">
         <div class="list-group-item-title">
-          <span class="count-badge">3</span>
+          <span class="count-badge">C</span>
           <h5>As Resource Form with Helper Provider</h5>
         </div>
         <p>If you have installed the ngFormioHelper library, you can use it to automatically set up pages and controllers for you using just the form URL.</p>

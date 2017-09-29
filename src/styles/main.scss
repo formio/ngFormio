@@ -1555,6 +1555,11 @@ footer {
   .list-group-heading {
     background-color: $table-bg-hover;
   }
+  &.steps {
+    .list-group-item {
+      margin-bottom: 20px;
+    }
+  }
   .list-group-item-title {
     margin: 20px 0;
     .count-badge {
@@ -1573,6 +1578,7 @@ footer {
       display: inline-block;
       font-size: 1.7em;
       margin-left: 20px;
+      font-weight: bold;
     }
   }
 }

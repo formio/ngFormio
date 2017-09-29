@@ -25,7 +25,7 @@ app.constant('ProjectFrameworks', [
     img: 'images/platforms/vue.png'
   },
   {
-    title: 'HTML 5',
+    title: 'Web Components',
     name: 'html5',
     disabled: true,
     img: 'images/platforms/html5.png'
