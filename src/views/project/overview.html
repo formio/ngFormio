@@ -32,8 +32,8 @@
             <div class="col-sm-2" ng-repeat="column in submission.data track by $index | limitTo : 4">
               <div>{{column}}</div>
             </div>
-            <div class="col-sm-2 pull-right">
-              <a ui-sref="project.{{form.type}}.form.edit({formId: form._id})" class="btn btn-default pull-right">View</a>
+            <div class="col-sm-2 pull-right" ng-if="forms[submission.form]">
+              <a ui-sref="project.{{forms[submission.form].type}}.form.submission.item.view({formId: submission.form, subId: submission._id})" class="btn btn-default pull-right">View</a>
             </div>
           </div>
         </li>
