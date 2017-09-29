@@ -108,6 +108,12 @@ module.exports = function(app) {
           Formio
         ) {
           if ($scope.options && $scope.options.building) return;
+          if ($scope.component.keepFileName === true) {
+            var string = $scope.file.name;
+            var splitstring = string.split('-');
+            var format = string.split('.');
+            $scope.file.name= splitstring[0] +'.'+ format[1];
+          }
           $scope.getFile = function(evt) {
             evt.preventDefault();
             $scope.form = $scope.form || $rootScope.filePath;
@@ -185,9 +191,6 @@ module.exports = function(app) {
           angular.forEach(files, function(file) {
             // Get a unique name for this file to keep file collisions from occurring.
             var fileName = FormioUtils.uniqueName(file.name);
-            if ($scope.component.keepFileName === true) {
-              fileName = file.name;
-            }
 
             $scope.fileUploads[fileName] = {
               name: fileName,
