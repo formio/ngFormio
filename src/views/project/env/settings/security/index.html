@@ -9,6 +9,9 @@
             <label for="secret" class="control-label">Encrypted fields secret</label>
             <input class="form-control" id="secret" ng-disabled="primaryProject.plan === 'basic'" ng-model="currentProject.settings.secret" placeholder="A secret phrase used to encrypt fields."></input>
           </div>
+          <div class="alert alert-danger">
+            <strong>Warning!</strong> Changing the key can cause the impossibility of decryption of stored data.
+          </div>
         </div>
       </div>
     </div>
