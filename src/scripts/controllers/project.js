@@ -704,13 +704,15 @@ app.controller('ProjectOverviewController', [
   'AppConfig',
   'Formio',
   'FormioAlerts',
+  'ProjectFrameworks',
   function(
     $scope,
     $stateParams,
     $http,
     AppConfig,
     Formio,
-    FormioAlerts
+    FormioAlerts,
+    ProjectFrameworks
   ) {
     // This is restricted to form.io domains.
     var key = 'AIzaSyDms9ureQ45lp6BT6LuZtoANB_GcR2jZmE';
@@ -719,19 +721,75 @@ app.controller('ProjectOverviewController', [
     $scope.currentSection.icon = 'fa fa-dashboard';
     $scope.currentSection.help = '';
 
+    $scope.graphType = $stateParams.graphType;
+
     $scope.hasTeams = function() {
       return ['trial', 'team', 'commercial'].indexOf($scope.currentProject.plan) !== -1;
     };
 
-    $scope.formio.loadForms({
-        params: {
-          sort: '-modified'
+    $scope.loadProjectPromise.then(function() {
+      var projectCreated = new Date($scope.currentProject.created);
+      projectCreated.setSeconds(projectCreated.getSeconds() + 30);
+
+      $scope.formio.loadForms({
+          params: {
+            type: 'form',
+            modified__gt: projectCreated,
+            sort: '-modified'
+          }
+        })
+        .then(function(forms) {
+          $scope.recentForms = forms;
+        }, FormioAlerts.onError.bind(FormioAlerts))
+        .catch(FormioAlerts.onError.bind(FormioAlerts));
+
+      $scope.formio.loadForms({
+          params: {
+            type: 'resource',
+            modified__gt: projectCreated,
+            sort: '-modified'
+          }
+        })
+        .then(function(forms) {
+          $scope.recentResources = forms;
+        }, FormioAlerts.onError.bind(FormioAlerts))
+        .catch(FormioAlerts.onError.bind(FormioAlerts));
+
+      $scope.currentFramework = {};
+      ProjectFrameworks.forEach(function(framework) {
+        if (framework.name === $scope.currentProject.framework) {
+          $scope.currentFramework = framework;
         }
-      })
-      .then(function(forms) {
-        $scope.recentForms = forms;
-      }, FormioAlerts.onError.bind(FormioAlerts))
-      .catch(FormioAlerts.onError.bind(FormioAlerts));
+      });
+
+      $http.post($scope.projectUrl + '/report', [
+        {
+          $sort: {
+            created: -1
+          }
+        },
+        {
+          $limit: 10
+        },
+      ]).then(function(result) {
+        $scope.submissions = result.data;
+
+        var formIds = _.uniq($scope.submissions.map(function(submission) {
+          return submission.form;
+        }));
+
+        $scope.formio.loadForms({
+          params: {
+            _id__in: formIds
+          }
+        }).then(function(results) {
+          $scope.forms = {};
+          results.forEach(function(form) {
+            $scope.forms[form._id] = form;
+          });
+        });
+      });
+    });
   }
 ]);
 

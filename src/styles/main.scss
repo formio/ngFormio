@@ -1554,6 +1554,9 @@ footer {
 .list-group {
   .list-group-heading {
     background-color: $table-bg-hover;
+    h3 {
+      margin: 5px 0;
+    }
   }
   &.steps {
     .list-group-item {
