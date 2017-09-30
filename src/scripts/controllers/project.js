@@ -123,7 +123,7 @@ app.controller('ProjectCreateController', [
     $scope.createType = 'Project';
     $scope.projectType = 'Project';
 
-    $scope.frameworks = ProjectFrameworks;
+    $scope.frameworks = _.filter(ProjectFrameworks, function(item) {return !item.disabled});
 
     $scope.project = {};
 
@@ -1994,8 +1994,6 @@ app.controller('ProjectSettingsController', [
     $http,
     PrimaryProject
   ) {
-    $scope.platforms = ProjectFrameworks;
-
     $scope.loadProjectPromise.then(function() {
       $scope.localProject.plan = $scope.localProject.plan || 'basic';
 
@@ -2288,7 +2286,7 @@ app.controller('PrimaryProjectSettingsController', [
     GoogleAnalytics,
     PrimaryProject
   ) {
-    $scope.frameworks = ProjectFrameworks;
+    $scope.frameworks = _.filter(ProjectFrameworks, function(item) {return !item.disabled});
 
     $scope.primaryProjectPromise.then(function(primaryProject) {
       $scope.project = _.clone(primaryProject);

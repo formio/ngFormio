@@ -631,7 +631,7 @@ angular
       $scope.selectedFramework = null;
       $scope.newProject = function(framework) {
         // Don't allow disabled frameworks.
-        if (framework.disabled) {
+        if (framework && framework.disabled) {
           return;
         }
         $scope.selectedFramework = framework;
