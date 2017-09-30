@@ -14,7 +14,7 @@
               <strong>Created</strong>
             </div>
             <div class="col-sm-6">
-              <strong>Data</strong>
+              <strong>Data Preview</strong>
             </div>
             <div class="col-sm-2">
               <strong class="pull-right">Links</strong>
@@ -79,7 +79,7 @@
         <li class="list-group-item list-group-heading">
           <h3>Current Framework</h3>
         </li>
-        <li class="list-group-item" ng-repeat="form in recentForms track by $index">
+        <li class="list-group-item">
           <p><img src="{{currentFramework.img}}" alt="{{currentFramework.title}}" style="width: 50px;"> {{currentFramework.title}} <a ui-sref="project.settings" class="btn btn-default">Change</a></p>
           <a class="btn btn-primary" ui-sref="project.tour">View Walkthrough</a>
         </li>

@@ -772,22 +772,24 @@ app.controller('ProjectOverviewController', [
           $limit: 10
         },
       ]).then(function(result) {
-        $scope.submissions = result.data;
+        $scope.submissions = result.data || [];
 
-        var formIds = _.uniq($scope.submissions.map(function(submission) {
-          return submission.form;
-        }));
+        if ($scope.submissions.length) {
+          var formIds = _.uniq($scope.submissions.map(function(submission) {
+            return submission.form;
+          }));
 
-        $scope.formio.loadForms({
-          params: {
-            _id__in: formIds
-          }
-        }).then(function(results) {
-          $scope.forms = {};
-          results.forEach(function(form) {
-            $scope.forms[form._id] = form;
+          $scope.formio.loadForms({
+            params: {
+              _id__in: formIds
+            }
+          }).then(function(results) {
+            $scope.forms = {};
+            results.forEach(function(form) {
+              $scope.forms[form._id] = form;
+            });
           });
-        });
+        }
       });
     });
   }

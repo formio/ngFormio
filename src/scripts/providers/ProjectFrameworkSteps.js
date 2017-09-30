@@ -101,12 +101,13 @@ app.constant('ProjectFrameworkSteps', function(framework) {
       steps[1].children[0].template = 'views/frameworks/angular2/download.html';
       steps[1].children[1].template = 'views/frameworks/angular2/configure.html';
       steps[4].template = 'views/frameworks/angular2/embed.html';
+      steps[5].template = 'views/frameworks/angular2/launch.html';
       break;
     case 'react':
       steps[1].template = 'views/frameworks/react/download.html';
       steps[1].children[0].template = 'views/frameworks/react/download.html';
       steps[1].children[1].template = 'views/frameworks/react/configure.html';
-      steps[4].template = 'views/frameworks/react/embed.html';
+      steps[4].template = 'views/frameworks/react/embed-app.html';
       break;
     case 'vue':
       steps[1].template = 'views/frameworks/vue/download.html';

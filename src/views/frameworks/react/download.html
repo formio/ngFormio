@@ -1,0 +1,71 @@
+<div class="row">
+  <div class="col-sm-12">
+    <h4>To begin development of your application you will need to set up a local development environment. There are three ways to do this. You can start with our StarterKit, start with another application framework or roll your own.</h4>
+    <p>Your options are:</p>
+    <ul class="list-group steps">
+      <li class="list-group-item">
+        <div class="list-group-item-title">
+          <span class="count-badge">A</span>
+          <h5>Clone the Form.io React StarterKit</h5>
+        </div>
+        <p>Our React StarterKit comes set up with React Router, ngFormio and lots of Providers that make it easy to set up and use our forms within React. This is the easiest route to getting a running application.</p>
+        <p>In order to clone the github repo you must have git installed on your computer. If you don't already have it, you can get it at <a href="https://git-scm.com/" target="_blank">https://git-scm.com/</a>.</p>
+        <p>Once you have git, go to your terminal and type</p>
+        <p><pre>git clone git@github.com:formio/react-app-starterkit.git
+cd react-app-starterkit</pre>
+        </p>
+        <p>If you do no have git installed, you can go to <a href="https://github.com/formio/react-app-starterkit" target="_blank">https://github.com/formio/react-app-starterkit</a> and click the <strong>Download Zip</strong> button and unzip it on your computer.</p>
+        <p>Finally, be sure to install all the dependencies to get everything set up. From within the application root directory type</p>
+        <p><pre>npm install</pre>
+        </p>
+      </li>
+      <li class="list-group-item">
+        <div class="list-group-item-title">
+          <span class="count-badge">B</span>
+          <h5>Use a Fountain.js Generator</h5>
+        </div>
+        <p><a href="http://fountainjs.io/" target="_blank">Fountain.js</a> is a yeoman generator that will build the framework of an application for you and has a lot of sane defaults. It is a good way to get started but does not come pre-configured with the Form.io libraries installed.</p>
+        <p>To set it up, go to your terminal and type</p>
+        <p><pre>npm install -g yo generator-fountain-webapp</pre></p>
+        <p>Once the dependencies installed, simply launch the generator and answer the questions.</p>
+        <p><pre>mkdir myapp
+cd myapp
+yo fountain-webapp</pre></p>
+        <p>You can choose whatever you want for the options but we recommend the following</p>
+        <p><pre>
+? Which JavaScript framework do you want? React
+? Which module management do you want? Webpack with NPM
+? Which JS preprocessor do you want? ES2015 today with Babel
+? Which CSS preprocessor do you want? SASS
+? Which Continuous Integration platform do you want?
+? Do you want a sample app? A working landing page
+? Would you like a router? React router</pre></p>
+        <p>Be sure to install all the dependencies to get everything set up. From within the application root directory, type these commands</p>
+        <p><pre>npm install</pre>
+        </p>
+        <p>Finally, add in the React Form.io library.</p>
+        <ul>
+          <li>
+            <a href="https://github.com/formio/react-formio">react-formio</a> - The main React form renderer.
+          </li>
+        </ul>
+        <br />
+        <p>To add it to your application, type the following</p>
+        <p><pre>npm install --save react-formio</pre><p>
+      </li>
+      <li class="list-group-item">
+        <div class="list-group-item-title">
+          <span class="count-badge">C</span>
+          <h5>Roll your own application</h5>
+        </div>
+        <p>If you are have experience with and are comfortable setting up your own React application you can, of course, do so. This works best for teams that already have an application or have a different set of build tools or dependent libraries than the starterkits use.</p>
+        <p>To add Form.io forms to your application, use one of the package managers and include the react-formio library to your application.</p>
+        <ul>
+          <li>
+            <a href="https://github.com/formio/react-formio">react-formio</a> - The main React form renderer.
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</div>
