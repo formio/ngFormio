@@ -1192,4 +1192,77 @@ module.exports = function (config) {
       });
     });
   };
+
+  this.checkElementIsDisabled = function (ele) {
+    it('I see ' + ele + ' is disabled', function (next) {
+      try {
+        var btn = element(by.xpath(ele));
+        browser.wait(function () {
+          return btn.isPresent().then(function (present) {
+            if (present) {
+              return btn.isEnabled().then(function (res) {
+                return !res;
+              });
+            }
+            return present;
+          });
+        }, timeout).then(function (value) {
+          try {
+            assert.equal(value, true);
+            next();
+          } catch (err) {
+            next(err);
+          }
+        });
+      } catch (err) {
+        next(err);
+      }
+    });
+    };
+
+  this.checkElement = function (text) {
+    it('I check the ' + text, function (next) {
+      var ele = element(by.xpath(text));
+      browser.wait(function () {
+        return ele.isPresent();
+      }, timeout).then(function () {
+        ele.click().then(next).catch(next);
+      });
+    });
+  };
+  this.checkElementWithTextIsDisabled = function (text)   {
+    it('I see ' + text + ' button is disabled', function (next) {
+      var ele = element(by.xpath('//*[text()="' + text + '"]'));
+      browser.wait(function () {
+        return ele.isPresent();
+      }, timeout).then(function () {
+            ele.getAttribute('class').then(function(value){
+            try {
+              config.expect(value.split(" ")).contain('disabled');
+              next();
+            } catch (err) {
+              next(err);
+            }
+          });
+      });
+    });
+  };
+
+  this.checkElementWithTextIsNotDisabled = function (text) {
+    it('I see ' + text + ' button is disabled', function (next) {
+      var ele = element(by.xpath('//*[text()="' + text + '"]'));
+      browser.wait(function () {
+        return ele.isPresent();
+      }, timeout).then(function () {
+        ele.getAttribute('class').then(function(value){
+          try {
+            config.expect(value.split(" ")).not.contain('disabled');
+            next();
+          } catch (err) {
+            next(err);
+          }
+        });
+      });
+    });
+  };
 };
