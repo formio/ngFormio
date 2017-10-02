@@ -223,7 +223,10 @@ app.controller('ProjectCreateEnvironmentController', [
       });
     });
 
+    $scope.isBusy = false;
+
     $scope.saveProject = function() {
+      $scope.isBusy = true;
       FormioProject.createEnvironment($scope.currentProject).then(function(project) {
         // Update team access to new environment.
         project.access = project.access.concat(_.filter($scope.primaryProject.access, function(access) { return access.type.indexOf('team_') === 0;}));
@@ -232,7 +235,8 @@ app.controller('ProjectCreateEnvironmentController', [
           .then(function() {
             PrimaryProject.clear();
             $state.go('project.overview', {projectId: project._id});
-          });
+          })
+          .catch(function() {$scope.isBusy = false});
       });
     };
   }
@@ -559,11 +563,13 @@ app.controller('ProjectDeployController', [
           message: 'Please select a tag to deploy.'
         });
       }
+      $scope.isBusy = true;
       Formio.makeStaticRequest($scope.projectUrl + '/deploy', 'POST', {
         type: 'template',
         template: tag.template
       })
         .then(function() {
+          $scope.isBusy = false;
           $scope.deployTagOption = '';
           FormioAlerts.addAlert({
             type: 'success',
@@ -584,7 +590,8 @@ app.controller('ProjectDeployController', [
             $state.reload();
           }
         })
-        .catch(FormioAlerts.onError.bind(FormioAlerts));
+        .catch(FormioAlerts.onError.bind(FormioAlerts))
+        .catch(function() {$scope.isBusy = false});
     };
   }
 ]);
