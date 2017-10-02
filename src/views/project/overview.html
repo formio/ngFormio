@@ -78,6 +78,17 @@
           <a class="btn btn-primary" ui-sref="project.tour">View Walkthrough</a>
         </li>
       </ul>
+      <ul class="list-group list-group-striped">
+        <li class="list-group-item list-group-heading">
+          <h3>Monthly Submission Requests</h3>
+        </li>
+        <li class="list-group-item">
+          <div class="progress">
+            <div class="progress-bar" role="progressbar" ng-style="{width: getAPICallsPercent(currentProject.apiCalls)}" ng-class="getProgressBarClass(currentProject.apiCalls)"></div>
+          </div>
+          <p class="text-center text-muted progress-caption"><small>{{ currentProject.apiCalls.used | number }} / {{ getAPICallsLimit(currentProject.apiCalls) }}</small></p>
+        </li>
+      </ul>
       <ul class="list-group list-group-striped" ng-if="hasTeams()">
         <li class="list-group-item list-group-heading">
           <h3>Team Status</h3>
