@@ -236,7 +236,7 @@ app.controller('ProjectCreateEnvironmentController', [
             PrimaryProject.clear();
             $state.go('project.overview', {projectId: project._id});
           })
-          .catch(function() {$scope.isBusy = false});
+          .catch(function() {$scope.isBusy = false;});
       });
     };
   }
@@ -591,7 +591,7 @@ app.controller('ProjectDeployController', [
           }
         })
         .catch(FormioAlerts.onError.bind(FormioAlerts))
-        .catch(function() {$scope.isBusy = false});
+        .catch(function() {$scope.isBusy = false;});
     };
   }
 ]);
