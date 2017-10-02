@@ -100,7 +100,7 @@ app.constant('ProjectFrameworkSteps', function(framework) {
       steps[1].template = 'views/frameworks/angular2/download.html';
       steps[1].children[0].template = 'views/frameworks/angular2/download.html';
       steps[1].children[1].template = 'views/frameworks/angular2/configure.html';
-      steps[4].template = 'views/frameworks/angular2/embed.html';
+      steps[4].template = 'views/frameworks/angular2/embed-app.html';
       steps[5].template = 'views/frameworks/angular2/launch.html';
       break;
     case 'react':
@@ -118,8 +118,24 @@ app.constant('ProjectFrameworkSteps', function(framework) {
     case 'html5':
       break;
     case 'simple':
+      steps[4].template = 'views/frameworks/simple/embed-app.html';
+      delete steps[5];
+      delete steps[2];
+      delete steps[1];
+      steps.splice(4, 0, {
+        step: 'launch',
+        title: 'Launch the form',
+        next: 'Launch your form',
+        icon: 'fa fa-rocket',
+        template: 'views/frameworks/simple/launch.html',
+        children: []
+      });
       break;
     case 'custom':
+      steps[1].template = 'views/frameworks/custom/download.html';
+      steps[1].children = [];
+      steps[4].template = 'views/frameworks/custom/embed-app.html';
+      delete steps[5];
       break;
   }
 

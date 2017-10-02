@@ -5,98 +5,51 @@
       <li class="list-group-item">
         <div class="list-group-item-title">
           <span class="count-badge">A</span>
-          <h5>Simple Uncontrolled Embed</h5>
+          <h5>Uncontrolled Embed</h5>
         </div>
-        <p>The easiest way to do an embed is to directly embed via the form URL. First, set up a sample page in your application using UI router.</p>
-        <p><pre>
-// Set inside app.config()
-$stateProvider
-  .state('demographics', {
-    url: '/demographics',
-    templateUrl: 'views/demographics.html',
-    controller: 'DemographicsController'
-  });</pre></p>
-        <p>Then create a file called <strong>views/demographics.html</strong> that contains the following</p>
-        <p>
-<pre><code>&lt;formio src="'{{ variables.projectUrl }}/demographics'" /&gt;</code></pre>
-        </p>
-        <p class="alert alert-warning">Please note that there are single quotes inside the double quotes. This is since the src of the form is interpolated by angular. You can use a variable as well.</p>
-        <p>Finally, you can respond to events such as a submission within your controller</p>
-        <p><pre>
-app.controller('DemographicsController, function($scope, $state) {
-  $scope.$on('formSubmit', function(event, submission) {
-    // Occurs before submission to server. The request can be cancelled with event.preventDefault();
-  });
+        <p>The easiest way to do an embed is to directly embed via the form URL.</p>
+        <p>To embed a form within your react application, import the Formio library and add it to the render tree.</p>
+    <pre><code>import React from 'react';
+      import ReactDOM from 'react-dom';
+      import { Formio } from 'react-formio';
 
-  $scope.$on('formSubmission', function(event, submission) {
-    // Occurs after submission to server. Can do things like change route to a thank you page.
-    $state.go('thanks');
-  });
-
-  $scope.$on('formLoad', function(err, form) {
-    // Occurs after form is loaded.
-  });
-};</pre></p>
-      </li>
+      ReactDOM.render(
+      &nbsp;&nbsp;&lt;Formio src="{{ variables.projectUrl }}/demographics" onSubmitDone={function(submission)} { // do something }" /&gt;, document.getElementById('example')
+      );</code></pre>      </li>
       <li class="list-group-item">
         <div class="list-group-item-title">
           <span class="count-badge">B</span>
           <h5>Controlled Embed</h5>
         </div>
-        <p>This is similar to the uncontrolled embed but we are going to load the form first and then pass it to the formio directive. First, set up a sample page in your application using UI router.</p>
-        <p><pre>
-// Set inside app.config()
-$stateProvider
-  .state('demographics', {
-    url: '/demographics',
-    templateUrl: 'views/demographics.html',
-    controller: 'DemographicsController'
-  });</pre></p>
-        <p>Then create a file called <strong>views/demographics.html</strong> that contains the following</p>
-        <p>
-        <pre><code>&lt;formio form="form" /&gt;</code></pre>
-        </p>
-        <p>Finally, create a controller for loading the form and responding to events.</p>
-        <p><pre>
-app.controller('DemographicsController, function($scope, $state, config, Formio) {
-  // config is typically a service that returns the results of the /src/config.js file we set up earlier.
-  // Formio is provided by ngFormio and is a library to make it easier to contact the Form.io server.
+        <p>A controlled embed is where the loading and saving are controlled outside of the actual element. Typically this is done with flux or redux.</p>
+    <pre><code>import React from 'react';
+      import ReactDOM from 'react-dom';
+      import { Formio } from 'react-formio';
 
-  $scope.formio = new Formio(config.forms.demographicsForm);
+      // These are typically loaded from flux or redux in a controlled component.
+      var form = {};
+      var submission = {
+      &nbsp;&nbsp;data: {}
+      };
 
-  $scope.formio.loadForm().then(function(form) {
-    $scope.form = form;
-  });
-
-  $scope.$on('formSubmit', function(event, submission) {
-    // Occurs before submission to server. The request can be cancelled with event.preventDefault();
-  });
-
-  $scope.$on('formSubmission', function(event, submission) {
-    // Occurs after submission to server. Can do things like change route to a thank you page.
-    $state.go('thanks');
-  });
-
-  $scope.$on('formLoad', function(err, form) {
-    // Occurs after form is loaded.
-  });
-};</pre></p>
-
+      ReactDOM.render(
+      &nbsp;&nbsp;&lt;Formio form={form} submission={submission} onChange={function() {}} onSubmit={function() {}} /&gt;, document.getElementById('example')
+      );</code></pre>      </li>
       </li>
-      <li class="list-group-item">
-        <div class="list-group-item-title">
-          <span class="count-badge">C</span>
-          <h5>As Resource Form with Helper Provider</h5>
-        </div>
-        <p>If you have installed the ngFormioHelper library, you can use it to automatically set up pages and controllers for you using just the form URL.</p>
-        <p>You can do this by registering your resource form in the app.config stage like this</p>
-        <p><pre>
-app.config(function(config, FormioResourceProvider) {
-  FormioResourceProvider.register('demographic', AppConfig.forms.demographicsForm);
-});</pre></p>
-        <p>This will automatically create several ui-router states, templates and controllers that make it easy to use the form within your application. After loading your app, try going to <strong>/demographic</strong> and see what all is there. </p>
-        <p>For more information on the FormioResource Provider, see <a href="https://github.com/formio/ngFormioHelper/wiki/FormioResource-Provider" target="_blank">https://github.com/formio/ngFormioHelper/wiki/FormioResource-Provider</a> </p>
-      </li>
+      <!--<li class="list-group-item">-->
+        <!--<div class="list-group-item-title">-->
+          <!--<span class="count-badge">C</span>-->
+          <!--<h5>As Resource Form with Helper Provider</h5>-->
+        <!--</div>-->
+        <!--<p>If you have installed the ngFormioHelper library, you can use it to automatically set up pages and controllers for you using just the form URL.</p>-->
+        <!--<p>You can do this by registering your resource form in the app.config stage like this</p>-->
+        <!--<p><pre>-->
+<!--app.config(function(config, FormioResourceProvider) {-->
+  <!--FormioResourceProvider.register('demographic', AppConfig.forms.demographicsForm);-->
+<!--});</pre></p>-->
+        <!--<p>This will automatically create several ui-router states, templates and controllers that make it easy to use the form within your application. After loading your app, try going to <strong>/demographic</strong> and see what all is there. </p>-->
+        <!--<p>For more information on the FormioResource Provider, see <a href="https://github.com/formio/ngFormioHelper/wiki/FormioResource-Provider" target="_blank">https://github.com/formio/ngFormioHelper/wiki/FormioResource-Provider</a> </p>-->
+      <!--</li>-->
     </ul>
   </div>
 </div>

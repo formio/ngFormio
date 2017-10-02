@@ -52,6 +52,26 @@ yo fountain-webapp</pre></p>
         <br />
         <p>To add it to your application, type the following</p>
         <p><pre>npm install --save angular-formio</pre><p>
+        <p>Then add the angular-formio module to your application by ensuring they are added to your module dependencies.</p>
+        <strong>app.module.ts</strong>
+    <pre><code>import { NgModule } from '@angular/core';
+      import { FormioModule } from 'angular-formio';
+      import { BrowserModule } from '@angular/platform-browser';
+      import { MainComponent } from './main.component.ts';
+
+      @NgModule({
+      &nbsp;&nbsp;&nbsp;imports: [
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BrowserModule,
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FormioModule
+      &nbsp;&nbsp;&nbsp;],
+      &nbsp;&nbsp;&nbsp;declarations: [
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MainComponent
+      &nbsp;&nbsp;&nbsp;],
+      &nbsp;&nbsp;&nbsp;bootstrap: [
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MainComponent
+      &nbsp;&nbsp;&nbsp;]
+      })
+      export class AppModule {}</code></pre>
       </li>
       <li class="list-group-item">
         <div class="list-group-item-title">
@@ -65,6 +85,28 @@ yo fountain-webapp</pre></p>
             <a href="https://github.com/formio/angular-formio">angular-formio</a> - The main Angular form renderer.
           </li>
         </ul>
+        <br />
+        <p>Then add the angular-formio module to your application by ensuring they are added to your module dependencies.</p>
+        <strong>app.module.ts</strong>
+    <pre><code>import { NgModule } from '@angular/core';
+      import { FormioModule } from 'angular-formio';
+      import { BrowserModule } from '@angular/platform-browser';
+      import { MainComponent } from './main.component.ts';
+
+      @NgModule({
+      &nbsp;&nbsp;&nbsp;imports: [
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BrowserModule,
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FormioModule
+      &nbsp;&nbsp;&nbsp;],
+      &nbsp;&nbsp;&nbsp;declarations: [
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MainComponent
+      &nbsp;&nbsp;&nbsp;],
+      &nbsp;&nbsp;&nbsp;bootstrap: [
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MainComponent
+      &nbsp;&nbsp;&nbsp;]
+      })
+      export class AppModule {}</code></pre>
+
       </li>
     </ul>
   </div>
