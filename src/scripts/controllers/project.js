@@ -123,7 +123,7 @@ app.controller('ProjectCreateController', [
     $scope.createType = 'Project';
     $scope.projectType = 'Project';
 
-    $scope.frameworks = _.filter(ProjectFrameworks, function(item) {return !item.disabled});
+    $scope.frameworks = _.filter(ProjectFrameworks, function(item) {return !item.disabled;});
 
     $scope.project = {};
 
@@ -2286,7 +2286,7 @@ app.controller('PrimaryProjectSettingsController', [
     GoogleAnalytics,
     PrimaryProject
   ) {
-    $scope.frameworks = _.filter(ProjectFrameworks, function(item) {return !item.disabled});
+    $scope.frameworks = _.filter(ProjectFrameworks, function(item) {return !item.disabled;});
 
     $scope.primaryProjectPromise.then(function(primaryProject) {
       $scope.project = _.clone(primaryProject);
