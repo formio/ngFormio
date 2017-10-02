@@ -20,7 +20,7 @@ app.constant('ProjectFrameworkSteps', function(framework) {
         {
           step: 'download',
           title: 'Download',
-          next: 'Download a starterkit application',
+          next: 'Download a StarterKit Application',
           icon: 'fa fa-download',
           template: 'views/project/tour/download.html'
         },
@@ -35,7 +35,7 @@ app.constant('ProjectFrameworkSteps', function(framework) {
     },
     {
       step: 'user',
-      title: 'Application User',
+      title: 'Admin User',
       next: 'Create an Admin user for your application',
       icon: 'fa fa-user-plus',
       template: 'views/project/tour/user.html',
@@ -91,30 +91,51 @@ app.constant('ProjectFrameworkSteps', function(framework) {
 
   switch(framework) {
     case 'angular':
-      steps[1].children[0].template = 'views/project/tour/angular/download.html';
-      steps[1].children[1].template = 'views/project/tour/angular/configure.html';
-      steps[4].template = 'views/frameworks/angular/embed.html';
+      steps[1].template = 'views/frameworks/angular/download.html';
+      steps[1].children[0].template = 'views/frameworks/angular/download.html';
+      steps[1].children[1].template = 'views/frameworks/angular/configure.html';
+      steps[4].template = 'views/frameworks/angular/embed-app.html';
       break;
     case 'angular2':
-      steps[1].children[0].template = 'views/project/tour/angular2/download.html';
-      steps[1].children[1].template = 'views/project/tour/angular2/configure.html';
-      steps[4].template = 'views/frameworks/angular2/embed.html';
+      steps[1].template = 'views/frameworks/angular2/download.html';
+      steps[1].children[0].template = 'views/frameworks/angular2/download.html';
+      steps[1].children[1].template = 'views/frameworks/angular2/configure.html';
+      steps[4].template = 'views/frameworks/angular2/embed-app.html';
+      steps[5].template = 'views/frameworks/angular2/launch.html';
       break;
     case 'react':
-      steps[1].children[0].template = 'views/project/tour/react/download.html';
-      steps[1].children[1].template = 'views/project/tour/react/configure.html';
-      steps[4].template = 'views/frameworks/react/embed.html';
+      steps[1].template = 'views/frameworks/react/download.html';
+      steps[1].children[0].template = 'views/frameworks/react/download.html';
+      steps[1].children[1].template = 'views/frameworks/react/configure.html';
+      steps[4].template = 'views/frameworks/react/embed-app.html';
       break;
     case 'vue':
-      steps[1].children[0].template = 'views/project/tour/vue/download.html';
-      steps[1].children[1].template = 'views/project/tour/vue/configure.html';
+      steps[1].template = 'views/frameworks/vue/download.html';
+      steps[1].children[0].template = 'views/frameworks/vue/download.html';
+      steps[1].children[1].template = 'views/frameworks/vue/configure.html';
       steps[4].template = 'views/frameworks/vue/embed.html';
       break;
     case 'html5':
       break;
     case 'simple':
+      steps[4].template = 'views/frameworks/simple/embed-app.html';
+      delete steps[5];
+      delete steps[2];
+      delete steps[1];
+      steps.splice(4, 0, {
+        step: 'launch',
+        title: 'Launch the form',
+        next: 'Launch your form',
+        icon: 'fa fa-rocket',
+        template: 'views/frameworks/simple/launch.html',
+        children: []
+      });
       break;
     case 'custom':
+      steps[1].template = 'views/frameworks/custom/download.html';
+      steps[1].children = [];
+      steps[4].template = 'views/frameworks/custom/embed-app.html';
+      delete steps[5];
       break;
   }
 

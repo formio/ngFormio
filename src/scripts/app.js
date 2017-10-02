@@ -259,7 +259,10 @@ angular
         .state('project.overview', {
           url: '/overview',
           controller: 'ProjectOverviewController',
-          templateUrl: 'views/project/overview.html'
+          templateUrl: 'views/project/overview.html',
+          params: {
+            graphType: 'Month'
+          }
         })
         .state('project.tour', {
           url: '/tour',
@@ -357,15 +360,6 @@ angular
           url: '/staging/export',
           parent: 'project.env',
           templateUrl: 'views/project/env/staging/export.html'
-        })
-        .state('project.env.activity', {
-          url: '/activity',
-          parent: 'project.env',
-          controller: 'ProjectOverviewController',
-          templateUrl: 'views/project/env/activity/index.html',
-          params: {
-            graphType: 'Month'
-          }
         })
         .state('project.env.logs', {
           url: '/logs',
@@ -636,6 +630,10 @@ angular
       $scope.submitted = false;
       $scope.selectedFramework = null;
       $scope.newProject = function(framework) {
+        // Don't allow disabled frameworks.
+        if (framework && framework.disabled) {
+          return;
+        }
         $scope.selectedFramework = framework;
         ngDialog.open({
           templateUrl: 'views/project/create.html',

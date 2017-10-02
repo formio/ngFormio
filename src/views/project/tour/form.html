@@ -1,19 +1,44 @@
-<div class="col-md-6">
-  <p>To create a form, we have to go to the Forms page and click on <a target="_blank" ui-sref="project.form.index">Create  Form</a> Choose API Web Form, Let's name the form Email Action and set an API path</p>
-  <p>With the Drag-n-Drop components select the Special Components and Drag the Email Component, then let's put a Label and a Placeholder to our field component. Finally, hit save and then
-    click Create Form.</p>
-</div>
-<div class="col-md-6">
-  <ul class="gallery gallery1">
-    <li ng-repeat="image in formCreate">
-      <a ng-click="openLightboxModal(formCreate,$index)">
-        <img ng-src="{{image.thumbUrl}}" class="img-thumbnail">
-      </a>
-    </li>
-  </ul>
-</div>
-<div class="col-sm-12">
+<div class="row">
+  <div class="col-md-12">
+    <ul class="list-group steps">
+      <li class="list-group-item">
+        <div class="list-group-item-title">
+          <span class="count-badge">1</span>
+          <h5>Go to form page</h5>
+        </div>
 
-  <h4 class="text-center">Congrats! we have created an API Web Form, now let's add Actions to this form
-    .</h4>
+        <div>
+          <p>To create a form, go to the <span class="project-sidebar-button"><i class="fa fa-tasks"></i><br><span>Forms</span></span> page on the left and click on <a class="btn btn-success"><i class="fa fa-plus"></i> New Form</a></p>
+          <p>Then select <strong>API Web Form</strong> to build a web form instead of a PDF Form.</p>
+        </div>
+      </li>
+      <li class="list-group-item">
+        <div class="list-group-item-title">
+          <span class="count-badge">2</span>
+          <h5>Build the form</h5>
+        </div>
+        <p>Add a title to the form. Call it <strong>Demographics</strong>. </p>
+        <p>Add the following components to the form:</p>
+        <ul>
+          <li>A Text Field with the label <strong>First Name</strong></li>
+          <li>A Text Field with the label <strong>Last Name</strong></li>
+          <li>An Email Field with the label <strong>Email</strong></li>
+          <li>A Text Area with the label <strong>Message</strong></li>
+        </ul>
+        <br />
+        <p>Your form should look like this:</p>
+        <img src="images/tour/createForm.png" alt="Create Form" style="width:100%" />
+      </li>
+      <li class="list-group-item">
+        <div class="list-group-item-title">
+          <span class="count-badge">3</span>
+          <h5>Save and test the form</h5>
+        </div>
+        <p>When done, click the <a class="btn btn-primary">Create Form</a> button.</p>
+        <p>You should see a message saying you have successfully saved the form.</p>
+        <p>Go to the <span class="btn btn-default nav-pills-button"><i class="fa fa-check-square-o"></i> <span>Use</span></span> tab to test it out.</p>
+      </li>
+    </ul>
+    <p><strong>Congratulations!</strong> You've created your first form on Form.io. This form definition is now stored as a JSON representation of the form and has a corresponding REST API for submissions. In a couple steps we'll look at how to embed it within your application. But first, lets add an email action to it.</p>
+  </div>
 </div>

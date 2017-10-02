@@ -2,10 +2,10 @@
   <div class="col-sm-12">
     <h4>To begin development of your application you will need to set up a local development environment. There are three ways to do this. You can start with our StarterKit, start with another application framework or roll your own.</h4>
     <p>Your options are:</p>
-    <ul class="list-group">
+    <ul class="list-group steps">
       <li class="list-group-item">
         <div class="list-group-item-title">
-          <span class="count-badge">1</span>
+          <span class="count-badge">A</span>
           <h5>Clone the Form.io AngularJS StarterKit</h5>
         </div>
         <p>Our AngularJS StarterKit comes set up with Angular UI Router, ngFormio and lots of Providers that make it easy to set up and use our forms within AngularJS. This is the easiest route to getting a running application.</p>
@@ -22,7 +22,7 @@ bower install</pre>
       </li>
       <li class="list-group-item">
         <div class="list-group-item-title">
-          <span class="count-badge">2</span>
+          <span class="count-badge">B</span>
           <h5>Use a Fountain.js Generator</h5>
         </div>
         <p><a href="http://fountainjs.io/" target="_blank">Fountain.js</a> is a yeoman generator that will build the framework of an application for you and has a lot of sane defaults. It is a good way to get started but does not come pre-configured with the Form.io libraries installed.</p>
@@ -61,11 +61,11 @@ bower install</pre>
         <p>To add these to your application, type the following</p>
         <p><pre>bower install --save ng-formio ng-formio-builder ng-formio-helper</pre><p>
         <p>Then add them to your application by ensuring they are added to your module dependencies.</p>
-        <p><pre>app.module('myapp', ['ngFormio', 'ngFormBuilder', 'ngFormioHelper']);</pre><p>
+        <p><pre>app.module('myapp', ['formio', 'ngFormBuilder', 'ngFormioHelper']);</pre><p>
       </li>
       <li class="list-group-item">
         <div class="list-group-item-title">
-          <span class="count-badge">3</span>
+          <span class="count-badge">C</span>
           <h5>Roll your own application</h5>
         </div>
         <p>If you are have experience with and are comfortable setting up your own AngularJS application you can, of course, do so. This works best for teams that already have an application or have a different set of build tools or dependent libraries than the starterkits use.</p>
@@ -80,7 +80,7 @@ bower install</pre>
         </ul>
         <br />
         <p>Then add them to your application by ensuring they are added to your module dependencies.</p>
-        <p><pre>app.module('myapp', ['ngFormio', 'ngFormBuilder']);</pre><p>
+        <p><pre>app.module('myapp', ['formio', 'ngFormBuilder']);</pre><p>
       </li>
     </ul>
   </div>

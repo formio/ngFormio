@@ -1,0 +1,32 @@
+<div class="row">
+  <div class="col-sm-12">
+    <h4>When embedding the form into a webpage, you have two options for how to do it. You can directly use our formio.js javascript library or use iframes. The javascript library has more dependencies and more features and the iframe is simpler but more limited in its functionality.</h4>
+    <ul class="list-group steps">
+      <li class="list-group-item">
+        <div class="list-group-item-title">
+          <span class="count-badge">A</span>
+          <h5>Embed using the formio.js javascript library</h5>
+        </div>
+        <p>You can use the formio.js library as a JavaScript embedding of a form using a single line of code. For example, you can simply use the following embed code.</p>
+
+        <p><pre>&lt;script src="https://unpkg.com/formiojs@latest/dist/formio.embed.min.js?src={{variables.projectUrl}}/demographics" /&gt;</pre></p>
+        For an example of how this looks and works, check out the following <a target="_blank" href="http://codepen.io/travist/pen/ggQOBa">Form.io Form Embedding CodePen</a>
+      </li>
+      <li class="list-group-item">
+        <div class="list-group-item-title">
+          <span class="count-badge">B</span>
+          <h5>Embed using iframes</h5>
+        </div>
+        <p>The iframe embed allows a self contained embed of this form into your application. Use this if you are embedding this within an existing CMS such as Wordpress or Drupal.</p>
+        <p>
+        <div class="form-group">
+          <label for="gotoUrl">Redirect after submit</label>
+          <input type="text" class="form-control" id="gotoUrl" ng-model="gotoUrl" ng-change="setiframeCode(gotoUrl)" placeholder="https://example.com">
+        </div>
+        </p>
+        <p><pre><textarea style="width:100%;" rows="8" onclick="this.focus();this.select()" readonly="readonly" ng-model="iframeCode"></textarea></pre></p>
+        <small>With this method, you will not have CSS access to the rendered form.</small>
+      </li>
+    </ul>
+  </div>
+</div>

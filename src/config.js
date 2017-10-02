@@ -18,16 +18,13 @@ if (parts[0] === 'portal') {
 
 // Force portal and server to match protocols if not on localhost.
 if (apiProtocol !== protocol && ['localhost', 'portal.localhost', 'lvh.me', 'portal.lvh.me'].indexOf(window.location.hostname) === -1) {
-  var response = confirm('The API protocol (' + apiProtocol + ') is different than this portal (' + protocol + '). Switch to ' + apiProtocol + '?');
-  if (response) {
-    var url = apiProtocol
-      + "//"
-      + window.location.host
-      + window.location.pathname;
-      + window.location.hash;
+  var url = apiProtocol
+    + "//"
+    + window.location.host
+    + window.location.pathname;
+  + window.location.hash;
 
-    window.location.replace(url);
-  }
+  window.location.replace(url);
 }
 
 var appBase = protocol + '//' + host;

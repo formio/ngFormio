@@ -283,7 +283,18 @@ $project-header-color: #eee;
 }
 
 .project-template-item {
+  position: relative;
   .project-template-card {
+    .framework-coming-soon {
+      position: absolute;
+      color: red;
+      text-align: center;
+      width: 100%;
+      font-weight: bolder;
+      font-size: 2em;
+      opacity: 0.3;
+      margin-top: 30px;
+    }
     .project-template-img {
       width: 80px;
       height: 80px;
@@ -344,6 +355,33 @@ $project-header-color: #eee;
       }
     }
   }
+}
+
+.project-sidebar-button {
+  display: inline-block;
+  border: none;
+  background-color: darken($brand-primary, 25%);
+  color: $project-header-color;
+  text-align: center;
+  padding: 10px;
+  width: 70px;
+  vertical-align: middle;
+  span {
+    font-size: 0.7em;
+  }
+  i {
+    font-size: 1.8em;
+  }
+}
+
+.nav-pills-button {
+  display: inline-block;
+  padding: 10px 15px;
+  vertical-align: middle;
+  color: #333333;
+  background-color: #e7e7e7;
+  border-color: #ccc;
+  border-radius: 0;
 }
 
 .project-main {
@@ -1516,6 +1554,35 @@ footer {
 .list-group {
   .list-group-heading {
     background-color: $table-bg-hover;
+    h3 {
+      margin: 5px 0;
+    }
+  }
+  &.steps {
+    .list-group-item {
+      margin-bottom: 20px;
+    }
+  }
+  .list-group-item-title {
+    margin: 20px 0;
+    .count-badge {
+      color: #fff;
+      font-size: 2.5em;
+      padding-top: 12px;
+      background-color: $brand-primary;
+      border-radius: 50%;
+      height: 75px;
+      width: 75px;
+      display: inline-block;
+      text-align: center;
+      vertical-align: middle;
+    }
+    h5 {
+      display: inline-block;
+      font-size: 1.7em;
+      margin-left: 20px;
+      font-weight: bold;
+    }
   }
 }
 
@@ -2004,6 +2071,9 @@ li.step-info {
       width:80%;
       padding: 0px 20px;
     }
+    .flow-footer {
+      margin-top: 30px;
+    }
   }
   .gallery {
     list-style: none;
@@ -2024,10 +2094,10 @@ li.step-info {
 }
 
 .btn-blink {
-  -webkit-animation: buttonblink 10s infinite;  /* Safari 4+ */
-  -moz-animation: buttonblink 10s infinite;  /* Fx 5+ */
-  -o-animation: buttonblink 10s infinite;  /* Opera 12+ */
-  animation: buttonblink 10s infinite;  /* IE 10+, Fx 29+ */
+  -webkit-animation: buttonblink 6s infinite;  /* Safari 4+ */
+  -moz-animation: buttonblink 6s infinite;  /* Fx 5+ */
+  -o-animation: buttonblink 6s infinite;  /* Opera 12+ */
+  animation: buttonblink 6s infinite;  /* IE 10+, Fx 29+ */
 }
 
 @keyframes buttonblink {

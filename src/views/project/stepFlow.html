@@ -31,13 +31,11 @@
         <h3 class="flow-content-title">{{currentParentStep.title}}<span ng-if="currentChildStep">: {{ currentChildStep.title}}</span></h3>
       </div>
       <div class="flow-content__container">
-        <ng-include src="currentStep.template" />
-        <div class="row">
-          <div class="col-md-12">
-            <div class="text-right" ng-if="nextSteps[currentStep.step]">
-              Next: <a class="btn btn-primary btn-lg" ng-click=changeStep(nextSteps[currentStep.step])>{{nextSteps[currentStep.step].next}}</a>
-            </div>
-          </div>
+        <ng-include src="currentStep.template" ng-init="init()" />
+      </div>
+      <div class="flow-footer">
+        <div class="text-right" ng-if="nextSteps[currentStep.step]">
+          <strong>Next:</strong> <a class="btn btn-primary btn-lg" ng-click="changeStep(nextStep.parentStep, nextStep.childStep)">{{nextStep.childStep.next || nextStep.parentStep.next}}</a>
         </div>
       </div>
     </div>

@@ -1,6 +1,6 @@
 'use strict';
 
-/* globals NumberAbbreviate, chance, Chartist, semver */
+/* globals NumberAbbreviate, chance, Chartist, semver, localStorage */
 
 // loadedFiles is used to prevent double loading files on each session.
 var loadedFiles = [];
@@ -123,7 +123,7 @@ app.controller('ProjectCreateController', [
     $scope.createType = 'Project';
     $scope.projectType = 'Project';
 
-    $scope.frameworks = ProjectFrameworks;
+    $scope.frameworks = _.filter(ProjectFrameworks, function(item) {return !item.disabled;});
 
     $scope.project = {};
 
@@ -174,8 +174,8 @@ app.controller('ProjectCreateController', [
       FormioProject.createProject($scope.project).then(function(project) {
         $scope.isBusy = false;
         // Reset tour and go directly to it.
-        sessionStorage.removeItem('stepFlowCurrentParentStep');
-        sessionStorage.removeItem('stepFlowCurrentChildStep');
+        localStorage.removeItem('stepFlowCurrentParentStep');
+        localStorage.removeItem('stepFlowCurrentChildStep');
         $state.go('project.tour', {projectId: project._id});
       });
     };
@@ -544,7 +544,7 @@ app.controller('ProjectDeployController', [
     PrimaryProject
   ) {
     var loadTags = function(project) {
-      Formio.makeStaticRequest(AppConfig.apiBase + '/project/' + project._id + '/tag', 'GET', null, {ignoreCache: true})
+      Formio.makeStaticRequest(AppConfig.apiBase + '/project/' + project._id + '/tag?limit=1000', 'GET', null, {ignoreCache: true})
         .then(function(tags) {
           $scope.tags = tags;
         });
@@ -704,13 +704,15 @@ app.controller('ProjectOverviewController', [
   'AppConfig',
   'Formio',
   'FormioAlerts',
+  'ProjectFrameworks',
   function(
     $scope,
     $stateParams,
     $http,
     AppConfig,
     Formio,
-    FormioAlerts
+    FormioAlerts,
+    ProjectFrameworks
   ) {
     // This is restricted to form.io domains.
     var key = 'AIzaSyDms9ureQ45lp6BT6LuZtoANB_GcR2jZmE';
@@ -719,19 +721,77 @@ app.controller('ProjectOverviewController', [
     $scope.currentSection.icon = 'fa fa-dashboard';
     $scope.currentSection.help = '';
 
+    $scope.graphType = $stateParams.graphType;
+
     $scope.hasTeams = function() {
       return ['trial', 'team', 'commercial'].indexOf($scope.currentProject.plan) !== -1;
     };
 
-    $scope.formio.loadForms({
-        params: {
-          sort: '-modified'
+    $scope.loadProjectPromise.then(function() {
+      var projectCreated = new Date($scope.currentProject.created);
+      projectCreated.setSeconds(projectCreated.getSeconds() + 30);
+
+      $scope.formio.loadForms({
+          params: {
+            type: 'form',
+            modified__gt: projectCreated,
+            sort: '-modified'
+          }
+        })
+        .then(function(forms) {
+          $scope.recentForms = forms;
+        }, FormioAlerts.onError.bind(FormioAlerts))
+        .catch(FormioAlerts.onError.bind(FormioAlerts));
+
+      $scope.formio.loadForms({
+          params: {
+            type: 'resource',
+            modified__gt: projectCreated,
+            sort: '-modified'
+          }
+        })
+        .then(function(forms) {
+          $scope.recentResources = forms;
+        }, FormioAlerts.onError.bind(FormioAlerts))
+        .catch(FormioAlerts.onError.bind(FormioAlerts));
+
+      $scope.currentFramework = {};
+      ProjectFrameworks.forEach(function(framework) {
+        if (framework.name === $scope.currentProject.framework) {
+          $scope.currentFramework = framework;
         }
-      })
-      .then(function(forms) {
-        $scope.recentForms = forms;
-      }, FormioAlerts.onError.bind(FormioAlerts))
-      .catch(FormioAlerts.onError.bind(FormioAlerts));
+      });
+
+      $http.post($scope.projectUrl + '/report', [
+        {
+          $sort: {
+            created: -1
+          }
+        },
+        {
+          $limit: 10
+        },
+      ]).then(function(result) {
+        $scope.submissions = result.data || [];
+
+        if ($scope.submissions.length) {
+          var formIds = _.uniq($scope.submissions.map(function(submission) {
+            return submission.form;
+          }));
+
+          $scope.formio.loadForms({
+            params: {
+              _id__in: formIds
+            }
+          }).then(function(results) {
+            $scope.forms = {};
+            results.forEach(function(form) {
+              $scope.forms[form._id] = form;
+            });
+          });
+        }
+      });
+    });
   }
 ]);
 
@@ -1934,8 +1994,6 @@ app.controller('ProjectSettingsController', [
     $http,
     PrimaryProject
   ) {
-    $scope.platforms = ProjectFrameworks;
-
     $scope.loadProjectPromise.then(function() {
       $scope.localProject.plan = $scope.localProject.plan || 'basic';
 
@@ -2228,7 +2286,7 @@ app.controller('PrimaryProjectSettingsController', [
     GoogleAnalytics,
     PrimaryProject
   ) {
-    $scope.frameworks = ProjectFrameworks;
+    $scope.frameworks = _.filter(ProjectFrameworks, function(item) {return !item.disabled;});
 
     $scope.primaryProjectPromise.then(function(primaryProject) {
       $scope.project = _.clone(primaryProject);

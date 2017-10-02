@@ -1,28 +1,141 @@
 <div class="project-section-inner-content">
   <div class="row overview">
     <div class="col-md-8 overview-content">
-      <h2>Welcome to your Form.io Project</h2>
-      <h4>Projects are a collection of resources, forms, actions and settings that form the backbone of your serverless application.</h4>
-      <p>By using one of the modern web frameworks you can quickly build out an application with dynamic forms.
-        You can also embed your forms directly into other websites or mobile platforms like iOS and Android.</p>
-      <div class="text-center">
-        <img width="500px" src="images/formio.png" alt="">
-        <p>Never done this before? Try the Walkthrough.</p>
-        <a class="btn btn-primary btn-lg" ui-sref="project.tour">Start Walkthrough</a>
-      </div>
+      <ul class="list-group list-group-striped">
+        <li class="list-group-item list-group-heading">
+          <h3>Recent Submissions</h3>
+        </li>
+        <li class="list-group-item list-group-heading">
+          <div class="row">
+            <div class="col-sm-2">
+              <strong>Form</strong>
+            </div>
+            <div class="col-sm-2">
+              <strong>Created</strong>
+            </div>
+            <div class="col-sm-6">
+              <strong>Data Preview</strong>
+            </div>
+            <div class="col-sm-2">
+              <strong class="pull-right">Links</strong>
+            </div>
+          </div>
+        </li>
+        <li class="list-group-item" ng-repeat="submission in submissions track by $index">
+          <div class="row">
+            <div class="col-sm-2">
+              <strong>{{forms[submission.form].title}}</strong>
+            </div>
+            <div class="col-sm-2">
+              {{submission.created | date : 'short'}}
+            </div>
+            <div class="col-sm-2" ng-repeat="column in submission.data track by $index | limitTo : 4">
+              <div>{{column}}</div>
+            </div>
+            <div class="col-sm-2 pull-right" ng-if="forms[submission.form]">
+              <a ui-sref="project.{{forms[submission.form].type}}.form.submission.item.view({formId: submission.form, subId: submission._id})" class="btn btn-default pull-right">View</a>
+            </div>
+          </div>
+        </li>
+        <li class="list-group-item text-center">
+          <a ui-sref="project.data">More...</a>
+        </li>
+      </ul>
     </div>
     <div class="col-md-4">
       <ul class="list-group list-group-striped">
-        <li class="list-group-item lsist-group-heading">
-          <strong>Recently Modified Forms and Resources</strong>
+        <li class="list-group-item list-group-heading">
+          <h3>Recent Resources</h3>
         </li>
-        <li class="list-group-item" ng-repeat="form in recentForms track by $index">
-          <a ui-sref="project.{{form.type}}.form.edit({formId: form._id})">{{form.title}}</a>
+        <li class="list-group-item" ng-repeat="form in recentResources track by $index">
+          <div class="row">
+            <div class="col-sm-12">
+              <strong><a ui-sref="project.{{form.type}}.form.edit({formId: form._id})">{{form.title}}</a></strong>
+              <a ui-sref="project.{{form.type}}.form.edit({formId: form._id})" class="btn btn-default pull-right">Edit</a>
+            </div>
+          </div>
         </li>
         <li class="list-group-item text-center">
           <a ui-sref="project.form.index">More...</a>
         </li>
       </ul>
+      <ul class="list-group list-group-striped">
+        <li class="list-group-item list-group-heading">
+          <h3>Recent Forms</h3>
+        </li>
+        <li class="list-group-item" ng-repeat="form in recentForms track by $index">
+          <div class="row">
+            <div class="col-sm-12">
+              <strong><a ui-sref="project.{{form.type}}.form.edit({formId: form._id})">{{form.title}}</a></strong>
+              <a ui-sref="project.{{form.type}}.form.edit({formId: form._id})" class="btn btn-default pull-right">Edit</a>
+            </div>
+          </div>
+        </li>
+        <li class="list-group-item text-center">
+          <a ui-sref="project.form.index">More...</a>
+        </li>
+      </ul>
+      <ul class="list-group list-group-striped">
+        <li class="list-group-item list-group-heading">
+          <h3>Current Framework</h3>
+        </li>
+        <li class="list-group-item">
+          <p><img src="{{currentFramework.img}}" alt="{{currentFramework.title}}" style="width: 50px;"> {{currentFramework.title}} <a ui-sref="project.settings" class="btn btn-default">Change</a></p>
+          <a class="btn btn-primary" ui-sref="project.tour">View Walkthrough</a>
+        </li>
+      </ul>
+      <ul class="list-group list-group-striped" ng-if="hasTeams()">
+        <li class="list-group-item list-group-heading">
+          <h3>Team Status</h3>
+        </li>
+        <li class="list-group-item" ng-repeat="form in recentForms track by $index">
+          <div class="list-group">
+            <a ui-sref="team.view({teamId: team._id})" class="list-group-item" ng-repeat="team in currentProjectTeams">
+              <span class="badge"><i class="fa fa-users"></i>&nbsp;{{ team.data.members.length || 0 }}</span>
+              <h4 class="list-group-item-heading">
+                {{ team.data.name }}
+                <small ng-if="team.permission === 'team_read'">Read-only</small>
+                <small ng-if="team.permission === 'team_admin'">Admin</small>
+              </h4>
+              <span class="label label-success">{{ team.owner === user._id ? 'OWNER' : 'MEMBER'}}</span>
+            </a>
+          </div>
+          <h4>
+            <span ng-if="highestRole === 'owner'">You are the project <strong>owner</strong>.</span>
+            <span ng-if="highestRole === 'team_admin'">You are a project <strong>admin</strong>.</span>
+            <span ng-if="highestRole === 'team_write'">You are a project <strong>member</strong>.</span>
+            <span ng-if="highestRole === 'team_read'">You are a <strong>read-only project member</strong>.</span>
+            You can:
+          </h4>
+          <dl class="dl-horizontal">
+            <dt ng-class="{'text-muted': !projectPermissions.read}">Read</dt>
+            <dd><i class="fa" ng-class="{'text-success fa-check': projectPermissions.read, 'text-muted fa-times': !projectPermissions.read}"></i></dd>
+            <dt ng-class="{'text-muted': !projectPermissions.write}">Write</dt>
+            <dd><i class="fa" ng-class="{'text-success fa-check': projectPermissions.write, 'text-muted fa-times': !projectPermissions.write}"></i></dd>
+            <dt ng-class="{'text-muted': !projectPermissions.admin}">Administrate</dt>
+            <dd><i class="fa" ng-class="{'text-success fa-check': projectPermissions.admin, 'text-muted fa-times': !projectPermissions.admin}"></i></dd>
+          </dl>
+        </li>
+      </ul>
+      <div ng-if="!hasTeams()">
+        <div class="well">
+          <h4><a href="" ng-click="showUpgradeDialog(currentProject)">Upgrade Plan</a> to enable teams for this project</h4>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="submission-activity">
+      <div class="col-md-12">
+        <h3>Submission Activity</h3>
+      </div>
+      <div class="project-data project-summary" ng-if="projectUrl" ng-controller="ChartController">
+        <div class="col-sm-12">
+          <h3 class="center">{{label[currentType]}}</h3>
+          <h4>{{viewDate.year}} / {{viewDate.month}} / {{viewDate.day}}&nbsp;(UTC)&emsp;<select ng-init="graphChange()" ng-options="type for type in types" ng-model="graphType" ng-change="graphChange()"></select></h4>
+          <chartist class="ct-chart" chartist-data="analytics" chartist-chart-type="Line" chartist-chart-options="analyticsOptions" chartist-events="analyticsEvents"></chartist>
+        </div>
+      </div>
     </div>
   </div>
 </div>
