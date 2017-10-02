@@ -622,6 +622,16 @@ angular
 
       $scope.frameworks = ProjectFrameworks;
 
+      $scope.getFrameworkTitle = function(frameworkName) {
+        var title = '';
+        ProjectFrameworks.forEach(function(framework) {
+          if (framework.name === frameworkName) {
+            title = framework.title;
+          }
+        });
+        return title;
+      };
+
       $scope.templates = [];
       FormioProject.loadTemplates().then(function(templates) {
         $scope.templates = templates;
