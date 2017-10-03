@@ -32,5 +32,5 @@
       </ul>
     </div>
   </div>
-  <span class="btn btn-primary" ng-disabled="projectForm.$invalid || isBusy" ng-click="saveProject()"><i ng-if="isBusy" class="fa fa-spinner fa-pulse"></i> {{currentProject._id ? 'Save ' + projectType : 'Add Stage' }}</span>
+  <button class="btn btn-primary" ng-disabled="projectForm.$invalid || isBusy" ng-click="saveProject()"><i ng-if="isBusy" class="fa fa-spinner fa-pulse"></i> {{currentProject._id ? 'Save ' + projectType : 'Add Stage' }}</button>
 </form>

@@ -2046,7 +2046,7 @@ li.step-info {
                   background-color: #0ea6ff;
                 }
                 .flow-side-step__title {
-                  color: #58c01a;
+                  color: $brand-primary;
                   font-weight: bold;
                 }
               }
@@ -2080,6 +2080,7 @@ li.step-info {
     }
     .flow-content-title {
       color: $brand-primary;
+      font-weight: bold;
     }
     .flow-footer {
       margin-top: 30px;
