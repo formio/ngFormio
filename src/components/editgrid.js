@@ -295,7 +295,7 @@ module.exports = function(app) {
       '        </ng-form>' +
       '        <div class="editgrid-actions">' +
       '          <div ng-click="editDone(formioForm)" class="btn btn-primary">{{ component.saveRow || \'Save\' }}</div>' +
-      '          <div ng-if="component.removeRow" on-click="removeRow(rowIndex)" class="btn btn-danger">{{component.removeRow || \'Cancel\' }}</div>' +
+      '          <div ng-if="component.removeRow" ng-click="removeRow(rowIndex)" class="btn btn-danger">{{component.removeRow || \'Cancel\' }}</div>' +
       '        </div> ' +
       '      </div>' +
       '    </div>' +
