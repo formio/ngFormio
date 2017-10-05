@@ -36,7 +36,9 @@ module.exports = function(app) {
           ) {
             $scope.options = $scope.options || {};
             var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
-            $scope.componentSubmission = $scope.data[$scope.component.key] || {data: {}};
+            if (!$scope.data[$scope.component.key]) {
+              $scope.data[$scope.component.key] = {data: {}};
+            }
 
             var loadForm = function() {
               if (!$scope.component.form) {
@@ -96,7 +98,7 @@ module.exports = function(app) {
             };
 
             var submitForm = function(scope, cb) {
-              var submission = angular.copy($scope.componentSubmission);
+              var submission = angular.copy($scope.data[$scope.component.key]);
 
               // Only save if we have provided data.
               if (angular.equals(submission, {})) {
@@ -156,7 +158,7 @@ module.exports = function(app) {
               if (!submission) {
                 return;
               }
-              angular.merge($scope.componentSubmission, submission);
+              angular.merge($scope.data[$scope.component.key], submission);
             }, true);
           }
         ],
