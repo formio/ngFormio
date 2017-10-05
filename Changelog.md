@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.23.8
+### Fixed
+ - Fix typo on-click should be ng-click for Edit Grid
+ - Fixed an issue with multi-form workflows where next page would not execute.
+ - Fixed multi-line tooltips.
+
+### Added
+ - Add tooltip for resource component with Add button checked
+
 ## 2.23.7
 ### Changed
  - Make formioTranslate filter stateful
