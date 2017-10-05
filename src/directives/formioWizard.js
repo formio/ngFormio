@@ -1,5 +1,6 @@
 var isNaN = require('lodash/isNAN');
 var isFinite = require('lodash/isFinite');
+var _ = require('lodash')
 
 module.exports = function() {
   return {
@@ -116,12 +117,31 @@ module.exports = function() {
               $scope.clear();
             }
 
+            // Handle Local Storage Definition
             if ($scope.storage && !$scope.readOnly) {
-              localStorage.setItem($scope.storage, angular.toJson({
-                page: $scope.currentPage,
-                data: $scope.submission.data
-              }));
+              // If there is no localStorage object - make a new object schema
+              if (!localStorage.getItem($scope.storage)) {
+                localStorage.setItem($scope.storage, angular.toJson({
+                  page: $scope.currentPage,
+                  data: $scope.submission.data
+                }));
+              }
+
+              // if there is a localStorage object && submission.data is blank then bind localStorage to $scope
+              if(localStorage.getItem($scope.storage) && _.isEmpty($scope.submission.data) == true){
+                var storageToScope = JSON.parse(localStorage.getItem($scope.storage));
+                $scope.submission.data = storageToScope.data
+              }
+
+              // if there is a localStorage object | && it is data | merge the two
+              if(localStorage.getItem($scope.storage) && _.isEmpty($scope.submission.data) == false){
+                localStorage.setItem($scope.storage, angular.toJson({
+                  page: $scope.currentPage,
+                  data: $scope.submission.data
+                }));
+              }
             }
+
 
             $scope.page.components = $scope.pages[$scope.currentPage].components;
             $scope.activePage = $scope.pages[$scope.currentPage];
