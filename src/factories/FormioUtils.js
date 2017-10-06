@@ -347,7 +347,7 @@ module.exports = function() {
           '</div>' +
         '</div>' +
         '<div ng-if="!!component.description" class="help-block">' +
-          '<span>{{ component.description }}</span>' +
+          '<span>{{ component.description | formioTranslate:null:options.building }}</span>' +
         '</div>' +
         '<div ng-if="component.multiple"><table class="table table-bordered">' +
           inputLabel +
