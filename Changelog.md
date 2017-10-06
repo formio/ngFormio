@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.23.9
+### Fixed
+ - Wizard refresh losing data
+ - Field descriptions not translatable.
+
 ## 2.23.8
 ### Fixed
  - Fix typo on-click should be ng-click for Edit Grid
