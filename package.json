@@ -5,7 +5,7 @@
   "main": "dist/ng-formio.js",
   "scripts": {
     "test": "node test/test",
-    "build": "babel ./src --ignore=*.spec.js --out-dir ./lib --presets es2015,react,stage-2",
+    "build": "babel ./src --ignore=*.spec.js --out-dir ./lib --presets es2015,stage-2",
     "prepare": "npm run build; webpack"
   },
   "author": "",

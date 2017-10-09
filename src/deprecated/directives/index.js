@@ -1,2 +1,0 @@
-import './formioComponent';
-//import './formioElement';

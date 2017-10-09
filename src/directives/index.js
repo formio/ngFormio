@@ -1,2 +1,1 @@
 import './formio';
-import './formioWizard';
