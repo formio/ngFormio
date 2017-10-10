@@ -4,7 +4,13 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [UNRERELEASED
+## 2.23.10
+### Fixed
+ - The tooltip to be below the input controls for multiple inputs.
+
+### Changed
+ - Upgrade formio.js to 2.19.2
+
 ### Added
  - Tooltip for button component.
 
