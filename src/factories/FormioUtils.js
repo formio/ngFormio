@@ -346,9 +346,6 @@ module.exports = function() {
             '<formio-errors ng-if="::!options.building"></formio-errors>' +
           '</div>' +
         '</div>' +
-        '<div ng-if="!!component.description" class="help-block">' +
-          '<span>{{ component.description | formioTranslate:null:options.building }}</span>' +
-        '</div>' +
         '<div ng-if="component.multiple"><table class="table table-bordered">' +
           inputLabel +
           '<tr ng-repeat="value in data[component.key] track by $index">' +
@@ -368,7 +365,10 @@ module.exports = function() {
           '<tr>' +
             '<td colspan="2"><a ng-click="(readOnly || formioForm.submitting)? null: addFieldValue() " ng-disabled = "readOnly || formioForm.submitting" class="btn btn-primary"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {{ component.addAnother || "Add Another" | formioTranslate:null:options.building }}</a></td>' +
           '</tr>' +
-        '</table></div>';
+        '</table></div>' +
+        '<div ng-if="!!component.description" class="help-block">' +
+          '<span>{{ component.description | formioTranslate:null:options.building }}</span>' +
+        '</div>';
       return template;
     },
 
