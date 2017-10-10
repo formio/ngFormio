@@ -42,6 +42,7 @@
     "main-bower-files": "^2.5.0",
     "merge-stream": "^1.0.0",
     "opn": "^1.0.0",
+    "protractor-helpers": "^1.1.0",
     "require-dir": "^0.3.0",
     "ternary-stream": "^2.0.0",
     "vinyl-paths": "^1.0.0",

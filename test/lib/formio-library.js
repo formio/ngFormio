@@ -538,7 +538,6 @@ module.exports = function (config) {
   this.clickOnElementWithText = function (text) {
     it('I click on the ' + text + ' text', function (next) {
       var ele =  element(by.xpath('//*[text()="' + replacements(text.toString()) + '"]'));
-     // console.log(ele);
       browser.wait(function () {
         return ele.isPresent();
       }, timeout).then(function (res) {
@@ -586,7 +585,7 @@ module.exports = function (config) {
 
   this.clickOnClass = function (className) {
     it('I click on the ' + className + ' class', function (next) {
-      var ele =  element(by.className(replacements(className.toString())));
+      var ele =  element(by.css(replacements(className.toString())));
       browser.wait(function () {
         return ele.isPresent();
       }, timeout).then(function (res) {
@@ -664,8 +663,7 @@ module.exports = function (config) {
 
   this.iSeeTextIn = function (ele, text) {
     it('I see text "' + text + '"', function (next) {
-      text = replacements(text);
-      ele = (typeof (ele) == 'object') ? ele : element(by.cssContainingText(ele, text));
+      ele = (typeof (ele) == 'object') ? ele : element(by.css(ele, text));
       browser.wait(function () {
         return ele.isPresent();
       }, timeout).then(function () {
@@ -1220,6 +1218,33 @@ module.exports = function (config) {
     });
     };
 
+  this.checkElementIsNotDisabled = function (ele) {
+    it('I see ' + ele + ' is not disabled', function (next) {
+      try {
+        var btn = element(by.xpath(ele));
+        browser.wait(function () {
+          return btn.isPresent().then(function (present) {
+            if (present) {
+              return btn.isEnabled().then(function (res) {
+                return res;
+              });
+            }
+            return present;
+          });
+        }, timeout).then(function (value) {
+          try {
+            assert.equal(value, true);
+            next();
+          } catch (err) {
+            next(err);
+          }
+        });
+      } catch (err) {
+        next(err);
+      }
+    });
+  };
+
   this.checkElement = function (text) {
     it('I check the ' + text, function (next) {
       var ele = element(by.xpath(text));
@@ -1265,4 +1290,31 @@ module.exports = function (config) {
       });
     });
   };
+
+  this.selectComponentCount = function (text, count) {
+    it('I see '+count+' values in ' + text, function (next) {
+      var ele = element(by.css(text));
+      browser.wait(function () {
+        return ele.isPresent();
+      }, timeout).then(function () {
+        ele.all(by.tagName('option')).count().then(function(res){
+          config.expect(res).to.equal(count);
+          next();
+        });
+      });
+    });
+  };
+
+  this.selectComponentOption = function (text, option) {
+    it('Click on value '+option+' in '+ text, function (next) {
+      var ele = element(by.css(text));
+      browser.wait(function () {
+        return ele.isPresent();
+      }, timeout).then(function () {
+        element(by.cssContainingText('option',option)).click();
+        next();
+      });
+    });
+  };
+
 };
