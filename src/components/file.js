@@ -20,7 +20,10 @@ module.exports = function(app) {
           protected: false,
           persistent: true,
           hidden: false,
-          clearOnHide: true
+          clearOnHide: true,
+          filePattern: '',
+          fileMinSize: '',
+          fileMaxSize: ''
         },
         viewTemplate: 'formio/componentsView/file.html'
       });
