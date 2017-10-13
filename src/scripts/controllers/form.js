@@ -371,16 +371,8 @@ app.controller('FormController', [
 
       // Determine if we have enough to upload.
       $scope.purchaseRequired = false;
-      PDFServer.getInfo($scope.primaryProjectPromise).then(function(info) {
-        var numForms = parseInt(info.data.forms, 10);
-        switch (info.data.plan) {
-          case 'basic':
-            $scope.purchaseRequired = (numForms >= 1);
-            break;
-          case 'hosted':
-            $scope.purchaseRequired = (numForms >= 1000);
-            break;
-        }
+      PDFServer.getAllowed($scope.primaryProjectPromise).then(function(allowed) {
+        $scope.purchaseRequired = (allowed.forms - allowed.numForms) <= 0;
       });
     };
     var formType = $stateParams.formType || 'form';

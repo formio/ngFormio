@@ -28,10 +28,10 @@
         <!--<li role="presentation" ng-class="{active:($state.includes('project.env.database.wipe'))}"><a ui-sref="project.env.database.wipe">Wipe</a></li>-->
       <!--</ul>-->
     <!--</li>-->
+    <li role="presentation" ng-class="{active:($state.includes('project.env.integrations.pdf'))}"><a ui-sref="project.env.integrations.pdf">PDF Management</a></li>
     <li role="presentation" ng-class="{active:($state.is('project.env.integrations.info'))}">
       <a ui-sref="project.env.integrations.info" role="button" aria-haspopup="true" aria-expanded="false">Integrations</a>
       <ul ng-if="$state.current.name.includes('project.env.integrations')" class="nav nav-pills nav-stacked">
-        <li role="presentation" ng-class="{active:($state.includes('project.env.integrations.pdf'))}"><a ui-sref="project.env.integrations.pdf">PDFs</a></li>
         <li role="presentation" ng-class="{active:($state.includes('project.env.integrations.email'))}"><a ui-sref="project.env.integrations.email">Email Providers</a></li>
         <li role="presentation" ng-class="{active:($state.includes('project.env.integrations.storage'))}"><a ui-sref="project.env.integrations.storage">File Storage</a></li>
         <li role="presentation" ng-class="{active:($state.includes('project.env.integrations.data'))}"><a ui-sref="project.env.integrations.data">Data Connections</a></li>

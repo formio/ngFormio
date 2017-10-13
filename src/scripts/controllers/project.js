@@ -366,7 +366,7 @@ app.controller('ProjectController', [
 
       if ($scope.localProject.remote) {
         $scope.isRemote = true;
-        $scope.projectUrl = $rootScope.projectPath($scope.localProject.remote.project, $scope.localProject.remote.url, $scope.localProject.remote.type);
+        Formio.setProjectUrl($scope.projectUrl = $rootScope.projectPath($scope.localProject.remote.project, $scope.localProject.remote.url, $scope.localProject.remote.type));
         $scope.projectProtocol = $scope.localProject.remote.url.indexOf('https') === 0 ? 'https:' : 'http:';
         $scope.projectServer = $scope.localProject.remote.url.replace(/(^\w+:|^)\/\//, '');
         $scope.localFormio = $scope.formio;
@@ -397,7 +397,7 @@ app.controller('ProjectController', [
         $scope.projectServer = AppConfig.apiServer;
         $scope.baseUrl = AppConfig.apiBase;
         $scope.currentProject = $scope.localProject;
-        $scope.projectUrl = $rootScope.projectPath(result);
+        Formio.setProjectUrl($scope.projectUrl = $rootScope.projectPath(result));
         loadRoles();
       }
       $scope.projectType = 'Stage';
@@ -1264,7 +1264,7 @@ app.controller('LaunchController', [
       }];
     $scope.$watch('project', function(newProject, oldProject) {
       if (newProject && newProject.name) {
-        $scope.projectUrl = $rootScope.projectPath(newProject);
+        Formio.setProjectUrl($scope.projectUrl = $rootScope.projectPath(newProject));
       }
     });
     $scope.openLightboxModal = function (images,index) {
