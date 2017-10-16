@@ -1,24 +1,24 @@
 module.exports = function (actions) {
   describe('Settings',function(){
     describe('Basic Plan > Environment Settings',function(){
-      actions.logout();
-      actions.enterTextInField('.login-container #email','admin@example.com');
-      actions.enterTextInField('.login-container #password','password');
-      actions.clickOnElementWithText('LOG IN');
-      actions.waitForActionToComplete(2000);
-      // actions.iAmLoggedInFor('profileuser2');
-      // actions.goToPage('#/');
-      // actions.goToPage('#/profile/payment/view');
-      // actions.clickOnElementWithText('Add Credit Card');
-      // actions.enterTextInField('#cardholderName','Test');
-      // actions.enterTextInField('#ccNumber','4111111111111111');
-      // actions.enterTextInField('#securityCode','411');
-      // actions.clickOnClass('#form-group-ccExpiryMonth');
-      // actions.clickOnElementWithText('01');
-      // actions.clickOnClass('#form-group-ccExpiryYear');
-      // actions.clickOnElementWithText('25');
-      // actions.clickOnClass('#submit');
+      // actions.logout();
+      // actions.enterTextInField('.login-container #email','admin@example.com');
+      // actions.enterTextInField('.login-container #password','password');
+      // actions.clickOnElementWithText('LOG IN');
       // actions.waitForActionToComplete(2000);
+      actions.iAmLoggedInFor('profileuser2');
+      actions.goToPage('#/');
+      actions.goToPage('#/profile/payment/view');
+      actions.clickOnElementWithText('Add Credit Card');
+      actions.enterTextInField('#cardholderName','Test');
+      actions.enterTextInField('#ccNumber','4111111111111111');
+      actions.enterTextInField('#securityCode','411');
+      actions.clickOnClass('#form-group-ccExpiryMonth');
+      actions.clickOnElementWithText('01');
+      actions.clickOnClass('#form-group-ccExpiryYear');
+      actions.clickOnElementWithText('25');
+      actions.clickOnClass('#submit');
+      actions.waitForActionToComplete(2000);
       actions.goToPage('#/');
       actions.clickOnElementWithText('New Project');
       actions.enterTextInField('#title','testProject');
