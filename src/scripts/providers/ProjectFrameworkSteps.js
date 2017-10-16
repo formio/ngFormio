@@ -123,13 +123,15 @@ app.constant('ProjectFrameworkSteps', function(framework) {
       delete steps[2];
       delete steps[1];
       steps.splice(4, 0, {
-        step: 'launch',
-        title: 'Launch the form',
-        next: 'Launch your form',
-        icon: 'fa fa-rocket',
-        template: 'views/frameworks/simple/launch.html',
+        step: 'configure',
+        title: 'Configure access',
+        next: 'Configura access to your form',
+        icon: 'fa fa-lock',
+        template: 'views/frameworks/simple/configure.html',
         children: []
       });
+      steps[5].next = 'Use the form';
+      steps[5].title = 'Use the form';
       break;
     case 'custom':
       steps[1].template = 'views/frameworks/custom/download.html';

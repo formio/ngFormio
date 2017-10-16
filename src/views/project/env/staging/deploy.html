@@ -6,10 +6,10 @@
       <h4>Select Version Tag</h4>
       <div ng-if="tags.length">
         <p><select class="form-control tags" ng-model="deployTagOption" ng-options="selectTag as selectTag.tag for selectTag in tags"></select></p>
-        <span class="btn btn-primary" ng-click="deployTag(deployTagOption)">Deploy version tag to {{ environmentName }}</span>
+        <span class="btn btn-primary" ng-click="deployTag(deployTagOption)" ng-disabled="isBusy"><i ng-if="isBusy" class="fa fa-spinner fa-pulse"></i> Deploy version tag to {{ environmentName }}</span>
       </div>
       <div ng-if="!tags.length">
-        <p>No version tags exist. <a ui-sref="project.env.deployments.create">Create</a> a new version tag in the source stage before deploying.</p>
+        <p>No version tags exist. <a ui-sref="project.env.staging.create">Create</a> a new version tag in the source stage before deploying.</p>
       </div>
     </div>
     <div class="col-md-4">

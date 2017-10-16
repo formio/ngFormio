@@ -123,6 +123,36 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
             }.bind(this));
           }.bind(this));
         },
+        getAllowed: function(projectPromise) {
+          return this.ensureProject(projectPromise).then(function(project) {
+            return this.getInfo(projectPromise).then(function(info) {
+              var numForms = parseInt(info.data.forms, 10);
+              var numSubs = parseInt(info.data.submissions, 10);
+              var allowed = {
+                forms: 1,
+                submissions: 10
+              };
+
+              if (project.plan === 'enterprise') {
+                allowed.forms = AppConfig.pdfHostedForms;
+                allowed.submissions = AppConfig.pdfHostedSubs;
+              }
+
+              if (info.data.plan === 'hosted') {
+                allowed.forms = AppConfig.pdfHostedForms;
+                allowed.submissions = AppConfig.pdfHostedSubs;
+                if (project.plan === 'enterprise') {
+                  allowed.forms *= 2;
+                  allowed.submissions *= 2;
+                }
+              }
+
+              allowed.availableForms = (info.data.plan === 'enterprise') ? 1000000 : (allowed.forms - numForms);
+              allowed.availableSubs = (info.data.plan === 'enterprise') ? 1000000 : (allowed.submissions - numSubs);
+              return allowed;
+            }.bind(this));
+          }.bind(this));
+        },
         getPDFs: function(projectPromise) {
           return this.ensureProject(projectPromise).then(function(project) {
             return this.getInfo(projectPromise).then(function(info) {
@@ -165,9 +195,9 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
     ) {
       PDFServer.clearCache();
       $scope.availablePDFs = [];
-      $scope.numForms = '1,000';
-      $scope.numSubmissions = '10,000';
-      $scope.totalPrice = 100;
+      $scope.numForms = AppConfig.pdfHostedForms.toLocaleString();
+      $scope.numSubmissions = AppConfig.pdfHostedSubs.toLocaleString();
+      $scope.totalPrice = AppConfig.pdfHostedPrice;
       $scope.currentPlan = 'hosted';
       $scope.currentTab = 'pdf';
       $scope.loading = true;
@@ -184,15 +214,16 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
           $scope.totalPrice = 0;
         }
         else if (this.currentPlan === 'hosted') {
-          $scope.numForms = '1,000';
-          $scope.numSubmissions = '10,000';
-          $scope.totalPrice = 100;
+          $scope.numForms = AppConfig.pdfHostedForms.toLocaleString();
+          $scope.numSubmissions = AppConfig.pdfHostedSubs.toLocaleString();
+          $scope.totalPrice = AppConfig.pdfHostedPrice;
         }
         else {
           $scope.numForms = 'Unlimited';
           $scope.numSubmissions = 'Unlimited';
-          $scope.totalPrice = 250;
+          $scope.totalPrice = AppConfig.pdfEnterprisePrice;
         }
+        $scope.getAvailable();
       };
 
       $scope.getPlan = function() {
@@ -214,24 +245,13 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
         return pdfServer + pdf.data.path + '.html';
       };
 
-      $scope.getAvailable = function(type) {
-        if ($scope.pdfInfo.data.plan === 'enterprise') {
-          return 'Unlimited';
-        }
-        var allowedForms = 1;
-        var allowedSubmissions = 10;
-        if ($scope.pdfInfo.data.plan === 'hosted') {
-          allowedForms = 1000;
-          allowedSubmissions = 10000;
-        }
-        if (type === 'forms') {
-          var forms = parseInt($scope.pdfInfo.data.forms, 10);
-          return (allowedForms - forms);
-        }
-        else {
-          var submissions = parseInt($scope.pdfInfo.data.submissions, 10);
-          return (allowedSubmissions - submissions);
-        }
+      $scope.availableForms = 0;
+      $scope.availableSubs = 0;
+      $scope.getAvailable = function() {
+        return PDFServer.getAllowed($scope.primaryProjectPromise).then(function(allowed) {
+          $scope.availableForms = (allowed.availableForms === 1000000) ? 'Unlimited' : allowed.availableForms.toLocaleString();
+          $scope.availableSubs = (allowed.availableSubs === 1000000) ? 'Unlimited' : allowed.availableSubs.toLocaleString();
+        });
       };
 
       $scope.askToBuy = function() {
@@ -277,6 +297,7 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
       };
 
       $scope.getPDFs = function() {
+        $scope.getAvailable();
         PDFServer.getPDFs($scope.primaryProjectPromise).then(function(pdfs) {
           $scope.availablePDFs = pdfs;
         });
