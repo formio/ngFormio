@@ -52,7 +52,7 @@
           <div class="project well" ng-click="goToProject(project)" title="{{ project.title }}">
             <span class="label project-plan-label" ng-class="getPlanLabel(project.plan)">{{ getPlanName(project.plan) | uppercase }}</span>
             <h4 class="project-title ellipsis"><a ui-sref="project.overview({projectId: project._id})">{{ project.title }}</a></h4>
-            <p class="project-url ellipsis" ui-sref="project.overview({projectId: project._id})"><strong>{{ projectPath(project) }}</strong></p>
+            <p class="project-framework"><strong>{{ getFrameworkTitle(project.framework) }}</strong></p>
             <p class="project-description">{{ project.description | characters: 50 }}</p>
             <div class="project-section-separator"></div>
             <p class="progress-label text-center"><small>Monthly API Calls</small></p>
@@ -62,7 +62,7 @@
             </div>
             <div class="row" style="z-index:1000;">
               <div class="col-sm-6 project-tile-button"><button ui-sref="project.overview({projectId: project._id})" class="btn btn-default btn-xs btn-block">Manage</button></div>
-              <div class="col-sm-6 project-tile-button" ng-if="!onPrem"><span ng-disabled="!isProjectOwner(project)" ui-sref="project.billing({projectId: primaryProject._id})" class="btn btn-default btn-xs btn-block" title="{{!isProjectOwner(project) ? 'You must be a project owner to upgrade its plan' : ''}}">Upgrade Plan</span></div>
+              <div class="col-sm-6 project-tile-button" ng-if="!onPrem"><span ng-disabled="!isProjectOwner(project)" ui-sref="project.billing({projectId: project._id})" class="btn btn-default btn-xs btn-block" title="{{!isProjectOwner(project) ? 'You must be a project owner to upgrade its plan' : ''}}">Upgrade Plan</span></div>
             </div>
             <div class="row project-teams">
               <h5 class="text-center project-teams-header">Teams <i class="fa fa-users"></i></h5><hr />

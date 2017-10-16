@@ -294,6 +294,7 @@ $project-header-color: #eee;
       font-size: 2em;
       opacity: 0.3;
       margin-top: 30px;
+      padding-right: 7px;
     }
     .project-template-img {
       width: 80px;
@@ -2040,8 +2041,14 @@ li.step-info {
                   font-size: 18px;
                 }
               }
-              .logo-active {
-                background-color: #0ea6ff;
+              &.active {
+                .flow-side-logo {
+                  background-color: #0ea6ff;
+                }
+                .flow-side-step__title {
+                  color: $brand-primary;
+                  font-weight: bold;
+                }
               }
               .step-item {
                 padding-top: 20px;
@@ -2070,6 +2077,10 @@ li.step-info {
     .flow-content {
       width:80%;
       padding: 0px 20px;
+    }
+    .flow-content-title {
+      color: $brand-primary;
+      font-weight: bold;
     }
     .flow-footer {
       margin-top: 30px;

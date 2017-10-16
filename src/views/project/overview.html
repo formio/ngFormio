@@ -8,13 +8,10 @@
         <li class="list-group-item list-group-heading">
           <div class="row">
             <div class="col-sm-2">
-              <strong>Form</strong>
-            </div>
-            <div class="col-sm-2">
               <strong>Created</strong>
             </div>
-            <div class="col-sm-6">
-              <strong>Data Preview</strong>
+            <div class="col-sm-8">
+              <strong>Form</strong>
             </div>
             <div class="col-sm-2">
               <strong class="pull-right">Links</strong>
@@ -24,13 +21,10 @@
         <li class="list-group-item" ng-repeat="submission in submissions track by $index">
           <div class="row">
             <div class="col-sm-2">
-              <strong>{{forms[submission.form].title}}</strong>
-            </div>
-            <div class="col-sm-2">
               {{submission.created | date : 'short'}}
             </div>
-            <div class="col-sm-2" ng-repeat="column in submission.data track by $index | limitTo : 4">
-              <div>{{column}}</div>
+            <div class="col-sm-8">
+              <strong>{{forms[submission.form].title}}</strong>
             </div>
             <div class="col-sm-2 pull-right" ng-if="forms[submission.form]">
               <a ui-sref="project.{{forms[submission.form].type}}.form.submission.item.view({formId: submission.form, subId: submission._id})" class="btn btn-default pull-right">View</a>
@@ -84,11 +78,22 @@
           <a class="btn btn-primary" ui-sref="project.tour">View Walkthrough</a>
         </li>
       </ul>
+      <ul class="list-group list-group-striped">
+        <li class="list-group-item list-group-heading">
+          <h3>Monthly Submission Requests</h3>
+        </li>
+        <li class="list-group-item">
+          <div class="progress">
+            <div class="progress-bar" role="progressbar" ng-style="{width: getAPICallsPercent(currentProject.apiCalls)}" ng-class="getProgressBarClass(currentProject.apiCalls)"></div>
+          </div>
+          <p class="text-center text-muted progress-caption"><small>{{ currentProject.apiCalls.used | number }} / {{ getAPICallsLimit(currentProject.apiCalls) }}</small></p>
+        </li>
+      </ul>
       <ul class="list-group list-group-striped" ng-if="hasTeams()">
         <li class="list-group-item list-group-heading">
           <h3>Team Status</h3>
         </li>
-        <li class="list-group-item" ng-repeat="form in recentForms track by $index">
+        <li class="list-group-item">
           <div class="list-group">
             <a ui-sref="team.view({teamId: team._id})" class="list-group-item" ng-repeat="team in currentProjectTeams">
               <span class="badge"><i class="fa fa-users"></i>&nbsp;{{ team.data.members.length || 0 }}</span>

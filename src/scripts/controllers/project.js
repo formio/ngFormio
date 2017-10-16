@@ -223,7 +223,10 @@ app.controller('ProjectCreateEnvironmentController', [
       });
     });
 
+    $scope.isBusy = false;
+
     $scope.saveProject = function() {
+      $scope.isBusy = true;
       FormioProject.createEnvironment($scope.currentProject).then(function(project) {
         // Update team access to new environment.
         project.access = project.access.concat(_.filter($scope.primaryProject.access, function(access) { return access.type.indexOf('team_') === 0;}));
@@ -232,7 +235,8 @@ app.controller('ProjectCreateEnvironmentController', [
           .then(function() {
             PrimaryProject.clear();
             $state.go('project.overview', {projectId: project._id});
-          });
+          })
+          .catch(function() {$scope.isBusy = false;});
       });
     };
   }
@@ -362,7 +366,7 @@ app.controller('ProjectController', [
 
       if ($scope.localProject.remote) {
         $scope.isRemote = true;
-        $scope.projectUrl = $rootScope.projectPath($scope.localProject.remote.project, $scope.localProject.remote.url, $scope.localProject.remote.type);
+        Formio.setProjectUrl($scope.projectUrl = $rootScope.projectPath($scope.localProject.remote.project, $scope.localProject.remote.url, $scope.localProject.remote.type));
         $scope.projectProtocol = $scope.localProject.remote.url.indexOf('https') === 0 ? 'https:' : 'http:';
         $scope.projectServer = $scope.localProject.remote.url.replace(/(^\w+:|^)\/\//, '');
         $scope.localFormio = $scope.formio;
@@ -393,7 +397,7 @@ app.controller('ProjectController', [
         $scope.projectServer = AppConfig.apiServer;
         $scope.baseUrl = AppConfig.apiBase;
         $scope.currentProject = $scope.localProject;
-        $scope.projectUrl = $rootScope.projectPath(result);
+        Formio.setProjectUrl($scope.projectUrl = $rootScope.projectPath(result));
         loadRoles();
       }
       $scope.projectType = 'Stage';
@@ -559,11 +563,13 @@ app.controller('ProjectDeployController', [
           message: 'Please select a tag to deploy.'
         });
       }
+      $scope.isBusy = true;
       Formio.makeStaticRequest($scope.projectUrl + '/deploy', 'POST', {
         type: 'template',
         template: tag.template
       })
         .then(function() {
+          $scope.isBusy = false;
           $scope.deployTagOption = '';
           FormioAlerts.addAlert({
             type: 'success',
@@ -584,7 +590,8 @@ app.controller('ProjectDeployController', [
             $state.reload();
           }
         })
-        .catch(FormioAlerts.onError.bind(FormioAlerts));
+        .catch(FormioAlerts.onError.bind(FormioAlerts))
+        .catch(function() {$scope.isBusy = false;});
     };
   }
 ]);
@@ -1257,7 +1264,7 @@ app.controller('LaunchController', [
       }];
     $scope.$watch('project', function(newProject, oldProject) {
       if (newProject && newProject.name) {
-        $scope.projectUrl = $rootScope.projectPath(newProject);
+        Formio.setProjectUrl($scope.projectUrl = $rootScope.projectPath(newProject));
       }
     });
     $scope.openLightboxModal = function (images,index) {
