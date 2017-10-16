@@ -76,10 +76,10 @@ module.exports = function (actions) {
       actions.clickOnLink('Settings');
       actions.clickOnLink('Staging');
       actions.clickOnLink('Create Version Tag');
-      actions.enterTextInField('#tag', '0.0.3');
+      actions.enterTextInField('#tag', '0.0.4');
       actions.clickOnElementWithText('Create version tag');
       actions.waitForActionToComplete(2000);
-      actions.iSeeTextIn('.active .environment-tab .badge', '0.0.3');
+      actions.iSeeTextIn('.active .environment-tab .badge', '0.0.4');
       actions.clickOnLink('Forms');
       actions.clickOnClass('.glyphicon.glyphicon-cloud-download');
       actions.enterTextInField('#embedURL','https://basiccomponenttest.form.io/basiccomponents');

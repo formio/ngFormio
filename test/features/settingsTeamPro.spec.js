@@ -1,32 +1,9 @@
 module.exports = function (actions) {
   describe('Team Pro Plan Settings',function(){
     describe('Team Pro Plan > Environment Settings',function(){
-      actions.logout();
-      actions.enterTextInField('.login-container #email','admin@example.com');
-      actions.enterTextInField('.login-container #password','password');
-      actions.clickOnElementWithText('LOG IN');
-      actions.waitForActionToComplete(2000);
-      // // actions.iAmLoggedInFor('profileuser2');
-      // // actions.goToPage('#/');
-      // // actions.goToPage('#/profile/payment/view');
-      // // actions.clickOnElementWithText('Add Credit Card');
-      // // actions.enterTextInField('#cardholderName','Test');
-      // // actions.enterTextInField('#ccNumber','4111111111111111');
-      // // actions.enterTextInField('#securityCode','411');
-      // // actions.clickOnClass('#form-group-ccExpiryMonth');
-      // // actions.clickOnElementWithText('01');
-      // // actions.clickOnClass('#form-group-ccExpiryYear');
-      // // actions.clickOnElementWithText('25');
-      // // actions.clickOnClass('#submit');
-      // // actions.waitForActionToComplete(50000);
-      // // actions.goToPage('#/');
-      // // actions.clickOnElementWithText('New Project');
-      // // actions.enterTextInField('#title','testProject');
-      // // actions.clickOnElementWithText(' Create Project');
-      // // actions.clickOnElementWithText('Trial');
-      // // actions.clickOnElementWithText('Upgrade');
-      // // actions.waitForActionToComplete(5000);
-      actions.goToPage('#/project/59d6a8ba09867520081db499/overview');
+      actions.clickOnElementWithText('Independent');
+      actions.clickOnElementWithTextLast('Upgrade');
+      actions.clickOnElementWithText('Confirm Billing Change');
       actions.clickOnLink('Settings');
       actions.checkElementIsDisabled('//*[@id="form-group-title"]/input');
       actions.checkElementIsNotDisabled('//*[@id="name"]');
@@ -74,7 +51,7 @@ module.exports = function (actions) {
       actions.clickOnClass('#ui-select-choices-row-0-1');
       actions.clickOnElementWithText('Connect Stage');
       actions.iSeeText('https://remote.form.io');
-      actions.goToPage('#/project/59d6a8ba09867520081db499/env/settings/remote');
+      //actions.goToPage('#/project/59d6a8ba09867520081db499/env/settings/remote');
       actions.iSeeText('https://remote.form.io');
       actions.clickOnElementWithText('Disconnect');
       actions.clickOnElementWithText('API Keys');
@@ -82,14 +59,9 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Add New Key');
       actions.clickOnElementWithText('CORS');
       actions.clickOnElementWithText('Custom JS and CSS');
-      actions.checkingUrlIamOn('http://localhost:9002/#/project/59d6a8ba09867520081db499/env/settings/customjscss');
+      actions.checkingUrlEndsWith('/env/settings/customjscss');
     });
     describe('Team Pro Plan > Deployment Settings',function(){
-        // actions.enterTextInField('.login-container #email','admin@example.com');
-        // actions.enterTextInField('.login-container #password','password');
-        // actions.clickOnElementWithText('LOG IN');
-        // actions.waitForActionToComplete(2000);
-        // actions.goToPage('#/project/59d3d2ad4962aa0ac03499e2/overview');
         actions.clickOnLink('Settings');
         actions.checkElement('//*[@id="protect"]');
         actions.clickOnElementWithText(' Save Stage');
@@ -98,21 +70,16 @@ module.exports = function (actions) {
         actions.clickOnElementWithText('Create Version Tag');
         actions.iSeeText('Upgrade your project to Enterprise to enable deploying to stages.');
         actions.clickOnElementWithText('Import Template');
-        actions.checkingUrlIamOn('http://localhost:9002/#/project/59d6a8ba09867520081db499/env/staging/import');
+        actions.checkingUrlEndsWith('env/staging/import');
         actions.clickOnElementWithText('Export Template');
-        actions.checkingUrlIamOn('http://localhost:9002/#/project/59d6a8ba09867520081db499/env/staging/export');
+        actions.checkingUrlEndsWith('env/staging/export');
     });
     describe('Team Pro Plan > Integrations Settings',function(){
-      // actions.enterTextInField('.login-container #email','admin@example.com');
-      // actions.enterTextInField('.login-container #password','password');
-      // actions.clickOnElementWithText('LOG IN');
-      // actions.waitForActionToComplete(2000);
-      // actions.goToPage('#/project/59d3d2ad4962aa0ac03499e2/overview');
       actions.clickOnLink('Settings');
       actions.clickOnElementWithText('Integrations');
-      actions.checkingUrlIamOn('http://localhost:9002/#/project/59d6a8ba09867520081db499/env/integrations/info');
+      actions.checkingUrlEndsWith('env/integrations/info');
       actions.clickOnElementWithText('PDFs');
-      actions.checkingUrlIamOn('http://localhost:9002/#/project/59d6a8ba09867520081db499/env/pdf');
+      actions.checkingUrlEndsWith('env/pdf');
       actions.clickOnElementWithText('Email Providers');
       actions.iSeeText('SMTP Settings');
       actions.iSeeText('SendGrid Settings');

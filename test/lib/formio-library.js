@@ -460,6 +460,29 @@ module.exports = function (config) {
     });
   };
 
+  this.checkingUrlEndsWith = function (url) {
+    it('URL contains ' + url, function (next) {
+      browser.wait(function () {
+        return browser.getCurrentUrl().then(function (cUrl) {
+          return cUrl.endsWith(url);
+        });
+      }, timeout).then(function (value) {
+        try {
+          assert.equal(value, true);
+          next();
+        } catch (err) {
+          next(err);
+        }
+      });
+    });
+  };
+  this.goToPage = function (url) {
+    it('I go to ' + url, function (next) {
+      url = config.baseUrl + "/" + url;
+      browser.get(url).then(next).catch(next);
+    });
+  };
+
   this.waitForActionToComplete = function (time) {
     it('I wait for ' + (time / 1000) + ' seconds', function (next) {
       browser.sleep(time).then(next).catch(next);
@@ -528,16 +551,23 @@ module.exports = function (config) {
     });
   };
 
-  this.goToPage = function (url) {
-    it('I go to ' + url, function (next) {
-      url = config.baseUrl + "/" + url;
-      browser.get(url).then(next).catch(next);
-    });
-  };
-
   this.clickOnElementWithText = function (text) {
     it('I click on the ' + text + ' text', function (next) {
       var ele =  element(by.xpath('//*[text()="' + replacements(text.toString()) + '"]'));
+      browser.wait(function () {
+        return ele.isPresent();
+      }, timeout).then(function (res) {
+        scrollTo(ele)
+          .then(function() {
+            ele.click().then(next).catch(next);
+          });
+      });
+    });
+  };
+
+  this.clickOnElementWithTextLast = function (text) {
+    it('I click on the ' + text + ' text', function (next) {
+      var ele =  element.all(by.xpath('//*[text()="' + replacements(text.toString()) + '"]')).last();
       browser.wait(function () {
         return ele.isPresent();
       }, timeout).then(function (res) {

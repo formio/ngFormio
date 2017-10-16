@@ -1,32 +1,31 @@
 module.exports = function (actions) {
   describe('Settings',function(){
     describe('Basic Plan > Environment Settings',function(){
-      actions.logout();
-      actions.enterTextInField('.login-container #email','admin@example.com');
-      actions.enterTextInField('.login-container #password','password');
-      actions.clickOnElementWithText('LOG IN');
+      // actions.logout();
+      // actions.enterTextInField('.login-container #email','admin@example.com');
+      // actions.enterTextInField('.login-container #password','password');
+      // actions.clickOnElementWithText('LOG IN');
+      // actions.waitForActionToComplete(2000);
+      actions.iAmLoggedInFor('profileuser2');
+      actions.goToPage('#/');
+      actions.goToPage('#/profile/payment/view');
+      actions.clickOnElementWithText('Add Credit Card');
+      actions.enterTextInField('#cardholderName','Test');
+      actions.enterTextInField('#ccNumber','4111111111111111');
+      actions.enterTextInField('#securityCode','411');
+      actions.clickOnClass('#form-group-ccExpiryMonth');
+      actions.clickOnElementWithText('01');
+      actions.clickOnClass('#form-group-ccExpiryYear');
+      actions.clickOnElementWithText('25');
+      actions.clickOnClass('#submit');
       actions.waitForActionToComplete(2000);
-      // actions.iAmLoggedInFor('profileuser2');
-      // actions.goToPage('#/');
-      // actions.goToPage('#/profile/payment/view');
-      // actions.clickOnElementWithText('Add Credit Card');
-      // actions.enterTextInField('#cardholderName','Test');
-      // actions.enterTextInField('#ccNumber','4111111111111111');
-      // actions.enterTextInField('#securityCode','411');
-      // actions.clickOnClass('#form-group-ccExpiryMonth');
-      // actions.clickOnElementWithText('01');
-      // actions.clickOnClass('#form-group-ccExpiryYear');
-      // actions.clickOnElementWithText('25');
-      // actions.clickOnClass('#submit');
-      // actions.waitForActionToComplete(50000);
-      // actions.goToPage('#/');
-      // actions.clickOnElementWithText('New Project');
-      // actions.enterTextInField('#title','testProject');
-      // actions.clickOnElementWithText(' Create Project');
-      // actions.clickOnElementWithText('Trial');
-      // actions.clickOnElementWithText('Upgrade');
-      // actions.waitForActionToComplete(5000);
-      actions.goToPage('#/project/59db9dd83edc533dd059b868/overview');
+      actions.goToPage('#/');
+      actions.clickOnElementWithText('New Project');
+      actions.enterTextInField('#title','testProject');
+      actions.clickOnElementWithText(' Create Project');
+      actions.clickOnElementWithText('Trial');
+      actions.clickOnElementWithTextLast('Upgrade');
+      actions.clickOnElementWithText('Confirm Billing Change');
       actions.clickOnLink('Settings');
       actions.checkElementIsDisabled('//*[@id="form-group-title"]/input');
       actions.checkElementIsDisabled('//*[@id="name"]');
@@ -52,7 +51,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('CORS');
       actions.iSeeText('Upgrade your project to a paid plan to enable CORS Settings.');
       actions.clickOnElementWithText('Custom JS and CSS');
-      actions.checkingUrlIamOn('http://localhost:9002/#/project/59db9dd83edc533dd059b868/env/settings/customjscss');
+      actions.checkingUrlEndsWith('/env/settings/customjscss');
       actions.clickOnElementWithText('Save Settings');
     });
     describe('Basic Plan > Deployment Settings',function(){
@@ -65,16 +64,16 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Create Version Tag');
       actions.iSeeText('Upgrade your project to Enterprise to enable deploying to stages.');
       actions.clickOnElementWithText('Import Template');
-      actions.checkingUrlIamOn('http://localhost:9002/#/project/59db9dd83edc533dd059b868/env/staging/import');
+      actions.checkingUrlEndsWith('env/staging/import');
       actions.clickOnElementWithText('Export Template');
-      actions.checkingUrlIamOn('http://localhost:9002/#/project/59db9dd83edc533dd059b868/env/staging/export');
+      actions.checkingUrlEndsWith('env/staging/export');
     });
     describe('Basic Plan > Integrations Settings',function(){
       actions.clickOnLink('Settings');
       actions.clickOnElementWithText('Integrations');
-      actions.checkingUrlIamOn('http://localhost:9002/#/project/59db9dd83edc533dd059b868/env/integrations/info');
+      actions.checkingUrlEndsWith('env/integrations/info');
       actions.clickOnElementWithText('PDFs');
-      actions.checkingUrlIamOn('http://localhost:9002/#/project/59db9dd83edc533dd059b868/env/pdf');
+      actions.checkingUrlEndsWith('env/pdf');
       actions.clickOnElementWithText('Email Providers');
       actions.iSeeText('Upgrade your project to a paid plan to access email settings.');
       actions.clickOnElementWithText('File Storage');
