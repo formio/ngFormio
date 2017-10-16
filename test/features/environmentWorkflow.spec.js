@@ -15,7 +15,7 @@ module.exports = function (actions) {
     describe('Removing Environment',function() {
       actions.clickOnElementWithText(' Dev ');
       actions.clickOnElementWithText('Settings');
-      actions.clickOnLink('Delete Dev Stage');
+      actions.clickOnElementWithText('Delete Dev Stage');
       actions.clickOnElementWithText(' Yes');
       actions.iDonotSeeText(' Dev ');
     });

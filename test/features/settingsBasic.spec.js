@@ -1,24 +1,24 @@
 module.exports = function (actions) {
   describe('Settings',function(){
     describe('Basic Plan > Environment Settings',function(){
-      // actions.logout();
-      // actions.enterTextInField('.login-container #email','admin@example.com');
-      // actions.enterTextInField('.login-container #password','password');
-      // actions.clickOnElementWithText('LOG IN');
-      // actions.waitForActionToComplete(2000);
-      actions.iAmLoggedInFor('profileuser2');
-      actions.goToPage('#/');
-      actions.goToPage('#/profile/payment/view');
-      actions.clickOnElementWithText('Add Credit Card');
-      actions.enterTextInField('#cardholderName','Test');
-      actions.enterTextInField('#ccNumber','4111111111111111');
-      actions.enterTextInField('#securityCode','411');
-      actions.clickOnClass('#form-group-ccExpiryMonth');
-      actions.clickOnElementWithText('01');
-      actions.clickOnClass('#form-group-ccExpiryYear');
-      actions.clickOnElementWithText('25');
-      actions.clickOnClass('#submit');
+      actions.logout();
+      actions.enterTextInField('.login-container #email','admin@example.com');
+      actions.enterTextInField('.login-container #password','password');
+      actions.clickOnElementWithText('LOG IN');
       actions.waitForActionToComplete(2000);
+      // actions.iAmLoggedInFor('profileuser2');
+      // actions.goToPage('#/');
+      // actions.goToPage('#/profile/payment/view');
+      // actions.clickOnElementWithText('Add Credit Card');
+      // actions.enterTextInField('#cardholderName','Test');
+      // actions.enterTextInField('#ccNumber','4111111111111111');
+      // actions.enterTextInField('#securityCode','411');
+      // actions.clickOnClass('#form-group-ccExpiryMonth');
+      // actions.clickOnElementWithText('01');
+      // actions.clickOnClass('#form-group-ccExpiryYear');
+      // actions.clickOnElementWithText('25');
+      // actions.clickOnClass('#submit');
+      // actions.waitForActionToComplete(2000);
       actions.goToPage('#/');
       actions.clickOnElementWithText('New Project');
       actions.enterTextInField('#title','testProject');
@@ -26,14 +26,14 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Trial');
       actions.clickOnElementWithTextLast('Upgrade');
       actions.clickOnElementWithText('Confirm Billing Change');
-      actions.clickOnLink('Settings');
+      actions.clickOnElementWithText('Settings');
       actions.checkElementIsDisabled('//*[@id="form-group-title"]/input');
       actions.checkElementIsDisabled('//*[@id="name"]');
       actions.checkElement('//*[@id="protect"]');
       actions.iSeeElement('i.fa.fa-shield.ng-scope');
       actions.clickOnElementWithText(' Save Stage');
       actions.iSeeText('Project saved.');
-      actions.clickOnLink('Forms');
+      actions.clickOnElementWithText('Forms');
       actions.checkElementWithTextIsDisabled(' New Form');
       actions.checkElementWithTextIsDisabled(' Edit');
       actions.checkElementWithTextIsDisabled(' Actions');
@@ -43,7 +43,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText(' Data');
       actions.checkElementWithTextIsNotDisabled('{...} Export JSON');
       actions.checkElementWithTextIsNotDisabled(' Export CSV');
-      actions.clickOnLink('Settings');
+      actions.clickOnElementWithText('Settings');
       actions.clickOnElementWithText('Remote Environment');
       actions.iSeeText('Upgrade your project to a team or commercial plan to enable Remote Environments.');
       actions.clickOnElementWithText('API Keys');
@@ -55,10 +55,9 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Save Settings');
     });
     describe('Basic Plan > Deployment Settings',function(){
-      actions.clickOnLink('Settings');
+      actions.clickOnElementWithText('Settings');
       actions.checkElement('//*[@id="protect"]');
       actions.clickOnElementWithText(' Save Stage');
-      actions.clickOnElementWithText('Staging');
       actions.clickOnElementWithText('Staging');
       actions.iSeeText('Upgrade your project to Enterprise to enable deploying to stages.');
       actions.clickOnElementWithText('Create Version Tag');
@@ -69,7 +68,7 @@ module.exports = function (actions) {
       actions.checkingUrlEndsWith('env/staging/export');
     });
     describe('Basic Plan > Integrations Settings',function(){
-      actions.clickOnLink('Settings');
+      actions.clickOnElementWithText('Settings');
       actions.clickOnElementWithText('Integrations');
       actions.checkingUrlEndsWith('env/integrations/info');
       actions.clickOnElementWithText('PDFs');

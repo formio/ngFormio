@@ -4,26 +4,26 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Independent');
       actions.clickOnElementWithTextLast('Upgrade');
       actions.clickOnElementWithText('Confirm Billing Change');
-      actions.clickOnLink('Settings');
+      actions.clickOnElementWithText('Settings');
       actions.checkElementIsDisabled('//*[@id="form-group-title"]/input');
       actions.checkElementIsNotDisabled('//*[@id="name"]');
       actions.enterTextInField('#name','testteampro');
       actions.clickOnElementWithText(' Save Stage');
       actions.iSeeValueIn('#name','testteampro');
-      actions.clickOnLink('Overview');
+      actions.clickOnElementWithText('Overview');
       actions.iSeeText('testteampro');
-      actions.clickOnLink('Forms');
+      actions.clickOnElementWithText('Forms');
       actions.clickOnElementWithText('User Login');
       actions.iSeeValueIn('#form-group-path','testteampro');
-      actions.clickOnLink('Resources');
+      actions.clickOnElementWithText('Resources');
       actions.clickOnElementWithText(' API');
       actions.iSeeValueIn('.wrap-table-cell','testteampro');
-      actions.clickOnLink('Settings');
+      actions.clickOnElementWithText('Settings');
       actions.checkElement('//*[@id="protect"]');
       actions.iSeeElement('i.fa.fa-shield.ng-scope');
       actions.clickOnElementWithText(' Save Stage');
       actions.iSeeText('Project saved.');
-      actions.clickOnLink('Forms');
+      actions.clickOnElementWithText('Forms');
       actions.checkElementWithTextIsDisabled(' New Form');
       actions.checkElementWithTextIsDisabled(' Edit');
       actions.checkElementWithTextIsDisabled(' Actions');
@@ -33,7 +33,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText(' Data');
       actions.checkElementWithTextIsNotDisabled('{...} Export JSON');
       actions.checkElementWithTextIsNotDisabled(' Export CSV');
-      actions.clickOnLink('Settings');
+      actions.clickOnElementWithText('Settings');
       actions.clickOnElementWithText('Remote Environment');
       actions.iSeeText('Subdirectories');
       actions.enterTextInField('#serverURL','test');
@@ -62,7 +62,7 @@ module.exports = function (actions) {
       actions.checkingUrlEndsWith('/env/settings/customjscss');
     });
     describe('Team Pro Plan > Deployment Settings',function(){
-        actions.clickOnLink('Settings');
+        actions.clickOnElementWithText('Settings');
         actions.checkElement('//*[@id="protect"]');
         actions.clickOnElementWithText(' Save Stage');
         actions.clickOnElementWithText('Staging');
@@ -75,7 +75,7 @@ module.exports = function (actions) {
         actions.checkingUrlEndsWith('env/staging/export');
     });
     describe('Team Pro Plan > Integrations Settings',function(){
-      actions.clickOnLink('Settings');
+      actions.clickOnElementWithText('Settings');
       actions.clickOnElementWithText('Integrations');
       actions.checkingUrlEndsWith('env/integrations/info');
       actions.clickOnElementWithText('PDFs');
@@ -99,7 +99,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText(' Add Action');
       actions.clickOnClass('#transport');
       actions.iSeeText('SMTP');
-      actions.clickOnLink('Settings');
+      actions.clickOnElementWithText('Settings');
       actions.clickOnElementWithText('Integrations');
       actions.clickOnElementWithText('Email Providers');
       actions.clickOnElementWithText('SendGrid Settings');
@@ -112,7 +112,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText(' Add Action');
       actions.clickOnClass('#transport');
       actions.iSeeText('SendGrid');
-      actions.clickOnLink('Settings');
+      actions.clickOnElementWithText('Settings');
       actions.clickOnElementWithText('Integrations');
       actions.clickOnElementWithText('Email Providers');
       actions.clickOnElementWithText('Mailgun Settings');
@@ -126,7 +126,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText(' Add Action');
       actions.clickOnClass('#transport');
       actions.iSeeText('Mailgun');
-      actions.clickOnLink('Settings');
+      actions.clickOnElementWithText('Settings');
       actions.clickOnElementWithText('Integrations');
       actions.clickOnElementWithText('Email Providers');
       actions.clickOnElementWithText('Custom Email Server');
@@ -140,7 +140,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText(' Add Action');
       actions.clickOnClass('#transport');
       actions.iSeeText('Custom');
-      actions.clickOnLink('Settings');
+      actions.clickOnElementWithText('Settings');
       actions.clickOnElementWithText('Integrations');
       actions.clickOnElementWithText('File Storage');
       actions.clickOnElementWithText('Data Connections');
