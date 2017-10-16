@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+### Fixed
+ - Editing nested forms mapped to another resource with save as another resource returns 404.
+
 ## 2.23.10
 ### Fixed
  - The tooltip to be below the input controls for multiple inputs.
