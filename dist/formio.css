@@ -1,3 +1,7 @@
+.formio-form {
+  overflow: scroll;
+}
+
 .ngdialog.ngdialog-theme-default .ngdialog-content {
   width: 65%;
 }
