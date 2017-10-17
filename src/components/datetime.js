@@ -73,15 +73,12 @@ module.exports = function(app) {
           }
           else {
             var maxDate = new Date($scope.component.datePicker.maxDate);
-            $scope.component.datePicker.maxDate = new Date(
-              maxDate.getUTCFullYear(),
-              maxDate.getUTCMonth(),
-              maxDate.getUTCDate(),
-              23,
-              59,
-              59,
-              999
-            );
+            var utcMaxDate = new Date(0, 0, 0, 0, 59, 59, 999);
+            utcMaxDate.setUTCHours(23);
+            utcMaxDate.setUTCDate(maxDate.getUTCDate());
+            utcMaxDate.setUTCMonth(maxDate.getUTCMonth());
+            utcMaxDate.setUTCFullYear(maxDate.getUTCFullYear());
+            $scope.component.datePicker.maxDate = utcMaxDate;
           }
 
           if (!$scope.component.datePicker.minDate) {
@@ -89,15 +86,11 @@ module.exports = function(app) {
           }
           else {
             var minDate = new Date($scope.component.datePicker.minDate);
-            $scope.component.datePicker.minDate = new Date(
-              minDate.getUTCFullYear(),
-              minDate.getUTCMonth(),
-              minDate.getUTCDate(),
-              0,
-              0,
-              0,
-              0
-            );
+            var utcMinDate = new Date(0);
+            utcMinDate.setUTCDate(minDate.getUTCDate());
+            utcMinDate.setUTCMonth(minDate.getUTCMonth());
+            utcMinDate.setUTCFullYear(minDate.getUTCFullYear());
+            $scope.component.datePicker.minDate = utcMinDate;
           }
 
           $scope.autoOpen = true;
