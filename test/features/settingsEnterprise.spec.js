@@ -20,7 +20,7 @@ module.exports = function (actions) {
       actions.iSeeValueIn('.wrap-table-cell','commercialplantest');
       actions.clickOnElementWithText('Settings');
       actions.checkElement('//*[@id="protect"]');
-      actions.iSeeElement('i.fa.fa-shield.ng-scope');
+      //actions.iSeeElement('i.fa.fa-shield.ng-scope');
       actions.clickOnElementWithText(' Save Stage');
       actions.iSeeText('Project saved.');
       actions.clickOnElementWithText('Forms');
@@ -76,10 +76,10 @@ module.exports = function (actions) {
     });
     describe('Enterprise Plan > Integrations Settings',function(){
       actions.clickOnElementWithText('Settings');
+      actions.clickOnElementWithText('PDF Management');
+      actions.checkingUrlEndsWith('env/pdf');
       actions.clickOnElementWithText('Integrations');
       actions.checkingUrlEndsWith('env/integrations/info');
-      actions.clickOnElementWithText('PDFs');
-      actions.checkingUrlEndsWith('env/pdf');
       actions.clickOnElementWithText('Email Providers');
       actions.iSeeText('SMTP Settings');
       actions.iSeeText('SendGrid Settings');

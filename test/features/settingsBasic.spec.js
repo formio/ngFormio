@@ -10,6 +10,7 @@ module.exports = function (actions) {
       actions.goToPage('#/');
       actions.goToPage('#/profile/payment/view');
       actions.clickOnElementWithText('Add Credit Card');
+      //actions.clickOnElementWithText('Change Credit Card');
       actions.enterTextInField('#cardholderName','Test');
       actions.enterTextInField('#ccNumber','4111111111111111');
       actions.enterTextInField('#securityCode','411');
@@ -69,10 +70,10 @@ module.exports = function (actions) {
     });
     describe('Basic Plan > Integrations Settings',function(){
       actions.clickOnElementWithText('Settings');
+      actions.clickOnElementWithText('PDF Management');
+      actions.checkingUrlEndsWith('env/pdf');
       actions.clickOnElementWithText('Integrations');
       actions.checkingUrlEndsWith('env/integrations/info');
-      actions.clickOnElementWithText('PDFs');
-      actions.checkingUrlEndsWith('env/pdf');
       actions.clickOnElementWithText('Email Providers');
       actions.iSeeText('Upgrade your project to a paid plan to access email settings.');
       actions.clickOnElementWithText('File Storage');
