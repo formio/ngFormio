@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Fixed
  - Editing nested forms mapped to another resource with save as another resource returns 404.
+ - Min and max date for Datetime component.
 
 ## 2.23.10
 ### Fixed
