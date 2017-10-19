@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [UNRELEASED]
 ### Fixed
  - Empty disabled signature component.
+ - Editing nested forms mapped to another resource with save as another resource returns 404.
+ - Min and max date for Datetime component.
 
 ## 2.23.10
 ### Fixed
