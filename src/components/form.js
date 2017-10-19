@@ -59,7 +59,12 @@ module.exports = function(app) {
               }
 
               if ($scope.data[$scope.component.key] && $scope.data[$scope.component.key]._id) {
-                url += '/submission/' + $scope.data[$scope.component.key]._id;
+                // Submission url should refer to the submission's form.
+                $scope.submissionFormio = new Formio($scope.formio.formsUrl + '/' + $scope.data[$scope.component.key].form + '/submission/' + $scope.data[$scope.component.key]._id, {base: baseUrl});
+              }
+              else {
+                // Submission url is the same as the form url.
+                $scope.submissionFormio = new Formio(url, {base: baseUrl});
               }
 
               $scope.formFormio = new Formio(url, {base: baseUrl});
@@ -82,12 +87,12 @@ module.exports = function(app) {
 
               // See if we need to load the submission into scope.
               if (
-                $scope.formFormio.submissionId &&
+                $scope.submissionFormio.submissionId &&
                 $scope.data[$scope.component.key] &&
                 $scope.data[$scope.component.key]._id &&
                 !$scope.data[$scope.component.key].data
               ) {
-                $scope.formFormio.loadSubmission().then(function(submission) {
+                $scope.submissionFormio.loadSubmission().then(function(submission) {
                   if (!submission) {
                     return;
                   }
@@ -113,7 +118,7 @@ module.exports = function(app) {
                 components = scope.form.components;
               }
               if (FormioUtils.getComponent(components, $scope.component.key)) {
-                $scope.formFormio.saveSubmission(submission).then(function(sub) {
+                $scope.submissionFormio.saveSubmission(submission).then(function(sub) {
                   if (!$scope.data[$scope.component.key]) {
                     $scope.data[$scope.component.key] = {data: {}};
                   }
@@ -158,6 +163,7 @@ module.exports = function(app) {
               if (!submission) {
                 return;
               }
+              loadForm();
               angular.merge($scope.data[$scope.component.key], submission);
             }, true);
           }
