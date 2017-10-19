@@ -170,6 +170,10 @@ app.controller('ProjectCreateController', [
     };
 
     $scope.saveProject = function() {
+      // Debounce.
+      if ($scope.isBusy) {
+        return;
+      }
       $scope.isBusy = true;
       FormioProject.createProject($scope.project).then(function(project) {
         $scope.isBusy = false;
@@ -226,6 +230,10 @@ app.controller('ProjectCreateEnvironmentController', [
     $scope.isBusy = false;
 
     $scope.saveProject = function() {
+      // Debounce.
+      if ($scope.isBusy) {
+        return;
+      }
       $scope.isBusy = true;
       FormioProject.createEnvironment($scope.currentProject).then(function(project) {
         // Update team access to new environment.
@@ -234,6 +242,7 @@ app.controller('ProjectCreateEnvironmentController', [
           .catch(FormioAlerts.onError.bind(FormioAlerts))
           .then(function() {
             PrimaryProject.clear();
+            $scope.isBusy = false;
             $state.go('project.overview', {projectId: project._id});
           })
           .catch(function() {$scope.isBusy = false;});
@@ -2301,6 +2310,10 @@ app.controller('PrimaryProjectSettingsController', [
     });
 
     $scope.saveProject = function() {
+      // Debounce.
+      if ($scope.status.save === 'saving') {
+        return;
+      }
       $scope.status.save = 'saving';
       $scope.formio.saveProject($scope.project)
         .then(function(project) {
