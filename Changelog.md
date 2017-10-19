@@ -4,11 +4,12 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [UNRELEASED]
+## 2.23.12
 ### Fixed
  - Empty disabled signature component.
  - Editing nested forms mapped to another resource with save as another resource returns 404.
  - Min and max date for Datetime component.
+ - Issues with using the renderer without Lodash installed globally.
 
 ## 2.23.10
 ### Fixed

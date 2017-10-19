@@ -5,6 +5,7 @@ var _isEqual = require('lodash/isEqual');
 var _assign = require('lodash/assign');
 var _set = require('lodash/set');
 var _cloneDeep = require('lodash/cloneDeep');
+var _mapValues = require('lodash/mapValues');
 module.exports = function(app) {
   app.directive('formioSelectItem', [
     '$compile',
@@ -475,7 +476,7 @@ module.exports = function(app) {
                     // Add the other filter.
                     if (settings.filter) {
                       // This changes 'a=b&c=d' into an object and assigns to params.
-                      _assign(options.params, _.mapValues(JSON.parse('{"' + decodeURI(settings.filter).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}'), function(value) {
+                      _assign(options.params, _mapValues(JSON.parse('{"' + decodeURI(settings.filter).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}'), function(value) {
                         return $interpolate(value)({
                           data: $scope.submission ? $scope.submission.data : {},
                           row: $scope.data

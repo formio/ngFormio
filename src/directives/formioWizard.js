@@ -1,6 +1,6 @@
 var isNaN = require('lodash/isNAN');
 var isFinite = require('lodash/isFinite');
-var _ = require('lodash')
+var isEmpty = require('lodash/isEmpty');
 
 module.exports = function() {
   return {
@@ -128,13 +128,13 @@ module.exports = function() {
               }
 
               // if there is a localStorage object && submission.data is blank then bind localStorage to $scope
-              if(localStorage.getItem($scope.storage) && _.isEmpty($scope.submission.data) == true){
+              if(localStorage.getItem($scope.storage) && isEmpty($scope.submission.data) == true){
                 var storageToScope = JSON.parse(localStorage.getItem($scope.storage));
                 $scope.submission.data = storageToScope.data
               }
 
               // if there is a localStorage object | && it is data | merge the two
-              if(localStorage.getItem($scope.storage) && _.isEmpty($scope.submission.data) == false){
+              if(localStorage.getItem($scope.storage) && isEmpty($scope.submission.data) == false){
                 localStorage.setItem($scope.storage, angular.toJson({
                   page: $scope.currentPage,
                   data: $scope.submission.data
