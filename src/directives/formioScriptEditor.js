@@ -1,3 +1,4 @@
+var _map = require('lodash/map');
 // Javascript editor directive
 module.exports = ['FormioUtils', function(FormioUtils) {
   return {
@@ -41,7 +42,7 @@ module.exports = ['FormioUtils', function(FormioUtils) {
                 tools.completed   = true;
                 tools.addCompleter({
                   getCompletions: function(editor, session, pos, prefix, callback) {
-                    callback(null, _.map(FormioUtils.flattenComponents(editor.components, true), function(comp) {
+                    callback(null, _map(FormioUtils.flattenComponents(editor.components, true), function(comp) {
                       return {name: comp.key, value: comp.key, score: 1000, meta: 'component'};
                     }));
                   }
