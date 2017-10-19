@@ -4,8 +4,9 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [UNRELEASED]
 ### Fixed
+ - Empty disabled signature component.
  - Editing nested forms mapped to another resource with save as another resource returns 404.
  - Min and max date for Datetime component.
 

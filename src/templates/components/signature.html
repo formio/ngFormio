@@ -2,11 +2,18 @@
   <div ng-if="data[component.key] === 'YES'">
     [ Signature is hidden ]
   </div>
-  <div ng-if="data[component.key] !== 'YES'">
+  <div ng-if="!data[component.key]">
+    <div ng-style="{width: component.width, height: '150px', backgroundColor: component.backgroundColor, cursor: 'not-allowed'}"></div>
+    <div class="formio-signature-footer" style="text-align: center;color:#C3C3C3;" ng-class="{'field-required': isRequired(component)}">
+      {{ component.footer | formioTranslate:null:options.building }}
+      <formio-component-tooltip></formio-component-tooltip>
+    </div>
+  </div>
+  <div ng-if="data[component.key] && data[component.key] !== 'YES'">
     <img class="signature" ng-attr-src="{{data[component.key]}}" src="" />
   </div>
 </div>
-<div ng-if="!readOnly" style="width: {{ component.width }}; height: 100%">
+<div ng-if="!readOnly" ng-style="{width: component.width, height: '100%'}">
   <a class="btn btn-xs btn-default" style="position:absolute; left: 0; top: 0; z-index: 1000" ng-click="component.clearSignature()">
     <span class="glyphicon glyphicon-refresh"></span>
   </a>
