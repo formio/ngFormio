@@ -235,18 +235,14 @@ app.controller('ProjectCreateEnvironmentController', [
         return;
       }
       $scope.isBusy = true;
-      FormioProject.createEnvironment($scope.currentProject).then(function(project) {
-        // Update team access to new environment.
-        project.access = project.access.concat(_.filter($scope.primaryProject.access, function(access) { return access.type.indexOf('team_') === 0;}));
-        (new Formio(AppConfig.apiBase + '/project/' + project._id)).saveProject(angular.copy(project))
-          .catch(FormioAlerts.onError.bind(FormioAlerts))
-          .then(function() {
-            PrimaryProject.clear();
-            $scope.isBusy = false;
-            $state.go('project.overview', {projectId: project._id});
-          })
-          .catch(function() {$scope.isBusy = false;});
-      });
+      FormioProject.createEnvironment($scope.currentProject)
+        .then(function(project) {
+          PrimaryProject.clear();
+          $scope.isBusy = false;
+          $state.go('project.overview', {projectId: project._id});
+        })
+        .catch(FormioAlerts.onError.bind(FormioAlerts))
+        .catch(function() {$scope.isBusy = false;});
     };
   }
 ]);
@@ -2432,11 +2428,6 @@ app.controller('ProjectTeamController', [
       saveProject($scope.primaryProject).then(function(project) {
         $scope.primaryProject = project;
       });
-      // Add team to environments as well
-      $scope.environments.forEach(function(environment) {
-        setTeamPermission(environment, team, 'team_read');
-        saveProject(environment);
-      });
       _.remove($scope.uniqueEligibleTeams, { _id: team._id });
       team.permission = 'team_read';
       $scope.primaryProjectTeams.push(team);
@@ -2448,11 +2439,6 @@ app.controller('ProjectTeamController', [
       saveProject($scope.primaryProject).then(function(project) {
         $scope.primaryProject = project;
       });
-      // Remove team from environments as well
-      $scope.environments.forEach(function(environment) {
-        setTeamPermission(environment, team);
-        saveProject(environment);
-      });
       _.remove($scope.primaryProjectTeams, { _id: team._id });
       delete team.permission;
       $scope.uniqueEligibleTeams.push(team);
@@ -2462,11 +2448,6 @@ app.controller('ProjectTeamController', [
       setTeamPermission($scope.primaryProject, team, permission);
       saveProject($scope.primaryProject).then(function(project) {
         $scope.primaryProject = project;
-      });
-      // Update team in environments as well
-      $scope.environments.forEach(function(environment) {
-        setTeamPermission(environment, team, permission);
-        saveProject(environment);
       });
     };
   }
