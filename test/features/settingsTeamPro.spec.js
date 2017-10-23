@@ -4,7 +4,6 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Independent');
       actions.clickOnElementWithTextLast('Upgrade');
       actions.clickOnElementWithText('Confirm Billing Change');
-      actions.waitForActionToComplete(2000);
       actions.goToPage('#/');
       actions.clickOnElementWithText('testProject');
       actions.clickOnElementWithText('Settings');
@@ -54,7 +53,6 @@ module.exports = function (actions) {
       actions.clickOnClass('#ui-select-choices-row-0-1');
       actions.clickOnElementWithText('Connect Stage');
       actions.iSeeText('https://remote.form.io');
-      //actions.goToPage('#/project/59d6a8ba09867520081db499/env/settings/remote');
       actions.iSeeText('https://remote.form.io');
       actions.clickOnElementWithText('Disconnect');
       actions.clickOnElementWithText('API Keys');
@@ -97,7 +95,6 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Save Settings');
       actions.clickOnElementWithText('Forms');
       actions.clickOnElementWithText(' Actions');
-      actions.waitForActionToComplete(2000);
       actions.clickOnElementWithText('Select an Action');
       actions.clickOnElementWithText('Email');
       actions.clickOnElementWithText(' Add Action');
@@ -111,7 +108,6 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Save Settings');
       actions.clickOnElementWithText('Forms');
       actions.clickOnElementWithText(' Actions');
-      actions.waitForActionToComplete(2000);
       actions.clickOnElementWithText('Select an Action');
       actions.clickOnElementWithText('Email');
       actions.clickOnElementWithText(' Add Action');
@@ -126,7 +122,6 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Save Settings');
       actions.clickOnElementWithText('Forms');
       actions.clickOnElementWithText(' Actions');
-      actions.waitForActionToComplete(2000);
       actions.clickOnElementWithText('Select an Action');
       actions.clickOnElementWithText('Email');
       actions.clickOnElementWithText(' Add Action');
@@ -141,7 +136,6 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Save Settings');
       actions.clickOnElementWithText('Forms');
       actions.clickOnElementWithText(' Actions');
-      actions.waitForActionToComplete(2000);
       actions.clickOnElementWithText('Select an Action');
       actions.clickOnElementWithText('Email');
       actions.clickOnElementWithText(' Add Action');

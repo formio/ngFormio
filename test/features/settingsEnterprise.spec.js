@@ -4,7 +4,6 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Team Pro');
       actions.clickOnElementWithTextLast('Upgrade');
       actions.clickOnElementWithText('Confirm Billing Change');
-      actions.waitForActionToComplete(2000);
       actions.goToPage('#/');
       actions.clickOnElementWithText('testProject');
       actions.clickOnElementWithText('Settings');
@@ -54,8 +53,6 @@ module.exports = function (actions) {
       actions.clickOnClass('#ui-select-choices-row-0-1');
       actions.clickOnElementWithText('Connect Stage');
       actions.iSeeText('https://remote.form.io');
-      //actions.goToPage('#/project/59db96c33edc533dd059b810/env/settings/remote');
-      actions.iSeeText('https://remote.form.io');
       actions.clickOnElementWithText('Disconnect');
       actions.clickOnElementWithText('API Keys');
       actions.clickOnClass('.fa.fa-trash');
@@ -97,7 +94,6 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Save Settings');
       actions.clickOnElementWithText('Forms');
       actions.clickOnElementWithText(' Actions');
-      actions.waitForActionToComplete(2000);
       actions.clickOnElementWithText('Select an Action');
       actions.clickOnElementWithText('Email');
       actions.clickOnElementWithText(' Add Action');
@@ -111,7 +107,6 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Save Settings');
       actions.clickOnElementWithText('Forms');
       actions.clickOnElementWithText(' Actions');
-      actions.waitForActionToComplete(2000);
       actions.clickOnElementWithText('Select an Action');
       actions.clickOnElementWithText('Email');
       actions.clickOnElementWithText(' Add Action');
@@ -126,7 +121,6 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Save Settings');
       actions.clickOnElementWithText('Forms');
       actions.clickOnElementWithText(' Actions');
-      actions.waitForActionToComplete(2000);
       actions.clickOnElementWithText('Select an Action');
       actions.clickOnElementWithText('Email');
       actions.clickOnElementWithText(' Add Action');
@@ -141,7 +135,6 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Save Settings');
       actions.clickOnElementWithText('Forms');
       actions.clickOnElementWithText(' Actions');
-      actions.waitForActionToComplete(2000);
       actions.clickOnElementWithText('Select an Action');
       actions.clickOnElementWithText('Email');
       actions.clickOnElementWithText(' Add Action');
@@ -153,5 +146,10 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Data Connections');
       actions.clickOnElementWithText('OAuth');
     });
+    // describe('Deleting testProject',function(){
+    //   actions.clickOnElementWithText('Project Settings');
+    //   actions.clickOnElementWithText('Delete test Project');
+    //   actions.clickOnElementWithText(' Yes');
+    // });
   });
 };

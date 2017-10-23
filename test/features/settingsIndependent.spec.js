@@ -4,7 +4,6 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Basic');
       actions.clickOnElementWithTextLast('Upgrade');
       actions.clickOnElementWithText('Confirm Billing Change');
-      actions.waitForActionToComplete(2000);
       actions.goToPage('#/');
       actions.clickOnElementWithText('testProject');
       actions.clickOnElementWithText('Settings');
@@ -40,7 +39,6 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Remote Environment');
       actions.iSeeText('Upgrade your project to a team or commercial plan to enable Remote Environments.');
       actions.clickOnElementWithText('API Keys');
-      //actions.clickOnClass('.fa.fa-trash');
       actions.clickOnElementWithText('Add New Key');
       actions.clickOnElementWithText('CORS');
       actions.iSeeText('Upgrade your project to a paid plan to enable CORS Settings.');
@@ -80,7 +78,6 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Save Settings');
       actions.clickOnElementWithText('Forms');
       actions.clickOnElementWithText(' Actions');
-      actions.waitForActionToComplete(2000);
       actions.clickOnElementWithText('Select an Action');
       actions.clickOnElementWithText('Email');
       actions.clickOnElementWithText(' Add Action');
@@ -94,7 +91,6 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Save Settings');
       actions.clickOnElementWithText('Forms');
       actions.clickOnElementWithText(' Actions');
-      actions.waitForActionToComplete(2000);
       actions.clickOnElementWithText('Select an Action');
       actions.clickOnElementWithText('Email');
       actions.clickOnElementWithText(' Add Action');
@@ -109,7 +105,6 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Save Settings');
       actions.clickOnElementWithText('Forms');
       actions.clickOnElementWithText(' Actions');
-      actions.waitForActionToComplete(2000);
       actions.clickOnElementWithText('Select an Action');
       actions.clickOnElementWithText('Email');
       actions.clickOnElementWithText(' Add Action');
@@ -124,7 +119,6 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Save Settings');
       actions.clickOnElementWithText('Forms');
       actions.clickOnElementWithText(' Actions');
-      actions.waitForActionToComplete(2000);
       actions.clickOnElementWithText('Select an Action');
       actions.clickOnElementWithText('Email');
       actions.clickOnElementWithText(' Add Action');
