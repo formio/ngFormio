@@ -52,7 +52,6 @@ module.exports = function (actions) {
       actions.checkElement('//*[@id="protect"]');
       actions.clickOnElementWithText(' Save Stage');
       actions.clickOnElementWithText('Staging');
-      actions.clickOnElementWithText('Staging');
       actions.iSeeText('Upgrade your project to Enterprise to enable deploying to stages.');
       actions.clickOnElementWithText('Create Version Tag');
       actions.iSeeText('Upgrade your project to Enterprise to enable deploying to stages.');
