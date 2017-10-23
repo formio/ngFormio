@@ -1,7 +1,7 @@
 import utils from 'formiojs/utils';
 
 const app = angular.module('formio');
-export default app.factory('FormioUtils', module.exports = function() {
+export default app.factory('FormioUtils', function() {
   return Object.assign({
     hideFields: function(form, components) {
       this.eachComponent(form.components, function(component) {
@@ -26,6 +26,9 @@ export default app.factory('FormioUtils', module.exports = function() {
         var r = Math.random()*16|0, v = c === 'x' ? r : (r&0x3|0x8);
         return v.toString(16);
       });
+    },
+    fieldWrap: function(field) {
+      return field;
     }
   }, utils);
 });
