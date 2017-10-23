@@ -1,7 +1,7 @@
 module.exports = function (actions) {
   describe('Settings',function(){
     describe('Basic Plan > Environment Settings',function(){
-      // actions.logout();
+      // //actions.logout();
       // actions.enterTextInField('.login-container #email','admin@example.com');
       // actions.enterTextInField('.login-container #password','password');
       // actions.clickOnElementWithText('LOG IN');
