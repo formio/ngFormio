@@ -7,14 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Added
  - Overall access page in left menu
- - Project Environments!
+ - Project Stages!
  - Version deployments/creation
- - Locking environments
+ - Locking stages
  - Framework support
- - Remote Environments
+ - Remote Stages
 
 ### Changed
- - Projects are created from platforms, not templates
+ - Projects are created from platforms, not app templates
  - Improved Teams pages
  - Improved access permissions and descriptions
  - Fix for content component's 'unsaved changes' error message
