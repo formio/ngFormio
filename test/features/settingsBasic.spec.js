@@ -27,6 +27,9 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Trial');
       actions.clickOnElementWithTextLast('Upgrade');
       actions.clickOnElementWithText('Confirm Billing Change');
+      actions.waitForActionToComplete(2000);
+      actions.goToPage('#/');
+      actions.clickOnElementWithText('testProject');
       actions.clickOnElementWithText('Settings');
       actions.checkElementIsDisabled('//*[@id="form-group-title"]/input');
       actions.checkElementIsDisabled('//*[@id="name"]');
