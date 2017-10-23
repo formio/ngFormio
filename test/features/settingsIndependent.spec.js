@@ -14,7 +14,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText(' Save Stage');
       actions.iSeeValueIn('#name','independent');
       actions.clickOnElementWithText('Overview');
-      actions.iSeeText('independent');
+      //actions.iSeeText('independent');
       actions.clickOnElementWithText('Forms');
       actions.clickOnElementWithText('User Login');
       actions.iSeeValueIn('#form-group-path','independent');
@@ -80,6 +80,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Save Settings');
       actions.clickOnElementWithText('Forms');
       actions.clickOnElementWithText(' Actions');
+      actions.waitForActionToComplete(2000);
       actions.clickOnElementWithText('Select an Action');
       actions.clickOnElementWithText('Email');
       actions.clickOnElementWithText(' Add Action');
@@ -93,6 +94,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Save Settings');
       actions.clickOnElementWithText('Forms');
       actions.clickOnElementWithText(' Actions');
+      actions.waitForActionToComplete(2000);
       actions.clickOnElementWithText('Select an Action');
       actions.clickOnElementWithText('Email');
       actions.clickOnElementWithText(' Add Action');
@@ -107,6 +109,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Save Settings');
       actions.clickOnElementWithText('Forms');
       actions.clickOnElementWithText(' Actions');
+      actions.waitForActionToComplete(2000);
       actions.clickOnElementWithText('Select an Action');
       actions.clickOnElementWithText('Email');
       actions.clickOnElementWithText(' Add Action');
@@ -121,6 +124,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Save Settings');
       actions.clickOnElementWithText('Forms');
       actions.clickOnElementWithText(' Actions');
+      actions.waitForActionToComplete(2000);
       actions.clickOnElementWithText('Select an Action');
       actions.clickOnElementWithText('Email');
       actions.clickOnElementWithText(' Add Action');
