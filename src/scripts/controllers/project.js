@@ -586,8 +586,7 @@ app.controller('ProjectDeployController', [
             $scope.saveLocalProject()
               .then(function() {
                 PrimaryProject.clear();
-                $state.reload();
-                //$state.transitionTo($state.current, null, { reload: true, inherit: true, notify: true });
+                $state.transitionTo($state.current, null, { reload: true, inherit: true, notify: true });
               });
           }
           else {
