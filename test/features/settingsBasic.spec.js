@@ -6,7 +6,7 @@ module.exports = function (actions) {
       // actions.enterTextInField('.login-container #password','password');
       // actions.clickOnElementWithText('LOG IN');
       // actions.waitForActionToComplete(2000);
-      // actions.iAmLoggedInFor('profileuser2');
+      actions.iAmLoggedInFor('profileuser2');
       actions.goToPage('#/');
       actions.goToPage('#/profile/payment/view');
       actions.clickOnElementWithText('Add Credit Card');
