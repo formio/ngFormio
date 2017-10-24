@@ -16,14 +16,18 @@ export default app.directive('formio', function() {
       scope.element = element[0];
 
       scope.initializeForm()
-        .then(scope.setupForm)
-        .catch(console.warn);
+        .then((formio) => {
+          scope.setupForm(formio);
+        })
+        .catch((err, two) => {
+          console.warn(err, two);
+        });
     },
     controller: [
       '$scope',
       function ($scope) {
         $scope.initializeForm = function() {
-          return new Promise((reject, resolve) => {
+          return new Promise((resolve, reject) => {
             if ($scope.src) {
               resolve(Formio.createForm($scope.element, $scope.src, $scope.options)
                 .then(formio => {
@@ -45,7 +49,7 @@ export default app.directive('formio', function() {
               reject('Must set src or form attribute');
             }
           });
-        }
+        };
 
         $scope.setupForm = function() {
           if ($scope.submission) {
@@ -100,24 +104,34 @@ export default app.directive('formio', function() {
         };
 
         $scope.$watch('src', src => {
-          $scope.formio.src = src;
+          if ($scope.formio) {
+            $scope.formio.src = src;
+          }
         });
 
         $scope.$watch('url', url => {
-          $scope.formio.url = url;
+          if ($scope.formio) {
+            $scope.formio.url = url;
+          }
         });
 
         $scope.$watch('form', form => {
-          $scope.formio.form = form;
+          if ($scope.formio) {
+            $scope.formio.form = form;
+          }
         });
 
         $scope.$watch('submission', submission => {
-          $scope.formio.submission = submission;
+          if ($scope.formio) {
+            $scope.formio.submission = submission;
+          }
         });
 
         // Clean up the Form from DOM.
         $scope.$on('$destroy', function () {
-          $scope.formio.destroy(true);
+          if ($scope.formio) {
+            $scope.formio.destroy(true);
+          }
         });
       }
     ],
