@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Version deployments/creation
  - Locking stages
  - Framework support
- - Remote Stages
+ - New Environments
 
 ### Changed
  - Projects are created from platforms, not app templates
