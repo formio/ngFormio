@@ -373,6 +373,10 @@ app.controller('ProjectController', [
         $scope.isRemote = true;
         Formio.setProjectUrl($scope.projectUrl = $rootScope.projectPath($scope.localProject.remote.project, $scope.localProject.remote.url, $scope.localProject.remote.type));
         $scope.projectProtocol = $scope.localProject.remote.url.indexOf('https') === 0 ? 'https:' : 'http:';
+        if ($scope.projectProtocol === 'http:' && $scope.projectProtocol !== window.location.protocol) {
+          $scope.protocolSecureError = true;
+          $scope.unsecurePortal = 'http://' + window.location.host;
+        }
         $scope.projectServer = $scope.localProject.remote.url.replace(/(^\w+:|^)\/\//, '');
         $scope.localFormio = $scope.formio;
         $scope.baseUrl = $scope.localProject.remote.url;
