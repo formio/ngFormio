@@ -4,7 +4,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Team Pro');
       actions.clickOnElementWithTextLast('Upgrade');
       actions.clickOnElementWithText('Confirm Billing Change');
-      ctions.waitForActionToComplete(2000);
+      actions.waitForActionToComplete(2000);
       actions.goToPage('#/');
       actions.clickOnElementWithText('testProject');
       actions.clickOnElementWithText('Settings');
