@@ -10,6 +10,7 @@ export default app.directive('formio', function() {
       url: '=?',
       form: '=?',
       submission: '=?',
+      readOnly: '=?',
       options: '=?'
     },
     link: function (scope, element) {
@@ -19,14 +20,21 @@ export default app.directive('formio', function() {
         .then((formio) => {
           scope.setupForm(formio);
         })
-        .catch((err, two) => {
-          console.warn(err, two);
+        .catch((err) => {
+          console.warn(err);
         });
     },
     controller: [
       '$scope',
       function ($scope) {
         $scope.initializeForm = function() {
+          $scope.options = $scope.options || {};
+
+          // Set read only if using legacy option.
+          if (!$scope.options.hasOwnProperty('readOnly') && $scope.readOnly !== undefined) {
+            $scope.options.readOnly = $scope.readOnly;
+          }
+
           return new Promise((resolve, reject) => {
             if ($scope.src) {
               resolve(Formio.createForm($scope.element, $scope.src, $scope.options)
