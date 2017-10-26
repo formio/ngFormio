@@ -27,7 +27,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithTextLast('Upgrade');
       actions.clickOnElementWithText('Confirm Billing Change');
       actions.waitForActionToComplete(2000);
-      actions.clickOnElementWithText('Basic');
+      //actions.clickOnElementWithText('Basic');
       actions.clickOnElementWithTextLast('Upgrade');
       actions.clickOnElementWithText('Confirm Billing Change');
       actions.waitForActionToComplete(2000);
