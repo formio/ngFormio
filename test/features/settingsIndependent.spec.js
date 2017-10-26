@@ -1,12 +1,38 @@
 module.exports = function (actions) {
   describe('Independent Plan Settings',function(){
     describe('Independent Plan > Environment Settings',function(){
+      actions.logout();
+      actions.enterTextInField('.login-container #email','admin@example.com');
+      actions.enterTextInField('.login-container #password','password');
+      actions.clickOnElementWithText('LOG IN');
+      actions.waitForActionToComplete(2000);
+      //actions.iAmLoggedInFor('profileuser2');
+      actions.goToPage('#/');
+      //actions.goToPage('#/profile/payment/view');
+      //actions.clickOnElementWithText('Add Credit Card');
+      // actions.clickOnElementWithText('Change Credit Card');
+      // actions.enterTextInField('#cardholderName','Test');
+      // actions.enterTextInField('#ccNumber','4111111111111111');
+      // actions.enterTextInField('#securityCode','411');
+      // actions.clickOnClass('#form-group-ccExpiryMonth');
+      // actions.clickOnElementWithText('01');
+      // actions.clickOnClass('#form-group-ccExpiryYear');
+      // actions.clickOnElementWithText('25');
+      // actions.clickOnClass('#submit');
+      // actions.goToPage('#/');
+      actions.clickOnElementWithText('New Project');
+      actions.enterTextInField('#title','independentProject');
+      actions.clickOnElementWithText(' Create Project');
+      actions.clickOnElementWithText('Trial');
+      actions.clickOnElementWithTextLast('Upgrade');
+      actions.clickOnElementWithText('Confirm Billing Change');
+      actions.waitForActionToComplete(2000);
       actions.clickOnElementWithText('Basic');
       actions.clickOnElementWithTextLast('Upgrade');
       actions.clickOnElementWithText('Confirm Billing Change');
       actions.waitForActionToComplete(2000);
       actions.goToPage('#/');
-      actions.clickOnElementWithText('testProject');
+      actions.clickOnElementWithText('independentProject');
       actions.clickOnElementWithText('Settings');
       actions.checkElementIsDisabled('//*[@id="form-group-title"]/input');
       actions.checkElementIsNotDisabled('//*[@id="name"]');
@@ -131,6 +157,11 @@ module.exports = function (actions) {
       actions.iSeeText('Upgrade your project to a paid plan to access file storage settings.');
       actions.clickOnElementWithText('Data Connections');
       actions.clickOnElementWithText('OAuth');
+    });
+    describe('Deleting independentProject',function(){
+      actions.clickOnClass('.fa.fa-cog');
+      actions.clickOnElementWithText('Delete independentProject Project');
+      actions.clickOnElementWithText(' Yes');
     });
   });
 };
