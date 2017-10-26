@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "angular": "^1.5.0",
-    "formiojs": "^2.12.3",
+    "formiojs": "^2.20.4",
     "jquery": "^3.2.1"
   },
   "browserify": {
