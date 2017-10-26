@@ -301,6 +301,7 @@ app.controller('ProjectController', [
     $scope.localFormio = $scope.formio;
     $scope.currentProject = {_id: $stateParams.projectId, access: []};
     $scope.projectUrl = '';
+    $scope.unsecurePortal = 'http://' + window.location.host;
 
     $scope.rolesLoading = true;
     $scope.loadRoles = function() {
@@ -375,7 +376,6 @@ app.controller('ProjectController', [
         $scope.projectProtocol = $scope.localProject.remote.url.indexOf('https') === 0 ? 'https:' : 'http:';
         if ($scope.projectProtocol === 'http:' && $scope.projectProtocol !== window.location.protocol) {
           $scope.protocolSecureError = true;
-          $scope.unsecurePortal = 'http://' + window.location.host;
         }
         $scope.projectServer = $scope.localProject.remote.url.replace(/(^\w+:|^)\/\//, '');
         $scope.localFormio = $scope.formio;
@@ -2150,6 +2150,11 @@ app.controller('ProjectRemoteController', [
       type: 'Subdirectories'
     };
     $scope.environmentTypes = ['Subdomains', 'Subdirectories'];
+
+    $scope.insecureWarning = false;
+    $scope.$watch('remote.url', function(url) {
+      $scope.insecureWarning = url.indexOf('http:') !== -1 && window.location.protocol === 'https:';
+    });
 
     $scope.check = function() {
       if (!$scope.remote.url || !$scope.remote.secret) {

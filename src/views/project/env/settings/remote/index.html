@@ -9,6 +9,10 @@
           <label class="control-label"><strong>Environment URL</strong></label>
           <input type="text" class="form-control" id="serverURL" ng-model="remote.url" placeholder="https://myremoteevironment.com" />
           <p class="text-muted">Use the root url of the environment, not a project url.</p>
+          <div class="alert alert-danger" ng-if="insecureWarning">
+            <p>Browsers don't allow access to an unsecure resource from a secure page. Either add an SSL Certificate to your environment or switch to the unsecure version of the portal.</p>
+            <p><a href="{{unsecurePortal}}" class="btn btn-default">Switch to unsecure portal</a></p>
+          </div>
           <label class="control-label"><strong>Portal Secret</strong></label>
           <input type="text" class="form-control" id="portalSecret" ng-model="remote.secret" placeholder="abcdefg123456" />
           <p class="text-muted">The secret key for authentication between the portal and your on-premise environment. Configured in the PORTAL_SECRET environment variable on your server.</p>
