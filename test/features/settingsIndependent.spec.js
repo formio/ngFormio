@@ -10,7 +10,7 @@ module.exports = function (actions) {
       actions.goToPage('#/');
       actions.goToPage('#/profile/payment/view');
       actions.clickOnElementWithText('Add Credit Card');
-      // actions.clickOnElementWithText('Change Credit Card');
+      //actions.clickOnElementWithText('Change Credit Card');
       actions.enterTextInField('#cardholderName','Test');
       actions.enterTextInField('#ccNumber','4111111111111111');
       actions.enterTextInField('#securityCode','411');
@@ -96,6 +96,7 @@ module.exports = function (actions) {
       actions.iSeeText('SendGrid Settings');
       actions.iSeeText('Mailgun Settings');
       actions.iSeeText('Custom Email Server');
+      actions.waitForActionToComplete(2000);
       actions.clickOnElementWithText('SMTP Settings');
       actions.checkElement('//*[@id="smtpSecure"]');
       actions.enterTextInField('#smtpHost','smtpHost');
@@ -113,6 +114,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Settings');
       actions.clickOnElementWithText('Integrations');
       actions.clickOnElementWithText('Email Providers');
+      actions.waitForActionToComplete(2000);
       actions.clickOnElementWithText('SendGrid Settings');
       actions.enterTextInField('#sendGridPassword','sendGridPassword');
       actions.clickOnElementWithText('Save Settings');
@@ -126,6 +128,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Settings');
       actions.clickOnElementWithText('Integrations');
       actions.clickOnElementWithText('Email Providers');
+      actions.waitForActionToComplete(2000);
       actions.clickOnElementWithText('Mailgun Settings');
       actions.enterTextInField('#mailgunAPIKey','mailgunAPIKey');
       actions.enterTextInField('#mailgunDomain','mailgunDomain');
@@ -140,6 +143,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Settings');
       actions.clickOnElementWithText('Integrations');
       actions.clickOnElementWithText('Email Providers');
+      actions.waitForActionToComplete(2000);
       actions.clickOnElementWithText('Custom Email Server');
       actions.enterTextInField('#customUrl','customUrl');
       actions.enterTextInField('#customPassword','customPassword');
