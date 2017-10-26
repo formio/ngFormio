@@ -40,7 +40,6 @@ export default app.directive('formio', function() {
               resolve(Formio.createForm($scope.element, $scope.src, $scope.options)
                 .then(formio => {
                   $scope.formio = formio;
-                  $scope.formio.src = $scope.src;
                   return formio;
                 }));
             }
@@ -48,7 +47,6 @@ export default app.directive('formio', function() {
               resolve(Formio.createForm($scope.element, $scope.form, $scope.options)
                 .then(formio => {
                   $scope.formio = formio;
-                  $scope.formio.submission = $scope.form;
                   return formio;
                 }));
             }
