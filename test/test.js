@@ -47,7 +47,7 @@ describe("Formio Tests", function () {
   // //require('./features/createResource2.spec')(actions);
   // //require('./features/createForm.spec')(actions);
   require('./features/settingsBasic.spec')(actions);
-  require('./features/settingsIndependent.spec')(actions);
+  // require('./features/settingsIndependent.spec')(actions);
   // require('./features/settingsTeamPro.spec')(actions);
   // require('./features/settingsEnterprise.spec')(actions );
    // require('./features/versioning.spec')(actions);
