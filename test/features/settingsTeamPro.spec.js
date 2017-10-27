@@ -1,12 +1,40 @@
 module.exports = function (actions) {
   describe('Team Pro Plan Settings',function(){
     describe('Team Pro Plan > Environment Settings',function(){
-      actions.clickOnElementWithText('Independent');
+      actions.logout();
+      // actions.enterTextInField('.login-container #email','admin@example.com');
+      // actions.enterTextInField('.login-container #password','password');
+      // actions.clickOnElementWithText('LOG IN');
+      // actions.waitForActionToComplete(2000);
+      actions.iAmLoggedInFor('profileuser2');
+      actions.goToPage('#/');
+      actions.goToPage('#/profile/payment/view');
+      actions.clickOnElementWithText('Add Credit Card');
+      // actions.clickOnElementWithText('Change Credit Card');
+      actions.enterTextInField('#cardholderName','Test');
+      actions.enterTextInField('#ccNumber','4111111111111111');
+      actions.enterTextInField('#securityCode','411');
+      actions.clickOnClass('#form-group-ccExpiryMonth');
+      actions.clickOnElementWithText('01');
+      actions.clickOnClass('#form-group-ccExpiryYear');
+      actions.clickOnElementWithText('25');
+      actions.clickOnClass('#submit');
+      actions.goToPage('#/');
+      actions.clickOnElementWithText('New Project');
+      actions.enterTextInField('#title','teamProProject');
+      actions.clickOnElementWithText(' Create Project');
+      actions.clickOnElementWithText('Trial');
+      actions.clickOnElementWithTextLast('Upgrade');
+      actions.clickOnElementWithText('Confirm Billing Change');
+      actions.waitForActionToComplete(2000);
+      actions.clickOnElementWithTextLast('Upgrade');
+      actions.clickOnElementWithText('Confirm Billing Change');
+      actions.waitForActionToComplete(2000);
       actions.clickOnElementWithTextLast('Upgrade');
       actions.clickOnElementWithText('Confirm Billing Change');
       actions.waitForActionToComplete(2000);
       actions.goToPage('#/');
-      actions.clickOnElementWithText('testProject');
+      actions.clickOnElementWithText('teamProProject');
       actions.clickOnElementWithText('Settings');
       actions.checkElementIsDisabled('//*[@id="form-group-title"]/input');
       actions.checkElementIsNotDisabled('//*[@id="name"]');
@@ -57,8 +85,8 @@ module.exports = function (actions) {
       actions.iSeeText('https://remote.form.io');
       actions.clickOnElementWithText('Disconnect');
       actions.clickOnElementWithText('API Keys');
-      actions.clickOnClass('.fa.fa-trash');
       actions.clickOnElementWithText('Add New Key');
+      actions.clickOnClass('.fa.fa-trash');
       actions.clickOnElementWithText('CORS');
       actions.clickOnElementWithText('Custom JS and CSS');
       actions.checkingUrlEndsWith('/env/settings/customjscss');
@@ -147,6 +175,11 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('File Storage');
       actions.clickOnElementWithText('Data Connections');
       actions.clickOnElementWithText('OAuth');
+    });
+    describe('Deleting basicProject',function(){
+      actions.clickOnClass('.fa.fa-cog');
+      actions.clickOnElementWithText('Delete teamProProject Project');
+      actions.clickOnElementWithText(' Yes');
     });
   });
 };
