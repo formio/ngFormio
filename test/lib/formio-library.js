@@ -552,7 +552,7 @@ module.exports = function (config) {
   };
 
   this.clickOnElementWithText = function (text) {
-    it('I click on the ' + text + ' text', function (next) {
+    it('I click on the ' + text + ' text ', function (next) {
       var ele =  element(by.xpath('//*[text()="' + replacements(text.toString()) + '"]'));
       browser.wait(function () {
         return ele.isPresent();

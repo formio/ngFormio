@@ -1,5 +1,5 @@
 module.exports = function (actions) {
-  describe('User Portal Links and Welcome Module',function(){
+  describe('User Portal Links and Welcome Module ',function(){
     describe('Closing the Welcome Module',function(){
       actions.logout();
       actions.iAmLoggedInFor('profileuser2');

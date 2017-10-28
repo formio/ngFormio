@@ -1,5 +1,5 @@
 module.exports = function (actions) {
-  describe('Register Functionality',function() {
+  describe('Register Functionality ',function() {
     describe('Empty Register', function () {
       actions.logout();
       actions.btnDisabled('REGISTER');
