@@ -181,31 +181,65 @@
         <ul class="list-group project-onpremise">
           <li class="list-group-item list-group-heading">
             <div class="row">
-              <div class="col-sm-10">
-                <h4 style="font-weight:bold">PDF Hosting with Form.io</h4>
+              <div class="col-sm-3">
+                <h4 style="font-weight:bold">Plan</h4>
+              </div>
+              <div class="col-sm-3">
+                <h4 style="font-weight:bold">Details</h4>
+              </div>
+              <div class="col-sm-3">
+                <h4 style="font-weight:bold">Price</h4>
+              </div>
+              <div class="col-sm-3"></div>
+            </div>
+          </li>
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col-sm-3">
+                <h4>Basic</h4>
+              </div>
+              <div class="col-sm-3">
+                <table class="table table-condensed table-bordered">
+                  <tr>
+                    <th>Forms</th>
+                    <td>1</td>
+                  </tr>
+                  <tr>
+                    <th>Downloads</th>
+                    <td>10 / month</td>
+                  </tr>
+                </table>
+              </div>
+              <div class="col-sm-3">
+                Included
+              </div>
+              <div class="col-sm-3">
+                <span class="btn" ng-class="{'btn-success': (pdfInfo.plan === 'basic'), 'btn-default': (pdfInfo.plan !== 'basic')}" ng-click="setPDFHostedPlan('basic')">{{ pdfInfo.plan === 'basic' ? 'Selected' : 'Select' }}</span>
               </div>
             </div>
           </li>
           <li class="list-group-item">
             <div class="row">
-              <div class="col-sm-6">
-                <h4>Host your PDF forms on our infrastructure</h4>
+              <div class="col-sm-3">
+                <h4>Hosted</h4>
               </div>
-              <div class="col-sm-4">
-                <h4>$50 / month</h4>
+              <div class="col-sm-3">
                 <table class="table table-condensed table-bordered">
                   <tr>
-                    <th>PDF forms</th>
+                    <th>Forms</th>
                     <td>25</td>
                   </tr>
                   <tr>
-                    <th>PDF Downloads</th>
+                    <th>Downloads</th>
                     <td>1000 / month</td>
                   </tr>
                 </table>
               </div>
-              <div class="col-sm-2">
-                <span class="btn" ng-class="{'btn-success': (pdfInfo.plan === 'hosted'), 'btn-default': (pdfInfo.plan === 'basic'), 'btn-primary': (pdfInfo.plan === 'enterprise')}" ng-click="togglePDFHostedPlan()">{{ pdfInfo.plan === 'hosted' ? 'Downgrade' : (pdfInfo.plan === 'enterprise' ? 'Enterprise' : 'Upgrade') }}</span>
+              <div class="col-sm-3">
+                <h4>$50 / month</h4>
+              </div>
+              <div class="col-sm-3">
+                <span class="btn" ng-class="{'btn-success': (pdfInfo.plan === 'hosted'), 'btn-default': (pdfInfo.plan !== 'hosted')}" ng-click="setPDFHostedPlan('hosted')">{{ pdfInfo.plan === 'hosted' ? 'Selected' : 'Select' }}</span>
               </div>
             </div>
           </li>

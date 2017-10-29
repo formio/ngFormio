@@ -2768,9 +2768,9 @@ app.controller('ProjectBilling', [
       }
     };
 
-    $scope.togglePDFHostedPlan = function() {
+    $scope.setPDFHostedPlan = function(plan) {
       $scope.servers.pdf = 0;
-      $scope.pdfInfo.plan = ($scope.pdfInfo.plan === 'hosted') ? 'basic' : 'hosted';
+      $scope.pdfInfo.plan = plan;
       calculatePrice();
     };
 
