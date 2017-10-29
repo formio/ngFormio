@@ -2,15 +2,15 @@ module.exports = function (actions) {
   describe('Independent Plan Settings',function(){
     describe('Independent Plan > Environment Settings',function(){
       actions.logout();
-      // actions.enterTextInField('.login-container #email','admin@example.com');
-      // actions.enterTextInField('.login-container #password','password');
-      // actions.clickOnElementWithText('LOG IN');
-      // actions.waitForActionToComplete(2000);
-      actions.iAmLoggedInFor('profileuser2');
+      actions.enterTextInField('.login-container #email','admin@example.com');
+      actions.enterTextInField('.login-container #password','password');
+      actions.clickOnElementWithText('LOG IN');
+      actions.waitForActionToComplete(2000);
+      //actions.iAmLoggedInFor('profileuser2');
       actions.goToPage('#/');
       actions.goToPage('#/profile/payment/view');
-      actions.clickOnElementWithText('Add Credit Card');
-      //actions.clickOnElementWithText('Change Credit Card');
+      //actions.clickOnElementWithText('Add Credit Card');
+      actions.clickOnElementWithText('Change Credit Card');
       actions.enterTextInField('#cardholderName','Test');
       actions.enterTextInField('#ccNumber','4111111111111111');
       actions.enterTextInField('#securityCode','411');
@@ -26,11 +26,10 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Trial');
       actions.clickOnElementWithTextLast('Upgrade');
       actions.clickOnElementWithText('Confirm Billing Change');
-      actions.waitForActionToComplete(2000);
-      //actions.clickOnElementWithText('Basic');
+      // actions.waitForActionToComplete(2000);
       actions.clickOnElementWithTextLast('Upgrade');
       actions.clickOnElementWithText('Confirm Billing Change');
-      actions.waitForActionToComplete(2000);
+      // actions.waitForActionToComplete(2000);
       actions.goToPage('#/');
       actions.clickOnElementWithText('independentProject');
       actions.clickOnElementWithText('Settings');
@@ -67,6 +66,7 @@ module.exports = function (actions) {
       actions.iSeeText('Upgrade your project to a team or commercial plan to enable Remote Environments.');
       actions.clickOnElementWithText('API Keys');
       actions.clickOnElementWithText('Add New Key');
+      actions.clickOnClass('.fa.fa-trash');
       actions.clickOnElementWithText('CORS');
       actions.iSeeText('Upgrade your project to a paid plan to enable CORS Settings.');
       actions.clickOnElementWithText('Custom JS and CSS');
@@ -96,7 +96,7 @@ module.exports = function (actions) {
       actions.iSeeText('SendGrid Settings');
       actions.iSeeText('Mailgun Settings');
       actions.iSeeText('Custom Email Server');
-      actions.waitForActionToComplete(2000);
+      // actions.waitForActionToComplete(2000);
       actions.clickOnElementWithText('SMTP Settings');
       actions.checkElement('//*[@id="smtpSecure"]');
       actions.enterTextInField('#smtpHost','smtpHost');
@@ -114,7 +114,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Settings');
       actions.clickOnElementWithText('Integrations');
       actions.clickOnElementWithText('Email Providers');
-      actions.waitForActionToComplete(2000);
+      // actions.waitForActionToComplete(2000);
       actions.clickOnElementWithText('SendGrid Settings');
       actions.enterTextInField('#sendGridPassword','sendGridPassword');
       actions.clickOnElementWithText('Save Settings');
@@ -128,7 +128,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Settings');
       actions.clickOnElementWithText('Integrations');
       actions.clickOnElementWithText('Email Providers');
-      actions.waitForActionToComplete(2000);
+      // actions.waitForActionToComplete(2000);
       actions.clickOnElementWithText('Mailgun Settings');
       actions.enterTextInField('#mailgunAPIKey','mailgunAPIKey');
       actions.enterTextInField('#mailgunDomain','mailgunDomain');
@@ -143,7 +143,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Settings');
       actions.clickOnElementWithText('Integrations');
       actions.clickOnElementWithText('Email Providers');
-      actions.waitForActionToComplete(2000);
+      // actions.waitForActionToComplete(2000);
       actions.clickOnElementWithText('Custom Email Server');
       actions.enterTextInField('#customUrl','customUrl');
       actions.enterTextInField('#customPassword','customPassword');
