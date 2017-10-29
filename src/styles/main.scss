@@ -1628,6 +1628,10 @@ footer {
   color: $brand-secondary;
 }
 
+.list-group.list-group-or .list-group-heading {
+  background-color: #fff;
+}
+
 /********************* Project Plan Upgrade Dialog *********************/
 .ngdialog.ngdialog-theme-default.project-upgrade .ngdialog-content {
   padding: 0;
