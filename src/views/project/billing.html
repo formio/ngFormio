@@ -44,13 +44,23 @@
             </div>
           </div>
         </li>
-        <li class="list-group-item" ng-if="pricing.pdf">
+        <li class="list-group-item" ng-if="pricing.pdf.plan === 'hosted'">
+          <div class="row">
+            <div class="col-xs-7">
+              <h4>Hosted PDF</h4>
+            </div>
+            <div class="col-xs-5">
+              <h4>${{ pricing.pdf.price }}/month</h4>
+            </div>
+          </div>
+        </li>
+        <li class="list-group-item" ng-if="pricing.pdf.plan === 'enterprise'">
           <div class="row">
             <div class="col-xs-7">
               <h4>PDF Servers ({{servers.pdf}})</h4>
             </div>
             <div class="col-xs-5">
-              <h4>${{ pricing.pdf }}/month</h4>
+              <h4>${{ pricing.pdf.price }}/month</h4>
             </div>
           </div>
         </li>
@@ -65,7 +75,7 @@
           </div>
         </li>
       </ul>
-      <span class="btn btn-success pull-right" ng-if="primaryProject.plan !== selectedPlan.name || servers.api !== primaryProject.billing.servers.api || servers.pdf !== primaryProject.billing.servers.pdf" ng-disabled="selectedPlan.price !== 0 && !paymentInfo" ng-click="changePlan()">Confirm Billing Change</span>
+      <span class="btn btn-success pull-right" ng-if="primaryProject.plan !== selectedPlan.name || servers.api !== primaryProject.billing.servers.api || servers.pdf !== primaryProject.billing.servers.pdf" ng-disabled="selectedPlan.price !== 0 && !paymentInfo" ng-click="changePlan()"><i ng-if="planLoading" class="fa fa-spinner fa-pulse"></i> Confirm Billing Change</span>
     </div>
     <div class="col-sm-8" style="padding: 0 20px 40px 0;">
       <h2>Project Plan and Pricing</h2>
@@ -93,7 +103,7 @@
             </div>
             <div class="col-sm-4">
               <span class="btn btn-default" ng-if="selectedPlan.order !== plan.order" ng-click="setSelectedPlan(plan)">{{ selectedPlan.order > plan.order ? 'Downgrade' : 'Upgrade' }}</span>
-              <h4 ng-if="selectedPlan.order === plan.order" class="text-warning">Selected</h4>
+              <span ng-if="selectedPlan.order === plan.order" class="btn btn-success">Selected</span>
             </div>
           </div>
         </li>
@@ -124,7 +134,7 @@
           <li class="list-group-item list-group-heading">
             <div class="row">
               <div class="col-sm-10">
-                <h4 style="font-weight:bold">On Premise or Private Cloud Deployments</h4>
+                <h4 style="font-weight:bold">On Premise or Private Cloud Deployment</h4>
               </div>
               <div class="col-sm-2">
                 <h4 style="font-weight:bold"># of Servers</h4>
@@ -145,10 +155,61 @@
               </div>
             </div>
           </li>
+          <li class="list-group-item list-group-heading">
+            <div class="text-muted">Servers may be used for multiple projects however each project requires a plan of Team Pro or Enterprise.</div>
+          </li>
+        </ul>
+      </div>
+      <div>
+        <h2>PDF Hosting</h2>
+        <ul class="list-group project-onpremise">
+          <li class="list-group-item list-group-heading">
+            <div class="row">
+              <div class="col-sm-10">
+                <h4 style="font-weight:bold">PDF Hosting with Form.io</h4>
+              </div>
+            </div>
+          </li>
           <li class="list-group-item">
             <div class="row">
               <div class="col-sm-6">
-                <h4 style="font-weight:bold">PDF Manager Server</h4>
+                <h4>Host your PDF forms on our infrastructure</h4>
+              </div>
+              <div class="col-sm-4">
+                <h4>$50 / month</h4>
+                <table class="table table-condensed table-bordered">
+                  <tr>
+                    <th>PDF forms</th>
+                    <td>25</td>
+                  </tr>
+                  <tr>
+                    <th>PDF Downloads</th>
+                    <td>1000 / month</td>
+                  </tr>
+                </table>
+              </div>
+              <div class="col-sm-2">
+                <span class="btn" ng-class="{'btn-success': (pdfInfo.plan === 'hosted'), 'btn-default': (pdfInfo.plan === 'basic'), 'btn-primary': (pdfInfo.plan === 'enterprise')}" ng-click="togglePDFHostedPlan()">{{ pdfInfo.plan === 'hosted' ? 'Downgrade' : (pdfInfo.plan === 'enterprise' ? 'Enterprise' : 'Upgrade') }}</span>
+              </div>
+            </div>
+          </li>
+        </ul>
+        <h3 class="text-center"> - or -</h3>
+        <ul class="list-group project-onpremise">
+          <li class="list-group-item list-group-heading">
+            <div class="row">
+              <div class="col-sm-10">
+                <h4 style="font-weight:bold">On Premise or Private Cloud Deployments</h4>
+              </div>
+              <div class="col-sm-2">
+                <h4 style="font-weight:bold"># of Servers</h4>
+              </div>
+            </div>
+          </li>
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col-sm-6">
+                <h4 style="font-weight:bold">PDF Server</h4>
                 <p>&nbsp;&nbsp;-&nbsp;Unlimited PDF Storage and Downloads</p>
               </div>
               <div class="col-sm-4">

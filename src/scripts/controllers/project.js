@@ -2639,13 +2639,17 @@ app.controller('ProjectBilling', [
   'FormioAlerts',
   'UserInfo',
   'ProjectPlans',
-  function($rootScope, $scope, $http, $state, $window, AppConfig, Formio, FormioAlerts, UserInfo, ProjectPlans) {
+  'PDFServer',
+  function($rootScope, $scope, $http, $state, $window, AppConfig, Formio, FormioAlerts, UserInfo, ProjectPlans, PDFServer) {
     $scope.primaryProjectPromise.then(function(project) {
 
       $scope.servers = (project.billing && project.billing.servers) ? angular.copy(project.billing.servers) : {
         api: 0,
         pdf: 0
       };
+
+      $scope.planLoading = false;
+      $scope.pdfInfo = {};
 
       $scope.plans = ProjectPlans.getPlans();
 
@@ -2691,6 +2695,22 @@ app.controller('ProjectBilling', [
     };
 
     $scope.changePlan = function() {
+      $scope.planLoading = true;
+
+      PDFServer.purchasePDF($scope.primaryProjectPromise, {
+        plan: $scope.pdfInfo.plan
+      }).then(function(results) {
+        $scope.pdfInfo = results.data.data;
+        $scope.pdfPlanLoading = false;
+        $scope.planLoading = false;
+      }, function(err) {
+        FormioAlerts.onError({message: err.data || err.message});
+        $scope.pdfPlanLoading = false;
+      }).catch(function(err) {
+        FormioAlerts.onError({message: err.data || err.message});
+        $scope.pdfPlanLoading = false;
+      });
+
       $http.post(AppConfig.apiBase + '/project/' + $scope.primaryProject._id + '/upgrade',
         {
           plan: $scope.selectedPlan.name,
@@ -2698,6 +2718,7 @@ app.controller('ProjectBilling', [
         }
         )
         .then(function() {
+          $scope.planLoading = false;
           Formio.clearCache();
           $window.location.reload();
         }, FormioAlerts.onError.bind(FormioAlerts))
@@ -2721,14 +2742,42 @@ app.controller('ProjectBilling', [
             pdf: 0
           };
         }
+
+        var pdfPrice = 0;
+        if (parseInt($scope.servers.pdf, 10) > 0) {
+          $scope.pdfInfo.plan = 'enterprise';
+          pdfPrice = ($scope.servers.pdf % 3 * 250) + (Math.floor($scope.servers.pdf / 3) * 500);
+        }
+        else if ($scope.pdfInfo.plan === 'hosted') {
+          pdfPrice = 50;
+        }
+        else {
+          $scope.pdfInfo.plan = 'basic';
+        }
+
         $scope.pricing = {
           plan: $scope.selectedPlan.price,
           api: ($scope.servers.api % 3 * 250) + (Math.floor($scope.servers.api / 3) * 500),
-          pdf: ($scope.servers.pdf % 3 * 250) + (Math.floor($scope.servers.pdf / 3) * 500)
+          pdf: {
+            plan: $scope.pdfInfo.plan,
+            servers: $scope.servers.pdf,
+            price: pdfPrice
+          }
         };
-        $scope.pricing.total = $scope.pricing.plan + $scope.pricing.api + $scope.pricing.pdf;
+        $scope.pricing.total = $scope.pricing.plan + $scope.pricing.api + $scope.pricing.pdf.price;
       }
     };
+
+    $scope.togglePDFHostedPlan = function() {
+      $scope.servers.pdf = 0;
+      $scope.pdfInfo.plan = ($scope.pdfInfo.plan === 'hosted') ? 'basic' : 'hosted';
+      calculatePrice();
+    };
+
+    PDFServer.getInfo($scope.primaryProjectPromise).then(function(info) {
+      $scope.pdfInfo = info.data;
+      calculatePrice();
+    });
 
     $scope.$watch('servers', calculatePrice, true);
     $scope.$watch('selectedPlan', calculatePrice, true);
