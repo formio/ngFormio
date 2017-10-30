@@ -502,6 +502,7 @@ app.controller('ProjectController', [
 
         $scope.trialDaysRemaining = trialRemaining > 0 ? trialRemaining : 0;
         $scope.createdDays = createdDays;
+        document.body.className += ' ' + 'project-' + primaryProject.plan;
 
         PrimaryProject.set(primaryProject, $scope);
       });

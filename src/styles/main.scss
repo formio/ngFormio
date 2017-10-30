@@ -21,6 +21,9 @@ body {
 .grow { transition: all .2s ease-in-out; }
 .grow:hover { transform: scale(1.2); }
 
+.project-commercial .form-builder-premium {
+  display: block;
+}
 
 .btn {
   overflow: hidden;
