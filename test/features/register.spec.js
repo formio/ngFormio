@@ -75,7 +75,7 @@ module.exports = function (actions) {
       actions.enterTextInField('.register-container #verifyPassword', '${register3.password}');
       actions.btnEnabled('REGISTER');
       actions.clickOnElementWithText('REGISTER');
-      actions.iAmLoggedIn();
+      //actions.iAmLoggedIn();
     });
   });
 };
