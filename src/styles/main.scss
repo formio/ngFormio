@@ -21,8 +21,18 @@ body {
 .grow { transition: all .2s ease-in-out; }
 .grow:hover { transform: scale(1.2); }
 
-.project-commercial .form-builder-premium {
+.form-builder-premium {
   display: block;
+}
+
+.form-builder-premium label {
+  color: #aaa;
+  pointer-events: none;
+}
+
+.project-commercial .form-builder-premium label {
+  color: inherit;
+  pointer-events: auto;
 }
 
 .btn {
