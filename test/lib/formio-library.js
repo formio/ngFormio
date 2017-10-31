@@ -440,14 +440,21 @@ module.exports = function (config) {
    });
    };*/
 
+  //example inputs
+  //1. 'https://help.form.io/intro/welcome/'
+  //2. 'regex:^#\/project\/[0-9a-z]{24}\/$'
+  //3. '#/profile/view'
   this.checkingUrlIamOn = function (url) {
-    if (!url.toLowerCase().includes('http')) {
+    if (!url.toLowerCase().includes('http') && !url.toLowerCase().includes('regex')) {
       url = config.baseUrl + "/" + url;
+    } else if (url.toLowerCase().includes('regex')) {
+      url = url.split(':')[1];
     }
     it('I am on ' + url, function (next) {
       browser.wait(function () {
         return browser.getCurrentUrl().then(function (cUrl) {
-          return cUrl.toLowerCase() == url.toLowerCase();
+          return cUrl.toLowerCase() == url.toLowerCase()
+            || (cUrl.toLowerCase().substring(cUrl.indexOf('#/')).match(url) != null);
         });
       }, timeout).then(function (value) {
         try {
@@ -548,6 +555,12 @@ module.exports = function (config) {
       } catch (err) {
         next(err);
       }
+    });
+  };
+
+  this.enableAngular = function(text){
+    it('Angular is enabled '+ text,function(){
+        browser.waitForAngularEnabled(text);
     });
   };
 

@@ -10,8 +10,8 @@ exports.config = {
   capabilities: {
     'browserName': 'chrome'
   },
-  //allScriptSTimeout : 10000,
-  //getPageTimeout: 10000,
+  allScriptSTimeout : 120000,
+  getPageTimeout: 120000,
   // Spec patterns are relative to the current working directory when
   // protractor is called.
   // specs: [paths.e2e + '/**/*.js'],
