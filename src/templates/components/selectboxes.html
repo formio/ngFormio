@@ -1,5 +1,5 @@
 <div class="select-boxes">
-  <label ng-if="component.label && !component.hideLabel" for="{{ componentId }}" class="control-label" ng-class="{'field-required': isRequired(component)}">
+  <label ng-if="options.building || (component.label && !component.hideLabel)" for="{{ componentId }}" class="control-label" ng-class="{'field-required': isRequired(component)}">
     {{ component.label }}
     <formio-component-tooltip></formio-component-tooltip>
   </label>
