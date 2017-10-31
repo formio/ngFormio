@@ -2,7 +2,6 @@
 
 var gulp = require('gulp');
 var plugins = require('gulp-load-plugins')();
-plugins.pump = require('pump');
 plugins.source = require('vinyl-source-stream');
 plugins.browserify = require('browserify');
 plugins.watchify = require('watchify');

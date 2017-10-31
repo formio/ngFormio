@@ -33,7 +33,6 @@
     "karma": "^1.7.1",
     "main-bower-files": "^2.11.1",
     "node-qunit-phantomjs": "^1.2.1",
-    "pump": "^1.0.2",
     "run-sequence": "^2.2.0",
     "strictify": "^0.2.0",
     "uglifyify": "^4.0.4",
