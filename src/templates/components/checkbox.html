@@ -22,7 +22,7 @@
       ng-required="isRequired(component)"
       custom-validator="component.validate.custom"
     >
-    <span ng-if="!(component.hideLabel && component.datagridLabel === false)">
+    <span ng-if="options.building || !(component.hideLabel && component.datagridLabel === false)">
       {{ component.label | formioTranslate:null:options.building }}
       <formio-component-tooltip></formio-component-tooltip>
     </span>
