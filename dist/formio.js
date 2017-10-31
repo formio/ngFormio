@@ -1,4 +1,4 @@
-/*! ng-formio v2.23.12 | https://unpkg.com/ng-formio@2.23.12/LICENSE.txt */
+/*! ng-formio v2.24.0 | https://unpkg.com/ng-formio@2.24.0/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 exports.defaults = {};
 
@@ -95,6 +95,7 @@ exports.all = function() {
 };
 
 },{}],2:[function(_dereq_,module,exports){
+(function (process){
 /*!
  * EventEmitter2
  * https://github.com/hij1nx/EventEmitter2
@@ -121,7 +122,8 @@ exports.all = function() {
       this._conf = conf;
 
       conf.delimiter && (this.delimiter = conf.delimiter);
-      this._events.maxListeners = conf.maxListeners !== undefined ? conf.maxListeners : defaultMaxListeners;
+      this._maxListeners = conf.maxListeners !== undefined ? conf.maxListeners : defaultMaxListeners;
+
       conf.wildcard && (this.wildcard = conf.wildcard);
       conf.newListener && (this.newListener = conf.newListener);
       conf.verboseMemoryLeak && (this.verboseMemoryLeak = conf.verboseMemoryLeak);
@@ -130,24 +132,31 @@ exports.all = function() {
         this.listenerTree = {};
       }
     } else {
-      this._events.maxListeners = defaultMaxListeners;
+      this._maxListeners = defaultMaxListeners;
     }
   }
 
   function logPossibleMemoryLeak(count, eventName) {
     var errorMsg = '(node) warning: possible EventEmitter memory ' +
-        'leak detected. %d listeners added. ' +
+        'leak detected. ' + count + ' listeners added. ' +
         'Use emitter.setMaxListeners() to increase limit.';
 
     if(this.verboseMemoryLeak){
-      errorMsg += ' Event name: %s.';
-      console.error(errorMsg, count, eventName);
-    } else {
-      console.error(errorMsg, count);
+      errorMsg += ' Event name: ' + eventName + '.';
     }
 
-    if (console.trace){
-      console.trace();
+    if(typeof process !== 'undefined' && process.emitWarning){
+      var e = new Error(errorMsg);
+      e.name = 'MaxListenersExceededWarning';
+      e.emitter = this;
+      e.count = count;
+      process.emitWarning(e);
+    } else {
+      console.error(errorMsg);
+
+      if (console.trace){
+        console.trace();
+      }
     }
   }
 
@@ -308,8 +317,8 @@ exports.all = function() {
 
           if (
             !tree._listeners.warned &&
-            this._events.maxListeners > 0 &&
-            tree._listeners.length > this._events.maxListeners
+            this._maxListeners > 0 &&
+            tree._listeners.length > this._maxListeners
           ) {
             tree._listeners.warned = true;
             logPossibleMemoryLeak.call(this, tree._listeners.length, name);
@@ -333,8 +342,7 @@ exports.all = function() {
 
   EventEmitter.prototype.setMaxListeners = function(n) {
     if (n !== undefined) {
-      this._events || init.call(this);
-      this._events.maxListeners = n;
+      this._maxListeners = n;
       if (!this._conf) this._conf = {};
       this._conf.maxListeners = n;
     }
@@ -342,12 +350,29 @@ exports.all = function() {
 
   EventEmitter.prototype.event = '';
 
+
   EventEmitter.prototype.once = function(event, fn) {
-    this.many(event, 1, fn);
+    return this._once(event, fn, false);
+  };
+
+  EventEmitter.prototype.prependOnceListener = function(event, fn) {
+    return this._once(event, fn, true);
+  };
+
+  EventEmitter.prototype._once = function(event, fn, prepend) {
+    this._many(event, 1, fn, prepend);
     return this;
   };
 
   EventEmitter.prototype.many = function(event, ttl, fn) {
+    return this._many(event, ttl, fn, false);
+  }
+
+  EventEmitter.prototype.prependMany = function(event, ttl, fn) {
+    return this._many(event, ttl, fn, true);
+  }
+
+  EventEmitter.prototype._many = function(event, ttl, fn, prepend) {
     var self = this;
 
     if (typeof fn !== 'function') {
@@ -358,12 +383,12 @@ exports.all = function() {
       if (--ttl === 0) {
         self.off(event, listener);
       }
-      fn.apply(this, arguments);
+      return fn.apply(this, arguments);
     }
 
     listener._origin = fn;
 
-    this.on(event, listener);
+    this._on(event, listener, prepend);
 
     return self;
   };
@@ -539,6 +564,7 @@ exports.all = function() {
         promises.push(handler.apply(this, args));
       }
     } else if (handler && handler.length) {
+      handler = handler.slice();
       if (al > 3) {
         args = new Array(al - 1);
         for (j = 1; j < al; j++) args[j - 1] = arguments[j];
@@ -571,8 +597,45 @@ exports.all = function() {
   };
 
   EventEmitter.prototype.on = function(type, listener) {
+    return this._on(type, listener, false);
+  };
+
+  EventEmitter.prototype.prependListener = function(type, listener) {
+    return this._on(type, listener, true);
+  };
+
+  EventEmitter.prototype.onAny = function(fn) {
+    return this._onAny(fn, false);
+  };
+
+  EventEmitter.prototype.prependAny = function(fn) {
+    return this._onAny(fn, true);
+  };
+
+  EventEmitter.prototype.addListener = EventEmitter.prototype.on;
+
+  EventEmitter.prototype._onAny = function(fn, prepend){
+    if (typeof fn !== 'function') {
+      throw new Error('onAny only accepts instances of Function');
+    }
+
+    if (!this._all) {
+      this._all = [];
+    }
+
+    // Add the function to the event listener collection.
+    if(prepend){
+      this._all.unshift(fn);
+    }else{
+      this._all.push(fn);
+    }
+
+    return this;
+  }
+
+  EventEmitter.prototype._on = function(type, listener, prepend) {
     if (typeof type === 'function') {
-      this.onAny(type);
+      this._onAny(type, listener);
       return this;
     }
 
@@ -600,14 +663,18 @@ exports.all = function() {
         this._events[type] = [this._events[type]];
       }
 
-      // If we've already got an array, just append.
-      this._events[type].push(listener);
+      // If we've already got an array, just add
+      if(prepend){
+        this._events[type].unshift(listener);
+      }else{
+        this._events[type].push(listener);
+      }
 
       // Check for listener leak
       if (
         !this._events[type].warned &&
-        this._events.maxListeners > 0 &&
-        this._events[type].length > this._events.maxListeners
+        this._maxListeners > 0 &&
+        this._events[type].length > this._maxListeners
       ) {
         this._events[type].warned = true;
         logPossibleMemoryLeak.call(this, this._events[type].length, type);
@@ -615,23 +682,7 @@ exports.all = function() {
     }
 
     return this;
-  };
-
-  EventEmitter.prototype.onAny = function(fn) {
-    if (typeof fn !== 'function') {
-      throw new Error('onAny only accepts instances of Function');
-    }
-
-    if (!this._all) {
-      this._all = [];
-    }
-
-    // Add the function to the event listener collection.
-    this._all.push(fn);
-    return this;
-  };
-
-  EventEmitter.prototype.addListener = EventEmitter.prototype.on;
+  }
 
   EventEmitter.prototype.off = function(type, listener) {
     if (typeof listener !== 'function') {
@@ -788,6 +839,10 @@ exports.all = function() {
     return this._events[type];
   };
 
+  EventEmitter.prototype.eventNames = function(){
+    return Object.keys(this._events);
+  }
+
   EventEmitter.prototype.listenerCount = function(type) {
     return this.listeners(type).length;
   };
@@ -818,7 +873,8 @@ exports.all = function() {
   }
 }();
 
-},{}],3:[function(_dereq_,module,exports){
+}).call(this,_dereq_('_process'))
+},{"_process":225}],3:[function(_dereq_,module,exports){
 (function (global){
 'use strict';
 
@@ -1500,7 +1556,7 @@ var Formio = function () {
       }
 
       // Set up and fetch request
-      var headers = header || new Headers({
+      var headers = header || new Headers(opts.headers || {
         'Accept': 'application/json',
         'Content-type': 'application/json; charset=UTF-8'
       });
@@ -2006,6 +2062,7 @@ var Formio = function () {
 
 
 exports.Formio = Formio;
+Formio.Headers = Headers;
 Formio.baseUrl = 'https://api.form.io';
 Formio.projectUrl = Formio.baseUrl;
 Formio.projectUrlSet = false;
@@ -2020,7 +2077,7 @@ Formio.events = new EventEmitter({
 module.exports = global.Formio = Formio;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./providers":4,"browser-cookies":1,"eventemitter2":2,"native-promise-only":224,"shallow-copy":225,"whatwg-fetch":227}],4:[function(_dereq_,module,exports){
+},{"./providers":4,"browser-cookies":1,"eventemitter2":2,"native-promise-only":224,"shallow-copy":226,"whatwg-fetch":228}],4:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = {
@@ -14686,6 +14743,192 @@ return hooks;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],225:[function(_dereq_,module,exports){
+// shim for using process in browser
+var process = module.exports = {};
+
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+
+var cachedSetTimeout;
+var cachedClearTimeout;
+
+function defaultSetTimout() {
+    throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout () {
+    throw new Error('clearTimeout has not been defined');
+}
+(function () {
+    try {
+        if (typeof setTimeout === 'function') {
+            cachedSetTimeout = setTimeout;
+        } else {
+            cachedSetTimeout = defaultSetTimout;
+        }
+    } catch (e) {
+        cachedSetTimeout = defaultSetTimout;
+    }
+    try {
+        if (typeof clearTimeout === 'function') {
+            cachedClearTimeout = clearTimeout;
+        } else {
+            cachedClearTimeout = defaultClearTimeout;
+        }
+    } catch (e) {
+        cachedClearTimeout = defaultClearTimeout;
+    }
+} ())
+function runTimeout(fun) {
+    if (cachedSetTimeout === setTimeout) {
+        //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    // if setTimeout wasn't available but was latter defined
+    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+        cachedSetTimeout = setTimeout;
+        return setTimeout(fun, 0);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedSetTimeout(fun, 0);
+    } catch(e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+            return cachedSetTimeout.call(null, fun, 0);
+        } catch(e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+            return cachedSetTimeout.call(this, fun, 0);
+        }
+    }
+
+
+}
+function runClearTimeout(marker) {
+    if (cachedClearTimeout === clearTimeout) {
+        //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    // if clearTimeout wasn't available but was latter defined
+    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+        cachedClearTimeout = clearTimeout;
+        return clearTimeout(marker);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedClearTimeout(marker);
+    } catch (e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+            return cachedClearTimeout.call(null, marker);
+        } catch (e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+            return cachedClearTimeout.call(this, marker);
+        }
+    }
+
+
+
+}
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = runTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    runClearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        runTimeout(drainQueue);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+process.prependListener = noop;
+process.prependOnceListener = noop;
+
+process.listeners = function (name) { return [] }
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+},{}],226:[function(_dereq_,module,exports){
 module.exports = function (obj) {
     if (!obj || typeof obj !== 'object') return obj;
     
@@ -14722,9 +14965,9 @@ var isArray = Array.isArray || function (xs) {
     return {}.toString.call(xs) === '[object Array]';
 };
 
-},{}],226:[function(_dereq_,module,exports){
+},{}],227:[function(_dereq_,module,exports){
 /*!
- * Signature Pad v1.6.0
+ * Signature Pad v2.3.2
  * https://github.com/szimek/signature_pad
  *
  * Copyright 2017 Szymon Nowak
@@ -14759,6 +15002,10 @@ Point.prototype.velocityFrom = function (start) {
 
 Point.prototype.distanceTo = function (start) {
   return Math.sqrt(Math.pow(this.x - start.x, 2) + Math.pow(this.y - start.y, 2));
+};
+
+Point.prototype.equals = function (other) {
+  return this.x === other.x && this.y === other.y && this.time === other.time;
 };
 
 function Bezier(startPoint, control1, control2, endPoint) {
@@ -14796,6 +15043,41 @@ Bezier.prototype._point = function (t, start, c1, c2, end) {
   return start * (1.0 - t) * (1.0 - t) * (1.0 - t) + 3.0 * c1 * (1.0 - t) * (1.0 - t) * t + 3.0 * c2 * (1.0 - t) * t * t + end * t * t * t;
 };
 
+/* eslint-disable */
+
+// http://stackoverflow.com/a/27078401/815507
+function throttle(func, wait, options) {
+  var context, args, result;
+  var timeout = null;
+  var previous = 0;
+  if (!options) options = {};
+  var later = function later() {
+    previous = options.leading === false ? 0 : Date.now();
+    timeout = null;
+    result = func.apply(context, args);
+    if (!timeout) context = args = null;
+  };
+  return function () {
+    var now = Date.now();
+    if (!previous && options.leading === false) previous = now;
+    var remaining = wait - (now - previous);
+    context = this;
+    args = arguments;
+    if (remaining <= 0 || remaining > wait) {
+      if (timeout) {
+        clearTimeout(timeout);
+        timeout = null;
+      }
+      previous = now;
+      result = func.apply(context, args);
+      if (!timeout) context = args = null;
+    } else if (!timeout && options.trailing !== false) {
+      timeout = setTimeout(later, remaining);
+    }
+    return result;
+  };
+}
+
 function SignaturePad(canvas, options) {
   var self = this;
   var opts = options || {};
@@ -14803,6 +15085,15 @@ function SignaturePad(canvas, options) {
   this.velocityFilterWeight = opts.velocityFilterWeight || 0.7;
   this.minWidth = opts.minWidth || 0.5;
   this.maxWidth = opts.maxWidth || 2.5;
+  this.throttle = 'throttle' in opts ? opts.throttle : 16; // in miliseconds
+  this.minDistance = 'minDistance' in opts ? opts.minDistance : 5;
+
+  if (this.throttle) {
+    this._strokeMoveUpdate = throttle(SignaturePad.prototype._strokeUpdate, this.throttle);
+  } else {
+    this._strokeMoveUpdate = SignaturePad.prototype._strokeUpdate;
+  }
+
   this.dotSize = opts.dotSize || function () {
     return (this.minWidth + this.maxWidth) / 2;
   };
@@ -14826,7 +15117,7 @@ function SignaturePad(canvas, options) {
 
   this._handleMouseMove = function (event) {
     if (self._mouseButtonDown) {
-      self._strokeUpdate(event);
+      self._strokeMoveUpdate(event);
     }
   };
 
@@ -14849,7 +15140,7 @@ function SignaturePad(canvas, options) {
     event.preventDefault();
 
     var touch = event.targetTouches[0];
-    self._strokeUpdate(touch);
+    self._strokeMoveUpdate(touch);
   };
 
   this._handleTouchEnd = function (event) {
@@ -14881,10 +15172,12 @@ SignaturePad.prototype.clear = function () {
 SignaturePad.prototype.fromDataURL = function (dataUrl) {
   var _this = this;
 
+  var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
   var image = new Image();
-  var ratio = window.devicePixelRatio || 1;
-  var width = this._canvas.width / ratio;
-  var height = this._canvas.height / ratio;
+  var ratio = options.ratio || window.devicePixelRatio || 1;
+  var width = options.width || this._canvas.width / ratio;
+  var height = options.height || this._canvas.height / ratio;
 
   this._reset();
   image.src = dataUrl;
@@ -14944,28 +15237,51 @@ SignaturePad.prototype._strokeUpdate = function (event) {
   var y = event.clientY;
 
   var point = this._createPoint(x, y);
+  var lastPointGroup = this._data[this._data.length - 1];
+  var lastPoint = lastPointGroup && lastPointGroup[lastPointGroup.length - 1];
+  var isLastPointTooClose = lastPoint && point.distanceTo(lastPoint) < this.minDistance;
 
-  var _addPoint = this._addPoint(point),
-      curve = _addPoint.curve,
-      widths = _addPoint.widths;
+  // Skip this point if it's too close to the previous one
+  if (!(lastPoint && isLastPointTooClose)) {
+    var _addPoint = this._addPoint(point),
+        curve = _addPoint.curve,
+        widths = _addPoint.widths;
 
-  if (curve && widths) {
-    this._drawCurve(curve, widths.start, widths.end);
+    if (curve && widths) {
+      this._drawCurve(curve, widths.start, widths.end);
+    }
+
+    this._data[this._data.length - 1].push({
+      x: point.x,
+      y: point.y,
+      time: point.time,
+      color: this.penColor
+    });
   }
-
-  this._data[this._data.length - 1].push({
-    x: point.x,
-    y: point.y,
-    time: point.time
-  });
 };
 
 SignaturePad.prototype._strokeEnd = function (event) {
   var canDrawCurve = this.points.length > 2;
-  var point = this.points[0];
+  var point = this.points[0]; // Point instance
 
   if (!canDrawCurve && point) {
     this._drawDot(point);
+  }
+
+  if (point) {
+    var lastPointGroup = this._data[this._data.length - 1];
+    var lastPoint = lastPointGroup[lastPointGroup.length - 1]; // plain object
+
+    // When drawing a dot, there's only one point in a group, so without this check
+    // such group would end up with exactly the same 2 points.
+    if (!point.equals(lastPoint)) {
+      lastPointGroup.push({
+        x: point.x,
+        y: point.y,
+        time: point.time,
+        color: this.penColor
+      });
+    }
   }
 
   if (typeof this.onEnd === 'function') {
@@ -15141,10 +15457,16 @@ SignaturePad.prototype._fromData = function (pointGroups, drawCurve, drawDot) {
       for (var j = 0; j < group.length; j += 1) {
         var rawPoint = group[j];
         var point = new Point(rawPoint.x, rawPoint.y, rawPoint.time);
+        var color = rawPoint.color;
 
         if (j === 0) {
           // First point in a group. Nothing to draw yet.
+
+          // All points in the group have the same color, so it's enough to set
+          // penColor just at the beginning.
+          this.penColor = color;
           this._reset();
+
           this._addPoint(point);
         } else if (j !== group.length - 1) {
           // Middle point in a group.
@@ -15153,7 +15475,7 @@ SignaturePad.prototype._fromData = function (pointGroups, drawCurve, drawDot) {
               widths = _addPoint2.widths;
 
           if (curve && widths) {
-            drawCurve(curve, widths);
+            drawCurve(curve, widths, color);
           }
         } else {
           // Last point in a group. Do nothing.
@@ -15182,7 +15504,7 @@ SignaturePad.prototype._toSVG = function () {
   svg.setAttributeNS(null, 'width', canvas.width);
   svg.setAttributeNS(null, 'height', canvas.height);
 
-  this._fromData(pointGroups, function (curve, widths) {
+  this._fromData(pointGroups, function (curve, widths, color) {
     var path = document.createElement('path');
 
     // Need to check curve for NaN values, these pop up when drawing
@@ -15193,7 +15515,7 @@ SignaturePad.prototype._toSVG = function () {
 
       path.setAttribute('d', attr);
       path.setAttribute('stroke-width', (widths.end * 2.25).toFixed(3));
-      path.setAttribute('stroke', _this2.penColor);
+      path.setAttribute('stroke', color);
       path.setAttribute('fill', 'none');
       path.setAttribute('stroke-linecap', 'round');
 
@@ -15205,7 +15527,7 @@ SignaturePad.prototype._toSVG = function () {
     circle.setAttribute('r', dotSize);
     circle.setAttribute('cx', rawPoint.x);
     circle.setAttribute('cy', rawPoint.y);
-    circle.setAttribute('fill', _this2.penColor);
+    circle.setAttribute('fill', rawPoint.color);
 
     svg.appendChild(circle);
   });
@@ -15243,6 +15565,8 @@ SignaturePad.prototype.fromData = function (pointGroups) {
   }, function (rawPoint) {
     return _this3._drawDot(rawPoint);
   });
+
+  this._data = pointGroups;
 };
 
 SignaturePad.prototype.toData = function () {
@@ -15253,7 +15577,7 @@ return SignaturePad;
 
 })));
 
-},{}],227:[function(_dereq_,module,exports){
+},{}],228:[function(_dereq_,module,exports){
 (function(self) {
   'use strict';
 
@@ -15716,7 +16040,7 @@ return SignaturePad;
   self.fetch.polyfill = true
 })(typeof self !== 'undefined' ? self : this);
 
-},{}],228:[function(_dereq_,module,exports){
+},{}],229:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -15794,7 +16118,7 @@ module.exports = function(app) {
     '$templateCache',
     function($templateCache) {
       $templateCache.put('formio/components/address.html',
-        "<label ng-if=\"component.label && !component.hideLabel\" for=\"{{ componentId }}\" ng-class=\"{'field-required': isRequired(component)}\">\n  {{ component.label | formioTranslate:null:options.building }}\n  <formio-component-tooltip></formio-component-tooltip>\n</label>\n<span ng-if=\"!component.label && isRequired(component)\" class=\"glyphicon glyphicon-asterisk form-control-feedback field-required-inline\" aria-hidden=\"true\"></span>\n<ui-select ng-model=\"data[component.key]\" safe-multiple-to-single ng-disabled=\"readOnly\" ng-required=\"isRequired(component)\" id=\"{{ componentId }}\" name=\"{{ componentId }}\" tabindex=\"{{ component.tabindex || 0 }}\" theme=\"bootstrap\">\n  <ui-select-match class=\"ui-select-match\" placeholder=\"{{ component.placeholder | formioTranslate:null:options.building }}\">{{$item.formatted_address || $select.selected.formatted_address}}</ui-select-match>\n  <ui-select-choices class=\"ui-select-choices\" repeat=\"address in addresses\" refresh=\"refreshAddress($select.search)\" refresh-delay=\"500\">\n    <div ng-bind-html=\"address.formatted_address | highlight: $select.search\"></div>\n  </ui-select-choices>\n</ui-select>\n<formio-errors ng-if=\"::!options.building\"></formio-errors>\n"
+        "<label ng-if=\"options.building || (component.label && !component.hideLabel)\" for=\"{{ componentId }}\" ng-class=\"{'field-required': isRequired(component)}\">\n  {{ component.label | formioTranslate:null:options.building }}\n  <formio-component-tooltip></formio-component-tooltip>\n</label>\n<span ng-if=\"!component.label && isRequired(component)\" class=\"glyphicon glyphicon-asterisk form-control-feedback field-required-inline\" aria-hidden=\"true\"></span>\n<ui-select ng-model=\"data[component.key]\" safe-multiple-to-single ng-disabled=\"readOnly\" ng-required=\"isRequired(component)\" id=\"{{ componentId }}\" name=\"{{ componentId }}\" tabindex=\"{{ component.tabindex || 0 }}\" theme=\"bootstrap\">\n  <ui-select-match class=\"ui-select-match\" placeholder=\"{{ component.placeholder | formioTranslate:null:options.building }}\">{{$item.formatted_address || $select.selected.formatted_address}}</ui-select-match>\n  <ui-select-choices class=\"ui-select-choices\" repeat=\"address in addresses\" refresh=\"refreshAddress($select.search)\" refresh-delay=\"500\">\n    <div ng-bind-html=\"address.formatted_address | highlight: $select.search\"></div>\n  </ui-select-choices>\n</ui-select>\n<formio-errors ng-if=\"::!options.building\"></formio-errors>\n"
       );
 
       // Change the ui-select to ui-select multiple.
@@ -15805,7 +16129,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],229:[function(_dereq_,module,exports){
+},{}],230:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -16011,7 +16335,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],230:[function(_dereq_,module,exports){
+},{}],231:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -16085,13 +16409,13 @@ module.exports = function(app) {
     '$templateCache',
     function($templateCache) {
       $templateCache.put('formio/components/checkbox.html',
-        "<div class=\"checkbox\">\n  <label for=\"{{ componentId }}\" ng-class=\"{'field-required': isRequired(component)}\">\n    <input\n      ng-if=\"component.name\"\n      type=\"{{ component.inputType }}\"\n      id=\"{{ componentId }}\"\n      name=\"{{ component.name }}\"\n      value=\"{{ component.value }}\"\n      tabindex=\"{{ component.tabindex || 0 }}\"\n      ng-disabled=\"readOnly\"\n      ng-model=\"data[component.name]\"\n      ng-required=\"component.validate.required\"\n    >\n    <input\n      ng-if=\"!component.name\"\n      type=\"{{ component.inputType }}\"\n      id=\"{{ componentId }}\"\n      name=\"{{ componentId }}\"\n      tabindex=\"{{ component.tabindex || 0 }}\"\n      ng-disabled=\"readOnly\"\n      ng-model=\"data[component.key]\"\n      ng-required=\"isRequired(component)\"\n      custom-validator=\"component.validate.custom\"\n    >\n    <span ng-if=\"!(component.hideLabel && component.datagridLabel === false)\">\n      {{ component.label | formioTranslate:null:options.building }}\n      <formio-component-tooltip></formio-component-tooltip>\n    </span>\n  </label>\n</div>\n<div ng-if=\"!!component.description\" class=\"help-block\">\n  <span>{{ component.description }}</span>\n</div>\n"
+        "<div class=\"checkbox\">\n  <label for=\"{{ componentId }}\" ng-class=\"{'field-required': isRequired(component)}\">\n    <input\n      ng-if=\"component.name\"\n      type=\"{{ component.inputType }}\"\n      id=\"{{ componentId }}\"\n      name=\"{{ component.name }}\"\n      value=\"{{ component.value }}\"\n      tabindex=\"{{ component.tabindex || 0 }}\"\n      ng-disabled=\"readOnly\"\n      ng-model=\"data[component.name]\"\n      ng-required=\"component.validate.required\"\n    >\n    <input\n      ng-if=\"!component.name\"\n      type=\"{{ component.inputType }}\"\n      id=\"{{ componentId }}\"\n      name=\"{{ componentId }}\"\n      tabindex=\"{{ component.tabindex || 0 }}\"\n      ng-disabled=\"readOnly\"\n      ng-model=\"data[component.key]\"\n      ng-required=\"isRequired(component)\"\n      custom-validator=\"component.validate.custom\"\n    >\n    <span ng-if=\"options.building || !(component.hideLabel && component.datagridLabel === false)\">\n      {{ component.label | formioTranslate:null:options.building }}\n      <formio-component-tooltip></formio-component-tooltip>\n    </span>\n  </label>\n</div>\n<div ng-if=\"!!component.description\" class=\"help-block\">\n  <span>{{ component.description }}</span>\n</div>\n"
       );
     }
   ]);
 };
 
-},{}],231:[function(_dereq_,module,exports){
+},{}],232:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -16177,7 +16501,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":279}],232:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":280}],233:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.provider('formioComponents', function() {
@@ -16237,7 +16561,7 @@ module.exports = function(app) {
   }]);
 };
 
-},{}],233:[function(_dereq_,module,exports){
+},{}],234:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -16303,7 +16627,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":279}],234:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":280}],235:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -16332,7 +16656,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],235:[function(_dereq_,module,exports){
+},{}],236:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -16443,7 +16767,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],236:[function(_dereq_,module,exports){
+},{}],237:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -16471,7 +16795,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":279}],237:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":280}],238:[function(_dereq_,module,exports){
 "use strict";
 
 var formioUtils = _dereq_('formiojs/utils');
@@ -16604,7 +16928,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"formiojs/utils":11}],238:[function(_dereq_,module,exports){
+},{"formiojs/utils":11}],239:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -16762,7 +17086,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],239:[function(_dereq_,module,exports){
+},{}],240:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -16969,7 +17293,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],240:[function(_dereq_,module,exports){
+},{}],241:[function(_dereq_,module,exports){
 "use strict";
 
 var formioUtils = _dereq_('formiojs/utils');
@@ -17348,12 +17672,12 @@ module.exports = function(app) {
     '$templateCache',
     'FormioUtils',
     function($templateCache, FormioUtils) {
-      $templateCache.put('formio/components/editgrid.html', "<div name=\"{{ componentId }}\" ng-model=\"data[component.key]\" custom-validator=\"component.validate.custom\" editgrid-validation ng-controller=\"formioEditGrid\">\n  <label ng-if=\"component.label && !component.hideLabel\" for=\"{{ component.key }}\" class=\"control-label\" ng-class=\"{'field-required': isRequired(component)}\">\n    {{ component.label | formioTranslate:null:options.building }}\n    <formio-component-tooltip></formio-component-tooltip>\n  </label>\n  <div class=\"formio-data-grid\" id=\"{{ component.key }}\">\n    <ul class=\"list-group\">\n      <li ng-if=\"component.templates.header\" class=\"list-group-item list-group-header\">\n        <render-template template=\"component.templates.header\" data=\"headerData\" />\n      </li>\n      <li class=\"list-group-item\" ng-repeat=\"row in rows track by $index\" ng-init=\"rowIndex = $index\">\n        <div name=\"{{ componentId }}-row-{{ $index }}\" ng-model=\"row\" editgrid-row-validation>\n          <edit-grid-row />\n          <p class=\"help-block\" ng-show=\"openRows.indexOf($index) !== -1 && formioForm.$error.editgrid\">{{ 'Please save all rows before proceeding' | formioTranslate }}.</p>\n          <p class=\"help-block\" ng-show=\"formioForm[componentId + '-row-' + $index].$error.editgridrow\">{{ 'Please correct rows before proceeding' | formioTranslate }}.</p>\n        </div>\n      </li>\n      <li ng-if=\"component.templates.footer\" class=\"list-group-item list-group-footer\">\n        <render-template template=\"component.templates.footer\" data=\"headerData\" />\n      </li>\n    </ul>\n    <div class=\"datagrid-add\" ng-if=\"!component.hasOwnProperty('validate') || !component.validate.hasOwnProperty('maxLength') || rows.length < component.validate.maxLength\">\n      <a ng-click=\"addRow()\" class=\"btn btn-primary\">\n        <span class=\"glyphicon glyphicon-plus\" aria-hidden=\"true\"></span> {{ component.addAnother || \"Add Another\" | formioTranslate:null:options.building }}\n      </a>\n    </div>\n  </div>\n</div>\n");
+      $templateCache.put('formio/components/editgrid.html', "<div name=\"{{ componentId }}\" ng-model=\"data[component.key]\" custom-validator=\"component.validate.custom\" editgrid-validation ng-controller=\"formioEditGrid\">\n  <label ng-if=\"options.building || (component.label && !component.hideLabel)\" for=\"{{ component.key }}\" class=\"control-label\" ng-class=\"{'field-required': isRequired(component)}\">\n    {{ component.label | formioTranslate:null:options.building }}\n    <formio-component-tooltip></formio-component-tooltip>\n  </label>\n  <div class=\"formio-data-grid\" id=\"{{ component.key }}\">\n    <ul class=\"list-group\">\n      <li ng-if=\"component.templates.header\" class=\"list-group-item list-group-header\">\n        <render-template template=\"component.templates.header\" data=\"headerData\" />\n      </li>\n      <li class=\"list-group-item\" ng-repeat=\"row in rows track by $index\" ng-init=\"rowIndex = $index\">\n        <div name=\"{{ componentId }}-row-{{ $index }}\" ng-model=\"row\" editgrid-row-validation>\n          <edit-grid-row />\n          <p class=\"help-block\" ng-show=\"openRows.indexOf($index) !== -1 && formioForm.$error.editgrid\">{{ 'Please save all rows before proceeding' | formioTranslate }}.</p>\n          <p class=\"help-block\" ng-show=\"formioForm[componentId + '-row-' + $index].$error.editgridrow\">{{ 'Please correct rows before proceeding' | formioTranslate }}.</p>\n        </div>\n      </li>\n      <li ng-if=\"component.templates.footer\" class=\"list-group-item list-group-footer\">\n        <render-template template=\"component.templates.footer\" data=\"headerData\" />\n      </li>\n    </ul>\n    <div class=\"datagrid-add\" ng-if=\"!component.hasOwnProperty('validate') || !component.validate.hasOwnProperty('maxLength') || rows.length < component.validate.maxLength\">\n      <a ng-click=\"addRow()\" class=\"btn btn-primary\">\n        <span class=\"glyphicon glyphicon-plus\" aria-hidden=\"true\"></span> {{ component.addAnother || \"Add Another\" | formioTranslate:null:options.building }}\n      </a>\n    </div>\n  </div>\n</div>\n");
     }
   ]);
 };
 
-},{"formiojs/utils":11}],241:[function(_dereq_,module,exports){
+},{"formiojs/utils":11}],242:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -17387,7 +17711,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],242:[function(_dereq_,module,exports){
+},{}],243:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -17442,7 +17766,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":279}],243:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":280}],244:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -17698,17 +18022,17 @@ module.exports = function(app) {
       );
 
       $templateCache.put('formio/components/file.html',
-        "<label ng-if=\"component.label && !component.hideLabel\" for=\"{{ componentId }}\" class=\"control-label\" ng-class=\"{'field-required': isRequired(component)}\">\n  {{ component.label | formioTranslate:null:options.building }}\n  <formio-component-tooltip></formio-component-tooltip>\n</label>\n<span ng-if=\"!component.label && isRequired(component)\" class=\"glyphicon glyphicon-asterisk form-control-feedback field-required-inline\" aria-hidden=\"true\"></span>\n<div class=\"formio-errors\"><formio-errors ng-if=\"::!options.building\"></formio-errors></div>\n<div ng-controller=\"formioFileUpload\">\n  <formio-file-list files=\"data[component.key]\" form=\"formio.formUrl\" ng-if=\"!component.image\" ng-required=\"isRequired(component)\" ng-model=\"data[component.key]\" name=\"{{ componentId }}\"></formio-file-list>\n  <formio-image-list files=\"data[component.key]\" form=\"formio.formUrl\" width=\"component.imageSize\" ng-if=\"component.image\" ng-required=\"isRequired(component)\" ng-model=\"data[component.key]\" name=\"{{ componentId }}\"></formio-image-list>\n  <div ng-if=\"!readOnly && (component.multiple || (!component.multiple && !data[component.key].length))\">\n    <div ngf-drop=\"upload($files)\" class=\"fileSelector\" ngf-drag-over-class=\"'fileDragOver'\" ngf-multiple=\"component.multiple\" id=\"{{ componentId }}\" name=\"{{ componentId }}\"><span class=\"glyphicon glyphicon-cloud-upload\"></span>Drop files to attach, or <a style=\"cursor: pointer;\" ngf-select=\"upload($files)\" tabindex=\"{{ component.tabindex || 0 }}\" ngf-multiple=\"component.multiple\">browse</a>.</div>\n    <div ng-if=\"!component.storage\" class=\"alert alert-warning\">No storage has been set for this field. File uploads are disabled until storage is set up.</div>\n    <div ngf-no-file-drop>File Drag/Drop is not supported for this browser</div>\n  </div>\n  <div ng-repeat=\"fileUpload in fileUploads track by $index\" ng-class=\"{'has-error': fileUpload.status === 'error'}\" class=\"file\">\n    <div class=\"row\">\n      <div class=\"fileName control-label col-sm-10\">{{ fileUpload.name }} <span ng-click=\"removeUpload(fileUpload.name)\" class=\"glyphicon glyphicon-remove\"></span></div>\n      <div class=\"fileSize control-label col-sm-2 text-right\">{{ fileSize(fileUpload.size) }}</div>\n    </div>\n    <div class=\"row\">\n      <div class=\"col-sm-12\">\n        <span ng-if=\"fileUpload.status === 'progress'\">\n          <div class=\"progress\">\n            <div class=\"progress-bar\" role=\"progressbar\" aria-valuenow=\"{{fileUpload.progress}}\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"width:{{fileUpload.progress}}%\">\n              <span class=\"sr-only\">{{fileUpload.progress}}% Complete</span>\n            </div>\n          </div>\n        </span>\n        <div ng-if=\"!fileUpload.status !== 'progress'\" class=\"bg-{{ fileUpload.status }} control-label\">{{ fileUpload.message }}</div>\n      </div>\n    </div>\n  </div>\n</div>\n"
+        "<label ng-if=\"options.building || (component.label && !component.hideLabel)\" for=\"{{ componentId }}\" class=\"control-label\" ng-class=\"{'field-required': isRequired(component)}\">\n  {{ component.label | formioTranslate:null:options.building }}\n  <formio-component-tooltip></formio-component-tooltip>\n</label>\n<span ng-if=\"!component.label && isRequired(component)\" class=\"glyphicon glyphicon-asterisk form-control-feedback field-required-inline\" aria-hidden=\"true\"></span>\n<div class=\"formio-errors\"><formio-errors ng-if=\"::!options.building\"></formio-errors></div>\n<div ng-controller=\"formioFileUpload\">\n  <formio-file-list files=\"data[component.key]\" form=\"formio.formUrl\" ng-if=\"!component.image\" ng-required=\"isRequired(component)\" ng-model=\"data[component.key]\" name=\"{{ componentId }}\"></formio-file-list>\n  <formio-image-list files=\"data[component.key]\" form=\"formio.formUrl\" width=\"component.imageSize\" ng-if=\"component.image\" ng-required=\"isRequired(component)\" ng-model=\"data[component.key]\" name=\"{{ componentId }}\"></formio-image-list>\n  <div ng-if=\"!readOnly && (component.multiple || (!component.multiple && !data[component.key].length))\">\n    <div ngf-drop=\"upload($files)\" class=\"fileSelector\" ngf-drag-over-class=\"'fileDragOver'\" ngf-multiple=\"component.multiple\" id=\"{{ componentId }}\" name=\"{{ componentId }}\"><span class=\"glyphicon glyphicon-cloud-upload\"></span>Drop files to attach, or <a style=\"cursor: pointer;\" ngf-select=\"upload($files)\" tabindex=\"{{ component.tabindex || 0 }}\" ngf-multiple=\"component.multiple\">browse</a>.</div>\n    <div ng-if=\"!component.storage\" class=\"alert alert-warning\">No storage has been set for this field. File uploads are disabled until storage is set up.</div>\n    <div ngf-no-file-drop>File Drag/Drop is not supported for this browser</div>\n  </div>\n  <div ng-repeat=\"fileUpload in fileUploads track by $index\" ng-class=\"{'has-error': fileUpload.status === 'error'}\" class=\"file\">\n    <div class=\"row\">\n      <div class=\"fileName control-label col-sm-10\">{{ fileUpload.name }} <span ng-click=\"removeUpload(fileUpload.name)\" class=\"glyphicon glyphicon-remove\"></span></div>\n      <div class=\"fileSize control-label col-sm-2 text-right\">{{ fileSize(fileUpload.size) }}</div>\n    </div>\n    <div class=\"row\">\n      <div class=\"col-sm-12\">\n        <span ng-if=\"fileUpload.status === 'progress'\">\n          <div class=\"progress\">\n            <div class=\"progress-bar\" role=\"progressbar\" aria-valuenow=\"{{fileUpload.progress}}\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"width:{{fileUpload.progress}}%\">\n              <span class=\"sr-only\">{{fileUpload.progress}}% Complete</span>\n            </div>\n          </div>\n        </span>\n        <div ng-if=\"!fileUpload.status !== 'progress'\" class=\"bg-{{ fileUpload.status }} control-label\">{{ fileUpload.message }}</div>\n      </div>\n    </div>\n  </div>\n</div>\n"
       );
 
       $templateCache.put('formio/componentsView/file.html',
-        "<label ng-if=\"component.label && !component.hideLabel\" for=\"{{ component.key }}\" class=\"control-label\" ng-class=\"{'field-required': component.validate.required}\">{{ component.label | formioTranslate:null:options.building }}</label>\n<div ng-controller=\"formioFileUpload\">\n  <formio-file-list files=\"data[component.key]\" form=\"formUrl\" read-only=\"true\" ng-if=\"!component.image\"></formio-file-list>\n  <formio-image-list files=\"data[component.key]\" form=\"formUrl\" read-only=\"true\" width=\"component.imageSize\" ng-if=\"component.image\"></formio-image-list>\n</div>\n"
+        "<label ng-if=\"options.building || (component.label && !component.hideLabel)\" for=\"{{ component.key }}\" class=\"control-label\" ng-class=\"{'field-required': component.validate.required}\">{{ component.label | formioTranslate:null:options.building }}</label>\n<div ng-controller=\"formioFileUpload\">\n  <formio-file-list files=\"data[component.key]\" form=\"formUrl\" read-only=\"true\" ng-if=\"!component.image\"></formio-file-list>\n  <formio-image-list files=\"data[component.key]\" form=\"formUrl\" read-only=\"true\" width=\"component.imageSize\" ng-if=\"component.image\"></formio-image-list>\n</div>\n"
       );
     }
   ]);
 };
 
-},{}],244:[function(_dereq_,module,exports){
+},{}],245:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -17894,7 +18218,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":279}],245:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":280}],246:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -17930,7 +18254,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":279}],246:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":280}],247:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -18022,7 +18346,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],247:[function(_dereq_,module,exports){
+},{}],248:[function(_dereq_,module,exports){
 "use strict";
 var app = angular.module('formio');
 
@@ -18067,7 +18391,7 @@ _dereq_('./panel')(app);
 _dereq_('./table')(app);
 _dereq_('./well')(app);
 
-},{"./address":228,"./button":229,"./checkbox":230,"./columns":231,"./components":232,"./container":233,"./content":234,"./currency":235,"./custom":236,"./datagrid":237,"./datetime":238,"./day":239,"./editgrid":240,"./email":241,"./fieldset":242,"./file":243,"./form":244,"./hidden":245,"./htmlelement":246,"./number":248,"./page":249,"./panel":250,"./password":251,"./phonenumber":252,"./radio":253,"./resource":254,"./select":255,"./selectboxes":256,"./signature":257,"./survey":258,"./table":259,"./textarea":260,"./textfield":261,"./time":262,"./well":263}],248:[function(_dereq_,module,exports){
+},{"./address":229,"./button":230,"./checkbox":231,"./columns":232,"./components":233,"./container":234,"./content":235,"./currency":236,"./custom":237,"./datagrid":238,"./datetime":239,"./day":240,"./editgrid":241,"./email":242,"./fieldset":243,"./file":244,"./form":245,"./hidden":246,"./htmlelement":247,"./number":249,"./page":250,"./panel":251,"./password":252,"./phonenumber":253,"./radio":254,"./resource":255,"./select":256,"./selectboxes":257,"./signature":258,"./survey":259,"./table":260,"./textarea":261,"./textfield":262,"./time":263,"./well":264}],249:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -18132,7 +18456,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],249:[function(_dereq_,module,exports){
+},{}],250:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -18159,7 +18483,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],250:[function(_dereq_,module,exports){
+},{}],251:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -18215,7 +18539,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":279}],251:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":280}],252:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -18246,7 +18570,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],252:[function(_dereq_,module,exports){
+},{}],253:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -18282,7 +18606,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],253:[function(_dereq_,module,exports){
+},{}],254:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -18333,7 +18657,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],254:[function(_dereq_,module,exports){
+},{}],255:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -18550,7 +18874,7 @@ module.exports = function(app) {
     '$templateCache',
     function($templateCache) {
       $templateCache.put('formio/components/resource.html',
-        "<div ng-if=\"!component.addResource\">\n  <label ng-if=\"component.label && !component.hideLabel\" for=\"{{ componentId }}\" class=\"control-label\" ng-class=\"{'field-required': isRequired(component)}\">\n    {{ component.label | formioTranslate:null:options.building }}\n    <formio-component-tooltip></formio-component-tooltip>\n  </label>\n  <span ng-if=\"!component.label && isRequired(component)\" class=\"glyphicon glyphicon-asterisk form-control-feedback field-required-inline\" aria-hidden=\"true\"></span>\n  <ui-select ui-select-required safe-multiple-to-single ui-select-open-on-focus ng-model=\"data[component.key]\" ng-disabled=\"readOnly\" ng-required=\"isRequired(component)\" id=\"{{ componentId }}\" name=\"{{ componentId }}\" theme=\"bootstrap\" tabindex=\"{{ component.tabindex || 0 }}\">\n    <ui-select-match class=\"ui-select-match\" placeholder=\"{{ component.placeholder | formioTranslate:null:options.building }}\">\n      <formio-select-item template=\"component.template\" item=\"$item || $select.selected\" select=\"$select\"></formio-select-item>\n    </ui-select-match>\n    <ui-select-choices class=\"ui-select-choices\" repeat=\"item in selectItems | filter: $select.search\" refresh=\"refreshSubmissions($select.search)\" refresh-delay=\"250\">\n      <formio-select-item template=\"component.template\" item=\"item\" select=\"$select\"></formio-select-item>\n      <button ng-if=\"hasNextPage && ($index == $select.items.length-1)\" class=\"btn btn-success btn-block\" ng-click=\"loadMoreItems($select, $event)\" ng-disabled=\"resourceLoading\">Load more...</button>\n    </ui-select-choices>\n  </ui-select>\n  <formio-errors ng-if=\"::!options.building\"></formio-errors>\n</div>\n<div ng-if=\"component.addResource\">\n  <table class=\"table table-bordered\">\n    <label ng-if=\"component.label && !component.hideLabel\" for=\"{{ componentId }}\" class=\"control-label\" ng-class=\"{'field-required': isRequired(component)}\">\n      {{ component.label | formioTranslate:null:options.building }}\n      <formio-component-tooltip></formio-component-tooltip>\n    </label>\n    <span ng-if=\"!component.label && isRequired(component)\" class=\"glyphicon glyphicon-asterisk form-control-feedback field-required-inline\" aria-hidden=\"true\"></span>\n    <tr>\n      <td>\n        <ui-select ui-select-required safe-multiple-to-single ui-select-open-on-focus ng-model=\"data[component.key]\" ng-disabled=\"readOnly\" ng-required=\"isRequired(component)\" id=\"{{ componentId }}\" name=\"{{ componentId }}\" theme=\"bootstrap\" tabindex=\"{{ component.tabindex || 0 }}\">\n          <ui-select-match class=\"ui-select-match\" placeholder=\"{{ component.placeholder | formioTranslate:null:options.building }}\">\n            <formio-select-item template=\"component.template\" item=\"$item || $select.selected\" select=\"$select\"></formio-select-item>\n          </ui-select-match>\n          <ui-select-choices class=\"ui-select-choices\" repeat=\"item in selectItems | filter: $select.search\" refresh=\"refreshSubmissions($select.search)\" refresh-delay=\"250\">\n            <formio-select-item template=\"component.template\" item=\"item\" select=\"$select\"></formio-select-item>\n            <button ng-if=\"hasNextPage && ($index == $select.items.length-1)\" class=\"btn btn-success btn-block\" ng-click=\"loadMoreItems($select, $event)\" ng-disabled=\"resourceLoading\">Load more...</button>\n          </ui-select-choices>\n        </ui-select>\n        <formio-errors ng-if=\"::!options.building\"></formio-errors>\n      </td>\n    </tr>\n    <tr>\n      <td>\n        <a ng-click=\"newResource()\" class=\"btn btn-primary\">\n          <span class=\"glyphicon glyphicon-plus\" aria-hidden=\"true\"></span> {{ component.addResourceLabel || \"Add Resource\" | formioTranslate:null:options.building}}\n        </a>\n      </td>\n    </tr>\n  </table>\n</div>\n"
+        "<div ng-if=\"!component.addResource\">\n  <label ng-if=\"options.building || (component.label && !component.hideLabel)\" for=\"{{ componentId }}\" class=\"control-label\" ng-class=\"{'field-required': isRequired(component)}\">\n    {{ component.label | formioTranslate:null:options.building }}\n    <formio-component-tooltip></formio-component-tooltip>\n  </label>\n  <span ng-if=\"!component.label && isRequired(component)\" class=\"glyphicon glyphicon-asterisk form-control-feedback field-required-inline\" aria-hidden=\"true\"></span>\n  <ui-select ui-select-required safe-multiple-to-single ui-select-open-on-focus ng-model=\"data[component.key]\" ng-disabled=\"readOnly\" ng-required=\"isRequired(component)\" id=\"{{ componentId }}\" name=\"{{ componentId }}\" theme=\"bootstrap\" tabindex=\"{{ component.tabindex || 0 }}\">\n    <ui-select-match class=\"ui-select-match\" placeholder=\"{{ component.placeholder | formioTranslate:null:options.building }}\">\n      <formio-select-item template=\"component.template\" item=\"$item || $select.selected\" select=\"$select\"></formio-select-item>\n    </ui-select-match>\n    <ui-select-choices class=\"ui-select-choices\" repeat=\"item in selectItems | filter: $select.search\" refresh=\"refreshSubmissions($select.search)\" refresh-delay=\"250\">\n      <formio-select-item template=\"component.template\" item=\"item\" select=\"$select\"></formio-select-item>\n      <button ng-if=\"hasNextPage && ($index == $select.items.length-1)\" class=\"btn btn-success btn-block\" ng-click=\"loadMoreItems($select, $event)\" ng-disabled=\"resourceLoading\">Load more...</button>\n    </ui-select-choices>\n  </ui-select>\n  <formio-errors ng-if=\"::!options.building\"></formio-errors>\n</div>\n<div ng-if=\"component.addResource\">\n  <table class=\"table table-bordered\">\n    <label ng-if=\"options.building || (component.label && !component.hideLabel)\" for=\"{{ componentId }}\" class=\"control-label\" ng-class=\"{'field-required': isRequired(component)}\">\n      {{ component.label | formioTranslate:null:options.building }}\n      <formio-component-tooltip></formio-component-tooltip>\n    </label>\n    <span ng-if=\"!component.label && isRequired(component)\" class=\"glyphicon glyphicon-asterisk form-control-feedback field-required-inline\" aria-hidden=\"true\"></span>\n    <tr>\n      <td>\n        <ui-select ui-select-required safe-multiple-to-single ui-select-open-on-focus ng-model=\"data[component.key]\" ng-disabled=\"readOnly\" ng-required=\"isRequired(component)\" id=\"{{ componentId }}\" name=\"{{ componentId }}\" theme=\"bootstrap\" tabindex=\"{{ component.tabindex || 0 }}\">\n          <ui-select-match class=\"ui-select-match\" placeholder=\"{{ component.placeholder | formioTranslate:null:options.building }}\">\n            <formio-select-item template=\"component.template\" item=\"$item || $select.selected\" select=\"$select\"></formio-select-item>\n          </ui-select-match>\n          <ui-select-choices class=\"ui-select-choices\" repeat=\"item in selectItems | filter: $select.search\" refresh=\"refreshSubmissions($select.search)\" refresh-delay=\"250\">\n            <formio-select-item template=\"component.template\" item=\"item\" select=\"$select\"></formio-select-item>\n            <button ng-if=\"hasNextPage && ($index == $select.items.length-1)\" class=\"btn btn-success btn-block\" ng-click=\"loadMoreItems($select, $event)\" ng-disabled=\"resourceLoading\">Load more...</button>\n          </ui-select-choices>\n        </ui-select>\n        <formio-errors ng-if=\"::!options.building\"></formio-errors>\n      </td>\n    </tr>\n    <tr>\n      <td>\n        <a ng-click=\"newResource()\" class=\"btn btn-primary\">\n          <span class=\"glyphicon glyphicon-plus\" aria-hidden=\"true\"></span> {{ component.addResourceLabel || \"Add Resource\" | formioTranslate:null:options.building}}\n        </a>\n      </td>\n    </tr>\n  </table>\n</div>\n"
       );
 
       // Change the ui-select to ui-select multiple.
@@ -18561,7 +18885,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],255:[function(_dereq_,module,exports){
+},{}],256:[function(_dereq_,module,exports){
 "use strict";
 /*eslint max-depth: ["error", 6]*/
 
@@ -19173,7 +19497,7 @@ module.exports = function(app) {
     '$templateCache',
     function($templateCache) {
       $templateCache.put('formio/components/select.html',
-        "<label ng-if=\"component.label && !component.hideLabel\"  for=\"{{ componentId }}\" class=\"control-label\" ng-class=\"{'field-required': isRequired(component)}\">\n  {{ component.label | formioTranslate:null:options.building }}\n  <formio-component-tooltip></formio-component-tooltip>\n</label>\n<span ng-if=\"!component.label && isRequired(component)\" class=\"glyphicon glyphicon-asterisk form-control-feedback field-required-inline\" aria-hidden=\"true\"></span>\n<ui-select\n  ui-select-required\n  ui-select-open-on-focus\n  ng-model=\"data[component.key]\"\n  safe-multiple-to-single\n  name=\"{{ componentId }}\"\n  ng-disabled=\"readOnly\"\n  ng-required=\"isRequired(component)\"\n  id=\"{{ componentId }}\"\n  theme=\"bootstrap\"\n  custom-validator=\"component.validate.custom\"\n  tabindex=\"{{ component.tabindex || 0 }}\"\n>\n  <ui-select-match class=\"ui-select-match\" placeholder=\"{{ component.placeholder | formioTranslate:null:options.building }}\">\n    <formio-select-item template=\"component.template\" item=\"$item || $select.selected\" select=\"$select\"></formio-select-item>\n  </ui-select-match>\n  <ui-select-choices class=\"ui-select-choices\" repeat=\"getSelectItem(item) as item in selectItems | filter: $select.search\" refresh=\"refreshItems($select.search)\" refresh-delay=\"250\">\n    <formio-select-item template=\"component.template\" item=\"item\" select=\"$select\"></formio-select-item>\n    <button ng-if=\"hasNextPage && ($index == $select.items.length-1)\" class=\"btn btn-success btn-block\" ng-click=\"loadMoreItems($select, $event)\" ng-disabled=\"selectLoading\">Load more...</button>\n  </ui-select-choices>\n</ui-select>\n<div ng-if=\"!!component.description\" class=\"help-block\">\n  <span>{{ component.description }}</span>\n</div>\n<formio-errors ng-if=\"::!options.building\"></formio-errors>\n"
+        "<label ng-if=\"options.building || (component.label && !component.hideLabel)\"  for=\"{{ componentId }}\" class=\"control-label\" ng-class=\"{'field-required': isRequired(component)}\">\n  {{ component.label | formioTranslate:null:options.building }}\n  <formio-component-tooltip></formio-component-tooltip>\n</label>\n<span ng-if=\"!component.label && isRequired(component)\" class=\"glyphicon glyphicon-asterisk form-control-feedback field-required-inline\" aria-hidden=\"true\"></span>\n<ui-select\n  ui-select-required\n  ui-select-open-on-focus\n  ng-model=\"data[component.key]\"\n  safe-multiple-to-single\n  name=\"{{ componentId }}\"\n  ng-disabled=\"readOnly\"\n  ng-required=\"isRequired(component)\"\n  id=\"{{ componentId }}\"\n  theme=\"bootstrap\"\n  custom-validator=\"component.validate.custom\"\n  tabindex=\"{{ component.tabindex || 0 }}\"\n>\n  <ui-select-match class=\"ui-select-match\" placeholder=\"{{ component.placeholder | formioTranslate:null:options.building }}\">\n    <formio-select-item template=\"component.template\" item=\"$item || $select.selected\" select=\"$select\"></formio-select-item>\n  </ui-select-match>\n  <ui-select-choices class=\"ui-select-choices\" repeat=\"getSelectItem(item) as item in selectItems | filter: $select.search\" refresh=\"refreshItems($select.search)\" refresh-delay=\"250\">\n    <formio-select-item template=\"component.template\" item=\"item\" select=\"$select\"></formio-select-item>\n    <button ng-if=\"hasNextPage && ($index == $select.items.length-1)\" class=\"btn btn-success btn-block\" ng-click=\"loadMoreItems($select, $event)\" ng-disabled=\"selectLoading\">Load more...</button>\n  </ui-select-choices>\n</ui-select>\n<div ng-if=\"!!component.description\" class=\"help-block\">\n  <span>{{ component.description }}</span>\n</div>\n<formio-errors ng-if=\"::!options.building\"></formio-errors>\n"
       );
 
       // Change the ui-select to ui-select multiple.
@@ -19184,7 +19508,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"lodash/assign":174,"lodash/cloneDeep":179,"lodash/get":184,"lodash/isEqual":192,"lodash/mapValues":209,"lodash/set":214}],256:[function(_dereq_,module,exports){
+},{"lodash/assign":174,"lodash/cloneDeep":179,"lodash/get":184,"lodash/isEqual":192,"lodash/mapValues":209,"lodash/set":214}],257:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -19286,13 +19610,13 @@ module.exports = function(app) {
         "<div class=\"select-boxes\">\n  <div ng-class=\"component.inline ? 'checkbox-inline' : 'checkbox'\" ng-repeat=\"v in component.values track by $index\">\n    <label class=\"control-label\" for=\"{{ componentId }}-{{ v.value }}\">\n      <input type=\"checkbox\"\n        id=\"{{ componentId }}-{{ v.value }}\"\n        name=\"{{ componentId }}-{{ v.value }}\"\n        value=\"{{ v.value }}\"\n        tabindex=\"{{ component.tabindex || 0 }}\"\n        ng-disabled=\"readOnly\"\n        ng-click=\"toggleCheckbox(v.value)\"\n        ng-checked=\"model[v.value]\"\n        grid-row=\"gridRow\"\n        grid-col=\"gridCol\"\n      >\n      {{ v.label | formioTranslate:null:options.building }}\n    </label>\n  </div>\n</div>\n"
       );
       $templateCache.put('formio/components/selectboxes.html',
-        "<div class=\"select-boxes\">\n  <label ng-if=\"component.label && !component.hideLabel\" for=\"{{ componentId }}\" class=\"control-label\" ng-class=\"{'field-required': isRequired(component)}\">\n    {{ component.label }}\n    <formio-component-tooltip></formio-component-tooltip>\n  </label>\n  <formio-select-boxes\n    name=\"{{componentId}}\"\n    ng-model=\"data[component.key]\"\n    ng-model-options=\"{allowInvalid: true}\"\n    component=\"component\"\n    component-id=\"componentId\"\n    read-only=\"readOnly\"\n    ng-required=\"isRequired(component)\"\n    custom-validator=\"component.validate.custom\"\n    grid-row=\"gridRow\"\n    grid-col=\"gridCol\"\n    options=\"options\"\n  ></formio-select-boxes>\n  <div ng-if=\"!!component.description\" class=\"help-block\">\n    <span>{{ component.description }}</span>\n  </div>\n  <formio-errors ng-if=\"::!options.building\"></formio-errors>\n</div>\n"
+        "<div class=\"select-boxes\">\n  <label ng-if=\"options.building || (component.label && !component.hideLabel)\" for=\"{{ componentId }}\" class=\"control-label\" ng-class=\"{'field-required': isRequired(component)}\">\n    {{ component.label }}\n    <formio-component-tooltip></formio-component-tooltip>\n  </label>\n  <formio-select-boxes\n    name=\"{{componentId}}\"\n    ng-model=\"data[component.key]\"\n    ng-model-options=\"{allowInvalid: true}\"\n    component=\"component\"\n    component-id=\"componentId\"\n    read-only=\"readOnly\"\n    ng-required=\"isRequired(component)\"\n    custom-validator=\"component.validate.custom\"\n    grid-row=\"gridRow\"\n    grid-col=\"gridCol\"\n    options=\"options\"\n  ></formio-select-boxes>\n  <div ng-if=\"!!component.description\" class=\"help-block\">\n    <span>{{ component.description }}</span>\n  </div>\n  <formio-errors ng-if=\"::!options.building\"></formio-errors>\n</div>\n"
       );
     }
   ]);
 };
 
-},{}],257:[function(_dereq_,module,exports){
+},{}],258:[function(_dereq_,module,exports){
 "use strict";
 
 var SignaturePad = _dereq_('signature_pad');
@@ -19434,7 +19758,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"signature_pad":226}],258:[function(_dereq_,module,exports){
+},{"signature_pad":227}],259:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -19495,7 +19819,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],259:[function(_dereq_,module,exports){
+},{}],260:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -19575,7 +19899,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":279}],260:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":280}],261:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -19701,7 +20025,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],261:[function(_dereq_,module,exports){
+},{}],262:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -19762,7 +20086,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],262:[function(_dereq_,module,exports){
+},{}],263:[function(_dereq_,module,exports){
 "use strict";
 
 var moment = _dereq_('moment');
@@ -19834,7 +20158,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"moment":223}],263:[function(_dereq_,module,exports){
+},{"moment":223}],264:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -19887,7 +20211,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":279}],264:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":280}],265:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -19965,7 +20289,7 @@ module.exports = function() {
   };
 };
 
-},{}],265:[function(_dereq_,module,exports){
+},{}],266:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -20372,7 +20696,7 @@ module.exports = function() {
   };
 };
 
-},{}],266:[function(_dereq_,module,exports){
+},{}],267:[function(_dereq_,module,exports){
 "use strict";
 module.exports = ['$sce', '$parse', '$compile', function($sce, $parse, $compile) {
   return {
@@ -20389,7 +20713,7 @@ module.exports = ['$sce', '$parse', '$compile', function($sce, $parse, $compile)
   };
 }];
 
-},{}],267:[function(_dereq_,module,exports){
+},{}],268:[function(_dereq_,module,exports){
 "use strict";
 var _get = _dereq_('lodash/get');
 
@@ -20657,7 +20981,7 @@ module.exports = [
   }
 ];
 
-},{"lodash/get":184}],268:[function(_dereq_,module,exports){
+},{"lodash/get":184}],269:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -20673,7 +20997,7 @@ module.exports = function() {
   };
 };
 
-},{}],269:[function(_dereq_,module,exports){
+},{}],270:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'formioComponents',
@@ -20746,7 +21070,7 @@ module.exports = [
   }
 ];
 
-},{}],270:[function(_dereq_,module,exports){
+},{}],271:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -20830,7 +21154,7 @@ module.exports = function() {
   };
 };
 
-},{}],271:[function(_dereq_,module,exports){
+},{}],272:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$compile',
@@ -20849,7 +21173,7 @@ module.exports = [
   }
 ];
 
-},{}],272:[function(_dereq_,module,exports){
+},{}],273:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -20859,7 +21183,7 @@ module.exports = function() {
   };
 };
 
-},{}],273:[function(_dereq_,module,exports){
+},{}],274:[function(_dereq_,module,exports){
 "use strict";
 var _map = _dereq_('lodash/map');
 // Javascript editor directive
@@ -20935,7 +21259,7 @@ module.exports = ['FormioUtils', function(FormioUtils) {
   };
 }];
 
-},{"lodash/map":208}],274:[function(_dereq_,module,exports){
+},{"lodash/map":208}],275:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -20967,7 +21291,7 @@ module.exports = function() {
   };
 };
 
-},{}],275:[function(_dereq_,module,exports){
+},{}],276:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -21023,7 +21347,7 @@ module.exports = function() {
   };
 };
 
-},{}],276:[function(_dereq_,module,exports){
+},{}],277:[function(_dereq_,module,exports){
 "use strict";
 var isNaN = _dereq_('lodash/isNAN');
 var isFinite = _dereq_('lodash/isFinite');
@@ -21642,7 +21966,7 @@ module.exports = function() {
   };
 };
 
-},{"lodash/isEmpty":191,"lodash/isFinite":194,"lodash/isNAN":197}],277:[function(_dereq_,module,exports){
+},{"lodash/isEmpty":191,"lodash/isFinite":194,"lodash/isNAN":197}],278:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -21826,7 +22150,7 @@ module.exports = [
   }
 ];
 
-},{}],278:[function(_dereq_,module,exports){
+},{}],279:[function(_dereq_,module,exports){
 "use strict";
 var formioUtils = _dereq_('formiojs/utils');
 var _filter = _dereq_('lodash/filter');
@@ -22158,7 +22482,7 @@ module.exports = function() {
     },
     fieldWrap: function(input) {
       var multiInput = input.replace('data[component.key]', 'data[component.key][$index]');
-      var inputLabel = '<label ng-if="component.label && !component.hideLabel" for="{{ component.key }}" class="control-label" ng-class="{\'field-required\': isRequired(component)}">' +
+      var inputLabel = '<label ng-if="options.building || (component.label && !component.hideLabel)" for="{{ component.key }}" class="control-label" ng-class="{\'field-required\': isRequired(component)}">' +
         '{{ component.label | formioTranslate:null:options.building }} ' +
         '<formio-component-tooltip></formio-component-tooltip>' +
         '</label>';
@@ -22214,7 +22538,7 @@ module.exports = function() {
   };
 };
 
-},{"formiojs/utils":11,"lodash/filter":183,"lodash/get":184}],279:[function(_dereq_,module,exports){
+},{"formiojs/utils":11,"lodash/filter":183,"lodash/get":184}],280:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   var generic = function(data, component) {
@@ -22340,7 +22664,7 @@ module.exports = function() {
   };
 };
 
-},{}],280:[function(_dereq_,module,exports){
+},{}],281:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$q',
@@ -22389,7 +22713,7 @@ module.exports = [
   }
 ];
 
-},{}],281:[function(_dereq_,module,exports){
+},{}],282:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -22423,7 +22747,7 @@ module.exports = [
   }
 ];
 
-},{}],282:[function(_dereq_,module,exports){
+},{}],283:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'FormioUtils',
@@ -22432,7 +22756,7 @@ module.exports = [
   }
 ];
 
-},{}],283:[function(_dereq_,module,exports){
+},{}],284:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$sce',
@@ -22445,7 +22769,7 @@ module.exports = [
   }
 ];
 
-},{}],284:[function(_dereq_,module,exports){
+},{}],285:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   function() {
@@ -22464,7 +22788,7 @@ module.exports = [
   }
 ];
 
-},{}],285:[function(_dereq_,module,exports){
+},{}],286:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'formioTableView',
@@ -22477,7 +22801,7 @@ module.exports = [
   }
 ];
 
-},{}],286:[function(_dereq_,module,exports){
+},{}],287:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -22492,7 +22816,7 @@ module.exports = [
   }
 ];
 
-},{}],287:[function(_dereq_,module,exports){
+},{}],288:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$filter',
@@ -22549,7 +22873,7 @@ module.exports = [
   }
 ];
 
-},{}],288:[function(_dereq_,module,exports){
+},{}],289:[function(_dereq_,module,exports){
 "use strict";
 module.exports = ['$sce', function($sce) {
   return function(val) {
@@ -22557,7 +22881,7 @@ module.exports = ['$sce', function($sce) {
   };
 }];
 
-},{}],289:[function(_dereq_,module,exports){
+},{}],290:[function(_dereq_,module,exports){
 "use strict";
 _dereq_('./polyfills/polyfills');
 
@@ -22715,7 +23039,7 @@ app.run([
 
 _dereq_('./components');
 
-},{"./components":247,"./directives/customValidator":264,"./directives/formio":265,"./directives/formioBindHtml.js":266,"./directives/formioComponent":267,"./directives/formioComponentTooltip":268,"./directives/formioComponentView":269,"./directives/formioDelete":270,"./directives/formioElement":271,"./directives/formioErrors":272,"./directives/formioScriptEditor":273,"./directives/formioSubmission":274,"./directives/formioSubmissions":275,"./directives/formioWizard":276,"./factories/FormioScope":277,"./factories/FormioUtils":278,"./factories/formioInterceptor":280,"./factories/formioTableView":281,"./filters/flattenComponents":282,"./filters/safehtml":283,"./filters/tableComponents":284,"./filters/tableFieldView":285,"./filters/tableView":286,"./filters/translate":287,"./filters/trusturl":288,"./polyfills/polyfills":291,"./providers/Formio":292}],290:[function(_dereq_,module,exports){
+},{"./components":248,"./directives/customValidator":265,"./directives/formio":266,"./directives/formioBindHtml.js":267,"./directives/formioComponent":268,"./directives/formioComponentTooltip":269,"./directives/formioComponentView":270,"./directives/formioDelete":271,"./directives/formioElement":272,"./directives/formioErrors":273,"./directives/formioScriptEditor":274,"./directives/formioSubmission":275,"./directives/formioSubmissions":276,"./directives/formioWizard":277,"./factories/FormioScope":278,"./factories/FormioUtils":279,"./factories/formioInterceptor":281,"./factories/formioTableView":282,"./filters/flattenComponents":283,"./filters/safehtml":284,"./filters/tableComponents":285,"./filters/tableFieldView":286,"./filters/tableView":287,"./filters/translate":288,"./filters/trusturl":289,"./polyfills/polyfills":292,"./providers/Formio":293}],291:[function(_dereq_,module,exports){
 "use strict";
 'use strict';
 
@@ -22746,13 +23070,13 @@ if (typeof Object.assign != 'function') {
   })();
 }
 
-},{}],291:[function(_dereq_,module,exports){
+},{}],292:[function(_dereq_,module,exports){
 "use strict";
 'use strict';
 
 _dereq_('./Object.assign');
 
-},{"./Object.assign":290}],292:[function(_dereq_,module,exports){
+},{"./Object.assign":291}],293:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   // The formio class.
@@ -22822,5 +23146,5 @@ module.exports = function() {
   };
 };
 
-},{"formiojs":3}]},{},[289])(289)
+},{"formiojs":3}]},{},[290])(290)
 });
