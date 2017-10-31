@@ -1,12 +1,28 @@
 <div ng-show="formioForm[componentId].$error && !formioForm[componentId].$pristine">
-  <p class="help-block" ng-show="formioForm[componentId].$error.email">{{ component.errorLabel || component.label || component.placeholder || component.key }} {{'must be a valid email' | formioTranslate:null:options.building}}.</p>
-  <p class="help-block" ng-show="formioForm[componentId].$error.required">{{ component.errorLabel || component.label || component.placeholder || component.key }} {{'is required' | formioTranslate:null:options.building}}.</p>
-  <p class="help-block" ng-show="formioForm[componentId].$error.number">{{ component.errorLabel || component.label || component.placeholder || component.key }} {{'must be a number' | formioTranslate:null:options.building}}.</p>
-  <p class="help-block" ng-show="formioForm[componentId].$error.maxlength">{{ component.errorLabel || component.label || component.placeholder || component.key }} {{'must be shorter than' | formioTranslate:null:options.building}} {{ component.validate.maxLength + 1 }} {{'characters' | formioTranslate:null:options.building}}.</p>
-  <p class="help-block" ng-show="formioForm[componentId].$error.minlength">{{ component.errorLabel || component.label || component.placeholder || component.key }} {{'must be longer than' | formioTranslate:null:options.building}} {{ component.validate.minLength - 1 }} {{'characters' | formioTranslate:null:options.building}}.</p>
-  <p class="help-block" ng-show="formioForm[componentId].$error.min">{{ component.errorLabel || component.label || component.placeholder || component.key }} {{'must be greater than or equal to' | formioTranslate:null:options.building}} {{ component.validate.min }}.</p>
-  <p class="help-block" ng-show="formioForm[componentId].$error.max">{{ component.errorLabel || component.label || component.placeholder || component.key }} {{'must be less than or equal to' | formioTranslate:null:options.building}} {{ component.validate.max }}.</p>
-  <p class="help-block" ng-show="formioForm[componentId].$error.custom">{{ component.customError | formioTranslate }}</p>
-  <p class="help-block" ng-show="formioForm[componentId].$error.pattern">{{ component.errorLabel || component.label || component.placeholder || component.key }} {{'does not match the pattern' | formioTranslate:null:options.building}} {{ component.validate.pattern }}</p>
-  <p class="help-block" ng-show="formioForm[componentId].$error.day">{{ component.errorLabel || component.label || component.placeholder || component.key }} {{'must be a valid date' | formioTranslate:null:options.building}}.</p>
+  <div ng-show="component.validate.customMessage && (
+    formioForm[componentId].$error.email ||
+    formioForm[componentId].$error.required ||
+    formioForm[componentId].$error.number ||
+    formioForm[componentId].$error.maxlength ||
+    formioForm[componentId].$error.minlength ||
+    formioForm[componentId].$error.min ||
+    formioForm[componentId].$error.max ||
+    formioForm[componentId].$error.custom ||
+    formioForm[componentId].$error.pattern ||
+    formioForm[componentId].$error.day
+  )">
+      <p class="help-block">{{ component.validate.customMessage | formioTranslate:null:options.building }}</p>
+  </div>
+  <div ng-hide="component.validate.customMessage">
+    <p class="help-block" ng-show="formioForm[componentId].$error.email">{{ component.errorLabel || component.label || component.placeholder || component.key }} {{'must be a valid email' | formioTranslate:null:options.building}}.</p>
+    <p class="help-block" ng-show="formioForm[componentId].$error.required">{{ component.errorLabel || component.label || component.placeholder || component.key }} {{'is required' | formioTranslate:null:options.building}}.</p>
+    <p class="help-block" ng-show="formioForm[componentId].$error.number">{{ component.errorLabel || component.label || component.placeholder || component.key }} {{'must be a number' | formioTranslate:null:options.building}}.</p>
+    <p class="help-block" ng-show="formioForm[componentId].$error.maxlength">{{ component.errorLabel || component.label || component.placeholder || component.key }} {{'must be shorter than' | formioTranslate:null:options.building}} {{ component.validate.maxLength + 1 }} {{'characters' | formioTranslate:null:options.building}}.</p>
+    <p class="help-block" ng-show="formioForm[componentId].$error.minlength">{{ component.errorLabel || component.label || component.placeholder || component.key }} {{'must be longer than' | formioTranslate:null:options.building}} {{ component.validate.minLength - 1 }} {{'characters' | formioTranslate:null:options.building}}.</p>
+    <p class="help-block" ng-show="formioForm[componentId].$error.min">{{ component.errorLabel || component.label || component.placeholder || component.key }} {{'must be greater than or equal to' | formioTranslate:null:options.building}} {{ component.validate.min }}.</p>
+    <p class="help-block" ng-show="formioForm[componentId].$error.max">{{ component.errorLabel || component.label || component.placeholder || component.key }} {{'must be less than or equal to' | formioTranslate:null:options.building}} {{ component.validate.max }}.</p>
+    <p class="help-block" ng-show="formioForm[componentId].$error.custom">{{ component.customError | formioTranslate }}</p>
+    <p class="help-block" ng-show="formioForm[componentId].$error.pattern">{{ component.errorLabel || component.label || component.placeholder || component.key }} {{'does not match the pattern' | formioTranslate:null:options.building}} {{ component.validate.pattern }}</p>
+    <p class="help-block" ng-show="formioForm[componentId].$error.day">{{ component.errorLabel || component.label || component.placeholder || component.key }} {{'must be a valid date' | formioTranslate:null:options.building}}.</p>
+  </div>
 </div>
