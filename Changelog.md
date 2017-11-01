@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.24.0
+### Changed
+ - Upgraded all dependencies.
+
+### Fixed
+ - Make sure to always show labels within a form builder.
+
 ## 2.23.12
 ### Fixed
  - Empty disabled signature component.
