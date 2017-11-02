@@ -79,6 +79,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Connect Stage');
       actions.iSeeText('https://remote.form.io');
       actions.clickOnElementWithText('Disconnect');
+      actions.waitForActionToComplete(4000);
       actions.clickOnElementWithText('API Keys');
       actions.enableAngular(true);
       actions.waitForActionToComplete(4000);
@@ -95,6 +96,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText(' Save Stage');
       actions.clickOnElementWithText('Staging');
       actions.iDonotSeeText('Upgrade your project to Enterprise to enable deploying to stages.');
+      actions.waitForActionToComplete(4000);
       actions.clickOnElementWithText('Create Version Tag');
       actions.iDonotSeeText('Upgrade your project to Enterprise to enable deploying to stages.');
       actions.clickOnElementWithText('Import Template');
