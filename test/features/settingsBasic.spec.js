@@ -26,6 +26,7 @@ module.exports = function (actions) {
       actions.upgradeToPlan("Basic");
       actions.clickOnElementWithText(' Confirm Billing Change');
       actions.waitForActionToComplete(2000);
+      actions.enableAngular(false);
       actions.clickOnElementWithText('Settings');
       actions.checkElementIsDisabled('//*[@id="form-group-title"]/input');
       actions.checkElementIsDisabled('//*[@id="name"]');
@@ -33,6 +34,7 @@ module.exports = function (actions) {
       actions.iSeeElement('i.fa.fa-shield.ng-scope');
       actions.clickOnElementWithText(' Save Stage');
       actions.iSeeText('Project saved.');
+      actions.waitForActionToComplete(2000);
       actions.clickOnElementWithText('Forms');
       actions.checkElementWithTextIsDisabled(' New Form');
       actions.checkElementWithTextIsDisabled(' Edit');
