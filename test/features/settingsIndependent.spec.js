@@ -22,10 +22,7 @@ module.exports = function (actions) {
       actions.enterTextInField('#title','independentProject');
       actions.clickOnElementWithText(' Create Project');
       actions.clickOnElementWithText('Trial');
-      actions.clickOnElementWithTextLast('Upgrade');
-      actions.clickOnElementWithText(' Confirm Billing Change');
-      actions.waitForActionToComplete(2000);
-      actions.clickOnElementWithTextLast('Upgrade');
+      actions.upgradeToPlan("Independent");
       actions.clickOnElementWithText(' Confirm Billing Change');
       actions.waitForActionToComplete(2000);
       actions.goToPage('#/');
@@ -159,7 +156,6 @@ module.exports = function (actions) {
       actions.clickOnClass('.fa.fa-cog');
       actions.clickOnElementWithText('Delete independentProject Project');
       actions.clickOnElementWithText(' Yes');
-      actions.goToPage('#/');
       actions.iDonotSeeText('independentProject');
     });
   });

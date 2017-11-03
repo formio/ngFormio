@@ -1300,7 +1300,7 @@ module.exports = function (config) {
   };
   this.checkElementWithTextIsDisabled = function (text)   {
     it('I see ' + text + ' button is disabled', function (next) {
-      var ele = element(by.xpath('//*[text()="' + text + '"]'));
+      var ele = element.all(by.xpath('//*[text()="' + text + '"]')).first();
       browser.wait(function () {
         return ele.isPresent();
       }, timeout).then(function () {
@@ -1356,6 +1356,32 @@ module.exports = function (config) {
       }, timeout).then(function () {
         element(by.cssContainingText('option',option)).click();
         next();
+      });
+    });
+  };
+
+  this.upgradeToPlan = function (text) {
+    it('Upgrading to '+ text, function (next) {
+      var ele;
+      if(text==="Basic"){
+        ele =  element(by.xpath('//*[@id="main-wrapper"]/div[2]/div[2]/div/div/div/div[2]/div[1]/ul/li[5]/div/div[3]/span'));
+      }
+      else if(text==="Independent") {
+        ele = element(by.xpath('//*[@id="main-wrapper"]/div[2]/div[2]/div/div/div/div[2]/div[1]/ul/li[4]/div/div[3]/span'));
+      }
+      else if(text==="Team Pro"){
+        ele = element(by.xpath('//*[@id="main-wrapper"]/div[2]/div[2]/div/div/div/div[2]/div[1]/ul/li[3]/div/div[3]/span'));
+      }
+      else{
+        ele = element(by.xpath('//*[@id="main-wrapper"]/div[2]/div[2]/div/div/div/div[2]/div[1]/ul/li[2]/div/div[3]/span'));
+      }
+      browser.wait(function () {
+        return ele.isPresent();
+      }, timeout).then(function (res) {
+        scrollTo(ele)
+          .then(function() {
+            ele.click().then(next).catch(next);
+          });
       });
     });
   };
