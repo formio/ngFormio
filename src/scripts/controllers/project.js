@@ -321,32 +321,33 @@ app.controller('ProjectController', [
       return plans.indexOf(checkProject.plan) >= plans.indexOf(plan);
     };
 
-    $scope.saveProject = function() {
-      if (!$scope.currentProject._id) { return FormioAlerts.onError(new Error('No Project found.')); }
+    $scope._saveProject = function(project) {
+      if (!project._id) { return FormioAlerts.onError(new Error('No Project found.')); }
+      if ($scope.status.save === 'saving') {
+        return;
+      }
+
       $scope.status.save = 'saving';
-      $scope.formio.saveProject($scope.currentProject)
+      return (new Formio('/project/' + project._id)).saveProject(angular.copy(project))
         .then(function(project) {
           FormioAlerts.addAlert({
             type: 'success',
             message: 'Project settings saved.'
           });
+          PrimaryProject.clear();
           GoogleAnalytics.sendEvent('Project', 'update', null, 1);
           $scope.status.save = 'saved';
+          return project;
         }, FormioAlerts.onError.bind(FormioAlerts))
         .catch(FormioAlerts.onError.bind(FormioAlerts));
     };
 
+    $scope.saveProject = function() {
+      return $scope._saveProject($scope.currentProject);
+    };
+
     $scope.saveLocalProject = function() {
-      if (!$scope.localProject._id) { return FormioAlerts.onError(new Error('No Project found.')); }
-      return $scope.localFormio.saveProject($scope.localProject)
-        .then(function(project) {
-          FormioAlerts.addAlert({
-            type: 'success',
-            message: 'Project settings saved.'
-          });
-          GoogleAnalytics.sendEvent('Project', 'update', null, 1);
-        }, FormioAlerts.onError.bind(FormioAlerts))
-        .catch(FormioAlerts.onError.bind(FormioAlerts));
+      return $scope._saveProject($scope.localProject);
     };
 
     $scope.switchEnv = function(environmentId) {
@@ -2031,7 +2032,6 @@ app.controller('ProjectSettingsController', [
     });
 
     $scope.addKey = function() {
-      $scope.status.save = 'saving';
       if (!$scope.currentProject.settings.keys) {
         $scope.currentProject.settings.keys = [];
       }
@@ -2048,25 +2048,16 @@ app.controller('ProjectSettingsController', [
           pool: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
         })
       });
-      $scope.formio.saveProject($scope.currentProject).then(function() {
-        $scope.status.save = 'saved';
-      });
+      $scope._saveProject($scope.currentProject);
     };
 
     $scope.removeKey = function($index) {
-      $scope.status.save = 'saving';
       $scope.currentProject.settings.keys.splice($index, 1);
-      $scope.formio.saveProject($scope.currentProject).then(function() {
-        $scope.status.save = 'saved';
-      });
+      $scope._saveProject($scope.currentProject);
     };
 
     $scope.updateProject = function() {
-      $scope.status.save = 'saving';
-      $scope.formio.saveProject($scope.currentProject)
-        .then(function() {
-          $scope.status.save = 'saved';
-        });
+      $scope._saveProject($scope.currentProject);
     };
 
     // Save the Project.
@@ -2076,21 +2067,11 @@ app.controller('ProjectSettingsController', [
         $scope.currentProject.name = $scope.currentProject.name.toLowerCase().replace(/[^0-9a-z\-]|^\-+|\-+$/g, '');
       }
 
-      if (!$scope.currentProject._id) { return FormioAlerts.onError(new Error('No Project found.')); }
-      $scope.formio.saveProject($scope.currentProject)
-        .then(function(project) {
-          FormioAlerts.addAlert({
-            type: 'success',
-            message: 'Project saved.'
-          });
-          GoogleAnalytics.sendEvent('Project', 'update', null, 1);
-          // Reload state so alerts display and project updates.
-          PrimaryProject.clear();
-          $state.go($state.current.name, {
-            projectId: project._id
-          }, {reload: true});
-        }, FormioAlerts.onError.bind(FormioAlerts))
-        .catch(FormioAlerts.onError.bind(FormioAlerts));
+      $scope._saveProject($scope.currentProject).then(function(project) {
+        $state.go($state.current.name, {
+          projectId: project._id
+        }, {reload: true});
+      });
     };
 
     $scope.authenticatedWithOAuth = false;
@@ -2129,7 +2110,7 @@ app.controller('ProjectSettingsController', [
         $scope.verifiedOAuth = true;
         var data = result.data;
         $scope.currentProject.settings.atlassian.oauth.token = data.access_token;
-        $scope.saveProject();
+        $scope._saveProject($scope.currentProject);
       })
       .catch(function(error) {
         FormioAlerts.onError({
@@ -2294,46 +2275,24 @@ app.controller('PrimaryProjectSettingsController', [
   '$state',
   'ProjectFrameworks',
   'Formio',
-  'FormioAlerts',
-  'GoogleAnalytics',
-  'PrimaryProject',
   function(
     $scope,
     $rootScope,
     $state,
     ProjectFrameworks,
-    Formio,
-    FormioAlerts,
-    GoogleAnalytics,
-    PrimaryProject
+    Formio
   ) {
     $scope.frameworks = _.filter(ProjectFrameworks, function(item) {return !item.disabled;});
 
     $scope.primaryProjectPromise.then(function(primaryProject) {
       $scope.project = _.clone(primaryProject);
-      $scope.formio = new Formio('/project/' + primaryProject._id);
     });
 
     $scope.saveProject = function() {
-      // Debounce.
-      if ($scope.status.save === 'saving') {
-        return;
-      }
-      $scope.status.save = 'saving';
-      $scope.formio.saveProject($scope.project)
-        .then(function(project) {
-          FormioAlerts.addAlert({
-            type: 'success',
-            message: 'Project settings saved.'
-          });
-          GoogleAnalytics.sendEvent('Project', 'update', null, 1);
-          $scope.status.save = 'saved';
-          PrimaryProject.clear();
-          $state.go('project.overview', null, { reload: true, inherit: true, notify: true });
-        }, FormioAlerts.onError.bind(FormioAlerts))
-        .catch(FormioAlerts.onError.bind(FormioAlerts));
+      return $scope._saveProject($scope.project).then(function(project) {
+        $state.go('project.overview', null, { reload: true, inherit: true, notify: true });
+      });
     };
-
   }
 ]);
 
@@ -2405,11 +2364,6 @@ app.controller('ProjectTeamController', [
       project.access = access;
     };
 
-    var saveProject = function(project) {
-      return (new Formio(AppConfig.apiBase + '/project/' + project._id)).saveProject(angular.copy(project))
-        .catch(FormioAlerts.onError.bind(FormioAlerts));
-    };
-
     $scope.teamPermissions = [
       {
         value: 'team_read',
@@ -2434,7 +2388,7 @@ app.controller('ProjectTeamController', [
 
     $scope.addTeam = function(team) {
       setTeamPermission($scope.primaryProject, team, 'team_read');
-      saveProject($scope.primaryProject).then(function(project) {
+      $scope._saveProject($scope.primaryProject).then(function(project) {
         $scope.primaryProject = project;
       });
       _.remove($scope.uniqueEligibleTeams, { _id: team._id });
@@ -2445,7 +2399,7 @@ app.controller('ProjectTeamController', [
 
     $scope.removeTeam = function(team) {
       setTeamPermission($scope.primaryProject, team);
-      saveProject($scope.primaryProject).then(function(project) {
+      $scope._saveProject($scope.primaryProject).then(function(project) {
         $scope.primaryProject = project;
       });
       _.remove($scope.primaryProjectTeams, { _id: team._id });
@@ -2455,7 +2409,7 @@ app.controller('ProjectTeamController', [
 
     $scope.updateTeam = function(team, permission) {
       setTeamPermission($scope.primaryProject, team, permission);
-      saveProject($scope.primaryProject).then(function(project) {
+      $scope._saveProject($scope.primaryProject).then(function(project) {
         $scope.primaryProject = project;
       });
     };
