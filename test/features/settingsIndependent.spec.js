@@ -34,9 +34,6 @@ module.exports = function (actions) {
       actions.checkElementIsDisabled('//*[@id="form-group-title"]/input');
       actions.checkElementIsNotDisabled('//*[@id="name"]');
       actions.enterTextInField('#name','independent');
-      // actions.enableAngular(true);
-      // actions.waitForActionToComplete(4000);
-      // actions.enableAngular(false);
       actions.clickOnElementWithText(' Save Stage');
       actions.iSeeText('Project saved.');
       actions.iSeeValueIn('#name','independent');
@@ -49,10 +46,8 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Settings');
       actions.checkElement('//*[@id="protect"]');
       actions.iSeeElement('i.fa.fa-shield.ng-scope');
-      // actions.waitForActionToComplete(4000);
       actions.clickOnElementWithText(' Save Stage');
       actions.iSeeText('Project saved.');
-      // actions.waitForActionToComplete(4000);
       actions.clickOnElementWithText('Forms');
       actions.checkElementWithTextIsDisabled(' New Form');
       actions.checkElementWithTextIsDisabled(' Edit');
@@ -66,10 +61,6 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Settings');
       actions.clickOnElementWithText('On-Premise Environment');
       actions.iSeeText('Upgrade your project to a team or commercial plan to enable On-Premise Environments.');
-      // actions.waitForActionToComplete(4000);
-      // actions.enableAngular(true);
-      // actions.waitForActionToComplete(4000);
-      // actions.enableAngular(false);
       actions.clickOnElementWithText('API Keys');
       actions.clickOnElementWithText('Add New Key');
       actions.clickOnClass('.fa.fa-trash');
@@ -84,7 +75,6 @@ module.exports = function (actions) {
       actions.clickOnElementWithText(' Save Stage');
       actions.clickOnElementWithText('Staging');
       actions.iSeeText('Upgrade your project to Enterprise to enable deploying to stages.');
-      // actions.waitForActionToComplete(4000);
       actions.clickOnElementWithText('Create Version Tag');
       actions.iSeeText('Upgrade your project to Enterprise to enable deploying to stages.');
       actions.clickOnElementWithText('Import Template');

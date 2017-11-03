@@ -566,7 +566,7 @@ module.exports = function (config) {
 
   this.clickOnElementWithText = function (text) {
     it('I click on the ' + text + ' text ', function (next) {
-      var ele =  element(by.xpath('//*[text()="' + replacements(text.toString()) + '"]'));
+      var ele =  element.all(by.xpath('//*[text()="' + replacements(text.toString()) + '"]')).first();
       browser.wait(function () {
         return ele.isPresent();
       }, timeout).then(function (res) {
@@ -753,7 +753,7 @@ module.exports = function (config) {
   this.btnDisabled = function (field) {
     it('I see ' + field + ' button is disabled', function (next) {
       try {
-        var btn = element(by.partialButtonText(field));
+        var btn = element.all(by.partialButtonText(field)).first();
         browser.wait(function () {
           return btn.isPresent().then(function (present) {
             if (present) {
@@ -780,7 +780,7 @@ module.exports = function (config) {
   this.btnEnabled = function (field) {
     it('I see ' + field + ' button is Enabled', function (next) {
       try {
-        var btn = element(by.xpath('//button[text()="' + field + '"]'));
+        var btn = element.all(by.xpath('//button[text()="' + field + '"]')).first();
         browser.wait(function () {
           return btn.isPresent().then(function (present) {
             if (present) {
@@ -953,7 +953,7 @@ module.exports = function (config) {
   this.iSeeValueIn = function (ele, text) {
     text = replacements(text.toString());
     it('I see text ' + text + ' in ' + ele, function (next) {
-      var ele1 = (typeof (ele) == 'object') ? ele : element(by.css(ele, text));
+      var ele1 = (typeof (ele) == 'object') ? ele : element.all(by.css(ele, text)).first();
       browser.wait(function () {
         return ele1.isPresent();
       }, timeout).then(function () {
