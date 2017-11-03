@@ -2,15 +2,13 @@ module.exports = function (actions) {
   describe('Settings',function(){
     describe('Basic Plan > Environment Settings',function(){
       actions.logout();
-      // actions.enterTextInField('.login-container #email','admin@example.com');
-      // actions.enterTextInField('.login-container #password','password');
-      // actions.clickOnElementWithText('LOG IN');
-      // //actions.waitForActionToComplete(2000);
-      actions.iAmLoggedInFor('profileuser2');
-      actions.goToPage('#/');
+      actions.enterTextInField('.login-container #email','automated@tests');
+      actions.enterTextInField('.login-container #password','password');
+      actions.clickOnElementWithText('LOG IN');
+      actions.iAmLoggedIn();
+      actions.waitForActionToComplete(2000);
       actions.goToPage('#/profile/payment/view');
-      actions.clickOnElementWithText('Add Credit Card');
-      // actions.clickOnElementWithText('Change Credit Card');
+      actions.clickOnElementWithText('Change Credit Card');
       actions.enterTextInField('#cardholderName','Test');
       actions.enterTextInField('#ccNumber','4111111111111111');
       actions.enterTextInField('#securityCode','411');
@@ -19,16 +17,15 @@ module.exports = function (actions) {
       actions.clickOnClass('#form-group-ccExpiryYear');
       actions.clickOnElementWithText('25');
       actions.clickOnClass('#submit');
+      actions.waitForActionToComplete(2000);
       actions.goToPage('#/');
       actions.clickOnElementWithText('New Project');
       actions.enterTextInField('#title','basicProject');
       actions.clickOnElementWithText(' Create Project');
       actions.clickOnElementWithText('Trial');
-      actions.clickOnElementWithTextLast('Upgrade');
-      actions.clickOnElementWithText('Confirm Billing Change');
+      actions.upgradeToPlan("Basic");
+      actions.clickOnElementWithText(' Confirm Billing Change');
       actions.waitForActionToComplete(2000);
-      actions.goToPage('#/');
-      actions.clickOnElementWithText('basicProject');
       actions.clickOnElementWithText('Settings');
       actions.checkElementIsDisabled('//*[@id="form-group-title"]/input');
       actions.checkElementIsDisabled('//*[@id="name"]');
@@ -47,8 +44,8 @@ module.exports = function (actions) {
       actions.checkElementWithTextIsNotDisabled('{...} Export JSON');
       actions.checkElementWithTextIsNotDisabled(' Export CSV');
       actions.clickOnElementWithText('Settings');
-      actions.clickOnElementWithText('Remote Environment');
-      actions.iSeeText('Upgrade your project to a team or commercial plan to enable Remote Environments.');
+      actions.clickOnElementWithText('On-Premise Environment');
+      actions.iSeeText('Upgrade your project to a team or commercial plan to enable On-Premise Environments.');
       actions.clickOnElementWithText('API Keys');
       actions.iSeeText('Upgrade your project to a paid plan to use API Keys.');
       actions.clickOnElementWithText('CORS');
@@ -89,6 +86,7 @@ module.exports = function (actions) {
       actions.clickOnClass('.fa.fa-cog');
       actions.clickOnElementWithText('Delete basicProject Project');
       actions.clickOnElementWithText(' Yes');
+      actions.iDonotSeeText('basicProject');
     });
   });
 };

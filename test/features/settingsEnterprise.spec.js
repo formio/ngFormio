@@ -1,6 +1,7 @@
 module.exports = function (actions) {
   describe('Enterprise  Plan Settings',function(){
     describe('Enterprise  Plan > Environment Settings',function(){
+      actions.logout();
       actions.enterTextInField('.login-container #email','automated@tests');
       actions.enterTextInField('.login-container #password','password');
       actions.clickOnElementWithText('LOG IN');
@@ -16,19 +17,20 @@ module.exports = function (actions) {
       actions.clickOnClass('#form-group-ccExpiryYear');
       actions.clickOnElementWithText('25');
       actions.clickOnClass('#submit');
+      actions.waitForActionToComplete(2000);
       actions.goToPage('#/');
       actions.clickOnElementWithText('New Project');
       actions.enterTextInField('#title','enterpriseProject');
       actions.clickOnElementWithText(' Create Project');
+      actions.enableAngular(true);
       actions.clickOnElementWithText('Trial');
-      actions.clickOnElementWithText('Upgrade');
+      actions.upgradeToPlan("Enterprise");
       actions.clickOnElementWithText(' Confirm Billing Change');
       actions.waitForActionToComplete(2000);
-      actions.goToPage('#/');
-      actions.clickOnElementWithText('enterpriseProject');
       actions.enableAngular(false);
       actions.clickOnElementWithText('Settings');
       actions.checkElementIsDisabled('//*[@id="form-group-title"]/input');
+      actions.waitForActionToComplete(2000);
       actions.checkElementIsNotDisabled('//*[@id="name"]');
       actions.enterTextInField('#name','commercialplantest');
       actions.enableAngular(true);
@@ -79,7 +81,6 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Connect Stage');
       actions.iSeeText('https://remote.form.io');
       actions.clickOnElementWithText('Disconnect');
-      actions.waitForActionToComplete(4000);
       actions.clickOnElementWithText('API Keys');
       actions.enableAngular(true);
       actions.waitForActionToComplete(4000);

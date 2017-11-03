@@ -17,13 +17,16 @@ module.exports = function (actions) {
       actions.clickOnClass('#form-group-ccExpiryYear');
       actions.clickOnElementWithText('25');
       actions.clickOnClass('#submit');
+      actions.waitForActionToComplete(2000);
       actions.goToPage('#/');
       actions.clickOnElementWithText('New Project');
       actions.enterTextInField('#title','teamProProject');
       actions.clickOnElementWithText(' Create Project');
+      actions.enableAngular(true);
       actions.clickOnElementWithText('Trial');
       actions.upgradeToPlan("Team Pro");
       actions.clickOnElementWithText(' Confirm Billing Change');
+      actions.waitForActionToComplete(2000);
       actions.enableAngular(false);
       actions.clickOnElementWithText('Settings');
       actions.checkElementIsDisabled('//*[@id="form-group-title"]/input');
@@ -69,7 +72,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Continue');
       actions.iSeeText('Connect to an On-Premise Environment');
       actions.clickOnClass('.ui-select-match.ng-scope');
-      actions.clickOnClass('#ui-select-choices-row-0-1');
+      actions.clickOnClass('#ui-select-choices-row-0-7');
       actions.clickOnElementWithText('Connect Stage');
       actions.iSeeText('https://remote.form.io');
       actions.clickOnElementWithText('Disconnect');

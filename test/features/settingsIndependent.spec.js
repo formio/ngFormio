@@ -17,6 +17,7 @@ module.exports = function (actions) {
       actions.clickOnClass('#form-group-ccExpiryYear');
       actions.clickOnElementWithText('25');
       actions.clickOnClass('#submit');
+      actions.waitForActionToComplete(2000);
       actions.goToPage('#/');
       actions.clickOnElementWithText('New Project');
       actions.enterTextInField('#title','independentProject');
@@ -24,10 +25,11 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Trial');
       actions.upgradeToPlan("Independent");
       actions.clickOnElementWithText(' Confirm Billing Change');
+      actions.waitForActionToComplete(2000);
       actions.enableAngular(false);
       actions.clickOnElementWithText('Settings');
       actions.checkElementIsDisabled('//*[@id="form-group-title"]/input');
-      // actions.waitForActionToComplete(2000);
+      actions.waitForActionToComplete(2000);
       actions.checkElementIsNotDisabled('//*[@id="name"]');
       actions.enterTextInField('#name','independent');
       actions.clickOnElementWithText(' Save Stage');
@@ -44,7 +46,7 @@ module.exports = function (actions) {
       actions.iSeeElement('i.fa.fa-shield.ng-scope');
       actions.clickOnElementWithText(' Save Stage');
       actions.iSeeText('Project saved.');
-      // actions.waitForActionToComplete(2000);
+      actions.waitForActionToComplete(2000);
       actions.clickOnElementWithText('Forms');
       actions.checkElementWithTextIsDisabled(' New Form');
       actions.checkElementWithTextIsDisabled(' Edit');
@@ -59,9 +61,6 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('On-Premise Environment');
       actions.iSeeText('Upgrade your project to a team or commercial plan to enable On-Premise Environments.');
       actions.clickOnElementWithText('API Keys');
-      // actions.enableAngular(true);
-      // actions.waitForActionToComplete(2000);
-      // actions.enableAngular(false);
       actions.clickOnElementWithText('Add New Key');
       actions.clickOnClass('.fa.fa-trash');
       actions.clickOnElementWithText('CORS');
@@ -75,7 +74,6 @@ module.exports = function (actions) {
       actions.clickOnElementWithText(' Save Stage');
       actions.clickOnElementWithText('Staging');
       actions.iSeeText('Upgrade your project to Enterprise to enable deploying to stages.');
-      // actions.waitForActionToComplete(2000);
       actions.clickOnElementWithText('Create Version Tag');
       actions.iSeeText('Upgrade your project to Enterprise to enable deploying to stages.');
       actions.clickOnElementWithText('Import Template');
