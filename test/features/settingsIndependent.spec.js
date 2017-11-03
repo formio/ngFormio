@@ -24,6 +24,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Trial');
       actions.upgradeToPlan("Independent");
       actions.clickOnElementWithText(' Confirm Billing Change');
+      actions.enableAngular(false);
       actions.clickOnElementWithText('Settings');
       actions.checkElementIsDisabled('//*[@id="form-group-title"]/input');
       // actions.waitForActionToComplete(2000);
