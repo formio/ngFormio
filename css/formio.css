@@ -1,5 +1,5 @@
 .formio-form {
-  overflow: scroll;
+  overflow: auto;
 }
 
 .ngdialog.ngdialog-theme-default .ngdialog-content {
