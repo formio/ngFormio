@@ -2645,7 +2645,7 @@ angular.module('ui.ace', [])
  * angular-ui-bootstrap
  * http://angular-ui.github.io/bootstrap/
 
- * Version: 2.5.6 - 2017-10-14
+ * Version: 2.5.0 - 2017-01-28
  * License: MIT
  */angular.module("ui.bootstrap", ["ui.bootstrap.tpls", "ui.bootstrap.collapse","ui.bootstrap.tabindex","ui.bootstrap.accordion","ui.bootstrap.alert","ui.bootstrap.buttons","ui.bootstrap.carousel","ui.bootstrap.dateparser","ui.bootstrap.isClass","ui.bootstrap.datepicker","ui.bootstrap.position","ui.bootstrap.datepickerPopup","ui.bootstrap.debounce","ui.bootstrap.multiMap","ui.bootstrap.dropdown","ui.bootstrap.stackedMap","ui.bootstrap.modal","ui.bootstrap.paging","ui.bootstrap.pager","ui.bootstrap.pagination","ui.bootstrap.tooltip","ui.bootstrap.popover","ui.bootstrap.progressbar","ui.bootstrap.rating","ui.bootstrap.tabs","ui.bootstrap.timepicker","ui.bootstrap.typeahead"]);
 angular.module("ui.bootstrap.tpls", ["uib/template/accordion/accordion-group.html","uib/template/accordion/accordion.html","uib/template/alert/alert.html","uib/template/carousel/carousel.html","uib/template/carousel/slide.html","uib/template/datepicker/datepicker.html","uib/template/datepicker/day.html","uib/template/datepicker/month.html","uib/template/datepicker/year.html","uib/template/datepickerPopup/popup.html","uib/template/modal/window.html","uib/template/pager/pager.html","uib/template/pagination/pagination.html","uib/template/tooltip/tooltip-html-popup.html","uib/template/tooltip/tooltip-popup.html","uib/template/tooltip/tooltip-template-popup.html","uib/template/popover/popover-html.html","uib/template/popover/popover-template.html","uib/template/popover/popover.html","uib/template/progressbar/bar.html","uib/template/progressbar/progress.html","uib/template/progressbar/progressbar.html","uib/template/rating/rating.html","uib/template/tabs/tab.html","uib/template/tabs/tabset.html","uib/template/timepicker/timepicker.html","uib/template/typeahead/typeahead-match.html","uib/template/typeahead/typeahead-popup.html"]);
@@ -10048,7 +10048,7 @@ angular.module('ui.bootstrap.typeahead', ['ui.bootstrap.debounce', 'ui.bootstrap
     };
   }]);
 
-angular.module("uib/template/accordion/accordion-group.html", []).run(["$templateCache", function ($templateCache) {
+angular.module("uib/template/accordion/accordion-group.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("uib/template/accordion/accordion-group.html",
     "<div role=\"tab\" id=\"{{::headingId}}\" aria-selected=\"{{isOpen}}\" class=\"panel-heading\" ng-keypress=\"toggleOpen($event)\">\n" +
     "  <h4 class=\"panel-title\">\n" +
@@ -10061,12 +10061,12 @@ angular.module("uib/template/accordion/accordion-group.html", []).run(["$templat
     "");
 }]);
 
-angular.module("uib/template/accordion/accordion.html", []).run(["$templateCache", function ($templateCache) {
+angular.module("uib/template/accordion/accordion.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("uib/template/accordion/accordion.html",
     "<div role=\"tablist\" class=\"panel-group\" ng-transclude></div>");
 }]);
 
-angular.module("uib/template/alert/alert.html", []).run(["$templateCache", function ($templateCache) {
+angular.module("uib/template/alert/alert.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("uib/template/alert/alert.html",
     "<button ng-show=\"closeable\" type=\"button\" class=\"close\" ng-click=\"close({$event: $event})\">\n" +
     "  <span aria-hidden=\"true\">&times;</span>\n" +
@@ -10076,7 +10076,7 @@ angular.module("uib/template/alert/alert.html", []).run(["$templateCache", funct
     "");
 }]);
 
-angular.module("uib/template/carousel/carousel.html", []).run(["$templateCache", function ($templateCache) {
+angular.module("uib/template/carousel/carousel.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("uib/template/carousel/carousel.html",
     "<div class=\"carousel-inner\" ng-transclude></div>\n" +
     "<a role=\"button\" href class=\"left carousel-control\" ng-click=\"prev()\" ng-class=\"{ disabled: isPrevDisabled() }\" ng-show=\"slides.length > 1\">\n" +
@@ -10095,13 +10095,13 @@ angular.module("uib/template/carousel/carousel.html", []).run(["$templateCache",
     "");
 }]);
 
-angular.module("uib/template/carousel/slide.html", []).run(["$templateCache", function ($templateCache) {
+angular.module("uib/template/carousel/slide.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("uib/template/carousel/slide.html",
     "<div class=\"text-center\" ng-transclude></div>\n" +
     "");
 }]);
 
-angular.module("uib/template/datepicker/datepicker.html", []).run(["$templateCache", function ($templateCache) {
+angular.module("uib/template/datepicker/datepicker.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("uib/template/datepicker/datepicker.html",
     "<div ng-switch=\"datepickerMode\">\n" +
     "  <div uib-daypicker ng-switch-when=\"day\" tabindex=\"0\" class=\"uib-daypicker\"></div>\n" +
@@ -10111,7 +10111,7 @@ angular.module("uib/template/datepicker/datepicker.html", []).run(["$templateCac
     "");
 }]);
 
-angular.module("uib/template/datepicker/day.html", []).run(["$templateCache", function ($templateCache) {
+angular.module("uib/template/datepicker/day.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("uib/template/datepicker/day.html",
     "<table role=\"grid\" aria-labelledby=\"{{::uniqueId}}-title\" aria-activedescendant=\"{{activeDateId}}\">\n" +
     "  <thead>\n" +
@@ -10146,7 +10146,7 @@ angular.module("uib/template/datepicker/day.html", []).run(["$templateCache", fu
     "");
 }]);
 
-angular.module("uib/template/datepicker/month.html", []).run(["$templateCache", function ($templateCache) {
+angular.module("uib/template/datepicker/month.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("uib/template/datepicker/month.html",
     "<table role=\"grid\" aria-labelledby=\"{{::uniqueId}}-title\" aria-activedescendant=\"{{activeDateId}}\">\n" +
     "  <thead>\n" +
@@ -10176,24 +10176,7 @@ angular.module("uib/template/datepicker/month.html", []).run(["$templateCache", 
     "");
 }]);
 
-angular.module("uib/template/datepicker/popup.html", []).run(["$templateCache", function($templateCache) {
-  $templateCache.put("uib/template/datepicker/popup.html",
-    "<div>\n" +
-    "  <ul class=\"uib-datepicker-popup dropdown-menu uib-position-measure\" dropdown-nested ng-if=\"isOpen\" ng-keydown=\"keydown($event)\" ng-click=\"$event.stopPropagation()\">\n" +
-    "    <li ng-transclude></li>\n" +
-    "    <li ng-if=\"showButtonBar\" class=\"uib-button-bar\">\n" +
-    "      <span class=\"btn-group pull-left\">\n" +
-    "        <button type=\"button\" class=\"btn btn-sm btn-info uib-datepicker-current\" ng-click=\"select('today', $event)\" ng-disabled=\"isDisabled('today')\">{{ getText('current') }}</button>\n" +
-    "        <button type=\"button\" class=\"btn btn-sm btn-danger uib-clear\" ng-click=\"select(null, $event)\">{{ getText('clear') }}</button>\n" +
-    "      </span>\n" +
-    "      <button type=\"button\" class=\"btn btn-sm btn-success pull-right uib-close\" ng-click=\"close($event)\">{{ getText('close') }}</button>\n" +
-    "    </li>\n" +
-    "  </ul>\n" +
-    "</div>\n" +
-    "");
-}]);
-
-angular.module("uib/template/datepicker/year.html", []).run(["$templateCache", function ($templateCache) {
+angular.module("uib/template/datepicker/year.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("uib/template/datepicker/year.html",
     "<table role=\"grid\" aria-labelledby=\"{{::uniqueId}}-title\" aria-activedescendant=\"{{activeDateId}}\">\n" +
     "  <thead>\n" +
@@ -10223,7 +10206,7 @@ angular.module("uib/template/datepicker/year.html", []).run(["$templateCache", f
     "");
 }]);
 
-angular.module("uib/template/datepickerPopup/popup.html", []).run(["$templateCache", function ($templateCache) {
+angular.module("uib/template/datepickerPopup/popup.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("uib/template/datepickerPopup/popup.html",
     "<ul role=\"presentation\" class=\"uib-datepicker-popup dropdown-menu uib-position-measure\" dropdown-nested ng-if=\"isOpen\" ng-keydown=\"keydown($event)\" ng-click=\"$event.stopPropagation()\">\n" +
     "  <li ng-transclude></li>\n" +
@@ -10238,30 +10221,20 @@ angular.module("uib/template/datepickerPopup/popup.html", []).run(["$templateCac
     "");
 }]);
 
-angular.module("uib/template/modal/backdrop.html", []).run(["$templateCache", function($templateCache) {
-  $templateCache.put("uib/template/modal/backdrop.html",
-    "<div class=\"modal-backdrop\"\n" +
-    "     uib-modal-animation-class=\"fade\"\n" +
-    "     modal-in-class=\"in\"\n" +
-    "     ng-style=\"{'z-index': 1040 + (index && 1 || 0) + index*10}\"\n" +
-    "></div>\n" +
-    "");
-}]);
-
-angular.module("uib/template/modal/window.html", []).run(["$templateCache", function ($templateCache) {
+angular.module("uib/template/modal/window.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("uib/template/modal/window.html",
     "<div class=\"modal-dialog {{size ? 'modal-' + size : ''}}\"><div class=\"modal-content\" uib-modal-transclude></div></div>\n" +
     "");
 }]);
 
-angular.module("uib/template/pager/pager.html", []).run(["$templateCache", function ($templateCache) {
+angular.module("uib/template/pager/pager.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("uib/template/pager/pager.html",
     "<li ng-class=\"{disabled: noPrevious()||ngDisabled, previous: align}\"><a href ng-click=\"selectPage(page - 1, $event)\" ng-disabled=\"noPrevious()||ngDisabled\" uib-tabindex-toggle>{{::getText('previous')}}</a></li>\n" +
     "<li ng-class=\"{disabled: noNext()||ngDisabled, next: align}\"><a href ng-click=\"selectPage(page + 1, $event)\" ng-disabled=\"noNext()||ngDisabled\" uib-tabindex-toggle>{{::getText('next')}}</a></li>\n" +
     "");
 }]);
 
-angular.module("uib/template/pagination/pagination.html", []).run(["$templateCache", function ($templateCache) {
+angular.module("uib/template/pagination/pagination.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("uib/template/pagination/pagination.html",
     "<li role=\"menuitem\" ng-if=\"::boundaryLinks\" ng-class=\"{disabled: noPrevious()||ngDisabled}\" class=\"pagination-first\"><a href ng-click=\"selectPage(1, $event)\" ng-disabled=\"noPrevious()||ngDisabled\" uib-tabindex-toggle>{{::getText('first')}}</a></li>\n" +
     "<li role=\"menuitem\" ng-if=\"::directionLinks\" ng-class=\"{disabled: noPrevious()||ngDisabled}\" class=\"pagination-prev\"><a href ng-click=\"selectPage(page - 1, $event)\" ng-disabled=\"noPrevious()||ngDisabled\" uib-tabindex-toggle>{{::getText('previous')}}</a></li>\n" +
@@ -10271,21 +10244,21 @@ angular.module("uib/template/pagination/pagination.html", []).run(["$templateCac
     "");
 }]);
 
-angular.module("uib/template/tooltip/tooltip-html-popup.html", []).run(["$templateCache", function ($templateCache) {
+angular.module("uib/template/tooltip/tooltip-html-popup.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("uib/template/tooltip/tooltip-html-popup.html",
     "<div class=\"tooltip-arrow\"></div>\n" +
     "<div class=\"tooltip-inner\" ng-bind-html=\"contentExp()\"></div>\n" +
     "");
 }]);
 
-angular.module("uib/template/tooltip/tooltip-popup.html", []).run(["$templateCache", function ($templateCache) {
+angular.module("uib/template/tooltip/tooltip-popup.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("uib/template/tooltip/tooltip-popup.html",
     "<div class=\"tooltip-arrow\"></div>\n" +
     "<div class=\"tooltip-inner\" ng-bind=\"content\"></div>\n" +
     "");
 }]);
 
-angular.module("uib/template/tooltip/tooltip-template-popup.html", []).run(["$templateCache", function ($templateCache) {
+angular.module("uib/template/tooltip/tooltip-template-popup.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("uib/template/tooltip/tooltip-template-popup.html",
     "<div class=\"tooltip-arrow\"></div>\n" +
     "<div class=\"tooltip-inner\"\n" +
@@ -10294,7 +10267,7 @@ angular.module("uib/template/tooltip/tooltip-template-popup.html", []).run(["$te
     "");
 }]);
 
-angular.module("uib/template/popover/popover-html.html", []).run(["$templateCache", function ($templateCache) {
+angular.module("uib/template/popover/popover-html.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("uib/template/popover/popover-html.html",
     "<div class=\"arrow\"></div>\n" +
     "\n" +
@@ -10305,7 +10278,7 @@ angular.module("uib/template/popover/popover-html.html", []).run(["$templateCach
     "");
 }]);
 
-angular.module("uib/template/popover/popover-template.html", []).run(["$templateCache", function ($templateCache) {
+angular.module("uib/template/popover/popover-template.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("uib/template/popover/popover-template.html",
     "<div class=\"arrow\"></div>\n" +
     "\n" +
@@ -10318,7 +10291,7 @@ angular.module("uib/template/popover/popover-template.html", []).run(["$template
     "");
 }]);
 
-angular.module("uib/template/popover/popover.html", []).run(["$templateCache", function ($templateCache) {
+angular.module("uib/template/popover/popover.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("uib/template/popover/popover.html",
     "<div class=\"arrow\"></div>\n" +
     "\n" +
@@ -10329,18 +10302,18 @@ angular.module("uib/template/popover/popover.html", []).run(["$templateCache", f
     "");
 }]);
 
-angular.module("uib/template/progressbar/bar.html", []).run(["$templateCache", function ($templateCache) {
+angular.module("uib/template/progressbar/bar.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("uib/template/progressbar/bar.html",
     "<div class=\"progress-bar\" ng-class=\"type && 'progress-bar-' + type\" role=\"progressbar\" aria-valuenow=\"{{value}}\" aria-valuemin=\"0\" aria-valuemax=\"{{max}}\" ng-style=\"{width: (percent < 100 ? percent : 100) + '%'}\" aria-valuetext=\"{{percent | number:0}}%\" aria-labelledby=\"{{::title}}\" ng-transclude></div>\n" +
     "");
 }]);
 
-angular.module("uib/template/progressbar/progress.html", []).run(["$templateCache", function ($templateCache) {
+angular.module("uib/template/progressbar/progress.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("uib/template/progressbar/progress.html",
     "<div class=\"progress\" ng-transclude aria-labelledby=\"{{::title}}\"></div>");
 }]);
 
-angular.module("uib/template/progressbar/progressbar.html", []).run(["$templateCache", function ($templateCache) {
+angular.module("uib/template/progressbar/progressbar.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("uib/template/progressbar/progressbar.html",
     "<div class=\"progress\">\n" +
     "  <div class=\"progress-bar\" ng-class=\"type && 'progress-bar-' + type\" role=\"progressbar\" aria-valuenow=\"{{value}}\" aria-valuemin=\"0\" aria-valuemax=\"{{max}}\" ng-style=\"{width: (percent < 100 ? percent : 100) + '%'}\" aria-valuetext=\"{{percent | number:0}}%\" aria-labelledby=\"{{::title}}\" ng-transclude></div>\n" +
@@ -10348,7 +10321,7 @@ angular.module("uib/template/progressbar/progressbar.html", []).run(["$templateC
     "");
 }]);
 
-angular.module("uib/template/rating/rating.html", []).run(["$templateCache", function ($templateCache) {
+angular.module("uib/template/rating/rating.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("uib/template/rating/rating.html",
     "<span ng-mouseleave=\"reset()\" ng-keydown=\"onKeydown($event)\" tabindex=\"0\" role=\"slider\" aria-valuemin=\"0\" aria-valuemax=\"{{range.length}}\" aria-valuenow=\"{{value}}\" aria-valuetext=\"{{title}}\">\n" +
     "    <span ng-repeat-start=\"r in range track by $index\" class=\"sr-only\">({{ $index < value ? '*' : ' ' }})</span>\n" +
@@ -10357,7 +10330,7 @@ angular.module("uib/template/rating/rating.html", []).run(["$templateCache", fun
     "");
 }]);
 
-angular.module("uib/template/tabs/tab.html", []).run(["$templateCache", function ($templateCache) {
+angular.module("uib/template/tabs/tab.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("uib/template/tabs/tab.html",
     "<li ng-class=\"[{active: active, disabled: disabled}, classes]\" class=\"uib-tab nav-item\">\n" +
     "  <a href ng-click=\"select($event)\" class=\"nav-link\" uib-tab-heading-transclude>{{heading}}</a>\n" +
@@ -10365,7 +10338,7 @@ angular.module("uib/template/tabs/tab.html", []).run(["$templateCache", function
     "");
 }]);
 
-angular.module("uib/template/tabs/tabset.html", []).run(["$templateCache", function ($templateCache) {
+angular.module("uib/template/tabs/tabset.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("uib/template/tabs/tabset.html",
     "<div>\n" +
     "  <ul class=\"nav nav-{{tabset.type || 'tabs'}}\" ng-class=\"{'nav-stacked': vertical, 'nav-justified': justified}\" ng-transclude></ul>\n" +
@@ -10380,7 +10353,7 @@ angular.module("uib/template/tabs/tabset.html", []).run(["$templateCache", funct
     "");
 }]);
 
-angular.module("uib/template/timepicker/timepicker.html", []).run(["$templateCache", function ($templateCache) {
+angular.module("uib/template/timepicker/timepicker.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("uib/template/timepicker/timepicker.html",
     "<table class=\"uib-timepicker\">\n" +
     "  <tbody>\n" +
@@ -10419,7 +10392,7 @@ angular.module("uib/template/timepicker/timepicker.html", []).run(["$templateCac
     "");
 }]);
 
-angular.module("uib/template/typeahead/typeahead-match.html", []).run(["$templateCache", function ($templateCache) {
+angular.module("uib/template/typeahead/typeahead-match.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("uib/template/typeahead/typeahead-match.html",
     "<a href\n" +
     "   tabindex=\"-1\"\n" +
@@ -10428,7 +10401,7 @@ angular.module("uib/template/typeahead/typeahead-match.html", []).run(["$templat
     "");
 }]);
 
-angular.module("uib/template/typeahead/typeahead-popup.html", []).run(["$templateCache", function ($templateCache) {
+angular.module("uib/template/typeahead/typeahead-popup.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("uib/template/typeahead/typeahead-popup.html",
     "<ul class=\"dropdown-menu\" ng-show=\"isOpen() && !moveInProgress\" ng-style=\"{top: position().top+'px', left: position().left+'px'}\" role=\"listbox\" aria-hidden=\"{{!isOpen()}}\">\n" +
     "    <li class=\"uib-typeahead-match\" ng-repeat=\"match in matches track by $index\" ng-class=\"{active: isActive($index) }\" ng-mouseenter=\"selectActive($index)\" ng-click=\"selectMatch($index, $event)\" role=\"option\" id=\"{{::match.id}}\">\n" +
@@ -48296,7 +48269,6 @@ exports.all = function() {
 };
 
 },{}],27:[function(_dereq_,module,exports){
-(function (process){
 /*!
  * EventEmitter2
  * https://github.com/hij1nx/EventEmitter2
@@ -48323,8 +48295,7 @@ exports.all = function() {
       this._conf = conf;
 
       conf.delimiter && (this.delimiter = conf.delimiter);
-      this._maxListeners = conf.maxListeners !== undefined ? conf.maxListeners : defaultMaxListeners;
-
+      this._events.maxListeners = conf.maxListeners !== undefined ? conf.maxListeners : defaultMaxListeners;
       conf.wildcard && (this.wildcard = conf.wildcard);
       conf.newListener && (this.newListener = conf.newListener);
       conf.verboseMemoryLeak && (this.verboseMemoryLeak = conf.verboseMemoryLeak);
@@ -48333,31 +48304,24 @@ exports.all = function() {
         this.listenerTree = {};
       }
     } else {
-      this._maxListeners = defaultMaxListeners;
+      this._events.maxListeners = defaultMaxListeners;
     }
   }
 
   function logPossibleMemoryLeak(count, eventName) {
     var errorMsg = '(node) warning: possible EventEmitter memory ' +
-        'leak detected. ' + count + ' listeners added. ' +
+        'leak detected. %d listeners added. ' +
         'Use emitter.setMaxListeners() to increase limit.';
 
     if(this.verboseMemoryLeak){
-      errorMsg += ' Event name: ' + eventName + '.';
+      errorMsg += ' Event name: %s.';
+      console.error(errorMsg, count, eventName);
+    } else {
+      console.error(errorMsg, count);
     }
 
-    if(typeof process !== 'undefined' && process.emitWarning){
-      var e = new Error(errorMsg);
-      e.name = 'MaxListenersExceededWarning';
-      e.emitter = this;
-      e.count = count;
-      process.emitWarning(e);
-    } else {
-      console.error(errorMsg);
-
-      if (console.trace){
-        console.trace();
-      }
+    if (console.trace){
+      console.trace();
     }
   }
 
@@ -48518,8 +48482,8 @@ exports.all = function() {
 
           if (
             !tree._listeners.warned &&
-            this._maxListeners > 0 &&
-            tree._listeners.length > this._maxListeners
+            this._events.maxListeners > 0 &&
+            tree._listeners.length > this._events.maxListeners
           ) {
             tree._listeners.warned = true;
             logPossibleMemoryLeak.call(this, tree._listeners.length, name);
@@ -48543,7 +48507,8 @@ exports.all = function() {
 
   EventEmitter.prototype.setMaxListeners = function(n) {
     if (n !== undefined) {
-      this._maxListeners = n;
+      this._events || init.call(this);
+      this._events.maxListeners = n;
       if (!this._conf) this._conf = {};
       this._conf.maxListeners = n;
     }
@@ -48551,29 +48516,12 @@ exports.all = function() {
 
   EventEmitter.prototype.event = '';
 
-
   EventEmitter.prototype.once = function(event, fn) {
-    return this._once(event, fn, false);
-  };
-
-  EventEmitter.prototype.prependOnceListener = function(event, fn) {
-    return this._once(event, fn, true);
-  };
-
-  EventEmitter.prototype._once = function(event, fn, prepend) {
-    this._many(event, 1, fn, prepend);
+    this.many(event, 1, fn);
     return this;
   };
 
   EventEmitter.prototype.many = function(event, ttl, fn) {
-    return this._many(event, ttl, fn, false);
-  }
-
-  EventEmitter.prototype.prependMany = function(event, ttl, fn) {
-    return this._many(event, ttl, fn, true);
-  }
-
-  EventEmitter.prototype._many = function(event, ttl, fn, prepend) {
     var self = this;
 
     if (typeof fn !== 'function') {
@@ -48584,12 +48532,12 @@ exports.all = function() {
       if (--ttl === 0) {
         self.off(event, listener);
       }
-      return fn.apply(this, arguments);
+      fn.apply(this, arguments);
     }
 
     listener._origin = fn;
 
-    this._on(event, listener, prepend);
+    this.on(event, listener);
 
     return self;
   };
@@ -48765,7 +48713,6 @@ exports.all = function() {
         promises.push(handler.apply(this, args));
       }
     } else if (handler && handler.length) {
-      handler = handler.slice();
       if (al > 3) {
         args = new Array(al - 1);
         for (j = 1; j < al; j++) args[j - 1] = arguments[j];
@@ -48798,45 +48745,8 @@ exports.all = function() {
   };
 
   EventEmitter.prototype.on = function(type, listener) {
-    return this._on(type, listener, false);
-  };
-
-  EventEmitter.prototype.prependListener = function(type, listener) {
-    return this._on(type, listener, true);
-  };
-
-  EventEmitter.prototype.onAny = function(fn) {
-    return this._onAny(fn, false);
-  };
-
-  EventEmitter.prototype.prependAny = function(fn) {
-    return this._onAny(fn, true);
-  };
-
-  EventEmitter.prototype.addListener = EventEmitter.prototype.on;
-
-  EventEmitter.prototype._onAny = function(fn, prepend){
-    if (typeof fn !== 'function') {
-      throw new Error('onAny only accepts instances of Function');
-    }
-
-    if (!this._all) {
-      this._all = [];
-    }
-
-    // Add the function to the event listener collection.
-    if(prepend){
-      this._all.unshift(fn);
-    }else{
-      this._all.push(fn);
-    }
-
-    return this;
-  }
-
-  EventEmitter.prototype._on = function(type, listener, prepend) {
     if (typeof type === 'function') {
-      this._onAny(type, listener);
+      this.onAny(type);
       return this;
     }
 
@@ -48864,18 +48774,14 @@ exports.all = function() {
         this._events[type] = [this._events[type]];
       }
 
-      // If we've already got an array, just add
-      if(prepend){
-        this._events[type].unshift(listener);
-      }else{
-        this._events[type].push(listener);
-      }
+      // If we've already got an array, just append.
+      this._events[type].push(listener);
 
       // Check for listener leak
       if (
         !this._events[type].warned &&
-        this._maxListeners > 0 &&
-        this._events[type].length > this._maxListeners
+        this._events.maxListeners > 0 &&
+        this._events[type].length > this._events.maxListeners
       ) {
         this._events[type].warned = true;
         logPossibleMemoryLeak.call(this, this._events[type].length, type);
@@ -48883,7 +48789,23 @@ exports.all = function() {
     }
 
     return this;
-  }
+  };
+
+  EventEmitter.prototype.onAny = function(fn) {
+    if (typeof fn !== 'function') {
+      throw new Error('onAny only accepts instances of Function');
+    }
+
+    if (!this._all) {
+      this._all = [];
+    }
+
+    // Add the function to the event listener collection.
+    this._all.push(fn);
+    return this;
+  };
+
+  EventEmitter.prototype.addListener = EventEmitter.prototype.on;
 
   EventEmitter.prototype.off = function(type, listener) {
     if (typeof listener !== 'function') {
@@ -49040,10 +48962,6 @@ exports.all = function() {
     return this._events[type];
   };
 
-  EventEmitter.prototype.eventNames = function(){
-    return Object.keys(this._events);
-  }
-
   EventEmitter.prototype.listenerCount = function(type) {
     return this.listeners(type).length;
   };
@@ -49074,8 +48992,7 @@ exports.all = function() {
   }
 }();
 
-}).call(this,_dereq_('_process'))
-},{"_process":253}],28:[function(_dereq_,module,exports){
+},{}],28:[function(_dereq_,module,exports){
 (function (global){
 'use strict';
 
@@ -49340,7 +49257,30 @@ var Formio = function () {
   }, {
     key: 'makeRequest',
     value: function makeRequest(type, url, method, data, opts) {
-      return Formio.makeRequest(this, type, url, method, data, opts);
+      method = (method || 'GET').toUpperCase();
+      if (!opts || (typeof opts === 'undefined' ? 'undefined' : _typeof(opts)) !== 'object') {
+        opts = {};
+      }
+
+      var requestArgs = {
+        formio: this,
+        type: type,
+        url: url,
+        method: method,
+        data: data,
+        opts: opts
+      };
+
+      var request = Formio.pluginWait('preRequest', requestArgs).then(function () {
+        return Formio.pluginGet('request', requestArgs).then(function (result) {
+          if (result === null || result === undefined) {
+            return Formio.request(url, method, data, opts.header, opts);
+          }
+          return result;
+        });
+      });
+
+      return Formio.pluginAlter('wrapRequestPromise', request, requestArgs);
     }
   }, {
     key: 'loadProject',
@@ -49460,18 +49400,6 @@ var Formio = function () {
           return form._id;
         });
       }
-    }
-
-    /**
-     * Returns the JWT token for this instance.
-     *
-     * @return {*}
-     */
-
-  }, {
-    key: 'getToken',
-    value: function getToken() {
-      return Formio.getToken();
     }
 
     /**
@@ -49598,14 +49526,12 @@ var Formio = function () {
         var anonRole = {};
         var adminRole = {};
         for (var roleName in access.roles) {
-          if (access.roles.hasOwnProperty(roleName)) {
-            var role = access.roles[roleName];
-            if (role.default) {
-              anonRole = role;
-            }
-            if (role.admin) {
-              adminRole = role;
-            }
+          var role = access.roles[roleName];
+          if (role.default) {
+            anonRole = role;
+          }
+          if (role.admin) {
+            adminRole = role;
           }
         }
 
@@ -49618,25 +49544,21 @@ var Formio = function () {
         }
 
         for (var i in form.submissionAccess) {
-          if (form.submissionAccess.hasOwnProperty(i)) {
-            var subRole = form.submissionAccess[i];
-            if (subRole.type === 'create_all' || subRole.type === 'create_own') {
-              for (var j in subRole.roles) {
-                if (subRole.roles.hasOwnProperty(j)) {
-                  // Check if anonymous is allowed.
-                  if (anonRole._id === subRole.roles[j]) {
-                    canSubmitAnonymously = true;
-                  }
-                  // Check if the logged in user has the appropriate role.
-                  if (user && user.roles.indexOf(subRole.roles[j]) !== -1) {
-                    canSubmit = true;
-                    break;
-                  }
-                }
+          var subRole = form.submissionAccess[i];
+          if (subRole.type === 'create_all' || subRole.type === 'create_own') {
+            for (var j in subRole.roles) {
+              // Check if anonymous is allowed.
+              if (anonRole._id === subRole.roles[j]) {
+                canSubmitAnonymously = true;
               }
-              if (canSubmit) {
+              // Check if the logged in user has the appropriate role.
+              if (user && user.roles.indexOf(subRole.roles[j]) !== -1) {
+                canSubmit = true;
                 break;
               }
+            }
+            if (canSubmit) {
+              break;
             }
           }
         }
@@ -49704,34 +49626,6 @@ var Formio = function () {
       return Formio.pluginAlter('wrapStaticRequestPromise', request, requestArgs);
     }
   }, {
-    key: 'makeRequest',
-    value: function makeRequest(formio, type, url, method, data, opts) {
-      method = (method || 'GET').toUpperCase();
-      if (!opts || (typeof opts === 'undefined' ? 'undefined' : _typeof(opts)) !== 'object') {
-        opts = {};
-      }
-
-      var requestArgs = {
-        formio: formio,
-        type: type,
-        url: url,
-        method: method,
-        data: data,
-        opts: opts
-      };
-
-      var request = Formio.pluginWait('preRequest', requestArgs).then(function () {
-        return Formio.pluginGet('request', requestArgs).then(function (result) {
-          if (result === null || result === undefined) {
-            return Formio.request(url, method, data, opts.header, opts);
-          }
-          return result;
-        });
-      });
-
-      return Formio.pluginAlter('wrapRequestPromise', request, requestArgs);
-    }
-  }, {
     key: 'request',
     value: function request(url, method, data, header, opts) {
       if (!url) {
@@ -49757,7 +49651,7 @@ var Formio = function () {
       }
 
       // Set up and fetch request
-      var headers = header || new Headers(opts.headers || {
+      var headers = header || new Headers({
         'Accept': 'application/json',
         'Content-type': 'application/json; charset=UTF-8'
       });
@@ -49898,16 +49792,24 @@ var Formio = function () {
         Formio.setUser(null);
         // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
         try {
-          return localStorage.removeItem('formioToken');
+          if (typeof Storage !== "undefined") {
+            return localStorage.removeItem('formioToken');
+          } else {
+            return cookies.erase('formioToken');
+          }
         } catch (err) {
-          return cookies.erase('formioToken');
+          return;
         }
       }
       // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
       try {
-        localStorage.setItem('formioToken', token);
+        if (typeof Storage !== "undefined") {
+          localStorage.setItem('formioToken', token);
+        } else {
+          cookies.set('formioToken', token);
+        }
       } catch (err) {
-        cookies.set('formioToken', token);
+        // Do nothing.
       }
       return Formio.currentUser(); // Run this so user is updated if null
     }
@@ -49918,10 +49820,14 @@ var Formio = function () {
         return this.token;
       }
       try {
-        this.token = localStorage.getItem('formioToken') || '';
+        if (typeof Storage !== "undefined") {
+          this.token = localStorage.getItem('formioToken') || '';
+        } else {
+          this.token = cookies.get('formioToken');
+        }
         return this.token;
       } catch (e) {
-        this.token = cookies.get('formioToken');
+        return '';
       }
     }
   }, {
@@ -49931,25 +49837,37 @@ var Formio = function () {
         this.setToken(null);
         // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
         try {
-          return localStorage.removeItem('formioUser');
+          if (typeof Storage !== "undefined") {
+            return localStorage.removeItem('formioUser');
+          } else {
+            return cookies.erase('formioUser');
+          }
         } catch (err) {
-          return cookies.erase('formioUser');
+          return;
         }
       }
       // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
       try {
-        localStorage.setItem('formioUser', JSON.stringify(user));
+        if (typeof Storage !== "undefined") {
+          localStorage.setItem('formioUser', JSON.stringify(user));
+        } else {
+          cookies.set('formioUser', JSON.stringify(user));
+        }
       } catch (err) {
-        cookies.set('formioUser', JSON.stringify(user));
+        // Do nothing.
       }
     }
   }, {
     key: 'getUser',
     value: function getUser() {
       try {
-        return JSON.parse(localStorage.getItem('formioUser') || null);
+        if (typeof Storage !== "undefined") {
+          return JSON.parse(localStorage.getItem('formioUser') || null);
+        } else {
+          return JSON.parse(cookies.get('formioUser'));
+        }
       } catch (e) {
-        return JSON.parse(cookies.get('formioUser'));
+        return;
       }
     }
   }, {
@@ -50087,7 +50005,7 @@ var Formio = function () {
           method: 'GET'
         });
       }
-      var token = Formio.getToken();
+      var token = this.getToken();
       if (!token) {
         return Formio.pluginAlter('wrapStaticRequestPromise', Promise.resolve(null), {
           url: url,
@@ -50263,7 +50181,6 @@ var Formio = function () {
 
 
 exports.Formio = Formio;
-Formio.Headers = Headers;
 Formio.baseUrl = 'https://api.form.io';
 Formio.projectUrl = Formio.baseUrl;
 Formio.projectUrlSet = false;
@@ -50278,7 +50195,7 @@ Formio.events = new EventEmitter({
 module.exports = global.Formio = Formio;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./providers":29,"browser-cookies":26,"eventemitter2":27,"native-promise-only":249,"shallow-copy":254,"whatwg-fetch":257}],29:[function(_dereq_,module,exports){
+},{"./providers":29,"browser-cookies":26,"eventemitter2":27,"native-promise-only":249,"shallow-copy":253,"whatwg-fetch":256}],29:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = {
@@ -50372,7 +50289,12 @@ var dropbox = function dropbox(formio) {
         };
 
         xhr.open('POST', formio.formUrl + '/storage/dropbox');
-        var token = formio.getToken();
+        var token = false;
+        try {
+          token = localStorage.getItem('formioToken');
+        } catch (e) {
+          // Swallow error.
+        }
         if (token) {
           xhr.setRequestHeader('x-jwt-token', token);
         }
@@ -50380,7 +50302,12 @@ var dropbox = function dropbox(formio) {
       });
     },
     downloadFile: function downloadFile(file) {
-      var token = formio.getToken();
+      var token = false;
+      try {
+        token = localStorage.getItem('formioToken');
+      } catch (e) {
+        // Swallow error.
+      }
       file.url = formio.formUrl + '/storage/dropbox?path_lower=' + file.path_lower + (token ? '&x-jwt-token=' + token : '');
       return Promise.resolve(file);
     }
@@ -50485,7 +50412,12 @@ var s3 = function s3(formio) {
 
         pre.setRequestHeader('Accept', 'application/json');
         pre.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-        var token = formio.getToken();
+        var token = false;
+        try {
+          token = localStorage.getItem('formioToken');
+        } catch (e) {
+          // swallow error.
+        }
         if (token) {
           pre.setRequestHeader('x-jwt-token', token);
         }
@@ -50572,7 +50504,7 @@ var url = function url(formio) {
         };
 
         xhr.open('POST', url);
-        var token = formio.getToken();
+        var token = localStorage.getItem('formioToken');
         if (token) {
           xhr.setRequestHeader('x-jwt-token', token);
         }
@@ -50661,15 +50593,6 @@ var FormioUtils = {
   },
 
   /**
-   * Check to see if an ID is a mongoID.
-   * @param text
-   * @return {Array|{index: number, input: string}|Boolean|*}
-   */
-  isMongoId: function isMongoId(text) {
-    return text.toString().match(/^[0-9a-fA-F]{24}$/);
-  },
-
-  /**
    * Determine if a component is a layout component or not.
    *
    * @param {Object} component
@@ -50721,7 +50644,7 @@ var FormioUtils = {
       }
 
       var subPath = function subPath() {
-        if (component.key && (component.type === 'datagrid' || component.type === 'container' || component.type === 'editgrid' || component.tree)) {
+        if (component.key && (component.type === 'datagrid' || component.type === 'container')) {
           return newPath;
         }
         return path;
@@ -50758,11 +50681,9 @@ var FormioUtils = {
     } else {
       var matches = false;
       for (var search in query) {
-        if (query.hasOwnProperty(search)) {
-          matches = (0, _get3.default)(component, search) === query[search];
-          if (!matches) {
-            break;
-          }
+        matches = (0, _get3.default)(component, search) === query[search];
+        if (!matches) {
+          break;
         }
       }
       return matches;
@@ -50837,7 +50758,7 @@ var FormioUtils = {
    * @returns {boolean} - TRUE - This component has a conditional, FALSE - No conditional provided.
    */
   hasCondition: function hasCondition(component) {
-    return component.hasOwnProperty('customConditional') && component.customConditional || component.hasOwnProperty('conditional') && component.conditional && component.conditional.when || component.hasOwnProperty('conditional') && component.conditional && component.conditional.json ? true : false;
+    return component.hasOwnProperty('customConditional') && component.customConditional || component.hasOwnProperty('conditional') && component.conditional && component.conditional.when || component.hasOwnProperty('conditional') && component.conditional && component.conditional.json;
   },
 
   /**
@@ -51165,14 +51086,6 @@ http://ricostacruz.com/cheatsheets/umdjs.html
     },
     "cat": function() {
       return Array.prototype.join.call(arguments, "");
-    },
-    "substr":function(source, start, end) {
-      if(end < 0){
-        // JavaScript doesn't support negative end, this emulates PHP behavior
-        var temp = String(source).substr(start);
-        return temp.substr(0, temp.length + end);
-      }
-      return String(source).substr(start, end);
     },
     "+": function() {
       return Array.prototype.reduce.call(arguments, function(a, b) {
@@ -58052,7 +57965,7 @@ module.exports = toString;
 
 },{"./_baseToString":98}],248:[function(_dereq_,module,exports){
 //! moment.js
-//! version : 2.19.1
+//! version : 2.18.1
 //! authors : Tim Wood, Iskren Chernev, Moment.js contributors
 //! license : MIT
 //! momentjs.com
@@ -58086,17 +57999,12 @@ function isObject(input) {
 }
 
 function isObjectEmpty(obj) {
-    if (Object.getOwnPropertyNames) {
-        return (Object.getOwnPropertyNames(obj).length === 0);
-    } else {
-        var k;
-        for (k in obj) {
-            if (obj.hasOwnProperty(k)) {
-                return false;
-            }
-        }
-        return true;
+    var k;
+    for (k in obj) {
+        // even if its not own property I'd still call it non-empty
+        return false;
     }
+    return true;
 }
 
 function isUndefined(input) {
@@ -58190,10 +58098,12 @@ if (Array.prototype.some) {
     };
 }
 
+var some$1 = some;
+
 function isValid(m) {
     if (m._isValid == null) {
         var flags = getParsingFlags(m);
-        var parsedParts = some.call(flags.parsedDateParts, function (i) {
+        var parsedParts = some$1.call(flags.parsedDateParts, function (i) {
             return i != null;
         });
         var isNowValid = !isNaN(m._d.getTime()) &&
@@ -58201,7 +58111,6 @@ function isValid(m) {
             !flags.empty &&
             !flags.invalidMonth &&
             !flags.invalidWeekday &&
-            !flags.weekdayMismatch &&
             !flags.nullInput &&
             !flags.invalidFormat &&
             !flags.userInvalidated &&
@@ -58467,6 +58376,8 @@ if (Object.keys) {
     };
 }
 
+var keys$1 = keys;
+
 var defaultCalendar = {
     sameDay : '[Today at] LT',
     nextDay : '[Tomorrow at] LT',
@@ -58590,6 +58501,56 @@ function getPrioritizedUnits(unitsObj) {
         return a.priority - b.priority;
     });
     return units;
+}
+
+function makeGetSet (unit, keepTime) {
+    return function (value) {
+        if (value != null) {
+            set$1(this, unit, value);
+            hooks.updateOffset(this, keepTime);
+            return this;
+        } else {
+            return get(this, unit);
+        }
+    };
+}
+
+function get (mom, unit) {
+    return mom.isValid() ?
+        mom._d['get' + (mom._isUTC ? 'UTC' : '') + unit]() : NaN;
+}
+
+function set$1 (mom, unit, value) {
+    if (mom.isValid()) {
+        mom._d['set' + (mom._isUTC ? 'UTC' : '') + unit](value);
+    }
+}
+
+// MOMENTS
+
+function stringGet (units) {
+    units = normalizeUnits(units);
+    if (isFunction(this[units])) {
+        return this[units]();
+    }
+    return this;
+}
+
+
+function stringSet (units, value) {
+    if (typeof units === 'object') {
+        units = normalizeObjectUnits(units);
+        var prioritized = getPrioritizedUnits(units);
+        for (var i = 0; i < prioritized.length; i++) {
+            this[prioritized[i].unit](units[prioritized[i].unit]);
+        }
+    } else {
+        units = normalizeUnits(units);
+        if (isFunction(this[units])) {
+            return this[units](value);
+        }
+    }
+    return this;
 }
 
 function zeroFill(number, targetLength, forceSign) {
@@ -58782,131 +58743,6 @@ var MILLISECOND = 6;
 var WEEK = 7;
 var WEEKDAY = 8;
 
-// FORMATTING
-
-addFormatToken('Y', 0, 0, function () {
-    var y = this.year();
-    return y <= 9999 ? '' + y : '+' + y;
-});
-
-addFormatToken(0, ['YY', 2], 0, function () {
-    return this.year() % 100;
-});
-
-addFormatToken(0, ['YYYY',   4],       0, 'year');
-addFormatToken(0, ['YYYYY',  5],       0, 'year');
-addFormatToken(0, ['YYYYYY', 6, true], 0, 'year');
-
-// ALIASES
-
-addUnitAlias('year', 'y');
-
-// PRIORITIES
-
-addUnitPriority('year', 1);
-
-// PARSING
-
-addRegexToken('Y',      matchSigned);
-addRegexToken('YY',     match1to2, match2);
-addRegexToken('YYYY',   match1to4, match4);
-addRegexToken('YYYYY',  match1to6, match6);
-addRegexToken('YYYYYY', match1to6, match6);
-
-addParseToken(['YYYYY', 'YYYYYY'], YEAR);
-addParseToken('YYYY', function (input, array) {
-    array[YEAR] = input.length === 2 ? hooks.parseTwoDigitYear(input) : toInt(input);
-});
-addParseToken('YY', function (input, array) {
-    array[YEAR] = hooks.parseTwoDigitYear(input);
-});
-addParseToken('Y', function (input, array) {
-    array[YEAR] = parseInt(input, 10);
-});
-
-// HELPERS
-
-function daysInYear(year) {
-    return isLeapYear(year) ? 366 : 365;
-}
-
-function isLeapYear(year) {
-    return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
-}
-
-// HOOKS
-
-hooks.parseTwoDigitYear = function (input) {
-    return toInt(input) + (toInt(input) > 68 ? 1900 : 2000);
-};
-
-// MOMENTS
-
-var getSetYear = makeGetSet('FullYear', true);
-
-function getIsLeapYear () {
-    return isLeapYear(this.year());
-}
-
-function makeGetSet (unit, keepTime) {
-    return function (value) {
-        if (value != null) {
-            set$1(this, unit, value);
-            hooks.updateOffset(this, keepTime);
-            return this;
-        } else {
-            return get(this, unit);
-        }
-    };
-}
-
-function get (mom, unit) {
-    return mom.isValid() ?
-        mom._d['get' + (mom._isUTC ? 'UTC' : '') + unit]() : NaN;
-}
-
-function set$1 (mom, unit, value) {
-    if (mom.isValid() && !isNaN(value)) {
-        if (unit === 'FullYear' && isLeapYear(mom.year())) {
-            mom._d['set' + (mom._isUTC ? 'UTC' : '') + unit](value, mom.month(), daysInMonth(value, mom.month()));
-        }
-        else {
-            mom._d['set' + (mom._isUTC ? 'UTC' : '') + unit](value);
-        }
-    }
-}
-
-// MOMENTS
-
-function stringGet (units) {
-    units = normalizeUnits(units);
-    if (isFunction(this[units])) {
-        return this[units]();
-    }
-    return this;
-}
-
-
-function stringSet (units, value) {
-    if (typeof units === 'object') {
-        units = normalizeObjectUnits(units);
-        var prioritized = getPrioritizedUnits(units);
-        for (var i = 0; i < prioritized.length; i++) {
-            this[prioritized[i].unit](units[prioritized[i].unit]);
-        }
-    } else {
-        units = normalizeUnits(units);
-        if (isFunction(this[units])) {
-            return this[units](value);
-        }
-    }
-    return this;
-}
-
-function mod(n, x) {
-    return ((n % x) + x) % x;
-}
-
 var indexOf;
 
 if (Array.prototype.indexOf) {
@@ -58924,13 +58760,10 @@ if (Array.prototype.indexOf) {
     };
 }
 
+var indexOf$1 = indexOf;
+
 function daysInMonth(year, month) {
-    if (isNaN(year) || isNaN(month)) {
-        return NaN;
-    }
-    var modMonth = mod(month, 12);
-    year += (month - modMonth) / 12;
-    return modMonth === 1 ? (isLeapYear(year) ? 29 : 28) : (31 - modMonth % 7 % 2);
+    return new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
 }
 
 // FORMATTING
@@ -59019,26 +58852,26 @@ function handleStrictParse(monthName, format, strict) {
 
     if (strict) {
         if (format === 'MMM') {
-            ii = indexOf.call(this._shortMonthsParse, llc);
+            ii = indexOf$1.call(this._shortMonthsParse, llc);
             return ii !== -1 ? ii : null;
         } else {
-            ii = indexOf.call(this._longMonthsParse, llc);
+            ii = indexOf$1.call(this._longMonthsParse, llc);
             return ii !== -1 ? ii : null;
         }
     } else {
         if (format === 'MMM') {
-            ii = indexOf.call(this._shortMonthsParse, llc);
+            ii = indexOf$1.call(this._shortMonthsParse, llc);
             if (ii !== -1) {
                 return ii;
             }
-            ii = indexOf.call(this._longMonthsParse, llc);
+            ii = indexOf$1.call(this._longMonthsParse, llc);
             return ii !== -1 ? ii : null;
         } else {
-            ii = indexOf.call(this._longMonthsParse, llc);
+            ii = indexOf$1.call(this._longMonthsParse, llc);
             if (ii !== -1) {
                 return ii;
             }
-            ii = indexOf.call(this._shortMonthsParse, llc);
+            ii = indexOf$1.call(this._shortMonthsParse, llc);
             return ii !== -1 ? ii : null;
         }
     }
@@ -59195,6 +59028,72 @@ function computeMonthsParse () {
     this._monthsShortRegex = this._monthsRegex;
     this._monthsStrictRegex = new RegExp('^(' + longPieces.join('|') + ')', 'i');
     this._monthsShortStrictRegex = new RegExp('^(' + shortPieces.join('|') + ')', 'i');
+}
+
+// FORMATTING
+
+addFormatToken('Y', 0, 0, function () {
+    var y = this.year();
+    return y <= 9999 ? '' + y : '+' + y;
+});
+
+addFormatToken(0, ['YY', 2], 0, function () {
+    return this.year() % 100;
+});
+
+addFormatToken(0, ['YYYY',   4],       0, 'year');
+addFormatToken(0, ['YYYYY',  5],       0, 'year');
+addFormatToken(0, ['YYYYYY', 6, true], 0, 'year');
+
+// ALIASES
+
+addUnitAlias('year', 'y');
+
+// PRIORITIES
+
+addUnitPriority('year', 1);
+
+// PARSING
+
+addRegexToken('Y',      matchSigned);
+addRegexToken('YY',     match1to2, match2);
+addRegexToken('YYYY',   match1to4, match4);
+addRegexToken('YYYYY',  match1to6, match6);
+addRegexToken('YYYYYY', match1to6, match6);
+
+addParseToken(['YYYYY', 'YYYYYY'], YEAR);
+addParseToken('YYYY', function (input, array) {
+    array[YEAR] = input.length === 2 ? hooks.parseTwoDigitYear(input) : toInt(input);
+});
+addParseToken('YY', function (input, array) {
+    array[YEAR] = hooks.parseTwoDigitYear(input);
+});
+addParseToken('Y', function (input, array) {
+    array[YEAR] = parseInt(input, 10);
+});
+
+// HELPERS
+
+function daysInYear(year) {
+    return isLeapYear(year) ? 366 : 365;
+}
+
+function isLeapYear(year) {
+    return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+}
+
+// HOOKS
+
+hooks.parseTwoDigitYear = function (input) {
+    return toInt(input) + (toInt(input) > 68 ? 1900 : 2000);
+};
+
+// MOMENTS
+
+var getSetYear = makeGetSet('FullYear', true);
+
+function getIsLeapYear () {
+    return isLeapYear(this.year());
 }
 
 function createDate (y, m, d, h, M, s, ms) {
@@ -59464,48 +59363,48 @@ function handleStrictParse$1(weekdayName, format, strict) {
 
     if (strict) {
         if (format === 'dddd') {
-            ii = indexOf.call(this._weekdaysParse, llc);
+            ii = indexOf$1.call(this._weekdaysParse, llc);
             return ii !== -1 ? ii : null;
         } else if (format === 'ddd') {
-            ii = indexOf.call(this._shortWeekdaysParse, llc);
+            ii = indexOf$1.call(this._shortWeekdaysParse, llc);
             return ii !== -1 ? ii : null;
         } else {
-            ii = indexOf.call(this._minWeekdaysParse, llc);
+            ii = indexOf$1.call(this._minWeekdaysParse, llc);
             return ii !== -1 ? ii : null;
         }
     } else {
         if (format === 'dddd') {
-            ii = indexOf.call(this._weekdaysParse, llc);
+            ii = indexOf$1.call(this._weekdaysParse, llc);
             if (ii !== -1) {
                 return ii;
             }
-            ii = indexOf.call(this._shortWeekdaysParse, llc);
+            ii = indexOf$1.call(this._shortWeekdaysParse, llc);
             if (ii !== -1) {
                 return ii;
             }
-            ii = indexOf.call(this._minWeekdaysParse, llc);
+            ii = indexOf$1.call(this._minWeekdaysParse, llc);
             return ii !== -1 ? ii : null;
         } else if (format === 'ddd') {
-            ii = indexOf.call(this._shortWeekdaysParse, llc);
+            ii = indexOf$1.call(this._shortWeekdaysParse, llc);
             if (ii !== -1) {
                 return ii;
             }
-            ii = indexOf.call(this._weekdaysParse, llc);
+            ii = indexOf$1.call(this._weekdaysParse, llc);
             if (ii !== -1) {
                 return ii;
             }
-            ii = indexOf.call(this._minWeekdaysParse, llc);
+            ii = indexOf$1.call(this._minWeekdaysParse, llc);
             return ii !== -1 ? ii : null;
         } else {
-            ii = indexOf.call(this._minWeekdaysParse, llc);
+            ii = indexOf$1.call(this._minWeekdaysParse, llc);
             if (ii !== -1) {
                 return ii;
             }
-            ii = indexOf.call(this._weekdaysParse, llc);
+            ii = indexOf$1.call(this._weekdaysParse, llc);
             if (ii !== -1) {
                 return ii;
             }
-            ii = indexOf.call(this._shortWeekdaysParse, llc);
+            ii = indexOf$1.call(this._shortWeekdaysParse, llc);
             return ii !== -1 ? ii : null;
         }
     }
@@ -59894,10 +59793,11 @@ function loadLocale(name) {
             module && module.exports) {
         try {
             oldLocale = globalLocale._abbr;
-            var aliasedRequire = _dereq_;
-            aliasedRequire('./locale/' + name);
+            _dereq_('./locale/' + name);
+            // because defineLocale currently also sets the global locale, we
+            // want to undo that for lazy loaded locales
             getSetGlobalLocale(oldLocale);
-        } catch (e) {}
+        } catch (e) { }
     }
     return locales[name];
 }
@@ -60023,7 +59923,7 @@ function getLocale (key) {
 }
 
 function listLocales() {
-    return keys(locales);
+    return keys$1(locales);
 }
 
 function checkOverflow (m) {
@@ -60054,154 +59954,6 @@ function checkOverflow (m) {
     }
 
     return m;
-}
-
-// Pick the first defined of two or three arguments.
-function defaults(a, b, c) {
-    if (a != null) {
-        return a;
-    }
-    if (b != null) {
-        return b;
-    }
-    return c;
-}
-
-function currentDateArray(config) {
-    // hooks is actually the exported moment object
-    var nowValue = new Date(hooks.now());
-    if (config._useUTC) {
-        return [nowValue.getUTCFullYear(), nowValue.getUTCMonth(), nowValue.getUTCDate()];
-    }
-    return [nowValue.getFullYear(), nowValue.getMonth(), nowValue.getDate()];
-}
-
-// convert an array to a date.
-// the array should mirror the parameters below
-// note: all values past the year are optional and will default to the lowest possible value.
-// [year, month, day , hour, minute, second, millisecond]
-function configFromArray (config) {
-    var i, date, input = [], currentDate, yearToUse;
-
-    if (config._d) {
-        return;
-    }
-
-    currentDate = currentDateArray(config);
-
-    //compute day of the year from weeks and weekdays
-    if (config._w && config._a[DATE] == null && config._a[MONTH] == null) {
-        dayOfYearFromWeekInfo(config);
-    }
-
-    //if the day of the year is set, figure out what it is
-    if (config._dayOfYear != null) {
-        yearToUse = defaults(config._a[YEAR], currentDate[YEAR]);
-
-        if (config._dayOfYear > daysInYear(yearToUse) || config._dayOfYear === 0) {
-            getParsingFlags(config)._overflowDayOfYear = true;
-        }
-
-        date = createUTCDate(yearToUse, 0, config._dayOfYear);
-        config._a[MONTH] = date.getUTCMonth();
-        config._a[DATE] = date.getUTCDate();
-    }
-
-    // Default to current date.
-    // * if no year, month, day of month are given, default to today
-    // * if day of month is given, default month and year
-    // * if month is given, default only year
-    // * if year is given, don't default anything
-    for (i = 0; i < 3 && config._a[i] == null; ++i) {
-        config._a[i] = input[i] = currentDate[i];
-    }
-
-    // Zero out whatever was not defaulted, including time
-    for (; i < 7; i++) {
-        config._a[i] = input[i] = (config._a[i] == null) ? (i === 2 ? 1 : 0) : config._a[i];
-    }
-
-    // Check for 24:00:00.000
-    if (config._a[HOUR] === 24 &&
-            config._a[MINUTE] === 0 &&
-            config._a[SECOND] === 0 &&
-            config._a[MILLISECOND] === 0) {
-        config._nextDay = true;
-        config._a[HOUR] = 0;
-    }
-
-    config._d = (config._useUTC ? createUTCDate : createDate).apply(null, input);
-    // Apply timezone offset from input. The actual utcOffset can be changed
-    // with parseZone.
-    if (config._tzm != null) {
-        config._d.setUTCMinutes(config._d.getUTCMinutes() - config._tzm);
-    }
-
-    if (config._nextDay) {
-        config._a[HOUR] = 24;
-    }
-
-    // check for mismatching day of week
-    if (config._w && typeof config._w.d !== 'undefined' && config._w.d !== config._d.getDay()) {
-        getParsingFlags(config).weekdayMismatch = true;
-    }
-}
-
-function dayOfYearFromWeekInfo(config) {
-    var w, weekYear, week, weekday, dow, doy, temp, weekdayOverflow;
-
-    w = config._w;
-    if (w.GG != null || w.W != null || w.E != null) {
-        dow = 1;
-        doy = 4;
-
-        // TODO: We need to take the current isoWeekYear, but that depends on
-        // how we interpret now (local, utc, fixed offset). So create
-        // a now version of current config (take local/utc/offset flags, and
-        // create now).
-        weekYear = defaults(w.GG, config._a[YEAR], weekOfYear(createLocal(), 1, 4).year);
-        week = defaults(w.W, 1);
-        weekday = defaults(w.E, 1);
-        if (weekday < 1 || weekday > 7) {
-            weekdayOverflow = true;
-        }
-    } else {
-        dow = config._locale._week.dow;
-        doy = config._locale._week.doy;
-
-        var curWeek = weekOfYear(createLocal(), dow, doy);
-
-        weekYear = defaults(w.gg, config._a[YEAR], curWeek.year);
-
-        // Default to current week.
-        week = defaults(w.w, curWeek.week);
-
-        if (w.d != null) {
-            // weekday -- low day numbers are considered next week
-            weekday = w.d;
-            if (weekday < 0 || weekday > 6) {
-                weekdayOverflow = true;
-            }
-        } else if (w.e != null) {
-            // local weekday -- counting starts from begining of week
-            weekday = w.e + dow;
-            if (w.e < 0 || w.e > 6) {
-                weekdayOverflow = true;
-            }
-        } else {
-            // default to begining of week
-            weekday = dow;
-        }
-    }
-    if (week < 1 || week > weeksInYear(weekYear, dow, doy)) {
-        getParsingFlags(config)._overflowWeeks = true;
-    } else if (weekdayOverflow != null) {
-        getParsingFlags(config)._overflowWeekday = true;
-    } else {
-        temp = dayOfYearFromWeeks(weekYear, week, weekday, dow, doy);
-        config._a[YEAR] = temp.year;
-        config._dayOfYear = temp.dayOfYear;
-    }
 }
 
 // iso 8601 regex
@@ -60295,94 +60047,70 @@ function configFromISO(config) {
 }
 
 // RFC 2822 regex: For details see https://tools.ietf.org/html/rfc2822#section-3.3
-var rfc2822 = /^(?:(Mon|Tue|Wed|Thu|Fri|Sat|Sun),?\s)?(\d{1,2})\s(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s(\d{2,4})\s(\d\d):(\d\d)(?::(\d\d))?\s(?:(UT|GMT|[ECMP][SD]T)|([Zz])|([+-]\d{4}))$/;
-
-function extractFromRFC2822Strings(yearStr, monthStr, dayStr, hourStr, minuteStr, secondStr) {
-    var result = [
-        untruncateYear(yearStr),
-        defaultLocaleMonthsShort.indexOf(monthStr),
-        parseInt(dayStr, 10),
-        parseInt(hourStr, 10),
-        parseInt(minuteStr, 10)
-    ];
-
-    if (secondStr) {
-        result.push(parseInt(secondStr, 10));
-    }
-
-    return result;
-}
-
-function untruncateYear(yearStr) {
-    var year = parseInt(yearStr, 10);
-    if (year <= 49) {
-        return 2000 + year;
-    } else if (year <= 999) {
-        return 1900 + year;
-    }
-    return year;
-}
-
-function preprocessRFC2822(s) {
-    // Remove comments and folding whitespace and replace multiple-spaces with a single space
-    return s.replace(/\([^)]*\)|[\n\t]/g, ' ').replace(/(\s\s+)/g, ' ').trim();
-}
-
-function checkWeekday(weekdayStr, parsedInput, config) {
-    if (weekdayStr) {
-        // TODO: Replace the vanilla JS Date object with an indepentent day-of-week check.
-        var weekdayProvided = defaultLocaleWeekdaysShort.indexOf(weekdayStr),
-            weekdayActual = new Date(parsedInput[0], parsedInput[1], parsedInput[2]).getDay();
-        if (weekdayProvided !== weekdayActual) {
-            getParsingFlags(config).weekdayMismatch = true;
-            config._isValid = false;
-            return false;
-        }
-    }
-    return true;
-}
-
-var obsOffsets = {
-    UT: 0,
-    GMT: 0,
-    EDT: -4 * 60,
-    EST: -5 * 60,
-    CDT: -5 * 60,
-    CST: -6 * 60,
-    MDT: -6 * 60,
-    MST: -7 * 60,
-    PDT: -7 * 60,
-    PST: -8 * 60
-};
-
-function calculateOffset(obsOffset, militaryOffset, numOffset) {
-    if (obsOffset) {
-        return obsOffsets[obsOffset];
-    } else if (militaryOffset) {
-        // the only allowed military tz is Z
-        return 0;
-    } else {
-        var hm = parseInt(numOffset, 10);
-        var m = hm % 100, h = (hm - m) / 100;
-        return h * 60 + m;
-    }
-}
+var basicRfcRegex = /^((?:Mon|Tue|Wed|Thu|Fri|Sat|Sun),?\s)?(\d?\d\s(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s(?:\d\d)?\d\d\s)(\d\d:\d\d)(\:\d\d)?(\s(?:UT|GMT|[ECMP][SD]T|[A-IK-Za-ik-z]|[+-]\d{4}))$/;
 
 // date and time from ref 2822 format
 function configFromRFC2822(config) {
-    var match = rfc2822.exec(preprocessRFC2822(config._i));
+    var string, match, dayFormat,
+        dateFormat, timeFormat, tzFormat;
+    var timezones = {
+        ' GMT': ' +0000',
+        ' EDT': ' -0400',
+        ' EST': ' -0500',
+        ' CDT': ' -0500',
+        ' CST': ' -0600',
+        ' MDT': ' -0600',
+        ' MST': ' -0700',
+        ' PDT': ' -0700',
+        ' PST': ' -0800'
+    };
+    var military = 'YXWVUTSRQPONZABCDEFGHIKLM';
+    var timezone, timezoneIndex;
+
+    string = config._i
+        .replace(/\([^\)]*\)|[\n\t]/g, ' ') // Remove comments and folding whitespace
+        .replace(/(\s\s+)/g, ' ') // Replace multiple-spaces with a single space
+        .replace(/^\s|\s$/g, ''); // Remove leading and trailing spaces
+    match = basicRfcRegex.exec(string);
+
     if (match) {
-        var parsedArray = extractFromRFC2822Strings(match[4], match[3], match[2], match[5], match[6], match[7]);
-        if (!checkWeekday(match[1], parsedArray, config)) {
-            return;
+        dayFormat = match[1] ? 'ddd' + ((match[1].length === 5) ? ', ' : ' ') : '';
+        dateFormat = 'D MMM ' + ((match[2].length > 10) ? 'YYYY ' : 'YY ');
+        timeFormat = 'HH:mm' + (match[4] ? ':ss' : '');
+
+        // TODO: Replace the vanilla JS Date object with an indepentent day-of-week check.
+        if (match[1]) { // day of week given
+            var momentDate = new Date(match[2]);
+            var momentDay = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][momentDate.getDay()];
+
+            if (match[1].substr(0,3) !== momentDay) {
+                getParsingFlags(config).weekdayMismatch = true;
+                config._isValid = false;
+                return;
+            }
         }
 
-        config._a = parsedArray;
-        config._tzm = calculateOffset(match[8], match[9], match[10]);
-
-        config._d = createUTCDate.apply(null, config._a);
-        config._d.setUTCMinutes(config._d.getUTCMinutes() - config._tzm);
-
+        switch (match[5].length) {
+            case 2: // military
+                if (timezoneIndex === 0) {
+                    timezone = ' +0000';
+                } else {
+                    timezoneIndex = military.indexOf(match[5][1].toUpperCase()) - 12;
+                    timezone = ((timezoneIndex < 0) ? ' -' : ' +') +
+                        (('' + timezoneIndex).replace(/^-?/, '0')).match(/..$/)[0] + '00';
+                }
+                break;
+            case 4: // Zone
+                timezone = timezones[match[5]];
+                break;
+            default: // UT or +/-9999
+                timezone = timezones[' GMT'];
+        }
+        match[5] = timezone;
+        config._i = match.splice(1).join('');
+        tzFormat = ' ZZ';
+        config._f = dayFormat + dateFormat + timeFormat + tzFormat;
+        configFromStringAndFormat(config);
         getParsingFlags(config).rfc2822 = true;
     } else {
         config._isValid = false;
@@ -60425,6 +60153,149 @@ hooks.createFromInputFallback = deprecate(
         config._d = new Date(config._i + (config._useUTC ? ' UTC' : ''));
     }
 );
+
+// Pick the first defined of two or three arguments.
+function defaults(a, b, c) {
+    if (a != null) {
+        return a;
+    }
+    if (b != null) {
+        return b;
+    }
+    return c;
+}
+
+function currentDateArray(config) {
+    // hooks is actually the exported moment object
+    var nowValue = new Date(hooks.now());
+    if (config._useUTC) {
+        return [nowValue.getUTCFullYear(), nowValue.getUTCMonth(), nowValue.getUTCDate()];
+    }
+    return [nowValue.getFullYear(), nowValue.getMonth(), nowValue.getDate()];
+}
+
+// convert an array to a date.
+// the array should mirror the parameters below
+// note: all values past the year are optional and will default to the lowest possible value.
+// [year, month, day , hour, minute, second, millisecond]
+function configFromArray (config) {
+    var i, date, input = [], currentDate, yearToUse;
+
+    if (config._d) {
+        return;
+    }
+
+    currentDate = currentDateArray(config);
+
+    //compute day of the year from weeks and weekdays
+    if (config._w && config._a[DATE] == null && config._a[MONTH] == null) {
+        dayOfYearFromWeekInfo(config);
+    }
+
+    //if the day of the year is set, figure out what it is
+    if (config._dayOfYear != null) {
+        yearToUse = defaults(config._a[YEAR], currentDate[YEAR]);
+
+        if (config._dayOfYear > daysInYear(yearToUse) || config._dayOfYear === 0) {
+            getParsingFlags(config)._overflowDayOfYear = true;
+        }
+
+        date = createUTCDate(yearToUse, 0, config._dayOfYear);
+        config._a[MONTH] = date.getUTCMonth();
+        config._a[DATE] = date.getUTCDate();
+    }
+
+    // Default to current date.
+    // * if no year, month, day of month are given, default to today
+    // * if day of month is given, default month and year
+    // * if month is given, default only year
+    // * if year is given, don't default anything
+    for (i = 0; i < 3 && config._a[i] == null; ++i) {
+        config._a[i] = input[i] = currentDate[i];
+    }
+
+    // Zero out whatever was not defaulted, including time
+    for (; i < 7; i++) {
+        config._a[i] = input[i] = (config._a[i] == null) ? (i === 2 ? 1 : 0) : config._a[i];
+    }
+
+    // Check for 24:00:00.000
+    if (config._a[HOUR] === 24 &&
+            config._a[MINUTE] === 0 &&
+            config._a[SECOND] === 0 &&
+            config._a[MILLISECOND] === 0) {
+        config._nextDay = true;
+        config._a[HOUR] = 0;
+    }
+
+    config._d = (config._useUTC ? createUTCDate : createDate).apply(null, input);
+    // Apply timezone offset from input. The actual utcOffset can be changed
+    // with parseZone.
+    if (config._tzm != null) {
+        config._d.setUTCMinutes(config._d.getUTCMinutes() - config._tzm);
+    }
+
+    if (config._nextDay) {
+        config._a[HOUR] = 24;
+    }
+}
+
+function dayOfYearFromWeekInfo(config) {
+    var w, weekYear, week, weekday, dow, doy, temp, weekdayOverflow;
+
+    w = config._w;
+    if (w.GG != null || w.W != null || w.E != null) {
+        dow = 1;
+        doy = 4;
+
+        // TODO: We need to take the current isoWeekYear, but that depends on
+        // how we interpret now (local, utc, fixed offset). So create
+        // a now version of current config (take local/utc/offset flags, and
+        // create now).
+        weekYear = defaults(w.GG, config._a[YEAR], weekOfYear(createLocal(), 1, 4).year);
+        week = defaults(w.W, 1);
+        weekday = defaults(w.E, 1);
+        if (weekday < 1 || weekday > 7) {
+            weekdayOverflow = true;
+        }
+    } else {
+        dow = config._locale._week.dow;
+        doy = config._locale._week.doy;
+
+        var curWeek = weekOfYear(createLocal(), dow, doy);
+
+        weekYear = defaults(w.gg, config._a[YEAR], curWeek.year);
+
+        // Default to current week.
+        week = defaults(w.w, curWeek.week);
+
+        if (w.d != null) {
+            // weekday -- low day numbers are considered next week
+            weekday = w.d;
+            if (weekday < 0 || weekday > 6) {
+                weekdayOverflow = true;
+            }
+        } else if (w.e != null) {
+            // local weekday -- counting starts from begining of week
+            weekday = w.e + dow;
+            if (w.e < 0 || w.e > 6) {
+                weekdayOverflow = true;
+            }
+        } else {
+            // default to begining of week
+            weekday = dow;
+        }
+    }
+    if (week < 1 || week > weeksInYear(weekYear, dow, doy)) {
+        getParsingFlags(config)._overflowWeeks = true;
+    } else if (weekdayOverflow != null) {
+        getParsingFlags(config)._overflowWeekday = true;
+    } else {
+        temp = dayOfYearFromWeeks(weekYear, week, weekday, dow, doy);
+        config._a[YEAR] = temp.year;
+        config._dayOfYear = temp.dayOfYear;
+    }
+}
 
 // constant that refers to the ISO standard
 hooks.ISO_8601 = function () {};
@@ -60750,7 +60621,7 @@ var ordering = ['year', 'quarter', 'month', 'week', 'day', 'hour', 'minute', 'se
 
 function isDurationValid(m) {
     for (var key in m) {
-        if (!(indexOf.call(ordering, key) !== -1 && (m[key] == null || !isNaN(m[key])))) {
+        if (!(ordering.indexOf(key) !== -1 && (m[key] == null || !isNaN(m[key])))) {
             return false;
         }
     }
@@ -60801,7 +60672,7 @@ function Duration (duration) {
     // day when working around DST, we need to store them separately
     this._days = +days +
         weeks * 7;
-    // It is impossible to translate months into days without knowing
+    // It is impossible translate months into days without knowing
     // which months you are are talking about, so we have to store
     // it separately.
     this._months = +months +
@@ -61048,12 +60919,12 @@ function isUtc () {
 }
 
 // ASP.NET json date format regex
-var aspNetRegex = /^(\-|\+)?(?:(\d*)[. ])?(\d+)\:(\d+)(?:\:(\d+)(\.\d*)?)?$/;
+var aspNetRegex = /^(\-)?(?:(\d*)[. ])?(\d+)\:(\d+)(?:\:(\d+)(\.\d*)?)?$/;
 
 // from http://docs.closure-library.googlecode.com/git/closure_goog_date_date.js.source.html
 // somewhat more in line with 4.4.3.2 2004 spec, but allows decimal anywhere
 // and further modified to allow for strings containing both week and day
-var isoRegex = /^(-|\+)?P(?:([-+]?[0-9,.]*)Y)?(?:([-+]?[0-9,.]*)M)?(?:([-+]?[0-9,.]*)W)?(?:([-+]?[0-9,.]*)D)?(?:T(?:([-+]?[0-9,.]*)H)?(?:([-+]?[0-9,.]*)M)?(?:([-+]?[0-9,.]*)S)?)?$/;
+var isoRegex = /^(-)?P(?:(-?[0-9,.]*)Y)?(?:(-?[0-9,.]*)M)?(?:(-?[0-9,.]*)W)?(?:(-?[0-9,.]*)D)?(?:T(?:(-?[0-9,.]*)H)?(?:(-?[0-9,.]*)M)?(?:(-?[0-9,.]*)S)?)?$/;
 
 function createDuration (input, key) {
     var duration = input,
@@ -61087,7 +60958,7 @@ function createDuration (input, key) {
             ms : toInt(absRound(match[MILLISECOND] * 1000)) * sign // the millisecond decimal point is included in the match
         };
     } else if (!!(match = isoRegex.exec(input))) {
-        sign = (match[1] === '-') ? -1 : (match[1] === '+') ? 1 : 1;
+        sign = (match[1] === '-') ? -1 : 1;
         duration = {
             y : parseIso(match[2], sign),
             M : parseIso(match[3], sign),
@@ -61190,14 +61061,14 @@ function addSubtract (mom, duration, isAdding, updateOffset) {
 
     updateOffset = updateOffset == null ? true : updateOffset;
 
-    if (months) {
-        setMonth(mom, get(mom, 'Month') + months * isAdding);
+    if (milliseconds) {
+        mom._d.setTime(mom._d.valueOf() + milliseconds * isAdding);
     }
     if (days) {
         set$1(mom, 'Date', get(mom, 'Date') + days * isAdding);
     }
-    if (milliseconds) {
-        mom._d.setTime(mom._d.valueOf() + milliseconds * isAdding);
+    if (months) {
+        setMonth(mom, get(mom, 'Month') + months * isAdding);
     }
     if (updateOffset) {
         hooks.updateOffset(mom, days || months);
@@ -61307,18 +61178,22 @@ function diff (input, units, asFloat) {
 
     units = normalizeUnits(units);
 
-    switch (units) {
-        case 'year': output = monthDiff(this, that) / 12; break;
-        case 'month': output = monthDiff(this, that); break;
-        case 'quarter': output = monthDiff(this, that) / 3; break;
-        case 'second': output = (this - that) / 1e3; break; // 1000
-        case 'minute': output = (this - that) / 6e4; break; // 1000 * 60
-        case 'hour': output = (this - that) / 36e5; break; // 1000 * 60 * 60
-        case 'day': output = (this - that - zoneDelta) / 864e5; break; // 1000 * 60 * 60 * 24, negate dst
-        case 'week': output = (this - that - zoneDelta) / 6048e5; break; // 1000 * 60 * 60 * 24 * 7, negate dst
-        default: output = this - that;
+    if (units === 'year' || units === 'month' || units === 'quarter') {
+        output = monthDiff(this, that);
+        if (units === 'quarter') {
+            output = output / 3;
+        } else if (units === 'year') {
+            output = output / 12;
+        }
+    } else {
+        delta = this - that;
+        output = units === 'second' ? delta / 1e3 : // 1000
+            units === 'minute' ? delta / 6e4 : // 1000 * 60
+            units === 'hour' ? delta / 36e5 : // 1000 * 60 * 60
+            units === 'day' ? (delta - zoneDelta) / 864e5 : // 1000 * 60 * 60 * 24, negate dst
+            units === 'week' ? (delta - zoneDelta) / 6048e5 : // 1000 * 60 * 60 * 24 * 7, negate dst
+            delta;
     }
-
     return asFloat ? output : absFloor(output);
 }
 
@@ -62296,10 +62171,6 @@ var asWeeks        = makeAs('w');
 var asMonths       = makeAs('M');
 var asYears        = makeAs('y');
 
-function clone$1 () {
-    return createDuration(this);
-}
-
 function get$2 (units) {
     units = normalizeUnits(units);
     return this.isValid() ? this[units + 's']() : NaN;
@@ -62409,10 +62280,6 @@ function humanize (withSuffix) {
 
 var abs$1 = Math.abs;
 
-function sign(x) {
-    return ((x > 0) - (x < 0)) || +x;
-}
-
 function toISOString$1() {
     // for ISO strings we do not use the normal bubbling rules:
     //  * milliseconds bubble up until they become hours
@@ -62447,7 +62314,7 @@ function toISOString$1() {
     var D = days;
     var h = hours;
     var m = minutes;
-    var s = seconds ? seconds.toFixed(3).replace(/\.?0+$/, '') : '';
+    var s = seconds;
     var total = this.asSeconds();
 
     if (!total) {
@@ -62456,19 +62323,15 @@ function toISOString$1() {
         return 'P0D';
     }
 
-    var totalSign = total < 0 ? '-' : '';
-    var ymSign = sign(this._months) !== sign(total) ? '-' : '';
-    var daysSign = sign(this._days) !== sign(total) ? '-' : '';
-    var hmsSign = sign(this._milliseconds) !== sign(total) ? '-' : '';
-
-    return totalSign + 'P' +
-        (Y ? ymSign + Y + 'Y' : '') +
-        (M ? ymSign + M + 'M' : '') +
-        (D ? daysSign + D + 'D' : '') +
+    return (total < 0 ? '-' : '') +
+        'P' +
+        (Y ? Y + 'Y' : '') +
+        (M ? M + 'M' : '') +
+        (D ? D + 'D' : '') +
         ((h || m || s) ? 'T' : '') +
-        (h ? hmsSign + h + 'H' : '') +
-        (m ? hmsSign + m + 'M' : '') +
-        (s ? hmsSign + s + 'S' : '');
+        (h ? h + 'H' : '') +
+        (m ? m + 'M' : '') +
+        (s ? s + 'S' : '');
 }
 
 var proto$2 = Duration.prototype;
@@ -62488,7 +62351,6 @@ proto$2.asMonths       = asMonths;
 proto$2.asYears        = asYears;
 proto$2.valueOf        = valueOf$1;
 proto$2._bubble        = bubble;
-proto$2.clone          = clone$1;
 proto$2.get            = get$2;
 proto$2.milliseconds   = milliseconds;
 proto$2.seconds        = seconds;
@@ -62530,7 +62392,7 @@ addParseToken('x', function (input, array, config) {
 // Side effect imports
 
 
-hooks.version = '2.19.1';
+hooks.version = '2.18.1';
 
 setHookCallback(createLocal);
 
@@ -62557,7 +62419,7 @@ hooks.updateLocale          = updateLocale;
 hooks.locales               = listLocales;
 hooks.weekdaysShort         = listWeekdaysShort;
 hooks.normalizeUnits        = normalizeUnits;
-hooks.relativeTimeRounding  = getSetRelativeTimeRounding;
+hooks.relativeTimeRounding = getSetRelativeTimeRounding;
 hooks.relativeTimeThreshold = getSetRelativeTimeThreshold;
 hooks.calendarFormat        = getCalendarFormat;
 hooks.prototype             = proto;
@@ -66802,192 +66664,6 @@ ngFileUpload.service('UploadExif', ['UploadResize', '$q', function (UploadResize
 _dereq_('./dist/ng-file-upload-all');
 module.exports = 'ngFileUpload';
 },{"./dist/ng-file-upload-all":251}],253:[function(_dereq_,module,exports){
-// shim for using process in browser
-var process = module.exports = {};
-
-// cached from whatever global is present so that test runners that stub it
-// don't break things.  But we need to wrap it in a try catch in case it is
-// wrapped in strict mode code which doesn't define any globals.  It's inside a
-// function because try/catches deoptimize in certain engines.
-
-var cachedSetTimeout;
-var cachedClearTimeout;
-
-function defaultSetTimout() {
-    throw new Error('setTimeout has not been defined');
-}
-function defaultClearTimeout () {
-    throw new Error('clearTimeout has not been defined');
-}
-(function () {
-    try {
-        if (typeof setTimeout === 'function') {
-            cachedSetTimeout = setTimeout;
-        } else {
-            cachedSetTimeout = defaultSetTimout;
-        }
-    } catch (e) {
-        cachedSetTimeout = defaultSetTimout;
-    }
-    try {
-        if (typeof clearTimeout === 'function') {
-            cachedClearTimeout = clearTimeout;
-        } else {
-            cachedClearTimeout = defaultClearTimeout;
-        }
-    } catch (e) {
-        cachedClearTimeout = defaultClearTimeout;
-    }
-} ())
-function runTimeout(fun) {
-    if (cachedSetTimeout === setTimeout) {
-        //normal enviroments in sane situations
-        return setTimeout(fun, 0);
-    }
-    // if setTimeout wasn't available but was latter defined
-    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-        cachedSetTimeout = setTimeout;
-        return setTimeout(fun, 0);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedSetTimeout(fun, 0);
-    } catch(e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-            return cachedSetTimeout.call(null, fun, 0);
-        } catch(e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-            return cachedSetTimeout.call(this, fun, 0);
-        }
-    }
-
-
-}
-function runClearTimeout(marker) {
-    if (cachedClearTimeout === clearTimeout) {
-        //normal enviroments in sane situations
-        return clearTimeout(marker);
-    }
-    // if clearTimeout wasn't available but was latter defined
-    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-        cachedClearTimeout = clearTimeout;
-        return clearTimeout(marker);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedClearTimeout(marker);
-    } catch (e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-            return cachedClearTimeout.call(null, marker);
-        } catch (e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-            return cachedClearTimeout.call(this, marker);
-        }
-    }
-
-
-
-}
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
-
-function cleanUpNextTick() {
-    if (!draining || !currentQueue) {
-        return;
-    }
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
-}
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = runTimeout(cleanUpNextTick);
-    draining = true;
-
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            if (currentQueue) {
-                currentQueue[queueIndex].run();
-            }
-        }
-        queueIndex = -1;
-        len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    runClearTimeout(timeout);
-}
-
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
-        }
-    }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-        runTimeout(drainQueue);
-    }
-};
-
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
-}
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
-};
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-process.prependListener = noop;
-process.prependOnceListener = noop;
-
-process.listeners = function (name) { return [] }
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
-
-},{}],254:[function(_dereq_,module,exports){
 module.exports = function (obj) {
     if (!obj || typeof obj !== 'object') return obj;
     
@@ -67024,9 +66700,9 @@ var isArray = Array.isArray || function (xs) {
     return {}.toString.call(xs) === '[object Array]';
 };
 
-},{}],255:[function(_dereq_,module,exports){
+},{}],254:[function(_dereq_,module,exports){
 /*!
- * Signature Pad v2.3.2
+ * Signature Pad v1.6.0
  * https://github.com/szimek/signature_pad
  *
  * Copyright 2017 Szymon Nowak
@@ -67061,10 +66737,6 @@ Point.prototype.velocityFrom = function (start) {
 
 Point.prototype.distanceTo = function (start) {
   return Math.sqrt(Math.pow(this.x - start.x, 2) + Math.pow(this.y - start.y, 2));
-};
-
-Point.prototype.equals = function (other) {
-  return this.x === other.x && this.y === other.y && this.time === other.time;
 };
 
 function Bezier(startPoint, control1, control2, endPoint) {
@@ -67102,41 +66774,6 @@ Bezier.prototype._point = function (t, start, c1, c2, end) {
   return start * (1.0 - t) * (1.0 - t) * (1.0 - t) + 3.0 * c1 * (1.0 - t) * (1.0 - t) * t + 3.0 * c2 * (1.0 - t) * t * t + end * t * t * t;
 };
 
-/* eslint-disable */
-
-// http://stackoverflow.com/a/27078401/815507
-function throttle(func, wait, options) {
-  var context, args, result;
-  var timeout = null;
-  var previous = 0;
-  if (!options) options = {};
-  var later = function later() {
-    previous = options.leading === false ? 0 : Date.now();
-    timeout = null;
-    result = func.apply(context, args);
-    if (!timeout) context = args = null;
-  };
-  return function () {
-    var now = Date.now();
-    if (!previous && options.leading === false) previous = now;
-    var remaining = wait - (now - previous);
-    context = this;
-    args = arguments;
-    if (remaining <= 0 || remaining > wait) {
-      if (timeout) {
-        clearTimeout(timeout);
-        timeout = null;
-      }
-      previous = now;
-      result = func.apply(context, args);
-      if (!timeout) context = args = null;
-    } else if (!timeout && options.trailing !== false) {
-      timeout = setTimeout(later, remaining);
-    }
-    return result;
-  };
-}
-
 function SignaturePad(canvas, options) {
   var self = this;
   var opts = options || {};
@@ -67144,15 +66781,6 @@ function SignaturePad(canvas, options) {
   this.velocityFilterWeight = opts.velocityFilterWeight || 0.7;
   this.minWidth = opts.minWidth || 0.5;
   this.maxWidth = opts.maxWidth || 2.5;
-  this.throttle = 'throttle' in opts ? opts.throttle : 16; // in miliseconds
-  this.minDistance = 'minDistance' in opts ? opts.minDistance : 5;
-
-  if (this.throttle) {
-    this._strokeMoveUpdate = throttle(SignaturePad.prototype._strokeUpdate, this.throttle);
-  } else {
-    this._strokeMoveUpdate = SignaturePad.prototype._strokeUpdate;
-  }
-
   this.dotSize = opts.dotSize || function () {
     return (this.minWidth + this.maxWidth) / 2;
   };
@@ -67176,7 +66804,7 @@ function SignaturePad(canvas, options) {
 
   this._handleMouseMove = function (event) {
     if (self._mouseButtonDown) {
-      self._strokeMoveUpdate(event);
+      self._strokeUpdate(event);
     }
   };
 
@@ -67199,7 +66827,7 @@ function SignaturePad(canvas, options) {
     event.preventDefault();
 
     var touch = event.targetTouches[0];
-    self._strokeMoveUpdate(touch);
+    self._strokeUpdate(touch);
   };
 
   this._handleTouchEnd = function (event) {
@@ -67231,12 +66859,10 @@ SignaturePad.prototype.clear = function () {
 SignaturePad.prototype.fromDataURL = function (dataUrl) {
   var _this = this;
 
-  var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
   var image = new Image();
-  var ratio = options.ratio || window.devicePixelRatio || 1;
-  var width = options.width || this._canvas.width / ratio;
-  var height = options.height || this._canvas.height / ratio;
+  var ratio = window.devicePixelRatio || 1;
+  var width = this._canvas.width / ratio;
+  var height = this._canvas.height / ratio;
 
   this._reset();
   image.src = dataUrl;
@@ -67296,51 +66922,28 @@ SignaturePad.prototype._strokeUpdate = function (event) {
   var y = event.clientY;
 
   var point = this._createPoint(x, y);
-  var lastPointGroup = this._data[this._data.length - 1];
-  var lastPoint = lastPointGroup && lastPointGroup[lastPointGroup.length - 1];
-  var isLastPointTooClose = lastPoint && point.distanceTo(lastPoint) < this.minDistance;
 
-  // Skip this point if it's too close to the previous one
-  if (!(lastPoint && isLastPointTooClose)) {
-    var _addPoint = this._addPoint(point),
-        curve = _addPoint.curve,
-        widths = _addPoint.widths;
+  var _addPoint = this._addPoint(point),
+      curve = _addPoint.curve,
+      widths = _addPoint.widths;
 
-    if (curve && widths) {
-      this._drawCurve(curve, widths.start, widths.end);
-    }
-
-    this._data[this._data.length - 1].push({
-      x: point.x,
-      y: point.y,
-      time: point.time,
-      color: this.penColor
-    });
+  if (curve && widths) {
+    this._drawCurve(curve, widths.start, widths.end);
   }
+
+  this._data[this._data.length - 1].push({
+    x: point.x,
+    y: point.y,
+    time: point.time
+  });
 };
 
 SignaturePad.prototype._strokeEnd = function (event) {
   var canDrawCurve = this.points.length > 2;
-  var point = this.points[0]; // Point instance
+  var point = this.points[0];
 
   if (!canDrawCurve && point) {
     this._drawDot(point);
-  }
-
-  if (point) {
-    var lastPointGroup = this._data[this._data.length - 1];
-    var lastPoint = lastPointGroup[lastPointGroup.length - 1]; // plain object
-
-    // When drawing a dot, there's only one point in a group, so without this check
-    // such group would end up with exactly the same 2 points.
-    if (!point.equals(lastPoint)) {
-      lastPointGroup.push({
-        x: point.x,
-        y: point.y,
-        time: point.time,
-        color: this.penColor
-      });
-    }
   }
 
   if (typeof this.onEnd === 'function') {
@@ -67516,16 +67119,10 @@ SignaturePad.prototype._fromData = function (pointGroups, drawCurve, drawDot) {
       for (var j = 0; j < group.length; j += 1) {
         var rawPoint = group[j];
         var point = new Point(rawPoint.x, rawPoint.y, rawPoint.time);
-        var color = rawPoint.color;
 
         if (j === 0) {
           // First point in a group. Nothing to draw yet.
-
-          // All points in the group have the same color, so it's enough to set
-          // penColor just at the beginning.
-          this.penColor = color;
           this._reset();
-
           this._addPoint(point);
         } else if (j !== group.length - 1) {
           // Middle point in a group.
@@ -67534,7 +67131,7 @@ SignaturePad.prototype._fromData = function (pointGroups, drawCurve, drawDot) {
               widths = _addPoint2.widths;
 
           if (curve && widths) {
-            drawCurve(curve, widths, color);
+            drawCurve(curve, widths);
           }
         } else {
           // Last point in a group. Do nothing.
@@ -67563,7 +67160,7 @@ SignaturePad.prototype._toSVG = function () {
   svg.setAttributeNS(null, 'width', canvas.width);
   svg.setAttributeNS(null, 'height', canvas.height);
 
-  this._fromData(pointGroups, function (curve, widths, color) {
+  this._fromData(pointGroups, function (curve, widths) {
     var path = document.createElement('path');
 
     // Need to check curve for NaN values, these pop up when drawing
@@ -67574,7 +67171,7 @@ SignaturePad.prototype._toSVG = function () {
 
       path.setAttribute('d', attr);
       path.setAttribute('stroke-width', (widths.end * 2.25).toFixed(3));
-      path.setAttribute('stroke', color);
+      path.setAttribute('stroke', _this2.penColor);
       path.setAttribute('fill', 'none');
       path.setAttribute('stroke-linecap', 'round');
 
@@ -67586,7 +67183,7 @@ SignaturePad.prototype._toSVG = function () {
     circle.setAttribute('r', dotSize);
     circle.setAttribute('cx', rawPoint.x);
     circle.setAttribute('cy', rawPoint.y);
-    circle.setAttribute('fill', rawPoint.color);
+    circle.setAttribute('fill', _this2.penColor);
 
     svg.appendChild(circle);
   });
@@ -67624,8 +67221,6 @@ SignaturePad.prototype.fromData = function (pointGroups) {
   }, function (rawPoint) {
     return _this3._drawDot(rawPoint);
   });
-
-  this._data = pointGroups;
 };
 
 SignaturePad.prototype.toData = function () {
@@ -67636,7 +67231,7 @@ return SignaturePad;
 
 })));
 
-},{}],256:[function(_dereq_,module,exports){
+},{}],255:[function(_dereq_,module,exports){
 /*!
  * ui-select
  * http://github.com/angular-ui/ui-select
@@ -70064,7 +69659,7 @@ $templateCache.put("selectize/match.tpl.html","<div ng-hide=\"$select.searchEnab
 $templateCache.put("selectize/no-choice.tpl.html","<div class=\"ui-select-no-choice selectize-dropdown\" ng-show=\"$select.items.length == 0\"><div class=\"selectize-dropdown-content\"><div data-selectable=\"\" ng-transclude=\"\"></div></div></div>");
 $templateCache.put("selectize/select-multiple.tpl.html","<div class=\"ui-select-container selectize-control multi plugin-remove_button\" ng-class=\"{\'open\': $select.open}\"><div class=\"selectize-input\" ng-class=\"{\'focus\': $select.open, \'disabled\': $select.disabled, \'selectize-focus\' : $select.focus}\" ng-click=\"$select.open && !$select.searchEnabled ? $select.toggle($event) : $select.activate()\"><div class=\"ui-select-match\"></div><input type=\"search\" autocomplete=\"off\" tabindex=\"-1\" class=\"ui-select-search\" ng-class=\"{\'ui-select-search-hidden\':!$select.searchEnabled}\" placeholder=\"{{$selectMultiple.getPlaceholder()}}\" ng-model=\"$select.search\" ng-disabled=\"$select.disabled\" aria-expanded=\"{{$select.open}}\" aria-label=\"{{ $select.baseTitle }}\" ondrop=\"return false;\"></div><div class=\"ui-select-choices\"></div><div class=\"ui-select-no-choice\"></div></div>");
 $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container selectize-control single\" ng-class=\"{\'open\': $select.open}\"><div class=\"selectize-input\" ng-class=\"{\'focus\': $select.open, \'disabled\': $select.disabled, \'selectize-focus\' : $select.focus}\" ng-click=\"$select.open && !$select.searchEnabled ? $select.toggle($event) : $select.activate()\"><div class=\"ui-select-match\"></div><input type=\"search\" autocomplete=\"off\" tabindex=\"-1\" class=\"ui-select-search ui-select-toggle\" ng-class=\"{\'ui-select-search-hidden\':!$select.searchEnabled}\" ng-click=\"$select.toggle($event)\" placeholder=\"{{$select.placeholder}}\" ng-model=\"$select.search\" ng-hide=\"!$select.isEmpty() && !$select.open\" ng-disabled=\"$select.disabled\" aria-label=\"{{ $select.baseTitle }}\"></div><div class=\"ui-select-choices\"></div><div class=\"ui-select-no-choice\"></div></div>");}]);
-},{}],257:[function(_dereq_,module,exports){
+},{}],256:[function(_dereq_,module,exports){
 (function(self) {
   'use strict';
 
@@ -70527,7 +70122,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
   self.fetch.polyfill = true
 })(typeof self !== 'undefined' ? self : this);
 
-},{}],258:[function(_dereq_,module,exports){
+},{}],257:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -70616,7 +70211,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],259:[function(_dereq_,module,exports){
+},{}],258:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -70822,7 +70417,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],260:[function(_dereq_,module,exports){
+},{}],259:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -70902,7 +70497,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],261:[function(_dereq_,module,exports){
+},{}],260:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -70988,7 +70583,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":309}],262:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":308}],261:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.provider('formioComponents', function() {
@@ -71048,7 +70643,7 @@ module.exports = function(app) {
   }]);
 };
 
-},{}],263:[function(_dereq_,module,exports){
+},{}],262:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -71114,7 +70709,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":309}],264:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":308}],263:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -71143,7 +70738,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],265:[function(_dereq_,module,exports){
+},{}],264:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -71254,7 +70849,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],266:[function(_dereq_,module,exports){
+},{}],265:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -71282,7 +70877,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":309}],267:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":308}],266:[function(_dereq_,module,exports){
 "use strict";
 
 var formioUtils = _dereq_('formiojs/utils');
@@ -71415,7 +71010,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"formiojs/utils":36}],268:[function(_dereq_,module,exports){
+},{"formiojs/utils":36}],267:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -71573,7 +71168,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],269:[function(_dereq_,module,exports){
+},{}],268:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -71780,7 +71375,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],270:[function(_dereq_,module,exports){
+},{}],269:[function(_dereq_,module,exports){
 "use strict";
 
 var formioUtils = _dereq_('formiojs/utils');
@@ -72164,7 +71759,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"formiojs/utils":36}],271:[function(_dereq_,module,exports){
+},{"formiojs/utils":36}],270:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -72198,7 +71793,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],272:[function(_dereq_,module,exports){
+},{}],271:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -72253,7 +71848,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":309}],273:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":308}],272:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -72519,7 +72114,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],274:[function(_dereq_,module,exports){
+},{}],273:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -72705,7 +72300,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":309}],275:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":308}],274:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -72741,7 +72336,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":309}],276:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":308}],275:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -72833,7 +72428,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],277:[function(_dereq_,module,exports){
+},{}],276:[function(_dereq_,module,exports){
 "use strict";
 var app = angular.module('formio');
 
@@ -72878,7 +72473,7 @@ _dereq_('./panel')(app);
 _dereq_('./table')(app);
 _dereq_('./well')(app);
 
-},{"./address":258,"./button":259,"./checkbox":260,"./columns":261,"./components":262,"./container":263,"./content":264,"./currency":265,"./custom":266,"./datagrid":267,"./datetime":268,"./day":269,"./editgrid":270,"./email":271,"./fieldset":272,"./file":273,"./form":274,"./hidden":275,"./htmlelement":276,"./number":278,"./page":279,"./panel":280,"./password":281,"./phonenumber":282,"./radio":283,"./resource":284,"./select":285,"./selectboxes":286,"./signature":287,"./survey":288,"./table":289,"./textarea":290,"./textfield":291,"./time":292,"./well":293}],278:[function(_dereq_,module,exports){
+},{"./address":257,"./button":258,"./checkbox":259,"./columns":260,"./components":261,"./container":262,"./content":263,"./currency":264,"./custom":265,"./datagrid":266,"./datetime":267,"./day":268,"./editgrid":269,"./email":270,"./fieldset":271,"./file":272,"./form":273,"./hidden":274,"./htmlelement":275,"./number":277,"./page":278,"./panel":279,"./password":280,"./phonenumber":281,"./radio":282,"./resource":283,"./select":284,"./selectboxes":285,"./signature":286,"./survey":287,"./table":288,"./textarea":289,"./textfield":290,"./time":291,"./well":292}],277:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -72943,7 +72538,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],279:[function(_dereq_,module,exports){
+},{}],278:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -72970,7 +72565,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],280:[function(_dereq_,module,exports){
+},{}],279:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -73026,7 +72621,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":309}],281:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":308}],280:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -73057,7 +72652,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],282:[function(_dereq_,module,exports){
+},{}],281:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -73093,7 +72688,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],283:[function(_dereq_,module,exports){
+},{}],282:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -73144,7 +72739,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],284:[function(_dereq_,module,exports){
+},{}],283:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -73372,7 +72967,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],285:[function(_dereq_,module,exports){
+},{}],284:[function(_dereq_,module,exports){
 "use strict";
 /*eslint max-depth: ["error", 6]*/
 
@@ -73591,9 +73186,13 @@ module.exports = function(app) {
             };
 
             // Ensures that the value is within the select items.
-            var ensureValue = function() {
-              var value = $scope.data[settings.key];
+            var ensureValue = function(value) {
+              value = value || $scope.data[settings.key];
               if (!value || (Array.isArray(value) && value.length === 0)) {
+                return;
+              }
+              if (Array.isArray(value)) {
+                value.forEach(ensureValue);
                 return;
               }
               // Iterate through the list of items and see if our value exists...
@@ -73995,7 +73594,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"lodash/assign":199,"lodash/cloneDeep":204,"lodash/get":209,"lodash/isEqual":217,"lodash/mapValues":234,"lodash/set":239}],286:[function(_dereq_,module,exports){
+},{"lodash/assign":199,"lodash/cloneDeep":204,"lodash/get":209,"lodash/isEqual":217,"lodash/mapValues":234,"lodash/set":239}],285:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -74103,7 +73702,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],287:[function(_dereq_,module,exports){
+},{}],286:[function(_dereq_,module,exports){
 "use strict";
 
 var SignaturePad = _dereq_('signature_pad');
@@ -74245,7 +73844,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"signature_pad":255}],288:[function(_dereq_,module,exports){
+},{"signature_pad":254}],287:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -74306,7 +73905,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],289:[function(_dereq_,module,exports){
+},{}],288:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -74386,7 +73985,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":309}],290:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":308}],289:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -74512,7 +74111,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],291:[function(_dereq_,module,exports){
+},{}],290:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -74573,7 +74172,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],292:[function(_dereq_,module,exports){
+},{}],291:[function(_dereq_,module,exports){
 "use strict";
 
 var moment = _dereq_('moment');
@@ -74645,7 +74244,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"moment":248}],293:[function(_dereq_,module,exports){
+},{"moment":248}],292:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -74698,7 +74297,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":309}],294:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":308}],293:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -74776,7 +74375,7 @@ module.exports = function() {
   };
 };
 
-},{}],295:[function(_dereq_,module,exports){
+},{}],294:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -75183,7 +74782,7 @@ module.exports = function() {
   };
 };
 
-},{}],296:[function(_dereq_,module,exports){
+},{}],295:[function(_dereq_,module,exports){
 "use strict";
 module.exports = ['$sce', '$parse', '$compile', function($sce, $parse, $compile) {
   return {
@@ -75200,7 +74799,7 @@ module.exports = ['$sce', '$parse', '$compile', function($sce, $parse, $compile)
   };
 }];
 
-},{}],297:[function(_dereq_,module,exports){
+},{}],296:[function(_dereq_,module,exports){
 "use strict";
 var _get = _dereq_('lodash/get');
 
@@ -75468,7 +75067,7 @@ module.exports = [
   }
 ];
 
-},{"lodash/get":209}],298:[function(_dereq_,module,exports){
+},{"lodash/get":209}],297:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -75484,7 +75083,7 @@ module.exports = function() {
   };
 };
 
-},{}],299:[function(_dereq_,module,exports){
+},{}],298:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'formioComponents',
@@ -75557,7 +75156,7 @@ module.exports = [
   }
 ];
 
-},{}],300:[function(_dereq_,module,exports){
+},{}],299:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -75641,7 +75240,7 @@ module.exports = function() {
   };
 };
 
-},{}],301:[function(_dereq_,module,exports){
+},{}],300:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$compile',
@@ -75660,7 +75259,7 @@ module.exports = [
   }
 ];
 
-},{}],302:[function(_dereq_,module,exports){
+},{}],301:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -75670,7 +75269,7 @@ module.exports = function() {
   };
 };
 
-},{}],303:[function(_dereq_,module,exports){
+},{}],302:[function(_dereq_,module,exports){
 "use strict";
 var _map = _dereq_('lodash/map');
 // Javascript editor directive
@@ -75746,7 +75345,7 @@ module.exports = ['FormioUtils', function(FormioUtils) {
   };
 }];
 
-},{"lodash/map":233}],304:[function(_dereq_,module,exports){
+},{"lodash/map":233}],303:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -75778,7 +75377,7 @@ module.exports = function() {
   };
 };
 
-},{}],305:[function(_dereq_,module,exports){
+},{}],304:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -75834,7 +75433,7 @@ module.exports = function() {
   };
 };
 
-},{}],306:[function(_dereq_,module,exports){
+},{}],305:[function(_dereq_,module,exports){
 "use strict";
 var isNaN = _dereq_('lodash/isNAN');
 var isFinite = _dereq_('lodash/isFinite');
@@ -76453,7 +76052,7 @@ module.exports = function() {
   };
 };
 
-},{"lodash/isEmpty":216,"lodash/isFinite":219,"lodash/isNAN":222}],307:[function(_dereq_,module,exports){
+},{"lodash/isEmpty":216,"lodash/isFinite":219,"lodash/isNAN":222}],306:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -76637,7 +76236,7 @@ module.exports = [
   }
 ];
 
-},{}],308:[function(_dereq_,module,exports){
+},{}],307:[function(_dereq_,module,exports){
 "use strict";
 var formioUtils = _dereq_('formiojs/utils');
 var _filter = _dereq_('lodash/filter');
@@ -77025,7 +76624,7 @@ module.exports = function() {
   };
 };
 
-},{"formiojs/utils":36,"lodash/filter":208,"lodash/get":209}],309:[function(_dereq_,module,exports){
+},{"formiojs/utils":36,"lodash/filter":208,"lodash/get":209}],308:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   var generic = function(data, component) {
@@ -77151,7 +76750,7 @@ module.exports = function() {
   };
 };
 
-},{}],310:[function(_dereq_,module,exports){
+},{}],309:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$q',
@@ -77200,7 +76799,7 @@ module.exports = [
   }
 ];
 
-},{}],311:[function(_dereq_,module,exports){
+},{}],310:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -77234,7 +76833,7 @@ module.exports = [
   }
 ];
 
-},{}],312:[function(_dereq_,module,exports){
+},{}],311:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'FormioUtils',
@@ -77243,7 +76842,7 @@ module.exports = [
   }
 ];
 
-},{}],313:[function(_dereq_,module,exports){
+},{}],312:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$sce',
@@ -77256,7 +76855,7 @@ module.exports = [
   }
 ];
 
-},{}],314:[function(_dereq_,module,exports){
+},{}],313:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   function() {
@@ -77275,7 +76874,7 @@ module.exports = [
   }
 ];
 
-},{}],315:[function(_dereq_,module,exports){
+},{}],314:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'formioTableView',
@@ -77288,7 +76887,7 @@ module.exports = [
   }
 ];
 
-},{}],316:[function(_dereq_,module,exports){
+},{}],315:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -77303,7 +76902,7 @@ module.exports = [
   }
 ];
 
-},{}],317:[function(_dereq_,module,exports){
+},{}],316:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$filter',
@@ -77360,7 +76959,7 @@ module.exports = [
   }
 ];
 
-},{}],318:[function(_dereq_,module,exports){
+},{}],317:[function(_dereq_,module,exports){
 "use strict";
 module.exports = ['$sce', function($sce) {
   return function(val) {
@@ -77368,7 +76967,7 @@ module.exports = ['$sce', function($sce) {
   };
 }];
 
-},{}],319:[function(_dereq_,module,exports){
+},{}],318:[function(_dereq_,module,exports){
 "use strict";
 _dereq_('angular-ui-mask/dist/mask');
 _dereq_('ui-select/dist/select');
@@ -77384,7 +76983,7 @@ _dereq_('ng-dialog');
 _dereq_('angular-ui-ace/src/ui-ace');
 _dereq_('./formio');
 
-},{"./formio":320,"angular-ckeditor":1,"angular-file-saver":2,"angular-moment":3,"angular-sanitize":5,"angular-ui-ace/src/ui-ace":6,"angular-ui-bootstrap":8,"angular-ui-mask/dist/mask":9,"bootstrap":13,"bootstrap-ui-datetime-picker/dist/datetime-picker":12,"ng-dialog":250,"ng-file-upload":252,"ui-select/dist/select":256}],320:[function(_dereq_,module,exports){
+},{"./formio":319,"angular-ckeditor":1,"angular-file-saver":2,"angular-moment":3,"angular-sanitize":5,"angular-ui-ace/src/ui-ace":6,"angular-ui-bootstrap":8,"angular-ui-mask/dist/mask":9,"bootstrap":13,"bootstrap-ui-datetime-picker/dist/datetime-picker":12,"ng-dialog":250,"ng-file-upload":252,"ui-select/dist/select":255}],319:[function(_dereq_,module,exports){
 "use strict";
 _dereq_('./polyfills/polyfills');
 
@@ -77542,7 +77141,7 @@ app.run([
 
 _dereq_('./components');
 
-},{"./components":277,"./directives/customValidator":294,"./directives/formio":295,"./directives/formioBindHtml.js":296,"./directives/formioComponent":297,"./directives/formioComponentTooltip":298,"./directives/formioComponentView":299,"./directives/formioDelete":300,"./directives/formioElement":301,"./directives/formioErrors":302,"./directives/formioScriptEditor":303,"./directives/formioSubmission":304,"./directives/formioSubmissions":305,"./directives/formioWizard":306,"./factories/FormioScope":307,"./factories/FormioUtils":308,"./factories/formioInterceptor":310,"./factories/formioTableView":311,"./filters/flattenComponents":312,"./filters/safehtml":313,"./filters/tableComponents":314,"./filters/tableFieldView":315,"./filters/tableView":316,"./filters/translate":317,"./filters/trusturl":318,"./polyfills/polyfills":322,"./providers/Formio":323}],321:[function(_dereq_,module,exports){
+},{"./components":276,"./directives/customValidator":293,"./directives/formio":294,"./directives/formioBindHtml.js":295,"./directives/formioComponent":296,"./directives/formioComponentTooltip":297,"./directives/formioComponentView":298,"./directives/formioDelete":299,"./directives/formioElement":300,"./directives/formioErrors":301,"./directives/formioScriptEditor":302,"./directives/formioSubmission":303,"./directives/formioSubmissions":304,"./directives/formioWizard":305,"./factories/FormioScope":306,"./factories/FormioUtils":307,"./factories/formioInterceptor":309,"./factories/formioTableView":310,"./filters/flattenComponents":311,"./filters/safehtml":312,"./filters/tableComponents":313,"./filters/tableFieldView":314,"./filters/tableView":315,"./filters/translate":316,"./filters/trusturl":317,"./polyfills/polyfills":321,"./providers/Formio":322}],320:[function(_dereq_,module,exports){
 "use strict";
 'use strict';
 
@@ -77573,13 +77172,13 @@ if (typeof Object.assign != 'function') {
   })();
 }
 
-},{}],322:[function(_dereq_,module,exports){
+},{}],321:[function(_dereq_,module,exports){
 "use strict";
 'use strict';
 
 _dereq_('./Object.assign');
 
-},{"./Object.assign":321}],323:[function(_dereq_,module,exports){
+},{"./Object.assign":320}],322:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   // The formio class.
@@ -77649,5 +77248,5 @@ module.exports = function() {
   };
 };
 
-},{"formiojs":28}]},{},[319])(319)
+},{"formiojs":28}]},{},[318])(318)
 });
