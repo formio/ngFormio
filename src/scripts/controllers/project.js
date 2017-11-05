@@ -321,14 +321,15 @@ app.controller('ProjectController', [
       return plans.indexOf(checkProject.plan) >= plans.indexOf(plan);
     };
 
-    $scope._saveProject = function(project) {
+    $scope._saveProject = function(project, formio) {
       if (!project._id) { return FormioAlerts.onError(new Error('No Project found.')); }
       if ($scope.status.save === 'saving') {
         return;
       }
 
+      formio = formio || (new Formio('/project/' + project._id));
       $scope.status.save = 'saving';
-      return (new Formio('/project/' + project._id)).saveProject(angular.copy(project))
+      return formio.saveProject(angular.copy(project))
         .then(function(project) {
           FormioAlerts.addAlert({
             type: 'success',
@@ -343,11 +344,11 @@ app.controller('ProjectController', [
     };
 
     $scope.saveProject = function() {
-      return $scope._saveProject($scope.currentProject);
+      return $scope._saveProject($scope.currentProject, $scope.formio);
     };
 
     $scope.saveLocalProject = function() {
-      return $scope._saveProject($scope.localProject);
+      return $scope._saveProject($scope.localProject, $scope.localFormio);
     };
 
     $scope.switchEnv = function(environmentId) {
@@ -2048,16 +2049,16 @@ app.controller('ProjectSettingsController', [
           pool: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
         })
       });
-      $scope._saveProject($scope.currentProject);
+      $scope._saveProject($scope.currentProject, $scope.formio);
     };
 
     $scope.removeKey = function($index) {
       $scope.currentProject.settings.keys.splice($index, 1);
-      $scope._saveProject($scope.currentProject);
+      $scope._saveProject($scope.currentProject, $scope.formio);
     };
 
     $scope.updateProject = function() {
-      $scope._saveProject($scope.currentProject);
+      $scope._saveProject($scope.currentProject, $scope.formio);
     };
 
     // Save the Project.
@@ -2067,7 +2068,7 @@ app.controller('ProjectSettingsController', [
         $scope.currentProject.name = $scope.currentProject.name.toLowerCase().replace(/[^0-9a-z\-]|^\-+|\-+$/g, '');
       }
 
-      $scope._saveProject($scope.currentProject).then(function(project) {
+      $scope._saveProject($scope.currentProject, $scope.formio).then(function(project) {
         $state.go($state.current.name, {
           projectId: project._id
         }, {reload: true});
@@ -2286,10 +2287,11 @@ app.controller('PrimaryProjectSettingsController', [
 
     $scope.primaryProjectPromise.then(function(primaryProject) {
       $scope.project = _.clone(primaryProject);
+      $scope.formio = new Formio('/project/' + primaryProject._id);
     });
 
     $scope.saveProject = function() {
-      return $scope._saveProject($scope.project).then(function(project) {
+      return $scope._saveProject($scope.project, $scope.formio).then(function(project) {
         $state.go('project.overview', null, { reload: true, inherit: true, notify: true });
       });
     };
