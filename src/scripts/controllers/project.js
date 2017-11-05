@@ -2069,9 +2069,7 @@ app.controller('ProjectSettingsController', [
       }
 
       $scope._saveProject($scope.currentProject, $scope.formio).then(function(project) {
-        $state.go($state.current.name, {
-          projectId: project._id
-        }, {reload: true});
+        $state.go($state.current.name, null, {reload: true});
       });
     };
 
