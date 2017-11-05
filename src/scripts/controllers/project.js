@@ -2731,6 +2731,7 @@ app.controller('ProjectBilling', [
 
     PDFServer.getInfo($scope.primaryProjectPromise).then(function(info) {
       $scope.pdfInfo = info.data;
+      $scope.pdfInfoOriginalPlan = $scope.pdfInfo.plan;
       calculatePrice();
     });
 
