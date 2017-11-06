@@ -221,9 +221,6 @@ input[type="password"][draggable="true"] {
 .bs-wizard > .bs-wizard-step.disabled a.bs-wizard-dot{ pointer-events: none; }
 /*END Form Wizard*/
 
-
-
-
 @media (max-width: 767px) {
   .col-sm-1.bs-wizard-step,
   .col-sm-2.bs-wizard-step,
