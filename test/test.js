@@ -38,7 +38,7 @@ describe("Formio Tests", function () {
   require('./features/loginFunctionality.spec')(actions);
   require('./features/userPortalandWelcome.spec')(actions);
   require('./features/feedbackrequest.spec')(actions);
-  require('./features/documentationLinks.spec')(actions);
+  //require('./features/documentationLinks.spec')(actions);
   require('./features/profileFunctionality.spec')(actions);
   //require('./features/project.spec')(actions);
   //require('./features/projectSettings.spec')(actions);
