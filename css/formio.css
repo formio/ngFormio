@@ -241,6 +241,10 @@ input[type="password"][draggable="true"] {
     width: 16.66667%;
   }
 
+  .col-sm-1.bs-wizard-step {
+    width: 8.33333%;
+  }
+
   /*.bs-wizard > .bs-wizard-step:first-child {*/
   /*margin-left: 24.999999995%; */
   /*}*/
