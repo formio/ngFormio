@@ -2741,3 +2741,28 @@ app.controller('ProjectBilling', [
     $scope.$watch('selectedPlan', calculatePrice, true);
   }
 ]);
+
+app.controller('ProjectExportController', [
+  '$scope',
+  '$http',
+  function(
+    $scope,
+    $http
+  ) {
+    $scope.downloadTemplate = function() {
+      $http({
+        url: $scope.projectUrl + '/export',
+        method: 'GET',
+        responseType: 'blob'
+      }).then(function(response) {
+        var a = document.createElement('a');
+        a.href = window.URL.createObjectURL(response.data);
+        a.download = $scope.currentProject.name + '-' + $scope.currentProject.tag + '.json';
+        a.click();
+        window.URL.revokeObjectURL(a.href);
+      }).catch(function(error) {
+        console.error(error);
+      });
+    };
+  }
+]);
