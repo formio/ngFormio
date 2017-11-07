@@ -2134,7 +2134,9 @@ app.controller('ProjectRemoteController', [
 
     $scope.insecureWarning = false;
     $scope.$watch('remote.url', function(url) {
-      $scope.insecureWarning = url.indexOf('http:') !== -1 && window.location.protocol === 'https:';
+      if (url) {
+        $scope.insecureWarning = url.indexOf('http:') !== -1 && window.location.protocol === 'https:';
+      }
     });
 
     $scope.check = function() {
