@@ -34,6 +34,7 @@ before(function (next) {
 });
 
 describe("Formio Tests", function () {
+  this.retries(3);
   require('./features/register.spec')(actions);
   require('./features/loginFunctionality.spec')(actions);
   require('./features/userPortalandWelcome.spec')(actions);

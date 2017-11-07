@@ -789,26 +789,30 @@ app.controller('ProjectOverviewController', [
         {
           $limit: 10
         },
-      ]).then(function(result) {
-        $scope.submissions = result.data || [];
+      ])
+        .then(function(result) {
+          $scope.submissions = result.data || [];
 
-        if ($scope.submissions.length) {
-          var formIds = _.uniq($scope.submissions.map(function(submission) {
-            return submission.form;
-          }));
+          if ($scope.submissions.length) {
+            var formIds = _.uniq($scope.submissions.map(function(submission) {
+              return submission.form;
+            }));
 
-          $scope.formio.loadForms({
-            params: {
-              _id__in: formIds
-            }
-          }).then(function(results) {
-            $scope.forms = {};
-            results.forEach(function(form) {
-              $scope.forms[form._id] = form;
+            $scope.formio.loadForms({
+              params: {
+                _id__in: formIds
+              }
+            }).then(function(results) {
+              $scope.forms = {};
+              results.forEach(function(form) {
+                $scope.forms[form._id] = form;
+              });
             });
-          });
-        }
-      });
+          }
+        })
+        .catch(function(err) {
+          console.warn('Unable to get recent submissions', err);
+        });
     });
   }
 ]);
@@ -2134,7 +2138,9 @@ app.controller('ProjectRemoteController', [
 
     $scope.insecureWarning = false;
     $scope.$watch('remote.url', function(url) {
-      $scope.insecureWarning = url.indexOf('http:') !== -1 && window.location.protocol === 'https:';
+      if (url) {
+        $scope.insecureWarning = url.indexOf('http:') !== -1 && window.location.protocol === 'https:';
+      }
     });
 
     $scope.check = function() {
@@ -2737,5 +2743,30 @@ app.controller('ProjectBilling', [
 
     $scope.$watch('servers', calculatePrice, true);
     $scope.$watch('selectedPlan', calculatePrice, true);
+  }
+]);
+
+app.controller('ProjectExportController', [
+  '$scope',
+  '$http',
+  function(
+    $scope,
+    $http
+  ) {
+    $scope.downloadTemplate = function() {
+      $http({
+        url: $scope.projectUrl + '/export',
+        method: 'GET',
+        responseType: 'blob'
+      }).then(function(response) {
+        var a = document.createElement('a');
+        a.href = window.URL.createObjectURL(response.data);
+        a.download = $scope.currentProject.name + '-' + $scope.currentProject.tag + '.json';
+        a.click();
+        window.URL.revokeObjectURL(a.href);
+      }).catch(function(error) {
+        console.error(error);
+      });
+    };
   }
 ]);

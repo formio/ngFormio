@@ -364,7 +364,8 @@ angular
         .state('project.env.staging.export', {
           url: '/staging/export',
           parent: 'project.env',
-          templateUrl: 'views/project/env/staging/export.html'
+          templateUrl: 'views/project/env/staging/export.html',
+          controller: 'ProjectExportController'
         })
         .state('project.env.logs', {
           url: '/logs',
