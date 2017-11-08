@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
  - Display custom validation error message.
 
+## 2.24.1
+### Fixed
+ - Scroll bars for form appearing every time.
+ - Fix ensure value on select component when it is a multiple field.
+ - Issue with validation not working with selectboxes. Also how form is submitted.
+ - Fixed Wizard Progress Bar on Mobile
+
 ## 2.24.0
 ### Changed
  - Upgraded all dependencies.

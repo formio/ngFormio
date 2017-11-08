@@ -18,18 +18,7 @@ module.exports = function(app) {
       templateUrl: 'formio/components/selectboxes-directive.html',
       link: function($scope, el, attrs, ngModel) {
         if ($scope.options && $scope.options.building) return;
-        // Initialize model
-        var model = {};
-        angular.forEach($scope.component.values, function(v) {
-          model[v.value] = ngModel.$viewValue.hasOwnProperty(v.value)
-            ? !!ngModel.$viewValue[v.value]
-            : false;
-        });
-        // FA-835 - Update the view model with our defaults.
-        // FA-921 - Attempt to load a current model, if present before the defaults.
-        ngModel.$setViewValue($scope.model || model);
 
-        ngModel.$setPristine(true);
         ngModel.$isEmpty = function(value) {
           if (typeof value === 'undefined') {
             return true;
@@ -39,6 +28,22 @@ module.exports = function(app) {
             return !value[key];
           });
         };
+
+        // Initialize model
+        var model = {};
+        angular.forEach($scope.component.values, function(v) {
+          model[v.value] = ngModel.$viewValue.hasOwnProperty(v.value)
+            ? !!ngModel.$viewValue[v.value]
+            : false;
+        });
+
+        var modelValue = $scope.model || model;
+        if (!ngModel.$isEmpty(modelValue)) {
+          // FA-835 - Update the view model with our defaults.
+          // FA-921 - Attempt to load a current model, if present before the defaults.
+          ngModel.$setViewValue(modelValue);
+          ngModel.$setPristine(true);
+        }
 
         $scope.toggleCheckbox = function(value) {
           var _model = angular.copy(ngModel.$viewValue || {});
