@@ -328,26 +328,31 @@ module.exports = function() {
     },
     fieldWrap: function(input) {
       var multiInput = input.replace('data[component.key]', 'data[component.key][$index]');
-      var inputLabel = '<label ng-if="options.building || (component.label && !component.hideLabel)" for="{{ component.key }}" class="control-label" ng-class="{\'field-required\': isRequired(component)}">' +
+      var inputTopLabel = '<label ng-if="options.building || (component.label && !component.hideLabel && component.labelPosition !== \'bottom\')" for="{{ component.key }}" class="control-label" ng-class="{\'field-required\': isRequired(component)}" ng-style="getLabelStyles(component)">' +
+        '{{ component.label | formioTranslate:null:options.building }} ' +
+        '<formio-component-tooltip></formio-component-tooltip>' +
+        '</label>';
+      var inputBottomLabel = '<label ng-if="options.building || (component.label && !component.hideLabel && component.labelPosition === \'bottom\')" for="{{ component.key }}" class="control-label" ng-class="{\'field-required\': isRequired(component)}" style="margin-top: 5px; margin-bottom: 0">' +
         '{{ component.label | formioTranslate:null:options.building }} ' +
         '<formio-component-tooltip></formio-component-tooltip>' +
         '</label>';
       var requiredInline = '<span ng-if="(component.hideLabel === true || component.label === \'\' || !component.label) && isRequired(component)" class="glyphicon glyphicon-asterisk form-control-feedback field-required-inline" aria-hidden="true"></span>';
       var template =
         '<div ng-if="!component.multiple">' +
-          inputLabel +
-          '<div class="input-group">' +
+          inputTopLabel +
+          '<div class="input-group" ng-style="getInputGroupStyles(component)">' +
             '<div class="input-group-addon" ng-if="!!component.prefix">{{ component.prefix }}</div>' +
             input +
             requiredInline +
             '<div class="input-group-addon" ng-if="!!component.suffix">{{ component.suffix }}</div>' +
           '</div>' +
+          inputBottomLabel +
           '<div class="formio-errors">' +
             '<formio-errors ng-if="::!options.building"></formio-errors>' +
           '</div>' +
         '</div>' +
         '<div ng-if="component.multiple"><table class="table table-bordered">' +
-          inputLabel +
+          inputTopLabel +
           '<tr ng-repeat="value in data[component.key] track by $index">' +
             '<td>' +
               '<div class="input-group">' +
