@@ -332,7 +332,7 @@ module.exports = function() {
         '{{ component.label | formioTranslate:null:options.building }} ' +
         '<formio-component-tooltip></formio-component-tooltip>' +
         '</label>';
-      var inputBottomLabel = '<label ng-if="options.building || (component.label && !component.hideLabel && component.labelPosition === \'bottom\')" for="{{ component.key }}" class="control-label" ng-class="{\'field-required\': isRequired(component)}" style="margin-top: 5px; margin-bottom: 0">' +
+        var inputBottomLabel = '<label ng-if="options.building || (component.label && !component.hideLabel && component.labelPosition === \'bottom\')" for="{{ component.key }}" class="control-label control-label--bottom" ng-class="{\'field-required\': isRequired(component)}">' +
         '{{ component.label | formioTranslate:null:options.building }} ' +
         '<formio-component-tooltip></formio-component-tooltip>' +
         '</label>';

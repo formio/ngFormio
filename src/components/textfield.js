@@ -14,7 +14,6 @@ module.exports = function(app) {
           inputType: 'text',
           inputMask: '',
           label: '',
-          labelPosition: 'top',
           key: 'textField',
           placeholder: '',
           prefix: '',

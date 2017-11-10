@@ -161,9 +161,18 @@ module.exports = [
             var labelPosition = _get(component, 'labelPosition');
             
             if (labelOnTheLeftOrRight(labelPosition)) {
-              return {
-                width: (100 - getComponentLabelWidth(component) - getComponentLabelMargin(component)) + '%'
-              };
+              var totalLabelWidth = getComponentLabelWidth(component) + getComponentLabelMargin(component);
+              var styles = {
+                width: (100 - totalLabelWidth) + '%'
+              }
+
+              if (labelOnTheLeft(labelPosition)) {
+                styles['margin-left'] = totalLabelWidth + '%';
+              } else {
+                styles['margin-right'] = totalLabelWidth + '%';
+              }
+
+              return styles;
             }
           };
 
