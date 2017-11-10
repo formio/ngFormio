@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
  - Display custom validation error message.
 
+## 2.24.2
+### Fixed
+ - Removed the css for overflow on formio forms.
+
 ## 2.24.1
 ### Fixed
  - Scroll bars for form appearing every time.

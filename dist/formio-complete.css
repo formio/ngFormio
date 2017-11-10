@@ -671,10 +671,6 @@ body > .ui-select-bootstrap.open {
   -webkit-animation: none 0s;
 }
 
-.formio-form {
-  overflow: auto;
-}
-
 .ngdialog.ngdialog-theme-default .ngdialog-content {
   width: 65%;
 }
