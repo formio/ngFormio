@@ -22,10 +22,12 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('New Project');
       actions.enterTextInField('#title','basicProject');
       actions.clickOnElementWithText(' Create Project');
+      actions.enableAngular(true);
       actions.clickOnElementWithText('Trial');
       actions.upgradeToPlan("Basic");
       actions.clickOnElementWithText(' Confirm Billing Change');
       actions.waitForActionToComplete(2000);
+      actions.iSeeTextIn("a.project-plan.label-info","Basic");
       actions.enableAngular(false);
       actions.clickOnElementWithText('Settings');
       actions.checkElementIsDisabled('//*[@id="form-group-title"]/input');
@@ -33,7 +35,7 @@ module.exports = function (actions) {
       actions.checkElement('//*[@id="protect"]');
       actions.iSeeElement('i.fa.fa-shield.ng-scope');
       actions.clickOnElementWithText(' Save Stage');
-      actions.iSeeText('Project saved.');
+      // actions.iSeeText('Project saved.');
       actions.waitForActionToComplete(2000);
       actions.clickOnElementWithText('Forms');
       actions.checkElementWithTextIsDisabled(' New Form');
@@ -60,6 +62,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Settings');
       actions.checkElement('//*[@id="protect"]');
       actions.clickOnElementWithText(' Save Stage');
+      actions.waitForActionToComplete(2000);
       actions.clickOnElementWithText('Staging');
       actions.iSeeText('Upgrade your project to Enterprise to enable deploying to stages.');
       actions.clickOnElementWithText('Create Version Tag');
