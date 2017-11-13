@@ -4,7 +4,7 @@ module.exports = function (actions) {
       actions.logout();
       actions.iAmLoggedInFor('formuser1');
       actions.goToPage('#/');
-      actions.clickOnClass('new-project-custom');
+      actions.clickOnElementWithText('New Project');
       actions.iSeeText('Project Title');
       actions.iSeeText('Description');
       actions.enterTextInField('#title', '${random-title>primaryproject1.title}');
