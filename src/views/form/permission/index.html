@@ -5,64 +5,44 @@
     </div>
   </div>
 </div>
-<div class="panel panel-primary" ng-if="form.type === 'resource'">
-  <div class="panel-heading">
-    <h3 class="panel-title">Self Access Permissions
-      <a class="pull-right" href="https://help.form.io/userguide/roles-and-permissions/#selfaccesspermissions" target="_blank">
-        <i class="glyphicon glyphicon-question-sign"></i>
-      </a>
-    </h3>
-  </div>
-  <div class="panel-body">
-    <div class="well">
-      Self Access Permissions allow Submissions of this Resource to access themselves, as the owner. You can define granular access control with the Own Submission permissions below.
-    </div>
-    <div ng-if="form._id" class="checkbox">
-      <label>
-        <input type="checkbox" ng-model="selfAccessPermissions" ng-change="toggleSelfAccessPermissions()">
-        Enable
-      </label>
-    </div>
-  </div>
-</div>
-<div class="panel panel-info">
-  <div class="panel-heading">
-    <h3 class="panel-title">Submission Permissions
-      <a class="pull-right" href="https://help.form.io/userguide/roles-and-permissions/#permissions" target="_blank">
-        <i class="glyphicon glyphicon-question-sign"></i>
-      </a>
-    </h3>
-  </div>
-  <div class="panel-body">
-    <div class="well">
-      User Permissions allow you to control who can create, view, and modify form submissions. Here you may assign Project Roles to permissions. <strong>Roles</strong> can be created and edited in <a ui-sref="project.settings.roles.view({projectId: currentProject._id})">Project Settings</a>.
-    </div>
-    <div ng-if="form._id">
-      <permission-editor permissions="form.submissionAccess" labels="submissionAccessLabels" roles="currentProjectRoles" wait-for="loadFormPromise"></permission-editor>
+
+<div class="row">
+  <div class="col-md-8">
+    <div class="panel panel-info">
+      <div class="panel-heading">
+        <h3 class="panel-title">Submission Data Permissions
+          <a class="pull-right" href="https://help.form.io/userguide/roles-and-permissions/#permissions" target="_blank">
+            <i class="glyphicon glyphicon-question-sign"></i>
+          </a>
+        </h3>
+      </div>
+      <div class="panel-body">
+        <div ng-if="form._id">
+          <permission-editor permissions="form.submissionAccess" labels="submissionAccessLabels" roles="currentProjectRoles" wait-for="loadFormPromise"></permission-editor>
+        </div>
+      </div>
     </div>
   </div>
-</div>
-<div class="panel panel-success">
-  <div class="panel-heading">
-    <h3 class="panel-title">Submission Resource Access
-      <a class="pull-right" href="https://help.form.io/userguide/roles-and-permissions/#submissionpermissions" target="_blank">
-        <i class="glyphicon glyphicon-question-sign"></i>
-      </a>
-    </h3>
-  </div>
-  <div class="panel-body">
-    <div class="well">
-      User Resource Permissions allow you to give a specific resource access to a single submission. The resource type is chosen here, and the resource itself is selected on the Submission.
-    </div>
-    <div ng-if="form._id">
-      <resource-permission-editor labels="resourceAccessLabels" resources="currentFormResources" wait-for="loadFormPromise" form="form"></resource-permission-editor>
+  <div class="col-md-4">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h3 class="panel-title">About Submission Data Permissions</h3>
+      </div>
+      <div class="panel-body">
+        <p>Submission Data Permissions allow you to control who can create, view, and modify form submission data. </p>
+        <ul>
+          <li><strong>Own Permissions</strong> - These permissions apply if the user is the original creator of the submission data and is listed as the owner of the submission in <strong>submission.owner</strong>. This allows users to create and edit their own submission data without seeing other user's data.</li>
+          <li><strong>All Permissions</strong> - These permissions apply to all submission data regardless of who owns it.</li>
+        </ul>
+        <p>Here you may assign Project Roles to permissions. <strong>Roles</strong> can be created and edited in <a ui-sref="project.access({projectId: currentProject._id})">Project Access</a>.</p>
+      </div>
     </div>
   </div>
 </div>
 
-
-
-<div class="panel panel-default">
+<div class="row">
+  <div class="col-md-8">
+    <div class="panel panel-default">
   <div class="panel-heading">
     <h3 class="panel-title">Form Definition Access
       <a class="pull-right" href="https://help.form.io/userguide/roles-and-permissions/#permissions" target="_blank">
@@ -71,19 +51,90 @@
     </h3>
   </div>
   <div class="panel-body">
-    <div class="well">
-      These permissions allow you to give a specific access to a single form.
-    </div>
     <div ng-if="form._id">
       <permission-editor permissions="form.access" labels="accessLabels" permission-filter="'read_all,read_form,update_all,delete_all,read_own,update_own,delete_own'" roles="currentProjectRoles" wait-for="loadFormPromise" form="form"></permission-editor>
     </div>
   </div>
 </div>
+  </div>
+  <div class="col-md-4">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h3 class="panel-title">About Form Definition Access</h3>
+      </div>
+      <div class="panel-body">
+        <p>These permissions allow you to give access to a single form's JSON definition so they can render the form.</p>
+        <p>Typically you will want to allow all of your roles to be able to Read the form definition.</p>
+        <p>Each form also has an owner at <strong>form.owner</strong> which is the user who created the form. In some applications users are allowed to create their own forms. In those cases it is helpful to have Owner based permissions as well.</p>
+      </div>
+    </div>
+  </div>
+</div>
 
+<div class="row" ng-if="form.type === 'resource'">
+  <div class="col-md-8">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h3 class="panel-title">Self Access Permissions
+          <a class="pull-right" href="https://help.form.io/userguide/roles-and-permissions/#selfaccesspermissions" target="_blank">
+            <i class="glyphicon glyphicon-question-sign"></i>
+          </a>
+        </h3>
+      </div>
+      <div class="panel-body">
+        <div class="well">
+          <p>Self Access Permissions allow Submissions of this Resource to access themselves, as the owner. You can define granular access control with the Own Submission permissions below.</p>
+        </div>
+        <div ng-if="form._id" class="checkbox">
+          <label>
+            <input type="checkbox" ng-model="selfAccessPermissions" ng-change="toggleSelfAccessPermissions()">
+            Enable
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h3 class="panel-title">About Self Access</h3>
+      </div>
+      <div class="panel-body">
+        <p>By default the only user who can access a submission is the owner of the submission in <strong>submission.owner</strong>.</p>
+        <p> However, sometimes an administrator or manager will create an account for users in which case the user cannot modify their own object. Self Access Permissions allow a user who does not own their own object to be able to still edit it as if they are the owner. This allows them to do things like change their password and update their account information regardless of who created their account.</p>
+      </div>
+    </div>
+  </div>
+</div>
 
-
-
-<div class="form-group pull-right">
-  <a class="btn btn-default" ng-click="back('project.{{ formInfo.type }}.form.view')">Cancel</a>
-  <input ng-hide="highestRole === 'team_read'" type="submit" class="btn btn-primary" ng-click="saveForm()" value="Save Changes" />
+<div class="row">
+  <div class="col-md-8">
+    <div class="panel panel-success">
+      <div class="panel-heading">
+        <h3 class="panel-title">Field Based Resource Access
+          <a class="pull-right" href="https://help.form.io/userguide/roles-and-permissions/#submissionpermissions" target="_blank">
+            <i class="glyphicon glyphicon-question-sign"></i>
+          </a>
+        </h3>
+      </div>
+      <div class="panel-body">
+        <div ng-if="form._id">
+          <resource-permission-editor labels="resourceAccessLabels" resources="currentFormResources" wait-for="loadFormPromise" form="form"></resource-permission-editor>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h3 class="panel-title">About Field Based Resource Access</h3>
+      </div>
+      <div class="panel-body">
+        <p>Field Based Resource Access is useful if you want to assign a permission to specific submission data based on assignment in a field.</p>
+        <p>For example, if you have multiple contractors and want to assign a job to a contractor by selecting them in a field on the job form.</p>
+        <p>To use Field Based Resource Access, Add a Resource or Select Resource field to a form and then assign the field with the permission for the selected Resource.</p>
+        <p>In the example above the Job form would have Contractor field of type Resource on it that points to the Contractor Resource. Then the Contractor Field would be selected in the appropriated Field Based Resource Access permission depending on the level of access required to that Job Submission Data. When creating a Job and assigning it to a specific contractor, that contractor would then get the appropriate permission for just that job.</p>
+      </div>
+    </div>
+  </div>
 </div>

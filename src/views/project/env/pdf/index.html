@@ -1,0 +1,126 @@
+<ul class="nav nav-tabs" role="tablist" ng-if="pdfInfo.data.plan === 'enterprise'" style="margin-bottom:10px;">
+  <li role="presentation" ng-class="{'active': (currentTab === 'pdf')}"><a ng-click="setTab('pdf')"aria-controls="home" role="tab">PDF</a></li>
+  <li role="presentation" ng-class="{'active': (currentTab === 'enterprise')}"><a ng-click="setTab('enterprise')" aria-controls="profile" role="tab">Enterprise</a></li>
+</ul>
+<span class="fa fa-spinner fa-pulse" ng-if="loading" style="font-size: 2em;"></span>
+<div class="row" ng-if="(pdfInfo.data.plan === 'enterprise') && (currentTab === 'enterprise')">
+  <div class="col col-sm-12">
+    <p>Our Enterprise PDF solution allows you to deploy our PDF server within your own environment. Please follow these steps to get your own PDF server installed and running.</p>
+    <ul>
+      <li>To get started, create a new default project called <strong>PDF Manager</strong></li>
+      <li>Now import the <strong>PDF</strong> form within that project. Use the Form Import feature to import this <a href="https://files.form.io/view/pdf.json">https://files.form.io/view/pdf.json</a> as a new form. Make sure to give it the path and name of <strong>pdf</strong></li>
+      <li>Next, you will need to create an <strong>API Key</strong> for the form manager project.</li>
+      <li>After that, you will now need to create a <a href="https://hub.docker.com/">Docker Hub</a> account, then then send your username</li>
+      <li>Now you will pull in the latest <code>formio/formio-files-core</code> container into your environment.
+        <pre>docker login<br/>docker pull formio/formio-files-core</pre>
+      </li>
+      <li>Next you will need to launch our Docker container within your own environment using the following command.
+        <pre>
+docker run -itd \
+  -e "FORMIO_PROJECT=<strong>{{ currentProject._id }}</strong>" \
+  -e "FORMIO_PROJECT_TOKEN=<strong>{{ pdfInfo.data.token }}</strong>" \
+  -e "FORMIO_PDF_PROJECT=<strong>[PDF PROJECT API URL]</strong>" \
+  -e "FORMIO_PDF_APIKEY=<strong>[PDF PROJECT API KEY]</strong>" \
+  -e "FORMIO_S3_BUCKET=[YOUR S3 BUCKET NAME]" \
+  -e "FORMIO_S3_REGION=[YOUR S3 REGION]" \
+  -e "FORMIO_S3_KEY=[YOUR S3 AUTH KEY]" \
+  -e "FORMIO_S3_SECRET=[YOUR S3 AUTH SECRET]" \
+  --restart unless-stopped \
+  --name formio-files-core \
+  -p 80:4005 \
+  formio/formio-files-core;
+        </pre>
+      </li>
+      <li>Now, configure this portal to point to your deployed instance by providing the following setting.
+        <div class="panel panel-default">
+          <div class="panel-heading">Deployment Settings</div>
+          <div class="panel-body">
+            <div class="form-group">
+              <label for="pdfserver">PDF Server URL</label>
+              <input type="text" class="form-control" id="pdfserver" ng-model="currentProject.settings.pdfserver" placeholder="https://files.form.io" />
+            </div>
+            <button class="btn btn-primary" ng-click="saveProject()">Save Settings</button>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>
+<div ng-if="pdfInfo.data && ((pdfInfo.data.plan !== 'enterprise') || (currentTab === 'pdf'))">
+  <div class="row">
+    <div class="col col-sm-6">
+      <div class="panel panel-info">
+        <div class="panel-heading">
+          <h3 class="panel-title">PDF Forms</h3>
+        </div>
+        <div class="well" style="margin-bottom:0">
+          <p><strong>PDF Forms</strong> are hosted PDFs that have been converted to API driven fillable PDF forms.</p>
+        </div>
+        <table class="table table-bordered">
+          <tr>
+            <th><h4>Available</h4></th>
+            <td><h4>{{ availableForms }}</h4></td>
+          </tr>
+          <tr>
+            <th><h4>Total</h4></th>
+            <td><h4>{{ pdfInfo.data.forms }}</h4></td>
+          </tr>
+        </table>
+        <div class="panel-footer">
+          <a class="btn btn-primary btn-block" ui-sref="project.billing()">
+            <span>Change Plan</span>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="col col-sm-6">
+      <div class="panel panel-info">
+        <div class="panel-heading">
+          <h3 class="panel-title">Submission PDFs</h3>
+        </div>
+        <div class="well" style="margin-bottom:0">
+          <p><strong>Submission PDFs</strong> are anytime you wish to download a submission as a filled out PDF.</p>
+        </div>
+        <table class="table table-bordered">
+          <tr>
+            <th><h4>Available</h4></th>
+            <td><h4>{{ availableSubs }}</h4></td>
+          </tr>
+          <tr>
+            <th><h4>Total</h4></th>
+            <td><h4>{{ pdfInfo.data.submissions }}</h4></td>
+          </tr>
+        </table>
+        <div class="panel-footer">
+          <a class="btn btn-primary btn-block" ui-sref="project.billing()">
+            <span>Change Plan</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <table class="table table-striped table-bordered">
+    <thead>
+    <tr>
+      <th>#</th>
+      <th>PDF</th>
+      <th>Forms</th>
+      <th>Operations</th>
+    </tr>
+    </thead>
+    <thead>
+    <tr ng-repeat="pdf in availablePDFs">
+      <td>{{ $index + 1 }}</td>
+      <td><a href="{{ getPDFUrl(pdf) }}" target="_blank">{{ pdf.data.id }}</a></td>
+      <td><ul>
+        <li ng-repeat="form in forms[pdf.data.id]"><a ui-sref="project.{{ form.type }}.form.view({formId: form._id})">{{ form.title }}</a></li>
+      </ul></td>
+      <td>
+        <ul class="list-inline">
+          <li><button class="btn btn-default" ng-if="canDelete(pdf)" ng-click="deletePDF(pdf)"><span class="glyphicon glyphicon-trash"></span></button></li>
+        </ul>
+      </td>
+    </tr>
+    </thead>
+  </table>
+</div>

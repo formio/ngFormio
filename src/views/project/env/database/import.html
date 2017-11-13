@@ -1,0 +1,13 @@
+<h3>Import {{ currentProject.title }} Database </h3>
+<p>Importing a database will replace all of the data currently in the database from the contents of an export file. You will lose all existing data.</p>
+<div class="well">
+  <div class="form-inline">
+    <label class="control-label" for="file">Name</label>
+    <input id="file" class="form-control" type="file" name="file">
+    <label class="form-check-label">
+      <input class="form-check-input" type="checkbox"> Obfuscate Data
+    </label>
+
+    <button type="submit" class="btn btn-primary">Import Database to {{ currentProject.title }}</button>
+  </div>
+</div>

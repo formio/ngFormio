@@ -6,49 +6,57 @@ app.controller('AccessController', ['$scope', function($scope) {
   $scope.permissionLabels = {
     'create_all': {
       label: 'Create All',
-      tooltip: 'The Create All permission will allow a user, with one of the given Roles, to create an Project level entity, regardless of who owns the Project. Additionally with this permission, a user can define the Owner of the entity. E.g. Forms or Roles.'
+      tooltip: 'The Create All permission will allow a user with one of the given Roles to create a form, resource and role and define the Owner of the entity.',
+      elevated: true
     },
     'read_all': {
       label: 'Read All',
-      tooltip: 'The Read All permission will allow a user, with one of the given Roles, to read an Project level entity, regardless of who owns the Project. E.g. The Project itself or its Roles.'
+      tooltip: 'The Read All permission will allow a user with one of the given Roles to read all forms, resources and roles as well as the project itself regardless of who owns the entity.',
+      elevated: true
     },
     'update_all': {
       label: 'Update All',
-      tooltip: 'The Update All permission will allow a user, with one of the given Roles, to update an Project level entity, regardless of who owns the Project. Additionally with this permission, a user can change the Owner of an entity. E.g. The Project itself or its Roles.'
+      tooltip: 'The Update All permission will allow a user with one of the given Roles to update all forms, resources and roles as well as the project itself regardless of who owns the entity.',
+      elevated: true
     },
     'delete_all': {
       label: 'Delete All',
-      tooltip: 'The Delete All permission will allow a user, with one of the given Roles, to delete an Project level entity, regardless of who owns the Project. E.g. The Project itself or its Roles.'
+      tooltip: 'The Delete All permission will allow a user with one of the given Roles to delete all forms, resources and roles as well as the project itself regardless of who owns the entity.',
+      elevated: true
     },
     'create_own': {
       label: 'Create Own',
-      tooltip: 'The Create Own permission will allow a user, with one of the given Roles, to create an Project level entity. Upon creating an entity, the user will be defined as its Owner. E.g. Forms or Roles.'
+      tooltip: 'The Create Own permission will allow a user with one of the given Roles to create a form or resource and the user will be defined as its Owner.'
     },
     'read_own': {
       label: 'Read Own',
-      tooltip: 'The Read Own permission will allow a user, with one of the given Roles, to read an Project level entity. A user can only read an entity if they are defined as its owner. E.g. Forms or Roles.'
+      tooltip: 'The Read Own permission will allow a user with one of the given Roles to read a form or resource if they are defined as its owner.'
     },
     'update_own': {
       label: 'Update Own',
-      tooltip: 'The Update Own permission will allow a user, with one of the given Roles, to update an Project level entity. A user can only update an entity if they are defined as its owner. E.g. Forms or Roles.'
+      tooltip: 'The Update Own permission will allow a user with one of the given Roles to update a form or resource if they are defined as its owner.'
     },
     'delete_own': {
       label: 'Delete Own',
-      tooltip: 'The Delete Own permission will allow a user, with one of the given Roles, to delete an Project level entity. A user can only delete an entity if they are defined as its owner. E.g. Forms or Roles.'
+      tooltip: 'The Delete Own permission will allow a user with one of the given Roles to delete a form or resource if they are defined as its owner.'
     },
     'team_read': {
       label: 'Team Read',
-      tooltip: 'The Team Read permission will allow a user, on one of the given Teams, the ability to read form definitions.'
+      tooltip: 'The Team Read permission will allow a user on one of the given Teams the ability to read form definitions.'
     },
     'team_write': {
       label: 'Team Write',
-      tooltip: 'The Team Write permission will allow a user, on one of the given Teams, the ability to read and edit form definitions.'
+      tooltip: 'The Team Write permission will allow a user on one of the given Teams the ability to read and edit form definitions.'
     },
     'team_admin': {
       label: 'Team Admin',
-      tooltip: 'The Team Admin permission will allow a user, on one of the given Teams, the ability to read and edit form definitions, project settings, and submission data.'
+      tooltip: 'The Team Admin permission will allow a user on one of the given Teams the ability to read and edit form definitions, project settings, and submission data.'
     }
   };
+
+  $scope.$on('permissionsChange', function() {
+    $scope.saveProject();
+  });
 }]);
 
 /**
@@ -60,14 +68,14 @@ app.controller('AccessController', ['$scope', function($scope) {
  */
 app.directive('permissionEditor', ['$q', function($q) {
   var PERMISSION_TYPES = [
-    'create_all',
-    'read_all',
-    'update_all',
-    'delete_all',
     'create_own',
+    'create_all',
     'read_own',
+    'read_all',
     'update_own',
+    'update_all',
     'delete_own',
+    'delete_all',
     'team_read',
     'team_write',
     'team_admin'
@@ -79,10 +87,11 @@ app.directive('permissionEditor', ['$q', function($q) {
       permissions: '=',
       labels: '=',
       waitFor: '=',
-      permissionFilter: '=?'
+      permissionFilter: '=?',
+      protected: '=?'
     },
     restrict: 'E',
-    templateUrl: 'views/project/access/permission-editor.html',
+    templateUrl: 'views/project/access/access/permission-editor.html',
     link: function($scope) {
       // Fill in missing permissions / enforce order
       ($scope.waitFor || $q.when()).then(function() {
@@ -125,6 +134,14 @@ app.directive('permissionEditor', ['$q', function($q) {
       $scope.getPermissionTooltip = function(permission) {
         return $scope.labels[permission.type].tooltip;
       };
+
+      $scope.getPermissionElevated = function(permission) {
+        return $scope.labels[permission.type].elevated || false;
+      };
+
+      $scope.onChange = function() {
+        $scope.$emit('permissionsChange');
+      };
     }
   };
 }]);
@@ -140,7 +157,7 @@ app.directive('resourcePermissionEditor', ['$q', 'FormioUtils', function($q, For
       form: '='
     },
     restrict: 'E',
-    templateUrl: 'views/project/access/resource-permission-editor.html',
+    templateUrl: 'views/project/access/access/resource-permission-editor.html',
     link: function($scope) {
       // Maintain a list of unique resources.
       $scope.uniqueResources = _($scope.resources)
@@ -159,6 +176,8 @@ app.directive('resourcePermissionEditor', ['$q', 'FormioUtils', function($q, For
           .without(change.key)
           .uniq()
           .value();
+
+        $scope.onChange();
       };
       $scope.removeSelected = function(change, val) {
         _.map(FormioUtils.flattenComponents($scope.form.components), function(component) {
@@ -171,6 +190,8 @@ app.directive('resourcePermissionEditor', ['$q', 'FormioUtils', function($q, For
         $scope.uniqueResources = _($scope.uniqueResources)
           .uniq()
           .value();
+
+        $scope.onChange();
       };
 
       var permissions = [];
@@ -221,6 +242,10 @@ app.directive('resourcePermissionEditor', ['$q', 'FormioUtils', function($q, For
 
       $scope.getPermissionTooltip = function(permission) {
         return $scope.labels[permission.type].tooltip;
+      };
+
+      $scope.onChange = function() {
+        $scope.$emit('permissionsChange');
       };
     }
   };

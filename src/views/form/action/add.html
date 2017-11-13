@@ -1,2 +1,10 @@
-<div ng-if="error" class="alert alert-danger"><i class="glyphicon glyphicon-exclamation-sign"></i> {{error}} Go to <a href="#/project/{{currentProject._id}}/settings">Project Settings</a>.</div>
+<div ng-if="error" class="alert alert-danger"><i class="glyphicon glyphicon-exclamation-sign"></i> {{error}} Go to <a ui-sref="project.env.integrations.info">Integration Settings</a>.</div>
+<div class="row">
+  <div class="col-md-12">
+    <br>
+    <div ng-if="actionInfo.premium === true" class="alert alert-warning">
+      This is a Premium Action, not available on the {{ getPlanName(currentProject.plan) }} plan. Please <a ui-sref="project.billing({projectId: primaryProject._id})">Upgrade</a> this project to access this feature.
+    </div>
+  </div>
+</div>
 <formio form="actionInfo.settingsForm" submission="action" read-only="formDisabled"></formio>

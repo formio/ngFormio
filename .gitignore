@@ -7,7 +7,9 @@ bower_components
 test/bower_components
 .idea
 dist
+aws.json
 test/screenshots/*.png
+test/screenshots/*.txt
 *~
 npm-debug.log
 

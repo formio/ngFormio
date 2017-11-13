@@ -1,24 +1,12 @@
-<uib-accordion close-others="true">
-  <div uib-accordion-group class="panel panel-default" heading="Microsoft Office 365">
-    <ng-include src="'views/project/data/office365.html'" is-open="true"></ng-include>
+<div class="project-section-content project-section-inner-content project-data">
+  <div class="row">
+    <div class="col-md-6">
+      <h2>Form Submissions</h2>
+      <form-list forms="forms" form-name="'Form'" list-mode="'data'" formio="formio" project-url="projectUrl" form-type="'form'" protected="currentProject.protect"></form-list>
+    </div>
+    <div class="col-md-6">
+      <h2>Resource Form Submissions</h2>
+      <form-list forms="resources" form-name="'Resource'" list-mode="'data'" formio="formio" project-url="projectUrl" form-type="'resource'" protected="currentProject.protect"></form-list>
+    </div>
   </div>
-  <div uib-accordion-group class="panel panel-default" heading="Google Drive">
-    <ng-include src="'views/project/data/google.html'"></ng-include>
-  </div>
-  <div uib-accordion-group class="panel panel-default" heading="Kickbox">
-    <ng-include src="'views/project/data/kickbox.html'"></ng-include>
-  </div>
-  <div uib-accordion-group class="panel panel-default" heading="Hubspot">
-    <ng-include src="'views/project/data/hubspot.html'"></ng-include>
-  </div>
-  <div uib-accordion-group class="panel panel-default" heading="SQL Connector">
-    <ng-include src="'views/project/data/sqlconnector.html'"></ng-include>
-  </div>
-  <div uib-accordion-group class="panel panel-default" heading="Atlassian">
-    <ng-include src="'views/project/data/atlassian.html'"></ng-include>
-  </div>
-  <div uib-accordion-group class="panel panel-default" heading="Moxtra">
-    <ng-include src="'views/project/data/moxtra.html'"></ng-include>
-  </div>
-</uib-accordion>
-<button class="btn btn-primary" ng-click="saveProject()">Save Settings</button>
+</div>

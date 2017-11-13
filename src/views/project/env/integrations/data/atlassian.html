@@ -1,0 +1,65 @@
+<div class="well">
+  <h4>Atlassian</h4>
+  <p>Enter the following information for your Atlassian account.</p>
+  <p class="small">Note: Either Basic Auth or OAuth is required.</p>
+</div>
+
+<div class="form-group">
+  <label for="url" class="control-label">Atlassian URL</label>
+  <input ng-model="currentProject.settings.atlassian.url" type="text" class="form-control" id="url" placeholder="myproject.atlassian.net">
+</div>
+
+<uib-accordion close-others="true">
+  <div uib-accordion-group class="panel panel-default" heading="Basic Authentication">
+    <div is-open="true">
+      <div class="form-group">
+        <label for="username" class="control-label">Username</label>
+        <input ng-model="currentProject.settings.atlassian.username" type="text" class="form-control" id="username" placeholder="me@example.com">
+      </div>
+
+      <div class="form-group">
+        <label for="password" class="control-label">Password</label>
+        <input type="password" class="form-control" ng-model="currentProject.settings.atlassian.password" id="password" />
+      </div>
+    </div>
+  </div>
+  <div uib-accordion-group class="panel panel-default" heading="OAuth">
+    <div>
+      <div class="form-group">
+        <label for="private_key" class="control-label">RSA Private Key</label>
+        <textarea ng-model="currentProject.settings.atlassian.oauth.private_key" class="form-control" rows="5" id="private_key" placeholder="-----BEGIN RSA PRIVATE KEY-----
+...
+-----END RSA PRIVATE KEY-----"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="consumer_key" class="control-label">Consumer Key</label>
+        <input type="text" class="form-control" ng-model="currentProject.settings.atlassian.oauth.consumer_key" id="consumer_key">
+      </div>
+      <div>
+        <button
+          class="btn btn-primary btn-sm"
+          ng-if="currentProject.settings.atlassian.oauth.private_key && currentProject.settings.atlassian.oauth.consumer_key && !authenticatedWithOAuth"
+          ng-click="loginWithOAuth()"
+        >
+          {{ currentProject.settings.atlassian.oauth.oauth_verifier ? 'Update OAuth Connection' : 'Login with OAuth' }}
+        </button>
+      </div>
+
+      <div class="form-group" ng-if="(currentProject.settings.atlassian.oauth.oauth_verifier && authenticatedWithOAuth && !verifiedOAuth) || (!currentProject.settings.atlassian.oauth.oauth_verifier && authenticatedWithOAuth)">
+        <label for="oauth_verifier" class="control-label">Verification Code</label>
+        <input type="text" class="form-control" ng-model="currentProject.settings.atlassian.oauth.oauth_verifier" id="oauth_verifier">
+      </div>
+    </div>
+
+    <div>
+      <button
+        class="btn btn-success btn-sm"
+        ng-if="currentProject.settings.atlassian.oauth.oauth_verifier && authenticatedWithOAuth && !verifiedOAuth"
+        ng-click="verifyOAuth()"
+      >
+        Verify OAuth Connection
+      </button>
+    </div>
+  </div>
+</uib-accordion>

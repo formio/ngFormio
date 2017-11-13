@@ -1,0 +1,25 @@
+<div class="well">
+  <div class="container text-center">
+    <h2>What kind of {{ capitalize(form.type) }} would you like to create?</h2>
+    <div class="row">
+      <div class="col col-sm-4 col-sm-offset-2">
+        <div class="thumbnail" ui-sref="project.form.create" style="cursor:pointer;">
+          <div class="caption">
+            <h3>API Web Form</h3>
+            <p>Use our powerful <strong>Drag-and-Drop</strong> form builder to create a dynamic API driven web form that can be embedded into any external application.</p>
+          </div>
+          <img src="images/webform.png">
+        </div>
+      </div>
+      <div class="col col-sm-4">
+        <div class="thumbnail" ng-click="uploadPDF()">
+          <div class="caption" style="cursor:pointer;">
+            <h3>PDF Form</h3>
+            <p>Convert a PDF document into an API driven PDF form, as well as provide a way to download form submissions as PDF documents.</p>
+          </div>
+          <img src="images/w4.png">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

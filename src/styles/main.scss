@@ -1,6 +1,5 @@
 @import "variables.scss";
 @import "mixins.scss";
-@import "circle.scss";
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
   display: none !important;
 }
@@ -11,13 +10,35 @@
   cursor: pointer;
 }
 
+:focus {
+  outline: none;
+}
+
 body {
   padding-top: 45px;
+}
+
+.grow { transition: all .2s ease-in-out; }
+.grow:hover { transform: scale(1.2); }
+
+.form-builder-premium {
+  display: block;
+}
+
+.form-builder-premium label {
+  color: #aaa;
+  pointer-events: none;
+}
+
+.project-commercial .form-builder-premium label {
+  color: inherit;
+  pointer-events: auto;
 }
 
 .btn {
   overflow: hidden;
   text-overflow: ellipsis;
+  border-radius: 3px;
 }
 
 .btn-light {
@@ -201,10 +222,8 @@ li.user-dropdown a {
 }
 
 .sidebar {
-  position: fixed;
-  top: 45px;
-  bottom: 0;
-  left: 0;
+  position: relative;
+  float: left;
   z-index: 1000;
   display: block;
   padding: 20px;
@@ -268,33 +287,35 @@ $project-header-color: #eee;
 
 .new-project-row {
   position:relative;
-  padding: 35px 0 0 0;
-  background-color: $brand-secondary;
-  color: $project-header-color;
-  .new-project-header {
-    position:absolute;
-    top: 0;
-    margin: 10px 0 0 0;
-  }
+  background-color: #eee;
+  color: #333;
   .new-project-section {
     float: left;
     margin-right: 10px;
   }
 }
 
-.new-project-row-min {
-  background-color: darken($brand-primary, 15%);
-}
-
 .project-template-item {
+  position: relative;
   .project-template-card {
+    .framework-coming-soon {
+      position: absolute;
+      color: red;
+      text-align: center;
+      width: 100%;
+      font-weight: bolder;
+      font-size: 2em;
+      opacity: 0.3;
+      margin-top: 30px;
+      padding-right: 7px;
+    }
     .project-template-img {
-      width: 133px;
-      height: 100px;
-      border: solid $brand-primary 4px;
+      width: 80px;
+      height: 80px;
+      //border: solid $brand-primary 4px;
+      margin: 10px 35px;
       &:hover {
         cursor: pointer;
-        border: solid lighten($brand-primary, 20%) 4px;
       }
     }
     .project-template-info {
@@ -306,18 +327,23 @@ $project-header-color: #eee;
   }
 }
 
+.project-container {
+  position: relative;
+}
+
 .project-sidebar {
   border: none;
   background-color: darken($brand-primary, 25%);
   text-align: center;
   padding: 0;
-  width: 6%;
+  width: 70px;
+  position: absolute;
   .nav {
     margin: 0;
     li {
       & > a {
-        height: 90px;
-        padding: 20px 0 0 0;
+        height: 70px;
+        padding: 14px 0 0 0;
         color: $project-header-color;
         &:hover {
           background-color: darken($brand-primary, 20%);
@@ -326,7 +352,7 @@ $project-header-color: #eee;
           font-size: 0.6em;
         }
         i {
-          font-size: 2em;
+          font-size: 1.8em;
         }
       }
       &.active {
@@ -336,28 +362,84 @@ $project-header-color: #eee;
           border-right: solid lighten($brand-primary, 15%) 8px;
         }
       }
+      &:last-child {
+        .fa-sign-out {
+          transform: scaleX(-1);
+        }
+      }
     }
   }
 }
 
+.project-sidebar-button {
+  display: inline-block;
+  border: none;
+  background-color: darken($brand-primary, 25%);
+  color: $project-header-color;
+  text-align: center;
+  padding: 10px;
+  width: 70px;
+  vertical-align: middle;
+  span {
+    font-size: 0.7em;
+  }
+  i {
+    font-size: 1.8em;
+  }
+}
+
+.nav-pills-button {
+  display: inline-block;
+  padding: 10px 15px;
+  vertical-align: middle;
+  color: #333333;
+  background-color: #e7e7e7;
+  border-color: #ccc;
+  border-radius: 0;
+}
+
 .project-main {
-  margin-left: 6%;
-  width: 94%;
+  float: left;
+  width: 100%;
+  min-height: 700px;
   padding: 0;
+  border-left: solid darken($brand-primary, 25%) 70px;
 }
 
 .project-content {
   margin-bottom: 40px;
+  position: relative;
+  min-height: 700px;
 }
 
 .main .page-header {
   margin-top: 0;
 }
 
-.navbar {
+.navbar.navbar-inverse {
   border-radius: 0;
   margin-bottom: 0;
-  background-color: #eee;
+
+  .dropdown-menu {
+    background-color: darken($brand-primary, 20%);
+  }
+
+  .help-menu {
+    color: #eee;
+    .list-group-item {
+      background-color: darken($brand-primary, 15%);
+      border-color: $brand-primary;
+      a {
+        color: #eee;
+        &:hover {
+          color: #fff;
+        }
+      }
+      &:hover {
+        background-color: darken($brand-primary, 10%);
+      }
+    }
+  }
 }
 
 .navbar-nav {
@@ -457,15 +539,12 @@ div.project-section-separator {
 }
 
 .project-section-header {
-  background-color: $brand-secondary;
-  color: $brand-primary;
-  padding-left: 20px;
-  padding-top: 20px;
-  border-bottom: solid lighten($brand-primary, 10%) 8px;
+  background-color: #eee;
+  padding: 6px 10px 0 10px;
   h2 {
-    color: $project-header-color;
+    color: darken($brand-primary, 20%);
     a {
-      color: $project-header-color;
+      color: darken($brand-primary, 20%);
       &:hover, &:focus {
         text-decoration: none;
       }
@@ -477,6 +556,11 @@ div.project-section-separator {
     font-weight: normal;
     margin: 0;
     font-size: 2em;
+    h2 {
+      a {
+        color: #aaa;
+      }
+    }
     .project-title-link {
       color: $project-header-color;
       &:hover, &:focus {
@@ -489,14 +573,92 @@ div.project-section-separator {
     overflow: hidden;
     display: inline-block;
   }
+
+  .project-plan {
+    padding: 5px 10px;
+    color: white;
+    border-radius: 12px;
+    position: relative;
+    top: -3px;
+  }
+
+  .nav-tabs.project-nav {
+    margin-left: 75px;
+    border: none;
+    li {
+      margin-right: 4px;
+      margin-bottom: 0;
+      a {
+        padding: 6px 15px;
+        background-color: $brand-secondary;
+        border-radius: 3px 3px 0 0;
+        color: #fff;
+        border: none;
+        .badge {
+          background-color: darken($brand-secondary, 10%);
+        }
+      }
+    }
+    li.active {
+      a {
+        background-color: #fff;
+        margin-right: 0;
+        color: #000;
+        border: none;
+        .badge {
+          background-color: #999;
+        }
+      }
+    }
+  }
+}
+
+.project-section-info {
+  background-color: white;
+  color: #333;
+  padding: 10px 10px 10px 18px;
+  a {
+    color: #333;
+    text-decoration: none;
+  }
+}
+
+.project-example {
+  .well {
+    border: 2px dashed #ddd;
+    background-color: inherit;
+    box-shadow: none;
+    cursor: pointer;
+    padding-top: 100px;
+    i.fa-plus {
+      font-size: 3em;
+    }
+  }
+}
+
+.project-trial-remaining {
+  font-size: 1.2em;
+  top: -2px;
+  position: relative;
+  margin-left: 10px;
+}
+
+ul.project-settings-menu {
+  ul {
+    margin-left: 15px;
+  }
 }
 
 .project-section-inner-content {
   padding: 20px;
+  position: relative;
 }
 
-.project-form-form-view-page .form-content, .project-resource-form-api-page .form-content {
+.project-resource-form-view-page .form-content, .project-form-form-view-page .form-content, .project-resource-form-api-page .form-content {
   background-color: #666;
+  min-height: 700px;
+  padding-bottom: 80px;
+  margin-bottom: -40px;
 }
 
 #application-preview {
@@ -520,8 +682,15 @@ div.project-section-separator {
 }
 
 .project-section-header-button {
-  border: solid $project-header-color 2px;
+  border: none !important;
   margin-right: 5px;
+  margin-top: 3px;
+}
+
+.project-section-header-icon {
+  font-size: 2em;
+  margin: 0 10px;
+  color: black;
 }
 
 .project-header-block {
@@ -555,9 +724,10 @@ div.project-section-separator {
 }
 
 .form-nav {
-  background-color: $gray-lighter;
+  background-color: #fff;
   color: $gray;
   padding: 5px 10px;
+  border-bottom: 2px solid #eee;
   .nav-pills {
     li {
       padding: 0;
@@ -638,6 +808,11 @@ pre code {
   color: #999;
 }
 
+.panel-trial > .panel-heading {
+  background-color: $price-panel-trial;
+  border-color: $price-panel-trial;
+}
+
 /***************************** Feedback *****************************/
 .feedback {
   position: fixed;
@@ -660,6 +835,7 @@ pre code {
     padding: 5px;
     background-color: #fafafa;
     border: 1px solid #e8e8e8;
+    z-index: 1000;
   }
   .feedback-cancel {
     margin: 5px;
@@ -834,11 +1010,10 @@ body {
 
 footer {
   color: #f0f0f0;
-  padding: 0 0 25px 0;
   text-align: center;
   background-color: darken($brand-secondary, 2%);
   display: table-row;
-  width: 100%;
+  border-left: 85px solid darken($brand-primary, 25%);
   a {
     color: white;
   }
@@ -849,9 +1024,16 @@ footer {
   .section-heading {
     color: #eee;
   }
-  .footer-banner img {
-    margin-top: -2.2em;
-    width: 100%;
+  .footer-content {
+    padding: 50px 0;
+  }
+  .footer-banner {
+    position:absolute;
+    z-index: 100;
+    img {
+      margin-top: -2.2em;
+      width: 100%;
+    }
   }
   .list-group .list-group-item {
     font-size: 1.1em;
@@ -1165,6 +1347,10 @@ footer {
   background-color: #CD69C9;
   color: #FFF;
 }
+.label-trial {
+  background-color: $price-panel-trial;
+  color: #FFF;
+}
 
 .ellipsis {
   overflow: hidden;
@@ -1345,11 +1531,15 @@ footer {
   .list-group {
     padding: 0px;
 
+    .list-group-heading {
+      font-weight: bold;
+      font-size: 1.8em;
+      background-color: $table-bg-hover;
+    }
+
     .list-group-item {
       padding: 30px 0;
       border-color: #eeeeee;
-      border-left: none;
-      border-right: none;
       &:nth-child(even) {
         background-color: $table-bg-accent;
       }
@@ -1371,6 +1561,50 @@ footer {
           }
         }
       }
+    }
+  }
+}
+
+.list-group {
+  .list-group-heading {
+    background-color: $table-bg-hover;
+    h3 {
+      margin: 5px 0;
+    }
+  }
+  &.steps {
+    .list-group-item {
+      margin-bottom: 20px;
+    }
+  }
+  .list-group-item-title {
+    margin: 20px 0;
+    .count-badge {
+      color: #fff;
+      font-size: 2.5em;
+      padding-top: 12px;
+      background-color: $brand-primary;
+      border-radius: 50%;
+      height: 75px;
+      width: 75px;
+      display: inline-block;
+      text-align: center;
+      vertical-align: middle;
+    }
+    h5 {
+      display: inline-block;
+      font-size: 1.7em;
+      margin-left: 20px;
+      font-weight: bold;
+    }
+  }
+}
+
+.list-group.list-group-striped {
+  .list-group-item {
+    border-color: #eeeeee;
+    &:nth-child(odd) {
+      background-color: $table-bg-accent;
     }
   }
 }
@@ -1405,6 +1639,10 @@ footer {
 
 .type-icon-form {
   color: $brand-secondary;
+}
+
+.list-group.list-group-or .list-group-heading {
+  background-color: #fff;
 }
 
 /********************* Project Plan Upgrade Dialog *********************/
@@ -1496,6 +1734,10 @@ footer {
 
     &.plan-column-commercial {
       background-color: darken($price-panel-commercial, 10%);
+    }
+
+    &.plan-column-trial {
+      background-color: darken($price-panel-trial, 10%);
     }
 
     .table {
@@ -1628,5 +1870,297 @@ footer {
   padding: 10px;
   p.help-block {
     color: red;
+  }
+}
+
+.project-title-header {
+  margin-bottom: 6px;
+}
+
+.form-inline .ui-select-container {
+  postion:absolute;
+  display: inline-block;
+  vertical-align: middle;
+  width: auto;
+}
+
+.upgrade-warning-container {
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background-color: rgba(128,128,128,0.3);
+  z-index: 10;
+  padding: 50px;
+  margin-bottom: -40px;
+  min-height: 600px;
+  .upgrade-warning {
+    padding: 100px;
+    background-color: #666666;
+    color: white;
+    width: 50%;
+    margin: auto;
+    border-radius: 5px;
+  }
+}
+
+.trial {
+  .count {
+    font-size: 3em;
+  }
+}
+
+.ngdialog {
+  .ngdialog-content {
+    width: 80% !important;
+  }
+}
+
+.current {
+  text-align: center;
+  background-color:$brand-primary;
+  color: white;
+}
+
+.table > tbody > tr > td {
+  border: 1px solid #eee;
+}
+.overview {
+  .overview-content {
+
+  }
+}
+
+.overview-action {
+  width: 100%;
+  height: 120px;
+  background-color: #0069a7;
+  color: #fff;
+  padding: 10px 20px;
+  margin: 10px;
+  .overview-action-logo {
+    width: 100%;
+    text-align: center;
+    font-size: 50px;
+  }
+  .overview-action-title {
+    text-align: center;
+  }
+}
+
+.step-info > a > span.round-tab {
+  width: 30px;
+  height: 30px;
+  font-size: 14px;
+  left: 19px;
+  top: 19px;
+  line-height: 28px;
+}
+.nav-tabs > .step-info > a:hover {
+  border:none;
+}
+.wizard .nav-tabs > .step-info a {
+  background-color: #fff;
+}
+li.disabled.step-info {
+  width: 5%;
+}
+li.active.step-info {
+  width: 5%;
+}
+li.step-info {
+  width: 5% !important;
+}
+.scale {
+  transition: all .2s ease-in-out;
+}
+.scale:hover {
+  transform: scale(1.06);
+}
+.scaled {
+  transform: scale(1.03);
+  background-color: #0ea6ff;
+}
+.docs {
+  .list-group-item:hover {
+    background-color: #efefef;
+    a {
+      color: #2c2c2c;
+      text-decoration: none;
+    }
+  }
+}
+
+.overview-content-image {
+  img {
+    background-color: #fff;
+  }
+}
+
+.flow {
+  .flow-container {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    background-color: #fff;
+    .flow-side {
+      width:20%;
+      padding: 10px;
+      border-right: 1px solid #ddd;
+      .flow-side-header {
+        flex: 1;
+        .flow-side-title {
+          margin: 0 -10px;
+          padding: 10px;
+          border-bottom: 1px solid #ddd;
+        }
+      }
+      .flow-side-content {
+        padding: 10px;
+        .flow-side-line {
+          padding: 0 0 2em 15px;
+          .flow-side-steps {
+            border-left: 1px solid #dddddd;
+            &:last-child {
+              margin-top: 10px;
+            }
+            .flow-side-step {
+              margin: 45px 0 30px 0;
+              position: relative;
+              &:first-child {
+                margin-top: 0;
+                margin-bottom: 15px;
+                .flow-side-logo {
+                  left: -25px;
+                  top: -15px;
+                  width: 50px;
+                  height: 50px;
+                  .fa {
+                    font-size: 32px;
+                  }
+                }
+              }
+              .flow-side-logo {
+                position: absolute;
+                left: -18px;
+                top: -6px;
+                width: 35px;
+                height: 35px;
+                text-align: center;
+                padding-top: 8px;
+                border-radius: 50%;
+                border: 1px solid;
+                background-color: #0069a7;
+                color: #fff;
+                .fa {
+                  font-size: 18px;
+                }
+              }
+              &.active {
+                .flow-side-logo {
+                  background-color: #0ea6ff;
+                }
+                .flow-side-step__title {
+                  color: $brand-primary;
+                  font-weight: bold;
+                }
+              }
+              .step-item {
+                padding-top: 20px;
+                font-size: 17px;
+              }
+              .step-item:last-child {
+                margin-bottom: -15px;
+              }
+              .steps {
+                margin-left: 40px;
+                .step-info {
+                  a {
+                    text-decoration: none;
+                  }
+                  .info-active {
+                    color: #58c01a;
+                  }
+                }
+              }
+            }
+          }
+
+        }
+      }
+    }
+    .flow-content {
+      width:80%;
+      padding: 0px 20px;
+    }
+    .flow-content-title {
+      color: $brand-primary;
+      font-weight: bold;
+    }
+    .flow-footer {
+      margin-top: 30px;
+    }
+  }
+  .gallery {
+    list-style: none;
+  }
+}
+
+.framework-control .ui-select-toggle {
+  width: 200px;
+}
+
+.cc-form {
+  label {
+    white-space: nowrap;
+  }
+  .ui-select-container {
+    min-width: inherit;
+  }
+}
+
+.btn-blink {
+  -webkit-animation: buttonblink 6s infinite;  /* Safari 4+ */
+  -moz-animation: buttonblink 6s infinite;  /* Fx 5+ */
+  -o-animation: buttonblink 6s infinite;  /* Opera 12+ */
+  animation: buttonblink 6s infinite;  /* IE 10+, Fx 29+ */
+}
+
+@keyframes buttonblink {
+  0%, 100% {
+    color: #fff;
+    background-color: #0079c0;
+    border-color: #0069a7;
+  }
+  50% {
+    color: #fff;
+    background-color: #58c01a;
+    border-color: #4eaa17;
+  }
+}
+@-webkit-keyframes buttonblink {
+  0%, 100% {
+    color: #fff;
+    background-color: #0079c0;
+    border-color: #0069a7;
+  }
+  50% {
+    color: #fff;
+    background-color: #58c01a;
+    border-color: #4eaa17;
+  }
+}
+@-moz-keyframes buttonblink {
+  0%, 100% {
+    color: #fff;
+    background-color: #0079c0;
+    border-color: #0069a7;
+  }
+  50% {
+    color: #fff;
+    background-color: #58c01a;
+    border-color: #4eaa17;
   }
 }

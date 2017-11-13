@@ -1,8 +1,14 @@
 <div class="container">
+  <ul class="list-inline project-title-header">
+    <li><h2><a ui-sref="home" title="Home"><i class="fa fa-home"></i><br /></a></h2></li>
+    <li><h2>›</h2></li>
+    <li><h2><i class="fa fa-users"></i> Teams</h2></li>
+    </li>
+  </ul>
   <h2>New Team</h2>
   <div class="row">
     <div class="col-sm-8">
-      <formio src="teamForm"></formio>
+      <formio src="teamForm" submission="team" hide-components="['members', 'admins']"></formio>
     </div>
     <div class="col-sm-4">
       <div class="panel panel-info">

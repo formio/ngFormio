@@ -1,0 +1,24 @@
+<upgrade-warning ng-if="!minPlan('commercial')" warning="Upgrade your project to Enterprise to enable deploying to stages." />
+<div>
+  <h3>Create version tag from {{ environmentName }}</h3>
+  <div class="row">
+    <div class="col-md-8">
+      <h4>Create a version tag from current stage</h4>
+      <input id="tag" class="form-control" placeholder="0.0.0" ng-model="tag" />
+      <br />
+      <span class="btn btn-default" ng-click="addTag(tag)">Create version tag</span>
+    </div>
+    <div class="col-md-4">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <h3 class="panel-title">Creating a version tag</h3>
+        </div>
+        <div class="panel-body">
+          <p>Creating a version tag from a stage will bundle all forms, resources, roles, actions and access into a setting and store them with the associated version tag.</p>
+          <p>This version tag can then be deployed into another stage which will overwrite the project there.</p>
+          <p>To create a new version tag, enter a version tag into the version tag field and click <strong>Create version tag</strong>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

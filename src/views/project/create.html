@@ -1,15 +1,22 @@
-<div class="container">
-  <h2>New Project</h2>
-  <div class="col-sm-8 col-margin-bottom">
-    <ng-include src="'views/project/project-settings.html'"></ng-include>
+<div class="row">
+  <div class="col-sm-6 col-margin-bottom" ng-controller="ProjectCreateController">
+    <h2>Create a New {{ selectedFramework.title }}</h2>
+    <ng-include src="'views/project/settings.html'"></ng-include>
   </div>
-  <div class="col-sm-4">
-    <div class="panel panel-info project-help-panel">
+  <div class="col-sm-6">
+    <div class="panel panel-info">
       <div class="panel-heading">
-        <h3 class="panel-title"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> About Projects</h3>
+        <h2 class="panel-title">Free 30 day Enterprise Trial</h2>
       </div>
       <div class="panel-body">
-        <ng-include src="'views/project/help.html'"></ng-include>
+        <p>Test out the features of Enterprise free for 30 days. No Credit Card required!</p>
+        <p>Enterprise Plan Features</p>
+        <ul>
+          <li><strong>Team Collaboration</strong> - Create teams and collaborate with other developers</li>
+          <li><strong>Premium Actions</strong> - Test out 3rd party integrations such as Email, File storage and Data connectors</li>
+          <li><strong>Project Staging</strong> - Create multiple stages for Dev/Test/Live and set up a staging and testing workflow for your project.</li>
+        </ul>
+        <p>You can upgrade or downgrade your project at any time.</p>
       </div>
     </div>
   </div>

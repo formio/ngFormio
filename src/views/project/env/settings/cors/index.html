@@ -1,0 +1,29 @@
+<upgrade-warning ng-if="!minPlan('team')" warning="Upgrade your project to a paid plan to enable CORS Settings."></upgrade-warning>
+<div class="row">
+  <div class="col-sm-6">
+    <div class="panel panel-default">
+      <div class="panel-heading">Allowed CORS Domains</div>
+      <div class="panel-body">
+        <div class="form-group" ng-if="currentProject && currentProject._id">
+          <div id="form-group-cors" class="form-group">
+            <label for="cors" class="control-label">CORS - Cross Origin Resource Sharing</label>
+            <textarea class="form-control" id="cors" ng-disabled="primaryProject.plan === 'basic'" ng-model="currentProject.settings.cors" placeholder="A comma separated list of domains that forms may be embedded on. Use * to allow all domains."></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button class="btn btn-primary" ng-click="saveProject()">Save Settings</button>
+  </div>
+  <div class="col-sm-6">
+    <div class="panel panel-primary">
+      <div class="panel-heading">About Cross-origin resource sharing</div>
+      <div class="panel-body">
+        <p>Cross-origin resource sharing occurs whenever a browser detects a data request being made to a domain other than the one loading the page. The pre-flight request, sometimes called an OPTIONS request, will ask the server if the domain has permission to perform the requested operation. By setting CORS domains you can limit which domains can access form definitions and form submissions.</p>
+        <p>CORS is enforced in the browser so API requests will still work as normal.</p>
+        <p>List all domains that will embed your forms separated by a space or a comma. For example:</p>
+        <pre><code>https://mysecuredomain.com,http://test-mysecuredomain.com</code></pre>
+        <p>Use * for all domains.</p>
+      </div>
+    </div>
+  </div>
+</div>

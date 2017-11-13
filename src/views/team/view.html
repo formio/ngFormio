@@ -1,43 +1,111 @@
-<h3>{{ team.data.name }}</h3>
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th>Member</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr ng-repeat="member in team.data.members">
-      <td>
-        <div class="col-sm-11">
-          {{ member.data.name }}
+<div class="row">
+  <div class="col col-sm-3">
+    <ul class="list-group">
+      <li class="list-group-item">
+        <h3>{{ team.data.name }}</h3>
+        <!--<a ng-if="team.owner === user._id" ui-sref="team.edit()">Edit</a>-->
+      </li>
+      <li class="list-group-item">
+        <div class="row">
+          <div class="col-sm-6">
+            <h5>{{ team.data.members.length + team.data.admins.length || 0 }}</h5>
+            <div>Members</div>
+          </div>
+          <div class="col-sm-6">
+            <h5>{{ teamPermissions.length || 0 }}</h5>
+            <div>Projects</div>
+          </div>
         </div>
-        <div class="col-sm-1">
-          <button ng-show="(team.owner !== member._id) && (member._id === user._id)" class="btn btn-danger btn-xs" ng-click="leaveTeam(team._id)">Leave</button>
+      </li>
+      <li class="list-group-item" ng-show="!isAdmin" >
+        <span class="btn btn-danger btn-xs" ng-click="leaveTeam(team._id)">Leave</span>
+      </li>
+      <li class="list-group-item" ng-show="isAdmin" >
+        <a class="btn btn-danger btn-xs" ui-sref="team.delete()">Delete Team</a>
+      </li>
+    </ul>
+  </div>
+  <div class="col col-sm-9">
+    <div class="team-header">
+      <div class="col-xs-5 pull-right" ng-if="activeView === 'members'">
+        <div class="input-group ">
+          <span class="input-group-addon"><i class='fa fa-user' /></span>
+          <ui-select ng-model="add.Person" theme="bootstrap" ng-change="changeRole($select.selected, 'members')">
+            <ui-select-match placeholder="Add a person">{{$select.selected.data.name}}</ui-select-match>
+            <ui-select-choices repeat="member in selectMembers" refresh="refreshMembers($select.search)" refresh-delay="250" minimum-input-length="3">
+              <span>{{ member.data.name }}</span>
+            </ui-select-choices>
+          </ui-select>
         </div>
-      </td>
-    </tr>
-  </tbody>
-</table>
-<br>
-<div ng-if="team.owner === user._id">
-  <h3>Team Permissions</h3>
-  <table class="table table-striped">
-    <thead>
-    <tr>
-      <th class="col-sm-6">Project</th>
-      <th class="col-sm-6">Permission</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr ng-repeat="project in teamPermissions">
-      <td class="col-sm-6 ellipsis">{{project.title}}</td>
-      <td class="col-sm-5">{{ getPermissionLabel(project.permission) }}</td>
-      <td class="col-sm-1">
-        <button ui-sref="project.settings.teams.edit({teamId: team._id, projectId: project._id})" class="btn btn-default btn-xs">
-          <span class="glyphicon glyphicon-edit"></span>&nbsp;Edit
-        </button>
-      </td>
-    </tr>
-    </tbody>
-  </table>
+      </div>
+      <div class="btn-group">
+        <span ng-click="switchView('members')" ng-class="{ 'btn-primary': activeView === 'members' }" class="btn btn-default btn-sm">Team Members</span>
+        <span ng-click="switchView('projects')" ng-class="{ 'btn-primary': activeView === 'projects' }"  class="btn btn-default btn-sm">Projects</span>
+      </div>
+    </div>
+    <br />
+    <div class="panel panel-default" ng-if="activeView === 'members'">
+      <ul class="list-group">
+        <li class="list-group-item" ng-if="team.data.members.length" ng-repeat="member in team.data.admins">
+          <div class="btn-group pull-right" ng-if="isAdmin && team.owner !== member._id">
+            <span class="dropdown">
+              <span ng-if="authenticated" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-cog" /></span>
+              <ul class="dropdown-menu">
+                <li><a ng-click="changeRole(member, 'members')">Make team member</a></li>
+                <li><a ng-click="changeRole(member)">Remove from team</a></li>
+              </ul>
+            </span>
+          </div>
+          <div><strong>{{ member.data.name }}</strong></div>
+          <span class="label label-success">{{ team.owner === member._id ? 'OWNER' : 'TEAM ADMIN'}}</span>
+        </li>
+        <li class="list-group-item" ng-if="team.data.members.length" ng-repeat="member in team.data.members">
+          <div class="btn-group pull-right" ng-if="isAdmin && team.owner !== member._id">
+            <span class="dropdown">
+              <span ng-if="authenticated" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-cog" /></span>
+              <ul class="dropdown-menu">
+                <li><a ng-click="changeRole(member, 'admins')">Make team admin</a></li>
+                <li><a ng-click="changeRole(member)">Remove from team</a></li>
+              </ul>
+            </span>
+          </div>
+          <div><strong>{{ member.data.name }}</strong></div>
+          <span class="label label-success">{{ team.owner === member._id ? 'OWNER' : 'TEAM MEMBER'}}</span>
+        </li>
+        <li class="list-group-item" ng-if="!team.data.members.length">
+          No members in this team.
+        </li>
+        <li class="list-group-item disabled">
+          Team Admins can add this team to their projects and manage team members.
+        </li>
+      </ul>
+    </div>
+    <div ng-if="activeView === 'projects'">
+      <table class="table table-striped" ng-if="teamPermissions.length">
+        <thead>
+        <tr>
+          <th class="col-sm-6">Project</th>
+          <th class="col-sm-6">Permission</th>
+          <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="project in teamPermissions">
+          <td class="col-sm-6 ellipsis">{{project.title}}</td>
+          <td class="col-sm-5">{{ getPermissionLabel(project.permission) }}</td>
+          <td class="col-sm-1">
+            <span ui-sref="project.teams({projectId: project._id})" class="btn btn-default btn-xs" ng-if="isAdmin">
+              <span class="glyphicon glyphicon-edit"></span>&nbsp;Modify
+            </span>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+      <ul ng-if="!teamPermissions.length" class="list-group">
+        <li class="list-group-item">
+          Team is not assigned to any project. Visit the project team page to assign.
+        </li>
+      </ul>
+    </div>
+  </div>
 </div>

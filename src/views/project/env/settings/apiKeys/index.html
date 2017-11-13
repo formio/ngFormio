@@ -1,0 +1,45 @@
+<upgrade-warning ng-if="!minPlan('independent')" warning="Upgrade your project to a paid plan to use API Keys."></upgrade-warning>
+<div class="row">
+  <div class="col col-sm-6">
+    <h3>API Keys</h3>
+    <hr></hr>
+    <table class="table table-striped">
+      <thead>
+      <tr>
+        <th>Name</th>
+        <th>API Key</th>
+        <th>Remove</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr ng-repeat="key in currentProject.settings.keys">
+        <td>
+          <input type="text" class="form-control" ng-model="key.name" ng-change="updateProject()" ng-model-options='{ debounce: 300 }'>
+        </td>
+        <td>{{ key.key }}</td>
+        <td><button ng-click="removeKey($index)"><i class="fa fa-trash"></i></button></td>
+      </tr>
+      </tbody>
+    </table>
+    <button class="btn btn-primary" ng-click="addKey()">Add New Key</button>
+  </div>
+  <div class="col col-sm-6">
+    <div class="panel panel-primary">
+      <div class="panel-heading">How to use API Keys</div>
+      <div class="panel-body">
+        <p>API Keys are designed for server to server communication to allow a backend server to talk directly to Form.io and has full access to all of the data, forms, resources and other settings in a project. They provide full <strong>Ownership</strong> access.</p>
+        <p><span class="text-danger">API Keys should <strong>never</strong> be used in a browser.</span></p>
+        <p>To use an API Key provide the key within the <code>x-token</code> header of a request.</p>
+        <p><strong>Example:</strong></p>
+        <ul>
+          <li>GET - <code>{{ projectPath({name: 'myproject'}) }}/myform</code>
+            <ul>
+              <li>Header: <code>x-token</code></li>
+              <li>Value: <code>23234lkj234lklkj234lkj2lkj34</code></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

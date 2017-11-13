@@ -1,0 +1,39 @@
+<div ng-if="roles">
+  <ul class="list-group list-group-striped">
+    <li class="list-group-item list-group-heading">
+      <div class="row">
+        <div class="col col-sm-3">
+          <strong>Permission</strong>
+        </div>
+        <div class="col col-sm-9">
+          <strong>Roles</strong>
+        </div>
+      </div>
+    </li>
+    <li class="list-group-item" ng-repeat="permission in getPermissionsToShow()">
+      <div class="row">
+        <div class="col col-sm-3">
+          <h4 >{{getPermissionLabel(permission)}}</h4>
+        </div>
+        <div class="col col-sm-9">
+          <ui-select multiple ng-model="permission.roles" theme="bootstrap" reset-search-input="true" name="{{permission.type}}_role" id="{{permission.type}}_role" ng-change="onChange()" ng-disabled="protected">
+            <ui-select-match class="ui-select-match" placeholder="Select roles...">{{$item.title}}</ui-select-match>
+            <ui-select-choices class="ui-select-choices" repeat="role._id as role in roles | filter: $select.search">
+              <div>{{ role.title }}</div>
+            </ui-select-choices>
+          </ui-select>
+        </div>
+      </div>
+      <div class="row" style="margin-top: 10px;">
+        <div class="col col-xs-12">
+          <div class="text-muted">
+            <span class="text-warning" ng-if="getPermissionElevated(permission)">Elevated Permission:</span> {{getPermissionTooltip(permission)}}
+          </div>
+        </div>
+      </div>
+    </li>
+    <li class="list-group-item disabled">
+      <span class="text-warning">Elevated permissions allow users to access and modify other user's entities. Assign with caution.</span>
+    </li>
+  </ul>
+</div>

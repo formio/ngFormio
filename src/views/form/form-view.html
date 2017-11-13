@@ -1,12 +1,15 @@
+<div class="alert alert-info" ng-if="form.type === 'form'">
+  <p>If you would like other people to use this form, then you can <a ui-sref="project.form.form.share"><i class="fa fa-rocket"></i> Launch this form</a></p>
+</div>
 <div class="panel panel-default">
   <div class="panel-heading">
-    <h3 class="panel-title">Preview</h3>
+    <h3 class="panel-title">Submit Form</h3>
   </div>
   <div class="panel-body">
-    <div ng-if="hasAuthAction" ng-cloak class="alert alert-warning" role="alert"><i class="glyphicon glyphicon-exclamation-sign"></i> This preview is read only because this form contains an Authentication action.</div>
+    <div ng-if="hasAuthAction" ng-cloak class="alert alert-warning" role="alert"><i class="glyphicon glyphicon-exclamation-sign"></i> This form is read only because it contains an Authentication action.</div>
     <div ng-if="hasPremAction && (currentProject.plan === 'basic')" ng-cloak class="alert alert-warning" role="alert"><i class="glyphicon glyphicon-exclamation-sign"></i> This form contains a Premium action, upgrade your <a ui-sref="project.settings.plan">project plan</a> to enable it.</div>
     <div class="{{currentProject.name}}Form">
-      <formio src="formUrl" read-only="hasAuthAction"></formio>
+      <formio src="formUrl" options="{baseUrl: baseUrl}" read-only="hasAuthAction"></formio>
     </div>
   </div>
 </div>

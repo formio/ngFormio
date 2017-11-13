@@ -1,8 +1,9 @@
 <div class="container">
-  <ul class="nav nav-tabs">
-    <li role="presentation" ng-class="{active:isActive('team.view')}"><a ui-sref="team.view()">View</a></li>
-    <li role="presentation" ng-show="team.owner === user._id" ng-class="{active:isActive('team.edit')}"><a ui-sref="team.edit()">Edit</a></li>
-    <li role="presentation" ng-show="team.owner === user._id" ng-class="{active:isActive('team.delete')}"><a ui-sref="team.delete()">Delete</a></li>
+  <ul class="list-inline project-title-header">
+    <li><h2><a ui-sref="home" title="Home"><i class="fa fa-home"></i><br /></a></h2></li>
+    <li><h2>›</h2></li>
+    <li><h2><i class="fa fa-users"></i> Teams</h2></li>
+    </li>
   </ul>
   <div ui-view></div>
 </div>

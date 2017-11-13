@@ -1,0 +1,28 @@
+<upgrade-warning ng-if="!minPlan('commercial')" warning="Upgrade your project to Enterprise to enable deploying to stages." />
+<div>
+  <h3>Deploy to {{ environmentName }}</h3>
+  <div class="row">
+    <div class="col-md-8">
+      <h4>Select Version Tag</h4>
+      <div ng-if="tags.length">
+        <p><select class="form-control tags" ng-model="deployTagOption" ng-options="selectTag as selectTag.tag for selectTag in tags"></select></p>
+        <span class="btn btn-primary" ng-click="deployTag(deployTagOption)" ng-disabled="isBusy"><i ng-if="isBusy" class="fa fa-spinner fa-pulse"></i> Deploy version tag to {{ environmentName }}</span>
+      </div>
+      <div ng-if="!tags.length">
+        <p>No version tags exist. <a ui-sref="project.env.staging.create">Create</a> a new version tag in the source stage before deploying.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <h3 class="panel-title">Deploying a project tag</h3>
+        </div>
+        <div class="panel-body">
+          <p>Deploying a version tag to a stage will replace all forms, resources, roles, actions and access settings with the ones in the version tag.</p>
+          <p>This is used for migrating a project from one stage to another. First create a new version tag from the source stage and then deploy it into the target stage. This allows for performing a <br />Dev -> Stage -> Prod deployment strategy.</p>
+          <p>To deploy a version tag, select the version tag you would like to deploy and click the <strong>Deploy</strong> button.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

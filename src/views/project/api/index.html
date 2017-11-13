@@ -1,13 +1,13 @@
 <div class="panel panel-default">
   <div class="panel-heading">
-    <h4 class="panel-title">Endpoint: <strong>{{ projectApi }}</strong>
+    <h4 class="panel-title">Endpoint: <strong>{{ projectUrl }}</strong>
       <a class="pull-right" href="https://help.form.io/developer/api/postman/" target="_blank">
         <i class="glyphicon glyphicon-question-sign "></i>
       </a>
     </h4>
   </div>
   <div class="panel-body">
-    <p class="well">For full API documentation, check out our <a class="btn btn-primary btn-sm" href="https://documenter.getpostman.com/view/684631/formio-api/2Jvuks" target="_blank"><i class="fa fa-book"></i> Online API Documenation</a></p>
+    <p class="well">For full API documentation, check out our <a class="btn btn-success btn-sm" href="https://documenter.getpostman.com/view/684631/formio-api/2Jvuks" target="_blank"><i class="fa fa-book"></i> Online API Documenation</a></p>
     <p class="well"><b>Warning: The API Explorer can change and delete your *live* Form Submission data.</b></p>
     <div ng-show="swaggerLoading">Loading...</div>
     <div id="docs" swagger-ui url="getSwaggerURL()" api-explorer="true" loading="swaggerLoading" validator-url="false"></div>

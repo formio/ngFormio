@@ -22,6 +22,39 @@ gulp.task('build', ['jshint', 'wiredep', 'html', 'views', 'images', 'libraries',
   return gulp.src('dist/**/*').pipe(plugins.size({title: 'build', gzip: true}));
 });
 
+var s3 = require("gulp-s3");
+gulp.task('deploy:beta', function () {
+  var settings = require('../aws.json');
+  settings.bucket = 'beta.form.io';
+  settings.region = 'us-west-2';
+  return gulp.src(['./dist/**/*', '!./dist/lib/**/*']).pipe(s3(settings));
+});
+
+gulp.task('deploy:beta:test', function () {
+  var settings = require('../aws.json');
+  settings.bucket = 'portal.test-form.io';
+  settings.region = 'us-west-2';
+  return gulp.src(['./dist/**/*', '!./dist/lib/**/*']).pipe(s3(settings, {
+    uploadPath: '/beta/'
+  }));
+});
+
+gulp.task('deploy:beta:prod', function () {
+  var settings = require('../aws.json');
+  settings.bucket = 'portal.form.io';
+  settings.region = 'us-west-2';
+  return gulp.src(['./dist/**/*', '!./dist/lib/**/*']).pipe(s3(settings, {
+    uploadPath: '/beta/'
+  }));
+});
+
+gulp.task('deploy:beta:develop', function () {
+  var settings = require('../aws.json');
+  settings.bucket = 'portal.develop-form.io';
+  settings.region = 'us-west-2';
+  return gulp.src(['./dist/**/*', '!./dist/lib/**/*']).pipe(s3(settings));
+});
+
 gulp.task('default', ['clean'], function() {
   gulp.start('build');
 });

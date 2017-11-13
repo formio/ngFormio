@@ -1,0 +1,15 @@
+<div class="row">
+  <div class="col-sm-8 col-margin-bottom">
+    <ng-include src="'views/project/env/settings.html'"></ng-include>
+  </div>
+  <div class="col-sm-4">
+    <div class="panel panel-danger" ng-if="localProject._id !== primaryProject._id && ['owner', 'team_admin'].indexOf(highestRole) !== -1">
+      <div class="panel-heading">Delete Stage</div>
+      <div class="panel-body">
+        <p>To remove this stage, select the delete button</p>
+        <a ui-sref="project.delete({projectId: currentProject._id})" class="btn btn-danger">Delete {{ currentProject.title }} Stage</a>
+      </div>
+    </div>
+
+  </div>
+</div>

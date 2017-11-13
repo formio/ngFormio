@@ -1,0 +1,13 @@
+<h3>Clone Database to {{ currentProject.title }}</h3>
+<p>Cloning a database will replace all of the data currently in the database with the contents from another stage. You will lose all existing data.</p>
+<div class="well">
+  <label>From this Stage:</label>
+  <select class="form-control" ng-model="sourceEnv" ng-options="env as env.title for env in environments | filter:{ _id: '!currentProject._id'} track by env._id"></select>
+  <div>
+    <label class="form-check-label">
+      <input class="form-check-input" type="checkbox"> Obfuscate Data
+    </label>
+  </div>
+
+  <button type="submit" class="btn btn-primary">Clone the Database from {{ sourceEnv.title }} into {{ currentProject.title }}</button>
+</div>

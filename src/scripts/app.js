@@ -27,25 +27,35 @@ angular
     'ngFileUpload',
     'ngDialog',
     'swaggerUi',
-    'toastr'
+    'toastr',
+    'bootstrapLightbox'
   ])
   .config([
     '$stateProvider',
     '$urlRouterProvider',
     '$locationProvider',
+    '$httpProvider',
     'FormioProvider',
-    'formioComponentsProvider',
     'AppConfig',
     'toastrConfig',
+    'RemoteTokensProvider',
+    'formioComponentsProvider',
+    'COMMON_OPTIONS',
     function(
       $stateProvider,
       $urlRouterProvider,
       $locationProvider,
+      $httpProvider,
       FormioProvider,
-      formioComponentsProvider,
       AppConfig,
-      toastrConfig
+      toastrConfig,
+      RemoteTokensProvider,
+      formioComponentsProvider,
+      COMMON_OPTIONS
     ) {
+      // Change the form builder options for encrypted to be commercial only.
+      COMMON_OPTIONS.encrypted.label = 'Encrypted (Commercial Only)';
+
       // Reset the hashPrefix to remove the "!".
       $locationProvider.hashPrefix('');
 
@@ -54,11 +64,44 @@ angular
 
       // Set the base URL for our API.
       FormioProvider.setBaseUrl(AppConfig.apiBase);
-      FormioProvider.setAppUrl(AppConfig.formioBase);
+      FormioProvider.setProjectUrl(AppConfig.formioBase);
       FormioProvider.setDomain(AppConfig.domain);
 
-      // Disable form component until we can fix it.
-      formioComponentsProvider.register('form', {disabled: true});
+      formioComponentsProvider.addGroup('advanced', {
+        title: 'Advanced'
+      });
+      formioComponentsProvider.addGroup('data', {
+        title: 'Data'
+      });
+      formioComponentsProvider.addGroup('layout', {
+        title: 'Layout'
+      });
+      formioComponentsProvider.addGroup('premium', {
+        title: 'Premium'
+      });
+      formioComponentsProvider.register('datagrid', {group: 'data', title: 'Datagrid (Array)'});
+      formioComponentsProvider.register('editgrid', {group: 'data', title: 'Editgrid (Array)'});
+      formioComponentsProvider.register('container', {group: 'data', title: 'Container (Object)'});
+      formioComponentsProvider.register('hidden', {group: 'data'});
+      formioComponentsProvider.register('form', {group: 'premium', title: 'Nested Form'});
+      formioComponentsProvider.register('file', {group: 'premium'});
+      formioComponentsProvider.register('custom', {group: 'premium'});
+
+      var RemotePlugin = function() {};
+
+      RemotePlugin.prototype.requestOptions = function(options, url) {
+        var remoteToken = RemoteTokensProvider.getRemoteToken(url);
+        if (remoteToken) {
+          options.headers.append('x-remote-token', remoteToken);
+          options.headers.delete('x-jwt-token');
+        }
+        return options;
+      };
+
+      var remotePlugin = new RemotePlugin();
+
+      FormioProvider.registerPlugin(remotePlugin, 'remote');
+      $httpProvider.interceptors.push('RemoteInterceptor');
 
       $stateProvider
         .state('home', {
@@ -145,22 +188,19 @@ angular
             showWelcomeModal: false
           }
         })
-        .state('project.overview', {
-          url: '/overview',
-          controller: 'ProjectOverviewController',
-          templateUrl: 'views/project/overview.html',
-          params: {
-            graphType: 'Month'
-          }
-        })
         .state('createProject', {
           url: '/create/project',
           templateUrl: 'views/project/create.html',
           controller: 'ProjectCreateController'
         })
+        .state('project.environment', {
+          url: '/addenv',
+          controller: 'ProjectCreateEnvironmentController',
+          templateUrl: 'views/project/env/create.html'
+        })
         .state('project.data', {
           url: '/data',
-          templateUrl: 'views/project/data.html',
+          templateUrl: 'views/project/data/index.html',
           controller: 'ProjectDataController',
           params: {
             graphType: 'Month'
@@ -170,11 +210,6 @@ angular
           url: '/formio',
           templateUrl: 'views/formio/index.html',
           controller: 'ProjectFormioController'
-        })
-        .state('project.build', {
-          url: '/build',
-          templateUrl: 'views/project/build.html',
-          controller: 'ProjectBuildController'
         })
         .state('project.launch', {
           url: '',
@@ -213,89 +248,185 @@ angular
         })
         .state('project.settings', {
           url: '/settings',
-          templateUrl: 'views/project/settings.html',
+          templateUrl: 'views/project/primary-settings.html',
+          controller: 'PrimaryProjectSettingsController'
+        })
+        .state('project.billing', {
+          url: '/billing',
+          templateUrl: 'views/project/billing.html',
+          controller: 'ProjectBilling'
+        })
+        .state('project.env', {
+          url: '/env',
+          abstract: true,
+          templateUrl: 'views/project/env/index.html'
+        })
+        .state('project.overview', {
+          url: '/overview',
+          controller: 'ProjectOverviewController',
+          templateUrl: 'views/project/overview.html',
+          params: {
+            graphType: 'Month'
+          }
+        })
+        .state('project.tour', {
+          url: '/tour',
+          controller: 'LaunchController',
+          templateUrl: 'views/project/tour/index.html'
+        })
+        .state('project.env.settings', {
+          url: '/settings',
+          abstract: true,
+          parent: 'project.env'
+        })
+        .state('project.env.settings.info', {
+          url: '/settings',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/settings/index.html',
           controller: 'ProjectSettingsController'
         })
-        .state('project.settings.project', {
-          url: '/project',
-          templateUrl: 'views/project/project-settings.html'
+        .state('project.env.settings.remote', {
+          url: '/settings/remote',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/settings/remote/index.html',
+          controller: 'ProjectSettingsController'
         })
-        .state('project.settings.access', {
-          url: '/access',
-          parent: 'project.settings',
-          templateUrl: 'views/project/access/access.html',
-          controller: 'AccessController'
+        .state('project.env.settings.apiKeys', {
+          url: '/settings/apiKeys',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/settings/apiKeys/index.html',
+          controller: 'ProjectSettingsController'
         })
-        .state('project.settings.email', {
-          url: '/email',
-          parent: 'project.settings',
-          templateUrl: 'views/project/email/email.html'
+        .state('project.env.settings.customjscss', {
+          url: '/settings/customjscss',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/settings/customjscss/index.html'
         })
-        .state('project.settings.storage', {
-          url: '/storage',
-          parent: 'project.settings',
-          templateUrl: 'views/project/storage/storage.html',
+        .state('project.env.settings.cors', {
+          url: '/settings/cors',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/settings/cors/index.html'
+        })
+        .state('project.env.database', {
+          url: '/database',
+          abstract: true,
+          parent: 'project.env'
+        })
+        .state('project.env.database.clone', {
+          url: '/database',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/database/clone.html'
+        })
+        .state('project.env.database.import', {
+          url: '/database/import',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/database/import.html'
+        })
+        .state('project.env.database.export', {
+          url: '/database/export',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/database/export.html'
+        })
+        .state('project.env.database.wipe', {
+          url: '/database/wipe',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/database/wipe.html',
+        })
+        .state('project.env.integrations.pdf', {
+          url: '/pdf',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/pdf/index.html',
+          controller: 'PDFController'
+        })
+        .state('project.env.staging', {
+          url: '/staging',
+          abstract: true,
+          parent: 'project.env'
+        })
+        .state('project.env.staging.deploy', {
+          url: '/staging',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/staging/deploy.html',
+          controller: 'ProjectDeployController'
+        })
+        .state('project.env.staging.create', {
+          url: '/staging/create',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/staging/create.html',
+          controller: 'ProjectTagCreateController'
+        })
+        .state('project.env.staging.import', {
+          url: '/staging/import',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/staging/import.html',
+          controller: 'ProjectImportController'
+        })
+        .state('project.env.staging.export', {
+          url: '/staging/export',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/staging/export.html',
+          controller: 'ProjectExportController'
+        })
+        .state('project.env.logs', {
+          url: '/logs',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/logs/index.html',
+        })
+        .state('project.env.integrations', {
+          url: '/integrations',
+          abstract: true,
+          parent: 'project.env'
+        })
+        .state('project.env.integrations.info', {
+          url: '/integrations/info',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/integrations/index.html'
+        })
+        .state('project.env.integrations.email', {
+          url: '/integrations/email',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/integrations/email/email.html'
+        })
+        .state('project.env.integrations.storage', {
+          url: '/integrations/storage',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/integrations/storage/storage.html',
           controller: 'ProjectStorageController'
         })
-        .state('project.settings.data', {
-          url: '/data',
-          templateUrl: 'views/project/data/index.html'
+        .state('project.env.integrations.data', {
+          url: '/integrations/data',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/integrations/data/index.html'
         })
-        .state('project.settings.apiKeys', {
-          url: '/apiKeys',
-          templateUrl: 'views/project/apiKeys/index.html'
+        .state('project.env.integrations.oauth', {
+          url: '/integrations/oauth',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/integrations/oauth/index.html'
         })
-        .state('project.settings.customjscss', {
-          url: '/customjscss',
-          templateUrl: 'views/project/customjscss/index.html'
+        .state('project.access', {
+          url: '/access',
+          templateUrl: 'views/project/access/index.html',
+            controller: 'AccessController'
         })
-        .state('project.settings.oauth', {
-          url: '/oauth',
-          templateUrl: 'views/project/oauth/index.html'
-        })
-        .state('project.settings.roles', {
+        .state('project.roles', {
           abstract: true,
           url: '/roles',
-          templateUrl: 'views/project/roles/roles.html'
+          templateUrl: 'views/project/access/roles/roles.html'
         })
-        .state('project.settings.roles.view', {
-          url: '',
-          templateUrl: 'views/project/roles/view.html'
-        })
-        .state('project.settings.roles.edit', {
+        .state('project.roles.edit', {
           url: '/:roleId/edit',
-          templateUrl: 'views/project/roles/edit.html',
+          templateUrl: 'views/project/access/roles/edit.html',
           controller: 'RoleController'
         })
-        .state('project.settings.roles.delete', {
+        .state('project.roles.delete', {
           url: '/:roleId/delete',
-          templateUrl: 'views/project/roles/delete.html',
+          templateUrl: 'views/project/access/roles/delete.html',
           controller: 'RoleController'
         })
-        .state('project.settings.teams', {
-          abstract: true,
+        .state('project.teams', {
           url: '/teams',
-          templateUrl: 'views/project/teams/teams.html'
-        })
-        .state('project.settings.teams.view', {
-          url: '',
-          controller: 'ProjectTeamViewController',
-          templateUrl: 'views/project/teams/view.html'
-        })
-        .state('project.settings.teams.add', {
-          url: '/add',
-          controller: 'ProjectTeamEditController',
-          templateUrl: 'views/project/teams/edit.html'
-        })
-        .state('project.settings.teams.edit', {
-          url: '/:teamId/edit',
-          controller: 'ProjectTeamEditController',
-          templateUrl: 'views/project/teams/edit.html'
-        })
-        .state('project.settings.teams.delete', {
-          url: '/:teamId/delete',
-          controller: 'ProjectTeamDeleteController',
-          templateUrl: 'views/project/teams/delete.html'
+          controller: 'ProjectTeamController',
+          templateUrl: 'views/project/teams/index.html'
         })
         .state('project.delete', {
           url: '/delete',
@@ -317,20 +448,10 @@ angular
           controller: 'TeamViewController',
           templateUrl: 'views/team/view.html'
         })
-        .state('team.edit', {
-          url: '/edit',
-          controller: 'TeamEditController',
-          templateUrl: 'views/team/edit.html'
-        })
         .state('team.delete', {
           url: '/delete',
           controller: 'TeamDeleteController',
           templateUrl: 'views/team/delete.html'
-        })
-        .state('importExport', {
-          url: '/import-export',
-          templateUrl: 'views/import/index.html',
-          controller: 'ImportExportController'
         })
         .state('help', {
           url: '/help',
@@ -349,13 +470,15 @@ angular
     'FormioAlerts',
     'GoogleAnalytics',
     'AppConfig',
+    '$rootScope',
     function(
       $http,
       $q,
       Formio,
       FormioAlerts,
       GoogleAnalytics,
-      AppConfig
+      AppConfig,
+      $rootScope
     ) {
       return {
         createProject: function(project) {
@@ -389,6 +512,37 @@ angular
           });
           return deferred.promise;
         },
+        createEnvironment: function(project) {
+          var deferred = $q.defer();
+          var formio = new Formio();
+
+          // Default all new projects to have cors set to '*'.
+          if (!project.settings) {
+            project.settings = {};
+          }
+          if (!project.settings.cors) {
+            project.settings.cors = '*';
+          }
+
+          formio.saveProject(project).then(function(project) {
+            FormioAlerts.addAlert({
+              type: 'success',
+              message: 'New Stage created!'
+            });
+            GoogleAnalytics.sendEvent('Project', 'create', null, 1);
+            deferred.resolve(project);
+          }, function(error) {
+            if (error.data && error.data.message && error.data.message.indexOf('duplicate key error index') !== -1) {
+              error.data.errors.name = {
+                path: 'name',
+                message: 'Stage domain already exists. Please pick a different domain.'
+              };
+            }
+            FormioAlerts.onError(error);
+            deferred.reject();
+          });
+          return deferred.promise;
+        },
         loadTemplates: function() {
           var deferred = $q.defer();
           deferred.resolve(AppConfig.templates);
@@ -406,9 +560,10 @@ angular
     'FormioProject',
     'AppConfig',
     'ProjectPlans',
-    'ProjectUpgradeDialog',
+    'ProjectFrameworks',
     '$timeout',
     '$q',
+    'ngDialog',
     function(
       $scope,
       $state,
@@ -418,9 +573,10 @@ angular
       FormioProject,
       AppConfig,
       ProjectPlans,
-      ProjectUpgradeDialog,
+      ProjectFrameworks,
       $timeout,
-      $q
+      $q,
+      ngDialog
     ) {
       $rootScope.showHeader = true;
       $rootScope.activeSideBar = 'home';
@@ -452,8 +608,34 @@ angular
         }
       });
 
+      Formio.request($scope.appConfig.apiBase + '/team/all', 'GET').then(function(results) {
+        $scope.userTeams  = results;
+      });
+
       $scope.teamSupport = function(project) {
-        return (project.plan === 'team' || project.plan === 'commercial');
+        return (project.plan === 'team' || project.plan === 'commercial' || project.plan === 'trial');
+      };
+
+      $scope.teamAdmin = function(project, user) {
+        user = user || $rootScope.user;
+        var userTeams = _($scope.userTeams ? $scope.userTeams : [])
+          .map('_id')
+          .filter()
+          .value();
+
+        return project.owner === user._id || _.intersection(userTeams, project.adminTeams).length > 0;
+      };
+
+      $scope.frameworks = ProjectFrameworks;
+
+      $scope.getFrameworkTitle = function(frameworkName) {
+        var title = '';
+        ProjectFrameworks.forEach(function(framework) {
+          if (framework.name === frameworkName) {
+            title = framework.title;
+          }
+        });
+        return title;
       };
 
       $scope.templates = [];
@@ -462,6 +644,19 @@ angular
       });
 
       $scope.submitted = false;
+      $scope.selectedFramework = null;
+      $scope.newProject = function(framework) {
+        // Don't allow disabled frameworks.
+        if (framework && framework.disabled) {
+          return;
+        }
+        $scope.selectedFramework = framework;
+        ngDialog.open({
+          templateUrl: 'views/project/create.html',
+          scope: $scope
+        });
+      };
+
       $scope.createProject = function(template) {
         if (!$scope.submitted) {
           $scope.submitted = true;
@@ -498,17 +693,22 @@ angular
       $q.all([_teamsPromise, _projectsPromise]).then(function() {
         $scope.projects = _.map($scope.projects, function(project) {
           project.teams = [];
+          project.adminTeams = [];
 
           // Build the projects teams list if present in the permissions.
           _.forEach(project.access, function(permission) {
             if (_.startsWith(permission.type, 'team_')) {
               permission.roles = permission.roles || [];
               project.teams.push(permission.roles);
+              if (permission.type === 'team_admin') {
+                project.adminTeams.push(permission.roles);
+              }
             }
           });
 
           // Filter and translate the teams for use on the ui.
           project.teams = _.uniq(_.flattenDeep(project.teams));
+          project.adminTeams = _.uniq(_.flattenDeep(project.adminTeams));
           project.teams = _.map(project.teams, function(team) {
             _.forEach($scope.teams, function(loadedTeam) {
               if (loadedTeam._id === team) {
@@ -537,8 +737,6 @@ angular
       $scope.getAPICallsPercent = ProjectPlans.getAPICallsPercent.bind(ProjectPlans);
       $scope.getProgressBarClass = ProjectPlans.getProgressBarClass.bind(ProjectPlans);
 
-      $scope.showUpgradeDialog = ProjectUpgradeDialog.show.bind(ProjectUpgradeDialog);
-
       $rootScope.welcomeForceClose = false;
       $scope.closeWelcome = function() {
         $rootScope.welcomeForceClose = true;
@@ -566,6 +764,9 @@ angular
   ])
   .filter('capitalize', function() {
     return function(token) {
+      if (!token) {
+        return '';
+      }
       return token.charAt(0).toUpperCase() + token.slice(1);
     };
   })
@@ -609,7 +810,6 @@ angular
     'FormioAlerts',
     'Formio',
     'AppConfig',
-    'ProjectProgress',
     'GoogleAnalytics',
     '$location',
     '$window',
@@ -622,7 +822,6 @@ angular
       FormioAlerts,
       Formio,
       AppConfig,
-      ProjectProgress,
       GoogleAnalytics,
       $location,
       $window,
@@ -646,32 +845,36 @@ angular
       $rootScope.teamForm = AppConfig.teamForm;
       $rootScope.feedbackForm = AppConfig.feedbackForm;
       $rootScope.resetPassForm = AppConfig.resetPassForm;
+      $rootScope.pdfUploadForm = AppConfig.pdfUploadForm;
       $rootScope.planForm = AppConfig.planForm;
       $rootScope.apiBase = AppConfig.apiBase;
       $rootScope.apiProtocol = AppConfig.apiProtocol;
       $rootScope.apiServer = AppConfig.apiServer;
 
-      $rootScope.projectPath = function(project) {
+      $rootScope.projectPath = function(project, base, type) {
         var path = '';
-        switch(AppConfig.pathType) {
+        var serverBase = base || AppConfig.protocol + '//' + AppConfig.serverHost;
+        var server = serverBase.replace(/(^\w+:|^)\/\//, '');
+        var protocol = serverBase.indexOf('https') === 0 ? 'https:' : 'http:';
+        switch(type || AppConfig.pathType) {
           case 'Subdomains':
             if (project.hasOwnProperty('name')) {
-              path = AppConfig.apiProtocol + '//' + project.name + '.' + AppConfig.apiServer;
+              path = protocol + '//' + project.name + '.' + server;
             }
             else if (project.hasOwnProperty('_id')) {
-              path = AppConfig.apiBase + '/project/' + project._id;
+              path = serverBase + '/project/' + project._id;
             }
             break;
           case 'Subdirectories':
             if (project.hasOwnProperty('name')) {
-              path = AppConfig.apiBase + '/' + project.name;
+              path = serverBase + '/' + project.name;
             }
             else if (project.hasOwnProperty('_id')) {
-              path = AppConfig.apiBase + '/project/' + project._id;
+              path = serverBase + '/project/' + project._id;
             }
             break;
           case 'ProjectId':
-            path = AppConfig.apiBase + '/project/' + project._id;
+            path = serverBase + '/project/' + project._id;
             break;
         }
         return path;
@@ -827,10 +1030,6 @@ angular
         $rootScope.mainClass = classes.join(' ');
       });
 
-      $rootScope.$watch('currentProject', function(newProject) {
-        ProjectProgress.setProject(newProject);
-      });
-
       // Set the active sidebar.
       $rootScope.activeSideBar = 'projects';
 
@@ -885,7 +1084,8 @@ angular
           order: 0,
           name: 'trial',
           title: 'Trial',
-          labelStyle: 'label-success',
+          labelStyle: 'label-trial',
+          price: 0,
           priceDescription: 'Free for 30 days'
         },
         basic: {
@@ -893,28 +1093,32 @@ angular
           name: 'basic',
           title: 'Basic',
           labelStyle: 'label-info',
-          priceDescription: 'Free'
+          price: 0,
+          priceDescription: '$0/month'
         },
         independent: {
           order: 2,
           name: 'independent',
           title: 'Independent',
           labelStyle: 'label-warning',
-          priceDescription: '$15/mo'
+          price: 15,
+          priceDescription: '$15/month'
         },
         team: {
           order: 3,
           name: 'team',
           title: 'Team Pro',
           labelStyle: 'label-success',
-          priceDescription: '$100/mo'
+          price: 100,
+          priceDescription: '$100/month'
         },
         commercial: {
           order: 4,
           name: 'commercial',
-          title: 'Commercial',
+          title: 'Enterprise',
           labelStyle: 'label-commercial',
-          priceDescription: '$250/mo'
+          price: 250,
+          priceDescription: '$250/month'
         }
       },
       getPlans: function() {
@@ -971,4 +1175,75 @@ angular
         return this.permissions[type].label;
       }
     };
-  });
+  })
+  .directive("fileread", [function () {
+    return {
+      scope: {
+        fileread: "=",
+        readAs: "=?"
+      },
+      link: function (scope, element, attributes) {
+        element.bind("change", function (changeEvent) {
+          var reader = new FileReader();
+          reader.onload = function (loadEvent) {
+            scope.$apply(function () {
+              scope.fileread = loadEvent.target.result;
+            });
+          };
+          if (scope.readAs === 'base64') {
+            reader.readAsDataURL(changeEvent.target.files[0]);
+          }
+          else {
+            reader.readAsText(changeEvent.target.files[0]);
+          }
+        });
+      }
+    };
+  }])
+  .provider('RemoteTokens', function () {
+    var that = this;
+    this.tokens = {};
+
+    this.getRemoteToken = function(url) {
+      var token = false;
+      Object.keys(that.tokens).forEach(function(key) {
+        if (url.indexOf(key) === 0) {
+          token = that.tokens[key];
+        }
+      });
+      return token;
+    };
+
+    this.setRemoteToken = function(projectUrl, token) {
+      that.tokens[projectUrl] = token;
+    };
+
+    this.$get = function () {
+      return {
+        getRemoteToken: this.getRemoteToken,
+        setRemoteToken: this.setRemoteToken
+      };
+    };
+  })
+  .factory('RemoteInterceptor', [
+    '$q',
+    'RemoteTokens',
+    function($q, RemoteTokens) {
+      var Interceptor = {
+        /**
+         * Set the token in the request headers.
+         */
+        request: function(config) {
+          if (config.disableJWT) return config;
+          var remoteToken = RemoteTokens.getRemoteToken(config.url);
+          if (remoteToken) {
+            config.headers['x-remote-token'] = remoteToken;
+            delete config.headers['x-jwt-token'];
+          }
+          return config;
+        }
+      };
+
+      return Interceptor;
+    }
+  ]);

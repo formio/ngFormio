@@ -4,7 +4,21 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [UNRELEASED]
+## [Unreleased]
+### Added
+ - Overall access page in left menu
+ - Project Stages!
+ - Version deployments/creation
+ - Locking stages
+ - Framework support
+ - New Environments
+
+### Changed
+ - Projects are created from platforms, not app templates
+ - Improved Teams pages
+ - Improved access permissions and descriptions
+ - Fix for content component's 'unsaved changes' error message
+
 ## 4.1.5
  - Upgraded ng-formio to 2.20.7
  - Upgraded ng-formio-builder to 2.20.12
@@ -42,6 +56,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
  - Upgraded ng-formio to 2.19.1
  - Upgraded ng-formio-builder to 2.19.1
+
+### Fixed
+ - All spinners to give feedback.
+ - Bugs with Teams and Access
+ - Some empty components were displaying incorrectly in submission grid.
+
+### Removed
+ - Tour
+ - Environment Switcher
+ - Project Templates
 
 ## 4.0.13
 ### Changed

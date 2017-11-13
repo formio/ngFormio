@@ -1,0 +1,22 @@
+<div class="panel panel-default">
+  <div class="panel-heading">Custom CSS and Javascript</div>
+  <div class="panel-body">
+    <div>These settings allow adding custom CSS and Javascript that will be used within the Form.io portal. You must also include the CSS or javascript within your app to see the same functionality. Common uses of these settings are to have the form preview have the same styling as your application and to include custom components into the form builder.</div>
+    <label class="control-label"><strong>Custom CSS</strong></label>
+    <input type="text" class="form-control" id="custom-css" ng-model="currentProject.settings.custom.css" placeholder="The url of a custom css file." />
+    <p>It is recommended to wrap all CSS classes with a custom class specific to a project. Otherwise theses styles will apply to all projects once loaded. You can use the <strong>.{{ currentProject.name}}Form</strong> class to target only forms in this project.</p>
+    <label class="control-label"><strong>Custom Javascript</strong></label>
+    <input type="text" class="form-control" id="custom-js" ng-model="currentProject.settings.custom.js" placeholder="The url of a custom js file." />
+    <p>Custom Javascript is useful for adding custom components to a project.</p>
+  </div>
+</div>
+<!--<div class="panel panel-default">-->
+  <!--<div class="panel-heading">Preview</div>-->
+  <!--<div class="panel-body">-->
+    <!--<label for="preview-repo" class="control-label">Preview Git Repo</label>-->
+    <!--<input type="text" class="form-control" id="preview-repo" ng-model="currentProject.settings.preview.repo" placeholder="The git repository for the preview app." />-->
+    <!--<label for="preview-repo" class="control-label">Preview App Url</label>-->
+    <!--<input type="text" class="form-control" id="preview-url" ng-model="currentProject.settings.preview.url" placeholder="The app url for the preview app." />-->
+  <!--</div>-->
+<!--</div>-->
+<button class="btn btn-primary" ng-click="saveProject()">Save Settings</button>

@@ -24,6 +24,7 @@ $price-panel-basic:       $brand-secondary;
 $price-panel-independent: $brand-primary;
 $price-panel-team:        lighten($brand-primary, 5%);
 $price-panel-commercial:  darken($gray, 10%);
+$price-panel-trial:       darken($brand-danger, 15%);
 
 //== Scaffolding
 //
@@ -390,15 +391,15 @@ $navbar-default-toggle-border-color:       transparent;
 // Inverted navbar
 // Reset inverted navbar basics
 $navbar-inverse-color:                      #fff;
-$navbar-inverse-bg:                         #333;
-$navbar-inverse-border:                     darken($navbar-inverse-bg, 10%);
+$navbar-inverse-bg:                         darken($brand-primary, 25%);
+$navbar-inverse-border:                     lighten($navbar-inverse-bg, 10%);
 
 // Inverted navbar links
 $navbar-inverse-link-color:                 #fff;
 $navbar-inverse-link-hover-color:           #fff;
-$navbar-inverse-link-hover-bg:              darken($navbar-inverse-bg, 10%);
+$navbar-inverse-link-hover-bg:              lighten($navbar-inverse-bg, 10%);
 $navbar-inverse-link-active-color:          #fff;
-$navbar-inverse-link-active-bg:             darken($navbar-inverse-bg, 10%);
+$navbar-inverse-link-active-bg:             lighten($navbar-inverse-bg, 10%);
 $navbar-inverse-link-disabled-color:        #444;
 $navbar-inverse-link-disabled-bg:           transparent;
 

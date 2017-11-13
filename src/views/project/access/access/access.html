@@ -1,0 +1,6 @@
+<i id="roles-loader" ng-if="rolesLoading" style="font-size: 2em;" class="fa fa-spinner fa-pulse"></i>
+<div ng-if="!rolesLoading">
+  <legend>Project Level Access Permissions</legend>
+  <p>These permissions control project level access and should should be granted with caution. Users with Create, Update or Delete All on the project level can significantly modify a project.</p>
+  <permission-editor permissions="currentProject.access" labels="permissionLabels" roles="currentProjectRoles" wait-for="loadProjectPromise" permission-filter="'_all'" protected="currentProject.protect"></permission-editor>
+</div>

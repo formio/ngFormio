@@ -1,3 +1,4 @@
+<a class="pull-right" ng-if="downloadUrl" target="_blank" href="{{ downloadUrl }}"><img src="{{ pdfImage }}" style="width: 2.5em;" /></a>
 <ul class="nav nav-tabs submission-nav">
     <li role="presentation" ng-class="{active:isActive('project.{{ formInfo.type }}.form.submission.item.view')}"><a ui-sref="project.{{ formInfo.type }}.form.submission.item.view()">View</a></li>
     <li role="presentation" ng-class="{active:isActive('project.{{ formInfo.type }}.form.submission.item.edit')}"><a ui-sref="project.{{ formInfo.type }}.form.submission.item.edit()">Edit</a></li>

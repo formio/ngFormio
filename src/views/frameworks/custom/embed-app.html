@@ -1,0 +1,27 @@
+<div class="row">
+  <div class="col-sm-12">
+    <ul class="list-group steps">
+      <li class="list-group-item">
+        <div class="list-group-item-title">
+          <span class="count-badge">1</span>
+          <h5>Create the mount point</h5>
+        </div>
+        <p>Place the following where you would like to show the form.</p>
+        <pre><code>&lt;div id="formio" /&gt;</code></pre>
+      </li>
+      <li class="list-group-item">
+        <div class="list-group-item-title">
+          <span class="count-badge">2</span>
+          <h5>Attach the form to the mount point</h5>
+        </div>
+        <p>Next, you will attach the form to the HTML element.</p>
+    <pre style="font-size:0.8em;"><code>&lt;script type="text/javascript"&gt;
+      &nbsp;&nbsp;window.onload = function() {
+      &nbsp;&nbsp;&nbsp;&nbsp;Formio.createForm(document.getElementById('formio'), '{{ variables.projectUrl }}/demographics');
+      &nbsp;&nbsp;};
+      &lt;/script&gt;</code></pre>
+      </li>
+    </ul>
+    <p>The form should now render on your page. If you try it out and receive an access denied error, be sure to go to the access settings for the form and allow anonymous users to create submissions.</p>
+  </div>
+</div>

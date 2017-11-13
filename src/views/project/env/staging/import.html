@@ -1,0 +1,24 @@
+<div>
+  <h3>Import Project Template to {{ environmentName }}</h3>
+  <div class="row">
+    <div class="col-md-8">
+      <p>Importing a project definition will update all forms, resources, roles and access for the stage from a definition file.</p>
+      <div class="form-inline">
+        <label class="control-label" for="file">Name</label>
+        <p><input id="file" class="form-control" type="file" name="file" accept=".json" fileread="importFile"></p>
+        <p><button type="submit" class="btn btn-primary" ng-click="importTemplate(importFile)">Import Project Template to {{ environmentName }}</button></p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <h3 class="panel-title">Importing a project template</h3>
+        </div>
+        <div class="panel-body">
+          <p>Importing a project template to a stage will replace all forms, resources, roles, actions and access settings with the ones in the properly formatted JSON file.</p>
+          <p>To import, select the file and click <strong>Import Project Template</strong>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

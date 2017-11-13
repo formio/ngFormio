@@ -22,7 +22,7 @@ app.controller('RoleController', [
         return;
       }
       var method = $scope.role._id ? 'put' : 'post';
-      var url = $scope.formio.projectUrl + '/role';
+      var url = $scope.formio.projectUrl + '/role?limit=1000';
       if($scope.role._id) {
         url += '/' + $scope.role._id;
       }
@@ -41,7 +41,7 @@ app.controller('RoleController', [
             message: 'Role successfully ' + ($scope.role._id ? 'saved' : 'created') + '.'
           });
 
-          $scope.back('project.settings.roles.view');
+          $scope.back('project.access');
         }, FormioAlerts.onError.bind(FormioAlerts))
         .catch(FormioAlerts.onError.bind(FormioAlerts));
     };
@@ -60,7 +60,7 @@ app.controller('RoleController', [
           message: 'Role successfully deleted.'
         });
 
-        $scope.back('project.settings.roles.view');
+        $scope.back('project.access');
       }).catch(function(err) {
         var error = {};
         switch(err.status) {

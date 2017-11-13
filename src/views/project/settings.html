@@ -1,23 +1,48 @@
-<div class="alert alert-success" role="alert"><i class="fa fa-lock fa-lg"></i> Project Settings are encrypted for your protection.</div>
-<div class="col-sm-2">
-  <div class="well">
-    <ul class="nav nav-pills nav-stacked">
-      <li role="presentation" ng-class="{active:($state.includes('project.settings.project'))}"><a ui-sref="project.settings.project">General Settings</a></li>
-      <li role="presentation" ng-class="{active:($state.includes('project.settings.roles'))}"><a ui-sref="project.settings.roles.view">Roles</a></li>
-      <li role="presentation" ng-class="{active:($state.includes('project.settings.access'))}"><a ui-sref="project.settings.access">Access</a></li>
-      <li role="presentation" ng-class="{active:($state.includes('project.settings.oauth'))}"><a ui-sref="project.settings.oauth">OAuth</a></li>
-      <li role="presentation" ng-if="user._id === currentProject.owner && (currentProject.plan === 'team' || currentProject.plan === 'commercial')" ng-class="{active:($state.includes('project.settings.teams'))}"><a ui-sref="project.settings.teams.view">Teams</a></li>
-      <li role="presentation" ng-class="{active:($state.includes('project.settings.email'))}"><a ui-sref="project.settings.email">Email Providers</a></li>
-      <li role="presentation" ng-class="{active:($state.includes('project.settings.storage'))}"><a ui-sref="project.settings.storage">File Storage</a></li>
-      <li role="presentation" ng-class="{active:($state.includes('project.settings.data'))}"><a ui-sref="project.settings.data">Data Connections</a></li>
-      <li role="presentation" ng-class="{active:($state.includes('project.settings.apiKeys'))}"><a ui-sref="project.settings.apiKeys">API Keys</a></li>
-      <li role="presentation" ng-class="{active:($state.includes('project.settings.customjscss'))}"><a ui-sref="project.settings.customjscss">Custom JS and CSS</a></li>
-    </ul>
+<form name="projectForm" ng-submit="saveProject()" novalidate>
+  <div id="form-group-title" class="form-group" ng-class="{'has-error': projectForm.title.$invalid && projectForm.title.$dirty}">
+    <label for="title" class="control-label required-field">{{ createType }} Title</label>
+    <input type="text" class="form-control" id="title" name="title" ng-model="project.title" placeholder="Give your {{ createType }} a name." ng-maxlength="63" ng-required="true" autofocus="true">
+    <p class="help-block" ng-show="projectForm.title.$error.maxlength">{{ projectType }} Title cannot be longer than 63 characters.</p>
   </div>
-</div>
-<div class="col-sm-10" style="padding: 0 20px 40px 0;">
-  <ng-form>
-    <i id="project-loader" ng-if="!currentProject" style="font-size: 2em;" class="fa fa-spinner fa-pulse"></i>
-    <div ng-if="currentProject" ui-view></div>
-  </ng-form>
-</div>
+  <div id="form-group-description" class="form-group" ng-class="{'has-error': projectForm.description.$invalid}">
+    <label for="description" class="control-label">Description</label>
+    <input type="text" class="form-control" id="description" name="description" ng-model="project.description" placeholder="Enter a short description for your project." ng-maxlength="512">
+    <p class="help-block" ng-show="projectForm.description.$error.maxlength">Description cannot be longer than 512 characters.</p>
+  </div>
+  <div ng-if="!hideFrameworks">
+    <label class="control-label">Target Framework</label>
+    <p class="text-muted">Select which framework you plan to build this project in.</p>
+    <ui-select ng-model="project.framework" theme="bootstrap">
+      <ui-select-match placeholder="Select framework">{{$select.selected.title}}</ui-select-match>
+      <ui-select-choices repeat="framework.name as framework in frameworks | filter:$select.search">
+        <span>{{ framework.title }}</span>
+      </ui-select-choices>
+    </ui-select>
+  </div>
+  <div ng-if="!project._id">
+    <div class="panel panel-default">
+      <div class="panel-heading" role="tab" id="advancedHeading">
+        <h4 class="panel-title">
+          <a role="button" data-toggle="collapse" href="#advanced" aria-controls="advanced">
+            Advanced Options
+          </a>
+        </h4>
+      </div>
+      <div id="advanced" class="panel-collapse collapse" role="tabpanel" aria-labelledby="advancedHeading">
+        <div class="panel-body">
+          <div ng-if="!hasTemplate">
+            <span class="btn btn-default btn-block btn-file">
+              Upload A Project Template <input id="template-select" type="file" accept=".json" onchange="angular.element(this).scope().loadTemplate.call(this)">
+            </span>
+          </div>
+          <div ng-if="hasTemplate">
+            Template added. <a ng-click="removeTemplate()">remove</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <br />
+  <a ui-sref="project.overview()" class="btn btn-default" ng-if="project._id">Cancel</a>
+  <button type="submit" class="btn btn-primary" ng-disabled="projectForm.$invalid"><i ng-if="isBusy" class="fa fa-spinner fa-pulse"></i> {{ project._id ? 'Save Project' : 'Create Project'}}</button>
+</form>

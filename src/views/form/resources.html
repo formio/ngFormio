@@ -1,12 +1,9 @@
-<div ng-if="resources.length === 0" class="alert alert-info text-center" style="margin-bottom:0;">
-  There are currently no <span ng-if="formInfo.type === 'form'">forms</span><span ng-if="formInfo.type === 'resource'">resources</span> defined for this project.
-</div>
 <div class="panel panel-primary form-list-panel">
   <div class="panel-body">
     <div class="row">
       <div class="col-sm-8">
         <h2>Resources</h2>
-        <form-list forms="resources" form-name="'Resource'" project="currentProject" form-type="'resource'" list-mode="'resource'"></form-list>
+        <form-list forms="resources" form-name="'Resource'" formio="formio" project-url="projectUrl" form-type="'resource'" list-mode="'resource'" protected="currentProject.protect"></form-list>
       </div>
       <div class="col-sm-4">
         <ng-include src="infoTemplate"></ng-include>

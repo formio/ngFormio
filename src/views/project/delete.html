@@ -1,8 +1,8 @@
 <div class="project-section-inner-content">
   <form class="form-horizontal" role="form">
-    <h2>Are you sure you wish to delete the Project <strong>{{ currentProject.title }} ({{ currentProject.name }})</strong>?</h2>
+    <h2>Are you sure you wish to delete the {{ (currentProject._id === primaryProject._id ? 'Project' : 'Environment') }} <strong>{{ currentProject.title }} ({{ currentProject.name }})</strong>?</h2>
     <div class="btn-toolbar">
-      <button ng-click="deleteProject()" class="btn btn-danger">Yes</button>
+      <button ng-click="deleteProject()" class="btn btn-danger" ng-disabled="isBusy"><i ng-if="isBusy" class="fa fa-spinner fa-pulse"></i> Yes</button>
       <button ng-click="back('home')" class="btn btn-default">No</button>
     </div>
   </form>

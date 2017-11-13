@@ -1,6 +1,7 @@
 <!doctype html>
 <html class="no-js" lang="">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta charset="utf-8">
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -16,11 +17,12 @@
     <link rel="stylesheet" href="/bower_components/ng-dialog/css/ngDialog-theme-default.css" />
     <link rel="stylesheet" href="/bower_components/angular-swagger-ui/dist/css/swagger-ui.min.css" />
     <link rel="stylesheet" href="/bower_components/angular-ui-select/dist/select.css" />
-    <link rel="stylesheet" href="/bower_components/ng-formio/dist/formio.min.css" />
+    <link rel="stylesheet" href="/bower_components/ng-formio/css/formio.css" />
     <link rel="stylesheet" href="/bower_components/ng-tags-input/ng-tags-input.css" />
-    <link rel="stylesheet" href="/bower_components/ng-formio-builder/dist/ngFormBuilder.min.css" />
+    <link rel="stylesheet" href="/bower_components/ng-formio-builder/css/ngFormBuilder.css" />
     <link rel="stylesheet" href="/bower_components/angular-toastr/dist/angular-toastr.min.css" />
     <link rel="stylesheet" href="/bower_components/chartist-plugin-tooltip/dist/chartist-plugin-tooltip.css" />
+    <link rel="stylesheet" href="/bower_components/angular-bootstrap-lightbox/dist/angular-bootstrap-lightbox.css" />
     <!-- endbower -->
     <!-- endbuild -->
 
@@ -59,10 +61,7 @@
       <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
     <div id="content">
-      <nav class="navbar navbar-fixed-top">
-        <ul id="home-button" class="nav navbar-nav navbar-left navbar-home" ng-if="isActive('project')" ng-cloak>
-          <li><a ui-sref="home" title="Home"><i class="fa fa-home"></i></a></li>
-        </ul>
+      <nav class="navbar navbar-fixed-top navbar-inverse">
         <div ng-class="{container: !isActive('project')}" ng-cloak>
           <div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -77,51 +76,19 @@
           </div>
           <div id="navbar" class="navbar-collapse collapse navbar-menu">
             <ul class="nav navbar-nav navbar-right">
-              <li>
-                <a class="btn btn-default" style="margin-top: 5px;" href="/beta">Try Beta UI</a>
-              </li>
-              <li class="dropbox" ng-controller="environmentSwitcher">
-                <a ng-cloak href="" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-server"></i> {{ (currentEnvironment.name ? currentEnvironment.name : 'Environments') }}<b class="caret"></b></a>
-                <ul class="dropdown-menu">
-                  <li ng-if="environments.length && currentEnvironment">
-                    <a ng-click="switchEnvironment()">Form.io</a>
+              <li class="dropbox">
+                <a ng-cloak href="" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-server"></i> Environments<b class="caret"></b></a>
+                <ul class="dropdown-menu help-menu">
+                  <li>
+                    <a href="https://help.form.io/support/" target="_blank">Environment switcher has been deprecated. Please use Environment Staging instead.<br />If you need access to the Environment Switcher, please contact us.</a>
+                    <a href="https://help.form.io/support/" target="_blank">Support</a>
+                    <a href="https://help.form.io/userguide/staging/" target="_blank">Environment Staging Help</a>
                   </li>
-                  <li style="position:  relative;" ng-repeat="environment in environments track by $index" ng-if="environment.url !== currentEnvironment.url">
-                    <span style="right: 10px; top: 10px; position: absolute;" ng-click="removeEnvironment($event, $index)"><i class="fa fa-close"></i></span>
-                    <a ng-click="switchEnvironment(environment)">{{environment.name}}</a>
-                  </li>
-                  <li ng-if="!addingEnvironment" ><a ng-click="addEnvironment($event)">Add Environment</a></li>
-                  <li ng-if="addingEnvironment" style="width: 620px;">
-                    <form class="form-inline" style="margin: 5px 10px;">
-                      <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Name" ng-model="environment.name">
-                      </div>
-                      <div class="form-group">
-                        <input type="text" class="form-control" placeholder="http://lvh.me:3000" ng-model="environment.url">
-                      </div>
-                      <div class="form-group">
-                        <!--<label class="form-label">Project Path</label>-->
-                        <select class="form-control" ng-options="option as option for option in environmentTypes" ng-model="environment.type" ng-click="typeClick($event)" placeholder="Project Paths">
-                          <option value="">(Project Path Type)</option>
-                        </select>
-                      </div>
-                      <a class="btn btn-default" ng-click="saveEnvironment($event)">Add</a>
-                      <span ng-click="cancelEnvironment()"><i class="fa fa-close"></i></span>
-                    </form>
-                    <div class="environment-errors">
-                      <p class="help-block" ng-show="errors.nameRequired">Environment name is required.</p>
-                      <p class="help-block" ng-show="errors.urlRequired">Environment Url is required.</p>
-                      <p class="help-block" ng-show="errors.typeRequired">Project Path Type is required.</p>
-                      <p class="help-block" ng-show="errors.urlInvalid">Url is not valid.</p>
-                      <p class="help-block" ng-show="errors.localhost">http://localhost cannot be used as a domain since it does not support subdomains. Use <strong>http://lvh.me</strong> instead for 127.0.0.1.</p>
-                    </div>
-                  </li>
-                  <li><a href="https://help.form.io/userguide/environment-switcher/" target="_blank">Help</a></li>
                 </ul>
               </li>
               <li class="dropdown">
                 <a href="" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-book"></i> Docs<b class="caret"></b></a>
-                <ul class="dropdown-menu">
+                <ul class="dropdown-menu help-menu">
                   <li class="no-hover">
                     <div class="row docs-dropdown">
                       <div class="col-md-3">
@@ -146,7 +113,7 @@
                         </ul>
                       </div>
                       <div class="col-md-3">
-                        <h5 class="section-heading"><i class="fa fa-cloud"></i> Integrations</h5>
+                        <h5 class="section-heading"><i class="fa fa-upload"></i> Integrations</h5>
                         <ul class="list-group">
                           <li class="list-group-item"><a href="https://help.form.io/developer/integrations/email/" target="_blank"><i class="fa fa-envelope"></i> Email Providers</a></li>
                           <li class="list-group-item"><a href="https://help.form.io/developer/integrations/filestorage/" target="_blank"><i class="fa fa-file"></i> File Storage Providers</a></li>
@@ -161,7 +128,8 @@
                           <li class="list-group-item"><a href="https://help.form.io/developer/info/bootstrap/" target="_blank"><i class="fa fa-copy"></i> Application Cloning</a></li>
                           <li class="list-group-item"><a href="https://help.form.io/userguide/actions/" target="_blank"><i class="fa fa-cogs"></i> Form Actions</a></li>
                           <li class="list-group-item"><a href="https://help.form.io/developer/info/offline/" target="_blank"><i class="fa fa-wifi"></i> Offline Mode</a></li>
-                          <li class="list-group-item"><a href="https://help.form.io/userguide/docker/" target="_blank"><i class="fa fa-ship"></i> Docker Deployments</a></li>
+                          <li class="list-group-item"><a href="https://help.form.io/userguide/staging/" target="_blank"><i class="fa fa-exchange"></i> Staging and Deploying</a></li>
+                          <li class="list-group-item"><a href="https://help.form.io/userguide/environments/" target="_blank"><i class="fa fa-cloud"></i> On-Premise</a></li>
                         </ul>
                       </div>
                     </div>
@@ -187,7 +155,7 @@
 
     <footer>
       <div class="footer-banner"><img src="images/footerlogo-before.png" /></div>
-      <div class="container">
+      <div class="container footer-content">
         <div class="row" ng-if="$state.current.name === 'auth'">
           <div class="col-md-3">
             <ul class="list-group">
@@ -263,15 +231,17 @@
     <script src="/bower_components/angular-ui-ace/ui-ace.js"></script>
     <script src="/bower_components/angular-ui-select/dist/select.js"></script>
     <script src="/bower_components/angular-ckeditor/angular-ckeditor.js"></script>
-    <script src="/bower_components/ng-formio/dist/formio.min.js"></script>
+    <script src="/bower_components/ng-formio/dist/formio.js"></script>
     <script src="/bower_components/angular-drag-and-drop-lists/angular-drag-and-drop-lists.js"></script>
     <script src="/bower_components/ng-tags-input/ng-tags-input.js"></script>
-    <script src="/bower_components/ng-formio-builder/dist/ngFormBuilder.min.js"></script>
+    <script src="/bower_components/ng-formio-builder/dist/ngFormBuilder.js"></script>
     <script src="/bower_components/chance/chance.js"></script>
     <script src="/bower_components/qs/dist/qs.js"></script>
     <script src="/bower_components/angular-toastr/dist/angular-toastr.tpls.min.js"></script>
     <script src="/bower_components/chartist-plugin-tooltip/dist/chartist-plugin-tooltip.min.js"></script>
     <script src="/bower_components/seamless/build/seamless.parent.min.js"></script>
+    <script src="/bower_components/angular-bootstrap-lightbox/dist/angular-bootstrap-lightbox.js"></script>
+    <script src="/bower_components/semver/semver.browser.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 
@@ -306,15 +276,18 @@
     <script src="scripts/components/resourcefields.js"></script>
     <script src="scripts/controllers/access.js"></script>
     <script src="scripts/controllers/controllers.js"></script>
-    <script src="scripts/controllers/environmentSwitcher.js"></script>
     <script src="scripts/controllers/feedback.js"></script>
     <script src="scripts/controllers/form.js"></script>
     <script src="scripts/controllers/help.js"></script>
-    <script src="scripts/controllers/import.js"></script>
+    <script src="scripts/controllers/pdf.js"></script>
     <script src="scripts/controllers/project.js"></script>
     <script src="scripts/controllers/role.js"></script>
     <script src="scripts/controllers/team.js"></script>
     <script src="scripts/controllers/user.js"></script>
+    <script src="scripts/directives/stepFlow.js"></script>
+    <script src="scripts/providers/ProjectFrameworkSteps.js"></script>
+    <script src="scripts/providers/ProjectFrameworks.js"></script>
+    <script src="scripts/providers/primaryProject.js"></script>
     <script src="scripts/utils/utils.js"></script>
     <!-- endinject -->
     <!-- endbuild -->

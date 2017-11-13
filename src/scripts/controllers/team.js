@@ -2,26 +2,6 @@
 
 var app = angular.module('formioApp.controllers.team', []);
 
-app.controller('TeamCreateController', [
-  '$scope',
-  '$state',
-  'FormioAlerts',
-  function(
-    $scope,
-    $state,
-    FormioAlerts
-  ) {
-    $scope.$on('formSubmission', function(event) {
-      event.stopPropagation();
-      FormioAlerts.addAlert({
-        type: 'success',
-        message: 'New team created!'
-      });
-      $state.go('home');
-    });
-  }
-]);
-
 app.controller('TeamController', [
   '$scope',
   '$stateParams',
@@ -36,8 +16,41 @@ app.controller('TeamController', [
     $scope.teamUrl = $rootScope.teamForm + '/submission/' + $stateParams.teamId;
     $scope.team = {};
     $scope.formio = new Formio($scope.teamUrl);
-    $scope.formio.loadSubmission().then(function(team) {
+    $scope.loadTeamPromise = $scope.formio.loadSubmission().then(function(team) {
       $scope.team = team;
+    });
+  }
+]);
+
+app.controller('TeamCreateController', [
+  '$rootScope',
+  '$scope',
+  '$state',
+  'FormioAlerts',
+  function(
+    $rootScope,
+    $scope,
+    $state,
+    FormioAlerts
+  ) {
+
+    $scope.team = {data: {}};
+    $scope.team.data.members = [];
+    $scope.team.data.admins = [];
+    $scope.team.data.members.push({
+      _id: $rootScope.user._id,
+      data: {
+        name: $rootScope.user.data.name || $rootScope.user.data.email.substr(0, $rootScope.user.data.email.indexOf('@'))
+      }
+    });
+
+    $scope.$on('formSubmission', function(event, team) {
+      event.stopPropagation();
+      FormioAlerts.addAlert({
+        type: 'success',
+        message: 'New team created!'
+      });
+      $state.go('team.view', { teamId: team._id });
     });
   }
 ]);
@@ -64,12 +77,27 @@ app.controller('TeamViewController', [
     TeamPermissions
   ) {
     $scope.getPermissionLabel = TeamPermissions.getPermissionLabel.bind(TeamPermissions);
+
+    $scope.activeView = 'members';
+    $scope.switchView = function(view) {
+      $scope.activeView = view;
+    };
+
+    $scope.add = {
+      Person: undefined
+    };
+
     $scope.teamPermissionsLoaded = false;
     Formio.request(AppConfig.apiBase + '/team/' + $stateParams.teamId + '/projects', 'GET')
       .then(function(teams) {
         $scope.teamPermissionsLoaded = true;
         $scope.teamPermissions = teams;
       });
+
+    $scope.isAdmin = false;
+    $scope.loadTeamPromise.then(function() {
+      $scope.isAdmin = $scope.team.owner === $rootScope.user._id || _.find($scope.team.data.admins, {_id: $rootScope.user._id});
+    });
 
     $scope.leaveTeam = function(id) {
       // Always clear cache for the current teams.
@@ -89,43 +117,43 @@ app.controller('TeamViewController', [
           $state.go('home', null, {reload: true});
         }, function(err) {
           console.log(err);
+          FormioAlerts.addAlert({
+            type: 'danger',
+            message: err.message
+          });
           $state.go('home', null, {reload: true});
         });
     };
-  }
-]);
 
-app.controller('TeamAddController', [
-  '$scope',
-  '$state',
-  'FormioAlerts',
-  function(
-    $scope,
-    $state,
-    FormioAlerts
-  ) {
-    $scope.$on('formSubmission', function(event) {
-      event.stopPropagation();
-      FormioAlerts.addAlert({
-        type: 'success',
-        message: 'Team was deleted.'
+    $scope.selectMembers = [];
+
+    $scope.refreshMembers = function(input) {
+      Formio.request(AppConfig.apiBase + '/team/members?limit=100&name=' + input, 'GET')
+        .then(function(members) {
+          $scope.selectMembers = members;
+        });
+    };
+
+    $scope.changeRole = function(member, role) {
+      $scope.add.Person = undefined;
+      _.remove($scope.team.data.admins, { _id: member._id });
+      _.remove($scope.team.data.members, { _id: member._id });
+      if (role) {
+        $scope.team.data[role] = $scope.team.data[role] || [];
+        $scope.team.data[role].push(member);
+      }
+      $scope.formio.saveSubmission(angular.copy($scope.team)).then(function() {
+        FormioAlerts.addAlert({
+          type: 'success',
+          message: 'Team membership updated.'
+        });
+      }).catch(function(err) {
+        FormioAlerts.addAlert({
+          type: 'danger',
+          message: err.message
+        });
       });
-      $state.go('project.settings.teams.view');
-    });
-  }
-]);
-
-app.controller('TeamEditController', [
-  '$scope',
-  '$state',
-  function(
-    $scope,
-    $state
-  ) {
-    $scope.$on('formSubmission', function(event) {
-      event.stopPropagation();
-      $state.go('home');
-    });
+    };
   }
 ]);
 
@@ -145,6 +173,11 @@ app.controller('TeamDeleteController', [
         message: 'Team was deleted.'
       });
       $state.go('home');
+    });
+
+    $scope.$on('cancel', function(event) {
+      event.stopPropagation();
+      $state.go('team.view', { teamId: $scope.team._id });
     });
   }
 ]);
