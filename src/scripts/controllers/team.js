@@ -117,6 +117,10 @@ app.controller('TeamViewController', [
           $state.go('home', null, {reload: true});
         }, function(err) {
           console.log(err);
+          FormioAlerts.addAlert({
+            type: 'danger',
+            message: err.message
+          });
           $state.go('home', null, {reload: true});
         });
     };
@@ -138,7 +142,17 @@ app.controller('TeamViewController', [
         $scope.team.data[role] = $scope.team.data[role] || [];
         $scope.team.data[role].push(member);
       }
-      $scope.formio.saveSubmission(angular.copy($scope.team));
+      $scope.formio.saveSubmission(angular.copy($scope.team)).then(function() {
+        FormioAlerts.addAlert({
+          type: 'success',
+          message: 'Team membership updated.'
+        });
+      }).catch(function(err) {
+        FormioAlerts.addAlert({
+          type: 'danger',
+          message: err.message
+        });
+      });
     };
   }
 ]);

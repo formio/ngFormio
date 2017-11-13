@@ -170,6 +170,10 @@ app.controller('ProjectCreateController', [
     };
 
     $scope.saveProject = function() {
+      // Debounce.
+      if ($scope.isBusy) {
+        return;
+      }
       $scope.isBusy = true;
       FormioProject.createProject($scope.project).then(function(project) {
         $scope.isBusy = false;
@@ -226,18 +230,19 @@ app.controller('ProjectCreateEnvironmentController', [
     $scope.isBusy = false;
 
     $scope.saveProject = function() {
+      // Debounce.
+      if ($scope.isBusy) {
+        return;
+      }
       $scope.isBusy = true;
-      FormioProject.createEnvironment($scope.currentProject).then(function(project) {
-        // Update team access to new environment.
-        project.access = project.access.concat(_.filter($scope.primaryProject.access, function(access) { return access.type.indexOf('team_') === 0;}));
-        (new Formio(AppConfig.apiBase + '/project/' + project._id)).saveProject(angular.copy(project))
-          .catch(FormioAlerts.onError.bind(FormioAlerts))
-          .then(function() {
-            PrimaryProject.clear();
-            $state.go('project.overview', {projectId: project._id});
-          })
-          .catch(function() {$scope.isBusy = false;});
-      });
+      FormioProject.createEnvironment($scope.currentProject)
+        .then(function(project) {
+          PrimaryProject.clear();
+          $scope.isBusy = false;
+          $state.go('project.overview', {projectId: project._id});
+        })
+        .catch(FormioAlerts.onError.bind(FormioAlerts))
+        .catch(function() {$scope.isBusy = false;});
     };
   }
 ]);
@@ -296,6 +301,7 @@ app.controller('ProjectController', [
     $scope.localFormio = $scope.formio;
     $scope.currentProject = {_id: $stateParams.projectId, access: []};
     $scope.projectUrl = '';
+    $scope.unsecurePortal = 'http://' + window.location.host;
 
     $scope.rolesLoading = true;
     $scope.loadRoles = function() {
@@ -315,32 +321,34 @@ app.controller('ProjectController', [
       return plans.indexOf(checkProject.plan) >= plans.indexOf(plan);
     };
 
-    $scope.saveProject = function() {
-      if (!$scope.currentProject._id) { return FormioAlerts.onError(new Error('No Project found.')); }
+    $scope._saveProject = function(project, formio) {
+      if (!project._id) { return FormioAlerts.onError(new Error('No Project found.')); }
+      if ($scope.status.save === 'saving') {
+        return;
+      }
+
+      formio = formio || (new Formio('/project/' + project._id));
       $scope.status.save = 'saving';
-      $scope.formio.saveProject($scope.currentProject)
+      return formio.saveProject(angular.copy(project))
         .then(function(project) {
           FormioAlerts.addAlert({
             type: 'success',
             message: 'Project settings saved.'
           });
+          PrimaryProject.clear();
           GoogleAnalytics.sendEvent('Project', 'update', null, 1);
           $scope.status.save = 'saved';
+          return project;
         }, FormioAlerts.onError.bind(FormioAlerts))
         .catch(FormioAlerts.onError.bind(FormioAlerts));
     };
 
+    $scope.saveProject = function() {
+      return $scope._saveProject($scope.currentProject, $scope.formio);
+    };
+
     $scope.saveLocalProject = function() {
-      if (!$scope.localProject._id) { return FormioAlerts.onError(new Error('No Project found.')); }
-      return $scope.localFormio.saveProject($scope.localProject)
-        .then(function(project) {
-          FormioAlerts.addAlert({
-            type: 'success',
-            message: 'Project settings saved.'
-          });
-          GoogleAnalytics.sendEvent('Project', 'update', null, 1);
-        }, FormioAlerts.onError.bind(FormioAlerts))
-        .catch(FormioAlerts.onError.bind(FormioAlerts));
+      return $scope._saveProject($scope.localProject, $scope.localFormio);
     };
 
     $scope.switchEnv = function(environmentId) {
@@ -368,6 +376,9 @@ app.controller('ProjectController', [
         $scope.isRemote = true;
         Formio.setProjectUrl($scope.projectUrl = $rootScope.projectPath($scope.localProject.remote.project, $scope.localProject.remote.url, $scope.localProject.remote.type));
         $scope.projectProtocol = $scope.localProject.remote.url.indexOf('https') === 0 ? 'https:' : 'http:';
+        if ($scope.projectProtocol === 'http:' && $scope.projectProtocol !== window.location.protocol) {
+          $scope.protocolSecureError = true;
+        }
         $scope.projectServer = $scope.localProject.remote.url.replace(/(^\w+:|^)\/\//, '');
         $scope.localFormio = $scope.formio;
         $scope.baseUrl = $scope.localProject.remote.url;
@@ -493,6 +504,7 @@ app.controller('ProjectController', [
 
         $scope.trialDaysRemaining = trialRemaining > 0 ? trialRemaining : 0;
         $scope.createdDays = createdDays;
+        document.body.className += ' ' + 'project-' + primaryProject.plan;
 
         PrimaryProject.set(primaryProject, $scope);
       });
@@ -581,8 +593,7 @@ app.controller('ProjectDeployController', [
             $scope.saveLocalProject()
               .then(function() {
                 PrimaryProject.clear();
-                $state.reload();
-                //$state.transitionTo($state.current, null, { reload: true, inherit: true, notify: true });
+                $state.transitionTo($state.current, null, { reload: true, inherit: true, notify: true });
               });
           }
           else {
@@ -778,26 +789,30 @@ app.controller('ProjectOverviewController', [
         {
           $limit: 10
         },
-      ]).then(function(result) {
-        $scope.submissions = result.data || [];
+      ])
+        .then(function(result) {
+          $scope.submissions = result.data || [];
 
-        if ($scope.submissions.length) {
-          var formIds = _.uniq($scope.submissions.map(function(submission) {
-            return submission.form;
-          }));
+          if ($scope.submissions.length) {
+            var formIds = _.uniq($scope.submissions.map(function(submission) {
+              return submission.form;
+            }));
 
-          $scope.formio.loadForms({
-            params: {
-              _id__in: formIds
-            }
-          }).then(function(results) {
-            $scope.forms = {};
-            results.forEach(function(form) {
-              $scope.forms[form._id] = form;
+            $scope.formio.loadForms({
+              params: {
+                _id__in: formIds
+              }
+            }).then(function(results) {
+              $scope.forms = {};
+              results.forEach(function(form) {
+                $scope.forms[form._id] = form;
+              });
             });
-          });
-        }
-      });
+          }
+        })
+        .catch(function(err) {
+          console.warn('Unable to get recent submissions', err);
+        });
     });
   }
 ]);
@@ -2022,7 +2037,6 @@ app.controller('ProjectSettingsController', [
     });
 
     $scope.addKey = function() {
-      $scope.status.save = 'saving';
       if (!$scope.currentProject.settings.keys) {
         $scope.currentProject.settings.keys = [];
       }
@@ -2039,25 +2053,16 @@ app.controller('ProjectSettingsController', [
           pool: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
         })
       });
-      $scope.formio.saveProject($scope.currentProject).then(function() {
-        $scope.status.save = 'saved';
-      });
+      $scope._saveProject($scope.currentProject, $scope.formio);
     };
 
     $scope.removeKey = function($index) {
-      $scope.status.save = 'saving';
       $scope.currentProject.settings.keys.splice($index, 1);
-      $scope.formio.saveProject($scope.currentProject).then(function() {
-        $scope.status.save = 'saved';
-      });
+      $scope._saveProject($scope.currentProject, $scope.formio);
     };
 
     $scope.updateProject = function() {
-      $scope.status.save = 'saving';
-      $scope.formio.saveProject($scope.currentProject)
-        .then(function() {
-          $scope.status.save = 'saved';
-        });
+      $scope._saveProject($scope.currentProject, $scope.formio);
     };
 
     // Save the Project.
@@ -2067,21 +2072,9 @@ app.controller('ProjectSettingsController', [
         $scope.currentProject.name = $scope.currentProject.name.toLowerCase().replace(/[^0-9a-z\-]|^\-+|\-+$/g, '');
       }
 
-      if (!$scope.currentProject._id) { return FormioAlerts.onError(new Error('No Project found.')); }
-      $scope.formio.saveProject($scope.currentProject)
-        .then(function(project) {
-          FormioAlerts.addAlert({
-            type: 'success',
-            message: 'Project saved.'
-          });
-          GoogleAnalytics.sendEvent('Project', 'update', null, 1);
-          // Reload state so alerts display and project updates.
-          PrimaryProject.clear();
-          $state.go($state.current.name, {
-            projectId: project._id
-          }, {reload: true});
-        }, FormioAlerts.onError.bind(FormioAlerts))
-        .catch(FormioAlerts.onError.bind(FormioAlerts));
+      $scope._saveProject($scope.currentProject, $scope.formio).then(function(project) {
+        $state.go($state.current.name, null, {reload: true});
+      });
     };
 
     $scope.authenticatedWithOAuth = false;
@@ -2120,7 +2113,7 @@ app.controller('ProjectSettingsController', [
         $scope.verifiedOAuth = true;
         var data = result.data;
         $scope.currentProject.settings.atlassian.oauth.token = data.access_token;
-        $scope.saveProject();
+        $scope._saveProject($scope.currentProject);
       })
       .catch(function(error) {
         FormioAlerts.onError({
@@ -2142,6 +2135,13 @@ app.controller('ProjectRemoteController', [
       type: 'Subdirectories'
     };
     $scope.environmentTypes = ['Subdomains', 'Subdirectories'];
+
+    $scope.insecureWarning = false;
+    $scope.$watch('remote.url', function(url) {
+      if (url) {
+        $scope.insecureWarning = url.indexOf('http:') !== -1 && window.location.protocol === 'https:';
+      }
+    });
 
     $scope.check = function() {
       if (!$scope.remote.url || !$scope.remote.secret) {
@@ -2280,18 +2280,12 @@ app.controller('PrimaryProjectSettingsController', [
   '$state',
   'ProjectFrameworks',
   'Formio',
-  'FormioAlerts',
-  'GoogleAnalytics',
-  'PrimaryProject',
   function(
     $scope,
     $rootScope,
     $state,
     ProjectFrameworks,
-    Formio,
-    FormioAlerts,
-    GoogleAnalytics,
-    PrimaryProject
+    Formio
   ) {
     $scope.frameworks = _.filter(ProjectFrameworks, function(item) {return !item.disabled;});
 
@@ -2301,21 +2295,10 @@ app.controller('PrimaryProjectSettingsController', [
     });
 
     $scope.saveProject = function() {
-      $scope.status.save = 'saving';
-      $scope.formio.saveProject($scope.project)
-        .then(function(project) {
-          FormioAlerts.addAlert({
-            type: 'success',
-            message: 'Project settings saved.'
-          });
-          GoogleAnalytics.sendEvent('Project', 'update', null, 1);
-          $scope.status.save = 'saved';
-          PrimaryProject.clear();
-          $state.go('project.overview', null, { reload: true, inherit: true, notify: true });
-        }, FormioAlerts.onError.bind(FormioAlerts))
-        .catch(FormioAlerts.onError.bind(FormioAlerts));
+      return $scope._saveProject($scope.project, $scope.formio).then(function(project) {
+        $state.go('project.overview', null, { reload: true, inherit: true, notify: true });
+      });
     };
-
   }
 ]);
 
@@ -2387,11 +2370,6 @@ app.controller('ProjectTeamController', [
       project.access = access;
     };
 
-    var saveProject = function(project) {
-      return (new Formio(AppConfig.apiBase + '/project/' + project._id)).saveProject(angular.copy(project))
-        .catch(FormioAlerts.onError.bind(FormioAlerts));
-    };
-
     $scope.teamPermissions = [
       {
         value: 'team_read',
@@ -2416,13 +2394,8 @@ app.controller('ProjectTeamController', [
 
     $scope.addTeam = function(team) {
       setTeamPermission($scope.primaryProject, team, 'team_read');
-      saveProject($scope.primaryProject).then(function(project) {
+      $scope._saveProject($scope.primaryProject).then(function(project) {
         $scope.primaryProject = project;
-      });
-      // Add team to environments as well
-      $scope.environments.forEach(function(environment) {
-        setTeamPermission(environment, team, 'team_read');
-        saveProject(environment);
       });
       _.remove($scope.uniqueEligibleTeams, { _id: team._id });
       team.permission = 'team_read';
@@ -2432,13 +2405,8 @@ app.controller('ProjectTeamController', [
 
     $scope.removeTeam = function(team) {
       setTeamPermission($scope.primaryProject, team);
-      saveProject($scope.primaryProject).then(function(project) {
+      $scope._saveProject($scope.primaryProject).then(function(project) {
         $scope.primaryProject = project;
-      });
-      // Remove team from environments as well
-      $scope.environments.forEach(function(environment) {
-        setTeamPermission(environment, team);
-        saveProject(environment);
       });
       _.remove($scope.primaryProjectTeams, { _id: team._id });
       delete team.permission;
@@ -2447,13 +2415,8 @@ app.controller('ProjectTeamController', [
 
     $scope.updateTeam = function(team, permission) {
       setTeamPermission($scope.primaryProject, team, permission);
-      saveProject($scope.primaryProject).then(function(project) {
+      $scope._saveProject($scope.primaryProject).then(function(project) {
         $scope.primaryProject = project;
-      });
-      // Update team in environments as well
-      $scope.environments.forEach(function(environment) {
-        setTeamPermission(environment, team, permission);
-        saveProject(environment);
       });
     };
   }
@@ -2637,13 +2600,17 @@ app.controller('ProjectBilling', [
   'FormioAlerts',
   'UserInfo',
   'ProjectPlans',
-  function($rootScope, $scope, $http, $state, $window, AppConfig, Formio, FormioAlerts, UserInfo, ProjectPlans) {
+  'PDFServer',
+  function($rootScope, $scope, $http, $state, $window, AppConfig, Formio, FormioAlerts, UserInfo, ProjectPlans, PDFServer) {
     $scope.primaryProjectPromise.then(function(project) {
 
       $scope.servers = (project.billing && project.billing.servers) ? angular.copy(project.billing.servers) : {
         api: 0,
         pdf: 0
       };
+
+      $scope.planLoading = false;
+      $scope.pdfInfo = {};
 
       $scope.plans = ProjectPlans.getPlans();
 
@@ -2689,6 +2656,22 @@ app.controller('ProjectBilling', [
     };
 
     $scope.changePlan = function() {
+      $scope.planLoading = true;
+
+      PDFServer.purchasePDF($scope.primaryProjectPromise, {
+        plan: $scope.pdfInfo.plan
+      }).then(function(results) {
+        $scope.pdfInfo = results.data.data;
+        $scope.pdfPlanLoading = false;
+        $scope.planLoading = false;
+      }, function(err) {
+        FormioAlerts.onError({message: err.data || err.message});
+        $scope.pdfPlanLoading = false;
+      }).catch(function(err) {
+        FormioAlerts.onError({message: err.data || err.message});
+        $scope.pdfPlanLoading = false;
+      });
+
       $http.post(AppConfig.apiBase + '/project/' + $scope.primaryProject._id + '/upgrade',
         {
           plan: $scope.selectedPlan.name,
@@ -2696,6 +2679,7 @@ app.controller('ProjectBilling', [
         }
         )
         .then(function() {
+          $scope.planLoading = false;
           Formio.clearCache();
           $window.location.reload();
         }, FormioAlerts.onError.bind(FormioAlerts))
@@ -2719,16 +2703,70 @@ app.controller('ProjectBilling', [
             pdf: 0
           };
         }
+
+        var pdfPrice = 0;
+        if (parseInt($scope.servers.pdf, 10) > 0) {
+          $scope.pdfInfo.plan = 'enterprise';
+          pdfPrice = ($scope.servers.pdf % 3 * 250) + (Math.floor($scope.servers.pdf / 3) * 500);
+        }
+        else if ($scope.pdfInfo.plan === 'hosted') {
+          pdfPrice = 50;
+        }
+        else {
+          $scope.pdfInfo.plan = 'basic';
+        }
+
         $scope.pricing = {
           plan: $scope.selectedPlan.price,
           api: ($scope.servers.api % 3 * 250) + (Math.floor($scope.servers.api / 3) * 500),
-          pdf: ($scope.servers.pdf % 3 * 250) + (Math.floor($scope.servers.pdf / 3) * 500)
+          pdf: {
+            plan: $scope.pdfInfo.plan,
+            servers: $scope.servers.pdf,
+            price: pdfPrice
+          }
         };
-        $scope.pricing.total = $scope.pricing.plan + $scope.pricing.api + $scope.pricing.pdf;
+        $scope.pricing.total = $scope.pricing.plan + $scope.pricing.api + $scope.pricing.pdf.price;
       }
     };
 
+    $scope.setPDFHostedPlan = function(plan) {
+      $scope.servers.pdf = 0;
+      $scope.pdfInfo.plan = plan;
+      calculatePrice();
+    };
+
+    PDFServer.getInfo($scope.primaryProjectPromise).then(function(info) {
+      $scope.pdfInfo = info.data;
+      $scope.pdfInfoOriginalPlan = $scope.pdfInfo.plan;
+      calculatePrice();
+    });
+
     $scope.$watch('servers', calculatePrice, true);
     $scope.$watch('selectedPlan', calculatePrice, true);
+  }
+]);
+
+app.controller('ProjectExportController', [
+  '$scope',
+  '$http',
+  function(
+    $scope,
+    $http
+  ) {
+    $scope.downloadTemplate = function() {
+      $http({
+        url: $scope.projectUrl + '/export',
+        method: 'GET',
+        responseType: 'blob'
+      }).then(function(response) {
+        var a = document.createElement('a');
+        a.href = window.URL.createObjectURL(response.data);
+        a.download = $scope.currentProject.name + '-' + $scope.currentProject.tag + '.json';
+        a.click();
+        window.URL.revokeObjectURL(a.href);
+      }).catch(function(error) {
+        console.error(error);
+      });
+    };
   }
 ]);

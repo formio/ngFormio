@@ -40,6 +40,7 @@ angular
     'toastrConfig',
     'RemoteTokensProvider',
     'formioComponentsProvider',
+    'COMMON_OPTIONS',
     function(
       $stateProvider,
       $urlRouterProvider,
@@ -49,8 +50,12 @@ angular
       AppConfig,
       toastrConfig,
       RemoteTokensProvider,
-      formioComponentsProvider
+      formioComponentsProvider,
+      COMMON_OPTIONS
     ) {
+      // Change the form builder options for encrypted to be commercial only.
+      COMMON_OPTIONS.encrypted.label = 'Encrypted (Commercial Only)';
+
       // Reset the hashPrefix to remove the "!".
       $locationProvider.hashPrefix('');
 
@@ -359,7 +364,8 @@ angular
         .state('project.env.staging.export', {
           url: '/staging/export',
           parent: 'project.env',
-          templateUrl: 'views/project/env/staging/export.html'
+          templateUrl: 'views/project/env/staging/export.html',
+          controller: 'ProjectExportController'
         })
         .state('project.env.logs', {
           url: '/logs',

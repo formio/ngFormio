@@ -2072,11 +2072,23 @@ app.controller('FormSubmissionDeleteController', [
 
 app.controller('FormPermissionController', [
   '$scope',
+  'FormioAlerts',
   function(
-    $scope
+    $scope,
+    FormioAlerts
   ) {
     $scope.$on('permissionsChange', function() {
-      $scope.formio.saveForm(angular.copy($scope.currentForm));
+      $scope.formio.saveForm(angular.copy($scope.currentForm)).then(function() {
+        FormioAlerts.addAlert({
+          type: 'success',
+          message: 'Permissions Saved'
+        });
+      }).catch(function(err) {
+        FormioAlerts.addAlert({
+          type: 'danger',
+          message: err.message
+        });
+      });
     });
   }
 ]);

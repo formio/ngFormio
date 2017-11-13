@@ -21,6 +21,19 @@ body {
 .grow { transition: all .2s ease-in-out; }
 .grow:hover { transform: scale(1.2); }
 
+.form-builder-premium {
+  display: block;
+}
+
+.form-builder-premium label {
+  color: #aaa;
+  pointer-events: none;
+}
+
+.project-commercial .form-builder-premium label {
+  color: inherit;
+  pointer-events: auto;
+}
 
 .btn {
   overflow: hidden;
@@ -1626,6 +1639,10 @@ footer {
 
 .type-icon-form {
   color: $brand-secondary;
+}
+
+.list-group.list-group-or .list-group-heading {
+  background-color: #fff;
 }
 
 /********************* Project Plan Upgrade Dialog *********************/

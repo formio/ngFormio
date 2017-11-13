@@ -67,9 +67,8 @@ docker run -itd \
           </tr>
         </table>
         <div class="panel-footer">
-          <a class="btn btn-primary btn-block" ng-click="purchase('pdfs')">
-            <span ng-if="pdfInfo.data.plan !== 'enterprise'">Upgrade</span>
-            <span ng-if="pdfInfo.data.plan === 'enterprise'">Downgrade</span>
+          <a class="btn btn-primary btn-block" ui-sref="project.billing()">
+            <span>Change Plan</span>
           </a>
         </div>
       </div>
@@ -93,9 +92,8 @@ docker run -itd \
           </tr>
         </table>
         <div class="panel-footer">
-          <a class="btn btn-primary btn-block" ng-click="purchase('submissions')">
-            <span ng-if="pdfInfo.data.plan !== 'enterprise'">Upgrade</span>
-            <span ng-if="pdfInfo.data.plan === 'enterprise'">Downgrade</span>
+          <a class="btn btn-primary btn-block" ui-sref="project.billing()">
+            <span>Change Plan</span>
           </a>
         </div>
       </div>
