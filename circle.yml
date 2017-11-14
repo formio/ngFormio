@@ -29,8 +29,8 @@ test:
     - sudo bash -c "echo \"127.0.0.1 portal.localhost\" >> /etc/hosts"
     - npm start:
         background: true
-  post:
-    - mv ./test/screenshots/ $CIRCLE_ARTIFACTS/screenshots
+#  post:
+#    - mv ./test/screenshots/ $CIRCLE_ARTIFACTS/screenshots
 
 deployment:
   prerelease:

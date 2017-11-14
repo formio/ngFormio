@@ -27,7 +27,7 @@ module.exports = function (actions) {
       actions.logout();
       actions.iAmLoggedInFor('profileuser1');
       actions.goToPage('#/profile/edit');
-      actions.iSeeTextIn(".control-label","Name");
+      // actions.iSeeTextIn(".control-label","Name");
       actions.enterTextInField('.profile-edit-page #fullName','${random-fullName>profileuser1.fullName}');
       actions.clickOnElementWithText('Submit');
       actions.iSeeTextIn(".alert","Submission was updated.");
@@ -38,7 +38,7 @@ module.exports = function (actions) {
       actions.logout();
       actions.iAmLoggedInFor('profileuser1');
       actions.goToPage('#/profile/edit');
-      actions.iSeeText("Username");
+      // actions.iSeeText("Username");
       actions.enterTextInField('.profile-edit-page #name','${random-name>profileuser1.name}');
       actions.clickOnElementWithText('Submit');
       actions.iSeeTextIn(".alert","Submission was updated.");
@@ -49,7 +49,7 @@ module.exports = function (actions) {
       actions.logout();
       actions.iAmLoggedInFor('profileuser1');
       actions.goToPage('#/profile/edit');
-      actions.iSeeText("Email");
+      // actions.iSeeText("Email");
       actions.enterTextInField('.profile-edit-page #email','${random-email>profileuser1.email}');
       actions.clickOnElementWithText('Submit');
       actions.iSeeTextIn(".alert","Submission was updated.");
