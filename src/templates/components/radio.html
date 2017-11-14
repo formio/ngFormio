@@ -13,7 +13,7 @@
         ng-disabled="readOnly"
         ng-style="getOptionInputStyles(component)"
       >
-      <span ng-if="!topOrLeftOptionLabel(component)">{{ v.label | formioTranslate:null:options.building }}</span>
+      <span ng-if="!topOrLeftOptionLabel(component)">{{ v.label | formioTranslate:null:options.building | shortcut:v.shortcut }}</span>
     </label>
   </div>
 </ng-form>

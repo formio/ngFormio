@@ -68,6 +68,7 @@ app.filter('tableFieldView', require('./filters/tableFieldView'));
 app.filter('safehtml', require('./filters/safehtml'));
 app.filter('formioTranslate', require('./filters/translate'));
 app.filter('trustAsResourceUrl', require('./filters/trusturl'));
+app.filter('shortcut', require('./filters/shortcut'));
 app.config([
   '$httpProvider',
   '$injector',
