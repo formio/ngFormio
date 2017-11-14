@@ -15,7 +15,7 @@ var expect = chai.expect;
 var url = (port === 80)
   ? protocol + '://' + domain
   : protocol + '://' + domain + ':' + port;
-url = "http://portal.test-form.io";
+// url = "http://portal.test-form.io";
 var config = {
   protocol: protocol,
   baseUrl: url,
@@ -40,27 +40,15 @@ describe("Formio Tests", function () {
   require('./features/loginFunctionality.spec')(actions);
   require('./features/userPortalandWelcome.spec')(actions);
   require('./features/feedbackrequest.spec')(actions);
-  //require('./features/documentationLinks.spec')(actions);
+  // require('./features/documentationLinks.spec')(actions);
   require('./features/profileFunctionality.spec')(actions);
-  //require('./features/project.spec')(actions);
-  //require('./features/projectSettings.spec')(actions);
+  // require('./features/project.spec')(actions);
+  // require('./features/projectSettings.spec')(actions);
   require('./features/form.spec')(actions);
   //require('./features/environments.spec')(actions);
   //require('./features/createResource2.spec')(actions);
   //require('./features/createForm.spec')(actions);
-  // require('./features/register.spec')(actions);
-  // require('./features/loginFunctionality.spec')(actions);
-  // require('./features/userPortalandWelcome.spec')(actions);
-  // require('./features/feedbackrequest.spec')(actions);
-  // require('./features/documentationLinks.spec')(actions);
-  // require('./features/profileFunctionality.spec')(actions);
-  // require('./features/project.spec')(actions);
-  // require('./features/projectSettings.spec')(actions);
-  // require('./features/form.spec')(actions);
-  // require('./features/environments.spec')(actions);
-  // //require('./features/createResource2.spec')(actions);
-  // //require('./features/createForm.spec')(actions);
-  require('./features/settingsBasic.spec')(actions);
+require('./features/settingsBasic.spec')(actions);
   require('./features/settingsIndependent.spec')(actions);
   require('./features/settingsTeamPro.spec')(actions);
   require('./features/settingsEnterprise.spec')(actions);
