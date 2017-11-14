@@ -1,5 +1,5 @@
 <div class="select-boxes">
-  <label ng-if="options.building || (component.label && !component.hideLabel)" for="{{ componentId }}" class="control-label" ng-class="{'field-required': isRequired(component)}">
+  <label ng-if="options.building || (component.label && !component.hideLabel && component.labelPosition !== 'bottom')" for="{{ componentId }}" class="control-label" ng-class="{'field-required': isRequired(component)}" ng-style="getLabelStyles(component)">
     {{ component.label }}
     <formio-component-tooltip></formio-component-tooltip>
   </label>
@@ -15,7 +15,12 @@
     grid-row="gridRow"
     grid-col="gridCol"
     options="options"
+    ng-style="getInputGroupStyles(component)"
   ></formio-select-boxes>
+  <label ng-if="options.building || (component.label && !component.hideLabel && component.labelPosition === 'bottom')" for="{{ componentId }}" class="control-label control-label--bottom" ng-class="{'field-required': isRequired(component)}">
+    {{ component.label }}
+    <formio-component-tooltip></formio-component-tooltip>
+  </label>
   <div ng-if="!!component.description" class="help-block">
     <span>{{ component.description }}</span>
   </div>

@@ -1,6 +1,7 @@
 <div class="select-boxes">
   <div ng-class="component.inline ? 'checkbox-inline' : 'checkbox'" ng-repeat="v in component.values track by $index">
-    <label class="control-label" for="{{ componentId }}-{{ v.value }}">
+    <label class="control-label" for="{{ componentId }}-{{ v.value }}" ng-style="getOptionLabelStyles(component)">
+      <span ng-if="topOrLeftOptionLabel(component)">{{ v.label | formioTranslate:null:options.building }}</span>
       <input type="checkbox"
         id="{{ componentId }}-{{ v.value }}"
         name="{{ componentId }}-{{ v.value }}"
@@ -11,8 +12,9 @@
         ng-checked="model[v.value]"
         grid-row="gridRow"
         grid-col="gridCol"
+        ng-style="getOptionInputStyles(component)"
       >
-      {{ v.label | formioTranslate:null:options.building | shortcut:v.shortcut }}
+      <span ng-if="!topOrLeftOptionLabel(component)">{{ v.label | formioTranslate:null:options.building | shortcut:v.shortcut }}</span>
     </label>
   </div>
 </div>

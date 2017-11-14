@@ -34,7 +34,7 @@ module.exports = function(app) {
         ];
 
         function isLeapYear(year) {
-          // Year is leap if it evenly divisible by 400 or evenly divisible by 4 and not evenly divisible by 100.
+          // Year is leap if it is evenly divisible by 400 or evenly divisible by 4 and not evenly divisible by 100.
           return !(year % 400) || (!!(year % 100) && !(year % 4));
         }
 
@@ -144,6 +144,50 @@ module.exports = function(app) {
             }
           }
           return true;
+        };
+
+        scope.getLabelStyles = function(component) {
+          var labelPosition = component.inputsLabelPosition;
+
+          if (labelPosition === 'left') {
+            return {
+              float: 'left',
+              width: '30%',
+              'margin-right': '3%',
+              'text-align': 'left'
+            };
+          }
+
+          if (labelPosition === 'right') {
+            return {
+              float: 'right',
+              width: '30%',
+              'margin-left': '3%',
+              'text-align': 'right'
+            };
+          }
+        };
+
+        scope.getInputStyles = function(component) {
+          var labelPosition = component.inputsLabelPosition;
+
+          if ([
+            'left',
+            'right'
+          ].indexOf(labelPosition) !== -1) {
+            var styles = {
+              width: '67%'
+            };
+
+            if (labelPosition === 'left') {
+              styles['margin-left'] = '33%';
+            }
+            else {
+              styles['margin-right'] = '33%';
+            }
+
+            return styles;
+          }
         };
       }
     };

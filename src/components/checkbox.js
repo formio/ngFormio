@@ -9,7 +9,7 @@ module.exports = function(app) {
         tableView: function(data) {
           return data ? 'Yes' : 'No';
         },
-        controller: ['$scope', '$timeout', function($scope, $timeout) {
+        controller: ['$scope', '$timeout', 'FormioUtils', function($scope, $timeout, FormioUtils) {
           if ($scope.options && $scope.options.building) return;
           var boolean = {
             true: true,
@@ -42,6 +42,10 @@ module.exports = function(app) {
               }
             });
           }
+
+          $scope.topOrLeftOptionLabel = FormioUtils.labelPositionWrapper(FormioUtils.topOrLeftOptionLabel);
+          $scope.getOptionLabelStyles = FormioUtils.labelPositionWrapper(FormioUtils.getOptionLabelStyles);
+          $scope.getOptionInputStyles = FormioUtils.labelPositionWrapper(FormioUtils.getOptionInputStyles);
         }],
         settings: {
           input: true,

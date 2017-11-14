@@ -97,6 +97,90 @@ module.exports = [
             return FormioUtils.isRequired(component);
           };
 
+          function labelOnTheLeft(position) {
+            return [
+              'left-left',
+              'left-right'
+            ].indexOf(position) !== -1;
+          }
+
+          function labelOnTheRight(position) {
+            return [
+              'right-left',
+              'right-right'
+            ].indexOf(position) !== -1;
+          }
+
+          function labelOnTheLeftOrRight(position) {
+            return labelOnTheLeft(position) || labelOnTheRight(position);
+          }
+
+          function getLabelTextAlign(position) {
+            return position.match('-right') ? 'right': 'left';
+          }
+
+          function getComponentLabelWidth(component) {
+            if (angular.isUndefined(component.labelWidth)) {
+              component.labelWidth = 30;
+            }
+
+            return component.labelWidth;
+          }
+
+          function getComponentLabelMargin(component) {
+            if (angular.isUndefined(component.labelMargin)) {
+              component.labelMargin = 3;
+            }
+
+            return component.labelMargin;
+          }
+
+          $scope.getLabelStyles = function(component) {
+            var labelPosition = _get(component, 'labelPosition');
+
+            if (labelOnTheLeft(labelPosition)) {
+              return {
+                float: 'left',
+                width: getComponentLabelWidth(component) + '%',
+                'margin-right': getComponentLabelMargin(component) + '%',
+                'text-align': getLabelTextAlign(labelPosition)
+              };
+            }
+
+            if (labelOnTheRight(labelPosition)) {
+              return {
+                float: 'right',
+                width: getComponentLabelWidth(component) + '%',
+                'margin-left': getComponentLabelMargin(component) + '%',
+                'text-align': getLabelTextAlign(labelPosition)
+              };
+            }
+          };
+
+          $scope.getInputGroupStyles = function(component) {
+            var labelPosition = _get(component, 'labelPosition');
+            
+            if (labelOnTheLeftOrRight(labelPosition)) {
+              var totalLabelWidth = getComponentLabelWidth(component) + getComponentLabelMargin(component);
+              var styles = {
+                width: (100 - totalLabelWidth) + '%'
+              };
+
+              if (labelOnTheLeft(labelPosition)) {
+                styles['margin-left'] = totalLabelWidth + '%';
+              }
+               else {
+                styles['margin-right'] = totalLabelWidth + '%';
+              }
+
+              return styles;
+            }
+          };
+
+          $scope.topOrLeftOptionLabel = FormioUtils.optionsLabelPositionWrapper(FormioUtils.topOrLeftOptionLabel);
+          $scope.getOptionLabelStyles = FormioUtils.optionsLabelPositionWrapper(FormioUtils.getOptionLabelStyles);
+          $scope.getOptionInputStyles = FormioUtils.optionsLabelPositionWrapper(FormioUtils.getOptionInputStyles);
+
           // Survey components haves questions.
           // We want to make the survey component label marked with error if any
           // of the questions is in invalid state.

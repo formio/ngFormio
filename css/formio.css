@@ -201,6 +201,11 @@ input[type="password"][draggable="true"] {
   white-space: pre-wrap;
 }
 
+.control-label--bottom {
+  margin-bottom: 0;
+  margin-top: 5px;
+}
+
 /*Form Wizard*/
 .bs-wizard {border-bottom: solid 1px #e0e0e0; padding: 0 0 10px 0;line-height: 1em;}
 .bs-wizard > .bs-wizard-step {padding: 0; position: relative;}

@@ -50,7 +50,19 @@ module.exports = function(app) {
           _model[value] = !_model[value];
           ngModel.$setViewValue(_model);
         };
-      }
+      },
+      controller: [
+        '$scope',
+        'FormioUtils',
+        function(
+          $scope,
+          FormioUtils
+        ) {
+          $scope.topOrLeftOptionLabel = FormioUtils.optionsLabelPositionWrapper(FormioUtils.topOrLeftOptionLabel);
+          $scope.getOptionLabelStyles = FormioUtils.optionsLabelPositionWrapper(FormioUtils.getOptionLabelStyles);
+          $scope.getOptionInputStyles = FormioUtils.optionsLabelPositionWrapper(FormioUtils.getOptionInputStyles);
+        }
+      ]
     };
   }]);
 
