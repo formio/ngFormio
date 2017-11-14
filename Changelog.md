@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.25.1
+### Fixed
+ - Issue where the label placement was getting messed up on form builder views.
+
 ## 2.25.0
 ### Added
  - Min and Max size options for file uploads.

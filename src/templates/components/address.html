@@ -1,4 +1,4 @@
-<label ng-if="options.building || (component.label && !component.hideLabel && component.labelPosition !== 'bottom')" for="{{ componentId }}" ng-class="{'field-required': isRequired(component)}" ng-style="getLabelStyles(component)">
+<label ng-if="(options.building || (component.label && !component.hideLabel)) && component.labelPosition !== 'bottom'" for="{{ componentId }}" ng-class="{'field-required': isRequired(component)}" ng-style="getLabelStyles(component)">
   {{ component.label | formioTranslate:null:options.building }}
   <formio-component-tooltip></formio-component-tooltip>
 </label>
@@ -9,7 +9,7 @@
     <div ng-bind-html="address.formatted_address | highlight: $select.search"></div>
   </ui-select-choices>
 </ui-select>
-<label ng-if="options.building || (component.label && !component.hideLabel && component.labelPosition === 'bottom')" for="{{ componentId }}" ng-class="{'field-required': isRequired(component)}" class="control-label--bottom">
+<label ng-if="(options.building || (component.label && !component.hideLabel)) && component.labelPosition === 'bottom'" for="{{ componentId }}" ng-class="{'field-required': isRequired(component)}" class="control-label--bottom">
   {{ component.label | formioTranslate:null:options.building }}
   <formio-component-tooltip></formio-component-tooltip>
 </label>

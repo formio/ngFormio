@@ -1,6 +1,6 @@
 <div class="checkbox">
   <label for="{{ componentId }}" ng-class="{'field-required': isRequired(component)}" ng-style="getOptionLabelStyles(component)">
-    <span ng-if="options.building || !(component.hideLabel && component.datagridLabel === false) && topOrLeftOptionLabel(component)">
+    <span ng-if="(options.building || !(component.hideLabel && component.datagridLabel === false)) && topOrLeftOptionLabel(component)">
       {{ component.label | formioTranslate:null:options.building }}
       <formio-component-tooltip></formio-component-tooltip>
     </span>
@@ -28,7 +28,7 @@
       custom-validator="component.validate.custom"
       ng-style="getOptionInputStyles(component)"
     >
-    <span ng-if="options.building || !(component.hideLabel && component.datagridLabel === false) && !topOrLeftOptionLabel(component)">
+    <span ng-if="(options.building || !(component.hideLabel && component.datagridLabel === false)) && !topOrLeftOptionLabel(component)">
       {{ component.label | formioTranslate:null:options.building | shortcut:component.shortcut }}
       <formio-component-tooltip></formio-component-tooltip>
     </span>
