@@ -1,6 +1,7 @@
 <ng-form name="{{ componentId }}" ng-model="data[component.key]" custom-validator="component.validate.custom">
   <div ng-class="component.inline ? 'radio-inline' : 'radio'" ng-repeat="v in component.values track by $index">
-    <label class="control-label" for="{{ componentId }}-{{ v.value }}">
+    <label class="control-label" for="{{ componentId }}-{{ v.value }}" ng-style="getOptionLabelStyles(component)">
+      <span ng-if="topOrLeftOptionLabel(component)">{{ v.label | formioTranslate:null:options.building }}</span>
       <input
         type="{{ component.inputType }}"
         id="{{ componentId }}-{{ v.value }}"
@@ -10,8 +11,9 @@
         ng-required="isRequired(component)"
         custom-validator="component.validate.custom"
         ng-disabled="readOnly"
+        ng-style="getOptionInputStyles(component)"
       >
-      {{ v.label | formioTranslate:null:options.building }}
+      <span ng-if="!topOrLeftOptionLabel(component)">{{ v.label | formioTranslate:null:options.building }}</span>
     </label>
   </div>
 </ng-form>

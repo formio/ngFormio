@@ -4,6 +4,14 @@ var _get = require('lodash/get');
 
 module.exports = function() {
   var hooks = {};
+
+  function optionsLabelOnTheTopOrBottom(position) {
+    return [
+      'top',
+      'bottom'
+    ].indexOf(position) !== -1;
+  }
+
   return {
     // Asynchronously iterate through a map.
     each: function(items, each, done) {
@@ -332,7 +340,7 @@ module.exports = function() {
         '{{ component.label | formioTranslate:null:options.building }} ' +
         '<formio-component-tooltip></formio-component-tooltip>' +
         '</label>';
-        var inputBottomLabel = '<label ng-if="options.building || (component.label && !component.hideLabel && component.labelPosition === \'bottom\')" for="{{ component.key }}" class="control-label control-label--bottom" ng-class="{\'field-required\': isRequired(component)}">' +
+      var inputBottomLabel = '<label ng-if="options.building || (component.label && !component.hideLabel && component.labelPosition === \'bottom\')" for="{{ component.key }}" class="control-label control-label--bottom" ng-class="{\'field-required\': isRequired(component)}">' +
         '{{ component.label | formioTranslate:null:options.building }} ' +
         '<formio-component-tooltip></formio-component-tooltip>' +
         '</label>';
@@ -351,26 +359,29 @@ module.exports = function() {
             '<formio-errors ng-if="::!options.building"></formio-errors>' +
           '</div>' +
         '</div>' +
-        '<div ng-if="component.multiple"><table class="table table-bordered">' +
+        '<div ng-if="component.multiple">' +
           inputTopLabel +
-          '<tr ng-repeat="value in data[component.key] track by $index">' +
-            '<td>' +
-              '<div class="input-group">' +
-                '<div class="input-group-addon" ng-if="!!component.prefix">{{ component.prefix }}</div>' +
-                  multiInput +
-                  requiredInline +
-                '<div class="input-group-addon" ng-if="!!component.suffix">{{ component.suffix }}</div>' +
-              '</div>' +
-              '<div class="formio-errors">' +
-                '<formio-errors ng-if="::!options.building"></formio-errors>' +
-              '</div>' +
-            '</td>' +
-            '<td><a ng-click="(readOnly || formioForm.submitting)? null:removeFieldValue($index) " ng-disabled = "readOnly || formioForm.submitting" class="btn btn-default"><span class="glyphicon glyphicon-remove-circle"></span></a></td>' +
-          '</tr>' +
-          '<tr>' +
-            '<td colspan="2"><a ng-click="(readOnly || formioForm.submitting)? null: addFieldValue() " ng-disabled = "readOnly || formioForm.submitting" class="btn btn-primary"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {{ component.addAnother || "Add Another" | formioTranslate:null:options.building }}</a></td>' +
-          '</tr>' +
-        '</table></div>' +
+          '<table class="table table-bordered" ng-style="getInputGroupStyles(component)">' +
+            '<tr ng-repeat="value in data[component.key] track by $index">' +
+              '<td>' +
+                '<div class="input-group">' +
+                  '<div class="input-group-addon" ng-if="!!component.prefix">{{ component.prefix }}</div>' +
+                    multiInput +
+                    requiredInline +
+                  '<div class="input-group-addon" ng-if="!!component.suffix">{{ component.suffix }}</div>' +
+                '</div>' +
+                '<div class="formio-errors">' +
+                  '<formio-errors ng-if="::!options.building"></formio-errors>' +
+                '</div>' +
+              '</td>' +
+              '<td><a ng-click="(readOnly || formioForm.submitting)? null:removeFieldValue($index) " ng-disabled = "readOnly || formioForm.submitting" class="btn btn-default"><span class="glyphicon glyphicon-remove-circle"></span></a></td>' +
+            '</tr>' +
+            '<tr>' +
+              '<td colspan="2"><a ng-click="(readOnly || formioForm.submitting)? null: addFieldValue() " ng-disabled = "readOnly || formioForm.submitting" class="btn btn-primary"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {{ component.addAnother || "Add Another" | formioTranslate:null:options.building }}</a></td>' +
+            '</tr>' +
+          '</table>' +
+          inputBottomLabel +
+        '</div>' +
         '<div ng-if="!!component.description" class="help-block">' +
           '<span>{{ component.description | formioTranslate:null:options.building }}</span>' +
         '</div>';
@@ -385,6 +396,58 @@ module.exports = function() {
      */
     isRequired: function(component, componentsToRequire) {
       return (component.validate && component.validate.required) || (Array.isArray(componentsToRequire) && componentsToRequire.indexOf(component.key) !== -1);
+    },
+    topOrLeftOptionLabel: function(position) {
+      return [
+        'top',
+        'left'
+      ].indexOf(position) !== -1;
+    },
+    getOptionLabelStyles: function(position) {
+      if (position === 'left') {
+        return {
+          'text-align': 'center',
+          'padding-left': 0
+        };
+      }
+
+      if (optionsLabelOnTheTopOrBottom(position)) {
+        return {
+          display: 'block',
+          'text-align': 'center',
+          'padding-left': 0
+        };
+      }
+
+      return null;
+    },
+    getOptionInputStyles: function(position) {
+      if (position === 'left') {
+        return {
+          position: 'initial',
+          'margin-left': 0
+        };
+      }
+
+      if (optionsLabelOnTheTopOrBottom(position)) {
+        return {
+          width: '100%',
+          position: 'initial',
+          'margin-left': 0
+        };
+      }
+
+      return null;
+    },
+    labelPositionWrapper: function(fn) {
+      return function(component) {
+        return fn(component.labelPosition);
+      };
+    },
+    optionsLabelPositionWrapper: function(fn) {
+      return function(component) {
+        return fn(component.optionsLabelPosition);
+      };
     }
   };
 };

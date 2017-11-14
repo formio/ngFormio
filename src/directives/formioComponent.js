@@ -144,7 +144,7 @@ module.exports = [
                 width: getComponentLabelWidth(component) + '%',
                 'margin-right': getComponentLabelMargin(component) + '%',
                 'text-align': getLabelTextAlign(labelPosition)
-              }
+              };
             }
 
             if (labelOnTheRight(labelPosition)) {
@@ -153,7 +153,7 @@ module.exports = [
                 width: getComponentLabelWidth(component) + '%',
                 'margin-left': getComponentLabelMargin(component) + '%',
                 'text-align': getLabelTextAlign(labelPosition)
-              }
+              };
             }
           };
 
@@ -164,17 +164,22 @@ module.exports = [
               var totalLabelWidth = getComponentLabelWidth(component) + getComponentLabelMargin(component);
               var styles = {
                 width: (100 - totalLabelWidth) + '%'
-              }
+              };
 
               if (labelOnTheLeft(labelPosition)) {
                 styles['margin-left'] = totalLabelWidth + '%';
-              } else {
+              }
+               else {
                 styles['margin-right'] = totalLabelWidth + '%';
               }
 
               return styles;
             }
           };
+
+          $scope.topOrLeftOptionLabel = FormioUtils.optionsLabelPositionWrapper(FormioUtils.topOrLeftOptionLabel);
+          $scope.getOptionLabelStyles = FormioUtils.optionsLabelPositionWrapper(FormioUtils.getOptionLabelStyles);
+          $scope.getOptionInputStyles = FormioUtils.optionsLabelPositionWrapper(FormioUtils.getOptionInputStyles);
 
           // Survey components haves questions.
           // We want to make the survey component label marked with error if any
