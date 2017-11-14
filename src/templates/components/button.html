@@ -7,7 +7,7 @@
     tabindex="{{ component.tabindex || 0 }}"
     ng-click="$emit('buttonClick', component, componentId)">
   <span ng-if="component.leftIcon" class="{{ component.leftIcon }}" aria-hidden="true"></span>
-  <span ng-if="component.leftIcon && component.label">&nbsp;</span>{{ component.label | formioTranslate:null:options.building }}<span ng-if="component.rightIcon && component.label">&nbsp;</span>
+  <span ng-if="component.leftIcon && component.label">&nbsp;</span>{{ component.label | formioTranslate:null:options.building | shortcut:component.shortcut }}<span ng-if="component.rightIcon && component.label">&nbsp;</span>
   <span ng-if="component.rightIcon" class="{{ component.rightIcon }}" aria-hidden="true"></span>
   <formio-component-tooltip></formio-component-tooltip>
   <i ng-if="component.action == 'submit' && formioForm.submitting" class="glyphicon glyphicon-refresh glyphicon-spin"></i>

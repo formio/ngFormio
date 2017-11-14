@@ -11,7 +11,7 @@
         custom-validator="component.validate.custom"
         ng-disabled="readOnly"
       >
-      {{ v.label | formioTranslate:null:options.building }}
+      {{ v.label | formioTranslate:null:options.building | shortcut:v.shortcut }}
     </label>
   </div>
 </ng-form>
