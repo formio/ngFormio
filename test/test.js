@@ -58,24 +58,24 @@ require('./features/settingsBasic.spec')(actions);
 
 });
 
-// afterEach(function () {
-//   if (this.currentTest.state !== 'passed') {
-//     var path = './test/screenshots/' + this.currentTest.title.replace(/\W+/g, '_').toLowerCase();
-//     browser.manage().logs().get('browser')
-//       .then(function(logs) {
-//         if (logs.length) {
-//           fs.writeFile(path + '.txt', JSON.stringify(logs));
-//         }
-//       });
-//     browser.takeScreenshot().then(function (png) {
-//       var stream = fs.createWriteStream(path + '.png');
-//       stream.write(new Buffer(png, 'base64'));
-//       stream.end();
-//       console.log(path + ' file saved.');
-//     });
-//   }
-//   else {
-//     // Clears the logs for the next run.
-//     //browser.manage().logs().get('browser');
-//   }
-// });
+afterEach(function () {
+  if (this.currentTest.state !== 'passed') {
+    var path = './test/screenshots/' + this.currentTest.title.replace(/\W+/g, '_').toLowerCase();
+    browser.manage().logs().get('browser')
+      .then(function(logs) {
+        if (logs.length) {
+          fs.writeFile(path + '.txt', JSON.stringify(logs));
+        }
+      });
+    browser.takeScreenshot().then(function (png) {
+      var stream = fs.createWriteStream(path + '.png');
+      stream.write(new Buffer(png, 'base64'));
+      stream.end();
+      console.log(path + ' file saved.');
+    });
+  }
+  else {
+    // Clears the logs for the next run.
+    //browser.manage().logs().get('browser');
+  }
+});

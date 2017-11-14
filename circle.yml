@@ -27,10 +27,11 @@ dependencies:
 test:
   pre:
     - sudo bash -c "echo \"127.0.0.1 portal.localhost\" >> /etc/hosts"
+    - mkdir /test/screenshots
     - npm start:
         background: true
-#  post:
-#    - mv ./test/screenshots/ $CIRCLE_ARTIFACTS/screenshots
+  post:
+    - mv ./test/screenshots/ $CIRCLE_ARTIFACTS/screenshots
 
 deployment:
   prerelease:
