@@ -4,11 +4,15 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [UNRELEASED]
+## 2.25.0
 ### Added
+ - Min and Max size options for file uploads.
  - Possibility to specify label position for component and for options for Checkboxes and Radio components.
  - Possibility to add shortcuts.
  - Display custom validation error message.
+
+### Fixed
+ - Issue with navigating backward with wizards and validating the current page.
 
 ## 2.24.2
 ### Fixed
