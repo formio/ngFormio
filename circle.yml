@@ -27,7 +27,7 @@ dependencies:
 test:
   pre:
     - sudo bash -c "echo \"127.0.0.1 portal.localhost\" >> /etc/hosts"
-    - mkdir /test/screenshots
+    - mkdir ./test/screenshots
     - npm start:
         background: true
   post:
