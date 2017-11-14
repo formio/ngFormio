@@ -15,7 +15,7 @@ var expect = chai.expect;
 var url = (port === 80)
   ? protocol + '://' + domain
   : protocol + '://' + domain + ':' + port;
-// url = "http://portal.test-form.io";
+url = "http://portal.test-form.io";
 var config = {
   protocol: protocol,
   baseUrl: url,
