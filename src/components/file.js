@@ -20,7 +20,10 @@ module.exports = function(app) {
           protected: false,
           persistent: true,
           hidden: false,
-          clearOnHide: true
+          clearOnHide: true,
+          filePattern: '*',
+          fileMinSize: '0KB',
+          fileMaxSize: '1GB'
         },
         viewTemplate: 'formio/componentsView/file.html'
       });
@@ -178,6 +181,17 @@ module.exports = function(app) {
       $scope.removeUpload = function(index) {
         delete $scope.fileUploads[index];
       };
+
+      // Defaults for unlimited components
+      if (!$scope.component.filePattern) {
+        $scope.component.filePattern = '*';
+      }
+      if (!$scope.component.fileMinSize) {
+        $scope.component.fileMinSize = '0KB';
+      }
+      if (!$scope.component.fileMaxSize) {
+        $scope.component.fileMaxSize = '1GB';
+      }
 
       $scope.upload = function(files) {
         if ($scope.component.storage && files && files.length) {
