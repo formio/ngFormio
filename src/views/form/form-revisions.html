@@ -16,10 +16,10 @@
       <div class="col-md-2">{{revision._vuser}}</div>
       <div class="col-md-3">{{revision._vnote}}</div>
       <div class="col-md-3">
-        <span class="btn btn-default">Use</span>
-        <span class="btn btn-default">Embed</span>
-        <span class="btn btn-default">Data</span>
-        <span class="btn btn-default">Restore</span>
+        <span class="btn btn-default" ui-sref="project.{{ form.type }}.form.view">Use</span>
+        <span class="btn btn-default" ui-sref="project.{{ form.type }}.form.edit">Embed</span>
+        <span class="btn btn-default" ui-sref="project.{{ form.type }}.form.submission.index">Data</span>
+        <span class="btn btn-default" ui-sref="project.{{ form.type }}.form.edit({components: revision.components})">Restore</span>
       </div>
     </div>
   </li>

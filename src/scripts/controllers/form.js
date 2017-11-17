@@ -105,7 +105,10 @@ app.config([
         .state(parentName + '.form.edit', {
           url: '/edit',
           controller: 'FormEditController',
-          templateUrl: 'views/form/form-edit.html'
+          templateUrl: 'views/form/form-edit.html',
+          params: {
+            components: null
+          }
         })
         .state(parentName + '.form.revisions', {
           url: '/revision',
@@ -726,12 +729,14 @@ app.controller('FormController', [
 
 app.controller('FormEditController', [
   '$scope',
+  '$stateParams',
   '$q',
   'ngDialog',
   '$state',
   '$timeout',
   function(
     $scope,
+    $stateParams,
     $q,
     ngDialog,
     $state,
@@ -746,6 +751,9 @@ app.controller('FormEditController', [
     ($scope.loadFormPromise || $q.when()).then(function() {
       $scope.originalForm = _.cloneDeep($scope.form);
     });
+
+    // Load in components if sent in stateParams.
+    $scope.form.components = $stateParams.components || $scope.form.components;
 
     $scope.copy = function() {
       $state.go('project.' + $scope.formInfo.type + '.create', {components: _.cloneDeep($scope.form.components)});
