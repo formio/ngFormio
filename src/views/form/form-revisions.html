@@ -1,0 +1,26 @@
+<h3 style="margin-top: 0px;">Form Revisions</h3>
+<ul class="list-group list-group-striped">
+  <li class="list-group-item list-group-heading">
+    <div class="row">
+      <div class="col-md-1"><strong>Vid</strong></div>
+      <div class="col-md-2"><strong>Date/Time</strong></div>
+      <div class="col-md-2"><strong>User</strong></div>
+      <div class="col-md-3"><strong>Note</strong></div>
+      <div class="col-md-3"><strong>Actions</strong></div>
+    </div>
+  </li>
+  <li class="list-group-item" ng-repeat="revision in revisions track by $index">
+    <div class="row">
+      <div class="col-md-1">{{revision._vid}}</div>
+      <div class="col-md-2">{{revision.modified | date: 'medium'}}</div>
+      <div class="col-md-2">{{revision._vuser}}</div>
+      <div class="col-md-3">{{revision._vnote}}</div>
+      <div class="col-md-3">
+        <span class="btn btn-default">Use</span>
+        <span class="btn btn-default">Embed</span>
+        <span class="btn btn-default">Data</span>
+        <span class="btn btn-default">Restore</span>
+      </div>
+    </div>
+  </li>
+</ul>

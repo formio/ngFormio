@@ -107,6 +107,11 @@ app.config([
           controller: 'FormEditController',
           templateUrl: 'views/form/form-edit.html'
         })
+        .state(parentName + '.form.revisions', {
+          url: '/revision',
+          controller: 'FormRevisionsController',
+          templateUrl: 'views/form/form-revisions.html'
+        })
         .state(parentName + '.form.embed', {
           url: '/embed',
           controller: 'FormEmbedController',
@@ -854,6 +859,19 @@ app.controller('FormEditController', [
           console.error(err);
         });
       });
+    });
+  }
+]);
+
+app.controller('FormRevisionsController', [
+  '$http',
+  '$scope',
+  function($http, $scope) {
+    $scope.loadFormPromise.then(function() {
+      $http.get($scope.formUrl + '/v')
+        .then(function(result) {
+          $scope.revisions = result.data;
+        });
     });
   }
 ]);

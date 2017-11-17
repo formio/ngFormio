@@ -1,8 +1,20 @@
+<div id="form-group-note" class="form-group" ng-if="form.revisions && minPlan('commercial')">
+  <label class="control-label">Revision Note  </label>
+
+  <textarea class="form-control" ng-model="form._vnote"></textarea>
+  <div class="text-muted">Describe the changes made to this revision.</div>
+</div>
 <uib-accordion close-others="true">
   <div uib-accordion-group class="panel panel-default" heading="Advanced Settings">
     <div id="form-group-action" class="form-group">
       <label for="form-action" class="control-label">Custom Action URL</label>
       <input type="text" ng-model="form.action" class="form-control" id="form-action" name="form-action" placeholder="Enter the custom submission URL."/>
+    </div>
+    <div id="form-group-versioning" class="form-group">
+      <label class="control-label">
+        <input type="checkbox" ng-model="form.revisions"> Enable Form Revisions
+      </label>
+      <div class="text-muted">Form revisions will save a copy of each form revision and allow matching submissions with the revision of the form it was submitted with.</div>
     </div>
     <div id="form-group-tags" class="form-group">
       <label class="control-label">Form Tags</label>
