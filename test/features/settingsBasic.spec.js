@@ -2,13 +2,10 @@ module.exports = function (actions) {
   describe('Settings',function(){
     describe('Basic Plan > Environment Settings',function(){
       actions.logout();
-      actions.enterTextInField('.login-container #email','automated@tests');
-      actions.enterTextInField('.login-container #password','password');
-      actions.clickOnElementWithText('LOG IN');
-      actions.iAmLoggedIn();
+      actions.iAmLoggedInFor('profileuser1');
       actions.waitForActionToComplete(2000);
       actions.goToPage('#/profile/payment/view');
-      actions.clickOnElementWithText('Change Credit Card');
+      actions.clickOnElementWithText('Add Credit Card');
       actions.enterTextInField('#cardholderName','Test');
       actions.enterTextInField('#ccNumber','4111111111111111');
       actions.enterTextInField('#securityCode','411');
