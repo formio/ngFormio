@@ -15,6 +15,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('25');
       actions.clickOnClass('#submit');
       actions.waitForActionToComplete(2000);
+      actions.goToPage('#/');
       actions.clickOnElementWithText('New Project');
       actions.enterTextInField('#title','teamProProject');
       actions.clickOnElementWithText(' Create Project');
