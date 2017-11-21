@@ -203,7 +203,7 @@ app.directive('formList', function() {
     scope: {
       formName: '=',
       forms: '=',
-      formio: '=',
+      formioReady: '=',
       projectUrl: '=',
       formType: '=',
       numPerPage: '=',
@@ -231,7 +231,7 @@ app.directive('formList', function() {
         $rootScope.currentForm = false;
         $scope.search = {};
         $scope.forms = [];
-        $scope.$watch('projectUrl', function() {
+        $scope.formioReady.then(function(formio) {
           var query = {
             params: {
               limit: 9999999
@@ -240,7 +240,7 @@ app.directive('formList', function() {
           if ($scope.formType) {
             query.params.type = $scope.formType;
           }
-          $scope.formio.loadForms(query).then(function(forms) {
+          formio.loadForms(query).then(function(forms) {
             $scope.forms = forms;
             $scope.formsFinished = true;
           });
