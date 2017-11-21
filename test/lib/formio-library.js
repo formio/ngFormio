@@ -8,7 +8,7 @@ var dragAndDrop = require('html-dnd').code;
 
 module.exports = function (config) {
   // Global timeout for wait* commands.
-  var timeout = 10000;
+  var timeout = 20000;
   var state = {};
   var projects = {};
   var theProject;
@@ -440,14 +440,21 @@ module.exports = function (config) {
    });
    };*/
 
+  //example inputs
+  //1. 'https://help.form.io/intro/welcome/'
+  //2. 'regex:^#\/project\/[0-9a-z]{24}\/$'
+  //3. '#/profile/view'
   this.checkingUrlIamOn = function (url) {
-    if (!url.toLowerCase().includes('http')) {
+    if (!url.toLowerCase().includes('http') && !url.toLowerCase().includes('regex')) {
       url = config.baseUrl + "/" + url;
+    } else if (url.toLowerCase().includes('regex')) {
+      url = url.split(':')[1];
     }
     it('I am on ' + url, function (next) {
       browser.wait(function () {
         return browser.getCurrentUrl().then(function (cUrl) {
-          return cUrl.toLowerCase() == url.toLowerCase();
+          return cUrl.toLowerCase() == url.toLowerCase()
+            || (cUrl.toLowerCase().substring(cUrl.indexOf('#/')).match(url) != null);
         });
       }, timeout).then(function (value) {
         try {
@@ -457,6 +464,29 @@ module.exports = function (config) {
           next(err);
         }
       });
+    });
+  };
+
+  this.checkingUrlEndsWith = function (url) {
+    it('URL contains ' + url, function (next) {
+      browser.wait(function () {
+        return browser.getCurrentUrl().then(function (cUrl) {
+          return cUrl.endsWith(url);
+        });
+      }, timeout).then(function (value) {
+        try {
+          assert.equal(value, true);
+          next();
+        } catch (err) {
+          next(err);
+        }
+      });
+    });
+  };
+  this.goToPage = function (url) {
+    it('I go to ' + url, function (next) {
+      url = config.baseUrl + "/" + url;
+      browser.get(url).then(next).catch(next);
     });
   };
 
@@ -528,17 +558,29 @@ module.exports = function (config) {
     });
   };
 
-  this.goToPage = function (url) {
-    it('I go to ' + url, function (next) {
-      url = config.baseUrl + "/" + url;
-      browser.get(url).then(next).catch(next);
+  this.enableAngular = function(text){
+    it('Angular is enabled '+ text,function(){
+        browser.waitForAngularEnabled(text);
     });
   };
 
   this.clickOnElementWithText = function (text) {
-    it('I click on the ' + text + ' text', function (next) {
+    it('I click on the ' + text + ' text ', function (next) {
       var ele =  element(by.xpath('//*[text()="' + replacements(text.toString()) + '"]'));
-     // console.log(ele);
+      browser.wait(function () {
+        return ele.isPresent();
+      }, timeout).then(function (res) {
+        scrollTo(ele)
+          .then(function() {
+            ele.click().then(next).catch(next);
+          });
+      });
+    });
+  };
+
+  this.clickOnElementWithTextLast = function (text) {
+    it('I click on the ' + text + ' text', function (next) {
+      var ele =  element.all(by.xpath('//*[text()="' + replacements(text.toString()) + '"]')).last();
       browser.wait(function () {
         return ele.isPresent();
       }, timeout).then(function (res) {
@@ -586,7 +628,7 @@ module.exports = function (config) {
 
   this.clickOnClass = function (className) {
     it('I click on the ' + className + ' class', function (next) {
-      var ele =  element(by.className(replacements(className.toString())));
+      var ele =  element(by.css(replacements(className.toString())));
       browser.wait(function () {
         return ele.isPresent();
       }, timeout).then(function (res) {
@@ -664,8 +706,7 @@ module.exports = function (config) {
 
   this.iSeeTextIn = function (ele, text) {
     it('I see text "' + text + '"', function (next) {
-      text = replacements(text);
-      ele = (typeof (ele) == 'object') ? ele : element(by.cssContainingText(ele, text));
+      ele = (typeof (ele) == 'object') ? ele : element(by.css(ele, text));
       browser.wait(function () {
         return ele.isPresent();
       }, timeout).then(function () {
@@ -712,7 +753,7 @@ module.exports = function (config) {
   this.btnDisabled = function (field) {
     it('I see ' + field + ' button is disabled', function (next) {
       try {
-        var btn = element(by.partialButtonText(field));
+        var btn = element.all(by.partialButtonText(field)).first();
         browser.wait(function () {
           return btn.isPresent().then(function (present) {
             if (present) {
@@ -739,7 +780,7 @@ module.exports = function (config) {
   this.btnEnabled = function (field) {
     it('I see ' + field + ' button is Enabled', function (next) {
       try {
-        var btn = element(by.xpath('//button[text()="' + field + '"]'));
+        var btn = element.all(by.xpath('//button[text()="' + field + '"]')).first();
         browser.wait(function () {
           return btn.isPresent().then(function (present) {
             if (present) {
@@ -912,7 +953,7 @@ module.exports = function (config) {
   this.iSeeValueIn = function (ele, text) {
     text = replacements(text.toString());
     it('I see text ' + text + ' in ' + ele, function (next) {
-      var ele1 = (typeof (ele) == 'object') ? ele : element(by.css(ele, text));
+      var ele1 = (typeof (ele) == 'object') ? ele : element.all(by.css(ele, text)).first();
       browser.wait(function () {
         return ele1.isPresent();
       }, timeout).then(function () {
@@ -1220,6 +1261,33 @@ module.exports = function (config) {
     });
     };
 
+  this.checkElementIsNotDisabled = function (ele) {
+    it('I see ' + ele + ' is not disabled', function (next) {
+      try {
+        var btn = element(by.xpath(ele));
+        browser.wait(function () {
+          return btn.isPresent().then(function (present) {
+            if (present) {
+              return btn.isEnabled().then(function (res) {
+                return res;
+              });
+            }
+            return present;
+          });
+        }, timeout).then(function (value) {
+          try {
+            assert.equal(value, true);
+            next();
+          } catch (err) {
+            next(err);
+          }
+        });
+      } catch (err) {
+        next(err);
+      }
+    });
+  };
+
   this.checkElement = function (text) {
     it('I check the ' + text, function (next) {
       var ele = element(by.xpath(text));
@@ -1232,7 +1300,7 @@ module.exports = function (config) {
   };
   this.checkElementWithTextIsDisabled = function (text)   {
     it('I see ' + text + ' button is disabled', function (next) {
-      var ele = element(by.xpath('//*[text()="' + text + '"]'));
+      var ele = element.all(by.xpath('//*[text()="' + text + '"]')).first();
       browser.wait(function () {
         return ele.isPresent();
       }, timeout).then(function () {
@@ -1265,4 +1333,57 @@ module.exports = function (config) {
       });
     });
   };
+
+  this.selectComponentCount = function (text, count) {
+    it('I see '+count+' values in ' + text, function (next) {
+      var ele = element(by.css(text));
+      browser.wait(function () {
+        return ele.isPresent();
+      }, timeout).then(function () {
+        ele.all(by.tagName('option')).count().then(function(res){
+          config.expect(res).to.equal(count);
+          next();
+        });
+      });
+    });
+  };
+
+  this.selectComponentOption = function (text, option) {
+    it('Click on value '+option+' in '+ text, function (next) {
+      var ele = element(by.css(text));
+      browser.wait(function () {
+        return ele.isPresent();
+      }, timeout).then(function () {
+        element(by.cssContainingText('option',option)).click();
+        next();
+      });
+    });
+  };
+
+  this.upgradeToPlan = function (text) {
+    it('Upgrading to '+ text, function (next) {
+      var ele;
+      if(text==="Basic"){
+        ele =  element(by.xpath('//*[@id="main-wrapper"]/div[2]/div[2]/div/div/div/div[2]/div[1]/ul/li[5]/div/div[3]/span'));
+      }
+      else if(text==="Independent") {
+        ele = element(by.xpath('//*[@id="main-wrapper"]/div[2]/div[2]/div/div/div/div[2]/div[1]/ul/li[4]/div/div[3]/span'));
+      }
+      else if(text==="Team Pro"){
+        ele = element(by.xpath('//*[@id="main-wrapper"]/div[2]/div[2]/div/div/div/div[2]/div[1]/ul/li[3]/div/div[3]/span'));
+      }
+      else{
+        ele = element(by.xpath('//*[@id="main-wrapper"]/div[2]/div[2]/div/div/div/div[2]/div[1]/ul/li[2]/div/div[3]/span'));
+      }
+      browser.wait(function () {
+        return ele.isPresent();
+      }, timeout).then(function (res) {
+        scrollTo(ele)
+          .then(function() {
+            ele.click().then(next).catch(next);
+          });
+      });
+    });
+  };
+
 };
