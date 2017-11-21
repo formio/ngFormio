@@ -734,33 +734,55 @@ app.controller('FormEditController', [
   'ngDialog',
   '$state',
   '$timeout',
+  'FormioAlerts',
+  'GoogleAnalytics',
   function(
     $scope,
     $stateParams,
     $q,
     ngDialog,
     $state,
-    $timeout
+    $timeout,
+    FormioAlerts,
+    GoogleAnalytics
   ) {
     $scope.loadFormPromise.then(function() {
       $scope.form.builder = true;
     });
 
-    // Clone original form after it has loaded, or immediately
-    // if we're not loading a form
-    ($scope.loadFormPromise || $q.when()).then(function() {
-      $scope.originalForm = _.cloneDeep($scope.form);
-    });
+    $scope.formReady = false;
+    var checkDraft = function() {
+      if ($scope.form.revisions) {
+        // Load a draft if it is available.
+        Formio.makeStaticRequest($scope.formUrl + '/draft', 'GET', null, {base: $scope.baseUrl})
+          .then(function(form) {
+            $scope.form.components = form.components;
+            if (form._vid === 'draft') {
+              $scope.draft = true;
+            }
+            // Load in components if sent in stateParams.
+            $scope.form.components = $stateParams.components || $scope.form.components;
+            $scope.originalForm = _.cloneDeep($scope.form);
+            $scope.formReady = true;
+          });
+        $scope.revisionsEnabled = true;
+      }
+      else {
+        // Load in components if sent in stateParams.
+        $scope.form.components = $stateParams.components || $scope.form.components;
+        $scope.originalForm = _.cloneDeep($scope.form);
+        $scope.formReady = true;
+      }
+    };
 
-    // Load in components if sent in stateParams.
-    $scope.form.components = $stateParams.components || $scope.form.components;
+    ($scope.loadFormPromise || $q.when()).then(checkDraft);
 
     $scope.copy = function() {
       $state.go('project.' + $scope.formInfo.type + '.create', {components: _.cloneDeep($scope.form.components)});
     };
 
     // Track any modifications for save/cancel prompt on navigation away from the builder.
-    var dirty = false;
+    $scope.dirty = false;
     var contentLoaded = false;
     $timeout(function() {
       contentLoaded = true;
@@ -769,30 +791,68 @@ app.controller('FormEditController', [
     $scope.$on('formBuilder:add', function(event) {
       // FOR-488 - Fix issues with loading the content component and flagging the builder as dirty.
       if (event.targetScope.formComponent.settings.type === 'content') {
-        dirty = true;
+        $scope.dirty = true;
       }
 
     });
     $scope.$on('formBuilder:update', function(event) {
       // FOR-488 - Fix issues with loading the content component and flagging the builder as dirty.
       if (contentLoaded && event.targetScope.formComponent.settings.type === 'content') {
-        dirty = true;
+        $scope.dirty = true;
       }
 
     });
     $scope.$on('formBuilder:remove', function() {
-      dirty = true;
+      $scope.dirty = true;
     });
     $scope.$on('formBuilder:edit', function() {
-      dirty = true;
+      $scope.dirty = true;
     });
 
     // Wrap saveForm in the editor to clear dirty when saved.
     var parentSave = $scope.saveForm;
     $scope.saveForm = function() {
       contentLoaded = false;
-      dirty = false;
-      return parentSave();
+      $scope.dirty = false;
+      return parentSave().then(function() {
+        $state.go('project.' + $scope.formInfo.type + '.form.edit', {formId: $scope.form._id}, {reload: true});
+      });
+    };
+
+    $scope.saveFormDraft = function() {
+      angular.element('.has-error').removeClass('has-error');
+      $scope.dirty = false;
+
+      // Copy to remove angular $$hashKey
+      return Formio.makeStaticRequest($scope.formUrl + '/draft', 'PUT', angular.copy($scope.form), {base: $scope.baseUrl})
+        .then(function(response) {
+          GoogleAnalytics.sendEvent('FormDraft', 'PUT'.substring(0, 'PUT'.length - 1), null, 1);
+
+          FormioAlerts.addAlert({
+            type: 'success',
+            message: 'Successfully saved form draft!'
+          });
+
+          // Reload page.
+          $state.go('project.' + $scope.formInfo.type + '.form.edit', {formId: $scope.form._id}, {reload: true});
+        })
+        .catch(function(err) {
+          if (err) {
+            FormioAlerts.onError.call(FormioAlerts, err);
+          }
+
+          // FOR-128 - if we're editing a form, make note of the components with issues.
+          try {
+            var issues = (/Component keys must be unique: (.*)/.exec(_.get(err, 'errors.components.message'))).slice(1);
+            if (($state.includes('project.form.form.edit') || $state.includes('project.form.create')) && (issues.length > 0)) {
+              issues = (issues.shift()).toString().split(', ');
+              issues.forEach(function(issue) {
+                angular.element('div.dropzone #' + issue).parent().addClass('has-error');
+              });
+            }
+          }
+          catch (e) {}
+        });
     };
 
     /**
@@ -835,7 +895,7 @@ app.controller('FormEditController', [
     // Listen for events to navigate away from the form builder.
     $scope.$on('$stateChangeStart', function(event, transition) {
       // If the form hasnt been modified, skip this cancel modal logic.
-      if (!dirty) {
+      if (!$scope.dirty) {
         return;
       }
 
@@ -847,7 +907,7 @@ app.controller('FormEditController', [
       .then(function() {
         // Cancel without save was clicked, revert the form and get out.
         $scope.form = $scope.$parent.form = angular.copy($scope.originalForm);
-        dirty = false;
+        $scope.dirty = false;
         $state.go(transition.name, {notify: false});
       })
       .catch(function(val) {
@@ -860,7 +920,7 @@ app.controller('FormEditController', [
         // If there was no return the cancel action was rejected, save the form before navigation.
         return $scope.saveForm()
         .then(function(result) {
-          dirty = false;
+          $scope.dirty = false;
           $state.go(transition.name, {reload: true, notify: false});
         })
         .catch(function(err) {
@@ -876,7 +936,7 @@ app.controller('FormRevisionsController', [
   '$scope',
   function($http, $scope) {
     $scope.loadFormPromise.then(function() {
-      $http.get($scope.formUrl + '/v')
+      $http.get($scope.formUrl + '/v?sort=-_vid')
         .then(function(result) {
           $scope.revisions = result.data;
         });

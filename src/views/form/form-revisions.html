@@ -11,13 +11,12 @@
   </li>
   <li class="list-group-item" ng-repeat="revision in revisions track by $index">
     <div class="row">
-      <div class="col-md-1">{{revision._vid}}</div>
+      <div class="col-md-1"><a href="{{formUrl}}/v/{{revision._vid}}" target="_blank">{{revision._vid}}</a></div>
       <div class="col-md-2">{{revision.modified | date: 'medium'}}</div>
       <div class="col-md-2">{{revision._vuser}}</div>
       <div class="col-md-3">{{revision._vnote}}</div>
       <div class="col-md-3">
         <span class="btn btn-default" ui-sref="project.{{ form.type }}.form.view">Use</span>
-        <span class="btn btn-default" ui-sref="project.{{ form.type }}.form.edit">Embed</span>
         <span class="btn btn-default" ui-sref="project.{{ form.type }}.form.submission.index">Data</span>
         <span class="btn btn-default" ui-sref="project.{{ form.type }}.form.edit({components: revision.components})">Restore</span>
       </div>

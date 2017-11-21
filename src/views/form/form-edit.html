@@ -3,6 +3,11 @@
   <li role="presentation" ng-if="isCopy"><span ng-switch="form.type" class="navbar-text form-title">Copy {{ capitalize(form.type) }}</span></li>
 </ul>
 <div ng-class="{'form-content': !formId}" class="form-edit">
+  <div class="alert alert-warning" ng-if="dirty && !draft">You have unsaved changes.
+    <span ng-if="revisionsEnabled">Save these changes to a draft or publish them to a new revision.</span>
+    <span ng-if="!revisionsEnabled">Be sure to save your changes when done.</span>
+  </div>
+  <div class="alert alert-info" ng-if="draft">You are editing a draft. Publish the changes to see them on your live form.</div>
   <form role="form" novalidate>
     <div class="row">
       <div class="col-lg-2 col-md-4 col-sm-4">
@@ -47,7 +52,7 @@
             <button ng-hide="highestRole === 'team_read'" type="submit" class="btn btn-primary" ng-click="saveForm()">{{formId ? 'Save' : 'Create'}} {{ capitalize(form.type)  }}</button>
           </span>
           <span ng-if="formId && form.revisions && minPlan('commercial')">
-            <button ng-hide="highestRole === 'team_read'" type="submit" class="btn btn-success" ng-click="saveForm()">Save Draft</button>
+            <button ng-hide="highestRole === 'team_read'" type="submit" class="btn btn-success" ng-click="saveFormDraft()">Save Draft</button>
             <button ng-hide="highestRole === 'team_read'" type="submit" class="btn btn-primary" ng-click="saveForm()">Publish {{ capitalize(form.type)  }}</button>
           </span>
         </div>
@@ -76,7 +81,7 @@
         <button ng-hide="highestRole === 'team_read'" type="submit" class="btn btn-primary" ng-click="saveForm()">{{formId ? 'Save' : 'Create'}} {{ capitalize(form.type)  }}</button>
       </span>
       <span ng-if="formId && form.revisions && minPlan('commercial')">
-        <button ng-hide="highestRole === 'team_read'" type="submit" class="btn btn-success" ng-click="saveForm()">Save Draft</button>
+        <button ng-hide="highestRole === 'team_read'" type="submit" class="btn btn-success" ng-click="saveFormDraft()">Save Draft</button>
         <button ng-hide="highestRole === 'team_read'" type="submit" class="btn btn-primary" ng-click="saveForm()">Publish {{ capitalize(form.type)  }}</button>
       </span>
     </div>
