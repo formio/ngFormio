@@ -70,7 +70,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Continue');
       actions.iSeeText('Connect to an On-Premise Environment');
       actions.clickOnClass('.ui-select-match.ng-scope');
-      actions.clickOnClass('#ui-select-choices-row-0-7');
+      actions.clickOnClass('#ui-select-choices-row-0-3');
       actions.clickOnElementWithText('Connect Stage');
       actions.iSeeText('https://remote.form.io');
       actions.waitForActionToComplete(2000);
