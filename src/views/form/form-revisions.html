@@ -16,8 +16,8 @@
       <div class="col-md-2">{{revision._vuser}}</div>
       <div class="col-md-3">{{revision._vnote}}</div>
       <div class="col-md-3">
-        <span class="btn btn-default" ui-sref="project.{{ form.type }}.form.view">Use</span>
-        <span class="btn btn-default" ui-sref="project.{{ form.type }}.form.submission.index">Data</span>
+        <span class="btn btn-default" ui-sref="project.{{ form.type }}.form.view({revision: revision})">Use</span>
+        <span class="btn btn-default" ui-sref="project.{{ form.type }}.form.submission.index({_vid: revision._vid})">Data</span>
         <span class="btn btn-default" ui-sref="project.{{ form.type }}.form.edit({components: revision.components})">Restore</span>
       </div>
     </div>

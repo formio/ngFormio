@@ -100,7 +100,11 @@ app.config([
         })
         .state(parentName + '.form.view', {
           url: '/',
-          templateUrl: 'views/form/form-view.html'
+          controller: 'FormViewController',
+          templateUrl: 'views/form/form-view.html',
+          params: {
+            revision: null
+          }
         })
         .state(parentName + '.form.edit', {
           url: '/edit',
@@ -167,7 +171,10 @@ app.config([
           .state(state + '.index', {
             url: '',
             templateUrl: 'views/form' + info.path + '/index.html',
-            controller: info.indexController
+            controller: info.indexController,
+            params: {
+              _vid: null
+            }
           })
           .state(state + '.item', {
             abstract: true,
@@ -638,18 +645,18 @@ app.controller('FormController', [
       return $scope.projectUrl + '/form/' + $scope.formId + '/spec.json';
     };
 
-    // When a submission is made.
-    $scope.$on('formSubmission', function(event, submission) {
-      event.stopPropagation();
-      FormioAlerts.addAlert({
-        type: 'success',
-        message: 'New submission added!'
-      });
-      GoogleAnalytics.sendEvent('Submission', 'create', null, 1);
-      if (submission._id) {
-        $state.go('project.' + $scope.formInfo.type + '.form.submission.item.view', {formId: submission.form, subId: submission._id});
-      }
-    });
+    //// When a submission is made.
+    //$scope.$on('formSubmit', function(event, submission) {
+    //  event.stopPropagation();
+    //  FormioAlerts.addAlert({
+    //    type: 'success',
+    //    message: 'New submission added!'
+    //  });
+    //  GoogleAnalytics.sendEvent('Submission', 'create', null, 1);
+    //  if (submission._id) {
+    //    $state.go('project.' + $scope.formInfo.type + '.form.submission.item.view', {formId: submission.form, subId: submission._id});
+    //  }
+    //});
 
     // Save a form.
     $scope.saveForm = function() {
@@ -727,6 +734,46 @@ app.controller('FormController', [
   }
 ]);
 
+app.controller('FormViewController', [
+  '$scope',
+  '$state',
+  '$stateParams',
+  'FormioAlerts',
+  'GoogleAnalytics',
+  function($scope, $state, $stateParams, FormioAlerts, GoogleAnalytics) {
+    $scope.formReady = false;
+
+    $scope.submission = {data: {}};
+
+    $scope.loadFormPromise.then(function() {
+      if ($stateParams.revision) {
+        $scope.form = angular.copy($scope.form);
+        $scope.form.components = $stateParams.revision.components;
+
+        $scope.revision = $stateParams.revision;
+      }
+      $scope.formReady = true;
+    });
+
+    $scope.$on('formSubmit', function(event, submission) {
+      if ($stateParams.revision) {
+        submission._fvid = $stateParams.revision._vid;
+      }
+      $scope.formio.saveSubmission(submission)
+        .then(function(submission) {
+          FormioAlerts.addAlert({
+            type: 'success',
+            message: 'New submission added!'
+          });
+          GoogleAnalytics.sendEvent('Submission', 'create', null, 1);
+          if (submission._id) {
+            $state.go('project.' + $scope.formInfo.type + '.form.submission.item.view', {formId: submission.form, subId: submission._id});
+          }
+        });
+    });
+  }
+]);
+
 app.controller('FormEditController', [
   '$scope',
   '$stateParams',
@@ -749,6 +796,7 @@ app.controller('FormEditController', [
     $scope.loadFormPromise.then(function() {
       $scope.form.builder = true;
     });
+    $scope.dirty = false;
 
     $scope.formReady = false;
     var checkDraft = function() {
@@ -762,6 +810,9 @@ app.controller('FormEditController', [
             }
             // Load in components if sent in stateParams.
             $scope.form.components = $stateParams.components || $scope.form.components;
+            if ($stateParams.components) {
+              $scope.dirty = true;
+            }
             $scope.originalForm = _.cloneDeep($scope.form);
             $scope.formReady = true;
           });
@@ -770,6 +821,9 @@ app.controller('FormEditController', [
       else {
         // Load in components if sent in stateParams.
         $scope.form.components = $stateParams.components || $scope.form.components;
+        if ($stateParams.components) {
+          $scope.dirty = true;
+        }
         $scope.originalForm = _.cloneDeep($scope.form);
         $scope.formReady = true;
       }
@@ -782,7 +836,6 @@ app.controller('FormEditController', [
     };
 
     // Track any modifications for save/cancel prompt on navigation away from the builder.
-    $scope.dirty = false;
     var contentLoaded = false;
     $timeout(function() {
       contentLoaded = true;
@@ -1622,6 +1675,7 @@ app.controller('FormActionDeleteController', [
 app.controller('FormSubmissionsController', [
   '$scope',
   '$state',
+  '$stateParams',
   '$http',
   '$timeout',
   '$window',
@@ -1636,6 +1690,7 @@ app.controller('FormSubmissionsController', [
   function(
     $scope,
     $state,
+    $stateParams,
     $http,
     $timeout,
     $window,
@@ -1648,6 +1703,9 @@ app.controller('FormSubmissionsController', [
     ngDialog,
     $interpolate
   ) {
+    if ($stateParams._vid) {
+      $scope._vid = $stateParams._vid;
+    }
     // Returns true if component should appear in table
     $scope.tableView = function(component) {
       return !component.protected &&
@@ -1864,6 +1922,10 @@ app.controller('FormSubmissionsController', [
                 skip: options.data.skip,
                 sort: getSortQuery(options.data.sort)
               };
+              // Filter by _vid if provided.
+              if ($stateParams._vid) {
+                params._fvid = $stateParams._vid;
+              }
               _.each(filters, function(filter) {
                 // FOR-395 - Fix query regression with FOR-323
                 filter.field = filter.field.replace(/^\["|"\]$/gi, '');
