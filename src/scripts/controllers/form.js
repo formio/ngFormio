@@ -936,10 +936,10 @@ app.controller('FormRevisionsController', [
   '$scope',
   function($http, $scope) {
     $scope.loadFormPromise.then(function() {
-      $http.get($scope.formUrl + '/v?sort=-_vid')
-        .then(function(result) {
-          $scope.revisions = result.data;
-        });
+      $scope.revisionsUrl = $scope.formUrl + '/v';
+      $scope.revisionsParams = {
+        sort: '-_vid'
+      };
     });
   }
 ]);
