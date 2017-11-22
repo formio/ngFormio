@@ -1,0 +1,32 @@
+<h3 style="margin-top: 0px;">Form Revisions</h3>
+<ul class="list-group list-group-striped">
+  <li class="list-group-item list-group-heading">
+    <div class="row">
+      <div class="col-md-1"><strong>Vid</strong></div>
+      <div class="col-md-2"><strong>Date/Time</strong></div>
+      <div class="col-md-2"><strong>User</strong></div>
+      <div class="col-md-3"><strong>Note</strong></div>
+      <div class="col-md-3"><strong>Actions</strong></div>
+    </div>
+  </li>
+  <li class="list-group-item" ng-repeat="revision in revisions track by $index">
+    <div class="row">
+      <div class="col-md-1"><a href="{{formUrl}}/v/{{revision._vid}}" target="_blank">{{revision._vid}}</a></div>
+      <div class="col-md-2">{{revision.modified | date: 'medium'}}</div>
+      <div class="col-md-2">{{revision._vuser}}</div>
+      <div class="col-md-3">{{revision._vnote}}</div>
+      <div class="col-md-3">
+        <span class="btn btn-default" ui-sref="project.{{ form.type }}.form.view({revision: revision})">Use</span>
+        <span class="btn btn-default" ui-sref="project.{{ form.type }}.form.submission.index({_vid: revision._vid})">Data</span>
+        <span class="btn btn-default" ui-sref="project.{{ form.type }}.form.edit({components: revision.components})">Restore</span>
+      </div>
+    </div>
+  </li>
+</ul>
+<bgf-pagination
+  collection="revisions"
+  url="revisionsUrl"
+  url-params="revisionsParams"
+  per-page="10"
+  template-url="/views/partials/pager.html"
+/>

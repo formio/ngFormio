@@ -1,3 +1,6 @@
+<div class="alert alert-info" ng-if="_vid">
+  <p>You are viewing submissions for form revision {{ _vid }}.</p>
+</div>
 <div class="well submissions-header">
   <a class="btn btn-warning" href="{{ formio.formUrl }}/export?format=json&x-jwt-token={{ token }}">{...} Export JSON</a>
   <a class="btn btn-success" href="{{ formio.formUrl }}/export?format=csv&x-jwt-token={{ token }}"><i class="fa fa-file-text-o"></i> Export CSV</a>
