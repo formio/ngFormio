@@ -1364,16 +1364,16 @@ module.exports = function (config) {
     it('Upgrading to '+ text, function (next) {
       var ele;
       if(text==="Basic"){
-        ele =  element(by.xpath('//*[@id="main-wrapper"]/div[2]/div[2]/div/div/div/div[2]/div[1]/ul/li[5]/div/div[3]/span'));
+        ele =  element.all(by.xpath('//*[text()="Upgrade"]')).get(3);
       }
       else if(text==="Independent") {
-        ele = element(by.xpath('//*[@id="main-wrapper"]/div[2]/div[2]/div/div/div/div[2]/div[1]/ul/li[4]/div/div[3]/span'));
+        ele =  element.all(by.xpath('//*[text()="Upgrade"]')).get(2);
       }
       else if(text==="Team Pro"){
-        ele = element(by.xpath('//*[@id="main-wrapper"]/div[2]/div[2]/div/div/div/div[2]/div[1]/ul/li[3]/div/div[3]/span'));
+        ele =  element.all(by.xpath('//*[text()="Upgrade"]')).get(1);
       }
       else{
-        ele = element(by.xpath('//*[@id="main-wrapper"]/div[2]/div[2]/div/div/div/div[2]/div[1]/ul/li[2]/div/div[3]/span'));
+        ele =  element.all(by.xpath('//*[text()="Upgrade"]')).get(0);
       }
       browser.wait(function () {
         return ele.isPresent();
