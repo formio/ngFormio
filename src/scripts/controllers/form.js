@@ -100,12 +100,24 @@ app.config([
         })
         .state(parentName + '.form.view', {
           url: '/',
-          templateUrl: 'views/form/form-view.html'
+          controller: 'FormViewController',
+          templateUrl: 'views/form/form-view.html',
+          params: {
+            revision: null
+          }
         })
         .state(parentName + '.form.edit', {
           url: '/edit',
           controller: 'FormEditController',
-          templateUrl: 'views/form/form-edit.html'
+          templateUrl: 'views/form/form-edit.html',
+          params: {
+            components: null
+          }
+        })
+        .state(parentName + '.form.revisions', {
+          url: '/revision',
+          controller: 'FormRevisionsController',
+          templateUrl: 'views/form/form-revisions.html'
         })
         .state(parentName + '.form.embed', {
           url: '/embed',
@@ -159,7 +171,10 @@ app.config([
           .state(state + '.index', {
             url: '',
             templateUrl: 'views/form' + info.path + '/index.html',
-            controller: info.indexController
+            controller: info.indexController,
+            params: {
+              _vid: null
+            }
           })
           .state(state + '.item', {
             abstract: true,
@@ -630,18 +645,18 @@ app.controller('FormController', [
       return $scope.projectUrl + '/form/' + $scope.formId + '/spec.json';
     };
 
-    // When a submission is made.
-    $scope.$on('formSubmission', function(event, submission) {
-      event.stopPropagation();
-      FormioAlerts.addAlert({
-        type: 'success',
-        message: 'New submission added!'
-      });
-      GoogleAnalytics.sendEvent('Submission', 'create', null, 1);
-      if (submission._id) {
-        $state.go('project.' + $scope.formInfo.type + '.form.submission.item.view', {formId: submission.form, subId: submission._id});
-      }
-    });
+    //// When a submission is made.
+    //$scope.$on('formSubmit', function(event, submission) {
+    //  event.stopPropagation();
+    //  FormioAlerts.addAlert({
+    //    type: 'success',
+    //    message: 'New submission added!'
+    //  });
+    //  GoogleAnalytics.sendEvent('Submission', 'create', null, 1);
+    //  if (submission._id) {
+    //    $state.go('project.' + $scope.formInfo.type + '.form.submission.item.view', {formId: submission.form, subId: submission._id});
+    //  }
+    //});
 
     // Save a form.
     $scope.saveForm = function() {
@@ -719,35 +734,110 @@ app.controller('FormController', [
   }
 ]);
 
+app.controller('FormViewController', [
+  '$scope',
+  '$state',
+  '$stateParams',
+  'FormioAlerts',
+  'GoogleAnalytics',
+  function($scope, $state, $stateParams, FormioAlerts, GoogleAnalytics) {
+    $scope.formReady = false;
+
+    $scope.submission = {data: {}};
+
+    $scope.loadFormPromise.then(function() {
+      if ($stateParams.revision) {
+        $scope.form = angular.copy($scope.form);
+        $scope.form.components = $stateParams.revision.components;
+
+        $scope.revision = $stateParams.revision;
+      }
+      $scope.formReady = true;
+    });
+
+    $scope.$on('formSubmit', function(event, submission) {
+      if ($stateParams.revision) {
+        submission._fvid = $stateParams.revision._vid;
+      }
+      $scope.formio.saveSubmission(submission)
+        .then(function(submission) {
+          FormioAlerts.addAlert({
+            type: 'success',
+            message: 'New submission added!'
+          });
+          GoogleAnalytics.sendEvent('Submission', 'create', null, 1);
+          if (submission._id) {
+            $state.go('project.' + $scope.formInfo.type + '.form.submission.item.view', {formId: submission.form, subId: submission._id});
+          }
+        });
+    });
+  }
+]);
+
 app.controller('FormEditController', [
   '$scope',
+  '$stateParams',
   '$q',
   'ngDialog',
   '$state',
   '$timeout',
+  'Formio',
+  'FormioAlerts',
+  'GoogleAnalytics',
   function(
     $scope,
+    $stateParams,
     $q,
     ngDialog,
     $state,
-    $timeout
+    $timeout,
+    Formio,
+    FormioAlerts,
+    GoogleAnalytics
   ) {
     $scope.loadFormPromise.then(function() {
       $scope.form.builder = true;
     });
+    $scope.dirty = false;
 
-    // Clone original form after it has loaded, or immediately
-    // if we're not loading a form
-    ($scope.loadFormPromise || $q.when()).then(function() {
-      $scope.originalForm = _.cloneDeep($scope.form);
-    });
+    $scope.formReady = false;
+    var checkDraft = function() {
+      if ($scope.form.revisions) {
+        // Load a draft if it is available.
+        Formio.makeStaticRequest($scope.formUrl + '/draft', 'GET', null, {base: $scope.baseUrl})
+          .then(function(form) {
+            $scope.form.components = form.components;
+            if (form._vid === 'draft') {
+              $scope.draft = true;
+            }
+            // Load in components if sent in stateParams.
+            $scope.form.components = $stateParams.components || $scope.form.components;
+            if ($stateParams.components) {
+              $scope.dirty = true;
+            }
+            $scope.originalForm = _.cloneDeep($scope.form);
+            $scope.formReady = true;
+          });
+        $scope.revisionsEnabled = true;
+      }
+      else {
+        // Load in components if sent in stateParams.
+        $scope.form.components = $stateParams.components || $scope.form.components;
+        if ($stateParams.components) {
+          $scope.dirty = true;
+        }
+        $scope.originalForm = _.cloneDeep($scope.form);
+        $scope.formReady = true;
+      }
+    };
+
+    ($scope.loadFormPromise || $q.when()).then(checkDraft);
 
     $scope.copy = function() {
       $state.go('project.' + $scope.formInfo.type + '.create', {components: _.cloneDeep($scope.form.components)});
     };
 
     // Track any modifications for save/cancel prompt on navigation away from the builder.
-    var dirty = false;
     var contentLoaded = false;
     $timeout(function() {
       contentLoaded = true;
@@ -756,30 +846,68 @@ app.controller('FormEditController', [
     $scope.$on('formBuilder:add', function(event) {
       // FOR-488 - Fix issues with loading the content component and flagging the builder as dirty.
       if (event.targetScope.formComponent.settings.type === 'content') {
-        dirty = true;
+        $scope.dirty = true;
       }
 
     });
     $scope.$on('formBuilder:update', function(event) {
       // FOR-488 - Fix issues with loading the content component and flagging the builder as dirty.
       if (contentLoaded && event.targetScope.formComponent.settings.type === 'content') {
-        dirty = true;
+        $scope.dirty = true;
       }
 
     });
     $scope.$on('formBuilder:remove', function() {
-      dirty = true;
+      $scope.dirty = true;
     });
     $scope.$on('formBuilder:edit', function() {
-      dirty = true;
+      $scope.dirty = true;
     });
 
     // Wrap saveForm in the editor to clear dirty when saved.
     var parentSave = $scope.saveForm;
     $scope.saveForm = function() {
       contentLoaded = false;
-      dirty = false;
-      return parentSave();
+      $scope.dirty = false;
+      return parentSave().then(function() {
+        $state.go('project.' + $scope.formInfo.type + '.form.edit', {formId: $scope.form._id}, {reload: true});
+      });
+    };
+
+    $scope.saveFormDraft = function() {
+      angular.element('.has-error').removeClass('has-error');
+      $scope.dirty = false;
+
+      // Copy to remove angular $$hashKey
+      return Formio.makeStaticRequest($scope.formUrl + '/draft', 'PUT', angular.copy($scope.form), {base: $scope.baseUrl})
+        .then(function(response) {
+          GoogleAnalytics.sendEvent('FormDraft', 'PUT'.substring(0, 'PUT'.length - 1), null, 1);
+
+          FormioAlerts.addAlert({
+            type: 'success',
+            message: 'Successfully saved form draft!'
+          });
+
+          // Reload page.
+          $state.go('project.' + $scope.formInfo.type + '.form.edit', {formId: $scope.form._id}, {reload: true});
+        })
+        .catch(function(err) {
+          if (err) {
+            FormioAlerts.onError.call(FormioAlerts, err);
+          }
+
+          // FOR-128 - if we're editing a form, make note of the components with issues.
+          try {
+            var issues = (/Component keys must be unique: (.*)/.exec(_.get(err, 'errors.components.message'))).slice(1);
+            if (($state.includes('project.form.form.edit') || $state.includes('project.form.create')) && (issues.length > 0)) {
+              issues = (issues.shift()).toString().split(', ');
+              issues.forEach(function(issue) {
+                angular.element('div.dropzone #' + issue).parent().addClass('has-error');
+              });
+            }
+          }
+          catch (e) {}
+        });
     };
 
     /**
@@ -822,7 +950,7 @@ app.controller('FormEditController', [
     // Listen for events to navigate away from the form builder.
     $scope.$on('$stateChangeStart', function(event, transition) {
       // If the form hasnt been modified, skip this cancel modal logic.
-      if (!dirty) {
+      if (!$scope.dirty) {
         return;
       }
 
@@ -834,7 +962,7 @@ app.controller('FormEditController', [
       .then(function() {
         // Cancel without save was clicked, revert the form and get out.
         $scope.form = $scope.$parent.form = angular.copy($scope.originalForm);
-        dirty = false;
+        $scope.dirty = false;
         $state.go(transition.name, {notify: false});
       })
       .catch(function(val) {
@@ -847,13 +975,26 @@ app.controller('FormEditController', [
         // If there was no return the cancel action was rejected, save the form before navigation.
         return $scope.saveForm()
         .then(function(result) {
-          dirty = false;
+          $scope.dirty = false;
           $state.go(transition.name, {reload: true, notify: false});
         })
         .catch(function(err) {
           console.error(err);
         });
       });
+    });
+  }
+]);
+
+app.controller('FormRevisionsController', [
+  '$http',
+  '$scope',
+  function($http, $scope) {
+    $scope.loadFormPromise.then(function() {
+      $scope.revisionsUrl = $scope.formUrl + '/v';
+      $scope.revisionsParams = {
+        sort: '-_vid'
+      };
     });
   }
 ]);
@@ -1536,6 +1677,7 @@ app.controller('FormActionDeleteController', [
 app.controller('FormSubmissionsController', [
   '$scope',
   '$state',
+  '$stateParams',
   '$http',
   '$timeout',
   '$window',
@@ -1550,6 +1692,7 @@ app.controller('FormSubmissionsController', [
   function(
     $scope,
     $state,
+    $stateParams,
     $http,
     $timeout,
     $window,
@@ -1562,6 +1705,9 @@ app.controller('FormSubmissionsController', [
     ngDialog,
     $interpolate
   ) {
+    if ($stateParams._vid) {
+      $scope._vid = $stateParams._vid;
+    }
     // Returns true if component should appear in table
     $scope.tableView = function(component) {
       return !component.protected &&
@@ -1778,6 +1924,10 @@ app.controller('FormSubmissionsController', [
                 skip: options.data.skip,
                 sort: getSortQuery(options.data.sort)
               };
+              // Filter by _vid if provided.
+              if ($stateParams._vid) {
+                params._fvid = $stateParams._vid;
+              }
               _.each(filters, function(filter) {
                 // FOR-395 - Fix query regression with FOR-323
                 filter.field = filter.field.replace(/^\["|"\]$/gi, '');
