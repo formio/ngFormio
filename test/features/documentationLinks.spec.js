@@ -1,5 +1,5 @@
 module.exports = function (actions) {
-  describe('Documentation Links',function () {
+  describe('Documentation Links ',function () {
     describe('Expanding the ‘Documentation’ button',function(){
      actions.goToPage('#/auth');
      actions.clickOnElementWithText(' Docs');

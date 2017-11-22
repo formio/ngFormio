@@ -1,5 +1,5 @@
 module.exports = function (actions) {
-  describe('Login Functionality',function(){
+  describe('Login Functionality ',function(){
     describe('Empty Login',function(){
       actions.logout();
       actions.enterTextInField('.login-container #email','admin@example.com');

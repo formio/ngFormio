@@ -4,7 +4,7 @@ module.exports = function (actions) {
       actions.logout();
       actions.iAmLoggedInFor('formuser1');
       actions.goToPage('#/');
-      actions.clickOnClass('new-project-custom');
+      actions.clickOnElementWithText('New Project');
       actions.iSeeText('Project Title');
       actions.iSeeText('Description');
       actions.enterTextInField('#title', '${random-title>primaryproject1.title}');
@@ -22,10 +22,10 @@ module.exports = function (actions) {
       actions.enterTextInField('#path', '${random-title>form1.path}');
       actions.dragTo('Text Field', 'formarea');
       actions.iSeeText('Text Field Component');
-      actions.enterTextInField('#label', '${random-title>textfield1.label}');
+      actions.enterTextInField('#label', 'textField');
       actions.clickOnButton('Save');
       actions.waitForClassRemoval('ngdialog-overlay');
-      actions.iSeeTextIn('.control-label', '${textfield1.label}');
+      actions.iSeeTextIn('label.control-label.ng-binding.ng-scope', 'textField');
       actions.clickOnButton('Create Form');
     });
   });
