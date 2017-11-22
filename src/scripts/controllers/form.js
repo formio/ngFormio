@@ -781,6 +781,7 @@ app.controller('FormEditController', [
   'ngDialog',
   '$state',
   '$timeout',
+  'Formio',
   'FormioAlerts',
   'GoogleAnalytics',
   function(
@@ -790,6 +791,7 @@ app.controller('FormEditController', [
     ngDialog,
     $state,
     $timeout,
+    Formio,
     FormioAlerts,
     GoogleAnalytics
   ) {
