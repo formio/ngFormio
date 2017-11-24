@@ -246,6 +246,7 @@ module.exports = function(app) {
             }
             $scope.rows[$scope.rowIndex] = $scope.rowData;
             $scope.openRows.splice($scope.openRows.indexOf($scope.rowIndex), 1);
+            $scope.formioForm[$scope.componentId].$validate();
           }
 
           var editRow = function() {

@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [UNRELEASED]
+### Fixed
+ - Fixed error message on EditGrid row save.
 ### Added
  - Possibility to use moment APIs to set min/max date for DateTime component.
 ### Changed
