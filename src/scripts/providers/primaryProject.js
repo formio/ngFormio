@@ -32,7 +32,7 @@ app.factory('PrimaryProject', [
           scope.primaryProjectTeams = result.data;
           scope.projectTeamsLoading = false;
           _.assign($scope, scope);
-        });
+
 
         // Calculate the users highest role within the project.
         scope.highestRoleLoaded = $q.all([$scope.userTeamsPromise, $scope.projectTeamsPromise]).then(function() {
@@ -43,7 +43,6 @@ app.factory('PrimaryProject', [
             .value();
           var allRoles = _(roles.concat(teams)).filter().value();
           var highestRole = null;
-
           /**
            * Determine if the user contains a role of the given type.
            *
@@ -53,12 +52,15 @@ app.factory('PrimaryProject', [
            *   If the current user has the role or not.
            */
           var hasRoles = function(type) {
-            var potential = _(scope.primaryProjectTeams)
-              .filter({permission: type})
-              .map('_id')
-              .value();
-            return (_.intersection(allRoles, potential).length > 0);
+            if(scope.primaryProjectTeams) {
+              var potential = _(scope.primaryProjectTeams)
+                .filter({permission: type})
+                .map('_id')
+                .value();
+              return (_.intersection(allRoles, potential).length > 0);
+            }
           };
+
 
           scope.projectPermissions = {
             read: true,
@@ -73,12 +75,12 @@ app.factory('PrimaryProject', [
           }
           else if (hasRoles('team_write')) {
             highestRole = 'team_write';
-            $scope.projectPermissions.admin = false;
+            scope.projectPermissions.admin = false;
           }
           else if (hasRoles('team_read')) {
             highestRole = 'team_read';
-            $scope.projectPermissions.admin = false;
-            $scope.projectPermissions.write = false;
+            scope.projectPermissions.admin = false;
+            scope.projectPermissions.write = false;
           }
           else {
             highestRole = 'anonymous';
@@ -86,6 +88,7 @@ app.factory('PrimaryProject', [
 
           scope.highestRole = highestRole;
           _.assign($scope, scope);
+        });
         });
         return _.assign($scope, scope);
       },
