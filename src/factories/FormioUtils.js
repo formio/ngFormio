@@ -310,6 +310,7 @@ module.exports = function() {
     getValue: formioUtils.getValue,
     jsonLogic: formioUtils.jsonLogic,
     hasCondition: formioUtils.hasCondition,
+    getDateSetting: formioUtils.getDateSetting,
     hideFields: function(form, components) {
       this.eachComponent(form.components, function(component) {
         for (var i in components) {
