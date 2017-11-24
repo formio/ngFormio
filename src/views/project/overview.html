@@ -32,7 +32,7 @@
           </div>
         </li>
         <li class="list-group-item text-center">
-          <a ui-sref="project.data">More...</a>
+          <a ui-sref="project.data">Coming Soon...</a>
         </li>
       </ul>
     </div>
@@ -124,7 +124,7 @@
       </ul>
       <div ng-if="!hasTeams()">
         <div class="well">
-          <h4><a href="" ng-click="showUpgradeDialog(currentProject)">Upgrade Plan</a> to enable teams for this project</h4>
+          <h4><a href="" ui-sref="project.billing({projectId: primaryProject._id})">Upgrade Plan</a> to enable teams for this project</h4>
         </div>
       </div>
     </div>
