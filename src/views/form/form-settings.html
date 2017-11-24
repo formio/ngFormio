@@ -1,3 +1,9 @@
+<div id="form-group-note" class="form-group" ng-if="form.revisions && minPlan('commercial')">
+  <label class="control-label">Revision Note  </label>
+
+  <textarea class="form-control" ng-model="form._vnote"></textarea>
+  <div class="text-muted">Describe the changes made to this revision.</div>
+</div>
 <uib-accordion close-others="true">
   <div uib-accordion-group class="panel panel-default" heading="Advanced Settings">
     <div id="form-group-action" class="form-group">
@@ -7,6 +13,26 @@
     <div id="form-group-tags" class="form-group">
       <label class="control-label">Form Tags</label>
       <tags-input ng-model="formTags" on-tag-added="addTag($tag)" on-tag-removed="removeTag($tag)"></tags-input>
+    </div>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        Form Revisions
+      </div>
+      <div class="panel-body">
+        <div class="well well-sm">
+          Form revisions will save a copy of each form revision and allow matching submissions with the revision of the form it was submitted with.
+        </div>
+        <div id="form-group-versioning" class="form-group">
+          <label class="control-label">
+            <select ng-model="form.revisions">
+              <option value="">Disabled</option>
+              <option value="current">Enabled - Use current form version when viewing submissions.</option>
+              <option value="original">Enabled - Use original form version when viewing submissions.</option>
+            </select>
+          </label>
+          <div class="text-muted">When enabled, you can configure whether existing form submissions will be viewed in the latest version of the form or in the original version the submission was submitted with.</div>
+        </div>
+      </div>
     </div>
     <div class="panel panel-danger">
       <div class="panel-heading">
