@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [UNRELEASED]
+### Added
+ - Possibility to use moment APIs to set min/max date for DateTime component.
+### Changed
+ - Min/Max date for DateTime component doesn't transform to UTC.
+
 ## 2.25.1
 ### Fixed
  - Issue where the label placement was getting messed up on form builder views.
@@ -71,7 +77,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
  - Make formioTranslate filter stateful
  - Upgrade angular-moment to 1.1.0
- 
+
 ### Fixed
  - The form component to pass along the form options and readOnly states.
 
@@ -139,7 +145,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## 2.22.0
 ### Fixed
  - Fix submission message on update.
- 
+
 ### Changed
  - Default phone number fields to have input type of "tel"
  - Upgraded formio.js to 2.16.0 to add cookie fallback in old browsers.
@@ -225,7 +231,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Fixed issue with required file uploads not enforcing a file upload.
  - Display issue for the survey component.
  - Removed the $hashKey from the form submission.
- 
+
 ### Added
  - Custom javascript logic to execute on button click.
  - Take initial values for resource component search from URL
@@ -299,7 +305,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## 2.18.5
 ### Added
  - Add headers to Select Urls if specified.
- 
+
 ### Fixed
  - Fields inside a panel inside a wizard didn't highlight properly if validation failed.
  - Survey components didn't hightlight validations properly.
@@ -313,13 +319,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
  - Changed Object.assign to lodash assign for compatibility.
 
-## 2.18.2 
+## 2.18.2
 ### Added
  -  Allow interpolation of file directories for uploads.
 
 ### Changed
  - Select resource components use Formio provider instead of $http.get to allow offline compatibility.
- 
+
 ### Fixed
  - Fixed false value for checkbox.
 
@@ -331,7 +337,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## 2.18.0
 ### Fixed
  - An empty array was being appended to select data values when editing fields.
-  
+
 ### Added
  - Ability to specify width, offset, push and pull on columns.
 
@@ -367,7 +373,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Upgrade formio.js to 2.7.3
  - Changed the jsonLogic to use both row and data for logic.
  - No longer use "jsonConditionals" in favor of "conditions.json" property.
- 
+
 ## Removed
  - jsonLogic from conditionals since that is now handled within the formio.js library.
 
