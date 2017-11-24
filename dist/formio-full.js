@@ -86037,7 +86037,8 @@ module.exports = function() {
       src: '=?',
       formAction: '=?',
       resourceName: '=?',
-      message: '=?'
+      message: '=?',
+      options: '=?'
     },
     templateUrl: 'formio-delete.html',
     controller: [
