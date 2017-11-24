@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.25.3
+### Fixed
+ - Issue with loading submissions in a form without revisions enabled. (Upgrade formio.js to 2.24.2)
+
 ## 2.25.2
 ### Fixed
  - Fixed error message on EditGrid row save.
