@@ -1607,6 +1607,8 @@ app.controller('FormActionEditController', [
           $scope.currentProject.hasOwnProperty('plan') &&
           ['basic', 'trial'].indexOf($scope.currentProject.plan) !== -1
         ) {
+          $scope.formDisabled = true;
+          $scope.premiumNotAvailable = true;
           FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> This is a Premium Action, please upgrade your <a ui-sref="project.billing({projectId: $scope.primaryProject._id)">project plan</a> to enable it.');
         }
 
