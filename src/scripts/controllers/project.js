@@ -2223,6 +2223,7 @@ app.controller('ProjectRemoteController', [
             project.template = result.data;
             delete project.access;
             delete project._id;
+            delete project.project;
             $http({
               method: 'POST',
               url: $scope.remote.url + '/project',
