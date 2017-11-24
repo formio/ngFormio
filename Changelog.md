@@ -20,8 +20,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Fix for content component's 'unsaved changes' error message
 
 ### Fixed
+ - Environment Settings menu in IE11.
  - Alerts on Premium actions when project plan is not Basic.
-
 
 ## 4.1.5
  - Upgraded ng-formio to 2.20.7
