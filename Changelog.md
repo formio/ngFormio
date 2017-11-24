@@ -1,4 +1,4 @@
-# Change Log 
+# Change Log
 All notable changes to this project will be documented in this file
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
@@ -18,6 +18,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Improved Teams pages
  - Improved access permissions and descriptions
  - Fix for content component's 'unsaved changes' error message
+
+### Fixed
+ - Environment Settings menu in IE11.
+ - Alerts on Premium actions when project plan is not Basic.
 
 ## 4.1.5
  - Upgraded ng-formio to 2.20.7
@@ -88,7 +92,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Fixed an issue with editing teams, where you wouldn't be taken to the team view, but rather the project overview.
  - Fixed issue where the save submission action mapped to another resource would redirect you to the wrong page after
    making a new submission in the portal preview
-   
+
 ### Changed
  - Upgraded ng-formio to 2.17.0
  - Upgraded ng-formio-builder to 2.17.0
@@ -135,7 +139,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## 4.0.2
 ### Changed
  - Updated ngFormBuilder to 2.15.1
- 
+
 ## 4.0.1
 ### Changed
  - Removed test that randomly fails.
@@ -143,7 +147,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## 4.0.0
 ### Fixed
  - Signaturepad no longer supports bower.
- 
+
 ### Changed
  - Updated ngFormio to 2.15.1
  - Updated ngFormBuilder to 2.15.0

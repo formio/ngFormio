@@ -307,6 +307,11 @@ angular
           parent: 'project.env',
           templateUrl: 'views/project/env/settings/cors/index.html'
         })
+        .state('project.env.settings.security', {
+          url: '/settings/security',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/settings/security/index.html'
+        })
         .state('project.env.database', {
           url: '/database',
           abstract: true,

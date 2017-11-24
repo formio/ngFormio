@@ -1,0 +1,20 @@
+<upgrade-warning ng-if="!minPlan('team')" warning="Upgrade your project to a paid plan to enable security settings."></upgrade-warning>
+<div class="row">
+  <div class="col-sm-12">
+    <div class="panel panel-default">
+      <div class="panel-heading">Encryption</div>
+      <div class="panel-body">
+        <div class="form-group" ng-if="currentProject && currentProject._id">
+          <div class="form-group">
+            <label for="secret" class="control-label">Encrypted fields secret</label>
+            <input class="form-control" id="secret" ng-disabled="primaryProject.plan === 'basic'" ng-model="currentProject.settings.secret" placeholder="A secret phrase used to encrypt fields."></input>
+          </div>
+          <div class="alert alert-danger">
+            <strong>Warning!</strong> Changing the key can cause the impossibility of decryption of stored data.
+          </div>
+        </div>
+      </div>
+    </div>
+    <button class="btn btn-primary" ng-click="saveProject()">Save Settings</button>
+  </div>
+</div>

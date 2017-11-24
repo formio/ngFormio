@@ -16,7 +16,7 @@
     </div>
     <div class="panel panel-default">
       <div class="panel-heading">
-        Form Revisions
+        Form Revisions (Enterprise Only)
       </div>
       <div class="panel-body">
         <div class="well well-sm">
@@ -24,7 +24,7 @@
         </div>
         <div id="form-group-versioning" class="form-group">
           <label class="control-label">
-            <select ng-model="form.revisions">
+            <select ng-model="form.revisions" ng-disabled="!minPlan('commercial')">
               <option value="">Disabled</option>
               <option value="current">Enabled - Use current form version when viewing submissions.</option>
               <option value="original">Enabled - Use original form version when viewing submissions.</option>

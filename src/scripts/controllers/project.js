@@ -542,6 +542,7 @@ app.controller('ProjectController', [
 app.controller('ProjectDeployController', [
   '$scope',
   '$state',
+  '$stateParams',
   'AppConfig',
   'Formio',
   'FormioAlerts',
@@ -549,6 +550,7 @@ app.controller('ProjectDeployController', [
   function(
     $scope,
     $state,
+    $stateParams,
     AppConfig,
     Formio,
     FormioAlerts,
@@ -582,18 +584,19 @@ app.controller('ProjectDeployController', [
             type: 'success',
             message: 'Project tag ' + tag.tag + ' deployed to ' + $scope.currentProject.title + '.'
           });
+          Formio.clearCache();
           // If Remote, update the local project as well.
           if ($scope.localProject._id !== $scope.currentProject._id) {
             $scope.localProject.tag = tag.tag;
             $scope.saveLocalProject()
               .then(function() {
                 PrimaryProject.clear();
-                $state.transitionTo($state.current, null, { reload: true, inherit: true, notify: true });
+                $state.go($state.current, $stateParams, { reload: true, inherit: false, notify: true });
               });
           }
           else {
             PrimaryProject.clear();
-            $state.reload();
+            $state.go($state.current, $stateParams, { reload: true, inherit: false, notify: true });
           }
         })
         .catch(FormioAlerts.onError.bind(FormioAlerts))
@@ -775,39 +778,39 @@ app.controller('ProjectOverviewController', [
         }
       });
 
-      $http.post($scope.projectUrl + '/report', [
-        {
-          $sort: {
-            created: -1
-          }
-        },
-        {
-          $limit: 10
-        },
-      ])
-        .then(function(result) {
-          $scope.submissions = result.data || [];
-
-          if ($scope.submissions.length) {
-            var formIds = _.uniq($scope.submissions.map(function(submission) {
-              return submission.form;
-            }));
-
-            $scope.formio.loadForms({
-              params: {
-                _id__in: formIds
-              }
-            }).then(function(results) {
-              $scope.forms = {};
-              results.forEach(function(form) {
-                $scope.forms[form._id] = form;
-              });
-            });
-          }
-        })
-        .catch(function(err) {
-          console.warn('Unable to get recent submissions', err);
-        });
+      //$http.post($scope.projectUrl + '/report', [
+      //  {
+      //    $sort: {
+      //      created: -1
+      //    }
+      //  },
+      //  {
+      //    $limit: 10
+      //  },
+      //])
+      //  .then(function(result) {
+      //    $scope.submissions = result.data || [];
+      //
+      //    if ($scope.submissions.length) {
+      //      var formIds = _.uniq($scope.submissions.map(function(submission) {
+      //        return submission.form;
+      //      }));
+      //
+      //      $scope.formio.loadForms({
+      //        params: {
+      //          _id__in: formIds
+      //        }
+      //      }).then(function(results) {
+      //        $scope.forms = {};
+      //        results.forEach(function(form) {
+      //          $scope.forms[form._id] = form;
+      //        });
+      //      });
+      //    }
+      //  })
+      //  .catch(function(err) {
+      //    console.warn('Unable to get recent submissions', err);
+      //  });
     });
   }
 ]);
