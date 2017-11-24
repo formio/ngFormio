@@ -519,7 +519,7 @@ module.exports = function(app) {
 
                     var promise;
                     if (settings.dataSrc === 'resource') {
-                      promise = (new Formio(newUrl)).loadSubmissions(options);
+                      promise = (new Formio(newUrl, {base: baseUrl})).loadSubmissions(options);
                     }
                     else {
                       // Add in headers if specified
