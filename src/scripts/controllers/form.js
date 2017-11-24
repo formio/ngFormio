@@ -755,7 +755,7 @@ app.controller('FormViewController', [
       $scope.formReady = true;
     });
 
-    $scope.$on('formSubmit', function(event, submission) {
+    $scope.$on('formSubmission', function(event, submission) {
       if ($stateParams.revision) {
         submission._fvid = $stateParams.revision._vid;
       }
@@ -769,6 +769,11 @@ app.controller('FormViewController', [
           if (submission._id) {
             $state.go('project.' + $scope.formInfo.type + '.form.submission.item.view', {formId: submission.form, subId: submission._id});
           }
+        })
+        .catch(function(err) {
+          _.each(err.details, function(errDetails) {
+            FormioAlerts.onError.call(FormioAlerts, errDetails);
+          });
         });
     });
   }
