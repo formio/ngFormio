@@ -4,13 +4,16 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [UNRELEASED]
+## 2.25.2
 ### Fixed
  - Fixed error message on EditGrid row save.
+ - Select resource not properly instanciating with base URL.
 ### Added
  - Possibility to use moment APIs to set min/max date for DateTime component.
+ - Alerts to PDF.
 ### Changed
  - Min/Max date for DateTime component doesn't transform to UTC.
+ - Load submissions before forms so form versions can be found from submissions.
 
 ## 2.25.1
 ### Fixed
