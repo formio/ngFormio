@@ -544,7 +544,7 @@ module.exports = function(app) {
                     }
 
                     return promise.then(function(data) {
-                      if (data.length > 0) {
+                      if (data) {
                         // If the selectValue prop is defined, use it.
                         if (selectValues) {
                           setResult(_get(data, selectValues, []));
