@@ -226,7 +226,7 @@ app.directive('formList', function() {
     scope: {
       formName: '=',
       forms: '=',
-      formio: '=',
+      formioReady: '=',
       projectUrl: '=',
       formType: '=',
       numPerPage: '=',
@@ -254,7 +254,7 @@ app.directive('formList', function() {
         $rootScope.currentForm = false;
         $scope.search = {};
         $scope.forms = [];
-        $scope.$watch('projectUrl', function() {
+        $scope.formioReady.then(function(formio) {
           var query = {
             params: {
               limit: 9999999
@@ -263,7 +263,7 @@ app.directive('formList', function() {
           if ($scope.formType) {
             query.params.type = $scope.formType;
           }
-          $scope.formio.loadForms(query).then(function(forms) {
+          formio.loadForms(query).then(function(forms) {
             $scope.forms = forms;
             $scope.formsFinished = true;
           });
@@ -766,7 +766,7 @@ app.controller('FormViewController', [
       $scope.formReady = true;
     });
 
-    $scope.$on('formSubmit', function(event, submission) {
+    $scope.$on('formSubmission', function(event, submission) {
       if ($stateParams.revision) {
         submission._fvid = $stateParams.revision._vid;
       }
@@ -780,6 +780,11 @@ app.controller('FormViewController', [
           if (submission._id) {
             $state.go('project.' + $scope.formInfo.type + '.form.submission.item.view', {formId: submission.form, subId: submission._id});
           }
+        })
+        .catch(function(err) {
+          _.each(err.details, function(errDetails) {
+            FormioAlerts.onError.call(FormioAlerts, errDetails);
+          });
         });
     });
   }

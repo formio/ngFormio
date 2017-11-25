@@ -313,8 +313,6 @@ app.controller('ProjectController', [
       });
     };
 
-    $scope.loadRoles();
-
     $scope.minPlan = function(plan, project) {
       var plans = ['basic', 'independent', 'team', 'commercial', 'trial'];
       var checkProject = project || $scope.primaryProject || { plan: 'none' };
@@ -356,6 +354,8 @@ app.controller('ProjectController', [
     };
 
     var primaryProjectQ = $q.defer();
+    var formioReady = $q.defer();
+    $scope.formioReady = formioReady.promise;
     $scope.primaryProjectPromise = primaryProjectQ.promise;
 
     $scope.loadProjectPromise = $scope.formio.loadProject(null, {ignoreCache: true}).then(function(result) {
@@ -365,12 +365,6 @@ app.controller('ProjectController', [
       // If this is a remote project, load the remote.
 
       $scope.rolesLoading = true;
-      var loadRoles = function() {
-        $http.get($scope.projectUrl + '/role?limit=1000').then(function(result) {
-          $scope.currentProjectRoles = result.data;
-          $scope.rolesLoading = false;
-        });
-      };
 
       if ($scope.localProject.remote) {
         $scope.isRemote = true;
@@ -382,23 +376,23 @@ app.controller('ProjectController', [
         $scope.projectServer = $scope.localProject.remote.url.replace(/(^\w+:|^)\/\//, '');
         $scope.localFormio = $scope.formio;
         $scope.baseUrl = $scope.localProject.remote.url;
-        $scope.formio = new Formio($scope.projectUrl, {  });
+        $scope.formio = new Formio($scope.projectUrl, {
+          base: $scope.localProject.remote.url
+        });
+        formioReady.resolve($scope.formio);
         promiseResult = $http({
           method: 'GET',
           url: $scope.localProjectUrl + '/access/remote'
         })
           .then(function(response) {
             RemoteTokens.setRemoteToken($scope.projectUrl, response.data);
-            $scope.formio = new Formio($scope.projectUrl, {
-              base: $scope.localProject.remote.url
-            });
             return $scope.formio
               .loadProject(null, {
                 ignoreCache: true
               })
               .then(function(currentProject) {
                 $scope.currentProject = currentProject;
-                loadRoles();
+                $scope.loadRoles();
                 return currentProject;
               });
           });
@@ -409,7 +403,8 @@ app.controller('ProjectController', [
         $scope.baseUrl = AppConfig.apiBase;
         $scope.currentProject = $scope.localProject;
         Formio.setProjectUrl($scope.projectUrl = $rootScope.projectPath(result));
-        loadRoles();
+        formioReady.resolve($scope.formio);
+        $scope.loadRoles();
       }
       $scope.projectType = 'Stage';
       $scope.environmentName = ($scope.localProject.project) ? result.title : 'Live';

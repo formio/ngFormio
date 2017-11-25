@@ -22,9 +22,12 @@ app.controller('RoleController', [
         return;
       }
       var method = $scope.role._id ? 'put' : 'post';
-      var url = $scope.formio.projectUrl + '/role?limit=1000';
+      var url = $scope.formio.projectUrl + '/role';
       if($scope.role._id) {
         url += '/' + $scope.role._id;
+      }
+      else {
+        url += '?limit=1000';
       }
       return $http[method](url, $scope.role)
         .then(function(result) {
