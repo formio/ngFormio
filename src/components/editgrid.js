@@ -56,7 +56,7 @@ module.exports = function(app) {
           input: true,
           tree: true,
           components: [],
-          multiple: true,
+          multiple: false,
           tableView: true,
           label: '',
           key: 'editgrid',
