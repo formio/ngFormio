@@ -2572,12 +2572,14 @@ app.controller('ProjectDeleteController', [
   'FormioAlerts',
   'GoogleAnalytics',
   'PrimaryProject',
+  'Formio',
   function(
     $scope,
     $state,
     FormioAlerts,
     GoogleAnalytics,
-    PrimaryProject
+    PrimaryProject,
+    Formio
   ) {
     $scope.primaryProjectPromise.then(function(primaryProject) {
       var isProject = ($scope.currentProject._id === primaryProject._id);
@@ -2585,7 +2587,7 @@ app.controller('ProjectDeleteController', [
       $scope.deleteProject = function() {
         if (!$scope.currentProject || !$scope.currentProject._id) { return; }
         $scope.isBusy = true;
-        let localFormio = new Formio('/project/' + $scope.localProject._id);
+        var localFormio = new Formio('/project/' + $scope.localProject._id);
         localFormio.deleteProject()
           .then(function() {
             FormioAlerts.addAlert({
