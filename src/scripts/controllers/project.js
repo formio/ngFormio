@@ -620,6 +620,7 @@ app.controller('ProjectTagCreateController', [
     FormioAlerts,
     PrimaryProject
   ) {
+    $scope.isBusy = false;
     $scope.addTag = function(tag) {
       if (!tag) {
         return FormioAlerts.addAlert({
@@ -627,6 +628,7 @@ app.controller('ProjectTagCreateController', [
           message: 'Please enter a tag identifier.'
         });
       }
+      $scope.isBusy = true;
       Formio.makeStaticRequest($scope.projectUrl + '/export', 'GET')
         .then(function(template) {
           Formio.makeStaticRequest(AppConfig.apiBase + '/project/' + $scope.localProject._id + '/tag', 'POST', {
@@ -639,12 +641,19 @@ app.controller('ProjectTagCreateController', [
                 type: 'success',
                 message: 'Project Tag was created.'
               });
+              $scope.isBusy = false;
               PrimaryProject.clear();
               $state.reload();
             })
-            .catch(FormioAlerts.onError.bind(FormioAlerts));
+            .catch(function(err) {
+              $scope.isBusy = false;
+              FormioAlerts.onError(err);
+            });
         })
-        .catch(FormioAlerts.onError.bind(FormioAlerts));
+        .catch(function(err) {
+          $scope.isBusy = false;
+          FormioAlerts.onError(err);
+        });
     };
   }
 ]);
@@ -660,24 +669,33 @@ app.controller('ProjectImportController', [
     Formio,
     FormioAlerts
   ) {
+    $scope.isBusy = false;
     $scope.importTemplate = function(template) {
+      $scope.isBusy = true;
       if (!template) {
         return FormioAlerts.addAlert({
           type: 'warning',
           message: 'Please select a file to import.'
         });
       }
+      delete template.title;
+      delete template.name;
+      delete template.description;
       Formio.makeStaticRequest($scope.projectUrl + '/import', 'POST', {
           template: template
         })
         .then(function() {
+          $scope.isBusy = false;
           $scope.importFile = null;
           FormioAlerts.addAlert({
             type: 'success',
             message: 'Project template imported to ' + $scope.currentProject.title + '.'
           });
         })
-        .catch(FormioAlerts.onError.bind(FormioAlerts));
+        .catch(function(err) {
+          $scope.isBusy = false;
+          FormioAlerts.onError(err);
+        });
     };
   }
 ]);
@@ -2554,37 +2572,43 @@ app.controller('ProjectDeleteController', [
   'FormioAlerts',
   'GoogleAnalytics',
   'PrimaryProject',
+  'Formio',
   function(
     $scope,
     $state,
     FormioAlerts,
     GoogleAnalytics,
-    PrimaryProject
+    PrimaryProject,
+    Formio
   ) {
+    $scope.primaryProjectPromise.then(function(primaryProject) {
+      var isProject = ($scope.currentProject._id === primaryProject._id);
+      var type = (isProject ? 'Project' : 'Stage');
+      $scope.deleteProject = function() {
+        if (!$scope.currentProject || !$scope.currentProject._id) { return; }
+        $scope.isBusy = true;
+        var localFormio = new Formio('/project/' + $scope.localProject._id);
+        localFormio.deleteProject()
+          .then(function() {
+            FormioAlerts.addAlert({
+              type: 'success',
+              message: type + ' was deleted!'
+            });
+            $scope.isBusy = false;
+            GoogleAnalytics.sendEvent(type, 'delete', null, 1);
+            PrimaryProject.clear();
+            if (isProject) {
+              $state.go('home');
+            }
+            else {
+              $state.go('project.overview', {projectId: primaryProject._id});
+            }
+          }, FormioAlerts.onError.bind(FormioAlerts))
+          .catch(FormioAlerts.onError.bind(FormioAlerts));
+      };
+    });
+
     $scope.isBusy = false;
-    var isProject = ($scope.currentProject._id === $scope.primaryProject._id);
-    var type = (isProject ? 'Project' : 'Stage');
-    $scope.deleteProject = function() {
-      if (!$scope.currentProject || !$scope.currentProject._id) { return; }
-      $scope.isBusy = true;
-      $scope.formio.deleteProject()
-        .then(function() {
-          FormioAlerts.addAlert({
-            type: 'success',
-            message: type + ' was deleted!'
-          });
-          $scope.isBusy = false;
-          GoogleAnalytics.sendEvent(type, 'delete', null, 1);
-          PrimaryProject.clear();
-          if (isProject) {
-            $state.go('home');
-          }
-          else {
-            $state.go('project.overview', {projectId: $scope.primaryProject._id});
-          }
-        }, FormioAlerts.onError.bind(FormioAlerts))
-        .catch(FormioAlerts.onError.bind(FormioAlerts));
-    };
   }
 ]);
 
@@ -2752,18 +2776,22 @@ app.controller('ProjectExportController', [
     $scope,
     $http
   ) {
+    $scope.isBusy = false;
     $scope.downloadTemplate = function() {
+      $scope.isBusy = true;
       $http({
         url: $scope.projectUrl + '/export',
         method: 'GET',
         responseType: 'blob'
       }).then(function(response) {
+        $scope.isBusy = false;
         var a = document.createElement('a');
         a.href = window.URL.createObjectURL(response.data);
         a.download = $scope.currentProject.name + '-' + $scope.currentProject.tag + '.json';
         a.click();
         window.URL.revokeObjectURL(a.href);
       }).catch(function(error) {
+        $scope.isBusy = false;
         console.error(error);
       });
     };

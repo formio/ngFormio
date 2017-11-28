@@ -1619,9 +1619,9 @@ app.controller('FormActionEditController', [
           actionInfo &&
           actionInfo.hasOwnProperty('premium') &&
           actionInfo.premium === true &&
-          $scope.currentProject &&
-          $scope.currentProject.hasOwnProperty('plan') &&
-          ['basic', 'trial'].indexOf($scope.currentProject.plan) !== -1
+          $scope.primaryProject &&
+          $scope.primaryProject.hasOwnProperty('plan') &&
+          ['basic', 'trial'].indexOf($scope.primaryProject.plan) !== -1
         ) {
           $scope.formDisabled = true;
           $scope.premiumNotAvailable = true;
