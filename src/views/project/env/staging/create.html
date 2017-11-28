@@ -6,7 +6,7 @@
       <h4>Create a version tag from current stage</h4>
       <input id="tag" class="form-control" placeholder="0.0.0" ng-model="tag" />
       <br />
-      <span class="btn btn-default" ng-click="addTag(tag)">Create version tag</span>
+      <span class="btn btn-default" ng-click="addTag(tag)"><i ng-if="isBusy" class="fa fa-spinner fa-pulse"></i> Create version tag</span>
     </div>
     <div class="col-md-4">
       <div class="panel panel-primary">

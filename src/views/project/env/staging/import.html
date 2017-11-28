@@ -6,7 +6,7 @@
       <div class="form-inline">
         <label class="control-label" for="file">Name</label>
         <p><input id="file" class="form-control" type="file" name="file" accept=".json" fileread="importFile"></p>
-        <p><button type="submit" class="btn btn-primary" ng-click="importTemplate(importFile)">Import Project Template to {{ environmentName }}</button></p>
+        <p><button type="submit" class="btn btn-primary" ng-click="importTemplate(importFile)"><i ng-if="isBusy" class="fa fa-spinner fa-pulse"></i> Import Project Template to {{ environmentName }}</button></p>
       </div>
     </div>
     <div class="col-md-4">
