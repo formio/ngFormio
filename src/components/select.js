@@ -420,7 +420,7 @@ module.exports = function(app) {
                 else {
                   url = baseUrl;
                   if (settings.data.project) {
-                    url += '/project/' + settings.data.project;
+                    url += '/' + settings.data.project;
                   }
                   url += '/form/' + settings.data.resource + '/submission';
                 }
