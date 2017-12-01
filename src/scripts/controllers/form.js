@@ -1,6 +1,6 @@
 'use strict';
 
-/* global _: false, jQuery: false, document: false */
+/* global _: false, jQuery: false, document: false, Promise: false */
 var app = angular.module('formioApp.controllers.form', [
   'ngDialog',
   'ui.bootstrap.tabs',
@@ -1885,7 +1885,7 @@ app.controller('FormSubmissionsController', [
     // When form is loaded, create the columns
     $scope.loadFormPromise.then(function(form) {
       var currentForm = _.clone(form);
-      const loadRevisionsPromise = new Promise(function(resolve, reject) {
+      var loadRevisionsPromise = new Promise(function(resolve, reject) {
         if (form.revisions === 'original' && !isNaN(parseInt($stateParams._vid))) {
           (new Formio($scope.formUrl + '/v/' + $stateParams._vid)).loadForm()
             .then(function(revisionForm) {
@@ -2063,7 +2063,7 @@ app.controller('FormSubmissionsController', [
               field: '_fvid',
               title: 'Form Version',
               width: '100px',
-            })
+            });
           }
 
           columns.push(
@@ -2160,7 +2160,7 @@ app.controller('FormSubmissionsController', [
             }
           };
         });
-      })
+      });
     });
   }
 ]);
