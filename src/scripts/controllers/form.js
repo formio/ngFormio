@@ -269,7 +269,22 @@ app.directive('formList', function() {
           });
         });
         $scope.export = function(form, type) {
-          window.open($scope.projectUrl + '/form/' + form._id + '/export?format=' + type + '&x-jwt-token=' + $rootScope.userToken);
+          $scope.isBusy = true;
+          $http({
+            url: $scope.projectUrl + '/form/' + form._id + '/export?format=' + type,
+            method: 'GET',
+            responseType: 'blob'
+          }).then(function(response) {
+            $scope.isBusy = false;
+            var a = document.createElement('a');
+            a.href = window.URL.createObjectURL(response.data);
+            a.download = form.name + '.' + type;
+            a.click();
+            window.URL.revokeObjectURL(a.href);
+          }).catch(function(error) {
+            $scope.isBusy = false;
+            console.error(error);
+          });
         };
         $scope.componentCount = function(components) {
           return _(FormioUtils.flattenComponents(components)).filter(function (o) {
@@ -1731,6 +1746,26 @@ app.controller('FormSubmissionsController', [
       return !component.protected &&
         (!component.hasOwnProperty('persistent') || component.persistent) &&
         (component.tableView);
+    };
+
+    $scope.export = function(form, type) {
+
+      $scope.isBusy = true;
+      $http({
+        url: $scope.projectUrl + '/form/' + form._id + '/export?format=' + type + (!isNaN(parseInt($scope._vid)) ? '&_fvid=' + $scope._vid : ''),
+        method: 'GET',
+        responseType: 'blob'
+      }).then(function(response) {
+        $scope.isBusy = false;
+        var a = document.createElement('a');
+        a.href = window.URL.createObjectURL(response.data);
+        a.download = form.name + '.' + type;
+        a.click();
+        window.URL.revokeObjectURL(a.href);
+      }).catch(function(error) {
+        $scope.isBusy = false;
+        console.error(error);
+      });
     };
 
     // Creates resourcejs sort query from kendo datasource read options

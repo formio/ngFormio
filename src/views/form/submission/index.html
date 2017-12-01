@@ -2,7 +2,8 @@
   <p>You are viewing submissions for form revision {{ _vid }}.</p>
 </div>
 <div class="well submissions-header">
-  <a class="btn btn-warning" href="{{ formio.formUrl }}/export?format=json&x-jwt-token={{ token }}">{...} Export JSON</a>
-  <a class="btn btn-success" href="{{ formio.formUrl }}/export?format=csv&x-jwt-token={{ token }}"><i class="fa fa-file-text-o"></i> Export CSV</a>
+  <span class="fa fa-spinner fa-pulse" ng-if="isBusy" style="font-size: 2em;"></span>
+  <a class="btn btn-warning" ng-click="export(currentForm, 'json')">{...} Export JSON</a>
+  <a class="btn btn-success" ng-click="export(currentForm, 'csv')"><i class="fa fa-file-text-o"></i> Export CSV</a>
 </div>
 <div kendo-grid="grid" k-options="gridOptions" k-ng-delay="gridOptions.columns" style="width:0"></div>
