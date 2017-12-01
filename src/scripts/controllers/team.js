@@ -131,6 +131,7 @@ app.controller('TeamViewController', [
       Formio.request(AppConfig.apiBase + '/team/members?limit=100&name=' + input, 'GET')
         .then(function(members) {
           $scope.selectMembers = members;
+          $scope.$apply();
         });
     };
 
