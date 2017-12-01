@@ -1887,7 +1887,6 @@ app.controller('FormSubmissionsController', [
       var currentForm = _.clone(form);
       const loadRevisionsPromise = new Promise(function(resolve, reject) {
         if (form.revisions === 'original' && !isNaN(parseInt($stateParams._vid))) {
-          console.log('loading revision');
           (new Formio($scope.formUrl + '/v/' + $stateParams._vid)).loadForm()
             .then(function(revisionForm) {
               currentForm.components = revisionForm.components;
@@ -1902,7 +1901,6 @@ app.controller('FormSubmissionsController', [
         // Load the grid on the next digest.
         $timeout(function() {
           // Define DataSource
-          console.log('setting up');
           var dataSource = new kendo.data.DataSource({
             page: 1,
             pageSize: 10,
