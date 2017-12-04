@@ -36,7 +36,7 @@ module.exports = function (actions) {
       actions.checkElement('//*[@id="protect"]');
       actions.iSeeElement('i.fa.fa-shield.ng-scope');
       actions.clickOnElementWithText(' Save Stage');
-      actions.waitForActionToComplete(1000);
+      actions.waitForActionToComplete(2000);
       actions.clickOnElementWithText('Forms');
       actions.checkElementWithTextIsDisabled(' New Form');
       actions.checkElementWithTextIsDisabled(' Edit');

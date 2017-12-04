@@ -34,6 +34,7 @@ module.exports = function (actions) {
       actions.checkElementIsNotDisabled('//*[@id="name"]');
       actions.enterTextInField('#name','independentauto');
       actions.clickOnElementWithText(' Save Stage');
+      actions.waitForActionToComplete(2000);
       actions.iSeeValueIn('#name','independentauto');
       actions.clickOnElementWithText('Forms');
       actions.clickOnElementWithText('User Login');
