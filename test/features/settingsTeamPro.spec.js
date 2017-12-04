@@ -1,24 +1,24 @@
 module.exports = function (actions) {
   describe('Team Pro Plan Settings',function(){
     describe('Team Pro Plan > Environment Settings',function(){
-      // actions.logout();
-      // actions.iAmLoggedInFor('profileuser1');
-      // actions.waitForActionToComplete(2000);
-      // actions.goToPage('#/profile/payment/view');
-      // actions.clickOnElementWithText('Add Credit Card');
-      // actions.enterTextInField('#cardholderName','Test');
-      // actions.enterTextInField('#ccNumber','4111111111111111');
-      // actions.enterTextInField('#securityCode','411');
-      // actions.clickOnClass('#form-group-ccExpiryMonth');
-      // actions.clickOnElementWithText('01');
-      // actions.clickOnClass('#form-group-ccExpiryYear');
-      // actions.clickOnElementWithText('25');
-      // actions.clickOnClass('#submit');
       actions.logout();
-      actions.enterTextInField('.login-container #email', 'admin@example.com');
-      actions.enterTextInField('.login-container #password', 'password');
-      actions.clickOnElementWithText('LOG IN');
-      actions.iAmLoggedIn();
+      actions.iAmLoggedInFor('profileuser1');
+      actions.waitForActionToComplete(2000);
+      actions.goToPage('#/profile/payment/view');
+      actions.clickOnElementWithText('Add Credit Card');
+      actions.enterTextInField('#cardholderName','Test');
+      actions.enterTextInField('#ccNumber','4111111111111111');
+      actions.enterTextInField('#securityCode','411');
+      actions.clickOnClass('#form-group-ccExpiryMonth');
+      actions.clickOnElementWithText('01');
+      actions.clickOnClass('#form-group-ccExpiryYear');
+      actions.clickOnElementWithText('25');
+      actions.clickOnClass('#submit');
+      // actions.logout();
+      // actions.enterTextInField('.login-container #email', 'admin@example.com');
+      // actions.enterTextInField('.login-container #password', 'password');
+      // actions.clickOnElementWithText('LOG IN');
+      // actions.iAmLoggedIn();
       actions.goToPage('#/');
       actions.clickOnElementWithText('New Project');
       actions.enterTextInField('#title','teamProProject');
