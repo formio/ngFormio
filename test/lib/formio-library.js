@@ -566,7 +566,7 @@ module.exports = function (config) {
 
   this.clickOnElementWithText = function (text) {
     it('I click on the ' + text + ' text ', function (next) {
-      var ele =  element(by.xpath('//*[text()="' + replacements(text.toString()) + '"]'));
+      var ele =  element.all(by.xpath('//*[text()="' + replacements(text.toString()) + '"]')).first();
       browser.wait(function () {
         return ele.isPresent();
       }, timeout).then(function (res) {
@@ -578,19 +578,6 @@ module.exports = function (config) {
     });
   };
 
-  this.clickOnElementWithTextLast = function (text) {
-    it('I click on the ' + text + ' text', function (next) {
-      var ele =  element.all(by.xpath('//*[text()="' + replacements(text.toString()) + '"]')).last();
-      browser.wait(function () {
-        return ele.isPresent();
-      }, timeout).then(function (res) {
-        scrollTo(ele)
-          .then(function() {
-            ele.click().then(next).catch(next);
-          });
-      });
-    });
-  };
 
   this.clickOnLink = function (text) {
     it('I click on the ' + text + ' link', function (next) {
@@ -1315,10 +1302,26 @@ module.exports = function (config) {
       });
     });
   };
-
-  this.checkElementWithTextIsNotDisabled = function (text) {
+  this.checkElementWithClassIsDisabled = function (text)   {
     it('I see ' + text + ' button is disabled', function (next) {
-      var ele = element(by.xpath('//*[text()="' + text + '"]'));
+      var ele = element(by.css(text));
+      browser.wait(function () {
+        return ele.isPresent();
+      }, timeout).then(function () {
+        ele.getAttribute('class').then(function(value){
+          try {
+            config.expect(value.split(" ")).contain('disabled');
+            next();
+          } catch (err) {
+            next(err);
+          }
+        });
+      });
+    });
+  };
+  this.checkElementWithTextIsNotDisabled = function (text) {
+    it('I see ' + text + ' button is not disabled', function (next) {
+      var ele = element.all(by.xpath('//*[text()="' + text + '"]')).first();
       browser.wait(function () {
         return ele.isPresent();
       }, timeout).then(function () {
@@ -1383,6 +1386,16 @@ module.exports = function (config) {
             ele.click().then(next).catch(next);
           });
       });
+    });
+  };
+
+  this.pageReload = function () {
+    it('Reload Page', function (next) {
+      try{
+      driver.navigate().refresh();}
+      catch(e){
+        next(e);
+      }
     });
   };
 
