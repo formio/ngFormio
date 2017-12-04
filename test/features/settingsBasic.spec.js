@@ -27,6 +27,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Trial');
       actions.upgradeToPlan("Basic");
       actions.clickOnElementWithText(' Confirm Billing Change');
+      actions.waitForActionToComplete(2000);
       actions.iSeeTextIn("a.project-plan.label-info","Basic");
       actions.enableAngular(false);
       actions.clickOnElementWithText('Settings');

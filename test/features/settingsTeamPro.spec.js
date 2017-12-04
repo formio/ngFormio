@@ -26,6 +26,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Trial');
       actions.upgradeToPlan("Team Pro");
       actions.clickOnElementWithText(' Confirm Billing Change');
+      actions.waitForActionToComplete(2000);
       actions.iSeeTextIn("a.project-plan.label-success","Team Pro");
       actions.clickOnElementWithText('Settings');
       actions.checkElementIsDisabled('//*[@id="form-group-title"]/input');
