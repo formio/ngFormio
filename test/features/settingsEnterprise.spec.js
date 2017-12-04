@@ -19,6 +19,7 @@ module.exports = function (actions) {
       // actions.enterTextInField('.login-container #password', 'password');
       // actions.clickOnElementWithText('LOG IN');
       // actions.iAmLoggedIn();
+      actions.waitForActionToComplete(2000);
       actions.goToPage('#/');
       actions.clickOnElementWithText('New Project');
       actions.enterTextInField('#title','enterpriseProject');
