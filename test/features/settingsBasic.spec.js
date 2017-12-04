@@ -23,13 +23,12 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('New Project');
       actions.enterTextInField('#title','basicProject');
       actions.clickOnElementWithText(' Create Project');
-      actions.enableAngular(true);
+      actions.waitForActionToComplete(1000);
       actions.clickOnElementWithText('Trial');
       actions.upgradeToPlan("Basic");
       actions.clickOnElementWithText(' Confirm Billing Change');
       actions.waitForActionToComplete(2000);
       actions.iSeeTextIn("a.project-plan.label-info","Basic");
-      actions.enableAngular(false);
       actions.clickOnElementWithText('Settings');
       actions.checkElementIsDisabled('//*[@id="form-group-title"]/input');
       actions.checkElementIsDisabled('//*[@id="name"]');

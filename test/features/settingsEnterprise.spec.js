@@ -24,6 +24,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('New Project');
       actions.enterTextInField('#title','enterpriseProject');
       actions.clickOnElementWithText(' Create Project');
+      actions.waitForActionToComplete(1000);
       actions.clickOnElementWithText('Trial');
       actions.upgradeToPlan("Enterprise");
       actions.clickOnElementWithText(' Confirm Billing Change');
