@@ -444,51 +444,7 @@ module.exports = function (config) {
   //1. 'https://help.form.io/intro/welcome/'
   //2. 'regex:^#\/project\/[0-9a-z]{24}\/$'
   //3. '#/profile/view'
-  this.checkingUrlIamOn = function (url) {
-    if (!url.toLowerCase().includes('http') && !url.toLowerCase().includes('regex')) {
-      url = config.baseUrl + "/" + url;
-    } else if (url.toLowerCase().includes('regex')) {
-      url = url.split(':')[1];
-    }
-    it('I am on ' + url, function (next) {
-      browser.wait(function () {
-        return browser.getCurrentUrl().then(function (cUrl) {
-          return cUrl.toLowerCase() == url.toLowerCase()
-            || (cUrl.toLowerCase().substring(cUrl.indexOf('#/')).match(url) != null);
-        });
-      }, timeout).then(function (value) {
-        try {
-          assert.equal(value, true);
-          next();
-        } catch (err) {
-          next(err);
-        }
-      });
-    });
-  };
 
-  this.checkingUrlEndsWith = function (url) {
-    it('URL contains ' + url, function (next) {
-      browser.wait(function () {
-        return browser.getCurrentUrl().then(function (cUrl) {
-          return cUrl.endsWith(url);
-        });
-      }, timeout).then(function (value) {
-        try {
-          assert.equal(value, true);
-          next();
-        } catch (err) {
-          next(err);
-        }
-      });
-    });
-  };
-  this.goToPage = function (url) {
-    it('I go to ' + url, function (next) {
-      url = config.baseUrl + "/" + url;
-      browser.get(url).then(next).catch(next);
-    });
-  };
 
   this.waitForActionToComplete = function (time) {
     it('I wait for ' + (time / 1000) + ' seconds', function (next) {
@@ -1388,15 +1344,56 @@ module.exports = function (config) {
       });
     });
   };
-
-  this.pageReload = function () {
-    it('Reload Page', function (next) {
-      try{
-      driver.navigate().refresh();}
-      catch(e){
-        next(e);
-      }
+  this.checkingUrlIamOn = function (url) {
+    if (!url.toLowerCase().includes('http') && !url.toLowerCase().includes('regex')) {
+      url = config.baseUrl + "/" + url;
+    } else if (url.toLowerCase().includes('regex')) {
+      url = url.split(':')[1];
+    }
+    it('I am on ' + url, function (next) {
+      browser.wait(function () {
+        return browser.getCurrentUrl().then(function (cUrl) {
+          return cUrl.toLowerCase() == url.toLowerCase()
+            || (cUrl.toLowerCase().substring(cUrl.indexOf('#/')).match(url) != null);
+        });
+      }, timeout).then(function (value) {
+        try {
+          assert.equal(value, true);
+          next();
+        } catch (err) {
+          next(err);
+        }
+      });
     });
   };
 
+  this.checkingUrlEndsWith = function (url) {
+    it('URL contains ' + url, function (next) {
+      browser.wait(function () {
+        return browser.getCurrentUrl().then(function (cUrl) {
+          return cUrl.endsWith(url);
+        });
+      }, timeout).then(function (value) {
+        try {
+          assert.equal(value, true);
+          next();
+        } catch (err) {
+          next(err);
+        }
+      });
+    });
+  };
+  this.goToPage = function (url) {
+    it('I go to ' + url, function (next) {
+      url = config.baseUrl + "/" + url;
+      browser.get(url).then(next).catch(next);
+    });
+  };
+  this.pageReload = function () {
+    it('Reload Page', function (next) {
+      browser.getCurrentUrl().then(function (url) {
+        browser.get(url).then(next).catch(next);
+      });
+    });
+  };
 };

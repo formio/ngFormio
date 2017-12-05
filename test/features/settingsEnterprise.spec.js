@@ -28,14 +28,14 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Trial');
       actions.upgradeToPlan("Enterprise");
       actions.clickOnElementWithText(' Confirm Billing Change');
-      actions.waitForActionToComplete(2000);
+      actions.waitForActionToComplete(1000);
       actions.iSeeTextIn("a.project-plan.label-commercial","Enterprise");
       actions.clickOnElementWithText('Settings');
       actions.checkElementIsDisabled('//*[@id="form-group-title"]/input');
       actions.checkElementIsNotDisabled('//*[@id="name"]');
       actions.enterTextInField('#name','commercialplantestauto');
       actions.clickOnElementWithText(' Save Stage');
-      actions.waitForActionToComplete(2000);
+      actions.waitForActionToComplete(1000);
       actions.iSeeValueIn('#name','commercialplantestauto');
       actions.clickOnElementWithText('Forms');
       actions.clickOnElementWithText('User Login');
@@ -69,9 +69,8 @@ module.exports = function (actions) {
       actions.checkElementWithTextIsNotDisabled(' Export CSV');
       actions.clickOnElementWithText('Settings');
       actions.checkElement('//*[@id="protect"]');
-      actions.waitForActionToComplete(1000);
       actions.clickOnElementWithText(' Save Stage');
-      actions.waitForActionToComplete(1000);
+      actions.pageReload();
       actions.clickOnElementWithText('On-Premise Environment');
       actions.iSeeText('Subdirectories');
       actions.enterTextInField('#serverURL','test');
@@ -91,6 +90,7 @@ module.exports = function (actions) {
       actions.iSeeText('https://remote.form.io');
       actions.waitForActionToComplete(1000);
       actions.clickOnElementWithText('Disconnect');
+      actions.waitForActionToComplete(1000);
       actions.iSeeText('Connect to an On-Premise Environment');
       actions.clickOnElementWithText('API Keys');
       actions.clickOnElementWithText('Add New Key');
