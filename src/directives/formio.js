@@ -301,6 +301,9 @@ module.exports = function() {
             if ($scope.submission._id) {
               submissionData._id = $scope.submission._id;
             }
+            if ($scope.submission.owner) {
+              submissionData.owner = $scope.submission.owner;
+            }
             if ($scope.submission.data._id) {
               submissionData._id = $scope.submission.data._id;
             }
