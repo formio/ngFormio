@@ -14,11 +14,6 @@ module.exports = function (actions) {
       actions.clickOnClass('#form-group-ccExpiryYear');
       actions.clickOnElementWithText('25');
       actions.clickOnClass('#submit');
-      // actions.logout();
-      // actions.enterTextInField('.login-container #email', 'admin@example.com');
-      // actions.enterTextInField('.login-container #password', 'password');
-      // actions.clickOnElementWithText('LOG IN');
-      // actions.iAmLoggedIn();
       actions.waitForActionToComplete(2000);
       actions.goToPage('#/');
       actions.clickOnElementWithText('New Project');
