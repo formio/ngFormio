@@ -74,7 +74,11 @@
     <div ng-if="form.display !== 'pdf' || form.settings.pdf">
       <form-builder url="formUrl" form="form" type="form.type" on-save="saveForm" on-cancel="cancel" ng-if="formReady" options="{baseUrl: baseUrl, building: true}"></form-builder>
     </div>
-    <div ng-include="'views/form/form-settings.html'"></div>
+    <div id="form-group-note" class="form-group" ng-if="revisionsEnabled && minPlan('commercial')">
+      <label class="control-label">Revision Note  </label>
+      <textarea class="form-control" ng-model="form._vnote"></textarea>
+      <div class="text-muted">Describe the changes made to this revision.</div>
+    </div>
     <div class="form-group pull-right">
       <a class="btn btn-default" ng-click="formId ? cancel() : $state.go('project.' + form.type + '.index')">Cancel</a>
       <span ng-if="!formId || !revisionsEnabled || !minPlan('commercial')">
