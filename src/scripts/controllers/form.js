@@ -1100,7 +1100,7 @@ app.controller('FormShareController', ['$scope', function($scope) {
   $scope.options = {
     theme: '',
     showHeader: true,
-    showWizard: false
+    auth: false
   };
   $scope.themes = [
     'Cerulean',
@@ -1129,8 +1129,8 @@ app.controller('FormShareController', ['$scope', function($scope) {
     if ($scope.options.theme) {
       $scope.previewUrl += '&theme=' + $scope.options.theme.toLowerCase();
     }
-    if ($scope.options.showWizard) {
-      $scope.previewUrl += '&wizard=1';
+    if ($scope.options.auth) {
+      $scope.previewUrl += '&auth=1';
     }
     jQuery('#form-preview').html(jQuery(document.createElement('iframe')).attr({
       style: 'width: 100%;',
@@ -1149,15 +1149,22 @@ app.controller('FormShareController', ['$scope', function($scope) {
   // Make a form public.
   $scope.makePublic = function() {
     angular.forEach($scope.form.submissionAccess, function(access, index) {
-      if (access.type === 'create_own') {
+      if (
+        (access.type === 'create_own') &&
+        ($scope.form.submissionAccess[index].roles.indexOf(defaultRole._id) === -1)
+      ) {
         $scope.form.submissionAccess[index].roles.push(defaultRole._id);
       }
-      if(access.type === 'read_all') {
-        if($scope.form.access[index].roles !=  defaultRole._id) {
-          $scope.form.access[index].roles.push(defaultRole._id);
-        }
+    });
+    angular.forEach($scope.form.access, function(access, index) {
+      if (
+        (access.type === 'read_all') &&
+        ($scope.form.access[index].roles.indexOf(defaultRole._id) === -1)
+      ) {
+        $scope.form.access[index].roles.push(defaultRole._id);
       }
     });
+
     $scope.publicForm = true;
     $scope.saveForm();
   };
@@ -1168,6 +1175,8 @@ app.controller('FormShareController', ['$scope', function($scope) {
       if (access.type === 'create_own' || access.type === 'create_all') {
         _.pull($scope.form.submissionAccess[index].roles, defaultRole._id);
       }
+    });
+    angular.forEach($scope.form.access, function(access, index) {
       if (access.type === 'read_all') {
         _.pull($scope.form.access[index].roles, defaultRole._id);
       }
@@ -1193,12 +1202,6 @@ app.controller('FormShareController', ['$scope', function($scope) {
               (access.type === 'create_own' || access.type === 'create_all') &&
               (_.indexOf(access.roles, defaultRole._id) !== -1)
             ) {
-              $scope.publicForm = true;
-            }
-          });
-          angular.forEach($scope.form.access, function(access) {
-            if ((access.type === 'read_all') &&
-              (_.indexOf(access.roles, defaultRole._id) !== -1)) {
               $scope.publicForm = true;
             }
           });
