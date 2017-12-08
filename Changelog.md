@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+##
+### Fixed
+ - Datagrid not rendering properly in submission view. (issue for Sky Nurses)
+
 ## 2.25.7
 ### Fixed
  - Problem with select dropdowns loading within a nested form.
