@@ -27,7 +27,7 @@
   </div>
   <div class="col col-sm-9">
     <div class="team-header">
-      <div class="col-xs-5 pull-right" ng-if="activeView === 'members'">
+      <div class="col-xs-5 pull-right" ng-if="activeView === 'members' && isAdmin">
         <div class="input-group ">
           <span class="input-group-addon"><i class='fa fa-user' /></span>
           <ui-select ng-model="add.Person" theme="bootstrap" ng-change="changeRole($select.selected, 'members')">
@@ -75,7 +75,7 @@
         <li class="list-group-item" ng-if="!team.data.members.length">
           No members in this team.
         </li>
-        <li class="list-group-item disabled">
+        <li class="list-group-item disabled" ng-if="isAdmin">
           Team Admins can add this team to their projects and manage team members.
         </li>
       </ul>

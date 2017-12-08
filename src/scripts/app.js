@@ -53,9 +53,9 @@ angular
       formioComponentsProvider,
       COMMON_OPTIONS
     ) {
-      // Change the form builder options for encrypted to be commercial only.
+      // Change the form builder options for encrypted to be enterprise only.
       COMMON_OPTIONS.encrypted.label = 'Encrypted (Enterprise Only)';
-      COMMON_OPTIONS.dbIndex.label = 'Database Index (Enterprise Only)';
+      COMMON_OPTIONS.dbIndex.label = 'Database Index (On-Premise Only)';
 
       // Reset the hashPrefix to remove the "!".
       $locationProvider.hashPrefix('');

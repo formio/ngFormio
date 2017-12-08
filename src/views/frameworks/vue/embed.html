@@ -1,64 +1,42 @@
 <div class="panel panel-primary">
   <div class="panel-heading">
-    <h3 class="panel-title">Install formiojs</h3>
+    <h3 class="panel-title">Install vue-formio</h3>
   </div>
   <div class="panel-body">
-    <pre><code>npm install --save formiojs</code></pre>
+    <p>Install the <strong>vue-formio</strong> module.</p>
+    <pre><code>npm install --save vue-formio</code></pre>
   </div>
 </div>
-<hr/>
 <div class="panel panel-primary">
   <div class="panel-heading">
-    <h3 class="panel-title">Create a Vue Component</h3>
+    <h3 class="panel-title">Render the directive</h3>
   </div>
   <div class="panel-body">
-    <p>To embed a form within your Vue application, lets create a component call FormVue. First you have to import FormioForm from the formiojs library.</p>
-    <strong>FormVue.vue</strong>
-    <pre><code>&lt;template&gt;
-      &nbsp;&nbsp;&lt;div id="formio"&gt;&lt;/div&gt;
+    <p>To embed a form within your vue application, create a vue component using the formio component.</p>
+    <pre><code>
+      &lt;template&gt;
+      &nbsp;&nbsp;&lt;formio :src="formUrl" v-on:submit="onSubmitMethod" /&gt;
       &lt;/template&gt;
       &lt;script&gt;
-      &nbsp;&nbsp;import FormioForm from 'formiojs/form';
-      &nbsp;&nbsp;export default {
-      &nbsp;&nbsp;&nbsp;&nbsp;name: 'formio-vue',
-      &nbsp;&nbsp;&nbsp;&nbsp;props: ['src'],
-      &nbsp;&nbsp;&nbsp;&nbsp;mounted () {
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;let self = this;
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;let form = new FormioForm(document.getElementById('formio'));
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;form.src = self.src;
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;form.on('submit', (submission) => {
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;console.log('The form was just submitted!!!');
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;});
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;form.on('error', (errors) => {
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;console.log('We have errors!');
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;})
+      import { Formio } from 'vue-formio';
+
+      export default {
+      &nbsp;&nbsp;data: function() {
+      &nbsp;&nbsp;&nbsp;&nbsp;// Load these from vuex or some other state store system.
+      &nbsp;&nbsp;&nbsp;&nbsp;return {
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;formUrl: "{{ projectUrl }}/{{ form.path }}"
+      &nbsp;&nbsp;&nbsp;&nbsp;}
+      &nbsp;&nbsp;},
+      &nbsp;&nbsp;components: {
+      &nbsp;&nbsp;&nbsp;&nbsp;formio: Formio
+      &nbsp;&nbsp;},
+      &nbsp;&nbsp;methods: {
+      &nbsp;&nbsp;&nbsp;&nbsp;onSubmitMethod: function(submission) {
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;console.log(submission);
       &nbsp;&nbsp;&nbsp;&nbsp;}
       &nbsp;&nbsp;}
-    &lt;/script&gt;
+      };
+      &lt;/script&gt;
     </code></pre>
-  </div>
-</div>
-<div class="panel panel-primary">
-  <div class="panel-heading">
-    <h3 class="panel-title">Include component in App.vue.</h3>
-  </div>
-  <div class="panel-body">
-    <p>Now that we have a Vue component, we can include that component within our App.vue file.</p>
-    <strong>App.vue</strong>
-    <pre><code>&lt;template&gt;
-      &nbsp;&nbsp;&lt;div id="app"&gt;
-      &nbsp;&nbsp;&nbsp;&nbsp;&lt;formio-vue src="'{{ projectUrl }}/{{ form.path }}'"&gt;&lt;/formio-vue&gt;
-      &nbsp;&nbsp;&lt;/div&gt;
-      &lt;/template&gt;
-      &lt;script&gt;
-      &nbsp;&nbsp;import FormioVue from './components/Formio.vue'
-      &nbsp;&nbsp;export default {
-      &nbsp;&nbsp;&nbsp;&nbsp;name: 'app',
-      &nbsp;&nbsp;&nbsp;&nbsp;components: {
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FormioVue
-      &nbsp;&nbsp;&nbsp;&nbsp;}
-      &nbsp;&nbsp;}
-     &lt;/script&gt;
-          </code></pre>
   </div>
 </div>
