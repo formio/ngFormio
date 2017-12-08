@@ -54,7 +54,8 @@ angular
       COMMON_OPTIONS
     ) {
       // Change the form builder options for encrypted to be commercial only.
-      COMMON_OPTIONS.encrypted.label = 'Encrypted (Commercial Only)';
+      COMMON_OPTIONS.encrypted.label = 'Encrypted (Enterprise Only)';
+      COMMON_OPTIONS.dbIndex.label = 'Database Index (Enterprise Only)';
 
       // Reset the hashPrefix to remove the "!".
       $locationProvider.hashPrefix('');

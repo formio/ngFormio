@@ -25,12 +25,14 @@ body {
   display: block;
 }
 
-.form-builder-premium label {
+.form-builder-premium label,
+.project-commercial .form-builder-premium.form-builder-dbindex label {
   color: #aaa;
   pointer-events: none;
 }
 
-.project-commercial .form-builder-premium label {
+.project-commercial .form-builder-premium label,
+.project-commercial.form-has-collection .form-builder-premium.form-builder-dbindex label {
   color: inherit;
   pointer-events: auto;
 }
@@ -733,6 +735,7 @@ ul.project-settings-menu {
       padding: 0;
       &.form-nav {
         a {
+          padding: 6px 12px;
           &:hover {
             background-color: lighten($gray-base, 85%);
           }

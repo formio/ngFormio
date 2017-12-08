@@ -150,6 +150,23 @@ app.config([
         .state(parentName + '.form.api', {
           url: '/api',
           templateUrl: 'views/form/form-api.html'
+        })
+        .state(parentName + '.form.settings', {
+          url: '/settings',
+          templateUrl: 'views/form/form-settings.html',
+          controller: ['$scope', function($scope) {
+            $scope.disableCollection = function() {
+              if (!$scope.minPlan('commercial')) {
+                return true;
+              }
+
+              if ($scope.primaryProject.plan === 'trial') {
+                return true;
+              }
+
+              return false;
+            };
+          }]
         });
 
       var formStates = {};
@@ -602,6 +619,10 @@ app.controller('FormController', [
             $scope.formTags = _.map(form.tags, function(tag) {
               return {text: tag};
             });
+
+            if (form && form.settings && form.settings.collection) {
+              document.body.className += ' ' + 'form-has-collection';
+            }
 
             $rootScope.currentForm = $scope.form;
             $scope.formReady = true;
@@ -1626,9 +1647,12 @@ app.controller('FormActionEditController', [
           $scope.primaryProject.hasOwnProperty('plan') &&
           ['basic', 'trial'].indexOf($scope.primaryProject.plan) !== -1
         ) {
-          $scope.formDisabled = true;
+          $scope.formDisabled = ($scope.primaryProject.plan === 'basic');
           $scope.premiumNotAvailable = true;
-          FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> This is a Premium Action, please upgrade your <a ui-sref="project.billing({projectId: $scope.primaryProject._id)">project plan</a> to enable it.');
+          $scope.premiumWarning = $scope.formDisabled ?
+            '<i class="glyphicon glyphicon-exclamation-sign"></i> This is a Premium Action, please upgrade your <a ui-sref="project.billing({projectId: $scope.primaryProject._id)">project plan</a> to enable it.' :
+            '<i class="glyphicon glyphicon-exclamation-sign"></i> This is a Premium Action. This action will not work after your trial period. Upgrade your project <a ui-sref="project.billing({projectId: $scope.primaryProject._id)">project plan</a> to make it permanent.';
+          FormioAlerts.warn($scope.premiumWarning);
         }
 
         var component = FormioUtils.getComponent($scope.form.components, _.get($scope, 'action.data.condition.field'));

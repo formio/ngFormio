@@ -1,51 +1,35 @@
-<div id="form-group-note" class="form-group" ng-if="revisionsEnabled && minPlan('commercial')">
-  <label class="control-label">Revision Note  </label>
-
-  <textarea class="form-control" ng-model="form._vnote"></textarea>
-  <div class="text-muted">Describe the changes made to this revision.</div>
+<div id="form-group-action" class="form-group">
+  <label for="form-action" class="control-label">Custom Action URL</label>
+  <input type="text" ng-model="form.action" class="form-control" id="form-action" name="form-action" placeholder="Enter the custom submission URL."/>
 </div>
-<uib-accordion close-others="true">
-  <div uib-accordion-group class="panel panel-default" heading="Advanced Settings">
-    <div id="form-group-action" class="form-group">
-      <label for="form-action" class="control-label">Custom Action URL</label>
-      <input type="text" ng-model="form.action" class="form-control" id="form-action" name="form-action" placeholder="Enter the custom submission URL."/>
-    </div>
-    <div id="form-group-tags" class="form-group">
-      <label class="control-label">Form Tags</label>
-      <tags-input ng-model="formTags" on-tag-added="addTag($tag)" on-tag-removed="removeTag($tag)"></tags-input>
-    </div>
-    <div class="panel panel-default">
-      <div class="panel-heading">
-        Form Revisions (Enterprise Only)
-      </div>
-      <div class="panel-body">
-        <div class="well well-sm">
-          Form revisions will save a copy of each form revision and allow matching submissions with the revision of the form it was submitted with.
-        </div>
-        <div id="form-group-versioning" class="form-group">
-          <label class="control-label">
-            <select ng-model="form.revisions" ng-disabled="!minPlan('commercial')">
-              <option value="">Disabled</option>
-              <option value="current">Enabled - Use current form version when viewing submissions.</option>
-              <option value="original">Enabled - Use original form version when viewing submissions.</option>
-            </select>
-          </label>
-          <div class="text-muted">When enabled, you can configure whether existing form submissions will be viewed in the latest version of the form or in the original version the submission was submitted with.</div>
-        </div>
-      </div>
-    </div>
-    <div class="panel panel-danger">
-      <div class="panel-heading">
-        Form Deployment MachineName
-      </div>
-      <div class="panel-body">
-        <div class="well well-sm">
-          Warning: Tampering with the Form machineName can break Project imports and exports. This should not be tampered
-          with, unless you know what you're doing.
-        </div>
-        <label for="machineName" class="control-label">MachineName</label>
-        <input type="text" ng-model="form.machineName" class="form-control" id="machineName"/>
-      </div>
-    </div>
+<div id="form-group-tags" class="form-group">
+  <label class="control-label">Form Tags</label>
+  <tags-input ng-model="formTags" on-tag-added="addTag($tag)" on-tag-removed="removeTag($tag)"></tags-input>
+</div>
+<div class="panel panel-info">
+  <div class="panel-heading">
+    <h3 class="panel-title">Form Collection</h3>
   </div>
-</uib-accordion>
+  <div class="panel-body">
+    <div class="well">
+      This setting allows you to modify the database collection that stores all of the submissions within the form. This allows for you to select certain fields as <strong>indexes</strong> for significant performance improvements.
+    </div>
+    <div class="well" ng-if="disableCollection()">This is only available for <strong>Enterprise Level - On-Premise Environments.</strong> Please <a ui-sref="project.billing()">Upgrade your Project</a> or <a ui-sref="project.env.settings.remote()">connect to a remote environment</a> to enable this feature.</div>
+    <label for="formCollection" class="control-label">Collection Name</label>
+    <input type="text" ng-disabled="disableCollection()" ng-model="form.settings.collection" class="form-control" id="formCollection"/>
+  </div>
+</div>
+<div class="panel panel-danger">
+  <div class="panel-heading">
+    <h3 class="panel-title">Form Deployment MachineName</h3>
+  </div>
+  <div class="panel-body">
+    <div class="well">
+      Warning: Tampering with the Form machineName can break Project imports and exports. This should not be tampered
+      with, unless you know what you're doing.
+    </div>
+    <label for="machineName" class="control-label">MachineName</label>
+    <input type="text" ng-model="form.machineName" class="form-control" id="machineName"/>
+  </div>
+</div>
+<button ng-hide="highestRole === 'team_read'" type="submit" class="btn btn-primary" ng-click="saveForm()">Save Settings</button>
