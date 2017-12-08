@@ -560,8 +560,14 @@ app.controller('FormController', [
       $scope.$broadcast('formDisplay', display);
     });
 
-    $scope.$watch('form', function() {
+    $scope.$watch('form', function(form) {
+      if (!form) {
+        return;
+      }
       $scope.setiframeCode();
+      if (form.settings && form.settings.collection) {
+        document.body.className += ' form-has-collection';
+      }
     });
 
     $scope.$watch('currentProject', function() {
@@ -634,10 +640,6 @@ app.controller('FormController', [
             $scope.formTags = _.map(form.tags, function(tag) {
               return {text: tag};
             });
-
-            if (form && form.settings && form.settings.collection) {
-              document.body.className += ' ' + 'form-has-collection';
-            }
 
             $rootScope.currentForm = $scope.form;
             $scope.formReady = true;
