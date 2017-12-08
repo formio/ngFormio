@@ -1,6 +1,6 @@
 'use strict';
 
-/* global _: false, jQuery: false, document: false */
+/* global _: false, jQuery: false, document: false, Promise: false */
 var app = angular.module('formioApp.controllers.form', [
   'ngDialog',
   'ui.bootstrap.tabs',
@@ -1883,260 +1883,283 @@ app.controller('FormSubmissionsController', [
     };
 
     // When form is loaded, create the columns
-    $scope.loadFormPromise.then(function() {
-      // Load the grid on the next digest.
-      $timeout(function() {
-        // Define DataSource
-        var dataSource = new kendo.data.DataSource({
-          page: 1,
-          pageSize: 10,
-          serverPaging: true,
-          serverSorting: true,
-          serverFiltering: true,
-          sort: {
-            dir: 'desc',
-            field: 'created'
-          },
-          schema: {
-            model: {
-              id: '_id',
-              fields: _(FormioUtils.flattenComponents($scope.form.components))
-                .filter(function(component, path) {
-                  // Don't include fields that are nested.
-                  return path.indexOf('.') === -1;
-                })
-                .filter($scope.tableView)
-                .map(function(component) {
-                  var type;
-                  switch(component.type) {
-                    case 'checkbox': type = 'boolean';
-                      break;
-                    case 'datetime': type = 'date';
-                      break;
-                    case 'number': type = 'number';
-                      break;
-                    default: type = 'string';
-                  }
-
-                  // FOR-323 - Escape data to fix keys with - in them, because they are not valid js identifiers.
-                  return ['["data.' + component.key.replace(/\./g, '.data.') + '"]', {type: type}];
-                })
-                .concat([
-                  ['created', {type: 'date'}],
-                  ['modified', {type: 'date'}]
-                ])
-                .fromPairs()
-                .value()
+    $scope.loadFormPromise.then(function(form) {
+      var currentForm = _.clone(form);
+      var loadRevisionsPromise = new Promise(function(resolve, reject) {
+        if (form.revisions === 'original' && !isNaN(parseInt($stateParams._vid))) {
+          (new Formio($scope.formUrl + '/v/' + $stateParams._vid)).loadForm()
+            .then(function(revisionForm) {
+              currentForm.components = revisionForm.components;
+              return resolve();
+            });
+        }
+        else {
+          return resolve();
+        }
+      });
+      loadRevisionsPromise.then(function() {
+        // Load the grid on the next digest.
+        $timeout(function() {
+          // Define DataSource
+          var dataSource = new kendo.data.DataSource({
+            page: 1,
+            pageSize: 10,
+            serverPaging: true,
+            serverSorting: true,
+            serverFiltering: true,
+            sort: {
+              dir: 'desc',
+              field: 'created'
             },
-            total: function(result) {
-              var match = result.headers('content-range').match(/\d+-\d+\/(\d+)/);
-              return (match && match[1]) || 0;
-            },
-            data: 'data'
-          },
-          transport: {
-            read: function(options) {
-              var filters = options.data.filter && options.data.filter.filters;
-              var params = {
-                limit: options.data.take,
-                skip: options.data.skip,
-                sort: getSortQuery(options.data.sort)
-              };
-              // Filter by _vid if provided.
-              if ($stateParams._vid) {
-                params._fvid = $stateParams._vid;
-              }
-              _.each(filters, function(filter) {
-                // FOR-395 - Fix query regression with FOR-323
-                filter.field = filter.field.replace(/^\["|"\]$/gi, '');
+            schema: {
+              model: {
+                id: '_id',
+                fields: _(FormioUtils.flattenComponents(currentForm.components))
+                  .filter(function(component, path) {
+                    // Don't include fields that are nested.
+                    return path.indexOf('.') === -1;
+                  })
+                  .filter($scope.tableView)
+                  .map(function(component) {
+                    var type;
+                    switch(component.type) {
+                      case 'checkbox': type = 'boolean';
+                        break;
+                      case 'datetime': type = 'date';
+                        break;
+                      case 'number': type = 'number';
+                        break;
+                      default: type = 'string';
+                    }
 
-                switch(filter.operator) {
-                  case 'eq': params[filter.field] = filter.value;
-                    break;
-                  case 'neq': params[filter.field + '__ne'] = filter.value;
-                    break;
-                  case 'startswith': params[filter.field + '__regex'] = '/^' + filter.value + '/i';
-                    break;
-                  case 'endswith': params[filter.field + '__regex'] = '/' + filter.value + '$/i';
-                    break;
-                  case 'contains': params[filter.field + '__regex'] = '/' + _.escapeRegExp(filter.value) + '/i';
-                    break;
-                  case 'doesnotcontain': params[filter.field + '__regex'] = '/^((?!' + _.escapeRegExp(filter.value) + ').)*$/i';
-                    break;
-                  case 'matchesregex': params[filter.field + '__regex'] = filter.value;
-                    break;
-                  case 'gt': params[filter.field + '__gt'] = filter.value;
-                    break;
-                  case 'gte': params[filter.field + '__gte'] = filter.value;
-                    break;
-                  case 'lt': params[filter.field + '__lt'] = filter.value;
-                    break;
-                  case 'lte': params[filter.field + '__lte'] = filter.value;
-                    break;
+                    // FOR-323 - Escape data to fix keys with - in them, because they are not valid js identifiers.
+                    return ['["data.' + component.key.replace(/\./g, '.data.') + '"]', {type: type}];
+                  })
+                  .concat([
+                    ['created', {type: 'date'}],
+                    ['modified', {type: 'date'}]
+                  ])
+                  .fromPairs()
+                  .value()
+              },
+              total: function(result) {
+                var match = result.headers('content-range').match(/\d+-\d+\/(\d+)/);
+                return (match && match[1]) || 0;
+              },
+              data: 'data'
+            },
+            transport: {
+              read: function(options) {
+                var filters = options.data.filter && options.data.filter.filters;
+                var params = {
+                  limit: options.data.take,
+                  skip: options.data.skip,
+                  sort: getSortQuery(options.data.sort)
+                };
+                // Filter by _vid if provided.
+                if (!isNaN(parseInt($stateParams._vid))) {
+                  params._fvid = $stateParams._vid;
                 }
-              });
+                _.each(filters, function(filter) {
+                  // FOR-395 - Fix query regression with FOR-323
+                  filter.field = filter.field.replace(/^\["|"\]$/gi, '');
 
-              $http.get($scope.formio.submissionsUrl, {
-                params: params
-              })
-                .then(options.success)
-                .catch(function(err) {
-                  FormioAlerts.onError(err);
-                  options.error(err);
+                  switch(filter.operator) {
+                    case 'eq': params[filter.field] = filter.value;
+                      break;
+                    case 'neq': params[filter.field + '__ne'] = filter.value;
+                      break;
+                    case 'startswith': params[filter.field + '__regex'] = '/^' + filter.value + '/i';
+                      break;
+                    case 'endswith': params[filter.field + '__regex'] = '/' + filter.value + '$/i';
+                      break;
+                    case 'contains': params[filter.field + '__regex'] = '/' + _.escapeRegExp(filter.value) + '/i';
+                      break;
+                    case 'doesnotcontain': params[filter.field + '__regex'] = '/^((?!' + _.escapeRegExp(filter.value) + ').)*$/i';
+                      break;
+                    case 'matchesregex': params[filter.field + '__regex'] = filter.value;
+                      break;
+                    case 'gt': params[filter.field + '__gt'] = filter.value;
+                      break;
+                    case 'gte': params[filter.field + '__gte'] = filter.value;
+                      break;
+                    case 'lt': params[filter.field + '__lt'] = filter.value;
+                      break;
+                    case 'lte': params[filter.field + '__lte'] = filter.value;
+                      break;
+                  }
                 });
-            },
-            destroy: function(options) {
-              $scope.recentlyDeletedPromises.push($http.delete($scope.formio.submissionsUrl + '/' + options.data._id)
-                .then(function(result) {
-                  GoogleAnalytics.sendEvent('Submission', 'delete', null, 1);
-                  options.success();
-                })
-                .catch(function(err) {
-                  FormioAlerts.onError(err);
-                  options.error(err);
-                }));
-            }
-          }
-        });
 
-        // Track component keys inside objects, so they dont appear in the grid more than once.
-        var componentHistory = [];
-
-        // Generate columns
-        var columns = [];
-        FormioUtils.eachComponent($scope.form.components, function(component, componentPath) {
-          if (component.tableView === false || !component.key) {
-            return;
-          }
-          // FOR-310 - If this component was already added to the grid, dont add it again.
-          if (component.key && componentHistory.indexOf(component.key) !== -1) {
-            return;
-          }
-
-          if (['container', 'datagrid', 'well', 'fieldset', 'panel'].indexOf(component.type) !== -1) {
-            FormioUtils.eachComponent(component.components, function(component) {
-              if (component.key) {
-                componentHistory.push(component.key);
+                $http.get($scope.formio.submissionsUrl, {
+                    params: params
+                  })
+                  .then(options.success)
+                  .catch(function(err) {
+                    FormioAlerts.onError(err);
+                    options.error(err);
+                  });
+              },
+              destroy: function(options) {
+                $scope.recentlyDeletedPromises.push($http.delete($scope.formio.submissionsUrl + '/' + options.data._id)
+                  .then(function(result) {
+                    GoogleAnalytics.sendEvent('Submission', 'delete', null, 1);
+                    options.success();
+                  })
+                  .catch(function(err) {
+                    FormioAlerts.onError(err);
+                    options.error(err);
+                  }));
               }
-            }, true);
-          }
-          else if (['columns'].indexOf(component.type) !== -1) {
-            component.columns.forEach(function(column) {
-              FormioUtils.eachComponent(column.components, function(component) {
+            }
+          });
+
+          // Track component keys inside objects, so they dont appear in the grid more than once.
+          var componentHistory = [];
+
+          // Generate columns
+          var columns = [];
+          FormioUtils.eachComponent(currentForm.components, function(component, componentPath) {
+            if (component.tableView === false || !component.key) {
+              return;
+            }
+            // FOR-310 - If this component was already added to the grid, dont add it again.
+            if (component.key && componentHistory.indexOf(component.key) !== -1) {
+              return;
+            }
+
+            if (['container', 'datagrid', 'well', 'fieldset', 'panel'].indexOf(component.type) !== -1) {
+              FormioUtils.eachComponent(component.components, function(component) {
                 if (component.key) {
                   componentHistory.push(component.key);
                 }
               }, true);
-            });
-          }
-          else if (['table'].indexOf(component.type) !== -1) {
-            component.rows.forEach(function(row) {
-              row.forEach(function(col) {
-                FormioUtils.eachComponent(col.components, function(component) {
+            }
+            else if (['columns'].indexOf(component.type) !== -1) {
+              component.columns.forEach(function(column) {
+                FormioUtils.eachComponent(column.components, function(component) {
                   if (component.key) {
                     componentHistory.push(component.key);
                   }
                 }, true);
               });
+            }
+            else if (['table'].indexOf(component.type) !== -1) {
+              component.rows.forEach(function(row) {
+                row.forEach(function(col) {
+                  FormioUtils.eachComponent(col.components, function(component) {
+                    if (component.key) {
+                      componentHistory.push(component.key);
+                    }
+                  }, true);
+                });
+              });
+            }
+
+            columns.push(getKendoCell(component));
+          }, true);
+
+          if (form.revisions) {
+            columns.push({
+              field: '_fvid',
+              title: 'Form Version',
+              width: '100px',
             });
           }
 
-          columns.push(getKendoCell(component));
-        }, true);
-
-        columns.push(
-          {
-            field: 'created',
-            title: 'Submitted',
-            width: '200px',
-            filterable: {
-              ui: 'datetimepicker'
-            },
-            template: function(dataItem) {
-              return moment(dataItem.created).format('lll');
-            }
-          },
-          {
-            field: 'modified',
-            title: 'Updated',
-            width: '200px',
-            filterable: {
-              ui: 'datetimepicker'
-            },
-            template: function(dataItem) {
-              return moment(dataItem.modified).format('lll');
-            }
-          }
-        );
-
-        // Define grid options
-        $scope.gridOptions = {
-          allowCopy: {
-            delimiter: ','
-          },
-          filterable: {
-            operators: {
-              string: {
-                eq: 'Is equal to',
-                neq: 'Is not equal to',
-                startswith: 'Starts with',
-                contains: 'Contains',
-                doesnotcontain: 'Does not contain',
-                endswith: 'Ends with',
-                matchesregex: 'Matches (RegExp)',
-                gt: 'Greater than',
-                gte: 'Greater than or equal to',
-                lt: 'Less than',
-                lte: 'Less than or equal to'
+          columns.push(
+            {
+              field: 'created',
+              title: 'Submitted',
+              width: '200px',
+              filterable: {
+                ui: 'datetimepicker'
               },
-              date: {
-                gt: 'Is after',
-                lt: 'Is before'
+              template: function(dataItem) {
+                return moment(dataItem.created).format('lll');
               }
             },
-            messages: {
-              isTrue: 'True',
-              isFalse: 'False'
+            {
+              field: 'modified',
+              title: 'Updated',
+              width: '200px',
+              filterable: {
+                ui: 'datetimepicker'
+              },
+              template: function(dataItem) {
+                return moment(dataItem.modified).format('lll');
+              }
+            }
+          );
+
+          // Define grid options
+          $scope.gridOptions = {
+            allowCopy: {
+              delimiter: ','
             },
-            mode: 'menu',
-            extra: false
-          },
-          pageable: {
-            numeric: false,
-            input: true,
-            refresh: true,
-            pageSizes: [5, 10, 25, 50, 100, 'all']
-          },
-          sortable: true,
-          resizable: true,
-          reorderable: true,
-          selectable: 'multiple, row',
-          columnMenu: true,
-          // This defaults to 'data' and screws everything up,
-          // so we set it to something that isn't a property on submissions
-          templateSettings: { paramName: 'notdata' },
-          toolbar:
-          '<div>' +
-          '<button class="btn btn-default btn-xs" ng-click="view()" ng-disabled="selected().length != 1" ng-class="{\'btn-primary\':selected().length == 1}">' +
-          '<span class="glyphicon glyphicon-eye-open"></span> View' +
-          '</button>&nbsp;' +
-          '<button class="btn btn-default btn-xs" ng-click="edit()" ng-disabled="selected().length != 1" ng-class="{\'btn-primary\':selected().length == 1}">' +
-          '<span class="glyphicon glyphicon-edit"></span> Edit' +
-          '</button>&nbsp;' +
-          '<button class="btn btn-default btn-xs" ng-click="delete()" ng-disabled="selected().length < 1" ng-class="{\'btn-danger\':selected().length >= 1}">' +
-          '<span class="glyphicon glyphicon-remove-circle"></span> Delete' +
-          '</button>' +
-          '</div>',
-          change: $scope.$apply.bind($scope),
-          dataSource: dataSource,
-          columns: columns,
-          columnMenuInit: function(e) {
-            e.container.find('[data-role=dropdownlist]').each(function() {
-              var widget = angular.element(this).data('kendoDropDownList');
-              stopScroll(widget.ul.parent());
-            });
-          }
-        };
+            filterable: {
+              operators: {
+                string: {
+                  eq: 'Is equal to',
+                  neq: 'Is not equal to',
+                  startswith: 'Starts with',
+                  contains: 'Contains',
+                  doesnotcontain: 'Does not contain',
+                  endswith: 'Ends with',
+                  matchesregex: 'Matches (RegExp)',
+                  gt: 'Greater than',
+                  gte: 'Greater than or equal to',
+                  lt: 'Less than',
+                  lte: 'Less than or equal to'
+                },
+                date: {
+                  gt: 'Is after',
+                  lt: 'Is before'
+                }
+              },
+              messages: {
+                isTrue: 'True',
+                isFalse: 'False'
+              },
+              mode: 'menu',
+              extra: false
+            },
+            pageable: {
+              numeric: false,
+              input: true,
+              refresh: true,
+              pageSizes: [5, 10, 25, 50, 100, 'all']
+            },
+            sortable: true,
+            resizable: true,
+            reorderable: true,
+            selectable: 'multiple, row',
+            columnMenu: true,
+            // This defaults to 'data' and screws everything up,
+            // so we set it to something that isn't a property on submissions
+            templateSettings: { paramName: 'notdata' },
+            toolbar:
+            '<div>' +
+            '<button class="btn btn-default btn-xs" ng-click="view()" ng-disabled="selected().length != 1" ng-class="{\'btn-primary\':selected().length == 1}">' +
+            '<span class="glyphicon glyphicon-eye-open"></span> View' +
+            '</button>&nbsp;' +
+            '<button class="btn btn-default btn-xs" ng-click="edit()" ng-disabled="selected().length != 1" ng-class="{\'btn-primary\':selected().length == 1}">' +
+            '<span class="glyphicon glyphicon-edit"></span> Edit' +
+            '</button>&nbsp;' +
+            '<button class="btn btn-default btn-xs" ng-click="delete()" ng-disabled="selected().length < 1" ng-class="{\'btn-danger\':selected().length >= 1}">' +
+            '<span class="glyphicon glyphicon-remove-circle"></span> Delete' +
+            '</button>' +
+            '</div>',
+            change: $scope.$apply.bind($scope),
+            dataSource: dataSource,
+            columns: columns,
+            columnMenuInit: function(e) {
+              e.container.find('[data-role=dropdownlist]').each(function() {
+                var widget = angular.element(this).data('kendoDropDownList');
+                stopScroll(widget.ul.parent());
+              });
+            }
+          };
+        });
       });
     });
   }
