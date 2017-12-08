@@ -89,7 +89,7 @@
           <span class="team-upgrade">Want to work collaboratively? Create a team to allow others to help work on your project.</span>
         </div>
         <a ui-sref="team.view({teamId: team._id})" class="list-group-item" ng-repeat="team in teams">
-          <span class="badge"><i class="fa fa-users"></i>&nbsp;{{ team.data.members.length || 0 }}</span>
+          <span class="badge"><i class="fa fa-users"></i>&nbsp;{{(team.data.members.length + team.data.admins.length) || 0 }}</span>
           <h4 class="list-group-item-heading">{{ team.data.name }}</h4>
           <span class="label label-success">{{ team.owner === user._id ? 'OWNER' : 'MEMBER'}}</span>
         </a>
