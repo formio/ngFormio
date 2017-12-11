@@ -72,9 +72,7 @@ module.exports = {
   //externals: [nodeExternals()],
   externals: {
     jquery: 'jQuery',
-    angular: 'angular',
-    lodash: '_',
-    moment: 'moment'
+    angular: 'angular'
   },
   devtool: 'source-map',
   resolve: {
