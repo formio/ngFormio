@@ -34324,7 +34324,7 @@ module.exports = function(app) {
           if (!tableChild) {
             view += '<thead><tr>';
             angular.forEach(component.components, function(component) {
-              view += '<th>' + (component.label || '') + ' (' + component.key + ')</th>';
+              view += '<th>' + (component.label || '( '+component.key+')')+'</th>';
             });
             view += '</tr></thead>';
           }
@@ -34333,11 +34333,6 @@ module.exports = function(app) {
           angular.forEach(data, function(row) {
             view += '<tr>';
             formioUtils.eachComponent(component.components, function(component) {
-              // Don't render disabled fields, or fields with undefined data.
-              if (!component.tableView || row[component.key] === undefined) {
-                return;
-              }
-
               // If the component has a defined tableView, use that, otherwise try and use the raw data as a string.
               var info = componentInfo.components.hasOwnProperty(component.type) ? componentInfo.components[component.type] : {};
               if (info.tableView) {
