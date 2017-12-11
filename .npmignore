@@ -1,0 +1,6 @@
+.DS_Store
+.bower.json
+node_modules
+bower_components
+src
+.idea
