@@ -420,7 +420,10 @@ module.exports = function(app) {
                 else {
                   url = baseUrl;
                   if (settings.data.project) {
-                    url += '/project/' + settings.data.project;
+                    if (settings.data.project.match(/^[0-9a-fA-F]{24}$/)) {
+                      url += '/project';
+                    }
+                    url += '/' + settings.data.project;
                   }
                   url += '/form/' + settings.data.resource + '/submission';
                 }

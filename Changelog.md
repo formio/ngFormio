@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.25.8
+### Fixed
+ - Reverted https://github.com/formio/ngFormio/commit/d7bf526a6d581680d156561972821b63ce65a4b5 which was breaking Select components to resources.
+
+### Added
+ - Proper check of Select component project configuration to add /project if it is a mongoId.
+
 ## 2.25.7
 ### Fixed
  - Problem with select dropdowns loading within a nested form.
