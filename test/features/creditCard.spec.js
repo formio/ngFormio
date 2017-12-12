@@ -79,6 +79,7 @@ module.exports = function (actions) {
       actions.checkingUrlEndsWith('#/profile/payment/edit');
       actions.enterTextInField('#securityCode','411');
       actions.clickOnClass('#submit');
+      actions.waitForActionToComplete(2000);
     });
     describe('Updating Existing Credit Card',function(){
       actions.clickOnElementWithText('Change Credit Card');
@@ -105,6 +106,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('26');
       actions.enterTextInField('#securityCode','422');
       actions.clickOnClass('#submit');
+      actions.waitForActionToComplete(2000);
       actions.iSeeText('Bad Request (22) - Invalid Credit Card Number');
     });
     describe('Submitting Credit Card with expiration date that has already expired',function(){
