@@ -2,13 +2,17 @@ module.exports = function (actions) {
   describe('Inputting Credit Card Info',function(){
     describe('Navigating to ‘Payment Info’ page',function(){
       actions.iAmLoggedInFor('profileuser1');
+      actions.logout();
+      actions.enterTextInField('.login-container #email', 'admin@example.com');
+      actions.enterTextInField('.login-container #password', 'password');
+      actions.clickOnElementWithText('LOG IN');
       actions.iAmLoggedIn();
       actions.clickOnElement('#user-menu');
       actions.clickOnElementWithText(' Payment Info');
       actions.checkingUrlEndsWith('#/profile/payment/view');
     });
     describe('Navigating to the Credit Card input page',function(){
-      actions.clickOnElementWithText('Add Credit Card');
+      actions.clickOnElementWithText('Change Credit Card');
       actions.checkingUrlEndsWith('#/profile/payment/edit');
     });
     describe('Adding valid Credit Card to profile',function(){
@@ -19,7 +23,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('01');
       actions.clickOnClass('#form-group-ccExpiryYear');
       actions.clickOnElementWithText('25');
-      actions.clickOnClass('#submit');
+      actions.clickOnButton('Submit');
       actions.checkingUrlEndsWith('/#/profile/payment/view');
       actions.iSeeText('Visa ending in 1111');
       actions.iSeeText('Expires on 01/25');
@@ -33,7 +37,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('01');
       actions.clickOnClass('#form-group-ccExpiryYear');
       actions.clickOnElementWithText('25');
-      actions.clickOnClass('#submit');
+      actions.clickOnButton('Submit');
       actions.checkingUrlEndsWith('#/profile/payment/edit');
     });
     describe('Submitting Credit Card input form with missing ‘Credit Card’ value',function(){
@@ -44,7 +48,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('01');
       actions.clickOnClass('#form-group-ccExpiryYear');
       actions.clickOnElementWithText('25');
-      actions.clickOnClass('#submit');
+      actions.clickOnButton('Submit');
       actions.checkingUrlEndsWith('#/profile/payment/edit');
     });
     describe('Submitting Credit Card input form with missing ‘Exp Month value',function(){
@@ -54,7 +58,7 @@ module.exports = function (actions) {
       actions.enterTextInField('#securityCode','411');
       actions.clickOnClass('#form-group-ccExpiryYear');
       actions.clickOnElementWithText('25');
-      actions.clickOnClass('#submit');
+      actions.clickOnButton('Submit');
       actions.checkingUrlEndsWith('#/profile/payment/edit');
     });
     describe('Submitting Credit Card input form with missing ‘Exp Year value',function(){
@@ -64,7 +68,7 @@ module.exports = function (actions) {
       actions.enterTextInField('#securityCode','411');
       actions.clickOnClass('#form-group-ccExpiryMonth');
       actions.clickOnElementWithText('01');
-      actions.clickOnClass('#submit');
+      actions.clickOnButton('Submit');
       actions.checkingUrlEndsWith('#/profile/payment/edit');
     });
     describe('Submitting Credit Card input form with missing ‘Security Code’ value',function(){
@@ -75,11 +79,10 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('01');
       actions.clickOnClass('#form-group-ccExpiryYear');
       actions.clickOnElementWithText('25');
-      actions.clickOnClass('#submit');
+      actions.clickOnButton('Submit');
       actions.checkingUrlEndsWith('#/profile/payment/edit');
       actions.enterTextInField('#securityCode','411');
-      actions.clickOnClass('#submit');
-      actions.waitForActionToComplete(2000);
+      actions.clickOnButton('Submit');
     });
     describe('Updating Existing Credit Card',function(){
       actions.clickOnElementWithText('Change Credit Card');
@@ -90,7 +93,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('02');
       actions.clickOnClass('#form-group-ccExpiryYear');
       actions.clickOnElementWithText('26');
-      actions.clickOnClass('#submit');
+      actions.clickOnButton('Submit');
       actions.checkingUrlEndsWith('/#/profile/payment/view');
       actions.iSeeText('Visa ending in 1111');
       actions.iSeeText('Expires on 02/26');
@@ -105,8 +108,7 @@ module.exports = function (actions) {
       actions.clickOnClass('#form-group-ccExpiryYear');
       actions.clickOnElementWithText('26');
       actions.enterTextInField('#securityCode','422');
-      actions.clickOnClass('#submit');
-      actions.waitForActionToComplete(2000);
+      actions.clickOnButton('Submit');
       actions.iSeeText('Bad Request (22) - Invalid Credit Card Number');
     });
     describe('Submitting Credit Card with expiration date that has already expired',function(){
@@ -118,7 +120,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('02');
       actions.clickOnClass('#form-group-ccExpiryYear');
       actions.clickOnElementWithText('15');
-      actions.clickOnClass('#submit');
+      actions.clickOnButton('Submit');
       actions.iSeeText('Invalid Expiration Date');
     });
     // describe('Submitting Credit Card with invalid security code value',function(){
@@ -130,7 +132,7 @@ module.exports = function (actions) {
     //   actions.clickOnElementWithText('02');
     //   actions.clickOnClass('#form-group-ccExpiryYear');
     //   actions.clickOnElementWithText('26');
-    //   actions.clickOnClass('#submit');
+    //   actions.clickOnButton('Submit');
     //   actions.iSeeText('Invalid CC number');
     // });
     describe('Viewing Credit Card Info on Upgrade Window',function(){
@@ -155,7 +157,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('01');
       actions.clickOnClass('#form-group-ccExpiryYear');
       actions.clickOnElementWithText('25');
-      actions.clickOnClass('#submit');
+      actions.clickOnButton('Submit');
       actions.iSeeText('Payments will be charged to:');
       actions.iSeeText('Visa ending in 1111');
       actions.iSeeText('Expires on 01/25');
