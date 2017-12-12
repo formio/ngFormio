@@ -10,7 +10,7 @@ module.exports = function (actions) {
       // actions.clickOnElementWithText('LOG IN');
       actions.iAmLoggedIn();
       actions.goToPage('#/profile/payment/view');
-      actions.clickOnElementWithText('Change Credit Card');
+      actions.clickOnElementWithText('Add Credit Card');
       actions.enterTextInField('#cardholderName','Test');
       actions.enterTextInField('#ccNumber','4111111111111111');
       actions.enterTextInField('#securityCode','411');
