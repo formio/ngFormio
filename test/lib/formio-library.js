@@ -534,6 +534,20 @@ module.exports = function (config) {
     });
   };
 
+  this.clickOnElementWithTextIndex = function (text,index) {
+    it('I click on the ' + text + ' text ', function (next) {
+      var ele =  element.all(by.xpath('//*[text()="' + replacements(text.toString()) + '"]')).get(index);
+      browser.wait(function () {
+        return ele.isPresent();
+      }, timeout).then(function (res) {
+        scrollTo(ele)
+          .then(function() {
+            ele.click().then(next).catch(next);
+          });
+      });
+    });
+  };
+
 
   this.clickOnLink = function (text) {
     it('I click on the ' + text + ' link', function (next) {
@@ -571,7 +585,7 @@ module.exports = function (config) {
 
   this.clickOnClass = function (className) {
     it('I click on the ' + className + ' class', function (next) {
-      var ele =  element(by.css(replacements(className.toString())));
+      var ele =  element.all(by.css(replacements(className.toString()))).first();
       browser.wait(function () {
         return ele.isPresent();
       }, timeout).then(function (res) {
@@ -1259,7 +1273,7 @@ module.exports = function (config) {
     });
   };
   this.checkElementWithClassIsDisabled = function (text)   {
-    it('I see ' + text + ' button is disabled', function (next) {
+    it('I see ' + text + 'is disabled', function (next) {
       var ele = element(by.css(text));
       browser.wait(function () {
         return ele.isPresent();
@@ -1393,6 +1407,37 @@ module.exports = function (config) {
     it('Reload Page', function (next) {
       browser.getCurrentUrl().then(function (url) {
         browser.get(url).then(next).catch(next);
+      });
+    });
+  };
+
+
+  this.iSeeTextCount = function (text,count) {
+    it('I see text ' + text +' ' +count + ' times ', function (next) {
+      try {
+        var xpath = '//*[contains(text(),"' + replacements(text) + '")]';
+        var ele = element(by.xpath(xpath));
+        browser.wait(function () {
+          return element(by.xpath(xpath)).isPresent();
+        }, timeout).then(function (result) {
+          element.all(by.xpath(xpath)).count().then(function (c) {
+              assert.equal(c,count);
+          });
+          next();
+        });
+      } catch (err) {
+        next(err);
+      }
+    });
+  };
+  this.enterTextInFieldIndex = function (field,index, text) {
+    it('I enter ' + text + ' in ' + field + ' field', function (next) {
+      text = replacements(text.toString());
+      var ele = element.all(by.css(field)).get(index);
+      browser.wait(function () {
+        return ele.isPresent();
+      }, timeout).then(function () {
+        ele.clear().sendKeys(text).then(next).catch(next);
       });
     });
   };
