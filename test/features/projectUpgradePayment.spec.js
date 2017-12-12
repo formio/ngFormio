@@ -1,9 +1,8 @@
 module.exports = function (actions) {
   describe('Project Upgrade/Payment',function(){
     describe('Project Upgrade/Payment',function(){
-      actions.logout();
       actions.iAmLoggedInFor('profileuser1');
-      actions.iAmLoggedIn();
+      actions.waitForActionToComplete(2000);
       actions.goToPage('#/profile/payment/view');
       actions.clickOnElementWithText('Add Credit Card');
       actions.enterTextInField('#cardholderName','Test');
@@ -14,8 +13,8 @@ module.exports = function (actions) {
       actions.clickOnClass('#form-group-ccExpiryYear');
       actions.clickOnElementWithText('25');
       actions.clickOnClass('#submit');
-      actions.goToPage('#/');
       actions.waitForActionToComplete(2000);
+      actions.goToPage('#/');
       actions.clickOnElementWithText('New Project');
       actions.enterTextInField('#title', 'projectPayment');
       actions.clickOnElementWithText(' Create Project');
