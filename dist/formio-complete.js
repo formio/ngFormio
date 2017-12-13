@@ -1,4 +1,4 @@
-/*! ng-formio v2.25.8 | https://unpkg.com/ng-formio@2.25.8/LICENSE.txt */
+/*! ng-formio v2.25.9 | https://unpkg.com/ng-formio@2.25.9/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 (function (root, factory) {
   // AMD
@@ -49863,7 +49863,7 @@ var Formio = function () {
       apiUrl += '/submission/' + this.submissionId;
       apiUrl += '/download';
 
-      var download = Formio.baseUrl + apiUrl;
+      var download = this.base + apiUrl;
       return new Promise(function (resolve, reject) {
         _this4.getTempToken(3600, 'GET:' + apiUrl).then(function (tempToken) {
           download += '?token=' + tempToken.key;
@@ -75854,7 +75854,7 @@ module.exports = toString;
 
 },{"./_baseToString":102}],260:[function(_dereq_,module,exports){
 //! moment.js
-//! version : 2.19.3
+//! version : 2.19.4
 //! authors : Tim Wood, Iskren Chernev, Moment.js contributors
 //! license : MIT
 //! momentjs.com
@@ -77884,7 +77884,7 @@ function currentDateArray(config) {
 // note: all values past the year are optional and will default to the lowest possible value.
 // [year, month, day , hour, minute, second, millisecond]
 function configFromArray (config) {
-    var i, date, input = [], currentDate, yearToUse;
+    var i, date, input = [], currentDate, expectedWeekday, yearToUse;
 
     if (config._d) {
         return;
@@ -77934,6 +77934,8 @@ function configFromArray (config) {
     }
 
     config._d = (config._useUTC ? createUTCDate : createDate).apply(null, input);
+    expectedWeekday = config._useUTC ? config._d.getUTCDay() : config._d.getDay();
+
     // Apply timezone offset from input. The actual utcOffset can be changed
     // with parseZone.
     if (config._tzm != null) {
@@ -77945,7 +77947,7 @@ function configFromArray (config) {
     }
 
     // check for mismatching day of week
-    if (config._w && typeof config._w.d !== 'undefined' && config._w.d !== config._d.getDay()) {
+    if (config._w && typeof config._w.d !== 'undefined' && config._w.d !== expectedWeekday) {
         getParsingFlags(config).weekdayMismatch = true;
     }
 }
@@ -79521,7 +79523,7 @@ addRegexToken('Do', function (isStrict, locale) {
 
 addParseToken(['D', 'DD'], DATE);
 addParseToken('Do', function (input, array) {
-    array[DATE] = toInt(input.match(match1to2)[0], 10);
+    array[DATE] = toInt(input.match(match1to2)[0]);
 });
 
 // MOMENTS
@@ -80333,7 +80335,7 @@ addParseToken('x', function (input, array, config) {
 // Side effect imports
 
 
-hooks.version = '2.19.3';
+hooks.version = '2.19.4';
 
 setHookCallback(createLocal);
 
