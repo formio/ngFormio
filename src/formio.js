@@ -7,7 +7,6 @@ var app = angular.module('formio', [
   'ui.bootstrap.datetimepicker',
   'ui.bootstrap.popover',
   'ui.select',
-  'ui.mask',
   'angularMoment',
   'ngDialog',
   'ngFileUpload',
@@ -57,6 +56,8 @@ app.directive('formioWizard', require('./directives/formioWizard'));
 app.directive('formioBindHtml', require('./directives/formioBindHtml.js'));
 
 app.directive('formioScriptEditor', require('./directives/formioScriptEditor'));
+
+app.directive('formioMask', require('./directives/formioMask'));
 
 /**
  * Filter to flatten form components.

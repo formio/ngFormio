@@ -1,5 +1,6 @@
 <input
-  type="{{ component.inputType }}"
+  type="text"
+  inputmode="numeric"
   class="form-control"
   id="{{ componentId }}"
   name="{{ componentId }}"
@@ -10,7 +11,5 @@
   safe-multiple-to-single
   ng-attr-placeholder="{{ component.placeholder }}"
   custom-validator="component.validate.custom"
-  currency-input
-  ui-mask-placeholder=""
-  ui-options="uiMaskOptions"
+  formio-mask="currency"
 >
