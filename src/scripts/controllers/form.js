@@ -366,10 +366,10 @@ app.controller('FormController', [
     $scope.upload = function (file) {
       $scope.uploading = true;
       $scope.formReady = false;
-      $scope.primaryProjectPromise.then(function(primaryProject) {
-        var filePath = '/pdf/' + primaryProject._id + '/file';
+      $scope.loadProjectPromise.then(function(project) {
+        var filePath = '/pdf/' + project._id + '/file';
         var pdfServer = AppConfig.pdfServer;
-        PDFServer.ensureFileToken(primaryProject).then(function(project) {
+        PDFServer.ensureFileToken(project).then(function(project) {
           if (project.settings.pdfserver) {
             pdfServer = project.settings.pdfserver;
           }
