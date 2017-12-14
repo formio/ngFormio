@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.26.0
+### Changed
+ - Replaced the ui-mask library and replaced with the core renderer masking system.
+
 ## 2.25.9
 ### Fixed
  - Issue with getDownloadUrl by upgrading formio.js
