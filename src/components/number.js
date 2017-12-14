@@ -36,7 +36,7 @@ module.exports = function(app) {
         },
         controller: ['$scope', function($scope) {
           if ($scope.options && $scope.options.building) return; // FOR-71 - Skip parsing input data.
-
+          
           // Ensure that values are numbers.
           if ($scope.data && $scope.data.hasOwnProperty($scope.component.key)) {
             if (Array.isArray($scope.data[$scope.component.key])) {

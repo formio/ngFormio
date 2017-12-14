@@ -2121,7 +2121,7 @@ Formio.events = new EventEmitter({
 module.exports = global.Formio = Formio;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./formio.polyfill":4,"./providers":5,"browser-cookies":1,"eventemitter2":2,"native-promise-only":236,"shallow-copy":238,"whatwg-fetch":240}],4:[function(_dereq_,module,exports){
+},{"./formio.polyfill":4,"./providers":5,"browser-cookies":1,"eventemitter2":2,"native-promise-only":236,"shallow-copy":238,"whatwg-fetch":242}],4:[function(_dereq_,module,exports){
 "use strict";
 
 /**
@@ -33086,6 +33086,10 @@ return SignaturePad;
 })));
 
 },{}],240:[function(_dereq_,module,exports){
+!function(e,t){"object"==typeof exports&&"object"==typeof module?module.exports=t():"function"==typeof define&&define.amd?define([],t):"object"==typeof exports?exports.createNumberMask=t():e.createNumberMask=t()}(this,function(){return function(e){function t(n){if(o[n])return o[n].exports;var i=o[n]={exports:{},id:n,loaded:!1};return e[n].call(i.exports,i,i.exports,t),i.loaded=!0,i.exports}var o={};return t.m=e,t.c=o,t.p="",t(0)}([function(e,t,o){e.exports=o(2)},,function(e,t){"use strict";function o(){function e(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:l,t=e.length;if(e===l||e[0]===y[0]&&1===t)return y.split(l).concat([v]).concat(g.split(l));if(e===k&&M)return y.split(l).concat(["0",k,v]).concat(g.split(l));var o=e[0]===s&&q;o&&(e=e.toString().substr(1));var c=e.lastIndexOf(k),u=c!==-1,a=void 0,b=void 0,h=void 0;if(e.slice(T*-1)===g&&(e=e.slice(0,T*-1)),u&&(M||$)?(a=e.slice(e.slice(0,R)===y?R:0,c),b=e.slice(c+1,t),b=n(b.replace(f,l))):a=e.slice(0,R)===y?e.slice(R):e,P&&("undefined"==typeof P?"undefined":r(P))===p){var S="."===j?"[.]":""+j,w=(a.match(new RegExp(S,"g"))||[]).length;a=a.slice(0,P+w*Z)}return a=a.replace(f,l),E||(a=a.replace(/^0+(0$|[^0])/,"$1")),a=x?i(a,j):a,h=n(a),(u&&M||$===!0)&&(e[c-1]!==k&&h.push(m),h.push(k,m),b&&(("undefined"==typeof L?"undefined":r(L))===p&&(b=b.slice(0,L)),h=h.concat(b)),$===!0&&e[c-1]===k&&h.push(v)),R>0&&(h=y.split(l).concat(h)),o&&(h.length===R&&h.push(v),h=[d].concat(h)),g.length>0&&(h=h.concat(g.split(l))),h}var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:{},o=t.prefix,y=void 0===o?c:o,b=t.suffix,g=void 0===b?l:b,h=t.includeThousandsSeparator,x=void 0===h||h,S=t.thousandsSeparatorSymbol,j=void 0===S?u:S,w=t.allowDecimal,M=void 0!==w&&w,N=t.decimalSymbol,k=void 0===N?a:N,D=t.decimalLimit,L=void 0===D?2:D,O=t.requireDecimal,$=void 0!==O&&O,_=t.allowNegative,q=void 0!==_&&_,B=t.allowLeadingZeroes,E=void 0!==B&&B,I=t.integerLimit,P=void 0===I?null:I,R=y&&y.length||0,T=g&&g.length||0,Z=j&&j.length||0;return e.instanceOf="createNumberMask",e}function n(e){return e.split(l).map(function(e){return v.test(e)?v:e})}function i(e,t){return e.replace(/\B(?=(\d{3})+(?!\d))/g,t)}Object.defineProperty(t,"__esModule",{value:!0});var r="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e};t.default=o;var c="$",l="",u=",",a=".",s="-",d=/-/,f=/\D+/g,p="number",v=/\d/,m="[]"}])});
+},{}],241:[function(_dereq_,module,exports){
+!function(e,r){"object"==typeof exports&&"object"==typeof module?module.exports=r():"function"==typeof define&&define.amd?define([],r):"object"==typeof exports?exports.vanillaTextMask=r():e.vanillaTextMask=r()}(this,function(){return function(e){function r(n){if(t[n])return t[n].exports;var o=t[n]={exports:{},id:n,loaded:!1};return e[n].call(o.exports,o,o.exports,r),o.loaded=!0,o.exports}var t={};return r.m=e,r.c=t,r.p="",r(0)}([function(e,r,t){"use strict";function n(e){return e&&e.__esModule?e:{default:e}}function o(e){var r=e.inputElement,t=(0,u.default)(e),n=function(e){var r=e.target.value;return t.update(r)};return r.addEventListener("input",n),t.update(r.value),{textMaskInputElement:t,destroy:function(){r.removeEventListener("input",n)}}}Object.defineProperty(r,"__esModule",{value:!0}),r.conformToMask=void 0,r.maskInput=o;var i=t(2);Object.defineProperty(r,"conformToMask",{enumerable:!0,get:function(){return n(i).default}});var a=t(5),u=n(a);r.default=o},function(e,r){"use strict";Object.defineProperty(r,"__esModule",{value:!0}),r.placeholderChar="_"},function(e,r,t){"use strict";function n(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:a,r=arguments.length>1&&void 0!==arguments[1]?arguments[1]:a,t=arguments.length>2&&void 0!==arguments[2]?arguments[2]:{},n=t.guide,u=void 0===n||n,l=t.previousConformedValue,s=void 0===l?a:l,f=t.placeholderChar,d=void 0===f?i.placeholderChar:f,c=t.placeholder,v=void 0===c?(0,o.convertMaskToPlaceholder)(r,d):c,p=t.currentCaretPosition,h=t.keepCharPositions,g=u===!1&&void 0!==s,m=e.length,y=s.length,b=v.length,C=r.length,P=m-y,x=P>0,k=p+(x?-P:0),O=k+Math.abs(P);if(h===!0&&!x){for(var M=a,T=k;T<O;T++)v[T]===d&&(M+=d);e=e.slice(0,k)+M+e.slice(k,m)}for(var w=e.split(a).map(function(e,r){return{char:e,isNew:r>=k&&r<O}}),_=m-1;_>=0;_--){var j=w[_].char;if(j!==d){var V=_>=k&&y===C;j===v[V?_-P:_]&&w.splice(_,1)}}var S=a,E=!1;e:for(var N=0;N<b;N++){var A=v[N];if(A===d){if(w.length>0)for(;w.length>0;){var I=w.shift(),L=I.char,R=I.isNew;if(L===d&&g!==!0){S+=d;continue e}if(r[N].test(L)){if(h===!0&&R!==!1&&s!==a&&u!==!1&&x){for(var J=w.length,q=null,F=0;F<J;F++){var W=w[F];if(W.char!==d&&W.isNew===!1)break;if(W.char===d){q=F;break}}null!==q?(S+=L,w.splice(q,1)):N--}else S+=L;continue e}E=!0}g===!1&&(S+=v.substr(N,b));break}S+=A}if(g&&x===!1){for(var z=null,B=0;B<S.length;B++)v[B]===d&&(z=B);S=null!==z?S.substr(0,z+1):a}return{conformedValue:S,meta:{someCharsRejected:E}}}Object.defineProperty(r,"__esModule",{value:!0}),r.default=n;var o=t(3),i=t(1),a=""},function(e,r,t){"use strict";function n(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:l,r=arguments.length>1&&void 0!==arguments[1]?arguments[1]:u.placeholderChar;if(e.indexOf(r)!==-1)throw new Error("Placeholder character must not be used as part of the mask. Please specify a character that is not present in your mask as your placeholder character.\n\n"+("The placeholder character that was received is: "+JSON.stringify(r)+"\n\n")+("The mask that was received is: "+JSON.stringify(e)));return e.map(function(e){return e instanceof RegExp?r:e}).join("")}function o(e){return"string"==typeof e||e instanceof String}function i(e){return"number"==typeof e&&void 0===e.length&&!isNaN(e)}function a(e){for(var r=[],t=void 0;t=e.indexOf(s),t!==-1;)r.push(t),e.splice(t,1);return{maskWithoutCaretTraps:e,indexes:r}}Object.defineProperty(r,"__esModule",{value:!0}),r.convertMaskToPlaceholder=n,r.isString=o,r.isNumber=i,r.processCaretTraps=a;var u=t(1),l=[],s="[]"},function(e,r){"use strict";function t(e){var r=e.previousConformedValue,t=void 0===r?o:r,i=e.previousPlaceholder,a=void 0===i?o:i,u=e.currentCaretPosition,l=void 0===u?0:u,s=e.conformedValue,f=e.rawValue,d=e.placeholderChar,c=e.placeholder,v=e.indexesOfPipedChars,p=void 0===v?n:v,h=e.caretTrapIndexes,g=void 0===h?n:h;if(0===l)return 0;var m=f.length,y=t.length,b=c.length,C=s.length,P=m-y,x=P>0,k=0===y,O=P>1&&!x&&!k;if(O)return l;var M=x&&(t===s||s===c),T=0,w=void 0,_=void 0;if(M)T=l-P;else{var j=s.toLowerCase(),V=f.toLowerCase(),S=V.substr(0,l).split(o),E=S.filter(function(e){return j.indexOf(e)!==-1});_=E[E.length-1];var N=a.substr(0,E.length).split(o).filter(function(e){return e!==d}).length,A=c.substr(0,E.length).split(o).filter(function(e){return e!==d}).length,I=A!==N,L=void 0!==a[E.length-1]&&void 0!==c[E.length-2]&&a[E.length-1]!==d&&a[E.length-1]!==c[E.length-1]&&a[E.length-1]===c[E.length-2];!x&&(I||L)&&N>0&&c.indexOf(_)>-1&&void 0!==f[l]&&(w=!0,_=f[l]);for(var R=p.map(function(e){return j[e]}),J=R.filter(function(e){return e===_}).length,q=E.filter(function(e){return e===_}).length,F=c.substr(0,c.indexOf(d)).split(o).filter(function(e,r){return e===_&&f[r]!==e}).length,W=F+q+J+(w?1:0),z=0,B=0;B<C;B++){var D=j[B];if(T=B+1,D===_&&z++,z>=W)break}}if(x){for(var G=T,H=T;H<=b;H++)if(c[H]===d&&(G=H),c[H]===d||g.indexOf(H)!==-1||H===b)return G}else if(w){for(var K=T-1;K>=0;K--)if(s[K]===_||g.indexOf(K)!==-1||0===K)return K}else for(var Q=T;Q>=0;Q--)if(c[Q-1]===d||g.indexOf(Q)!==-1||0===Q)return Q}Object.defineProperty(r,"__esModule",{value:!0}),r.default=t;var n=[],o=""},function(e,r,t){"use strict";function n(e){return e&&e.__esModule?e:{default:e}}function o(e){var r={previousConformedValue:void 0,previousPlaceholder:void 0};return{state:r,update:function(t){var n=arguments.length>1&&void 0!==arguments[1]?arguments[1]:e,o=n.inputElement,s=n.mask,d=n.guide,m=n.pipe,b=n.placeholderChar,C=void 0===b?p.placeholderChar:b,P=n.keepCharPositions,x=void 0!==P&&P,k=n.showMask,O=void 0!==k&&k;if("undefined"==typeof t&&(t=o.value),t!==r.previousConformedValue){("undefined"==typeof s?"undefined":l(s))===y&&void 0!==s.pipe&&void 0!==s.mask&&(m=s.pipe,s=s.mask);var M=void 0,T=void 0;if(s instanceof Array&&(M=(0,v.convertMaskToPlaceholder)(s,C)),s!==!1){var w=a(t),_=o.selectionEnd,j=r.previousConformedValue,V=r.previousPlaceholder,S=void 0;if(("undefined"==typeof s?"undefined":l(s))===h){if(T=s(w,{currentCaretPosition:_,previousConformedValue:j,placeholderChar:C}),T===!1)return;var E=(0,v.processCaretTraps)(T),N=E.maskWithoutCaretTraps,A=E.indexes;T=N,S=A,M=(0,v.convertMaskToPlaceholder)(T,C)}else T=s;var I={previousConformedValue:j,guide:d,placeholderChar:C,pipe:m,placeholder:M,currentCaretPosition:_,keepCharPositions:x},L=(0,c.default)(w,T,I),R=L.conformedValue,J=("undefined"==typeof m?"undefined":l(m))===h,q={};J&&(q=m(R,u({rawValue:w},I)),q===!1?q={value:j,rejected:!0}:(0,v.isString)(q)&&(q={value:q}));var F=J?q.value:R,W=(0,f.default)({previousConformedValue:j,previousPlaceholder:V,conformedValue:F,placeholder:M,rawValue:w,currentCaretPosition:_,placeholderChar:C,indexesOfPipedChars:q.indexesOfPipedChars,caretTrapIndexes:S}),z=F===M&&0===W,B=O?M:g,D=z?B:F;r.previousConformedValue=D,r.previousPlaceholder=M,o.value!==D&&(o.value=D,i(o,W))}}}}}function i(e,r){document.activeElement===e&&(b?C(function(){return e.setSelectionRange(r,r,m)},0):e.setSelectionRange(r,r,m))}function a(e){if((0,v.isString)(e))return e;if((0,v.isNumber)(e))return String(e);if(void 0===e||null===e)return g;throw new Error("The 'value' provided to Text Mask needs to be a string or a number. The value received was:\n\n "+JSON.stringify(e))}Object.defineProperty(r,"__esModule",{value:!0});var u=Object.assign||function(e){for(var r=1;r<arguments.length;r++){var t=arguments[r];for(var n in t)Object.prototype.hasOwnProperty.call(t,n)&&(e[n]=t[n])}return e},l="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e};r.default=o;var s=t(4),f=n(s),d=t(2),c=n(d),v=t(3),p=t(1),h="function",g="",m="none",y="object",b="undefined"!=typeof navigator&&/Android/i.test(navigator.userAgent),C="undefined"!=typeof requestAnimationFrame?requestAnimationFrame:setTimeout}])});
+},{}],242:[function(_dereq_,module,exports){
 (function(self) {
   'use strict';
 
@@ -33548,7 +33552,7 @@ return SignaturePad;
   self.fetch.polyfill = true
 })(typeof self !== 'undefined' ? self : this);
 
-},{}],241:[function(_dereq_,module,exports){
+},{}],243:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -33637,7 +33641,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],242:[function(_dereq_,module,exports){
+},{}],244:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -33843,7 +33847,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],243:[function(_dereq_,module,exports){
+},{}],245:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -33927,7 +33931,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],244:[function(_dereq_,module,exports){
+},{}],246:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -34013,7 +34017,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":292}],245:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":295}],247:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.provider('formioComponents', function() {
@@ -34073,7 +34077,7 @@ module.exports = function(app) {
   }]);
 };
 
-},{}],246:[function(_dereq_,module,exports){
+},{}],248:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -34139,7 +34143,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":292}],247:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":295}],249:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -34168,69 +34172,11 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],248:[function(_dereq_,module,exports){
+},{}],250:[function(_dereq_,module,exports){
 "use strict";
 
 
 module.exports = function(app) {
-  app.directive('currencyInput', function() {
-    // May be better way than adding to prototype.
-    var splice = function(string, idx, rem, s) {
-      return (string.slice(0, idx) + s + string.slice(idx + Math.abs(rem)));
-    };
-    return {
-      restrict: 'A',
-      link: function(scope, element) {
-        if (scope.options && scope.options.building) return;
-        element.bind('keyup', function() {
-          var data = scope.data[scope.component.key];
-
-          //clearing left side zeros
-          while (data.charAt(0) === '0') {
-            data = data.substr(1);
-          }
-
-          data = data.replace(/[^\d.\',']/g, '');
-
-          var point = data.indexOf('.');
-          if (point >= 0) {
-            data = data.slice(0, point + 3);
-          }
-
-          var decimalSplit = data.split('.');
-          var intPart = decimalSplit[0];
-          var decPart = decimalSplit[1];
-
-          intPart = intPart.replace(/[^\d]/g, '');
-          if (intPart.length > 3) {
-            var intDiv = Math.floor(intPart.length / 3);
-            while (intDiv > 0) {
-              var lastComma = intPart.indexOf(',');
-              if (lastComma < 0) {
-                lastComma = intPart.length;
-              }
-
-              if (lastComma - 3 > 0) {
-                intPart = splice(intPart, lastComma - 3, 0, ',');
-              }
-              intDiv--;
-            }
-          }
-
-          if (decPart === undefined) {
-            decPart = '';
-          }
-          else {
-            decPart = '.' + decPart;
-          }
-          var res = intPart + decPart;
-          scope.$apply(function() {
-            scope.data[scope.component.key] = res;
-          });
-        });
-      }
-    };
-  });
   app.config([
     'formioComponentsProvider',
     function(formioComponentsProvider) {
@@ -34273,13 +34219,13 @@ module.exports = function(app) {
     'FormioUtils',
     function($templateCache, FormioUtils) {
       $templateCache.put('formio/components/currency.html', FormioUtils.fieldWrap(
-        "<input\n  type=\"{{ component.inputType }}\"\n  class=\"form-control\"\n  id=\"{{ componentId }}\"\n  name=\"{{ componentId }}\"\n  tabindex=\"{{ component.tabindex || 0 }}\"\n  ng-model=\"data[component.key]\"\n  ng-required=\"isRequired(component)\"\n  ng-disabled=\"readOnly\"\n  safe-multiple-to-single\n  ng-attr-placeholder=\"{{ component.placeholder }}\"\n  custom-validator=\"component.validate.custom\"\n  currency-input\n  ui-mask-placeholder=\"\"\n  ui-options=\"uiMaskOptions\"\n>\n"
+        "<input\n  type=\"text\"\n  inputmode=\"numeric\"\n  class=\"form-control\"\n  id=\"{{ componentId }}\"\n  name=\"{{ componentId }}\"\n  tabindex=\"{{ component.tabindex || 0 }}\"\n  ng-model=\"data[component.key]\"\n  ng-required=\"isRequired(component)\"\n  ng-disabled=\"readOnly\"\n  safe-multiple-to-single\n  ng-attr-placeholder=\"{{ component.placeholder }}\"\n  custom-validator=\"component.validate.custom\"\n  formio-mask=\"currency\"\n>\n"
       ));
     }
   ]);
 };
 
-},{}],249:[function(_dereq_,module,exports){
+},{}],251:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -34307,7 +34253,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":292}],250:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":295}],252:[function(_dereq_,module,exports){
 "use strict";
 
 var formioUtils = _dereq_('formiojs/utils');
@@ -34435,7 +34381,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"formiojs/utils":13}],251:[function(_dereq_,module,exports){
+},{"formiojs/utils":13}],253:[function(_dereq_,module,exports){
 "use strict";
 
 var _get = _dereq_('lodash/get');
@@ -34551,7 +34497,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"lodash/get":190}],252:[function(_dereq_,module,exports){
+},{"lodash/get":190}],254:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -34802,7 +34748,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],253:[function(_dereq_,module,exports){
+},{}],255:[function(_dereq_,module,exports){
 "use strict";
 
 var formioUtils = _dereq_('formiojs/utils');
@@ -35187,7 +35133,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"formiojs/utils":13}],254:[function(_dereq_,module,exports){
+},{"formiojs/utils":13}],256:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -35221,7 +35167,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],255:[function(_dereq_,module,exports){
+},{}],257:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -35276,7 +35222,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":292}],256:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":295}],258:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -35556,7 +35502,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],257:[function(_dereq_,module,exports){
+},{}],259:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -35742,7 +35688,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":292}],258:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":295}],260:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -35778,7 +35724,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":292}],259:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":295}],261:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -35870,7 +35816,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],260:[function(_dereq_,module,exports){
+},{}],262:[function(_dereq_,module,exports){
 "use strict";
 var app = angular.module('formio');
 
@@ -35915,7 +35861,7 @@ _dereq_('./panel')(app);
 _dereq_('./table')(app);
 _dereq_('./well')(app);
 
-},{"./address":241,"./button":242,"./checkbox":243,"./columns":244,"./components":245,"./container":246,"./content":247,"./currency":248,"./custom":249,"./datagrid":250,"./datetime":251,"./day":252,"./editgrid":253,"./email":254,"./fieldset":255,"./file":256,"./form":257,"./hidden":258,"./htmlelement":259,"./number":261,"./page":262,"./panel":263,"./password":264,"./phonenumber":265,"./radio":266,"./resource":267,"./select":268,"./selectboxes":269,"./signature":270,"./survey":271,"./table":272,"./textarea":273,"./textfield":274,"./time":275,"./well":276}],261:[function(_dereq_,module,exports){
+},{"./address":243,"./button":244,"./checkbox":245,"./columns":246,"./components":247,"./container":248,"./content":249,"./currency":250,"./custom":251,"./datagrid":252,"./datetime":253,"./day":254,"./editgrid":255,"./email":256,"./fieldset":257,"./file":258,"./form":259,"./hidden":260,"./htmlelement":261,"./number":263,"./page":264,"./panel":265,"./password":266,"./phonenumber":267,"./radio":268,"./resource":269,"./select":270,"./selectboxes":271,"./signature":272,"./survey":273,"./table":274,"./textarea":275,"./textfield":276,"./time":277,"./well":278}],263:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -35955,7 +35901,7 @@ module.exports = function(app) {
         },
         controller: ['$scope', function($scope) {
           if ($scope.options && $scope.options.building) return; // FOR-71 - Skip parsing input data.
-
+          
           // Ensure that values are numbers.
           if ($scope.data && $scope.data.hasOwnProperty($scope.component.key)) {
             if (Array.isArray($scope.data[$scope.component.key])) {
@@ -35979,13 +35925,13 @@ module.exports = function(app) {
     'FormioUtils',
     function($templateCache, FormioUtils) {
       $templateCache.put('formio/components/number.html', FormioUtils.fieldWrap(
-        "<input\n  type=\"number\"\n  class=\"form-control\"\n  id=\"{{ componentId }}\"\n  name=\"{{ componentId }}\"\n  tabindex=\"{{ component.tabindex || 0 }}\"\n  ng-model=\"data[component.key]\"\n  ng-required=\"isRequired(component)\"\n  ng-disabled=\"readOnly\"\n  safe-multiple-to-single\n  ng-attr-min=\"{{ component.validate.min }}\"\n  ng-attr-max=\"{{ component.validate.max }}\"\n  ng-attr-step=\"{{ component.validate.step }}\"\n  ng-attr-placeholder=\"{{ component.placeholder | formioTranslate:null:options.building }}\"\n  custom-validator=\"component.validate.custom\"\n  ui-mask=\"{{ component.inputMask }}\"\n  ui-mask-placeholder=\"\"\n  ui-options=\"uiMaskOptions\"\n>\n"
+        "<input\n  type=\"text\"\n  inputmode=\"numeric\"\n  class=\"form-control\"\n  id=\"{{ componentId }}\"\n  name=\"{{ componentId }}\"\n  tabindex=\"{{ component.tabindex || 0 }}\"\n  ng-model=\"data[component.key]\"\n  ng-required=\"isRequired(component)\"\n  ng-disabled=\"readOnly\"\n  safe-multiple-to-single\n  ng-attr-min=\"{{ component.validate.min }}\"\n  ng-attr-max=\"{{ component.validate.max }}\"\n  ng-attr-step=\"{{ component.validate.step }}\"\n  ng-attr-placeholder=\"{{ component.placeholder | formioTranslate:null:options.building }}\"\n  custom-validator=\"component.validate.custom\"\n  formio-mask=\"number\"\n>\n"
       ));
     }
   ]);
 };
 
-},{}],262:[function(_dereq_,module,exports){
+},{}],264:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -36012,7 +35958,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],263:[function(_dereq_,module,exports){
+},{}],265:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -36068,7 +36014,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":292}],264:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":295}],266:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -36099,7 +36045,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],265:[function(_dereq_,module,exports){
+},{}],267:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -36135,7 +36081,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],266:[function(_dereq_,module,exports){
+},{}],268:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -36186,7 +36132,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],267:[function(_dereq_,module,exports){
+},{}],269:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -36414,7 +36360,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],268:[function(_dereq_,module,exports){
+},{}],270:[function(_dereq_,module,exports){
 "use strict";
 /*eslint max-depth: ["error", 6]*/
 
@@ -37044,7 +36990,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"lodash/assign":179,"lodash/cloneDeep":184,"lodash/get":190,"lodash/isEqual":201,"lodash/mapValues":221,"lodash/set":226}],269:[function(_dereq_,module,exports){
+},{"lodash/assign":179,"lodash/cloneDeep":184,"lodash/get":190,"lodash/isEqual":201,"lodash/mapValues":221,"lodash/set":226}],271:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -37169,7 +37115,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],270:[function(_dereq_,module,exports){
+},{}],272:[function(_dereq_,module,exports){
 "use strict";
 
 var SignaturePad = _dereq_('signature_pad');
@@ -37311,7 +37257,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"signature_pad":239}],271:[function(_dereq_,module,exports){
+},{"signature_pad":239}],273:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -37372,7 +37318,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],272:[function(_dereq_,module,exports){
+},{}],274:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -37452,7 +37398,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":292}],273:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":295}],275:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -37578,7 +37524,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],274:[function(_dereq_,module,exports){
+},{}],276:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -37633,13 +37579,13 @@ module.exports = function(app) {
       FormioUtils
     ) {
       $templateCache.put('formio/components/textfield.html', FormioUtils.fieldWrap(
-        "<input\n  type=\"{{ component.mask ? 'password' : component.inputType }}\"\n  class=\"form-control\"\n  id=\"{{ componentId }}\"\n  name=\"{{ componentId }}\"\n  tabindex=\"{{ component.tabindex || 0 }}\"\n  ng-disabled=\"readOnly\"\n  ng-model=\"data[component.key]\"\n  ng-model-options=\"{ debounce: 500 }\"\n  safe-multiple-to-single\n  ng-required=\"isRequired(component)\"\n  ng-minlength=\"component.validate.minLength\"\n  ng-maxlength=\"component.validate.maxLength\"\n  ng-pattern=\"component.validate.pattern\"\n  custom-validator=\"component.validate.custom\"\n  ng-attr-placeholder=\"{{ component.placeholder | formioTranslate:null:options.building }}\"\n  ui-mask=\"{{ component.inputMask }}\"\n  ui-mask-placeholder=\"\"\n  ui-options=\"uiMaskOptions\"\n>\n"
+        "<input\n  type=\"{{ component.mask ? 'password' : component.inputType }}\"\n  class=\"form-control\"\n  id=\"{{ componentId }}\"\n  name=\"{{ componentId }}\"\n  tabindex=\"{{ component.tabindex || 0 }}\"\n  ng-disabled=\"readOnly\"\n  ng-model=\"data[component.key]\"\n  ng-model-options=\"{ debounce: 500 }\"\n  safe-multiple-to-single\n  ng-required=\"isRequired(component)\"\n  ng-minlength=\"component.validate.minLength\"\n  ng-maxlength=\"component.validate.maxLength\"\n  ng-pattern=\"component.validate.pattern\"\n  custom-validator=\"component.validate.custom\"\n  ng-attr-placeholder=\"{{ component.placeholder | formioTranslate:null:options.building }}\"\n  formio-mask\n>\n"
       ));
     }
   ]);
 };
 
-},{}],275:[function(_dereq_,module,exports){
+},{}],277:[function(_dereq_,module,exports){
 "use strict";
 
 var moment = _dereq_('moment');
@@ -37705,13 +37651,13 @@ module.exports = function(app) {
       FormioUtils
     ) {
       $templateCache.put('formio/components/time.html', FormioUtils.fieldWrap(
-        "{{data[component.key]}}<input\n  time-format\n  type=\"{{ component.inputType }}\"\n  class=\"form-control\"\n  id=\"{{ componentId }}\"\n  name=\"{{ componentId }}\"\n  tabindex=\"{{ component.tabindex || 0 }}\"\n  ng-disabled=\"readOnly\"\n  ng-model=\"data[component.key]\"\n  safe-multiple-to-single\n  ng-required=\"isRequired(component)\"\n  ng-minlength=\"component.validate.minLength\"\n  ng-maxlength=\"component.validate.maxLength\"\n  ng-pattern=\"component.validate.pattern\"\n  custom-validator=\"component.validate.custom\"\n  ng-attr-placeholder=\"{{ component.placeholder | formioTranslate:null:options.building }}\"\n  ui-mask=\"{{ component.inputMask }}\"\n  ui-mask-placeholder=\"\"\n  ui-options=\"uiMaskOptions\"\n>\n"
+        "<input\n  time-format\n  type=\"{{ component.inputType }}\"\n  class=\"form-control\"\n  id=\"{{ componentId }}\"\n  name=\"{{ componentId }}\"\n  tabindex=\"{{ component.tabindex || 0 }}\"\n  ng-disabled=\"readOnly\"\n  ng-model=\"data[component.key]\"\n  safe-multiple-to-single\n  ng-required=\"isRequired(component)\"\n  ng-minlength=\"component.validate.minLength\"\n  ng-maxlength=\"component.validate.maxLength\"\n  ng-pattern=\"component.validate.pattern\"\n  custom-validator=\"component.validate.custom\"\n  ng-attr-placeholder=\"{{ component.placeholder | formioTranslate:null:options.building }}\"\n>\n"
       ));
     }
   ]);
 };
 
-},{"moment":235}],276:[function(_dereq_,module,exports){
+},{"moment":235}],278:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -37764,7 +37710,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":292}],277:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":295}],279:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -37842,7 +37788,7 @@ module.exports = function() {
   };
 };
 
-},{}],278:[function(_dereq_,module,exports){
+},{}],280:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -37859,7 +37805,7 @@ module.exports = function() {
       requireComponents: '=?',
       disableComponents: '=?',
       formioOptions: '=?',
-      options: '=?'
+      options: '<'
     },
     controller: [
       '$scope',
@@ -38252,7 +38198,7 @@ module.exports = function() {
   };
 };
 
-},{}],279:[function(_dereq_,module,exports){
+},{}],281:[function(_dereq_,module,exports){
 "use strict";
 module.exports = ['$sce', '$parse', '$compile', function($sce, $parse, $compile) {
   return {
@@ -38269,7 +38215,7 @@ module.exports = ['$sce', '$parse', '$compile', function($sce, $parse, $compile)
   };
 }];
 
-},{}],280:[function(_dereq_,module,exports){
+},{}],282:[function(_dereq_,module,exports){
 "use strict";
 var _get = _dereq_('lodash/get');
 
@@ -38621,7 +38567,7 @@ module.exports = [
   }
 ];
 
-},{"lodash/get":190}],281:[function(_dereq_,module,exports){
+},{"lodash/get":190}],283:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -38637,7 +38583,7 @@ module.exports = function() {
   };
 };
 
-},{}],282:[function(_dereq_,module,exports){
+},{}],284:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'formioComponents',
@@ -38710,7 +38656,7 @@ module.exports = [
   }
 ];
 
-},{}],283:[function(_dereq_,module,exports){
+},{}],285:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -38795,7 +38741,7 @@ module.exports = function() {
   };
 };
 
-},{}],284:[function(_dereq_,module,exports){
+},{}],286:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$compile',
@@ -38814,7 +38760,7 @@ module.exports = [
   }
 ];
 
-},{}],285:[function(_dereq_,module,exports){
+},{}],287:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -38824,7 +38770,210 @@ module.exports = function() {
   };
 };
 
-},{}],286:[function(_dereq_,module,exports){
+},{}],288:[function(_dereq_,module,exports){
+"use strict";
+var maskInput = _dereq_('text-mask-all/vanilla').maskInput;
+var createNumberMask = _dereq_('text-mask-all/addons/dist/createNumberMask').default;
+
+module.exports = function() {
+  return {
+    restrict: 'A',
+    require: 'ngModel',
+    link: function(scope, element, attrs, controller, transcludeFn) {
+      var format = attrs.formioMask;
+      var inputElement;
+      var inputMask;
+
+      if (element[0].tagName === 'INPUT') {
+        // `textMask` directive is used directly on an input element
+        inputElement = element[0]
+      } else {
+        // `textMask` directive is used on an abstracted input element
+        inputElement = element[0].getElementsByTagName('INPUT')[0]
+      }
+
+      var getFormatOptions = function() {
+        if (format === 'currency') {
+          return {
+            style: 'currency',
+            currency: scope.currency,
+            useGrouping: true,
+            maximumFractionDigits: _.get(scope.component, 'decimalLimit', scope.decimalLimit)
+          };
+        }
+        return {
+          style: 'decimal',
+          useGrouping: true,
+          maximumFractionDigits: _.get(scope.component, 'decimalLimit', scope.decimalLimit)
+        };
+      }
+
+      scope.decimalSeparator = scope.options.decimalSeparator = scope.options.decimalSeparator || (12345.6789).toLocaleString(scope.options.language).match(/345(.*)67/)[1];
+      scope.thousandsSeparator = scope.options.thousandsSeparator = scope.options.thousandsSeparator || (12345.6789).toLocaleString(scope.options.language).match(/12(.*)345/)[1];
+
+      if (format === 'currency') {
+        scope.currency = scope.component.currency || 'USD';
+        scope.decimalLimit = scope.component.decimalLimit || 2
+
+        // Get the prefix and suffix from the localized string.
+        var regex = '(.*)?100(' + (scope.decimalSeparator === '.' ? '\.' : scope.decimalSeparator) + '0{' + scope.decimalLimit + '})?(.*)?';
+        var parts = (100).toLocaleString(scope.options.language, getFormatOptions()).match(new RegExp(regex));
+        scope.prefix = parts[1] || '';
+        scope.suffix = parts[3] || '';
+      }
+      else if (format ==='number') {
+        // Determine the decimal limit. Defaults to 20 but can be overridden by validate.step or decimalLimit settings.
+        scope.decimalLimit = 20;
+        if (
+          scope.component.validate &&
+          scope.component.validate.step &&
+          scope.component.validate.step !== 'any'
+        ) {
+          var parts = scope.component.validate.step.toString().split('.');
+          if (parts.length > 1) {
+            scope.decimalLimit = parts[1].length;
+          }
+        }
+      }
+
+      /**
+       * Returns an input mask that is compatible with the input mask library.
+       * @param {string} mask - The Form.io input mask.
+       * @returns {Array} - The input mask for the mask library.
+       */
+      var getInputMask = function(mask) {
+        if (mask instanceof Array) {
+          return mask;
+        }
+        var maskArray = [];
+        maskArray.numeric = true;
+        for (var i=0; i < mask.length; i++) {
+          switch (mask[i]) {
+            case '9':
+              maskArray.push(/\d/);
+              break;
+            case 'A':
+              maskArray.numeric = false;
+              maskArray.push(/[a-zA-Z]/);
+              break;
+            case 'a':
+              maskArray.numeric = false;
+              maskArray.push(/[a-z]/);
+              break;
+            case '*':
+              maskArray.numeric = false;
+              maskArray.push(/[a-zA-Z0-9]/);
+              break;
+            default:
+              maskArray.push(mask[i]);
+              break;
+          }
+        }
+        return maskArray;
+      }
+
+      /**
+       * Sets the input mask for an input.
+       * @param {HTMLElement} input - The html input to apply the mask to.
+       */
+      var setInputMask = function(input) {
+        if (!input) {
+          console.log('no input');
+          return;
+        }
+
+        var mask;
+        if (scope.component.inputMask) {
+          // Text or other input mask, including number with inputMask.
+          mask= getInputMask(scope.component.inputMask);
+        }
+        else if (format === 'currency') {
+          // Currency mask.
+          mask = createNumberMask({
+            prefix: scope.prefix,
+            suffix: scope.suffix,
+            thousandsSeparatorSymbol: _.get(scope.component, 'thousandsSeparator', scope.thousandsSeparator),
+            decimalSymbol: _.get(scope.component, 'decimalSymbol', scope.decimalSeparator),
+            decimalLimit: _.get(scope.component, 'decimalLimit', scope.decimalLimit),
+            allowNegative: _.get(scope.component, 'allowNegative', true),
+            allowDecimal: _.get(scope.component, 'allowDecimal', true)
+          });
+        }
+        else if (format === 'number') {
+          // Numeric input mask.
+          mask = createNumberMask({
+            prefix: '',
+            suffix: '',
+            thousandsSeparatorSymbol: _.get(scope.component, 'thousandsSeparator', scope.thousandsSeparator),
+            decimalSymbol: _.get(scope.component, 'decimalSymbol', scope.decimalSeparator),
+            decimalLimit: _.get(scope.component, 'decimalLimit', scope.decimalLimit),
+            allowNegative: _.get(scope.component, 'allowNegative', true),
+            allowDecimal: _.get(scope.component, 'allowDecimal', !(scope.component.validate && scope.component.validate.integer))
+          })
+        }
+
+        // Set the mask on the input element.
+        if (mask) {
+          inputMask = maskInput({
+            inputElement: input,
+            mask: mask
+          });
+        }
+      }
+
+      setInputMask(inputElement);
+
+      // Only use for currency or number formats.
+      if (format) {
+        // Convert from view to model
+        controller.$parsers.push(function(value) {
+          // Strip out the prefix and suffix before parsing.
+          value = value.replace(scope.prefix, '').replace(scope.suffix, '');
+
+          // Remove thousands separators and convert decimal separator to dot.
+          value = value.split(scope.thousandsSeparator).join('').replace(scope.decimalSeparator, '.');
+
+          if (scope.component.validate && scope.component.validate.integer) {
+            return parseInt(value, 10);
+          }
+          else {
+            return parseFloat(value);
+          }
+        });
+
+        // Convert from model to view
+        controller.$formatters.push(function(value) {
+          try {
+            // Strip out the prefix and suffix. scope occurs when numbers are from an old renderer.
+            value = value.replace(scope.prefix, '').replace(scope.suffix, '');
+          }
+          catch (e) {
+            // If value doesn't have a replace method, continue on as before.
+          }
+
+          // If not a number, return empty string.
+          if (isNaN(value)) {
+            return '';
+          }
+
+          // If empty string, zero or other, don't format.
+          if (!value) {
+            return value;
+          }
+
+          if (scope.component.validate && scope.component.validate.integer) {
+            return parseInt(value, 10).toLocaleString(scope.options.language, getFormatOptions());
+          }
+          else {
+            return parseFloat(value).toLocaleString(scope.options.language, getFormatOptions());
+          }
+        });
+      }
+    }
+  };
+};
+
+},{"text-mask-all/addons/dist/createNumberMask":240,"text-mask-all/vanilla":241}],289:[function(_dereq_,module,exports){
 "use strict";
 var _map = _dereq_('lodash/map');
 // Javascript editor directive
@@ -38900,7 +39049,7 @@ module.exports = ['FormioUtils', function(FormioUtils) {
   };
 }];
 
-},{"lodash/map":220}],287:[function(_dereq_,module,exports){
+},{"lodash/map":220}],290:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -38932,7 +39081,7 @@ module.exports = function() {
   };
 };
 
-},{}],288:[function(_dereq_,module,exports){
+},{}],291:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -38988,7 +39137,7 @@ module.exports = function() {
   };
 };
 
-},{}],289:[function(_dereq_,module,exports){
+},{}],292:[function(_dereq_,module,exports){
 "use strict";
 var isNaN = _dereq_('lodash/isNAN');
 var isFinite = _dereq_('lodash/isFinite');
@@ -39598,7 +39747,7 @@ module.exports = function() {
   };
 };
 
-},{"lodash/isEmpty":200,"lodash/isFinite":203,"lodash/isNAN":206}],290:[function(_dereq_,module,exports){
+},{"lodash/isEmpty":200,"lodash/isFinite":203,"lodash/isNAN":206}],293:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -39791,7 +39940,7 @@ module.exports = [
   }
 ];
 
-},{}],291:[function(_dereq_,module,exports){
+},{}],294:[function(_dereq_,module,exports){
 "use strict";
 var formioUtils = _dereq_('formiojs/utils');
 var _filter = _dereq_('lodash/filter');
@@ -40248,7 +40397,7 @@ module.exports = function() {
   };
 };
 
-},{"formiojs/utils":13,"lodash/filter":188,"lodash/get":190}],292:[function(_dereq_,module,exports){
+},{"formiojs/utils":13,"lodash/filter":188,"lodash/get":190}],295:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   var generic = function(data, component) {
@@ -40374,7 +40523,7 @@ module.exports = function() {
   };
 };
 
-},{}],293:[function(_dereq_,module,exports){
+},{}],296:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$q',
@@ -40423,7 +40572,7 @@ module.exports = [
   }
 ];
 
-},{}],294:[function(_dereq_,module,exports){
+},{}],297:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -40457,7 +40606,7 @@ module.exports = [
   }
 ];
 
-},{}],295:[function(_dereq_,module,exports){
+},{}],298:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'FormioUtils',
@@ -40466,7 +40615,7 @@ module.exports = [
   }
 ];
 
-},{}],296:[function(_dereq_,module,exports){
+},{}],299:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$sce',
@@ -40479,7 +40628,7 @@ module.exports = [
   }
 ];
 
-},{}],297:[function(_dereq_,module,exports){
+},{}],300:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
     return function(label, shortcut) {
@@ -40501,7 +40650,7 @@ module.exports = function() {
     };
   }
   
-},{}],298:[function(_dereq_,module,exports){
+},{}],301:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   function() {
@@ -40520,7 +40669,7 @@ module.exports = [
   }
 ];
 
-},{}],299:[function(_dereq_,module,exports){
+},{}],302:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'formioTableView',
@@ -40533,7 +40682,7 @@ module.exports = [
   }
 ];
 
-},{}],300:[function(_dereq_,module,exports){
+},{}],303:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -40548,7 +40697,7 @@ module.exports = [
   }
 ];
 
-},{}],301:[function(_dereq_,module,exports){
+},{}],304:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$filter',
@@ -40605,7 +40754,7 @@ module.exports = [
   }
 ];
 
-},{}],302:[function(_dereq_,module,exports){
+},{}],305:[function(_dereq_,module,exports){
 "use strict";
 module.exports = ['$sce', function($sce) {
   return function(val) {
@@ -40613,7 +40762,7 @@ module.exports = ['$sce', function($sce) {
   };
 }];
 
-},{}],303:[function(_dereq_,module,exports){
+},{}],306:[function(_dereq_,module,exports){
 "use strict";
 _dereq_('./polyfills/polyfills');
 
@@ -40624,7 +40773,6 @@ var app = angular.module('formio', [
   'ui.bootstrap.datetimepicker',
   'ui.bootstrap.popover',
   'ui.select',
-  'ui.mask',
   'angularMoment',
   'ngDialog',
   'ngFileUpload',
@@ -40674,6 +40822,8 @@ app.directive('formioWizard', _dereq_('./directives/formioWizard'));
 app.directive('formioBindHtml', _dereq_('./directives/formioBindHtml.js'));
 
 app.directive('formioScriptEditor', _dereq_('./directives/formioScriptEditor'));
+
+app.directive('formioMask', _dereq_('./directives/formioMask'));
 
 /**
  * Filter to flatten form components.
@@ -40772,7 +40922,7 @@ app.run([
 
 _dereq_('./components');
 
-},{"./components":260,"./directives/customValidator":277,"./directives/formio":278,"./directives/formioBindHtml.js":279,"./directives/formioComponent":280,"./directives/formioComponentTooltip":281,"./directives/formioComponentView":282,"./directives/formioDelete":283,"./directives/formioElement":284,"./directives/formioErrors":285,"./directives/formioScriptEditor":286,"./directives/formioSubmission":287,"./directives/formioSubmissions":288,"./directives/formioWizard":289,"./factories/FormioScope":290,"./factories/FormioUtils":291,"./factories/formioInterceptor":293,"./factories/formioTableView":294,"./filters/flattenComponents":295,"./filters/safehtml":296,"./filters/shortcut":297,"./filters/tableComponents":298,"./filters/tableFieldView":299,"./filters/tableView":300,"./filters/translate":301,"./filters/trusturl":302,"./polyfills/polyfills":305,"./providers/Formio":306}],304:[function(_dereq_,module,exports){
+},{"./components":262,"./directives/customValidator":279,"./directives/formio":280,"./directives/formioBindHtml.js":281,"./directives/formioComponent":282,"./directives/formioComponentTooltip":283,"./directives/formioComponentView":284,"./directives/formioDelete":285,"./directives/formioElement":286,"./directives/formioErrors":287,"./directives/formioMask":288,"./directives/formioScriptEditor":289,"./directives/formioSubmission":290,"./directives/formioSubmissions":291,"./directives/formioWizard":292,"./factories/FormioScope":293,"./factories/FormioUtils":294,"./factories/formioInterceptor":296,"./factories/formioTableView":297,"./filters/flattenComponents":298,"./filters/safehtml":299,"./filters/shortcut":300,"./filters/tableComponents":301,"./filters/tableFieldView":302,"./filters/tableView":303,"./filters/translate":304,"./filters/trusturl":305,"./polyfills/polyfills":308,"./providers/Formio":309}],307:[function(_dereq_,module,exports){
 "use strict";
 'use strict';
 
@@ -40803,13 +40953,13 @@ if (typeof Object.assign != 'function') {
   })();
 }
 
-},{}],305:[function(_dereq_,module,exports){
+},{}],308:[function(_dereq_,module,exports){
 "use strict";
 'use strict';
 
 _dereq_('./Object.assign');
 
-},{"./Object.assign":304}],306:[function(_dereq_,module,exports){
+},{"./Object.assign":307}],309:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   // The formio class.
@@ -40879,5 +41029,5 @@ module.exports = function() {
   };
 };
 
-},{"formiojs":3}]},{},[303])(303)
+},{"formiojs":3}]},{},[306])(306)
 });

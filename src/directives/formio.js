@@ -13,7 +13,7 @@ module.exports = function() {
       requireComponents: '=?',
       disableComponents: '=?',
       formioOptions: '=?',
-      options: '=?'
+      options: '<'
     },
     controller: [
       '$scope',
