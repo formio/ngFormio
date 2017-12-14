@@ -6,7 +6,7 @@ var pathType = 'Subdomains';
 serverHost = host;
 apiProtocol = (serverHost.split(':')[0] !== 'localhost') ? 'https:' : protocol;
 var parts = serverHost.split('.');
-if (parts[0] === 'portal') {
+if (parts[0] === 'portal' || parts[0] === 'beta') {
   parts.shift();
   serverHost = parts.join('.');
 }
