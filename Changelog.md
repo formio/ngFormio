@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.25.9
+### Fixed
+ - Issue with getDownloadUrl by upgrading formio.js
+
 ## 2.25.8
 ### Fixed
  - Reverted https://github.com/formio/ngFormio/commit/d7bf526a6d581680d156561972821b63ce65a4b5 which was breaking Select components to resources.
