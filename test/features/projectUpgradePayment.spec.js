@@ -28,10 +28,12 @@ module.exports = function (actions) {
       actions.checkingUrlEndsWith('billing');
       actions.clickOnClass('.fa.fa-home');
       actions.clickOnElementWithText('projectPayment');
+      actions.waitForActionToComplete(1000);
       actions.clickOnElementWithText(' Upgrade Now');
       actions.checkingUrlEndsWith('billing');
       actions.clickOnClass('.fa.fa-home');
       actions.clickOnElementWithText('projectPayment');
+      actions.waitForActionToComplete(1000);
       actions.clickOnElementWithText('Trial');
       actions.checkingUrlEndsWith('billing');
       actions.iSeeText('Selected');
