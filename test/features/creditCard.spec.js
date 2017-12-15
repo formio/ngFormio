@@ -1,13 +1,17 @@
 module.exports = function (actions) {
   describe('Inputting Credit Card Info',function(){
     describe('Navigating to ‘Payment Info’ page',function(){
-      actions.iAmLoggedInFor('profileuser1');
+      // actions.iAmLoggedInFor('profileuser2');
+      actions.logout();
+      actions.enterTextInField('.login-container #email', 'admin@example.com');
+      actions.enterTextInField('.login-container #password', 'password');
+      actions.clickOnElementWithText('LOG IN');
       actions.clickOnClass('#user-menu');
       actions.clickOnElementWithText(' Payment Info');
       actions.checkingUrlEndsWith('#/profile/payment/view');
     });
     describe('Navigating to the Credit Card input page',function(){
-      actions.clickOnElementWithText('Add Credit Card');
+      actions.clickOnElementWithText('Change Credit Card');
       actions.checkingUrlEndsWith('#/profile/payment/edit');
     });
     describe('Adding valid Credit Card to profile',function(){
