@@ -3,6 +3,7 @@ module.exports = function (actions) {
     describe('Navigating to ‘Payment Info’ page',function(){
       actions.iAmLoggedInFor('profileuser1');
       actions.iAmLoggedIn();
+      actions.iSeeText('Free 30 Day Enterprise Plan Trial');
       actions.clickOnClass('#user-menu');
       actions.clickOnElementWithText(' Payment Info');
       actions.checkingUrlEndsWith('#/profile/payment/view');
