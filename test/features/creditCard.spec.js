@@ -3,8 +3,7 @@ module.exports = function (actions) {
     describe('Navigating to ‘Payment Info’ page',function(){
       actions.iAmLoggedInFor('profileuser1');
       actions.iAmLoggedIn();
-      actions.waitForActionToComplete(1000);
-      actions.clickOnElement('#user-menu');
+      actions.clickOnClass('#user-menu');
       actions.clickOnElementWithText(' Payment Info');
       actions.checkingUrlEndsWith('#/profile/payment/view');
     });
