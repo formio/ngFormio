@@ -2,10 +2,6 @@ module.exports = function (actions) {
   describe('Inputting Credit Card Info',function(){
     describe('Navigating to ‘Payment Info’ page',function(){
       actions.iAmLoggedInFor('profileuser1');
-      actions.logout();
-      // actions.enterTextInField('.login-container #email', 'admin@example.com');
-      // actions.enterTextInField('.login-container #password', 'password');
-      // actions.clickOnElementWithText('LOG IN');
       actions.iAmLoggedIn();
       actions.clickOnElement('#user-menu');
       actions.clickOnElementWithText(' Payment Info');
