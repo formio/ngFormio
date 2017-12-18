@@ -37,8 +37,18 @@ module.exports = function(app) {
             }
           };
 
+
+         var allowSubmission = true;
           $scope.hasError = function() {
-            return clicked && (settings.action === 'submit') && $scope.formioForm.$invalid && !$scope.formioForm.$pristine;
+            var errValue = clicked && (settings.action === 'submit') && $scope.formioForm.$invalid && !$scope.formioForm.$pristine;
+            if(errValue && settings.disableOnInvalid && $scope.formioForm.$invalid && !$scope.formioForm.$pristine){
+              allowSubmission = false;
+              $('#' +settings.key).addClass("bttn-disable");
+            }else{
+              allowSubmission = true;
+              $('#'+settings.key).removeClass("bttn-disable");
+            }
+            return errValue
           };
 
           var onCustom = function() {
@@ -59,7 +69,7 @@ module.exports = function(app) {
             }
           };
 
-          var onClick = function() {
+          var onClick = function () {
             clicked = true;
             switch (settings.action) {
               case 'submit':
@@ -98,7 +108,11 @@ module.exports = function(app) {
             if (componentId !== $scope.componentId) {
               return;
             }
-            onClick();
+            if(allowSubmission === true) {
+              onClick();
+            }else{
+              $scope.hasError();
+            }
           });
 
           $scope.openOAuth = function(settings) {

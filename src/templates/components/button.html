@@ -3,7 +3,7 @@
     name="{{ componentId }}"
     ng-class="{'btn-block': component.block}"
     class="btn btn-{{ component.theme }} btn-{{ component.size }}"
-    ng-disabled="readOnly || formioForm.submitting || (component.disableOnInvalid && formioForm.$invalid) || hasError()"
+    ng-disabled="readOnly || formioForm.submitting"
     tabindex="{{ component.tabindex || 0 }}"
     ng-click="$emit('buttonClick', component, componentId)">
   <span ng-if="component.leftIcon" class="{{ component.leftIcon }}" aria-hidden="true"></span>
