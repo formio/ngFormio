@@ -59,6 +59,10 @@ app.directive('formioScriptEditor', require('./directives/formioScriptEditor'));
 
 app.directive('formioMask', require('./directives/formioMask'));
 
+app.directive('formioMin', require('./directives/formioMin'));
+
+app.directive('formioMax', require('./directives/formioMax'));
+
 /**
  * Filter to flatten form components.
  */
