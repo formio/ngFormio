@@ -8,7 +8,7 @@ module.exports = function(app) {
       require: 'ngModel',
       link: function(scope, element, attr, ngModel) {
         ngModel.$parsers.push(function(utcDate) {
-          if (!utcDate) return;
+          if (!utcDate) return '';
           return moment(utcDate).format(scope.component.format);
         });
 

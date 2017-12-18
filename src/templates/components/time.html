@@ -9,8 +9,6 @@
   ng-model="data[component.key]"
   safe-multiple-to-single
   ng-required="isRequired(component)"
-  ng-minlength="component.validate.minLength"
-  ng-maxlength="component.validate.maxLength"
   ng-pattern="component.validate.pattern"
   custom-validator="component.validate.custom"
   ng-attr-placeholder="{{ component.placeholder | formioTranslate:null:options.building }}"

@@ -153,6 +153,10 @@ module.exports = function() {
       if (format) {
         // Convert from view to model
         controller.$parsers.push(function(value) {
+          if (!value) {
+            return value;
+          }
+
           // Strip out the prefix and suffix before parsing.
           value = value.replace(scope.prefix, '').replace(scope.suffix, '');
 
