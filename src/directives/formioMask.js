@@ -169,6 +169,9 @@ module.exports = function() {
 
         // Convert from model to view
         controller.$formatters.push(function(value) {
+          if (Array.isArray(value)) {
+            value = value[0];
+          }
           try {
             // Strip out the prefix and suffix. scope occurs when numbers are from an old renderer.
             value = value.replace(scope.prefix, '').replace(scope.suffix, '');

@@ -5,7 +5,6 @@ module.exports = function() {
     link: function(scope, element, attrs, ctrl) {
       var minValue;
       ctrl.$validators.min = function(value) {
-        console.log('validate min');
         if (ctrl.$isEmpty(value) || angular.isUndefined(minValue)) {
           return true;
         } else {

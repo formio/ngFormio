@@ -5,7 +5,6 @@ module.exports = function() {
     link: function(scope, element, attrs, ctrl) {
       var maxValue;
       ctrl.$validators.max = function(value) {
-        console.log('validate max');
         if (ctrl.$isEmpty(value) || angular.isUndefined(maxValue)) {
           return true;
         } else {
