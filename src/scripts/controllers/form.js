@@ -291,7 +291,7 @@ app.directive('formList', function() {
         });
         $scope.export = function(form, type) {
           $scope.isBusy = true;
-          SubmissionExport.export($scope.localProject, $scope.formio, form, type).then(function() {
+          SubmissionExport.export($scope.formio, form, type).then(function() {
             $scope.isBusy = false;
           }).catch(function(err) {
             $scope.isBusy = false;
@@ -1777,7 +1777,7 @@ app.controller('FormSubmissionsController', [
 
     $scope.export = function(form, type) {
       $scope.isBusy = true;
-      SubmissionExport.export($scope.localProject, $scope.formio, form, type).then(function() {
+      SubmissionExport.export($scope.formio, form, type).then(function() {
         $scope.isBusy = false;
       }).catch(function(err) {
         $scope.isBusy = false;
