@@ -153,6 +153,10 @@ module.exports = function() {
       if (format) {
         // Convert from view to model
         controller.$parsers.push(function(value) {
+          if (!value) {
+            return value;
+          }
+
           // Strip out the prefix and suffix before parsing.
           value = value.replace(scope.prefix, '').replace(scope.suffix, '');
 
@@ -169,6 +173,9 @@ module.exports = function() {
 
         // Convert from model to view
         controller.$formatters.push(function(value) {
+          if (Array.isArray(value)) {
+            value = value[0];
+          }
           try {
             // Strip out the prefix and suffix. scope occurs when numbers are from an old renderer.
             value = value.replace(scope.prefix, '').replace(scope.suffix, '');

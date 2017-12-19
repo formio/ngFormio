@@ -9,9 +9,8 @@
   ng-required="isRequired(component)"
   ng-disabled="readOnly"
   safe-multiple-to-single
-  ng-attr-min="{{ component.validate.min }}"
-  ng-attr-max="{{ component.validate.max }}"
-  ng-attr-step="{{ component.validate.step }}"
+  formio-min="{{ component.validate.min }}"
+  formio-max="{{ component.validate.max }}"
   ng-attr-placeholder="{{ component.placeholder | formioTranslate:null:options.building }}"
   custom-validator="component.validate.custom"
   formio-mask="number"
