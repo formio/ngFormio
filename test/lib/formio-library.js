@@ -757,8 +757,14 @@ module.exports = function (config) {
         browser.wait(function () {
           return btn.isPresent().then(function (present) {
             if (present) {
-              return btn.isEnabled().then(function (res) {
-                return !res;
+              return btn.isEnabled().then(function(enabled) {
+                if (enabled) {
+                  return false;
+                }
+
+                return btn.getAttribute('class').then(function (classes) {
+                  return classes.split(' ').indexOf('btn-disable') !== -1;
+                });
               });
             }
             return present;
@@ -784,7 +790,15 @@ module.exports = function (config) {
         browser.wait(function () {
           return btn.isPresent().then(function (present) {
             if (present) {
-              return btn.isEnabled();
+              btn.isEnabled().then(function(enabled) {
+                if (!enabled) {
+                  return false;
+                }
+
+                return btn.getAttribute('class').then(function (classes) {
+                  return classes.split(' ').indexOf('btn-disable') === -1;
+                });
+              });
             }
             return present;
           });
