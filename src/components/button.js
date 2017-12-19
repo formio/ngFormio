@@ -41,12 +41,12 @@ module.exports = function(app) {
          var allowSubmission = true;
           $scope.hasError = function() {
             var errValue = clicked && (settings.action === 'submit') && $scope.formioForm.$invalid && !$scope.formioForm.$pristine;
-            if(errValue && settings.disableOnInvalid && $scope.formioForm.$invalid && !$scope.formioForm.$pristine){
+            if (errValue && settings.disableOnInvalid && $scope.formioForm.$invalid && !$scope.formioForm.$pristine) {
               allowSubmission = false;
-              $('#' +settings.key).addClass("bttn-disable");
-            }else{
+              $scope.disableBtn = true;
+            } else {
               allowSubmission = true;
-              $('#'+settings.key).removeClass("bttn-disable");
+              $scope.disableBtn = false
             }
             return errValue
           };
@@ -108,9 +108,9 @@ module.exports = function(app) {
             if (componentId !== $scope.componentId) {
               return;
             }
-            if(allowSubmission === true) {
+            if (allowSubmission === true) {
               onClick();
-            }else{
+            } else {
               $scope.hasError();
             }
           });

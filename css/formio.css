@@ -72,7 +72,7 @@
 }
 
 /* FOR-873 */
-.bttn-disable{
+.btn-disable{
   outline: none !important;
   cursor: not-allowed !important;
   background-color: #7DC4EE !important;
@@ -85,7 +85,7 @@
   user-select: none; /* No */
 }
 
-.bttn-disable:hover{
+.btn-disable:hover{
   outline: none !important;
   background-color: #7DC4EE !important;
   border: #7DC4EE !important;
@@ -97,7 +97,7 @@
   user-select: none; /* No */
 }
 
-.bttn-disable:active{
+.btn-disable:active{
   -webkit-box-shadow: none !important;
   box-shadow: none !important;
 }
