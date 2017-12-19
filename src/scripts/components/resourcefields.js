@@ -21,6 +21,7 @@ angular.module('formioApp').config([
             placeholder: settings.placeholder || '',
             dataSrc: 'url',
             data: {url: settings.basePath + '?type=resource' + resourceExclude},
+            searchField: 'title__regex',
             valueProperty: '_id',
             defaultValue: $scope.data.resource,
             template: '<span>{{ item.title }}</span>',
