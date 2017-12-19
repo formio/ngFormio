@@ -40,7 +40,7 @@ module.exports = function(app) {
          var allowSubmission = true;
           $scope.hasError = function() {
             var errValue = (settings.action === 'submit') && $scope.formioForm.$invalid && !$scope.formioForm.$pristine;
-            if (errValue && settings.disableOnInvalid && $scope.formioForm.$invalid && !$scope.formioForm.$pristine) {
+            if (errValue || (settings.disableOnInvalid && $scope.formioForm.$invalid)) {
               allowSubmission = false;
               $scope.disableBtn = true;
             } else {
