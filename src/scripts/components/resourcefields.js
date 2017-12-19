@@ -19,6 +19,7 @@ angular.module('formioApp').config([
             label: settings.title ? settings.title : 'Select a resource',
             key: 'resource',
             placeholder: settings.placeholder || '',
+            limit: 10,
             dataSrc: 'url',
             data: {url: settings.basePath + '?type=resource' + resourceExclude},
             searchField: 'title__regex',
