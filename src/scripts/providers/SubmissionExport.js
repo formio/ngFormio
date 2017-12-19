@@ -9,7 +9,7 @@ app.factory('SubmissionExport', [
       export: function(formio, form, type) {
         var url = formio.projectUrl + '/form/' + form._id + '/export';
         var headers = {
-          'x-expire': 3600,
+          'x-expire': 300,
           'x-allow': 'GET:' + '/project/' + form.project + '/form/' + form._id + '/export'
         };
         return formio.makeRequest('tempToken', formio.projectUrl + '/token', 'GET', null, {
