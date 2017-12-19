@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.26.1
+### Fixed
+ - Fix nesting forms multiple levvels deep
+ - ng-disabled dynamic update issue
+ - Fix number, currency, and time components issues with new input mask
+
 ## 2.26.0
 ### Changed
  - Replaced the ui-mask library and replaced with the core renderer masking system.
