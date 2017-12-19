@@ -66,6 +66,7 @@ module.exports = function(app) {
                 // Submission url is the same as the form url.
                 $scope.submissionFormio = new Formio(url, {base: baseUrl});
               }
+              $scope.url = url;
 
               $scope.formFormio = new Formio(url, {base: baseUrl});
               if ($scope.formFormio.formId) {
