@@ -21,6 +21,7 @@ module.exports = function(app) {
         },
         controller: ['$scope', 'FormioUtils', function($scope, FormioUtils) {
           if ($scope.options && $scope.options.building) return;
+          var clicked = false;
           var settings = $scope.component;
           $scope.getButtonType = function() {
             switch (settings.action) {
@@ -36,18 +37,15 @@ module.exports = function(app) {
             }
           };
 
-
-         var allowSubmission = true;
           $scope.hasError = function() {
-            var errValue = (settings.action === 'submit') && $scope.formioForm.$invalid && !$scope.formioForm.$pristine;
-            if (errValue || (settings.disableOnInvalid && $scope.formioForm.$invalid)) {
-              allowSubmission = false;
+            if (clicked && (settings.action === 'submit') && $scope.formioForm.$invalid && !$scope.formioForm.$pristine) {
               $scope.disableBtn = true;
+              return true
             } else {
-              allowSubmission = true;
-              $scope.disableBtn = false
+              clicked = false;
+              $scope.disableBtn = false;
+              return false
             }
-            return errValue
           };
 
           var onCustom = function() {
@@ -69,6 +67,7 @@ module.exports = function(app) {
           };
 
           var onClick = function () {
+            clicked = true;
             switch (settings.action) {
               case 'submit':
                 return;
@@ -106,11 +105,7 @@ module.exports = function(app) {
             if (componentId !== $scope.componentId) {
               return;
             }
-            if (allowSubmission === true) {
-              onClick();
-            } else {
-              $scope.hasError();
-            }
+            onClick();
           });
 
           $scope.openOAuth = function(settings) {
