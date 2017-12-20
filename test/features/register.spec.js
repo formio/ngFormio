@@ -55,7 +55,7 @@ module.exports = function (actions) {
       actions.enterTextInField('.register-container #password', '${random-password>register2.password}');
       actions.enterTextInField('.register-container #verifyPassword', '${register2.password}');
       actions.clickOnElementWithText('REGISTER');
-      actions.iSeeText('Username must be unique.');
+      actions.iSeeText('ValidationError: "Username" must be unique.');
     });
     describe('Email unique', function () {
       actions.userExistsWith('${random-name>register2.name}', '${random-email>register2.email}', '${random-password>register2.password}');
@@ -65,7 +65,7 @@ module.exports = function (actions) {
       actions.enterTextInField('.register-container #password', '${random-password>register3.password}');
       actions.enterTextInField('.register-container #verifyPassword', '${register3.password}');
       actions.clickOnElementWithText('REGISTER');
-      actions.iSeeText('Email must be unique.');
+      actions.iSeeText('ValidationError: "Email" must be unique.');
     });
     describe('Successful registration', function () {
       actions.logout();

@@ -539,7 +539,7 @@ module.exports = function (config) {
   this.iSeeText = function (text) {
     it('I see text "' + text + '"', function (next) {
       try {
-        var xpath = '//*[contains(text(),"' + replacements(text) + '")]';
+        var xpath = '//*[contains(text(),\'' + replacements(text) + '\')]';
         browser.wait(function () {
           return element(by.xpath(xpath)).isPresent();
         }, timeout).then(function (result) {
@@ -566,7 +566,7 @@ module.exports = function (config) {
 
   this.clickOnElementWithText = function (text) {
     it('I click on the ' + text + ' text ', function (next) {
-      var ele =  element(by.xpath('//*[text()="' + replacements(text.toString()) + '"]'));
+      var ele =  element(by.xpath('//*[text()=\'' + replacements(text.toString()) + '\']'));
       browser.wait(function () {
         return ele.isPresent();
       }, timeout).then(function (res) {
@@ -580,7 +580,7 @@ module.exports = function (config) {
 
   this.clickOnElementWithTextLast = function (text) {
     it('I click on the ' + text + ' text', function (next) {
-      var ele =  element.all(by.xpath('//*[text()="' + replacements(text.toString()) + '"]')).last();
+      var ele =  element.all(by.xpath('//*[text()=\'' + replacements(text.toString()) + '\']')).last();
       browser.wait(function () {
         return ele.isPresent();
       }, timeout).then(function (res) {
@@ -642,7 +642,7 @@ module.exports = function (config) {
 
   this.iGoToEnv = function (env) {
     it('I go to environment ' + env, function(next) {
-      var envTab = element(by.xpath('//a[contains(@class, "environment-tab") and contains(text(),"' + env + '")]'));
+      var envTab = element(by.xpath('//a[contains(@class, "environment-tab") and contains(text(),\'' + env + '\')]'));
       browser.wait(function () {
         return envTab.isPresent();
       }, timeout).then(function (res) {
@@ -656,7 +656,7 @@ module.exports = function (config) {
 
   this.envHasTag = function(env, tag) {
     it('Environment ' + env + ' has tag ' + tag, function(next) {
-      var envTab = element(by.xpath('//a[contains(@class, "environment-tab") and contains(text(),"' + env + '")]/span[text()="' + tag + '"]'));
+      var envTab = element(by.xpath('//a[contains(@class, "environment-tab") and contains(text(),\'' + env + '\')]/span[text()="' + tag + '"]'));
       browser.wait(function () {
         return envTab.isPresent();
       }, timeout).then(function() {
@@ -682,7 +682,7 @@ module.exports = function (config) {
 
   this.iSeeEnv = function (env) {
     it('I see environment ' + env, function(next) {
-      var envTab = element(by.xpath('//a[contains(@class, "environment-tab") and contains(text(),"' + env + '")]'));
+      var envTab = element(by.xpath('//a[contains(@class, "environment-tab") and contains(text(),\'' + env + '\')]'));
       browser.wait(function () {
         return envTab.isPresent();
       }, timeout).then(function () {
@@ -693,7 +693,7 @@ module.exports = function (config) {
 
   this.iDontSeeEnv = function (env) {
     it('I see environment ' + env, function(next) {
-      var envTab = element(by.xpath('//a[contains(@class, "environment-tab") and contains(text(),"' + env + '")]'));
+      var envTab = element(by.xpath('//a[contains(@class, "environment-tab") and contains(text(),\'' + env + '\')]'));
       browser.wait(function () {
         return envTab.isPresent().then(function(res) {
           return !res;
@@ -758,8 +758,8 @@ module.exports = function (config) {
           return btn.isPresent().then(function (present) {
             if (present) {
               return btn.isEnabled().then(function(enabled) {
-                if (enabled) {
-                  return false;
+                if (!enabled) {
+                  return true;
                 }
 
                 return btn.getAttribute('class').then(function (classes) {
@@ -767,7 +767,6 @@ module.exports = function (config) {
                 });
               });
             }
-            return present;
           });
         }, timeout).then(function (value) {
           try {
@@ -786,7 +785,7 @@ module.exports = function (config) {
   this.btnEnabled = function (field) {
     it('I see ' + field + ' button is Enabled', function (next) {
       try {
-        var btn = element.all(by.xpath('//button[text()="' + field + '"]')).first();
+        var btn = element.all(by.xpath('//button[text()=\'' + field + '\']')).first();
         browser.wait(function () {
           return btn.isPresent().then(function (present) {
             if (present) {
@@ -1314,7 +1313,7 @@ module.exports = function (config) {
   };
   this.checkElementWithTextIsDisabled = function (text)   {
     it('I see ' + text + ' button is disabled', function (next) {
-      var ele = element.all(by.xpath('//*[text()="' + text + '"]')).first();
+      var ele = element.all(by.xpath('//*[text()=\'' + text + '\']')).first();
       browser.wait(function () {
         return ele.isPresent();
       }, timeout).then(function () {
@@ -1332,7 +1331,7 @@ module.exports = function (config) {
 
   this.checkElementWithTextIsNotDisabled = function (text) {
     it('I see ' + text + ' button is disabled', function (next) {
-      var ele = element(by.xpath('//*[text()="' + text + '"]'));
+      var ele = element(by.xpath('//*[text()=\'' + text + '\']'));
       browser.wait(function () {
         return ele.isPresent();
       }, timeout).then(function () {
