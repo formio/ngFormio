@@ -2325,7 +2325,7 @@ app.controller('FormPermissionController', [
     FormioAlerts
   ) {
     $scope.$on('permissionsChange', function() {
-      $scope.formio.saveForm(angular.copy($scope.currentForm)).then(function() {
+      $scope.formio.saveForm(angular.copy($scope.form)).then(function() {
         FormioAlerts.addAlert({
           type: 'success',
           message: 'Permissions Saved'
