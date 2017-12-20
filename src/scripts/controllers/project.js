@@ -386,6 +386,8 @@ app.controller('ProjectController', [
         })
           .then(function(response) {
             RemoteTokens.setRemoteToken($scope.projectUrl, response.data);
+            // Set remote token for projectId url as well.
+            RemoteTokens.setRemoteToken($scope.projectUrl.replace($scope.localProject.remote.project.name, 'project/' + $scope.localProject.remote.project._id), response.data);
             return $scope.formio
               .loadProject(null, {
                 ignoreCache: true
