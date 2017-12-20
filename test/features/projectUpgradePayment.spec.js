@@ -87,7 +87,7 @@ module.exports = function (actions) {
       actions.iSeeText('Payments will be charged to:');
       actions.iSeeText('Visa ending in 1111');
       actions.iSeeText('Expires on 01/25');
-      actions.iSeeText('Name on Card: Test');
+      // actions.iSeeText('Name on Card: Test');
       actions.clickOnElementWithText(' Confirm Billing Change');
       actions.iSeeTextIn("a.project-plan.label-warning","Independent");
       actions.iSeeText('$15/month');
@@ -95,7 +95,7 @@ module.exports = function (actions) {
       actions.iSeeText('Payments will be charged to:');
       actions.iSeeText('Visa ending in 1111');
       actions.iSeeText('Expires on 01/25');
-      actions.iSeeText('Name on Card: Test');
+      // actions.iSeeText('Name on Card: Test');
       actions.clickOnElementWithText(' Confirm Billing Change');
       actions.iSeeTextIn("a.project-plan.label-success","Team Pro");
       actions.iSeeText('$100/month');
@@ -120,7 +120,7 @@ module.exports = function (actions) {
       actions.iSeeText('Payments will be charged to:');
       actions.iSeeText('Visa ending in 1111');
       actions.iSeeText('Expires on 01/25');
-      actions.iSeeText('Name on Card: Test');
+      // actions.iSeeText('Name on Card: Test');
       actions.clickOnElementWithText(' Confirm Billing Change');
       actions.iSeeTextIn("a.project-plan.label-commercial","Enterprise");
       actions.iSeeText('$250/month');
