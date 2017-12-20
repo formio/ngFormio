@@ -259,12 +259,16 @@ app.directive('formList', function() {
       '$http',
       'AppConfig',
       'FormioUtils',
+      'FormioAlerts',
+      'SubmissionExport',
       function(
         $scope,
         $rootScope,
         $http,
         AppConfig,
-        FormioUtils
+        FormioUtils,
+        FormioAlerts,
+        SubmissionExport
       ) {
         $rootScope.activeSideBar = 'projects';
         $rootScope.noBreadcrumb = false;
@@ -287,20 +291,12 @@ app.directive('formList', function() {
         });
         $scope.export = function(form, type) {
           $scope.isBusy = true;
-          $http({
-            url: $scope.projectUrl + '/form/' + form._id + '/export?format=' + type,
-            method: 'GET',
-            responseType: 'blob'
-          }).then(function(response) {
+          SubmissionExport.export($scope.formio, form, type).then(function() {
             $scope.isBusy = false;
-            var a = document.createElement('a');
-            a.href = window.URL.createObjectURL(response.data);
-            a.download = form.name + '.' + type;
-            a.click();
-            window.URL.revokeObjectURL(a.href);
-          }).catch(function(error) {
+          }).catch(function(err) {
             $scope.isBusy = false;
-            console.error(error);
+            console.warn(err);
+            FormioAlerts.onError(err);
           });
         };
         $scope.componentCount = function(components) {
@@ -1751,6 +1747,7 @@ app.controller('FormSubmissionsController', [
   'GoogleAnalytics',
   'ngDialog',
   '$interpolate',
+  'SubmissionExport',
   function(
     $scope,
     $state,
@@ -1765,7 +1762,8 @@ app.controller('FormSubmissionsController', [
     formioComponents,
     GoogleAnalytics,
     ngDialog,
-    $interpolate
+    $interpolate,
+    SubmissionExport
   ) {
     if ($stateParams._vid) {
       $scope._vid = $stateParams._vid;
@@ -1778,22 +1776,13 @@ app.controller('FormSubmissionsController', [
     };
 
     $scope.export = function(form, type) {
-
       $scope.isBusy = true;
-      $http({
-        url: $scope.projectUrl + '/form/' + form._id + '/export?format=' + type + (!isNaN(parseInt($scope._vid)) ? '&_fvid=' + $scope._vid : ''),
-        method: 'GET',
-        responseType: 'blob'
-      }).then(function(response) {
+      SubmissionExport.export($scope.formio, form, type).then(function() {
         $scope.isBusy = false;
-        var a = document.createElement('a');
-        a.href = window.URL.createObjectURL(response.data);
-        a.download = form.name + '.' + type;
-        a.click();
-        window.URL.revokeObjectURL(a.href);
-      }).catch(function(error) {
+      }).catch(function(err) {
         $scope.isBusy = false;
-        console.error(error);
+        console.warn(err);
+        FormioAlerts.onError(err);
       });
     };
 
