@@ -662,6 +662,7 @@ module.exports = function (config) {
   };
 
   this.iSeeTextIn = function (ele, text) {
+    text = replacements(text);
     it('I see text "' + text + '"', function (next) {
       ele = (typeof (ele) == 'object') ? ele : element(by.css(ele, text));
       browser.wait(function () {

@@ -4,7 +4,7 @@ module.exports = function (actions) {
       actions.logout();
       actions.iAmLoggedInFor('projuser1');
       actions.goToPage('#/');
-      actions.clickOnClass('new-project-custom');
+      actions.clickOnElementWithText('New Project');
       actions.iSeeText('Project Title');
       actions.iSeeText('Description');
       actions.enterTextInField('#title', '${random-title>project1.title}');
@@ -16,7 +16,7 @@ module.exports = function (actions) {
       actions.logout();
       actions.iAmLoggedInFor('projuser1');
       actions.goToPage('#/');
-      actions.clickOnClass('new-project-custom');
+      actions.clickOnElementWithText('New Project');
       actions.iSeeText('Project Title');
       actions.iSeeText('Description');
       actions.btnDisabled(' Create Project');
@@ -26,7 +26,7 @@ module.exports = function (actions) {
       actions.logout();
       actions.iAmLoggedInFor('projuser1');
       actions.goToPage('#/');
-      actions.clickOnClass('new-project-custom');
+      actions.clickOnElementWithText('New Project');
       actions.iSeeText('Project Title');
       actions.iSeeText('Description');
       actions.enterTextInField('#title', '${random-title>project1.title}');
@@ -37,7 +37,7 @@ module.exports = function (actions) {
       actions.logout();
       actions.iAmLoggedInFor('projuser1');
       actions.goToPage('#/');
-      actions.clickOnClass('new-project-custom');
+      actions.clickOnElementWithText('New Project');
       actions.iSeeText('Project Title');
       actions.iSeeText('Description');
       actions.enterTextInField('#title', '1234567890123456789012345678901234567890123456789012345678901234');
@@ -52,7 +52,7 @@ module.exports = function (actions) {
       actions.iSeeTextIn('.project.well>h4>a', '${project3.title}');
       actions.clickOnButton('Manage');
       actions.portalIamOn('${project3.title}');
-      actions.clickOnClass('fa-cog');
+      actions.clickOnClass('.fa.fa-cog');
       actions.clickOnButton('Save Project');
       actions.iSeeTextIn('.toast-message', 'Project settings saved.');
     });
@@ -65,7 +65,7 @@ module.exports = function (actions) {
       actions.iSeeTextIn('.project.well>h4>a', '${project4.title}');
       actions.clickOnButton('Manage');
       actions.portalIamOn('${project4.title}');
-      actions.clickOnClass('fa-cog');
+      actions.clickOnClass('.fa.fa-cog');
       actions.enterTextInField('#title', '${empty}');
       actions.btnDisabled(' Save Project');
     });
@@ -78,7 +78,7 @@ module.exports = function (actions) {
       actions.iSeeTextIn('.project.well>h4>a', '${project5.title}');
       actions.clickOnButton('Manage');
       actions.portalIamOn('${project5.title}');
-      actions.clickOnClass('fa-cog');
+      actions.clickOnClass('.fa.fa-cog');
       actions.enterTextInField('#description', '${empty}');
       actions.clickOnButton('Save Project');
       actions.iSeeTextIn('.toast-message', 'Project settings saved.');
@@ -88,12 +88,12 @@ module.exports = function (actions) {
       actions.logout();
       actions.iAmLoggedInFor('projuser7');
       actions.goToPage("#/");
-      actions.clickOnClass('fa-close');
+      actions.clickOnClass('.fa.fa-close');
       actions.projectExisting('${random-title>project7.title}', '${random-description>project7.description}');
       actions.iSeeTextIn('.project.well>h4>a', '${project7.title}');
       actions.clickOnButton('Manage');
       actions.portalIamOn('${project7.title}');
-      actions.clickOnClass('fa-cog');
+      actions.clickOnClass('.fa.fa-cog');
       actions.iSeeText("To remove this project and all of it\'s environments, select this delete button.");
       actions.iSeeTextIn('.btn.btn-danger.ng-binding', 'Delete ${project7.title} Project');
       actions.clickOnElementWithText('Delete ${project7.title} Project');
