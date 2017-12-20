@@ -37,19 +37,15 @@ module.exports = function(app) {
             }
           };
 
-
-         var allowSubmission = true;
           $scope.hasError = function() {
-            var errValue = clicked && (settings.action === 'submit') && $scope.formioForm.$invalid && !$scope.formioForm.$pristine;
-            if (errValue && $scope.formioForm.$invalid) {
-              allowSubmission = false;
+            if (clicked && (settings.action === 'submit') && $scope.formioForm.$invalid && !$scope.formioForm.$pristine) {
               $scope.disableBtn = true;
+              return true
             } else {
               clicked = false;
-              allowSubmission = true;
-              $scope.disableBtn = false
+              $scope.disableBtn = false;
+              return false
             }
-            return errValue
           };
 
           var onCustom = function() {
@@ -109,11 +105,7 @@ module.exports = function(app) {
             if (componentId !== $scope.componentId) {
               return;
             }
-            if (allowSubmission === true) {
-              onClick();
-            } else {
-              $scope.hasError();
-            }
+            onClick();
           });
 
           $scope.openOAuth = function(settings) {
