@@ -245,7 +245,6 @@ module.exports = [
 
                 // Set Relative Maximum Date
                 formioUtils.jsonLogic.add_operation("relativeMaxDate", function(relativeMaxDate){
-                  console.log("looks good");
                   return moment().add(relativeMaxDate, "days").toDate();
                 });
 
