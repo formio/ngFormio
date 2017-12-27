@@ -223,22 +223,12 @@ module.exports = [
               if (_get($scope.component, 'validate.json')) {
                 var input;
 
-                // Set Minimum Valid Date.
-                formioUtils.jsonLogic.add_operation("minDate", function(minDate){
-                  return moment(minDate).toDate()
-                });
-
-                // Set Maximum Valid Date.
-                formioUtils.jsonLogic.add_operation("maxDate", function(maxDate){
-                  return moment(maxDate).toDate()
-                });
-
                 // Retrieve Any Date
                 formioUtils.jsonLogic.add_operation("getDate", function(date){
                   return moment(date).toDate()
                 });
 
-                // Set Reactive Minimum Date
+                // Set Relative Minimum Date
                 formioUtils.jsonLogic.add_operation("relativeMinDate", function(relativeMinDate){
                   return moment().subtract(relativeMinDate, "days").toDate()
                 });
