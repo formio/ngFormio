@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Locking stages
  - Framework support
  - New Environments
+ - Custom Form properties.
 
 ### Changed
  - Projects are created from platforms, not app templates
