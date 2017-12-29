@@ -126,17 +126,27 @@ app.controller('TeamViewController', [
     };
 
     $scope.selectMembers = [];
+    var notFoundMember = {
+      data: {
+        name: 'Not Found'
+      }
+    };
 
     $scope.refreshMembers = function(input) {
-      Formio.request(AppConfig.apiBase + '/team/members?limit=100&name=' + input, 'GET')
+      Formio.request(AppConfig.apiBase + '/team/members?&name=' + input, 'GET')
         .then(function(members) {
-          $scope.selectMembers = members;
+          $scope.selectMembers = members.length ? members : [ _.clone(notFoundMember) ];
           $scope.$apply();
         });
     };
 
     $scope.changeRole = function(member, role) {
       $scope.add.Person = undefined;
+
+      if (member.data.name === notFoundMember.data.name) {
+        return;
+      }
+
       _.remove($scope.team.data.admins, { _id: member._id });
       _.remove($scope.team.data.members, { _id: member._id });
       if (role) {
