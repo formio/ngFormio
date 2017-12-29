@@ -142,7 +142,11 @@ module.exports = function() {
         if (mask) {
           inputMask = maskInput({
             inputElement: input,
-            mask: mask
+            mask: mask,
+            showMask: true,
+            keepCharPositions: false,
+            guide: true,
+            placeholderChar: '_'
           });
         }
       }
