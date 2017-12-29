@@ -1,4 +1,4 @@
-/*! ng-formio v2.26.4 | https://unpkg.com/ng-formio@2.26.4/LICENSE.txt */
+/*! ng-formio v2.26.5 | https://unpkg.com/ng-formio@2.26.5/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 exports.defaults = {};
 
@@ -13,6 +13,7 @@ exports.set = function(name, value, options) {
   var path     = opts.path     !== undefined ? opts.path     : (defaults.path !== undefined ? defaults.path : '/');
   var secure   = opts.secure   !== undefined ? opts.secure   : defaults.secure;
   var httponly = opts.httponly !== undefined ? opts.httponly : defaults.httponly;
+  var samesite = opts.samesite !== undefined ? opts.samesite : defaults.samesite;
 
   // Determine cookie expiration date
   // If succesful the result will be a valid Date, otherwise it will be an invalid Date or false(ish)
@@ -21,7 +22,7 @@ exports.set = function(name, value, options) {
       typeof expires === 'number' ? new Date().getTime() + (expires * 864e5) :
       // else expires should be either a Date object or in a format recognized by Date.parse()
       expires
-  ) : '';
+  ) : 0;
 
   // Set cookie
   document.cookie = name.replace(/[^+#$&^`|]/g, encodeURIComponent)                // Encode cookie name
@@ -29,31 +30,31 @@ exports.set = function(name, value, options) {
   .replace(')', '%29') +
   '=' + value.replace(/[^+#$&/:<-\[\]-}]/g, encodeURIComponent) +                  // Encode cookie value (RFC6265)
   (expDate && expDate.getTime() >= 0 ? ';expires=' + expDate.toUTCString() : '') + // Add expiration date
-  (domain   ? ';domain=' + domain : '') +                                          // Add domain
-  (path     ? ';path='   + path   : '') +                                          // Add path
-  (secure   ? ';secure'           : '') +                                          // Add secure option
-  (httponly ? ';httponly'         : '');                                           // Add httponly option
+  (domain   ? ';domain=' + domain     : '') +                                      // Add domain
+  (path     ? ';path='   + path       : '') +                                      // Add path
+  (secure   ? ';secure'               : '') +                                      // Add secure option
+  (httponly ? ';httponly'             : '') +                                      // Add httponly option
+  (samesite ? ';samesite=' + samesite : '');                                       // Add samesite option
 };
 
 exports.get = function(name) {
   var cookies = document.cookie.split(';');
-
+  
   // Iterate all cookies
-  for(var i = 0; i < cookies.length; i++) {
-    var cookie = cookies[i];
-    var cookieLength = cookie.length;
+  while(cookies.length) {
+    var cookie = cookies.pop();
 
     // Determine separator index ("name=value")
     var separatorIndex = cookie.indexOf('=');
 
     // IE<11 emits the equal sign when the cookie value is empty
-    separatorIndex = separatorIndex < 0 ? cookieLength : separatorIndex;
+    separatorIndex = separatorIndex < 0 ? cookie.length : separatorIndex;
 
-    var cookie_name = decodeURIComponent(cookie.substring(0, separatorIndex).replace(/^\s+/, ''));
+    var cookie_name = decodeURIComponent(cookie.slice(0, separatorIndex).replace(/^\s+/, ''));
 
     // Return cookie value if the name matches
     if (cookie_name === name) {
-      return decodeURIComponent(cookie.substring(separatorIndex + 1, cookieLength));
+      return decodeURIComponent(cookie.slice(separatorIndex + 1));
     }
   }
 
@@ -76,20 +77,19 @@ exports.all = function() {
   var cookies = document.cookie.split(';');
 
   // Iterate all cookies
-  for(var i = 0; i < cookies.length; i++) {
-	  var cookie = cookies[i];
-    var cookieLength = cookie.length;
+  while(cookies.length) {
+    var cookie = cookies.pop();
 
-	  // Determine separator index ("name=value")
-	  var separatorIndex = cookie.indexOf('=');
+    // Determine separator index ("name=value")
+    var separatorIndex = cookie.indexOf('=');
 
-	  // IE<11 emits the equal sign when the cookie value is empty
-	  separatorIndex = separatorIndex < 0 ? cookieLength : separatorIndex;
+    // IE<11 emits the equal sign when the cookie value is empty
+    separatorIndex = separatorIndex < 0 ? cookie.length : separatorIndex;
 
     // add the cookie name and value to the `all` object
-	  var cookie_name = decodeURIComponent(cookie.substring(0, separatorIndex).replace(/^\s+/, ''));
-	  all[cookie_name] = decodeURIComponent(cookie.substring(separatorIndex + 1, cookieLength));
-	}
+    var cookie_name = decodeURIComponent(cookie.slice(0, separatorIndex).replace(/^\s+/, ''));
+    all[cookie_name] = decodeURIComponent(cookie.slice(separatorIndex + 1));
+  }
 
   return all;
 };
@@ -1328,6 +1328,7 @@ var Formio = function () {
         return Promise.reject('You must be authenticated to generate a temporary auth token.');
       }
       return this.makeRequest('tempToken', this.projectUrl + '/token', 'GET', null, {
+        ignoreCache: true,
         header: new Headers({
           'x-expire': expire,
           'x-allow': allowed
@@ -2561,6 +2562,29 @@ _operators.lodashOperators.forEach(function (name) {
   return _jsonLogicJs2.default.add_operation('_' + name, _lodash2.default[name]);
 });
 
+// Fix the "in" operand for jsonlogic.
+// We can remove this once https://github.com/jwadhams/json-logic-js/pull/47 is committed.
+_jsonLogicJs2.default.add_operation('in', function (a, b) {
+  if (!b) return false;
+  if (typeof b.indexOf === "undefined") return false;
+  return b.indexOf(a) !== -1;
+});
+
+// Retrieve Any Date
+_jsonLogicJs2.default.add_operation("getDate", function (date) {
+  return (0, _moment2.default)(date).toISOString();
+});
+
+// Set Relative Minimum Date
+_jsonLogicJs2.default.add_operation("relativeMinDate", function (relativeMinDate) {
+  return (0, _moment2.default)().subtract(relativeMinDate, "days").toISOString();
+});
+
+// Set Relative Maximum Date
+_jsonLogicJs2.default.add_operation("relativeMaxDate", function (relativeMaxDate) {
+  return (0, _moment2.default)().add(relativeMaxDate, "days").toISOString();
+});
+
 var FormioUtils = {
   jsonLogic: _jsonLogicJs2.default, // Share
 
@@ -2899,11 +2923,18 @@ var FormioUtils = {
 
       return value.toString() === cond.eq.toString() === (cond.show.toString() === 'true');
     } else if (component.conditional && component.conditional.json) {
-      return _jsonLogicJs2.default.apply(component.conditional.json, {
-        data: data,
-        row: row,
-        _: _lodash2.default
-      });
+      var retVal = true;
+      try {
+        retVal = _jsonLogicJs2.default.apply(component.conditional.json, {
+          data: data,
+          row: row,
+          _: _lodash2.default
+        });
+      } catch (err) {
+        console.warn('An error occurred in jsonLogic condition for ' + component.key, err);
+        retVal = true;
+      }
+      return retVal;
     }
 
     // Default to show.
@@ -3016,6 +3047,17 @@ var FormioUtils = {
   },
   isValidDate: function isValidDate(date) {
     return (0, _isDate3.default)(date) && !(0, _isNaN3.default)(date.getDate());
+  },
+  getLocaleDateFormatInfo: function getLocaleDateFormatInfo(locale) {
+    var formatInfo = {};
+
+    var day = 21;
+    var exampleDate = new Date(2017, 11, day);
+    var localDateString = exampleDate.toLocaleDateString(locale);
+
+    formatInfo.dayFirst = localDateString.slice(0, 2) === day.toString();
+
+    return formatInfo;
   }
 };
 
