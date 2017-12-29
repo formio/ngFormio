@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Framework support
  - New Environments
  - 'Not Found' option for team members search.
+ - Custom Form properties.
 
 ### Changed
  - Projects are created from platforms, not app templates
