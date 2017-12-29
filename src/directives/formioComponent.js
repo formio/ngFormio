@@ -1,4 +1,6 @@
 var _get = require('lodash/get');
+var formioUtils = require('formiojs/utils');
+var moment = require('moment');
 
 module.exports = [
   'Formio',
@@ -220,6 +222,21 @@ module.exports = [
               // Process jsonLogic stuff if present.
               if (_get($scope.component, 'validate.json')) {
                 var input;
+
+                // Retrieve Any Date
+                formioUtils.jsonLogic.add_operation("getDate", function(date){
+                  return moment(date).toDate()
+                });
+
+                // Set Relative Minimum Date
+                formioUtils.jsonLogic.add_operation("relativeMinDate", function(relativeMinDate){
+                  return moment().subtract(relativeMinDate, "days").toDate()
+                });
+
+                // Set Relative Maximum Date
+                formioUtils.jsonLogic.add_operation("relativeMaxDate", function(relativeMaxDate){
+                  return moment().add(relativeMaxDate, "days").toDate();
+                });
 
                 // Only json parse once.
                 if (typeof $scope.component.validate.json === 'string') {
