@@ -8,8 +8,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
  - Confirmation to cancel a wizard.
 
+### Fixed
+ - Bugfix/button disable
+
 ### Changed
  - Upgraded formiojs to version 2.25.8
+ - Show mask by default on masked fields.
 
 ## 2.26.4
 ### Fixed

@@ -103303,7 +103303,11 @@ module.exports = function() {
         if (mask) {
           inputMask = maskInput({
             inputElement: input,
-            mask: mask
+            mask: mask,
+            showMask: true,
+            keepCharPositions: false,
+            guide: true,
+            placeholderChar: '_'
           });
         }
       }
@@ -103947,14 +103951,19 @@ module.exports = function() {
         };
 
         $scope.cancel = function() {
-          $scope.clear();
-          FormioUtils.alter('cancel', $scope, function(err) {
-            if (err) {
-              return this.showAlerts(err.alerts);
-            }
-            showPage(true);
-            $scope.$emit('cancel');
-          }.bind(this));
+          if(confirm('Are you sure you want to cancel?')){
+            $scope.clear();
+            FormioUtils.alter('cancel', $scope, function(err) {
+              if (err) {
+                return this.showAlerts(err.alerts);
+              }
+              showPage(true);
+              $scope.$emit('cancel');
+            }.bind(this));
+          }
+          else {
+            return;
+          }
         };
 
         $scope.pageHasErrors = {};
