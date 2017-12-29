@@ -22,7 +22,7 @@
     "angular-swagger-ui": "https://github.com/randallknutson/angular-swagger-ui.git#master",
     "number-abbreviate": "^1.2.1",
     "ng-formio": "^2.26.5",
-    "ng-formio-builder": "^2.26.2",
+    "ng-formio-builder": "^2.26.3",
     "ng-tags-input": "^3.1.1",
     "chance": "^1.0.4",
     "ng-file-upload": "^12.2.13",
