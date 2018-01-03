@@ -1,4 +1,5 @@
-<label ng-if="(options.building || (component.label && !component.hideLabel)) && component.labelPosition !== 'bottom'" for="{{ componentId }}" class="control-label" ng-class="{'field-required': isRequired(component)}" ng-style="getLabelStyles(component)">
+<label ng-if="(options.building || (component.label && !component.hideLabel)) && component.labelPosition !== 'bottom'" for="{{ componentId }}" id="{{ componentId+'Label' }}" class="control-label" ng-class="{'field-required': isRequired(component)}"
+       ng-style="getLabelStyles(component)">
   {{ component.label | formioTranslate:null:options.building }}
   <formio-component-tooltip></formio-component-tooltip>
 </label>
@@ -8,6 +9,8 @@
   ui-select-open-on-focus
   ng-model="data[component.key]"
   safe-multiple-to-single
+  aria-labelledby="{{ componentId +'Label'}}"
+  aria-describedby="{{componentId + 'Desc'}}"
   name="{{ componentId }}"
   ng-disabled="readOnly"
   ng-required="isRequired(component)"
@@ -30,6 +33,6 @@
   <formio-component-tooltip></formio-component-tooltip>
 </label>
 <div ng-if="!!component.description" class="help-block">
-  <span>{{ component.description }}</span>
+  <span id="{{ componentId+'Desc' }}">{{ component.description }}</span>
 </div>
 <formio-errors ng-if="::!options.building"></formio-errors>

@@ -1,12 +1,14 @@
 <div class="daySelect form row">
   <div class="form-group col-xs-3" ng-if="component.dayFirst && !component.fields.day.hide">
-    <label for="{{componentId}}-day" ng-if="component.inputsLabelPosition !== 'bottom'" ng-class="{'field-required': component.fields.day.required}" ng-style="getLabelStyles(component)">{{ "Day" | formioTranslate:null:options.building }}</label>
+    <label for="{{componentId}}-day" id="{{componentId}}-dayLabel" ng-if="component.inputsLabelPosition !== 'bottom'"
+           ng-class="{'field-required': component.fields.day.required}" ng-style="getLabelStyles(component)">{{ "Day" | formioTranslate:null:options.building }}</label>
     <div ng-style="getInputStyles(component)">
         <input
         class="form-control"
         type="number"
         id="{{componentId}}-day"
         ng-model="date.day"
+        aria-labelledby="{{ componentId }}-dayLabel"
         ng-change="onChange()"
         style="padding-right: 10px;"
         ng-attr-placeholder="{{component.fields.day.placeholder}}"
@@ -17,25 +19,28 @@
         ng-disabled="readOnly"
       />
     </div>
-    <label for="{{componentId}}-day" ng-if="component.inputsLabelPosition === 'bottom'" ng-class="{'field-required': component.fields.day.required}" class="control-label--bottom">{{ "Day" | formioTranslate:null:options.building }}</label>
+    <label for="{{componentId}}-day" id="{{componentId}}-dayLabel" ng-if="component.inputsLabelPosition === 'bottom'"
+           ng-class="{'field-required': component.fields.day.required}" class="control-label--bottom">{{ "Day" | formioTranslate:null:options.building }}</label>
   </div>
   <div class="form-group col-xs-4" ng-if="!component.fields.month.hide">
-    <label for="{{componentId}}-month" ng-if="component.inputsLabelPosition !== 'bottom'" ng-class="{'field-required': component.fields.month.required}" ng-style="getLabelStyles(component)">{{ "Month" | formioTranslate:null:options.building }}</label>
+    <label for="{{componentId}}-month" id="{{componentId}}-monthLabel" ng-if="component.inputsLabelPosition !== 'bottom'" ng-class="{'field-required': component.fields.month.required}" ng-style="getLabelStyles(component)">{{ "Month" | formioTranslate:null:options.building }}</label>
     <div ng-style="getInputStyles(component)">
       <select
         class="form-control"
         type="text"
         id="{{componentId}}-month"
+        aria-labelledby="{{ componentId }}-monthLabel"
         ng-model="date.month"
         ng-change="onChange()"
         ng-disabled="readOnly"
         ng-options="month.value as month.label | formioTranslate:null:options.building for month in months"
       ></select>
     </div>
-    <label for="{{componentId}}-month" ng-if="component.inputsLabelPosition === 'bottom'" ng-class="{'field-required': component.fields.month.required}" class="control-label--bottom">{{ "Month" | formioTranslate:null:options.building }}</label>
+    <label for="{{componentId}}-month" id="{{componentId}}-monthLabel" ng-if="component.inputsLabelPosition === 'bottom'" ng-class="{'field-required': component.fields.month.required}" class="control-label--bottom">{{ "Month" | formioTranslate:null:options.building }}</label>
   </div>
   <div class="form-group col-xs-3" ng-if="!component.dayFirst && !component.fields.day.hide">
-    <label for="{{componentId}}-day" ng-if="component.inputsLabelPosition !== 'bottom'" ng-class="{'field-required': component.fields.day.required}" ng-style="getLabelStyles(component)">{{ "Day" | formioTranslate:null:options.building }}</label>
+    <label for="{{componentId}}-day1" id="{{componentId}}-day1Label" ng-if="component.inputsLabelPosition !== 'bottom'"
+           ng-class="{'field-required': component.fields.day.required}" ng-style="getLabelStyles(component)">{{ "Day" | formioTranslate:null:options.building }}</label>
     <div ng-style="getInputStyles(component)">
       <input
         class="form-control"
@@ -44,6 +49,7 @@
         ng-model="date.day"
         ng-change="onChange()"
         style="padding-right: 10px;"
+        aria-labelledby="{{ componentId }}-day1Label"
         ng-attr-placeholder="{{component.fields.day.placeholder}}"
         day-part
         characters="2"
@@ -52,10 +58,10 @@
         ng-disabled="readOnly"
       />
     </div>
-    <label for="{{componentId}}-day" ng-if="component.inputsLabelPosition === 'bottom'" ng-class="{'field-required': component.fields.day.required}" class="control-label--bottom">{{ "Day" | formioTranslate:null:options.building }}</label>
+    <label for="{{componentId}}-day" id="{{componentId}}-day1Label" ng-if="component.inputsLabelPosition === 'bottom'" ng-class="{'field-required': component.fields.day.required}" class="control-label--bottom">{{ "Day" | formioTranslate:null:options.building }}</label>
   </div>
   <div class="form-group col-xs-5" ng-if="!component.fields.year.hide">
-    <label for="{{componentId}}-year" ng-if="component.inputsLabelPosition !== 'bottom'" ng-class="{'field-required': component.fields.year.required}" ng-style="getLabelStyles(component)">{{ "Year" | formioTranslate:null:options.building }}</label>
+    <label for="{{componentId}}-year" id="{{componentId}}-yearLabel" ng-if="component.inputsLabelPosition !== 'bottom'" ng-class="{'field-required': component.fields.year.required}" ng-style="getLabelStyles(component)">{{ "Year" | formioTranslate:null:options.building }}</label>
     <div ng-style="getInputStyles(component)">
       <input
         class="form-control"
@@ -63,6 +69,7 @@
         id="{{componentId}}-year"
         ng-model="date.year"
         ng-change="onChange()"
+        aria-labelledby="{{ componentId }}-yearLabel"
         style="padding-right: 10px;"
         ng-attr-placeholder="{{component.fields.year.placeholder}}"
         characters="4"
@@ -71,6 +78,6 @@
         ng-disabled="readOnly"
       />
     </div>
-    <label for="{{componentId}}-year" ng-if="component.inputsLabelPosition === 'bottom'" ng-class="{'field-required': component.fields.year.required}" class="control-label--bottom">{{ "Year" | formioTranslate:null:options.building }}</label>
+    <label for="{{componentId}}-year" id="{{componentId}}-yearLabel" ng-if="component.inputsLabelPosition === 'bottom'" ng-class="{'field-required': component.fields.year.required}" class="control-label--bottom">{{ "Year" | formioTranslate:null:options.building }}</label>
   </div>
 </div>

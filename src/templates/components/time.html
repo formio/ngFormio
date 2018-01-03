@@ -6,6 +6,8 @@
   name="{{ componentId }}"
   tabindex="{{ component.tabindex || 0 }}"
   ng-disabled="readOnly"
+  aria-labelledby="{{ componentId +'Label'}}"
+  aria-describedby="{{componentId + 'Desc'}}"
   ng-model="data[component.key]"
   safe-multiple-to-single
   ng-required="isRequired(component)"

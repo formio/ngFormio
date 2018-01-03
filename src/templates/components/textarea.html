@@ -6,6 +6,8 @@
   safe-multiple-to-single
   id="{{ componentId }}"
   name="{{ componentId }}"
+  aria-labelledby="{{ componentId +'Label'}}"
+  aria-describedby="{{componentId + 'Desc'}}"
   tabindex="{{ component.tabindex || 0 }}"
   ng-attr-placeholder="{{ component.placeholder | formioTranslate:null:options.building }}"
   custom-validator="component.validate.custom"

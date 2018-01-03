@@ -8,6 +8,6 @@ module.exports = function() {
     ' ng-class="{ \'text-muted\': component.type !== \'button\' }"' +
     ' uib-tooltip="{{ component.tooltip }}"' +
     ' tooltip-placement="right"' +
-    ' tooltip-popup-close-delay="100"></i>'
+    ' tooltip-popup-close-delay="100" id="{{component.key+\'Desc\'}}"></i>'
   };
 };

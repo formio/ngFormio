@@ -13,6 +13,8 @@
     datetime-picker="{{ component.format }}"
     datepicker-mode="component.datepickerMode"
     when-closed="onClosed()"
+    aria-labelledby="{{ componentId +'Label'}}"
+    aria-describedby="{{componentId + 'Desc'}}"
     custom-validator="component.validate.custom"
     enable-date="component.enableDate"
     enable-time="component.enableTime"
