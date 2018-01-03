@@ -52,7 +52,7 @@ module.exports = function(app) {
           tree: true,
           components: [],
           tableView: true,
-          label: '',
+          label: 'Data Grid',
           key: 'datagrid',
           protected: false,
           persistent: true,

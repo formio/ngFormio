@@ -38,7 +38,7 @@ module.exports = function(app) {
           tableView: true,
           inputType: 'time',
           format: 'HH:mm',
-          label: '',
+          label: 'Time Field',
           key: 'timeField',
           placeholder: '',
           prefix: '',

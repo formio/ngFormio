@@ -14,7 +14,7 @@ module.exports = function(app) {
         settings: {
           input: true,
           tableView: true,
-          label: '',
+          label: 'Signature',
           key: 'signature',
           placeholder: '',
           footer: 'Sign above',

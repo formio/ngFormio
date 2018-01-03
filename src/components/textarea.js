@@ -77,7 +77,7 @@ module.exports = function(app) {
         settings: {
           input: true,
           tableView: true,
-          label: '',
+          label: 'Text Area Field',
           key: 'textareaField',
           placeholder: '',
           prefix: '',

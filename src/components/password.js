@@ -12,7 +12,7 @@ module.exports = function(app) {
           input: true,
           tableView: false,
           inputType: 'password',
-          label: '',
+          label: 'Password Field',
           key: 'passwordField',
           placeholder: '',
           prefix: '',

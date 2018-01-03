@@ -28,7 +28,7 @@ module.exports = function(app) {
         settings: {
           input: true,
           tableView: true,
-          label: '',
+          label: 'Survey',
           key: 'survey',
           questions: [],
           values: [],

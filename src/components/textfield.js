@@ -13,7 +13,7 @@ module.exports = function(app) {
           tableView: true,
           inputType: 'text',
           inputMask: '',
-          label: '',
+          label: 'Text Field',
           key: 'textField',
           placeholder: '',
           prefix: '',

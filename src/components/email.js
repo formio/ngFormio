@@ -10,7 +10,7 @@ module.exports = function(app) {
           input: true,
           tableView: true,
           inputType: 'email',
-          label: '',
+          label: 'Email Field',
           key: 'emailField',
           placeholder: '',
           prefix: '',
