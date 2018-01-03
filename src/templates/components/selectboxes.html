@@ -1,4 +1,30 @@
-<div class="select-boxes">
+<fieldset ng-if="component.fieldSet">
+  <legend ng-if="component.label">
+    {{ component.label }}
+    <formio-component-tooltip></formio-component-tooltip>
+  </legend>
+  <div class="select-boxes">
+    <formio-select-boxes
+      name="{{componentId}}"
+      ng-model="data[component.key]"
+      ng-model-options="{allowInvalid: true}"
+      component="component"
+      component-id="componentId"
+      read-only="readOnly"
+      ng-required="isRequired(component)"
+      custom-validator="component.validate.custom"
+      grid-row="gridRow"
+      grid-col="gridCol"
+      options="options"
+      ng-style="getInputGroupStyles(component)"
+    ></formio-select-boxes>
+    <div ng-if="!!component.description" class="help-block">
+      <span>{{ component.description }}</span>
+    </div>
+    <formio-errors ng-if="::!options.building"></formio-errors>
+  </div>
+</fieldset>
+<div class="select-boxes" ng-if="!component.fieldSet">
   <label ng-if="(options.building || (component.label && !component.hideLabel)) && component.labelPosition !== 'bottom'" for="{{ componentId }}" class="control-label" ng-class="{'field-required': isRequired(component)}" ng-style="getLabelStyles(component)">
     {{ component.label }}
     <formio-component-tooltip></formio-component-tooltip>
