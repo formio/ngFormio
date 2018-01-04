@@ -1,7 +1,7 @@
 <upgrade-warning ng-if="!minPlan('independent') && projectSettingsVisible()" warning="Upgrade your project to a paid plan to access OAuth settings."></upgrade-warning>
 <uib-accordion close-others="true">
-  <div uib-accordion-group class="panel panel-default" heading="OAuth2">
-    <ng-include src="'views/project/env/authentication/oauth/oauth2.html'"></ng-include>
+  <div uib-accordion-group class="panel panel-default" heading="OpenID">
+    <ng-include src="'views/project/env/authentication/oauth/openid.html'"></ng-include>
   </div>
   <div uib-accordion-group class="panel panel-default" heading="GitHub">
     <ng-include src="'views/project/env/authentication/oauth/github.html'"></ng-include>

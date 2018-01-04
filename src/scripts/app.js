@@ -424,6 +424,11 @@ angular
           parent: 'project.env',
           templateUrl: 'views/project/env/authentication/formio.html'
         })
+        .state('project.env.authentication.saml', {
+          url: '/authentication/saml',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/authentication/saml.html'
+        })
         .state('project.access', {
           url: '/access',
           templateUrl: 'views/project/access/index.html',
