@@ -5,7 +5,7 @@
       <formio-component-tooltip></formio-component-tooltip>
     </legend>
     <div ng-class="component.inline ? 'radio-inline' : 'radio'" ng-repeat="v in component.values track by $index">
-      <label class="control-label" for="{{ componentId }}-{{ v.value }}" ng-style="getOptionLabelStyles(component)">
+      <label class="control-label" for="{{ componentId }}-{{ v.value }}" id="{{ componentId +'-'+ v.value+'Label' }}" ng-style="getOptionLabelStyles(component)">
         <span ng-if="topOrLeftOptionLabel(component)">{{ v.label | formioTranslate:null:options.building }}</span>
         <input
           type="{{ component.inputType }}"
@@ -13,6 +13,7 @@
           value="{{ v.value }}"
           tabindex="{{ component.tabindex || 0 }}"
           ng-model="data[component.key]"
+          aria-labelledby="{{componentId +'-'+ v.value+'Label'}}"
           ng-required="isRequired(component)"
           custom-validator="component.validate.custom"
           ng-disabled="readOnly"
@@ -24,13 +25,14 @@
   </fieldset>
   <div ng-class="component.inline ? 'radio-inline' : 'radio'" ng-repeat="v in component.values track by $index"
        ng-if="!component.fieldSet">
-    <label class="control-label" for="{{ componentId }}-{{ v.value }}" ng-style="getOptionLabelStyles(component)">
+    <label class="control-label" for="{{ componentId }}-{{ v.value }}" id="{{ componentId +'-'+ v.value+'Label' }}" ng-style="getOptionLabelStyles(component)">
       <span ng-if="topOrLeftOptionLabel(component)">{{ v.label | formioTranslate:null:options.building }}</span>
       <input
         type="{{ component.inputType }}"
         id="{{ componentId }}-{{ v.value }}"
         value="{{ v.value }}"
         tabindex="{{ component.tabindex || 0 }}"
+        aria-labelledby="{{componentId +'-'+ v.value+'Label'}}"
         ng-model="data[component.key]"
         ng-required="isRequired(component)"
         custom-validator="component.validate.custom"

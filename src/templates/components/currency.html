@@ -9,6 +9,8 @@
   ng-required="isRequired(component)"
   ng-disabled="readOnly"
   safe-multiple-to-single
+  aria-labelledby="{{ componentId +'Label'}}"
+  aria-describedby="{{componentId + 'Desc'}}"
   ng-attr-placeholder="{{ component.placeholder }}"
   custom-validator="component.validate.custom"
   formio-mask="currency"

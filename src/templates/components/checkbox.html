@@ -1,5 +1,6 @@
 <div class="checkbox">
-  <label for="{{ componentId }}" ng-class="{'field-required': isRequired(component)}" ng-style="getOptionLabelStyles(component)">
+  <label for="{{ componentId }}" ng-class="{'field-required': isRequired(component)}" id="{{ componentId+'Label' }}"
+         ng-style="getOptionLabelStyles(component)">
     <span ng-if="(options.building || !(component.hideLabel && component.datagridLabel === false)) && topOrLeftOptionLabel(component)">
       {{ component.label | formioTranslate:null:options.building }}
       <formio-component-tooltip></formio-component-tooltip>
@@ -11,6 +12,8 @@
       name="{{ component.name }}"
       value="{{ component.value }}"
       tabindex="{{ component.tabindex || 0 }}"
+      aria-labelledby="{{ componentId +'Label'}}"
+      aria-describedby="{{componentId + 'Desc'}}"
       ng-disabled="readOnly"
       ng-model="data[component.name]"
       ng-required="component.validate.required"
@@ -24,6 +27,8 @@
       tabindex="{{ component.tabindex || 0 }}"
       ng-disabled="readOnly"
       ng-model="data[component.key]"
+      aria-labelledby="{{ componentId +'Label'}}"
+      aria-describedby="{{componentId + 'Desc'}}"
       ng-required="isRequired(component)"
       custom-validator="component.validate.custom"
       ng-style="getOptionInputStyles(component)"
@@ -35,5 +40,5 @@
   </label>
 </div>
 <div ng-if="!!component.description" class="help-block">
-  <span>{{ component.description }}</span>
+  <span id="{{ componentId+'Desc' }}">{{ component.description }}</span>
 </div>

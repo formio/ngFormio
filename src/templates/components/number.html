@@ -8,6 +8,8 @@
   ng-model="data[component.key]"
   ng-required="isRequired(component)"
   ng-disabled="readOnly"
+  aria-labelledby="{{ componentId +'Label'}}"
+  aria-describedby="{{componentId + 'Desc'}}"
   safe-multiple-to-single
   formio-min="{{ component.validate.min }}"
   formio-max="{{ component.validate.max }}"
