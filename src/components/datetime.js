@@ -62,7 +62,7 @@ module.exports = function(app) {
         settings: {
           input: true,
           tableView: true,
-          label: '',
+          label: 'Date Time Field',
           key: 'datetimeField',
           placeholder: '',
           format: 'yyyy-MM-dd HH:mm a',

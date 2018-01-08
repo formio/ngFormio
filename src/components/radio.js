@@ -19,7 +19,7 @@ module.exports = function(app) {
           input: true,
           tableView: true,
           inputType: 'radio',
-          label: '',
+          label: 'Radio Field',
           key: 'radioField',
           values: [],
           defaultValue: '',

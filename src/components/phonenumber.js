@@ -11,7 +11,7 @@ module.exports = function(app) {
           tableView: true,
           inputType: 'tel',
           inputMask: '(999) 999-9999',
-          label: '',
+          label: 'Phone Number Field',
           key: 'phonenumberField',
           placeholder: '',
           prefix: '',

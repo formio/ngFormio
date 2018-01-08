@@ -58,7 +58,7 @@ module.exports = function(app) {
           components: [],
           multiple: false,
           tableView: true,
-          label: '',
+          label: 'Edit Grid',
           key: 'editgrid',
           protected: false,
           persistent: true,

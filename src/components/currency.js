@@ -13,7 +13,7 @@ module.exports = function(app) {
           tableView: true,
           inputType: 'text',
           inputMask: '',
-          label: '',
+          label: 'Currency Field',
           key: 'currencyField',
           placeholder: '',
           prefix: '',
