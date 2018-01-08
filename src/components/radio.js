@@ -24,6 +24,7 @@ module.exports = function(app) {
           values: [],
           defaultValue: '',
           protected: false,
+          fieldSet:false,
           persistent: true,
           hidden: false,
           clearOnHide: true,
