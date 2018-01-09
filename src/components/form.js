@@ -10,7 +10,7 @@ module.exports = function(app) {
         template: 'formio/components/form.html',
         group: 'advanced',
         settings: {
-          clearOnHide: false,
+          clearOnHide: true,
           input: true,
           tableView: true,
           key: 'formField',
