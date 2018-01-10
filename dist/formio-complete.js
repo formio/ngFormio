@@ -1,4 +1,4 @@
-/*! ng-formio v2.27.0 | https://unpkg.com/ng-formio@2.27.0/LICENSE.txt */
+/*! ng-formio v2.27.1 | https://unpkg.com/ng-formio@2.27.1/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 (function (root, factory) {
   // AMD
@@ -50644,25 +50644,21 @@ var FormioUtils = {
    * @param data
    *   The full submission data.
    */
-  checkCalculated: function checkCalculated(component, submission, data) {
+  checkCalculated: function checkCalculated(component, submission, rowData) {
     // Process calculated value stuff if present.
     if (component.calculateValue) {
-      var row = data;
-      data = submission ? submission.data : data;
+      var row = rowData;
+      var data = submission ? submission.data : rowData;
       if ((0, _isString3.default)(component.calculateValue)) {
         try {
           var util = this;
-          data[component.key] = eval('(function(data, row, util) { var value = [];' + component.calculateValue.toString() + '; return value; })(data, row, util)');
+          rowData[component.key] = eval('(function(data, row, util) { var value = [];' + component.calculateValue.toString() + '; return value; })(data, row, util)');
         } catch (e) {
           console.warn('An error occurred calculating a value for ' + component.key, e);
         }
       } else {
         try {
-          data[component.key] = this.jsonLogic.apply(component.calculateValue, {
-            data: data,
-            row: row,
-            _: _lodash2.default
-          });
+          rowData[component.key] = this.jsonLogic.apply(component.calculateValue, { data: data, row: row, _: _lodash2.default });
         } catch (e) {
           console.warn('An error occurred calculating a value for ' + component.key, e);
         }
