@@ -35537,6 +35537,14 @@ module.exports = function(app) {
         $scope.component.fileMaxSize = '1GB';
       }
 
+      $scope.$watch('data.' + $scope.component.key, function(value) {
+        // For some reason required validation doesn't fire properly after removing an item from an array which results
+        // in an empty array that is marked as valid. Fix by removing the empty array.
+        if (Array.isArray(value) && value.length === 0) {
+          delete $scope.data[$scope.component.key];
+        }
+      }, true)
+
       $scope.upload = function(files) {
         if ($scope.component.storage && files && files.length) {
           angular.forEach(files, function(file) {
