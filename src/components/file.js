@@ -169,12 +169,10 @@ module.exports = function(app) {
 
   app.controller('formioFileUpload', [
     '$scope',
-    '$element',
     '$interpolate',
     'FormioUtils',
     function(
       $scope,
-      $element,
       $interpolate,
       FormioUtils
     ) {
@@ -195,7 +193,6 @@ module.exports = function(app) {
         $scope.component.fileMaxSize = '1GB';
       }
 
-      var ngModel = $element.controller('ngModel');
       $scope.$watch('data.' + $scope.component.key, function(value) {
         // For some reason required validation doesn't fire properly after removing an item from an array which results
         // in an empty array that is marked as valid. Fix by removing the empty array.
