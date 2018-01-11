@@ -9,8 +9,8 @@
         ng-if="options.building ? '::true' : anyVisible(col)"
       >{{ col.label | formioTranslate:null:options.building }}</th>
       <th style="padding-left: 9px;">
-        <div style="padding: 0; margin-bottom: 0;" class="datagrid-add" ng-if="!component.hasOwnProperty('validate') || !component.validate.hasOwnProperty('maxLength') || rows.length < component.validate.maxLength">
-          <a ng-if="component.addAnotherPosition === 'top' || component.addAnotherPosition === 'both'" ng-click="(readOnly || formioForm.submitting)? null: addRow() " ng-disabled = "readOnly || formioForm.submitting" class="btn btn-primary">
+        <div style="padding: 0; margin-bottom: 0;" class="datagrid-add" ng-if="(!component.hasOwnProperty('validate') || !component.validate.hasOwnProperty('maxLength') || rows.length < component.validate.maxLength) && (component.addAnotherPosition === 'top' || component.addAnotherPosition === 'both')">
+          <a ng-click="(readOnly || formioForm.submitting)? null: addRow() " ng-disabled = "readOnly || formioForm.submitting" class="btn btn-primary">
             <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {{ "" | formioTranslate:null:options.building }}
           </a>
         </div>
@@ -39,8 +39,8 @@
       </td>
     </tr>
   </table>
-  <div style="margin-top: 10px" class="datagrid-add" ng-if="!component.hasOwnProperty('validate') || !component.validate.hasOwnProperty('maxLength') || rows.length < component.validate.maxLength">
-    <a ng-if="component.addAnotherPosition === 'bottom' || component.addAnotherPosition === 'both'" ng-click="(readOnly || formioForm.submitting)? null: addRow() " ng-disabled = "readOnly || formioForm.submitting" class="btn btn-primary">
+  <div style="margin-top: 10px" class="datagrid-add" ng-if="(!component.hasOwnProperty('validate') || !component.validate.hasOwnProperty('maxLength') || rows.length < component.validate.maxLength) && (!component.addAnotherPosition || component.addAnotherPosition === 'bottom' || component.addAnotherPosition === 'both')">
+    <a ng-click="(readOnly || formioForm.submitting)? null: addRow() " ng-disabled = "readOnly || formioForm.submitting" class="btn btn-primary">
       <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {{ component.addAnother || "Add Another" | formioTranslate:null:options.building }}
     </a>
   </div>
