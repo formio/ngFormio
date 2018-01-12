@@ -202,9 +202,16 @@ module.exports = function(app) {
       }, true)
 
       $scope.invalidFiles = [];
-      $scope.validateFiles = function(fileErrors) {
-        if (fileErrors.length) {
-          angular.forEach(fileErrors, function(fileError) {
+      $scope.currentErrors = [];
+      $scope.upload = function(files, newFiles, invalidFiles) {
+        if (invalidFiles.length) {
+          angular.forEach(invalidFiles, function(fileError) {
+            if (fileError.$error === 'pattern') {
+              if (!$scope.component.validate) {
+                $scope.component.validate = {};
+              }
+              $scope.component.validate.pattern = $scope.component.filePattern;
+            }
             if (fileError.$error === 'maxSize') {
               fileError.$error = 'custom';
               $scope.component.customError = 'File size is larger than the allowed ' + $scope.component.fileMaxSize;
@@ -214,15 +221,21 @@ module.exports = function(app) {
               $scope.component.customError = 'File size is smaller than the allowed ' + $scope.component.fileMinSize;
             }
 
+            $scope.currentErrors.push(fileError.$error);
             $scope.formioForm[$scope.componentId].$setValidity(fileError.$error, false);
             $scope.formioForm[$scope.componentId].$setDirty();
           });
+          return;
         }
-      };
+        else {
+          angular.forEach($scope.currentErrors, function(err) {
+            $scope.formioForm[$scope.componentId].$setValidity(err, true);
+          });
+          $scope.currentErrors = [];
+        }
 
-      $scope.upload = function(files) {
-        if ($scope.component.storage && files && files.length) {
-          angular.forEach(files, function(file) {
+        if ($scope.component.storage && newFiles && newFiles.length) {
+          angular.forEach(newFiles, function(file) {
             // Get a unique name for this file to keep file collisions from occurring.
             var fileName = FormioUtils.uniqueName(file.name);
             $scope.fileUploads[fileName] = {

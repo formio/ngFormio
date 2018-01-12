@@ -8,27 +8,24 @@
   <formio-file-list files="data[component.key]" form="formio.formUrl" ng-if="!component.image" ng-required="isRequired(component)" ng-model="data[component.key]" name="{{ componentId }}"></formio-file-list>
   <formio-image-list files="data[component.key]" form="formio.formUrl" width="component.imageSize" ng-if="component.image" ng-required="isRequired(component)" ng-model="data[component.key]" name="{{ componentId }}"></formio-image-list>
   <div ng-if="!readOnly && (component.multiple || (!component.multiple && !data[component.key].length))">
-    <div ngf-drop="upload($files)"
+    <div ngf-drop="upload($files, $newFiles, $invalidFiles)"
       class="fileSelector"
       ngf-drag-over-class="'fileDragOver'"
       ngf-pattern="component.filePattern"
       ngf-min-size="component.fileMinSize"
       ngf-max-size="component.fileMaxSize"
       ngf-multiple="component.multiple"
-      ngf-model-invalid="invalidFiles"
-      ngf-change="validateFiles($invalidFiles)"
       id="{{ componentId }}"
       name="{{ componentId }}">
       <span class="glyphicon glyphicon-cloud-upload"></span>Drop files to attach, or
       <a style="cursor: pointer;"
-        ngf-select="upload($files)"
+        ngf-select="upload($files, $newFiles, $invalidFiles)"
+        ngf-change="upload($files, $newFiles, $invalidFiles)"
         tabindex="{{ component.tabindex || 0 }}"
         ngf-pattern="component.filePattern"
         ngf-min-size="component.fileMinSize"
         ngf-max-size="component.fileMaxSize"
-        ngf-multiple="component.multiple"
-        ngf-model-invalid="invalidFiles"
-        ngf-change="validateFiles($invalidFiles)">browse</a>.
+        ngf-multiple="component.multiple">browse</a>.
     </div>
     <div ng-if="!component.storage" class="alert alert-warning">No storage has been set for this field. File uploads are disabled until storage is set up.</div>
     <div ngf-no-file-drop>File Drag/Drop is not supported for this browser</div>
