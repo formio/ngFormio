@@ -201,6 +201,25 @@ module.exports = function(app) {
         }
       }, true)
 
+      $scope.invalidFiles = [];
+      $scope.validateFiles = function(fileErrors) {
+        if (fileErrors.length) {
+          angular.forEach(fileErrors, function(fileError) {
+            if (fileError.$error === 'maxSize') {
+              fileError.$error = 'custom';
+              $scope.component.customError = 'File size is larger than the allowed ' + $scope.component.fileMaxSize;
+            }
+            if (fileError.$error === 'minSize') {
+              fileError.$error = 'custom';
+              $scope.component.customError = 'File size is smaller than the allowed ' + $scope.component.fileMinSize;
+            }
+
+            $scope.formioForm[$scope.componentId].$setValidity(fileError.$error, false);
+            $scope.formioForm[$scope.componentId].$setDirty();
+          });
+        }
+      };
+
       $scope.upload = function(files) {
         if ($scope.component.storage && files && files.length) {
           angular.forEach(files, function(file) {
