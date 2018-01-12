@@ -203,7 +203,7 @@ module.exports = function(app) {
 
       $scope.invalidFiles = [];
       $scope.currentErrors = [];
-      $scope.upload = function(files, newFiles, invalidFiles) {
+      $scope.upload = function(files, invalidFiles) {
         if (invalidFiles.length) {
           angular.forEach(invalidFiles, function(fileError) {
             if (fileError.$error === 'pattern') {
@@ -232,8 +232,8 @@ module.exports = function(app) {
           $scope.currentErrors = [];
         }
 
-        if ($scope.component.storage && newFiles && newFiles.length) {
-          angular.forEach(newFiles, function(file) {
+        if ($scope.component.storage && files && files.length) {
+          angular.forEach(files, function(file) {
             // Get a unique name for this file to keep file collisions from occurring.
             var fileName = FormioUtils.uniqueName(file.name);
             $scope.fileUploads[fileName] = {
