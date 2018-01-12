@@ -207,10 +207,8 @@ module.exports = function(app) {
         if (invalidFiles.length) {
           angular.forEach(invalidFiles, function(fileError) {
             if (fileError.$error === 'pattern') {
-              if (!$scope.component.validate) {
-                $scope.component.validate = {};
-              }
-              $scope.component.validate.pattern = $scope.component.filePattern;
+              fileError.$error = 'custom';
+              $scope.component.customError = 'File extension does not match the pattern ' + $scope.component.filePattern;
             }
             if (fileError.$error === 'maxSize') {
               fileError.$error = 'custom';
