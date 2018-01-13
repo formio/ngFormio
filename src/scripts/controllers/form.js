@@ -1,6 +1,6 @@
 'use strict';
 
-/* global _: false, jQuery: false, document: false, Promise: false */
+/* global _: false, document: false, Promise: false */
 var app = angular.module('formioApp.controllers.form', [
   'ngDialog',
   'ui.bootstrap.tabs',
@@ -1151,12 +1151,14 @@ app.controller('FormShareController', ['$scope', function($scope) {
     if ($scope.options.auth) {
       $scope.previewUrl += '&auth=1';
     }
-    jQuery('#form-preview').html(jQuery(document.createElement('iframe')).attr({
-      style: 'width: 100%;',
-      id: 'share-preview',
-      src: $scope.previewUrl
-    }));
-    jQuery('#share-preview').seamless({
+    var formPreview = document.getElementById('form-preview');
+    formPreview.innerHTML = '';
+    var iframe = document.createElement('iframe');
+    iframe.setAttribute('style', 'width: 100%');
+    iframe.setAttribute('id', 'share-preview');
+    iframe.setAttribute('src', $scope.previewUrl);
+    formPreview.appendChild(iframe);
+    window.seamless(document.getElementById('share-preview'), {
       spinner: '',
       loading: 'Loading ...'
     });

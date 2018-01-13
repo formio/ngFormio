@@ -693,6 +693,7 @@ angular
       };
 
       $scope.projects = {};
+      $scope.projectSearch = {};
       $scope.projectsLoaded = false;
       // TODO: query for unlimited projects instead of this limit
       var _projectsPromise = Formio.loadProjects('?limit=9007199254740991&sort=-modified&project__exists=false')
@@ -706,7 +707,7 @@ angular
         })
         .then(function(projects) {
           $scope.projectsLoaded = true;
-          angular.element('#projects-loader').hide();
+          document.getElementById('projects-loader').style.display = 'none';
           $scope.projects = projects;
           $scope.teamsEnabled = _.some(projects, function(project) {
             project.plan = project.plan || '';
